@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "packages/rnjs",
+    "packages/rnjs2"
+  ],
+  "devDependencies": {}
+}

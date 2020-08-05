@@ -1,0 +1,11 @@
+{
+  "name": "rnjs",
+  "license": "MIT",
+  "version": "1.0.0",
+  "scripts": {
+    "echo": "echo 'hello rnjs1!'"
+  },
+  "devDependencies": {
+    "cross-env": "5.0.5"
+  }
+}
