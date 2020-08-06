@@ -1,3 +1,3 @@
 # mono
 
-monorepo for nodejs projects.
+A monorepo for nodejs projects.
