@@ -1,9 +1,24 @@
 {
   "name": "rnjs",
+  "version": "1.2.0",
+  "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
-  "version": "1.0.0",
+  "author": "noshiro",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "echo": "echo 'hello rnjs1!'"
+    "prebuild": "rimraf lib",
+    "build": "webpack",
+    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "script_genindex": "bash ../../scripts/index_ts_generator.sh",
+    "gi": "yarn script_genindex ./src",
+    "script_formatglob": "node ../../scripts-dist/format_glob",
+    "script_formatchanged": "node ../../scripts-dist/format_changed",
+    "fmtall": "yarn script_formatglob \"./src/**/*.{ts,tsx}\"",
+    "fmtstaged": "yarn script_formatchanged",
+    "fmt": "yarn script_formatchanged master",
+    "compilewebpackconfig": "tsc ./webpack.config.ts && prettier --write ./webpack.config.js",
+    "test": "jest --watch --config jest.config.json"
   },
   "devDependencies": {
     "cross-env": "5.0.5"

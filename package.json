@@ -1,6 +1,7 @@
 {
   "private": true,
   "license": "MIT",
+  "description": "monorepo for nodejs projects",
   "workspaces": [
     "packages/rnjs2",
     "packages/rnjs"
