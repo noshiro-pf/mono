@@ -2,7 +2,8 @@
   "private": true,
   "license": "MIT",
   "workspaces": [
-    "packages/*"
+    "packages/rnjs2",
+    "packages/rnjs"
   ],
   "scripts": {
     "precompilescripts": "rimraf scripts-dist",
