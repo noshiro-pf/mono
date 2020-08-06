@@ -12,7 +12,7 @@ const organizeImportsAndRunPrettier = (
   sourceFiles: tsm.SourceFile[],
   prettierOptions: prettier.Options
 ): void => {
-  sourceFiles.forEach(sourceFile => {
+  sourceFiles.forEach((sourceFile) => {
     sourceFile.organizeImports();
 
     // run prettier

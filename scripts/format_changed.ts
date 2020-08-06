@@ -10,7 +10,7 @@ type FileName = string;
 
 const commands = {
   gitAdd: 'git add .',
-  gitDiff: `git diff --name-only --diff-filter=ACMTUXB --relative --staged ${gitCommitId}`
+  gitDiff: `git diff --name-only --diff-filter=ACMTUXB --relative --staged ${gitCommitId}`,
 };
 
 const gitAdd = async () => {
@@ -41,7 +41,7 @@ const gitDiff = async (): Promise<FileName[]> => {
 
 const filterChangedTsFiles = (updatedFiles: FileName[]) =>
   updatedFiles.filter(
-    filename => filename.endsWith('.ts') || filename.endsWith('.tsx')
+    (filename) => filename.endsWith('.ts') || filename.endsWith('.tsx')
   );
 
 const main = async () => {
@@ -51,7 +51,7 @@ const main = async () => {
   const tsFiles = filterChangedTsFiles(updatedFiles);
 
   console.log(`target files (${tsFiles.length} files):`);
-  tsFiles.forEach(filename => console.log(`- ${filename}`));
+  tsFiles.forEach((filename) => console.log(`- ${filename}`));
 
   await organizeImportsAndRunPrettierWithIO(tsFiles);
 

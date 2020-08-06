@@ -13,14 +13,17 @@
     "pwd": "bash -c pwd",
     "genindex": "bash ../../scripts/test.sh",
     "gi": "yarn genindex ./src",
-    "fmtall": "node ../../scripts-dist/format_glob \"./src/**/*.{ts,tsx}\"",
-    "formatchangedscript": "node ../../scripts-dist/format_changed",
-    "fmtstaged": "yarn formatchangedscript",
-    "fmt": "yarn formatchangedscript master",
-    "gen-pipable-type-def": "export TARGET_FILE='./src/abstract_class/pipable.ts' && node ./scripts-dist/gen_pipable_type_def 12 $TARGET_FILE && node ./scripts-dist/format_glob $TARGET_FILE",
-    "test": "jest --watch"
+    "script_formatglob": "node ../../scripts-dist/format_glob",
+    "script_formatchanged": "node ../../scripts-dist/format_changed",
+    "fmtall": "yarn script_formatglob \"./src/**/*.{ts,tsx}\"",
+    "fmtstaged": "yarn script_formatchanged",
+    "fmt": "yarn script_formatchanged master",
+    "genpipabletypedef": "export TARGET_FILE='./src/abstract_class/pipable.ts' && node ./scripts-dist/gen_pipable_type_def 12 $TARGET_FILE && yarn script_formatglob $TARGET_FILE",
+    "test": "jest --watch --config jest.config.json"
   },
   "devDependencies": {
-    "cross-env": "5.0.5"
+    "cross-env": "5.0.5",
+    "@types/jest": "^26.0.8",
+    "jest": "^26.2.2"
   }
 }
