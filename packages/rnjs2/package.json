@@ -1,9 +1,25 @@
 {
   "name": "rnjs2",
-  "license": "MIT",
   "version": "1.0.0",
+  "description": "Reactive Programming Library for TypeScript/JavaScript",
+  "license": "MIT",
+  "main": "index.js",
   "scripts": {
-    "echo": "echo 'hello rnjs2!'"
+    "prebuild": "rimraf lib",
+    "build": "webpack",
+    "prestart": "rimraf dist",
+    "start": "tsc --project tsconfig.dev.json && node dist/test/preview-main.js",
+    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "pwd": "bash -c pwd",
+    "genindex": "bash ../../scripts/test.sh",
+    "gi": "yarn genindex ./src",
+    "fmtall": "node ../../scripts-dist/format_glob \"./src/**/*.{ts,tsx}\"",
+    "formatchangedscript": "node ../../scripts-dist/format_changed",
+    "fmtstaged": "yarn formatchangedscript",
+    "fmt": "yarn formatchangedscript master",
+    "compilewebpackconfig": "tsc ./webpack.config.ts && prettier --write ./webpack.config.js",
+    "gen-pipable-type-def": "export TARGET_FILE='./src/abstract_class/pipable.ts' && node ./scripts-dist/gen_pipable_type_def 12 $TARGET_FILE && node ./scripts-dist/format_glob $TARGET_FILE",
+    "test": "jest --watch"
   },
   "devDependencies": {
     "cross-env": "5.0.5"
