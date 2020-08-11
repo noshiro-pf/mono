@@ -1,4 +1,6 @@
 node_modules
-dist
-scripts-dist
-webpack.config.js
+**/build
+**/dist
+scripts/*.js
+**/scripts_dist
+**/.env

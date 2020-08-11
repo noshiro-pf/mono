@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fafafa;
+}
+
+* {
+  /* font-family: "Helvetica","Arial",sans-serif; */
+
+  font-family: 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+
+  box-sizing: border-box;
+
+  /* Material buttonのテキストの大文字化を防止 */
+  text-transform: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1,
+h2 {
+  position: relative;
+}
+h1 {
+  border-bottom: solid 3px #cce4ff;
+}
+h2 {
+  border-bottom: solid 2px #e8d8b9;
+}
+
+h1:after,
+h2:after {
+  position: absolute;
+  content: ' ';
+  display: block;
+  width: 20%;
+}
+h1:after {
+  bottom: -3px;
+  border-bottom: solid 3px #5472cd;
+}
+h2:after {
+  bottom: -2px;
+  border-bottom: solid 2px #cda354;
+}

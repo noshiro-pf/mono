@@ -1,14 +1,20 @@
 {
   "private": true,
-  "license": "MIT",
   "description": "monorepo for nodejs projects",
+  "license": "MIT",
   "workspaces": [
-    "packages/rnjs2",
-    "packages/rnjs"
+    "packages/*"
   ],
   "scripts": {
-    "precompilescripts": "rimraf scripts-dist",
-    "compilescripts": "tsc --project ./scripts/tsconfig.json"
+    "compilereactconfig": "tsc --project ${npm_package_config_react_config_dir}/tsconfig.reactconfig.json",
+    "postcompilereactconfig": "prettier --write \"${npm_package_config_react_config_dir}/*.js\"",
+    "precompilescripts": "rimraf scripts_dist",
+    "compilescripts": "tsc --project ./scripts/tsconfig.json",
+    "sortpackagejson": "sort-package-json \"package.json\" \"packages/*/package.json\"",
+    "build:my_profile_app": "npm --prefix packages/my_profile_app run build"
+  },
+  "config": {
+    "react_config_dir": "config/react"
   },
   "devDependencies": {
     "@types/jest": "^26.0.8",
@@ -23,6 +29,7 @@
     "jest": "^26.2.2",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
+    "sort-package-json": "^1.44.0",
     "ts-jest": "^26.1.4",
     "ts-loader": "^8.0.2",
     "ts-morph": "^7.1.3",
