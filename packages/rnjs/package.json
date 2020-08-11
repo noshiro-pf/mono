@@ -7,10 +7,10 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "_script_formatchanged": "node ../../scripts_dist/format_changed",
-    "_script_formatglob": "node ../../scripts_dist/format_glob",
-    "_script_genindex": "bash ../../scripts/index_ts_generator.sh",
-    "prebuild": "rimraf lib",
+    "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
+    "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
+    "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
+    "prebuild": "rimraf ${npm_package_config_lib_dir}",
     "build": "webpack",
     "compilewebpackconfig": "tsc ./webpack.config.ts && prettier --write ./webpack.config.js",
     "fmt": "yarn _script_formatchanged master",
@@ -20,7 +20,8 @@
     "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
     "test": "jest --watch --config jest.config.json"
   },
-  "devDependencies": {
-    "cross-env": "5.0.5"
+  "config": {
+    "lib_dir": "lib",
+    "scripts_dir": "../../scripts"
   }
 }

@@ -1,7 +1,8 @@
 import * as prettier from 'prettier';
 import * as tsm from 'ts-morph';
+import { cwd } from './cwd';
 
-const project = new tsm.Project({ tsConfigFilePath: 'tsconfig.json' });
+const project = new tsm.Project({ tsConfigFilePath: `${cwd()}/tsconfig.json` });
 
 const getPrettierrc = async (): Promise<prettier.Options | undefined> => {
   const prettierOptions = await prettier.resolveConfig('.prettierrc');

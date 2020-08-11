@@ -19,7 +19,7 @@
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
-    "project": "./config/tsconfig.eslint.json"
+    "project": "./tsconfig.eslint.json"
     // "tsconfigRootDir": "./"
   },
   "rules": {

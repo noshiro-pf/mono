@@ -4,8 +4,8 @@
   "license": "MIT",
   "author": "noshiro",
   "scripts": {
-    "_script_formatchanged": "node ${npm_package_config_scripts_dist_dir}/format_changed",
-    "_script_formatglob": "node ${npm_package_config_scripts_dist_dir}/format_glob",
+    "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
+    "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
     "prebuild": "rimraf ${npm_package_config_dist_dir}",
     "build": "webpack --config ${npm_package_config_config_dir}/webpack.prod.js",
@@ -16,7 +16,7 @@
     "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
     "fmtstaged": "yarn _script_formatchanged",
     "gi": "yarn _script_genindex ./src",
-    "lint": "eslint --config \"${npm_package_config_config_dir}/.eslintrc.json\" src/ --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint --config \"${npm_package_config_eslintrc_path}\" src/ --ext .js,.jsx,.ts,.tsx",
     "serve": "http-server ${npm_package_config_dist_dir}",
     "start": "webpack-dev-server --config ${npm_package_config_config_dir}/webpack.dev.js",
     "test": "jest --watch --config ${npm_package_config_config_dir}/jest.config.json"
@@ -24,9 +24,9 @@
   "config": {
     "config_dir": "config",
     "dist_dir": "build",
+    "eslintrc_path": ".eslintrc.json",
     "public_dir": "public",
-    "scripts_dir": "../../scripts",
-    "scripts_dist_dir": "../../scripts_dist"
+    "scripts_dir": "../../scripts"
   },
   "browserslist": {
     "production": [
@@ -49,40 +49,5 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "styled-components": "^5.1.1"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/compression-webpack-plugin": "^4.0.0",
-    "@types/dotenv-webpack": "^1.8.0",
-    "@types/node": "^14.0.27",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
-    "@types/react-hot-loader": "^4.1.1",
-    "@types/react-router": "^5.1.8",
-    "@types/react-router-dom": "^5.1.5",
-    "@types/styled-components": "^5.1.2",
-    "@types/terser-webpack-plugin": "^4.0.0",
-    "@types/webpack-bundle-analyzer": "^3.8.0",
-    "@types/webpack-dev-server": "^3.11.0",
-    "compression-webpack-plugin": "^4.0.0",
-    "cpx": "^1.5.0",
-    "css-loader": "^4.2.1",
-    "dotenv": "^8.2.0",
-    "dotenv-webpack": "^2.0.0",
-    "eslint-plugin-react": "^7.20.5",
-    "eslint-plugin-react-hooks": "^4.0.8",
-    "html-webpack-plugin": "^4.3.0",
-    "http-server": "^0.12.3",
-    "package-size": "^2.3.0",
-    "react-hot-loader": "^4.12.21",
-    "rimraf": "^3.0.2",
-    "source-map-loader": "^1.0.1",
-    "style-loader": "^1.2.1",
-    "terser-webpack-plugin": "^4.0.0",
-    "webpack-bundle-analyzer": "^3.8.0",
-    "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^5.1.1"
   }
 }
