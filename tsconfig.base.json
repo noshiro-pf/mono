@@ -1,12 +1,19 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "importHelpers": true,
-    "downlevelIteration": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "isolatedModules": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "importHelpers": true,
     "newLine": "lf",
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -14,13 +21,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "jsx": "react",
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "suppressImplicitAnyIndexErrors": true
   }
 }
