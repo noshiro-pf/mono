@@ -24,13 +24,14 @@
     "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
     "prestart": "rimraf ${npm_package_config_dist_dir}",
     "start": "tsc --project \"${npm_package_config_config_dir}/tsconfig.dev.json\" && node ${npm_package_config_dist_dir}/test/preview-main.js",
-    "test": "jest --watch --config ${npm_package_config_config_dir}/jest.config.json"
+    "test": "jest --watch --config ${npm_package_config_jest_config_path}"
   },
   "config": {
     "config_dir": "config",
     "dist_dir": "dist",
     "lib_dir": "lib",
     "scripts_dir": "../../scripts",
-    "scripts_local_dir": "./scripts"
+    "scripts_local_dir": "./scripts",
+    "jest_config_path": "./jest.config.json"
   }
 }
