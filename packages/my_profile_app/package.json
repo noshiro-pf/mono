@@ -6,7 +6,6 @@
   "scripts": {
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
-    "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
     "prebuild": "rimraf ${npm_package_config_dist_dir}",
     "build": "webpack --config ${npm_package_config_config_dir}/webpack.prod.js",
     "postbuild": "cpx \"${npm_package_config_public_dir}/**\" \"${npm_package_config_dist_dir}\"",
@@ -15,7 +14,6 @@
     "fmt": "yarn _script_formatchanged master",
     "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
     "fmtstaged": "yarn _script_formatchanged",
-    "gi": "yarn _script_genindex ./src",
     "lint": "eslint --config \"${npm_package_config_eslintrc_path}\" src/ --ext .js,.jsx,.ts,.tsx",
     "serve": "http-server ${npm_package_config_dist_dir}",
     "start": "webpack-dev-server --config ${npm_package_config_config_dir}/webpack.dev.js",

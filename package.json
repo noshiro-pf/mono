@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "build:my_profile_app": "npm --prefix packages/my_profile_app run build",
-    "compilereactconfig": "tsc --project ${npm_package_config_react_config_dir}/tsconfig.reactconfig.json",
+    "compilereactconfig": "tsc --project \"${npm_package_config_react_config_dir}/tsconfig.reactconfig.json\"",
     "postcompilereactconfig": "prettier --write \"${npm_package_config_react_config_dir}/*.js\"",
     "precompilescripts": "rimraf scripts/*.js",
     "compilescripts": "tsc --project ./scripts/tsconfig.json",

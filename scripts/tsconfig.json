@@ -5,5 +5,6 @@
     "isolatedModules": false,
     "module": "commonjs"
   },
-  "include": ["./*.ts"]
+  "include": ["./*.ts"],
+  "exclude": ["./*.js"]
 }
