@@ -1,7 +1,7 @@
 import { binarySearch, halfInt, mapNullable } from './utils';
 
 describe('mapNullable', () => {
-  const sq = (x: number) => x ** 2;
+  const sq = (x: number): number => x ** 2;
   test('case 1', () => {
     expect(mapNullable(sq)(2)).toBe(4);
   });

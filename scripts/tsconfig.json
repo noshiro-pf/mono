@@ -1,9 +1,10 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../scripts_dist",
+    "outDir": "./",
     "isolatedModules": false,
     "module": "commonjs"
   },
-  "include": ["./*.ts"]
+  "include": ["./*.ts"],
+  "exclude": ["./*.js"]
 }

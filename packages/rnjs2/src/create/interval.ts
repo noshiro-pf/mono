@@ -1,5 +1,6 @@
 import { ManagerRNClass, RN } from '../abstract_class';
 import { none } from '../util';
+import { TimerId } from '../types';
 
 export const interval = (millisec: number): IntervalRN =>
   new IntervalRNClass(millisec);
@@ -11,7 +12,7 @@ export interface IntervalRN extends RN<number> {
 
 class IntervalRNClass extends ManagerRNClass<number> implements IntervalRN {
   private millisec: number;
-  private timerId: NodeJS.Timeout | undefined;
+  private timerId: TimerId | undefined;
   private counter: number = 0;
 
   constructor(millisec: number) {
@@ -19,7 +20,7 @@ class IntervalRNClass extends ManagerRNClass<number> implements IntervalRN {
     this.millisec = millisec;
   }
 
-  start() {
+  start(): void {
     if (this.isCompleted) return;
     this.isUpdated = true;
     this.update(0);
@@ -29,7 +30,7 @@ class IntervalRNClass extends ManagerRNClass<number> implements IntervalRN {
     }, this.millisec);
   }
 
-  stop() {
+  stop(): void {
     this.complete();
   }
 

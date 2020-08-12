@@ -23,6 +23,7 @@ class CombineLatestRNClass<A extends RN<any>[]> extends RNClass<Unwrap<A>>
       if (this.parents.some((a) => isNone(a.currentValue))) return false;
       if (this.parents.every((a) => !a.isUpdated)) return false;
       const currValues = this.parents.map(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         (a) => (a.currentValue as Some<any>).value
       );
       this.update(currValues as Unwrap<A>);

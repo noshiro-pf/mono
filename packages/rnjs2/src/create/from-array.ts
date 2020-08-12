@@ -16,7 +16,7 @@ class FromArrayRNClass<A> extends ManagerRNClass<A> implements FromArrayRN<A> {
     this._values = values;
   }
 
-  emit() {
+  emit(): void {
     if (this.isCompleted) return;
     this._values.forEach((v) => {
       this.update(v);

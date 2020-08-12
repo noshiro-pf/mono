@@ -1,5 +1,5 @@
 import { ManagerOperatorRNClass, RN } from '../abstract_class';
-import { Operator } from '../types';
+import { Operator, TimerId } from '../types';
 import { monoParentTryUpdate, none } from '../util';
 
 export const debounceTime = <A>(millisec: number): Operator<A, A> => (
@@ -8,7 +8,7 @@ export const debounceTime = <A>(millisec: number): Operator<A, A> => (
 
 class DebounceTimeRNClass<A> extends ManagerOperatorRNClass<A, A>
   implements RN<A> {
-  private timerId: NodeJS.Timeout | undefined;
+  private timerId: TimerId | undefined;
   private millisec: number;
 
   constructor(parent: RN<A>, millisec: number) {

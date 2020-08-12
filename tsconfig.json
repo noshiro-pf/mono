@@ -1,0 +1,6 @@
+{
+  // for VSCode
+  "compilerOptions": {
+    "typeRoots": ["node_modules/@types", "packages/**/node_modules/@types"]
+  }
+}

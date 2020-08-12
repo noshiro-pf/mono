@@ -1,9 +1,9 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "sourceMap": true,
     "allowJs": true,
     "module": "esnext"
   },
-  "include": ["../packages", "../scripts", "../config"]
+  "include": ["./packages", "./scripts", "./config"]
 }

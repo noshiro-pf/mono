@@ -1,5 +1,5 @@
 import { ManagerOperatorRNClass, RN } from '../abstract_class';
-import { Operator } from '../types';
+import { Operator, TimerId } from '../types';
 import { isNone, monoParentTryUpdate, none, Option, some } from '../util';
 
 export const throttleTime = <A>(millisec: number): Operator<A, A> => (
@@ -8,7 +8,7 @@ export const throttleTime = <A>(millisec: number): Operator<A, A> => (
 
 class ThrottleTimeRNClass<A> extends ManagerOperatorRNClass<A, A>
   implements RN<A> {
-  private timerId: NodeJS.Timeout | undefined;
+  private timerId: TimerId | undefined;
   private millisec: number;
   private isSkippingInput: boolean;
   private nextValueCandidate: Option<A>;
