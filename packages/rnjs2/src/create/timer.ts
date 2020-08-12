@@ -1,5 +1,6 @@
 import { ManagerRNClass, RN } from '../abstract_class';
 import { none } from '../util';
+import { TimerId } from '../types';
 
 export const timer = (millisec: number): TimerRN => new TimerRNClass(millisec);
 
@@ -10,14 +11,14 @@ export interface TimerRN extends RN<number> {
 
 class TimerRNClass extends ManagerRNClass<number> implements TimerRN {
   private millisec: number;
-  private timerId: NodeJS.Timeout | undefined;
+  private timerId: TimerId | undefined;
 
   constructor(millisec: number) {
     super('source', 0, [], none, false);
     this.millisec = millisec;
   }
 
-  start() {
+  start(): void {
     if (this.isCompleted) return;
     this.isUpdated = true;
     this.update(0);
@@ -26,7 +27,7 @@ class TimerRNClass extends ManagerRNClass<number> implements TimerRN {
     }, this.millisec);
   }
 
-  stop() {
+  stop(): void {
     this.complete();
   }
 

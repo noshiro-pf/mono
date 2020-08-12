@@ -1,8 +1,9 @@
-import { fromArray } from '../../src/create';
+import { fromArray, FromArrayRN } from '../../src/create';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
 
-const createStream = () => fromArray([1, 1, 2, 3, 5, 8, 13, 21, 34]);
+const createStream = (): FromArrayRN<number> =>
+  fromArray([1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
 
 export const fromArrayTestCases: StreamTestCase<number>[] = [
   {

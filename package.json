@@ -11,7 +11,8 @@
     "postcompilereactconfig": "prettier --write \"${npm_package_config_react_config_dir}/*.js\"",
     "precompilescripts": "rimraf scripts/*.js",
     "compilescripts": "tsc --project ./scripts/tsconfig.json",
-    "sortpackagejson": "sort-package-json \"package.json\" \"packages/*/package.json\""
+    "sortpackagejson": "sort-package-json \"package.json\" \"packages/*/package.json\"",
+    "testall": "yarn workspaces run test"
   },
   "config": {
     "react_config_dir": "config/react"
@@ -61,7 +62,7 @@
     "source-map-loader": "^1.0.1",
     "style-loader": "^1.2.1",
     "terser-webpack-plugin": "^4.0.0",
-    "ts-jest": "^26.1.4",
+    "ts-jest": "^26.2.0",
     "ts-loader": "^8.0.2",
     "ts-morph": "^7.2.0",
     "ts-node": "^8.10.2",

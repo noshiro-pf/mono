@@ -1,5 +1,5 @@
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.react.base.json",
   "compilerOptions": {
     "sourceMap": true,
     "allowJs": true,

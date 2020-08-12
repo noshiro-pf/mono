@@ -27,3 +27,5 @@ export type Subscribable<A> = {
     complete?: () => void
   ): Subscription;
 };
+
+export type TimerId = any; // NodeJS.Timeout or number

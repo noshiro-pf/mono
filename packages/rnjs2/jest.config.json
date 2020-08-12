@@ -1,5 +1,6 @@
 {
   "moduleFileExtensions": ["ts", "js"],
+  "roots": ["<rootDir>/src", "<rootDir>/test"],
   "transform": {
     "^.+\\.ts$": "ts-jest"
   },
@@ -8,5 +9,5 @@
       "tsConfig": "tsconfig.test.json"
     }
   },
-  "testMatch": ["**/*.test.+(ts|js)"]
+  "testMatch": ["**/(test|src)/**/?(*.)+(spec|test).ts"]
 }
