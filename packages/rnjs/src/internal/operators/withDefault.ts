@@ -15,9 +15,9 @@ class WithDefaultValueRN<T> extends RN<T> {
     this.defaultValue = defaultValue;
   }
 
-  protected fire() {
+  protected fire(): void {
     const src = this.parents[0];
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
-    this.fireWith(src.value || this.defaultValue);
+    this.fireWith(src.value ?? this.defaultValue);
   }
 }

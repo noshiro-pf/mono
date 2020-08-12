@@ -15,7 +15,7 @@ class DebounceRN<T> extends RN<T> {
     this.time = time;
   }
 
-  protected fire() {
+  protected fire(): void {
     clearTimeout(this.timerId);
 
     this.timerId = setTimeout(() => {
@@ -23,7 +23,7 @@ class DebounceRN<T> extends RN<T> {
     }, this.time);
   }
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     clearTimeout(this.timerId);
   }

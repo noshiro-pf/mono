@@ -18,18 +18,18 @@ class TakeUntilRN<T> extends RN<T> {
 
   constructor(src: RN<T>, terminator: RN<void>, name: string) {
     super(src.value, [src], name);
-    const terminate = () => {
+    const terminate = (): void => {
       this.complete();
     };
     this.subscription = terminator.listen(false, terminate, noop, terminate);
   }
 
-  protected fire() {
+  protected fire(): void {
     const src = this.parents[0];
     this.fireWith(src.value);
   }
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     this.subscription.unsubscribe();
   }

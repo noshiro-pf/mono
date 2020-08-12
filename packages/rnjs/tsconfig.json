@@ -1,9 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./lib",
-    "types": ["node", "jest"],
-    "typeRoots": ["node_modules/@types"]
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "outDir": "./lib"
   },
   "include": ["src", "test"]
 }

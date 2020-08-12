@@ -18,16 +18,18 @@ class SkipAlreadyAppearedRN<T, K extends keyof T> extends RN<T> {
     this.key = key;
   }
 
-  protected fire() {
+  protected fire(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const nextVal = this.parents[0].value;
-    const v = this.key ? nextVal[this.key] : nextVal;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+    const v = this.key !== undefined ? nextVal[this.key] : nextVal;
     if (!this.appeared.has(v)) {
       this.appeared.add(v);
       this.fireWith(nextVal);
     }
   }
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     this.appeared.clear();
   }

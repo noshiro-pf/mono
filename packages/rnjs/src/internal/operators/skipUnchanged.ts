@@ -16,7 +16,8 @@ class SkipUnchangedRN<T> extends RN<T> {
     this.eq = eq;
   }
 
-  protected fire() {
+  protected fire(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const currVal = this.parents[0].value;
     const prevVal = this.value;
 

@@ -23,7 +23,7 @@ class SwitchMapRN<T, U> extends RN<U> {
     this.subscription = this.latestRN.listen(true, (e) => this.fireWith(e));
   }
 
-  protected fire() {
+  protected fire(): void {
     // switch latestRN here
     this.subscription.unsubscribe();
     const src = this.parents[0];
@@ -32,7 +32,7 @@ class SwitchMapRN<T, U> extends RN<U> {
     this.subscription = this.latestRN.listen(true, (e) => this.fireWith(e));
   }
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     this.subscription.unsubscribe();
   }

@@ -15,10 +15,12 @@ class FromPromiseRN<T> extends RN<T> {
     this.pr = pr;
     this.returnValue = initialValue; // dummy
 
-    this.pr.then((value) => {
-      this.returnValue = value;
-      this.fireWith(this.returnValue);
-      this.complete();
-    });
+    this.pr
+      .then((value) => {
+        this.returnValue = value;
+        this.fireWith(this.returnValue);
+        this.complete();
+      })
+      .catch((err) => console.error(err));
   }
 }

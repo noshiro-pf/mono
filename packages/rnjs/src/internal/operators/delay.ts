@@ -14,13 +14,13 @@ class DelayRN<T> extends RN<T> {
     this.time = time;
   }
 
-  protected fire() {
+  protected fire(): void {
     this.timerId = setTimeout(() => {
       this.fireWith(this.parents[0].value);
     }, this.time);
   }
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     clearTimeout(this.timerId);
   }

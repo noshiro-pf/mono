@@ -8,9 +8,10 @@ export const merge = <T extends RN<any>[]>(
 const getLatestCurr = <T extends RN<[any, number]>[]>(
   rns: T
 ): ArrayElement<Unwrap<T>> => {
-  if (!rns || !Array.isArray(rns) || rns.length === 0) {
+  if (!Array.isArray(rns) || rns.length === 0) {
     throw new Error('arg of getLatestCurr must be non-empty array');
   }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return rns.reduce((latest, rn) =>
     rn.value[1] > latest.value[1] ? rn : latest
   ).value[0];
@@ -25,8 +26,10 @@ class MergeRN<T extends RN<any>[]> extends RN<ArrayElement<Unwrap<T>>> {
     }
 
     const srcsWithTimestamp: RN<any>[] = srcs.map((rn) =>
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       rn.map((e) => [e, Date.now()])
     );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const latestCurr = getLatestCurr(srcsWithTimestamp);
 
     super(
@@ -38,7 +41,7 @@ class MergeRN<T extends RN<any>[]> extends RN<ArrayElement<Unwrap<T>>> {
     this.srcsWithTimestamp = srcsWithTimestamp;
   }
 
-  protected fire() {
+  protected fire(): void {
     this.fireWith(getLatestCurr(this.srcsWithTimestamp));
   }
 }

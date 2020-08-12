@@ -25,7 +25,7 @@ class FilterRN<T> extends RN<T> {
     this.predicate = predicate;
   }
 
-  protected fire() {
+  protected fire(): void {
     const src = this.parents[0];
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
     if (this.predicate(src.value, src.index, this.index + 1)) {
