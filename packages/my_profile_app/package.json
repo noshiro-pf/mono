@@ -7,24 +7,28 @@
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "prebuild": "rimraf ${npm_package_config_dist_dir}",
-    "build": "webpack --config ${npm_package_config_config_dir}/webpack.prod.js",
+    "build": "webpack --config \"${npm_package_config_webpack_prod_config}\"",
     "postbuild": "cpx \"${npm_package_config_public_dir}/**\" \"${npm_package_config_dist_dir}\"",
-    "compilereactconfig": "tsc --project ${npm_package_config_config_dir}/tsconfig.reactconfig.json",
+    "compilereactconfig": "tsc --project ${npm_package_config_tsconfig_for_webpack}",
     "postcompilereactconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
     "fmt": "yarn _script_formatchanged master",
     "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
     "fmtstaged": "yarn _script_formatchanged",
     "lint": "eslint --config \"${npm_package_config_eslintrc_path}\" src/ --ext .js,.jsx,.ts,.tsx",
-    "serve": "npx http-server ${npm_package_config_dist_dir}",
-    "start": "webpack-dev-server --config ${npm_package_config_config_dir}/webpack.dev.js",
-    "test": "jest --watch --config ${npm_package_config_config_dir}/jest.config.json"
+    "serve": "npx http-server \"${npm_package_config_dist_dir}\"",
+    "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
+    "test": "jest --watch --config \"${npm_package_config_jest_config}\""
   },
   "config": {
     "config_dir": "config",
     "dist_dir": "build",
     "eslintrc_path": ".eslintrc.json",
+    "jest_config": "jest.config.json",
     "public_dir": "public",
-    "scripts_dir": "../../scripts"
+    "scripts_dir": "../../scripts",
+    "tsconfig_for_webpack": "config/tsconfig.reactconfig.json",
+    "webpack_dev_config": "config/webpack.dev.js",
+    "webpack_prod_config": "config/webpack.prod.js"
   },
   "browserslist": {
     "production": [

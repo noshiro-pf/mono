@@ -1,6 +1,5 @@
 "use strict";
 exports.__esModule = true;
-var path = require("path");
 var rules = [
     {
         test: /\.ts$/,
@@ -8,17 +7,17 @@ var rules = [
         use: {
             loader: 'ts-loader',
             options: {
-                configFile: 'tsconfig.lib.json'
+                configFile: __dirname + "/tsconfig.lib.json"
             }
         }
     },
 ];
 var config = {
     mode: 'production',
-    entry: './src/index.ts',
+    entry: __dirname + "/../src/index.ts",
     output: {
         filename: 'bundle.js',
-        path: path.resolve(process.cwd() + '/lib')
+        path: __dirname + "/../lib"
     },
     resolve: {
         extensions: ['.ts', '.js']

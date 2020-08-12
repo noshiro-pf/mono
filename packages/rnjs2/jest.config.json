@@ -2,7 +2,7 @@
   "moduleFileExtensions": ["ts", "js"],
   "roots": ["<rootDir>/src", "<rootDir>/test"],
   "transform": {
-    "^.+\\.ts$": "ts-jest"
+    "^.+\\.tsx?$": "ts-jest"
   },
   "globals": {
     "ts-jest": {
