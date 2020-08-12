@@ -1,13 +1,11 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./lib",
-    "types": ["node", "jest"],
-    "typeRoots": ["node_modules/@types"]
+    "outDir": "../lib"
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "node_modules"]
+  "include": ["../src"],
+  "exclude": ["../src/**/*.test.ts", "node_modules"]
 }

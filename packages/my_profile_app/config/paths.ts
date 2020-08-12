@@ -7,5 +7,5 @@ export const paths: Paths = {
   appIndexJs: resolveAppPath('src/index.tsx'),
   publicUrlOrPath: dotenvValues.PUBLIC_URL ?? '/',
   contentBase: resolveAppPath('public', true),
-  tsconfigJson: resolveAppPath('config/tsconfig.json'),
+  tsconfigJson: resolveAppPath('tsconfig.json'),
 };

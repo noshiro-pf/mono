@@ -1,6 +1,7 @@
 'use strict';
-exports.__esModule = true;
-var path = require('path');
+Object.defineProperty(exports, '__esModule', { value: true });
+var tslib_1 = require('tslib');
+var path = tslib_1.__importStar(require('path'));
 var rules = [
   {
     test: /\.ts$/,
@@ -8,14 +9,14 @@ var rules = [
     use: {
       loader: 'ts-loader',
       options: {
-        configFile: 'tsconfig.lib.json',
+        configFile: __dirname + '/tsconfig.lib.json',
       },
     },
   },
 ];
 var config = {
   mode: 'production',
-  entry: './src/index.ts',
+  entry: __dirname + '/../src/index.ts',
   output: {
     filename: 'bundle.js',
     path: path.resolve(process.cwd() + '/lib'),
@@ -25,4 +26,4 @@ var config = {
   },
   module: { rules: rules },
 };
-exports['default'] = config;
+exports.default = config;
