@@ -19,6 +19,7 @@
     "fmtstaged": "yarn _script_formatchanged",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .js,.ts",
+    "setup": "yarn compilewebpackconfig",
     "test": "jest --watch --config \"${npm_package_config_jest_config_path}\""
   },
   "config": {

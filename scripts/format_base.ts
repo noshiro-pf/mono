@@ -29,25 +29,27 @@ const organizeImportsAndRunPrettier = (
 
 export async function organizeImportsAndRunPrettierWithIO(
   globPattern: string
-): Promise<void>;
+): Promise<boolean>;
 
 export async function organizeImportsAndRunPrettierWithIO(
   globPatterns: string[]
-): Promise<void>;
+): Promise<boolean>;
 
 export async function organizeImportsAndRunPrettierWithIO(
   globPatterns: string | ReadonlyArray<string>
-): Promise<void> {
+): Promise<boolean> {
   const prettierOptions = await getPrettierrc();
-  if (prettierOptions === undefined) return;
+  if (prettierOptions === undefined) return false;
 
   const sourceFiles: tsm.SourceFile[] =
     typeof globPatterns === 'string'
       ? project.getSourceFiles(globPatterns)
       : project.getSourceFiles(globPatterns);
+  console.log('sourceFiles', sourceFiles);
 
   organizeImportsAndRunPrettier(sourceFiles, prettierOptions);
 
   // save updates to files
   project.saveSync();
+  return true;
 }

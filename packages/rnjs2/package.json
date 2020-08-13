@@ -24,6 +24,7 @@
     "postgenpipabletypedef": "yarn _script_formatglob \"${npm_package_config_pipable_ts_path}\"",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .js,.ts",
+    "setup": "yarn compilegenpipabletypedefscript && yarn compilepreview && yarn compilewebpackconfig",
     "start": "node \"${npm_package_config_start_script}\"",
     "test": "jest --watch --config \"${npm_package_config_jest_config}\""
   },
@@ -33,8 +34,8 @@
     "gen_pipable_ts_config": "scripts/tsconfig.json",
     "jest_config": "jest.config.json",
     "lib_dir": "lib",
-    "pipable_max_length": 13,
-    "pipable_ts_path": "./src/abstract_class/pipable.ts",
+    "pipable_max_length": 11,
+    "pipable_ts_path": "src/abstract_class/pipable.ts",
     "scripts_dir": "../../scripts",
     "start_script": "dist/test/preview-main.js",
     "tsconfig_dev": "config/tsconfig.dev.json",
