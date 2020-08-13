@@ -11,11 +11,12 @@
     "postbuild": "cpx \"${npm_package_config_public_dir}/**\" \"${npm_package_config_dist_dir}\"",
     "compilewebpackconfig": "tsc --project ${npm_package_config_tsconfig_for_webpack}",
     "postcompilewebpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
+    "create_dot_env": "cp ${npm_package_config_dotenv_example} .env",
     "fmt": "yarn _script_formatchanged master",
     "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
     "lint": "eslint --config \"${npm_package_config_eslintrc_path}\" src/ --ext .js,.jsx,.ts,.tsx",
     "serve": "npx http-server \"${npm_package_config_dist_dir}\"",
-    "setup": "yarn compilewebpackconfig",
+    "setup": "yarn compilewebpackconfig && yarn create_dot_env",
     "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
     "test": "jest --config \"${npm_package_config_jest_config}\"",
     "testw": "yarn test --watch"
@@ -23,6 +24,7 @@
   "config": {
     "config_dir": "config",
     "dist_dir": "build",
+    "dotenv_example": "dotenv-example",
     "eslintrc_path": ".eslintrc.json",
     "jest_config": "jest.config.json",
     "public_dir": "public",
