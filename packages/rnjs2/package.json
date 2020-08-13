@@ -32,7 +32,7 @@
     "dist_dir": "dist",
     "gen_pipable_def": "scripts/gen_pipable_type_def",
     "gen_pipable_ts_config": "scripts/tsconfig.json",
-    "jest_config": "jest.config.json",
+    "jest_config": "config/jest.config.json",
     "lib_dir": "lib",
     "pipable_max_length": 12,
     "pipable_ts_path": "src/abstract_class/pipable.ts",

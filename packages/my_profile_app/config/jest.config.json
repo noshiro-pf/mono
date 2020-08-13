@@ -1,15 +1,14 @@
 {
   "moduleFileExtensions": ["ts", "js", "tsx", "jsx"],
+  "rootDir": "../",
   "roots": ["<rootDir>/src"],
   "transform": {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
   "globals": {
     "ts-jest": {
-      "tsConfig": "tsconfig.test.json"
+      "tsConfig": "<rootDir>/config/tsconfig.test.json"
     }
   },
-  "automock": false,
-  "setupFiles": ["./config/setupJest.js"],
   "testMatch": ["<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"]
 }

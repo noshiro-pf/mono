@@ -25,7 +25,7 @@
     "config_dir": "config",
     "dist_dir": "build",
     "dotenv_example": "dotenv-example",
-    "jest_config": "jest.config.json",
+    "jest_config": "config/jest.config.json",
     "public_dir": "public",
     "scripts_dir": "../../scripts",
     "tsconfig_for_webpack": "config/tsconfig.reactconfig.json",
