@@ -1,61 +1,35 @@
-import { exec } from 'child_process';
-import * as util from 'util';
 import { organizeImportsAndRunPrettierWithIO } from './format_base';
+import { gitAddAll, gitDiff } from './get_changed_files';
+import { monoRootAbsolutePath } from './get_mono_root_path';
+import { pathResolverMaker } from './path_resolver_maker';
 
-const gitCommitId = process.argv[2] ?? ''; // master
-
-const execp = util.promisify(exec);
+const toAbsolutePath = (path: string): string =>
+  pathResolverMaker(monoRootAbsolutePath)(path);
 
 type FileName = string;
 
-const commands = {
-  gitAdd: 'git add .',
-  gitDiff: `git diff --name-only --diff-filter=ACMTUXB --relative --staged ${gitCommitId}`,
-};
+const isTsFileName = (filename: FileName): boolean =>
+  (filename.endsWith('.ts') || filename.endsWith('.tsx')) &&
+  !filename.endsWith('.d.ts');
 
-const gitAdd = async () => {
-  const { stderr, stdout } = await execp(commands.gitAdd);
+const main = async (): Promise<void> => {
+  const gitCommitId = process.argv[2] ?? ''; // master
+  await gitAddAll();
 
-  if (stderr !== '') {
-    console.log(stderr);
-  }
-  if (stdout !== '') {
-    console.log(stdout);
-  }
-};
-
-const parseDiff = (stdout: string): FileName[] => {
-  const lines = stdout.split('\n');
-  return lines;
-};
-
-const gitDiff = async (): Promise<FileName[]> => {
-  const { stdout, stderr } = await execp(commands.gitDiff);
-
-  if (stderr !== '') {
-    console.log(stderr);
-  }
-
-  return parseDiff(stdout);
-};
-
-const filterChangedTsFiles = (updatedFiles: FileName[]) =>
-  updatedFiles.filter(
-    (filename) => filename.endsWith('.ts') || filename.endsWith('.tsx')
-  );
-
-const main = async () => {
-  await gitAdd();
-
-  const updatedFiles = await gitDiff();
-  const tsFiles = filterChangedTsFiles(updatedFiles);
+  const updatedFiles = await gitDiff(gitCommitId);
+  const tsFiles = updatedFiles.filter(isTsFileName).map(toAbsolutePath);
 
   console.log(`target files (${tsFiles.length} files):`);
   tsFiles.forEach((filename) => console.log(`- ${filename}`));
 
-  await organizeImportsAndRunPrettierWithIO(tsFiles);
+  const success = await organizeImportsAndRunPrettierWithIO(tsFiles);
+  if (!success) {
+    console.error(
+      'some errors occurred in organizeImportsAndRunPrettierWithIO'
+    );
+  }
 
-  await gitAdd();
+  await gitAddAll();
 };
 
-main();
+main().catch((err) => console.error(err));

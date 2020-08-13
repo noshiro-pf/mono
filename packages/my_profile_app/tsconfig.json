@@ -1,9 +1,9 @@
 {
-  "extends": "../../../tsconfig.react.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "sourceMap": true,
     "allowJs": true,
     "module": "esnext"
   },
-  "include": ["../src"]
+  "include": ["src"]
 }

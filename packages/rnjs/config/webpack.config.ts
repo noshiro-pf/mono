@@ -1,5 +1,4 @@
 import * as webpack from 'webpack';
-import * as path from 'path';
 
 const rules: webpack.RuleSetRule[] = [
   {
@@ -8,7 +7,7 @@ const rules: webpack.RuleSetRule[] = [
     use: {
       loader: 'ts-loader',
       options: {
-        configFile: 'tsconfig.lib.json',
+        configFile: `${__dirname}/tsconfig.lib.json`,
       },
     },
   },
@@ -16,10 +15,10 @@ const rules: webpack.RuleSetRule[] = [
 
 const config: webpack.Configuration = {
   mode: 'production',
-  entry: './src/index.ts',
+  entry: `${__dirname}/../src/index.ts`,
   output: {
     filename: 'bundle.js',
-    path: path.resolve(process.cwd() + '/lib'),
+    path: `${__dirname}/../lib`,
   },
   resolve: {
     extensions: ['.ts', '.js'],

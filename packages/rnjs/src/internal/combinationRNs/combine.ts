@@ -23,7 +23,7 @@ class CombineRN<T extends RN<any>[]> extends RN<Unwrap<T>> {
     );
   }
 
-  protected fire() {
+  protected fire(): void {
     this.fireWith(unwrapCurr(...(this.parents as T)));
   }
 }

@@ -15,7 +15,7 @@ class WithLatestRN<T, U> extends RN<[T, U]> {
     this.src2 = src2;
   }
 
-  protected fire() {
+  protected fire(): void {
     this.fireWith([this.parents[0].value, this.src2.value]);
   }
 }

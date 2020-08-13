@@ -17,4 +17,5 @@ export declare type RNType = 'base' | 'source' | 'sync child' | 'async child' | 
 export declare type Subscribable<A> = {
     subscribe(next: (v: A) => void, error?: (e?: any) => void, complete?: () => void): Subscription;
 };
+export declare type TimerId = any;
 //# sourceMappingURL=types.d.ts.map

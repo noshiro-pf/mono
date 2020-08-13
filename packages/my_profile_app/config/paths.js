@@ -10,5 +10,5 @@ exports.paths = {
   publicUrlOrPath:
     (_a = env_1.dotenvValues.PUBLIC_URL) !== null && _a !== void 0 ? _a : '/',
   contentBase: app_directory_1.resolveAppPath('public', true),
-  tsconfigJson: app_directory_1.resolveAppPath('config/tsconfig.json'),
+  tsconfigJson: app_directory_1.resolveAppPath('tsconfig.json'),
 };

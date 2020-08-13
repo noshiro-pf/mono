@@ -25,7 +25,6 @@ const devServerConfigMaker = (
     disableDotRule: true,
     index: paths.publicUrlOrPath,
   },
-  quiet: true,
   overlay: true,
 });
 

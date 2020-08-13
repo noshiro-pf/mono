@@ -14,7 +14,7 @@ class ThrottleRN<T> extends RN<T> {
     this.time = time;
   }
 
-  protected fire() {
+  protected fire(): void {
     if (Date.now() > this.lastFireTime + this.time) {
       this.fireWith(this.parents[0].value);
       this.lastFireTime = Date.now();

@@ -1,12 +1,16 @@
 import * as prettier from 'prettier';
 import * as tsm from 'ts-morph';
+import { monoRootAbsolutePath } from './get_mono_root_path';
 
-const project = new tsm.Project({
-  tsConfigFilePath: `${__dirname}/tsconfig.json`,
-});
+const paths = {
+  prettierrc: '.prettierrc',
+  formatTargetDirectories: ['packages', 'scripts', 'configs,'],
+};
+
+const project = new tsm.Project();
 
 const getPrettierrc = async (): Promise<prettier.Options | undefined> => {
-  const prettierOptions = await prettier.resolveConfig('.prettierrc');
+  const prettierOptions = await prettier.resolveConfig(paths.prettierrc);
   return { ...prettierOptions, parser: 'typescript' } ?? undefined;
 };
 
@@ -28,26 +32,24 @@ const organizeImportsAndRunPrettier = (
 };
 
 export async function organizeImportsAndRunPrettierWithIO(
-  globPattern: string
-): Promise<void>;
-
-export async function organizeImportsAndRunPrettierWithIO(
   globPatterns: string[]
-): Promise<void>;
+): Promise<boolean>;
 
 export async function organizeImportsAndRunPrettierWithIO(
-  globPatterns: string | ReadonlyArray<string>
-): Promise<void> {
+  globPatterns: ReadonlyArray<string>
+): Promise<boolean> {
   const prettierOptions = await getPrettierrc();
-  if (prettierOptions === undefined) return;
+  if (prettierOptions === undefined) return false;
 
-  const sourceFiles: tsm.SourceFile[] =
-    typeof globPatterns === 'string'
-      ? project.getSourceFiles(globPatterns)
-      : project.getSourceFiles(globPatterns);
+  paths.formatTargetDirectories.forEach((dir) => {
+    project.addSourceFilesAtPaths(`${monoRootAbsolutePath}/${dir}/**/*.ts`);
+  });
+
+  const sourceFiles: tsm.SourceFile[] = project.getSourceFiles(globPatterns);
 
   organizeImportsAndRunPrettier(sourceFiles, prettierOptions);
+  project.saveSync();
 
   // save updates to files
-  project.saveSync();
+  return true;
 }

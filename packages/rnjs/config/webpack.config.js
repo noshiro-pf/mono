@@ -1,7 +1,5 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
-var tslib_1 = require('tslib');
-var path = tslib_1.__importStar(require('path'));
 var rules = [
   {
     test: /\.ts$/,
@@ -19,7 +17,7 @@ var config = {
   entry: __dirname + '/../src/index.ts',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(process.cwd() + '/lib'),
+    path: __dirname + '/../lib',
   },
   resolve: {
     extensions: ['.ts', '.js'],

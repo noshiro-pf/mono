@@ -12,7 +12,7 @@ class WithInitialValueRN<T> extends RN<T> {
     super(initialValue, [src], name);
   }
 
-  protected fire() {
+  protected fire(): void {
     const src = this.parents[0];
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
     this.fireWith(src.value);

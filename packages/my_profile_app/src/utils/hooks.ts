@@ -5,10 +5,23 @@ export const useFetchedJsonData = (url: string): Json | undefined => {
   const [data, setData] = useState<Json | undefined>(undefined);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetch(url)
-      .then((response) => response.json())
-      .then(setData);
+    let alive = true;
+    const fetchFn = async (): Promise<string | void> => {
+      const response = await fetch(url);
+      if (!response.ok) {
+        return response.text();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const responseJson = await response.json();
+      if (alive) {
+        setData(responseJson);
+      }
+    };
+    fetchFn().catch((err) => console.error(err));
+
+    return () => {
+      alive = false;
+    };
   }, [url, setData]);
 
   return data;

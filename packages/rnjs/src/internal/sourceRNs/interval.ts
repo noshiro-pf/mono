@@ -23,7 +23,7 @@ class IntervalRN extends RN<number> {
     if (startImmediately) this.start();
   }
 
-  start() {
+  start(): void {
     if (this.started) return;
     this.started = true;
 
@@ -34,11 +34,11 @@ class IntervalRN extends RN<number> {
     }, this.milliSec);
   }
 
-  stop() {
+  stop(): void {
     this.complete();
   } // alias
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     clearInterval(this.timerId);
   }

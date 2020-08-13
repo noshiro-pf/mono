@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["esnext"],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
     "isolatedModules": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "jsx": "react",
     "downlevelIteration": true,
     "importHelpers": true,
     "newLine": "lf",

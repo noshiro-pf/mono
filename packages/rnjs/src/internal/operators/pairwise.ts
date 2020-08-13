@@ -15,9 +15,11 @@ class PairwiseRN<T> extends RN<[T, T]> {
     this.prevVal = initialPrevValue || src.value;
   }
 
-  protected fire() {
+  protected fire(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const nextVal = this.parents[0].value;
     this.fireWith([this.prevVal, nextVal]);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.prevVal = nextVal;
   }
 }

@@ -45,13 +45,13 @@ export class RN<T> {
     doTaskIsRunning: false,
   };
 
-  private static addTasks(rns: RN<any>[]) {
-    if (!rns || rns.length === 0) return;
+  private static addTasks(rns: RN<any>[]): void {
+    if (rns.length === 0) return;
     rns.forEach((rn) => this.addAsHeapUniq(rn));
     if (!this.engine.doTaskIsRunning) this.doTask();
   }
 
-  private static doTask() {
+  private static doTask(): void {
     this.engine.doTaskIsRunning = true;
     const rn = this.removeAsHeap();
     if (rn === undefined) {
@@ -68,13 +68,13 @@ export class RN<T> {
     );
   }
 
-  private static addAsHeapUniq(newValue: RN<any>) {
+  private static addAsHeapUniq(newValue: RN<any>): void {
     if (!this.exists(newValue)) {
       this.addAsHeap(newValue);
     }
   }
 
-  private static addAsHeap(newValue: RN<any>) {
+  private static addAsHeap(newValue: RN<any>): void {
     const heap = this.engine.priorityQueue;
     heap.push(newValue);
     if (heap.length <= 1) return;
@@ -149,7 +149,7 @@ export class RN<T> {
   constructor(initialValue: T, parents: RN<any>[], name: string) {
     this.id = RN.rnId++;
     this.name = name;
-    if (!parents || !Array.isArray(parents)) {
+    if (!Array.isArray(parents)) {
       throw new Error('"parents" must be an array');
     }
 
@@ -225,16 +225,16 @@ export class RN<T> {
     if (typeof nextOrSubscriber === 'function') {
       // next
       subscriber = {
-        next: nextOrSubscriber || noop,
+        next: nextOrSubscriber,
         error: error || noop,
         complete: complete || noop,
       };
     } else {
       // Subscriber
       subscriber = {
-        next: nextOrSubscriber.next || noop,
-        error: nextOrSubscriber.error || noop,
-        complete: nextOrSubscriber.complete || noop,
+        next: nextOrSubscriber.next,
+        error: nextOrSubscriber.error,
+        complete: nextOrSubscriber.complete,
       };
     }
 
@@ -304,7 +304,7 @@ export class RN<T> {
     const pr = new Promise<T>((res) => {
       sb = this.listen(false, res);
     });
-    pr.then(() => sb.unsubscribe());
+    pr.then(() => sb.unsubscribe()).catch((err) => console.error(err));
     return pr;
   }
 
@@ -385,6 +385,7 @@ export class RN<T> {
   ): RN<any>;
   // eslint-disable-next-line no-dupe-class-members
   pipe(...operators: Operator<any, any>[]): RN<any> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return operators.reduce((prev: RN<any>, op) => op(prev), this);
   }
 
@@ -623,14 +624,13 @@ export class RN<T> {
     // this.parents.forEach( rn => { rn.askIfComplete(); });
   }
 
-  private get isCompleted() {
+  private get isCompleted(): boolean {
     return this.state === 'end-successfully' || this.state === 'end-with-error';
   }
 
   // methods for RN
 
-  private addChild(c: RN<any>) {
-    if (!c) return;
+  private addChild(c: RN<any>): void {
     this.children.push(c);
   }
 

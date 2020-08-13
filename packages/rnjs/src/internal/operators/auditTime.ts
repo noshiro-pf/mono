@@ -16,7 +16,7 @@ class AuditTimeRN<T> extends RN<T> {
     this.time = time;
   }
 
-  protected fire() {
+  protected fire(): void {
     if (!this.timerIsRunning) {
       this.timerIsRunning = true;
       this.timerId = setTimeout(() => {
@@ -26,7 +26,7 @@ class AuditTimeRN<T> extends RN<T> {
     }
   }
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     clearTimeout(this.timerId);
   }

@@ -1,5 +1,4 @@
 export * from './constant';
-export * from './fromEvent';
 export * from './fromObservable';
 export * from './fromPromise';
 export * from './interval';

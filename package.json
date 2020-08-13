@@ -6,12 +6,15 @@
     "packages/*"
   ],
   "scripts": {
+    "_compile_react_configs": "tsc --project \"${npm_package_config_react_config_dir}/tsconfig.reactconfig.json\" && yarn _format_react_configs",
+    "_compile_scripts": "yarn _remove_old_scripts && tsc --project ./scripts/tsconfig.json",
+    "_format_react_configs": "prettier --write \"${npm_package_config_react_config_dir}/*.js\"",
+    "_remove_old_scripts": "rimraf scripts/*.js",
     "build:my_profile_app": "npm --prefix packages/my_profile_app run build",
-    "compilereactconfig": "tsc --project \"${npm_package_config_react_config_dir}/tsconfig.reactconfig.json\"",
-    "postcompilereactconfig": "prettier --write \"${npm_package_config_react_config_dir}/*.js\"",
-    "precompilescripts": "rimraf scripts/*.js",
-    "compilescripts": "tsc --project ./scripts/tsconfig.json",
-    "sortpackagejson": "sort-package-json \"package.json\" \"packages/*/package.json\"",
+    "lintall": "yarn workspaces run lint",
+    "setup": "yarn setuproot && yarn workspaces run setup",
+    "setuproot": "yarn _compile_react_configs && yarn _compile_scripts",
+    "sort_package_json": "sort-package-json \"package.json\" \"packages/*/package.json\"",
     "testall": "yarn workspaces run test"
   },
   "config": {
@@ -53,6 +56,7 @@
     "glob": "^7.1.6",
     "html-webpack-plugin": "^4.3.0",
     "jest": "^26.3.0",
+    "jest-fetch-mock": "^3.0.3",
     "prettier": "^2.0.5",
     "react-hot-loader": "^4.12.21",
     "rimraf": "^3.0.2",

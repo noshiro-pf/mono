@@ -26,7 +26,7 @@ class FlatMapRN<T, U> extends RN<U> {
     );
   }
 
-  protected fire() {
+  protected fire(): void {
     // switch latestRN here
     const src = this.parents[0];
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
@@ -36,7 +36,7 @@ class FlatMapRN<T, U> extends RN<U> {
     );
   }
 
-  protected complete() {
+  protected complete(): void {
     super.complete();
     this.subscriptions.forEach((s) => s.unsubscribe());
   }

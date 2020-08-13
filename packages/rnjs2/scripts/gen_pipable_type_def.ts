@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 const header = `
 import { Operator } from '../types';
@@ -23,7 +23,7 @@ const genPipeMethod = (length: number): string => {
   const typeVarList = seq(1, length + 1).map((i) => `T${i}`);
   let result: string = '';
   result += `  pipe<${typeVarList.join(', ')}>(\n`;
-  let currTypeVar = `A`;
+  let currTypeVar = 'A';
   for (const [index, nextTypeVar] of typeVarList.entries()) {
     result += `    op${index + 1}: Operator<${currTypeVar}, ${nextTypeVar}>,\n`;
     currTypeVar = nextTypeVar;
@@ -68,16 +68,16 @@ const input = (): [number, string] => {
   }
 
   if (!path) {
-    throw new Error(`Path is required.`);
+    throw new Error('Path is required.');
   }
 
   return [length, path];
 };
 
-const main = () => {
+const main = (): void => {
   const [length, path] = input();
   const result = createPipableTypeDef(length);
-  fs.writeFile(path, result, { flags: 'w' }, () => {});
+  fs.writeFile(path, result, { flag: 'w' }, () => undefined);
 };
 
 main();
