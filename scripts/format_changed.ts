@@ -1,72 +1,33 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import { organizeImportsAndRunPrettierWithIO } from './format_base';
-import { pathResolverMaker } from './path_resolver_maker';
-
-const gitCommitId = process.argv[2] ?? ''; // master
-const rootDir = pathResolverMaker(__dirname)('../');
+import { gitDiff, gitAddAll } from './get_changed_files';
 
 // const toAbsolutePath = (path: string): string =>
 //   pathResolverMaker(rootDir)(path);
 
-const execp = promisify(exec);
-
 type FileName = string;
 
-const commands = {
-  gitAdd: 'git add .',
-  gitDiff: `git diff --name-only --diff-filter=ACMTUXB --staged ${gitCommitId}`,
-};
-
-const gitAdd = async (): Promise<void> => {
-  const { stderr, stdout } = await execp(commands.gitAdd, { cwd: rootDir });
-
-  if (stderr !== '') {
-    console.log(stderr);
-  }
-  if (stdout !== '') {
-    console.log(stdout);
-  }
-};
-
-const parseDiff = (stdout: string): FileName[] => stdout.split('\n');
-
-const gitDiff = async (): Promise<FileName[]> => {
-  const { stdout, stderr } = await execp(commands.gitDiff, { cwd: rootDir });
-
-  if (stderr !== '') {
-    console.log(stderr);
-  }
-
-  return parseDiff(stdout);
-};
-
-const filterChangedTsFiles = (updatedFiles: FileName[]): string[] =>
-  updatedFiles.filter(
-    (filename) => filename.endsWith('.ts') || filename.endsWith('.tsx')
-  );
+const isTsFileName = (filename: FileName): boolean =>
+  filename.endsWith('.ts') || filename.endsWith('.tsx');
 
 const main = async (): Promise<void> => {
-  await gitAdd();
+  const gitCommitId = process.argv[2] ?? ''; // master
+  await gitAddAll();
 
-  const updatedFiles = await gitDiff();
-  const tsFiles = filterChangedTsFiles(updatedFiles);
-  // const tsFilesAbsolutePath = tsFiles.map(toAbsolutePath);
+  const updatedFiles = await gitDiff(gitCommitId);
+  const tsFiles = updatedFiles.filter(isTsFileName);
+  // .map(toAbsolutePath);
 
   console.log(`target files (${tsFiles.length} files):`);
   tsFiles.forEach((filename) => console.log(`- ${filename}`));
 
-  const success = await organizeImportsAndRunPrettierWithIO(
-    // tsFilesAbsolutePath
-    tsFiles
-  );
+  const success = await organizeImportsAndRunPrettierWithIO(tsFiles);
   if (!success) {
     console.error(
       'some errors occurred in organizeImportsAndRunPrettierWithIO'
     );
   }
 
-  await gitAdd();
+  await gitAddAll();
 };
 
 main().catch((err) => console.error(err));
