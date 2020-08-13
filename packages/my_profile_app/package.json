@@ -13,12 +13,12 @@
     "postcompilewebpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
     "fmt": "yarn _script_formatchanged master",
     "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
-    "fmtstaged": "yarn _script_formatchanged",
     "lint": "eslint --config \"${npm_package_config_eslintrc_path}\" src/ --ext .js,.jsx,.ts,.tsx",
     "serve": "npx http-server \"${npm_package_config_dist_dir}\"",
     "setup": "yarn compilewebpackconfig",
     "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
-    "test": "jest --watch --config \"${npm_package_config_jest_config}\""
+    "test": "jest --config \"${npm_package_config_jest_config}\"",
+    "testw": "yarn test --watch"
   },
   "config": {
     "config_dir": "config",

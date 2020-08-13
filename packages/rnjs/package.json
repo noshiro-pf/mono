@@ -11,23 +11,22 @@
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
     "prebuild": "rimraf ${npm_package_config_lib_dir}",
-    "build": "webpack --config ${npm_package_config_config_dir}/webpack.config.js",
-    "compilewebpackconfig": "tsc ${npm_package_config_config_dir}/webpack.config.ts",
-    "postcompilewebpackconfig": "prettier --write ${npm_package_config_config_dir}/webpack.config.js",
+    "build": "webpack --config \"${npm_package_config_webpack_config_js}\"",
+    "compilewebpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack_config}\"",
+    "postcompilewebpackconfig": "prettier --write \"${npm_package_config_webpack_config_js}\"",
     "fmt": "yarn _script_formatchanged master",
     "fmtall": "yarn _script_formatglob \"./src/**/*.ts\"",
-    "fmtstaged": "yarn _script_formatchanged",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .js,.ts",
     "setup": "yarn compilewebpackconfig",
-    "test": "jest --watch --config \"${npm_package_config_jest_config_path}\""
+    "test": "jest --config \"${npm_package_config_jest_config}\"",
+    "testw": "yarn test --watch"
   },
   "config": {
-    "config_dir": "config",
-    "dist_dir": "dist",
-    "jest_config_path": "jest.config.json",
+    "jest_config": "jest.config.json",
     "lib_dir": "lib",
     "scripts_dir": "../../scripts",
-    "scripts_local_dir": "./scripts"
+    "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
+    "webpack_config_js": "config/webpack.config.js"
   }
 }

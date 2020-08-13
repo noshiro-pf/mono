@@ -19,14 +19,14 @@
     "postcompilewebpackconfig": "prettier --write \"${npm_package_config_webpack_config_js}\"",
     "fmt": "yarn _script_formatchanged master",
     "fmtall": "yarn _script_formatglob \"./src/**/*.ts\"",
-    "fmtstaged": "yarn _script_formatchanged",
     "genpipabletypedef": "node \"${npm_package_config_gen_pipable_def}\" ${npm_package_config_pipable_max_length} \"${npm_package_config_pipable_ts_path}\"",
     "postgenpipabletypedef": "yarn _script_formatglob \"${npm_package_config_pipable_ts_path}\"",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .js,.ts",
     "setup": "yarn compilegenpipabletypedefscript && yarn compilepreview && yarn compilewebpackconfig",
     "start": "node \"${npm_package_config_start_script}\"",
-    "test": "jest --watch --config \"${npm_package_config_jest_config}\""
+    "test": "jest --config \"${npm_package_config_jest_config}\"",
+    "testw": "yarn test --watch"
   },
   "config": {
     "dist_dir": "dist",
@@ -34,13 +34,12 @@
     "gen_pipable_ts_config": "scripts/tsconfig.json",
     "jest_config": "jest.config.json",
     "lib_dir": "lib",
-    "pipable_max_length": 11,
+    "pipable_max_length": 12,
     "pipable_ts_path": "src/abstract_class/pipable.ts",
     "scripts_dir": "../../scripts",
     "start_script": "dist/test/preview-main.js",
     "tsconfig_dev": "config/tsconfig.dev.json",
     "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
-    "webpack_config_js": "config/webpack.config.js",
-    "webpack_config_ts": "config/webpack.config.ts"
+    "webpack_config_js": "config/webpack.config.js"
   }
 }

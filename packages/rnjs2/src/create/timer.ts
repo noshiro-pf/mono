@@ -1,6 +1,6 @@
 import { ManagerRNClass, RN } from '../abstract_class';
-import { none } from '../util';
 import { TimerId } from '../types';
+import { none } from '../util';
 
 export const timer = (millisec: number): TimerRN => new TimerRNClass(millisec);
 

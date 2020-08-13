@@ -14,6 +14,7 @@ clear=$2
 
 # move to target directory
 cd ${target_directory}
+pwd
 
 # regenerate index.ts recursively
 for directory in $(find . -maxdepth ${MAX_RECURSION_DEPTH} -type d); do

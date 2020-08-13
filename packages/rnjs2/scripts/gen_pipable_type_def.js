@@ -1,32 +1,7 @@
 "use strict";
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var fs = require('fs');
+Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
+var fs_1 = tslib_1.__importDefault(require("fs"));
 var header = "\nimport { Operator } from '../types';\nimport { RN } from './rn-interface';\n\nexport interface Pipable<A> {\n";
 var seq = function (start, end) {
     return new Array(end - start).fill(0).map(function (_, i) { return i + start; });
@@ -46,10 +21,10 @@ var genPipeMethod = function (length) {
     var typeVarList = seq(1, length + 1).map(function (i) { return "T" + i; });
     var result = '';
     result += "  pipe<" + typeVarList.join(', ') + ">(\n";
-    var currTypeVar = "A";
+    var currTypeVar = 'A';
     try {
-        for (var _b = __values(typeVarList.entries()), _c = _b.next(); !_c.done; _c = _b.next()) {
-            var _d = __read(_c.value, 2), index = _d[0], nextTypeVar = _d[1];
+        for (var _b = tslib_1.__values(typeVarList.entries()), _c = _b.next(); !_c.done; _c = _b.next()) {
+            var _d = tslib_1.__read(_c.value, 2), index = _d[0], nextTypeVar = _d[1];
             result += "    op" + (index + 1) + ": Operator<" + currTypeVar + ", " + nextTypeVar + ">,\n";
             currTypeVar = nextTypeVar;
         }
@@ -89,13 +64,13 @@ var input = function () {
         throw new Error("Length must be greater than or equal to " + MIN_LENGTH + ".");
     }
     if (!path) {
-        throw new Error("Path is required.");
+        throw new Error('Path is required.');
     }
     return [length, path];
 };
 var main = function () {
-    var _a = __read(input(), 2), length = _a[0], path = _a[1];
+    var _a = tslib_1.__read(input(), 2), length = _a[0], path = _a[1];
     var result = createPipableTypeDef(length);
-    fs.writeFile(path, result, { flags: 'w' }, function () { });
+    fs_1.default.writeFile(path, result, { flag: 'w' }, function () { return undefined; });
 };
 main();
