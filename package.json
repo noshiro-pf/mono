@@ -34,6 +34,7 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/styled-components": "^5.1.2",
     "@types/terser-webpack-plugin": "^4.1.0",
+    "@types/typescript": "^2.0.0",
     "@types/webpack": "^4.41.21",
     "@types/webpack-bundle-analyzer": "^3.8.0",
     "@types/webpack-dev-server": "^3.11.0",
