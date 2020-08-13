@@ -19,7 +19,6 @@ var devServerConfigMaker = function (paths, host, port) { return ({
         disableDotRule: true,
         index: paths.publicUrlOrPath,
     },
-    quiet: true,
     overlay: true,
 }); };
 var plugins = tslib_1.__spread(webpack_config_common_maker_1.pluginsCommon, [
