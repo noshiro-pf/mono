@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import { resolveAppPath } from './app_directory';
 
-const dotenvConfigOutput = dotenv.config({ path: resolveAppPath('.env') });
+const dotenvConfigOutput = dotenv.config({
+  path: resolveAppPath('.env.webpack'),
+});
 const dotenvParsed = dotenvConfigOutput.parsed;
 
 export const dotenvValues: {

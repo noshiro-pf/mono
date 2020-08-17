@@ -5,7 +5,7 @@ var tslib_1 = require('tslib');
 var dotenv_1 = tslib_1.__importDefault(require('dotenv'));
 var app_directory_1 = require('./app_directory');
 var dotenvConfigOutput = dotenv_1.default.config({
-  path: app_directory_1.resolveAppPath('.env'),
+  path: app_directory_1.resolveAppPath('.env.webpack'),
 });
 var dotenvParsed = dotenvConfigOutput.parsed;
 exports.dotenvValues = {
