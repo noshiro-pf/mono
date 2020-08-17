@@ -7,7 +7,7 @@ const execp = promisify(exec);
 type FileName = string;
 
 const commands = {
-  gitUnStagedFiles: 'git status --porcelain | grep "^??" | cut -c 4-',
+  gitUnStagedFiles: 'git ls-files --others --exclude-standard',
   gitDiff: (commitId?: string) =>
     `git diff --name-only --diff-filter=ACMTUXB --staged ${commitId ?? ''}`,
 };
