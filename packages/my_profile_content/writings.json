@@ -1,0 +1,32 @@
+{
+  "listElements": [
+    {
+      "link": "https://qiita.com/pikohideaki/items/59415524503f833ce41e",
+      "title": " 見分けやすいN色をうまく選ぶ関数を作ったよ",
+      "subtitle": "コントラスト比を考慮した見分けやすいN色を選ぶアルゴリズムについての記事",
+      "body1": "",
+      "body2": ""
+    },
+    {
+      "link": "https://qiita.com/pikohideaki/items/57dab6c6e8d0687a8806",
+      "title": "簡易リアクティブプログラミングライブラリの作り方（TypeScript）",
+      "subtitle": "TypeScriptで簡単なリアクティブプログラミングライブラリっぽいものをスクラッチで実装する",
+      "body1": "RxJSのようなリアクティブプログラミングができるライブラリの超簡易版を実装し、敷居を下げるために書いたもの。",
+      "body2": ""
+    },
+    {
+      "link": "https://qiita.com/pikohideaki/items/292ab134397f4959e66b",
+      "title": "RxJSによるリアクティブプログラミング入門",
+      "subtitle": "RxJSを用いたリアクティブプログラミングについての入門者向け解説記事",
+      "body1": "リアクティブプログラミングとは何なのか・どうやって使うのか・使うと何が嬉しいのかを初心者向けに解説してみたもの。",
+      "body2": ""
+    },
+    {
+      "link": "https://noshiro-slides-dezero-step06-16.netlify.app/",
+      "title": "ゼロから作るディープラーニング3 step06-16",
+      "subtitle": "ゼロから作るディープラーニング3の社内輪読会で使用した資料",
+      "body1": "reveal.jsを用いて作成．各ステップごとのコードの差分をコードブロックで表示．",
+      "body2": ""
+    }
+  ]
+}
