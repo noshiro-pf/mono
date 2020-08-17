@@ -12,6 +12,7 @@
     "prebuild": "rimraf ${npm_package_config_dist_dir}",
     "build": "webpack --config \"${npm_package_config_webpack_prod_config}\"",
     "postbuild": "cpx \"${npm_package_config_public_dir}/**\" \"${npm_package_config_dist_dir}\"",
+    "predeploy": "yarn build",
     "deploy": "firebase deploy",
     "firebase:login": "firebase login",
     "fmt": "yarn _script_formatchanged master",

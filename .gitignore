@@ -1,5 +1,8 @@
 node_modules
 **/build
 **/dist
-scripts/*.js
 **/.env
+packages/*/config/**/*.js
+packages/*/scripts/**/*.js
+config/**/*.js
+scripts/**/*.js
