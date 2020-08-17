@@ -10,7 +10,10 @@
     "_compile_scripts": "yarn _remove_old_scripts && tsc --project ./scripts/tsconfig.json",
     "_format_react_configs": "prettier --write \"${npm_package_config_react_config_dir}/*.js\"",
     "_remove_old_scripts": "rimraf scripts/*.js",
+    "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
+    "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "build:my_profile_app": "npm --prefix packages/my_profile_app run build",
+    "fmt": "yarn _script_formatchanged master",
     "lintall": "yarn workspaces run lint",
     "setup": "yarn setuproot && yarn workspaces run setup",
     "setuproot": "yarn _compile_react_configs && yarn _compile_scripts",
@@ -18,7 +21,8 @@
     "testall": "yarn workspaces run test"
   },
   "config": {
-    "react_config_dir": "config/react"
+    "react_config_dir": "config/react",
+    "scripts_dir": "scripts"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.3",
