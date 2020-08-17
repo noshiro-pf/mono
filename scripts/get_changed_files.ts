@@ -7,22 +7,21 @@ const execp = promisify(exec);
 type FileName = string;
 
 const commands = {
-  gitAddAll: 'git add .',
+  gitUnStagedFiles: 'git status --porcelain | grep "^??" | cut -c 4-',
   gitDiff: (commitId?: string) =>
     `git diff --name-only --diff-filter=ACMTUXB --staged ${commitId ?? ''}`,
 };
 
-export const gitAddAll = async (): Promise<void> => {
-  const { stderr, stdout } = await execp(commands.gitAddAll, {
+export const gitUnTrackedFiles = async (): Promise<FileName[]> => {
+  const { stdout, stderr } = await execp(commands.gitUnStagedFiles, {
     cwd: monoRootAbsolutePath,
   });
 
   if (stderr !== '') {
     console.log(stderr);
   }
-  if (stdout !== '') {
-    console.log(stdout);
-  }
+
+  return stdout.split('\n');
 };
 
 export const gitDiff = async (fromCommitId: string): Promise<FileName[]> => {
