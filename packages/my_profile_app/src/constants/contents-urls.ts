@@ -1,5 +1,5 @@
 const prefix =
-  'https://raw.githubusercontent.com/noshiro-pf/my_profile_content/master';
+  'https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/my_profile_content';
 
 export const contentsUrls = {
   lastUpdated: `${prefix}/last-updated.txt`,
