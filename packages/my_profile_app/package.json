@@ -12,10 +12,12 @@
     "prebuild": "rimraf ${npm_package_config_dist_dir}",
     "build": "webpack --config \"${npm_package_config_webpack_prod_config}\"",
     "postbuild": "cpx \"${npm_package_config_public_dir}/**\" \"${npm_package_config_dist_dir}\"",
+    "deploy": "firebase deploy",
+    "firebase:login": "firebase login",
     "fmt": "yarn _script_formatchanged master",
     "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
     "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
-    "serve": "npx http-server \"${npm_package_config_dist_dir}\"",
+    "serve": "firebase serve",
     "setup": "yarn _compile_webpackconfig && yarn _create_dot_env",
     "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
     "test": "jest --config \"${npm_package_config_jest_config}\"",
@@ -53,5 +55,8 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "styled-components": "^5.1.1"
+  },
+  "devDependencies": {
+    "firebase-tools": "^8.7.0"
   }
 }
