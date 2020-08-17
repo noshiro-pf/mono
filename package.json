@@ -15,6 +15,8 @@
     "prebuild:my_profile_app": "npm --prefix packages/my_profile_app run prebuild",
     "build:my_profile_app": "npm --prefix packages/my_profile_app run build",
     "postbuild:my_profile_app": "npm --prefix packages/my_profile_app run postbuild",
+    "clean": "rimraf config/**/*.js scripts/**/*.js",
+    "cleanall": "yarn clean && rimraf packages/*/config/**/*.js packages/*/scripts/**/*.js",
     "fmt": "yarn _script_formatchanged master",
     "lintall": "yarn workspaces run lint",
     "setup": "yarn setuproot && yarn workspaces run setup",
