@@ -5,7 +5,7 @@
   "author": "noshiro",
   "scripts": {
     "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\" && yarn _format_webpackconfig",
-    "_create_dot_env": "cp ${npm_package_config_dotenv_example} .env",
+    "_create_dot_env": "cpx ${npm_package_config_dotenv_example} .env",
     "_format_webpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
