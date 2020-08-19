@@ -1,7 +1,3 @@
-export const mapNullable = <A, B>(fn: (v: A) => B) => (
-  value: A | undefined
-): B | undefined => (value === undefined ? undefined : fn(value));
-
 export const toNumber = (value: string): number | undefined => {
   const result = parseInt(value);
   return Number.isNaN(result) ? undefined : result;

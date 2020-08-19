@@ -1,0 +1,8 @@
+import { Percent as P } from '../../types';
+import { Alpha } from './alpha';
+import { Hue } from './hue';
+
+export type Hsl = [Hue, P, P];
+export const hsl = (h: Hue, s: P, l: P): Hsl => [h, s, l];
+export type Hsla = [Hsl[0], Hsl[1], Hsl[2], Alpha];
+export const hsla = (h: Hue, s: P, l: P, a: Alpha): Hsla => [h, s, l, a];
