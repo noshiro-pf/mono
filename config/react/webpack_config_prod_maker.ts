@@ -7,7 +7,7 @@ import { merge } from 'webpack-merge';
 import { Paths } from './paths_type';
 import {
   pluginsCommon,
-  webpackConfigCommonMaker,
+  webpackConfigReactCommonMaker,
 } from './webpack_config_common_maker';
 
 const plugins: webpack.Plugin[] = [
@@ -20,12 +20,12 @@ const plugins: webpack.Plugin[] = [
   }),
 ];
 
-export const webpackConfigProdMaker = (
+export const webpackConfigReactProdMaker = (
   paths: Paths,
   bundlejsName: string,
   use_bundle_analyzer: boolean = false
 ): webpack.Configuration =>
-  merge(webpackConfigCommonMaker(paths.tsconfigJson), {
+  merge(webpackConfigReactCommonMaker(paths.tsconfigJson), {
     mode: 'production',
     entry: [paths.appIndexJs],
     output: {
