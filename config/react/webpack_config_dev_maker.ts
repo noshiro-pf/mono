@@ -5,7 +5,7 @@ import { merge } from 'webpack-merge';
 import { Paths } from './paths_type';
 import {
   pluginsCommon,
-  webpackConfigCommonMaker,
+  webpackConfigReactCommonMaker,
 } from './webpack_config_common_maker';
 
 const devServerConfigMaker = (
@@ -33,13 +33,13 @@ const plugins: webpack.Plugin[] = [
   new webpack.HotModuleReplacementPlugin(),
 ];
 
-export const webpackConfigDevExtensionMaker = (
+export const webpackConfigReactDevMaker = (
   paths: Paths,
   host: string,
   port: number,
   bundlejsName: string
 ): webpack.Configuration =>
-  merge(webpackConfigCommonMaker(paths.tsconfigJson), {
+  merge(webpackConfigReactCommonMaker(paths.tsconfigJson), {
     mode: 'development',
     entry: [
       `webpack-dev-server/client?http://localhost:${port}`,

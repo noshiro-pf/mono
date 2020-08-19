@@ -1,6 +1,6 @@
-import DotenvPlugin from 'dotenv-webpack';
 import * as webpack from 'webpack';
 import 'webpack-dev-server';
+import nodeExternals from 'webpack-node-externals';
 
 const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
   {
@@ -14,28 +14,32 @@ const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
     },
   },
   {
-    test: /\.css$/i,
-    use: ['style-loader', 'css-loader'],
-  },
-  {
-    test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
-    exclude: /node_modules/,
-    use: ['file-loader?name=[name].[ext]'], // ?name=[name].[ext] is only necessary to preserve the original file name
-  },
-  {
     test: /\.js$/,
     enforce: 'pre',
     use: ['source-map-loader'],
   },
 ];
 
-export const pluginsCommon: webpack.Plugin[] = [new DotenvPlugin()];
-
-export const webpackConfigReactCommonMaker = (
+export const webpackConfigCommonMaker = (
+  entry: string,
+  outputPath: string,
   pathToTsconfigJson: string
 ): webpack.Configuration => ({
+  mode: 'production',
+  entry,
+  output: {
+    filename: 'bundle.js',
+    path: outputPath,
+  },
   resolve: {
-    extensions: ['.ts', '.js', '.tsx', '.jsx'],
+    extensions: ['.ts', '.js'],
   },
   module: { rules: rulesMaker(pathToTsconfigJson) },
+  target: 'node',
+  externals: [
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    nodeExternals({
+      modulesFromFile: true,
+    }),
+  ],
 });

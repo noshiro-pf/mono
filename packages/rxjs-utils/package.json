@@ -1,5 +1,5 @@
 {
-  "name": "rxjs-utils",
+  "name": "noshiro-rxjs-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -31,6 +31,7 @@
     "webpack_config_js": "config/webpack.config.js"
   },
   "dependencies": {
+    "noshiro-ts-utils": "*",
     "rxjs": "^6.6.2"
   }
 }
