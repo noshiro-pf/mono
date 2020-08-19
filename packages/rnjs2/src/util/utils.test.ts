@@ -1,19 +1,4 @@
-import { binarySearch, halfInt, mapNullable } from './utils';
-
-describe('mapNullable', () => {
-  const sq = (x: number): number => x ** 2;
-  test('case 1', () => {
-    expect(mapNullable(sq)(2)).toBe(4);
-  });
-
-  test('case 2', () => {
-    expect(mapNullable(sq)(0)).toBe(0);
-  });
-
-  test('case 3', () => {
-    expect(mapNullable(sq)(undefined)).toBe(undefined);
-  });
-});
+import { binarySearch, halfInt } from './utils';
 
 describe('halfInt', () => {
   test('case: even number', () => {
