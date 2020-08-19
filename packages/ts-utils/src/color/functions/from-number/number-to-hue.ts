@@ -1,0 +1,6 @@
+import { Hue } from '../../../color';
+import { clamp, roundToInt } from '../../../num';
+
+const clamp359 = clamp(0, 359) as (x: number) => Hue;
+
+export const numberToHue = (x: number): Hue => clamp359(roundToInt(x));
