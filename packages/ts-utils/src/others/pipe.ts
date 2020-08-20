@@ -4,6 +4,7 @@ export const pipe: Pipe = (x: any, ...fns: FuncType<any, any>[]) =>
 type FuncType<A, B> = (v: A) => B;
 
 export interface Pipe {
+  <T0, T1>(x: T0, f1: FuncType<T0, T1>): T1;
   <T0, T1, T2>(x: T0, f1: FuncType<T0, T1>, f2: FuncType<T1, T2>): T2;
   <T0, T1, T2, T3>(
     x: T0,
@@ -96,5 +97,5 @@ export interface Pipe {
     f11: FuncType<T10, T11>
   ): T11;
 
-  (x: any, ...fns: FuncType<any, any>[]): any;
+  <T0>(x: T0, f1: FuncType<T0, any>, ...fns: FuncType<any, any>[]): any;
 }

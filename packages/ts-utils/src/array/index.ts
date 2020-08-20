@@ -9,6 +9,7 @@ export * from './is-in-range';
 export * from './is-non-empty';
 export * from './math';
 export * from './mutation';
+export * from './non-empty-array';
 export * from './set';
 export * from './slice';
 export * from './transform';

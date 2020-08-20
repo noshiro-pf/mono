@@ -1,1 +1,2 @@
-export const isEmpty = (ar: readonly unknown[]): boolean => ar.length === 0;
+export const isEmpty = (array: readonly unknown[]): boolean =>
+  array.length === 0;
