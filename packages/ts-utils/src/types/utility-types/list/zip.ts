@@ -1,8 +1,8 @@
+import { assertType, TypeEq } from '../test-type';
 import { Cons } from './cons';
 import { First } from './first';
 import { Rest } from './rest';
 import { Reverse } from './reverse';
-import { assertType, TypeEq } from '../test-type';
 
 export type Zip<A extends any[], B extends any[], R extends any[] = []> = {
   0: Reverse<R>;

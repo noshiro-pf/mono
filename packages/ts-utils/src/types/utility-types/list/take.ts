@@ -1,8 +1,8 @@
+import { assertType, TypeEq } from '../test-type';
 import { Cons } from './cons';
 import { First } from './first';
 import { Rest } from './rest';
 import { Reverse } from './reverse';
-import { assertType, TypeEq } from '../test-type';
 
 export type Take<N extends number, T extends any[], R extends any[] = []> = {
   0: Reverse<R>;
