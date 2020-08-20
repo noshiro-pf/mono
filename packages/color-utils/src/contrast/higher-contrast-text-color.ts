@@ -1,4 +1,4 @@
-import { blackHsl, Hsl, whiteHsl } from 'noshiro-ts-utils';
+import { blackHsl, Hsl, whiteHsl } from '@mono/ts-utils';
 import { contrastRatioHsl } from './contrast-ratio';
 
 export const higherContrastTextColorHsl = (hsl: Hsl): 'black' | 'white' => {

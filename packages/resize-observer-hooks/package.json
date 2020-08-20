@@ -1,5 +1,5 @@
 {
-  "name": "noshiro-resize-observer-hooks",
+  "name": "@mono/resize-observer-hooks",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -26,12 +26,11 @@
     "jest_config": "config/jest.config.json",
     "lib_dir": "lib",
     "scripts_dir": "../../scripts",
-    "tsconfig_dev": "config/tsconfig.dev.json",
     "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
     "webpack_config_js": "config/webpack.config.js"
   },
   "dependencies": {
-    "noshiro-ts-utils": "*",
+    "@mono/ts-utils": "*",
     "react": "^16.13.1",
     "resize-observer": "^1.0.0"
   }

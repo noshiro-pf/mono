@@ -1,4 +1,4 @@
-import { RectSize } from 'noshiro-ts-utils';
+import { RectSize } from '@mono/ts-utils';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { ResizeObserver } from 'resize-observer';
 
