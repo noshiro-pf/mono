@@ -1,7 +1,7 @@
-import { Hue, max, Percent, seq, zeros } from 'noshiro-ts-utils';
-import { relativeLuminance } from '.';
+import { Hue, max, Percent, seq, zeros } from '@mono/ts-utils';
 import { hslToRgb } from '../convert/hsl-to-rgb';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc';
+import { relativeLuminance } from './relative-luminance';
 
 // constants
 const hues: Hue[] = seq(360) as Hue[];

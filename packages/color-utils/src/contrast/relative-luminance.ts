@@ -1,4 +1,4 @@
-import { Rgb } from 'noshiro-ts-utils';
+import { Rgb } from '@mono/ts-utils';
 
 /**
  * link: https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef

@@ -6,7 +6,7 @@ import {
   numberToPercent,
   Rgb,
   Rgba,
-} from 'noshiro-ts-utils';
+} from '@mono/ts-utils';
 
 export const rgbToHsl = ([r, g, b]: Rgb): Hsl => {
   const tc = new TinyColor({ r, g, b });

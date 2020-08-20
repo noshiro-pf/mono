@@ -1,4 +1,4 @@
-import { testColors, testHslEquality } from 'noshiro-ts-utils';
+import { testColors, testHslEquality } from '@mono/ts-utils';
 import { hexToHsl } from './hex-to-hsl';
 
 for (const [index, testColor] of testColors.entries()) {

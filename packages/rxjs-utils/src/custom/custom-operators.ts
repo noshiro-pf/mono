@@ -1,4 +1,4 @@
-import { isNotUndefined, PrimitiveType } from 'noshiro-ts-utils';
+import { isNotUndefined, PrimitiveType } from '@mono/ts-utils';
 import { Observable, ObservableInput, OperatorFunction } from 'rxjs';
 import { filter, map, mapTo, pluck, withLatestFrom } from 'rxjs/operators';
 import { combineLatestTyped } from '../combine-latest';

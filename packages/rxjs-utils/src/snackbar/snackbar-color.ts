@@ -1,4 +1,4 @@
-import { hsla } from 'noshiro-ts-utils';
+import { hsla } from '@mono/ts-utils';
 
 export const snackbarColor = {
   pending: hsla(0, 0, 40, 1),

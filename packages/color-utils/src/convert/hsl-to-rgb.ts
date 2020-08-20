@@ -1,5 +1,5 @@
 import { TinyColor } from '@ctrl/tinycolor';
-import { Hsl, Hsla, numberToRgbValue, Rgb, Rgba } from 'noshiro-ts-utils';
+import { Hsl, Hsla, numberToRgbValue, Rgb, Rgba } from '@mono/ts-utils';
 
 export const hslToRgb = ([h, s, l]: Hsl): Rgb => {
   const tc = new TinyColor({ h, s, l });

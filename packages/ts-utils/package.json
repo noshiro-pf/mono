@@ -1,5 +1,5 @@
 {
-  "name": "noshiro-ts-utils",
+  "name": "@mono/ts-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -34,7 +34,6 @@
     "pipe_max_length": 12,
     "pipe_ts_path": "src/others/pipe.ts",
     "scripts_dir": "../../scripts",
-    "tsconfig_dev": "config/tsconfig.dev.json",
     "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
     "webpack_config_js": "config/webpack.config.js"
   }

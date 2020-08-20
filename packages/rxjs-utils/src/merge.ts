@@ -1,4 +1,4 @@
-import { ArrayElement } from 'noshiro-ts-utils';
+import { ArrayElement } from '@mono/ts-utils';
 import { merge, Observable, ObservableInput } from 'rxjs';
 import { Unwrap } from './unwrap';
 

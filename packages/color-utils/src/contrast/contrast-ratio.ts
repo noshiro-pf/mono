@@ -1,4 +1,4 @@
-import { Hsl, Rgb } from 'noshiro-ts-utils';
+import { Hsl, Rgb } from '@mono/ts-utils';
 import { hslToRgb } from '../convert/hsl-to-rgb';
 import { relativeLuminance } from './relative-luminance';
 

@@ -1,5 +1,5 @@
 {
-  "name": "noshiro-react-router-utils",
+  "name": "@mono/react-router-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -19,19 +19,18 @@
     "lint": "eslint src/ --ext .js,.ts",
     "setup": "yarn _compile_webpackconfig",
     "start": "node \"${npm_package_config_start_script}\"",
-    "test": "jest --config \"${npm_package_config_jest_config}\"",
+    "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
     "testw": "yarn test --watch"
   },
   "config": {
     "jest_config": "config/jest.config.json",
     "lib_dir": "lib",
     "scripts_dir": "../../scripts",
-    "tsconfig_dev": "config/tsconfig.dev.json",
     "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
     "webpack_config_js": "config/webpack.config.js"
   },
   "dependencies": {
-    "noshiro-ts-utils": "*",
+    "@mono/ts-utils": "*",
     "react": "^16.13.1"
   }
 }

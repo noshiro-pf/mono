@@ -1,5 +1,5 @@
 {
-  "name": "noshiro-color-utils",
+  "name": "@mono/color-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -27,12 +27,11 @@
     "jest_config": "config/jest.config.json",
     "lib_dir": "lib",
     "scripts_dir": "../../scripts",
-    "tsconfig_dev": "config/tsconfig.dev.json",
     "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
     "webpack_config_js": "config/webpack.config.js"
   },
   "dependencies": {
     "@ctrl/tinycolor": "^3.1.4",
-    "noshiro-ts-utils": "*"
+    "@mono/ts-utils": "*"
   }
 }
