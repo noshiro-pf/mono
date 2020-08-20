@@ -21,6 +21,6 @@ testArrayEquality({
 
 testArrayEquality({
   testName: 'uniqBy',
-  target: uniqBy([1, 2, 3, 4, 5, 6], (a) => a % 3),
+  target: uniqBy((a: number) => a % 3)([1, 2, 3, 4, 5, 6]),
   toBe: [1, 2, 3],
 });
