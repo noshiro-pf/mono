@@ -19,7 +19,7 @@
     "lint": "eslint src/ --ext .js,.ts",
     "setup": "yarn _compile_webpackconfig",
     "start": "node \"${npm_package_config_start_script}\"",
-    "test": "jest --config \"${npm_package_config_jest_config}\"",
+    "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
     "testw": "yarn test --watch"
   },
   "config": {
