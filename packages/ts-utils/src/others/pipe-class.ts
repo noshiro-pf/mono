@@ -13,4 +13,4 @@ class Pipe<A> {
   }
 }
 
-export const pipe = <A>(a: A): Pipe<A> => new Pipe(a);
+export const pipeClass = <A>(a: A): Pipe<A> => new Pipe(a);

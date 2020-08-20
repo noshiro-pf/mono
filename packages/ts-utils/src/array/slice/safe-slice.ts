@@ -1,6 +1,5 @@
 import { clamp } from '../../num';
 
-/** @internal */
 export const safeSlice = <T>(
   array: readonly T[],
   start: number,

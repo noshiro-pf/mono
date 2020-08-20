@@ -1,5 +1,5 @@
 import { isEmpty } from '../is-empty';
 import { sum } from './sum';
 
-export const average = (arr: readonly number[]): number =>
-  isEmpty(arr) ? 0 : sum(arr) / arr.length;
+export const average = (array: readonly number[]): number =>
+  isEmpty(array) ? 0 : sum(array) / array.length;

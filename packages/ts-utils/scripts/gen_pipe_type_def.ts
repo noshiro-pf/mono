@@ -11,7 +11,8 @@ type ${funcTypeName}<A, B> = (v: A) => B;
 export interface Pipe {
 `;
 
-const seq = (len: number): number[] => new Array(len).fill(0).map((_, i) => i);
+const range = (start: number, end: number): number[] =>
+  new Array(end - start).fill(0).map((_, i) => start + i);
 
 const genPipeMethod = (length: number): string => {
   if (length < 2) return '';
@@ -19,23 +20,29 @@ const genPipeMethod = (length: number): string => {
   // ```
   // <T0, T1, T2>(x: T0, f1: FuncType<T0, T1>, f2: FuncType<T1, T2>): T2;
   // ```
-  const typeVars = seq(length + 1).map((i) => `T${i}`);
+  const typeVars = range(0, length).map((i) => `T${i}`);
   let result = `<${typeVars.join(',')}>(x: ${typeVars[0]}, `;
-  for (let i = 1; i <= length; ++i) {
+  for (let i = 1; i < length; ++i) {
     result += `f${i}: ${funcTypeName}<${typeVars[i - 1]}, ${typeVars[i]}>, `;
   }
-  result += `): ${typeVars[length]};`;
+  result += `): ${typeVars[length - 1]};`;
 
   return result;
 };
 
 const footer = `
-  (x: any, ...fns: ${funcTypeName}<any, any>[]): any;
+  <T0>(x: T0, f1: ${funcTypeName}<T0, any>, ...fns: ${funcTypeName}<any, any>[]): any;
 }
 `;
 
 const createPipeTypeDef = (length: number): string =>
-  [header, seq(length).map(genPipeMethod).join('\n'), footer].join('\n');
+  [
+    header,
+    range(2, length + 1)
+      .map(genPipeMethod)
+      .join('\n'),
+    footer,
+  ].join('\n');
 
 const input = (): [number, string] => {
   const args = process.argv.slice(2);

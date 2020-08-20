@@ -1,7 +1,10 @@
-export function max(array: number[]): undefined | number;
-export function max(array: readonly number[]): undefined | number;
-export function max(array: readonly number[]): undefined | number {
-  return array.length === 0
-    ? undefined
-    : Math.max.apply(null, array as number[]);
+import { isEmpty } from '../is-empty';
+import { ReadonlyNonEmptyArray } from '../non-empty-array';
+
+interface Max {
+  (array: ReadonlyNonEmptyArray<number>): number;
+  (array: readonly number[]): number | undefined;
 }
+
+export const max: Max = ((array: readonly number[]): number | undefined =>
+  isEmpty(array) ? undefined : Math.max.apply(null, array as number[])) as Max;

@@ -1,11 +1,11 @@
-/** @internal */
-export const scan = <T, R>(
-  array: readonly T[],
-  reducer: (acc: R, curr: T) => R,
-  init: R
-): R[] => {
-  const n = array.length;
-  const result: R[] = new Array<R>(n + 1).fill(init);
+import { ReducerType } from '../../types';
+import { newArray } from '../create/new-array';
+import { ReadonlyNonEmptyArray } from '../non-empty-array';
+
+export const scan = <A, B>(reducer: ReducerType<B, A>, init: B) => (
+  array: ReadonlyNonEmptyArray<A> | readonly A[]
+): ReadonlyNonEmptyArray<B> => {
+  const result: B[] = newArray<B>(array.length + 1, init);
 
   let acc = init;
   for (const [index, value] of array.entries()) {
@@ -13,5 +13,5 @@ export const scan = <T, R>(
     result[index + 1] = acc;
   }
 
-  return result;
+  return (result as unknown) as ReadonlyNonEmptyArray<B>;
 };

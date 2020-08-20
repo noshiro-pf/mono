@@ -1,4 +1,5 @@
-export const isNonEmpty = <A>(array: readonly A[]): array is NonEmptyArray<A> =>
-  array.length > 0;
+import { ReadonlyNonEmptyArray } from './non-empty-array';
 
-export type NonEmptyArray<A> = A[] & { 0: A };
+export const isNonEmpty = <A>(
+  array: readonly A[]
+): array is ReadonlyNonEmptyArray<A> => array.length > 0;
