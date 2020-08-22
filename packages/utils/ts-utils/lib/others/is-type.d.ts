@@ -1,0 +1,13 @@
+export declare const isUndefined: (value: unknown) => value is undefined;
+export declare const isNotUndefined: <T>(value: T) => value is Exclude<T, undefined>;
+export declare const isBoolean: (value: unknown) => value is boolean;
+export declare const isNotBoolean: <T>(value: T) => value is Exclude<T, boolean>;
+export declare const isNumber: (value: unknown) => value is number;
+export declare const isNotNumber: <T>(value: T) => value is Exclude<T, number>;
+export declare const isString: (value: unknown) => value is string;
+export declare const isNotString: <T>(value: T) => value is Exclude<T, string>;
+export declare const isSymbol: (value: unknown) => value is symbol;
+export declare const isNotSymbol: <T>(value: T) => value is Exclude<T, symbol>;
+export declare const isNull: (value: unknown) => value is null;
+export declare const isNotNull: <T>(value: T | null) => value is T;
+//# sourceMappingURL=is-type.d.ts.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"first.d.ts","sourceRoot":"","sources":["../../../src/array/access/first.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,MAAM,oBAAoB,CAAC;AAG3D,UAAU,KAAK;IACb,CAAC,CAAC,EAAE,KAAK,EAAE,qBAAqB,CAAC,CAAC,CAAC,GAAG,CAAC,CAAC;IACxC,CAAC,CAAC,EAAE,KAAK,EAAE,SAAS,CAAC,EAAE,GAAG,CAAC,GAAG,SAAS,CAAC;CACzC;AAED,eAAO,MAAM,KAAK,EAAE,KAEY,CAAC"}

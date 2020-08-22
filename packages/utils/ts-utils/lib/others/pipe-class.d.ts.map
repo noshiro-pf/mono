@@ -1,0 +1,1 @@
+{"version":3,"file":"pipe-class.d.ts","sourceRoot":"","sources":["../../src/others/pipe-class.ts"],"names":[],"mappings":"AAAA,cAAM,IAAI,CAAC,CAAC;IACV,OAAO,CAAC,CAAC,CAAI;gBACD,CAAC,EAAE,CAAC;IAIhB,GAAG,CAAC,CAAC,EAAE,EAAE,EAAE,CAAC,CAAC,EAAE,CAAC,KAAK,CAAC,GAAG,IAAI,CAAC,CAAC,CAAC;IAIhC,IAAI,KAAK,IAAI,CAAC,CAEb;CACF;AAED,eAAO,MAAM,SAAS,sBAAoC,CAAC"}

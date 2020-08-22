@@ -1,0 +1,1 @@
+{"version":3,"file":"promise-snackbar-state.d.ts","sourceRoot":"","sources":["../../src/snackbar/promise-snackbar-state.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,gBAAgB,CAAC;AAE9C,oBAAY,wBAAwB,GAAG;IACrC,MAAM,EAAE,OAAO,CAAC;IAChB,OAAO,EAAE,MAAM,CAAC;IAChB,YAAY,EAAE,YAAY,CAAC;CAC5B,CAAC"}
