@@ -13,8 +13,9 @@
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
     "build": "yarn _cleanup_build && webpack --config \"${npm_package_config_webpack_config_js}\"",
-    "fmt": "yarn _script_formatchanged master",
-    "fmtall": "yarn _script_formatglob \"./src/**/*.ts\"",
+    "fmt": "yarn _script_formatchanged",
+    "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
+    "fmtb": "yarn _script_formatchanged master",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .js,.ts",
     "setup": "yarn _compile_webpackconfig",
@@ -31,6 +32,7 @@
   },
   "dependencies": {
     "@mono/ts-utils": "*",
-    "react": "^16.13.1"
+    "react": "^16.13.1",
+    "react-router": "^5.2.0"
   }
 }
