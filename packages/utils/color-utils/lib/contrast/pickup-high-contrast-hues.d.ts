@@ -1,4 +1,4 @@
-import { Hue, Percent } from 'noshiro-ts-utils';
+import { Hue, Percent } from '@mono/ts-utils';
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（＝hue）を返す
  */

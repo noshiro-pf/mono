@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isNotNone = exports.isNone = exports.some = exports.none = exports.noop = exports.binarySearch = exports.halfInt = exports.toNumber = exports.mapNullable = void 0;
-exports.mapNullable = function (fn) { return function (value) { return (value === undefined ? undefined : fn(value)); }; };
+exports.isNotNone = exports.isNone = exports.some = exports.none = exports.noop = exports.binarySearch = exports.halfInt = exports.toNumber = void 0;
 exports.toNumber = function (value) {
     var result = parseInt(value);
     return Number.isNaN(result) ? undefined : result;

@@ -1,18 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var utils_1 = require("./utils");
-describe('mapNullable', function () {
-    var sq = function (x) { return Math.pow(x, 2); };
-    test('case 1', function () {
-        expect(utils_1.mapNullable(sq)(2)).toBe(4);
-    });
-    test('case 2', function () {
-        expect(utils_1.mapNullable(sq)(0)).toBe(0);
-    });
-    test('case 3', function () {
-        expect(utils_1.mapNullable(sq)(undefined)).toBe(undefined);
-    });
-});
 describe('halfInt', function () {
     test('case: even number', function () {
         expect(utils_1.halfInt(2)).toBe(1);

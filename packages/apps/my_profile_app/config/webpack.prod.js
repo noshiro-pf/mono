@@ -1,11 +1,11 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
 require('webpack-dev-server');
-var webpack_config_prod_maker_1 = require('../../../config/react/webpack_config_prod_maker');
+var webpack_config_prod_maker_1 = require('../../../../config/react/webpack_config_prod_maker');
 var env_1 = require('./env');
 var paths_1 = require('./paths');
 console.log('use bundle analyzer: ', env_1.dotenvValues.USE_BUNDLE_ANALYZER);
-var webpackConfigMerged = webpack_config_prod_maker_1.webpackConfigProdMaker(
+var webpackConfigMerged = webpack_config_prod_maker_1.webpackConfigReactProdMaker(
   paths_1.paths,
   'bundle.js',
   env_1.dotenvValues.USE_BUNDLE_ANALYZER

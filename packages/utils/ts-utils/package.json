@@ -6,7 +6,6 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "_cleanup_build": "rimraf \"${npm_package_config_lib_dir}\"",
     "_compile_genpipetypedef_script": "tsc --project \"${npm_package_config_gen_pipe_type_ts_config}\"",
     "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack_config}\" && yarn _format_webpackconfig",
     "_format_genpipetypedef": "yarn _script_formatglob \"${npm_package_config_pipe_ts_path}\"",
@@ -14,7 +13,8 @@
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
-    "build": "yarn _cleanup_build && webpack --config \"${npm_package_config_webpack_config_js}\"",
+    "prebuild": "rimraf \"${npm_package_config_lib_dir}\"",
+    "build": "webpack --config \"${npm_package_config_webpack_config_js}\"",
     "fmt": "yarn _script_formatchanged",
     "fmtall": "yarn _script_formatglob \"./src/**/*.ts\"",
     "fmtb": "yarn _script_formatchanged master",
@@ -22,7 +22,6 @@
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .js,.ts",
     "setup": "yarn _compile_genpipetypedef_script && yarn _compile_webpackconfig",
-    "start": "node \"${npm_package_config_start_script}\"",
     "test": "jest --config \"${npm_package_config_jest_config}\"",
     "testw": "yarn test --watch"
   },
@@ -33,7 +32,7 @@
     "lib_dir": "lib",
     "pipe_max_length": 12,
     "pipe_ts_path": "src/others/pipe.ts",
-    "scripts_dir": "../../scripts",
+    "scripts_dir": "../../../scripts",
     "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
     "webpack_config_js": "config/webpack.config.js"
   }

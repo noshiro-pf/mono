@@ -2157,6 +2157,8 @@ object-assign
 
 // $FlowFixMe: Not typed to avoid destructuring arguments
 
+// $FlowIgnore
+
 // (so also no leading and trailing slashes - it does not distinguish
 
 // .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,

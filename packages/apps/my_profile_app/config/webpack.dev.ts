@@ -1,5 +1,5 @@
 import 'webpack-dev-server';
-import { webpackConfigReactDevMaker } from '../../../config/react/webpack_config_dev_maker';
+import { webpackConfigReactDevMaker } from '../../../../config/react/webpack_config_dev_maker';
 import { dotenvValues } from './env';
 import { paths } from './paths';
 

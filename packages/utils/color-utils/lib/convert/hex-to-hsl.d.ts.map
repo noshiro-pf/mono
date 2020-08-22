@@ -1,1 +1,1 @@
-{"version":3,"file":"hex-to-hsl.d.ts","sourceRoot":"","sources":["../../src/convert/hex-to-hsl.ts"],"names":[],"mappings":"AAAA,OAAO,EAAY,GAAG,EAAE,MAAM,kBAAkB,CAAC;AAGjD,eAAO,MAAM,QAAQ,QAAS,MAAM,QAAiC,CAAC"}
+{"version":3,"file":"hex-to-hsl.d.ts","sourceRoot":"","sources":["../../src/convert/hex-to-hsl.ts"],"names":[],"mappings":"AAAA,OAAO,EAAY,GAAG,EAAE,MAAM,gBAAgB,CAAC;AAG/C,eAAO,MAAM,QAAQ,QAAS,MAAM,QAAiC,CAAC"}

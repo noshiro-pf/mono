@@ -6,7 +6,7 @@
   "scripts": {
     "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\" && yarn _format_webpackconfig",
     "_create_dot_env": "cpx ${npm_package_config_dotenv_example} .env",
-    "_format_webpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
+    "_format_webpackconfig": "prettier --write \"./config/*.js\"",
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "prebuild": "rimraf ${npm_package_config_dist_dir}",
@@ -26,12 +26,11 @@
     "testw": "yarn test --watch"
   },
   "config": {
-    "config_dir": "config",
     "dist_dir": "build",
     "dotenv_example": "dotenv-example",
     "jest_config": "config/jest.config.json",
     "public_dir": "public",
-    "scripts_dir": "../../scripts",
+    "scripts_dir": "../../../scripts",
     "tsconfig_for_webpack": "config/tsconfig.reactconfig.json",
     "webpack_dev_config": "config/webpack.dev.js",
     "webpack_prod_config": "config/webpack.prod.js"

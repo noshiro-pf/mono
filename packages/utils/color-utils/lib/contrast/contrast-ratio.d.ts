@@ -1,4 +1,4 @@
-import { Hsl, Rgb } from 'noshiro-ts-utils';
+import { Hsl, Rgb } from '@mono/ts-utils';
 /**
  * @description
  * Contrast ratios can range from 1 to 21.

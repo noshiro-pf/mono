@@ -1,4 +1,3 @@
-export declare const mapNullable: <A, B>(fn: (v: A) => B) => (value: A | undefined) => B | undefined;
 export declare const toNumber: (value: string) => number | undefined;
 export declare const halfInt: (x: number) => number;
 export declare const binarySearch: (sortedArray: number[], x: number) => number;
