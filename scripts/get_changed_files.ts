@@ -7,12 +7,13 @@ const execp = promisify(exec);
 type FileName = string;
 
 const commands = {
-  gitUnStagedFiles: 'git ls-files --others --exclude-standard',
+  gitUnStagedFiles: 'git ls-files -mo --exclude-standard',
   gitDiff: (commitId?: string) =>
     `git diff --name-only --diff-filter=ACMTUXB --staged ${commitId ?? ''}`,
 };
 
 export const gitUnTrackedFiles = async (): Promise<FileName[]> => {
+  console.log(commands.gitUnStagedFiles);
   const { stdout, stderr } = await execp(commands.gitUnStagedFiles, {
     cwd: monoRootAbsolutePath,
   });
@@ -25,6 +26,7 @@ export const gitUnTrackedFiles = async (): Promise<FileName[]> => {
 };
 
 export const gitDiff = async (fromCommitId: string): Promise<FileName[]> => {
+  console.log(commands.gitDiff(fromCommitId));
   const { stdout, stderr } = await execp(commands.gitDiff(fromCommitId), {
     cwd: monoRootAbsolutePath,
   });
