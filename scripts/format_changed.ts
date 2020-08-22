@@ -12,15 +12,16 @@ const isTsFileName = (filename: FileName): boolean =>
   (filename.endsWith('.ts') || filename.endsWith('.tsx')) &&
   !filename.endsWith('.d.ts');
 
+const uniq = (array: string[]): string[] => Array.from(new Set(array));
+
 const main = async (): Promise<void> => {
   const gitCommitId = process.argv[2] ?? ''; // master
 
   const untrackedFiles = await gitUnTrackedFiles();
   const updatedFiles = await gitDiff(gitCommitId);
-  const tsFiles = untrackedFiles
-    .concat(updatedFiles)
-    .filter(isTsFileName)
-    .map(toAbsolutePath);
+  const tsFiles = uniq(
+    untrackedFiles.concat(updatedFiles).filter(isTsFileName).map(toAbsolutePath)
+  );
 
   console.log(`target files (${tsFiles.length} files):`);
   tsFiles.forEach((filename) => console.log(`- ${filename}`));
