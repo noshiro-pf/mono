@@ -1,0 +1,1 @@
+{"version":3,"file":"rgb-to-str.d.ts","sourceRoot":"","sources":["../../../../src/color/functions/to-string/rgb-to-str.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,GAAG,EAAE,IAAI,EAAE,MAAM,aAAa,CAAC;AAExC,eAAO,MAAM,QAAQ,sBAAqB,MAAiC,CAAC;AAC5E,eAAO,MAAM,SAAS,0BAAyB,MACf,CAAC"}
