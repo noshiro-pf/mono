@@ -1,6 +1,6 @@
+import { memoNamed } from '@mono/react-utils';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { memoNamed } from '@mono/react-utils';
 
 const Root = styled.div`
   width: 100%;

@@ -1,7 +1,7 @@
+import { memoNamed } from '@mono/react-utils';
 import { Rect } from '@mono/ts-utils';
 import React from 'react';
 import styled from 'styled-components';
-import { memoNamed } from '@mono/react-utils';
 import { DivCropped } from './div-cropped';
 
 const Img = styled.img`
