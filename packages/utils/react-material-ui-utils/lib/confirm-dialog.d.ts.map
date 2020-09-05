@@ -1,1 +1,0 @@
-{"version":3,"file":"confirm-dialog.d.ts","sourceRoot":"","sources":["../src/confirm-dialog.tsx"],"names":[],"mappings":"AAOA,OAAO,KAAgC,MAAM,OAAO,CAAC;AAsCrD,eAAO,MAAM,aAAa;aAnCf,MAAM;UACT,OAAO;kBACC,KAAK,GAAG,IAAI,KAAK,IAAI;GAiCY,CAAC"}

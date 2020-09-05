@@ -1,1 +1,0 @@
-{"version":3,"file":"flip-bit-array.d.ts","sourceRoot":"","sources":["../../src/bit-array/flip-bit-array.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,gBAAgB,EAAE,MAAM,UAAU,CAAC;AAC5C,OAAO,EAAE,oBAAoB,EAAE,MAAM,sBAAsB,CAAC;AAE5D,eAAO,MAAM,oBAAoB,EAAE,gBAAgB,CAAC,oBAAoB,CAEnC,CAAC"}
