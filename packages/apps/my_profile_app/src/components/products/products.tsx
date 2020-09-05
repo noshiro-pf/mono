@@ -1,9 +1,9 @@
+import { memoNamed } from '@mono/react-utils';
 import React, { useMemo } from 'react';
 import { contentsUrls } from '../../constants/contents-urls';
 import { productsInfo, ProductsInfo } from '../../types/products';
 import { convertJsonData } from '../../utils/convert-json-data';
 import { useFetchedJsonData } from '../../utils/hooks';
-import { memoNamed } from '../../utils/react/memo-named';
 import { ProductsViewMobile } from './products-mobile-view/products-mobile-view';
 import { ProductsView } from './products-view/products-view';
 

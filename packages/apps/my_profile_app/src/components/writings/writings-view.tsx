@@ -1,7 +1,7 @@
+import { memoNamed } from '@mono/react-utils';
+import { Mappable } from '@mono/ts-utils';
 import React from 'react';
 import { WritingsInfo } from '../../types/writings';
-import { memoNamed } from '../../utils/react/memo-named';
-import { Mappable } from '../../utils/type';
 import { WritingsElement } from './writings-element';
 
 export const WritingsView = memoNamed<{

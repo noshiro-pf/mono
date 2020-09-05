@@ -1,7 +1,7 @@
+import { memoNamed } from '@mono/react-utils';
+import { Mappable } from '@mono/ts-utils';
 import React from 'react';
 import { ProductsInfo } from '../../../types/products';
-import { memoNamed } from '../../../utils/react/memo-named';
-import { Mappable } from '../../../utils/type';
 import { ProductsElementMobileView } from './products-mobile-element-view';
 
 export const ProductsViewMobile = memoNamed<{

@@ -1,4 +1,4 @@
-import { Json } from '../utils/type';
+import { JsonType } from '@mono/ts-utils';
 
 export interface WritingsInfo {
   link: string;
@@ -8,7 +8,7 @@ export interface WritingsInfo {
   body2: string;
 }
 
-export const writingInfo = (obj: Json | undefined): WritingsInfo => ({
+export const writingInfo = (obj: JsonType | undefined): WritingsInfo => ({
   link: obj?.link?.toString() ?? '',
   title: obj?.title?.toString() ?? '',
   subtitle: obj?.subtitle?.toString() ?? '',

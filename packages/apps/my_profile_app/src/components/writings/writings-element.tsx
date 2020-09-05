@@ -1,7 +1,7 @@
 import { Card, CardContent, Typography } from '@material-ui/core';
+import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
-import { memoNamed } from '../../utils/react/memo-named';
 
 const CardStyled = styled(Card)`
   margin: 10px;
