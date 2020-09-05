@@ -17,7 +17,7 @@
     "postcompileconfigs": "prettier --write \"config/**/*.js\"",
     "compilescripts": "tsc --project ./scripts/tsconfig.json",
     "fmt": "yarn _script_formatchanged",
-    "fmt:all": "yarn workspaces run fmtall",
+    "fmt:all": "yarn _script_formatglob \"./{packages,scripts,config}/**/*.{ts,tsx}\"",
     "fmtb": "yarn _script_formatchanged master",
     "lint:all": "yarn workspaces run lint",
     "presetup:all": "yarn clean:all",
