@@ -5,7 +5,12 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "../lib"
+    // "baseUrl": "../",
+    // "paths": {
+    //   "@mono/ts-utils": ["../ts-utils"]
+    // }
   },
+  // "references": [{ "path": "../../ts-utils" }],
   "include": ["../src"],
   "exclude": ["../src/**/*.test.ts", "node_modules"]
 }

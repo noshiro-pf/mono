@@ -1,3 +1,8 @@
 {
-  "extends": "../../../.eslintrc.json"
+  "extends": "../../../.eslintrc.json",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  }
 }
