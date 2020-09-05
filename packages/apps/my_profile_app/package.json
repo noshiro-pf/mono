@@ -4,14 +4,15 @@
   "license": "MIT",
   "author": "noshiro",
   "scripts": {
-    "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\" && yarn _format_webpackconfig",
-    "_create_dot_env": "cpx ${npm_package_config_dotenv_example} .env",
-    "_format_webpackconfig": "prettier --write \"./config/*.js\"",
+    "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\"",
+    "post_compile_webpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
+    "_remove_build": "rimraf ${npm_package_config_dist_dir}",
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
-    "prebuild": "rimraf ${npm_package_config_dist_dir}",
+    "prebuild": "yarn _remove_build",
     "build": "webpack --config \"${npm_package_config_webpack_prod_config}\"",
     "postbuild": "cpx \"${npm_package_config_public_dir}/**\" \"${npm_package_config_dist_dir}\"",
+    "clean": "rimraf config/**/*.js scripts/**/*.js && yarn _remove_build",
     "predeploy": "yarn build",
     "deploy": "firebase deploy",
     "firebase:login": "firebase login",
@@ -20,18 +21,19 @@
     "fmtb": "yarn _script_formatchanged master",
     "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
     "serve": "firebase serve",
-    "setup": "yarn _compile_webpackconfig && yarn _create_dot_env",
+    "setup": "yarn _compile_webpackconfig",
     "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
-    "test": "jest --config \"${npm_package_config_jest_config}\"",
+    "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
     "testw": "yarn test --watch"
   },
   "config": {
+    "config_dir": "config",
     "dist_dir": "build",
     "dotenv_example": "dotenv-example",
     "jest_config": "config/jest.config.json",
     "public_dir": "public",
     "scripts_dir": "../../../scripts",
-    "tsconfig_for_webpack": "config/tsconfig.reactconfig.json",
+    "tsconfig_for_webpack": "config/tsconfig.webpackconfig.json",
     "webpack_dev_config": "config/webpack.dev.js",
     "webpack_prod_config": "config/webpack.prod.js"
   },
@@ -58,6 +60,7 @@
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
+    "@mono/ts-utils": "*",
     "firebase-tools": "^8.7.0"
   }
 }

@@ -1,15 +1,14 @@
-import { Json, JsonValue } from './type';
+import { JsonType, JsonValueType } from '@mono/ts-utils';
 
 export const convertJsonData = <T>(
-  data: Json | undefined,
-  mapFn: (data?: Json) => JsonValue | undefined,
-  converter: (v: Json) => T
+  data: JsonType | undefined,
+  mapFn: (data?: JsonType) => JsonValueType | undefined,
+  converter: (v: JsonType) => T
 ): T[] => {
-  // if (data == null) return [];
-  // if (typeof data !== 'object') return [];
-  // if (Array.isArray(data)) return [];
   const listElementsOrNull = mapFn(data);
-  return listElementsOrNull === undefined || !Array.isArray(listElementsOrNull)
-    ? []
-    : listElementsOrNull.map(converter);
+  if (listElementsOrNull === undefined || !Array.isArray(listElementsOrNull))
+    return [];
+  if (listElementsOrNull.some((e) => e === null || typeof e !== 'object'))
+    return [];
+  return (listElementsOrNull as JsonType[]).map(converter);
 };

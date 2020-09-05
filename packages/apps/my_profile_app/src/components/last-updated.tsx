@@ -1,7 +1,7 @@
+import { memoNamed } from '@mono/react-utils';
 import React, { useMemo } from 'react';
 import { contentsUrls } from '../constants/contents-urls';
 import { useFetchedText } from '../utils/hooks';
-import { memoNamed } from '../utils/react/memo-named';
 
 export const LastUpdated = memoNamed('LastUpdated', () => {
   const data = useFetchedText(contentsUrls.lastUpdated);

@@ -1,8 +1,8 @@
 import { Tab, Tabs } from '@material-ui/core';
+import { memoNamed } from '@mono/react-utils';
+import { Mappable } from '@mono/ts-utils';
 import React, { useCallback } from 'react';
 import { useValueWithDefault } from './hooks';
-import { memoNamed } from './react/memo-named';
-import { Mappable } from './type';
 
 export const MyTabs = memoNamed<{
   tabIndex: number;

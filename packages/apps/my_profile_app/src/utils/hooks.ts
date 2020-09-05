@@ -1,8 +1,8 @@
+import { JsonType } from '@mono/ts-utils';
 import { useEffect, useMemo, useState } from 'react';
-import { Json } from './type';
 
-export const useFetchedJsonData = (url: string): Json | undefined => {
-  const [data, setData] = useState<Json | undefined>(undefined);
+export const useFetchedJsonData = (url: string): JsonType | undefined => {
+  const [data, setData] = useState<JsonType | undefined>(undefined);
 
   useEffect(() => {
     let alive = true;

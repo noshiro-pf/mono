@@ -1,6 +1,6 @@
+import { memoNamed } from '@mono/react-utils';
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { memoNamed } from '../../utils/react/memo-named';
 
 export const MarkdownPage = memoNamed<{ url: string }>(
   'MarkdownPage',

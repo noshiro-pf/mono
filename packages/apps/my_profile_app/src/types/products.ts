@@ -1,4 +1,4 @@
-import { Json } from '../utils/type';
+import { JsonType } from '@mono/ts-utils';
 
 export interface ProductsInfo {
   link: string;
@@ -9,7 +9,7 @@ export interface ProductsInfo {
   imageUrl: string;
 }
 
-export const productsInfo = (obj: Json | undefined): ProductsInfo => ({
+export const productsInfo = (obj: JsonType | undefined): ProductsInfo => ({
   link: obj?.link?.toString() ?? '',
   title: obj?.title?.toString() ?? '',
   subtitle: obj?.subtitle?.toString() ?? '',
