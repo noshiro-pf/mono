@@ -9,22 +9,22 @@
   "scripts": {
     "_compile_genpipabletypedef_script": "tsc --project \"${npm_package_config_gen_pipable_ts_config}\"",
     "_compile_preview": "yarn _remove_preview_script && tsc --project \"${npm_package_config_tsconfig_dev}\"",
-    "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack_config}\" && yarn _format_webpackconfig",
     "_format_genpipabletypedef": "yarn _script_formatglob \"${npm_package_config_pipable_ts_path}\"",
-    "_format_webpackconfig": "prettier --write \"${npm_package_config_webpack_config_js}\"",
+    "_remove_build": "rimraf \"${npm_package_config_lib_dir}\"",
     "_remove_preview_script": "rimraf \"${npm_package_config_dist_dir}\"",
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
     "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
-    "prebuild": "rimraf \"${npm_package_config_lib_dir}\"",
-    "build": "webpack --config \"${npm_package_config_webpack_config_js}\"",
+    "prebuild": "yarn _remove_build",
+    "build": "tsc --project \"${npm_package_config_tsconfig_dev}\"",
+    "clean": "rimraf config/**/*.js scripts/**/*.js && yarn _remove_build",
     "fmt": "yarn _script_formatchanged",
     "fmtall": "yarn _script_formatglob \"./src/**/*.ts\"",
     "fmtb": "yarn _script_formatchanged master",
     "genpipabletypedef": "node \"${npm_package_config_gen_pipable_def}\" ${npm_package_config_pipable_max_length} \"${npm_package_config_pipable_ts_path}\" && yarn _format_genpipabletypedef",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .js,.ts",
-    "setup": "yarn _compile_genpipabletypedef_script && yarn _compile_preview && yarn _compile_webpackconfig",
+    "setup": "yarn _compile_genpipabletypedef_script && yarn _compile_preview",
     "start": "node \"${npm_package_config_start_script}\"",
     "test": "jest --config \"${npm_package_config_jest_config}\"",
     "testw": "yarn test --watch"
@@ -40,7 +40,6 @@
     "scripts_dir": "../../../scripts",
     "start_script": "dist/test/preview-main.js",
     "tsconfig_dev": "config/tsconfig.dev.json",
-    "tsconfig_for_webpack_config": "config/tsconfig.webpackconfig.json",
-    "webpack_config_js": "config/webpack.config.js"
+    "tsconfig_lib": "config/tsconfig.lib.json"
   }
 }

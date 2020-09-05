@@ -51,9 +51,6 @@ export const webpackConfigReactDevMaker = (
       pathinfo: true,
       filename: bundlejsName,
     },
-    resolve: {
-      extensions: ['.ts', '.js', '.tsx', '.jsx'],
-    },
     devServer: devServerConfigMaker(paths, host, port),
     devtool: 'inline-source-map',
     plugins,

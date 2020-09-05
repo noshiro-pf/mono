@@ -1,8 +1,8 @@
-import * as webpack from 'webpack';
+import { Configuration, RuleSetRule } from 'webpack';
 import 'webpack-dev-server';
-import nodeExternals from 'webpack-node-externals';
+// import { absolutePathFromMonoRoot } from '../../scripts/get_mono_root_path';
 
-const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
+export const rulesMakerCommon = (pathToTsconfigJson: string): RuleSetRule[] => [
   {
     test: /\.tsx?$/,
     exclude: [/node_modules/],
@@ -21,25 +21,25 @@ const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
 ];
 
 export const webpackConfigCommonMaker = (
+  pathToTsconfigJson: string,
   entry: string,
   outputPath: string,
-  pathToTsconfigJson: string
-): webpack.Configuration => ({
+  bundleJsName: string
+): Configuration => ({
   mode: 'production',
+  // stats: 'verbose',
   entry,
   output: {
-    filename: 'bundle.js',
+    filename: bundleJsName,
     path: outputPath,
   },
   resolve: {
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
+    // symlinks: false,
   },
-  module: { rules: rulesMaker(pathToTsconfigJson) },
-  target: 'node',
-  externals: [
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    nodeExternals({
-      modulesFromFile: true,
-    }),
-  ],
+  module: { rules: rulesMakerCommon(pathToTsconfigJson) },
+  // target: 'node',
+  optimization: {
+    runtimeChunk: true,
+  },
 });
