@@ -60,6 +60,7 @@
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
+    "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
     "firebase-tools": "^8.7.0"
   }
