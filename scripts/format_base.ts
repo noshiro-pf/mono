@@ -4,7 +4,7 @@ import { monoRootAbsolutePath } from './get_mono_root_path';
 
 const paths = {
   prettierrc: '.prettierrc',
-  formatTargetDirectories: ['packages', 'scripts', 'configs,'],
+  formatTargetDirectories: ['packages', 'scripts', 'config'],
 };
 
 const project = new tsm.Project();
@@ -32,17 +32,15 @@ const organizeImportsAndRunPrettier = (
 };
 
 export async function organizeImportsAndRunPrettierWithIO(
-  globPatterns: string[]
-): Promise<boolean>;
-
-export async function organizeImportsAndRunPrettierWithIO(
   globPatterns: ReadonlyArray<string>
 ): Promise<boolean> {
   const prettierOptions = await getPrettierrc();
   if (prettierOptions === undefined) return false;
 
   paths.formatTargetDirectories.forEach((dir) => {
-    project.addSourceFilesAtPaths(`${monoRootAbsolutePath}/${dir}/**/*.ts`);
+    project.addSourceFilesAtPaths(
+      `${monoRootAbsolutePath}/${dir}/**/*.{ts,tsx}`
+    );
   });
 
   const sourceFiles: tsm.SourceFile[] = project.getSourceFiles(globPatterns);
