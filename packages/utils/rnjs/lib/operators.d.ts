@@ -1,2 +1,0 @@
-export { auditTime, debounce, delay, filter, flatMap, map, mapTo, pairwise, pluck, scan, skip, skipAlreadyAppeared, skipUnchanged, skipWhile, startWith, switchMap, take, takeUntil, takeWhile, terminateBy, throttle, valueIs, valueIsNot, withInitialValue, withLatest, withTimestamp, } from './internal/mod';
-//# sourceMappingURL=operators.d.ts.map

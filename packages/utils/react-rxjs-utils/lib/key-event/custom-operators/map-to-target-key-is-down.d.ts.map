@@ -1,1 +1,0 @@
-{"version":3,"file":"map-to-target-key-is-down.d.ts","sourceRoot":"","sources":["../../../src/key-event/custom-operators/map-to-target-key-is-down.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,MAAM,mBAAmB,CAAC;AACtD,OAAO,EAAc,gBAAgB,EAAE,MAAM,MAAM,CAAC;AAIpD,eAAO,MAAM,oBAAoB,QAC1B,MAAM,KACV,gBAAgB,CAAC,CAAC,MAAM,GAAG,IAAI,EAAE,iBAAiB,CAAC,EAAE,OAAO,CAM5D,CAAC"}
