@@ -1,3 +1,3 @@
 export const mapNullable = <A, B>(fn: (v: A) => B) => (
-  value: A | undefined
-): B | undefined => (value === undefined ? undefined : fn(value));
+  value: A | undefined | null
+): B | undefined => (value == null ? undefined : fn(value));
