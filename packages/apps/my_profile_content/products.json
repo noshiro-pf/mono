@@ -33,7 +33,7 @@
       "imageUrl": "https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/apps/my_profile_content/images/color-demo.png"
     },
     {
-      "link": " https://catan-dice.netlify.com/ ",
+      "link": "https://catan-dice-5f3bc.web.app/",
       "title": "CATAN dice",
       "subtitle": "6面ダイス2個を振って合計を表示するカタン（ボードゲーム）用サポートアプリ",
       "body1": "同じ目が出ても振ったかどうか分かるようなエフェクトを付けている。ダイスを転がすアニメーション等があってもよいかもしれない。",
