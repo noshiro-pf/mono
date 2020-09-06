@@ -1,0 +1,71 @@
+{
+  "name": "@mono/catan_dice_app",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "scripts": {
+    "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\"",
+    "post_compile_webpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
+    "_remove_build": "rimraf ${npm_package_config_dist_dir}",
+    "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
+    "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
+    "prebuild": "yarn _remove_build",
+    "build": "webpack --config \"${npm_package_config_webpack_prod_config}\"",
+    "postbuild": "cpx \"${npm_package_config_public_dir}/**\" \"${npm_package_config_dist_dir}\"",
+    "clean": "rimraf config/**/*.js scripts/**/*.js && yarn _remove_build",
+    "predeploy": "yarn build",
+    "deploy": "firebase deploy",
+    "firebase:init": "firebase init",
+    "firebase:login": "firebase login",
+    "fmt": "yarn _script_formatchanged",
+    "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
+    "fmtb": "yarn _script_formatchanged master",
+    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "serve": "firebase serve",
+    "setup": "yarn _compile_webpackconfig",
+    "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
+    "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "config_dir": "config",
+    "dist_dir": "build",
+    "dotenv_example": "dotenv-example",
+    "jest_config": "config/jest.config.json",
+    "public_dir": "public",
+    "scripts_dir": "../../../scripts",
+    "tsconfig_for_webpack": "config/tsconfig.webpackconfig.json",
+    "webpack_dev_config": "config/webpack.dev.js",
+    "webpack_prod_config": "config/webpack.prod.js"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.2.0",
+    "@material-ui/icons": "^4.2.1",
+    "@mono/react-rxjs-utils": "*",
+    "@mono/react-utils": "*",
+    "@mono/rxjs-utils": "*",
+    "@mono/ts-utils": "*",
+    "immutable": "^4.0.0-rc.12",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "rxjs": "^6.5.3",
+    "styled-components": "^5.1.1"
+  },
+  "devDependencies": {
+    "firebase-tools": "^8.7.0"
+  }
+}
