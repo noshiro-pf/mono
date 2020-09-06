@@ -27,6 +27,14 @@ const useLocation = <RouteParam>(): Location<any> => {
   return useMemo(() => router.location, [router.location]);
 };
 
+export const useQuery = <RouteParam>(): URLSearchParams => {
+  const location = useLocation<RouteParam>();
+  const params = useMemo(() => new URLSearchParams(location.search), [
+    location.search,
+  ]);
+  return params;
+};
+
 export const useMatch = <RouteParam>(): match<RouteParam> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.match, [router.match]);
