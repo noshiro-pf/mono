@@ -1,0 +1,26 @@
+import { memoNamed } from '@mono/react-utils';
+import React from 'react';
+import styled from 'styled-components';
+
+const DataTitle = styled.dt`
+  padding: 5px;
+`;
+
+const DataDescription = styled.dd`
+  padding: 5px;
+`;
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+export const DataItem = memoNamed<Props>(
+  'DataItem',
+  ({ title, description }) => (
+    <>
+      <DataTitle>{title}</DataTitle>
+      <DataDescription>{description}</DataDescription>
+    </>
+  )
+);
