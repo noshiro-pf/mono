@@ -65,7 +65,7 @@
       "imageUrl": "https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/apps/my_profile_content/images/dominion_online.png"
     },
     {
-      "link": "https://untyped-lambda-calculus-interpreter.netlify.com/",
+      "link": "https://lambda-calculus-interpre-70e41.web.app",
       "title": "Lambda Calculus Interpreter",
       "subtitle": "簡単な型無しラムダ計算のインタプリタ",
       "body1": "Chrome推奨。使えるアルファベットは [a-z]。一部のマクロ（'+', 'PLUS', 'SUCC', 数字）に対応。括弧の省略は未対応。もうちょっと高機能にしたい。",
