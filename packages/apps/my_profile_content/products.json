@@ -17,11 +17,11 @@
       "imageUrl": ""
     },
     {
-      "link": "https://housing-loan-calculator.netlify.com/",
+      "link": "https://housing-loan-calculator.web.app",
       "title": "住宅ローン返済シミュレータ",
       "subtitle": "住宅ローンの月々の返済額などを計算",
       "body1": "Chrome推奨。クエリパラメータでスナップショットを保存可能。",
-      "body2": "React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2020年1月27日）",
+      "body2": "React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2020年9月06日）",
       "imageUrl": "https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/apps/my_profile_content/images/housing_loan_calculator.png"
     },
     {
