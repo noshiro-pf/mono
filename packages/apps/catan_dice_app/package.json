@@ -1,8 +1,7 @@
 {
   "name": "@mono/catan_dice_app",
   "version": "0.1.0",
-  "license": "MIT",
-  "author": "noshiro",
+  "private": true,
   "scripts": {
     "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\"",
     "post_compile_webpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
