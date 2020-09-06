@@ -15,6 +15,7 @@
     "clean": "rimraf config/**/*.js scripts/**/*.js && yarn _remove_build",
     "predeploy": "yarn build",
     "deploy": "firebase deploy",
+    "firebase:init": "firebase init",
     "firebase:login": "firebase login",
     "fmt": "yarn _script_formatchanged",
     "fmtall": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
@@ -51,6 +52,8 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
+    "@mono/react-utils": "*",
+    "@mono/ts-utils": "*",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-markdown": "^4.3.1",
@@ -60,8 +63,6 @@
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
-    "@mono/react-utils": "*",
-    "@mono/ts-utils": "*",
     "firebase-tools": "^8.7.0"
   }
 }
