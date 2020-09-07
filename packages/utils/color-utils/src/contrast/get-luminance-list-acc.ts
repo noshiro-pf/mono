@@ -12,7 +12,7 @@ import {
 
 export const getLuminanceListAccumulated = (
   luminanceList: readonly number[]
-): readonly number[] => {
+): number[] => {
   if (!isNonEmpty(luminanceList)) return [];
 
   /* +0.05はコントラスト比計算時に足される補正項  */
