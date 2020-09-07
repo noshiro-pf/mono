@@ -25,7 +25,7 @@
       "imageUrl": "https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/apps/my_profile_content/images/housing_loan_calculator.png"
     },
     {
-      "link": "https://color-demo.netlify.com",
+      "link": "https://color-demo-app.web.app",
       "title": "Color Contrast Demo",
       "subtitle": "色のコントラストなどについて書いた記事（https://qiita.com/pikohideaki/items/59415524503f833ce41e）のために作ったデモアプリ。",
       "body1": "Chrome推奨。",
