@@ -9,3 +9,10 @@ insert_final_newline = true
 [*.md]
 indent_size = 4
 trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+indent_size = 2
+
+[Dockerfile]
+indent_size = 4
