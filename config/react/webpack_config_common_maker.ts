@@ -1,5 +1,5 @@
 import DotenvPlugin from 'dotenv-webpack';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import 'webpack-dev-server';
 import { rulesMakerCommon } from '../ts/webpack_config_common_maker';
 
