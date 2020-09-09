@@ -19,3 +19,5 @@ yarn.lock
 hosting.YnVpbGQ.cache
 LICENSE
 *.log
+dotenv-example
+*.svg
