@@ -1,0 +1,11 @@
+{
+  "name": "test_transpile",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^13.13.4",
+    "react": "^16.13.1",
+    "typescript": "^3.8.3"
+  }
+}

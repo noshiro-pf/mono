@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  padding: 0;
+  /* font-family: sans-serif; */
+  background-color: #f3ebaa;
+}
+
+* {
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  box-sizing: border-box;
+
+  /* Material buttonのテキストの大文字化を防止 */
+  text-transform: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+input[type='number'] {
+  text-align: right;
+}

@@ -1,0 +1,11 @@
+node_modules/
+src/
+.editorconfig
+.gitattributes
+.gitignore
+.npmignore
+package-lock.json
+README.md
+tsconfig.json
+tslint.json
+tsconfig.tsbuildinfo

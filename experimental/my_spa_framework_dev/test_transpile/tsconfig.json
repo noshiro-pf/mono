@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "es5", // TSはECMAScript 5に変換
+    // "module": "es2015", // TSのモジュールはES Modulesとして出力
+    "module": "CommonJS",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react"
+  },
+  "include": ["./src", "../react-app/src/my-syntax.tsx"]
+}

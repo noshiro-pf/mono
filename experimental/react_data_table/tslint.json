@@ -1,0 +1,29 @@
+{
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "rules": {
+    "curly": false,
+    "no-console": false,
+    "member-access": false,
+    "variable-name": false,
+    "object-literal-shorthand": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "semicolon": false,
+    "trailing-comma": false,
+    "no-consecutive-blank-lines": false,
+    "no-multi-spaces": false,
+    "no-bitwise": false,
+    "quotemark": false,
+    "whitespace": false,
+    "interface-name": false,
+    "object-curly-spacing": false,
+    "array-type": false,
+    "strict-boolean-expressions": false
+  },
+  "jsRules": {
+    "object-literal-sort-keys": false
+  },
+  "linterOptions": {
+    "exclude": ["config/**/*.js", "node_modules/**/*.ts", "dist/**/*"]
+  }
+}
