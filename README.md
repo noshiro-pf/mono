@@ -6,14 +6,14 @@ A monorepo for nodejs projects.
 
 -   js projects to be added to mono
     -   apps
-        -   [ ] color_demo_app
+        -   [x] color_demo_app
         -   [ ] event_schedule_app
         -   [ ] dominion_app
     -   utils
         -   [ ] react_data_table
     -   slides
-        -   [ ] slides_dezero_06_to_16
-        -   [ ] slides_chain_rule
+        -   [x] slides_dezero_06_to_16
+        -   [x] slides_chain_rule
     -   tutorial
         -   [ ] svelte_tutorial
         -   [ ] solid_tutorial
