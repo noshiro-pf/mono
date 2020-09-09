@@ -1,0 +1,28 @@
+{
+  "name": "@mono/chain-rule-slides",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\"",
+    "_remove_build": "rimraf ${npm_package_config_dist_dir}",
+    "prebuild": "yarn _remove_build",
+    "build": "webpack --config \"${npm_package_config_webpack_prod_config}\"",
+    "clean": "rimraf config/**/*.js scripts/**/*.js && yarn _remove_build",
+    "predeploy": "yarn build",
+    "deploy": "firebase deploy",
+    "firebase:init": "firebase init",
+    "firebase:login": "firebase login",
+    "setup": "yarn _compile_webpackconfig",
+    "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
+    "watch": "webpack --watch"
+  },
+  "config": {
+    "dist_dir": "dist",
+    "tsconfig_for_webpack": "config/tsconfig.webpackconfig.json",
+    "webpack_dev_config": "config/webpack.dev.js",
+    "webpack_prod_config": "config/webpack.prod.js"
+  },
+  "dependencies": {
+    "reveal.js": "^4.0.2"
+  }
+}
