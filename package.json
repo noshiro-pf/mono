@@ -3,8 +3,7 @@
   "description": "monorepo for nodejs projects",
   "license": "MIT",
   "workspaces": [
-    "packages/apps/*",
-    "packages/utils/*"
+    "packages/*/*"
   ],
   "scripts": {
     "_script_formatchanged": "node scripts/format_changed",
@@ -21,6 +20,7 @@
     "fmtb": "yarn _script_formatchanged master",
     "lint:all": "yarn workspaces run lint",
     "newapp": "scripts/create_new_react_app.sh",
+    "newslides": "scripts/create_new_slides.sh",
     "presetup:all": "yarn clean:all",
     "setup:all": "yarn setup:root && yarn workspaces run setup",
     "presetup:root": "yarn clean:root",
@@ -32,11 +32,14 @@
     "test:all": "yarn workspaces run test"
   },
   "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
     "@testing-library/jest-dom": "^5.11.3",
     "@testing-library/react": "^10.4.8",
     "@testing-library/user-event": "^12.1.1",
     "@types/argparse": "^1.0.38",
     "@types/compression-webpack-plugin": "^4.0.0",
+    "@types/copy-webpack-plugin": "^6.0.0",
     "@types/dotenv-webpack": "^1.8.0",
     "@types/jest": "^26.0.9",
     "@types/node": "^14.0.27",
@@ -54,7 +57,10 @@
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
     "argparse": "^1.0.10",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
     "compression-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^6.1.0",
     "cpx": "^1.5.0",
     "cross-env": "7.0.2",
     "css-loader": "^4.2.1",
@@ -68,6 +74,7 @@
     "file-loader": "^6.0.0",
     "glob": "^7.1.6",
     "html-webpack-plugin": "^4.3.0",
+    "http-server": "^0.12.3",
     "jest": "^26.3.0",
     "jest-fetch-mock": "^3.0.3",
     "prettier": "^2.0.5",
@@ -87,7 +94,6 @@
     "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^5.1.1",
-    "webpack-node-externals": "^2.5.1"
+    "webpack-merge": "^5.1.1"
   }
 }
