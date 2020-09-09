@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "_compile_webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\"",
-    "post_compile_webpackconfig": "prettier --write \"./${npm_package_config_config_dir}/*.js\"",
     "_remove_build": "rimraf ${npm_package_config_dist_dir}",
     "_script_formatchanged": "node ${npm_package_config_scripts_dir}/format_changed",
     "_script_formatglob": "node ${npm_package_config_scripts_dir}/format_glob",
