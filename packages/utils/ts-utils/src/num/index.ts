@@ -6,3 +6,4 @@ export * from './is-int';
 export * from './round';
 export * from './round-at';
 export * from './round-to-int';
+export * from './sign';
