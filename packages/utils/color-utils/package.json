@@ -30,7 +30,6 @@
     "ts_config_for_build": "config/tsconfig.lib.json"
   },
   "dependencies": {
-    "@ctrl/tinycolor": "^3.1.4",
     "@mono/ts-utils": "*"
   }
 }
