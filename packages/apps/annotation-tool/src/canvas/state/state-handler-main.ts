@@ -1,0 +1,92 @@
+import { Point, Rgba } from '@mono/ts-utils';
+import { Direction } from '../functions/bbox-points';
+import {
+  turnOfHighlight,
+  turnOnHighlight,
+} from '../functions/update-pixi-bbox';
+import { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
+import { IdType } from '../types/id-type';
+import { PixiApp } from '../types/pixi-app-type';
+import { PixiBbox } from '../types/pixi-bbox';
+import { CanvasAppState } from './canvas-state-type';
+import { onPointerDown } from './handlers/on-pointer-down';
+import { onPointerDownOnBackground } from './handlers/on-pointer-down-on-bg';
+import { onPointerMove } from './handlers/on-pointer-move';
+import { onPointerUpOnBackground } from './handlers/on-pointer-up-on-bg';
+
+export type CanvasAppAction =
+  | { type: 'pointerMove'; pointerPos: Point }
+  | { type: 'pointerUp' }
+  | { type: 'backgroundPointerDown' }
+  | { type: 'bboxFacePointerOver'; pixiBbox: PixiBbox }
+  | { type: 'bboxFacePointerOut'; pixiBbox: PixiBbox }
+  | { type: 'bboxFacePointerDown'; pixiBbox: PixiBbox }
+  | { type: 'bboxPointPointerDown'; pixiBbox: PixiBbox; direction: Direction }
+  | { type: 'cancel' };
+
+export type CanvasAppStateHandler = (
+  state: CanvasAppState,
+  action: CanvasAppAction
+) => void;
+
+export const canvasAppStateHandlerGenerator = (
+  pixiApp: PixiApp,
+  idMaker: () => IdType,
+  canvasStyles: AnnotationCanvasStyle,
+  newBboxColor: { border: Rgba; face: Rgba }
+): CanvasAppStateHandler =>
+  function canvasAppStateHandler(state, action) {
+    switch (action.type) {
+      case 'pointerMove':
+        onPointerMove(state, action.pointerPos, pixiApp);
+        break;
+
+      case 'pointerUp':
+        onPointerUpOnBackground(
+          state,
+          idMaker,
+          newBboxColor,
+          canvasStyles,
+          pixiApp,
+          canvasAppStateHandler
+        );
+        break;
+
+      case 'backgroundPointerDown':
+        state.grabbingObject = { type: 'background' };
+        onPointerDown(state);
+        onPointerDownOnBackground(state, canvasStyles, pixiApp);
+        break;
+
+      case 'bboxFacePointerOver':
+        if (state.grabbingObject.type !== undefined) return;
+        // highlight on
+        turnOnHighlight(action.pixiBbox);
+        break;
+      case 'bboxFacePointerOut':
+        // highlight off
+        console.log('bboxFacePointerOut', action.pixiBbox);
+        turnOfHighlight(action.pixiBbox);
+        break;
+
+      case 'bboxFacePointerDown':
+        onPointerDown(state);
+        state.grabbingObject = {
+          type: 'bbox-face',
+          pixiBbox: action.pixiBbox,
+        };
+        break;
+
+      case 'bboxPointPointerDown':
+        onPointerDown(state);
+        state.grabbingObject = {
+          type: 'bbox-point',
+          pixiBbox: action.pixiBbox,
+        };
+        console.log(`points ${action.direction} pointerdown`);
+        break;
+
+      case 'cancel':
+        break;
+    }
+  };

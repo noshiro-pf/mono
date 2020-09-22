@@ -1,0 +1,47 @@
+import { memoNamed } from '@mono/react-utils';
+import { Hsl, Percent } from '@mono/ts-utils';
+import React, { useCallback, useMemo } from 'react';
+import { Label } from '../../../canvas/types/label';
+import { AppEventHandler } from '../../event-handlers';
+import { LabelButtonItemView } from './label-button-item-view';
+
+interface Props {
+  index: number;
+  label: Label;
+  labelsSaturation: Percent;
+  labelsLightness: Percent;
+  isSelected: boolean;
+  isVisible: boolean;
+  handlers: AppEventHandler;
+}
+
+export const LabelButtonItem = memoNamed<Props>('LabelButtonItem', (props) => {
+  const hsl = useMemo<Hsl>(
+    () => [props.label.hue, props.labelsSaturation, props.labelsLightness],
+    [props.label.hue, props.labelsSaturation, props.labelsLightness]
+  );
+
+  const onLabelClick = useCallback(() => {
+    props.handlers.selectLabel(props.label.id);
+  }, [props.label.id, props.handlers]);
+
+  const onVisibilityIconClick = useCallback(
+    (ev: React.BaseSyntheticEvent) => {
+      props.handlers.flipLabelVisibility(props.label.id);
+      ev.stopPropagation();
+    },
+    [props.label.id, props.handlers]
+  );
+
+  return (
+    <LabelButtonItemView
+      index={props.index}
+      hsl={hsl}
+      isSelected={props.isSelected}
+      labelText={props.label.name}
+      isVisible={props.isVisible}
+      onLabelClick={onLabelClick}
+      onVisibilityIconClick={onVisibilityIconClick}
+    />
+  );
+});

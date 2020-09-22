@@ -1,0 +1,92 @@
+import { Rect, Rgba, rgbaToHexNumber } from '@mono/ts-utils';
+import { Graphics, Sprite, Texture } from 'pixi.js';
+
+export const createDummySpriteRectangle = (rect: Rect): Sprite => {
+  const rectObj = new Sprite(Texture.EMPTY);
+  rectObj.roundPixels = true;
+  rectObj.position.set(rect.left, rect.top);
+  rectObj.width = rect.width;
+  rectObj.height = rect.height;
+  return rectObj;
+};
+
+export const createRectangleSprite = (rect: Rect, faceColor: Rgba): Sprite => {
+  const rectObj = new Sprite(Texture.WHITE);
+  rectObj.roundPixels = true;
+  rectObj.position.set(rect.left, rect.top);
+  rectObj.width = rect.width;
+  rectObj.height = rect.height;
+  {
+    const { hex, alpha } = rgbaToHexNumber(faceColor);
+    rectObj.tint = hex;
+    rectObj.alpha = alpha;
+  }
+  return rectObj;
+};
+
+export const getSpriteRect = (sprite: Sprite): Rect => ({
+  left: sprite.x,
+  top: sprite.y,
+  width: sprite.width,
+  height: sprite.height,
+});
+
+export const createRectangleGraphics = (
+  rect: Rect,
+  faceColor: Rgba
+): Graphics => {
+  const gr = new Graphics();
+  updateRectangleGraphics(gr, rect, faceColor);
+  return gr;
+};
+
+export const updateRectangleGraphics = (
+  gr: Graphics,
+  rect: Rect,
+  faceColor: Rgba
+): void => {
+  gr.clear();
+  const { left, top, width, height } = rect;
+  const { hex, alpha } = rgbaToHexNumber(faceColor);
+  gr.beginFill(hex, alpha);
+  gr.drawRect(left, top, width, height);
+  gr.endFill();
+};
+
+export const createBorderedRectangleGraphics = (
+  rect: Rect,
+  faceColor: Rgba,
+  borderWidthPx: number,
+  borderColor: Rgba
+): Graphics => {
+  const gr = new Graphics();
+  updateBorderedRectangleGraphics(
+    gr,
+    rect,
+    faceColor,
+    borderWidthPx,
+    borderColor
+  );
+  return gr;
+};
+
+export const updateBorderedRectangleGraphics = (
+  gr: Graphics,
+  rect: Rect,
+  faceColor: Rgba,
+  borderWidthPx: number,
+  borderColor: Rgba
+): void => {
+  gr.clear();
+  {
+    const { hex, alpha } = rgbaToHexNumber(borderColor);
+    gr.lineStyle(borderWidthPx, hex, alpha, 0);
+  }
+  {
+    const { left, top, width, height } = rect;
+    const { hex, alpha } = rgbaToHexNumber(faceColor);
+    gr.beginFill(hex, alpha);
+    gr.drawRect(left, top, width, height);
+    gr.endFill();
+  }
+};
