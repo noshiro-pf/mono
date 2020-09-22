@@ -8,4 +8,5 @@ export * from './use-debounce-fn';
 export * from './use-previous';
 export * from './use-promise-value';
 export * from './use-state-with-reset';
+export * from './use-toggle-state';
 export * from './use-value-as-ref';
