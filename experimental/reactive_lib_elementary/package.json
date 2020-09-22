@@ -1,0 +1,55 @@
+{
+  "name": "reactive-node",
+  "version": "0.0.1",
+  "description": "Reactive Programming Library for TypeScript/JavaScript",
+  "author": "Hideaki Noshiro",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noshiro-pf/reactive-node/issues"
+  },
+  "homepage": "https://github.com/noshiro-pf/reactive-node#readme",
+  "scripts": {
+    "start": "tsc && node ./dist/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf dist",
+    "prebuild": "rimraf dist",
+    "build": "tsc",
+    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write \"src/**/*.{js,ts}\"",
+    "organizeimport": "node scripts/organize_imports.js",
+    "oi": "npm run organizeimport",
+    "fmt": "npm run oi && npm run format"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/reactive-node.git"
+  },
+  "keywords": [
+    "reactive programming",
+    "dataflow programming",
+    "typescript",
+    "javascript",
+    "observable"
+  ],
+  "dependencies": {
+    "rxjs": "^6.5.2",
+    "ts-node": "^8.5.4",
+    "typescript": "~3.7.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.10.0",
+    "@typescript-eslint/parser": "^2.10.0",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.17.0",
+    "eslint-plugin-react-hooks": "^2.3.0",
+    "glob": "^7.1.6",
+    "husky": "^3.1.0",
+    "organize-imports-cli": "^0.7.0",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.0"
+  }
+}
