@@ -1,0 +1,51 @@
+type Todo {
+  title: String!
+  completed: Boolean
+}
+
+type YearMonthDate {
+  year: Int!
+  month: Int!
+  date: Int!
+}
+type HoursMinutes {
+  hours: Int!
+  minutes: Int!
+}
+type YmdHm {
+  ymd: YearMonthDate!
+  hm: HoursMinutes!
+}
+type TimeRange {
+  start: HoursMinutes!
+  end: HoursMinutes!
+}
+type DateRange {
+  ymd: YearMonthDate!
+  timeRange: TimeRange!
+}
+
+type AnswerSymbol {
+  name: String!
+  iconId: String!
+  description: String!
+  point: Float!
+}
+
+type EventSchedule {
+  title: String!
+  notes: String!
+  datetimeSpecification: String!
+  datetimeRangeList: [DateRange!]
+  useAnswerDeadline: Boolean!
+  answerDeadline: YmdHm!
+  usePassword: Boolean!
+  password: String!
+  answerSymbolList: [AnswerSymbol!]
+}
+
+type Query {
+  allTodos: [Todo!]
+  todosByCompletedFlag(completed: Boolean!): [Todo!]
+  allEventSchedules: [EventSchedule!]
+}
