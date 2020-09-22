@@ -7,3 +7,4 @@ export * from './mappable';
 export * from './monotype-function';
 export * from './reducer-type';
 export * from './test-type';
+export * from './writable';
