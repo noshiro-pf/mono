@@ -16,11 +16,11 @@ import {
 } from '../../types/record/datetime-range';
 import { IEventSchedule } from '../../types/record/event-schedule';
 import { IYmdHm, IYmdHmType } from '../../types/record/ymd-hm';
-import { IList } from '../../utils/immutable';
 import {
   ForciblyUpdatedValue,
   forciblyUpdatedValue,
 } from '../../utils/forcibly-updated-value';
+import { IList } from '../../utils/immutable';
 import { Description } from '../atoms/description';
 import { EventSettings } from '../organisms/event-settings';
 import { NameAndNotes } from '../organisms/name-and-note';
