@@ -8,6 +8,7 @@
   "scripts": {
     "_script_formatchanged": "node scripts/format_changed",
     "_script_formatglob": "node scripts/format_glob",
+    "_script_formatstaged": "node scripts/format_staged",
     "build:utils": "scripts/build_utils.sh",
     "clean:all": "npm-run-all --sequential clean:root clean:sub",
     "clean:root": "rimraf config/**/*.js scripts/**/*.js",
@@ -15,6 +16,7 @@
     "fmt": "yarn _script_formatchanged",
     "fmt:all": "prettier --write \"./{packages,scripts,config}/**/*\" > /dev/null",
     "fmt:b": "yarn _script_formatchanged master",
+    "fmt:st": "yarn _script_formatstaged",
     "fmt:ts": "yarn _script_formatglob \"./{packages,scripts,config}/**/*.{ts,tsx}\"",
     "lint:all": "yarn workspaces run lint",
     "newapp": "scripts/create_new_react_app.sh",
@@ -27,6 +29,11 @@
     "setup:sub": "yarn workspaces run setup",
     "sortpkg": "sort-package-json \"package.json\" \"packages/**/package.json\"",
     "test:all": "yarn workspaces run test"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn fmt:st"
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
@@ -72,6 +79,7 @@
     "glob": "^7.1.6",
     "html-webpack-plugin": "^4.3.0",
     "http-server": "^0.12.3",
+    "husky": "^4.3.0",
     "jest": "^26.3.0",
     "jest-fetch-mock": "^3.0.3",
     "npm-run-all": "^4.1.5",

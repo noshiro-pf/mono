@@ -35,7 +35,10 @@ export async function organizeImportsAndRunPrettierWithIO(
   globPatterns: ReadonlyArray<string>
 ): Promise<boolean> {
   const prettierOptions = await getPrettierrc();
-  if (prettierOptions === undefined) return false;
+  if (prettierOptions === undefined) {
+    console.error('cannot find prettierrc');
+    return false;
+  }
 
   paths.formatTargetDirectories.forEach((dir) => {
     project.addSourceFilesAtPaths(

@@ -8,8 +8,23 @@ type FileName = string;
 
 const commands = {
   gitUnStagedFiles: 'git ls-files -mo --exclude-standard',
+  gitStaged: 'git diff --name-only --staged',
   gitDiff: (commitId?: string) =>
     `git diff --name-only --diff-filter=ACMTUXB --staged ${commitId ?? ''}`,
+};
+
+export const gitStagedFiles = async (): Promise<FileName[]> => {
+  console.log(commands.gitStaged);
+
+  const { stdout, stderr } = await execp(commands.gitStaged, {
+    cwd: monoRootAbsolutePath,
+  });
+
+  if (stderr !== '') {
+    console.log(stderr);
+  }
+
+  return stdout.split('\n');
 };
 
 export const gitUnTrackedFiles = async (): Promise<FileName[]> => {
