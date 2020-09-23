@@ -1,7 +1,7 @@
 import { dist } from '../../num';
-import { Rect } from '../../types';
+import { Point, Rect } from '../../types';
 
-export const RectFromXYs = (
+export const rectFromXYs = (
   xs: readonly [number, number],
   ys: readonly [number, number]
 ): Rect => ({
@@ -9,4 +9,11 @@ export const RectFromXYs = (
   left: Math.min(xs[0], xs[1]),
   width: dist(xs[0], xs[1]),
   height: dist(ys[0], ys[1]),
+});
+
+export const rectFrom2Points = (p1: Point, p2: Point): Rect => ({
+  top: Math.min(p1.y, p2.y),
+  left: Math.min(p1.x, p2.x),
+  width: dist(p1.x, p2.x),
+  height: dist(p1.y, p2.y),
 });

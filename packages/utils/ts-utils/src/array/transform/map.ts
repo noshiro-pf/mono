@@ -10,5 +10,11 @@ interface Overload<A, B> {
   (array: ReadonlyNonEmptyArray<A>): ReadonlyNonEmptyArray<B>;
   (array: readonly A[]): B[];
 }
+
 export const map = <A, B>(mapFn: FunctionType<A, B>): Overload<A, B> =>
+  ((array: readonly A[]): B[] => array.map(mapFn)) as Overload<A, B>;
+
+export const mapWithIndex = <A, B>(
+  mapFn: (a: A, index: number) => B
+): Overload<A, B> =>
   ((array: readonly A[]): B[] => array.map(mapFn)) as Overload<A, B>;
