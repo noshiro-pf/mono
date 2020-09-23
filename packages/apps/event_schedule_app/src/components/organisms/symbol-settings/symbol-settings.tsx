@@ -5,8 +5,8 @@ import { texts } from '../../../constants/texts';
 import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
 import { IAnswerSymbolType } from '../../../types/record/answer-symbol';
-import { IList } from '../../../utils/immutable';
 import { ForciblyUpdatedValue } from '../../../utils/forcibly-updated-value';
+import { IList } from '../../../utils/immutable';
 import { Description } from '../../atoms/description';
 import {
   symbolListReducer,

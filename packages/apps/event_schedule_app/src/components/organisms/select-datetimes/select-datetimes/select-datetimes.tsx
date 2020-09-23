@@ -11,11 +11,11 @@ import {
   IYearMonthDate,
   IYearMonthDateType,
 } from '../../../../types/record/year-month-date';
-import { IList } from '../../../../utils/immutable';
 import {
   ForciblyUpdatedValue,
   forciblyUpdatedValue,
 } from '../../../../utils/forcibly-updated-value';
+import { IList } from '../../../../utils/immutable';
 import { getMostFrequentTimeRange } from './get-most-frequent-time-range';
 import {
   datetimeListreducer,
