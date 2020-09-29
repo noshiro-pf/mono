@@ -14,8 +14,11 @@ const Title = styled.div`
   font-size: large;
 `;
 
-export const NotFoundPage = memoNamed<{}>('NotFoundPage', () => (
-  <RootCentered>
-    <Title></Title>
-  </RootCentered>
-));
+export const NotFoundPage = memoNamed<Record<string, void>>(
+  'NotFoundPage',
+  () => (
+    <RootCentered>
+      <Title></Title>
+    </RootCentered>
+  )
+);
