@@ -1,10 +1,8 @@
 import { memoNamed } from '@mono/react-utils';
+import { weekdays } from '@mono/ts-utils';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import {
-  weekdays,
-  WeekdaysNumberEnum,
-} from '../../utils/datetime/constants/weekdays';
+import { WeekdaysNumberEnum } from '../../types/enum/weekdays-number-enum';
 
 const DivPointer = styled.div`
   border-radius: 3px;

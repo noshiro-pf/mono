@@ -1,12 +1,11 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@mono/react-utils';
+import { getHours, getMinutes } from '@mono/ts-utils';
 import React, { useCallback, useMemo } from 'react';
 import {
   IHoursMinutes,
   IHoursMinutesType,
 } from '../../../types/record/hours-minutes';
-import { getHours } from '../../../utils/datetime/functions/date-method-wrapper/hours';
-import { getMinutes } from '../../../utils/datetime/functions/date-method-wrapper/minutes';
 
 export const BpTimePicker = memoNamed<{
   time: IHoursMinutesType;

@@ -1,6 +1,4 @@
-import { sign } from '@mono/ts-utils';
-import { HoursEnum } from '../../utils/datetime/types/hour';
-import { MinutesEnum } from '../../utils/datetime/types/minutes';
+import { HoursEnum, MinutesEnum, sign } from '@mono/ts-utils';
 import { IRecord, IRecordType } from '../../utils/immutable';
 
 export type HoursMinutesType = {
