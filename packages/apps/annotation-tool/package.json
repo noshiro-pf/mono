@@ -50,14 +50,18 @@
     ]
   },
   "dependencies": {
+    "@blueprintjs/core": "^3.31.0",
+    "@blueprintjs/icons": "^3.20.1",
     "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
     "pixi.js": "^5.3.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "styled-components": "^5.1.1"
+    "styled-components": "^5.1.1",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
+    "@types/uuid": "^8.3.0",
     "firebase-tools": "^8.7.0"
   }
 }
