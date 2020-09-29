@@ -4,22 +4,20 @@ A monorepo for nodejs projects.
 
 ## TODO
 
--   js projects to be added to mono
-    -   apps
-        -   [x] color_demo_app
-        -   [ ] event_schedule_app
-        -   [ ] dominion_app
-    -   utils
-        -   [ ] react_data_table
-    -   slides
-        -   [x] slides_dezero_06_to_16
-        -   [x] slides_chain_rule
-    -   tutorial
-        -   [ ] svelte_tutorial
-        -   [ ] solid_tutorial
-        -   [ ] learn_svelte_with_react
-    -   others
-        -   [ ] reactive_lib_elementary
-        -   [ ] reactive_node
-        -   [ ] my_script_lang_dev
-        -   [ ] my_spa_framework_dev
+-   [ ] fix lint errors
+    -   [ ] packages/apps/lambda_calculus_interpreter
+    -   [ ] packages/utils/rnjs2
+-   utils
+    -   [ ] add ts-utils
+        -   array reduce(foldl, foldr), filter, reverse
+        -   iterator utils
+    -   rnjs2
+        -   implement operators
+        -   publish
+        -   rename "rnjs" -> "SyncFlow"
+-   implement apps
+    -   [ ] event_schedule_app
+        -   fix forceUpdateValue
+    -   [ ] annotation-tool
+-   optional
+    -   move packages from `/experimental` to `/packages`
