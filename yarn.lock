@@ -933,7 +933,7 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blueprintjs/core@^3.23.1", "@blueprintjs/core@^3.29.0", "@blueprintjs/core@^3.31.0":
+"@blueprintjs/core@^3.31.0":
   version "3.31.0"
   resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.31.0.tgz#75702c3cdcb84cf28ba1e9e856b7b863700d8cc4"
   integrity sha512-kfCYeyY2ojTMU5hxURNCwV4jQNDmLjTMOPImtbdW3Z7gHwiT2OA9qgNCkM0lhUjv0vyZ5py+AtZalx2FOH6PiA==
@@ -950,14 +950,31 @@
     resize-observer-polyfill "^1.5.1"
     tslib "~1.13.0"
 
-"@blueprintjs/datetime@^3.15.2", "@blueprintjs/datetime@^3.18.3":
-  version "3.18.6"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/datetime/-/datetime-3.18.6.tgz#bb892975839811c438d916fb59bae43b121fe3e3"
-  integrity sha512-yKD8jZzceZJCBVI6E2rkcj2uWnOvCOTpPE45T7QEvFlQnY9rpWzowYF9IKypo934INpRPOmZOEM2hHttUoQ34A==
+"@blueprintjs/core@^3.32.1":
+  version "3.32.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.32.1.tgz#16a2034727b2a71e492538193e31d38cd40fc61c"
+  integrity sha512-rJoBQEZaE3o3dKgow7ZVFnVDBoR0zUNzg94AfR3jTiSdWNyNHWpXHAv0/RSCxUF4nA4+jP+iqidfxZoKyYEZIg==
   dependencies:
-    "@blueprintjs/core" "^3.31.0"
+    "@blueprintjs/icons" "^3.21.0"
+    "@types/dom4" "^2.0.1"
     classnames "^2.2"
-    react-day-picker "7.3.2"
+    dom4 "^2.1.5"
+    normalize.css "^8.0.1"
+    popper.js "^1.16.1"
+    react-lifecycles-compat "^3.0.4"
+    react-popper "^1.3.7"
+    react-transition-group "^2.9.0"
+    resize-observer-polyfill "^1.5.1"
+    tslib "~1.13.0"
+
+"@blueprintjs/datetime@^3.19.1":
+  version "3.19.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/datetime/-/datetime-3.19.1.tgz#d7030f6389a850a4080e1fbc7fc6aa5447885497"
+  integrity sha512-AmJJsAZdPWgEOjNzDCSr+m0sdut9TM23UX6ctZWmqmrA13irSX4Vg7IUt90IHKlIxucXOZXWlPhkii8C2TULuQ==
+  dependencies:
+    "@blueprintjs/core" "^3.32.1"
+    classnames "^2.2"
+    react-day-picker "7.4.8"
     react-lifecycles-compat "^3.0.4"
     tslib "~1.13.0"
 
@@ -969,37 +986,12 @@
     classnames "^2.2"
     tslib "~1.13.0"
 
-"@blueprintjs/select@^3.11.2", "@blueprintjs/select@^3.13.4", "@blueprintjs/select@^3.13.7":
-  version "3.13.7"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/select/-/select-3.13.7.tgz#166675a8caeccacdb31216e92ef114f29888dbf6"
-  integrity sha512-kJVtbDDGVwIIC1+cN7H0DUrlumSVZGNEq2CnczQNI07RkHpPzuIR5stjn3LU+NjtCa3pidPNr4w78JRTesZzLg==
+"@blueprintjs/icons@^3.21.0":
+  version "3.21.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-3.21.0.tgz#1cab6d2de069674fd4909ca10fefa94d3563ea5f"
+  integrity sha512-5vszPkRNaCctDRp2wDLJLTzqQ1Qlp8gr2BqkjPcPBDVMGlYCdM1/LaBZazMgj+/52n7Z+kJzQ5rRNv9DX5LJoA==
   dependencies:
-    "@blueprintjs/core" "^3.31.0"
     classnames "^2.2"
-    tslib "~1.13.0"
-
-"@blueprintjs/table@^3.8.10", "@blueprintjs/table@^3.8.3":
-  version "3.8.13"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/table/-/table-3.8.13.tgz#034b2e21669ed168508245354a2238fe071807a5"
-  integrity sha512-5IAlTNOp7Hxe8g77rHNh+C/sT5JbPeQcJxk2Xwx66lDIvYIYQb6NjWQoaqdrYyzre/k1b2+0SJC6xWDucP4f4Q==
-  dependencies:
-    "@blueprintjs/core" "^3.31.0"
-    classnames "^2.2"
-    prop-types "^15.7.2"
-    react-lifecycles-compat "^3.0.4"
-    tslib "~1.13.0"
-
-"@blueprintjs/timezone@^3.6.1", "@blueprintjs/timezone@^3.6.8":
-  version "3.6.11"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/timezone/-/timezone-3.6.11.tgz#c8de2e9748b4a032a1593bb72d47ca3752bb66d8"
-  integrity sha512-B/0e8CfEe+N41P/1yTNQ4nNYA4bXHdZL/4fgplg3k5mrxHTAg2UG8xlz9NqAEG5L8cFyBu25mUOwSnFl9xcXfw==
-  dependencies:
-    "@blueprintjs/core" "^3.31.0"
-    "@blueprintjs/select" "^3.13.7"
-    classnames "^2.2"
-    moment "^2.27.0"
-    moment-timezone "^0.5.31"
-    react-lifecycles-compat "^3.0.4"
     tslib "~1.13.0"
 
 "@cnakazawa/watch@^1.0.3":
@@ -1009,11 +1001,6 @@
   dependencies:
     exec-sh "^0.3.2"
     minimist "^1.2.0"
-
-"@ctrl/tinycolor@^3.1.4":
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/@ctrl/tinycolor/-/tinycolor-3.1.4.tgz#e27c158836e6523fd41a647bd86ec73a74aa4151"
-  integrity sha512-WHn6ClDzGS3oACt4F/k0B9QwhQCeXXRguYE6UFe6OD6wLdESU8RoMs7Y1+FEr4Tj2VZd9bfb1aEhnB9KoVrLEA==
 
 "@dabh/diagnostics@^2.0.2":
   version "2.0.2"
@@ -1322,7 +1309,7 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@material-ui/core@^4.11.0", "@material-ui/core@^4.2.0", "@material-ui/core@^4.9.0":
+"@material-ui/core@^4.11.0":
   version "4.11.0"
   resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-4.11.0.tgz#b69b26e4553c9e53f2bfaf1053e216a0af9be15a"
   integrity sha512-bYo9uIub8wGhZySHqLQ833zi4ZML+XCBE1XwJ8EuUVSpTWWG57Pm+YugQToJNFsEyiKFhPh8DPD0bgupz8n01g==
@@ -1340,7 +1327,7 @@
     react-is "^16.8.0"
     react-transition-group "^4.4.0"
 
-"@material-ui/icons@^4.2.1", "@material-ui/icons@^4.5.1":
+"@material-ui/icons@^4.2.1":
   version "4.9.1"
   resolved "https://registry.yarnpkg.com/@material-ui/icons/-/icons-4.9.1.tgz#fdeadf8cb3d89208945b33dbc50c7c616d0bd665"
   integrity sha512-GBitL3oBWO0hzBhvA9KxqcowRUsA0qzwKkURyC8nppnC3fw54KPKZ+d4V1Eeg/UnDRSzDaI9nGCdel/eh9AQMg==
@@ -9069,18 +9056,6 @@ mkdirp@1.x, mkdirp@^1.0.3, mkdirp@^1.0.4:
   dependencies:
     minimist "^1.2.5"
 
-moment-timezone@^0.5.31:
-  version "0.5.31"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.31.tgz#9c40d8c5026f0c7ab46eda3d63e49c155148de05"
-  integrity sha512-+GgHNg8xRhMXfEbv81iDtrVeTcWt0kWmTEY1XQK14dICTXnWJnT0dxdlPspwqF3keKMVPXwayEsk1DI0AA/jdA==
-  dependencies:
-    moment ">= 2.9.0"
-
-"moment@>= 2.9.0", moment@^2.27.0:
-  version "2.27.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.27.0.tgz#8bff4e3e26a236220dfe3e36de756b6ebaa0105d"
-  integrity sha512-al0MUK7cpIcglMv3YF13qSgdAIqxHTO7brRtaz3DlSULbqfazqkc5kEjNrLDOM7fsjshoFIihnU8snrP7zUvhQ==
-
 morgan@^1.10.0, morgan@^1.8.2:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.10.0.tgz#091778abc1fc47cd3509824653dae1faab6b17d7"
@@ -10436,10 +10411,10 @@ re2@^1.15.0:
     nan "^2.14.1"
     node-gyp "^7.0.0"
 
-react-day-picker@7.3.2:
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-7.3.2.tgz#b9b9b0000ba53b2c9df9bccb79664862aba6b60a"
-  integrity sha512-mij2j2Un/v2V2ow+hf/hFBMdl6Eis/C/YhBtlI6Xpbvh3Q6WMix78zEkCdw6i9GldafOrpnupWKofv/h5oSI4g==
+react-day-picker@7.4.8:
+  version "7.4.8"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-7.4.8.tgz#675625240d3fae1b41c0a9d5177c968c8517c1d4"
+  integrity sha512-pp0hnxFVoRuBQcRdR1Hofw4CQtOCGVmzCNrscyvS0Q8NEc+UiYLEDqE5dk37bf0leSnBW4lheIt0CKKhuKzDVw==
   dependencies:
     prop-types "^15.6.2"
 
@@ -10514,7 +10489,7 @@ react-popper@^1.3.7:
     typed-styles "^0.0.7"
     warning "^4.0.2"
 
-react-router-dom@^5.1.2, react-router-dom@^5.2.0:
+react-router-dom@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-5.2.0.tgz#9e65a4d0c45e13289e66c7b17c7e175d0ea15662"
   integrity sha512-gxAmfylo2QUjcwxI63RhQ5G85Qqt4voZpUXSEqCwykV0baaOTQDR1f0PmY8AELqIyVc0NEZUj0Gov5lNGcXgsA==
