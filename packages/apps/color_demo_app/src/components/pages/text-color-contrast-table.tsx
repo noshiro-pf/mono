@@ -6,10 +6,10 @@ import {
   TableHead,
   TableRow,
 } from '@material-ui/core';
-import { contrastRatioHsl } from '@mono/color-utils';
 import { memoNamed } from '@mono/react-utils';
 import {
   blackHsl,
+  contrastRatioHsl,
   Hue,
   Percent,
   range,

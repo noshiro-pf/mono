@@ -1,5 +1,12 @@
-import { hslToRgb, relativeLuminance } from '@mono/color-utils';
-import { Hue, max, Percent, seq, zeros } from '@mono/ts-utils';
+import {
+  hslToRgb,
+  Hue,
+  max,
+  Percent,
+  relativeLuminance,
+  seq,
+  zeros,
+} from '@mono/ts-utils';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
 const huesDefault = seq(360) as readonly Hue[];
