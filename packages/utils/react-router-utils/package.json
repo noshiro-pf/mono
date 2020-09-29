@@ -18,7 +18,7 @@
     "fmt:all": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
     "fmt:b": "yarn _script_formatchanged master",
     "gi": "yarn _script_genindex ./src",
-    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint src/ --ext .ts,.tsx",
     "setup": "echo \"no setup script\"",
     "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
     "testw": "yarn test --watch"
