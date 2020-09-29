@@ -1,5 +1,4 @@
-import { contrastRatioHsl } from '@mono/color-utils';
-import { at, Hue, Percent } from '@mono/ts-utils';
+import { at, contrastRatioHsl, Hue, Percent } from '@mono/ts-utils';
 
 export const hueListToContrastRatioList = (
   hueList: readonly Hue[],

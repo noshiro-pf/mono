@@ -53,7 +53,6 @@
     "@ctrl/tinycolor": "^3.1.4",
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
-    "@mono/color-utils": "*",
     "@mono/react-material-ui-utils": "*",
     "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
