@@ -1,7 +1,7 @@
 {
   "webapps": [
     {
-      "link": "https://event-schedule.netlify.app/",
+      "link": "https://event-schedule-app.web.app/",
       "title": "日程調整ツール2（開発中）",
       "subtitle": "イベントのスケジュール調整用アプリケーション",
       "body1": "以前作成した日程調整ツールのUIを改善",
@@ -37,7 +37,7 @@
       "title": "CATAN dice",
       "subtitle": "6面ダイス2個を振って合計を表示するカタン（ボードゲーム）用サポートアプリ",
       "body1": "同じ目が出ても振ったかどうか分かるようなエフェクトを付けている。ダイスを転がすアニメーション等があってもよいかもしれない。",
-      "body2": "React・RxJS・TypeScriptで実装。RxJSはリングの透明度変化を扱うために使用した（連打時に前のアニメーションをキャンセルする処理）。netlifyを使用。（制作時期：2019年7月）",
+      "body2": "React・RxJS・TypeScriptで実装。RxJSはリングの透明度変化を扱うために使用した（連打時に前のアニメーションをキャンセルする処理）。（制作時期：2019年7月）",
       "imageUrl": "https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/apps/my_profile_content/images/catan-dice.png"
     },
     {
@@ -91,7 +91,7 @@
   ],
   "libraries": [
     {
-      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/rnjs2",
+      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs2",
       "title": "(WIP) rnjs2",
       "subtitle": "リアクティブプログラミング用のJavaScriptのライブラリ",
       "body1": "RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにObservableの発火をpriority queueで管理している。rnjs v1で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。",
@@ -99,7 +99,7 @@
       "imageUrl": ""
     },
     {
-      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/rnjs",
+      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs",
       "title": "rnjs",
       "subtitle": "リアクティブプログラミング用のJavaScriptのライブラリ",
       "body1": "RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにObservableの発火をpriority queueで管理している。",
