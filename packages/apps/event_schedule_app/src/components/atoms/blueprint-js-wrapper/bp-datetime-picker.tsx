@@ -1,14 +1,16 @@
 import { DateInput, IDateInputProps } from '@blueprintjs/datetime';
 import { memoNamed } from '@mono/react-utils';
+import {
+  getDate,
+  getHours,
+  getMinutes,
+  getMonth,
+  getYear,
+} from '@mono/ts-utils';
 import React, { useCallback, useMemo } from 'react';
 import { IHoursMinutes } from '../../../types/record/hours-minutes';
 import { IYearMonthDate } from '../../../types/record/year-month-date';
 import { IYmdHm, IYmdHmType } from '../../../types/record/ymd-hm';
-import { getDate } from '../../../utils/datetime/functions/date-method-wrapper/date';
-import { getHours } from '../../../utils/datetime/functions/date-method-wrapper/hours';
-import { getMinutes } from '../../../utils/datetime/functions/date-method-wrapper/minutes';
-import { getMonth } from '../../../utils/datetime/functions/date-method-wrapper/month';
-import { getYear } from '../../../utils/datetime/functions/date-method-wrapper/year';
 
 const dateFormatter = (date: Date): string =>
   `${getYear(date)}-${getMonth(date).toString().padStart(2, '0')}-${getDate(

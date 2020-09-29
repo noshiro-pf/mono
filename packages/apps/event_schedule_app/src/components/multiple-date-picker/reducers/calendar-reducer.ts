@@ -1,9 +1,11 @@
-import { ReducerType } from '@mono/ts-utils';
-import { getMonth } from '../../../utils/datetime/functions/date-method-wrapper/month';
-import { today } from '../../../utils/datetime/functions/date-method-wrapper/today';
-import { getYear } from '../../../utils/datetime/functions/date-method-wrapper/year';
-import { MonthEnum } from '../../../utils/datetime/types/month';
-import { YearEnum } from '../../../utils/datetime/types/year';
+import {
+  getMonth,
+  getYear,
+  MonthEnum,
+  ReducerType,
+  today,
+  YearEnum,
+} from '@mono/ts-utils';
 
 export type CalendarCurrentPageReducerState = {
   year: YearEnum;
