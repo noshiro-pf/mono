@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.31.0",
-    "@blueprintjs/icons": "^3.20.1",
+    "@blueprintjs/icons": "^3.21.0",
     "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
     "pixi.js": "^5.3.3",

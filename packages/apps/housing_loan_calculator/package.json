@@ -50,19 +50,12 @@
     ]
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.23.1",
-    "@blueprintjs/datetime": "^3.15.2",
-    "@blueprintjs/select": "^3.11.2",
-    "@blueprintjs/table": "^3.8.3",
-    "@blueprintjs/timezone": "^3.6.1",
+    "@blueprintjs/core": "^3.31.0",
+    "@blueprintjs/icons": "^3.21.0",
     "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
-    "immutable": "^4.0.0-rc.12",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
-    "rxjs": "^6.5.3",
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
