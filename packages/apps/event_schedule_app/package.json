@@ -51,7 +51,8 @@
   },
   "dependencies": {
     "@apollo/react-hooks": "^3.1.5",
-    "@blueprintjs/core": "^3.31.0",
+    "@blueprintjs/core": "^3.32.1",
+    "@blueprintjs/datetime": "^3.19.1",
     "@blueprintjs/icons": "^3.21.0",
     "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
