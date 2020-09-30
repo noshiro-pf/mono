@@ -1,6 +1,7 @@
 import { Point, rectFrom2Points } from '@mono/ts-utils';
 import { updateBorderedRectangleGraphics } from '../../functions/create-pixi-object';
 import { moveBbox } from '../../functions/move-bbox';
+import { resizeBbox } from '../../functions/resize-bbox';
 import { PixiApp } from '../../types/pixi-app-type';
 import { CanvasAppState } from '../canvas-state-type';
 
@@ -30,9 +31,18 @@ export const onPointerMove = (
     case 'bbox-face':
       moveBbox(
         state.grabbingObject.pixiBbox,
+        state.grabbingObject.rectPrevious,
         state.dragStartPoint,
         state.dragEndPoint
       );
       break;
+    case 'bbox-point':
+      resizeBbox(
+        state.grabbingObject.pixiBbox,
+        state.grabbingObject.rectPrevious,
+        state.grabbingObject.direction,
+        state.dragStartPoint,
+        state.dragEndPoint
+      );
   }
 };

@@ -1,9 +1,9 @@
 import { Point, Rgba } from '@mono/ts-utils';
 import { Direction } from '../functions/bbox-points';
 import {
-  turnOfHighlight,
+  turnOffHighlight,
   turnOnHighlight,
-} from '../functions/update-pixi-bbox';
+} from '../functions/update-pixi-bbox-rect';
 import { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
 import { IdType } from '../types/id-type';
 import { PixiApp } from '../types/pixi-app-type';
@@ -65,8 +65,7 @@ export const canvasAppStateHandlerGenerator = (
         break;
       case 'bboxFacePointerOut':
         // highlight off
-        console.log('bboxFacePointerOut', action.pixiBbox);
-        turnOfHighlight(action.pixiBbox);
+        turnOffHighlight(action.pixiBbox);
         break;
 
       case 'bboxFacePointerDown':
@@ -74,6 +73,7 @@ export const canvasAppStateHandlerGenerator = (
         state.grabbingObject = {
           type: 'bbox-face',
           pixiBbox: action.pixiBbox,
+          rectPrevious: action.pixiBbox.rect,
         };
         break;
 
@@ -82,8 +82,9 @@ export const canvasAppStateHandlerGenerator = (
         state.grabbingObject = {
           type: 'bbox-point',
           pixiBbox: action.pixiBbox,
+          rectPrevious: action.pixiBbox.rect,
+          direction: action.direction,
         };
-        console.log(`points ${action.direction} pointerdown`);
         break;
 
       case 'cancel':

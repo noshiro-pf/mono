@@ -1,26 +1,21 @@
 import { Rect, Rgba, roundToInt } from '@mono/ts-utils';
-import { Graphics, Rectangle } from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import { zIndex } from '../z-index';
 import { bboxPointsFromRect, Direction, mapBboxPoints } from './bbox-points';
-import { createRectangleGraphics } from './create-pixi-object';
-import { updateBboxRect } from './update-pixi-bbox';
+import { updateBboxPoint } from './update-pixi-bbox-point';
+import { updateBboxRect } from './update-pixi-bbox-rect';
 
 const createBboxPoint = (
   direction: Direction,
-  pointWidthPx: number,
   pointWidthPxHalf: number,
   x: number,
   y: number,
   color: Rgba
 ): Graphics => {
-  const rect: Rect = {
-    left: x - pointWidthPxHalf,
-    top: y - pointWidthPxHalf,
-    width: pointWidthPx,
-    height: pointWidthPx,
-  };
-  const point = createRectangleGraphics(rect, color);
-  point.hitArea = new Rectangle(rect.left, rect.top, rect.width, rect.height);
+  const point = new Graphics();
+
+  updateBboxPoint(point, x, y, pointWidthPxHalf, color);
+
   point.interactive = true;
   point.zIndex = zIndex.bboxPoint;
   switch (direction) {
@@ -41,7 +36,6 @@ const createBboxPoint = (
       point.cursor = 'nwse-resize';
       break;
   }
-
   return point;
 };
 
@@ -52,7 +46,7 @@ const createBboxPoints = (
 ): { [key in Direction]: Graphics } => {
   const pointWidthPxHalf = roundToInt(pointWidthPx / 2);
   return mapBboxPoints(bboxPointsFromRect(rect), (direction, p) =>
-    createBboxPoint(direction, pointWidthPx, pointWidthPxHalf, p.x, p.y, color)
+    createBboxPoint(direction, pointWidthPxHalf, p.x, p.y, color)
   );
 };
 
@@ -64,7 +58,6 @@ export const createBboxRect = (
   const gr = new Graphics();
   updateBboxRect(gr, rect, borderWidthPx, borderColor, undefined);
   gr.zIndex = zIndex.bboxFace;
-  gr.hitArea = new Rectangle(rect.left, rect.top, rect.width, rect.height);
   gr.cursor = 'move';
   gr.interactive = true;
   return gr;
