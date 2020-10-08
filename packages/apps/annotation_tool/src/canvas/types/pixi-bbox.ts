@@ -3,12 +3,13 @@ import { Graphics } from 'pixi.js';
 import { IdType } from './id-type';
 
 export type PixiBbox = {
-  id: IdType;
+  readonly id: IdType;
   rect: Rect;
-  style: {
+  readonly style: {
     borderWidthPx: number;
     borderColor: Rgba;
     faceHighlightColor: Rgba;
+    pointWidthPxHalf: number;
   };
   pixi: {
     face: Graphics;

@@ -1,57 +1,16 @@
-import { Rect, Rgba, rgbaToHexNumber } from '@mono/ts-utils';
-import { Graphics, Rectangle } from 'pixi.js';
+import { Rect } from '@mono/ts-utils';
 import { PixiBbox } from '../types/pixi-bbox';
+import { bboxPointsFromRect, foreachBboxPoints } from './bbox-points';
+import { updatePointOfBbox } from './update-pixi-bbox-point';
+import { updateRectOfBbox } from './update-pixi-bbox-rect';
 
-export const updateBboxRect = (
-  graphics: Graphics,
-  rect: Rect,
-  borderWidthPx: number,
-  borderColor: Rgba,
-  faceColor: Rgba | undefined
-): void => {
-  graphics.clear();
+export const updatePixiBbox = (pixiBbox: PixiBbox, rectAfter: Rect): void => {
+  pixiBbox.rect = rectAfter;
+  updateRectOfBbox(pixiBbox, rectAfter);
 
-  if (faceColor !== undefined) {
-    const { hex, alpha } = rgbaToHexNumber(faceColor);
-    graphics.beginFill(hex, alpha);
-  }
-  {
-    const { hex, alpha } = rgbaToHexNumber(borderColor);
-    graphics.lineStyle(borderWidthPx, hex, alpha, 0.5);
-    const { left, top, width, height } = rect;
-    graphics.drawRect(left, top, width, height);
-    graphics.hitArea = new Rectangle(left, top, width, height);
-  }
+  const pointsPosAfter = bboxPointsFromRect(rectAfter);
 
-  graphics.endFill();
-};
-
-export const turnOnHighlight = (pixiBbox: PixiBbox): void => {
-  updateBboxRect(
-    pixiBbox.pixi.face,
-    pixiBbox.rect,
-    pixiBbox.style.borderWidthPx,
-    pixiBbox.style.borderColor,
-    pixiBbox.style.faceHighlightColor
-  );
-};
-
-export const turnOfHighlight = (pixiBbox: PixiBbox): void => {
-  updateBboxRect(
-    pixiBbox.pixi.face,
-    pixiBbox.rect,
-    pixiBbox.style.borderWidthPx,
-    pixiBbox.style.borderColor,
-    undefined
-  );
-};
-
-export const updateRectOfBbox = (pixiBbox: PixiBbox, rectAfter: Rect): void => {
-  updateBboxRect(
-    pixiBbox.pixi.face,
-    rectAfter,
-    pixiBbox.style.borderWidthPx,
-    pixiBbox.style.borderColor,
-    pixiBbox.style.faceHighlightColor
-  );
+  foreachBboxPoints(pixiBbox.pixi.points, (direction, _) => {
+    updatePointOfBbox(pixiBbox, direction, pointsPosAfter[direction]);
+  });
 };

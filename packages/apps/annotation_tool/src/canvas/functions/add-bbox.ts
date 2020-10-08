@@ -1,4 +1,4 @@
-import { Rect, Rgba } from '@mono/ts-utils';
+import { Rect, Rgba, roundToInt } from '@mono/ts-utils';
 import { Application } from 'pixi.js';
 import { CanvasAppState } from '../state/canvas-state-type';
 import { CanvasAppStateHandler } from '../state/state-handler-main';
@@ -32,6 +32,7 @@ export const addBboxToCanvas = (
       borderColor: bboxColor.border,
       borderWidthPx: canvasStyles.bbox.borderWidthPx.notSelected,
       faceHighlightColor: bboxColor.face,
+      pointWidthPxHalf: roundToInt(canvasStyles.bbox.pointWidthPx / 2),
     },
     pixi: {
       face: pixiBboxRect,

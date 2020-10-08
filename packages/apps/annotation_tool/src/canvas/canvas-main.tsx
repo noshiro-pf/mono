@@ -1,6 +1,6 @@
 import { memoNamed } from '@mono/react-utils';
 import { hslaToRgba, Hue, RectSize, Rgba } from '@mono/ts-utils';
-import { Application, InteractionManager } from 'pixi.js';
+import { Application, InteractionManager, settings } from 'pixi.js';
 import React, {
   CSSProperties,
   useEffect,
@@ -19,6 +19,10 @@ import { AnnotationCanvasStyle } from './types/annotation-canvas-style';
 import { IdType } from './types/id-type';
 import { PixiApp } from './types/pixi-app-type';
 import { zIndex } from './z-index';
+
+// Pixi.js global settings
+settings.SORTABLE_CHILDREN = true;
+settings.ROUND_PIXELS = true;
 
 interface Props {
   idMaker: () => IdType;
