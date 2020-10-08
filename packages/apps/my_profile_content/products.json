@@ -1,6 +1,14 @@
 {
   "webapps": [
     {
+      "link": "https://annotation-tool-d8b49.web.app/",
+      "title": "アノテーションツール（開発中）",
+      "subtitle": "矩形ツールによる画像アノテーションを行うUI",
+      "body1": "polygon, paint toolやkey-pointなどのアノテーションもできるようにしたい。",
+      "body2": "React・TypeScript・Pixi.jsで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2020年9月28日）",
+      "imageUrl": ""
+    },
+    {
       "link": "https://event-schedule-app.web.app/",
       "title": "日程調整ツール2（開発中）",
       "subtitle": "イベントのスケジュール調整用アプリケーション",
