@@ -5,7 +5,7 @@ import { client } from '../api/faunadb-client';
 import { routing } from '../routing/routing';
 import { NotFoundPage } from './pages/not-found-page';
 
-export const Root: FC<{}> = () => (
+export const Root: FC<Record<string, void>> = () => (
   <ApolloProvider client={client}>
     <BrowserRouter>
       <Switch>
