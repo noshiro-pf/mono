@@ -37,11 +37,13 @@ export const useResizeObserverRef = (
   return targetElRef;
 };
 
-export const useResizeObserver = (): [RectSize, RefObject<HTMLDivElement>] => {
-  const [rootRectSize, setRootRectSize] = useState<RectSize>({
+export const useResizeObserver = (
+  defaultRectSize: RectSize = {
     width: 0,
     height: 0,
-  });
+  }
+): [RectSize, RefObject<HTMLDivElement>] => {
+  const [rootRectSize, setRootRectSize] = useState<RectSize>(defaultRectSize);
 
   const targetElRef = useResizeObserverRef(setRootRectSize);
 
