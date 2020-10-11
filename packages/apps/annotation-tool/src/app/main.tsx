@@ -3,7 +3,8 @@ import {
   useBoolState,
   useStateWithMapFn,
 } from '@noshiro/react-utils';
-import type { Hue, Percent, RectSize } from '@noshiro/ts-utils-additional';
+import { useResizeObserver } from '@noshiro/resize-observer-react-hooks';
+import type { Hue, Percent, Rect } from '@noshiro/ts-utils-additional';
 import { pickupHighContrastHues } from '@noshiro/ts-utils-additional';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
@@ -12,8 +13,10 @@ import { AnnotationCanvas, defaultAnnotationCanvasStyle } from '../canvas';
 import type { AppEventHandler } from './event-handlers';
 import { Sidebar, visibleLabelsReducer } from './sidebar';
 
-const canvasSize: RectSize = {
-  width: 600,
+const canvasDefaultSize: Rect = {
+  top: 0,
+  left: 0,
+  width: 800,
   height: 600,
 };
 
@@ -73,6 +76,11 @@ export const Main = memoNamed('Main', () => {
     labels.map(() => true)
   );
 
+  const [rootSize, rootRef] =
+    useResizeObserver<HTMLDivElement>(canvasDefaultSize);
+
+  console.log(rootSize);
+
   const [selectedLabel, selectLabel] = useStateWithMapFn<Label, IdType>(
     labelInit,
     (labelId) => labels.find((l) => l.id === labelId) ?? labelInit
@@ -100,10 +108,10 @@ export const Main = memoNamed('Main', () => {
   const visibleLabels = labels.filter((_, i) => visibleLabelIndices[i]);
 
   return (
-    <Root>
+    <Root ref={rootRef}>
       <CanvasWrapper>
         <AnnotationCanvas
-          canvasSize={canvasSize}
+          canvasSize={rootSize}
           canvasStyles={canvasStyles}
           selectedHue={selectedLabel.hue}
         />

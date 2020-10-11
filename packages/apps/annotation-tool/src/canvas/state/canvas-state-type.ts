@@ -4,9 +4,9 @@ import type { Direction } from '../functions';
 import type { PixiBbox, PixiTempRect } from '../types';
 
 export type CanvasAppState = {
-  pointerPos: Writable<Point>;
-  dragStartPoint: Writable<Point>;
-  dragEndPoint: Writable<Point>;
+  pointerPos: Point;
+  dragStartPoint: Point;
+  dragEndPoint: Point;
   grabbingObject: Readonly<
     | {
         type: 'bbox-point';
@@ -20,10 +20,10 @@ export type CanvasAppState = {
     | { type: undefined }
   >;
 
-  verticalLine: Sprite | undefined;
-  horizontalLine: Sprite | undefined;
-  temporaryRect: PixiTempRect | undefined;
-  bboxList: PixiBbox[];
+  readonly verticalLine: Sprite | undefined;
+  readonly horizontalLine: Sprite | undefined;
+  readonly temporaryRect: PixiTempRect | undefined;
+  readonly bboxList: PixiBbox[];
 };
 
 export const defaultCanvasAppState: CanvasAppState = {
