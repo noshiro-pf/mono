@@ -1,19 +1,22 @@
 import { rectFrom2Points } from '@noshiro/ts-utils-additional';
 import { updateBorderedRectangleGraphics } from '../../functions';
-import { type AnnotationCanvasStyle, type PixiApp } from '../../types';
+import {
+  type AnnotationCanvasStyle,
+  type PixiGlobalObjects,
+} from '../../types';
 import { type CanvasAppState } from '../canvas-state-type';
 
 export const onPointerDownOnBackground = (
   state: CanvasAppState,
-  canvasStyles: AnnotationCanvasStyle,
-  mut_pixiApp: PixiApp,
+  mut_canvasStyles: AnnotationCanvasStyle,
+  mut_pixiGlobalObjects: PixiGlobalObjects,
 ): void => {
-  mut_pixiApp.temporaryRect.pixi.visible = true;
+  mut_pixiGlobalObjects.temporaryRect.pixi.visible = true;
   updateBorderedRectangleGraphics(
-    mut_pixiApp.temporaryRect.pixi,
+    mut_pixiGlobalObjects.temporaryRect.pixi,
     rectFrom2Points(state.dragStartPoint, state.dragEndPoint),
-    canvasStyles.temporaryRectFaceColor,
-    canvasStyles.temporaryRectBorderWidthPx,
-    canvasStyles.temporaryRectBorderColor,
+    mut_canvasStyles.temporaryRectFaceColor,
+    mut_canvasStyles.temporaryRectBorderWidthPx,
+    mut_canvasStyles.temporaryRectBorderColor,
   );
 };

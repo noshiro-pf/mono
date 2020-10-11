@@ -1,4 +1,5 @@
-import { type RectSize } from '@noshiro/ts-utils-additional';
+import { useResizeObserver } from '@noshiro/resize-observer-react-hooks';
+import { type Rect } from '@noshiro/ts-utils-additional';
 import {
   AnnotationCanvas,
   defaultAnnotationCanvasStyle,
@@ -18,8 +19,14 @@ export const App = memoNamed('App', () => {
   const selectedLabel = useSelectedLabel();
   const visibleLabels = useObservableValue(visibleLabels$);
 
+  const [rootSize, rootRef] =
+    useResizeObserver<HTMLDivElement>(canvasDefaultSize);
+
+  console.log(rootSize);
+
   return (
     <div
+      ref={rootRef}
       css={css`
         width: 100vw;
         height: 100vh;
@@ -38,7 +45,7 @@ export const App = memoNamed('App', () => {
         `}
       >
         <AnnotationCanvas
-          canvasSize={canvasSize}
+          canvasSize={rootSize}
           canvasStyles={canvasStyles}
           selectedHue={selectedLabel.hue}
         />
@@ -66,8 +73,10 @@ export const App = memoNamed('App', () => {
 
 const sidebarWidthPx = 250;
 
-const canvasSize: RectSize = {
-  width: 600,
+const canvasDefaultSize: Rect = {
+  top: 0,
+  left: 0,
+  width: 800,
   height: 600,
 };
 
