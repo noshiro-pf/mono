@@ -1,3 +1,4 @@
+import { useResizeObserver } from '@noshiro/react-resize-observer-hooks';
 import {
   memoNamed,
   useBooleanState,
@@ -17,8 +18,8 @@ import { AnnotataionCanvas, defaultAnnotationCanvasStyle } from '../canvas';
 import type { AppEventHandler } from './event-handlers';
 import { Sidebar, visibleLabelsReducer } from './sidebar';
 
-const canvasSize: RectSize = {
-  width: 600,
+const canvasDefaultSize: RectSize = {
+  width: 800,
   height: 600,
 };
 
@@ -70,6 +71,10 @@ const labelInit: Label = labels[0];
 export const App = memoNamed('App', () => {
   const [hidden, hide, show] = useBooleanState(false);
 
+  const [rootSize, rootRef] = useResizeObserver(canvasDefaultSize);
+
+  console.log(rootSize);
+
   const [visibleLabelIndice, visibleLabelIndiceDispatcher] = useReducer(
     visibleLabelsReducer,
     labels.map(() => true)
@@ -102,10 +107,10 @@ export const App = memoNamed('App', () => {
   const visibleLabels = labels.filter((_, i) => visibleLabelIndice[i]);
 
   return (
-    <Root>
+    <Root ref={rootRef}>
       <CanvasWrapper>
         <AnnotataionCanvas
-          canvasSize={canvasSize}
+          canvasSize={rootSize}
           canvasStyles={canvasStyles}
           selectedHue={selectedLabel.hue}
         />

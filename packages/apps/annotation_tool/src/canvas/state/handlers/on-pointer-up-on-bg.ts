@@ -1,7 +1,12 @@
 import type { Rgba } from '@noshiro/ts-utils';
 import { rectFrom2Points } from '@noshiro/ts-utils';
+import type { Application } from 'pixi.js';
 import { addBboxToCanvas } from '../../functions';
-import type { AnnotationCanvasStyle, IdType, PixiApp } from '../../types';
+import type {
+  AnnotationCanvasStyle,
+  IdType,
+  PixiGlobalObjects,
+} from '../../types';
 import type { CanvasAppState } from '../canvas-state-type';
 import type { CanvasAppStateHandler } from '../state-handler-main';
 
@@ -10,7 +15,8 @@ export const onPointerUpOnBackground = (
   idMaker: () => IdType,
   newBboxColor: Readonly<{ border: Rgba; face: Rgba }>,
   canvasStyles: AnnotationCanvasStyle,
-  pixiApp: PixiApp,
+  app: Application,
+  pixiGlobalObjects: PixiGlobalObjects,
   stateHandler: CanvasAppStateHandler
 ): void => {
   if (state.grabbingObject.type === 'background') {
@@ -20,10 +26,10 @@ export const onPointerUpOnBackground = (
       rectFrom2Points(state.dragStartPoint, state.dragEndPoint),
       newBboxColor,
       canvasStyles,
-      pixiApp.app,
+      app,
       stateHandler
     );
   }
   state.grabbingObject = { type: undefined };
-  pixiApp.temporaryRect.pixi.visible = false;
+  pixiGlobalObjects.temporaryRect.pixi.visible = false;
 };

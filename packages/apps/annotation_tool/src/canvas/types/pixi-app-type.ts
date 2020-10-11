@@ -1,8 +1,7 @@
-import type { Application, Sprite } from 'pixi.js';
+import type { Sprite } from 'pixi.js';
 import type { PixiTempRect } from './pixi-temp-rect';
 
-export type PixiApp = Readonly<{
-  app: Application;
+export type PixiGlobalObjects = Readonly<{
   background: Sprite;
   verticalLine: Sprite;
   horizontalLine: Sprite;
