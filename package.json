@@ -3,7 +3,7 @@
   "description": "monorepo for nodejs projects",
   "license": "MIT",
   "workspaces": [
-    "packages/*/*"
+    "packages/**"
   ],
   "scripts": {
     "_script_formatchanged": "node scripts/format_changed",

@@ -1,0 +1,2 @@
+-   `https://us-central1-slack-manager-af6c4.cloudfunctions.net/addMessage?text=uppercasemetoo`
+-   https://blog.katsubemakito.net/firebase/functions-environmentvariable
