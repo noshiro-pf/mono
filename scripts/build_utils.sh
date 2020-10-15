@@ -7,7 +7,6 @@ targets=(
   "rnjs2"
 
   # ts-utils dependent
-  "color-utils"
   "react-router-utils"
   "react-utils"
   "resize-observer-hooks"

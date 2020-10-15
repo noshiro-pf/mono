@@ -8,13 +8,14 @@
     "deploy": "firebase deploy --only functions",
     "fb": "firebase",
     "firebase": "firebase",
+    "get": "node src/get.js",
     "logs": "firebase functions:log",
     "seeconfig": "firebase functions:config:get",
     "serve": "yarn build && firebase emulators:start --only functions",
     "setapikey": "firebase functions:config:set slack.apikey=",
+    "setup": "echo \"no setup script\"",
     "shell": "yarn build && firebase functions:shell",
-    "start": "yarn shell",
-    "get": "node src/get.js"
+    "start": "yarn shell"
   },
   "dependencies": {
     "firebase-admin": "^8.10.0",
