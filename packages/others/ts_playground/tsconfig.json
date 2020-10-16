@@ -1,0 +1,10 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "CommonJS",
+    "declaration": true
+  },
+  "include": ["src/20201016_namespaces"]
+}
