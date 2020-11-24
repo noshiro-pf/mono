@@ -1,6 +1,6 @@
-import { filter } from './filter';
+import { setFilter } from './filter';
 
-export const filterNot = <A>(
+export const setFilterNot = <A>(
   set: Set<A>,
   filterFn: (a: A) => boolean
-): Set<A> => filter(set, (a) => !filterFn(a));
+): Set<A> => setFilter(set, (a) => !filterFn(a));

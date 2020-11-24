@@ -1,9 +1,9 @@
 import {
-  filter,
-  filterNot,
-  intersection,
+  setFilter,
+  setFilterNot,
+  setIntersection,
   mappedSet,
-  subtract,
+  setSubtract,
 } from '../../set';
 import { IGroupedSetDiff, IGroupedSetDiffType } from './grouped-set-diff';
 
@@ -21,14 +21,14 @@ export const getGroupedSetDiff = <A>(
   idSelector: (e: A) => any = (e) => e
 ): IGroupedSetDiffType<A> => {
   // TODO: Set.includesの使用を最小限に抑えたアルゴリズムに修正し高速化する
-  const oldElements = subtract(oldSet, newSet); // oldSetに存在しnewSetに存在しない要素
-  const newElements = subtract(newSet, oldSet); // newSetに存在しoldSetに存在しない要素
+  const oldElements = setSubtract(oldSet, newSet); // oldSetに存在しnewSetに存在しない要素
+  const newElements = setSubtract(newSet, oldSet); // newSetに存在しoldSetに存在しない要素
   const idsInOldElements = mappedSet(oldElements, idSelector);
   const idsInNewElements = mappedSet(newElements, idSelector);
-  const commonIds = intersection(idsInOldElements, idsInNewElements);
+  const commonIds = setIntersection(idsInOldElements, idsInNewElements);
   const isUpdatedElement = (e: A): boolean => commonIds.has(idSelector(e));
-  const updated = filter(newElements, isUpdatedElement);
-  const added = filterNot(newElements, isUpdatedElement);
-  const deleted = filterNot(oldElements, isUpdatedElement);
+  const updated = setFilter(newElements, isUpdatedElement);
+  const added = setFilterNot(newElements, isUpdatedElement);
+  const deleted = setFilterNot(oldElements, isUpdatedElement);
   return IGroupedSetDiff({ deleted, added, updated });
 };
