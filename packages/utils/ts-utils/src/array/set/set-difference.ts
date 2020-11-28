@@ -1,4 +1,4 @@
-export const setDifference = (
+export const arraySetDifference = (
   sortedArray1: readonly number[],
   sortedArray2: readonly number[]
 ): number[] => {

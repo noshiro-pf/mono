@@ -1,4 +1,4 @@
-export function includes<A, B>(
+export function arrayIncludes<A, B>(
   array: readonly A[],
   target: B,
   mapFn: (v: A) => B

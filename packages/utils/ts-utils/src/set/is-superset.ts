@@ -1,4 +1,4 @@
-export const isSuperset = <T>(
+export const setIsSuperset = <T>(
   maybeSuperset: Set<T>,
   maybeSubset: Set<T>
 ): boolean => {
