@@ -1,6 +1,7 @@
 export * from './canvas-hooks';
 export * from './key-event';
 export * from './reactive';
+export * from './use-alive';
 export * from './use-async-reducer';
 export * from './use-boolean-state';
 export * from './use-debounce';
