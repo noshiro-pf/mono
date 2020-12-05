@@ -22,7 +22,7 @@
     -   jQuery（2 年） 今は使っていない
     -   firebase
 -   データベース
-    -   趣味アプリのバックエンドは Firebase Realtime Database がほとんど
+    -   趣味アプリでは firebase で済ませることがほとんど
     -   MySQL 少し
 -   短期間使用経験のあるもの
     -   言語
