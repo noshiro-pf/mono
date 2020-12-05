@@ -32,11 +32,6 @@
     "sortpkg": "sort-package-json \"package.json\" \"packages/**/package.json\"",
     "test:all": "yarn workspaces run test"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn fmt:st"
-    }
-  },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
