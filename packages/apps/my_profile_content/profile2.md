@@ -31,15 +31,16 @@
 -   マルチタスク（ヘビーなタスクに長期間・長時間集中して取り組むことは比較的得意だが、切り替えは苦手）
 -   ミスをシステマティックに防げない作業（注意力に頼る割合が多い作業は苦手）
 
-## 普段使う言語・ライブラリなど
+## 普段よく使う言語・ライブラリなど
 
 -   Web のフロントエンド開発
     -   TypeScript
     -   React
-        -   Angular も使用可能。Vue.js はほぼ触ったことがない。
-    -   Immutable.js
-        -   必要に応じて
-    -   CSS ライブラリ：Material-UI、 blueprint.js
+    -   業務で Angular
+    -   ライブラリ
+        -   RxJS
+        -   Immutable.js
+        -   CSS ライブラリ：blueprint.js、Material-UI
 -   その他
     -   C++
         -   大学時代に研究に使っていた。
