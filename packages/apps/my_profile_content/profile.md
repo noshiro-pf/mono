@@ -4,15 +4,16 @@
 
 -   Qiita: [https://qiita.com/pikohideaki](https://qiita.com/pikohideaki)
 -   GitHub
-    -   company: [https://github.com/lm-noshiro](https://github.com/lm-noshiro)
     -   private: [https://github.com/noshiro-pf](https://github.com/noshiro-pf)
     -   old: [https://github.com/pikohideaki/](https://github.com/pikohideaki/)
 -   Twitter: [https://twitter.com/noshiro_piko](https://twitter.com/noshiro_piko)
 
 ## 職歴
 
+-   カブク株式会社
+    -   2020 年 11 月～現在
 -   LeapMind 株式会社
-    -   2019 年 4 月〜現在
+    -   2019 年 4 月〜2020 年 10 月
 -   日本電信電話株式会社
     -   2018 年 4 月～ 2019 年 3 月
     -   深層学習のモデル圧縮・高速化に関する研究

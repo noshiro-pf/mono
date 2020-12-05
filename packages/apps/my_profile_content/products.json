@@ -10,9 +10,9 @@
     },
     {
       "link": "https://event-schedule-app.web.app/",
-      "title": "日程調整ツール2（開発中）",
+      "title": "イベント日程調整ツール2",
       "subtitle": "イベントのスケジュール調整用アプリケーション",
-      "body1": "以前作成した日程調整ツールのUIを改善",
+      "body1": "",
       "body2": "React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2020年6月28日）",
       "imageUrl": "https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/apps/my_profile_content/images/event-schedule-app2.png"
     },
@@ -50,7 +50,7 @@
     },
     {
       "link": "https://pikoappsproduct.firebaseapp.com/#/",
-      "title": "日程調整",
+      "title": "イベント日程調整ツール",
       "subtitle": "イベントのスケジュール調整用アプリケーション",
       "body1": "Chrome推奨。調整さんを使いやすくし高機能にしたもの。（作成画面 → ○△×以外の記号の追加・点数の設定・回答締め切り日の設定、回答画面 → 回答のソート。） ToDo：Google Calendar等との連携オプション、回答締切前のリマインド送信",
       "body2": "Angular・RxJS・TypeScriptで実装。バックエンドはFirebase Realtime DB。（最終更新：2019年1月）",
