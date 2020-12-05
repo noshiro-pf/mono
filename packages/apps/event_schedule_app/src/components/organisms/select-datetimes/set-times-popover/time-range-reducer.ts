@@ -1,0 +1,36 @@
+import { ReducerType } from '@mono/ts-utils';
+import {
+  compareHm,
+  IHoursMinutes,
+} from '../../../../types/record/base/hours-minutes';
+import { ITimeRange } from '../../../../types/record/time-range';
+
+export type TimeRangeReducerAction = {
+  type: 'start' | 'end';
+  hm: IHoursMinutes;
+};
+
+export type TimeRangeReducerState = ITimeRange;
+
+export const timeRangeReducer: ReducerType<
+  TimeRangeReducerState,
+  TimeRangeReducerAction
+> = (state, action) => {
+  switch (action.type) {
+    case 'start':
+      return state.withMutations((draft) => {
+        const newStart = action.hm;
+        draft.set('start', newStart);
+        draft.update('end', (e) =>
+          compareHm(newStart, e) <= 0 ? e : newStart
+        );
+      });
+
+    case 'end':
+      return state.withMutations((draft) => {
+        const newEnd = action.hm;
+        draft.set('end', newEnd);
+        draft.update('start', (s) => (compareHm(s, newEnd) <= 0 ? s : newEnd));
+      });
+  }
+};

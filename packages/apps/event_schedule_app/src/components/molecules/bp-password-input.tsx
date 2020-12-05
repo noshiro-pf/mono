@@ -1,21 +1,25 @@
-import { Button } from '@blueprintjs/core';
 import { memoNamed, useToggleState } from '@mono/react-utils';
 import React from 'react';
 import { BpInput } from '../atoms/blueprint-js-wrapper/bp-input';
+import { BpButton } from '../atoms/blueprint-js-wrapper/button';
 
-export const BpPasswordInput = memoNamed<{
+interface Props {
   password: string;
   onPasswordChange: (value: string) => void;
-}>('BpPasswordInput', ({ password, onPasswordChange }) => {
+  disabled: boolean;
+}
+
+export const BpPasswordInput = memoNamed<Props>('BpPasswordInput', (props) => {
   const [showPassword, onToggleVisibilityClick] = useToggleState(false);
 
   return (
     <BpInput
       type={showPassword ? 'text' : 'password'}
-      value={password}
-      onValueChange={onPasswordChange}
+      value={props.password}
+      onValueChange={props.onPasswordChange}
+      disabled={props.disabled}
       rightElement={
-        <Button
+        <BpButton
           icon={showPassword ? 'eye-open' : 'eye-off'}
           minimal={true}
           onClick={onToggleVisibilityClick}

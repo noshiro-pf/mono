@@ -2,10 +2,6 @@ import { INumericInputProps, NumericInput } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import React, { CSSProperties } from 'react';
 
-const style: CSSProperties = {
-  textAlign: 'right',
-};
-
 interface Props extends INumericInputProps {
   value: number;
   onValueChange: (value: number) => void;
@@ -34,3 +30,7 @@ export const BpNumericInput = memoNamed<Props>(
     />
   )
 );
+
+const style: CSSProperties = {
+  textAlign: 'right',
+};

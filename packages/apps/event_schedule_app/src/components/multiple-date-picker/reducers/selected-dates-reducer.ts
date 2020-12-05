@@ -1,42 +1,30 @@
 import { ReducerType } from '@mono/ts-utils';
-import { IYearMonthDateType } from '../../../types/record/year-month-date';
+import { IYearMonthDate } from '../../../types/record/base/year-month-date';
 import { IList, ISet } from '../../../utils/immutable';
 
-type SelectedDatesReducerAction =
-  | { type: 'flip'; dateToFlip: IYearMonthDateType }
-  | { type: 'fill-column'; dates: IList<IYearMonthDateType> }
-  | { type: 'fromProps'; dates: IList<IYearMonthDateType> };
+export type SelectedDatesReducerAction =
+  | { type: 'flip'; dateToFlip: IYearMonthDate }
+  | { type: 'fill-column'; dates: IList<IYearMonthDate> };
 
-type SelectedDatesReducerState = {
-  lastAction: SelectedDatesReducerAction['type'];
-  value: ISet<IYearMonthDateType>;
-};
+export type SelectedDatesReducerState = ISet<IYearMonthDate>;
 
-export const selectedDatesReducerInitialState: SelectedDatesReducerState = {
-  lastAction: 'fromProps',
-  value: ISet<IYearMonthDateType>(),
-};
+export const selectedDatesReducerInitialState: SelectedDatesReducerState = ISet<
+  IYearMonthDate
+>();
 
 export const selectedDatesReducer: ReducerType<
   SelectedDatesReducerState,
   SelectedDatesReducerAction
 > = (state, action) => {
-  const nextState = ((prevState: SelectedDatesReducerState['value']) => {
-    switch (action.type) {
-      case 'flip':
-        return prevState.has(action.dateToFlip)
-          ? prevState.delete(action.dateToFlip)
-          : prevState.add(action.dateToFlip);
+  switch (action.type) {
+    case 'flip':
+      return state.has(action.dateToFlip)
+        ? state.delete(action.dateToFlip)
+        : state.add(action.dateToFlip);
 
-      case 'fill-column':
-        return action.dates.isSubset(prevState)
-          ? prevState.subtract(action.dates)
-          : prevState.union(action.dates);
-
-      case 'fromProps':
-        return ISet(action.dates);
-    }
-  })(state.value);
-
-  return { lastAction: action.type, value: nextState };
+    case 'fill-column':
+      return action.dates.isSubset(state)
+        ? state.subtract(action.dates)
+        : state.union(action.dates);
+  }
 };

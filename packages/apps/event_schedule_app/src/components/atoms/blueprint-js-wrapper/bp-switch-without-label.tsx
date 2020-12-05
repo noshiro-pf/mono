@@ -2,10 +2,6 @@ import { ISwitchProps, Switch } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import React, { CSSProperties } from 'react';
 
-const style: CSSProperties = {
-  margin: 0,
-};
-
 interface Props extends Omit<ISwitchProps, 'label' | 'labelElement'> {
   onToggle: () => void;
 }
@@ -23,3 +19,7 @@ export const BpSwitchWithoutLabel = memoNamed<Props>(
     />
   )
 );
+
+const style: CSSProperties = {
+  margin: 0,
+};

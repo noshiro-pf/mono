@@ -1,26 +1,31 @@
-import { Alert } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import { texts } from '../../../../constants/texts';
+import { BpAlert } from '../../../atoms/blueprint-js-wrapper/bp-dialog';
 
 const vt = texts.createEventPage.section2;
 
-export const ConfirmDeleteAllDialog = memoNamed<{
+interface Props {
   isOpen: boolean;
   onCancel: () => void;
   onConfirm: () => void;
-}>('ConfirmDeleteAllDialog', ({ isOpen, onCancel, onConfirm }) => (
-  <Alert
-    isOpen={isOpen}
-    onConfirm={onConfirm}
-    onCancel={onCancel}
-    cancelButtonText={texts.buttonText.cancel}
-    confirmButtonText={texts.buttonText.delete}
-    intent={'danger'}
-    icon={'trash'}
-    canEscapeKeyCancel={true}
-    canOutsideClickCancel={true}
-  >
-    <p>{vt.removeAllConfirmation}</p>
-  </Alert>
-));
+}
+
+export const ConfirmDeleteAllDialog = memoNamed<Props>(
+  'ConfirmDeleteAllDialog',
+  (props) => (
+    <BpAlert
+      isOpen={props.isOpen}
+      onConfirm={props.onConfirm}
+      onCancel={props.onCancel}
+      cancelButtonText={texts.buttonText.cancel}
+      confirmButtonText={texts.buttonText.delete}
+      intent={'danger'}
+      icon={'trash'}
+      canEscapeKeyCancel={true}
+      canOutsideClickCancel={true}
+    >
+      <p>{vt.removeAllConfirmation}</p>
+    </BpAlert>
+  )
+);

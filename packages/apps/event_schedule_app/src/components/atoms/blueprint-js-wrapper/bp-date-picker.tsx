@@ -4,14 +4,14 @@ import { memoNamed } from '@mono/react-utils';
 import { getDate, getMonth, getYear } from '@mono/ts-utils';
 import React, { useCallback, useMemo } from 'react';
 import {
+  createIYearMonthDate,
   IYearMonthDate,
-  IYearMonthDateType,
-} from '../../../types/record/year-month-date';
+} from '../../../types/record/base/year-month-date';
 
 const dateFormatter = (date: Date): string => date.toLocaleDateString();
 const dateParser = (str: string): Date => new Date(str);
 
-const defaultDate = IYearMonthDate();
+const defaultDate = createIYearMonthDate();
 
 const defaultDateObj = new Date(
   `${defaultDate.year}/${defaultDate.month}/${defaultDate.date} 00:00:00`
@@ -25,8 +25,8 @@ const tenYearsLater = new Date(new Date().getFullYear() + 99, 11);
 
 interface Props
   extends Omit<IDateInputProps, 'formatDate' | 'parseDate' | 'timePrecision'> {
-  ymd: IYearMonthDateType | undefined;
-  onYmdChange: (ymd: IYearMonthDateType | undefined) => void;
+  ymd: IYearMonthDate | undefined;
+  onYmdChange: (ymd: IYearMonthDate | undefined) => void;
 }
 
 export const BpDatePicker = memoNamed<Props>(
@@ -52,7 +52,11 @@ export const BpDatePicker = memoNamed<Props>(
         const y = getYear(dt ?? defaultDateObj);
         const m = getMonth(dt ?? defaultDateObj);
         const d = getDate(dt ?? defaultDateObj);
-        const ymdFromDate = IYearMonthDate({ year: y, month: m, date: d });
+        const ymdFromDate = createIYearMonthDate({
+          year: y,
+          month: m,
+          date: d,
+        });
         onYmdChange(ymdFromDate);
       },
       [onYmdChange]

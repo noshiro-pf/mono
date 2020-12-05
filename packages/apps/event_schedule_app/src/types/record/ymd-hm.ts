@@ -1,24 +1,48 @@
 import { IRecord, IRecordType } from '../../utils/immutable';
-import { compareHm, IHoursMinutes, IHoursMinutesType } from './hours-minutes';
+import {
+  compareHm,
+  createIHoursMinutes,
+  fillHoursMinutes,
+  IHoursMinutes,
+  PartialHoursMinutes,
+} from './base/hours-minutes';
 import {
   compareYmd,
+  createIYearMonthDate,
+  fillYearMonthDate,
   IYearMonthDate,
-  IYearMonthDateType,
-} from './year-month-date';
+  PartialYearMonthDate,
+} from './base/year-month-date';
 
-export type YmdHmType = {
-  ymd: IYearMonthDateType;
-  hm: IHoursMinutesType;
+type YmdHmBaseType = {
+  ymd: IYearMonthDate;
+  hm: IHoursMinutes;
 };
 
-export const IYmdHm = IRecord<YmdHmType>({
-  ymd: IYearMonthDate(),
-  hm: IHoursMinutes(),
+export type PartialYmdHm = Partial<
+  Readonly<{
+    ymd: PartialYearMonthDate;
+    hm: PartialHoursMinutes;
+  }>
+>;
+
+export type IYmdHm = IRecordType<YmdHmBaseType>;
+
+const IYmdHmRecordFactory = IRecord<YmdHmBaseType>({
+  ymd: createIYearMonthDate(),
+  hm: createIHoursMinutes(),
 });
 
-export type IYmdHmType = IRecordType<YmdHmType>;
+export const createIYmdHm: (a?: YmdHmBaseType) => IYmdHm = IYmdHmRecordFactory;
 
-export const compareYmdHm = (a: IYmdHmType, b: IYmdHmType): -1 | 0 | 1 => {
+const d = IYmdHmRecordFactory();
+export const fillYmdHm = (p: PartialYmdHm): IYmdHm =>
+  createIYmdHm({
+    ymd: fillYearMonthDate(p.ymd ?? d.ymd),
+    hm: fillHoursMinutes(p.hm ?? d.hm),
+  });
+
+export const compareYmdHm = (a: IYmdHm, b: IYmdHm): -1 | 0 | 1 => {
   const compareYmdResult = compareYmd(a.ymd, b.ymd);
   if (compareYmdResult !== 0) return compareYmdResult;
   const compareHmResult = compareHm(a.hm, b.hm);

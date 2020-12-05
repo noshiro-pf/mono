@@ -1,13 +1,14 @@
-import { IDatetimeRangeType } from '../../../../types/record/datetime-range';
+import { createIHoursMinutes } from '../../../../types/record/base/hours-minutes';
+import { IDatetimeRange } from '../../../../types/record/datetime-range';
 import {
+  createITimeRange,
   ITimeRange,
-  ITimeRangeType,
 } from '../../../../types/record/time-range';
 import { IList } from '../../../../utils/immutable';
 
 export const getMostFrequentTimeRange = (
-  datetimeList: IList<IDatetimeRangeType>
-): ITimeRangeType => {
+  datetimeList: IList<IDatetimeRange>
+): ITimeRange => {
   const startMaxFreq = datetimeList
     .groupBy((e) => e.timeRange.start)
     .maxBy((v) => v.count())
@@ -18,8 +19,8 @@ export const getMostFrequentTimeRange = (
     .maxBy((v) => v.count())
     ?.get(0)?.timeRange.end;
 
-  return ITimeRange({
-    start: startMaxFreq,
-    end: endMaxFreq,
+  return createITimeRange({
+    start: startMaxFreq ?? createIHoursMinutes(),
+    end: endMaxFreq ?? createIHoursMinutes(),
   });
 };

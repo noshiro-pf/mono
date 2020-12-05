@@ -1,20 +1,22 @@
 import { memoNamed, useBooleanState } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
-import { ITimeRangeType } from '../../../../types/record/time-range';
+import { ITimeRange } from '../../../../types/record/time-range';
 import { SetTimesPopoverView } from './set-times-popover-view';
 
-export const SetTimesPopover = memoNamed<{
+interface Props {
   datetimeSpecification: DatetimeSpecificationEnumType;
-  initialValue: ITimeRangeType;
-  onSetTimesSubmit: (range: ITimeRangeType) => void;
-}>(
+  initialValue: ITimeRange;
+  onSetTimesSubmit: (range: ITimeRange) => void;
+}
+
+export const SetTimesPopover = memoNamed<Props>(
   'SetTimesPopover',
   ({ datetimeSpecification, initialValue, onSetTimesSubmit }) => {
     const [isOpen, open, close] = useBooleanState(false);
 
     const onOkClick = useCallback(
-      (range: ITimeRangeType) => {
+      (range: ITimeRange) => {
         onSetTimesSubmit(range);
         close();
       },

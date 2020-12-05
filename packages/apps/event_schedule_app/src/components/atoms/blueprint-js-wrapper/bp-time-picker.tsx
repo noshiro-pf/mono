@@ -3,28 +3,33 @@ import { memoNamed } from '@mono/react-utils';
 import { getHours, getMinutes } from '@mono/ts-utils';
 import React, { useCallback, useMemo } from 'react';
 import {
+  createIHoursMinutes,
   IHoursMinutes,
-  IHoursMinutesType,
-} from '../../../types/record/hours-minutes';
+} from '../../../types/record/base/hours-minutes';
 
-export const BpTimePicker = memoNamed<{
-  time: IHoursMinutesType;
-  onTimeChange: (hm: IHoursMinutesType) => void;
-}>('BpTimePicker', ({ time, onTimeChange }) => {
-  const onChangeHandler = useCallback(
-    (date: Date) => {
-      const h = getHours(date);
-      const m = getMinutes(date);
-      const hmFromDate = IHoursMinutes({ hours: h, minutes: m });
-      onTimeChange(hmFromDate);
-    },
-    [onTimeChange]
-  );
+interface Props {
+  time: IHoursMinutes;
+  onTimeChange: (hm: IHoursMinutes) => void;
+}
 
-  const dateObj = useMemo<Date>(
-    () => new Date(`1900/1/1 ${time.hours}:${time.minutes}:11`),
-    [time]
-  );
+export const BpTimePicker = memoNamed<Props>(
+  'BpTimePicker',
+  ({ time, onTimeChange }) => {
+    const onChangeHandler = useCallback(
+      (date: Date) => {
+        const h = getHours(date);
+        const m = getMinutes(date);
+        const hmFromDate = createIHoursMinutes({ hours: h, minutes: m });
+        onTimeChange(hmFromDate);
+      },
+      [onTimeChange]
+    );
 
-  return <TimePicker value={dateObj} onChange={onChangeHandler} />;
-});
+    const dateObj = useMemo<Date>(
+      () => new Date(`1900/1/1 ${time.hours}:${time.minutes}:11`),
+      [time]
+    );
+
+    return <TimePicker value={dateObj} onChange={onChangeHandler} />;
+  }
+);

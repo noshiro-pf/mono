@@ -1,26 +1,52 @@
 import { IRecord, IRecordType } from '../../utils/immutable';
-import { compareTimeRange, ITimeRange, ITimeRangeType } from './time-range';
 import {
   compareYmd,
+  createIYearMonthDate,
+  fillYearMonthDate,
   IYearMonthDate,
-  IYearMonthDateType,
-} from './year-month-date';
+  PartialYearMonthDate,
+} from './base/year-month-date';
+import {
+  compareTimeRange,
+  createITimeRange,
+  fillTimeRange,
+  ITimeRange,
+  PartialTimeRange,
+} from './time-range';
 
-type DatetimeRangeType = {
-  ymd: IYearMonthDateType;
-  timeRange: ITimeRangeType;
+type DatetimeRangeBaseType = {
+  ymd: IYearMonthDate;
+  timeRange: ITimeRange;
 };
 
-export const IDatetimeRange = IRecord<DatetimeRangeType>({
-  ymd: IYearMonthDate(),
-  timeRange: ITimeRange(),
+export type PartialDatetimeRange = Partial<
+  Readonly<{
+    ymd: PartialYearMonthDate;
+    timeRange: PartialTimeRange;
+  }>
+>;
+
+export type IDatetimeRange = IRecordType<DatetimeRangeBaseType>;
+
+const IDatetimeRangeRecordFactory = IRecord<DatetimeRangeBaseType>({
+  ymd: createIYearMonthDate(),
+  timeRange: createITimeRange(),
 });
 
-export type IDatetimeRangeType = IRecordType<DatetimeRangeType>;
+export const createIDatetimeRange: (
+  a?: DatetimeRangeBaseType
+) => IDatetimeRange = IDatetimeRangeRecordFactory;
+
+const d = IDatetimeRangeRecordFactory();
+export const fillDatetimeRange = (p: PartialDatetimeRange): IDatetimeRange =>
+  createIDatetimeRange({
+    ymd: fillYearMonthDate(p.ymd ?? d.ymd),
+    timeRange: fillTimeRange(p.timeRange ?? d.timeRange),
+  });
 
 export const compareDatetimeRange = (
-  a: IDatetimeRangeType,
-  b: IDatetimeRangeType
+  a: IDatetimeRange,
+  b: IDatetimeRange
 ): number => {
   const compareYmdResult = compareYmd(a.ymd, b.ymd);
   if (compareYmdResult !== 0) return compareYmdResult;

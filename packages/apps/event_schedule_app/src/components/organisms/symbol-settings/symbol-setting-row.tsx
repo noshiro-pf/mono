@@ -1,19 +1,78 @@
-import { Icon, IconName } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import {
   answerSymbolPointConfig,
-  AnswerSymbolPointEnumType,
   clampAndRoundAnswerSymbolPoint,
-} from '../../../types/enum/answer-symbol-point';
-import { IAnswerSymbolType } from '../../../types/record/answer-symbol';
-// import { SelectSymbolPopover } from './select-symbol-popover/select-symbol-popover';
+} from '../../../constants/answer-symbol-point';
+import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
+import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
 import { IList } from '../../../utils/immutable';
+// import { SelectSymbolPopover } from './select-symbol-popover/select-symbol-popover';
 import { BpInput } from '../../atoms/blueprint-js-wrapper/bp-input';
 import { BpNumericInput } from '../../atoms/blueprint-js-wrapper/bp-numeric-input';
-import { CircleIcon, CloseIcon, TriangleIcon } from '../../atoms/icons';
+import { CustomIcon } from '../../atoms/icon';
+
+interface Props {
+  answerSymbol: IAnswerSymbol;
+  iconsInUse: IList<AnswerSymbolIconId>;
+  onDescriptionChange: (value: string) => void;
+  onPointChange: (value: AnswerSymbolPointEnumType) => void;
+  onDeleteClick: () => void;
+  disabled: boolean;
+}
+
+export const AnswerSymbolRow = memoNamed<Props>(
+  'AnswerSymbolRow',
+  ({ answerSymbol, onDescriptionChange, onPointChange, disabled }) => {
+    // const onIconSelect = useCallback((id: AnswerSymbolIconId) => {
+    //   console.log('onIconSelect', id);
+    // }, []);
+
+    const onPointChangeHandler = useCallback(
+      (value: number) => {
+        onPointChange(clampAndRoundAnswerSymbolPoint(value));
+      },
+      [onPointChange]
+    );
+
+    return (
+      <Root>
+        <IconWrapper>
+          <CustomIcon name={answerSymbol.iconId} />
+          {/* <SelectSymbolPopover
+            openerIcon={icon}
+            iconsInUse={iconsInUse}
+            onIconSelectSubmit={onIconSelect}
+          /> */}
+        </IconWrapper>
+        <DescriptionWrapper>
+          <BpInput
+            value={answerSymbol.description}
+            onValueChange={onDescriptionChange}
+            disabled={disabled}
+          />
+        </DescriptionWrapper>
+        <NumericInputWrapper>
+          <BpNumericInput
+            value={answerSymbol.point}
+            onValueChange={onPointChangeHandler}
+            min={answerSymbolPointConfig.min}
+            max={answerSymbolPointConfig.max}
+            minorStepSize={answerSymbolPointConfig.minorStep}
+            stepSize={answerSymbolPointConfig.step}
+            majorStepSize={answerSymbolPointConfig.majorStep}
+            disabled={disabled}
+          />
+        </NumericInputWrapper>
+        {/* <ButtonsWrapper>
+          <BpButton icon={'trash'} minimal={true} onClick={onDeleteClick} />
+        </ButtonsWrapper> */}
+      </Root>
+    );
+  }
+);
 
 const Root = styled.div`
   display: flex;
@@ -46,78 +105,3 @@ const DescriptionWrapper = styled.div`
 const NumericInputWrapper = styled.div`
   flex: 0 0 65px;
 `;
-
-export const AnswerSymbolRow = memoNamed<{
-  answerSymbol: IAnswerSymbolType;
-  iconsInUse: IList<AnswerSymbolIconId>;
-  onDescriptionChange: (value: string) => void;
-  onPointChange: (value: AnswerSymbolPointEnumType) => void;
-  onDeleteClick: () => void;
-}>(
-  'AnswerSymbolRow',
-  (
-    {
-      answerSymbol,
-      // iconsInUse,
-      onDescriptionChange,
-      onPointChange,
-    } // onDeleteClick
-  ) => {
-    // const onIconSelect = useCallback((id: AnswerSymbolIconId) => {
-    //   console.log('onIconSelect', id);
-    // }, []);
-
-    const onPointChangeHandler = useCallback(
-      (value: number) => {
-        onPointChange(clampAndRoundAnswerSymbolPoint(value));
-      },
-      [onPointChange]
-    );
-
-    const icon = useMemo<IconName | JSX.Element>(() => {
-      switch (answerSymbol.iconId) {
-        case 'handmade-circle':
-          return <CircleIcon />;
-        case 'handmade-triangle':
-          return <TriangleIcon />;
-        case 'handmade-cross':
-          return <CloseIcon />;
-        default:
-          return answerSymbol.iconId;
-      }
-    }, [answerSymbol.iconId]);
-
-    return (
-      <Root>
-        <IconWrapper>
-          <Icon icon={icon} />
-          {/* <SelectSymbolPopover
-            openerIcon={icon}
-            iconsInUse={iconsInUse}
-            onIconSelectSubmit={onIconSelect}
-          /> */}
-        </IconWrapper>
-        <DescriptionWrapper>
-          <BpInput
-            value={answerSymbol.description}
-            onValueChange={onDescriptionChange}
-          />
-        </DescriptionWrapper>
-        <NumericInputWrapper>
-          <BpNumericInput
-            value={answerSymbol.point}
-            onValueChange={onPointChangeHandler}
-            min={answerSymbolPointConfig.min}
-            max={answerSymbolPointConfig.max}
-            minorStepSize={answerSymbolPointConfig.minorStep}
-            stepSize={answerSymbolPointConfig.step}
-            majorStepSize={answerSymbolPointConfig.majorStep}
-          />
-        </NumericInputWrapper>
-        {/* <ButtonsWrapper>
-          <Button icon={'trash'} minimal={true} onClick={onDeleteClick} />
-        </ButtonsWrapper> */}
-      </Root>
-    );
-  }
-);

@@ -1,16 +1,20 @@
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
-import { IYearMonthDateType } from '../../types/record/year-month-date';
+import { IYearMonthDate } from '../../types/record/base/year-month-date';
 
-export const YearMonthDate = memoNamed<{ ymd: IYearMonthDateType }>(
-  'YearMonthDate',
-  ({ ymd }) => (
+interface Props {
+  ymd: IYearMonthDate;
+}
+
+export const YearMonthDateView = memoNamed<Props>(
+  'YearMonthDateView',
+  (props) => (
     <div>
-      <span>{ymd.year}</span>
+      <span>{props.ymd.year}</span>
       {'/'}
-      <span>{ymd.month}</span>
+      <span>{props.ymd.month}</span>
       {'/'}
-      <span>{ymd.date}</span>
+      <span>{props.ymd.date}</span>
     </div>
   )
 );

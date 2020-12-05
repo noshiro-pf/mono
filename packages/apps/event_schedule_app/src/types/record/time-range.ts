@@ -1,22 +1,43 @@
 import { IRecord, IRecordType } from '../../utils/immutable';
-import { compareHm, IHoursMinutes, IHoursMinutesType } from './hours-minutes';
+import {
+  compareHm,
+  createIHoursMinutes,
+  fillHoursMinutes,
+  IHoursMinutes,
+  PartialHoursMinutes,
+} from './base/hours-minutes';
 
-export type TimeRangeType = {
-  start: IHoursMinutesType;
-  end: IHoursMinutesType;
+type TimeRangeBaseType = {
+  start: IHoursMinutes;
+  end: IHoursMinutes;
 };
 
-export const ITimeRange = IRecord<TimeRangeType>({
-  start: IHoursMinutes(),
-  end: IHoursMinutes(),
+export type PartialTimeRange = Partial<
+  Readonly<{
+    start: PartialHoursMinutes;
+    end: PartialHoursMinutes;
+  }>
+>;
+
+export type ITimeRange = IRecordType<TimeRangeBaseType>;
+
+const ITimeRangeRecordFactory = IRecord<TimeRangeBaseType>({
+  start: createIHoursMinutes(),
+  end: createIHoursMinutes(),
 });
 
-export type ITimeRangeType = IRecordType<TimeRangeType>;
+export const createITimeRange: (
+  a?: TimeRangeBaseType
+) => ITimeRange = ITimeRangeRecordFactory;
 
-export const compareTimeRange = (
-  a: ITimeRangeType,
-  b: ITimeRangeType
-): number => {
+const d = ITimeRangeRecordFactory();
+export const fillTimeRange = (p: PartialTimeRange): ITimeRange =>
+  createITimeRange({
+    start: fillHoursMinutes(p.start ?? d.start),
+    end: fillHoursMinutes(p.end ?? d.end),
+  });
+
+export const compareTimeRange = (a: ITimeRange, b: ITimeRange): number => {
   const compareStartHmResult = compareHm(a.start, b.start);
   if (compareStartHmResult !== 0) return compareStartHmResult;
   const compareEndHmResult = compareHm(a.end, b.end);

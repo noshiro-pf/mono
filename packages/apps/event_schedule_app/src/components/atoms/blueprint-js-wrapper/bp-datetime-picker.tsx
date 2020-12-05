@@ -8,32 +8,27 @@ import {
   getYear,
 } from '@mono/ts-utils';
 import React, { useCallback, useMemo } from 'react';
-import { IHoursMinutes } from '../../../types/record/hours-minutes';
-import { IYearMonthDate } from '../../../types/record/year-month-date';
-import { IYmdHm, IYmdHmType } from '../../../types/record/ymd-hm';
+import { createIHoursMinutes } from '../../../types/record/base/hours-minutes';
+import { createIYearMonthDate } from '../../../types/record/base/year-month-date';
+import { createIYmdHm, IYmdHm } from '../../../types/record/ymd-hm';
+import { pad2 } from '../../../utils/pad2';
+import { ymdhm2Date } from '../../../utils/ymdhm2date';
 
 const dateFormatter = (date: Date): string =>
-  `${getYear(date)}-${getMonth(date).toString().padStart(2, '0')}-${getDate(
-    date
-  )
-    .toString()
-    .padStart(2, '0')}  ${getHours(date)
-    .toString()
-    .padStart(2, '0')}:${getMinutes(date).toString().padStart(2, '0')}`;
+  `${getYear(date)}-${pad2(getMonth(date))}-${pad2(getDate(date))}  ${pad2(
+    getHours(date)
+  )}:${pad2(getMinutes(date))}`;
 
 const dateParser = (str: string): Date => new Date(str);
 
-const defaultDatetime = IYmdHm();
-const defaultDateObj = new Date(
-  `${defaultDatetime.ymd.year}/${defaultDatetime.ymd.month}/${defaultDatetime.ymd.date} ${defaultDatetime.hm.hours}:${defaultDatetime.hm.minutes}:00`
-);
+const defaultDateObj = ymdhm2Date(createIYmdHm());
 
 const tenYearsLater = new Date(new Date().getFullYear() + 99, 11);
 
 interface Props
   extends Omit<IDateInputProps, 'formatDate' | 'parseDate' | 'timePrecision'> {
-  ymdhm: IYmdHmType | undefined;
-  onYmdHmChange: (ymdhm: IYmdHmType | undefined) => void;
+  ymdhm: IYmdHm | undefined;
+  onYmdHmChange: (ymdhm: IYmdHm | undefined) => void;
 }
 
 export const BpDatetimePicker = memoNamed<Props>(
@@ -61,9 +56,9 @@ export const BpDatetimePicker = memoNamed<Props>(
         const d = getDate(dt ?? defaultDateObj);
         const h = getHours(dt ?? defaultDateObj);
         const min = getMinutes(dt ?? defaultDateObj);
-        const ymdhmFromDate = IYmdHm({
-          ymd: IYearMonthDate({ year: y, month: m, date: d }),
-          hm: IHoursMinutes({ hours: h, minutes: min }),
+        const ymdhmFromDate = createIYmdHm({
+          ymd: createIYearMonthDate({ year: y, month: m, date: d }),
+          hm: createIHoursMinutes({ hours: h, minutes: min }),
         });
         onYmdHmChange(ymdhmFromDate);
       },

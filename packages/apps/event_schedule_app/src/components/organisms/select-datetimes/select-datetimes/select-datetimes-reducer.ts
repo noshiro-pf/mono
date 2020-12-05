@@ -1,118 +1,101 @@
 import { ReducerType } from '@mono/ts-utils';
+import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
+import { IYearMonthDate } from '../../../../types/record/base/year-month-date';
 import {
   compareDatetimeRange,
+  createIDatetimeRange,
   IDatetimeRange,
-  IDatetimeRangeType,
 } from '../../../../types/record/datetime-range';
-import { IHoursMinutesType as IHmType } from '../../../../types/record/hours-minutes';
-import { ITimeRangeType } from '../../../../types/record/time-range';
-import { IYearMonthDateType as IYmdType } from '../../../../types/record/year-month-date';
+import {
+  createITimeRange,
+  ITimeRange,
+} from '../../../../types/record/time-range';
 import { IList, ISet } from '../../../../utils/immutable';
+import { timeRangeReducer } from '../set-times-popover/time-range-reducer';
 
-type DatetimeListReducerAction =
-  | {
-      type: 'fromProps';
-      list: IList<IDatetimeRangeType>;
-    }
+export type DatetimeListReducerAction =
   | {
       type: 'fromCalendar';
-      list: IList<IYmdType>;
-      mostFrequentTimeRange: ITimeRangeType;
+      list: IList<IYearMonthDate>;
+      mostFrequentTimeRange: ITimeRange;
     }
   | {
       type: 'ymd';
-      payload: {
-        index: number;
-        value: IYmdType;
-      };
+      index: number;
+      ymd: IYearMonthDate;
     }
   | {
       type: 'start' | 'end';
-      payload: {
-        index: number;
-        value: IHmType;
-      };
+      index: number;
+      hm: IHoursMinutes;
     }
   | { type: 'duplicate'; index: number }
   | {
       type: 'setTimeAtOneTime';
-      timeRange: ITimeRangeType;
+      timeRange: ITimeRange;
     }
   | {
       type: 'addClick';
-      datetimeRange: IDatetimeRangeType;
+      datetimeRange: IDatetimeRange;
     }
   | { type: 'delete'; index: number }
   | { type: 'deleteAll' | 'sort' };
 
-type DatetimeListReducerState = {
-  lastAction: DatetimeListReducerAction['type'];
-  value: IList<IDatetimeRangeType>;
-};
+export type DatetimeListReducerState = IList<IDatetimeRange>;
 
-export const datetimeListReducerInitialState: DatetimeListReducerState = {
-  lastAction: 'fromProps',
-  value: IList<IDatetimeRangeType>(),
-};
-
-export const datetimeListreducer: ReducerType<
+export const datetimeListReducer: ReducerType<
   DatetimeListReducerState,
   DatetimeListReducerAction
 > = (state, action) => {
-  const nextState = ((prevState: DatetimeListReducerState['value']) => {
-    switch (action.type) {
-      case 'fromProps':
-        return action.list.sort(compareDatetimeRange);
-
-      case 'fromCalendar': {
-        /* [note]
-        カレンダーから追加された要素は時刻 00:00 でリストに追加する。
-        カレンダーから削除された要素はリストからも削除する。 */
-        const datetimeSet: ISet<IYmdType> = prevState.map((e) => e.ymd).toSet();
-        const dateSetFromCalendar: ISet<IYmdType> = action.list.toSet();
-        const removed = datetimeSet.subtract(dateSetFromCalendar);
-        const added = dateSetFromCalendar.subtract(datetimeSet);
-        return prevState
-          .filterNot((e) => removed.has(e.ymd))
-          .concat(added.map((ymd) => IDatetimeRange({ ymd })))
-          .sort(compareDatetimeRange);
-      }
-
-      case 'ymd':
-        return prevState.update(action.payload.index, (val) =>
-          val.set(action.type, action.payload.value)
-        );
-
-      case 'start':
-      case 'end':
-        return prevState.update(action.payload.index, (val) =>
-          val.update('timeRange', (v) =>
-            v.set(action.type, action.payload.value)
+  switch (action.type) {
+    case 'fromCalendar': {
+      /* [note]
+      カレンダーから追加された要素は時刻 00:00 でリストに追加する。
+      カレンダーから削除された要素はリストからも削除する。 */
+      const datetimeSet: ISet<IYearMonthDate> = state.map((e) => e.ymd).toSet();
+      const dateSetFromCalendar: ISet<IYearMonthDate> = action.list.toSet();
+      const removed = datetimeSet.subtract(dateSetFromCalendar);
+      const added = dateSetFromCalendar.subtract(datetimeSet);
+      return state
+        .filterNot((e) => removed.has(e.ymd))
+        .concat(
+          added.map((ymd) =>
+            createIDatetimeRange({ ymd, timeRange: createITimeRange() })
           )
-        );
-
-      case 'duplicate':
-        return prevState.insert(
-          action.index,
-          prevState.get(action.index) ?? IDatetimeRange()
-        );
-
-      case 'delete':
-        return prevState.remove(action.index);
-
-      case 'addClick':
-        return prevState.push(action.datetimeRange);
-
-      case 'deleteAll':
-        return prevState.clear();
-
-      case 'setTimeAtOneTime':
-        return prevState.map((el) => el.set('timeRange', action.timeRange));
-
-      case 'sort':
-        return prevState.sort(compareDatetimeRange);
+        )
+        .sort(compareDatetimeRange);
     }
-  })(state.value);
 
-  return { lastAction: action.type, value: nextState };
+    case 'ymd':
+      return state.update(action.index, (val) =>
+        val.set(action.type, action.ymd)
+      );
+
+    case 'start':
+    case 'end':
+      return state.update(action.index, (val) =>
+        val.update('timeRange', (v) => timeRangeReducer(v, action))
+      );
+
+    case 'duplicate':
+      return state.insert(
+        action.index,
+        state.get(action.index) ?? createIDatetimeRange()
+      );
+
+    case 'delete':
+      return state.remove(action.index);
+
+    case 'addClick':
+      return state.push(action.datetimeRange);
+
+    case 'deleteAll':
+      return state.clear();
+
+    case 'setTimeAtOneTime':
+      return state.map((el) => el.set('timeRange', action.timeRange));
+
+    case 'sort':
+      return state.sort(compareDatetimeRange);
+  }
 };
