@@ -1,4 +1,22 @@
 {
+  "libraries": [
+    {
+      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs2",
+      "title": "rnjs2（開発中）",
+      "subtitle": "リアクティブプログラミング用のJavaScriptのライブラリ",
+      "body1": "RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じくRxJSで発生しうる「グリッチ」という現象が起きないようにしたものだが、rnjs v1で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。",
+      "body2": "TypeScriptで実装中。（最終更新：2020年7月）",
+      "imageUrl": ""
+    },
+    {
+      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs",
+      "title": "rnjs",
+      "subtitle": "リアクティブプログラミング用のJavaScriptのライブラリ",
+      "body1": "RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにしたもの（Observableの発火をpriority queueで管理している）。",
+      "body2": "TypeScriptで実装。npmで\"rnjs\"という名前で公開。（最終更新：2019年1月）",
+      "imageUrl": ""
+    }
+  ],
   "webapps": [
     {
       "link": "https://event-schedule-app.web.app/",
@@ -14,14 +32,6 @@
       "subtitle": "矩形ツールによる画像アノテーションを行うUI",
       "body1": "polygon, paint toolやkey-pointなどのアノテーションもできるようにしたい。",
       "body2": "React・TypeScript・Pixi.jsで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2020年9月28日）",
-      "imageUrl": ""
-    },
-    {
-      "link": "https://my-profile-app-ec7bf.web.app",
-      "title": "プロフィール",
-      "subtitle": "このページ",
-      "body1": "Chrome推奨。",
-      "body2": "React・TypeScript・Material UIで実装。静的ページだが、Markdownでモバイル端末でも簡単に編集できるように、 Dropbox上に置いたMarkdown形式テキストを fetchし\"ReactMarkdown\"により表示するようにした。タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）",
       "imageUrl": ""
     },
     {
@@ -47,6 +57,14 @@
       "body1": "同じ目が出ても振ったかどうか分かるようなエフェクトを付けている。ダイスを転がすアニメーション等があってもよいかもしれない。",
       "body2": "React・RxJS・TypeScriptで実装。RxJSはリングの透明度変化を扱うために使用した（連打時に前のアニメーションをキャンセルする処理）。（制作時期：2019年7月）",
       "imageUrl": "https://raw.githubusercontent.com/noshiro-pf/mono/master/packages/apps/my_profile_content/images/catan-dice.png"
+    },
+    {
+      "link": "https://my-profile-app-ec7bf.web.app",
+      "title": "プロフィール",
+      "subtitle": "このページ",
+      "body1": "Chrome推奨。",
+      "body2": "React・TypeScript・Material UIで実装。静的ページだが、Markdownでモバイル端末でも簡単に編集できるように、 Dropbox上に置いたMarkdown形式テキストを fetchし\"ReactMarkdown\"により表示するようにした。タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）",
+      "imageUrl": ""
     },
     {
       "link": "https://pikoappsproduct.firebaseapp.com/#/",
@@ -94,24 +112,6 @@
       "subtitle": "JSONテキストデータの整形",
       "body1": "Chrome推奨。難読化されたJSONテキストデータを整形して出力する",
       "body2": "Angular・RxJS・TypeScriptで実装。（制作時期：2017年）",
-      "imageUrl": ""
-    }
-  ],
-  "libraries": [
-    {
-      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs2",
-      "title": "(WIP) rnjs2",
-      "subtitle": "リアクティブプログラミング用のJavaScriptのライブラリ",
-      "body1": "RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにObservableの発火をpriority queueで管理している。rnjs v1で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。",
-      "body2": "TypeScriptで実装中。（最終更新：2020年7月）",
-      "imageUrl": ""
-    },
-    {
-      "link": "https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs",
-      "title": "rnjs",
-      "subtitle": "リアクティブプログラミング用のJavaScriptのライブラリ",
-      "body1": "RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにObservableの発火をpriority queueで管理している。",
-      "body2": "TypeScriptで実装。npmで\"rnjs\"という名前で公開。（最終更新：2019年1月）",
       "imageUrl": ""
     }
   ]
