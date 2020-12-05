@@ -1,4 +1,4 @@
-import { Button, IconName } from '@blueprintjs/core';
+import { IconName } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -7,11 +7,8 @@ import {
   answerSymbolIconIdsFromBp,
 } from '../../../../types/enum/answer-symbol-icon';
 import { IList } from '../../../../utils/immutable';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/button';
 import { CircleIcon, CloseIcon, TriangleIcon } from '../../../atoms/icons';
-
-const Root = styled.div`
-  padding: 10px;
-`;
 
 const icons: { id: AnswerSymbolIconId; icon: IconName | JSX.Element }[] = [
   ...answerSymbolIconIdsFromBp.map((iconId) => ({ id: iconId, icon: iconId })),
@@ -20,32 +17,41 @@ const icons: { id: AnswerSymbolIconId; icon: IconName | JSX.Element }[] = [
   { id: 'handmade-cross', icon: <CloseIcon /> },
 ];
 
-export const SelectSymbolPopoverContent = memoNamed<{
+interface Props {
   iconsInUse: IList<AnswerSymbolIconId>;
   onIconSelect: (iconId: AnswerSymbolIconId) => void;
-}>('SelectSymbolPopoverContent', ({ iconsInUse, onIconSelect }) => {
-  const iconsWithHandler = useMemo(
-    () =>
-      icons.map((icn) => ({
-        ...icn,
-        disabled: iconsInUse.includes(icn.id),
-        onClickHandler: () => onIconSelect(icn.id),
-      })),
+}
 
-    [iconsInUse, onIconSelect]
-  );
+export const SelectSymbolPopoverContent = memoNamed<Props>(
+  'SelectSymbolPopoverContent',
+  ({ iconsInUse, onIconSelect }) => {
+    const iconsWithHandler = useMemo(
+      () =>
+        icons.map((icn) => ({
+          ...icn,
+          disabled: iconsInUse.includes(icn.id),
+          onClickHandler: () => onIconSelect(icn.id),
+        })),
 
-  return (
-    <Root>
-      {iconsWithHandler.map(({ id, icon, disabled, onClickHandler }) => (
-        <Button
-          key={id}
-          icon={icon}
-          minimal={true}
-          disabled={disabled || true}
-          onClick={onClickHandler}
-        />
-      ))}
-    </Root>
-  );
-});
+      [iconsInUse, onIconSelect]
+    );
+
+    return (
+      <Root>
+        {iconsWithHandler.map(({ id, icon, disabled, onClickHandler }) => (
+          <BpButton
+            key={id}
+            icon={icon}
+            minimal={true}
+            disabled={disabled || true}
+            onClick={onClickHandler}
+          />
+        ))}
+      </Root>
+    );
+  }
+);
+
+const Root = styled.div`
+  padding: 10px;
+`;

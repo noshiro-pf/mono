@@ -1,4 +1,4 @@
-import { Button, IOptionProps } from '@blueprintjs/core';
+import { IOptionProps } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import {
   getMonth,
@@ -13,12 +13,7 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { IRange } from '../../utils/immutable';
 import { BpSelect } from '../atoms/blueprint-js-wrapper/bp-select';
-
-const Nav = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
+import { BpButton } from '../atoms/blueprint-js-wrapper/button';
 
 const thisYear = getYear(today());
 const thisMonth = getMonth(today());
@@ -29,14 +24,16 @@ const monthOption: IOptionProps[] = months.map((e) => ({
   label: e.name,
 }));
 
-export const DatepickerNav = memoNamed<{
+interface Props {
   year: YearEnum;
   month: MonthEnum;
   onYearChange: (year: YearEnum) => void;
   onMonthChange: (month: MonthEnum) => void;
   onPrevMonthClick: () => void;
   onNextMonthClick: () => void;
-}>(
+}
+
+export const DatepickerNav = memoNamed<Props>(
   'DatepickerNav',
   ({
     year,
@@ -62,7 +59,7 @@ export const DatepickerNav = memoNamed<{
 
     return (
       <Nav>
-        <Button
+        <BpButton
           icon={'chevron-left'}
           type='button'
           minimal={true}
@@ -80,7 +77,7 @@ export const DatepickerNav = memoNamed<{
           value={month}
           onValueChange={onMonthChangeHandler}
         />
-        <Button
+        <BpButton
           icon={'chevron-right'}
           type='button'
           minimal={true}
@@ -90,3 +87,9 @@ export const DatepickerNav = memoNamed<{
     );
   }
 );
+
+const Nav = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;

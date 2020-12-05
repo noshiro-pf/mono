@@ -2,7 +2,7 @@ import { Button, TextArea } from '@blueprintjs/core';
 import { memoNamed, useToggleState } from '@mono/react-utils';
 import React, { CSSProperties, useState } from 'react';
 import styled from 'styled-components';
-import { IHoursMinutes } from '../../types/record/hours-minutes';
+import { createIHoursMinutes } from '../../types/record/base/hours-minutes';
 import { BpInput } from '../atoms/blueprint-js-wrapper/bp-input';
 import { BpSelect } from '../atoms/blueprint-js-wrapper/bp-select';
 import { BpSwitch } from '../atoms/blueprint-js-wrapper/bp-switch';
@@ -18,17 +18,6 @@ import {
 } from '../atoms/icons';
 
 const size: CSSProperties = { width: '32px', height: '32px' };
-
-const PadWrapper = styled.div`
-  padding: 5px;
-`;
-
-const IconWrapper = styled.div`
-  display: inline-block;
-  padding: 5px;
-`;
-
-const noop = (): void => undefined;
 
 export const UiPartsTest = memoNamed<Record<string, void>>(
   'UiPartsTest',
@@ -102,7 +91,7 @@ export const UiPartsTest = memoNamed<Record<string, void>>(
         </PadWrapper>
         <PadWrapper>
           <BpTimePicker
-            time={IHoursMinutes({ hours: 12, minutes: 34 })}
+            time={createIHoursMinutes({ hours: 12, minutes: 34 })}
             onTimeChange={(e) => console.log(e)}
           />
         </PadWrapper>
@@ -124,3 +113,14 @@ export const UiPartsTest = memoNamed<Record<string, void>>(
     );
   }
 );
+
+const PadWrapper = styled.div`
+  padding: 5px;
+`;
+
+const IconWrapper = styled.div`
+  display: inline-block;
+  padding: 5px;
+`;
+
+const noop = (): void => undefined;

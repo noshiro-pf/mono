@@ -25,8 +25,7 @@ export const calendarCurrentPageInitialState: CalendarCurrentPageReducerState = 
 export const calendarCurrentPageReducer: ReducerType<
   CalendarCurrentPageReducerState,
   CalendarCurrentPageReducerAction
-> = (state, action) => {
-  const { year, month } = state;
+> = ({ year, month }, action) => {
   switch (action.type) {
     case 'prev-month':
       return month === 1

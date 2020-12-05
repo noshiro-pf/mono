@@ -12,7 +12,7 @@
     "clean:build": "rimraf ${npm_package_config_dist_dir}",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "predeploy": "yarn build",
-    "deploy": "firebase deploy",
+    "deploy": "firebase deploy --only hosting:event-schedule-app",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fmt": "yarn _script_formatchanged",
@@ -27,9 +27,7 @@
     "testw": "yarn test --watch"
   },
   "config": {
-    "config_dir": "config",
     "dist_dir": "build",
-    "dotenv_example": "dotenv-example",
     "jest_config": "config/jest.config.json",
     "public_dir": "public",
     "scripts_dir": "../../../scripts",
@@ -50,17 +48,20 @@
     ]
   },
   "dependencies": {
-    "@apollo/react-hooks": "^3.1.5",
     "@blueprintjs/core": "^3.32.1",
     "@blueprintjs/datetime": "^3.19.1",
     "@blueprintjs/icons": "^3.21.0",
+    "@blueprintjs/table": "^3.8.18",
+    "@mono/react-rxjs-utils": "*",
+    "@mono/rxjs-utils": "*",
     "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
-    "apollo-boost": "^0.4.9",
+    "firebase": "^8.1.1",
     "global": "^4.4.0",
-    "graphql": "^15.2.0",
+    "immer": "^8.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "rxjs": "^6.6.3",
     "styled-components": "^5.1.1"
   },
   "devDependencies": {

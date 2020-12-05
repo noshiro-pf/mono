@@ -12,20 +12,3 @@ export type AnswerSymbolPointEnumType = number &
    | 9 | 9.1 | 9.2 | 9.3 | 9.4 | 9.5 | 9.6 | 9.7 | 9.8 | 9.9
    | 10
   );
-
-export const answerSymbolPointConfig = {
-  minorStep: 0.1,
-  majorStep: 1,
-  step: 1,
-  min: 0,
-  max: 10,
-};
-
-export const clampAndRoundAnswerSymbolPoint = (
-  x: number
-): AnswerSymbolPointEnumType =>
-  x < 0
-    ? 0
-    : 10 < x
-    ? 10
-    : ((Math.round(x * 10) / 10) as AnswerSymbolPointEnumType);

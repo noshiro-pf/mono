@@ -1,7 +1,7 @@
 import { IconName } from '@blueprintjs/core';
 import { assertType, TypeExtends } from '@mono/ts-utils';
 
-export type AnswerSymbolIconIdFromBp = IconName &
+type AnswerSymbolIconIdFromBp = IconName &
   (
     | 'circle'
     | 'full-circle'
@@ -44,7 +44,7 @@ export type AnswerSymbolIconIdFromBp = IconName &
     | 'tick-circle'
   );
 
-export type AnswerSymbolIconHandmade =
+type AnswerSymbolIconHandmade =
   | 'handmade-circle'
   | 'handmade-triangle'
   | 'handmade-cross';
@@ -95,7 +95,7 @@ export const answerSymbolIconIdsFromBp: AnswerSymbolIconIdFromBp[] = [
   'tick-circle',
 ];
 
-export const answerSymbolIconIdsHandmade: AnswerSymbolIconHandmade[] = [
+const answerSymbolIconIdsHandmade: AnswerSymbolIconHandmade[] = [
   'handmade-circle',
   'handmade-triangle',
   'handmade-cross',

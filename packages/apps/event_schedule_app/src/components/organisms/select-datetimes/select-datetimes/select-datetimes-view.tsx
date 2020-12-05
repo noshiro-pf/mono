@@ -1,4 +1,4 @@
-import { Button, IOptionProps } from '@blueprintjs/core';
+import { IOptionProps } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
@@ -7,34 +7,21 @@ import {
   DatetimeSpecificationEnumType,
   datetimeSpecificationOptions,
 } from '../../../../types/enum/datetime-specification-type';
-import { IDatetimeRangeType } from '../../../../types/record/datetime-range';
-import { IHoursMinutesType } from '../../../../types/record/hours-minutes';
-import { ITimeRangeType } from '../../../../types/record/time-range';
-import { IYearMonthDateType } from '../../../../types/record/year-month-date';
-import { ForciblyUpdatedValue } from '../../../../utils/forcibly-updated-value';
+import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
+import { IYearMonthDate } from '../../../../types/record/base/year-month-date';
+import { IDatetimeRange } from '../../../../types/record/datetime-range';
+import { ITimeRange } from '../../../../types/record/time-range';
 import { IList } from '../../../../utils/immutable';
 import { BpSelect } from '../../../atoms/blueprint-js-wrapper/bp-select';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/button';
 import { AddElementButton } from '../../../molecules/add-element-button';
 import { ButtonsWrapper } from '../../../molecules/buttons-wrapper';
-import { SelectedDatetimeRow } from '../../../molecules/selected-datetime-row';
 import { MultipleDatePicker } from '../../../multiple-date-picker/multiple-date-picker';
 import { DeleteAllButton } from '../delete-all/delete-all-button';
 import { SetTimesPopover } from '../set-times-popover/set-times-popover';
+import { SelectedDatetimeRow } from './selected-datetime-row';
 
 const vt = texts.createEventPage.section2;
-
-const Root = styled.div`
-  display: flex;
-  flex-wrap: wrap-reverse;
-`;
-
-const DatetimeSpecificationSelectWrapper = styled.div`
-  margin-bottom: 10px;
-`;
-
-const DatetimeRangeListWrapper = styled.div`
-  margin-bottom: 10px;
-`;
 
 const options: IOptionProps[] = [
   {
@@ -55,58 +42,46 @@ const options: IOptionProps[] = [
   },
 ];
 
-const handlerTypeConverter = <T, S>(
-  handler: (value: T) => void
-): ((value: S) => void) => (value: S) => handler((value as unknown) as T);
+type CastedHandlerType = (value: string) => void;
 
-export const SelectDatetimeView = memoNamed<{
-  selectedDates: ForciblyUpdatedValue<IList<IYearMonthDateType>>;
-  onSelectedDatesChange: (v: IList<IYearMonthDateType>) => void;
+interface Props {
+  selectedDates: IList<IYearMonthDate>;
+  onSelectedDatesChange: (v: IList<IYearMonthDate>) => void;
   datetimeSpecification: DatetimeSpecificationEnumType;
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
   datetimeListWithHandler: IList<{
     id: number;
-    datetimeRange: IDatetimeRangeType;
-    onYmdChange: (ymd: IYearMonthDateType | undefined) => void;
-    onRangeStartChange: (hm: IHoursMinutesType) => void;
-    onRangeEndChange: (hm: IHoursMinutesType) => void;
+    datetimeRange: IDatetimeRange;
+    onYmdChange: (ymd: IYearMonthDate | undefined) => void;
+    onRangeStartChange: (hm: IHoursMinutes) => void;
+    onRangeEndChange: (hm: IHoursMinutes) => void;
     onDuplicateClick: () => void;
     onDeleteClick: () => void;
   }>;
   onAddDatetimeClick: () => void;
   onConfirmDeleteAll: () => void;
-  setTimesPopoverInitialValue: ITimeRangeType;
-  onSetTimesPopoverSubmit: (timeRange: ITimeRangeType) => void;
+  setTimesPopoverInitialValue: ITimeRange;
+  onSetTimesPopoverSubmit: (timeRange: ITimeRange) => void;
   onSortClick: () => void;
-}>(
+}
+
+export const SelectDatetimeView = memoNamed<Props>(
   'SelectDatetimeView',
-  ({
-    selectedDates,
-    onSelectedDatesChange,
-    datetimeSpecification,
-    onDatetimeSpecificationChange,
-    datetimeListWithHandler,
-    onAddDatetimeClick,
-    setTimesPopoverInitialValue,
-    onSetTimesPopoverSubmit,
-    onConfirmDeleteAll,
-    onSortClick,
-  }) => (
+  (props) => (
     <Root>
       <div>
         <DatetimeSpecificationSelectWrapper>
           <div>{vt.datetimeSpecification}</div>
           <BpSelect
-            value={datetimeSpecification}
-            onValueChange={handlerTypeConverter<
-              DatetimeSpecificationEnumType,
-              string
-            >(onDatetimeSpecificationChange)}
+            value={props.datetimeSpecification}
+            onValueChange={
+              props.onDatetimeSpecificationChange as CastedHandlerType
+            }
             options={options}
           />
         </DatetimeSpecificationSelectWrapper>
         <DatetimeRangeListWrapper>
-          {datetimeListWithHandler.map(
+          {props.datetimeListWithHandler.map(
             ({
               id,
               datetimeRange,
@@ -118,7 +93,7 @@ export const SelectDatetimeView = memoNamed<{
             }) => (
               <SelectedDatetimeRow
                 key={id}
-                datetimeSpecification={datetimeSpecification}
+                datetimeSpecification={props.datetimeSpecification}
                 datetimeRange={datetimeRange}
                 onYmdChange={onYmdChange}
                 onRangeStartChange={onRangeStartChange}
@@ -128,27 +103,40 @@ export const SelectDatetimeView = memoNamed<{
               />
             )
           )}
-          <AddElementButton onClick={onAddDatetimeClick} />
+          <AddElementButton onClick={props.onAddDatetimeClick} />
         </DatetimeRangeListWrapper>
         <ButtonsWrapper>
-          <DeleteAllButton onConfirmDeleteAll={onConfirmDeleteAll} />
+          <DeleteAllButton onConfirmDeleteAll={props.onConfirmDeleteAll} />
           <SetTimesPopover
-            initialValue={setTimesPopoverInitialValue}
-            datetimeSpecification={datetimeSpecification}
-            onSetTimesSubmit={onSetTimesPopoverSubmit}
+            initialValue={props.setTimesPopoverInitialValue}
+            datetimeSpecification={props.datetimeSpecification}
+            onSetTimesSubmit={props.onSetTimesPopoverSubmit}
           />
-          <Button
+          <BpButton
             intent='primary'
             icon='sort-asc'
             text={vt.sortDatetimes}
-            onClick={onSortClick}
+            onClick={props.onSortClick}
           />
         </ButtonsWrapper>
       </div>
       <MultipleDatePicker
-        selectedDates={selectedDates}
-        onSelectedDatesChange={onSelectedDatesChange}
+        selectedDates={props.selectedDates}
+        onSelectedDatesChange={props.onSelectedDatesChange}
       />
     </Root>
   )
 );
+
+const Root = styled.div`
+  display: flex;
+  flex-wrap: wrap-reverse;
+`;
+
+const DatetimeSpecificationSelectWrapper = styled.div`
+  margin-bottom: 10px;
+`;
+
+const DatetimeRangeListWrapper = styled.div`
+  margin-bottom: 10px;
+`;

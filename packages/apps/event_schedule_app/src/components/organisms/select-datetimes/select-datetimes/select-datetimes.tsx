@@ -1,73 +1,52 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
+import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
 import {
-  IDatetimeRange,
-  IDatetimeRangeType,
-} from '../../../../types/record/datetime-range';
-import { IHoursMinutesType } from '../../../../types/record/hours-minutes';
-import { ITimeRangeType } from '../../../../types/record/time-range';
-import {
+  createIYearMonthDate,
   IYearMonthDate,
-  IYearMonthDateType,
-} from '../../../../types/record/year-month-date';
+} from '../../../../types/record/base/year-month-date';
 import {
-  ForciblyUpdatedValue,
-  forciblyUpdatedValue,
-} from '../../../../utils/forcibly-updated-value';
+  createIDatetimeRange,
+  IDatetimeRange,
+} from '../../../../types/record/datetime-range';
+import { ITimeRange } from '../../../../types/record/time-range';
 import { IList } from '../../../../utils/immutable';
 import { getMostFrequentTimeRange } from './get-most-frequent-time-range';
 import {
-  datetimeListreducer,
-  datetimeListReducerInitialState,
+  datetimeListReducer,
+  DatetimeListReducerAction,
 } from './select-datetimes-reducer';
 import { SelectDatetimeView } from './select-datetimes-view';
 
-export const SelectDatetimes = memoNamed<{
+interface Props {
   datetimeSpecification: DatetimeSpecificationEnumType;
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
-  datetimeList: IList<IDatetimeRangeType>;
-  onDatetimeListChange: (list: IList<IDatetimeRangeType>) => void;
-}>(
+  datetimeList: IList<IDatetimeRange>;
+  onDatetimeListChange: (list: IList<IDatetimeRange>) => void;
+}
+
+export const SelectDatetimes = memoNamed<Props>(
   'SelectDatetimes',
   ({
     datetimeSpecification,
     onDatetimeSpecificationChange,
-    datetimeList: datetimeListInput,
+    datetimeList,
     onDatetimeListChange,
   }) => {
-    /* states */
+    const dispatch = useCallback(
+      (action: DatetimeListReducerAction) => {
+        onDatetimeListChange(datetimeListReducer(datetimeList, action));
+      },
+      [datetimeList, onDatetimeListChange]
+    );
 
-    const [
-      // dummy comment to control prettier
-      datetimeListState,
-      dispatch,
-    ] = useReducer(datetimeListreducer, datetimeListReducerInitialState);
+    const selectedDates = useMemo<IList<IYearMonthDate>>(
+      () => datetimeList.map((e) => e.ymd),
+      [datetimeList]
+    );
 
-    /* callbacks */
-
-    useEffect(() => {
-      if (datetimeListState.lastAction !== 'fromProps') {
-        onDatetimeListChange(datetimeListState.value);
-      }
-    }, [onDatetimeListChange, datetimeListState]);
-
-    /* from props */
-
-    useEffect(() => {
-      dispatch({ type: 'fromProps', list: datetimeListInput });
-    }, [datetimeListInput]);
-
-    /* values */
-    const datetimeList: IList<IDatetimeRangeType> = datetimeListState.value;
-
-    const selectedDates = useMemo<
-      ForciblyUpdatedValue<IList<IYearMonthDateType>>
-    >(() => forciblyUpdatedValue(datetimeList.map((e) => e.ymd)), [
-      datetimeList,
-    ]);
-
-    const mostFrequentTimeRange = useMemo<ITimeRangeType>(
+    const mostFrequentTimeRange = useMemo<ITimeRange>(
       () => getMostFrequentTimeRange(datetimeList),
       [datetimeList]
     );
@@ -75,61 +54,70 @@ export const SelectDatetimes = memoNamed<{
     /* handlers */
 
     const onDatetimeRangeYmdChange = useCallback(
-      (index: number, ymd: IYearMonthDateType) => {
-        dispatch({ type: 'ymd', payload: { index, value: ymd } });
+      (index: number, ymd: IYearMonthDate) => {
+        dispatch({ type: 'ymd', index, ymd: ymd });
       },
-      []
+      [dispatch]
     );
 
     const onDatetimeRangeStartChange = useCallback(
-      (index: number, hm: IHoursMinutesType) => {
-        dispatch({ type: 'start', payload: { index, value: hm } });
+      (index: number, hm: IHoursMinutes) => {
+        dispatch({ type: 'start', index, hm: hm });
       },
-      []
+      [dispatch]
     );
 
     const onDatetimeRangeEndChange = useCallback(
-      (index: number, hm: IHoursMinutesType) => {
-        dispatch({ type: 'end', payload: { index, value: hm } });
+      (index: number, hm: IHoursMinutes) => {
+        dispatch({ type: 'end', index, hm: hm });
       },
-      []
+      [dispatch]
     );
 
-    const onDeleteDatetimeClick = useCallback((index: number) => {
-      dispatch({ type: 'delete', index });
-    }, []);
+    const onDeleteDatetimeClick = useCallback(
+      (index: number) => {
+        dispatch({ type: 'delete', index });
+      },
+      [dispatch]
+    );
 
-    const onDuplicateDatetimeClick = useCallback((index: number) => {
-      dispatch({ type: 'duplicate', index });
-    }, []);
+    const onDuplicateDatetimeClick = useCallback(
+      (index: number) => {
+        dispatch({ type: 'duplicate', index });
+      },
+      [dispatch]
+    );
 
     const onAddDatetimeClick = useCallback(() => {
       dispatch({
         type: 'addClick',
-        datetimeRange: IDatetimeRange({ timeRange: mostFrequentTimeRange }),
+        datetimeRange: createIDatetimeRange({
+          ymd: createIYearMonthDate(),
+          timeRange: mostFrequentTimeRange,
+        }),
       });
-    }, [mostFrequentTimeRange]);
+    }, [mostFrequentTimeRange, dispatch]);
 
     const onConfirmDeleteAll = useCallback(() => {
       dispatch({ type: 'deleteAll' });
-    }, []);
+    }, [dispatch]);
 
     const onSetTimesAtOneTimeClick = useCallback(
-      (timeRange: ITimeRangeType) => {
+      (timeRange: ITimeRange) => {
         dispatch({ type: 'setTimeAtOneTime', timeRange });
       },
-      []
+      [dispatch]
     );
 
     const onSortClick = useCallback(() => {
       dispatch({ type: 'sort' });
-    }, []);
+    }, [dispatch]);
 
     const onSelectedDatesChange = useCallback(
-      (list: IList<IYearMonthDateType>) => {
+      (list: IList<IYearMonthDate>) => {
         dispatch({ type: 'fromCalendar', list, mostFrequentTimeRange });
       },
-      [mostFrequentTimeRange]
+      [mostFrequentTimeRange, dispatch]
     );
 
     /* view values */
@@ -139,13 +127,13 @@ export const SelectDatetimes = memoNamed<{
         datetimeList.map((datetimeRange, index) => ({
           id: index,
           datetimeRange,
-          onYmdChange: (ymd: IYearMonthDateType | undefined) => {
-            onDatetimeRangeYmdChange(index, ymd ?? IYearMonthDate());
+          onYmdChange: (ymd: IYearMonthDate | undefined) => {
+            onDatetimeRangeYmdChange(index, ymd ?? createIYearMonthDate());
           },
-          onRangeStartChange: (hm: IHoursMinutesType) => {
+          onRangeStartChange: (hm: IHoursMinutes) => {
             onDatetimeRangeStartChange(index, hm);
           },
-          onRangeEndChange: (hm: IHoursMinutesType) => {
+          onRangeEndChange: (hm: IHoursMinutes) => {
             onDatetimeRangeEndChange(index, hm);
           },
           onDuplicateClick: () => {

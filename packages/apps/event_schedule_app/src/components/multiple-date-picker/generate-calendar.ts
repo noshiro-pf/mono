@@ -1,8 +1,8 @@
 import { DateEnum, getDay, MonthEnum, YearEnum } from '@mono/ts-utils';
 import {
+  createIYearMonthDate,
   IYearMonthDate,
-  IYearMonthDateType,
-} from '../../types/record/year-month-date';
+} from '../../types/record/base/year-month-date';
 import { IList, IRange } from '../../utils/immutable';
 
 /**
@@ -23,7 +23,7 @@ import { IList, IRange } from '../../utils/immutable';
 export const generateCalendar = (
   year: YearEnum,
   month: MonthEnum
-): IList<IList<IYearMonthDateType>> => {
+): IList<IList<IYearMonthDate>> => {
   const numPrevMonthDates = getDay(getFirstDateOfMonth(year, month));
   const numNextMonthDates =
     7 - getDay(getFirstDateOfMonth(year, (month + 1) as MonthEnum));
@@ -57,9 +57,9 @@ const genYmdRangeList = (
   month: MonthEnum,
   from: DateEnum,
   to: DateEnum
-): IList<IYearMonthDateType> =>
+): IList<IYearMonthDate> =>
   IRange(from, to + 1)
-    .map((n) => IYearMonthDate({ year, month, date: n as DateEnum }))
+    .map((n) => createIYearMonthDate({ year, month, date: n as DateEnum }))
     .toList();
 
 const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): Date =>

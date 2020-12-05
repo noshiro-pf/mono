@@ -9,31 +9,33 @@ import { WidthRestrictedInputWrapper } from '../styled/width-restricted-input-wr
 
 const vt = texts.createEventPage.section1;
 
-const Root = styled(WidthRestrictedInputWrapper)`
-  padding: 10px;
-`;
-
-export const NameAndNotes = memoNamed<{
+interface Props {
   title: string;
   onTitleChange: (value: string) => void;
   notes: string;
   onNotesChange: (value: string) => void;
-}>('NameAndNotes', ({ title, onTitleChange, notes, onNotesChange }) => (
+}
+
+export const NameAndNotes = memoNamed<Props>('NameAndNotes', (props) => (
   <Root>
     <FormGroup label={vt.eventName}>
       <BpInput
         placeholder={vt.eventNamePlaceholder}
-        value={title}
-        onValueChange={onTitleChange}
+        value={props.title}
+        onValueChange={props.onTitleChange}
       />
     </FormGroup>
     <FormGroup label={vt.notes}>
       <BpTextArea
         placeholder={vt.notesPlaceholder}
-        value={notes}
-        onValueChange={onNotesChange}
+        value={props.notes}
+        onValueChange={props.onNotesChange}
         fill={true}
       />
     </FormGroup>
   </Root>
 ));
+
+const Root = styled(WidthRestrictedInputWrapper)`
+  padding: 10px;
+`;

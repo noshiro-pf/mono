@@ -1,69 +1,55 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../constants/texts';
 import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
-import { IAnswerSymbolType } from '../../../types/record/answer-symbol';
-import { ForciblyUpdatedValue } from '../../../utils/forcibly-updated-value';
-import { IList } from '../../../utils/immutable';
-import { Description } from '../../atoms/description';
+import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import { IList, IMap } from '../../../utils/immutable';
 import {
   symbolListReducer,
-  symbolListReducerInitialState,
+  SymbolListReducerAction,
+  SymbolListReducerState,
 } from './symbol-list-reducer';
 import { AnswerSymbolRow } from './symbol-setting-row';
 
-const vt = texts.createEventPage.section3;
+interface Props {
+  answerSymbolList: IList<IAnswerSymbol>;
+  onAnswerSymbolListChange: (value: IList<IAnswerSymbol>) => void;
+  disabled: boolean;
+}
 
-const Root = styled.div`
-  & > * {
-    margin-bottom: 5px;
-  }
-`;
-
-export const SymbolSettings = memoNamed<{
-  answerSymbolList: ForciblyUpdatedValue<IList<IAnswerSymbolType>>;
-  onAnswerSymbolListChange: (value: IList<IAnswerSymbolType>) => void;
-}>(
+export const SymbolSettings = memoNamed<Props>(
   'SymbolSettings',
-  ({ answerSymbolList: answerSymbolListInput, onAnswerSymbolListChange }) => {
-    const [answerSymbolSet, dispach] = useReducer(
-      symbolListReducer,
-      symbolListReducerInitialState
+  ({ answerSymbolList, onAnswerSymbolListChange, disabled }) => {
+    const answerSymbolListMap = useMemo<SymbolListReducerState>(
+      () => IMap(answerSymbolList.map((e) => [e.iconId, e])),
+      [answerSymbolList]
     );
-
-    const answerSymbolList = useMemo<IList<IAnswerSymbolType>>(
-      () => answerSymbolSet.value.toList(),
-      [answerSymbolSet]
+    const dispatch = useCallback(
+      (action: SymbolListReducerAction) => {
+        onAnswerSymbolListChange(
+          symbolListReducer(answerSymbolListMap, action).toList()
+        );
+      },
+      [answerSymbolListMap, onAnswerSymbolListChange]
     );
 
     useEffect(() => {
-      dispach({ type: 'fromProps', list: answerSymbolListInput.value });
-    }, [answerSymbolListInput]);
-
-    useEffect(() => {
-      if (answerSymbolSet.lastAction !== 'fromProps') {
-        onAnswerSymbolListChange(answerSymbolList);
-      }
-    }, [
-      answerSymbolSet.lastAction,
-      onAnswerSymbolListChange,
-      answerSymbolList,
-    ]);
+      onAnswerSymbolListChange(answerSymbolList);
+    }, [onAnswerSymbolListChange, answerSymbolList]);
 
     const onPointChange = useCallback(
       (iconId: AnswerSymbolIconId, point: AnswerSymbolPointEnumType) => {
-        dispach({ type: 'update-point', iconId, point });
+        dispatch({ type: 'update-point', iconId, point });
       },
-      []
+      [dispatch]
     );
 
     const onDescriptionChange = useCallback(
       (iconId: AnswerSymbolIconId, description: string) => {
-        dispach({ type: 'update-description', iconId, description });
+        dispatch({ type: 'update-description', iconId, description });
       },
-      []
+      [dispatch]
     );
 
     const onDeleteClick = useCallback((iconId: AnswerSymbolIconId) => {
@@ -110,11 +96,18 @@ export const SymbolSettings = memoNamed<{
               onDescriptionChange={onDescriptionChangeHandler}
               onPointChange={onPointChangeHandler}
               onDeleteClick={onDeleteClickHandler}
+              disabled={disabled}
             />
           )
         )}
-        <Description text={vt.customizeSymbolDescription} />
+        {/* <Description text={vt.customizeSymbolDescription} /> */}
       </Root>
     );
   }
 );
+
+const Root = styled.div`
+  & > * {
+    margin-bottom: 5px;
+  }
+`;

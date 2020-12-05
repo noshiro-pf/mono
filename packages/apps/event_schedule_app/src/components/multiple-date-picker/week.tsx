@@ -1,19 +1,27 @@
 import { memoNamed } from '@mono/react-utils';
+import { Mappable } from '@mono/ts-utils';
 import React, { useMemo } from 'react';
-import { IYearMonthDateType } from '../../types/record/year-month-date';
-import { IList } from '../../utils/immutable';
+import { IYearMonthDate } from '../../types/record/base/year-month-date';
 import { DatePickerDate } from './date-picker-day';
 
-export const Week = memoNamed<{
-  week: IList<{
-    ymd: IYearMonthDateType;
-    selected?: boolean | undefined;
-    disabled?: boolean | undefined;
-  }>;
-  onClick: (ymd: IYearMonthDateType) => void;
-}>('Week', ({ week, onClick }) => {
+interface Props {
+  week: Readonly<
+    Mappable<{
+      ymd: IYearMonthDate;
+      selected?: boolean | undefined;
+      disabled?: boolean | undefined;
+    }>
+  >;
+  onClick: (ymd: IYearMonthDate) => void;
+}
+
+export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
   const listWithHandler = useMemo(
-    () => week.map((d) => ({ value: d, handler: () => onClick(d.ymd) })),
+    () =>
+      week.map((d) => ({
+        value: d,
+        handler: () => onClick(d.ymd),
+      })),
     [week, onClick]
   );
 

@@ -1,15 +1,14 @@
 import { memoNamed } from '@mono/react-utils';
-import { MonthEnum, YearEnum } from '@mono/ts-utils';
-import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
+import { Mappable, MonthEnum, YearEnum } from '@mono/ts-utils';
+import React, { useCallback, useMemo, useReducer } from 'react';
 import styled from 'styled-components';
 import { WeekdaysNumberEnum } from '../../types/enum/weekdays-number-enum';
 import {
   compareYmd,
+  createIYearMonthDate,
   IYearMonthDate,
-  IYearMonthDateType,
-} from '../../types/record/year-month-date';
-import { ForciblyUpdatedValue } from '../../utils/forcibly-updated-value';
-import { IList } from '../../utils/immutable';
+} from '../../types/record/base/year-month-date';
+import { IList, ISet } from '../../utils/immutable';
 import { generateCalendar } from './generate-calendar';
 import { DatepickerNav } from './navigation';
 import {
@@ -18,23 +17,19 @@ import {
 } from './reducers/calendar-reducer';
 import {
   selectedDatesReducer,
-  selectedDatesReducerInitialState,
+  SelectedDatesReducerAction,
 } from './reducers/selected-dates-reducer';
 import { Week } from './week';
 import { WeekdaysHeader } from './weekdays-header';
 
-const CenteringWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+interface Props {
+  selectedDates: IList<IYearMonthDate>;
+  onSelectedDatesChange: (value: IList<IYearMonthDate>) => void;
+}
 
-export const MultipleDatePicker = memoNamed<{
-  selectedDates: ForciblyUpdatedValue<IList<IYearMonthDateType>>;
-  onSelectedDatesChange: (value: IList<IYearMonthDateType>) => void;
-}>(
+export const MultipleDatePicker = memoNamed<Props>(
   'MultipleDatePicker',
-  ({ selectedDates: selectedDatesInput, onSelectedDatesChange }) => {
+  ({ selectedDates, onSelectedDatesChange }) => {
     /* states */
 
     const [calendarCurrentPage, calendarCurrentPageDispatch] = useReducer(
@@ -42,32 +37,23 @@ export const MultipleDatePicker = memoNamed<{
       calendarCurrentPageInitialState
     );
 
-    const [selectedDatesSet, selectedDatesDispatch] = useReducer(
-      selectedDatesReducer,
-      selectedDatesReducerInitialState
-    );
-
-    /* from props */
-
-    useEffect(() => {
-      selectedDatesDispatch({
-        type: 'fromProps',
-        dates: selectedDatesInput.value,
-      });
-    }, [selectedDatesInput]);
-
     /* values */
 
-    const dates = useMemo<IList<IList<IYearMonthDateType>>>(
+    const selectedDatesSet = useMemo<ISet<IYearMonthDate>>(
+      () => ISet(selectedDates),
+      [selectedDates]
+    );
+
+    const dates = useMemo<IList<IList<IYearMonthDate>>>(
       () =>
         generateCalendar(calendarCurrentPage.year, calendarCurrentPage.month),
       [calendarCurrentPage]
     );
 
     const calendarCells = useMemo<
-      IList<
-        IList<{
-          ymd: IYearMonthDateType;
+      Mappable<
+        Mappable<{
+          ymd: IYearMonthDate;
           selected?: boolean;
           disabled?: boolean;
         }>
@@ -77,7 +63,7 @@ export const MultipleDatePicker = memoNamed<{
         dates.map((week) =>
           week.map((ymd) => ({
             ymd,
-            selected: selectedDatesSet.value.has(ymd),
+            selected: selectedDatesSet.has(ymd),
             disabled: ymd.month !== calendarCurrentPage.month,
           }))
         ),
@@ -102,29 +88,35 @@ export const MultipleDatePicker = memoNamed<{
       calendarCurrentPageDispatch({ type: 'set-month', month });
     }, []);
 
-    const onDateClick = useCallback((ymd: IYearMonthDateType) => {
-      selectedDatesDispatch({ type: 'flip', dateToFlip: ymd });
-    }, []);
+    const selectedDatesDispatch = useCallback(
+      (action: SelectedDatesReducerAction) => {
+        onSelectedDatesChange(
+          selectedDatesReducer(selectedDatesSet, action)
+            .toList()
+            .sort(compareYmd)
+        );
+      },
+      [selectedDatesSet, onSelectedDatesChange]
+    );
+
+    const onDateClick = useCallback(
+      (ymd: IYearMonthDate) => {
+        selectedDatesDispatch({ type: 'flip', dateToFlip: ymd });
+      },
+      [selectedDatesDispatch]
+    );
 
     const onWeekdaysHeaderCellClick = useCallback(
       (w: WeekdaysNumberEnum) => {
         selectedDatesDispatch({
           type: 'fill-column',
           dates: dates
-            .map((week) => week.get(w) ?? IYearMonthDate())
+            .map((week) => week.get(w) ?? createIYearMonthDate())
             .filter((d) => d?.month === calendarCurrentPage.month),
         });
       },
-      [dates, calendarCurrentPage]
+      [selectedDatesDispatch, dates, calendarCurrentPage.month]
     );
-
-    /* callbacks */
-
-    useEffect(() => {
-      if (selectedDatesSet.lastAction !== 'fromProps') {
-        onSelectedDatesChange(selectedDatesSet.value.toList().sort(compareYmd));
-      }
-    }, [selectedDatesSet, onSelectedDatesChange]);
 
     return (
       <>
@@ -156,3 +148,9 @@ export const MultipleDatePicker = memoNamed<{
     );
   }
 );
+
+const CenteringWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;

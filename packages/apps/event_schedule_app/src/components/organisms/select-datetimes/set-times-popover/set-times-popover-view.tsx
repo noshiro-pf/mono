@@ -1,50 +1,45 @@
-import { Button, Popover } from '@blueprintjs/core';
+import { Popover } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import { texts } from '../../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
-import { ITimeRangeType } from '../../../../types/record/time-range';
+import { ITimeRange } from '../../../../types/record/time-range';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/button';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const vt = texts.createEventPage.section2;
 
-export const SetTimesPopoverView = memoNamed<{
-  initialValue: ITimeRangeType;
+interface Props {
+  initialValue: ITimeRange;
   datetimeSpecification: DatetimeSpecificationEnumType;
   isOpen: boolean;
   onOpenClick: () => void;
   onClose: () => void;
   onCancelClick: () => void;
-  onOkClick: (timeRange: ITimeRangeType) => void;
-}>(
+  onOkClick: (timeRange: ITimeRange) => void;
+}
+
+export const SetTimesPopoverView = memoNamed<Props>(
   'SetTimesPopoverView',
-  ({
-    initialValue,
-    datetimeSpecification,
-    isOpen,
-    onClose,
-    onOpenClick,
-    onCancelClick,
-    onOkClick,
-  }) => (
+  (props) => (
     <Popover
       target={
-        <Button
+        <BpButton
           intent='success'
-          onClick={onOpenClick}
+          onClick={props.onOpenClick}
           text={vt.setTimesAtOneTime}
         />
       }
       content={
         <SetTimesPopoverContent
-          initialValue={initialValue}
-          datetimeSpecification={datetimeSpecification}
-          onCancelClick={onCancelClick}
-          onOkClick={onOkClick}
+          initialValue={props.initialValue}
+          datetimeSpecification={props.datetimeSpecification}
+          onCancelClick={props.onCancelClick}
+          onOkClick={props.onOkClick}
         />
       }
-      isOpen={isOpen}
-      onClose={onClose}
+      isOpen={props.isOpen}
+      onClose={props.onClose}
       canEscapeKeyClose={true}
     />
   )
