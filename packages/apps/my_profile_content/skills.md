@@ -3,7 +3,7 @@
 ## プログラミング
 
 -   言語（コード行数測定日は 2019 年 1 月）
-    -   bash（6 年）
+    -   bash（普通のコマンドは使える）
     -   C++（4 年・2 万行以上）
     -   Rust（半年・2 千行程度）
     -   Python3（>1 年・<5000 行程度）
@@ -13,17 +13,17 @@
         -   JavaScript (ES6~)（4 年・3 万行程度）
         -   HTML/CSS
 -   Web-frontend
-    -   React（>1 年）
-    -   Angular（v2 以降、2 年） 今は使っていない
+    -   フレームワーク
+        -   React（>2 年）
+        -   Angular（2 年） バージョン 2 ～ 4 あたり、今は使っていない
+        -   Vue：業務で軽微な修正をした程度
     -   Material UI
     -   RxJS（2 年）
     -   jQuery（2 年） 今は使っていない
+    -   firebase
 -   データベース
     -   趣味アプリのバックエンドは Firebase Realtime Database がほとんど
     -   MySQL 少し
--   サーバー
-    -   AWS EC2
-    -   Firebase Hosting service
 -   短期間使用経験のあるもの
     -   言語
         -   Haskell
@@ -39,42 +39,16 @@
 -   [PAST](https://atcoder.jp/contests/past202005-2)
     -   2020-05-25 に受け、成績は初級（52 点）
         -   普段使わないので C++の構文で引っかかってしまい大幅に時間をロスした
-
-## 大学時代
-
--   計算量理論
--   離散数学
--   形式言語理論
-
-## ツール
-
--   文書作成
-    -   Google Docs / Slides / Spreadsheet
-    -   markdown
-    -   LaTeX
-        -   図の作成を Tikz で頑張ったことはあるが人類にはまだ早いと感じた
-    -   MS Word
--   スライド作成
-    -   Google Slides
-    -   reveal.js
-        -   カジュアルなスライド資料作成で Google Slides だと不便なときに使用（数式が多いときなど）
-    -   Beamer
-        -   図が少なく数式が多いことが最初から分かっており、フォーマルなスライドを作りたいとき
-    -   MS Powerpoint
--   ソースコード管理
-    -   Git（5 年）
-    -   Subversion（1 年） - 卒論の時使っていた
+-   Git
 
 ## 開発環境
 
 -   自宅の PC
-    -   ノート：ThinkPad X1 Extreme 2018
+    -   ThinkPad X1 Extreme
 -   OS
     -   Windows（>15 年、現在使用。開発は WSL）
     -   macOS（2 年）
     -   Linux
-        -   Ubuntu（4 年）
-        -   CentOS（1 年）
 -   エディタ
     -   VS Code（>3 年、現在使用）
     -   Sublime Text（2 年）
