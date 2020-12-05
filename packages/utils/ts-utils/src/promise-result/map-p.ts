@@ -1,8 +1,8 @@
 import { idfn } from '../others';
 import { mapEach } from './map-each';
-import { WithPromiseState } from './with-promise-state';
+import { PromiseResult } from './promise-result-type';
 
 export const mapP = <P, PR = P, E = never, S = never>(
   mapFn: (value: P) => PR
-): ((target: WithPromiseState<P, E, S>) => WithPromiseState<PR, E, S>) =>
+): ((target: PromiseResult<P, E, S>) => PromiseResult<PR, E, S>) =>
   mapEach<P, E, S, PR, E, S>(mapFn, idfn, idfn);

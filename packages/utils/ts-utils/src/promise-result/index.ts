@@ -4,4 +4,5 @@ export * from './map-e';
 export * from './map-each';
 export * from './map-p';
 export * from './map-s';
-export * from './with-promise-state';
+export * from './promise-result-type';
+export * from './unfold';
