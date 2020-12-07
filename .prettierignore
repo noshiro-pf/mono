@@ -21,3 +21,5 @@ LICENSE
 *.log
 dotenv-example
 *.svg
+firestore.rules
+.gitignore
