@@ -5,7 +5,8 @@ import { isNone, none } from '../util';
 export const zip = <A extends RN<any>[]>(...rns: A): RN<Unwrap<A>> =>
   new ZipRNClass(rns);
 
-class ZipRNClass<A extends RN<any>[]> extends RNClass<Unwrap<A>>
+class ZipRNClass<A extends RN<any>[]>
+  extends RNClass<Unwrap<A>>
   implements RN<Unwrap<A>> {
   private _nextValueQueues: ArrayElement<Unwrap<A>>[][];
   private _subscriptions: Subscription[];

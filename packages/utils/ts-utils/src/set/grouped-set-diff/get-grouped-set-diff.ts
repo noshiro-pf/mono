@@ -1,8 +1,8 @@
 import {
+  mappedSet,
   setFilter,
   setFilterNot,
   setIntersection,
-  mappedSet,
   setSubtract,
 } from '../../set';
 import { IGroupedSetDiff, IGroupedSetDiffType } from './grouped-set-diff';

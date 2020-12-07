@@ -6,7 +6,8 @@ export const merge = <T extends RN<any>[]>(
   ...srcs: T
 ): RN<ArrayElement<Unwrap<T>>> => new MergeRNClass(srcs);
 
-class MergeRNClass<A extends RN<any>[]> extends RNClass<ArrayElement<Unwrap<A>>>
+class MergeRNClass<A extends RN<any>[]>
+  extends RNClass<ArrayElement<Unwrap<A>>>
   implements RN<ArrayElement<Unwrap<A>>> {
   private _nextValueCandidate: Option<ArrayElement<Unwrap<A>>>;
   private _subscriptions: Subscription[];

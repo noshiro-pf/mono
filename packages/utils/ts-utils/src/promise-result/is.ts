@@ -1,5 +1,5 @@
 import { promiseState } from '../types';
-import { Error, Pending, Success, PromiseResult } from './promise-result-type';
+import { Error, Pending, PromiseResult, Success } from './promise-result-type';
 
 export const isUnresolved = <P, E, S>(
   pr: PromiseResult<P, E, S>

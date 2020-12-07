@@ -6,7 +6,8 @@ export const auditTime = <A>(millisec: number): Operator<A, A> => (
   parent: RN<A>
 ) => new AuditTimeRNClass(parent, millisec);
 
-class AuditTimeRNClass<A> extends ManagerOperatorRNClass<A, A>
+class AuditTimeRNClass<A>
+  extends ManagerOperatorRNClass<A, A>
   implements RN<A> {
   private timerId: TimerId | undefined;
   private millisec: number;

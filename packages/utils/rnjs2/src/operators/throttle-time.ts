@@ -6,7 +6,8 @@ export const throttleTime = <A>(millisec: number): Operator<A, A> => (
   parent: RN<A>
 ) => new ThrottleTimeRNClass(parent, millisec);
 
-class ThrottleTimeRNClass<A> extends ManagerOperatorRNClass<A, A>
+class ThrottleTimeRNClass<A>
+  extends ManagerOperatorRNClass<A, A>
   implements RN<A> {
   private timerId: TimerId | undefined;
   private millisec: number;
