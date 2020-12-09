@@ -2,7 +2,6 @@ import { Tab, Tabs } from '@material-ui/core';
 import { memoNamed } from '@mono/react-utils';
 import { Mappable } from '@mono/ts-utils';
 import React, { useCallback } from 'react';
-import { useValueWithDefault } from './hooks';
 
 export const MyTabs = memoNamed<{
   tabIndex: number;
@@ -19,7 +18,7 @@ export const MyTabs = memoNamed<{
       [tabIndexChange]
     );
 
-    const scrollable = useValueWithDefault(scrollableInput, false);
+    const scrollable = scrollableInput ?? false;
 
     return (
       <Tabs

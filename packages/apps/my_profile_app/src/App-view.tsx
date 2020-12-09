@@ -3,40 +3,20 @@ import { useNavigator, usePathNameList } from '@mono/react-router-utils';
 import { memoNamed } from '@mono/react-utils';
 import { last } from '@mono/ts-utils';
 import React, { useCallback, useMemo } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import { LastUpdated } from './components/last-updated';
 import { Products } from './components/products/products';
-import { MarkdownPage } from './components/shared/markdown-page';
 import { Writings } from './components/writings/writings';
-import { contentsUrls } from './constants/contents-urls';
-import { routes, routesList } from './constants/routes';
+import { labelList, routeList, routes } from './constants/routes';
+import ProfileMd from './contents/profile.md';
+import Profile2Md from './contents/profile2.md';
+import SkillsMd from './contents/skills.md';
 import { MyTabs } from './utils/tabs';
 
-const LastUpdatedWrapper = styled.div`
-  padding: 10px 15px 0 0;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const ContentWrapper = styled.div`
-  padding: 0 20px 20px 20px;
-`;
-
-const MyTabsStyled = styled(MyTabs)`
-  font-size: large;
-`;
-
-const AppBarFlex = styled(AppBar)`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-`;
-
-const labels = ['Profile', 'Profile2', 'Skills', 'Products', 'Writings'];
-
 const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
-  const res = routesList.findIndex((e) => e === `/${pathNameLast}`);
+  const res = routeList.findIndex((e) => e === `/${pathNameLast}`);
   return res === -1 ? undefined : res;
 };
 
@@ -57,8 +37,8 @@ export const AppSub = memoNamed<{
 
   const tabIndexOnChange = useCallback(
     (tabIdx: number) => {
-      if (0 <= tabIdx && tabIdx < routesList.length) {
-        navigator(routesList[tabIdx]);
+      if (0 <= tabIdx && tabIdx < routeList.length) {
+        navigator(routeList[tabIdx]);
       }
     },
     [navigator]
@@ -71,7 +51,7 @@ export const AppSub = memoNamed<{
           tabIndex={tabIndex}
           tabIndexChange={tabIndexOnChange}
           scrollable={true}
-          labels={labels}
+          labels={labelList}
         />
       </AppBarFlex>
 
@@ -82,13 +62,13 @@ export const AppSub = memoNamed<{
       <ContentWrapper>
         <Switch>
           <Route exact={true} path={routes.profile}>
-            <MarkdownPage url={contentsUrls.profile} />
+            <ReactMarkdown source={ProfileMd} />
           </Route>
           <Route exact={true} path={routes.profile2}>
-            <MarkdownPage url={contentsUrls.profile2} />
+            <ReactMarkdown source={Profile2Md} />
           </Route>
           <Route exact={true} path={routes.skills}>
-            <MarkdownPage url={contentsUrls.skills} />
+            <ReactMarkdown source={SkillsMd} />
           </Route>
           <Route exact={true} path={routes.products}>
             <Products mobile={mobile} />
@@ -104,3 +84,23 @@ export const AppSub = memoNamed<{
     </div>
   );
 });
+
+const LastUpdatedWrapper = styled.div`
+  padding: 10px 15px 0 0;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const ContentWrapper = styled.div`
+  padding: 0 20px 20px 20px;
+`;
+
+const MyTabsStyled = styled(MyTabs)`
+  font-size: large;
+`;
+
+const AppBarFlex = styled(AppBar)`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+`;

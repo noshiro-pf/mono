@@ -1,15 +1,7 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { useMemo } from 'react';
-import { contentsUrls } from '../constants/contents-urls';
-import { useFetchedText } from '../utils/hooks';
+import React from 'react';
+import { lastUpdated } from '../contents/last-updated';
 
-export const LastUpdated = memoNamed('LastUpdated', () => {
-  const data = useFetchedText(contentsUrls.lastUpdated);
-
-  const dateStr = useMemo(
-    () => (data === undefined ? '' : new Date(data).toLocaleDateString()),
-    [data]
-  );
-
-  return <div>{dateStr ? `（最終更新日：${dateStr}）` : ''}</div>;
-});
+export const LastUpdated = memoNamed('LastUpdated', () => (
+  <div>{`（最終更新日：${lastUpdated}）`}</div>
+));

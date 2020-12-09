@@ -18,6 +18,12 @@ export const rulesMakerCommon = (pathToTsconfigJson: string): RuleSetRule[] => [
     enforce: 'pre',
     use: ['source-map-loader'],
   },
+  {
+    test: /\.(txt|md)$/,
+    use: {
+      loader: 'raw-loader',
+    },
+  },
 ];
 
 export const webpackConfigCommonMaker = (
