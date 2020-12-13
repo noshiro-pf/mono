@@ -5,7 +5,8 @@ import { isNone, none, Some } from '../util';
 export const combineLatest = <A extends RN<any>[]>(...rns: A): RN<Unwrap<A>> =>
   new CombineLatestRNClass(rns);
 
-class CombineLatestRNClass<A extends RN<any>[]> extends RNClass<Unwrap<A>>
+class CombineLatestRNClass<A extends RN<any>[]>
+  extends RNClass<Unwrap<A>>
   implements RN<Unwrap<A>> {
   constructor(parents: A) {
     super(

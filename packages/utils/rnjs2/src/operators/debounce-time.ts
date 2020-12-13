@@ -6,7 +6,8 @@ export const debounceTime = <A>(millisec: number): Operator<A, A> => (
   parent: RN<A>
 ) => new DebounceTimeRNClass(parent, millisec);
 
-class DebounceTimeRNClass<A> extends ManagerOperatorRNClass<A, A>
+class DebounceTimeRNClass<A>
+  extends ManagerOperatorRNClass<A, A>
   implements RN<A> {
   private timerId: TimerId | undefined;
   private millisec: number;

@@ -4,7 +4,8 @@ import { ManagerRNClass } from './manager-rn';
 import { RNClass } from './rn';
 import { RN } from './rn-interface';
 
-export abstract class OperatorRNClass<A, B> extends RNClass<B>
+export abstract class OperatorRNClass<A, B>
+  extends RNClass<B>
   implements RN<B> {
   protected parent: RN<A>; // alias for this.parents[0]
 
@@ -26,7 +27,8 @@ export abstract class OperatorRNClass<A, B> extends RNClass<B>
   }
 }
 
-export abstract class ManagerOperatorRNClass<A, B> extends ManagerRNClass<B>
+export abstract class ManagerOperatorRNClass<A, B>
+  extends ManagerRNClass<B>
   implements RN<B> {
   protected parent: RN<A>; // alias for this.parents[0]
 
