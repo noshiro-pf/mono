@@ -1,7 +1,7 @@
 import { memoNamed, useToggleState } from '@mono/react-utils';
 import React from 'react';
+import { BpButton } from '../atoms/blueprint-js-wrapper/bp-button';
 import { BpInput } from '../atoms/blueprint-js-wrapper/bp-input';
-import { BpButton } from '../atoms/blueprint-js-wrapper/button';
 
 interface Props {
   password: string;

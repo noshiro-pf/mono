@@ -1,8 +1,13 @@
+import { Popover } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@mono/react-utils';
 import React, { useCallback } from 'react';
+import { texts } from '../../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
 import { ITimeRange } from '../../../../types/record/time-range';
-import { SetTimesPopoverView } from './set-times-popover-view';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
+import { SetTimesPopoverContent } from './set-times-popover-content';
+
+const vt = texts.createEventPage.section2;
 
 interface Props {
   datetimeSpecification: DatetimeSpecificationEnumType;
@@ -24,14 +29,25 @@ export const SetTimesPopover = memoNamed<Props>(
     );
 
     return (
-      <SetTimesPopoverView
-        initialValue={initialValue}
-        datetimeSpecification={datetimeSpecification}
+      <Popover
+        target={
+          <BpButton
+            intent='success'
+            onClick={open}
+            text={vt.setTimesAtOneTime}
+          />
+        }
+        content={
+          <SetTimesPopoverContent
+            initialValue={initialValue}
+            datetimeSpecification={datetimeSpecification}
+            onCancelClick={close}
+            onOkClick={onOkClick}
+          />
+        }
         isOpen={isOpen}
-        onOpenClick={open}
         onClose={close}
-        onCancelClick={close}
-        onOkClick={onOkClick}
+        canEscapeKeyClose={true}
       />
     );
   }

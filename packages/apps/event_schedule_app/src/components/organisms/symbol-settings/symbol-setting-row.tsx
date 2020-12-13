@@ -27,7 +27,7 @@ export const AnswerSymbolRow = memoNamed<Props>(
   'AnswerSymbolRow',
   ({ answerSymbol, onDescriptionChange, onPointChange, disabled }) => {
     // const onIconSelect = useCallback((id: AnswerSymbolIconId) => {
-    //   console.log('onIconSelect', id);
+    //   clog('onIconSelect', id);
     // }, []);
 
     const onPointChangeHandler = useCallback(
@@ -85,12 +85,6 @@ const Root = styled.div`
     margin-right: 3px;
   }
 `;
-
-// const ButtonsWrapper = styled.div`
-//   display: flex;
-//   flex-wrap: nowrap;
-//   margin-left: 5px;
-// `;
 
 const IconWrapper = styled.div`
   flex: 0;

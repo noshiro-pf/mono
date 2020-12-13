@@ -57,6 +57,7 @@ const HeaderCell = memoNamed<PropsHeaderCell>('HeaderCell', (props) => (
 const DivPointer = styled.div`
   border-radius: 3px;
   cursor: pointer;
+  outline: none;
   &:hover {
     background: #d8e1e8;
   }

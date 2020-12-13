@@ -1,6 +1,6 @@
-import { dbEvents } from '../../index';
+import { firestorePaths } from '../../constants/firestore-paths';
+import { dbEvents } from '../../initialize-firebase';
 import { IAnswer } from '../../types/record/answer';
-import { firestorePaths } from './collection-name';
 
 export const updateAnswer = async (
   eventId: string,

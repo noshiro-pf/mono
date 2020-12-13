@@ -5,7 +5,7 @@ import { texts } from '../../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
 import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
 import { ITimeRange } from '../../../../types/record/time-range';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/button';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
 import { ButtonsWrapperAlignEnd } from '../../../molecules/buttons-wrapper';
 import { TimeRangeView } from '../../../molecules/time-range';
 import { timeRangeReducer } from './time-range-reducer';

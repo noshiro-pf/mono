@@ -1,7 +1,7 @@
-import { dbEvents } from '../../index';
+import { firestorePaths } from '../../constants/firestore-paths';
+import { dbEvents } from '../../initialize-firebase';
 import { fillAnswer, IAnswer } from '../../types/record/answer';
 import { IList } from '../../utils/immutable';
-import { firestorePaths } from './collection-name';
 
 export const getAnswers = async (eventId: string): Promise<IList<IAnswer>> => {
   const querySnapshot = await dbEvents

@@ -3,6 +3,7 @@ import { memoNamed, useToggleState } from '@mono/react-utils';
 import React, { CSSProperties, useState } from 'react';
 import styled from 'styled-components';
 import { createIHoursMinutes } from '../../types/record/base/hours-minutes';
+import { clog } from '../../utils/log';
 import { BpInput } from '../atoms/blueprint-js-wrapper/bp-input';
 import { BpSelect } from '../atoms/blueprint-js-wrapper/bp-select';
 import { BpSwitch } from '../atoms/blueprint-js-wrapper/bp-switch';
@@ -92,7 +93,7 @@ export const UiPartsTest = memoNamed<Record<string, void>>(
         <PadWrapper>
           <BpTimePicker
             time={createIHoursMinutes({ hours: 12, minutes: 34 })}
-            onTimeChange={(e) => console.log(e)}
+            onTimeChange={clog}
           />
         </PadWrapper>
         <PadWrapper>

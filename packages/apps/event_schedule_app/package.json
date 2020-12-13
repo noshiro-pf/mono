@@ -15,6 +15,7 @@
     "deploy": "firebase deploy --only hosting:event-schedule-app",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
+    "fb:start": "firebase emulators:start",
     "fmt": "yarn _script_formatchanged",
     "fmt:all": "yarn _script_formatglob \"./src/**/*.{ts,tsx}\"",
     "fmt:b": "yarn _script_formatchanged master",
@@ -53,10 +54,10 @@
     "@blueprintjs/icons": "^3.21.0",
     "@blueprintjs/table": "^3.8.18",
     "@mono/react-rxjs-utils": "*",
-    "@mono/rxjs-utils": "*",
     "@mono/react-utils": "*",
+    "@mono/rxjs-utils": "*",
     "@mono/ts-utils": "*",
-    "firebase": "^8.1.1",
+    "firebase": "^8.1.2",
     "global": "^4.4.0",
     "immer": "^8.0.0",
     "react": "^16.13.1",
@@ -65,6 +66,7 @@
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
+    "dotenv": "^8.2.0",
     "firebase-tools": "^8.7.0"
   }
 }

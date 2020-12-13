@@ -1,4 +1,4 @@
-import { dbEvents } from '../../index';
+import { dbEvents } from '../../initialize-firebase';
 import {
   fillEventSchedule,
   IEventSchedule,

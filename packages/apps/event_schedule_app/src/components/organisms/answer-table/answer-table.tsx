@@ -1,20 +1,19 @@
+import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, {
-  CSSProperties,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import { answerTableColor } from '../../../constants/answer-table-color';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import React, { CSSProperties } from 'react';
+import styled from 'styled-components';
+import { texts } from '../../../constants/texts';
 import { IAnswer } from '../../../types/record/answer';
-import { IDatetimeRange } from '../../../types/record/datetime-range';
 import { IEventSchedule } from '../../../types/record/event-schedule';
-import { IList, IMap } from '../../../utils/immutable';
-import { AnswerTableView } from './answer-table-view';
-import { createAnswerSummary, createScore } from './create-answer-summary';
-import { useAnswerTable } from './use-answer-table';
+import { IList } from '../../../utils/immutable';
+import { roundBy } from '../../../utils/round-by';
+import { BpButton } from '../../atoms/blueprint-js-wrapper/bp-button';
+import { CustomIcon } from '../../atoms/icon';
+import { Td, Th } from '../../atoms/table-cell-centered';
+import { DatetimeRangeCell } from '.././answer-table/datetime-range-cell';
+import { useAnswerTableHooks } from './answer-table-hooks';
+import { CommentButton } from './comment-button';
+import { SortButton } from './sort-button';
 
 interface Props {
   eventSchedule: IEventSchedule;
@@ -23,138 +22,135 @@ interface Props {
   isExpired: boolean;
 }
 
+const vt = texts.answerPage.answers;
+
 export const AnswerTable = memoNamed<Props>(
   'AnswerTable',
   ({ eventSchedule, answers, onAnswerClick, isExpired }) => {
-    const answerTable = useAnswerTable(eventSchedule, answers);
-
-    const answerSummary = useMemo<IMap<IDatetimeRange, IList<number>>>(
-      () =>
-        createAnswerSummary(
-          eventSchedule.datetimeRangeList,
-          eventSchedule.answerSymbolList,
-          answerTable
-        ),
-      [eventSchedule, answerTable]
-    );
-
-    const scores = useMemo<IMap<IDatetimeRange, number>>(
-      () =>
-        createScore(
-          eventSchedule.datetimeRangeList,
-          eventSchedule.answerSymbolList,
-          answerSummary,
-          answers.size
-        ),
-      [answerSummary, eventSchedule, answers.size]
-    );
-
-    const answersWithHandler = useMemo<
-      IList<{
-        id: IAnswer['id'];
-        userName: IAnswer['userName'];
-        comment: IAnswer['comment'];
-        onClick: () => void;
-      }>
-    >(
-      () =>
-        answers.map((a) => ({
-          id: a.id,
-          userName: a.userName,
-          comment: a.comment,
-          onClick: () => {
-            onAnswerClick(a);
-          },
-        })),
-      [answers, onAnswerClick]
-    );
-
-    const [
-      datetimeRangeListReordered,
-      setDatetimeRangeListReordered,
-    ] = useState(eventSchedule.datetimeRangeList);
-
-    useEffect(() => {
-      setDatetimeRangeListReordered(eventSchedule.datetimeRangeList);
-    }, [eventSchedule.datetimeRangeList]);
-
-    const onDatetimeSortChange = useCallback(
-      (state: 'asc' | 'desc') => {
-        switch (state) {
-          case 'asc':
-            setDatetimeRangeListReordered(eventSchedule.datetimeRangeList);
-            break;
-          case 'desc':
-            setDatetimeRangeListReordered(
-              eventSchedule.datetimeRangeList.reverse()
-            );
-            break;
-        }
-      },
-      [eventSchedule.datetimeRangeList]
-    );
-
-    const onScoreSortChange = useCallback(
-      (state: 'asc' | 'desc') => {
-        switch (state) {
-          case 'asc':
-            setDatetimeRangeListReordered(
-              eventSchedule.datetimeRangeList.sortBy((d) => scores.get(d) ?? 0)
-            );
-            break;
-          case 'desc':
-            setDatetimeRangeListReordered(
-              eventSchedule.datetimeRangeList
-                .sortBy((d) => scores.get(d) ?? 0)
-                .reverse()
-            );
-            break;
-        }
-      },
-      [eventSchedule.datetimeRangeList, scores]
-    );
-
-    const tableBodyValues = useMemo<
-      IList<{
-        datetimeRange: IDatetimeRange;
-        score: number;
-        answerSummaryRow: IList<number> | undefined;
-        answerTableRow: IList<AnswerSymbolIconId | undefined> | undefined;
-        style: CSSProperties;
-      }>
-    >(
-      () =>
-        datetimeRangeListReordered.map((datetimeRange) => {
-          const score = scores.get(datetimeRange) ?? 0;
-          return {
-            datetimeRange,
-            score,
-            answerSummaryRow: answerSummary.get(datetimeRange),
-            answerTableRow: answerTable.get(datetimeRange),
-            style: {
-              backgroundColor:
-                score === 1
-                  ? answerTableColor.perfectColor
-                  : score >= answerTableColor.goodThreshold
-                  ? answerTableColor.goodColor
-                  : undefined,
-            },
-          };
-        }),
-      [datetimeRangeListReordered, scores, answerSummary, answerTable]
-    );
+    const {
+      datetimeSpecification,
+      answerSymbolList,
+      answersWithHandler,
+      tableBodyValues,
+      onDatetimeSortChange,
+      onScoreSortChange,
+    } = useAnswerTableHooks(eventSchedule, answers, onAnswerClick);
 
     return (
-      <AnswerTableView
-        datetimeRangeList={datetimeRangeListReordered}
-        datetimeSpecification={eventSchedule.datetimeSpecification}
-        answerSymbolList={eventSchedule.answerSymbolList}
-        answersWithHandler={answersWithHandler}
-        tableBodyValues={tableBodyValues}
-        onDatetimeSortChange={onDatetimeSortChange}
-        onScoreSortChange={onScoreSortChange}
-        isExpired={isExpired}
-      />
+      <HTMLTable bordered={true}>
+        <thead>
+          <tr>
+            <Th style={tcellStyle}>
+              <PaddedSpan>{vt.datetime}</PaddedSpan>
+              <SortButton onSortChange={onDatetimeSortChange} />
+            </Th>
+            <Th style={tcellStyle}>
+              <PaddedSpan>{vt.score}</PaddedSpan>
+              <SortButton onSortChange={onScoreSortChange} />
+            </Th>
+            {answerSymbolList.map((s) => (
+              <Th key={s.iconId} style={tcellStyle}>
+                <CustomIcon name={s.iconId} />
+              </Th>
+            ))}
+            {answersWithHandler.map((answer) => (
+              <Th key={answer.id} style={nopadStyle}>
+                {isExpired ? (
+                  answer.userName
+                ) : (
+                  <BpButtonOverflowHidden
+                    minimal={true}
+                    title={answer.userName}
+                    onClick={answer.onClick}
+                  >
+                    {answer.userName}
+                  </BpButtonOverflowHidden>
+                )}
+              </Th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {tableBodyValues.map(
+            (
+              { datetimeRange, score, answerSummaryRow, answerTableRow, style },
+              key
+            ) => (
+              <tr key={key} style={style}>
+                <Td style={tcellStyle}>
+                  <DatetimeRangeCell
+                    datetimeRange={datetimeRange}
+                    datetimeSpecification={datetimeSpecification}
+                  />
+                </Td>
+                <Td>
+                  <span>{roundBy(2, score)}</span>
+                </Td>
+                {answerSummaryRow?.map((s, i) => (
+                  <Td style={tcellStyle} key={i}>
+                    <SummaryCellStyle>
+                      <span>{s}</span>
+                      <SummaryCellUnit>{vt.numAnswersUnit}</SummaryCellUnit>
+                    </SummaryCellStyle>
+                  </Td>
+                ))}
+                {answerTableRow?.map((iconId, i) => (
+                  <Td style={tcellStyle} key={i}>
+                    {iconId === undefined ? '' : <CustomIcon name={iconId} />}
+                  </Td>
+                ))}
+              </tr>
+            )
+          )}
+          <tr>
+            <Td style={tcellStyle}>{vt.comment}</Td>
+            <Td style={tcellStyle}></Td>
+            {answerSymbolList.map((s) => (
+              <Td key={s.iconId} style={tcellStyle}></Td>
+            ))}
+            {answersWithHandler.map((answer) => (
+              <Td key={answer.id} style={nopadStyle}>
+                <div>
+                  {answer.comment === '' ? (
+                    ''
+                  ) : (
+                    <CommentButton comment={answer.comment} />
+                  )}
+                </div>
+              </Td>
+            ))}
+          </tr>
+        </tbody>
+      </HTMLTable>
     );
   }
 );
+
+const tcellStyle: CSSProperties = {
+  verticalAlign: 'middle',
+  whiteSpace: 'nowrap',
+};
+
+const nopadStyle: CSSProperties = {
+  minWidth: '80px',
+  maxWidth: '80px',
+  overflowX: 'hidden',
+  padding: '5px',
+  verticalAlign: 'middle',
+};
+
+const BpButtonOverflowHidden = styled(BpButton)`
+  overflow-x: hidden;
+`;
+
+const SummaryCellStyle = styled.div`
+  vertical-align: baseline;
+`;
+
+const SummaryCellUnit = styled.span`
+  font-size: x-small;
+`;
+
+const PaddedSpan = styled.span`
+  margin-right: 5px;
+`;

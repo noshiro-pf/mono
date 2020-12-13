@@ -6,6 +6,12 @@ import {
   PartialAnswerSymbol,
 } from './base/answer-symbol';
 import {
+  createINotificationSettings,
+  fillNotificationSettings,
+  INotificationSettings,
+  PartialNotificationSettings,
+} from './base/notification-settings';
+import {
   fillDatetimeRange,
   IDatetimeRange,
   PartialDatetimeRange,
@@ -22,6 +28,8 @@ type EventScheduleBaseType = {
   usePassword: boolean;
   password: string;
   answerSymbolList: IList<IAnswerSymbol>;
+  useNotification: boolean;
+  notificationSettings: INotificationSettings;
 };
 
 export type PartialEventSchedule = Partial<
@@ -35,6 +43,8 @@ export type PartialEventSchedule = Partial<
     usePassword: EventScheduleBaseType['usePassword'];
     password: EventScheduleBaseType['password'];
     answerSymbolList: readonly PartialAnswerSymbol[];
+    useNotification: EventScheduleBaseType['useNotification'];
+    notificationSettings: PartialNotificationSettings;
   }>
 >;
 
@@ -50,6 +60,8 @@ const IEventScheduleRecordFactory = IRecord<EventScheduleBaseType>({
   usePassword: false,
   password: '',
   answerSymbolList: IList<IAnswerSymbol>(),
+  useNotification: false,
+  notificationSettings: createINotificationSettings(),
 });
 
 export const createIEventSchedule: (
@@ -71,5 +83,9 @@ export const fillEventSchedule = (p: PartialEventSchedule): IEventSchedule =>
     password: p.password ?? d.password,
     answerSymbolList: IList(p.answerSymbolList ?? d.answerSymbolList).map(
       fillAnswerSymbol
+    ),
+    useNotification: p.useNotification ?? d.useNotification,
+    notificationSettings: fillNotificationSettings(
+      p.notificationSettings ?? d.notificationSettings
     ),
   });

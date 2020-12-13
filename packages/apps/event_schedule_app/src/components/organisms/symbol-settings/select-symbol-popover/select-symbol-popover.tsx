@@ -1,9 +1,10 @@
-import { IconName } from '@blueprintjs/core';
+import { IconName, Popover } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
 import { IList } from '../../../../utils/immutable';
-import { SelectSymbolPopoverView } from './select-symbol-popover-view';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
+import { SelectSymbolPopoverContent } from './select-symbol-popover-content';
 
 interface Props {
   openerIcon: IconName | JSX.Element;
@@ -25,13 +26,17 @@ export const SelectSymbolPopover = memoNamed<Props>(
     );
 
     return (
-      <SelectSymbolPopoverView
-        openerIcon={openerIcon}
-        iconsInUse={iconsInUse}
+      <Popover
+        target={<BpButton icon={openerIcon} minimal={true} onClick={open} />}
+        content={
+          <SelectSymbolPopoverContent
+            iconsInUse={iconsInUse}
+            onIconSelect={onIconSelect}
+          />
+        }
         isOpen={isOpen}
-        onOpenClick={open}
         onClose={close}
-        onIconSelect={onIconSelect}
+        canEscapeKeyClose={true}
       />
     );
   }

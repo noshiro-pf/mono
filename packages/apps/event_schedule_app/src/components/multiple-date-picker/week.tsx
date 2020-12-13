@@ -1,17 +1,18 @@
 import { memoNamed } from '@mono/react-utils';
-import { Mappable } from '@mono/ts-utils';
 import React, { useMemo } from 'react';
+import { DayType } from '../../types/enum/day-type';
 import { IYearMonthDate } from '../../types/record/base/year-month-date';
+import { IList } from '../../utils/immutable';
 import { DatePickerDate } from './date-picker-day';
 
 interface Props {
-  week: Readonly<
-    Mappable<{
-      ymd: IYearMonthDate;
-      selected?: boolean | undefined;
-      disabled?: boolean | undefined;
-    }>
-  >;
+  week: IList<{
+    ymd: IYearMonthDate;
+    selected: boolean;
+    disabled: boolean;
+    dayType: DayType;
+    holidayJpName: string | undefined;
+  }>;
   onClick: (ymd: IYearMonthDate) => void;
 }
 
@@ -34,6 +35,8 @@ export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
           onClick={handler}
           selected={value.selected}
           disabled={value.disabled}
+          dayType={value.dayType}
+          holidayJpName={value.holidayJpName}
         />
       ))}
     </div>

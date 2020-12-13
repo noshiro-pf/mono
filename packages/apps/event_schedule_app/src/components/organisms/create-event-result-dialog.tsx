@@ -3,8 +3,8 @@ import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants/texts';
+import { BpButton } from '../atoms/blueprint-js-wrapper/bp-button';
 import { BpDialog } from '../atoms/blueprint-js-wrapper/bp-dialog';
-import { BpButton } from '../atoms/blueprint-js-wrapper/button';
 import { ButtonsWrapperAlignEnd } from '../molecules/buttons-wrapper';
 
 const vt = texts.createEventResultDialog;
@@ -12,7 +12,6 @@ const vt = texts.createEventResultDialog;
 interface Props {
   isOpen: boolean;
   close: () => void;
-  discardAndClose: () => void;
   url: string;
   onClipboardButtonClick: () => void;
   isLoading: boolean;

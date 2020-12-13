@@ -5,8 +5,8 @@ import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-s
 import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
 import { IYearMonthDate } from '../../../../types/record/base/year-month-date';
 import { IDatetimeRange } from '../../../../types/record/datetime-range';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
 import { BpDatePicker } from '../../../atoms/blueprint-js-wrapper/bp-date-picker';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/button';
 import { TimeRangeView } from '../../../molecules/time-range';
 
 interface Props {

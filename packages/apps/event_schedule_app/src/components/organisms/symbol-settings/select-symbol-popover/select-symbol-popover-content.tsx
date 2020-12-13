@@ -7,7 +7,7 @@ import {
   answerSymbolIconIdsFromBp,
 } from '../../../../types/enum/answer-symbol-icon';
 import { IList } from '../../../../utils/immutable';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/button';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
 import { CircleIcon, CloseIcon, TriangleIcon } from '../../../atoms/icons';
 
 const icons: { id: AnswerSymbolIconId; icon: IconName | JSX.Element }[] = [

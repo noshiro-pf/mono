@@ -37,6 +37,14 @@ export const texts = {
       symbolSettings: '回答に使う記号をカスタマイズ',
       customizeSymbolDescription:
         '記号の追加機能は今後のアップデートで追加予定です！',
+      useNotification: '幹事用通知設定',
+      emailAddress: '通知先メールアドレス',
+      notifyOnAnswerChange: '回答に更新があったときにメール通知',
+      notify01daysBeforeAnswerDeadline: '回答締め切り1日前にメール通知',
+      notify03daysBeforeAnswerDeadline: '回答締め切り3日前にメール通知',
+      notify07daysBeforeAnswerDeadline: '回答締め切り7日前にメール通知',
+      notify14daysBeforeAnswerDeadline: '回答締め切り14日前にメール通知',
+      notify28daysBeforeAnswerDeadline: '回答締め切り28日前にメール通知',
     },
     errorMessages: {
       titleIsEmpty: 'イベント名は必須項目です。',
@@ -46,6 +54,9 @@ export const texts = {
       passwordIsEnabledButEmpty:
         'パスワードをオンにしていますが空欄になっています。',
       atLeastTwoSymbolsRequired: '少なくとも2つの記号を設定してください。',
+      invalidEmail: '有効なメールアドレスではありません',
+      atLeastOneNotificationCheckRequired:
+        '通知設定をオンにする場合は少なくとも1つの通知にチェックをしてください。',
     },
     createEventButton: '日程調整ページを作成',
     resetButton: {
@@ -100,6 +111,8 @@ export const texts = {
       answerDeadlineIsExpired: '回答を締め切りました。',
       answerDeadlineDescription:
         '回答期限を過ぎると回答の追加・編集ができなくなります。',
+      noAnswerDeadline: 'なし',
+      editButton: 'イベント設定編集（幹事用）',
     },
 
     answers: {

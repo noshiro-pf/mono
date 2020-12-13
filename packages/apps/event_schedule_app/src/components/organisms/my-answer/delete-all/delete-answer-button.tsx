@@ -1,7 +1,7 @@
 import { memoNamed, useBooleanState } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import { texts } from '../../../../constants/texts';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/button';
+import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
 import { ConfirmDeleteAnswerDialog } from './confirm-delete-answer-dialog';
 
 interface Props {

@@ -1,0 +1,10 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "sourceMap": false,
+    "target": "es2017",
+    "outDir": "lib"
+  },
+  "include": ["./src"]
+}

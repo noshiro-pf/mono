@@ -5,6 +5,7 @@ import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
 import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
 import { IList, IMap } from '../../../utils/immutable';
+import { clog } from '../../../utils/log';
 import {
   symbolListReducer,
   SymbolListReducerAction,
@@ -53,7 +54,7 @@ export const SymbolSettings = memoNamed<Props>(
     );
 
     const onDeleteClick = useCallback((iconId: AnswerSymbolIconId) => {
-      console.log('onDeleteClick', iconId); // TODO
+      clog('onDeleteClick', iconId); // TODO
     }, []);
 
     const iconsInUse = useMemo<IList<AnswerSymbolIconId>>(

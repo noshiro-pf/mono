@@ -1,4 +1,4 @@
-import { dbEvents } from '../../index';
+import { dbEvents } from '../../initialize-firebase';
 import { IEventSchedule } from '../../types/record/event-schedule';
 
 export const addEventSchedule = async (ev: IEventSchedule): Promise<string> => {

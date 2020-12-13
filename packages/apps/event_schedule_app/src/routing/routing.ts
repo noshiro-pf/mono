@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
-import { AnswerPage } from '../components/pages/answer-page';
-import { CreateEventSchedule } from '../components/pages/create-event-schedule';
+import { AnswerPage } from '../components/pages/answer-page/answer-page';
+import { CreateEventSchedule } from '../components/pages/create-event-schedule/create-event-schedule';
 import { UiPartsTest } from '../components/pages/ui-parts-test';
 import { eventIdParamName } from './use-event-id';
 

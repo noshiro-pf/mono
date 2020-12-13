@@ -15,38 +15,44 @@ interface Props {
 
 export const AnswerPageEventInfo = memoNamed<Props>(
   'AnswerPageEventInfo',
-  (props: Props) => (
-    <div>
-      <table>
-        <tbody>
-          <tr>
-            <Title>{vt.eventInfo.eventName}</Title>
-            <Content>{props.eventSchedule.title}</Content>
-          </tr>
-          <tr>
-            <Title>{vt.eventInfo.notes}</Title>
-            <Content>{props.eventSchedule.notes}</Content>
-          </tr>
-          {props.eventSchedule.useAnswerDeadline ? (
+  ({ eventSchedule, isExpired }) => {
+    return (
+      <div>
+        <table>
+          <tbody>
+            <tr>
+              <Title>{vt.eventInfo.eventName}</Title>
+              <Content>{eventSchedule.title}</Content>
+            </tr>
+            <tr>
+              <Title>{vt.eventInfo.notes}</Title>
+              <Content>{eventSchedule.notes}</Content>
+            </tr>
             <tr>
               <Title>{vt.eventInfo.answerDeadline}</Title>
               <Content>
-                {ymdhm2strWithDay(props.eventSchedule.answerDeadline)}
-                <Description
-                  error={props.isExpired}
-                  text={
-                    props.isExpired
-                      ? vt.eventInfo.answerDeadlineIsExpired
-                      : vt.eventInfo.answerDeadlineDescription
-                  }
-                />
+                {eventSchedule.useAnswerDeadline ? (
+                  <>
+                    <div>{ymdhm2strWithDay(eventSchedule.answerDeadline)}</div>
+                    <Description
+                      error={isExpired}
+                      text={
+                        isExpired
+                          ? vt.eventInfo.answerDeadlineIsExpired
+                          : vt.eventInfo.answerDeadlineDescription
+                      }
+                    />
+                  </>
+                ) : (
+                  <div>{texts.answerPage.eventInfo.noAnswerDeadline}</div>
+                )}
               </Content>
             </tr>
-          ) : undefined}
-        </tbody>
-      </table>
-    </div>
-  )
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 );
 
 const Title = styled.th`

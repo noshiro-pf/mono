@@ -1,4 +1,4 @@
-import { Toaster } from '@blueprintjs/core';
+import { IToaster } from '@blueprintjs/core';
 import {
   useDataStream,
   useStateAsStream,
@@ -8,10 +8,11 @@ import {
   useValueAsStream,
   useVoidEventAsStream,
 } from '@mono/react-rxjs-utils';
-import { memoNamed, useAlive } from '@mono/react-utils';
+import { useAlive } from '@mono/react-utils';
 import { asValueFrom, filterNotUndefined } from '@mono/rxjs-utils';
 import { pending, PromiseResult, unfold } from '@mono/ts-utils';
-import React, {
+import {
+  RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -28,21 +29,41 @@ import {
   switchMap,
   throttleTime,
 } from 'rxjs/operators';
-import { api } from '../../api/api';
-import { fetchThrottleTime } from '../../constants/fetch-throttle-time';
-import { texts } from '../../constants/texts';
-import { useEventId } from '../../routing/use-event-id';
-import { createIAnswer, IAnswer } from '../../types/record/answer';
-import { createIAnswerSelection } from '../../types/record/answer-selection';
-import { IEventSchedule } from '../../types/record/event-schedule';
-import { compareYmdHm } from '../../types/record/ymd-hm';
-import { IList } from '../../utils/immutable';
-import { now } from '../../utils/today';
-import { AnswerPageView } from './answer-page-view';
+import { api } from '../../../api/api';
+import { fetchThrottleTime } from '../../../constants/fetch-throttle-time';
+import { texts } from '../../../constants/texts';
+import { useEventId } from '../../../routing/use-event-id';
+import { createIAnswer, IAnswer } from '../../../types/record/answer';
+import { createIAnswerSelection } from '../../../types/record/answer-selection';
+import { IEventSchedule } from '../../../types/record/event-schedule';
+import { compareYmdHm } from '../../../types/record/ymd-hm';
+import { IList } from '../../../utils/immutable';
+import { clog } from '../../../utils/log';
+import { now } from '../../../utils/today';
 
-const toast = Toaster.create({ canEscapeKeyClear: true, position: 'top' });
+interface AnswerPageState {
+  eventSchedule: IEventSchedule | undefined;
+  onEditButtonClick: () => void;
+  answers: IList<IAnswer> | undefined;
+  isError: boolean;
+  onAnswerClick: (answer: IAnswer) => void;
+  showMyAnswerSection: () => void;
+  myAnswerSectionState: 'hidden' | 'creating' | 'editing';
+  answerSectionRef: RefObject<HTMLDivElement>;
+  myAnswer: IAnswer;
+  setMyAnswer: (answer: IAnswer) => void;
+  onCancel: () => void;
+  onDeleteAnswer: () => void;
+  onSubmitAnswer: () => void;
+  submitButtonIsLoading: boolean;
+  submitButtonIsDisabled: boolean;
+  fetchAnswers: () => void;
+  refreshButtonIsLoading: boolean;
+  refreshButtonIsDisabled: boolean;
+  isExpired: boolean;
+}
 
-export const AnswerPage = memoNamed('AnswerPage', () => {
+export const useAnswerPageState = (toast: IToaster): AnswerPageState => {
   const eventId = useEventId();
 
   const eventId$ = useValueAsStream(eventId);
@@ -57,10 +78,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   );
 
   useStreamEffect(fetchEventScheduleThrottled$, () => {
-    console.log('fetchEventScheduleThrottled$');
+    clog('fetchEventScheduleThrottled$');
   });
   useStreamEffect(fetchAnswersThrottled$, () => {
-    console.log('fetchAnswers$');
+    clog('fetchAnswers$');
   });
 
   useEffect(() => {
@@ -259,6 +280,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     alive,
     fetchAnswers,
     resetMyAnswer,
+    toast,
   ]);
 
   const onDeleteAnswer = useCallback(() => {
@@ -282,7 +304,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
         });
       })
       .catch(console.error);
-  }, [myAnswer.id, eventId, alive, fetchAnswers, resetMyAnswer]);
+  }, [myAnswer.id, eventId, alive, fetchAnswers, resetMyAnswer, toast]);
 
   const onAnswerClick = useCallback(
     (answer: IAnswer) => {
@@ -327,26 +349,30 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
           compareYmdHm(now(), eventSchedule.answerDeadline) >= 0,
     [eventSchedule]
   );
-  return (
-    <AnswerPageView
-      eventSchedule={eventSchedule}
-      answers={answers}
-      isError={isError}
-      onAnswerClick={onAnswerClick}
-      showMyAnswerSection={showMyAnswerSection}
-      myAnswerSectionState={myAnswerSectionState}
-      answerSectionRef={answerSectionRef}
-      myAnswer={myAnswer}
-      onMyAnswerChange={setMyAnswer}
-      onCancel={onCancel}
-      onDeleteAnswer={onDeleteAnswer}
-      onSubmitAnswer={onSubmitAnswer}
-      submitButtonIsLoading={submitButtonIsLoading}
-      submitButtonIsDisabled={submitButtonIsDisabled}
-      refresh={fetchAnswers}
-      refreshButtonIsLoading={refreshButtonIsLoading}
-      refreshButtonIsDisabled={refreshButtonIsDisabled}
-      isExpired={isExpired}
-    />
-  );
-});
+
+  const onEditButtonClick = useCallback(() => {
+    clog('onEditButtonClick');
+  }, []);
+
+  return {
+    eventSchedule,
+    onEditButtonClick,
+    answers,
+    isError,
+    onAnswerClick,
+    showMyAnswerSection,
+    myAnswerSectionState,
+    answerSectionRef,
+    myAnswer,
+    setMyAnswer,
+    onCancel,
+    onDeleteAnswer,
+    onSubmitAnswer,
+    submitButtonIsLoading,
+    submitButtonIsDisabled,
+    fetchAnswers,
+    refreshButtonIsLoading,
+    refreshButtonIsDisabled,
+    isExpired,
+  };
+};

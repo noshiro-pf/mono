@@ -3,7 +3,7 @@ import { memoNamed, useBooleanState } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
-import { BpButton } from '../../atoms/blueprint-js-wrapper/button';
+import { BpButton } from '../../atoms/blueprint-js-wrapper/bp-button';
 import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
 
 interface Props {

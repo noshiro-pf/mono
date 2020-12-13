@@ -2,7 +2,7 @@ import { ButtonGroup, Popover } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import { texts } from '../../../constants/texts';
-import { BpButton } from '../../atoms/blueprint-js-wrapper/button';
+import { BpButton } from '../../atoms/blueprint-js-wrapper/bp-button';
 
 interface Props {
   onSortChange: (state: 'asc' | 'desc') => void;
