@@ -15,7 +15,8 @@
     "setapikey": "firebase functions:config:set slack.apikey=",
     "setup": "echo \"no setup script\"",
     "shell": "yarn build && firebase functions:shell",
-    "start": "yarn shell"
+    "start": "yarn shell",
+    "test": "echo \"no test script\""
   },
   "dependencies": {
     "firebase-admin": "^8.10.0",
