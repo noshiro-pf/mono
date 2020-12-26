@@ -7,7 +7,8 @@ import {
   rest,
   scan,
 } from '../../../array';
-import { pipe, tuple } from '../../../others';
+import { pipe } from '../../../functional';
+import { tuple } from '../../../others';
 
 export const getLuminanceListAccumulated = (
   luminanceList: readonly number[]

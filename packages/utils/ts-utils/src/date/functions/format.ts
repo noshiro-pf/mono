@@ -7,25 +7,18 @@ import {
 } from './date-wrapper';
 import { getSeconds } from './date-wrapper/seconds';
 
+const pad2 = (str: number): string => str.toString().padStart(2, '0');
+
 export const toYMD = (date: Date, delimiter: string = '/'): string =>
-  [
-    getYear(date),
-    getMonth(date).toString().padStart(2, '0'),
-    getDate(date).toString().padStart(2, '0'),
-  ].join(delimiter);
+  [getYear(date), pad2(getMonth(date)), pad2(getDate(date))].join(delimiter);
 
 export const toHM = (date: Date, delimiter: string = ':'): string =>
-  [
-    getHours(date).toString().padStart(2, '0'),
-    getMinutes(date).toString().padStart(2, '0'),
-  ].join(delimiter);
+  [pad2(getHours(date)), pad2(getMinutes(date))].join(delimiter);
 
 export const toHMS = (date: Date, delimiter: string = ':'): string =>
-  [
-    getHours(date).toString().padStart(2, '0'),
-    getMinutes(date).toString().padStart(2, '0'),
-    getSeconds(date).toString().padStart(2, '0'),
-  ].join(delimiter);
+  [pad2(getHours(date)), pad2(getMinutes(date)), pad2(getSeconds(date))].join(
+    delimiter
+  );
 
 export const toYMDHMS = (
   date: Date,

@@ -9,6 +9,6 @@ export * from './new-date';
 export * from './num-weeks';
 export * from './to-timestamp';
 export * from './today';
-export * from './tommorow';
+export * from './tomorrow';
 export * from './week-number';
 export * from './yesterday';

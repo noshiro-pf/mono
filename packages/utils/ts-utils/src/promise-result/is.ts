@@ -1,14 +1,13 @@
-import { promiseState } from '../types';
-import { Error, Pending, PromiseResult, Success } from './promise-result-type';
+import { promiseStatus } from '../types';
+import { Error, Pending, PromiseState, Success } from './promise-result-type';
 
 export const isUnresolved = <P, E, S>(
-  pr: PromiseResult<P, E, S>
-): pr is Pending<P> => pr.status === promiseState.pending;
+  pr: PromiseState<P, E, S>
+): pr is Pending<P> => pr.status === promiseStatus.pending;
 
-export const isError = <P, E, S>(
-  wps: PromiseResult<P, E, S>
-): wps is Error<E> => wps.status === promiseState.error;
+export const isError = <P, E, S>(wps: PromiseState<P, E, S>): wps is Error<E> =>
+  wps.status === promiseStatus.error;
 
 export const isSuccess = <P, E, S>(
-  wps: PromiseResult<P, E, S>
-): wps is Success<S> => wps.status === promiseState.success;
+  wps: PromiseState<P, E, S>
+): wps is Success<S> => wps.status === promiseStatus.success;

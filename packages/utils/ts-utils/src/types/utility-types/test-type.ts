@@ -4,9 +4,7 @@ export type TypeEq<A, B> = (<T>() => T extends A ? 1 : 2) extends <
   ? true
   : false;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function assertType<_T extends true>(): void {}
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function assertNotType<_T extends false>(): void {}
-
 export type TypeExtends<A, B> = A extends B ? true : false;
+
+export const assertType = <_T extends true>(): void => undefined;
+export const assertNotType = <_T extends false>(): void => undefined;

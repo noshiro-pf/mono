@@ -1,7 +1,7 @@
-import { PromiseResult } from './promise-result-type';
+import { PromiseState } from './promise-result-type';
 
 export const unfold = <S, P = undefined, E = any>(
-  result: PromiseResult<P, E, S>
+  result: PromiseState<P, E, S>
 ): S | undefined => {
   switch (result.status) {
     case 'success':
