@@ -33,7 +33,7 @@
     "observable"
   ],
   "dependencies": {
-    "rxjs": "^6.5.2",
+    "rxjs": "^6.6.3",
     "typescript": "~3.7.2"
   },
   "devDependencies": {
