@@ -28,6 +28,9 @@ utils_path="${MONO_ROOT_DIR}/packages/utils"
 echo ${utils_path}
 
 for target in "${targets[@]}" ; do
+    echo "building \"${target}\" ..." 
     cd "${utils_path}/${target}"
     yarn build
+    echo "done."
+    echo ""
 done
