@@ -5,7 +5,7 @@ export const useDebounce = <ResultValue>(
   deps: any[],
   bufferMilliSec: number = 300
 ): ResultValue => {
-  const timerId = useRef<number | undefined>(undefined);
+  const timerId = useRef<any>(undefined);
 
   const [value, setValue] = useState<ResultValue>(fn);
 
