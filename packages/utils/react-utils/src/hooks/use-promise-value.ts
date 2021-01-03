@@ -1,13 +1,13 @@
-import { PromiseResult } from '@mono/ts-utils';
+import { PromiseState } from '@mono/ts-utils';
 import { useEffect, useRef, useState } from 'react';
 
 export const usePromiseValue = <T>(
   promise: Promise<T>
-): PromiseResult<undefined, any, T> => {
+): PromiseState<undefined, any, T> => {
   const promiseMemoized = useRef(promise);
 
   const [settledValue, setSettledValue] = useState<
-    PromiseResult<undefined, any, T>
+    PromiseState<undefined, any, T>
   >({
     status: 'pending',
     value: undefined,

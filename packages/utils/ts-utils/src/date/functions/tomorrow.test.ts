@@ -1,4 +1,4 @@
-import { getTomorrow } from './tommorow';
+import { getTomorrow } from './tomorrow';
 
 test('getTomorrow 1', () => {
   expect(getTomorrow(new Date('2020/01/01'))).toEqual(new Date('2020/01/02'));

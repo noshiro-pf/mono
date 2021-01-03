@@ -1,18 +1,18 @@
-import { promiseState } from '../types';
+import { promiseStatus } from '../types';
 import { error, pending, success } from './gen';
-import { PromiseResult } from './promise-result-type';
+import { PromiseState } from './promise-result-type';
 
 export const mapEach = <P, E, S, PR = P, ER = E, SR = S>(
   mapP: (value: P) => PR,
   mapE: (value: E) => ER,
   mapS: (value: S) => SR
-) => (target: PromiseResult<P, E, S>): PromiseResult<PR, ER, SR> => {
+) => (target: PromiseState<P, E, S>): PromiseState<PR, ER, SR> => {
   switch (target.status) {
-    case promiseState.pending:
+    case promiseStatus.pending:
       return pending(mapP(target.value));
-    case promiseState.error:
+    case promiseStatus.error:
       return error(mapE(target.value));
-    case promiseState.success:
+    case promiseStatus.success:
       return success(mapS(target.value));
   }
 };

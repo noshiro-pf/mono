@@ -4,9 +4,9 @@ export type PromiseSuccess = 'success';
 
 export type PromiseSettled = PromiseError | PromiseSuccess;
 
-export type PromiseState = PromisePending | PromiseSettled;
+export type PromiseStatus = PromisePending | PromiseSettled;
 
-export const promiseState: {
+export const promiseStatus: {
   pending: PromisePending;
   error: PromiseError;
   success: PromiseSuccess;
