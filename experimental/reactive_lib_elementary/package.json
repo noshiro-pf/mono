@@ -34,7 +34,7 @@
     "observable"
   ],
   "dependencies": {
-    "rxjs": "^6.5.2",
+    "rxjs": "^6.6.3",
     "ts-node": "^8.5.4",
     "typescript": "~3.7.2"
   },

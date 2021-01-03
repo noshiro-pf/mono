@@ -31,6 +31,6 @@
   },
   "dependencies": {
     "@mono/ts-utils": "*",
-    "rxjs": "^6.6.2"
+    "rxjs": "^6.6.3"
   }
 }
