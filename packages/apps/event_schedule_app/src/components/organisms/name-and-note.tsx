@@ -1,13 +1,12 @@
 import { FormGroup } from '@blueprintjs/core';
+import { BpInput, BpTextArea } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants/texts';
-import { BpInput } from '../atoms/blueprint-js-wrapper/bp-input';
-import { BpTextArea } from '../atoms/blueprint-js-wrapper/bp-textarea';
 import { WidthRestrictedInputWrapper } from '../styled/width-restricted-input-wrapper';
 
-const vt = texts.createEventPage.section1;
+const vt = texts.eventSettingsPage.section1;
 
 interface Props {
   title: string;

@@ -1,12 +1,18 @@
+import {
+  BpButton,
+  BpDatePicker,
+  YearMonthDate,
+} from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
 import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
-import { IYearMonthDate } from '../../../../types/record/base/year-month-date';
+import {
+  createIYearMonthDate,
+  IYearMonthDate,
+} from '../../../../types/record/base/year-month-date';
 import { IDatetimeRange } from '../../../../types/record/datetime-range';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
-import { BpDatePicker } from '../../../atoms/blueprint-js-wrapper/bp-date-picker';
 import { TimeRangeView } from '../../../molecules/time-range';
 
 interface Props {
@@ -19,6 +25,12 @@ interface Props {
   onDeleteClick: () => void;
 }
 
+const onYmdChangeFn = (
+  onIYmdChange: (iymd: IYearMonthDate | undefined) => void
+) => (ymd: YearMonthDate | undefined) => {
+  onIYmdChange(createIYearMonthDate(ymd));
+};
+
 export const SelectedDatetimeRow = memoNamed<Props>(
   'SelectedDatetimeRow',
   (props) => (
@@ -27,7 +39,7 @@ export const SelectedDatetimeRow = memoNamed<Props>(
         <YmdWrapper>
           <BpDatePicker
             ymd={props.datetimeRange.ymd}
-            onYmdChange={props.onYmdChange}
+            onYmdChange={onYmdChangeFn(props.onYmdChange)}
             closeOnSelection={true}
           />
         </YmdWrapper>

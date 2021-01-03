@@ -2,21 +2,22 @@ import {
   createIDatetimeRange,
   IDatetimeRange,
 } from '../../../types/record/datetime-range';
-import { IRecord, IRecordType } from '../../../utils/immutable';
+import { IRecord } from '../../../utils/immutable';
 
 type AnswerSelectionMapKeyBaseType = {
   datetimeRange: IDatetimeRange;
   userName: string;
 };
 
-export type IAnswerSelectionMapKey = IRecordType<AnswerSelectionMapKeyBaseType>;
+export type IAnswerSelectionMapKey = IRecord<AnswerSelectionMapKeyBaseType> &
+  Readonly<AnswerSelectionMapKeyBaseType>;
 
-const IAnswerSelectionMapKeyRecordFactory = IRecord<
-  AnswerSelectionMapKeyBaseType
->({
-  datetimeRange: createIDatetimeRange(),
-  userName: '',
-});
+const IAnswerSelectionMapKeyRecordFactory = IRecord<AnswerSelectionMapKeyBaseType>(
+  {
+    datetimeRange: createIDatetimeRange(),
+    userName: '',
+  }
+);
 
 export const createAnswerSelectionMapKey: (
   a?: AnswerSelectionMapKeyBaseType

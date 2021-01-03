@@ -1,9 +1,9 @@
 import { IconName, Popover } from '@blueprintjs/core';
+import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
 import { IList } from '../../../../utils/immutable';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
 import { SelectSymbolPopoverContent } from './select-symbol-popover-content';
 
 interface Props {

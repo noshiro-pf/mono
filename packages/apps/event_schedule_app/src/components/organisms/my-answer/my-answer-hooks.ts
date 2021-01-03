@@ -15,8 +15,6 @@ interface MyAnswerHooks {
   onUserNameChange: (v: string) => void;
   comment: string;
   onCommentChange: (v: string) => void;
-  onDelete: () => void;
-  onSubmit: () => void;
   symbolHeader: IList<{
     iconId: AnswerSymbolIconId;
     symbolDescription: string;
@@ -36,9 +34,7 @@ interface MyAnswerHooks {
 export const useMyAnswerHooks = (
   eventSchedule: IEventSchedule,
   myAnswer: IAnswer,
-  onMyAnswerChange: (answer: IAnswer) => void,
-  onDeleteAnswer: () => void,
-  onSubmitAnswer: () => void
+  onMyAnswerChange: (answer: IAnswer) => void
 ): MyAnswerHooks => {
   const onUserNameChange = useCallback(
     (userName) => {
@@ -137,7 +133,5 @@ export const useMyAnswerHooks = (
     onCommentChange: onCommentsChange,
     symbolHeader: symbolHeader,
     myAnswerList: myAnswerList,
-    onDelete: onDeleteAnswer,
-    onSubmit: onSubmitAnswer,
   };
 };

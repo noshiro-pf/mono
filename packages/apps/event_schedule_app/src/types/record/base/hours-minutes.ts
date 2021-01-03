@@ -1,5 +1,5 @@
 import { HoursEnum, MinutesEnum, sign } from '@mono/ts-utils';
-import { IRecord, IRecordType } from '../../../utils/immutable';
+import { IRecord } from '../../../utils/immutable';
 
 type HoursMinutesBaseType = {
   hours: HoursEnum;
@@ -8,7 +8,8 @@ type HoursMinutesBaseType = {
 
 export type PartialHoursMinutes = Partial<Readonly<HoursMinutesBaseType>>;
 
-export type IHoursMinutes = IRecordType<HoursMinutesBaseType>;
+export type IHoursMinutes = IRecord<HoursMinutesBaseType> &
+  Readonly<HoursMinutesBaseType>;
 
 const IHoursMinutesRecordFactory = IRecord<HoursMinutesBaseType>({
   hours: 0,
@@ -20,7 +21,7 @@ export const createIHoursMinutes: (
 ) => IHoursMinutes = IHoursMinutesRecordFactory;
 
 export const fillHoursMinutes: (
-  a: PartialHoursMinutes
+  a?: PartialHoursMinutes
 ) => IHoursMinutes = IHoursMinutesRecordFactory;
 
 export const compareHm = (a: IHoursMinutes, b: IHoursMinutes): -1 | 0 | 1 => {

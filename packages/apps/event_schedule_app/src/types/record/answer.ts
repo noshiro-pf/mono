@@ -1,16 +1,18 @@
-import { IList, IRecord, IRecordType } from '../../utils/immutable';
+import { IList, IRecord } from '../../utils/immutable';
 import {
   fillAnswerSelection,
   IAnswerSelection,
   PartialAnswerSelection,
 } from './answer-selection';
 
+export const ANSWER_KEY_CREATED_AT = 'createdAt';
+
 type AnswerBaseType = {
   id: string;
   userName: string;
   comment: string;
   selection: IList<IAnswerSelection>;
-  createdAt: number;
+  [ANSWER_KEY_CREATED_AT]: number;
 };
 
 export type PartialAnswer = Partial<
@@ -19,18 +21,18 @@ export type PartialAnswer = Partial<
     userName: AnswerBaseType['userName'];
     comment: AnswerBaseType['comment'];
     selection: readonly PartialAnswerSelection[];
-    createdAt: AnswerBaseType['createdAt'];
+    [ANSWER_KEY_CREATED_AT]: AnswerBaseType[typeof ANSWER_KEY_CREATED_AT];
   }>
 >;
 
-export type IAnswer = IRecordType<AnswerBaseType>;
+export type IAnswer = IRecord<AnswerBaseType> & Readonly<AnswerBaseType>;
 
 const IAnswerRecordFactory = IRecord<AnswerBaseType>({
   id: '',
   userName: '',
   comment: '',
   selection: IList<IAnswerSelection>(),
-  createdAt: Date.now(),
+  [ANSWER_KEY_CREATED_AT]: Date.now(),
 });
 
 export const createIAnswerWithoutId: (
@@ -42,11 +44,13 @@ export const createIAnswer: (
 ) => IAnswer = IAnswerRecordFactory;
 
 const d = IAnswerRecordFactory();
-export const fillAnswer = (p: PartialAnswer): IAnswer =>
+export const fillAnswer = (p?: PartialAnswer): IAnswer =>
   createIAnswer({
-    id: p.id ?? d.id,
-    userName: p.userName ?? d.userName,
-    comment: p.comment ?? d.comment,
-    selection: IList(p.selection ?? d.selection).map(fillAnswerSelection),
-    createdAt: p.createdAt ?? d.createdAt,
+    id: p?.id ?? d.id,
+    userName: p?.userName ?? d.userName,
+    comment: p?.comment ?? d.comment,
+    selection: IList(p?.selection ?? d.selection).map(fillAnswerSelection),
+    [ANSWER_KEY_CREATED_AT]:
+      (p === undefined ? undefined : p[ANSWER_KEY_CREATED_AT]) ??
+      d[ANSWER_KEY_CREATED_AT],
   });

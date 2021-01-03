@@ -12,7 +12,7 @@ import {
 } from '../types/record/base/year-month-date';
 import { createIYmdHm, IYmdHm } from '../types/record/ymd-hm';
 
-export const today = (): IYearMonthDate => {
+const today = (): IYearMonthDate => {
   const nowDateObj = new Date();
   return createIYearMonthDate({
     year: getYear(nowDateObj),

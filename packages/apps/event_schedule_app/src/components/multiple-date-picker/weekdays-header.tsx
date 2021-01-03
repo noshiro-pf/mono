@@ -1,11 +1,10 @@
 import { memoNamed } from '@mono/react-utils';
-import { weekdays } from '@mono/ts-utils';
+import { WeekDayEnum, weekdaysList } from '@mono/ts-utils';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import { WeekdaysNumberEnum } from '../../types/enum/weekdays-number-enum';
 
 interface Props {
-  onClick: (w: WeekdaysNumberEnum) => void;
+  onClick: (w: WeekDayEnum) => void;
 }
 
 export const WeekdaysHeader = memoNamed<Props>(
@@ -13,10 +12,10 @@ export const WeekdaysHeader = memoNamed<Props>(
   ({ onClick }) => {
     const listWithHandler = useMemo(
       () =>
-        weekdays.map((w, idx) => ({
+        weekdaysList.en.map((w, idx) => ({
           ...w,
           onClickHandler: () => {
-            onClick(idx as WeekdaysNumberEnum);
+            onClick(idx as WeekDayEnum);
           },
         })),
       [onClick]

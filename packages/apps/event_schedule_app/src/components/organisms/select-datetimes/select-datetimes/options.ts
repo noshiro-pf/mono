@@ -2,7 +2,7 @@ import { IOptionProps } from '@blueprintjs/core';
 import { texts } from '../../../../constants/texts';
 import { datetimeSpecificationOptions } from '../../../../types/enum/datetime-specification-type';
 
-const vt = texts.createEventPage.section2;
+const vt = texts.eventSettingsPage.section2;
 
 export const selctorOptions: IOptionProps[] = [
   {

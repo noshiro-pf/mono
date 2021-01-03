@@ -1,4 +1,4 @@
-import { IRecord, IRecordType } from '../../utils/immutable';
+import { IRecord } from '../../utils/immutable';
 import {
   compareYmd,
   createIYearMonthDate,
@@ -26,7 +26,8 @@ export type PartialDatetimeRange = Partial<
   }>
 >;
 
-export type IDatetimeRange = IRecordType<DatetimeRangeBaseType>;
+export type IDatetimeRange = IRecord<DatetimeRangeBaseType> &
+  Readonly<DatetimeRangeBaseType>;
 
 const IDatetimeRangeRecordFactory = IRecord<DatetimeRangeBaseType>({
   ymd: createIYearMonthDate(),
@@ -38,10 +39,10 @@ export const createIDatetimeRange: (
 ) => IDatetimeRange = IDatetimeRangeRecordFactory;
 
 const d = IDatetimeRangeRecordFactory();
-export const fillDatetimeRange = (p: PartialDatetimeRange): IDatetimeRange =>
+export const fillDatetimeRange = (p?: PartialDatetimeRange): IDatetimeRange =>
   createIDatetimeRange({
-    ymd: fillYearMonthDate(p.ymd ?? d.ymd),
-    timeRange: fillTimeRange(p.timeRange ?? d.timeRange),
+    ymd: fillYearMonthDate(p?.ymd ?? d.ymd),
+    timeRange: fillTimeRange(p?.timeRange ?? d.timeRange),
   });
 
 export const compareDatetimeRange = (

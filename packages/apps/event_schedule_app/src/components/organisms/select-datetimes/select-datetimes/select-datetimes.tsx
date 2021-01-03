@@ -1,3 +1,4 @@
+import { BpButton, BpSelect } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
@@ -6,12 +7,10 @@ import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-s
 import { IYearMonthDate } from '../../../../types/record/base/year-month-date';
 import { IDatetimeRange } from '../../../../types/record/datetime-range';
 import { IList, IMap } from '../../../../utils/immutable';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
-import { BpSelect } from '../../../atoms/blueprint-js-wrapper/bp-select';
 import { AddElementButton } from '../../../molecules/add-element-button';
 import { ButtonsWrapper } from '../../../molecules/buttons-wrapper';
 import { MultipleDatePicker } from '../../../multiple-date-picker/multiple-date-picker';
-import { DeleteAllButton } from '../delete-all/delete-all-button';
+import { DeleteAllButton } from '../../button-with-confirm/delete-all-button';
 import { SetTimesPopover } from '../set-times-popover/set-times-popover';
 import { selctorOptions } from './options';
 import { useSelectDatetimesHooks } from './select-datetimes-hooks';
@@ -25,7 +24,7 @@ interface Props {
   holidaysJpDefinition: IMap<IYearMonthDate, string>;
 }
 
-const vt = texts.createEventPage.section2;
+const vt = texts.eventSettingsPage.section2;
 
 type CastedHandlerType = (value: string) => void;
 

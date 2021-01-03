@@ -1,7 +1,6 @@
 import { getDay, MonthEnum, WeekDayEnum, YearEnum } from '@mono/ts-utils';
 import { useCallback, useMemo, useReducer } from 'react';
 import { DayType } from '../../types/enum/day-type';
-import { WeekdaysNumberEnum } from '../../types/enum/weekdays-number-enum';
 import {
   compareYmd,
   createIYearMonthDate,
@@ -36,7 +35,7 @@ interface MultipleDatePickerState {
     }>
   >;
   onDateClick: (ymd: IYearMonthDate) => void;
-  onWeekdaysHeaderCellClick: (w: WeekdaysNumberEnum) => void;
+  onWeekdaysHeaderCellClick: (w: WeekDayEnum) => void;
   onTodayClick: () => void;
 }
 
@@ -49,7 +48,7 @@ export const useMultipleDatePickerState = (
 
   const [calendarCurrentPage, calendarCurrentPageDispatch] = useReducer(
     calendarCurrentPageReducer,
-    calendarCurrentPageInitialState
+    calendarCurrentPageInitialState()
   );
 
   /* values */
@@ -137,7 +136,7 @@ export const useMultipleDatePickerState = (
   );
 
   const onWeekdaysHeaderCellClick = useCallback(
-    (w: WeekdaysNumberEnum) => {
+    (w: WeekDayEnum) => {
       selectedDatesDispatch({
         type: 'fill-column',
         dates: dates

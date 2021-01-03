@@ -52,7 +52,7 @@ export const createScore = (
         return [datetimeRange, 0];
       }
 
-      const scoreSum = answerSymbolList
+      const scoreSum: number = answerSymbolList
         .zip(summaryForThisDatetimeRange)
         .reduce((sum, [symbol, summary]) => sum + symbol.point * summary, 0);
 

@@ -1,4 +1,5 @@
 import { IconName } from '@blueprintjs/core';
+import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -7,10 +8,12 @@ import {
   answerSymbolIconIdsFromBp,
 } from '../../../../types/enum/answer-symbol-icon';
 import { IList } from '../../../../utils/immutable';
-import { BpButton } from '../../../atoms/blueprint-js-wrapper/bp-button';
 import { CircleIcon, CloseIcon, TriangleIcon } from '../../../atoms/icons';
 
-const icons: { id: AnswerSymbolIconId; icon: IconName | JSX.Element }[] = [
+const icons: readonly {
+  id: AnswerSymbolIconId;
+  icon: IconName | JSX.Element;
+}[] = [
   ...answerSymbolIconIdsFromBp.map((iconId) => ({ id: iconId, icon: iconId })),
   { id: 'handmade-circle', icon: <CircleIcon /> },
   { id: 'handmade-triangle', icon: <TriangleIcon /> },

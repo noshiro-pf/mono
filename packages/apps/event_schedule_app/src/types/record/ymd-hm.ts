@@ -1,4 +1,4 @@
-import { IRecord, IRecordType } from '../../utils/immutable';
+import { IRecord } from '../../utils/immutable';
 import {
   compareHm,
   createIHoursMinutes,
@@ -26,7 +26,7 @@ export type PartialYmdHm = Partial<
   }>
 >;
 
-export type IYmdHm = IRecordType<YmdHmBaseType>;
+export type IYmdHm = IRecord<YmdHmBaseType> & Readonly<YmdHmBaseType>;
 
 const IYmdHmRecordFactory = IRecord<YmdHmBaseType>({
   ymd: createIYearMonthDate(),
@@ -36,10 +36,10 @@ const IYmdHmRecordFactory = IRecord<YmdHmBaseType>({
 export const createIYmdHm: (a?: YmdHmBaseType) => IYmdHm = IYmdHmRecordFactory;
 
 const d = IYmdHmRecordFactory();
-export const fillYmdHm = (p: PartialYmdHm): IYmdHm =>
+export const fillYmdHm = (p?: PartialYmdHm): IYmdHm =>
   createIYmdHm({
-    ymd: fillYearMonthDate(p.ymd ?? d.ymd),
-    hm: fillHoursMinutes(p.hm ?? d.hm),
+    ymd: fillYearMonthDate(p?.ymd ?? d.ymd),
+    hm: fillHoursMinutes(p?.hm ?? d.hm),
   });
 
 export const compareYmdHm = (a: IYmdHm, b: IYmdHm): -1 | 0 | 1 => {

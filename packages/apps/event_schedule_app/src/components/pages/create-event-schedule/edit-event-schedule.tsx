@@ -1,0 +1,94 @@
+import { Icon, Spinner } from '@blueprintjs/core';
+import {
+  useDataStream,
+  useStreamEffect,
+  useStreamValue,
+  useValueAsStream,
+} from '@mono/react-rxjs-utils';
+import { memoNamed } from '@mono/react-utils';
+import { Result } from '@mono/ts-utils';
+import React from 'react';
+import { from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import styled from 'styled-components';
+import { api } from '../../../api/api';
+import { descriptionFontColor } from '../../../constants/color';
+import { texts } from '../../../constants/texts';
+import { useEventId } from '../../../routing/use-event-id';
+import { IEventSchedule } from '../../../types/record/event-schedule';
+import { clog } from '../../../utils/log';
+import { FetchEventScheduleError } from './error';
+import { EventScheduleSettingCommon } from './event-schedule-setting-common';
+
+const vt = texts.eventSettingsPage;
+
+export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
+  const eventId = useEventId();
+  const eventId$ = useValueAsStream(eventId);
+
+  const eventScheduleResult$ = useDataStream<
+    undefined | Result<IEventSchedule, 'not-found' | 'others'>
+  >(
+    undefined,
+    eventId$.pipe(switchMap((eId) => from(api.event.get(eId ?? ''))))
+  );
+
+  useStreamEffect(eventScheduleResult$, (e) => {
+    if (Result.isErr(e)) {
+      clog('eventScheduleResult', e);
+    }
+  });
+
+  const eventScheduleResult = useStreamValue(eventScheduleResult$);
+
+  return (
+    <div>
+      <TitleWrapper>
+        <Title href={'../'} target='_blank' rel='noopener noreferrer'>
+          <Icon icon={'timeline-events'} iconSize={28} />
+          <div>{vt.title}</div>
+        </Title>
+      </TitleWrapper>
+      {eventId === undefined || eventScheduleResult === undefined ? (
+        <Spinner />
+      ) : Result.isErr(eventScheduleResult) ? (
+        <FetchEventScheduleError errorType={eventScheduleResult.value} />
+      ) : (
+        <>
+          <SubTitle>
+            {`${vt.editSubTitle.prefix}${eventScheduleResult.value.title}${vt.editSubTitle.suffix}`}
+          </SubTitle>
+          <EventScheduleSettingCommon
+            mode={'edit'}
+            initialValues={eventScheduleResult.value}
+          />
+        </>
+      )}
+    </div>
+  );
+});
+
+const TitleWrapper = styled.div`
+  display: flex;
+`;
+
+const Title = styled.a`
+  display: flex;
+  align-items: center;
+  & > * {
+    margin-right: 10px;
+  }
+
+  margin: 20px;
+
+  /* h1 style */
+  font-size: 2em;
+  font-weight: bold;
+  color: black !important;
+  text-decoration: none !important;
+`;
+
+const SubTitle = styled.div`
+  margin: 10px 20px;
+  color: ${descriptionFontColor.normal};
+`;
