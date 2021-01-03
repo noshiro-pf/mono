@@ -1,14 +1,17 @@
 import { IInputGroupProps, InputGroup } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
-import React, { useCallback } from 'react';
+import { memoNamed, useTinyObservableEffect } from '@mono/react-utils';
+import { TinyObservable } from '@mono/ts-utils';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 interface Props extends IInputGroupProps {
   onValueChange: (value: string) => void;
+  autoFocus?: boolean;
+  focus$?: TinyObservable<void>;
 }
 
 export const BpInput = memoNamed<Props>(
   'BpInput',
-  ({ value, onValueChange, ...props }) => {
+  ({ value, onValueChange, autoFocus, focus$, ...props }) => {
     const onChangeHandler = useCallback(
       (
         event: React.FormEvent<HTMLElement> &
@@ -19,6 +22,26 @@ export const BpInput = memoNamed<Props>(
       [onValueChange]
     );
 
-    return <InputGroup value={value} onChange={onChangeHandler} {...props} />;
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const focus = useCallback(() => {
+      inputRef.current?.focus();
+    }, []);
+
+    useEffect(() => {
+      if (autoFocus === true) {
+        focus();
+      }
+    }, [autoFocus, focus]);
+
+    useTinyObservableEffect(focus$ ?? new TinyObservable(), focus);
+
+    return (
+      <InputGroup
+        value={value}
+        onChange={onChangeHandler}
+        inputRef={inputRef}
+        {...props}
+      />
+    );
   }
 );
