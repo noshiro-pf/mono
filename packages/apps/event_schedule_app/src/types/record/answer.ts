@@ -1,4 +1,5 @@
 import { IList, IRecord } from '../../utils/immutable';
+import { answerId, AnswerId, userName, UserName } from '../phantom';
 import {
   fillAnswerSelection,
   IAnswerSelection,
@@ -8,8 +9,8 @@ import {
 export const ANSWER_KEY_CREATED_AT = 'createdAt';
 
 type AnswerBaseType = {
-  id: string;
-  userName: string;
+  id: AnswerId;
+  userName: UserName;
   comment: string;
   selection: IList<IAnswerSelection>;
   [ANSWER_KEY_CREATED_AT]: number;
@@ -28,8 +29,8 @@ export type PartialAnswer = Partial<
 export type IAnswer = IRecord<AnswerBaseType> & Readonly<AnswerBaseType>;
 
 const IAnswerRecordFactory = IRecord<AnswerBaseType>({
-  id: '',
-  userName: '',
+  id: answerId(''),
+  userName: userName(''),
   comment: '',
   selection: IList<IAnswerSelection>(),
   [ANSWER_KEY_CREATED_AT]: Date.now(),

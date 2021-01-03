@@ -53,7 +53,11 @@ export const MyAnswer = memoNamed<Props>(
       <>
         <WidthRestrictedInputWrapper>
           <FormGroup label={vt.yourName}>
-            <BpInput value={userName} onValueChange={onUserNameChange} />
+            <BpInput
+              value={userName}
+              onValueChange={onUserNameChange}
+              autoFocus={true}
+            />
           </FormGroup>
         </WidthRestrictedInputWrapper>
         <HTMLTable bordered={true}>

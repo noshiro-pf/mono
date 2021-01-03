@@ -1,6 +1,7 @@
 import { Result } from '@mono/ts-utils';
 import { firestorePaths } from '../../constants/firestore-paths';
 import { dbEvents } from '../../initialize-firebase';
+import { answerId } from '../../types/phantom';
 import {
   ANSWER_KEY_CREATED_AT,
   fillAnswer,
@@ -20,7 +21,9 @@ export const getAnswers = async (
 
     return Result.ok(
       IList<IAnswer>(
-        querySnapshot.docs.map((d) => fillAnswer({ ...d.data(), id: d.id }))
+        querySnapshot.docs.map((d) =>
+          fillAnswer({ ...d.data(), id: answerId(d.id) })
+        )
       )
     );
   } catch (e) {

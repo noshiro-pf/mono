@@ -108,6 +108,7 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
     return (
       <BpDialog
         isOpen={isOpen}
+        onClose={close}
         hasBackdrop={true}
         isCloseButtonShown={true}
         canEscapeKeyClose={true}
@@ -125,6 +126,7 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
               invalidMessage={
                 texts.eventSettingsPage.errorMessages.invalidEmail
               }
+              autoFocus={true}
             />
             {showValidationFailedMessage ? (
               <Description

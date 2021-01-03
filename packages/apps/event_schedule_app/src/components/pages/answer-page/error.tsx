@@ -18,15 +18,8 @@ export const AnswerPageError = memoNamed<Props>(
   ({ errorType }) => (
     <ErrorMessageWrapper>
       {errorType.data === 'eventScheduleResult' &&
-      errorType.type === 'not-found' ? (
-        <Description color={errorFontColor} text={vt.eventScheduleNotFound} />
-      ) : undefined}
-      {errorType.data === 'eventScheduleResult' &&
       errorType.type === 'others' ? (
         <Description color={errorFontColor} text={vt.eventScheduleOtherError} />
-      ) : undefined}
-      {errorType.data === 'answersResult' && errorType.type === 'not-found' ? (
-        <Description color={errorFontColor} text={vt.answersResultNotFound} />
       ) : undefined}
       {errorType.data === 'answersResult' && errorType.type === 'others' ? (
         <Description color={errorFontColor} text={vt.answersResultOtherError} />

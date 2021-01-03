@@ -1,3 +1,4 @@
+import { answerId, AnswerId } from '../../../types/phantom';
 import {
   createIDatetimeRange,
   IDatetimeRange,
@@ -5,8 +6,8 @@ import {
 import { IRecord } from '../../../utils/immutable';
 
 type AnswerSelectionMapKeyBaseType = {
+  answerId: AnswerId;
   datetimeRange: IDatetimeRange;
-  userName: string;
 };
 
 export type IAnswerSelectionMapKey = IRecord<AnswerSelectionMapKeyBaseType> &
@@ -14,8 +15,8 @@ export type IAnswerSelectionMapKey = IRecord<AnswerSelectionMapKeyBaseType> &
 
 const IAnswerSelectionMapKeyRecordFactory = IRecord<AnswerSelectionMapKeyBaseType>(
   {
+    answerId: answerId(''),
     datetimeRange: createIDatetimeRange(),
-    userName: '',
   }
 );
 

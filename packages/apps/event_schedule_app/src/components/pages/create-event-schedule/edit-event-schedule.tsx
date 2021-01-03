@@ -17,6 +17,7 @@ import { texts } from '../../../constants/texts';
 import { useEventId } from '../../../routing/use-event-id';
 import { IEventSchedule } from '../../../types/record/event-schedule';
 import { clog } from '../../../utils/log';
+import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
@@ -41,7 +42,10 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
 
   const eventScheduleResult = useStreamValue(eventScheduleResult$);
 
-  return (
+  return Result.isErr(eventScheduleResult) &&
+    eventScheduleResult.value === 'not-found' ? (
+    <NotFoundPage />
+  ) : (
     <div>
       <TitleWrapper>
         <Title href={'../'} target='_blank' rel='noopener noreferrer'>
@@ -49,10 +53,10 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
           <div>{vt.title}</div>
         </Title>
       </TitleWrapper>
-      {eventId === undefined || eventScheduleResult === undefined ? (
-        <Spinner />
-      ) : Result.isErr(eventScheduleResult) ? (
+      {Result.isErr(eventScheduleResult) ? (
         <FetchEventScheduleError errorType={eventScheduleResult.value} />
+      ) : eventId === undefined || eventScheduleResult === undefined ? (
+        <Spinner />
       ) : (
         <>
           <SubTitle>

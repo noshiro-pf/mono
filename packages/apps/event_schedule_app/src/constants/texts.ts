@@ -1,5 +1,6 @@
 export const texts = {
   pageNotFound: 'ページが見つかりませんでした。',
+  topPage: 'トップページ',
   eventSettingsPage: {
     title: '日程調整',
     editSubTitle: {
