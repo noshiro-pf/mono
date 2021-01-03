@@ -7,7 +7,7 @@
   },
   "globals": {
     "ts-jest": {
-      "tsConfig": "<rootDir>/config/tsconfig.test.json"
+      "tsconfig": "<rootDir>/config/tsconfig.test.json"
     }
   },
   "testMatch": ["<rootDir>/src/**/?(*.)+(spec|test).ts"]
