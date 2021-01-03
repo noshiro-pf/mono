@@ -1,15 +1,30 @@
+import { Result } from '@mono/ts-utils';
 import { firestorePaths } from '../../constants/firestore-paths';
 import { dbEvents } from '../../initialize-firebase';
-import { fillAnswer, IAnswer } from '../../types/record/answer';
+import {
+  ANSWER_KEY_CREATED_AT,
+  fillAnswer,
+  IAnswer,
+} from '../../types/record/answer';
 import { IList } from '../../utils/immutable';
 
-export const getAnswers = async (eventId: string): Promise<IList<IAnswer>> => {
-  const querySnapshot = await dbEvents
-    .doc(eventId)
-    .collection(firestorePaths.answers)
-    .orderBy('createdAt', 'asc')
-    .get();
-  return IList<IAnswer>(
-    querySnapshot.docs.map((d) => fillAnswer({ ...d.data(), id: d.id }))
-  );
+export const getAnswers = async (
+  eventId: string
+): Promise<Result<IList<IAnswer>, 'not-found' | 'others'>> => {
+  try {
+    const querySnapshot = await dbEvents
+      .doc(eventId)
+      .collection(firestorePaths.answers)
+      .orderBy(ANSWER_KEY_CREATED_AT, 'asc')
+      .get();
+
+    return Result.ok(
+      IList<IAnswer>(
+        querySnapshot.docs.map((d) => fillAnswer({ ...d.data(), id: d.id }))
+      )
+    );
+  } catch (e) {
+    console.log(e);
+    return Result.err('others');
+  }
 };

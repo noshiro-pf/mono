@@ -1,29 +1,26 @@
+import { BpDatetimePicker, Ymdhm } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
+import { mapNullable } from '@mono/ts-utils';
 import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import { createIHoursMinutes } from '../../../types/record/base/hours-minutes';
 import { INotificationSettings } from '../../../types/record/base/notification-settings';
-import { IYmdHm } from '../../../types/record/ymd-hm';
+import { createIYearMonthDate } from '../../../types/record/base/year-month-date';
+import { createIYmdHm, IYmdHm } from '../../../types/record/ymd-hm';
 import { IList } from '../../../utils/immutable';
-import { BpDatetimePicker } from '../../atoms/blueprint-js-wrapper/bp-datetime-picker';
 import { NotificationSettings } from '../notification-settings/notification-settings';
-// import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
 import { SymbolSettings } from '../symbol-settings/symbol-settings';
-// import { BpPasswordInput } from '../../molecules/bp-password-input';
 import { ParagraphWithSwitch } from './paragraph-with-switch';
 
-const vt = texts.createEventPage.section3;
+const vt = texts.eventSettingsPage.section3;
 
 interface Props {
   useAnswerDeadline: boolean;
   onToggleAnswerDeadline: () => void;
   answerDeadline: IYmdHm | undefined;
   onAnswerDeadlineChange: (value: IYmdHm | undefined) => void;
-  usePassword: boolean;
-  onToggleUsePassword: () => void;
-  password: string;
-  onPasswordChange: (value: string) => void;
   customizeSymbolSettings: boolean;
   onToggleCustomizeSymbolSettings: () => void;
   answerSymbolList: IList<IAnswerSymbol>;
@@ -34,6 +31,27 @@ interface Props {
   onNotificationSettingsChange: (value: INotificationSettings) => void;
 }
 
+const toYmdhm = mapNullable<IYmdHm, Ymdhm>(({ ymd, hm }) => ({
+  year: ymd.year,
+  month: ymd.month,
+  date: ymd.date,
+  hours: hm.hours,
+  minutes: hm.minutes,
+}));
+
+const onYmdHmChangeFn = (
+  onIYmdChange: (iymdhm: IYmdHm | undefined) => void
+) => (ymdhm: Ymdhm | undefined): void => {
+  onIYmdChange(
+    mapNullable((ymdhm: Ymdhm) =>
+      createIYmdHm({
+        ymd: createIYearMonthDate(ymdhm),
+        hm: createIHoursMinutes(ymdhm),
+      })
+    )(ymdhm)
+  );
+};
+
 export const EventSettings = memoNamed<Props>('EventSettings', (props) => (
   <Root>
     <ParagraphWithSwitch
@@ -43,8 +61,8 @@ export const EventSettings = memoNamed<Props>('EventSettings', (props) => (
       onToggle={props.onToggleAnswerDeadline}
       elementToToggle={
         <BpDatetimePicker
-          ymdhm={props.answerDeadline}
-          onYmdHmChange={props.onAnswerDeadlineChange}
+          ymdhm={toYmdhm(props.answerDeadline)}
+          onYmdhmChange={onYmdHmChangeFn(props.onAnswerDeadlineChange)}
           disabled={!props.useAnswerDeadline}
         />
       }
@@ -76,21 +94,6 @@ export const EventSettings = memoNamed<Props>('EventSettings', (props) => (
         />
       }
     />
-    {/* <ParagraphWithSwitch
-      title={vt.usePassword}
-      description={vt.howPasswordIsUsed}
-      show={props.usePassword}
-      onToggle={props.onToggleUsePassword}
-      elementToToggle={
-        <WidthRestrictedInputWrapper>
-          <BpPasswordInput
-            password={props.password}
-            onPasswordChange={props.onPasswordChange}
-            disabled={!props.usePassword}
-          />
-        </WidthRestrictedInputWrapper>
-      }
-    /> */}
   </Root>
 ));
 

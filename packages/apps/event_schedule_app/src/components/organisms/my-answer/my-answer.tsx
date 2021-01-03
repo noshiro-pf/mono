@@ -1,18 +1,16 @@
 import { FormGroup, HTMLTable } from '@blueprintjs/core';
+import { BpButton, BpInput, BpTextArea } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import { texts } from '../../../constants/texts';
 import { IAnswer } from '../../../types/record/answer';
 import { IEventSchedule } from '../../../types/record/event-schedule';
-import { BpButton } from '../../atoms/blueprint-js-wrapper/bp-button';
-import { BpInput } from '../../atoms/blueprint-js-wrapper/bp-input';
-import { BpTextArea } from '../../atoms/blueprint-js-wrapper/bp-textarea';
 import { CustomIcon } from '../../atoms/icon';
 import { Td, Th } from '../../atoms/table-cell-centered';
 import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
 import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
 import { DatetimeRangeCell } from '../answer-table/datetime-range-cell';
-import { DeleteAnswerButton } from './delete-all/delete-answer-button';
+import { DeleteAnswerButton } from './delete-answer-button';
 import { useMyAnswerHooks } from './my-answer-hooks';
 
 interface Props {
@@ -20,8 +18,8 @@ interface Props {
   myAnswer: IAnswer;
   onMyAnswerChange: (answer: IAnswer) => void;
   onCancel: () => void;
-  onDeleteAnswer: () => void;
-  onSubmitAnswer: () => void;
+  onDeleteAnswer: () => Promise<void>;
+  onSubmitAnswer: () => Promise<void>;
   myAnswerSectionState: 'hidden' | 'creating' | 'editing';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
@@ -49,15 +47,7 @@ export const MyAnswer = memoNamed<Props>(
       onCommentChange,
       symbolHeader,
       myAnswerList,
-      onDelete,
-      onSubmit,
-    } = useMyAnswerHooks(
-      eventSchedule,
-      myAnswer,
-      onMyAnswerChange,
-      onDeleteAnswer,
-      onSubmitAnswer
-    );
+    } = useMyAnswerHooks(eventSchedule, myAnswer, onMyAnswerChange);
 
     return (
       <>
@@ -136,9 +126,8 @@ export const MyAnswer = memoNamed<Props>(
           />
           {myAnswerSectionState === 'editing' ? (
             <DeleteAnswerButton
-              onConfirmDeleteAnswer={onDelete}
+              onConfirmDeleteAnswer={onDeleteAnswer}
               loading={submitButtonIsLoading}
-              disabled={submitButtonIsDisabled}
             />
           ) : undefined}
           <BpButton
@@ -151,7 +140,7 @@ export const MyAnswer = memoNamed<Props>(
                 ? vt.submitButton.update
                 : ''
             }
-            onClick={onSubmit}
+            onClick={onSubmitAnswer}
             loading={submitButtonIsLoading}
             disabled={submitButtonIsDisabled}
             nowrap={true}

@@ -4,14 +4,15 @@ import styled from 'styled-components';
 import { DayType } from '../../types/enum/day-type';
 import { IYearMonthDate } from '../../types/record/base/year-month-date';
 
-interface Props {
-  ymd: IYearMonthDate;
-  onClick: () => void;
-  selected: boolean;
-  disabled: boolean;
-  dayType: DayType;
-  holidayJpName: string | undefined;
-}
+interface Props
+  extends Readonly<{
+    ymd: IYearMonthDate;
+    onClick: () => void;
+    selected: boolean;
+    disabled: boolean;
+    dayType: DayType;
+    holidayJpName: string | undefined;
+  }> {}
 
 const noop = (): undefined => undefined;
 

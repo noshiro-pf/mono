@@ -6,13 +6,15 @@ export const answerSymbolPointConfig = {
   step: 1,
   min: 0,
   max: 10,
-};
+} as const;
+
+const cfg = answerSymbolPointConfig;
 
 export const clampAndRoundAnswerSymbolPoint = (
   x: number
 ): AnswerSymbolPointEnumType =>
   x < 0
     ? 0
-    : 10 < x
-    ? 10
-    : ((Math.round(x * 10) / 10) as AnswerSymbolPointEnumType);
+    : cfg.max < x
+    ? cfg.max
+    : ((Math.round(x / cfg.step) * cfg.step) as AnswerSymbolPointEnumType);

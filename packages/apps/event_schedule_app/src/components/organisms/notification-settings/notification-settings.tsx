@@ -1,10 +1,9 @@
+import { BpCheckbox, BpEmailInput } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { INotificationSettings } from '../../../types/record/base/notification-settings';
-import { BpCheckbox } from '../../atoms/blueprint-js-wrapper/bp-checkbox';
-import { BpEmailInput } from '../../atoms/blueprint-js-wrapper/bp-email-input-group';
 import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
 
 interface Props {
@@ -14,7 +13,7 @@ interface Props {
   useAnswerDeadline: boolean;
 }
 
-const vt = texts.createEventPage.section3;
+const vt = texts.eventSettingsPage.section3;
 
 export const NotificationSettings = memoNamed<Props>(
   'NotificationSettings',
@@ -89,7 +88,7 @@ export const NotificationSettings = memoNamed<Props>(
             value={notificationSettings.email}
             onValueChange={onEmailChange}
             disabled={disabled}
-            invalidMessage={texts.createEventPage.errorMessages.invalidEmail}
+            invalidMessage={texts.eventSettingsPage.errorMessages.invalidEmail}
           />
         </WidthRestrictedInputWrapper>
         <CheckboxesWrapper>

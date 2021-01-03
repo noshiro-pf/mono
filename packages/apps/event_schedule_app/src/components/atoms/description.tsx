@@ -1,6 +1,7 @@
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
+import { descriptionFontColor } from '../../constants/color';
 
 interface Props {
   text: string;
@@ -11,7 +12,13 @@ interface Props {
 export const Description = memoNamed<Props>(
   'Description',
   ({ text, error = false, color }) => (
-    <Root style={{ color: color ?? (error ? '#f44336' : '#5c7080') }}>
+    <Root
+      style={{
+        color:
+          color ??
+          (error ? descriptionFontColor.error : descriptionFontColor.normal),
+      }}
+    >
       {text}
     </Root>
   )

@@ -1,4 +1,4 @@
-import { IRecord, IRecordType } from '../../utils/immutable';
+import { IRecord } from '../../utils/immutable';
 import {
   compareHm,
   createIHoursMinutes,
@@ -19,7 +19,8 @@ export type PartialTimeRange = Partial<
   }>
 >;
 
-export type ITimeRange = IRecordType<TimeRangeBaseType>;
+export type ITimeRange = IRecord<TimeRangeBaseType> &
+  Readonly<TimeRangeBaseType>;
 
 const ITimeRangeRecordFactory = IRecord<TimeRangeBaseType>({
   start: createIHoursMinutes(),
@@ -31,10 +32,10 @@ export const createITimeRange: (
 ) => ITimeRange = ITimeRangeRecordFactory;
 
 const d = ITimeRangeRecordFactory();
-export const fillTimeRange = (p: PartialTimeRange): ITimeRange =>
+export const fillTimeRange = (p?: PartialTimeRange): ITimeRange =>
   createITimeRange({
-    start: fillHoursMinutes(p.start ?? d.start),
-    end: fillHoursMinutes(p.end ?? d.end),
+    start: fillHoursMinutes(p?.start ?? d.start),
+    end: fillHoursMinutes(p?.end ?? d.end),
   });
 
 export const compareTimeRange = (a: ITimeRange, b: ITimeRange): number => {

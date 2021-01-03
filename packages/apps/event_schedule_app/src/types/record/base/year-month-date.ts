@@ -1,5 +1,5 @@
 import { DateEnum, MonthEnum, sign, YearEnum } from '@mono/ts-utils';
-import { IRecord, IRecordType } from '../../../utils/immutable';
+import { IRecord } from '../../../utils/immutable';
 
 type YearMonthDateBaseType = {
   year: YearEnum;
@@ -9,7 +9,8 @@ type YearMonthDateBaseType = {
 
 export type PartialYearMonthDate = Partial<Readonly<YearMonthDateBaseType>>;
 
-export type IYearMonthDate = IRecordType<YearMonthDateBaseType>;
+export type IYearMonthDate = IRecord<YearMonthDateBaseType> &
+  Readonly<YearMonthDateBaseType>;
 
 const IYearMonthDateRecordFactory = IRecord<YearMonthDateBaseType>({
   year: new Date().getFullYear() as YearEnum,
@@ -22,7 +23,7 @@ export const createIYearMonthDate: (
 ) => IYearMonthDate = IYearMonthDateRecordFactory;
 
 export const fillYearMonthDate: (
-  a: PartialYearMonthDate
+  a?: PartialYearMonthDate
 ) => IYearMonthDate = IYearMonthDateRecordFactory;
 
 export const compareYmd = (

@@ -1,3 +1,5 @@
+// import { SelectSymbolPopover } from './select-symbol-popover/select-symbol-popover';
+import { BpInput, BpNumericInput } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
@@ -9,9 +11,6 @@ import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
 import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
 import { IList } from '../../../utils/immutable';
-// import { SelectSymbolPopover } from './select-symbol-popover/select-symbol-popover';
-import { BpInput } from '../../atoms/blueprint-js-wrapper/bp-input';
-import { BpNumericInput } from '../../atoms/blueprint-js-wrapper/bp-numeric-input';
 import { CustomIcon } from '../../atoms/icon';
 
 interface Props {

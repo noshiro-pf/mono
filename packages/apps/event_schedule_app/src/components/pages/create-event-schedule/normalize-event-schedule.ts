@@ -17,9 +17,9 @@ export const normalizeEventSchedule = (
       .sort(compareDatetimeRange),
     useAnswerDeadline: eventSchedule.useAnswerDeadline,
     answerDeadline: eventSchedule.answerDeadline,
-    usePassword: eventSchedule.usePassword,
-    password: eventSchedule.password,
+    customizeSymbolSettings: eventSchedule.customizeSymbolSettings,
     answerSymbolList: eventSchedule.answerSymbolList,
     useNotification: eventSchedule.useNotification,
     notificationSettings: eventSchedule.notificationSettings,
+    timezoneOffsetMinutes: eventSchedule.timezoneOffsetMinutes,
   });

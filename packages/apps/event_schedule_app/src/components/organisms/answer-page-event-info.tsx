@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants/texts';
 import { IEventSchedule } from '../../types/record/event-schedule';
+import { createIYmdHm } from '../../types/record/ymd-hm';
 import { ymdhm2strWithDay } from '../../utils/ymdhm2str';
 import { Description } from '../atoms/description';
 
@@ -33,7 +34,11 @@ export const AnswerPageEventInfo = memoNamed<Props>(
               <Content>
                 {eventSchedule.useAnswerDeadline ? (
                   <>
-                    <div>{ymdhm2strWithDay(eventSchedule.answerDeadline)}</div>
+                    <div>
+                      {ymdhm2strWithDay(
+                        eventSchedule.answerDeadline ?? createIYmdHm()
+                      )}
+                    </div>
                     <Description
                       error={isExpired}
                       text={

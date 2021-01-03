@@ -1,24 +1,14 @@
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
+import { texts } from '../../constants/texts';
 
 export const NotFoundPage = memoNamed<Record<string, void>>(
   'NotFoundPage',
-  () => (
-    <RootCentered>
-      <Title></Title>
-    </RootCentered>
-  )
+  () => <Title>{texts.pageNotFound}</Title>
 );
 
-const RootCentered = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
 const Title = styled.div`
-  padding: 10px;
+  margin: 20px;
   font-size: large;
 `;

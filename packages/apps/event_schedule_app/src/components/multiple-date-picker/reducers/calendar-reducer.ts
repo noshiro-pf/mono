@@ -11,6 +11,7 @@ export type CalendarCurrentPageReducerState = {
   year: YearEnum;
   month: MonthEnum;
 };
+
 export type CalendarCurrentPageReducerAction =
   | { type: 'prev-month' }
   | { type: 'next-month' }
@@ -18,10 +19,10 @@ export type CalendarCurrentPageReducerAction =
   | { type: 'set-month'; month: MonthEnum }
   | { type: 'today' };
 
-export const calendarCurrentPageInitialState: CalendarCurrentPageReducerState = {
+export const calendarCurrentPageInitialState = (): CalendarCurrentPageReducerState => ({
   year: getYear(today()),
   month: getMonth(today()),
-};
+});
 
 export const calendarCurrentPageReducer: ReducerType<
   CalendarCurrentPageReducerState,
@@ -45,6 +46,6 @@ export const calendarCurrentPageReducer: ReducerType<
       return { year: action.year, month };
 
     case 'today':
-      return calendarCurrentPageInitialState;
+      return calendarCurrentPageInitialState();
   }
 };

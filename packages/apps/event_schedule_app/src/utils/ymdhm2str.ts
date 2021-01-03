@@ -3,8 +3,9 @@ import { texts } from '../constants/texts';
 import { IHoursMinutes } from '../types/record/base/hours-minutes';
 import { IYearMonthDate } from '../types/record/base/year-month-date';
 import { IYmdHm } from '../types/record/ymd-hm';
-import { pad2 } from './pad2';
 import { ymd2Date } from './ymdhm2date';
+
+const pad2 = (n: number): string => n.toString().padStart(2, '0');
 
 export const ymd2str = (ymd: IYearMonthDate): string => {
   const { year, month, date } = ymd;

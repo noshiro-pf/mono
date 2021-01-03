@@ -1,4 +1,4 @@
-import { IRecord, IRecordType } from '../../../utils/immutable';
+import { IRecord } from '../../../utils/immutable';
 import { AnswerSymbolIconId } from '../../enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../enum/answer-symbol-point';
 
@@ -10,7 +10,8 @@ type AnswerSymbolBaseType = {
 
 export type PartialAnswerSymbol = Partial<Readonly<AnswerSymbolBaseType>>;
 
-export type IAnswerSymbol = IRecordType<AnswerSymbolBaseType>;
+export type IAnswerSymbol = IRecord<AnswerSymbolBaseType> &
+  Readonly<AnswerSymbolBaseType>;
 
 const IAnswerSymbolRecordFactory = IRecord<AnswerSymbolBaseType>({
   iconId: 'handmade-cross',

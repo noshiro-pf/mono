@@ -1,6 +1,6 @@
+import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
-import { BpButton } from '../atoms/blueprint-js-wrapper/bp-button';
 
 interface Props {
   onClick: () => void;

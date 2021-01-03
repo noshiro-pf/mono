@@ -1,4 +1,4 @@
-import { IRecord, IRecordType } from '../../utils/immutable';
+import { IRecord } from '../../utils/immutable';
 import { AnswerSymbolIconId } from '../enum/answer-symbol-icon';
 import {
   createIDatetimeRange,
@@ -19,7 +19,8 @@ export type PartialAnswerSelection = Partial<
   }>
 >;
 
-export type IAnswerSelection = IRecordType<AnswerSelectionBaseType>;
+export type IAnswerSelection = IRecord<AnswerSelectionBaseType> &
+  Readonly<AnswerSelectionBaseType>;
 
 const IAnswerSelectionRecordFactory = IRecord<AnswerSelectionBaseType>({
   datetimeRange: createIDatetimeRange(),
@@ -32,9 +33,9 @@ export const createIAnswerSelection: (
 
 const d = IAnswerSelectionRecordFactory();
 export const fillAnswerSelection = (
-  p: PartialAnswerSelection
+  p?: PartialAnswerSelection
 ): IAnswerSelection =>
   createIAnswerSelection({
-    datetimeRange: fillDatetimeRange(p.datetimeRange ?? d.datetimeRange),
-    iconId: p.iconId ?? d.iconId,
+    datetimeRange: fillDatetimeRange(p?.datetimeRange ?? d.datetimeRange),
+    iconId: p?.iconId ?? d.iconId,
   });

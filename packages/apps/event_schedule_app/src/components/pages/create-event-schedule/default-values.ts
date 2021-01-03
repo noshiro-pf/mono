@@ -1,5 +1,7 @@
 import { DateEnum, getDate, setDate } from '@mono/ts-utils';
+import { defaultAnswerDeadlineRemainingDays } from '../../../constants/default-answer-deadline-remaining';
 import { texts } from '../../../constants/texts';
+import { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
 import {
   createIAnswerSymbol,
   IAnswerSymbol,
@@ -33,11 +35,15 @@ export const defaultAnswerSymbolList: IList<IAnswerSymbol> = IList([
   }),
 ]);
 
+const today = new Date();
 export const defaultAnswerDeadline: IYmdHm = ymdhmFromDate(
-  setDate(new Date(), (getDate(new Date()) + 30) as DateEnum)
+  setDate(
+    today,
+    (getDate(today) + defaultAnswerDeadlineRemainingDays) as DateEnum
+  )
 );
 
-export const defaultNotificationSettings: INotificationSettings = createINotificationSettings().set(
-  'notifyOnAnswerChange',
-  true
-);
+export const defaultNotificationSettings: INotificationSettings = createINotificationSettings();
+
+export const defaultDatetimeSpecification: DatetimeSpecificationEnumType =
+  'startSpecified';

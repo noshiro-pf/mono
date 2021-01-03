@@ -53,6 +53,8 @@
     "@blueprintjs/datetime": "^3.19.1",
     "@blueprintjs/icons": "^3.21.0",
     "@blueprintjs/table": "^3.8.18",
+    "@mono/react-blueprintjs-utils": "*",
+    "@mono/react-router-utils": "*",
     "@mono/react-rxjs-utils": "*",
     "@mono/react-utils": "*",
     "@mono/rxjs-utils": "*",

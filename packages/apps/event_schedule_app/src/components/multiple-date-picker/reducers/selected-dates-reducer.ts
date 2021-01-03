@@ -8,9 +8,7 @@ export type SelectedDatesReducerAction =
 
 export type SelectedDatesReducerState = ISet<IYearMonthDate>;
 
-export const selectedDatesReducerInitialState: SelectedDatesReducerState = ISet<
-  IYearMonthDate
->();
+export const selectedDatesReducerInitialState: SelectedDatesReducerState = ISet<IYearMonthDate>();
 
 export const selectedDatesReducer: ReducerType<
   SelectedDatesReducerState,

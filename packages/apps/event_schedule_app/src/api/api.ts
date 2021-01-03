@@ -4,11 +4,13 @@ import { deleteAnswer } from './crud/delete-answer';
 import { getAnswers } from './crud/get-answers';
 import { getEventSchedule } from './crud/get-event-schedule';
 import { updateAnswer } from './crud/update-answer';
+import { updateEventSchedule } from './crud/update-event-schedule';
 
 export const api = {
   event: {
     add: addEventSchedule,
     get: getEventSchedule,
+    update: updateEventSchedule,
   },
   answers: {
     add: addAnswer,

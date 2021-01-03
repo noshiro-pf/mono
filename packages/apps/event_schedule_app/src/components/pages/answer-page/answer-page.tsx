@@ -1,11 +1,9 @@
-import { Icon, Spinner, Toaster } from '@blueprintjs/core';
+import { Icon, Spinner } from '@blueprintjs/core';
+import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import React from 'react';
 import styled from 'styled-components';
-import { errorFontColor } from '../../../constants/color';
 import { texts } from '../../../constants/texts';
-import { BpButton } from '../../atoms/blueprint-js-wrapper/bp-button';
-import { Description } from '../../atoms/description';
 import { CustomIcon } from '../../atoms/icon';
 import {
   ButtonsWrapperAlignEnd,
@@ -14,35 +12,36 @@ import {
 import { Section } from '../../molecules/section';
 import { AnswerPageEventInfo } from '../../organisms/answer-page-event-info';
 import { AnswerTable } from '../../organisms/answer-table/answer-table';
+import { GoToEditPageButton } from '../../organisms/button-with-confirm/go-to-edit-page-button';
 import { MyAnswer } from '../../organisms/my-answer/my-answer';
 import { useAnswerPageState } from './answer-page-hooks';
+import { AnswerPageError } from './error';
 
 const vt = texts.answerPage;
 
-const toast = Toaster.create({ canEscapeKeyClear: true, position: 'top' });
-
 export const AnswerPage = memoNamed('AnswerPage', () => {
   const {
-    eventSchedule: eventSchedule,
-    onEditButtonClick: onEditButtonClick,
-    answers: answers,
-    isError: isError,
-    onAnswerClick: onAnswerClick,
-    showMyAnswerSection: showMyAnswerSection,
-    myAnswerSectionState: myAnswerSectionState,
-    answerSectionRef: answerSectionRef,
-    myAnswer: myAnswer,
+    eventId,
+    eventSchedule,
+    onEditButtonClick,
+    answers,
+    errorType,
+    onAnswerClick,
+    showMyAnswerSection,
+    myAnswerSectionState,
+    answerSectionRef,
+    myAnswer,
     setMyAnswer: onMyAnswerChange,
-    onCancel: onCancel,
-    onDeleteAnswer: onDeleteAnswer,
-    onSubmitAnswer: onSubmitAnswer,
-    submitButtonIsLoading: submitButtonIsLoading,
-    submitButtonIsDisabled: submitButtonIsDisabled,
+    onCancel,
+    onDeleteAnswer,
+    onSubmitAnswer,
+    submitButtonIsLoading,
+    submitButtonIsDisabled,
     fetchAnswers: refresh,
-    refreshButtonIsLoading: refreshButtonIsLoading,
-    refreshButtonIsDisabled: refreshButtonIsDisabled,
-    isExpired: isExpired,
-  } = useAnswerPageState(toast);
+    refreshButtonIsLoading,
+    refreshButtonIsDisabled,
+    isExpired,
+  } = useAnswerPageState();
 
   return (
     <div>
@@ -52,14 +51,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
           <div>{vt.title}</div>
         </Title>
       </TitleWrapper>
-      {isError ? (
-        <ErrorMessageWrapper>
-          <Description
-            color={errorFontColor}
-            text={vt.errorMessages.eventScheduleNotFound}
-          />
-        </ErrorMessageWrapper>
-      ) : eventSchedule === undefined || answers === undefined ? (
+      {errorType !== undefined ? (
+        <AnswerPageError errorType={errorType} />
+      ) : eventId === undefined ||
+        eventSchedule === undefined ||
+        answers === undefined ? (
         <Spinner />
       ) : (
         <>
@@ -69,11 +65,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               isExpired={isExpired}
             />
             <ButtonsWrapperAlignEnd>
-              <BpButton
-                intent='none'
-                icon='cog'
-                text={vt.eventInfo.editButton}
-                onClick={onEditButtonClick}
+              <GoToEditPageButton
+                email={eventSchedule.notificationSettings.email}
+                onConfirmClick={onEditButtonClick}
               />
             </ButtonsWrapperAlignEnd>
           </Section>
@@ -174,10 +168,6 @@ const Title = styled.a`
   font-weight: bold;
   color: black !important;
   text-decoration: none !important;
-`;
-
-const ErrorMessageWrapper = styled.div`
-  margin: 20px;
 `;
 
 const TableWrapper = styled.div`

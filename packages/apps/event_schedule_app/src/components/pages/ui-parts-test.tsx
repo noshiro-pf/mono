@@ -1,13 +1,14 @@
 import { Button, TextArea } from '@blueprintjs/core';
+import {
+  BpInput,
+  BpSelect,
+  BpSwitch,
+  BpTimePicker,
+} from '@mono/react-blueprintjs-utils';
 import { memoNamed, useToggleState } from '@mono/react-utils';
 import React, { CSSProperties, useState } from 'react';
 import styled from 'styled-components';
-import { createIHoursMinutes } from '../../types/record/base/hours-minutes';
 import { clog } from '../../utils/log';
-import { BpInput } from '../atoms/blueprint-js-wrapper/bp-input';
-import { BpSelect } from '../atoms/blueprint-js-wrapper/bp-select';
-import { BpSwitch } from '../atoms/blueprint-js-wrapper/bp-switch';
-import { BpTimePicker } from '../atoms/blueprint-js-wrapper/bp-time-picker';
 import {
   CalendarIcon,
   CircleIcon,
@@ -91,10 +92,7 @@ export const UiPartsTest = memoNamed<Record<string, void>>(
           <Button intent='none'>none</Button>
         </PadWrapper>
         <PadWrapper>
-          <BpTimePicker
-            time={createIHoursMinutes({ hours: 12, minutes: 34 })}
-            onTimeChange={clog}
-          />
+          <BpTimePicker time={{ hours: 12, minutes: 34 }} onTimeChange={clog} />
         </PadWrapper>
         <PadWrapper>
           <BpSelect onValueChange={noop}>

@@ -1,4 +1,4 @@
-import { IList, IRecord, IRecordType } from '../../utils/immutable';
+import { IList, IRecord } from '../../utils/immutable';
 import { DatetimeSpecificationEnumType } from '../enum/datetime-specification-type';
 import {
   fillAnswerSymbol,
@@ -18,18 +18,18 @@ import {
 } from './datetime-range';
 import { createIYmdHm, fillYmdHm, IYmdHm, PartialYmdHm } from './ymd-hm';
 
-type EventScheduleBaseType = {
+export type EventScheduleBaseType = {
   title: string;
   notes: string;
   datetimeSpecification: DatetimeSpecificationEnumType;
   datetimeRangeList: IList<IDatetimeRange>;
   useAnswerDeadline: boolean;
-  answerDeadline: IYmdHm;
-  usePassword: boolean;
-  password: string;
+  answerDeadline: IYmdHm | undefined;
+  customizeSymbolSettings: boolean;
   answerSymbolList: IList<IAnswerSymbol>;
   useNotification: boolean;
   notificationSettings: INotificationSettings;
+  timezoneOffsetMinutes: number;
 };
 
 export type PartialEventSchedule = Partial<
@@ -40,15 +40,16 @@ export type PartialEventSchedule = Partial<
     datetimeRangeList: readonly PartialDatetimeRange[];
     useAnswerDeadline: EventScheduleBaseType['useAnswerDeadline'];
     answerDeadline: PartialYmdHm;
-    usePassword: EventScheduleBaseType['usePassword'];
-    password: EventScheduleBaseType['password'];
+    customizeSymbolSettings: EventScheduleBaseType['customizeSymbolSettings'];
     answerSymbolList: readonly PartialAnswerSymbol[];
     useNotification: EventScheduleBaseType['useNotification'];
     notificationSettings: PartialNotificationSettings;
+    timezoneOffsetMinutes: EventScheduleBaseType['timezoneOffsetMinutes'];
   }>
 >;
 
-export type IEventSchedule = IRecordType<EventScheduleBaseType>;
+export type IEventSchedule = IRecord<EventScheduleBaseType> &
+  Readonly<EventScheduleBaseType>;
 
 const IEventScheduleRecordFactory = IRecord<EventScheduleBaseType>({
   title: '',
@@ -57,11 +58,11 @@ const IEventScheduleRecordFactory = IRecord<EventScheduleBaseType>({
   datetimeRangeList: IList<IDatetimeRange>(),
   useAnswerDeadline: false,
   answerDeadline: createIYmdHm(),
-  usePassword: false,
-  password: '',
+  customizeSymbolSettings: false,
   answerSymbolList: IList<IAnswerSymbol>(),
   useNotification: false,
   notificationSettings: createINotificationSettings(),
+  timezoneOffsetMinutes: new Date().getTimezoneOffset(),
 });
 
 export const createIEventSchedule: (
@@ -69,23 +70,24 @@ export const createIEventSchedule: (
 ) => IEventSchedule = IEventScheduleRecordFactory;
 
 const d = IEventScheduleRecordFactory();
-export const fillEventSchedule = (p: PartialEventSchedule): IEventSchedule =>
+export const fillEventSchedule = (p?: PartialEventSchedule): IEventSchedule =>
   createIEventSchedule({
-    title: p.title ?? d.title,
-    notes: p.notes ?? d.notes,
-    datetimeSpecification: p.datetimeSpecification ?? d.datetimeSpecification,
-    datetimeRangeList: IList(p.datetimeRangeList ?? d.datetimeRangeList).map(
+    title: p?.title ?? d.title,
+    notes: p?.notes ?? d.notes,
+    datetimeSpecification: p?.datetimeSpecification ?? d.datetimeSpecification,
+    datetimeRangeList: IList(p?.datetimeRangeList ?? d.datetimeRangeList).map(
       fillDatetimeRange
     ),
-    useAnswerDeadline: p.useAnswerDeadline ?? d.useAnswerDeadline,
-    answerDeadline: fillYmdHm(p.answerDeadline ?? d.answerDeadline),
-    usePassword: p.usePassword ?? d.usePassword,
-    password: p.password ?? d.password,
-    answerSymbolList: IList(p.answerSymbolList ?? d.answerSymbolList).map(
+    useAnswerDeadline: p?.useAnswerDeadline ?? d.useAnswerDeadline,
+    answerDeadline: fillYmdHm(p?.answerDeadline ?? d.answerDeadline),
+    customizeSymbolSettings:
+      p?.customizeSymbolSettings ?? d.customizeSymbolSettings,
+    answerSymbolList: IList(p?.answerSymbolList ?? d.answerSymbolList).map(
       fillAnswerSymbol
     ),
-    useNotification: p.useNotification ?? d.useNotification,
+    useNotification: p?.useNotification ?? d.useNotification,
     notificationSettings: fillNotificationSettings(
-      p.notificationSettings ?? d.notificationSettings
+      p?.notificationSettings ?? d.notificationSettings
     ),
+    timezoneOffsetMinutes: p?.timezoneOffsetMinutes ?? d.timezoneOffsetMinutes,
   });
