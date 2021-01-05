@@ -15,11 +15,11 @@ export const products: {
   libraries: [
     {
       link:
-        'https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs2',
-      title: 'rnjs2（開発中）',
+        'https://github.com/noshiro-pf/mono/tree/master/packages/utils/sync-flow',
+      title: 'SyncFlow（開発中）',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
       body1:
-        'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じくRxJSで発生しうる「グリッチ」という現象が起きないようにしたものだが、rnjs v1で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。',
+        'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。',
       body2: 'TypeScriptで実装中。（最終更新：2020年7月）',
       imageUrl: '',
     },
@@ -42,7 +42,7 @@ export const products: {
       subtitle: 'イベントのスケジュール調整用アプリケーション',
       body1: '',
       body2:
-        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2020年12月05日）',
+        'React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（最終更新：2020年1月05日）',
       imageUrl: EventScheduleApp2Image,
     },
     {
