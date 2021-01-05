@@ -6,18 +6,15 @@ A monorepo for nodejs projects.
 
 -   [ ] fix lint errors
     -   [ ] packages/apps/lambda_calculus_interpreter
-    -   [ ] packages/utils/rnjs2
+    -   [ ] packages/utils/sync-flow
 -   utils
     -   [ ] add ts-utils
         -   array reduce(foldl, foldr), filter, reverse
         -   iterator utils
-    -   rnjs2
+    -   sync-flow
         -   implement operators
         -   publish
-        -   rename "rnjs" -> "SyncFlow"
 -   implement apps
-    -   [ ] event_schedule_app
-        -   fix forceUpdateValue
     -   [ ] annotation-tool
 -   optional
     -   move packages from `/experimental` to `/packages`
