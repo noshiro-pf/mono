@@ -9,7 +9,7 @@
     "fb": "firebase",
     "firebase": "firebase",
     "get": "node src/get.js",
-    "lint": "eslint \"src/**/*\"",
+    "lint": "eslint src/ --ext .ts",
     "logs": "firebase functions:log",
     "seeconfig": "firebase functions:config:get",
     "serve": "yarn build && firebase emulators:start --only functions",

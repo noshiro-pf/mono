@@ -22,7 +22,7 @@
     "genpipabletypedef": "node \"${npm_package_config_gen_pipable_def}\" ${npm_package_config_pipable_max_length} \"${npm_package_config_pipable_ts_path}\"",
     "postgenpipabletypedef": "yarn _script_formatglob \"${npm_package_config_pipable_ts_path}\"",
     "gi": "yarn _script_genindex ./src",
-    "lint": "eslint src/ --ext .js,.ts",
+    "lint": "eslint src/ --ext .ts",
     "setup": "npm-run-all setup:*",
     "setup:genpipabletypedef_script": "tsc --project \"${npm_package_config_gen_pipable_ts_config}\"",
     "presetup:preview": "yarn clean:preview_script",

@@ -10,7 +10,7 @@
     "fb": "firebase",
     "firebase": "firebase",
     "getconfig": "firebase functions:config:get",
-    "lint": "eslint \"src/**/*\"",
+    "lint": "eslint src/ --ext .ts",
     "logs": "firebase functions:log",
     "serve": "yarn build && firebase emulators:start --only functions",
     "setconfig": "firebase functions:config:set",

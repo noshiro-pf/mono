@@ -20,6 +20,7 @@ targets=(
 
   # dependencies: [react-utils, react-utils-styled, resize-observer-hooks, ts-utils]
   "react-material-ui-utils"
+  "react-blueprintjs-utils"
 )
 
 THIS_SCRIPT_DIR=$(cd $(dirname $0); pwd)

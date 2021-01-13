@@ -20,7 +20,7 @@
     "genpipetypedef": "node \"${npm_package_config_gen_pipe_typedef}\" ${npm_package_config_pipe_max_length} \"${npm_package_config_pipe_ts_path}\"",
     "postgenpipetypedef": "yarn _script_formatglob \"${npm_package_config_pipe_ts_path}\"",
     "gi": "yarn _script_genindex ./src",
-    "lint": "eslint src/ --ext .js,.ts",
+    "lint": "eslint src/ --ext .ts",
     "setup": "npm-run-all setup:*",
     "setup:genpipetypedef_script": "tsc --project \"${npm_package_config_gen_pipe_type_ts_config}\"",
     "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
