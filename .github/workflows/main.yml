@@ -2,31 +2,33 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [master]
+    paths-ignore:
+      - 'docs/**'
+      - 'experimental/**'
+      - '**.md'
+      - '**.txt'
   pull_request:
     branches: [master]
+    paths-ignore:
+      - 'docs/**'
+      - 'experimental/**'
+      - '**.md'
+      - '**.txt'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  skipci:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "[skip ci] ${{ contains(github.event.head_commit.message, '[skip ci]') }}"
-          echo "commit message: ${{ github.event.head_commit.message }}"
-
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, '[skip ci]') == false
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -44,7 +46,7 @@ jobs:
 
       - name: setup
         run: yarn setup:all
-      
+
       - name: lint
         run: yarn lint:all
 
