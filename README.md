@@ -18,3 +18,6 @@ A monorepo for nodejs projects.
     -   [ ] annotation-tool
 -   optional
     -   move packages from `/experimental` to `/packages`
+-   workflow
+    -   add Lighthouse CI
+    -   build apps
