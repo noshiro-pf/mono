@@ -2,6 +2,20 @@ import { memoNamed } from '@mono/react-utils';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
+export const CodeArea = memoNamed<{
+  value: string;
+  valueChange?: (value: string) => void;
+  className?: string;
+}>('CodeArea', ({ value, valueChange = () => undefined, className }) => {
+  const onChange = useCallback(
+    (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+      valueChange(ev.target.value ?? '');
+    },
+    [valueChange]
+  );
+  return <Styled className={className} value={value} onChange={onChange} />;
+});
+
 const Styled = styled.textarea`
   /* size */
   overflow: hidden;
@@ -25,19 +39,3 @@ const Styled = styled.textarea`
     color: #ffffff91;
   }
 `;
-
-export const CodeArea = memoNamed<
-  Readonly<{
-    value: string;
-    valueChange?: (value: string) => void;
-    className?: string;
-  }>
->('CodeArea', ({ value, valueChange = () => undefined, className }) => {
-  const onChange = useCallback(
-    (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
-      valueChange(ev.target.value || '');
-    },
-    [valueChange]
-  );
-  return <Styled className={className} value={value} onChange={onChange} />;
-});

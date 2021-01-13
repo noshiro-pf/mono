@@ -3,6 +3,32 @@ import React from 'react';
 import styled from 'styled-components';
 import { CodeArea } from './input-area';
 
+export const MainView = memoNamed<{
+  inputAreaString: string;
+  inputAreaStringChange: (value: string) => void;
+  outputAreaString: string;
+}>(
+  'MainView',
+  ({ inputAreaString, inputAreaStringChange, outputAreaString }) => (
+    <Root>
+      <Title>(Untyped) lambda calculus</Title>
+      <Description>expr ::= x | (lambda x. expr) | (expr expr)</Description>
+      <TextAreaWrapper>
+        <div>Input:</div>
+        <InputAreaStyled
+          value={inputAreaString}
+          valueChange={inputAreaStringChange}
+        />
+      </TextAreaWrapper>
+
+      <TextAreaWrapper>
+        <div>Output:</div>
+        <OutputAreaStyled value={outputAreaString} />
+      </TextAreaWrapper>
+    </Root>
+  )
+);
+
 const Root = styled.div`
   padding: 10px;
 `;
@@ -33,31 +59,3 @@ const OutputAreaStyled = styled(CodeAreaStyled)`
   min-height: 500px;
   max-height: 800px;
 `;
-
-export const MainView = memoNamed<
-  Readonly<{
-    inputAreaString: string;
-    inputAreaStringChange: (value: string) => void;
-    outputAreaString: string;
-  }>
->(
-  'MainView',
-  ({ inputAreaString, inputAreaStringChange, outputAreaString }) => (
-    <Root>
-      <Title>(Untyped) lambda calculus</Title>
-      <Description>expr ::= x | (lambda x. expr) | (expr expr)</Description>
-      <TextAreaWrapper>
-        <div>Input:</div>
-        <InputAreaStyled
-          value={inputAreaString}
-          valueChange={inputAreaStringChange}
-        />
-      </TextAreaWrapper>
-
-      <TextAreaWrapper>
-        <div>Output:</div>
-        <OutputAreaStyled value={outputAreaString} />
-      </TextAreaWrapper>
-    </Root>
-  )
-);

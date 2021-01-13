@@ -1,11 +1,13 @@
+import { LambdaTerm } from '../../types/lambda-term';
 import { isAlphaEqual } from '../is-alpha-equal';
 import { isNumber } from '../macro/is-number';
-import { parse } from '../parser/parse';
+import { PLUS } from '../macro/plus';
+import { SUCC } from '../macro/succ';
 
-export const hasMacro = (term: any): boolean => {
+export const hasMacro = (term: LambdaTerm): boolean => {
   // ToDo
-  if (isAlphaEqual(term, parse('PLUS'))) return true;
-  if (isAlphaEqual(term, parse('SUCC'))) return true;
+  if (isAlphaEqual(term, PLUS)) return true;
+  if (isAlphaEqual(term, SUCC)) return true;
   if (isNumber(term)) return true;
   return false;
 };

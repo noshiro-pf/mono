@@ -1,15 +1,15 @@
-import { LAMBDA } from '../../constants/lambda';
+import { LambdaTerm } from '../../types/lambda-term';
 import { isAbstraction } from '../is-abstraction';
 import { isApplication } from '../is-application';
 import { isVariable } from '../is-variable';
 import { termEq } from '../term-eq';
 import { substitute } from './substitute';
 
-export const betaReduction1step = (term: any): any => {
+export const betaReduction1step = (term: LambdaTerm): LambdaTerm => {
   // console.log( 'betaReduction1step', term );
   if (isVariable(term)) return term;
   if (isAbstraction(term)) {
-    return [LAMBDA, term[1], betaReduction1step(term[2])];
+    return ['lambda', term[1], betaReduction1step(term[2])];
   }
   if (isApplication(term)) {
     const left = term[0];
@@ -27,6 +27,6 @@ export const betaReduction1step = (term: any): any => {
       }
     }
   }
-  console.error(`Syntax error: "${term}" is not lambda term.`);
+  console.error(`Syntax error: "${JSON.stringify(term)}" is not lambda term.`);
   return term;
 };

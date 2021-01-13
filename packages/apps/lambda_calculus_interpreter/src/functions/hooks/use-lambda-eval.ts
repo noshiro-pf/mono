@@ -1,8 +1,10 @@
 import { useDataStream } from '@mono/react-rxjs-utils';
+import { isNotUndefined } from '@mono/ts-utils';
 import { Observable } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
+import { debounceTime, filter, map } from 'rxjs/operators';
+import { LambdaTerm } from '../../types/lambda-term';
 import { evalSequence } from '../evaluator/eval-sequence';
-import { parse } from '../parser/parse';
+import { parseLambdaTerm } from '../parser/parse-lambda-term';
 import { termToString } from '../print/term-to-string';
 // import { splitToTokens } from '../parser/split-to-tokens';
 // import { isLambdaTerm } from '../is-lambda-term';
@@ -15,9 +17,9 @@ export const useLambdaEval = (
     input$.pipe(debounceTime(200 /* ms */))
   );
 
-  const parseTree$ = useDataStream<undefined | string | any[]>(
+  const parseTree$ = useDataStream<LambdaTerm | undefined>(
     undefined,
-    inputBuffered$.pipe(map(parse))
+    inputBuffered$.pipe(map(parseLambdaTerm))
   );
 
   // const parseTreeToStr$ = useDataStream<string>(
@@ -25,9 +27,9 @@ export const useLambdaEval = (
   //   parseTree$.pipe(map(termToString))
   // );
 
-  const evalSequence$ = useDataStream<any[]>(
+  const evalSequence$ = useDataStream<LambdaTerm[]>(
     [],
-    parseTree$.pipe(map(evalSequence))
+    parseTree$.pipe(filter(isNotUndefined), map(evalSequence))
   );
 
   const evalSeqToStr$ = useDataStream<string[]>(

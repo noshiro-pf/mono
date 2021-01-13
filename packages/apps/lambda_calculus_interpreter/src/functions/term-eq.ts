@@ -1,8 +1,9 @@
+import { LambdaTerm } from '../types/lambda-term';
 import { isAbstraction } from './is-abstraction';
 import { isApplication } from './is-application';
 import { isVariable } from './is-variable';
 
-export const termEq = (term1: any, term2: any): boolean => {
+export const termEq = (term1: LambdaTerm, term2: LambdaTerm): boolean => {
   if (isVariable(term1) && isVariable(term2)) {
     return term1 === term2;
   }

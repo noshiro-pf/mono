@@ -1,26 +1,40 @@
+import { assertNotType, assertType, TypeExtends } from '@mono/ts-utils';
 import { Variable } from './variable';
 
-// type TLambdaTerm = Variable | [TLambdaTerm, TLambdaTerm] | ['lambda', Variable, TLambdaTerm]
-export type TLambdaTerm = Variable | LambdaApplication | LambdaAbstraction;
+export type LambdaTerm = Variable | LambdaApplication | LambdaAbstraction;
+export type LambdaApplication = readonly [LambdaTerm, LambdaTerm];
+export type LambdaAbstraction = readonly ['lambda', Variable, LambdaTerm];
 
-interface LambdaApplication {
-  // type: 'appli';
-  first: TLambdaTerm;
-  second: TLambdaTerm;
-}
+const l1 = 'x';
+const l2 = ['x', 'x'] as const;
+const l3 = ['x', ['y', 'y']] as const;
+const l4 = [
+  ['x', ['y', 'y']],
+  ['x', ['y', 'y']],
+] as const;
+const l5 = ['lambda', 'x', ['x', ['y', 'y']]] as const;
 
-interface LambdaAbstraction {
-  // type: 'abstr';
-  var: Variable;
-  body: TLambdaTerm;
-}
+assertType<TypeExtends<typeof l1, LambdaTerm>>();
+assertType<TypeExtends<typeof l1, Variable>>();
+assertNotType<TypeExtends<typeof l1, LambdaApplication>>();
+assertNotType<TypeExtends<typeof l1, LambdaAbstraction>>();
 
-const l1: TLambdaTerm = 'x';
-const l2: TLambdaTerm = { var: 'x', body: 'x' };
-const l3: TLambdaTerm = { var: 'x', body: { var: 'y', body: 'y' } };
-const l4: TLambdaTerm = {
-  first: { var: 'x', body: { var: 'y', body: 'y' } },
-  second: { var: 'x', body: { var: 'y', body: 'y' } },
-};
+assertType<TypeExtends<typeof l2, LambdaTerm>>();
+assertNotType<TypeExtends<typeof l2, Variable>>();
+assertType<TypeExtends<typeof l2, LambdaApplication>>();
+assertNotType<TypeExtends<typeof l2, LambdaAbstraction>>();
 
-console.log(l1, l2, l3, l4);
+assertType<TypeExtends<typeof l3, LambdaTerm>>();
+assertNotType<TypeExtends<typeof l3, Variable>>();
+assertType<TypeExtends<typeof l3, LambdaApplication>>();
+assertNotType<TypeExtends<typeof l3, LambdaAbstraction>>();
+
+assertType<TypeExtends<typeof l4, LambdaTerm>>();
+assertNotType<TypeExtends<typeof l4, Variable>>();
+assertType<TypeExtends<typeof l4, LambdaApplication>>();
+assertNotType<TypeExtends<typeof l4, LambdaAbstraction>>();
+
+assertType<TypeExtends<typeof l5, LambdaTerm>>();
+assertNotType<TypeExtends<typeof l5, Variable>>();
+assertNotType<TypeExtends<typeof l5, LambdaApplication>>();
+assertType<TypeExtends<typeof l5, LambdaAbstraction>>();

@@ -1,15 +1,17 @@
+import { LambdaTerm } from '../types/lambda-term';
 import { alphaConversion } from './evaluator/alpha-convertion';
 import { isAbstraction } from './is-abstraction';
 import { isApplication } from './is-application';
 import { isVariable } from './is-variable';
 
-export const isAlphaEqual = (term1: any, term2: any): boolean => {
+export const isAlphaEqual = (term1: LambdaTerm, term2: LambdaTerm): boolean => {
   if (isVariable(term1) && isVariable(term2)) {
     return term1 === term2;
   }
   if (isAbstraction(term1) && isAbstraction(term2)) {
-    if (term1[1] === term2[1]) return isAlphaEqual(term1[2], term2[2]);
-    else {
+    if (term1[1] === term2[1]) {
+      return isAlphaEqual(term1[2], term2[2]);
+    } else {
       const term2converted = alphaConversion(term1[1], term2);
       return isAlphaEqual(term1[2], term2converted[2]);
     }

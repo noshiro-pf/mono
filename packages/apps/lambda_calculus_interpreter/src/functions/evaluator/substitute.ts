@@ -1,4 +1,5 @@
-import { LAMBDA } from '../../constants/lambda';
+import { LambdaTerm } from '../../types/lambda-term';
+import { Variable } from '../../types/variable';
 import { getFreeVariables } from '../get-free-variables';
 import { isAbstraction } from '../is-abstraction';
 import { isApplication } from '../is-application';
@@ -16,7 +17,11 @@ import { alphaConversion } from './alpha-convertion';
  * (λy.M)[x := N]  = λy.(M[x := N]), if x ≠ y, provided y ∉ FV(N)
  * if y ∈ FV(N) then proceed α-conversion
  */
-export const substitute = (to: any, from: any, term: any): any => {
+export const substitute = (
+  to: LambdaTerm,
+  from: Variable,
+  term: LambdaTerm
+): LambdaTerm => {
   // console.log( 'substitute', to, from, term );
   if (isVariable(term)) {
     return term === from ? to : term;
@@ -25,20 +30,19 @@ export const substitute = (to: any, from: any, term: any): any => {
     return [substitute(to, from, term[0]), substitute(to, from, term[1])];
   }
   if (isAbstraction(term)) {
-    const arg = term[1];
-    const body = term[2];
+    const [, arg, body] = term;
 
     if (arg === from) return term;
 
     const freeVariables = getFreeVariables(to);
     if (!freeVariables.includes(arg)) {
-      return [LAMBDA, arg, substitute(to, from, body)];
+      return ['lambda', arg, substitute(to, from, body)];
     } else {
       const v = pickUpAvailableVariable(freeVariables);
       const converted = alphaConversion(v, term);
       return substitute(to, from, converted);
     }
   }
-  console.error(`Syntax error: "${term}" is not lambda term.`);
+  console.error(`Syntax error: "${JSON.stringify(term)}" is not lambda term.`);
   return term;
 };
