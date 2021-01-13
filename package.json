@@ -18,7 +18,6 @@
     "fmt:b": "yarn _script_formatchanged master",
     "fmt:st": "yarn _script_formatstaged",
     "fmt:ts": "yarn _script_formatglob \"./{packages,scripts,config}/**/*.{ts,tsx}\"",
-    "lint": "eslint packages/ --ext .ts,.tsx",
     "lint:all": "yarn workspaces run lint",
     "newapp": "scripts/create_new_react_app.sh",
     "newslides": "scripts/create_new_slides.sh",
