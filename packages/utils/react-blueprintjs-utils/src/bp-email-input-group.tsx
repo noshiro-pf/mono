@@ -1,6 +1,6 @@
 import { FormGroup, IInputGroupProps } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import { isEmailString } from '@mono/ts-utils';
+import { isEmailString, TinyObservable } from '@mono/ts-utils';
 import React from 'react';
 import styled from 'styled-components';
 import { BpInput } from './bp-input';
@@ -9,6 +9,8 @@ interface Props extends IInputGroupProps {
   formGroupLabel: string;
   onValueChange: (value: string) => void;
   invalidMessage?: string;
+  autoFocus?: boolean;
+  focus$?: TinyObservable<void>;
 }
 
 export const BpEmailInput = memoNamed<Props>(
@@ -20,6 +22,8 @@ export const BpEmailInput = memoNamed<Props>(
     disabled = false,
     placeholder = 'sample@gmail.com',
     invalidMessage = '有効なメールアドレスではありません',
+    autoFocus,
+    focus$,
     ...props
   }) => {
     const isEmailAddressResult = isEmailString(value ?? '');
@@ -33,6 +37,8 @@ export const BpEmailInput = memoNamed<Props>(
           value={value}
           onValueChange={onValueChange}
           disabled={disabled}
+          autoFocus={autoFocus}
+          focus$={focus$}
           {...props}
         />
         {disabled || isEmailAddressResult ? undefined : (
