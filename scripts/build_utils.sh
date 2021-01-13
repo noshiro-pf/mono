@@ -4,7 +4,7 @@ targets=(
   # no local dependency
   "ts-utils"
   "rnjs"
-  "rnjs2"
+  "sync-flow"
 
   # ts-utils dependent
   "react-router-utils"
