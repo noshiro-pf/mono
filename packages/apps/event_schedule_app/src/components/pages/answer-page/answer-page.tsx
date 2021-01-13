@@ -14,6 +14,7 @@ import { AnswerPageEventInfo } from '../../organisms/answer-page-event-info';
 import { AnswerTable } from '../../organisms/answer-table/answer-table';
 import { GoToEditPageButton } from '../../organisms/button-with-confirm/go-to-edit-page-button';
 import { MyAnswer } from '../../organisms/my-answer/my-answer';
+import { NotFoundPage } from '../not-found-page';
 import { useAnswerPageState } from './answer-page-hooks';
 import { AnswerPageError } from './error';
 
@@ -43,7 +44,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     isExpired,
   } = useAnswerPageState();
 
-  return (
+  return errorType !== undefined && errorType.type === 'not-found' ? (
+    <NotFoundPage />
+  ) : (
     <div>
       <TitleWrapper>
         <Title href={'../../'} target='_blank' rel='noopener noreferrer'>

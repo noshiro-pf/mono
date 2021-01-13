@@ -15,9 +15,6 @@ export const FetchEventScheduleError = memoNamed<Props>(
   'AnswerPageError',
   ({ errorType }) => (
     <ErrorMessageWrapper>
-      {errorType === 'not-found' ? (
-        <Description color={errorFontColor} text={vt.eventScheduleNotFound} />
-      ) : undefined}
       {errorType === 'others' ? (
         <Description color={errorFontColor} text={vt.eventScheduleOtherError} />
       ) : undefined}

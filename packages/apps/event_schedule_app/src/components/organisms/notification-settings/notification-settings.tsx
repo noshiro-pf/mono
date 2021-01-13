@@ -1,5 +1,6 @@
 import { BpCheckbox, BpEmailInput } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
+import { TinyObservable } from '@mono/ts-utils';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
@@ -11,6 +12,7 @@ interface Props {
   onNotificationSettingsChange: (value: INotificationSettings) => void;
   disabled: boolean;
   useAnswerDeadline: boolean;
+  focusEmailInput$: TinyObservable<void>;
 }
 
 const vt = texts.eventSettingsPage.section3;
@@ -22,6 +24,7 @@ export const NotificationSettings = memoNamed<Props>(
     onNotificationSettingsChange,
     disabled,
     useAnswerDeadline,
+    focusEmailInput$,
   }) => {
     const onEmailChange = useCallback(
       (email: string) => {
@@ -84,6 +87,7 @@ export const NotificationSettings = memoNamed<Props>(
       <div>
         <WidthRestrictedInputWrapper>
           <BpEmailInput
+            focus$={focusEmailInput$}
             formGroupLabel={vt.emailAddress}
             value={notificationSettings.email}
             onValueChange={onEmailChange}

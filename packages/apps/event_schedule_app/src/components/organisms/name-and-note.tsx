@@ -22,6 +22,7 @@ export const NameAndNotes = memoNamed<Props>('NameAndNotes', (props) => (
         placeholder={vt.eventNamePlaceholder}
         value={props.title}
         onValueChange={props.onTitleChange}
+        autoFocus={true}
       />
     </FormGroup>
     <FormGroup label={vt.notes}>

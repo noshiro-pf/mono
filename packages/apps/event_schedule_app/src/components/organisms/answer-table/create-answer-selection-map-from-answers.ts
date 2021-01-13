@@ -7,11 +7,11 @@ export const createAnswerSelectionMapFromAnswers = (
   answers: IList<IAnswer>
 ): IMap<IAnswerSelectionMapKey, AnswerSymbolIconId | undefined> =>
   IMap(
-    answers.flatMap(({ userName, selection }) =>
+    answers.flatMap(({ id, selection }) =>
       selection.map((s) => [
         createAnswerSelectionMapKey({
           datetimeRange: s.datetimeRange,
-          userName,
+          answerId: id,
         }),
         s.iconId,
       ])

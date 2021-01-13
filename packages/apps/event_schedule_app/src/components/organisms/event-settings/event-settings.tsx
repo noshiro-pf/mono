@@ -1,7 +1,7 @@
 import { BpDatetimePicker, Ymdhm } from '@mono/react-blueprintjs-utils';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed, useTinyObservable } from '@mono/react-utils';
 import { mapNullable } from '@mono/ts-utils';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
@@ -52,50 +52,86 @@ const onYmdHmChangeFn = (
   );
 };
 
-export const EventSettings = memoNamed<Props>('EventSettings', (props) => (
-  <Root>
-    <ParagraphWithSwitch
-      title={vt.answerDeadline}
-      description={vt.howAnswerDeadlineIsUsed}
-      show={props.useAnswerDeadline}
-      onToggle={props.onToggleAnswerDeadline}
-      elementToToggle={
-        <BpDatetimePicker
-          ymdhm={toYmdhm(props.answerDeadline)}
-          onYmdhmChange={onYmdHmChangeFn(props.onAnswerDeadlineChange)}
-          disabled={!props.useAnswerDeadline}
-        />
+export const EventSettings = memoNamed<Props>(
+  'EventSettings',
+  ({
+    useAnswerDeadline,
+    onToggleAnswerDeadline,
+    answerDeadline,
+    onAnswerDeadlineChange,
+    customizeSymbolSettings,
+    onToggleCustomizeSymbolSettings,
+    answerSymbolList,
+    onAnswerSymbolListChange,
+    useNotification,
+    onToggleUseNotification,
+    notificationSettings,
+    onNotificationSettingsChange,
+  }) => {
+    const focusEmailInput$ = useTinyObservable<void>();
+
+    const [clickedMoreThanOnce, setClickedMoreThanOnce] = useState<boolean>(
+      false
+    );
+
+    const onToggleUseNotificationLocal = useCallback(() => {
+      onToggleUseNotification();
+      setClickedMoreThanOnce(true);
+    }, [onToggleUseNotification]);
+
+    useEffect(() => {
+      if (useNotification && clickedMoreThanOnce) {
+        focusEmailInput$.next();
       }
-    />
-    <hr />
-    <ParagraphWithSwitch
-      title={vt.useNotification}
-      show={props.useNotification}
-      onToggle={props.onToggleUseNotification}
-      elementToToggle={
-        <NotificationSettings
-          notificationSettings={props.notificationSettings}
-          onNotificationSettingsChange={props.onNotificationSettingsChange}
-          disabled={!props.useNotification}
-          useAnswerDeadline={props.useAnswerDeadline}
+    }, [useNotification, focusEmailInput$, clickedMoreThanOnce]);
+
+    return (
+      <Root>
+        <ParagraphWithSwitch
+          title={vt.answerDeadline}
+          description={vt.howAnswerDeadlineIsUsed}
+          show={useAnswerDeadline}
+          onToggle={onToggleAnswerDeadline}
+          elementToToggle={
+            <BpDatetimePicker
+              ymdhm={toYmdhm(answerDeadline)}
+              onYmdhmChange={onYmdHmChangeFn(onAnswerDeadlineChange)}
+              disabled={!useAnswerDeadline}
+            />
+          }
         />
-      }
-    />
-    <hr />
-    <ParagraphWithSwitch
-      title={vt.symbolSettings}
-      show={props.customizeSymbolSettings}
-      onToggle={props.onToggleCustomizeSymbolSettings}
-      elementToToggle={
-        <SymbolSettings
-          answerSymbolList={props.answerSymbolList}
-          onAnswerSymbolListChange={props.onAnswerSymbolListChange}
-          disabled={!props.customizeSymbolSettings}
+        <hr />
+        <ParagraphWithSwitch
+          title={vt.useNotification}
+          show={useNotification}
+          onToggle={onToggleUseNotificationLocal}
+          elementToToggle={
+            <NotificationSettings
+              notificationSettings={notificationSettings}
+              onNotificationSettingsChange={onNotificationSettingsChange}
+              disabled={!useNotification}
+              useAnswerDeadline={useAnswerDeadline}
+              focusEmailInput$={focusEmailInput$}
+            />
+          }
         />
-      }
-    />
-  </Root>
-));
+        <hr />
+        <ParagraphWithSwitch
+          title={vt.symbolSettings}
+          show={customizeSymbolSettings}
+          onToggle={onToggleCustomizeSymbolSettings}
+          elementToToggle={
+            <SymbolSettings
+              answerSymbolList={answerSymbolList}
+              onAnswerSymbolListChange={onAnswerSymbolListChange}
+              disabled={!customizeSymbolSettings}
+            />
+          }
+        />
+      </Root>
+    );
+  }
+);
 
 const Root = styled.div`
   padding: 10px;

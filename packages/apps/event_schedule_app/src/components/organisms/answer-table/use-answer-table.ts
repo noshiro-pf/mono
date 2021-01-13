@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import { AnswerId } from '../../../types/phantom';
 import { IAnswer } from '../../../types/record/answer';
 import { IDatetimeRange } from '../../../types/record/datetime-range';
 import { IEventSchedule } from '../../../types/record/event-schedule';
@@ -19,10 +20,10 @@ export const useAnswerTable = (
   const answerSelectionMapFn = useCallback(
     (
       datetimeRange: IDatetimeRange,
-      userName: string
+      answerId: AnswerId
     ): AnswerSymbolIconId | undefined =>
       answerSelectionMap.get(
-        createAnswerSelectionMapKey({ datetimeRange, userName })
+        createAnswerSelectionMapKey({ datetimeRange, answerId })
       ),
     [answerSelectionMap]
   );
