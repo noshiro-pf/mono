@@ -5,7 +5,6 @@ A monorepo for nodejs projects.
 ## TODO
 
 -   [ ] fix lint errors
-    -   [ ] packages/apps/lambda_calculus_interpreter
     -   [ ] packages/utils/sync-flow
 -   utils
     -   [ ] add ts-utils
@@ -16,6 +15,8 @@ A monorepo for nodejs projects.
         -   publish
 -   implement apps
     -   [ ] annotation-tool
+    -   lambda_calculus_interpreter
+        -   add tests
 -   optional
     -   move packages from `/experimental` to `/packages`
 -   workflow

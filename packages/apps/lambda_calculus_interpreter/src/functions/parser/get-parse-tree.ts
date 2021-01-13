@@ -1,48 +1,54 @@
-import { LAMBDA } from '../../constants/lambda';
+import { LambdaTerm } from '../../types/lambda-term';
 import { isVariable } from '../is-variable';
-import { tokenListIsLambdaTerm } from './token-list-is-lambda-term';
+import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term';
 
 /**
  * e ::= x | (lambda x.e) | (e e)
  * */
-export const getParseTree = (tokens: string[]): any => {
-  if (!tokens || tokens.length < 1) {
+export const getParseTree = (tokens: string[]): LambdaTerm | undefined => {
+  if (tokens.length < 1) {
     console.error(`invalid tokens passed: "${JSON.stringify(tokens)}"`);
     return undefined;
   }
 
   /* x? */
-  if (tokens.length === 1) return tokens[0];
+  if (tokens.length === 1 && isVariable(tokens[0])) return tokens[0];
 
   /* (lambda x.e)? */
   if (
+    tokens.length >= 6 &&
     tokens[0] === '(' &&
-    tokens[1] === LAMBDA &&
+    tokens[1] === 'lambda' &&
     isVariable(tokens[2]) &&
     tokens[3] === '.' &&
-    tokenListIsLambdaTerm(tokens.slice(4, tokens.length - 1)) &&
+    tokensRepresentsLambdaTerm(tokens.slice(4, tokens.length - 1)) &&
     tokens[tokens.length - 1] === ')'
   ) {
-    return [
-      LAMBDA,
-      tokens[2],
-      getParseTree(tokens.slice(4, tokens.length - 1)),
-    ];
+    const body = getParseTree(tokens.slice(4, tokens.length - 1));
+    if (body === undefined) return undefined;
+    return ['lambda', tokens[2], body];
   }
 
   /* (e e)? */
-  if (tokens[0] === '(' && tokens[tokens.length - 1] === ')') {
+  if (
+    tokens.length >= 3 &&
+    tokens[0] === '(' &&
+    tokens[tokens.length - 1] === ')'
+  ) {
     for (let sep = 1; sep < tokens.length - 1; ++sep) {
       const leftTokens = tokens.slice(1, sep);
       const rightTokens = tokens.slice(sep, tokens.length - 1);
       if (
-        tokenListIsLambdaTerm(leftTokens) &&
-        tokenListIsLambdaTerm(rightTokens)
+        tokensRepresentsLambdaTerm(leftTokens) &&
+        tokensRepresentsLambdaTerm(rightTokens)
       ) {
-        return [getParseTree(leftTokens), getParseTree(rightTokens)];
+        const left = getParseTree(leftTokens);
+        const right = getParseTree(rightTokens);
+        if (left === undefined || right === undefined) return undefined;
+        return [left, right];
       }
     }
   }
 
-  return tokens;
+  return undefined;
 };

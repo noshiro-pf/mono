@@ -1,14 +1,15 @@
 import { MAX_STEPS } from '../../constants/max-steps';
+import { LambdaTerm } from '../../types/lambda-term';
 import { isLambdaTerm } from '../is-lambda-term';
 import { termEq } from '../term-eq';
 import { evaluate1step } from './eval-1-step';
 
-export const evalSequence = (term: any) => {
-  if (!term || !isLambdaTerm(term)) return [];
+export const evalSequence = (term: LambdaTerm): LambdaTerm[] => {
+  if (!isLambdaTerm(term)) return [];
   let curr = term;
   // let prev = undefined;
 
-  const seq = [];
+  const seq: LambdaTerm[] = [];
   seq.push(term);
 
   for (let counter = MAX_STEPS; counter-- > 0; ) {

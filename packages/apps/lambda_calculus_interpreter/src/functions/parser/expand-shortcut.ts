@@ -1,7 +1,6 @@
-import { LAMBDA } from '../../constants/lambda';
 import { numberLambdaTerm } from '../macro/number';
-import { PLUS } from '../macro/plus';
-import { SUCC } from '../macro/succ';
+import { PLUStokens } from '../macro/plus';
+import { SUCCtokens } from '../macro/succ';
 
 export const expandShortcuts = (tokens: string[]): string[] => {
   const expanded: string[] = [];
@@ -14,14 +13,14 @@ export const expandShortcuts = (tokens: string[]): string[] => {
     }
     switch (token) {
       case 'SUCC':
-        expanded.push(...SUCC);
+        expanded.push(...SUCCtokens);
         break;
       case 'PLUS':
       case '+':
-        expanded.push(...PLUS);
+        expanded.push(...PLUStokens);
         break;
       case '\\':
-        expanded.push(LAMBDA);
+        expanded.push('lambda');
         break;
       default:
         expanded.push(token);

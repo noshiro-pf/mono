@@ -1,7 +1,7 @@
 import { Variable } from '../types/variable';
 
 // prettier-ignore
-export const ALPHABETS: ReadonlyArray<Variable> = [
+export const ALPHABETS: readonly Variable[] = [
   'a', 'b', 'c', 'd', 'e', 
   'f', 'g', 'h', 'i', 'j', 
   'k', 'l', 'm', 'n', 'o', 
