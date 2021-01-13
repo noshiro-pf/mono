@@ -38,9 +38,7 @@ jobs:
         run: yarn setup:all
       
       - name: lint
-        run: |
-          yarn lint
-          yarn lint:all
+        run: yarn lint:all
 
       - name: test
         run: yarn test:all
