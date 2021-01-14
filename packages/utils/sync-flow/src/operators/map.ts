@@ -1,4 +1,4 @@
-import { OperatorObservableClass, Observable } from '../abstract_class';
+import { Observable, OperatorObservableClass } from '../abstract_class';
 import { Operator } from '../types';
 import { monoParentTryUpdate, none } from '../util';
 
