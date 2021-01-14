@@ -7,7 +7,7 @@ import {
   getMonth,
   getYear,
 } from '@mono/ts-utils';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Ymdhm } from './types/ymdhm';
 
 const pad2 = (n: number): string => n.toString().padStart(2, '0');

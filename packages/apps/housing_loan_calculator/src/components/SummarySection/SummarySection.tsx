@@ -1,5 +1,4 @@
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import { viewTexts } from '../../constants/view-texts';
 import { RepaymentType } from '../../types/enum/repayment-type';
 import { DataItem } from './DataItem';

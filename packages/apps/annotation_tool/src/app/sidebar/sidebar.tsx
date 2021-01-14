@@ -1,6 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
 import { Percent } from '@mono/ts-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { Label } from '../../canvas/types/label';
 import { AppEventHandler } from '../event-handlers';

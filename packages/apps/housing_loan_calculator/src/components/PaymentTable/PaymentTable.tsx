@@ -1,7 +1,7 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import { seq } from '@mono/ts-utils';
-import React, { CSSProperties, useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import { viewTexts } from '../../constants/view-texts';
 import { RepaymentType } from '../../types/enum/repayment-type';
 

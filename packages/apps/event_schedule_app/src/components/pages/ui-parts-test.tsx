@@ -6,7 +6,7 @@ import {
   BpTimePicker,
 } from '@mono/react-blueprintjs-utils';
 import { memoNamed, useToggleState } from '@mono/react-utils';
-import React, { CSSProperties, useState } from 'react';
+import { CSSProperties, useState } from 'react';
 import styled from 'styled-components';
 import { clog } from '../../utils/log';
 import {

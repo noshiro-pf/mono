@@ -33,6 +33,6 @@
     "@mono/react-utils": "*",
     "@mono/rxjs-utils": "*",
     "@mono/ts-utils": "*",
-    "react": "^16.13.1"
+    "react": "^17.0.1"
   }
 }

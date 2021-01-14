@@ -1,6 +1,5 @@
 import { AnchorButton, NonIdealState } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import { texts } from '../../constants/texts';
 import { routePaths } from '../../routing/routing';
 

@@ -1,6 +1,6 @@
 import Slider from '@material-ui/core/Slider';
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 export const MuiSlider = memoNamed<
   Readonly<{

@@ -1,6 +1,6 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { memoNamed, useBooleanState } from '@mono/react-utils';
-import React, { CSSProperties, useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`

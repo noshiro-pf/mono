@@ -1,6 +1,6 @@
 import { Card } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { SectionTitle } from '../atoms/section-title';
 

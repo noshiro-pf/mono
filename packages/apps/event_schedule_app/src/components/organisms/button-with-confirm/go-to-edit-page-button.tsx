@@ -5,7 +5,7 @@ import {
   BpEmailInput,
 } from '@mono/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@mono/react-utils';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { texts } from '../../../constants/texts';
 import { Description } from '../../atoms/description';
 import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';

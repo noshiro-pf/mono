@@ -1,6 +1,6 @@
 import { Button, IButtonProps } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { CSSProperties, useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 
 interface Props extends IButtonProps, React.HTMLAttributes<HTMLElement> {
   nowrap?: boolean;

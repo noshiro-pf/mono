@@ -1,5 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { CSSProperties, useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import styled from 'styled-components';
 import { DayType } from '../../types/enum/day-type';
 import { IYearMonthDate } from '../../types/record/base/year-month-date';

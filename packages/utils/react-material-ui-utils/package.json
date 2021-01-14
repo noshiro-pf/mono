@@ -35,7 +35,7 @@
     "@mono/react-utils-styled": "*",
     "@mono/resize-observer-hooks": "*",
     "@mono/ts-utils": "*",
-    "react": "^16.13.1",
+    "react": "^17.0.1",
     "styled-components": "^5.1.1"
   }
 }

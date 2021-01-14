@@ -1,7 +1,7 @@
 import { IconName } from '@blueprintjs/core';
 import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import {
   AnswerSymbolIconId,

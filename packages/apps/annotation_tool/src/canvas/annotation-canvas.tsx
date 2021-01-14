@@ -1,6 +1,6 @@
 import { memoNamed } from '@mono/react-utils';
 import { Hue, RectSize } from '@mono/ts-utils';
-import React, { CSSProperties, useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import styled from 'styled-components';
 import SampleImage from '../assets/sample_image.jpg';
 import { CanvasMain } from './canvas-main';

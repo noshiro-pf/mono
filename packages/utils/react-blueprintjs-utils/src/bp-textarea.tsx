@@ -1,6 +1,6 @@
 import { ITextAreaProps, TextArea } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 interface Props extends ITextAreaProps {
   onValueChange: (value: string) => void;

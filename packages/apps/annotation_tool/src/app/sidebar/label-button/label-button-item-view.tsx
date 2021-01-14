@@ -1,7 +1,7 @@
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import { higherContrastTextColorHsl, Hsl, hslToStr } from '@mono/ts-utils';
-import React, { CSSProperties, useCallback, useMemo } from 'react';
+import { CSSProperties, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import {
   LabelButtonItemBodyDisabledStyled,

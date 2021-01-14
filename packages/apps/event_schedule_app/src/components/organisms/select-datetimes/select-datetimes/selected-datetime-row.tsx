@@ -4,7 +4,6 @@ import {
   YearMonthDate,
 } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
 import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';

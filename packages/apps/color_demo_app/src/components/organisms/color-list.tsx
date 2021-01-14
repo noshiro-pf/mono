@@ -1,6 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
 import { Hue, Mappable, Percent } from '@mono/ts-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { ColorItem } from '../atoms/color-item';
 

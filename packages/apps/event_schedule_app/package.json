@@ -62,8 +62,8 @@
     "firebase": "^8.1.2",
     "global": "^4.4.0",
     "immer": "^8.0.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.0",
     "rxjs": "^6.6.3",
     "styled-components": "^5.1.1"
   },

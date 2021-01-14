@@ -7,7 +7,6 @@ import {
 } from '@mono/react-rxjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import { Result } from '@mono/ts-utils';
-import React from 'react';
 import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import styled from 'styled-components';

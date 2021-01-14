@@ -2,7 +2,7 @@ import { HTMLInputProps, IInputGroupProps } from '@blueprintjs/core';
 import { DateInput, IDateInputProps } from '@blueprintjs/datetime';
 import { memoNamed } from '@mono/react-utils';
 import { getDate, getMonth, getYear } from '@mono/ts-utils';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { YearMonthDate } from './types/year-month-date';
 
 const formatDate = (date: Date): string => date.toLocaleDateString();

@@ -2,7 +2,7 @@ import { HTMLTable } from '@blueprintjs/core';
 import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import { roundBy } from '@mono/ts-utils';
-import React, { CSSProperties } from 'react';
+import { CSSProperties } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { IAnswer } from '../../../types/record/answer';

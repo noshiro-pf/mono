@@ -11,7 +11,7 @@ import {
   RectSize,
   zip,
 } from '@mono/ts-utils';
-import React, { useMemo, useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
 import { AnnotataionCanvas } from '../canvas/annotation-canvas';
 import {

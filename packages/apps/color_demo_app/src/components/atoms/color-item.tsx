@@ -1,6 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
 import { Hsl, hslToStr } from '@mono/ts-utils';
-import React from 'react';
 import styled from 'styled-components';
 
 const Box = styled.div`

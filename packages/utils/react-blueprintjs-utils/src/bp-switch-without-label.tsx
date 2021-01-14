@@ -1,6 +1,6 @@
 import { ISwitchProps, Switch } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { CSSProperties } from 'react';
+import { CSSProperties } from 'react';
 
 interface Props extends Omit<ISwitchProps, 'label' | 'labelElement'> {
   onToggle: () => void;

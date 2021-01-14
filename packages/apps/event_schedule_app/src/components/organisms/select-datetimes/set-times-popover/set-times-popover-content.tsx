@@ -1,6 +1,6 @@
 import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback, useReducer } from 'react';
+import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
