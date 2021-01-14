@@ -50,8 +50,8 @@
     ]
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.32.1",
-    "@blueprintjs/icons": "^3.21.0",
+    "@blueprintjs/core": "^3.36.0",
+    "@blueprintjs/icons": "^3.23.0",
     "@mono/react-utils": "*",
     "@mono/ts-utils": "*",
     "react": "^17.0.1",
