@@ -143,7 +143,7 @@ export class RN<T> {
   private valueInternal: T;
   private indexInternal: number;
 
-  private promiseResolver: (value?: T | PromiseLike<T> | undefined) => void;
+  private promiseResolver: (value: T | PromiseLike<T>) => void;
   private promiseRejector: (reason?: any) => void;
 
   constructor(initialValue: T, parents: RN<any>[], name: string) {
