@@ -1,6 +1,6 @@
 import { memoNamed } from '@mono/react-utils';
 import { Hsl, Percent } from '@mono/ts-utils';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Label } from '../../../canvas/types/label';
 import { AppEventHandler } from '../../event-handlers';
 import { LabelButtonItemView } from './label-button-item-view';

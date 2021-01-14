@@ -57,8 +57,8 @@
     "@mono/rxjs-utils": "*",
     "@mono/ts-utils": "*",
     "immutable": "^4.0.0-rc.12",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.0",
     "rxjs": "^6.6.3",
     "styled-components": "^5.1.1"
   },

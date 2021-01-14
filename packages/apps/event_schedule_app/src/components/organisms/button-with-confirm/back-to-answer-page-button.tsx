@@ -1,6 +1,5 @@
 import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import { texts } from '../../../constants/texts';
 import { ButtonWithConfirm } from './button-with-confirm';
 

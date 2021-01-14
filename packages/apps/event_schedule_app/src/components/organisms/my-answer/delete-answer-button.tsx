@@ -1,5 +1,4 @@
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import { texts } from '../../../constants/texts';
 import { ButtonWithConfirm } from '../button-with-confirm/button-with-confirm';
 

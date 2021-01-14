@@ -1,5 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { IList } from '../../immutable';
 import { HistogramView } from './histogram-view';
 

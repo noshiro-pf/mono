@@ -1,6 +1,6 @@
 import { BpSwitchWithoutLabel } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
 import { Description } from '../../atoms/description';
 

@@ -1,6 +1,6 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 export const MuiTabs = memoNamed<
   Readonly<{

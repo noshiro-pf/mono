@@ -1,5 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 const Root = styled.div`

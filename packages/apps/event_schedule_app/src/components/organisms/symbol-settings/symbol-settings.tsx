@@ -1,5 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';

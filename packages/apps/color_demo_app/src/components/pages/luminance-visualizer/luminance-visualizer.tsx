@@ -1,6 +1,6 @@
 import { memoNamed, useDebounce } from '@mono/react-utils';
 import { Hue, Percent } from '@mono/ts-utils';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { calcAll } from '../../../functions/calc-all';
 import { LuminanceVisualizerView } from './luminance-visualizer-view';
 

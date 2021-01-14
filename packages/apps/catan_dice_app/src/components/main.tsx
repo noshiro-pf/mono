@@ -5,7 +5,6 @@ import {
 } from '@mono/react-rxjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import { mapToConst } from '@mono/rxjs-utils';
-import React from 'react';
 import { interval, merge } from 'rxjs';
 import { map, scan, switchMapTo, take } from 'rxjs/operators';
 import { historyReducer } from '../functions/history-reducer';

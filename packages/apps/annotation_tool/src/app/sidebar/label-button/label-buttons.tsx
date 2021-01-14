@@ -1,7 +1,7 @@
 import { Button, Collapse } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
 import { Percent, tuple } from '@mono/ts-utils';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import { Label } from '../../../canvas/types/label';
 import { AppEventHandler } from '../../event-handlers';

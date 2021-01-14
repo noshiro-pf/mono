@@ -1,5 +1,4 @@
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import { texts } from '../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
 import { IDatetimeRange } from '../../../types/record/datetime-range';

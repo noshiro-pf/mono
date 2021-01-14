@@ -1,5 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { CSSProperties } from 'react';
+import { CSSProperties } from 'react';
 
 interface Props {
   size?: number;

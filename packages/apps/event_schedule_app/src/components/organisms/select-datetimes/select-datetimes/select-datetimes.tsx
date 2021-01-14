@@ -1,6 +1,5 @@
 import { BpButton, BpSelect } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';

@@ -1,13 +1,7 @@
 import { memoNamed } from '@mono/react-utils';
 import { hslaToRgba, Hue, RectSize, Rgba } from '@mono/ts-utils';
 import { Application, InteractionManager, settings } from 'pixi.js';
-import React, {
-  CSSProperties,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { addGlobalPointerEventListener } from './functions/add-pointer-event-listener';
 import { createGlobalPixiObjects } from './functions/create-global-pixi-objects';
 import {

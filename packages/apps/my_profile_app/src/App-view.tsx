@@ -2,7 +2,7 @@ import { AppBar } from '@material-ui/core';
 import { useNavigator, usePathNameList } from '@mono/react-router-utils';
 import { memoNamed } from '@mono/react-utils';
 import { last } from '@mono/ts-utils';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';

@@ -1,5 +1,4 @@
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { descriptionFontColor } from '../../constants/color';
 

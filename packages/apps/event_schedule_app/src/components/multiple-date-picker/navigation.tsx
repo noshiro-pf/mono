@@ -11,7 +11,7 @@ import {
   today,
   YearEnum,
 } from '@mono/ts-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 
 const thisYear = getYear(today());

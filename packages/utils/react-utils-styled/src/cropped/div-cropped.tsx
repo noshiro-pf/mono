@@ -1,6 +1,6 @@
 import { memoNamed } from '@mono/react-utils';
 import { Rect } from '@mono/ts-utils';
-import React, { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`

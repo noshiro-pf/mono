@@ -5,7 +5,7 @@ import {
   DialogContent,
   Typography,
 } from '@material-ui/core';
-import React, { FC, memo, useCallback } from 'react';
+import { FC, memo, useCallback } from 'react';
 
 type Props = Readonly<{
   message: string;

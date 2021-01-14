@@ -1,5 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 
 export const CodeArea = memoNamed<{

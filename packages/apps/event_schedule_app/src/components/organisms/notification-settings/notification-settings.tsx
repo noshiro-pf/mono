@@ -1,7 +1,7 @@
 import { BpCheckbox, BpEmailInput } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
 import { TinyObservable } from '@mono/ts-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { INotificationSettings } from '../../../types/record/base/notification-settings';

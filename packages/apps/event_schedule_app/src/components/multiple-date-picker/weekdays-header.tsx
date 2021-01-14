@@ -1,6 +1,6 @@
 import { memoNamed } from '@mono/react-utils';
 import { WeekDayEnum, weekdaysList } from '@mono/ts-utils';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 interface Props {

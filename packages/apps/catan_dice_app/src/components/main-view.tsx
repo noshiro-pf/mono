@@ -8,7 +8,6 @@ import {
   Paper,
 } from '@material-ui/core';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import DiceIcon from '../assets/dice-icon.png';
 import SumIcon from '../assets/sum-sign.png';

@@ -1,5 +1,4 @@
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import { products } from '../../contents/products';
 import { ProductsViewMobile } from './products-mobile-view/products-mobile-view';
 import { ProductsView } from './products-view/products-view';

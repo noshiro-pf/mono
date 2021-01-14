@@ -1,6 +1,5 @@
 import { memoNamed } from '@mono/react-utils';
 import { ImgWithPreview } from '@mono/react-utils-styled';
-import React from 'react';
 import { ImgWithLoadingCircle } from './img-with-loading-circle';
 
 type Props = Readonly<{

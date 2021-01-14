@@ -1,7 +1,6 @@
 import { FormGroup } from '@blueprintjs/core';
 import { BpInput, BpTextArea } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants/texts';
 import { WidthRestrictedInputWrapper } from '../styled/width-restricted-input-wrapper';

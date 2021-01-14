@@ -1,7 +1,6 @@
 import { Paper } from '@material-ui/core';
 import { memoNamed } from '@mono/react-utils';
 import { Hsl, Hue, Mappable, Percent } from '@mono/ts-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { ExperimentResult } from '../../../types/experiment-result';
 import { ContrastRatioList } from '../../molecules/contrast-ratio-list';

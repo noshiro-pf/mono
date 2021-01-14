@@ -1,6 +1,5 @@
 import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { IYearMonthDate } from '../../types/record/base/year-month-date';
 import { IList, IMap } from '../../utils/immutable';

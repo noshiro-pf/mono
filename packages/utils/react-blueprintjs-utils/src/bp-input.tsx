@@ -1,7 +1,7 @@
 import { IInputGroupProps, InputGroup } from '@blueprintjs/core';
 import { memoNamed, useTinyObservableEffect } from '@mono/react-utils';
 import { TinyObservable } from '@mono/ts-utils';
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 interface Props extends IInputGroupProps {
   onValueChange: (value: string) => void;

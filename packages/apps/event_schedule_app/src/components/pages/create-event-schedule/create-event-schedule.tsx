@@ -1,6 +1,5 @@
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { createIEventSchedule } from '../../../types/record/event-schedule';

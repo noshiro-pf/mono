@@ -1,6 +1,5 @@
 import { BpButton } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { IEventSchedule } from '../../../types/record/event-schedule';

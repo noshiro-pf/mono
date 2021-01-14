@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { redirects, routingList } from '../routing/routing';
 import { NotFoundPage } from './pages/not-found-page';

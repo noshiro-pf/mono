@@ -1,7 +1,6 @@
 import { AnchorButton, Classes, Spinner, Tooltip } from '@blueprintjs/core';
 import { BpButton, BpDialog } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants/texts';
 import { ButtonsWrapperAlignEnd } from '../molecules/buttons-wrapper';

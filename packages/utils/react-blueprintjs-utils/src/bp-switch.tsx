@@ -1,6 +1,6 @@
 import { ISwitchProps, Switch } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 interface Props extends ISwitchProps {
   onToggle: () => void;

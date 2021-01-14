@@ -1,7 +1,7 @@
 import { useNavigator, useQuery } from '@mono/react-router-utils';
 import { memoNamed, useDebounce } from '@mono/react-utils';
 import { mapNullable, pipe, stringToNumber } from '@mono/ts-utils';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppView } from './App-view';
 import { defaultValues } from './constants/default-values';
 import { calcAll } from './functions/calc-all';

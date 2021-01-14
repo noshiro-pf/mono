@@ -1,7 +1,7 @@
 import { BpDatetimePicker, Ymdhm } from '@mono/react-blueprintjs-utils';
 import { memoNamed, useTinyObservable } from '@mono/react-utils';
 import { mapNullable } from '@mono/ts-utils';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';

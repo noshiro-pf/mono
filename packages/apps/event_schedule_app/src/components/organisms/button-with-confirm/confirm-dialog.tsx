@@ -1,7 +1,6 @@
 import { IconName, Intent } from '@blueprintjs/core';
 import { BpAlert } from '@mono/react-blueprintjs-utils';
 import { memoNamed } from '@mono/react-utils';
-import React from 'react';
 
 interface Props {
   isOpen: boolean;

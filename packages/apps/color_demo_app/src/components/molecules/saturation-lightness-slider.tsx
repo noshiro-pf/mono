@@ -1,7 +1,6 @@
 import { MuiSlider } from '@mono/react-material-ui-utils';
 import { memoNamed } from '@mono/react-utils';
 import { Hue, Percent } from '@mono/ts-utils';
-import React from 'react';
 import styled from 'styled-components';
 import { DivisionNumberSlider } from './division-number-slider';
 import { FirstHueSlider } from './first-hue-slider';

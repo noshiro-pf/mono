@@ -1,6 +1,6 @@
 import { memoNamed } from '@mono/react-utils';
 import { useResizeObserver } from '@mono/resize-observer-hooks';
-import React, { CSSProperties, ReactNode, useMemo } from 'react';
+import { CSSProperties, ReactNode, useMemo } from 'react';
 import styled from 'styled-components';
 
 const Root = styled.div`

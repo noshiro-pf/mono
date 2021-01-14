@@ -17,7 +17,7 @@ import {
   whiteHsl,
   zip,
 } from '@mono/ts-utils';
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import styled from 'styled-components';
 
 const Root = styled.div`

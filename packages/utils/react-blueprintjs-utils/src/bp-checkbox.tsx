@@ -1,6 +1,6 @@
 import { Checkbox, ICheckboxProps } from '@blueprintjs/core';
 import { memoNamed } from '@mono/react-utils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 interface Props extends ICheckboxProps {
   checked: boolean;
