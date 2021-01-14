@@ -9,6 +9,7 @@
     "_script_formatchanged": "node scripts/format_changed",
     "_script_formatglob": "node scripts/format_glob",
     "_script_formatstaged": "node scripts/format_staged",
+    "build:apps": "scripts/build_apps.sh",
     "build:utils": "scripts/build_utils.sh",
     "clean:all": "npm-run-all --sequential clean:root clean:sub",
     "clean:root": "rimraf config/**/*.js scripts/**/*.js",
