@@ -52,3 +52,9 @@ jobs:
 
       - name: test
         run: yarn test:all
+
+      - name: build utils
+        run: yarn build:utils
+
+      - name: build apps
+        run: yarn build:apps
