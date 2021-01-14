@@ -1,4 +1,4 @@
-import { Operator, ObservableType, Subscriber, Subscription } from '../types';
+import { ObservableType, Operator, Subscriber, Subscription } from '../types';
 import {
   genId,
   IdType,
