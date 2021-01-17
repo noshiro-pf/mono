@@ -14,11 +14,11 @@
     "logs": "firebase functions:log",
     "serve": "yarn build && firebase emulators:start --only functions",
     "setconfig": "firebase functions:config:set",
-    "setup": "echo \"no setup script\"",
+    "setup": "echo 'no setup script'",
     "shell": "yarn build && firebase functions:shell",
     "showlog": "firebase functions:log",
     "start": "yarn shell",
-    "test": "echo \"no test script\""
+    "test": "echo 'no test script'"
   },
   "dependencies": {
     "firebase-admin": "^9.4.1",

@@ -12,11 +12,11 @@
     "deploy": "firebase deploy",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
-    "lint": "echo \"no lint script\"",
+    "lint": "echo 'no lint script'",
     "setup": "yarn setup:webpackconfig",
     "setup:webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\"",
     "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
-    "test": "echo \"no test\"",
+    "test": "echo 'no test script'",
     "watch": "webpack --watch"
   },
   "config": {
