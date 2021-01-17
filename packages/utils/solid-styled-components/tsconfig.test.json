@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jsxImportSource": "solid-js",
+    "noEmit": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "lib": ["dom", "es2015", "dom.iterable"],
+    "jsx": "preserve"
+  },
+  "include": ["./test"],
+  "exclude": ["node_modules"]
+}
