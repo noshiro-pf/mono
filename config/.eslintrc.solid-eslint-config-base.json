@@ -1,0 +1,3 @@
+{
+  "extends": ["@solid/eslint-config-base", "./.eslintrc.base.js"]
+}

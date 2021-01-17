@@ -1,5 +1,5 @@
 {
-  "extends": "../../../.eslintrc.json",
+  "extends": "../../../config/.eslintrc.base.js",
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
