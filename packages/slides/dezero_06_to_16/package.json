@@ -27,5 +27,8 @@
   },
   "dependencies": {
     "reveal.js": "^4.0.2"
+  },
+  "devDependencies": {
+    "typescript": "4.1.3"
   }
 }
