@@ -1,3 +1,4 @@
+export * from './array-at-least';
 export * from './array-element';
 export * from './deep-partial';
 export * from './function';
@@ -7,5 +8,6 @@ export * from './mappable';
 export * from './monotype-function';
 export * from './phantomic';
 export * from './reducer-type';
+export * from './strict-omit';
 export * from './test-type';
 export * from './writable';
