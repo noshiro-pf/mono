@@ -1,7 +1,7 @@
-import { ReadonlyNonEmptyArray } from '../non-empty-array';
+import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
 interface UniqType {
-  <T>(arr: ReadonlyNonEmptyArray<T>): ReadonlyNonEmptyArray<T>;
+  <T>(arr: ReadonlyNonEmptyArray<T>): NonEmptyArray<T>;
   <T>(arr: readonly T[]): T[];
 }
 
@@ -14,7 +14,7 @@ export const uniq: UniqType = (<T>(arr: readonly T[]): T[] =>
   Array.from(new Set(arr))) as UniqType;
 
 interface UniqByType<A> {
-  (arr: ReadonlyNonEmptyArray<A>): ReadonlyNonEmptyArray<A>;
+  (arr: ReadonlyNonEmptyArray<A>): NonEmptyArray<A>;
   (arr: readonly A[]): A[];
 }
 
