@@ -1,13 +1,12 @@
 import { FunctionType } from '../../types/utility-types/function';
-import { ReadonlyNonEmptyArray } from '../non-empty-array';
+import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
 export const neaMap = <A, B>(mapFn: FunctionType<A, B>) => (
   array: ReadonlyNonEmptyArray<A>
-): ReadonlyNonEmptyArray<B> =>
-  (array.map(mapFn) as unknown) as ReadonlyNonEmptyArray<B>;
+): NonEmptyArray<B> => (array.map(mapFn) as unknown) as NonEmptyArray<B>;
 
 interface Overload<A, B> {
-  (array: ReadonlyNonEmptyArray<A>): ReadonlyNonEmptyArray<B>;
+  (array: ReadonlyNonEmptyArray<A>): NonEmptyArray<B>;
   (array: readonly A[]): B[];
 }
 
