@@ -1,0 +1,21 @@
+{
+  "name": "typescript-organize-imports",
+  "version": "1.0.4",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "bin": {
+    "organizeimports": "lib/index.js"
+  },
+  "scripts": {
+    "lint": "echo 'no lint script.'",
+    "setup": "echo 'no setup script.'",
+    "test": "echo 'no test script.'"
+  },
+  "dependencies": {
+    "command-line-args": "^5.1.1",
+    "command-line-usage": "^6.1.1",
+    "ts-morph": "^9.1.0"
+  }
+}
