@@ -69,6 +69,7 @@
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
-    "firebase-tools": "^8.7.0"
+    "firebase-tools": "^8.7.0",
+    "typescript": "4.1.3"
   }
 }

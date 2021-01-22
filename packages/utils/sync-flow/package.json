@@ -4,6 +4,7 @@
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
   "author": "noshiro",
+  "sideEffects": false,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -43,5 +44,8 @@
     "start_script": "dist/test/preview-main.js",
     "tsconfig_dev": "config/tsconfig.dev.json",
     "tsconfig_lib": "config/tsconfig.lib.json"
+  },
+  "devDependencies": {
+    "typescript": "4.1.3"
   }
 }

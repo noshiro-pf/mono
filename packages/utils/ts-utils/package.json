@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
+  "sideEffects": false,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -35,5 +36,8 @@
     "pipe_ts_path": "src/functional/pipe.ts",
     "scripts_dir": "../../../scripts",
     "ts_config_for_build": "config/tsconfig.lib.json"
+  },
+  "devDependencies": {
+    "typescript": "4.1.3"
   }
 }

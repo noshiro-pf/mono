@@ -4,6 +4,7 @@
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
   "author": "noshiro",
+  "sideEffects": false,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -20,7 +21,7 @@
     "fmt:b": "yarn _script_formatchanged master",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .ts",
-    "setup": "echo \"no setup script\"",
+    "setup": "echo 'no setup script'",
     "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
     "testw": "yarn test --watch"
   },
@@ -29,5 +30,8 @@
     "lib_dir": "lib",
     "scripts_dir": "../../../scripts",
     "ts_config_for_build": "config/tsconfig.lib.json"
+  },
+  "devDependencies": {
+    "typescript": "4.1.3"
   }
 }
