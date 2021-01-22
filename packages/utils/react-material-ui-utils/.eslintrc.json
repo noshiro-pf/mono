@@ -1,5 +1,5 @@
 {
-  "extends": "../../../.eslintrc.json",
+  "extends": "../../../config/.eslintrc.react.json",
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
