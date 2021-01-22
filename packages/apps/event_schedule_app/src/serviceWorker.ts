@@ -28,7 +28,7 @@ export function register(config?: Config): void {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(
-      (process as { env: { [key: string]: string } }).env.PUBLIC_URL,
+      (process as { env: Record<string, string> }).env.PUBLIC_URL,
       window.location.href
     );
     if (publicUrl.origin !== window.location.origin) {
@@ -58,54 +58,60 @@ export function register(config?: Config): void {
         });
       } else {
         // Is not localhost. Just register service worker
-        registerValidSW(swUrl, config);
+        registerValidSW(swUrl, config).catch(console.error);
       }
     });
   }
 }
 
-function registerValidSW(swUrl: string, config?: Config): void {
-  navigator.serviceWorker
+async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
+  const registration = await navigator.serviceWorker
     .register(swUrl)
-    .then((registration) => {
-      registration.onupdatefound = () => {
-        const installingWorker = registration.installing;
-        if (installingWorker == null) {
-          return;
-        }
-        installingWorker.onstatechange = () => {
-          if (installingWorker.state === 'installed') {
-            if (navigator.serviceWorker.controller !== null) {
-              // At this point, the updated precached content has been fetched,
-              // but the previous service worker will still serve the older
-              // content until all client tabs are closed.
-              console.log(
-                'New content is available and will be used when all ' +
-                  'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
-              );
-
-              // Execute callback
-              if (config?.onUpdate !== undefined) {
-                config.onUpdate(registration);
-              }
-            } else {
-              // At this point, everything has been precached.
-              // It's the perfect time to display a
-              // "Content is cached for offline use." message.
-              console.log('Content is cached for offline use.');
-
-              // Execute callback
-              if (config?.onSuccess !== undefined) {
-                config.onSuccess(registration);
-              }
-            }
-          }
-        };
-      };
-    })
     .catch((error) => {
       console.error('Error during service worker registration:', error);
     });
+
+  if (!registration) return;
+
+  console.log(
+    'ServiceWorker registration successful with scope: ',
+    registration.scope
+  );
+
+  registration.onupdatefound = () => {
+    const installingWorker = registration.installing;
+    if (installingWorker == null) {
+      return;
+    }
+    installingWorker.onstatechange = () => {
+      if (installingWorker.state === 'installed') {
+        if (navigator.serviceWorker.controller !== null) {
+          // At this point, the updated precached content has been fetched,
+          // but the previous service worker will still serve the older
+          // content until all client tabs are closed.
+          console.log(
+            'New content is available and will be used when all ' +
+              'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
+          );
+
+          // Execute callback
+          if (config?.onUpdate !== undefined) {
+            config.onUpdate(registration);
+          }
+        } else {
+          // At this point, everything has been precached.
+          // It's the perfect time to display a
+          // "Content is cached for offline use." message.
+          console.log('Content is cached for offline use.');
+
+          // Execute callback
+          if (config?.onSuccess !== undefined) {
+            config.onSuccess(registration);
+          }
+        }
+      }
+    };
+  };
 }
 
 function checkValidServiceWorker(swUrl: string, config?: Config): void {
@@ -119,16 +125,16 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
         (contentType != null && contentType.includes('javascript'))
       ) {
         // No service worker found. Probably a different app. Reload the page.
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        navigator.serviceWorker.ready.then((registration) => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          registration.unregister().then(() => {
-            window.location.reload();
-          });
-        });
+        navigator.serviceWorker.ready
+          .then((registration) =>
+            registration.unregister().then(() => {
+              window.location.reload();
+            })
+          )
+          .catch(console.error);
       } else {
         // Service worker found. Proceed as normal.
-        registerValidSW(swUrl, config);
+        registerValidSW(swUrl, config).catch(console.error);
       }
     })
     .catch(() => {
@@ -140,10 +146,8 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
 
 export function unregister(): void {
   if ('serviceWorker' in navigator) {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    navigator.serviceWorker.ready.then((registration) => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      registration.unregister();
-    });
+    navigator.serviceWorker.ready
+      .then((registration) => registration.unregister())
+      .catch(console.error);
   }
 }
