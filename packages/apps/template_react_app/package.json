@@ -1,5 +1,5 @@
 {
-  "name": "@mono/app-template",
+  "name": "@mono/react-app-template",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -29,7 +29,6 @@
   "config": {
     "config_dir": "config",
     "dist_dir": "build",
-    "dotenv_example": "dotenv-example",
     "jest_config": "config/jest.config.json",
     "public_dir": "public",
     "scripts_dir": "../../../scripts",
