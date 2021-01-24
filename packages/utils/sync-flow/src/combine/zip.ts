@@ -24,7 +24,7 @@ class ZipObservableClass<A extends Observable<any>[]>
     this._nextValueQueues = parents.map(() => []);
     this._subscriptions = parents.map((p, i) =>
       p.subscribe((v) => {
-        this._nextValueQueues[i].push(v);
+        this._nextValueQueues[i]?.push(v);
       })
     );
   }

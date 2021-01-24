@@ -32,7 +32,10 @@ const createStreams = (
   };
 };
 
-export const auditTimeTestCases: StreamTestCase<number>[] = [
+export const auditTimeTestCases: [
+  StreamTestCase<number>,
+  StreamTestCase<number>
+] = [
   {
     name: 'auditTime case 1',
     numTakeDefault: 6,

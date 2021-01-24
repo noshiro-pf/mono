@@ -25,7 +25,7 @@ class TakeUntilRN<T> extends RN<T> {
   }
 
   protected fire(): void {
-    const src = this.parents[0];
+    const src = this.parents[0] as RN<any>;
     this.fireWith(src.value);
   }
 

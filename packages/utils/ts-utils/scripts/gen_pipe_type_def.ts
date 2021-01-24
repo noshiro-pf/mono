@@ -21,11 +21,13 @@ const genPipeMethod = (length: number): string => {
   // <T0, T1, T2>(x: T0, f1: FuncType<T0, T1>, f2: FuncType<T1, T2>): T2;
   // ```
   const typeVars = range(0, length).map((i) => `T${i}`);
-  let result = `<${typeVars.join(',')}>(x: ${typeVars[0]}, `;
+  let result = `<${typeVars.join(',')}>(x: ${typeVars[0] ?? ''}, `;
   for (let i = 1; i < length; ++i) {
-    result += `f${i}: ${funcTypeName}<${typeVars[i - 1]}, ${typeVars[i]}>, `;
+    result += `f${i}: ${funcTypeName}<${typeVars[i - 1] ?? ''}, ${
+      typeVars[i] ?? ''
+    }>, `;
   }
-  result += `): ${typeVars[length - 1]};`;
+  result += `): ${typeVars[length - 1] ?? ''};`;
 
   return result;
 };
@@ -51,7 +53,7 @@ const input = (): [number, string] => {
   }
 
   const length: number = Number(args[0]);
-  const path: string = args[1];
+  const path: string | undefined = args[1];
 
   if (Number.isNaN(length)) {
     throw new Error('The first argument must be integer.');
@@ -62,7 +64,7 @@ const input = (): [number, string] => {
     throw new Error(`Length must be greater than or equal to ${MIN_LENGTH}.`);
   }
 
-  if (!path) {
+  if (path === undefined) {
     throw new Error('Path is required.');
   }
 

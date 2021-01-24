@@ -28,7 +28,7 @@ class FlatMapRN<T, U> extends RN<U> {
 
   protected fire(): void {
     // switch latestRN here
-    const src = this.parents[0];
+    const src = this.parents[0] as RN<any>;
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
     this.latestRN = this.fn(src.value, src.index, this.index + 1);
     this.subscriptions.push(

@@ -8,7 +8,7 @@ export function zip<A, B>(
   array2: readonly B[]
 ): [A, B][] {
   const len = Math.min(array1.length, array2.length);
-  return seq(len).map((i) => tuple(array1[i], array2[i]));
+  return seq(len).map((i) => tuple(array1[i] as A, array2[i] as B));
 }
 
 type Unwrap<S> = { [P in keyof S]: ArrayElement<S[P]> };

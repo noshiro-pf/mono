@@ -35,7 +35,7 @@ const createStreams = (
   };
 };
 
-export const mergeTestCases: StreamTestCase<number | string>[] = [
+export const mergeTestCases: [StreamTestCase<number | string>] = [
   {
     name: 'merge case 1',
     numTakeDefault: 6,

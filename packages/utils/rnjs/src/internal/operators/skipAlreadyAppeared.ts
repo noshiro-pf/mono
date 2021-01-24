@@ -20,7 +20,7 @@ class SkipAlreadyAppearedRN<T, K extends keyof T> extends RN<T> {
 
   protected fire(): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const nextVal = this.parents[0].value;
+    const nextVal = (this.parents[0] as RN<any>).value;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     const v = this.key !== undefined ? nextVal[this.key] : nextVal;
     if (!this.appeared.has(v)) {

@@ -31,7 +31,10 @@ const createStreams = (
   };
 };
 
-export const throttleTimeTestCases: StreamTestCase<number>[] = [
+export const throttleTimeTestCases: [
+  StreamTestCase<number>,
+  StreamTestCase<number>
+] = [
   {
     name: 'throttleTime case 1',
     numTakeDefault: 5,

@@ -34,7 +34,7 @@ class ScanRN<T, U> extends RN<U> {
   }
 
   protected fire(): void {
-    const src = this.parents[0];
+    const src = this.parents[0] as RN<any>;
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
     this.scanState = this.fn(
       this.scanState,

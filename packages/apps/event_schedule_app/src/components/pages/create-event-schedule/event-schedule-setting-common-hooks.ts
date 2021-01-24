@@ -232,9 +232,9 @@ export const useEventScheduleSettingCommonHooks = (
     from(fetchHolidaysJson()).pipe(
       map((record) =>
         IMap(
-          Object.keys(record).map((key) => [
+          Object.entries(record).map(([key, value]) => [
             ymdFromDate(new Date(key)),
-            record[key],
+            value,
           ])
         )
       )

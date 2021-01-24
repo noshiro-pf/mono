@@ -56,7 +56,7 @@ const input = (): [number, string] => {
   }
 
   const length: number = Number(args[0]);
-  const path: string = args[1];
+  const path: string | undefined = args[1];
 
   if (Number.isNaN(length)) {
     throw new Error('The first argument must be integer.');
@@ -67,7 +67,7 @@ const input = (): [number, string] => {
     throw new Error(`Length must be greater than or equal to ${MIN_LENGTH}.`);
   }
 
-  if (!path) {
+  if (path === undefined) {
     throw new Error('Path is required.');
   }
 
