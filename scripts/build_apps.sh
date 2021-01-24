@@ -2,6 +2,7 @@
 
 targets=(
   "annotation_tool"
+  "cant_stop_probability"
   "catan_dice_app"
   "color_demo_app"
   "event_schedule_app"
