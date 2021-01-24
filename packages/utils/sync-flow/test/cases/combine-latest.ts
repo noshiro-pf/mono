@@ -54,9 +54,9 @@ const createStreams = (
   };
 };
 
-export const combineLatestTestCases: StreamTestCase<
-  [number, number, number, number, number]
->[] = [
+export const combineLatestTestCases: [
+  StreamTestCase<[number, number, number, number, number]>
+] = [
   {
     name: 'combineLatest case 1',
     numTakeDefault: 10,

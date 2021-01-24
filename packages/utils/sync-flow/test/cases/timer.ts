@@ -2,7 +2,7 @@ import { timer } from '../../src/create';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
 
-export const timerTestCases: StreamTestCase<number>[] = [
+export const timerTestCases: [StreamTestCase<number>] = [
   {
     name: 'timer case 1',
     numTakeDefault: 1,

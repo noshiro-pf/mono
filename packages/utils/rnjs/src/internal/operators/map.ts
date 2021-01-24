@@ -46,7 +46,7 @@ class MapRN<T, U> extends RN<U> {
   }
 
   protected fire(): void {
-    const src = this.parents[0];
+    const src = this.parents[0] as RN<any>;
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
     this.fireWith(this.fn(src.value, src.index, this.index + 1));
   }

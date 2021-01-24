@@ -32,7 +32,7 @@ class TakeWhileRN<T> extends RN<T> {
   }
 
   protected fire(): void {
-    const src = this.parents[0];
+    const src = this.parents[0] as RN<any>;
 
     // note: 'this.index' is not updated yet (will be updated in this.fireWith())
     if (this.predicate(src.value, src.index, this.index + 1)) {

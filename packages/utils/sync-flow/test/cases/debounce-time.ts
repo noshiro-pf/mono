@@ -36,7 +36,7 @@ const createStreams = (
   };
 };
 
-export const debounceTimeTestCases: StreamTestCase<[number, number]>[] = [
+export const debounceTimeTestCases: [StreamTestCase<[number, number]>] = [
   {
     name: 'debounceTime case 1',
     numTakeDefault: 20,

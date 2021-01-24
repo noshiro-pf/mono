@@ -33,7 +33,7 @@ const createStreams = (
   };
 };
 
-export const zipTestCases: StreamTestCase<[number, number]>[] = [
+export const zipTestCases: [StreamTestCase<[number, number]>] = [
   {
     name: 'merge case 1',
     numTakeDefault: 12,

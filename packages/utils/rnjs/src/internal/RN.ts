@@ -82,8 +82,11 @@ export class RN<T> {
     // initialize
     let currentIdx = heap.length - 1;
     let parentIdx = Math.floor(currentIdx / 2);
-    while (newValue.priority < heap[parentIdx].priority) {
-      [heap[currentIdx], heap[parentIdx]] = [heap[parentIdx], heap[currentIdx]];
+    while (newValue.priority < (heap[parentIdx] as RN<any>).priority) {
+      [heap[currentIdx], heap[parentIdx]] = [
+        heap[parentIdx] as RN<any>,
+        heap[currentIdx] as RN<any>,
+      ];
 
       // update
       currentIdx = parentIdx;
@@ -112,13 +115,15 @@ export class RN<T> {
       if (childIdx1 >= heap.length) break;
 
       // case: 1 or 2 children
-      const child1priority = heap[childIdx1].priority;
+      const child1priority = (heap[childIdx1] as RN<any>).priority;
       const child2priority =
-        childIdx2 >= heap.length ? Infinity : heap[childIdx2].priority;
+        childIdx2 >= heap.length
+          ? Infinity
+          : (heap[childIdx2] as RN<any>).priority;
       const minChildIdx =
         child1priority < child2priority ? childIdx1 : childIdx2;
-      const curr = heap[currentIdx];
-      const minChild = heap[minChildIdx];
+      const curr = heap[currentIdx] as RN<any>;
+      const minChild = heap[minChildIdx] as RN<any>;
       if (curr.priority <= minChild.priority) break;
       [heap[currentIdx], heap[minChildIdx]] = [minChild, curr]; // swap
       currentIdx = minChildIdx;

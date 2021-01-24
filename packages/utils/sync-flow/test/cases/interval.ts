@@ -2,7 +2,7 @@ import { interval } from '../../src/create';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
 
-export const intervalTestCases: StreamTestCase<number>[] = [
+export const intervalTestCases: [StreamTestCase<number>] = [
   {
     name: 'interval case 1',
     numTakeDefault: 10,

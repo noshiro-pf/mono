@@ -20,7 +20,7 @@ class AuditTimeRN<T> extends RN<T> {
     if (!this.timerIsRunning) {
       this.timerIsRunning = true;
       this.timerId = setTimeout(() => {
-        this.fireWith(this.parents[0].value);
+        this.fireWith((this.parents[0] as RN<any>).value);
         this.timerIsRunning = false;
       }, this.time);
     }

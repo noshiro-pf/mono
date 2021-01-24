@@ -19,7 +19,7 @@ class DebounceRN<T> extends RN<T> {
     clearTimeout(this.timerId);
 
     this.timerId = setTimeout(() => {
-      this.fireWith(this.parents[0].value);
+      this.fireWith((this.parents[0] as RN<any>).value);
     }, this.time);
   }
 

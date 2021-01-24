@@ -12,7 +12,7 @@ const createStream = (tick: number): Observable<number> => {
   return fromPromise(promise);
 };
 
-export const fromPromiseTestCases: StreamTestCase<number>[] = [
+export const fromPromiseTestCases: [StreamTestCase<number>] = [
   {
     name: 'fromPromise case 1',
     numTakeDefault: 1,

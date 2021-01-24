@@ -29,7 +29,11 @@ const createStreams = (
   };
 };
 
-export const mapTestCases: StreamTestCase<number>[] = [
+export const mapTestCases: [
+  StreamTestCase<number>,
+  StreamTestCase<number>,
+  StreamTestCase<number>
+] = [
   {
     name: 'map case 1',
     numTakeDefault: 10,

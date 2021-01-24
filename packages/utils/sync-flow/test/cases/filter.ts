@@ -27,7 +27,7 @@ const createStreams = (
   };
 };
 
-export const filterTestCases: StreamTestCase<number>[] = [
+export const filterTestCases: [StreamTestCase<number>] = [
   {
     name: 'filter case 1',
     numTakeDefault: 10,

@@ -65,6 +65,7 @@ const labels: readonly Label[] = pipe(
     name,
   }))
 );
+const labelInit: Label = labels[0] as Label;
 
 export const App = memoNamed('App', () => {
   const [hidden, hide, show] = useBooleanState(false);
@@ -75,8 +76,8 @@ export const App = memoNamed('App', () => {
   );
 
   const [selectedLabel, selectLabel] = useStateWithMapFn<Label, IdType>(
-    labels[0],
-    (labelId) => labels.find((l) => l.id === labelId) ?? labels[0]
+    labelInit,
+    (labelId) => labels.find((l) => l.id === labelId) ?? labelInit
   );
 
   const handlers = useMemo<AppEventHandler>(

@@ -100,9 +100,9 @@ const getArgs = (): {
     isPreviewMode: boolean;
     testCaseIdx: number;
   } => ({
-    exampleIdx: (toNumber(args.example_no[0]) ?? 0) - 1,
+    exampleIdx: (toNumber(args.example_no[0] ?? '0') ?? 0) - 1,
     isPreviewMode: args.preview != null,
-    testCaseIdx: (toNumber(args.case_no[0]) ?? 0) - 1,
+    testCaseIdx: (toNumber(args.case_no[0] ?? '0') ?? 0) - 1,
   });
 
   return convertArgs(parser.parseArgs());
@@ -124,6 +124,7 @@ const main = (): void => {
     return;
   }
   const example = exampleList[exampleIdx];
+  if (example === undefined) return;
 
   printExampleCases(example.cases, testCaseIdx);
   console.log('');
@@ -137,6 +138,7 @@ const main = (): void => {
     return;
   }
   const exampleCase = example.cases[testCaseIdx];
+  if (exampleCase === undefined) return;
 
   if (isPreviewMode) {
     exampleCase.preview(TICK.preview);

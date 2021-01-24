@@ -28,7 +28,7 @@ export function register(config?: Config): void {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(
-      (process as { env: Record<string, string> }).env.PUBLIC_URL,
+      (process as { env: Record<string, string> }).env.PUBLIC_URL as string,
       window.location.href
     );
     if (publicUrl.origin !== window.location.origin) {
@@ -49,13 +49,14 @@ export function register(config?: Config): void {
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        navigator.serviceWorker.ready.then(() => {
-          console.log(
-            'This web app is being served cache-first by a service ' +
-              'worker. To learn more, visit https://bit.ly/CRA-PWA'
-          );
-        });
+        navigator.serviceWorker.ready
+          .then(() => {
+            console.log(
+              'This web app is being served cache-first by a service ' +
+                'worker. To learn more, visit https://bit.ly/CRA-PWA'
+            );
+          })
+          .catch(console.error);
       } else {
         // Is not localhost. Just register service worker
         registerValidSW(swUrl, config).catch(console.error);

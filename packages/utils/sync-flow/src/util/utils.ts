@@ -23,6 +23,7 @@ export const binarySearch = (sortedArray: number[], x: number): number => {
   while (left <= right) {
     const curr = sortedArray[mid];
     if (x === curr) break;
+    if (curr === undefined) break;
     if (curr > x) {
       right = mid - 1;
     } else {

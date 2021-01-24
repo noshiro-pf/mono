@@ -8,5 +8,5 @@ export const pickUpAvailableVariable = (
     (e) => !freeVariables.includes(e)
   );
   if (availableVariables.length < 1) console.error('alphabets exhausted');
-  return availableVariables[0]; // pick up one available
+  return availableVariables[0] as Variable; // pick up one available
 };
