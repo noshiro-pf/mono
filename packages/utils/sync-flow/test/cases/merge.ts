@@ -1,5 +1,6 @@
+import { Observable } from '../../src/abstract_class';
 import { merge } from '../../src/combine';
-import { interval } from '../../src/create';
+import { interval, IntervalObservable } from '../../src/create';
 import { filter, map } from '../../src/operators';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
@@ -10,7 +11,14 @@ import { getStreamOutputAsPromise } from '../utils';
   odd          "1"     "3"     "5"     "7"     "9"     "11"    "13"    "15"    "17"    "19"    "21"    "23"
   merged    0  "1"  2  "3"  4  "5"  6  "7"  8  "9"  10 "11" 12 "13" 14 "15" 16 "17" 18 "19" 20 "21" 22 "23"
 */
-const createStreams = (tick: number) => {
+const createStreams = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  even$: Observable<number>;
+  odd$: Observable<string>;
+  merged$: Observable<string | number>;
+} => {
   const counter$ = interval(tick);
   const even$ = counter$.pipe(filter((n) => n % 2 === 0));
   const odd$ = counter$.pipe(

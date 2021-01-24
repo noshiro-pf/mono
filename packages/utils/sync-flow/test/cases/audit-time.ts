@@ -1,5 +1,6 @@
+import { Observable } from '../../src/abstract_class';
 import { merge } from '../../src/combine';
-import { interval } from '../../src/create';
+import { interval, IntervalObservable } from '../../src/create';
 import { filter } from '../../src/operators';
 import { auditTime } from '../../src/operators/audit-time';
 import { StreamTestCase } from '../typedef';
@@ -10,7 +11,14 @@ import { getStreamOutputAsPromise } from '../utils';
   filtered      1       3   4                       10          13          16  17  18  19  20
   auditTime               3           4                       10          13          18          20
 */
-const createStreams = (tick: number) => {
+const createStreams = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  filtered$: Observable<number>;
+  auditTime$: Observable<number>;
+  merged$: Observable<number>;
+} => {
   const emitValues = [1, 3, 4, 10, 13, 16, 17, 18, 19, 20];
   const counter$ = interval(tick);
   const filtered$ = counter$.pipe(filter((n) => emitValues.includes(n)));

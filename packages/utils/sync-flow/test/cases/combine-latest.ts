@@ -1,5 +1,6 @@
+import { Observable } from '../../src/abstract_class';
 import { combineLatest } from '../../src/combine';
-import { interval } from '../../src/create';
+import { interval, IntervalObservable } from '../../src/create';
 import { filter, map } from '../../src/operators';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
@@ -16,7 +17,16 @@ import { getStreamOutputAsPromise } from '../utils';
  *  [      combined       ]
  */
 
-const createStreams = (tick: number) => {
+const createStreams = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  double$: Observable<number>;
+  quad$: Observable<number>;
+  square$: Observable<number>;
+  squareEven$: Observable<number>;
+  combined$: Observable<[number, number, number, number, number]>;
+} => {
   const counter$ = interval(tick);
 
   const double$ = counter$.pipe(map((x) => x * 2));

@@ -1,5 +1,6 @@
+import { Observable } from '../../src/abstract_class';
 import { combineLatest } from '../../src/combine';
-import { interval } from '../../src/create';
+import { interval, IntervalObservable } from '../../src/create';
 import { debounceTime, filter } from '../../src/operators';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
@@ -12,7 +13,15 @@ import { getStreamOutputAsPromise } from '../utils';
   combined                              x   x       x       x       x       x   x   x       x
 */
 
-const createStreams = (tick: number) => {
+const createStreams = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  even$: Observable<number>;
+  filtered$: Observable<number>;
+  debounced$: Observable<number>;
+  combined$: Observable<[number, number]>;
+} => {
   const counter$ = interval(tick);
   const even$ = counter$.pipe(filter((n) => n % 2 === 0));
   const filtered$ = counter$.pipe(filter((n) => n % 10 < 5));

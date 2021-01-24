@@ -1,4 +1,5 @@
-import { interval } from '../../src/create';
+import { Observable } from '../../src/abstract_class';
+import { interval, IntervalObservable } from '../../src/create';
 import { filter } from '../../src/operators';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
@@ -9,7 +10,13 @@ import { getStreamOutputAsPromise } from '../utils';
   filtered  0   1   2   3   4                       10  11  12  13  14
 */
 
-const createStreams = (tick: number) => {
+const createStreams = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  even$: Observable<number>;
+  filtered$: Observable<number>;
+} => {
   const counter$ = interval(tick);
   const even$ = counter$.pipe(filter((n) => n % 2 === 0));
   const filtered$ = counter$.pipe(filter((n) => n % 10 < 5));
