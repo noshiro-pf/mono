@@ -33,4 +33,4 @@ export type Subscribable<A> = {
   ): Subscription;
 };
 
-export type TimerId = any; // NodeJS.Timeout or number
+export type TimerId = ReturnType<typeof setTimeout>; // NodeJS.Timeout or number
