@@ -16,7 +16,7 @@ const config: Linter.Config = {
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
-    project: '../tsconfig.eslint.json',
+    project: './tsconfig.eslint.json',
   },
   rules: {
     'linebreak-style': ['error', 'unix'],
