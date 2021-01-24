@@ -1,10 +1,11 @@
+import { Observable } from '../../src/abstract_class';
 import { fromPromise } from '../../src/create';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
 
 const valueToEmit = 1;
 
-const createStream = (tick: number) => {
+const createStream = (tick: number): Observable<number> => {
   const promise = new Promise<number>((resolve) => {
     setTimeout(() => resolve(valueToEmit), tick);
   });

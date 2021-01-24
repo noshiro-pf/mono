@@ -29,7 +29,7 @@ const exampleList: readonly { name: string; cases: StreamTestCase<any>[] }[] = [
   { name: 'zip', cases: zipTestCases },
 ];
 
-const printExamples = (exampleIdx: number) => {
+const printExamples = (exampleIdx: number): void => {
   console.log('examples:');
   exampleList.forEach((example, i) => {
     const isSelected = exampleIdx === i;
@@ -44,7 +44,7 @@ const printExamples = (exampleIdx: number) => {
 const printExampleCases = (
   exampleCases: StreamTestCase<any>[],
   testCaseIdx: number
-) => {
+): void => {
   console.log('test cases:');
   exampleCases.forEach((c, i) => {
     const isSelected = testCaseIdx === i;
@@ -56,15 +56,19 @@ const printExampleCases = (
   });
 };
 
-const printSeparator = () => {
+const printSeparator = (): void => {
   console.log('---------------------------------');
 };
 
-const printIsPreviewMode = (isPreviewMode: boolean) => {
+const printIsPreviewMode = (isPreviewMode: boolean): void => {
   console.log(`mode: ${isPreviewMode ? 'preview' : 'dump'}`);
 };
 
-const getArgs = () => {
+const getArgs = (): {
+  exampleIdx: number;
+  isPreviewMode: boolean;
+  testCaseIdx: number;
+} => {
   const parser = new ArgumentParser({
     version: '0.0.1',
     addHelp: true,
@@ -104,7 +108,7 @@ const getArgs = () => {
   return convertArgs(parser.parseArgs());
 };
 
-const main = () => {
+const main = (): void => {
   const { isPreviewMode, exampleIdx, testCaseIdx } = getArgs();
 
   console.log('');
@@ -137,7 +141,10 @@ const main = () => {
   if (isPreviewMode) {
     exampleCase.preview(TICK.preview);
   } else {
-    exampleCase.run(exampleCase.numTakeDefault, TICK.test).then(console.log);
+    exampleCase
+      .run(exampleCase.numTakeDefault, TICK.test)
+      .then(console.log)
+      .catch(console.error);
   }
 };
 

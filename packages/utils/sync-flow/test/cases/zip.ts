@@ -1,5 +1,6 @@
+import { Observable } from '../../src/abstract_class';
 import { zip } from '../../src/combine';
-import { interval } from '../../src/create';
+import { interval, IntervalObservable } from '../../src/create';
 import { filter } from '../../src/operators';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
@@ -10,7 +11,14 @@ import { getStreamOutputAsPromise } from '../utils';
   n%3       0           3           6           9           12          15          18          21
   zipped    [0,0]       [2,3]       [4,6]       [6,9]       [8,12]      [10,15]     [12,18]     [14,21]
 */
-const createStreams = (tick: number) => {
+const createStreams = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  even$: Observable<number>;
+  multiplesOf3$: Observable<number>;
+  zipped$: Observable<[number, number]>;
+} => {
   const counter$ = interval(tick);
   const even$ = counter$.pipe(filter((n) => n % 2 === 0));
   const multiplesOf3$ = counter$.pipe(filter((n) => n % 3 === 0));

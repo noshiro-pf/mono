@@ -1,9 +1,17 @@
-import { interval } from '../../src/create';
+import { Observable } from '../../src/abstract_class';
+import { interval, IntervalObservable } from '../../src/create';
 import { map } from '../../src/operators';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';
 
-const createStreams = (tick: number) => {
+const createStreams = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  double$: Observable<number>;
+  quad1$: Observable<number>;
+  quad2$: Observable<number>;
+} => {
   const counter$ = interval(tick);
 
   const double$ = counter$.pipe(map((x) => x * 2));
