@@ -2,23 +2,43 @@ import type { Linter } from 'eslint';
 import { readGitignoreFiles } from 'eslint-gitignore';
 
 const config: Linter.Config = {
+  root: true,
   env: { browser: true, node: true, es6: true },
+  plugins: ['@typescript-eslint', 'functional', 'total-functions'],
   extends: [
     'eslint:recommended',
+    // 'plugin:functional/recommended',
+    // 'plugin:functional/external-recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:prettier/recommended',
     'prettier/@typescript-eslint',
+    // 'plugin:total-functions/recommended',
   ],
-  plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
-    project: './tsconfig.eslint.json',
+    project: './config/tsconfig.eslint.json',
   },
   rules: {
+    /**
+     * Additional rules that are not part of `eslint:recommended`.
+     * See https://eslint.org/docs/rules/
+     */
+    // eval is completely unsafe from a security point of view, but also from a type-safety point of view.
+    'no-eval': 'error',
+    'no-implied-eval': 'error',
+    'no-await-in-loop': 'error',
+    'no-new-wrappers': 'error',
+
+    // No 90s style coercion.
+    // eqeqeq: 'error',
+    // 'no-caller': 'error',
+    // 'require-unicode-regexp': 'error',
+    // 'no-loss-of-precision': 'error',
+
     'linebreak-style': ['error', 'unix'],
     quotes: ['error', 'single', { avoidEscape: true }],
     semi: ['error', 'always'],

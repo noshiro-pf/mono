@@ -1,3 +1,3 @@
 {
-  "extends": ["./config/.eslintrc.base.js", "./config/.eslintrc.react.json"]
+  "extends": ["./config/.eslintrc.base.js", "./config/.eslintrc.react.js"]
 }
