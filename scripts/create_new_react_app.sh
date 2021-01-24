@@ -5,7 +5,7 @@
 THIS_SCRIPT_DIR=$(cd $(dirname $0); pwd)
 MONO_ROOT_DIR=$(dirname ${THIS_SCRIPT_DIR})
 
-TEMPLATE_DIR_NAME="template"
+TEMPLATE_DIR_NAME="template_react_app"
 APPS_DIR="${MONO_ROOT_DIR}/packages/apps"
 TEMPLATE_DIR="${APPS_DIR}/${TEMPLATE_DIR_NAME}"
 
