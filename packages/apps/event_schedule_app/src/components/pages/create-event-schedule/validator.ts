@@ -1,4 +1,4 @@
-import { ifthen, isEmailString } from '@mono/ts-utils';
+import { ifthen, isEmailString, StrictOmit } from '@mono/ts-utils';
 import { EventScheduleBaseType } from '../../../types/record/event-schedule';
 import { EventScheduleValidation } from '../../../types/record/event-schedule-validation';
 
@@ -10,7 +10,7 @@ export const validateEventSchedule = ({
   answerSymbolList,
   useNotification,
   notificationSettings,
-}: Omit<
+}: StrictOmit<
   EventScheduleBaseType,
   | 'answerDeadline'
   | 'timezoneOffsetMinutes'

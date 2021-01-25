@@ -1,3 +1,4 @@
+import { StrictOmit } from '@mono/ts-utils';
 import { IList, IRecord } from '../../utils/immutable';
 import { answerId, AnswerId, userName, UserName } from '../phantom';
 import {
@@ -37,7 +38,7 @@ const IAnswerRecordFactory = IRecord<AnswerBaseType>({
 });
 
 export const createIAnswerWithoutId: (
-  a: Omit<AnswerBaseType, 'id'>
+  a: StrictOmit<AnswerBaseType, 'id'>
 ) => IAnswer = IAnswerRecordFactory;
 
 export const createIAnswer: (
