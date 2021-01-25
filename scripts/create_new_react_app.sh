@@ -17,7 +17,7 @@ if [ -z ${new_app_name} ]; then
 fi
 
 mkdir -p "${APPS_DIR}/${new_app_name}"
-cp -r "${TEMPLATE_DIR}/*" "${APPS_DIR}/${new_app_name}/"
+cp -r "${TEMPLATE_DIR}/." "${APPS_DIR}/${new_app_name}/"
 
 new_app_name_kebab=$(echo "${new_app_name}" | sed "s/_/-/g")
 echo ${new_app_name_kebab}
