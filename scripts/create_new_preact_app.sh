@@ -17,4 +17,8 @@ if [ -z ${new_app_name} ]; then
 fi
 
 cp -r ${TEMPLATE_DIR} "${APPS_DIR}/${new_app_name}"
+
+sed -i "s/preact-app-template/${new_app_name}/" "${APPS_DIR}/${new_app_name}/package.json"
+echo ${new_app_name} >> "${THIS_SCRIPT_DIR}/apps.txt"
+
 echo "created ${APPS_DIR}/${new_app_name}"
