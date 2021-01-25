@@ -1,3 +1,4 @@
+import { isArrayOfLength1OrMore } from '@mono/ts-utils';
 import { ObservableType, Operator, Subscriber, Subscription } from '../types';
 import {
   genId,
@@ -81,7 +82,7 @@ export abstract class ObservableClass<A> implements Observable<A> {
     }
     // register this to ancestor SourceObservables
     const rest = this.parents.slice();
-    while (rest.length > 0) {
+    while (isArrayOfLength1OrMore(rest)) {
       const p = rest.pop();
       if (p === undefined) break;
       p.addDescendant(this);

@@ -17,7 +17,7 @@ export const answerDiffAsString = (
 
   // Note: assume before.selection and after.selection are the same length and the same order
   after.selection.forEach((sel, idx) => {
-    const iconBefore = before.selection[idx].iconId;
+    const iconBefore = before.selection[idx]?.iconId;
     const iconAfter = sel.iconId;
     if (iconBefore !== iconAfter) {
       answerChanges.push(

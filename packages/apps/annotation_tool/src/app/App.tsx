@@ -4,12 +4,14 @@ import {
   useStateWithMapFn,
 } from '@mono/react-utils';
 import {
-  mapWithIndex,
+  Hue,
+  neaMapWithIndex,
+  neaZip,
   Percent,
   pickupHighContrastHues,
   pipe,
+  ReadonlyNonEmptyArray,
   RectSize,
-  zip,
 } from '@mono/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
@@ -45,7 +47,7 @@ export const [
 
 // const highlightAlpha: Alpha = 0.4;
 
-const labelNames: readonly string[] = [
+const labelNames: ReadonlyNonEmptyArray<string> = [
   'Ant',
   'Bat',
   'Cat',
@@ -56,16 +58,19 @@ const labelNames: readonly string[] = [
   'Horse',
 ];
 
-const labels: readonly Label[] = pipe(
-  pickupHighContrastHues(labelNames.length, saturationDarker, lightnessDarker),
-  (list) => zip(list, labelNames),
-  mapWithIndex(([hue, name], index) => ({
-    id: index.toString(),
-    hue,
-    name,
-  }))
+const hues = pickupHighContrastHues(
+  labelNames.length,
+  saturationDarker,
+  lightnessDarker
+) as ReadonlyNonEmptyArray<Hue>;
+
+const labels: ReadonlyNonEmptyArray<Label> = pipe(
+  hues,
+  (list) => neaZip(list, labelNames),
+  neaMapWithIndex(([hue, name], index) => ({ id: index.toString(), hue, name }))
 );
-const labelInit: Label = labels[0] as Label;
+
+const labelInit: Label = labels[0];
 
 export const App = memoNamed('App', () => {
   const [hidden, hide, show] = useBooleanState(false);
