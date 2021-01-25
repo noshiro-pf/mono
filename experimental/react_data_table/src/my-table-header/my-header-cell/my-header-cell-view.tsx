@@ -1,16 +1,15 @@
-import React, { memo } from 'react'
-import * as I from 'immutable'
 import { TableCell, TableSortLabel } from '@material-ui/core'
-import SortIcon from '@material-ui/icons/Sort'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-
-import { FilterType } from '../../types/filter-type'
-import { ISelectorOptionWithViewValue } from '../../types/selector-option-with-view-value'
-import { CellAlignType } from '../../types/cell-align-type'
-import { CellSortStateType } from '../../types/sort-state'
-import { HeaderValueType } from '../../types/header-value-type'
-import { SwitchHeadereCellView } from './switch-header-cell-view'
+import SortIcon from '@material-ui/icons/Sort'
+import * as I from 'immutable'
+import React, { memo } from 'react'
 import styled from 'styled-components'
+import { CellAlignType } from '../../types/cell-align-type'
+import { FilterType } from '../../types/filter-type'
+import { HeaderValueType } from '../../types/header-value-type'
+import { ISelectorOptionWithViewValue } from '../../types/selector-option-with-view-value'
+import { CellSortStateType } from '../../types/sort-state'
+import { SwitchHeadereCellView } from './switch-header-cell-view'
 
 const TableCellContent = styled.div`
   display: flex;
@@ -35,7 +34,7 @@ export const HeaderCellView = memo(
     inputChange,
     selectedIndexChange,
     selectedIndiceChange,
-    sortClick
+    sortClick,
   }: Readonly<{
     filterType: FilterType
     label: string

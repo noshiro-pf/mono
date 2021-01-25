@@ -1,5 +1,5 @@
-import { ReactElement, useEffect, useReducer, useRef } from "react";
-import { usePrevious } from "./use-previous";
+import { ReactElement, useEffect, useReducer, useRef } from 'react';
+import { usePrevious } from './use-previous';
 
 type ReducerStateWithLastAction<State, ActionType extends string> = {
   state: State;
@@ -38,7 +38,7 @@ export const component = <
   reducer,
   view,
   effect,
-  componentName = "",
+  componentName = '',
 }: {
   initialState: State;
   reducer: (state: State, action: Action) => State;
@@ -85,7 +85,7 @@ export const component = <
     return view(propsImmutable.current, state.state);
   });
 
-component.name = "component";
+component.name = 'component';
 
 // export const SafeStatefulComponent = component<{}, {}, '', { type: '' }>(
 //   (state, action) => state,

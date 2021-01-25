@@ -1,9 +1,9 @@
-import React, { CSSProperties, memo, useCallback } from 'react'
+import { Button, Checkbox, FormControlLabel } from '@material-ui/core'
 import * as I from 'immutable'
-import { FormControlLabel, Button, Checkbox } from '@material-ui/core'
+import React, { CSSProperties, memo, useCallback } from 'react'
 
 const buttonStyle: CSSProperties = {
-  margin: '5px'
+  margin: '5px',
 }
 
 export const ExpansionsToggleListView = memo(
@@ -11,7 +11,7 @@ export const ExpansionsToggleListView = memo(
     expansionsWithCheck,
     checkOnChange: checkOnChangeInput,
     selectAllClick,
-    deselectAllClick
+    deselectAllClick,
   }: Readonly<{
     expansionsWithCheck: I.List<[string, boolean]>
     checkOnChange: (v: { name: string; checked: boolean }) => void

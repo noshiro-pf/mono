@@ -1,15 +1,12 @@
-import React, { memo, CSSProperties } from 'react'
+import AppBar from '@material-ui/core/AppBar'
+import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
+import Toolbar from '@material-ui/core/Toolbar'
+import HomeIcon from '@material-ui/icons/Home'
+import PersonIcon from '@material-ui/icons/Person'
+import React, { CSSProperties, memo } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import IconButton from '@material-ui/core/IconButton'
-
-import HomeIcon from '@material-ui/icons/Home'
-import Button from '@material-ui/core/Button'
-import PersonIcon from '@material-ui/icons/Person'
-
 import { routes } from '~/constants/route'
 import { Spacer } from '~/utils/components/spacer'
 
@@ -23,11 +20,11 @@ const UserName = styled.div`
 `
 
 const iconsStyle: CSSProperties = {
-  color: 'white'
+  color: 'white',
 }
 
 const toolbarStyle: CSSProperties = {
-  backgroundColor: 'rgba(34,49,52,0.6)'
+  backgroundColor: 'rgba(34,49,52,0.6)',
 }
 
 export const MyAppBarView = memo(({ myName }: Readonly<{ myName: string }>) => (

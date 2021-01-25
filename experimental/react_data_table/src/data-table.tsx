@@ -1,10 +1,9 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
-import { TTableSettings } from './types/table-settings'
+import React, { memo } from 'react'
 import { DataTableSub } from './data-table-sub'
-import { TDataTableState } from './types/data-table-state'
 import { ICellPosition } from './types/cell-position'
+import { TDataTableState } from './types/data-table-state'
+import { TTableSettings } from './types/table-settings'
 
 const noop = () => 0
 
@@ -13,7 +12,7 @@ export const DataTable = memo(
     table,
     settings,
     cellClick,
-    tableStateChange
+    tableStateChange,
   }: Readonly<{
     table: I.List<I.List<any>>
     settings: TTableSettings

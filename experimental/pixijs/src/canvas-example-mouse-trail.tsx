@@ -1,5 +1,5 @@
 import { Application, BLEND_MODES, Point, SimpleRope, Texture } from 'pixi.js';
-import React, { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { RectSize } from '../../../utils';
 import TrailImg from '../pixi/trail.png';
 
@@ -15,7 +15,7 @@ export const CanvasExample = memo((props: Props) => {
       width: props.canvasSize.width,
       height: props.canvasSize.height,
       transparent: true,
-      view: canvasRef.current ?? undefined
+      view: canvasRef.current ?? undefined,
     });
 
     const trailTexture = Texture.from(TrailImg);
@@ -109,7 +109,7 @@ function cubicInterpolation(
   const k = Math.floor(t);
   const m = [
     getTangent(k, tangentFactor, array),
-    getTangent(k + 1, tangentFactor, array)
+    getTangent(k + 1, tangentFactor, array),
   ];
   const p = [clipInput(k, array), clipInput(k + 1, array)];
   t -= k;

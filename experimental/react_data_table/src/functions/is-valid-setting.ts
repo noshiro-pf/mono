@@ -1,7 +1,6 @@
 import * as I from 'immutable'
-
-import { TTableSettings } from '../types/table-settings'
 import { TColumnSetting } from '../types/column-setting'
+import { TTableSettings } from '../types/table-settings'
 
 export const isValidSettings = (settings: TTableSettings): boolean => {
   /* settingsに不正な値がある場合 */
@@ -19,7 +18,8 @@ export const isValidSettings = (settings: TTableSettings): boolean => {
   if (!I.List.isList(settings.columnSettings)) return false
   if (!settings.itemsPerPageOptions.includes(settings.itemsPerPageInit))
     return false
-  if (settings.columnSettings.some(e => !isValidColumnSetting(e))) return false
+  if (settings.columnSettings.some((e) => !isValidColumnSetting(e)))
+    return false
 
   return true
 }

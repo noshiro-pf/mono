@@ -1,7 +1,5 @@
 import React, { memo } from 'react'
-
 import { ImgWithLoader } from '~/utils/components/img-with-loader'
-
 import { Loading } from './loading'
 
 export const ImgWithFrame = memo(
@@ -10,7 +8,7 @@ export const ImgWithFrame = memo(
     width,
     height,
     borderWidth,
-    onClick
+    onClick,
   }: {
     imgUrl: string
     width: number
@@ -23,7 +21,7 @@ export const ImgWithFrame = memo(
         <div
           style={{
             width: `${width}px`,
-            height: `${height}px`
+            height: `${height}px`,
           }}
         />
       ) : (
@@ -37,11 +35,11 @@ export const ImgWithFrame = memo(
               borderWidth: `${borderWidth}px`,
               borderRadius: `${borderWidth}px`,
               borderStyle: 'solid',
-              borderColor: 'black'
+              borderColor: 'black',
             },
             src: imgUrl,
             width: width,
-            height: height
+            height: height,
           }}
         />
       )}

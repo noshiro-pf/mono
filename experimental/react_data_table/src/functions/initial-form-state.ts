@@ -1,9 +1,8 @@
 import * as I from 'immutable'
-
-import { TTableSettings } from '../types/table-settings'
-import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
 import { HeaderValueType } from '../types/header-value-type'
+import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
 import { SortState, TSortState } from '../types/sort-state'
+import { TTableSettings } from '../types/table-settings'
 
 export const initialHeaderValues = (
   settings: TTableSettings,
@@ -35,5 +34,5 @@ export const initialFormState = (
   sortState: TSortState
 } => ({
   sortState: SortState(),
-  headerValues: initialHeaderValues(settings, selectorOptionsAll)
+  headerValues: initialHeaderValues(settings, selectorOptionsAll),
 })

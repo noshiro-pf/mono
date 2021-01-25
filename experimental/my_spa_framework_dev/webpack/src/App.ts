@@ -5,7 +5,7 @@ import {
   createState,
   insert,
   listen,
-} from "./utils";
+} from './utils';
 
 /**
  * <body>
@@ -17,26 +17,26 @@ import {
 export const App = () => {
   // elements
 
-  const $h1 = document.createElement("h1");
-  const $t0 = document.createTextNode("Hello ");
-  const $t1 = document.createTextNode("");
+  const $h1 = document.createElement('h1');
+  const $t0 = document.createTextNode('Hello ');
+  const $t1 = document.createTextNode('');
   const updateText_$t1 = (text: string) => {
     $t1.data = text;
   };
   const $t2 = createSpaceElement();
 
-  const $button0 = document.createElement("button");
-  $button0.textContent = "+1";
+  const $button0 = document.createElement('button');
+  $button0.textContent = '+1';
   const $t3 = createSpaceElement();
-  const $button1 = document.createElement("button");
-  $button1.textContent = "-1";
+  const $button1 = document.createElement('button');
+  $button1.textContent = '-1';
 
   // states
 
   const [numRef, , updateNum, onNumChangeFns] = createState(2);
 
   const [suffixRef, updateSuffix, onSuffixChangeFns] = createReactiveValue(() =>
-    new Array(numRef.value).fill("!").join("")
+    new Array(numRef.value).fill('!').join('')
   );
   onNumChangeFns.push(updateSuffix);
   updateSuffix(); // initialize
@@ -59,10 +59,10 @@ export const App = () => {
       insert(target, $button1);
 
       const dispose = [
-        listen($button0, "click", () => {
+        listen($button0, 'click', () => {
           updateNum((x) => x + 1);
         }),
-        listen($button1, "click", () => {
+        listen($button1, 'click', () => {
           updateNum((x) => Math.max(0, x - 1));
         }),
       ];

@@ -1,17 +1,16 @@
-import React, { memo } from 'react'
-import * as I from 'immutable'
 import { TableHead, TableRow } from '@material-ui/core'
-
-import { MyHeaderCell } from './my-header-cell/my-header-cell'
-import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
+import * as I from 'immutable'
+import React, { memo } from 'react'
 import { ColumnSetting, TColumnSetting } from '../types/column-setting'
-import { TSortState, CellSortStateType } from '../types/sort-state'
 import { HeaderValueType } from '../types/header-value-type'
+import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
+import { CellSortStateType, TSortState } from '../types/sort-state'
+import { MyHeaderCell } from './my-header-cell/my-header-cell'
 
 const NumberColumnColumnSettings = ColumnSetting({
   label: '',
   align: 'center',
-  sort: 'number'
+  sort: 'number',
 })
 
 export const MyTableHeaderView = memo(
@@ -22,7 +21,7 @@ export const MyTableHeaderView = memo(
     headerValues,
     sortState,
     cellSortStateChange,
-    headerValueChange
+    headerValueChange,
   }: Readonly<{
     displayNo: boolean
     columnSettings: I.List<TColumnSetting>

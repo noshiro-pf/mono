@@ -1,16 +1,13 @@
+import * as I from 'immutable'
 import React, { memo, useCallback, useMemo } from 'react'
 import ReactDOM from 'react-dom'
-
-import * as I from 'immutable'
-
 import * as num from 'typescript-utils/functions/number'
-import * as str from 'typescript-utils/functions/string'
 import * as random from 'typescript-utils/functions/random'
-
-import { TableSettings } from './types/table-settings'
+import * as str from 'typescript-utils/functions/string'
 import { DataTable } from './data-table'
-import { TDataTableState } from './types/data-table-state'
 import { ColumnSetting } from './types/column-setting'
+import { TDataTableState } from './types/data-table-state'
+import { TableSettings } from './types/table-settings'
 
 const alph = I.List(str.getAlphabets('lower'))
 
@@ -21,7 +18,7 @@ const tableGenerator = () =>
       random.getShuffled(randomAlphabets.toArray()).join(''),
       randomAlphabets,
       randomAlphabets,
-      randomAlphabets.size
+      randomAlphabets.size,
     ])
   })
 
@@ -34,7 +31,7 @@ const settings = TableSettings({
     headerValues: 200,
     sort: 200,
     itemsPerPage: 50,
-    pageNumber: 50
+    pageNumber: 50,
   },
   columnSettings: I.List([
     ColumnSetting({
@@ -43,7 +40,7 @@ const settings = TableSettings({
       filterType: 'input',
       align: 'center',
       sort: 'string',
-      isButton: false
+      isButton: false,
     }),
     ColumnSetting({
       label: 'alphabets set (and)',
@@ -52,7 +49,7 @@ const settings = TableSettings({
       align: 'center',
       sort: 'string-lex',
       isButton: true,
-      cellToStr: (cell: I.List<string>) => cell.join(',')
+      cellToStr: (cell: I.List<string>) => cell.join(','),
     }),
     ColumnSetting({
       label: 'alphabets set (or)',
@@ -61,7 +58,7 @@ const settings = TableSettings({
       align: 'center',
       sort: false,
       isButton: false,
-      cellToStr: (cell: I.List<string>) => cell.join(',')
+      cellToStr: (cell: I.List<string>) => cell.join(','),
     }),
     ColumnSetting({
       label: 'length',
@@ -69,9 +66,9 @@ const settings = TableSettings({
       filterType: 'select',
       align: 'center',
       sort: num.cmp,
-      isButton: false
-    })
-  ])
+      isButton: false,
+    }),
+  ]),
 })
 
 export const DataTableDemo = memo(() => {

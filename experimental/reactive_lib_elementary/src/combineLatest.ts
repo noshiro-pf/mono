@@ -18,7 +18,7 @@ class MergeObservable<T extends Observable<any>[]> extends Observable<
     this.latestValues = new Array<any>(srcs.length).fill(INITIAL_VALUE);
 
     srcs.forEach((src, idx) => {
-      src.subscribe(v => {
+      src.subscribe((v) => {
         this.latestValues[idx] = v;
 
         if (!this.latestValues.includes(INITIAL_VALUE)) {

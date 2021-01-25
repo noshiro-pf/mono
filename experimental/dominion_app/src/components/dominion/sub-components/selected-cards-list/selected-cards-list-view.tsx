@@ -1,39 +1,38 @@
-import React, { useCallback, memo, Fragment, CSSProperties } from 'react'
-import * as I from 'immutable'
 import {
+  Button,
+  Checkbox,
   Table,
+  TableBody,
+  TableCell,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-  Checkbox,
-  Button
 } from '@material-ui/core'
-
-import {
-  TSelectedCards,
-  isEmpty,
-  TSelectedCardsKeys
-} from '~/types/selected-cards'
-import { TDCardProperty, DCardProperty } from '~/types/dcard-property'
-import { TSelectedCardsCheckbox } from '~/types/selected-cards-checkbox-values'
-import { dcardCostToStr } from '~/types/card-cost'
+import * as I from 'immutable'
+import React, { CSSProperties, Fragment, memo, useCallback } from 'react'
 import styled from 'styled-components'
+import { dcardCostToStr } from '~/types/card-cost'
+import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
+import {
+  isEmpty,
+  TSelectedCards,
+  TSelectedCardsKeys,
+} from '~/types/selected-cards'
+import { TSelectedCardsCheckbox } from '~/types/selected-cards-checkbox-values'
 
 const TableWrapper = styled.div`
   overflow-x: auto;
 `
 
 const expansionColumnCellStyle: CSSProperties = {
-  minWidth: '140px'
+  minWidth: '140px',
 }
 
 const nameJpColumnCellStyle: CSSProperties = {
-  minWidth: '180px'
+  minWidth: '180px',
 }
 
 const nameEngColumnCellStyle: CSSProperties = {
-  minWidth: '140px'
+  minWidth: '140px',
 }
 
 export const SelectedCardsListView = memo(
@@ -44,7 +43,7 @@ export const SelectedCardsListView = memo(
     dcardlist,
     selectedCardsCheckbox,
     selectedCardsCategories,
-    cardInfoButtonClicked
+    cardInfoButtonClicked,
   }: Readonly<{
     selectedCards: TSelectedCards
     showSelectedCardsCheckbox: boolean
@@ -95,7 +94,7 @@ export const SelectedCardsListView = memo(
               </TableRow>
             )}
           </TableHead>
-          {selectedCardsCategories.map(category => (
+          {selectedCardsCategories.map((category) => (
             <Fragment key={category.name}>
               <TableHead>
                 {!selectedCards.get(category.name).isEmpty() && (
@@ -115,7 +114,7 @@ export const SelectedCardsListView = memo(
                             <Checkbox
                               checked={selectedCardsCheckbox.getIn([
                                 category.name,
-                                idx
+                                idx,
                               ])}
                               onChange={checkboxOnChange(category.name, idx)}
                             />

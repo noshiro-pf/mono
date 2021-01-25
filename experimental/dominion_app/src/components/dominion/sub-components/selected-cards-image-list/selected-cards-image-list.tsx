@@ -1,15 +1,13 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
+import React, { memo } from 'react'
 import { TDCardProperty } from '~/types/dcard-property'
 import { TSelectedCardsId } from '~/types/selected-cards-id'
-
 import { DCardImageList } from '../dcard-image-list/dcard-image-list'
 
 export const SelectedCardsImageList = memo(
   ({
     cardIdToDCardProperty,
-    selectedCardsId
+    selectedCardsId,
   }: Readonly<{
     cardIdToDCardProperty: I.Map<string, TDCardProperty>
     selectedCardsId: TSelectedCardsId

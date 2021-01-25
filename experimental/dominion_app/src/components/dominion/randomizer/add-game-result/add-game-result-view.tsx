@@ -1,16 +1,14 @@
-import React, { memo } from 'react'
+import { Button, Dialog, DialogActions, DialogContent } from '@material-ui/core'
 import * as I from 'immutable'
+import React, { memo } from 'react'
 import styled from 'styled-components'
-import { Button, Dialog, DialogContent, DialogActions } from '@material-ui/core'
-
-import { TPlayerResultRanked } from '~/types/player-result-ranked'
 import { TPlayerResultChange } from '~/types/player-result-change'
-
-import { VictoryPointsCalculator } from '../victory-points-calculator/victory-points-calculator'
+import { TPlayerResultRanked } from '~/types/player-result-ranked'
 import { GamePlayedDate } from '../../sub-components/game-result-sub-components/game-played-date'
+import { GameResultMemo } from '../../sub-components/game-result-sub-components/game-result-memo'
 import { GameResultPlace } from '../../sub-components/game-result-sub-components/game-result-place'
 import { PlayerResultTable } from '../../sub-components/game-result-sub-components/player-result-table/player-result-table'
-import { GameResultMemo } from '../../sub-components/game-result-sub-components/game-result-memo'
+import { VictoryPointsCalculator } from '../victory-points-calculator/victory-points-calculator'
 
 const Item = styled.div`
   margin: 10px;
@@ -40,7 +38,7 @@ export const AddGameResultView = memo(
     lastTurnPlayer,
     lastTurnPlayerChange,
     playerResults,
-    playerResultChange
+    playerResultChange,
   }: Readonly<{
     VPCalcIsOpen: boolean
     openVPCalc: () => void

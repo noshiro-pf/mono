@@ -1,11 +1,10 @@
-import React, { memo, useMemo } from 'react'
-import * as I from 'immutable'
-import FilterListIcon from '@material-ui/icons/FilterList'
 import { IconButton } from '@material-ui/core'
-
+import FilterListIcon from '@material-ui/icons/FilterList'
+import * as I from 'immutable'
+import React, { memo, useMemo } from 'react'
+import styled from 'styled-components'
 import { ISelectorOptionWithViewValue } from '../../../../types/selector-option-with-view-value'
 import { FilterByMultiselectDialog } from './filter-by-multiselect-dialog'
-import styled from 'styled-components'
 
 const Label = styled.div`
   text-align: center;
@@ -33,7 +32,7 @@ const generateLabel = (
     return selectorOptions.get(selectedIndice.get(0, 0), { viewValue: '' })
       .viewValue
   const values = selectedIndice.map(
-    i => selectorOptions.get(i, { viewValue: '' }).viewValue
+    (i) => selectorOptions.get(i, { viewValue: '' }).viewValue
   )
   return `${values.join(', ')} (${multiSelectType})`
 }
@@ -47,7 +46,7 @@ export const HeaderCellMultiSelectByDialogView = memo(
     openDialogClick,
     dialogTitle,
     dialogCancelClick,
-    dialogOkClick
+    dialogOkClick,
   }: Readonly<{
     multiSelectType: 'and' | 'or'
     selectorOptions: I.List<ISelectorOptionWithViewValue>

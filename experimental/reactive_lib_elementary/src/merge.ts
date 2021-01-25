@@ -11,8 +11,8 @@ class MergeObservable<T extends Observable<any>[]> extends Observable<
   constructor(...srcs: T) {
     super();
 
-    srcs.forEach(src => {
-      src.subscribe(v => this.update(v));
+    srcs.forEach((src) => {
+      src.subscribe((v) => this.update(v));
     });
   }
 }

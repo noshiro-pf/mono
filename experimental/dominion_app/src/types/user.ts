@@ -1,8 +1,7 @@
 import * as I from 'immutable'
-
 import {
   withDefault,
-  withDefaultMix
+  withDefaultMix,
 } from 'typescript-utils/functions/with-default'
 
 interface IUser {
@@ -57,8 +56,8 @@ const UserRecordFactory = I.Record<IUser>({
     cardSizeAutoChange: true,
     cardSizeRatio: 1,
     messageSec: 2000,
-    autoSort: true
-  })()
+    autoSort: true,
+  })(),
 })
 
 export const User = (user?: Partial<TUser>): TUser => {
@@ -79,8 +78,8 @@ export const User = (user?: Partial<TUser>): TUser => {
       cardSizeAutoChange: wdog('cardSizeAutoChange'),
       cardSizeRatio: wdog('cardSizeRatio'),
       messageSec: wdog('messageSec'),
-      autoSort: wdog('autoSort')
-    }
+      autoSort: wdog('autoSort'),
+    },
   })
 }
 
@@ -102,8 +101,8 @@ export const UserFromJS = (user?: Partial<IUserJS>): TUser => {
       cardSizeAutoChange: wdog('cardSizeAutoChange'),
       cardSizeRatio: wdog('cardSizeRatio'),
       messageSec: wdog('messageSec'),
-      autoSort: wdog('autoSort')
-    }
+      autoSort: wdog('autoSort'),
+    },
   })
 }
 
@@ -121,6 +120,6 @@ export const UserToJS = (user: TUser): IUserJS => ({
     cardSizeAutoChange: user.onlineGame.cardSizeAutoChange,
     cardSizeRatio: user.onlineGame.cardSizeRatio,
     messageSec: user.onlineGame.messageSec,
-    autoSort: user.onlineGame.autoSort
-  }
+    autoSort: user.onlineGame.autoSort,
+  },
 })

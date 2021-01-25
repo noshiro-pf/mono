@@ -1,5 +1,5 @@
-import React, { useCallback, memo } from 'react'
-import { Tabs, Tab } from '@material-ui/core'
+import { Tab, Tabs } from '@material-ui/core'
+import React, { memo, useCallback } from 'react'
 import { useValueWithDefault } from '../hooks/use-prop-with-default'
 
 export const MyTabs = memo(
@@ -7,7 +7,7 @@ export const MyTabs = memo(
     tabIndex,
     tabIndexChange,
     labels,
-    scrollable: scrollableInput
+    scrollable: scrollableInput,
   }: Readonly<{
     tabIndex: number
     tabIndexChange: (v: number) => void
@@ -32,7 +32,7 @@ export const MyTabs = memo(
         variant={scrollable ? 'scrollable' : 'fullWidth'}
         scrollButtons={scrollable ? 'off' : undefined}
       >
-        {labels.map(label => (
+        {labels.map((label) => (
           <Tab key={label} label={label} />
         ))}
       </Tabs>

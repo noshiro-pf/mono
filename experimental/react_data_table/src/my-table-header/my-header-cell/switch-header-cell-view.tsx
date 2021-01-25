@@ -1,13 +1,12 @@
+import * as I from 'immutable'
 import React, { memo } from 'react'
 import styled from 'styled-components'
-import * as I from 'immutable'
-
 import { FilterType } from '../../types/filter-type'
-import { ISelectorOptionWithViewValue } from '../../types/selector-option-with-view-value'
 import { HeaderValueType } from '../../types/header-value-type'
+import { ISelectorOptionWithViewValue } from '../../types/selector-option-with-view-value'
 import { HeaderCellInput } from './sub-components/header-cell-input/header-cell-input'
-import { HeaderCellSelect } from './sub-components/header-cell-select/header-cell-select'
 import { HeaderCellMultiSelectWithDialog } from './sub-components/header-cell-multiselect/header-cell-multiselect-with-dialog'
+import { HeaderCellSelect } from './sub-components/header-cell-select/header-cell-select'
 
 const HeaderCellDefault = styled.div`
   font-size: initial;
@@ -22,7 +21,7 @@ export const SwitchHeadereCellView = memo(
     headerValue,
     inputChange,
     selectedIndexChange,
-    selectedIndiceChange
+    selectedIndiceChange,
   }: Readonly<{
     filterType: FilterType
     label: string

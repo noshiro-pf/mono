@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
-import { EmptyCard } from './empty-card'
 import { DCardImageSub } from './dcard-image-sub'
+import { EmptyCard } from './empty-card'
 
 const noop = () => 0
 
@@ -13,7 +13,7 @@ export const DCardImageView = memo(
     height,
     borderWidth,
     description,
-    onClick
+    onClick,
   }: {
     empty: boolean
     isButton: boolean

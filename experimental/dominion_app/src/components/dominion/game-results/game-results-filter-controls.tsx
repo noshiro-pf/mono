@@ -1,8 +1,6 @@
-import React, { useMemo, useCallback, memo } from 'react'
 import * as I from 'immutable'
-
+import React, { memo, useCallback, useMemo } from 'react'
 import * as date from 'typescript-utils/functions/date'
-
 import { GameResultFilterControlsView } from './game-results-filter-controls-responsive'
 
 export const GameResultFilterControls = memo(
@@ -14,7 +12,7 @@ export const GameResultFilterControls = memo(
     latestClick,
     resetAllClick,
     numPlayersOptions,
-    numPlayerCheck
+    numPlayerCheck,
   }: Readonly<{
     dateBegin: number
     dateBeginChange: (v: number) => void

@@ -5,7 +5,7 @@ export const GameResultMemo = memo(
   ({
     editMode,
     memo,
-    memoChange
+    memoChange,
   }: Readonly<{
     editMode: boolean
     memo: string

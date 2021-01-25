@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { withDefaultMix } from 'typescript-utils/functions/with-default'
 
 interface ISelectedCardsCheckbox {
@@ -32,7 +31,7 @@ const SelectedCardsCheckboxRecordFactory = I.Record<ISelectedCardsCheckbox>({
   LandmarkCards: I.Repeat(false, 2).toList(),
   ProjectCards: I.Repeat(false, 2).toList(),
   Obelisk: I.Repeat(false, 1).toList(),
-  BlackMarketPile: I.Repeat(false, 15).toList()
+  BlackMarketPile: I.Repeat(false, 15).toList(),
 })
 
 export const SelectedCardsCheckbox = (
@@ -51,7 +50,7 @@ export const SelectedCardsCheckboxFromJS = (
     LandmarkCards: I.List(wd('LandmarkCards')),
     ProjectCards: I.List(wd('ProjectCards')),
     Obelisk: I.List(wd('Obelisk')),
-    BlackMarketPile: I.List(wd('BlackMarketPile'))
+    BlackMarketPile: I.List(wd('BlackMarketPile')),
   })
 }
 
@@ -64,5 +63,5 @@ export const SelectedCardsCheckboxToJS = (
   LandmarkCards: scchk.LandmarkCards.toArray(),
   ProjectCards: scchk.ProjectCards.toArray(),
   Obelisk: scchk.Obelisk.toArray(),
-  BlackMarketPile: scchk.BlackMarketPile.toArray()
+  BlackMarketPile: scchk.BlackMarketPile.toArray(),
 })

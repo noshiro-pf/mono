@@ -17,8 +17,8 @@ export class Observable<T> {
 
   update(value: T): void {
     this.value = value; // 値の更新
-    this.subscribers.forEach(s => s(value)); // subscribersへの通知
-    this.children.forEach(c => c.updateWithParentValue(value)); // 子Observableを発火させる
+    this.subscribers.forEach((s) => s(value)); // subscribersへの通知
+    this.children.forEach((c) => c.updateWithParentValue(value)); // 子Observableを発火させる
   }
 
   subscribe(fn: (value: T) => void): void {
@@ -44,7 +44,8 @@ export class Observable<T> {
   }
 }
 
-class MapObservable<T, S> extends Observable<S>
+class MapObservable<T, S>
+  extends Observable<S>
   implements ChildObservable<T, S> {
   private readonly mapFn: (value: T) => S;
 
@@ -59,7 +60,8 @@ class MapObservable<T, S> extends Observable<S>
   }
 }
 
-class FilterObservable<T> extends Observable<T>
+class FilterObservable<T>
+  extends Observable<T>
   implements ChildObservable<T, T> {
   private readonly filterFn: (value: T) => boolean;
 
@@ -75,7 +77,8 @@ class FilterObservable<T> extends Observable<T>
   }
 }
 
-class DebounceTimeObservable<T> extends Observable<T>
+class DebounceTimeObservable<T>
+  extends Observable<T>
   implements ChildObservable<T, T> {
   private readonly milliSec: number;
   private timerId: any;

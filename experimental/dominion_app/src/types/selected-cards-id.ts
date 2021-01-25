@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { withDefaultMix } from 'typescript-utils/functions/with-default'
 
 interface ISelectedCardsId {
@@ -38,7 +37,7 @@ const SelectedCardsIdRecordFactory = I.Record<ISelectedCardsId>({
   Obelisk: I.List<string>(),
   LandmarkCards: I.List<string>(),
   ProjectCards: I.List<string>(),
-  BlackMarketPile: I.List<string>()
+  BlackMarketPile: I.List<string>(),
 })
 
 export const SelectedCardsId = (
@@ -59,13 +58,13 @@ export const SelectedCardsIdFromJS = (
     Obelisk: I.List(wd('Obelisk')),
     LandmarkCards: I.List(wd('LandmarkCards')),
     ProjectCards: I.List(wd('ProjectCards')),
-    BlackMarketPile: I.List(wd('BlackMarketPile'))
+    BlackMarketPile: I.List(wd('BlackMarketPile')),
   })
 }
 
 export const SelectedCardsIdToJS: (
   scid: TSelectedCardsId
-) => ISelectedCardsIdJS = scid => ({
+) => ISelectedCardsIdJS = (scid) => ({
   Prosperity: scid.Prosperity,
   DarkAges: scid.DarkAges,
   KingdomCards10: scid.KingdomCards10.toArray(),
@@ -74,5 +73,5 @@ export const SelectedCardsIdToJS: (
   Obelisk: scid.Obelisk.toArray(),
   LandmarkCards: scid.LandmarkCards.toArray(),
   ProjectCards: scid.ProjectCards.toArray(),
-  BlackMarketPile: scid.BlackMarketPile.toArray()
+  BlackMarketPile: scid.BlackMarketPile.toArray(),
 })

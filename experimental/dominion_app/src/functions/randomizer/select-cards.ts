@@ -1,13 +1,11 @@
 import * as I from 'immutable'
-
 import { TDCardProperty } from '~/types/dcard-property'
-import { TSelectedCards, SelectedCards } from '~/types/selected-cards'
-
+import { SelectedCards, TSelectedCards } from '~/types/selected-cards'
 import { getDcardsInSelectedExpansionsWithIndex } from './get-shuffled-dcardlist'
-import { selectKingdomCards } from './select-kingdom-cards'
 import { ProperityDarkAges } from './properity_dark-ages'
 import { selectBaneCard } from './select-bane-card'
 import { selectBlackMarketPile } from './select-blackmarket'
+import { selectKingdomCards } from './select-kingdom-cards'
 import { selectObelisk } from './select-obelisk'
 
 export const selectCards = (
@@ -83,6 +81,6 @@ export const selectCards = (
     KingdomCards10: KingdomCards10.sort(), // （注）繁栄場・避難所場の決定後にソート
     LandmarkCards: LandmarkCards.sort(),
     Obelisk,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   })
 }

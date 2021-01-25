@@ -1,13 +1,11 @@
-import React, { memo } from 'react'
+import { Paper, Table, TableCell, TableHead, TableRow } from '@material-ui/core'
 import * as I from 'immutable'
+import React, { memo } from 'react'
 import styled from 'styled-components'
-import { Paper, Table, TableHead, TableCell, TableRow } from '@material-ui/core'
-
-import { TPlayerResultRanked } from '~/types/player-result-ranked'
 import { TPlayerResultChange } from '~/types/player-result-change'
-
-import { PlayerResultTableBodyNormal } from './table-body-normal'
+import { TPlayerResultRanked } from '~/types/player-result-ranked'
 import { PlayerResultTableBodyEditMode } from './table-body-edit-mode'
+import { PlayerResultTableBodyNormal } from './table-body-normal'
 
 const TableWrapper = styled.div`
   overflow-x: auto;
@@ -19,7 +17,7 @@ const tableHead: I.List<string> = I.List([
   'VP',
   'スコア',
   '席順',
-  '最後のプレイヤー'
+  '最後のプレイヤー',
 ])
 
 export const PlayerResultTable = memo(
@@ -28,7 +26,7 @@ export const PlayerResultTable = memo(
     lastTurnPlayer,
     playerResults,
     lastTurnPlayerChange,
-    playerResultChange
+    playerResultChange,
   }: Readonly<{
     editMode: boolean
     lastTurnPlayer: string

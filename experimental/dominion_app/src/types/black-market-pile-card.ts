@@ -15,7 +15,7 @@ export const BlackMarketPileCard = (
 ): TBlackMarketPileCard =>
   I.Record<IBlackMarketPileCard>({
     cardIndex: 0,
-    faceUp: false
+    faceUp: false,
   })(bm)
 
 export const BlackMarketPileCardFromJS = (
@@ -26,5 +26,5 @@ export const BlackMarketPileCardToJS = (
   bm: TBlackMarketPileCard
 ): IBlackMarketPileCardJS => ({
   cardIndex: bm.cardIndex,
-  faceUp: bm.faceUp
+  faceUp: bm.faceUp,
 })

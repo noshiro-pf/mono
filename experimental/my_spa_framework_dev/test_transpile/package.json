@@ -1,8 +1,8 @@
 {
   "name": "test_transpile",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
+  "main": "index.js",
   "dependencies": {
     "@types/node": "^13.13.4",
     "react": "^16.13.1",

@@ -1,25 +1,24 @@
-import React, { memo } from 'react'
+import { TableBody, TableCell, TableRow } from '@material-ui/core'
 import * as I from 'immutable'
-import { TableBody, TableRow, TableCell } from '@material-ui/core'
-
+import React, { memo } from 'react'
 import { TPlayerResultRanked } from '~/types/player-result-ranked'
 
 export const PlayerResultTableBodyNormal = memo(
   ({
     playerResults,
-    lastTurnPlayer
+    lastTurnPlayer,
   }: Readonly<{
     playerResults: I.List<TPlayerResultRanked>
     lastTurnPlayer: string
   }>) => {
-    const tableBody: I.List<I.List<any>> = playerResults.map(p =>
+    const tableBody: I.List<I.List<any>> = playerResults.map((p) =>
       I.List([
         p.rank,
         p.name,
         p.VP,
         p.score,
         p.turnOrder,
-        p.name === lastTurnPlayer ? 'o' : ''
+        p.name === lastTurnPlayer ? 'o' : '',
       ])
     )
 

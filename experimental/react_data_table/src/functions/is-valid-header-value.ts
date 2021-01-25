@@ -1,8 +1,7 @@
 import * as I from 'immutable'
-
+import { FilterType } from '../types/filter-type'
 import { HeaderValueType } from '../types/header-value-type'
 import { TTableSettings } from '../types/table-settings'
-import { FilterType } from '../types/filter-type'
 
 export const isValidHeaderValues = (
   settings: TTableSettings,

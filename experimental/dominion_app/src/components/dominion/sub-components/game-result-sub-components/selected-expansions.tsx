@@ -1,15 +1,15 @@
-import React, { CSSProperties, memo } from 'react'
-import * as I from 'immutable'
 import { Chip } from '@material-ui/core'
+import * as I from 'immutable'
+import React, { CSSProperties, memo } from 'react'
 
 const chipStyle: CSSProperties = {
-  margin: '5px'
+  margin: '5px',
 }
 
 export const SelectedExpansions = memo(
   ({
     expansions,
-    selectedExpansions
+    selectedExpansions,
   }: Readonly<{
     expansions: I.List<string>
     selectedExpansions: I.List<string>

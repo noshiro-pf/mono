@@ -1,21 +1,18 @@
-import React, { memo } from 'react'
-import * as I from 'immutable'
-import styled from 'styled-components'
 import { CircularProgress } from '@material-ui/core'
-
+import * as I from 'immutable'
+import React, { memo } from 'react'
+import { combine, merge, RN } from 'rnjs'
 import {
+  useEventAsStream,
+  useRN,
   useRNValue,
   useStateAsStream,
-  useEventAsStream,
-  useRN
 } from 'rnjs-hooks'
-import { RN, merge, combine } from 'rnjs'
+import styled from 'styled-components'
 import * as date from 'typescript-utils/functions/date'
-import * as ls from '~/local-storage-api'
-
 import * as fb from '~/firebase/firebase-worker'
+import * as ls from '~/local-storage-api'
 import { GameResult } from '~/types/game-result'
-
 import { SelectMyName } from '../select-my-name/select-my-name'
 import { GameResultsView } from './game-results-view'
 
@@ -49,13 +46,15 @@ export const GameResults = memo(() => {
 
   const firstDateInGRList$: RN<number> = useRN(
     fb.gameResults$
-      .map(grlist => date.toMidnightTimestamp(grlist.first(GameResult()).date))
+      .map((grlist) =>
+        date.toMidnightTimestamp(grlist.first(GameResult()).date)
+      )
       .skipUnchanged()
   )
 
   const latestDateInGRList$: RN<number> = useRN(
     fb.gameResults$
-      .map(grlist => date.toMidnightTimestamp(grlist.last(GameResult()).date))
+      .map((grlist) => date.toMidnightTimestamp(grlist.last(GameResult()).date))
       .skipUnchanged()
   )
 
@@ -98,8 +97,8 @@ export const GameResults = memo(() => {
   )
 
   const numPlayersOptions$ = useRN(
-    numPlayersCheckedValues$.map(s =>
-      numPlayersList.map(e => ({ numPlayers: e, checked: s.has(e) }))
+    numPlayersCheckedValues$.map((s) =>
+      numPlayersList.map((e) => ({ numPlayers: e, checked: s.has(e) }))
     )
   )
 
@@ -110,7 +109,7 @@ export const GameResults = memo(() => {
       dateEnd$,
       numPlayersCheckedValues$
     ).map(([GR, dBegin, dEnd, numPlayersChecked]) =>
-      GR.filter(g => {
+      GR.filter((g) => {
         const mDate = date.toMidnightTimestamp(g.date)
         return (
           mDate >= dBegin &&

@@ -1,33 +1,30 @@
 import * as I from 'immutable'
-
 import * as str from 'typescript-utils/functions/string'
 import { withDefaultMix } from 'typescript-utils/functions/with-default'
-
 import {
   ISelectedCardsJS,
-  TSelectedCards,
   SelectedCards,
-  SelectedCardsToJS
+  SelectedCardsToJS,
+  TSelectedCards,
 } from '~/types/selected-cards'
 import {
-  SelectedCardsCheckbox,
   ISelectedCardsCheckboxJS,
+  SelectedCardsCheckbox,
+  SelectedCardsCheckboxToJS,
   TSelectedCardsCheckbox,
-  SelectedCardsCheckboxToJS
 } from '~/types/selected-cards-checkbox-values'
-
 import {
-  IPlayerResultJS,
-  TPlayerResult,
-  PlayerResult,
-  PlayerResultToJS
-} from './player-result'
-import {
+  BlackMarketPileCard,
   IBlackMarketPileCardJS,
   TBlackMarketPileCard,
-  BlackMarketPileCard
 } from '../black-market-pile-card'
 import { BlackMarketPhase } from './black-market-phase.enum'
+import {
+  IPlayerResultJS,
+  PlayerResult,
+  PlayerResultToJS,
+  TPlayerResult,
+} from './player-result'
 
 interface IRandomizerGroup {
   key: string // set only when newly created
@@ -91,8 +88,8 @@ const RandomizerGroupRecordFactory = I.Record<IRandomizerGroup>({
     players: I.List(),
     place: '',
     memo: '',
-    lastTurnPlayerName: ''
-  })()
+    lastTurnPlayerName: '',
+  })(),
 })
 
 export const RandomizerGroup = (
@@ -126,12 +123,12 @@ export const RandomizerGroupFromJS = (
     resetVPCalculator: wd('resetVPCalculator'),
     newGameResult: {
       players: I.List(wdngr('players'))
-        .map(p => PlayerResult(p))
+        .map((p) => PlayerResult(p))
         .sort((a, b) => str.cmp(a.nameYomi, b.nameYomi)),
       place: wdngr('place'),
       memo: wdngr('memo'),
-      lastTurnPlayerName: wdngr('lastTurnPlayerName')
-    }
+      lastTurnPlayerName: wdngr('lastTurnPlayerName'),
+    },
   })
 }
 
@@ -156,6 +153,6 @@ export const RandomizerGroupToJS = (
     players: rmg.newGameResult.players.map(PlayerResultToJS).toArray(),
     place: rmg.newGameResult.place,
     memo: rmg.newGameResult.memo,
-    lastTurnPlayerName: rmg.newGameResult.lastTurnPlayerName
-  }
+    lastTurnPlayerName: rmg.newGameResult.lastTurnPlayerName,
+  },
 })

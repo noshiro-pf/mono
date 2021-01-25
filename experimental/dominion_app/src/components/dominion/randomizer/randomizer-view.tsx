@@ -1,12 +1,10 @@
-import React, { memo, useMemo } from 'react'
 import { Paper } from '@material-ui/core'
-
+import React, { memo, useMemo } from 'react'
 import { ComponentSwitcher } from '~/utils/components/component-switcher'
 import { MyTabs } from '~/utils/components/tabs'
-
-import { RandomizerSelectCards } from './randomizer-select-cards/randomizer-select-cards'
-import { BlackMarketPile } from './black-market-pile/black-marked-pile'
 import { AddGameResult } from './add-game-result/add-game-result'
+import { BlackMarketPile } from './black-market-pile/black-marked-pile'
+import { RandomizerSelectCards } from './randomizer-select-cards/randomizer-select-cards'
 
 export const RandomizerView = memo(
   ({
@@ -14,7 +12,7 @@ export const RandomizerView = memo(
     signedInToGroup,
     tabIndex,
     tabIndexOnChange: tabIndexOnChangeInput,
-    BlackMarketIsUsed
+    BlackMarketIsUsed,
   }: Readonly<{
     signedIn: boolean
     signedInToGroup: boolean

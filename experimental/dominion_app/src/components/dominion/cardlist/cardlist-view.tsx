@@ -1,11 +1,10 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
+import React, { memo } from 'react'
 import {
   DataTable,
-  TTableSettings,
+  ICellPosition,
   TDataTableState,
-  ICellPosition
+  TTableSettings,
 } from 'react-data-table'
 import styled from 'styled-components'
 
@@ -18,7 +17,7 @@ export const CardListView = memo(
     table,
     settings,
     cellClick,
-    tableStateChange
+    tableStateChange,
   }: Readonly<{
     table: I.List<I.List<any>>
     settings: TTableSettings

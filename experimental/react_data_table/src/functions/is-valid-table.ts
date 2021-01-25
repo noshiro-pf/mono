@@ -23,7 +23,7 @@ export const isValidTable = (
 
   // 行の長さが合わない場合
   const lengthOfRow0 = table.get(0, I.List()).size
-  if (table.findIndex(row => row.size !== lengthOfRow0) !== -1) {
+  if (table.findIndex((row) => row.size !== lengthOfRow0) !== -1) {
     if (log) console.error('some row differ in length')
     return false
   }

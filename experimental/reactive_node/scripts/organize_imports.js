@@ -5,7 +5,7 @@ const {
   Project,
   IndentationText,
   NewLineKind,
-  QuoteKind
+  QuoteKind,
 } = require('ts-morph');
 const tsconfig = require('tsconfig');
 const editorconfig = require('editorconfig');
@@ -13,7 +13,7 @@ const chalk = require('chalk');
 const path = require('path');
 
 // options is optional
-glob('./src/**/*.{ts,tsx}', null, function(er, files) {
+glob('./src/**/*.{ts,tsx}', null, function (er, files) {
   // files is an array of filenames.
   // If the `nonull` option is set, and nothing
   // was found, then files is ["**/*.js"]
@@ -39,13 +39,13 @@ function main(filePaths) {
       if (!tsConfigFilePath) {
         const adHocProject = new Project({
           manipulationSettings,
-          compilerOptions: { allowJs: true }
+          compilerOptions: { allowJs: true },
         });
         adHocProject.addExistingSourceFile(filePath);
         projects[adHocProjectCounter++] = {
           filePaths: [filePath],
           project: adHocProject,
-          detectNewLineKind: !!ec.end_of_line
+          detectNewLineKind: !!ec.end_of_line,
         };
       } else {
         projects[tsConfigFilePath] = {
@@ -53,7 +53,7 @@ function main(filePaths) {
           project: new Project({ tsConfigFilePath, manipulationSettings }),
           processAllFiles:
             path.basename(filePath).toLowerCase() === 'tsconfig.json',
-          detectNewLineKind: !!ec.end_of_line
+          detectNewLineKind: !!ec.end_of_line,
         };
       }
     }
@@ -63,11 +63,11 @@ function main(filePaths) {
     filePaths,
     project,
     processAllFiles,
-    detectNewLineKind
+    detectNewLineKind,
   } of Object.values(projects)) {
     const sourceFiles = processAllFiles
       ? project.getSourceFiles()
-      : filePaths.map(filePath => project.getSourceFile(filePath));
+      : filePaths.map((filePath) => project.getSourceFile(filePath));
 
     let changeCounter = 0,
       crLfWeight = 0;
@@ -102,7 +102,7 @@ function main(filePaths) {
           newLineKind:
             crLfWeight > 0
               ? NewLineKind.CarriageReturnLineFeed
-              : NewLineKind.LineFeed
+              : NewLineKind.LineFeed,
         });
       }
       project.saveSync();
@@ -124,6 +124,6 @@ function getManipulationSettings(ec) {
       ec.end_of_line === 'crlf'
         ? NewLineKind.CarriageReturnLineFeed
         : NewLineKind.LineFeed,
-    quoteKind: QuoteKind.Single
+    quoteKind: QuoteKind.Single,
   };
 }

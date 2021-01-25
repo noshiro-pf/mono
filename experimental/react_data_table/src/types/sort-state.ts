@@ -11,7 +11,7 @@ export type TSortState = I.Record<ISortState> & Readonly<ISortState>
 
 const SortStateRecordFactory = I.Record<ISortState>({
   activeColumnId: '',
-  activeCellState: ''
+  activeCellState: '',
 })
 
 export const SortState = (ss?: Partial<ISortState>): TSortState =>

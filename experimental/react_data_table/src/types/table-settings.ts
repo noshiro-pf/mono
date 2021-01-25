@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { TColumnSetting } from './column-setting'
 import { SortState, TSortState } from './sort-state'
 
@@ -31,8 +30,8 @@ const TableSettingsRecordFactory = I.Record<ITableSettings>({
     headerValues: 200,
     sort: 150,
     itemsPerPage: 50,
-    pageNumber: 50
-  }
+    pageNumber: 50,
+  },
 })
 
 export const TableSettings = (ts?: Partial<ITableSettings>): TTableSettings =>

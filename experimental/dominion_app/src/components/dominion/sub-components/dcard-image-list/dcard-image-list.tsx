@@ -1,9 +1,7 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
+import React, { memo } from 'react'
 import styled from 'styled-components'
-
-import { TDCardProperty, DCardProperty } from '~/types/dcard-property'
-
+import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
 import { DCardImage } from '../dcard-image/dcard-image'
 
 const DCardList = styled.div`
@@ -20,7 +18,7 @@ export const DCardImageList = memo(
   ({
     title,
     cardIds,
-    cardIdToDCardProperty
+    cardIdToDCardProperty,
   }: Readonly<{
     title?: string
     cardIds: I.List<string>
@@ -29,7 +27,7 @@ export const DCardImageList = memo(
     <>
       {title !== undefined && <div>{title}</div>}
       <DCardList>
-        {cardIds.map(k => (
+        {cardIds.map((k) => (
           <DCard key={k}>
             <DCardImage dcard={cardIdToDCardProperty.get(k, DCardProperty())} />
           </DCard>

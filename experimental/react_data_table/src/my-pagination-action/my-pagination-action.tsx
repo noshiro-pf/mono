@@ -6,7 +6,7 @@ export const MyPaginationActions = memo(
     page,
     count,
     rowsPerPage,
-    onChangePage
+    onChangePage,
   }: Readonly<{
     page: number
     count: number

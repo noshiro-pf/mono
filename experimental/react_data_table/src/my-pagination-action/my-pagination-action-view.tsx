@@ -1,10 +1,9 @@
-import React, { memo } from 'react'
 import { IconButton } from '@material-ui/core'
-
 import FirstPageIcon from '@material-ui/icons/FirstPage'
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import LastPageIcon from '@material-ui/icons/LastPage'
+import React, { memo } from 'react'
 import styled from 'styled-components'
 
 const Root = styled.div`
@@ -19,7 +18,7 @@ export const MyPaginationActionsView = memo(
     handleFirstPageButtonClick,
     handleBackButtonClick,
     handleNextButtonClick,
-    handleLastPageButtonClick
+    handleLastPageButtonClick,
   }: Readonly<{
     page: number
     count: number

@@ -1,17 +1,15 @@
-import React, { useState, useCallback, memo } from 'react'
 import * as I from 'immutable'
-
-import { useRNValue } from 'rnjs-hooks'
+import React, { memo, useCallback, useState } from 'react'
 import {
-  DataTable,
-  TableSettings,
-  SortState,
   ColumnSetting,
-  ICellPosition
+  DataTable,
+  ICellPosition,
+  SortState,
+  TableSettings,
 } from 'react-data-table'
-
-import * as fb from '~/firebase/firebase-worker'
+import { useRNValue } from 'rnjs-hooks'
 import * as fbc from '~/firebase/firebase-combined-values'
+import * as fb from '~/firebase/firebase-worker'
 import { GameResult, TGameResult } from '~/types/game-result'
 import { GameResultDialog } from '../../sub-components/game-result-dialog/game-result-dialog'
 
@@ -24,18 +22,18 @@ const settings = TableSettings({
   columnSettings: I.List([
     ColumnSetting({
       label: '日付',
-      sort: 'number'
+      sort: 'number',
     }),
     ColumnSetting({
       label: '場所',
-      filterType: 'select'
+      filterType: 'select',
     }),
     ColumnSetting({
       label: '順位（クリックすると詳細を表示します）',
       align: 'left',
-      isButton: true
-    })
-  ])
+      isButton: true,
+    }),
+  ]),
 })
 
 const toYMDslashed = (e: string) => {
@@ -45,15 +43,15 @@ const toYMDslashed = (e: string) => {
 
 export const GameResultList = memo(
   ({
-    gameResultsFiltered
+    gameResultsFiltered,
   }: Readonly<{
     gameResultsFiltered: I.List<TGameResult>
   }>) => {
-    const table = gameResultsFiltered.map(gr =>
+    const table = gameResultsFiltered.map((gr) =>
       I.List([
         toYMDslashed(gr.date),
         gr.place,
-        gr.players.map(p => `${p.rank}. ${p.name}(${p.VP})`).join('，')
+        gr.players.map((p) => `${p.rank}. ${p.name}(${p.VP})`).join('，'),
       ])
     )
 

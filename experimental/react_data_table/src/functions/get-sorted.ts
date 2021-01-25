@@ -1,12 +1,10 @@
 import * as I from 'immutable'
-
 import * as list from 'typescript-utils/functions/list'
-import * as str from 'typescript-utils/functions/string'
 import * as num from 'typescript-utils/functions/number'
-
-import { TTableSettings } from '../types/table-settings'
-import { TSortState } from '../types/sort-state'
+import * as str from 'typescript-utils/functions/string'
 import { ColumnSetting } from '../types/column-setting'
+import { TSortState } from '../types/sort-state'
+import { TTableSettings } from '../types/table-settings'
 
 export const getSortedIndice = (
   table: I.List<I.List<any>>,

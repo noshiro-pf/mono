@@ -4,7 +4,7 @@ export const fbAppConfig = {
   databaseURL: 'https://dominionapps.firebaseio.com',
   projectId: 'dominionapps',
   storageBucket: 'dominionapps.appspot.com',
-  messagingSenderId: '830879011229'
+  messagingSenderId: '830879011229',
 }
 
 const devOrProd: 'dev' | 'prod' = (() => {
@@ -22,18 +22,18 @@ export const fbPaths = {
   storage: {
     dcardImages: 'images/dcard',
     rulebookCoverImage: 'images/cover',
-    rulebookPdf: 'pdf'
+    rulebookPdf: 'pdf',
   },
   database: {
     data: {
       dcardlist: `/${devOrProd}/data/dcardPropertyList`,
       expansions: `/${devOrProd}/data/expansions`,
-      scoreTable: `/${devOrProd}/data/scoreTable`
+      scoreTable: `/${devOrProd}/data/scoreTable`,
     },
     gameResults: `/${devOrProd}/gameResultList`,
     onlineGameCommunications: `/${devOrProd}/onlineGameCommunicationList`,
     onlineGameRooms: `/${devOrProd}/onlineGameRooms`,
     randomizerGroups: `/${devOrProd}/randomizerGroups`,
-    users: `/${devOrProd}/users`
-  }
+    users: `/${devOrProd}/users`,
+  },
 }

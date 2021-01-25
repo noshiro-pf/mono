@@ -12,5 +12,5 @@ export const Rulebook = (rb: Partial<IRulebook>): TRulebook =>
   I.Record({
     imgurl: '',
     pdfurl: '',
-    title: ''
+    title: '',
   })(rb)

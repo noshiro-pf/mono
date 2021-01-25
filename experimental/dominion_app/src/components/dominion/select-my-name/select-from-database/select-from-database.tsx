@@ -1,8 +1,7 @@
-import React, { memo, useMemo } from 'react'
+import { Button, FormControl, FormHelperText } from '@material-ui/core'
 import * as I from 'immutable'
+import React, { memo, useMemo } from 'react'
 import styled from 'styled-components'
-import { FormControl, Button, FormHelperText } from '@material-ui/core'
-
 import { MySelect } from '~/utils/components/native-select'
 
 const Root = styled.div`
@@ -26,7 +25,7 @@ export const SelectFromDatabase = memo(
     selectedNameChange,
     deleteCurrentNameClick,
     renameClick,
-    selectedNameIsInGameResults
+    selectedNameIsInGameResults,
   }: Readonly<{
     nameList: I.List<string>
     selectedName: string

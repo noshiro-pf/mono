@@ -1,24 +1,22 @@
-import React, { useMemo, useState, useCallback, memo } from 'react'
 import * as I from 'immutable'
-
+import React, { memo, useCallback, useMemo, useState } from 'react'
+import {
+  ICellPosition,
+  TDataTableState,
+  TTableSettings,
+} from 'react-data-table'
 import { RN } from 'rnjs'
 import { useRNValue } from 'rnjs-hooks'
-import {
-  TDataTableState,
-  ICellPosition,
-  TTableSettings
-} from 'react-data-table'
-
 import * as fb from '~/firebase/firebase-worker'
 import { DCardPropertyListDialog } from '../sub-components/dcard-property-dialog/dcard-property-list-dialog'
-import { CardListView } from './cardlist-view'
 import { cardlistTableSettings } from './cardlist-table-settings'
+import { CardListView } from './cardlist-view'
 
 export const CardList = memo(() => {
   const table$: RN<I.List<I.List<any>>> = useMemo(
     () =>
-      fb.dcardlist$.map(list =>
-        list.map(dc =>
+      fb.dcardlist$.map((list) =>
+        list.map((dc) =>
           I.List([
             dc.nameJp, // '名前'
             dc.nameEng, // 'Name'
@@ -35,7 +33,7 @@ export const CardList = memo(() => {
             dc.effects.coffer, // '+coffer'
             dc.effects.villager, // '+villager'
             dc.implemented, // 'ゲーム実装状況'
-            dc.randomizerCandidate // 'ランダマイザー対象'
+            dc.randomizerCandidate, // 'ランダマイザー対象'
           ])
         )
       ),
@@ -44,7 +42,7 @@ export const CardList = memo(() => {
 
   const cardlistSettings$: RN<TTableSettings> = useMemo(
     () =>
-      fb.expansions$.map(expansions =>
+      fb.expansions$.map((expansions) =>
         cardlistTableSettings(
           expansions.reduce((m, v, i) => m.set(v, i), I.Map<string, number>())
         )

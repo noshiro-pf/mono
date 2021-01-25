@@ -11,7 +11,7 @@ export const detach = <T extends Node>(node: T): void => {
   node.parentNode?.removeChild(node);
 };
 
-export const createSpaceElement = (): Text => document.createTextNode(" ");
+export const createSpaceElement = (): Text => document.createTextNode(' ');
 
 export const listen = (
   node: HTMLElement,

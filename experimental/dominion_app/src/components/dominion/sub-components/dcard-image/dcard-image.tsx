@@ -1,7 +1,5 @@
-import React, { memo, useMemo, useCallback } from 'react'
-
-import { TDCardProperty, isWideCard } from '~/types/dcard-property'
-
+import React, { memo, useCallback, useMemo } from 'react'
+import { isWideCard, TDCardProperty } from '~/types/dcard-property'
 import { DCardImageView } from './dcard-image-view'
 
 export const DCardImage = memo(
@@ -14,7 +12,7 @@ export const DCardImage = memo(
     height: heightInput,
     description: descriptionInput,
     returnValue,
-    onClick: onClickInput
+    onClick: onClickInput,
   }: Readonly<{
     dcard: TDCardProperty
     faceUp?: boolean
@@ -53,7 +51,7 @@ export const DCardImage = memo(
 
     const borderWidth = useMemo(() => (18 / 250) * Math.min(width, height), [
       width,
-      height
+      height,
     ])
 
     const imgUrl = faceUp ? dcard.imgUrl.front : dcard.imgUrl.back

@@ -1,20 +1,18 @@
 import * as I from 'immutable'
-
-import { RN, merge, combine } from 'rnjs'
+import { combine, merge, RN } from 'rnjs'
 import * as obj from 'typescript-utils/functions/object'
-
-import { TableSettings, TTableSettings } from '../types/table-settings'
-import { TSortState } from '../types/sort-state'
-import { getFilteredIndice } from './get-filtered'
-import { getSortedIndice } from './get-sorted'
-import { getSlicedIndice } from './get-sliced'
-import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
-import { makeAllSelectOptions } from './make-select-options'
+import { DataTableState, TDataTableState } from '../types/data-table-state'
 import { HeaderValueType } from '../types/header-value-type'
-import { TDataTableState, DataTableState } from '../types/data-table-state'
-import { makeAllSelectOptionsWithViewValue } from './make-select-options-view-value'
+import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
+import { TSortState } from '../types/sort-state'
+import { TableSettings, TTableSettings } from '../types/table-settings'
+import { getFilteredIndice } from './get-filtered'
+import { getSlicedIndice } from './get-sliced'
+import { getSortedIndice } from './get-sorted'
 import { initialHeaderValues as getInitialHeaderValues } from './initial-form-state'
 import { isValidInput } from './is-valid-input'
+import { makeAllSelectOptions } from './make-select-options'
+import { makeAllSelectOptionsWithViewValue } from './make-select-options-view-value'
 import { transformTable } from './transform-table'
 
 type IHeaderValueChange = {
@@ -63,7 +61,7 @@ export const DataTableDataFlow = (
 
   const headerValuesAll$: RN<
     I.List<HeaderValueType>
-  > = initialHeaderValues$.switchMap(initialHeaderValues =>
+  > = initialHeaderValues$.switchMap((initialHeaderValues) =>
     merge(headerValueChange$, resetAllClick$.mapTo<'resetAll'>('resetAll'))
       .scan(
         initialHeaderValues,
@@ -78,11 +76,11 @@ export const DataTableDataFlow = (
   const headerValuesAllBuffered$ = settings$
     .pluck('bufferTime')
     .pluck('headerValues')
-    .switchMap(t => headerValuesAll$.debounce(t))
+    .switchMap((t) => headerValuesAll$.debounce(t))
 
   const sortState$: RN<TSortState> = settings$
     .pluck('sortInit')
-    .switchMap(sortInit =>
+    .switchMap((sortInit) =>
       merge(sortStateChange$, resetAllClick$.mapTo(sortInit))
         .withInitialValue(sortInit)
         .skipUnchanged(obj.shallowEq)
@@ -91,12 +89,12 @@ export const DataTableDataFlow = (
   const sortStateBuffered$ = settings$
     .pluck('bufferTime')
     .pluck('sort')
-    .switchMap(t => sortState$.debounce(t))
+    .switchMap((t) => sortState$.debounce(t))
 
   // グローバル変数にすると複数のDataTableでcacheが共有されてしまう
   const filterCache = {
     headerValuesAllPrev: I.List(),
-    filterResults: [] as boolean[][]
+    filterResults: [] as boolean[][],
   }
 
   const filteredIndice$: RN<I.List<number>> = combine(
@@ -138,7 +136,7 @@ export const DataTableDataFlow = (
 
   const itemsPerPage$: RN<number> = settings$
     .pluck('itemsPerPageInit')
-    .switchMap(itemsPerPageInit =>
+    .switchMap((itemsPerPageInit) =>
       merge(itemsPerPageChange$, resetAllClick$.mapTo(itemsPerPageInit))
         .withInitialValue(itemsPerPageInit)
         .skipUnchanged()
@@ -147,7 +145,7 @@ export const DataTableDataFlow = (
   const itemsPerPageBuffered$ = settings$
     .pluck('bufferTime')
     .pluck('itemsPerPage')
-    .switchMap(t => itemsPerPage$.debounce(t))
+    .switchMap((t) => itemsPerPage$.debounce(t))
 
   const pageLength$: RN<number> = combine(filteredLength$, itemsPerPage$)
     .map(([length, itemsPerPage]) => Math.ceil(length / itemsPerPage))
@@ -162,7 +160,7 @@ export const DataTableDataFlow = (
   const pageNumberBuffered$ = settings$
     .pluck('bufferTime')
     .pluck('pageNumber')
-    .switchMap(t => pageNumber$.debounce(t))
+    .switchMap((t) => pageNumber$.debounce(t))
 
   const sortedIndice$: RN<I.List<number>> = combine(
     filteredIndice$,
@@ -189,7 +187,7 @@ export const DataTableDataFlow = (
     slicedIndice$
   ).map(([tableTransformed, slicedIndice]) =>
     slicedIndice.map(
-      i =>
+      (i) =>
         [i, tableTransformed.get(i, I.List<string>())] as [
           number,
           I.List<string>
@@ -217,7 +215,7 @@ export const DataTableDataFlow = (
       filteredIndice,
       sortedIndice,
       slicedIndice,
-      tableTransformedSliced
+      tableTransformedSliced,
     ]) =>
       DataTableState({
         sortState,
@@ -228,7 +226,7 @@ export const DataTableDataFlow = (
         filteredIndice,
         sortedIndice,
         slicedIndice,
-        tableTransformedSliced
+        tableTransformedSliced,
       })
   )
 }

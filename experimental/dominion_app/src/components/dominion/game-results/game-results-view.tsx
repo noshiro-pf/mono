@@ -1,15 +1,14 @@
-import React, { useState, memo } from 'react'
-import * as I from 'immutable'
-import styled from 'styled-components'
 import { Divider, Paper } from '@material-ui/core'
-
+import * as I from 'immutable'
+import React, { memo, useState } from 'react'
+import styled from 'styled-components'
 import { TGameResult } from '~/types/game-result'
-import { GameResultFilterControls } from './game-results-filter-controls'
-import { ScoreTable } from './score-table/score-table'
-import { GameResultList } from './game-result-list/game-result-list'
-import { GameResultOfPlayer } from './game-result-of-player/game-result-of-player'
 import { ComponentSwitcher } from '~/utils/components/component-switcher'
 import { MyTabs } from '~/utils/components/tabs'
+import { GameResultList } from './game-result-list/game-result-list'
+import { GameResultOfPlayer } from './game-result-of-player/game-result-of-player'
+import { GameResultFilterControls } from './game-results-filter-controls'
+import { ScoreTable } from './score-table/score-table'
 
 const Root = styled.div`
   padding: 20px;
@@ -29,7 +28,7 @@ export const GameResultsView = memo(
     latestClick,
     resetAllClick,
     numPlayersOptions,
-    numPlayerCheck
+    numPlayerCheck,
   }: Readonly<{
     gameResultsFiltered: I.List<TGameResult>
     dateBegin: number

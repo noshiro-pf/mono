@@ -1,11 +1,10 @@
-import React, { memo, useCallback } from 'react'
 import * as I from 'immutable'
-
-import { MyTableHeaderView } from './my-table-header-view'
-import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
+import React, { memo, useCallback } from 'react'
 import { TColumnSetting } from '../types/column-setting'
-import { CellSortStateType, TSortState, SortState } from '../types/sort-state'
 import { HeaderValueType } from '../types/header-value-type'
+import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
+import { CellSortStateType, SortState, TSortState } from '../types/sort-state'
+import { MyTableHeaderView } from './my-table-header-view'
 
 export const MyTableHeader = memo(
   ({
@@ -15,7 +14,7 @@ export const MyTableHeader = memo(
     headerValues,
     sortState,
     headerValueChange,
-    sortStateChange
+    sortStateChange,
   }: Readonly<{
     displayNo: boolean
     columnSettings: I.List<TColumnSetting>
@@ -33,7 +32,7 @@ export const MyTableHeader = memo(
         sortStateChange(
           SortState({
             activeColumnId: cellSortState === '' ? '' : columnId,
-            activeCellState: cellSortState
+            activeCellState: cellSortState,
           })
         )
       },

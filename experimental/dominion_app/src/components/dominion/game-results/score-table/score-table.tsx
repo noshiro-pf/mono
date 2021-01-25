@@ -1,12 +1,10 @@
-import React, { useMemo, memo } from 'react'
-import * as I from 'immutable'
 import { CircularProgress } from '@material-ui/core'
-
+import * as I from 'immutable'
+import React, { memo, useMemo } from 'react'
+import { ColumnSetting, DataTable, TableSettings } from 'react-data-table'
 import { useRNValue } from 'rnjs-hooks'
-import { TableSettings, DataTable, ColumnSetting } from 'react-data-table'
-
-import * as fb from '~/firebase/firebase-worker'
 import styled from 'styled-components'
+import * as fb from '~/firebase/firebase-worker'
 
 const Loading = styled.div`
   display: flex;
@@ -26,18 +24,18 @@ const settings = TableSettings({
     ColumnSetting({ label: '3位' }),
     ColumnSetting({ label: '4位' }),
     ColumnSetting({ label: '5位' }),
-    ColumnSetting({ label: '6位' })
-  ])
+    ColumnSetting({ label: '6位' }),
+  ]),
 })
 
 export const ScoreTable = memo(() => {
   const scoreTableForView$ = useMemo(
     () =>
-      fb.scoreTable$.map(scoringTable =>
+      fb.scoreTable$.map((scoringTable) =>
         scoringTable
           .map((value, index) => ({ numPlayers: index, score: value }))
-          .filter(e => e.score.get(1, -1) > 0)
-          .map(e =>
+          .filter((e) => e.score.get(1, -1) > 0)
+          .map((e) =>
             I.List([
               e.numPlayers.toString(),
               e.score.get(1, -1) < 0 ? '' : e.score.get(1, 0).toString(),
@@ -45,7 +43,7 @@ export const ScoreTable = memo(() => {
               e.score.get(3, -1) < 0 ? '' : e.score.get(3, 0).toString(),
               e.score.get(4, -1) < 0 ? '' : e.score.get(4, 0).toString(),
               e.score.get(5, -1) < 0 ? '' : e.score.get(5, 0).toString(),
-              e.score.get(6, -1) < 0 ? '' : e.score.get(6, 0).toString()
+              e.score.get(6, -1) < 0 ? '' : e.score.get(6, 0).toString(),
             ])
           )
       ),

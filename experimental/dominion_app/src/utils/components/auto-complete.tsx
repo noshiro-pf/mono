@@ -1,5 +1,5 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
+import React, { memo } from 'react'
 // import CreatableSelect from 'react-select/src/Creatable';
 // import { ValueType } from 'react-select/lib/types';
 
@@ -8,7 +8,7 @@ export const AutoComplete = memo(
     value: valueInput,
     options: optionsInput,
     onChange: onChangeInput,
-    placeholder
+    placeholder,
   }: Readonly<{
     value: string
     options: I.List<string>

@@ -1,15 +1,15 @@
 import React, {
-  useState,
+  CSSProperties,
+  memo,
   useCallback,
   useEffect,
-  memo,
-  CSSProperties
+  useState,
 } from 'react'
 
 export const ImgWithLoader = memo(
   ({
     Loading,
-    img
+    img,
   }: Readonly<{
     Loading: JSX.Element
     img: {

@@ -1,5 +1,5 @@
 import { createRoot } from 'solid-js';
-import { styled, ThemeProvider, setup } from '../dist/index';
+import { setup, styled, ThemeProvider } from '../dist/index';
 
 describe('Simple Styled', () => {
   test('Creates component properly', () => {

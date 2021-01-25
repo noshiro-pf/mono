@@ -1,11 +1,15 @@
 {
-  "license": "MIT",
   "name": "svelte-app",
   "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public --dev"
+  },
+  "dependencies": {
+    "sirv-cli": "^0.4.4",
+    "tslib": "^1.11.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "11.0.2",
@@ -15,9 +19,5 @@
     "rollup-plugin-svelte": "^5.0.3",
     "rollup-plugin-terser": "^5.1.2",
     "svelte": "^3.0.0"
-  },
-  "dependencies": {
-    "sirv-cli": "^0.4.4",
-    "tslib": "^1.11.1"
   }
 }

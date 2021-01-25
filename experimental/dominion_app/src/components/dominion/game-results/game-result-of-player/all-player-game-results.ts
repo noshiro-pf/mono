@@ -1,15 +1,14 @@
 import * as I from 'immutable'
-
-import { IPlayerGameResult } from './player-game-result-type'
 import { TGameResult } from '~/types/game-result'
+import { IPlayerGameResult } from './player-game-result-type'
 
 export const allPlayerGameResults = (
   gameResultsFiltered: I.List<TGameResult>
 ): I.List<IPlayerGameResult> => {
   // get all player names
   const userNames = new Set<string>()
-  gameResultsFiltered.forEach(gr =>
-    gr.players.forEach(player => {
+  gameResultsFiltered.forEach((gr) =>
+    gr.players.forEach((player) => {
       userNames.add(player.name)
     })
   )
@@ -19,16 +18,16 @@ export const allPlayerGameResults = (
     [key: string]: { numEachRank: number[]; scoreSum: number }
   } = {}
 
-  userNames.forEach(name => {
+  userNames.forEach((name) => {
     rankScoreSumObj[name] = {
       numEachRank: [0, 0, 0, 0, 0, 0, 0],
-      scoreSum: 0.0
+      scoreSum: 0.0,
     }
   })
 
   // sum up rank & score of each player
-  gameResultsFiltered.forEach(gr =>
-    gr.players.forEach(player => {
+  gameResultsFiltered.forEach((gr) =>
+    gr.players.forEach((player) => {
       rankScoreSumObj[player.name].numEachRank[player.rank]++
       rankScoreSumObj[player.name].scoreSum += player.score
     })
@@ -36,7 +35,7 @@ export const allPlayerGameResults = (
 
   // calculate numEachRank and score average
   const GRofEachPlayer: I.List<IPlayerGameResult> = I.List(userNames).map(
-    uname => {
+    (uname) => {
       const pl = rankScoreSumObj[uname]
       const count = pl.numEachRank.reduce((a, b) => a + b, 0)
       return {
@@ -44,7 +43,7 @@ export const allPlayerGameResults = (
         count: count,
         numEachRank: I.List(pl.numEachRank),
         scoreSum: pl.scoreSum,
-        scoreAverage: pl.scoreSum / count
+        scoreAverage: pl.scoreSum / count,
       }
     }
   )

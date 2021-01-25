@@ -1,10 +1,8 @@
-import React, { memo, useCallback, useState } from 'react'
 import { Button } from '@material-ui/core'
-
+import React, { memo, useCallback, useState } from 'react'
 import { useRNValue } from 'rnjs-hooks'
-
-import * as fb from '~/firebase/firebase-worker'
 import { fbPaths } from '~/constants/firebase-config'
+import * as fb from '~/firebase/firebase-worker'
 
 export const AdminDatabase = memo(() => {
   const dcardlist = useRNValue(fb.dcardlist$)
@@ -36,11 +34,11 @@ export const AdminDatabase = memo(() => {
         .getDownloadURL(),
       fb.storage
         .ref(`${fbPaths.storage.dcardImages}/${NormalBackImgName}`)
-        .getDownloadURL()
+        .getDownloadURL(),
     ])
 
     const frontImageUrls: string[] = await Promise.all(
-      dcardlist.map(dcard =>
+      dcardlist.map((dcard) =>
         fb.storage
           .ref(
             `${fbPaths.storage.dcardImages}/${dcard.nameEng.replace(
@@ -62,7 +60,7 @@ export const AdminDatabase = memo(() => {
 
     await Promise.all(
       dcardlist
-        .map(dcard => {
+        .map((dcard) => {
           const backImageUrl: string = (() => {
             if (dcard.cardTypes.includes('Boon')) return BoonBackImgUrl
             if (dcard.cardTypes.includes('Hex')) return HexBackImgUrl

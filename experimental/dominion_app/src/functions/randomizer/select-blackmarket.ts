@@ -1,6 +1,5 @@
 import * as I from 'immutable'
-
-import { TDCardProperty, DCardProperty } from '~/types/dcard-property'
+import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
 
 export const selectBlackMarketPile = (
   KingdomCards10: I.List<number>,
@@ -12,7 +11,7 @@ export const selectBlackMarketPile = (
 ): I.List<number> | 'error' => {
   if (
     KingdomCards10.concat(BaneCard)
-      .map(e => dcardlist.get(e, DCardProperty().nameJp))
+      .map((e) => dcardlist.get(e, DCardProperty().nameJp))
       .includes('闇市場')
   ) {
     const BlackMarketPileTemp: number[] = []

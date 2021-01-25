@@ -18,5 +18,5 @@ export const properties: I.List<{ memberName: string; name: string }> = I.List([
   { memberName: 'VPtoken', name: '+VP-token' },
   { memberName: 'coffer', name: '+Coffer' },
   { memberName: 'villager', name: '+Villager' },
-  { memberName: 'implemented', name: 'オンラインゲーム実装状況' }
+  { memberName: 'implemented', name: 'オンラインゲーム実装状況' },
 ])

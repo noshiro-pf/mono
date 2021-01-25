@@ -1,11 +1,11 @@
-import React, { ReactNodeArray, memo } from 'react'
+import React, { memo, ReactNodeArray } from 'react'
 
 // 非表示componentも状態を維持するためdisplay: noneを利用
 
 export const ComponentSwitcher = memo(
   ({
     children,
-    index
+    index,
   }: Readonly<{
     children: ReactNodeArray
     index: number

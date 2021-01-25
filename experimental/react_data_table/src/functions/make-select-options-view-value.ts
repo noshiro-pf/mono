@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { ColumnSetting, TColumnSetting } from '../types/column-setting'
 import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
 
@@ -12,7 +11,7 @@ export const makeAllSelectOptionsWithViewValue = (
   selectorOptionsAll.map((selectorOptions, colIdx) =>
     makeSelectOptionsViewValue(
       selectorOptions,
-      filteredIndice.map(rowIdx => table.getIn([rowIdx, colIdx])),
+      filteredIndice.map((rowIdx) => table.getIn([rowIdx, colIdx])),
       columnSettings.get(colIdx, ColumnSetting())
     )
   )
@@ -30,16 +29,16 @@ const makeSelectOptionsViewValue = (
     return selectorOptions.map((e: number | string) => ({
       value: e,
       viewValue:
-        cs.cellToStr([e]) + (!cs.selectorWithCount ? '' : `(${count(e)})`)
+        cs.cellToStr([e]) + (!cs.selectorWithCount ? '' : `(${count(e)})`),
     }))
   } else {
     const count = (e: any) =>
       columnFiltered.filter((cell: any) => cell === e).size
 
-    return selectorOptions.map(e => ({
+    return selectorOptions.map((e) => ({
       value: e,
       viewValue:
-        cs.cellToStr(e) + (!cs.selectorWithCount ? '' : `(${count(e)})`)
+        cs.cellToStr(e) + (!cs.selectorWithCount ? '' : `(${count(e)})`),
     }))
   }
 }

@@ -1,21 +1,19 @@
-import React, { memo } from 'react'
-import * as I from 'immutable'
 import {
-  Dialog,
-  DialogTitle,
   Button,
+  Dialog,
   DialogActions,
-  DialogContent
+  DialogContent,
+  DialogTitle,
 } from '@material-ui/core'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
-
-import { TDCardProperty, isWideCard } from '~/types/dcard-property'
-
+import * as I from 'immutable'
+import React, { memo } from 'react'
+import styled from 'styled-components'
+import { isWideCard, TDCardProperty } from '~/types/dcard-property'
+import { Spacer } from '~/utils/components/spacer'
 import { DCardImage } from '../dcard-image/dcard-image'
 import { DCardPropertyDialogTable } from './dcard-property-table'
-import { Spacer } from '~/utils/components/spacer'
-import styled from 'styled-components'
 
 const TitleWrapper = styled.div`
   display: flex;
@@ -38,7 +36,7 @@ export const DCardPropertyDialogView = memo(
     dcardIndex,
     filteredIndice: filteredIndiceInput,
     goToPreviousCard,
-    goToNextCard
+    goToNextCard,
   }: Readonly<{
     open: boolean
     closeDialog: () => void

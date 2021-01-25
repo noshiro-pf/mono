@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import * as str from 'typescript-utils/functions/string'
 
 interface IDCardCost {
@@ -18,7 +17,7 @@ export const DCardCost = (cost?: Partial<IDCardCost>): TDCardCost =>
     coin: 0,
     potion: 0,
     debt: 0,
-    special: ''
+    special: '',
   })(cost)
 
 export const DCardCostFromJS = (cost?: Partial<IDCardCostJS>): TDCardCost =>
@@ -28,7 +27,7 @@ export const DCardCostToJS = (cost: TDCardCost): IDCardCostJS => ({
   coin: cost.coin,
   potion: cost.potion,
   debt: cost.debt,
-  special: cost.special
+  special: cost.special,
 })
 
 // methods

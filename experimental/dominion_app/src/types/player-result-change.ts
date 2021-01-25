@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { TPlayerResultRanked } from './player-result-ranked'
 
 interface IPlayerResultChange {
@@ -14,5 +13,5 @@ export type TPlayerResultChange = I.Record<IPlayerResultChange> &
 export const PlayerResultChange = I.Record<IPlayerResultChange>({
   playerIndex: -1,
   key: 'VP',
-  value: -1
+  value: -1,
 })

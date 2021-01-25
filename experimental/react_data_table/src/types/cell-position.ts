@@ -11,7 +11,7 @@ export const CellPosition = I.Record<ICellPosition>({
   rowIndex: 0,
   rowIndexInFilteredIndice: 0,
   rowIndexInSlicedIndice: 0,
-  columnIndex: 0
+  columnIndex: 0,
 })()
 
 export type ICellPositionInPage = {
@@ -21,5 +21,5 @@ export type ICellPositionInPage = {
 
 export const CellPositionInPage = I.Record<ICellPositionInPage>({
   rowIndexInThisPage: 0,
-  columnIndex: 0
+  columnIndex: 0,
 })

@@ -1,7 +1,6 @@
 import * as I from 'immutable'
-
 import { getRandomElement } from 'typescript-utils/functions/list'
-import { TDCardProperty, DCardProperty } from '~/types/dcard-property'
+import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
 
 export const selectObelisk = (
   KingdomCards10: I.List<number>,
@@ -16,11 +15,11 @@ export const selectObelisk = (
       .includes('Obelisk')
   ) {
     const KingdomCards = KingdomCards10.concat(BaneCard)
-    const LooterExists: boolean = KingdomCards.some(k =>
+    const LooterExists: boolean = KingdomCards.some((k) =>
       dcardlist.get(k, DCardProperty()).cardTypes.includes('Looter')
     )
-    const ruinsIndex: number = dcardlist.findIndex(e => e.nameJp === '廃墟')
-    const actionCards: I.List<number> = KingdomCards.filter(k =>
+    const ruinsIndex: number = dcardlist.findIndex((e) => e.nameJp === '廃墟')
+    const actionCards: I.List<number> = KingdomCards.filter((k) =>
       dcardlist.get(k, DCardProperty()).cardTypes.includes('Action')
     ).concat(LooterExists ? [ruinsIndex] : [])
 

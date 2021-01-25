@@ -1,8 +1,6 @@
 import * as I from 'immutable'
-
 import * as num from 'typescript-utils/functions/number'
 import * as str from 'typescript-utils/functions/string'
-
 import { TColumnSetting } from '../types/column-setting'
 import { ISelectorOptionWithViewValue } from '../types/selector-option-with-view-value'
 
@@ -13,7 +11,10 @@ export const makeAllSelectOptions = (
   !table || table.isEmpty()
     ? columnSettings.map(() => I.List())
     : columnSettings.map((cs, ci) =>
-        makeSelectOptions(table.map(line => line.get(ci)), cs)
+        makeSelectOptions(
+          table.map((line) => line.get(ci)),
+          cs
+        )
       )
 
 const makeSelectOptions = (
@@ -31,7 +32,7 @@ const makeSelectOptions = (
   const cellTypeIsArray = ['number[]', 'string[]'].includes(cs.cellType)
 
   const options = (cellTypeIsArray
-    ? I.Set((column as I.List<I.List<number | string>>).flatMap(a => a))
+    ? I.Set((column as I.List<I.List<number | string>>).flatMap((a) => a))
     : I.Set(column)
   ).toList()
 
@@ -53,9 +54,9 @@ const makeSelectOptions = (
     default:
       return cellTypeIsArray
         ? options
-            .map(e => I.List([e]))
+            .map((e) => I.List([e]))
             .sort(cs.sort)
-            .map(e => e.first())
+            .map((e) => e.first())
         : options.sort(cs.sort)
   }
 }

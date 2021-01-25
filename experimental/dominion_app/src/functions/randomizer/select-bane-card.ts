@@ -1,6 +1,5 @@
 import * as I from 'immutable'
-
-import { TDCardProperty, DCardProperty } from '~/types/dcard-property'
+import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
 
 export const selectBaneCard = (
   KingdomCards10: I.List<number>,

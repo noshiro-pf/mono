@@ -1,6 +1,6 @@
 import { Subscriber } from './subscriber';
-import { RNodeState } from './types/RNodeState';
 import { RNodeDepth } from './types/RNodeDepth';
+import { RNodeState } from './types/RNodeState';
 
 export class RNode<T> {
   private _value: T | undefined;

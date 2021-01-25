@@ -1,5 +1,5 @@
 import * as ls from 'local-storage'
-import { RN, manual } from 'rnjs'
+import { manual, RN } from 'rnjs'
 
 const myNameSource$ = manual<string>(ls.get('my-name') || '')
 

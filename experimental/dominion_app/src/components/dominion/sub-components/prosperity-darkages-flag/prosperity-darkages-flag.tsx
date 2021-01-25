@@ -1,6 +1,6 @@
+import { Chip } from '@material-ui/core'
 import React, { memo } from 'react'
 import styled from 'styled-components'
-import { Chip } from '@material-ui/core'
 
 const ChipWrapper = styled.div`
   padding: 5px;
@@ -15,7 +15,7 @@ const Root = styled.div`
 export const ProsperityDarkAgesFlag = memo(
   ({
     Prosperity,
-    DarkAges
+    DarkAges,
   }: Readonly<{
     Prosperity: boolean
     DarkAges: boolean

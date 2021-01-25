@@ -1,11 +1,11 @@
-import React, { memo } from 'react'
 import {
-  Dialog,
-  DialogTitle,
   Button,
+  Dialog,
   DialogActions,
-  DialogContent
+  DialogContent,
+  DialogTitle,
 } from '@material-ui/core'
+import React, { memo } from 'react'
 import { MyInput } from '~/utils/components/native-input'
 
 export const RenameDialog = memo(
@@ -18,7 +18,7 @@ export const RenameDialog = memo(
     nameAfterChange,
     nameAfterIsValid,
     errorMessage,
-    waitingForRenaming
+    waitingForRenaming,
   }: Readonly<{
     open: boolean
     okClick: () => void

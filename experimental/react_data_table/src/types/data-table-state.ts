@@ -1,8 +1,7 @@
 import * as I from 'immutable'
-
-import { TSortState, SortState } from './sort-state'
-import { ISelectorOptionWithViewValue } from './selector-option-with-view-value'
 import { HeaderValueType } from './header-value-type'
+import { ISelectorOptionWithViewValue } from './selector-option-with-view-value'
+import { SortState, TSortState } from './sort-state'
 
 type IDataTableState = {
   sortState: TSortState
@@ -28,7 +27,7 @@ const DataTableStateRecordFactory = I.Record<IDataTableState>({
   filteredIndice: I.List<number>(),
   sortedIndice: I.List<number>(),
   slicedIndice: I.List<number>(),
-  tableTransformedSliced: I.List<[number, I.List<string>]>()
+  tableTransformedSliced: I.List<[number, I.List<string>]>(),
 })
 
 export const DataTableState = (

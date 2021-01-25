@@ -1,15 +1,15 @@
-import React, { CSSProperties, memo, useCallback, ChangeEvent } from 'react'
 import {
-  IconButton,
-  InputAdornment,
   FormControl,
+  IconButton,
+  Input,
+  InputAdornment,
   InputLabel,
-  Input
 } from '@material-ui/core'
 import ClearIcon from '@material-ui/icons/Clear'
+import React, { ChangeEvent, CSSProperties, memo, useCallback } from 'react'
 
 const inputStyle: CSSProperties = {
-  minWidth: '120px'
+  minWidth: '120px',
 }
 
 export const HeaderCellInputView = memo(
@@ -17,7 +17,7 @@ export const HeaderCellInputView = memo(
     placeholder,
     value,
     valueChange,
-    resetClick
+    resetClick,
   }: Readonly<{
     placeholder: string
     value: string

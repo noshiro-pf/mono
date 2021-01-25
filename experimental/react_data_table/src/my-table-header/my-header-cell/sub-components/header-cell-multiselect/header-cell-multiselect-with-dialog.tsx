@@ -1,6 +1,5 @@
-import React, { memo, useState, useCallback } from 'react'
 import * as I from 'immutable'
-
+import React, { memo, useCallback, useState } from 'react'
 import { ISelectorOptionWithViewValue } from '../../../../types/selector-option-with-view-value'
 import { HeaderCellMultiSelectByDialogView } from './header-cell-multiselect-with-dialog-view'
 
@@ -10,7 +9,7 @@ export const HeaderCellMultiSelectWithDialog = memo(
     label,
     selectorOptions,
     selectedIndice,
-    selectedIndiceChange
+    selectedIndiceChange,
   }: Readonly<{
     multiSelectType: 'and' | 'or'
     label: string
@@ -21,7 +20,7 @@ export const HeaderCellMultiSelectWithDialog = memo(
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false)
 
     const openDialog = useCallback(() => setDialogIsOpen(true), [
-      setDialogIsOpen
+      setDialogIsOpen,
     ])
 
     const dialogOkClick = useCallback(
