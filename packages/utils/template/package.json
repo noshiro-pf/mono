@@ -27,8 +27,5 @@
     "ts_config_for_build": "config/tsconfig.lib.json"
   },
   "dependencies": {
-    "@mono/ts-utils": "*",
-    "react": "^17.0.1",
-    "resize-observer": "^1.0.0"
   }
 }
