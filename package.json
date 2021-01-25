@@ -16,6 +16,7 @@
     "create:preactapp": "scripts/create_new_preact_app.sh",
     "create:reactapp": "scripts/create_new_react_app.sh",
     "create:slides": "scripts/create_new_slides.sh",
+    "create:util": "scripts/create_new_util.sh",
     "fmt:all": "prettier --write . > /dev/null",
     "lint:all": "yarn workspaces run lint",
     "setup:all": "npm-run-all --sequential setup:configs build:utils",
