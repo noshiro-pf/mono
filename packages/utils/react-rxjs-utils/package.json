@@ -31,8 +31,5 @@
     "@mono/rxjs-utils": "*",
     "@mono/ts-utils": "*",
     "react": "^17.0.1"
-  },
-  "devDependencies": {
-    "typescript": "4.1.3"
   }
 }

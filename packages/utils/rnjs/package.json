@@ -26,8 +26,5 @@
     "lib_dir": "lib",
     "scripts_dir": "../../../scripts",
     "ts_config_for_build": "config/tsconfig.lib.json"
-  },
-  "devDependencies": {
-    "typescript": "4.1.3"
   }
 }

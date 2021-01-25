@@ -12,8 +12,5 @@
     "start": "node src/20201016_namespaces/main.js",
     "test": "echo 'no test script'",
     "tsc": "tsc"
-  },
-  "devDependencies": {
-    "typescript": "4.1.3"
   }
 }
