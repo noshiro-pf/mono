@@ -14,7 +14,7 @@
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fb:start": "firebase emulators:start",
-    "fmt": "prettier --write .",
+    "fmt": "prettier --write . --ignore-path ${npm_package_config_prettierignore_path}",
     "lint": "eslint src/ --ext .ts,.tsx",
     "serve": "firebase serve",
     "setup": "yarn setup:webpackconfig",
@@ -26,6 +26,7 @@
   "config": {
     "dist_dir": "build",
     "jest_config": "config/jest.config.json",
+    "prettierignore_path": "../../../.prettierignore",
     "public_dir": "public",
     "scripts_dir": "../../../scripts",
     "tsconfig_for_webpack": "config/tsconfig.webpackconfig.json",

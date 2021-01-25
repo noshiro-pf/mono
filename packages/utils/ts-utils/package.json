@@ -13,7 +13,7 @@
     "clean": "npm-run-all clean:*",
     "clean:build": "rimraf \"${npm_package_config_lib_dir}\"",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
-    "fmt": "prettier --write .",
+    "fmt": "prettier --write . --ignore-path ${npm_package_config_prettierignore_path}",
     "genpipetypedef": "node \"${npm_package_config_gen_pipe_typedef}\" ${npm_package_config_pipe_max_length} \"${npm_package_config_pipe_ts_path}\"",
     "postgenpipetypedef": "yarn _script_formatglob \"${npm_package_config_pipe_ts_path}\"",
     "gi": "yarn _script_genindex ./src",
@@ -30,6 +30,7 @@
     "lib_dir": "lib",
     "pipe_max_length": 12,
     "pipe_ts_path": "src/functional/pipe.ts",
+    "prettierignore_path": "../../../.prettierignore",
     "scripts_dir": "../../../scripts",
     "ts_config_for_build": "config/tsconfig.lib.json"
   }
