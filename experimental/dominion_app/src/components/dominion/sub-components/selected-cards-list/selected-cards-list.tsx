@@ -1,19 +1,15 @@
-import React, { memo, useCallback, useState } from 'react'
 import * as I from 'immutable'
-
+import React, { memo, useCallback, useState } from 'react'
 import { useRNValue } from 'rnjs-hooks'
-
 import * as fb from '~/firebase/firebase-worker'
-
-import { TSelectedCards, TSelectedCardsKeys } from '~/types/selected-cards'
 import { TDCardProperty } from '~/types/dcard-property'
+import { TSelectedCards, TSelectedCardsKeys } from '~/types/selected-cards'
 import {
+  SelectedCardsCheckbox,
   TSelectedCardsCheckbox,
-  SelectedCardsCheckbox
 } from '~/types/selected-cards-checkbox-values'
-
-import { SelectedCardsListView } from './selected-cards-list-view'
 import { DCardPropertyDialog } from '../dcard-property-dialog/dcard-property-dialog'
+import { SelectedCardsListView } from './selected-cards-list-view'
 
 const selectedCardsCategories: I.List<{
   name: TSelectedCardsKeys
@@ -24,14 +20,14 @@ const selectedCardsCategories: I.List<{
   { name: 'EventCards' as const, title: 'EventCards' },
   { name: 'LandmarkCards' as const, title: 'LandmarkCards' },
   { name: 'Obelisk' as const, title: 'Obelisk 指定カード' },
-  { name: 'BlackMarketPile' as const, title: '闇市場デッキ' }
+  { name: 'BlackMarketPile' as const, title: '闇市場デッキ' },
 ])
 
 export const SelectedCardsList = memo(
   ({
     selectedCards,
     selectedCardsCheckbox: selectedCardsCheckboxInput,
-    selectedCardsCheckboxOnChange: selectedCardsCheckboxOnChangeInput
+    selectedCardsCheckboxOnChange: selectedCardsCheckboxOnChangeInput,
   }: Readonly<{
     selectedCards: TSelectedCards
     selectedCardsCheckbox?: TSelectedCardsCheckbox

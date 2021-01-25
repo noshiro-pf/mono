@@ -5,7 +5,7 @@ export const HeaderCellInput = memo(
   ({
     placeholder,
     value,
-    valueChange
+    valueChange,
   }: Readonly<{
     placeholder: string
     value: string

@@ -1,24 +1,20 @@
-import React, { memo, useState, useCallback } from 'react'
 import * as I from 'immutable'
-
-import { combine, RN, merge } from 'rnjs'
+import React, { memo, useCallback, useState } from 'react'
+import { combine, merge, RN } from 'rnjs'
 import {
-  useRNValue,
-  useRNEffect,
   useEventAsStream,
+  useRN,
+  useRNEffect,
+  useRNValue,
   useStateAsStream,
-  useRN
 } from 'rnjs-hooks'
-import * as ls from '~/local-storage-api'
-
-import * as fb from '~/firebase/firebase-worker'
 import * as fbc from '~/firebase/firebase-combined-values'
-
+import * as fb from '~/firebase/firebase-worker'
+import * as ls from '~/local-storage-api'
 import { User } from '~/types/user'
-
-import { SelectMyNameView } from './select-my-name-view'
-import { RenameDialog } from './rename-dialog/rename-dialog'
 import { executeRename } from './rename-dialog/execute-rename'
+import { RenameDialog } from './rename-dialog/rename-dialog'
+import { SelectMyNameView } from './select-my-name-view'
 
 export const SelectMyName = memo(() => {
   /* events */
@@ -51,7 +47,7 @@ export const SelectMyName = memo(() => {
       .map(([fromGRlist, users, lsMyName]) => {
         if (users.isEmpty() || fromGRlist.isEmpty()) return I.List()
         const names = new Set<string>(fromGRlist)
-        users.map(u => names.add(u.name))
+        users.map((u) => names.add(u.name))
         if (!!lsMyName) {
           names.add(lsMyName)
         }
@@ -132,8 +128,8 @@ export const SelectMyName = memo(() => {
     addNameClick$
       .withLatest(newName$)
       .map(([_, n]) => n)
-      .filter('', e => e !== ''),
-    v => {
+      .filter('', (e) => e !== ''),
+    (v) => {
       fb.addUser(User({ name: v })).catch(console.log)
     },
     false
@@ -143,8 +139,8 @@ export const SelectMyName = memo(() => {
     deleteCurrentNameClick$
       .withLatest(selectedName$)
       .map(([_, n]) => n)
-      .filter('', e => e !== ''),
-    v => {
+      .filter('', (e) => e !== ''),
+    (v) => {
       fb.deleteUserByName(v).catch(console.log)
     },
     false
@@ -171,7 +167,7 @@ export const SelectMyName = memo(() => {
     setWaitingForRenaming,
     setDialogOpen,
     selectedNameChange,
-    setNameAfter
+    setNameAfter,
   ])
 
   const renameDialogCancelClick = useCallback(() => {

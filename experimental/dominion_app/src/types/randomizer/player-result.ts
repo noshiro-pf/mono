@@ -1,13 +1,11 @@
 import * as I from 'immutable'
-
 import { withDefaultMix } from 'typescript-utils/functions/with-default'
-
 import {
-  TNumVictoryCards,
   INumVictoryCardsJS,
-  NumVictoryCardsToJS,
+  NumVictoryCards,
   NumVictoryCardsFromJS,
-  NumVictoryCards
+  NumVictoryCardsToJS,
+  TNumVictoryCards,
 } from '~/types/number-of-victory-cards'
 
 interface IPlayerResult {
@@ -39,7 +37,7 @@ const PlayerResultRecordFactory = I.Record<IPlayerResult>({
   selected: false,
   VP: 0,
   turnOrder: 0,
-  numVictoryCards: NumVictoryCards()
+  numVictoryCards: NumVictoryCards(),
 })
 
 export const PlayerResult = (pr?: Partial<IPlayerResult>): TPlayerResult =>
@@ -57,7 +55,7 @@ export const PlayerResultFromJS = (
     selected: wd('selected'),
     VP: wd('VP'),
     turnOrder: wd('turnOrder'),
-    numVictoryCards: NumVictoryCardsFromJS(wd('numVictoryCards'))
+    numVictoryCards: NumVictoryCardsFromJS(wd('numVictoryCards')),
   })
 }
 
@@ -68,5 +66,5 @@ export const PlayerResultToJS = (pr: TPlayerResult): IPlayerResultJS => ({
   selected: pr.selected,
   VP: pr.VP,
   turnOrder: pr.turnOrder,
-  numVictoryCards: NumVictoryCardsToJS(pr.numVictoryCards)
+  numVictoryCards: NumVictoryCardsToJS(pr.numVictoryCards),
 })

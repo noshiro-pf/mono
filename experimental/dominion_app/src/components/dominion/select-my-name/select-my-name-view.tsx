@@ -1,13 +1,11 @@
-import React, { memo, useMemo } from 'react'
+import { CircularProgress, Divider, Paper } from '@material-ui/core'
 import * as I from 'immutable'
+import React, { memo, useMemo } from 'react'
 import styled from 'styled-components'
-import { Divider, Paper, CircularProgress } from '@material-ui/core'
-
 import { ComponentSwitcher } from '~/utils/components/component-switcher'
 import { MyTabs } from '~/utils/components/tabs'
-
-import { SelectFromDatabase } from './select-from-database/select-from-database'
 import { AddNewName } from './create-new-name/create-new-name'
+import { SelectFromDatabase } from './select-from-database/select-from-database'
 
 const CenterWindow = styled.div`
   background-color: white;
@@ -34,7 +32,7 @@ export const SelectMyNameView = memo(
     deleteCurrentNameClick,
     renameClick,
     selectedNameIsInGameResults,
-    newNameIsAlreadyUsed
+    newNameIsAlreadyUsed,
   }: {
     nameList: I.List<string>
     selectedTabIndex: number

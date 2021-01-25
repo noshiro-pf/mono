@@ -1,21 +1,19 @@
 import * as I from 'immutable'
-
 import { withDefaultMix } from 'typescript-utils/functions/with-default'
-
 import {
-  TSelectedCardsId,
+  IPlayerResultRankedJS,
+  PlayerResultRanked,
+  PlayerResultRankedFromJS,
+  PlayerResultRankedToJS,
+  TPlayerResultRanked,
+} from './player-result-ranked'
+import {
   ISelectedCardsIdJS,
   SelectedCardsId,
   SelectedCardsIdFromJS,
-  SelectedCardsIdToJS
+  SelectedCardsIdToJS,
+  TSelectedCardsId,
 } from './selected-cards-id'
-import {
-  IPlayerResultRankedJS,
-  TPlayerResultRanked,
-  PlayerResultRankedToJS,
-  PlayerResultRanked,
-  PlayerResultRankedFromJS
-} from './player-result-ranked'
 
 interface IGameResult {
   key: string
@@ -49,7 +47,7 @@ const GameResultRecordFactory = I.Record<IGameResult>({
   memo: '',
   selectedExpansions: I.List<string>(),
   selectedCardsId: SelectedCardsId(),
-  lastTurnPlayer: ''
+  lastTurnPlayer: '',
 })
 
 export const GameResult = (gr?: Partial<IGameResult>): TGameResult =>
@@ -66,7 +64,7 @@ export const GameResultFromJS = (gr?: Partial<IGameResultJS>): TGameResult => {
     memo: wd('memo'),
     selectedExpansions: I.List(wd('selectedExpansions')),
     selectedCardsId: SelectedCardsIdFromJS(gr.selectedCardsId),
-    lastTurnPlayer: wd('lastTurnPlayer')
+    lastTurnPlayer: wd('lastTurnPlayer'),
   })
 }
 
@@ -77,8 +75,8 @@ export const GameResultToJS = (gr: TGameResult): IGameResultJS => ({
   memo: gr.memo,
   selectedExpansions: gr.selectedExpansions.toArray(),
   lastTurnPlayer: gr.lastTurnPlayer,
-  players: gr.players.map(p => PlayerResultRankedToJS(p)).toArray(),
-  selectedCardsId: SelectedCardsIdToJS(gr.selectedCardsId)
+  players: gr.players.map((p) => PlayerResultRankedToJS(p)).toArray(),
+  selectedCardsId: SelectedCardsIdToJS(gr.selectedCardsId),
 })
 
 // methods
@@ -105,7 +103,7 @@ const getRanked = (
   const rankTemp: number[] = players.map(() => 1).toArray()
 
   const lastTurnPlayerResult =
-    players.find(e => e.name === lastTurnPlayer) || PlayerResultRanked()
+    players.find((e) => e.name === lastTurnPlayer) || PlayerResultRanked()
   const lastTurnOrder = lastTurnPlayerResult
     ? lastTurnPlayerResult.turnOrder
     : -1
@@ -124,7 +122,7 @@ const getRanked = (
       numVictoryCards: p.numVictoryCards,
       rank: rankTemp[i],
       score: p.score,
-      turnOrder: p.turnOrder
+      turnOrder: p.turnOrder,
     })
   )
   // .map((p, i) => [i, p] as [number, TPlayerResultRanked])
@@ -147,10 +145,7 @@ const averagedScore = (
   rankList: I.List<number> // ex.) I.List([1, 2, 2, 4])
 ): I.List<number> => {
   const scoreListTemp = scoreList.toArray() // [-1, 6, 3, 1, 0, -1, -1]
-  const rankListTemp = rankList
-    .sort()
-    .push(10000)
-    .toArray() // 番兵付きrankList [1, 2, 2, 4, 10000]
+  const rankListTemp = rankList.sort().push(10000).toArray() // 番兵付きrankList [1, 2, 2, 4, 10000]
   const tieRange = { begin: 0, end: 1 }
   while (tieRange.end < rankListTemp.length) {
     if (rankListTemp[tieRange.begin] === rankListTemp[tieRange.end]) {
@@ -180,10 +175,10 @@ export const getScored = (
   const playersRanked = getRanked(lastTurnPlayer, players)
   const scoreList = averagedScore(
     scoreTable.get(players.size, I.List([0, 0, 0, 0, 0, 0, 0])),
-    playersRanked.map(e => e.rank)
+    playersRanked.map((e) => e.rank)
   )
 
-  return playersRanked.map(e => e.set('score', scoreList.get(e.rank, 0)))
+  return playersRanked.map((e) => e.set('score', scoreList.get(e.rank, 0)))
 }
 
 // test

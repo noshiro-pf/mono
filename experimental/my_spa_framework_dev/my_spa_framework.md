@@ -2,8 +2,8 @@
 
 ## SPA に必要な機能
 
-- component の管理
-- ルーティング
+-   component の管理
+-   ルーティング
 -
 
 ## sample input
@@ -82,5 +82,5 @@ export const App = component(
 
 ## Links
 
-- [仮想 DOM は本当に“速い”のか？ DOM 操作の新しい考え方を、フレームワークを実装して理解しよう](https://employment.en-japan.com/engineerhub/entry/2020/02/18/103000)
-- [自作フレームワークをつくって学ぶ 仮想 DOM 実践入門](https://kuroeveryday.blogspot.com/2018/11/how-to-create-virtual-dom-framework.html)
+-   [仮想 DOM は本当に“速い”のか？ DOM 操作の新しい考え方を、フレームワークを実装して理解しよう](https://employment.en-japan.com/engineerhub/entry/2020/02/18/103000)
+-   [自作フレームワークをつくって学ぶ 仮想 DOM 実践入門](https://kuroeveryday.blogspot.com/2018/11/how-to-create-virtual-dom-framework.html)

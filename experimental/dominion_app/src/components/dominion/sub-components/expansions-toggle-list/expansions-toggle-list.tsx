@@ -1,23 +1,21 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
-import { RN, merge, combine } from 'rnjs'
+import React, { memo } from 'react'
+import { combine, merge, RN } from 'rnjs'
 import {
-  useStateAsStream,
-  useRNValue,
   useEffectFromProps,
-  useRNEffect,
   useEventAsStream,
-  useRN
+  useRN,
+  useRNEffect,
+  useRNValue,
+  useStateAsStream,
 } from 'rnjs-hooks'
-
 import { ExpansionsToggleListView } from './expansions-toggle-list-view'
 
 export const ExpansionsToggleList = memo(
   ({
     expansions,
     expansionsChecked: expansionsCheckedInput,
-    expansionscheckedOnChange
+    expansionscheckedOnChange,
   }: Readonly<{
     expansions: I.List<string>
     expansionsChecked: I.List<string>
@@ -42,7 +40,7 @@ export const ExpansionsToggleList = memo(
 
     const [
       expansionsCheckedInput$,
-      setExpansionsCheckedInput
+      setExpansionsCheckedInput,
     ] = useStateAsStream<I.List<string>>(I.List())
     useEffectFromProps(expansionsCheckedInput, setExpansionsCheckedInput)
 
@@ -50,15 +48,15 @@ export const ExpansionsToggleList = memo(
 
     const expansionsChecked$: RN<I.Set<string>> = useRN(
       merge(
-        expansionsCheckedInput$.map(v => ({
+        expansionsCheckedInput$.map((v) => ({
           id: 'input' as 'input',
-          value: v
+          value: v,
         })),
-        checkChange$.map(v => ({ id: 'change' as 'change', value: v })),
+        checkChange$.map((v) => ({ id: 'change' as 'change', value: v })),
         deselectAllClick$.mapTo({ id: 'deselectAll' as 'deselectAll' }),
         selectAllClick$.withLatest(expansions$).map(([_, expansions]) => ({
           id: 'selectAll' as 'selectAll',
-          value: expansions
+          value: expansions,
         }))
       )
         .scan(
@@ -93,16 +91,18 @@ export const ExpansionsToggleList = memo(
     )
 
     const expansionsWithCheck$: RN<I.List<[string, boolean]>> = useRN(
-      combine(expansions$, expansionsChecked$).map(
-        ([expansions, expansionsChecked]) =>
-          expansions.map(e => [e, expansionsChecked.has(e)])
+      combine(
+        expansions$,
+        expansionsChecked$
+      ).map(([expansions, expansionsChecked]) =>
+        expansions.map((e) => [e, expansionsChecked.has(e)])
       )
     )
 
     /* side effects */
 
     useRNEffect(
-      expansionsChecked$.map(s => s.toList()),
+      expansionsChecked$.map((s) => s.toList()),
       expansionscheckedOnChange
     )
 

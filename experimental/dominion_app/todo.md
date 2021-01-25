@@ -1,14 +1,12 @@
 # ToDo
 
-* CardList
-  * CardPropertyDialog
-    * CardImage
-      * card, size, faceUp
-* DataTable
-  * autocompleteの対応
-  * sub-table
-    * table全体のalign
-* Immutable.jsの使用の検討？
-  * RNのscanオペレータの純粋関数化
-
-
+-   CardList
+    -   CardPropertyDialog
+        -   CardImage
+            -   card, size, faceUp
+-   DataTable
+    -   autocomplete の対応
+    -   sub-table
+        -   table 全体の align
+-   Immutable.js の使用の検討？
+    -   RN の scan オペレータの純粋関数化

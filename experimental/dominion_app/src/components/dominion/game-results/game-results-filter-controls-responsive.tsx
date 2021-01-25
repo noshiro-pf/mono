@@ -1,14 +1,13 @@
-import React, { memo, useCallback } from 'react'
-import * as I from 'immutable'
-import styled from 'styled-components'
 import {
   Button,
-  FormGroup,
-  FormControlLabel,
   Checkbox,
-  FormLabel
+  FormControlLabel,
+  FormGroup,
+  FormLabel,
 } from '@material-ui/core'
-
+import * as I from 'immutable'
+import React, { memo, useCallback } from 'react'
+import styled from 'styled-components'
 import { Centering } from '~/utils/components/centering'
 import { MyInput } from '~/utils/components/native-input'
 
@@ -57,7 +56,7 @@ export const GameResultFilterControlsView = memo(
     latestClick,
     resetAllClick,
     numPlayersOptions,
-    onCheck: onCheckInput
+    onCheck: onCheckInput,
   }: Readonly<{
     dateBeginStr: string
     dateBeginChange: (v: string) => void
@@ -111,7 +110,7 @@ export const GameResultFilterControlsView = memo(
             <FormLabelWrapper>
               <FormLabel>プレイヤー数：</FormLabel>
             </FormLabelWrapper>
-            {numPlayersOptions.map(option => (
+            {numPlayersOptions.map((option) => (
               <FormControlLabel
                 key={option.numPlayers}
                 control={

@@ -5,7 +5,7 @@ import {
   append,
   addPropTransaction,
   propUpdater,
-} from "vidact/runtime";
+} from 'vidact/runtime';
 /*--- Import Vidact Runtime Helpers ---*/
 
 function App() {
@@ -37,7 +37,7 @@ function App() {
 
   _executer3();
 
-  let _el_4 = createText("Current count is ");
+  let _el_4 = createText('Current count is ');
 
   let _el_5;
 
@@ -48,31 +48,31 @@ function App() {
 
   _el_5_update();
 
-  let _el_3 = createElement("p");
+  let _el_3 = createElement('p');
 
   append(_el_3, _el_4, _el_5);
 
-  let _el_6 = createText(" ");
+  let _el_6 = createText(' ');
 
-  let _el_8 = createText("+ Increment ");
+  let _el_8 = createText('+ Increment ');
 
-  let _el_7 = createElement("button", {
+  let _el_7 = createElement('button', {
     onClick: handleIncrement,
   });
 
   const _executer4 = () => {
-    addPropTransaction(__props_transactions, _el_7, "onClick", handleIncrement);
+    addPropTransaction(__props_transactions, _el_7, 'onClick', handleIncrement);
   };
 
   _executer4();
 
   append(_el_7, _el_8);
 
-  let _el_9 = createText(" ");
+  let _el_9 = createText(' ');
 
-  let _el_11 = createText("- Decrement ");
+  let _el_11 = createText('- Decrement ');
 
-  let _el_10 = createElement("button", {
+  let _el_10 = createElement('button', {
     onClick: handleDecrement,
   });
 
@@ -80,7 +80,7 @@ function App() {
     addPropTransaction(
       __props_transactions,
       _el_10,
-      "onClick",
+      'onClick',
       handleDecrement
     );
   };
@@ -89,7 +89,7 @@ function App() {
 
   append(_el_10, _el_11);
 
-  let _el_ = createElement("div");
+  let _el_ = createElement('div');
 
   append(_el_, _el_3, _el_6, _el_7, _el_9, _el_10);
   const updateState = propUpdater(
@@ -97,7 +97,7 @@ function App() {
     [_executer, _executer2, _executer3, _el_5_update, _executer4, _executer5],
     [
       [
-        "_s",
+        '_s',
         [
           /*_executer*/ 0,
           /*_executer2*/ 1,
@@ -117,5 +117,5 @@ function App() {
   };
 }
 
-document.body.innerHTML = "";
+document.body.innerHTML = '';
 document.body.append(App({}).element.element);

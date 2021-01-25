@@ -1,4 +1,4 @@
-import { createState, onCleanup } from "solid-js";
+import { createState, onCleanup } from 'solid-js';
 
 export const Sub = () => {
   const [state, setState] = createState<{ count: number }>({ count: 0 });

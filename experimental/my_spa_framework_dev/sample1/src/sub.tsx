@@ -1,4 +1,4 @@
-import React, { useEffect, memo } from "react";
+import React, { memo, useEffect } from 'react';
 
 export const Sub = memo((props: { count: number; increment: () => void }) => {
   useEffect(() => {

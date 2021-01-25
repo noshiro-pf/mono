@@ -1,8 +1,7 @@
-import React, { memo, useCallback } from 'react'
 import { TableCell } from '@material-ui/core'
-
-import { ICellPositionInPage } from '../../types/cell-position'
+import React, { memo, useCallback } from 'react'
 import { CellAlignType } from '../../types/cell-align-type'
+import { ICellPositionInPage } from '../../types/cell-position'
 import { MyTableCellButton } from './my-table-cell-button'
 
 export const MyTableCell = memo(
@@ -11,7 +10,7 @@ export const MyTableCell = memo(
     isButton,
     align,
     pos,
-    cellClick
+    cellClick,
   }: Readonly<{
     value: string
     isButton: boolean

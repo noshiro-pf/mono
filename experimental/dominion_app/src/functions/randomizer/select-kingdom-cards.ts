@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { TDCardProperty } from '~/types/dcard-property'
 
 export const selectKingdomCards = (
@@ -32,6 +31,6 @@ export const selectKingdomCards = (
   return {
     KingdomCards10: I.List(KingdomCards10temp),
     EventCards: I.List(EventCardsTemp),
-    LandmarkCards: I.List(LandmarkCardsTemp)
+    LandmarkCards: I.List(LandmarkCardsTemp),
   }
 }

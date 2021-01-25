@@ -1,24 +1,20 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
-import { RN, combine, merge } from 'rnjs'
+import React, { memo } from 'react'
+import { combine, merge, RN } from 'rnjs'
 import {
-  useRNValue,
-  useEventAsStream,
-  useStateAsStream,
   useEffectFromProps,
-  useRN
+  useEventAsStream,
+  useRN,
+  useRNValue,
+  useStateAsStream,
 } from 'rnjs-hooks'
 import * as num from 'typescript-utils/functions/number'
-
 import * as fb from '~/firebase/firebase-worker'
-
 import {
   DCardProperty,
+  DCardPropertytoStr,
   TDCardProperty,
-  DCardPropertytoStr
 } from '~/types/dcard-property'
-
 import { DCardPropertyDialogView } from './dcard-property-dialog-view'
 
 export const DCardPropertyListDialog = memo(
@@ -26,7 +22,7 @@ export const DCardPropertyListDialog = memo(
     open,
     closeDialog,
     filteredIndice: filteredIndiceInput,
-    indexInFilteredListInit: indexInFilteredListInitInput
+    indexInFilteredListInit: indexInFilteredListInitInput,
   }: Readonly<{
     open: boolean
     closeDialog: () => void
@@ -62,7 +58,7 @@ export const DCardPropertyListDialog = memo(
     // combined
     const indexInFilteredList$: RN<number> = useRN(
       indexInFilteredListInit$
-        .switchMap(v =>
+        .switchMap((v) =>
           merge(decrementIndex$.mapTo(-1), incrementIndex$.mapTo(1)).scan(
             v,
             num.add

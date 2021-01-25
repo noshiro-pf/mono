@@ -1,6 +1,5 @@
-import React, { memo, useCallback } from 'react'
 import * as I from 'immutable'
-
+import React, { memo, useCallback } from 'react'
 import { ISelectorOptionWithViewValue } from '../../../../types/selector-option-with-view-value'
 import { HeaderCellSelectView } from './header-cell-select-view'
 
@@ -9,7 +8,7 @@ export const HeaderCellSelect = memo(
     label,
     selectorOptions,
     selectedIndex,
-    selectedIndexChange
+    selectedIndexChange,
   }: Readonly<{
     label: string
     selectorOptions: I.List<ISelectorOptionWithViewValue>

@@ -1,7 +1,6 @@
+import { Button } from '@material-ui/core'
 import React, { memo, useMemo } from 'react'
 import styled from 'styled-components'
-import { Button } from '@material-ui/core'
-
 import { MyInput } from '~/utils/components/native-input'
 
 const Root = styled.div`
@@ -23,7 +22,7 @@ export const AddNewName = memo(
     newName,
     newNameChange,
     addNewNameClick,
-    newNameIsAlreadyUsed
+    newNameIsAlreadyUsed,
   }: Readonly<{
     newName: string
     newNameChange: (name: string) => void

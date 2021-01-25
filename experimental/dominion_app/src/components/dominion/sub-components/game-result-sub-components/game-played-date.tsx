@@ -1,5 +1,4 @@
 import React, { memo, useMemo } from 'react'
-
 import * as dateUtils from 'typescript-utils/functions/date'
 import { MyInput } from '~/utils/components/native-input'
 
@@ -9,7 +8,7 @@ export const GamePlayedDate = memo(
   ({
     editMode,
     date,
-    dateChange
+    dateChange,
   }: Readonly<{
     editMode: boolean
     date: string

@@ -1,13 +1,10 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
-import { combine, RN, fromPromise } from 'rnjs'
-import { useRNValue, useRN } from 'rnjs-hooks'
-import * as fb from '~/firebase/firebase-worker'
-
+import React, { memo } from 'react'
+import { combine, fromPromise, RN } from 'rnjs'
+import { useRN, useRNValue } from 'rnjs-hooks'
 import { rulebooksPath } from '~/constants/route'
-import { TRulebook, Rulebook } from '~/types/rulebook'
-
+import * as fb from '~/firebase/firebase-worker'
+import { Rulebook, TRulebook } from '~/types/rulebook'
 import { RulebooksView } from './rulebooks-view'
 
 const toImgUrl$ = (filename: string): RN<string> =>
@@ -28,11 +25,11 @@ const toPdfUrl$ = (filename: string): RN<string> =>
 
 export const Rulebooks = memo(() => {
   const imgUrls$: RN<string[]> = useRN(
-    combine(...rulebooksPath.map(e => toImgUrl$(e.imgurl)).toArray())
+    combine(...rulebooksPath.map((e) => toImgUrl$(e.imgurl)).toArray())
   )
 
   const pdfUrls$: RN<string[]> = useRN(
-    combine(...rulebooksPath.map(e => toPdfUrl$(e.pdfurl)).toArray())
+    combine(...rulebooksPath.map((e) => toPdfUrl$(e.pdfurl)).toArray())
   )
 
   const rulebooks$: RN<I.List<TRulebook>> = useRN(
@@ -41,7 +38,7 @@ export const Rulebooks = memo(() => {
         Rulebook({
           title: rb.title,
           imgurl: imgUrls[i],
-          pdfurl: pdfUrls[i]
+          pdfurl: pdfUrls[i],
         })
       )
     )

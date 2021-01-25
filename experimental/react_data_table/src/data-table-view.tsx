@@ -1,15 +1,14 @@
-import React, { memo, useCallback, useMemo, ChangeEvent } from 'react'
+import { Button, Paper, Table, TablePagination } from '@material-ui/core'
+import React, { ChangeEvent, memo, useCallback, useMemo } from 'react'
 import styled from 'styled-components'
-import { Table, TablePagination, Paper, Button } from '@material-ui/core'
-
-import { TTableSettings } from './types/table-settings'
-import { TDataTableState } from './types/data-table-state'
-import { ICellPositionInPage } from './types/cell-position'
-import { MyTableHeader } from './my-table-header/my-table-header'
-import { MyTableBody } from './my-table-body/my-table-body'
-import { TSortState } from './types/sort-state'
 import { MyPaginationActions } from './my-pagination-action/my-pagination-action'
+import { MyTableBody } from './my-table-body/my-table-body'
+import { MyTableHeader } from './my-table-header/my-table-header'
+import { ICellPositionInPage } from './types/cell-position'
+import { TDataTableState } from './types/data-table-state'
 import { HeaderValueType } from './types/header-value-type'
+import { TSortState } from './types/sort-state'
+import { TTableSettings } from './types/table-settings'
 
 const TableWrapper = styled.div`
   overflow-x: auto;
@@ -40,7 +39,7 @@ export const DataTableView = memo(
     cellClick,
     itemsPerPageChange,
     pageNumberChange,
-    resetAll
+    resetAll,
   }: Readonly<{
     settings: TTableSettings
     dtState: TDataTableState
@@ -61,7 +60,7 @@ export const DataTableView = memo(
       filteredIndice,
       itemsPerPage,
       pageNumber,
-      tableTransformedSliced
+      tableTransformedSliced,
     } = dtState
 
     const pageNumberOnChange = useCallback(
@@ -90,7 +89,7 @@ export const DataTableView = memo(
     const useResetAllButton: boolean = useMemo(
       () =>
         settings.usepagination ||
-        settings.columnSettings.some(e => e.filterType !== 'none'),
+        settings.columnSettings.some((e) => e.filterType !== 'none'),
       [settings]
     )
 

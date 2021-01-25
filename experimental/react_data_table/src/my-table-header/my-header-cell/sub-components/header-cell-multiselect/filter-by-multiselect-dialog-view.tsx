@@ -1,20 +1,19 @@
-import React, { memo, useCallback } from 'react'
-import * as I from 'immutable'
 import {
-  Dialog,
-  DialogTitle,
   Button,
+  Checkbox,
+  Dialog,
   DialogActions,
   DialogContent,
-  Checkbox,
+  DialogTitle,
   Table,
+  TableBody,
+  TableCell,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-  Tooltip
+  Tooltip,
 } from '@material-ui/core'
-
+import * as I from 'immutable'
+import React, { memo, useCallback } from 'react'
 import { ISelectorOptionWithViewValue } from '../../../../types/selector-option-with-view-value'
 
 export const FilterByMultiselectDialogView = memo(
@@ -26,7 +25,7 @@ export const FilterByMultiselectDialogView = memo(
     selectorOptions,
     selectedIndice,
     flip,
-    selectAllClick
+    selectAllClick,
   }: Readonly<{
     open: boolean
     okClick: () => void

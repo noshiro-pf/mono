@@ -1,4 +1,4 @@
-declare module "rxfire/database";
+declare module 'rxfire/database'
 /**
  * Copyright 2018 Google Inc.
  *
@@ -14,14 +14,26 @@ declare module "rxfire/database";
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { database } from 'firebase';
-import { QueryChange, ListenEvent } from 'rxfire/database/dist/database/interfaces';
-import { Observable } from 'rxjs';
-export declare function stateChanges(query: database.Query, events?: ListenEvent[]): Observable<QueryChange>;
-export declare function list(query: database.Query, events?: ListenEvent[]): Observable<QueryChange[]>;
+import { database } from 'firebase'
+import {
+  ListenEvent,
+  QueryChange,
+} from 'rxfire/database/dist/database/interfaces'
+import { Observable } from 'rxjs'
+export declare function stateChanges(
+  query: database.Query,
+  events?: ListenEvent[]
+): Observable<QueryChange>
+export declare function list(
+  query: database.Query,
+  events?: ListenEvent[]
+): Observable<QueryChange[]>
 /**
  * Get an object mapped to its value, and optionally its key
  * @param query object ref or query
  * @param keyField map the object key to a specific field
  */
-export declare function listVal<T>(query: database.Query, keyField?: string): Observable<T[]>;
+export declare function listVal<T>(
+  query: database.Query,
+  keyField?: string
+): Observable<T[]>

@@ -1,35 +1,34 @@
-import React, { memo } from 'react'
-import * as I from 'immutable'
 import {
   Card,
   CardActionArea,
-  CardMedia,
   CardContent,
-  Typography
+  CardMedia,
+  Typography,
 } from '@material-ui/core'
-
+import * as I from 'immutable'
+import React, { memo } from 'react'
 import { main } from '~/constants/default-styles'
 import { TRulebook } from '~/types/rulebook'
 
 const css = {
   box: {
-    margin: '30px'
+    margin: '30px',
   },
   card: {
-    width: '250px'
+    width: '250px',
   },
   wrapper: {
     display: 'flex',
     flexFlow: 'row wrap',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    alignContent: 'flex-start'
-  }
+    alignContent: 'flex-start',
+  },
 }
 
 export const RulebooksView = memo(
   ({
-    rulebooks
+    rulebooks,
   }: Readonly<{
     rulebooks: I.List<TRulebook>
   }>) => (
@@ -37,8 +36,8 @@ export const RulebooksView = memo(
       <h2>Rulebooks</h2>
       <div style={css.wrapper}>
         {rulebooks
-          .filter(rb => !!rb.imgurl)
-          .map(rb => (
+          .filter((rb) => !!rb.imgurl)
+          .map((rb) => (
             <div key={rb.title} style={css.box}>
               <Card style={css.card}>
                 <CardActionArea>

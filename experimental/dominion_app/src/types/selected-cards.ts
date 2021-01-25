@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { withDefaultMix } from 'typescript-utils/functions/with-default'
 
 interface ISelectedCards {
@@ -49,7 +48,7 @@ const SelectedCardsRecordFactory = I.Record<ISelectedCards>({
   LandmarkCards: I.List<number>(),
   ProjectCards: I.List<number>(),
   Obelisk: I.List<number>(),
-  BlackMarketPile: I.List<number>()
+  BlackMarketPile: I.List<number>(),
 })
 
 export const SelectedCards = (sc?: Partial<ISelectedCards>): TSelectedCards =>
@@ -70,7 +69,7 @@ export const SelectedCardsFromJS = (
     LandmarkCards: I.List(wd('LandmarkCards')),
     ProjectCards: I.List(wd('ProjectCards')),
     Obelisk: I.List(wd('Obelisk')),
-    BlackMarketPile: I.List(wd('BlackMarketPile'))
+    BlackMarketPile: I.List(wd('BlackMarketPile')),
   })
 }
 
@@ -84,7 +83,7 @@ export const SelectedCardsToJS = (sc: TSelectedCards): ISelectedCardsJS => ({
   LandmarkCards: sc.LandmarkCards.toArray(),
   ProjectCards: sc.ProjectCards.toArray(),
   Obelisk: sc.Obelisk.toArray(),
-  BlackMarketPile: sc.BlackMarketPile.toArray()
+  BlackMarketPile: sc.BlackMarketPile.toArray(),
 })
 
 // methods

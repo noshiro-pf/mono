@@ -1,8 +1,7 @@
 import * as I from 'immutable'
-
+import { TTableSettings } from '../types/table-settings'
 import { isValidSettings } from './is-valid-setting'
 import { isValidTable } from './is-valid-table'
-import { TTableSettings } from '../types/table-settings'
 
 export const isValidInput = (
   settings: TTableSettings,

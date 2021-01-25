@@ -1,29 +1,27 @@
-import React, { memo, CSSProperties } from 'react'
-import * as I from 'immutable'
-import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit'
-
+import * as I from 'immutable'
+import React, { CSSProperties, memo } from 'react'
+import styled from 'styled-components'
 import { TDCardProperty } from '~/types/dcard-property'
+import { TPlayerResultChange } from '~/types/player-result-change'
 import { TPlayerResultRanked } from '~/types/player-result-ranked'
 import { TSelectedCardsId } from '~/types/selected-cards-id'
-import { TPlayerResultChange } from '~/types/player-result-change'
-
-import { PlayerResultTable } from '../game-result-sub-components/player-result-table/player-result-table'
-import { SelectedExpansions } from '../game-result-sub-components/selected-expansions'
-import { SelectedCardsImageList } from '../selected-cards-image-list/selected-cards-image-list'
 import { GamePlayedDate } from '../game-result-sub-components/game-played-date'
 import { GameResultMemo } from '../game-result-sub-components/game-result-memo'
 import { GameResultPlace } from '../game-result-sub-components/game-result-place'
+import { PlayerResultTable } from '../game-result-sub-components/player-result-table/player-result-table'
+import { SelectedExpansions } from '../game-result-sub-components/selected-expansions'
 import { ProsperityDarkAgesFlag } from '../prosperity-darkages-flag/prosperity-darkages-flag'
-import styled from 'styled-components'
+import { SelectedCardsImageList } from '../selected-cards-image-list/selected-cards-image-list'
 
 const dialogContentStyle: CSSProperties = {
-  backgroundColor: 'light-gray'
+  backgroundColor: 'light-gray',
 }
 
 const buttonStyle: CSSProperties = {
   margin: '5px',
-  flexBasis: 'fit-content'
+  flexBasis: 'fit-content',
 }
 
 const Item = styled.div`
@@ -62,7 +60,7 @@ export const GameResultDialogView = memo(
     lastTurnPlayer,
     lastTurnPlayerChange,
     playerResults,
-    playerResultChange
+    playerResultChange,
   }: Readonly<{
     isOpen: boolean
     expansions: I.List<string>

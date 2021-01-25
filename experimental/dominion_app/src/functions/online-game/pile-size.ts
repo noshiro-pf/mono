@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
 
 export const pileSize = (

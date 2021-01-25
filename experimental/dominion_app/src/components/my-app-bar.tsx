@@ -1,8 +1,6 @@
 import React, { memo } from 'react'
-
-import { myName$ } from '~/local-storage-api'
 import { useRNValue } from 'rnjs-hooks'
-
+import { myName$ } from '~/local-storage-api'
 import { MyAppBarView } from './my-app-bar-view'
 
 export const MyAppBar = memo(() => {

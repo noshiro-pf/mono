@@ -7,9 +7,9 @@
 // A.update(3);
 // A.update(6);
 
-import { interval } from './interval';
 // import { merge } from './merge';
 import { combineLatest } from './combineLatest';
+import { interval } from './interval';
 
 // interval(1000)
 //   .map(x => x * 2)
@@ -31,6 +31,6 @@ import { combineLatest } from './combineLatest';
 // ).subscribe(console.log);
 
 combineLatest(
-  interval(1000).filter(x => x % 2 === 0),
-  interval(1000).filter(x => x % 2 === 1)
+  interval(1000).filter((x) => x % 2 === 0),
+  interval(1000).filter((x) => x % 2 === 1)
 ).subscribe(console.log);

@@ -1,22 +1,20 @@
-import React, { memo, useCallback } from 'react'
+import {
+  IconButton,
+  Radio,
+  TableBody,
+  TableCell,
+  TableRow,
+} from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
+import RemoveIcon from '@material-ui/icons/Remove'
 import * as I from 'immutable'
+import React, { memo, useCallback } from 'react'
 import styled from 'styled-components'
 import {
-  TableBody,
-  TableRow,
-  TableCell,
-  Radio,
-  IconButton
-} from '@material-ui/core'
-import RemoveIcon from '@material-ui/icons/Remove'
-import AddIcon from '@material-ui/icons/Add'
-
-import { TPlayerResultRanked } from '~/types/player-result-ranked'
-
-import {
+  PlayerResultChange,
   TPlayerResultChange,
-  PlayerResultChange
 } from '~/types/player-result-change'
+import { TPlayerResultRanked } from '~/types/player-result-ranked'
 import { MyInput } from '~/utils/components/native-input'
 
 const TurnOrderBox = styled.div`
@@ -30,7 +28,7 @@ export const PlayerResultTableBodyEditMode = memo(
     lastTurnPlayer,
     playerResults,
     lastTurnPlayerChange,
-    playerResultChange
+    playerResultChange,
   }: Readonly<{
     playerResults: I.List<TPlayerResultRanked>
     lastTurnPlayer: string
@@ -45,7 +43,7 @@ export const PlayerResultTableBodyEditMode = memo(
           PlayerResultChange({
             playerIndex,
             key,
-            value: key === 'VP' ? parseInt(value, 10) : value.toString()
+            value: key === 'VP' ? parseInt(value, 10) : value.toString(),
           })
         )
       },
@@ -58,7 +56,7 @@ export const PlayerResultTableBodyEditMode = memo(
           PlayerResultChange({
             playerIndex,
             key: 'turnOrder',
-            value
+            value,
           })
         )
       },

@@ -1,16 +1,13 @@
 import * as I from 'immutable'
-
-import * as list from 'typescript-utils/functions/list'
+import { ColumnSetting, TableSettings } from 'react-data-table'
 import * as bool from 'typescript-utils/functions/boolean'
-
-import { TableSettings, ColumnSetting } from 'react-data-table'
-
-import { cmpCardCost, dcardCostToStr } from '~/types/card-cost'
+import * as list from 'typescript-utils/functions/list'
 import {
+  dcardTypeToJpStr,
   implementedToStr,
   randomizerCandidateToStr,
-  dcardTypeToJpStr
 } from '~/functions/transform-card-property'
+import { cmpCardCost, dcardCostToStr } from '~/types/card-cost'
 import { DCardType } from '~/types/card-type'
 
 export const cardlistTableSettings = (setNameIndex: I.Map<string, number>) =>
@@ -25,13 +22,13 @@ export const cardlistTableSettings = (setNameIndex: I.Map<string, number>) =>
         filterType: 'input',
         label: '名前',
         isButton: true,
-        sort: 'string'
+        sort: 'string',
       }),
       ColumnSetting({
         cellType: 'string',
         filterType: 'input',
         label: 'Name',
-        sort: 'string'
+        sort: 'string',
       }),
       ColumnSetting({
         cellType: 'string[]',
@@ -41,13 +38,13 @@ export const cardlistTableSettings = (setNameIndex: I.Map<string, number>) =>
           (a: string, b: string): number =>
             setNameIndex.get(a, -1) - setNameIndex.get(b, -1)
         ),
-        cellToStr: (names: I.List<string>) => names.join('，')
+        cellToStr: (names: I.List<string>) => names.join('，'),
       }),
       ColumnSetting({
         cellType: 'string',
         filterType: 'select',
         label: '分類',
-        sort: 'string'
+        sort: 'string',
       }),
       ColumnSetting({
         cellType: 'string[]',
@@ -55,84 +52,84 @@ export const cardlistTableSettings = (setNameIndex: I.Map<string, number>) =>
         label: '種別',
         sort: 'string-lex',
         cellToStr: (values: I.List<DCardType>) =>
-          values.map(dcardTypeToJpStr).join('，')
+          values.map(dcardTypeToJpStr).join('，'),
       }),
       ColumnSetting({
         cellType: 'others',
         filterType: 'none',
         label: 'コスト',
         sort: cmpCardCost,
-        cellToStr: dcardCostToStr
+        cellToStr: dcardCostToStr,
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: 'VP',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: '+card',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: '+action',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: '+buy',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: '+coin',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: '+VPtoken',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: '+Coffer',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'number',
         filterType: 'none',
         align: 'center',
         label: '+Villager',
-        sort: 'number'
+        sort: 'number',
       }),
       ColumnSetting({
         cellType: 'others',
         filterType: 'select',
         label: 'ゲーム実装状況',
         cellToStr: implementedToStr,
-        sort: bool.cmp
+        sort: bool.cmp,
       }),
       ColumnSetting({
         cellType: 'others',
         filterType: 'select',
         label: 'ランダマイザー対象',
         cellToStr: randomizerCandidateToStr,
-        sort: bool.cmp
-      })
-    ])
+        sort: bool.cmp,
+      }),
+    ]),
   })

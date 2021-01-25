@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { DCardProperty, TDCardProperty } from './dcard-property'
 
 interface INumVictoryCards {
@@ -85,7 +84,7 @@ const keys: (keyof INumVictoryCards)[] = [
   'numActionCards',
   'numDiffNameCards',
   'numSilvers',
-  'DistantLandsOnTavernMat'
+  'DistantLandsOnTavernMat',
 ]
 
 export type INumVictoryCardsJS = INumVictoryCards
@@ -94,13 +93,10 @@ export type TNumVictoryCards = I.Record<INumVictoryCards> &
   Readonly<INumVictoryCards>
 
 const NumVictoryCardsRecordFactory = I.Record<INumVictoryCards>(
-  keys.reduce(
-    (acc, key) => {
-      acc[key] = 0
-      return acc
-    },
-    {} as INumVictoryCards
-  )
+  keys.reduce((acc, key) => {
+    acc[key] = 0
+    return acc
+  }, {} as INumVictoryCards)
 )
 
 export const NumVictoryCards = (
@@ -157,7 +153,7 @@ export const countVictoryCards = (nvc: INumVictoryCards): number =>
   countCastles(nvc)
 
 export const VPtotal = (nvc: INumVictoryCards): number =>
-  keys.map(key => VPofCard(nvc, key)).reduce((acc, curr) => acc + curr)
+  keys.map((key) => VPofCard(nvc, key)).reduce((acc, curr) => acc + curr)
 
 export const VPofCard = (
   nvc: INumVictoryCards,
@@ -273,7 +269,7 @@ export const toStr = (
   }
 
   const toNameJp = (id: string) =>
-    (dcardlist.find(e => e.cardId === id) || DCardProperty()).nameJp
+    (dcardlist.find((e) => e.cardId === id) || DCardProperty()).nameJp
 
   const cardIds = [
     'Curse',
@@ -297,10 +293,10 @@ export const toStr = (
     'Silk_Road',
     'Feodum',
     'Distant_Lands',
-    'Pasture'
+    'Pasture',
   ] as (keyof INumVictoryCards)[]
 
-  cardIds.forEach(id => {
+  cardIds.forEach((id) => {
     if (nvc[id] !== 0) {
       result.push(`${toNameJp(id)}(${VPperCard(nvc, id)}x${nvc[id]})`)
     }
@@ -314,11 +310,11 @@ export const toStr = (
     'Opulent_Castle',
     'Sprawling_Castle',
     'Grand_Castle',
-    'Kings_Castle'
+    'Kings_Castle',
   ] as (keyof INumVictoryCards)[]
 
   const CastleVPtotal = castleCardIds
-    .map(cardId => VPperCard(nvc, cardId) * nvc[cardId])
+    .map((cardId) => VPperCard(nvc, cardId) * nvc[cardId])
     .reduce((prev, curr) => prev + curr)
 
   if (CastleVPtotal !== 0) {

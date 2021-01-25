@@ -1,5 +1,5 @@
-import React, { memo } from 'react'
 import { CircularProgress } from '@material-ui/core'
+import React, { memo } from 'react'
 
 export const Loading = memo(
   ({ width, height }: { width: number; height: number }) => (
@@ -11,7 +11,7 @@ export const Loading = memo(
         // centering
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       }}
     >
       <CircularProgress />

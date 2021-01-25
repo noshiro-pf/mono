@@ -1,4 +1,4 @@
-const ts = require("typescript");
+const ts = require('typescript');
 
 // const source = "const x = <div />";
 
@@ -9,8 +9,8 @@ const ts = require("typescript");
 // console.log(JSON.stringify(result));
 
 function makeFactorialFunction() {
-  const functionName = ts.createIdentifier("factorial");
-  const paramName = ts.createIdentifier("n");
+  const functionName = ts.createIdentifier('factorial');
+  const paramName = ts.createIdentifier('n');
   const parameter = ts.createParameter(
     /*decorators*/ undefined,
     /*modifiers*/ undefined,
@@ -53,8 +53,8 @@ function makeFactorialFunction() {
 }
 
 const resultFile = ts.createSourceFile(
-  "someFileName.ts",
-  "",
+  'someFileName.ts',
+  '',
   ts.ScriptTarget.Latest,
   /*setParentNodes*/ false,
   ts.ScriptKind.TS

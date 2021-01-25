@@ -8,7 +8,7 @@ export const EmptyCard = memo(
     width,
     height,
     borderWidth,
-    description
+    description,
   }: {
     width: number
     height: number

@@ -20,7 +20,7 @@ const defaultValues = (): IUser => ({
   id: '',
   timestamp: Date.now(),
   name: '',
-  data: { a: 0, b: 0 }
+  data: { a: 0, b: 0 },
 })
 
 export class User implements IUser {
@@ -41,7 +41,7 @@ export class User implements IUser {
     const wdData = withDefault(wd('data'), dfl.data)
     this.data = {
       a: wdData('a'),
-      b: wdData('b')
+      b: wdData('b'),
     }
   }
 }

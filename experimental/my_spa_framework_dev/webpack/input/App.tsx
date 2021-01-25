@@ -1,9 +1,9 @@
-import { useState } from "./piko-react";
+import { useState } from './piko-react';
 
 export const App = () => {
   const [num, , updateNum] = useState<number>(2);
 
-  const suffix = new Array(num).fill("!").join("");
+  const suffix = new Array(num).fill('!').join('');
   const msg = `world${suffix}`;
 
   return (

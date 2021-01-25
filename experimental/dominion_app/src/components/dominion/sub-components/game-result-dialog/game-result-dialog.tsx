@@ -1,28 +1,25 @@
-import React, { memo, useMemo, useState, useCallback } from 'react'
 import * as I from 'immutable'
-
-import { RN, combine, merge } from 'rnjs'
+import React, { memo, useCallback, useMemo, useState } from 'react'
+import { combine, merge, RN } from 'rnjs'
 import {
+  useEffectFromProps,
+  useRN,
   useRNValue,
   useStateAsStream,
-  useEffectFromProps,
-  useRN
 } from 'rnjs-hooks'
-
-import * as fb from '~/firebase/firebase-worker'
 import { placeListFromGameResults$ } from '~/firebase/firebase-combined-values'
-
-import { GameResultDialogView } from './game-result-dialog-view'
-import { TGameResult, getScored, GameResult } from '~/types/game-result'
+import * as fb from '~/firebase/firebase-worker'
 import { TDCardProperty } from '~/types/dcard-property'
-import {
-  PlayerResultRanked,
-  TPlayerResultRanked
-} from '~/types/player-result-ranked'
+import { GameResult, getScored, TGameResult } from '~/types/game-result'
 import {
   PlayerResultChange,
-  TPlayerResultChange
+  TPlayerResultChange,
 } from '~/types/player-result-change'
+import {
+  PlayerResultRanked,
+  TPlayerResultRanked,
+} from '~/types/player-result-ranked'
+import { GameResultDialogView } from './game-result-dialog-view'
 
 export const GameResultDialog = memo(
   ({
@@ -30,7 +27,7 @@ export const GameResultDialog = memo(
     closeDialog,
     gameResult,
     expansions,
-    cardIdToDCardProperty
+    cardIdToDCardProperty,
   }: Readonly<{
     isOpen: boolean
     closeDialog: () => void
@@ -48,7 +45,7 @@ export const GameResultDialog = memo(
       date: datePrev,
       memo: memoPrev,
       players: playerResultsPrev,
-      lastTurnPlayer: lastTurnPlayerPrev
+      lastTurnPlayer: lastTurnPlayerPrev,
     } = gameResult
 
     const playerResultsInit = useMemo(
@@ -91,7 +88,7 @@ export const GameResultDialog = memo(
         combine(
           fb.scoreTable$,
           lastTurnPlayer$,
-          playerResultsInit$.switchMap(init =>
+          playerResultsInit$.switchMap((init) =>
             playerResultChange$.scan(init, (state, chg) => {
               const k = chg.key
               const playerIndex = chg.playerIndex
@@ -108,10 +105,10 @@ export const GameResultDialog = memo(
                 }
                 const curr = state.getIn([playerIndex, 'turnOrder'])
                 const swapIndex =
-                  state.findIndex(e => e.turnOrder === curr + value) || 0
+                  state.findIndex((e) => e.turnOrder === curr + value) || 0
                 return state
-                  .updateIn([playerIndex, 'turnOrder'], x => x + value)
-                  .updateIn([swapIndex, 'turnOrder'], x => x - value)
+                  .updateIn([playerIndex, 'turnOrder'], (x) => x + value)
+                  .updateIn([swapIndex, 'turnOrder'], (x) => x - value)
               }
             })
           )
@@ -144,7 +141,7 @@ export const GameResultDialog = memo(
       datePrev,
       memoPrev,
       lastTurnPlayerPrev,
-      playerResultsInit
+      playerResultsInit,
     ])
 
     const submitChanges = useCallback(async () => {
@@ -159,7 +156,7 @@ export const GameResultDialog = memo(
           lastTurnPlayer,
           selectedCardsId,
           place,
-          selectedExpansions
+          selectedExpansions,
         })
       )
       // TODO snackbar
@@ -172,7 +169,7 @@ export const GameResultDialog = memo(
       lastTurnPlayer,
       selectedCardsId,
       place,
-      selectedExpansions
+      selectedExpansions,
     ])
 
     const discardChangesAndClose = useCallback(() => {

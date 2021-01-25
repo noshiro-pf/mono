@@ -2,7 +2,7 @@
 
 `XYZ`という型を定義する場合の例．
 
-- 型定義
+-   型定義
 
 ```ts
 interface IXYZ {
@@ -16,7 +16,7 @@ export type IXYZJS {
 export type TXYZ = Record<IXYZ> & Readonly<IXYZ>;
 ```
 
-- 生成用関数定義
+-   生成用関数定義
 
 ```ts
 /**

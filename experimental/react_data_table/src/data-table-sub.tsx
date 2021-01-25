@@ -1,31 +1,29 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
+import React, { memo } from 'react'
 import { RN } from 'rnjs'
 import {
-  useRNValue,
-  useRNEffect,
   useEffectFromProps,
-  useStateAsStream,
   useEventAsStream,
-  useRN
+  useRN,
+  useRNEffect,
+  useRNValue,
+  useStateAsStream,
 } from 'rnjs-hooks'
-
-import { TTableSettings, TableSettings } from './types/table-settings'
-import { TSortState, SortState } from './types/sort-state'
-import { ICellPosition, ICellPositionInPage } from './types/cell-position'
-import { HeaderValueType } from './types/header-value-type'
-import { TDataTableState } from './types/data-table-state'
+import { DataTableView } from './data-table-view'
 import { DataTableDataFlow } from './functions/data-table-flow'
 import { isValidInput } from './functions/is-valid-input'
-import { DataTableView } from './data-table-view'
+import { ICellPosition, ICellPositionInPage } from './types/cell-position'
+import { TDataTableState } from './types/data-table-state'
+import { HeaderValueType } from './types/header-value-type'
+import { SortState, TSortState } from './types/sort-state'
+import { TableSettings, TTableSettings } from './types/table-settings'
 
 export const DataTableSub = memo(
   ({
     table,
     settings,
     tableStateChange,
-    cellClick
+    cellClick,
   }: Readonly<{
     table: I.List<I.List<any>>
     settings: TTableSettings
@@ -86,7 +84,7 @@ export const DataTableSub = memo(
         rowIndexInFilteredIndice:
           itemsPerPage * (pageNumber - 1) + rowIndexInPage,
         rowIndexInSlicedIndice: rowIndexInPage,
-        columnIndex: columnIndex
+        columnIndex: columnIndex,
       })
     }
 

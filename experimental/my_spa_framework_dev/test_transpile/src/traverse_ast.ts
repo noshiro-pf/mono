@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
-import * as ts from "typescript";
+import { readFileSync } from 'fs';
+import * as ts from 'typescript';
 
 export function delint(sourceFile: ts.SourceFile) {
   delintNode(sourceFile);
@@ -65,7 +65,7 @@ export function delint(sourceFile: ts.SourceFile) {
 }
 
 const fileNames = process.argv.slice(2);
-console.log("input:", fileNames);
+console.log('input:', fileNames);
 fileNames.forEach((fileName) => {
   // Parse a file
   const sourceFile = ts.createSourceFile(
@@ -75,7 +75,7 @@ fileNames.forEach((fileName) => {
     /*setParentNodes */ true
   );
 
-  console.log("AST", sourceFile);
+  console.log('AST', sourceFile);
 
   // delint it
   delint(sourceFile);

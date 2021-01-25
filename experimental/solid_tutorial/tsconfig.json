@@ -14,10 +14,6 @@
     "noEmit": true,
     "jsx": "preserve"
   },
-  "files": [
-    "./node_modules/solid-scripts/types/solid-app.d.ts"
-  ],
-  "include": [
-    "src"
-  ]
+  "files": ["./node_modules/solid-scripts/types/solid-app.d.ts"],
+  "include": ["src"]
 }

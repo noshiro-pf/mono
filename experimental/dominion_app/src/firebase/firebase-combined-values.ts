@@ -1,30 +1,27 @@
 import * as I from 'immutable'
-
-import { RN, combine } from 'rnjs'
+import { combine, RN } from 'rnjs'
 import * as ls from '~/local-storage-api'
-
+import { TDCardProperty } from '~/types/dcard-property'
+import { TRandomizerGroup } from '~/types/randomizer/randomizer-group'
+import { TUser, User } from '~/types/user'
 import {
   dcardlist$,
-  users$,
+  gameResults$,
   randomizerGroups$,
-  gameResults$
+  users$,
 } from './firebase-worker'
-
-import { TDCardProperty } from '~/types/dcard-property'
-import { TUser, User } from '~/types/user'
-import { TRandomizerGroup } from '~/types/randomizer/randomizer-group'
 
 export const cardIdToDCardProperty$: RN<
   I.Map<string, TDCardProperty>
-> = dcardlist$.map(dcardlist => {
+> = dcardlist$.map((dcardlist) => {
   const m = new Map<string, TDCardProperty>()
-  dcardlist.forEach(d => m.set(d.cardId, d))
+  dcardlist.forEach((d) => m.set(d.cardId, d))
   return I.Map(m)
 })
 
 export const me$: RN<TUser> = combine(users$, ls.myName$).map(
   ([users, myName]) =>
-    users.find(u => u.name === myName) || User({ name: myName }),
+    users.find((u) => u.name === myName) || User({ name: myName }),
   'me'
 )
 
@@ -33,13 +30,13 @@ export const currentRandomizerGroup$: RN<
 > = combine(
   randomizerGroups$,
   me$.pluck('randomizerGroupId').skipUnchanged()
-).map(([list, id]) => list.find(r => r.key === id))
+).map(([list, id]) => list.find((r) => r.key === id))
 
 export const nameListFromGameResults$: RN<I.List<string>> = gameResults$.map(
-  gameResults => {
+  (gameResults) => {
     const names = new Set<string>()
-    gameResults.forEach(g => {
-      g.players.forEach(p => {
+    gameResults.forEach((g) => {
+      g.players.forEach((p) => {
         names.add(p.name)
       })
     })
@@ -48,10 +45,10 @@ export const nameListFromGameResults$: RN<I.List<string>> = gameResults$.map(
 )
 
 export const placeListFromGameResults$: RN<I.List<string>> = gameResults$.map(
-  gameResults => {
-    const places = new Set<string>(gameResults.map(g => g.place))
+  (gameResults) => {
+    const places = new Set<string>(gameResults.map((g) => g.place))
     return I.List(places)
-      .filter(e => e !== '')
+      .filter((e) => e !== '')
       .sort()
   }
 )

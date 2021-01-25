@@ -1,5 +1,5 @@
-import React, { useCallback, memo, CSSProperties } from 'react'
 import { TextField } from '@material-ui/core'
+import React, { CSSProperties, memo, useCallback } from 'react'
 import { useValueWithDefault } from '../hooks/use-prop-with-default'
 
 export const MyInput = memo(
@@ -12,7 +12,7 @@ export const MyInput = memo(
     helperText: helperTextInput,
     style,
     type,
-    disabled
+    disabled,
   }: Readonly<{
     value: string | number
     valueChange: (value: string) => void

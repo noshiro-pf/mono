@@ -1,13 +1,11 @@
-import React, { memo } from 'react'
+import { Button, Paper } from '@material-ui/core'
 import * as I from 'immutable'
+import React, { memo } from 'react'
 import styled from 'styled-components'
-import { Paper, Button } from '@material-ui/core'
-
 import { TSelectedCards } from '~/types/selected-cards'
-
 import { ExpansionsToggleList } from '../../sub-components/expansions-toggle-list/expansions-toggle-list'
-import { SelectedCardsList } from '../../sub-components/selected-cards-list/selected-cards-list'
 import { ProsperityDarkAgesFlag } from '../../sub-components/prosperity-darkages-flag/prosperity-darkages-flag'
+import { SelectedCardsList } from '../../sub-components/selected-cards-list/selected-cards-list'
 
 const Root = styled.div`
   padding: 10px;
@@ -30,7 +28,7 @@ export const RandomizerSelectCardsView = memo(
     selectedCards,
     randomizerOnClick,
     resetOnClick,
-    setSelectedExpansions
+    setSelectedExpansions,
   }: Readonly<{
     expansions: I.List<string>
     expansionsSelected: I.List<string>

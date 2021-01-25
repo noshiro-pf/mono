@@ -1,18 +1,15 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
-import { RN, merge } from 'rnjs'
+import React, { memo } from 'react'
+import { merge, RN } from 'rnjs'
 import {
-  useRNValue,
   useEventAsStream,
+  useRN,
+  useRNValue,
   useStateAsStream,
-  useRN
 } from 'rnjs-hooks'
-
 import * as fb from '~/firebase/firebase-worker'
 import { selectCards } from '~/functions/randomizer/select-cards'
 import { TSelectedCards } from '~/types/selected-cards'
-
 import { RandomizerSelectCardsView } from './randomizer-select-cards-view'
 
 export const RandomizerSelectCards = memo(() => {

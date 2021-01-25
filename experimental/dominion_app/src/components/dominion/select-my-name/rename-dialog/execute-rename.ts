@@ -6,5 +6,5 @@ export const executeRename = async (
 ): Promise<any> =>
   Promise.all([
     fb.renameGameResult(nameBefore, nameAfter),
-    fb.rename(nameBefore, nameAfter)
+    fb.rename(nameBefore, nameAfter),
   ])

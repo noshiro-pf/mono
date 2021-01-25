@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
-import * as ts from "typescript";
+import { readFileSync } from 'fs';
+import * as ts from 'typescript';
 
 export function delint(sourceFile: ts.SourceFile) {
   delintNode(sourceFile);

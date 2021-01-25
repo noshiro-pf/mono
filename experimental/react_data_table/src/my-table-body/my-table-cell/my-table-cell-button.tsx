@@ -1,14 +1,14 @@
-import React, { CSSProperties, memo } from 'react'
 import { Button } from '@material-ui/core'
+import React, { CSSProperties, memo } from 'react'
 
 const buttonStyle: CSSProperties = {
-  fontWeight: 700
+  fontWeight: 700,
 }
 
 export const MyTableCellButton = memo(
   ({
     value,
-    onClick
+    onClick,
   }: Readonly<{
     value: string
     onClick: () => void

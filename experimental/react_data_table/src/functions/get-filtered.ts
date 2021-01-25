@@ -1,7 +1,5 @@
 import * as I from 'immutable'
-
 import * as str from 'typescript-utils/functions/string'
-
 import { ColumnSetting, TColumnSetting } from '../types/column-setting'
 import { HeaderValueType } from '../types/header-value-type'
 import { TTableSettings } from '../types/table-settings'
@@ -35,7 +33,7 @@ export const getFilteredIndice = (
     (cache.filterResults[0] || []).length !== table.get(0, I.List()).size
   ) {
     cache.filterResults = table
-      .map(row => row.map(_ => true).toArray())
+      .map((row) => row.map((_) => true).toArray())
       .toArray()
   }
 
@@ -51,8 +49,8 @@ export const getFilteredIndice = (
   // update headerValuesAllPrev
   cache.headerValuesAllPrev = headerValuesAll.slice() // copy
 
-  return indice.filter(rowIdx =>
-    (cache.filterResults[rowIdx] || []).every(e => e)
+  return indice.filter((rowIdx) =>
+    (cache.filterResults[rowIdx] || []).every((e) => e)
   )
 }
 
@@ -131,7 +129,7 @@ const filterResultOfCell = (
       // case 'number[]'
       // columnSetting.filterType is 'multiSelect-and/or'
 
-      const headerValueMapped = headerValue.map(e => selectorOptions.get(e))
+      const headerValueMapped = headerValue.map((e) => selectorOptions.get(e))
 
       if (filterType === 'multiSelect-and') {
         /* for any e in headerValue, e in cell */

@@ -12,5 +12,5 @@ function App() {
   );
 }
 
-document.body.innerHTML = "";
+document.body.innerHTML = '';
 document.body.append(App({}).element.element);

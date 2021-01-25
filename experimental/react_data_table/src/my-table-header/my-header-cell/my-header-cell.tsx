@@ -1,10 +1,9 @@
-import React, { memo, useCallback } from 'react'
 import * as I from 'immutable'
-
-import { ISelectorOptionWithViewValue } from '../../types/selector-option-with-view-value'
+import React, { memo, useCallback } from 'react'
 import { TColumnSetting } from '../../types/column-setting'
-import { CellSortStateType } from '../../types/sort-state'
 import { HeaderValueType } from '../../types/header-value-type'
+import { ISelectorOptionWithViewValue } from '../../types/selector-option-with-view-value'
+import { CellSortStateType } from '../../types/sort-state'
 import { HeaderCellView } from './my-header-cell-view'
 
 export const MyHeaderCell = memo(
@@ -15,7 +14,7 @@ export const MyHeaderCell = memo(
     cellSortState,
     headerValue,
     cellSortStateChange,
-    headerValueChange
+    headerValueChange,
   }: Readonly<{
     columnId: number | 'NoColumn'
     columnSetting: TColumnSetting
@@ -42,7 +41,7 @@ export const MyHeaderCell = memo(
       (selectedIndex: number) => {
         headerValueChange({
           columnIndex: columnId as number,
-          value: selectedIndex
+          value: selectedIndex,
         })
       },
       [columnId, headerValueChange]
@@ -52,7 +51,7 @@ export const MyHeaderCell = memo(
       (selectedIndice: I.List<number>) => {
         headerValueChange({
           columnIndex: columnId as number,
-          value: selectedIndice
+          value: selectedIndice,
         })
       },
       [columnId, headerValueChange]

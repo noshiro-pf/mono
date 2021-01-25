@@ -1,8 +1,7 @@
 import * as I from 'immutable'
-
-import { FilterType } from './filter-type'
 import { CellAlignType } from './cell-align-type'
 import { CellValueType } from './cell-value-type'
+import { FilterType } from './filter-type'
 import { SortColumnType } from './sort-column-type'
 
 type IColumnSetting = {
@@ -26,7 +25,7 @@ const ColumnSettingRecordFactory = I.Record<IColumnSetting>({
   filterType: 'none',
   sort: false,
   cellToStr: (v: any) => v.toString(),
-  selectorWithCount: false
+  selectorWithCount: false,
 })
 
 export const ColumnSetting = (cs?: Partial<IColumnSetting>): TColumnSetting =>

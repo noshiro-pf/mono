@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { TDCardProperty } from '~/types/dcard-property'
 
 export const getDcardsInSelectedExpansionsWithIndex = (
@@ -10,8 +9,9 @@ export const getDcardsInSelectedExpansionsWithIndex = (
 
   return dcardlist
     .map((v, i) => ({ index: i, dcardprop: v }))
-    .filter(v => v.dcardprop.randomizerCandidate)
+    .filter((v) => v.dcardprop.randomizerCandidate)
     .filter(
-      v => !selectedExpansionsSet.intersect(v.dcardprop.expansionName).isEmpty()
+      (v) =>
+        !selectedExpansionsSet.intersect(v.dcardprop.expansionName).isEmpty()
     )
 }

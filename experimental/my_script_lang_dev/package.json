@@ -1,18 +1,27 @@
 {
   "name": "piko",
   "displayName": "pikoscript",
-  "description": "pikoscript language support",
   "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.45.0"
-  },
-  "scripts": {
-    "build": "vsce package"
-  },
+  "description": "pikoscript language support",
   "categories": [
     "Programming Languages"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:noshiro-pf/pikoscript.git"
+  },
+  "publisher": "noshiro",
+  "scripts": {
+    "build": "vsce package"
+  },
   "contributes": {
+    "grammars": [
+      {
+        "language": "piko",
+        "scopeName": "source.piko",
+        "path": "./syntaxes/piko.tmLanguage.json"
+      }
+    ],
     "languages": [
       {
         "id": "piko",
@@ -25,23 +34,14 @@
         ],
         "configuration": "./language-configuration.json"
       }
-    ],
-    "grammars": [
-      {
-        "language": "piko",
-        "scopeName": "source.piko",
-        "path": "./syntaxes/piko.tmLanguage.json"
-      }
     ]
-  },
-  "publisher": "noshiro",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com:noshiro-pf/pikoscript.git"
   },
   "devDependencies": {
     "generator-code": "^1.2.13",
     "vsce": "^1.75.0",
     "yo": "^3.1.1"
+  },
+  "engines": {
+    "vscode": "^1.45.0"
   }
 }

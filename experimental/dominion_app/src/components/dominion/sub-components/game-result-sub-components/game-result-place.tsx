@@ -1,6 +1,5 @@
-import React, { memo } from 'react'
 import * as I from 'immutable'
-
+import React, { memo } from 'react'
 import { AutoComplete } from '~/utils/components/auto-complete'
 
 // import { TextField } from '@material-ui/core';
@@ -10,7 +9,7 @@ export const GameResultPlace = memo(
     editMode,
     place,
     placeList,
-    placeChange
+    placeChange,
   }: Readonly<{
     editMode: boolean
     place: string

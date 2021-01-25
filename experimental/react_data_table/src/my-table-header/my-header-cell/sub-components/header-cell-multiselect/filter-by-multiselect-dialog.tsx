@@ -1,17 +1,15 @@
-import React, { memo, useCallback } from 'react'
 import * as I from 'immutable'
-
-import * as num from 'typescript-utils/functions/number'
-import { RN, merge, combine } from 'rnjs'
+import React, { memo, useCallback } from 'react'
+import { combine, merge, RN } from 'rnjs'
 import {
-  useRNValue,
-  useRNEffect,
-  useEventAsStream,
-  useStateAsStream,
   useEffectFromProps,
-  useRN
+  useEventAsStream,
+  useRN,
+  useRNEffect,
+  useRNValue,
+  useStateAsStream,
 } from 'rnjs-hooks'
-
+import * as num from 'typescript-utils/functions/number'
 import { ISelectorOptionWithViewValue } from '../../../../types/selector-option-with-view-value'
 import { FilterByMultiselectDialogView } from './filter-by-multiselect-dialog-view'
 
@@ -22,7 +20,7 @@ export const FilterByMultiselectDialog = memo(
     cancelClick,
     title,
     selectorOptions,
-    selectedIndice: selectedIndiceInput
+    selectedIndice: selectedIndiceInput,
   }: Readonly<{
     open: boolean
     okClick: (selectedIndice: I.List<number>) => void
@@ -58,7 +56,7 @@ export const FilterByMultiselectDialog = memo(
     const selectedIndice$: RN<I.List<number>> = useRN(
       combine(
         selectedIndiceInput$,
-        selectorOptionsInput$.map(list => list.map((_, i) => i))
+        selectorOptionsInput$.map((list) => list.map((_, i) => i))
       ).switchMap(([init, selectorOps]) =>
         merge(
           flip$,
@@ -81,7 +79,7 @@ export const FilterByMultiselectDialog = memo(
                 return acc.has(curr) ? acc.delete(curr) : acc.add(curr)
             }
           })
-          .map(s => I.List(s).sort(num.cmp))
+          .map((s) => I.List(s).sort(num.cmp))
       )
     )
 

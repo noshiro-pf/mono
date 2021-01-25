@@ -1,27 +1,24 @@
-import * as I from 'immutable'
-import { map } from 'rxjs/operators'
 import { initializeApp } from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/database'
 import 'firebase/storage'
+import * as I from 'immutable'
+import { combine, fromObservable, RN } from 'rnjs'
 import { list } from 'rxfire/database'
-
-import { RN, fromObservable, combine } from 'rnjs'
-
-import { fbPaths, fbAppConfig } from '~/constants/firebase-config'
-
-import { UserFromJS, TUser, UserToJS } from '~/types/user'
-import { TDCardProperty, DCardPropertyFromJS } from '~/types/dcard-property'
+import { map } from 'rxjs/operators'
+import { fbAppConfig, fbPaths } from '~/constants/firebase-config'
+import { DCardPropertyFromJS, TDCardProperty } from '~/types/dcard-property'
 import {
+  GameResultFromJS,
+  GameResultToJS,
   getScored,
   TGameResult,
-  GameResultToJS,
-  GameResultFromJS
 } from '~/types/game-result'
 import {
+  RandomizerGroupFromJS,
   TRandomizerGroup,
-  RandomizerGroupFromJS
 } from '~/types/randomizer/randomizer-group'
+import { TUser, UserFromJS, UserToJS } from '~/types/user'
 
 export const paths = fbPaths
 const firebaseApp = initializeApp(fbAppConfig)
@@ -37,29 +34,29 @@ const keyGen = () => Math.random().toString()
 export const scoreTable$: RN<I.List<I.List<number>>> = fromObservable(
   [],
   list(database.ref(paths.database.data.scoreTable)).pipe(
-    map(changes => changes.map(c => c.snapshot.val()))
+    map((changes) => changes.map((c) => c.snapshot.val()))
   )
-).map(s => I.List(s.map(e => I.List(e))))
+).map((s) => I.List(s.map((e) => I.List(e))))
 
 export const expansions$: RN<I.List<string>> = fromObservable(
   [],
   list(database.ref(paths.database.data.expansions)).pipe(
-    map(changes => changes.map(c => c.snapshot.val()))
+    map((changes) => changes.map((c) => c.snapshot.val()))
   )
-).map(s => I.List(s))
+).map((s) => I.List(s))
 
 // dcardlist
 
 export const dcardlist$: RN<I.List<TDCardProperty>> = fromObservable(
   [],
   list(database.ref(paths.database.data.dcardlist)).pipe(
-    map(changes =>
-      changes.map(c =>
+    map((changes) =>
+      changes.map((c) =>
         DCardPropertyFromJS({ key: c.snapshot.key, ...c.snapshot.val() })
       )
     )
   )
-).map(dcardlist => I.List(dcardlist))
+).map((dcardlist) => I.List(dcardlist))
 
 export const setDcardImgUrl = (
   key: string,
@@ -77,9 +74,9 @@ export const setDcardImgUrl = (
 export const users$: RN<I.List<TUser>> = fromObservable(
   [],
   list(database.ref(paths.database.users)).pipe(
-    map(changes => changes.map(c => UserFromJS(c.snapshot.val())))
+    map((changes) => changes.map((c) => UserFromJS(c.snapshot.val())))
   )
-).map(users => I.List(users))
+).map((users) => I.List(users))
 
 export const setUser = (key: string, user: TUser): Promise<any> => {
   if (!key) return Promise.resolve()
@@ -97,13 +94,13 @@ export const deleteUserByKey = (key: string): Promise<any> => {
 }
 
 export const deleteUserByName = (name: string): Promise<any> => {
-  const user = users$.value.find(v => v.name === name)
+  const user = users$.value.find((v) => v.name === name)
   if (!user) return Promise.reject()
   return deleteUserByKey(user.key)
 }
 
 export const rename = (nameBefore: string, nameAfter: string): Promise<any> => {
-  const user = users$.value.find(v => v.name === nameBefore)
+  const user = users$.value.find((v) => v.name === nameBefore)
   if (!user) return Promise.reject()
   return database.ref(`${paths.database.users}/${user.key}/name`).set(nameAfter)
 }
@@ -114,12 +111,12 @@ export const gameResults$: RN<I.List<TGameResult>> = combine(
   fromObservable(
     [],
     list(database.ref(paths.database.gameResults)).pipe(
-      map(changes => changes.map(c => GameResultFromJS(c.snapshot.val())))
+      map((changes) => changes.map((c) => GameResultFromJS(c.snapshot.val())))
     )
   ),
   scoreTable$
 ).map(([gameResults, scoreTable]) =>
-  I.List(gameResults).map(gr =>
+  I.List(gameResults).map((gr) =>
     gr.set('players', getScored(scoreTable, gr.players, gr.lastTurnPlayer))
   )
 )
@@ -142,7 +139,7 @@ export const renameGameResult = (
   nameAfter: string
 ): Promise<any> => {
   const updates: { [key: string]: any } = {}
-  gameResults$.value.forEach(gr => {
+  gameResults$.value.forEach((gr) => {
     if (gr.lastTurnPlayer === nameBefore) {
       updates[`/${gr.key}/lastTurnPlayer`] = nameAfter
     }
@@ -161,6 +158,8 @@ export const renameGameResult = (
 export const randomizerGroups$: RN<I.List<TRandomizerGroup>> = fromObservable(
   [],
   list(database.ref(paths.database.randomizerGroups)).pipe(
-    map(changes => changes.map(c => RandomizerGroupFromJS(c.snapshot.val())))
+    map((changes) =>
+      changes.map((c) => RandomizerGroupFromJS(c.snapshot.val()))
+    )
   )
-).map(randomizerGroups => I.List(randomizerGroups))
+).map((randomizerGroups) => I.List(randomizerGroups))

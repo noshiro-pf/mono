@@ -1,23 +1,21 @@
 import * as I from 'immutable'
-
 import {
   withDefault,
-  withDefaultMix
+  withDefaultMix,
 } from 'typescript-utils/functions/with-default'
-
-import { DCardType } from './card-type'
-import {
-  TDCardCost,
-  IDCardCostJS,
-  DCardCost,
-  DCardCostToJS,
-  dcardCostToStr
-} from './card-cost'
 import {
   dcardTypeToJpStr,
   implementedToStr,
-  randomizerCandidateToStr
+  randomizerCandidateToStr,
 } from '../functions/transform-card-property'
+import {
+  DCardCost,
+  DCardCostToJS,
+  dcardCostToStr,
+  IDCardCostJS,
+  TDCardCost,
+} from './card-cost'
+import { DCardType } from './card-type'
 
 interface IDCardProperty {
   key: string
@@ -96,7 +94,7 @@ const DCardPropertyRecordFactory = I.Record<IDCardProperty>({
   linkId: -1,
   imgUrl: I.Record({
     front: '',
-    back: ''
+    back: '',
   })(),
   effects: I.Record({
     cost: DCardCost(),
@@ -107,8 +105,8 @@ const DCardPropertyRecordFactory = I.Record<IDCardProperty>({
     coin: 0,
     VPtoken: 0,
     villager: 0,
-    coffer: 0
-  })()
+    coffer: 0,
+  })(),
 })
 
 export const DCardProperty = (dcp?: Partial<IDCardProperty>): TDCardProperty =>
@@ -137,7 +135,7 @@ export const DCardPropertyFromJS = (
     linkId: wd('linkId'),
     imgUrl: {
       front: wdImgUrl('front'),
-      back: wdImgUrl('back')
+      back: wdImgUrl('back'),
     },
     effects: {
       VP: wdEffects('VP'),
@@ -148,8 +146,8 @@ export const DCardPropertyFromJS = (
       VPtoken: wdEffects('VPtoken'),
       villager: wdEffects('villager'),
       coffer: wdEffects('coffer'),
-      cost: DCardCost(wdEffects('cost'))
-    }
+      cost: DCardCost(wdEffects('cost')),
+    },
   })
 }
 
@@ -168,7 +166,7 @@ export const DCardPropertyToJS = (dcp: TDCardProperty): IDCardPropertyJS => ({
   linkId: dcp.linkId,
   imgUrl: {
     front: '',
-    back: ''
+    back: '',
   },
   effects: {
     cost: DCardCostToJS(dcp.effects.cost),
@@ -179,8 +177,8 @@ export const DCardPropertyToJS = (dcp: TDCardProperty): IDCardPropertyJS => ({
     coin: dcp.effects.coin,
     VPtoken: dcp.effects.VPtoken,
     villager: dcp.effects.villager,
-    coffer: dcp.effects.coffer
-  }
+    coffer: dcp.effects.coffer,
+  },
 })
 
 // methods
@@ -232,5 +230,5 @@ export const DCardPropertytoStr = (
     coffer: dcp.effects.coffer.toString(),
     villager: dcp.effects.villager.toString(),
     implemented: implementedToStr(dcp.implemented),
-    randomizerCandidate: randomizerCandidateToStr(dcp.randomizerCandidate)
+    randomizerCandidate: randomizerCandidateToStr(dcp.randomizerCandidate),
   })

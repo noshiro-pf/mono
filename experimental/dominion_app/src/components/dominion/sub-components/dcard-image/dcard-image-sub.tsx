@@ -9,7 +9,7 @@ export const DCardImageSub = memo(
     height,
     borderWidth,
     isButton,
-    onClick
+    onClick,
   }: {
     imgUrl: string
     description: string
@@ -23,7 +23,7 @@ export const DCardImageSub = memo(
       style={{
         display: 'inline-flex',
         flexDirection: 'column',
-        cursor: isButton ? 'pointer' : 'auto'
+        cursor: isButton ? 'pointer' : 'auto',
       }}
     >
       <ImgWithFrame
@@ -37,7 +37,7 @@ export const DCardImageSub = memo(
         <div
           style={{
             justifyContent: 'center',
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           {description}

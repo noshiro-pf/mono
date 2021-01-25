@@ -1,6 +1,6 @@
-import React, { memo, useCallback } from 'react'
-import * as I from 'immutable'
 import { TextField } from '@material-ui/core'
+import * as I from 'immutable'
+import React, { memo, useCallback } from 'react'
 
 export const MySelect = memo(
   ({
@@ -8,7 +8,7 @@ export const MySelect = memo(
     value,
     valueChange,
     label,
-    helperText
+    helperText,
   }: Readonly<{
     options: I.List<string>
     value: string
@@ -41,13 +41,13 @@ export const MySelect = memo(
         value={value}
         onChange={onChange}
         SelectProps={{
-          native: true
+          native: true,
         }}
         helperText={helperText || ''}
         margin='normal'
       >
         <option value='' />
-        {options.map(value => (
+        {options.map((value) => (
           <option key={value} value={value}>
             {value}
           </option>

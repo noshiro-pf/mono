@@ -1,17 +1,16 @@
-import React, { memo } from 'react'
+import { TableBody, TableCell, TableRow } from '@material-ui/core'
 import * as I from 'immutable'
-import { TableBody, TableRow, TableCell } from '@material-ui/core'
-
-import { MyTableCell } from './my-table-cell/my-table-cell'
-import { TColumnSetting } from '../types/column-setting'
+import React, { memo } from 'react'
 import { ICellPositionInPage } from '../types/cell-position'
+import { TColumnSetting } from '../types/column-setting'
+import { MyTableCell } from './my-table-cell/my-table-cell'
 
 export const MyTableBody = memo(
   ({
     displayNo,
     columnSettings,
     tableTransformedSliced,
-    cellClick
+    cellClick,
   }: Readonly<{
     displayNo: boolean
     columnSettings: I.List<TColumnSetting>
@@ -32,7 +31,7 @@ export const MyTableBody = memo(
               isButton={cs.isButton}
               pos={{
                 columnIndex: colIdx,
-                rowIndexInThisPage: rowIndexInThisPage
+                rowIndexInThisPage: rowIndexInThisPage,
               }}
               cellClick={cellClick}
             />

@@ -2,29 +2,6 @@
   "name": "reactive-node",
   "version": "0.0.1",
   "description": "Reactive Programming Library for TypeScript/JavaScript",
-  "author": "Hideaki Noshiro",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/noshiro-pf/reactive-node/issues"
-  },
-  "homepage": "https://github.com/noshiro-pf/reactive-node#readme",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rimraf dist",
-    "prebuild": "rimraf dist",
-    "build": "tsc",
-    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
-    "format": "prettier --write \"src/**/*.{js,ts}\"",
-    "organizeimport": "node scripts/organize_imports.js",
-    "oi": "npm run organizeimport",
-    "fmt": "npm run oi && npm run format"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/noshiro-pf/reactive-node.git"
-  },
   "keywords": [
     "reactive programming",
     "dataflow programming",
@@ -32,6 +9,29 @@
     "javascript",
     "observable"
   ],
+  "homepage": "https://github.com/noshiro-pf/reactive-node#readme",
+  "bugs": {
+    "url": "https://github.com/noshiro-pf/reactive-node/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/reactive-node.git"
+  },
+  "license": "ISC",
+  "author": "Hideaki Noshiro",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "fmt": "npm run oi && npm run format",
+    "format": "prettier --write \"src/**/*.{js,ts}\"",
+    "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "oi": "npm run organizeimport",
+    "organizeimport": "node scripts/organize_imports.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "rxjs": "^6.6.3",
     "typescript": "~3.7.2"

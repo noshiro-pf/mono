@@ -1,28 +1,24 @@
 import React, { memo } from 'react'
-
-import { RN, combine } from 'rnjs'
+import { combine, RN } from 'rnjs'
 import {
+  useEffectFromProps,
+  useRN,
   useRNValue,
   useStateAsStream,
-  useEffectFromProps,
-  useRN
 } from 'rnjs-hooks'
-
 import * as fb from '~/firebase/firebase-worker'
-
 import {
   DCardProperty,
+  DCardPropertytoStr,
   TDCardProperty,
-  DCardPropertytoStr
 } from '~/types/dcard-property'
-
 import { DCardPropertyDialogView } from './dcard-property-dialog-view'
 
 export const DCardPropertyDialog = memo(
   ({
     open,
     closeDialog,
-    dcardIndex
+    dcardIndex,
   }: Readonly<{
     open: boolean
     closeDialog: () => void

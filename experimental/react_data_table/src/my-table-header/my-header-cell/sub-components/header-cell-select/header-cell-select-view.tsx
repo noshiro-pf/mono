@@ -1,21 +1,20 @@
-import React, { memo, useCallback, CSSProperties } from 'react'
-import * as I from 'immutable'
 import {
+  FormControl,
+  InputLabel,
+  // InputAdornment
   // IconButton,
   // MenuItem,
   // TextField,
   Select,
-  FormControl,
-  InputLabel
-  // InputAdornment
 } from '@material-ui/core'
+import * as I from 'immutable'
+import React, { CSSProperties, memo, useCallback } from 'react'
 // import ClearIcon from '@material-ui/icons/Clear'
-
 import { ISelectorOptionWithViewValue } from '../../../../types/selector-option-with-view-value'
 
 const selectStyle: CSSProperties = {
   minWidth: '180px',
-  maxWidth: '360px'
+  maxWidth: '360px',
 }
 
 export const HeaderCellSelectView = memo(
@@ -24,7 +23,7 @@ export const HeaderCellSelectView = memo(
     selectorOptions,
     selectedIndex,
     selectedIndexChange,
-    reset
+    reset,
   }: Readonly<{
     label: string
     selectorOptions: I.List<ISelectorOptionWithViewValue>
@@ -61,7 +60,7 @@ export const HeaderCellSelectView = memo(
               onChange={selectedIndexOnChange}
               inputProps={{
                 name: 'header-cell-select',
-                id: 'header-cell-select'
+                id: 'header-cell-select',
               }}
             >
               <option value={-1} />

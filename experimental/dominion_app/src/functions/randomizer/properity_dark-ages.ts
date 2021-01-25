@@ -1,5 +1,4 @@
 import * as I from 'immutable'
-
 import { TDCardProperty } from '~/types/dcard-property'
 
 export const ProperityDarkAges = (
@@ -16,6 +15,6 @@ export const ProperityDarkAges = (
   }
   return {
     Prosperity: firstSelectedCard.expansionName.includes('繁栄'),
-    DarkAges: lastSelectedCard.expansionName.includes('暗黒時代')
+    DarkAges: lastSelectedCard.expansionName.includes('暗黒時代'),
   }
 }

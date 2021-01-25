@@ -1,12 +1,9 @@
-import React, { memo, useState, useMemo } from 'react'
-
+import React, { memo, useMemo, useState } from 'react'
 import { RN } from 'rnjs'
 import { useRNValue } from 'rnjs-hooks'
-import { myName$ } from '~/local-storage-api'
-
 import * as fbc from '~/firebase/firebase-combined-values'
+import { myName$ } from '~/local-storage-api'
 import { SelectedCards } from '~/types/selected-cards'
-
 import { RandomizerView } from './randomizer-view'
 
 export const Randomizer = memo(() => {
@@ -19,7 +16,7 @@ export const Randomizer = memo(() => {
   const signedInToGroup$: RN<boolean> = useMemo(
     () =>
       fbc.currentRandomizerGroup$
-        .map(g => g !== undefined)
+        .map((g) => g !== undefined)
         .mapTo<boolean>(true), // TODO
     []
   )
@@ -27,7 +24,7 @@ export const Randomizer = memo(() => {
   const BlackMarketIsUsed$: RN<boolean> = useMemo(
     () =>
       fbc.currentRandomizerGroup$.map(
-        group =>
+        (group) =>
           group !== undefined &&
           !group.selectedCardsHistory.isEmpty() &&
           !group.selectedCardsHistory
@@ -40,7 +37,7 @@ export const Randomizer = memo(() => {
   /* extract values */
 
   const BlackMarketIsUsed = useRNValue(BlackMarketIsUsed$)
-  const signedIn = useRNValue(myName$.map(n => !!n))
+  const signedIn = useRNValue(myName$.map((n) => !!n))
   const signedInToGroup = useRNValue(signedInToGroup$)
 
   return (
