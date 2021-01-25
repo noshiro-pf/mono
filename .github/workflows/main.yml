@@ -45,16 +45,16 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: setup
-        run: yarn setup:all
-
-      - name: lint
-        run: yarn lint:all
-
-      - name: test
-        run: yarn test:all
+        run: yarn setup:configs
 
       - name: build utils
         run: yarn build:utils
 
       - name: build apps
         run: yarn build:apps
+
+      - name: lint
+        run: yarn lint:all
+
+      - name: test
+        run: yarn test:all
