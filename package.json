@@ -25,7 +25,7 @@
     "presetup:root": "yarn clean:root",
     "setup:root": "npm-run-all --sequential setup:root:configs setup:root:scripts",
     "setup:root:configs": "tsc --project \"config/tsconfig.config.json\"",
-    "setup:root:scripts": "tsc --project ./scripts/tsconfig.json",
+    "setup:root:scripts": "tsc --project \"./scripts/tsconfig.json\"",
     "setup:sub": "yarn workspaces run setup",
     "test:all": "yarn workspaces run test"
   },
