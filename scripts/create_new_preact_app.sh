@@ -16,9 +16,12 @@ if [ -z ${new_app_name} ]; then
   exit 1
 fi
 
-cp -r ${TEMPLATE_DIR} "${APPS_DIR}/${new_app_name}"
+mkdir -p "${APPS_DIR}/${new_app_name}"
+cp -r "${TEMPLATE_DIR}/*" "${APPS_DIR}/${new_app_name}/"
 
-sed -i "s/preact-app-template/${new_app_name}/" "${APPS_DIR}/${new_app_name}/package.json"
+new_app_name_kebab=$(echo "${new_app_name}" | sed "s/_/-/g")
+echo ${new_app_name_kebab}
+sed -i "s/preact-app-template/${new_app_name_kebab}/" "${APPS_DIR}/${new_app_name}/package.json"
 echo ${new_app_name} >> "${THIS_SCRIPT_DIR}/apps.txt"
 
 echo "created ${APPS_DIR}/${new_app_name}"
