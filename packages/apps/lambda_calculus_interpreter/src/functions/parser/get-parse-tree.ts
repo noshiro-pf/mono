@@ -1,3 +1,4 @@
+import { isArrayOfLength3OrMore, isArrayOfLength6OrMore } from '@mono/ts-utils';
 import { LambdaTerm } from '../../types/lambda-term';
 import { isVariable } from '../is-variable';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term';
@@ -16,7 +17,7 @@ export const getParseTree = (tokens: string[]): LambdaTerm | undefined => {
 
   /* (lambda x.e)? */
   if (
-    tokens.length >= 6 &&
+    isArrayOfLength6OrMore(tokens) &&
     tokens[0] === '(' &&
     tokens[1] === 'lambda' &&
     isVariable(tokens[2]) &&
@@ -31,7 +32,7 @@ export const getParseTree = (tokens: string[]): LambdaTerm | undefined => {
 
   /* (e e)? */
   if (
-    tokens.length >= 3 &&
+    isArrayOfLength3OrMore(tokens) &&
     tokens[0] === '(' &&
     tokens[tokens.length - 1] === ')'
   ) {

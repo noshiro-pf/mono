@@ -1,3 +1,4 @@
+import { isArrayOfLength1OrMore } from '@mono/ts-utils';
 import { ALPHABETS } from '../constants/alphabets';
 import { Variable } from '../types/variable';
 
@@ -7,6 +8,9 @@ export const pickUpAvailableVariable = (
   const availableVariables = ALPHABETS.filter(
     (e) => !freeVariables.includes(e)
   );
-  if (availableVariables.length < 1) console.error('alphabets exhausted');
-  return availableVariables[0] as Variable; // pick up one available
+  if (isArrayOfLength1OrMore(availableVariables)) {
+    return availableVariables[0]; // pick up one available
+  } else {
+    throw new Error('alphabets exhausted');
+  }
 };

@@ -1,7 +1,6 @@
-import { RectSize } from '@mono/ts-utils';
+import { isArrayOfLength1OrMore, RectSize } from '@mono/ts-utils';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { ResizeObserver } from 'resize-observer';
-import { ResizeObserverEntry } from 'resize-observer/lib/ResizeObserverEntry';
 
 export const useResizeObserverRef = (
   setRootRectSize: (v: RectSize) => void
@@ -9,8 +8,8 @@ export const useResizeObserverRef = (
   const rootResizeObserver = useMemo(
     () =>
       new ResizeObserver((entries) => {
-        if (entries.length >= 1) {
-          const contentRect = (entries[0] as ResizeObserverEntry).contentRect;
+        if (isArrayOfLength1OrMore(entries)) {
+          const contentRect = entries[0].contentRect;
           setRootRectSize({
             width: contentRect.width,
             height: contentRect.height,
