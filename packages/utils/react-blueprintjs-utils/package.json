@@ -37,8 +37,5 @@
     "@mono/ts-utils": "*",
     "react": "^17.0.1",
     "styled-components": "^5.1.1"
-  },
-  "devDependencies": {
-    "typescript": "4.1.3"
   }
 }

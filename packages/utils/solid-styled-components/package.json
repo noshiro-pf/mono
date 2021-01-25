@@ -23,9 +23,6 @@
     "csstype": "^3.0.3",
     "goober": "^2.0.15"
   },
-  "devDependencies": {
-    "solid-js": "^0.23.11"
-  },
   "peerDependencies": {
     "solid-js": "^0.23.11"
   }

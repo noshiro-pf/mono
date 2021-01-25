@@ -42,6 +42,7 @@
     "@types/eslint": "^7.2.6",
     "@types/jest": "^26.0.9",
     "@types/node": "^14.0.27",
+    "@types/nodemailer": "^6.4.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "@types/react-hot-loader": "^4.1.1",
@@ -49,6 +50,7 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/styled-components": "^5.1.2",
     "@types/terser-webpack-plugin": "^4.1.0",
+    "@types/uuid": "^8.3.0",
     "@types/webpack": "^4.41.21",
     "@types/webpack-bundle-analyzer": "^3.8.0",
     "@types/webpack-dev-server": "^3.11.0",
@@ -70,11 +72,14 @@
     "eslint-config-prettier": "^7.1.0",
     "eslint-gitignore": "^0.1.0",
     "eslint-plugin-functional": "^3.2.1",
+    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-total-functions": "^4.7.2",
     "file-loader": "^6.0.0",
+    "firebase-functions-test": "^0.2.0",
+    "firebase-tools": "^8.7.0",
     "glob": "^7.1.6",
     "html-webpack-plugin": "^4.3.0",
     "http-server": "^0.12.3",
@@ -89,6 +94,8 @@
     "react-codemod": "^5.4.3",
     "react-hot-loader": "^4.12.21",
     "rimraf": "^3.0.2",
+    "solid-js": "^0.23.11",
+    "solid-scripts": "0.0.50",
     "sort-package-json": "^1.44.0",
     "source-map-loader": "^1.0.1",
     "style-loader": "^1.2.1",
@@ -103,6 +110,7 @@
     "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^5.1.1"
+    "webpack-merge": "^5.1.1",
+    "webpack-node-externals": "^2.5.2"
   }
 }
