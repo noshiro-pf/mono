@@ -14,7 +14,7 @@
     "clean": "npm-run-all clean:*",
     "clean:build": "rimraf \"${npm_package_config_lib_dir}\"",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
-    "fmt": "prettier --write .",
+    "fmt": "prettier --write . --ignore-path ${npm_package_config_prettierignore_path}",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .ts",
     "setup": "echo 'no setup script'",
@@ -24,6 +24,7 @@
   "config": {
     "jest_config": "config/jest.config.json",
     "lib_dir": "lib",
+    "prettierignore_path": "../../../.prettierignore",
     "scripts_dir": "../../../scripts",
     "ts_config_for_build": "config/tsconfig.lib.json"
   }
