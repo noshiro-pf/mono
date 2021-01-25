@@ -1,8 +1,8 @@
 import { styled } from '@mono/solid-styled-components';
 import { JSX } from 'solid-js';
-import { toLambdaEvaluated } from '../functions/to-lambda-eval-operator';
 import { useStateAsStream, useStreamValue } from '../utils/use-stream-value';
 import { CodeArea } from './code-area';
+import { toLambdaEvaluated } from './to-lambda-eval-operator';
 
 const inputAreaStringInitialValue: string = '((+ 2) 3)';
 

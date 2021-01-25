@@ -1,0 +1,33 @@
+{
+  "name": "@mono/lambda-calculus-interpreter-core",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
+    "prebuild": "yarn clean:build",
+    "build": "yarn gi && tsc --project ${npm_package_config_ts_config_for_build}",
+    "clean": "npm-run-all clean:*",
+    "clean:build": "rimraf \"${npm_package_config_lib_dir}\"",
+    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
+    "fmt": "prettier --write . --ignore-path ${npm_package_config_prettierignore_path}",
+    "gi": "yarn _script_genindex ./src",
+    "postgi": "yarn fmt",
+    "lint": "eslint src/ --ext .ts",
+    "setup": "echo 'no setup script'",
+    "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "jest_config": "config/jest.config.json",
+    "lib_dir": "lib",
+    "prettierignore_path": "../../../.prettierignore",
+    "scripts_dir": "../../../scripts",
+    "ts_config_for_build": "config/tsconfig.lib.json"
+  },
+  "dependencies": {
+    "@mono/ts-utils": "*"
+  }
+}
