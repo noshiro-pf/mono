@@ -23,3 +23,10 @@ dotenv-example
 *.svg
 firestore.rules
 .gitignore
+*.zip
+.gitattributes
+.npmignore
+.prettierignore
+.editorconfig
+.vscodeignore
+*.svelte
