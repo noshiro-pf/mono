@@ -4,8 +4,9 @@
   "private": true,
   "main": "lib/index.js",
   "scripts": {
-    "prebuild": "rimraf lib",
+    "prebuild": "npm run clean",
     "build": "tsc",
+    "clean": "rimraf lib",
     "deploy": "firebase deploy --only functions",
     "fb": "firebase",
     "firebase": "firebase",
