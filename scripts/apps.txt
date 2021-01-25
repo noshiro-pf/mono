@@ -4,6 +4,8 @@ catan_dice_app
 color_demo_app
 event_schedule_app
 housing_loan_calculator
-lambda_calculus_interpreter
+lambda_calculus_interpreter_core
+lambda_calculus_interpreter_react
+lambda_calculus_interpreter_solid
 my_profile_app
 slack_app

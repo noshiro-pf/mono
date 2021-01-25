@@ -28,6 +28,7 @@
     "Node 10"
   ],
   "dependencies": {
+    "@mono/lambda-calculus-interpreter-core": "*",
     "@mono/solid-styled-components": "*",
     "@mono/ts-utils": "*",
     "rxjs": "^6.6.3"
