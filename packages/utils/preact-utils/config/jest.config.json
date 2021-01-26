@@ -1,0 +1,17 @@
+{
+  "moduleNameMapper": {
+    "^@mono/(.*)$": "<rootDir>/../$1/src"
+  },
+  "moduleFileExtensions": ["ts", "js"],
+  "rootDir": "../",
+  "roots": ["<rootDir>/src"],
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
+  "globals": {
+    "ts-jest": {
+      "tsconfig": "<rootDir>/config/tsconfig.test.json"
+    }
+  },
+  "testMatch": ["<rootDir>/src/**/?(*.)+(spec|test).ts"]
+}

@@ -1,0 +1,5 @@
+{
+  "extends": "../../../../config/tsconfig.preact.json",
+  "include": ["../src", "../test"],
+  "exclude": ["../node_modules", "../lib", "../dist"]
+}
