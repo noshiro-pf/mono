@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
 export const useTimerRef = (): [
-  React.MutableRefObject<number | undefined>,
+  MutableRefObject<number | undefined>,
   () => void
 ] => {
   const timerRef = useRef<number | undefined>(undefined);

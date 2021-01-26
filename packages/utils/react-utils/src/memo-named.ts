@@ -1,9 +1,9 @@
-import { FC, memo } from 'react';
+import { FC, memo, NamedExoticComponent } from 'react';
 
 export const memoNamed = <Props>(
   displayName: string,
   fc: FC<Readonly<Props>>
-): React.NamedExoticComponent<Readonly<Props>> => {
+): NamedExoticComponent<Readonly<Props>> => {
   const memoizedComponent = memo(fc);
   memoizedComponent.displayName = displayName;
   return memoizedComponent;

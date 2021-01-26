@@ -6,6 +6,7 @@ export * from './bp-dialog';
 export * from './bp-email-input-group';
 export * from './bp-input';
 export * from './bp-numeric-input';
+export * from './bp-password-input';
 export * from './bp-select';
 export * from './bp-switch';
 export * from './bp-switch-without-label';

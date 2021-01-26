@@ -1,3 +1,5 @@
+import { KeyboardEvent as ReactKeyboardEvent } from 'react';
+
 export type KeyboardEventType<T = Element> =
   | KeyboardEvent
-  | React.KeyboardEvent<T>;
+  | ReactKeyboardEvent<T>;
