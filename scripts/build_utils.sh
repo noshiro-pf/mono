@@ -9,11 +9,13 @@ targets=(
   # ts-utils dependent
   "react-router-utils"
   "react-utils"
+  "preact-utils"
   "resize-observer-hooks"
   "rxjs-utils"
   
   # dependencies: [react-utils, rxjs-utils, ts-utils]
   "react-rxjs-utils"
+  "preact-rxjs-utils"
 
   # dependencies: [react-utils, resize-observer-hooks, ts-utils]
   "react-utils-styled"
