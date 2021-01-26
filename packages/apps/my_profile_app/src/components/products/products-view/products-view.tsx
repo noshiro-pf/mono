@@ -10,6 +10,7 @@ export const ProductsView = memoNamed<{
   <div>
     <h1>制作物</h1>
     <h2>ライブラリ</h2>
+    <p>下の方ほどメンテされていない（特にAngular製のものは放置状態）</p>
     {libraries.map((app, i) => (
       <ProductsElementView
         key={i}

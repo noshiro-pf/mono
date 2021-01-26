@@ -15,6 +15,7 @@
     -   Frameworks
         -   React（メイン）
             -   フレームワークというよりライブラリだが役割的にここに入れた
+        -   Preact
         -   Angular
         -   (Vue) （業務で軽微な修正をした程度）
         -   (Elm) （チュートリアルをやっただけ）
@@ -49,10 +50,10 @@
         -   Testing
             -   Jest
         -   Linters & Formatters
-            -   TypeScript-eslint
+            -   ESLint (TypeScript-eslint)
             -   Prettier
-            -   TypeScript organize-imports
-                -   ts-morph を使った簡単な自作スクリプト (https://qiita.com/pikohideaki/items/9f3843853903fcff392c)
+                -   [prettier-plugin-organize-imports](https://github.com/simonhaenisch/prettier-plugin-organize-imports#readme) を入れている。
+                    これを見つける前は自作スクリプト (https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
 -   Web backend
     -   Languages
         -   Node.js
@@ -88,12 +89,12 @@
 
 ### メモ
 
--   基本的にウェブフロントエンドに興味があり、バックエンドは比較的知識が少ない。firebase が便利で今のところ趣味で作りたいと思ったものはすべてそれだけで済んでしまったというのも理由としてある。
--   競技プログラミングはあまり得意でない＆好きでないのでほとんどやっておらず、上の PAST の結果は会社でほぼぶっつけで受けたときのもの（競技プログラミングを普段からやっている人だと思われてしまうと上の PAST の成績は低く見える気がするので念のため）。
+-   基本的にウェブフロントエンドに興味があり、バックエンドは比較的知識が少ない。今まで趣味で作りたいと思ったものはバックエンドヘビーなタスクが無かったので firebase で済んでしまったというのも理由としてある。
 -   今後覚えようかと思いつつあまり触れていないもの
     -   Server Side Rendering, Static Site Generator
     -   GraphQL
     -   Recoil
+        -   RxJS で非同期処理も状態管理もできてしまうので個人的にはモチベーションが薄い。
     -   WASM
 -   watch list
     -   [deno](https://github.com/denoland/deno)

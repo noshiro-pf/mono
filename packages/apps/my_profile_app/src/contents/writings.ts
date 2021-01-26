@@ -2,6 +2,16 @@ import { WritingsInfo } from '../types/writings';
 
 export const writings: WritingsInfo[] = [
   {
+    link:
+      'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
+    title: ' リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
+    subtitle:
+      'RxJSで発生するglitchという不健全な挙動と、拙作「SyncFlow」の紹介',
+    body1:
+      'RxJSで発生するglitchという現象の発生原因とその対処法、他のglitch-freeリアクティブプログラミングライブラリがどう解決しているかを論文等を参照しつつ紹介。最後に拙作「SyncFlow」の実装概要を説明。',
+    body2: '',
+  },
+  {
     link: 'https://qiita.com/pikohideaki/items/59415524503f833ce41e',
     title: ' 見分けやすいN色をうまく選ぶ関数を作ったよ',
     subtitle:
