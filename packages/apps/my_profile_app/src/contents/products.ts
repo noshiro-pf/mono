@@ -16,11 +16,11 @@ export const products: {
     {
       link:
         'https://github.com/noshiro-pf/mono/tree/master/packages/utils/syncflow',
-      title: 'SyncFlow（開発中）',
+      title: 'SyncFlow',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
       body1:
-        'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。',
-      body2: 'TypeScriptで実装中。（最終更新：2020年7月）',
+        'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。priority queueを使わずtopological sortによりObservable全体のDAGの依存関係を前計算してglitchを回避した。',
+      body2: 'TypeScriptで実装。（最終更新：2021年2月）',
       imageUrl: '',
     },
     {
@@ -50,7 +50,7 @@ export const products: {
       title: 'アノテーションツール（開発途中）',
       subtitle: '矩形ツールによる画像アノテーションを行うUI',
       body1:
-        'polygon, paint toolやkey-pointなどのアノテーションもできるようにしたい。',
+        '昔作っていたアノテーションアプリをPixi.jsでぬるぬる動かしてみたくて作ったおもちゃ。polygon, paint toolやkey-pointなどのアノテーションもできるようにしたい。',
       body2:
         'React・TypeScript・Pixi.jsで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2020年9月28日）',
       imageUrl: '',
@@ -59,7 +59,8 @@ export const products: {
       link: 'https://housing-loan-calculator.web.app',
       title: '住宅ローン返済シミュレータ',
       subtitle: '住宅ローンの月々の返済額などを計算',
-      body1: 'Chrome推奨。クエリパラメータでスナップショットを保存可能。',
+      body1:
+        '表計算ソフトで作りかけてなんとなくBlueprint.jsを試したくなったので作った。Chrome推奨。クエリパラメータでスナップショットを保存可能。',
       body2:
         'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2020年9月06日）',
       imageUrl: HousingLoanCalculatorImage,
@@ -80,7 +81,7 @@ export const products: {
       subtitle:
         '6面ダイス2個を振って合計を表示するカタン（ボードゲーム）用サポートアプリ',
       body1:
-        '同じ目が出ても振ったかどうか分かるようなエフェクトを付けている。ダイスを転がすアニメーション等があってもよいかもしれない。',
+        'ダイスを振るのが面倒なのと実物より良い乱数で遊びたかったので作った。同じ目が出ても振ったかどうか分かるようなエフェクトを付けている。ダイスを転がすアニメーション等があってもよいかもしれない。',
       body2:
         'React・RxJS・TypeScriptで実装。RxJSはリングの透明度変化を扱うために使用した（連打時に前のアニメーションをキャンセルする処理）。（制作時期：2019年7月）',
       imageUrl: CatanDiceImage,
@@ -93,6 +94,16 @@ export const products: {
       body2:
         'React・TypeScript・Material UIで実装。静的ページだが、Markdownでモバイル端末でも簡単に編集できるように、 Dropbox上に置いたMarkdown形式テキストを fetchし"ReactMarkdown"により表示するようにした。タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）',
       imageUrl: '',
+    },
+    {
+      link: 'https://lambda-calculus-interpre-70e41.web.app',
+      title: 'Lambda Calculus Interpreter',
+      subtitle: '簡単な型無しラムダ計算のインタプリタ（おもちゃ）',
+      body1:
+        "Chrome推奨。使えるアルファベットは [a-z]。一部のマクロ（'+', 'PLUS', 'SUCC', 数字）に対応。括弧の省略は未対応。もうちょっと高機能にしたい。",
+      body2:
+        'Angular・RxJS・TypeScriptで実装。（制作時期：2017年12月） → 2019年8月7日にReactで再実装 → 2021/1/27にPreactやSolidにも移植',
+      imageUrl: LambdaInterpreterAppImage,
     },
     {
       link: 'https://pikoappsproduct.firebaseapp.com/#/',
@@ -108,7 +119,8 @@ export const products: {
       link: 'https://tools-8af31.firebaseapp.com/#/toybox/mnist',
       title: 'MNIST App',
       subtitle: '手書き数字認識のデモアプリケーション',
-      body1: 'Chrome推奨。「ゼロから作るDeep Learning」第7章のCNN。',
+      body1:
+        '勉強用に手を動かしたくてなんとなく作ったおもちゃ。Chrome推奨。「ゼロから作るDeep Learning」第7章のCNN。',
       body2:
         'Angular・RxJS・TypeScriptで実装。推論器(CNN)はTypeScriptでスクラッチで実装（教科書ではPythonで実装していたのでnumpyの一部の関数もTypeScriptに移植した）。テストデータでの精度は>98%だが、単純なモデルなので汚く書くと正解できないことも多い。パラメータはjson形式のテキストデータをダウンロードしているので初期読み込みが少し遅い。（制作時期：2018年9月）',
       imageUrl: MnistAppImage,
@@ -122,16 +134,6 @@ export const products: {
       body2:
         'Angular・RxJS・TypeScriptで実装。バックエンドはFirebase Realtime DB。（制作時期（旧バージョン含む）：2016年12月～2018年3月）',
       imageUrl: DominionOnlineImage,
-    },
-    {
-      link: 'https://lambda-calculus-interpre-70e41.web.app',
-      title: 'Lambda Calculus Interpreter',
-      subtitle: '簡単な型無しラムダ計算のインタプリタ',
-      body1:
-        "Chrome推奨。使えるアルファベットは [a-z]。一部のマクロ（'+', 'PLUS', 'SUCC', 数字）に対応。括弧の省略は未対応。もうちょっと高機能にしたい。",
-      body2:
-        'Angular・RxJS・TypeScriptで実装。（制作時期：2017年12月 → 2019年8月7日にReactで再実装）',
-      imageUrl: LambdaInterpreterAppImage,
     },
     {
       link: 'https://tools-8af31.firebaseapp.com/#/tools-collection/tsv2json',
