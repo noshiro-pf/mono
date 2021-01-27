@@ -1,4 +1,3 @@
-/** @jsx h */
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent } from 'preact';
 
 export const App: FunctionalComponent = () => <div>Hello</div>;
