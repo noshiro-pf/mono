@@ -6,8 +6,8 @@ export const timer = (millisec: number): TimerObservable =>
   new TimerObservableClass(millisec);
 
 export interface TimerObservable extends Observable<number> {
-  start(): void;
-  stop(): void;
+  start: () => void;
+  stop: () => void;
 }
 
 class TimerObservableClass

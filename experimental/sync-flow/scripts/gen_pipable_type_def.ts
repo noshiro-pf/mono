@@ -5,6 +5,7 @@ import { Operator } from '../types';
 import { Observable } from './observable-interface';
 
 export interface Pipable<A> {
+  pipe:
 `;
 
 const seq = (start: number, end: number): number[] =>
@@ -14,29 +15,29 @@ const genPipeMethod = (length: number): string => {
   if (length < 1) return '';
   // length === 3 =>
   //    `
-  //      pipe<T1, T2, T3>(
-  //        op1: Operator<A, T1>,
-  //        op2: Operator<T1, T2>,
-  //        op3: Operator<T2, T3>
-  //      ): Observable<T3>;
+  //     | (<T1, T2, T3>(
+  //         op1: Operator<A, T1>,
+  //         op2: Operator<T1, T2>,
+  //         op3: Operator<T2, T3>
+  //       ) => Observable<T3>)
   //    `
   const typeVarList = seq(1, length + 1).map((i) => `T${i}`);
   let result: string = '';
-  result += `  pipe<${typeVarList.join(', ')}>(\n`;
+  result += `| (<${typeVarList.join(', ')}>(\n`;
   let currTypeVar = 'A';
   for (const [index, nextTypeVar] of typeVarList.entries()) {
-    result += `    op${index + 1}: Operator<${currTypeVar}, ${nextTypeVar}>,\n`;
+    result += `op${index + 1}: Operator<${currTypeVar}, ${nextTypeVar}>,\n`;
     currTypeVar = nextTypeVar;
   }
-  result += `  ): Observable<${currTypeVar}>;\n`;
+  result += `) => Observable<${currTypeVar}>)\n`;
 
   return result;
 };
 
 const footer = `
-  pipe(
+  | ((
     ...operators: readonly [Operator<any, any>, ...Operator<any, any>[]]
-  ): Observable<any>;
+  ) => Observable<any>)
 }
 `;
 

@@ -6,8 +6,8 @@ export const interval = (millisec: number): IntervalObservable =>
   new IntervalObservableClass(millisec);
 
 export interface IntervalObservable extends Observable<number> {
-  start(): void;
-  stop(): void;
+  start: () => void;
+  stop: () => void;
 }
 
 class IntervalObservableClass

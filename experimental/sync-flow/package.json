@@ -17,7 +17,7 @@
     "clean:preview_script": "rimraf \"${npm_package_config_dist_dir}\"",
     "fmt": "prettier --write . --ignore-path ${npm_package_config_prettierignore_path}",
     "genpipabletypedef": "node \"${npm_package_config_gen_pipable_def}\" ${npm_package_config_pipable_max_length} \"${npm_package_config_pipable_ts_path}\"",
-    "postgenpipabletypedef": "yarn _script_formatglob \"${npm_package_config_pipable_ts_path}\"",
+    "postgenpipabletypedef": "prettier --write ${npm_package_config_pipable_ts_path}",
     "gi": "yarn _script_genindex ./src",
     "postgi": "yarn fmt",
     "lint": "eslint src/ --ext .ts",

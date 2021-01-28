@@ -12,7 +12,7 @@ export type Subscription = {
   unsubscribe: () => void;
 };
 
-export type ArrayElement<S> = S extends Array<infer T> ? T : never;
+export type ArrayElement<S> = S extends (infer T)[] ? T : never;
 
 export type ObservableValue<A> = A extends Observable<infer B> ? B : never;
 
@@ -26,11 +26,11 @@ export type ObservableType =
   | 'merge';
 
 export type Subscribable<A> = {
-  subscribe(
+  subscribe: (
     next: (v: A) => void,
     error?: (e?: any) => void,
     complete?: () => void
-  ): Subscription;
+  ) => Subscription;
 };
 
 export type TimerId = ReturnType<typeof setTimeout>; // NodeJS.Timeout or number

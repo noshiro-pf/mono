@@ -5,6 +5,11 @@ packages/**/dist
 packages/**/lib
 packages/**/config/**/*.js
 packages/**/scripts/**/*.js
+experimental/**/build
+experimental/**/dist
+experimental/**/lib
+experimental/**/config/**/*.js
+experimental/**/scripts/**/*.js
 config/**/*.js
 scripts/**/*.js
 
