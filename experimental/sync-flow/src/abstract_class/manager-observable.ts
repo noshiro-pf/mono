@@ -51,7 +51,7 @@ export abstract class ManagerObservableClass<A>
   }
 
   /** @internal */
-  tryUpdate(nextValue: A): void {
+  fire(nextValue: A): void {
     this.tryUpdateAndSetFlag(() => {
       this.update(nextValue);
       return true;

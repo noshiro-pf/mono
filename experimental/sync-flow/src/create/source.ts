@@ -7,7 +7,7 @@ export const source = <A>(): SourceObservable<A> =>
 export const subject = source; // alias
 
 export interface SourceObservable<A> extends Observable<A> {
-  push(nextValue: A): void;
+  push: (nextValue: A) => void;
 }
 
 class SourceObservableClass<A>

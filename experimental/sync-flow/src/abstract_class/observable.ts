@@ -163,16 +163,8 @@ export abstract class ObservableClass<A> implements Observable<A> {
   }
 
   /** @internal */
-  tryUpdate(nextValue?: A): void {
-    this.tryUpdateAndSetFlag(() => {
-      // always update by default
-      if (nextValue !== undefined) {
-        this.update(nextValue);
-        return true;
-      } else {
-        return false;
-      }
-    });
+  tryUpdate(): void {
+    this.tryUpdateAndSetFlag(() => false);
   }
 
   pipe(
