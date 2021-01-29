@@ -6,9 +6,9 @@ import { Reverse } from './reverse';
 
 export type Group<
   N extends number,
-  T extends any[],
-  R1 extends any[] = [],
-  R2 extends any[] = []
+  T extends unknown[],
+  R1 extends unknown[] = [],
+  R2 extends unknown[] = []
 > = {
   0: Reverse<R2>;
   1: Group<N, T, [], Cons<Reverse<R1>, R2>>;

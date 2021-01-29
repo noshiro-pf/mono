@@ -2,15 +2,17 @@ import { useCallback, useEffect, useRef, useState } from 'preact/compat';
 
 export const useDebounce = <ResultValue>(
   fn: () => ResultValue,
-  deps: any[],
+  deps: unknown[],
   bufferMilliSec: number = 300
 ): ResultValue => {
-  const timerId = useRef<any>(undefined);
+  const timerId = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [value, setValue] = useState<ResultValue>(fn);
 
   const clearTimer = useCallback(() => {
-    clearTimeout(timerId.current);
+    if (timerId.current !== undefined) {
+      clearTimeout(timerId.current);
+    }
   }, []);
 
   useEffect(

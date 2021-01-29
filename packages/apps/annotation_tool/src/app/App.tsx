@@ -89,8 +89,12 @@ export const App = memoNamed('App', () => {
     () => ({
       collapseLabelList: hide,
       expandLabelList: show,
-      showAllLabels: () => visibleLabelIndiceDispatcher({ type: 'show-all' }),
-      hideAllLabels: () => visibleLabelIndiceDispatcher({ type: 'hide-all' }),
+      showAllLabels: () => {
+        visibleLabelIndiceDispatcher({ type: 'show-all' });
+      },
+      hideAllLabels: () => {
+        visibleLabelIndiceDispatcher({ type: 'hide-all' });
+      },
       flipLabelVisibility: (labelId) => {
         const index = labels.findIndex((l) => l.id === labelId);
         visibleLabelIndiceDispatcher({ type: 'flip', index });

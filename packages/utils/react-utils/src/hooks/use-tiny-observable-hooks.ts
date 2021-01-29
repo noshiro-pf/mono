@@ -32,6 +32,8 @@ export const useTinyObservableValue: UseTinyObservableValueType = <T>(
   const [state, setState] = useState<{ value: T | undefined }>({
     value: initialValue,
   });
-  useTinyObservableEffect(stream$, (value) => setState({ value }));
+  useTinyObservableEffect(stream$, (value) => {
+    setState({ value });
+  });
   return state.value ?? initialValue;
 };

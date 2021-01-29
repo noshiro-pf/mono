@@ -20,7 +20,7 @@ export const tokensRepresentsLambdaTerm = (tokens: string[]): boolean => {
 
   /* (e e)? */
   if (tokens[0] === '(' && tokens[tokens.length - 1] === ')') {
-    for (let sep = 1; sep < tokens.length - 1; ++sep) {
+    for (let sep = 1; sep < tokens.length - 1; sep += 1) {
       if (
         tokensRepresentsLambdaTerm(tokens.slice(1, sep)) &&
         tokensRepresentsLambdaTerm(tokens.slice(sep, tokens.length - 1))

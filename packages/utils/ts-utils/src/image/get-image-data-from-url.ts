@@ -3,7 +3,9 @@ export const getImageElementFromUrl = (
 ): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(img);
+    img.onload = () => {
+      resolve(img);
+    };
     img.onerror = reject;
     img.src = url;
   });

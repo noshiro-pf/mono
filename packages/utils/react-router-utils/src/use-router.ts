@@ -1,5 +1,5 @@
 import { History, Location } from 'history';
-import { useCallback, useContext, useMemo } from 'react';
+import { Context, useCallback, useContext, useMemo } from 'react';
 import {
   match,
   RouteComponentProps,
@@ -11,18 +11,20 @@ import { pathnameToPathList } from './pathname-to-pathlist';
 const useRouter = <RouteParam>(): RouteComponentProps<
   RouteParam,
   StaticContext,
-  any
+  unknown
 > =>
-  useContext<RouteComponentProps<RouteParam, StaticContext, any>>(
-    __RouterContext as any
+  useContext<RouteComponentProps<RouteParam, StaticContext, unknown>>(
+    (__RouterContext as unknown) as Context<
+      RouteComponentProps<RouteParam, StaticContext, unknown>
+    >
   );
 
-const useHistory = <RouteParam>(): History<any> => {
+const useHistory = <RouteParam>(): History<unknown> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.history, [router.history]);
 };
 
-const useLocation = <RouteParam>(): Location<any> => {
+const useLocation = <RouteParam>(): Location<unknown> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.location, [router.location]);
 };

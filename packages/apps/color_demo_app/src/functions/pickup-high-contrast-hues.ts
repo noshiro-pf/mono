@@ -18,7 +18,7 @@ export const pickupHighContrastHues = (
   n: number,
   saturation: Percent,
   lightness: Percent,
-  firstHue: Hue = 0,
+  firstHue: Hue,
   useLog: boolean
 ): Hue[] => {
   const hues = huesDefault.map((h) => ((h - firstHue + 360) % 360) as Hue);

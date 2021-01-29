@@ -1,6 +1,6 @@
 import { PromiseState } from './promise-result-type';
 
-export const unfold = <S, P = undefined, E = any>(
+export const unfold = <S, P = undefined, E = unknown>(
   result: PromiseState<P, E, S>
 ): S | undefined => {
   switch (result.status) {

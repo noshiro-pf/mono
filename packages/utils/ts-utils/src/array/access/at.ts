@@ -1,4 +1,2 @@
-export const at = <T>(array: readonly T[], pos: number): T | undefined => {
-  if (pos < 0 || array.length <= pos) return undefined;
-  return array[pos];
-};
+export const at = <T>(array: readonly T[], pos: number): T | undefined =>
+  0 <= pos && pos < array.length ? array[pos] : undefined;

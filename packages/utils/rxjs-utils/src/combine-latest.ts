@@ -17,6 +17,6 @@ import { Unwrap } from './unwrap';
  * export declare function combineLatest<O extends ObservableInput<any>>(sources: O[]): Observable<ObservedValueOf<O>[]>;
  * ```
  */
-export const combineLatestTyped = <T extends ObservableInput<any>[]>(
+export const combineLatestTyped = <T extends ObservableInput<unknown>[]>(
   ...observables: T
 ): Observable<Unwrap<T>> => combineLatest(observables) as Observable<Unwrap<T>>;

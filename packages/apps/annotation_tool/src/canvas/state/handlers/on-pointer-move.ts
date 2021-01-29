@@ -44,5 +44,8 @@ export const onPointerMove = (
         state.dragStartPoint,
         state.dragEndPoint
       );
+      break;
+    default:
+      break;
   }
 };

@@ -3,7 +3,11 @@ import { Cons } from './cons';
 import { First } from './first';
 import { Rest } from './rest';
 
-export type Skip<N extends number, T extends any[], R extends any[] = []> = {
+export type Skip<
+  N extends number,
+  T extends unknown[],
+  R extends unknown[] = []
+> = {
   0: T;
   1: Skip<N, Rest<T>, Cons<First<T>, R>>;
 }[T extends [] ? 0 : R['length'] extends N ? 0 : 1];

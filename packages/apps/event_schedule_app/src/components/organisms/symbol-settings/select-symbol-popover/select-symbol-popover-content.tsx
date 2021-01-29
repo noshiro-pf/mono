@@ -33,7 +33,9 @@ export const SelectSymbolPopoverContent = memoNamed<Props>(
         icons.map((icn) => ({
           ...icn,
           disabled: iconsInUse.includes(icn.id),
-          onClickHandler: () => onIconSelect(icn.id),
+          onClickHandler: () => {
+            onIconSelect(icn.id);
+          },
         })),
 
       [iconsInUse, onIconSelect]

@@ -1,6 +1,9 @@
 import { assertType, TypeEq } from '../test-type';
 
-export type First<T extends any[], D = never> = T extends [infer X, ...any[]]
+export type First<T extends unknown[], D = never> = T extends [
+  infer X,
+  ...unknown[]
+]
   ? X
   : D;
 

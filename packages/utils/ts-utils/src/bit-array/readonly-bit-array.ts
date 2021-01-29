@@ -2,12 +2,14 @@ import { isInRange } from '../num';
 
 export interface ReadonlyBitArrayType {
   size: number;
-  get(at: number): 0 | 1 | undefined;
-  get(at: number, notSetValue: 0 | 1): 0 | 1;
+  get:
+    | ((at: number) => 0 | 1 | undefined)
+    | ((at: number, notSetValue: 0 | 1) => 0 | 1);
+
   values: () => IterableIterator<0 | 1>;
   entries: () => IterableIterator<[number, 0 | 1]>;
-  map(fn: (value: 0 | 1, index: number) => 0 | 1): ReadonlyBitArrayType;
-  forEach(fn: (value: 0 | 1, index: number) => void): void;
+  map: (fn: (value: 0 | 1, index: number) => 0 | 1) => ReadonlyBitArrayType;
+  forEach: (fn: (value: 0 | 1, index: number) => void) => void;
   toString: () => string;
 }
 
@@ -31,9 +33,8 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
   get(at: number, notSetValue?: 0 | 1): 0 | 1 | undefined {
     if (!this._isInRange(at)) {
       return notSetValue;
-    } else {
-      return this._data[at] === 0 ? 0 : 1;
     }
+    return this._data[at] === 0 ? 0 : 1;
   }
 
   *values(): IterableIterator<0 | 1> {
@@ -57,7 +58,9 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
   }
 
   forEach(fn: (value: 0 | 1, index: number) => void): void {
-    this._data.forEach((v, i) => fn(v === 0 ? 0 : 1, i));
+    this._data.forEach((v, i) => {
+      fn(v === 0 ? 0 : 1, i);
+    });
   }
 
   toString(): string {

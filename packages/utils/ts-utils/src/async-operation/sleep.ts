@@ -1,2 +1,4 @@
-export const sleep = (sec: number): Promise<any> =>
-  new Promise((resolve) => setTimeout(resolve, sec * 1000));
+export const sleep = (sec: number): Promise<unknown> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, sec * 1000);
+  });

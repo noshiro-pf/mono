@@ -10,7 +10,7 @@ export const MuiTabs = memoNamed<
   }>
 >('MyTabs', ({ tabIndex, tabIndexChange, labels }) => {
   const onChange = useCallback(
-    (_event: any, value: string) => {
+    (_event: unknown, value: string) => {
       tabIndexChange(parseInt(value, 10));
     },
     [tabIndexChange]

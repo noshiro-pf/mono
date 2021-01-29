@@ -205,7 +205,7 @@ export namespace utc {
       minutes,
       seconds,
       milliseconds,
-    } = utc.getLocale(u);
+    } = getLocale(u);
 
     return setLocale({
       year: updateYear === undefined ? undefined : updateYear(year),
@@ -238,15 +238,9 @@ export namespace utc {
     updateSeconds?: (seconds: SecondsEnum) => SecondsEnum;
     updateMilliseconds?: (milliseconds: MillisecondsEnum) => MillisecondsEnum;
   }) => (u: UTC): UTC => {
-    const {
-      year,
-      month,
-      date,
-      hours,
-      minutes,
-      seconds,
-      milliseconds,
-    } = utc.getUTC(u);
+    const { year, month, date, hours, minutes, seconds, milliseconds } = getUTC(
+      u
+    );
 
     return setUTC({
       year: updateYear === undefined ? undefined : updateYear(year),

@@ -19,7 +19,7 @@ export const betaReduction1step = (term: LambdaTerm): LambdaTerm => {
       const body = left[2];
       return substitute(right, arg, body);
     } else {
-      const leftAfter1step: any = betaReduction1step(left);
+      const leftAfter1step = betaReduction1step(left);
       if (!termEq(leftAfter1step, left)) {
         return [leftAfter1step, right];
       } else {

@@ -15,7 +15,7 @@ export const getEventSchedule = async (
       return Result.err('not-found');
     }
     return Result.ok(fillEventSchedule(res.data()));
-  } catch (e) {
+  } catch (e: unknown) {
     console.log(e);
     return Result.err('others');
   }

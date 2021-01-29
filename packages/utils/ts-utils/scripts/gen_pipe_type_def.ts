@@ -3,8 +3,8 @@ import fs from 'fs';
 const funcTypeName = 'FuncType';
 
 const header = `
-export const pipe: Pipe = (x: any, ...fns: ${funcTypeName}<any, any>[]) =>
-  fns.reduce((curr, f) => f(curr) as unknown, x) as unknown;
+export const pipe: Pipe = (x: unknown, ...fns: ${funcTypeName}<unknown, unknown>[]) =>
+  fns.reduce((curr, f) => f(curr), x);
 
 type ${funcTypeName}<A, B> = (v: A) => B;
 
@@ -22,7 +22,7 @@ const genPipeMethod = (length: number): string => {
   // ```
   const typeVars = range(0, length).map((i) => `T${i}`);
   let result = `<${typeVars.join(',')}>(x: ${typeVars[0] ?? ''}, `;
-  for (let i = 1; i < length; ++i) {
+  for (let i = 1; i < length; i += 1) {
     result += `f${i}: ${funcTypeName}<${typeVars[i - 1] ?? ''}, ${
       typeVars[i] ?? ''
     }>, `;
@@ -33,7 +33,7 @@ const genPipeMethod = (length: number): string => {
 };
 
 const footer = `
-  <T0>(x: T0, f1: ${funcTypeName}<T0, any>, ...fns: ${funcTypeName}<any, any>[]): any;
+  <T0>(x: T0, f1: ${funcTypeName}<T0, unknown>, ...fns: ${funcTypeName}<unknown, unknown>[]): unknown;
 }
 `;
 

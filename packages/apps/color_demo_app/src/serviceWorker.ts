@@ -10,7 +10,7 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://bit.ly/CRA-PWA
 
-const localhostRegex = /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/;
+const localhostRegex = /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/u;
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     // [::1] is the IPv6 localhost address.
@@ -27,10 +27,10 @@ type Config = {
 export function register(config?: Config): void {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(
-      (process as { env: Record<string, string> }).env.PUBLIC_URL as string,
-      window.location.href
-    );
+    const PUBLIC_URL = (process as { env: Record<string, string> }).env
+      .PUBLIC_URL;
+    if (PUBLIC_URL === undefined) return;
+    const publicUrl = new URL(PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
@@ -123,7 +123,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
       const contentType = response.headers.get('content-type');
       if (
         response.status === 404 ||
-        (contentType != null && contentType.includes('javascript'))
+        contentType?.includes('javascript') === true
       ) {
         // No service worker found. Probably a different app. Reload the page.
         navigator.serviceWorker.ready

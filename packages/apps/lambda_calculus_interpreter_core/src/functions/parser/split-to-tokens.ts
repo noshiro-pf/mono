@@ -1,6 +1,6 @@
 export const splitToTokens = (input: string): string[] => {
   let spaceInserted = '';
-  for (let i = 0; i < input.length; ++i) {
+  for (let i = 0; i < input.length; i += 1) {
     const char = input.charAt(i);
     switch (char) {
       case '(':

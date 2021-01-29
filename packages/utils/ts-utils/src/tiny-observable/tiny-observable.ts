@@ -3,7 +3,7 @@ export interface Subscription {
 }
 
 export class TinyObservable<T> {
-  private subscriptions = new Map<symbol, (value: T) => void>();
+  private readonly subscriptions = new Map<symbol, (value: T) => void>();
 
   next(value: T): void {
     this.subscriptions.forEach((fn) => {

@@ -7,7 +7,7 @@ import { every } from './every';
 
 export const mapToConst = <T extends PrimitiveType>(
   constant: T
-): OperatorFunction<any, T> => mapTo(constant);
+): OperatorFunction<unknown, T> => mapTo(constant);
 
 export const get: <T, K extends keyof T>(
   name: K
@@ -75,7 +75,7 @@ export const probe = <T>(
     return v;
   });
 
-export const withLatestValuesFrom = <U extends ObservableInput<any>[]>(
+export const withLatestValuesFrom = <U extends ObservableInput<unknown>[]>(
   ...observables: U
 ) => <T>(input$: Observable<T>): Observable<[T, Unwrap<U>]> =>
   input$.pipe(withLatestFrom(combineLatestTyped(...observables)));

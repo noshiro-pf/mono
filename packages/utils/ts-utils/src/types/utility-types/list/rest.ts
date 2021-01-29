@@ -1,7 +1,7 @@
 import { assertType, TypeEq } from '../test-type';
 
-export type Rest<T extends any[]> = ((...x: T) => void) extends (
-  x: any,
+export type Rest<T extends unknown[]> = ((...x: T) => void) extends (
+  x: T[0],
   ...xs: infer XS
 ) => void
   ? XS
