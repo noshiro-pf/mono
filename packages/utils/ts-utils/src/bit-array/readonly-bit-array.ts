@@ -2,9 +2,7 @@ import { isInRange } from '../num';
 
 export interface ReadonlyBitArrayType {
   size: number;
-  get:
-    | ((at: number) => 0 | 1 | undefined)
-    | ((at: number, notSetValue: 0 | 1) => 0 | 1);
+  get: (at: number) => 0 | 1 | undefined;
 
   values: () => IterableIterator<0 | 1>;
   entries: () => IterableIterator<[number, 0 | 1]>;
@@ -14,25 +12,21 @@ export interface ReadonlyBitArrayType {
 }
 
 class CReadonlyBitArray implements ReadonlyBitArrayType {
-  private readonly _data: Uint8Array = new Uint8Array();
-  private readonly _isInRange = isInRange(0, -1);
+  private readonly _data: Uint8Array;
+  private readonly _isInRange;
 
-  constructor(input?: (0 | 1)[] | Uint8Array) {
-    if (input !== undefined) {
-      this._data = new Uint8Array(input);
-      this._isInRange = isInRange(0, input.length - 1);
-    }
+  constructor(input: (0 | 1)[] | Uint8Array) {
+    this._data = new Uint8Array(input);
+    this._isInRange = isInRange(0, input.length - 1);
   }
 
   get size(): number {
     return this._data.length;
   }
 
-  get(at: number): 0 | 1 | undefined;
-  get(at: number, notSetValue: 0 | 1): 0 | 1;
-  get(at: number, notSetValue?: 0 | 1): 0 | 1 | undefined {
+  get(at: number): 0 | 1 | undefined {
     if (!this._isInRange(at)) {
-      return notSetValue;
+      return undefined;
     }
     return this._data[at] === 0 ? 0 : 1;
   }
@@ -69,7 +63,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
 }
 
 export const ReadonlyBitArray = (
-  input?: (0 | 1)[] | Uint8Array
+  input: (0 | 1)[] | Uint8Array
 ): ReadonlyBitArrayType => new CReadonlyBitArray(input) as ReadonlyBitArrayType;
 
 export const ReadonlyBitArrayFromStr = (bitstr: string): ReadonlyBitArrayType =>

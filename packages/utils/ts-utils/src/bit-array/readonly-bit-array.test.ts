@@ -28,11 +28,11 @@ test('get', () => {
 });
 
 test('get', () => {
-  expect(ReadonlyBitArray([0, 0, 1]).get(-1, 0)).toBe(0);
+  expect(ReadonlyBitArray([0, 0, 1]).get(-1) ?? 0).toBe(0);
 });
 
 test('get', () => {
-  expect(ReadonlyBitArray([0, 0, 1]).get(-1, 1)).toBe(1);
+  expect(ReadonlyBitArray([0, 0, 1]).get(-1) ?? 1).toBe(1);
 });
 
 test('get', () => {
