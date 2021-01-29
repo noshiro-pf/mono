@@ -21,6 +21,6 @@ class FromPromiseRN<T> extends RN<T> {
         this.fireWith(this.returnValue);
         this.complete();
       })
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }
 }

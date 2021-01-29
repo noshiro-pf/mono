@@ -309,7 +309,7 @@ export class RN<T> {
     const pr = new Promise<T>((res) => {
       sb = this.listen(false, res);
     });
-    pr.then(() => sb.unsubscribe()).catch((err) => console.error(err));
+    pr.then(() => sb.unsubscribe()).catch(console.error);
     return pr;
   }
 
