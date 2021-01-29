@@ -6,7 +6,7 @@ export const useInterval = (
 ): number => {
   const [counter, setCounter] = useState<number>(0);
   useEffect(() => {
-    let intervalTimer: any = undefined;
+    let intervalTimer: ReturnType<typeof setTimeout> | undefined = undefined;
     const delayTimer = setTimeout(() => {
       intervalTimer = setInterval(() => {
         setCounter((i) => i + 1);

@@ -12,7 +12,7 @@ export const MyTabs = memoNamed<{
   'MyTabs',
   ({ tabIndex, tabIndexChange, labels, scrollable: scrollableInput }) => {
     const onChange = useCallback(
-      (_event: any, value: string) => {
+      (_event: unknown, value: string) => {
         tabIndexChange(parseInt(value, 10));
       },
       [tabIndexChange]

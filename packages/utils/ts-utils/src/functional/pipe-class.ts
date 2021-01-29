@@ -1,5 +1,5 @@
 class Pipe<A> {
-  private a: A;
+  private readonly a: A;
   constructor(a: A) {
     this.a = a;
   }

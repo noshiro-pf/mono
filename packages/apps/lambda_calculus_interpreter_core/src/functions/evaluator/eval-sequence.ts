@@ -12,7 +12,7 @@ export const evalSequence = (term: LambdaTerm): LambdaTerm[] => {
   const seq: LambdaTerm[] = [];
   seq.push(term);
 
-  for (let counter = MAX_STEPS; counter-- > 0; ) {
+  for (let counter = MAX_STEPS; counter > 0; counter -= 1) {
     const next = evaluate1step(curr);
     if (termEq(next, curr)) break;
     seq.push(next);

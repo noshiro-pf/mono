@@ -41,18 +41,20 @@ export const useStreamValue: UseStreamValueType = <T>(
   const [state, setState] = useState<{ value: T | undefined }>({
     value: initialValue,
   });
-  useStreamEffect(stream$, (value) => setState({ value }));
+  useStreamEffect(stream$, (value) => {
+    setState({ value });
+  });
   return state.value ?? initialValue;
 };
 
-export const useVoidEventAsStream = (): [Observable<void>, () => void] => {
-  const src$ = useRef(new Subject<void>());
+export const useVoidEventAsStream = (): [Observable<undefined>, () => void] => {
+  const src$ = useRef(new Subject<undefined>());
 
   const emitter = useCallback(() => {
     src$.current.next();
   }, []);
 
-  const event$ = useStream<void>(src$.current.asObservable());
+  const event$ = useStream<undefined>(src$.current.asObservable());
   return [event$, emitter];
 };
 
@@ -83,7 +85,7 @@ export const useStateAsStream = <T>(
 
 export const useChangeValueEffect = <T>(
   input: T,
-  callback: (v: T) => any
+  callback: (v: T) => void
 ): void => {
   useEffect(() => {
     callback(input);

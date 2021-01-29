@@ -5,9 +5,9 @@ import { Rest } from './rest';
 import { Reverse } from './reverse';
 
 export type Flatten<
-  T extends any[][],
-  R1 extends any[] = [],
-  R2 extends any[] = []
+  T extends unknown[][],
+  R1 extends unknown[] = [],
+  R2 extends unknown[] = []
 > = {
   0: Reverse<R2>;
   1: Flatten<Rest<T>, First<T, []>, R2>;

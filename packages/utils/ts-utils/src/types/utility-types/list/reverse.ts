@@ -3,7 +3,7 @@ import { Cons } from './cons';
 import { First } from './first';
 import { Rest } from './rest';
 
-export type Reverse<L extends any[], X extends any[] = []> = {
+export type Reverse<L extends unknown[], X extends unknown[] = []> = {
   1: X;
   0: Reverse<Rest<L>, Cons<First<L>, X>>;
 }[L extends [] ? 1 : 0];

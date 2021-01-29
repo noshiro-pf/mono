@@ -1,1 +1,1 @@
-export type ArrayElement<S> = S extends Array<infer T> ? T : never;
+export type ArrayElement<S> = S extends (infer T)[] ? T : never;

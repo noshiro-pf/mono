@@ -1,8 +1,9 @@
 import { assertType, TypeEq } from '../test-type';
 
-export type Cons<X, XS extends any[]> = ((h: X, ...args: XS) => void) extends (
-  ...args: infer R
-) => void
+export type Cons<X, XS extends unknown[]> = ((
+  h: X,
+  ...args: XS
+) => void) extends (...args: infer R) => void
   ? R
   : [];
 

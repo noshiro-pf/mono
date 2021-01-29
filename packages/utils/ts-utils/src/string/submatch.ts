@@ -5,4 +5,4 @@ export const submatch = (
 ): boolean =>
   ignoreCase
     ? submatch(target.toUpperCase(), key.toUpperCase())
-    : target.indexOf(key) !== -1;
+    : target.includes(key);

@@ -68,7 +68,7 @@ export const EventSettings = memoNamed<Props>(
     notificationSettings,
     onNotificationSettingsChange,
   }) => {
-    const focusEmailInput$ = useTinyObservable<void>();
+    const focusEmailInput$ = useTinyObservable<undefined>();
 
     const [clickedMoreThanOnce, setClickedMoreThanOnce] = useState<boolean>(
       false
@@ -81,7 +81,7 @@ export const EventSettings = memoNamed<Props>(
 
     useEffect(() => {
       if (useNotification && clickedMoreThanOnce) {
-        focusEmailInput$.next();
+        focusEmailInput$.next(undefined);
       }
     }, [useNotification, focusEmailInput$, clickedMoreThanOnce]);
 

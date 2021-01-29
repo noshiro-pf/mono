@@ -16,6 +16,7 @@ import { Unwrap } from './unwrap';
  * export declare function merge<T, R>(...observables: (ObservableInput<any> | number)[]): Observable<R>;
  * ```
  */
-export const mergeTyped = <T extends ObservableInput<any>[]>(
+export const mergeTyped = <T extends ObservableInput<unknown>[]>(
   ...observables: T
-): Observable<ArrayElement<Unwrap<T>>> => merge(observables as any);
+): Observable<ArrayElement<Unwrap<T>>> =>
+  merge(observables) as Observable<ArrayElement<Unwrap<T>>>;

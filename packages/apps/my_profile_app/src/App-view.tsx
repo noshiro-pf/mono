@@ -1,7 +1,7 @@
 import { AppBar } from '@material-ui/core';
 import { useNavigator, usePathNameList } from '@mono/react-router-utils';
 import { memoNamed } from '@mono/react-utils';
-import { ArrayElement, last } from '@mono/ts-utils';
+import { last } from '@mono/ts-utils';
 import { useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Redirect, Route, Switch } from 'react-router-dom';
@@ -38,7 +38,10 @@ export const AppSub = memoNamed<{
   const tabIndexOnChange = useCallback(
     (tabIdx: number) => {
       if (0 <= tabIdx && tabIdx < routeList.length) {
-        navigator(routeList[tabIdx] as ArrayElement<typeof routeList>);
+        const route = routeList[tabIdx];
+        if (route !== undefined) {
+          navigator(route);
+        }
       }
     },
     [navigator]

@@ -1,5 +1,5 @@
-export const pipe: Pipe = (x: any, ...fns: FuncType<any, any>[]) =>
-  fns.reduce((curr, f) => f(curr) as unknown, x) as unknown;
+export const pipe: Pipe = (x: unknown, ...fns: FuncType<unknown, unknown>[]) =>
+  fns.reduce((curr, f) => f(curr), x);
 
 type FuncType<A, B> = (v: A) => B;
 
@@ -97,5 +97,9 @@ export interface Pipe {
     f11: FuncType<T10, T11>
   ): T11;
 
-  <T0>(x: T0, f1: FuncType<T0, any>, ...fns: FuncType<any, any>[]): any;
+  <T0>(
+    x: T0,
+    f1: FuncType<T0, unknown>,
+    ...fns: FuncType<unknown, unknown>[]
+  ): unknown;
 }

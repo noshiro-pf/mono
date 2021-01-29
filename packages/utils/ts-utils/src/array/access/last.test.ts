@@ -1,5 +1,11 @@
 import { last } from './last';
 
-test('last', () => expect(last([1, 2, 3, 4, 5])).toEqual(5));
-test('last', () => expect(last([] ?? 0)).toEqual(undefined));
-test('last', () => expect(last([1, 2, 3])).toEqual(3));
+test('last', () => {
+  expect(last([1, 2, 3, 4, 5])).toEqual(5);
+});
+test('last', () => {
+  expect(last<unknown>([] ?? 0)).toEqual(undefined);
+});
+test('last', () => {
+  expect(last([1, 2, 3])).toEqual(3);
+});

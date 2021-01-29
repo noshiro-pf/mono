@@ -36,7 +36,7 @@ export const getParseTree = (tokens: string[]): LambdaTerm | undefined => {
     tokens[0] === '(' &&
     tokens[tokens.length - 1] === ')'
   ) {
-    for (let sep = 1; sep < tokens.length - 1; ++sep) {
+    for (let sep = 1; sep < tokens.length - 1; sep += 1) {
       const leftTokens = tokens.slice(1, sep);
       const rightTokens = tokens.slice(sep, tokens.length - 1);
       if (

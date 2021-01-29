@@ -1,7 +1,8 @@
 import { Hsl, Hsla, Rgb, Rgba } from '../../types';
 import { numberToRgbValue } from '../from-number';
 
-const hue2rgb = (p: number, q: number, t: number): number => {
+const hue2rgb = (p: number, q: number, s: number): number => {
+  let t = s;
   if (t < 0) {
     t += 1;
   }

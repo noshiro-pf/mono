@@ -14,7 +14,9 @@ export const useAsyncDispatchFunction = <S, A>(
 
   // ensure resolvers are called once state updates have been applied
   useEffect(() => {
-    resolvers.current.forEach((resolve) => resolve(state));
+    resolvers.current.forEach((resolve) => {
+      resolve(state);
+    });
     resolvers.current = [];
   }, [state]);
 
@@ -35,7 +37,7 @@ export const useAsyncDispatchFunction = <S, A>(
               resolvers.current.push(resolve);
             }
             return stateAfter;
-          } catch (e) {
+          } catch (e: unknown) {
             reject(e);
             throw e;
           }

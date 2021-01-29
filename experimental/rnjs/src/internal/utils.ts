@@ -1,7 +1,7 @@
 import { RN } from './RN';
 
 export type RNValue<S> = S extends RN<infer T> ? T : never;
-export type ArrayElement<S> = S extends Array<infer T> ? T : never;
+export type ArrayElement<S> = S extends (infer T)[] ? T : never;
 
 export type Unwrap<S> = { [P in keyof S]: RNValue<S[P]> };
 

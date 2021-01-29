@@ -4,7 +4,11 @@ import { First } from './first';
 import { Rest } from './rest';
 import { Reverse } from './reverse';
 
-export type Zip<A extends any[], B extends any[], R extends any[] = []> = {
+export type Zip<
+  A extends unknown[],
+  B extends unknown[],
+  R extends unknown[] = []
+> = {
   0: Reverse<R>;
   1: Zip<Rest<A>, Rest<B>, Cons<[First<A>, First<B>], R>>;
 }[A extends [] ? 0 : B extends [] ? 0 : 1];

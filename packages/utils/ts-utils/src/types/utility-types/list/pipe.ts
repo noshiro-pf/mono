@@ -2,13 +2,13 @@ import { assertType, TypeEq } from '../test-type';
 import { Rest } from './rest';
 import { Zip } from './zip';
 
-export type ShiftZip<T extends any[]> = Zip<T, Rest<T>>;
+export type ShiftZip<T extends unknown[]> = Zip<T, Rest<T>>;
 assertType<TypeEq<ShiftZip<[1, 2, 3]>, [[1, 2], [2, 3]]>>();
 
 export type Tuple2Fn<T> = T extends [infer A, infer B] ? (x: A) => B : never;
 assertType<TypeEq<Tuple2Fn<[1, 2]>, (x: 1) => 2>>();
 
-export type _Pipe<T extends any[]> = { [P in keyof T]: Tuple2Fn<T[P]> };
+export type _Pipe<T extends unknown[]> = { [P in keyof T]: Tuple2Fn<T[P]> };
 assertType<TypeEq<_Pipe<[[1, 2], [2, 3]]>, [(x: 1) => 2, (x: 2) => 3]>>();
 
 export type Cast<T, P, D> = T extends P ? T : D;

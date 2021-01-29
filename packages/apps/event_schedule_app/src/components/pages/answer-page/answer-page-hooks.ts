@@ -173,6 +173,9 @@ export const useAnswerPageState = (): AnswerPageState => {
             });
           })
           .catch(console.error);
+        break;
+      case 'hidden':
+        break;
     }
   }, [
     myAnswer,

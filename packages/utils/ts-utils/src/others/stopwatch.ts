@@ -2,7 +2,7 @@ export class Stopwatch {
   private startTime = 0;
   private endTime = 0;
   private time = 0;
-  private name = '';
+  private readonly name;
 
   constructor(name = '') {
     this.name = name;

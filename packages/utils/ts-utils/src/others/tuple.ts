@@ -1,1 +1,1 @@
-export const tuple = <T extends readonly any[]>(...args: T): T => args;
+export const tuple = <T extends readonly unknown[]>(...args: T): T => args;

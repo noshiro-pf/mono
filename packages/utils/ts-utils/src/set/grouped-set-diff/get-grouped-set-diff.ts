@@ -18,7 +18,7 @@ import { IGroupedSetDiff, IGroupedSetDiffType } from './grouped-set-diff';
 export const getGroupedSetDiff = <A>(
   oldSet: Set<A>,
   newSet: Set<A>,
-  idSelector: (e: A) => any = (e) => e
+  idSelector: (e: A) => unknown = (e) => e
 ): IGroupedSetDiffType<A> => {
   // TODO: Set.includesの使用を最小限に抑えたアルゴリズムに修正し高速化する
   const oldElements = setSubtract(oldSet, newSet); // oldSetに存在しnewSetに存在しない要素

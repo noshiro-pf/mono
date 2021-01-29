@@ -26,7 +26,7 @@ export const getAnswers = async (
         )
       )
     );
-  } catch (e) {
+  } catch (e: unknown) {
     console.log(e);
     return Result.err('others');
   }
