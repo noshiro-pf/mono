@@ -5,4 +5,4 @@ import { indexIsInRange } from '../is-in-range';
  * @return the deleted element
  */
 export const removeAt = <T>(array: T[], index: number): T | undefined =>
-  !indexIsInRange(index)(array) ? undefined : array.splice(index, 1)[0];
+  !indexIsInRange(array)(index) ? undefined : array.splice(index, 1)[0];

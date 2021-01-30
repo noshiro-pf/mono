@@ -1,6 +1,12 @@
 export namespace Result {
-  export interface Ok<S> extends Readonly<{ type: 'ok'; value: S }> {}
-  export interface Err<E> extends Readonly<{ type: 'err'; value: E }> {}
+  export interface Ok<S> {
+    readonly type: 'ok';
+    readonly value: S;
+  }
+  export interface Err<E> {
+    readonly type: 'err';
+    readonly value: E;
+  }
 
   export type Result<S, E> = Ok<S> | Err<E>;
 
