@@ -1,4 +1,4 @@
-import { Paths } from '../../../../config/react/paths_type';
+import { Paths } from '../../../../config/webpackconfig/react/paths_type';
 import { resolveAppPath } from './app_directory';
 import { dotenvValues } from './env';
 

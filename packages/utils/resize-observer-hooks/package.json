@@ -3,25 +3,25 @@
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "sideEffects": false,
+  "main": "esm/index.js",
+  "types": "esm/index.d.ts",
   "scripts": {
-    "prebuild": "yarn clean:build",
-    "build": "tsc --project ${npm_package_config_ts_config_for_build}",
-    "clean": "npm-run-all clean:*",
-    "clean:build": "rimraf \"${npm_package_config_lib_dir}\"",
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "build": "yarn build:esm",
+    "prebuild:esm": "yarn clean:build:esm",
+    "build:esm": "tsc --project config/tsconfig.esm.json",
+    "clean": "run-s clean:*",
+    "clean:build:esm": "rimraf esm",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
-    "fmt": "prettier --write . --ignore-path ${npm_package_config_prettierignore_path}",
+    "fmt": "yarn _prettier .",
     "lint": "eslint src/ --ext .ts",
     "setup": "echo 'no setup script'",
-    "test": "jest --config \"${npm_package_config_jest_config}\" --passWithNoTests",
+    "test": "jest --config config/jest.config.json --passWithNoTests",
     "testw": "yarn test --watch"
   },
   "config": {
-    "jest_config": "config/jest.config.json",
-    "lib_dir": "lib",
-    "prettierignore_path": "../../../.prettierignore",
-    "ts_config_for_build": "config/tsconfig.lib.json"
+    "root_dir": "../../.."
   },
   "dependencies": {
     "@mono/ts-utils": "*",

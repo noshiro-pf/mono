@@ -1,9 +1,7 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig/tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "skipLibCheck": true,
-    "esModuleInterop": true
+    "module": "commonjs"
   },
-  "include": ["./.eslintrc.*.ts", "./**/*.ts"]
+  "include": ["./**/*.ts", "./**/.*.ts"]
 }

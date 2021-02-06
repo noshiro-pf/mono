@@ -1,5 +1,5 @@
 {
-  "extends": "../../../config/.eslintrc.preact.js",
+  "extends": "../../../config/eslintrc/.eslintrc.preact.js",
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",

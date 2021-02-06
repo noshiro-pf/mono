@@ -1,4 +1,4 @@
-import { Paths } from '../../../../config/slides/paths_type';
+import { Paths } from '../../../../config/webpackconfig/slides/paths_type';
 import { resolveAppPath } from './app_directory';
 import { dotenvValues } from './env';
 

@@ -11,7 +11,7 @@
     "_script_genindex": "bash ${npm_package_config_scripts_dir}/index_ts_generator.sh",
     "prebuild": "yarn clean:build",
     "build": "yarn gi && tsc --project ${npm_package_config_ts_config_for_build}",
-    "clean": "npm-run-all clean:*",
+    "clean": "run-s clean:*",
     "clean:build": "rimraf \"${npm_package_config_lib_dir}\"",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "prettier --write . --ignore-path ${npm_package_config_prettierignore_path}",

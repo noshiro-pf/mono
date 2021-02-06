@@ -6,10 +6,26 @@ MONO_ROOT_DIR=$(dirname ${THIS_SCRIPT_DIR})
 apps_path="${MONO_ROOT_DIR}/packages/apps"
 echo ${apps_path}
 
+echo "build task list: "
 while read target; do
-    echo "building \"${target}\" ..." 
-    cd "${apps_path}/${target}"
-    yarn build
-    echo "done."
-    echo ""
+    if [[ ${target} == \#* ]] ;
+    then
+        echo "  - (skipped) ${target} "
+    else
+        echo "  - ${target}"
+    fi
+done < "${THIS_SCRIPT_DIR}/apps.txt"
+echo
+
+while read target; do
+    if [[ ${target} == \#* ]] ;
+    then
+        echo "skipped ${target} "
+    else
+        echo "building \"${target}\" ..." 
+        cd "${apps_path}/${target}"
+        yarn build
+        echo "done."
+        echo ""
+    fi
 done < "${THIS_SCRIPT_DIR}/apps.txt"
