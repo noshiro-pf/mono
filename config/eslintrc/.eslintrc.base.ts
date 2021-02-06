@@ -199,7 +199,7 @@ const eslintRules: Readonly<{
       'no-useless-return': 'error',
       'no-void': 'error',
       'no-warning-comments': 'off',
-      'prefer-named-capture-group': 'error',
+      'prefer-named-capture-group': 'off',
       'prefer-promise-reject-errors': 'error',
       'prefer-regex-literals': 'error',
       radix: 'error',

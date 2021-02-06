@@ -13,7 +13,7 @@ import {
 const plugins: webpack.Plugin[] = [
   ...pluginsCommon,
   new CompressionPlugin({
-    test: /\.(css)|(js)$/,
+    test: /\.(css)|(js)$/u,
     compressionOptions: {
       level: 9,
     },

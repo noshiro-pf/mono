@@ -6,16 +6,16 @@ import { rulesMakerCommon } from '../ts/webpack_config_common_maker';
 const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
   ...rulesMakerCommon(pathToTsconfigJson),
   {
-    test: /\.css$/i,
+    test: /\.css$/iu,
     use: ['style-loader', 'css-loader'],
   },
   {
-    test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
-    exclude: /node_modules/,
+    test: /\.(png|svg|jpg|jpeg|gif|ico)$/u,
+    exclude: /node_modules/u,
     use: ['file-loader?name=[name].[ext]'], // ?name=[name].[ext] is only necessary to preserve the original file name
   },
   {
-    test: /\.(ttf|eot|svg)$/,
+    test: /\.(ttf|eot|svg)$/u,
     use: {
       loader: 'file-loader',
       options: {
@@ -24,7 +24,7 @@ const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
     },
   },
   {
-    test: /\.(woff|woff2)$/,
+    test: /\.(woff|woff2)$/u,
     use: {
       loader: 'url-loader',
       options: {

@@ -1,5 +1,4 @@
 import webpack from 'webpack';
-import 'webpack-dev-server';
 import WebpackDevServer from 'webpack-dev-server';
 import { merge } from 'webpack-merge';
 import { Paths } from './paths_type';

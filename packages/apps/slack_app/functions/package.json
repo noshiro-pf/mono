@@ -2,11 +2,11 @@
   "name": "@mono/slack-app-functions",
   "version": "0.1.0",
   "private": true,
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "prebuild": "npm run clean",
     "build": "tsc",
-    "clean": "rimraf build",
+    "clean": "rimraf dist",
     "deploy": "firebase deploy --only functions",
     "fb": "firebase",
     "firebase": "firebase",
