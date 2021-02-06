@@ -7,8 +7,8 @@ import { Paths } from './paths_type';
 
 const rulesMaker = (): webpack.RuleSetRule[] => [
   {
-    test: /\.js$/,
-    exclude: /node_modules/,
+    test: /\.js$/u,
+    exclude: /node_modules/u,
     use: [
       {
         loader: 'babel-loader',
@@ -19,14 +19,14 @@ const rulesMaker = (): webpack.RuleSetRule[] => [
     ],
   },
   {
-    test: /\.(ttf|woff|eot)$/,
+    test: /\.(ttf|woff|eot)$/u,
     loader: 'file-loader',
     options: {
       name: '[name].[ext]?[hash]',
     },
   },
   {
-    test: /\.css$/,
+    test: /\.css$/u,
     use: ['style-loader', 'css-loader'],
   },
 ];

@@ -1,5 +1,5 @@
 {
-  "extends": "../../../config/.eslintrc.solid.json",
+  "extends": "../../../config/eslintrc/.eslintrc.solid.json",
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",

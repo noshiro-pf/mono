@@ -3,14 +3,14 @@
 targets=(
   # no local dependency
   "ts-utils"
-  "sync-flow"
 
   # ts-utils dependent
+  "sync-flow"
+  "rxjs-utils"
   "react-router-utils"
   "react-utils"
   "preact-utils"
   "resize-observer-hooks"
-  "rxjs-utils"
   
   # dependencies: [react-utils, rxjs-utils, ts-utils]
   "react-rxjs-utils"

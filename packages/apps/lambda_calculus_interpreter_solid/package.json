@@ -5,20 +5,14 @@
   "scripts": {
     "prebuild": "yarn clean:build",
     "build": "solid-scripts build",
-    "clean": "npm-run-all clean:*",
-    "clean:build": "rimraf ${npm_package_config_dist_dir}",
+    "clean": "run-s clean:*",
+    "clean:build": "rimraf build",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "lint": "eslint src/ --ext .ts,.tsx",
-    "prettierignore_path": "../../../.prettierignore",
     "setup": "echo 'no setup script'",
     "start": "solid-scripts start",
     "test": "echo 'no test script'",
     "testw": "solid-scripts test"
-  },
-  "config": {
-    "dist_dir": "build",
-    "prettierignore_path": "../../../.prettierignore",
-    "scripts_dir": "../../../scripts"
   },
   "browserslist": [
     "Chrome 74",

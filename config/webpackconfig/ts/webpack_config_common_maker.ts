@@ -4,22 +4,23 @@ import 'webpack-dev-server';
 
 export const rulesMakerCommon = (pathToTsconfigJson: string): RuleSetRule[] => [
   {
-    test: /\.tsx?$/,
-    exclude: [/node_modules/],
+    test: /\.tsx?$/u,
+    exclude: [/node_modules/u],
     use: {
       loader: 'ts-loader',
       options: {
         configFile: pathToTsconfigJson,
+        onlyCompileBundledFiles: true,
       },
     },
   },
   {
-    test: /\.js$/,
+    test: /\.js$/u,
     enforce: 'pre',
     use: ['source-map-loader'],
   },
   {
-    test: /\.(txt|md)$/,
+    test: /\.(txt|md)$/u,
     use: {
       loader: 'raw-loader',
     },
@@ -42,6 +43,7 @@ export const webpackConfigCommonMaker = (
   resolve: {
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
     // symlinks: false,
+    mainFields: ['modules', 'main'],
   },
   module: { rules: rulesMakerCommon(pathToTsconfigJson) },
   // target: 'node',

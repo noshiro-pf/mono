@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.lib.esm.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  }
+}

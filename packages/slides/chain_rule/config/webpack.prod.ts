@@ -1,5 +1,5 @@
 import webpack from 'webpack';
-import { webpackConfigSlidesProdMaker } from '../../../../config/slides/webpack_config_prod_maker';
+import { webpackConfigSlidesProdMaker } from '../../../../config/webpackconfig/slides/webpack_config_prod_maker';
 import { copyPaths } from './copy_paths';
 import { dotenvValues } from './env';
 import { paths } from './paths';

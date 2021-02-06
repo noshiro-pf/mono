@@ -2,6 +2,8 @@
 
 # index_ts_generator.sh
 
+SCRIPT_DIR=$(cd $(dirname $0); pwd)
+
 # configs
 ADD_SUB_DIRECTORY_EXPORT_IN_INDEX_TS="true"
 TS_FILENAME_REGEX="^[a-zA-Z0-9_\-]+.tsx?$"
@@ -16,6 +18,8 @@ clear=$2
 cd ${target_directory}
 pwd
 
+index_ts_files=()
+
 # regenerate index.ts recursively
 for directory in $(find . -maxdepth ${MAX_RECURSION_DEPTH} -type d); do
   if [ "${OMIT_ROOT_INDEX_TS}" = "true" -a "${directory}" = "." ]; then
@@ -29,7 +33,8 @@ for directory in $(find . -maxdepth ${MAX_RECURSION_DEPTH} -type d); do
   else
 
     # reset index.ts
-    echo -n "" > ${index_ts}
+    # echo -n "" > ${index_ts}
+    result=""
 
     # files in a current directory
     for file in $(find ${directory} -mindepth 1 -maxdepth 1 -type f); do
@@ -42,7 +47,7 @@ for directory in $(find . -maxdepth ${MAX_RECURSION_DEPTH} -type d); do
       if [ ${filename} != "index.ts" ]; then
         if [[ ${filename} =~ ${TS_FILENAME_REGEX} ]]; then
           # add line "export * from 'filename'"
-          echo "export * from './${filename_without_ext}';" >> ${index_ts}
+          result+="export * from './${filename_without_ext}';"
         fi
       fi
     done
@@ -52,12 +57,18 @@ for directory in $(find . -maxdepth ${MAX_RECURSION_DEPTH} -type d); do
       for sub_directory in $(find ${directory} -mindepth 1 -maxdepth 1 -type d); do
         # add line "export * from 'directory_name'"
         sub_directory_basename=$(basename ${sub_directory})
-        echo "export * from './${sub_directory_basename}';" >> ${index_ts}
+        result+="export * from './${sub_directory_basename}';"
       done
     fi
+
+    echo "${result}" > ${index_ts}
+    index_ts_files+=" ${index_ts}"
 
   fi
 
   echo ${directory} "done"
 
 done
+
+
+node ${SCRIPT_DIR}/../node_modules/.bin/prettier --write ${index_ts_files}

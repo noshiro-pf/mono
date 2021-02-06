@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "prebuild": "yarn clean:build",
-    "build": "webpack --config \"${npm_package_config_webpack_prod_config}\"",
-    "clean": "npm-run-all clean:*",
-    "clean:build": "rimraf ${npm_package_config_dist_dir}",
+    "build": "webpack --config config/webpack.prod.js",
+    "clean": "run-s clean:*",
+    "clean:build": "rimraf dist",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "predeploy": "yarn build",
     "deploy": "firebase deploy",
@@ -14,16 +14,10 @@
     "fb:login": "firebase login",
     "lint": "echo 'no lint script'",
     "setup": "yarn setup:webpackconfig",
-    "setup:webpackconfig": "tsc --project \"${npm_package_config_tsconfig_for_webpack}\"",
-    "start": "webpack-dev-server --config \"${npm_package_config_webpack_dev_config}\"",
+    "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",
+    "start": "webpack-dev-server --config config/webpack.dev.js",
     "test": "echo 'no test script'",
     "watch": "webpack --watch"
-  },
-  "config": {
-    "dist_dir": "dist",
-    "tsconfig_for_webpack": "config/tsconfig.webpackconfig.json",
-    "webpack_dev_config": "config/webpack.dev.js",
-    "webpack_prod_config": "config/webpack.prod.js"
   },
   "dependencies": {
     "reveal.js": "^4.0.2"

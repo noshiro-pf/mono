@@ -1,7 +1,7 @@
 {
   "extends": [
-    "./config/.eslintrc.base.js",
-    "./config/.eslintrc.react.js",
-    "./config/.eslintrc.preact.js"
+    "./config/eslintrc/.eslintrc.base.js",
+    "./config/eslintrc/.eslintrc.react.js",
+    "./config/eslintrc/.eslintrc.preact.js"
   ]
 }

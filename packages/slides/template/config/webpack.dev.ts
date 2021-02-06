@@ -1,5 +1,5 @@
 import 'webpack-dev-server';
-import { webpackConfigSlidesDevMaker } from '../../../../config/slides/webpack_config_dev_maker';
+import { webpackConfigSlidesDevMaker } from '../../../../config/webpackconfig/slides/webpack_config_dev_maker';
 import { copyPaths } from './copy_paths';
 import { dotenvValues } from './env';
 import { paths } from './paths';

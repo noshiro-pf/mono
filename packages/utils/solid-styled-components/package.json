@@ -4,7 +4,7 @@
   "description": "Styled Components for Solid (forked)",
   "license": "MIT",
   "author": "noshiro",
-  "sideEffects": "false",
+  "sideEffects": false,
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "clean": "echo 'no clean script'",
+    "fmt": "echo 'no fmt script'",
     "lint": "echo 'no lint script'",
     "setup": "echo 'no setup script'",
     "test": "echo 'no test script'",

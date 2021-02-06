@@ -1,5 +1,5 @@
 {
-  "extends": "../../../config/tsconfig.preact.json",
+  "extends": "../../../config/tsconfig/tsconfig.preact.json",
   "compilerOptions": {
     "sourceMap": true
   },
