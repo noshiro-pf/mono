@@ -2,9 +2,10 @@
   "extends": "../../../../config/tsconfig.base.json",
   "compilerOptions": {
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "../lib"
+    "declarationMap": false,
+    "sourceMap": false,
+    "outDir": "../cjs",
+    "module": "CommonJS"
   },
   "include": ["../src"],
   "exclude": ["../src/**/*.test.ts", "node_modules"]

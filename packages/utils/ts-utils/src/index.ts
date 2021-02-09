@@ -8,6 +8,7 @@ export * from './image';
 export * from './num';
 export * from './others';
 export * from './promise-result';
+export * from './queue';
 export * from './random';
 export * from './set';
 export * from './shape';

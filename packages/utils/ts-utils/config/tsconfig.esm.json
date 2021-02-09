@@ -1,0 +1,12 @@
+{
+  "extends": "../../../../config/tsconfig.base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "../esm",
+    "module": "ESNext"
+  },
+  "include": ["../src"],
+  "exclude": ["../src/**/*.test.ts", "node_modules"]
+}
