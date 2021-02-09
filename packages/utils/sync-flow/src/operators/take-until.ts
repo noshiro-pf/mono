@@ -1,0 +1,41 @@
+import { Option } from '@mono/ts-utils';
+import { SyncChildObservableClass } from '../class';
+import {
+  Observable,
+  Operator,
+  TakeUntilOperatorObservable,
+  Token,
+} from '../types';
+
+export const takeUntil = <A>(notifier: Observable<unknown>): Operator<A, A> => (
+  parent: Observable<A>
+) => new TakeUntilObservableClass(parent, notifier);
+
+class TakeUntilObservableClass<A>
+  extends SyncChildObservableClass<A, 'takeUntil', [A]>
+  implements TakeUntilOperatorObservable<A> {
+  constructor(parent: Observable<A>, notifier: Observable<unknown>) {
+    super({
+      parents: [parent],
+      type: 'takeUntil',
+      currentValueInit: Option.none,
+    });
+
+    notifier.subscribe(
+      () => {
+        this.complete();
+      },
+      () => {
+        this.complete();
+      }
+    );
+  }
+
+  tryUpdate(token: Token): void {
+    const parent = this.parents[0];
+    if (parent.token !== token) return; // skip update
+    if (Option.isNone(parent.currentValue)) return; // skip update
+
+    this.setNext(parent.currentValue.value, token);
+  }
+}

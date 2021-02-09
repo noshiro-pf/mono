@@ -1,0 +1,41 @@
+{
+  "name": "@mono/sync-flow",
+  "version": "1.0.0",
+  "description": "Reactive Programming Library for TypeScript/JavaScript",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
+    "build": "npm-run-all build:*",
+    "prebuild:lib": "yarn clean:build:lib",
+    "build:lib": "yarn gi && tsc --project \"config/tsconfig.lib.json\"",
+    "prebuild:preview": "yarn clean:build:preview",
+    "build:preview": "tsc --project \"config/tsconfig.preview.json\"",
+    "clean": "npm-run-all clean:*",
+    "clean:build": "npm-run-all clean:build:*",
+    "clean:build:lib": "rimraf \"lib\"",
+    "clean:build:preview": "rimraf \"dist\"",
+    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
+    "fmt": "yarn fmt:prettier .",
+    "fmt:index": "yarn fmt:prettier src/index.ts {src,test}/**/index.ts",
+    "fmt:prettier": "prettier --ignore-path ${npm_package_config_root_dir}.prettierignore  --write",
+    "gi": "npm-run-all gi:*",
+    "postgi": "yarn fmt:index",
+    "gi:src": "yarn _script_genindex ./src",
+    "gi:test": "yarn _script_genindex ./test/cases",
+    "lint": "eslint src/ --ext .ts",
+    "setup": "yarn setup:preview",
+    "start": "node \"dist/test/preview-main.js\"",
+    "test": "jest --config \"config/jest.config.json\" --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "root_dir": "../../../"
+  },
+  "dependencies": {
+    "@mono/ts-utils": "*"
+  }
+}
