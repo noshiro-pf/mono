@@ -1,5 +1,5 @@
 import { styled } from '@mono/solid-styled-components';
-import { FunctionType } from '@mono/ts-utils/lib';
+import { FunctionType } from '@mono/ts-utils';
 import { JSX } from 'solid-js';
 
 export const CodeArea = ({
