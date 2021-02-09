@@ -75,7 +75,14 @@ const typescriptEslintRules: Readonly<
     // '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/require-array-sort-compare': 'error', // important
     // '@typescript-eslint/sort-type-union-intersection-members': 'error',
-    '@typescript-eslint/strict-boolean-expressions': 'error', // important
+    '@typescript-eslint/strict-boolean-expressions': [
+      'error',
+      {
+        allowString: false,
+        allowNumber: false,
+        allowNullableObject: false,
+      },
+    ], // important
     '@typescript-eslint/switch-exhaustiveness-check': 'error',
     // '@typescript-eslint/type-annotation-spacing': 'error',  -> scope of prettier
     // '@typescript-eslint/typedef': 'error',  -> unnecessary if noImplicitAny and/or strictPropertyInitialization is enabled.

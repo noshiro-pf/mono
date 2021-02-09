@@ -70,10 +70,10 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
     .register(swUrl)
     .catch((error) => {
       console.error('Error during service worker registration:', error);
+      return undefined;
     });
 
-  if (!registration) return;
-
+  if (registration === undefined) return;
   console.log(
     'ServiceWorker registration successful with scope: ',
     registration.scope

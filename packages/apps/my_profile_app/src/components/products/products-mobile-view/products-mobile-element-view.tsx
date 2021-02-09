@@ -45,7 +45,7 @@ export const ProductsElementMobileView = memoNamed<{
         <Typography variant='subtitle1' color='textSecondary'>
           {subtitle}
         </Typography>
-        {imageUrl && <ImgStyled alt='' src={imageUrl} />}
+        {imageUrl === '' ? undefined : <ImgStyled alt='' src={imageUrl} />}
         <DividerWithMargin />
         <Typography variant='body1' component='p' color='initial'>
           {body1}
