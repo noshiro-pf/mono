@@ -1,0 +1,86 @@
+
+.body {
+  display: flex;
+  height: var(--main-height-without-toolbar);
+}
+
+.black-cover {
+  position: fixed; /* Stay in place */
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-message {
+  background-color: white;
+  padding: 50px;
+}
+
+/********* side bar ***************/
+.sidebar,.game-result-bar {
+  flex-basis: 48px;
+  flex-grow: 0;
+}
+
+/********* side navi ***************/
+.sidenav-container {
+  background-color: #F3EBAA;
+  flex-basis: 800px;
+  flex-grow: 1;
+  height: 100%;
+
+}
+
+
+/*****************************************************/
+
+.main {
+  /* position: relative; */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.main .upper-part {
+  overflow-y: auto;
+}
+
+.main
+  .upper-part
+  .shared-area_other-players-area {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.main
+  .upper-part
+  .shared-area_other-players-area
+  .shared-area {
+  flex: 1;
+  flex-basis: 400px;
+}
+
+.main
+  .upper-part
+  .shared-area_other-players-area
+  .other-players-area {
+  flex-basis: auto;
+}
+
+.main .my-area {
+  flex-grow: 0;
+  flex-shrink: 0;
+  /* position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0; */
+}

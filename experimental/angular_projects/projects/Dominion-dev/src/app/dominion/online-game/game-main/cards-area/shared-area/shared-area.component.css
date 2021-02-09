@@ -1,0 +1,47 @@
+.shared-area {
+  background-color: #B5C8F1;
+  padding: 5px;
+  margin: 10px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+}
+.BasicCards_KingdomCards {
+  flex: 1;
+}
+.trashPile-area {
+  flex-grow: 0;
+  padding: 3px;
+}
+
+.BasicCards,.KingdomCards {
+  padding: 3px;
+}
+
+.BasicCards {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+.treasures,.victories,.Curse {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  padding-right: 10px;
+}
+
+.KingdomCards {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+.trashPile {
+  background-image: url(/assets/img/trashArea.jpg);
+  background-size: cover;
+  padding-top : 35px;
+  padding-left : 10px;
+}
+
+.card-pile {
+  padding: 2px;
+}

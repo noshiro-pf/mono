@@ -1,0 +1,64 @@
+<ng-container *ngIf="{
+      width:             cardWidth$         | async,
+      boxMinWidth:       boxMinWidth$       | async,
+      myIndex:           myIndex$           | async,
+      DCardArray:        DCardArray$        | async,
+      DCardArrayForView: DCardArrayForView$ | async
+    } as data">
+
+  <div class="card-images-lined-up"
+      [style.minWidth.px]="data.boxMinWidth" >
+
+    <ng-container *ngIf="!data.DCardArray || data.DCardArray.length === 0;
+                            then emptyCard; else CardImage"></ng-container>
+    <ng-template #emptyCard>
+      <app-dominion-card-image
+        [width]="data.width"
+        [empty]="true">
+      </app-dominion-card-image>
+    </ng-template>
+    <ng-template #CardImage>
+      <div *ngFor="let dcard of data.DCardArrayForView"
+          class="card-image-in-line"
+          [style.paddingRight.px]="padding">
+
+        <div class="card-image-wrapper">
+          <div [matTooltip]="dcard.cardProperty.nameJp" matTooltipPosition="below"
+              [matTooltipDisabled]="!dcard.faceUp[ data.myIndex ]">
+            <app-dominion-card-image
+              [class.unavailable]="hideNonButtonCards && !dcard.isButton[ data.myIndex ]"
+              [card]="dcard.cardProperty"
+              [faceUp]="dcard.faceUp[ data.myIndex ]"
+              [isButton]="dcard.isButton[ data.myIndex ]"
+              [width]="data.width"
+              [empty]="false"
+              (cardClicked)="onClicked( dcard )" >
+            </app-dominion-card-image>
+          </div>
+          <div class="pile-info absolute-position">
+            <div *ngIf="dcard.faceUp[ data.myIndex ]"
+                class="card-cost-coin"
+                [style.fontSize.em]="data.width / 50">
+              {{dcard.cardProperty.cost.toStr()}}
+            </div>
+            <div class="spacer"></div>
+            <div *ngIf="showArraySize"
+                class="dcard-array-size"
+                [matTooltip]="data.DCardArray.length + '枚'" matTooltipPosition="below"
+                [style.fontSize.em]="data.width / 50">
+              {{data.DCardArray.length}}
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showCardProperty && dcard.faceUp[ data.myIndex ]"
+            class="card-property-button-wrapper">
+          <button mat-icon-button
+              (click)="openCardPropertyDialog( dcard )">
+            <mat-icon>description</mat-icon>
+          </button>
+        </div>
+
+      </div>
+    </ng-template>
+  </div>
+</ng-container>

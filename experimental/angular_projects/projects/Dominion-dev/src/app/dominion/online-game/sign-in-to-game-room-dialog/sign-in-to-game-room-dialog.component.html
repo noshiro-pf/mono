@@ -1,0 +1,46 @@
+<ng-container *ngIf="{
+    playersNameList:    playersNameList$    | async,
+    allPlayersAreReady: allPlayersAreReady$ | async
+  } as data">
+
+<div  class="body-with-padding"
+    *ngIf="data.allPlayersAreReady; then thenBlock; else elseBlock">
+</div>
+
+<ng-template #thenBlock>
+  <div class="center">人数が揃いました。まもなく開始します…</div>
+  <div class="center"> <mat-spinner mode="indeterminate"></mat-spinner> </div>
+</ng-template>
+
+<ng-template #elseBlock>
+  <h1 mat-dialog-title>新規ゲーム</h1>
+
+  <div mat-dialog-content>
+    <ng-container>
+      <span>プレイヤーの参加を待っています…</span>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+
+      <div class="margined-element">
+        <span>参加中：{{data.playersNameList.join(', ')}}</span>
+      </div>
+
+      <app-selected-expansions
+        [selectedExpansionNameList$]="selectedExpansionNameList$" >
+      </app-selected-expansions>
+      <app-selected-cards-list
+        [selectedCards$]="selectedCards$" >
+      </app-selected-cards-list>
+    </ng-container>
+  </div>
+
+  <div mat-dialog-actions class='action-buttons'>
+    <span class="margined-element">
+      <button mat-raised-button
+          mat-dialog-close="Cancel Clicked"
+          class="margined-element">
+        Cancel
+      </button>
+    </span>
+  </div>
+</ng-template>
+</ng-container>

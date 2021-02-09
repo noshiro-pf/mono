@@ -1,0 +1,99 @@
+table.data-table {
+  position: relative;
+  border: 1px solid rgba(0,0,0,.12);
+  white-space: nowrap;
+  background-color: white;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.shadow3px {
+  box-shadow :
+  0 3px 4px 0 rgba(0,0,0,.14),
+  0 3px 3px -2px rgba(0,0,0,.2),
+  0 1px 8px 0 rgba(0,0,0,.12)
+}
+
+.data-table th,
+.data-table td {
+  position: relative;
+  height: 40px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  box-sizing: border-box;
+  padding: 6px 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.data-table th {
+  text-overflow: ellipsis;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0;
+  font-size: 14px;
+  color: rgba(0,0,0,.54);
+  /*padding: 0 18px 12px 18px;  */
+  text-align: center;
+}
+
+.data-table.vertical-line th,
+.data-table.vertical-line td {
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+
+.data-table .data-table--cell-alignRight {
+  text-align: right;
+}
+.data-table .data-table--cell-alignLeft {
+  text-align: left;
+}
+.data-table .data-table--cell-alignCenter {
+  text-align: center;
+}
+
+.data-table:not(.no-hover-effect) tr:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+
+
+
+.data-table .clear-select-icon {
+  font-size: 16px;
+}
+tbody button {
+  font-weight: 700;
+}
+
+.pager-wrapper {
+  margin: 20px;
+}
+
+/*
+.data-table--stripe tbody tr:nth-child(even){
+    background:#F2F2FF;
+}*/
+
+
+
+/* small table */
+
+.small-table {
+  box-shadow: none;
+}
+.small-table td {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  height: 28px;
+}
+.small-table td.small-table--normal-cell {
+  width: 80px;
+}
+.small-table td.small-table--narrow-cell {
+  width: 60px;
+}
+
+.resetButton {
+  float: right;
+  margin: 5px;
+}

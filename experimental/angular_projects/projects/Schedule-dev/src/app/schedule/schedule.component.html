@@ -1,0 +1,112 @@
+<ng-container *ngIf="{
+      title             : title$             | async,
+      notes             : notes$             | async,
+      selectedDatetimes : selectedDatetimes$ | async,
+      answerDeadline    : answerDeadline$    | async,
+      symbols           : symbols$           | async,
+      password          : password$          | async,
+      passwordEnabled   : passwordEnabled$   | async,
+      createEventButtonDisabled : createEventButtonDisabled$ | async
+    } as data">
+
+  <mat-vertical-stepper class="default-background-color" #stepper>
+    <mat-step label="イベント名を入力">
+      <app-name-and-notes
+        (titleChange)="titleChange( $event )"
+        (notesChange)="notesChange( $event )" >
+      </app-name-and-notes>
+      <div class="margined-element">
+        <button mat-raised-button color="primary" matStepperNext>Next</button>
+      </div>
+    </mat-step>
+
+    <mat-step label="候補日程を選択">
+      <app-select-dates
+        (selectedDatetimesChange)="selectedDatetimesChange( $event )">
+      </app-select-dates>
+      <div class="margined-element">
+        <span class="margined-element">
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+        </span>
+        <span class="margined-element">
+          <button mat-raised-button color="primary" matStepperNext >Next</button>
+        </span>
+      </div>
+    </mat-step>
+
+    <mat-step label="回答の設定">
+      <app-answer-deadline
+        [answerDeadlineInit]="data.answerDeadline"
+        (answerDeadlineChange)="answerDeadlineChange( $event )">
+      </app-answer-deadline>
+
+      <hr>
+
+      <app-symbol-settings
+          [symbolsInit]="data.symbols"
+          (symbolsChange)="symbolsChange( $event )">
+      </app-symbol-settings>
+      <app-password
+        (enabledChange)="passwordEnabledChange( $event )"
+        (passwordChange)="passwordChange( $event )" >
+      </app-password>
+
+      <div class="margined-element">
+        <span class="margined-element">
+          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+        </span>
+        <span class="margined-element">
+          <button mat-raised-button color="accent"
+              (click)="createEvent( stepper )"
+              [disabled]="data.createEventButtonDisabled" >
+            イベント作成
+          </button>
+        </span>
+        <div class="margined-element">
+          <p class="error-message" *ngIf="!data.title">
+            イベント名は必須項目です。
+          </p>
+          <p class="error-message" *ngIf="data.selectedDatetimes.length === 0">
+            1つ以上の日程を選択してください。
+          </p>
+          <p class="error-message" *ngIf="!data.answerDeadline">
+            回答期限は必須項目です。
+          </p>
+        </div>
+      </div>
+    </mat-step>
+
+    <mat-step label="回答ページへのリンク">
+      <div *ngIf="!eventPageId; then thenBlock; else elseBlock"></div>
+      <ng-template #thenBlock>
+        <p>イベントはまだ作成されていません。</p>
+      </ng-template>
+      <ng-template #elseBlock>
+        <div>
+          イベントが作成されました。
+          以下のURLをメール等を使って皆に知らせてあげましょう。
+          以降、このURLページにて各自の出欠情報を入力してもらいます。
+        </div>
+        <div>
+          <a [href]="eventPageUrl" target="_blank">
+            {{eventPageUrl}}
+          </a>
+          <button mat-button class="mini-button"
+              ngxClipboard
+              [cbContent]="eventPageUrl"
+              aria-label="copy-link"
+              matTooltip="リンクをコピー">
+            <mat-icon aria-hidden="true">content_copy</mat-icon>
+          </button>
+        </div>
+        <div class="margined-element">
+          <a mat-raised-button
+              [href]="eventPageUrl"
+              target="_blank">
+            回答ページを表示
+          </a>
+        </div>
+      </ng-template>
+    </mat-step>
+  </mat-vertical-stepper>
+</ng-container>

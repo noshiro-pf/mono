@@ -1,0 +1,83 @@
+<ng-container *ngIf="{
+    gameResultListFiltered: gameResultListFiltered$ | async,
+    gameResultList:         gameResultList$         | async,
+    dateBegin:              dateBegin$              | async,
+    dateEnd:                dateEnd$                | async,
+    nofPlayersOptions:      nofPlayersOptions$      | async
+  } as data">
+
+<div class="body-with-padding">
+  <p>
+    <span class="filterTitle"> 期間： </span>
+    <mat-form-field>
+      <input matInput
+          placeholder="日付"
+          [matDatepicker]="datepickerBegin"
+          [value]="data.dateBegin"
+          (dateInput)="changeDateBegin( $event.target.value )"
+          (dateChange)="changeDateBegin( $event.target.value )" >
+      <mat-datepicker-toggle
+        matSuffix [for]="datepickerBegin">
+      </mat-datepicker-toggle>
+      <mat-datepicker #datepickerBegin></mat-datepicker>
+    </mat-form-field>
+    ～
+    <mat-form-field>
+      <input matInput
+          placeholder="日付"
+          [matDatepicker]="datepickerEnd"
+          [value]="data.dateEnd"
+          (dateInput)="changeDateEnd( $event.target.value )"
+          (dateChange)="changeDateEnd( $event.target.value )">
+      <mat-datepicker-toggle
+        matSuffix [for]="datepickerEnd">
+      </mat-datepicker-toggle>
+      <mat-datepicker #datepickerEnd></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button class="latestResultButton"
+        (click)="latestResultClicked( data.gameResultList )">
+      最新の結果
+    </button>
+
+    <button class='floatButton' mat-raised-button
+        (click)="resetAllClicked( data.gameResultList )">
+      Reset All
+    </button>
+  </p>
+
+  <p>
+    <span class="filterTitle">プレイヤー数：</span>
+    <ng-container *ngFor="let option of data.nofPlayersOptions">
+      <mat-checkbox
+          [checked]="option.checked"
+          (change)="nofPlayersOnCheck(
+              $event.checked,
+              option.nofPlayers
+            )" >
+        {{option.nofPlayers}}人
+      </mat-checkbox>
+    </ng-container>
+  </p>
+
+  <mat-tab-group *ngIf="data.gameResultList && data.gameResultListFiltered">
+    <!-- <mat-tab label="総合成績">
+      <app-game-result-list
+          [gameResultListFiltered]="data.gameResultListFiltered">
+      </app-game-result-list>
+    </mat-tab> -->
+    <mat-tab label="個人成績">
+      <app-game-result-of-player
+          [gameResultListFiltered]="data.gameResultListFiltered">
+      </app-game-result-of-player>
+    </mat-tab>
+    <mat-tab label="スコア定義">
+      <app-scoring-table></app-scoring-table>
+    </mat-tab>
+  </mat-tab-group>
+
+  <app-waiting-spinner
+    [waiting]="!data.gameResultList || data.gameResultList.length == 0">
+  </app-waiting-spinner>
+</div>
+</ng-container>

@@ -1,0 +1,27 @@
+#gameMessage-area {
+  --message-line-height: 1.5em;
+}
+
+#gameMessage-area {
+  padding: 3px 8px;
+  border-radius: 5px;
+  background-color: white;
+  color: black;
+  font-family: sans-serif;
+}
+
+#messages {
+  max-height: calc( var(--message-line-height) * 3 );
+  overflow-y: auto;
+}
+
+.message-line {
+  height: var(--message-line-height);
+  font-size: 1em;
+}
+.message-line:not(.gray) {
+  color: black;
+}
+.message-line.gray {
+  color: #a7a7a7;
+}

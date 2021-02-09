@@ -1,0 +1,67 @@
+<ng-container *ngIf="{
+      gameResult:       gameResult$       | async,
+      cardPropertyList: cardPropertyList$ | async
+    } as data">
+
+<ng-container *ngIf="!data.gameResult; then loading; else main"></ng-container>
+<ng-template #loading>Loading...</ng-template>
+<ng-template #main>
+  <div class="body-with-padding" >
+
+    <h1 mat-dialog-title>結果</h1>
+
+    <div mat-dialog-content class="content">
+
+      <p>日付：
+          {{data.gameResult.date.getFullYear()}}年
+          {{data.gameResult.date.getMonth() + 1}}月
+          {{data.gameResult.date.getDate()}}日</p>
+      <p>場所：{{data.gameResult.place}}</p>
+      <div>
+        <table class='data-table shadow3px vertical-line'>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>VP</th>
+              <th>Score</th>
+              <th>Order</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let player of data.gameResult.players; let idx = index">
+            <tr>
+              <td> {{player.rank}} </td>
+              <td> {{player.name}} </td>
+              <td> {{player.VP}} </td>
+              <td> {{player.score}} </td>
+              <td>
+                <span *ngIf="player.name === data.gameResult.lastTurnPlayerName;
+                              then braced; else normal"></span>
+                <ng-template #braced>[{{player.turnOrder}}]</ng-template>
+                <ng-template #normal>{{player.turnOrder}}</ng-template>
+              </td>
+              <td>
+                {{player.NofVictoryCards.toStr( data.cardPropertyList )}}
+              </td>
+            </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div mat-dialog-actions class='action-buttons'>
+      <span class="margined-element">
+        <button mat-raised-button
+            mat-dialog-close="OK Clicked" color='primary'>
+          OK
+        </button>
+      </span>
+    </div>
+  </div>
+</ng-template>
+
+</ng-container>

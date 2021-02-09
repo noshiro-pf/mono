@@ -1,0 +1,18 @@
+.CardArea {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom:10px;
+}
+
+.BlackMarketPile {
+  background-color: #C6C5C5;
+}
+
+
+.card-image-area {
+  display: flex;
+  flex-flow: row wrap;
+}
+.card-image-element {
+  margin: 5px;
+}

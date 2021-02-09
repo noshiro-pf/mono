@@ -1,0 +1,201 @@
+<div mat-dialog-title>
+  <span>ヘルプ</span>
+</div>
+
+<div mat-dialog-content>
+  <div class="my-list">
+
+    <h3>手番プレイヤーの情報</h3>
+
+    <div class="my-list-item">
+      <div class="my-list-icon item phase">A</div>
+      <p class="content">現在のフェーズを表します。</p>
+    </div>
+
+    <div class="my-list sub-list">
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">A</div>
+        <span class="content">アクションフェーズ</span>
+      </div>
+
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">〈A〉</div>
+        <span class="content">アクションフェーズ（アクションカードの効果の途中）</span>
+      </div>
+
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">B</div>
+        <span class="content">購入フェーズ（財宝カードのプレイ・カードの購入）</span>
+      </div>
+
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">〈B〉</div>
+        <span class="content">購入フェーズ（財宝カードの効果の途中）</span>
+      </div>
+
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">B*</div>
+        <span class="content">購入フェーズ（カードの購入のみ可能）</span>
+      </div>
+
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">N</div>
+        <span class="content">Nightフェーズ</span>
+      </div>
+
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">〈N〉</div>
+        <span class="content">Nightフェーズ（Nightカードの効果の途中）</span>
+      </div>
+
+      <div class="my-list-item">
+        <div class="my-list-icon item phase">C</div>
+        <span class="content">クリーンアップフェーズ</span>
+      </div>
+
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon item action">1</div>
+      <p class="content">手番プレイヤーのアクションの残り数を表しています。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon item buy">1</div>
+      <p class="content">手番プレイヤーの購入の残り数を表しています。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon item coin">0</div>
+      <p class="content">手番プレイヤーのコインを表しています。</p>
+    </div>
+
+
+    <div class="my-divider"></div>
+
+    <h3>サイドバーのボタン</h3>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>textsms</mat-icon></div>
+      <p class="content">チャット画面の表示／非表示を切り替えます。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>stop</mat-icon></div>
+      <p class="content">
+        【チャットを開いているときのみ表示】
+        チャットを自動でスクロールしないようにします。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>arrow_downwards</mat-icon></div>
+      <p class="content">
+        【チャットを開いているときのみ表示】
+        チャットのスクロールを自動で行います。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>description</mat-icon></div>
+      <p class="content">カードの下の情報を見るボタンの表示／非表示を切り替えます。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>tune</mat-icon></div>
+      <p class="content">設定画面を開きます。</p>
+    </div>
+
+
+    <div class="my-divider"></div>
+
+    <h3>自分のカードエリアのボタン</h3>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>history</mat-icon></div>
+      <p class="content">操作ログを見ることができます。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>hourglass_full</mat-icon></div>
+      <p class="content">考え中のときに押してください。
+        プレイヤーのエリアに
+        <mat-icon>hourglass_full</mat-icon>が表示されます。
+        （もう一度押すか、ゲーム内で何か操作をすると消えます）
+      </p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>sort</mat-icon></div>
+      <p class="content">手札をソートします。
+        （自動でソートさせたい場合は、
+        設定画面で「手札を自動でソート」にチェックを入れてください）
+      </p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>present_to_all</mat-icon></div>
+      <p class="content">
+        【購入フェーズのみ表示】基本財宝カード（効果がコインのみの財宝カード）
+        をすべてプレイします。
+      </p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon">
+        <mat-icon style="transform: rotate( -90deg )">file_download</mat-icon>
+      </div>
+      <p class="content">【自分の手番のみ表示】次のフェーズに移ります。（確認あり）</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>forward</mat-icon></div>
+      <p class="content">【自分の手番のみ表示】ターンを終了します。（確認あり）</p>
+    </div>
+
+
+    <div class="my-divider"></div>
+
+    <h3>ゲーム終了時に表示</h3>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>format_list_numbered</mat-icon></div>
+      <p class="content">ゲーム結果を表示します。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>view_comfy</mat-icon></div>
+      <p class="content">各プレイヤーの山札の一覧を表示します。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><mat-icon>exit_to_app</mat-icon></div>
+      <p class="content">ゲームを終了し部屋リスト画面に戻ります。</p>
+    </div>
+
+
+    <div class="my-divider"></div>
+
+    <h3>その他の要素の説明</h3>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><div class="card-cost-coin">3</div></div>
+      <p class="content">カードのコストを表します。</p>
+    </div>
+
+    <div class="my-list-item">
+      <div class="my-list-icon"><div class="dcard-array-size">10</div></div>
+      <p class="content">山の枚数を表します。</p>
+    </div>
+
+
+
+  </div>
+
+</div>
+
+
+
+<div mat-dialog-actions class="center">
+  <button mat-raised-button mat-dialog-close="yes" color='primary'>
+    OK
+  </button>
+</div>

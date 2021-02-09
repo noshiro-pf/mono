@@ -1,0 +1,17 @@
+.httpGetWaitingSpinner {
+  width:24px;
+}
+
+/*sidenav*/
+.sidenavContainer {
+  height: var(--main-height-without-toolbar);
+}
+
+.sidenavMain {
+  width: 100%;
+}
+
+.sidenav {
+  max-width: 400px;
+  background-color: #DBF7F7;
+}

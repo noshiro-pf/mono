@@ -1,0 +1,195 @@
+<ng-container *ngIf="{
+      cardPropertyList:      cardPropertyList$      | async,
+      VictoryCardsFiltered:  VictoryCardsFiltered$  | async,
+      otherSettingsFiltered: otherSettingsFiltered$ | async,
+      VPtotal:               VPtotal$               | async,
+      numberOfVictoryCards:  numberOfVictoryCards$  | async
+    } as data">
+
+  <app-waiting-spinner
+    [waiting]="!data.cardPropertyList || !data.numberOfVictoryCards">
+  </app-waiting-spinner>
+
+  <ng-container *ngIf="!!data.cardPropertyList && !!data.numberOfVictoryCards">
+    <div class="result">
+      <span>合計点＝<b>{{data.VPtotal}}</b></span>
+      <span class="margined-element">
+        <button mat-raised-button (click)="resetNumbers( data.numberOfVictoryCards )">
+          reset
+        </button>
+      </span>
+
+      <span class="spacer"></span>
+
+      <span>
+        <app-card-image-size-slider
+          min="70" max="280" default="180" [(value)]="cardLongSideLength" >
+        </app-card-image-size-slider>
+      </span>
+    </div>
+
+    <hr>
+
+    <div>
+      <table class="OtherVictoryPoints">
+        <tr *ngFor="let victoryPoint of otherVictoryPoints">
+          <td nowrap> {{victoryPoint.title}} </td>
+          <td>
+            <button mat-raised-button class="mini-button"
+                [disabled]="data.numberOfVictoryCards[ victoryPoint.id ] <= 0"
+                (click)="decrement( data.numberOfVictoryCards, victoryPoint.id, 5 )">
+              <span class="numberIcon">-5</span>
+            </button>
+          </td>
+          <td>
+            <button mat-raised-button class="mini-button"
+                [disabled]="data.numberOfVictoryCards[ victoryPoint.id ] <= 0"
+                (click)="decrement( data.numberOfVictoryCards, victoryPoint.id, 2 )">
+              <span class="numberIcon">-2</span>
+            </button>
+          </td>
+          <td>
+            <button mat-raised-button class="mini-button"
+                [disabled]="data.numberOfVictoryCards[ victoryPoint.id ] <= 0"
+                (click)="decrement( data.numberOfVictoryCards, victoryPoint.id, 1 )">
+              <span class="numberIcon">-1</span>
+            </button>
+          </td>
+          <td>
+            <mat-form-field class="OtherVictoryPointsInput">
+              <input matInput type="number"
+                min="0"
+                [value]="data.numberOfVictoryCards[ victoryPoint.id ]"
+                onclick="this.select(0, this.value.length)"
+                (input)="setValue( data.numberOfVictoryCards,
+                                   victoryPoint.id,
+                                   $event.target.valueAsNumber )">
+            </mat-form-field>
+          </td>
+          <td>
+            <button mat-raised-button class="mini-button"
+                (click)="increment( data.numberOfVictoryCards, victoryPoint.id, 1 )">
+              <span class="numberIcon">+1</span>
+            </button>
+          </td>
+          <td>
+            <button mat-raised-button class="mini-button"
+                (click)="increment( data.numberOfVictoryCards, victoryPoint.id, 2 )">
+              <span class="numberIcon">+2</span>
+            </button>
+          </td>
+          <td>
+            <button mat-raised-button class="mini-button"
+                (click)="increment( data.numberOfVictoryCards, victoryPoint.id, 5 )">
+              <span class="numberIcon">+5</span>
+            </button>
+          </td>
+        </tr>
+      </table>
+
+      <hr>
+
+      <table class="OtherSettings">
+        <ng-container *ngFor="let setting of data.otherSettingsFiltered">
+          <tr>
+            <td nowrap> {{setting.title}} </td>
+            <td>
+              <button mat-raised-button class="mini-button"
+                  [disabled]="data.numberOfVictoryCards[ setting.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, setting.id, setting.by )">
+                <span class="numberIcon">-{{setting.by}}</span>
+              </button>
+            </td>
+            <td>
+              <button mat-raised-button class="mini-button"
+                  [disabled]="data.numberOfVictoryCards[ setting.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, setting.id, 1 )">
+                <span class="numberIcon">-1</span>
+              </button>
+            </td>
+            <td>
+              <span class="margined-element">
+                {{data.numberOfVictoryCards[ setting.id ]}}
+              </span>
+            </td>
+            <td>
+              <button mat-raised-button class="mini-button"
+                  (click)="increment( data.numberOfVictoryCards, setting.id, 1 )">
+                <span class="numberIcon">+1</span>
+              </button>
+            </td>
+            <td>
+              <button mat-raised-button class="mini-button"
+                  (click)="increment( data.numberOfVictoryCards, setting.id, setting.by )">
+                <span class="numberIcon">+{{setting.by}}</span>
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+      </table>
+
+      <hr>
+
+      <div>
+        <ng-container *ngFor="let victoryCard of data.VictoryCardsFiltered">
+          <span class="VictoryCard">
+            <app-dominion-card-image
+                class="cardImage"
+                [height]="cardLongSideLength"
+                [isButton]="false"
+                [faceUp]="true"
+                [description]=""
+                [card]="cardProperty( victoryCard.id, data.cardPropertyList )">
+            </app-dominion-card-image>
+            <span> {{VPperCard( data.numberOfVictoryCards, victoryCard.id )}} VP </span>
+            <span class="setNumberOfCards">
+              <button *ngIf="victoryCard.maxNumber >= 12"
+                  mat-raised-button class="mini-button"
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, victoryCard.id, 2 )">
+                <span class="numberIcon">-2</span>
+              </button>
+              <button mat-raised-button class="mini-button"
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, victoryCard.id, 1 )">
+                <span class="numberIcon">-1</span>
+              </button>
+              <span class="margined-element">
+                {{data.numberOfVictoryCards[ victoryCard.id ]}} 枚
+              </span>
+              <button mat-raised-button class="mini-button"
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] >= victoryCard.maxNumber"
+                  (click)="increment( data.numberOfVictoryCards, victoryCard.id, 1 )">
+                <span class="numberIcon">+1</span>
+              </button>
+              <button *ngIf="victoryCard.maxNumber >= 12"
+                  mat-raised-button class="mini-button"
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] >= victoryCard.maxNumber"
+                  (click)="increment( data.numberOfVictoryCards, victoryCard.id, 2 )">
+                <span class="numberIcon">+2</span>
+              </button>
+            </span>
+
+            <!-- Distant_Lands_on_TavernMat -->
+            <span *ngIf="victoryCard.id == 'Distant_Lands'" class="setNumberOfCards">
+              <span class="margined-element">on Tavern mat</span>
+              <button mat-raised-button class="mini-button"
+                  [disabled]="data.numberOfVictoryCards.Distant_Lands_on_TavernMat <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, 'Distant_Lands_on_TavernMat', 1 )">
+                <span class="numberIcon">-1</span>
+              </button>
+              <span class="margined-element">
+                {{data.numberOfVictoryCards.Distant_Lands_on_TavernMat}} 枚
+              </span>
+              <button mat-raised-button class="mini-button"
+                  (click)="increment( data.numberOfVictoryCards, 'Distant_Lands_on_TavernMat', 1 )">
+                <span class="numberIcon">+1</span>
+              </button>
+            </span>
+
+          </span>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

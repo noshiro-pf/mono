@@ -1,0 +1,78 @@
+<ng-container *ngIf="{
+      card:             card$             | async,
+      cardForView:      cardForView$      | async,
+      indiceInCardList: indiceInCardList$ | async,
+      showingIndex:     showingIndex$     | async
+    } as data">
+<ng-container *ngIf="
+         data.card
+      && data.cardForView
+      && data.showingIndex >= 0
+    ; then main; else loading">
+</ng-container>
+<ng-template #loading>Loading...</ng-template>
+<ng-template #main>
+  <div mat-dialog-title class="title-bar">
+    <span> {{data.card.nameJp}} ({{data.card.nameEng}}) </span>
+    <span class="spacer"></span>
+    <span *ngIf="data.indiceInCardList?.length > 1" class="margined-element">
+      <button mat-raised-button class="navigationButton"
+          (click)='goToPreviousCard()'
+          [disabled]='data.showingIndex <= 0' >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-raised-button class="navigationButton"
+          (click)='goToNextCard()'
+          [disabled]='data.showingIndex >= data.indiceInCardList.length - 1' >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </span>
+  </div>
+
+  <div mat-dialog-content>
+    <div class="flex-content">
+      <div class="image">
+        <app-dominion-card-image
+          [card]='data.card'
+          [faceUp]='true'
+          width='250'>
+        </app-dominion-card-image>
+      </div>
+      <div class="description">
+        <table class='data-table small-table shadow3px vertical-line'>
+          <tbody>
+            <tr *ngFor="let item of items">
+              <td>{{item.name}}</td>
+              <td class="fixed-width" >{{data.cardForView[item.memberName]}}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <div *ngIf="data.card.linkId >= 0; then link; else dummy"></div>
+                <ng-template #link>
+                  <a mat-raised-button
+                      [href]="cardListLinkPath( data.card.linkId )"
+                      target="_blank">
+                    カードリスト
+                  </a>
+                </ng-template>
+                <ng-template #dummy>
+                  <a mat-button></a>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="action-buttons">
+    <button mat-raised-button color='primary' class='actionButton'
+        (click)="dialogRef.close()">
+      OK
+    </button>
+  </div>
+</ng-template>
+</ng-container>

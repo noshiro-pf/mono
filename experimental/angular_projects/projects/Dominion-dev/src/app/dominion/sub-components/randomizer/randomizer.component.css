@@ -1,0 +1,18 @@
+.randomizerOptions,
+.expansionNameList {
+  padding: 20px;
+  flex-basis: auto;
+}
+
+.two-column {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.mini-button {
+  padding : 0;
+  min-width : 0;
+  width: 35px;
+  color: rgba(0,0,0,.54);
+}

@@ -1,0 +1,38 @@
+.container {
+  padding: 20px;
+}
+
+.draw-area {
+  margin: 10px;
+  width: min-content;
+  height: min-content;
+}
+
+.signature-pad {
+  display: block;
+}
+
+.signature-pad canvas {
+  display: block;
+}
+
+.buttons {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.columns {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.is-selected {
+  background-color: #00C0AA;
+  color: white;
+  font-size: bold;
+}
+
+#canvas {
+  border: 2px solid;
+  background-color: black;
+}
