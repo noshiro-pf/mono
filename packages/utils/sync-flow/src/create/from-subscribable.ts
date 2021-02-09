@@ -1,0 +1,28 @@
+import { Option, Result } from '@mono/ts-utils';
+import { RootObservableClass } from '../class';
+import { FromSubscribableObservable, Subscribable } from '../types';
+
+export const fromSubscribable = <A, E = unknown>(
+  subscribable: Subscribable<A>
+): FromSubscribableObservable<A, E> =>
+  new FromSubscribableObservableClass(subscribable);
+
+class FromSubscribableObservableClass<A, E = unknown>
+  extends RootObservableClass<Result<A, E>, 'FromSubscribable'>
+  implements FromSubscribableObservable<A, E> {
+  constructor(subscribable: Subscribable<A>) {
+    super({ type: 'FromSubscribable', currentValueInit: Option.none });
+
+    subscribable.subscribe(
+      (nextValue) => {
+        this.startUpdate(Result.ok(nextValue));
+      },
+      (error?: unknown) => {
+        this.startUpdate(Result.err(error as E));
+      },
+      () => {
+        this.complete();
+      }
+    );
+  }
+}
