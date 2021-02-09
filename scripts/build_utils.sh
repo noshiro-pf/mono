@@ -3,7 +3,6 @@
 targets=(
   # no local dependency
   "ts-utils"
-  "rnjs"
   "sync-flow"
 
   # ts-utils dependent
