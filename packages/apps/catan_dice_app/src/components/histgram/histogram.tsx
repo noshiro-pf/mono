@@ -14,6 +14,6 @@ export const Histogram = memoNamed<
 >('Histogram', ({ sumCount }) => {
   const xy = useMemo(() => domain.zip(sumCount), [sumCount]);
   const max = useMemo(() => sumCount.max() ?? 0, [sumCount]);
-  const numSample = useMemo(() => sumCount.reduce(add) || 0, [sumCount]);
+  const numSample = useMemo(() => sumCount.reduce(add) ?? 0, [sumCount]);
   return <HistogramView xy={xy} max={max} numSample={numSample} />;
 });

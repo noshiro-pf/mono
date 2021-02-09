@@ -58,7 +58,7 @@ export const ProductsElementView = memoNamed<{
           {'［実装］：' + body2}
         </Typography>
       </CardContentStyled>
-      {imageUrl && <ImgStyled alt='' src={imageUrl} />}
+      {imageUrl === '' ? undefined : <ImgStyled alt='' src={imageUrl} />}
     </CardStyled>
   )
 );
