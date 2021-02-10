@@ -1,0 +1,41 @@
+.action-buttons {
+  margin: auto;
+  width: 100%;
+  justify-content: center;
+}
+
+.image {
+  flex-basis: 250px;
+  flex-grow: 0;
+}
+.description {
+  flex-basis: 250px;
+  flex-grow: 1;
+  padding: 10px;
+}
+
+.flex-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+
+.navigationButton {
+  padding : 0;
+  margin: 2px 0;
+  min-width : 30px;
+  color: rgba(0,0,0,.54);
+}
+
+
+.fixed-width {
+  width: 200px;
+}
+
+.title-bar {
+  flex-basis: 48px;
+  flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+}

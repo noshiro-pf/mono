@@ -1,0 +1,26 @@
+.dominionCard {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.description {
+  justify-content: center;
+  text-align: center;
+}
+
+img {
+  display: block;  /* 余白削除 */
+}
+.image-box {
+  background-color: black;
+  border-style: solid;
+  border-color: black;
+}
+
+.is-button:hover {
+  box-shadow: 0 0 30px #EA5959;
+}

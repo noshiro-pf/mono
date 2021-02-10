@@ -1,0 +1,30 @@
+.groupList {
+  padding: 20px;
+}
+
+.groupListItem {
+  margin: 5px 0;
+}
+
+.groupListItem:hover {
+  cursor: pointer;
+}
+
+.sideBarBody {
+  height: calc(var(--main-height-without-toolbar) - 40px);
+}
+
+#closeSideNavBtn {
+  float: right;
+}
+
+
+.headers-align .header-title,
+.headers-align .header-description {
+  flex-basis: 0;
+}
+
+.headers-align .header-description {
+  justify-content: space-between;
+  align-items: center;
+}

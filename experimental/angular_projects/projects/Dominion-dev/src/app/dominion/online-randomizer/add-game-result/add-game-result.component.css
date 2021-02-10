@@ -1,0 +1,18 @@
+.playerChbox {
+  margin-right: 20px;
+}
+
+.player-list {
+  max-width: 400px;
+}
+
+.clearIcon {
+  font-size: 16px;
+}
+
+.mini-button {
+  padding : 0;
+  min-width : 0;
+  width: 35px;
+  color: rgba(0,0,0,.54);
+}

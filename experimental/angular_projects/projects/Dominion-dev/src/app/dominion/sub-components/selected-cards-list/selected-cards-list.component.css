@@ -1,0 +1,12 @@
+.Prosperity_DarkAges {
+  margin: 10px;
+}
+.supplyTable {
+  padding: 20px;
+  flex-basis: auto;
+}
+
+.Prosperity-not-selected,
+.DarkAges-not-selected {
+  color: rgb(168, 168, 168);
+}

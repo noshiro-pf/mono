@@ -1,0 +1,7 @@
+.symbol-toggle-button:not(.selected) {
+  color: rgb(214, 214, 214);
+}
+.symbol-toggle-button.selected {
+  color: #FF4081;
+  font-weight: bold;
+}

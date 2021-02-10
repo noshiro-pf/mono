@@ -1,0 +1,109 @@
+table.data-table {
+  position: relative;
+  border: 1px solid rgba(0,0,0,.12);
+  white-space: nowrap;
+  background-color: white;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.data-table.shadow3px {
+  box-shadow :
+  0 3px 4px 0 rgba(0,0,0,.14),
+  0 3px 3px -2px rgba(0,0,0,.2),
+  0 1px 8px 0 rgba(0,0,0,.12)
+}
+
+.data-table th,
+.data-table td {
+  position: relative;
+  height: 40px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  box-sizing: border-box;
+  padding: 6px 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.data-table th {
+  text-overflow: ellipsis;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0;
+  font-size: 14px;
+  color: rgba(0,0,0,.54);
+  /*padding: 0 18px 12px 18px;  */
+}
+
+.data-table.vertical-line th,
+.data-table.vertical-line td {
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+.data-table .cell-align-right {
+  text-align: right;
+  justify-content: flex-end;
+}
+.data-table .cell-align-left {
+  text-align: left;
+  justify-content: flex-start;
+}
+.data-table .cell-align-center {
+  text-align: center;
+  justify-content: center;
+}
+
+.data-table:not(.no-hover-effect) tr:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+.data-table .header-cell {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+
+
+.data-table .clear-select-icon {
+  font-size: 16px;
+}
+tbody button {
+  font-weight: 700;
+}
+
+.pager-wrapper {
+  margin: 20px;
+}
+
+
+/* stripe */
+/*
+.data-table--stripe tbody tr:nth-child(even){
+    background:#F2F2FF;
+}*/
+
+.reset-button {
+  /* float: right; */
+  margin: 5px;
+}
+
+
+/* small table */
+
+.small-table {
+  box-shadow: none;
+}
+.small-table td {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  height: 28px;
+}
+.small-table td.narrow-cell {
+  width: 60px;
+}
+.small-table td.normal-cell {
+  width: 80px;
+}
+.small-table td.wide-cell {
+  width: 100px;
+}

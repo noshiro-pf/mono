@@ -1,0 +1,29 @@
+.pagenation {
+  padding: 20px;
+  display: inline-block;
+  min-width: 700px;
+}
+
+.mat-button-toggle-normal {
+  background: white;
+  color: rgba(0,0,0,.54);
+  border-right: 1px solid rgba(0,0,0,.06);
+}
+.mat-button-toggle-selected {
+  background: blue;
+  color: white;
+  border-right: 1px solid rgba(0,0,0,.06);
+}
+
+.navigationButton {
+  padding : 0;
+  margin: 2px 0;
+  min-width : 30px;
+  color: rgba(0,0,0,.54);
+}
+
+.range {
+  width: 150px;
+  display: inline-block;
+  text-align: center;
+}

@@ -1,0 +1,35 @@
+.button-with-margin {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.buttons-wrapper {
+  padding: 10px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-button {
+  padding : 0;
+  margin: 2px 0;
+  min-width : 30px;
+  color: rgba(0,0,0,.54);
+}
+
+
+.mat-button-toggle-normal {
+  background: white;
+  color: rgba(0,0,0,.54);
+  border-right: 1px solid rgba(0,0,0,.06);
+}
+.mat-button-toggle-selected {
+  background: blue;
+  color: white;
+  border-right: 1px solid rgba(0,0,0,.06);
+}
+
+.range-notation {
+  padding: 0 5px 0 5px;
+}

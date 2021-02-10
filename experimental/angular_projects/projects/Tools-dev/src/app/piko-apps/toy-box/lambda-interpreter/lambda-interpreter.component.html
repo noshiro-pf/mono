@@ -1,0 +1,42 @@
+<div class="body-with-padding">
+  <h2>(Untyped) lambda calculus</h2>
+  <div class="descriptions">
+    <p>expr ::= x | (lambda x. expr) | (expr expr)</p>
+  </div>
+  <div class="input-area">
+    Input:
+    <textarea matInput
+      (input)="inputTextOnChange( $event.target.value )"
+      matTextareaAutosize matAutosizeMinRows="5"
+      class="prettyprint prettyprinted line-nums lambda-source-code"
+      spellcheck="false"
+      placeholder="input" >((+ 2) 3)</textarea>
+  </div>
+  <!-- <div class="memo-area">
+    <p> is lambda term : {{isLambdaTerm$ | async}} </p>
+    <p> parse tree : {{parseTreeToStr$ | async}} </p>
+  </div> -->
+  <div class="output-area">
+    Result:
+    <pre class="prettyprint prettyprinted line-nums lambda-source-code"
+      contenteditable="false" spellcheck="false"
+      >{{output$ | async}}</pre>
+  </div>
+
+
+  <!-- <hr> -->
+
+  <!-- <div class="descriptions"> -->
+    <!-- <ng-katex [equation]="'\sum_{i=1}^nx_i'"></ng-katex> -->
+    <!-- <iframe src="src/app/piko-apps/toy-box/lambda-interpreter/memo.html" title="descriptions">
+      <p>Your browser does not support iframes.</p>
+    </iframe> -->
+  <!-- </div> -->
+
+</div>
+
+
+
+
+<!-- <p [innerHTML]="memoHTML" ></p> -->
+

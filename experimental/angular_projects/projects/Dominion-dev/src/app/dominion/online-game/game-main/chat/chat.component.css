@@ -1,0 +1,145 @@
+.body {
+  width: 330px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-list {
+  flex: 1;
+  padding: 10px 20px 10px 10px;
+  overflow-y: scroll;
+  font-size: 14px;
+  background: #7da4cd;
+  text-align: right;
+}
+
+.new-message {
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+
+.new-message-input-box {
+  flex: 1;
+  margin: 0 5px;
+}
+
+.send-button {
+  padding: 0;
+  min-width: 48px;
+}
+
+
+
+/* https://saruwakakun.com/html-css/reference/speech-bubble */
+
+/*以下、①背景色など*/
+/* .line-bc {
+  padding: 20px 10px;
+  max-width: 450px;
+  margin: 15px 0;
+  text-align: right;
+  font-size: 14px;
+  background: #7da4cd;
+} */
+
+/*以下、②左側のコメント*/
+.balloon6 {
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.balloon6 .faceicon {
+  float: left;
+  margin-right: -50px;
+  width: 40px;
+}
+
+.balloon6 .player-name {
+  text-align: left;
+  margin: 5px;
+  color: white;
+  font-size: large;
+}
+
+.balloon6 .faceicon img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+}
+.balloon6 .chatting {
+  width: 100%;
+  text-align: left;
+}
+.says {
+  display: inline-block;
+  position: relative;
+  margin: 0 0 0 50px;
+  padding: 10px;
+  max-width: 250px;
+  border-radius: 12px;
+  background: #edf1ee;
+  min-height: 35px;
+}
+
+.says:after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 3px;
+  left: -19px;
+  border: 8px solid transparent;
+  border-right: 18px solid #edf1ee;
+  -ms-transform: rotate(35deg);
+  -webkit-transform: rotate(35deg);
+  transform: rotate(35deg);
+}
+.says p {
+  margin: 0;
+  padding: 0;
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
+
+/*以下、右側の緑コメント*/
+.mycomment {
+  margin: 10px 0;
+}
+.mycomment p {
+  display: inline-block;
+  position: relative;
+  margin: 0 10px 0 0;
+  padding: 8px;
+  max-width: 250px;
+  border-radius: 12px;
+  background: #C2FF65;  /* #30e852; */
+  font-size: 15px;
+  min-height: 35px;
+  text-align: left;
+  word-wrap: break-word;
+}
+
+.mycomment p:after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: -19px;
+  border: 8px solid transparent;
+  border-left: 18px solid #C2FF65;  /* #30e852; */
+  -ms-transform: rotate(-35deg);
+  -webkit-transform: rotate(-35deg);
+  transform: rotate(-35deg);
+}
+
+.command {
+  margin: 20px;
+  border-radius: 20px;
+  padding: 3px;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}

@@ -1,0 +1,67 @@
+<ng-container *ngIf="{
+      scEvent               : event$                 | async,
+      scEventId             : eventId$               | async,
+      answerDeadlineExpired : answerDeadlineExpired$ | async,
+      answerId              : answerId$              | async
+    } as data">
+
+  <div class="body-with-padding">
+    <div *ngIf="(!!data.scEvent && !!data.scEventId && !!data.scEvent.title)
+                  then main; else loading"></div>
+    <ng-template #loading>
+      <app-loading-dots></app-loading-dots>
+    </ng-template>
+    <ng-template #main>
+      <H2>
+        イベント名：{{data.scEvent.title}}
+        <button mat-icon-button (click)="editEvent( data.scEvent, data.scEventId )"
+            matTooltip="イベントを編集">
+          <mat-icon aria-hidden="true">edit</mat-icon>
+        </button>
+      </H2>
+      <p>ノート：{{data.scEvent.notes}}</p>
+      <p>回答期限：
+        <span [class.answerDeadlineExpired]="data.answerDeadlineExpired">
+          {{toYMD( data.scEvent.answerDeadline )}}
+          <span *ngIf="data.answerDeadlineExpired">（回答の受付を終了しました。）</span>
+        </span>
+      </p>
+      <div class="margined-element">
+        <p>回答数：{{data.scEvent.answers.length}}</p>
+      </div>
+
+      <app-spreadsheet
+        [scEvent]="data.scEvent"
+        [answerDeadlineExpired]="data.answerDeadlineExpired"
+        (answerIdChange)="answerIdOnChange( $event )" >
+      </app-spreadsheet>
+
+      <table class="margined-element" data-comment="記号の説明">
+        <tbody>
+          <ng-container *ngFor="let symbol of data.scEvent.symbols">
+            <tr *ngIf="symbol.useThis">
+              <th><mat-icon>{{symbol.iconName}}</mat-icon></th>
+              <td>：</td>
+              <td>{{symbol.description}}</td>
+              <td class="align-right">（{{symbol.score}}点）</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <div *ngIf="!data.answerDeadlineExpired"
+          class="margined-element answer-form"
+          data-comment="入力">
+        <app-answer-form
+          [scEvent]="data.scEvent"
+          [scEventId]="data.scEventId"
+          [answerId]="data.answerId"
+          (answerIdChange)="answerIdOnChange( $event )" >
+        </app-answer-form>
+      </div>
+
+    </ng-template>
+  </div>
+</ng-container>

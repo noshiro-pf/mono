@@ -1,0 +1,33 @@
+<!doctype html><html><head><meta charset='utf-8'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.4.1/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/default.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css">
+<link rel="stylesheet" href="https://gitcdn.xyz/repo/goessner/mdmath/master/css/texmath.css">
+<link rel="stylesheet" href="https://gitcdn.xyz/repo/goessner/mdmath/master/css/vscode-texmath.css">
+
+</head><body class="markdown-body">
+<h2 data-line="1" class="code-line" id="%E4%BB%95%E6%A7%98">仕様</h2>
+<ul>
+<li data-line="2" class="code-line">使えるアルファベットは <code>[a-z]</code></li>
+<li data-line="3" class="code-line">入力として許されるλ式は以下のBNFで定義されるもののみである．
+<ul>
+<li data-line="4" class="code-line">括弧の補完はしない</li>
+<li data-line="5" class="code-line"><eq><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.64444em;vertical-align:0em;"></span><span class="base"><span class="mord mathrm">1</span></span></span></span></eq>, <eq><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn></mrow><annotation encoding="application/x-tex">2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.64444em;"></span><span class="strut bottom" style="height:0.64444em;vertical-align:0em;"></span><span class="base"><span class="mord mathrm">2</span></span></span></span></eq>, <eq><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>+</mo></mrow><annotation encoding="application/x-tex">+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.58333em;"></span><span class="strut bottom" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="base"><span class="mord">+</span></span></span></span></eq>, <eq><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>×</mo></mrow><annotation encoding="application/x-tex">\\times</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.58333em;"></span><span class="strut bottom" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="base"><span class="mord">×</span></span></span></span></eq> などは使用できない．</li>
+</ul>
+</li>
+</ul>
+<section><eqn><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⟨</mo><mtext>expr</mtext><mo>⟩</mo><mstyle><mo><mo>:</mo></mo></mstyle><mstyle><mrow></mrow></mstyle><mstyle><mo><mo>:</mo></mo></mstyle><mstyle><mrow></mrow></mstyle><mo>=</mo><mi>x</mi><mo>∣</mo><mo>(</mo><mi>λ</mi><mi>x</mi><mi mathvariant="normal">.</mi><mo>⟨</mo><mtext>expr</mtext><mo>⟩</mo><mo>)</mo><mo>∣</mo><mo>(</mo><mo>⟨</mo><mtext>expr</mtext><mo>⟩</mo><mo>⟨</mo><mtext>expr</mtext><mo>⟩</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">
+  \\langle \\textrm{expr} \\rangle
+  \\Coloneqq
+  x
+    \\mid (\\lambda x. \\langle \\textrm{expr} \\rangle )
+    \\mid (\\langle \\textrm{expr} \\rangle \\langle \\textrm{expr} \\rangle)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base"><span class="mopen">⟨</span><span class="mord text"><span class="mord mathrm">expr</span></span><span class="mclose">⟩</span><span class="mrel"><span class="mop" style="position:relative;top:-0.03472em;">:</span></span><span class="mrel"><span class="mord rule" style="margin-left:-0.049999999999999996em;"></span></span><span class="mrel"><span class="mop" style="position:relative;top:-0.03472em;">:</span></span><span class="mrel"><span class="mord rule" style="margin-left:-0.06666666666666667em;"></span></span><span class="mrel">=</span><span class="mord mathit">x</span><span class="mrel">∣</span><span class="mopen">(</span><span class="mord mathit">λ</span><span class="mord mathit">x</span><span class="mord mathrm">.</span><span class="mopen">⟨</span><span class="mord text"><span class="mord mathrm">expr</span></span><span class="mclose">⟩</span><span class="mclose">)</span><span class="mrel">∣</span><span class="mopen">(</span><span class="mopen">⟨</span><span class="mord text"><span class="mord mathrm">expr</span></span><span class="mclose">⟩</span><span class="mopen">⟨</span><span class="mord text"><span class="mord mathrm">expr</span></span><span class="mclose">⟩</span><span class="mclose">)</span></span></span></span></span></eqn></section><h2 data-line="18" class="code-line" id="todo">ToDo</h2>
+<ul>
+<li data-line="19" class="code-line">簡約のステップ数上限の入力欄</li>
+<li data-line="20" class="code-line">1ステップ<eq><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>β</mi></mrow><annotation encoding="application/x-tex">\\beta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.69444em;"></span><span class="strut bottom" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.05278em;">β</span></span></span></span></eq>-簡約の実装（今の実装は1ステップで止まらない）</li>
+<li data-line="21" class="code-line">括弧の補完</li>
+<li data-line="22" class="code-line">略記の対応</li>
+</ul>
+
+</body></html>

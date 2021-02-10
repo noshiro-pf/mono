@@ -1,0 +1,66 @@
+記号の定義
+<table class="margined-element">
+  <tr *ngFor="let symbol of defaultSymbols">
+    <!-- <td> <mat-icon aria-hidden="true">{{symbol.iconName}}</mat-icon> </td> -->
+    <td>
+      <mat-checkbox
+          [checked]="symbol.useThis"
+          (change)="symbolChecked( symbol.id, $event.checked )">
+        <mat-icon aria-hidden="true">{{symbol.iconName}}</mat-icon>
+      </mat-checkbox>
+    </td>
+    <td>：</td>
+    <td>
+      <mat-form-field>
+        <input matInput
+            [value]="symbol.description || ''"
+            (change)="symbolDescriptionChange( symbol.id, $event.target.value )">
+      </mat-form-field>
+    </td>
+    <td>
+      <mat-form-field class="input-number" matTooltip="集計時に使う値を設定して下さい">
+        <input matInput
+            type="number" min="0" max="10"
+            [value]="symbol.score || 0"
+            (change)="symbolScoreChange( symbol.id, $event.target.valueAsNumber )">
+        <span matSuffix>点</span>
+      </mat-form-field>
+    </td>
+  </tr>
+</table>
+
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      記号を追加
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <table class="margined-element">
+    <tr *ngFor="let symbol of optionalSymbols">
+      <td>
+        <mat-checkbox
+            [checked]="symbol.useThis"
+            (change)="symbolChecked( symbol.id, $event.checked )">
+          <mat-icon aria-hidden="true">{{symbol.iconName}}</mat-icon>
+        </mat-checkbox>
+      </td>
+      <td>：</td>
+      <td>
+        <mat-form-field>
+          <input matInput
+              [value]="symbol.description || ''"
+              (change)="symbolDescriptionChange( symbol.id, $event.target.value )">
+        </mat-form-field>
+      </td>
+      <td>
+        <mat-form-field class="input-number">
+          <input matInput
+              type="number" min="0" max="10"
+              [value]="symbol.score || 0"
+              (change)="symbolScoreChange( symbol.id, $event.target.valueAsNumber )">
+          <span matSuffix>点</span>
+        </mat-form-field>
+      </td>
+    </tr>
+  </table>
+</mat-expansion-panel>

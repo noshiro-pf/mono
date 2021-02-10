@@ -1,0 +1,58 @@
+<ng-container *ngIf="{
+    selectedPageIndex: selectedPageIndex$ | async,
+    rangeStart:        rangeStart$        | async,
+    rangeEnd:          rangeEnd$          | async,
+    dataSize:          dataSize$          | async,
+    pageLength:        pageLength$        | async,
+    pageIndice:        pageIndice$        | async
+  } as data">
+
+<ng-container *ngIf="!!data.pageIndice; then main; else loading"></ng-container>
+<ng-template #loading>Loading...</ng-template>
+<ng-template #main>
+  <div class='pagenation'>
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex(0)'
+        [disabled]='data.selectedPageIndex <= 0' >
+      <mat-icon>first_page</mat-icon>
+    </button>
+
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex( data.selectedPageIndex - 1 )'
+        [disabled]='data.selectedPageIndex <= 0' >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    <div *ngIf="data.pageLength <= 10; then thenBlock; else elseBlock" ></div>
+    <ng-template #thenBlock>
+      <mat-button-toggle-group #group="matButtonToggleGroup" >
+        <mat-button-toggle *ngFor='let pageIndex of data.pageIndice'
+            [value]="pageIndex"
+            [class.mat-button-toggle-normal]="data.selectedPageIndex !== pageIndex"
+            [class.mat-button-toggle-selected]="data.selectedPageIndex === pageIndex"
+            (click)="setSelectedPageIndex( pageIndex )" >
+          <span>{{pageIndex + 1}}</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </ng-template>
+    <ng-template #elseBlock>
+      <span class="range">
+        {{data.rangeStart}}-{{data.rangeEnd}} of {{data.dataSize}}
+      </span>
+    </ng-template>
+
+
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex( data.selectedPageIndex + 1 )'
+        [disabled]='data.selectedPageIndex >= data.pageLength - 1' >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex( data.pageLength - 1 )'
+        [disabled]='data.selectedPageIndex >= data.pageLength - 1' >
+      <mat-icon>last_page</mat-icon>
+    </button>
+  </div>
+</ng-template>
+</ng-container>

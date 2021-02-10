@@ -1,0 +1,48 @@
+<ng-container *ngIf="{
+    gameRoomList: gameRoomList$ | async,
+    myName:       myName$       | async,
+    inPlayGameId: inPlayGameId$ | async
+  } as data">
+
+<div class="body-with-padding" (click)="backgroundClicked()">
+  <div *ngIf="!!data.inPlayGameId"
+      class="return-to-game-button">
+    <button mat-raised-button (click)="returnToGame()">
+      プレイ中のゲームに復帰
+    </button>
+  </div>
+
+  <div *ngFor="let room of data.gameRoomList | reverse">
+    <mat-card class="roomListItem"
+        [class.notWaitingForPlayers]="!room.waitingForNewPlayers()"
+        (click)="roomClicked( $event, room.databaseKey )">
+
+      <mat-card-header>
+        <mat-icon mat-card-avatar>group</mat-icon>
+        <mat-card-title> {{room.name}} </mat-card-title>
+        <mat-card-subtitle>
+          {{room.playersNameList.join(", ")}}<br>
+          {{toYMDHMS(room.date)}}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content *ngIf="room.databaseKey === selectedRoomId">
+        {{(room.waitingForNewPlayers() ? '参加者募集中' : '対戦中')}}
+      </mat-card-content>
+
+      <mat-card-actions *ngIf="room.databaseKey === selectedRoomId">
+        <button mat-raised-button color="primary"
+              (click)="signIn( room, data.myName )"
+              [disabled]="!data.myName || !room.waitingForNewPlayers()" >
+          参加
+        </button>
+      </mat-card-actions>
+
+    </mat-card>
+  </div>
+<!--
+  <button mat-raised-button (click)="resetRooms( data.gameRoomList )">
+    Reset rooms
+  </button> -->
+</div>
+</ng-container>

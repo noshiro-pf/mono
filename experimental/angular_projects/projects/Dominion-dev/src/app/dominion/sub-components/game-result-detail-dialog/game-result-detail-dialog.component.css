@@ -1,0 +1,12 @@
+/*to put button in the middle of dialog*/
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+
+.player-result {
+  padding: 20px;
+  flex-basis: auto;
+}

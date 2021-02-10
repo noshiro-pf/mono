@@ -1,0 +1,25 @@
+.center {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+.reset-game-password {
+  margin-right: 20px;
+}
+
+.box {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.content {
+  padding: 10px;
+}
+
+.title-bar {
+  display: flex;
+}
+
+#devModeButton {
+  float: right;
+}

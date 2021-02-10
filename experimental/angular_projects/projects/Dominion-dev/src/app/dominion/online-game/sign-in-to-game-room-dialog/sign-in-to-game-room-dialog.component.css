@@ -1,0 +1,9 @@
+.action-buttons {
+  justify-content: center;
+}
+
+
+.center {
+  display: flex;
+  justify-content: center;
+}

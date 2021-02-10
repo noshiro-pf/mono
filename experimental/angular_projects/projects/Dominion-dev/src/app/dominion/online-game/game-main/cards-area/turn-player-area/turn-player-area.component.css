@@ -1,0 +1,31 @@
+.turn-player-area {
+  margin: 10px;
+}
+
+.CardArea {
+  background-color: #9BC694;
+  padding: 5px;
+  margin: 5px;
+}
+
+
+.PlayArea_Aside,
+.Deck_HandCards_DiscardPile {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.PlayArea {
+  flex: 2;
+}
+.Aside {
+  flex: 1;
+}
+
+.HandCards {
+  flex: 1;
+}
+
+.players-name {
+  padding: 5px;
+}

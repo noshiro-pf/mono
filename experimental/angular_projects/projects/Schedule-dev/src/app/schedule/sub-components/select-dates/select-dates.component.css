@@ -1,0 +1,6 @@
+.mini-button {
+  padding : 0;
+  min-width : 0;
+  width: 35px;
+  color: rgba(0,0,0,.54);
+}

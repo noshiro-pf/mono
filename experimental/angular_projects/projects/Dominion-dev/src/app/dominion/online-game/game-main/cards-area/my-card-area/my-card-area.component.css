@@ -1,0 +1,85 @@
+
+.body {
+  padding: 5px;
+}
+
+
+
+.my-tokens {
+  width: 100%;
+  padding: 5px;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.my-tokens .vcoins-debts {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-grow: 0;
+}
+.vcoins-debts:not(.is-my-turn) {
+  background-color: #f1f1f1;
+}
+.vcoins-debts.is-my-turn {
+  background-color: #f3ebaa;
+}
+
+.vcoins,.debts {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 3px;
+}
+.vcoin,.debt {
+  padding: 2px;
+}
+
+.my-tokens .VP-tokens {
+  padding: 2px;
+  flex-grow: 0;
+}
+.tokens .VP-tokens {
+  flex-grow: 0;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+}
+.my-tokens .VP-tokens .VPtoken-value {
+  padding-left: 3px;
+}
+
+
+.card-area {
+  padding: 5px;
+  margin: 5px;
+}
+.card-area:not(.is-my-turn) {
+  background-color: #f1f1f1; /* #9BC694; */
+}
+.card-area.is-my-turn {
+  background-color: #f3ebaa; /* #9BC694; */
+}
+
+.PlayArea_Aside,
+.Deck_HandCards_DiscardPile {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.PlayArea {
+  flex: 2;
+}
+.Aside {
+  flex: 1;
+}
+
+.HandCards {
+  flex: 1;
+}

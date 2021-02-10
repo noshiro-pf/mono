@@ -1,0 +1,19 @@
+.dateIsPerfect {
+  background-color: #AEDD03;
+}
+
+.dateIsGood {
+  background-color: #D8FF62;
+}
+
+.small-font {
+  font-size: xx-small;
+}
+
+.mini-button {
+  padding : 0 10px;
+  min-width : 0;
+  max-width: 80px;
+  overflow: hidden;
+  color: rgba(0,0,0,.54);
+}

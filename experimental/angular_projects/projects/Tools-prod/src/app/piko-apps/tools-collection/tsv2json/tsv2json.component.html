@@ -1,0 +1,42 @@
+<div class="body-with-padding">
+
+  <mat-form-field>
+    <mat-select placeholder="区切り文字を選択"
+        [value]="separator$ | async" (change)="changeSeparator( $event.value )">
+      <mat-option *ngFor="let char of separators" [value]="char.value">
+        {{ char.viewValue }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="tsv-header-area">
+    <textarea matInput (input)="tsvHeaderOnInput( $event.target.value )"
+      matTextareaAutosize matAutosizeMinRows="2" matAutosizeMaxRows="3"
+      placeholder="input TSV header" ></textarea>
+  </mat-form-field>
+  <mat-form-field class="tsv-area">
+    <textarea matInput (input)="tsvOnInput( $event.target.value )"
+      matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="20"
+      placeholder="input TSV" ></textarea>
+  </mat-form-field>
+
+  <div class="margined-element">
+    <table class='data-table  shadow3px'>
+      <thead>
+        <tr> <th *ngFor="let name of tableHeader$ | async">{{name}}</th> </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let line of table$ | async">
+          <td *ngFor="let element of line">{{element}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <mat-form-field class="json-area">
+    <textarea matInput [value]="jsonText$ | async"
+      matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="20"
+      placeholder="output JSON" ></textarea>
+  </mat-form-field>
+
+</div>

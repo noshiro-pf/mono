@@ -1,0 +1,64 @@
+.player-area {
+  margin: 10px;
+  background-color: #C6BF94;
+  /* min-width: 360px; */
+}
+
+.is-turn-player {
+  background-color: #EF9448;
+}
+
+
+
+.tokens {
+  width: 100%;
+  padding: 5px;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.tokens .vcoins-debts {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-grow: 0;
+}
+.vcoins-debts {
+  background-color: #9BC694;
+}
+
+
+
+
+.CardArea {
+  background-color: #9BC694;
+  padding: 5px;
+  margin: 5px;
+}
+
+.PlayArea_Aside,
+.Deck_HandCards_DiscardPile {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.PlayArea {
+  flex: 2;
+}
+.Aside {
+  flex: 1;
+}
+.HandCards {
+  flex: 1;
+}
+
+
+.players-name {
+  padding: 5px;
+  display: inline-flex;
+  vertical-align: middle;
+  width: 100%;
+}

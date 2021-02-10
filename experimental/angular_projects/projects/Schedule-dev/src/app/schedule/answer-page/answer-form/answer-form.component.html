@@ -1,0 +1,91 @@
+<ng-container *ngIf="{
+    userName         : userName$         | async,
+    comment          : comment$          | async,
+    scEvent          : scEvent$          | async,
+    dateToSymbolId   : dateToSymbolId$   | async,
+    answerId         : answerId$         | async,
+    allDatesSelected : allDatesSelected$ | async
+  } as data">
+
+  <div class="margined-element">
+    <mat-form-field>
+      <input matInput placeholder="表示名"
+          [value]="data.userName || ''"
+          (input)="userNameOnChange( $event.target.value )"
+          (change)="userNameOnChange( $event.target.value )"
+          required>
+    </mat-form-field>
+  </div>
+
+  <table *ngIf="data.scEvent"
+      class="data-table  shadow3px  vertical-line">
+    <thead>
+      <tr>
+        <th>日程</th>
+        <ng-container *ngFor="let symbol of data.scEvent.symbols">
+          <th *ngIf="symbol.useThis">
+            <button mat-icon-button [value]="symbol.id"
+                [matTooltip]="symbol.description"
+                (click)="symbolHeaderSelected( symbol.id )">
+              <mat-icon aria-hidden="true">
+                {{symbol.iconName}}
+              </mat-icon>
+            </button>
+          </th>
+        </ng-container>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let datetime of data.scEvent.selectedDatetimes">
+        <th>
+          {{toYMD( datetime )}}
+          ({{getDayStringEng( datetime )}})
+          {{toHM( datetime )}}
+        </th>
+        <ng-container *ngFor="let symbol of data.scEvent.symbols">
+          <td *ngIf="symbol.useThis">
+            <button mat-icon-button [value]="symbol.id"
+                [matTooltip]="symbol.description"
+                (click)="symbolSelected( datetime, symbol.id )">
+              <mat-icon aria-hidden="true"
+                  class="symbol-toggle-button"
+                  [class.selected]="symbol.id === data.dateToSymbolId[ datetime ]"
+                  [matTooltip]="symbol.description">
+                {{symbol.iconName}}
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="margined-element">
+    <mat-form-field>
+      <textarea  matInput placeholder="コメント"
+          [value]="data.comment || ''"
+          (input)="commentOnChange( $event.target.value )" >
+      </textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="margined-element">
+    <span class="margined-element">
+      <button mat-raised-button (click)="resetForm()"> リセット </button>
+    </span>
+    <span class="margined-element">
+      <button mat-raised-button color="primary"
+          [disabled]="!data.allDatesSelected || !data.userName"
+          (click)="submitAnswer()">
+        {{data.answerId ? '更新' : '登録' }}
+      </button>
+    </span>
+    <span class="margined-element">
+      <button mat-raised-button color="warn"
+          *ngIf="!!data.answerId"
+          (click)="deleteAnswer()">
+        登録を削除
+      </button>
+    </span>
+  </div>
+</ng-container>

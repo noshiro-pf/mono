@@ -1,0 +1,18 @@
+<app-waiting-spinner [waiting]="!apps"></app-waiting-spinner>
+
+<ng-container *ngIf="!!appName && !!apps">
+  <mat-toolbar color="primary">
+    <span>{{appName}}</span>
+  </mat-toolbar>
+</ng-container>
+
+<div *ngFor="let app of apps">
+  <mat-card class="appElement"
+      [class.inService]="app.inService"
+      [class.notInService]="!(app.inService)"
+      [routerLink]="( app.inService ? app.routerLink : '' )">
+    <mat-card-title>{{app.title}}</mat-card-title>
+    <mat-card-subtitle>{{app.subtitle}}</mat-card-subtitle>
+    <mat-card-content>{{app.description}}</mat-card-content>
+  </mat-card>
+</div>
