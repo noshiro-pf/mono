@@ -15,7 +15,7 @@ class MapObservableClass<A, B>
     super({
       parents: [parent],
       type: 'map',
-      currentValueInit: Option.none,
+      currentValueInit: Option.map(mapFn)(parent.currentValue),
     });
     this._mapFn = mapFn;
   }

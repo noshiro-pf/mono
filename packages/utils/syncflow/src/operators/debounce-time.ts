@@ -21,8 +21,9 @@ class DebounceTimeObservableClass<A>
     super({
       parents: [parent],
       type: 'debounceTime',
-      currentValueInit: Option.none,
+      currentValueInit: parent.currentValue,
     });
+    this._timerId = undefined;
     this._millisec = millisec;
   }
 

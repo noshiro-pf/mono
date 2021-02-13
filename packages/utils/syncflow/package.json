@@ -1,13 +1,19 @@
 {
   "name": "@noshiro/syncflow",
-  "version": "1.0.0",
+  "version": "1.0.6",
+  "private": false,
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
-  "main": "cjs/index.js",
+  "main": "cjs/src/index.js",
   "module": "esm/index.js",
-  "types": "cjs/index.d.ts",
+  "types": "cjs/src/index.d.ts",
+  "files": [
+    "package.json",
+    "cjs",
+    "esm"
+  ],
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
@@ -24,7 +30,7 @@
     "gi": "run-s gi:*",
     "gi:src": "yarn _script_genindex ./src",
     "gi:test": "yarn _script_genindex ./test/cases",
-    "lint": "eslint src/ --ext .ts",
+    "lint": "eslint \"./{src,test}/**/*\" --ext .ts",
     "setup": "echo 'no setup script'",
     "start": "node cjs/test/preview-main.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
@@ -35,5 +41,9 @@
   },
   "dependencies": {
     "@noshiro/ts-utils": "*"
+  },
+  "peerDependencies": {
+    "tslib": "2.1.0",
+    "typescript": "^4.1.3"
   }
 }

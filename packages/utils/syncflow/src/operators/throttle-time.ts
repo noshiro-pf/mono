@@ -16,14 +16,16 @@ class ThrottleTimeObservableClass<A>
   implements ThrottleTimeOperatorObservable<A> {
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
-  private _isSkipping: boolean = false;
+  private _isSkipping: boolean;
 
   constructor(parent: Observable<A>, millisec: number) {
     super({
       parents: [parent],
       type: 'throttleTime',
-      currentValueInit: Option.none,
+      currentValueInit: parent.currentValue,
     });
+    this._timerId = undefined;
+    this._isSkipping = false;
     this._millisec = millisec;
   }
 

@@ -8,8 +8,8 @@ import {
   mapWithIndex,
   Observable,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 /*
   counter   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20
@@ -29,7 +29,7 @@ const createStreams = (
   debouncedWithIndex$: Observable<[number, number]>;
   combined$: Observable<[number, number]>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const filtered$ = counter$.chain(filter((n) => n % 10 < 5));
   const debounced$ = filtered$.chain(debounceTime(tick * 3));

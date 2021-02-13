@@ -18,7 +18,7 @@ class TakeUntilObservableClass<A>
     super({
       parents: [parent],
       type: 'takeUntil',
-      currentValueInit: Option.none,
+      currentValueInit: parent.currentValue,
     });
 
     notifier.subscribe(

@@ -9,14 +9,15 @@ class TakeObservableClass<A>
   extends SyncChildObservableClass<A, 'take', [A]>
   implements TakeOperatorObservable<A> {
   private readonly _n: number;
-  private _counter: number = 0;
+  private _counter: number;
 
   constructor(parent: Observable<A>, n: number) {
     super({
       parents: [parent],
       type: 'take',
-      currentValueInit: Option.none,
+      currentValueInit: n === 0 ? Option.none : parent.currentValue,
     });
+    this._counter = 0;
     this._n = n;
   }
 

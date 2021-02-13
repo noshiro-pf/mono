@@ -1,6 +1,6 @@
 import { interval, IntervalObservable, Observable, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 const createStreams = (
   tick: number
@@ -8,7 +8,7 @@ const createStreams = (
   counter$: IntervalObservable;
   take5$: Observable<number>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
 
   const take5$ = counter$.chain(take(5));
 
@@ -22,11 +22,11 @@ export const takeTestCases: [StreamTestCase<number>] = [
   {
     name: 'take case 1',
     expectedOutput: [0, 1, 2, 3, 4],
-    run: (take: number, tick: number): Promise<number[]> => {
+    run: (takeNum: number, tick: number): Promise<number[]> => {
       const { counter$, take5$ } = createStreams(tick);
       return getStreamOutputAsPromise(
         take5$,
-        take,
+        takeNum,
         () => {
           counter$.start();
         },

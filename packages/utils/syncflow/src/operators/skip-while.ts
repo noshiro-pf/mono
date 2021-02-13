@@ -21,7 +21,11 @@ class SkipWhileObservableClass<A>
     super({
       parents: [parent],
       type: 'skipWhile',
-      currentValueInit: Option.none,
+      currentValueInit: Option.isNone(parent.currentValue)
+        ? Option.none
+        : predicate(parent.currentValue.value)
+        ? Option.none
+        : parent.currentValue,
     });
     this._predicate = predicate;
   }

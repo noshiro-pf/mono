@@ -25,10 +25,13 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   private readonly _queues: TupleToQueueTuple<A>;
 
   constructor(parents: Wrap<A>) {
+    const parentsValues = parents.map((p) => p.currentValue);
     super({
       parents,
       type: 'zip',
-      currentValueInit: Option.none,
+      currentValueInit: parentsValues.every(Option.isSome)
+        ? Option.some(parentsValues.map((c) => c.value) as A)
+        : Option.none,
     });
 
     this._queues = (parents.map(

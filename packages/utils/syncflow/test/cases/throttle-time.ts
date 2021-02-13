@@ -6,8 +6,8 @@ import {
   Observable,
   throttleTime,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 /*
   counter      0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23
@@ -23,9 +23,9 @@ const createStreams = (
   merged$: Observable<number>;
 } => {
   const emitValues = [1, 2, 3, 7, 9, 10, 12, 13, 16, 17, 18, 19, 20];
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick * 2, true);
   const filtered$ = counter$.chain(filter((n) => emitValues.includes(n)));
-  const throttleTime$ = filtered$.chain(throttleTime(tick * 2.5));
+  const throttleTime$ = filtered$.chain(throttleTime(tick * 5));
   const merged$ = merge(filtered$, throttleTime$);
   return {
     counter$,

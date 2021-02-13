@@ -6,8 +6,8 @@ import {
   merge,
   Observable,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 /*
   counter   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23
@@ -23,9 +23,9 @@ const createStreams = (
   merged$: Observable<number>;
 } => {
   const emitValues = [1, 3, 4, 10, 13, 16, 17, 18, 19, 20];
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick * 2, true);
   const filtered$ = counter$.chain(filter((n) => emitValues.includes(n)));
-  const auditTime$ = filtered$.chain(auditTime(tick * 2.5));
+  const auditTime$ = filtered$.chain(auditTime(tick * 5));
   const merged$ = merge(filtered$, auditTime$);
   return {
     counter$,

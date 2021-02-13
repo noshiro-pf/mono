@@ -1,4 +1,4 @@
-import { ArrayElement, Result } from '@noshiro/ts-utils';
+import { ArrayElement, Option, Result } from '@noshiro/ts-utils';
 import {
   AsyncChildObservable,
   RootObservable,
@@ -56,6 +56,61 @@ export type MapWithIndexOperatorObservable<A, B> = SyncChildObservable<
   'mapWithIndex',
   [A]
 >;
+export type MapToOperatorObservable<A, B> = SyncChildObservable<
+  B,
+  'mapTo',
+  [A]
+>;
+export type PluckOperatorObservable<A, K extends keyof A> = SyncChildObservable<
+  A[K],
+  'pluck',
+  [A]
+>;
+export type UnwrapOptionOperatorObservable<A> = SyncChildObservable<
+  A | undefined,
+  'unwrapOption',
+  [Option<A>]
+>;
+export type UnwrapResultOkOperatorObservable<S, E> = SyncChildObservable<
+  S | undefined,
+  'unwrapResultOk',
+  [Result<S, E>]
+>;
+export type UnwrapResultErrOperatorObservable<S, E> = SyncChildObservable<
+  E | undefined,
+  'unwrapResultErr',
+  [Result<S, E>]
+>;
+export type MapOptionOperatorObservable<A, B> = SyncChildObservable<
+  Option<B>,
+  'mapOption',
+  [Option<A>]
+>;
+export type MapResultOkOperatorObservable<S, S2, E> = SyncChildObservable<
+  Result<S2, E>,
+  'mapResultOk',
+  [Result<S, E>]
+>;
+export type MapResultErrOperatorObservable<S, E, E2> = SyncChildObservable<
+  Result<S, E2>,
+  'mapResultErr',
+  [Result<S, E>]
+>;
+export type WithIndexOperatorObservable<A> = SyncChildObservable<
+  [number, A],
+  'withIndex',
+  [A]
+>;
+export type WithInitialValueOperatorObservable<A, I = A> = SyncChildObservable<
+  A | I,
+  'withInitialValue',
+  [A]
+>;
+export type PairwiseOperatorObservable<A> = SyncChildObservable<
+  [A, A],
+  'pairwise',
+  [A]
+>;
 
 export type TakeOperatorObservable<A> = SyncChildObservable<A, 'take', [A]>;
 export type TakeWhileOperatorObservable<A> = SyncChildObservable<
@@ -79,9 +134,19 @@ export type SkipUntilOperatorObservable<A> = SyncChildObservable<
   'skipUntil',
   [A]
 >;
+export type WithLatestOperatorObservable<A, B> = SyncChildObservable<
+  [A, B],
+  'withLatest',
+  [A]
+>;
 
 export type ScanOperatorObservable<A, B> = SyncChildObservable<B, 'scan', [A]>;
 export type FilterOperatorObservable<A> = SyncChildObservable<A, 'filter', [A]>;
+export type DistinctUntilChangedOperatorObservable<A> = SyncChildObservable<
+  A,
+  'distinctUntilChanged',
+  [A]
+>;
 export type ThrottleTimeOperatorObservable<A> = SyncChildObservable<
   A,
   'throttleTime',

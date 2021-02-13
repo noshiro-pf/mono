@@ -30,7 +30,6 @@ export type ObservableBase<A> = Readonly<{
   // reactive dependency tree structure
   depth: number;
   addChild: <B>(child: ChildObservable<B>) => void;
-  addDescendantId: <B>(child: ChildObservable<B>) => void;
 
   // state
   currentValue: Option<A>;
@@ -65,6 +64,7 @@ export type AsyncChildObservable<
     kind: 'async child';
     type: Type;
     parents: Wrap<P>;
+    addDescendant: <B>(child: ChildObservable<B>) => void;
   }>;
 
 export type ChildObservable<
@@ -82,6 +82,7 @@ export type RootObservable<
     kind: 'root';
     type: Type;
     depth: 0;
+    addDescendant: <B>(child: ChildObservable<B>) => void;
   }>;
 
 export type Observable<A> =

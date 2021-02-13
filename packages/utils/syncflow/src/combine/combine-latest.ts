@@ -13,14 +13,19 @@ export const combineLatest = <A extends NonEmptyUnknownList>(
   ...parents: Wrap<A>
 ): CombineLatestObservable<A> => new CombineLatestObservableClass(parents);
 
+export const combine = combineLatest; // alias
+
 class CombineLatestObservableClass<A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, 'combineLatest', A>
   implements CombineLatestObservable<A> {
   constructor(parents: Wrap<A>) {
+    const parentsValues = parents.map((p) => p.currentValue);
     super({
       parents,
       type: 'combineLatest',
-      currentValueInit: Option.none,
+      currentValueInit: parentsValues.every(Option.isSome)
+        ? Option.some(parentsValues.map((c) => c.value) as A)
+        : Option.none,
     });
   }
 

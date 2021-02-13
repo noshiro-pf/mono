@@ -13,5 +13,6 @@
       "tsconfig": "<rootDir>/config/tsconfig.test.json"
     }
   },
-  "testMatch": ["<rootDir>/(test|src)/**/?(*.)+(spec|test).ts"]
+  "testMatch": ["<rootDir>/(test|src)/**/?(*.)+(spec|test).ts"],
+  "testTimeout": 10000
 }

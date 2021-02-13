@@ -17,8 +17,8 @@ class SwitchMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'switchMap', [A]>
   implements SwitchMapOperatorObservable<A, B> {
   private readonly _mapToObservable: (curr: A) => Observable<B>;
-  private _observable: Observable<B> | undefined = undefined;
-  private _subscription: Subscription | undefined = undefined;
+  private _observable: Observable<B> | undefined;
+  private _subscription: Subscription | undefined;
 
   constructor(
     parent: Observable<A>,
@@ -29,6 +29,8 @@ class SwitchMapObservableClass<A, B>
       type: 'switchMap',
       currentValueInit: Option.none,
     });
+    this._observable = undefined;
+    this._subscription = undefined;
     this._mapToObservable = mapToObservable;
   }
 

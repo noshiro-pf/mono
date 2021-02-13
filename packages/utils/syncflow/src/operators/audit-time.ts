@@ -16,14 +16,16 @@ class AuditTimeObservableClass<A>
   implements AuditTimeOperatorObservable<A> {
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
-  private _isSkipping: boolean = false;
+  private _isSkipping: boolean;
 
   constructor(parent: Observable<A>, millisec: number) {
     super({
       parents: [parent],
       type: 'auditTime',
-      currentValueInit: Option.none,
+      currentValueInit: parent.currentValue,
     });
+    this._isSkipping = false;
+    this._timerId = undefined;
     this._millisec = millisec;
   }
 

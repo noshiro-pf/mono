@@ -1,6 +1,6 @@
 import { interval, IntervalObservable, map, Observable } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 const createStreams = (
   tick: number
@@ -10,7 +10,7 @@ const createStreams = (
   quad1$: Observable<number>;
   quad2$: Observable<number>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
 
   const double$ = counter$.chain(map((x) => x * 2));
   const quad1$ = double$.chain(map((x) => x * 2));
