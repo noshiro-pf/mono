@@ -6,8 +6,8 @@ import {
   map,
   Observable,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 /*
  *  [      counter      ]
@@ -31,7 +31,7 @@ const createStreams = (
   squareEven$: Observable<number>;
   combined$: Observable<[number, number, number, number, number]>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
 
   const double$ = counter$.chain(map((x) => x * 2));
   const quad$ = counter$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
@@ -55,8 +55,29 @@ const createStreams = (
   };
 };
 
+const createStreams2 = (
+  tick: number
+): {
+  counter$: IntervalObservable;
+  multiplied$: Observable<number>;
+  sum$: Observable<number>;
+} => {
+  const counter$ = interval(tick, true);
+  const multiplied$ = counter$.chain(map((x) => 1000 * x));
+  const sum$ = combineLatest(counter$, multiplied$).chain(
+    map(([a, b]) => a + b)
+  );
+
+  return {
+    counter$,
+    multiplied$,
+    sum$,
+  };
+};
+
 export const combineLatestTestCases: [
-  StreamTestCase<[number, number, number, number, number]>
+  StreamTestCase<[number, number, number, number, number]>,
+  StreamTestCase<number>
 ] = [
   {
     name: 'combineLatest case 1',
@@ -115,6 +136,32 @@ export const combineLatestTestCases: [
       });
       combined$.subscribe((a) => {
         console.log('combined', a);
+      });
+
+      counter$.start();
+    },
+  },
+  {
+    name: 'combineLatest case 2',
+    expectedOutput: [0, 1001, 2002, 3003, 4004],
+    run: (take: number, tick: number): Promise<number[]> => {
+      const { counter$, sum$ } = createStreams2(tick);
+      return getStreamOutputAsPromise(
+        sum$,
+        take,
+        () => {
+          counter$.start();
+        },
+        () => {
+          counter$.complete();
+        }
+      );
+    },
+    preview: (tick: number): void => {
+      const { counter$, sum$ } = createStreams2(tick);
+
+      sum$.subscribe((a) => {
+        console.log('sum', a);
       });
 
       counter$.start();

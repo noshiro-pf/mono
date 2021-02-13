@@ -1,13 +1,13 @@
 import { timer } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 export const timerTestCases: [StreamTestCase<number>] = [
   {
     name: 'timer case 1',
     expectedOutput: [0],
     run: (take: number, tick: number): Promise<number[]> => {
-      const source$ = timer(tick, false);
+      const source$ = timer(tick, true);
       return getStreamOutputAsPromise(
         source$,
         take,
@@ -20,10 +20,11 @@ export const timerTestCases: [StreamTestCase<number>] = [
       );
     },
     preview: (tick: number): void => {
-      const source$ = timer(tick, false);
+      const source$ = timer(tick, true);
       source$.subscribe((a) => {
         console.log('timer', a);
       });
+      source$.start();
     },
   },
 ];

@@ -4,24 +4,32 @@ import { TimerObservable } from '../types';
 
 export const timer = (
   millisec: number,
-  startRightNow: boolean = true
-): TimerObservable => new TimerObservableClass(millisec, startRightNow);
+  startManually: boolean = false
+): TimerObservable => new TimerObservableClass(millisec, startManually);
 
 class TimerObservableClass
   extends RootObservableClass<number, 'Timer'>
   implements TimerObservable {
   private readonly _millisec: number;
-  private _timerId: TimerId | undefined = undefined;
+  private _timerId: TimerId | undefined;
+  private _isStarted: boolean;
 
-  constructor(millisec: number, startRightNow: boolean) {
+  constructor(millisec: number, startManually: boolean) {
     super({ type: 'Timer', currentValueInit: Option.none });
     this._millisec = millisec;
-    if (startRightNow) {
+    this._timerId = undefined;
+    this._isStarted = false;
+    if (!startManually) {
       this.start();
     }
   }
 
   start(): this {
+    if (this._isStarted) {
+      console.warn('cannot start twice');
+      return this;
+    }
+    this._isStarted = true;
     if (this.isCompleted) return this;
     this._timerId = setTimeout(() => {
       this.startUpdate(0);

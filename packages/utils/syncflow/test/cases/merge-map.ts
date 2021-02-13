@@ -7,17 +7,18 @@ import {
   mergeMap,
   Observable,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 /*
   counter         0                    1                    2                    3                    4
-  sub counter 1   0     0     0     0     0     0
-  sub counter 2                        0     1     2     3     4     5
-  sub counter 3                                             0     2     4     6     8     10
-  sub counter 4                                                                  0     3     6     9     12    15
-  sub counter 4                                                                                       0     4     8     ...
-  mergeMap        0     0     0     0  0  0  1  0  2     3  0  4  2  5  4     6  0  8  3  10 6     9     12 4  15 8
+  sub counter 1   *     0     0     0     0     0
+  sub counter 2                        *     0     1     2     3     4
+  sub counter 3                                             *     0     2     4     6     8
+  sub counter 4                                                                  *     0     3     6     9     12
+  sub counter 4                                                                                       *     0     4     8     ...
+  i                     0     0     0     0  1  0  1     1     1  2  1  2     2     2  3  2  3     3     3  4  3  4     4
+  mergeMap              0     0     0     0  0  0  1     2     3  0  4  2     4     6  0  8  3     6     9  0  12 4     8
 */
 
 const createStreams = (
@@ -26,12 +27,12 @@ const createStreams = (
   counter$: IntervalObservable;
   mergeMap$: Observable<[number, number]>;
 } => {
-  const counter$ = interval(tick * 3.5, false);
+  const counter$ = interval(tick * 7, true);
 
   const mergeMap$ = counter$.chain(
     mergeMap((i) =>
-      interval(tick)
-        .chain(filter((i) => i <= 5))
+      interval(tick * 2)
+        .chain(filter((j) => j < 5))
         .chain(map((x) => tuple(i, x * i)))
     )
   );
@@ -50,27 +51,22 @@ export const mergeMapTestCases: [StreamTestCase<[number, number]>] = [
       [1, 0],
       [0, 0],
       [1, 1],
-      [0, 0],
       [1, 2],
       [1, 3],
       [2, 0],
       [1, 4],
       [2, 2],
-      [1, 5],
       [2, 4],
       [2, 6],
       [3, 0],
       [2, 8],
       [3, 3],
-      [2, 10],
       [3, 6],
       [3, 9],
       [4, 0],
       [3, 12],
       [4, 4],
-      [3, 15],
       [4, 8],
-      [4, 12],
     ],
     run: (take: number, tick: number): Promise<[number, number][]> => {
       const { counter$, mergeMap$ } = createStreams(tick);

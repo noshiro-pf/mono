@@ -7,8 +7,6 @@ import {
   Token,
 } from '../types';
 
-// filter<S extends T>(predicate: (value: T, index: number, array: T[]) => value is S, thisArg?: any): S[];
-
 export function filter<A, B extends A>(
   predicate: (value: A) => value is B
 ): Operator<A, B>;
@@ -27,7 +25,11 @@ class FilterObservableClass<A>
     super({
       parents: [parent],
       type: 'filter',
-      currentValueInit: Option.none,
+      currentValueInit: Option.isNone(parent.currentValue)
+        ? Option.none
+        : predicate(parent.currentValue.value)
+        ? parent.currentValue
+        : Option.none,
     });
     this._predicate = predicate;
   }

@@ -25,7 +25,7 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
     super({
       parents,
       type: 'merge',
-      currentValueInit: Option.none,
+      currentValueInit: parents[0].currentValue as Option<ArrayElement<P>>,
     });
   }
 

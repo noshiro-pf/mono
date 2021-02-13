@@ -1,6 +1,6 @@
 import { interval, IntervalObservable, Observable, skipWhile } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 const createStreams = (
   tick: number
@@ -8,7 +8,7 @@ const createStreams = (
   counter$: IntervalObservable;
   skip5$: Observable<number>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
 
   const skip5$ = counter$.chain(skipWhile((i) => i < 5));
 

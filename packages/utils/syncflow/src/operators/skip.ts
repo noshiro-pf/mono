@@ -9,14 +9,15 @@ class SkipObservableClass<A>
   extends SyncChildObservableClass<A, 'skip', [A]>
   implements SkipOperatorObservable<A> {
   private readonly _n: number;
-  private _counter: number = 0;
+  private _counter: number;
 
   constructor(parent: Observable<A>, n: number) {
     super({
       parents: [parent],
       type: 'skip',
-      currentValueInit: Option.none,
+      currentValueInit: n === 0 ? parent.currentValue : Option.none,
     });
+    this._counter = 0;
     this._n = n;
   }
 

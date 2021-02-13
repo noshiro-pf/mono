@@ -5,8 +5,8 @@ import {
   mapWithIndex,
   Observable,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 const createStreams = (
   tick: number
@@ -14,7 +14,7 @@ const createStreams = (
   counter$: IntervalObservable;
   doubleWithIndex$: Observable<[number, number]>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
 
   const doubleWithIndex$ = counter$.chain(
     mapWithIndex((x, i) => tuple(i, x * 2))

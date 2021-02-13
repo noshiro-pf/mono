@@ -19,8 +19,8 @@ class MergeMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'mergeMap', [A]>
   implements MergeMapOperatorObservable<A, B> {
   private readonly _mapToObservable: (curr: A) => Observable<B>;
-  private readonly _observables: Observable<B>[] = [];
-  private readonly _subscriptions: Subscription[] = [];
+  private readonly _observables: Observable<B>[];
+  private readonly _subscriptions: Subscription[];
 
   constructor(
     parent: Observable<A>,
@@ -32,6 +32,8 @@ class MergeMapObservableClass<A, B>
       currentValueInit: Option.none,
     });
     this._mapToObservable = mapToObservable;
+    this._observables = [];
+    this._subscriptions = [];
   }
 
   tryUpdate(token: Token): void {

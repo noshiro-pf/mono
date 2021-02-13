@@ -5,8 +5,8 @@ import {
   Observable,
   zip,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 /*
   counter   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23
@@ -22,7 +22,7 @@ const createStreams = (
   multiplesOf3$: Observable<number>;
   zipped$: Observable<[number, number]>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const multiplesOf3$ = counter$.chain(filter((n) => n % 3 === 0));
 
@@ -38,7 +38,7 @@ const createStreams = (
 
 export const zipTestCases: [StreamTestCase<[number, number]>] = [
   {
-    name: 'merge case 1',
+    name: 'zip case 1',
     expectedOutput: [
       [0, 0],
       [2, 3],

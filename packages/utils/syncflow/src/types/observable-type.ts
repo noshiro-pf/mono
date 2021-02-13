@@ -1,32 +1,45 @@
 export type RootObservableType =
-  | 'Source'
   | 'FromArray'
   | 'FromPromise'
   | 'FromSubscribable'
   | 'Interval'
+  | 'Source'
   | 'Timer';
 
 export type SyncChildObservableType =
   | 'combineLatest'
-  | 'merge'
-  | 'zip'
-  | 'map'
-  | 'mapWithIndex'
-  | 'take'
-  | 'skip'
-  | 'takeWhile'
-  | 'skipWhile'
-  | 'takeUntil'
-  | 'skipUntil'
-  | 'scan'
+  | 'distinctUntilChanged'
   | 'filter'
-  | 'throttleTime';
+  | 'map'
+  | 'mapOption'
+  | 'mapResultErr'
+  | 'mapResultOk'
+  | 'mapTo'
+  | 'mapWithIndex'
+  | 'merge'
+  | 'pairwise'
+  | 'pluck'
+  | 'scan'
+  | 'skip'
+  | 'skipUntil'
+  | 'skipWhile'
+  | 'take'
+  | 'takeUntil'
+  | 'takeWhile'
+  | 'throttleTime'
+  | 'unwrapOption'
+  | 'unwrapResultErr'
+  | 'unwrapResultOk'
+  | 'withIndex'
+  | 'withInitialValue'
+  | 'withLatest'
+  | 'zip';
 
 export type AsyncChildObservableType =
   | 'auditTime'
   | 'debounceTime'
-  | 'switchMap'
-  | 'mergeMap';
+  | 'mergeMap'
+  | 'switchMap';
 
 export type ChildObservableType =
   | SyncChildObservableType

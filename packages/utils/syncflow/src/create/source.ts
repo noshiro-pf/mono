@@ -2,8 +2,10 @@ import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import { SourceObservable } from '../types';
 
-export const source = <A>(): SourceObservable<A> =>
+export const subject = <A>(): SourceObservable<A> =>
   new SourceObservableClass<A>();
+
+export const source = subject; // alias
 
 class SourceObservableClass<A>
   extends RootObservableClass<A, 'Source'>

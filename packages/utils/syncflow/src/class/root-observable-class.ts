@@ -1,5 +1,9 @@
-import { Option } from '@noshiro/ts-utils';
-import { ChildObservable, RootObservable, RootObservableType } from '../types';
+import {
+  ChildObservable,
+  ObservableId,
+  RootObservable,
+  RootObservableType,
+} from '../types';
 import { binarySearch, issueToken } from '../utils';
 import { ObservableBaseClass } from './observable-base-class';
 
@@ -7,26 +11,29 @@ export class RootObservableClass<A, Type extends RootObservableType>
   extends ObservableBaseClass<A, 'root', 0>
   implements RootObservable<A, Type> {
   readonly type;
-  private readonly _procedure: ChildObservable<unknown>[] = [];
+  private readonly _procedure: ChildObservable<unknown>[];
+  protected readonly _descendantsIdSet: Set<ObservableId>;
 
   constructor({
     type,
     currentValueInit,
   }: {
     type: Type;
-    currentValueInit?: RootObservable<A, Type>['currentValue'];
+    currentValueInit: RootObservable<A, Type>['currentValue'];
   }) {
     super({
       kind: 'root',
       type,
       depth: 0,
-      currentValueInit: currentValueInit ?? Option.none,
+      currentValueInit,
     });
     this.type = type;
+    this._procedure = [];
+    this._descendantsIdSet = new Set<ObservableId>();
   }
 
   // overload
-  addDescendantId<B>(child: ChildObservable<B>): void {
+  addDescendant<B>(child: ChildObservable<B>): void {
     if (this._descendantsIdSet.has(child.id)) return;
     this._descendantsIdSet.add(child.id);
 

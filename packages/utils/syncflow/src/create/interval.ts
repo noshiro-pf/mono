@@ -4,32 +4,38 @@ import { IntervalObservable } from '../types';
 
 export const interval = (
   millisec: number,
-  startRightNow: boolean = true
-): IntervalObservable => new IntervalObservableClass(millisec, startRightNow);
+  startManually: boolean = false
+): IntervalObservable => new IntervalObservableClass(millisec, startManually);
 
 class IntervalObservableClass
   extends RootObservableClass<number, 'Interval'>
   implements IntervalObservable {
   private readonly _millisec: number;
-  private _counter: number = 0;
-  private _timerId: TimerId | undefined = undefined;
+  private _counter: number;
+  private _timerId: TimerId | undefined;
+  private _isStarted: boolean;
 
-  constructor(millisec: number, startRightNow: boolean) {
+  constructor(millisec: number, startManually: boolean) {
     super({ type: 'Interval', currentValueInit: Option.none });
     this._millisec = millisec;
-    if (startRightNow) {
+    this._counter = -1;
+    this._timerId = undefined;
+    this._isStarted = false;
+    if (!startManually) {
       this.start();
     }
   }
 
   start(): this {
+    if (this._isStarted) {
+      console.warn('cannot start twice');
+      return this;
+    }
+    this._isStarted = true;
     if (this.isCompleted) {
       console.warn('start on stopped IntervalObservable is ignored.');
       return this;
     }
-    setTimeout(() => {
-      this.startUpdate(0);
-    }, 0);
     this._timerId = setInterval(() => {
       this._counter += 1;
       this.startUpdate(this._counter);

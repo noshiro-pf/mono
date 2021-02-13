@@ -16,14 +16,17 @@ class MapWithIndexObservableClass<A, B>
   extends SyncChildObservableClass<B, 'mapWithIndex', [A]>
   implements MapWithIndexOperatorObservable<A, B> {
   private readonly _mapFn: (x: A, index: number) => B;
-  private _index: number = -1;
+  private _index: number;
 
   constructor(parent: Observable<A>, mapFn: (x: A, index: number) => B) {
     super({
       parents: [parent],
       type: 'mapWithIndex',
-      currentValueInit: Option.none,
+      currentValueInit: Option.map<A, B>((x) => mapFn(x, -1))(
+        parent.currentValue
+      ),
     });
+    this._index = -1;
     this._mapFn = mapFn;
   }
 

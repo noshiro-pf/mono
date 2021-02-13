@@ -21,7 +21,11 @@ class TakeWhileObservableClass<A>
     super({
       parents: [parent],
       type: 'takeWhile',
-      currentValueInit: Option.none,
+      currentValueInit: Option.isNone(parent.currentValue)
+        ? Option.none
+        : predicate(parent.currentValue.value)
+        ? parent.currentValue
+        : Option.none,
     });
     this._predicate = predicate;
   }

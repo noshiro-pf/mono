@@ -1,10 +1,11 @@
-import { isArrayOfLength1OrMore, Option } from '@noshiro/ts-utils';
+import { isArrayOfLength1OrMore } from '@noshiro/ts-utils';
 import {
   AsyncChildObservable,
   AsyncChildObservableType,
   ChildObservable,
   isManagerObservable,
   NonEmptyUnknownList,
+  ObservableId,
   SyncChildObservable,
   SyncChildObservableType,
   Wrap,
@@ -19,16 +20,16 @@ const registerChild = <A>(
   for (const p of parents) {
     p.addChild(child);
   }
-  // register this to ancestor SourceObservables
+  // register child to all reachable ManagerObservables
   const rest = parents.slice();
   while (isArrayOfLength1OrMore(rest)) {
     const p = rest.pop();
-    if (p !== undefined) {
-      p.addDescendantId(child);
-      if (!isManagerObservable(p)) {
-        // trace back dependency tree
-        rest.push(...p.parents);
-      }
+    if (p === undefined) break;
+    if (isManagerObservable(p)) {
+      p.addDescendant(child);
+    } else {
+      // trace back dependency graph
+      rest.push(...p.parents);
     }
   }
 };
@@ -42,30 +43,35 @@ export class AsyncChildObservableClass<
   implements AsyncChildObservable<A, Type, P> {
   readonly type;
   readonly parents;
-  private readonly procedure: ChildObservable<unknown>[] = [];
+  private readonly procedure: ChildObservable<unknown>[];
+  protected readonly _descendantsIdSet: Set<ObservableId>;
 
   constructor({
     type,
     parents,
-    currentValueInit = Option.none,
+    depth = 1 + maxDepth(parents),
+    currentValueInit,
   }: {
     type: Type;
     parents: Wrap<P>;
-    currentValueInit?: AsyncChildObservable<A, Type>['currentValue'];
+    depth?: number;
+    currentValueInit: AsyncChildObservable<A, Type>['currentValue'];
   }) {
     super({
       kind: 'async child',
       type,
-      depth: 1 + maxDepth(parents),
-      currentValueInit: currentValueInit ?? Option.none,
+      depth,
+      currentValueInit,
     });
     this.type = type;
     this.parents = parents;
+    this.procedure = [];
+    this._descendantsIdSet = new Set<ObservableId>();
     registerChild(this, parents);
   }
 
   // overload
-  addDescendantId<B>(child: ChildObservable<B>): void {
+  addDescendant<B>(child: ChildObservable<B>): void {
     if (this._descendantsIdSet.has(child.id)) return;
     this._descendantsIdSet.add(child.id);
 
@@ -113,17 +119,19 @@ export class SyncChildObservableClass<
   constructor({
     type,
     parents,
-    currentValueInit = Option.none,
+    depth = 1 + maxDepth(parents),
+    currentValueInit,
   }: {
     type: Type;
     parents: Wrap<P>;
-    currentValueInit?: SyncChildObservable<A, Type>['currentValue'];
+    depth?: number;
+    currentValueInit: SyncChildObservable<A, Type>['currentValue'];
   }) {
     super({
       kind: 'sync child',
       type,
-      depth: 1 + maxDepth(parents),
-      currentValueInit: currentValueInit ?? Option.none,
+      depth,
+      currentValueInit,
     });
     this.type = type;
     this.parents = parents;

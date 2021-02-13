@@ -3,7 +3,6 @@ import {
   ChildObservable,
   Observable,
   ObservableBase,
-  ObservableId,
   Operator,
   Subscriber,
   SubscriberId,
@@ -22,19 +21,15 @@ export class ObservableBaseClass<
   Kind extends ObservableBase<A>['kind'],
   Depth extends ObservableBase<A>['depth']
 > implements ObservableBase<A> {
-  readonly id = issueObservableId();
+  readonly id;
   readonly kind: Kind;
   readonly type;
   readonly depth: Depth;
-  protected readonly _children: ChildObservable<unknown>[] = [];
-  protected readonly _descendantsIdSet: Set<ObservableId> = new Set<ObservableId>();
-  protected readonly _subscribers: Map<SubscriberId, Subscriber<A>> = new Map<
-    SubscriberId,
-    Subscriber<A>
-  >();
+  protected readonly _children: ChildObservable<unknown>[];
+  protected readonly _subscribers: Map<SubscriberId, Subscriber<A>>;
   private _currentValue: ObservableBase<A>['currentValue'];
-  private _isCompleted: ObservableBase<A>['isCompleted'] = false;
-  private _token: ObservableBase<A>['token'] = issueToken();
+  private _isCompleted: ObservableBase<A>['isCompleted'];
+  private _token: ObservableBase<A>['token'];
 
   constructor({
     kind,
@@ -45,20 +40,21 @@ export class ObservableBaseClass<
     kind: Kind;
     type: ObservableBase<A>['type'];
     depth: Depth;
-    currentValueInit?: ObservableBase<A>['currentValue'];
+    currentValueInit: ObservableBase<A>['currentValue'];
   }) {
     this.kind = kind;
     this.type = type;
     this.depth = depth;
-    this._currentValue = currentValueInit ?? Option.none;
+    this.id = issueObservableId();
+    this._currentValue = currentValueInit;
+    this._children = [];
+    this._subscribers = new Map<SubscriberId, Subscriber<A>>();
+    this._isCompleted = false;
+    this._token = issueToken();
   }
 
   addChild<B>(child: ChildObservable<B>): void {
     this._children.push(child as ChildObservable<unknown>);
-  }
-
-  addDescendantId<B>(child: ChildObservable<B>): void {
-    this._descendantsIdSet.add(child.id);
   }
 
   get currentValue(): ObservableBase<A>['currentValue'] {
@@ -112,7 +108,7 @@ export class ObservableBaseClass<
   }
 
   chain<B>(operator: Operator<A, B>): Observable<B> {
-    return operator(this as Observable<A>);
+    return operator((this as unknown) as Observable<A>);
   }
 
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {

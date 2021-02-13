@@ -6,8 +6,8 @@ import {
   merge,
   Observable,
 } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 /*
   counter   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23
@@ -23,7 +23,7 @@ const createStreams = (
   odd$: Observable<string>;
   merged$: Observable<string | number>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const odd$ = counter$
     .chain(filter((n) => n % 2 === 1))

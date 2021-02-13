@@ -1,6 +1,6 @@
 import { interval, IntervalObservable, Observable, scan } from '../../src';
+import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
-import { getStreamOutputAsPromise } from '../utils';
 
 const createStreams = (
   tick: number
@@ -8,7 +8,7 @@ const createStreams = (
   counter$: IntervalObservable;
   scan$: Observable<number>;
 } => {
-  const counter$ = interval(tick, false);
+  const counter$ = interval(tick, true);
 
   const scan$ = counter$.chain(scan((acc, curr) => acc + curr, 0));
 
