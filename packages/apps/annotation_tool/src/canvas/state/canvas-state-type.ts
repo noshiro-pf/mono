@@ -1,13 +1,13 @@
-import { Point, Rect, Writeable } from '@noshiro/ts-utils';
+import { Point, Rect, Writable } from '@noshiro/ts-utils';
 import { Sprite } from 'pixi.js';
 import { Direction } from '../functions/bbox-points';
 import { PixiBbox } from '../types/pixi-bbox';
 import { PixiTempRect } from '../types/pixi-temp-rect';
 
 export type CanvasAppState = {
-  pointerPos: Writeable<Point>;
-  dragStartPoint: Writeable<Point>;
-  dragEndPoint: Writeable<Point>;
+  pointerPos: Writable<Point>;
+  dragStartPoint: Writable<Point>;
+  dragEndPoint: Writable<Point>;
   grabbingObject:
     | { type: undefined }
     | { type: 'background' }

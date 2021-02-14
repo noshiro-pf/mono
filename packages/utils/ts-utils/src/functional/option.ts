@@ -1,25 +1,31 @@
 export namespace Option {
-  export interface Some<S> {
-    readonly type: 'some';
+  const SomeTypeSymbol: unique symbol = Symbol('Option.some');
+  const NoneTypeSymbol: unique symbol = Symbol('Option.none');
+
+  export type Some<S> = {
+    readonly type: typeof SomeTypeSymbol;
     readonly value: S;
-  }
-  export interface None {
-    readonly type: 'none';
-  }
+  };
+  export type None = {
+    readonly type: typeof NoneTypeSymbol;
+  };
 
   export type Option<S> = Some<S> | None;
 
-  export const some = <S>(value: S): Some<S> => ({ type: 'some', value });
+  export const some = <S>(value: S): Some<S> => ({
+    type: SomeTypeSymbol,
+    value,
+  });
 
-  export const none: None = { type: 'none' } as const;
+  export const none: None = { type: NoneTypeSymbol } as const;
 
   export const isSome = <S>(
     result: Option<S> | undefined | null
-  ): result is Some<S> => result?.type === 'some';
+  ): result is Some<S> => result?.type === SomeTypeSymbol;
 
   export const isNone = <S>(
     result: Option<S> | undefined | null
-  ): result is None => result?.type === 'none';
+  ): result is None => result?.type === NoneTypeSymbol;
 
   export const map = <S, S2>(mapFn: (value: S) => S2) => (
     result: Option<S>

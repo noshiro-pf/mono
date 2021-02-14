@@ -10,6 +10,7 @@ export * from './others';
 export * from './promise-result';
 export * from './queue';
 export * from './random';
+export * from './record';
 export * from './set';
 export * from './shape';
 export * from './string';
