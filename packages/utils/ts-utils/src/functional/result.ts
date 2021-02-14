@@ -1,26 +1,29 @@
 export namespace Result {
-  export interface Ok<S> {
-    readonly type: 'ok';
+  const OkTypeSymbol: unique symbol = Symbol('Result.ok');
+  const ErrTypeSymbol: unique symbol = Symbol('Result.err');
+
+  export type Ok<S> = {
+    readonly type: typeof OkTypeSymbol;
     readonly value: S;
-  }
-  export interface Err<E> {
-    readonly type: 'err';
+  };
+  export type Err<E> = {
+    readonly type: typeof ErrTypeSymbol;
     readonly value: E;
-  }
+  };
 
   export type Result<S, E> = Ok<S> | Err<E>;
 
-  export const ok = <S>(value: S): Ok<S> => ({ type: 'ok', value });
+  export const ok = <S>(value: S): Ok<S> => ({ type: OkTypeSymbol, value });
 
-  export const err = <E>(value: E): Err<E> => ({ type: 'err', value });
+  export const err = <E>(value: E): Err<E> => ({ type: ErrTypeSymbol, value });
 
   export const isOk = <S, E>(
     result: Result<S, E> | undefined | null
-  ): result is Ok<S> => result?.type === 'ok';
+  ): result is Ok<S> => result?.type === OkTypeSymbol;
 
   export const isErr = <S, E>(
     result: Result<S, E> | undefined | null
-  ): result is Err<E> => result?.type === 'err';
+  ): result is Err<E> => result?.type === ErrTypeSymbol;
 
   export const map = <S, S2, E>(mapFn: (value: S) => S2) => (
     result: Result<S, E>
@@ -37,13 +40,21 @@ export namespace Result {
     return result.value;
   };
 
-  export const unwrap = <S, E>(result: Result<S, E>): S | undefined =>
+  export const unwrapOk = <S, E>(result: Result<S, E>): S | undefined =>
     isErr(result) ? undefined : result.value;
 
-  export const unwrapOr = <S, E, D>(
+  export const unwrapOkOr = <S, E, D>(
     defaultValue: D
   ): ((result: Result<S, E>) => S | D) => (result: Result<S, E>): S | D =>
     isErr(result) ? defaultValue : result.value;
+
+  export const unwrapErr = <S, E>(result: Result<S, E>): E | undefined =>
+    isErr(result) ? result.value : undefined;
+
+  export const unwrapErrOr = <S, E, D>(
+    defaultValue: D
+  ): ((result: Result<S, E>) => E | D) => (result: Result<S, E>): E | D =>
+    isErr(result) ? result.value : defaultValue;
 
   export const expect = <S, E>(message: string) => (
     result: Result<S, E>

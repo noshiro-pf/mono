@@ -72,7 +72,7 @@ export const useFetchResults = (
 
   const eventSchedule$ = useDataStream<undefined | IEventSchedule>(
     undefined,
-    eventScheduleResult$.pipe(filterNotUndefined(), map(Result.unwrap))
+    eventScheduleResult$.pipe(filterNotUndefined(), map(Result.unwrapOk))
   );
 
   const answers$ = useDataStream<undefined | IList<IAnswer>>(
@@ -80,7 +80,7 @@ export const useFetchResults = (
     answersResult$.pipe(
       pluck('value'),
       filterNotUndefined(),
-      map(Result.unwrap)
+      map(Result.unwrapOk)
     )
   );
 
