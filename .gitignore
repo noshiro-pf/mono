@@ -16,7 +16,7 @@ experimental/**/config/**/*.js
 experimental/**/scripts/**/*.js
 config/**/*.js
 scripts/**/*.js
-*.d.ts
+**/*.d.ts
 
 # Logs
 logs
