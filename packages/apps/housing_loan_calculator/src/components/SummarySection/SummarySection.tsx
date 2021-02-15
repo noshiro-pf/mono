@@ -3,14 +3,14 @@ import { viewTexts } from '../../constants/view-texts';
 import { RepaymentType } from '../../types/enum/repayment-type';
 import { DataItem } from './DataItem';
 
-interface Props {
+type Props = Readonly<{
   repaymentType: RepaymentType;
   propertyPriceManYen: number;
   downPaymentManYen: number;
   fixedPrincipalYenPerMonth: number;
   fixedMonthlyPaymentsYen: number;
   interestSumManYen: number;
-}
+}>;
 
 export const SummarySection = memoNamed<Props>(
   'SummarySection',

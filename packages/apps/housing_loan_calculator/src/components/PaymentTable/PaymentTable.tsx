@@ -19,13 +19,13 @@ const formatYenValue = (value: number): string =>
     currency: 'JPY',
   }).format(value);
 
-interface Props {
+type Props = Readonly<{
   repaymentType: RepaymentType;
-  borrowingBalanceYen: number[]; // 借入残高（円）
-  interestYen: number[]; // 利息（円）
-  monthlyPaymentTotalYen: number[]; // 月支払い額（円）
-  monthlyPrincipalPaymentYen: number[]; // 月々の元金支払い額（円）
-}
+  borrowingBalanceYen: readonly number[]; // 借入残高（円）
+  interestYen: readonly number[]; // 利息（円）
+  monthlyPaymentTotalYen: readonly number[]; // 月支払い額（円）
+  monthlyPrincipalPaymentYen: readonly number[]; // 月々の元金支払い額（円）
+}>;
 
 export const PaymentTable = memoNamed<Props>(
   'PaymentTable',
@@ -36,7 +36,7 @@ export const PaymentTable = memoNamed<Props>(
     monthlyPaymentTotalYen,
     monthlyPrincipalPaymentYen,
   }) => {
-    const monthlyPayment = useMemo<number[]>(
+    const monthlyPayment = useMemo<readonly number[]>(
       () =>
         repaymentType === 'principal-equal-payment'
           ? monthlyPaymentTotalYen
@@ -58,7 +58,7 @@ export const PaymentTable = memoNamed<Props>(
       ]
     );
 
-    const tableData = useMemo<string[][]>(
+    const tableData = useMemo<readonly (readonly string[])[]>(
       () =>
         seq(numRows).map((i) => [
           i.toString(),

@@ -9,7 +9,7 @@ import {
 } from './label-button-item-main-styled';
 import { LabelButtonText } from './label-button-item-text-styled';
 
-interface Props {
+type Props = Readonly<{
   index: number;
   hsl: Hsl;
   isSelected: boolean;
@@ -18,7 +18,7 @@ interface Props {
   disabled?: boolean;
   onLabelClick: () => void;
   onVisibilityIconClick: (ev: React.BaseSyntheticEvent) => void;
-}
+}>;
 
 export const LabelButtonItemView = memoNamed<Props>(
   'LabelButtonItemView',

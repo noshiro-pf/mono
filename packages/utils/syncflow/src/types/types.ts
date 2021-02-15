@@ -23,22 +23,22 @@ export type NonEmptyUnknownList = [unknown, ...unknown[]];
 
 export type Operator<A, B> = (src: Observable<A>) => Observable<B>;
 
-export type Subscriber<A> = {
+export type Subscriber<A> = Readonly<{
   onNext: (v: A) => void;
   onComplete: () => void;
-};
+}>;
 
-export type Subscription = {
+export type Subscription = Readonly<{
   unsubscribe: () => void;
-};
+}>;
 
-export type Subscribable<A> = {
+export type Subscribable<A> = Readonly<{
   subscribe: (
     onNext: (nextValue: A) => void,
     onError?: (error?: unknown) => void,
     onComplete?: () => void
   ) => Subscription;
-};
+}>;
 
 // type tests
 

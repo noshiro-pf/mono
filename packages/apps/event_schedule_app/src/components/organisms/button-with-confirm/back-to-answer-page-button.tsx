@@ -5,11 +5,11 @@ import { ButtonWithConfirm } from './button-with-confirm';
 
 const vt = texts.eventSettingsPage.backToAnswerPageButton;
 
-interface Props {
+type Props = Readonly<{
   hasNoChanges: boolean;
   onConfirmClick: () => void;
   disabled?: boolean;
-}
+}>;
 
 const buttonConfig = {
   name: vt.name,

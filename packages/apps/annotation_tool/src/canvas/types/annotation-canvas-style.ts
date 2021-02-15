@@ -8,10 +8,10 @@ import {
 } from './bbox-style';
 
 export type AnnotationCanvasStyle = Readonly<{
-  background: {
+  background: Readonly<{
     style: BackgroundStyle;
     minPaddingPx: number;
-  };
+  }>;
   bbox: BboxStyle;
   crosshairLineColor: Rgba;
   crosshairLineWidthPx: number;
@@ -23,10 +23,10 @@ export type AnnotationCanvasStyle = Readonly<{
 }>;
 
 export type AnnotationCanvasStylePartial = Readonly<{
-  background?: {
+  background?: Readonly<{
     style?: BackgroundStyle;
     minPaddingPx?: number;
-  };
+  }>;
   bbox?: BboxStylePartial;
   crosshairLineColor?: Rgba;
   crosshairLineWidthPx?: number;

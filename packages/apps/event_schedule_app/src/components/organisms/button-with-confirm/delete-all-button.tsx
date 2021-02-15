@@ -4,9 +4,9 @@ import { ButtonWithConfirm } from './button-with-confirm';
 
 const vt = texts.eventSettingsPage.section2;
 
-interface Props {
+type Props = Readonly<{
   onConfirmDeleteAll: () => void;
-}
+}>;
 
 const buttonConfig = {
   name: vt.removeAllDates,

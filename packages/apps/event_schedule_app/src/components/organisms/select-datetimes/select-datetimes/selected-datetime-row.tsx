@@ -14,7 +14,7 @@ import {
 import { IDatetimeRange } from '../../../../types/record/datetime-range';
 import { TimeRangeView } from '../../../molecules/time-range';
 
-interface Props {
+type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   datetimeRange: IDatetimeRange;
   onYmdChange: (ymd: IYearMonthDate | undefined) => void;
@@ -22,7 +22,7 @@ interface Props {
   onRangeEndChange: (hm: IHoursMinutes) => void;
   onDuplicateClick: () => void;
   onDeleteClick: () => void;
-}
+}>;
 
 const onYmdChangeFn = (
   onIYmdChange: (iymd: IYearMonthDate | undefined) => void

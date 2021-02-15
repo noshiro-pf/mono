@@ -15,12 +15,12 @@ import { useAnswerTableHooks } from './answer-table-hooks';
 import { CommentButton } from './comment-button';
 import { SortButton } from './sort-button';
 
-interface Props {
+type Props = Readonly<{
   eventSchedule: IEventSchedule;
   answers: IList<IAnswer>;
   onAnswerClick: (answer: IAnswer) => void;
   isExpired: boolean;
-}
+}>;
 
 const vt = texts.answerPage.answers;
 

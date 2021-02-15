@@ -9,13 +9,13 @@ import {
 
 export const ANSWER_KEY_CREATED_AT = 'createdAt';
 
-type AnswerBaseType = {
+type AnswerBaseType = Readonly<{
   id: AnswerId;
   userName: UserName;
   comment: string;
   selection: IList<IAnswerSelection>;
   [ANSWER_KEY_CREATED_AT]: number;
-};
+}>;
 
 export type PartialAnswer = Partial<
   Readonly<{

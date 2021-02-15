@@ -14,7 +14,7 @@ import { onPointerDownOnBackground } from './handlers/on-pointer-down-on-bg';
 import { onPointerMove } from './handlers/on-pointer-move';
 import { onPointerUpOnBackground } from './handlers/on-pointer-up-on-bg';
 
-export type CanvasAppAction =
+export type CanvasAppAction = Readonly<
   | { type: 'pointerMove'; pointerPos: Point }
   | { type: 'pointerUp' }
   | { type: 'backgroundPointerDown' }
@@ -22,7 +22,8 @@ export type CanvasAppAction =
   | { type: 'bboxFacePointerOut'; pixiBbox: PixiBbox }
   | { type: 'bboxFacePointerDown'; pixiBbox: PixiBbox }
   | { type: 'bboxPointPointerDown'; pixiBbox: PixiBbox; direction: Direction }
-  | { type: 'cancel' };
+  | { type: 'cancel' }
+>;
 
 export type CanvasAppStateHandler = (
   state: CanvasAppState,

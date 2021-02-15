@@ -2,9 +2,10 @@ import { ReducerType } from '@noshiro/ts-utils';
 import { IYearMonthDate } from '../../../types/record/base/year-month-date';
 import { IList, ISet } from '../../../utils/immutable';
 
-export type SelectedDatesReducerAction =
+export type SelectedDatesReducerAction = Readonly<
   | { type: 'flip'; dateToFlip: IYearMonthDate }
-  | { type: 'fill-column'; dates: IList<IYearMonthDate> };
+  | { type: 'fill-column'; dates: IList<IYearMonthDate> }
+>;
 
 export type SelectedDatesReducerState = ISet<IYearMonthDate>;
 

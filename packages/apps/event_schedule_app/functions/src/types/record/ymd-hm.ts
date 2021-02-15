@@ -1,10 +1,10 @@
 import { compareHm, HoursMinutesType } from './base/hours-minutes';
 import { compareYmd, YearMonthDateType } from './base/year-month-date';
 
-export type YmdHmJsType = {
+export type YmdHmJsType = Readonly<{
   ymd: YearMonthDateType;
   hm: HoursMinutesType;
-};
+}>;
 
 export const compareYmdHm = (a: YmdHmJsType, b: YmdHmJsType): -1 | 0 | 1 => {
   const compareYmdResult = compareYmd(a.ymd, b.ymd);

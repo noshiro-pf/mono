@@ -16,26 +16,30 @@ import { IList, IMap } from '../../../utils/immutable';
 import { createAnswerSummary, createScore } from './create-answer-summary';
 import { useAnswerTable } from './use-answer-table';
 
-interface AnswerTableHooks {
+type AnswerTableHooks = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   answerSymbolList: IList<IAnswerSymbol>;
-  answersWithHandler: IList<{
-    id: IAnswer['id'];
-    userName: IAnswer['userName'];
-    comment: IAnswer['comment'];
-    onClick: () => void;
-  }>;
+  answersWithHandler: IList<
+    Readonly<{
+      id: IAnswer['id'];
+      userName: IAnswer['userName'];
+      comment: IAnswer['comment'];
+      onClick: () => void;
+    }>
+  >;
   onDatetimeSortChange: (state: 'asc' | 'desc') => void;
   onScoreSortChange: (state: 'asc' | 'desc') => void;
 
-  tableBodyValues: IList<{
-    datetimeRange: IDatetimeRange;
-    score: number;
-    answerSummaryRow: IList<number> | undefined;
-    answerTableRow: IList<AnswerSymbolIconId | undefined> | undefined;
-    style: CSSProperties;
-  }>;
-}
+  tableBodyValues: IList<
+    Readonly<{
+      datetimeRange: IDatetimeRange;
+      score: number;
+      answerSummaryRow: IList<number> | undefined;
+      answerTableRow: IList<AnswerSymbolIconId | undefined> | undefined;
+      style: CSSProperties;
+    }>
+  >;
+}>;
 
 export const useAnswerTableHooks = (
   eventSchedule: IEventSchedule,

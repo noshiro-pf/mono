@@ -14,10 +14,10 @@ import {
   PartialTimeRange,
 } from './time-range';
 
-type DatetimeRangeBaseType = {
+type DatetimeRangeBaseType = Readonly<{
   ymd: IYearMonthDate;
   timeRange: ITimeRange;
-};
+}>;
 
 export type PartialDatetimeRange = Partial<
   Readonly<{

@@ -4,9 +4,9 @@ import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { texts } from '../../../constants/texts';
 
-interface Props {
+type Props = Readonly<{
   onSortChange: (state: 'asc' | 'desc') => void;
-}
+}>;
 
 export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
   const [isOpen, open, close] = useBooleanState(false);

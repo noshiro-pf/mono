@@ -6,9 +6,9 @@ import { Description } from '../../atoms/description';
 
 const vt = texts.errorMessages;
 
-interface Props {
+type Props = Readonly<{
   errorType: 'not-found' | 'others';
-}
+}>;
 
 export const FetchEventScheduleError = memoNamed<Props>(
   'AnswerPageError',

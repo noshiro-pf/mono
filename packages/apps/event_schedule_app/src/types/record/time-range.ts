@@ -7,10 +7,10 @@ import {
   PartialHoursMinutes,
 } from './base/hours-minutes';
 
-type TimeRangeBaseType = {
+type TimeRangeBaseType = Readonly<{
   start: IHoursMinutes;
   end: IHoursMinutes;
-};
+}>;
 
 export type PartialTimeRange = Partial<
   Readonly<{

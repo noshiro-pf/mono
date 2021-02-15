@@ -4,11 +4,11 @@ import { useMemo } from 'react';
 import { AnswerSymbolIconId } from '../../types/enum/answer-symbol-icon';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons';
 
-interface Props {
+type Props = Readonly<{
   name: AnswerSymbolIconId;
   color?: string;
   size?: number;
-}
+}>;
 
 export const CustomIcon = memoNamed<Props>(
   'MyIcon',

@@ -15,13 +15,13 @@ import { selctorOptions } from './options';
 import { useSelectDatetimesHooks } from './select-datetimes-hooks';
 import { SelectedDatetimeRow } from './selected-datetime-row';
 
-interface Props {
+type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
   datetimeList: IList<IDatetimeRange>;
   onDatetimeListChange: (list: IList<IDatetimeRange>) => void;
   holidaysJpDefinition: IMap<IYearMonthDate, string>;
-}
+}>;
 
 const vt = texts.eventSettingsPage.section2;
 

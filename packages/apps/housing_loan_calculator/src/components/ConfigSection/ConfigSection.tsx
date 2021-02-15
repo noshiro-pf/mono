@@ -15,7 +15,7 @@ const ConfigElement = styled.div`
   display: flex;
 `;
 
-interface Props {
+type Props = Readonly<{
   downPaymentManYen: number; // 頭金（万円）
   onDownPaymentManYenChange: (v: number) => void;
   propertyPriceManYen: number; // 物件の金額（万円）
@@ -26,7 +26,7 @@ interface Props {
   onInterestRatePercentPerYearChange: (v: number) => void;
   repaymentType: RepaymentType;
   onRepaymentTypeChange: (value: RepaymentType) => void;
-}
+}>;
 
 export const ConfigSection = memoNamed<Props>(
   'ConfigSection',

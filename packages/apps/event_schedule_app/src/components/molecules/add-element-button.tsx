@@ -1,9 +1,9 @@
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 
-interface Props {
+type Props = Readonly<{
   onClick: () => void;
-}
+}>;
 
 export const AddElementButton = memoNamed<Props>(
   'AddElementButton',

@@ -1,16 +1,17 @@
-import { FormGroup, IInputGroupProps } from '@blueprintjs/core';
+import { FormGroup, IInputGroupProps2 } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { isEmailString, TinyObservable } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { BpInput } from './bp-input';
 
-interface Props extends IInputGroupProps {
-  formGroupLabel: string;
-  onValueChange: (value: string) => void;
-  invalidMessage?: string;
-  autoFocus?: boolean;
-  focus$?: TinyObservable<void>;
-}
+type Props = IInputGroupProps2 &
+  Readonly<{
+    formGroupLabel: string;
+    onValueChange: (value: string) => void;
+    invalidMessage?: string;
+    autoFocus?: boolean;
+    focus$?: TinyObservable<void>;
+  }>;
 
 export const BpEmailInput = memoNamed<Props>(
   'BpEmailInput',

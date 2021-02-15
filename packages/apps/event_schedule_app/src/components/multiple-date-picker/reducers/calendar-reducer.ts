@@ -7,17 +7,18 @@ import {
   YearEnum,
 } from '@noshiro/ts-utils';
 
-export type CalendarCurrentPageReducerState = {
+export type CalendarCurrentPageReducerState = Readonly<{
   year: YearEnum;
   month: MonthEnum;
-};
+}>;
 
-export type CalendarCurrentPageReducerAction =
+export type CalendarCurrentPageReducerAction = Readonly<
   | { type: 'prev-month' }
   | { type: 'next-month' }
   | { type: 'set-year'; year: YearEnum }
   | { type: 'set-month'; month: MonthEnum }
-  | { type: 'today' };
+  | { type: 'today' }
+>;
 
 export const calendarCurrentPageInitialState = (): CalendarCurrentPageReducerState => ({
   year: getYear(today()),

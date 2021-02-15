@@ -7,13 +7,13 @@ import { ButtonsWrapperAlignEnd } from '../molecules/buttons-wrapper';
 
 const vt = texts.createEventResultDialog;
 
-interface Props {
+type Props = Readonly<{
   isOpen: boolean;
   close: () => void;
   url: string;
   onClipboardButtonClick: () => void;
   isLoading: boolean;
-}
+}>;
 
 export const CreateEventResultDialog = memoNamed<Props>(
   'CreateEventResultDialog',

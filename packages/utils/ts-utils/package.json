@@ -21,7 +21,7 @@
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
     "genpipetypedef": "node scripts/gen_pipe_type_def ${npm_package_config_pipe_max_length} ${npm_package_config_pipe_ts_path}",
-    "postgenpipetypedef": "yarn _script_formatglob ${npm_package_config_pipe_ts_path}",
+    "postgenpipetypedef": "yarn _prettier ${npm_package_config_pipe_ts_path}",
     "gi": "yarn _script_genindex ./src",
     "lint": "eslint src/ --ext .ts",
     "setup": "run-s setup:*",

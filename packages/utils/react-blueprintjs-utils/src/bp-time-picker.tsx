@@ -4,10 +4,10 @@ import { getHours, getMinutes } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { HoursMinutes } from './types/hours-minutes';
 
-interface Props {
+type Props = Readonly<{
   time: HoursMinutes;
   onTimeChange: (hm: HoursMinutes) => void;
-}
+}>;
 
 export const BpTimePicker = memoNamed<Props>(
   'BpTimePicker',

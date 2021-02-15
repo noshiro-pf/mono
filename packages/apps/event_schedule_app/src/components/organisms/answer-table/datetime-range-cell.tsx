@@ -6,10 +6,10 @@ import { hm2str, ymd2str, ymd2strWithDay } from '../../../utils/ymdhm2str';
 
 const vt = texts.date;
 
-interface Props {
+type Props = Readonly<{
   datetimeRange: IDatetimeRange;
   datetimeSpecification: DatetimeSpecificationEnumType;
-}
+}>;
 
 export const DatetimeRangeCell = memoNamed<Props>(
   'DatetimeRangeCell',

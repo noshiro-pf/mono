@@ -19,25 +19,27 @@ import {
   SelectedDatesReducerAction,
 } from './reducers/selected-dates-reducer';
 
-interface MultipleDatePickerState {
+type MultipleDatePickerState = Readonly<{
   calendarCurrentPage: CalendarCurrentPageReducerState;
   onPrevMonthClick: () => void;
   onNextMonthClick: () => void;
   onYearChange: (year: YearEnum) => void;
   onMonthChange: (month: MonthEnum) => void;
   calendarCells: IList<
-    IList<{
-      ymd: IYearMonthDate;
-      selected: boolean;
-      disabled: boolean;
-      dayType: DayType;
-      holidayJpName: string | undefined;
-    }>
+    IList<
+      Readonly<{
+        ymd: IYearMonthDate;
+        selected: boolean;
+        disabled: boolean;
+        dayType: DayType;
+        holidayJpName: string | undefined;
+      }>
+    >
   >;
   onDateClick: (ymd: IYearMonthDate) => void;
   onWeekdaysHeaderCellClick: (w: WeekDayEnum) => void;
   onTodayClick: () => void;
-}
+}>;
 
 export const useMultipleDatePickerState = (
   selectedDates: IList<IYearMonthDate>,

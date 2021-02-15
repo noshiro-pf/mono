@@ -7,9 +7,9 @@ import { Description } from '../atoms/description';
 
 const vt = texts.eventSettingsPage;
 
-interface Props {
+type Props = Readonly<{
   eventScheduleValidation: EventScheduleValidation;
-}
+}>;
 
 export const EventSchedulePropertiesErrors = memoNamed<Props>(
   'EventSchedulePropertiesErrors',

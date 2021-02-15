@@ -1,10 +1,10 @@
 import { HoursEnum, MinutesEnum, sign } from '@noshiro/ts-utils';
 import { IRecord } from '../../../utils/immutable';
 
-type HoursMinutesBaseType = {
+type HoursMinutesBaseType = Readonly<{
   hours: HoursEnum;
   minutes: MinutesEnum;
-};
+}>;
 
 export type PartialHoursMinutes = Partial<Readonly<HoursMinutesBaseType>>;
 

@@ -8,13 +8,13 @@ import { useEventId } from '../../../routing/use-event-id';
 import { IEventSchedule } from '../../../types/record/event-schedule';
 import { createToaster, showToast } from '../../../utils/toaster';
 
-interface EditEventScheduleHooks {
+type EditEventScheduleHooks = Readonly<{
   editButtonIsEnabled: boolean;
   editButtonIsLoading: boolean;
   onEditEventClick: () => void;
   onBackToAnswerPageClick: () => void;
   isLoading: boolean;
-}
+}>;
 
 const toast = createToaster();
 

@@ -20,10 +20,10 @@ const icons: readonly {
   { id: 'handmade-cross', icon: <CloseIcon /> },
 ];
 
-interface Props {
+type Props = Readonly<{
   iconsInUse: IList<AnswerSymbolIconId>;
   onIconSelect: (iconId: AnswerSymbolIconId) => void;
-}
+}>;
 
 export const SelectSymbolPopoverContent = memoNamed<Props>(
   'SelectSymbolPopoverContent',

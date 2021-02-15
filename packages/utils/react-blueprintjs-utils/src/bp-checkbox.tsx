@@ -2,10 +2,11 @@ import { Checkbox, ICheckboxProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 
-interface Props extends ICheckboxProps {
-  checked: boolean;
-  onCheck: (checked: boolean) => void;
-}
+type Props = ICheckboxProps &
+  Readonly<{
+    checked: boolean;
+    onCheck: (checked: boolean) => void;
+  }>;
 
 export const BpCheckbox = memoNamed<Props>(
   'BpCheckbox',

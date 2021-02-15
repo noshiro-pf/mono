@@ -5,10 +5,10 @@ import {
 } from '../../../types/record/datetime-range';
 import { IRecord } from '../../../utils/immutable';
 
-type AnswerSelectionMapKeyBaseType = {
+type AnswerSelectionMapKeyBaseType = Readonly<{
   answerId: AnswerId;
   datetimeRange: IDatetimeRange;
-};
+}>;
 
 export type IAnswerSelectionMapKey = IRecord<AnswerSelectionMapKeyBaseType> &
   Readonly<AnswerSelectionMapKeyBaseType>;

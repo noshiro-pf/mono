@@ -7,13 +7,13 @@ import { texts } from '../../../constants/texts';
 import { INotificationSettings } from '../../../types/record/base/notification-settings';
 import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
 
-interface Props {
+type Props = Readonly<{
   notificationSettings: INotificationSettings;
   onNotificationSettingsChange: (value: INotificationSettings) => void;
   disabled: boolean;
   useAnswerDeadline: boolean;
   focusEmailInput$: TinyObservable<void>;
-}
+}>;
 
 const vt = texts.eventSettingsPage.section3;
 

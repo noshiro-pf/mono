@@ -1,11 +1,11 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties } from 'react';
 
-interface Props {
+type Props = Readonly<{
   size?: number;
   style?: CSSProperties;
   color?: string;
-}
+}>;
 
 export const DeleteIcon = memoNamed<Props>(
   'DeleteIcon',

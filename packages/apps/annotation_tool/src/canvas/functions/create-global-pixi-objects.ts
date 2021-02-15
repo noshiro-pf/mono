@@ -8,18 +8,18 @@ import {
   createRectangleSprite,
 } from './create-pixi-object';
 
-interface Args {
+type Args = Readonly<{
   app: Application;
   canvasSize: RectSize;
   canvasStyles: AnnotationCanvasStyle;
-}
+}>;
 
-interface ReturnType {
+type ReturnType = Readonly<{
   background: Sprite;
   verticalLine: Sprite;
   horizontalLine: Sprite;
   temporaryRect: PixiTempRect;
-}
+}>;
 
 export const createGlobalPixiObjects = ({
   app,

@@ -2,14 +2,14 @@ export namespace Result {
   const OkTypeSymbol: unique symbol = Symbol('Result.ok');
   const ErrTypeSymbol: unique symbol = Symbol('Result.err');
 
-  export type Ok<S> = {
-    readonly type: typeof OkTypeSymbol;
-    readonly value: S;
-  };
-  export type Err<E> = {
-    readonly type: typeof ErrTypeSymbol;
-    readonly value: E;
-  };
+  export type Ok<S> = Readonly<{
+    type: typeof OkTypeSymbol;
+    value: S;
+  }>;
+  export type Err<E> = Readonly<{
+    type: typeof ErrTypeSymbol;
+    value: E;
+  }>;
 
   export type Result<S, E> = Ok<S> | Err<E>;
 

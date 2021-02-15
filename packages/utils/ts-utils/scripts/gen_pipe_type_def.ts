@@ -1,14 +1,9 @@
 import fs from 'fs';
 
-const funcTypeName = 'FuncType';
+const funcTypeName = 'FunctionType';
 
 const header = `
-export const pipe: Pipe = (x: unknown, ...fns: ${funcTypeName}<unknown, unknown>[]) =>
-  fns.reduce((curr, f) => f(curr), x);
-
-type ${funcTypeName}<A, B> = (v: A) => B;
-
-export interface Pipe {
+import { FunctionType } from '../types';
 `;
 
 const range = (start: number, end: number): number[] =>
@@ -18,10 +13,12 @@ const genPipeMethod = (length: number): string => {
   if (length < 2) return '';
   // length === 3 =>
   // ```
-  // <T0, T1, T2>(x: T0, f1: FuncType<T0, T1>, f2: FuncType<T1, T2>): T2;
+  // export function pipe<T0, T1, T2>(x: T0, f1: FunctionType<T0, T1>, f2: FunctionType<T1, T2>): T2;
   // ```
   const typeVars = range(0, length).map((i) => `T${i}`);
-  let result = `<${typeVars.join(',')}>(x: ${typeVars[0] ?? ''}, `;
+  let result = `export function pipe<${typeVars.join(',')}>(x: ${
+    typeVars[0] ?? ''
+  }, `;
   for (let i = 1; i < length; i += 1) {
     result += `f${i}: ${funcTypeName}<${typeVars[i - 1] ?? ''}, ${
       typeVars[i] ?? ''
@@ -33,7 +30,8 @@ const genPipeMethod = (length: number): string => {
 };
 
 const footer = `
-  <T0>(x: T0, f1: ${funcTypeName}<T0, unknown>, ...fns: ${funcTypeName}<unknown, unknown>[]): unknown;
+export function pipe(x: unknown, ...fns: FunctionType<unknown, unknown>[]): unknown {
+  return fns.reduce((curr, f) => f(curr), x);
 }
 `;
 

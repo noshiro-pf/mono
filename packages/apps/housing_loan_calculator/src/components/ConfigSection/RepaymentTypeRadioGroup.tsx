@@ -4,10 +4,11 @@ import { useCallback } from 'react';
 import { viewTexts } from '../../constants/view-texts';
 import { RepaymentType } from '../../types/enum/repayment-type';
 
-interface Props {
+type Props = Readonly<{
   repaymentType: RepaymentType;
   onRepaymentTypeChange: (value: RepaymentType) => void;
-}
+}>;
+
 export const RepaymentTypeRadioGroup = memoNamed<Props>(
   'RepaymentTypeRadioGroup',
   ({ repaymentType, onRepaymentTypeChange }) => {

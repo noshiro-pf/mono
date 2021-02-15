@@ -29,7 +29,7 @@ const typescriptEslintRules: Readonly<
     // '@typescript-eslint/class-literal-property-style': 'error',
     '@typescript-eslint/consistent-indexed-object-style': 'error',
     '@typescript-eslint/consistent-type-assertions': 'error',
-    // '@typescript-eslint/consistent-type-definitions': 'error',  // TODO: enable this
+    '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
     // '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/explicit-function-return-type': [
       'warn',

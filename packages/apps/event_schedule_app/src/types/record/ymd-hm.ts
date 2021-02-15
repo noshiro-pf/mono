@@ -14,10 +14,10 @@ import {
   PartialYearMonthDate,
 } from './base/year-month-date';
 
-type YmdHmBaseType = {
+type YmdHmBaseType = Readonly<{
   ymd: IYearMonthDate;
   hm: IHoursMinutes;
-};
+}>;
 
 export type PartialYmdHm = Partial<
   Readonly<{

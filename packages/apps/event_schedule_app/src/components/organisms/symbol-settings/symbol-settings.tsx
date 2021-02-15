@@ -13,11 +13,11 @@ import {
 } from './symbol-list-reducer';
 import { AnswerSymbolRow } from './symbol-setting-row';
 
-interface Props {
+type Props = Readonly<{
   answerSymbolList: IList<IAnswerSymbol>;
   onAnswerSymbolListChange: (value: IList<IAnswerSymbol>) => void;
   disabled: boolean;
-}
+}>;
 
 export const SymbolSettings = memoNamed<Props>(
   'SymbolSettings',

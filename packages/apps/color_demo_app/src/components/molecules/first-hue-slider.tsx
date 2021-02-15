@@ -7,10 +7,10 @@ const SliderWrapper = styled.div`
   padding: 10px 0;
 `;
 
-interface Props {
+type Props = Readonly<{
   firstHue: Hue;
   firstHueOnChange: (h: Hue) => void;
-}
+}>;
 
 export const FirstHueSlider = memoNamed<Props>('FirstHueSlider', (props) => (
   <SliderWrapper>

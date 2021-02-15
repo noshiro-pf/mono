@@ -1,6 +1,6 @@
-export interface Subscription {
+export type Subscription = Readonly<{
   unsubscribe: () => void;
-}
+}>;
 
 export class TinyObservable<T> {
   private readonly subscriptions = new Map<symbol, (value: T) => void>();

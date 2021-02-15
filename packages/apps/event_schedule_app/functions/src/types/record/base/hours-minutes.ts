@@ -1,10 +1,10 @@
 import { HoursEnum, MinutesEnum } from '@noshiro/ts-utils';
 import { sign } from '../../../utils/sign';
 
-export type HoursMinutesType = {
+export type HoursMinutesType = Readonly<{
   hours: HoursEnum;
   minutes: MinutesEnum;
-};
+}>;
 
 export const compareHm = (
   a: HoursMinutesType,

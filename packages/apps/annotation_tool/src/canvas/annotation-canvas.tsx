@@ -8,11 +8,11 @@ import { bgCheckerboardImg } from './img/checkerboard';
 import { AnnotationCanvasStyle } from './types/annotation-canvas-style';
 import { defaultIdMaker } from './types/id-type';
 
-interface Props {
+type Props = Readonly<{
   canvasStyles: AnnotationCanvasStyle;
   canvasSize: RectSize;
   selectedHue: Hue;
-}
+}>;
 
 export const AnnotataionCanvas = memoNamed<Props>(
   'AnnotataionCanvas',

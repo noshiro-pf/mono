@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-namespace,@typescript-eslint/no-unused-vars,no-unused-vars
 namespace Validation {
-  export interface StringValidator {
+  export type StringValidator = Readonly<{
     isAcceptable(s: string): boolean;
-  }
+  }>;
 }

@@ -22,7 +22,7 @@ import { normalizeEventSchedule } from './normalize-event-schedule';
 import { useToggleSectionState } from './use-toggle-section-state';
 import { validateEventSchedule, validateEventScheduleAll } from './validator';
 
-interface EventScheduleSettingCommonHooks {
+type EventScheduleSettingCommonHooks = Readonly<{
   title: string;
   onTitleChange: (value: string) => void;
   notes: string;
@@ -59,7 +59,7 @@ interface EventScheduleSettingCommonHooks {
   onBackToAnswerPageClick: () => void;
   hasNoChanges: boolean;
   holidaysJpDefinition: IMap<IYearMonthDate, string>;
-}
+}>;
 
 export const useEventScheduleSettingCommonHooks = (
   initialValuesInput: IEventSchedule

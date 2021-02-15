@@ -1,10 +1,10 @@
-export interface Routes {
+export type Routes = Readonly<{
   profile: string;
   skills: string;
   profile2: string;
   products: string;
   writings: string;
-}
+}>;
 
 export const routes = {
   profile: '/profile',

@@ -2,7 +2,7 @@ import { IconName, Intent } from '@blueprintjs/core';
 import { BpAlert } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 
-interface Props {
+type Props = Readonly<{
   isOpen: boolean;
   onCancel: () => void;
   onConfirm: () => void;
@@ -11,7 +11,7 @@ interface Props {
   message: string;
   icon: IconName | undefined;
   intent: Intent;
-}
+}>;
 
 export const ConfirmDialog = memoNamed<Props>(
   'ConfirmDialog',

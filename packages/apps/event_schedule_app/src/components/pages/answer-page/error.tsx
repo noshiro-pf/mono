@@ -6,11 +6,12 @@ import { Description } from '../../atoms/description';
 
 const vt = texts.errorMessages;
 
-interface Props {
-  errorType:
+type Props = Readonly<{
+  errorType: Readonly<
     | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
-    | { data: 'answersResult'; type: 'not-found' | 'others' };
-}
+    | { data: 'answersResult'; type: 'not-found' | 'others' }
+  >;
+}>;
 
 export const AnswerPageError = memoNamed<Props>(
   'AnswerPageError',

@@ -1,11 +1,11 @@
 import { DateEnum, MonthEnum, sign, YearEnum } from '@noshiro/ts-utils';
 import { IRecord } from '../../../utils/immutable';
 
-type YearMonthDateBaseType = {
+type YearMonthDateBaseType = Readonly<{
   year: YearEnum;
   month: MonthEnum;
   date: DateEnum;
-};
+}>;
 
 export type PartialYearMonthDate = Partial<Readonly<YearMonthDateBaseType>>;
 

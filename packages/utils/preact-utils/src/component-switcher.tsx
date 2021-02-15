@@ -1,10 +1,10 @@
 import { VNode } from 'preact';
 import { memoNamed } from './memo-named';
 
-interface Props {
+type Props = Readonly<{
   children: readonly VNode[];
   index: number;
-}
+}>;
 
 const displayNoneStyle = { display: 'none' };
 

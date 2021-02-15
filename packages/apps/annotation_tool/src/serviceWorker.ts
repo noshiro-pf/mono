@@ -19,10 +19,10 @@ const isLocalhost = Boolean(
     localhostRegex.test(window.location.hostname)
 );
 
-type Config = {
+type Config = Readonly<{
   onSuccess?: (registration: ServiceWorkerRegistration) => void;
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
-};
+}>;
 
 export function register(config?: Config): void {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {

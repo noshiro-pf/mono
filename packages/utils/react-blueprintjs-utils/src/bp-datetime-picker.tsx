@@ -19,11 +19,14 @@ const parseDate = (str: string): Date => new Date(str);
 
 const tenYearsLater = new Date(getYear(new Date()) + 99, 11);
 
-interface Props
-  extends Omit<IDateInputProps, 'formatDate' | 'parseDate' | 'timePrecision'> {
-  ymdhm: Ymdhm | undefined;
-  onYmdhmChange: (ymdhm: Ymdhm | undefined) => void;
-}
+type Props = Omit<
+  IDateInputProps,
+  'formatDate' | 'parseDate' | 'timePrecision'
+> &
+  Readonly<{
+    ymdhm: Ymdhm | undefined;
+    onYmdhmChange: (ymdhm: Ymdhm | undefined) => void;
+  }>;
 
 export const BpDatetimePicker = memoNamed<Props>(
   'BpDatetimePicker',

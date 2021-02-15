@@ -28,16 +28,13 @@ export const useStreamEffect = <T>(
   }, []);
 };
 
-interface UseStreamValueType {
-  <T>(stream$: Observable<T>): T | undefined;
-  <T>(stream$: Observable<T>, initialValue: T): T;
-}
-
 // Wraps the value with an object to avoid setState's update behavior when T is function type.
-export const useStreamValue: UseStreamValueType = <T>(
+export function useStreamValue<T>(stream$: Observable<T>, initialValue: T): T;
+export function useStreamValue<T>(stream$: Observable<T>): T | undefined;
+export function useStreamValue<T>(
   stream$: Observable<T>,
   initialValue?: T
-) => {
+): T | undefined {
   const [state, setState] = useState<{ value: T | undefined }>({
     value: initialValue,
   });
@@ -45,7 +42,7 @@ export const useStreamValue: UseStreamValueType = <T>(
     setState({ value });
   });
   return state.value ?? initialValue;
-};
+}
 
 export const useVoidEventAsStream = (): [Observable<undefined>, () => void] => {
   const src$ = useRef(new Subject<undefined>());

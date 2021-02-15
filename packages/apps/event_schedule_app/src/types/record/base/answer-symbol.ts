@@ -2,11 +2,11 @@ import { IRecord } from '../../../utils/immutable';
 import { AnswerSymbolIconId } from '../../enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../enum/answer-symbol-point';
 
-type AnswerSymbolBaseType = {
+type AnswerSymbolBaseType = Readonly<{
   iconId: AnswerSymbolIconId;
   description: string;
   point: AnswerSymbolPointEnumType;
-};
+}>;
 
 export type PartialAnswerSymbol = Partial<Readonly<AnswerSymbolBaseType>>;
 

@@ -29,7 +29,7 @@ const Variance = styled.div`
   padding: 10px;
 `;
 
-interface Props {
+type Props = Readonly<{
   saturation: Percent;
   saturationOnChange: (v: Percent) => void;
   lightness: Percent;
@@ -42,7 +42,7 @@ interface Props {
   result1_equallySpaced: ExperimentResult;
   result2_weighted: ExperimentResult;
   result3_weighted_log: ExperimentResult;
-}
+}>;
 
 export const LuminanceVisualizerView = memoNamed<Props>(
   'LuminanceVisualizerView',

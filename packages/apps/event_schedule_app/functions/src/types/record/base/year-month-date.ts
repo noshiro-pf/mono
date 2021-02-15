@@ -1,11 +1,11 @@
 import { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
 import { sign } from '../../../utils/sign';
 
-export type YearMonthDateType = {
+export type YearMonthDateType = Readonly<{
   year: YearEnum;
   month: MonthEnum;
   date: DateEnum;
-};
+}>;
 
 export const compareYmd = (
   a: YearMonthDateType,
