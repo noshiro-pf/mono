@@ -16,7 +16,7 @@ import { ParagraphWithSwitch } from './paragraph-with-switch';
 
 const vt = texts.eventSettingsPage.section3;
 
-interface Props {
+type Props = Readonly<{
   useAnswerDeadline: boolean;
   onToggleAnswerDeadline: () => void;
   answerDeadline: IYmdHm | undefined;
@@ -29,7 +29,7 @@ interface Props {
   onToggleUseNotification: () => void;
   notificationSettings: INotificationSettings;
   onNotificationSettingsChange: (value: INotificationSettings) => void;
-}
+}>;
 
 const toYmdhm = mapNullable<IYmdHm, Ymdhm>(({ ymd, hm }) => ({
   year: ymd.year,

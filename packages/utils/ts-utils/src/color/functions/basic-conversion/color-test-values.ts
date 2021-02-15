@@ -1,10 +1,10 @@
 import { Hsl, Rgb } from '../../../color';
 
-type TestColorObject = {
+type TestColorObject = Readonly<{
   HEX: string;
   rgb: Rgb;
   hsl: Hsl;
-};
+}>;
 
 // [values from google color picker](https://www.google.com/search?q=color+picker&oq=color+picker&aqs=chrome..69i57.1262j0j7&sourceid=chrome&ie=UTF-8)
 export const testColors: TestColorObject[] = [

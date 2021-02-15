@@ -2,11 +2,11 @@ import { memoNamed, useToggleState } from '@noshiro/react-utils';
 import { BpButton } from './bp-button';
 import { BpInput } from './bp-input';
 
-interface Props {
+type Props = Readonly<{
   password: string;
   onPasswordChange: (value: string) => void;
   disabled: boolean;
-}
+}>;
 
 export const BpPasswordInput = memoNamed<Props>('BpPasswordInput', (props) => {
   const [showPassword, onToggleVisibilityClick] = useToggleState(false);

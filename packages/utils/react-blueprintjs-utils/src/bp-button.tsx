@@ -2,9 +2,11 @@ import { Button, IButtonProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties, useMemo } from 'react';
 
-interface Props extends IButtonProps, React.HTMLAttributes<HTMLElement> {
-  nowrap?: boolean;
-}
+type Props = IButtonProps &
+  React.HTMLAttributes<HTMLElement> &
+  Readonly<{
+    nowrap?: boolean;
+  }>;
 
 export const BpButton = memoNamed<Props>('BpButton', ({ nowrap, ...props }) => {
   const style = useMemo<CSSProperties>(

@@ -10,12 +10,12 @@ import { ButtonsWrapperAlignEnd } from '../../../molecules/buttons-wrapper';
 import { TimeRangeView } from '../../../molecules/time-range';
 import { timeRangeReducer } from './time-range-reducer';
 
-interface Props {
+type Props = Readonly<{
   initialValue: ITimeRange;
   datetimeSpecification: DatetimeSpecificationEnumType;
   onCancelClick: () => void;
   onOkClick: (timeRange: ITimeRange) => void;
-}
+}>;
 
 export const SetTimesPopoverContent = memoNamed<Props>(
   'SetTimesPopoverContent',

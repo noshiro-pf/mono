@@ -1,4 +1,4 @@
-export type NotificationSettingsJsType = {
+export type NotificationSettingsJsType = Readonly<{
   email: string;
   notifyOnAnswerChange: boolean;
   notify01daysBeforeAnswerDeadline: boolean;
@@ -6,4 +6,4 @@ export type NotificationSettingsJsType = {
   notify07daysBeforeAnswerDeadline: boolean;
   notify14daysBeforeAnswerDeadline: boolean;
   notify28daysBeforeAnswerDeadline: boolean;
-};
+}>;

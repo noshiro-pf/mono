@@ -2,10 +2,10 @@ import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants/texts';
 import { ButtonWithConfirm } from '../button-with-confirm/button-with-confirm';
 
-interface Props {
+type Props = Readonly<{
   onConfirmDeleteAnswer: () => Promise<void>;
   loading: boolean;
-}
+}>;
 
 const vt = texts.answerPage.myAnswer.deleteButton;
 

@@ -16,7 +16,7 @@ import { DatetimeRangeCell } from '../answer-table/datetime-range-cell';
 import { DeleteAnswerButton } from './delete-answer-button';
 import { useMyAnswerHooks } from './my-answer-hooks';
 
-interface Props {
+type Props = Readonly<{
   eventSchedule: IEventSchedule;
   myAnswer: IAnswer;
   onMyAnswerChange: (answer: IAnswer) => void;
@@ -26,7 +26,7 @@ interface Props {
   myAnswerSectionState: 'hidden' | 'creating' | 'editing';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
-}
+}>;
 
 const vt = texts.answerPage.myAnswer;
 

@@ -7,10 +7,10 @@ import {
   PartialDatetimeRange,
 } from './datetime-range';
 
-type AnswerSelectionBaseType = {
+type AnswerSelectionBaseType = Readonly<{
   datetimeRange: IDatetimeRange;
   iconId: AnswerSymbolIconId | undefined;
-};
+}>;
 
 export type PartialAnswerSelection = Partial<
   Readonly<{

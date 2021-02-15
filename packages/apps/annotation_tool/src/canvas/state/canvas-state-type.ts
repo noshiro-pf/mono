@@ -8,7 +8,7 @@ export type CanvasAppState = {
   pointerPos: Writable<Point>;
   dragStartPoint: Writable<Point>;
   dragEndPoint: Writable<Point>;
-  grabbingObject:
+  grabbingObject: Readonly<
     | { type: undefined }
     | { type: 'background' }
     | { type: 'bbox-face'; pixiBbox: PixiBbox; rectPrevious: Rect }
@@ -18,7 +18,8 @@ export type CanvasAppState = {
         pixiBbox: PixiBbox;
         rectPrevious: Rect;
         direction: Direction;
-      };
+      }
+  >;
 
   verticalLine: Sprite | undefined;
   horizontalLine: Sprite | undefined;

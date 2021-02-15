@@ -4,13 +4,13 @@ import { ReactNode } from 'react';
 import styled from 'styled-components';
 import { Description } from '../../atoms/description';
 
-interface Props {
+type Props = Readonly<{
   title: string;
   description?: string;
   show: boolean;
   onToggle: () => void;
   elementToToggle: ReactNode;
-}
+}>;
 
 export const ParagraphWithSwitch = memoNamed<Props>(
   'ParagraphWithSwitch',

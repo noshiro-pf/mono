@@ -8,11 +8,11 @@ import { DatepickerNav } from './navigation';
 import { Week } from './week';
 import { WeekdaysHeader } from './weekdays-header';
 
-interface Props {
+type Props = Readonly<{
   selectedDates: IList<IYearMonthDate>;
   onSelectedDatesChange: (value: IList<IYearMonthDate>) => void;
   holidaysJpDefinition?: IMap<IYearMonthDate, string>;
-}
+}>;
 
 export const MultipleDatePicker = memoNamed<Props>(
   'MultipleDatePicker',

@@ -10,26 +10,32 @@ import {
   AnswerSelectionReducerAction,
 } from './answer-selection-reducer';
 
-interface MyAnswerHooks {
+type MyAnswerHooks = Readonly<{
   userName: string;
   onUserNameChange: (v: string) => void;
   comment: string;
   onCommentChange: (v: string) => void;
-  symbolHeader: IList<{
-    iconId: AnswerSymbolIconId;
-    symbolDescription: string;
-    onClick: () => void;
-  }>;
-  myAnswerList: IList<{
-    datetimeRange: IDatetimeRange;
-    selectedSymbol: AnswerSymbolIconId | undefined;
-    buttons: IList<{
+  symbolHeader: IList<
+    Readonly<{
       iconId: AnswerSymbolIconId;
       symbolDescription: string;
       onClick: () => void;
-    }>;
-  }>;
-}
+    }>
+  >;
+  myAnswerList: IList<
+    Readonly<{
+      datetimeRange: IDatetimeRange;
+      selectedSymbol: AnswerSymbolIconId | undefined;
+      buttons: IList<
+        Readonly<{
+          iconId: AnswerSymbolIconId;
+          symbolDescription: string;
+          onClick: () => void;
+        }>
+      >;
+    }>
+  >;
+}>;
 
 export const useMyAnswerHooks = (
   eventSchedule: IEventSchedule,

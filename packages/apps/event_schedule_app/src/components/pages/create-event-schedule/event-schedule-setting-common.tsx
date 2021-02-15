@@ -17,10 +17,10 @@ import { useEventScheduleSettingCommonHooks } from './event-schedule-setting-com
 
 const vt = texts.eventSettingsPage;
 
-interface Props {
+type Props = Readonly<{
   mode: 'create' | 'edit';
   initialValues: IEventSchedule;
-}
+}>;
 
 export const EventScheduleSettingCommon = memoNamed<Props>(
   'EventScheduleSettingCommon',

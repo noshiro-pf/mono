@@ -2,9 +2,10 @@ import { ITextAreaProps, TextArea } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 
-interface Props extends ITextAreaProps {
-  onValueChange: (value: string) => void;
-}
+type Props = ITextAreaProps &
+  Readonly<{
+    onValueChange: (value: string) => void;
+  }>;
 
 export const BpTextArea = memoNamed<Props>(
   'BpTextArea',

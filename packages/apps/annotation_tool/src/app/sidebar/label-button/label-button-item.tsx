@@ -5,7 +5,7 @@ import { Label } from '../../../canvas/types/label';
 import { AppEventHandler } from '../../event-handlers';
 import { LabelButtonItemView } from './label-button-item-view';
 
-interface Props {
+type Props = Readonly<{
   index: number;
   label: Label;
   labelsSaturation: Percent;
@@ -13,7 +13,7 @@ interface Props {
   isSelected: boolean;
   isVisible: boolean;
   handlers: AppEventHandler;
-}
+}>;
 
 export const LabelButtonItem = memoNamed<Props>('LabelButtonItem', (props) => {
   const hsl = useMemo<Hsl>(

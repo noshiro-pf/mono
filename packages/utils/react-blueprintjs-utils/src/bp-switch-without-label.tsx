@@ -2,9 +2,10 @@ import { ISwitchProps, Switch } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties } from 'react';
 
-interface Props extends Omit<ISwitchProps, 'label' | 'labelElement'> {
-  onToggle: () => void;
-}
+type Props = Omit<ISwitchProps, 'label' | 'labelElement'> &
+  Readonly<{
+    onToggle: () => void;
+  }>;
 
 export const BpSwitchWithoutLabel = memoNamed<Props>(
   'BpSwitchWithoutLabel',

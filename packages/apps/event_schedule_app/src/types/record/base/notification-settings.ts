@@ -1,6 +1,6 @@
 import { IRecord } from '../../../utils/immutable';
 
-type NotificationSettingsBaseType = {
+type NotificationSettingsBaseType = Readonly<{
   email: string;
   notifyOnAnswerChange: boolean;
   notify01daysBeforeAnswerDeadline: boolean;
@@ -8,7 +8,7 @@ type NotificationSettingsBaseType = {
   notify07daysBeforeAnswerDeadline: boolean;
   notify14daysBeforeAnswerDeadline: boolean;
   notify28daysBeforeAnswerDeadline: boolean;
-};
+}>;
 
 export type PartialNotificationSettings = Partial<
   Readonly<NotificationSettingsBaseType>

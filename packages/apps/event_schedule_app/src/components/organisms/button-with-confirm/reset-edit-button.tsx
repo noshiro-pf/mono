@@ -4,10 +4,10 @@ import { ButtonWithConfirm } from './button-with-confirm';
 
 const vt = texts.eventSettingsPage.resetEditButton;
 
-interface Props {
+type Props = Readonly<{
   onConfirmClick: () => void;
   disabled?: boolean;
-}
+}>;
 
 const buttonConfig = {
   name: vt.name,

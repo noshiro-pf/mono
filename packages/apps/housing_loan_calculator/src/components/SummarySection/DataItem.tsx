@@ -9,10 +9,10 @@ const DataDescription = styled.dd`
   padding: 5px;
 `;
 
-interface Props {
+type Props = Readonly<{
   title: string;
   description: string;
-}
+}>;
 
 export const DataItem = memoNamed<Props>(
   'DataItem',

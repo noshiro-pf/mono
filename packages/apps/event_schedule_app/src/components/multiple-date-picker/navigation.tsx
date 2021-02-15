@@ -23,14 +23,14 @@ const monthOption: IOptionProps[] = monthsList.en.map((e) => ({
   label: e.name,
 }));
 
-interface Props {
+type Props = Readonly<{
   year: YearEnum;
   month: MonthEnum;
   onYearChange: (year: YearEnum) => void;
   onMonthChange: (month: MonthEnum) => void;
   onPrevMonthClick: () => void;
   onNextMonthClick: () => void;
-}
+}>;
 
 export const DatepickerNav = memoNamed<Props>(
   'DatepickerNav',

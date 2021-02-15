@@ -7,7 +7,7 @@ import { Label } from '../../../canvas/types/label';
 import { AppEventHandler } from '../../event-handlers';
 import { LabelButtonItem } from './label-button-item';
 
-interface Props {
+type Props = Readonly<{
   labels: readonly Label[];
   labelSaturation: Percent;
   labelLightness: Percent;
@@ -15,7 +15,7 @@ interface Props {
   selectedLabel: Label;
   hidden: boolean;
   handlers: AppEventHandler;
-}
+}>;
 
 export const LabelButtons = memoNamed<Props>('LabelButtons', (props) => {
   const labelsWithVisibleFlag = useMemo(

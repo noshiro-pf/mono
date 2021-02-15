@@ -5,7 +5,7 @@ import { api } from '../../../api/api';
 import { routePaths } from '../../../routing/routing';
 import { IEventSchedule } from '../../../types/record/event-schedule';
 
-interface CreateEventScheduleHooks {
+type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;
   createButtonIsLoading: boolean;
   onCreateEventClick: () => void;
@@ -14,7 +14,7 @@ interface CreateEventScheduleHooks {
   onClipboardButtonClick: () => void;
   url: string;
   isLoading: boolean;
-}
+}>;
 
 export const useCreateEventScheduleHooks = ({
   newEventSchedule,

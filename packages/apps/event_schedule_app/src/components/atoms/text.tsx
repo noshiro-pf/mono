@@ -1,9 +1,9 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 
-interface Props {
+type Props = Readonly<{
   text: string;
-}
+}>;
 
 export const Text = memoNamed<Props>('Text', (props) => (
   <Root>{props.text}</Root>

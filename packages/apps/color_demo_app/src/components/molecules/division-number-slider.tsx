@@ -6,10 +6,10 @@ const SliderWrapper = styled.div`
   padding: 10px 0;
 `;
 
-interface Props {
+type Props = Readonly<{
   divisionNumber: number;
   divisionNumberOnChange: (value: number) => void;
-}
+}>;
 
 export const DivisionNumberSlider = memoNamed<Props>(
   'DivisionNumberSlider',

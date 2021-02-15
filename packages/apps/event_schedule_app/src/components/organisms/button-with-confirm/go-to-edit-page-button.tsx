@@ -13,10 +13,10 @@ import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input
 
 const vt = texts.answerPage.eventInfo;
 
-interface Props {
+type Props = Readonly<{
   email: string;
   onConfirmClick: () => void;
-}
+}>;
 
 const buttonConfig = {
   name: vt.editButton,
@@ -43,10 +43,10 @@ export const GoToEditPageButton = memoNamed<Props>(
     )
 );
 
-interface ButtonWithConfirmProps {
+type ButtonWithConfirmProps = Readonly<{
   onConfirmClick: () => void;
   emailAnswer: string;
-}
+}>;
 
 const ButtonWithConfirm = memoNamed<ButtonWithConfirmProps>(
   'ButtonWithConfirm',
@@ -72,12 +72,12 @@ const ButtonWithConfirm = memoNamed<ButtonWithConfirmProps>(
   }
 );
 
-interface ConfirmEmailDialogProps {
+type ConfirmEmailDialogProps = Readonly<{
   onConfirmClick: () => void;
   emailAnswer: string;
   isOpen: boolean;
   close: () => void;
-}
+}>;
 
 const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
   'ConfirmEmailDialog',

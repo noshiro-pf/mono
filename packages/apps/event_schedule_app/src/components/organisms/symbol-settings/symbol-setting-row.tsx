@@ -13,14 +13,14 @@ import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
 import { IList } from '../../../utils/immutable';
 import { CustomIcon } from '../../atoms/icon';
 
-interface Props {
+type Props = Readonly<{
   answerSymbol: IAnswerSymbol;
   iconsInUse: IList<AnswerSymbolIconId>;
   onDescriptionChange: (value: string) => void;
   onPointChange: (value: AnswerSymbolPointEnumType) => void;
   onDeleteClick: () => void;
   disabled: boolean;
-}
+}>;
 
 export const AnswerSymbolRow = memoNamed<Props>(
   'AnswerSymbolRow',

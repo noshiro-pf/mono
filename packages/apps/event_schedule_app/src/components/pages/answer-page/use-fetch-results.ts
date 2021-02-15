@@ -14,15 +14,17 @@ import { IEventSchedule } from '../../../types/record/event-schedule';
 import { IList } from '../../../utils/immutable';
 import { clog } from '../../../utils/log';
 
-interface FetchResults {
+type FetchResults = Readonly<{
   eventSchedule$: Observable<undefined | IEventSchedule>;
   answers$: Observable<undefined | IList<IAnswer>>;
   answersResultTimestamp$: Observable<number>;
   errorType:
     | undefined
-    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
-    | { data: 'answersResult'; type: 'not-found' | 'others' };
-}
+    | Readonly<
+        | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
+        | { data: 'answersResult'; type: 'not-found' | 'others' }
+      >;
+}>;
 
 export const useFetchResults = (
   fetchEventScheduleThrottled$: Observable<void>,

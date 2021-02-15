@@ -16,12 +16,12 @@ export const mailTransport = createTransport({
   },
 });
 
-export type MailOptions = {
+export type MailOptions = Readonly<{
   from: string;
   to: string;
   subject: string;
   text: string;
-};
+}>;
 
 export const createMailOptions = ({
   text,

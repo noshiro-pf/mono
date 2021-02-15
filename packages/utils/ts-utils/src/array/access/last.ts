@@ -1,10 +1,8 @@
 import { ReadonlyNonEmptyArray } from '../non-empty-array';
 import { at } from './at';
 
-interface Last {
-  <T>(array: ReadonlyNonEmptyArray<T>): T;
-  <T>(array: readonly T[]): T | undefined;
+export function last<T>(array: ReadonlyNonEmptyArray<T>): T;
+export function last<T>(array: readonly T[]): T | undefined;
+export function last<T>(array: readonly T[]): T | undefined {
+  return at(array, array.length - 1);
 }
-
-export const last: Last = <T>(array: readonly T[]): T | undefined =>
-  at(array, array.length - 1);

@@ -3,7 +3,7 @@ import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { IDatetimeRange } from '../../../types/record/datetime-range';
 import { IList, IMap } from '../../../utils/immutable';
 
-export type AnswerSelectionReducerAction =
+export type AnswerSelectionReducerAction = Readonly<
   | {
       type: 'cell';
       datetimeRange: IDatetimeRange;
@@ -13,7 +13,8 @@ export type AnswerSelectionReducerAction =
       type: 'header';
       icon: AnswerSymbolIconId | undefined;
       datetimeRangeList: IList<IDatetimeRange>;
-    };
+    }
+>;
 
 export type AnswerSelectionReducerState = IMap<
   IDatetimeRange,

@@ -1,6 +1,6 @@
 import { isInRange } from '../num';
 
-export interface ReadonlyBitArrayType {
+export type ReadonlyBitArrayType = Readonly<{
   size: number;
   get: (at: number) => 0 | 1 | undefined;
 
@@ -9,7 +9,7 @@ export interface ReadonlyBitArrayType {
   map: (fn: (value: 0 | 1, index: number) => 0 | 1) => ReadonlyBitArrayType;
   forEach: (fn: (value: 0 | 1, index: number) => void) => void;
   toString: () => string;
-}
+}>;
 
 class CReadonlyBitArray implements ReadonlyBitArrayType {
   private readonly _data: Uint8Array;

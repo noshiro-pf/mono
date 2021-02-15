@@ -18,12 +18,12 @@ import { zIndex } from './z-index';
 settings.SORTABLE_CHILDREN = true;
 settings.ROUND_PIXELS = true;
 
-interface Props {
+type Props = Readonly<{
   idMaker: () => IdType;
   canvasStyles: AnnotationCanvasStyle;
   canvasSize: RectSize;
   selectedHue: Hue;
-}
+}>;
 
 export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

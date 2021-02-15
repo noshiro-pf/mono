@@ -5,16 +5,18 @@ import { IYearMonthDate } from '../../types/record/base/year-month-date';
 import { IList } from '../../utils/immutable';
 import { DatePickerDate } from './date-picker-day';
 
-interface Props {
-  week: IList<{
-    ymd: IYearMonthDate;
-    selected: boolean;
-    disabled: boolean;
-    dayType: DayType;
-    holidayJpName: string | undefined;
-  }>;
+type Props = Readonly<{
+  week: IList<
+    Readonly<{
+      ymd: IYearMonthDate;
+      selected: boolean;
+      disabled: boolean;
+      dayType: DayType;
+      holidayJpName: string | undefined;
+    }>
+  >;
   onClick: (ymd: IYearMonthDate) => void;
-}
+}>;
 
 export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
   const listWithHandler = useMemo(

@@ -3,9 +3,9 @@ import { WeekDayEnum, weekdaysList } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 
-interface Props {
+type Props = Readonly<{
   onClick: (w: WeekDayEnum) => void;
-}
+}>;
 
 export const WeekdaysHeader = memoNamed<Props>(
   'WeekdaysHeader',
@@ -37,11 +37,11 @@ export const WeekdaysHeader = memoNamed<Props>(
   }
 );
 
-interface PropsHeaderCell {
+type PropsHeaderCell = Readonly<{
   title: string;
   abbr: string;
   onClick: () => void;
-}
+}>;
 
 const HeaderCell = memoNamed<PropsHeaderCell>('HeaderCell', (props) => (
   <DivPointer

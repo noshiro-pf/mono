@@ -19,10 +19,10 @@ export const useTinyObservableEffect = <T>(
   }, []);
 };
 
-interface UseTinyObservableValueType {
+type UseTinyObservableValueType = Readonly<{
   <T>(stream$: TinyObservable<T>): T | undefined;
   <T>(stream$: TinyObservable<T>, initialValue: T): T;
-}
+}>;
 
 // Wraps the value with an object to avoid setState's update behavior when T is function type.
 export const useTinyObservableValue: UseTinyObservableValueType = <T>(

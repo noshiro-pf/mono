@@ -1,14 +1,14 @@
 import { Label, NumericInput } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 
-interface Props {
+type Props = Readonly<{
   label: string;
   value?: number;
   disabled?: boolean;
   onValueChange?: (valueAsNumber: number) => void;
   min?: number;
   max?: number;
-}
+}>;
 
 export const BpNumericInputWithLabel = memoNamed<Props>(
   'BpNumericInputWithLabel',

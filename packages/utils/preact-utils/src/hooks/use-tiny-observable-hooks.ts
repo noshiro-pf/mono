@@ -19,16 +19,18 @@ export const useTinyObservableEffect = <T>(
   }, []);
 };
 
-interface UseTinyObservableValueType {
-  <T>(stream$: TinyObservable<T>): T | undefined;
-  <T>(stream$: TinyObservable<T>, initialValue: T): T;
-}
-
 // Wraps the value with an object to avoid setState's update behavior when T is function type.
-export const useTinyObservableValue: UseTinyObservableValueType = <T>(
+export function useTinyObservableValue<T>(
+  stream$: TinyObservable<T>,
+  initialValue: T
+): T;
+export function useTinyObservableValue<T>(
+  stream$: TinyObservable<T>
+): T | undefined;
+export function useTinyObservableValue<T>(
   stream$: TinyObservable<T>,
   initialValue?: T
-) => {
+): T | undefined {
   const [state, setState] = useState<{ value: T | undefined }>({
     value: initialValue,
   });
@@ -36,4 +38,4 @@ export const useTinyObservableValue: UseTinyObservableValueType = <T>(
     setState({ value });
   });
   return state.value ?? initialValue;
-};
+}

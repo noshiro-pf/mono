@@ -18,7 +18,7 @@ import {
 } from './datetime-range';
 import { createIYmdHm, fillYmdHm, IYmdHm, PartialYmdHm } from './ymd-hm';
 
-export type EventScheduleBaseType = {
+export type EventScheduleBaseType = Readonly<{
   title: string;
   notes: string;
   datetimeSpecification: DatetimeSpecificationEnumType;
@@ -30,7 +30,7 @@ export type EventScheduleBaseType = {
   useNotification: boolean;
   notificationSettings: INotificationSettings;
   timezoneOffsetMinutes: number;
-};
+}>;
 
 export type PartialEventSchedule = Partial<
   Readonly<{

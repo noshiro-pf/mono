@@ -7,12 +7,12 @@ import { WidthRestrictedInputWrapper } from '../styled/width-restricted-input-wr
 
 const vt = texts.eventSettingsPage.section1;
 
-interface Props {
+type Props = Readonly<{
   title: string;
   onTitleChange: (value: string) => void;
   notes: string;
   onNotesChange: (value: string) => void;
-}
+}>;
 
 export const NameAndNotes = memoNamed<Props>('NameAndNotes', (props) => (
   <Root>

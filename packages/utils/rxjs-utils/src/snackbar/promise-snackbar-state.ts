@@ -1,7 +1,7 @@
 import { PromiseStatus } from '@noshiro/ts-utils';
 
-export type PromiseSnackbarStateType = {
+export type PromiseSnackbarStateType = Readonly<{
   isOpen: boolean;
   message: string;
   promiseState: PromiseStatus;
-};
+}>;

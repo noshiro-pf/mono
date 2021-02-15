@@ -16,24 +16,26 @@ import {
   DatetimeListReducerAction,
 } from './select-datetimes-reducer';
 
-interface SelectDatetimesHooks {
+type SelectDatetimesHooks = Readonly<{
   selectedDates: IList<IYearMonthDate>;
   onSelectedDatesChange: (v: IList<IYearMonthDate>) => void;
-  datetimeListWithHandler: IList<{
-    id: number;
-    datetimeRange: IDatetimeRange;
-    onYmdChange: (ymd: IYearMonthDate | undefined) => void;
-    onRangeStartChange: (hm: IHoursMinutes) => void;
-    onRangeEndChange: (hm: IHoursMinutes) => void;
-    onDuplicateClick: () => void;
-    onDeleteClick: () => void;
-  }>;
+  datetimeListWithHandler: IList<
+    Readonly<{
+      id: number;
+      datetimeRange: IDatetimeRange;
+      onYmdChange: (ymd: IYearMonthDate | undefined) => void;
+      onRangeStartChange: (hm: IHoursMinutes) => void;
+      onRangeEndChange: (hm: IHoursMinutes) => void;
+      onDuplicateClick: () => void;
+      onDeleteClick: () => void;
+    }>
+  >;
   onAddDatetimeClick: () => void;
   onConfirmDeleteAll: () => void;
   setTimesPopoverInitialValue: ITimeRange;
   onSetTimesPopoverSubmit: (timeRange: ITimeRange) => void;
   onSortClick: () => void;
-}
+}>;
 
 export const useSelectDatetimesHooks = (
   datetimeList: IList<IDatetimeRange>,

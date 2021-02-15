@@ -5,7 +5,7 @@ import { Label } from '../../canvas/types/label';
 import { AppEventHandler } from '../event-handlers';
 import { LabelButtons } from './label-button/label-buttons';
 
-interface Props {
+type Props = Readonly<{
   labels: readonly Label[];
   labelsSaturation: Percent;
   labelsLightness: Percent;
@@ -13,7 +13,7 @@ interface Props {
   selectedLabel: Label;
   hidden: boolean;
   handlers: AppEventHandler;
-}
+}>;
 
 export const Sidebar = memoNamed<Props>('Sidebar', (props) => (
   <Root>

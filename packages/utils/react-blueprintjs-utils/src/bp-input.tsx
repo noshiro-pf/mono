@@ -1,13 +1,14 @@
-import { IInputGroupProps, InputGroup } from '@blueprintjs/core';
+import { IInputGroupProps2, InputGroup } from '@blueprintjs/core';
 import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
 import { TinyObservable } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useRef } from 'react';
 
-interface Props extends IInputGroupProps {
-  onValueChange: (value: string) => void;
-  autoFocus?: boolean;
-  focus$?: TinyObservable<void>;
-}
+type Props = IInputGroupProps2 &
+  Readonly<{
+    onValueChange: (value: string) => void;
+    autoFocus?: boolean;
+    focus$?: TinyObservable<void>;
+  }>;
 
 export const BpInput = memoNamed<Props>(
   'BpInput',

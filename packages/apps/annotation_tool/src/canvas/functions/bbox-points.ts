@@ -2,12 +2,12 @@ import { Point, Rect } from '@noshiro/ts-utils';
 
 export type Direction = 'nw' | 'n_' | 'ne' | 'w_' | 'e_' | 'sw' | 's_' | 'se';
 
-export type BboxPoint = {
+export type BboxPoint = Readonly<{
   direction: Direction;
   position: Point;
-};
+}>;
 
-export type BboxPoints = { [key in Direction]: Point };
+export type BboxPoints = Readonly<{ [key in Direction]: Point }>;
 
 /*
  *     x0    x1    x2

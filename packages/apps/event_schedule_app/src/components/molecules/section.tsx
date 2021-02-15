@@ -4,9 +4,9 @@ import { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { SectionTitle } from '../atoms/section-title';
 
-interface Props {
+type Props = Readonly<{
   sectionTitle?: string;
-}
+}>;
 
 export const Section = memoNamed<PropsWithChildren<Props>>(
   'Section',

@@ -8,9 +8,9 @@ const Box = styled.div`
   border-radius: 25%;
 `;
 
-interface Props {
+type Props = Readonly<{
   hsl: Hsl;
-}
+}>;
 
 export const ColorItem = memoNamed<Props>('ColorItem', (props) => (
   <Box style={{ backgroundColor: hslToStr(props.hsl) }} />

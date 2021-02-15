@@ -17,11 +17,11 @@ const ColorItemWrapper = styled.div`
   padding: 3px;
 `;
 
-interface Props {
+type Props = Readonly<{
   hueList: Mappable<Hue>;
   saturation: Percent;
   lightness: Percent;
-}
+}>;
 
 export const ColorList = memoNamed<Props>('ColorList', (props) => (
   <ColorsWrapper>

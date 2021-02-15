@@ -6,11 +6,11 @@ import { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
 import { IList } from '../../../../utils/immutable';
 import { SelectSymbolPopoverContent } from './select-symbol-popover-content';
 
-interface Props {
+type Props = Readonly<{
   openerIcon: IconName | JSX.Element;
   iconsInUse: IList<AnswerSymbolIconId>;
   onIconSelectSubmit: (id: AnswerSymbolIconId) => void;
-}
+}>;
 
 export const SelectSymbolPopover = memoNamed<Props>(
   'SelectSymbolPopover',

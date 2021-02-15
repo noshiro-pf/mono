@@ -1,11 +1,11 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties } from 'react';
 
-interface Props {
+type Props = Readonly<{
   size?: number;
   color?: string;
   style?: CSSProperties;
-}
+}>;
 
 export const CloseIcon = memoNamed<Props>(
   'CloseIcon',

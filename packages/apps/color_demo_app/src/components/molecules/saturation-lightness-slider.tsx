@@ -9,7 +9,7 @@ const SliderWrapper = styled.div`
   padding: 10px 0;
 `;
 
-interface Props {
+type Props = Readonly<{
   saturation: Percent;
   lightness: Percent;
   saturationOnChange: (value: Percent) => void;
@@ -18,7 +18,7 @@ interface Props {
   firstHueOnChange: (value: Hue) => void;
   divisionNumber: number;
   divisionNumberOnChange: (value: number) => void;
-}
+}>;
 
 export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
   <div>

@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
 
-interface Props {
+type Props = Readonly<{
   comment: string;
-}
+}>;
 
 export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
   const [isOpen, open, close] = useBooleanState(false);

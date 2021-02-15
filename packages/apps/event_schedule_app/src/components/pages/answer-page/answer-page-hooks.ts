@@ -24,15 +24,17 @@ import { useFetchResults } from './use-fetch-results';
 import { useMyAnswer } from './use-my-answer';
 import { useRefreshButtonState } from './use-refresh-button-state';
 
-interface AnswerPageState {
+type AnswerPageState = Readonly<{
   eventId: string | undefined;
   eventSchedule: IEventSchedule | undefined;
   onEditButtonClick: () => void;
   answers: IList<IAnswer> | undefined;
   errorType:
     | undefined
-    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
-    | { data: 'answersResult'; type: 'not-found' | 'others' };
+    | Readonly<
+        | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
+        | { data: 'answersResult'; type: 'not-found' | 'others' }
+      >;
   onAnswerClick: (answer: IAnswer) => void;
   showMyAnswerSection: () => void;
   myAnswerSectionState: 'hidden' | 'creating' | 'editing';
@@ -48,7 +50,7 @@ interface AnswerPageState {
   refreshButtonIsLoading: boolean;
   refreshButtonIsDisabled: boolean;
   isExpired: boolean;
-}
+}>;
 
 const toast = createToaster();
 

@@ -5,24 +5,24 @@ import { useCallback } from 'react';
 import { createToaster, showToast } from '../../../utils/toaster';
 import { ConfirmDialog } from './confirm-dialog';
 
-interface Props {
+type Props = Readonly<{
   onConfirmClick: (() => void) | (() => Promise<void>);
   disabled?: boolean;
   loading?: boolean;
-  buttonConfig: {
+  buttonConfig: Readonly<{
     name: string;
     intent?: Intent;
     icon?: IconName;
-  };
-  dialogConfig: {
+  }>;
+  dialogConfig: Readonly<{
     icon?: IconName;
     intent?: Intent;
     message: string;
     cancelButtonText: string;
     confirmButtonText: string;
-  };
-  toastConfig: { message: string; intent: Intent };
-}
+  }>;
+  toastConfig: Readonly<{ message: string; intent: Intent }>;
+}>;
 
 const toast = createToaster();
 

@@ -8,10 +8,10 @@ import { Description } from '../atoms/description';
 
 const vt = texts.answerPage;
 
-interface Props {
+type Props = Readonly<{
   eventSchedule: IEventSchedule;
   isExpired: boolean;
-}
+}>;
 
 export const AnswerPageEventInfo = memoNamed<Props>(
   'AnswerPageEventInfo',

@@ -1,6 +1,6 @@
 import { HoursEnum, MinutesEnum } from '@noshiro/ts-utils';
 
-export interface HoursMinutes {
+export type HoursMinutes = Readonly<{
   hours: HoursEnum;
   minutes: MinutesEnum;
-}
+}>;

@@ -9,11 +9,11 @@ import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const vt = texts.eventSettingsPage.section2;
 
-interface Props {
+type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   initialValue: ITimeRange;
   onSetTimesSubmit: (range: ITimeRange) => void;
-}
+}>;
 
 export const SetTimesPopover = memoNamed<Props>(
   'SetTimesPopover',

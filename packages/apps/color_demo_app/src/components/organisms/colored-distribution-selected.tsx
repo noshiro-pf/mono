@@ -23,9 +23,9 @@ const Bar = styled.div`
   /* border-color: black; */
 `;
 
-interface Props {
+type Props = Readonly<{
   experimentResult: ExperimentResult;
-}
+}>;
 
 export const ColoredDistributionSelected = memoNamed<Props>(
   'ColoredDistributionSelected',

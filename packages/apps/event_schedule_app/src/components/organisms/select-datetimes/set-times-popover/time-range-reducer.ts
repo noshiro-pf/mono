@@ -5,10 +5,10 @@ import {
 } from '../../../../types/record/base/hours-minutes';
 import { ITimeRange } from '../../../../types/record/time-range';
 
-export type TimeRangeReducerAction = {
+export type TimeRangeReducerAction = Readonly<{
   type: 'start' | 'end';
   hm: IHoursMinutes;
-};
+}>;
 
 export type TimeRangeReducerState = ITimeRange;
 

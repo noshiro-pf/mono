@@ -1,10 +1,10 @@
 import { ReactNodeArray } from 'react';
 import { memoNamed } from './memo-named';
 
-interface Props {
+type Props = Readonly<{
   children: ReactNodeArray;
   index: number;
-}
+}>;
 
 const displayNoneStyle = { display: 'none' };
 
