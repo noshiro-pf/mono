@@ -7,12 +7,38 @@ SCRIPT_DIR=$(cd $(dirname $0); pwd)
 # configs
 ADD_SUB_DIRECTORY_EXPORT_IN_INDEX_TS="true"
 TS_FILENAME_REGEX="^[a-zA-Z0-9_\-]+.tsx?$"
-OMIT_ROOT_INDEX_TS=false
-MAX_RECURSION_DEPTH=10
 
 # args
 target_directory=$1
-clear=$2
+clear=false
+omit_root_index_ts=false
+max_recursion_depth=10
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+
+  case $key in
+    --clear)
+    $clear=true
+    shift # past argument
+    ;;
+    --omitroot)
+    $omit_root_index_ts=true
+    shift # past argument
+    ;;
+    --max-depth)
+    $max_recursion_depth=$2
+    shift # past argument
+    shift # past argument
+    ;;
+    *)    # unknown option
+    shift # past argument
+    ;;
+  esac
+done
+
+echo ${clear}
 
 # move to target directory
 cd ${target_directory}
@@ -20,20 +46,18 @@ pwd
 
 index_ts_files=()
 
-# regenerate index.ts recursively
-for directory in $(find . -maxdepth ${MAX_RECURSION_DEPTH} -type d); do
-  if [ "${OMIT_ROOT_INDEX_TS}" = "true" -a "${directory}" = "." ]; then
+# generate index.ts recursively
+for directory in $(find . -maxdepth ${max_recursion_depth} -type d); do
+  if [ "${omit_root_index_ts}" = "true" -a "${directory}" = "." ]; then
     continue;
   fi
 
   index_ts="${directory}/index.ts"
 
-  if [ "${clear}" = "clear" ]; then
+  if "${clear}"; then
     rm ${index_ts}
   else
 
-    # reset index.ts
-    # echo -n "" > ${index_ts}
     result=""
 
     # files in a current directory
