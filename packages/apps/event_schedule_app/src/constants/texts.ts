@@ -1,4 +1,5 @@
 export const texts = {
+  aboutThisApp: 'このアプリについて',
   pageNotFound: 'ページが見つかりませんでした。',
   topPage: 'トップページ',
   eventSettingsPage: {
@@ -118,6 +119,7 @@ export const texts = {
 
   answerPage: {
     title: '日程調整 回答ページ',
+    createNew: '日程調整を新規作成',
     eventInfo: {
       title: '概要',
       eventName: 'イベント名',
@@ -153,6 +155,7 @@ export const texts = {
       },
       yourName: 'あなたの名前：',
       comments: 'コメント（オプション）：',
+      nameIsRequired: '名前は必須項目です',
       theNameIsAlreadyUsed: 'その名前は既に使われています',
 
       submitButton: {

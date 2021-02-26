@@ -27,7 +27,6 @@ export const SelectSymbolPopover = memoNamed<Props>(
 
     return (
       <Popover
-        target={<BpButton icon={openerIcon} minimal={true} onClick={open} />}
         content={
           <SelectSymbolPopoverContent
             iconsInUse={iconsInUse}
@@ -37,7 +36,9 @@ export const SelectSymbolPopover = memoNamed<Props>(
         isOpen={isOpen}
         onClose={close}
         canEscapeKeyClose={true}
-      />
+      >
+        <BpButton icon={openerIcon} minimal={true} onClick={open} />
+      </Popover>
     );
   }
 );

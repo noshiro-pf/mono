@@ -1,5 +1,5 @@
 import { useNavigator } from '@noshiro/react-router-utils';
-import { useStreamValue } from '@noshiro/react-rxjs-utils';
+import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { useAlive } from '@noshiro/react-utils';
 import {
   RefObject,
@@ -13,6 +13,7 @@ import { api } from '../../../api/api';
 import { texts } from '../../../constants/texts';
 import { routePaths } from '../../../routing/routing';
 import { useEventId } from '../../../routing/use-event-id';
+import { UserName } from '../../../types/phantom';
 import { IAnswer } from '../../../types/record/answer';
 import { IEventSchedule } from '../../../types/record/event-schedule';
 import { compareYmdHm } from '../../../types/record/ymd-hm';
@@ -31,10 +32,8 @@ type AnswerPageState = Readonly<{
   answers: IList<IAnswer> | undefined;
   errorType:
     | undefined
-    | Readonly<
-        | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
-        | { data: 'answersResult'; type: 'not-found' | 'others' }
-      >;
+    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
+    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>;
   onAnswerClick: (answer: IAnswer) => void;
   showMyAnswerSection: () => void;
   myAnswerSectionState: 'hidden' | 'creating' | 'editing';
@@ -50,6 +49,7 @@ type AnswerPageState = Readonly<{
   refreshButtonIsLoading: boolean;
   refreshButtonIsDisabled: boolean;
   isExpired: boolean;
+  usernameDuplicateCheckException: UserName | undefined;
 }>;
 
 const toast = createToaster();
@@ -88,9 +88,15 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const { myAnswer, setMyAnswer, resetMyAnswer } = useMyAnswer(eventSchedule$);
 
+  const [
+    usernameDuplicateCheckException,
+    setUsernameDuplicateCheckException,
+  ] = useState<UserName | undefined>(undefined);
+
   const answerSectionRef = useRef<HTMLDivElement>(null);
 
   const showMyAnswerSection = useCallback(() => {
+    setUsernameDuplicateCheckException(undefined);
     setMyAnswerSectionState('creating');
   }, []);
 
@@ -208,6 +214,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     (answer: IAnswer) => {
       setMyAnswerSectionState('editing');
       setMyAnswer(answer);
+      setUsernameDuplicateCheckException(answer.userName);
     },
     [setMyAnswer]
   );
@@ -256,5 +263,6 @@ export const useAnswerPageState = (): AnswerPageState => {
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
+    usernameDuplicateCheckException,
   };
 };

@@ -47,14 +47,13 @@
     "@blueprintjs/table": "^3.8.18",
     "@noshiro/react-blueprintjs-utils": "*",
     "@noshiro/react-router-utils": "*",
-    "@noshiro/react-rxjs-utils": "*",
+    "@noshiro/react-syncflow-hooks": "*",
     "@noshiro/react-utils": "*",
-    "@noshiro/rxjs-utils": "*",
     "@noshiro/ts-utils": "*",
     "firebase": "^8.1.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
-    "rxjs": "^6.6.3",
-    "styled-components": "^5.1.1"
+    "styled-components": "^5.1.1",
+    "url-regex": "^5.0.0"
   }
 }

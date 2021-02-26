@@ -2,10 +2,9 @@ import {
   useStream,
   useStreamEffect,
   useVoidEventAsStream,
-} from '@noshiro/react-rxjs-utils';
+} from '@noshiro/react-syncflow-hooks';
+import { Observable, throttleTime } from '@noshiro/syncflow';
 import { useEffect } from 'react';
-import { Observable } from 'rxjs';
-import { throttleTime } from 'rxjs/operators';
 import { fetchThrottleTime } from '../../../constants/fetch-throttle-time';
 import { clog } from '../../../utils/log';
 
@@ -16,11 +15,11 @@ export const useFetchEventStreams = (): {
 } => {
   const [fetchEventSchedule$, fetchEventSchedule] = useVoidEventAsStream();
   const [fetchAnswers$, fetchAnswers] = useVoidEventAsStream();
-  const fetchEventScheduleThrottled$ = useStream(
-    fetchEventSchedule$.pipe(throttleTime(fetchThrottleTime))
+  const fetchEventScheduleThrottled$ = useStream(() =>
+    fetchEventSchedule$.chain(throttleTime(fetchThrottleTime))
   );
-  const fetchAnswersThrottled$ = useStream(
-    fetchAnswers$.pipe(throttleTime(fetchThrottleTime))
+  const fetchAnswersThrottled$ = useStream(() =>
+    fetchAnswers$.chain(throttleTime(fetchThrottleTime))
   );
 
   useStreamEffect(fetchEventScheduleThrottled$, () => {

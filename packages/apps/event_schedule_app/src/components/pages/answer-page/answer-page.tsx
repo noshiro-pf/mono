@@ -1,4 +1,4 @@
-import { Icon, Spinner } from '@blueprintjs/core';
+import { AnchorButton, Icon, Spinner } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
@@ -41,6 +41,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
+    usernameDuplicateCheckException,
   } = useAnswerPageState();
 
   return errorType !== undefined && errorType.type === 'not-found' ? (
@@ -52,6 +53,17 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
           <Icon icon={'timeline-events'} iconSize={28} />
           <div>{vt.title}</div>
         </Title>
+        <CreateNewButtonWrapper>
+          <AnchorButton
+            intent={'primary'}
+            href={'../../'}
+            target='_blank'
+            rel='noopener noreferrer'
+            icon='add'
+          >
+            {vt.createNew}
+          </AnchorButton>
+        </CreateNewButtonWrapper>
       </TitleWrapper>
       {errorType !== undefined ? (
         <AnswerPageError errorType={errorType} />
@@ -134,6 +146,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               >
                 <MyAnswer
                   eventSchedule={eventSchedule}
+                  answers={answers}
                   myAnswer={myAnswer}
                   onMyAnswerChange={onMyAnswerChange}
                   onCancel={onCancel}
@@ -142,6 +155,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   myAnswerSectionState={myAnswerSectionState}
                   submitButtonIsLoading={submitButtonIsLoading}
                   submitButtonIsDisabled={submitButtonIsDisabled}
+                  usernameDuplicateCheckException={
+                    usernameDuplicateCheckException
+                  }
                 />
               </Section>
             )}
@@ -154,6 +170,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
 const TitleWrapper = styled.div`
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const Title = styled.a`
@@ -170,6 +189,14 @@ const Title = styled.a`
   font-weight: bold;
   color: black !important;
   text-decoration: none !important;
+`;
+
+const CreateNewButtonWrapper = styled.div`
+  flex: 1;
+  margin: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 `;
 
 const TableWrapper = styled.div`

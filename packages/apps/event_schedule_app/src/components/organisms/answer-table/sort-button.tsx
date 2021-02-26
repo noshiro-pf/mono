@@ -26,16 +26,7 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
       isOpen={isOpen}
       onClose={close}
       canEscapeKeyClose={true}
-      position={'bottom'}
-      target={
-        <BpButton
-          minimal={true}
-          icon={'chevron-down'}
-          outlined={true}
-          small={true}
-          onClick={open}
-        />
-      }
+      placement={'bottom'}
       content={
         <ButtonGroup vertical={true}>
           <BpButton icon='sort-asc' minimal={true} onClick={onSortAscClick}>
@@ -46,6 +37,14 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
           </BpButton>
         </ButtonGroup>
       }
-    ></Popover>
+    >
+      <BpButton
+        minimal={true}
+        icon={'chevron-down'}
+        outlined={true}
+        small={true}
+        onClick={open}
+      />
+    </Popover>
   );
 });

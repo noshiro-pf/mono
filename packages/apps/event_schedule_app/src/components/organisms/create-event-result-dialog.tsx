@@ -35,7 +35,11 @@ export const CreateEventResultDialog = memoNamed<Props>(
             <UrlWrapper>
               <div>URL: </div>
               <AnchorWrapper>
-                <Anchor href={props.url} target='_blank' rel='noreferrer'>
+                <Anchor
+                  href={props.url}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
                   {props.url}
                 </Anchor>
               </AnchorWrapper>
@@ -62,7 +66,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
               intent={'primary'}
               href={props.url}
               target='_blank'
-              rel='noreferrer'
+              rel='noopener noreferrer'
             >
               {vt.openEventPageCreated}
             </AnchorButton>

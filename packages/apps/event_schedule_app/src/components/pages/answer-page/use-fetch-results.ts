@@ -1,13 +1,22 @@
 import {
-  useDataStream,
+  useStream,
   useStreamEffect,
   useStreamValue,
   useValueAsStream,
-} from '@noshiro/react-rxjs-utils';
-import { asValueFrom, filterNotUndefined } from '@noshiro/rxjs-utils';
-import { Result } from '@noshiro/ts-utils';
-import { combineLatest, from, Observable } from 'rxjs';
-import { distinctUntilChanged, map, pluck, switchMap } from 'rxjs/operators';
+} from '@noshiro/react-syncflow-hooks';
+import {
+  combineLatest,
+  distinctUntilChanged,
+  filter,
+  fromPromise,
+  map,
+  Observable,
+  pluck,
+  switchMap,
+  unwrapResultOk,
+  withInitialValue,
+} from '@noshiro/syncflow';
+import { isNotUndefined, Result } from '@noshiro/ts-utils';
 import { api } from '../../../api/api';
 import { IAnswer } from '../../../types/record/answer';
 import { IEventSchedule } from '../../../types/record/event-schedule';
@@ -20,10 +29,8 @@ type FetchResults = Readonly<{
   answersResultTimestamp$: Observable<number>;
   errorType:
     | undefined
-    | Readonly<
-        | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
-        | { data: 'answersResult'; type: 'not-found' | 'others' }
-      >;
+    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
+    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>;
 }>;
 
 export const useFetchResults = (
@@ -33,30 +40,36 @@ export const useFetchResults = (
 ): FetchResults => {
   const eventId$ = useValueAsStream(eventId);
 
-  const eventScheduleResult$ = useDataStream<
+  const eventScheduleResult$ = useStream<
     undefined | Result<IEventSchedule, 'not-found' | 'others'>
-  >(
-    undefined,
-    fetchEventScheduleThrottled$.pipe(
-      asValueFrom(eventId$),
-      switchMap((eId) => from(api.event.get(eId ?? '')))
-    )
+  >(() =>
+    combineLatest(fetchEventScheduleThrottled$, eventId$)
+      .chain(map(([_, x]) => x))
+      .chain(
+        switchMap((eId) =>
+          fromPromise(api.event.get(eId ?? '')).chain(unwrapResultOk())
+        )
+      )
+      .chain(withInitialValue(undefined))
   );
 
-  const answersResult$ = useDataStream<{
+  const answersResult$ = useStream<{
     timestamp: number;
     value: undefined | Result<IList<IAnswer>, 'not-found' | 'others'>;
-  }>(
-    { timestamp: Date.now(), value: undefined },
-    fetchAnswersThrottled$.pipe(
-      asValueFrom(eventId$),
-      switchMap((eId) => from(api.answers.getList(eId ?? ''))),
-      map((r) => ({ timestamp: Date.now(), value: r }))
-    )
+  }>(() =>
+    combineLatest(fetchAnswersThrottled$, eventId$)
+      .chain(map(([_, x]) => x))
+      .chain(
+        switchMap((eId) =>
+          fromPromise(api.answers.getList(eId ?? '')).chain(unwrapResultOk())
+        )
+      )
+      .chain(map((r) => ({ timestamp: Date.now(), value: r })))
+      .chain(withInitialValue({ timestamp: Date.now(), value: undefined }))
   );
 
   useStreamEffect(eventScheduleResult$, (e) => {
-    if (Result.isErr(e)) {
+    if (e !== undefined && Result.isErr(e)) {
       clog('eventScheduleResult', e);
     }
   });
@@ -67,40 +80,50 @@ export const useFetchResults = (
     }
   });
 
-  const answersResultTimestamp$ = useDataStream<number>(
-    Date.now(),
-    answersResult$.pipe(pluck('timestamp'), distinctUntilChanged())
+  const answersResultTimestamp$ = useStream<number>(() =>
+    answersResult$
+      .chain(pluck('timestamp'))
+      .chain(distinctUntilChanged())
+      .chain(withInitialValue(Date.now()))
   );
 
-  const eventSchedule$ = useDataStream<undefined | IEventSchedule>(
-    undefined,
-    eventScheduleResult$.pipe(filterNotUndefined(), map(Result.unwrapOk))
+  const eventSchedule$ = useStream<undefined | IEventSchedule>(() =>
+    eventScheduleResult$
+      .chain(filter(isNotUndefined))
+      .chain(unwrapResultOk())
+      .chain(withInitialValue(undefined))
   );
 
-  const answers$ = useDataStream<undefined | IList<IAnswer>>(
-    undefined,
-    answersResult$.pipe(
-      pluck('value'),
-      filterNotUndefined(),
-      map(Result.unwrapOk)
-    )
+  const answers$ = useStream<undefined | IList<IAnswer>>(() =>
+    answersResult$
+      .chain(pluck('value'))
+      .chain(filter(isNotUndefined))
+      .chain(unwrapResultOk())
+      .chain(withInitialValue(undefined))
   );
 
-  const errorType$ = useDataStream<
+  const errorType$ = useStream<
     | undefined
-    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
-    | { data: 'answersResult'; type: 'not-found' | 'others' }
-  >(
-    undefined,
-    combineLatest([eventScheduleResult$, answersResult$]).pipe(
-      map(([esr, ar]) =>
-        Result.isErr(esr)
-          ? { data: 'eventScheduleResult' as const, type: esr.value }
-          : Result.isErr(ar.value)
-          ? { data: 'answersResult' as const, type: ar.value.value }
-          : undefined
+    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
+    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
+  >(() =>
+    combineLatest(eventScheduleResult$, answersResult$)
+      .chain(
+        map(([esr, ar]) =>
+          Result.isErr(esr)
+            ? ({
+                data: 'eventScheduleResult' as const,
+                type: esr.value,
+              } as const)
+            : Result.isErr(ar.value)
+            ? ({
+                data: 'answersResult' as const,
+                type: ar.value.value,
+              } as const)
+            : undefined
+        )
       )
-    )
+      .chain(withInitialValue(undefined))
   );
 
   const errorType = useStreamValue(errorType$);
