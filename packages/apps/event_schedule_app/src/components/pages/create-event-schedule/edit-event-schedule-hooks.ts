@@ -1,5 +1,5 @@
 import { useNavigator } from '@noshiro/react-router-utils';
-import { useBooleanState } from '@noshiro/react-utils';
+import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { api } from '../../../api/api';
 import { texts } from '../../../constants/texts';
@@ -39,14 +39,17 @@ export const useEditEventScheduleHooks = ({
     navigator(answerPagePath);
   }, [navigator, answerPagePath]);
 
+  const alive = useAlive();
   const onEditEventClick = useCallback(() => {
     if (!eventScheduleValidationOk) return;
     if (eventId === undefined) return;
+    if (!alive) return;
 
     setIsLoadingTrue();
     api.event
       .update(eventId, newEventSchedule)
       .then(() => {
+        if (!alive) return;
         setIsLoadingFalse();
         onBackToAnswerPage();
         showToast({
@@ -65,6 +68,7 @@ export const useEditEventScheduleHooks = ({
     setIsLoadingFalse,
     eventId,
     onBackToAnswerPage,
+    alive,
   ]);
 
   return {

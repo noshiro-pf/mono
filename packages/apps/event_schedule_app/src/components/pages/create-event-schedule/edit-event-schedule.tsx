@@ -1,14 +1,18 @@
 import { Icon, Spinner } from '@blueprintjs/core';
 import {
-  useDataStream,
+  useStream,
   useStreamEffect,
   useStreamValue,
   useValueAsStream,
-} from '@noshiro/react-rxjs-utils';
+} from '@noshiro/react-syncflow-hooks';
 import { memoNamed } from '@noshiro/react-utils';
+import {
+  fromPromise,
+  switchMap,
+  unwrapResultOk,
+  withInitialValue,
+} from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
-import { from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import styled from 'styled-components';
 import { api } from '../../../api/api';
 import { descriptionFontColor } from '../../../constants/color';
@@ -26,11 +30,16 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useEventId();
   const eventId$ = useValueAsStream(eventId);
 
-  const eventScheduleResult$ = useDataStream<
+  const eventScheduleResult$ = useStream<
     undefined | Result<IEventSchedule, 'not-found' | 'others'>
-  >(
-    undefined,
-    eventId$.pipe(switchMap((eId) => from(api.event.get(eId ?? ''))))
+  >(() =>
+    eventId$
+      .chain(
+        switchMap((eId) =>
+          fromPromise(api.event.get(eId ?? '')).chain(unwrapResultOk())
+        )
+      )
+      .chain(withInitialValue(undefined))
   );
 
   useStreamEffect(eventScheduleResult$, (e) => {

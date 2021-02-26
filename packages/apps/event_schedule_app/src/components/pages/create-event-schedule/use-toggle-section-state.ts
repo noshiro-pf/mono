@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 // const NULL = Symbol();
 // const isNonNull = <T>(v: T | symbol): v is T => v !== NULL;
@@ -6,7 +6,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 export const useToggleSectionState = <A>(
   initialToggleState: boolean,
   initialValue: A,
-  valueWhenTurnedOff: A
+  valueWhenTurnedOff: A,
+  valueWhenTurnedOn?: A
 ): [
   boolean,
   (b: boolean) => void,
@@ -19,26 +20,39 @@ export const useToggleSectionState = <A>(
   const valueWhenTurnedOffRef: React.MutableRefObject<A> = useRef(
     valueWhenTurnedOff
   );
+  const valueWhenTurnedOnRef: React.MutableRefObject<A | undefined> = useRef(
+    valueWhenTurnedOn
+  );
 
   const [useThisConfig, setUseThisConfig] = useState<boolean>(
     initialToggleState
   );
 
-  const toggle = useCallback(() => {
-    setUseThisConfig((b) => !b);
+  const turnOn = useCallback(() => {
+    setUseThisConfig(true);
+    if (valueWhenTurnedOnRef.current !== undefined) {
+      setValue(valueWhenTurnedOnRef.current);
+    }
   }, []);
+
+  const turnOff = useCallback(() => {
+    setUseThisConfig(false);
+    setValue(valueWhenTurnedOffRef.current);
+  }, []);
+
+  const toggle = useCallback(() => {
+    if (useThisConfig) {
+      turnOff();
+    } else {
+      turnOn();
+    }
+  }, [useThisConfig, turnOff, turnOn]);
 
   const [value, setValue] = useState<A>(initialValueRef.current);
 
   const resetValue = useCallback(() => {
     setValue(initialValueRef.current);
   }, []);
-
-  useEffect(() => {
-    if (!useThisConfig) {
-      setValue(valueWhenTurnedOffRef.current);
-    }
-  }, [useThisConfig]);
 
   return [useThisConfig, setUseThisConfig, toggle, value, setValue, resetValue];
 };

@@ -1,7 +1,13 @@
-import { useDataStream, useStreamValue } from '@noshiro/react-rxjs-utils';
+import { useStream, useStreamValue } from '@noshiro/react-syncflow-hooks';
+import {
+  filter,
+  fromPromise,
+  map,
+  unwrapResultOk,
+  withInitialValue,
+} from '@noshiro/syncflow';
+import { isNotUndefined, recordEntries } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { from } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
 import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
 import {
@@ -17,6 +23,10 @@ import { fetchHolidaysJson } from '../../../utils/fetch-holidays';
 import { IList, IMap } from '../../../utils/immutable';
 import { ymdFromDate } from '../../../utils/ymdhm-from-date';
 import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
+import {
+  defaultAnswerDeadline,
+  defaultNotificationSettings,
+} from './default-values';
 import { useEditEventScheduleHooks } from './edit-event-schedule-hooks';
 import { normalizeEventSchedule } from './normalize-event-schedule';
 import { useToggleSectionState } from './use-toggle-section-state';
@@ -93,7 +103,8 @@ export const useEventScheduleSettingCommonHooks = (
   ] = useToggleSectionState<IYmdHm | undefined>(
     initialValues.current.useAnswerDeadline,
     initialValues.current.answerDeadline,
-    undefined
+    undefined,
+    defaultAnswerDeadline
   );
 
   const [
@@ -119,7 +130,8 @@ export const useEventScheduleSettingCommonHooks = (
   ] = useToggleSectionState<INotificationSettings>(
     initialValues.current.useNotification,
     initialValues.current.notificationSettings,
-    createINotificationSettings()
+    createINotificationSettings(),
+    defaultNotificationSettings
   );
 
   const newEventSchedule: IEventSchedule = useMemo(
@@ -227,18 +239,21 @@ export const useEventScheduleSettingCommonHooks = (
     resetNotificationSettings,
   ]);
 
-  const holidaysJpDefinition$ = useDataStream<IMap<IYearMonthDate, string>>(
-    IMap<IYearMonthDate, string>(),
-    from(fetchHolidaysJson()).pipe(
-      map((record) =>
-        IMap(
-          Object.entries(record).map(([key, value]) => [
-            ymdFromDate(new Date(key)),
-            value,
-          ])
+  const holidaysJpDefinition$ = useStream<IMap<IYearMonthDate, string>>(() =>
+    fromPromise(fetchHolidaysJson())
+      .chain(unwrapResultOk())
+      .chain(filter(isNotUndefined))
+      .chain(
+        map((record) =>
+          IMap(
+            recordEntries(record).map(([key, value]) => [
+              ymdFromDate(new Date(key)),
+              value,
+            ])
+          )
         )
       )
-    )
+      .chain(withInitialValue(IMap<IYearMonthDate, string>()))
   );
 
   const holidaysJpDefinition = useStreamValue<IMap<IYearMonthDate, string>>(

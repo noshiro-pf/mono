@@ -7,10 +7,9 @@ import { Description } from '../../atoms/description';
 const vt = texts.errorMessages;
 
 type Props = Readonly<{
-  errorType: Readonly<
-    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
-    | { data: 'answersResult'; type: 'not-found' | 'others' }
-  >;
+  errorType:
+    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
+    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>;
 }>;
 
 export const AnswerPageError = memoNamed<Props>(

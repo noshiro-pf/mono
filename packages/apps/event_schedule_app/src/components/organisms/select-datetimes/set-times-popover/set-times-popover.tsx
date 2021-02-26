@@ -30,13 +30,6 @@ export const SetTimesPopover = memoNamed<Props>(
 
     return (
       <Popover
-        target={
-          <BpButton
-            intent='success'
-            onClick={open}
-            text={vt.setTimesAtOneTime}
-          />
-        }
         content={
           <SetTimesPopoverContent
             initialValue={initialValue}
@@ -48,7 +41,9 @@ export const SetTimesPopover = memoNamed<Props>(
         isOpen={isOpen}
         onClose={close}
         canEscapeKeyClose={true}
-      />
+      >
+        <BpButton intent='success' onClick={open} text={vt.setTimesAtOneTime} />
+      </Popover>
     );
   }
 );

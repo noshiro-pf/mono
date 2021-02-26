@@ -1,1 +1,1 @@
-export const defaultAnswerDeadlineRemainingDays = 30;
+export const defaultAnswerDeadlineRemainingDays = 7;

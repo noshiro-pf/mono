@@ -1,12 +1,18 @@
 import {
-  useDataStream,
   useStateAsStream,
+  useStream,
   useStreamValue,
   useVoidEventAsStream,
-} from '@noshiro/react-rxjs-utils';
-import { asValueFrom, filterNotUndefined } from '@noshiro/rxjs-utils';
-import { merge, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+} from '@noshiro/react-syncflow-hooks';
+import {
+  filter,
+  map,
+  merge,
+  Observable,
+  withInitialValue,
+  withLatestFrom,
+} from '@noshiro/syncflow';
+import { isNotUndefined } from '@noshiro/ts-utils';
 import { createIAnswer, IAnswer } from '../../../types/record/answer';
 import { createIAnswerSelection } from '../../../types/record/answer-selection';
 import { IEventSchedule } from '../../../types/record/event-schedule';
@@ -18,19 +24,20 @@ export const useMyAnswer = (
   resetMyAnswer: () => void;
   setMyAnswer: (a: IAnswer) => void;
 } => {
-  const emptyAnswerSelection$ = useDataStream<IAnswer>(
-    createIAnswer(),
-    eventSchedule$.pipe(
-      filterNotUndefined(),
-      map((e) =>
-        createIAnswer().set(
-          'selection',
-          e.datetimeRangeList.map((d) =>
-            createIAnswerSelection({ datetimeRange: d, iconId: undefined })
+  const emptyAnswerSelection$ = useStream<IAnswer>(() =>
+    eventSchedule$
+      .chain(filter(isNotUndefined))
+      .chain(
+        map((e) =>
+          createIAnswer().set(
+            'selection',
+            e.datetimeRangeList.map((d) =>
+              createIAnswerSelection({ datetimeRange: d, iconId: undefined })
+            )
           )
         )
       )
-    )
+      .chain(withInitialValue(createIAnswer()))
   );
 
   const [resetMyAnswer$, resetMyAnswer] = useVoidEventAsStream();
@@ -39,16 +46,17 @@ export const useMyAnswer = (
     createIAnswer()
   );
 
-  const myAnswer$ = useDataStream<IAnswer>(
-    createIAnswer(),
+  const myAnswer$ = useStream<IAnswer>(() =>
     merge(
       emptyAnswerSelection$,
       myAnswerUserInput$,
-      resetMyAnswer$.pipe(asValueFrom(emptyAnswerSelection$))
-    )
+      resetMyAnswer$
+        .chain(withLatestFrom(emptyAnswerSelection$))
+        .chain(map(([_, x]) => x))
+    ).chain(withInitialValue(createIAnswer()))
   );
 
-  const myAnswer = useStreamValue(myAnswer$, createIAnswer());
+  const myAnswer = useStreamValue(myAnswer$);
 
   return {
     myAnswer,

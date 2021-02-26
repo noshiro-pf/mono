@@ -1,6 +1,6 @@
 import { IconName, Intent } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
-import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { createToaster, showToast } from '../../../utils/toaster';
 import { ConfirmDialog } from './confirm-dialog';
@@ -38,7 +38,9 @@ export const ButtonWithConfirm = memoNamed<Props>(
   }) => {
     const [isOpen, open, close] = useBooleanState(false);
 
+    const alive = useAlive();
     const onConfirm = useCallback(() => {
+      if (!alive) return;
       const afterConfirm = (): void => {
         showToast({
           toast,
@@ -50,11 +52,12 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
       const p = onConfirmClick();
       if (p instanceof Promise) {
+        if (!alive) return;
         p.then(afterConfirm).catch(console.error);
       } else {
         afterConfirm();
       }
-    }, [onConfirmClick, close, toastConfig]);
+    }, [alive, onConfirmClick, close, toastConfig]);
 
     return (
       <>

@@ -1,4 +1,4 @@
-import { useBooleanState } from '@noshiro/react-utils';
+import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../../api/api';
@@ -35,13 +35,16 @@ export const useCreateEventScheduleHooks = ({
 
   const [url, setUrl] = useState<string>('');
 
+  const alive = useAlive();
   const onCreateEventClick = useCallback(() => {
     if (!eventScheduleValidationOk) return;
+    if (!alive) return;
     setIsLoadingTrue();
     openCreateResultDialog();
     api.event
       .add(newEventSchedule)
       .then((id) => {
+        if (!alive) return;
         setIsLoadingFalse();
         setUrl(toAbsolutePath(`..${routePaths.answerPage}/${id}`));
       })
@@ -54,6 +57,7 @@ export const useCreateEventScheduleHooks = ({
     setIsLoadingTrue,
     setIsLoadingFalse,
     openCreateResultDialog,
+    alive,
   ]);
 
   const onClipboardButtonClick = useCallback(() => {

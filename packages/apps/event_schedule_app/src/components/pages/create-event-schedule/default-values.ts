@@ -1,4 +1,11 @@
-import { DateEnum, getDate, setDate } from '@noshiro/ts-utils';
+import {
+  DateEnum,
+  getDate,
+  pipe,
+  setDate,
+  setHours,
+  setMinutes,
+} from '@noshiro/ts-utils';
 import { defaultAnswerDeadlineRemainingDays } from '../../../constants/default-answer-deadline-remaining';
 import { texts } from '../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
@@ -37,13 +44,19 @@ export const defaultAnswerSymbolList: IList<IAnswerSymbol> = IList([
 
 const today = new Date();
 export const defaultAnswerDeadline: IYmdHm = ymdhmFromDate(
-  setDate(
+  pipe(
     today,
-    (getDate(today) + defaultAnswerDeadlineRemainingDays) as DateEnum
+    (d) =>
+      setDate(d, (getDate(d) + defaultAnswerDeadlineRemainingDays) as DateEnum),
+    (d) => setHours(d, 23),
+    (d) => setMinutes(d, 59)
   )
 );
 
-export const defaultNotificationSettings: INotificationSettings = createINotificationSettings();
+export const defaultNotificationSettings: INotificationSettings = createINotificationSettings().set(
+  'notifyOnAnswerChange',
+  true
+);
 
 export const defaultDatetimeSpecification: DatetimeSpecificationEnumType =
   'startSpecified';

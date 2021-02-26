@@ -1,18 +1,23 @@
 import { useCallback, useMemo } from 'react';
 import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import { UserName } from '../../../types/phantom';
 import { IAnswer } from '../../../types/record/answer';
 import { createIAnswerSelection } from '../../../types/record/answer-selection';
 import { IDatetimeRange } from '../../../types/record/datetime-range';
 import { IEventSchedule } from '../../../types/record/event-schedule';
 import { IList, IMap } from '../../../utils/immutable';
+import { useFormError } from '../../../utils/use-form-error-hook';
 import {
   answerSelectionReducer,
   AnswerSelectionReducerAction,
 } from './answer-selection-reducer';
 
 type MyAnswerHooks = Readonly<{
-  userName: string;
-  onUserNameChange: (v: string) => void;
+  userName: UserName;
+  showUserNameError: boolean;
+  theNameIsAlreadyUsed: boolean;
+  onUserNameBlur: () => void;
+  onUserNameChange: (v: UserName) => void;
   comment: string;
   onCommentChange: (v: string) => void;
   symbolHeader: IList<
@@ -37,8 +42,19 @@ type MyAnswerHooks = Readonly<{
   >;
 }>;
 
+const theNameIsAlreadyUsedFn = (
+  userName: UserName,
+  answers: IList<IAnswer>,
+  nameToOmit: UserName | undefined
+): boolean =>
+  userName !== undefined && userName === nameToOmit
+    ? false
+    : answers.find((a) => a.userName === userName) !== undefined;
+
 export const useMyAnswerHooks = (
   eventSchedule: IEventSchedule,
+  answers: IList<IAnswer>,
+  usernameDuplicateCheckException: UserName | undefined,
   myAnswer: IAnswer,
   onMyAnswerChange: (answer: IAnswer) => void
 ): MyAnswerHooks => {
@@ -49,7 +65,29 @@ export const useMyAnswerHooks = (
     [myAnswer, onMyAnswerChange]
   );
 
-  const onCommentsChange = useCallback(
+  const theNameIsAlreadyUsed: boolean = useMemo(
+    () =>
+      theNameIsAlreadyUsedFn(
+        myAnswer.userName,
+        answers,
+        usernameDuplicateCheckException
+      ),
+    [answers, myAnswer, usernameDuplicateCheckException]
+  );
+
+  const [
+    showUserNameError,
+    onUserNameChangeLocal,
+    onUserNameBlur,
+  ] = useFormError(
+    myAnswer.userName,
+    (v) =>
+      v === '' ||
+      theNameIsAlreadyUsedFn(v, answers, usernameDuplicateCheckException),
+    onUserNameChange
+  );
+
+  const onCommentChange = useCallback(
     (comment) => {
       onMyAnswerChange(myAnswer.set('comment', comment));
     },
@@ -134,10 +172,13 @@ export const useMyAnswerHooks = (
 
   return {
     userName: myAnswer.userName,
-    onUserNameChange: onUserNameChange,
+    showUserNameError,
+    theNameIsAlreadyUsed,
+    onUserNameBlur,
+    onUserNameChange: onUserNameChangeLocal,
     comment: myAnswer.comment,
-    onCommentChange: onCommentsChange,
-    symbolHeader: symbolHeader,
-    myAnswerList: myAnswerList,
+    onCommentChange,
+    symbolHeader,
+    myAnswerList,
   };
 };

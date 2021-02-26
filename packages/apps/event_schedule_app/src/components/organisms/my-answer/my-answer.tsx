@@ -6,8 +6,10 @@ import {
 } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants/texts';
+import { UserName } from '../../../types/phantom';
 import { IAnswer } from '../../../types/record/answer';
 import { IEventSchedule } from '../../../types/record/event-schedule';
+import { IList } from '../../../utils/immutable';
 import { CustomIcon } from '../../atoms/icon';
 import { Td, Th } from '../../atoms/table-cell-centered';
 import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
@@ -18,6 +20,7 @@ import { useMyAnswerHooks } from './my-answer-hooks';
 
 type Props = Readonly<{
   eventSchedule: IEventSchedule;
+  answers: IList<IAnswer>;
   myAnswer: IAnswer;
   onMyAnswerChange: (answer: IAnswer) => void;
   onCancel: () => void;
@@ -26,6 +29,7 @@ type Props = Readonly<{
   myAnswerSectionState: 'hidden' | 'creating' | 'editing';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
+  usernameDuplicateCheckException: UserName | undefined;
 }>;
 
 const vt = texts.answerPage.myAnswer;
@@ -34,6 +38,7 @@ export const MyAnswer = memoNamed<Props>(
   'MyAnswer',
   ({
     eventSchedule,
+    answers,
     myAnswer,
     onMyAnswerChange,
     onCancel,
@@ -42,24 +47,45 @@ export const MyAnswer = memoNamed<Props>(
     myAnswerSectionState,
     submitButtonIsLoading,
     submitButtonIsDisabled,
+    usernameDuplicateCheckException,
   }) => {
     const {
       userName,
+      showUserNameError,
+      theNameIsAlreadyUsed,
+      onUserNameBlur,
       onUserNameChange,
       comment,
       onCommentChange,
       symbolHeader,
       myAnswerList,
-    } = useMyAnswerHooks(eventSchedule, myAnswer, onMyAnswerChange);
+    } = useMyAnswerHooks(
+      eventSchedule,
+      answers,
+      usernameDuplicateCheckException,
+      myAnswer,
+      onMyAnswerChange
+    );
 
     return (
       <>
         <WidthRestrictedInputWrapper>
-          <FormGroup label={vt.yourName}>
+          <FormGroup
+            label={vt.yourName}
+            helperText={
+              showUserNameError
+                ? theNameIsAlreadyUsed
+                  ? vt.theNameIsAlreadyUsed
+                  : vt.nameIsRequired
+                : undefined
+            }
+            intent={showUserNameError ? 'danger' : 'primary'}
+          >
             <BpInput
               value={userName}
-              onValueChange={onUserNameChange}
+              onValueChange={onUserNameChange as (v: string) => void}
               autoFocus={true}
+              onBlur={onUserNameBlur}
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>

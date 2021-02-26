@@ -1,6 +1,12 @@
-import { useDataStream, useStreamValue } from '@noshiro/react-rxjs-utils';
-import { merge, Observable, timer } from 'rxjs';
-import { mapTo, startWith, switchMap } from 'rxjs/operators';
+import { useStream, useStreamValue } from '@noshiro/react-syncflow-hooks';
+import {
+  mapTo,
+  merge,
+  Observable,
+  switchMap,
+  timer,
+  withInitialValue,
+} from '@noshiro/syncflow';
 import { fetchThrottleTime } from '../../../constants/fetch-throttle-time';
 
 export const useRefreshButtonState = (
@@ -10,28 +16,28 @@ export const useRefreshButtonState = (
   refreshButtonIsLoading: boolean;
   refreshButtonIsDisabled: boolean;
 } => {
-  const refreshButtonIsLoading$ = useDataStream<boolean>(
-    false,
+  // clog(answersResultTimestamp$);
+  const refreshButtonIsLoading$ = useStream<boolean>(() =>
     merge(
-      fetchAnswersThrottled$.pipe(mapTo(true)),
-      answersResultTimestamp$.pipe(mapTo(false))
-    )
+      fetchAnswersThrottled$.chain(mapTo(true)),
+      answersResultTimestamp$.chain(mapTo(false))
+    ).chain(withInitialValue(false))
   );
 
-  const refreshButtonIsDisabled$ = useDataStream<boolean>(
-    false,
-    fetchAnswersThrottled$.pipe(
-      switchMap(() =>
-        timer(fetchThrottleTime).pipe(mapTo(false), startWith(true))
+  const refreshButtonIsDisabled$ = useStream<boolean>(() =>
+    fetchAnswersThrottled$
+      .chain(
+        switchMap(() =>
+          timer(fetchThrottleTime)
+            .chain(mapTo(false))
+            .chain(withInitialValue<boolean>(true))
+        )
       )
-    )
+      .chain(withInitialValue(false))
   );
 
-  const refreshButtonIsLoading = useStreamValue(refreshButtonIsLoading$, false);
-  const refreshButtonIsDisabled = useStreamValue(
-    refreshButtonIsDisabled$,
-    false
-  );
+  const refreshButtonIsLoading = useStreamValue(refreshButtonIsLoading$);
+  const refreshButtonIsDisabled = useStreamValue(refreshButtonIsDisabled$);
 
   return {
     refreshButtonIsLoading,

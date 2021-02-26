@@ -5,6 +5,7 @@ import { IEventSchedule } from '../../types/record/event-schedule';
 import { createIYmdHm } from '../../types/record/ymd-hm';
 import { ymdhm2strWithDay } from '../../utils/ymdhm2str';
 import { Description } from '../atoms/description';
+import { AnswerPageNotes } from './answer-page-notes';
 
 const vt = texts.answerPage;
 
@@ -17,59 +18,87 @@ export const AnswerPageEventInfo = memoNamed<Props>(
   'AnswerPageEventInfo',
   ({ eventSchedule, isExpired }) => {
     return (
-      <div>
-        <table>
-          <tbody>
-            <tr>
-              <Title>{vt.eventInfo.eventName}</Title>
-              <Content>{eventSchedule.title}</Content>
-            </tr>
-            <tr>
-              <Title>{vt.eventInfo.notes}</Title>
-              <Content>{eventSchedule.notes}</Content>
-            </tr>
-            <tr>
-              <Title>{vt.eventInfo.answerDeadline}</Title>
-              <Content>
-                {eventSchedule.useAnswerDeadline ? (
-                  <>
-                    <div>
-                      {ymdhm2strWithDay(
-                        eventSchedule.answerDeadline ?? createIYmdHm()
-                      )}
-                    </div>
-                    <Description
-                      error={isExpired}
-                      text={
-                        isExpired
-                          ? vt.eventInfo.answerDeadlineIsExpired
-                          : vt.eventInfo.answerDeadlineDescription
-                      }
-                    />
-                  </>
-                ) : (
-                  <div>{texts.answerPage.eventInfo.noAnswerDeadline}</div>
+      <Container>
+        <TableLabel1>{vt.eventInfo.eventName}</TableLabel1>
+        <TableValue1>{eventSchedule.title}</TableValue1>
+        <TableLabel2>{vt.eventInfo.notes}</TableLabel2>
+        <TableValue2>
+          <AnswerPageNotes notes={eventSchedule.notes} />
+        </TableValue2>
+        <TableLabel3>{vt.eventInfo.answerDeadline}</TableLabel3>
+        <TableValue3>
+          {eventSchedule.useAnswerDeadline ? (
+            <>
+              <div>
+                {ymdhm2strWithDay(
+                  eventSchedule.answerDeadline ?? createIYmdHm()
                 )}
-              </Content>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              </div>
+              <Description
+                error={isExpired}
+                text={
+                  isExpired
+                    ? vt.eventInfo.answerDeadlineIsExpired
+                    : vt.eventInfo.answerDeadlineDescription
+                }
+              />
+            </>
+          ) : (
+            <div>{texts.answerPage.eventInfo.noAnswerDeadline}</div>
+          )}
+        </TableValue3>
+      </Container>
     );
   }
 );
 
-const Title = styled.th`
+const Container = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: repeat(3, auto);
+  grid-template-areas:
+    'label1 value1'
+    'label2 value2'
+    'label3 value3';
+`;
+
+const TableLabel = styled.div`
+  grid-area: label;
   text-align: left;
   vertical-align: text-top;
   white-space: nowrap;
   padding-bottom: 5px;
   padding-right: 10px;
+  font-weight: bolder;
 `;
 
-const Content = styled.td`
+const TableLabel1 = styled(TableLabel)`
+  grid-area: label1;
+`;
+const TableLabel2 = styled(TableLabel)`
+  grid-area: label2;
+`;
+const TableLabel3 = styled(TableLabel)`
+  grid-area: label3;
+`;
+
+const TableValue = styled.div`
+  grid-area: value;
   text-align: left;
   vertical-align: text-top;
   white-space: pre-line;
   padding-bottom: 10px;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const TableValue1 = styled(TableValue)`
+  grid-area: value1;
+`;
+const TableValue2 = styled(TableValue)`
+  grid-area: value2;
+`;
+const TableValue3 = styled(TableValue)`
+  grid-area: value3;
 `;
