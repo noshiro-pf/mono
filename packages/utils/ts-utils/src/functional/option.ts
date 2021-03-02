@@ -10,7 +10,7 @@ export namespace Option {
     type: typeof NoneTypeSymbol;
   }>;
 
-  export type Option<S> = Some<S> | None;
+  export type _Option<S> = Some<S> | None;
 
   export const some = <S>(value: S): Some<S> => ({
     type: SomeTypeSymbol,
@@ -20,33 +20,33 @@ export namespace Option {
   export const none: None = { type: NoneTypeSymbol } as const;
 
   export const isSome = <S>(
-    result: Option<S> | undefined | null
+    result: _Option<S> | undefined | null
   ): result is Some<S> => result?.type === SomeTypeSymbol;
 
   export const isNone = <S>(
-    result: Option<S> | undefined | null
+    result: _Option<S> | undefined | null
   ): result is None => result?.type === NoneTypeSymbol;
 
   export const map = <S, S2>(mapFn: (value: S) => S2) => (
-    result: Option<S>
-  ): Option<S2> => (isNone(result) ? result : some(mapFn(result.value)));
+    result: _Option<S>
+  ): _Option<S2> => (isNone(result) ? none : some(mapFn(result.value)));
 
-  export const unwrapThrow = <S>(result: Option<S>): S => {
+  export const unwrapThrow = <S>(result: _Option<S>): S => {
     if (isNone(result)) {
       throw new Error();
     }
     return result.value;
   };
 
-  export const unwrap = <S>(result: Option<S>): S | undefined =>
+  export const unwrap = <S>(result: _Option<S>): S | undefined =>
     isNone(result) ? undefined : result.value;
 
   export const unwrapOr = <S, D>(
     defaultValue: D
-  ): ((result: Option<S>) => S | D) => (result: Option<S>): S | D =>
+  ): ((result: _Option<S>) => S | D) => (result: _Option<S>): S | D =>
     isNone(result) ? defaultValue : result.value;
 
-  export const expect = <S>(message: string) => (result: Option<S>): S => {
+  export const expect = <S>(message: string) => (result: _Option<S>): S => {
     if (isNone(result)) {
       throw new Error(message);
     }
@@ -54,4 +54,4 @@ export namespace Option {
   };
 }
 
-export type Option<S> = Option.Option<S>;
+export type Option<S> = Option._Option<S>;

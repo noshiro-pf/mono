@@ -38,5 +38,5 @@ export function zipArrays<
 >(...arrays: T): Unwrap<T>[] {
   const len = min(arrays.map((a) => a.length));
   if (len === undefined) return [];
-  return seq(len).map((i) => tuple(...arrays.map((a) => a[i]))) as Unwrap<T>[];
+  return seq(len).map((i) => arrays.map((a) => a[i])) as Unwrap<T>[];
 }

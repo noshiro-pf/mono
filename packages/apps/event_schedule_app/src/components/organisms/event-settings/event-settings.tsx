@@ -43,10 +43,10 @@ const onYmdHmChangeFn = (
   onIYmdChange: (iymdhm: IYmdHm | undefined) => void
 ) => (ymdhm: Ymdhm | undefined): void => {
   onIYmdChange(
-    mapNullable((ymdhm: Ymdhm) =>
+    mapNullable((_ymdhm: Ymdhm) =>
       createIYmdHm({
-        ymd: createIYearMonthDate(ymdhm),
-        hm: createIHoursMinutes(ymdhm),
+        ymd: createIYearMonthDate(_ymdhm),
+        hm: createIHoursMinutes(_ymdhm),
       })
     )(ymdhm)
   );

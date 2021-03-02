@@ -10,7 +10,7 @@ export const useAsyncDispatchFunction = <S, A>(
   setState: SyncSetState<S>
 ): AsyncDispatch<S, A> => {
   // hold resolution function for all setState calls still unresolved
-  const resolvers = useRef<((state: S) => void)[]>([]);
+  const resolvers = useRef<((_state: S) => void)[]>([]);
 
   // ensure resolvers are called once state updates have been applied
   useEffect(() => {

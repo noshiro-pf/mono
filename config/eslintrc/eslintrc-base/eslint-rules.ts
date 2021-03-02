@@ -99,7 +99,7 @@ export const eslintRules: Readonly<{
       'init-declarations': 'off',
       'no-label-var': 'error',
       'no-restricted-globals': 'error',
-      'no-shadow': 'off',
+      'no-shadow': 'error',
       // 'no-undef-init': 'error',
       'no-undefined': 'off',
       // 'no-use-before-define': 'error',
