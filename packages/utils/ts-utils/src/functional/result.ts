@@ -11,59 +11,59 @@ export namespace Result {
     value: E;
   }>;
 
-  export type Result<S, E> = Ok<S> | Err<E>;
+  export type _Result<S, E> = Ok<S> | Err<E>;
 
   export const ok = <S>(value: S): Ok<S> => ({ type: OkTypeSymbol, value });
 
   export const err = <E>(value: E): Err<E> => ({ type: ErrTypeSymbol, value });
 
   export const isOk = <S, E>(
-    result: Result<S, E> | undefined | null
+    result: _Result<S, E> | undefined | null
   ): result is Ok<S> => result?.type === OkTypeSymbol;
 
   export const isErr = <S, E>(
-    result: Result<S, E> | undefined | null
+    result: _Result<S, E> | undefined | null
   ): result is Err<E> => result?.type === ErrTypeSymbol;
 
   export const map = <S, S2, E>(mapFn: (value: S) => S2) => (
-    result: Result<S, E>
-  ): Result<S2, E> => (isErr(result) ? result : ok(mapFn(result.value)));
+    result: _Result<S, E>
+  ): _Result<S2, E> => (isErr<S, E>(result) ? result : ok(mapFn(result.value)));
 
   export const mapErr = <S, E, E2>(mapFn: (error: E) => E2) => (
-    result: Result<S, E>
-  ): Result<S, E2> => (isOk(result) ? result : err(mapFn(result.value)));
+    result: _Result<S, E>
+  ): _Result<S, E2> => (isOk<S, E>(result) ? result : err(mapFn(result.value)));
 
-  export const unwrapThrow = <S, E>(result: Result<S, E>): S => {
-    if (isErr(result)) {
+  export const unwrapThrow = <S, E>(result: _Result<S, E>): S => {
+    if (isErr<S, E>(result)) {
       throw new Error(JSON.stringify(result.value));
     }
     return result.value;
   };
 
-  export const unwrapOk = <S, E>(result: Result<S, E>): S | undefined =>
-    isErr(result) ? undefined : result.value;
+  export const unwrapOk = <S, E>(result: _Result<S, E>): S | undefined =>
+    isErr<S, E>(result) ? undefined : result.value;
 
   export const unwrapOkOr = <S, E, D>(
     defaultValue: D
-  ): ((result: Result<S, E>) => S | D) => (result: Result<S, E>): S | D =>
-    isErr(result) ? defaultValue : result.value;
+  ): ((result: _Result<S, E>) => S | D) => (result: _Result<S, E>): S | D =>
+    isErr<S, E>(result) ? defaultValue : result.value;
 
-  export const unwrapErr = <S, E>(result: Result<S, E>): E | undefined =>
-    isErr(result) ? result.value : undefined;
+  export const unwrapErr = <S, E>(result: _Result<S, E>): E | undefined =>
+    isErr<S, E>(result) ? result.value : undefined;
 
   export const unwrapErrOr = <S, E, D>(
     defaultValue: D
-  ): ((result: Result<S, E>) => E | D) => (result: Result<S, E>): E | D =>
-    isErr(result) ? result.value : defaultValue;
+  ): ((result: _Result<S, E>) => E | D) => (result: _Result<S, E>): E | D =>
+    isErr<S, E>(result) ? result.value : defaultValue;
 
   export const expect = <S, E>(message: string) => (
-    result: Result<S, E>
+    result: _Result<S, E>
   ): S => {
-    if (isErr(result)) {
+    if (isErr<S, E>(result)) {
       throw new Error(message);
     }
     return result.value;
   };
 }
 
-export type Result<S, E> = Result.Result<S, E>;
+export type Result<S, E> = Result._Result<S, E>;
