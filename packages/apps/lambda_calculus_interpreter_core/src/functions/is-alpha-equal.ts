@@ -1,5 +1,5 @@
-import { LambdaTerm } from '../types/lambda-term';
-import { alphaConversion } from './evaluator/alpha-convertion';
+import { LambdaTerm } from '../types';
+import { alphaConversion } from './evaluator';
 import { isAbstraction } from './is-abstraction';
 import { isApplication } from './is-application';
 import { isVariable } from './is-variable';

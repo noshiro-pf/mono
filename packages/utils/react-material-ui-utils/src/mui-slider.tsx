@@ -1,4 +1,4 @@
-import Slider from '@material-ui/core/Slider';
+import { Slider } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 

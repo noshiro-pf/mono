@@ -1,14 +1,14 @@
 import {
   DateEnum,
   HoursEnum,
+  MillisecondsEnum,
   MinutesEnum,
   MonthEnum,
   SecondsEnum,
   WeekDayEnum,
   YearEnum,
 } from '../date';
-import { MillisecondsEnum } from '../date/types/milliseconds';
-import { Phantomic } from '../types/utility-types/phantomic';
+import { Phantomic } from '../types';
 
 export namespace utc {
   export type UTC = Phantomic<number, 'UTC'>;

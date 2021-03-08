@@ -1,4 +1,4 @@
-import { MonthEnum } from '../../types/month';
+import { MonthEnum } from '../../types';
 
 export const getMonth = (date: Date): MonthEnum =>
   (date.getMonth() + 1) as MonthEnum;

@@ -8,7 +8,7 @@ import {
   getYear,
 } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { Ymdhm } from './types/ymdhm';
+import { Ymdhm } from './types';
 
 const pad2 = (n: number): string => n.toString().padStart(2, '0');
 const formatDate = (date: Date): string =>

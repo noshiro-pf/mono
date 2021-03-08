@@ -1,8 +1,7 @@
 import { KeyboardEventType } from '@noshiro/react-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { filterKeyIsDown } from '../custom-operators/filter-key-is-down';
-import { filterKeyInList } from '../custom-operators/filter-keys-in-list';
+import { filterKeyInList, filterKeyIsDown } from '../custom-operators';
 
 export type NumKey = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 

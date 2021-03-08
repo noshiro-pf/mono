@@ -1,4 +1,4 @@
-import { splitToTokens } from '../parser/split-to-tokens';
+import { splitToTokens } from '../parser';
 
 const numberStr = (n: number): string =>
   `(lambda s.(lambda z. ${'(s'.repeat(n)} z${')'.repeat(n)}))`;

@@ -1,5 +1,5 @@
-import { Hsl } from '../../../../color';
 import { dist } from '../../../../num';
+import { Hsl } from '../../../types';
 import { epsilon } from '../color-test-values';
 
 export const testHslEquality = (name: string, hsl1: Hsl, hsl2: Hsl): void => {

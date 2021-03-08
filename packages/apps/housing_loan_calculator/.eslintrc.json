@@ -5,5 +5,9 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
+  "rules": {
+    "import/no-internal-modules": "off",
+    "import/no-cycle": "off"
+  },
   "ignorePatterns": ["*.d.ts", "*.js"]
 }

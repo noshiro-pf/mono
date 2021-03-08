@@ -1,7 +1,7 @@
 import { sum } from '@noshiro/ts-utils';
-import { calcPrincipalAndInterestEqualPayment } from '../functions/calc-principal-and-interest-equal-repayment';
-import { calcPrincipalEqualPayment } from '../functions/calc-principal-equal-payment';
 import { RepaymentType } from '../types/enum/repayment-type';
+import { calcPrincipalAndInterestEqualPayment } from './calc-principal-and-interest-equal-repayment';
+import { calcPrincipalEqualPayment } from './calc-principal-equal-payment';
 
 export const calcAll = (
   repaymentType: RepaymentType,

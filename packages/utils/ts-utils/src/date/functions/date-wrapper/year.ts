@@ -1,4 +1,4 @@
-import { YearEnum } from '../../types/year';
+import { YearEnum } from '../../types';
 
 export const getYear = (date: Date): YearEnum => date.getFullYear() as YearEnum;
 

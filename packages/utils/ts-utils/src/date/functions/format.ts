@@ -3,9 +3,9 @@ import {
   getHours,
   getMinutes,
   getMonth,
+  getSeconds,
   getYear,
 } from './date-wrapper';
-import { getSeconds } from './date-wrapper/seconds';
 
 const pad2 = (str: number): string => str.toString().padStart(2, '0');
 

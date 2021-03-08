@@ -1,8 +1,7 @@
 import { KeyboardEventType } from '@noshiro/react-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { filterKeyInList } from '../custom-operators/filter-keys-in-list';
-import { mapToKey } from '../custom-operators/map-to-key';
+import { filterKeyInList, mapToKey } from '../custom-operators';
 
 export type ArrowKey = 'ArrowLeft' | 'ArrowRight' | 'ArrowUp' | 'ArrowDown';
 
