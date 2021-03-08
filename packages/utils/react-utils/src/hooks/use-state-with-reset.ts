@@ -1,4 +1,4 @@
-import { tuple } from '@mono/ts-utils';
+import { tuple } from '@noshiro/ts-utils';
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
 export const useStateWithResetter = <T>(

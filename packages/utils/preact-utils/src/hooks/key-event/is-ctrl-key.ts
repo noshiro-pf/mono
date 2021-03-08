@@ -1,4 +1,4 @@
-import { getPlatform } from '@mono/ts-utils';
+import { getPlatform } from '@noshiro/ts-utils';
 
 export const isCtrlKey = (keyEvent: KeyboardEvent): boolean => {
   const os = getPlatform();

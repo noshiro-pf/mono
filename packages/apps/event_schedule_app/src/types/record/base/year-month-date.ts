@@ -1,4 +1,4 @@
-import { DateEnum, MonthEnum, sign, YearEnum } from '@mono/ts-utils';
+import { DateEnum, MonthEnum, sign, YearEnum } from '@noshiro/ts-utils';
 import { IRecord } from '../../../utils/immutable';
 
 type YearMonthDateBaseType = {

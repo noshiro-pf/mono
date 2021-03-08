@@ -1,5 +1,5 @@
-import { memoNamed } from '@mono/react-utils';
-import { Hsl, Percent } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { Hsl, Percent } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { Label } from '../../../canvas/types/label';
 import { AppEventHandler } from '../../event-handlers';

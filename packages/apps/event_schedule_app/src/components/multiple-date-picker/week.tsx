@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
 import { DayType } from '../../types/enum/day-type';
 import { IYearMonthDate } from '../../types/record/base/year-month-date';

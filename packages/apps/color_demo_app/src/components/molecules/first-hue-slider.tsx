@@ -1,6 +1,6 @@
-import { MuiSlider } from '@mono/react-material-ui-utils';
-import { memoNamed } from '@mono/react-utils';
-import { Hue } from '@mono/ts-utils';
+import { MuiSlider } from '@noshiro/react-material-ui-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { Hue } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const SliderWrapper = styled.div`

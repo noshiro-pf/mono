@@ -1,4 +1,4 @@
-import { ReducerType } from '@mono/ts-utils';
+import { ReducerType } from '@noshiro/ts-utils';
 import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { IDatetimeRange } from '../../../types/record/datetime-range';
 import { IList, IMap } from '../../../utils/immutable';

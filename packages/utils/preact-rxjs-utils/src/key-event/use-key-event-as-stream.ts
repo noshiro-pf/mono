@@ -1,6 +1,6 @@
-import { useKeyEventListener } from '@mono/preact-utils';
-import { filterNotUndefined, mergeTyped } from '@mono/rxjs-utils';
-import { tuple } from '@mono/ts-utils';
+import { useKeyEventListener } from '@noshiro/preact-utils';
+import { filterNotUndefined, mergeTyped } from '@noshiro/rxjs-utils';
+import { tuple } from '@noshiro/ts-utils';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { useStateAsStream } from '../rxjs-hooks';

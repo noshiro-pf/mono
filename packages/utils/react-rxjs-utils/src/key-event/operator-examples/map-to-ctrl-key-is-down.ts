@@ -1,4 +1,4 @@
-import { isCtrlKey, KeyboardEventType } from '@mono/react-utils';
+import { isCtrlKey, KeyboardEventType } from '@noshiro/react-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 

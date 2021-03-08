@@ -1,5 +1,5 @@
 {
-  "name": "@mono/resize-observer-hooks",
+  "name": "@noshiro/resize-observer-hooks",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -24,7 +24,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/ts-utils": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "resize-observer": "^1.0.0"
   }

@@ -1,6 +1,6 @@
 import { IconName, Popover } from '@blueprintjs/core';
-import { BpButton } from '@mono/react-blueprintjs-utils';
-import { memoNamed, useBooleanState } from '@mono/react-utils';
+import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
 import { IList } from '../../../../utils/immutable';

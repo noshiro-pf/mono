@@ -1,4 +1,4 @@
-import { assertNotType, assertType, TypeExtends } from '@mono/ts-utils';
+import { assertNotType, assertType, TypeExtends } from '@noshiro/ts-utils';
 import { Variable } from './variable';
 
 export type LambdaTerm = Variable | LambdaApplication | LambdaAbstraction;

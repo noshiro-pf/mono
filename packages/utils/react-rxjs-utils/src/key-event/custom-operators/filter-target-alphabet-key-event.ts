@@ -1,5 +1,5 @@
-import { KeyboardEventType } from '@mono/react-utils';
-import { Alphabet } from '@mono/ts-utils';
+import { KeyboardEventType } from '@noshiro/react-utils';
+import { Alphabet } from '@noshiro/ts-utils';
 import { MonoTypeOperatorFunction } from 'rxjs';
 import { filterTargetKeyEvent } from './filter-target-key-event';
 

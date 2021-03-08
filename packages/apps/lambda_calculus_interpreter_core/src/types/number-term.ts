@@ -1,4 +1,4 @@
-import { assertType, TypeExtends } from '@mono/ts-utils';
+import { assertType, TypeExtends } from '@noshiro/ts-utils';
 import { LambdaTerm } from './lambda-term';
 import { Variable } from './variable';
 

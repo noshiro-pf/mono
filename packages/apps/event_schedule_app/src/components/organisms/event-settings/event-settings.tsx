@@ -1,6 +1,6 @@
-import { BpDatetimePicker, Ymdhm } from '@mono/react-blueprintjs-utils';
-import { memoNamed, useTinyObservable } from '@mono/react-utils';
-import { mapNullable } from '@mono/ts-utils';
+import { BpDatetimePicker, Ymdhm } from '@noshiro/react-blueprintjs-utils';
+import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
+import { mapNullable } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';

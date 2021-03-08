@@ -1,4 +1,4 @@
-import { Hue } from '@mono/ts-utils';
+import { Hue } from '@noshiro/ts-utils';
 import { defaultIdMaker, IdType } from './id-type';
 
 export type Label = Readonly<{

@@ -1,4 +1,4 @@
-import { Option, TimerId } from '@mono/ts-utils';
+import { Option, TimerId } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import { TimerObservable } from '../types';
 

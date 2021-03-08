@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { ReactNodeArray } from 'react';
 
 // 非表示componentも状態を維持するためdisplay: noneを利用

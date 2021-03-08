@@ -1,5 +1,5 @@
 import { Button, IButtonProps } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties, useMemo } from 'react';
 
 interface Props extends IButtonProps, React.HTMLAttributes<HTMLElement> {

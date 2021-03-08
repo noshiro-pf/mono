@@ -1,4 +1,4 @@
-import { Point, Rect } from '@mono/ts-utils';
+import { Point, Rect } from '@noshiro/ts-utils';
 
 export type Direction = 'nw' | 'n_' | 'ne' | 'w_' | 'e_' | 'sw' | 's_' | 'se';
 

@@ -2,8 +2,8 @@ import {
   BpButton,
   BpDatePicker,
   YearMonthDate,
-} from '@mono/react-blueprintjs-utils';
-import { memoNamed } from '@mono/react-utils';
+} from '@noshiro/react-blueprintjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
 import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';

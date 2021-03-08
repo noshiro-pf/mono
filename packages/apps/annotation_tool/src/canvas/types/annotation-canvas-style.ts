@@ -1,4 +1,4 @@
-import { Percent, Rgba } from '@mono/ts-utils';
+import { Percent, Rgba } from '@noshiro/ts-utils';
 import { BackgroundStyle } from './background-style';
 import {
   BboxStyle,

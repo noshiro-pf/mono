@@ -1,4 +1,4 @@
-import { normalizeRect, Point, Rect } from '@mono/ts-utils';
+import { normalizeRect, Point, Rect } from '@noshiro/ts-utils';
 import { Direction } from './bbox-points';
 
 const resizeRectSub = (

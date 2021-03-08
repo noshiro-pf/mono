@@ -1,6 +1,6 @@
 import { IOptionProps } from '@blueprintjs/core';
-import { BpButton, BpSelect } from '@mono/react-blueprintjs-utils';
-import { memoNamed } from '@mono/react-utils';
+import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import {
   getMonth,
   getYear,
@@ -10,7 +10,7 @@ import {
   stringToNumber,
   today,
   YearEnum,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 

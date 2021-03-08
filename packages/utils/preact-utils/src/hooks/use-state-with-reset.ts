@@ -1,4 +1,4 @@
-import { tuple } from '@mono/ts-utils';
+import { tuple } from '@noshiro/ts-utils';
 import { StateUpdater, useCallback, useState } from 'preact/compat';
 
 export const useStateWithResetter = <T>(

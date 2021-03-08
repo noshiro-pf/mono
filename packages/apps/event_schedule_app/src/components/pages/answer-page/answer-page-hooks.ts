@@ -1,6 +1,6 @@
-import { useNavigator } from '@mono/react-router-utils';
-import { useStreamValue } from '@mono/react-rxjs-utils';
-import { useAlive } from '@mono/react-utils';
+import { useNavigator } from '@noshiro/react-router-utils';
+import { useStreamValue } from '@noshiro/react-rxjs-utils';
+import { useAlive } from '@noshiro/react-utils';
 import {
   RefObject,
   useCallback,

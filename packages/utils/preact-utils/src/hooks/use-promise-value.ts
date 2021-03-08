@@ -1,4 +1,4 @@
-import { PromiseState } from '@mono/ts-utils';
+import { PromiseState } from '@noshiro/ts-utils';
 import { useEffect, useRef, useState } from 'preact/compat';
 
 export const usePromiseValue = <T>(

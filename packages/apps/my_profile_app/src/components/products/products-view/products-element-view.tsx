@@ -1,5 +1,5 @@
 import { Card, CardContent, Divider, Typography } from '@material-ui/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 
 const CardStyled = styled(Card)`

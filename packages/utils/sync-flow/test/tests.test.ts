@@ -1,4 +1,4 @@
-import { assertType, TypeEq } from '@mono/ts-utils';
+import { assertType, TypeEq } from '@noshiro/ts-utils';
 import { filter, fromArray, Observable } from '../src';
 import {
   auditTimeTestCases,

@@ -1,4 +1,4 @@
-import { useDataStream, useStreamValue } from '@mono/react-rxjs-utils';
+import { useDataStream, useStreamValue } from '@noshiro/react-rxjs-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { from } from 'rxjs';
 import { map } from 'rxjs/operators';

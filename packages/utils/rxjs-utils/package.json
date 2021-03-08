@@ -1,5 +1,5 @@
 {
-  "name": "@mono/rxjs-utils",
+  "name": "@noshiro/rxjs-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -30,7 +30,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/ts-utils": "*",
+    "@noshiro/ts-utils": "*",
     "rxjs": "^6.6.3"
   }
 }

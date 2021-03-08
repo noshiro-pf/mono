@@ -1,5 +1,5 @@
 {
-  "name": "@mono/react-material-ui-utils",
+  "name": "@noshiro/react-material-ui-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -27,10 +27,10 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
-    "@mono/react-utils": "*",
-    "@mono/react-utils-styled": "*",
-    "@mono/resize-observer-hooks": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/react-utils-styled": "*",
+    "@noshiro/resize-observer-hooks": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "styled-components": "^5.1.1"
   }

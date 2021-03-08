@@ -1,4 +1,4 @@
-import { randInt } from '@mono/ts-utils';
+import { randInt } from '@noshiro/ts-utils';
 
 export const rollTwoDices = (): [number, number] => [
   randInt(1, 6),

@@ -1,5 +1,5 @@
-import { memoNamed } from '@mono/react-utils';
-import { Hue, RectSize } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { Hue, RectSize } from '@noshiro/ts-utils';
 import { CSSProperties, useMemo } from 'react';
 import styled from 'styled-components';
 import SampleImage from '../assets/sample_image.jpg';

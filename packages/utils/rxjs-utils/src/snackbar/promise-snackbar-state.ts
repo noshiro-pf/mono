@@ -1,4 +1,4 @@
-import { PromiseStatus } from '@mono/ts-utils';
+import { PromiseStatus } from '@noshiro/ts-utils';
 
 export type PromiseSnackbarStateType = {
   isOpen: boolean;

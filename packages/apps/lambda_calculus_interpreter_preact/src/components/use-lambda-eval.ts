@@ -3,9 +3,9 @@ import {
   LambdaTerm,
   parseLambdaTerm,
   termToString,
-} from '@mono/lambda-calculus-interpreter-core';
-import { useDataStream } from '@mono/preact-rxjs-utils';
-import { isNotUndefined } from '@mono/ts-utils';
+} from '@noshiro/lambda-calculus-interpreter-core';
+import { useDataStream } from '@noshiro/preact-rxjs-utils';
+import { isNotUndefined } from '@noshiro/ts-utils';
 import { Observable } from 'rxjs';
 import { debounceTime, filter, map } from 'rxjs/operators';
 // import { splitToTokens } from '../parser/split-to-tokens';

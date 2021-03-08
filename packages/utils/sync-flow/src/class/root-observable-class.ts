@@ -1,4 +1,4 @@
-import { Option } from '@mono/ts-utils';
+import { Option } from '@noshiro/ts-utils';
 import { ChildObservable, RootObservable, RootObservableType } from '../types';
 import { binarySearch, issueToken } from '../utils';
 import { ObservableBaseClass } from './observable-base-class';

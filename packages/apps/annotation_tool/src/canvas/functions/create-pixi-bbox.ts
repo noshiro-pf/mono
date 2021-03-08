@@ -1,4 +1,4 @@
-import { Rect, Rgba, roundToInt } from '@mono/ts-utils';
+import { Rect, Rgba, roundToInt } from '@noshiro/ts-utils';
 import { Graphics } from 'pixi.js';
 import { zIndex } from '../z-index';
 import { bboxPointsFromRect, Direction, mapBboxPoints } from './bbox-points';

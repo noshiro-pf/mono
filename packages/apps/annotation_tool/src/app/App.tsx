@@ -2,7 +2,7 @@ import {
   memoNamed,
   useBooleanState,
   useStateWithMapFn,
-} from '@mono/react-utils';
+} from '@noshiro/react-utils';
 import {
   Hue,
   neaMapWithIndex,
@@ -12,7 +12,7 @@ import {
   pipe,
   ReadonlyNonEmptyArray,
   RectSize,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
 import { AnnotataionCanvas } from '../canvas/annotation-canvas';

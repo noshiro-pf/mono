@@ -6,7 +6,7 @@ import {
   TableHead,
   TableRow,
 } from '@material-ui/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import {
   blackHsl,
   contrastRatioHsl,
@@ -16,7 +16,7 @@ import {
   roundAt,
   whiteHsl,
   zip,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { Fragment } from 'react';
 import styled from 'styled-components';
 

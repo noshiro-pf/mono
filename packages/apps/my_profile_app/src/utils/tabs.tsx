@@ -1,6 +1,6 @@
 import { Tab, Tabs } from '@material-ui/core';
-import { memoNamed } from '@mono/react-utils';
-import { Mappable } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { Mappable } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 
 export const MyTabs = memoNamed<{

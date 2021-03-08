@@ -1,4 +1,4 @@
-import { isCtrlKey } from '@mono/preact-utils';
+import { isCtrlKey } from '@noshiro/preact-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 

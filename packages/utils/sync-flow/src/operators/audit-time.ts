@@ -1,4 +1,4 @@
-import { Option, TimerId } from '@mono/ts-utils';
+import { Option, TimerId } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import {
   AuditTimeOperatorObservable,

@@ -4,7 +4,7 @@ import {
   Queue,
   TypeEq,
   TypeExtends,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { Observable } from './observable';
 
 export type ObservableValue<A> = A extends Observable<infer B> ? B : never;

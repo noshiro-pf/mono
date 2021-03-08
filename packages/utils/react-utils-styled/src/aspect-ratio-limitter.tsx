@@ -1,5 +1,5 @@
-import { memoNamed } from '@mono/react-utils';
-import { useResizeObserver } from '@mono/resize-observer-hooks';
+import { memoNamed } from '@noshiro/react-utils';
+import { useResizeObserver } from '@noshiro/resize-observer-hooks';
 import { CSSProperties, ReactNode, useMemo } from 'react';
 import styled from 'styled-components';
 

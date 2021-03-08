@@ -1,6 +1,6 @@
 import { IInputGroupProps, InputGroup } from '@blueprintjs/core';
-import { memoNamed, useTinyObservableEffect } from '@mono/react-utils';
-import { TinyObservable } from '@mono/ts-utils';
+import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
+import { TinyObservable } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useRef } from 'react';
 
 interface Props extends IInputGroupProps {

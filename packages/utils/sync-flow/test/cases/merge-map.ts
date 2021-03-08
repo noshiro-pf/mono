@@ -1,4 +1,4 @@
-import { tuple } from '@mono/ts-utils';
+import { tuple } from '@noshiro/ts-utils';
 import {
   filter,
   interval,

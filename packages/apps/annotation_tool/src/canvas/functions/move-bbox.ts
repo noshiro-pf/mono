@@ -1,4 +1,4 @@
-import { Point, Rect } from '@mono/ts-utils';
+import { Point, Rect } from '@noshiro/ts-utils';
 import { PixiBbox } from '../types/pixi-bbox';
 import { moveRect } from './move-rect';
 import { updatePixiBbox } from './update-pixi-bbox';

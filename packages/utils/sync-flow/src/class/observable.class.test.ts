@@ -5,7 +5,7 @@ import {
   Option,
   TypeEq,
   TypeExtends,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import {
   AsyncChildObservable,
   ChildObservable,

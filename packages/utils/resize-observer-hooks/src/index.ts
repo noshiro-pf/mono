@@ -1,4 +1,4 @@
-import { isArrayOfLength1OrMore, RectSize } from '@mono/ts-utils';
+import { isArrayOfLength1OrMore, RectSize } from '@noshiro/ts-utils';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { ResizeObserver } from 'resize-observer';
 

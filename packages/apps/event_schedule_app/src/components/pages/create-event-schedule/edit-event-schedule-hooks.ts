@@ -1,5 +1,5 @@
-import { useNavigator } from '@mono/react-router-utils';
-import { useBooleanState } from '@mono/react-utils';
+import { useNavigator } from '@noshiro/react-router-utils';
+import { useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { api } from '../../../api/api';
 import { texts } from '../../../constants/texts';

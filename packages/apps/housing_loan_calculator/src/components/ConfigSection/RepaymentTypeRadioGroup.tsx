@@ -1,5 +1,5 @@
 import { Radio, RadioGroup } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { viewTexts } from '../../constants/view-texts';
 import { RepaymentType } from '../../types/enum/repayment-type';

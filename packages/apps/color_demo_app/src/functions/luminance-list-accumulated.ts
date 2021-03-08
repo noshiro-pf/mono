@@ -8,7 +8,7 @@ import {
   rest,
   scan,
   tuple,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (
   luminanceList: readonly number[],

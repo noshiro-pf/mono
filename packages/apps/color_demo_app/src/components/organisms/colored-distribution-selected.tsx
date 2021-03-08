@@ -1,5 +1,5 @@
-import { memoNamed } from '@mono/react-utils';
-import { hslToStr } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { hslToStr } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { ExperimentResult } from '../../types/experiment-result';
 

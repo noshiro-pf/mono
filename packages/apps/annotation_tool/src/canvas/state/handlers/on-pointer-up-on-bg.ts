@@ -1,4 +1,4 @@
-import { rectFrom2Points, Rgba } from '@mono/ts-utils';
+import { rectFrom2Points, Rgba } from '@noshiro/ts-utils';
 import { addBboxToCanvas } from '../../functions/add-bbox';
 import { AnnotationCanvasStyle } from '../../types/annotation-canvas-style';
 import { IdType } from '../../types/id-type';

@@ -1,4 +1,4 @@
-import { Option } from '@mono/ts-utils';
+import { Option } from '@noshiro/ts-utils';
 import { ObservableId, Token } from './id';
 import { ObservableKind } from './observable-kind';
 import {

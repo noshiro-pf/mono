@@ -1,4 +1,4 @@
-import { roundToInt } from '@mono/ts-utils';
+import { roundToInt } from '@noshiro/ts-utils';
 import { Application, Sprite } from 'pixi.js';
 import { CanvasAppState } from '../state/canvas-state-type';
 import { CanvasAppStateHandler } from '../state/state-handler-main';

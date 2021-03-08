@@ -1,4 +1,4 @@
-import { Point, Rect, Rgba } from '@mono/ts-utils';
+import { Point, Rect, Rgba } from '@noshiro/ts-utils';
 import { Graphics, Rectangle } from 'pixi.js';
 import { PixiBbox } from '../types/pixi-bbox';
 import { Direction } from './bbox-points';

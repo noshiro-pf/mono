@@ -1,4 +1,4 @@
-import { Rect, Rgba, rgbaToHexNumber } from '@mono/ts-utils';
+import { Rect, Rgba, rgbaToHexNumber } from '@noshiro/ts-utils';
 import { Graphics, Sprite, Texture } from 'pixi.js';
 
 export const createDummySpriteRectangle = (rect: Rect): Sprite => {

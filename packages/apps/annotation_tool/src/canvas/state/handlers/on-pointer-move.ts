@@ -1,4 +1,4 @@
-import { Point, rectFrom2Points } from '@mono/ts-utils';
+import { Point, rectFrom2Points } from '@noshiro/ts-utils';
 import { updateBorderedRectangleGraphics } from '../../functions/create-pixi-object';
 import { moveBbox } from '../../functions/move-bbox';
 import { resizeBbox } from '../../functions/resize-bbox';

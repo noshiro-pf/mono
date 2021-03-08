@@ -1,5 +1,5 @@
 {
-  "name": "@mono/react-utils",
+  "name": "@noshiro/react-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -26,7 +26,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/ts-utils": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1"
   }
 }

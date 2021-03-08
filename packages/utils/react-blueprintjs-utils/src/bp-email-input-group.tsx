@@ -1,6 +1,6 @@
 import { FormGroup, IInputGroupProps } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
-import { isEmailString, TinyObservable } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { isEmailString, TinyObservable } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { BpInput } from './bp-input';
 

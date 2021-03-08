@@ -1,5 +1,5 @@
-import { useStateAsStream, useStreamValue } from '@mono/preact-rxjs-utils';
-import { memoNamed } from '@mono/preact-utils';
+import { useStateAsStream, useStreamValue } from '@noshiro/preact-rxjs-utils';
+import { memoNamed } from '@noshiro/preact-utils';
 import { MainView } from './main-view';
 import { useLambdaEval } from './use-lambda-eval';
 

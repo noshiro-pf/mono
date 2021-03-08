@@ -1,6 +1,6 @@
 import { Icon } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
-import { higherContrastTextColorHsl, Hsl, hslToStr } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { higherContrastTextColorHsl, Hsl, hslToStr } from '@noshiro/ts-utils';
 import { CSSProperties, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import {

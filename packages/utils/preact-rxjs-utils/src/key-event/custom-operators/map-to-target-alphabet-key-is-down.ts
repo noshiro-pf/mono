@@ -1,4 +1,4 @@
-import { Alphabet } from '@mono/ts-utils';
+import { Alphabet } from '@noshiro/ts-utils';
 import { OperatorFunction } from 'rxjs';
 import { mapToTargetKeyIsDown } from './map-to-target-key-is-down';
 

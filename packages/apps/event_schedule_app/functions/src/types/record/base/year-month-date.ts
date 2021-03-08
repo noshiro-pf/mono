@@ -1,4 +1,4 @@
-import { DateEnum, MonthEnum, YearEnum } from '@mono/ts-utils';
+import { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
 import { sign } from '../../../utils/sign';
 
 export type YearMonthDateType = {

@@ -1,4 +1,4 @@
-import { sum } from '@mono/ts-utils';
+import { sum } from '@noshiro/ts-utils';
 import { calcPrincipalAndInterestEqualPayment } from '../functions/calc-principal-and-interest-equal-repayment';
 import { calcPrincipalEqualPayment } from '../functions/calc-principal-equal-payment';
 import { RepaymentType } from '../types/enum/repayment-type';

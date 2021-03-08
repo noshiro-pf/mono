@@ -1,5 +1,5 @@
 {
-  "name": "@mono/preact-app-template",
+  "name": "@noshiro/preact-app-template",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -40,8 +40,8 @@
     ]
   },
   "dependencies": {
-    "@mono/react-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/ts-utils": "*",
     "goober": "^2.0.5",
     "preact": "^10.4.7",
     "preact-router": "^3.2.1"

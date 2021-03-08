@@ -1,4 +1,4 @@
-import { memoNamed, useToggleState } from '@mono/react-utils';
+import { memoNamed, useToggleState } from '@noshiro/react-utils';
 import { BpButton } from './bp-button';
 import { BpInput } from './bp-input';
 

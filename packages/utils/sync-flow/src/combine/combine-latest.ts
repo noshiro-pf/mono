@@ -1,4 +1,4 @@
-import { assertType, Option, TypeExtends } from '@mono/ts-utils';
+import { assertType, Option, TypeExtends } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
 import {

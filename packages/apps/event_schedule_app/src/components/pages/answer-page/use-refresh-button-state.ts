@@ -1,4 +1,4 @@
-import { useDataStream, useStreamValue } from '@mono/react-rxjs-utils';
+import { useDataStream, useStreamValue } from '@noshiro/react-rxjs-utils';
 import { merge, Observable, timer } from 'rxjs';
 import { mapTo, startWith, switchMap } from 'rxjs/operators';
 import { fetchThrottleTime } from '../../../constants/fetch-throttle-time';

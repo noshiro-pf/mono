@@ -9,7 +9,7 @@ import {
   seq,
   variance,
   zip,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { ExperimentResult } from '../types/experiment-result';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';

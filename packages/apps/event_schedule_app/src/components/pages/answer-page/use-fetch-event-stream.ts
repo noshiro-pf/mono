@@ -2,7 +2,7 @@ import {
   useStream,
   useStreamEffect,
   useVoidEventAsStream,
-} from '@mono/react-rxjs-utils';
+} from '@noshiro/react-rxjs-utils';
 import { useEffect } from 'react';
 import { Observable } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';

@@ -1,5 +1,5 @@
 {
-  "name": "@mono/slack-app-functions",
+  "name": "@noshiro/slack-app-functions",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",

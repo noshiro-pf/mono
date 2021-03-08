@@ -3,9 +3,9 @@ import {
   useStreamEffect,
   useStreamValue,
   useValueAsStream,
-} from '@mono/react-rxjs-utils';
-import { asValueFrom, filterNotUndefined } from '@mono/rxjs-utils';
-import { Result } from '@mono/ts-utils';
+} from '@noshiro/react-rxjs-utils';
+import { asValueFrom, filterNotUndefined } from '@noshiro/rxjs-utils';
+import { Result } from '@noshiro/ts-utils';
 import { combineLatest, from, Observable } from 'rxjs';
 import { distinctUntilChanged, map, pluck, switchMap } from 'rxjs/operators';
 import { api } from '../../../api/api';

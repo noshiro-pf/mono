@@ -1,5 +1,5 @@
-import { BpButton } from '@mono/react-blueprintjs-utils';
-import { memoNamed } from '@mono/react-utils';
+import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../../constants/texts';

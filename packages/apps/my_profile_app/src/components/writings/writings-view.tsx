@@ -1,5 +1,5 @@
-import { memoNamed } from '@mono/react-utils';
-import { Mappable } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { Mappable } from '@noshiro/ts-utils';
 import { WritingsInfo } from '../../types/writings';
 import { WritingsElement } from './writings-element';
 
