@@ -1,5 +1,5 @@
 {
-  "name": "@noshiro/sync-flow",
+  "name": "@noshiro/syncflow",
   "version": "1.0.0",
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
