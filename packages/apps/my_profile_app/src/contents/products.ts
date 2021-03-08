@@ -15,7 +15,7 @@ export const products: {
   libraries: [
     {
       link:
-        'https://github.com/noshiro-pf/mono/tree/master/packages/utils/sync-flow',
+        'https://github.com/noshiro-pf/mono/tree/master/packages/utils/syncflow',
       title: 'SyncFlow（開発中）',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
       body1:
