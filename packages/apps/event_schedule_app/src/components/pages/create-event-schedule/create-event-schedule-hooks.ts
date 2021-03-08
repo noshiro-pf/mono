@@ -1,5 +1,5 @@
-import { useBooleanState } from '@mono/react-utils';
-import { toAbsolutePath } from '@mono/ts-utils';
+import { useBooleanState } from '@noshiro/react-utils';
+import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../../api/api';
 import { routePaths } from '../../../routing/routing';

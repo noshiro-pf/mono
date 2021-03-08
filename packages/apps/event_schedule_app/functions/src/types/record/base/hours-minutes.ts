@@ -1,4 +1,4 @@
-import { HoursEnum, MinutesEnum } from '@mono/ts-utils';
+import { HoursEnum, MinutesEnum } from '@noshiro/ts-utils';
 import { sign } from '../../../utils/sign';
 
 export type HoursMinutesType = {

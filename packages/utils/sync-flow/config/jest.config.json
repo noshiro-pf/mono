@@ -1,6 +1,6 @@
 {
   "moduleNameMapper": {
-    "^@mono/(.*)$": "<rootDir>/../$1/src"
+    "^@noshiro/(.*)$": "<rootDir>/../$1/src"
   },
   "moduleFileExtensions": ["ts", "js"],
   "rootDir": "../",

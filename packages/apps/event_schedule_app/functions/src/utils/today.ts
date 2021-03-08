@@ -4,7 +4,7 @@ import {
   MinutesEnum,
   MonthEnum,
   YearEnum,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { YearMonthDateType } from '../types/record/base/year-month-date';
 import { YmdHmJsType } from '../types/record/ymd-hm';
 

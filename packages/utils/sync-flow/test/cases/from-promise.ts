@@ -1,4 +1,4 @@
-import { Result } from '@mono/ts-utils';
+import { Result } from '@noshiro/ts-utils';
 import { fromPromise, Observable } from '../../src';
 import { StreamTestCase } from '../typedef';
 import { getStreamOutputAsPromise } from '../utils';

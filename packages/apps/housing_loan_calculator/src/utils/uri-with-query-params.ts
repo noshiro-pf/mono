@@ -1,4 +1,4 @@
-import { isNotUndefined } from '@mono/ts-utils';
+import { isNotUndefined } from '@noshiro/ts-utils';
 import { makeUriEndWithSlash } from './make-uri-end-with-slash';
 
 export const uriWithQueryParams = (

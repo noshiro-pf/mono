@@ -1,4 +1,4 @@
-import { Rect, Rgba, rgbaToHexNumber } from '@mono/ts-utils';
+import { Rect, Rgba, rgbaToHexNumber } from '@noshiro/ts-utils';
 import { Graphics, Rectangle } from 'pixi.js';
 import { PixiBbox } from '../types/pixi-bbox';
 

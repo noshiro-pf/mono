@@ -3,8 +3,8 @@ import {
   useStateAsStream,
   useStreamValue,
   useVoidEventAsStream,
-} from '@mono/react-rxjs-utils';
-import { asValueFrom, filterNotUndefined } from '@mono/rxjs-utils';
+} from '@noshiro/react-rxjs-utils';
+import { asValueFrom, filterNotUndefined } from '@noshiro/rxjs-utils';
 import { merge, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { createIAnswer, IAnswer } from '../../../types/record/answer';

@@ -1,4 +1,4 @@
-import { Option, Result } from '@mono/ts-utils';
+import { Option, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import { FromPromiseObservable } from '../types';
 

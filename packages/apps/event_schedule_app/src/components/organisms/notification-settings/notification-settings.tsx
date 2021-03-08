@@ -1,6 +1,6 @@
-import { BpCheckbox, BpEmailInput } from '@mono/react-blueprintjs-utils';
-import { memoNamed } from '@mono/react-utils';
-import { TinyObservable } from '@mono/ts-utils';
+import { BpCheckbox, BpEmailInput } from '@noshiro/react-blueprintjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { TinyObservable } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';

@@ -1,4 +1,4 @@
-import { ReducerType } from '@mono/ts-utils';
+import { ReducerType } from '@noshiro/ts-utils';
 import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
 import { IYearMonthDate } from '../../../../types/record/base/year-month-date';
 import {

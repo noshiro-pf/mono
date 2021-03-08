@@ -1,4 +1,4 @@
-import { Rect, Rgba } from '@mono/ts-utils';
+import { Rect, Rgba } from '@noshiro/ts-utils';
 import { Graphics } from 'pixi.js';
 
 export type PixiTempRect = {

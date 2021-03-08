@@ -3,8 +3,8 @@ import {
   BpButton,
   BpDialog,
   BpEmailInput,
-} from '@mono/react-blueprintjs-utils';
-import { memoNamed, useBooleanState } from '@mono/react-utils';
+} from '@noshiro/react-blueprintjs-utils';
+import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
 import { texts } from '../../../constants/texts';
 import { Description } from '../../atoms/description';

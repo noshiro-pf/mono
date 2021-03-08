@@ -1,4 +1,4 @@
-import { Point, Rgba } from '@mono/ts-utils';
+import { Point, Rgba } from '@noshiro/ts-utils';
 import { Direction } from '../functions/bbox-points';
 import {
   turnOffHighlight,

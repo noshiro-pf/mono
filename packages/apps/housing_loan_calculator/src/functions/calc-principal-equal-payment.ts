@@ -1,4 +1,4 @@
-import { seq } from '@mono/ts-utils';
+import { seq } from '@noshiro/ts-utils';
 
 export const calcPrincipalEqualPayment = ({
   borrowingPeriodMonth: numPayments,

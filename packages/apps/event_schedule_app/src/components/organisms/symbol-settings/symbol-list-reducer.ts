@@ -1,4 +1,4 @@
-import { ReducerType } from '@mono/ts-utils';
+import { ReducerType } from '@noshiro/ts-utils';
 import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
 import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
 import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';

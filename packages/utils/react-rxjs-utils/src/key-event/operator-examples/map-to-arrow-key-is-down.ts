@@ -1,4 +1,4 @@
-import { KeyboardEventType } from '@mono/react-utils';
+import { KeyboardEventType } from '@noshiro/react-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { filterKeyInList } from '../custom-operators/filter-keys-in-list';

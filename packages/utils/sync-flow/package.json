@@ -1,5 +1,5 @@
 {
-  "name": "@mono/sync-flow",
+  "name": "@noshiro/sync-flow",
   "version": "1.0.0",
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
@@ -34,6 +34,6 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/ts-utils": "*"
+    "@noshiro/ts-utils": "*"
   }
 }

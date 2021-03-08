@@ -3,8 +3,8 @@ import {
   LambdaTerm,
   parseLambdaTerm,
   termToString,
-} from '@mono/lambda-calculus-interpreter-core';
-import { isNotUndefined } from '@mono/ts-utils';
+} from '@noshiro/lambda-calculus-interpreter-core';
+import { isNotUndefined } from '@noshiro/ts-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { debounceTime, filter, map } from 'rxjs/operators';
 

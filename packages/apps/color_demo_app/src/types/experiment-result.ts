@@ -1,4 +1,4 @@
-import { Hsl, Hue } from '@mono/ts-utils';
+import { Hsl, Hue } from '@noshiro/ts-utils';
 
 export type ExperimentResult = {
   accumulatedDistribution: [Hsl, number][];

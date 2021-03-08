@@ -1,4 +1,4 @@
-import { Result } from '@mono/ts-utils';
+import { Result } from '@noshiro/ts-utils';
 import { dbEvents } from '../../initialize-firebase';
 import {
   fillEventSchedule,

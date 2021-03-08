@@ -5,7 +5,7 @@ import {
   ReducerType,
   today,
   YearEnum,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 
 export type CalendarCurrentPageReducerState = {
   year: YearEnum;

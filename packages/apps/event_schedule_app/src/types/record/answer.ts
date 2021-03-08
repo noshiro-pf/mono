@@ -1,4 +1,4 @@
-import { StrictOmit } from '@mono/ts-utils';
+import { StrictOmit } from '@noshiro/ts-utils';
 import { IList, IRecord } from '../../utils/immutable';
 import { answerId, AnswerId, userName, UserName } from '../phantom';
 import {

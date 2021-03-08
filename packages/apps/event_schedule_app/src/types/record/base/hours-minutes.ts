@@ -1,4 +1,4 @@
-import { HoursEnum, MinutesEnum, sign } from '@mono/ts-utils';
+import { HoursEnum, MinutesEnum, sign } from '@noshiro/ts-utils';
 import { IRecord } from '../../../utils/immutable';
 
 type HoursMinutesBaseType = {

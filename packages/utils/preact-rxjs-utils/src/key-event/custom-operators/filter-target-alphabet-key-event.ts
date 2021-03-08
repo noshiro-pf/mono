@@ -1,4 +1,4 @@
-import { Alphabet } from '@mono/ts-utils';
+import { Alphabet } from '@noshiro/ts-utils';
 import { MonoTypeOperatorFunction } from 'rxjs';
 import { filterTargetKeyEvent } from './filter-target-key-event';
 

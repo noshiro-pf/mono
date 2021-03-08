@@ -1,5 +1,5 @@
 {
-  "name": "@mono/react-utils-styled",
+  "name": "@noshiro/react-utils-styled",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -26,9 +26,9 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/react-utils": "*",
-    "@mono/resize-observer-hooks": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/resize-observer-hooks": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "styled-components": "^5.1.1"
   }

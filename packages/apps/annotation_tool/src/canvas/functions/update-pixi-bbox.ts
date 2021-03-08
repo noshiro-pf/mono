@@ -1,4 +1,4 @@
-import { Rect } from '@mono/ts-utils';
+import { Rect } from '@noshiro/ts-utils';
 import { PixiBbox } from '../types/pixi-bbox';
 import { bboxPointsFromRect, foreachBboxPoints } from './bbox-points';
 import { updatePointOfBbox } from './update-pixi-bbox-point';

@@ -1,4 +1,4 @@
-import { ReducerType } from '@mono/ts-utils';
+import { ReducerType } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useRef, useState } from 'preact/compat';
 
 type AsyncDispatch<S, A> = (action: A) => Promise<S>;

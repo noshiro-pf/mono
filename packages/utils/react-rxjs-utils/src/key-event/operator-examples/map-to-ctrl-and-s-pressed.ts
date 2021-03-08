@@ -1,5 +1,5 @@
-import { KeyboardEventType } from '@mono/react-utils';
-import { filterByLatest } from '@mono/rxjs-utils';
+import { KeyboardEventType } from '@noshiro/react-utils';
+import { filterByLatest } from '@noshiro/rxjs-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { filterKeyIsDown } from '../custom-operators/filter-key-is-down';

@@ -1,5 +1,5 @@
 import { INumericInputProps, NumericInput } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties } from 'react';
 
 interface Props extends INumericInputProps {

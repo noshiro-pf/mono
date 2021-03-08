@@ -1,5 +1,5 @@
 {
-  "name": "@mono/color-demo-app",
+  "name": "@noshiro/color-demo-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -41,9 +41,9 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
-    "@mono/react-material-ui-utils": "*",
-    "@mono/react-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-material-ui-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
     "styled-components": "^5.1.1"

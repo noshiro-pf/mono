@@ -1,6 +1,10 @@
 import { FormGroup, HTMLTable } from '@blueprintjs/core';
-import { BpButton, BpInput, BpTextArea } from '@mono/react-blueprintjs-utils';
-import { memoNamed } from '@mono/react-utils';
+import {
+  BpButton,
+  BpInput,
+  BpTextArea,
+} from '@noshiro/react-blueprintjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants/texts';
 import { IAnswer } from '../../../types/record/answer';
 import { IEventSchedule } from '../../../types/record/event-schedule';

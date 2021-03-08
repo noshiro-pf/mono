@@ -1,4 +1,4 @@
-import { setIsSuperset } from '@mono/ts-utils';
+import { setIsSuperset } from '@noshiro/ts-utils';
 import { denom } from '../constants/denom';
 import { diceValueSet } from '../constants/dice-value-set';
 import { twoDiceSumSet } from '../constants/two-dice-sum-set';

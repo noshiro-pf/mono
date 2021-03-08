@@ -1,6 +1,6 @@
 // import { SelectSymbolPopover } from './select-symbol-popover/select-symbol-popover';
-import { BpInput, BpNumericInput } from '@mono/react-blueprintjs-utils';
-import { memoNamed } from '@mono/react-utils';
+import { BpInput, BpNumericInput } from '@noshiro/react-blueprintjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import {

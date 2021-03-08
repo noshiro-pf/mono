@@ -1,4 +1,4 @@
-import { StrictExclude } from '@mono/ts-utils';
+import { StrictExclude } from '@noshiro/ts-utils';
 
 export type ObservableKind = 'root' | 'sync child' | 'async child';
 

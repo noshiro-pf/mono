@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { lastUpdated } from '../contents/last-updated';
 
 export const LastUpdated = memoNamed('LastUpdated', () => (

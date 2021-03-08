@@ -1,4 +1,4 @@
-import { isArrayOfLength1OrMore } from '@mono/ts-utils';
+import { isArrayOfLength1OrMore } from '@noshiro/ts-utils';
 import { ALPHABETS } from '../constants/alphabets';
 import { Variable } from '../types/variable';
 

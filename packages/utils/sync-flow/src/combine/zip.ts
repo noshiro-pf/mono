@@ -1,4 +1,9 @@
-import { assertType, createQueue, Option, TypeExtends } from '@mono/ts-utils';
+import {
+  assertType,
+  createQueue,
+  Option,
+  TypeExtends,
+} from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
 import {

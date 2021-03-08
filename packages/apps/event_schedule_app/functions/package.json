@@ -1,5 +1,5 @@
 {
-  "name": "@mono/event-schedule-app-functions",
+  "name": "@noshiro/event-schedule-app-functions",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",

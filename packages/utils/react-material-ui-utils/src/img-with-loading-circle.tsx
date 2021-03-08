@@ -1,5 +1,5 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { memoNamed, useBooleanState } from '@mono/react-utils';
+import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { CSSProperties, useMemo } from 'react';
 import styled from 'styled-components';
 

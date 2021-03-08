@@ -1,4 +1,4 @@
-import { styled } from '@mono/solid-styled-components';
+import { styled } from '@noshiro/solid-styled-components';
 import { JSX } from 'solid-js';
 import { useStateAsStream, useStreamValue } from '../utils/use-stream-value';
 import { CodeArea } from './code-area';

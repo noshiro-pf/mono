@@ -1,4 +1,4 @@
-import { indexIsInRange, stringToNumber } from '@mono/ts-utils';
+import { indexIsInRange, stringToNumber } from '@noshiro/ts-utils';
 import { ArgumentParser } from 'argparse';
 import {
   auditTimeTestCases,

@@ -1,5 +1,5 @@
 import { Icon, IconName } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
 import { AnswerSymbolIconId } from '../../types/enum/answer-symbol-icon';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons';

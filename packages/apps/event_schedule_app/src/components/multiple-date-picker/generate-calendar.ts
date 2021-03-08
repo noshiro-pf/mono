@@ -1,4 +1,4 @@
-import { DateEnum, getDay, MonthEnum, YearEnum } from '@mono/ts-utils';
+import { DateEnum, getDay, MonthEnum, YearEnum } from '@noshiro/ts-utils';
 import {
   createIYearMonthDate,
   IYearMonthDate,

@@ -1,4 +1,4 @@
-import { getDay, MonthEnum, WeekDayEnum, YearEnum } from '@mono/ts-utils';
+import { getDay, MonthEnum, WeekDayEnum, YearEnum } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useReducer } from 'react';
 import { DayType } from '../../types/enum/day-type';
 import {

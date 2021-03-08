@@ -1,5 +1,5 @@
 {
-  "name": "@mono/preact-utils",
+  "name": "@noshiro/preact-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -26,7 +26,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/ts-utils": "*",
+    "@noshiro/ts-utils": "*",
     "preact": "^10.4.7"
   }
 }

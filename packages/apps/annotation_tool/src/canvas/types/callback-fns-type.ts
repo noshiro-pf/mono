@@ -1,4 +1,4 @@
-import { Rect } from '@mono/ts-utils';
+import { Rect } from '@noshiro/ts-utils';
 
 export type CallbackFnsType = {
   addBbox: (rect: Rect) => void;

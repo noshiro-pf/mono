@@ -1,6 +1,6 @@
 import { TimePicker } from '@blueprintjs/datetime';
-import { memoNamed } from '@mono/react-utils';
-import { getHours, getMinutes } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { getHours, getMinutes } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { HoursMinutes } from './types/hours-minutes';
 

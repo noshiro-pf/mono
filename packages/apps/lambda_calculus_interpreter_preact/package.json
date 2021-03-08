@@ -1,5 +1,5 @@
 {
-  "name": "@mono/lambda-calculus-interpreter-preact",
+  "name": "@noshiro/lambda-calculus-interpreter-preact",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -40,10 +40,10 @@
     ]
   },
   "dependencies": {
-    "@mono/lambda-calculus-interpreter-core": "*",
-    "@mono/preact-rxjs-utils": "*",
-    "@mono/preact-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/lambda-calculus-interpreter-core": "*",
+    "@noshiro/preact-rxjs-utils": "*",
+    "@noshiro/preact-utils": "*",
+    "@noshiro/ts-utils": "*",
     "goober": "^2.0.5",
     "preact": "^10.4.7"
   }

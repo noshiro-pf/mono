@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/preact-utils';
+import { memoNamed } from '@noshiro/preact-utils';
 import { styled } from 'goober';
 import { useCallback } from 'preact/compat';
 import type { ChangeEventHandler } from 'react';

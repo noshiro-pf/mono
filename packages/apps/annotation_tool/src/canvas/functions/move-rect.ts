@@ -1,4 +1,4 @@
-import { Point, Rect } from '@mono/ts-utils';
+import { Point, Rect } from '@noshiro/ts-utils';
 
 export const moveRect = (rectPrevious: Rect, from: Point, to: Point): Rect => ({
   top: rectPrevious.top - from.y + to.y,

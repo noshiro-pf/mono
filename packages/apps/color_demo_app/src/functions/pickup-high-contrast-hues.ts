@@ -6,7 +6,7 @@ import {
   relativeLuminance,
   seq,
   zeros,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
 const huesDefault = seq(360) as readonly Hue[];

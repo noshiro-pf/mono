@@ -1,7 +1,7 @@
 import { HTMLInputProps, IInputGroupProps } from '@blueprintjs/core';
 import { DateInput, IDateInputProps } from '@blueprintjs/datetime';
-import { memoNamed } from '@mono/react-utils';
-import { getDate, getMonth, getYear } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { getDate, getMonth, getYear } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { YearMonthDate } from './types/year-month-date';
 

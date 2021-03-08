@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties, useMemo } from 'react';
 import styled from 'styled-components';
 import { DayType } from '../../types/enum/day-type';

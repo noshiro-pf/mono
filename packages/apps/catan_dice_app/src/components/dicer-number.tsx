@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`

@@ -1,4 +1,4 @@
-import { ReducerType } from '@mono/ts-utils';
+import { ReducerType } from '@noshiro/ts-utils';
 
 export const visibleLabelsReducer: ReducerType<
   readonly boolean[],

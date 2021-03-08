@@ -1,4 +1,4 @@
-import { ReducerType } from '@mono/ts-utils';
+import { ReducerType } from '@noshiro/ts-utils';
 import { IYearMonthDate } from '../../../types/record/base/year-month-date';
 import { IList, ISet } from '../../../utils/immutable';
 

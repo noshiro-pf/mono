@@ -1,4 +1,4 @@
-import { noop, Option } from '@mono/ts-utils';
+import { noop, Option } from '@noshiro/ts-utils';
 import {
   ChildObservable,
   Observable,

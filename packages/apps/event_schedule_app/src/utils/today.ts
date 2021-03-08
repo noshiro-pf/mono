@@ -4,7 +4,7 @@ import {
   getMinutes,
   getMonth,
   getYear,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { createIHoursMinutes } from '../types/record/base/hours-minutes';
 import {
   createIYearMonthDate,

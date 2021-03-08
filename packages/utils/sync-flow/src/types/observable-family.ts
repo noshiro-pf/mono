@@ -1,4 +1,4 @@
-import { ArrayElement, Result } from '@mono/ts-utils';
+import { ArrayElement, Result } from '@noshiro/ts-utils';
 import {
   AsyncChildObservable,
   RootObservable,

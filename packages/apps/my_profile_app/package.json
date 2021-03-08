@@ -1,5 +1,5 @@
 {
-  "name": "@mono/my-profile-app",
+  "name": "@noshiro/my-profile-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -41,8 +41,8 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
-    "@mono/react-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
     "react-markdown": "^4.3.1",

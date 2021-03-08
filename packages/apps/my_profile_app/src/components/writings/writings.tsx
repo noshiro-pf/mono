@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { writings } from '../../contents/writings';
 import { WritingsView } from './writings-view';
 

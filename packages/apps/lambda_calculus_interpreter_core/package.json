@@ -1,5 +1,5 @@
 {
-  "name": "@mono/lambda-calculus-interpreter-core",
+  "name": "@noshiro/lambda-calculus-interpreter-core",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -26,6 +26,6 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/ts-utils": "*"
+    "@noshiro/ts-utils": "*"
   }
 }

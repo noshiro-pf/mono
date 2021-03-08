@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/preact-utils';
+import { memoNamed } from '@noshiro/preact-utils';
 import { styled } from 'goober';
 import { CodeArea } from './input-area';
 

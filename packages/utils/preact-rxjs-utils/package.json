@@ -1,5 +1,5 @@
 {
-  "name": "@mono/preact-rxjs-utils",
+  "name": "@noshiro/preact-rxjs-utils",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -26,9 +26,9 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@mono/preact-utils": "*",
-    "@mono/rxjs-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/preact-utils": "*",
+    "@noshiro/rxjs-utils": "*",
+    "@noshiro/ts-utils": "*",
     "preact": "^10.4.7"
   }
 }

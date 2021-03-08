@@ -1,12 +1,12 @@
 import { DateInput, IDateInputProps } from '@blueprintjs/datetime';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import {
   getDate,
   getHours,
   getMinutes,
   getMonth,
   getYear,
-} from '@mono/ts-utils';
+} from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { Ymdhm } from './types/ymdhm';
 

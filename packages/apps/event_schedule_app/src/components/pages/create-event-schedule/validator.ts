@@ -1,4 +1,4 @@
-import { ifthen, isEmailString, StrictOmit } from '@mono/ts-utils';
+import { ifthen, isEmailString, StrictOmit } from '@noshiro/ts-utils';
 import { EventScheduleBaseType } from '../../../types/record/event-schedule';
 import { EventScheduleValidation } from '../../../types/record/event-schedule-validation';
 

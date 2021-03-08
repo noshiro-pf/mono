@@ -1,4 +1,4 @@
-import { getDay } from '@mono/ts-utils';
+import { getDay } from '@noshiro/ts-utils';
 import { texts } from '../constants/texts';
 import { IHoursMinutes } from '../types/record/base/hours-minutes';
 import { IYearMonthDate } from '../types/record/base/year-month-date';

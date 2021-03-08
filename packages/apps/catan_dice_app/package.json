@@ -1,5 +1,5 @@
 {
-  "name": "@mono/catan_dice_app",
+  "name": "@noshiro/catan_dice_app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -42,10 +42,10 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.2.1",
-    "@mono/react-rxjs-utils": "*",
-    "@mono/react-utils": "*",
-    "@mono/rxjs-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-rxjs-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/rxjs-utils": "*",
+    "@noshiro/ts-utils": "*",
     "immutable": "^4.0.0-rc.12",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",

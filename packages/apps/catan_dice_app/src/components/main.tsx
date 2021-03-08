@@ -2,9 +2,9 @@ import {
   useDataStream,
   useStreamValue,
   useVoidEventAsStream,
-} from '@mono/react-rxjs-utils';
-import { memoNamed } from '@mono/react-utils';
-import { mapToConst } from '@mono/rxjs-utils';
+} from '@noshiro/react-rxjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { mapToConst } from '@noshiro/rxjs-utils';
 import { interval, merge } from 'rxjs';
 import { map, scan, switchMapTo, take } from 'rxjs/operators';
 import { historyReducer } from '../functions/history-reducer';

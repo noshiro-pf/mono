@@ -1,5 +1,5 @@
 import { Label, NumericInput } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 
 interface Props {
   label: string;

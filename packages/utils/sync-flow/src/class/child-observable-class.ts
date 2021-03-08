@@ -1,4 +1,4 @@
-import { isArrayOfLength1OrMore, Option } from '@mono/ts-utils';
+import { isArrayOfLength1OrMore, Option } from '@noshiro/ts-utils';
 import {
   AsyncChildObservable,
   AsyncChildObservableType,

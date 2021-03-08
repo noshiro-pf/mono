@@ -1,5 +1,5 @@
 {
-  "name": "@mono/cant-stop-probability",
+  "name": "@noshiro/cant-stop-probability",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -41,9 +41,9 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.36.0",
-    "@mono/react-blueprintjs-utils": "*",
-    "@mono/react-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-blueprintjs-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
     "styled-components": "^5.1.1"

@@ -1,6 +1,6 @@
 import { Paper } from '@material-ui/core';
-import { MuiTabs } from '@mono/react-material-ui-utils';
-import { ComponentSwitcher } from '@mono/react-utils';
+import { MuiTabs } from '@noshiro/react-material-ui-utils';
+import { ComponentSwitcher } from '@noshiro/react-utils';
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { LuminanceVisualizer } from './components/pages/luminance-visualizer/luminance-visualizer';

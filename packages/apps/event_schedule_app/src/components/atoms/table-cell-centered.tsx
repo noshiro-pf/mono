@@ -1,4 +1,4 @@
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 

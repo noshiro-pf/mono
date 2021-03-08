@@ -1,5 +1,5 @@
 {
-  "name": "@mono/lambda-interpreter-app-solid",
+  "name": "@noshiro/lambda-interpreter-app-solid",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,9 +22,9 @@
     "Node 10"
   ],
   "dependencies": {
-    "@mono/lambda-calculus-interpreter-core": "*",
-    "@mono/solid-styled-components": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/lambda-calculus-interpreter-core": "*",
+    "@noshiro/solid-styled-components": "*",
+    "@noshiro/ts-utils": "*",
     "rxjs": "^6.6.3"
   }
 }

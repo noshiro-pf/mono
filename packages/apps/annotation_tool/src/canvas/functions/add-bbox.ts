@@ -1,4 +1,4 @@
-import { Rect, Rgba, roundToInt } from '@mono/ts-utils';
+import { Rect, Rgba, roundToInt } from '@noshiro/ts-utils';
 import { Application } from 'pixi.js';
 import { CanvasAppState } from '../state/canvas-state-type';
 import { CanvasAppStateHandler } from '../state/state-handler-main';

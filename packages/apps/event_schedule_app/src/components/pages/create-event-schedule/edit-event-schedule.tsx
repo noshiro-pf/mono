@@ -4,9 +4,9 @@ import {
   useStreamEffect,
   useStreamValue,
   useValueAsStream,
-} from '@mono/react-rxjs-utils';
-import { memoNamed } from '@mono/react-utils';
-import { Result } from '@mono/ts-utils';
+} from '@noshiro/react-rxjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { Result } from '@noshiro/ts-utils';
 import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import styled from 'styled-components';

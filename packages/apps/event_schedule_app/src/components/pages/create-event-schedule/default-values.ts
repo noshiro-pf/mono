@@ -1,4 +1,4 @@
-import { DateEnum, getDate, setDate } from '@mono/ts-utils';
+import { DateEnum, getDate, setDate } from '@noshiro/ts-utils';
 import { defaultAnswerDeadlineRemainingDays } from '../../../constants/default-answer-deadline-remaining';
 import { texts } from '../../../constants/texts';
 import { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';

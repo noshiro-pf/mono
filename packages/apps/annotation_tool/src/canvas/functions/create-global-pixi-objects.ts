@@ -1,4 +1,4 @@
-import { RectSize } from '@mono/ts-utils';
+import { RectSize } from '@noshiro/ts-utils';
 import { Application, Sprite } from 'pixi.js';
 import { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
 import { PixiTempRect } from '../types/pixi-temp-rect';

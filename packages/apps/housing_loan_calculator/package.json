@@ -1,5 +1,5 @@
 {
-  "name": "@mono/housing-loan-calculator-app",
+  "name": "@noshiro/housing-loan-calculator-app",
   "version": "0.2.0",
   "private": true,
   "scripts": {
@@ -42,8 +42,8 @@
   "dependencies": {
     "@blueprintjs/core": "^3.36.0",
     "@blueprintjs/icons": "^3.23.0",
-    "@mono/react-utils": "*",
-    "@mono/ts-utils": "*",
+    "@noshiro/react-utils": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
     "styled-components": "^5.1.1"

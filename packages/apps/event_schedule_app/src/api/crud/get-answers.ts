@@ -1,4 +1,4 @@
-import { Result } from '@mono/ts-utils';
+import { Result } from '@noshiro/ts-utils';
 import { firestorePaths } from '../../constants/firestore-paths';
 import { dbEvents } from '../../initialize-firebase';
 import { answerId } from '../../types/phantom';

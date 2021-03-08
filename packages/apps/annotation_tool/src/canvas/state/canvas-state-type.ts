@@ -1,4 +1,4 @@
-import { Point, Rect, Writeable } from '@mono/ts-utils';
+import { Point, Rect, Writeable } from '@noshiro/ts-utils';
 import { Sprite } from 'pixi.js';
 import { Direction } from '../functions/bbox-points';
 import { PixiBbox } from '../types/pixi-bbox';

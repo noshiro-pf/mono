@@ -1,5 +1,5 @@
-import { memoNamed } from '@mono/react-utils';
-import { Percent } from '@mono/ts-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import { Percent } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { Label } from '../../canvas/types/label';
 import { AppEventHandler } from '../event-handlers';

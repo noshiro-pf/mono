@@ -1,5 +1,5 @@
 import { Spinner } from '@blueprintjs/core';
-import { memoNamed } from '@mono/react-utils';
+import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { ConfigSection } from './components/ConfigSection/ConfigSection';
 import { PaymentTable } from './components/PaymentTable/PaymentTable';
