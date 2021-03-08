@@ -1,18 +1,22 @@
-<ng-container *ngIf="{
-      devMode:            devMode$            | async,
-      cardSizeRatio:      cardSizeRatio$      | async,
-      cardSizeAutoChange: cardSizeAutoChange$ | async,
-      autoSort:           autoSort$           | async
-    } as data">
-      <!-- messageSec:         messageSec$         | async, -->
-
+<ng-container
+  *ngIf="{
+    devMode: devMode$ | async,
+    cardSizeRatio: cardSizeRatio$ | async,
+    cardSizeAutoChange: cardSizeAutoChange$ | async,
+    autoSort: autoSort$ | async
+  } as data"
+>
+  <!-- messageSec:         messageSec$         | async, -->
 
   <div mat-dialog-title class="title-bar">
     <span>設定</span>
     <span class="spacer"></span>
-    <button mat-icon-button (click)="smartphoneMode()"
-        matTooltip="Smart phone用表示"
-        matTooltipPosition="below" >
+    <button
+      mat-icon-button
+      (click)="smartphoneMode()"
+      matTooltip="Smart phone用表示"
+      matTooltipPosition="below"
+    >
       <mat-icon>smartphone</mat-icon>
     </button>
   </div>
@@ -27,25 +31,27 @@
     <div class="box">
       カードサイズ（％）
       <mat-slider
-          [min]="30"
-          [max]="200"
-          [step]="10"
-          [thumbLabel]="true"
-          [tickInterval]="1"
-          [value]="data.cardSizeRatio * 100"
-          (change)="setCardSizeRatio( $event.value / 100 )">
+        [min]="30"
+        [max]="200"
+        [step]="10"
+        [thumbLabel]="true"
+        [tickInterval]="1"
+        [value]="data.cardSizeRatio * 100"
+        (change)="setCardSizeRatio($event.value / 100)"
+      >
       </mat-slider>
-      <button mat-raised-button (click)="setCardSizeRatio( 1.0 )">reset</button>
+      <button mat-raised-button (click)="setCardSizeRatio(1.0)">reset</button>
     </div>
 
     <div class="box">
       <mat-checkbox
-          [checked]="data.cardSizeAutoChange"
-          (change)="cardSizeAutoChangeChecked( $event.checked )">
+        [checked]="data.cardSizeAutoChange"
+        (change)="cardSizeAutoChangeChecked($event.checked)"
+      >
         カードサイズ自動変更
       </mat-checkbox>
     </div>
-<!--
+    <!--
     <div class="box">
       メッセージ表示時間（秒）
       <mat-slider
@@ -62,49 +68,62 @@
 
     <div class="box">
       <mat-checkbox
-          [checked]="data.autoSort"
-          (change)="setAutoSort( $event.checked )">
+        [checked]="data.autoSort"
+        (change)="setAutoSort($event.checked)"
+      >
         手札を自動でソート
       </mat-checkbox>
     </div>
 
     <div class="box">
-      <p>ゲームを初期状態に戻すには、
+      <p>
+        ゲームを初期状態に戻すには、
         下の4桁の数字を入力した後「ゲームをリセット」を押してください。
       </p>
-      <p>ゲームを強制終了して結果画面に移るには、
+      <p>
+        ゲームを強制終了して結果画面に移るには、
         下の数字を入力した後「ゲームを強制終了」を押してください。
       </p>
       <div class="center">
-        <span class="reset-game-password">{{resetGameKeycode}}</span>
+        <span class="reset-game-password">{{ resetGameKeycode }}</span>
         <mat-form-field class="new-message-input-box">
-          <input matInput
-              type="number"
-              (input)="keycodeOnInput( $event.target.valueAsNumber )"
-              placeholder="数字を入力">
+          <input
+            matInput
+            type="number"
+            (input)="keycodeOnInput($event.target.valueAsNumber)"
+            placeholder="数字を入力"
+          />
         </mat-form-field>
       </div>
     </div>
   </div>
 
   <div mat-dialog-actions class="center">
-    <button mat-raised-button mat-dialog-close="yes" color='primary'>
-      OK
-    </button>
-    <button mat-raised-button mat-dialog-close="resetGame" color='warn'
-        [disabled]="resetGameKeycode !== keycode">
+    <button mat-raised-button mat-dialog-close="yes" color="primary">OK</button>
+    <button
+      mat-raised-button
+      mat-dialog-close="resetGame"
+      color="warn"
+      [disabled]="resetGameKeycode !== keycode"
+    >
       ゲームをリセット
     </button>
-    <button mat-raised-button mat-dialog-close="terminateGame" color='warn'
-        [disabled]="resetGameKeycode !== keycode">
+    <button
+      mat-raised-button
+      mat-dialog-close="terminateGame"
+      color="warn"
+      [disabled]="resetGameKeycode !== keycode"
+    >
       ゲームを強制終了
     </button>
   </div>
 
-  <button *ngIf="isDevMode"
-      mat-icon-button id="devModeButton"
-      (click)="toggleDevMode( data.devMode )">
+  <button
+    *ngIf="isDevMode"
+    mat-icon-button
+    id="devModeButton"
+    (click)="toggleDevMode(data.devMode)"
+  >
     <mat-icon>developer_mode</mat-icon>
   </button>
-
 </ng-container>

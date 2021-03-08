@@ -1,14 +1,12 @@
 .player-area {
   margin: 10px;
-  background-color: #C6BF94;
+  background-color: #c6bf94;
   /* min-width: 360px; */
 }
 
 .is-turn-player {
-  background-color: #EF9448;
+  background-color: #ef9448;
 }
-
-
 
 .tokens {
   width: 100%;
@@ -27,14 +25,11 @@
   flex-grow: 0;
 }
 .vcoins-debts {
-  background-color: #9BC694;
+  background-color: #9bc694;
 }
 
-
-
-
 .CardArea {
-  background-color: #9BC694;
+  background-color: #9bc694;
   padding: 5px;
   margin: 5px;
 }
@@ -54,7 +49,6 @@
 .HandCards {
   flex: 1;
 }
-
 
 .players-name {
   padding: 5px;

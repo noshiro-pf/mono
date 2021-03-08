@@ -1,8 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DCard } from '../../../types/dcard';
-
-
 
 @Component({
   selector: 'app-cards-pile',
@@ -17,29 +15,28 @@ import { DCard } from '../../../types/dcard';
       [cardWidth$]="width$"
       [defaultArrayLength]="1"
       [padding]="0"
-      (cardClicked)="onClicked( $event )" >
+      (cardClicked)="onClicked($event)"
+    >
     </app-cards-area>
   `,
   styles: [],
 })
 export class CardsPileComponent implements OnInit {
-
-  @Input() showArraySize:      boolean = true;
-  @Input() showCardProperty:   boolean = false;
+  @Input() showArraySize: boolean = true;
+  @Input() showCardProperty: boolean = false;
   @Input() hideNonButtonCards: boolean = false;
 
-  @Input() myIndex$!:    Observable<number>;
+  @Input() myIndex$!: Observable<number>;
   @Input() DCardArray$!: Observable<DCard[]>;
-  @Input() width$!:      Observable<number>;
+  @Input() width$!: Observable<number>;
 
   @Output() cardClicked = new EventEmitter<DCard>();
-
 
   constructor() {}
 
   ngOnInit() {}
 
-  onClicked( topCard: DCard ) {
-    this.cardClicked.emit( topCard );
+  onClicked(topCard: DCard) {
+    this.cardClicked.emit(topCard);
   }
 }

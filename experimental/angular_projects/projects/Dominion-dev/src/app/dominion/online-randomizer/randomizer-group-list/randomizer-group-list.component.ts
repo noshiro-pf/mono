@@ -1,63 +1,53 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { MatSidenav } from '@angular/material/sidenav';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-
-import { RN, combine } from 'rnjs';
-
-import { utils } from '../../../mylib/utilities';
+import { MatSidenav } from '@angular/material/sidenav';
+import { combine, RN } from 'rnjs';
 import { FireDatabaseService } from '../../../database/database.service';
 import { UserService } from '../../../database/user.service';
-
-import { MyRandomizerGroupService } from '../my-randomizer-group.service';
-
-import { RandomizerGroup       } from '../types/randomizer-group';
+import { utils } from '../../../mylib/utilities';
 import { SelectedCardsCheckbox } from '../../types/selected-cards-checkbox-values';
-import { BlackMarketPhase      } from '../types/black-market-phase.enum';
-
+import { MyRandomizerGroupService } from '../my-randomizer-group.service';
+import { BlackMarketPhase } from '../types/black-market-phase.enum';
+import { RandomizerGroup } from '../types/randomizer-group';
 
 @Component({
   selector: 'app-randomizer-group-list',
   templateUrl: './randomizer-group-list.component.html',
-  styleUrls: ['./randomizer-group-list.component.css']
+  styleUrls: ['./randomizer-group-list.component.css'],
 })
 export class RandomizerGroupListComponent implements OnInit {
-
   @Input() private sidenav!: MatSidenav;
 
-  uid$:        RN<string> = this.user.uid$;
-  myName$:     RN<string> = this.user.name$;
+  uid$: RN<string> = this.user.uid$;
+  myName$: RN<string> = this.user.name$;
   myNameYomi$: RN<string> = this.user.nameYomi$;
 
-  randomizerGroupListWithUsers$: RN<{ group: RandomizerGroup, users: string[] }[]>
-    = combine(
-          this.database.randomizerGroupList$,
-          this.database.users$
-      ).map( ([randomizerGroupList, users]) =>
-        randomizerGroupList.map( group => ({
-          group: group,
-          users: users.filter( user => user.randomizerGroupId === group.databaseKey )
-                      .map( user => user.name ),
-        }))
-      );
+  randomizerGroupListWithUsers$: RN<
+    { group: RandomizerGroup; users: string[] }[]
+  > = combine(this.database.randomizerGroupList$, this.database.users$).map(
+    ([randomizerGroupList, users]) =>
+      randomizerGroupList.map((group) => ({
+        group: group,
+        users: users
+          .filter((user) => user.randomizerGroupId === group.databaseKey)
+          .map((user) => user.name),
+      }))
+  );
 
-  newGroupName!:     string;
+  newGroupName!: string;
   newGroupPassword!: string;
-  signInPassword!:   string;
+  signInPassword!: string;
   showWrongPasswordAlert = false;
   selectedGroupId = '';
-
 
   constructor(
     public snackBar: MatSnackBar,
     private user: UserService,
     private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService
-  ) {
-  }
+  ) {}
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 
   /* sidenav */
   closeSideNav() {
@@ -71,50 +61,50 @@ export class RandomizerGroupListComponent implements OnInit {
     this.selectedGroupId = '';
   }
 
-
   /* 新規グループ */
-  newGroupNameOnChange( value: string ) {
+  newGroupNameOnChange(value: string) {
     this.newGroupName = value;
   }
 
-  newGroupPasswordOnChange( value: string ) {
+  newGroupPasswordOnChange(value: string) {
     this.newGroupPassword = value;
   }
 
   async addRandomizerGroup(
-    uid:                string,
-    myName:             string,
-    myNameYomi:         string,
-    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+    uid: string,
+    myName: string,
+    myNameYomi: string,
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
   ) {
-    const expansionNameList
-      = await this.database.expansionNameList$.once();
-    const isSelectedExpansionsInit = expansionNameList.map( _ => true );
+    const expansionNameList = await this.database.expansionNameList$.once();
+    const isSelectedExpansionsInit = expansionNameList.map((_) => true);
 
-    const newRandomizerGroup = new RandomizerGroup( undefined, {
-        name:                    this.newGroupName,
-        password:                this.newGroupPassword,
-        timeStamp:               Date.now(),
-        isSelectedExpansions:    isSelectedExpansionsInit,
-        selectedCardsCheckbox:   new SelectedCardsCheckbox(),
-        BlackMarketPileShuffled: [],
-        BlackMarketPhase:        BlackMarketPhase.init,
-        selectedCardsHistory:    [],
-        selectedIndexInHistory:  0,
-        newGameResult: {
-          players:            {},
-          place:              '',
-          memo:               '',
-          lastTurnPlayerName: '',
-        },
-        newGameResultDialogOpened: false,
-        resetVPCalculator:         0,
+    const newRandomizerGroup = new RandomizerGroup(undefined, {
+      name: this.newGroupName,
+      password: this.newGroupPassword,
+      timeStamp: Date.now(),
+      isSelectedExpansions: isSelectedExpansionsInit,
+      selectedCardsCheckbox: new SelectedCardsCheckbox(),
+      BlackMarketPileShuffled: [],
+      BlackMarketPhase: BlackMarketPhase.init,
+      selectedCardsHistory: [],
+      selectedIndexInHistory: 0,
+      newGameResult: {
+        players: {},
+        place: '',
+        memo: '',
+        lastTurnPlayerName: '',
+      },
+      newGameResultDialogOpened: false,
+      resetVPCalculator: 0,
     });
 
-    const ref = await this.database.randomizerGroup.addGroup( newRandomizerGroup );
+    const ref = await this.database.randomizerGroup.addGroup(
+      newRandomizerGroup
+    );
     const groupId = ref.key;
-    await this.user.setRandomizerGroupId( groupId );
-    await this.myRandomizerGroup.addMember( groupId, uid, myName, myNameYomi );
+    await this.user.setRandomizerGroupId(groupId);
+    await this.myRandomizerGroup.addMember(groupId, uid, myName, myNameYomi);
     // await this.removeMemberEmptyGroup();
     this.resetAddGroupForm();
 
@@ -122,36 +112,34 @@ export class RandomizerGroupListComponent implements OnInit {
     this.sidenav.close();
   }
 
-
-
   /* グループ選択 */
-  groupClicked( $event: any, groupId: string ) {
+  groupClicked($event: any, groupId: string) {
     this.resetSignInForm();
     this.selectedGroupId = groupId;
     $event.stopPropagation();
   }
 
-  toYMDHMS( date: Date ) {
-    return utils.date.toYMDHMS( date );
+  toYMDHMS(date: Date) {
+    return utils.date.toYMDHMS(date);
   }
 
-  signInPasswordOnChange( value: string ) {
+  signInPasswordOnChange(value: string) {
     this.signInPassword = value;
   }
 
   async signIn(
-    groupId:            string,
-    uid:                string,
-    myName:             string,
-    myNameYomi:         string,
-    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+    groupId: string,
+    uid: string,
+    myName: string,
+    myNameYomi: string,
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
   ) {
-    if ( !this.signInPasswordIsValid( groupId, groupListWithUsers ) ) return;
+    if (!this.signInPasswordIsValid(groupId, groupListWithUsers)) return;
 
     this.resetSignInForm();
     await Promise.all([
-      this.user.setRandomizerGroupId( groupId ),
-      this.myRandomizerGroup.addMember( groupId, uid, myName, myNameYomi ),
+      this.user.setRandomizerGroupId(groupId),
+      this.myRandomizerGroup.addMember(groupId, uid, myName, myNameYomi),
     ]);
 
     this.openSnackBar('Successfully signed in!');
@@ -160,15 +148,15 @@ export class RandomizerGroupListComponent implements OnInit {
   }
 
   async signOut(
-    groupId:            string,
-    uid:                string,
-    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+    groupId: string,
+    uid: string,
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
   ) {
-    if ( !this.signInPasswordIsValid( groupId, groupListWithUsers ) ) return;
+    if (!this.signInPasswordIsValid(groupId, groupListWithUsers)) return;
 
     this.resetSignInForm();
     await Promise.all([
-      this.myRandomizerGroup.removeMember( groupId, uid ),
+      this.myRandomizerGroup.removeMember(groupId, uid),
       this.user.setRandomizerGroupId(''),
     ]);
 
@@ -177,16 +165,17 @@ export class RandomizerGroupListComponent implements OnInit {
     // await this.removeMemberEmptyGroup();
   }
 
-
-
   /* private methods */
   private signInPasswordIsValid(
-    groupId:            string,
-    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+    groupId: string,
+    groupListWithUsers: { group: RandomizerGroup; users: string[] }[]
   ): boolean {
-    const group = (groupListWithUsers.find( g => g.group.databaseKey === groupId )
-                    || { group: new RandomizerGroup() }).group;
-    const isValid = ( !group.password ) || ( this.signInPassword === group.password );
+    const group = (
+      groupListWithUsers.find((g) => g.group.databaseKey === groupId) || {
+        group: new RandomizerGroup(),
+      }
+    ).group;
+    const isValid = !group.password || this.signInPassword === group.password;
     this.showWrongPasswordAlert = !isValid;
     return isValid;
   }
@@ -211,7 +200,7 @@ export class RandomizerGroupListComponent implements OnInit {
     this.signInPassword = '';
   }
 
-  private openSnackBar( message: string ) {
-    this.snackBar.open( message, undefined, { duration: 3000 } );
+  private openSnackBar(message: string) {
+    this.snackBar.open(message, undefined, { duration: 3000 });
   }
 }

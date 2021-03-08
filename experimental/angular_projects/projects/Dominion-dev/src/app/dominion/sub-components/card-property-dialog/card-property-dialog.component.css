@@ -20,14 +20,12 @@
   align-content: flex-start;
 }
 
-
 .navigationButton {
-  padding : 0;
+  padding: 0;
   margin: 2px 0;
-  min-width : 30px;
-  color: rgba(0,0,0,.54);
+  min-width: 30px;
+  color: rgba(0, 0, 0, 0.54);
 }
-
 
 .fixed-width {
   width: 200px;

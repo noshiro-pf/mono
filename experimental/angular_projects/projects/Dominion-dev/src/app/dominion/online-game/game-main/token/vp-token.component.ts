@@ -1,18 +1,19 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-vp-token',
   template: `
-    <img src="assets/img/game-object/VP.png"
-      width="auto" [style.height.px]="diameter">
+    <img
+      src="assets/img/game-object/VP.png"
+      width="auto"
+      [style.height.px]="diameter"
+    />
   `,
-  styles: []
+  styles: [],
 })
 export class VpTokenComponent implements OnInit {
-
   @Input() diameter: number = 24;
 
-  constructor() { }
+  constructor() {}
   ngOnInit() {}
 }
-

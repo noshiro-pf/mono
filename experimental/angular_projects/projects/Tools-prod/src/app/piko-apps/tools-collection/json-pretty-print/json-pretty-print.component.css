@@ -1,6 +1,9 @@
-.input-area,.output-area {
+.input-area,
+.output-area {
   width: 100%;
 }
-.input-area,.output-area,.spacer {
+.input-area,
+.output-area,
+.spacer {
   padding: 20px;
 }

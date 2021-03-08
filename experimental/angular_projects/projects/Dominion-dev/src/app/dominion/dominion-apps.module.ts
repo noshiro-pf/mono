@@ -1,26 +1,20 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { NgModule } from '@angular/core';
 /* modules */
 import { MyOwnCustomMaterialModule } from '../my-own-custom-material.module';
-import { MyLibModule        } from '../mylib/mylib.module';
-import { SubComponentsModule       } from './sub-components/sub-components.module';
-import { OnlineRandomizerModule    } from './online-randomizer/online-randomizer.module';
-import { OnlineGameModule          } from './online-game/online-game.module';
-
+import { MyLibModule } from '../mylib/mylib.module';
 /* components */
-import { CardPropertyListComponent        } from './card-property-list.component';
-import { RuleBooksComponent               } from './rule-books.component';
-import { ScoringTableComponent            } from './game-result/scoring-table.component';
-import { GameResultComponent              } from './game-result/game-result.component';
-import { GameResultOfPlayerComponent      } from './game-result/game-result-of-player.component';
-import { GameResultListComponent          } from './game-result/game-result-list.component';
-
+import { CardPropertyListComponent } from './card-property-list.component';
+import { GameResultListComponent } from './game-result/game-result-list.component';
+import { GameResultOfPlayerComponent } from './game-result/game-result-of-player.component';
+import { GameResultComponent } from './game-result/game-result.component';
+import { ScoringTableComponent } from './game-result/scoring-table.component';
+import { OnlineGameModule } from './online-game/online-game.module';
+import { OnlineRandomizerModule } from './online-randomizer/online-randomizer.module';
+import { RuleBooksComponent } from './rule-books.component';
 /* entry components */
 import { GameResultDetailDialogComponent } from './sub-components/game-result-detail-dialog/game-result-detail-dialog.component';
-
-
-
+import { SubComponentsModule } from './sub-components/sub-components.module';
 
 @NgModule({
   imports: [
@@ -51,10 +45,7 @@ import { GameResultDetailDialogComponent } from './sub-components/game-result-de
     GameResultListComponent,
     GameResultDetailDialogComponent,
   ],
-  providers: [
-  ],
-  entryComponents: [
-    GameResultDetailDialogComponent,
-  ]
+  providers: [],
+  entryComponents: [GameResultDetailDialogComponent],
 })
-export class DominionAppsModule { }
+export class DominionAppsModule {}

@@ -1,12 +1,10 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
-import { MyOwnCustomMaterialModule } from './my-own-custom-material.module';
-
+import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { MnistComponent } from './mnist/mnist.component';
-import { WaitingSpinnerComponent } from './mylib/waiting-spinner.component';
+import { MyOwnCustomMaterialModule } from './my-own-custom-material.module';
 import { MessageDialogComponent } from './mylib/message-dialog.component';
+import { WaitingSpinnerComponent } from './mylib/waiting-spinner.component';
 
 @NgModule({
   declarations: [
@@ -15,14 +13,9 @@ import { MessageDialogComponent } from './mylib/message-dialog.component';
     WaitingSpinnerComponent,
     MessageDialogComponent,
   ],
-  imports: [
-    BrowserModule,
-    MyOwnCustomMaterialModule,
-  ],
-  entryComponents: [
-    MessageDialogComponent,
-  ],
+  imports: [BrowserModule, MyOwnCustomMaterialModule],
+  entryComponents: [MessageDialogComponent],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

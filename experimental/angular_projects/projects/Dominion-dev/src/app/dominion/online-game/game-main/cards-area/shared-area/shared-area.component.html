@@ -1,167 +1,181 @@
-<ng-container *ngIf="{
+<ng-container
+  *ngIf="{
     showCardProperty: showCardProperty$ | async,
-    gainCardState:    gainCardState$    | async,
-    trashPileWidth:   trashPileWidth$   | async,
-    trashPileHeight:  trashPileHeight$  | async,
-    Prosperity:       Prosperity$       | async,
-    usePotion:        usePotion$        | async,
-    trashPile:        trashPile$        | async
-  } as data">
+    gainCardState: gainCardState$ | async,
+    trashPileWidth: trashPileWidth$ | async,
+    trashPileHeight: trashPileHeight$ | async,
+    Prosperity: Prosperity$ | async,
+    usePotion: usePotion$ | async,
+    trashPile: trashPile$ | async
+  } as data"
+>
+  <div class="shared-area box-shadow">
+    <div class="BasicCards_KingdomCards">
+      <div class="BasicCards">
+        <div class="Curse">
+          <div class="card-pile">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Curse$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+        </div>
 
-<div class="shared-area box-shadow">
-  <div class="BasicCards_KingdomCards">
-    <div class="BasicCards">
+        <div class="victories">
+          <div class="card-pile">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Estate$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+          <div class="card-pile">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Duchy$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+          <div class="card-pile">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Province$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+          <div class="card-pile" *ngIf="data.Prosperity">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Colony$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+        </div>
 
-      <div class="Curse">
-        <div class="card-pile">
+        <div class="treasures">
+          <div class="card-pile" *ngIf="data.usePotion">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Potion$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+
+          <div class="card-pile">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Copper$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+          <div class="card-pile">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Silver$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+          <div class="card-pile">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Gold$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+          <div class="card-pile" *ngIf="data.Prosperity">
+            <app-cards-pile
+              [showArraySize]="true"
+              [showCardProperty]="data.showCardProperty"
+              [hideNonButtonCards]="data.gainCardState"
+              [DCardArray$]="BasicCards.Platinum$"
+              [myIndex$]="myIndex$"
+              [width$]="width$"
+              (cardClicked)="onClick($event)"
+            >
+            </app-cards-pile>
+          </div>
+        </div>
+      </div>
+      <div class="KingdomCards">
+        <div class="card-pile" *ngFor="let idArray$ of KingdomCards">
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
             [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Curse$"
+            [DCardArray$]="idArray$"
             [myIndex$]="myIndex$"
             [width$]="width$"
-            (cardClicked)="onClick( $event )" >
+            (cardClicked)="onClick($event)"
+          >
           </app-cards-pile>
         </div>
       </div>
-
-      <div class="victories">
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Estate$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Duchy$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Province$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile" *ngIf="data.Prosperity">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Colony$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-      </div>
-
-      <div class="treasures">
-        <div class="card-pile" *ngIf="data.usePotion">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Potion$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Copper$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Silver$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Gold$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile" *ngIf="data.Prosperity">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="data.gainCardState"
-            [DCardArray$]="BasicCards.Platinum$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-      </div>
-
     </div>
-    <div class="KingdomCards">
-      <div class="card-pile" *ngFor="let idArray$ of KingdomCards">
+
+    <div class="trashPile-area">
+      <div
+        class="trashPile"
+        [style.width.px]="data.trashPileWidth"
+        [style.height.px]="data.trashPileHeight"
+      >
         <app-cards-pile
+          *ngIf="data.trashPile?.length > 0"
           [showArraySize]="true"
           [showCardProperty]="data.showCardProperty"
           [hideNonButtonCards]="data.gainCardState"
-          [DCardArray$]="idArray$"
+          [DCardArray$]="trashPile$"
           [myIndex$]="myIndex$"
           [width$]="width$"
-          (cardClicked)="onClick( $event )" >
+          (cardClicked)="onClick($event)"
+        >
         </app-cards-pile>
       </div>
     </div>
   </div>
-
-  <div class="trashPile-area">
-    <div class="trashPile"
-        [style.width.px]="data.trashPileWidth"
-        [style.height.px]="data.trashPileHeight" >
-      <app-cards-pile *ngIf="data.trashPile?.length > 0"
-        [showArraySize]="true"
-        [showCardProperty]="data.showCardProperty"
-        [hideNonButtonCards]="data.gainCardState"
-        [DCardArray$]="trashPile$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-      </app-cards-pile>
-    </div>
-  </div>
-</div>
 </ng-container>

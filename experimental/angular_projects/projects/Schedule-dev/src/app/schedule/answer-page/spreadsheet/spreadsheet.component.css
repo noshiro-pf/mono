@@ -1,9 +1,9 @@
 .dateIsPerfect {
-  background-color: #AEDD03;
+  background-color: #aedd03;
 }
 
 .dateIsGood {
-  background-color: #D8FF62;
+  background-color: #d8ff62;
 }
 
 .small-font {
@@ -11,9 +11,9 @@
 }
 
 .mini-button {
-  padding : 0 10px;
-  min-width : 0;
+  padding: 0 10px;
+  min-width: 0;
   max-width: 80px;
   overflow: hidden;
-  color: rgba(0,0,0,.54);
+  color: rgba(0, 0, 0, 0.54);
 }

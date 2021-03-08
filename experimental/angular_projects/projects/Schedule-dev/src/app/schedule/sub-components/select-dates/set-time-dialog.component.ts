@@ -24,38 +24,46 @@ import { utils } from '../../../mylib/utilities';
 
     <div mat-dialog-actions class="actionButtons">
       <span class="margined-element">
-        <button mat-raised-button
-          [mat-dialog-close]="{ clicked: 'ok',
-                                hours: selectedHours,
-                                minutes: selectedMinutes }"
-          color='primary'>
+        <button
+          mat-raised-button
+          [mat-dialog-close]="{
+            clicked: 'ok',
+            hours: selectedHours,
+            minutes: selectedMinutes
+          }"
+          color="primary"
+        >
           OK
         </button>
       </span>
       <span class="margined-element">
-        <button mat-raised-button
-          [mat-dialog-close]="{ clicked: 'cancel' }">
+        <button mat-raised-button [mat-dialog-close]="{ clicked: 'cancel' }">
           Cancel
         </button>
       </span>
     </div>
   `,
-  styles: [`
-    .actionButtons { justify-content: center; }
-    .hours-selector,.minutes-selector { width: 50px; }
-  `]
+  styles: [
+    `
+      .actionButtons {
+        justify-content: center;
+      }
+      .hours-selector,
+      .minutes-selector {
+        width: 50px;
+      }
+    `,
+  ],
 })
 export class SetTimeDialogComponent implements OnInit {
+  hoursList = utils.number.seq0(24);
+  minutesList = utils.number.seq0(6).map((e) => 10 * e);
 
-  hoursList   = utils.number.seq0(24);
-  minutesList = utils.number.seq0(6).map( e => 10 * e );
-
-  selectedHours   = 0;
+  selectedHours = 0;
   selectedMinutes = 0;
 
-  hoursInit!: number;  // input
-  minutesInit!: number;  // input
-
+  hoursInit!: number; // input
+  minutesInit!: number; // input
 
   constructor() {}
 
@@ -63,5 +71,4 @@ export class SetTimeDialogComponent implements OnInit {
     this.selectedHours = this.hoursInit;
     this.selectedMinutes = this.minutesInit;
   }
-
 }

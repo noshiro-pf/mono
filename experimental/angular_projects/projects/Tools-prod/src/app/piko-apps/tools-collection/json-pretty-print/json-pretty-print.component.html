@@ -1,22 +1,32 @@
 <div class="body-with-padding">
-
   <mat-form-field class="spacer">
-    <input matInput placeholder="Spacer"
-        [value]="'  '"
-        (input)="spacerChange( $event.target.value )">
+    <input
+      matInput
+      placeholder="Spacer"
+      [value]="'  '"
+      (input)="spacerChange($event.target.value)"
+    />
   </mat-form-field>
 
   <mat-form-field class="input-area">
-    <textarea matInput
-      (input)="inputTextOnInput( $event.target.value )"
-      matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="20"
-      placeholder="input" ></textarea>
+    <textarea
+      matInput
+      (input)="inputTextOnInput($event.target.value)"
+      matTextareaAutosize
+      matAutosizeMinRows="5"
+      matAutosizeMaxRows="20"
+      placeholder="input"
+    ></textarea>
   </mat-form-field>
 
   <mat-form-field class="output-area">
-    <textarea matInput [value]="output$ | async"
-      matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="20"
-      placeholder="output" ></textarea>
+    <textarea
+      matInput
+      [value]="output$ | async"
+      matTextareaAutosize
+      matAutosizeMinRows="5"
+      matAutosizeMaxRows="20"
+      placeholder="output"
+    ></textarea>
   </mat-form-field>
-
 </div>

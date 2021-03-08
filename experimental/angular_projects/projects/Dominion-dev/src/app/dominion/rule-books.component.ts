@@ -1,62 +1,63 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireStorage } from 'angularfire2/storage';
-import { RN, fromObservable } from 'rnjs';
-
+import { fromObservable, RN } from 'rnjs';
 
 @Component({
   selector: 'app-rule-books',
   template: `
     <div class="wrapper">
-      <div *ngFor="let rulebook of RuleBooks" class='rulebook-box'>
-        <ng-container *ngIf="{
+      <div *ngFor="let rulebook of RuleBooks" class="rulebook-box">
+        <ng-container
+          *ngIf="{
             pdfurl: rulebook.pdfurl$ | async,
             imgurl: rulebook.imgurl$ | async
-          } as data">
-          <a *ngIf="data.pdfurl && data.imgurl"
-              [href]='data.pdfurl' target="_blank">
+          } as data"
+        >
+          <a
+            *ngIf="data.pdfurl && data.imgurl"
+            [href]="data.pdfurl"
+            target="_blank"
+          >
             <mat-card>
-              <img mat-card-image [src]='data.imgurl'>
-              <mat-card-content>{{rulebook.title}}</mat-card-content>
+              <img mat-card-image [src]="data.imgurl" />
+              <mat-card-content>{{ rulebook.title }}</mat-card-content>
             </mat-card>
           </a>
         </ng-container>
       </div>
     </div>
   `,
-  styles: [`
-    .wrapper {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: flex-start;
-      align-items: flex-end;
-      align-content: flex-start;
-    }
-    .rulebook-box {
-      margin: 30px;
-      width: 250px;
-    }
-    .rulebook-box:hover {
-      cursor: pointer;
-    }
-  `]
+  styles: [
+    `
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: flex-end;
+        align-content: flex-start;
+      }
+      .rulebook-box {
+        margin: 30px;
+        width: 250px;
+      }
+      .rulebook-box:hover {
+        cursor: pointer;
+      }
+    `,
+  ],
 })
 export class RuleBooksComponent implements OnInit {
-
   private COVER_IMAGE_DIR = 'images/cover';
   private PDF_DIR = 'pdf';
 
-
   RuleBooks!: {
-    imgurl$: RN<string>,
-    pdfurl$: RN<string>,
-    title: string
+    imgurl$: RN<string>;
+    pdfurl$: RN<string>;
+    title: string;
   }[];
 
-
-  constructor(
-    private storage: AngularFireStorage
-  ) {}
+  constructor(private storage: AngularFireStorage) {}
 
   ngOnInit() {
     this.RuleBooks = [
@@ -131,17 +132,17 @@ export class RuleBooksComponent implements OnInit {
         title: '14 - ドミニオン「夜想曲」',
       },
     ];
-
   }
 
-
   private toImgUrl = (filename: string) =>
-    fromObservable( '',
-      this.storage.ref(`${this.COVER_IMAGE_DIR}/${filename}`).getDownloadURL() )
+    fromObservable(
+      '',
+      this.storage.ref(`${this.COVER_IMAGE_DIR}/${filename}`).getDownloadURL()
+    );
 
   private toPdfUrl = (filename: string) =>
-    fromObservable( '',
-      this.storage.ref(`${this.PDF_DIR}/${filename}`).getDownloadURL() )
-
-
+    fromObservable(
+      '',
+      this.storage.ref(`${this.PDF_DIR}/${filename}`).getDownloadURL()
+    );
 }

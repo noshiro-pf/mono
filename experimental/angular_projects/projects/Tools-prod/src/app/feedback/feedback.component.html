@@ -6,16 +6,20 @@
     <mat-card-content>
       <div class="margined-element">
         <mat-form-field>
-          <input matInput
-              placeholder="名前（任意）"
-              [value]="name || ''"
-              (input)="nameChange( $event.target.value )">
+          <input
+            matInput
+            placeholder="名前（任意）"
+            [value]="name || ''"
+            (input)="nameChange($event.target.value)"
+          />
         </mat-form-field>
       </div>
       <div class="margined-element">
         投稿の種類：
-        <mat-button-toggle-group #group="matButtonToggleGroup"
-            (change)="categoryChange( $event.value )">
+        <mat-button-toggle-group
+          #group="matButtonToggleGroup"
+          (change)="categoryChange($event.value)"
+        >
           <mat-button-toggle value="bugReport">
             <mat-icon matTooltip="バグ報告">bug_report</mat-icon>
           </mat-button-toggle>
@@ -26,26 +30,36 @@
       </div>
       <div class="margined-element">
         <mat-form-field>
-          <textarea matInput
-              cols="25" rows="4"
-              maxlength="140"
-              [value]="feedbackText"
-              placeholder="機能のリクエスト、バグの報告など"
-              (input)="feedbackTextChange( $event.target.value )"></textarea>
+          <textarea
+            matInput
+            cols="25"
+            rows="4"
+            maxlength="140"
+            [value]="feedbackText"
+            placeholder="機能のリクエスト、バグの報告など"
+            (input)="feedbackTextChange($event.target.value)"
+          ></textarea>
         </mat-form-field>
       </div>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-raised-button color="primary" (click)="submit()" [disabled]="!feedbackText">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="submit()"
+        [disabled]="!feedbackText"
+      >
         Submit
       </button>
     </mat-card-actions>
   </mat-card>
 
-  <hr>
+  <hr />
 
-  <table *ngIf="feedbacks.length > 0"
-      class="data-table  shadow3px vertical-line">
+  <table
+    *ngIf="feedbacks.length > 0"
+    class="data-table shadow3px vertical-line"
+  >
     <thead>
       <tr>
         <th></th>
@@ -57,7 +71,7 @@
     <tbody>
       <tr *ngFor="let fb of feedbacks">
         <td>
-          <span *ngIf="fb.closed then closedIcon; else openIcon"></span>
+          <span *ngIf="fb.closed; then closedIcon; else openIcon"></span>
           <ng-template #closedIcon>
             <mat-icon matTooltip="解決済み">checked</mat-icon>
           </ng-template>
@@ -65,16 +79,20 @@
             <mat-icon matTooltip="未解決">error_outline</mat-icon>
           </ng-template>
         </td>
-        <td>{{fb.name}}</td>
+        <td>{{ fb.name }}</td>
         <td>
           <div [ngSwitch]="fb.category">
-            <mat-icon *ngSwitchCase="'bugReport'" matTooltip="バグ報告">bug_report</mat-icon>
-            <mat-icon *ngSwitchCase="'suggestion'" matTooltip="アイデアなど">lightbulb_outline</mat-icon>
+            <mat-icon *ngSwitchCase="'bugReport'" matTooltip="バグ報告"
+              >bug_report</mat-icon
+            >
+            <mat-icon *ngSwitchCase="'suggestion'" matTooltip="アイデアなど"
+              >lightbulb_outline</mat-icon
+            >
             <span *ngSwitchDefault></span>
           </div>
         </td>
         <td class="data-table--cell-alignLeft">
-          {{fb.content}}
+          {{ fb.content }}
         </td>
       </tr>
     </tbody>

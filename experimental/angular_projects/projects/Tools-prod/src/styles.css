@@ -1,10 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 
 /* @import '~@angular/material/prebuilt-themes/indigo-pink.css'; */
-@import "@angular/material/prebuilt-themes/indigo-pink.css";
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 * {
-  font-family: "Helvetica","Arial",sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   box-sizing: border-box;
 }
 /* code {
@@ -15,9 +15,8 @@ a {
   text-decoration: none;
 }
 
-
 .default-background-color {
-  background-color: #F3EBAA;
+  background-color: #f3ebaa;
 }
 
 body {
@@ -28,7 +27,7 @@ input {
   min-width: 50px;
 }
 
-input[type=number] {
+input[type='number'] {
   text-align: right;
 }
 
@@ -36,8 +35,6 @@ mat-icon {
   display: inline-flex;
   vertical-align: middle;
 }
-
-
 
 .body-with-padding {
   padding: 20px;
@@ -64,16 +61,13 @@ mat-icon {
 }
 
 .box-shadow {
-  box-shadow:
-    0 3px 4px 0 rgba(0,0,0,.14),
-    0 3px 3px -2px rgba(0,0,0,.2),
-    0 1px 8px 0 rgba(0,0,0,.12)
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 3px 3px -2px rgba(0, 0, 0, 0.2),
+    0 1px 8px 0 rgba(0, 0, 0, 0.12);
 }
 
 .spacer {
   flex: 1 1 auto;
 }
-
 
 .center-window {
   background-color: white;
@@ -87,7 +81,6 @@ mat-icon {
 .align-right {
   text-align: right;
 }
-
 
 /*
 .mini-button {

@@ -1,16 +1,12 @@
-<div  class="body-with-padding" >
-
+<div class="body-with-padding">
   <h1 mat-dialog-title>結果</h1>
 
   <div mat-dialog-content>
     <div class="player-result">
-      <p>日付：
-          {{fullYear}}年
-          {{month}}月
-          {{date}}日</p>
-      <p>場所：{{gameResult.place}}</p>
+      <p>日付： {{ fullYear }}年 {{ month }}月 {{ date }}日</p>
+      <p>場所：{{ gameResult.place }}</p>
       <div>
-        <table class='data-table shadow3px vertical-line'>
+        <table class="data-table shadow3px vertical-line">
           <thead>
             <tr>
               <th>Rank</th>
@@ -22,65 +18,70 @@
           </thead>
           <tbody>
             <ng-container *ngFor="let player of gameResult.players">
-            <tr>
-              <td> {{player.rank}} </td>
-              <td> {{player.name}} </td>
-              <td> {{player.VP}} </td>
-              <td> {{player.score}} </td>
-              <td *ngIf="player.turnOrder <= 6"
-                  class='sub-table--narrow-cell'>
-                <span *ngIf="player.name !== gameResult.lastTurnPlayerName">
-                  {{player.turnOrder}}
-                </span>
-                <span *ngIf="player.name === gameResult.lastTurnPlayerName"
-                    matTooltip="[]で囲まれている手番が最終手番です">
-                  [{{player.turnOrder}}]
-                </span>
-              </td>
-            </tr>
+              <tr>
+                <td>{{ player.rank }}</td>
+                <td>{{ player.name }}</td>
+                <td>{{ player.VP }}</td>
+                <td>{{ player.score }}</td>
+                <td
+                  *ngIf="player.turnOrder <= 6"
+                  class="sub-table--narrow-cell"
+                >
+                  <span *ngIf="player.name !== gameResult.lastTurnPlayerName">
+                    {{ player.turnOrder }}
+                  </span>
+                  <span
+                    *ngIf="player.name === gameResult.lastTurnPlayerName"
+                    matTooltip="[]で囲まれている手番が最終手番です"
+                  >
+                    [{{ player.turnOrder }}]
+                  </span>
+                </td>
+              </tr>
             </ng-container>
           </tbody>
         </table>
       </div>
-      <p> Memo : {{gameResult.memo}} </p>
+      <p>Memo : {{ gameResult.memo }}</p>
     </div>
 
     <app-selected-expansions
-      [selectedExpansionNameList]="selectedExpansionNameList" >
+      [selectedExpansionNameList]="selectedExpansionNameList"
+    >
     </app-selected-expansions>
-    <app-selected-cards-list
-      [selectedCards$]="selectedCards$" >
+    <app-selected-cards-list [selectedCards$]="selectedCards$">
     </app-selected-cards-list>
 
-    <div class='action-buttons'>
+    <div class="action-buttons">
       <span class="margined-element">
-        <a mat-raised-button
-            color='accent'
-            mat-dialog-close="edit Clicked"
-            [href]="firebasePath"
-            target="_blank">
+        <a
+          mat-raised-button
+          color="accent"
+          mat-dialog-close="edit Clicked"
+          [href]="firebasePath"
+          target="_blank"
+        >
           Firebaseで編集
         </a>
       </span>
       <span class="margined-element">
-        <button mat-raised-button
-            mat-dialog-close="delete Clicked"
-            color='warn'
-            (click)='deleteGameResult()'>
+        <button
+          mat-raised-button
+          mat-dialog-close="delete Clicked"
+          color="warn"
+          (click)="deleteGameResult()"
+        >
           削除
         </button>
       </span>
     </div>
   </div>
 
-  <div mat-dialog-actions class='action-buttons'>
+  <div mat-dialog-actions class="action-buttons">
     <span class="margined-element">
-      <button mat-raised-button
-          mat-dialog-close="OK Clicked"
-          color='primary'>
+      <button mat-raised-button mat-dialog-close="OK Clicked" color="primary">
         OK
       </button>
     </span>
   </div>
-
 </div>

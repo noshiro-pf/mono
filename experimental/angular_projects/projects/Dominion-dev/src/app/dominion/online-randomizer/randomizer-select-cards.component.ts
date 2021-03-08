@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-
-import { MyRandomizerGroupService } from './my-randomizer-group.service';
-
-import { SelectedCards       } from '../types/selected-cards';
 import { BlackMarketPileCard } from '../types/black-market-pile-card';
-import { BlackMarketPhase    } from './types/black-market-phase.enum';
-
+import { SelectedCards } from '../types/selected-cards';
+import { MyRandomizerGroupService } from './my-randomizer-group.service';
+import { BlackMarketPhase } from './types/black-market-phase.enum';
 
 @Component({
   selector: 'app-randomizer-select-cards',
@@ -14,69 +11,71 @@ import { BlackMarketPhase    } from './types/black-market-phase.enum';
       [implementedOnly]="false"
       [showSelectedCardsCheckbox]="true"
       [useHistory]="true"
-
       [isSelectedExpansions$]="isSelectedExpansions$"
       [selectedCardsHistory$]="selectedCardsHistory$"
       [selectedIndexInHistory$]="selectedIndexInHistory$"
       [selectedCardsCheckbox$]="selectedCardsCheckbox$"
-
-      (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )"
-      (selectedCardsAdded)="selectedCardsAdded( $event )"
-      (BlackMarketPileShuffledChange)="BlackMarketPileShuffledOnChange( $event )"
-      (selectedCardsCheckboxPartEmitter)="selectedCardsCheckboxOnChange( $event )"
+      (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange($event)"
+      (selectedCardsAdded)="selectedCardsAdded($event)"
+      (BlackMarketPileShuffledChange)="BlackMarketPileShuffledOnChange($event)"
+      (selectedCardsCheckboxPartEmitter)="selectedCardsCheckboxOnChange($event)"
       (selectedCardsCheckboxOnReset)="selectedCardsCheckboxOnReset()"
-      (selectedIndexInHistoryChange)="selectedIndexInHistoryOnChange( $event )"
+      (selectedIndexInHistoryChange)="selectedIndexInHistoryOnChange($event)"
     >
     </app-randomizer>
   `,
-  styles: []
+  styles: [],
 })
 export class RandomizerSelectCardsComponent implements OnInit {
-
-  isSelectedExpansions$   = this.myRandomizerGroup.isSelectedExpansions$;
-  selectedCardsCheckbox$  = this.myRandomizerGroup.selectedCardsCheckbox$;
-  selectedCardsHistory$   = this.myRandomizerGroup.selectedCardsHistory$;
+  isSelectedExpansions$ = this.myRandomizerGroup.isSelectedExpansions$;
+  selectedCardsCheckbox$ = this.myRandomizerGroup.selectedCardsCheckbox$;
+  selectedCardsHistory$ = this.myRandomizerGroup.selectedCardsHistory$;
   selectedIndexInHistory$ = this.myRandomizerGroup.selectedIndexInHistory$;
 
+  constructor(private myRandomizerGroup: MyRandomizerGroupService) {}
 
-  constructor(
-    private myRandomizerGroup: MyRandomizerGroupService,
-  ) {
-  }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 
   /* app-randomizer */
-  async isSelectedExpansionsOnChange( value: { index: number, checked: boolean } ) {
-    await this.myRandomizerGroup.setIsSelectedExpansions( value.index, value.checked );
+  async isSelectedExpansionsOnChange(value: {
+    index: number;
+    checked: boolean;
+  }) {
+    await this.myRandomizerGroup.setIsSelectedExpansions(
+      value.index,
+      value.checked
+    );
   }
 
-  async selectedCardsAdded( selectedCards: SelectedCards ) {
-    if ( selectedCards.isEmpty() ) return;
+  async selectedCardsAdded(selectedCards: SelectedCards) {
+    if (selectedCards.isEmpty()) return;
     await Promise.all([
-      this.myRandomizerGroup.addToHistory( selectedCards ),
-      this.myRandomizerGroup.resetVPCalculator()
+      this.myRandomizerGroup.addToHistory(selectedCards),
+      this.myRandomizerGroup.resetVPCalculator(),
     ]);
   }
 
-  async selectedIndexInHistoryOnChange( newValue: number ) {
-    await this.myRandomizerGroup.setSelectedIndexInHistory( newValue );
+  async selectedIndexInHistoryOnChange(newValue: number) {
+    await this.myRandomizerGroup.setSelectedIndexInHistory(newValue);
   }
 
-  async BlackMarketPileShuffledOnChange( value: BlackMarketPileCard[] ) {
+  async BlackMarketPileShuffledOnChange(value: BlackMarketPileCard[]) {
     await Promise.all([
-      this.myRandomizerGroup.setBMPileShuffled( value ),
-      this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init )
+      this.myRandomizerGroup.setBMPileShuffled(value),
+      this.myRandomizerGroup.setBlackMarketPhase(BlackMarketPhase.init),
     ]);
   }
 
-  async selectedCardsCheckboxOnChange(
-    value: { category: string, index: number, checked: boolean }
-  ) {
+  async selectedCardsCheckboxOnChange(value: {
+    category: string;
+    index: number;
+    checked: boolean;
+  }) {
     await this.myRandomizerGroup.setSelectedCardsCheckbox(
-            value.category, value.index, value.checked );
+      value.category,
+      value.index,
+      value.checked
+    );
   }
 
   async selectedCardsCheckboxOnReset() {

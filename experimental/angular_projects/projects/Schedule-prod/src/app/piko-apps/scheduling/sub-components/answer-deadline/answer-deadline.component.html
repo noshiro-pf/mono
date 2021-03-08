@@ -1,15 +1,20 @@
 回答期限：
 <mat-form-field>
-  <input matInput
-      readonly
-      (focus)="answerDeadlinePicker.open()"
-      (click)="answerDeadlinePicker.open()"
-      required
-      [matDatepicker]="answerDeadlinePicker"
-      [value]="answerDeadline || ''"
-      placeholder="Choose a date"
-      (dateInput)="answerDeadlineOnInput( $event.target.value )"
-      (dateChange)="answerDeadlineOnChange( $event.target.value )">
-  <mat-datepicker-toggle matSuffix [for]="answerDeadlinePicker"></mat-datepicker-toggle>
+  <input
+    matInput
+    readonly
+    (focus)="answerDeadlinePicker.open()"
+    (click)="answerDeadlinePicker.open()"
+    required
+    [matDatepicker]="answerDeadlinePicker"
+    [value]="answerDeadline || ''"
+    placeholder="Choose a date"
+    (dateInput)="answerDeadlineOnInput($event.target.value)"
+    (dateChange)="answerDeadlineOnChange($event.target.value)"
+  />
+  <mat-datepicker-toggle
+    matSuffix
+    [for]="answerDeadlinePicker"
+  ></mat-datepicker-toggle>
   <mat-datepicker #answerDeadlinePicker></mat-datepicker>
 </mat-form-field>

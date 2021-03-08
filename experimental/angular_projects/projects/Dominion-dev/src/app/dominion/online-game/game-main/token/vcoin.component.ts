@@ -1,21 +1,25 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-vcoin',
   template: `
     <div [class.button]="isButton" (click)="clicked()">
-      <img src="assets/img/game-object/Coin_token.png"
-          [style.height.px]="diameter" width="auto">
+      <img
+        src="assets/img/game-object/Coin_token.png"
+        [style.height.px]="diameter"
+        width="auto"
+      />
     </div>
   `,
-  styles: [`
-    .button:hover {
-      cursor: pointer;
-    }
-  `]
+  styles: [
+    `
+      .button:hover {
+        cursor: pointer;
+      }
+    `,
+  ],
 })
 export class VcoinComponent implements OnInit {
-
   @Input() diameter: number = 24;
   @Input() isButton: boolean = false;
   @Output() click = new EventEmitter<void>();
@@ -24,6 +28,6 @@ export class VcoinComponent implements OnInit {
   ngOnInit() {}
 
   clicked() {
-    if ( this.isButton ) this.click.emit();
+    if (this.isButton) this.click.emit();
   }
 }

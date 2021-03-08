@@ -1,39 +1,51 @@
-<ng-container  *ngIf="{
-      accuracyScores   : accuracyScores$   | async,
-      maxAccuracyIndex : maxAccuracyIndex$ | async,
-      modelIsReady     : modelIsReady$     | async,
-      calculating      : calculating$      | async
-    } as obs">
-
+<ng-container
+  *ngIf="{
+    accuracyScores: accuracyScores$ | async,
+    maxAccuracyIndex: maxAccuracyIndex$ | async,
+    modelIsReady: modelIsReady$ | async,
+    calculating: calculating$ | async
+  } as obs"
+>
   <div class="container">
     <h1 class="title">MNIST recognition</h1>
     <h2 class="subtitle">Using pre-trained model (CNN)</h2>
     <div class="columns is-centered">
       <div class="column">
         <div class="draw-area">
-          <canvas id="canvas" width="280" height="280"
-            (touchstart)="onTouchStart( $event )"
-            (touchmove)="onTouchMove( $event )"
-            (touchend)="onTouchEnd( $event )"
-            (mousedown)="onMouseDown( $event )"
-            (mousemove)="onMouseMove( $event )"
-            (mouseup)="onMouseUp( $event )" >
+          <canvas
+            id="canvas"
+            width="280"
+            height="280"
+            (touchstart)="onTouchStart($event)"
+            (touchmove)="onTouchMove($event)"
+            (touchend)="onTouchEnd($event)"
+            (mousedown)="onMouseDown($event)"
+            (mousemove)="onMouseMove($event)"
+            (mouseup)="onMouseUp($event)"
+          >
           </canvas>
         </div>
         <div class="buttons">
           <div class="margined-element">
-            <button id="predict-button" class="button is-link is-loading"
-                mat-raised-button color="primary"
-                [disabled]="!obs.modelIsReady || obs.calculating"
-                (click)="prediction()">
+            <button
+              id="predict-button"
+              class="button is-link is-loading"
+              mat-raised-button
+              color="primary"
+              [disabled]="!obs.modelIsReady || obs.calculating"
+              (click)="prediction()"
+            >
               Infer
             </button>
           </div>
           <div class="margined-element">
-            <button class="button"
-                mat-raised-button color="primary"
-                [disabled]="!obs.modelIsReady || obs.calculating"
-                (click)="clearCanvas()">
+            <button
+              class="button"
+              mat-raised-button
+              color="primary"
+              [disabled]="!obs.modelIsReady || obs.calculating"
+              (click)="clearCanvas()"
+            >
               Reset
             </button>
           </div>
@@ -48,11 +60,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let score of obs.accuracyScores; let i = index"
-                [class.is-selected]="i === obs.maxAccuracyIndex">
-              <th>{{i}}</th>
+            <tr
+              *ngFor="let score of obs.accuracyScores; let i = index"
+              [class.is-selected]="i === obs.maxAccuracyIndex"
+            >
+              <th>{{ i }}</th>
               <td class="accuracy">
-                {{score === undefined ? '-' : score}}
+                {{ score === undefined ? '-' : score }}
               </td>
             </tr>
           </tbody>

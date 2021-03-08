@@ -1,45 +1,64 @@
-<ng-container *ngIf="{
-      randBtnLocked:           randomizerButtonLocked$  | async,
-      selectedCardsHistory:    selectedCardsHistory$    | async,
-      selectedIndexInHistory:  selectedIndexInHistory$  | async,
-      isSelectedExpansions:    isSelectedExpansions$    | async,
-      expansionsToggleIsEmpty: expansionsToggleIsEmpty$ | async,
-      undoable:                undoable$                | async,
-      redoable:                redoable$                | async
-    } as data">
-
+<ng-container
+  *ngIf="{
+    randBtnLocked: randomizerButtonLocked$ | async,
+    selectedCardsHistory: selectedCardsHistory$ | async,
+    selectedIndexInHistory: selectedIndexInHistory$ | async,
+    isSelectedExpansions: isSelectedExpansions$ | async,
+    expansionsToggleIsEmpty: expansionsToggleIsEmpty$ | async,
+    undoable: undoable$ | async,
+    redoable: redoable$ | async
+  } as data"
+>
   <div class="body-with-padding two-column">
     <div class="randomizerOptions">
       <app-expansions-toggle
-          [isSelectedExpansions]="data.isSelectedExpansions"
-          (isSelectedExpansionsPartEmitter)="expansionToggleOnChange( $event )" >
+        [isSelectedExpansions]="data.isSelectedExpansions"
+        (isSelectedExpansionsPartEmitter)="expansionToggleOnChange($event)"
+      >
       </app-expansions-toggle>
       <div class="margined-element">
-        <button mat-raised-button color="primary"
-            (click)="randomizerButtonOnClick( data.isSelectedExpansions,
-                                              data.selectedCardsHistory )"
-            [disabled]="data.randBtnLocked || data.expansionsToggleIsEmpty">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="
+            randomizerButtonOnClick(
+              data.isSelectedExpansions,
+              data.selectedCardsHistory
+            )
+          "
+          [disabled]="data.randBtnLocked || data.expansionsToggleIsEmpty"
+        >
           Randomizer
         </button>
       </div>
       <div class="margined-element">
-        <button mat-raised-button
-            [disabled]="data.randBtnLocked"
-            (click)="resetOnClick()">
+        <button
+          mat-raised-button
+          [disabled]="data.randBtnLocked"
+          (click)="resetOnClick()"
+        >
           Reset
         </button>
       </div>
       <div class="margined-element" *ngIf="useHistory">
-        <button mat-raised-button class="mini-button"
-            (click)="undoOnClick( data.selectedIndexInHistory,
-                                  data.selectedCardsHistory )"
-            [disabled]="data.randBtnLocked || !data.undoable">
+        <button
+          mat-raised-button
+          class="mini-button"
+          (click)="
+            undoOnClick(data.selectedIndexInHistory, data.selectedCardsHistory)
+          "
+          [disabled]="data.randBtnLocked || !data.undoable"
+        >
           <mat-icon>undo</mat-icon>
         </button>
-        <button mat-raised-button class="mini-button"
-            (click)="redoOnClick( data.selectedIndexInHistory,
-                                  data.selectedCardsHistory )"
-            [disabled]="data.randBtnLocked || !data.redoable">
+        <button
+          mat-raised-button
+          class="mini-button"
+          (click)="
+            redoOnClick(data.selectedIndexInHistory, data.selectedCardsHistory)
+          "
+          [disabled]="data.randBtnLocked || !data.redoable"
+        >
           <mat-icon>redo</mat-icon>
         </button>
       </div>
@@ -50,9 +69,11 @@
         [showSelectedCardsCheckbox]="showSelectedCardsCheckbox"
         [selectedCards$]="selectedCardsLocal$"
         [selectedCardsCheckbox$]="selectedCardsCheckbox$"
-        (selectedCardsCheckboxPartEmitter)="selectedCardsCheckboxOnChange( $event )">
+        (selectedCardsCheckboxPartEmitter)="
+          selectedCardsCheckboxOnChange($event)
+        "
+      >
       </app-selected-cards-list>
     </div>
   </div>
-
 </ng-container>

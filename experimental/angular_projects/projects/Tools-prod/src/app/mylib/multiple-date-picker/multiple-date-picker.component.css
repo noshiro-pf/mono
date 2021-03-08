@@ -1,16 +1,19 @@
 .text-center {
-  text-align:center;
+  text-align: center;
 }
 
 .multiple-date-picker {
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-  user-select:none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-.multiple-date-picker,.picker-days-row,.picker-days-week-row,.picker-top-row {
-  width:100%;
+.multiple-date-picker,
+.picker-days-row,
+.picker-days-week-row,
+.picker-top-row {
+  width: 100%;
 }
 
 .picker-top-row {
@@ -18,57 +21,63 @@
   justify-content: space-between;
 }
 
-.picker-days-row>td,.picker-days-week-row>th {
+.picker-days-row > td,
+.picker-days-week-row > th {
   width: calc(100% / 7);
   min-width: calc(100% / 7);
 }
-.picker-days-week-row>th {
+.picker-days-week-row > th {
   cursor: pointer;
 }
 
-.picker-day,.picker-top-row {
-  padding:10px 0;
+.picker-day,
+.picker-top-row {
+  padding: 10px 0;
 }
 
 .picker-day {
-  background-color:#fff;
-  border:1px solid #eee;
-  color:#000;
+  background-color: #fff;
+  border: 1px solid #eee;
+  color: #000;
 }
 
-.picker-day.today,.picker-day.today.picker-off,.picker-day.today.picker-off:hover,.picker-day.today.picker-selected,.picker-day.today:hover {
-  color:#00a3ff;
+.picker-day.today,
+.picker-day.today.picker-off,
+.picker-day.today.picker-off:hover,
+.picker-day.today.picker-selected,
+.picker-day.today:hover {
+  color: #00a3ff;
 }
-
 
 .picker-day:not(.picker-off):not(.picker-empty):hover {
   /* background-color:#C6000B;
   color:#fff; */
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .picker-day.picker-selected {
-  background-color:#C6000B;
-  color:#fff;
+  background-color: #c6000b;
+  color: #fff;
 }
 
-.picker-day.picker-off,.picker-day.picker-off:hover {
-  background-color:#eee;
-  color:#bbb;
-  cursor:default;
+.picker-day.picker-off,
+.picker-day.picker-off:hover {
+  background-color: #eee;
+  color: #bbb;
+  cursor: default;
 }
 
 .picker-day.picker-selected.picker-off {
   background-color: #d08085;
-  color:#bbb;
-  cursor:default;
+  color: #bbb;
+  cursor: default;
 }
 
-.picker-day.picker-empty,.picker-day.picker-empty:hover {
-  background-color:#fafafa;
-  cursor:default;
+.picker-day.picker-empty,
+.picker-day.picker-empty:hover {
+  background-color: #fafafa;
+  cursor: default;
 }
-
 
 .current-year-month {
   padding: 10px;
@@ -77,8 +86,8 @@
 }
 
 .mini-button {
-  padding : 0;
-  min-width : 0;
+  padding: 0;
+  min-width: 0;
   width: 35px;
-  color: rgba(0,0,0,.54);
+  color: rgba(0, 0, 0, 0.54);
 }

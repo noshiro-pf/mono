@@ -3,6 +3,8 @@ export const slice = <T>(
   itemsPerPage: number,
   pageNumber: number
 ): T[] => {
-  return table.slice( itemsPerPage * (pageNumber - 1),
-               itemsPerPage * pageNumber );
+  return table.slice(
+    itemsPerPage * (pageNumber - 1),
+    itemsPerPage * pageNumber
+  );
 };

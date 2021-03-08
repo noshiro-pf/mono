@@ -1,22 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore    } from 'angularfire2/firestore';
 import { AngularFireDatabase } from 'angularfire2/database';
-
+import { AngularFirestore } from 'angularfire2/firestore';
 
 @Component({
   selector: 'app-edit-database',
   template: ` <p>app-edit-database</p> `,
-  styles: []
+  styles: [],
 })
 export class EditDatabaseComponent implements OnInit {
+  constructor(afs: AngularFirestore, afdb: AngularFireDatabase) {}
 
-  constructor(
-    afs: AngularFirestore,
-    afdb: AngularFireDatabase,
-  ) {
-  }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

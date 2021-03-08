@@ -1,17 +1,13 @@
-<div class="body-with-padding" >
-
+<div class="body-with-padding">
   <h1 mat-dialog-title>結果</h1>
 
   <div mat-dialog-content class="content">
-    <p> 以下の内容で登録します。 </p>
+    <p>以下の内容で登録します。</p>
 
-    <p>日付：
-        {{fullYear}}年
-        {{month}}月
-        {{date}}日</p>
-    <p>場所：{{newGameResult.place}}</p>
+    <p>日付： {{ fullYear }}年 {{ month }}月 {{ date }}日</p>
+    <p>場所：{{ newGameResult.place }}</p>
     <div>
-      <table class='data-table shadow3px vertical-line'>
+      <table class="data-table shadow3px vertical-line">
         <thead>
           <tr>
             <th>Rank</th>
@@ -23,37 +19,43 @@
         </thead>
         <tbody>
           <ng-container *ngFor="let player of newGameResult.players">
-          <tr>
-            <td> {{player.rank}} </td>
-            <td> {{player.name}} </td>
-            <td> {{player.VP}} </td>
-            <td> {{player.score}} </td>
-            <td>
-              <span *ngIf="player.name === newGameResult.lastTurnPlayerName; then braced; else normal"></span>
-              <ng-template #braced>[{{player.turnOrder}}]</ng-template>
-              <ng-template #normal>{{player.turnOrder}}</ng-template>
-            </td>
-          </tr>
+            <tr>
+              <td>{{ player.rank }}</td>
+              <td>{{ player.name }}</td>
+              <td>{{ player.VP }}</td>
+              <td>{{ player.score }}</td>
+              <td>
+                <span
+                  *ngIf="
+                    player.name === newGameResult.lastTurnPlayerName;
+                    then braced;
+                    else normal
+                  "
+                ></span>
+                <ng-template #braced>[{{ player.turnOrder }}]</ng-template>
+                <ng-template #normal>{{ player.turnOrder }}</ng-template>
+              </td>
+            </tr>
           </ng-container>
         </tbody>
       </table>
     </div>
-    <p> Memo : {{newGameResult.memo}} </p>
+    <p>Memo : {{ newGameResult.memo }}</p>
   </div>
 
-
-  <div mat-dialog-actions class='action-buttons'>
+  <div mat-dialog-actions class="action-buttons">
     <span class="margined-element">
-      <button mat-raised-button
-          mat-dialog-close="OK Clicked"
-          color='primary'
-          (click)="submitGameResult()">
+      <button
+        mat-raised-button
+        mat-dialog-close="OK Clicked"
+        color="primary"
+        (click)="submitGameResult()"
+      >
         OK
       </button>
     </span>
     <span class="margined-element">
-      <button mat-raised-button
-          mat-dialog-close="Cancel Clicked">
+      <button mat-raised-button mat-dialog-close="Cancel Clicked">
         Cancel
       </button>
     </span>

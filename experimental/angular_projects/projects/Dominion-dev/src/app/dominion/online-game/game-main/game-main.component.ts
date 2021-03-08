@@ -1,35 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MatDialog,
-  MatSnackBar,
-  MatSidenav,
-  MatDrawer,
-  MatSidenavContainer,
-  MatSidenavContent,
-  MatDrawerToggleResult } from '@angular/material';
-
-import { Observable, BehaviorSubject, combineLatest, Subscription } from 'rxjs';
-
-
-import { MessageDialogComponent } from '../../../mylib/message-dialog.component';
-import { OnlineGameResultDialogComponent } from './dialogs/online-game-result-dialog/online-game-result-dialog.component';
-
-import { UserService } from '../../../database/user.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog, MatSidenav, MatSnackBar } from '@angular/material';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { distinctUntilChanged, map, skip, takeWhile } from 'rxjs/operators';
 import { FireDatabaseService } from '../../../database/database.service';
-import { MyGameRoomService } from './services/my-game-room.service';
-
-import { GameRoomCommunicationService } from './services/game-room-communication.service';
-import { GameMessageService           } from './services/game-message.service';
-import { SubmitGameResultService      } from './services/submit-game-result.service';
-import { GameStateService             } from './services/game-state-services/game-state.service';
-import { TransitStateService          } from './services/game-state-services/transit-state.service';
-
-import { ValuesForViewService } from './services/values-for-view.service';
+import { UserService } from '../../../database/user.service';
 import { DCard } from '../types/dcard';
-import { withLatestFrom, takeWhile, skip, first, distinctUntilChanged, map } from 'rxjs/operators';
-import { GameState } from '../types/game-state';
-
-
-
+import { OnlineGameResultDialogComponent } from './dialogs/online-game-result-dialog/online-game-result-dialog.component';
+import { GameMessageService } from './services/game-message.service';
+import { GameRoomCommunicationService } from './services/game-room-communication.service';
+import { GameStateService } from './services/game-state-services/game-state.service';
+import { TransitStateService } from './services/game-state-services/transit-state.service';
+import { MyGameRoomService } from './services/my-game-room.service';
+import { SubmitGameResultService } from './services/submit-game-result.service';
+import { ValuesForViewService } from './services/values-for-view.service';
 
 @Component({
   providers: [
@@ -48,42 +31,43 @@ import { GameState } from '../types/game-state';
 export class GameMainComponent implements OnInit, OnDestroy {
   private alive = true;
 
-  gameMessageList$         = this.gameMessage.gameMessageList$;
-  gameMessageListSliced$   = this.gameMessage.gameMessageListSliced$;
+  gameMessageList$ = this.gameMessage.gameMessageList$;
+  gameMessageListSliced$ = this.gameMessage.gameMessageListSliced$;
   gameMessageIndexDelayed$ = this.gameMessage.gameMessageIndexDelayed$;
   // myIndex$                 = this.myGameRoomService.myIndex$;
-  isMyTurn$                = this.gameStateService.isMyTurn$;
-  gameIsOver$              = this.gameStateService.gameIsOver$;
+  isMyTurn$ = this.gameStateService.isMyTurn$;
+  gameIsOver$ = this.gameStateService.gameIsOver$;
   // gameResult$              = this.submitGameResultService.gameResult$;
 
-  private initialStateIsReadySource = new BehaviorSubject<boolean>( false );
-  initialStateIsReady$
-    = this.initialStateIsReadySource.asObservable().pipe( distinctUntilChanged() );
+  private initialStateIsReadySource = new BehaviorSubject<boolean>(false);
+  initialStateIsReady$ = this.initialStateIsReadySource
+    .asObservable()
+    .pipe(distinctUntilChanged());
 
   private userInputSubscription!: Subscription;
 
   // view config
   chatOpened$ = this.user.onlineGame.chatOpened$;
-  autoSort$   = this.user.onlineGame.autoSort$;
+  autoSort$ = this.user.onlineGame.autoSort$;
   private showCardPropertySource = new BehaviorSubject<boolean>(false);
   showCardProperty$ = this.showCardPropertySource.asObservable();
   gainCardState$: Observable<boolean> = this.valuesForView.gainCardState$;
 
-
   // left sidebar
   private autoScrollSource = new BehaviorSubject<boolean>(true);
   autoScroll$ = this.autoScrollSource.asObservable();
-  isBuyPlayPhase$ = this.gameStateService.phase$.pipe( map( e => e === 'BuyPlay' ) );
+  isBuyPlayPhase$ = this.gameStateService.phase$.pipe(
+    map((e) => e === 'BuyPlay')
+  );
   // myThinkingState$
   //   = combineLatest(
   //         this.gameRoomCommunication.thinkingState$,
   //         this.myIndex$,
   //         (list, myIndex) => list[ myIndex ] );
 
-  private logSnapshotSource = new BehaviorSubject<void>(undefined);  // debug
+  private logSnapshotSource = new BehaviorSubject<void>(undefined); // debug
 
   loading$ = this.transitStateService.loadingInitialUserInputList$;
-
 
   constructor(
     private dialog: MatDialog,
@@ -96,7 +80,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
     private gameMessage: GameMessageService,
     private transitStateService: TransitStateService,
     private submitGameResultService: SubmitGameResultService,
-    private valuesForView: ValuesForViewService,
+    private valuesForView: ValuesForViewService
   ) {
     this.startProcessing();
 
@@ -113,10 +97,12 @@ export class GameMainComponent implements OnInit, OnDestroy {
     //   }
     // });
 
-    this.gameRoomCommunication.resetGameClicked$.pipe(
-      skip(1),
-      takeWhile( () => this.alive ) )
-    .subscribe( _ => this.startProcessing() );  // reset game
+    this.gameRoomCommunication.resetGameClicked$
+      .pipe(
+        skip(1),
+        takeWhile(() => this.alive)
+      )
+      .subscribe((_) => this.startProcessing()); // reset game
 
     // TODO: RxJS -> RN
     // combineLatest(
@@ -162,83 +148,81 @@ export class GameMainComponent implements OnInit, OnDestroy {
     //       ) );
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngOnDestroy() {
     this.alive = false;
   }
 
-
-
   private async startProcessing() {
-    if ( this.userInputSubscription !== undefined ) {
+    if (this.userInputSubscription !== undefined) {
       this.userInputSubscription.unsubscribe();
     }
 
     // 命令列の取得・適用を開始
-    this.userInputSubscription
-      = this.transitStateService.gameData$.pipe(
-          takeWhile( () => this.alive ) )
-        .subscribe( ([[userInput, currState], myIndex, playersNameList]) =>
-          this.transitStateService.transitState(
-              userInput,
-              currState,
-              myIndex,
-              playersNameList ) );
+    this.userInputSubscription = this.transitStateService.gameData$
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(([[userInput, currState], myIndex, playersNameList]) =>
+        this.transitStateService.transitState(
+          userInput,
+          currState,
+          myIndex,
+          playersNameList
+        )
+      );
 
     // const initialState = await this.myGameRoomService.initialState$.pipe( first() ).toPromise();
     // this.gameStateService.setGameState( initialState );
     // this.transitStateService.setNextGameState( initialState );
 
-    this.initialStateIsReadySource.next( true );
+    this.initialStateIsReadySource.next(true);
   }
 
-
- // left sidebar
-  async toggleSideNav( sidenav: MatSidenav ) {
-    this.user.setOnlineGameChatOpened( (await sidenav.toggle()) === 'open' );
+  // left sidebar
+  async toggleSideNav(sidenav: MatSidenav) {
+    this.user.setOnlineGameChatOpened((await sidenav.toggle()) === 'open');
   }
 
-  autoScrollChange( value: boolean ) {
-    this.autoScrollSource.next( value );
+  autoScrollChange(value: boolean) {
+    this.autoScrollSource.next(value);
   }
 
   toggleShowCardPropertyButtons() {
-    this.showCardPropertySource.next( !this.showCardPropertySource.getValue() );
+    this.showCardPropertySource.next(!this.showCardPropertySource.getValue());
   }
 
-  logSnapshot() {  // developer mode only
+  logSnapshot() {
+    // developer mode only
     this.logSnapshotSource.next(undefined);
   }
 
-  initialStateIsReadyChange( value: boolean ) {
-    this.initialStateIsReadySource.next( value );
+  initialStateIsReadyChange(value: boolean) {
+    this.initialStateIsReadySource.next(value);
   }
-
-
 
   // ゲーム操作
-  onCardClick(
-    myIndex: number,
-    dcard: DCard,
-    autoSort: boolean,
-  ) {
+  onCardClick(myIndex: number, dcard: DCard, autoSort: boolean) {
     this.gameRoomCommunication.sendUserInput(
-        'clicked card', myIndex, autoSort, dcard.id );
+      'clicked card',
+      myIndex,
+      autoSort,
+      dcard.id
+    );
   }
 
-  onVcoinClick( myIndex: number, autoSort: boolean ) {
+  onVcoinClick(myIndex: number, autoSort: boolean) {
     this.gameRoomCommunication.sendUserInput(
-        'clicked vcoin', myIndex, autoSort );
+      'clicked vcoin',
+      myIndex,
+      autoSort
+    );
   }
 
-  onDebtClick( myIndex: number, autoSort: boolean ) {
-    this.gameRoomCommunication.sendUserInput(
-        'clicked debt', myIndex, autoSort );
+  onDebtClick(myIndex: number, autoSort: boolean) {
+    this.gameRoomCommunication.sendUserInput('clicked debt', myIndex, autoSort);
   }
 
-  private async showChangeTurnMessage( name: string ) {
+  private async showChangeTurnMessage(name: string) {
     // const dialogRef = this.dialog.open( MessageDialogComponent );
     // dialogRef.componentInstance.message = `${name}のターン`;
     // await this.utils.sleep(1);
@@ -247,15 +231,14 @@ export class GameMainComponent implements OnInit, OnDestroy {
   }
 
   showGameResultDialog() {
-    const dialogRef = this.dialog.open( OnlineGameResultDialogComponent );
+    const dialogRef = this.dialog.open(OnlineGameResultDialogComponent);
     // dialogRef.componentInstance.gameResult$ = this.gameResult$;
 
     // TODO: RxJS -> RN
     // dialogRef.componentInstance.cardPropertyList$ = this.database.cardPropertyList$;
   }
 
-  private openSnackBar( message: string ) {
-    this.snackBar.open( message, undefined, { duration: 3000 } );
+  private openSnackBar(message: string) {
+    this.snackBar.open(message, undefined, { duration: 3000 });
   }
-
 }

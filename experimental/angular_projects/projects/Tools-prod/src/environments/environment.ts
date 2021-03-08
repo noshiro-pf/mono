@@ -11,6 +11,6 @@ export const environment = {
     databaseURL: 'https://pikoappsdevlopment.firebaseio.com',
     projectId: 'pikoappsdevlopment',
     storageBucket: 'pikoappsdevlopment.appspot.com',
-    messagingSenderId: '352451149439'
-  }
+    messagingSenderId: '352451149439',
+  },
 };

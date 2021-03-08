@@ -1,32 +1,36 @@
 <ng-container *ngIf="{ playersNameList: playersNameList$ | async } as data">
+  <ng-container
+    *ngIf="!data.playersNameList; then loading; else main"
+  ></ng-container>
+  <ng-template #loading>Loading...</ng-template>
+  <ng-template #main>
+    <div class="body-with-padding">
+      <h1 mat-dialog-title>プレイヤーの山札一覧</h1>
 
-<ng-container *ngIf="!data.playersNameList; then loading; else main"></ng-container>
-<ng-template #loading>Loading...</ng-template>
-<ng-template #main>
-  <div class="body-with-padding" >
+      <div mat-dialog-content class="content">
+        <ng-container
+          *ngFor="let name of data.playersNameList; let idx = index"
+        >
+          <app-each-player-cards
+            [name]="name"
+            [playerIndex]="idx"
+            [allPlayersCards$]="allPlayersCards$"
+          >
+          </app-each-player-cards>
+        </ng-container>
+      </div>
 
-    <h1 mat-dialog-title>プレイヤーの山札一覧</h1>
-
-    <div mat-dialog-content class="content">
-      <ng-container *ngFor="let name of data.playersNameList; let idx = index">
-        <app-each-player-cards
-          [name]="name"
-          [playerIndex]="idx"
-          [allPlayersCards$]="allPlayersCards$">
-        </app-each-player-cards>
-      </ng-container>
+      <div mat-dialog-actions class="action-buttons">
+        <span class="margined-element">
+          <button
+            mat-raised-button
+            mat-dialog-close="OK Clicked"
+            color="primary"
+          >
+            OK
+          </button>
+        </span>
+      </div>
     </div>
-
-
-    <div mat-dialog-actions class='action-buttons'>
-      <span class="margined-element">
-        <button mat-raised-button
-            mat-dialog-close="OK Clicked" color='primary'>
-          OK
-        </button>
-      </span>
-    </div>
-  </div>
-</ng-template>
-
+  </ng-template>
 </ng-container>

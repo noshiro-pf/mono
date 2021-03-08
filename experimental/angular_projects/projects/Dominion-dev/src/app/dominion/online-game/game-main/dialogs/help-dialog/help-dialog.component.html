@@ -4,7 +4,6 @@
 
 <div mat-dialog-content>
   <div class="my-list">
-
     <h3>手番プレイヤーの情報</h3>
 
     <div class="my-list-item">
@@ -20,12 +19,16 @@
 
       <div class="my-list-item">
         <div class="my-list-icon item phase">〈A〉</div>
-        <span class="content">アクションフェーズ（アクションカードの効果の途中）</span>
+        <span class="content"
+          >アクションフェーズ（アクションカードの効果の途中）</span
+        >
       </div>
 
       <div class="my-list-item">
         <div class="my-list-icon item phase">B</div>
-        <span class="content">購入フェーズ（財宝カードのプレイ・カードの購入）</span>
+        <span class="content"
+          >購入フェーズ（財宝カードのプレイ・カードの購入）</span
+        >
       </div>
 
       <div class="my-list-item">
@@ -52,7 +55,6 @@
         <div class="my-list-icon item phase">C</div>
         <span class="content">クリーンアップフェーズ</span>
       </div>
-
     </div>
 
     <div class="my-list-item">
@@ -70,7 +72,6 @@
       <p class="content">手番プレイヤーのコインを表しています。</p>
     </div>
 
-
     <div class="my-divider"></div>
 
     <h3>サイドバーのボタン</h3>
@@ -84,26 +85,29 @@
       <div class="my-list-icon"><mat-icon>stop</mat-icon></div>
       <p class="content">
         【チャットを開いているときのみ表示】
-        チャットを自動でスクロールしないようにします。</p>
+        チャットを自動でスクロールしないようにします。
+      </p>
     </div>
 
     <div class="my-list-item">
       <div class="my-list-icon"><mat-icon>arrow_downwards</mat-icon></div>
       <p class="content">
         【チャットを開いているときのみ表示】
-        チャットのスクロールを自動で行います。</p>
+        チャットのスクロールを自動で行います。
+      </p>
     </div>
 
     <div class="my-list-item">
       <div class="my-list-icon"><mat-icon>description</mat-icon></div>
-      <p class="content">カードの下の情報を見るボタンの表示／非表示を切り替えます。</p>
+      <p class="content">
+        カードの下の情報を見るボタンの表示／非表示を切り替えます。
+      </p>
     </div>
 
     <div class="my-list-item">
       <div class="my-list-icon"><mat-icon>tune</mat-icon></div>
       <p class="content">設定画面を開きます。</p>
     </div>
-
 
     <div class="my-divider"></div>
 
@@ -116,8 +120,8 @@
 
     <div class="my-list-item">
       <div class="my-list-icon"><mat-icon>hourglass_full</mat-icon></div>
-      <p class="content">考え中のときに押してください。
-        プレイヤーのエリアに
+      <p class="content">
+        考え中のときに押してください。 プレイヤーのエリアに
         <mat-icon>hourglass_full</mat-icon>が表示されます。
         （もう一度押すか、ゲーム内で何か操作をすると消えます）
       </p>
@@ -125,8 +129,8 @@
 
     <div class="my-list-item">
       <div class="my-list-icon"><mat-icon>sort</mat-icon></div>
-      <p class="content">手札をソートします。
-        （自動でソートさせたい場合は、
+      <p class="content">
+        手札をソートします。 （自動でソートさせたい場合は、
         設定画面で「手札を自動でソート」にチェックを入れてください）
       </p>
     </div>
@@ -141,16 +145,19 @@
 
     <div class="my-list-item">
       <div class="my-list-icon">
-        <mat-icon style="transform: rotate( -90deg )">file_download</mat-icon>
+        <mat-icon style="transform: rotate(-90deg)">file_download</mat-icon>
       </div>
-      <p class="content">【自分の手番のみ表示】次のフェーズに移ります。（確認あり）</p>
+      <p class="content">
+        【自分の手番のみ表示】次のフェーズに移ります。（確認あり）
+      </p>
     </div>
 
     <div class="my-list-item">
       <div class="my-list-icon"><mat-icon>forward</mat-icon></div>
-      <p class="content">【自分の手番のみ表示】ターンを終了します。（確認あり）</p>
+      <p class="content">
+        【自分の手番のみ表示】ターンを終了します。（確認あり）
+      </p>
     </div>
-
 
     <div class="my-divider"></div>
 
@@ -171,7 +178,6 @@
       <p class="content">ゲームを終了し部屋リスト画面に戻ります。</p>
     </div>
 
-
     <div class="my-divider"></div>
 
     <h3>その他の要素の説明</h3>
@@ -185,17 +191,9 @@
       <div class="my-list-icon"><div class="dcard-array-size">10</div></div>
       <p class="content">山の枚数を表します。</p>
     </div>
-
-
-
   </div>
-
 </div>
 
-
-
 <div mat-dialog-actions class="center">
-  <button mat-raised-button mat-dialog-close="yes" color='primary'>
-    OK
-  </button>
+  <button mat-raised-button mat-dialog-close="yes" color="primary">OK</button>
 </div>

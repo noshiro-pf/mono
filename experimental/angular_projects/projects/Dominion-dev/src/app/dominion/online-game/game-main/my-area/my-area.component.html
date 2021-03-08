@@ -1,69 +1,93 @@
-<ng-container *ngIf="{
-      isMyTurn:        isMyTurn$        | async,
-      isBuyPlayPhase:  isBuyPlayPhase$  | async,
-      gameMessageList: gameMessageList$ | async,
-      myIndex:         myIndex$         | async,
-      myThinkingState: myThinkingState$ | async,
-      autoSort:        autoSort$        | async,
-      gameIsOver:      gameIsOver$      | async
-    } as data">
-
-<div class="body" [class.is-my-turn]="data.isMyTurn">
-
-  <div class="bar">
-    <button mat-icon-button id="show-message-history-button"
-        (click)="showMessageHistory( data.gameMessageList )">
-      <mat-icon>history</mat-icon>
-    </button>
-    <app-message-for-me-area
+<ng-container
+  *ngIf="{
+    isMyTurn: isMyTurn$ | async,
+    isBuyPlayPhase: isBuyPlayPhase$ | async,
+    gameMessageList: gameMessageList$ | async,
+    myIndex: myIndex$ | async,
+    myThinkingState: myThinkingState$ | async,
+    autoSort: autoSort$ | async,
+    gameIsOver: gameIsOver$ | async
+  } as data"
+>
+  <div class="body" [class.is-my-turn]="data.isMyTurn">
+    <div class="bar">
+      <button
+        mat-icon-button
+        id="show-message-history-button"
+        (click)="showMessageHistory(data.gameMessageList)"
+      >
+        <mat-icon>history</mat-icon>
+      </button>
+      <app-message-for-me-area
         class="gameMessage-area"
         [gameMessageIndexDelayed$]="gameMessageIndexDelayed$"
-        [gameMessageList$]="gameMessageList$">
-    </app-message-for-me-area>
+        [gameMessageList$]="gameMessageList$"
+      >
+      </app-message-for-me-area>
 
-    <div class="buttons-area" *ngIf="!data.gameIsOver">
-      <button mat-icon-button class="sidebar-button"
-          matTooltipPosition="above" matTooltip="考慮中"
-          (click)="toggleMyThinkingState( data.myThinkingState, data.myIndex )" >
-        <mat-icon>hourglass_full</mat-icon>
-      </button>
+      <div class="buttons-area" *ngIf="!data.gameIsOver">
+        <button
+          mat-icon-button
+          class="sidebar-button"
+          matTooltipPosition="above"
+          matTooltip="考慮中"
+          (click)="toggleMyThinkingState(data.myThinkingState, data.myIndex)"
+        >
+          <mat-icon>hourglass_full</mat-icon>
+        </button>
 
-      <button mat-icon-button class="sidebar-button"
-          matTooltipPosition="above" matTooltip="手札をソート"
-          (click)="sortMyHandCards( data.myIndex )">
-        <mat-icon>sort</mat-icon>
-      </button>
+        <button
+          mat-icon-button
+          class="sidebar-button"
+          matTooltipPosition="above"
+          matTooltip="手札をソート"
+          (click)="sortMyHandCards(data.myIndex)"
+        >
+          <mat-icon>sort</mat-icon>
+        </button>
 
-      <ng-container *ngIf="data.isMyTurn">
-        <button *ngIf="data.isBuyPlayPhase"
-            mat-icon-button class="sidebar-button"
-            matTooltipPosition="above" matTooltip="基本財宝カードをすべてプレイ"
-            (click)="playAllTreasures( data.myIndex, data.autoSort )" >
-          <mat-icon>present_to_all</mat-icon>
-        </button>
-        <button mat-icon-button class="sidebar-button"
-            matTooltipPosition="above" matTooltip="次のフェーズへ"
-            (click)="goToNextPhase( data.myIndex, data.autoSort )" >
-          <mat-icon style="transform: rotate( -90deg )">file_download</mat-icon>
-        </button>
-        <button mat-icon-button class="sidebar-button"
-            matTooltipPosition="above" matTooltip="手番を終了する"
-            (click)="finishMyTurn( data.myIndex, data.autoSort )" >
-          <mat-icon>forward</mat-icon>
-        </button>
-      </ng-container>
+        <ng-container *ngIf="data.isMyTurn">
+          <button
+            *ngIf="data.isBuyPlayPhase"
+            mat-icon-button
+            class="sidebar-button"
+            matTooltipPosition="above"
+            matTooltip="基本財宝カードをすべてプレイ"
+            (click)="playAllTreasures(data.myIndex, data.autoSort)"
+          >
+            <mat-icon>present_to_all</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            class="sidebar-button"
+            matTooltipPosition="above"
+            matTooltip="次のフェーズへ"
+            (click)="goToNextPhase(data.myIndex, data.autoSort)"
+          >
+            <mat-icon style="transform: rotate(-90deg)">file_download</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            class="sidebar-button"
+            matTooltipPosition="above"
+            matTooltip="手番を終了する"
+            (click)="finishMyTurn(data.myIndex, data.autoSort)"
+          >
+            <mat-icon>forward</mat-icon>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="my-card-area">
+      <app-my-card-area
+        [showCardProperty$]="showCardProperty$"
+        [buttonizeVCoins]="data.isBuyPlayPhase && data.isMyTurn"
+        (cardClicked)="onCardClick($event)"
+        (vcoinClicked)="vcoinClick()"
+        (debtClicked)="debtClick()"
+      >
+      </app-my-card-area>
     </div>
   </div>
-
-  <div class="my-card-area">
-    <app-my-card-area
-      [showCardProperty$]="showCardProperty$"
-      [buttonizeVCoins]="data.isBuyPlayPhase && data.isMyTurn"
-      (cardClicked)="onCardClick( $event )"
-      (vcoinClicked)="vcoinClick()"
-      (debtClicked)="debtClick()" >
-    </app-my-card-area>
-  </div>
-
-</div>
 </ng-container>

@@ -31,8 +31,6 @@
   min-width: 48px;
 }
 
-
-
 /* https://saruwakakun.com/html-css/reference/speech-bubble */
 
 /*以下、①背景色など*/
@@ -86,7 +84,7 @@
 }
 
 .says:after {
-  content: "";
+  content: '';
   display: inline-block;
   position: absolute;
   top: 3px;
@@ -104,7 +102,6 @@
   word-wrap: break-word;
 }
 
-
 /*以下、右側の緑コメント*/
 .mycomment {
   margin: 10px 0;
@@ -116,7 +113,7 @@
   padding: 8px;
   max-width: 250px;
   border-radius: 12px;
-  background: #C2FF65;  /* #30e852; */
+  background: #c2ff65; /* #30e852; */
   font-size: 15px;
   min-height: 35px;
   text-align: left;
@@ -124,12 +121,12 @@
 }
 
 .mycomment p:after {
-  content: "";
+  content: '';
   position: absolute;
   top: 3px;
   right: -19px;
   border: 8px solid transparent;
-  border-left: 18px solid #C2FF65;  /* #30e852; */
+  border-left: 18px solid #c2ff65; /* #30e852; */
   -ms-transform: rotate(-35deg);
   -webkit-transform: rotate(-35deg);
   transform: rotate(-35deg);

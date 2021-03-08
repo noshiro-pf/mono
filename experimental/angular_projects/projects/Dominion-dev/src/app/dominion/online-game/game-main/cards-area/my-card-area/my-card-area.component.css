@@ -1,9 +1,6 @@
-
 .body {
   padding: 5px;
 }
-
-
 
 .my-tokens {
   width: 100%;
@@ -28,14 +25,16 @@
   background-color: #f3ebaa;
 }
 
-.vcoins,.debts {
+.vcoins,
+.debts {
   display: inline-flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   padding: 3px;
 }
-.vcoin,.debt {
+.vcoin,
+.debt {
   padding: 2px;
 }
 
@@ -54,7 +53,6 @@
 .my-tokens .VP-tokens .VPtoken-value {
   padding-left: 3px;
 }
-
 
 .card-area {
   padding: 5px;

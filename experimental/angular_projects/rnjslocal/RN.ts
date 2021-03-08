@@ -1,10 +1,9 @@
+export { combine } from './internal/combinationRNs/combine';
+export { merge } from './internal/combinationRNs/merge';
 export { RN } from './internal/RN';
-
-export { combine        } from './internal/combinationRNs/combine';
-export { merge          } from './internal/combinationRNs/merge';
-export { fromEvent      } from './internal/sourceRNs/fromEvent';
-export { fromPromise    } from './internal/sourceRNs/fromPromise';
+export { constant, of } from './internal/sourceRNs/constant';
+export { fromEvent } from './internal/sourceRNs/fromEvent';
 export { fromObservable } from './internal/sourceRNs/fromObservable';
-export { interval       } from './internal/sourceRNs/interval';
-export { manual         } from './internal/sourceRNs/manual';
-export { constant, of   } from './internal/sourceRNs/constant';
+export { fromPromise } from './internal/sourceRNs/fromPromise';
+export { interval } from './internal/sourceRNs/interval';
+export { manual } from './internal/sourceRNs/manual';

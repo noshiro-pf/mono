@@ -1,34 +1,47 @@
 <div class="center">
-
-  <div class="item centering phase"
-        matTooltip="Phase" matTooltipPosition="after">
-    <div class="text phase-text">{{phaseCharacter$ | async}}</div>
+  <div
+    class="item centering phase"
+    matTooltip="Phase"
+    matTooltipPosition="after"
+  >
+    <div class="text phase-text">{{ phaseCharacter$ | async }}</div>
   </div>
 
-  <div class="item centering text action"
-        matTooltip="Action" matTooltipPosition="after">
-    <div class="text">{{action$ | async}}</div>
+  <div
+    class="item centering text action"
+    matTooltip="Action"
+    matTooltipPosition="after"
+  >
+    <div class="text">{{ action$ | async }}</div>
   </div>
 
-  <div class="item centering text buy"
-        matTooltip="Buy" matTooltipPosition="after">
-    <div class="text">{{buy$ | async}}</div>
+  <div
+    class="item centering text buy"
+    matTooltip="Buy"
+    matTooltipPosition="after"
+  >
+    <div class="text">{{ buy$ | async }}</div>
   </div>
 
   <div class="square-container">
-    <div class="square-container-content image-padding"
-        matTooltip="Coin" matTooltipPosition="after">
+    <div
+      class="square-container-content image-padding"
+      matTooltip="Coin"
+      matTooltipPosition="after"
+    >
       <div class="coin-image image centering">
-        <div class="text">{{coin$ | async}}</div>
+        <div class="text">{{ coin$ | async }}</div>
       </div>
     </div>
   </div>
 
-  <div class="square-container" *ngFor="let _ of (potionRepeater$ | async)">
-    <div class="square-container-content image-padding centering"
-        matTooltip="Potion" matTooltipPosition="after">
-      <img src="assets/img/game-object/Potion.png" height="100%" width="auto">
+  <div class="square-container" *ngFor="let _ of potionRepeater$ | async">
+    <div
+      class="square-container-content image-padding centering"
+      matTooltip="Potion"
+      matTooltipPosition="after"
+    >
+      <img src="assets/img/game-object/Potion.png" height="100%" width="auto" />
     </div>
   </div>
-
 </div>

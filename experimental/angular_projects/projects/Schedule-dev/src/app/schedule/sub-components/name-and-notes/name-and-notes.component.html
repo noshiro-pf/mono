@@ -1,20 +1,28 @@
-<ng-container *ngIf="{
-    title : title$ | async,
-    notes : notes$ | async
-  } as data">
+<ng-container
+  *ngIf="{
+    title: title$ | async,
+    notes: notes$ | async
+  } as data"
+>
   <div class="margined-element">
     <mat-form-field>
-      <input matInput placeholder="イベント名"
-          [value]="data.title || ''"
-          (input)="titleOnInput( $event.target.value )"
-          required>
+      <input
+        matInput
+        placeholder="イベント名"
+        [value]="data.title || ''"
+        (input)="titleOnInput($event.target.value)"
+        required
+      />
     </mat-form-field>
   </div>
   <div class="margined-element">
     <mat-form-field>
-      <textarea  matInput placeholder="ノート"
-          [value]="data.notes || ''"
-          (input)="notesOnInput( $event.target.value )">
+      <textarea
+        matInput
+        placeholder="ノート"
+        [value]="data.notes || ''"
+        (input)="notesOnInput($event.target.value)"
+      >
       </textarea>
     </mat-form-field>
   </div>

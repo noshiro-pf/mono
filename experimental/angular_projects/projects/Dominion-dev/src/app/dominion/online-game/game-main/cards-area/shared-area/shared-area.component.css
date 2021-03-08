@@ -1,5 +1,5 @@
 .shared-area {
-  background-color: #B5C8F1;
+  background-color: #b5c8f1;
   padding: 5px;
   margin: 10px;
   display: flex;
@@ -14,7 +14,8 @@
   padding: 3px;
 }
 
-.BasicCards,.KingdomCards {
+.BasicCards,
+.KingdomCards {
   padding: 3px;
 }
 
@@ -23,7 +24,9 @@
   flex-flow: row wrap;
   justify-content: flex-start;
 }
-.treasures,.victories,.Curse {
+.treasures,
+.victories,
+.Curse {
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
@@ -38,8 +41,8 @@
 .trashPile {
   background-image: url(/assets/img/trashArea.jpg);
   background-size: cover;
-  padding-top : 35px;
-  padding-left : 10px;
+  padding-top: 35px;
+  padding-left: 10px;
 }
 
 .card-pile {

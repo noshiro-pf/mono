@@ -1,20 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-import { AngularFirestore    } from 'angularfire2/firestore';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
-
-import { User } from '../classes/user';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Feedback } from '../classes/feedback';
+import { User } from '../classes/user';
 import { utils } from '../mylib/utilities';
-
 
 @Injectable()
 export class DatabaseService {
   fdPath = {
-    users : '/users',
+    users: '/users',
     schedulingEvents: '/schedulingEvents',
     feedbacks: '/feedbacks',
   };
@@ -24,70 +20,78 @@ export class DatabaseService {
 
   /* methods */
   user: {
-    setUser: ( uid: string, newUser: User ) => Promise<void>,
+    setUser: (uid: string, newUser: User) => Promise<void>;
     set: {
-      name:      ( uid: string, value: string ) => Promise<void>,
-      name_yomi: ( uid: string, value: string ) => Promise<void>,
-    }
+      name: (uid: string, value: string) => Promise<void>;
+      name_yomi: (uid: string, value: string) => Promise<void>;
+    };
   };
 
   feedbacks: {
-    add: ( value: Feedback ) => firebase.database.ThenableReference,
-    closeIssue: ( feedbackID: string, value: boolean ) => Promise<void>,
+    add: (value: Feedback) => firebase.database.ThenableReference;
+    closeIssue: (feedbackID: string, value: boolean) => Promise<void>;
   };
 
+  constructor(private afdb: AngularFireDatabase) {
+    this.users$ = this.afdb
+      .list(this.fdPath.users, (ref) => ref.orderByChild('name_yomi'))
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map(
+            (action) => new User(<any>action.key, <any>action.payload.val())
+          )
+        )
+      );
 
-  constructor(
-    private afdb: AngularFireDatabase,
-  ) {
-    this.users$
-      = this.afdb.list( this.fdPath.users, ref => ref.orderByChild('name_yomi') ).snapshotChanges()
-          .pipe( map( actions => actions.map( action => new User( <any>action.key, <any>action.payload.val() ) ) ) );
-
-    this.feedbacks$
-      = this.afdb.list( this.fdPath.feedbacks ).snapshotChanges()
-          .pipe( map( actions => actions.map( action => new Feedback( <any>action.key, <any>action.payload.val() ) ) ) );
-
+    this.feedbacks$ = this.afdb
+      .list(this.fdPath.feedbacks)
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map(
+            (action) => new Feedback(<any>action.key, <any>action.payload.val())
+          )
+        )
+      );
 
     /*** methods ***/
 
-    const userSetProperty = ( uid: string, pathPrefix: string, value: any ) => {
-      if ( !uid ) throw new Error('uid is empty');
-      return this.afdb.object( `${this.fdPath.users}/${uid}/${pathPrefix}` )
-                      .set( value );
+    const userSetProperty = (uid: string, pathPrefix: string, value: any) => {
+      if (!uid) throw new Error('uid is empty');
+      return this.afdb
+        .object(`${this.fdPath.users}/${uid}/${pathPrefix}`)
+        .set(value);
     };
     this.user = {
-      setUser: ( uid: string, newUser: User ) => {
-        const newUserObj = utils.object.copy( newUser );
+      setUser: (uid: string, newUser: User) => {
+        const newUserObj = utils.object.copy(newUser);
         delete newUserObj.databaseKey;
-        return this.afdb.object(`${this.fdPath.users}/${uid}`).set( newUserObj );
+        return this.afdb.object(`${this.fdPath.users}/${uid}`).set(newUserObj);
       },
 
       set: {
-        name: ( uid: string, value: string ) =>
-          userSetProperty( uid, 'name', value ),
+        name: (uid: string, value: string) =>
+          userSetProperty(uid, 'name', value),
 
-        name_yomi: ( uid: string, value: string ) =>
-          userSetProperty( uid, 'name_yomi', value ),
-      }
+        name_yomi: (uid: string, value: string) =>
+          userSetProperty(uid, 'name_yomi', value),
+      },
     };
 
-
     this.feedbacks = {
-      add: ( value: Feedback ) => {
-        const copy = utils.object.copy( value );
+      add: (value: Feedback) => {
+        const copy = utils.object.copy(value);
         delete copy.databaseKey;
         delete copy.date;
         copy.timeStamp = value.date;
-        return this.afdb.list( this.fdPath.feedbacks ).push( copy );
+        return this.afdb.list(this.fdPath.feedbacks).push(copy);
       },
 
-      closeIssue: ( feedbackID: string, value: boolean ) =>
-        this.afdb.object( `${this.fdPath.feedbacks}/${feedbackID}/closed`).set( value ),
+      closeIssue: (feedbackID: string, value: boolean) =>
+        this.afdb
+          .object(`${this.fdPath.feedbacks}/${feedbackID}/closed`)
+          .set(value),
     };
   }
-
-
-
-
 }

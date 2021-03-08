@@ -1,10 +1,7 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable, combineLatest } from 'rxjs';
-
-import { GameConfigService } from '../../services/game-config.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Observable } from 'rxjs';
 import { DCard } from '../../../types/dcard';
-import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
-
+import { GameConfigService } from '../../services/game-config.service';
 
 @Component({
   selector: 'app-cards-lined-up',
@@ -19,32 +16,28 @@ import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
       [cardWidth$]="widthShrunk$"
       [defaultArrayLength]="defaultArrayLength"
       [padding]="2"
-      (cardClicked)="onClicked( $event )" >
+      (cardClicked)="onClicked($event)"
+    >
     </app-cards-area>
   `,
   styles: [],
 })
 export class CardsLinedUpComponent implements OnInit {
-
-  @Input() showCardProperty:   boolean = false;
+  @Input() showCardProperty: boolean = false;
   @Input() hideNonButtonCards: boolean = false;
 
-  @Input() myIndex$!:    Observable<number>;
+  @Input() myIndex$!: Observable<number>;
   @Input() DCardArray$!: Observable<DCard[]>;
 
   @Input() width$!: Observable<number>;
-  @Input() defaultArrayLength: number = 1;  // min-width
+  @Input() defaultArrayLength: number = 1; // min-width
   widthShrunk$!: Observable<number>; // カードの枚数が増えるごとにカードサイズを縮小
 
   @Output() cardClicked = new EventEmitter<DCard>();
 
   // @Input() overlayDisplay: boolean = false;
 
-
-  constructor(
-    private config: GameConfigService,
-  ) {
-  }
+  constructor(private config: GameConfigService) {}
 
   ngOnInit() {
     // TODO: RxJS -> RN
@@ -59,8 +52,7 @@ export class CardsLinedUpComponent implements OnInit {
     //       .pipe( debounceTime(100) );
   }
 
-
-  onClicked( dcard: DCard ) {
-    this.cardClicked.emit( dcard );
+  onClicked(dcard: DCard) {
+    this.cardClicked.emit(dcard);
   }
 }

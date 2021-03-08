@@ -1,73 +1,106 @@
-<ng-container *ngIf="{
-      newChatMessageAlert: newChatMessageAlert$ | async,
-      myIndex:             myIndex$             | async,
-      chatOpened:          chatOpened$          | async,
-      autoScroll:          autoScroll$          | async,
-      devMode:             devMode$             | async
-    } as data">
+<ng-container
+  *ngIf="{
+    newChatMessageAlert: newChatMessageAlert$ | async,
+    myIndex: myIndex$ | async,
+    chatOpened: chatOpened$ | async,
+    autoScroll: autoScroll$ | async,
+    devMode: devMode$ | async
+  } as data"
+>
+  <div class="body">
+    <button
+      mat-button
+      class="sidebar-button"
+      matTooltip="ヘルプ"
+      matTooltipPosition="after"
+      (click)="showHelpDialog()"
+    >
+      <mat-icon>help</mat-icon>
+    </button>
 
-<div class="body">
+    <span class="spacer"></span>
 
-  <button mat-button class="sidebar-button"
-      matTooltip="ヘルプ" matTooltipPosition="after"
-      (click)="showHelpDialog()" >
-    <mat-icon >help</mat-icon>
-  </button>
+    <app-turn-info></app-turn-info>
 
-
-  <span class="spacer"></span>
-
-  <app-turn-info></app-turn-info>
-
-  <ng-container *ngIf="data.chatOpened">
-    <button mat-button class="sidebar-button"
-        matTooltip="オートスクロール：オフ" matTooltipPosition="after"
+    <ng-container *ngIf="data.chatOpened">
+      <button
+        mat-button
+        class="sidebar-button"
+        matTooltip="オートスクロール：オフ"
+        matTooltipPosition="after"
         [class.button-checked]="!data.autoScroll"
         disableRipple
-        (click)="toggleAutoScroll( false )" >
-      <mat-icon>stop</mat-icon>
-    </button>
-    <button mat-button class="sidebar-button"
-        matTooltip="オートスクロール：オン" matTooltipPosition="after"
+        (click)="toggleAutoScroll(false)"
+      >
+        <mat-icon>stop</mat-icon>
+      </button>
+      <button
+        mat-button
+        class="sidebar-button"
+        matTooltip="オートスクロール：オン"
+        matTooltipPosition="after"
         [class.button-checked]="data.autoScroll"
         disableRipple
-        (click)="toggleAutoScroll( true )" >
-      <mat-icon>arrow_downwards</mat-icon>
-    </button>
-  </ng-container>
+        (click)="toggleAutoScroll(true)"
+      >
+        <mat-icon>arrow_downwards</mat-icon>
+      </button>
+    </ng-container>
 
-  <button mat-button class="sidebar-button"
+    <button
+      mat-button
+      class="sidebar-button"
       [class.alert-icon]="data.newChatMessageAlert"
-      matTooltip="チャットを表示／非表示" matTooltipPosition="after"
-      (click)="toggleSideNavClicked()" >
-    <mat-icon>textsms</mat-icon>
-  </button>
+      matTooltip="チャットを表示／非表示"
+      matTooltipPosition="after"
+      (click)="toggleSideNavClicked()"
+    >
+      <mat-icon>textsms</mat-icon>
+    </button>
 
-  <button mat-button class="sidebar-button"
-      matTooltip="カード情報確認ボタンを表示／非表示" matTooltipPosition="after"
-      (click)="toggleShowCardPropertyButtonsClicked()">
-    <mat-icon>description</mat-icon><!-- featured_video -->
-  </button>
-  <button mat-button class="sidebar-button"
-      matTooltip="設定" matTooltipPosition="after"
-      (click)="settings()">
-    <mat-icon>tune</mat-icon>
-  </button>
+    <button
+      mat-button
+      class="sidebar-button"
+      matTooltip="カード情報確認ボタンを表示／非表示"
+      matTooltipPosition="after"
+      (click)="toggleShowCardPropertyButtonsClicked()"
+    >
+      <mat-icon>description</mat-icon
+      ><!-- featured_video -->
+    </button>
+    <button
+      mat-button
+      class="sidebar-button"
+      matTooltip="設定"
+      matTooltipPosition="after"
+      (click)="settings()"
+    >
+      <mat-icon>tune</mat-icon>
+    </button>
 
-  <!-- debug -->
-  <ng-container *ngIf="data.devMode">
-    <button mat-button class="sidebar-button developer"
-        (click)="incrementTurnCounter( data.myIndex )">
-      <mat-icon>plus_one</mat-icon>
-    </button>
-    <button mat-button class="sidebar-button developer"
-        (click)="logSnapshotClicked()">
-      <mat-icon>camera_alt</mat-icon>
-    </button>
-    <button mat-button class="sidebar-button developer"
-        (click)="userInputLog()">
-      log
-    </button>
-  </ng-container>
-</div>
+    <!-- debug -->
+    <ng-container *ngIf="data.devMode">
+      <button
+        mat-button
+        class="sidebar-button developer"
+        (click)="incrementTurnCounter(data.myIndex)"
+      >
+        <mat-icon>plus_one</mat-icon>
+      </button>
+      <button
+        mat-button
+        class="sidebar-button developer"
+        (click)="logSnapshotClicked()"
+      >
+        <mat-icon>camera_alt</mat-icon>
+      </button>
+      <button
+        mat-button
+        class="sidebar-button developer"
+        (click)="userInputLog()"
+      >
+        log
+      </button>
+    </ng-container>
+  </div>
 </ng-container>

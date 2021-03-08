@@ -1,96 +1,110 @@
-<ng-container *ngIf="{
-  scEventId : scEventId$ | async
-} as data">
+<ng-container
+  *ngIf="{
+    scEventId: scEventId$ | async
+  } as data"
+>
+  <app-waiting-spinner [done]="!!data.scEventId"></app-waiting-spinner>
+  <ng-container *ngIf="!!data.scEventId">
+    <div class="margined-element">
+      <button mat-raised-button color="normal" (click)="exit(data.scEventId)">
+        更新せずに回答ページへ戻る
+      </button>
+    </div>
 
-<app-waiting-spinner [done]="!!data.scEventId"></app-waiting-spinner>
-<ng-container *ngIf="!!data.scEventId">
-
-  <div class="margined-element">
-    <button mat-raised-button color="normal"
-        (click)="exit( data.scEventId )">
-      更新せずに回答ページへ戻る
-    </button>
-  </div>
-
-  <mat-vertical-stepper class="default-background-color">
-    <mat-step label="イベント名を入力">
-      <app-name-and-notes
-        [titleInit]="title"
-        [notesInit]="notes"
-        (titleChange)="titleChange( $event )"
-        (notesChange)="notesChange( $event )" >
-      </app-name-and-notes>
-      <div class="margined-element">
-        <button mat-raised-button color="primary" matStepperNext>Next</button>
-      </div>
-    </mat-step>
-
-    <mat-step label="候補日程を選択">
-      <app-select-dates *ngIf="selectedDatetimes"
-        [selectedDatetimesInit]="selectedDatetimes"
-        (selectedDatetimesChange)="selectedDatetimesChange( $event )">
-      </app-select-dates>
-      <div class="margined-element">
-        <button mat-raised-button color="primary"
-          (click)="removePastDates()">過去日の削除</button>
-      </div>
-      <span class="margined-element">
-        <button mat-raised-button color="primary" matStepperPrevious>Back</button>
-      </span>
-      <span class="margined-element">
-        <button mat-raised-button color="primary" matStepperNext >Next</button>
-      </span>
-    </mat-step>
-
-    <mat-step label="回答の設定">
-      <app-answer-deadline *ngIf="answerDeadline"
-        [answerDeadlineInit]="answerDeadline"
-        (answerDeadlineChange)="answerDeadlineChange( $event )">
-      </app-answer-deadline>
-
-      <hr>
-
-      <app-symbol-settings *ngIf="symbols"
-        [symbolsInit]="symbols"
-        (symbolsChange)="symbolsChange( $event )">
-      </app-symbol-settings>
-
-      <app-password
-        [passwordInit]="password"
-        (passwordChange)="passwordChange( $event )" >
-      </app-password>
-
-      <span class="margined-element">
-        <button mat-raised-button color="primary" matStepperPrevious>Back</button>
-      </span>
-      <span class="margined-element">
-        <button *ngIf="title
-                        && answerDeadline
-                        && selectedDatetimes
-                        && data.scEventId"
-          mat-raised-button color="warn"
-            [disabled]="!title ||
-                        !answerDeadline ||
-                         selectedDatetimes.length === 0"
-            (click)="updateEvent( data.scEventId )">
-          イベントを更新
-        </button>
+    <mat-vertical-stepper class="default-background-color">
+      <mat-step label="イベント名を入力">
+        <app-name-and-notes
+          [titleInit]="title"
+          [notesInit]="notes"
+          (titleChange)="titleChange($event)"
+          (notesChange)="notesChange($event)"
+        >
+        </app-name-and-notes>
         <div class="margined-element">
-          <p class="error-message" *ngIf="!title">
-            イベント名は必須項目です。
-          </p>
-          <p class="error-message"
-            *ngIf="!selectedDatetimes ||
-                    selectedDatetimes.length === 0">
-            1つ以上の日程を選択してください。
-          </p>
-          <p class="error-message" *ngIf="!answerDeadline">
-            回答期限は必須項目です。
-          </p>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
         </div>
-      </span>
-    </mat-step>
-  </mat-vertical-stepper>
+      </mat-step>
 
-</ng-container>
+      <mat-step label="候補日程を選択">
+        <app-select-dates
+          *ngIf="selectedDatetimes"
+          [selectedDatetimesInit]="selectedDatetimes"
+          (selectedDatetimesChange)="selectedDatetimesChange($event)"
+        >
+        </app-select-dates>
+        <div class="margined-element">
+          <button mat-raised-button color="primary" (click)="removePastDates()">
+            過去日の削除
+          </button>
+        </div>
+        <span class="margined-element">
+          <button mat-raised-button color="primary" matStepperPrevious>
+            Back
+          </button>
+        </span>
+        <span class="margined-element">
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
+        </span>
+      </mat-step>
+
+      <mat-step label="回答の設定">
+        <app-answer-deadline
+          *ngIf="answerDeadline"
+          [answerDeadlineInit]="answerDeadline"
+          (answerDeadlineChange)="answerDeadlineChange($event)"
+        >
+        </app-answer-deadline>
+
+        <hr />
+
+        <app-symbol-settings
+          *ngIf="symbols"
+          [symbolsInit]="symbols"
+          (symbolsChange)="symbolsChange($event)"
+        >
+        </app-symbol-settings>
+
+        <app-password
+          [passwordInit]="password"
+          (passwordChange)="passwordChange($event)"
+        >
+        </app-password>
+
+        <span class="margined-element">
+          <button mat-raised-button color="primary" matStepperPrevious>
+            Back
+          </button>
+        </span>
+        <span class="margined-element">
+          <button
+            *ngIf="
+              title && answerDeadline && selectedDatetimes && data.scEventId
+            "
+            mat-raised-button
+            color="warn"
+            [disabled]="
+              !title || !answerDeadline || selectedDatetimes.length === 0
+            "
+            (click)="updateEvent(data.scEventId)"
+          >
+            イベントを更新
+          </button>
+          <div class="margined-element">
+            <p class="error-message" *ngIf="!title">
+              イベント名は必須項目です。
+            </p>
+            <p
+              class="error-message"
+              *ngIf="!selectedDatetimes || selectedDatetimes.length === 0"
+            >
+              1つ以上の日程を選択してください。
+            </p>
+            <p class="error-message" *ngIf="!answerDeadline">
+              回答期限は必須項目です。
+            </p>
+          </div>
+        </span>
+      </mat-step>
+    </mat-vertical-stepper>
+  </ng-container>
 </ng-container>

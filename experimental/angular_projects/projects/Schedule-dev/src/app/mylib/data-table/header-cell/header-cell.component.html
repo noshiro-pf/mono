@@ -1,32 +1,38 @@
-<ng-container *ngIf="{
+<ng-container
+  *ngIf="{
     selectorOptions: selectorOptions$ | async,
-    headerSettings:  headerSettings$  | async,
-    headerValue:     headerValue$     | async
-  } as data">
-
+    headerSettings: headerSettings$ | async,
+    headerValue: headerValue$ | async
+  } as data"
+>
   <ng-container *ngIf="!!data.headerSettings">
     <ng-container [ngSwitch]="data.headerSettings.filterType">
       <ng-container *ngSwitchCase="'input'">
         <mat-form-field>
-          <input matInput
-              [placeholder]="data.headerSettings.displayName"
-              [value]="data.headerValue || ''"
-              (input)="changeHeaderValue( $event.target.value || '' )" >
+          <input
+            matInput
+            [placeholder]="data.headerSettings.displayName"
+            [value]="data.headerValue || ''"
+            (input)="changeHeaderValue($event.target.value || '')"
+          />
           <button matSuffix mat-icon-button (click)="resetOnClick()">
-            <mat-icon class='clear-select-icon'>clear</mat-icon>
+            <mat-icon class="clear-select-icon">clear</mat-icon>
           </button>
         </mat-form-field>
       </ng-container>
       <ng-container *ngSwitchCase="'select'">
         <mat-form-field>
           <mat-select
-              [placeholder]="data.headerSettings.displayName"
-              [value]="data.headerValue"
-              (selectionChange)="changeHeaderValue( $event.value )" >
+            [placeholder]="data.headerSettings.displayName"
+            [value]="data.headerValue"
+            (selectionChange)="changeHeaderValue($event.value)"
+          >
             <mat-option>reset</mat-option>
-            <mat-option *ngFor="let option of data.selectorOptions"
-                [value]="option.value">
-              {{option.viewValue}}
+            <mat-option
+              *ngFor="let option of data.selectorOptions"
+              [value]="option.value"
+            >
+              {{ option.viewValue }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -37,39 +43,45 @@
       <ng-container *ngSwitchCase="'multiSelect-and'">
         <mat-form-field>
           <mat-select
-                [placeholder]="data.headerSettings.displayName"
-                [value]="data.headerValue"
-                (selectionChange)="changeHeaderValue( $event.value )"
-                multiple>
-            <mat-option *ngFor="let option of data.selectorOptions"
-                [value]="option.value">
-              {{option.viewValue}}
+            [placeholder]="data.headerSettings.displayName"
+            [value]="data.headerValue"
+            (selectionChange)="changeHeaderValue($event.value)"
+            multiple
+          >
+            <mat-option
+              *ngFor="let option of data.selectorOptions"
+              [value]="option.value"
+            >
+              {{ option.viewValue }}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <button mat-icon-button (click)="resetOnClick()">
-          <mat-icon class='clear-select-icon'>clear</mat-icon>
+          <mat-icon class="clear-select-icon">clear</mat-icon>
         </button>
       </ng-container>
       <ng-container *ngSwitchCase="'multiSelect-or'">
         <mat-form-field>
           <mat-select
-                [placeholder]="data.headerSettings.displayName"
-                [value]="data.headerValue"
-                (selectionChange)="changeHeaderValue( $event.value )"
-                multiple>
-            <mat-option *ngFor="let option of data.selectorOptions"
-                [value]="option.value">
-              {{option.viewValue}}
+            [placeholder]="data.headerSettings.displayName"
+            [value]="data.headerValue"
+            (selectionChange)="changeHeaderValue($event.value)"
+            multiple
+          >
+            <mat-option
+              *ngFor="let option of data.selectorOptions"
+              [value]="option.value"
+            >
+              {{ option.viewValue }}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <button mat-icon-button (click)="resetOnClick()">
-          <mat-icon class='clear-select-icon'>clear</mat-icon>
+          <mat-icon class="clear-select-icon">clear</mat-icon>
         </button>
       </ng-container>
       <ng-container *ngSwitchDefault>
-        <span> {{data.headerSettings.displayName}} </span>
+        <span> {{ data.headerSettings.displayName }} </span>
       </ng-container>
     </ng-container>
   </ng-container>
