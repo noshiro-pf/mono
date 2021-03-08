@@ -6,6 +6,7 @@ targets=(
 
   # ts-utils dependent
   "syncflow"
+  "react-syncflow-hooks"
   "rxjs-utils"
   "react-router-utils"
   "react-utils"

@@ -1,0 +1,30 @@
+{
+  "name": "@noshiro/react-syncflow-hooks",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": false,
+  "main": "esm/index.js",
+  "types": "esm/index.d.ts",
+  "scripts": {
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "build": "run-s build:*",
+    "prebuild:esm": "yarn clean:build:esm",
+    "build:esm": "tsc --project config/tsconfig.esm.json",
+    "clean": "run-s clean:*",
+    "clean:build:esm": "rimraf esm",
+    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
+    "fmt": "yarn _prettier .",
+    "lint": "eslint src/ --ext .ts",
+    "setup": "echo 'no setup script'",
+    "test": "jest --config config/jest.config.json --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "root_dir": "../../.."
+  },
+  "dependencies": {
+    "@noshiro/syncflow": "*",
+    "react": "^17.0.1"
+  }
+}
