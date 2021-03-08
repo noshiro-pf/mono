@@ -1,19 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest } from 'rxjs';
-
-import { GameResult           } from '../../../types/game-result';
-import { NumberOfVictoryCards } from '../../../types/number-of-victory-cards';
-
 import { FireDatabaseService } from '../../../../database/database.service';
+import { utils } from '../../../../mylib/utilities';
+import { GameResult } from '../../../types/game-result';
+import { NumberOfVictoryCards } from '../../../types/number-of-victory-cards';
+import { GameState } from '../../types/game-state';
 import { GameStateService } from './game-state-services/game-state.service';
 import { MyGameRoomService } from './my-game-room.service';
-import { utils } from '../../../../mylib/utilities';
-import { GameState } from '../../types/game-state';
-
 
 @Injectable()
 export class SubmitGameResultService {
-
   // TODO: RxJS -> RN
   // gameResult$: Observable<GameResult>
   //   = combineLatest(
@@ -62,17 +57,14 @@ export class SubmitGameResultService {
   //         return gameResult;
   //       });
 
-
   constructor(
     private database: FireDatabaseService,
     private myGameRoomService: MyGameRoomService,
-    private gameStateService: GameStateService,
-  ) { }
+    private gameStateService: GameStateService
+  ) {}
 
-
-
-  submitGameResult( gameResult: GameResult ) {
-    return this.database.gameResult.add( gameResult );
+  submitGameResult(gameResult: GameResult) {
+    return this.database.gameResult.add(gameResult);
   }
 
   private countNumberOfVictoryCards(
@@ -80,25 +72,24 @@ export class SubmitGameResultService {
     gameState: GameState
   ): NumberOfVictoryCards {
     const nofVictoryCards = new NumberOfVictoryCards();
-    nofVictoryCards.VPtoken = gameState.allPlayersData[ playerIndex ].VPtoken;
-    const playerCards = gameState.DCards.allPlayersCards[ playerIndex ];
+    nofVictoryCards.VPtoken = gameState.allPlayersData[playerIndex].VPtoken;
+    const playerCards = gameState.DCards.allPlayersCards[playerIndex];
     const allCards = playerCards.getDCards();
     allCards
-      .filter( dcard => dcard.cardProperty.cardTypes.includes('Victory') )
-      .forEach( dcard => {
-        nofVictoryCards[ dcard.cardProperty.cardId ]++;
+      .filter((dcard) => dcard.cardProperty.cardTypes.includes('Victory'))
+      .forEach((dcard) => {
+        nofVictoryCards[dcard.cardProperty.cardId]++;
       });
-    nofVictoryCards.DeckSize
-      = allCards.length;
-    nofVictoryCards.numberOfActionCards
-      = allCards.filter( e => e.cardProperty.cardTypes.includes('Action') )
-          .length;
-    nofVictoryCards.numberOfDifferentlyNamedCards
-      = utils.array.uniq( allCards.map( e => e.cardProperty.nameEng ) )
-          .length;
-    nofVictoryCards.numberOfSilvers
-      = allCards.filter( e => e.cardProperty.cardId === 'Silver' )
-          .length;
+    nofVictoryCards.DeckSize = allCards.length;
+    nofVictoryCards.numberOfActionCards = allCards.filter((e) =>
+      e.cardProperty.cardTypes.includes('Action')
+    ).length;
+    nofVictoryCards.numberOfDifferentlyNamedCards = utils.array.uniq(
+      allCards.map((e) => e.cardProperty.nameEng)
+    ).length;
+    nofVictoryCards.numberOfSilvers = allCards.filter(
+      (e) => e.cardProperty.cardId === 'Silver'
+    ).length;
     // TavernMatを追加したら編集
     nofVictoryCards.Distant_Lands_on_TavernMat = 0;
     return nofVictoryCards;

@@ -14,27 +14,24 @@ import { Component, OnInit } from '@angular/core';
       </mat-tab-group>
     </div>
   `,
-  styles: [`
-    .loginFormWrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+  styles: [
+    `
+      .loginFormWrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
 
-    .body{
-      width: 100vw;
-      height: var(--main-height-without-toolbar);
-    }
-  `]
+      .body {
+        width: 100vw;
+        height: var(--main-height-without-toolbar);
+      }
+    `,
+  ],
 })
 export class UserAdminComponent implements OnInit {
+  constructor() {}
 
-
-  constructor(
-  ) { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

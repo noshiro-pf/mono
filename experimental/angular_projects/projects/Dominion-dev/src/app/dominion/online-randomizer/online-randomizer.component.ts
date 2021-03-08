@@ -1,28 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-
 import { Observable } from 'rxjs';
-
 import { UserService } from '../../database/user.service';
 import { MyRandomizerGroupService } from './my-randomizer-group.service';
-import { distinctUntilChanged, map } from 'rxjs/operators';
-
 
 @Component({
-  providers: [ MyRandomizerGroupService ],
+  providers: [MyRandomizerGroupService],
   selector: 'app-online-randomizer',
   templateUrl: './online-randomizer.component.html',
-  styleUrls: ['./online-randomizer.component.css']
+  styleUrls: ['./online-randomizer.component.css'],
 })
 export class OnlineRandomizerComponent implements OnInit {
-  signedIn$:                  Observable<boolean>;
+  signedIn$: Observable<boolean>;
   signedInToRandomizerGroup$: Observable<boolean>;
-  myRandomizerGroupName$:     Observable<string>;
-  BlackMarketIsUsed$:         Observable<boolean>;
-
+  myRandomizerGroupName$: Observable<string>;
+  BlackMarketIsUsed$: Observable<boolean>;
 
   constructor(
     private user: UserService,
-    private myRandomizerGroup: MyRandomizerGroupService,
+    private myRandomizerGroup: MyRandomizerGroupService
   ) {
     // TODO: RxJS -> RN
     // this.signedIn$ = this.user.signedIn$;
@@ -34,6 +29,5 @@ export class OnlineRandomizerComponent implements OnInit {
     //       distinctUntilChanged() );
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

@@ -1,63 +1,75 @@
 <div class="wrapper">
   <div>
-    <mat-form-field [color]="( errorMessageForEmail !== '' ? 'primary' : 'warn' )">
-      <input matInput
-          [value]="email || '' "
-          (input)="emailOnChange( $event.target.value )"
-          placeholder="E-mail"
-          required>
+    <mat-form-field [color]="errorMessageForEmail !== '' ? 'primary' : 'warn'">
+      <input
+        matInput
+        [value]="email || ''"
+        (input)="emailOnChange($event.target.value)"
+        placeholder="E-mail"
+        required
+      />
     </mat-form-field>
   </div>
   <div>
-    <mat-hint *ngIf="errorMessageForEmail !== '' " class="alert">
-      {{errorMessageForEmail}}
+    <mat-hint *ngIf="errorMessageForEmail !== ''" class="alert">
+      {{ errorMessageForEmail }}
     </mat-hint>
   </div>
 
   <div>
-    <mat-form-field [color]="( errorMessageForPassword !== '' ? 'primary' : 'warn' )">
-      <input matInput type="password"
-          [value]="password || '' "
-          (input)="passwordOnChange( $event.target.value )"
-          placeholder="Password"
-          required>
+    <mat-form-field
+      [color]="errorMessageForPassword !== '' ? 'primary' : 'warn'"
+    >
+      <input
+        matInput
+        type="password"
+        [value]="password || ''"
+        (input)="passwordOnChange($event.target.value)"
+        placeholder="Password"
+        required
+      />
     </mat-form-field>
   </div>
   <div>
-    <mat-hint *ngIf="errorMessageForPassword !== '' " class="alert">
-      {{errorMessageForPassword}}
+    <mat-hint *ngIf="errorMessageForPassword !== ''" class="alert">
+      {{ errorMessageForPassword }}
     </mat-hint>
   </div>
 
   <div>
     <mat-form-field>
-      <input matInput
-          [value]="name || '' "
-          (input)="nameOnChange( $event.target.value )"
-          placeholder="名前"
-          required>
+      <input
+        matInput
+        [value]="name || ''"
+        (input)="nameOnChange($event.target.value)"
+        placeholder="名前"
+        required
+      />
     </mat-form-field>
   </div>
 
   <div>
     <mat-form-field>
-      <input matInput
-          [value]="nameYomi || '' "
-          (input)="nameYomiOnChange( $event.target.value )"
-          placeholder="フリガナ"
-          required>
+      <input
+        matInput
+        [value]="nameYomi || ''"
+        (input)="nameYomiOnChange($event.target.value)"
+        placeholder="フリガナ"
+        required
+      />
     </mat-form-field>
   </div>
-
 
   <div class="buttons">
-    <button mat-raised-button color="primary"
-        [disabled]="!email || !password || !name || !nameYomi"
-        (click)="signUp()">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="!email || !password || !name || !nameYomi"
+      (click)="signUp()"
+    >
       Sign Up
     </button>
   </div>
-
 </div>
 
 <mat-progress-bar *ngIf="waitingForResponse" mode="indeterminate">

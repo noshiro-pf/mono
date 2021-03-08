@@ -1,24 +1,15 @@
 import { Injectable } from '@angular/core';
-
-import { Observable, combineLatest } from 'rxjs';
-
-import { GameRoom } from '../../types/game-room';
-import { GameState } from '../../types/game-state';
-
-import { UserService } from '../../../../database/user.service';
 import { FireDatabaseService } from '../../../../database/database.service';
-import { distinctUntilChanged, startWith, map, filter, first } from 'rxjs/operators';
-
+import { UserService } from '../../../../database/user.service';
 
 @Injectable()
 export class MyGameRoomService {
-
   // TODO: RxJS -> RN
   // myGameRoom$: Observable<GameRoom>
   //   = combineLatest(
-        // this.database.onlineGameRooms$,
-        // this.user.onlineGame.roomId$,
-        // (list, id) => (list.find( e => e.databaseKey === id ) || new GameRoom()) );
+  // this.database.onlineGameRooms$,
+  // this.user.onlineGame.roomId$,
+  // (list, id) => (list.find( e => e.databaseKey === id ) || new GameRoom()) );
 
   // initialState$: Observable<GameState>
   //   = this.myGameRoom$.pipe(
@@ -64,11 +55,8 @@ export class MyGameRoomService {
   //       map( e => e.numberOfPlayers ),
   //       distinctUntilChanged() );
 
-
-
   constructor(
     private database: FireDatabaseService,
     private user: UserService
-  ) {
-  }
+  ) {}
 }

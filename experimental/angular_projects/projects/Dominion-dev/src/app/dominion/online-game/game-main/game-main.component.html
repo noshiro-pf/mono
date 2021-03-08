@@ -1,51 +1,62 @@
-<ng-container *ngIf="{
-      chatOpened:          chatOpened$          | async,
-      autoScroll:          autoScroll$          | async,
-      loading:             loading$             | async,
-      initialStateIsReady: initialStateIsReady$ | async,
-      autoSort:            autoSort$            | async,
-      myIndex:             myIndex$             | async,
-      isMyTurn:            isMyTurn$            | async,
-      gameIsOver:          gameIsOver$          | async
-    } as data">
-
+<ng-container
+  *ngIf="{
+    chatOpened: chatOpened$ | async,
+    autoScroll: autoScroll$ | async,
+    loading: loading$ | async,
+    initialStateIsReady: initialStateIsReady$ | async,
+    autoSort: autoSort$ | async,
+    myIndex: myIndex$ | async,
+    isMyTurn: isMyTurn$ | async,
+    gameIsOver: gameIsOver$ | async
+  } as data"
+>
   <div class="body">
     <div class="sidebar">
       <app-sidebar-left
-          [autoScroll$]="autoScroll$"
-          [myIndex$]="myIndex$"
-          [chatOpened$]="chatOpened$"
-          (toggleSideNav)="toggleSideNav( sidenav )"
-          (autoScrollChange)="autoScrollChange( $event )"
-          (logSnapshot)="logSnapshot()"
-          (toggleShowCardPropertyButtons)="toggleShowCardPropertyButtons()"
-          (initialStateIsReadyChange)="initialStateIsReadyChange()"
-        >
+        [autoScroll$]="autoScroll$"
+        [myIndex$]="myIndex$"
+        [chatOpened$]="chatOpened$"
+        (toggleSideNav)="toggleSideNav(sidenav)"
+        (autoScrollChange)="autoScrollChange($event)"
+        (logSnapshot)="logSnapshot()"
+        (toggleShowCardPropertyButtons)="toggleShowCardPropertyButtons()"
+        (initialStateIsReadyChange)="initialStateIsReadyChange()"
+      >
       </app-sidebar-left>
     </div>
 
     <mat-sidenav-container class="sidenav-container">
-      <mat-sidenav #sidenav mode="side" disableClose="true"
-            [opened]="data.chatOpened" >
-        <app-chat [autoScroll]="data.autoScroll" [sidenav]="sidenav"> </app-chat>
+      <mat-sidenav
+        #sidenav
+        mode="side"
+        disableClose="true"
+        [opened]="data.chatOpened"
+      >
+        <app-chat [autoScroll]="data.autoScroll" [sidenav]="sidenav">
+        </app-chat>
       </mat-sidenav>
 
-      <div *ngIf="!data.initialStateIsReady || data.loading"
-        class="black-cover">
+      <div
+        *ngIf="!data.initialStateIsReady || data.loading"
+        class="black-cover"
+      >
         <div class="modal-message">準備中です…</div>
       </div>
 
       <div class="main">
         <div class="upper-part">
           <div class="shared-area_other-players-area">
-            <app-shared-area class="shared-area"
+            <app-shared-area
+              class="shared-area"
               [gainCardState$]="gainCardState$"
               [showCardProperty$]="showCardProperty$"
-              (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
+              (cardClicked)="onCardClick(data.myIndex, $event, data.autoSort)"
+            >
             </app-shared-area>
             <app-other-players-area
               class="other-players-area"
-              (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
+              (cardClicked)="onCardClick(data.myIndex, $event, data.autoSort)"
+            >
             </app-other-players-area>
           </div>
           <!-- <div *ngIf="!data.isMyTurn">
@@ -56,7 +67,7 @@
         </div>
         <div class="spacer"></div>
         <div class="my-area">
-            <!-- [gameMessage$]="gameMessage$" -->
+          <!-- [gameMessage$]="gameMessage$" -->
           <app-my-area
             [isMyTurn$]="isMyTurn$"
             [gameMessageList$]="gameMessageList$"
@@ -68,9 +79,10 @@
             [isBuyPlayPhase$]="isBuyPlayPhase$"
             [gameIsOver$]="gameIsOver$"
             [myThinkingState$]="myThinkingState$"
-            (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )"
-            (vcoinClicked)="onVcoinClick( data.myIndex, data.autoSort )"
-            (debtClicked)="onDebtClick( data.myIndex, data.autoSort )" >
+            (cardClicked)="onCardClick(data.myIndex, $event, data.autoSort)"
+            (vcoinClicked)="onVcoinClick(data.myIndex, data.autoSort)"
+            (debtClicked)="onDebtClick(data.myIndex, data.autoSort)"
+          >
           </app-my-area>
         </div>
       </div>

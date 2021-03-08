@@ -1,14 +1,19 @@
-<ng-container *ngIf="{
-      list:      gameMessageList_default1Line$ | async,
-      grayIndex: gameMessageIndexDelayed$      | async
-    } as data">
-
+<ng-container
+  *ngIf="{
+    list: gameMessageList_default1Line$ | async,
+    grayIndex: gameMessageIndexDelayed$ | async
+  } as data"
+>
   <div id="gameMessage-area">
     <div id="messages">
       <ng-container *ngFor="let msg of data.list; let idx = index">
-        <div class="message-line list-element" [class.gray]="idx <= data.grayIndex"> {{msg}} </div>
+        <div
+          class="message-line list-element"
+          [class.gray]="idx <= data.grayIndex"
+        >
+          {{ msg }}
+        </div>
       </ng-container>
     </div>
   </div>
-
 </ng-container>

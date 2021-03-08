@@ -1,30 +1,23 @@
 import { RN } from '../RN';
 
-
 export const fromEvent = (
-    target: HTMLElement|null,
-    eventType: string,
-    options?: boolean | AddEventListenerOptions
-  ) => new FromEventRN( target, eventType, options );
-
-
+  target: HTMLElement | null,
+  eventType: string,
+  options?: boolean | AddEventListenerOptions
+) => new FromEventRN(target, eventType, options);
 
 class FromEventRN extends RN<Event> {
-
   constructor(
-    target: HTMLElement|null,
+    target: HTMLElement | null,
     eventType: string,
     options?: boolean | AddEventListenerOptions
   ) {
-    if ( target === null ) {
+    if (target === null) {
       throw new Error('"target" is not nullable');
     }
 
-    super( new Event( eventType ), [] );
+    super(new Event(eventType), []);
 
-    target.addEventListener(
-        eventType,
-        ev => this.fireWith(ev),
-        options );
+    target.addEventListener(eventType, (ev) => this.fireWith(ev), options);
   }
 }

@@ -1,27 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-
-import { RN, combine } from 'rnjs';
-
-import { FireDatabaseService } from '../../database/database.service';
-import { MyRandomizerGroupService } from './my-randomizer-group.service';
+import { combine, RN } from 'rnjs';
 import { UserService } from '../../database/user.service';
-
-import { SelectedCards } from '../types/selected-cards';
 import { NumberOfVictoryCards } from '../types/number-of-victory-cards';
+import { MyRandomizerGroupService } from './my-randomizer-group.service';
 import { PlayerResult } from './types/player-result';
-
 
 @Component({
   selector: 'app-online-victory-points-calculator',
   template: `
-    <ng-container *ngIf="(uid$ | async) as uid">
+    <ng-container *ngIf="uid$ | async as uid">
       <div class="body-with-padding">
-        <app-victory-points-calculator *ngIf="!!uid"
+        <app-victory-points-calculator
+          *ngIf="!!uid"
           [selectedCards]="selectedCards$ | async"
           [resetVPCalculator]="resetVPCalculator$ | async"
           [numberOfVictoryCards]="numberOfVictoryCards$ | async"
-          (numberOfVictoryCardsChange)="numberOfVictoryCardsOnChange( $event, uid )"
-          (VPtotalChange)="VPtotalOnChange( $event, uid )">
+          (numberOfVictoryCardsChange)="
+            numberOfVictoryCardsOnChange($event, uid)
+          "
+          (VPtotalChange)="VPtotalOnChange($event, uid)"
+        >
         </app-victory-points-calculator>
       </div>
     </ng-container>
@@ -29,39 +27,38 @@ import { PlayerResult } from './types/player-result';
   styles: [],
 })
 export class OnlineVictoryPointsCalculatorComponent implements OnInit {
-
-  selectedCards$ = this.myRandomizerGroup.selectedCards$;  // 存在するもののみ表示
+  selectedCards$ = this.myRandomizerGroup.selectedCards$; // 存在するもののみ表示
   resetVPCalculator$ = this.myRandomizerGroup.resetVPCalculator$;
   uid$: RN<string> = this.user.uid$;
-  numberOfVictoryCards$
-    = combine(
-        this.myRandomizerGroup.newGameResult.players$,
-        this.uid$.filter( '', uid => !!uid )
-      ).map( ([players, uid]) =>
-        ( players.find( e => e.uid === uid ) || new PlayerResult() )
-                            .numberOfVictoryCards );
-
+  numberOfVictoryCards$ = combine(
+    this.myRandomizerGroup.newGameResult.players$,
+    this.uid$.filter('', (uid) => !!uid)
+  ).map(
+    ([players, uid]) =>
+      (players.find((e) => e.uid === uid) || new PlayerResult())
+        .numberOfVictoryCards
+  );
 
   constructor(
     private user: UserService,
-    private myRandomizerGroup: MyRandomizerGroupService,
-  ) {
-  }
+    private myRandomizerGroup: MyRandomizerGroupService
+  ) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
-  VPtotalOnChange( VPtotal: number, uid: string ) {
-    if ( !uid ) return;
-    this.myRandomizerGroup.setNGRPlayerVP( uid, VPtotal );
+  VPtotalOnChange(VPtotal: number, uid: string) {
+    if (!uid) return;
+    this.myRandomizerGroup.setNGRPlayerVP(uid, VPtotal);
   }
 
   numberOfVictoryCardsOnChange(
     numberOfVictoryCards: NumberOfVictoryCards,
     uid: string
   ) {
-    if ( !uid ) return;
+    if (!uid) return;
     this.myRandomizerGroup.setNGRPlayerNumberOfVictoryCards(
-        uid, numberOfVictoryCards );
+      uid,
+      numberOfVictoryCards
+    );
   }
 }

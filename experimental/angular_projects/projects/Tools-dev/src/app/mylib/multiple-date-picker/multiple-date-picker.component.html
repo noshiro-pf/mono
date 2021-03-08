@@ -1,52 +1,64 @@
-<ng-container *ngIf="{
-      currentYear:  currentYear$  | async,
-      currentMonth: currentMonth$ | async,
-      weeks:        weeks$        | async
-    } as data">
-
-<ng-container *ngIf="data.currentYear  !== undefined
-                  && data.currentMonth !== undefined
-                  && data.weeks        !== undefined
-                ">
-  <div class="margined-element" [style.width.px]="width">
-    <div class="picker-top-row">
-      <button mat-button class="mini-button" (click)='goToPreviousMonth()' >
-        <mat-icon>chevron_left</mat-icon>
-      </button>
-      <span class="current-year-month">
-        {{data.currentYear}}/{{data.currentMonth + 1}}
-      </span>
-      <button mat-button class="mini-button" (click)='goToNextMonth()'>
-        <mat-icon>chevron_right</mat-icon>
-      </button>
-    </div>
-    <table class="multiple-date-picker" >
-      <thead>
-        <tr class="picker-days-week-row">
-          <th *ngFor="let dayStr of dayStrings; let idx = index"
-              (click)="selectToggleDayColumn( idx )">
-            {{dayStr}}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let week of data.weeks" class="picker-days-row">
-          <td *ngFor="let date of week"
+<ng-container
+  *ngIf="{
+    currentYear: currentYear$ | async,
+    currentMonth: currentMonth$ | async,
+    weeks: weeks$ | async
+  } as data"
+>
+  <ng-container
+    *ngIf="
+      data.currentYear !== undefined &&
+      data.currentMonth !== undefined &&
+      data.weeks !== undefined
+    "
+  >
+    <div class="margined-element" [style.width.px]="width">
+      <div class="picker-top-row">
+        <button mat-button class="mini-button" (click)="goToPreviousMonth()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="current-year-month">
+          {{ data.currentYear }}/{{ data.currentMonth + 1 }}
+        </span>
+        <button mat-button class="mini-button" (click)="goToNextMonth()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+      <table class="multiple-date-picker">
+        <thead>
+          <tr class="picker-days-week-row">
+            <th
+              *ngFor="let dayStr of dayStrings; let idx = index"
+              (click)="selectToggleDayColumn(idx)"
+            >
+              {{ dayStr }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let week of data.weeks" class="picker-days-row">
+            <td
+              *ngFor="let date of week"
               class="text-center picker-day"
-              [class.picker-off]="!filterFn( date.date )"
+              [class.picker-off]="!filterFn(date.date)"
               [class.picker-empty]="!date.date"
               [class.picker-selected]="date.selected"
-              [class.today]="isToday( date.date )"
-              (click)="dateOnSelectToggle( date.date )">
-            {{(!!date.date ? date.date.getDate() : '')}}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="margined-element">
-      <button mat-raised-button (click)="resetSelections()">Reset Selections</button>
-      <button mat-raised-button (click)="goToToday()"><mat-icon>undo</mat-icon>Today</button>
+              [class.today]="isToday(date.date)"
+              (click)="dateOnSelectToggle(date.date)"
+            >
+              {{ !!date.date ? date.date.getDate() : '' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="margined-element">
+        <button mat-raised-button (click)="resetSelections()">
+          Reset Selections
+        </button>
+        <button mat-raised-button (click)="goToToday()">
+          <mat-icon>undo</mat-icon>Today
+        </button>
+      </div>
     </div>
-  </div>
-</ng-container>
+  </ng-container>
 </ng-container>

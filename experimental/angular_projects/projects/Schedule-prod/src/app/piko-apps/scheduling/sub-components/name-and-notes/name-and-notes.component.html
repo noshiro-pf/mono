@@ -1,16 +1,22 @@
 <div class="margined-element">
   <mat-form-field>
-    <input matInput placeholder="イベント名"
-        [value]="title || ''"
-        (change)="titleOnChange( $event.target.value )"
-        required>
+    <input
+      matInput
+      placeholder="イベント名"
+      [value]="title || ''"
+      (change)="titleOnChange($event.target.value)"
+      required
+    />
   </mat-form-field>
 </div>
 <div class="margined-element">
   <mat-form-field>
-    <textarea  matInput placeholder="ノート"
-        [value]="notes || ''"
-        (change)="notesOnChange( $event.target.value )" >
+    <textarea
+      matInput
+      placeholder="ノート"
+      [value]="notes || ''"
+      (change)="notesOnChange($event.target.value)"
+    >
     </textarea>
   </mat-form-field>
 </div>

@@ -1,73 +1,67 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UserService } from '../../../../../database/user.service';
-import { PlayerCards } from '../../../types/player-cards';
-import { DCard } from '../../../types/dcard';
 import { filter, map } from 'rxjs/operators';
-
+import { UserService } from '../../../../../database/user.service';
+import { DCard } from '../../../types/dcard';
+import { PlayerCards } from '../../../types/player-cards';
 
 @Component({
   selector: 'app-online-game-result-player-cards-dialog',
   templateUrl: './online-game-result-player-cards-dialog.component.html',
-  styleUrls: ['./online-game-result-player-cards-dialog.component.css']
+  styleUrls: ['./online-game-result-player-cards-dialog.component.css'],
 })
 export class OnlineGamePlayerCardsDialogComponent implements OnInit {
+  allPlayersCards$!: Observable<PlayerCards[]>; // input
+  playersNameList$!: Observable<string[]>; // input
 
-  allPlayersCards$!: Observable<PlayerCards[]>;  // input
-  playersNameList$!: Observable<string[]>;  // input
+  constructor() {}
 
-
-  constructor( ) { }
-
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }
-
-
 
 @Component({
   selector: 'app-each-player-cards',
   template: `
-    <ng-container *ngIf="{
-          cardSizeRatio: cardSizeRatio$      | async,
-          dcards:        playerCardsForView$ | async
-        } as data">
+    <ng-container
+      *ngIf="{
+        cardSizeRatio: cardSizeRatio$ | async,
+        dcards: playerCardsForView$ | async
+      } as data"
+    >
       <div *ngIf="data.cardSizeRatio && data.dcards">
-        <div> {{name}} </div>
+        <div>{{ name }}</div>
         <div>
           <ng-container *ngFor="let DCard of data.dcards">
             <app-dominion-card-image
               [card]="DCard.cardProperty"
               [width]="50 * data.cardSizeRatio"
               [faceUp]="true"
-              [isButton]="false">
+              [isButton]="false"
+            >
             </app-dominion-card-image>
           </ng-container>
         </div>
       </div>
     </ng-container>
-`
+  `,
 })
 export class EachPlayerCardsComponent implements OnInit {
-
-  @Input() name!: string;  // input
+  @Input() name!: string; // input
   @Input() playerIndex!: number; // input
-  @Input() allPlayersCards$!: Observable<PlayerCards[]>;  // input
+  @Input() allPlayersCards$!: Observable<PlayerCards[]>; // input
 
   cardSizeRatio$ = this.user.onlineGame.cardSizeRatio$;
 
   playerCardsForView$!: Observable<DCard[]>;
 
-
-  constructor(
-    private user: UserService
-  ) { }
+  constructor(private user: UserService) {}
 
   ngOnInit() {
-    this.playerCardsForView$
-      = this.allPlayersCards$.pipe(
-          filter( e => e.length > this.playerIndex ),
-          map( allPlayersCards =>
-                allPlayersCards[ this.playerIndex ].getDCards( undefined, true ) ) );
+    this.playerCardsForView$ = this.allPlayersCards$.pipe(
+      filter((e) => e.length > this.playerIndex),
+      map((allPlayersCards) =>
+        allPlayersCards[this.playerIndex].getDCards(undefined, true)
+      )
+    );
   }
 }

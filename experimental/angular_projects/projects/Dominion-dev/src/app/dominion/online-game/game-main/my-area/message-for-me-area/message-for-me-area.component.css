@@ -11,7 +11,7 @@
 }
 
 #messages {
-  max-height: calc( var(--message-line-height) * 3 );
+  max-height: calc(var(--message-line-height) * 3);
   overflow-y: auto;
 }
 

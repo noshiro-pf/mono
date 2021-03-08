@@ -1,4 +1,6 @@
-.tsv-area,.json-area, .tsv-header-area {
+.tsv-area,
+.json-area,
+.tsv-header-area {
   width: 100%;
   padding: 20px;
 }

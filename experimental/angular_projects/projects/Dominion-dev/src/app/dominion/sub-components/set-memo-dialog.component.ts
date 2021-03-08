@@ -5,42 +5,39 @@ import { Component, OnInit } from '@angular/core';
   template: `
     <div mat-dialog-content>
       <mat-form-field>
-        <textarea matInput placeholder="Memo"
+        <textarea
+          matInput
+          placeholder="Memo"
           [value]="newMemo || ''"
-          (input)="changeMemo( $event.target.value )" >
+          (input)="changeMemo($event.target.value)"
+        >
         </textarea>
       </mat-form-field>
     </div>
-    <div mat-dialog-actions class='action-buttons'>
+    <div mat-dialog-actions class="action-buttons">
       <span class="margined-element">
-        <button mat-raised-button
-            [mat-dialog-close]="newMemo"
-            color='primary'>
+        <button mat-raised-button [mat-dialog-close]="newMemo" color="primary">
           OK
         </button>
       </span>
       <span class="margined-element">
-        <button mat-raised-button
-            [mat-dialog-close]="undefined">
-          Cancel
-        </button>
+        <button mat-raised-button [mat-dialog-close]="undefined">Cancel</button>
       </span>
     </div>
   `,
-  styles: []
+  styles: [],
 })
 export class SetMemoDialogComponent implements OnInit {
-
-  memo!: string;  // input
+  memo!: string; // input
   newMemo: string = '';
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     this.newMemo = this.memo;
   }
 
-  changeMemo( value: string ) {
+  changeMemo(value: string) {
     this.newMemo = value;
   }
 }

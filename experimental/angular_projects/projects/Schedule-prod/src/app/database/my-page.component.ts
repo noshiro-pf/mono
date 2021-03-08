@@ -2,18 +2,11 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-my-page',
-  template: `
-    <p>
-      my-page Works!
-    </p>
-  `,
-  styles: []
+  template: ` <p>my-page Works!</p> `,
+  styles: [],
 })
 export class MyPageComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

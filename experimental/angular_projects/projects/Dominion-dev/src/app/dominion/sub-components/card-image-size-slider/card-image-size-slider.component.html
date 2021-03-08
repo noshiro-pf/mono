@@ -4,7 +4,8 @@
     [min]="min"
     [max]="max"
     [value]="value"
-    (input)="changeCardSize( $event.value )">
+    (input)="changeCardSize($event.value)"
+  >
   </mat-slider>
   <button mat-raised-button (click)="resetCardLongSideLength()">reset</button>
 </div>

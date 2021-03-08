@@ -5,13 +5,13 @@ export type ArrayElement<S> = S extends Array<infer T> ? T : never;
 
 export type Unwrap<S> = { [P in keyof S]: RNValue<S[P]> };
 
-export function unwrapCurr<T extends RN<any>[]>( ...rns: T ): Unwrap<T> {
-  return rns.map( e => e.value ) as Unwrap<T>;
+export function unwrapCurr<T extends RN<any>[]>(...rns: T): Unwrap<T> {
+  return rns.map((e) => e.value) as Unwrap<T>;
 }
 
-export function applyMixins( derivedCtor: any, baseCtors: any[] ) {
-  baseCtors.forEach( baseCtor => {
-    Object.getOwnPropertyNames( baseCtor.prototype ).forEach( name => {
+export function applyMixins(derivedCtor: any, baseCtors: any[]) {
+  baseCtors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
       derivedCtor.prototype[name] = baseCtor.prototype[name];
     });
   });

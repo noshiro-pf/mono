@@ -5,31 +5,33 @@ import { Component, OnInit } from '@angular/core';
   template: `
     <!-- message -->
     <div mat-dialog-content>
-      {{message}}
+      {{ message }}
     </div>
 
     <!-- buttons -->
     <div mat-dialog-actions class="action-buttons">
       <span class="margined-element">
-        <button mat-raised-button mat-dialog-close="yes" color='primary'>
+        <button mat-raised-button mat-dialog-close="yes" color="primary">
           OK
         </button>
       </span>
       <span class="margined-element">
-        <button mat-raised-button mat-dialog-close="no">
-          Cancel
-        </button>
+        <button mat-raised-button mat-dialog-close="no">Cancel</button>
       </span>
     </div>
   `,
-  styles: [` .action-buttons { justify-content: center; } `]
+  styles: [
+    `
+      .action-buttons {
+        justify-content: center;
+      }
+    `,
+  ],
 })
 export class ConfirmDialogComponent implements OnInit {
-
-  message!: string;  // input
+  message!: string; // input
 
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

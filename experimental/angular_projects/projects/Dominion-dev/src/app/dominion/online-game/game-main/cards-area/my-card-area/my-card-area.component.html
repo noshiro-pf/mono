@@ -1,94 +1,115 @@
-<ng-container *ngIf="{
-    PlayArea:         myCards.PlayArea$ | async,
-    Aside:            myCards.Aside$    | async,
+<ng-container
+  *ngIf="{
+    PlayArea: myCards.PlayArea$ | async,
+    Aside: myCards.Aside$ | async,
     showCardProperty: showCardProperty$ | async,
-    isMyTurn:         isMyTurn$         | async,
-    VPtoken:          VPtoken$          | async,
-    vcoin:            vcoin$            | async,
-    debt:             debt$             | async
-  } as data">
-
-<div class="body">
-
-  <div class="my-tokens">
-    <div *ngIf="data.vcoin + data.debt > 0"
+    isMyTurn: isMyTurn$ | async,
+    VPtoken: VPtoken$ | async,
+    vcoin: vcoin$ | async,
+    debt: debt$ | async
+  } as data"
+>
+  <div class="body">
+    <div class="my-tokens">
+      <div
+        *ngIf="data.vcoin + data.debt > 0"
         class="vcoins-debts box-shadow"
-        [class.is-my-turn]="data.isMyTurn">
-      <app-vcoins diameter="24" [number$]="vcoin$"
+        [class.is-my-turn]="data.isMyTurn"
+      >
+        <app-vcoins
+          diameter="24"
+          [number$]="vcoin$"
           [isButton]="buttonizeVCoins"
-          (click)="vcoinClick()">
-      </app-vcoins>
-      <app-debts  diameter="24" [number$]="debt$"
+          (click)="vcoinClick()"
+        >
+        </app-vcoins>
+        <app-debts
+          diameter="24"
+          [number$]="debt$"
           [isButton]="buttonizeDebts"
-          (click)="debtClick()">
-      </app-debts>
+          (click)="debtClick()"
+        >
+        </app-debts>
+      </div>
+      <div class="spacer"></div>
+      <app-vp-tokens
+        *ngIf="data.VPtoken > 0"
+        [diameter]="24"
+        [VPtoken]="data.VPtoken"
+      ></app-vp-tokens>
     </div>
-    <div class="spacer"></div>
-    <app-vp-tokens *ngIf="data.VPtoken > 0"
-        [diameter]="24" [VPtoken]="data.VPtoken"></app-vp-tokens>
-  </div>
 
-  <div class="PlayArea_Aside">
-    <!-- <div *ngIf="data.isMyTurn || data.PlayArea?.length > 0" -->
-    <div
+    <div class="PlayArea_Aside">
+      <!-- <div *ngIf="data.isMyTurn || data.PlayArea?.length > 0" -->
+      <div
         class="card-area box-shadow PlayArea"
-        [class.is-my-turn]="data.isMyTurn">
-      <app-cards-lined-up
-        [showCardProperty]="data.showCardProperty"
-        [DCardArray$]="myCards.PlayArea$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-      </app-cards-lined-up>
-    </div>
-    <!-- <div *ngIf="data.isMyTurn || data.Aside?.length > 0" -->
-    <div
+        [class.is-my-turn]="data.isMyTurn"
+      >
+        <app-cards-lined-up
+          [showCardProperty]="data.showCardProperty"
+          [DCardArray$]="myCards.PlayArea$"
+          [myIndex$]="myIndex$"
+          [width$]="width$"
+          (cardClicked)="onClick($event)"
+        >
+        </app-cards-lined-up>
+      </div>
+      <!-- <div *ngIf="data.isMyTurn || data.Aside?.length > 0" -->
+      <div
         class="card-area box-shadow Aside"
-        [class.is-my-turn]="data.isMyTurn">
-      <app-cards-lined-up
-        [showCardProperty]="data.showCardProperty"
-        [DCardArray$]="myCards.Aside$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-      </app-cards-lined-up>
+        [class.is-my-turn]="data.isMyTurn"
+      >
+        <app-cards-lined-up
+          [showCardProperty]="data.showCardProperty"
+          [DCardArray$]="myCards.Aside$"
+          [myIndex$]="myIndex$"
+          [width$]="width$"
+          (cardClicked)="onClick($event)"
+        >
+        </app-cards-lined-up>
+      </div>
     </div>
-  </div>
 
-  <div class="Deck_HandCards_DiscardPile">
-    <div class="card-area box-shadow Deck"
-        [class.is-my-turn]="data.isMyTurn">
-      <app-cards-pile
-        [showArraySize]="true"
-        [showCardProperty]="data.showCardProperty"
-        [DCardArray$]="myCards.Deck$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-      </app-cards-pile>
-    </div>
-    <div class="card-area box-shadow HandCards"
-        [class.is-my-turn]="data.isMyTurn">
-      <app-cards-lined-up
-        [defaultArrayLength]="5"
-        [showCardProperty]="data.showCardProperty"
-        [DCardArray$]="myCards.HandCards$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-      </app-cards-lined-up>
-    </div>
-    <div class="card-area box-shadow DiscardPile"
-        [class.is-my-turn]="data.isMyTurn">
-      <app-cards-pile
-        [showArraySize]="false"
-        [showCardProperty]="data.showCardProperty"
-        [DCardArray$]="myCards.DiscardPileReveresed$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-      </app-cards-pile>
+    <div class="Deck_HandCards_DiscardPile">
+      <div class="card-area box-shadow Deck" [class.is-my-turn]="data.isMyTurn">
+        <app-cards-pile
+          [showArraySize]="true"
+          [showCardProperty]="data.showCardProperty"
+          [DCardArray$]="myCards.Deck$"
+          [myIndex$]="myIndex$"
+          [width$]="width$"
+          (cardClicked)="onClick($event)"
+        >
+        </app-cards-pile>
+      </div>
+      <div
+        class="card-area box-shadow HandCards"
+        [class.is-my-turn]="data.isMyTurn"
+      >
+        <app-cards-lined-up
+          [defaultArrayLength]="5"
+          [showCardProperty]="data.showCardProperty"
+          [DCardArray$]="myCards.HandCards$"
+          [myIndex$]="myIndex$"
+          [width$]="width$"
+          (cardClicked)="onClick($event)"
+        >
+        </app-cards-lined-up>
+      </div>
+      <div
+        class="card-area box-shadow DiscardPile"
+        [class.is-my-turn]="data.isMyTurn"
+      >
+        <app-cards-pile
+          [showArraySize]="false"
+          [showCardProperty]="data.showCardProperty"
+          [DCardArray$]="myCards.DiscardPileReveresed$"
+          [myIndex$]="myIndex$"
+          [width$]="width$"
+          (cardClicked)="onClick($event)"
+        >
+        </app-cards-pile>
+      </div>
     </div>
   </div>
-</div>
 </ng-container>

@@ -14,25 +14,25 @@
   flex-direction: row;
 }
 
-.card-cost-coin,.dcard-array-size {
+.card-cost-coin,
+.dcard-array-size {
   flex-grow: 0;
   text-align: center;
-  font-size: 1.0em;
+  font-size: 1em;
   font-weight: bold;
   padding: 2px;
 }
 .card-cost-coin {
-  color: #69501C;
-  background: #FFE37B;
+  color: #69501c;
+  background: #ffe37b;
   border-radius: 15px;
   border: 1px solid #f3ebaa;
 }
 .dcard-array-size {
-  color:white;
+  color: white;
   background: #7abcff;
   border: 1px solid #cccccc;
 }
-
 
 /****************************************/
 
@@ -40,7 +40,6 @@
   display: flex;
   justify-content: center;
 }
-
 
 /***** lineUp *****/
 .card-images-lined-up {

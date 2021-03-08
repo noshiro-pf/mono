@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-
-import { UserService } from '../../database/user.service';
 import { RN } from 'rnjs';
-
+import { UserService } from '../../database/user.service';
 
 @Component({
   providers: [],
   selector: 'app-online-game',
   template: `
-    <div *ngIf="(signedIn$ | async); then signedIn; else notSignedIn" ></div>
+    <div *ngIf="signedIn$ | async; then signedIn; else notSignedIn"></div>
     <ng-template #notSignedIn>ログインしてください。</ng-template>
     <ng-template #signedIn>
       <mat-tab-group>
@@ -21,16 +19,12 @@ import { RN } from 'rnjs';
       </mat-tab-group>
     </ng-template>
   `,
-  styles: []
+  styles: [],
 })
 export class OnlineGameComponent implements OnInit {
   signedIn$: RN<boolean> = this.user.signedIn$;
 
-  constructor(
-    private user: UserService
-  ) {
-  }
+  constructor(private user: UserService) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

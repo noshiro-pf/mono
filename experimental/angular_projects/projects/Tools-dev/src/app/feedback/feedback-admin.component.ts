@@ -1,9 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { takeWhile } from 'rxjs/operators';
-
-import { DatabaseService } from '../database/database.service';
 import { Feedback } from '../classes/feedback';
+import { DatabaseService } from '../database/database.service';
 
 @Component({
   selector: 'app-feedback-admin',
@@ -23,49 +21,50 @@ import { Feedback } from '../classes/feedback';
             <td>
               <mat-checkbox
                 [checked]="fb.closed"
-                (change)="issueClosedChange( fb.databaseKey, $event.checked )">
+                (change)="issueClosedChange(fb.databaseKey, $event.checked)"
+              >
               </mat-checkbox>
             </td>
-            <td>{{fb.name}}</td>
+            <td>{{ fb.name }}</td>
             <td>
               <div [ngSwitch]="fb.category">
-                <mat-icon *ngSwitchCase="'bugReport'" matTooltip="バグ報告">bug_report</mat-icon>
-                <mat-icon *ngSwitchCase="'suggestion'" matTooltip="アイデアなど">lightbulb_outline</mat-icon>
+                <mat-icon *ngSwitchCase="'bugReport'" matTooltip="バグ報告"
+                  >bug_report</mat-icon
+                >
+                <mat-icon *ngSwitchCase="'suggestion'" matTooltip="アイデアなど"
+                  >lightbulb_outline</mat-icon
+                >
                 <span *ngSwitchDefault></span>
               </div>
             </td>
             <td class="data-table--cell-alignLeft">
-              {{fb.content}}
+              {{ fb.content }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   `,
-  styleUrls: [ '../mylib/data-table/data-table.component.css' ]
+  styleUrls: ['../mylib/data-table/data-table.component.css'],
 })
 export class FeedbackAdminComponent implements OnInit, OnDestroy {
   private alive = true;
 
   feedbacks: Feedback[] = [];
 
-  constructor(
-    private database: DatabaseService
-  ) {
+  constructor(private database: DatabaseService) {
     this.database.feedbacks$
-      .pipe( takeWhile( () => this.alive ) )
-      .subscribe( val => this.feedbacks = val );
+      .pipe(takeWhile(() => this.alive))
+      .subscribe((val) => (this.feedbacks = val));
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngOnDestroy() {
     this.alive = false;
   }
 
-  issueClosedChange( feedbackID: string, value: boolean ) {
-    this.database.feedbacks.closeIssue( feedbackID, value );
+  issueClosedChange(feedbackID: string, value: boolean) {
+    this.database.feedbacks.closeIssue(feedbackID, value);
   }
-
 }

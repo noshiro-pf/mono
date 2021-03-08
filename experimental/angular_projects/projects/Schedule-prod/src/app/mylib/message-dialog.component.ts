@@ -1,21 +1,18 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-message-dialog',
   template: `
     <div mat-dialog-content>
-      {{message}}
+      {{ message }}
     </div>
   `,
-  styles: []
+  styles: [],
 })
 export class MessageDialogComponent implements OnInit {
+  message!: string; // input
 
-  message!: string;  // input
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

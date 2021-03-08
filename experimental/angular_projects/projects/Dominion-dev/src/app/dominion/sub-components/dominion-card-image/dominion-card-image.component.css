@@ -13,7 +13,7 @@
 }
 
 img {
-  display: block;  /* 余白削除 */
+  display: block; /* 余白削除 */
 }
 .image-box {
   background-color: black;
@@ -22,5 +22,5 @@ img {
 }
 
 .is-button:hover {
-  box-shadow: 0 0 30px #EA5959;
+  box-shadow: 0 0 30px #ea5959;
 }

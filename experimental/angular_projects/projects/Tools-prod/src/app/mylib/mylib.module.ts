@@ -1,29 +1,20 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
 import { MyOwnCustomMaterialModule } from '../my-own-custom-material.module';
-
-import { MessageDialogComponent  } from './message-dialog.component';
-import { AlertDialogComponent    } from './alert-dialog.component';
-import { ConfirmDialogComponent  } from './confirm-dialog.component';
-import { WaitingSpinnerComponent } from './waiting-spinner.component';
-import { AppListComponent        } from './app-list/app-list.component';
-
+import { AlertDialogComponent } from './alert-dialog.component';
+import { AppListComponent } from './app-list/app-list.component';
+import { ConfirmDialogComponent } from './confirm-dialog.component';
+import { DataTableComponent } from './data-table/data-table.component';
 // data table
 import { ItemsPerPageComponent } from './data-table/items-per-page.component';
-import { PagenationComponent   } from './data-table/pagenation/pagenation.component';
-import { DataTableComponent   } from './data-table/data-table.component';
+import { PagenationComponent } from './data-table/pagenation/pagenation.component';
+import { MessageDialogComponent } from './message-dialog.component';
 import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-date-picker.component';
-
+import { WaitingSpinnerComponent } from './waiting-spinner.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RouterModule,
-    MyOwnCustomMaterialModule,
-  ],
+  imports: [CommonModule, RouterModule, MyOwnCustomMaterialModule],
   exports: [
     MessageDialogComponent,
     AlertDialogComponent,
@@ -51,6 +42,6 @@ import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-dat
     MessageDialogComponent,
     AlertDialogComponent,
     ConfirmDialogComponent,
-  ]
+  ],
 })
-export class MyLibModule { }
+export class MyLibModule {}

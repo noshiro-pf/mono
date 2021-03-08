@@ -1,125 +1,157 @@
-<ng-container *ngIf="{
-      trPagenatedData:    transformedPagenatedData$ | async,
-      filteredDataLength: filteredDataLength$       | async,
-      datalist:           data$                     | async,
-      itemsPerPage:       itemsPerPage$             | async,
-      selectedPageIndex:  selectedPageIndex$        | async,
-      columnSettings:     columnSettings$           | async
-    } as dat">
+<ng-container
+  *ngIf="{
+    trPagenatedData: transformedPagenatedData$ | async,
+    filteredDataLength: filteredDataLength$ | async,
+    datalist: data$ | async,
+    itemsPerPage: itemsPerPage$ | async,
+    selectedPageIndex: selectedPageIndex$ | async,
+    columnSettings: columnSettings$ | async
+  } as dat"
+>
   <app-waiting-spinner [done]="!!dat.datalist"></app-waiting-spinner>
 
   <ng-container *ngIf="!!dat.datalist">
-    <div *ngIf="usePagenation && itemsPerPageOptions !== undefined"
-        class="pager-wrapper">
+    <div
+      *ngIf="usePagenation && itemsPerPageOptions !== undefined"
+      class="pager-wrapper"
+    >
       <app-data-table--items-per-page
-          [itemsPerPageOptions]='itemsPerPageOptions'
-          [itemsPerPage]='dat.itemsPerPage'
-          (itemsPerPageChange)="itemsPerPageOnChange( $event )">
+        [itemsPerPageOptions]="itemsPerPageOptions"
+        [itemsPerPage]="dat.itemsPerPage"
+        (itemsPerPageChange)="itemsPerPageOnChange($event)"
+      >
       </app-data-table--items-per-page>
       <app-data-table--pagenation
-          [itemsPerPage]='data.itemsPerPage'
-          [dataSize]='data.filteredDataLength'
-          [selectedPageIndex]='data.selectedPageIndex'
-          (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
+        [itemsPerPage]="data.itemsPerPage"
+        [dataSize]="data.filteredDataLength"
+        [selectedPageIndex]="data.selectedPageIndex"
+        (selectedPageIndexChange)="selectedPageIndexOnChange($event)"
+      >
       </app-data-table--pagenation>
-      <button class='resetButton' mat-raised-button (click)="resetAll()">
+      <button class="resetButton" mat-raised-button (click)="resetAll()">
         Reset All
       </button>
-      <div>{{dat.filteredDataLength}} items</div>
+      <div>{{ dat.filteredDataLength }} items</div>
     </div>
 
-    <table class='data-table shadow3px vertical-line'>
+    <table class="data-table shadow3px vertical-line">
       <thead>
         <tr>
-          <th *ngFor='let column of dat.columnSettings'
-              [class.data-table--cell-alignLeft]  ="column.align === 'l' "
-              [class.data-table--cell-alignCenter]="column.align === 'c' "
-              [class.data-table--cell-alignRight] ="column.align === 'r' " >
+          <th
+            *ngFor="let column of dat.columnSettings"
+            [class.data-table--cell-alignLeft]="column.align === 'l'"
+            [class.data-table--cell-alignCenter]="column.align === 'c'"
+            [class.data-table--cell-alignRight]="column.align === 'r'"
+          >
             <ng-container [ngSwitch]="column.manip">
               <ng-container *ngSwitchCase="'input'">
                 <mat-form-field>
-                  <input matInput
-                      id="filteringInputBox"
-                      [placeholder]="column.headerTitle"
-                      [value]="column.manipState || ''"
-                      (input)="changeColumnState( column.name, $event.target.value )" >
-                  <button matSuffix mat-icon-button (click)="reset( column.name )">
-                    <mat-icon class='clear-select-icon'>clear</mat-icon>
+                  <input
+                    matInput
+                    id="filteringInputBox"
+                    [placeholder]="column.headerTitle"
+                    [value]="column.manipState || ''"
+                    (input)="
+                      changeColumnState(column.name, $event.target.value)
+                    "
+                  />
+                  <button
+                    matSuffix
+                    mat-icon-button
+                    (click)="reset(column.name)"
+                  >
+                    <mat-icon class="clear-select-icon">clear</mat-icon>
                   </button>
                 </mat-form-field>
               </ng-container>
               <ng-container *ngSwitchCase="'select'">
                 <mat-form-field>
                   <mat-select
-                      [placeholder]="column.headerTitle"
-                      [value]="column.manipState || ''"
-                      (change)="changeColumnState( column.name, $event.value )" >
-                    <mat-option *ngFor="let option of column.selectOptions"
-                        [value]="option.value">
-                      {{option.viewValue}}
+                    [placeholder]="column.headerTitle"
+                    [value]="column.manipState || ''"
+                    (change)="changeColumnState(column.name, $event.value)"
+                  >
+                    <mat-option
+                      *ngFor="let option of column.selectOptions"
+                      [value]="option.value"
+                    >
+                      {{ option.viewValue }}
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-                <button mat-icon-button (click)="reset( column.name )">
-                  <mat-icon class='clear-select-icon'>clear</mat-icon>
+                <button mat-icon-button (click)="reset(column.name)">
+                  <mat-icon class="clear-select-icon">clear</mat-icon>
                 </button>
               </ng-container>
               <ng-container *ngSwitchCase="'multiSelect-and'">
                 <mat-form-field>
                   <mat-select
-                        [placeholder]="column.headerTitle"
-                        [value]="column.manipState"
-                        (change)="changeColumnState( column.name, $event.value )"
-                        multiple>
-                    <mat-option *ngFor="let option of column.selectOptions"
-                        [value]="option.value">
-                      {{option.viewValue}}
+                    [placeholder]="column.headerTitle"
+                    [value]="column.manipState"
+                    (change)="changeColumnState(column.name, $event.value)"
+                    multiple
+                  >
+                    <mat-option
+                      *ngFor="let option of column.selectOptions"
+                      [value]="option.value"
+                    >
+                      {{ option.viewValue }}
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-                <button mat-icon-button (click)="reset( column.name )">
-                  <mat-icon class='clear-select-icon'>clear</mat-icon>
+                <button mat-icon-button (click)="reset(column.name)">
+                  <mat-icon class="clear-select-icon">clear</mat-icon>
                 </button>
               </ng-container>
               <ng-container *ngSwitchCase="'multiSelect-or'">
                 <mat-form-field>
                   <mat-select
-                        [placeholder]="column.headerTitle"
-                        [value]="column.manipState"
-                        (change)="changeColumnState( column.name, $event.value )"
-                        multiple>
-                    <mat-option *ngFor="let option of column.selectOptions"
-                        [value]="option.value">
-                      {{option.viewValue}}
+                    [placeholder]="column.headerTitle"
+                    [value]="column.manipState"
+                    (change)="changeColumnState(column.name, $event.value)"
+                    multiple
+                  >
+                    <mat-option
+                      *ngFor="let option of column.selectOptions"
+                      [value]="option.value"
+                    >
+                      {{ option.viewValue }}
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-                <button mat-icon-button (click)="reset( column.name )">
-                  <mat-icon class='clear-select-icon'>clear</mat-icon>
+                <button mat-icon-button (click)="reset(column.name)">
+                  <mat-icon class="clear-select-icon">clear</mat-icon>
                 </button>
               </ng-container>
               <ng-container *ngSwitchDefault>
-                <span> {{column.headerTitle}} </span>
+                <span> {{ column.headerTitle }} </span>
               </ng-container>
             </ng-container>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor='let value of dat.trPagenatedData; let rowIndex = index'>
-          <td *ngFor='let column of dat.columnSettings'
-              [class.data-table--cell-alignLeft]  ="column.align=='l'"
-              [class.data-table--cell-alignCenter]="column.align=='c'"
-              [class.data-table--cell-alignRight] ="column.align=='r'" >
-
+        <tr *ngFor="let value of dat.trPagenatedData; let rowIndex = index">
+          <td
+            *ngFor="let column of dat.columnSettings"
+            [class.data-table--cell-alignLeft]="column.align == 'l'"
+            [class.data-table--cell-alignCenter]="column.align == 'c'"
+            [class.data-table--cell-alignRight]="column.align == 'r'"
+          >
             <div *ngIf="column.isButton; then thenBlock; else elseBlock"></div>
             <ng-template #thenBlock>
-              <button mat-button color="primary"
-                    (click)="cellClicked(
-                        dat.datalist,
-                        rowIndex,
-                        column.name,
-                        dat.columnSettings )">
+              <button
+                mat-button
+                color="primary"
+                (click)="
+                  cellClicked(
+                    dat.datalist,
+                    rowIndex,
+                    column.name,
+                    dat.columnSettings
+                  )
+                "
+              >
                 {{ value[column.name] }}
               </button>
             </ng-template>
@@ -131,20 +163,24 @@
       </tbody>
     </table>
 
-    <div *ngIf="usePagenation && itemsPerPageOptions !== undefined"
-        class="pager-wrapper">
+    <div
+      *ngIf="usePagenation && itemsPerPageOptions !== undefined"
+      class="pager-wrapper"
+    >
       <app-data-table--items-per-page
-          [itemsPerPageOptions]='itemsPerPageOptions'
-          [itemsPerPage]='dat.itemsPerPage'
-          (itemsPerPageChange)="itemsPerPageOnChange( $event )">
+        [itemsPerPageOptions]="itemsPerPageOptions"
+        [itemsPerPage]="dat.itemsPerPage"
+        (itemsPerPageChange)="itemsPerPageOnChange($event)"
+      >
       </app-data-table--items-per-page>
       <app-data-table--pagenation
-          [itemsPerPage]='data.itemsPerPage'
-          [dataSize]='data.filteredDataLength'
-          [selectedPageIndex]='data.selectedPageIndex'
-          (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
+        [itemsPerPage]="data.itemsPerPage"
+        [dataSize]="data.filteredDataLength"
+        [selectedPageIndex]="data.selectedPageIndex"
+        (selectedPageIndexChange)="selectedPageIndexOnChange($event)"
+      >
       </app-data-table--pagenation>
-      <div>{{dat.filteredDataLength}} items</div>
+      <div>{{ dat.filteredDataLength }} items</div>
     </div>
   </ng-container>
 </ng-container>

@@ -1,22 +1,8 @@
-import { RN,
-    interval,
-    combine,
-    manual,
-    merge,
-    fromObservable,
-  } from './RN';
+import { interval } from './RN';
 
-import {
-    map,
-    debounce,
-    filter,
-    scan,
-  } from './operators';
-
-
-const a = interval( 1000, true ).take( 5 );
-a.listen( true, console.log );
-setTimeout( () => a.once().then( v => console.log('once', v ) ), 2500 );
+const a = interval(1000, true).take(5);
+a.listen(true, console.log);
+setTimeout(() => a.once().then((v) => console.log('once', v)), 2500);
 
 /*
 listen 0
@@ -30,8 +16,6 @@ listen 3
 subscribe 4
 listen 4
 */
-
-
 
 // const a = interval( 100, false );
 // const b = a.withInitialValue(999)
@@ -50,9 +34,6 @@ listen 4
 7
 ...
 */
-
-
-
 
 // const a = fromObservable( 0, rxjsInterval( 1000 ) );
 // a.listen( false, console.log );
@@ -90,4 +71,3 @@ interval   : 0 |0---------1---------2---------...
     --- switchMap & mapTo ---
          [0,0] |0--0--0--01-01-01-012012012012012012012012012
 */
-

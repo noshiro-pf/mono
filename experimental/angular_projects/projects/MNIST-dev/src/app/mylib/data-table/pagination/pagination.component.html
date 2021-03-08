@@ -1,66 +1,85 @@
-<ng-container *ngIf="{
-    pageNumber : pageNumber$ | async,
-    rangeStart : rangeStart$ | async,
-    rangeEnd   : rangeEnd$   | async,
-    rowSize    : rowSize$    | async,
-    pageLength : pageLength$ | async,
-    pageIndice : pageIndice$ | async
-  } as data">
+<ng-container
+  *ngIf="{
+    pageNumber: pageNumber$ | async,
+    rangeStart: rangeStart$ | async,
+    rangeEnd: rangeEnd$ | async,
+    rowSize: rowSize$ | async,
+    pageLength: pageLength$ | async,
+    pageIndice: pageIndice$ | async
+  } as data"
+>
+  <ng-container
+    *ngIf="!!data.pageIndice; then main; else loading"
+  ></ng-container>
+  <ng-template #loading>Loading...</ng-template>
+  <ng-template #main>
+    <div class="buttons-wrapper">
+      <span class="button-with-margin">
+        <button
+          mat-raised-button
+          class="nav-button"
+          (click)="setPageNumber(1)"
+          [disabled]="data.pageNumber <= 1"
+        >
+          <mat-icon>first_page</mat-icon>
+        </button>
+      </span>
 
-<ng-container *ngIf="!!data.pageIndice; then main; else loading"></ng-container>
-<ng-template #loading>Loading...</ng-template>
-<ng-template #main>
-  <div class='buttons-wrapper'>
-    <span class="button-with-margin">
-      <button mat-raised-button class="nav-button"
-          (click)='setPageNumber(1)'
-          [disabled]='data.pageNumber <= 1' >
-        <mat-icon>first_page</mat-icon>
-      </button>
-    </span>
+      <span class="button-with-margin">
+        <button
+          mat-raised-button
+          class="nav-button"
+          (click)="setPageNumber(data.pageNumber - 1)"
+          [disabled]="data.pageNumber <= 1"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+      </span>
 
-    <span class="button-with-margin">
-      <button mat-raised-button class="nav-button"
-          (click)='setPageNumber( data.pageNumber - 1 )'
-          [disabled]='data.pageNumber <= 1' >
-        <mat-icon>chevron_left</mat-icon>
-      </button>
-    </span>
-
-    <div *ngIf="data.pageLength <= 10; then thenBlock; else elseBlock"
-      class="button-with-margin"></div>
-    <ng-template #thenBlock>
-      <ng-container *ngFor='let pageIndex of data.pageIndice'>
-        <button mat-raised-button
+      <div
+        *ngIf="data.pageLength <= 10; then thenBlock; else elseBlock"
+        class="button-with-margin"
+      ></div>
+      <ng-template #thenBlock>
+        <ng-container *ngFor="let pageIndex of data.pageIndice">
+          <button
+            mat-raised-button
             class="nav-button"
             [class.mat-button-toggle-normal]="data.pageNumber !== pageIndex"
             [class.mat-button-toggle-selected]="data.pageNumber === pageIndex"
-            (click)="setPageNumber( pageIndex )" >
-          <span>{{pageIndex}}</span>
+            (click)="setPageNumber(pageIndex)"
+          >
+            <span>{{ pageIndex }}</span>
+          </button>
+        </ng-container>
+      </ng-template>
+      <ng-template #elseBlock>
+        <div class="range-notation">
+          {{ data.rangeStart }}-{{ data.rangeEnd }} of {{ data.rowSize }}
+        </div>
+      </ng-template>
+
+      <span class="button-with-margin">
+        <button
+          mat-raised-button
+          class="nav-button"
+          (click)="setPageNumber(data.pageNumber + 1)"
+          [disabled]="data.pageNumber >= data.pageLength"
+        >
+          <mat-icon>chevron_right</mat-icon>
         </button>
-      </ng-container>
-    </ng-template>
-    <ng-template #elseBlock>
-      <div class="range-notation">
-        {{data.rangeStart}}-{{data.rangeEnd}} of {{data.rowSize}}
-      </div>
-    </ng-template>
+      </span>
 
-    <span class="button-with-margin">
-      <button mat-raised-button class="nav-button"
-          (click)='setPageNumber( data.pageNumber + 1 )'
-          [disabled]='data.pageNumber >= data.pageLength' >
-        <mat-icon>chevron_right</mat-icon>
-      </button>
-    </span>
-
-    <span class="button-with-margin">
-      <button mat-raised-button class="nav-button"
-          (click)='setPageNumber( data.pageLength )'
-          [disabled]='data.pageNumber >= data.pageLength' >
-        <mat-icon>last_page</mat-icon>
-      </button>
-    </span>
-  </div>
-</ng-template>
+      <span class="button-with-margin">
+        <button
+          mat-raised-button
+          class="nav-button"
+          (click)="setPageNumber(data.pageLength)"
+          [disabled]="data.pageNumber >= data.pageLength"
+        >
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </span>
+    </div>
+  </ng-template>
 </ng-container>

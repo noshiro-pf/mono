@@ -1,44 +1,48 @@
-<ng-container *ngIf="{
-      signedIn: signedIn$ | async,
-      myName:   myName$   | async
-    } as data">
-
-  <mat-toolbar color='primary' class='header box-shadow'>
-    <a mat-icon-button routerLink='/'> <mat-icon>home</mat-icon> </a>
+<ng-container
+  *ngIf="{
+    signedIn: signedIn$ | async,
+    myName: myName$ | async
+  } as data"
+>
+  <mat-toolbar color="primary" class="header box-shadow">
+    <a mat-icon-button routerLink="/"> <mat-icon>home</mat-icon> </a>
 
     <div *ngIf="data.signedIn">
-
       <a mat-icon-button [matMenuTriggerFor]="appMenu">
         <mat-icon>menu</mat-icon>
       </a>
       <mat-menu #appMenu="matMenu" [overlapTrigger]="false">
-        <a mat-menu-item routerLink='/online-game'>Online Game</a>
-        <a mat-menu-item routerLink='/online-randomizer'>Randomizer</a>
-        <a mat-menu-item routerLink='/game-result'>Game Results</a>
-        <a mat-menu-item routerLink='/cardlist'>Card List</a>
+        <a mat-menu-item routerLink="/online-game">Online Game</a>
+        <a mat-menu-item routerLink="/online-randomizer">Randomizer</a>
+        <a mat-menu-item routerLink="/game-result">Game Results</a>
+        <a mat-menu-item routerLink="/cardlist">Card List</a>
       </mat-menu>
     </div>
 
     <span class="spacer"></span>
 
-    <span class="userName">{{data.myName}}</span>
+    <span class="userName">{{ data.myName }}</span>
 
-    <ng-container *ngIf="data.signedIn; then thenBlock; else ElseBlock"></ng-container>
+    <ng-container
+      *ngIf="data.signedIn; then thenBlock; else ElseBlock"
+    ></ng-container>
     <ng-template #thenBlock>
-      <a mat-icon-button [matMenuTriggerFor]="userMenu"> <mat-icon>person</mat-icon> </a>
+      <a mat-icon-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>person</mat-icon>
+      </a>
       <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
         <!-- <a mat-menu-item routerLink='/my-page'>マイページ</a> -->
-        <a mat-menu-item routerLink='/user-admin'>アカウント</a>
+        <a mat-menu-item routerLink="/user-admin">アカウント</a>
         <button mat-menu-item (click)="logout()">
           <span>ログアウト</span>
         </button>
       </mat-menu>
     </ng-template>
     <ng-template #ElseBlock>
-      <a mat-icon-button routerLink='/user-admin'> <mat-icon>person</mat-icon> </a>
+      <a mat-icon-button routerLink="/user-admin">
+        <mat-icon>person</mat-icon>
+      </a>
     </ng-template>
-
-
   </mat-toolbar>
 
   <router-outlet></router-outlet>

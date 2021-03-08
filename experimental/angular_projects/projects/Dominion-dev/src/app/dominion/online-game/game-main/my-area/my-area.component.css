@@ -5,7 +5,11 @@
   background-color: rgb(193, 193, 193);
 }
 .body.is-my-turn {
-  background-color: rgb(216, 172, 12); /*rgb(234, 197, 61)  rgb(236, 197, 139); */
+  background-color: rgb(
+    216,
+    172,
+    12
+  ); /*rgb(234, 197, 61)  rgb(236, 197, 139); */
 }
 
 .bar {
@@ -28,10 +32,8 @@
   flex-grow: 0;
 }
 
-
 .bar .buttons-area {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
 }
-

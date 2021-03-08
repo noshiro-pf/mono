@@ -5,42 +5,39 @@ import { Component, OnInit } from '@angular/core';
   template: `
     <div mat-dialog-content>
       <mat-form-field>
-        <input matInput type="number"
+        <input
+          matInput
+          type="number"
           onclick="this.select(0, this.value.length)"
           [value]="newVP"
-          (change)="changeVP( $event.target.valueAsNumber )" >
+          (change)="changeVP($event.target.valueAsNumber)"
+        />
       </mat-form-field>
     </div>
-    <div mat-dialog-actions class='action-buttons'>
+    <div mat-dialog-actions class="action-buttons">
       <span class="margined-element">
-        <button mat-raised-button
-            [mat-dialog-close]="newVP"
-            color='primary'>
+        <button mat-raised-button [mat-dialog-close]="newVP" color="primary">
           OK
         </button>
       </span>
       <span class="margined-element">
-        <button mat-raised-button
-            mat-dialog-close="">
-          Cancel
-        </button>
+        <button mat-raised-button mat-dialog-close="">Cancel</button>
       </span>
     </div>
   `,
-  styles: []
+  styles: [],
 })
 export class SetVpDialogComponent implements OnInit {
-
-  VP!: number;  // input
+  VP!: number; // input
   newVP: number = 0;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     this.newVP = this.VP;
   }
 
-  changeVP( value: number ) {
+  changeVP(value: number) {
     this.newVP = value;
   }
 }

@@ -1,5 +1,4 @@
-export const testKingdomCards = [12, 49, 92, 99, 138, 230, 232,  16, 18, 24];
-
+export const testKingdomCards = [12, 49, 92, 99, 138, 230, 232, 16, 18, 24];
 
 /*  13. 議事堂 */
 /*  50. 貧民街 */

@@ -1,18 +1,18 @@
-<ng-container *ngIf="{
-  title             : title$             | async,
-  notes             : notes$             | async,
-  selectedDatetimes : selectedDatetimes$ | async,
-  answerDeadline    : answerDeadline$    | async,
-  symbols           : symbols$           | async,
-  password          : password$          | async,
-  passwordEnabled   : passwordEnabled$   | async,
-  scEventId         : scEventId$         | async,
-  updateEventButtonDisabled : updateEventButtonDisabled$ | async
-} as data">
-
+<ng-container
+  *ngIf="{
+    title: title$ | async,
+    notes: notes$ | async,
+    selectedDatetimes: selectedDatetimes$ | async,
+    answerDeadline: answerDeadline$ | async,
+    symbols: symbols$ | async,
+    password: password$ | async,
+    passwordEnabled: passwordEnabled$ | async,
+    scEventId: scEventId$ | async,
+    updateEventButtonDisabled: updateEventButtonDisabled$ | async
+  } as data"
+>
   <div class="margined-element" *ngIf="!!data.scEventId">
-    <button mat-raised-button color="normal"
-        (click)="exit( data.scEventId )">
+    <button mat-raised-button color="normal" (click)="exit(data.scEventId)">
       更新せずに回答ページへ戻る
     </button>
   </div>
@@ -26,8 +26,9 @@
         <app-name-and-notes
           [titleInit]="data.title"
           [notesInit]="data.notes"
-          (titleChange)="titleChange( $event )"
-          (notesChange)="notesChange( $event )" >
+          (titleChange)="titleChange($event)"
+          (notesChange)="notesChange($event)"
+        >
         </app-name-and-notes>
         <div class="margined-element">
           <button mat-raised-button color="primary" matStepperNext>Next</button>
@@ -35,65 +36,84 @@
       </mat-step>
 
       <mat-step label="候補日程を選択">
-        <app-select-dates *ngIf="data.selectedDatetimes"
+        <app-select-dates
+          *ngIf="data.selectedDatetimes"
           [selectedDatetimesInit]="data.selectedDatetimes"
-          (selectedDatetimesChange)="selectedDatetimesChange( $event )">
+          (selectedDatetimesChange)="selectedDatetimesChange($event)"
+        >
         </app-select-dates>
         <div class="margined-element">
-          <button mat-raised-button color="primary"
-            (click)="removePastDates()">過去日の削除</button>
+          <button mat-raised-button color="primary" (click)="removePastDates()">
+            過去日の削除
+          </button>
         </div>
         <span class="margined-element">
-          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperPrevious>
+            Back
+          </button>
         </span>
         <span class="margined-element">
-          <button mat-raised-button color="primary" matStepperNext >Next</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
         </span>
       </mat-step>
 
       <mat-step label="回答の設定">
-        <app-answer-deadline *ngIf="data.answerDeadline"
+        <app-answer-deadline
+          *ngIf="data.answerDeadline"
           [answerDeadlineInit]="data.answerDeadline"
-          (answerDeadlineChange)="answerDeadlineChange( $event )">
+          (answerDeadlineChange)="answerDeadlineChange($event)"
+        >
         </app-answer-deadline>
 
-        <hr>
+        <hr />
 
-        <app-symbol-settings *ngIf="data.symbols"
+        <app-symbol-settings
+          *ngIf="data.symbols"
           [symbolsInit]="data.symbols"
-          (symbolsChange)="symbolsChange( $event )">
+          (symbolsChange)="symbolsChange($event)"
+        >
         </app-symbol-settings>
 
         <app-password
           [passwordInit]="data.password"
-          (enabledChange)="passwordEnabledChange( $event )"
-          (passwordChange)="passwordChange( $event )" >
+          (enabledChange)="passwordEnabledChange($event)"
+          (passwordChange)="passwordChange($event)"
+        >
         </app-password>
 
         <span class="margined-element">
-          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperPrevious>
+            Back
+          </button>
         </span>
         <span class="margined-element">
           <button
-            mat-raised-button color="warn"
-              [disabled]="data.updateEventButtonDisabled"
-              (click)="updateEvent( data.scEventId )">
+            mat-raised-button
+            color="warn"
+            [disabled]="data.updateEventButtonDisabled"
+            (click)="updateEvent(data.scEventId)"
+          >
             イベントを更新
           </button>
           <div class="margined-element">
             <p class="error-message" *ngIf="!data.title">
               イベント名は必須項目です。
             </p>
-            <p class="error-message"
-              *ngIf="!data.selectedDatetimes ||
-                      data.selectedDatetimes.length === 0">
+            <p
+              class="error-message"
+              *ngIf="
+                !data.selectedDatetimes || data.selectedDatetimes.length === 0
+              "
+            >
               1つ以上の日程を選択してください。
             </p>
             <p class="error-message" *ngIf="!data.answerDeadline">
               回答期限は必須項目です。
             </p>
-            <p class="error-message"
-                *ngIf="data.passwordEnabled && data.password === ''">
+            <p
+              class="error-message"
+              *ngIf="data.passwordEnabled && data.password === ''"
+            >
               パスワードがONなのに空になっています。
             </p>
           </div>

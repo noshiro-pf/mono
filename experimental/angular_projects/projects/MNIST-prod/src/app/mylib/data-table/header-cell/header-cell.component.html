@@ -2,25 +2,30 @@
   <ng-container [ngSwitch]="headerSetting.filterType">
     <ng-container *ngSwitchCase="'input'">
       <mat-form-field>
-        <input matInput
-            [placeholder]="headerSetting.displayName"
-            [value]="headerValue || ''"
-            (input)="changeHeaderValue( $event.target.value || '' )" >
+        <input
+          matInput
+          [placeholder]="headerSetting.displayName"
+          [value]="headerValue || ''"
+          (input)="changeHeaderValue($event.target.value || '')"
+        />
         <button matSuffix mat-icon-button (click)="resetOnClick()">
-          <mat-icon class='clear-select-icon'>clear</mat-icon>
+          <mat-icon class="clear-select-icon">clear</mat-icon>
         </button>
       </mat-form-field>
     </ng-container>
     <ng-container *ngSwitchCase="'select'">
       <mat-form-field>
         <mat-select
-            [placeholder]="headerSetting.displayName"
-            [value]="headerValue"
-            (selectionChange)="changeHeaderValue( $event.value )" >
+          [placeholder]="headerSetting.displayName"
+          [value]="headerValue"
+          (selectionChange)="changeHeaderValue($event.value)"
+        >
           <mat-option>reset</mat-option>
-          <mat-option *ngFor="let option of selectorOptions"
-              [value]="option.value">
-            {{option.viewValue}}
+          <mat-option
+            *ngFor="let option of selectorOptions"
+            [value]="option.value"
+          >
+            {{ option.viewValue }}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -31,39 +36,45 @@
     <ng-container *ngSwitchCase="'multiSelect-and'">
       <mat-form-field>
         <mat-select
-              [placeholder]="headerSetting.displayName"
-              [value]="headerValue"
-              (selectionChange)="changeHeaderValue( $event.value )"
-              multiple>
-          <mat-option *ngFor="let option of selectorOptions"
-              [value]="option.value">
-            {{option.viewValue}}
+          [placeholder]="headerSetting.displayName"
+          [value]="headerValue"
+          (selectionChange)="changeHeaderValue($event.value)"
+          multiple
+        >
+          <mat-option
+            *ngFor="let option of selectorOptions"
+            [value]="option.value"
+          >
+            {{ option.viewValue }}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <button mat-icon-button (click)="resetOnClick()">
-        <mat-icon class='clear-select-icon'>clear</mat-icon>
+        <mat-icon class="clear-select-icon">clear</mat-icon>
       </button>
     </ng-container>
     <ng-container *ngSwitchCase="'multiSelect-or'">
       <mat-form-field>
         <mat-select
-              [placeholder]="headerSetting.displayName"
-              [value]="headerValue"
-              (selectionChange)="changeHeaderValue( $event.value )"
-              multiple>
-          <mat-option *ngFor="let option of selectorOptions"
-              [value]="option.value">
-            {{option.viewValue}}
+          [placeholder]="headerSetting.displayName"
+          [value]="headerValue"
+          (selectionChange)="changeHeaderValue($event.value)"
+          multiple
+        >
+          <mat-option
+            *ngFor="let option of selectorOptions"
+            [value]="option.value"
+          >
+            {{ option.viewValue }}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <button mat-icon-button (click)="resetOnClick()">
-        <mat-icon class='clear-select-icon'>clear</mat-icon>
+        <mat-icon class="clear-select-icon">clear</mat-icon>
       </button>
     </ng-container>
     <ng-container *ngSwitchDefault>
-      <span> {{headerSetting.displayName}} </span>
+      <span> {{ headerSetting.displayName }} </span>
     </ng-container>
   </ng-container>
 </ng-container>

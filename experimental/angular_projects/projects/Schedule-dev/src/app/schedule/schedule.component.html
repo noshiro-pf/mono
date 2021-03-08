@@ -1,19 +1,21 @@
-<ng-container *ngIf="{
-      title             : title$             | async,
-      notes             : notes$             | async,
-      selectedDatetimes : selectedDatetimes$ | async,
-      answerDeadline    : answerDeadline$    | async,
-      symbols           : symbols$           | async,
-      password          : password$          | async,
-      passwordEnabled   : passwordEnabled$   | async,
-      createEventButtonDisabled : createEventButtonDisabled$ | async
-    } as data">
-
+<ng-container
+  *ngIf="{
+    title: title$ | async,
+    notes: notes$ | async,
+    selectedDatetimes: selectedDatetimes$ | async,
+    answerDeadline: answerDeadline$ | async,
+    symbols: symbols$ | async,
+    password: password$ | async,
+    passwordEnabled: passwordEnabled$ | async,
+    createEventButtonDisabled: createEventButtonDisabled$ | async
+  } as data"
+>
   <mat-vertical-stepper class="default-background-color" #stepper>
     <mat-step label="イベント名を入力">
       <app-name-and-notes
-        (titleChange)="titleChange( $event )"
-        (notesChange)="notesChange( $event )" >
+        (titleChange)="titleChange($event)"
+        (notesChange)="notesChange($event)"
+      >
       </app-name-and-notes>
       <div class="margined-element">
         <button mat-raised-button color="primary" matStepperNext>Next</button>
@@ -22,14 +24,17 @@
 
     <mat-step label="候補日程を選択">
       <app-select-dates
-        (selectedDatetimesChange)="selectedDatetimesChange( $event )">
+        (selectedDatetimesChange)="selectedDatetimesChange($event)"
+      >
       </app-select-dates>
       <div class="margined-element">
         <span class="margined-element">
-          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperPrevious>
+            Back
+          </button>
         </span>
         <span class="margined-element">
-          <button mat-raised-button color="primary" matStepperNext >Next</button>
+          <button mat-raised-button color="primary" matStepperNext>Next</button>
         </span>
       </div>
     </mat-step>
@@ -37,28 +42,36 @@
     <mat-step label="回答の設定">
       <app-answer-deadline
         [answerDeadlineInit]="data.answerDeadline"
-        (answerDeadlineChange)="answerDeadlineChange( $event )">
+        (answerDeadlineChange)="answerDeadlineChange($event)"
+      >
       </app-answer-deadline>
 
-      <hr>
+      <hr />
 
       <app-symbol-settings
-          [symbolsInit]="data.symbols"
-          (symbolsChange)="symbolsChange( $event )">
+        [symbolsInit]="data.symbols"
+        (symbolsChange)="symbolsChange($event)"
+      >
       </app-symbol-settings>
       <app-password
-        (enabledChange)="passwordEnabledChange( $event )"
-        (passwordChange)="passwordChange( $event )" >
+        (enabledChange)="passwordEnabledChange($event)"
+        (passwordChange)="passwordChange($event)"
+      >
       </app-password>
 
       <div class="margined-element">
         <span class="margined-element">
-          <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" matStepperPrevious>
+            Back
+          </button>
         </span>
         <span class="margined-element">
-          <button mat-raised-button color="accent"
-              (click)="createEvent( stepper )"
-              [disabled]="data.createEventButtonDisabled" >
+          <button
+            mat-raised-button
+            color="accent"
+            (click)="createEvent(stepper)"
+            [disabled]="data.createEventButtonDisabled"
+          >
             イベント作成
           </button>
         </span>
@@ -89,20 +102,21 @@
         </div>
         <div>
           <a [href]="eventPageUrl" target="_blank">
-            {{eventPageUrl}}
+            {{ eventPageUrl }}
           </a>
-          <button mat-button class="mini-button"
-              ngxClipboard
-              [cbContent]="eventPageUrl"
-              aria-label="copy-link"
-              matTooltip="リンクをコピー">
+          <button
+            mat-button
+            class="mini-button"
+            ngxClipboard
+            [cbContent]="eventPageUrl"
+            aria-label="copy-link"
+            matTooltip="リンクをコピー"
+          >
             <mat-icon aria-hidden="true">content_copy</mat-icon>
           </button>
         </div>
         <div class="margined-element">
-          <a mat-raised-button
-              [href]="eventPageUrl"
-              target="_blank">
+          <a mat-raised-button [href]="eventPageUrl" target="_blank">
             回答ページを表示
           </a>
         </div>

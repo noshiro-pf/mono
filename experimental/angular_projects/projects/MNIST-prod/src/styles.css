@@ -5,11 +5,11 @@
 :root {
   --toolbar-height: 56px;
   --main-height: 100vh;
-  --main-height-without-toolbar: calc(100vh - var(--toolbar-height) );
+  --main-height-without-toolbar: calc(100vh - var(--toolbar-height));
 }
 
 * {
-  font-family: "Helvetica","Arial",sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   box-sizing: border-box;
 }
 
@@ -21,9 +21,8 @@ a {
   text-decoration: none;
 }
 
-
 .default-background-color {
-  background-color: #F3EBAA;
+  background-color: #f3ebaa;
 }
 
 body {
@@ -34,7 +33,7 @@ input {
   min-width: 50px;
 }
 
-input[type=number] {
+input[type='number'] {
   text-align: right;
 }
 
@@ -42,8 +41,6 @@ mat-icon {
   display: inline-flex;
   vertical-align: middle;
 }
-
-
 
 .body-with-padding {
   padding: 20px;
@@ -70,10 +67,8 @@ mat-icon {
 }
 
 .box-shadow {
-  box-shadow:
-    0 3px 4px 0 rgba(0,0,0,.14),
-    0 3px 3px -2px rgba(0,0,0,.2),
-    0 1px 8px 0 rgba(0,0,0,.12)
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 3px 3px -2px rgba(0, 0, 0, 0.2),
+    0 1px 8px 0 rgba(0, 0, 0, 0.12);
 }
 
 .spacer {
@@ -102,15 +97,14 @@ mat-icon {
   position: relative; /* If you want text inside of it */
 }
 .square-container-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
 }
-
 
 .align-right {
   text-align: right;

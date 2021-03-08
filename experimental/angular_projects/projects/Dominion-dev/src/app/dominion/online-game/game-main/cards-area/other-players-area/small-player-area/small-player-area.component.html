@@ -1,92 +1,100 @@
-<ng-container *ngIf="{
-    PlayArea:        playerCards.PlayArea$ | async,
-    Aside:           playerCards.Aside$    | async,
-    turnPlayerIndex: turnPlayerIndex$      | async,
-    myIndex:         myIndex$              | async,
-    VPtoken:         VPtoken$              | async,
-    vcoin:           vcoin$                | async,
-    debt:            debt$                 | async
-  } as data">
-
-
-<div class="player-area"
-    [class.is-turn-player]="playerIndex === data.turnPlayerIndex">
-  <div class="players-name">
-    <span> {{playerName}} </span>
-    <span class="spacer"></span>
-    <mat-icon *ngIf="thinkingState">hourglass_full</mat-icon>
-  </div>
-
-  <ng-container *ngIf="playerIndex !== data.myIndex">
-
-    <div class="tokens">
-      <div *ngIf="data.vcoin + data.debt > 0"
-          class="vcoins-debts box-shadow">
-        <app-vcoins diameter="20" [number$]="vcoin$"></app-vcoins>
-        <app-debts  diameter="20" [number$]="debt$" ></app-debts>
-      </div>
-      <div class="spacer"></div>
-      <app-vp-tokens *ngIf="data.VPtoken > 0"
-          [diameter]="20" [VPtoken]="data.VPtoken"></app-vp-tokens>
+<ng-container
+  *ngIf="{
+    PlayArea: playerCards.PlayArea$ | async,
+    Aside: playerCards.Aside$ | async,
+    turnPlayerIndex: turnPlayerIndex$ | async,
+    myIndex: myIndex$ | async,
+    VPtoken: VPtoken$ | async,
+    vcoin: vcoin$ | async,
+    debt: debt$ | async
+  } as data"
+>
+  <div
+    class="player-area"
+    [class.is-turn-player]="playerIndex === data.turnPlayerIndex"
+  >
+    <div class="players-name">
+      <span> {{ playerName }} </span>
+      <span class="spacer"></span>
+      <mat-icon *ngIf="thinkingState">hourglass_full</mat-icon>
     </div>
-  <!-- <ng-container *ngIf="playerIndex !== data.turnPlayerIndex
+
+    <ng-container *ngIf="playerIndex !== data.myIndex">
+      <div class="tokens">
+        <div *ngIf="data.vcoin + data.debt > 0" class="vcoins-debts box-shadow">
+          <app-vcoins diameter="20" [number$]="vcoin$"></app-vcoins>
+          <app-debts diameter="20" [number$]="debt$"></app-debts>
+        </div>
+        <div class="spacer"></div>
+        <app-vp-tokens
+          *ngIf="data.VPtoken > 0"
+          [diameter]="20"
+          [VPtoken]="data.VPtoken"
+        ></app-vp-tokens>
+      </div>
+      <!-- <ng-container *ngIf="playerIndex !== data.turnPlayerIndex
                       && playerIndex !== data.myIndex"> -->
-    <div class="PlayArea_Aside">
-      <div *ngIf="data.PlayArea?.length > 0"
-          class="CardArea box-shadow PlayArea">
-        <app-cards-lined-up
-          [showCardProperty]="false"
-          [DCardArray$]="playerCards.PlayArea$"
-          [myIndex$]="myIndex$"
-          [width$]="width$"
-          (cardClicked)="onClick( $event )" >
-        </app-cards-lined-up>
+      <div class="PlayArea_Aside">
+        <div
+          *ngIf="data.PlayArea?.length > 0"
+          class="CardArea box-shadow PlayArea"
+        >
+          <app-cards-lined-up
+            [showCardProperty]="false"
+            [DCardArray$]="playerCards.PlayArea$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick($event)"
+          >
+          </app-cards-lined-up>
+        </div>
+        <div *ngIf="data.Aside?.length > 0" class="CardArea box-shadow Aside">
+          <app-cards-lined-up
+            [showCardProperty]="false"
+            [DCardArray$]="playerCards.Aside$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick($event)"
+          >
+          </app-cards-lined-up>
+        </div>
       </div>
-      <div *ngIf="data.Aside?.length > 0"
-          class="CardArea box-shadow Aside">
-        <app-cards-lined-up
-          [showCardProperty]="false"
-          [DCardArray$]="playerCards.Aside$"
-          [myIndex$]="myIndex$"
-          [width$]="width$"
-          (cardClicked)="onClick( $event )" >
-        </app-cards-lined-up>
-      </div>
-    </div>
 
-    <div class="Deck_HandCards_DiscardPile">
-      <div class="CardArea box-shadow Deck">
-        <app-cards-pile
-        [showArraySize]="true"
-        [showCardProperty]="false"
-        [DCardArray$]="playerCards.Deck$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-        </app-cards-pile>
+      <div class="Deck_HandCards_DiscardPile">
+        <div class="CardArea box-shadow Deck">
+          <app-cards-pile
+            [showArraySize]="true"
+            [showCardProperty]="false"
+            [DCardArray$]="playerCards.Deck$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick($event)"
+          >
+          </app-cards-pile>
+        </div>
+        <div class="CardArea box-shadow HandCards">
+          <app-cards-lined-up
+            [showCardProperty]="false"
+            [DCardArray$]="playerCards.HandCards$"
+            [myIndex$]="myIndex$"
+            [defaultArrayLength]="5"
+            [width$]="width$"
+            (cardClicked)="onClick($event)"
+          >
+          </app-cards-lined-up>
+        </div>
+        <div class="CardArea box-shadow DiscardPile">
+          <app-cards-pile
+            [showArraySize]="false"
+            [showCardProperty]="false"
+            [DCardArray$]="playerCards.DiscardPileReveresed$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick($event)"
+          >
+          </app-cards-pile>
+        </div>
       </div>
-      <div class="CardArea box-shadow HandCards">
-        <app-cards-lined-up
-          [showCardProperty]="false"
-          [DCardArray$]="playerCards.HandCards$"
-          [myIndex$]="myIndex$"
-          [defaultArrayLength]="5"
-          [width$]="width$"
-          (cardClicked)="onClick( $event )" >
-        </app-cards-lined-up>
-      </div>
-      <div class="CardArea box-shadow DiscardPile">
-        <app-cards-pile
-        [showArraySize]="false"
-        [showCardProperty]="false"
-        [DCardArray$]="playerCards.DiscardPileReveresed$"
-        [myIndex$]="myIndex$"
-        [width$]="width$"
-        (cardClicked)="onClick( $event )" >
-        </app-cards-pile>
-      </div>
-    </div>
-  </ng-container>
-
-</div>
+    </ng-container>
+  </div>
 </ng-container>

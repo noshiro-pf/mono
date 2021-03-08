@@ -5,22 +5,21 @@ export type ArrayElement<S> = S extends Array<infer T> ? T : never;
 
 export type Unwrap<S> = { [P in keyof S]: RNValue<S[P]> };
 
-export function unwrapCurr<T extends RN<any>[]>( ...rns: T ): Unwrap<T> {
-  return rns.map( e => e.value ) as Unwrap<T>;
+export function unwrapCurr<T extends RN<any>[]>(...rns: T): Unwrap<T> {
+  return rns.map((e) => e.value) as Unwrap<T>;
 }
 
-
-export function cancelableSleep( time: number ): [Promise<void>, () => void] {
+export function cancelableSleep(time: number): [Promise<void>, () => void] {
   let timerId: any;
   let reject: () => void;
 
-  const promise = new Promise<void>( (res, rej) => {
-    timerId = setTimeout( res, time );
+  const promise = new Promise<void>((res, rej) => {
+    timerId = setTimeout(res, time);
     reject = rej;
-  } );
+  });
 
   const cancel = () => {
-    clearTimeout( timerId );
+    clearTimeout(timerId);
     reject();
   };
 

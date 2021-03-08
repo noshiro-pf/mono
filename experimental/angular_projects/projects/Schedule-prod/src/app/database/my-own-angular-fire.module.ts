@@ -1,30 +1,21 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
+import { NgModule } from '@angular/core';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFireAuthModule } from 'angularfire2/auth';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
+import { environment } from '../../environments/environment';
 /* angular material */
 import { MyOwnCustomMaterialModule } from '../my-own-custom-material.module';
-
-
-import { environment } from '../../environments/environment';
-
-import { AngularFireModule         } from 'angularfire2';
-import { AngularFireAuthModule     } from 'angularfire2/auth';
-import { AngularFirestoreModule    } from 'angularfire2/firestore';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
-
 import { MyLibModule } from '../mylib/mylib.module';
-
-import { AutoBackupOnFirebaseService   } from './auto-backup-on-firebase.service';
-import { UserService             } from './user.service';
+import { AutoBackupOnFirebaseService } from './auto-backup-on-firebase.service';
 import { DatabaseService } from './database.service';
-
-import { EditDatabaseComponent         } from './edit-database.component';
-import { UserAdminComponent            } from './user-admin/user-admin.component';
-import { LoginComponent                } from './user-admin/login/login.component';
-import { SignUpComponent               } from './user-admin/sign-up/sign-up.component';
-import { MyPageComponent               } from './my-page.component';
-
+import { EditDatabaseComponent } from './edit-database.component';
+import { MyPageComponent } from './my-page.component';
+import { LoginComponent } from './user-admin/login/login.component';
+import { SignUpComponent } from './user-admin/sign-up/sign-up.component';
+import { UserAdminComponent } from './user-admin/user-admin.component';
+import { UserService } from './user.service';
 
 @NgModule({
   imports: [
@@ -43,10 +34,6 @@ import { MyPageComponent               } from './my-page.component';
     SignUpComponent,
     MyPageComponent,
   ],
-  providers: [
-    UserService,
-    DatabaseService,
-    AutoBackupOnFirebaseService,
-  ]
+  providers: [UserService, DatabaseService, AutoBackupOnFirebaseService],
 })
-export class MyOwnAngularFireModule { }
+export class MyOwnAngularFireModule {}

@@ -1,4 +1,3 @@
-
 .body {
   display: flex;
   height: var(--main-height-without-toolbar);
@@ -25,20 +24,19 @@
 }
 
 /********* side bar ***************/
-.sidebar,.game-result-bar {
+.sidebar,
+.game-result-bar {
   flex-basis: 48px;
   flex-grow: 0;
 }
 
 /********* side navi ***************/
 .sidenav-container {
-  background-color: #F3EBAA;
+  background-color: #f3ebaa;
   flex-basis: 800px;
   flex-grow: 1;
   height: 100%;
-
 }
-
 
 /*****************************************************/
 
@@ -54,25 +52,17 @@
   overflow-y: auto;
 }
 
-.main
-  .upper-part
-  .shared-area_other-players-area {
+.main .upper-part .shared-area_other-players-area {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 }
-.main
-  .upper-part
-  .shared-area_other-players-area
-  .shared-area {
+.main .upper-part .shared-area_other-players-area .shared-area {
   flex: 1;
   flex-basis: 400px;
 }
 
-.main
-  .upper-part
-  .shared-area_other-players-area
-  .other-players-area {
+.main .upper-part .shared-area_other-players-area .other-players-area {
   flex-basis: auto;
 }
 

@@ -1,58 +1,74 @@
-<ng-container *ngIf="{
-      card:         card$         | async,
-      width:        width$        | async,
-      height:       height$       | async,
-      sourceUrl:    sourceUrl$    | async,
-      borderWidth:  borderWidth$  | async,
-      borderRadius: borderRadius$ | async,
-      faceUp:       faceUp$       | async,
-      isButton:     isButton$     | async,
-      empty:        empty$        | async
-    } as data">
-
-<ng-container *ngIf="!!data.card && !!data.sourceUrl; then card; else loading"></ng-container>
-<!-- <ng-template #loading>Loading...</ng-template> -->
-<ng-template #loading>
-  <div class="center"
+<ng-container
+  *ngIf="{
+    card: card$ | async,
+    width: width$ | async,
+    height: height$ | async,
+    sourceUrl: sourceUrl$ | async,
+    borderWidth: borderWidth$ | async,
+    borderRadius: borderRadius$ | async,
+    faceUp: faceUp$ | async,
+    isButton: isButton$ | async,
+    empty: empty$ | async
+  } as data"
+>
+  <ng-container
+    *ngIf="!!data.card && !!data.sourceUrl; then card; else loading"
+  ></ng-container>
+  <!-- <ng-template #loading>Loading...</ng-template> -->
+  <ng-template #loading>
+    <div
+      class="center"
       [style.width.px]="data.width"
       [style.height.px]="data.height"
       [style.border-width.px]="data.borderWidth"
-      [style.border-radius.px]="data.borderRadius">
-    Loading...
-  </div>
-</ng-template>
-<ng-template #card>
-  <ng-container *ngIf="data.empty; then emptyCard; else main"></ng-container>
-  <ng-template #emptyCard>
-    <div class="dominionCard" #emptyCard>
-      <div>
-        <img [src]="data.sourceUrl" [width]="data.width" [height]="data.height">
-      </div>
-      <div *ngIf="description?.length > 0" class="description">{{description}}</div>
+      [style.border-radius.px]="data.borderRadius"
+    >
+      Loading...
     </div>
   </ng-template>
-  <ng-template #main>
-    <div class="dominionCard">
-      <div class="box-shadow"
-            [class.faceUp]="data.faceUp"
-            [class.faceDown]="!data.faceUp"
-            [class.pointer]="data.isButton"
-            [class.is-button]="data.isButton"
-            [style.width.px]="data.width"
-            [style.height.px]="data.height"
-            [style.border-width.px]="data.borderWidth"
-            [style.border-radius.px]="data.borderRadius"
-            (click)="onClicked()">
-        <img class="image-box"
+  <ng-template #card>
+    <ng-container *ngIf="data.empty; then emptyCard; else main"></ng-container>
+    <ng-template #emptyCard>
+      <div class="dominionCard" #emptyCard>
+        <div>
+          <img
+            [src]="data.sourceUrl"
+            [width]="data.width"
+            [height]="data.height"
+          />
+        </div>
+        <div *ngIf="description?.length > 0" class="description">
+          {{ description }}
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #main>
+      <div class="dominionCard">
+        <div
+          class="box-shadow"
+          [class.faceUp]="data.faceUp"
+          [class.faceDown]="!data.faceUp"
+          [class.pointer]="data.isButton"
+          [class.is-button]="data.isButton"
+          [style.width.px]="data.width"
+          [style.height.px]="data.height"
+          [style.border-width.px]="data.borderWidth"
+          [style.border-radius.px]="data.borderRadius"
+          (click)="onClicked()"
+        >
+          <img
+            class="image-box"
             [src]="data.sourceUrl"
             [width]="data.width"
             [height]="data.height"
             [style.border-width.px]="data.borderWidth"
-            [style.border-radius.px]="data.borderRadius">
+            [style.border-radius.px]="data.borderRadius"
+          />
+        </div>
+        <div *ngIf="description?.length > 0" class="description">
+          {{ description }}
+        </div>
       </div>
-      <div *ngIf="description?.length > 0" class="description">{{description}}</div>
-    </div>
+    </ng-template>
   </ng-template>
-</ng-template>
-
 </ng-container>

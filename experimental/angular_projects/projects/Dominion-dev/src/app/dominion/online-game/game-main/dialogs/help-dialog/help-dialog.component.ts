@@ -7,14 +7,11 @@ import { Component, OnInit } from '@angular/core';
     '../../sidebars/sidebar-left/turn-info/turn-info.component.css',
     '../../sidebars/sidebar-left/sidebar-left.component.css',
     '../../cards-area/cards-area/cards-area/cards-area.component.css',
-    './help-dialog.component.css'
+    './help-dialog.component.css',
   ],
 })
 export class HelpDialogComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

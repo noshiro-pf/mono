@@ -1,18 +1,23 @@
-<ng-container *ngIf="{
-      sortBy                 : sortBy$                 | async,
-      table                  : table$                  | async,
-      settings               : settings$               | async,
-      itemsPerPage           : itemsPerPage$           | async,
-      pageNumber             : pageNumber$             | async,
-      headerValuesAll        : headerValuesAll$        | async,
-      selectorOptionsAll     : selectorOptionsAll$     | async,
-      tableSlicedTransformedIndexed : tableSlicedTransformedIndexed$ | async,
-      filteredLength        : filteredLength$        | async
-    } as data">
-
-  <div *ngIf="(!!data.table && !!data.tableSlicedTransformedIndexed)
-                then main; else loading ">
-  </div>
+<ng-container
+  *ngIf="{
+    sortBy: sortBy$ | async,
+    table: table$ | async,
+    settings: settings$ | async,
+    itemsPerPage: itemsPerPage$ | async,
+    pageNumber: pageNumber$ | async,
+    headerValuesAll: headerValuesAll$ | async,
+    selectorOptionsAll: selectorOptionsAll$ | async,
+    tableSlicedTransformedIndexed: tableSlicedTransformedIndexed$ | async,
+    filteredLength: filteredLength$ | async
+  } as data"
+>
+  <div
+    *ngIf="
+      !!data.table && !!data.tableSlicedTransformedIndexed;
+      then main;
+      else loading
+    "
+  ></div>
 
   <ng-template #loading>
     <div class="body-with-padding">
@@ -23,106 +28,137 @@
     <div class="pager-wrapper">
       <div *ngIf="data.settings.usepagination">
         <app-items-per-page
-            [options]='data.settings.itemsPerPageOptions'
-            [itemsPerPage]='data.itemsPerPage'
-            (itemsPerPageChange)="itemsPerPageOnChange( $event )">
+          [options]="data.settings.itemsPerPageOptions"
+          [itemsPerPage]="data.itemsPerPage"
+          (itemsPerPageChange)="itemsPerPageOnChange($event)"
+        >
         </app-items-per-page>
         <app-pagination
-            [itemsPerPage]='data.itemsPerPage'
-            [pageNumber]='data.pageNumber'
-            [rowSize]='data.filteredLength'
-            (pageNumberChange)="pageNumberOnChange( $event )">
+          [itemsPerPage]="data.itemsPerPage"
+          [pageNumber]="data.pageNumber"
+          [rowSize]="data.filteredLength"
+          (pageNumberChange)="pageNumberOnChange($event)"
+        >
         </app-pagination>
       </div>
     </div>
 
     <div class="margined-element">
-      <span class="margined-element">
-        {{data.filteredLength}} items
-      </span>
-      <span class='reset-button'>
-        <button mat-raised-button (click)="resetAllOnClick()">
-          Reset All
-        </button>
+      <span class="margined-element"> {{ data.filteredLength }} items </span>
+      <span class="reset-button">
+        <button mat-raised-button (click)="resetAllOnClick()">Reset All</button>
       </span>
     </div>
 
     <table
-        matSort
-          [matSortActive]="data.sortBy.active"
-          [matSortDirection]="data.sortBy.direction"
-          (matSortChange)="sortOnChange( $event )"
-        class='data-table shadow3px vertical-line'>
+      matSort
+      [matSortActive]="data.sortBy.active"
+      [matSortDirection]="data.sortBy.direction"
+      (matSortChange)="sortOnChange($event)"
+      class="data-table shadow3px vertical-line"
+    >
       <thead *ngIf="!!data.headerValuesAll && !!data.selectorOptionsAll">
         <tr>
-          <th *ngIf="data.settings.displayNo"
-              class="cell-align-center">
-            <div [mat-sort-header]="NoColumn">
-              No.
-            </div>
+          <th *ngIf="data.settings.displayNo" class="cell-align-center">
+            <div [mat-sort-header]="NoColumn">No.</div>
           </th>
-          <th *ngFor='let header of data.settings.headerSettings; let colIndex = index'>
-            <div class="header-cell"
-                [class.cell-align-left]="header.align === 'l' "
-                [class.cell-align-center]="header.align === 'c' "
-                [class.cell-align-right]="header.align === 'r' " >
+          <th
+            *ngFor="
+              let header of data.settings.headerSettings;
+              let colIndex = index
+            "
+          >
+            <div
+              class="header-cell"
+              [class.cell-align-left]="header.align === 'l'"
+              [class.cell-align-center]="header.align === 'c'"
+              [class.cell-align-right]="header.align === 'r'"
+            >
               <app-header-cell
                 [headerSetting]="header"
                 [selectorOptions]="data.selectorOptionsAll[colIndex]"
                 [headerValue]="data.headerValuesAll[colIndex]"
-                (headerValueChange)="headerValueOnChange( colIndex, $event )"
-                (reset)="resetOnClick( colIndex )">
+                (headerValueChange)="headerValueOnChange(colIndex, $event)"
+                (reset)="resetOnClick(colIndex)"
+              >
               </app-header-cell>
-              <span *ngIf="header.sort"
-                [mat-sort-header]="colIndex.toString()">
+              <span *ngIf="header.sort" [mat-sort-header]="colIndex.toString()">
               </span>
             </div>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor='let line of data.tableSlicedTransformedIndexed'>
-          <td *ngIf="data.settings.displayNo"
-              class="cell-align-center">
-            {{line.idx + 1}}
+        <tr *ngFor="let line of data.tableSlicedTransformedIndexed">
+          <td *ngIf="data.settings.displayNo" class="cell-align-center">
+            {{ line.idx + 1 }}
           </td>
-          <td *ngFor='let header of data.settings.headerSettings; let colIndex = index'
-              [class.cell-align-left]="header.align=='l'"
-              [class.cell-align-center]="header.align=='c'"
-              [class.cell-align-right]="header.align=='r'" >
-
+          <td
+            *ngFor="
+              let header of data.settings.headerSettings;
+              let colIndex = index
+            "
+            [class.cell-align-left]="header.align == 'l'"
+            [class.cell-align-center]="header.align == 'c'"
+            [class.cell-align-right]="header.align == 'r'"
+          >
             <div *ngIf="header.isButton; then thenBlock; else elseBlock"></div>
             <ng-template #thenBlock>
-              <button mat-button color="primary"
-                    (click)="cellOnClick(
-                        line.idx,
-                        colIndex,
-                        data.itemsPerPage,
-                        data.pageNumber,
-                        data.tableSlicedTransformedIndexed )">
+              <button
+                mat-button
+                color="primary"
+                (click)="
+                  cellOnClick(
+                    line.idx,
+                    colIndex,
+                    data.itemsPerPage,
+                    data.pageNumber,
+                    data.tableSlicedTransformedIndexed
+                  )
+                "
+              >
                 {{ line.val[colIndex] }}
               </button>
             </ng-template>
             <ng-template #elseBlock>
-              <ng-container *ngIf="header.makeSubTable; then subTable; else normal">
+              <ng-container
+                *ngIf="header.makeSubTable; then subTable; else normal"
+              >
               </ng-container>
               <ng-template #normal>
                 {{ line.val[colIndex] }}
               </ng-template>
               <ng-template #subTable>
-                <table class='data-table small-table'>
+                <table class="data-table small-table">
                   <thead>
                     <tr>
-                      <th *ngFor="let h of header.subTableHeader">{{h.name}}</th>
+                      <th *ngFor="let h of header.subTableHeader">
+                        {{ h.name }}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor='let subline of line.val[colIndex]; let subTablecolIdx = index'>
-                      <td *ngFor="let e of subline"
-                          [class.narrow-cell]="header.subTableHeader[subTablecolIdx].width === 'narrow' "
-                          [class.normal-cell]="header.subTableHeader[subTablecolIdx].width === 'normal' "
-                          [class.wide-cell]="header.subTableHeader[subTablecolIdx].width === 'wide' " >
-                        {{e}}
+                    <tr
+                      *ngFor="
+                        let subline of line.val[colIndex];
+                        let subTablecolIdx = index
+                      "
+                    >
+                      <td
+                        *ngFor="let e of subline"
+                        [class.narrow-cell]="
+                          header.subTableHeader[subTablecolIdx].width ===
+                          'narrow'
+                        "
+                        [class.normal-cell]="
+                          header.subTableHeader[subTablecolIdx].width ===
+                          'normal'
+                        "
+                        [class.wide-cell]="
+                          header.subTableHeader[subTablecolIdx].width === 'wide'
+                        "
+                      >
+                        {{ e }}
                       </td>
                     </tr>
                   </tbody>
@@ -136,17 +172,18 @@
 
     <div>
       <div *ngIf="data.settings.usepagination" class="pager-wrapper">
-
         <app-items-per-page
-            [options]='data.settings.itemsPerPageOptions'
-            [itemsPerPage]='data.itemsPerPage'
-            (itemsPerPageChange)="itemsPerPageOnChange( $event )">
+          [options]="data.settings.itemsPerPageOptions"
+          [itemsPerPage]="data.itemsPerPage"
+          (itemsPerPageChange)="itemsPerPageOnChange($event)"
+        >
         </app-items-per-page>
         <app-pagination
-            [itemsPerPage]='data.itemsPerPage'
-            [pageNumber]='data.pageNumber'
-            [rowSize]='data.filteredLength'
-            (pageNumberChange)="pageNumberOnChange( $event )">
+          [itemsPerPage]="data.itemsPerPage"
+          [pageNumber]="data.pageNumber"
+          [rowSize]="data.filteredLength"
+          (pageNumberChange)="pageNumberOnChange($event)"
+        >
         </app-pagination>
       </div>
     </div>

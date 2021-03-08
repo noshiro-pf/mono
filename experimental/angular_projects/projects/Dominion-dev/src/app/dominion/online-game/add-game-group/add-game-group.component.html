@@ -1,74 +1,82 @@
-<ng-container *ngIf="{
-    numberOfPlayers:       numberOfPlayers$       | async,
-    isSelectedExpansions:  isSelectedExpansions$  | async,
+<ng-container
+  *ngIf="{
+    numberOfPlayers: numberOfPlayers$ | async,
+    isSelectedExpansions: isSelectedExpansions$ | async,
     disableMakeRoomButton: disableMakeRoomButton$ | async,
-    preparingDialog:       preparingDialog$       | async,
-    memo:                  memo$                  | async
-  } as data">
+    preparingDialog: preparingDialog$ | async,
+    memo: memo$ | async
+  } as data"
+>
+  <div class="body-with-padding">
+    <span class="margined-element">
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="data.disableMakeRoomButton"
+        (click)="
+          makeNewGameRoomClicked(
+            data.numberOfPlayers,
+            data.isSelectedExpansions
+          )
+        "
+      >
+        部屋を作成
+      </button>
+    </span>
+    <span *ngIf="isdevmode" class="margined-element">
+      <mat-checkbox
+        [checked]="addTestPlayer"
+        (change)="addTestPlayerChecked($event.checked)"
+      >
+        テストプレイヤーを追加
+      </mat-checkbox>
+    </span>
+    <span *ngIf="data.preparingDialog" class="margined-element"> 準備中… </span>
 
+    <hr />
 
-<div class="body-with-padding" >
-  <span class="margined-element">
-    <button mat-raised-button color='primary'
-      [disabled]="data.disableMakeRoomButton"
-      (click)="makeNewGameRoomClicked(
-          data.numberOfPlayers,
-          data.isSelectedExpansions )" >
-      部屋を作成
-    </button>
-  </span>
-  <span *ngIf="isdevmode" class="margined-element">
-    <mat-checkbox [checked]="addTestPlayer"
-        (change)="addTestPlayerChecked( $event.checked )">
-      テストプレイヤーを追加
-    </mat-checkbox>
-  </span>
-  <span *ngIf="data.preparingDialog" class="margined-element">
-    準備中…
-  </span>
-
-  <hr>
-
-  <div class="margined-element">
-
-    <div>
-      <span>人数（自分含む）：</span>
-      <button mat-raised-button class="mini-button"
+    <div class="margined-element">
+      <div>
+        <span>人数（自分含む）：</span>
+        <button
+          mat-raised-button
+          class="mini-button"
           [disabled]="data.numberOfPlayers <= 2"
-          (click)="decrement( data.numberOfPlayers )">
-        <mat-icon>exposure_neg_1</mat-icon>
-      </button>
-      <span>{{data.numberOfPlayers}}人</span>
-      <button mat-raised-button class="mini-button"
+          (click)="decrement(data.numberOfPlayers)"
+        >
+          <mat-icon>exposure_neg_1</mat-icon>
+        </button>
+        <span>{{ data.numberOfPlayers }}人</span>
+        <button
+          mat-raised-button
+          class="mini-button"
           [disabled]="data.numberOfPlayers >= 6"
-          (click)="increment( data.numberOfPlayers )">
-        <mat-icon>exposure_plus_1</mat-icon>
-      </button>
+          (click)="increment(data.numberOfPlayers)"
+        >
+          <mat-icon>exposure_plus_1</mat-icon>
+        </button>
+      </div>
+
+      <div>
+        Memo：{{ data.memo }}
+        <button mat-icon-button (click)="memoClicked()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
     </div>
 
-    <div>
-      Memo：{{data.memo}}
-      <button mat-icon-button (click)="memoClicked()">
-        <mat-icon>edit</mat-icon>
-      </button>
-    </div>
+    <hr />
 
+    <app-randomizer
+      [implementedOnly]="true"
+      [showSelectedCardsCheckbox]="false"
+      [useHistory]="false"
+      [isSelectedExpansions$]="isSelectedExpansions$"
+      [selectedCards$]="selectedCards$"
+      (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange($event)"
+      (selectedCardsChange)="selectedCardsOnChange($event)"
+      (BlackMarketPileShuffledChange)="BlackMarketPileShuffledOnChange($event)"
+    >
+    </app-randomizer>
   </div>
-
-  <hr>
-
-  <app-randomizer
-    [implementedOnly]="true"
-    [showSelectedCardsCheckbox]="false"
-    [useHistory]="false"
-
-    [isSelectedExpansions$]="isSelectedExpansions$"
-    [selectedCards$]="selectedCards$"
-
-    (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )"
-    (selectedCardsChange)="selectedCardsOnChange( $event )"
-    (BlackMarketPileShuffledChange)="BlackMarketPileShuffledOnChange( $event )"
-  >
-  </app-randomizer>
-</div>
 </ng-container>

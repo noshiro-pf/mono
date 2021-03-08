@@ -1,82 +1,98 @@
-<ng-container *ngIf="{
-    currentPhase:            currentPhase$            | async,
-    cardPropertyList:        cardPropertyList$        | async,
+<ng-container
+  *ngIf="{
+    currentPhase: currentPhase$ | async,
+    cardPropertyList: cardPropertyList$ | async,
     BlackMarketPileShuffled: BlackMarketPileShuffled$ | async,
-    putOnTheBottomDone:      putOnTheBottomDone$      | async
-  } as data">
-
-<div class="body-with-padding">
-
-  <div class="margined-element" >
-
-    <div [ngSwitch]="data.currentPhase">
-      <button *ngSwitchCase="PHASE.init"
-          mat-raised-button color="primary"
-          (click)="revealTop3Cards(
-              data.cardPropertyList,
-              data.BlackMarketPileShuffled )">
-        上から3枚めくる
-      </button>
-      <button *ngSwitchCase="PHASE.buy"
-          mat-raised-button color="primary"
-          (click)="onClick('buy', -1, true)">
-        購入しない
-      </button>
-      <div *ngSwitchCase="PHASE.putOnTheBottom">
-        <span>
-          残りを好きな順に戻してください。（クリックしたものが一番下に差し込まれます）
-        </span>
+    putOnTheBottomDone: putOnTheBottomDone$ | async
+  } as data"
+>
+  <div class="body-with-padding">
+    <div class="margined-element">
+      <div [ngSwitch]="data.currentPhase">
         <button
-            mat-raised-button color="primary"
-            [disabled]="!data.putOnTheBottomDone"
-            (click)="onClick('putOnTheBottom', -1, true)">
-          OK
+          *ngSwitchCase="PHASE.init"
+          mat-raised-button
+          color="primary"
+          (click)="
+            revealTop3Cards(data.cardPropertyList, data.BlackMarketPileShuffled)
+          "
+        >
+          上から3枚めくる
         </button>
+        <button
+          *ngSwitchCase="PHASE.buy"
+          mat-raised-button
+          color="primary"
+          (click)="onClick('buy', -1, true)"
+        >
+          購入しない
+        </button>
+        <div *ngSwitchCase="PHASE.putOnTheBottom">
+          <span>
+            残りを好きな順に戻してください。（クリックしたものが一番下に差し込まれます）
+          </span>
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="!data.putOnTheBottomDone"
+            (click)="onClick('putOnTheBottom', -1, true)"
+          >
+            OK
+          </button>
+        </div>
       </div>
     </div>
 
+    <div
+      class="CardArea BlackMarketPile"
+      *ngIf="data.cardPropertyList && data.BlackMarketPileShuffled"
+    >
+      <ng-container [ngSwitch]="data.currentPhase">
+        <div *ngSwitchCase="PHASE.init" class="card-image-area">
+          <div
+            *ngFor="let card of data.BlackMarketPileShuffled; let idx = index"
+            class="card-image-element"
+          >
+            <app-dominion-card-image
+              [height]="longSideLength"
+              [isButton]="false"
+              [faceUp]="card.faceUp"
+              [card]="data.cardPropertyList[card.cardIndex]"
+            >
+            </app-dominion-card-image>
+          </div>
+        </div>
+        <div *ngSwitchCase="PHASE.buy" class="card-image-area">
+          <div
+            *ngFor="let card of data.BlackMarketPileShuffled; let idx = index"
+            class="card-image-element"
+          >
+            <app-dominion-card-image
+              [height]="longSideLength"
+              [isButton]="card.faceUp"
+              [faceUp]="card.faceUp"
+              [card]="data.cardPropertyList[card.cardIndex]"
+              (click)="onClick('buy', idx, card.faceUp)"
+            >
+            </app-dominion-card-image>
+          </div>
+        </div>
+        <div *ngSwitchCase="PHASE.putOnTheBottom" class="card-image-area">
+          <div
+            *ngFor="let card of data.BlackMarketPileShuffled; let idx = index"
+            class="card-image-element"
+          >
+            <app-dominion-card-image
+              [height]="longSideLength"
+              [isButton]="card.faceUp"
+              [faceUp]="card.faceUp"
+              [card]="data.cardPropertyList[card.cardIndex]"
+              (click)="onClick('putOnTheBottom', idx, card.faceUp)"
+            >
+            </app-dominion-card-image>
+          </div>
+        </div>
+      </ng-container>
+    </div>
   </div>
-
-
-  <div class="CardArea BlackMarketPile"
-      *ngIf="data.cardPropertyList && data.BlackMarketPileShuffled">
-    <ng-container [ngSwitch]="data.currentPhase">
-      <div *ngSwitchCase="PHASE.init" class="card-image-area">
-        <div *ngFor="let card of data.BlackMarketPileShuffled; let idx = index"
-            class="card-image-element">
-          <app-dominion-card-image
-            [height]="longSideLength"
-            [isButton]="false"
-            [faceUp]="card.faceUp"
-            [card]="data.cardPropertyList[card.cardIndex]">
-          </app-dominion-card-image>
-        </div>
-      </div>
-      <div *ngSwitchCase="PHASE.buy" class="card-image-area">
-        <div *ngFor="let card of data.BlackMarketPileShuffled; let idx = index"
-            class="card-image-element">
-          <app-dominion-card-image
-            [height]="longSideLength"
-            [isButton]="card.faceUp"
-            [faceUp]="card.faceUp"
-            [card]="data.cardPropertyList[card.cardIndex]"
-            (click)="onClick('buy', idx, card.faceUp)">
-          </app-dominion-card-image>
-        </div>
-      </div>
-      <div *ngSwitchCase="PHASE.putOnTheBottom" class="card-image-area">
-        <div *ngFor="let card of data.BlackMarketPileShuffled; let idx = index"
-            class="card-image-element">
-          <app-dominion-card-image
-            [height]="longSideLength"
-            [isButton]="card.faceUp"
-            [faceUp]="card.faceUp"
-            [card]="data.cardPropertyList[card.cardIndex]"
-            (click)="onClick('putOnTheBottom', idx, card.faceUp)">
-          </app-dominion-card-image>
-        </div>
-      </div>
-    </ng-container>
-  </div>
-</div>
 </ng-container>

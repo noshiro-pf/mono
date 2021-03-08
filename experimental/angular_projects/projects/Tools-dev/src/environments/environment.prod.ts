@@ -6,6 +6,6 @@ export const environment = {
     databaseURL: 'https://pikoappsproduct.firebaseio.com',
     projectId: 'pikoappsproduct',
     storageBucket: '',
-    messagingSenderId: '745841731865'
-  }
+    messagingSenderId: '745841731865',
+  },
 };

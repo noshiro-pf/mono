@@ -3,19 +3,15 @@ import { RN } from '../RN';
 
 type Observable<T> = any;
 
-export const fromObservable = <T>(
-    initialValue: T,
-    obs: Observable<T>
-  ) => new FromObservableRN<T>( initialValue, obs );
-
-
+export const fromObservable = <T>(initialValue: T, obs: Observable<T>) =>
+  new FromObservableRN<T>(initialValue, obs);
 
 class FromObservableRN<T> extends RN<T> {
   private obs: Observable<T>;
   private latestValue: T;
 
-  constructor( initialValue: T, obs: Observable<T> ) {
-    super( initialValue, [] );
+  constructor(initialValue: T, obs: Observable<T>) {
+    super(initialValue, []);
     this.obs = obs;
     this.latestValue = initialValue;
     // this.obs.subscribe(
