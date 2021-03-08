@@ -1,4 +1,9 @@
-import { Option } from '@noshiro/ts-utils';
+import {
+  assertNotType,
+  assertType,
+  Option,
+  TypeExtends,
+} from '@noshiro/ts-utils';
 import { ObservableId, Token } from './id';
 import { ObservableKind } from './observable-kind';
 import {
@@ -7,7 +12,7 @@ import {
   RootObservableType,
   SyncChildObservableType,
 } from './observable-type';
-import { NonEmptyUnknownList, Operator, Subscription, Wrap } from './types';
+import { NonEmptyUnknownList, Subscription } from './types';
 
 /**
  * inheritance
@@ -106,3 +111,31 @@ export const isChildObservable = <A>(
   obs: Observable<A>
 ): obs is ChildObservable<A> =>
   obs.kind === 'sync child' || obs.kind === 'async child';
+
+export type Operator<A, B> = (src: Observable<A>) => Observable<B>;
+
+export type ObservableValue<A> = A extends Observable<infer B> ? B : never;
+
+export type Unwrap<A extends Observable<unknown>[]> = {
+  [P in keyof A]: ObservableValue<A[P]>;
+};
+
+export type Wrap<A extends unknown[]> = { [P in keyof A]: Observable<A[P]> };
+
+assertType<TypeExtends<number, ObservableValue<Observable<number>>>>();
+assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
+
+assertType<
+  TypeExtends<
+    [number, string],
+    Unwrap<[Observable<number>, Observable<string>]>
+  >
+>();
+assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
+
+assertType<
+  TypeExtends<[Observable<number>, Observable<number>], Wrap<[number, number]>>
+>();
+assertNotType<
+  TypeExtends<[Observable<number>, Observable<string>], Wrap<[number, number]>>
+>();

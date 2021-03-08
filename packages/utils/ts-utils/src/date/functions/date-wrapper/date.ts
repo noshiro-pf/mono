@@ -1,4 +1,4 @@
-import { DateEnum } from '../../types/date';
+import { DateEnum } from '../../types';
 
 export const getDate = (date: Date): DateEnum => date.getDate() as DateEnum;
 

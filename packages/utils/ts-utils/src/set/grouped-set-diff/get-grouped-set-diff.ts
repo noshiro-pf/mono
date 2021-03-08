@@ -1,10 +1,8 @@
-import {
-  mappedSet,
-  setFilter,
-  setFilterNot,
-  setIntersection,
-  setSubtract,
-} from '../../set';
+import { setFilter } from '../filter';
+import { setFilterNot } from '../filter-not';
+import { setIntersection } from '../intersection';
+import { mappedSet } from '../map';
+import { setSubtract } from '../subtract';
 import { IGroupedSetDiff, IGroupedSetDiffType } from './grouped-set-diff';
 
 /**

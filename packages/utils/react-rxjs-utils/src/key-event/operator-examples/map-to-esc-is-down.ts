@@ -1,6 +1,6 @@
 import { KeyboardEventType } from '@noshiro/react-utils';
 import { Observable, OperatorFunction } from 'rxjs';
-import { mapToTargetKeyIsDown } from '../custom-operators/map-to-target-key-is-down';
+import { mapToTargetKeyIsDown } from '../custom-operators';
 
 export const mapToEscapeKeyIsDown = (): OperatorFunction<
   ['down' | 'up', KeyboardEventType],

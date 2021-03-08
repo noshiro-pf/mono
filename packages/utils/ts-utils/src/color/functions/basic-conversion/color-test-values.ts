@@ -1,4 +1,4 @@
-import { Hsl, Rgb } from '../../../color';
+import { Hsl, Rgb } from '../../types';
 
 type TestColorObject = Readonly<{
   HEX: string;

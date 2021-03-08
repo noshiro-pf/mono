@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { Mappable } from '@noshiro/ts-utils';
-import { WritingsInfo } from '../../types/writings';
+import { WritingsInfo } from '../../types';
 import { WritingsElement } from './writings-element';
 
 export const WritingsView = memoNamed<{

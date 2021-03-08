@@ -1,5 +1,5 @@
 import { ReducerType } from '../../types';
-import { newArray } from '../create/new-array';
+import { newArray } from '../create';
 import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
 export const scan = <A, B>(reducer: ReducerType<B, A>, init: B) => (

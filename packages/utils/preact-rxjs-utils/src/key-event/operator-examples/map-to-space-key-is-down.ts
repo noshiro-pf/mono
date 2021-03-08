@@ -1,5 +1,5 @@
 import { Observable, OperatorFunction } from 'rxjs';
-import { mapToTargetKeyIsDown } from '../custom-operators/map-to-target-key-is-down';
+import { mapToTargetKeyIsDown } from '../custom-operators';
 
 export const mapToSpaceKeyIsDown = (): OperatorFunction<
   ['down' | 'up', KeyboardEvent],

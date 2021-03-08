@@ -1,12 +1,14 @@
-import { ProductsInfo } from '../types/products';
-import CatanDiceImage from './images/catan_dice_app.png';
-import ColorDemoImage from './images/color_demo_app.png';
-import DominionOnlineImage from './images/dominion_online_app.png';
-import ScheduleImage from './images/event_schedule_app1.png';
-import EventScheduleApp2Image from './images/event_schedule_app2.png';
-import HousingLoanCalculatorImage from './images/housing_loan_calculator_app.png';
-import LambdaInterpreterAppImage from './images/lambda_interpreter_app.png';
-import MnistAppImage from './images/mnist_app.png';
+import { ProductsInfo } from '../types';
+import {
+  CatanDiceImage,
+  ColorDemoImage,
+  DominionOnlineImage,
+  EventScheduleApp2Image,
+  HousingLoanCalculatorImage,
+  LambdaInterpreterAppImage,
+  MnistAppImage,
+  ScheduleImage,
+} from './images';
 
 export const products: {
   libraries: ProductsInfo[];

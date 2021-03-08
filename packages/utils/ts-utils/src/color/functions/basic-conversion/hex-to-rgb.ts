@@ -1,5 +1,5 @@
-import { Rgb, RgbValue } from '../../../color';
 import { clamp } from '../../../num';
+import { Rgb, RgbValue } from '../../types';
 
 const clamp255 = clamp(0, 255) as (target: number) => RgbValue;
 

@@ -3,7 +3,7 @@ import { DateInput, IDateInputProps } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { getDate, getMonth, getYear } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { YearMonthDate } from './types/year-month-date';
+import { YearMonthDate } from './types';
 
 const formatDate = (date: Date): string => date.toLocaleDateString();
 const parseDate = (str: string): Date => new Date(str);

@@ -10,9 +10,9 @@ import { IEventSchedule } from '../../../types/record/event-schedule';
 import { IList } from '../../../utils/immutable';
 import { CustomIcon } from '../../atoms/icon';
 import { Td, Th } from '../../atoms/table-cell-centered';
-import { DatetimeRangeCell } from '.././answer-table/datetime-range-cell';
 import { useAnswerTableHooks } from './answer-table-hooks';
 import { CommentButton } from './comment-button';
+import { DatetimeRangeCell } from './datetime-range-cell';
 import { SortButton } from './sort-button';
 
 type Props = Readonly<{

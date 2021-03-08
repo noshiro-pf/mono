@@ -1,7 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { products } from '../../contents/products';
-import { ProductsViewMobile } from './products-mobile-view/products-mobile-view';
-import { ProductsView } from './products-view/products-view';
+import { products } from '../../contents';
+import { ProductsViewMobile } from './products-mobile-view';
+import { ProductsView } from './products-view';
 
 export const Products = memoNamed<{ mobile: boolean }>(
   'Products',

@@ -1,4 +1,5 @@
 import { AppBar } from '@material-ui/core';
+import { MuiTabs } from '@noshiro/react-material-ui-utils';
 import { useNavigator, usePathNameList } from '@noshiro/react-router-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { last } from '@noshiro/ts-utils';
@@ -6,14 +7,9 @@ import { useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
-import { LastUpdated } from './components/last-updated';
-import { Products } from './components/products/products';
-import { Writings } from './components/writings/writings';
-import { labelList, routeList, routes } from './constants/routes';
-import ProfileMd from './contents/profile.md';
-import Profile2Md from './contents/profile2.md';
-import SkillsMd from './contents/skills.md';
-import { MyTabs } from './utils/tabs';
+import { LastUpdated, Products, Writings } from './components';
+import { labelList, routeList, routes } from './constants';
+import { Profile2Md, ProfileMd, SkillsMd } from './contents';
 
 const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
   const res = routeList.findIndex((e) => e === `/${pathNameLast}`);
@@ -50,7 +46,7 @@ export const AppSub = memoNamed<{
   return (
     <div>
       <AppBarFlex position='static' color='default'>
-        <MyTabsStyled
+        <MuiTabsStyled
           tabIndex={tabIndex}
           tabIndexChange={tabIndexOnChange}
           scrollable={true}
@@ -98,7 +94,7 @@ const ContentWrapper = styled.div`
   padding: 0 20px 20px 20px;
 `;
 
-const MyTabsStyled = styled(MyTabs)`
+const MuiTabsStyled = styled(MuiTabs)`
   font-size: large;
 `;
 

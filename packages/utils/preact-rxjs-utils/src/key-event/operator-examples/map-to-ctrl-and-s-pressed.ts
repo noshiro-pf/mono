@@ -1,8 +1,10 @@
 import { filterByLatest } from '@noshiro/rxjs-utils';
 import { Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { filterKeyIsDown } from '../custom-operators/filter-key-is-down';
-import { filterTargetAlphabetKeyEvent } from '../custom-operators/filter-target-alphabet-key-event';
+import {
+  filterKeyIsDown,
+  filterTargetAlphabetKeyEvent,
+} from '../custom-operators';
 import { mapToCtrlKeyIsDown } from './map-to-ctrl-key-is-down';
 
 export const mapToSKeyWithCtrl = (): OperatorFunction<

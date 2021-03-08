@@ -1,5 +1,5 @@
-import { MAX_STEPS } from '../../constants/max-steps';
-import { LambdaTerm } from '../../types/lambda-term';
+import { MAX_STEPS } from '../../constants';
+import { LambdaTerm } from '../../types';
 import { isLambdaTerm } from '../is-lambda-term';
 import { termEq } from '../term-eq';
 import { evaluate1step } from './eval-1-step';

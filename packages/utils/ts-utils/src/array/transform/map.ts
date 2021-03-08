@@ -1,4 +1,4 @@
-import { FunctionType } from '../../types/utility-types/function';
+import { FunctionType } from '../../types';
 import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
 export const neaMap = <A, B>(mapFn: FunctionType<A, B>) => (

@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
+    "@noshiro/react-material-ui-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/ts-utils": "*",
     "react": "^17.0.1",

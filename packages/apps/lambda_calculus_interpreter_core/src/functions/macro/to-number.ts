@@ -1,6 +1,4 @@
-import { LambdaTerm } from '../../types/lambda-term';
-import { NumberTermBody } from '../../types/number-term';
-import { Variable } from '../../types/variable';
+import { LambdaTerm, NumberTermBody, Variable } from '../../types';
 import { isVariable } from '../is-variable';
 import { isNumber } from './is-number';
 

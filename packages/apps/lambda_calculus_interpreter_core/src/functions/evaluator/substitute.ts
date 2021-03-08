@@ -1,5 +1,4 @@
-import { LambdaTerm } from '../../types/lambda-term';
-import { Variable } from '../../types/variable';
+import { LambdaTerm, Variable } from '../../types';
 import { getFreeVariables } from '../get-free-variables';
 import { isAbstraction } from '../is-abstraction';
 import { isApplication } from '../is-application';

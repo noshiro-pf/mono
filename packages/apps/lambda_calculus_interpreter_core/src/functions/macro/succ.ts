@@ -1,5 +1,5 @@
-import { LambdaTerm } from '../../types/lambda-term';
-import { splitToTokens } from '../parser/split-to-tokens';
+import { LambdaTerm } from '../../types';
+import { splitToTokens } from '../parser';
 
 const succStr: string = '(lambda n.(lambda s.(lambda z.(s((n s)z)))))';
 

@@ -1,4 +1,4 @@
-import { MinutesEnum } from '../../types/minutes';
+import { MinutesEnum } from '../../types';
 
 export const getMinutes = (date: Date): MinutesEnum =>
   date.getMinutes() as MinutesEnum;

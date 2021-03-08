@@ -11,8 +11,8 @@ import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import DiceIcon from '../assets/dice-icon.png';
 import SumIcon from '../assets/sum-sign.png';
-import { DiceNumber } from '../components/dicer-number';
 import { IList } from '../immutable';
+import { DiceNumber } from './dicer-number';
 import { Histogram } from './histgram/histogram';
 
 const Root = styled.div`
