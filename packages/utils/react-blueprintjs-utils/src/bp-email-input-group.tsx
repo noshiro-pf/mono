@@ -1,7 +1,6 @@
 import { FormGroup, IInputGroupProps2 } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { isEmailString, TinyObservable } from '@noshiro/ts-utils';
-import styled from 'styled-components';
 import { BpInput } from './bp-input';
 
 type Props = IInputGroupProps2 &
@@ -28,11 +27,16 @@ export const BpEmailInput = memoNamed<Props>(
   }) => {
     const isEmailAddressResult = isEmailString(value ?? '');
 
+    const showError: boolean = !disabled && !isEmailAddressResult;
+
     return (
-      <FormGroup label={formGroupLabel}>
+      <FormGroup
+        label={formGroupLabel}
+        helperText={showError ? invalidMessage : undefined}
+        intent={showError ? 'danger' : 'primary'}
+      >
         <BpInput
           type='email'
-          intent={isEmailAddressResult ? 'none' : 'danger'}
           placeholder={placeholder}
           value={value}
           onValueChange={onValueChange}
@@ -41,16 +45,7 @@ export const BpEmailInput = memoNamed<Props>(
           focus$={focus$}
           {...props}
         />
-        {disabled || isEmailAddressResult ? undefined : (
-          <HelperText className='bp3-form-helper-text'>
-            {invalidMessage}
-          </HelperText>
-        )}
       </FormGroup>
     );
   }
 );
-
-const HelperText = styled.div`
-  color: #f44336 !important;
-`;
