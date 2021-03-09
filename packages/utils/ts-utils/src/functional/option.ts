@@ -2,13 +2,13 @@ export namespace Option {
   const SomeTypeSymbol: unique symbol = Symbol('Option.some');
   const NoneTypeSymbol: unique symbol = Symbol('Option.none');
 
-  export type Some<S> = Readonly<{
-    type: typeof SomeTypeSymbol;
-    value: S;
-  }>;
-  export type None = Readonly<{
-    type: typeof NoneTypeSymbol;
-  }>;
+  export type Some<S> = {
+    readonly type: typeof SomeTypeSymbol;
+    readonly value: S;
+  };
+  export type None = {
+    readonly type: typeof NoneTypeSymbol;
+  };
 
   export type _Option<S> = Some<S> | None;
 

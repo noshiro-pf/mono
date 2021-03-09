@@ -7,3 +7,8 @@ export const setHours = (curr: Date, minutes: HoursEnum): Date => {
   copy.setHours(minutes);
   return copy;
 };
+
+export const updateHours = (
+  curr: Date,
+  updater: (date: HoursEnum) => HoursEnum
+): Date => setHours(curr, updater(getHours(curr)));
