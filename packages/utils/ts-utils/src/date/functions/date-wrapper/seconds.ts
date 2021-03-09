@@ -8,3 +8,8 @@ export const setSeconds = (curr: Date, seconds: SecondsEnum): Date => {
   copy.setSeconds(seconds);
   return copy;
 };
+
+export const updateSeconds = (
+  curr: Date,
+  updater: (date: SecondsEnum) => SecondsEnum
+): Date => setSeconds(curr, updater(getSeconds(curr)));

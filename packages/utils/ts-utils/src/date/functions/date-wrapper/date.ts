@@ -7,3 +7,8 @@ export const setDate = (curr: Date, date: DateEnum): Date => {
   copy.setDate(date);
   return copy;
 };
+
+export const updateDate = (
+  curr: Date,
+  updater: (date: DateEnum) => DateEnum
+): Date => setDate(curr, updater(getDate(curr)));

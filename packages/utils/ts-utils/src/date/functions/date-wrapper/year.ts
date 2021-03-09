@@ -7,3 +7,8 @@ export const setYear = (curr: Date, year: YearEnum): Date => {
   copy.setFullYear(year);
   return copy;
 };
+
+export const updateYear = (
+  curr: Date,
+  updater: (date: YearEnum) => YearEnum
+): Date => setYear(curr, updater(getYear(curr)));

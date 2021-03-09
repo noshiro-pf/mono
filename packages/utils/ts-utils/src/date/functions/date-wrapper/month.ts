@@ -8,3 +8,8 @@ export const setMonth = (curr: Date, month: MonthEnum): Date => {
   copy.setMonth(month - 1);
   return copy;
 };
+
+export const updateMonth = (
+  curr: Date,
+  updater: (date: MonthEnum) => MonthEnum
+): Date => setMonth(curr, updater(getMonth(curr)));
