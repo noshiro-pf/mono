@@ -20,8 +20,7 @@ export const Main = memoNamed('Main', () => {
   const [undo$, undo] = useVoidEventAsStream();
   const [redo$, redo] = useVoidEventAsStream();
 
-  const history$ = useDataStream(
-    HistoryState(),
+  const history$ = useDataStream(HistoryState(), () =>
     merge(
       rollDices$.pipe(mapToConst('roll-dices')),
       undo$.pipe(mapToConst('undo')),
@@ -29,30 +28,25 @@ export const Main = memoNamed('Main', () => {
     ).pipe(scan(historyReducer, HistoryState()))
   );
 
-  const undoable$ = useDataStream(
-    false,
+  const undoable$ = useDataStream(false, () =>
     history$.pipe(map((h) => h.index > -1))
   );
 
-  const redoable$ = useDataStream(
-    false,
+  const redoable$ = useDataStream(false, () =>
     history$.pipe(map((h) => h.index < h.history.size - 1))
   );
 
-  const diceValues$ = useDataStream<[number, number]>(
-    [0, 0],
+  const diceValues$ = useDataStream<[number, number]>([0, 0], () =>
     history$.pipe(
       map((histState) => histState.history.get(histState.index, [0, 0]))
     )
   );
 
-  const sumCount$ = useDataStream<IList<number>>(
-    sumCountInitial,
+  const sumCount$ = useDataStream<IList<number>>(sumCountInitial, () =>
     history$.pipe(map(historyToSumCount))
   );
 
-  const opacity$ = useDataStream<number>(
-    0,
+  const opacity$ = useDataStream<number>(0, () =>
     rollDices$.pipe(
       switchMapTo(
         interval(50).pipe(

@@ -14,13 +14,11 @@ import { debounceTime, filter, map } from 'rxjs/operators';
 export const useLambdaEval = (
   input$: Observable<string>
 ): Observable<string> => {
-  const inputBuffered$ = useDataStream<string>(
-    '',
+  const inputBuffered$ = useDataStream<string>('', () =>
     input$.pipe(debounceTime(200 /* ms */))
   );
 
-  const parseTree$ = useDataStream<LambdaTerm | undefined>(
-    undefined,
+  const parseTree$ = useDataStream<LambdaTerm | undefined>(undefined, () =>
     inputBuffered$.pipe(map(parseLambdaTerm))
   );
 
@@ -29,18 +27,15 @@ export const useLambdaEval = (
   //   parseTree$.pipe(map(termToString))
   // );
 
-  const evalSequence$ = useDataStream<LambdaTerm[]>(
-    [],
+  const evalSequence$ = useDataStream<LambdaTerm[]>([], () =>
     parseTree$.pipe(filter(isNotUndefined), map(evalSequence))
   );
 
-  const evalSeqToStr$ = useDataStream<string[]>(
-    [],
+  const evalSeqToStr$ = useDataStream<string[]>([], () =>
     evalSequence$.pipe(map((seq) => seq.map(termToString)))
   );
 
-  const output$ = useDataStream<string>(
-    '',
+  const output$ = useDataStream<string>('', () =>
     evalSeqToStr$.pipe(
       map((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
     )
