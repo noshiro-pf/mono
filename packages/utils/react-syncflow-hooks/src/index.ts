@@ -1,4 +1,4 @@
-import { Observable, source } from '@noshiro/syncflow';
+import { InitializedObservable, Observable, source } from '@noshiro/syncflow';
 import { Option } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -37,6 +37,7 @@ export function useStreamValue<A, B = A>(
   stream$: Observable<A>,
   initialValue: B
 ): A | B;
+export function useStreamValue<A>(stream$: InitializedObservable<A>): A;
 export function useStreamValue<A>(stream$: Observable<A>): A | undefined;
 export function useStreamValue<A, B = A>(
   stream$: Observable<A>,

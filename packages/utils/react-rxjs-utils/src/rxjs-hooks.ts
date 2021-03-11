@@ -1,30 +1,36 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, shareReplay, startWith } from 'rxjs/operators';
 
-export const useStream = <T>(stream$: Observable<T>): Observable<T> => {
-  const ref = useRef(stream$.pipe(shareReplay(1)));
-  return ref.current;
-};
+export function useStream<A>(
+  createStream$: () => Observable<A>
+): Observable<A> {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const s = useMemo(() => createStream$().pipe(shareReplay(1)), []);
+  return s;
+}
 
-export const useDataStream = <T>(
-  initialValue: T,
-  stream$: Observable<T>
-): Observable<T> =>
-  useStream<T>(
-    stream$.pipe(startWith(initialValue), distinctUntilChanged(Object.is))
+export const useDataStream = <A>(
+  initialValue: A,
+  createStream$: () => Observable<A>
+): Observable<A> =>
+  useStream<A>(() =>
+    createStream$().pipe(
+      startWith(initialValue),
+      distinctUntilChanged<A>(Object.is)
+    )
   );
 
 export const useStreamEffect = <T>(
   stream$: Observable<T>,
   subscriptionFn: (v: T) => void
 ): void => {
-  const ref = useRef({ stream$, subscriptionFn });
   useEffect(() => {
-    const s = ref.current.stream$.subscribe(ref.current.subscriptionFn);
+    const s = stream$.subscribe(subscriptionFn);
     return () => {
       s.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 
@@ -41,41 +47,45 @@ export function useStreamValue<T>(
   useStreamEffect(stream$, (value) => {
     setState({ value });
   });
-  return state.value ?? initialValue;
+  return state.value;
 }
 
 export const useVoidEventAsStream = (): [Observable<undefined>, () => void] => {
-  const src$ = useRef(new Subject<undefined>());
+  const src$ = useMemo(() => new Subject<undefined>(), []);
 
   const emitter = useCallback(() => {
-    src$.current.next();
+    src$.next();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const event$ = useStream<undefined>(src$.current.asObservable());
+  const event$ = useStream<undefined>(() => src$.asObservable());
   return [event$, emitter];
 };
 
 export const useEventAsStream = <T>(): [Observable<T>, (value: T) => void] => {
-  const src$ = useRef(new Subject<T>());
+  const src$ = useMemo(() => new Subject<T>(), []);
 
   const emitter = useCallback((value: T) => {
-    src$.current.next(value);
+    src$.next(value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const event$ = useStream<T>(src$.current.asObservable());
+  const event$ = useStream<T>(() => src$.asObservable());
   return [event$, emitter];
 };
 
 export const useStateAsStream = <T>(
   initialValue: T
 ): [Observable<T>, (v: T) => void] => {
-  const src$ = useRef(new BehaviorSubject<T>(initialValue));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const src$ = useMemo(() => new BehaviorSubject<T>(initialValue), []);
 
   const setter = useCallback((v: T) => {
-    src$.current.next(v);
+    src$.next(v);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const value$ = useStream<T>(src$.current.asObservable());
+  const value$ = useStream<T>(() => src$.asObservable());
 
   return [value$, setter];
 };
