@@ -1,9 +1,16 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import { Observable, Operator, TakeOperatorObservable, Token } from '../types';
+import {
+  Observable,
+  RemoveInitializedOperator,
+  TakeOperatorObservable,
+  Token,
+} from '../types';
+import { isPositiveInteger } from '../utils';
 
-export const take = <A>(n: number): Operator<A, A> => (parent: Observable<A>) =>
-  new TakeObservableClass(parent, n);
+export const take = <A>(n: number): RemoveInitializedOperator<A, A> => (
+  parent: Observable<A>
+) => new TakeObservableClass(parent, n);
 
 class TakeObservableClass<A>
   extends SyncChildObservableClass<A, 'take', [A]>
@@ -15,10 +22,17 @@ class TakeObservableClass<A>
     super({
       parents: [parent],
       type: 'take',
-      currentValueInit: n === 0 ? Option.none : parent.currentValue,
+      currentValueInit: !isPositiveInteger(n)
+        ? Option.none
+        : parent.currentValue,
     });
     this._counter = 0;
     this._n = n;
+
+    // complete immediately if n is not positive integer
+    if (!isPositiveInteger(n)) {
+      this.complete();
+    }
   }
 
   tryUpdate(token: Token): void {

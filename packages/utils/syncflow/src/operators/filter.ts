@@ -3,15 +3,19 @@ import { SyncChildObservableClass } from '../class';
 import {
   FilterOperatorObservable,
   Observable,
-  Operator,
+  RemoveInitializedOperator,
   Token,
 } from '../types';
 
 export function filter<A, B extends A>(
   predicate: (value: A) => value is B
-): Operator<A, B>;
-export function filter<A>(predicate: (value: A) => boolean): Operator<A, A>;
-export function filter<A>(predicate: (value: A) => boolean): Operator<A, A> {
+): RemoveInitializedOperator<A, B>;
+export function filter<A>(
+  predicate: (value: A) => boolean
+): RemoveInitializedOperator<A, A>;
+export function filter<A>(
+  predicate: (value: A) => boolean
+): RemoveInitializedOperator<A, A> {
   return (parent: Observable<A>) =>
     new FilterObservableClass(parent, predicate);
 }

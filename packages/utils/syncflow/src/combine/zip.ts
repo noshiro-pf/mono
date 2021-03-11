@@ -7,17 +7,24 @@ import {
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
 import {
+  InitializedZipObservable,
   NonEmptyUnknownList,
   SyncChildObservable,
   Token,
   TupleToQueueTuple,
   Wrap,
+  WrapInitialized,
   ZipObservable,
 } from '../types';
 
 export const zip = <A extends NonEmptyUnknownList>(
   ...parents: Wrap<A>
 ): ZipObservable<A> => new ZipObservableClass(parents);
+
+export const zipI = <A extends NonEmptyUnknownList>(
+  ...parents: WrapInitialized<A>
+): InitializedZipObservable<A> =>
+  new ZipObservableClass(parents as Wrap<A>) as InitializedZipObservable<A>;
 
 class ZipObservableClass<A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, 'zip', A>

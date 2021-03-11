@@ -14,9 +14,9 @@ const createStreams = (
   counter$: IntervalObservable;
   skip5$: Observable<number>;
 } => {
-  const counter$ = interval(tick, true);
+  const counter$ = interval(tick * 2, true);
 
-  const skip5$ = counter$.chain(skipUntil(timer(tick * 5)));
+  const skip5$ = counter$.chain(skipUntil(timer(tick * 9)));
 
   return {
     counter$,

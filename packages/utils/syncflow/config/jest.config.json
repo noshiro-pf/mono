@@ -14,5 +14,5 @@
     }
   },
   "testMatch": ["<rootDir>/(test|src)/**/?(*.)+(spec|test).ts"],
-  "testTimeout": 10000
+  "testTimeout": 20000
 }

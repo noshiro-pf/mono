@@ -1,8 +1,10 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
+  InitializedObservable,
+  InitializedToInitializedOperator,
   Observable,
-  Operator,
+  ToBaseOperator,
   Token,
   WithLatestOperatorObservable,
 } from '../types';
@@ -10,10 +12,16 @@ import { maxDepth } from '../utils';
 
 export const withLatest = <A, B>(
   observable: Observable<B>
-): Operator<A, [A, B]> => (parent: Observable<A>) =>
+): ToBaseOperator<A, [A, B]> => (parent: Observable<A>) =>
   new WithLatestObservableClass(parent, observable);
 
+export const withLatestI = <A, B>(
+  observable: InitializedObservable<B>
+): InitializedToInitializedOperator<A, [A, B]> =>
+  withLatest(observable) as InitializedToInitializedOperator<A, [A, B]>;
+
 export const withLatestFrom = withLatest; // alias
+export const withLatestFromI = withLatestI; // alias
 
 class WithLatestObservableClass<A, B>
   extends SyncChildObservableClass<[A, B], 'withLatest', [A]>

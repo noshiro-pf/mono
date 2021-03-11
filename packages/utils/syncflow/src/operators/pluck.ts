@@ -1,10 +1,22 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import { Observable, Operator, PluckOperatorObservable, Token } from '../types';
+import {
+  InitializedToInitializedOperator,
+  Observable,
+  PluckOperatorObservable,
+  ToBaseOperator,
+  Token,
+} from '../types';
 
-export const pluck = <A, K extends keyof A>(key: K): Operator<A, A[K]> => (
-  parent: Observable<A>
-) => new PluckObservableClass(parent, key);
+export const pluck = <A, K extends keyof A>(
+  key: K
+): ToBaseOperator<A, A[K]> => (parent: Observable<A>) =>
+  new PluckObservableClass(parent, key);
+
+export const pluckI = <A, K extends keyof A>(
+  key: K
+): InitializedToInitializedOperator<A, A[K]> =>
+  pluck(key) as InitializedToInitializedOperator<A, A[K]>;
 
 class PluckObservableClass<A, K extends keyof A>
   extends SyncChildObservableClass<A[K], 'pluck', [A]>

@@ -2,14 +2,14 @@ import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   Observable,
-  Operator,
+  RemoveInitializedOperator,
   SkipWhileOperatorObservable,
   Token,
 } from '../types';
 
 export const skipWhile = <A>(
   predicate: (value: A) => boolean
-): Operator<A, A> => (parent: Observable<A>) =>
+): RemoveInitializedOperator<A, A> => (parent: Observable<A>) =>
   new SkipWhileObservableClass(parent, predicate);
 
 class SkipWhileObservableClass<A>

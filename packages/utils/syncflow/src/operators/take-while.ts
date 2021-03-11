@@ -2,14 +2,14 @@ import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   Observable,
-  Operator,
+  RemoveInitializedOperator,
   TakeWhileOperatorObservable,
   Token,
 } from '../types';
 
 export const takeWhile = <A>(
   predicate: (value: A) => boolean
-): Operator<A, A> => (parent: Observable<A>) =>
+): RemoveInitializedOperator<A, A> => (parent: Observable<A>) =>
   new TakeWhileObservableClass(parent, predicate);
 
 class TakeWhileObservableClass<A>

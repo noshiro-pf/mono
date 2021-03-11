@@ -1,10 +1,21 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import { MapToOperatorObservable, Observable, Operator, Token } from '../types';
+import {
+  InitializedToInitializedOperator,
+  MapToOperatorObservable,
+  Observable,
+  ToBaseOperator,
+  Token,
+} from '../types';
 
-export const mapTo = <A, B>(value: B): Operator<A, B> => (
+export const mapTo = <A, B>(value: B): ToBaseOperator<A, B> => (
   parent: Observable<A>
 ) => new MapToObservableClass(parent, value);
+
+export const mapToI = <A, B>(
+  value: B
+): InitializedToInitializedOperator<A, B> =>
+  mapTo(value) as InitializedToInitializedOperator<A, B>;
 
 class MapToObservableClass<A, B>
   extends SyncChildObservableClass<B, 'mapTo', [A]>

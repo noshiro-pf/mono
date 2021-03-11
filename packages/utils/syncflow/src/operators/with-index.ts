@@ -1,17 +1,24 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
+  InitializedToInitializedOperator,
   Observable,
-  Operator,
+  ToBaseOperator,
   Token,
   WithIndexOperatorObservable,
 } from '../types';
 
-export const withIndex = <A>(): Operator<A, [number, A]> => (
+export const withIndex = <A>(): ToBaseOperator<A, [number, A]> => (
   parent: Observable<A>
 ) => new WithIndexObservableClass(parent);
 
-export const attachIndex = withIndex;
+export const withIndexI = <A>(): InitializedToInitializedOperator<
+  A,
+  [number, A]
+> => withIndex() as InitializedToInitializedOperator<A, [number, A]>;
+
+export const attachIndex = withIndex; // alias
+export const attachIndexI = withIndexI; // alias
 
 class WithIndexObservableClass<A>
   extends SyncChildObservableClass<[number, A], 'withIndex', [A]>

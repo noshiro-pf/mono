@@ -3,15 +3,24 @@ import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
 import {
   CombineLatestObservable,
+  InitializedCombineLatestObservable,
   NonEmptyUnknownList,
   SyncChildObservable,
   Token,
   Wrap,
+  WrapInitialized,
 } from '../types';
 
 export const combineLatest = <A extends NonEmptyUnknownList>(
   ...parents: Wrap<A>
 ): CombineLatestObservable<A> => new CombineLatestObservableClass(parents);
+
+export const combineLatestI = <A extends NonEmptyUnknownList>(
+  ...parents: WrapInitialized<A>
+): InitializedCombineLatestObservable<A> =>
+  new CombineLatestObservableClass(
+    parents as Wrap<A>
+  ) as InitializedCombineLatestObservable<A>;
 
 export const combine = combineLatest; // alias
 
