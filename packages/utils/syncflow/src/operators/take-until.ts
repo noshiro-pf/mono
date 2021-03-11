@@ -1,15 +1,22 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
+  InitializedToInitializedOperator,
   Observable,
-  Operator,
   TakeUntilOperatorObservable,
+  ToBaseOperator,
   Token,
 } from '../types';
 
-export const takeUntil = <A>(notifier: Observable<unknown>): Operator<A, A> => (
-  parent: Observable<A>
-) => new TakeUntilObservableClass(parent, notifier);
+export const takeUntil = <A>(
+  notifier: Observable<unknown>
+): ToBaseOperator<A, A> => (parent: Observable<A>) =>
+  new TakeUntilObservableClass(parent, notifier);
+
+export const takeUntilI = <A>(
+  notifier: Observable<unknown>
+): InitializedToInitializedOperator<A, A> =>
+  takeUntil(notifier) as InitializedToInitializedOperator<A, A>;
 
 class TakeUntilObservableClass<A>
   extends SyncChildObservableClass<A, 'takeUntil', [A]>

@@ -1,13 +1,19 @@
-import { isArrayOfLength1OrMore } from '@noshiro/ts-utils';
+import { isArrayOfLength1OrMore, Option } from '@noshiro/ts-utils';
 import {
   AsyncChildObservable,
   AsyncChildObservableType,
   ChildObservable,
+  InitializedObservable,
+  InitializedSyncChildObservable,
+  InitializedToInitializedOperator,
   isManagerObservable,
   NonEmptyUnknownList,
+  Observable,
   ObservableId,
+  Operator,
   SyncChildObservable,
   SyncChildObservableType,
+  ToInitializedOperator,
   Wrap,
 } from '../types';
 import { binarySearch, issueToken, maxDepth } from '../utils';
@@ -150,5 +156,42 @@ export class SyncChildObservableClass<
     if (this._subscribers.size === 0 && this._children.length === 0) {
       this.complete();
     }
+  }
+}
+
+export class InitializedSyncChildObservableClass<
+    A,
+    Type extends SyncChildObservableType,
+    P extends NonEmptyUnknownList
+  >
+  extends SyncChildObservableClass<A, Type, P>
+  implements InitializedSyncChildObservable<A, Type, P> {
+  constructor({
+    type,
+    parents,
+    depth = 1 + maxDepth(parents),
+    currentValueInit,
+  }: {
+    type: Type;
+    parents: Wrap<P>;
+    depth?: number;
+    currentValueInit: InitializedSyncChildObservable<A, Type>['currentValue'];
+  }) {
+    super({ type, parents, depth, currentValueInit });
+  }
+
+  get currentValue(): Option.Some<A> {
+    return super.getCurrentValue() as Option.Some<A>;
+  }
+
+  chain<B>(
+    operator:
+      | InitializedToInitializedOperator<A, B>
+      | ToInitializedOperator<A, B>
+  ): InitializedObservable<B>;
+
+  chain<B>(operator: Operator<A, B>): Observable<B>;
+  chain<B>(operator: Operator<A, B>): Observable<B> {
+    return operator((this as unknown) as InitializedObservable<A>);
   }
 }

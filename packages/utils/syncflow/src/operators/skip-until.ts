@@ -2,14 +2,15 @@ import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   Observable,
-  Operator,
+  RemoveInitializedOperator,
   SkipUntilOperatorObservable,
   Token,
 } from '../types';
 
-export const skipUntil = <A>(notifier: Observable<unknown>): Operator<A, A> => (
-  parent: Observable<A>
-) => new SkipUntilObservableClass(parent, notifier);
+export const skipUntil = <A>(
+  notifier: Observable<unknown>
+): RemoveInitializedOperator<A, A> => (parent: Observable<A>) =>
+  new SkipUntilObservableClass(parent, notifier);
 
 class SkipUntilObservableClass<A>
   extends SyncChildObservableClass<A, 'skipUntil', [A]>

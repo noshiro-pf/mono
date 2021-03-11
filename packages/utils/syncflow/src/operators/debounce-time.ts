@@ -2,14 +2,20 @@ import { Option, TimerId } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import {
   DebounceTimeOperatorObservable,
+  InitializedToInitializedOperator,
   Observable,
-  Operator,
+  ToBaseOperator,
   Token,
 } from '../types';
 
-export const debounceTime = <A>(millisec: number): Operator<A, A> => (
+export const debounceTime = <A>(millisec: number): ToBaseOperator<A, A> => (
   parent: Observable<A>
 ) => new DebounceTimeObservableClass(parent, millisec);
+
+export const debounceTimeI = <A>(
+  millisec: number
+): InitializedToInitializedOperator<A, A> =>
+  debounceTime(millisec) as InitializedToInitializedOperator<A, A>;
 
 class DebounceTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'debounceTime', [A]>

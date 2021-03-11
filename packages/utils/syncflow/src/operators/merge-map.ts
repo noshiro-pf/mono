@@ -3,14 +3,14 @@ import { AsyncChildObservableClass } from '../class';
 import {
   MergeMapOperatorObservable,
   Observable,
-  Operator,
+  RemoveInitializedOperator,
   Subscription,
   Token,
 } from '../types';
 
 export const mergeMap = <A, B>(
   mapToObservable: (curr: A) => Observable<B>
-): Operator<A, B> => (parent: Observable<A>) =>
+): RemoveInitializedOperator<A, B> => (parent: Observable<A>) =>
   new MergeMapObservableClass(parent, mapToObservable);
 
 export const flatMap = mergeMap;

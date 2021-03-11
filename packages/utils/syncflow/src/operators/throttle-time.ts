@@ -1,15 +1,21 @@
 import { Option, TimerId } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
+  InitializedToInitializedOperator,
   Observable,
-  Operator,
   ThrottleTimeOperatorObservable,
+  ToBaseOperator,
   Token,
 } from '../types';
 
-export const throttleTime = <A>(millisec: number): Operator<A, A> => (
+export const throttleTime = <A>(millisec: number): ToBaseOperator<A, A> => (
   parent: Observable<A>
 ) => new ThrottleTimeObservableClass(parent, millisec);
+
+export const throttleTimeI = <A>(
+  millisec: number
+): InitializedToInitializedOperator<A, A> =>
+  throttleTime(millisec) as InitializedToInitializedOperator<A, A>;
 
 class ThrottleTimeObservableClass<A>
   extends SyncChildObservableClass<A, 'throttleTime', [A]>

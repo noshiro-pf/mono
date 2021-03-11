@@ -1,15 +1,20 @@
 import { Option } from '@noshiro/ts-utils';
-import { SyncChildObservableClass } from '../class';
-import { Observable, Operator, ScanOperatorObservable, Token } from '../types';
+import { InitializedSyncChildObservableClass } from '../class';
+import {
+  Observable,
+  ScanOperatorObservable,
+  ToInitializedOperator,
+  Token,
+} from '../types';
 
 export const scan = <A, B>(
   reducer: (acc: B, curr: A) => B,
   initialValue: B
-): Operator<A, B> => (parent: Observable<A>) =>
+): ToInitializedOperator<A, B> => (parent: Observable<A>) =>
   new ScanObservableClass(parent, reducer, initialValue);
 
 class ScanObservableClass<A, B>
-  extends SyncChildObservableClass<B, 'scan', [A]>
+  extends InitializedSyncChildObservableClass<B, 'scan', [A]>
   implements ScanOperatorObservable<A, B> {
   private readonly _reducer: (acc: B, curr: A) => B;
 

@@ -2,14 +2,20 @@ import { Option, TimerId } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import {
   AuditTimeOperatorObservable,
+  InitializedToInitializedOperator,
   Observable,
-  Operator,
+  ToBaseOperator,
   Token,
 } from '../types';
 
-export const auditTime = <A>(millisec: number): Operator<A, A> => (
+export const auditTime = <A>(millisec: number): ToBaseOperator<A, A> => (
   parent: Observable<A>
 ) => new AuditTimeObservableClass(parent, millisec);
+
+export const auditTimeI = <A>(
+  millisec: number
+): InitializedToInitializedOperator<A, A> =>
+  auditTime(millisec) as InitializedToInitializedOperator<A, A>;
 
 class AuditTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'auditTime', [A]>

@@ -1,12 +1,14 @@
 import { noop, Option } from '@noshiro/ts-utils';
 import {
   ChildObservable,
+  InitializedObservable,
   Observable,
   ObservableBase,
   Operator,
   Subscriber,
   SubscriberId,
   Subscription,
+  ToInitializedOperator,
   Token,
 } from '../types';
 import {
@@ -61,6 +63,10 @@ export class ObservableBaseClass<
     return this._currentValue;
   }
 
+  protected getCurrentValue(): ObservableBase<A>['currentValue'] {
+    return this._currentValue;
+  }
+
   get isCompleted(): boolean {
     return this._isCompleted;
   }
@@ -107,8 +113,10 @@ export class ObservableBaseClass<
     });
   }
 
+  chain<B>(operator: ToInitializedOperator<A, B>): InitializedObservable<B>;
+  chain<B>(operator: Operator<A, B>): Observable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B> {
-    return operator((this as unknown) as Observable<A>);
+    return operator((this as unknown) as InitializedObservable<A>);
   }
 
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {

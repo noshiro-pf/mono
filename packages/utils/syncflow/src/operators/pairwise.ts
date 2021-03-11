@@ -2,13 +2,14 @@ import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   Observable,
-  Operator,
   PairwiseOperatorObservable,
+  RemoveInitializedOperator,
   Token,
 } from '../types';
 
-export const pairwise = <A>(): Operator<A, [A, A]> => (parent: Observable<A>) =>
-  new PairwiseObservableClass(parent);
+export const pairwise = <A>(): RemoveInitializedOperator<A, [A, A]> => (
+  parent: Observable<A>
+) => new PairwiseObservableClass(parent);
 
 class PairwiseObservableClass<A>
   extends SyncChildObservableClass<[A, A], 'pairwise', [A]>

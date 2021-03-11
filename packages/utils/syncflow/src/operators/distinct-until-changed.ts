@@ -2,19 +2,26 @@ import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   DistinctUntilChangedOperatorObservable,
+  InitializedToInitializedOperator,
   Observable,
-  Operator,
+  ToBaseOperator,
   Token,
 } from '../types';
 
 export const distinctUntilChanged = <A>(
   compare: (x: A, y: A) => boolean = (x, y) => x === y
-): Operator<A, A> => (parent: Observable<A>) =>
-  new FilterObservableClass(parent, compare);
+): ToBaseOperator<A, A> => (parent: Observable<A>) =>
+  new DistinctUntilChangedObservableClass(parent, compare);
+
+export const distinctUntilChangedI = <A>(
+  compare: (x: A, y: A) => boolean = (x, y) => x === y
+): InitializedToInitializedOperator<A, A> =>
+  distinctUntilChanged(compare) as InitializedToInitializedOperator<A, A>;
 
 export const skipUnchanged = distinctUntilChanged; // alias
+export const skipUnchangedI = distinctUntilChangedI; // alias
 
-export class FilterObservableClass<A>
+class DistinctUntilChangedObservableClass<A>
   extends SyncChildObservableClass<A, 'distinctUntilChanged', [A]>
   implements DistinctUntilChangedOperatorObservable<A> {
   private readonly _compare: (x: A, y: A) => boolean;

@@ -1,19 +1,19 @@
 import { Option } from '@noshiro/ts-utils';
-import { SyncChildObservableClass } from '../class';
+import { InitializedSyncChildObservableClass } from '../class';
 import {
   Observable,
-  Operator,
+  ToInitializedOperator,
   Token,
   WithInitialValueOperatorObservable,
 } from '../types';
 
 export const withInitialValue = <A, I = A>(
   initialValue: I
-): Operator<A, A | I> => (parent: Observable<A>) =>
+): ToInitializedOperator<A, A | I> => (parent: Observable<A>) =>
   new WithInitialValueObservableClass(parent, initialValue);
 
 class WithInitialValueObservableClass<A, I>
-  extends SyncChildObservableClass<A | I, 'withInitialValue', [A]>
+  extends InitializedSyncChildObservableClass<A | I, 'withInitialValue', [A]>
   implements WithInitialValueOperatorObservable<A, I> {
   constructor(parent: Observable<A>, initialValue: I) {
     super({

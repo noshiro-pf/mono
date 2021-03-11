@@ -1,6 +1,7 @@
 import { ArrayElement, Option, Result } from '@noshiro/ts-utils';
 import {
   AsyncChildObservable,
+  InitializedSyncChildObservable,
   RootObservable,
   SyncChildObservable,
 } from './observable';
@@ -34,17 +35,41 @@ export type TimerObservable = RootObservable<number, 'Timer'> & {
   start: () => TimerObservable;
 };
 
+// InitilaizedSyncChildObservable
+
+export type WithInitialValueOperatorObservable<
+  A,
+  I = A
+> = InitializedSyncChildObservable<A | I, 'withInitialValue', [A]>;
+export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
+  B,
+  'scan',
+  [A]
+>;
+
 // SyncChildObservable
+
+export type InitializedCombineLatestObservable<
+  A extends NonEmptyUnknownList
+> = InitializedSyncChildObservable<A, 'combineLatest', A>;
 
 export type CombineLatestObservable<
   A extends NonEmptyUnknownList
 > = SyncChildObservable<A, 'combineLatest', A>;
+
+export type InitializedZipObservable<
+  A extends NonEmptyUnknownList
+> = InitializedSyncChildObservable<A, 'zip', A>;
 
 export type ZipObservable<A extends NonEmptyUnknownList> = SyncChildObservable<
   A,
   'zip',
   A
 >;
+
+export type InitializedMergeObservable<
+  P extends NonEmptyUnknownList
+> = InitializedSyncChildObservable<ArrayElement<P>, 'merge', P>;
 
 export type MergeObservable<
   P extends NonEmptyUnknownList
@@ -101,11 +126,6 @@ export type WithIndexOperatorObservable<A> = SyncChildObservable<
   'withIndex',
   [A]
 >;
-export type WithInitialValueOperatorObservable<A, I = A> = SyncChildObservable<
-  A | I,
-  'withInitialValue',
-  [A]
->;
 export type PairwiseOperatorObservable<A> = SyncChildObservable<
   [A, A],
   'pairwise',
@@ -140,7 +160,6 @@ export type WithLatestOperatorObservable<A, B> = SyncChildObservable<
   [A]
 >;
 
-export type ScanOperatorObservable<A, B> = SyncChildObservable<B, 'scan', [A]>;
 export type FilterOperatorObservable<A> = SyncChildObservable<A, 'filter', [A]>;
 export type DistinctUntilChangedOperatorObservable<A> = SyncChildObservable<
   A,

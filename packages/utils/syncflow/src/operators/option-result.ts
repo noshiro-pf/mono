@@ -1,49 +1,95 @@
 import { Option, Result } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
+  InitializedToInitializedOperator,
   MapOptionOperatorObservable,
   MapResultErrOperatorObservable,
   MapResultOkOperatorObservable,
   Observable,
-  Operator,
+  ToBaseOperator,
   Token,
   UnwrapOptionOperatorObservable,
   UnwrapResultErrOperatorObservable,
   UnwrapResultOkOperatorObservable,
 } from '../types';
 
-export const unwrapOption = <A>(): Operator<Option<A>, A | undefined> => (
+export const unwrapOption = <A>(): ToBaseOperator<Option<A>, A | undefined> => (
   parent: Observable<Option<A>>
 ) => new UnwrapOptionObservableClass(parent);
 
-export const unwrapResultOk = <S, E>(): Operator<
+export const unwrapOptionI = <A>(): InitializedToInitializedOperator<
+  Option<A>,
+  A | undefined
+> =>
+  unwrapOption() as InitializedToInitializedOperator<Option<A>, A | undefined>;
+
+export const unwrapResultOk = <S, E>(): ToBaseOperator<
   Result<S, E>,
   S | undefined
 > => (parent: Observable<Result<S, E>>) =>
   new UnwrapResultOkObservableClass(parent);
 
-export const unwrapResultErr = <S, E>(): Operator<
+export const unwrapResultOkI = <S, E>(): InitializedToInitializedOperator<
+  Result<S, E>,
+  S | undefined
+> =>
+  unwrapResultOk() as InitializedToInitializedOperator<
+    Result<S, E>,
+    S | undefined
+  >;
+
+export const unwrapResultErr = <S, E>(): ToBaseOperator<
   Result<S, E>,
   E | undefined
 > => (parent: Observable<Result<S, E>>) =>
   new UnwrapResultErrObservableClass(parent);
 
+export const unwrapResultErrI = <S, E>(): InitializedToInitializedOperator<
+  Result<S, E>,
+  E | undefined
+> =>
+  unwrapResultErr() as InitializedToInitializedOperator<
+    Result<S, E>,
+    E | undefined
+  >;
+
 export const mapOption = <A, B>(
   mapFn: (x: A) => B
-): Operator<Option<A>, Option<B>> => (parent: Observable<Option<A>>) =>
+): ToBaseOperator<Option<A>, Option<B>> => (parent: Observable<Option<A>>) =>
   new MapOptionObservableClass(parent, mapFn);
+
+export const mapOptionI = <A, B>(
+  mapFn: (x: A) => B
+): InitializedToInitializedOperator<Option<A>, Option<B>> =>
+  mapOption(mapFn) as InitializedToInitializedOperator<Option<A>, Option<B>>;
 
 export const mapResultOk = <S, S2, E>(
   mapFn: (x: S) => S2
-): Operator<Result<S, E>, Result<S2, E>> => (
+): ToBaseOperator<Result<S, E>, Result<S2, E>> => (
   parent: Observable<Result<S, E>>
 ) => new MapResultOkObservableClass(parent, mapFn);
 
+export const mapResultOkI = <S, S2, E>(
+  mapFn: (x: S) => S2
+): InitializedToInitializedOperator<Result<S, E>, Result<S2, E>> =>
+  mapResultOk(mapFn) as InitializedToInitializedOperator<
+    Result<S, E>,
+    Result<S2, E>
+  >;
+
 export const mapResultErr = <S, E, E2>(
   mapFn: (x: E) => E2
-): Operator<Result<S, E>, Result<S, E2>> => (
+): ToBaseOperator<Result<S, E>, Result<S, E2>> => (
   parent: Observable<Result<S, E>>
 ) => new MapResultErrObservableClass(parent, mapFn);
+
+export const mapResultErrI = <S, E, E2>(
+  mapFn: (x: E) => E2
+): InitializedToInitializedOperator<Result<S, E>, Result<S, E2>> =>
+  mapResultErr(mapFn) as InitializedToInitializedOperator<
+    Result<S, E>,
+    Result<S, E2>
+  >;
 
 class UnwrapOptionObservableClass<A>
   extends SyncChildObservableClass<A | undefined, 'unwrapOption', [Option<A>]>

@@ -2,7 +2,7 @@ import { Option } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import {
   Observable,
-  Operator,
+  RemoveInitializedOperator,
   Subscription,
   SwitchMapOperatorObservable,
   Token,
@@ -10,7 +10,7 @@ import {
 
 export const switchMap = <A, B>(
   mapToObservable: (curr: A) => Observable<B>
-): Operator<A, B> => (parent: Observable<A>) =>
+): RemoveInitializedOperator<A, B> => (parent: Observable<A>) =>
   new SwitchMapObservableClass(parent, mapToObservable);
 
 class SwitchMapObservableClass<A, B>

@@ -1,9 +1,16 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import { Observable, Operator, SkipOperatorObservable, Token } from '../types';
+import {
+  Observable,
+  RemoveInitializedOperator,
+  SkipOperatorObservable,
+  Token,
+} from '../types';
+import { isPositiveInteger } from '../utils';
 
-export const skip = <A>(n: number): Operator<A, A> => (parent: Observable<A>) =>
-  new SkipObservableClass(parent, n);
+export const skip = <A>(n: number): RemoveInitializedOperator<A, A> => (
+  parent: Observable<A>
+) => (!isPositiveInteger(n) ? parent : new SkipObservableClass(parent, n));
 
 class SkipObservableClass<A>
   extends SyncChildObservableClass<A, 'skip', [A]>
@@ -15,7 +22,9 @@ class SkipObservableClass<A>
     super({
       parents: [parent],
       type: 'skip',
-      currentValueInit: n === 0 ? parent.currentValue : Option.none,
+      currentValueInit: !isPositiveInteger(n)
+        ? parent.currentValue
+        : Option.none,
     });
     this._counter = 0;
     this._n = n;

@@ -1,16 +1,22 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
+  InitializedToInitializedOperator,
   MapWithIndexOperatorObservable,
   Observable,
-  Operator,
+  ToBaseOperator,
   Token,
 } from '../types';
 
 export const mapWithIndex = <A, B>(
   mapFn: (x: A, index: number) => B
-): Operator<A, B> => (parent: Observable<A>) =>
+): ToBaseOperator<A, B> => (parent: Observable<A>) =>
   new MapWithIndexObservableClass(parent, mapFn);
+
+export const mapWithIndexI = <A, B>(
+  mapFn: (x: A, index: number) => B
+): InitializedToInitializedOperator<A, B> =>
+  mapWithIndex(mapFn) as InitializedToInitializedOperator<A, B>;
 
 class MapWithIndexObservableClass<A, B>
   extends SyncChildObservableClass<B, 'mapWithIndex', [A]>
