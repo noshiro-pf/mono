@@ -3,6 +3,10 @@ import { Option } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function useStream<A>(
+  createStream$: () => InitializedObservable<A>
+): InitializedObservable<A>;
+export function useStream<A>(createStream$: () => Observable<A>): Observable<A>;
+export function useStream<A>(
   createStream$: () => Observable<A>
 ): Observable<A> {
   const s = useMemo(createStream$, []);
