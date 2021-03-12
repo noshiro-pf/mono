@@ -42,9 +42,9 @@ export const products: {
       link: 'https://event-schedule-app.web.app/',
       title: 'イベント日程調整ツール2',
       subtitle: 'イベントのスケジュール調整用アプリケーション',
-      body1: '',
-      body2:
-        'React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（最終更新：2020年1月05日）',
+      body1: 'https://www.notion.so/noshiro/c40d53907f204a3e9961a4a2b623ca22',
+      body2: `React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（最終更新：2020年1月05日）
+        → 2021-03-10にRxJSを自作ライブラリ SyncFlow に差し替えた。`,
       imageUrl: EventScheduleApp2Image,
     },
     {
@@ -84,8 +84,8 @@ export const products: {
         '6面ダイス2個を振って合計を表示するカタン（ボードゲーム）用サポートアプリ',
       body1:
         'ダイスを振るのが面倒なのと実物より良い乱数で遊びたかったので作った。同じ目が出ても振ったかどうか分かるようなエフェクトを付けている。ダイスを転がすアニメーション等があってもよいかもしれない。',
-      body2:
-        'React・RxJS・TypeScriptで実装。RxJSはリングの透明度変化を扱うために使用した（連打時に前のアニメーションをキャンセルする処理）。（制作時期：2019年7月）',
+      body2: `React・RxJS・TypeScriptで実装。RxJSはリングの透明度変化を扱うために使用した（連打時に前のアニメーションをキャンセルする処理）。（制作時期：2019年7月）
+        → 2021-03-12にRxJSを自作ライブラリ SyncFlow に差し替えた。`,
       imageUrl: CatanDiceImage,
     },
     {
@@ -103,8 +103,8 @@ export const products: {
       subtitle: '簡単な型無しラムダ計算のインタプリタ（おもちゃ）',
       body1:
         "Chrome推奨。使えるアルファベットは [a-z]。一部のマクロ（'+', 'PLUS', 'SUCC', 数字）に対応。括弧の省略は未対応。もうちょっと高機能にしたい。",
-      body2:
-        'Angular・RxJS・TypeScriptで実装。（制作時期：2017年12月） → 2019年8月7日にReactで再実装 → 2021/1/27にPreactやSolidにも移植',
+      body2: `Angular・RxJS・TypeScriptで実装。（制作時期：2017年12月） → 2019年8月7日にReactで再実装 → 2021/1/27にPreactやSolidにも移植
+        → 2021-03-12にRxJSを自作ライブラリ SyncFlow に差し替えた。`,
       imageUrl: LambdaInterpreterAppImage,
     },
     {
