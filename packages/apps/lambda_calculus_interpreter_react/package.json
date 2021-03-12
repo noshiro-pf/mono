@@ -41,13 +41,12 @@
   },
   "dependencies": {
     "@noshiro/lambda-calculus-interpreter-core": "*",
-    "@noshiro/react-rxjs-utils": "*",
+    "@noshiro/preact-syncflow-hooks": "*",
     "@noshiro/react-utils": "*",
-    "@noshiro/rxjs-utils": "*",
+    "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
-    "rxjs": "^6.6.3",
     "styled-components": "^5.1.1"
   }
 }

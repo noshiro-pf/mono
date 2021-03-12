@@ -24,7 +24,7 @@
   "dependencies": {
     "@noshiro/lambda-calculus-interpreter-core": "*",
     "@noshiro/solid-styled-components": "*",
-    "@noshiro/ts-utils": "*",
-    "rxjs": "^6.6.3"
+    "@noshiro/syncflow": "*",
+    "@noshiro/ts-utils": "*"
   }
 }

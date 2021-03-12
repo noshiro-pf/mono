@@ -1,12 +1,19 @@
 import {
-  useDataStream,
+  useStream,
   useStreamValue,
   useVoidEventAsStream,
-} from '@noshiro/react-rxjs-utils';
+} from '@noshiro/react-syncflow-hooks';
 import { memoNamed } from '@noshiro/react-utils';
-import { mapToConst } from '@noshiro/rxjs-utils';
-import { interval, merge } from 'rxjs';
-import { map, scan, switchMapTo, take } from 'rxjs/operators';
+import {
+  interval,
+  map,
+  mapTo,
+  merge,
+  scan,
+  switchMap,
+  take,
+  withInitialValue,
+} from '@noshiro/syncflow';
 import { historyReducer } from '../functions/history-reducer';
 import { historyToSumCount } from '../functions/history-to-sum-count';
 import { IList, IRepeat } from '../immutable';
@@ -20,51 +27,59 @@ export const Main = memoNamed('Main', () => {
   const [undo$, undo] = useVoidEventAsStream();
   const [redo$, redo] = useVoidEventAsStream();
 
-  const history$ = useDataStream(HistoryState(), () =>
+  const history$ = useStream(() =>
     merge(
-      rollDices$.pipe(mapToConst('roll-dices')),
-      undo$.pipe(mapToConst('undo')),
-      redo$.pipe(mapToConst('redo'))
-    ).pipe(scan(historyReducer, HistoryState()))
+      rollDices$.chain(mapTo('roll-dices' as const)),
+      undo$.chain(mapTo('undo' as const)),
+      redo$.chain(mapTo('redo' as const))
+    ).chain(scan(historyReducer, HistoryState()))
   );
 
-  const undoable$ = useDataStream(false, () =>
-    history$.pipe(map((h) => h.index > -1))
+  const undoable$ = useStream(() =>
+    history$.chain(map((h) => h.index > -1)).chain(withInitialValue(false))
   );
 
-  const redoable$ = useDataStream(false, () =>
-    history$.pipe(map((h) => h.index < h.history.size - 1))
+  const redoable$ = useStream(() =>
+    history$
+      .chain(map((h) => h.index < h.history.size - 1))
+      .chain(withInitialValue(false))
   );
 
-  const diceValues$ = useDataStream<[number, number]>([0, 0], () =>
-    history$.pipe(
-      map((histState) => histState.history.get(histState.index, [0, 0]))
-    )
-  );
-
-  const sumCount$ = useDataStream<IList<number>>(sumCountInitial, () =>
-    history$.pipe(map(historyToSumCount))
-  );
-
-  const opacity$ = useDataStream<number>(0, () =>
-    rollDices$.pipe(
-      switchMapTo(
-        interval(50).pipe(
-          take(11),
-          map((i) => (10 - i) / 10)
+  const diceValues$ = useStream<[number, number]>(() =>
+    history$
+      .chain(
+        map(
+          (histState) =>
+            histState.history.get(histState.index) ??
+            ([0, 0] as [number, number])
         )
       )
-    )
+      .chain(withInitialValue([0, 0]))
   );
 
-  const [dice1, dice2] = useStreamValue(diceValues$, [0, 0] as [
-    number,
-    number
-  ]);
-  const sumCount = useStreamValue(sumCount$, sumCountInitial);
-  const undoable = useStreamValue(undoable$, false);
-  const redoable = useStreamValue(redoable$, false);
-  const opacity = useStreamValue(opacity$, 0);
+  const sumCount$ = useStream<IList<number>>(() =>
+    history$
+      .chain(map(historyToSumCount))
+      .chain(withInitialValue(sumCountInitial))
+  );
+
+  const opacity$ = useStream<number>(() =>
+    rollDices$
+      .chain(
+        switchMap(() =>
+          interval(50)
+            .chain(take(11))
+            .chain(map((i) => (10 - i) / 10))
+        )
+      )
+      .chain(withInitialValue(0))
+  );
+
+  const [dice1, dice2] = useStreamValue(diceValues$);
+  const sumCount = useStreamValue(sumCount$);
+  const undoable = useStreamValue(undoable$);
+  const redoable = useStreamValue(redoable$);
+  const opacity = useStreamValue(opacity$);
 
   return (
     <MainView

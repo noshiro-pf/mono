@@ -18,6 +18,7 @@ export const expandShortcuts = (tokens: string[]): string[] => {
         expanded.push(...PLUStokens);
         break;
       case '\\':
+      case 'λ':
         expanded.push('lambda');
         break;
       default:

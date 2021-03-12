@@ -2,22 +2,17 @@ import { styled } from '@noshiro/solid-styled-components';
 import { JSX } from 'solid-js';
 import { useStateAsStream, useStreamValue } from '../utils';
 import { CodeArea } from './code-area';
-import { toLambdaEvaluated } from './to-lambda-eval-operator';
-
-const inputAreaStringInitialValue: string = '((+ 2) 3)';
+import { useLambdaEval } from './use-lambda-eval';
 
 export const App = (): JSX.Element => {
   const [inputAreaString$, setInputAreaString] = useStateAsStream<string>(
-    inputAreaStringInitialValue
+    '((+ 2) 3)'
   );
 
-  const inputAreaString = useStreamValue(
-    inputAreaString$,
-    inputAreaStringInitialValue
-  );
+  const outputAreaString$ = useLambdaEval(inputAreaString$);
 
-  const outputAreaString$ = inputAreaString$.pipe(toLambdaEvaluated);
-
+  /* extract values */
+  const inputAreaString = useStreamValue(inputAreaString$);
   const outputAreaString = useStreamValue(outputAreaString$, '');
 
   return (

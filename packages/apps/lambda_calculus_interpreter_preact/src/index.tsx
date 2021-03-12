@@ -1,6 +1,6 @@
 import { setup } from 'goober';
 import { h, render } from 'preact';
-import { Main } from './components';
+import { Main } from './components/main';
 import './index.css';
 
 setup(h);
