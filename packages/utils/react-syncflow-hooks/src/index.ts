@@ -1,4 +1,9 @@
-import { InitializedObservable, Observable, source } from '@noshiro/syncflow';
+import {
+  InitializedObservable,
+  Observable,
+  source,
+  withInitialValue,
+} from '@noshiro/syncflow';
 import { Option } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -74,18 +79,15 @@ export const useEventAsStream = <A>(): [Observable<A>, (value: A) => void] => {
 
 export const useStateAsStream = <A>(
   initialValue: A
-): [Observable<A>, (v: A) => void] => {
-  const value$ = useMemo(() => source<A>(), []);
-
-  useEffect(() => {
-    value$.next(initialValue);
-  }, []);
+): [InitializedObservable<A>, (v: A) => void] => {
+  const src$ = useMemo(() => source<A>(), []);
+  const state$ = useStream(() => src$.chain(withInitialValue(initialValue)));
 
   const setter = useCallback((v: A) => {
-    value$.next(v);
+    src$.next(v);
   }, []);
 
-  return [value$, setter];
+  return [state$, setter];
 };
 
 export const useChangeValueEffect = <A>(
