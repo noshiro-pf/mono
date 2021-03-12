@@ -42,14 +42,13 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.2.1",
-    "@noshiro/react-rxjs-utils": "*",
+    "@noshiro/react-syncflow-hooks": "*",
     "@noshiro/react-utils": "*",
-    "@noshiro/rxjs-utils": "*",
+    "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
     "immutable": "^4.0.0-rc.12",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
-    "rxjs": "^6.6.3",
     "styled-components": "^5.1.1"
   }
 }

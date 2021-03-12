@@ -1,53 +1,50 @@
 import {
   evalSequence,
-  LambdaTerm,
   parseLambdaTerm,
   termToString,
 } from '@noshiro/lambda-calculus-interpreter-core';
-import { useDataStream } from '@noshiro/react-rxjs-utils';
-import { isNotUndefined } from '@noshiro/ts-utils';
-import { Observable } from 'rxjs';
-import { debounceTime, filter, map } from 'rxjs/operators';
-// import { splitToTokens } from '../parser/split-to-tokens';
-// import { isLambdaTerm } from '../is-lambda-term';
+import {
+  useStateAsStream,
+  useStream,
+  useStreamValue,
+} from '@noshiro/react-syncflow-hooks';
+import { debounceTimeI, mapI } from '@noshiro/syncflow';
+import { mapNullable, pipeClass } from '@noshiro/ts-utils';
 
 export const useLambdaEval = (
-  input$: Observable<string>
-): Observable<string> => {
-  const inputBuffered$ = useDataStream<string>('', () =>
-    input$.pipe(debounceTime(200 /* ms */))
+  initialInput: string,
+  parseErrorMessage: string
+): {
+  inputAreaString: string;
+  outputAreaString: string;
+  setInputAreaString: (input: string) => void;
+} => {
+  const [inputAreaString$, setInputAreaString] = useStateAsStream<string>(
+    initialInput
   );
 
-  const parseTree$ = useDataStream<LambdaTerm | undefined>(undefined, () =>
-    inputBuffered$.pipe(map(parseLambdaTerm))
-  );
-
-  // const parseTreeToStr$ = useDataStream<string>(
-  //   '',
-  //   parseTree$.pipe(map(termToString))
-  // );
-
-  const evalSequence$ = useDataStream<LambdaTerm[]>([], () =>
-    parseTree$.pipe(filter(isNotUndefined), map(evalSequence))
-  );
-
-  const evalSeqToStr$ = useDataStream<string[]>([], () =>
-    evalSequence$.pipe(map((seq) => seq.map(termToString)))
-  );
-
-  const output$ = useDataStream<string>('', () =>
-    evalSeqToStr$.pipe(
-      map((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
+  const outputAreaString$ = useStream<string | undefined>(() =>
+    inputAreaString$.chain(debounceTimeI(200 /* ms */)).chain(
+      mapI(
+        (input) =>
+          pipeClass(input)
+            .map(parseLambdaTerm)
+            .map(mapNullable(evalSequence))
+            .map(mapNullable((seq) => seq.map(termToString)))
+            .map(
+              mapNullable((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
+            ).value
+      )
     )
   );
 
-  // const isLambdaTerm$ = useDataStream<boolean>(
-  //   false,
-  //   input$.pipe(
-  //     map(splitToTokens),
-  //     map(isLambdaTerm)
-  //   )
-  // );
+  /* extract values */
+  const inputAreaString = useStreamValue(inputAreaString$);
+  const outputAreaString = useStreamValue(outputAreaString$);
 
-  return output$;
+  return {
+    inputAreaString,
+    outputAreaString: outputAreaString ?? parseErrorMessage,
+    setInputAreaString,
+  };
 };

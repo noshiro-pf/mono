@@ -1,0 +1,40 @@
+import {
+  evalSequence,
+  LambdaTerm,
+  parseLambdaTerm,
+  termToString,
+} from '@noshiro/lambda-calculus-interpreter-core';
+import {
+  debounceTimeI,
+  filter,
+  InitializedObservable,
+  map,
+  mapI,
+  withInitialValue,
+} from '@noshiro/syncflow';
+import { isNotUndefined } from '@noshiro/ts-utils';
+
+export const useLambdaEval = (
+  input$: InitializedObservable<string>
+): InitializedObservable<string> => {
+  const inputBuffered$ = input$.chain(debounceTimeI(200 /* ms */));
+
+  const parseTree$: InitializedObservable<
+    LambdaTerm | undefined
+  > = inputBuffered$.chain(mapI(parseLambdaTerm));
+
+  const evalSequence$: InitializedObservable<LambdaTerm[]> = parseTree$
+    .chain(filter(isNotUndefined))
+    .chain(map(evalSequence))
+    .chain(withInitialValue([]));
+
+  const evalSeqToStr$: InitializedObservable<string[]> = evalSequence$.chain(
+    mapI((seq) => seq.map(termToString))
+  );
+
+  const output$: InitializedObservable<string> = evalSeqToStr$.chain(
+    mapI((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
+  );
+
+  return output$;
+};

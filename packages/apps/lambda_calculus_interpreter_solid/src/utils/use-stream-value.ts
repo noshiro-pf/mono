@@ -1,11 +1,25 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import {
+  InitializedObservable,
+  Observable,
+  source,
+  withInitialValue,
+} from '@noshiro/syncflow';
+import { Option } from '@noshiro/ts-utils';
 import { createSignal, onCleanup } from 'solid-js';
 
-export const useStreamValue = <T>(
-  stream$: Observable<T>,
-  initialValue: T
-): (() => T) => {
-  const [getValue, setValue] = createSignal<T>(initialValue);
+export function useStreamValue<A, B = A>(
+  stream$: Observable<A>,
+  initialValue: B
+): A | B;
+export function useStreamValue<A>(stream$: InitializedObservable<A>): A;
+export function useStreamValue<A>(stream$: Observable<A>): A | undefined;
+export function useStreamValue<A, B = A>(
+  stream$: Observable<A>,
+  initialValue?: B
+): () => A | B | undefined {
+  const [getValue, setValue] = createSignal<A | B | undefined>(
+    Option.unwrap(stream$.currentValue) ?? initialValue
+  );
 
   const subscription = stream$.subscribe(setValue);
   onCleanup(() => {
@@ -13,15 +27,17 @@ export const useStreamValue = <T>(
   });
 
   return getValue;
-};
+}
 
-export const useStateAsStream = <T>(
-  initialValue: T
-): [Observable<T>, (nextValue: T) => void] => {
-  const stream$ = new BehaviorSubject<T>(initialValue);
-  const next = (nextValue: T): void => {
-    stream$.next(nextValue);
+export const useStateAsStream = <A>(
+  initialValue: A
+): [InitializedObservable<A>, (v: A) => void] => {
+  const src$ = source<A>();
+  const state$ = src$.chain(withInitialValue(initialValue));
+
+  const setter = (v: A): void => {
+    src$.next(v);
   };
 
-  return [stream$, next];
+  return [state$, setter];
 };

@@ -1,24 +1,62 @@
-import { useStateAsStream, useStreamValue } from '@noshiro/preact-rxjs-utils';
 import { memoNamed } from '@noshiro/preact-utils';
-import { MainView } from './main-view';
+import { styled } from 'goober';
+import { CodeArea } from './input-area';
 import { useLambdaEval } from './use-lambda-eval';
 
 export const Main = memoNamed('Main', () => {
-  const [inputAreaString$, setInputAreaString] = useStateAsStream<string>(
-    '((+ 2) 3)'
-  );
-
-  const outputString$ = useLambdaEval(inputAreaString$);
-
-  /* extract values */
-  const inputAreaString = useStreamValue(inputAreaString$, '');
-  const outputAreaString = useStreamValue(outputString$, '');
+  const {
+    inputAreaString,
+    outputAreaString,
+    setInputAreaString,
+  } = useLambdaEval('((+ 2) 3)', 'Parse error.');
 
   return (
-    <MainView
-      inputAreaString={inputAreaString}
-      inputAreaStringChange={setInputAreaString}
-      outputAreaString={outputAreaString}
-    />
+    <Root>
+      <Title>(Untyped) lambda calculus</Title>
+      <Description>expr ::= x | (lambda x. expr) | (expr expr)</Description>
+      <TextAreaWrapper>
+        <div>Input:</div>
+        <InputAreaStyled
+          value={inputAreaString}
+          valueChange={setInputAreaString}
+        />
+      </TextAreaWrapper>
+
+      <TextAreaWrapper>
+        <div>Output:</div>
+        <OutputAreaStyled value={outputAreaString} />
+      </TextAreaWrapper>
+    </Root>
   );
 });
+
+const Root = styled('div')`
+  padding: 10px;
+`;
+
+const Title = styled('h2')``;
+
+const Description = styled('div')`
+  padding: 10px;
+`;
+
+const TextAreaWrapper = styled('div')`
+  padding: 10px;
+  width: 100%;
+`;
+
+const CodeAreaStyled = styled(CodeArea)`
+  /* max-width: 100%;
+  min-width: 600px; */
+  width: 100%;
+`;
+
+const InputAreaStyled = styled(CodeAreaStyled)`
+  min-height: 100px;
+  max-height: 500px;
+`;
+
+const OutputAreaStyled = styled(CodeAreaStyled)`
+  min-height: 500px;
+  max-height: 800px;
+`;
