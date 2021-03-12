@@ -13,6 +13,8 @@
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "predeploy": "yarn build",
     "deploy": "firebase deploy",
+    "deploy:nobuild": "firebase deploy",
+    "deploy:functions": "firebase deploy --only functions",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fmt": "yarn _prettier",

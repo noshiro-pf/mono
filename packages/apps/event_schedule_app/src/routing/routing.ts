@@ -2,7 +2,7 @@ import { ComponentType } from 'react';
 import { AnswerPage } from '../components/pages/answer-page/answer-page';
 import { CreateEventSchedule } from '../components/pages/create-event-schedule/create-event-schedule';
 import { EditEventSchedule } from '../components/pages/create-event-schedule/edit-event-schedule';
-import { UiPartsTest } from '../components/pages/ui-parts-test';
+// import { UiPartsTest } from '../components/pages/ui-parts-test';
 import { eventIdParamName } from './use-event-id';
 
 export const routePaths = {
@@ -11,7 +11,8 @@ export const routePaths = {
   editPageSuffix: '/edit',
   editPage: (eventId: string) =>
     `${routePaths.answerPage}/${eventId}${routePaths.editPageSuffix}`,
-  uiParts: '/ui-parts-test',
+  // answerPageTest: '/event-test',
+  // uiParts: '/ui-parts-test',
 } as const;
 
 export const routing = {
@@ -24,14 +25,19 @@ export const routing = {
     path: `${routePaths.answerPage}/:${eventIdParamName}${routePaths.editPageSuffix}`,
     component: EditEventSchedule,
   },
-  uiParts: { path: routePaths.uiParts, component: UiPartsTest },
+  // answerPageTest: {
+  //   path: `${routePaths.answerPageTest}/:${eventIdParamName}`,
+  //   component: AnswerPage,
+  // },
+  // uiParts: { path: routePaths.uiParts, component: UiPartsTest },
 };
 
 export const routingList: readonly [string, ComponentType][] = [
   routing.createPage,
   routing.answerPage,
   routing.editPage,
-  routing.uiParts,
+  // routing.answerPageTest,
+  // routing.uiParts,
 ].map((a) => [a.path, a.component]);
 
 export const redirects: [string, string][] = [['/', routePaths.createPage]];
