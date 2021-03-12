@@ -51,3 +51,22 @@ export const notifyAnswerDeadlineEveryday = functions.pubsub
   .schedule('00 12 * * *')
   .timeZone('Asia/Tokyo')
   .onRun(notifyAnswerDeadline);
+
+// export const answerPagePreRender = functions
+//   .region('asia-northeast2')
+//   .https.onRequest((_req, res) => {
+//     res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+//     fs.readFile('./index.html', 'utf8', (_e, html) => {
+//       const responseHtml = html.replace(
+//         'イベント日程調整',
+//         'イベント日程調整 回答ページ'
+//       );
+//       res.status(200).send(responseHtml);
+//     });
+//   });
+
+// export const testOnRequest = functions.https.onRequest((_req, res) => {
+//   res.json({
+//     result: `onRequest test`,
+//   });
+// });
