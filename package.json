@@ -11,7 +11,7 @@
     "check:after-setup": "run-s build:apps lint:all test:all check:no-changes",
     "check:all": "yarn && run-s setup:configs build:utils check:after-setup",
     "check:no-changes": "yarn fmt:all && scripts/git_no_changes.sh",
-    "clean:all": "yarn clean:root && yarn clean:sub && yarn clean:node_modules",
+    "clean:all": "run-s clean:root clean:sub clean:node_modules",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "clean:root": "run-s clean:root:*",
     "clean:root:config": "rimraf config/**/{*,.*}.js",
