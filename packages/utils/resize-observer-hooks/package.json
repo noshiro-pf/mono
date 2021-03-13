@@ -11,7 +11,7 @@
     "build": "yarn build:esm",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
-    "clean": "run-s clean:*",
+    "clean": "run-s clean:**",
     "clean:build:esm": "rimraf esm",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",

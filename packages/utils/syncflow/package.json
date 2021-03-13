@@ -22,7 +22,7 @@
     "build:cjs": "tsc --project config/tsconfig.cjs.json",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
-    "clean": "run-s clean:*",
+    "clean": "run-s clean:**",
     "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
