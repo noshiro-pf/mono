@@ -17,6 +17,7 @@ experimental/**/scripts/**/*.js
 config/**/*.js
 scripts/**/*.js
 **/*.d.ts
+!**/react-app-env.d.ts
 
 # Logs
 logs
