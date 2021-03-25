@@ -10721,6 +10721,11 @@ marked@^0.7.0:
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.7.0.tgz#b64201f051d271b1edc10a04d1ae9b74bb8e5c0e"
   integrity sha512-c+yYdCZJQrsRjTPhUx7VKkApw9bwDkNbHUKo1ovgcfDjb2kc8rLuRbIFyXL5WOEUwzSSKo3IXpph2K6DqB/KZg==
 
+marked@^0.8.0:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.8.2.tgz#4faad28d26ede351a7a1aaa5fec67915c869e355"
+  integrity sha512-EGwzEeCcLniFX51DhTpmTom+dSA/MG/OBUDjnWtHbEnjAH180VzUeAw+oE4+Zv+CoYBWyRlYOTR0N8SO9R1PVw==
+
 math-random@^1.0.1:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/math-random/-/math-random-1.0.4.tgz#5dd6943c938548267016d4e34f057583080c514c"
@@ -12892,6 +12897,29 @@ postcss@^8.1.0, postcss@^8.1.8:
     colorette "^1.2.2"
     nanoid "^3.1.20"
     source-map "^0.6.1"
+
+preact-markdown@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/preact-markdown/-/preact-markdown-2.0.0.tgz#a1241ddbd33ad22a3a3867ef5428d9af788279c1"
+  integrity sha512-zDLV5VD836Nrieik8j+X7WILfIZj2UorP+NJES0DvGxM9wyD2JyDYt1SN5IugsyYT2LOjISpn2IeArByqtd8XA==
+  dependencies:
+    marked "^0.8.0"
+    preact-markup "^2.0.0"
+
+preact-markup@^2.0.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/preact-markup/-/preact-markup-2.1.1.tgz#0451e7eed1dac732d7194c34a7f16ff45a2cfdd7"
+  integrity sha512-8JL2p36mzK8XkspOyhBxUSPjYwMxDM0L5BWBZWxsZMVW8WsGQrYQDgVuDKkRspt2hwrle+Cxr/053hpc9BJwfw==
+
+preact-media-hook@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/preact-media-hook/-/preact-media-hook-1.0.3.tgz#1e208a90bfae9a351d97415c58e9b3a8d2bfef7c"
+  integrity sha512-Vl32i29Hyb5DGg7atJ/Fp4dXhMrgRG9n3/99tRfxH7Wixapgguil0PGnzgXJMOWisPp/VAx6ShlWhXVaTYMITg==
+
+preact-mui@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/preact-mui/-/preact-mui-0.1.1.tgz#3bba05e55236d07a0a167f657cf4db06221784c2"
+  integrity sha1-O7oF5VI20HoKFn9lfPTbBiIXhMI=
 
 preact-router@^3.2.1:
   version "3.2.1"
