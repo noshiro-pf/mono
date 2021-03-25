@@ -8,6 +8,6 @@ lambda_calculus_interpreter_core
 lambda_calculus_interpreter_react
 lambda_calculus_interpreter_preact
 lambda_calculus_interpreter_solid
-my_profile_app
+my_profile_app_react
 my_profile_app_preact
 slack_app
