@@ -1,5 +1,4 @@
 export * from './array';
-export * from './async-operation';
 export * from './bit-array';
 export * from './color';
 export * from './date';
@@ -7,6 +6,7 @@ export * from './functional';
 export * from './image';
 export * from './num';
 export * from './others';
+export * from './promise';
 export * from './promise-result';
 export * from './queue';
 export * from './random';
