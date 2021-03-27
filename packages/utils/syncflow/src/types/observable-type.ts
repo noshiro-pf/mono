@@ -30,9 +30,10 @@ export type SyncChildObservableType =
   | 'unwrapOption'
   | 'unwrapResultErr'
   | 'unwrapResultOk'
+  | 'withBufferedFrom'
   | 'withIndex'
   | 'withInitialValue'
-  | 'withLatest'
+  | 'withLatestFrom'
   | 'zip';
 
 export type AsyncChildObservableType =

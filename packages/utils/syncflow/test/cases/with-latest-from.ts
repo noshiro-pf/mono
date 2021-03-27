@@ -3,7 +3,7 @@ import {
   IntervalObservable,
   map,
   Observable,
-  withLatest,
+  withLatestFrom,
 } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
@@ -17,7 +17,7 @@ const createStreams = (
   const counter$ = interval(tick, true);
   const double$ = counter$.chain(map((x) => x * 2));
 
-  const withLatest$ = counter$.chain(withLatest(double$));
+  const withLatest$ = counter$.chain(withLatestFrom(double$));
 
   return {
     counter$,
@@ -25,9 +25,9 @@ const createStreams = (
   };
 };
 
-export const withLatestTestCases: [StreamTestCase<[number, number]>] = [
+export const withLatestFromTestCases: [StreamTestCase<[number, number]>] = [
   {
-    name: 'withLatest case 1',
+    name: 'withLatestFrom case 1',
     expectedOutput: [
       [0, 0],
       [1, 2],

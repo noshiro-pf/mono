@@ -18,6 +18,7 @@ export * from './take';
 export * from './take-until';
 export * from './take-while';
 export * from './throttle-time';
+export * from './with-buffered-from';
 export * from './with-index';
 export * from './with-initial-value';
-export * from './with-latest';
+export * from './with-latest-from';

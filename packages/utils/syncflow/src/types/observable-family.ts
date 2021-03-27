@@ -154,9 +154,14 @@ export type SkipUntilOperatorObservable<A> = SyncChildObservable<
   'skipUntil',
   [A]
 >;
-export type WithLatestOperatorObservable<A, B> = SyncChildObservable<
+export type WithLatestFromOperatorObservable<A, B> = SyncChildObservable<
   [A, B],
-  'withLatest',
+  'withLatestFrom',
+  [A]
+>;
+export type WithBufferedFromOperatorObservable<A, B> = SyncChildObservable<
+  [A, B[]],
+  'withBufferedFrom',
   [A]
 >;
 
