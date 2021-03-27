@@ -26,9 +26,10 @@ import {
   takeWhileTestCases,
   throttleTimeTestCases,
   timerTestCases,
+  withBufferedFromTestCases,
   withIndexTestCases,
   withInitialValueTestCases,
-  withLatestTestCases,
+  withLatestFromTestCases,
   zipTestCases,
 } from './cases';
 import { TICK } from './constants';
@@ -63,9 +64,10 @@ const exampleList: readonly {
   { name: 'takeWhile', cases: takeWhileTestCases },
   { name: 'throttleTime', cases: throttleTimeTestCases },
   { name: 'timer', cases: timerTestCases },
+  { name: 'withBufferedFrom', cases: withBufferedFromTestCases },
   { name: 'withIndex', cases: withIndexTestCases },
   { name: 'withInitialValue', cases: withInitialValueTestCases },
-  { name: 'withLatest', cases: withLatestTestCases },
+  { name: 'withLatestFrom', cases: withLatestFromTestCases },
   { name: 'zip', cases: zipTestCases },
 ];
 

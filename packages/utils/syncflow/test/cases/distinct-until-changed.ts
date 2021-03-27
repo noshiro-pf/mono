@@ -4,7 +4,7 @@ import {
   IntervalObservable,
   map,
   Observable,
-  withLatest,
+  withLatestFrom,
 } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
 import { StreamTestCase } from '../typedef';
@@ -28,7 +28,7 @@ const createStreams = (
     .chain(map((i) => Math.floor(i / 3)))
     .chain(distinctUntilChanged());
 
-  const withLatest$ = distinctUntilChanged$.chain(withLatest(counter$));
+  const withLatest$ = distinctUntilChanged$.chain(withLatestFrom(counter$));
 
   return {
     counter$,

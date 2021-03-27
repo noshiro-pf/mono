@@ -6,33 +6,33 @@ import {
   Observable,
   ToBaseOperator,
   Token,
-  WithLatestOperatorObservable,
+  WithLatestFromOperatorObservable,
 } from '../types';
 import { maxDepth } from '../utils';
 
-export const withLatest = <A, B>(
+export const withLatestFrom = <A, B>(
   observable: Observable<B>
 ): ToBaseOperator<A, [A, B]> => (parent: Observable<A>) =>
-  new WithLatestObservableClass(parent, observable);
+  new WithLatestFromObservableClass(parent, observable);
 
-export const withLatestI = <A, B>(
+export const withLatestFromI = <A, B>(
   observable: InitializedObservable<B>
 ): InitializedToInitializedOperator<A, [A, B]> =>
-  withLatest(observable) as InitializedToInitializedOperator<A, [A, B]>;
+  withLatestFrom(observable) as InitializedToInitializedOperator<A, [A, B]>;
 
-export const withLatestFrom = withLatest; // alias
-export const withLatestFromI = withLatestI; // alias
+export const withLatest = withLatestFrom; // alias
+export const withLatestI = withLatestFromI; // alias
 
-class WithLatestObservableClass<A, B>
-  extends SyncChildObservableClass<[A, B], 'withLatest', [A]>
-  implements WithLatestOperatorObservable<A, B> {
+class WithLatestFromObservableClass<A, B>
+  extends SyncChildObservableClass<[A, B], 'withLatestFrom', [A]>
+  implements WithLatestFromOperatorObservable<A, B> {
   private readonly _observable: Observable<B>;
 
   constructor(parent: Observable<A>, observable: Observable<B>) {
     super({
       parents: [parent],
       depth: 1 + maxDepth([parent, observable]),
-      type: 'withLatest',
+      type: 'withLatestFrom',
       currentValueInit:
         Option.isNone(parent.currentValue) ||
         Option.isNone(observable.currentValue)
