@@ -11,3 +11,4 @@ lambda_calculus_interpreter_solid
 my_profile_app_react
 my_profile_app_preact
 slack_app
+algo_app
