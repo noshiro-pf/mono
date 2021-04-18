@@ -1,0 +1,50 @@
+{
+  "name": "@noshiro/algo-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "prebuild": "yarn clean:build",
+    "build": "webpack --config config/webpack.prod.js",
+    "postbuild": "cpx \"public/**\" ${npm_package_config_build_dir}",
+    "clean": "run-s clean:**",
+    "clean:build": "rimraf ${npm_package_config_build_dir}",
+    "clean:cache": "rimraf .firebase",
+    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
+    "predeploy": "yarn build",
+    "deploy": "firebase deploy",
+    "fb:init": "firebase init",
+    "fb:login": "firebase login",
+    "fmt": "yarn _prettier",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "serve": "firebase serve",
+    "setup": "yarn setup:webpackconfig",
+    "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",
+    "start": "webpack-dev-server --config config/webpack.dev.js",
+    "test": "jest --config config/jest.config.json --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "build_dir": "build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@noshiro/preact-resize-observer-hooks": "*",
+    "@noshiro/preact-utils": "*",
+    "@noshiro/ts-utils": "*",
+    "goober": "^2.0.5",
+    "preact": "^10.4.7",
+    "preact-router": "^3.2.1"
+  }
+}
