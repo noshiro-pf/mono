@@ -12,16 +12,16 @@ targets=(
   "react-router-utils"
   "react-utils"
   "preact-utils"
-  "resize-observer-hooks"
+  "react-resize-observer-hooks"
   
   # dependencies: [react-utils, rxjs-utils, ts-utils]
   "react-rxjs-utils"
   "preact-rxjs-utils"
 
-  # dependencies: [react-utils, resize-observer-hooks, ts-utils]
+  # dependencies: [react-utils, react-resize-observer-hooks, ts-utils]
   "react-utils-styled"
 
-  # dependencies: [react-utils, react-utils-styled, resize-observer-hooks, ts-utils]
+  # dependencies: [react-utils, react-utils-styled, react-resize-observer-hooks, ts-utils]
   "react-material-ui-utils"
   "react-blueprintjs-utils"
 )
