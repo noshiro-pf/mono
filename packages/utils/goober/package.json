@@ -1,0 +1,22 @@
+{
+  "name": "@noshiro/goober",
+  "version": "2.0.33",
+  "private": true,
+  "sideEffects": false,
+  "main": "dist/goober.js",
+  "module": "dist/goober.esm.js",
+  "source": "src/index.js",
+  "types": "goober.d.ts",
+  "typings": "./goober.d.ts",
+  "scripts": {
+    "test": "echo 'no test script'",
+    "clean": "rimraf dist",
+    "lint": "echo 'no lint script'",
+    "build": "echo 'no build script'",
+    "setup": "echo 'no setup script'",
+    "fmt": "prettier . --write"
+  },
+  "peerDependencies": {
+    "csstype": "^2.6.2"
+  }
+}
