@@ -26,8 +26,8 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/react-resize-observer-hooks": "*",
     "@noshiro/react-utils": "*",
-    "@noshiro/resize-observer-hooks": "*",
     "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "styled-components": "^5.1.1"
