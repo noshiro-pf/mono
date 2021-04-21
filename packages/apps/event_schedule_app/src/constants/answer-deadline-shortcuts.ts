@@ -12,12 +12,10 @@ import {
 const today = new Date();
 
 const createDate = (modifier: (d: Date) => Date): Date =>
-  pipe(
-    today,
-    modifier,
-    (d) => setHours(d, 23),
-    (d) => setMinutes(d, 59)
-  );
+  pipe(today)
+    .chain(modifier)
+    .chain((d) => setHours(d, 23))
+    .chain((d) => setMinutes(d, 59)).value;
 
 export const answerDeadlineShortcuts: IDatePickerShortcut[] = [
   {

@@ -24,12 +24,11 @@ export const pickupHighContrastHues = (
   saturation: Percent,
   lightness: Percent
 ): NonEmptyArray<Hue> | undefined => {
-  const luminanceList: ReadonlyNonEmptyArray<number> = pipe(
-    hues,
+  const luminanceList: ReadonlyNonEmptyArray<number> = pipe(hues).chain(
     neaMap((hue: Hue) =>
       relativeLuminance(hslToRgb([hue, saturation, lightness]))
     )
-  );
+  ).value;
 
   const luminanceDiffAccumulated: readonly number[] = getLuminanceListAccumulated(
     luminanceList

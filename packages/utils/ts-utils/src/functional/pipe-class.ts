@@ -4,7 +4,7 @@ class Pipe<A> {
     this.a = a;
   }
 
-  map<B>(fn: (a: A) => B): Pipe<B> {
+  chain<B>(fn: (a: A) => B): Pipe<B> {
     return new Pipe(fn(this.a));
   }
 
@@ -13,4 +13,4 @@ class Pipe<A> {
   }
 }
 
-export const pipeClass = <A>(a: A): Pipe<A> => new Pipe(a);
+export const pipe = <A>(a: A): Pipe<A> => new Pipe(a);

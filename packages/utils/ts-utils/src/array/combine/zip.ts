@@ -20,11 +20,10 @@ export function neaZip<A, B>(
   array2: ReadonlyNonEmptyArray<B>
 ): NonEmptyArray<[A, B]> {
   const len = Math.min(array1.length, array2.length);
-  return pipe(
-    (seq(len) as unknown) as ReadonlyNonEmptyArray<number>,
+  return pipe((seq(len) as unknown) as ReadonlyNonEmptyArray<number>).chain(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     neaMap((i) => tuple(array1[i]!, array2[i]!))
-  );
+  ).value;
 }
 
 type Unwrap<S> = { [P in keyof S]: ArrayElement<S[P]> };
