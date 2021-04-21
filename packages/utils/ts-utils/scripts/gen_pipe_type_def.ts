@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 const funcTypeName = 'FunctionType';
+const functionName = 'pipeF';
 
 const header = `
 import { FunctionType } from '../types';
@@ -13,10 +14,10 @@ const genPipeMethod = (length: number): string => {
   if (length < 2) return '';
   // length === 3 =>
   // ```
-  // export function pipe<T0, T1, T2>(x: T0, f1: FunctionType<T0, T1>, f2: FunctionType<T1, T2>): T2;
+  // export function pipeF<T0, T1, T2>(x: T0, f1: FunctionType<T0, T1>, f2: FunctionType<T1, T2>): T2;
   // ```
   const typeVars = range(0, length).map((i) => `T${i}`);
-  let result = `export function pipe<${typeVars.join(',')}>(x: ${
+  let result = `export function ${functionName}<${typeVars.join(',')}>(x: ${
     typeVars[0] ?? ''
   }, `;
   for (let i = 1; i < length; i += 1) {
@@ -30,7 +31,7 @@ const genPipeMethod = (length: number): string => {
 };
 
 const footer = `
-export function pipe(x: unknown, ...fns: FunctionType<unknown, unknown>[]): unknown {
+export function ${functionName}(x: unknown, ...fns: FunctionType<unknown, unknown>[]): unknown {
   return fns.reduce((curr, f) => f(curr), x);
 }
 `;

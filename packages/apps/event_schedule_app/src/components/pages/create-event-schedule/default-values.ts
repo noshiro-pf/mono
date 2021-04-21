@@ -44,13 +44,12 @@ export const defaultAnswerSymbolList: IList<IAnswerSymbol> = IList([
 
 const today = new Date();
 export const defaultAnswerDeadline: IYmdHm = ymdhmFromDate(
-  pipe(
-    today,
-    (d) =>
-      setDate(d, (getDate(d) + defaultAnswerDeadlineRemainingDays) as DateEnum),
-    (d) => setHours(d, 23),
-    (d) => setMinutes(d, 59)
-  )
+  pipe(today)
+    .chain((d) =>
+      setDate(d, (getDate(d) + defaultAnswerDeadlineRemainingDays) as DateEnum)
+    )
+    .chain((d) => setHours(d, 23))
+    .chain((d) => setMinutes(d, 59)).value
 );
 
 export const defaultNotificationSettings: INotificationSettings = createINotificationSettings().set(

@@ -18,18 +18,18 @@ export const getLuminanceListAccumulated = (
 
   /* +0.05はコントラスト比計算時に足される補正項  */
   const luminanceListCorrected: ReadonlyNonEmptyArray<number> = pipe(
-    luminanceList,
-    neaMap((v: number) => (useLog ? Math.log(v + 0.05) : v + 0.05))
-  );
+    luminanceList
+  ).chain(neaMap((v: number) => (useLog ? Math.log(v + 0.05) : v + 0.05)))
+    .value;
 
-  const luminanceDiffAccumulated = pipe(
-    rest(luminanceListCorrected),
-    scan(
-      ([prev, acc], curr) => tuple(curr, acc + Math.abs(curr - prev)),
-      tuple(first(luminanceListCorrected), 0)
-    ),
-    map(([_, acc]) => acc)
-  );
+  const luminanceDiffAccumulated = pipe(rest(luminanceListCorrected))
+    .chain(
+      scan(
+        ([prev, acc], curr) => tuple(curr, acc + Math.abs(curr - prev)),
+        tuple(first(luminanceListCorrected), 0)
+      )
+    )
+    .chain(map(([_, acc]) => acc)).value;
 
   return luminanceDiffAccumulated;
 };

@@ -9,7 +9,7 @@ import {
   useStreamValue,
 } from '@noshiro/react-syncflow-hooks';
 import { debounceTimeI, mapI } from '@noshiro/syncflow';
-import { mapNullable, pipeClass } from '@noshiro/ts-utils';
+import { mapNullable, pipe } from '@noshiro/ts-utils';
 
 export const useLambdaEval = (
   initialInput: string,
@@ -27,11 +27,11 @@ export const useLambdaEval = (
     inputAreaString$.chain(debounceTimeI(200 /* ms */)).chain(
       mapI(
         (input) =>
-          pipeClass(input)
-            .map(parseLambdaTerm)
-            .map(mapNullable(evalSequence))
-            .map(mapNullable((seq) => seq.map(termToString)))
-            .map(
+          pipe(input)
+            .chain(parseLambdaTerm)
+            .chain(mapNullable(evalSequence))
+            .chain(mapNullable((seq) => seq.map(termToString)))
+            .chain(
               mapNullable((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
             ).value
       )

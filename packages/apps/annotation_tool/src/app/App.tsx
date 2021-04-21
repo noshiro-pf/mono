@@ -64,11 +64,15 @@ const hues = pickupHighContrastHues(
   lightnessDarker
 ) as ReadonlyNonEmptyArray<Hue>;
 
-const labels: ReadonlyNonEmptyArray<Label> = pipe(
-  hues,
-  (list) => neaZip(list, labelNames),
-  neaMapWithIndex(([hue, name], index) => ({ id: index.toString(), hue, name }))
-);
+const labels: ReadonlyNonEmptyArray<Label> = pipe(hues)
+  .chain((list) => neaZip(list, labelNames))
+  .chain(
+    neaMapWithIndex(([hue, name], index) => ({
+      id: index.toString(),
+      hue,
+      name,
+    }))
+  ).value;
 
 const labelInit: Label = labels[0];
 

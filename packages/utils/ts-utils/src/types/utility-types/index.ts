@@ -13,4 +13,5 @@ export * from './strict-exclude';
 export * from './strict-omit';
 export * from './test-type';
 export * from './timer-id';
+export * from './value-of';
 export * from './writable';
