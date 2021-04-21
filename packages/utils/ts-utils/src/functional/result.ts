@@ -64,6 +64,10 @@ export namespace Result {
     }
     return result.value;
   };
+
+  export const fromPromise = <S, E = unknown>(
+    promise: Promise<S>
+  ): Promise<_Result<S, E>> => promise.then(ok).catch(err);
 }
 
 export type Result<S, E> = Result._Result<S, E>;
