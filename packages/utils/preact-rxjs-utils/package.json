@@ -29,6 +29,7 @@
     "@noshiro/preact-utils": "*",
     "@noshiro/rxjs-utils": "*",
     "@noshiro/ts-utils": "*",
-    "preact": "^10.4.7"
+    "preact": "^10.4.7",
+    "rxjs": "^6.6.3"
   }
 }
