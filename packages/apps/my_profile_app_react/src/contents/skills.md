@@ -10,8 +10,7 @@
             -   TSX
         -   (JavaScript)
         -   HTML
-        -   CSS
-        -   Sass（使うときは雰囲気で使っている）
+        -   CSS, Sass
     -   Frameworks
         -   React（メイン）
             -   フレームワークというよりライブラリだが役割的にここに入れた
@@ -26,22 +25,26 @@
                 -   ちょっと複雑な非同期処理を書きやすくするために
             -   Immutable.js
                 -   Set や Map の key に非 primitive 値を使いたいときなど
+                -   ある程度複雑になりそうなとき、reducer を書きやすくするために
                 -   Undo history が必要なときなど
         -   Routing
             -   React-router
-            -   [Rocon](https://blog.uhy.ooo/entry/2020-08-10/rocon-alpha/)も試したい
-                -   React-router の型安全性に不満があるので
+            -   [Rocon](https://blog.uhy.ooo/entry/2020-08-10/rocon-alpha/)
+                -   React-router の型安全性に不満があるので試したい（が、これを見つけて以降ルーティングがヘビーな趣味アプリを書いていない…）
         -   UI Library
             -   Blueprint.js
             -   Material-UI
-        -   CSSinJS
+        -   CSS in JS
             -   styled-components
+            -   goober
         -   Utilities
-            -   fp-ts（TypeScript で関数型っぽく書きたいとき）
+            -   (fp-ts)（TypeScript 用関数型ライブラリだがやややりすぎだと感じるのでお手製ライブラリを使っている）
             -   (jQuery) 今は使っていない
         -   Others
             -   Pixi.js
                 -   2D キャンバスの高速化に
+            -   discord.js
+                -   discord アプリを作った時に
     -   Development Environment
         -   Package manager
             -   npm
@@ -61,7 +64,8 @@
         -   MySQL（思い出せば書ける）
     -   BaaS
         -   firebase (hosting, firestore, functions, auth)
-        -   Netlify（遅かったので使うのをやめた）
+        -   Netlify
+        -   Heroku
     -   Docker
     -   express(nodejs) （チュートリアルをやっただけ）
 -   Others
@@ -85,11 +89,11 @@
         -   PowerPC のアセンブリ（大学の講義で）
     -   [PAST](https://atcoder.jp/contests/past202005-2)
         -   2020-05-25
-        -   初級（52 点）（普段使わない C++の構文で引っかかってしまった）
+        -   初級（52 点）（最近あまり使わない C++の構文で引っかかって時間をロスしたりしたので低めかも。そもそも競技プログラミングはあまり得意ではない）
 
 ### メモ
 
--   基本的にウェブフロントエンドに興味があり、バックエンドは比較的知識が少ない。今まで趣味で作りたいと思ったものはバックエンドヘビーなタスクが無かったので firebase で済んでしまったというのも理由としてある。
+-   基本的にウェブフロントエンドに興味があり、バックエンドは比較すると知識が少なめ。趣味でアプリを書くときは BaaS で簡単に済んでしまうのでなかなか書く機会が少ない。
 -   今後覚えようかと思いつつあまり触れていないもの
     -   Server Side Rendering, Static Site Generator
     -   GraphQL
