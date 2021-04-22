@@ -3,6 +3,16 @@ import { WritingsInfo } from '../types';
 export const writings: WritingsInfo[] = [
   {
     link:
+      'https://www.notion.so/noshiro/TypeScript-v4-1-noUncheckedIndexedAccess-00144ca0b4f44c1cb73f7ca43002aa70',
+    title:
+      'TypeScript v4.1 で追加されたnoUncheckedIndexedAccessオプションと上手くやっていくには',
+    subtitle: '',
+    body1:
+      'TSの新コンパイラオプションnoUncheckedIndexedAccessを使う際のノウハウをまとめました。',
+    body2: '',
+  },
+  {
+    link:
       'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
     title: ' リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
     subtitle:

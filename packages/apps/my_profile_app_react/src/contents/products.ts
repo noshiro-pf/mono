@@ -62,17 +62,27 @@ export const products: {
       title: '住宅ローン返済シミュレータ',
       subtitle: '住宅ローンの月々の返済額などを計算',
       body1:
-        '表計算ソフトで作りかけてなんとなくBlueprint.jsを試したくなったので作った。Chrome推奨。クエリパラメータでスナップショットを保存可能。',
+        '表計算ソフトで作りかけてなんとなくBlueprint.jsを試したくなったので作った。クエリパラメータでスナップショットを保存可能。',
       body2:
         'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2020年9月06日）',
       imageUrl: HousingLoanCalculatorImage,
+    },
+    {
+      link: 'https://cant-stop-probability.web.app/',
+      title: "ボードゲーム「Can't Stop」の確率表",
+      subtitle: '',
+      body1:
+        '表計算ソフトで式を書くのは骨が折れると思ったので作成。完全に自分用。',
+      body2:
+        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2021年1月22日）',
+      imageUrl: '',
     },
     {
       link: 'https://color-demo-app.web.app',
       title: 'Color Contrast Demo',
       subtitle:
         '色のコントラストなどについて書いた記事（https://qiita.com/pikohideaki/items/59415524503f833ce41e）のために作ったデモアプリ。',
-      body1: 'Chrome推奨。',
+      body1: '',
       body2:
         'React・TypeScriptで実装。CSSライブラリに material-UI を使用。（制作日：2019年12月07日、最終更新：2020年1月27日）',
       imageUrl: ColorDemoImage,
@@ -92,7 +102,7 @@ export const products: {
       link: 'https://my-profile-app-ec7bf.web.app',
       title: 'プロフィール',
       subtitle: 'このページ',
-      body1: 'Chrome推奨。',
+      body1: '',
       body2:
         'React・TypeScript・Material UIで実装。静的ページだが、Markdownでモバイル端末でも簡単に編集できるように、 Dropbox上に置いたMarkdown形式テキストを fetchし"ReactMarkdown"により表示するようにした。タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）',
       imageUrl: '',
@@ -112,7 +122,7 @@ export const products: {
       title: 'イベント日程調整ツール',
       subtitle: 'イベントのスケジュール調整用アプリケーション',
       body1:
-        'Chrome推奨。調整さんを使いやすくし高機能にしたもの。（作成画面 → ○△×以外の記号の追加・点数の設定・回答締め切り日の設定、回答画面 → 回答のソート。） ToDo：Google Calendar等との連携オプション、回答締切前のリマインド送信',
+        '調整さんを使いやすくし高機能にしたもの。（作成画面 → ○△×以外の記号の追加・点数の設定・回答締め切り日の設定、回答画面 → 回答のソート。） ToDo：Google Calendar等との連携オプション、回答締切前のリマインド送信',
       body2:
         'Angular・RxJS・TypeScriptで実装。バックエンドはFirebase Realtime DB。（最終更新：2019年1月）',
       imageUrl: ScheduleImage,
