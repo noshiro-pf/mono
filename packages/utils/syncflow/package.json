@@ -8,7 +8,7 @@
   "sideEffects": false,
   "main": "cjs/src/index.js",
   "module": "esm/index.js",
-  "types": "cjs/src/index.d.ts",
+  "types": "esm/index.d.ts",
   "files": [
     "package.json",
     "cjs",

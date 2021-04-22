@@ -6,7 +6,7 @@
   "sideEffects": false,
   "main": "cjs/index.js",
   "module": "esm/index.js",
-  "types": "cjs/index.d.ts",
+  "types": "esm/index.d.ts",
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",

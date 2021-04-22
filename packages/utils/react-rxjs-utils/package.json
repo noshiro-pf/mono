@@ -29,6 +29,7 @@
     "@noshiro/react-utils": "*",
     "@noshiro/rxjs-utils": "*",
     "@noshiro/ts-utils": "*",
-    "react": "^17.0.1"
+    "react": "^17.0.1",
+    "rxjs": "^6.6.3"
   }
 }
