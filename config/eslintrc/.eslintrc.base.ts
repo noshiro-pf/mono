@@ -28,10 +28,6 @@ const config: Linter.Config = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
 
-    /* prettier */
-    'plugin:prettier/recommended',
-    'prettier/@typescript-eslint',
-
     /* import */
     'plugin:import/recommended',
     // 'plugin:import/errors',
@@ -43,6 +39,9 @@ const config: Linter.Config = {
     // 'plugin:functional/recommended',
     // 'plugin:functional/external-recommended',
     // 'plugin:total-functions/recommended',
+
+    /* prettier */
+    'plugin:prettier/recommended', // turn off rules
   ],
   root: true,
   env: { browser: true, node: true, es6: true },
