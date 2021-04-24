@@ -2,6 +2,7 @@ export * from './array-at-least';
 export * from './array-element';
 export * from './bivariant-hack';
 export * from './deep-partial';
+export * from './deep-readonly';
 export * from './function';
 export * from './json-type';
 export * from './list';
