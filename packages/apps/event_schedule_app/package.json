@@ -19,6 +19,7 @@
     "fb:login": "firebase login",
     "fmt": "yarn _prettier",
     "lint": "eslint src/ --ext .ts,.tsx",
+    "lint:fix": "yarn lint --fix",
     "serve": "firebase serve",
     "setup": "yarn setup:webpackconfig",
     "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",

@@ -31,6 +31,7 @@
     "gi:src": "yarn _script_genindex ./src",
     "gi:test": "yarn _script_genindex ./test/cases",
     "lint": "eslint \"./{src,test}/**/*\" --ext .ts",
+    "lint:fix": "yarn lint --fix",
     "setup": "echo 'no setup script'",
     "start": "node cjs/test/preview-main.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",

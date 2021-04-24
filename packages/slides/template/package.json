@@ -13,6 +13,7 @@
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "lint": "echo 'no lint script'",
+    "lint:fix": "yarn lint --fix",
     "setup": "yarn setup:webpackconfig",
     "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",
     "start": "webpack-dev-server --config config/webpack.dev.js",

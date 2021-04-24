@@ -12,6 +12,7 @@
     "firebase": "firebase",
     "get": "node src/get.js",
     "lint": "eslint src/ --ext .ts",
+    "lint:fix": "yarn lint --fix",
     "logs": "firebase functions:log",
     "seeconfig": "firebase functions:config:get",
     "serve": "yarn build && firebase emulators:start --only functions",

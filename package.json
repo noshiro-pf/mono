@@ -23,6 +23,7 @@
     "create:util": "scripts/create_new_util.sh",
     "fmt:all": "prettier --write . > /dev/null",
     "lint:all": "yarn workspaces run lint",
+    "lintfix:all": "yarn workspaces run lint:fix",
     "setup:all": "run-s setup:configs build:utils",
     "setup:configs": "run-s setup:root setup:sub",
     "presetup:root": "yarn clean:root",
