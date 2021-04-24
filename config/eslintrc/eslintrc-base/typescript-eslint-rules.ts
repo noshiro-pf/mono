@@ -44,6 +44,7 @@ export const typescriptEslintRules: Readonly<
     '@typescript-eslint/no-unnecessary-qualifier': 'error', // maybe unnecessary
     '@typescript-eslint/no-unnecessary-type-arguments': 'error',
     '@typescript-eslint/no-unnecessary-type-constraint': 'error',
+    '@typescript-eslint/no-unsafe-return': 'error',
     '@typescript-eslint/non-nullable-type-assertion-style': 'error',
     // '@typescript-eslint/prefer-enum-initializers': 'error',  -> unnecessary because I don't use enum.
     '@typescript-eslint/prefer-for-of': 'error',
@@ -74,6 +75,10 @@ export const typescriptEslintRules: Readonly<
     '@typescript-eslint/unified-signatures': 'error',
   },
   modifiedRulesIncludedInRecommended: {
+    '@typescript-eslint/restrict-plus-operands': [
+      'error',
+      { checkCompoundAssignments: true },
+    ],
     '@typescript-eslint/restrict-template-expressions': [
       'error',
       { allowNumber: true, allowBoolean: true, allowNullable: true },
