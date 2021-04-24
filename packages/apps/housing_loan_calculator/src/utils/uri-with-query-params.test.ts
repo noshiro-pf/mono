@@ -2,7 +2,10 @@ import { uriWithQueryParams } from './uri-with-query-params';
 
 const testUri = (
   targetUri: string,
-  queryParameters: [string, string | number | boolean | undefined][],
+  queryParameters: readonly (readonly [
+    string,
+    boolean | number | string | undefined
+  ])[],
   expectedUri: string
 ): void => {
   test('equality', () => {

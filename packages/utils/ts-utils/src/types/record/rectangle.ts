@@ -1,10 +1,10 @@
 import { defaultRectSize, RectSize } from './rect-size';
 
-export type Rect = RectSize &
-  Readonly<{
-    top: number;
-    left: number;
-  }>;
+export type Rect = Readonly<{
+  top: number;
+  left: number;
+}> &
+  RectSize;
 
 export const defaultRect: Rect = {
   top: 0,

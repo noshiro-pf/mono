@@ -31,12 +31,12 @@ type AnswerPageState = Readonly<{
   onEditButtonClick: () => void;
   answers: IList<IAnswer> | undefined;
   errorType:
-    | undefined
+    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
     | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
-    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>;
+    | undefined;
   onAnswerClick: (answer: IAnswer) => void;
   showMyAnswerSection: () => void;
-  myAnswerSectionState: 'hidden' | 'creating' | 'editing';
+  myAnswerSectionState: 'creating' | 'editing' | 'hidden';
   answerSectionRef: RefObject<HTMLDivElement>;
   myAnswer: IAnswer;
   setMyAnswer: (answer: IAnswer) => void;
@@ -78,7 +78,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     //
     myAnswerSectionState,
     setMyAnswerSectionState,
-  ] = useState<'hidden' | 'creating' | 'editing'>('hidden');
+  ] = useState<'creating' | 'editing' | 'hidden'>('hidden');
 
   const [
     //

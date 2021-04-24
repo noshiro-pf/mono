@@ -1,1 +1,1 @@
-export type ButtonState = 'show' | 'hide' | 'disabled';
+export type ButtonState = 'disabled' | 'hide' | 'show';

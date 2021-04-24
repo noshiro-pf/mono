@@ -16,7 +16,7 @@ export const notifyOnAnswerChangeBody = async ({
   answerItemBefore,
   answerItemAfter,
 }: {
-  eventType: 'create' | 'update' | 'delete';
+  eventType: 'create' | 'delete' | 'update';
   eventId: string;
   answerItemBefore: AnswerJsType | undefined;
   answerItemAfter: AnswerJsType | undefined;

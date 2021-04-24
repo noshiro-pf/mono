@@ -1,1 +1,1 @@
-export type BackgroundStyle = 'none' | 'checkerboard' | 'white' | 'black';
+export type BackgroundStyle = 'black' | 'checkerboard' | 'none' | 'white';

@@ -31,7 +31,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId$ = useValueAsStream(eventId);
 
   const eventScheduleResult$ = useStream<
-    undefined | Result<IEventSchedule, 'not-found' | 'others'>
+    Result<IEventSchedule, 'not-found' | 'others'> | undefined
   >(() =>
     eventId$
       .chain(

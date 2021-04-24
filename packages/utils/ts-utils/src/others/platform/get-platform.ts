@@ -1,4 +1,4 @@
-export const getPlatform = (): 'mac' | 'windows' | 'other' => {
+export const getPlatform = (): 'mac' | 'other' | 'windows' => {
   if (navigator.platform.toUpperCase().includes('MAC')) {
     // for mac
     return 'mac';

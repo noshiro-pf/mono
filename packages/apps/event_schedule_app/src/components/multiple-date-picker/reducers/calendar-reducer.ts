@@ -13,10 +13,10 @@ export type CalendarCurrentPageReducerState = Readonly<{
 }>;
 
 export type CalendarCurrentPageReducerAction = Readonly<
-  | { type: 'prev-month' }
   | { type: 'next-month' }
-  | { type: 'set-year'; year: YearEnum }
+  | { type: 'prev-month' }
   | { type: 'set-month'; month: MonthEnum }
+  | { type: 'set-year'; year: YearEnum }
   | { type: 'today' }
 >;
 

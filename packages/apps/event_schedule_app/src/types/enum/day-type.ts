@@ -1,1 +1,1 @@
-export type DayType = 'normal' | 'holiday' | 'Sunday' | 'Saturday';
+export type DayType = 'holiday' | 'normal' | 'Saturday' | 'Sunday';

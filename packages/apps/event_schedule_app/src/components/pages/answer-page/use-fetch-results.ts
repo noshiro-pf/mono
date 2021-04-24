@@ -24,13 +24,13 @@ import { IList } from '../../../utils/immutable';
 import { clog } from '../../../utils/log';
 
 type FetchResults = Readonly<{
-  eventSchedule$: Observable<undefined | IEventSchedule>;
-  answers$: Observable<undefined | IList<IAnswer>>;
+  eventSchedule$: Observable<IEventSchedule | undefined>;
+  answers$: Observable<IList<IAnswer> | undefined>;
   answersResultTimestamp$: Observable<number>;
   errorType:
-    | undefined
+    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
     | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
-    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>;
+    | undefined;
 }>;
 
 export const useFetchResults = (
@@ -41,7 +41,7 @@ export const useFetchResults = (
   const eventId$ = useValueAsStream(eventId);
 
   const eventScheduleResult$ = useStream<
-    undefined | Result<IEventSchedule, 'not-found' | 'others'>
+    Result<IEventSchedule, 'not-found' | 'others'> | undefined
   >(() =>
     combineLatest(fetchEventScheduleThrottled$, eventId$)
       .chain(map(([_, x]) => x))
@@ -55,7 +55,7 @@ export const useFetchResults = (
 
   const answersResult$ = useStream<{
     timestamp: number;
-    value: undefined | Result<IList<IAnswer>, 'not-found' | 'others'>;
+    value: Result<IList<IAnswer>, 'not-found' | 'others'> | undefined;
   }>(() =>
     combineLatest(fetchAnswersThrottled$, eventId$)
       .chain(map(([_, x]) => x))
@@ -87,14 +87,14 @@ export const useFetchResults = (
       .chain(withInitialValue(Date.now()))
   );
 
-  const eventSchedule$ = useStream<undefined | IEventSchedule>(() =>
+  const eventSchedule$ = useStream<IEventSchedule | undefined>(() =>
     eventScheduleResult$
       .chain(filter(isNotUndefined))
       .chain(unwrapResultOk())
       .chain(withInitialValue(undefined))
   );
 
-  const answers$ = useStream<undefined | IList<IAnswer>>(() =>
+  const answers$ = useStream<IList<IAnswer> | undefined>(() =>
     answersResult$
       .chain(pluck('value'))
       .chain(filter(isNotUndefined))
@@ -103,9 +103,9 @@ export const useFetchResults = (
   );
 
   const errorType$ = useStream<
-    | undefined
-    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
     | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
+    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
+    | undefined
   >(() =>
     combineLatest(eventScheduleResult$, answersResult$)
       .chain(

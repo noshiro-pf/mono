@@ -11,18 +11,18 @@ export namespace Result {
     readonly value: E;
   };
 
-  export type _Result<S, E> = Ok<S> | Err<E>;
+  export type _Result<S, E> = Err<E> | Ok<S>;
 
   export const ok = <S>(value: S): Ok<S> => ({ type: OkTypeSymbol, value });
 
   export const err = <E>(value: E): Err<E> => ({ type: ErrTypeSymbol, value });
 
   export const isOk = <S, E>(
-    result: _Result<S, E> | undefined | null
+    result: _Result<S, E> | null | undefined
   ): result is Ok<S> => result?.type === OkTypeSymbol;
 
   export const isErr = <S, E>(
-    result: _Result<S, E> | undefined | null
+    result: _Result<S, E> | null | undefined
   ): result is Err<E> => result?.type === ErrTypeSymbol;
 
   export const map = <S, S2, E>(mapFn: (value: S) => S2) => (
@@ -45,7 +45,7 @@ export namespace Result {
 
   export const unwrapOkOr = <S, E, D>(
     defaultValue: D
-  ): ((result: _Result<S, E>) => S | D) => (result: _Result<S, E>): S | D =>
+  ): ((result: _Result<S, E>) => D | S) => (result: _Result<S, E>): D | S =>
     isErr<S, E>(result) ? defaultValue : result.value;
 
   export const unwrapErr = <S, E>(result: _Result<S, E>): E | undefined =>
@@ -53,7 +53,7 @@ export namespace Result {
 
   export const unwrapErrOr = <S, E, D>(
     defaultValue: D
-  ): ((result: _Result<S, E>) => E | D) => (result: _Result<S, E>): E | D =>
+  ): ((result: _Result<S, E>) => D | E) => (result: _Result<S, E>): D | E =>
     isErr<S, E>(result) ? result.value : defaultValue;
 
   export const expect = <S, E>(message: string) => (

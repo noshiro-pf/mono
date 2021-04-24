@@ -15,14 +15,14 @@ import { onPointerMove } from './handlers/on-pointer-move';
 import { onPointerUpOnBackground } from './handlers/on-pointer-up-on-bg';
 
 export type CanvasAppAction = Readonly<
-  | { type: 'pointerMove'; pointerPos: Point }
-  | { type: 'pointerUp' }
   | { type: 'backgroundPointerDown' }
-  | { type: 'bboxFacePointerOver'; pixiBbox: PixiBbox }
-  | { type: 'bboxFacePointerOut'; pixiBbox: PixiBbox }
   | { type: 'bboxFacePointerDown'; pixiBbox: PixiBbox }
+  | { type: 'bboxFacePointerOut'; pixiBbox: PixiBbox }
+  | { type: 'bboxFacePointerOver'; pixiBbox: PixiBbox }
   | { type: 'bboxPointPointerDown'; pixiBbox: PixiBbox; direction: Direction }
   | { type: 'cancel' }
+  | { type: 'pointerMove'; pointerPos: Point }
+  | { type: 'pointerUp' }
 >;
 
 export type CanvasAppStateHandler = (

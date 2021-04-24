@@ -15,31 +15,31 @@ import { timeRangeReducer } from '../set-times-popover/time-range-reducer';
 
 export type DatetimeListReducerAction =
   | {
+      type: 'addClick';
+      datetimeRange: IDatetimeRange;
+    }
+  | {
+      type: 'end' | 'start';
+      index: number;
+      hm: IHoursMinutes;
+    }
+  | {
       type: 'fromCalendar';
       list: IList<IYearMonthDate>;
       mostFrequentTimeRange: ITimeRange;
+    }
+  | {
+      type: 'setTimeAtOneTime';
+      timeRange: ITimeRange;
     }
   | {
       type: 'ymd';
       index: number;
       ymd: IYearMonthDate;
     }
-  | {
-      type: 'start' | 'end';
-      index: number;
-      hm: IHoursMinutes;
-    }
-  | { type: 'duplicate'; index: number }
-  | {
-      type: 'setTimeAtOneTime';
-      timeRange: ITimeRange;
-    }
-  | {
-      type: 'addClick';
-      datetimeRange: IDatetimeRange;
-    }
   | { type: 'delete'; index: number }
-  | { type: 'deleteAll' | 'sort' };
+  | { type: 'deleteAll' | 'sort' }
+  | { type: 'duplicate'; index: number };
 
 export type DatetimeListReducerState = IList<IDatetimeRange>;
 

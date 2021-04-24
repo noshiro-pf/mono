@@ -13,7 +13,7 @@ export const MuiSlider = memoNamed<
   }>
 >('MuiSlider', ({ value, onChange, ariaLabelledby, step, min, max }) => {
   const sliderOnChange = useCallback(
-    (_: unknown, _value: number | number[]) => {
+    (_: unknown, _value: number | readonly number[]) => {
       onChange(_value as number);
     },
     [onChange]

@@ -6,14 +6,14 @@ import { IMap } from '../../../utils/immutable';
 
 export type SymbolListReducerAction =
   | {
-      type: 'update-point';
-      iconId: AnswerSymbolIconId;
-      point: AnswerSymbolPointEnumType;
-    }
-  | {
       type: 'update-description';
       iconId: AnswerSymbolIconId;
       description: string;
+    }
+  | {
+      type: 'update-point';
+      iconId: AnswerSymbolIconId;
+      point: AnswerSymbolPointEnumType;
     };
 
 export type SymbolListReducerState = IMap<AnswerSymbolIconId, IAnswerSymbol>;

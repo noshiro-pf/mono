@@ -4,4 +4,4 @@ export type Pending<P> = { status: PromisePending; value: P };
 export type Error<E> = { status: PromiseError; value: E };
 export type Success<S> = { status: PromiseSuccess; value: S };
 
-export type PromiseState<P, E, S> = Pending<P> | Error<E> | Success<S>;
+export type PromiseState<P, E, S> = Error<E> | Pending<P> | Success<S>;

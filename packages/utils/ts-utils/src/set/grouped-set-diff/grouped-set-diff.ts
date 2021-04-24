@@ -1,4 +1,4 @@
-export type GroupedSetDiffKeyType = 'deleted' | 'added' | 'updated';
+export type GroupedSetDiffKeyType = 'added' | 'deleted' | 'updated';
 
 type GroupedSetDiff<T> = {
   [key in GroupedSetDiffKeyType]: Set<T>;

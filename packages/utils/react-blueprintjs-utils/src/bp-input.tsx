@@ -15,8 +15,8 @@ export const BpInput = memoNamed<Props>(
   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
     const onChangeHandler = useCallback(
       (
-        event: React.FormEvent<HTMLElement> &
-          React.ChangeEvent<HTMLInputElement>
+        event: React.ChangeEvent<HTMLInputElement> &
+          React.FormEvent<HTMLElement>
       ) => {
         onValueChange(event.target.value);
       },

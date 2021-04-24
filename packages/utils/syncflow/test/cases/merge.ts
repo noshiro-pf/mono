@@ -21,7 +21,7 @@ const createStreams = (
   counter$: IntervalObservable;
   even$: Observable<number>;
   odd$: Observable<string>;
-  merged$: Observable<string | number>;
+  merged$: Observable<number | string>;
 } => {
   const counter$ = interval(tick, true);
   const even$ = counter$.chain(filter((n) => n % 2 === 0));

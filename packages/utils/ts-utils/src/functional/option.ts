@@ -10,7 +10,7 @@ export namespace Option {
     readonly type: typeof NoneTypeSymbol;
   };
 
-  export type _Option<S> = Some<S> | None;
+  export type _Option<S> = None | Some<S>;
 
   export const some = <S>(value: S): Some<S> => ({
     type: SomeTypeSymbol,
@@ -20,11 +20,11 @@ export namespace Option {
   export const none: None = { type: NoneTypeSymbol } as const;
 
   export const isSome = <S>(
-    result: _Option<S> | undefined | null
+    result: _Option<S> | null | undefined
   ): result is Some<S> => result?.type === SomeTypeSymbol;
 
   export const isNone = <S>(
-    result: _Option<S> | undefined | null
+    result: _Option<S> | null | undefined
   ): result is None => result?.type === NoneTypeSymbol;
 
   export const map = <S, S2>(mapFn: (value: S) => S2) => (
@@ -43,7 +43,7 @@ export namespace Option {
 
   export const unwrapOr = <S, D>(
     defaultValue: D
-  ): ((result: _Option<S>) => S | D) => (result: _Option<S>): S | D =>
+  ): ((result: _Option<S>) => D | S) => (result: _Option<S>): D | S =>
     isNone(result) ? defaultValue : result.value;
 
   export const expect = <S>(message: string) => (result: _Option<S>): S => {

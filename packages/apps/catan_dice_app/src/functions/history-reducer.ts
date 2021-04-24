@@ -4,6 +4,7 @@ import { rollTwoDices } from './roll-dice';
 
 export const historyReducer: ReducerType<
   THistoryState,
+  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
   'undo' | 'redo' | 'roll-dices'
 > = (state, action) =>
   state.withMutations((st) => {

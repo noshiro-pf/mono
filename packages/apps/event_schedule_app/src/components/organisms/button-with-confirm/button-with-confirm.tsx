@@ -6,7 +6,7 @@ import { createToaster, showToast } from '../../../utils/toaster';
 import { ConfirmDialog } from './confirm-dialog';
 
 type Props = Readonly<{
-  onConfirmClick: (() => void) | (() => Promise<void>);
+  onConfirmClick: (() => Promise<void>) | (() => void);
   disabled?: boolean;
   loading?: boolean;
   buttonConfig: Readonly<{

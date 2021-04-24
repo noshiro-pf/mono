@@ -1,4 +1,4 @@
 export type AnswerSymbolIconId =
   | 'handmade-circle'
-  | 'handmade-triangle'
-  | 'handmade-cross';
+  | 'handmade-cross'
+  | 'handmade-triangle';

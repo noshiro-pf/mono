@@ -6,7 +6,7 @@ import {
 import { ITimeRange } from '../../../../types/record/time-range';
 
 export type TimeRangeReducerAction = Readonly<{
-  type: 'start' | 'end';
+  type: 'end' | 'start';
   hm: IHoursMinutes;
 }>;
 
