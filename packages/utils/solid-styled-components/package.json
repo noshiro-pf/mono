@@ -16,6 +16,7 @@
     "clean": "echo 'no clean script'",
     "fmt": "echo 'no fmt script'",
     "lint": "echo 'no lint script'",
+    "lint:fix": "yarn lint --fix",
     "setup": "echo 'no setup script'",
     "test": "echo 'no test script'",
     "test:types": "tsc --project tsconfig.test.json"
