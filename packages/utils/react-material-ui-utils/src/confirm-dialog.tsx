@@ -10,6 +10,7 @@ import { FC, memo, useCallback } from 'react';
 type Props = Readonly<{
   message: string;
   open: boolean;
+  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
   onClose: (yn: 'yes' | 'no') => void;
 }>;
 

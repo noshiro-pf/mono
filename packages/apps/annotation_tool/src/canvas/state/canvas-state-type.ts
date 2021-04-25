@@ -9,16 +9,16 @@ export type CanvasAppState = {
   dragStartPoint: Writable<Point>;
   dragEndPoint: Writable<Point>;
   grabbingObject: Readonly<
-    | { type: undefined }
-    | { type: 'background' }
-    | { type: 'bbox-face'; pixiBbox: PixiBbox; rectPrevious: Rect }
-    | { type: 'bbox-edge'; pixiBbox: PixiBbox; rectPrevious: Rect }
     | {
         type: 'bbox-point';
         pixiBbox: PixiBbox;
         rectPrevious: Rect;
         direction: Direction;
       }
+    | { type: 'background' }
+    | { type: 'bbox-edge'; pixiBbox: PixiBbox; rectPrevious: Rect }
+    | { type: 'bbox-face'; pixiBbox: PixiBbox; rectPrevious: Rect }
+    | { type: undefined }
   >;
 
   verticalLine: Sprite | undefined;

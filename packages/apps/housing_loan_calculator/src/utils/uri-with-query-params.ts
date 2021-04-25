@@ -3,7 +3,10 @@ import { makeUriEndWithSlash } from './make-uri-end-with-slash';
 
 export const uriWithQueryParams = (
   uri: string,
-  queryParameters: [string, string | number | boolean | undefined][]
+  queryParameters: readonly (readonly [
+    string,
+    boolean | number | string | undefined
+  ])[]
 ): string => {
   const nonNullQueryParameters = queryParameters.filter(
     ([_, value]) => value !== undefined

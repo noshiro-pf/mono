@@ -13,10 +13,10 @@ export const validateEventSchedule = ({
 }: StrictOmit<
   EventScheduleBaseType,
   | 'answerDeadline'
-  | 'timezoneOffsetMinutes'
-  | 'notes'
-  | 'datetimeSpecification'
   | 'customizeSymbolSettings'
+  | 'datetimeSpecification'
+  | 'notes'
+  | 'timezoneOffsetMinutes'
 > & {
   answerDeadline: EventScheduleBaseType['answerDeadline'] | undefined;
 }): EventScheduleValidation => ({

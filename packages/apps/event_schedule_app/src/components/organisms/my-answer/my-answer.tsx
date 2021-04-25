@@ -26,7 +26,7 @@ type Props = Readonly<{
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
   onSubmitAnswer: () => Promise<void>;
-  myAnswerSectionState: 'hidden' | 'creating' | 'editing';
+  myAnswerSectionState: 'creating' | 'editing' | 'hidden';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
   usernameDuplicateCheckException: UserName | undefined;

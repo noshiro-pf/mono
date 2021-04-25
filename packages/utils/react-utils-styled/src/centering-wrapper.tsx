@@ -10,7 +10,7 @@ const CenteringWrapperDiv = styled.div`
 `;
 
 type Props = Readonly<{
-  direction: 'row' | 'column';
+  direction: 'column' | 'row';
 }>;
 
 export const CenteringWrapper: FC<Props> = (props: Props) => (

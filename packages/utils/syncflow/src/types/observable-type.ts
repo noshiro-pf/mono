@@ -43,14 +43,14 @@ export type AsyncChildObservableType =
   | 'switchMap';
 
 export type ChildObservableType =
-  | SyncChildObservableType
-  | AsyncChildObservableType;
+  | AsyncChildObservableType
+  | SyncChildObservableType;
 
 export type ManagerObservableType =
-  | RootObservableType
-  | AsyncChildObservableType;
+  | AsyncChildObservableType
+  | RootObservableType;
 
 export type ObservableType =
+  | AsyncChildObservableType
   | RootObservableType
-  | SyncChildObservableType
-  | AsyncChildObservableType;
+  | SyncChildObservableType;

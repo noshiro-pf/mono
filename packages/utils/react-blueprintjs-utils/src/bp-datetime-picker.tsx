@@ -59,7 +59,7 @@ export const BpDatetimePicker = memoNamed<Props>(
       [onYmdhmChange]
     );
 
-    const dateObj = useMemo<undefined | Date>(
+    const dateObj = useMemo<Date | undefined>(
       () =>
         ymdhm === undefined
           ? undefined

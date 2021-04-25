@@ -8,8 +8,8 @@ const vt = texts.errorMessages;
 
 type Props = Readonly<{
   errorType:
-    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
-    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>;
+    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
+    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>;
 }>;
 
 export const AnswerPageError = memoNamed<Props>(

@@ -4,5 +4,5 @@ export type StreamTestCase<T> = Readonly<{
   run:
     | ((take: number, tick: number) => Promise<T[]>)
     | ((take: number) => Promise<T[]>);
-  preview: ((tick: number) => void) | (() => void);
+  preview: (() => void) | ((tick: number) => void);
 }>;

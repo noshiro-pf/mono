@@ -52,7 +52,7 @@ export const BpDatePicker = memoNamed<Props>(
       [onYmdChange]
     );
 
-    const dateObj = useMemo<undefined | Date>(
+    const dateObj = useMemo<Date | undefined>(
       () =>
         ymd === undefined
           ? undefined

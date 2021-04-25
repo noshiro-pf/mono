@@ -77,7 +77,7 @@ export type InitializedSyncChildObservable<
   A,
   Type extends SyncChildObservableType,
   P extends NonEmptyUnknownList = NonEmptyUnknownList
-> = SyncChildObservable<A, Type, P> & InitializedObservableBase<A>;
+> = InitializedObservableBase<A> & SyncChildObservable<A, Type, P>;
 
 export type AsyncChildObservable<
   A,
@@ -101,8 +101,8 @@ export type ChildObservable<
   A,
   P extends NonEmptyUnknownList = NonEmptyUnknownList
 > =
-  | SyncChildObservable<A, SyncChildObservableType, P>
-  | AsyncChildObservable<A, AsyncChildObservableType, P>;
+  | AsyncChildObservable<A, AsyncChildObservableType, P>
+  | SyncChildObservable<A, SyncChildObservableType, P>;
 
 export type RootObservable<
   A,
@@ -118,21 +118,21 @@ export type RootObservable<
 export type InitializedRootObservable<
   A,
   Type extends RootObservableType
-> = RootObservable<A, Type> & InitializedObservableBase<A>;
+> = InitializedObservableBase<A> & RootObservable<A, Type>;
 
 export type Observable<A> =
+  | AsyncChildObservable<A, AsyncChildObservableType>
   | RootObservable<A, RootObservableType>
-  | SyncChildObservable<A, SyncChildObservableType>
-  | AsyncChildObservable<A, AsyncChildObservableType>;
+  | SyncChildObservable<A, SyncChildObservableType>;
 
 export type InitializedObservable<A> =
+  | InitializedAsyncChildObservable<A, AsyncChildObservableType>
   | InitializedRootObservable<A, RootObservableType>
-  | InitializedSyncChildObservable<A, SyncChildObservableType>
-  | InitializedAsyncChildObservable<A, AsyncChildObservableType>;
+  | InitializedSyncChildObservable<A, SyncChildObservableType>;
 
 export type ManagerObservable<A> =
-  | RootObservable<A, RootObservableType>
-  | AsyncChildObservable<A, AsyncChildObservableType>;
+  | AsyncChildObservable<A, AsyncChildObservableType>
+  | RootObservable<A, RootObservableType>;
 
 export type InitializedToInitializedOperator<A, B> = (
   src: InitializedObservable<A>
@@ -150,10 +150,10 @@ export type ToBaseOperator<A, B> = RemoveInitializedOperator<A, B>; // alias
 type BaseToBaseOperator<A, B> = (src: Observable<A>) => Observable<B>;
 
 export type Operator<A, B> =
+  | BaseToBaseOperator<A, B>
   | InitializedToInitializedOperator<A, B>
-  | ToInitializedOperator<A, B>
   | RemoveInitializedOperator<A, B>
-  | BaseToBaseOperator<A, B>;
+  | ToInitializedOperator<A, B>;
 
 export const isManagerObservable = <A>(
   obs: Observable<A>

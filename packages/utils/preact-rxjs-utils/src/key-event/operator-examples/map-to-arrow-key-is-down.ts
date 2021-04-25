@@ -2,7 +2,7 @@ import { Observable, OperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { filterKeyInList, mapToKey } from '../custom-operators';
 
-export type ArrowKey = 'ArrowLeft' | 'ArrowRight' | 'ArrowUp' | 'ArrowDown';
+export type ArrowKey = 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'ArrowUp';
 
 export const mapToArrowKey = (): OperatorFunction<
   ['down' | 'up', KeyboardEvent],
