@@ -53,7 +53,7 @@ export const eslintRules: Readonly<{
       'no-extra-bind': 'error',
       'no-extra-label': 'error', // is unnecessary if no-labels is enabled?
       'no-floating-decimal': 'error',
-      'no-implicit-coercion': 'error',
+      'no-implicit-coercion': ['error', { disallowTemplateShorthand: true }],
       // 'no-implicit-globals': 'error',
       // 'no-implied-eval': 'error',
       'no-invalid-this': 'error',
@@ -76,10 +76,10 @@ export const eslintRules: Readonly<{
       'no-return-await': 'error',
       'no-script-url': 'error',
       'no-self-compare': 'error',
-      'no-sequences': 'error',
+      'no-sequences': ['error', { allowInParentheses: false }],
       // 'no-throw-literal': 'error',  -> unnecessary in favor of prefer-promise-reject-errors
       'no-unmodified-loop-condition': 'error',
-      'no-unused-expressions': 'error',
+      'no-unused-expressions': ['error', { enforceForJSX: false }],
       'no-useless-call': 'error',
       'no-useless-concat': 'error',
       'no-useless-return': 'error',
