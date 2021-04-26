@@ -1,4 +1,5 @@
 import { seq } from '../array';
+import { uint32 } from '../types';
 import { Hsl, Hue } from './types';
 
 export const whiteHsl: Hsl = [0, 0, 100];
@@ -21,4 +22,4 @@ export const [
   purpleHue,
   magentaHue, // fuchsia
   roseHue,
-]: readonly Hue[] = seq(12).map((i) => (i * 30) as Hue);
+]: readonly Hue[] = seq(12 as uint32).map((i) => (i * 30) as Hue);

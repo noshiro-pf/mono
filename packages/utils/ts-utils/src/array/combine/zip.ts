@@ -1,6 +1,7 @@
 import { tuple } from '../../others';
-import { ArrayElement } from '../../types';
+import { ArrayElement, uint32 } from '../../types';
 import { seq } from '../create';
+import { length } from '../length';
 import { min } from '../math';
 import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
@@ -15,7 +16,7 @@ export function zip<A, B>(
   array1: ReadonlyNonEmptyArray<A> | readonly A[],
   array2: ReadonlyNonEmptyArray<B> | readonly B[]
 ): [A, B][] {
-  const len = Math.min(array1.length, array2.length);
+  const len = Math.min(array1.length, array2.length) as uint32;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return seq(len).map((i) => tuple(array1[i]!, array2[i]!));
 }
@@ -29,7 +30,7 @@ export function zipArrays<
     ...(readonly (readonly unknown[])[])
   ]
 >(...arrays: T): Unwrap<T>[] {
-  const len = min(arrays.map((a) => a.length));
+  const len = min(arrays.map(length));
   if (len === undefined) return [];
   return seq(len).map((i) => arrays.map((a) => a[i])) as Unwrap<T>[];
 }
