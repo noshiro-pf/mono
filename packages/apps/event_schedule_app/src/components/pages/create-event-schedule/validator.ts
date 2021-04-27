@@ -10,16 +10,17 @@ export const validateEventSchedule = ({
   answerSymbolList,
   useNotification,
   notificationSettings,
-}: StrictOmit<
-  EventScheduleBaseType,
-  | 'answerDeadline'
-  | 'customizeSymbolSettings'
-  | 'datetimeSpecification'
-  | 'notes'
-  | 'timezoneOffsetMinutes'
-> & {
+}: Readonly<{
   answerDeadline: EventScheduleBaseType['answerDeadline'] | undefined;
-}): EventScheduleValidation => ({
+}> &
+  StrictOmit<
+    EventScheduleBaseType,
+    | 'answerDeadline'
+    | 'customizeSymbolSettings'
+    | 'datetimeSpecification'
+    | 'notes'
+    | 'timezoneOffsetMinutes'
+  >): EventScheduleValidation => ({
   title: title !== '',
   datetimeRangeList: !datetimeRangeList.isEmpty(),
   answerDeadline: ifthen(useAnswerDeadline, answerDeadline !== undefined),

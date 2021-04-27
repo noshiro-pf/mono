@@ -21,10 +21,10 @@ const toast = createToaster();
 export const useEditEventScheduleHooks = ({
   newEventSchedule,
   eventScheduleValidationOk,
-}: {
+}: Readonly<{
   newEventSchedule: IEventSchedule;
   eventScheduleValidationOk: boolean;
-}): EditEventScheduleHooks => {
+}>): EditEventScheduleHooks => {
   const [isLoading, setIsLoadingTrue, setIsLoadingFalse] = useBooleanState(
     false
   );

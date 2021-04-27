@@ -7,10 +7,10 @@ const urlPrefix = 'https://event-schedule-app.web.app/event';
 export const createMailBodyForNewAnswer = ({
   eventId,
   answerItem,
-}: {
+}: Readonly<{
   eventId: string;
   answerItem: AnswerJsType;
-}): string =>
+}>): string =>
   [
     `${answerItem.userName}さんが回答を追加しました。`,
     '',
@@ -21,10 +21,10 @@ export const createMailBodyForNewAnswer = ({
 export const createMailBodyForAnswerDelete = ({
   eventId,
   answerItem,
-}: {
+}: Readonly<{
   eventId: string;
   answerItem: AnswerJsType;
-}): string =>
+}>): string =>
   [
     `${answerItem.userName}さんが回答を削除しました。`,
     '',
@@ -37,12 +37,12 @@ export const createMailBodyForUpdatedAnswer = ({
   answerItemBefore,
   answerItemAfter,
   datetimeSpecification,
-}: {
+}: Readonly<{
   eventId: string;
   answerItemBefore: AnswerJsType;
   answerItemAfter: AnswerJsType;
   datetimeSpecification: DatetimeSpecificationEnumType;
-}): string =>
+}>): string =>
   [
     `${answerItemAfter.userName}さんが回答を更新しました。`,
     '',
@@ -61,10 +61,10 @@ export const createMailBodyForUpdatedAnswer = ({
 export const createMailBodyForAnswerDeadline = ({
   eventId,
   diff,
-}: {
+}: Readonly<{
   eventId: string;
   diff: 1 | 3 | 7 | 14 | 28;
-}): string =>
+}>): string =>
   [
     `回答期限${diff}日前になりました。未回答の人がいたらリマインドを送りましょう。`,
     '',

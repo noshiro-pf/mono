@@ -19,10 +19,10 @@ type CreateEventScheduleHooks = Readonly<{
 export const useCreateEventScheduleHooks = ({
   newEventSchedule,
   eventScheduleValidationOk,
-}: {
+}: Readonly<{
   newEventSchedule: IEventSchedule;
   eventScheduleValidationOk: boolean;
-}): CreateEventScheduleHooks => {
+}>): CreateEventScheduleHooks => {
   const [isLoading, setIsLoadingTrue, setIsLoadingFalse] = useBooleanState(
     false
   );
