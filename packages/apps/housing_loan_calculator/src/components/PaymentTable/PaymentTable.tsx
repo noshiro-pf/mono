@@ -1,6 +1,6 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { seq } from '@noshiro/ts-utils';
+import { seq, uint32 } from '@noshiro/ts-utils';
 import { CSSProperties, useMemo } from 'react';
 import { viewTexts } from '../../constants/view-texts';
 import { RepaymentType } from '../../types/enum/repayment-type';
@@ -50,7 +50,7 @@ export const PaymentTable = memoNamed<Props>(
           borrowingBalanceYen.length,
           interestYen.length,
           monthlyPaymentTotalYen.length
-        ),
+        ) as uint32,
       [
         borrowingBalanceYen.length,
         interestYen.length,

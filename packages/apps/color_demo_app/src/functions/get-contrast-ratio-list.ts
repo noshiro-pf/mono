@@ -1,4 +1,4 @@
-import { at, contrastRatioHsl, Hue, Percent } from '@noshiro/ts-utils';
+import { at, contrastRatioHsl, Hue, Percent, uint32 } from '@noshiro/ts-utils';
 
 export const hueListToContrastRatioList = (
   hueList: readonly Hue[],
@@ -8,6 +8,10 @@ export const hueListToContrastRatioList = (
   hueList.map((h, idx) =>
     contrastRatioHsl(
       [h, saturation, lightness],
-      [at(hueList, (idx + 1) % hueList.length) ?? 0, saturation, lightness]
+      [
+        at(hueList, ((idx + 1) % hueList.length) as uint32) ?? 0,
+        saturation,
+        lightness,
+      ]
     )
   );

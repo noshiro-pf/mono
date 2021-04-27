@@ -14,6 +14,7 @@ import {
   Percent,
   range,
   roundAt,
+  uint32,
   whiteHsl,
   zip,
 } from '@noshiro/ts-utils';
@@ -32,7 +33,7 @@ const PaperCustomized = styled(Paper)`
   padding: 10px;
 `;
 
-const hues: readonly Hue[] = range(0, 360) as Hue[];
+const hues: readonly Hue[] = range(0 as uint32, 360 as uint32) as Hue[];
 
 const saturationList: readonly Percent[] = [80, 80, 100] as const;
 const lightnessList: readonly Percent[] = [40, 60, 80] as const;

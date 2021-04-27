@@ -1,5 +1,6 @@
 import { MuiSlider } from '@noshiro/react-material-ui-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import { uint32 } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const SliderWrapper = styled.div`
@@ -8,7 +9,7 @@ const SliderWrapper = styled.div`
 
 type Props = Readonly<{
   divisionNumber: number;
-  divisionNumberOnChange: (value: number) => void;
+  divisionNumberOnChange: (value: uint32) => void;
 }>;
 
 export const DivisionNumberSlider = memoNamed<Props>(
@@ -18,7 +19,7 @@ export const DivisionNumberSlider = memoNamed<Props>(
       <div>分割数</div>
       <MuiSlider
         value={props.divisionNumber}
-        onChange={props.divisionNumberOnChange}
+        onChange={props.divisionNumberOnChange as (value: number) => void}
         ariaLabelledby='division-number'
         step={1}
         min={2}
