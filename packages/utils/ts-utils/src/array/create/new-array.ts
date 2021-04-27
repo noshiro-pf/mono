@@ -1,6 +1,4 @@
 export const newArray = <T>(length: number, init: T): T[] =>
-  length < 0
+  length < 0 || !Number.isSafeInteger(length)
     ? []
-    : new Array<T>(
-        Number.isSafeInteger(length) ? length : Math.floor(length)
-      ).fill(init);
+    : new Array(length).fill(0).map(() => init);

@@ -1,6 +1,6 @@
 import {
+  map,
   max,
-  neaMap,
   NonEmptyArray,
   ReadonlyNonEmptyArray,
   seq,
@@ -24,18 +24,15 @@ export const pickupHighContrastHues = (
   saturation: Percent,
   lightness: Percent
 ): NonEmptyArray<Hue> | undefined => {
-  const luminanceList: ReadonlyNonEmptyArray<number> = pipe(hues).chain(
-    neaMap((hue: Hue) =>
-      relativeLuminance(hslToRgb([hue, saturation, lightness]))
-    )
+  if (!Number.isInteger(n) || n < 1) return undefined;
+
+  const luminanceList = pipe(hues).chain(
+    map((hue: Hue) => relativeLuminance(hslToRgb([hue, saturation, lightness])))
   ).value;
 
-  const luminanceDiffAccumulated: readonly number[] = getLuminanceListAccumulated(
-    luminanceList
-  );
+  const luminanceDiffAccumulated = getLuminanceListAccumulated(luminanceList);
 
   /* pickup n hues */
-  if (n < 1) return undefined;
   const result = (zeros(n) as unknown) as NonEmptyArray<Hue>;
 
   let [i, y] = [0, 0];
