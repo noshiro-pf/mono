@@ -24,12 +24,12 @@ export const calcAll = ({
   lightness,
   firstHue,
   divisionNumber,
-}: {
+}: Readonly<{
   saturation: Percent;
   lightness: Percent;
   firstHue: Hue;
   divisionNumber: uint32;
-}): {
+}>): {
   relativeLuminanceDistribution: [Hsl, number][];
   result1_equallySpaced: ExperimentResult;
   result2_weighted: ExperimentResult;
