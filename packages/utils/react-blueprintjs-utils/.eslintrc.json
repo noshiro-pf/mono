@@ -5,5 +5,8 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
+  "rules": {
+    "@typescript-eslint/prefer-readonly-parameter-types": "off"
+  },
   "ignorePatterns": ["*.d.ts", "*.js"]
 }

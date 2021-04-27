@@ -6,6 +6,7 @@
     "project": "./tsconfig.json"
   },
   "rules": {
+    "@typescript-eslint/prefer-readonly-parameter-types": "off",
     "import/no-cycle": "off"
   },
   "ignorePatterns": ["*.d.ts", "*.js"]
