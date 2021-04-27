@@ -1,4 +1,4 @@
-export const concat = <T, S>(
-  arr1: readonly T[],
-  arr2: readonly S[]
-): (S | T)[] => ([] as (S | T)[]).concat(arr1, arr2);
+export const concat = <A, B>(
+  arr1: readonly A[],
+  arr2: readonly B[]
+): (A | B)[] => ([] as (A | B)[]).concat(arr1, arr2);
