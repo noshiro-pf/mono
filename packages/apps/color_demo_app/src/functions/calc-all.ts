@@ -7,6 +7,7 @@ import {
   relativeLuminance,
   roundToInt,
   seq,
+  uint32,
   variance,
   zip,
 } from '@noshiro/ts-utils';
@@ -16,7 +17,7 @@ import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues';
 
-const hueListDefault = seq(360);
+const hueListDefault = seq(360 as uint32);
 
 export const calcAll = ({
   saturation,
@@ -27,7 +28,7 @@ export const calcAll = ({
   saturation: Percent;
   lightness: Percent;
   firstHue: Hue;
-  divisionNumber: number;
+  divisionNumber: uint32;
 }): {
   relativeLuminanceDistribution: [Hsl, number][];
   result1_equallySpaced: ExperimentResult;

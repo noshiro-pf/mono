@@ -1,7 +1,7 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { roundBy } from '@noshiro/ts-utils';
+import { roundBy, uint32 } from '@noshiro/ts-utils';
 import { CSSProperties } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
@@ -84,7 +84,7 @@ export const AnswerTable = memoNamed<Props>(
                   />
                 </Td>
                 <Td>
-                  <span>{roundBy(2, score)}</span>
+                  <span>{roundBy(2 as uint32, score)}</span>
                 </Td>
                 {answerSummaryRow?.map((s, i) => (
                   <Td style={tcellStyle} key={i}>

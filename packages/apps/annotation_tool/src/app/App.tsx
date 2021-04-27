@@ -5,13 +5,13 @@ import {
 } from '@noshiro/react-utils';
 import {
   Hue,
-  neaMapWithIndex,
-  neaZip,
+  map,
   Percent,
   pickupHighContrastHues,
   pipe,
   ReadonlyNonEmptyArray,
   RectSize,
+  zip,
 } from '@noshiro/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
@@ -47,7 +47,7 @@ export const [
 
 // const highlightAlpha: Alpha = 0.4;
 
-const labelNames: ReadonlyNonEmptyArray<string> = [
+const labelNames = [
   'Ant',
   'Bat',
   'Cat',
@@ -56,7 +56,7 @@ const labelNames: ReadonlyNonEmptyArray<string> = [
   'Falcon',
   'Giraffe',
   'Horse',
-];
+] as const;
 
 const hues = pickupHighContrastHues(
   labelNames.length,
@@ -64,15 +64,15 @@ const hues = pickupHighContrastHues(
   lightnessDarker
 ) as ReadonlyNonEmptyArray<Hue>;
 
-const labels: ReadonlyNonEmptyArray<Label> = pipe(hues)
-  .chain((list) => neaZip(list, labelNames))
-  .chain(
-    neaMapWithIndex(([hue, name], index) => ({
+const labels: ReadonlyNonEmptyArray<Label> = pipe(zip(hues, labelNames)).chain(
+  map(
+    ([hue, name]: readonly [Hue, string], index): Label => ({
       id: index.toString(),
       hue,
       name,
-    }))
-  ).value;
+    })
+  )
+).value;
 
 const labelInit: Label = labels[0];
 

@@ -9,6 +9,7 @@ import {
   range,
   stringToNumber,
   today,
+  uint32,
   YearEnum,
 } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
@@ -17,7 +18,10 @@ import styled from 'styled-components';
 const thisYear = getYear(today());
 const thisMonth = getMonth(today());
 
-const yearOption: number[] = range(thisYear - 100, thisYear + 100);
+const yearOption: number[] = range(
+  (thisYear - 100) as uint32,
+  (thisYear + 100) as uint32
+);
 const monthOption: IOptionProps[] = monthsList.en.map((e) => ({
   value: e.value,
   label: e.name,

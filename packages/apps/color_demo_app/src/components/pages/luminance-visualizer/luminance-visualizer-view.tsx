@@ -1,6 +1,6 @@
 import { Paper } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { Hsl, Hue, Mappable, Percent } from '@noshiro/ts-utils';
+import { Hsl, Hue, Mappable, Percent, uint32 } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { ExperimentResult } from '../../../types/experiment-result';
 import { ContrastRatioList } from '../../molecules/contrast-ratio-list';
@@ -35,7 +35,7 @@ type Props = Readonly<{
   lightness: Percent;
   lightnessOnChange: (v: Percent) => void;
   divisionNumber: number;
-  divisionNumberOnChange: (v: number) => void;
+  divisionNumberOnChange: (v: uint32) => void;
   firstHue: Hue;
   firstHueOnChange: (v: Hue) => void;
   relativeLuminanceDistribution: Mappable<[Hsl, number]>;

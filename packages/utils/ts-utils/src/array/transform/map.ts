@@ -1,18 +1,10 @@
-import { FunctionType } from '../../types';
-import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
+import { uint32 } from '../../types';
 
-export const neaMap = <A, B>(mapFn: FunctionType<A, B>) => (
-  array: ReadonlyNonEmptyArray<A>
-): NonEmptyArray<B> => (array.map(mapFn) as unknown) as NonEmptyArray<B>;
-
-export const map = <A, B>(mapFn: FunctionType<A, B>) => (
-  array: readonly A[]
-): B[] => array.map(mapFn);
-
-export const neaMapWithIndex = <A, B>(mapFn: (a: A, index: number) => B) => (
-  array: ReadonlyNonEmptyArray<A>
-): NonEmptyArray<B> => array.map(mapFn) as NonEmptyArray<B>;
-
-export const mapWithIndex = <A, B>(mapFn: (a: A, index: number) => B) => (
-  array: readonly A[]
-): B[] => array.map(mapFn);
+export const map = <A, B>(mapFn: (a: A, index: uint32) => B) => <
+  T extends readonly A[]
+>(
+  array: T
+): { [K in keyof T]: B } =>
+  (array.map(mapFn as (a: A, index: number) => B) as unknown) as {
+    [K in keyof T]: B;
+  };

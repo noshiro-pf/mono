@@ -8,7 +8,7 @@ import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 export function uniq<T>(arr: ReadonlyNonEmptyArray<T>): NonEmptyArray<T>;
 export function uniq<T>(arr: readonly T[]): T[];
 export function uniq<T>(arr: readonly T[]): T[] {
-  return Array.from(new Set(arr));
+  return [...new Set(arr)];
 }
 
 export function uniqBy<A, B>(

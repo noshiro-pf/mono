@@ -1,4 +1,4 @@
-import { seq } from '@noshiro/ts-utils';
+import { seq, uint32 } from '@noshiro/ts-utils';
 import { ithBorrowingBalanceInPIER } from './financial/ith-borrowing-balance-in-pier';
 import { monthlyPaymentsInPIER } from './financial/monthly-payments-in-pier';
 
@@ -22,7 +22,7 @@ export const calcPrincipalAndInterestEqualPayment = ({
     interestRate,
   });
 
-  const borrowingBalanceYen = seq(numPayments + 1).map((ith) =>
+  const borrowingBalanceYen = seq((numPayments + 1) as uint32).map((ith) =>
     ithBorrowingBalanceInPIER({
       total: borrowingTotal,
       numPayments,

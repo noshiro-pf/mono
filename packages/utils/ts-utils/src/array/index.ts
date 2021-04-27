@@ -7,6 +7,7 @@ export * from './equal';
 export * from './is-empty';
 export * from './is-in-range';
 export * from './is-non-empty';
+export * from './length';
 export * from './math';
 export * from './mutation';
 export * from './non-empty-array';

@@ -5,8 +5,8 @@ export const testArrayEquality = <T>({
   toBe,
 }: {
   testName: string;
-  target: readonly T[];
-  toBe: readonly T[];
+  target: readonly T[] | undefined;
+  toBe: readonly T[] | undefined;
 }): void => {
   test(testName, () => {
     expect(target).toEqual(toBe);
