@@ -2,7 +2,7 @@ import { PromiseState } from '@noshiro/ts-utils';
 import { useEffect, useRef, useState } from 'preact/compat';
 
 export const usePromiseValue = <T>(
-  promise: Promise<T>
+  promise: Readonly<Promise<T>>
 ): PromiseState<undefined, unknown, T> => {
   const promiseMemoized = useRef(promise);
 

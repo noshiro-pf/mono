@@ -8,12 +8,12 @@ import {
 } from '../../types/record/base/hours-minutes';
 import { ITimeRange } from '../../types/record/time-range';
 
-type Props = {
+type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   timeRange: ITimeRange;
   onRangeStartChange: (hm: IHoursMinutes) => void;
   onRangeEndChange: (hm: IHoursMinutes) => void;
-};
+}>;
 
 const onTimeChangeFn = (onITimeChange: (hm: IHoursMinutes) => void) => (
   hm: HoursMinutes

@@ -17,7 +17,7 @@ export const addGlobalPointerEventListener = (
     stateHandler(state, { type: 'pointerUp' });
   };
 
-  const pointermoveCallback = (ev: PointerEvent): void => {
+  const pointermoveCallback = (ev: Readonly<PointerEvent>): void => {
     const pointerPos = { x: roundToInt(ev.offsetX), y: roundToInt(ev.offsetY) };
     stateHandler(state, { type: 'pointerMove', pointerPos });
   };

@@ -4,7 +4,7 @@ import { splitToTokens } from '../parser';
 const plusStr: string =
   '(lambda m.(lambda n.(lambda s.(lambda z.((m s) ((n s)z))))))';
 
-export const PLUStokens: string[] = splitToTokens(plusStr);
+export const PLUStokens: readonly string[] = splitToTokens(plusStr);
 
 export const PLUS: LambdaTerm = [
   'lambda',

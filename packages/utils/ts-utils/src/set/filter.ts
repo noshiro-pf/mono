@@ -1,5 +1,5 @@
 export const setFilter = <A>(
-  set: Set<A>,
+  set: ReadonlySet<A>,
   filterFn: (a: A) => boolean
 ): Set<A> => {
   const filtered = new Set<A>();

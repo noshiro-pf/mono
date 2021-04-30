@@ -9,10 +9,10 @@ import {
 import { mapToCtrlKeyIsDown } from './map-to-ctrl-key-is-down';
 
 export const mapToSKeyWithCtrl = (): OperatorFunction<
-  ['down' | 'up', KeyboardEventType],
+  readonly ['down' | 'up', KeyboardEventType],
   KeyboardEventType
 > => (
-  keyEvent$: Observable<['down' | 'up', KeyboardEventType]>
+  keyEvent$: Observable<readonly ['down' | 'up', KeyboardEventType]>
 ): Observable<KeyboardEventType> =>
   keyEvent$.pipe(
     filterTargetAlphabetKeyEvent('s'),

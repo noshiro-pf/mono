@@ -6,11 +6,11 @@ import {
   TypeExtends,
 } from '@noshiro/ts-utils';
 
-export type TupleToQueueTuple<T extends unknown[]> = {
+export type TupleToQueueTuple<T extends readonly unknown[]> = {
   [P in keyof T]: Queue<T[P]>;
 };
 
-export type NonEmptyUnknownList = [unknown, ...unknown[]];
+export type NonEmptyUnknownList = readonly [unknown, ...unknown[]];
 
 export type Subscriber<A> = Readonly<{
   onNext: (v: A) => void;
@@ -33,8 +33,8 @@ export type Subscribable<A> = Readonly<{
 
 assertType<
   TypeEq<
-    TupleToQueueTuple<[number, string, boolean]>,
-    [Queue<number>, Queue<string>, Queue<boolean>]
+    TupleToQueueTuple<readonly [number, string, boolean]>,
+    readonly [Queue<number>, Queue<string>, Queue<boolean>]
   >
 >();
 

@@ -6,11 +6,11 @@ export const calcPrincipalAndInterestEqualPayment = ({
   borrowingPeriodMonth: numPayments,
   borrowingTotalYen: borrowingTotal,
   interestRatePerMonth: interestRate,
-}: {
+}: Readonly<{
   borrowingPeriodMonth: number;
   borrowingTotalYen: number;
   interestRatePerMonth: number;
-}): {
+}>): {
   borrowingBalanceYen: number[];
   interestYen: number[];
   monthlyPrincipalPaymentYen: number[];

@@ -23,7 +23,7 @@ const Bar = styled.div`
 `;
 
 type Props = Readonly<{
-  accumulatedDistribution: Mappable<[Hsl, number]>;
+  accumulatedDistribution: Mappable<readonly [Hsl, number]>;
 }>;
 
 export const ColoredDistribution = memoNamed<Props>(

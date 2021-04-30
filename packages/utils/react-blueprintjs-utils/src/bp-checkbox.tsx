@@ -1,8 +1,8 @@
-import { Checkbox, ICheckboxProps } from '@blueprintjs/core';
+import { Checkbox, CheckboxProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import { FormEvent, useCallback } from 'react';
 
-type Props = ICheckboxProps &
+type Props = CheckboxProps &
   Readonly<{
     checked: boolean;
     onCheck: (checked: boolean) => void;
@@ -12,7 +12,7 @@ export const BpCheckbox = memoNamed<Props>(
   'BpCheckbox',
   ({ checked, onCheck, ...props }) => {
     const onChangeHandler = useCallback(
-      (ev: React.FormEvent<HTMLInputElement>) => {
+      (ev: FormEvent<HTMLInputElement>) => {
         onCheck(ev.currentTarget.checked);
       },
       [onCheck]

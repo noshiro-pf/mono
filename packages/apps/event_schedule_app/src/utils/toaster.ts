@@ -7,11 +7,11 @@ export const showToast = ({
   toast,
   message,
   intent,
-}: {
+}: Readonly<{
   toast: IToaster;
   message: string;
   intent: Intent;
-}): void => {
+}>): void => {
   toast.show({
     timeout: 2000,
     intent: intent,

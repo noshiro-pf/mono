@@ -1,4 +1,4 @@
-import { IOptionProps } from '@blueprintjs/core';
+import { OptionProps } from '@blueprintjs/core';
 import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import {
@@ -22,7 +22,7 @@ const yearOption: number[] = range(
   (thisYear - 100) as uint32,
   (thisYear + 100) as uint32
 );
-const monthOption: IOptionProps[] = monthsList.en.map((e) => ({
+const monthOption: OptionProps[] = monthsList.en.map((e) => ({
   value: e.value,
   label: e.name,
 }));

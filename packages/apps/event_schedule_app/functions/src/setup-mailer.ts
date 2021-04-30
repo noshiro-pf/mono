@@ -27,11 +27,11 @@ export const createMailOptions = ({
   text,
   to,
   subject,
-}: {
+}: Readonly<{
   text: string;
   to: string;
   subject: string;
-}): MailOptions => ({
+}>): MailOptions => ({
   from: `event-schedule-app <${gmailConfig.email}>`,
   to,
   subject,

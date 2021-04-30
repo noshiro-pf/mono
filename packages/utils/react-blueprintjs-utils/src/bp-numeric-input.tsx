@@ -1,8 +1,8 @@
-import { INumericInputProps, NumericInput } from '@blueprintjs/core';
+import { NumericInput, NumericInputProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { CSSProperties } from 'react';
 
-type Props = INumericInputProps &
+type Props = NumericInputProps &
   Readonly<{
     value: number;
     onValueChange: (value: number) => void;

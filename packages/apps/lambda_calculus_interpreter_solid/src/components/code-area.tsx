@@ -6,11 +6,11 @@ export const CodeArea = ({
   value,
   valueChange = (_value: string) => undefined,
   className,
-}: {
+}: Readonly<{
   value: () => string;
   valueChange?: FunctionType<string, void>;
   className?: string;
-}): JSX.Element => {
+}>): JSX.Element => {
   const onInput: JSX.EventHandler<HTMLTextAreaElement, Event> = (ev) => {
     valueChange(ev.target.value);
   };

@@ -26,7 +26,7 @@ export namespace utc {
     minutes = 0,
     seconds = 0,
     milliseconds = 0,
-  }: {
+  }: Readonly<{
     year: YearEnum;
     month: MonthEnum;
     date: DateEnum;
@@ -34,7 +34,7 @@ export namespace utc {
     minutes: MinutesEnum;
     seconds: SecondsEnum;
     milliseconds: MillisecondsEnum;
-  }): UTC =>
+  }>): UTC =>
     new Date(
       year,
       month - 1,
@@ -104,7 +104,7 @@ export namespace utc {
     minutes,
     seconds,
     milliseconds,
-  }: {
+  }: Readonly<{
     year?: YearEnum;
     month?: MonthEnum;
     date?: DateEnum;
@@ -112,7 +112,7 @@ export namespace utc {
     minutes?: MinutesEnum;
     seconds?: SecondsEnum;
     milliseconds?: MillisecondsEnum;
-  }) => (u: UTC): UTC => {
+  }>) => (u: UTC): UTC => {
     const d = new Date(u);
     if (year !== undefined) {
       d.setFullYear(year);
@@ -146,7 +146,7 @@ export namespace utc {
     minutes,
     seconds,
     milliseconds,
-  }: {
+  }: Readonly<{
     year?: YearEnum;
     month?: MonthEnum;
     date?: DateEnum;
@@ -154,7 +154,7 @@ export namespace utc {
     minutes?: MinutesEnum;
     seconds?: SecondsEnum;
     milliseconds?: MillisecondsEnum;
-  }) => (u: UTC): UTC => {
+  }>) => (u: UTC): UTC => {
     const d = new Date(u);
     if (year !== undefined) {
       d.setUTCFullYear(year);
@@ -188,7 +188,7 @@ export namespace utc {
     updateMinutes,
     updateSeconds,
     updateMilliseconds,
-  }: {
+  }: Readonly<{
     updateYear?: (year: YearEnum) => YearEnum;
     updateMonth?: (month: MonthEnum) => MonthEnum;
     updateDate?: (date: DateEnum) => DateEnum;
@@ -196,7 +196,7 @@ export namespace utc {
     updateMinutes?: (minutes: MinutesEnum) => MinutesEnum;
     updateSeconds?: (seconds: SecondsEnum) => SecondsEnum;
     updateMilliseconds?: (milliseconds: MillisecondsEnum) => MillisecondsEnum;
-  }) => (u: UTC): UTC => {
+  }>) => (u: UTC): UTC => {
     const {
       year,
       month,
@@ -229,7 +229,7 @@ export namespace utc {
     updateMinutes,
     updateSeconds,
     updateMilliseconds,
-  }: {
+  }: Readonly<{
     updateYear?: (year: YearEnum) => YearEnum;
     updateMonth?: (month: MonthEnum) => MonthEnum;
     updateDate?: (date: DateEnum) => DateEnum;
@@ -237,7 +237,7 @@ export namespace utc {
     updateMinutes?: (minutes: MinutesEnum) => MinutesEnum;
     updateSeconds?: (seconds: SecondsEnum) => SecondsEnum;
     updateMilliseconds?: (milliseconds: MillisecondsEnum) => MillisecondsEnum;
-  }) => (u: UTC): UTC => {
+  }>) => (u: UTC): UTC => {
     const { year, month, date, hours, minutes, seconds, milliseconds } = getUTC(
       u
     );

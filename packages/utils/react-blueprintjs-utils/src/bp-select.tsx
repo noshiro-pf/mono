@@ -1,8 +1,8 @@
-import { HTMLSelect, IHTMLSelectProps } from '@blueprintjs/core';
+import { HTMLSelect, HTMLSelectProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import { ChangeEvent, useCallback } from 'react';
 
-type Props = IHTMLSelectProps &
+type Props = HTMLSelectProps &
   Readonly<{
     onValueChange: (value: string) => void;
   }>;
@@ -11,7 +11,7 @@ export const BpSelect = memoNamed<Props>(
   'BpSelect',
   ({ value, onValueChange, ...props }) => {
     const onChangeHandler = useCallback(
-      (event: React.ChangeEvent<HTMLSelectElement>) => {
+      (event: ChangeEvent<HTMLSelectElement>) => {
         onValueChange(event.target.value);
       },
       [onValueChange]

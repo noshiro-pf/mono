@@ -1,6 +1,7 @@
 import { IList } from '../immutable';
 import { THistoryState } from '../type/history';
 
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const historyToSumCount = (history: THistoryState): IList<number> => {
   const count = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   const historyFiltered = history.history.take(history.index + 1);

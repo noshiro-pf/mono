@@ -15,12 +15,12 @@ export const notifyOnAnswerChangeBody = async ({
   eventId,
   answerItemBefore,
   answerItemAfter,
-}: {
+}: Readonly<{
   eventType: 'create' | 'delete' | 'update';
   eventId: string;
   answerItemBefore: AnswerJsType | undefined;
   answerItemAfter: AnswerJsType | undefined;
-}): Promise<void> => {
+}>): Promise<void> => {
   const eventItem = await getEventItem(eventId);
 
   if (!eventItem.useNotification) {

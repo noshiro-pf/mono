@@ -1,7 +1,7 @@
 import { clamp } from './clamp';
 
 const testClamp = (
-  [a, b]: [number, number],
+  [a, b]: readonly [number, number],
   target: number,
   expected: number
 ): void => {

@@ -1,8 +1,8 @@
 import { normalizeRect } from './normalize-rect';
 
 const testNormalizeRect = (
-  before: [number, number, number, number],
-  after: [number, number, number, number]
+  before: readonly [number, number, number, number],
+  after: readonly [number, number, number, number]
 ): void => {
   test(`normalizeRect({ top: ${before[0]}, left: ${before[1]}, width: ${before[2]}, height: ${before[3]} }))`, () => {
     expect(

@@ -5,8 +5,8 @@ import { filterTargetKeyEvent } from './filter-target-key-event';
 
 export const mapToTargetKeyIsDown = (
   key: string
-): OperatorFunction<['down' | 'up', KeyboardEventType], boolean> => (
-  keyEvents$: Observable<['down' | 'up', KeyboardEventType]>
+): OperatorFunction<readonly ['down' | 'up', KeyboardEventType], boolean> => (
+  keyEvents$: Observable<readonly ['down' | 'up', KeyboardEventType]>
 ): Observable<boolean> =>
   keyEvents$.pipe(
     filterTargetKeyEvent(key),

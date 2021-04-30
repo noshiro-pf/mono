@@ -1,8 +1,9 @@
-import { IDatePickerShortcut } from '@blueprintjs/datetime';
+import { DatePickerShortcut } from '@blueprintjs/datetime';
 import {
   DateEnum,
   MonthEnum,
   pipe,
+  ReadonlyDate,
   setHours,
   setMinutes,
   updateDate,
@@ -11,13 +12,13 @@ import {
 
 const today = new Date();
 
-const createDate = (modifier: (d: Date) => Date): Date =>
+const createDate = (modifier: (d: ReadonlyDate) => Date): Date =>
   pipe(today)
     .chain(modifier)
     .chain((d) => setHours(d, 23))
     .chain((d) => setMinutes(d, 59)).value;
 
-export const answerDeadlineShortcuts: IDatePickerShortcut[] = [
+export const answerDeadlineShortcuts: DatePickerShortcut[] = [
   {
     date: createDate((d) => updateDate(d, (v) => v)),
     label: 'Today',

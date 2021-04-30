@@ -13,7 +13,7 @@ export const addBboxToCanvas = (
   state: CanvasAppState,
   idMaker: () => IdType,
   bboxRect: Rect,
-  bboxColor: { border: Rgba; face: Rgba },
+  bboxColor: Readonly<{ border: Rgba; face: Rgba }>,
   canvasStyles: AnnotationCanvasStyle,
   app: Application,
   stateHandler: CanvasAppStateHandler

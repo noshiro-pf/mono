@@ -34,7 +34,7 @@ export const canvasAppStateHandlerGenerator = (
   pixiApp: PixiApp,
   idMaker: () => IdType,
   canvasStyles: AnnotationCanvasStyle,
-  newBboxColor: { border: Rgba; face: Rgba }
+  newBboxColor: Readonly<{ border: Rgba; face: Rgba }>
 ): CanvasAppStateHandler =>
   function canvasAppStateHandler(state, action) {
     switch (action.type) {

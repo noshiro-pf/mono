@@ -38,7 +38,7 @@ type Props = Readonly<{
   divisionNumberOnChange: (v: uint32) => void;
   firstHue: Hue;
   firstHueOnChange: (v: Hue) => void;
-  relativeLuminanceDistribution: Mappable<[Hsl, number]>;
+  relativeLuminanceDistribution: Mappable<readonly [Hsl, number]>;
   result1_equallySpaced: ExperimentResult;
   result2_weighted: ExperimentResult;
   result3_weighted_log: ExperimentResult;

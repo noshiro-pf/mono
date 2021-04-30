@@ -2,8 +2,8 @@ import { Observable, OperatorFunction } from 'rxjs';
 import { mapToTargetKeyIsDown } from '../custom-operators';
 
 export const mapToEscapeKeyIsDown = (): OperatorFunction<
-  ['down' | 'up', KeyboardEvent],
+  readonly ['down' | 'up', KeyboardEvent],
   boolean
 > => (
-  keyEvents$: Observable<['down' | 'up', KeyboardEvent]>
+  keyEvents$: Observable<readonly ['down' | 'up', KeyboardEvent]>
 ): Observable<boolean> => keyEvents$.pipe(mapToTargetKeyIsDown('Escape'));

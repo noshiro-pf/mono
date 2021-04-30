@@ -8,8 +8,8 @@ export const monthlyPaymentsInPIER = ({
   total,
   numPayments: n,
   interestRate: r,
-}: {
+}: Readonly<{
   total: number;
   numPayments: number;
   interestRate: number;
-}): number => total * r * (1 + 1 / ((1 + r) ** n - 1));
+}>): number => total * r * (1 + 1 / ((1 + r) ** n - 1));

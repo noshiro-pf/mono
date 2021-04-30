@@ -1,7 +1,7 @@
 import { isValidRect } from './is-valid-rect';
 
 const testIsValidRect = (
-  [top, left, width, height]: [number, number, number, number],
+  [top, left, width, height]: readonly [number, number, number, number],
   expected: boolean
 ): void => {
   test(`isValidRect(Rect({ top: ${top}, left: ${left}, width: ${width}, height: ${height} }))`, () => {

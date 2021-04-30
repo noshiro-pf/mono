@@ -1,6 +1,6 @@
 import { assertType, TypeEq } from './test-type';
 
-export type Bivariant<F extends (...args: never[]) => unknown> = {
+export type Bivariant<F extends (...args: readonly never[]) => unknown> = {
   // eslint-disable-next-line @typescript-eslint/method-signature-style
   bivariantHack(...args: Parameters<F>): ReturnType<F>;
 }['bivariantHack'];
