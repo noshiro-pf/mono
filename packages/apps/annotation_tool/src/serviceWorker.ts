@@ -20,7 +20,9 @@ const isLocalhost = Boolean(
 );
 
 type Config = Readonly<{
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   onSuccess?: (registration: ServiceWorkerRegistration) => void;
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
 }>;
 
