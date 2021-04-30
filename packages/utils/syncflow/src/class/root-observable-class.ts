@@ -17,10 +17,10 @@ export class RootObservableClass<A, Type extends RootObservableType>
   constructor({
     type,
     currentValueInit,
-  }: {
+  }: Readonly<{
     type: Type;
     currentValueInit: RootObservable<A, Type>['currentValue'];
-  }) {
+  }>) {
     super({
       kind: 'root',
       type,

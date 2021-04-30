@@ -171,12 +171,12 @@ export class InitializedSyncChildObservableClass<
     parents,
     depth = 1 + maxDepth(parents),
     currentValueInit,
-  }: {
+  }: Readonly<{
     type: Type;
     parents: Wrap<P>;
     depth?: number;
     currentValueInit: InitializedSyncChildObservable<A, Type>['currentValue'];
-  }) {
+  }>) {
     super({ type, parents, depth, currentValueInit });
   }
 

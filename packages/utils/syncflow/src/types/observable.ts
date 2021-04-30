@@ -170,12 +170,14 @@ export const isChildObservable = <A>(
 
 export type ObservableValue<A> = A extends Observable<infer B> ? B : never;
 
-export type Unwrap<A extends Observable<unknown>[]> = {
+export type Unwrap<A extends readonly Observable<unknown>[]> = {
   [P in keyof A]: ObservableValue<A[P]>;
 };
 
-export type Wrap<A extends unknown[]> = { [P in keyof A]: Observable<A[P]> };
-export type WrapInitialized<A extends unknown[]> = {
+export type Wrap<A extends readonly unknown[]> = {
+  [P in keyof A]: Observable<A[P]>;
+};
+export type WrapInitialized<A extends readonly unknown[]> = {
   [P in keyof A]: InitializedObservable<A[P]>;
 };
 
@@ -184,15 +186,21 @@ assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
 
 assertType<
   TypeExtends<
-    [number, string],
-    Unwrap<[Observable<number>, Observable<string>]>
+    readonly [number, string],
+    Unwrap<readonly [Observable<number>, Observable<string>]>
   >
 >();
 assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
 
 assertType<
-  TypeExtends<[Observable<number>, Observable<number>], Wrap<[number, number]>>
+  TypeExtends<
+    readonly [Observable<number>, Observable<number>],
+    Wrap<readonly [number, number]>
+  >
 >();
 assertNotType<
-  TypeExtends<[Observable<number>, Observable<string>], Wrap<[number, number]>>
+  TypeExtends<
+    readonly [Observable<number>, Observable<string>],
+    Wrap<readonly [number, number]>
+  >
 >();

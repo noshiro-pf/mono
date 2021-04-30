@@ -3,13 +3,13 @@ import { RootObservableClass } from '../class';
 import { FromPromiseObservable } from '../types';
 
 export const fromPromise = <A, E = unknown>(
-  promise: Promise<A>
+  promise: Readonly<Promise<A>>
 ): FromPromiseObservable<A, E> => new FromPromiseObservableClass(promise);
 
 class FromPromiseObservableClass<A, E = unknown>
   extends RootObservableClass<Result<A, E>, 'FromPromise'>
   implements FromPromiseObservable<A, E> {
-  constructor(promise: Promise<A>) {
+  constructor(promise: Readonly<Promise<A>>) {
     super({ type: 'FromPromise', currentValueInit: Option.none });
 
     promise

@@ -38,12 +38,12 @@ export class ObservableBaseClass<
     type,
     depth,
     currentValueInit,
-  }: {
+  }: Readonly<{
     kind: Kind;
     type: ObservableBase<A>['type'];
     depth: Depth;
     currentValueInit: ObservableBase<A>['currentValue'];
-  }) {
+  }>) {
     this.kind = kind;
     this.type = type;
     this.depth = depth;
