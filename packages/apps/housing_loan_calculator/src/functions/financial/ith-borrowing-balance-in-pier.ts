@@ -8,12 +8,12 @@ export const ithBorrowingBalanceInPIER = ({
   numPayments: n,
   interestRate: r,
   ith: i,
-}: {
+}: Readonly<{
   total: number;
   numPayments: number;
   interestRate: number;
   ith: number;
-}): number => {
+}>): number => {
   const q = 1 + r;
   return total * ((1 - q ** (i - n)) / (1 - q ** -n));
 };
