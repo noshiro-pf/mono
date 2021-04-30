@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'preact/compat';
 
 export const useDebounce = <ResultValue>(
   fn: () => ResultValue,
-  deps: unknown[],
+  deps: readonly unknown[],
   bufferMilliSec: number = 300
 ): ResultValue => {
   const timerId = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
