@@ -7,6 +7,7 @@ import {
   getMonth,
   getYear,
   ReadonlyDate,
+  StrictOmit,
 } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { Ymdhm } from './types';
@@ -20,14 +21,11 @@ const parseDate = (str: string): Date => new Date(str);
 
 const tenYearsLater = new Date(getYear(new Date()) + 99, 11);
 
-type Props = Omit<
-  DateInputProps,
-  'formatDate' | 'parseDate' | 'timePrecision'
-> &
-  Readonly<{
-    ymdhm: Ymdhm | undefined;
-    onYmdhmChange: (ymdhm: Ymdhm | undefined) => void;
-  }>;
+type Props = Readonly<{
+  ymdhm: Ymdhm | undefined;
+  onYmdhmChange: (ymdhm: Ymdhm | undefined) => void;
+}> &
+  StrictOmit<DateInputProps, 'formatDate' | 'parseDate' | 'timePrecision'>;
 
 export const BpDatetimePicker = memoNamed<Props>(
   'BpDatetimePicker',

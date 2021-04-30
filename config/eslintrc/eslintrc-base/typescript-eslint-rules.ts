@@ -78,6 +78,16 @@ export const typescriptEslintRules: Readonly<
     '@typescript-eslint/unified-signatures': 'error',
   },
   modifiedRulesIncludedInRecommended: {
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        types: {
+          Omit: 'Use `StrictOmit` instead.',
+          Exclude: 'Use `StrictExclude` instead.',
+        },
+        extendDefaults: true,
+      },
+    ],
     '@typescript-eslint/restrict-plus-operands': [
       'error',
       { checkCompoundAssignments: true },
