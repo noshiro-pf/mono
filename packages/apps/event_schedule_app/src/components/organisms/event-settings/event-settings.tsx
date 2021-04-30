@@ -44,7 +44,6 @@ export const EventSettings = memoNamed<Props>(
     notificationSettings,
     onNotificationSettingsChange,
   }) => {
-    console.log(notificationSettings.toJS());
     const focusEmailInput$ = useTinyObservable<undefined>();
 
     const [clickedMoreThanOnce, setClickedMoreThanOnce] = useState<boolean>(

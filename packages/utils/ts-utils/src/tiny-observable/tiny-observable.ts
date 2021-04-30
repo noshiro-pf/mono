@@ -2,7 +2,15 @@ export type Subscription = Readonly<{
   unsubscribe: () => void;
 }>;
 
-export class TinyObservable<T> {
+export type TinyObservable<T> = Readonly<{
+  next: (value: T) => void;
+  subscribe: (fn: (value: T) => void) => Subscription;
+}>;
+
+export const createTinyObservable = <T>(): TinyObservable<T> =>
+  new TinyObservableClass<T>();
+
+class TinyObservableClass<T> implements TinyObservable<T> {
   private readonly subscriptions = new Map<symbol, (value: T) => void>();
 
   next(value: T): void {

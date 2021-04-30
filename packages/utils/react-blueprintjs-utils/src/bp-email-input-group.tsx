@@ -9,7 +9,7 @@ type Props = IInputGroupProps2 &
     onValueChange: (value: string) => void;
     invalidMessage?: string;
     autoFocus?: boolean;
-    focus$?: TinyObservable<void>;
+    focus$?: TinyObservable<undefined>;
   }>;
 
 export const BpEmailInput = memoNamed<Props>(
