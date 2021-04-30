@@ -1,6 +1,6 @@
 import { Radio, RadioGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import { FormEvent, useCallback } from 'react';
 import { viewTexts } from '../../constants/view-texts';
 import { RepaymentType } from '../../types/enum/repayment-type';
 
@@ -13,7 +13,7 @@ export const RepaymentTypeRadioGroup = memoNamed<Props>(
   'RepaymentTypeRadioGroup',
   ({ repaymentType, onRepaymentTypeChange }) => {
     const onChange = useCallback(
-      (ev: React.FormEvent<HTMLInputElement>) => {
+      (ev: FormEvent<HTMLInputElement>) => {
         onRepaymentTypeChange(ev.currentTarget.value as RepaymentType);
       },
       [onRepaymentTypeChange]

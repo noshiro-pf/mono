@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { Hsl, Percent } from '@noshiro/ts-utils';
-import { useCallback, useMemo } from 'react';
+import { BaseSyntheticEvent, useCallback, useMemo } from 'react';
 import { Label } from '../../../canvas/types/label';
 import { AppEventHandler } from '../../event-handlers';
 import { LabelButtonItemView } from './label-button-item-view';
@@ -26,7 +26,7 @@ export const LabelButtonItem = memoNamed<Props>('LabelButtonItem', (props) => {
   }, [props.label.id, props.handlers]);
 
   const onVisibilityIconClick = useCallback(
-    (ev: React.BaseSyntheticEvent) => {
+    (ev: BaseSyntheticEvent) => {
       props.handlers.flipLabelVisibility(props.label.id);
       ev.stopPropagation();
     },
