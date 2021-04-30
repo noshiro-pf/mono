@@ -1,4 +1,4 @@
-import { DateInput, IDateInputProps } from '@blueprintjs/datetime';
+import { DateInput, DateInputProps } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import {
   getDate,
@@ -6,12 +6,13 @@ import {
   getMinutes,
   getMonth,
   getYear,
+  ReadonlyDate,
 } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { Ymdhm } from './types';
 
 const pad2 = (n: number): string => n.toString().padStart(2, '0');
-const formatDate = (date: Date): string =>
+const formatDate = (date: ReadonlyDate): string =>
   `${getYear(date)}-${pad2(getMonth(date))}-${pad2(getDate(date))}  ${pad2(
     getHours(date)
   )}:${pad2(getMinutes(date))}`;
@@ -20,7 +21,7 @@ const parseDate = (str: string): Date => new Date(str);
 const tenYearsLater = new Date(getYear(new Date()) + 99, 11);
 
 type Props = Omit<
-  IDateInputProps,
+  DateInputProps,
   'formatDate' | 'parseDate' | 'timePrecision'
 > &
   Readonly<{

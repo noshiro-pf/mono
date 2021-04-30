@@ -1,9 +1,9 @@
-import { Button, IButtonProps } from '@blueprintjs/core';
+import { Button, ButtonProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { CSSProperties, useMemo } from 'react';
+import { CSSProperties, HTMLAttributes, useMemo } from 'react';
 
-type Props = IButtonProps &
-  React.HTMLAttributes<HTMLElement> &
+type Props = ButtonProps &
+  HTMLAttributes<HTMLElement> &
   Readonly<{
     nowrap?: boolean;
   }>;

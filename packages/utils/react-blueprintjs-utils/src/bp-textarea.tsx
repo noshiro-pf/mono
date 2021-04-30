@@ -1,17 +1,15 @@
-import { ITextAreaProps, TextArea } from '@blueprintjs/core';
+import { TextArea, TextAreaProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import { ChangeEvent, useCallback } from 'react';
 
-type Props = ITextAreaProps &
-  Readonly<{
-    onValueChange: (value: string) => void;
-  }>;
+type Props = Readonly<{ onValueChange: (value: string) => void }> &
+  TextAreaProps;
 
 export const BpTextArea = memoNamed<Props>(
   'BpTextArea',
   ({ value, onValueChange, ...props }) => {
     const onChangeHandler = useCallback(
-      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      (event: ChangeEvent<HTMLTextAreaElement>) => {
         onValueChange(event.target.value);
       },
       [onValueChange]

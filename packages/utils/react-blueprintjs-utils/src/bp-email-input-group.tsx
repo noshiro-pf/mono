@@ -1,9 +1,9 @@
-import { FormGroup, IInputGroupProps2 } from '@blueprintjs/core';
+import { FormGroup, InputGroupProps2 } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { isEmailString, TinyObservable } from '@noshiro/ts-utils';
 import { BpInput } from './bp-input';
 
-type Props = IInputGroupProps2 &
+type Props = InputGroupProps2 &
   Readonly<{
     formGroupLabel: string;
     onValueChange: (value: string) => void;

@@ -1,27 +1,24 @@
-import { HTMLInputProps, IInputGroupProps2 } from '@blueprintjs/core';
-import { DateInput, IDateInputProps } from '@blueprintjs/datetime';
+import { HTMLInputProps, InputGroupProps2 } from '@blueprintjs/core';
+import { DateInput, DateInputProps } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import { getDate, getMonth, getYear } from '@noshiro/ts-utils';
+import { getDate, getMonth, getYear, StrictOmit } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { YearMonthDate } from './types';
 
 const formatDate = (date: Date): string => date.toLocaleDateString();
 const parseDate = (str: string): Date => new Date(str);
 
-const inputProps: HTMLInputProps & IInputGroupProps2 = {
+const inputProps: HTMLInputProps & InputGroupProps2 = {
   style: { width: '90px' },
 };
 
 const tenYearsLater = new Date(getYear(new Date()) + 99, 11);
 
-type Props = Omit<
-  IDateInputProps,
-  'formatDate' | 'parseDate' | 'timePrecision'
-> &
-  Readonly<{
-    ymd: YearMonthDate | undefined;
-    onYmdChange: (ymd: YearMonthDate | undefined) => void;
-  }>;
+type Props = Readonly<{
+  ymd: YearMonthDate | undefined;
+  onYmdChange: (ymd: YearMonthDate | undefined) => void;
+}> &
+  StrictOmit<DateInputProps, 'formatDate' | 'parseDate' | 'timePrecision'>;
 
 export const BpDatePicker = memoNamed<Props>(
   'BpDatePicker',

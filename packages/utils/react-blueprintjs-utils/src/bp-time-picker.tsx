@@ -1,6 +1,6 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import { getHours, getMinutes } from '@noshiro/ts-utils';
+import { getHours, getMinutes, ReadonlyDate } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { HoursMinutes } from './types';
 
@@ -13,7 +13,7 @@ export const BpTimePicker = memoNamed<Props>(
   'BpTimePicker',
   ({ time, onTimeChange }) => {
     const onChangeHandler = useCallback(
-      (date: Date) => {
+      (date: ReadonlyDate) => {
         onTimeChange({
           hours: getHours(date),
           minutes: getMinutes(date),
