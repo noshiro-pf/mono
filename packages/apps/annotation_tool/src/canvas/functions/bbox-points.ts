@@ -41,7 +41,7 @@ export const bboxPointsFromRect = (rect: Rect): BboxPoints => {
 };
 
 export const foreachBboxPoints = <A>(
-  bboxPoints: { [key in Direction]: A },
+  bboxPoints: { readonly [key in Direction]: A },
   fn: (direction: Direction, p: A) => void
 ): void => {
   fn('nw', bboxPoints.nw);
@@ -55,7 +55,7 @@ export const foreachBboxPoints = <A>(
 };
 
 export const mapBboxPoints = <A, B>(
-  bboxPoints: { [key in Direction]: A },
+  bboxPoints: { readonly [key in Direction]: A },
   fn: (direction: Direction, p: A) => B
 ): { [key in Direction]: B } => ({
   nw: fn('nw', bboxPoints.nw),

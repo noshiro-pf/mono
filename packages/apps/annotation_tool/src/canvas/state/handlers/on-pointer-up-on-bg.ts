@@ -9,7 +9,7 @@ import { CanvasAppStateHandler } from '../state-handler-main';
 export const onPointerUpOnBackground = (
   state: CanvasAppState,
   idMaker: () => IdType,
-  newBboxColor: { border: Rgba; face: Rgba },
+  newBboxColor: Readonly<{ border: Rgba; face: Rgba }>,
   canvasStyles: AnnotationCanvasStyle,
   pixiApp: PixiApp,
   stateHandler: CanvasAppStateHandler
