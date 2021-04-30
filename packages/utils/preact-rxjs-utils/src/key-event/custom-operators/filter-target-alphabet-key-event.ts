@@ -4,5 +4,5 @@ import { filterTargetKeyEvent } from './filter-target-key-event';
 
 export const filterTargetAlphabetKeyEvent = (
   key: Alphabet
-): MonoTypeOperatorFunction<['down' | 'up', KeyboardEvent]> =>
+): MonoTypeOperatorFunction<readonly ['down' | 'up', KeyboardEvent]> =>
   filterTargetKeyEvent(key);
