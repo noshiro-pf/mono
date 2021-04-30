@@ -8,14 +8,14 @@ import {
   WeekDayEnum,
   YearEnum,
 } from '../date';
-import { Phantomic } from '../types';
+import { Phantomic, ReadonlyDate } from '../types';
 
 export namespace utc {
   export type UTC = Phantomic<number, 'UTC'>;
 
   export const now = (): UTC => Date.now() as UTC;
 
-  export const fromDate = (date: Date): UTC => date.getTime() as UTC;
+  export const fromDate = (date: ReadonlyDate): UTC => date.getTime() as UTC;
 
   export const fromNumber = (n: number): UTC => n as UTC;
 
