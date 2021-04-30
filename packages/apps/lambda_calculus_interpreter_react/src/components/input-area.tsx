@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import { ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components';
 
 export const CodeArea = memoNamed<{
@@ -8,7 +8,7 @@ export const CodeArea = memoNamed<{
   className?: string;
 }>('CodeArea', ({ value, valueChange = () => undefined, className }) => {
   const onChange = useCallback(
-    (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (ev: ChangeEvent<HTMLTextAreaElement>) => {
       valueChange(ev.target.value ?? '');
     },
     [valueChange]

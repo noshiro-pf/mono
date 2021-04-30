@@ -1,7 +1,7 @@
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { higherContrastTextColorHsl, Hsl, hslToStr } from '@noshiro/ts-utils';
-import { CSSProperties, useCallback, useMemo } from 'react';
+import { BaseSyntheticEvent, CSSProperties, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import {
   LabelButtonItemBodyDisabledStyled,
@@ -17,7 +17,7 @@ type Props = Readonly<{
   isVisible: boolean;
   disabled?: boolean;
   onLabelClick: () => void;
-  onVisibilityIconClick: (ev: React.BaseSyntheticEvent) => void;
+  onVisibilityIconClick: (ev: BaseSyntheticEvent) => void;
 }>;
 
 export const LabelButtonItemView = memoNamed<Props>(
@@ -61,7 +61,7 @@ export const LabelButtonItemView = memoNamed<Props>(
     }, [disabled, props]);
 
     const onVisibilityIconClickConditional = useCallback(
-      (ev: React.BaseSyntheticEvent) => {
+      (ev: BaseSyntheticEvent) => {
         if (disabled) return;
         props.onVisibilityIconClick(ev);
       },

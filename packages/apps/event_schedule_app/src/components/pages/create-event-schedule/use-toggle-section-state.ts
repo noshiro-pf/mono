@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { MutableRefObject, useCallback, useRef, useState } from 'react';
 
 // const NULL = Symbol();
 // const isNonNull = <T>(v: T | symbol): v is T => v !== NULL;
@@ -17,10 +17,8 @@ export const useToggleSectionState = <A>(
   () => void
 ] => {
   const initialValueRef = useRef(initialValue);
-  const valueWhenTurnedOffRef: React.MutableRefObject<A> = useRef(
-    valueWhenTurnedOff
-  );
-  const valueWhenTurnedOnRef: React.MutableRefObject<A | undefined> = useRef(
+  const valueWhenTurnedOffRef: MutableRefObject<A> = useRef(valueWhenTurnedOff);
+  const valueWhenTurnedOnRef: MutableRefObject<A | undefined> = useRef(
     valueWhenTurnedOn
   );
 

@@ -1,10 +1,10 @@
-import { FC, memo } from 'react';
+import { ComponentType, FC, memo } from 'react';
 import { Redirect, Route } from 'react-router';
 
 type Props = Readonly<{
   loggedIn: boolean | undefined;
   path: string;
-  component: React.ComponentType;
+  component: ComponentType;
   exact: boolean;
   redirectTo: string;
 }>;
