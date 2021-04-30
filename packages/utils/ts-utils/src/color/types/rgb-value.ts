@@ -1,3 +1,5 @@
+import { clamp } from '../../num';
+
 // prettier-ignore
 export type RgbValue = number & (
    0 |   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9 |
@@ -29,4 +31,4 @@ export type RgbValue = number & (
 );
 
 export const rgbValue = (v: number): RgbValue =>
-  Math.round(v % 256) as RgbValue;
+  Math.round(clamp(0, 255)(v)) as RgbValue;
