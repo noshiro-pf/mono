@@ -5,17 +5,18 @@ import {
   Percent,
   relativeLuminance,
   seq,
+  uint32,
   zeros,
 } from '@noshiro/ts-utils';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
-const huesDefault = seq(360) as readonly Hue[];
+const huesDefault = seq(360 as uint32) as readonly Hue[];
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（＝hue）を返す
  */
 export const pickupHighContrastHues = (
-  n: number,
+  n: uint32,
   saturation: Percent,
   lightness: Percent,
   firstHue: Hue,
@@ -34,7 +35,7 @@ export const pickupHighContrastHues = (
 
   /* pickup n hues */
 
-  const result = zeros(n) as Hue[];
+  const result: Hue[] = zeros(n);
 
   let [i, y] = [0, 0];
 

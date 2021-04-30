@@ -7,4 +7,4 @@ export const possibleTwoDiceSums = (
   c: DiceValue,
   d: DiceValue
 ): Set<TwoDiceSumValue> =>
-  new Set([a + b, a + c, a + d, b + c, b + d, c + d]) as Set<TwoDiceSumValue>;
+  new Set([a + b, a + c, a + d, b + c, b + d, c + d] as TwoDiceSumValue[]);
