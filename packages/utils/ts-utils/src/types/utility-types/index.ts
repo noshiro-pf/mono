@@ -1,5 +1,6 @@
 export * from './array-at-least';
 export * from './array-element';
+export * from './array-of-length';
 export * from './bivariant-hack';
 export * from './deep-partial';
 export * from './deep-readonly';
