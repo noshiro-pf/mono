@@ -6,6 +6,7 @@ import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
 import { EventScheduleJsType } from './types/record/event-schedule';
 import { pad2 } from './utils/to-str';
+import { tuple } from './utils/tuple';
 
 export const notifyAnswerDeadline = async (): Promise<void> => {
   const querySnapshot = await admin
@@ -15,8 +16,8 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
     .where('useAnswerDeadline', '==', true)
     .get();
 
-  const events = querySnapshot.docs.map(
-    (doc) => [doc.id, doc.data()] as [string, EventScheduleJsType]
+  const events = querySnapshot.docs.map((doc) =>
+    tuple(doc.id, doc.data() as EventScheduleJsType)
   );
 
   await Promise.all(
