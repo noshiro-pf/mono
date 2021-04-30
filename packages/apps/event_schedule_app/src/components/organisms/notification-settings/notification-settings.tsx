@@ -16,7 +16,7 @@ type Props = Readonly<{
   disabled: boolean;
   useAnswerDeadline: boolean;
   answerDeadline: IYmdHm | undefined;
-  focusEmailInput$: TinyObservable<void>;
+  focusEmailInput$: TinyObservable<undefined>;
 }>;
 
 const vt = texts.eventSettingsPage.section3;

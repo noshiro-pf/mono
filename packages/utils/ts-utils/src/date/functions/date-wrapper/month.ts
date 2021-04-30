@@ -1,15 +1,16 @@
+import { ReadonlyDate } from '../../../types';
 import { MonthEnum } from '../../types';
 
-export const getMonth = (date: Date): MonthEnum =>
+export const getMonth = (date: ReadonlyDate): MonthEnum =>
   (date.getMonth() + 1) as MonthEnum;
 
-export const setMonth = (curr: Date, month: MonthEnum): Date => {
-  const copy: Date = new Date(curr);
+export const setMonth = (curr: ReadonlyDate, month: MonthEnum): Date => {
+  const copy: Date = new Date(curr as Date);
   copy.setMonth(month - 1);
   return copy;
 };
 
 export const updateMonth = (
-  curr: Date,
+  curr: ReadonlyDate,
   updater: (date: MonthEnum) => MonthEnum
 ): Date => setMonth(curr, updater(getMonth(curr)));

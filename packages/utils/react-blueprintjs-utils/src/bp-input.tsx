@@ -1,13 +1,13 @@
 import { IInputGroupProps2, InputGroup } from '@blueprintjs/core';
 import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
-import { TinyObservable } from '@noshiro/ts-utils';
+import { createTinyObservable, TinyObservable } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useRef } from 'react';
 
 type Props = IInputGroupProps2 &
   Readonly<{
     onValueChange: (value: string) => void;
     autoFocus?: boolean;
-    focus$?: TinyObservable<void>;
+    focus$?: TinyObservable<undefined>;
   }>;
 
 export const BpInput = memoNamed<Props>(
@@ -34,7 +34,7 @@ export const BpInput = memoNamed<Props>(
       }
     }, [autoFocus, focus]);
 
-    useTinyObservableEffect(focus$ ?? new TinyObservable(), focus);
+    useTinyObservableEffect(focus$ ?? createTinyObservable<undefined>(), focus);
 
     return (
       <InputGroup

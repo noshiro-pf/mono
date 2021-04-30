@@ -1,1 +1,3 @@
-export const toTimestamp = (d: Date): number => d.getTime();
+import { ReadonlyDate } from '../../types';
+
+export const toTimestamp = (d: ReadonlyDate): number => d.getTime();
