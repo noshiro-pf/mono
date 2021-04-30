@@ -22,9 +22,9 @@ while read target; do
     then
         echo "skipped ${target} "
     else
-        echo "building \"${target}\" ..." 
+        echo "linting \"${target}\" ..." 
         cd "${apps_path}/${target}"
-        yarn build
+        yarn lint
         echo "done."
         echo ""
     fi
