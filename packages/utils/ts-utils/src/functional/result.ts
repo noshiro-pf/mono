@@ -66,7 +66,7 @@ export namespace Result {
   };
 
   export const fromPromise = <S, E = unknown>(
-    promise: Promise<S>
+    promise: Readonly<Promise<S>>
   ): Promise<_Result<S, E>> => promise.then(ok).catch(err);
 }
 

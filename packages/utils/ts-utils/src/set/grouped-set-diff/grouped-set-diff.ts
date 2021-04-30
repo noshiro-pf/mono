@@ -1,7 +1,7 @@
 export type GroupedSetDiffKeyType = 'added' | 'deleted' | 'updated';
 
 type GroupedSetDiff<T> = {
-  [key in GroupedSetDiffKeyType]: Set<T>;
+  readonly [key in GroupedSetDiffKeyType]: Set<T>;
 };
 
 export type IGroupedSetDiffType<T> = Map<GroupedSetDiffKeyType, Set<T>>;

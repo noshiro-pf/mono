@@ -14,8 +14,8 @@ import { IGroupedSetDiff, IGroupedSetDiffType } from './grouped-set-diff';
  * `number`等primitiveの集合である場合は`e => e`をダミーとして用いる（primitiveの場合は `updated` は常に空となる）．
  */
 export const getGroupedSetDiff = <A>(
-  oldSet: Set<A>,
-  newSet: Set<A>,
+  oldSet: ReadonlySet<A>,
+  newSet: ReadonlySet<A>,
   idSelector: (e: A) => unknown = (e) => e
 ): IGroupedSetDiffType<A> => {
   // TODO: Set.includesの使用を最小限に抑えたアルゴリズムに修正し高速化する

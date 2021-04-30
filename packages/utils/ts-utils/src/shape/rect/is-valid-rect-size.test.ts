@@ -1,7 +1,7 @@
 import { isValidRectSize } from './is-valid-rect-size';
 
 const testIsValidRectSize = (
-  [width, height]: [number, number],
+  [width, height]: readonly [number, number],
   expected: boolean
 ): void => {
   test(`isValidRect(RectSize({width: ${width}, height: ${height} }))`, () => {
