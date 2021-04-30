@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { useStateAsStream } from '../rxjs-hooks';
 
 export const useKeyEventAsStream = (): Observable<
-  ['down' | 'up', KeyboardEventType]
+  readonly ['down' | 'up', KeyboardEventType]
 > => {
   const [
     //
