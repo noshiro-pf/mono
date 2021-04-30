@@ -3,7 +3,7 @@ import { ALPHABETS } from '../constants';
 import { Variable } from '../types';
 
 export const pickUpAvailableVariable = (
-  freeVariables: Variable[]
+  freeVariables: readonly Variable[]
 ): Variable => {
   const availableVariables = ALPHABETS.filter(
     (e) => !freeVariables.includes(e)

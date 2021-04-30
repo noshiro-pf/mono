@@ -1,6 +1,6 @@
 import { numberLambdaTerm, PLUStokens, SUCCtokens } from '../macro';
 
-export const expandShortcuts = (tokens: string[]): string[] => {
+export const expandShortcuts = (tokens: readonly string[]): string[] => {
   const expanded: string[] = [];
   tokens.forEach((token) => {
     const parsedAsNumber = parseInt(token, 10);

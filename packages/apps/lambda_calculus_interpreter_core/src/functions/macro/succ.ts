@@ -3,7 +3,7 @@ import { splitToTokens } from '../parser';
 
 const succStr: string = '(lambda n.(lambda s.(lambda z.(s((n s)z)))))';
 
-export const SUCCtokens: string[] = splitToTokens(succStr);
+export const SUCCtokens: readonly string[] = splitToTokens(succStr);
 
 export const SUCC: LambdaTerm = [
   'lambda',

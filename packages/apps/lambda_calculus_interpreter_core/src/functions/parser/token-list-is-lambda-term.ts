@@ -1,6 +1,8 @@
 import { isVariable } from '../is-variable';
 
-export const tokensRepresentsLambdaTerm = (tokens: string[]): boolean => {
+export const tokensRepresentsLambdaTerm = (
+  tokens: readonly string[]
+): boolean => {
   /* e ::= x | (lambda x.e) | (e e) */
   if (tokens.length < 1) return false;
 
