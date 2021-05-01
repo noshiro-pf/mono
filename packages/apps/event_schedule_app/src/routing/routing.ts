@@ -32,7 +32,7 @@ export const routing = {
   // uiParts: { path: routePaths.uiParts, component: UiPartsTest },
 };
 
-export const routingList: readonly [string, ComponentType][] = [
+export const routingList: readonly (readonly [string, ComponentType])[] = [
   routing.createPage,
   routing.answerPage,
   routing.editPage,
@@ -40,4 +40,6 @@ export const routingList: readonly [string, ComponentType][] = [
   // routing.uiParts,
 ].map((a) => [a.path, a.component]);
 
-export const redirects: [string, string][] = [['/', routePaths.createPage]];
+export const redirects: readonly (readonly [string, string])[] = [
+  ['/', routePaths.createPage],
+];

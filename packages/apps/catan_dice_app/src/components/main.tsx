@@ -45,16 +45,15 @@ export const Main = memoNamed('Main', () => {
       .chain(withInitialValue(false))
   );
 
-  const diceValues$ = useStream<[number, number]>(() =>
+  const diceValues$ = useStream<readonly [number, number]>(() =>
     history$
       .chain(
         map(
           (histState) =>
-            histState.history.get(histState.index) ??
-            ([0, 0] as [number, number])
+            histState.history.get(histState.index) ?? ([0, 0] as const)
         )
       )
-      .chain(withInitialValue([0, 0]))
+      .chain(withInitialValue([0, 0] as const))
   );
 
   const sumCount$ = useStream<IList<number>>(() =>
