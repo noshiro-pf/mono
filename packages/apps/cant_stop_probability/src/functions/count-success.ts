@@ -1,33 +1,71 @@
-import { setIsSuperset } from '@noshiro/ts-utils';
-import { denom } from '../constants/denom';
 import { diceValueSet } from '../constants/dice-value-set';
-import { twoDiceSumSet } from '../constants/two-dice-sum-set';
+import { Count } from '../types/count';
 import { TwoDiceSumValue } from '../types/two-dice-sum-value';
-import { possibleTwoDiceSums } from './possible-two-dice-sums';
+import { possibleTwoDiceSumPairs } from './possible-two-dice-sum-pair';
 
 export const countSuccess = (
   x: TwoDiceSumValue,
   y: TwoDiceSumValue,
   z: TwoDiceSumValue
-): number => {
-  const rest: Set<TwoDiceSumValue> = twoDiceSumSet();
-  rest.delete(x);
-  rest.delete(y);
-  rest.delete(z);
-
-  let ng: number = 0;
+): Count => {
+  const count: { -readonly [K in keyof Count]: number } = {
+    oneLine: 0,
+    twoLine: 0,
+    noLine: 0,
+  };
 
   for (const a of diceValueSet) {
     for (const b of diceValueSet) {
       for (const c of diceValueSet) {
         for (const d of diceValueSet) {
-          if (setIsSuperset(rest, possibleTwoDiceSums(a, b, c, d))) {
-            ng += 1;
+          const [pair1, pair2, pair3] = possibleTwoDiceSumPairs(a, b, c, d);
+          // どれか1列を2段進められる組み合わせ
+          if (
+            (pair1[0] === pair1[1] &&
+              (x === pair1[0] || y === pair1[0] || z === pair1[0])) ||
+            (pair2[0] === pair2[1] &&
+              (x === pair2[0] || y === pair2[0] || z === pair2[0])) ||
+            (pair3[0] === pair3[1] &&
+              (x === pair3[0] || y === pair3[0] || z === pair3[0]))
+          ) {
+            count.twoLine += 1;
+            continue;
           }
+
+          // どれか2列を1段ずつ進められる組み合わせ
+          const x1 = pair1.includes(x);
+          const y1 = pair1.includes(y);
+          const z1 = pair1.includes(z);
+          const x2 = pair2.includes(x);
+          const y2 = pair2.includes(y);
+          const z2 = pair2.includes(z);
+          const x3 = pair3.includes(x);
+          const y3 = pair3.includes(y);
+          const z3 = pair3.includes(z);
+          if (
+            (x1 && y1) ||
+            (x2 && y2) ||
+            (x3 && y3) ||
+            (x1 && z1) ||
+            (x2 && z2) ||
+            (x3 && z3) ||
+            (y1 && z1) ||
+            (y2 && z2) ||
+            (y3 && z3)
+          ) {
+            count.twoLine += 1;
+            continue;
+          }
+
+          if (x1 || x2 || x3 || y1 || y2 || y3 || z1 || z2 || z3) {
+            count.oneLine += 1;
+            continue;
+          }
+          count.noLine += 1;
         }
       }
     }
   }
 
-  return denom - ng;
+  return count as Count;
 };

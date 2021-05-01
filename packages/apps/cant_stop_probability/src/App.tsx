@@ -1,84 +1,149 @@
-import { HTMLTable } from '@blueprintjs/core';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { Navbar, Tab, Tabs } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
+import {
+  isNotUndefined,
+  stringToNumber,
+  tuple,
+  uint32,
+  zeros,
+} from '@noshiro/ts-utils';
 import { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { DeadColumn } from './components/dead-column';
+import { ProbabilityTable } from './components/table';
 import { denom } from './constants/denom';
 import { selected3List } from './constants/selected-3-list';
+import { calcExpected } from './functions/calc-expected';
 import { countSuccess } from './functions/count-success';
+import { countSuccessForRemains } from './functions/count-success-for-remains';
+import { ResultRow } from './types/result-row';
+import { isTwoDiceSumValue, TwoDiceSumValue } from './types/two-dice-sum-value';
 
-const results = selected3List().map(([x, y, z]) => {
+const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const count = countSuccess(x, y, z);
+  const countSum = (denom - count.noLine) as uint32;
   return {
-    selected: [x, y, z],
-    count: count,
-    probability: count / denom,
+    selected: tuple(x, y, z),
+    count,
+    countSum,
+    probability: countSum / denom,
+    expected: calcExpected(count),
   };
 });
 
+const separator = ',';
+
 const resultsSortedByprobability = results
   .slice()
-  .sort((a, b) => a.count - b.count)
+  .sort((a, b) => a.countSum - b.countSum)
   .reverse();
 
 export const App: FC = memoNamed('App', () => {
-  const [sortBy, setSortBy] = useState<1 | 2>(1);
-  const onSortChange1 = useCallback(() => {
-    setSortBy(1);
-  }, []);
-  const onSortChange2 = useCallback(() => {
-    setSortBy(2);
+  const [sortBy, setSortBy] = useState<'dice' | 'prob'>('prob');
+
+  const sortByDice = useCallback(() => {
+    setSortBy('dice');
   }, []);
 
+  const sortByProbability = useCallback(() => {
+    setSortBy('prob');
+  }, []);
+
+  const [filterByString, setFilterByString] = useState<string>('');
+  const filterBy: TwoDiceSumValue[] = useMemo(
+    () =>
+      filterByString
+        .split(separator)
+        .map(stringToNumber)
+        .filter(isNotUndefined)
+        .filter(isTwoDiceSumValue),
+    [filterByString]
+  );
+
   const sorted = useMemo(
-    () => (sortBy === 1 ? results : resultsSortedByprobability),
+    () => (sortBy === 'dice' ? results : resultsSortedByprobability),
     [sortBy]
   );
 
+  const filtered = useMemo(
+    () =>
+      sorted.filter((row) => filterBy.every((v) => row.selected.includes(v))),
+    [sorted, filterBy]
+  );
+
+  const [
+    //
+    selectedTabId,
+    handleTabChange,
+  ] = useState<'deadColumnUI' | 'table'>('table');
+
+  const [columnsAlive, setDeadColumns] = useState<readonly boolean[]>(
+    zeros(11 as uint32).map(() => true)
+  );
+
+  const columnsAliveWithHandler = useMemo<
+    readonly Readonly<{
+      columnId: TwoDiceSumValue;
+      alive: boolean;
+      toggle: () => void;
+    }>[]
+  >(
+    () =>
+      columnsAlive.map((alive, index) => ({
+        columnId: (index + 2) as TwoDiceSumValue,
+        alive,
+        toggle: () => {
+          setDeadColumns((prev) => prev.map((b, i) => (i === index ? !b : b)));
+        },
+      })),
+
+    [columnsAlive]
+  );
+
+  const hitSomeAliveColumnProbability = useMemo(
+    () =>
+      countSuccessForRemains(
+        new Set(
+          columnsAliveWithHandler.filter((a) => a.alive).map((a) => a.columnId)
+        )
+      ) / denom,
+    [columnsAliveWithHandler]
+  );
+
   return (
-    <Wrapper>
-      <HTMLTable striped={true} bordered={true}>
-        <thead>
-          <tr>
-            <Th colSpan={3}>
-              <span>選択した列の数字</span>
-              <BpButton minimal={true} icon={'sort'} onClick={onSortChange1} />
-            </Th>
-            <Th>
-              <span>その列の数字になる組み合わせが出る確率</span>
-              <BpButton minimal={true} icon={'sort'} onClick={onSortChange2} />
-            </Th>
-            <Th>
-              <span>組み合わせの数</span>
-              <BpButton minimal={true} icon={'sort'} onClick={onSortChange2} />
-            </Th>
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((r, i) => (
-            <tr key={i}>
-              <Td>{r.selected[0]} </Td>
-              <Td>{r.selected[1]} </Td>
-              <Td>{r.selected[2]} </Td>
-              <Td>{r.probability} </Td>
-              <Td>
-                {r.count}/{denom}
-              </Td>
-            </tr>
-          ))}
-        </tbody>
-      </HTMLTable>
-    </Wrapper>
+    <div>
+      <Navbar>
+        <Navbar.Group>
+          <Tabs
+            selectedTabId={selectedTabId}
+            onChange={handleTabChange as (value: string) => void}
+          >
+            <Tab id='table' title='確率表' />
+            <Tab id='deadColumnUI' title='残存列確率' />
+          </Tabs>
+        </Navbar.Group>
+      </Navbar>
+      <Wrapper>
+        {selectedTabId === 'table' ? (
+          <ProbabilityTable
+            sortByDice={sortByDice}
+            sortByProbability={sortByProbability}
+            filterByString={filterByString}
+            onFilterByStringChange={setFilterByString}
+            filtered={filtered}
+          />
+        ) : undefined}
+        {selectedTabId === 'deadColumnUI' ? (
+          <DeadColumn
+            columnsAliveWithHandler={columnsAliveWithHandler}
+            hitSomeAliveColumnProbability={hitSomeAliveColumnProbability}
+          />
+        ) : undefined}
+      </Wrapper>
+    </div>
   );
 });
 
 const Wrapper = styled.div`
   padding: 20px;
-`;
-
-const Th = styled.th`
-  text-align: center !important;
-`;
-const Td = styled.td`
-  text-align: center !important;
 `;
