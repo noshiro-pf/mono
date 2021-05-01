@@ -1,3 +1,5 @@
+import { clamp } from '../../num';
+
 // prettier-ignore
 export type Hue = number & (
    0 |   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9 |
@@ -38,4 +40,4 @@ export type Hue = number & (
  350 | 351 | 352 | 353 | 354 | 355 | 356 | 357 | 358 | 359
 );
 
-export const hue = (h: number): Hue => Math.round(h % 360) as Hue;
+export const hue = (h: number): Hue => Math.round(clamp(0, 359)(h)) as Hue;
