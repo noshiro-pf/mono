@@ -12,6 +12,7 @@ export * from './monotype-function';
 export * from './phantomic';
 export * from './phantomic-types';
 export * from './readonly-date';
+export * from './readonly-record';
 export * from './reducer-type';
 export * from './strict-exclude';
 export * from './strict-omit';

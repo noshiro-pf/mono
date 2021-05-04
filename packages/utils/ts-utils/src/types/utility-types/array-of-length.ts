@@ -2,6 +2,9 @@ import { Cons } from './list';
 import { assertType, TypeEq } from './test-type';
 
 export type ArrayOfLength<N extends number, T> = ArrayOfLengthRec<N, T, []>;
+export type ReadonlyArrayOfLength<N extends number, T> = Readonly<
+  ArrayOfLength<N, T>
+>;
 
 type ArrayOfLengthRec<Num, Elm, T extends unknown[]> = {
   0: T;
