@@ -12,6 +12,7 @@
     "newLine": "lf",
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
     "noImplicitReturns": true,
