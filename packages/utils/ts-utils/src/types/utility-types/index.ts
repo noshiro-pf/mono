@@ -4,6 +4,7 @@ export * from './array-of-length';
 export * from './bivariant-hack';
 export * from './deep-partial';
 export * from './deep-readonly';
+export * from './deep-writable';
 export * from './function';
 export * from './json-type';
 export * from './list';
