@@ -22,6 +22,7 @@ export const eslintImportsRules: Readonly<{
           'solid-js/web',
           '@testing-library/jest-dom/extend-expect',
           'preact/**',
+          'immer/**',
           'firebase/*',
           '@blueprintjs/*',
           '@material-ui/*',
