@@ -11,7 +11,7 @@ TS_FILENAME_REGEX="^[a-zA-Z0-9_\-]+.tsx?$"
 # args
 target_directory=$1
 clear=false
-omit_root_index_ts=false
+min_recursion_depth=0
 max_recursion_depth=10
 
 while [[ $# -gt 0 ]]
@@ -20,15 +20,16 @@ do
 
   case $key in
     --clear)
-    $clear=true
+    clear=true
     shift # past argument
     ;;
-    --omitroot)
-    $omit_root_index_ts=true
+    --min-depth)
+    min_recursion_depth=$2
+    shift # past argument
     shift # past argument
     ;;
     --max-depth)
-    $max_recursion_depth=$2
+    max_recursion_depth=$2
     shift # past argument
     shift # past argument
     ;;
@@ -38,19 +39,21 @@ do
   esac
 done
 
-echo ${clear}
+echo clear: ${clear}
+echo min_recursion_depth: ${min_recursion_depth}
+echo max_recursion_depth: ${max_recursion_depth}
 
 # move to target directory
 cd ${target_directory}
+echo -n "target_directory: "
 pwd
+echo
 
 index_ts_files=()
 
 # generate index.ts recursively
-for directory in $(find . -maxdepth ${max_recursion_depth} -type d); do
-  if [ "${omit_root_index_ts}" = "true" -a "${directory}" = "." ]; then
-    continue;
-  fi
+for directory in $(find . -mindepth ${min_recursion_depth} -maxdepth ${max_recursion_depth} -type d); do
+  echo ${directory}
 
   index_ts="${directory}/index.ts"
 
