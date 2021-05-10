@@ -1,22 +1,25 @@
-import { isArrayOfLength1OrMore, RectSize } from '@noshiro/ts-utils';
+import { isNonEmpty } from '@noshiro/ts-utils';
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { ResizeObserver } from 'resize-observer';
 
+type Size = Readonly<{
+  height: number;
+  left: number;
+  top: number;
+  width: number;
+}>;
+
 export const useResizeObserverRef = (
-  setRootRectSize: (v: RectSize) => void
+  setSize: (v: Size) => void
 ): RefObject<HTMLDivElement> => {
   const rootResizeObserver = useMemo(
     () =>
       new ResizeObserver((entries) => {
-        if (isArrayOfLength1OrMore(entries)) {
-          const contentRect = entries[0].contentRect;
-          setRootRectSize({
-            width: contentRect.width,
-            height: contentRect.height,
-          });
+        if (isNonEmpty(entries)) {
+          setSize(entries[0].contentRect);
         }
       }),
-    [setRootRectSize]
+    [setSize]
   );
 
   const targetElRef = useRef<HTMLDivElement>(null);
@@ -38,14 +41,11 @@ export const useResizeObserverRef = (
 };
 
 export const useResizeObserver = (
-  defaultRectSize: RectSize = {
-    width: 0,
-    height: 0,
-  }
-): [RectSize, RefObject<HTMLDivElement>] => {
-  const [rootRectSize, setRootRectSize] = useState<RectSize>(defaultRectSize);
+  defaultSize: Size = { width: 0, height: 0, left: 0, top: 0 }
+): [Size, RefObject<HTMLDivElement>] => {
+  const [size, setSize] = useState<Size>(defaultSize);
 
-  const targetElRef = useResizeObserverRef(setRootRectSize);
+  const targetElRef = useResizeObserverRef(setSize);
 
-  return [rootRectSize, targetElRef];
+  return [size, targetElRef];
 };
