@@ -13,6 +13,10 @@ export type SourceObservable<A> = RootObservable<A, 'Source'> & {
   next: (value: A) => void;
 };
 
+export type OfObservable<A> = RootObservable<A, 'Of'> & {
+  emit: () => OfObservable<A>;
+};
+
 export type FromArrayObservable<A> = RootObservable<A, 'FromArray'> & {
   emit: () => FromArrayObservable<A>;
 };
