@@ -1,0 +1,14 @@
+{
+  "extends": "../../../config/eslintrc/.eslintrc.preact.js",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    // "@typescript-eslint/prefer-readonly-parameter-types": "off",
+    // "import/no-internal-modules": "off",
+    // "import/no-cycle": "off"
+  },
+  "ignorePatterns": ["*.d.ts", "*.js"]
+}
