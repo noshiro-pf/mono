@@ -3,6 +3,7 @@ export type RootObservableType =
   | 'FromPromise'
   | 'FromSubscribable'
   | 'Interval'
+  | 'Of'
   | 'Source'
   | 'Timer';
 
