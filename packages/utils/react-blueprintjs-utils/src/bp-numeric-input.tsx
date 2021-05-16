@@ -1,6 +1,7 @@
-import { NumericInput, NumericInputProps } from '@blueprintjs/core';
+import type { NumericInputProps } from '@blueprintjs/core';
+import { NumericInput } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 type Props = NumericInputProps &
   Readonly<{

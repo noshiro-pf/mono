@@ -1,4 +1,4 @@
-import { Observable } from '../src';
+import type { Observable } from '../src';
 
 export const getStreamOutputAsPromise = <T>(
   stream$: Observable<T>,

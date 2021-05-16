@@ -1,6 +1,6 @@
-import { ReducerType, uint32 } from '../../types';
+import type { ReducerType, uint32 } from '../../types';
 import { newArray } from '../create';
-import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
+import type { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
 export const scan = <A, B>(reducer: ReducerType<B, A>, init: B) => (
   array: ReadonlyNonEmptyArray<A> | readonly A[]

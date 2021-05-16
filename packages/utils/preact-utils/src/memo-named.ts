@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'preact';
+import type { FunctionComponent } from 'preact';
 import { memo } from 'preact/compat';
 
 export const memoNamed = <Props>(

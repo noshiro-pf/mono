@@ -1,13 +1,14 @@
 import { Navbar, Tab, Tabs } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
+import type { uint32 } from '@noshiro/ts-utils';
 import {
   isNotUndefined,
   stringToNumber,
   tuple,
-  uint32,
   zeros,
 } from '@noshiro/ts-utils';
-import { FC, useCallback, useMemo, useState } from 'react';
+import type { FC } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { DeadColumn } from './components/dead-column';
 import { ProbabilityTable } from './components/table';
@@ -16,8 +17,9 @@ import { selected3List } from './constants/selected-3-list';
 import { calcExpected } from './functions/calc-expected';
 import { countSuccess } from './functions/count-success';
 import { countSuccessForRemains } from './functions/count-success-for-remains';
-import { ResultRow } from './types/result-row';
-import { isTwoDiceSumValue, TwoDiceSumValue } from './types/two-dice-sum-value';
+import type { ResultRow } from './types/result-row';
+import type { TwoDiceSumValue } from './types/two-dice-sum-value';
+import { isTwoDiceSumValue } from './types/two-dice-sum-value';
 
 const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const count = countSuccess(x, y, z);

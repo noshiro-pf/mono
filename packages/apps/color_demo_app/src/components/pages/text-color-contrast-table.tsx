@@ -7,14 +7,12 @@ import {
   TableRow,
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
+import type { Hue, Percent, uint32 } from '@noshiro/ts-utils';
 import {
   blackHsl,
   contrastRatioHsl,
-  Hue,
-  Percent,
   range,
   roundAt,
-  uint32,
   whiteHsl,
   zip,
 } from '@noshiro/ts-utils';

@@ -1,4 +1,5 @@
-import { assertType, TypeEq } from '../test-type';
+import type { TypeEq } from '../test-type';
+import { assertType } from '../test-type';
 
 export type First<T extends unknown[], D = never> = T extends [
   infer X,

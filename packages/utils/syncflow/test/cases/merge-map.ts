@@ -1,14 +1,8 @@
 import { tuple } from '@noshiro/ts-utils';
-import {
-  filter,
-  interval,
-  IntervalObservable,
-  map,
-  mergeMap,
-  Observable,
-} from '../../src';
+import type { IntervalObservable, Observable } from '../../src';
+import { filter, interval, map, mergeMap } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 /*
   counter         0                    1                    2                    3                    4

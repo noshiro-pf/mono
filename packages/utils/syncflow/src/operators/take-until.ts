@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   InitializedToInitializedOperator,
   Observable,
   TakeUntilOperatorObservable,
@@ -10,8 +10,8 @@ import {
 
 export const takeUntil = <A>(
   notifier: Observable<unknown>
-): ToBaseOperator<A, A> => (parent: Observable<A>) =>
-  new TakeUntilObservableClass(parent, notifier);
+): ToBaseOperator<A, A> => (parentObservable: Observable<A>) =>
+  new TakeUntilObservableClass(parentObservable, notifier);
 
 export const takeUntilI = <A>(
   notifier: Observable<unknown>
@@ -21,11 +21,11 @@ export const takeUntilI = <A>(
 class TakeUntilObservableClass<A>
   extends SyncChildObservableClass<A, 'takeUntil', [A]>
   implements TakeUntilOperatorObservable<A> {
-  constructor(parent: Observable<A>, notifier: Observable<unknown>) {
+  constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'takeUntil',
-      currentValueInit: parent.currentValue,
+      currentValueInit: parentObservable.currentValue,
     });
 
     notifier.subscribe(
@@ -39,10 +39,10 @@ class TakeUntilObservableClass<A>
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(parent.currentValue.value, token);
+    this.setNext(par.currentValue.value, token);
   }
 }

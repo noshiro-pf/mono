@@ -114,7 +114,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                     <tr key={s.iconId}>
                       <th>
                         <AlignCenter>
-                          <CustomIcon name={s.iconId} />
+                          <CustomIcon iconName={s.iconId} />
                           <span>{texts.colon}</span>
                         </AlignCenter>
                       </th>

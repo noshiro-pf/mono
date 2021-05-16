@@ -1,4 +1,4 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 import { isEmpty } from '../is-empty';
 
 export function sum(array: readonly uint32[]): uint32;

@@ -1,4 +1,4 @@
-import { Observable, OperatorFunction } from 'rxjs';
+import type { Observable, OperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { filterKeyInList, mapToKey } from '../custom-operators';
 

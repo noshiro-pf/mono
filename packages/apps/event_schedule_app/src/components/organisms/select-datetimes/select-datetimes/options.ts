@@ -1,4 +1,4 @@
-import { IOptionProps } from '@blueprintjs/core';
+import type { IOptionProps } from '@blueprintjs/core';
 import { texts } from '../../../../constants/texts';
 import { datetimeSpecificationOptions } from '../../../../types/enum/datetime-specification-type';
 

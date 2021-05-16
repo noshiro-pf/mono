@@ -1,5 +1,5 @@
 import { noop, Option } from '@noshiro/ts-utils';
-import {
+import type {
   ChildObservable,
   InitializedObservable,
   Observable,

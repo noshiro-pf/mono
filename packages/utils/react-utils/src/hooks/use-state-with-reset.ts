@@ -1,5 +1,6 @@
 import { tuple } from '@noshiro/ts-utils';
-import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useStateWithResetter = <T>(
   initialState: T

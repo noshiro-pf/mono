@@ -1,4 +1,4 @@
-import { LambdaTerm } from '../types';
+import type { LambdaTerm } from '../types';
 import { isAbstraction } from './is-abstraction';
 import { isApplication } from './is-application';
 import { isVariable } from './is-variable';

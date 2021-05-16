@@ -1,4 +1,4 @@
-import { WritingsInfo } from '../types';
+import type { WritingsInfo } from '../types';
 
 export const writings: WritingsInfo[] = [
   {

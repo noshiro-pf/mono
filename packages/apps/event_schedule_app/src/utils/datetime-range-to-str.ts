@@ -1,6 +1,6 @@
 import { texts } from '../constants/texts';
-import { IDatetimeRange } from '../types/record/datetime-range';
-import { ITimeRange } from '../types/record/time-range';
+import type { IDatetimeRange } from '../types/record/datetime-range';
+import type { ITimeRange } from '../types/record/time-range';
 import { hm2str, ymd2str } from './ymdhm2str';
 
 const vt = texts.date;

@@ -1,9 +1,9 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { RectSize } from '@noshiro/ts-utils';
+import type { RectSize } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
-import { JSXInternal } from 'preact/src/jsx';
-import { Player6Cards } from '../types/player-6-card';
+import type { JSXInternal } from 'preact/src/jsx';
+import type { Player6Cards } from '../types/player-6-card';
 import { PlayerCardsArea } from './player-cards-area';
 
 type Props = Readonly<{

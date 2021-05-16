@@ -1,4 +1,4 @@
-import { PromiseState } from '@noshiro/ts-utils';
+import type { PromiseState } from '@noshiro/ts-utils';
 import { useEffect, useRef, useState } from 'react';
 
 export const usePromiseValue = <T>(

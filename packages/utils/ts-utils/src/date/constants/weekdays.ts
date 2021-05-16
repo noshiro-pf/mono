@@ -1,5 +1,6 @@
-import { assertType, TypeExtends } from '../../types';
-import { WeekdaysNameEnum } from '../types';
+import type { TypeExtends } from '../../types';
+import { assertType } from '../../types';
+import type { WeekdaysNameEnum } from '../types';
 
 export const weekdays = {
   en: {

@@ -1,22 +1,19 @@
 import { IList, IRecord } from '../../utils/immutable';
-import { DatetimeSpecificationEnumType } from '../enum/datetime-specification-type';
-import {
-  fillAnswerSymbol,
-  IAnswerSymbol,
-  PartialAnswerSymbol,
-} from './base/answer-symbol';
-import {
-  createINotificationSettings,
-  fillNotificationSettings,
+import type { DatetimeSpecificationEnumType } from '../enum/datetime-specification-type';
+import type { IAnswerSymbol, PartialAnswerSymbol } from './base/answer-symbol';
+import { fillAnswerSymbol } from './base/answer-symbol';
+import type {
   INotificationSettings,
   PartialNotificationSettings,
 } from './base/notification-settings';
 import {
-  fillDatetimeRange,
-  IDatetimeRange,
-  PartialDatetimeRange,
-} from './datetime-range';
-import { createIYmdHm, fillYmdHm, IYmdHm, PartialYmdHm } from './ymd-hm';
+  createINotificationSettings,
+  fillNotificationSettings,
+} from './base/notification-settings';
+import type { IDatetimeRange, PartialDatetimeRange } from './datetime-range';
+import { fillDatetimeRange } from './datetime-range';
+import type { IYmdHm, PartialYmdHm } from './ymd-hm';
+import { createIYmdHm, fillYmdHm } from './ymd-hm';
 
 export type EventScheduleBaseType = Readonly<{
   title: string;

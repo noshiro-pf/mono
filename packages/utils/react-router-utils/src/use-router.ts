@@ -1,11 +1,8 @@
-import { History, Location } from 'history';
-import { Context, useCallback, useContext, useMemo } from 'react';
-import {
-  match,
-  RouteComponentProps,
-  StaticContext,
-  __RouterContext,
-} from 'react-router';
+import type { History as HistoryType, Location as LocationType } from 'history';
+import type { Context } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
+import type { match, RouteComponentProps, StaticContext } from 'react-router';
+import { __RouterContext } from 'react-router';
 import { pathnameToPathList } from './pathname-to-pathlist';
 
 const useRouter = <RouteParam>(): RouteComponentProps<
@@ -19,21 +16,19 @@ const useRouter = <RouteParam>(): RouteComponentProps<
     >
   );
 
-const useHistory = <RouteParam>(): History<unknown> => {
+const useHistory = <RouteParam>(): HistoryType<unknown> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.history, [router.history]);
 };
 
-const useLocation = <RouteParam>(): Location<unknown> => {
+const useLocation = <RouteParam>(): LocationType<unknown> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.location, [router.location]);
 };
 
 export const useQuery = <RouteParam>(): URLSearchParams => {
-  const location = useLocation<RouteParam>();
-  const params = useMemo(() => new URLSearchParams(location.search), [
-    location.search,
-  ]);
+  const loc = useLocation<RouteParam>();
+  const params = useMemo(() => new URLSearchParams(loc.search), [loc.search]);
   return params;
 };
 
@@ -43,8 +38,8 @@ export const useMatch = <RouteParam>(): match<RouteParam> => {
 };
 
 const usePathName = <RouteParam>(): string => {
-  const location = useLocation<RouteParam>();
-  return useMemo(() => location.pathname, [location.pathname]);
+  const loc = useLocation<RouteParam>();
+  return useMemo(() => loc.pathname, [loc.pathname]);
 };
 
 export const usePathNameList = <RouteParam>(): string[] => {
@@ -57,14 +52,14 @@ export const usePathNameList = <RouteParam>(): string[] => {
  * "Hash history cannot PUSH the same path; a new entry will not be added to the history stack"
  */
 export const useNavigator = <RouteParam>(): ((pathname: string) => void) => {
-  const history = useHistory<RouteParam>();
-  const navigator = useCallback(
+  const hist = useHistory<RouteParam>();
+  const nav = useCallback(
     (pathname: string) => {
-      if (pathname !== history.location.pathname) {
-        history.push(pathname);
+      if (pathname !== hist.location.pathname) {
+        hist.push(pathname);
       }
     },
-    [history]
+    [hist]
   );
-  return navigator;
+  return nav;
 };

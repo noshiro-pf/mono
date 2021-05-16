@@ -1,9 +1,5 @@
-import {
-  InitializedObservable,
-  Observable,
-  source,
-  withInitialValue,
-} from '@noshiro/syncflow';
+import type { InitializedObservable, Observable } from '@noshiro/syncflow';
+import { source, withInitialValue } from '@noshiro/syncflow';
 import { Option } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 

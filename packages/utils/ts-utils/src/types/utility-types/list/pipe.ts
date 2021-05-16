@@ -1,6 +1,7 @@
-import { assertType, TypeEq } from '../test-type';
-import { Rest } from './rest';
-import { Zip } from './zip';
+import type { TypeEq } from '../test-type';
+import { assertType } from '../test-type';
+import type { Rest } from './rest';
+import type { Zip } from './zip';
 
 export type ShiftZip<T extends unknown[]> = Zip<T, Rest<T>>;
 assertType<TypeEq<ShiftZip<[1, 2, 3]>, [[1, 2], [2, 3]]>>();

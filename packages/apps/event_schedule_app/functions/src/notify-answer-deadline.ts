@@ -4,7 +4,7 @@ import { firestorePaths } from './constants/firestore-paths';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
-import { EventScheduleJsType } from './types/record/event-schedule';
+import type { EventScheduleJsType } from './types/record/event-schedule';
 import { pad2 } from './utils/to-str';
 import { tuple } from './utils/tuple';
 

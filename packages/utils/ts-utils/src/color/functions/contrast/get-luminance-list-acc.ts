@@ -1,11 +1,5 @@
-import {
-  first,
-  map,
-  NonEmptyArray,
-  ReadonlyNonEmptyArray,
-  rest,
-  scan,
-} from '../../../array';
+import type { NonEmptyArray, ReadonlyNonEmptyArray } from '../../../array';
+import { first, map, rest, scan } from '../../../array';
 import { pipe } from '../../../functional';
 import { tuple } from '../../../others';
 

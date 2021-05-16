@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { Mappable } from '@noshiro/ts-utils';
+import type { Mappable } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const textHeightPx = 30;
@@ -19,7 +19,7 @@ const NumSample = styled.div`
   padding: 5px;
 `;
 
-const Body = styled.div`
+const Main = styled.div`
   height: calc(100% - ${textHeightPx}px);
   display: flex;
   flex-direction: row;
@@ -74,7 +74,7 @@ export const HistogramView = memoNamed<
     <NumSampleWrapper>
       <NumSample>N = {numSample}</NumSample>
     </NumSampleWrapper>
-    <Body>
+    <Main>
       {xy.map(([x, y]) => (
         <Column key={x}>
           <VerticalBarContainer>
@@ -87,6 +87,6 @@ export const HistogramView = memoNamed<
           <Domain>{x}</Domain>
         </Column>
       ))}
-    </Body>
+    </Main>
   </Root>
 ));

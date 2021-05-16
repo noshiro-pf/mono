@@ -1,4 +1,5 @@
-import { defaultRectSize, RectSize } from './rect-size';
+import type { RectSize } from './rect-size';
+import { defaultRectSize } from './rect-size';
 
 export type Rect = Readonly<{
   top: number;

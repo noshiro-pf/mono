@@ -1,5 +1,5 @@
 import { seq } from '../array';
-import { uint32 } from '../types';
+import type { uint32 } from '../types';
 
 export const getAlphabets = (charCase: 'lower' | 'upper'): string[] => {
   const code = charCase === 'lower' ? 'a'.charCodeAt(0) : 'A'.charCodeAt(0);

@@ -4,18 +4,19 @@ import {
   useStreamValue,
   useVoidEventAsStream,
 } from '@noshiro/react-syncflow-hooks';
+import type { Observable } from '@noshiro/syncflow';
 import {
   filter,
   map,
   merge,
-  Observable,
   withInitialValue,
   withLatestFrom,
 } from '@noshiro/syncflow';
 import { isNotUndefined } from '@noshiro/ts-utils';
-import { createIAnswer, IAnswer } from '../../../types/record/answer';
+import type { IAnswer } from '../../../types/record/answer';
+import { createIAnswer } from '../../../types/record/answer';
 import { createIAnswerSelection } from '../../../types/record/answer-selection';
-import { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
 
 export const useMyAnswer = (
   eventSchedule$: Observable<IEventSchedule | undefined>

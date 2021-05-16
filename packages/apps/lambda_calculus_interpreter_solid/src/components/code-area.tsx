@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/solid-styled-components';
-import { FunctionType } from '@noshiro/ts-utils';
-import { JSX } from 'solid-js';
+import type { FunctionType } from '@noshiro/ts-utils';
+import type { JSX } from 'solid-js';
 
 export const CodeArea = ({
   value,

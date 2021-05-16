@@ -1,5 +1,5 @@
-import { Rect, Rgba } from '@noshiro/ts-utils';
-import { Graphics } from 'pixi.js';
+import type { Rect, Rgba } from '@noshiro/ts-utils';
+import type { Graphics } from 'pixi.js';
 
 export type PixiTempRect = Readonly<{
   rect: Rect;

@@ -1,5 +1,5 @@
-import { ReadonlyDate } from '../../../types';
-import { HoursEnum } from '../../types';
+import type { ReadonlyDate } from '../../../types';
+import type { HoursEnum } from '../../types';
 
 export const getHours = (date: ReadonlyDate): HoursEnum =>
   date.getHours() as HoursEnum;

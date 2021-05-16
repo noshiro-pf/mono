@@ -1,12 +1,8 @@
-import {
-  assertType,
-  createQueue,
-  Option,
-  TypeExtends,
-} from '@noshiro/ts-utils';
+import type { TypeExtends } from '@noshiro/ts-utils';
+import { assertType, createQueue, Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
-import {
+import type {
   InitializedZipObservable,
   NonEmptyUnknownList,
   SyncChildObservable,
@@ -49,10 +45,10 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   // overload
   tryUpdate(token: Token): void {
     const queues = this._queues;
-    this.parents.forEach((parent, index) => {
-      if (parent.token === token) {
-        if (Option.isSome(parent.currentValue)) {
-          queues[index]?.enqueue(parent.currentValue.value);
+    this.parents.forEach((par, index) => {
+      if (par.token === token) {
+        if (Option.isSome(par.currentValue)) {
+          queues[index]?.enqueue(par.currentValue.value);
         }
       }
     });
@@ -68,7 +64,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
 
 const r1 = fromArray([1, 2, 3]);
 const r2 = fromArray(['a', 'b', 'c']);
-const c = zip(r1, r2);
+const z = zip(r1, r2);
 assertType<
-  TypeExtends<typeof c, SyncChildObservable<[number, string], 'zip'>>
+  TypeExtends<typeof z, SyncChildObservable<[number, string], 'zip'>>
 >();

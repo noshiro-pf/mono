@@ -1,5 +1,6 @@
 import { memoNamed } from '@noshiro/preact-utils';
-import { CardProps, useCardAttributes } from './common';
+import type { CardProps } from './common';
+import { useCardAttributes } from './common';
 
 export const Card3 = memoNamed(
   'Card3',

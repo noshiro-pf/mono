@@ -9,22 +9,22 @@ type Props = Readonly<{
 }>;
 
 export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
-  const [isOpen, open, close] = useBooleanState(false);
+  const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
   const onSortAscClick = useCallback(() => {
     onSortChange('asc');
-    close();
-  }, [onSortChange, close]);
+    handleClose();
+  }, [onSortChange, handleClose]);
 
   const onSortDescClick = useCallback(() => {
     onSortChange('desc');
-    close();
-  }, [onSortChange, close]);
+    handleClose();
+  }, [onSortChange, handleClose]);
 
   return (
     <Popover
       isOpen={isOpen}
-      onClose={close}
+      onClose={handleClose}
       canEscapeKeyClose={true}
       placement={'bottom'}
       content={
@@ -43,7 +43,7 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
         icon={'chevron-down'}
         outlined={true}
         small={true}
-        onClick={open}
+        onClick={handleOpen}
       />
     </Popover>
   );

@@ -16,7 +16,8 @@ import {
 } from '@noshiro/syncflow';
 import { historyReducer } from '../functions/history-reducer';
 import { historyToSumCount } from '../functions/history-to-sum-count';
-import { IList, IRepeat } from '../immutable';
+import type { IList } from '../immutable';
+import { IRepeat } from '../immutable';
 import { HistoryState } from '../type/history';
 import { MainView } from './main-view';
 

@@ -1,4 +1,4 @@
-import { Rect } from '../../../types';
+import type { Rect } from '../../../types';
 
 export const updateRectElementwise = (
   from: Rect,

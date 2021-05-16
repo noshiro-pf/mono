@@ -1,18 +1,14 @@
-import {
-  assertNotType,
-  assertType,
-  Option,
-  TypeExtends,
-} from '@noshiro/ts-utils';
-import { ObservableId, Token } from './id';
-import { ObservableKind } from './observable-kind';
-import {
+import type { Option, TypeExtends } from '@noshiro/ts-utils';
+import { assertNotType, assertType } from '@noshiro/ts-utils';
+import type { ObservableId, Token } from './id';
+import type { ObservableKind } from './observable-kind';
+import type {
   AsyncChildObservableType,
   ObservableType,
   RootObservableType,
   SyncChildObservableType,
 } from './observable-type';
-import { NonEmptyUnknownList, Subscription } from './types';
+import type { NonEmptyUnknownList, Subscription } from './types';
 
 /**
  * inheritance

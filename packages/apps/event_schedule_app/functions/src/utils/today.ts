@@ -1,12 +1,12 @@
-import {
+import type {
   DateEnum,
   HoursEnum,
   MinutesEnum,
   MonthEnum,
   YearEnum,
 } from '@noshiro/ts-utils';
-import { YearMonthDateType } from '../types/record/base/year-month-date';
-import { YmdHmJsType } from '../types/record/ymd-hm';
+import type { YearMonthDateType } from '../types/record/base/year-month-date';
+import type { YmdHmJsType } from '../types/record/ymd-hm';
 
 export const todayDate = (): Date => {
   const japanLocaleString = new Date().toLocaleString('ja-JP', {

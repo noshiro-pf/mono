@@ -1,5 +1,6 @@
-import { assertNotType, assertType, TypeExtends } from '@noshiro/ts-utils';
-import { Variable } from './variable';
+import type { TypeExtends } from '@noshiro/ts-utils';
+import { assertNotType, assertType } from '@noshiro/ts-utils';
+import type { Variable } from './variable';
 
 // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
 export type LambdaTerm = Variable | LambdaApplication | LambdaAbstraction;

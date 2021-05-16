@@ -1,7 +1,8 @@
-import { ReducerType } from '@noshiro/ts-utils';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import { IDatetimeRange } from '../../../types/record/datetime-range';
-import { IList, IMap } from '../../../utils/immutable';
+import type { ReducerType } from '@noshiro/ts-utils';
+import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import type { IDatetimeRange } from '../../../types/record/datetime-range';
+import type { IList } from '../../../utils/immutable';
+import { IMap } from '../../../utils/immutable';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {

@@ -1,6 +1,8 @@
-import { Rect, Rgba, rgbaToHexNumber } from '@noshiro/ts-utils';
-import { Graphics, Rectangle } from 'pixi.js';
-import { PixiBbox } from '../types/pixi-bbox';
+import type { Rect, Rgba } from '@noshiro/ts-utils';
+import { rgbaToHexNumber } from '@noshiro/ts-utils';
+import type { Graphics } from 'pixi.js';
+import { Rectangle } from 'pixi.js';
+import type { PixiBbox } from '../types/pixi-bbox';
 
 export const updateBboxRect = (
   graphics: Graphics,
@@ -18,9 +20,9 @@ export const updateBboxRect = (
   {
     const { hex, alpha } = rgbaToHexNumber(borderColor);
     graphics.lineStyle(borderWidthPx, hex, alpha, 0.5);
-    const { left, top, width, height } = rect;
-    graphics.drawRect(left, top, width, height);
-    graphics.hitArea = new Rectangle(left, top, width, height);
+    const { left, top: top_, width, height } = rect;
+    graphics.drawRect(left, top_, width, height);
+    graphics.hitArea = new Rectangle(left, top_, width, height);
   }
 
   graphics.endFill();

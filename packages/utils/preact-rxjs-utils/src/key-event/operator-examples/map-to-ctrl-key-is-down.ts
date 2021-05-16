@@ -1,5 +1,5 @@
 import { isCtrlKey } from '@noshiro/preact-utils';
-import { Observable, OperatorFunction } from 'rxjs';
+import type { Observable, OperatorFunction } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 export const mapToCtrlKeyIsDown = (): OperatorFunction<

@@ -10,7 +10,7 @@ export const splitToTokens = (input: string): string[] => {
       case '-':
       case '*':
       case '\\':
-        spaceInserted += ' ' + char + ' ';
+        spaceInserted += ` ${char} `;
         break;
 
       case '\t':

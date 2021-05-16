@@ -1,4 +1,4 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 
 export const map = <A, B>(mapFn: (a: A, index: uint32) => B) => <
   T extends readonly A[]

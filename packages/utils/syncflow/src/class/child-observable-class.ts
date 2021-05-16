@@ -1,12 +1,12 @@
-import { isArrayOfLength1OrMore, Option } from '@noshiro/ts-utils';
-import {
+import type { Option } from '@noshiro/ts-utils';
+import { isArrayOfLength1OrMore } from '@noshiro/ts-utils';
+import type {
   AsyncChildObservable,
   AsyncChildObservableType,
   ChildObservable,
   InitializedObservable,
   InitializedSyncChildObservable,
   InitializedToInitializedOperator,
-  isManagerObservable,
   NonEmptyUnknownList,
   Observable,
   ObservableId,
@@ -16,6 +16,7 @@ import {
   ToInitializedOperator,
   Wrap,
 } from '../types';
+import { isManagerObservable } from '../types';
 import { binarySearch, issueToken, maxDepth } from '../utils';
 import { ObservableBaseClass } from './observable-base-class';
 

@@ -1,9 +1,11 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { seq, uint32 } from '@noshiro/ts-utils';
-import { CSSProperties, useMemo } from 'react';
+import type { uint32 } from '@noshiro/ts-utils';
+import { seq } from '@noshiro/ts-utils';
+import type { CSSProperties } from 'react';
+import { useMemo } from 'react';
 import { viewTexts } from '../../constants/view-texts';
-import { RepaymentType } from '../../types/enum/repayment-type';
+import type { RepaymentType } from '../../types/enum/repayment-type';
 
 const headerCellStyle: CSSProperties = {
   textAlign: 'center',

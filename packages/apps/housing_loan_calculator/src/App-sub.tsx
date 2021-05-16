@@ -6,8 +6,8 @@ import { AppView } from './App-view';
 import { defaultValues } from './constants/default-values';
 import { calcAll } from './functions/calc-all';
 import { queryParams } from './route/query-params';
-import { CalculatingStateType } from './types/enum/calculating-state';
-import { RepaymentType } from './types/enum/repayment-type';
+import type { CalculatingStateType } from './types/enum/calculating-state';
+import type { RepaymentType } from './types/enum/repayment-type';
 import { uriWithQueryParams } from './utils/uri-with-query-params';
 
 export const AppSub = memoNamed('AppSub', () => {
@@ -118,7 +118,7 @@ export const AppSub = memoNamed('AppSub', () => {
     interestRatePercentPerYear,
   ]);
 
-  const navigator = useNavigator();
+  const routerNavigator = useNavigator();
 
   const {
     borrowingBalanceYen,
@@ -132,7 +132,7 @@ export const AppSub = memoNamed('AppSub', () => {
     () => {
       setCalculationState('idling');
 
-      navigator(
+      routerNavigator(
         uriWithQueryParams('/', [
           [queryParams.repaymentType, repaymentType],
           [queryParams.downPayment, downPaymentManYen],
@@ -151,7 +151,7 @@ export const AppSub = memoNamed('AppSub', () => {
       );
     },
     [
-      navigator,
+      routerNavigator,
       repaymentType,
       downPaymentManYen,
       propertyPriceManYen,

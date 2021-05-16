@@ -1,4 +1,5 @@
-import { createTinyObservable, TinyObservable } from '@noshiro/ts-utils';
+import type { TinyObservable } from '@noshiro/ts-utils';
+import { createTinyObservable } from '@noshiro/ts-utils';
 import { useEffect, useRef, useState } from 'preact/compat';
 
 export const useTinyObservable = <T>(): TinyObservable<T> => {

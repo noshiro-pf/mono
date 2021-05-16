@@ -27,6 +27,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/react-utils": "*",
     "@noshiro/ts-utils": "*",
     "react": "^17.0.1",
     "react-router": "^5.2.0"

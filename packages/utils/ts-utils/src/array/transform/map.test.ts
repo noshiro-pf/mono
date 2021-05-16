@@ -1,6 +1,7 @@
-import { assertType, TypeEq } from '../../types';
+import type { TypeEq } from '../../types';
+import { assertType } from '../../types';
 import { testArrayEquality } from '../array-tester';
-import { ReadonlyNonEmptyArray } from '../non-empty-array';
+import type { ReadonlyNonEmptyArray } from '../non-empty-array';
 import { map } from './map';
 
 testArrayEquality({

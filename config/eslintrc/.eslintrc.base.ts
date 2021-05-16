@@ -63,6 +63,7 @@ const config: Linter.Config = {
     ...eslintRules.additionalRulesNotIncludedInRecommended.bestPractices,
     ...eslintRules.additionalRulesNotIncludedInRecommended.variables,
     ...eslintRules.additionalRulesNotIncludedInRecommended.stylisticIssues,
+    ...eslintRules.additionalRulesNotIncludedInRecommended.ECMAScript6,
     ...eslintRules.modifiedRulesIncludedInRecommended,
     ...eslintRules.disabledRulesIncludedInRecommended,
     ...typescriptEslintRules.additionalRulesNotIncludedInRecommended,

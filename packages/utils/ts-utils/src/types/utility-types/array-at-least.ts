@@ -1,5 +1,6 @@
-import { Cons } from './list';
-import { assertNotType, assertType, TypeExtends } from './test-type';
+import type { Cons } from './list';
+import type { TypeExtends } from './test-type';
+import { assertNotType, assertType } from './test-type';
 
 // https://qiita.com/uhyo/items/80ce7c00f413c1d1be56
 

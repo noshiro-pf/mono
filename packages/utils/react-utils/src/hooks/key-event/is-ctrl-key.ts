@@ -1,5 +1,5 @@
 import { getPlatform } from '@noshiro/ts-utils';
-import { KeyboardEventType } from './key-event-type';
+import type { KeyboardEventType } from './key-event-type';
 
 export const isCtrlKey = <T = Element>(
   keyEvent: KeyboardEventType<T>

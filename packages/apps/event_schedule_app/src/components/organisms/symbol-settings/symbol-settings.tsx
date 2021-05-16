@@ -1,16 +1,17 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
-import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import { IList, IMap } from '../../../utils/immutable';
+import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import type { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
+import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import type { IList } from '../../../utils/immutable';
+import { IMap } from '../../../utils/immutable';
 import { clog } from '../../../utils/log';
-import {
-  symbolListReducer,
+import type {
   SymbolListReducerAction,
   SymbolListReducerState,
 } from './symbol-list-reducer';
+import { symbolListReducer } from './symbol-list-reducer';
 import { AnswerSymbolRow } from './symbol-setting-row';
 
 type Props = Readonly<{

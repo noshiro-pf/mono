@@ -1,6 +1,6 @@
 import { Option, Result } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   InitializedToInitializedOperator,
   MapOptionOperatorObservable,
   MapResultErrOperatorObservable,
@@ -14,8 +14,8 @@ import {
 } from '../types';
 
 export const unwrapOption = <A>(): ToBaseOperator<Option<A>, A | undefined> => (
-  parent: Observable<Option<A>>
-) => new UnwrapOptionObservableClass(parent);
+  parentObservable: Observable<Option<A>>
+) => new UnwrapOptionObservableClass(parentObservable);
 
 export const unwrapOptionI = <A>(): InitializedToInitializedOperator<
   Option<A>,
@@ -26,8 +26,8 @@ export const unwrapOptionI = <A>(): InitializedToInitializedOperator<
 export const unwrapResultOk = <S, E>(): ToBaseOperator<
   Result<S, E>,
   S | undefined
-> => (parent: Observable<Result<S, E>>) =>
-  new UnwrapResultOkObservableClass(parent);
+> => (parentObservable: Observable<Result<S, E>>) =>
+  new UnwrapResultOkObservableClass(parentObservable);
 
 export const unwrapResultOkI = <S, E>(): InitializedToInitializedOperator<
   Result<S, E>,
@@ -41,8 +41,8 @@ export const unwrapResultOkI = <S, E>(): InitializedToInitializedOperator<
 export const unwrapResultErr = <S, E>(): ToBaseOperator<
   Result<S, E>,
   E | undefined
-> => (parent: Observable<Result<S, E>>) =>
-  new UnwrapResultErrObservableClass(parent);
+> => (parentObservable: Observable<Result<S, E>>) =>
+  new UnwrapResultErrObservableClass(parentObservable);
 
 export const unwrapResultErrI = <S, E>(): InitializedToInitializedOperator<
   Result<S, E>,
@@ -55,8 +55,9 @@ export const unwrapResultErrI = <S, E>(): InitializedToInitializedOperator<
 
 export const mapOption = <A, B>(
   mapFn: (x: A) => B
-): ToBaseOperator<Option<A>, Option<B>> => (parent: Observable<Option<A>>) =>
-  new MapOptionObservableClass(parent, mapFn);
+): ToBaseOperator<Option<A>, Option<B>> => (
+  parentObservable: Observable<Option<A>>
+) => new MapOptionObservableClass(parentObservable, mapFn);
 
 export const mapOptionI = <A, B>(
   mapFn: (x: A) => B
@@ -66,8 +67,8 @@ export const mapOptionI = <A, B>(
 export const mapResultOk = <S, S2, E>(
   mapFn: (x: S) => S2
 ): ToBaseOperator<Result<S, E>, Result<S2, E>> => (
-  parent: Observable<Result<S, E>>
-) => new MapResultOkObservableClass(parent, mapFn);
+  parentObservable: Observable<Result<S, E>>
+) => new MapResultOkObservableClass(parentObservable, mapFn);
 
 export const mapResultOkI = <S, S2, E>(
   mapFn: (x: S) => S2
@@ -80,8 +81,8 @@ export const mapResultOkI = <S, S2, E>(
 export const mapResultErr = <S, E, E2>(
   mapFn: (x: E) => E2
 ): ToBaseOperator<Result<S, E>, Result<S, E2>> => (
-  parent: Observable<Result<S, E>>
-) => new MapResultErrObservableClass(parent, mapFn);
+  parentObservable: Observable<Result<S, E>>
+) => new MapResultErrObservableClass(parentObservable, mapFn);
 
 export const mapResultErrI = <S, E, E2>(
   mapFn: (x: E) => E2
@@ -94,20 +95,22 @@ export const mapResultErrI = <S, E, E2>(
 class UnwrapOptionObservableClass<A>
   extends SyncChildObservableClass<A | undefined, 'unwrapOption', [Option<A>]>
   implements UnwrapOptionOperatorObservable<A> {
-  constructor(parent: Observable<Option<A>>) {
+  constructor(parentObservable: Observable<Option<A>>) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'unwrapOption',
-      currentValueInit: Option.map(Option.unwrap)(parent.currentValue),
+      currentValueInit: Option.map(Option.unwrap)(
+        parentObservable.currentValue
+      ),
     });
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(Option.unwrap(parent.currentValue.value), token);
+    this.setNext(Option.unwrap(par.currentValue.value), token);
   }
 }
 
@@ -118,20 +121,22 @@ class UnwrapResultOkObservableClass<S, E>
     [Result<S, E>]
   >
   implements UnwrapResultOkOperatorObservable<S, E> {
-  constructor(parent: Observable<Result<S, E>>) {
+  constructor(parentObservable: Observable<Result<S, E>>) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'unwrapResultOk',
-      currentValueInit: Option.map(Result.unwrapOk)(parent.currentValue),
+      currentValueInit: Option.map(Result.unwrapOk)(
+        parentObservable.currentValue
+      ),
     });
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(Result.unwrapOk(parent.currentValue.value), token);
+    this.setNext(Result.unwrapOk(par.currentValue.value), token);
   }
 }
 
@@ -142,20 +147,22 @@ class UnwrapResultErrObservableClass<S, E>
     [Result<S, E>]
   >
   implements UnwrapResultErrOperatorObservable<S, E> {
-  constructor(parent: Observable<Result<S, E>>) {
+  constructor(parentObservable: Observable<Result<S, E>>) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'unwrapResultErr',
-      currentValueInit: Option.map(Result.unwrapErr)(parent.currentValue),
+      currentValueInit: Option.map(Result.unwrapErr)(
+        parentObservable.currentValue
+      ),
     });
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(Result.unwrapErr(parent.currentValue.value), token);
+    this.setNext(Result.unwrapErr(par.currentValue.value), token);
   }
 }
 
@@ -164,21 +171,23 @@ class MapOptionObservableClass<A, B>
   implements MapOptionOperatorObservable<A, B> {
   private readonly _mapFn: (x: A) => B;
 
-  constructor(parent: Observable<Option<A>>, mapFn: (x: A) => B) {
+  constructor(parentObservable: Observable<Option<A>>, mapFn: (x: A) => B) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'mapOption',
-      currentValueInit: Option.map(Option.map(mapFn))(parent.currentValue),
+      currentValueInit: Option.map(Option.map(mapFn))(
+        parentObservable.currentValue
+      ),
     });
     this._mapFn = mapFn;
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(Option.map(this._mapFn)(parent.currentValue.value), token);
+    this.setNext(Option.map(this._mapFn)(par.currentValue.value), token);
   }
 }
 
@@ -187,24 +196,24 @@ class MapResultOkObservableClass<S, S2, E>
   implements MapResultOkOperatorObservable<S, S2, E> {
   private readonly _mapFn: (x: S) => S2;
 
-  constructor(parent: Observable<Result<S, E>>, mapFn: (x: S) => S2) {
+  constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: S) => S2) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'mapResultOk',
       currentValueInit: Option.map(Result.map<S, S2, E>(mapFn))(
-        parent.currentValue
+        parentObservable.currentValue
       ),
     });
     this._mapFn = mapFn;
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     this.setNext(
-      Result.map<S, S2, E>(this._mapFn)(parent.currentValue.value),
+      Result.map<S, S2, E>(this._mapFn)(par.currentValue.value),
       token
     );
   }
@@ -219,24 +228,24 @@ class MapResultErrObservableClass<S, E, E2>
   implements MapResultErrOperatorObservable<S, E, E2> {
   private readonly _mapFn: (x: E) => E2;
 
-  constructor(parent: Observable<Result<S, E>>, mapFn: (x: E) => E2) {
+  constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: E) => E2) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'mapResultErr',
       currentValueInit: Option.map(Result.mapErr<S, E, E2>(mapFn))(
-        parent.currentValue
+        parentObservable.currentValue
       ),
     });
     this._mapFn = mapFn;
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     this.setNext(
-      Result.mapErr<S, E, E2>(this._mapFn)(parent.currentValue.value),
+      Result.mapErr<S, E, E2>(this._mapFn)(par.currentValue.value),
       token
     );
   }

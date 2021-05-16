@@ -51,7 +51,7 @@ type ButtonWithConfirmProps = Readonly<{
 const ButtonWithConfirm = memoNamed<ButtonWithConfirmProps>(
   'ButtonWithConfirm',
   ({ onConfirmClick, emailAnswer: emailAnswer }) => {
-    const [isOpen, open, close] = useBooleanState(false);
+    const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
     return (
       <>
@@ -59,13 +59,13 @@ const ButtonWithConfirm = memoNamed<ButtonWithConfirmProps>(
           text={buttonConfig.name}
           intent={buttonConfig.intent}
           icon={buttonConfig.icon}
-          onClick={open}
+          onClick={handleOpen}
         />
         <ConfirmEmailDialog
           onConfirmClick={onConfirmClick}
           emailAnswer={emailAnswer}
           isOpen={isOpen}
-          close={close}
+          onClose={handleClose}
         />
       </>
     );
@@ -76,12 +76,12 @@ type ConfirmEmailDialogProps = Readonly<{
   onConfirmClick: () => void;
   emailAnswer: string;
   isOpen: boolean;
-  close: () => void;
+  onClose: () => void;
 }>;
 
 const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
   'ConfirmEmailDialog',
-  ({ isOpen, close, onConfirmClick, emailAnswer }) => {
+  ({ isOpen, onClose, onConfirmClick, emailAnswer }) => {
     const [email, setEmail] = useState<string>('');
 
     const [
@@ -99,16 +99,16 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
     const onConfirm = useCallback(() => {
       if (ok) {
         onConfirmClick();
-        close();
+        onClose();
       } else {
         setShowValidationFailedMessage(true);
       }
-    }, [ok, onConfirmClick, close]);
+    }, [ok, onConfirmClick, onClose]);
 
     return (
       <BpDialog
         isOpen={isOpen}
-        onClose={close}
+        onClose={onClose}
         hasBackdrop={true}
         isCloseButtonShown={true}
         canEscapeKeyClose={true}
@@ -138,7 +138,7 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <ButtonsWrapperAlignEnd>
-            <BpButton intent={'none'} onClick={close}>
+            <BpButton intent={'none'} onClick={onClose}>
               {texts.buttonText.cancel}
             </BpButton>
             <BpButton

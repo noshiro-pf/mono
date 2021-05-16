@@ -1,6 +1,6 @@
 import { idfn } from '../others';
 import { mapEach } from './map-each';
-import { PromiseState } from './promise-result-type';
+import type { PromiseState } from './promise-result-type';
 
 export const mapE = <E, ER = E, P = never, S = never>(
   mapFn: (value: E) => ER

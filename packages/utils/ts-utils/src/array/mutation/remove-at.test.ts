@@ -1,4 +1,4 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 import { removeAt } from './remove-at';
 
 test('removeAt middle', () => {

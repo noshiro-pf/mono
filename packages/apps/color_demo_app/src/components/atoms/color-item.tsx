@@ -1,5 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { Hsl, hslToStr } from '@noshiro/ts-utils';
+import type { Hsl } from '@noshiro/ts-utils';
+import { hslToStr } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const Box = styled.div`

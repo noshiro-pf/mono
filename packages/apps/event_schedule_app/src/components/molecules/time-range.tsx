@@ -1,12 +1,11 @@
-import { BpTimePicker, HoursMinutes } from '@noshiro/react-blueprintjs-utils';
+import type { HoursMinutes } from '@noshiro/react-blueprintjs-utils';
+import { BpTimePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { DatetimeSpecificationEnumType } from '../../types/enum/datetime-specification-type';
-import {
-  createIHoursMinutes,
-  IHoursMinutes,
-} from '../../types/record/base/hours-minutes';
-import { ITimeRange } from '../../types/record/time-range';
+import type { DatetimeSpecificationEnumType } from '../../types/enum/datetime-specification-type';
+import type { IHoursMinutes } from '../../types/record/base/hours-minutes';
+import { createIHoursMinutes } from '../../types/record/base/hours-minutes';
+import type { ITimeRange } from '../../types/record/time-range';
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;

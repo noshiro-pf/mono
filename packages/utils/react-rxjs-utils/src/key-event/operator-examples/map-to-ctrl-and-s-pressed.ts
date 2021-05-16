@@ -1,6 +1,6 @@
-import { KeyboardEventType } from '@noshiro/react-utils';
+import type { KeyboardEventType } from '@noshiro/react-utils';
 import { filterByLatest } from '@noshiro/rxjs-utils';
-import { Observable, OperatorFunction } from 'rxjs';
+import type { Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   filterKeyIsDown,

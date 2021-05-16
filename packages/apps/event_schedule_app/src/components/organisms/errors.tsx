@@ -2,7 +2,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { errorFontColor } from '../../constants/color';
 import { texts } from '../../constants/texts';
-import { EventScheduleValidation } from '../../types/record/event-schedule-validation';
+import type { EventScheduleValidation } from '../../types/record/event-schedule-validation';
 import { Description } from '../atoms/description';
 
 const vt = texts.eventSettingsPage;

@@ -1,20 +1,21 @@
-import { Icon, IconName } from '@blueprintjs/core';
+import type { IconName } from '@blueprintjs/core';
+import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
-import { AnswerSymbolIconId } from '../../types/enum/answer-symbol-icon';
+import type { AnswerSymbolIconId } from '../../types/enum/answer-symbol-icon';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons';
 
 type Props = Readonly<{
-  name: AnswerSymbolIconId;
+  iconName: AnswerSymbolIconId;
   color?: string;
   size?: number;
 }>;
 
 export const CustomIcon = memoNamed<Props>(
   'MyIcon',
-  ({ name, color, size }) => {
+  ({ iconName, color, size }) => {
     const icon = useMemo<IconName | JSX.Element>(() => {
-      switch (name) {
+      switch (iconName) {
         case 'handmade-circle':
           return <CircleIcon color={color} size={size} />;
         case 'handmade-triangle':
@@ -22,9 +23,9 @@ export const CustomIcon = memoNamed<Props>(
         case 'handmade-cross':
           return <CloseIcon color={color} size={size} />;
         default:
-          return name;
+          return iconName;
       }
-    }, [name, color, size]);
+    }, [iconName, color, size]);
 
     return <Icon icon={icon} color={color} iconSize={size} />;
   }

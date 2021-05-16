@@ -1,4 +1,5 @@
-import { assertType, TypeEq } from '../types';
+import type { TypeEq } from '../types';
+import { assertType } from '../types';
 
 export const recordValues = <K extends PropertyKey, V>(
   object: Record<K, V>

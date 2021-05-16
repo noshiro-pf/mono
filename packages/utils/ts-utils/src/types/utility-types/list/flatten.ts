@@ -1,8 +1,9 @@
-import { assertType, TypeEq } from '../test-type';
-import { Cons } from './cons';
-import { First } from './first';
-import { Rest } from './rest';
-import { Reverse } from './reverse';
+import type { TypeEq } from '../test-type';
+import { assertType } from '../test-type';
+import type { Cons } from './cons';
+import type { First } from './first';
+import type { Rest } from './rest';
+import type { Reverse } from './reverse';
 
 export type Flatten<
   T extends unknown[][],

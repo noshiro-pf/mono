@@ -1,4 +1,4 @@
-import { Phantomic } from '@noshiro/ts-utils';
+import type { Phantomic } from '@noshiro/ts-utils';
 
 export type AnswerId = Phantomic<string, 'AnswerId'>;
 export const answerId = (s: string): AnswerId => s as AnswerId;

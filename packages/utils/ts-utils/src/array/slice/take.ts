@@ -1,4 +1,4 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 import { safeSlice } from './safe-slice';
 
 export const take = <T>(array: readonly T[], num: uint32): T[] =>

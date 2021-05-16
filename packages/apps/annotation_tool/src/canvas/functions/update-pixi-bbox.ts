@@ -1,5 +1,5 @@
-import { Rect } from '@noshiro/ts-utils';
-import { PixiBbox } from '../types/pixi-bbox';
+import type { Rect } from '@noshiro/ts-utils';
+import type { PixiBbox } from '../types/pixi-bbox';
 import { bboxPointsFromRect, foreachBboxPoints } from './bbox-points';
 import { updatePointOfBbox } from './update-pixi-bbox-point';
 import { updateRectOfBbox } from './update-pixi-bbox-rect';

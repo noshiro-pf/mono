@@ -1,4 +1,5 @@
-import { Ref, useEffect, useRef, useState } from 'preact/compat';
+import type { Ref } from 'preact/compat';
+import { useEffect, useRef, useState } from 'preact/compat';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,

@@ -1,9 +1,13 @@
 import { dist } from '../../../../num';
-import { Hsl } from '../../../types';
+import type { Hsl } from '../../../types';
 import { epsilon } from '../color-test-values';
 
-export const testHslEquality = (name: string, hsl1: Hsl, hsl2: Hsl): void => {
-  test(name, () => {
+export const testHslEquality = (
+  testname: string,
+  hsl1: Hsl,
+  hsl2: Hsl
+): void => {
+  test(testname, () => {
     const [h1, s1, l1] = hsl1;
     const [h2, s2, l2] = hsl2;
     expect(dist(h1, h2) < epsilon).toBe(true);

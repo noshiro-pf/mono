@@ -1,9 +1,7 @@
 import { Result } from '@noshiro/ts-utils';
 import { dbEvents } from '../../initialize-firebase';
-import {
-  fillEventSchedule,
-  IEventSchedule,
-} from '../../types/record/event-schedule';
+import type { IEventSchedule } from '../../types/record/event-schedule';
+import { fillEventSchedule } from '../../types/record/event-schedule';
 
 export const getEventSchedule = async (
   id: string

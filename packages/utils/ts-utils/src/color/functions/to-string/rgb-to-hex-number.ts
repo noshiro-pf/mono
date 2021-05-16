@@ -1,4 +1,4 @@
-import { Rgb, Rgba } from '../../types';
+import type { Rgb, Rgba } from '../../types';
 import { hexStrToNumber } from './hex-str-to-number';
 
 export const rgbToHexNumber = ([r, g, b]: Rgb): number =>

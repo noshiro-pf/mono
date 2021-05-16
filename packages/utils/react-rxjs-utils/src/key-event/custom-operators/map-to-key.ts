@@ -1,5 +1,5 @@
-import { KeyboardEventType } from '@noshiro/react-utils';
-import { Observable, OperatorFunction } from 'rxjs';
+import type { KeyboardEventType } from '@noshiro/react-utils';
+import type { Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export const mapToKey = <T extends string>(): OperatorFunction<

@@ -1,5 +1,5 @@
 import { clamp } from '../../num';
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 
 export const safeSlice = <T>(
   array: readonly T[],

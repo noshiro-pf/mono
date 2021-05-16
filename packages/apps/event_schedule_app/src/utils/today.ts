@@ -6,11 +6,10 @@ import {
   getYear,
 } from '@noshiro/ts-utils';
 import { createIHoursMinutes } from '../types/record/base/hours-minutes';
-import {
-  createIYearMonthDate,
-  IYearMonthDate,
-} from '../types/record/base/year-month-date';
-import { createIYmdHm, IYmdHm } from '../types/record/ymd-hm';
+import type { IYearMonthDate } from '../types/record/base/year-month-date';
+import { createIYearMonthDate } from '../types/record/base/year-month-date';
+import type { IYmdHm } from '../types/record/ymd-hm';
+import { createIYmdHm } from '../types/record/ymd-hm';
 
 const today = (): IYearMonthDate => {
   const nowDateObj = new Date();

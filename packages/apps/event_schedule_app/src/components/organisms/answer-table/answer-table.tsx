@@ -1,13 +1,14 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { roundBy, uint32 } from '@noshiro/ts-utils';
-import { CSSProperties } from 'react';
+import type { uint32 } from '@noshiro/ts-utils';
+import { roundBy } from '@noshiro/ts-utils';
+import type { CSSProperties } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
-import { IAnswer } from '../../../types/record/answer';
-import { IEventSchedule } from '../../../types/record/event-schedule';
-import { IList } from '../../../utils/immutable';
+import type { IAnswer } from '../../../types/record/answer';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IList } from '../../../utils/immutable';
 import { CustomIcon } from '../../atoms/icon';
 import { Td, Th } from '../../atoms/table-cell-centered';
 import { useAnswerTableHooks } from './answer-table-hooks';
@@ -50,7 +51,7 @@ export const AnswerTable = memoNamed<Props>(
             </Th>
             {answerSymbolList.map((s) => (
               <Th key={s.iconId} style={tcellStyle}>
-                <CustomIcon name={s.iconId} />
+                <CustomIcon iconName={s.iconId} />
               </Th>
             ))}
             {answersWithHandler.map((answer) => (
@@ -96,7 +97,11 @@ export const AnswerTable = memoNamed<Props>(
                 ))}
                 {answerTableRow?.map((iconId, i) => (
                   <Td style={tcellStyle} key={i}>
-                    {iconId === undefined ? '' : <CustomIcon name={iconId} />}
+                    {iconId === undefined ? (
+                      ''
+                    ) : (
+                      <CustomIcon iconName={iconId} />
+                    )}
                   </Td>
                 ))}
               </tr>

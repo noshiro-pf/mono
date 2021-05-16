@@ -1,7 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { viewTexts } from '../../constants/view-texts';
-import { RepaymentType } from '../../types/enum/repayment-type';
+import type { RepaymentType } from '../../types/enum/repayment-type';
 import { BpNumericInputWithLabel } from '../blueprint-wrapper/BpNumericInputWithLabel';
 import { RepaymentTypeRadioGroup } from './RepaymentTypeRadioGroup';
 

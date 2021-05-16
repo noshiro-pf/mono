@@ -1,4 +1,4 @@
-import { uint32 } from '../types';
+import type { uint32 } from '../types';
 import { randInt } from './rand-int';
 
 export const randomArrayElement = <T>(array: readonly T[]): T =>

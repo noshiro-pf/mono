@@ -1,8 +1,8 @@
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { IYearMonthDate } from '../../types/record/base/year-month-date';
-import { IList, IMap } from '../../utils/immutable';
+import type { IYearMonthDate } from '../../types/record/base/year-month-date';
+import type { IList, IMap } from '../../utils/immutable';
 import { useMultipleDatePickerState } from './multiple-date-picker-hooks';
 import { DatepickerNav } from './navigation';
 import { Week } from './week';

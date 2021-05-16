@@ -1,17 +1,18 @@
 import { IRecord } from '../../utils/immutable';
+import type { IHoursMinutes, PartialHoursMinutes } from './base/hours-minutes';
 import {
   compareHm,
   createIHoursMinutes,
   fillHoursMinutes,
-  IHoursMinutes,
-  PartialHoursMinutes,
 } from './base/hours-minutes';
+import type {
+  IYearMonthDate,
+  PartialYearMonthDate,
+} from './base/year-month-date';
 import {
   compareYmd,
   createIYearMonthDate,
   fillYearMonthDate,
-  IYearMonthDate,
-  PartialYearMonthDate,
 } from './base/year-month-date';
 
 type YmdHmBaseType = Readonly<{

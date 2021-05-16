@@ -1,4 +1,4 @@
-import { IconName, Intent } from '@blueprintjs/core';
+import type { IconName, Intent } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
@@ -36,7 +36,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
     dialogConfig,
     toastConfig,
   }) => {
-    const [isOpen, open, close] = useBooleanState(false);
+    const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
     const alive = useAlive();
     const onConfirm = useCallback(() => {
@@ -47,7 +47,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
           message: toastConfig.message,
           intent: toastConfig.intent,
         });
-        close();
+        handleClose();
       };
 
       const p = onConfirmClick();
@@ -57,7 +57,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
       } else {
         afterConfirm();
       }
-    }, [alive, onConfirmClick, close, toastConfig]);
+    }, [alive, onConfirmClick, handleClose, toastConfig]);
 
     return (
       <>
@@ -65,14 +65,14 @@ export const ButtonWithConfirm = memoNamed<Props>(
           text={buttonConfig.name}
           intent={buttonConfig.intent ?? 'none'}
           icon={buttonConfig.icon}
-          onClick={open}
+          onClick={handleOpen}
           disabled={disabled}
           loading={loading}
           nowrap={true}
         />
         <ConfirmDialog
           isOpen={isOpen}
-          onCancel={close}
+          onCancel={handleClose}
           onConfirm={onConfirm}
           cancelButtonText={dialogConfig.cancelButtonText}
           confirmButtonText={dialogConfig.confirmButtonText}

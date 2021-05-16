@@ -1,6 +1,6 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { Mappable } from '@noshiro/ts-utils';
+import type { Mappable } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 
 type Props = Readonly<{
