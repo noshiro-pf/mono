@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
     "prebuild": "yarn clean:build",
     "build": "webpack --config config/webpack.prod.js",
     "postbuild": "cpx \"public/**\" ${npm_package_config_build_dir}",
@@ -16,6 +17,7 @@
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fmt": "yarn _prettier .",
+    "gi": "yarn _script_genindex ./src --min-depth 1",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
     "serve": "firebase serve",
@@ -26,7 +28,8 @@
     "testw": "yarn test --watch"
   },
   "config": {
-    "build_dir": "build"
+    "build_dir": "build",
+    "root_dir": "../../.."
   },
   "browserslist": {
     "production": [
@@ -42,9 +45,14 @@
   },
   "dependencies": {
     "@noshiro/preact-resize-observer-hooks": "*",
+    "@noshiro/preact-syncflow-hooks": "*",
     "@noshiro/preact-utils": "*",
+    "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
+    "fast-deep-equal": "^3.1.3",
     "goober": "^2.0.5",
+    "immer": "^9.0.2",
+    "immutable": "^4.0.0-rc.12",
     "preact": "^10.4.7",
     "preact-router": "^3.2.1"
   }

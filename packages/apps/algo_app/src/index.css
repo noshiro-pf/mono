@@ -20,6 +20,8 @@ code {
 
   /* prevent capitalization of text caused by Material button */
   text-transform: none;
+
+  user-select: none;
 }
 
 a {
