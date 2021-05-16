@@ -33,7 +33,7 @@ export const filterNotValue = <S, T extends S>(
   value: T
 ): OperatorFunction<S, S> => filter((v) => !Object.is(v, value));
 
-export const filterNotUndefined = <T extends undefined>(): OperatorFunction<
+export const filterNotUndefined = <T>(): OperatorFunction<
   T,
   // eslint-disable-next-line @typescript-eslint/ban-types
   Exclude<T, undefined>
