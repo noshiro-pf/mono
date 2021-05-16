@@ -1,14 +1,12 @@
-import { mapNullable, RectSize } from '@noshiro/ts-utils';
-import { JSXInternal } from 'preact/src/jsx';
+import type { RectSize } from '@noshiro/ts-utils';
+import { mapNullable } from '@noshiro/ts-utils';
+import type { JSXInternal } from 'preact/src/jsx';
 import { defaultCardSize } from '../../../constants/default-card-size';
 import { fillCardSize } from '../../../functions/fill-card-size';
 import { flipColor } from '../../../functions/flip-color';
-import { CardColor } from '../../../types/card-color';
-import {
-  CardTextColor,
-  darkGray,
-  lightGray,
-} from '../../../types/card-text-color';
+import type { CardColor } from '../../../types/card-color';
+import type { CardTextColor } from '../../../types/card-text-color';
+import { darkGray, lightGray } from '../../../types/card-text-color';
 
 export type CardProps = Readonly<{
   color: CardColor;

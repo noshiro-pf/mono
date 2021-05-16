@@ -1,5 +1,5 @@
-import { KeyboardEventType } from '@noshiro/react-utils';
-import { MonoTypeOperatorFunction, Observable } from 'rxjs';
+import type { KeyboardEventType } from '@noshiro/react-utils';
+import type { MonoTypeOperatorFunction, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 export const filterTargetKeyEvent = (

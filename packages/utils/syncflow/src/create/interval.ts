@@ -1,6 +1,7 @@
-import { Option, TimerId } from '@noshiro/ts-utils';
+import type { TimerId } from '@noshiro/ts-utils';
+import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { IntervalObservable } from '../types';
+import type { IntervalObservable } from '../types';
 
 export const interval = (
   millisec: number,

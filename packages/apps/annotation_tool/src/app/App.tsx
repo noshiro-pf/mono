@@ -3,26 +3,21 @@ import {
   useBooleanState,
   useStateWithMapFn,
 } from '@noshiro/react-utils';
-import {
+import type {
   Hue,
-  map,
   Percent,
-  pickupHighContrastHues,
-  pipe,
   ReadonlyNonEmptyArray,
   RectSize,
-  zip,
 } from '@noshiro/ts-utils';
+import { map, pickupHighContrastHues, pipe, zip } from '@noshiro/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
 import { AnnotataionCanvas } from '../canvas/annotation-canvas';
-import {
-  AnnotationCanvasStyle,
-  defaultAnnotationCanvasStyle,
-} from '../canvas/types/annotation-canvas-style';
-import { IdType } from '../canvas/types/id-type';
-import { Label } from '../canvas/types/label';
-import { AppEventHandler } from './event-handlers';
+import type { AnnotationCanvasStyle } from '../canvas/types/annotation-canvas-style';
+import { defaultAnnotationCanvasStyle } from '../canvas/types/annotation-canvas-style';
+import type { IdType } from '../canvas/types/id-type';
+import type { Label } from '../canvas/types/label';
+import type { AppEventHandler } from './event-handlers';
 import { visibleLabelsReducer } from './sidebar/label-button/function/visible-labels-reducer';
 import { Sidebar } from './sidebar/sidebar';
 
@@ -66,10 +61,10 @@ const hues = pickupHighContrastHues(
 
 const labels: ReadonlyNonEmptyArray<Label> = pipe(zip(hues, labelNames)).chain(
   map(
-    ([hue, name]: readonly [Hue, string], index): Label => ({
+    ([hue, labelName]: readonly [Hue, string], index): Label => ({
       id: index.toString(),
       hue,
-      name,
+      name: labelName,
     })
   )
 ).value;

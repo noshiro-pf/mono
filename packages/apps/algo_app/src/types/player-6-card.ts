@@ -1,4 +1,4 @@
-import { Card, CardsWithDisplayValue } from './card-type';
+import type { Card, CardsWithDisplayValue } from './card-type';
 
 export type Player6Cards = readonly [Card, Card, Card, Card, Card, Card];
 

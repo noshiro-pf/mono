@@ -1,7 +1,9 @@
-import { Rect, Rgba, roundToInt } from '@noshiro/ts-utils';
+import type { Rect, Rgba } from '@noshiro/ts-utils';
+import { roundToInt } from '@noshiro/ts-utils';
 import { Graphics } from 'pixi.js';
 import { zIndex } from '../z-index';
-import { bboxPointsFromRect, Direction, mapBboxPoints } from './bbox-points';
+import type { Direction } from './bbox-points';
+import { bboxPointsFromRect, mapBboxPoints } from './bbox-points';
 import { updateBboxPoint } from './update-pixi-bbox-point';
 import { updateBboxRect } from './update-pixi-bbox-rect';
 

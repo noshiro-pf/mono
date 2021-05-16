@@ -1,4 +1,4 @@
-import { LambdaApplication } from '../types';
+import type { LambdaApplication } from '../types';
 import { isLambdaTerm } from './is-lambda-term';
 
 export const isApplication = (term: unknown): term is LambdaApplication => {

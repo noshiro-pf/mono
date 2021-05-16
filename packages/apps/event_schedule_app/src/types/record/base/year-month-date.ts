@@ -1,4 +1,5 @@
-import { DateEnum, MonthEnum, sign, YearEnum } from '@noshiro/ts-utils';
+import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
+import { sign } from '@noshiro/ts-utils';
 import { IRecord } from '../../../utils/immutable';
 
 type YearMonthDateBaseType = Readonly<{

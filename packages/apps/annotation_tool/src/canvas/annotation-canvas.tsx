@@ -1,11 +1,12 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { Hue, RectSize } from '@noshiro/ts-utils';
-import { CSSProperties, useMemo } from 'react';
+import type { Hue, RectSize } from '@noshiro/ts-utils';
+import type { CSSProperties } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import SampleImage from '../assets/sample_image.jpg';
 import { CanvasMain } from './canvas-main';
 import { bgCheckerboardImg } from './img/checkerboard';
-import { AnnotationCanvasStyle } from './types/annotation-canvas-style';
+import type { AnnotationCanvasStyle } from './types/annotation-canvas-style';
 import { defaultIdMaker } from './types/id-type';
 
 type Props = Readonly<{

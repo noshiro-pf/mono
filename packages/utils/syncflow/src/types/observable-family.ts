@@ -1,11 +1,11 @@
-import { ArrayElement, Option, Result } from '@noshiro/ts-utils';
-import {
+import type { ArrayElement, Option, Result } from '@noshiro/ts-utils';
+import type {
   AsyncChildObservable,
   InitializedSyncChildObservable,
   RootObservable,
   SyncChildObservable,
 } from './observable';
-import { NonEmptyUnknownList } from './types';
+import type { NonEmptyUnknownList } from './types';
 
 // RootObservable
 

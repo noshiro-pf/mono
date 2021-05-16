@@ -1,4 +1,4 @@
-import { Variable } from '../types';
+import type { Variable } from '../types';
 
 // prettier-ignore
 export const ALPHABETS: readonly Variable[] = [

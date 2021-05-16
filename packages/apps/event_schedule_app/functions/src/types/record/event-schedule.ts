@@ -1,8 +1,8 @@
-import { DatetimeSpecificationEnumType } from '../enum/datetime-specification-type';
-import { AnswerSymbolType } from './base/answer-symbol';
-import { NotificationSettingsJsType } from './base/notification-settings';
-import { DatetimeRangeJsType } from './datetime-range';
-import { YmdHmJsType } from './ymd-hm';
+import type { DatetimeSpecificationEnumType } from '../enum/datetime-specification-type';
+import type { AnswerSymbolType } from './base/answer-symbol';
+import type { NotificationSettingsJsType } from './base/notification-settings';
+import type { DatetimeRangeJsType } from './datetime-range';
+import type { YmdHmJsType } from './ymd-hm';
 
 export type EventScheduleJsType = Readonly<{
   title: string;

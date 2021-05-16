@@ -1,17 +1,17 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { hslaToRgba, Hue, RectSize, Rgba } from '@noshiro/ts-utils';
+import type { Hue, RectSize, Rgba } from '@noshiro/ts-utils';
+import { hslaToRgba } from '@noshiro/ts-utils';
 import { Application, InteractionManager, settings } from 'pixi.js';
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { addGlobalPointerEventListener } from './functions/add-pointer-event-listener';
 import { createGlobalPixiObjects } from './functions/create-global-pixi-objects';
-import {
-  CanvasAppState,
-  defaultCanvasAppState,
-} from './state/canvas-state-type';
+import type { CanvasAppState } from './state/canvas-state-type';
+import { defaultCanvasAppState } from './state/canvas-state-type';
 import { canvasAppStateHandlerGenerator } from './state/state-handler-main';
-import { AnnotationCanvasStyle } from './types/annotation-canvas-style';
-import { IdType } from './types/id-type';
-import { PixiApp } from './types/pixi-app-type';
+import type { AnnotationCanvasStyle } from './types/annotation-canvas-style';
+import type { IdType } from './types/id-type';
+import type { PixiApp } from './types/pixi-app-type';
 import { zIndex } from './z-index';
 
 // Pixi.js global settings

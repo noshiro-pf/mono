@@ -1,7 +1,7 @@
 import { memoNamed } from '@noshiro/preact-utils';
-import { RectSize } from '@noshiro/ts-utils';
-import { CardColor } from '../../types/card-color';
-import { CardNumber } from '../../types/card-number';
+import type { RectSize } from '@noshiro/ts-utils';
+import type { CardColor } from '../../types/card-color';
+import type { CardNumber } from '../../types/card-number';
 import { Card0 } from './sub/card-0';
 import { Card1 } from './sub/card-1';
 import { Card10 } from './sub/card-10';

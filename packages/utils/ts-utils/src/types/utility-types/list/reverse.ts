@@ -1,7 +1,8 @@
-import { assertType, TypeEq } from '../test-type';
-import { Cons } from './cons';
-import { First } from './first';
-import { Rest } from './rest';
+import type { TypeEq } from '../test-type';
+import { assertType } from '../test-type';
+import type { Cons } from './cons';
+import type { First } from './first';
+import type { Rest } from './rest';
 
 export type Reverse<L extends unknown[], X extends unknown[] = []> = {
   1: X;

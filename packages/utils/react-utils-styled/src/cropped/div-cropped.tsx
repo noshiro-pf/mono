@@ -1,6 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { Rect } from '@noshiro/ts-utils';
-import { ReactNode, useMemo } from 'react';
+import type { Rect } from '@noshiro/ts-utils';
+import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`
@@ -58,11 +59,11 @@ export const DivCropped = memoNamed<Props>(
   'DivCropped',
   ({ children, cropRectRelative }: Props) => {
     const zoomedImgStyle = useMemo(() => {
-      const { width, height, top, left } = cropRectRelative;
+      const { width, height, top: top_, left } = cropRectRelative;
       const W = 1 / width;
       const H = 1 / height;
       const L = -W * left;
-      const T = -H * top;
+      const T = -H * top_;
       return {
         width: `${W * 100}%`,
         height: `${H * 100}%`,

@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { Mappable } from '@noshiro/ts-utils';
-import { ProductsInfo } from '../../../types';
+import type { Mappable } from '@noshiro/ts-utils';
+import type { ProductsInfo } from '../../../types';
 import { ProductsElementMobileView } from './products-mobile-element-view';
 
 export const ProductsViewMobile = memoNamed<{

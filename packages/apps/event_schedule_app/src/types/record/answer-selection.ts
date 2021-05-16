@@ -1,11 +1,7 @@
 import { IRecord } from '../../utils/immutable';
-import { AnswerSymbolIconId } from '../enum/answer-symbol-icon';
-import {
-  createIDatetimeRange,
-  fillDatetimeRange,
-  IDatetimeRange,
-  PartialDatetimeRange,
-} from './datetime-range';
+import type { AnswerSymbolIconId } from '../enum/answer-symbol-icon';
+import type { IDatetimeRange, PartialDatetimeRange } from './datetime-range';
+import { createIDatetimeRange, fillDatetimeRange } from './datetime-range';
 
 type AnswerSelectionBaseType = Readonly<{
   datetimeRange: IDatetimeRange;

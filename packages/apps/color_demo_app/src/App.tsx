@@ -1,7 +1,8 @@
 import { Paper } from '@material-ui/core';
 import { MuiTabs } from '@noshiro/react-material-ui-utils';
 import { ComponentSwitcher } from '@noshiro/react-utils';
-import { FC, useState } from 'react';
+import type { FC } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { LuminanceVisualizer } from './components/pages/luminance-visualizer/luminance-visualizer';
 import { TextColorContrastTable } from './components/pages/text-color-contrast-table';

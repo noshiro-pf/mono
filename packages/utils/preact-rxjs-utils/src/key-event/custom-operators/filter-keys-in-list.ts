@@ -1,4 +1,4 @@
-import { MonoTypeOperatorFunction, Observable } from 'rxjs';
+import type { MonoTypeOperatorFunction, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 export const filterKeyInList = (

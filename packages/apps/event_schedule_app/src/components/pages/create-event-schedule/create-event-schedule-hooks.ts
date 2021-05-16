@@ -3,7 +3,7 @@ import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../../api/api';
 import { routePaths } from '../../../routing/routing';
-import { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
 
 type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;

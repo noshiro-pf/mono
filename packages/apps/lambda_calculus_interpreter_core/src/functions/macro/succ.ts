@@ -1,4 +1,4 @@
-import { LambdaTerm } from '../../types';
+import type { LambdaTerm } from '../../types';
 import { splitToTokens } from '../parser';
 
 const succStr: string = '(lambda n.(lambda s.(lambda z.(s((n s)z)))))';

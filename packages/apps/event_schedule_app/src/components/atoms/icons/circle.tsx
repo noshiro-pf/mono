@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 type Props = Readonly<{
   size?: number;

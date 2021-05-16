@@ -1,10 +1,7 @@
-import { assertType, TypeEq } from '@noshiro/ts-utils';
-import {
-  InitializedObservable,
-  interval,
-  mapI,
-  withInitialValue,
-} from '../../src';
+import type { TypeEq } from '@noshiro/ts-utils';
+import { assertType } from '@noshiro/ts-utils';
+import type { InitializedObservable } from '../../src';
+import { interval, mapI, withInitialValue } from '../../src';
 import { testStream } from '../test-stream';
 import { withInitialValueTestCases } from './with-initial-value';
 

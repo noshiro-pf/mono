@@ -1,7 +1,8 @@
-import { Switch, SwitchProps } from '@blueprintjs/core';
+import type { SwitchProps } from '@blueprintjs/core';
+import { Switch } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { StrictOmit } from '@noshiro/ts-utils';
-import { CSSProperties } from 'react';
+import type { StrictOmit } from '@noshiro/ts-utils';
+import type { CSSProperties } from 'react';
 
 type Props = Readonly<{ onToggle: () => void }> &
   StrictOmit<SwitchProps, 'label' | 'labelElement'>;

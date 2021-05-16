@@ -1,6 +1,6 @@
-import { Point, Rect } from '@noshiro/ts-utils';
-import { PixiBbox } from '../types/pixi-bbox';
-import { Direction } from './bbox-points';
+import type { Point, Rect } from '@noshiro/ts-utils';
+import type { PixiBbox } from '../types/pixi-bbox';
+import type { Direction } from './bbox-points';
 import { resizeRect } from './resize-rect';
 import { updatePixiBbox } from './update-pixi-bbox';
 

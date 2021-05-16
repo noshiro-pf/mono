@@ -1,4 +1,4 @@
-import { FunctionType } from '../types';
+import type { FunctionType } from '../types';
 
 export function pipeF<T0, T1>(x: T0, f1: FunctionType<T0, T1>): T1;
 export function pipeF<T0, T1, T2>(

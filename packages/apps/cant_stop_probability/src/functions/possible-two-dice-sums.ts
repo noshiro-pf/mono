@@ -1,5 +1,5 @@
-import { DiceValue } from '../types/dice-value';
-import { TwoDiceSumValue } from '../types/two-dice-sum-value';
+import type { DiceValue } from '../types/dice-value';
+import type { TwoDiceSumValue } from '../types/two-dice-sum-value';
 
 export const possibleTwoDiceSums = (
   a: DiceValue,

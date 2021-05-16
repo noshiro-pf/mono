@@ -1,4 +1,4 @@
-import { Rect, RectSize } from '../../types';
+import type { Rect, RectSize } from '../../types';
 
 /**
  * @description 縦横比を維持して表示するための位置計算
@@ -52,18 +52,15 @@ export const toInnerRectKeepingAspectRatio = (
   outerRect: Rect,
   aspectRatio: number
 ): Rect => {
-  const { height: outerHeight, width: outerWidth } = outerRect;
-  const {
-    height: innerHeight,
-    width: innerWidth,
-  } = toInnerRectSizeKeepingAspectRatio(
-    { width: outerWidth, height: outerHeight },
+  const { height: outerH, width: outerW } = outerRect;
+  const { height: innerH, width: innerW } = toInnerRectSizeKeepingAspectRatio(
+    { width: outerW, height: outerH },
     aspectRatio
   );
   return {
-    top: outerRect.top + (outerHeight - innerHeight) / 2,
-    left: outerRect.left + (outerWidth - innerWidth) / 2,
-    width: innerWidth,
-    height: innerHeight,
+    top: outerRect.top + (outerH - innerH) / 2,
+    left: outerRect.left + (outerW - innerW) / 2,
+    width: innerW,
+    height: innerH,
   };
 };

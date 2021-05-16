@@ -1,5 +1,5 @@
 import { styled } from '@noshiro/solid-styled-components';
-import { JSX } from 'solid-js';
+import type { JSX } from 'solid-js';
 import { useStateAsStream, useStreamValue } from '../utils';
 import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';

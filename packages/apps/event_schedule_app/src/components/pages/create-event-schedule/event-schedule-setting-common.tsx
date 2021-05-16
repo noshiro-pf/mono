@@ -2,7 +2,7 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
-import { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
 import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
 import { Section } from '../../molecules/section';
 import { BackToAnswerPageButton } from '../../organisms/button-with-confirm/back-to-answer-page-button';

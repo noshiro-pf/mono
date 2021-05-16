@@ -1,6 +1,6 @@
 import { isArrayOfLength1OrMore } from '@noshiro/ts-utils';
 import { ALPHABETS } from '../constants';
-import { Variable } from '../types';
+import type { Variable } from '../types';
 
 export const pickUpAvailableVariable = (
   freeVariables: readonly Variable[]

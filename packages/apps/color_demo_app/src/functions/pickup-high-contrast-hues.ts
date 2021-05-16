@@ -1,11 +1,9 @@
+import type { Hue, Percent, uint32 } from '@noshiro/ts-utils';
 import {
   hslToRgb,
-  Hue,
   max,
-  Percent,
   relativeLuminance,
   seq,
-  uint32,
   zeros,
 } from '@noshiro/ts-utils';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';

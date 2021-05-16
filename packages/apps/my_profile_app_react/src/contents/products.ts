@@ -1,4 +1,4 @@
-import { ProductsInfo } from '../types';
+import type { ProductsInfo } from '../types';
 import {
   CatanDiceImage,
   ColorDemoImage,

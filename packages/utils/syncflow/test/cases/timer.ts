@@ -1,6 +1,6 @@
 import { timer } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 export const timerTestCases: [StreamTestCase<number>] = [
   {

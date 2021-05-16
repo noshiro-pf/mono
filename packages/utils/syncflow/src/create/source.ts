@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { SourceObservable } from '../types';
+import type { SourceObservable } from '../types';
 
 export const subject = <A>(): SourceObservable<A> =>
   new SourceObservableClass<A>();

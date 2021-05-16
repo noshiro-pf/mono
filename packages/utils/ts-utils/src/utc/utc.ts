@@ -1,4 +1,4 @@
-import {
+import type {
   DateEnum,
   HoursEnum,
   MillisecondsEnum,
@@ -8,7 +8,7 @@ import {
   WeekDayEnum,
   YearEnum,
 } from '../date';
-import { Phantomic, ReadonlyDate } from '../types';
+import type { Phantomic, ReadonlyDate } from '../types';
 
 export namespace utc {
   export type UTC = Phantomic<number, 'UTC'>;

@@ -1,4 +1,5 @@
-import { Switch, SwitchProps } from '@blueprintjs/core';
+import type { SwitchProps } from '@blueprintjs/core';
+import { Switch } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 

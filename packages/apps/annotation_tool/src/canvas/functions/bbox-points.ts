@@ -1,4 +1,4 @@
-import { Point, Rect } from '@noshiro/ts-utils';
+import type { Point, Rect } from '@noshiro/ts-utils';
 
 // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
 export type Direction = 'nw' | 'n_' | 'ne' | 'w_' | 'e_' | 'sw' | 's_' | 'se';
@@ -19,14 +19,14 @@ export type BboxPoints = Readonly<{ [key in Direction]: Point }>;
  * y2 [ ]---[ ]---[ ]
  */
 export const bboxPointsFromRect = (rect: Rect): BboxPoints => {
-  const { top, left, width, height } = rect;
+  const { top: top_, left, width, height } = rect;
 
   const x0 = left;
   const x1 = left + width / 2;
   const x2 = left + width;
-  const y0 = top;
-  const y1 = top + height / 2;
-  const y2 = top + height;
+  const y0 = top_;
+  const y1 = top_ + height / 2;
+  const y2 = top_ + height;
 
   return {
     nw: { x: x0, y: y0 },

@@ -1,6 +1,6 @@
 import { MuiSlider } from '@noshiro/react-material-ui-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { uint32 } from '@noshiro/ts-utils';
+import type { uint32 } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const SliderWrapper = styled.div`

@@ -1,5 +1,5 @@
-import { KeyboardEventType } from '@noshiro/react-utils';
-import { Observable, OperatorFunction } from 'rxjs';
+import type { KeyboardEventType } from '@noshiro/react-utils';
+import type { Observable, OperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { filterKeyInList, mapToKey } from '../custom-operators';
 

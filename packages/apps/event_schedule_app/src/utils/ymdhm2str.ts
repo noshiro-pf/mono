@@ -1,8 +1,8 @@
 import { getDay } from '@noshiro/ts-utils';
 import { texts } from '../constants/texts';
-import { IHoursMinutes } from '../types/record/base/hours-minutes';
-import { IYearMonthDate } from '../types/record/base/year-month-date';
-import { IYmdHm } from '../types/record/ymd-hm';
+import type { IHoursMinutes } from '../types/record/base/hours-minutes';
+import type { IYearMonthDate } from '../types/record/base/year-month-date';
+import type { IYmdHm } from '../types/record/ymd-hm';
 import { ymd2Date } from './ymdhm2date';
 
 const pad2 = (n: number): string => n.toString().padStart(2, '0');

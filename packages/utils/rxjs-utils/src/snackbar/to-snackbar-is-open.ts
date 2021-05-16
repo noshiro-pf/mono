@@ -1,4 +1,5 @@
-import { Observable, OperatorFunction, timer } from 'rxjs';
+import type { Observable, OperatorFunction } from 'rxjs';
+import { timer } from 'rxjs';
 import { mapTo, startWith, switchMapTo } from 'rxjs/operators';
 
 export const toSnackbarIsOpen = <T>(

@@ -1,6 +1,7 @@
-import { Observable, OperatorFunction, timer } from 'rxjs';
+import type { Observable, OperatorFunction } from 'rxjs';
+import { timer } from 'rxjs';
 import { mapTo, startWith, switchMap } from 'rxjs/operators';
-import { PromiseSnackbarStateType } from './promise-snackbar-state';
+import type { PromiseSnackbarStateType } from './promise-snackbar-state';
 
 export const toPromiseSnackbarState = <T>(
   timerMilliSec: number,

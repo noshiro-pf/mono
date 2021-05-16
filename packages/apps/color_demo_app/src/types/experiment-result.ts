@@ -1,4 +1,4 @@
-import { Hsl, Hue } from '@noshiro/ts-utils';
+import type { Hsl, Hue } from '@noshiro/ts-utils';
 
 export type ExperimentResult = Readonly<{
   accumulatedDistribution: readonly [Hsl, number][];

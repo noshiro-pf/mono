@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import Media from 'react-media';
 import { BrowserRouter } from 'react-router-dom';
 import { AppSub } from './App-view';

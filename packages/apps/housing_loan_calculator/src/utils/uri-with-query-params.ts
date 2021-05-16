@@ -17,12 +17,8 @@ export const uriWithQueryParams = (
   if (nonNullQueryParameters.length === 0) {
     return normalizedUri;
   } else {
-    return (
-      normalizedUri +
-      '?' +
-      nonNullQueryParameters
-        .map(([key, value]) => (isNotUndefined(value) ? `${key}=${value}` : ''))
-        .join('&')
-    );
+    return `${normalizedUri}?${nonNullQueryParameters
+      .map(([key, value]) => (isNotUndefined(value) ? `${key}=${value}` : ''))
+      .join('&')}`;
   }
 };

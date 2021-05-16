@@ -1,5 +1,6 @@
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
-import { CSSProperties, useMemo } from 'react';
+import type { CSSProperties } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`

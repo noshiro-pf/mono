@@ -1,16 +1,14 @@
-import { ReducerType } from '@noshiro/ts-utils';
-import { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
-import { IYearMonthDate } from '../../../../types/record/base/year-month-date';
+import type { ReducerType } from '@noshiro/ts-utils';
+import type { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
+import type { IYearMonthDate } from '../../../../types/record/base/year-month-date';
+import type { IDatetimeRange } from '../../../../types/record/datetime-range';
 import {
   compareDatetimeRange,
   createIDatetimeRange,
-  IDatetimeRange,
 } from '../../../../types/record/datetime-range';
-import {
-  createITimeRange,
-  ITimeRange,
-} from '../../../../types/record/time-range';
-import { IList, ISet } from '../../../../utils/immutable';
+import type { ITimeRange } from '../../../../types/record/time-range';
+import { createITimeRange } from '../../../../types/record/time-range';
+import type { IList, ISet } from '../../../../utils/immutable';
 import { timeRangeReducer } from '../set-times-popover/time-range-reducer';
 
 export type DatetimeListReducerAction =

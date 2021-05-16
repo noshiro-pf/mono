@@ -1,16 +1,15 @@
 import { useCallback, useMemo } from 'react';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import { UserName } from '../../../types/phantom';
-import { IAnswer } from '../../../types/record/answer';
+import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import type { UserName } from '../../../types/phantom';
+import type { IAnswer } from '../../../types/record/answer';
 import { createIAnswerSelection } from '../../../types/record/answer-selection';
-import { IDatetimeRange } from '../../../types/record/datetime-range';
-import { IEventSchedule } from '../../../types/record/event-schedule';
-import { IList, IMap } from '../../../utils/immutable';
+import type { IDatetimeRange } from '../../../types/record/datetime-range';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IList } from '../../../utils/immutable';
+import { IMap } from '../../../utils/immutable';
 import { useFormError } from '../../../utils/use-form-error-hook';
-import {
-  answerSelectionReducer,
-  AnswerSelectionReducerAction,
-} from './answer-selection-reducer';
+import type { AnswerSelectionReducerAction } from './answer-selection-reducer';
+import { answerSelectionReducer } from './answer-selection-reducer';
 
 type MyAnswerHooks = Readonly<{
   userName: UserName;

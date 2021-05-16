@@ -1,4 +1,4 @@
-import { Phantomic } from '../phantomic';
+import type { Phantomic } from '../phantomic';
 
 // int
 export type int = Phantomic<number, 'int'>;

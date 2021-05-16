@@ -1,10 +1,5 @@
-import {
-  assertNotType,
-  assertType,
-  Queue,
-  TypeEq,
-  TypeExtends,
-} from '@noshiro/ts-utils';
+import type { Queue, TypeEq, TypeExtends } from '@noshiro/ts-utils';
+import { assertNotType, assertType } from '@noshiro/ts-utils';
 
 export type TupleToQueueTuple<T extends readonly unknown[]> = {
   [P in keyof T]: Queue<T[P]>;

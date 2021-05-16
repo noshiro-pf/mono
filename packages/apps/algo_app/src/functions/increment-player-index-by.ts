@@ -1,4 +1,4 @@
-import { PlayerIndex } from '../types/player-index';
+import type { PlayerIndex } from '../types/player-index';
 
 export const incrementPlayerIndexBy = (
   index: PlayerIndex,

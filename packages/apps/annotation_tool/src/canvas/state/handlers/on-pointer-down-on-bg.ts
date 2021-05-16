@@ -1,8 +1,8 @@
 import { rectFrom2Points } from '@noshiro/ts-utils';
 import { updateBorderedRectangleGraphics } from '../../functions/create-pixi-object';
-import { AnnotationCanvasStyle } from '../../types/annotation-canvas-style';
-import { PixiApp } from '../../types/pixi-app-type';
-import { CanvasAppState } from '../canvas-state-type';
+import type { AnnotationCanvasStyle } from '../../types/annotation-canvas-style';
+import type { PixiApp } from '../../types/pixi-app-type';
+import type { CanvasAppState } from '../canvas-state-type';
 
 export const onPointerDownOnBackground = (
   state: CanvasAppState,

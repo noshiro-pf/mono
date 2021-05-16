@@ -1,5 +1,5 @@
-import { ReadonlyDate } from '../../types';
-import { DateEnum, MonthEnum, YearEnum } from '../types';
+import type { ReadonlyDate } from '../../types';
+import type { DateEnum, MonthEnum, YearEnum } from '../types';
 import { getDate, getMonth, getYear } from './date-wrapper';
 import { newDate } from './new-date';
 

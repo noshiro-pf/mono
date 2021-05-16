@@ -2,7 +2,7 @@ import {
   isArrayOfLength3OrMore,
   isArrayOfLength6OrMore,
 } from '@noshiro/ts-utils';
-import { LambdaTerm } from '../../types';
+import type { LambdaTerm } from '../../types';
 import { isVariable } from '../is-variable';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term';
 

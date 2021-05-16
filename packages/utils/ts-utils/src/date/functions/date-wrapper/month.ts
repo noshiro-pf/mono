@@ -1,5 +1,5 @@
-import { ReadonlyDate } from '../../../types';
-import { MonthEnum } from '../../types';
+import type { ReadonlyDate } from '../../../types';
+import type { MonthEnum } from '../../types';
 
 export const getMonth = (date: ReadonlyDate): MonthEnum =>
   (date.getMonth() + 1) as MonthEnum;

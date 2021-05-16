@@ -1,4 +1,4 @@
-import { ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { AnswerPage } from '../components/pages/answer-page/answer-page';
 import { CreateEventSchedule } from '../components/pages/create-event-schedule/create-event-schedule';
 import { EditEventSchedule } from '../components/pages/create-event-schedule/edit-event-schedule';

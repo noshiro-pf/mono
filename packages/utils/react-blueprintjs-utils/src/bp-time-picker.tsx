@@ -1,8 +1,9 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import { getHours, getMinutes, ReadonlyDate } from '@noshiro/ts-utils';
+import type { ReadonlyDate } from '@noshiro/ts-utils';
+import { getHours, getMinutes } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { HoursMinutes } from './types';
+import type { HoursMinutes } from './types';
 
 type Props = Readonly<{
   time: HoursMinutes;

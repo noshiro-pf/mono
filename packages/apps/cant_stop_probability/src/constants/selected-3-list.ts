@@ -1,4 +1,4 @@
-import { TwoDiceSumValue } from '../types/two-dice-sum-value';
+import type { TwoDiceSumValue } from '../types/two-dice-sum-value';
 import { twoDiceSumSet } from './two-dice-sum-set';
 
 const t = twoDiceSumSet();

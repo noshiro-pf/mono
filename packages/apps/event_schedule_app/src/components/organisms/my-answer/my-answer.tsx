@@ -6,10 +6,10 @@ import {
 } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants/texts';
-import { UserName } from '../../../types/phantom';
-import { IAnswer } from '../../../types/record/answer';
-import { IEventSchedule } from '../../../types/record/event-schedule';
-import { IList } from '../../../utils/immutable';
+import type { UserName } from '../../../types/phantom';
+import type { IAnswer } from '../../../types/record/answer';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IList } from '../../../utils/immutable';
 import { CustomIcon } from '../../atoms/icon';
 import { Td, Th } from '../../atoms/table-cell-centered';
 import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
@@ -97,7 +97,7 @@ export const MyAnswer = memoNamed<Props>(
                 <Th key={s.iconId}>
                   <BpButton
                     title={s.symbolDescription}
-                    icon={<CustomIcon name={s.iconId} />}
+                    icon={<CustomIcon iconName={s.iconId} />}
                     minimal={true}
                     onClick={s.onClick}
                   />
@@ -122,7 +122,7 @@ export const MyAnswer = memoNamed<Props>(
                       <BpButton
                         icon={
                           <CustomIcon
-                            name={s.iconId}
+                            iconName={s.iconId}
                             color={
                               s.iconId === selectedSymbol ? 'blue' : 'gray'
                             }

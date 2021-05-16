@@ -1,13 +1,7 @@
-import {
-  distinctUntilChanged,
-  interval,
-  IntervalObservable,
-  map,
-  Observable,
-  withLatestFrom,
-} from '../../src';
+import type { IntervalObservable, Observable } from '../../src';
+import { distinctUntilChanged, interval, map, withLatestFrom } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 /*
   counter                0   1   2   3   4   5   6

@@ -1,8 +1,8 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
-import { DayType } from '../../types/enum/day-type';
-import { IYearMonthDate } from '../../types/record/base/year-month-date';
-import { IList } from '../../utils/immutable';
+import type { DayType } from '../../types/enum/day-type';
+import type { IYearMonthDate } from '../../types/record/base/year-month-date';
+import type { IList } from '../../utils/immutable';
 import { DatePickerDate } from './date-picker-day';
 
 type Props = Readonly<{

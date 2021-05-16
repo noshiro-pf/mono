@@ -1,9 +1,7 @@
-import { DatePickerShortcut } from '@blueprintjs/datetime';
+import type { DatePickerShortcut } from '@blueprintjs/datetime';
+import type { DateEnum, MonthEnum, ReadonlyDate } from '@noshiro/ts-utils';
 import {
-  DateEnum,
-  MonthEnum,
   pipe,
-  ReadonlyDate,
   setHours,
   setMinutes,
   updateDate,

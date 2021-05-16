@@ -1,5 +1,6 @@
 import { FormGroup } from '@blueprintjs/core';
-import { BpDatetimePicker, Ymdhm } from '@noshiro/react-blueprintjs-utils';
+import type { Ymdhm } from '@noshiro/react-blueprintjs-utils';
+import { BpDatetimePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { mapNullable } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
@@ -7,7 +8,8 @@ import { answerDeadlineShortcuts } from '../../../constants/answer-deadline-shor
 import { texts } from '../../../constants/texts';
 import { createIHoursMinutes } from '../../../types/record/base/hours-minutes';
 import { createIYearMonthDate } from '../../../types/record/base/year-month-date';
-import { createIYmdHm, IYmdHm } from '../../../types/record/ymd-hm';
+import type { IYmdHm } from '../../../types/record/ymd-hm';
+import { createIYmdHm } from '../../../types/record/ymd-hm';
 
 type Props = Readonly<{
   useAnswerDeadline: boolean;

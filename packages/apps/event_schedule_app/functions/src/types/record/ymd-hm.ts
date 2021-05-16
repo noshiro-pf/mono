@@ -1,5 +1,7 @@
-import { compareHm, HoursMinutesType } from './base/hours-minutes';
-import { compareYmd, YearMonthDateType } from './base/year-month-date';
+import type { HoursMinutesType } from './base/hours-minutes';
+import { compareHm } from './base/hours-minutes';
+import type { YearMonthDateType } from './base/year-month-date';
+import { compareYmd } from './base/year-month-date';
 
 export type YmdHmJsType = Readonly<{
   ymd: YearMonthDateType;

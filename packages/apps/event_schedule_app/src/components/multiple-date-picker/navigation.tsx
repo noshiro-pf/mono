@@ -1,16 +1,14 @@
-import { OptionProps } from '@blueprintjs/core';
+import type { OptionProps } from '@blueprintjs/core';
 import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import type { MonthEnum, uint32, YearEnum } from '@noshiro/ts-utils';
 import {
   getMonth,
   getYear,
-  MonthEnum,
   monthsList,
   range,
   stringToNumber,
   today,
-  uint32,
-  YearEnum,
 } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';

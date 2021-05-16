@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { CSSProperties, PropsWithChildren } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
 const CellContainer = styled.div`

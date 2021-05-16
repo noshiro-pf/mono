@@ -1,4 +1,4 @@
-import { Hsl, Hsla, Rgb, Rgba } from '../../types';
+import type { Hsl, Hsla, Rgb, Rgba } from '../../types';
 import { numberToHue, numberToPercent } from '../from-number';
 
 export const rgbToHsl = ([r, g, b]: Rgb): Hsl => {

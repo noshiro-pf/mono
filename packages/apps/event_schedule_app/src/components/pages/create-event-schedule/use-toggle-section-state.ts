@@ -1,4 +1,5 @@
-import { MutableRefObject, useCallback, useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 // const NULL = Symbol();
 // const isNonNull = <T>(v: T | symbol): v is T => v !== NULL;
@@ -13,7 +14,7 @@ export const useToggleSectionState = <A>(
   (b: boolean) => void,
   () => void,
   A,
-  (value: A) => void,
+  (a: A) => void,
   () => void
 ] => {
   const initialValueRef = useRef(initialValue);

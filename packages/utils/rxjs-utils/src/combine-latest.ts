@@ -1,5 +1,6 @@
-import { combineLatest, Observable, ObservableInput } from 'rxjs';
-import { Unwrap } from './unwrap';
+import type { Observable, ObservableInput } from 'rxjs';
+import { combineLatest } from 'rxjs';
+import type { Unwrap } from './unwrap';
 
 /**
  * @description combineLatest wrapper to apply better type check.

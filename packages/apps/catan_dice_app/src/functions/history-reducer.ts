@@ -1,5 +1,5 @@
-import { ReducerType } from '@noshiro/ts-utils';
-import { THistoryState } from '../type/history';
+import type { ReducerType } from '@noshiro/ts-utils';
+import type { THistoryState } from '../type/history';
 import { rollTwoDices } from './roll-dice';
 
 export const historyReducer: ReducerType<
@@ -22,13 +22,13 @@ export const historyReducer: ReducerType<
       }
     });
 
-    st.update('history', (history) => {
+    st.update('history', (hist) => {
       switch (action) {
         case 'undo':
         case 'redo':
           return st.history;
         case 'roll-dices':
-          return history.take(currIdx + 1).push(rollTwoDices());
+          return hist.take(currIdx + 1).push(rollTwoDices());
       }
     });
   });

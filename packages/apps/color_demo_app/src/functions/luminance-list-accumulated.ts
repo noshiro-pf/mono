@@ -1,9 +1,9 @@
+import type { ReadonlyNonEmptyArray } from '@noshiro/ts-utils';
 import {
   first,
   isNonEmpty,
   map,
   pipe,
-  ReadonlyNonEmptyArray,
   rest,
   scan,
   tuple,

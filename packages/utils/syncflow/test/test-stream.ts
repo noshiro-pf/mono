@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals';
 import { TICK } from './constants';
-import { StreamTestCase } from './typedef';
+import type { StreamTestCase } from './typedef';
 
 export const testStream = <T>(testCase: StreamTestCase<T>): void => {
   test(testCase.name, (done) =>

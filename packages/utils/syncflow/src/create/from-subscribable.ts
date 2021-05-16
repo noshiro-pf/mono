@@ -1,6 +1,6 @@
 import { Option, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { FromSubscribableObservable, Subscribable } from '../types';
+import type { FromSubscribableObservable, Subscribable } from '../types';
 
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>

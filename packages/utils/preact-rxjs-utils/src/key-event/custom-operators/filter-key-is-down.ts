@@ -1,4 +1,4 @@
-import { Observable, OperatorFunction } from 'rxjs';
+import type { Observable, OperatorFunction } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 export const filterKeyIsDown = (): OperatorFunction<

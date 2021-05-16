@@ -1,4 +1,5 @@
-import { at, contrastRatioHsl, Hue, Percent, uint32 } from '@noshiro/ts-utils';
+import type { Hue, Percent, uint32 } from '@noshiro/ts-utils';
+import { at, contrastRatioHsl } from '@noshiro/ts-utils';
 
 export const hueListToContrastRatioList = (
   hueList: readonly Hue[],

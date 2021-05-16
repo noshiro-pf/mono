@@ -1,6 +1,6 @@
 import { range } from '../../array';
-import { uint32 } from '../../types';
-import { DateEnum, MonthEnum, YearEnum } from '../types';
+import type { uint32 } from '../../types';
+import type { DateEnum, MonthEnum, YearEnum } from '../types';
 import { getLastDateNumberOfMonth } from './get-last-date-number-of-month';
 import { newDate } from './new-date';
 import { toTimestamp } from './to-timestamp';

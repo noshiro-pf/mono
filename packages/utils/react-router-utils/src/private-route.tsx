@@ -1,4 +1,5 @@
-import { ComponentType, FC, memo } from 'react';
+import { memoNamed } from '@noshiro/react-utils';
+import type { ComponentType } from 'react';
 import { Redirect, Route } from 'react-router';
 
 type Props = Readonly<{
@@ -9,8 +10,9 @@ type Props = Readonly<{
   redirectTo: string;
 }>;
 
-export const PrivateRoute: FC<Props> = memo(
-  ({ loggedIn, path, component, exact, redirectTo }: Props) => {
+export const PrivateRoute = memoNamed<Props>(
+  'PrivateRoute',
+  ({ loggedIn, path, component, exact, redirectTo }) => {
     switch (loggedIn) {
       case undefined:
         return <div />;
@@ -21,5 +23,3 @@ export const PrivateRoute: FC<Props> = memo(
     }
   }
 );
-
-PrivateRoute.displayName = 'PrivateRoute';

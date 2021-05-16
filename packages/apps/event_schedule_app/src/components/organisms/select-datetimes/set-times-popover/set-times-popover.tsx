@@ -3,8 +3,8 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { texts } from '../../../../constants/texts';
-import { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
-import { ITimeRange } from '../../../../types/record/time-range';
+import type { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
+import type { ITimeRange } from '../../../../types/record/time-range';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const vt = texts.eventSettingsPage.section2;
@@ -18,14 +18,14 @@ type Props = Readonly<{
 export const SetTimesPopover = memoNamed<Props>(
   'SetTimesPopover',
   ({ datetimeSpecification, initialValue, onSetTimesSubmit }) => {
-    const [isOpen, open, close] = useBooleanState(false);
+    const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
     const onOkClick = useCallback(
       (range: ITimeRange) => {
         onSetTimesSubmit(range);
-        close();
+        handleClose();
       },
-      [onSetTimesSubmit, close]
+      [onSetTimesSubmit, handleClose]
     );
 
     return (
@@ -34,15 +34,19 @@ export const SetTimesPopover = memoNamed<Props>(
           <SetTimesPopoverContent
             initialValue={initialValue}
             datetimeSpecification={datetimeSpecification}
-            onCancelClick={close}
+            onCancelClick={handleClose}
             onOkClick={onOkClick}
           />
         }
         isOpen={isOpen}
-        onClose={close}
+        onClose={handleClose}
         canEscapeKeyClose={true}
       >
-        <BpButton intent='success' onClick={open} text={vt.setTimesAtOneTime} />
+        <BpButton
+          intent='success'
+          onClick={handleOpen}
+          text={vt.setTimesAtOneTime}
+        />
       </Popover>
     );
   }

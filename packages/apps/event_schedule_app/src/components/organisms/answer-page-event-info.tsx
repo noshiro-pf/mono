@@ -1,7 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../constants/texts';
-import { IEventSchedule } from '../../types/record/event-schedule';
+import type { IEventSchedule } from '../../types/record/event-schedule';
 import { createIYmdHm } from '../../types/record/ymd-hm';
 import { ymdhm2strWithDay } from '../../utils/ymdhm2str';
 import { Description } from '../atoms/description';

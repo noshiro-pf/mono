@@ -1,11 +1,5 @@
-import {
-  getMonth,
-  getYear,
-  MonthEnum,
-  ReducerType,
-  today,
-  YearEnum,
-} from '@noshiro/ts-utils';
+import type { MonthEnum, ReducerType, YearEnum } from '@noshiro/ts-utils';
+import { getMonth, getYear, today } from '@noshiro/ts-utils';
 
 export type CalendarCurrentPageReducerState = Readonly<{
   year: YearEnum;

@@ -1,8 +1,9 @@
-import { isNotUndefined, PrimitiveType } from '@noshiro/ts-utils';
-import { Observable, ObservableInput, OperatorFunction } from 'rxjs';
+import type { PrimitiveType } from '@noshiro/ts-utils';
+import { isNotUndefined } from '@noshiro/ts-utils';
+import type { Observable, ObservableInput, OperatorFunction } from 'rxjs';
 import { filter, map, mapTo, pluck, withLatestFrom } from 'rxjs/operators';
 import { combineLatestTyped } from '../combine-latest';
-import { Unwrap } from '../unwrap';
+import type { Unwrap } from '../unwrap';
 import { every } from './every';
 
 export const mapToConst = <T extends PrimitiveType>(
@@ -10,7 +11,7 @@ export const mapToConst = <T extends PrimitiveType>(
 ): OperatorFunction<unknown, T> => mapTo(constant);
 
 export const get: <T, K extends keyof T>(
-  name: K
+  key: K
 ) => OperatorFunction<T, T[K]> = pluck;
 
 export const valueIs = <S, T extends S>(

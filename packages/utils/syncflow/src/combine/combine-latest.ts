@@ -1,7 +1,8 @@
-import { assertType, Option, TypeExtends } from '@noshiro/ts-utils';
+import type { TypeExtends } from '@noshiro/ts-utils';
+import { assertType, Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
-import {
+import type {
   CombineLatestObservable,
   InitializedCombineLatestObservable,
   NonEmptyUnknownList,
@@ -54,7 +55,7 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
 
 const r1 = fromArray([1, 2, 3]);
 const r2 = fromArray(['a', 'b', 'c']);
-const c = combineLatest(r1, r2);
+const cm = combineLatest(r1, r2);
 assertType<
-  TypeExtends<typeof c, SyncChildObservable<[number, string], 'combineLatest'>>
+  TypeExtends<typeof cm, SyncChildObservable<[number, string], 'combineLatest'>>
 >();

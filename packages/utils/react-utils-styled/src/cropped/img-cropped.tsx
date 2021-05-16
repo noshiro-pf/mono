@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { DivCropped } from './div-cropped';
 

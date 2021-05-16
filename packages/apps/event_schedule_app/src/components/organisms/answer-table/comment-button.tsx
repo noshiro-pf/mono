@@ -10,30 +10,35 @@ type Props = Readonly<{
 }>;
 
 export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
-  const [isOpen, open, close] = useBooleanState(false);
+  const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
   return (
     <Popover
       isOpen={isOpen}
-      onClose={close}
+      onClose={handleClose}
       canEscapeKeyClose={true}
       placement={'top'}
       minimal={true}
       content={
         <ContentRoot>
-          <Comment>{props.comment}</Comment>
+          <Comments>{props.comment}</Comments>
           <ButtonsWrapperAlignEnd>
             <BpButton
               type='button'
               intent='none'
-              onClick={close}
+              onClick={handleClose}
               text={texts.buttonText.close}
             />
           </ButtonsWrapperAlignEnd>
         </ContentRoot>
       }
     >
-      <BpButton minimal={true} icon={'comment'} small={true} onClick={open} />
+      <BpButton
+        minimal={true}
+        icon={'comment'}
+        small={true}
+        onClick={handleOpen}
+      />
     </Popover>
   );
 });
@@ -43,7 +48,7 @@ const ContentRoot = styled.div`
   max-width: 250px;
 `;
 
-const Comment = styled.div`
+const Comments = styled.div`
   margin: 10px;
   overflow-wrap: anywhere;
   white-space: pre-line;

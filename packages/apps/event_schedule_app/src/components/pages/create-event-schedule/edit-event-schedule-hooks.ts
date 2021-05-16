@@ -5,7 +5,7 @@ import { api } from '../../../api/api';
 import { texts } from '../../../constants/texts';
 import { routePaths } from '../../../routing/routing';
 import { useEventId } from '../../../routing/use-event-id';
-import { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
 import { createToaster, showToast } from '../../../utils/toaster';
 
 type EditEventScheduleHooks = Readonly<{
@@ -31,13 +31,13 @@ export const useEditEventScheduleHooks = ({
 
   const eventId = useEventId();
 
-  const navigator = useNavigator();
+  const routerNavigator = useNavigator();
 
   const answerPagePath = `${routePaths.answerPage}/${eventId ?? ''}`;
 
   const onBackToAnswerPage = useCallback(() => {
-    navigator(answerPagePath);
-  }, [navigator, answerPagePath]);
+    routerNavigator(answerPagePath);
+  }, [routerNavigator, answerPagePath]);
 
   const alive = useAlive();
   const onEditEventClick = useCallback(() => {

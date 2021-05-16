@@ -1,6 +1,7 @@
-import { interval, IntervalObservable, map, Observable } from '../../src';
+import type { IntervalObservable, Observable } from '../../src';
+import { interval, map } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number

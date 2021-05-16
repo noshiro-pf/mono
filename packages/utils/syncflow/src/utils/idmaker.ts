@@ -1,4 +1,4 @@
-import { ObservableId, SubscriberId, Token } from '../types';
+import type { ObservableId, SubscriberId, Token } from '../types';
 
 function* idMaker(): Generator<number, number, number> {
   let i = 0;
