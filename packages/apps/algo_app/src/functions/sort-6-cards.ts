@@ -1,11 +1,12 @@
-import type { TypeExtends } from '@noshiro/ts-utils';
-import { assertType, pipe, sort } from '@noshiro/ts-utils';
-import type { Card } from '../types/card-type';
-import type { Player6Cards } from '../types/player-6-card';
+import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
+import { pipe, sort } from '@noshiro/ts-utils';
+import type { Card } from '../types';
 
-export const sortCards = (cards: Player6Cards): Player6Cards =>
+export const sortCards = <C extends Card>(
+  cards: ReadonlyArrayOfLength<6, C>
+): ReadonlyArrayOfLength<6, C> =>
   pipe(cards).chain(
-    sort<Card>((a, b) =>
+    sort<C>((a, b) =>
       a.number === b.number
         ? a.color === 'black'
           ? -1
@@ -13,5 +14,3 @@ export const sortCards = (cards: Player6Cards): Player6Cards =>
         : a.number - b.number
     )
   ).value;
-
-assertType<TypeExtends<Player6Cards, readonly Card[]>>();

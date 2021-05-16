@@ -1,28 +1,43 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import type { RectSize } from '@noshiro/ts-utils';
+import type { ReadonlyArrayOfLength, Rect, RectSize } from '@noshiro/ts-utils';
+import { map, pipe } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
-import type { Player6Cards } from '../types/player-6-card';
-import { Card as CardComponent } from './cards/card';
+import { zIndex } from '../constants';
+import type { CardColor, CardNumber, CardWithDisplayValue } from '../types';
+import { CardComponent } from './card';
 
 type Props = Readonly<{
   areaSize: RectSize;
   cardSize: RectSize;
   rotate: 0 | 90 | 180 | 270;
-  cards: Player6Cards;
+  cards: ReadonlyArrayOfLength<6, CardWithDisplayValue>;
   paddingPx: number;
+  windowSize: RectSize;
+  cardPositionsDispatcher: (
+    action: readonly [CardColor, CardNumber, Rect]
+  ) => void;
 }>;
 
 export const PlayerCardsArea = memoNamed(
   'PlayerCardsArea',
-  ({ rotate, areaSize, cardSize, cards, paddingPx }: Props) => {
+  ({
+    rotate,
+    areaSize,
+    cardSize,
+    cards,
+    paddingPx,
+    windowSize,
+    cardPositionsDispatcher,
+  }: Props) => {
     const rotateStyle = useMemo<JSXInternal.CSSProperties>(() => {
       const common = {
         padding: `${paddingPx}px`,
         transform: `rotate(${rotate}deg)`,
         width: `${areaSize.width}px`,
         height: `${areaSize.height}px`,
+        zIndex: zIndex.cards,
       };
       switch (rotate) {
         case 0:
@@ -42,17 +57,44 @@ export const PlayerCardsArea = memoNamed(
       }
     }, [rotate, paddingPx, areaSize]);
 
+    const cardsWithConfig = useMemo<
+      ReadonlyArrayOfLength<
+        6,
+        CardWithDisplayValue &
+          Readonly<{
+            onBoundingClientRectChange: (rect: Rect) => void;
+          }>
+      >
+    >(
+      () =>
+        pipe(cards).chain(
+          map((c: CardWithDisplayValue) => ({
+            ...c,
+            onBoundingClientRectChange: (rect: Rect) => {
+              cardPositionsDispatcher([c.color, c.number, rect]);
+            },
+          }))
+        ).value,
+      [cards, cardPositionsDispatcher]
+    );
+
     return (
       <Container>
         <RotateContainer style={rotateStyle}>
-          {cards.map((c, index) => (
+          {cardsWithConfig.map((c, index) => (
             <CardComponent
               key={index}
-              faceUp={c.faceUp}
               number={c.number}
               color={c.color}
               size={cardSize}
-              visibleToMe={c.visibleToPair}
+              visibilityFromMe={c.visibilityFromMe}
+              isClickable={c.isClickable}
+              float={c.float}
+              showOutline={c.showOutline}
+              outlineColor={c.outlineColor}
+              onClick={c.onClick}
+              windowSize={windowSize}
+              onBoundingClientRectChange={c.onBoundingClientRectChange}
             />
           ))}
         </RotateContainer>
