@@ -22,6 +22,9 @@ cp -r "${TEMPLATE_DIR}/." "${APPS_DIR}/${new_app_name}/"
 new_app_name_kebab=$(echo "${new_app_name}" | sed "s/_/-/g")
 echo ${new_app_name_kebab}
 sed -i "s/react-app-template/${new_app_name_kebab}/" "${APPS_DIR}/${new_app_name}/package.json"
-echo ${new_app_name} >> "${THIS_SCRIPT_DIR}/apps.txt"
+
+APPS_TXT="${THIS_SCRIPT_DIR}/apps.txt"
+echo ${new_app_name} >> ${APPS_TXT}
+sort -o ${APPS_TXT} ${APPS_TXT}
 
 echo "created ${APPS_DIR}/${new_app_name}"
