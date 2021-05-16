@@ -17,7 +17,7 @@
     "deploy:functions": "firebase deploy --only functions",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
-    "fmt": "yarn _prettier",
+    "fmt": "yarn _prettier .",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
     "serve": "firebase serve",
