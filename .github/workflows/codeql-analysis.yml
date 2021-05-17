@@ -13,10 +13,26 @@ name: 'CodeQL'
 
 on:
   push:
-    branches: [main, annotation-tool-dev, dev]
+    branches:
+      - main
+      - '!dev'
+    paths-ignore:
+      - 'docs/**'
+      - 'experimental/**'
+      - '**.md'
+      - '**.txt'
+      - '.gitignore'
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [main]
+    branches:
+      - main
+      - '!dev'
+    paths-ignore:
+      - 'docs/**'
+      - 'experimental/**'
+      - '**.md'
+      - '**.txt'
+      - '.gitignore'
   schedule:
     - cron: '33 9 * * 4'
 
