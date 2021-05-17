@@ -8,10 +8,12 @@ import type {
   Token,
 } from '../types';
 
-export const distinctUntilChanged = <A>(
-  compare: (x: A, y: A) => boolean = (x, y) => x === y
-): ToBaseOperator<A, A> => (parentObservable: Observable<A>) =>
-  new DistinctUntilChangedObservableClass(parentObservable, compare);
+export const distinctUntilChanged =
+  <A>(
+    compare: (x: A, y: A) => boolean = (x, y) => x === y
+  ): ToBaseOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new DistinctUntilChangedObservableClass(parentObservable, compare);
 
 export const distinctUntilChangedI = <A>(
   compare: (x: A, y: A) => boolean = (x, y) => x === y
@@ -23,7 +25,8 @@ export const skipUnchangedI = distinctUntilChangedI; // alias
 
 class DistinctUntilChangedObservableClass<A>
   extends SyncChildObservableClass<A, 'distinctUntilChanged', [A]>
-  implements DistinctUntilChangedOperatorObservable<A> {
+  implements DistinctUntilChangedOperatorObservable<A>
+{
   private readonly _compare: (x: A, y: A) => boolean;
   private _previousValue: Option<A>;
 

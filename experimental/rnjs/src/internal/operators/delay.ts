@@ -1,9 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const delay = <T>(time: number, name: string = ''): Operator<T, T> => (
-  src: RN<T>
-) => new DelayRN<T>(src, time, name);
+export const delay =
+  <T>(time: number, name: string = ''): Operator<T, T> =>
+  (src: RN<T>) =>
+    new DelayRN<T>(src, time, name);
 
 class DelayRN<T> extends RN<T> {
   private readonly time: number;

@@ -1,10 +1,13 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const scan = <T, U>(
-  initialValue: U,
-  fn: (prev: U, curr: T, index?: number) => U
-): Operator<T, U> => (src: RN<T>) => new ScanRN<T, U>(initialValue, src, fn);
+export const scan =
+  <T, U>(
+    initialValue: U,
+    fn: (prev: U, curr: T, index?: number) => U
+  ): Operator<T, U> =>
+  (src: RN<T>) =>
+    new ScanRN<T, U>(initialValue, src, fn);
 
 class ScanRN<T, U> extends RN<U> {
   private scanState: U;

@@ -2,9 +2,10 @@ import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 import { Subscription } from '../types/Subscription';
 
-export const flatMap = <T, U>(fn: (e: T) => RN<U>): Operator<T, U> => (
-  src: RN<T>
-) => new FlatMapRN<T, U>(src, fn);
+export const flatMap =
+  <T, U>(fn: (e: T) => RN<U>): Operator<T, U> =>
+  (src: RN<T>) =>
+    new FlatMapRN<T, U>(src, fn);
 
 class FlatMapRN<T, U> extends RN<U> {
   private latestRN: RN<U>;

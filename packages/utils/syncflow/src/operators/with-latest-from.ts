@@ -10,10 +10,10 @@ import type {
 } from '../types';
 import { maxDepth } from '../utils';
 
-export const withLatestFrom = <A, B>(
-  observable: Observable<B>
-): ToBaseOperator<A, [A, B]> => (parentObservable: Observable<A>) =>
-  new WithLatestFromObservableClass(parentObservable, observable);
+export const withLatestFrom =
+  <A, B>(observable: Observable<B>): ToBaseOperator<A, [A, B]> =>
+  (parentObservable: Observable<A>) =>
+    new WithLatestFromObservableClass(parentObservable, observable);
 
 export const withLatestFromI = <A, B>(
   observable: InitializedObservable<B>
@@ -25,7 +25,8 @@ export const withLatestI = withLatestFromI; // alias
 
 class WithLatestFromObservableClass<A, B>
   extends SyncChildObservableClass<[A, B], 'withLatestFrom', [A]>
-  implements WithLatestFromOperatorObservable<A, B> {
+  implements WithLatestFromOperatorObservable<A, B>
+{
   private readonly _observable: Observable<B>;
 
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {

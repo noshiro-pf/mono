@@ -100,21 +100,17 @@ export type ChildObservable<
   | AsyncChildObservable<A, AsyncChildObservableType, P>
   | SyncChildObservable<A, SyncChildObservableType, P>;
 
-export type RootObservable<
-  A,
-  Type extends RootObservableType
-> = ObservableBase<A> &
-  Readonly<{
-    kind: 'root';
-    type: Type;
-    depth: 0;
-    addDescendant: <B>(child: ChildObservable<B>) => void;
-  }>;
+export type RootObservable<A, Type extends RootObservableType> =
+  ObservableBase<A> &
+    Readonly<{
+      kind: 'root';
+      type: Type;
+      depth: 0;
+      addDescendant: <B>(child: ChildObservable<B>) => void;
+    }>;
 
-export type InitializedRootObservable<
-  A,
-  Type extends RootObservableType
-> = InitializedObservableBase<A> & RootObservable<A, Type>;
+export type InitializedRootObservable<A, Type extends RootObservableType> =
+  InitializedObservableBase<A> & RootObservable<A, Type>;
 
 export type Observable<A> =
   | AsyncChildObservable<A, AsyncChildObservableType>

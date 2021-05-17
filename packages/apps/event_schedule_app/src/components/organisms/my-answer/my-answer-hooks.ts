@@ -74,17 +74,14 @@ export const useMyAnswerHooks = (
     [answers, myAnswer, usernameDuplicateCheckException]
   );
 
-  const [
-    showUserNameError,
-    onUserNameChangeLocal,
-    onUserNameBlur,
-  ] = useFormError(
-    myAnswer.userName,
-    (v) =>
-      v === '' ||
-      theNameIsAlreadyUsedFn(v, answers, usernameDuplicateCheckException),
-    onUserNameChange
-  );
+  const [showUserNameError, onUserNameChangeLocal, onUserNameBlur] =
+    useFormError(
+      myAnswer.userName,
+      (v) =>
+        v === '' ||
+        theNameIsAlreadyUsedFn(v, answers, usernameDuplicateCheckException),
+      onUserNameChange
+    );
 
   const onCommentChange = useCallback(
     (comment) => {
@@ -95,9 +92,10 @@ export const useMyAnswerHooks = (
 
   const answerSelectionMap = useMemo<
     IMap<IDatetimeRange, AnswerSymbolIconId | undefined>
-  >(() => IMap(myAnswer.selection.map((s) => [s.datetimeRange, s.iconId])), [
-    myAnswer.selection,
-  ]);
+  >(
+    () => IMap(myAnswer.selection.map((s) => [s.datetimeRange, s.iconId])),
+    [myAnswer.selection]
+  );
 
   const dispatch = useCallback(
     (action: AnswerSelectionReducerAction) => {

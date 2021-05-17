@@ -9,7 +9,8 @@ export const source = subject; // alias
 
 class SourceObservableClass<A>
   extends RootObservableClass<A, 'Source'>
-  implements SourceObservable<A> {
+  implements SourceObservable<A>
+{
   constructor() {
     super({ type: 'Source', currentValueInit: Option.none });
   }

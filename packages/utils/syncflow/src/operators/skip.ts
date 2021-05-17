@@ -8,16 +8,17 @@ import type {
 } from '../types';
 import { isPositiveInteger } from '../utils';
 
-export const skip = <A>(n: number): RemoveInitializedOperator<A, A> => (
-  parentObservable: Observable<A>
-) =>
-  !isPositiveInteger(n)
-    ? parentObservable
-    : new SkipObservableClass(parentObservable, n);
+export const skip =
+  <A>(n: number): RemoveInitializedOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    !isPositiveInteger(n)
+      ? parentObservable
+      : new SkipObservableClass(parentObservable, n);
 
 class SkipObservableClass<A>
   extends SyncChildObservableClass<A, 'skip', [A]>
-  implements SkipOperatorObservable<A> {
+  implements SkipOperatorObservable<A>
+{
   private readonly _n: number;
   private _counter: number;
 

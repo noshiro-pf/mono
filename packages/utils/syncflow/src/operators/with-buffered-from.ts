@@ -10,10 +10,10 @@ import type {
 } from '../types';
 import { maxDepth } from '../utils';
 
-export const withBufferedFrom = <A, B>(
-  observable: Observable<B>
-): ToBaseOperator<A, [A, B[]]> => (parentObservable: Observable<A>) =>
-  new WithBufferedFromObservableClass(parentObservable, observable);
+export const withBufferedFrom =
+  <A, B>(observable: Observable<B>): ToBaseOperator<A, [A, B[]]> =>
+  (parentObservable: Observable<A>) =>
+    new WithBufferedFromObservableClass(parentObservable, observable);
 
 export const withBufferedFromI = <A, B>(
   observable: InitializedObservable<B>
@@ -25,7 +25,8 @@ export const withBufferedI = withBufferedFromI; // alias
 
 class WithBufferedFromObservableClass<A, B>
   extends SyncChildObservableClass<[A, B[]], 'withBufferedFrom', [A]>
-  implements WithBufferedFromOperatorObservable<A, B> {
+  implements WithBufferedFromOperatorObservable<A, B>
+{
   private readonly _bufferedValues: B[] = [];
 
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {

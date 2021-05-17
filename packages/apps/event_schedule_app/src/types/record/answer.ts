@@ -42,9 +42,8 @@ export const createIAnswerWithoutId: (
   a: StrictOmit<AnswerBaseType, 'id'>
 ) => IAnswer = IAnswerRecordFactory;
 
-export const createIAnswer: (
-  a?: AnswerBaseType
-) => IAnswer = IAnswerRecordFactory;
+export const createIAnswer: (a?: AnswerBaseType) => IAnswer =
+  IAnswerRecordFactory;
 
 const d = IAnswerRecordFactory();
 export const fillAnswer = (p?: PartialAnswer): IAnswer =>

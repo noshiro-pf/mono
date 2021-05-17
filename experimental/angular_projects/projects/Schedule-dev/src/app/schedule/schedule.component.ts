@@ -28,66 +28,65 @@ export class ScheduleComponent implements OnInit {
   readonly answerDeadline$ = this.answerDeadlineFromUI$;
   readonly passwordEnabled$ = this.passwordEnabledFromUI$;
 
-  readonly symbols$: RN<
-    ScheduleSymbol[]
-  > = this.symbolsFromUI$.withInitialValue([
-    {
-      id: 'fav',
-      useThis: false,
-      score: 10,
-      iconName: 'favorite',
-      description: 'できればこの日で',
-    },
-    {
-      id: 'ok',
-      useThis: true,
-      score: 10,
-      iconName: 'radio_button_unchecked',
-      description: '参加可能',
-    },
-    {
-      id: 'maybe',
-      useThis: true,
-      score: 5,
-      iconName: 'change_history',
-      description: '行けるかも',
-    },
-    {
-      id: 'depends',
-      useThis: false,
-      score: 5,
-      iconName: 'watch',
-      description: '時間によります',
-    },
-    {
-      id: 'late',
-      useThis: false,
-      score: 5,
-      iconName: 'schedule',
-      description: '遅れてなら参加可能',
-    },
-    {
-      id: 'unknown',
-      useThis: false,
-      score: 5,
-      iconName: 'help_outline',
-      description: '分からない',
-    },
-    {
-      id: 'ng',
-      useThis: true,
-      score: 0,
-      iconName: 'clear',
-      description: '参加不可',
-    },
-    {
-      id: 'kusonemi',
-      useThis: false,
-      score: 0,
-      iconName: 'hotel',
-      description: '起きられません',
-    },
-  ]);
+  readonly symbols$: RN<ScheduleSymbol[]> =
+    this.symbolsFromUI$.withInitialValue([
+      {
+        id: 'fav',
+        useThis: false,
+        score: 10,
+        iconName: 'favorite',
+        description: 'できればこの日で',
+      },
+      {
+        id: 'ok',
+        useThis: true,
+        score: 10,
+        iconName: 'radio_button_unchecked',
+        description: '参加可能',
+      },
+      {
+        id: 'maybe',
+        useThis: true,
+        score: 5,
+        iconName: 'change_history',
+        description: '行けるかも',
+      },
+      {
+        id: 'depends',
+        useThis: false,
+        score: 5,
+        iconName: 'watch',
+        description: '時間によります',
+      },
+      {
+        id: 'late',
+        useThis: false,
+        score: 5,
+        iconName: 'schedule',
+        description: '遅れてなら参加可能',
+      },
+      {
+        id: 'unknown',
+        useThis: false,
+        score: 5,
+        iconName: 'help_outline',
+        description: '分からない',
+      },
+      {
+        id: 'ng',
+        useThis: true,
+        score: 0,
+        iconName: 'clear',
+        description: '参加不可',
+      },
+      {
+        id: 'kusonemi',
+        useThis: false,
+        score: 0,
+        iconName: 'hotel',
+        description: '起きられません',
+      },
+    ]);
 
   readonly password$: RN<string> = merge(
     this.passwordFromUI$,

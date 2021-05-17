@@ -9,9 +9,10 @@ import type {
   Token,
 } from '../types';
 
-export const auditTime = <A>(millisec: number): ToBaseOperator<A, A> => (
-  parentObservable: Observable<A>
-) => new AuditTimeObservableClass(parentObservable, millisec);
+export const auditTime =
+  <A>(millisec: number): ToBaseOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new AuditTimeObservableClass(parentObservable, millisec);
 
 export const auditTimeI = <A>(
   millisec: number
@@ -20,7 +21,8 @@ export const auditTimeI = <A>(
 
 class AuditTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'auditTime', [A]>
-  implements AuditTimeOperatorObservable<A> {
+  implements AuditTimeOperatorObservable<A>
+{
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
   private _isSkipping: boolean;

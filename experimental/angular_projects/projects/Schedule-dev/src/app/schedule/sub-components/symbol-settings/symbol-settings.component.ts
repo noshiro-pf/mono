@@ -27,16 +27,14 @@ export class SymbolSettingsComponent implements OnInit {
   ngOnInit() {}
 
   symbolChecked(id: string, value: boolean) {
-    (
-      this.symbols.find((e) => e.id === id) || { useThis: false }
-    ).useThis = value;
+    (this.symbols.find((e) => e.id === id) || { useThis: false }).useThis =
+      value;
     this.symbolsChange.emit(this.symbols);
   }
 
   symbolDescriptionChange(id: string, value: string) {
-    (
-      this.symbols.find((e) => e.id === id) || { description: '' }
-    ).description = value;
+    (this.symbols.find((e) => e.id === id) || { description: '' }).description =
+      value;
     this.symbolsChange.emit(this.symbols);
   }
 

@@ -2,10 +2,13 @@ import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 import { Subscription } from '../types/Subscription';
 
-export const flatMap = <T, U>(
-  fn: (srcValue: T, srcIndex: number, index: number) => RN<U>,
-  name: string = ''
-): Operator<T, U> => (src: RN<T>) => new FlatMapRN<T, U>(src, fn, name);
+export const flatMap =
+  <T, U>(
+    fn: (srcValue: T, srcIndex: number, index: number) => RN<U>,
+    name: string = ''
+  ): Operator<T, U> =>
+  (src: RN<T>) =>
+    new FlatMapRN<T, U>(src, fn, name);
 
 class FlatMapRN<T, U> extends RN<U> {
   private latestRN: RN<U>;

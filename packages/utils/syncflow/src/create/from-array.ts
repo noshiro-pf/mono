@@ -10,7 +10,8 @@ export const fromArray = <A>(
 
 class FromArrayObservableClass<A>
   extends RootObservableClass<A, 'FromArray'>
-  implements FromArrayObservable<A> {
+  implements FromArrayObservable<A>
+{
   private readonly _values: readonly A[];
 
   constructor(values: readonly A[], startManually: boolean = false) {

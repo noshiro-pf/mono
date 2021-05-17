@@ -8,18 +8,20 @@ import {
 } from '../custom-operators';
 import { mapToCtrlKeyIsDown } from './map-to-ctrl-key-is-down';
 
-export const mapToSKeyWithCtrl = (): OperatorFunction<
-  readonly ['down' | 'up', KeyboardEventType],
-  KeyboardEventType
-> => (
-  keyEvent$: Observable<readonly ['down' | 'up', KeyboardEventType]>
-): Observable<KeyboardEventType> =>
-  keyEvent$.pipe(
-    filterTargetAlphabetKeyEvent('s'),
-    filterKeyIsDown(),
-    filterByLatest(keyEvent$.pipe(mapToCtrlKeyIsDown())),
-    map((ev) => {
-      ev.preventDefault();
-      return ev;
-    })
-  );
+export const mapToSKeyWithCtrl =
+  (): OperatorFunction<
+    readonly ['down' | 'up', KeyboardEventType],
+    KeyboardEventType
+  > =>
+  (
+    keyEvent$: Observable<readonly ['down' | 'up', KeyboardEventType]>
+  ): Observable<KeyboardEventType> =>
+    keyEvent$.pipe(
+      filterTargetAlphabetKeyEvent('s'),
+      filterKeyIsDown(),
+      filterByLatest(keyEvent$.pipe(mapToCtrlKeyIsDown())),
+      map((ev) => {
+        ev.preventDefault();
+        return ev;
+      })
+    );

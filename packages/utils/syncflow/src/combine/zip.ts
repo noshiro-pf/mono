@@ -24,7 +24,8 @@ export const zipI = <A extends NonEmptyUnknownList>(
 
 class ZipObservableClass<A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, 'zip', A>
-  implements ZipObservable<A> {
+  implements ZipObservable<A>
+{
   private readonly _queues: TupleToQueueTuple<A>;
 
   constructor(parents: Wrap<A>) {
@@ -33,13 +34,11 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
       parents,
       type: 'zip',
       currentValueInit: parentsValues.every(Option.isSome)
-        ? Option.some((parentsValues.map((c) => c.value) as unknown) as A)
+        ? Option.some(parentsValues.map((c) => c.value) as unknown as A)
         : Option.none,
     });
 
-    this._queues = (parents.map(
-      createQueue
-    ) as unknown) as TupleToQueueTuple<A>;
+    this._queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
   }
 
   // overload
@@ -54,7 +53,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     });
 
     if (queues.every((list) => !list.isEmpty)) {
-      const nextValue = (queues.map((q) => q.dequeue()) as unknown) as A;
+      const nextValue = queues.map((q) => q.dequeue()) as unknown as A;
       this.setNext(nextValue, token);
     }
   }

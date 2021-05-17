@@ -26,9 +26,8 @@ const ITimeRangeRecordFactory = IRecord<TimeRangeBaseType>({
   end: createIHoursMinutes(),
 });
 
-export const createITimeRange: (
-  a?: TimeRangeBaseType
-) => ITimeRange = ITimeRangeRecordFactory;
+export const createITimeRange: (a?: TimeRangeBaseType) => ITimeRange =
+  ITimeRangeRecordFactory;
 
 const d = ITimeRangeRecordFactory();
 export const fillTimeRange = (p?: PartialTimeRange): ITimeRange =>

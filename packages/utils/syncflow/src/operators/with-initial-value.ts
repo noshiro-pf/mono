@@ -7,14 +7,15 @@ import type {
   WithInitialValueOperatorObservable,
 } from '../types';
 
-export const withInitialValue = <A, I = A>(
-  initialValue: I
-): ToInitializedOperator<A, A | I> => (parentObservable: Observable<A>) =>
-  new WithInitialValueObservableClass(parentObservable, initialValue);
+export const withInitialValue =
+  <A, I = A>(initialValue: I): ToInitializedOperator<A, A | I> =>
+  (parentObservable: Observable<A>) =>
+    new WithInitialValueObservableClass(parentObservable, initialValue);
 
 class WithInitialValueObservableClass<A, I>
   extends InitializedSyncChildObservableClass<A | I, 'withInitialValue', [A]>
-  implements WithInitialValueOperatorObservable<A, I> {
+  implements WithInitialValueOperatorObservable<A, I>
+{
   constructor(parentObservable: Observable<A>, initialValue: I) {
     super({
       parents: [parentObservable],

@@ -23,9 +23,8 @@ export const useCreateEventScheduleHooks = ({
   newEventSchedule: IEventSchedule;
   eventScheduleValidationOk: boolean;
 }>): CreateEventScheduleHooks => {
-  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] = useBooleanState(
-    false
-  );
+  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =
+    useBooleanState(false);
 
   const [
     createResultDialogIsOpen,

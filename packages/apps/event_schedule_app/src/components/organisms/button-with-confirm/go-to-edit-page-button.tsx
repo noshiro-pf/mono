@@ -84,10 +84,8 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
   ({ isOpen, onClose, onConfirmClick, emailAnswer }) => {
     const [email, setEmail] = useState<string>('');
 
-    const [
-      showValidationFailedMessage,
-      setShowValidationFailedMessage,
-    ] = useState<boolean>(false);
+    const [showValidationFailedMessage, setShowValidationFailedMessage] =
+      useState<boolean>(false);
 
     useEffect(() => {
       // 編集したらエラーメッセージを消す

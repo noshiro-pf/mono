@@ -37,10 +37,9 @@ export class PaginationComponent implements OnInit {
   pageIndice$: RN<number[]>;
 
   constructor() {
-    this.pageLength$ = combine(
-      this.rowSize$,
-      this.itemsPerPage$
-    ).map(([rowSize, itemsPerPage]) => Math.ceil(rowSize / itemsPerPage));
+    this.pageLength$ = combine(this.rowSize$, this.itemsPerPage$).map(
+      ([rowSize, itemsPerPage]) => Math.ceil(rowSize / itemsPerPage)
+    );
 
     this.pageIndice$ = this.pageLength$.map((len) =>
       utils.number.numSeq(1, len)

@@ -1,9 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const throttle = <T>(time: number, name: string): Operator<T, T> => (
-  src: RN<T>
-) => new ThrottleRN<T>(src, time, name);
+export const throttle =
+  <T>(time: number, name: string): Operator<T, T> =>
+  (src: RN<T>) =>
+    new ThrottleRN<T>(src, time, name);
 
 class ThrottleRN<T> extends RN<T> {
   private readonly time: number;

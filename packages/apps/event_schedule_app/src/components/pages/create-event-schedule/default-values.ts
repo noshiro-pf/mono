@@ -48,10 +48,8 @@ export const defaultAnswerDeadline: IYmdHm = ymdhmFromDate(
     .chain((d) => setMinutes(d, 59)).value
 );
 
-export const defaultNotificationSettings: INotificationSettings = createINotificationSettings().set(
-  'notifyOnAnswerChange',
-  true
-);
+export const defaultNotificationSettings: INotificationSettings =
+  createINotificationSettings().set('notifyOnAnswerChange', true);
 
 export const defaultDatetimeSpecification: DatetimeSpecificationEnumType =
   'startSpecified';

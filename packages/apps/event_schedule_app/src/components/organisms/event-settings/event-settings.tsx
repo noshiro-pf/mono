@@ -46,9 +46,8 @@ export const EventSettings = memoNamed<Props>(
   }) => {
     const focusEmailInput$ = useTinyObservable<undefined>();
 
-    const [clickedMoreThanOnce, setClickedMoreThanOnce] = useState<boolean>(
-      false
-    );
+    const [clickedMoreThanOnce, setClickedMoreThanOnce] =
+      useState<boolean>(false);
 
     const onToggleUseNotificationLocal = useCallback(() => {
       onToggleUseNotification();

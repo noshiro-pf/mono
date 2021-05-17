@@ -59,19 +59,21 @@ export const DataTableDataFlow = (
     selectorOptionsAllValueOnly$
   ).map(([settings, options]) => getInitialHeaderValues(settings, options))
 
-  const headerValuesAll$: RN<
-    I.List<HeaderValueType>
-  > = initialHeaderValues$.switchMap((initialHeaderValues) =>
-    merge(headerValueChange$, resetAllClick$.mapTo<'resetAll'>('resetAll'))
-      .scan(
-        initialHeaderValues,
-        (acc: I.List<HeaderValueType>, curr: 'resetAll' | IHeaderValueChange) =>
-          curr === 'resetAll'
-            ? initialHeaderValues
-            : acc.set(curr.columnIndex, curr.value)
-      )
-      .skipUnchanged(I.is)
-  )
+  const headerValuesAll$: RN<I.List<HeaderValueType>> =
+    initialHeaderValues$.switchMap((initialHeaderValues) =>
+      merge(headerValueChange$, resetAllClick$.mapTo<'resetAll'>('resetAll'))
+        .scan(
+          initialHeaderValues,
+          (
+            acc: I.List<HeaderValueType>,
+            curr: 'resetAll' | IHeaderValueChange
+          ) =>
+            curr === 'resetAll'
+              ? initialHeaderValues
+              : acc.set(curr.columnIndex, curr.value)
+        )
+        .skipUnchanged(I.is)
+    )
 
   const headerValuesAllBuffered$ = settings$
     .pluck('bufferTime')

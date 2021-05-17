@@ -7,15 +7,18 @@ import type {
   Token,
 } from '../types';
 
-export const scan = <A, B>(
-  reducer: (acc: B, curr: A) => B,
-  initialValue: B
-): ToInitializedOperator<A, B> => (parentObservable: Observable<A>) =>
-  new ScanObservableClass(parentObservable, reducer, initialValue);
+export const scan =
+  <A, B>(
+    reducer: (acc: B, curr: A) => B,
+    initialValue: B
+  ): ToInitializedOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new ScanObservableClass(parentObservable, reducer, initialValue);
 
 class ScanObservableClass<A, B>
   extends InitializedSyncChildObservableClass<B, 'scan', [A]>
-  implements ScanOperatorObservable<A, B> {
+  implements ScanOperatorObservable<A, B>
+{
   private readonly _reducer: (acc: B, curr: A) => B;
 
   constructor(

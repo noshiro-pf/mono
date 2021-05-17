@@ -19,9 +19,10 @@ export const HeaderCellMultiSelectWithDialog = memo(
   }>) => {
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false)
 
-    const openDialog = useCallback(() => setDialogIsOpen(true), [
-      setDialogIsOpen,
-    ])
+    const openDialog = useCallback(
+      () => setDialogIsOpen(true),
+      [setDialogIsOpen]
+    )
 
     const dialogOkClick = useCallback(
       (v: I.List<number>) => {

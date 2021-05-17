@@ -25,9 +25,8 @@ export const useEditEventScheduleHooks = ({
   newEventSchedule: IEventSchedule;
   eventScheduleValidationOk: boolean;
 }>): EditEventScheduleHooks => {
-  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] = useBooleanState(
-    false
-  );
+  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =
+    useBooleanState(false);
 
   const eventId = useEventId();
 

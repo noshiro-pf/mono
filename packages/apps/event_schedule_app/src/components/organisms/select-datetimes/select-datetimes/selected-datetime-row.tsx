@@ -19,11 +19,11 @@ type Props = Readonly<{
   onDeleteClick: () => void;
 }>;
 
-const onYmdChangeFn = (
-  onIYmdChange: (iymd: IYearMonthDate | undefined) => void
-) => (ymd: YearMonthDate | undefined) => {
-  onIYmdChange(createIYearMonthDate(ymd));
-};
+const onYmdChangeFn =
+  (onIYmdChange: (iymd: IYearMonthDate | undefined) => void) =>
+  (ymd: YearMonthDate | undefined) => {
+    onIYmdChange(createIYearMonthDate(ymd));
+  };
 
 export const SelectedDatetimeRow = memoNamed<Props>(
   'SelectedDatetimeRow',

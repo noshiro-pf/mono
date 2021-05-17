@@ -52,22 +52,15 @@ const toast = createToaster();
 export const useAnswerPageState = (): AnswerPageState => {
   const eventId = useEventId();
 
-  const {
-    fetchEventScheduleThrottled$,
-    fetchAnswersThrottled$,
-    fetchAnswers,
-  } = useFetchEventStreams();
+  const { fetchEventScheduleThrottled$, fetchAnswersThrottled$, fetchAnswers } =
+    useFetchEventStreams();
 
-  const {
-    eventSchedule$,
-    answers$,
-    answersResultTimestamp$,
-    errorType,
-  } = useFetchResults(
-    fetchEventScheduleThrottled$,
-    fetchAnswersThrottled$,
-    eventId
-  );
+  const { eventSchedule$, answers$, answersResultTimestamp$, errorType } =
+    useFetchResults(
+      fetchEventScheduleThrottled$,
+      fetchAnswersThrottled$,
+      eventId
+    );
 
   const [
     //
@@ -83,10 +76,8 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const { myAnswer, setMyAnswer, resetMyAnswer } = useMyAnswer(eventSchedule$);
 
-  const [
-    usernameDuplicateCheckException,
-    setUsernameDuplicateCheckException,
-  ] = useState<UserName | undefined>(undefined);
+  const [usernameDuplicateCheckException, setUsernameDuplicateCheckException] =
+    useState<UserName | undefined>(undefined);
 
   const answerSectionRef = useRef<HTMLDivElement>(null);
 
@@ -214,10 +205,8 @@ export const useAnswerPageState = (): AnswerPageState => {
     [setMyAnswer]
   );
 
-  const {
-    refreshButtonIsLoading,
-    refreshButtonIsDisabled,
-  } = useRefreshButtonState(fetchAnswersThrottled$, answersResultTimestamp$);
+  const { refreshButtonIsLoading, refreshButtonIsDisabled } =
+    useRefreshButtonState(fetchAnswersThrottled$, answersResultTimestamp$);
 
   const isExpired = useMemo<boolean>(
     () =>

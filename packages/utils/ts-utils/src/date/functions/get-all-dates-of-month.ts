@@ -6,10 +6,9 @@ import { newDate } from './new-date';
 import { toTimestamp } from './to-timestamp';
 
 export const getAllDatesOfMonth = (year: YearEnum, month: MonthEnum): Date[] =>
-  range(
-    1 as uint32,
-    (getLastDateNumberOfMonth(year, month) + 1) as uint32
-  ).map((date) => newDate(year, month, date as DateEnum));
+  range(1 as uint32, (getLastDateNumberOfMonth(year, month) + 1) as uint32).map(
+    (date) => newDate(year, month, date as DateEnum)
+  );
 
 export const getAllDatesOfMonthAsTimestamp = (
   year: YearEnum,

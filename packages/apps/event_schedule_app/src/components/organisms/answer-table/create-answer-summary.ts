@@ -20,13 +20,11 @@ export const createAnswerSummary = (
         return [datetimeRange, answerSymbolList.map(() => 0)];
       }
 
-      const answerGroups: IMap<
-        AnswerSymbolIconId | undefined,
-        number
-      > = answersForThisDatetimeRange
-        .groupBy((x) => x)
-        .map((v) => v.count())
-        .toMap();
+      const answerGroups: IMap<AnswerSymbolIconId | undefined, number> =
+        answersForThisDatetimeRange
+          .groupBy((x) => x)
+          .map((v) => v.count())
+          .toMap();
 
       return [
         datetimeRange,
@@ -45,9 +43,8 @@ export const createScore = (
 ): IMap<IDatetimeRange, number> =>
   IMap(
     datetimeRangeList.map((datetimeRange) => {
-      const summaryForThisDatetimeRange:
-        | IList<number>
-        | undefined = answerSummary.get(datetimeRange);
+      const summaryForThisDatetimeRange: IList<number> | undefined =
+        answerSummary.get(datetimeRange);
 
       if (summaryForThisDatetimeRange === undefined) {
         return [datetimeRange, 0];

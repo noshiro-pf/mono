@@ -10,7 +10,8 @@ export const interval = (
 
 class IntervalObservableClass
   extends RootObservableClass<number, 'Interval'>
-  implements IntervalObservable {
+  implements IntervalObservable
+{
   private readonly _millisec: number;
   private _counter: number;
   private _timerId: TimerId | undefined;

@@ -12,12 +12,11 @@ type AnswerSelectionMapKeyBaseType = Readonly<{
 export type IAnswerSelectionMapKey = IRecord<AnswerSelectionMapKeyBaseType> &
   Readonly<AnswerSelectionMapKeyBaseType>;
 
-const IAnswerSelectionMapKeyRecordFactory = IRecord<AnswerSelectionMapKeyBaseType>(
-  {
+const IAnswerSelectionMapKeyRecordFactory =
+  IRecord<AnswerSelectionMapKeyBaseType>({
     answerId: answerId(''),
     datetimeRange: createIDatetimeRange(),
-  }
-);
+  });
 
 export const createAnswerSelectionMapKey: (
   a?: AnswerSelectionMapKeyBaseType

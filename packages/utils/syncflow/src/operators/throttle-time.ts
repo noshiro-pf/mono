@@ -9,9 +9,10 @@ import type {
   Token,
 } from '../types';
 
-export const throttleTime = <A>(millisec: number): ToBaseOperator<A, A> => (
-  parentObservable: Observable<A>
-) => new ThrottleTimeObservableClass(parentObservable, millisec);
+export const throttleTime =
+  <A>(millisec: number): ToBaseOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new ThrottleTimeObservableClass(parentObservable, millisec);
 
 export const throttleTimeI = <A>(
   millisec: number
@@ -20,7 +21,8 @@ export const throttleTimeI = <A>(
 
 class ThrottleTimeObservableClass<A>
   extends SyncChildObservableClass<A, 'throttleTime', [A]>
-  implements ThrottleTimeOperatorObservable<A> {
+  implements ThrottleTimeOperatorObservable<A>
+{
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
   private _isSkipping: boolean;

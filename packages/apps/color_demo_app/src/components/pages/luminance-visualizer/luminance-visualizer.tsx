@@ -16,9 +16,8 @@ export const LuminanceVisualizer = memoNamed('LuminanceVisualizer', () => {
   const [lightness, setLightness] = useState<Percent>(lightnessInit);
   const [firstHue, setFirstHue] = useState<Hue>(hueInit);
 
-  const [divisionNumber, setDivisionNumber] = useState<uint32>(
-    divisionNumberInit
-  );
+  const [divisionNumber, setDivisionNumber] =
+    useState<uint32>(divisionNumberInit);
 
   /* values */
   const {

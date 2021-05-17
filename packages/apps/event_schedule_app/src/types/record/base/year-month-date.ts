@@ -23,9 +23,8 @@ export const createIYearMonthDate: (
   a?: YearMonthDateBaseType
 ) => IYearMonthDate = IYearMonthDateRecordFactory;
 
-export const fillYearMonthDate: (
-  a?: PartialYearMonthDate
-) => IYearMonthDate = IYearMonthDateRecordFactory;
+export const fillYearMonthDate: (a?: PartialYearMonthDate) => IYearMonthDate =
+  IYearMonthDateRecordFactory;
 
 export const compareYmd = (
   a: IYearMonthDate,

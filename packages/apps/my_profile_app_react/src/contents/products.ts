@@ -16,8 +16,7 @@ export const products: {
 } = {
   libraries: [
     {
-      link:
-        'https://github.com/noshiro-pf/mono/tree/master/packages/utils/syncflow',
+      link: 'https://github.com/noshiro-pf/mono/tree/master/packages/utils/syncflow',
       title: 'SyncFlow',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
       body1:
@@ -26,8 +25,7 @@ export const products: {
       imageUrl: '',
     },
     {
-      link:
-        'https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs',
+      link: 'https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs',
       title: 'rnjs',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
       body1:
@@ -157,8 +155,7 @@ export const products: {
       imageUrl: '',
     },
     {
-      link:
-        'https://tools-8af31.firebaseapp.com/#/tools-collection/json-pretty-print',
+      link: 'https://tools-8af31.firebaseapp.com/#/tools-collection/json-pretty-print',
       title: 'JSON pretty print',
       subtitle: 'JSONテキストデータの整形',
       body1: 'Chrome推奨。難読化されたJSONテキストデータを整形して出力する',

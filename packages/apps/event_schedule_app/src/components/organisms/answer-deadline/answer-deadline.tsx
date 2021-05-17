@@ -25,25 +25,26 @@ const toYmdhm = mapNullable<IYmdHm, Ymdhm>(({ ymd, hm }) => ({
   minutes: hm.minutes,
 }));
 
-const onYmdHmChangeFn = (
-  onIYmdChange: (iymdhm: IYmdHm | undefined) => void
-) => (ymdhm: Ymdhm | undefined): void => {
-  onIYmdChange(
-    mapNullable((_ymdhm: Ymdhm) =>
-      createIYmdHm({
-        ymd: createIYearMonthDate(_ymdhm),
-        hm: createIHoursMinutes(_ymdhm),
-      })
-    )(ymdhm)
-  );
-};
+const onYmdHmChangeFn =
+  (onIYmdChange: (iymdhm: IYmdHm | undefined) => void) =>
+  (ymdhm: Ymdhm | undefined): void => {
+    onIYmdChange(
+      mapNullable((_ymdhm: Ymdhm) =>
+        createIYmdHm({
+          ymd: createIYearMonthDate(_ymdhm),
+          hm: createIHoursMinutes(_ymdhm),
+        })
+      )(ymdhm)
+    );
+  };
 
 export const AnswerDeadlineDatepicker = memoNamed<Props>(
   'AnswerDeadlineDatepicker',
   ({ useAnswerDeadline, answerDeadline, onAnswerDeadlineChange }) => {
-    const answerDeadlineYmdhm = useMemo(() => toYmdhm(answerDeadline), [
-      answerDeadline,
-    ]);
+    const answerDeadlineYmdhm = useMemo(
+      () => toYmdhm(answerDeadline),
+      [answerDeadline]
+    );
 
     const showError: boolean =
       useAnswerDeadline && answerDeadline === undefined;

@@ -31,46 +31,44 @@ const createStreams = (
   };
 };
 
-export const distinctUntilChangedTestCases: [
-  StreamTestCase<[number, number]>
-] = [
-  {
-    name: 'distinctUntilChanged case 1',
-    expectedOutput: [
-      [0, 0],
-      [1, 3],
-      [2, 6],
-      [3, 9],
-    ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, withLatest$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        withLatest$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
-    },
-    preview: (tick: number): void => {
-      const { counter$, distinctUntilChanged$, withLatest$ } = createStreams(
-        tick
-      );
+export const distinctUntilChangedTestCases: [StreamTestCase<[number, number]>] =
+  [
+    {
+      name: 'distinctUntilChanged case 1',
+      expectedOutput: [
+        [0, 0],
+        [1, 3],
+        [2, 6],
+        [3, 9],
+      ],
+      run: (take: number, tick: number): Promise<[number, number][]> => {
+        const { counter$, withLatest$ } = createStreams(tick);
+        return getStreamOutputAsPromise(
+          withLatest$,
+          take,
+          () => {
+            counter$.start();
+          },
+          () => {
+            counter$.complete();
+          }
+        );
+      },
+      preview: (tick: number): void => {
+        const { counter$, distinctUntilChanged$, withLatest$ } =
+          createStreams(tick);
 
-      counter$.subscribe((a) => {
-        console.log('counter', a);
-      });
-      distinctUntilChanged$.subscribe((a) => {
-        console.log('distinctUntilChanged', a);
-      });
-      withLatest$.subscribe((a) => {
-        console.log('withLatest', a);
-      });
+        counter$.subscribe((a) => {
+          console.log('counter', a);
+        });
+        distinctUntilChanged$.subscribe((a) => {
+          console.log('distinctUntilChanged', a);
+        });
+        withLatest$.subscribe((a) => {
+          console.log('withLatest', a);
+        });
 
-      counter$.start();
+        counter$.start();
+      },
     },
-  },
-];
+  ];

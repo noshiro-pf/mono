@@ -3,15 +3,15 @@ import { Operator } from '../types/Operator';
 import { Subscription } from '../types/Subscription';
 import { noop } from '../utils';
 
-export const terminateBy = <T>(
-  terminator: RN<void>,
-  name: string
-): Operator<T, T> => (src: RN<T>) => new TakeUntilRN<T>(src, terminator, name);
+export const terminateBy =
+  <T>(terminator: RN<void>, name: string): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeUntilRN<T>(src, terminator, name);
 
-export const takeUntil = <T>(
-  terminator: RN<void>,
-  name: string
-): Operator<T, T> => (src: RN<T>) => new TakeUntilRN<T>(src, terminator, name);
+export const takeUntil =
+  <T>(terminator: RN<void>, name: string): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeUntilRN<T>(src, terminator, name);
 
 class TakeUntilRN<T> extends RN<T> {
   private readonly subscription: Subscription;

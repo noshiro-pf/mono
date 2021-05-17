@@ -19,9 +19,8 @@ export const useLambdaEval = (
 ): InitializedObservable<string> => {
   const inputBuffered$ = input$.chain(debounceTimeI(200 /* ms */));
 
-  const parseTree$: InitializedObservable<
-    LambdaTerm | undefined
-  > = inputBuffered$.chain(mapI(parseLambdaTerm));
+  const parseTree$: InitializedObservable<LambdaTerm | undefined> =
+    inputBuffered$.chain(mapI(parseLambdaTerm));
 
   const evalSequence$: InitializedObservable<LambdaTerm[]> = parseTree$
     .chain(filter(isNotUndefined))

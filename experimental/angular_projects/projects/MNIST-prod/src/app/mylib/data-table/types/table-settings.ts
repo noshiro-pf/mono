@@ -47,9 +47,7 @@ export class TableSettings implements ITableSettingsFilled {
       this.displayNo = !!initializer.displayNo;
       this.usepagination = !!initializer.usepagination;
       this.itemsPerPageOptions = initializer.itemsPerPageOptions || [
-        25,
-        50,
-        100,
+        25, 50, 100,
       ];
       this.itemsPerPageInit = initializer.itemsPerPageInit || 25;
       this.sortInit = initializer.sortInit || {

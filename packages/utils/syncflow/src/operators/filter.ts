@@ -22,7 +22,8 @@ export function filter<A>(
 
 class FilterObservableClass<A>
   extends SyncChildObservableClass<A, 'filter', [A]>
-  implements FilterOperatorObservable<A> {
+  implements FilterOperatorObservable<A>
+{
   private readonly _predicate: (x: A) => boolean;
 
   constructor(parentObservable: Observable<A>, predicate: (x: A) => boolean) {

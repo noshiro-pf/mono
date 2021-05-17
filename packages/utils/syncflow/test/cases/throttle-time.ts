@@ -79,9 +79,8 @@ export const throttleTimeTestCases: [
       );
     },
     preview: (tick: number): void => {
-      const { counter$, filtered$, throttleTime$, merged$ } = createStreams(
-        tick
-      );
+      const { counter$, filtered$, throttleTime$, merged$ } =
+        createStreams(tick);
 
       filtered$.subscribe((a) => {
         console.log('filtered', a);

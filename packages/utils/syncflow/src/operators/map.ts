@@ -8,9 +8,10 @@ import type {
   Token,
 } from '../types';
 
-export const map = <A, B>(mapFn: (x: A) => B): ToBaseOperator<A, B> => (
-  parentObservable: Observable<A>
-) => new MapObservableClass(parentObservable, mapFn);
+export const map =
+  <A, B>(mapFn: (x: A) => B): ToBaseOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new MapObservableClass(parentObservable, mapFn);
 
 export const mapI = <A, B>(
   mapFn: (x: A) => B
@@ -19,7 +20,8 @@ export const mapI = <A, B>(
 
 class MapObservableClass<A, B>
   extends SyncChildObservableClass<B, 'map', [A]>
-  implements MapOperatorObservable<A, B> {
+  implements MapOperatorObservable<A, B>
+{
   private readonly _mapFn: (x: A) => B;
 
   constructor(parentObservable: Observable<A>, mapFn: (x: A) => B) {

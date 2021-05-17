@@ -8,14 +8,17 @@ import type {
   Token,
 } from '../types';
 
-export const switchMap = <A, B>(
-  mapToObservable: (curr: A) => Observable<B>
-): RemoveInitializedOperator<A, B> => (parentObservable: Observable<A>) =>
-  new SwitchMapObservableClass(parentObservable, mapToObservable);
+export const switchMap =
+  <A, B>(
+    mapToObservable: (curr: A) => Observable<B>
+  ): RemoveInitializedOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new SwitchMapObservableClass(parentObservable, mapToObservable);
 
 class SwitchMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'switchMap', [A]>
-  implements SwitchMapOperatorObservable<A, B> {
+  implements SwitchMapOperatorObservable<A, B>
+{
   private readonly _mapToObservable: (curr: A) => Observable<B>;
   private _observable: Observable<B> | undefined;
   private _subscription: Subscription | undefined;

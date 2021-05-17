@@ -27,14 +27,15 @@ export const combine = combineLatest; // alias
 
 class CombineLatestObservableClass<A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, 'combineLatest', A>
-  implements CombineLatestObservable<A> {
+  implements CombineLatestObservable<A>
+{
   constructor(parents: Wrap<A>) {
     const parentsValues = parents.map((p) => p.currentValue);
     super({
       parents,
       type: 'combineLatest',
       currentValueInit: parentsValues.every(Option.isSome)
-        ? Option.some((parentsValues.map((c) => c.value) as unknown) as A)
+        ? Option.some(parentsValues.map((c) => c.value) as unknown as A)
         : Option.none,
     });
   }
@@ -45,7 +46,7 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
 
     const parentValues = this.parents.map((a) => a.currentValue);
     if (parentValues.every(Option.isSome)) {
-      const nextValue = (parentValues.map((a) => a.value) as unknown) as A;
+      const nextValue = parentValues.map((a) => a.value) as unknown as A;
       this.setNext(nextValue, token);
     }
   }

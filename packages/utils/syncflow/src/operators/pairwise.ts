@@ -7,13 +7,15 @@ import type {
   Token,
 } from '../types';
 
-export const pairwise = <A>(): RemoveInitializedOperator<A, [A, A]> => (
-  parentObservable: Observable<A>
-) => new PairwiseObservableClass(parentObservable);
+export const pairwise =
+  <A>(): RemoveInitializedOperator<A, [A, A]> =>
+  (parentObservable: Observable<A>) =>
+    new PairwiseObservableClass(parentObservable);
 
 class PairwiseObservableClass<A>
   extends SyncChildObservableClass<[A, A], 'pairwise', [A]>
-  implements PairwiseOperatorObservable<A> {
+  implements PairwiseOperatorObservable<A>
+{
   private _previousValue: Option<A> = Option.none;
   constructor(parentObservable: Observable<A>) {
     super({

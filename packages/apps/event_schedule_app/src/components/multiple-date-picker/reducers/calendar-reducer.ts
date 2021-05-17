@@ -14,10 +14,11 @@ export type CalendarCurrentPageReducerAction = Readonly<
   | { type: 'today' }
 >;
 
-export const calendarCurrentPageInitialState = (): CalendarCurrentPageReducerState => ({
-  year: getYear(today()),
-  month: getMonth(today()),
-});
+export const calendarCurrentPageInitialState =
+  (): CalendarCurrentPageReducerState => ({
+    year: getYear(today()),
+    month: getMonth(today()),
+  });
 
 export const calendarCurrentPageReducer: ReducerType<
   CalendarCurrentPageReducerState,

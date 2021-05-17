@@ -24,13 +24,15 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
     events.flatMap(([eventId, ev]) => {
       const ns = ev.notificationSettings;
 
-      return ([
-        [ns.notify01daysBeforeAnswerDeadline, 1],
-        [ns.notify03daysBeforeAnswerDeadline, 3],
-        [ns.notify07daysBeforeAnswerDeadline, 7],
-        [ns.notify14daysBeforeAnswerDeadline, 14],
-        [ns.notify28daysBeforeAnswerDeadline, 28],
-      ] as [boolean, 1 | 3 | 7 | 14 | 28][])
+      return (
+        [
+          [ns.notify01daysBeforeAnswerDeadline, 1],
+          [ns.notify03daysBeforeAnswerDeadline, 3],
+          [ns.notify07daysBeforeAnswerDeadline, 7],
+          [ns.notify14daysBeforeAnswerDeadline, 14],
+          [ns.notify28daysBeforeAnswerDeadline, 28],
+        ] as [boolean, 1 | 3 | 7 | 14 | 28][]
+      )
         .filter(
           ([flag, diff]) =>
             flag && todayIsNDaysBeforeDeadline(diff, ev.answerDeadline.ymd)

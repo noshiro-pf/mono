@@ -17,8 +17,8 @@ export type PartialNotificationSettings = Partial<
 export type INotificationSettings = IRecord<NotificationSettingsBaseType> &
   Readonly<NotificationSettingsBaseType>;
 
-const INotificationSettingsRecordFactory = IRecord<NotificationSettingsBaseType>(
-  {
+const INotificationSettingsRecordFactory =
+  IRecord<NotificationSettingsBaseType>({
     email: '',
     notifyOnAnswerChange: false,
     notify01daysBeforeAnswerDeadline: false,
@@ -26,8 +26,7 @@ const INotificationSettingsRecordFactory = IRecord<NotificationSettingsBaseType>
     notify07daysBeforeAnswerDeadline: false,
     notify14daysBeforeAnswerDeadline: false,
     notify28daysBeforeAnswerDeadline: false,
-  }
-);
+  });
 
 export const createINotificationSettings: (
   a?: NotificationSettingsBaseType

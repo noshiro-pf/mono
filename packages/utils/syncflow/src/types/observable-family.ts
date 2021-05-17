@@ -41,10 +41,8 @@ export type TimerObservable = RootObservable<number, 'Timer'> & {
 
 // InitilaizedSyncChildObservable
 
-export type WithInitialValueOperatorObservable<
-  A,
-  I = A
-> = InitializedSyncChildObservable<A | I, 'withInitialValue', [A]>;
+export type WithInitialValueOperatorObservable<A, I = A> =
+  InitializedSyncChildObservable<A | I, 'withInitialValue', [A]>;
 export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
   B,
   'scan',
@@ -53,17 +51,14 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 
 // SyncChildObservable
 
-export type InitializedCombineLatestObservable<
-  A extends NonEmptyUnknownList
-> = InitializedSyncChildObservable<A, 'combineLatest', A>;
+export type InitializedCombineLatestObservable<A extends NonEmptyUnknownList> =
+  InitializedSyncChildObservable<A, 'combineLatest', A>;
 
-export type CombineLatestObservable<
-  A extends NonEmptyUnknownList
-> = SyncChildObservable<A, 'combineLatest', A>;
+export type CombineLatestObservable<A extends NonEmptyUnknownList> =
+  SyncChildObservable<A, 'combineLatest', A>;
 
-export type InitializedZipObservable<
-  A extends NonEmptyUnknownList
-> = InitializedSyncChildObservable<A, 'zip', A>;
+export type InitializedZipObservable<A extends NonEmptyUnknownList> =
+  InitializedSyncChildObservable<A, 'zip', A>;
 
 export type ZipObservable<A extends NonEmptyUnknownList> = SyncChildObservable<
   A,
@@ -71,13 +66,11 @@ export type ZipObservable<A extends NonEmptyUnknownList> = SyncChildObservable<
   A
 >;
 
-export type InitializedMergeObservable<
-  P extends NonEmptyUnknownList
-> = InitializedSyncChildObservable<ArrayElement<P>, 'merge', P>;
+export type InitializedMergeObservable<P extends NonEmptyUnknownList> =
+  InitializedSyncChildObservable<ArrayElement<P>, 'merge', P>;
 
-export type MergeObservable<
-  P extends NonEmptyUnknownList
-> = SyncChildObservable<ArrayElement<P>, 'merge', P>;
+export type MergeObservable<P extends NonEmptyUnknownList> =
+  SyncChildObservable<ArrayElement<P>, 'merge', P>;
 
 export type MapOperatorObservable<A, B> = SyncChildObservable<B, 'map', [A]>;
 export type MapWithIndexOperatorObservable<A, B> = SyncChildObservable<

@@ -8,10 +8,10 @@ import type {
   Token,
 } from '../types';
 
-export const mapWithIndex = <A, B>(
-  mapFn: (x: A, index: number) => B
-): ToBaseOperator<A, B> => (parentObservable: Observable<A>) =>
-  new MapWithIndexObservableClass(parentObservable, mapFn);
+export const mapWithIndex =
+  <A, B>(mapFn: (x: A, index: number) => B): ToBaseOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new MapWithIndexObservableClass(parentObservable, mapFn);
 
 export const mapWithIndexI = <A, B>(
   mapFn: (x: A, index: number) => B
@@ -20,7 +20,8 @@ export const mapWithIndexI = <A, B>(
 
 class MapWithIndexObservableClass<A, B>
   extends SyncChildObservableClass<B, 'mapWithIndex', [A]>
-  implements MapWithIndexOperatorObservable<A, B> {
+  implements MapWithIndexOperatorObservable<A, B>
+{
   private readonly _mapFn: (x: A, index: number) => B;
   private _index: number;
 

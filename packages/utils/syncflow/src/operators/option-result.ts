@@ -13,9 +13,10 @@ import type {
   UnwrapResultOkOperatorObservable,
 } from '../types';
 
-export const unwrapOption = <A>(): ToBaseOperator<Option<A>, A | undefined> => (
-  parentObservable: Observable<Option<A>>
-) => new UnwrapOptionObservableClass(parentObservable);
+export const unwrapOption =
+  <A>(): ToBaseOperator<Option<A>, A | undefined> =>
+  (parentObservable: Observable<Option<A>>) =>
+    new UnwrapOptionObservableClass(parentObservable);
 
 export const unwrapOptionI = <A>(): InitializedToInitializedOperator<
   Option<A>,
@@ -23,11 +24,10 @@ export const unwrapOptionI = <A>(): InitializedToInitializedOperator<
 > =>
   unwrapOption() as InitializedToInitializedOperator<Option<A>, A | undefined>;
 
-export const unwrapResultOk = <S, E>(): ToBaseOperator<
-  Result<S, E>,
-  S | undefined
-> => (parentObservable: Observable<Result<S, E>>) =>
-  new UnwrapResultOkObservableClass(parentObservable);
+export const unwrapResultOk =
+  <S, E>(): ToBaseOperator<Result<S, E>, S | undefined> =>
+  (parentObservable: Observable<Result<S, E>>) =>
+    new UnwrapResultOkObservableClass(parentObservable);
 
 export const unwrapResultOkI = <S, E>(): InitializedToInitializedOperator<
   Result<S, E>,
@@ -38,11 +38,10 @@ export const unwrapResultOkI = <S, E>(): InitializedToInitializedOperator<
     S | undefined
   >;
 
-export const unwrapResultErr = <S, E>(): ToBaseOperator<
-  Result<S, E>,
-  E | undefined
-> => (parentObservable: Observable<Result<S, E>>) =>
-  new UnwrapResultErrObservableClass(parentObservable);
+export const unwrapResultErr =
+  <S, E>(): ToBaseOperator<Result<S, E>, E | undefined> =>
+  (parentObservable: Observable<Result<S, E>>) =>
+    new UnwrapResultErrObservableClass(parentObservable);
 
 export const unwrapResultErrI = <S, E>(): InitializedToInitializedOperator<
   Result<S, E>,
@@ -53,22 +52,22 @@ export const unwrapResultErrI = <S, E>(): InitializedToInitializedOperator<
     E | undefined
   >;
 
-export const mapOption = <A, B>(
-  mapFn: (x: A) => B
-): ToBaseOperator<Option<A>, Option<B>> => (
-  parentObservable: Observable<Option<A>>
-) => new MapOptionObservableClass(parentObservable, mapFn);
+export const mapOption =
+  <A, B>(mapFn: (x: A) => B): ToBaseOperator<Option<A>, Option<B>> =>
+  (parentObservable: Observable<Option<A>>) =>
+    new MapOptionObservableClass(parentObservable, mapFn);
 
 export const mapOptionI = <A, B>(
   mapFn: (x: A) => B
 ): InitializedToInitializedOperator<Option<A>, Option<B>> =>
   mapOption(mapFn) as InitializedToInitializedOperator<Option<A>, Option<B>>;
 
-export const mapResultOk = <S, S2, E>(
-  mapFn: (x: S) => S2
-): ToBaseOperator<Result<S, E>, Result<S2, E>> => (
-  parentObservable: Observable<Result<S, E>>
-) => new MapResultOkObservableClass(parentObservable, mapFn);
+export const mapResultOk =
+  <S, S2, E>(
+    mapFn: (x: S) => S2
+  ): ToBaseOperator<Result<S, E>, Result<S2, E>> =>
+  (parentObservable: Observable<Result<S, E>>) =>
+    new MapResultOkObservableClass(parentObservable, mapFn);
 
 export const mapResultOkI = <S, S2, E>(
   mapFn: (x: S) => S2
@@ -78,11 +77,12 @@ export const mapResultOkI = <S, S2, E>(
     Result<S2, E>
   >;
 
-export const mapResultErr = <S, E, E2>(
-  mapFn: (x: E) => E2
-): ToBaseOperator<Result<S, E>, Result<S, E2>> => (
-  parentObservable: Observable<Result<S, E>>
-) => new MapResultErrObservableClass(parentObservable, mapFn);
+export const mapResultErr =
+  <S, E, E2>(
+    mapFn: (x: E) => E2
+  ): ToBaseOperator<Result<S, E>, Result<S, E2>> =>
+  (parentObservable: Observable<Result<S, E>>) =>
+    new MapResultErrObservableClass(parentObservable, mapFn);
 
 export const mapResultErrI = <S, E, E2>(
   mapFn: (x: E) => E2
@@ -94,7 +94,8 @@ export const mapResultErrI = <S, E, E2>(
 
 class UnwrapOptionObservableClass<A>
   extends SyncChildObservableClass<A | undefined, 'unwrapOption', [Option<A>]>
-  implements UnwrapOptionOperatorObservable<A> {
+  implements UnwrapOptionOperatorObservable<A>
+{
   constructor(parentObservable: Observable<Option<A>>) {
     super({
       parents: [parentObservable],
@@ -120,7 +121,8 @@ class UnwrapResultOkObservableClass<S, E>
     'unwrapResultOk',
     [Result<S, E>]
   >
-  implements UnwrapResultOkOperatorObservable<S, E> {
+  implements UnwrapResultOkOperatorObservable<S, E>
+{
   constructor(parentObservable: Observable<Result<S, E>>) {
     super({
       parents: [parentObservable],
@@ -146,7 +148,8 @@ class UnwrapResultErrObservableClass<S, E>
     'unwrapResultErr',
     [Result<S, E>]
   >
-  implements UnwrapResultErrOperatorObservable<S, E> {
+  implements UnwrapResultErrOperatorObservable<S, E>
+{
   constructor(parentObservable: Observable<Result<S, E>>) {
     super({
       parents: [parentObservable],
@@ -168,7 +171,8 @@ class UnwrapResultErrObservableClass<S, E>
 
 class MapOptionObservableClass<A, B>
   extends SyncChildObservableClass<Option<B>, 'mapOption', [Option<A>]>
-  implements MapOptionOperatorObservable<A, B> {
+  implements MapOptionOperatorObservable<A, B>
+{
   private readonly _mapFn: (x: A) => B;
 
   constructor(parentObservable: Observable<Option<A>>, mapFn: (x: A) => B) {
@@ -193,7 +197,8 @@ class MapOptionObservableClass<A, B>
 
 class MapResultOkObservableClass<S, S2, E>
   extends SyncChildObservableClass<Result<S2, E>, 'mapResultOk', [Result<S, E>]>
-  implements MapResultOkOperatorObservable<S, S2, E> {
+  implements MapResultOkOperatorObservable<S, S2, E>
+{
   private readonly _mapFn: (x: S) => S2;
 
   constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: S) => S2) {
@@ -225,7 +230,8 @@ class MapResultErrObservableClass<S, E, E2>
     'mapResultErr',
     [Result<S, E>]
   >
-  implements MapResultErrOperatorObservable<S, E, E2> {
+  implements MapResultErrOperatorObservable<S, E, E2>
+{
   private readonly _mapFn: (x: E) => E2;
 
   constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: E) => E2) {

@@ -16,7 +16,8 @@ export const merge = <P extends NonEmptyUnknownList>(
 
 class MergeObservableClass<P extends NonEmptyUnknownList>
   extends SyncChildObservableClass<ArrayElement<P>, 'merge', P>
-  implements MergeObservable<P> {
+  implements MergeObservable<P>
+{
   constructor(parents: Wrap<P>) {
     super({
       parents,

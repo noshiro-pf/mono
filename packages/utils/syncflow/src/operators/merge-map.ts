@@ -8,16 +8,19 @@ import type {
   Token,
 } from '../types';
 
-export const mergeMap = <A, B>(
-  mapToObservable: (curr: A) => Observable<B>
-): RemoveInitializedOperator<A, B> => (parentObservable: Observable<A>) =>
-  new MergeMapObservableClass(parentObservable, mapToObservable);
+export const mergeMap =
+  <A, B>(
+    mapToObservable: (curr: A) => Observable<B>
+  ): RemoveInitializedOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new MergeMapObservableClass(parentObservable, mapToObservable);
 
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'mergeMap', [A]>
-  implements MergeMapOperatorObservable<A, B> {
+  implements MergeMapOperatorObservable<A, B>
+{
   private readonly _mapToObservable: (curr: A) => Observable<B>;
   private readonly _observables: Observable<B>[];
   private readonly _subscriptions: Subscription[];

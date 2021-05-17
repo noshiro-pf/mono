@@ -1,12 +1,14 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const filter = <T>(
-  initialValue: T,
-  predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
-  name: string = ''
-): Operator<T, T> => (src: RN<T>) =>
-  new FilterRN<T>(src, initialValue, predicate, name);
+export const filter =
+  <T>(
+    initialValue: T,
+    predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
+    name: string = ''
+  ): Operator<T, T> =>
+  (src: RN<T>) =>
+    new FilterRN<T>(src, initialValue, predicate, name);
 
 class FilterRN<T> extends RN<T> {
   private readonly predicate: (

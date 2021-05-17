@@ -17,13 +17,11 @@ const IHoursMinutesRecordFactory = IRecord<HoursMinutesBaseType>({
   minutes: 0,
 });
 
-export const createIHoursMinutes: (
-  a?: HoursMinutesBaseType
-) => IHoursMinutes = IHoursMinutesRecordFactory;
+export const createIHoursMinutes: (a?: HoursMinutesBaseType) => IHoursMinutes =
+  IHoursMinutesRecordFactory;
 
-export const fillHoursMinutes: (
-  a?: PartialHoursMinutes
-) => IHoursMinutes = IHoursMinutesRecordFactory;
+export const fillHoursMinutes: (a?: PartialHoursMinutes) => IHoursMinutes =
+  IHoursMinutesRecordFactory;
 
 export const compareHm = (a: IHoursMinutes, b: IHoursMinutes): -1 | 0 | 1 => {
   if (a.hours !== b.hours) return sign(a.hours - b.hours);

@@ -10,7 +10,8 @@ export type SelectedDatesReducerAction = Readonly<
 
 export type SelectedDatesReducerState = ISet<IYearMonthDate>;
 
-export const selectedDatesReducerInitialState: SelectedDatesReducerState = ISet<IYearMonthDate>();
+export const selectedDatesReducerInitialState: SelectedDatesReducerState =
+  ISet<IYearMonthDate>();
 
 export const selectedDatesReducer: ReducerType<
   SelectedDatesReducerState,

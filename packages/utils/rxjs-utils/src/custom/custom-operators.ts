@@ -10,9 +10,8 @@ export const mapToConst = <T extends PrimitiveType>(
   constant: T
 ): OperatorFunction<unknown, T> => mapTo(constant);
 
-export const get: <T, K extends keyof T>(
-  key: K
-) => OperatorFunction<T, T[K]> = pluck;
+export const get: <T, K extends keyof T>(key: K) => OperatorFunction<T, T[K]> =
+  pluck;
 
 export const valueIs = <S, T extends S>(
   value: T
@@ -22,13 +21,13 @@ export const valueIsNot = <S, T extends S>(
   value: T
 ): OperatorFunction<S, boolean> => map((v) => !Object.is(v, value));
 
-export const filterValue = <S, T extends S>(
-  value: T
-): OperatorFunction<S, T> => (input$: Observable<S>): Observable<T> =>
-  input$.pipe(
-    filter((v) => Object.is(v, value)),
-    map((e) => e as T)
-  );
+export const filterValue =
+  <S, T extends S>(value: T): OperatorFunction<S, T> =>
+  (input$: Observable<S>): Observable<T> =>
+    input$.pipe(
+      filter((v) => Object.is(v, value)),
+      map((e) => e as T)
+    );
 
 export const filterNotValue = <S, T extends S>(
   value: T
@@ -40,36 +39,37 @@ export const filterNotUndefined = <T>(): OperatorFunction<
   Exclude<T, undefined>
 > => filter(isNotUndefined);
 
-export const filterByLatest = (condition$: Observable<boolean>) => <T>(
-  input$: Observable<T>
-): Observable<T> =>
-  input$.pipe(
-    withLatestFrom(condition$),
-    filter(([_value, condition]) => condition),
-    map(([value, _condition]) => value)
-  );
+export const filterByLatest =
+  (condition$: Observable<boolean>) =>
+  <T>(input$: Observable<T>): Observable<T> =>
+    input$.pipe(
+      withLatestFrom(condition$),
+      filter(([_value, condition]) => condition),
+      map(([value, _condition]) => value)
+    );
 
-export const filterByAll = (...conditions: readonly Observable<boolean>[]) => <
-  T
->(
-  input$: Observable<T>
-): Observable<T> => input$.pipe(filterByLatest(every(...conditions)));
+export const filterByAll =
+  (...conditions: readonly Observable<boolean>[]) =>
+  <T>(input$: Observable<T>): Observable<T> =>
+    input$.pipe(filterByLatest(every(...conditions)));
 
-export const asValueFrom = <T>(from: Observable<T>) => <S>(
-  input$: Observable<S>
-): Observable<T> =>
-  input$.pipe(
-    withLatestFrom(from),
-    map(([_, value]) => value)
-  );
+export const asValueFrom =
+  <T>(from: Observable<T>) =>
+  <S>(input$: Observable<S>): Observable<T> =>
+    input$.pipe(
+      withLatestFrom(from),
+      map(([_, value]) => value)
+    );
 
-export const filterEnumSubset = <U extends string, S extends U>(
-  enumSubset: readonly S[]
-): OperatorFunction<U, S> => (input$: Observable<U>): Observable<S> =>
-  input$.pipe(
-    filter((e) => (enumSubset as readonly U[]).includes(e)),
-    map((e) => e as S)
-  );
+export const filterEnumSubset =
+  <U extends string, S extends U>(
+    enumSubset: readonly S[]
+  ): OperatorFunction<U, S> =>
+  (input$: Observable<U>): Observable<S> =>
+    input$.pipe(
+      filter((e) => (enumSubset as readonly U[]).includes(e)),
+      map((e) => e as S)
+    );
 
 export const probe = <T>(
   callback: (v: T) => void = console.log
@@ -79,9 +79,7 @@ export const probe = <T>(
     return v;
   });
 
-export const withLatestValuesFrom = <
-  U extends readonly ObservableInput<unknown>[]
->(
-  ...observables: U
-) => <T>(input$: Observable<T>): Observable<readonly [T, Unwrap<U>]> =>
-  input$.pipe(withLatestFrom(combineLatestTyped(...observables)));
+export const withLatestValuesFrom =
+  <U extends readonly ObservableInput<unknown>[]>(...observables: U) =>
+  <T>(input$: Observable<T>): Observable<readonly [T, Unwrap<U>]> =>
+    input$.pipe(withLatestFrom(combineLatestTyped(...observables)));

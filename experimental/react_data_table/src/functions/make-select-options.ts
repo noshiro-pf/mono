@@ -31,9 +31,10 @@ const makeSelectOptions = (
 
   const cellTypeIsArray = ['number[]', 'string[]'].includes(cs.cellType)
 
-  const options = (cellTypeIsArray
-    ? I.Set((column as I.List<I.List<number | string>>).flatMap((a) => a))
-    : I.Set(column)
+  const options = (
+    cellTypeIsArray
+      ? I.Set((column as I.List<I.List<number | string>>).flatMap((a) => a))
+      : I.Set(column)
   ).toList()
 
   switch (cs.sort) {

@@ -7,14 +7,15 @@ import type {
   Token,
 } from '../types';
 
-export const skipWhile = <A>(
-  predicate: (value: A) => boolean
-): RemoveInitializedOperator<A, A> => (parentObservable: Observable<A>) =>
-  new SkipWhileObservableClass(parentObservable, predicate);
+export const skipWhile =
+  <A>(predicate: (value: A) => boolean): RemoveInitializedOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new SkipWhileObservableClass(parentObservable, predicate);
 
 class SkipWhileObservableClass<A>
   extends SyncChildObservableClass<A, 'skipWhile', [A]>
-  implements SkipWhileOperatorObservable<A> {
+  implements SkipWhileOperatorObservable<A>
+{
   private readonly _predicate: (value: A) => boolean;
 
   constructor(

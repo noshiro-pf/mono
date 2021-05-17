@@ -7,14 +7,15 @@ import type {
   Token,
 } from '../types';
 
-export const skipUntil = <A>(
-  notifier: Observable<unknown>
-): RemoveInitializedOperator<A, A> => (parentObservable: Observable<A>) =>
-  new SkipUntilObservableClass(parentObservable, notifier);
+export const skipUntil =
+  <A>(notifier: Observable<unknown>): RemoveInitializedOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new SkipUntilObservableClass(parentObservable, notifier);
 
 class SkipUntilObservableClass<A>
   extends SyncChildObservableClass<A, 'skipUntil', [A]>
-  implements SkipUntilOperatorObservable<A> {
+  implements SkipUntilOperatorObservable<A>
+{
   private _isSkipping: boolean;
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({

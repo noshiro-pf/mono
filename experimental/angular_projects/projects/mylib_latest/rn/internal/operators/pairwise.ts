@@ -1,9 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const pairwise = <T>(initialPrevValue?: T): Operator<T, [T, T]> => (
-  src: RN<T>
-) => new PairwiseRN<T>(src, initialPrevValue);
+export const pairwise =
+  <T>(initialPrevValue?: T): Operator<T, [T, T]> =>
+  (src: RN<T>) =>
+    new PairwiseRN<T>(src, initialPrevValue);
 
 class PairwiseRN<T> extends RN<[T, T]> {
   private prevVal: T;

@@ -76,40 +76,34 @@ export class DataTableComponent implements OnInit, OnDestroy {
   /* user input */
 
   private readonly itemsPerPageSource = manual<number>(50);
-  private readonly itemsPerPageChange$ = this.itemsPerPageSource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private readonly itemsPerPageChange$ =
+    this.itemsPerPageSource.debounce(DEBOUNCE_TIME_SHORT);
 
   private readonly pageNumberSource = manual<number>(1);
-  private readonly pageNumberChange$ = this.pageNumberSource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private readonly pageNumberChange$ =
+    this.pageNumberSource.debounce(DEBOUNCE_TIME_SHORT);
 
   private readonly headerValueSource = manual<{
     columnIndex: number;
     value: any;
   }>({ columnIndex: 0, value: 0 });
-  private readonly headerValueChange$ = this.headerValueSource.debounce(
-    DEBOUNCE_TIME
-  );
+  private readonly headerValueChange$ =
+    this.headerValueSource.debounce(DEBOUNCE_TIME);
 
   private readonly resetAllClickSource = manual<void>(null);
-  private readonly resetAllClick$ = this.resetAllClickSource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private readonly resetAllClick$ =
+    this.resetAllClickSource.debounce(DEBOUNCE_TIME_SHORT);
 
   private readonly resetClickSource = manual<number>(0);
-  private readonly resetClick$ = this.resetClickSource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private readonly resetClick$ =
+    this.resetClickSource.debounce(DEBOUNCE_TIME_SHORT);
 
   private readonly sortBySource = manual<Sort>({
     active: '',
     direction: 'asc',
   });
-  private readonly sortByChange$ = this.sortBySource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private readonly sortByChange$ =
+    this.sortBySource.debounce(DEBOUNCE_TIME_SHORT);
 
   /***************************************************************************/
 
@@ -149,21 +143,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
       .map(([_, settings]) => settings.itemsPerPageInit || 100)
   );
 
-  private readonly tableFilteredIndexed$: RN<
-    { val: any[]; idx: number }[]
-  > = combine(
-    this.table$,
-    this.settings$,
-    this.headerValuesAll$
-  ).map(([table, settings, headerValuesAll]) =>
-    table
-      .map((e, i) => ({ val: e, idx: i }))
-      .filter((e) => filterFn(e.val, settings.headerSettings, headerValuesAll))
-  );
+  private readonly tableFilteredIndexed$: RN<{ val: any[]; idx: number }[]> =
+    combine(this.table$, this.settings$, this.headerValuesAll$).map(
+      ([table, settings, headerValuesAll]) =>
+        table
+          .map((e, i) => ({ val: e, idx: i }))
+          .filter((e) =>
+            filterFn(e.val, settings.headerSettings, headerValuesAll)
+          )
+    );
 
-  readonly filteredLength$: RN<number> = this.tableFilteredIndexed$.pluck(
-    'length'
-  );
+  readonly filteredLength$: RN<number> =
+    this.tableFilteredIndexed$.pluck('length');
 
   private readonly pageLength$: RN<number> = combine(
     this.filteredLength$,
@@ -189,22 +180,19 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   private readonly tableFilteredSortedIndexed$: RN<
     { val: any[]; idx: number }[]
-  > = combine(
-    this.tableFilteredIndexed$,
-    this.sortBy$,
-    this.settings$
-  ).map(([tbl, sortBy, settings]) => getSorted(tbl, sortBy, settings));
-
-  private readonly tableSlicedIndexed$: RN<
-    { val: any[]; idx: number }[]
-  > = combine(
-    this.itemsPerPage$,
-    this.pageNumber$,
-    this.settings$.map((e) => !!e.usepagination),
-    this.tableFilteredSortedIndexed$
-  ).map(([itemsPerPage, pageNumber, usePagenation, tbl]) =>
-    usePagenation ? slice(tbl, itemsPerPage, pageNumber) : tbl
+  > = combine(this.tableFilteredIndexed$, this.sortBy$, this.settings$).map(
+    ([tbl, sortBy, settings]) => getSorted(tbl, sortBy, settings)
   );
+
+  private readonly tableSlicedIndexed$: RN<{ val: any[]; idx: number }[]> =
+    combine(
+      this.itemsPerPage$,
+      this.pageNumber$,
+      this.settings$.map((e) => !!e.usepagination),
+      this.tableFilteredSortedIndexed$
+    ).map(([itemsPerPage, pageNumber, usePagenation, tbl]) =>
+      usePagenation ? slice(tbl, itemsPerPage, pageNumber) : tbl
+    );
 
   readonly tableSlicedTransformedIndexed$: RN<
     { val: string[]; idx: number }[]

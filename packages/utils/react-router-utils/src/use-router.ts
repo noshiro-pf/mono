@@ -11,7 +11,7 @@ const useRouter = <RouteParam>(): RouteComponentProps<
   unknown
 > =>
   useContext<RouteComponentProps<RouteParam, StaticContext, unknown>>(
-    (__RouterContext as unknown) as Context<
+    __RouterContext as unknown as Context<
       RouteComponentProps<RouteParam, StaticContext, unknown>
     >
   );

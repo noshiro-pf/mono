@@ -10,7 +10,8 @@ export const timer = (
 
 class TimerObservableClass
   extends RootObservableClass<number, 'Timer'>
-  implements TimerObservable {
+  implements TimerObservable
+{
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
   private _isStarted: boolean;

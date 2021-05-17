@@ -59,8 +59,8 @@ export class User {
     this.onlineGame.roomId = initObj.onlineGame.roomId || '';
     this.onlineGame.communicationId = initObj.onlineGame.communicationId || '';
     this.onlineGame.chatOpened = !!initObj.onlineGame.chatOpened;
-    this.onlineGame.cardSizeAutoChange = !!initObj.onlineGame
-      .cardSizeAutoChange;
+    this.onlineGame.cardSizeAutoChange =
+      !!initObj.onlineGame.cardSizeAutoChange;
     this.onlineGame.cardSizeRatio = initObj.onlineGame.cardSizeRatio || 1;
     this.onlineGame.messageSec = initObj.onlineGame.messageSec || 2000;
     this.onlineGame.autoSort = !!initObj.onlineGame.autoSort;

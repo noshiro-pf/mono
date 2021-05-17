@@ -36,17 +36,16 @@ export const PlayerResultTableBodyEditMode = memo(
     playerResultChange: (chg: TPlayerResultChange) => void
   }>) => {
     const onChange = useCallback(
-      (playerIndex: number, key: keyof TPlayerResultRanked) => (
-        value: string
-      ) => {
-        playerResultChange(
-          PlayerResultChange({
-            playerIndex,
-            key,
-            value: key === 'VP' ? parseInt(value, 10) : value.toString(),
-          })
-        )
-      },
+      (playerIndex: number, key: keyof TPlayerResultRanked) =>
+        (value: string) => {
+          playerResultChange(
+            PlayerResultChange({
+              playerIndex,
+              key,
+              value: key === 'VP' ? parseInt(value, 10) : value.toString(),
+            })
+          )
+        },
       [playerResultChange]
     )
 

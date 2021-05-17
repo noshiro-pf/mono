@@ -9,7 +9,8 @@ export const of = <A>(
 
 class OfObservableClass<A>
   extends RootObservableClass<A, 'Of'>
-  implements OfObservable<A> {
+  implements OfObservable<A>
+{
   private readonly _value: A;
 
   constructor(value: A, startManually: boolean = false) {

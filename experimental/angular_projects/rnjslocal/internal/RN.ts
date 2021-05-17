@@ -508,8 +508,10 @@ export class RN<T> {
   }
 }
 
-export const debounce = <T>(time: number): Operator<T, T> => (src: RN<T>) =>
-  new DebounceRN<T>(src, time);
+export const debounce =
+  <T>(time: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new DebounceRN<T>(src, time);
 
 class DebounceRN<T> extends RN<T> {
   private time: number;
@@ -534,8 +536,10 @@ class DebounceRN<T> extends RN<T> {
   }
 }
 
-export const delay = <T>(time: number): Operator<T, T> => (src: RN<T>) =>
-  new DelayRN<T>(src, time);
+export const delay =
+  <T>(time: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new DelayRN<T>(src, time);
 
 class DelayRN<T> extends RN<T> {
   private time: number;
@@ -558,11 +562,13 @@ class DelayRN<T> extends RN<T> {
   }
 }
 
-export const filter = <T>(
-  initialValue: T,
-  predicate: (srcValue: T, srcIndex: number, index: number) => boolean
-): Operator<T, T> => (src: RN<T>) =>
-  new FilterRN<T>(src, initialValue, predicate);
+export const filter =
+  <T>(
+    initialValue: T,
+    predicate: (srcValue: T, srcIndex: number, index: number) => boolean
+  ): Operator<T, T> =>
+  (src: RN<T>) =>
+    new FilterRN<T>(src, initialValue, predicate);
 
 class FilterRN<T> extends RN<T> {
   private predicate: (srcValue: T, srcIndex: number, index: number) => boolean;
@@ -585,9 +591,12 @@ class FilterRN<T> extends RN<T> {
   }
 }
 
-export const flatMap = <T, U>(
-  fn: (srcValue: T, srcIndex: number, index: number) => RN<U>
-): Operator<T, U> => (src: RN<T>) => new FlatMapRN<T, U>(src, fn);
+export const flatMap =
+  <T, U>(
+    fn: (srcValue: T, srcIndex: number, index: number) => RN<U>
+  ): Operator<T, U> =>
+  (src: RN<T>) =>
+    new FlatMapRN<T, U>(src, fn);
 
 class FlatMapRN<T, U> extends RN<U> {
   private latestRN: RN<U>;
@@ -619,19 +628,27 @@ class FlatMapRN<T, U> extends RN<U> {
   }
 }
 
-export const map = <T, U>(
-  fn: (srcValue: T, srcIndex: number, index: number) => U
-): Operator<T, U> => (src: RN<T>) => new MapRN<T, U>(src, fn);
+export const map =
+  <T, U>(
+    fn: (srcValue: T, srcIndex: number, index: number) => U
+  ): Operator<T, U> =>
+  (src: RN<T>) =>
+    new MapRN<T, U>(src, fn);
 
-export const mapTo = <T, U>(value: U): Operator<T, U> => (src: RN<T>) =>
-  new MapRN<T, U>(src, () => value);
+export const mapTo =
+  <T, U>(value: U): Operator<T, U> =>
+  (src: RN<T>) =>
+    new MapRN<T, U>(src, () => value);
 
-export const pluck = <T, K extends keyof T>(member: K): Operator<T, T[K]> => (
-  src: RN<T>
-) => new MapRN<T, T[K]>(src, (value) => value[member]);
+export const pluck =
+  <T, K extends keyof T>(member: K): Operator<T, T[K]> =>
+  (src: RN<T>) =>
+    new MapRN<T, T[K]>(src, (value) => value[member]);
 
-export const withTimestamp = <T>(): Operator<T, [T, number]> => (src: RN<T>) =>
-  new MapRN<T, [T, number]>(src, (value) => [value, Date.now()]);
+export const withTimestamp =
+  <T>(): Operator<T, [T, number]> =>
+  (src: RN<T>) =>
+    new MapRN<T, [T, number]>(src, (value) => [value, Date.now()]);
 
 class MapRN<T, U> extends RN<U> {
   private fn: (srcValue: T, srcIndex: number, index: number) => U;
@@ -651,9 +668,10 @@ class MapRN<T, U> extends RN<U> {
   }
 }
 
-export const pairwise = <T>(initialPrevValue?: T): Operator<T, [T, T]> => (
-  src: RN<T>
-) => new PairwiseRN<T>(src, initialPrevValue);
+export const pairwise =
+  <T>(initialPrevValue?: T): Operator<T, [T, T]> =>
+  (src: RN<T>) =>
+    new PairwiseRN<T>(src, initialPrevValue);
 
 class PairwiseRN<T> extends RN<[T, T]> {
   private prevVal: T;
@@ -670,10 +688,13 @@ class PairwiseRN<T> extends RN<[T, T]> {
   }
 }
 
-export const scan = <T, U>(
-  initialValue: U,
-  fn: (state: U, srcValue: T, srcIndex: number, index: number) => U
-): Operator<T, U> => (src: RN<T>) => new ScanRN<T, U>(initialValue, src, fn);
+export const scan =
+  <T, U>(
+    initialValue: U,
+    fn: (state: U, srcValue: T, srcIndex: number, index: number) => U
+  ): Operator<T, U> =>
+  (src: RN<T>) =>
+    new ScanRN<T, U>(initialValue, src, fn);
 
 class ScanRN<T, U> extends RN<U> {
   private scanState: U;
@@ -698,20 +719,22 @@ class ScanRN<T, U> extends RN<U> {
   }
 }
 
-export const skip = <T>(initialValue: T, skipNum: number): Operator<T, T> => (
-  src: RN<T>
-) =>
-  new SkipWhileRN<T>(
-    src,
-    initialValue,
-    (_srcValue, srcIndex, _index) => srcIndex < skipNum
-  );
+export const skip =
+  <T>(initialValue: T, skipNum: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipWhileRN<T>(
+      src,
+      initialValue,
+      (_srcValue, srcIndex, _index) => srcIndex < skipNum
+    );
 
-export const skipWhile = <T>(
-  initialValue: T,
-  predicate: (srcValue: T, srcIndex: number, index: number) => boolean
-): Operator<T, T> => (src: RN<T>) =>
-  new SkipWhileRN<T>(src, initialValue, predicate);
+export const skipWhile =
+  <T>(
+    initialValue: T,
+    predicate: (srcValue: T, srcIndex: number, index: number) => boolean
+  ): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipWhileRN<T>(src, initialValue, predicate);
 
 class SkipWhileRN<T> extends RN<T> {
   private predicate: (srcValue: T, srcIndex: number, index: number) => boolean;
@@ -734,9 +757,10 @@ class SkipWhileRN<T> extends RN<T> {
   }
 }
 
-export const skipAlreadyAppeared = <T, K extends keyof T>(
-  key?: K
-): Operator<T, T> => (src: RN<T>) => new SkipAlreadyAppearedRN<T, K>(src, key);
+export const skipAlreadyAppeared =
+  <T, K extends keyof T>(key?: K): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipAlreadyAppearedRN<T, K>(src, key);
 
 class SkipAlreadyAppearedRN<T, K extends keyof T> extends RN<T> {
   private key?: K;
@@ -764,9 +788,10 @@ class SkipAlreadyAppearedRN<T, K extends keyof T> extends RN<T> {
   }
 }
 
-export const skipUnchanged = <T>(
-  eq: (a: T, b: T) => boolean = (a, b) => a === b
-): Operator<T, T> => (src: RN<T>) => new SkipUnchangedRN<T>(src, eq);
+export const skipUnchanged =
+  <T>(eq: (a: T, b: T) => boolean = (a, b) => a === b): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipUnchangedRN<T>(src, eq);
 
 class SkipUnchangedRN<T> extends RN<T> {
   private eq: (a: T, b: T) => boolean = (a, b) => a === b;
@@ -786,9 +811,12 @@ class SkipUnchangedRN<T> extends RN<T> {
   }
 }
 
-export const switchMap = <T, U>(
-  fn: (srcValue: T, srcIndex: number, index: number) => RN<U>
-): Operator<T, U> => (src: RN<T>) => new SwitchMapRN<T, U>(src, fn);
+export const switchMap =
+  <T, U>(
+    fn: (srcValue: T, srcIndex: number, index: number) => RN<U>
+  ): Operator<T, U> =>
+  (src: RN<T>) =>
+    new SwitchMapRN<T, U>(src, fn);
 
 class SwitchMapRN<T, U> extends RN<U> {
   private latestRN: RN<U>;
@@ -820,12 +848,20 @@ class SwitchMapRN<T, U> extends RN<U> {
   }
 }
 
-export const take = <T>(takeNum: number): Operator<T, T> => (src: RN<T>) =>
-  new TakeWhileRN<T>(src, (_srcValue, srcIndex, _index) => srcIndex < takeNum);
+export const take =
+  <T>(takeNum: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeWhileRN<T>(
+      src,
+      (_srcValue, srcIndex, _index) => srcIndex < takeNum
+    );
 
-export const takeWhile = <T>(
-  predicate: (srcValue: T, srcIndex: number, index: number) => boolean
-): Operator<T, T> => (src: RN<T>) => new TakeWhileRN<T>(src, predicate);
+export const takeWhile =
+  <T>(
+    predicate: (srcValue: T, srcIndex: number, index: number) => boolean
+  ): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeWhileRN<T>(src, predicate);
 
 class TakeWhileRN<T> extends RN<T> {
   private predicate: (srcValue: T, srcIndex: number, index: number) => boolean;
@@ -850,8 +886,10 @@ class TakeWhileRN<T> extends RN<T> {
   }
 }
 
-export const throttle = <T>(time: number): Operator<T, T> => (src: RN<T>) =>
-  new ThrottleRN<T>(src, time);
+export const throttle =
+  <T>(time: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new ThrottleRN<T>(src, time);
 
 class ThrottleRN<T> extends RN<T> {
   private time: number;
@@ -870,9 +908,10 @@ class ThrottleRN<T> extends RN<T> {
   }
 }
 
-export const withInitialValue = <T>(initialValue: T): Operator<T, T> => (
-  src: RN<T>
-) => new WithInitialValueRN<T>(src, initialValue);
+export const withInitialValue =
+  <T>(initialValue: T): Operator<T, T> =>
+  (src: RN<T>) =>
+    new WithInitialValueRN<T>(src, initialValue);
 
 class WithInitialValueRN<T> extends RN<T> {
   constructor(src: RN<T>, initialValue: T) {
@@ -886,9 +925,10 @@ class WithInitialValueRN<T> extends RN<T> {
   }
 }
 
-export const withLatest = <T, U>(src2: RN<U>): Operator<T, [T, U]> => (
-  src: RN<T>
-) => new WithLatestRN<T, U>(src, src2);
+export const withLatest =
+  <T, U>(src2: RN<U>): Operator<T, [T, U]> =>
+  (src: RN<T>) =>
+    new WithLatestRN<T, U>(src, src2);
 
 class WithLatestRN<T, U> extends RN<[T, U]> {
   private src2: RN<U>;

@@ -104,14 +104,8 @@ export const combineLatestTestCases: [
       );
     },
     preview: (tick: number): void => {
-      const {
-        counter$,
-        double$,
-        quad$,
-        square$,
-        squareEven$,
-        combined$,
-      } = createStreams(tick);
+      const { counter$, double$, quad$, square$, squareEven$, combined$ } =
+        createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);

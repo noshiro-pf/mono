@@ -11,13 +11,12 @@ import {
   users$,
 } from './firebase-worker'
 
-export const cardIdToDCardProperty$: RN<
-  I.Map<string, TDCardProperty>
-> = dcardlist$.map((dcardlist) => {
-  const m = new Map<string, TDCardProperty>()
-  dcardlist.forEach((d) => m.set(d.cardId, d))
-  return I.Map(m)
-})
+export const cardIdToDCardProperty$: RN<I.Map<string, TDCardProperty>> =
+  dcardlist$.map((dcardlist) => {
+    const m = new Map<string, TDCardProperty>()
+    dcardlist.forEach((d) => m.set(d.cardId, d))
+    return I.Map(m)
+  })
 
 export const me$: RN<TUser> = combine(users$, ls.myName$).map(
   ([users, myName]) =>
@@ -25,12 +24,11 @@ export const me$: RN<TUser> = combine(users$, ls.myName$).map(
   'me'
 )
 
-export const currentRandomizerGroup$: RN<
-  TRandomizerGroup | undefined
-> = combine(
-  randomizerGroups$,
-  me$.pluck('randomizerGroupId').skipUnchanged()
-).map(([list, id]) => list.find((r) => r.key === id))
+export const currentRandomizerGroup$: RN<TRandomizerGroup | undefined> =
+  combine(
+    randomizerGroups$,
+    me$.pluck('randomizerGroupId').skipUnchanged()
+  ).map(([list, id]) => list.find((r) => r.key === id))
 
 export const nameListFromGameResults$: RN<I.List<string>> = gameResults$.map(
   (gameResults) => {

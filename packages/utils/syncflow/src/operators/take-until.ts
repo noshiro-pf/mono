@@ -8,10 +8,10 @@ import type {
   Token,
 } from '../types';
 
-export const takeUntil = <A>(
-  notifier: Observable<unknown>
-): ToBaseOperator<A, A> => (parentObservable: Observable<A>) =>
-  new TakeUntilObservableClass(parentObservable, notifier);
+export const takeUntil =
+  <A>(notifier: Observable<unknown>): ToBaseOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new TakeUntilObservableClass(parentObservable, notifier);
 
 export const takeUntilI = <A>(
   notifier: Observable<unknown>
@@ -20,7 +20,8 @@ export const takeUntilI = <A>(
 
 class TakeUntilObservableClass<A>
   extends SyncChildObservableClass<A, 'takeUntil', [A]>
-  implements TakeUntilOperatorObservable<A> {
+  implements TakeUntilOperatorObservable<A>
+{
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
       parents: [parentObservable],

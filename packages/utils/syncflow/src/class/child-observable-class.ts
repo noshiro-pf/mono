@@ -47,7 +47,8 @@ export class AsyncChildObservableClass<
     P extends NonEmptyUnknownList
   >
   extends ObservableBaseClass<A, 'async child', number>
-  implements AsyncChildObservable<A, Type, P> {
+  implements AsyncChildObservable<A, Type, P>
+{
   readonly type;
   readonly parents;
   private readonly procedure: ChildObservable<unknown>[];
@@ -119,7 +120,8 @@ export class SyncChildObservableClass<
     P extends NonEmptyUnknownList
   >
   extends ObservableBaseClass<A, 'sync child', number>
-  implements SyncChildObservable<A, Type, P> {
+  implements SyncChildObservable<A, Type, P>
+{
   readonly type;
   readonly parents;
 
@@ -166,7 +168,8 @@ export class InitializedSyncChildObservableClass<
     P extends NonEmptyUnknownList
   >
   extends SyncChildObservableClass<A, Type, P>
-  implements InitializedSyncChildObservable<A, Type, P> {
+  implements InitializedSyncChildObservable<A, Type, P>
+{
   constructor({
     type,
     parents,
@@ -193,6 +196,6 @@ export class InitializedSyncChildObservableClass<
 
   chain<B>(operator: Operator<A, B>): Observable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B> {
-    return operator((this as unknown) as InitializedObservable<A>);
+    return operator(this as unknown as InitializedObservable<A>);
   }
 }

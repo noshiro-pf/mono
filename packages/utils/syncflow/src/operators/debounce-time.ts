@@ -9,9 +9,10 @@ import type {
   Token,
 } from '../types';
 
-export const debounceTime = <A>(millisec: number): ToBaseOperator<A, A> => (
-  parentObservable: Observable<A>
-) => new DebounceTimeObservableClass(parentObservable, millisec);
+export const debounceTime =
+  <A>(millisec: number): ToBaseOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new DebounceTimeObservableClass(parentObservable, millisec);
 
 export const debounceTimeI = <A>(
   millisec: number
@@ -20,7 +21,8 @@ export const debounceTimeI = <A>(
 
 class DebounceTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'debounceTime', [A]>
-  implements DebounceTimeOperatorObservable<A> {
+  implements DebounceTimeOperatorObservable<A>
+{
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
 

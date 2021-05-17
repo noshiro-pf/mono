@@ -8,13 +8,15 @@ import type {
 } from '../types';
 import { isPositiveInteger } from '../utils';
 
-export const take = <A>(n: number): RemoveInitializedOperator<A, A> => (
-  parentObservable: Observable<A>
-) => new TakeObservableClass(parentObservable, n);
+export const take =
+  <A>(n: number): RemoveInitializedOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new TakeObservableClass(parentObservable, n);
 
 class TakeObservableClass<A>
   extends SyncChildObservableClass<A, 'take', [A]>
-  implements TakeOperatorObservable<A> {
+  implements TakeOperatorObservable<A>
+{
   private readonly _n: number;
   private _counter: number;
 

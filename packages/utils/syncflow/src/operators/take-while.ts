@@ -7,14 +7,15 @@ import type {
   Token,
 } from '../types';
 
-export const takeWhile = <A>(
-  predicate: (value: A) => boolean
-): RemoveInitializedOperator<A, A> => (parentObservable: Observable<A>) =>
-  new TakeWhileObservableClass(parentObservable, predicate);
+export const takeWhile =
+  <A>(predicate: (value: A) => boolean): RemoveInitializedOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new TakeWhileObservableClass(parentObservable, predicate);
 
 class TakeWhileObservableClass<A>
   extends SyncChildObservableClass<A, 'takeWhile', [A]>
-  implements TakeWhileOperatorObservable<A> {
+  implements TakeWhileOperatorObservable<A>
+{
   private readonly _predicate: (value: A) => boolean;
 
   constructor(

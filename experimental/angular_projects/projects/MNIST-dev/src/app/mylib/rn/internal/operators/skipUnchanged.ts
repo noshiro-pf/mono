@@ -1,9 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const skipUnchanged = <T>(
-  eq: (a: T, b: T) => boolean = (a, b) => a === b
-): Operator<T, T> => (src: RN<T>) => new SkipUnchangedRN<T>(src, eq);
+export const skipUnchanged =
+  <T>(eq: (a: T, b: T) => boolean = (a, b) => a === b): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipUnchangedRN<T>(src, eq);
 
 class SkipUnchangedRN<T> extends RN<T> {
   private eq: (a: T, b: T) => boolean = (a, b) => a === b;

@@ -29,9 +29,9 @@ export class GameResultOfPlayerComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    const GRofEachPlayerForView$: RN<
-      PlayerGR[]
-    > = this.GRListFiltered$.map((GRlist) => getAllPlayerGR(GRlist));
+    const GRofEachPlayerForView$: RN<PlayerGR[]> = this.GRListFiltered$.map(
+      (GRlist) => getAllPlayerGR(GRlist)
+    );
 
     const nofRankOption$: RN<number[]> = this.GRListFiltered$.map((list) =>
       utils.array.maxValue(list.map((e) => e.players.length))
@@ -77,17 +77,15 @@ export class GameResultOfPlayerComponent implements OnInit {
         })
     );
 
-    this.table$ = combine(
-      GRofEachPlayerForView$,
-      nofRankOption$
-    ).map(([list, nofRankOption]) =>
-      list.map((obj) => [
-        obj.name,
-        obj.scoreAverage,
-        obj.scoreSum,
-        obj.count,
-        ...nofRankOption.map((i) => obj.countRank[i]),
-      ])
+    this.table$ = combine(GRofEachPlayerForView$, nofRankOption$).map(
+      ([list, nofRankOption]) =>
+        list.map((obj) => [
+          obj.name,
+          obj.scoreAverage,
+          obj.scoreSum,
+          obj.count,
+          ...nofRankOption.map((i) => obj.countRank[i]),
+        ])
     );
   }
 }

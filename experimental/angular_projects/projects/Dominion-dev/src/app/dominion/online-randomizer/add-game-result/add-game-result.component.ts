@@ -40,17 +40,16 @@ export class AddGameResultComponent implements OnInit {
     )
     .withInitialValue([]);
 
-  place$: RN<string> = this.myRandomizerGroup.newGameResult.place$.withInitialValue(
-    ''
-  );
+  place$: RN<string> =
+    this.myRandomizerGroup.newGameResult.place$.withInitialValue('');
 
-  playerResults$: RN<
-    PlayerResult[]
-  > = this.myRandomizerGroup.newGameResult.players$.withInitialValue([]);
+  playerResults$: RN<PlayerResult[]> =
+    this.myRandomizerGroup.newGameResult.players$.withInitialValue([]);
 
-  lastTurnPlayerName$: RN<string> = this.myRandomizerGroup.newGameResult.lastTurnPlayerName$.withInitialValue(
-    ''
-  );
+  lastTurnPlayerName$: RN<string> =
+    this.myRandomizerGroup.newGameResult.lastTurnPlayerName$.withInitialValue(
+      ''
+    );
 
   selectedPlayers$: RN<PlayerResult[]> = this.playerResults$
     .map((list) => list.filter((e) => e.selected))
@@ -65,12 +64,11 @@ export class AddGameResultComponent implements OnInit {
     .map((list) => list.filter((e) => e.turnOrder !== 0).length + 1)
     .withInitialValue(1);
 
-  memo$: RN<string> = this.myRandomizerGroup.newGameResult.memo$.withInitialValue(
-    ''
-  );
+  memo$: RN<string> =
+    this.myRandomizerGroup.newGameResult.memo$.withInitialValue('');
 
-  newGameResultDialogOpened$: RN<boolean> = this.myRandomizerGroup
-    .newGameResultDialogOpened$;
+  newGameResultDialogOpened$: RN<boolean> =
+    this.myRandomizerGroup.newGameResultDialogOpened$;
 
   numberOfPlayersOK$: RN<boolean> = this.selectedPlayers$.map(
     (e) => 2 <= e.length && e.length <= 6

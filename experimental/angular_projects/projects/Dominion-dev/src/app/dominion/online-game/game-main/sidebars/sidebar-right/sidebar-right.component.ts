@@ -40,7 +40,8 @@ export class SideBarRightComponent implements OnInit {
 
   showPlayerCards() {
     const dialogRef = this.dialog.open(OnlineGamePlayerCardsDialogComponent);
-    dialogRef.componentInstance.allPlayersCards$ = this.gameStateService.allPlayersCards$;
+    dialogRef.componentInstance.allPlayersCards$ =
+      this.gameStateService.allPlayersCards$;
     // TODO: RxJS -> RN
     // dialogRef.componentInstance.playersNameList$ = this.myGameRoomService.playersNameShuffled$;
   }

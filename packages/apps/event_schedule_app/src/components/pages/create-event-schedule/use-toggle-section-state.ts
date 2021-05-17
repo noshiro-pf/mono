@@ -19,13 +19,11 @@ export const useToggleSectionState = <A>(
 ] => {
   const initialValueRef = useRef(initialValue);
   const valueWhenTurnedOffRef: MutableRefObject<A> = useRef(valueWhenTurnedOff);
-  const valueWhenTurnedOnRef: MutableRefObject<A | undefined> = useRef(
-    valueWhenTurnedOn
-  );
+  const valueWhenTurnedOnRef: MutableRefObject<A | undefined> =
+    useRef(valueWhenTurnedOn);
 
-  const [useThisConfig, setUseThisConfig] = useState<boolean>(
-    initialToggleState
-  );
+  const [useThisConfig, setUseThisConfig] =
+    useState<boolean>(initialToggleState);
 
   const turnOn = useCallback(() => {
     setUseThisConfig(true);

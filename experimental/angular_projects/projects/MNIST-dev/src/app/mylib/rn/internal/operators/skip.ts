@@ -1,15 +1,18 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const skip = <T>(initialValue: T, skipNum: number): Operator<T, T> => (
-  src: RN<T>
-) => new SkipWhileRN<T>(src, initialValue, (_, index) => index < skipNum);
+export const skip =
+  <T>(initialValue: T, skipNum: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipWhileRN<T>(src, initialValue, (_, index) => index < skipNum);
 
-export const skipWhile = <T>(
-  initialValue: T,
-  predicate: (value: T, index: number) => boolean
-): Operator<T, T> => (src: RN<T>) =>
-  new SkipWhileRN<T>(src, initialValue, predicate);
+export const skipWhile =
+  <T>(
+    initialValue: T,
+    predicate: (value: T, index: number) => boolean
+  ): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipWhileRN<T>(src, initialValue, predicate);
 
 class SkipWhileRN<T> extends RN<T> {
   private predicate: (value: T, index: number) => boolean;

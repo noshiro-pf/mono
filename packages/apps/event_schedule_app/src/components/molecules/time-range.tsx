@@ -14,11 +14,11 @@ type Props = Readonly<{
   onRangeEndChange: (hm: IHoursMinutes) => void;
 }>;
 
-const onTimeChangeFn = (onITimeChange: (hm: IHoursMinutes) => void) => (
-  hm: HoursMinutes
-): void => {
-  onITimeChange(createIHoursMinutes(hm));
-};
+const onTimeChangeFn =
+  (onITimeChange: (hm: IHoursMinutes) => void) =>
+  (hm: HoursMinutes): void => {
+    onITimeChange(createIHoursMinutes(hm));
+  };
 
 export const TimeRangeView = memoNamed<Props>('TimeRangeView', (props) => (
   <TimeRangeWrapper>

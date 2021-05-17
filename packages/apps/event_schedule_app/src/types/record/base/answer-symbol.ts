@@ -19,10 +19,8 @@ const IAnswerSymbolRecordFactory = IRecord<AnswerSymbolBaseType>({
   point: 0,
 });
 
-export const createIAnswerSymbol: (
-  a?: AnswerSymbolBaseType
-) => IAnswerSymbol = IAnswerSymbolRecordFactory;
+export const createIAnswerSymbol: (a?: AnswerSymbolBaseType) => IAnswerSymbol =
+  IAnswerSymbolRecordFactory;
 
-export const fillAnswerSymbol: (
-  a: PartialAnswerSymbol
-) => IAnswerSymbol = IAnswerSymbolRecordFactory;
+export const fillAnswerSymbol: (a: PartialAnswerSymbol) => IAnswerSymbol =
+  IAnswerSymbolRecordFactory;

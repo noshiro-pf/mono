@@ -8,9 +8,10 @@ import type {
   WithIndexOperatorObservable,
 } from '../types';
 
-export const withIndex = <A>(): ToBaseOperator<A, [number, A]> => (
-  parentObservable: Observable<A>
-) => new WithIndexObservableClass(parentObservable);
+export const withIndex =
+  <A>(): ToBaseOperator<A, [number, A]> =>
+  (parentObservable: Observable<A>) =>
+    new WithIndexObservableClass(parentObservable);
 
 export const withIndexI = <A>(): InitializedToInitializedOperator<
   A,
@@ -22,7 +23,8 @@ export const attachIndexI = withIndexI; // alias
 
 class WithIndexObservableClass<A>
   extends SyncChildObservableClass<[number, A], 'withIndex', [A]>
-  implements WithIndexOperatorObservable<A> {
+  implements WithIndexOperatorObservable<A>
+{
   private _index: number;
 
   constructor(parentObservable: Observable<A>) {

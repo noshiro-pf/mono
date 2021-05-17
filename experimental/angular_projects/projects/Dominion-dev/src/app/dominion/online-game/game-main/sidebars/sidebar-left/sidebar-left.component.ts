@@ -109,7 +109,9 @@ export class SideBarLeftComponent implements OnInit {
   userInputLog() {
     const dialogRef = this.dialog.open(UserInputLogDialogComponent);
     dialogRef.componentInstance.gameState$ = this.gameStateService.gameState$;
-    dialogRef.componentInstance.playersNameShuffled$ = this.myGameRoomService.playersNameShuffled$;
-    dialogRef.componentInstance.userInputList$ = this.gameRoomCommunication.userInputList$;
+    dialogRef.componentInstance.playersNameShuffled$ =
+      this.myGameRoomService.playersNameShuffled$;
+    dialogRef.componentInstance.userInputList$ =
+      this.gameRoomCommunication.userInputList$;
   }
 }
