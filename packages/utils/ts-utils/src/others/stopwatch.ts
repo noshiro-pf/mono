@@ -4,8 +4,8 @@ export class Stopwatch {
   private time = 0;
   private readonly name;
 
-  constructor(name = '') {
-    this.name = name;
+  constructor(timerName = '') {
+    this.name = timerName;
   }
 
   start(log = false): void {

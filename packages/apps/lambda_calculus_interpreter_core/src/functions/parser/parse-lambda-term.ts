@@ -1,4 +1,4 @@
-import { LambdaTerm } from '../../types';
+import type { LambdaTerm } from '../../types';
 import { expandShortcuts } from './expand-shortcut';
 import { getParseTree } from './get-parse-tree';
 import { splitToTokens } from './split-to-tokens';

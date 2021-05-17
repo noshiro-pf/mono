@@ -1,13 +1,13 @@
-import { Ref, useEffect, useRef, useState } from 'preact/compat';
+import type { Ref } from 'preact/compat';
+import { useEffect, useRef, useState } from 'preact/compat';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
   Ref<HTMLCanvasElement>
 ] => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [ctx, setCtx] = useState<CanvasRenderingContext2D | undefined>(
-    undefined
-  );
+  const [ctx, setCtx] =
+    useState<CanvasRenderingContext2D | undefined>(undefined);
 
   useEffect(() => {
     const canvasEl = canvasRef.current;

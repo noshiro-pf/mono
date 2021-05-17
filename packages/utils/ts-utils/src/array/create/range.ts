@@ -1,4 +1,4 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 import { seq } from './seq';
 
 export const range = (

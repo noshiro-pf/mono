@@ -99,12 +99,8 @@ function App() {
       [
         '_s',
         [
-          /*_executer*/ 0,
-          /*_executer2*/ 1,
-          /*_executer4*/ 4,
-          /*_executer3*/ 2,
-          /*_executer5*/ 5,
-          /*_el_5_update*/ 3,
+          /*_executer*/ 0, /*_executer2*/ 1, /*_executer4*/ 4, /*_executer3*/ 2,
+          /*_executer5*/ 5, /*_el_5_update*/ 3,
         ],
       ],
     ],

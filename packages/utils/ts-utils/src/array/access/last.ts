@@ -1,5 +1,5 @@
-import { uint32 } from '../../types';
-import { ReadonlyNonEmptyArray } from '../non-empty-array';
+import type { uint32 } from '../../types';
+import type { ReadonlyNonEmptyArray } from '../non-empty-array';
 import { at } from './at';
 
 export function last<T>(array: ReadonlyNonEmptyArray<T>): T;

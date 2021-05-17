@@ -1,5 +1,6 @@
-import { assertType, TypeExtends } from '@noshiro/ts-utils';
-import {
+import type { TypeExtends } from '@noshiro/ts-utils';
+import { assertType } from '@noshiro/ts-utils';
+import type {
   DatetimeSpecificationEnumType,
   datetimeSpecificationOptions,
 } from './datetime-specification-type';

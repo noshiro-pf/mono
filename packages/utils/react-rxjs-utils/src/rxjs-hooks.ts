@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { distinctUntilChanged, shareReplay, startWith } from 'rxjs/operators';
 
 export function useStream<A>(

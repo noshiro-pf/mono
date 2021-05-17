@@ -99,7 +99,7 @@ export const eslintRules: Readonly<{
       'init-declarations': 'off',
       'no-label-var': 'error',
       'no-restricted-globals': 'error',
-      'no-shadow': 'error',
+      'no-shadow': 'off', // typescript-eslint
       // 'no-undef-init': 'error',
       'no-undefined': 'off',
       // 'no-use-before-define': 'error',
@@ -112,6 +112,7 @@ export const eslintRules: Readonly<{
     ECMAScript6: {
       'prefer-arrow-callback': 'error',
       'prefer-template': 'error',
+      'no-duplicate-imports': 'off', // to suppress false positive on type imports
     },
   },
   modifiedRulesIncludedInRecommended: {},

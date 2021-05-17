@@ -1,6 +1,8 @@
-import { Button, ButtonProps } from '@blueprintjs/core';
+import type { ButtonProps } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { CSSProperties, HTMLAttributes, useMemo } from 'react';
+import type { CSSProperties, HTMLAttributes } from 'react';
+import { useMemo } from 'react';
 
 type Props = ButtonProps &
   HTMLAttributes<HTMLElement> &

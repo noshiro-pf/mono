@@ -1,8 +1,8 @@
 import { Paper } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { Hsl, Hue, Mappable, Percent, uint32 } from '@noshiro/ts-utils';
+import type { Hsl, Hue, Mappable, Percent, uint32 } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { ExperimentResult } from '../../../types/experiment-result';
+import type { ExperimentResult } from '../../../types/experiment-result';
 import { ContrastRatioList } from '../../molecules/contrast-ratio-list';
 import { AllSliders } from '../../molecules/saturation-lightness-slider';
 import { ColorList } from '../../organisms/color-list';

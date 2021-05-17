@@ -1,8 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const debounce = <T>(time: number): Operator<T, T> => (src: RN<T>) =>
-  new DebounceRN<T>(src, time);
+export const debounce =
+  <T>(time: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new DebounceRN<T>(src, time);
 
 class DebounceRN<T> extends RN<T> {
   private time: number;

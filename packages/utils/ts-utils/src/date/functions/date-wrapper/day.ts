@@ -1,5 +1,5 @@
-import { ReadonlyDate } from '../../../types';
-import { WeekDayEnum } from '../../types';
+import type { ReadonlyDate } from '../../../types';
+import type { WeekDayEnum } from '../../types';
 
 export const getDay = (dateLikeValue: ReadonlyDate): WeekDayEnum =>
   dateLikeValue.getDay() as WeekDayEnum;

@@ -4,7 +4,7 @@ import { firestorePaths } from './constants/firestore-paths';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
-import { EventScheduleJsType } from './types/record/event-schedule';
+import type { EventScheduleJsType } from './types/record/event-schedule';
 import { pad2 } from './utils/to-str';
 import { tuple } from './utils/tuple';
 
@@ -24,13 +24,15 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
     events.flatMap(([eventId, ev]) => {
       const ns = ev.notificationSettings;
 
-      return ([
-        [ns.notify01daysBeforeAnswerDeadline, 1],
-        [ns.notify03daysBeforeAnswerDeadline, 3],
-        [ns.notify07daysBeforeAnswerDeadline, 7],
-        [ns.notify14daysBeforeAnswerDeadline, 14],
-        [ns.notify28daysBeforeAnswerDeadline, 28],
-      ] as [boolean, 1 | 3 | 7 | 14 | 28][])
+      return (
+        [
+          [ns.notify01daysBeforeAnswerDeadline, 1],
+          [ns.notify03daysBeforeAnswerDeadline, 3],
+          [ns.notify07daysBeforeAnswerDeadline, 7],
+          [ns.notify14daysBeforeAnswerDeadline, 14],
+          [ns.notify28daysBeforeAnswerDeadline, 28],
+        ] as [boolean, 1 | 3 | 7 | 14 | 28][]
+      )
         .filter(
           ([flag, diff]) =>
             flag && todayIsNDaysBeforeDeadline(diff, ev.answerDeadline.ymd)

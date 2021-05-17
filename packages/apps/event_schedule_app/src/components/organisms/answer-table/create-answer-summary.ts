@@ -1,8 +1,9 @@
 import { answerSymbolPointConfig } from '../../../constants/answer-symbol-point';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import { IDatetimeRange } from '../../../types/record/datetime-range';
-import { IList, IMap } from '../../../utils/immutable';
+import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import type { IDatetimeRange } from '../../../types/record/datetime-range';
+import type { IList } from '../../../utils/immutable';
+import { IMap } from '../../../utils/immutable';
 
 export const createAnswerSummary = (
   datetimeRangeList: IList<IDatetimeRange>,
@@ -19,13 +20,11 @@ export const createAnswerSummary = (
         return [datetimeRange, answerSymbolList.map(() => 0)];
       }
 
-      const answerGroups: IMap<
-        AnswerSymbolIconId | undefined,
-        number
-      > = answersForThisDatetimeRange
-        .groupBy((x) => x)
-        .map((v) => v.count())
-        .toMap();
+      const answerGroups: IMap<AnswerSymbolIconId | undefined, number> =
+        answersForThisDatetimeRange
+          .groupBy((x) => x)
+          .map((v) => v.count())
+          .toMap();
 
       return [
         datetimeRange,
@@ -44,9 +43,8 @@ export const createScore = (
 ): IMap<IDatetimeRange, number> =>
   IMap(
     datetimeRangeList.map((datetimeRange) => {
-      const summaryForThisDatetimeRange:
-        | IList<number>
-        | undefined = answerSummary.get(datetimeRange);
+      const summaryForThisDatetimeRange: IList<number> | undefined =
+        answerSummary.get(datetimeRange);
 
       if (summaryForThisDatetimeRange === undefined) {
         return [datetimeRange, 0];

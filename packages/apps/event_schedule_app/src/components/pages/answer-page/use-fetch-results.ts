@@ -4,13 +4,13 @@ import {
   useStreamValue,
   useValueAsStream,
 } from '@noshiro/react-syncflow-hooks';
+import type { Observable } from '@noshiro/syncflow';
 import {
   combineLatest,
   distinctUntilChanged,
   filter,
   fromPromise,
   map,
-  Observable,
   pluck,
   switchMap,
   unwrapResultOk,
@@ -18,9 +18,9 @@ import {
 } from '@noshiro/syncflow';
 import { isNotUndefined, Result } from '@noshiro/ts-utils';
 import { api } from '../../../api/api';
-import { IAnswer } from '../../../types/record/answer';
-import { IEventSchedule } from '../../../types/record/event-schedule';
-import { IList } from '../../../utils/immutable';
+import type { IAnswer } from '../../../types/record/answer';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IList } from '../../../utils/immutable';
 import { clog } from '../../../utils/log';
 
 type FetchResults = Readonly<{

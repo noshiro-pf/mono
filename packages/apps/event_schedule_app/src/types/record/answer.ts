@@ -1,11 +1,12 @@
-import { StrictOmit } from '@noshiro/ts-utils';
+import type { StrictOmit } from '@noshiro/ts-utils';
 import { IList, IRecord } from '../../utils/immutable';
-import { answerId, AnswerId, userName, UserName } from '../phantom';
-import {
-  fillAnswerSelection,
+import type { AnswerId, UserName } from '../phantom';
+import { answerId, userName } from '../phantom';
+import type {
   IAnswerSelection,
   PartialAnswerSelection,
 } from './answer-selection';
+import { fillAnswerSelection } from './answer-selection';
 
 export const ANSWER_KEY_CREATED_AT = 'createdAt';
 
@@ -41,9 +42,8 @@ export const createIAnswerWithoutId: (
   a: StrictOmit<AnswerBaseType, 'id'>
 ) => IAnswer = IAnswerRecordFactory;
 
-export const createIAnswer: (
-  a?: AnswerBaseType
-) => IAnswer = IAnswerRecordFactory;
+export const createIAnswer: (a?: AnswerBaseType) => IAnswer =
+  IAnswerRecordFactory;
 
 const d = IAnswerRecordFactory();
 export const fillAnswer = (p?: PartialAnswer): IAnswer =>

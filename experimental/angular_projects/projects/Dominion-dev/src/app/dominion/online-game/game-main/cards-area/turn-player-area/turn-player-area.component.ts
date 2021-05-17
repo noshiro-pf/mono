@@ -20,8 +20,8 @@ export class TurnPlayerAreaComponent implements OnInit {
   width$ = this.config.cardSizeRatio$; // .pipe( map( ratio => ratio * 50 ) );
   // myIndex$ = this.gameRoomService.myIndex$;
 
-  private turnPlayerCards$: Observable<PlayerCards> = this.gameStateService
-    .turnPlayerCards$;
+  private turnPlayerCards$: Observable<PlayerCards> =
+    this.gameStateService.turnPlayerCards$;
 
   turnPlayerCards = {
     Aside$: this.turnPlayerCards$.pipe(map((e) => e.Aside)),

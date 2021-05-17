@@ -1,42 +1,46 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   Observable,
   RemoveInitializedOperator,
   TakeWhileOperatorObservable,
   Token,
 } from '../types';
 
-export const takeWhile = <A>(
-  predicate: (value: A) => boolean
-): RemoveInitializedOperator<A, A> => (parent: Observable<A>) =>
-  new TakeWhileObservableClass(parent, predicate);
+export const takeWhile =
+  <A>(predicate: (value: A) => boolean): RemoveInitializedOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new TakeWhileObservableClass(parentObservable, predicate);
 
 class TakeWhileObservableClass<A>
   extends SyncChildObservableClass<A, 'takeWhile', [A]>
-  implements TakeWhileOperatorObservable<A> {
+  implements TakeWhileOperatorObservable<A>
+{
   private readonly _predicate: (value: A) => boolean;
 
-  constructor(parent: Observable<A>, predicate: (value: A) => boolean) {
+  constructor(
+    parentObservable: Observable<A>,
+    predicate: (value: A) => boolean
+  ) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'takeWhile',
-      currentValueInit: Option.isNone(parent.currentValue)
+      currentValueInit: Option.isNone(parentObservable.currentValue)
         ? Option.none
-        : predicate(parent.currentValue.value)
-        ? parent.currentValue
+        : predicate(parentObservable.currentValue.value)
+        ? parentObservable.currentValue
         : Option.none,
     });
     this._predicate = predicate;
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
-    if (this._predicate(parent.currentValue.value)) {
-      this.setNext(parent.currentValue.value, token);
+    if (this._predicate(par.currentValue.value)) {
+      this.setNext(par.currentValue.value, token);
     } else {
       this.complete();
     }

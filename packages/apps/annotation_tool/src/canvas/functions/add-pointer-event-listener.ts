@@ -1,7 +1,7 @@
 import { roundToInt } from '@noshiro/ts-utils';
-import { Application, Sprite } from 'pixi.js';
-import { CanvasAppState } from '../state/canvas-state-type';
-import { CanvasAppStateHandler } from '../state/state-handler-main';
+import type { Application, Sprite } from 'pixi.js';
+import type { CanvasAppState } from '../state/canvas-state-type';
+import type { CanvasAppStateHandler } from '../state/state-handler-main';
 
 export const addGlobalPointerEventListener = (
   app: Application,

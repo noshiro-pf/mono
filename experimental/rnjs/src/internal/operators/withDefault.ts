@@ -1,11 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const withDefault = <T>(
-  defaultValue: T,
-  name: string = ''
-): Operator<T, T> => (src: RN<T>) =>
-  new WithDefaultValueRN<T>(src, defaultValue, name);
+export const withDefault =
+  <T>(defaultValue: T, name: string = ''): Operator<T, T> =>
+  (src: RN<T>) =>
+    new WithDefaultValueRN<T>(src, defaultValue, name);
 
 class WithDefaultValueRN<T> extends RN<T> {
   private readonly defaultValue: T;

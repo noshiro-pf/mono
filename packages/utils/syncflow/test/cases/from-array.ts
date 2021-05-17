@@ -1,6 +1,7 @@
-import { fromArray, FromArrayObservable } from '../../src';
+import type { FromArrayObservable } from '../../src';
+import { fromArray } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 const createStream = (): FromArrayObservable<number> =>
   fromArray([1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);

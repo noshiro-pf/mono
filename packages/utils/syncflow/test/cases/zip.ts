@@ -1,12 +1,7 @@
-import {
-  filter,
-  interval,
-  IntervalObservable,
-  Observable,
-  zip,
-} from '../../src';
+import type { IntervalObservable, Observable } from '../../src';
+import { filter, interval, zip } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 /*
   counter   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23

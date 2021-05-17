@@ -1,5 +1,5 @@
-import { Application, Sprite } from 'pixi.js';
-import { PixiTempRect } from './pixi-temp-rect';
+import type { Application, Sprite } from 'pixi.js';
+import type { PixiTempRect } from './pixi-temp-rect';
 
 export type PixiApp = Readonly<{
   app: Application;

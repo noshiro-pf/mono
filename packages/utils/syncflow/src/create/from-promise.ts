@@ -1,6 +1,6 @@
 import { Option, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { FromPromiseObservable } from '../types';
+import type { FromPromiseObservable } from '../types';
 
 export const fromPromise = <A, E = unknown>(
   promise: Readonly<Promise<A>>
@@ -8,7 +8,8 @@ export const fromPromise = <A, E = unknown>(
 
 class FromPromiseObservableClass<A, E = unknown>
   extends RootObservableClass<Result<A, E>, 'FromPromise'>
-  implements FromPromiseObservable<A, E> {
+  implements FromPromiseObservable<A, E>
+{
   constructor(promise: Readonly<Promise<A>>) {
     super({ type: 'FromPromise', currentValueInit: Option.none });
 

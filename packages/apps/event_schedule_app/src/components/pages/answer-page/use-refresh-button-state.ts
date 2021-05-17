@@ -1,8 +1,8 @@
 import { useStream, useStreamValue } from '@noshiro/react-syncflow-hooks';
+import type { Observable } from '@noshiro/syncflow';
 import {
   mapTo,
   merge,
-  Observable,
   switchMap,
   timer,
   withInitialValue,

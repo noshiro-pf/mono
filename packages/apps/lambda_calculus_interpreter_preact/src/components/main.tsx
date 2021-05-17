@@ -4,11 +4,8 @@ import { CodeArea } from './input-area';
 import { useLambdaEval } from './use-lambda-eval';
 
 export const Main = memoNamed('Main', () => {
-  const {
-    inputAreaString,
-    outputAreaString,
-    setInputAreaString,
-  } = useLambdaEval('((+ 2) 3)', 'Parse error.');
+  const { inputAreaString, outputAreaString, setInputAreaString } =
+    useLambdaEval('((+ 2) 3)', 'Parse error.');
 
   return (
     <Root>

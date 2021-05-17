@@ -1,6 +1,8 @@
-import { FormGroup, InputGroupProps2 } from '@blueprintjs/core';
+import type { InputGroupProps2 } from '@blueprintjs/core';
+import { FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { isEmailString, TinyObservable } from '@noshiro/ts-utils';
+import type { TinyObservable } from '@noshiro/ts-utils';
+import { isEmailString } from '@noshiro/ts-utils';
 import { BpInput } from './bp-input';
 
 type Props = InputGroupProps2 &

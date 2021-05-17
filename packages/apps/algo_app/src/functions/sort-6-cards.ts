@@ -1,6 +1,7 @@
-import { assertType, pipe, sort, TypeExtends } from '@noshiro/ts-utils';
-import { Card } from '../types/card-type';
-import { Player6Cards } from '../types/player-6-card';
+import type { TypeExtends } from '@noshiro/ts-utils';
+import { assertType, pipe, sort } from '@noshiro/ts-utils';
+import type { Card } from '../types/card-type';
+import type { Player6Cards } from '../types/player-6-card';
 
 export const sortCards = (cards: Player6Cards): Player6Cards =>
   pipe(cards).chain(

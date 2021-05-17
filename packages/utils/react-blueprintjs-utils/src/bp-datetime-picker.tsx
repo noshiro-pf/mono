@@ -1,16 +1,16 @@
-import { DateInput, DateInputProps } from '@blueprintjs/datetime';
+import type { DateInputProps } from '@blueprintjs/datetime';
+import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
+import type { ReadonlyDate, StrictOmit } from '@noshiro/ts-utils';
 import {
   getDate,
   getHours,
   getMinutes,
   getMonth,
   getYear,
-  ReadonlyDate,
-  StrictOmit,
 } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { Ymdhm } from './types';
+import type { Ymdhm } from './types';
 
 const pad2 = (n: number): string => n.toString().padStart(2, '0');
 const formatDate = (date: ReadonlyDate): string =>

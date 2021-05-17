@@ -1,5 +1,7 @@
-import { assertType, TypeEq } from '@noshiro/ts-utils';
-import { filter, fromArray, Observable } from '../../src';
+import type { TypeEq } from '@noshiro/ts-utils';
+import { assertType } from '@noshiro/ts-utils';
+import type { Observable } from '../../src';
+import { filter, fromArray } from '../../src';
 import { testStream } from '../test-stream';
 import { filterTestCases } from './filter';
 

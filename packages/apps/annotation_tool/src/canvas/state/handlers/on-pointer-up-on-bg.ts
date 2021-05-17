@@ -1,10 +1,11 @@
-import { rectFrom2Points, Rgba } from '@noshiro/ts-utils';
+import type { Rgba } from '@noshiro/ts-utils';
+import { rectFrom2Points } from '@noshiro/ts-utils';
 import { addBboxToCanvas } from '../../functions/add-bbox';
-import { AnnotationCanvasStyle } from '../../types/annotation-canvas-style';
-import { IdType } from '../../types/id-type';
-import { PixiApp } from '../../types/pixi-app-type';
-import { CanvasAppState } from '../canvas-state-type';
-import { CanvasAppStateHandler } from '../state-handler-main';
+import type { AnnotationCanvasStyle } from '../../types/annotation-canvas-style';
+import type { IdType } from '../../types/id-type';
+import type { PixiApp } from '../../types/pixi-app-type';
+import type { CanvasAppState } from '../canvas-state-type';
+import type { CanvasAppStateHandler } from '../state-handler-main';
 
 export const onPointerUpOnBackground = (
   state: CanvasAppState,

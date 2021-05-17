@@ -1,4 +1,4 @@
-import { HoursMinutesType } from './base/hours-minutes';
+import type { HoursMinutesType } from './base/hours-minutes';
 
 export type TimeRangeJsType = Readonly<{
   start: HoursMinutesType;

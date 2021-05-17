@@ -1,7 +1,5 @@
-import {
-  createIYearMonthDate,
-  IYearMonthDate,
-} from '../../types/record/base/year-month-date';
+import type { IYearMonthDate } from '../../types/record/base/year-month-date';
+import { createIYearMonthDate } from '../../types/record/base/year-month-date';
 import { IList } from '../../utils/immutable';
 import { generateCalendar } from './generate-calendar';
 

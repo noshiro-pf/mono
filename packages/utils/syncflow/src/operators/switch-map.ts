@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
-import {
+import type {
   Observable,
   RemoveInitializedOperator,
   Subscription,
@@ -8,24 +8,27 @@ import {
   Token,
 } from '../types';
 
-export const switchMap = <A, B>(
-  mapToObservable: (curr: A) => Observable<B>
-): RemoveInitializedOperator<A, B> => (parent: Observable<A>) =>
-  new SwitchMapObservableClass(parent, mapToObservable);
+export const switchMap =
+  <A, B>(
+    mapToObservable: (curr: A) => Observable<B>
+  ): RemoveInitializedOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new SwitchMapObservableClass(parentObservable, mapToObservable);
 
 class SwitchMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'switchMap', [A]>
-  implements SwitchMapOperatorObservable<A, B> {
+  implements SwitchMapOperatorObservable<A, B>
+{
   private readonly _mapToObservable: (curr: A) => Observable<B>;
   private _observable: Observable<B> | undefined;
   private _subscription: Subscription | undefined;
 
   constructor(
-    parent: Observable<A>,
+    parentObservable: Observable<A>,
     mapToObservable: (curr: A) => Observable<B>
   ) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'switchMap',
       currentValueInit: Option.none,
     });
@@ -35,14 +38,14 @@ class SwitchMapObservableClass<A, B>
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     this._observable?.complete();
     this._subscription?.unsubscribe();
 
-    this._observable = this._mapToObservable(parent.currentValue.value);
+    this._observable = this._mapToObservable(par.currentValue.value);
     this._subscription = this._observable.subscribe((curr) => {
       this.startUpdate(curr);
     });

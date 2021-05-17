@@ -1,6 +1,6 @@
 import { Option, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { FromSubscribableObservable, Subscribable } from '../types';
+import type { FromSubscribableObservable, Subscribable } from '../types';
 
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>
@@ -9,7 +9,8 @@ export const fromSubscribable = <A, E = unknown>(
 
 class FromSubscribableObservableClass<A, E = unknown>
   extends RootObservableClass<Result<A, E>, 'FromSubscribable'>
-  implements FromSubscribableObservable<A, E> {
+  implements FromSubscribableObservable<A, E>
+{
   constructor(subscribable: Subscribable<A>) {
     super({ type: 'FromSubscribable', currentValueInit: Option.none });
 

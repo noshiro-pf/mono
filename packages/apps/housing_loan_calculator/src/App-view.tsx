@@ -5,8 +5,8 @@ import { ConfigSection } from './components/ConfigSection/ConfigSection';
 import { PaymentTable } from './components/PaymentTable/PaymentTable';
 import { SummarySection } from './components/SummarySection/SummarySection';
 import { viewTexts } from './constants/view-texts';
-import { CalculatingStateType } from './types/enum/calculating-state';
-import { RepaymentType } from './types/enum/repayment-type';
+import type { CalculatingStateType } from './types/enum/calculating-state';
+import type { RepaymentType } from './types/enum/repayment-type';
 
 const Root = styled.div`
   padding: 10px;

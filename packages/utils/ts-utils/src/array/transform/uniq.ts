@@ -1,4 +1,4 @@
-import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
+import type { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
 /**
  * @desc copy and return unique array

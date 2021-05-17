@@ -1,4 +1,5 @@
-import { assertNotType, assertType, TypeExtends } from '../types';
+import type { TypeExtends } from '../types';
+import { assertNotType, assertType } from '../types';
 
 export type NonEmptyArray<A> = [A, ...A[]];
 export type ReadonlyNonEmptyArray<A> = readonly [A, ...(readonly A[])];

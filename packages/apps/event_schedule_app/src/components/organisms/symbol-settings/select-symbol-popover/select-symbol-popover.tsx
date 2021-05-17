@@ -1,9 +1,10 @@
-import { IconName, Popover } from '@blueprintjs/core';
+import type { IconName } from '@blueprintjs/core';
+import { Popover } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
-import { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
-import { IList } from '../../../../utils/immutable';
+import type { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
+import type { IList } from '../../../../utils/immutable';
 import { SelectSymbolPopoverContent } from './select-symbol-popover-content';
 
 type Props = Readonly<{
@@ -15,14 +16,14 @@ type Props = Readonly<{
 export const SelectSymbolPopover = memoNamed<Props>(
   'SelectSymbolPopover',
   ({ openerIcon, iconsInUse, onIconSelectSubmit }) => {
-    const [isOpen, open, close] = useBooleanState(false);
+    const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
     const onIconSelect = useCallback(
       (id: AnswerSymbolIconId) => {
         onIconSelectSubmit(id);
-        close();
+        handleClose();
       },
-      [onIconSelectSubmit, close]
+      [onIconSelectSubmit, handleClose]
     );
 
     return (
@@ -34,10 +35,10 @@ export const SelectSymbolPopover = memoNamed<Props>(
           />
         }
         isOpen={isOpen}
-        onClose={close}
+        onClose={handleClose}
         canEscapeKeyClose={true}
       >
-        <BpButton icon={openerIcon} minimal={true} onClick={open} />
+        <BpButton icon={openerIcon} minimal={true} onClick={handleOpen} />
       </Popover>
     );
   }

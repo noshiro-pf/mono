@@ -1,6 +1,6 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 import { isEmpty } from '../is-empty';
-import { ReadonlyNonEmptyArray } from '../non-empty-array';
+import type { ReadonlyNonEmptyArray } from '../non-empty-array';
 
 export function min(array: ReadonlyNonEmptyArray<uint32>): uint32;
 export function min(array: readonly uint32[]): uint32 | undefined;

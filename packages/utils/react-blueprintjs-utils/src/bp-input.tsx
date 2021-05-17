@@ -1,7 +1,10 @@
-import { InputGroup, InputGroupProps2 } from '@blueprintjs/core';
+import type { InputGroupProps2 } from '@blueprintjs/core';
+import { InputGroup } from '@blueprintjs/core';
 import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
-import { createTinyObservable, TinyObservable } from '@noshiro/ts-utils';
-import { ChangeEvent, FormEvent, useCallback, useEffect, useRef } from 'react';
+import type { TinyObservable } from '@noshiro/ts-utils';
+import { createTinyObservable } from '@noshiro/ts-utils';
+import type { ChangeEvent, FormEvent } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 type Props = InputGroupProps2 &
   Readonly<{
@@ -14,24 +17,27 @@ export const BpInput = memoNamed<Props>(
   'BpInput',
   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
     const onChangeHandler = useCallback(
-      (event: ChangeEvent<HTMLInputElement> & FormEvent<HTMLElement>) => {
-        onValueChange(event.target.value);
+      (ev: ChangeEvent<HTMLInputElement> & FormEvent<HTMLElement>) => {
+        onValueChange(ev.target.value);
       },
       [onValueChange]
     );
 
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const focus = useCallback(() => {
+    const onFocus = useCallback(() => {
       inputRef.current?.focus();
     }, []);
 
     useEffect(() => {
       if (autoFocus === true) {
-        focus();
+        onFocus();
       }
-    }, [autoFocus, focus]);
+    }, [autoFocus, onFocus]);
 
-    useTinyObservableEffect(focus$ ?? createTinyObservable<undefined>(), focus);
+    useTinyObservableEffect(
+      focus$ ?? createTinyObservable<undefined>(),
+      onFocus
+    );
 
     return (
       <InputGroup

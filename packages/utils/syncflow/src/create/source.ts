@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { SourceObservable } from '../types';
+import type { SourceObservable } from '../types';
 
 export const subject = <A>(): SourceObservable<A> =>
   new SourceObservableClass<A>();
@@ -9,7 +9,8 @@ export const source = subject; // alias
 
 class SourceObservableClass<A>
   extends RootObservableClass<A, 'Source'>
-  implements SourceObservable<A> {
+  implements SourceObservable<A>
+{
   constructor() {
     super({ type: 'Source', currentValueInit: Option.none });
   }

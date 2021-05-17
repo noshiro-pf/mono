@@ -1,6 +1,6 @@
 import { IRecord } from '../../../utils/immutable';
-import { AnswerSymbolIconId } from '../../enum/answer-symbol-icon';
-import { AnswerSymbolPointEnumType } from '../../enum/answer-symbol-point';
+import type { AnswerSymbolIconId } from '../../enum/answer-symbol-icon';
+import type { AnswerSymbolPointEnumType } from '../../enum/answer-symbol-point';
 
 type AnswerSymbolBaseType = Readonly<{
   iconId: AnswerSymbolIconId;
@@ -19,10 +19,8 @@ const IAnswerSymbolRecordFactory = IRecord<AnswerSymbolBaseType>({
   point: 0,
 });
 
-export const createIAnswerSymbol: (
-  a?: AnswerSymbolBaseType
-) => IAnswerSymbol = IAnswerSymbolRecordFactory;
+export const createIAnswerSymbol: (a?: AnswerSymbolBaseType) => IAnswerSymbol =
+  IAnswerSymbolRecordFactory;
 
-export const fillAnswerSymbol: (
-  a: PartialAnswerSymbol
-) => IAnswerSymbol = IAnswerSymbolRecordFactory;
+export const fillAnswerSymbol: (a: PartialAnswerSymbol) => IAnswerSymbol =
+  IAnswerSymbolRecordFactory;

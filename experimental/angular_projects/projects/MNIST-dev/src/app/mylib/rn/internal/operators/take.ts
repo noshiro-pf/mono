@@ -1,12 +1,15 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const take = <T>(takeNum: number): Operator<T, T> => (src: RN<T>) =>
-  new TakeWhileRN<T>(src, (_, index) => index < takeNum);
+export const take =
+  <T>(takeNum: number): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeWhileRN<T>(src, (_, index) => index < takeNum);
 
-export const takeWhile = <T>(
-  predicate: (value: T, index: number) => boolean
-): Operator<T, T> => (src: RN<T>) => new TakeWhileRN<T>(src, predicate);
+export const takeWhile =
+  <T>(predicate: (value: T, index: number) => boolean): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeWhileRN<T>(src, predicate);
 
 class TakeWhileRN<T> extends RN<T> {
   private predicate: (value: T, index: number) => boolean;

@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { FromArrayObservable } from '../types';
+import type { FromArrayObservable } from '../types';
 
 export const fromArray = <A>(
   values: readonly A[],
@@ -10,7 +10,8 @@ export const fromArray = <A>(
 
 class FromArrayObservableClass<A>
   extends RootObservableClass<A, 'FromArray'>
-  implements FromArrayObservable<A> {
+  implements FromArrayObservable<A>
+{
   private readonly _values: readonly A[];
 
   constructor(values: readonly A[], startManually: boolean = false) {

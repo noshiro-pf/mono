@@ -1,4 +1,5 @@
-import { assertType, TypeEq } from '../test-type';
+import type { TypeEq } from '../test-type';
+import { assertType } from '../test-type';
 
 export type Rest<T extends unknown[]> = ((...x: T) => void) extends (
   x: T[0],

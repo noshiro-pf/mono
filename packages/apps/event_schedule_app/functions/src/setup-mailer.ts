@@ -4,9 +4,11 @@ import { createTransport } from 'nodemailer';
 export const gmailConfig: {
   email: string;
   password: string;
-} = (functions.config() as {
-  gmail: { email: string; password: string };
-}).gmail;
+} = (
+  functions.config() as {
+    gmail: { email: string; password: string };
+  }
+).gmail;
 
 export const mailTransport = createTransport({
   service: 'gmail',

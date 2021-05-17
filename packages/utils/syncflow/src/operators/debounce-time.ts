@@ -1,6 +1,7 @@
-import { Option, TimerId } from '@noshiro/ts-utils';
+import type { TimerId } from '@noshiro/ts-utils';
+import { Option } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
-import {
+import type {
   DebounceTimeOperatorObservable,
   InitializedToInitializedOperator,
   Observable,
@@ -8,9 +9,10 @@ import {
   Token,
 } from '../types';
 
-export const debounceTime = <A>(millisec: number): ToBaseOperator<A, A> => (
-  parent: Observable<A>
-) => new DebounceTimeObservableClass(parent, millisec);
+export const debounceTime =
+  <A>(millisec: number): ToBaseOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new DebounceTimeObservableClass(parentObservable, millisec);
 
 export const debounceTimeI = <A>(
   millisec: number
@@ -19,30 +21,31 @@ export const debounceTimeI = <A>(
 
 class DebounceTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'debounceTime', [A]>
-  implements DebounceTimeOperatorObservable<A> {
+  implements DebounceTimeOperatorObservable<A>
+{
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
 
-  constructor(parent: Observable<A>, millisec: number) {
+  constructor(parentObservable: Observable<A>, millisec: number) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'debounceTime',
-      currentValueInit: parent.currentValue,
+      currentValueInit: parentObservable.currentValue,
     });
     this._timerId = undefined;
     this._millisec = millisec;
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     this.resetTimer();
     // set timer
     this._timerId = setTimeout(() => {
-      if (Option.isNone(parent.currentValue)) return;
-      this.startUpdate(parent.currentValue.value);
+      if (Option.isNone(par.currentValue)) return;
+      this.startUpdate(par.currentValue.value);
     }, this._millisec);
   }
 

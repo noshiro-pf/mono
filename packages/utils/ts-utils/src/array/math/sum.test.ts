@@ -1,4 +1,5 @@
-import { assertType, TypeEq, uint32 } from '../../types';
+import type { TypeEq, uint32 } from '../../types';
+import { assertType } from '../../types';
 import { sum } from './sum';
 
 test('sum', () => {

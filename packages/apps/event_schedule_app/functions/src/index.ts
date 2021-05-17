@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import { firestorePaths } from './constants/firestore-paths';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
-import { AnswerJsType } from './types/record/answer';
+import type { AnswerJsType } from './types/record/answer';
 
 admin.initializeApp();
 

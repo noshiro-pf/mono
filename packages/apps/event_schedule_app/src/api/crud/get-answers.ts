@@ -2,11 +2,8 @@ import { Result } from '@noshiro/ts-utils';
 import { firestorePaths } from '../../constants/firestore-paths';
 import { dbEvents } from '../../initialize-firebase';
 import { answerId } from '../../types/phantom';
-import {
-  ANSWER_KEY_CREATED_AT,
-  fillAnswer,
-  IAnswer,
-} from '../../types/record/answer';
+import type { IAnswer } from '../../types/record/answer';
+import { ANSWER_KEY_CREATED_AT, fillAnswer } from '../../types/record/answer';
 import { IList } from '../../utils/immutable';
 
 export const getAnswers = async (

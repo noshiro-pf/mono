@@ -1,5 +1,5 @@
-import { MonoTypeFunction } from '../types';
-import { ReadonlyBitArrayType } from './readonly-bit-array';
+import type { MonoTypeFunction } from '../types';
+import type { ReadonlyBitArrayType } from './readonly-bit-array';
 
 export const flipReadonlyBitArray: MonoTypeFunction<ReadonlyBitArrayType> = (
   rb

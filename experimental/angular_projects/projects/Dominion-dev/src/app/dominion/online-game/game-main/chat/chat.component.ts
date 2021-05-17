@@ -32,9 +32,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
     // auto scroll when view changed
     const target = document.getElementById('chat-list');
     const observer = new MutationObserver((_) => {
-      const $chatListElements = document.getElementsByClassName(
-        'chat-list-element'
-      );
+      const $chatListElements =
+        document.getElementsByClassName('chat-list-element');
       if (!this.autoScroll || $chatListElements.length <= 0) return;
       const $lastElement = $chatListElements[$chatListElements.length - 1];
       $lastElement.scrollIntoView(true);

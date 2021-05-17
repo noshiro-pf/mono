@@ -1,4 +1,4 @@
-import {
+import type {
   DateEnum,
   HoursEnum,
   MillisecondsEnum,
@@ -8,7 +8,7 @@ import {
   WeekDayEnum,
   YearEnum,
 } from '../date';
-import { Phantomic, ReadonlyDate } from '../types';
+import type { Phantomic, ReadonlyDate } from '../types';
 
 export namespace utc {
   export type UTC = Phantomic<number, 'UTC'>;
@@ -96,108 +96,8 @@ export namespace utc {
     };
   };
 
-  export const setLocale = ({
-    year,
-    month,
-    date,
-    hours,
-    minutes,
-    seconds,
-    milliseconds,
-  }: Readonly<{
-    year?: YearEnum;
-    month?: MonthEnum;
-    date?: DateEnum;
-    hours?: HoursEnum;
-    minutes?: MinutesEnum;
-    seconds?: SecondsEnum;
-    milliseconds?: MillisecondsEnum;
-  }>) => (u: UTC): UTC => {
-    const d = new Date(u);
-    if (year !== undefined) {
-      d.setFullYear(year);
-    }
-    if (month !== undefined) {
-      d.setMonth(month);
-    }
-    if (date !== undefined) {
-      d.setDate(date);
-    }
-    if (hours !== undefined) {
-      d.setHours(hours);
-    }
-    if (minutes !== undefined) {
-      d.setMinutes(minutes);
-    }
-    if (seconds !== undefined) {
-      d.setSeconds(seconds);
-    }
-    if (milliseconds !== undefined) {
-      d.setMilliseconds(milliseconds);
-    }
-    return d.getTime() as UTC;
-  };
-
-  export const setUTC = ({
-    year,
-    month,
-    date,
-    hours,
-    minutes,
-    seconds,
-    milliseconds,
-  }: Readonly<{
-    year?: YearEnum;
-    month?: MonthEnum;
-    date?: DateEnum;
-    hours?: HoursEnum;
-    minutes?: MinutesEnum;
-    seconds?: SecondsEnum;
-    milliseconds?: MillisecondsEnum;
-  }>) => (u: UTC): UTC => {
-    const d = new Date(u);
-    if (year !== undefined) {
-      d.setUTCFullYear(year);
-    }
-    if (month !== undefined) {
-      d.setUTCMonth(month);
-    }
-    if (date !== undefined) {
-      d.setUTCDate(date);
-    }
-    if (hours !== undefined) {
-      d.setUTCHours(hours);
-    }
-    if (minutes !== undefined) {
-      d.setUTCMinutes(minutes);
-    }
-    if (seconds !== undefined) {
-      d.setUTCSeconds(seconds);
-    }
-    if (milliseconds !== undefined) {
-      d.setUTCMilliseconds(milliseconds);
-    }
-    return d.getTime() as UTC;
-  };
-
-  export const updateLocale = ({
-    updateYear,
-    updateMonth,
-    updateDate,
-    updateHours,
-    updateMinutes,
-    updateSeconds,
-    updateMilliseconds,
-  }: Readonly<{
-    updateYear?: (year: YearEnum) => YearEnum;
-    updateMonth?: (month: MonthEnum) => MonthEnum;
-    updateDate?: (date: DateEnum) => DateEnum;
-    updateHours?: (hours: HoursEnum) => HoursEnum;
-    updateMinutes?: (minutes: MinutesEnum) => MinutesEnum;
-    updateSeconds?: (seconds: SecondsEnum) => SecondsEnum;
-    updateMilliseconds?: (milliseconds: MillisecondsEnum) => MillisecondsEnum;
-  }>) => (u: UTC): UTC => {
-    const {
+  export const setLocale =
+    ({
       year,
       month,
       date,
@@ -205,109 +105,221 @@ export namespace utc {
       minutes,
       seconds,
       milliseconds,
-    } = getLocale(u);
+    }: Readonly<{
+      year?: YearEnum;
+      month?: MonthEnum;
+      date?: DateEnum;
+      hours?: HoursEnum;
+      minutes?: MinutesEnum;
+      seconds?: SecondsEnum;
+      milliseconds?: MillisecondsEnum;
+    }>) =>
+    (u: UTC): UTC => {
+      const d = new Date(u);
+      if (year !== undefined) {
+        d.setFullYear(year);
+      }
+      if (month !== undefined) {
+        d.setMonth(month);
+      }
+      if (date !== undefined) {
+        d.setDate(date);
+      }
+      if (hours !== undefined) {
+        d.setHours(hours);
+      }
+      if (minutes !== undefined) {
+        d.setMinutes(minutes);
+      }
+      if (seconds !== undefined) {
+        d.setSeconds(seconds);
+      }
+      if (milliseconds !== undefined) {
+        d.setMilliseconds(milliseconds);
+      }
+      return d.getTime() as UTC;
+    };
 
-    return setLocale({
-      year: updateYear === undefined ? undefined : updateYear(year),
-      month: updateMonth === undefined ? undefined : updateMonth(month),
-      date: updateDate === undefined ? undefined : updateDate(date),
-      hours: updateHours === undefined ? undefined : updateHours(hours),
-      minutes: updateMinutes === undefined ? undefined : updateMinutes(minutes),
-      seconds: updateSeconds === undefined ? undefined : updateSeconds(seconds),
-      milliseconds:
-        updateMilliseconds === undefined
-          ? undefined
-          : updateMilliseconds(milliseconds),
-    })(u);
-  };
+  export const setUTC =
+    ({
+      year,
+      month,
+      date,
+      hours,
+      minutes,
+      seconds,
+      milliseconds,
+    }: Readonly<{
+      year?: YearEnum;
+      month?: MonthEnum;
+      date?: DateEnum;
+      hours?: HoursEnum;
+      minutes?: MinutesEnum;
+      seconds?: SecondsEnum;
+      milliseconds?: MillisecondsEnum;
+    }>) =>
+    (u: UTC): UTC => {
+      const d = new Date(u);
+      if (year !== undefined) {
+        d.setUTCFullYear(year);
+      }
+      if (month !== undefined) {
+        d.setUTCMonth(month);
+      }
+      if (date !== undefined) {
+        d.setUTCDate(date);
+      }
+      if (hours !== undefined) {
+        d.setUTCHours(hours);
+      }
+      if (minutes !== undefined) {
+        d.setUTCMinutes(minutes);
+      }
+      if (seconds !== undefined) {
+        d.setUTCSeconds(seconds);
+      }
+      if (milliseconds !== undefined) {
+        d.setUTCMilliseconds(milliseconds);
+      }
+      return d.getTime() as UTC;
+    };
 
-  export const updateUTC = ({
-    updateYear,
-    updateMonth,
-    updateDate,
-    updateHours,
-    updateMinutes,
-    updateSeconds,
-    updateMilliseconds,
-  }: Readonly<{
-    updateYear?: (year: YearEnum) => YearEnum;
-    updateMonth?: (month: MonthEnum) => MonthEnum;
-    updateDate?: (date: DateEnum) => DateEnum;
-    updateHours?: (hours: HoursEnum) => HoursEnum;
-    updateMinutes?: (minutes: MinutesEnum) => MinutesEnum;
-    updateSeconds?: (seconds: SecondsEnum) => SecondsEnum;
-    updateMilliseconds?: (milliseconds: MillisecondsEnum) => MillisecondsEnum;
-  }>) => (u: UTC): UTC => {
-    const { year, month, date, hours, minutes, seconds, milliseconds } = getUTC(
-      u
-    );
+  export const updateLocale =
+    ({
+      updateYear,
+      updateMonth,
+      updateDate,
+      updateHours,
+      updateMinutes,
+      updateSeconds,
+      updateMilliseconds,
+    }: Readonly<{
+      updateYear?: (year: YearEnum) => YearEnum;
+      updateMonth?: (month: MonthEnum) => MonthEnum;
+      updateDate?: (date: DateEnum) => DateEnum;
+      updateHours?: (hours: HoursEnum) => HoursEnum;
+      updateMinutes?: (minutes: MinutesEnum) => MinutesEnum;
+      updateSeconds?: (seconds: SecondsEnum) => SecondsEnum;
+      updateMilliseconds?: (milliseconds: MillisecondsEnum) => MillisecondsEnum;
+    }>) =>
+    (u: UTC): UTC => {
+      const { year, month, date, hours, minutes, seconds, milliseconds } =
+        getLocale(u);
 
-    return setUTC({
-      year: updateYear === undefined ? undefined : updateYear(year),
-      month: updateMonth === undefined ? undefined : updateMonth(month),
-      date: updateDate === undefined ? undefined : updateDate(date),
-      hours: updateHours === undefined ? undefined : updateHours(hours),
-      minutes: updateMinutes === undefined ? undefined : updateMinutes(minutes),
-      seconds: updateSeconds === undefined ? undefined : updateSeconds(seconds),
-      milliseconds:
-        updateMilliseconds === undefined
-          ? undefined
-          : updateMilliseconds(milliseconds),
-    })(u);
-  };
+      return setLocale({
+        year: updateYear === undefined ? undefined : updateYear(year),
+        month: updateMonth === undefined ? undefined : updateMonth(month),
+        date: updateDate === undefined ? undefined : updateDate(date),
+        hours: updateHours === undefined ? undefined : updateHours(hours),
+        minutes:
+          updateMinutes === undefined ? undefined : updateMinutes(minutes),
+        seconds:
+          updateSeconds === undefined ? undefined : updateSeconds(seconds),
+        milliseconds:
+          updateMilliseconds === undefined
+            ? undefined
+            : updateMilliseconds(milliseconds),
+      })(u);
+    };
+
+  export const updateUTC =
+    ({
+      updateYear,
+      updateMonth,
+      updateDate,
+      updateHours,
+      updateMinutes,
+      updateSeconds,
+      updateMilliseconds,
+    }: Readonly<{
+      updateYear?: (year: YearEnum) => YearEnum;
+      updateMonth?: (month: MonthEnum) => MonthEnum;
+      updateDate?: (date: DateEnum) => DateEnum;
+      updateHours?: (hours: HoursEnum) => HoursEnum;
+      updateMinutes?: (minutes: MinutesEnum) => MinutesEnum;
+      updateSeconds?: (seconds: SecondsEnum) => SecondsEnum;
+      updateMilliseconds?: (milliseconds: MillisecondsEnum) => MillisecondsEnum;
+    }>) =>
+    (u: UTC): UTC => {
+      const { year, month, date, hours, minutes, seconds, milliseconds } =
+        getUTC(u);
+
+      return setUTC({
+        year: updateYear === undefined ? undefined : updateYear(year),
+        month: updateMonth === undefined ? undefined : updateMonth(month),
+        date: updateDate === undefined ? undefined : updateDate(date),
+        hours: updateHours === undefined ? undefined : updateHours(hours),
+        minutes:
+          updateMinutes === undefined ? undefined : updateMinutes(minutes),
+        seconds:
+          updateSeconds === undefined ? undefined : updateSeconds(seconds),
+        milliseconds:
+          updateMilliseconds === undefined
+            ? undefined
+            : updateMilliseconds(milliseconds),
+      })(u);
+    };
 
   const pad2 = (str: number): string => str.toString().padStart(2, '0');
 
-  export const toLocaleYMD = (delimiter: string = '/') => (u: UTC): string => {
-    const { year, month, date } = getLocale(u);
-    return [year, pad2(month), pad2(date)].join(delimiter);
-  };
-  export const toUTCYMD = (delimiter: string = '/') => (u: UTC): string => {
-    const { year, month, date } = getUTC(u);
-    return [year, pad2(month), pad2(date)].join(delimiter);
-  };
+  export const toLocaleYMD =
+    (delimiter: string = '/') =>
+    (u: UTC): string => {
+      const { year, month, date } = getLocale(u);
+      return [year, pad2(month), pad2(date)].join(delimiter);
+    };
+  export const toUTCYMD =
+    (delimiter: string = '/') =>
+    (u: UTC): string => {
+      const { year, month, date } = getUTC(u);
+      return [year, pad2(month), pad2(date)].join(delimiter);
+    };
 
-  export const toLocaleHM = (delimiter: string = ':') => (u: UTC): string => {
-    const { hours, minutes } = getLocale(u);
-    return [pad2(hours), pad2(minutes)].join(delimiter);
-  };
-  export const toUTCHM = (delimiter: string = ':') => (u: UTC): string => {
-    const { hours, minutes } = getUTC(u);
-    return [pad2(hours), pad2(minutes)].join(delimiter);
-  };
+  export const toLocaleHM =
+    (delimiter: string = ':') =>
+    (u: UTC): string => {
+      const { hours, minutes } = getLocale(u);
+      return [pad2(hours), pad2(minutes)].join(delimiter);
+    };
+  export const toUTCHM =
+    (delimiter: string = ':') =>
+    (u: UTC): string => {
+      const { hours, minutes } = getUTC(u);
+      return [pad2(hours), pad2(minutes)].join(delimiter);
+    };
 
-  export const toLocaleHMS = (delimiter: string = ':') => (u: UTC): string => {
-    const { hours, minutes, seconds } = getLocale(u);
-    return [pad2(hours), pad2(minutes), pad2(seconds)].join(delimiter);
-  };
-  export const toUTCHMS = (delimiter: string = ':') => (u: UTC): string => {
-    const { hours, minutes, seconds } = getUTC(u);
-    return [pad2(hours), pad2(minutes), pad2(seconds)].join(delimiter);
-  };
+  export const toLocaleHMS =
+    (delimiter: string = ':') =>
+    (u: UTC): string => {
+      const { hours, minutes, seconds } = getLocale(u);
+      return [pad2(hours), pad2(minutes), pad2(seconds)].join(delimiter);
+    };
+  export const toUTCHMS =
+    (delimiter: string = ':') =>
+    (u: UTC): string => {
+      const { hours, minutes, seconds } = getUTC(u);
+      return [pad2(hours), pad2(minutes), pad2(seconds)].join(delimiter);
+    };
 
-  export const toLocaleYMDHM = (
-    YMDdelimiter: string = '/',
-    HMdelimiter: string = ':'
-  ) => (u: UTC): string =>
-    [toLocaleYMD(YMDdelimiter)(u), toLocaleHM(HMdelimiter)(u)].join(' ');
+  export const toLocaleYMDHM =
+    (YMDdelimiter: string = '/', HMdelimiter: string = ':') =>
+    (u: UTC): string =>
+      [toLocaleYMD(YMDdelimiter)(u), toLocaleHM(HMdelimiter)(u)].join(' ');
 
-  export const toUTCYMDHM = (
-    YMDdelimiter: string = '/',
-    HMdelimiter: string = ':'
-  ) => (u: UTC): string =>
-    [toUTCYMD(YMDdelimiter)(u), toUTCHM(HMdelimiter)(u)].join(' ');
+  export const toUTCYMDHM =
+    (YMDdelimiter: string = '/', HMdelimiter: string = ':') =>
+    (u: UTC): string =>
+      [toUTCYMD(YMDdelimiter)(u), toUTCHM(HMdelimiter)(u)].join(' ');
 
-  export const toLocaleYMDHMS = (
-    YMDdelimiter: string = '/',
-    HMSdelimiter: string = ':'
-  ) => (u: UTC): string =>
-    [toLocaleYMD(YMDdelimiter)(u), toLocaleHMS(HMSdelimiter)(u)].join(' ');
+  export const toLocaleYMDHMS =
+    (YMDdelimiter: string = '/', HMSdelimiter: string = ':') =>
+    (u: UTC): string =>
+      [toLocaleYMD(YMDdelimiter)(u), toLocaleHMS(HMSdelimiter)(u)].join(' ');
 
-  export const toUTCYMDHMS = (
-    YMDdelimiter: string = '/',
-    HMSdelimiter: string = ':'
-  ) => (u: UTC): string =>
-    [toUTCYMD(YMDdelimiter)(u), toUTCHMS(HMSdelimiter)(u)].join(' ');
+  export const toUTCYMDHMS =
+    (YMDdelimiter: string = '/', HMSdelimiter: string = ':') =>
+    (u: UTC): string =>
+      [toUTCYMD(YMDdelimiter)(u), toUTCHMS(HMSdelimiter)(u)].join(' ');
 
   export const toLocaleMidnight = setLocale({
     hours: 0,

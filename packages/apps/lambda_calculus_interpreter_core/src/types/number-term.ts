@@ -1,6 +1,7 @@
-import { assertType, TypeExtends } from '@noshiro/ts-utils';
-import { LambdaTerm } from './lambda-term';
-import { Variable } from './variable';
+import type { TypeExtends } from '@noshiro/ts-utils';
+import { assertType } from '@noshiro/ts-utils';
+import type { LambdaTerm } from './lambda-term';
+import type { Variable } from './variable';
 
 export type NumberTerm<S extends Variable, Z extends Variable> = readonly [
   'lambda',

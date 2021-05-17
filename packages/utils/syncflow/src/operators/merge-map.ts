@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
-import {
+import type {
   MergeMapOperatorObservable,
   Observable,
   RemoveInitializedOperator,
@@ -8,26 +8,29 @@ import {
   Token,
 } from '../types';
 
-export const mergeMap = <A, B>(
-  mapToObservable: (curr: A) => Observable<B>
-): RemoveInitializedOperator<A, B> => (parent: Observable<A>) =>
-  new MergeMapObservableClass(parent, mapToObservable);
+export const mergeMap =
+  <A, B>(
+    mapToObservable: (curr: A) => Observable<B>
+  ): RemoveInitializedOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new MergeMapObservableClass(parentObservable, mapToObservable);
 
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'mergeMap', [A]>
-  implements MergeMapOperatorObservable<A, B> {
+  implements MergeMapOperatorObservable<A, B>
+{
   private readonly _mapToObservable: (curr: A) => Observable<B>;
   private readonly _observables: Observable<B>[];
   private readonly _subscriptions: Subscription[];
 
   constructor(
-    parent: Observable<A>,
+    parentObservable: Observable<A>,
     mapToObservable: (curr: A) => Observable<B>
   ) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'mergeMap',
       currentValueInit: Option.none,
     });
@@ -37,11 +40,11 @@ class MergeMapObservableClass<A, B>
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
-    const observable = this._mapToObservable(parent.currentValue.value);
+    const observable = this._mapToObservable(par.currentValue.value);
     this._observables.push(observable);
 
     const subscription = observable.subscribe((curr) => {

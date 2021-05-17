@@ -1,12 +1,8 @@
-import {
-  ArrayElement,
-  assertType,
-  Option,
-  TypeExtends,
-} from '@noshiro/ts-utils';
+import type { ArrayElement, TypeExtends } from '@noshiro/ts-utils';
+import { assertType, Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
-import {
+import type {
   MergeObservable,
   NonEmptyUnknownList,
   SyncChildObservable,
@@ -20,7 +16,8 @@ export const merge = <P extends NonEmptyUnknownList>(
 
 class MergeObservableClass<P extends NonEmptyUnknownList>
   extends SyncChildObservableClass<ArrayElement<P>, 'merge', P>
-  implements MergeObservable<P> {
+  implements MergeObservable<P>
+{
   constructor(parents: Wrap<P>) {
     super({
       parents,

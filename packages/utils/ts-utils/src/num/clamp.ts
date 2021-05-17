@@ -5,7 +5,9 @@
  *  clamp(0, 2)(-0.5) // 0,
  *  clamp(0, 2)(1.5) // 1.5
  */
-export const clamp = (min: number, max: number) => (target: number): number =>
-  typeof target !== 'number' || !Number.isFinite(target)
-    ? min
-    : Math.max(min, Math.min(max, target));
+export const clamp =
+  (min: number, max: number) =>
+  (target: number): number =>
+    typeof target !== 'number' || !Number.isFinite(target)
+      ? min
+      : Math.max(min, Math.min(max, target));

@@ -19,9 +19,8 @@ export const useLambdaEval = (
   outputAreaString: string;
   setInputAreaString: (input: string) => void;
 } => {
-  const [inputAreaString$, setInputAreaString] = useStateAsStream<string>(
-    initialInput
-  );
+  const [inputAreaString$, setInputAreaString] =
+    useStateAsStream<string>(initialInput);
 
   const outputAreaString$ = useStream<string | undefined>(() =>
     inputAreaString$.chain(debounceTimeI(200 /* ms */)).chain(

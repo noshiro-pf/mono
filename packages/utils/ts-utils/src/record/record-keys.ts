@@ -1,4 +1,5 @@
-import { assertType, TypeEq } from '../types';
+import type { TypeEq } from '../types';
+import { assertType } from '../types';
 
 export const recordKeys = <R extends Record<PropertyKey, unknown>>(
   object: R

@@ -22,7 +22,7 @@ class MergeObservable<T extends Observable<any>[]> extends Observable<
         this.latestValues[idx] = v;
 
         if (!this.latestValues.includes(INITIAL_VALUE)) {
-          this.update((this.latestValues as unknown) as Unwrap<T>);
+          this.update(this.latestValues as unknown as Unwrap<T>);
         }
       });
     });

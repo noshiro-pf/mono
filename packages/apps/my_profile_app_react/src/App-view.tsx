@@ -29,18 +29,18 @@ export const AppSub = memoNamed<{
     [pathNameLast]
   );
 
-  const navigator = useNavigator();
+  const routerNavigator = useNavigator();
 
   const tabIndexOnChange = useCallback(
     (tabIdx: number) => {
       if (0 <= tabIdx && tabIdx < routeList.length) {
         const route = routeList[tabIdx];
         if (route !== undefined) {
-          navigator(route);
+          routerNavigator(route);
         }
       }
     },
-    [navigator]
+    [routerNavigator]
   );
 
   return (

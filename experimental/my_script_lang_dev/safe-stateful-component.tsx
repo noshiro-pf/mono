@@ -14,19 +14,17 @@ type ReducerWithLastAction<
   action: Action
 ) => ReducerStateWithLastAction<State, ActionType>;
 
-const toReducerWithLastAction = <
-  State,
-  ActionType extends string,
-  Action extends { type: ActionType }
->(
-  reducer: (state: State, action: Action) => State
-): ReducerWithLastAction<State, ActionType, Action> => (
-  stateWithLastAction: ReducerStateWithLastAction<State, ActionType>,
-  action: Action
-) => ({
-  state: reducer(stateWithLastAction.state, action),
-  lastAction: action.type,
-});
+const toReducerWithLastAction =
+  <State, ActionType extends string, Action extends { type: ActionType }>(
+    reducer: (state: State, action: Action) => State
+  ): ReducerWithLastAction<State, ActionType, Action> =>
+  (
+    stateWithLastAction: ReducerStateWithLastAction<State, ActionType>,
+    action: Action
+  ) => ({
+    state: reducer(stateWithLastAction.state, action),
+    lastAction: action.type,
+  });
 
 export const component = <
   Props,

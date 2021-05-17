@@ -1,14 +1,14 @@
-import { Point, Rgba } from '@noshiro/ts-utils';
-import { Direction } from '../functions/bbox-points';
+import type { Point, Rgba } from '@noshiro/ts-utils';
+import type { Direction } from '../functions/bbox-points';
 import {
   turnOffHighlight,
   turnOnHighlight,
 } from '../functions/update-pixi-bbox-rect';
-import { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
-import { IdType } from '../types/id-type';
-import { PixiApp } from '../types/pixi-app-type';
-import { PixiBbox } from '../types/pixi-bbox';
-import { CanvasAppState } from './canvas-state-type';
+import type { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
+import type { IdType } from '../types/id-type';
+import type { PixiApp } from '../types/pixi-app-type';
+import type { PixiBbox } from '../types/pixi-bbox';
+import type { CanvasAppState } from './canvas-state-type';
 import { onPointerDown } from './handlers/on-pointer-down';
 import { onPointerDownOnBackground } from './handlers/on-pointer-down-on-bg';
 import { onPointerMove } from './handlers/on-pointer-move';

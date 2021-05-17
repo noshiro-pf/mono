@@ -13,9 +13,8 @@ export class MultipleDatePickerComponent implements OnInit {
   @Input() readonly dayLabelLanguage: 'eng' | 'jp' = 'eng';
 
   private selectedDateValuesSource = new BehaviorSubject<number[]>([]);
-  private selectedDateValues$: Observable<
-    number[]
-  > = this.selectedDateValuesSource.asObservable();
+  private selectedDateValues$: Observable<number[]> =
+    this.selectedDateValuesSource.asObservable();
 
   @Input() set initialDateList(value: number[]) {
     const initialDateValuesUniq = utils.array.uniq(

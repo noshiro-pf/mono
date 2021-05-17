@@ -1,4 +1,4 @@
-import { Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils';
 
 export type CallbackFnsType = Readonly<{
   addBbox: (rect: Rect) => void;

@@ -49,10 +49,10 @@ export const DCardImage = memo(
 
     const description = descriptionInput || ''
 
-    const borderWidth = useMemo(() => (18 / 250) * Math.min(width, height), [
-      width,
-      height,
-    ])
+    const borderWidth = useMemo(
+      () => (18 / 250) * Math.min(width, height),
+      [width, height]
+    )
 
     const imgUrl = faceUp ? dcard.imgUrl.front : dcard.imgUrl.back
 

@@ -1,11 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const withLatest = <T, U>(
-  src2: RN<U>,
-  name: string = ''
-): Operator<T, [T, U]> => (src: RN<T>) =>
-  new WithLatestRN<T, U>(src, src2, name);
+export const withLatest =
+  <T, U>(src2: RN<U>, name: string = ''): Operator<T, [T, U]> =>
+  (src: RN<T>) =>
+    new WithLatestRN<T, U>(src, src2, name);
 
 class WithLatestRN<T, U> extends RN<[T, U]> {
   private readonly src2: RN<U>;

@@ -1,5 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { ChangeEvent, useCallback } from 'react';
+import type { ChangeEvent } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 
 export const CodeArea = memoNamed<{

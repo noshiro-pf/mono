@@ -1,6 +1,7 @@
-import { assertType, TypeEq } from '../test-type';
-import { First } from './first';
-import { Rest } from './rest';
+import type { TypeEq } from '../test-type';
+import { assertType } from '../test-type';
+import type { First } from './first';
+import type { Rest } from './rest';
 
 export type Last<T extends unknown[]> = {
   0: never;

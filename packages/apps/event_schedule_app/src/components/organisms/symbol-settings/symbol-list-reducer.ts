@@ -1,8 +1,8 @@
-import { ReducerType } from '@noshiro/ts-utils';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
-import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import { IMap } from '../../../utils/immutable';
+import type { ReducerType } from '@noshiro/ts-utils';
+import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import type { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
+import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import type { IMap } from '../../../utils/immutable';
 
 export type SymbolListReducerAction =
   | {

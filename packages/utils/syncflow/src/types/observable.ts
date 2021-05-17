@@ -1,18 +1,14 @@
-import {
-  assertNotType,
-  assertType,
-  Option,
-  TypeExtends,
-} from '@noshiro/ts-utils';
-import { ObservableId, Token } from './id';
-import { ObservableKind } from './observable-kind';
-import {
+import type { Option, TypeExtends } from '@noshiro/ts-utils';
+import { assertNotType, assertType } from '@noshiro/ts-utils';
+import type { ObservableId, Token } from './id';
+import type { ObservableKind } from './observable-kind';
+import type {
   AsyncChildObservableType,
   ObservableType,
   RootObservableType,
   SyncChildObservableType,
 } from './observable-type';
-import { NonEmptyUnknownList, Subscription } from './types';
+import type { NonEmptyUnknownList, Subscription } from './types';
 
 /**
  * inheritance
@@ -104,21 +100,17 @@ export type ChildObservable<
   | AsyncChildObservable<A, AsyncChildObservableType, P>
   | SyncChildObservable<A, SyncChildObservableType, P>;
 
-export type RootObservable<
-  A,
-  Type extends RootObservableType
-> = ObservableBase<A> &
-  Readonly<{
-    kind: 'root';
-    type: Type;
-    depth: 0;
-    addDescendant: <B>(child: ChildObservable<B>) => void;
-  }>;
+export type RootObservable<A, Type extends RootObservableType> =
+  ObservableBase<A> &
+    Readonly<{
+      kind: 'root';
+      type: Type;
+      depth: 0;
+      addDescendant: <B>(child: ChildObservable<B>) => void;
+    }>;
 
-export type InitializedRootObservable<
-  A,
-  Type extends RootObservableType
-> = InitializedObservableBase<A> & RootObservable<A, Type>;
+export type InitializedRootObservable<A, Type extends RootObservableType> =
+  InitializedObservableBase<A> & RootObservable<A, Type>;
 
 export type Observable<A> =
   | AsyncChildObservable<A, AsyncChildObservableType>

@@ -1,16 +1,16 @@
 import { useResizeObserver } from '@noshiro/preact-resize-observer-hooks';
 import { pipe } from '@noshiro/ts-utils';
-import { FunctionalComponent } from 'preact';
+import type { FunctionalComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
-import { JSXInternal } from 'preact/src/jsx';
+import type { JSXInternal } from 'preact/src/jsx';
 import { Table } from './components/table';
 import { incrementPlayerIndexBy } from './functions/increment-player-index-by';
 import { mapCards } from './functions/map-6-cards';
 import { sortCards } from './functions/sort-6-cards';
-import { CardsWithDisplayValue } from './types/card-type';
-import { GameState } from './types/game-state';
-import { Player6CardsWithDisplayValue } from './types/player-6-card';
-import { PlayerIndex } from './types/player-index';
+import type { CardsWithDisplayValue } from './types/card-type';
+import type { GameState } from './types/game-state';
+import type { Player6CardsWithDisplayValue } from './types/player-6-card';
+import type { PlayerIndex } from './types/player-index';
 
 export const App: FunctionalComponent = () => {
   const [windowSize, ref] = useResizeObserver({ width: 1280, height: 720 });

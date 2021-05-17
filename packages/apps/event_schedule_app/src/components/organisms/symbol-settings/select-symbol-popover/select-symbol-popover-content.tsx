@@ -1,13 +1,11 @@
-import { IconName } from '@blueprintjs/core';
+import type { IconName } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import {
-  AnswerSymbolIconId,
-  answerSymbolIconIdsFromBp,
-} from '../../../../types/enum/answer-symbol-icon';
-import { IList } from '../../../../utils/immutable';
+import type { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
+import { answerSymbolIconIdsFromBp } from '../../../../types/enum/answer-symbol-icon';
+import type { IList } from '../../../../utils/immutable';
 import { CircleIcon, CloseIcon, TriangleIcon } from '../../../atoms/icons';
 
 const icons: readonly {

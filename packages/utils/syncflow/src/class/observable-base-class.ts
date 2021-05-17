@@ -1,5 +1,5 @@
 import { noop, Option } from '@noshiro/ts-utils';
-import {
+import type {
   ChildObservable,
   InitializedObservable,
   Observable,
@@ -22,7 +22,8 @@ export class ObservableBaseClass<
   A,
   Kind extends ObservableBase<A>['kind'],
   Depth extends ObservableBase<A>['depth']
-> implements ObservableBase<A> {
+> implements ObservableBase<A>
+{
   readonly id;
   readonly kind: Kind;
   readonly type;
@@ -116,7 +117,7 @@ export class ObservableBaseClass<
   chain<B>(operator: ToInitializedOperator<A, B>): InitializedObservable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B> {
-    return operator((this as unknown) as InitializedObservable<A>);
+    return operator(this as unknown as InitializedObservable<A>);
   }
 
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {

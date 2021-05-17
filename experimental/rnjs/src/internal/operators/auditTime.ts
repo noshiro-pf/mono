@@ -1,10 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const auditTime = <T>(
-  time: number,
-  name: string = ''
-): Operator<T, T> => (src: RN<T>) => new AuditTimeRN<T>(src, time, name);
+export const auditTime =
+  <T>(time: number, name: string = ''): Operator<T, T> =>
+  (src: RN<T>) =>
+    new AuditTimeRN<T>(src, time, name);
 
 class AuditTimeRN<T> extends RN<T> {
   private readonly time: number;

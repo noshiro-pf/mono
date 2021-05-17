@@ -7,10 +7,10 @@ import {
   answerSymbolPointConfig,
   clampAndRoundAnswerSymbolPoint,
 } from '../../../constants/answer-symbol-point';
-import { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
-import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import { IList } from '../../../utils/immutable';
+import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
+import type { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
+import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import type { IList } from '../../../utils/immutable';
 import { CustomIcon } from '../../atoms/icon';
 
 type Props = Readonly<{
@@ -39,7 +39,7 @@ export const AnswerSymbolRow = memoNamed<Props>(
     return (
       <Root>
         <IconWrapper>
-          <CustomIcon name={answerSymbol.iconId} />
+          <CustomIcon iconName={answerSymbol.iconId} />
           {/* <SelectSymbolPopover
             openerIcon={icon}
             iconsInUse={iconsInUse}

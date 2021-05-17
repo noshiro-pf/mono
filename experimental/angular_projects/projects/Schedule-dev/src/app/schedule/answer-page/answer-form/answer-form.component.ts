@@ -50,9 +50,8 @@ export class AnswerFormComponent implements OnInit {
     this.selectedUsersAnswer$.pluck('comment')
   );
 
-  private readonly selectedDatetimes$: RN<number[]> = this.scEvent$.pluck(
-    'selectedDatetimes'
-  );
+  private readonly selectedDatetimes$: RN<number[]> =
+    this.scEvent$.pluck('selectedDatetimes');
 
   private readonly dateToSymbolIdReset$ = manual<void>(null);
   private readonly dateToSymbolIdSymbolHeaderClick$ = manual<string>(null);

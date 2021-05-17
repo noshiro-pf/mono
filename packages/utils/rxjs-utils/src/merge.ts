@@ -1,6 +1,7 @@
-import { ArrayElement } from '@noshiro/ts-utils';
-import { merge, Observable, ObservableInput } from 'rxjs';
-import { Unwrap } from './unwrap';
+import type { ArrayElement } from '@noshiro/ts-utils';
+import type { Observable, ObservableInput } from 'rxjs';
+import { merge } from 'rxjs';
+import type { Unwrap } from './unwrap';
 
 /**
  * @description combineLatest wrapper to apply better type check.

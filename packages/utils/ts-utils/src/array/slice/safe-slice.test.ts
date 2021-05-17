@@ -1,4 +1,4 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 import { testArrayEquality } from '../array-tester';
 import { safeSlice } from './safe-slice';
 

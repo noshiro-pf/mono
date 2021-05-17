@@ -1,12 +1,12 @@
 import { BpCheckbox, BpEmailInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { TinyObservable } from '@noshiro/ts-utils';
+import type { TinyObservable } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
 import { todayYmdhm } from '../../../constants/today-ymdhm';
-import { INotificationSettings } from '../../../types/record/base/notification-settings';
-import { IYmdHm } from '../../../types/record/ymd-hm';
+import type { INotificationSettings } from '../../../types/record/base/notification-settings';
+import type { IYmdHm } from '../../../types/record/ymd-hm';
 import { ymdhmDateDiff } from '../../../utils/ymdhm-date-diff';
 import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
 

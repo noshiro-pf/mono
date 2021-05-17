@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { redirects, routingList } from '../routing/routing';
 import { Footer } from './organisms/footer/footer';

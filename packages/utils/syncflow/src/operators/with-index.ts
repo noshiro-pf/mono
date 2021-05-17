@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   InitializedToInitializedOperator,
   Observable,
   ToBaseOperator,
@@ -8,9 +8,10 @@ import {
   WithIndexOperatorObservable,
 } from '../types';
 
-export const withIndex = <A>(): ToBaseOperator<A, [number, A]> => (
-  parent: Observable<A>
-) => new WithIndexObservableClass(parent);
+export const withIndex =
+  <A>(): ToBaseOperator<A, [number, A]> =>
+  (parentObservable: Observable<A>) =>
+    new WithIndexObservableClass(parentObservable);
 
 export const withIndexI = <A>(): InitializedToInitializedOperator<
   A,
@@ -22,26 +23,27 @@ export const attachIndexI = withIndexI; // alias
 
 class WithIndexObservableClass<A>
   extends SyncChildObservableClass<[number, A], 'withIndex', [A]>
-  implements WithIndexOperatorObservable<A> {
+  implements WithIndexOperatorObservable<A>
+{
   private _index: number;
 
-  constructor(parent: Observable<A>) {
+  constructor(parentObservable: Observable<A>) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'withIndex',
       currentValueInit: Option.map<A, [number, A]>((x) => [-1, x])(
-        parent.currentValue
+        parentObservable.currentValue
       ),
     });
     this._index = -1;
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     this._index += 1;
-    this.setNext([this._index, parent.currentValue.value], token);
+    this.setNext([this._index, par.currentValue.value], token);
   }
 }

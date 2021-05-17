@@ -1,17 +1,14 @@
+import type { Hsl, Hue, Percent, uint32 } from '@noshiro/ts-utils';
 import {
-  Hsl,
   hslToRgb,
-  Hue,
   max,
-  Percent,
   relativeLuminance,
   roundToInt,
   seq,
-  uint32,
   variance,
   zip,
 } from '@noshiro/ts-utils';
-import { ExperimentResult } from '../types/experiment-result';
+import type { ExperimentResult } from '../types/experiment-result';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';

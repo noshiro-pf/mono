@@ -1,13 +1,7 @@
-import {
-  filter,
-  interval,
-  IntervalObservable,
-  merge,
-  Observable,
-  throttleTime,
-} from '../../src';
+import type { IntervalObservable, Observable } from '../../src';
+import { filter, interval, merge, throttleTime } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 /*
   counter      0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23
@@ -85,9 +79,8 @@ export const throttleTimeTestCases: [
       );
     },
     preview: (tick: number): void => {
-      const { counter$, filtered$, throttleTime$, merged$ } = createStreams(
-        tick
-      );
+      const { counter$, filtered$, throttleTime$, merged$ } =
+        createStreams(tick);
 
       filtered$.subscribe((a) => {
         console.log('filtered', a);

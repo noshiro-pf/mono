@@ -1,13 +1,12 @@
 import { styled } from '@noshiro/solid-styled-components';
-import { JSX } from 'solid-js';
+import type { JSX } from 'solid-js';
 import { useStateAsStream, useStreamValue } from '../utils';
 import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';
 
 export const App = (): JSX.Element => {
-  const [inputAreaString$, setInputAreaString] = useStateAsStream<string>(
-    '((+ 2) 3)'
-  );
+  const [inputAreaString$, setInputAreaString] =
+    useStateAsStream<string>('((+ 2) 3)');
 
   const outputAreaString$ = useLambdaEval(inputAreaString$);
 

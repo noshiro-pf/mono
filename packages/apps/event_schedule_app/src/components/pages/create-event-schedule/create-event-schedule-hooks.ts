@@ -3,7 +3,7 @@ import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../../api/api';
 import { routePaths } from '../../../routing/routing';
-import { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
 
 type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;
@@ -23,9 +23,8 @@ export const useCreateEventScheduleHooks = ({
   newEventSchedule: IEventSchedule;
   eventScheduleValidationOk: boolean;
 }>): CreateEventScheduleHooks => {
-  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] = useBooleanState(
-    false
-  );
+  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =
+    useBooleanState(false);
 
   const [
     createResultDialogIsOpen,

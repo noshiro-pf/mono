@@ -13,7 +13,8 @@ export class PagenationComponent implements OnInit {
   @Input() set selectedPageIndex(value: number) {
     this.selectedPageIndexSource.next(value);
   }
-  selectedPageIndex$: Observable<number> = this.selectedPageIndexSource.asObservable();
+  selectedPageIndex$: Observable<number> =
+    this.selectedPageIndexSource.asObservable();
 
   @Output() selectedPageIndexChange = new EventEmitter<number>();
 

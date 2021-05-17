@@ -4,7 +4,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { denom } from '../constants/denom';
 import { toPercentString } from '../functions/to-percent-string';
-import { ResultRow } from '../types/result-row';
+import type { ResultRow } from '../types/result-row';
 
 const separator = ',';
 

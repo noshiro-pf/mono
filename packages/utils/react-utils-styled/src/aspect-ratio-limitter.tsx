@@ -1,6 +1,7 @@
 import { useResizeObserver } from '@noshiro/react-resize-observer-hooks';
 import { memoNamed } from '@noshiro/react-utils';
-import { CSSProperties, ReactNode, useMemo } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 const Root = styled.div`

@@ -1,6 +1,7 @@
 import { isNonEmpty } from '@noshiro/ts-utils';
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
-import { ResizeObserver } from 'resize-observer';
+import type { RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
 
 type Size = Readonly<{
   height: number;
@@ -14,7 +15,7 @@ export const useResizeObserverRef = (
 ): RefObject<HTMLDivElement> => {
   const rootResizeObserver = useMemo(
     () =>
-      new ResizeObserver((entries) => {
+      new CustomResizeObserver((entries) => {
         if (isNonEmpty(entries)) {
           setSize(entries[0].contentRect);
         }

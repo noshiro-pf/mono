@@ -1,4 +1,5 @@
-import { seq, uint32 } from '@noshiro/ts-utils';
+import type { uint32 } from '@noshiro/ts-utils';
+import { seq } from '@noshiro/ts-utils';
 
 export const calcPrincipalEqualPayment = ({
   borrowingPeriodMonth: numPayments,

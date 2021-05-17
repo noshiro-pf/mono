@@ -38,10 +38,8 @@ export const ExpansionsToggleList = memo(
     )
     useEffectFromProps(expansions, setExpansions)
 
-    const [
-      expansionsCheckedInput$,
-      setExpansionsCheckedInput,
-    ] = useStateAsStream<I.List<string>>(I.List())
+    const [expansionsCheckedInput$, setExpansionsCheckedInput] =
+      useStateAsStream<I.List<string>>(I.List())
     useEffectFromProps(expansionsCheckedInput, setExpansionsCheckedInput)
 
     /* streams */
@@ -91,11 +89,9 @@ export const ExpansionsToggleList = memo(
     )
 
     const expansionsWithCheck$: RN<I.List<[string, boolean]>> = useRN(
-      combine(
-        expansions$,
-        expansionsChecked$
-      ).map(([expansions, expansionsChecked]) =>
-        expansions.map((e) => [e, expansionsChecked.has(e)])
+      combine(expansions$, expansionsChecked$).map(
+        ([expansions, expansionsChecked]) =>
+          expansions.map((e) => [e, expansionsChecked.has(e)])
       )
     )
 

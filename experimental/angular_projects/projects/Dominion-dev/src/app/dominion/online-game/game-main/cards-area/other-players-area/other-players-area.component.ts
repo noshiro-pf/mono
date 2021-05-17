@@ -30,8 +30,8 @@ import { MyGameRoomService } from '../../services/my-game-room.service';
   styles: [],
 })
 export class OtherPlayerAreaComponent implements OnInit {
-  playersNameShuffled$: Observable<string[]> = this.myGameRoomService
-    .playersNameShuffled$;
+  playersNameShuffled$: Observable<string[]> =
+    this.myGameRoomService.playersNameShuffled$;
 
   thinkingState$: Observable<boolean[]> = this.communication.thinkingState$;
 

@@ -64,13 +64,11 @@ export class CardPropertyDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const showingIndexIncrement$: RN<string> = this.showingIndexIncrementSource.mapTo(
-      'increment'
-    );
+    const showingIndexIncrement$: RN<string> =
+      this.showingIndexIncrementSource.mapTo('increment');
 
-    const showingIndexDecrement$: RN<string> = this.showingIndexDecrementSource.mapTo(
-      'decrement'
-    );
+    const showingIndexDecrement$: RN<string> =
+      this.showingIndexDecrementSource.mapTo('decrement');
 
     const showingIndexIncrAcc$: RN<number> = merge(
       merge(showingIndexIncrement$, showingIndexDecrement$).scan(

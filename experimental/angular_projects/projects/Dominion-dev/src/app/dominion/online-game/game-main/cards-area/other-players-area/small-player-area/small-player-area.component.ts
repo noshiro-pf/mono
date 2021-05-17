@@ -53,9 +53,10 @@ export class SmallPlayerAreaComponent implements OnInit {
       ),
     };
 
-    const playerData$: Observable<PlayerData> = this.gameStateService.allPlayersData$.pipe(
-      map((e) => e[this.playerIndex])
-    );
+    const playerData$: Observable<PlayerData> =
+      this.gameStateService.allPlayersData$.pipe(
+        map((e) => e[this.playerIndex])
+      );
 
     this.VPtoken$ = playerData$.pipe(map((e) => e.VPtoken));
     this.vcoin$ = playerData$.pipe(map((e) => e.vcoin));

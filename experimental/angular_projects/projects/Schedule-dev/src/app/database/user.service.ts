@@ -17,13 +17,11 @@ export class UserService {
     this.afAuth.authState
   ).map((user) => !!user);
 
-  private user$: RN<User> = combine(
-    this.uid$,
-    this.database.users$
-  ).map(([uid, users]) =>
-    !uid || users.length === 0
-      ? new User()
-      : users.find((e) => e.databaseKey === uid) || new User()
+  private user$: RN<User> = combine(this.uid$, this.database.users$).map(
+    ([uid, users]) =>
+      !uid || users.length === 0
+        ? new User()
+        : users.find((e) => e.databaseKey === uid) || new User()
   );
 
   name$: RN<string> = this.user$.pluck('name').skipUnchanged();

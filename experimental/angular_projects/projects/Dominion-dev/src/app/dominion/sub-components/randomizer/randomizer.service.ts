@@ -68,18 +68,14 @@ export class RandomizerService {
     }
 
     // 繁栄場・避難所場の決定
-    const firstSelectedCard = this.cardPropertyList[
-      selectedCardsTemp.KingdomCards10[0]
-    ];
-    const lastSelectedCard = this.cardPropertyList[
-      selectedCardsTemp.KingdomCards10[9]
-    ];
-    selectedCardsTemp.Prosperity = firstSelectedCard.expansionName.includes(
-      '繁栄'
-    );
-    selectedCardsTemp.DarkAges = lastSelectedCard.expansionName.includes(
-      '暗黒時代'
-    );
+    const firstSelectedCard =
+      this.cardPropertyList[selectedCardsTemp.KingdomCards10[0]];
+    const lastSelectedCard =
+      this.cardPropertyList[selectedCardsTemp.KingdomCards10[9]];
+    selectedCardsTemp.Prosperity =
+      firstSelectedCard.expansionName.includes('繁栄');
+    selectedCardsTemp.DarkAges =
+      lastSelectedCard.expansionName.includes('暗黒時代');
 
     // 災いカード（収穫祭：魔女娘）
     if (
@@ -130,9 +126,8 @@ export class RandomizerService {
           selectedCardsTemp.KingdomCards10,
           selectedCardsTemp.BaneCard
         );
-        const ObeliskCandidatesActionCards: number[] = utils.array.copy(
-          supplyUsed
-        );
+        const ObeliskCandidatesActionCards: number[] =
+          utils.array.copy(supplyUsed);
 
         const ct: CardType[] = utils.array.flatten(
           supplyUsed.map((e) => this.cardPropertyList[e].cardTypes)

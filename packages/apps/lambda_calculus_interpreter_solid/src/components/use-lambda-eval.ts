@@ -1,13 +1,13 @@
+import type { LambdaTerm } from '@noshiro/lambda-calculus-interpreter-core';
 import {
   evalSequence,
-  LambdaTerm,
   parseLambdaTerm,
   termToString,
 } from '@noshiro/lambda-calculus-interpreter-core';
+import type { InitializedObservable } from '@noshiro/syncflow';
 import {
   debounceTimeI,
   filter,
-  InitializedObservable,
   map,
   mapI,
   withInitialValue,
@@ -19,9 +19,8 @@ export const useLambdaEval = (
 ): InitializedObservable<string> => {
   const inputBuffered$ = input$.chain(debounceTimeI(200 /* ms */));
 
-  const parseTree$: InitializedObservable<
-    LambdaTerm | undefined
-  > = inputBuffered$.chain(mapI(parseLambdaTerm));
+  const parseTree$: InitializedObservable<LambdaTerm | undefined> =
+    inputBuffered$.chain(mapI(parseLambdaTerm));
 
   const evalSequence$: InitializedObservable<LambdaTerm[]> = parseTree$
     .chain(filter(isNotUndefined))

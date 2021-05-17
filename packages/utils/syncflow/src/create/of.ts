@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { OfObservable } from '../types';
+import type { OfObservable } from '../types';
 
 export const of = <A>(
   value: A,
@@ -9,7 +9,8 @@ export const of = <A>(
 
 class OfObservableClass<A>
   extends RootObservableClass<A, 'Of'>
-  implements OfObservable<A> {
+  implements OfObservable<A>
+{
   private readonly _value: A;
 
   constructor(value: A, startManually: boolean = false) {

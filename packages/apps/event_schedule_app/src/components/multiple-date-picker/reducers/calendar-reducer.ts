@@ -1,11 +1,5 @@
-import {
-  getMonth,
-  getYear,
-  MonthEnum,
-  ReducerType,
-  today,
-  YearEnum,
-} from '@noshiro/ts-utils';
+import type { MonthEnum, ReducerType, YearEnum } from '@noshiro/ts-utils';
+import { getMonth, getYear, today } from '@noshiro/ts-utils';
 
 export type CalendarCurrentPageReducerState = Readonly<{
   year: YearEnum;
@@ -20,10 +14,11 @@ export type CalendarCurrentPageReducerAction = Readonly<
   | { type: 'today' }
 >;
 
-export const calendarCurrentPageInitialState = (): CalendarCurrentPageReducerState => ({
-  year: getYear(today()),
-  month: getMonth(today()),
-});
+export const calendarCurrentPageInitialState =
+  (): CalendarCurrentPageReducerState => ({
+    year: getYear(today()),
+    month: getMonth(today()),
+  });
 
 export const calendarCurrentPageReducer: ReducerType<
   CalendarCurrentPageReducerState,

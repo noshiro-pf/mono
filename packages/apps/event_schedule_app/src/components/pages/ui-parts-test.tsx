@@ -6,7 +6,8 @@ import {
   BpTimePicker,
 } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useToggleState } from '@noshiro/react-utils';
-import { CSSProperties, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { clog } from '../../utils/log';
 import {

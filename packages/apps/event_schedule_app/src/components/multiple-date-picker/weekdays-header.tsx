@@ -1,5 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { WeekDayEnum, weekdaysList } from '@noshiro/ts-utils';
+import type { WeekDayEnum } from '@noshiro/ts-utils';
+import { weekdaysList } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -23,10 +24,10 @@ export const WeekdaysHeader = memoNamed<Props>(
     return (
       <div className='DayPicker-Weekdays' role='rowgroup'>
         <div className='DayPicker-WeekdaysRow' role='row'>
-          {listWithHandler.map(({ name, abbr, onClickHandler }) => (
+          {listWithHandler.map(({ name: title, abbr, onClickHandler }) => (
             <HeaderCell
-              key={name}
-              title={name}
+              key={title}
+              title={title}
               abbr={abbr}
               onClick={onClickHandler}
             />

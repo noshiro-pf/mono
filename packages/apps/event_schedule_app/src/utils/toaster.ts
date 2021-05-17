@@ -1,4 +1,5 @@
-import { Intent, IToaster, Toaster } from '@blueprintjs/core';
+import type { Intent, IToaster } from '@blueprintjs/core';
+import { Toaster } from '@blueprintjs/core';
 
 export const createToaster = (): IToaster =>
   Toaster.create({ canEscapeKeyClear: true, position: 'top' });

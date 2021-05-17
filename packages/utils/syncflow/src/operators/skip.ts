@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   Observable,
   RemoveInitializedOperator,
   SkipOperatorObservable,
@@ -8,22 +8,26 @@ import {
 } from '../types';
 import { isPositiveInteger } from '../utils';
 
-export const skip = <A>(n: number): RemoveInitializedOperator<A, A> => (
-  parent: Observable<A>
-) => (!isPositiveInteger(n) ? parent : new SkipObservableClass(parent, n));
+export const skip =
+  <A>(n: number): RemoveInitializedOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    !isPositiveInteger(n)
+      ? parentObservable
+      : new SkipObservableClass(parentObservable, n);
 
 class SkipObservableClass<A>
   extends SyncChildObservableClass<A, 'skip', [A]>
-  implements SkipOperatorObservable<A> {
+  implements SkipOperatorObservable<A>
+{
   private readonly _n: number;
   private _counter: number;
 
-  constructor(parent: Observable<A>, n: number) {
+  constructor(parentObservable: Observable<A>, n: number) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'skip',
       currentValueInit: !isPositiveInteger(n)
-        ? parent.currentValue
+        ? parentObservable.currentValue
         : Option.none,
     });
     this._counter = 0;
@@ -31,13 +35,13 @@ class SkipObservableClass<A>
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     this._counter += 1;
     if (this._counter > this._n) {
-      this.setNext(parent.currentValue.value, token);
+      this.setNext(par.currentValue.value, token);
     }
   }
 }

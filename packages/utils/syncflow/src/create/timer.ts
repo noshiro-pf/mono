@@ -1,6 +1,7 @@
-import { Option, TimerId } from '@noshiro/ts-utils';
+import type { TimerId } from '@noshiro/ts-utils';
+import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import { TimerObservable } from '../types';
+import type { TimerObservable } from '../types';
 
 export const timer = (
   millisec: number,
@@ -9,7 +10,8 @@ export const timer = (
 
 class TimerObservableClass
   extends RootObservableClass<number, 'Timer'>
-  implements TimerObservable {
+  implements TimerObservable
+{
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
   private _isStarted: boolean;

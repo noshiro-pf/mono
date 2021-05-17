@@ -1,5 +1,5 @@
-import { CardColor } from './card-color';
-import { CardNumber } from './card-number';
+import type { CardColor } from './card-color';
+import type { CardNumber } from './card-number';
 
 export type Card = Readonly<{
   color: CardColor;

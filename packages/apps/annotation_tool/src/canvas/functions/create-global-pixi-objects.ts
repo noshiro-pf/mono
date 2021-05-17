@@ -1,7 +1,7 @@
-import { RectSize } from '@noshiro/ts-utils';
-import { Application, Sprite } from 'pixi.js';
-import { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
-import { PixiTempRect } from '../types/pixi-temp-rect';
+import type { RectSize } from '@noshiro/ts-utils';
+import type { Application, Sprite } from 'pixi.js';
+import type { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
+import type { PixiTempRect } from '../types/pixi-temp-rect';
 import {
   createBorderedRectangleGraphics,
   createDummySpriteRectangle,
@@ -14,7 +14,7 @@ type Args = Readonly<{
   canvasStyles: AnnotationCanvasStyle;
 }>;
 
-type ReturnType = Readonly<{
+type ComponentReturnType = Readonly<{
   background: Sprite;
   verticalLine: Sprite;
   horizontalLine: Sprite;
@@ -25,7 +25,7 @@ export const createGlobalPixiObjects = ({
   app,
   canvasSize,
   canvasStyles,
-}: Args): ReturnType => {
+}: Args): ComponentReturnType => {
   const halfWidth = Math.floor(canvasStyles.crosshairLineWidthPx / 2);
 
   const background = createDummySpriteRectangle({

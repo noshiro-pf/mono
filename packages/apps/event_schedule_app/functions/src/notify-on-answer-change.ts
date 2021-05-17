@@ -6,7 +6,7 @@ import {
 } from './create-mail-body';
 import { getEventItem } from './get-event-item';
 import { createMailOptions, sendEmail } from './setup-mailer';
-import { AnswerJsType } from './types/record/answer';
+import type { AnswerJsType } from './types/record/answer';
 import { compareYmdHm } from './types/record/ymd-hm';
 import { now } from './utils/today';
 

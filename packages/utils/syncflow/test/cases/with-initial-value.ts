@@ -1,14 +1,11 @@
-import {
-  combineLatest,
-  interval,
+import type {
   IntervalObservable,
   Observable,
-  timer,
   TimerObservable,
-  withInitialValue,
 } from '../../src';
+import { combineLatest, interval, timer, withInitialValue } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number

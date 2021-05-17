@@ -18,7 +18,7 @@ import { api } from '../../../api/api';
 import { descriptionFontColor } from '../../../constants/color';
 import { texts } from '../../../constants/texts';
 import { useEventId } from '../../../routing/use-event-id';
-import { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
 import { clog } from '../../../utils/log';
 import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';

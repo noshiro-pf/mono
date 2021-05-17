@@ -1,4 +1,4 @@
-import { IconName, Intent } from '@blueprintjs/core';
+import type { IconName, Intent } from '@blueprintjs/core';
 import { BpAlert } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 

@@ -1,4 +1,4 @@
-import { uint32 } from '../../types';
+import type { uint32 } from '../../types';
 import { indexIsInRange } from '../is-in-range';
 
 /**

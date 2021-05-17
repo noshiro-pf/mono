@@ -1,5 +1,5 @@
-import { ReadonlyDate } from '../../../types';
-import { MinutesEnum } from '../../types';
+import type { ReadonlyDate } from '../../../types';
+import type { MinutesEnum } from '../../types';
 
 export const getMinutes = (date: ReadonlyDate): MinutesEnum =>
   date.getMinutes() as MinutesEnum;

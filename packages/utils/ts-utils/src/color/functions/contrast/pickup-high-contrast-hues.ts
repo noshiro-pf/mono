@@ -1,20 +1,15 @@
-import {
-  map,
-  max,
-  NonEmptyArray,
-  ReadonlyNonEmptyArray,
-  seq,
-  zeros,
-} from '../../../array';
+import type { NonEmptyArray, ReadonlyNonEmptyArray } from '../../../array';
+import { map, max, seq, zeros } from '../../../array';
 import { pipe } from '../../../functional';
-import { isUint32, Percent, uint32 } from '../../../types';
-import { Hue } from '../../types';
+import type { Percent, uint32 } from '../../../types';
+import { isUint32 } from '../../../types';
+import type { Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc';
 import { relativeLuminance } from './relative-luminance';
 
 // constants
-const hues = (seq(360 as uint32) as unknown) as ReadonlyNonEmptyArray<Hue>;
+const hues = seq(360 as uint32) as unknown as ReadonlyNonEmptyArray<Hue>;
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（＝hue）を返す

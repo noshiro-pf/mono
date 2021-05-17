@@ -15,7 +15,7 @@ export const typescriptEslintRules: Readonly<
     '@typescript-eslint/consistent-indexed-object-style': 'error',
     '@typescript-eslint/consistent-type-assertions': 'error',
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-    // '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/explicit-function-return-type': [
       'warn',
       {
@@ -24,9 +24,12 @@ export const typescriptEslintRules: Readonly<
         allowHigherOrderFunctions: true,
       },
     ],
-    // '@typescript-eslint/explicit-member-accessibility': 'error',
+    '@typescript-eslint/explicit-member-accessibility': [
+      'error',
+      { accessibility: 'no-public' },
+    ],
     // '@typescript-eslint/member-delimiter-style': 'error',  -> scope of prettier
-    // '@typescript-eslint/member-ordering': 'error', -> off
+    // '@typescript-eslint/member-ordering': 'error', -> off because I use class only occasionally
     '@typescript-eslint/method-signature-style': 'error',
     // '@typescript-eslint/naming-convention': 'error',
     '@typescript-eslint/no-base-to-string': 'error',
@@ -76,6 +79,25 @@ export const typescriptEslintRules: Readonly<
     // '@typescript-eslint/type-annotation-spacing': 'error',  -> scope of prettier
     // '@typescript-eslint/typedef': 'error',  -> unnecessary if noImplicitAny and/or strictPropertyInitialization is enabled.
     '@typescript-eslint/unified-signatures': 'error',
+
+    // extension rules
+    'dot-notation': 'off',
+    '@typescript-eslint/dot-notation': 'error',
+    'no-dupe-class-members': 'off',
+    '@typescript-eslint/no-dupe-class-members': 'error',
+    'no-unused-expressions': 'off',
+    '@typescript-eslint/no-unused-expressions': 'error',
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': [
+      'warn',
+      {
+        allow: ['Option'],
+        builtinGlobals: true,
+        hoist: 'all',
+        ignoreTypeValueShadow: false,
+        ignoreFunctionTypeParameterNameValueShadow: false,
+      },
+    ],
   },
   modifiedRulesIncludedInRecommended: {
     '@typescript-eslint/ban-types': [
@@ -100,13 +122,6 @@ export const typescriptEslintRules: Readonly<
   disabledRulesIncludedInRecommended: {
     'no-unused-vars': ['off'],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    // '@typescript-eslint/no-unused-vars-experimental': [
-    //   'error',
-    //   {
-    //     ignoredNamesRegex: '^_',
-    //     ignoreArgsIfArgsAfterAreUsed: true,
-    //   },
-    // ],
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-inferrable-types': 'off',

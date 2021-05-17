@@ -1,6 +1,6 @@
 import { seq } from '../array';
-import { uint32 } from '../types';
-import { Hsl, Hue } from './types';
+import type { uint32 } from '../types';
+import type { Hsl, Hue } from './types';
 
 export const whiteHsl: Hsl = [0, 0, 100];
 export const blackHsl: Hsl = [0, 0, 0];

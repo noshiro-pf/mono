@@ -1,9 +1,9 @@
-import { DateEnum, getDay, MonthEnum, YearEnum } from '@noshiro/ts-utils';
-import {
-  createIYearMonthDate,
-  IYearMonthDate,
-} from '../../types/record/base/year-month-date';
-import { IList, IRange } from '../../utils/immutable';
+import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
+import { getDay } from '@noshiro/ts-utils';
+import type { IYearMonthDate } from '../../types/record/base/year-month-date';
+import { createIYearMonthDate } from '../../types/record/base/year-month-date';
+import type { IList } from '../../utils/immutable';
+import { IRange } from '../../utils/immutable';
 
 /**
  * rowsize = 5

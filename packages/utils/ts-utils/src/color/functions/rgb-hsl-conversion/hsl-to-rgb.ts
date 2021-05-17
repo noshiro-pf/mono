@@ -1,4 +1,4 @@
-import { Hsl, Hsla, Rgb, Rgba } from '../../types';
+import type { Hsl, Hsla, Rgb, Rgba } from '../../types';
 import { numberToRgbValue } from '../from-number';
 
 const hue2rgb = (p: number, q: number, s: number): number => {

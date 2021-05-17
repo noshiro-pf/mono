@@ -46,7 +46,8 @@ export class Observable<T> {
 
 class MapObservable<T, S>
   extends Observable<S>
-  implements ChildObservable<T, S> {
+  implements ChildObservable<T, S>
+{
   private readonly mapFn: (value: T) => S;
 
   constructor(mapFn: (value: T) => S) {
@@ -62,7 +63,8 @@ class MapObservable<T, S>
 
 class FilterObservable<T>
   extends Observable<T>
-  implements ChildObservable<T, T> {
+  implements ChildObservable<T, T>
+{
   private readonly filterFn: (value: T) => boolean;
 
   constructor(filterFn: (value: T) => boolean) {
@@ -79,7 +81,8 @@ class FilterObservable<T>
 
 class DebounceTimeObservable<T>
   extends Observable<T>
-  implements ChildObservable<T, T> {
+  implements ChildObservable<T, T>
+{
   private readonly milliSec: number;
   private timerId: any;
 

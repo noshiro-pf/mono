@@ -1,4 +1,4 @@
-import { RectSize } from '../types';
+import type { RectSize } from '../types';
 import { getImageSizeFromImageElement } from './get-image-size-from-img-element';
 
 export const getImageSizeFromUrl = (url: string): Promise<RectSize> =>

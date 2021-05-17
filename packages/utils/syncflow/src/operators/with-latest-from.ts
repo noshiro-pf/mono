@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   InitializedObservable,
   InitializedToInitializedOperator,
   Observable,
@@ -10,10 +10,10 @@ import {
 } from '../types';
 import { maxDepth } from '../utils';
 
-export const withLatestFrom = <A, B>(
-  observable: Observable<B>
-): ToBaseOperator<A, [A, B]> => (parent: Observable<A>) =>
-  new WithLatestFromObservableClass(parent, observable);
+export const withLatestFrom =
+  <A, B>(observable: Observable<B>): ToBaseOperator<A, [A, B]> =>
+  (parentObservable: Observable<A>) =>
+    new WithLatestFromObservableClass(parentObservable, observable);
 
 export const withLatestFromI = <A, B>(
   observable: InitializedObservable<B>
@@ -25,20 +25,21 @@ export const withLatestI = withLatestFromI; // alias
 
 class WithLatestFromObservableClass<A, B>
   extends SyncChildObservableClass<[A, B], 'withLatestFrom', [A]>
-  implements WithLatestFromOperatorObservable<A, B> {
+  implements WithLatestFromOperatorObservable<A, B>
+{
   private readonly _observable: Observable<B>;
 
-  constructor(parent: Observable<A>, observable: Observable<B>) {
+  constructor(parentObservable: Observable<A>, observable: Observable<B>) {
     super({
-      parents: [parent],
-      depth: 1 + maxDepth([parent, observable]),
+      parents: [parentObservable],
+      depth: 1 + maxDepth([parentObservable, observable]),
       type: 'withLatestFrom',
       currentValueInit:
-        Option.isNone(parent.currentValue) ||
+        Option.isNone(parentObservable.currentValue) ||
         Option.isNone(observable.currentValue)
           ? Option.none
           : Option.some([
-              parent.currentValue.value,
+              parentObservable.currentValue.value,
               observable.currentValue.value,
             ]),
     });
@@ -47,13 +48,13 @@ class WithLatestFromObservableClass<A, B>
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     const curr = this._observable.currentValue;
     if (Option.isNone(curr)) return; // skip update
 
-    this.setNext([parent.currentValue.value, curr.value], token);
+    this.setNext([par.currentValue.value, curr.value], token);
   }
 }

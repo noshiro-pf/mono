@@ -1,6 +1,7 @@
 import { memoNamed } from '@noshiro/preact-utils';
-import { StrictOmit } from '@noshiro/ts-utils';
-import { CardProps, useCardAttributes } from './common';
+import type { StrictOmit } from '@noshiro/ts-utils';
+import type { CardProps } from './common';
+import { useCardAttributes } from './common';
 
 export const CardEmpty = memoNamed(
   'CardEmpty',

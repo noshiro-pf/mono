@@ -1,4 +1,4 @@
-import { ReadonlyDate } from '../../types';
+import type { ReadonlyDate } from '../../types';
 import { toTimestamp } from './to-timestamp';
 
 export const toMidnight = (date: ReadonlyDate): Date => {

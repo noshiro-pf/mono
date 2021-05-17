@@ -1,6 +1,6 @@
 import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   InitializedToInitializedOperator,
   MapToOperatorObservable,
   Observable,
@@ -8,9 +8,10 @@ import {
   Token,
 } from '../types';
 
-export const mapTo = <A, B>(value: B): ToBaseOperator<A, B> => (
-  parent: Observable<A>
-) => new MapToObservableClass(parent, value);
+export const mapTo =
+  <A, B>(value: B): ToBaseOperator<A, B> =>
+  (parentObservable: Observable<A>) =>
+    new MapToObservableClass(parentObservable, value);
 
 export const mapToI = <A, B>(
   value: B
@@ -19,12 +20,13 @@ export const mapToI = <A, B>(
 
 class MapToObservableClass<A, B>
   extends SyncChildObservableClass<B, 'mapTo', [A]>
-  implements MapToOperatorObservable<A, B> {
+  implements MapToOperatorObservable<A, B>
+{
   private readonly _value: B;
 
-  constructor(parent: Observable<A>, value: B) {
+  constructor(parentObservable: Observable<A>, value: B) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'mapTo',
       currentValueInit: Option.some(value),
     });
@@ -32,9 +34,9 @@ class MapToObservableClass<A, B>
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
 
     this.setNext(this._value, token);
   }

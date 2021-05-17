@@ -1,13 +1,7 @@
-import {
-  combineLatest,
-  filter,
-  interval,
-  IntervalObservable,
-  map,
-  Observable,
-} from '../../src';
+import type { IntervalObservable, Observable } from '../../src';
+import { combineLatest, filter, interval, map } from '../../src';
 import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
-import { StreamTestCase } from '../typedef';
+import type { StreamTestCase } from '../typedef';
 
 /*
  *  [      counter      ]
@@ -110,14 +104,8 @@ export const combineLatestTestCases: [
       );
     },
     preview: (tick: number): void => {
-      const {
-        counter$,
-        double$,
-        quad$,
-        square$,
-        squareEven$,
-        combined$,
-      } = createStreams(tick);
+      const { counter$, double$, quad$, square$, squareEven$, combined$ } =
+        createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);

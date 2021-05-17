@@ -1,4 +1,4 @@
-import { AnswerSelectionJsType } from './answer-selection';
+import type { AnswerSelectionJsType } from './answer-selection';
 
 export type AnswerJsType = Readonly<{
   id: string;

@@ -1,4 +1,4 @@
-import { uint32 } from '../types';
+import type { uint32 } from '../types';
 
-export const length = (array: readonly unknown[]): uint32 =>
+export const arraySize = (array: readonly unknown[]): uint32 =>
   array.length as uint32;

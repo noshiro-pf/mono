@@ -2,9 +2,10 @@ import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 import { Subscription } from '../types/Subscription';
 
-export const switchMap = <T, U>(fn: (e: T) => RN<U>): Operator<T, U> => (
-  src: RN<T>
-) => new SwitchMapRN<T, U>(src, fn);
+export const switchMap =
+  <T, U>(fn: (e: T) => RN<U>): Operator<T, U> =>
+  (src: RN<T>) =>
+    new SwitchMapRN<T, U>(src, fn);
 
 class SwitchMapRN<T, U> extends RN<U> {
   private latestRN: RN<U>;

@@ -76,14 +76,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
   /* user input */
 
   private itemsPerPageSource = manual<number>(50);
-  private itemsPerPageChange$ = this.itemsPerPageSource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private itemsPerPageChange$ =
+    this.itemsPerPageSource.debounce(DEBOUNCE_TIME_SHORT);
 
   private pageNumberSource = manual<number>(1);
-  private pageNumberChange$ = this.pageNumberSource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private pageNumberChange$ =
+    this.pageNumberSource.debounce(DEBOUNCE_TIME_SHORT);
 
   private headerValueSource = manual<{ columnIndex: number; value: any }>({
     columnIndex: 0,
@@ -92,9 +90,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
   private headerValueChange$ = this.headerValueSource.debounce(DEBOUNCE_TIME);
 
   private resetAllClickSource = manual<void>(null);
-  private resetAllClick$ = this.resetAllClickSource.debounce(
-    DEBOUNCE_TIME_SHORT
-  );
+  private resetAllClick$ =
+    this.resetAllClickSource.debounce(DEBOUNCE_TIME_SHORT);
 
   private resetClickSource = manual<number>(0);
   private resetClick$ = this.resetClickSource.debounce(DEBOUNCE_TIME_SHORT);
@@ -180,10 +177,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
         .map(([_, settings]) => settings.itemsPerPageInit || 100)
     );
 
-    const pageLength$: RN<number> = combine(
-      filteredLength$,
-      itemsPerPage$
-    ).map(([length, itemsPerPage]) => Math.ceil(length / itemsPerPage));
+    const pageLength$: RN<number> = combine(filteredLength$, itemsPerPage$).map(
+      ([length, itemsPerPage]) => Math.ceil(length / itemsPerPage)
+    );
 
     const pageNumber$: RN<number> = merge(
       this.pageNumberChange$,
@@ -193,13 +189,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     /* table */
 
-    const tableFilteredSortedIndexed$: RN<
-      { val: any[]; idx: number }[]
-    > = combine(
-      tableFilteredIndexed$,
-      sortBy$,
-      this.settings$
-    ).map(([tbl, sortBy, settings]) => getSorted(tbl, sortBy, settings));
+    const tableFilteredSortedIndexed$: RN<{ val: any[]; idx: number }[]> =
+      combine(tableFilteredIndexed$, sortBy$, this.settings$).map(
+        ([tbl, sortBy, settings]) => getSorted(tbl, sortBy, settings)
+      );
 
     const tableSlicedIndexed$: RN<{ val: any[]; idx: number }[]> = combine(
       itemsPerPage$,
@@ -210,17 +203,16 @@ export class DataTableComponent implements OnInit, OnDestroy {
       usePagenation ? slice(tbl, itemsPerPage, pageNumber) : tbl
     );
 
-    const tableSlicedTransformedIndexed$: RN<
-      { val: string[]; idx: number }[]
-    > = combine(tableSlicedIndexed$, this.settings$).map(([tbl, settings]) =>
-      tbl.map((line) => ({
-        idx: line.idx,
-        val: line.val.map((e, i) => {
-          const tr = settings.headerSettings[i].transform;
-          return tr === undefined ? e : tr(e);
-        }),
-      }))
-    );
+    const tableSlicedTransformedIndexed$: RN<{ val: string[]; idx: number }[]> =
+      combine(tableSlicedIndexed$, this.settings$).map(([tbl, settings]) =>
+        tbl.map((line) => ({
+          idx: line.idx,
+          val: line.val.map((e, i) => {
+            const tr = settings.headerSettings[i].transform;
+            return tr === undefined ? e : tr(e);
+          }),
+        }))
+      );
 
     const selectorOptionsAll$: RN<SelectorOption[][]> = combine(
       tableFilteredIndexed$.map((list) => list.map((e) => e.val)),

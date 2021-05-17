@@ -1,11 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const startWith = <T>(
-  initialValue: T,
-  name: string = ''
-): Operator<T, T> => (src: RN<T>) =>
-  new StartWithRN<T>(src, initialValue, name);
+export const startWith =
+  <T>(initialValue: T, name: string = ''): Operator<T, T> =>
+  (src: RN<T>) =>
+    new StartWithRN<T>(src, initialValue, name);
 
 class StartWithRN<T> extends RN<T> {
   constructor(src: RN<T>, initialValue: T, name: string = '') {

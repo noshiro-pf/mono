@@ -1,4 +1,5 @@
-import { Rect, Rgba, rgbaToHexNumber } from '@noshiro/ts-utils';
+import type { Rect, Rgba } from '@noshiro/ts-utils';
+import { rgbaToHexNumber } from '@noshiro/ts-utils';
 import { Graphics, Sprite, Texture } from 'pixi.js';
 
 export const createDummySpriteRectangle = (rect: Rect): Sprite => {
@@ -46,10 +47,10 @@ export const updateRectangleGraphics = (
   faceColor: Rgba
 ): void => {
   gr.clear();
-  const { left, top, width, height } = rect;
+  const { left, top: top_, width, height } = rect;
   const { hex, alpha } = rgbaToHexNumber(faceColor);
   gr.beginFill(hex, alpha);
-  gr.drawRect(left, top, width, height);
+  gr.drawRect(left, top_, width, height);
   gr.endFill();
 };
 
@@ -83,10 +84,10 @@ export const updateBorderedRectangleGraphics = (
     gr.lineStyle(borderWidthPx, hex, alpha, 0);
   }
   {
-    const { left, top, width, height } = rect;
+    const { left, top: top_, width, height } = rect;
     const { hex, alpha } = rgbaToHexNumber(faceColor);
     gr.beginFill(hex, alpha);
-    gr.drawRect(left, top, width, height);
+    gr.drawRect(left, top_, width, height);
     gr.endFill();
   }
 };

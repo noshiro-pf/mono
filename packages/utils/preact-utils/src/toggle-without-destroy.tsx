@@ -1,4 +1,4 @@
-import { h, VNode } from 'preact';
+import type { h, VNode } from 'preact';
 import { memoNamed } from './memo-named';
 
 type Props = Readonly<{

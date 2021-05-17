@@ -1,13 +1,13 @@
-import { RefObject, useEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
   RefObject<HTMLCanvasElement>
 ] => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [ctx, setCtx] = useState<CanvasRenderingContext2D | undefined>(
-    undefined
-  );
+  const [ctx, setCtx] =
+    useState<CanvasRenderingContext2D | undefined>(undefined);
 
   useEffect(() => {
     const canvasEl = canvasRef.current;

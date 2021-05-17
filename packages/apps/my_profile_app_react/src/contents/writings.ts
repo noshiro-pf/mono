@@ -1,9 +1,8 @@
-import { WritingsInfo } from '../types';
+import type { WritingsInfo } from '../types';
 
 export const writings: WritingsInfo[] = [
   {
-    link:
-      'https://www.notion.so/noshiro/TypeScript-v4-1-noUncheckedIndexedAccess-00144ca0b4f44c1cb73f7ca43002aa70',
+    link: 'https://www.notion.so/noshiro/TypeScript-v4-1-noUncheckedIndexedAccess-00144ca0b4f44c1cb73f7ca43002aa70',
     title:
       'TypeScript v4.1 で追加されたnoUncheckedIndexedAccessオプションと上手くやっていくには',
     subtitle: '',
@@ -12,8 +11,7 @@ export const writings: WritingsInfo[] = [
     body2: '',
   },
   {
-    link:
-      'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
+    link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
     title: ' リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
     subtitle:
       'RxJSで発生するglitchという不健全な挙動と、拙作「SyncFlow」の紹介',

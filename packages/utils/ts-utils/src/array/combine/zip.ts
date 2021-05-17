@@ -1,9 +1,9 @@
 import { tuple } from '../../others';
-import { ArrayElement, uint32 } from '../../types';
+import type { ArrayElement, uint32 } from '../../types';
 import { seq } from '../create';
-import { length } from '../length';
+import { arraySize } from '../length';
 import { min } from '../math';
-import { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
+import type { NonEmptyArray, ReadonlyNonEmptyArray } from '../non-empty-array';
 
 export function zip<A, B>(
   array1: ReadonlyNonEmptyArray<A>,
@@ -30,7 +30,7 @@ export function zipArrays<
     ...(readonly (readonly unknown[])[])
   ]
 >(...arrays: T): Unwrap<T>[] {
-  const len = min(arrays.map(length));
+  const len = min(arrays.map(arraySize));
   if (len === undefined) return [];
   return seq(len).map((i) => arrays.map((a) => a[i])) as Unwrap<T>[];
 }

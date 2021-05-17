@@ -1,4 +1,5 @@
-import { assertType, TypeEq, uint32 } from '../../types';
+import type { TypeEq, uint32 } from '../../types';
+import { assertType } from '../../types';
 import { testArrayEquality } from '../array-tester';
 import { newArray } from './new-array';
 

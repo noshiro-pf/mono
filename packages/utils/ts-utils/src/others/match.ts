@@ -1,4 +1,5 @@
-import { assertType, ReadonlyRecord, TypeEq } from '../types';
+import type { ReadonlyRecord, TypeEq } from '../types';
+import { assertType } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const match = <Keys extends keyof any, V>(

@@ -1,9 +1,10 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const skipAlreadyAppeared = <T, K extends keyof T>(
-  key?: K
-): Operator<T, T> => (src: RN<T>) => new SkipAlreadyAppearedRN<T, K>(src, key);
+export const skipAlreadyAppeared =
+  <T, K extends keyof T>(key?: K): Operator<T, T> =>
+  (src: RN<T>) =>
+    new SkipAlreadyAppearedRN<T, K>(src, key);
 
 class SkipAlreadyAppearedRN<T, K extends keyof T> extends RN<T> {
   private key?: K;

@@ -33,12 +33,13 @@ import { nextPhase, sortHandCards } from './shortcut';
 
 @Injectable()
 export class TransitStateService {
-  userInput$: Observable<UserInput> = this.gameCommunication.userInputList$.pipe(
-    startWith([]),
-    pairwise(),
-    map(([prev, curr]) => from(curr.slice(prev.length))),
-    concatAll()
-  );
+  userInput$: Observable<UserInput> =
+    this.gameCommunication.userInputList$.pipe(
+      startWith([]),
+      pairwise(),
+      map(([prev, curr]) => from(curr.slice(prev.length))),
+      concatAll()
+    );
 
   private isMyTurn$ = this.gameStateService.isMyTurn$;
 

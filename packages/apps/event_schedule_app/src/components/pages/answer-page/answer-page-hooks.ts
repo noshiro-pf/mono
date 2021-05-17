@@ -1,23 +1,18 @@
 import { useNavigator } from '@noshiro/react-router-utils';
 import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { useAlive } from '@noshiro/react-utils';
-import {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import type { RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../../api/api';
 import { texts } from '../../../constants/texts';
 import { routePaths } from '../../../routing/routing';
 import { useEventId } from '../../../routing/use-event-id';
-import { UserName } from '../../../types/phantom';
-import { IAnswer } from '../../../types/record/answer';
-import { IEventSchedule } from '../../../types/record/event-schedule';
+import type { UserName } from '../../../types/phantom';
+import type { IAnswer } from '../../../types/record/answer';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
 import { compareYmdHm } from '../../../types/record/ymd-hm';
-import { IList, IMap } from '../../../utils/immutable';
+import type { IList } from '../../../utils/immutable';
+import { IMap } from '../../../utils/immutable';
 import { createToaster, showToast } from '../../../utils/toaster';
 import { now } from '../../../utils/today';
 import { useFetchEventStreams } from './use-fetch-event-stream';
@@ -57,22 +52,15 @@ const toast = createToaster();
 export const useAnswerPageState = (): AnswerPageState => {
   const eventId = useEventId();
 
-  const {
-    fetchEventScheduleThrottled$,
-    fetchAnswersThrottled$,
-    fetchAnswers,
-  } = useFetchEventStreams();
+  const { fetchEventScheduleThrottled$, fetchAnswersThrottled$, fetchAnswers } =
+    useFetchEventStreams();
 
-  const {
-    eventSchedule$,
-    answers$,
-    answersResultTimestamp$,
-    errorType,
-  } = useFetchResults(
-    fetchEventScheduleThrottled$,
-    fetchAnswersThrottled$,
-    eventId
-  );
+  const { eventSchedule$, answers$, answersResultTimestamp$, errorType } =
+    useFetchResults(
+      fetchEventScheduleThrottled$,
+      fetchAnswersThrottled$,
+      eventId
+    );
 
   const [
     //
@@ -88,10 +76,8 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const { myAnswer, setMyAnswer, resetMyAnswer } = useMyAnswer(eventSchedule$);
 
-  const [
-    usernameDuplicateCheckException,
-    setUsernameDuplicateCheckException,
-  ] = useState<UserName | undefined>(undefined);
+  const [usernameDuplicateCheckException, setUsernameDuplicateCheckException] =
+    useState<UserName | undefined>(undefined);
 
   const answerSectionRef = useRef<HTMLDivElement>(null);
 
@@ -219,10 +205,8 @@ export const useAnswerPageState = (): AnswerPageState => {
     [setMyAnswer]
   );
 
-  const {
-    refreshButtonIsLoading,
-    refreshButtonIsDisabled,
-  } = useRefreshButtonState(fetchAnswersThrottled$, answersResultTimestamp$);
+  const { refreshButtonIsLoading, refreshButtonIsDisabled } =
+    useRefreshButtonState(fetchAnswersThrottled$, answersResultTimestamp$);
 
   const isExpired = useMemo<boolean>(
     () =>
@@ -234,13 +218,13 @@ export const useAnswerPageState = (): AnswerPageState => {
     [eventSchedule]
   );
 
-  const navigator = useNavigator();
+  const routerNavigator = useNavigator();
 
   const onEditButtonClick = useCallback(() => {
     if (eventId !== undefined) {
-      navigator(routePaths.editPage(eventId));
+      routerNavigator(routePaths.editPage(eventId));
     }
-  }, [navigator, eventId]);
+  }, [routerNavigator, eventId]);
 
   return {
     eventId,

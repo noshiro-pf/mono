@@ -2,10 +2,10 @@ import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants/texts';
-import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import { INotificationSettings } from '../../../types/record/base/notification-settings';
-import { IYmdHm } from '../../../types/record/ymd-hm';
-import { IList } from '../../../utils/immutable';
+import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import type { INotificationSettings } from '../../../types/record/base/notification-settings';
+import type { IYmdHm } from '../../../types/record/ymd-hm';
+import type { IList } from '../../../utils/immutable';
 import { AnswerDeadlineDatepicker } from '../answer-deadline/answer-deadline';
 import { NotificationSettings } from '../notification-settings/notification-settings';
 import { SymbolSettings } from '../symbol-settings/symbol-settings';
@@ -46,9 +46,8 @@ export const EventSettings = memoNamed<Props>(
   }) => {
     const focusEmailInput$ = useTinyObservable<undefined>();
 
-    const [clickedMoreThanOnce, setClickedMoreThanOnce] = useState<boolean>(
-      false
-    );
+    const [clickedMoreThanOnce, setClickedMoreThanOnce] =
+      useState<boolean>(false);
 
     const onToggleUseNotificationLocal = useCallback(() => {
       onToggleUseNotification();

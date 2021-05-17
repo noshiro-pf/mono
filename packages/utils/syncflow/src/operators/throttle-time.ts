@@ -1,6 +1,7 @@
-import { Option, TimerId } from '@noshiro/ts-utils';
+import type { TimerId } from '@noshiro/ts-utils';
+import { Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import {
+import type {
   InitializedToInitializedOperator,
   Observable,
   ThrottleTimeOperatorObservable,
@@ -8,9 +9,10 @@ import {
   Token,
 } from '../types';
 
-export const throttleTime = <A>(millisec: number): ToBaseOperator<A, A> => (
-  parent: Observable<A>
-) => new ThrottleTimeObservableClass(parent, millisec);
+export const throttleTime =
+  <A>(millisec: number): ToBaseOperator<A, A> =>
+  (parentObservable: Observable<A>) =>
+    new ThrottleTimeObservableClass(parentObservable, millisec);
 
 export const throttleTimeI = <A>(
   millisec: number
@@ -19,16 +21,17 @@ export const throttleTimeI = <A>(
 
 class ThrottleTimeObservableClass<A>
   extends SyncChildObservableClass<A, 'throttleTime', [A]>
-  implements ThrottleTimeOperatorObservable<A> {
+  implements ThrottleTimeOperatorObservable<A>
+{
   private readonly _millisec: number;
   private _timerId: TimerId | undefined;
   private _isSkipping: boolean;
 
-  constructor(parent: Observable<A>, millisec: number) {
+  constructor(parentObservable: Observable<A>, millisec: number) {
     super({
-      parents: [parent],
+      parents: [parentObservable],
       type: 'throttleTime',
-      currentValueInit: parent.currentValue,
+      currentValueInit: parentObservable.currentValue,
     });
     this._timerId = undefined;
     this._isSkipping = false;
@@ -36,12 +39,12 @@ class ThrottleTimeObservableClass<A>
   }
 
   tryUpdate(token: Token): void {
-    const parent = this.parents[0];
-    if (parent.token !== token) return; // skip update
-    if (Option.isNone(parent.currentValue)) return; // skip update
+    const par = this.parents[0];
+    if (par.token !== token) return; // skip update
+    if (Option.isNone(par.currentValue)) return; // skip update
     if (this._isSkipping) return; // skip update
 
-    this.setNext(parent.currentValue.value, token);
+    this.setNext(par.currentValue.value, token);
 
     this._isSkipping = true;
     // set timer

@@ -1,5 +1,5 @@
 import { toMidnightTimestamp } from '@noshiro/ts-utils';
-import { IYmdHm } from '../types/record/ymd-hm';
+import type { IYmdHm } from '../types/record/ymd-hm';
 import { ymdhm2Date } from './ymdhm2date';
 
 export const ymdhmDateDiff = (a: IYmdHm, b: IYmdHm): number => {

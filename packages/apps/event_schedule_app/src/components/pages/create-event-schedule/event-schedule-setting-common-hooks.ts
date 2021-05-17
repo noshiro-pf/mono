@@ -8,19 +8,19 @@ import {
 } from '@noshiro/syncflow';
 import { isNotUndefined, recordEntries } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
-import { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import {
-  createINotificationSettings,
-  INotificationSettings,
-} from '../../../types/record/base/notification-settings';
-import { IYearMonthDate } from '../../../types/record/base/year-month-date';
-import { IDatetimeRange } from '../../../types/record/datetime-range';
-import { IEventSchedule } from '../../../types/record/event-schedule';
-import { EventScheduleValidation } from '../../../types/record/event-schedule-validation';
-import { createIYmdHm, IYmdHm } from '../../../types/record/ymd-hm';
+import type { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
+import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
+import type { INotificationSettings } from '../../../types/record/base/notification-settings';
+import { createINotificationSettings } from '../../../types/record/base/notification-settings';
+import type { IYearMonthDate } from '../../../types/record/base/year-month-date';
+import type { IDatetimeRange } from '../../../types/record/datetime-range';
+import type { IEventSchedule } from '../../../types/record/event-schedule';
+import type { EventScheduleValidation } from '../../../types/record/event-schedule-validation';
+import type { IYmdHm } from '../../../types/record/ymd-hm';
+import { createIYmdHm } from '../../../types/record/ymd-hm';
 import { fetchHolidaysJson } from '../../../utils/fetch-holidays';
-import { IList, IMap } from '../../../utils/immutable';
+import type { IList } from '../../../utils/immutable';
+import { IMap } from '../../../utils/immutable';
 import { ymdFromDate } from '../../../utils/ymdhm-from-date';
 import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
 import {

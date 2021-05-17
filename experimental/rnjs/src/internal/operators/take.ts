@@ -1,19 +1,22 @@
 import { RN } from '../mod';
 import { Operator } from '../types/Operator';
 
-export const take = <T>(takeNum: number, name: string = ''): Operator<T, T> => (
-  src: RN<T>
-) =>
-  new TakeWhileRN<T>(
-    src,
-    (_srcValue, srcIndex, _index) => srcIndex < takeNum,
-    name
-  );
+export const take =
+  <T>(takeNum: number, name: string = ''): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeWhileRN<T>(
+      src,
+      (_srcValue, srcIndex, _index) => srcIndex < takeNum,
+      name
+    );
 
-export const takeWhile = <T>(
-  predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
-  name: string = ''
-): Operator<T, T> => (src: RN<T>) => new TakeWhileRN<T>(src, predicate, name);
+export const takeWhile =
+  <T>(
+    predicate: (srcValue: T, srcIndex: number, index: number) => boolean,
+    name: string = ''
+  ): Operator<T, T> =>
+  (src: RN<T>) =>
+    new TakeWhileRN<T>(src, predicate, name);
 
 class TakeWhileRN<T> extends RN<T> {
   private readonly predicate: (

@@ -1,4 +1,4 @@
-import { CanvasAppState } from '../canvas-state-type';
+import type { CanvasAppState } from '../canvas-state-type';
 
 export const onPointerDown = (state: CanvasAppState): void => {
   state.dragStartPoint = state.pointerPos;
