@@ -40,8 +40,8 @@ for target in "${targets[@]}" ; do
     echo ""
 done
 
-echo "linting \"lambda_calculus_interpreter_core\" ..." 
-apps_path="${MONO_ROOT_DIR}/packages/apps"
-cd "${apps_path}/lambda_calculus_interpreter_core"
-yarn lint
-echo "done."
+# echo "linting \"lambda_calculus_interpreter_core\" ..." 
+# apps_path="${MONO_ROOT_DIR}/packages/apps"
+# cd "${apps_path}/lambda_calculus_interpreter_core"
+# yarn lint
+# echo "done."
