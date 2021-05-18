@@ -29,3 +29,16 @@ while read target; do
         echo ""
     fi
 done < "${THIS_SCRIPT_DIR}/apps.txt"
+
+
+echo "linting \"event_schedule_app/functions\" ..." 
+apps_path="${MONO_ROOT_DIR}/packages/apps"
+cd "${apps_path}/event_schedule_app/functions"
+yarn lint
+echo "done."
+
+echo "linting \"slack_app/functions\" ..." 
+apps_path="${MONO_ROOT_DIR}/packages/apps"
+cd "${apps_path}/slack_app/functions"
+yarn lint
+echo "done."
