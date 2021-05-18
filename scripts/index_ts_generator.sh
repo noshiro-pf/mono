@@ -13,6 +13,7 @@ target_directory=$1
 clear=false
 min_recursion_depth=0
 max_recursion_depth=10
+ignore=""
 
 while [[ $# -gt 0 ]]
 do
@@ -33,6 +34,11 @@ do
     shift # past argument
     shift # past argument
     ;;
+    --ignore)
+    ignore=$2
+    shift # past argument
+    shift # past argument
+    ;;
     *)    # unknown option
     shift # past argument
     ;;
@@ -42,6 +48,7 @@ done
 echo clear: ${clear}
 echo min_recursion_depth: ${min_recursion_depth}
 echo max_recursion_depth: ${max_recursion_depth}
+echo ignore: ${ignore}
 
 # move to target directory
 cd ${target_directory}
@@ -55,6 +62,13 @@ index_ts_files=()
 for directory in $(find . -mindepth ${min_recursion_depth} -maxdepth ${max_recursion_depth} -type d); do
   echo ${directory}
 
+  if [ -n "${ignore}" ]; then
+    if [[ "${directory}" =~ "${ignore}" ]]; then
+      echo "skipped."
+      continue
+    fi
+  fi
+
   index_ts="${directory}/index.ts"
 
   if "${clear}"; then
@@ -65,7 +79,7 @@ for directory in $(find . -mindepth ${min_recursion_depth} -maxdepth ${max_recur
 
     # files in a current directory
     for file in $(find ${directory} -mindepth 1 -maxdepth 1 -type f); do
-      filename=$(basename $file)
+      filename=$(basename ${file})
 
       # filename without extension
       filename_without_ext="${filename%.*}"
@@ -97,5 +111,10 @@ for directory in $(find . -mindepth ${min_recursion_depth} -maxdepth ${max_recur
 
 done
 
+echo 
+echo "--- prettier ---"
+echo index_ts_files: \(${index_ts_files}\)
 
-node ${SCRIPT_DIR}/../node_modules/.bin/prettier --write ${index_ts_files}
+if [ -n "${index_ts_files}" ]; then
+  node ${SCRIPT_DIR}/../node_modules/.bin/prettier --write ${index_ts_files}
+fi

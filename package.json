@@ -21,6 +21,7 @@
     "create:reactapp": "scripts/create_new_react_app.sh",
     "create:slides": "scripts/create_new_slides.sh",
     "create:util": "scripts/create_new_util.sh",
+    "gi:all": "yarn workspaces run gi",
     "fmt:all": "prettier --write . > /dev/null",
     "lint:all": "yarn workspaces run lint",
     "lint:apps": "scripts/lint_apps.sh",
