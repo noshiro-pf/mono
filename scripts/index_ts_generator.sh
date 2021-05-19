@@ -113,7 +113,6 @@ done
 
 echo 
 echo "--- prettier ---"
-echo index_ts_files: \(${index_ts_files}\)
 
 if [ -n "${index_ts_files}" ]; then
   node ${SCRIPT_DIR}/../node_modules/.bin/prettier --write ${index_ts_files}
