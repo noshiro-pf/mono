@@ -1,6 +1,14 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 
+type Props = Readonly<{ n: number; opacity: number }>;
+
+export const DiceNumber = memoNamed<Props>('DiceNumber', ({ n, opacity }) => (
+  <Wrapper style={{ borderColor: `rgba(143, 186, 255, ${opacity})` }}>
+    {n < 1 ? 0 : n}
+  </Wrapper>
+));
+
 const Wrapper = styled.div`
   background-color: white;
   width: 40px;
@@ -13,12 +21,3 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-export const DiceNumber = memoNamed<Readonly<{ n: number; opacity: number }>>(
-  'DiceNumber',
-  ({ n, opacity }) => (
-    <Wrapper style={{ borderColor: `rgba(143, 186, 255, ${opacity})` }}>
-      {n < 1 ? 0 : n}
-    </Wrapper>
-  )
-);

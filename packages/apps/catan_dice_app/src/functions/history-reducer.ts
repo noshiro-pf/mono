@@ -1,34 +1,28 @@
-import type { ReducerType } from '@noshiro/ts-utils';
-import type { THistoryState } from '../type';
+import type { ReducerType, uint32 } from '@noshiro/ts-utils';
+import { match, pipe, take } from '@noshiro/ts-utils';
+import { produce } from 'immer';
+import type { HistoryState } from '../type';
 import { rollTwoDices } from './roll-dice';
 
 export const historyReducer: ReducerType<
-  THistoryState,
-  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
-  'undo' | 'redo' | 'roll-dices'
+  HistoryState,
+  'redo' | 'roll-dices' | 'undo'
 > = (state, action) =>
-  state.withMutations((st) => {
-    const size = st.history.size;
-    const currIdx = st.index;
+  produce(state, (draft) => {
+    const size = draft.history.length;
+    const currIdx = draft.index as number;
 
-    st.update('index', (idx) => {
-      switch (action) {
-        case 'undo':
-          return Math.max(-1, idx - 1);
-        case 'redo':
-          return Math.min(size - 1, idx + 1);
-        case 'roll-dices':
-          return idx + 1;
-      }
-    });
+    draft.index = match(action, {
+      undo: Math.max(-1, currIdx - 1),
+      redo: Math.min(size - 1, currIdx + 1),
+      'roll-dices': currIdx + 1,
+    }) as uint32;
 
-    st.update('history', (hist) => {
-      switch (action) {
-        case 'undo':
-        case 'redo':
-          return st.history;
-        case 'roll-dices':
-          return hist.take(currIdx + 1).push(rollTwoDices());
-      }
+    draft.history = match(action, {
+      undo: draft.history,
+      redo: draft.history,
+      'roll-dices': pipe(draft.history)
+        .chain((hist) => take(hist, (currIdx + 1) as uint32))
+        .chain((hist) => [...hist, rollTwoDices()]).value,
     });
   });

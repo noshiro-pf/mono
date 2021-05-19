@@ -1,13 +1,11 @@
-import { IList, IRecord } from '../immutable';
+import type { uint32 } from '@noshiro/ts-utils';
 
-type IHistoryState = Readonly<{
-  index: number;
-  history: IList<readonly [number, number]>;
+export type HistoryState = Readonly<{
+  index: uint32 | -1;
+  history: readonly (readonly [number, number])[];
 }>;
 
-export const HistoryState = IRecord<IHistoryState>({
+export const defaultHistoryState: HistoryState = {
   index: -1,
-  history: IList<readonly [number, number]>([]),
-} as const);
-
-export type THistoryState = IRecord<IHistoryState> & Readonly<IHistoryState>;
+  history: [],
+} as const;

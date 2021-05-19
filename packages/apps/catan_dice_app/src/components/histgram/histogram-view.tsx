@@ -2,6 +2,37 @@ import { memoNamed } from '@noshiro/react-utils';
 import type { Mappable } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
+type Props = Readonly<{
+  xy: Mappable<readonly [number, number]>;
+  max: number;
+  numSample: number;
+}>;
+
+export const HistogramView = memoNamed<Props>(
+  'HistogramView',
+  ({ xy, max, numSample }) => (
+    <Root>
+      <NumSampleWrapper>
+        <NumSample>N = {numSample}</NumSample>
+      </NumSampleWrapper>
+      <Main>
+        {xy.map(([x, y]) => (
+          <Column key={x}>
+            <VerticalBarContainer>
+              <VerticalBar
+                style={{ height: `${max > 0 ? (100 * y) / max : 0}%` }}
+              >
+                {y > 0 ? y : ''}
+              </VerticalBar>
+            </VerticalBarContainer>
+            <Domain>{x}</Domain>
+          </Column>
+        ))}
+      </Main>
+    </Root>
+  )
+);
+
 const textHeightPx = 30;
 
 const Root = styled.div`
@@ -62,31 +93,3 @@ const Domain = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-export const HistogramView = memoNamed<
-  Readonly<{
-    xy: Mappable<[number, number]>;
-    max: number;
-    numSample: number;
-  }>
->('HistogramView', ({ xy, max, numSample }) => (
-  <Root>
-    <NumSampleWrapper>
-      <NumSample>N = {numSample}</NumSample>
-    </NumSampleWrapper>
-    <Main>
-      {xy.map(([x, y]) => (
-        <Column key={x}>
-          <VerticalBarContainer>
-            <VerticalBar
-              style={{ height: `${max > 0 ? (100 * y) / max : 0}%` }}
-            >
-              {y > 0 ? y : ''}
-            </VerticalBar>
-          </VerticalBarContainer>
-          <Domain>{x}</Domain>
-        </Column>
-      ))}
-    </Main>
-  </Root>
-));
