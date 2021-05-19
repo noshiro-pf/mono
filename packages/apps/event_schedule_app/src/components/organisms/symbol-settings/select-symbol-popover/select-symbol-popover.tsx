@@ -3,8 +3,8 @@ import { Popover } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
-import type { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
-import type { IList } from '../../../../utils/immutable';
+import type { AnswerSymbolIconId } from '../../../../types';
+import type { IList } from '../../../../utils';
 import { SelectSymbolPopoverContent } from './select-symbol-popover-content';
 
 type Props = Readonly<{

@@ -1,7 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
 import type { Hue, Mappable, Percent } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { ColorItem } from '../atoms/color-item';
+import { ColorItem } from '../atoms';
 
 const ColorsWrapper = styled.div`
   padding: 10px;

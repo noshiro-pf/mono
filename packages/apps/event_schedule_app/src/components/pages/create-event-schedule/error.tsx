@@ -1,8 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { errorFontColor } from '../../../constants/color';
-import { texts } from '../../../constants/texts';
-import { Description } from '../../atoms/description';
+import { errorFontColor, texts } from '../../../constants';
+import { Description } from '../../atoms';
 
 const vt = texts.errorMessages;
 

@@ -1,7 +1,6 @@
 import type { LambdaTerm, Variable } from '../../types';
 import { getFreeVariables } from '../get-free-variables';
-import { isAbstraction } from '../is-abstraction';
-import { isApplication } from '../is-application';
+import { isAbstraction, isApplication } from '../is-lambda-term';
 import { isVariable } from '../is-variable';
 import { pickUpAvailableVariable } from '../pickup-available-variable';
 import { alphaConversion } from './alpha-convertion';

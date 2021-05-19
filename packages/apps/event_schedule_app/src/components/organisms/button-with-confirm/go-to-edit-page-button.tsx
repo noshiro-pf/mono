@@ -6,10 +6,10 @@ import {
 } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
-import { texts } from '../../../constants/texts';
-import { Description } from '../../atoms/description';
-import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
-import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
+import { texts } from '../../../constants';
+import { Description } from '../../atoms';
+import { ButtonsWrapperAlignEnd } from '../../molecules';
+import { WidthRestrictedInputWrapper } from '../../styled';
 
 const vt = texts.answerPage.eventInfo;
 

@@ -9,11 +9,12 @@
     "organizeimports": "lib/index.js"
   },
   "scripts": {
-    "clean": "echo 'no clean script.'",
-    "lint": "echo 'no lint script.'",
+    "clean": "echo 'no clean script'",
+    "gi": "echo 'no gi script'",
+    "lint": "echo 'no lint script'",
     "lint:fix": "yarn lint --fix",
-    "setup": "echo 'no setup script.'",
-    "test": "echo 'no test script.'"
+    "setup": "echo 'no setup script'",
+    "test": "echo 'no test script'"
   },
   "dependencies": {
     "command-line-args": "^5.1.1",

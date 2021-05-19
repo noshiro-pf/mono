@@ -1,10 +1,10 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../constants/texts';
-import type { IEventSchedule } from '../../types/record/event-schedule';
-import { createIYmdHm } from '../../types/record/ymd-hm';
-import { ymdhm2strWithDay } from '../../utils/ymdhm2str';
-import { Description } from '../atoms/description';
+import { texts } from '../../constants';
+import { ymdhm2strWithDay } from '../../functions';
+import type { IEventSchedule } from '../../types';
+import { createIYmdHm } from '../../types';
+import { Description } from '../atoms';
 import { AnswerPageNotes } from './answer-page-notes';
 
 const vt = texts.answerPage;

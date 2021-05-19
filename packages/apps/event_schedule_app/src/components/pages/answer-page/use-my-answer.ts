@@ -13,10 +13,8 @@ import {
   withLatestFrom,
 } from '@noshiro/syncflow';
 import { isNotUndefined } from '@noshiro/ts-utils';
-import type { IAnswer } from '../../../types/record/answer';
-import { createIAnswer } from '../../../types/record/answer';
-import { createIAnswerSelection } from '../../../types/record/answer-selection';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
+import type { IAnswer, IEventSchedule } from '../../../types';
+import { createIAnswer, createIAnswerSelection } from '../../../types';
 
 export const useMyAnswer = (
   eventSchedule$: Observable<IEventSchedule | undefined>

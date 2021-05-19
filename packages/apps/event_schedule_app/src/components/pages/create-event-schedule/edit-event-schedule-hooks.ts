@@ -1,12 +1,11 @@
 import { useNavigator } from '@noshiro/react-router-utils';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
-import { api } from '../../../api/api';
-import { texts } from '../../../constants/texts';
-import { routePaths } from '../../../routing/routing';
-import { useEventId } from '../../../routing/use-event-id';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import { createToaster, showToast } from '../../../utils/toaster';
+import { api } from '../../../api';
+import { texts } from '../../../constants';
+import { createToaster, showToast } from '../../../functions';
+import { routePaths, useEventId } from '../../../routing';
+import type { IEventSchedule } from '../../../types';
 
 type EditEventScheduleHooks = Readonly<{
   editButtonIsEnabled: boolean;

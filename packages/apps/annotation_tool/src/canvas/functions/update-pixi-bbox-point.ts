@@ -1,7 +1,7 @@
 import type { Point, Rect, Rgba } from '@noshiro/ts-utils';
 import type { Graphics } from 'pixi.js';
 import { Rectangle } from 'pixi.js';
-import type { PixiBbox } from '../types/pixi-bbox';
+import type { PixiBbox } from '../types';
 import type { Direction } from './bbox-points';
 import { updateRectangleGraphics } from './create-pixi-object';
 

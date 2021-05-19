@@ -1,6 +1,6 @@
 import type { LambdaTerm } from '../../types';
 import { isAlphaEqual } from '../is-alpha-equal';
-import { isNumber, PLUS, SUCC } from '../macro';
+import { isNumber, PLUS, SUCC } from '../parser';
 
 export const hasMacro = (term: LambdaTerm): boolean => {
   // ToDo

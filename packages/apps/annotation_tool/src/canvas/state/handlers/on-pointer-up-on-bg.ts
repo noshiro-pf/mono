@@ -1,9 +1,7 @@
 import type { Rgba } from '@noshiro/ts-utils';
 import { rectFrom2Points } from '@noshiro/ts-utils';
-import { addBboxToCanvas } from '../../functions/add-bbox';
-import type { AnnotationCanvasStyle } from '../../types/annotation-canvas-style';
-import type { IdType } from '../../types/id-type';
-import type { PixiApp } from '../../types/pixi-app-type';
+import { addBboxToCanvas } from '../../functions';
+import type { AnnotationCanvasStyle, IdType, PixiApp } from '../../types';
 import type { CanvasAppState } from '../canvas-state-type';
 import type { CanvasAppStateHandler } from '../state-handler-main';
 

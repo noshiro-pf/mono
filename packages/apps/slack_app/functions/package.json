@@ -11,6 +11,7 @@
     "fb": "firebase",
     "firebase": "firebase",
     "get": "node src/get.js",
+    "gi": "echo 'no gi script'",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "yarn lint --fix",
     "logs": "firebase functions:log",

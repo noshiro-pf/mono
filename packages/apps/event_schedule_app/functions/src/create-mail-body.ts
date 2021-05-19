@@ -1,6 +1,5 @@
 import { answerDiffAsString } from './answer-diff';
-import type { DatetimeSpecificationEnumType } from './types/enum/datetime-specification-type';
-import type { AnswerJsType } from './types/record/answer';
+import type { AnswerJsType, DatetimeSpecificationEnumType } from './types';
 
 const urlPrefix = 'https://event-schedule-app.web.app/event';
 

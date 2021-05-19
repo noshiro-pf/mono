@@ -1,9 +1,11 @@
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { AnswerId } from '../../../types/phantom';
-import type { IAnswer } from '../../../types/record/answer';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import type { IList } from '../../../utils/immutable';
-import { IMap } from '../../../utils/immutable';
+import type {
+  AnswerId,
+  AnswerSymbolIconId,
+  IAnswer,
+  IDatetimeRange,
+} from '../../../types';
+import type { IList } from '../../../utils';
+import { IMap } from '../../../utils';
 
 export const createAnswerTable = (
   answerSelectionMapFn: (

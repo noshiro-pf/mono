@@ -1,6 +1,6 @@
 import type { LambdaTerm } from '../../types';
 import { isAlphaEqual } from '../is-alpha-equal';
-import { isNumber, PLUS, SUCC, toNumber } from '../macro';
+import { isNumber, PLUS, SUCC, toNumber } from '../parser';
 
 export const toMacroString = (term: LambdaTerm): string => {
   if (isAlphaEqual(term, PLUS)) return '+';

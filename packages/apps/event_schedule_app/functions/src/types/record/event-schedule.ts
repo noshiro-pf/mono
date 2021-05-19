@@ -1,6 +1,5 @@
-import type { DatetimeSpecificationEnumType } from '../enum/datetime-specification-type';
-import type { AnswerSymbolType } from './base/answer-symbol';
-import type { NotificationSettingsJsType } from './base/notification-settings';
+import type { DatetimeSpecificationEnumType } from '../enum';
+import type { AnswerSymbolType, NotificationSettingsJsType } from './base';
 import type { DatetimeRangeJsType } from './datetime-range';
 import type { YmdHmJsType } from './ymd-hm';
 

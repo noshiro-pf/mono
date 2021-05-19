@@ -6,8 +6,8 @@ import {
 import type { Observable } from '@noshiro/syncflow';
 import { throttleTime } from '@noshiro/syncflow';
 import { useEffect } from 'react';
-import { fetchThrottleTime } from '../../../constants/fetch-throttle-time';
-import { clog } from '../../../utils/log';
+import { fetchThrottleTime } from '../../../constants';
+import { clog } from '../../../utils';
 
 export const useFetchEventStreams = (): {
   fetchEventScheduleThrottled$: Observable<void>;

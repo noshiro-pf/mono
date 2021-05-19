@@ -3,10 +3,10 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import type { AnswerSymbolIconId } from '../../../../types/enum/answer-symbol-icon';
-import { answerSymbolIconIdsFromBp } from '../../../../types/enum/answer-symbol-icon';
-import type { IList } from '../../../../utils/immutable';
-import { CircleIcon, CloseIcon, TriangleIcon } from '../../../atoms/icons';
+import type { AnswerSymbolIconId } from '../../../../types';
+import { answerSymbolIconIdsFromBp } from '../../../../types';
+import type { IList } from '../../../../utils';
+import { CircleIcon, CloseIcon, TriangleIcon } from '../../../atoms';
 
 const icons: readonly {
   id: AnswerSymbolIconId;

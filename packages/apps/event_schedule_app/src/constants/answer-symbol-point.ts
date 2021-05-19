@@ -1,4 +1,4 @@
-import type { AnswerSymbolPointEnumType } from '../types/enum/answer-symbol-point';
+import type { AnswerSymbolPointEnumType } from '../types';
 
 export const answerSymbolPointConfig = {
   minorStep: 0.1,

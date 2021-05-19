@@ -4,12 +4,13 @@ import { BpDatetimePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { mapNullable } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
-import { answerDeadlineShortcuts } from '../../../constants/answer-deadline-shortcuts';
-import { texts } from '../../../constants/texts';
-import { createIHoursMinutes } from '../../../types/record/base/hours-minutes';
-import { createIYearMonthDate } from '../../../types/record/base/year-month-date';
-import type { IYmdHm } from '../../../types/record/ymd-hm';
-import { createIYmdHm } from '../../../types/record/ymd-hm';
+import { answerDeadlineShortcuts, texts } from '../../../constants';
+import type { IYmdHm } from '../../../types';
+import {
+  createIHoursMinutes,
+  createIYearMonthDate,
+  createIYmdHm,
+} from '../../../types';
 
 type Props = Readonly<{
   useAnswerDeadline: boolean;

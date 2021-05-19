@@ -1,5 +1,5 @@
 import { sum } from '@noshiro/ts-utils';
-import type { RepaymentType } from '../types/enum/repayment-type';
+import type { RepaymentType } from '../types';
 import { calcPrincipalAndInterestEqualPayment } from './calc-principal-and-interest-equal-repayment';
 import { calcPrincipalEqualPayment } from './calc-principal-equal-payment';
 

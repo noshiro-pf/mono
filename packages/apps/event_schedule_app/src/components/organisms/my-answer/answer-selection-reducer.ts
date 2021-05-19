@@ -1,8 +1,7 @@
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import type { IList } from '../../../utils/immutable';
-import { IMap } from '../../../utils/immutable';
+import type { AnswerSymbolIconId, IDatetimeRange } from '../../../types';
+import type { IList } from '../../../utils';
+import { IMap } from '../../../utils';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {

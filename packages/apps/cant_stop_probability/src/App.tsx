@@ -10,16 +10,15 @@ import {
 import type { FC } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { DeadColumn } from './components/dead-column';
-import { ProbabilityTable } from './components/table';
-import { denom } from './constants/denom';
-import { selected3List } from './constants/selected-3-list';
-import { calcExpected } from './functions/calc-expected';
-import { countSuccess } from './functions/count-success';
-import { countSuccessForRemains } from './functions/count-success-for-remains';
-import type { ResultRow } from './types/result-row';
-import type { TwoDiceSumValue } from './types/two-dice-sum-value';
-import { isTwoDiceSumValue } from './types/two-dice-sum-value';
+import { DeadColumn, ProbabilityTable } from './components';
+import { denom, selected3List } from './constants';
+import {
+  calcExpected,
+  countSuccess,
+  countSuccessForRemains,
+} from './functions';
+import type { ResultRow, TwoDiceSumValue } from './types';
+import { isTwoDiceSumValue } from './types';
 
 const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const count = countSuccess(x, y, z);

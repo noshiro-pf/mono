@@ -1,5 +1,5 @@
 import type { StrictOmit } from '@noshiro/ts-utils';
-import { IList, IRecord } from '../../utils/immutable';
+import { IList, IRecord } from '../../utils';
 import type { AnswerId, UserName } from '../phantom';
 import { answerId, userName } from '../phantom';
 import type {

@@ -1,18 +1,19 @@
 import type { Point, Rgba } from '@noshiro/ts-utils';
-import type { Direction } from '../functions/bbox-points';
-import {
-  turnOffHighlight,
-  turnOnHighlight,
-} from '../functions/update-pixi-bbox-rect';
-import type { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
-import type { IdType } from '../types/id-type';
-import type { PixiApp } from '../types/pixi-app-type';
-import type { PixiBbox } from '../types/pixi-bbox';
+import type { Direction } from '../functions';
+import { turnOffHighlight, turnOnHighlight } from '../functions';
+import type {
+  AnnotationCanvasStyle,
+  IdType,
+  PixiApp,
+  PixiBbox,
+} from '../types';
 import type { CanvasAppState } from './canvas-state-type';
-import { onPointerDown } from './handlers/on-pointer-down';
-import { onPointerDownOnBackground } from './handlers/on-pointer-down-on-bg';
-import { onPointerMove } from './handlers/on-pointer-move';
-import { onPointerUpOnBackground } from './handlers/on-pointer-up-on-bg';
+import {
+  onPointerDown,
+  onPointerDownOnBackground,
+  onPointerMove,
+  onPointerUpOnBackground,
+} from './handlers';
 
 export type CanvasAppAction = Readonly<
   | { type: 'backgroundPointerDown' }

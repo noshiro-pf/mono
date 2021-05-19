@@ -1,9 +1,11 @@
 import type { Point } from '@noshiro/ts-utils';
 import { rectFrom2Points } from '@noshiro/ts-utils';
-import { updateBorderedRectangleGraphics } from '../../functions/create-pixi-object';
-import { moveBbox } from '../../functions/move-bbox';
-import { resizeBbox } from '../../functions/resize-bbox';
-import type { PixiApp } from '../../types/pixi-app-type';
+import {
+  moveBbox,
+  resizeBbox,
+  updateBorderedRectangleGraphics,
+} from '../../functions';
+import type { PixiApp } from '../../types';
 import type { CanvasAppState } from '../canvas-state-type';
 
 export const onPointerMove = (

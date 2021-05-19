@@ -8,7 +8,7 @@ import {
   variance,
   zip,
 } from '@noshiro/ts-utils';
-import type { ExperimentResult } from '../types/experiment-result';
+import type { ExperimentResult } from '../types';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';

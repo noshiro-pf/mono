@@ -3,12 +3,10 @@ import { memoNamed } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../constants/texts';
-import { todayYmdhm } from '../../../constants/today-ymdhm';
-import type { INotificationSettings } from '../../../types/record/base/notification-settings';
-import type { IYmdHm } from '../../../types/record/ymd-hm';
-import { ymdhmDateDiff } from '../../../utils/ymdhm-date-diff';
-import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
+import { texts } from '../../../constants';
+import { now, ymdhmDateDiff } from '../../../functions';
+import type { INotificationSettings, IYmdHm } from '../../../types';
+import { WidthRestrictedInputWrapper } from '../../styled';
 
 type Props = Readonly<{
   notificationSettings: INotificationSettings;
@@ -94,27 +92,27 @@ export const NotificationSettings = memoNamed<Props>(
           disabled ||
           !useAnswerDeadline ||
           answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, todayYmdhm) <= 1,
+          ymdhmDateDiff(answerDeadline, now()) <= 1,
         notify03daysBefore:
           disabled ||
           !useAnswerDeadline ||
           answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, todayYmdhm) <= 3,
+          ymdhmDateDiff(answerDeadline, now()) <= 3,
         notify07daysBefore:
           disabled ||
           !useAnswerDeadline ||
           answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, todayYmdhm) <= 7,
+          ymdhmDateDiff(answerDeadline, now()) <= 7,
         notify14daysBefore:
           disabled ||
           !useAnswerDeadline ||
           answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, todayYmdhm) <= 14,
+          ymdhmDateDiff(answerDeadline, now()) <= 14,
         notify28daysBefore:
           disabled ||
           !useAnswerDeadline ||
           answerDeadline === undefined ||
-          ymdhmDateDiff(answerDeadline, todayYmdhm) <= 28,
+          ymdhmDateDiff(answerDeadline, now()) <= 28,
       }),
       [answerDeadline, disabled, useAnswerDeadline]
     );

@@ -1,13 +1,6 @@
-import { IRecord } from '../../utils/immutable';
-import type {
-  IYearMonthDate,
-  PartialYearMonthDate,
-} from './base/year-month-date';
-import {
-  compareYmd,
-  createIYearMonthDate,
-  fillYearMonthDate,
-} from './base/year-month-date';
+import { IRecord } from '../../utils';
+import type { IYearMonthDate, PartialYearMonthDate } from './base';
+import { compareYmd, createIYearMonthDate, fillYearMonthDate } from './base';
 import type { ITimeRange, PartialTimeRange } from './time-range';
 import {
   compareTimeRange,

@@ -1,7 +1,6 @@
 import type { uint32 } from '@noshiro/ts-utils';
 import { seq } from '@noshiro/ts-utils';
-import { ithBorrowingBalanceInPIER } from './financial/ith-borrowing-balance-in-pier';
-import { monthlyPaymentsInPIER } from './financial/monthly-payments-in-pier';
+import { ithBorrowingBalanceInPIER, monthlyPaymentsInPIER } from './financial';
 
 export const calcPrincipalAndInterestEqualPayment = ({
   borrowingPeriodMonth: numPayments,

@@ -17,11 +17,10 @@ import {
   withInitialValue,
 } from '@noshiro/syncflow';
 import { isNotUndefined, Result } from '@noshiro/ts-utils';
-import { api } from '../../../api/api';
-import type { IAnswer } from '../../../types/record/answer';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import type { IList } from '../../../utils/immutable';
-import { clog } from '../../../utils/log';
+import { api } from '../../../api';
+import type { IAnswer, IEventSchedule } from '../../../types';
+import type { IList } from '../../../utils';
+import { clog } from '../../../utils';
 
 type FetchResults = Readonly<{
   eventSchedule$: Observable<IEventSchedule | undefined>;

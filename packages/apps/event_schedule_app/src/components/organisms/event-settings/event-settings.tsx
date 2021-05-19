@@ -1,14 +1,16 @@
 import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../constants/texts';
-import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import type { INotificationSettings } from '../../../types/record/base/notification-settings';
-import type { IYmdHm } from '../../../types/record/ymd-hm';
-import type { IList } from '../../../utils/immutable';
-import { AnswerDeadlineDatepicker } from '../answer-deadline/answer-deadline';
-import { NotificationSettings } from '../notification-settings/notification-settings';
-import { SymbolSettings } from '../symbol-settings/symbol-settings';
+import { texts } from '../../../constants';
+import type {
+  IAnswerSymbol,
+  INotificationSettings,
+  IYmdHm,
+} from '../../../types';
+import type { IList } from '../../../utils';
+import { AnswerDeadlineDatepicker } from '../answer-deadline';
+import { NotificationSettings } from '../notification-settings';
+import { SymbolSettings } from '../symbol-settings';
 import { ParagraphWithSwitch } from './paragraph-with-switch';
 
 const vt = texts.eventSettingsPage.section3;

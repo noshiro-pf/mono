@@ -2,8 +2,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import type { DayType } from '../../types/enum/day-type';
-import type { IYearMonthDate } from '../../types/record/base/year-month-date';
+import type { DayType, IYearMonthDate } from '../../types';
 
 type Props = Readonly<{
   ymd: IYearMonthDate;

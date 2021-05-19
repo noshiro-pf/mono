@@ -1,4 +1,4 @@
-import { numberLambdaTerm, PLUStokens, SUCCtokens } from '../macro';
+import { numberLambdaTerm, PLUStokens, SUCCtokens } from './macro';
 
 export const expandShortcuts = (tokens: readonly string[]): string[] => {
   const expanded: string[] = [];

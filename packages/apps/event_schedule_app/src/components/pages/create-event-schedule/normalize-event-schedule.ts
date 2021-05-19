@@ -1,6 +1,5 @@
-import { compareDatetimeRange } from '../../../types/record/datetime-range';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import { createIEventSchedule } from '../../../types/record/event-schedule';
+import type { IEventSchedule } from '../../../types';
+import { compareDatetimeRange, createIEventSchedule } from '../../../types';
 
 export const normalizeEventSchedule = (
   eventSchedule: IEventSchedule

@@ -2,9 +2,11 @@ import { Popover } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
-import { texts } from '../../../../constants/texts';
-import type { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
-import type { ITimeRange } from '../../../../types/record/time-range';
+import { texts } from '../../../../constants';
+import type {
+  DatetimeSpecificationEnumType,
+  ITimeRange,
+} from '../../../../types';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const vt = texts.eventSettingsPage.section2;

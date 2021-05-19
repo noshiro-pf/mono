@@ -1,15 +1,16 @@
-import { IList, IRecord } from '../../utils/immutable';
-import type { DatetimeSpecificationEnumType } from '../enum/datetime-specification-type';
-import type { IAnswerSymbol, PartialAnswerSymbol } from './base/answer-symbol';
-import { fillAnswerSymbol } from './base/answer-symbol';
+import { IList, IRecord } from '../../utils';
+import type { DatetimeSpecificationEnumType } from '../enum';
 import type {
+  IAnswerSymbol,
   INotificationSettings,
+  PartialAnswerSymbol,
   PartialNotificationSettings,
-} from './base/notification-settings';
+} from './base';
 import {
   createINotificationSettings,
+  fillAnswerSymbol,
   fillNotificationSettings,
-} from './base/notification-settings';
+} from './base';
 import type { IDatetimeRange, PartialDatetimeRange } from './datetime-range';
 import { fillDatetimeRange } from './datetime-range';
 import type { IYmdHm, PartialYmdHm } from './ymd-hm';

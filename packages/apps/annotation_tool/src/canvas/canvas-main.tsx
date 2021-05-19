@@ -4,14 +4,13 @@ import { hslaToRgba } from '@noshiro/ts-utils';
 import { Application, InteractionManager, settings } from 'pixi.js';
 import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { addGlobalPointerEventListener } from './functions/add-pointer-event-listener';
-import { createGlobalPixiObjects } from './functions/create-global-pixi-objects';
-import type { CanvasAppState } from './state/canvas-state-type';
-import { defaultCanvasAppState } from './state/canvas-state-type';
-import { canvasAppStateHandlerGenerator } from './state/state-handler-main';
-import type { AnnotationCanvasStyle } from './types/annotation-canvas-style';
-import type { IdType } from './types/id-type';
-import type { PixiApp } from './types/pixi-app-type';
+import {
+  addGlobalPointerEventListener,
+  createGlobalPixiObjects,
+} from './functions';
+import type { CanvasAppState } from './state';
+import { canvasAppStateHandlerGenerator, defaultCanvasAppState } from './state';
+import type { AnnotationCanvasStyle, IdType, PixiApp } from './types';
 import { zIndex } from './z-index';
 
 // Pixi.js global settings

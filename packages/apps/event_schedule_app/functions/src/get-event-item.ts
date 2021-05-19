@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
-import { firestorePaths } from './constants/firestore-paths';
-import type { EventScheduleJsType } from './types/record/event-schedule';
+import { firestorePaths } from './constants';
+import type { EventScheduleJsType } from './types';
 
 export const getEventItem = async (
   eventId: string

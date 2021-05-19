@@ -2,8 +2,8 @@ import { Popover } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants/texts';
-import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
+import { texts } from '../../../constants';
+import { ButtonsWrapperAlignEnd } from '../../molecules';
 
 type Props = Readonly<{
   comment: string;

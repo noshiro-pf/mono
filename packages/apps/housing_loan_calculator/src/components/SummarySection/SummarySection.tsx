@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { viewTexts } from '../../constants/view-texts';
-import type { RepaymentType } from '../../types/enum/repayment-type';
+import { viewTexts } from '../../constants';
+import type { RepaymentType } from '../../types';
 import { DataItem } from './DataItem';
 
 type Props = Readonly<{

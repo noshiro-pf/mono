@@ -2,8 +2,8 @@ import { Radio, RadioGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import type { FormEvent } from 'react';
 import { useCallback } from 'react';
-import { viewTexts } from '../../constants/view-texts';
-import type { RepaymentType } from '../../types/enum/repayment-type';
+import { viewTexts } from '../../constants';
+import type { RepaymentType } from '../../types';
 
 type Props = Readonly<{
   repaymentType: RepaymentType;

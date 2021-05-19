@@ -4,7 +4,7 @@ import type { Percent } from '@noshiro/ts-utils';
 import { tuple } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import type { Label } from '../../../canvas/types/label';
+import type { Label } from '../../../canvas';
 import type { AppEventHandler } from '../../event-handlers';
 import { LabelButtonItem } from './label-button-item';
 

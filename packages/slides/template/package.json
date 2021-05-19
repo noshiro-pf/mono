@@ -12,6 +12,7 @@
     "deploy": "firebase deploy",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
+    "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
     "lint:fix": "yarn lint --fix",
     "setup": "yarn setup:webpackconfig",

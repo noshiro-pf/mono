@@ -1,23 +1,20 @@
 import type { MonthEnum, WeekDayEnum, YearEnum } from '@noshiro/ts-utils';
-import { getDay } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useReducer } from 'react';
-import type { DayType } from '../../types/enum/day-type';
-import type { IYearMonthDate } from '../../types/record/base/year-month-date';
-import {
-  compareYmd,
-  createIYearMonthDate,
-} from '../../types/record/base/year-month-date';
-import type { IList, IMap } from '../../utils/immutable';
-import { ISet } from '../../utils/immutable';
-import { ymd2Date } from '../../utils/ymdhm2date';
+import { ymd2day } from '../../functions';
+import type { DayType, IYearMonthDate } from '../../types';
+import { compareYmd, createIYearMonthDate } from '../../types';
+import type { IList, IMap } from '../../utils';
+import { ISet } from '../../utils';
 import { generateCalendar } from './generate-calendar';
-import type { CalendarCurrentPageReducerState } from './reducers/calendar-reducer';
+import type {
+  CalendarCurrentPageReducerState,
+  SelectedDatesReducerAction,
+} from './reducers';
 import {
   calendarCurrentPageInitialState,
   calendarCurrentPageReducer,
-} from './reducers/calendar-reducer';
-import type { SelectedDatesReducerAction } from './reducers/selected-dates-reducer';
-import { selectedDatesReducer } from './reducers/selected-dates-reducer';
+  selectedDatesReducer,
+} from './reducers';
 
 type MultipleDatePickerState = Readonly<{
   calendarCurrentPage: CalendarCurrentPageReducerState;
@@ -79,7 +76,7 @@ export const useMultipleDatePickerState = (
     () =>
       dates.map((week) =>
         week.map((ymd) => {
-          const dayValue: WeekDayEnum = getDay(ymd2Date(ymd));
+          const dayValue: WeekDayEnum = ymd2day(ymd);
           return {
             ymd,
             selected: selectedDatesSet.has(ymd),

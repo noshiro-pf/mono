@@ -14,11 +14,10 @@ import {
   take,
   withInitialValue,
 } from '@noshiro/syncflow';
-import { historyReducer } from '../functions/history-reducer';
-import { historyToSumCount } from '../functions/history-to-sum-count';
+import { historyReducer, historyToSumCount } from '../functions';
 import type { IList } from '../immutable';
 import { IRepeat } from '../immutable';
-import { HistoryState } from '../type/history';
+import { HistoryState } from '../type';
 import { MainView } from './main-view';
 
 const sumCountInitial = IRepeat(0, 12 - 2 + 1).toList();

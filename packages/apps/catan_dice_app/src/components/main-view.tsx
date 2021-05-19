@@ -9,11 +9,10 @@ import {
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import DiceIcon from '../assets/dice-icon.png';
-import SumIcon from '../assets/sum-sign.png';
+import { DiceIcon, SumIcon } from '../assets';
 import type { IList } from '../immutable';
 import { DiceNumber } from './dicer-number';
-import { Histogram } from './histgram/histogram';
+import { Histogram } from './histgram';
 
 const Root = styled.div`
   padding: 20px;

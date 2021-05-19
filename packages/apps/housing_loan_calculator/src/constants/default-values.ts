@@ -1,4 +1,4 @@
-import type { RepaymentType } from '../types/enum/repayment-type';
+import type { RepaymentType } from '../types';
 
 export const defaultValues: {
   repaymentType: RepaymentType;

@@ -2,12 +2,13 @@ import { Paper } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
 import type { Hsl, Hue, Mappable, Percent, uint32 } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import type { ExperimentResult } from '../../../types/experiment-result';
-import { ContrastRatioList } from '../../molecules/contrast-ratio-list';
-import { AllSliders } from '../../molecules/saturation-lightness-slider';
-import { ColorList } from '../../organisms/color-list';
-import { ColoredDistribution } from '../../organisms/colored-distribution';
-import { ColoredDistributionSelected } from '../../organisms/colored-distribution-selected';
+import type { ExperimentResult } from '../../../types';
+import { AllSliders, ContrastRatioList } from '../../molecules';
+import {
+  ColoredDistribution,
+  ColoredDistributionSelected,
+  ColorList,
+} from '../../organisms';
 
 const Root = styled.div`
   width: 100%;

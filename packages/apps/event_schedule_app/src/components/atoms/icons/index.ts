@@ -1,7 +1,7 @@
-export { CalendarIcon } from './calendar';
-export { CircleIcon } from './circle';
-export { CloseIcon } from './close';
-export { CommentIcon } from './comment';
-export { DeleteIcon } from './delete';
-export { EditIcon } from './edit';
-export { TriangleIcon } from './triangle';
+export * from './calendar';
+export * from './circle';
+export * from './close';
+export * from './comment';
+export * from './delete';
+export * from './edit';
+export * from './triangle';

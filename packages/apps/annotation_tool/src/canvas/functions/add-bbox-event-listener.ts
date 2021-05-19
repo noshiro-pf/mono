@@ -1,6 +1,5 @@
-import type { CanvasAppState } from '../state/canvas-state-type';
-import type { CanvasAppStateHandler } from '../state/state-handler-main';
-import type { PixiBbox } from '../types/pixi-bbox';
+import type { CanvasAppState, CanvasAppStateHandler } from '../state';
+import type { PixiBbox } from '../types';
 import { foreachBboxPoints } from './bbox-points';
 
 export const addBboxEventListener = (

@@ -1,7 +1,7 @@
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { IYearMonthDate } from '../../../types/record/base/year-month-date';
-import type { IList } from '../../../utils/immutable';
-import { ISet } from '../../../utils/immutable';
+import type { IYearMonthDate } from '../../../types';
+import type { IList } from '../../../utils';
+import { ISet } from '../../../utils';
 
 export type SelectedDatesReducerAction = Readonly<
   | { type: 'fill-column'; dates: IList<IYearMonthDate> }

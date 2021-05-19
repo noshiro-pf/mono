@@ -1,5 +1,5 @@
 import type { HoursEnum, MinutesEnum } from '@noshiro/ts-utils';
-import { sign } from '../../../utils/sign';
+import { sign } from '../../../utils';
 
 export type HoursMinutesType = Readonly<{
   hours: HoursEnum;

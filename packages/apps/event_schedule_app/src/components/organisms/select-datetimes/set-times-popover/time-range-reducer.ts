@@ -1,7 +1,6 @@
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
-import { compareHm } from '../../../../types/record/base/hours-minutes';
-import type { ITimeRange } from '../../../../types/record/time-range';
+import type { IHoursMinutes, ITimeRange } from '../../../../types';
+import { compareHm } from '../../../../types';
 
 export type TimeRangeReducerAction = Readonly<{
   type: 'end' | 'start';

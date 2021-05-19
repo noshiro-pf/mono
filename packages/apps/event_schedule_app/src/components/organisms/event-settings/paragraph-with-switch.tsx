@@ -2,7 +2,7 @@ import { BpSwitchWithoutLabel } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
-import { Description } from '../../atoms/description';
+import { Description } from '../../atoms';
 
 type Props = Readonly<{
   title: string;
