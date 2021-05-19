@@ -2,7 +2,7 @@ import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
-import type { AnswerSymbolIconId } from '../../types/enum/answer-symbol-icon';
+import type { AnswerSymbolIconId } from '../../types';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons';
 
 type Props = Readonly<{

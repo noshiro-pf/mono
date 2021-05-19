@@ -4,6 +4,7 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
+    "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
     "prebuild": "npm run clean",
     "build": "tsc",
     "clean": "rimraf dist",
@@ -11,6 +12,7 @@
     "fb": "firebase",
     "firebase": "firebase",
     "getconfig": "firebase functions:config:get",
+    "gi": "yarn _script_genindex ./src --min-depth 1 --ignore assets",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "yarn lint --fix",
     "logs": "firebase functions:log",
@@ -21,6 +23,9 @@
     "showlog": "firebase functions:log",
     "start": "yarn shell",
     "test": "echo 'no test script'"
+  },
+  "config": {
+    "root_dir": "../../../.."
   },
   "dependencies": {
     "firebase-admin": "^9.4.1",

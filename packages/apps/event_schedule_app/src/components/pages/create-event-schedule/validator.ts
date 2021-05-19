@@ -1,7 +1,9 @@
 import type { StrictOmit } from '@noshiro/ts-utils';
 import { ifthen, isEmailString } from '@noshiro/ts-utils';
-import type { EventScheduleBaseType } from '../../../types/record/event-schedule';
-import type { EventScheduleValidation } from '../../../types/record/event-schedule-validation';
+import type {
+  EventScheduleBaseType,
+  EventScheduleValidation,
+} from '../../../types';
 
 export const validateEventSchedule = ({
   title,

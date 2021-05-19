@@ -1,6 +1,5 @@
-import { IRecord } from '../../../utils/immutable';
-import type { AnswerSymbolIconId } from '../../enum/answer-symbol-icon';
-import type { AnswerSymbolPointEnumType } from '../../enum/answer-symbol-point';
+import { IRecord } from '../../../utils';
+import type { AnswerSymbolIconId, AnswerSymbolPointEnumType } from '../../enum';
 
 type AnswerSymbolBaseType = Readonly<{
   iconId: AnswerSymbolIconId;

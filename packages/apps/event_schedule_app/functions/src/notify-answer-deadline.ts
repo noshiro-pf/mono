@@ -1,12 +1,11 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { firestorePaths } from './constants/firestore-paths';
+import { firestorePaths } from './constants';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
-import type { EventScheduleJsType } from './types/record/event-schedule';
-import { pad2 } from './utils/to-str';
-import { tuple } from './utils/tuple';
+import type { EventScheduleJsType } from './types';
+import { pad2, tuple } from './utils';
 
 export const notifyAnswerDeadline = async (): Promise<void> => {
   const querySnapshot = await admin

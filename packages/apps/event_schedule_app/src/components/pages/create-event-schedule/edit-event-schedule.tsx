@@ -14,12 +14,11 @@ import {
 } from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { api } from '../../../api/api';
-import { descriptionFontColor } from '../../../constants/color';
-import { texts } from '../../../constants/texts';
-import { useEventId } from '../../../routing/use-event-id';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import { clog } from '../../../utils/log';
+import { api } from '../../../api';
+import { descriptionFontColor, texts } from '../../../constants';
+import { useEventId } from '../../../routing';
+import type { IEventSchedule } from '../../../types';
+import { clog } from '../../../utils';
 import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';

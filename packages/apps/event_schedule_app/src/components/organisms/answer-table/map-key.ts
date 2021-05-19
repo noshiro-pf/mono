@@ -1,8 +1,6 @@
-import type { AnswerId } from '../../../types/phantom';
-import { answerId } from '../../../types/phantom';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import { createIDatetimeRange } from '../../../types/record/datetime-range';
-import { IRecord } from '../../../utils/immutable';
+import type { AnswerId, IDatetimeRange } from '../../../types';
+import { answerId, createIDatetimeRange } from '../../../types';
+import { IRecord } from '../../../utils';
 
 type AnswerSelectionMapKeyBaseType = Readonly<{
   answerId: AnswerId;

@@ -1,5 +1,5 @@
 import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
-import { sign } from '../../../utils/sign';
+import { sign } from '../../../utils';
 
 export type YearMonthDateType = Readonly<{
   year: YearEnum;

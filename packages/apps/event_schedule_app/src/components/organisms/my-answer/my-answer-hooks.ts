@@ -1,13 +1,15 @@
 import { useCallback, useMemo } from 'react';
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { UserName } from '../../../types/phantom';
-import type { IAnswer } from '../../../types/record/answer';
-import { createIAnswerSelection } from '../../../types/record/answer-selection';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import type { IList } from '../../../utils/immutable';
-import { IMap } from '../../../utils/immutable';
-import { useFormError } from '../../../utils/use-form-error-hook';
+import { useFormError } from '../../../functions';
+import type {
+  AnswerSymbolIconId,
+  IAnswer,
+  IDatetimeRange,
+  IEventSchedule,
+  UserName,
+} from '../../../types';
+import { createIAnswerSelection } from '../../../types';
+import type { IList } from '../../../utils';
+import { IMap } from '../../../utils';
 import type { AnswerSelectionReducerAction } from './answer-selection-reducer';
 import { answerSelectionReducer } from './answer-selection-reducer';
 

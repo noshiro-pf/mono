@@ -7,6 +7,7 @@
     "bundle": "tsc --outFile src/20201016_namespaces/sample.js src/20201016_namespaces/Test.ts --skipLibCheck",
     "bundle2": "tsc --outFile src/20201016_namespaces/sample2.js src/20201016_namespaces/Validation.ts src/20201016_namespaces/LettersOnlyValidator.ts src/20201016_namespaces/ZipCodeValidator.ts src/20201016_namespaces/Test.ts --skipLibCheck",
     "clean": "echo 'no clean script'",
+    "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
     "lint:fix": "yarn lint --fix",
     "setup": "echo 'no setup script'",

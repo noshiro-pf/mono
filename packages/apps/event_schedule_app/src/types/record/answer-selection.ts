@@ -1,5 +1,5 @@
-import { IRecord } from '../../utils/immutable';
-import type { AnswerSymbolIconId } from '../enum/answer-symbol-icon';
+import { IRecord } from '../../utils';
+import type { AnswerSymbolIconId } from '../enum';
 import type { IDatetimeRange, PartialDatetimeRange } from './datetime-range';
 import { createIDatetimeRange, fillDatetimeRange } from './datetime-range';
 

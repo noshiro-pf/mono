@@ -2,9 +2,9 @@ import { HTMLTable } from '@blueprintjs/core';
 import { BpButton, BpInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { denom } from '../constants/denom';
-import { toPercentString } from '../functions/to-percent-string';
-import type { ResultRow } from '../types/result-row';
+import { denom } from '../constants';
+import { toPercentString } from '../functions';
+import type { ResultRow } from '../types';
 
 const separator = ',';
 

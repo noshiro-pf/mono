@@ -1,8 +1,8 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { viewTexts } from '../../constants/view-texts';
-import type { RepaymentType } from '../../types/enum/repayment-type';
-import { BpNumericInputWithLabel } from '../blueprint-wrapper/BpNumericInputWithLabel';
+import { viewTexts } from '../../constants';
+import type { RepaymentType } from '../../types';
+import { BpNumericInputWithLabel } from '../blueprint-wrapper';
 import { RepaymentTypeRadioGroup } from './RepaymentTypeRadioGroup';
 
 const SectionTitle = styled.div`

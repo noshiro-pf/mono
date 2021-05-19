@@ -2,8 +2,8 @@ import { AnchorButton, Classes, Spinner, Tooltip } from '@blueprintjs/core';
 import { BpButton, BpDialog } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../constants/texts';
-import { ButtonsWrapperAlignEnd } from '../molecules/buttons-wrapper';
+import { texts } from '../../constants';
+import { ButtonsWrapperAlignEnd } from '../molecules';
 
 const vt = texts.createEventResultDialog;
 

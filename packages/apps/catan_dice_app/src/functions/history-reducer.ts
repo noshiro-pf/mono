@@ -1,5 +1,5 @@
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { THistoryState } from '../type/history';
+import type { THistoryState } from '../type';
 import { rollTwoDices } from './roll-dice';
 
 export const historyReducer: ReducerType<

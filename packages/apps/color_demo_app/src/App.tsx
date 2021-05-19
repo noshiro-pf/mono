@@ -4,8 +4,7 @@ import { ComponentSwitcher } from '@noshiro/react-utils';
 import type { FC } from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { LuminanceVisualizer } from './components/pages/luminance-visualizer/luminance-visualizer';
-import { TextColorContrastTable } from './components/pages/text-color-contrast-table';
+import { LuminanceVisualizer, TextColorContrastTable } from './components';
 
 const Root = styled.div`
   width: 100vw;

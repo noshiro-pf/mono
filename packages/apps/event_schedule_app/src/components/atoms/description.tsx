@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { descriptionFontColor } from '../../constants/color';
+import { descriptionFontColor } from '../../constants';
 
 type Props = Readonly<{
   text: string;

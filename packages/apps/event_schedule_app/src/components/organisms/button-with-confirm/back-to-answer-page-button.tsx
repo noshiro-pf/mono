@@ -1,6 +1,6 @@
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { texts } from '../../../constants/texts';
+import { texts } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 const vt = texts.eventSettingsPage.backToAnswerPageButton;

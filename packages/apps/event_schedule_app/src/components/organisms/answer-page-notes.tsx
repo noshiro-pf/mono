@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import urlRegex from 'url-regex';
-import { splitStringByWhitespace } from '../../utils/split-string-by-whitespace';
+import { splitStringByWhitespace } from '../../utils';
 
 type Props = Readonly<{
   notes: string;

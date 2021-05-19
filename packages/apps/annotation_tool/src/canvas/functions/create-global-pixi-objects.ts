@@ -1,7 +1,6 @@
 import type { RectSize } from '@noshiro/ts-utils';
 import type { Application, Sprite } from 'pixi.js';
-import type { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
-import type { PixiTempRect } from '../types/pixi-temp-rect';
+import type { AnnotationCanvasStyle, PixiTempRect } from '../types';
 import {
   createBorderedRectangleGraphics,
   createDummySpriteRectangle,

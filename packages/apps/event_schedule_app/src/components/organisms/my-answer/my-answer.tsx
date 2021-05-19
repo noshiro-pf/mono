@@ -5,16 +5,13 @@ import {
   BpTextArea,
 } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { texts } from '../../../constants/texts';
-import type { UserName } from '../../../types/phantom';
-import type { IAnswer } from '../../../types/record/answer';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import type { IList } from '../../../utils/immutable';
-import { CustomIcon } from '../../atoms/icon';
-import { Td, Th } from '../../atoms/table-cell-centered';
-import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
-import { WidthRestrictedInputWrapper } from '../../styled/width-restricted-input-wrapper';
-import { DatetimeRangeCell } from '../answer-table/datetime-range-cell';
+import { texts } from '../../../constants';
+import type { IAnswer, IEventSchedule, UserName } from '../../../types';
+import type { IList } from '../../../utils';
+import { CustomIcon, Td, Th } from '../../atoms';
+import { ButtonsWrapperAlignEnd } from '../../molecules';
+import { WidthRestrictedInputWrapper } from '../../styled';
+import { DatetimeRangeCell } from '../answer-table';
 import { DeleteAnswerButton } from './delete-answer-button';
 import { useMyAnswerHooks } from './my-answer-hooks';
 

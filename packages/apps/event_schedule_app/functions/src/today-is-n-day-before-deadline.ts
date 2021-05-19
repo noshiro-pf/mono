@@ -1,5 +1,5 @@
-import type { YearMonthDateType } from './types/record/base/year-month-date';
-import { today } from './utils/today';
+import type { YearMonthDateType } from './types';
+import { today } from './utils';
 
 const ymd2Date = (ymd: YearMonthDateType): Date =>
   new Date(`${ymd.year}-${ymd.month}-${ymd.date}`);

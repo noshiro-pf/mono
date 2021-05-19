@@ -16,7 +16,7 @@ const createDate = (modifier: (d: ReadonlyDate) => Date): Date =>
     .chain((d) => setHours(d, 23))
     .chain((d) => setMinutes(d, 59)).value;
 
-export const answerDeadlineShortcuts: DatePickerShortcut[] = [
+export const answerDeadlineShortcuts: readonly DatePickerShortcut[] = [
   {
     date: createDate((d) => updateDate(d, (v) => v)),
     label: 'Today',

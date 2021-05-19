@@ -6,12 +6,14 @@ import styled from 'styled-components';
 import {
   answerSymbolPointConfig,
   clampAndRoundAnswerSymbolPoint,
-} from '../../../constants/answer-symbol-point';
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { AnswerSymbolPointEnumType } from '../../../types/enum/answer-symbol-point';
-import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import type { IList } from '../../../utils/immutable';
-import { CustomIcon } from '../../atoms/icon';
+} from '../../../constants';
+import type {
+  AnswerSymbolIconId,
+  AnswerSymbolPointEnumType,
+  IAnswerSymbol,
+} from '../../../types';
+import type { IList } from '../../../utils';
+import { CustomIcon } from '../../atoms';
 
 type Props = Readonly<{
   answerSymbol: IAnswerSymbol;

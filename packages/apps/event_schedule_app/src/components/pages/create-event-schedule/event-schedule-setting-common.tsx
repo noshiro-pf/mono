@@ -1,18 +1,19 @@
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants/texts';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import { ButtonsWrapperAlignEnd } from '../../molecules/buttons-wrapper';
-import { Section } from '../../molecules/section';
-import { BackToAnswerPageButton } from '../../organisms/button-with-confirm/back-to-answer-page-button';
-import { ResetButton } from '../../organisms/button-with-confirm/reset-button';
-import { ResetEditButton } from '../../organisms/button-with-confirm/reset-edit-button';
-import { CreateEventResultDialog } from '../../organisms/create-event-result-dialog';
-import { EventSchedulePropertiesErrors } from '../../organisms/errors';
-import { EventSettings } from '../../organisms/event-settings/event-settings';
-import { NameAndNotes } from '../../organisms/name-and-note';
-import { SelectDatetimes } from '../../organisms/select-datetimes/select-datetimes/select-datetimes';
+import { texts } from '../../../constants';
+import type { IEventSchedule } from '../../../types';
+import { ButtonsWrapperAlignEnd, Section } from '../../molecules';
+import {
+  BackToAnswerPageButton,
+  CreateEventResultDialog,
+  EventSchedulePropertiesErrors,
+  EventSettings,
+  NameAndNotes,
+  ResetButton,
+  ResetEditButton,
+  SelectDatetimes,
+} from '../../organisms';
 import { useEventScheduleSettingCommonHooks } from './event-schedule-setting-common-hooks';
 
 const vt = texts.eventSettingsPage;

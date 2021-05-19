@@ -2,17 +2,19 @@ import { AnchorButton, Icon, Spinner } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants/texts';
-import { CustomIcon } from '../../atoms/icon';
+import { texts } from '../../../constants';
+import { CustomIcon } from '../../atoms';
 import {
   ButtonsWrapperAlignEnd,
+  Section,
   SingleButtonWrapper,
-} from '../../molecules/buttons-wrapper';
-import { Section } from '../../molecules/section';
-import { AnswerPageEventInfo } from '../../organisms/answer-page-event-info';
-import { AnswerTable } from '../../organisms/answer-table/answer-table';
-import { GoToEditPageButton } from '../../organisms/button-with-confirm/go-to-edit-page-button';
-import { MyAnswer } from '../../organisms/my-answer/my-answer';
+} from '../../molecules';
+import {
+  AnswerPageEventInfo,
+  AnswerTable,
+  GoToEditPageButton,
+  MyAnswer,
+} from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { useAnswerPageState } from './answer-page-hooks';
 import { AnswerPageError } from './error';

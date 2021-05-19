@@ -1,4 +1,4 @@
-import type { AnswerSymbolIconId } from '../enum/answer-symbol-icon';
+import type { AnswerSymbolIconId } from '../enum';
 import type { DatetimeRangeJsType } from './datetime-range';
 
 export type AnswerSelectionJsType = Readonly<{

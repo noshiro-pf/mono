@@ -1,6 +1,5 @@
 import type { ArrayOfLength } from '@noshiro/ts-utils';
-import type { DiceValue } from '../types/dice-value';
-import type { TwoDiceSumValue } from '../types/two-dice-sum-value';
+import type { DiceValue, TwoDiceSumValue } from '../types';
 
 export const possibleTwoDiceSumPairs = (
   a: DiceValue,

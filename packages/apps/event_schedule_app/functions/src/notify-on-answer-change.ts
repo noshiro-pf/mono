@@ -6,9 +6,9 @@ import {
 } from './create-mail-body';
 import { getEventItem } from './get-event-item';
 import { createMailOptions, sendEmail } from './setup-mailer';
-import type { AnswerJsType } from './types/record/answer';
-import { compareYmdHm } from './types/record/ymd-hm';
-import { now } from './utils/today';
+import type { AnswerJsType } from './types';
+import { compareYmdHm } from './types';
+import { now } from './utils';
 
 export const notifyOnAnswerChangeBody = async ({
   eventType,

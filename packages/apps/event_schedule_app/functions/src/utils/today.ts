@@ -5,8 +5,7 @@ import type {
   MonthEnum,
   YearEnum,
 } from '@noshiro/ts-utils';
-import type { YearMonthDateType } from '../types/record/base/year-month-date';
-import type { YmdHmJsType } from '../types/record/ymd-hm';
+import type { YearMonthDateType, YmdHmJsType } from '../types';
 
 export const todayDate = (): Date => {
   const japanLocaleString = new Date().toLocaleString('ja-JP', {

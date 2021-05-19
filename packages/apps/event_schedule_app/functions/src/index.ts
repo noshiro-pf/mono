@@ -1,9 +1,9 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { firestorePaths } from './constants/firestore-paths';
+import { firestorePaths } from './constants';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
-import type { AnswerJsType } from './types/record/answer';
+import type { AnswerJsType } from './types';
 
 admin.initializeApp();
 

@@ -3,11 +3,11 @@ import type { Hue, RectSize } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import SampleImage from '../assets/sample_image.jpg';
+import { SampleImage } from '../assets';
 import { CanvasMain } from './canvas-main';
-import { bgCheckerboardImg } from './img/checkerboard';
-import type { AnnotationCanvasStyle } from './types/annotation-canvas-style';
-import { defaultIdMaker } from './types/id-type';
+import { bgCheckerboardImg } from './img';
+import type { AnnotationCanvasStyle } from './types';
+import { defaultIdMaker } from './types';
 
 type Props = Readonly<{
   canvasStyles: AnnotationCanvasStyle;

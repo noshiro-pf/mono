@@ -1,4 +1,4 @@
-import { isApplication } from './is-application';
+import { isApplication } from './is-lambda-term';
 
 test('isApplication 1', () => {
   expect(isApplication('x')).toBeFalsy();

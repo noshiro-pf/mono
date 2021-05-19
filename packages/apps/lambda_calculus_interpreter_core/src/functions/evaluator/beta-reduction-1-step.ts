@@ -1,6 +1,5 @@
 import type { LambdaTerm } from '../../types';
-import { isAbstraction } from '../is-abstraction';
-import { isApplication } from '../is-application';
+import { isAbstraction, isApplication } from '../is-lambda-term';
 import { isVariable } from '../is-variable';
 import { termEq } from '../term-eq';
 import { substitute } from './substitute';

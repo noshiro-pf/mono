@@ -1,7 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { aboutThisAppUrl } from '../../../constants/about-this-app-url';
-import { texts } from '../../../constants/texts';
+import { aboutThisAppUrl, texts } from '../../../constants';
 
 export const Footer = memoNamed('Footer', () => (
   <ReelaseNotesUrlWrapper>

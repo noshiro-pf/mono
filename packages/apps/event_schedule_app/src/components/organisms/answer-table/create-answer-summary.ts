@@ -1,9 +1,11 @@
-import { answerSymbolPointConfig } from '../../../constants/answer-symbol-point';
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import type { IList } from '../../../utils/immutable';
-import { IMap } from '../../../utils/immutable';
+import { answerSymbolPointConfig } from '../../../constants';
+import type {
+  AnswerSymbolIconId,
+  IAnswerSymbol,
+  IDatetimeRange,
+} from '../../../types';
+import type { IList } from '../../../utils';
+import { IMap } from '../../../utils';
 
 export const createAnswerSummary = (
   datetimeRangeList: IList<IDatetimeRange>,

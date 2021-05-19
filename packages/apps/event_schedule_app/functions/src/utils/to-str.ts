@@ -1,8 +1,10 @@
-import type { AnswerSymbolIconId } from '../types/enum/answer-symbol-icon';
-import type { DatetimeSpecificationEnumType } from '../types/enum/datetime-specification-type';
-import type { HoursMinutesType } from '../types/record/base/hours-minutes';
-import type { YearMonthDateType } from '../types/record/base/year-month-date';
-import type { DatetimeRangeJsType } from '../types/record/datetime-range';
+import type {
+  AnswerSymbolIconId,
+  DatetimeRangeJsType,
+  DatetimeSpecificationEnumType,
+  HoursMinutesType,
+  YearMonthDateType,
+} from '../types';
 
 export const pad2 = (n: number): string => n.toString().padStart(2, '0');
 

@@ -4,8 +4,8 @@ import type { uint32 } from '@noshiro/ts-utils';
 import { seq } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
-import { viewTexts } from '../../constants/view-texts';
-import type { RepaymentType } from '../../types/enum/repayment-type';
+import { viewTexts } from '../../constants';
+import type { RepaymentType } from '../../types';
 
 const headerCellStyle: CSSProperties = {
   textAlign: 'center',

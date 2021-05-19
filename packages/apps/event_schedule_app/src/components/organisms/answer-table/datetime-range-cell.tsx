@@ -1,8 +1,10 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { texts } from '../../../constants/texts';
-import type { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import { hm2str, ymd2strWithDay } from '../../../utils/ymdhm2str';
+import { texts } from '../../../constants';
+import { hm2str, ymd2strWithDay } from '../../../functions';
+import type {
+  DatetimeSpecificationEnumType,
+  IDatetimeRange,
+} from '../../../types';
 
 const vt = texts.date;
 

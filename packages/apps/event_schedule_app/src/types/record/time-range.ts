@@ -1,10 +1,6 @@
-import { IRecord } from '../../utils/immutable';
-import type { IHoursMinutes, PartialHoursMinutes } from './base/hours-minutes';
-import {
-  compareHm,
-  createIHoursMinutes,
-  fillHoursMinutes,
-} from './base/hours-minutes';
+import { IRecord } from '../../utils';
+import type { IHoursMinutes, PartialHoursMinutes } from './base';
+import { compareHm, createIHoursMinutes, fillHoursMinutes } from './base';
 
 type TimeRangeBaseType = Readonly<{
   start: IHoursMinutes;

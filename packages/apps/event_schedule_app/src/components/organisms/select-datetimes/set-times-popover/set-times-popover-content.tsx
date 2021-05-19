@@ -2,12 +2,13 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../../constants/texts';
-import type { DatetimeSpecificationEnumType } from '../../../../types/enum/datetime-specification-type';
-import type { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
-import type { ITimeRange } from '../../../../types/record/time-range';
-import { ButtonsWrapperAlignEnd } from '../../../molecules/buttons-wrapper';
-import { TimeRangeView } from '../../../molecules/time-range';
+import { texts } from '../../../../constants';
+import type {
+  DatetimeSpecificationEnumType,
+  IHoursMinutes,
+  ITimeRange,
+} from '../../../../types';
+import { ButtonsWrapperAlignEnd, TimeRangeView } from '../../../molecules';
 import { timeRangeReducer } from './time-range-reducer';
 
 type Props = Readonly<{

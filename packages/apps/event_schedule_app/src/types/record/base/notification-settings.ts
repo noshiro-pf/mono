@@ -1,4 +1,4 @@
-import { IRecord } from '../../../utils/immutable';
+import { IRecord } from '../../../utils';
 
 type NotificationSettingsBaseType = Readonly<{
   email: string;

@@ -1,7 +1,7 @@
 import { memoNamed, useDebounce } from '@noshiro/react-utils';
 import type { Hue, Percent, uint32 } from '@noshiro/ts-utils';
 import { useState } from 'react';
-import { calcAll } from '../../../functions/calc-all';
+import { calcAll } from '../../../functions';
 import { LuminanceVisualizerView } from './luminance-visualizer-view';
 
 const saturationInit = 80;

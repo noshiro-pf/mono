@@ -1,6 +1,5 @@
-import type { DatetimeSpecificationEnumType } from './types/enum/datetime-specification-type';
-import type { AnswerJsType } from './types/record/answer';
-import { datetimeRange2str, iconId2str } from './utils/to-str';
+import type { AnswerJsType, DatetimeSpecificationEnumType } from './types';
+import { datetimeRange2str, iconId2str } from './utils';
 
 export const answerDiffAsString = (
   before: AnswerJsType,

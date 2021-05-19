@@ -1,9 +1,9 @@
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
-import { api } from '../../../api/api';
-import { routePaths } from '../../../routing/routing';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
+import { api } from '../../../api';
+import { routePaths } from '../../../routing';
+import type { IEventSchedule } from '../../../types';
 
 type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;

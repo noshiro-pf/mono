@@ -1,13 +1,15 @@
 import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { answerTableColor } from '../../../constants/answer-table-color';
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { DatetimeSpecificationEnumType } from '../../../types/enum/datetime-specification-type';
-import type { IAnswer } from '../../../types/record/answer';
-import type { IAnswerSymbol } from '../../../types/record/base/answer-symbol';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import type { IList, IMap } from '../../../utils/immutable';
+import { answerTableColor } from '../../../constants';
+import type {
+  AnswerSymbolIconId,
+  DatetimeSpecificationEnumType,
+  IAnswer,
+  IAnswerSymbol,
+  IDatetimeRange,
+  IEventSchedule,
+} from '../../../types';
+import type { IList, IMap } from '../../../utils';
 import { createAnswerSummary, createScore } from './create-answer-summary';
 import { useAnswerTable } from './use-answer-table';
 

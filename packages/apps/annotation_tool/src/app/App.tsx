@@ -12,14 +12,10 @@ import type {
 import { map, pickupHighContrastHues, pipe, zip } from '@noshiro/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
-import { AnnotataionCanvas } from '../canvas/annotation-canvas';
-import type { AnnotationCanvasStyle } from '../canvas/types/annotation-canvas-style';
-import { defaultAnnotationCanvasStyle } from '../canvas/types/annotation-canvas-style';
-import type { IdType } from '../canvas/types/id-type';
-import type { Label } from '../canvas/types/label';
+import type { AnnotationCanvasStyle, IdType, Label } from '../canvas';
+import { AnnotataionCanvas, defaultAnnotationCanvasStyle } from '../canvas';
 import type { AppEventHandler } from './event-handlers';
-import { visibleLabelsReducer } from './sidebar/label-button/function/visible-labels-reducer';
-import { Sidebar } from './sidebar/sidebar';
+import { Sidebar, visibleLabelsReducer } from './sidebar';
 
 const canvasSize: RectSize = {
   width: 600,

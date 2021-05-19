@@ -1,6 +1,6 @@
 import type { IOptionProps } from '@blueprintjs/core';
-import { texts } from '../../../../constants/texts';
-import { datetimeSpecificationOptions } from '../../../../types/enum/datetime-specification-type';
+import { texts } from '../../../../constants';
+import { datetimeSpecificationOptions } from '../../../../types';
 
 const vt = texts.eventSettingsPage.section2;
 

@@ -1,4 +1,4 @@
-import { isAbstraction } from './is-abstraction';
+import { isAbstraction } from './is-lambda-term';
 
 test('isAbstraction 1', () => {
   expect(isAbstraction('x')).toBeFalsy();

@@ -1,7 +1,7 @@
 import type { uint32 } from '@noshiro/ts-utils';
 import { zeros } from '@noshiro/ts-utils';
 import { IList } from '../immutable';
-import type { THistoryState } from '../type/history';
+import type { THistoryState } from '../type';
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const historyToSumCount = (hist: THistoryState): IList<number> => {

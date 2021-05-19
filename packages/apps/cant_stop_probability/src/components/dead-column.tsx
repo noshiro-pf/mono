@@ -2,7 +2,7 @@ import { ButtonGroup } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import type { TwoDiceSumValue } from '../types/two-dice-sum-value';
+import type { TwoDiceSumValue } from '../types';
 
 type Props = Readonly<{
   columnsAliveWithHandler: readonly Readonly<{

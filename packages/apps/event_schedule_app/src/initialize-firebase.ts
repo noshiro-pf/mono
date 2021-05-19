@@ -1,9 +1,8 @@
 import firebase from 'firebase/app';
 import 'firebase/firestore';
-import { firebaseConfig } from './constants/firebase-config';
-import { firestorePaths } from './constants/firestore-paths';
+import { firebaseConfig, firestorePaths } from './constants';
 import './index.css';
-import { clog } from './utils/log';
+import { clog } from './utils';
 // import firebasejson from '../firebase.json';
 
 firebase.initializeApp(firebaseConfig);

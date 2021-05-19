@@ -1,11 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import type { IHoursMinutes } from '../../../../types/record/base/hours-minutes';
-import type { IYearMonthDate } from '../../../../types/record/base/year-month-date';
-import { createIYearMonthDate } from '../../../../types/record/base/year-month-date';
-import type { IDatetimeRange } from '../../../../types/record/datetime-range';
-import { createIDatetimeRange } from '../../../../types/record/datetime-range';
-import type { ITimeRange } from '../../../../types/record/time-range';
-import type { IList } from '../../../../utils/immutable';
+import type {
+  IDatetimeRange,
+  IHoursMinutes,
+  ITimeRange,
+  IYearMonthDate,
+} from '../../../../types';
+import { createIDatetimeRange, createIYearMonthDate } from '../../../../types';
+import type { IList } from '../../../../utils';
 import { getMostFrequentTimeRange } from './get-most-frequent-time-range';
 import type { DatetimeListReducerAction } from './select-datetimes-reducer';
 import { datetimeListReducer } from './select-datetimes-reducer';

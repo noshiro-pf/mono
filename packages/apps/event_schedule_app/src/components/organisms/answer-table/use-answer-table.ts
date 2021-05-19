@@ -1,10 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { AnswerId } from '../../../types/phantom';
-import type { IAnswer } from '../../../types/record/answer';
-import type { IDatetimeRange } from '../../../types/record/datetime-range';
-import type { IEventSchedule } from '../../../types/record/event-schedule';
-import type { IList, IMap } from '../../../utils/immutable';
+import type {
+  AnswerId,
+  AnswerSymbolIconId,
+  IAnswer,
+  IDatetimeRange,
+  IEventSchedule,
+} from '../../../types';
+import type { IList, IMap } from '../../../utils';
 import { createAnswerSelectionMapFromAnswers } from './create-answer-selection-map-from-answers';
 import { createAnswerTable } from './create-answer-table';
 import type { IAnswerSelectionMapKey } from './map-key';

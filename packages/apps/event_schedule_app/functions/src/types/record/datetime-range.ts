@@ -1,4 +1,4 @@
-import type { YearMonthDateType } from './base/year-month-date';
+import type { YearMonthDateType } from './base';
 import type { TimeRangeJsType } from './time-range';
 
 export type DatetimeRangeJsType = Readonly<{

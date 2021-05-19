@@ -2,7 +2,7 @@ import { ButtonGroup, Popover } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
-import { texts } from '../../../constants/texts';
+import { texts } from '../../../constants';
 
 type Props = Readonly<{
   onSortChange: (state: 'asc' | 'desc') => void;

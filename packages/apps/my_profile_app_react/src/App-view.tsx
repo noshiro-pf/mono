@@ -7,9 +7,9 @@ import { useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
+import { Profile2Md, ProfileMd, SkillsMd } from './assets';
 import { LastUpdated, Products, Writings } from './components';
 import { labelList, routeList, routes } from './constants';
-import { Profile2Md, ProfileMd, SkillsMd } from './contents';
 
 const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
   const res = routeList.findIndex((e) => e === `/${pathNameLast}`);

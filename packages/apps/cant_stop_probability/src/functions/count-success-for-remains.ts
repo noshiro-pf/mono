@@ -1,7 +1,7 @@
 import type { uint32 } from '@noshiro/ts-utils';
 import { setIntersection } from '@noshiro/ts-utils';
-import { diceValueSet } from '../constants/dice-value-set';
-import type { TwoDiceSumValue } from '../types/two-dice-sum-value';
+import { diceValueSet } from '../constants';
+import type { TwoDiceSumValue } from '../types';
 import { possibleTwoDiceSums } from './possible-two-dice-sums';
 
 // 踏破されていない列のいずれかが出る場合の数

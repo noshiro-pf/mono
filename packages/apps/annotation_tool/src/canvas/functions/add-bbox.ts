@@ -1,11 +1,8 @@
 import type { Rect, Rgba } from '@noshiro/ts-utils';
 import { roundToInt } from '@noshiro/ts-utils';
 import type { Application } from 'pixi.js';
-import type { CanvasAppState } from '../state/canvas-state-type';
-import type { CanvasAppStateHandler } from '../state/state-handler-main';
-import type { AnnotationCanvasStyle } from '../types/annotation-canvas-style';
-import type { IdType } from '../types/id-type';
-import type { PixiBbox } from '../types/pixi-bbox';
+import type { CanvasAppState, CanvasAppStateHandler } from '../state';
+import type { AnnotationCanvasStyle, IdType, PixiBbox } from '../types';
 import { addBboxEventListener } from './add-bbox-event-listener';
 import { foreachBboxPoints } from './bbox-points';
 import { createBbox } from './create-pixi-bbox';

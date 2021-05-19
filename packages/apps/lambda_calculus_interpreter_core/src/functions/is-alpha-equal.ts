@@ -1,7 +1,6 @@
 import type { LambdaTerm } from '../types';
 import { alphaConversion } from './evaluator';
-import { isAbstraction } from './is-abstraction';
-import { isApplication } from './is-application';
+import { isAbstraction, isApplication } from './is-lambda-term';
 import { isVariable } from './is-variable';
 
 export const isAlphaEqual = (term1: LambdaTerm, term2: LambdaTerm): boolean => {

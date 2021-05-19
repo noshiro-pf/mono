@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
     "prebuild": "yarn clean:build",
     "build": "webpack --config config/webpack.prod.js",
     "postbuild": "cpx \"public/**\" ${npm_package_config_build_dir}",
@@ -18,6 +19,7 @@
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fmt": "yarn _prettier .",
+    "gi": "yarn _script_genindex ./src --min-depth 1 --ignore assets",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
     "serve": "firebase serve",
@@ -28,7 +30,8 @@
     "testw": "yarn test --watch"
   },
   "config": {
-    "build_dir": "build"
+    "build_dir": "build",
+    "root_dir": "../../.."
   },
   "browserslist": {
     "production": [

@@ -7,7 +7,7 @@ import {
   timer,
   withInitialValue,
 } from '@noshiro/syncflow';
-import { fetchThrottleTime } from '../../../constants/fetch-throttle-time';
+import { fetchThrottleTime } from '../../../constants';
 
 export const useRefreshButtonState = (
   fetchAnswersThrottled$: Observable<void>,

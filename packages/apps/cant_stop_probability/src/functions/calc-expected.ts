@@ -1,5 +1,5 @@
 import type { uint32 } from '@noshiro/ts-utils';
-import type { Count } from '../types/count';
+import type { Count } from '../types';
 
 /**
  * （計算式）

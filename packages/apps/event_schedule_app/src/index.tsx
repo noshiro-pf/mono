@@ -1,7 +1,7 @@
 import 'firebase/firestore';
 import ReactDOM from 'react-dom';
-import { Root } from './components/root';
 import './index.css';
+import { Root } from './root';
 import { unregister } from './serviceWorker';
 
 ReactDOM.render(<Root />, document.getElementById('root'));

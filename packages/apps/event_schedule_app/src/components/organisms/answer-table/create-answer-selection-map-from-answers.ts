@@ -1,7 +1,6 @@
-import type { AnswerSymbolIconId } from '../../../types/enum/answer-symbol-icon';
-import type { IAnswer } from '../../../types/record/answer';
-import type { IList } from '../../../utils/immutable';
-import { IMap } from '../../../utils/immutable';
+import type { AnswerSymbolIconId, IAnswer } from '../../../types';
+import type { IList } from '../../../utils';
+import { IMap } from '../../../utils';
 import type { IAnswerSelectionMapKey } from './map-key';
 import { createAnswerSelectionMapKey } from './map-key';
 

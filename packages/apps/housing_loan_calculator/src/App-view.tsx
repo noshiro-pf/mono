@@ -1,12 +1,9 @@
 import { Spinner } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { ConfigSection } from './components/ConfigSection/ConfigSection';
-import { PaymentTable } from './components/PaymentTable/PaymentTable';
-import { SummarySection } from './components/SummarySection/SummarySection';
-import { viewTexts } from './constants/view-texts';
-import type { CalculatingStateType } from './types/enum/calculating-state';
-import type { RepaymentType } from './types/enum/repayment-type';
+import { ConfigSection, PaymentTable, SummarySection } from './components';
+import { viewTexts } from './constants';
+import type { CalculatingStateType, RepaymentType } from './types';
 
 const Root = styled.div`
   padding: 10px;

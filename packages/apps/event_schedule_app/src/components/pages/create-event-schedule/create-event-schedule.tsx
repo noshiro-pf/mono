@@ -1,8 +1,8 @@
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants/texts';
-import { createIEventSchedule } from '../../../types/record/event-schedule';
+import { texts } from '../../../constants';
+import { createIEventSchedule } from '../../../types';
 import {
   defaultAnswerDeadline,
   defaultAnswerSymbolList,
