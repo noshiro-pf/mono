@@ -50,7 +50,7 @@
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
-    "immutable": "^4.0.0-rc.12",
+    "immer": "^9.0.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.0",
     "styled-components": "^5.1.1"

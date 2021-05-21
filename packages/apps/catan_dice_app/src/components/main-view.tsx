@@ -8,52 +8,25 @@ import {
   Paper,
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
+import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { DiceIcon, SumIcon } from '../assets';
-import type { IList } from '../immutable';
 import { DiceNumber } from './dicer-number';
 import { Histogram } from './histgram';
 
-const Root = styled.div`
-  padding: 20px;
-  user-select: none;
-  -webkit-touch-callout: none;
-`;
+type Props = Readonly<{
+  diceValue1: number;
+  diceValue2: number;
+  sumCount: ReadonlyArrayOfLength<11, number>;
+  opacity: number;
+  rollDices: () => void;
+  undo: () => void;
+  redo: () => void;
+  undoable: boolean;
+  redoable: boolean;
+}>;
 
-const PaddedPaper = styled(Paper)`
-  padding: 10px;
-`;
-
-const HistogramWrapper = styled.div`
-  padding: 20px 10px;
-  height: 350px;
-  width: 350px;
-  max-width: 100%;
-`;
-
-const ButtonsWrapper = styled.div`
-  padding: 10px;
-  display: flex;
-  flex-direction: row;
-`;
-
-const ButtonWithMargin = styled.div`
-  padding: 5px;
-`;
-
-export const MainView = memoNamed<
-  Readonly<{
-    diceValue1: number;
-    diceValue2: number;
-    sumCount: IList<number>;
-    opacity: number;
-    rollDices: () => void;
-    undo: () => void;
-    redo: () => void;
-    undoable: boolean;
-    redoable: boolean;
-  }>
->(
+export const MainView = memoNamed<Props>(
   'MainView',
   ({
     diceValue1,
@@ -128,3 +101,30 @@ export const MainView = memoNamed<
     </Root>
   )
 );
+
+const Root = styled.div`
+  padding: 20px;
+  user-select: none;
+  -webkit-touch-callout: none;
+`;
+
+const PaddedPaper = styled(Paper)`
+  padding: 10px;
+`;
+
+const HistogramWrapper = styled.div`
+  padding: 20px 10px;
+  height: 350px;
+  width: 350px;
+  max-width: 100%;
+`;
+
+const ButtonsWrapper = styled.div`
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+`;
+
+const ButtonWithMargin = styled.div`
+  padding: 5px;
+`;

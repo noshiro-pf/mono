@@ -14,13 +14,12 @@ import {
   take,
   withInitialValue,
 } from '@noshiro/syncflow';
+import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import { historyReducer, historyToSumCount } from '../functions';
-import type { IList } from '../immutable';
-import { IRepeat } from '../immutable';
-import { HistoryState } from '../type';
+import { defaultHistoryState } from '../type';
 import { MainView } from './main-view';
 
-const sumCountInitial = IRepeat(0, 12 - 2 + 1).toList();
+const sumCountInitial = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as const;
 
 export const Main = memoNamed('Main', () => {
   const [rollDices$, rollDices] = useVoidEventAsStream();
@@ -32,7 +31,7 @@ export const Main = memoNamed('Main', () => {
       rollDices$.chain(mapTo('roll-dices' as const)),
       undo$.chain(mapTo('undo' as const)),
       redo$.chain(mapTo('redo' as const))
-    ).chain(scan(historyReducer, HistoryState()))
+    ).chain(scan(historyReducer, defaultHistoryState))
   );
 
   const undoable$ = useStream(() =>
@@ -41,7 +40,7 @@ export const Main = memoNamed('Main', () => {
 
   const redoable$ = useStream(() =>
     history$
-      .chain(map((h) => h.index < h.history.size - 1))
+      .chain(map((h) => h.index < h.history.length - 1))
       .chain(withInitialValue(false))
   );
 
@@ -49,14 +48,13 @@ export const Main = memoNamed('Main', () => {
     history$
       .chain(
         map(
-          (histState) =>
-            histState.history.get(histState.index) ?? ([0, 0] as const)
+          (histState) => histState.history[histState.index] ?? ([0, 0] as const)
         )
       )
       .chain(withInitialValue([0, 0] as const))
   );
 
-  const sumCount$ = useStream<IList<number>>(() =>
+  const sumCount$ = useStream<ReadonlyArrayOfLength<11, number>>(() =>
     history$
       .chain(map(historyToSumCount))
       .chain(withInitialValue(sumCountInitial))
