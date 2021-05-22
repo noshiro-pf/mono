@@ -1,6 +1,6 @@
 import type { WritableDraft } from 'immer/dist/internal';
 import { incrementPlayerIndex } from '../../functions';
-import type { GameState } from '../game-state';
+import type { GameState } from '../../types';
 
 export const goToNextTurn = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

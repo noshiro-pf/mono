@@ -4,7 +4,7 @@ import type { Rect, RectSize } from '@noshiro/ts-utils';
 import { recordFromEntries } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
-import type { CardColor, CardNumber, Direction, DisplayValues } from '../types';
+import type { CardColor, CardNumber, DisplayValues, NWES } from '../../types';
 import { PlayerCardsArea } from './player-cards-area';
 import { PlayerName, playerNameRectSize } from './player-name';
 
@@ -12,7 +12,7 @@ type Props = Readonly<{
   displayValues: DisplayValues;
   tableSize: RectSize;
   windowSize: Rect;
-  playerNamePositionsDispatcher: (action: readonly [Direction, Rect]) => void;
+  playerNamePositionsDispatcher: (action: readonly [NWES, Rect]) => void;
   cardPositionsDispatcher: (
     action: readonly [CardColor, CardNumber, Rect]
   ) => void;

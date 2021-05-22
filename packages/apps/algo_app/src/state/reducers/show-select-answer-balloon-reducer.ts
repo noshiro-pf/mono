@@ -1,6 +1,5 @@
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { GameStateAction } from '../action';
-import type { GameState } from '../game-state';
+import type { GameState, GameStateAction } from '../../types';
 
 export const selectAnswerBalloonIsOpenReducer: ReducerType<
   GameState['selectAnswerBalloonIsOpen'],

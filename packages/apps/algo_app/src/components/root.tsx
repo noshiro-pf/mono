@@ -1,7 +1,7 @@
 import { useResizeObserver } from '@noshiro/preact-resize-observer-hooks';
 import type { FunctionalComponent } from 'preact';
 import type { JSXInternal } from 'preact/src/jsx';
-import { GameMain } from '../game-main';
+import { GameMain } from './game-main';
 
 export const Root: FunctionalComponent = () => {
   const [windowSize, ref] = useResizeObserver({

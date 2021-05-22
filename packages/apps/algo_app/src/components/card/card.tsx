@@ -20,7 +20,7 @@ import {
   Card7,
   Card8,
   Card9,
-} from '../cards-sub';
+} from './cards-sub';
 import { useCardAttributes } from './use-card-attributes';
 
 type OptionalProps = Readonly<{

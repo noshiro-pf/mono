@@ -1,13 +1,13 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { combineLatestI, mapI } from '@noshiro/syncflow';
-import { getCardDirection } from '../../functions';
-import { mapToDisplayValue } from '../../state';
+import { getCardDirection } from '../functions';
+import { mapToDisplayValue } from '../state';
 import type {
   CardNumber,
   DecidedAnswerBalloonProps,
   DisplayValues,
   SelectAnswerBalloonProps,
-} from '../../types';
+} from '../types';
 import {
   onAnswerCancel,
   onAnswerSubmit,

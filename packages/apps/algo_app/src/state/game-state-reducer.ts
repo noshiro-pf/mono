@@ -1,10 +1,8 @@
 import type { ReducerType } from '@noshiro/ts-utils';
 import { produce } from 'immer';
 import { cardEq } from '../functions';
-import type { GameStateAction } from './action';
+import type { GameState, GameStateAction } from '../types';
 import { faceUpCard, goToNextTurn } from './draft-modifier';
-import type { GameState } from './game-state';
-import { phaseReducer } from './phase-reducer';
 import {
   answerSelectedReducer,
   cardChosenToAttackReducer,
@@ -88,16 +86,16 @@ export const gameStateReducer: ReducerType<GameState, GameStateAction> = (
           case 'o':
             switch (state.phase) {
               case 'ph030_firstAnswer':
-                draft.phase = phaseReducer([
-                  state.phase,
-                  'ac040_submitFirstAnswerAndSuccess',
-                ]);
+                // draft.phase = phaseReducer([
+                //   state.phase,
+                //   'ac040_submitFirstAnswerAndSuccess',
+                // ]);
                 break;
               case 'ph040_continuousAnswer':
-                draft.phase = phaseReducer([
-                  state.phase,
-                  'ac070_submitSecondAnswerAndSuccess',
-                ]);
+                // draft.phase = phaseReducer([
+                //   state.phase,
+                //   'ac070_submitSecondAnswerAndSuccess',
+                // ]);
                 break;
               default:
                 break;

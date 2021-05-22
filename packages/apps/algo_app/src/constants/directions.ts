@@ -1,7 +1,7 @@
 import type { TypeExtends } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
-import type { Direction } from '../types';
+import type { NWES } from '../types';
 
 export const directions = ['S', 'W', 'N', 'E'] as const;
 
-assertType<TypeExtends<typeof directions, readonly Direction[]>>();
+assertType<TypeExtends<typeof directions, readonly NWES[]>>();

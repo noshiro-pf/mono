@@ -1,12 +1,12 @@
 import type { ReadonlyArrayOfLength, ReadonlyRecord } from '@noshiro/ts-utils';
 import type { CardWithDisplayValue } from './card-type';
-import type { Direction } from './direction';
+import type { NWES } from './direction';
 
 export type DisplayValues = Readonly<{
   playerCards: ReadonlyRecord<
-    Direction,
+    NWES,
     ReadonlyArrayOfLength<6, CardWithDisplayValue>
   >;
   gameMessage: string;
-  turnPlayer: Direction;
+  turnPlayer: NWES;
 }>;

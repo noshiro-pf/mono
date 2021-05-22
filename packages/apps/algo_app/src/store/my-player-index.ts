@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { subject, withInitialValue } from '@noshiro/syncflow';
-import type { PlayerIndex } from '../../types';
+import type { PlayerIndex } from '../types';
 
 const myPlayerIndexSubject$ = subject<PlayerIndex>();
 

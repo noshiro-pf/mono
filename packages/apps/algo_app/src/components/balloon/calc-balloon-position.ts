@@ -1,6 +1,6 @@
 import type { ReadonlyRecord, Rect, RectSize } from '@noshiro/ts-utils';
 import { match, pipe } from '@noshiro/ts-utils';
-import type { Direction } from '../../types';
+import type { NWES } from '../../types';
 
 export const calcBalloonPosition = ({
   anchorCardRect,
@@ -9,7 +9,7 @@ export const calcBalloonPosition = ({
   marginBetweenCardAndBalloon,
 }: Readonly<{
   anchorCardRect: Rect;
-  arrowDirection: Direction;
+  arrowDirection: NWES;
   balloonSize: RectSize;
   marginBetweenCardAndBalloon: number;
 }>): ReadonlyRecord<'left' | 'top', `${number}px`> =>

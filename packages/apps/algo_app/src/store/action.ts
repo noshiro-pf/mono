@@ -1,8 +1,7 @@
 import type { Observable } from '@noshiro/syncflow';
 import { mapTo, merge, mergeMap, of, subject, timer } from '@noshiro/syncflow';
-import { time } from '../../constants';
-import type { GameStateAction } from '../../state';
-import type { Card, Direction } from '../../types';
+import { time } from '../constants';
+import type { Card, GameStateAction, NWES } from '../types';
 
 const gameStateAction$ = subject<GameStateAction>();
 
@@ -49,10 +48,7 @@ const gameStateDispatcher = (action: GameStateAction): void => {
   gameStateAction$.next(action);
 };
 
-export const onCardClick = (
-  card: Card,
-  playerDirectionFromMe: Direction
-): void => {
+export const onCardClick = (card: Card, playerDirectionFromMe: NWES): void => {
   switch (playerDirectionFromMe) {
     case 'W':
     case 'E':

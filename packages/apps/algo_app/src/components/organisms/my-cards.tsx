@@ -3,9 +3,9 @@ import { memoNamed } from '@noshiro/preact-utils';
 import type { ReadonlyArrayOfLength, RectSize } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
-import { darkGray } from '../constants';
-import type { Card } from '../types';
-import { CardComponent } from './card';
+import { darkGray } from '../../constants';
+import type { Card } from '../../types';
+import { CardComponent } from '../card';
 
 type Props = Readonly<{
   cards: ReadonlyArrayOfLength<6, Card>;
