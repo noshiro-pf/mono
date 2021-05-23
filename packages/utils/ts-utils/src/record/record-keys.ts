@@ -1,7 +1,7 @@
-import type { TypeEq } from '../types';
+import type { ReadonlyRecord, TypeEq } from '../types';
 import { assertType } from '../types';
 
-export const recordKeys = <R extends Record<PropertyKey, unknown>>(
+export const recordKeys = <R extends ReadonlyRecord<PropertyKey, unknown>>(
   object: R
 ): (keyof R)[] => Object.keys(object);
 

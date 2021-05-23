@@ -26,7 +26,7 @@ export type PartialYmdHm = Partial<
   }>
 >;
 
-export type IYmdHm = IRecord<YmdHmBaseType> & Readonly<YmdHmBaseType>;
+export type IYmdHm = Readonly<IRecord<YmdHmBaseType> & YmdHmBaseType>;
 
 const IYmdHmRecordFactory = IRecord<YmdHmBaseType>({
   ymd: createIYearMonthDate(),

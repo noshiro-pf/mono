@@ -15,8 +15,9 @@ export type PartialAnswerSelection = Partial<
   }>
 >;
 
-export type IAnswerSelection = IRecord<AnswerSelectionBaseType> &
-  Readonly<AnswerSelectionBaseType>;
+export type IAnswerSelection = Readonly<
+  AnswerSelectionBaseType & IRecord<AnswerSelectionBaseType>
+>;
 
 const IAnswerSelectionRecordFactory = IRecord<AnswerSelectionBaseType>({
   datetimeRange: createIDatetimeRange(),

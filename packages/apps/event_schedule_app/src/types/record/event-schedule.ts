@@ -46,8 +46,9 @@ export type PartialEventSchedule = Partial<
   }>
 >;
 
-export type IEventSchedule = IRecord<EventScheduleBaseType> &
-  Readonly<EventScheduleBaseType>;
+export type IEventSchedule = Readonly<
+  EventScheduleBaseType & IRecord<EventScheduleBaseType>
+>;
 
 const IEventScheduleRecordFactory = IRecord<EventScheduleBaseType>({
   title: '',

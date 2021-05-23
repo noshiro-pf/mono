@@ -13,6 +13,7 @@ export const BpSelect = memoNamed<Props>(
   'BpSelect',
   ({ value, onValueChange, ...props }) => {
     const onChangeHandler = useCallback(
+      // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
       (ev: ChangeEvent<HTMLSelectElement>) => {
         onValueChange(ev.target.value);
       },

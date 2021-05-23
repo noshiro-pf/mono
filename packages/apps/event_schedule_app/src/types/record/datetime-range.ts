@@ -20,8 +20,9 @@ export type PartialDatetimeRange = Partial<
   }>
 >;
 
-export type IDatetimeRange = IRecord<DatetimeRangeBaseType> &
-  Readonly<DatetimeRangeBaseType>;
+export type IDatetimeRange = Readonly<
+  DatetimeRangeBaseType & IRecord<DatetimeRangeBaseType>
+>;
 
 const IDatetimeRangeRecordFactory = IRecord<DatetimeRangeBaseType>({
   ymd: createIYearMonthDate(),

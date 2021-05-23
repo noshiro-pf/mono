@@ -163,14 +163,14 @@ export const isChildObservable = <A>(
 export type ObservableValue<A> = A extends Observable<infer B> ? B : never;
 
 export type Unwrap<A extends readonly Observable<unknown>[]> = {
-  [P in keyof A]: ObservableValue<A[P]>;
+  readonly [P in keyof A]: ObservableValue<A[P]>;
 };
 
 export type Wrap<A extends readonly unknown[]> = {
-  [P in keyof A]: Observable<A[P]>;
+  readonly [P in keyof A]: Observable<A[P]>;
 };
 export type WrapInitialized<A extends readonly unknown[]> = {
-  [P in keyof A]: InitializedObservable<A[P]>;
+  readonly [P in keyof A]: InitializedObservable<A[P]>;
 };
 
 assertType<TypeExtends<number, ObservableValue<Observable<number>>>>();

@@ -17,7 +17,7 @@ type Props = Readonly<{
 
 export const ImageElementRenderer = memoNamed<Props>(
   'ImageElementRenderer',
-  ({ imageElement }: Props) => {
+  ({ imageElement }) => {
     const elementRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

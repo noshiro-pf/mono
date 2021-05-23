@@ -44,6 +44,7 @@ export const cardPositionsReducer: ReducerType<
   ReadonlyRecord<CardColor, ArrayOfLength<12, Rect>> | undefined,
   readonly [CardColor, CardNumber, Rect]
 > = (state, [color, number, rect]) =>
+  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
   produce(state === undefined ? initialState() : state, (draft) => {
     draft[color][number] = rect;
   });

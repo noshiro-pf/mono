@@ -44,12 +44,15 @@ export const filterByLatest =
   <T>(input$: Observable<T>): Observable<T> =>
     input$.pipe(
       withLatestFrom(condition$),
-      filter(([_value, condition]) => condition),
+      filter(([_value, condition]: readonly [T, boolean]) => condition),
       map(([value, _condition]) => value)
     );
 
 export const filterByAll =
-  (...conditions: readonly Observable<boolean>[]) =>
+  (
+    // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+    ...conditions: readonly Observable<boolean>[]
+  ) =>
   <T>(input$: Observable<T>): Observable<T> =>
     input$.pipe(filterByLatest(every(...conditions)));
 
@@ -58,7 +61,7 @@ export const asValueFrom =
   <S>(input$: Observable<S>): Observable<T> =>
     input$.pipe(
       withLatestFrom(from),
-      map(([_, value]) => value)
+      map(([_, value]: readonly [S, T]) => value)
     );
 
 export const filterEnumSubset =

@@ -15,6 +15,7 @@ export const gameStateReducer: ReducerType<GameState, GameStateAction> = (
   state,
   action
 ) =>
+  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
   produce(state, (draft) => {
     draft.answerSelected = answerSelectedReducer(state.answerSelected, action);
 

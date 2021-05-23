@@ -1,0 +1,25 @@
+{
+  "name": "eslint-plugin-noshiro-custom",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib",
+    "prebuild": "yarn clean",
+    "build": "tsc --project tsconfig.json",
+    "gi": "echo 'no gi script'",
+    "lint": "echo 'no lint script'",
+    "lint:fix": "yarn lint --fix",
+    "setup": "echo 'no setup script'",
+    "test": "echo 'no test script'"
+  },
+  "dependencies": {
+    "@typescript-eslint/experimental-utils": "^4.24.0",
+    "@typescript-eslint/parser": "^4.24.0",
+    "@typescript-eslint/types": "^4.24.0",
+    "lodash": "^4.17.21",
+    "tsutils": "^3.21.0"
+  }
+}

@@ -4,7 +4,7 @@ import { filter } from 'rxjs/operators';
 
 export const filterKeyInList =
   (
-    list: string[]
+    list: readonly string[]
   ): MonoTypeOperatorFunction<readonly ['down' | 'up', KeyboardEventType]> =>
   (
     keyEvents$: Observable<readonly ['down' | 'up', KeyboardEventType]>

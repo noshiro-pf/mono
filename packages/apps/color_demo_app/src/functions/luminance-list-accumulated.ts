@@ -2,11 +2,11 @@ import type { ReadonlyNonEmptyArray } from '@noshiro/ts-utils';
 import {
   first,
   isNonEmpty,
+  ituple,
   map,
   pipe,
   rest,
   scan,
-  tuple,
 } from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (
@@ -23,8 +23,8 @@ export const getLuminanceListAccumulated = (
   const luminanceDiffAccumulated = pipe(rest(luminanceListCorrected))
     .chain(
       scan(
-        ([prev, acc], curr) => tuple(curr, acc + Math.abs(curr - prev)),
-        tuple(first(luminanceListCorrected), 0)
+        ([prev, acc], curr) => ituple(curr, acc + Math.abs(curr - prev)),
+        ituple(first(luminanceListCorrected), 0)
       )
     )
     .chain(map(([_, acc]: readonly [number, number]) => acc)).value;

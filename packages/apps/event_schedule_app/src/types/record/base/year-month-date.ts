@@ -1,4 +1,9 @@
-import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
+import type {
+  DateEnum,
+  DeepReadonly,
+  MonthEnum,
+  YearEnum,
+} from '@noshiro/ts-utils';
 import { sign } from '@noshiro/ts-utils';
 import { IRecord } from '../../../utils';
 
@@ -10,8 +15,9 @@ type YearMonthDateBaseType = Readonly<{
 
 export type PartialYearMonthDate = Partial<Readonly<YearMonthDateBaseType>>;
 
-export type IYearMonthDate = IRecord<YearMonthDateBaseType> &
-  Readonly<YearMonthDateBaseType>;
+export type IYearMonthDate = DeepReadonly<
+  IRecord<YearMonthDateBaseType> & YearMonthDateBaseType
+>;
 
 const IYearMonthDateRecordFactory = IRecord<YearMonthDateBaseType>({
   year: new Date().getFullYear() as YearEnum,

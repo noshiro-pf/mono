@@ -11,6 +11,7 @@ export const BpTextArea = memoNamed<Props>(
   'BpTextArea',
   ({ value, onValueChange, ...props }) => {
     const onChangeHandler = useCallback(
+      // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
       (ev: ChangeEvent<HTMLTextAreaElement>) => {
         onValueChange(ev.target.value);
       },

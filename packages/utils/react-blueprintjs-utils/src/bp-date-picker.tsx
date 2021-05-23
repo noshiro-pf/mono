@@ -2,12 +2,12 @@ import type { HTMLInputProps, InputGroupProps2 } from '@blueprintjs/core';
 import type { DateInputProps, DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import type { StrictOmit, Writable } from '@noshiro/ts-utils';
+import type { ReadonlyDate, StrictOmit, Writable } from '@noshiro/ts-utils';
 import { getDate, getMonth, getYear } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type { YearMonthDate } from './types';
 
-const formatDate = (date: Date): string => date.toLocaleDateString();
+const formatDate = (date: ReadonlyDate): string => date.toLocaleDateString();
 const parseDate = (str: string): Date => new Date(str);
 
 const inputProps: HTMLInputProps & InputGroupProps2 = {

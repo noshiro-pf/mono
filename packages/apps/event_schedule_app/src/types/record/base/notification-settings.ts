@@ -14,8 +14,9 @@ export type PartialNotificationSettings = Partial<
   Readonly<NotificationSettingsBaseType>
 >;
 
-export type INotificationSettings = IRecord<NotificationSettingsBaseType> &
-  Readonly<NotificationSettingsBaseType>;
+export type INotificationSettings = Readonly<
+  IRecord<NotificationSettingsBaseType> & NotificationSettingsBaseType
+>;
 
 const INotificationSettingsRecordFactory =
   IRecord<NotificationSettingsBaseType>({

@@ -9,7 +9,7 @@ export const CodeArea = memoNamed<{
   className?: string;
 }>('CodeArea', ({ value, valueChange = () => undefined, className }) => {
   const onChange = useCallback(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
     (ev: ChangeEvent<HTMLTextAreaElement>) => {
       valueChange(ev.target.value ?? '');
     },
