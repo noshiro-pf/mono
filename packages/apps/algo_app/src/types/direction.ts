@@ -1,1 +1,1 @@
-export type Direction = 'E' | 'N' | 'S' | 'W';
+export type NWES = 'E' | 'N' | 'S' | 'W';

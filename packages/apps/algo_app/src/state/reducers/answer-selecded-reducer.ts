@@ -1,7 +1,6 @@
 import type { ReducerType } from '@noshiro/ts-utils';
 import { cardEq } from '../../functions';
-import type { GameStateAction } from '../action';
-import type { GameState } from '../game-state';
+import type { GameState, GameStateAction } from '../../types';
 
 export const answerSelectedReducer: ReducerType<
   GameState['answerSelected'],

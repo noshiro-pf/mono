@@ -5,15 +5,6 @@ import type { Rect } from '@noshiro/ts-utils';
 import { createElement } from 'preact';
 import { useEffect } from 'preact/hooks';
 import {
-  DecidedAnswerBalloon,
-  GameMessage,
-  MyCards,
-  SelectAnswerBalloon,
-  Table,
-  TurnPlayerHighlighter,
-} from '../components';
-import type { DisplayValues } from '../types';
-import {
   cardPositionsDispatcher,
   decidedAnswerBalloonProps$,
   displayValues$,
@@ -21,7 +12,15 @@ import {
   selectAnswerBalloonProps$,
   setMyPlayerIndex,
   turnPlayerHighlighterPosition$,
-} from './store';
+} from '../store';
+import type { DisplayValues } from '../types';
+import { DecidedAnswerBalloon, SelectAnswerBalloon } from './balloon';
+import {
+  GameMessage,
+  MyCards,
+  Table,
+  TurnPlayerHighlighter,
+} from './organisms';
 import { useWindowSize } from './use-window-size';
 
 type Props = Readonly<{ windowSize: Rect }>;

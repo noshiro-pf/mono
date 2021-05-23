@@ -5,7 +5,7 @@ import { match } from '@noshiro/ts-utils';
 import { createElement, Fragment } from 'preact';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
-import { inTurnColor, zIndex } from '../constants';
+import { inTurnColor, zIndex } from '../../constants';
 
 type Props = Readonly<{
   playerName: string;

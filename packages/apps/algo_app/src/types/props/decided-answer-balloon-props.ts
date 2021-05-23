@@ -1,10 +1,10 @@
 import type { Rect } from '@noshiro/ts-utils';
 import type { Card } from '../card-type';
-import type { Direction } from '../direction';
+import type { NWES } from '../direction';
 
 export type DecidedAnswerBalloonProps = Readonly<{
   anchorCardRect: Rect;
-  arrowDirection: Direction;
+  arrowDirection: NWES;
   card: Card;
   showSymbol: 'o' | 'x' | undefined;
 }>;

@@ -11,12 +11,12 @@ import type {
   Card,
   CardWithDisplayValue,
   CardWithVisibility,
-  Direction,
   DisplayValues,
+  GameState,
+  NWES,
   PlayerIndex,
   VisibilityFromMe,
 } from '../types';
-import type { GameState } from './game-state';
 
 const mapPlayers6CardsToDisplayValue = ({
   direction,
@@ -24,10 +24,10 @@ const mapPlayers6CardsToDisplayValue = ({
   gameState,
   onCardClick,
 }: Readonly<{
-  direction: Direction;
+  direction: NWES;
   player6Cards: ReadonlyArrayOfLength<6, CardWithVisibility>;
   gameState: GameState;
-  onCardClick: (card: Card, playerDirectionFromMe: Direction) => void;
+  onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
 }>): ReadonlyArrayOfLength<6, CardWithDisplayValue> =>
   pipe(player6Cards)
     .chain(sortCards)
@@ -111,7 +111,7 @@ export const mapToDisplayValue = ({
 }: Readonly<{
   gameState: GameState;
   myPlayerIndex: PlayerIndex;
-  onCardClick: (card: Card, playerDirectionFromMe: Direction) => void;
+  onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
 }>): DisplayValues =>
   ({
     playerCards: {

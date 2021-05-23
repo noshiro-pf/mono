@@ -1,8 +1,8 @@
 import type { ReadonlyRecord, Rect, ReducerType } from '@noshiro/ts-utils';
 import { produce } from 'immer';
-import type { Direction } from '../../types';
+import type { NWES } from '../../types';
 
-const initialState = (): Record<Direction, Rect> => ({
+const initialState = (): Record<NWES, Rect> => ({
   S: { top: 0, left: 0, width: 0, height: 0 },
   W: { top: 0, left: 0, width: 0, height: 0 },
   N: { top: 0, left: 0, width: 0, height: 0 },
@@ -10,8 +10,8 @@ const initialState = (): Record<Direction, Rect> => ({
 });
 
 export const playerNamePositionsReducer: ReducerType<
-  ReadonlyRecord<Direction, Rect> | undefined,
-  readonly [Direction, Rect]
+  ReadonlyRecord<NWES, Rect> | undefined,
+  readonly [NWES, Rect]
 > = (state, [direction, rect]) =>
   produce(state ?? initialState(), (draft) => {
     draft[direction] = rect;

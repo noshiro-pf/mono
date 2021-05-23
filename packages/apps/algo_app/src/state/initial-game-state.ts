@@ -1,4 +1,4 @@
-import type { GameState } from './game-state';
+import type { GameState } from '../types';
 
 export const initialGameState: GameState = {
   playerCards: [

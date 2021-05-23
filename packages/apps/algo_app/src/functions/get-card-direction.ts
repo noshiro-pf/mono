@@ -1,11 +1,11 @@
 import type { ReadonlyArrayOfLength, ReadonlyRecord } from '@noshiro/ts-utils';
-import type { Card, Direction } from '../types';
+import type { Card, NWES } from '../types';
 import { cardEq } from './card-eq';
 
 export const getCardDirection = (
-  playerCards: ReadonlyRecord<Direction, ReadonlyArrayOfLength<6, Card>>,
+  playerCards: ReadonlyRecord<NWES, ReadonlyArrayOfLength<6, Card>>,
   target: Card
-): Direction =>
+): NWES =>
   playerCards.W.find((c) => cardEq(c, target)) !== undefined
     ? 'W'
     : playerCards.E.find((c) => cardEq(c, target)) !== undefined

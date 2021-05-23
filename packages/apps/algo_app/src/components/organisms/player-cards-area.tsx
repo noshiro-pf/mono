@@ -4,9 +4,9 @@ import type { ReadonlyArrayOfLength, Rect, RectSize } from '@noshiro/ts-utils';
 import { map, pipe } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
-import { zIndex } from '../constants';
-import type { CardColor, CardNumber, CardWithDisplayValue } from '../types';
-import { CardComponent } from './card';
+import { zIndex } from '../../constants';
+import type { CardColor, CardNumber, CardWithDisplayValue } from '../../types';
+import { CardComponent } from '../card';
 
 type Props = Readonly<{
   areaSize: RectSize;
