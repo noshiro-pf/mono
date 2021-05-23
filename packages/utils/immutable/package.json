@@ -1,0 +1,33 @@
+{
+  "name": "@noshiro/immutable",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": false,
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
+  "scripts": {
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
+    "build": "yarn gi && run-s build:*",
+    "prebuild:cjs": "yarn clean:build:cjs",
+    "build:cjs": "tsc --project config/tsconfig.cjs.json",
+    "prebuild:esm": "yarn clean:build:esm",
+    "build:esm": "tsc --project config/tsconfig.esm.json",
+    "clean": "run-s clean:**",
+    "clean:build:cjs": "rimraf cjs",
+    "clean:build:esm": "rimraf esm",
+    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
+    "fmt": "yarn _prettier .",
+    "gi": "yarn _script_genindex ./src --min-depth 1",
+    "lint": "echo 'no lint script'",
+    "lint:fix": "yarn lint --fix",
+    "setup": "echo 'no setup script'",
+    "test": "jest --config config/jest.config.json --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "root_dir": "../../.."
+  }
+}
