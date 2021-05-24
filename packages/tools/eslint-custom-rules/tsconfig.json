@@ -1,0 +1,8 @@
+{
+  "extends": "../../../config/tsconfig/tsconfig.cjs.json",
+  "compilerOptions": {
+    "outDir": "lib"
+  },
+  "include": ["./src", "./typings"],
+  "exclude": ["node_modules", "lib", "src/utils/exclude"]
+}

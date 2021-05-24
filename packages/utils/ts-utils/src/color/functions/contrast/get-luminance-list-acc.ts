@@ -1,7 +1,7 @@
 import type { NonEmptyArray, ReadonlyNonEmptyArray } from '../../../array';
 import { first, map, rest, scan } from '../../../array';
 import { pipe } from '../../../functional';
-import { tuple } from '../../../others';
+import { ituple } from '../../../others';
 
 export const getLuminanceListAccumulated = (
   luminanceList: ReadonlyNonEmptyArray<number>
@@ -14,8 +14,8 @@ export const getLuminanceListAccumulated = (
   const luminanceDiffAccumulated = pipe(rest(luminanceListCorrected))
     .chain(
       scan(
-        ([prev, acc], curr) => tuple(curr, acc + Math.abs(curr - prev)),
-        tuple(first(luminanceListCorrected), 0)
+        ([prev, acc], curr) => ituple(curr, acc + Math.abs(curr - prev)),
+        ituple(first(luminanceListCorrected), 0)
       )
     )
     .chain(map(([_, acc]: readonly [number, number]) => acc)).value;

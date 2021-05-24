@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/method-signature-style */
 import type { Intent, IToaster } from '@blueprintjs/core';
 import { Toaster } from '@blueprintjs/core';
 
 export const createToaster = (): IToaster =>
   Toaster.create({ canEscapeKeyClear: true, position: 'top' });
 
+// eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
 export const showToast = ({
   toast,
   message,

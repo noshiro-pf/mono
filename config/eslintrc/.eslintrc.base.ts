@@ -1,6 +1,7 @@
 import type { Linter } from 'eslint';
 import { readGitignoreFiles } from 'eslint-gitignore';
 import { eslintImportsRules } from './eslintrc-base/eslint-import-rules';
+import { eslintNoshiroCustomRules } from './eslintrc-base/eslint-noshiro-custom';
 import { eslintRules } from './eslintrc-base/eslint-rules';
 import { typescriptEslintRules } from './eslintrc-base/typescript-eslint-rules';
 
@@ -34,6 +35,7 @@ const config: Linter.Config = {
     // 'plugin:import/warnings',
     'plugin:import/typescript',
     'plugin:import/react',
+    'plugin:noshiro-custom/all',
 
     /* functional, total-functions */
     // 'plugin:functional/recommended',
@@ -48,6 +50,7 @@ const config: Linter.Config = {
   plugins: [
     '@typescript-eslint',
     'import',
+    'noshiro-custom',
     /* functional, total-functions */
     // 'functional',
     // 'total-functions',
@@ -73,6 +76,7 @@ const config: Linter.Config = {
     ...eslintImportsRules.helpfulWarnings,
     ...eslintImportsRules.moduleSystems,
     ...eslintImportsRules.styleGuide,
+    ...eslintNoshiroCustomRules,
   },
   ignorePatterns: readGitignoreFiles({ cwd: __dirname }),
 };

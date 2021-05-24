@@ -36,7 +36,10 @@ const hues: readonly Hue[] = range(0 as uint32, 360 as uint32) as Hue[];
 const saturationList: readonly Percent[] = [80, 80, 100] as const;
 const lightnessList: readonly Percent[] = [40, 60, 80] as const;
 
-const SL: readonly [Percent, Percent][] = zip(saturationList, lightnessList);
+const SL: readonly (readonly [Percent, Percent])[] = zip(
+  saturationList,
+  lightnessList
+);
 
 const componentElement = (
   <Root>

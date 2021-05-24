@@ -9,8 +9,9 @@ type AnswerSymbolBaseType = Readonly<{
 
 export type PartialAnswerSymbol = Partial<Readonly<AnswerSymbolBaseType>>;
 
-export type IAnswerSymbol = IRecord<AnswerSymbolBaseType> &
-  Readonly<AnswerSymbolBaseType>;
+export type IAnswerSymbol = Readonly<
+  AnswerSymbolBaseType & IRecord<AnswerSymbolBaseType>
+>;
 
 const IAnswerSymbolRecordFactory = IRecord<AnswerSymbolBaseType>({
   iconId: 'handmade-cross',

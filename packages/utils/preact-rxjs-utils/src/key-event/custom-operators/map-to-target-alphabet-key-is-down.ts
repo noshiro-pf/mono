@@ -4,5 +4,7 @@ import { mapToTargetKeyIsDown } from './map-to-target-key-is-down';
 
 export const mapToTargetAlphabetKeyIsDown = (
   key: Alphabet
-): OperatorFunction<readonly ['down' | 'up', KeyboardEvent], boolean> =>
-  mapToTargetKeyIsDown(key);
+): OperatorFunction<
+  readonly ['down' | 'up', Readonly<KeyboardEvent>],
+  boolean
+> => mapToTargetKeyIsDown(key);

@@ -14,8 +14,9 @@ export type PartialTimeRange = Partial<
   }>
 >;
 
-export type ITimeRange = IRecord<TimeRangeBaseType> &
-  Readonly<TimeRangeBaseType>;
+export type ITimeRange = Readonly<
+  IRecord<TimeRangeBaseType> & TimeRangeBaseType
+>;
 
 const ITimeRangeRecordFactory = IRecord<TimeRangeBaseType>({
   start: createIHoursMinutes(),

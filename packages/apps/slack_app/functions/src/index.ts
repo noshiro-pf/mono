@@ -44,7 +44,7 @@ export const makeUppercase = functions.firestore
       const data: Buffer[] = [];
       https.get(searchUrl, (res) => {
         res
-          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+          // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
           .on('data', (chunk: Buffer) => {
             data.push(chunk);
           })

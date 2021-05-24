@@ -4,8 +4,10 @@ import { filter } from 'rxjs/operators';
 export const filterKeyInList =
   (
     list: readonly string[]
-  ): MonoTypeOperatorFunction<readonly ['down' | 'up', KeyboardEvent]> =>
+  ): MonoTypeOperatorFunction<
+    readonly ['down' | 'up', Readonly<KeyboardEvent>]
+  > =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', KeyboardEvent]>
-  ): Observable<readonly ['down' | 'up', KeyboardEvent]> =>
+    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>
+  ): Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]> =>
     keyEvents$.pipe(filter(([_du, ev]) => list.includes(ev.key)));

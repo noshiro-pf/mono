@@ -26,6 +26,7 @@ export const eslintImportsRules: Readonly<{
           'firebase/*',
           '@blueprintjs/*',
           '@material-ui/*',
+          'resize-observer/lib/ResizeObserverEntry',
         ],
       },
     ],

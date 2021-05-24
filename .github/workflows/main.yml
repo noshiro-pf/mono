@@ -51,7 +51,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: setup
-        run: yarn setup:configs
+        run: yarn setup:ci
 
       - name: build utils
         run: yarn build:utils

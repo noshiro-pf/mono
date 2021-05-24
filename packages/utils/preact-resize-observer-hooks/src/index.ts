@@ -15,6 +15,7 @@ export const useResizeObserverRef = (
 ): RefObject<HTMLDivElement> => {
   const rootResizeObserver = useMemo(
     () =>
+      // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
       new CustomResizeObserver((entries) => {
         if (isNonEmpty(entries)) {
           setSize(entries[0].contentRect);

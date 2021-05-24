@@ -13,6 +13,7 @@ export const playerNamePositionsReducer: ReducerType<
   ReadonlyRecord<NWES, Rect> | undefined,
   readonly [NWES, Rect]
 > = (state, [direction, rect]) =>
+  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
   produce(state ?? initialState(), (draft) => {
     draft[direction] = rect;
   });

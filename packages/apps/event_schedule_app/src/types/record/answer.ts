@@ -28,7 +28,7 @@ export type PartialAnswer = Partial<
   }>
 >;
 
-export type IAnswer = IRecord<AnswerBaseType> & Readonly<AnswerBaseType>;
+export type IAnswer = Readonly<AnswerBaseType & IRecord<AnswerBaseType>>;
 
 const IAnswerRecordFactory = IRecord<AnswerBaseType>({
   id: answerId(''),

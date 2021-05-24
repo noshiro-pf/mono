@@ -21,7 +21,7 @@ import type { Count } from '../types';
  * で求められる。
  */
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+// eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
 export const calcExpected = (count: Count): uint32 => {
   const { noLine, oneLine, twoLine } = count as { [K in keyof Count]: number };
   return Math.floor((oneLine + 2 * twoLine) / noLine) as uint32;

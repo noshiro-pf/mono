@@ -3,8 +3,8 @@ import type { Linter } from 'eslint';
 export const typescriptEslintRules: Readonly<
   Record<
     | 'additionalRulesNotIncludedInRecommended'
-    | 'modifiedRulesIncludedInRecommended'
-    | 'disabledRulesIncludedInRecommended',
+    | 'disabledRulesIncludedInRecommended'
+    | 'modifiedRulesIncludedInRecommended',
     Partial<Linter.RulesRecord>
   >
 > = {
@@ -57,10 +57,7 @@ export const typescriptEslintRules: Readonly<
     '@typescript-eslint/prefer-nullish-coalescing': 'error',
     '@typescript-eslint/prefer-optional-chain': 'error',
     '@typescript-eslint/prefer-readonly': 'error',
-    '@typescript-eslint/prefer-readonly-parameter-types': [
-      'warn',
-      { checkParameterProperties: true, ignoreInferredTypes: true },
-    ], // note: this reports many errors
+    '@typescript-eslint/prefer-readonly-parameter-types': 'off', // -> use eslint-plugin-noshiro-custom/prefer-readonly-parameter-types
     '@typescript-eslint/prefer-reduce-type-parameter': 'error',
     '@typescript-eslint/prefer-string-starts-ends-with': 'error',
     '@typescript-eslint/prefer-ts-expect-error': 'error',

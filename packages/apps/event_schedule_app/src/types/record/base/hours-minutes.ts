@@ -9,8 +9,9 @@ type HoursMinutesBaseType = Readonly<{
 
 export type PartialHoursMinutes = Partial<Readonly<HoursMinutesBaseType>>;
 
-export type IHoursMinutes = IRecord<HoursMinutesBaseType> &
-  Readonly<HoursMinutesBaseType>;
+export type IHoursMinutes = Readonly<
+  HoursMinutesBaseType & IRecord<HoursMinutesBaseType>
+>;
 
 const IHoursMinutesRecordFactory = IRecord<HoursMinutesBaseType>({
   hours: 0,
