@@ -1,2 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ReadonlyRecord<K extends keyof any, V> = Readonly<Record<K, V>>;
+import type { RecordKeyType } from './record-key-type';
+
+export type ReadonlyRecord<K extends RecordKeyType, V> = Readonly<Record<K, V>>;

@@ -4,6 +4,7 @@ export * from './color';
 export * from './date';
 export * from './functional';
 export * from './image';
+export * from './immutable';
 export * from './num';
 export * from './others';
 export * from './promise';

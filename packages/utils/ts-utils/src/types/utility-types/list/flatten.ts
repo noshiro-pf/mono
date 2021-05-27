@@ -1,23 +1,41 @@
+import type { DeepReadonly } from '../deep';
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
-import type { Cons } from './cons';
-import type { First } from './first';
-import type { Rest } from './rest';
-import type { Reverse } from './reverse';
+import type { ReadonlyTupleFlatten, TupleFlatten } from '../tuple';
 
-export type Flatten<
-  T extends unknown[][],
-  R1 extends unknown[] = [],
-  R2 extends unknown[] = []
-> = {
-  0: Reverse<R2>;
-  1: Flatten<Rest<T>, First<T, []>, R2>;
-  2: Flatten<T, Rest<R1>, Cons<First<R1>, R2>>;
-}[T extends [] ? (R1 extends [] ? 0 : 2) : R1 extends [] ? 1 : 2];
+export type ListFlatten<T extends readonly (readonly unknown[])[]> =
+  TupleFlatten<T>;
 
-assertType<TypeEq<Flatten<[]>, []>>();
-assertType<TypeEq<Flatten<[[]]>, []>>();
-assertType<TypeEq<Flatten<[[1, 2], [], [3]]>, [1, 2, 3]>>();
-assertType<TypeEq<Flatten<[[1, 2], [3]]>, [1, 2, 3]>>();
-assertType<TypeEq<Flatten<[[1, 2], [3], []]>, [1, 2, 3]>>();
-assertType<TypeEq<Flatten<[[], [1, 2], [3]]>, [1, 2, 3]>>();
+assertType<TypeEq<ListFlatten<[]>, []>>();
+assertType<TypeEq<ListFlatten<[[]]>, []>>();
+assertType<TypeEq<ListFlatten<[[1, 2], [], [3]]>, [1, 2, 3]>>();
+assertType<TypeEq<ListFlatten<[[1, 2], [3]]>, [1, 2, 3]>>();
+assertType<TypeEq<ListFlatten<[[1, 2], [3], []]>, [1, 2, 3]>>();
+assertType<TypeEq<ListFlatten<[[], [1, 2], [3]]>, [1, 2, 3]>>();
+
+export type ReadonlyListFlatten<T extends readonly (readonly unknown[])[]> =
+  ReadonlyTupleFlatten<T>;
+
+assertType<TypeEq<ReadonlyListFlatten<DeepReadonly<[]>>, readonly []>>();
+assertType<TypeEq<ReadonlyListFlatten<DeepReadonly<[[]]>>, readonly []>>();
+assertType<
+  TypeEq<
+    ReadonlyListFlatten<DeepReadonly<[[1, 2], [], [3]]>>,
+    readonly [1, 2, 3]
+  >
+>();
+assertType<
+  TypeEq<ReadonlyListFlatten<DeepReadonly<[[1, 2], [3]]>>, readonly [1, 2, 3]>
+>();
+assertType<
+  TypeEq<
+    ReadonlyListFlatten<DeepReadonly<[[1, 2], [3], []]>>,
+    readonly [1, 2, 3]
+  >
+>();
+assertType<
+  TypeEq<
+    ReadonlyListFlatten<DeepReadonly<[[], [1, 2], [3]]>>,
+    readonly [1, 2, 3]
+  >
+>();

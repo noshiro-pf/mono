@@ -1,4 +1,3 @@
-import type { Cons } from './list';
 import type { TypeExtends } from './test-type';
 import { assertNotType, assertType } from './test-type';
 
@@ -8,7 +7,7 @@ export type AtLeast<N extends number, T> = AtLeastRec<N, T, T[], []>;
 
 type AtLeastRec<Num, Elm, T extends unknown[], C extends unknown[]> = {
   0: T;
-  1: AtLeastRec<Num, Elm, Cons<Elm, T>, Cons<unknown, C>>;
+  1: AtLeastRec<Num, Elm, [Elm, ...T], [unknown, ...C]>;
 }[C extends { length: Num } ? 0 : 1];
 
 assertNotType<TypeExtends<[0, 1], AtLeast<3, number>>>();

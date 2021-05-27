@@ -1,20 +1,19 @@
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
-import type { Cons } from './cons';
-import type { First } from './first';
-import type { Rest } from './rest';
-import type { Reverse } from './reverse';
+import type { ReadonlyTupleTake, TupleTake } from '../tuple';
 
-export type Take<
-  N extends number,
-  T extends unknown[],
-  R extends unknown[] = []
-> = {
-  0: Reverse<R>;
-  1: Take<N, Rest<T>, Cons<First<T>, R>>;
-}[T extends [] ? 0 : R['length'] extends N ? 0 : 1];
+export type ListTake<N extends number, T extends readonly unknown[]> =
+  TupleTake<N, T>;
 
-assertType<TypeEq<Take<2, []>, []>>();
-assertType<TypeEq<Take<2, [1, 2]>, [1, 2]>>();
-assertType<TypeEq<Take<2, [1, 2, 3]>, [1, 2]>>();
-assertType<TypeEq<Take<0, [1, 2, 3]>, []>>();
+assertType<TypeEq<ListTake<2, []>, []>>();
+assertType<TypeEq<ListTake<2, [1, 2]>, [1, 2]>>();
+assertType<TypeEq<ListTake<2, [1, 2, 3]>, [1, 2]>>();
+assertType<TypeEq<ListTake<0, [1, 2, 3]>, []>>();
+
+export type ReadonlyListTake<N extends number, T extends readonly unknown[]> =
+  ReadonlyTupleTake<N, T>;
+
+assertType<TypeEq<ReadonlyListTake<2, readonly []>, readonly []>>();
+assertType<TypeEq<ReadonlyListTake<2, readonly [1, 2]>, readonly [1, 2]>>();
+assertType<TypeEq<ReadonlyListTake<2, readonly [1, 2, 3]>, readonly [1, 2]>>();
+assertType<TypeEq<ReadonlyListTake<0, readonly [1, 2, 3]>, readonly []>>();

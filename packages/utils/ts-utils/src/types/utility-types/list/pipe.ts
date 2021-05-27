@@ -1,9 +1,9 @@
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
-import type { Rest } from './rest';
-import type { Zip } from './zip';
+import type { ListTail } from './tail';
+import type { ListZip } from './zip';
 
-export type ShiftZip<T extends unknown[]> = Zip<T, Rest<T>>;
+export type ShiftZip<T extends unknown[]> = ListZip<T, ListTail<T>>;
 assertType<TypeEq<ShiftZip<[1, 2, 3]>, [[1, 2], [2, 3]]>>();
 
 export type Tuple2Fn<T> = T extends [infer A, infer B] ? (x: A) => B : never;

@@ -1,13 +1,20 @@
 import type { TypeEq } from '../types';
 import { assertType } from '../types';
 
-export const recordFromEntries = <K extends PropertyKey, T>(
-  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
-  entries: Iterable<readonly [K, T]>
-): Record<K, T> => Object.fromEntries(entries) as Record<K, T>;
+export const recordFromEntries = <K extends PropertyKey, V>(
+  entries: Iterable<readonly [K, V]>
+): Record<K, V> => Object.fromEntries(entries) as Record<K, V>;
 
-const entryList = recordFromEntries([
-  ['x', 1],
-  ['y', 2],
-] as const);
-assertType<TypeEq<typeof entryList, Record<'x' | 'y', 1 | 2>>>();
+{
+  const entries: readonly (readonly ['x' | 'y' | 'z' | 4, 1 | 2 | 3])[] = [
+    ['x', 1],
+    ['y', 2],
+    ['z', 3],
+    [4, 3],
+  ] as const;
+  const entryList = recordFromEntries(entries);
+
+  assertType<
+    TypeEq<typeof entryList, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>
+  >();
+}
