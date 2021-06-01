@@ -7,7 +7,12 @@ export const eslintNoshiroCustomRules: Linter.RulesRecord = {
     {
       checkParameterProperties: true,
       ignoreInferredTypes: true,
-      allow: ['ServiceWorkerRegistration', 'Observable'],
+      allow: [
+        'ServiceWorkerRegistration',
+        'Observable',
+        'Iterator',
+        'Iterable',
+      ],
     },
   ],
 };
