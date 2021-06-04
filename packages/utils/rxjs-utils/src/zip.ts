@@ -2,6 +2,6 @@ import type { Observable, ObservableInput } from 'rxjs';
 import { zip } from 'rxjs';
 import type { Unwrap } from './unwrap';
 
-export const zipTyped = <T extends ObservableInput<unknown>[]>(
+export const zipTyped = zip as <T extends readonly ObservableInput<unknown>[]>(
   ...observables: T
-): Observable<Unwrap<T>> => zip(observables) as Observable<Unwrap<T>>;
+) => Observable<Unwrap<T>>;
