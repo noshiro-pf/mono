@@ -23,7 +23,7 @@ export const useKeyEventAsStream = (): Observable<
 
   useKeyEventListener(onKeyDown, onKeyUp);
 
-  return mergeTyped(
+  return mergeTyped([
     onKeyDown$.pipe(
       filterNotUndefined(),
       map((e) => tuple('down' as const, e))
@@ -31,6 +31,6 @@ export const useKeyEventAsStream = (): Observable<
     onKeyUp$.pipe(
       filterNotUndefined(),
       map((e) => tuple('up' as const, e))
-    )
-  );
+    ),
+  ]);
 };

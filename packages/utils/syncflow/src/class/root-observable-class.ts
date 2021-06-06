@@ -11,7 +11,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
   extends ObservableBaseClass<A, 'root', 0>
   implements RootObservable<A, Type>
 {
-  readonly type;
+  readonly type: Type;
   private readonly _procedure: ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: Set<ObservableId>;
 

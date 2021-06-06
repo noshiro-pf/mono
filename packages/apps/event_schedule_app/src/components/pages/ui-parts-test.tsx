@@ -1,3 +1,4 @@
+import type { HTMLSelectProps } from '@blueprintjs/core';
 import { Button, TextArea } from '@blueprintjs/core';
 import {
   BpInput,
@@ -21,6 +22,12 @@ import {
 } from '../atoms';
 
 const size: CSSProperties = { width: '32px', height: '32px' };
+
+const options: Readonly<HTMLSelectProps['options']> = [
+  { value: '', label: 'select...' },
+  { value: 0, label: 'aaa' },
+  { value: 1, label: 'bbb' },
+];
 
 export const UiPartsTest = memoNamed('UiPartsTest', () => {
   const [inputValue, setInputValue] = useState<string>('');
@@ -94,11 +101,7 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
         <BpTimePicker time={{ hours: 12, minutes: 34 }} onTimeChange={clog} />
       </PadWrapper>
       <PadWrapper>
-        <BpSelect onValueChange={noop}>
-          <option>select...</option>
-          <option value={0}>aaa</option>
-          <option value={1}>bbb</option>
-        </BpSelect>
+        <BpSelect options={options} onValueChange={noop} />
       </PadWrapper>
       <PadWrapper>
         <BpSwitch
