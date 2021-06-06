@@ -66,8 +66,8 @@ export const ReadonlyBitArray = (
   input: (0 | 1)[] | Uint8Array
 ): ReadonlyBitArrayType => new CReadonlyBitArray(input) as ReadonlyBitArrayType;
 
-export const ReadonlyBitArrayFromStr = (bitstr: string): ReadonlyBitArrayType =>
-  ReadonlyBitArray(Array.from(bitstr).map((c) => (c === '0' ? 0 : 1)));
+export const ReadonlyBitArrayFromStr = (bitStr: string): ReadonlyBitArrayType =>
+  ReadonlyBitArray(Array.from(bitStr).map((c) => (c === '0' ? 0 : 1)));
 
 export const ReadonlyBitArrayOfLength = (len: number): ReadonlyBitArrayType =>
   ReadonlyBitArray(new Uint8Array(len).fill(0));

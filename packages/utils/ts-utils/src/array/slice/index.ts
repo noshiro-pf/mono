@@ -1,4 +1,3 @@
-export * from './rest';
 export * from './safe-slice';
 export * from './skip';
 export * from './skip-last';

@@ -1,4 +1,3 @@
-import type { Cons } from './list';
 import type { TypeEq } from './test-type';
 import { assertType } from './test-type';
 
@@ -9,13 +8,18 @@ export type ReadonlyArrayOfLength<N extends number, T> = Readonly<
 
 type ArrayOfLengthRec<Num, Elm, T extends unknown[]> = {
   0: T;
-  1: ArrayOfLengthRec<Num, Elm, Cons<Elm, T>>;
+  1: ArrayOfLengthRec<Num, Elm, [Elm, ...T]>;
 }[T extends { length: Num } ? 0 : 1];
 
 assertType<TypeEq<[0, 0], ArrayOfLength<2, 0>>>();
 assertType<TypeEq<[0, 0, 0], ArrayOfLength<3, 0>>>();
 assertType<TypeEq<[0, 0, 0, 0], ArrayOfLength<4, 0>>>();
 assertType<TypeEq<[0, 0, 0, 0, 0], ArrayOfLength<5, 0>>>();
+
+assertType<TypeEq<readonly [0, 0], ReadonlyArrayOfLength<2, 0>>>();
+assertType<TypeEq<readonly [0, 0, 0], ReadonlyArrayOfLength<3, 0>>>();
+assertType<TypeEq<readonly [0, 0, 0, 0], ReadonlyArrayOfLength<4, 0>>>();
+assertType<TypeEq<readonly [0, 0, 0, 0, 0], ReadonlyArrayOfLength<5, 0>>>();
 
 export const isArrayOfLength1 = <T>(
   array: readonly T[]
