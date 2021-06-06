@@ -53,7 +53,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
             type='button'
             intent='primary'
             onClick={onOkClickHandler}
-            text={texts.buttonText.deside}
+            text={texts.buttonText.decide}
           />
         </ButtonsWrapperAlignEnd>
       </Root>

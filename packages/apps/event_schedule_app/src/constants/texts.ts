@@ -99,7 +99,7 @@ export const texts = {
   },
 
   buttonText: {
-    deside: '決定',
+    decide: '決定',
     cancel: 'キャンセル',
     register: '登録する',
     delete: '削除する',

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import styled from 'styled-components';
 import {
   AnswerPage,
   CreateEventSchedule,
@@ -53,7 +54,7 @@ const redirects: readonly (readonly [string, string])[] = [
 ];
 
 export const Root: FC = () => (
-  <div>
+  <Wrapper>
     <BrowserRouter>
       <Switch>
         {redirects.map(([from, to]) => (
@@ -67,5 +68,9 @@ export const Root: FC = () => (
       </Switch>
     </BrowserRouter>
     <Footer />
-  </div>
+  </Wrapper>
 );
+
+const Wrapper = styled.div`
+  min-height: 100vh;
+`;
