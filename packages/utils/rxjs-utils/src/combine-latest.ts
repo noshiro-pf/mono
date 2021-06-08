@@ -21,5 +21,5 @@ import type { Unwrap } from './unwrap';
 export const combineLatestTyped = combineLatest as <
   T extends readonly ObservableInput<unknown>[]
 >(
-  ...observables: T
+  observables: T
 ) => Observable<Unwrap<T>>;

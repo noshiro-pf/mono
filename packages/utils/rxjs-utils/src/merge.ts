@@ -20,5 +20,5 @@ import type { Unwrap } from './unwrap';
 export const mergeTyped = merge as <
   T extends readonly ObservableInput<unknown>[]
 >(
-  ...observables: T
+  observables: T
 ) => Observable<ArrayElement<Unwrap<T>>>;

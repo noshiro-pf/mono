@@ -37,9 +37,10 @@ assertType<
 assertType<TypeEq<ReadonlyListReverse<[1, 2, 3]>, readonly [3, 2, 1]>>();
 
 assertType<TypeEq<ReadonlyListReverse<readonly number[]>, readonly number[]>>();
+
 assertType<
   TypeEq<
     ReadonlyListReverse<readonly [1, 2, ...(readonly number[])]>,
-    readonly number[]
+    readonly [...number[], 2, 1]
   >
 >();

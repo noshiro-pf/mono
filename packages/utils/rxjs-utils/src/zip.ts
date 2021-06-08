@@ -3,5 +3,5 @@ import { zip } from 'rxjs';
 import type { Unwrap } from './unwrap';
 
 export const zipTyped = zip as <T extends readonly ObservableInput<unknown>[]>(
-  ...observables: T
+  observables: T
 ) => Observable<Unwrap<T>>;

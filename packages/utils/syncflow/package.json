@@ -44,7 +44,7 @@
     "@noshiro/ts-utils": "*"
   },
   "peerDependencies": {
-    "tslib": "2.1.0",
-    "typescript": "4.1.5"
+    "tslib": "2.2.0",
+    "typescript": "4.3.2"
   }
 }

@@ -49,7 +49,7 @@ export class AsyncChildObservableClass<
   extends ObservableBaseClass<A, 'async child', number>
   implements AsyncChildObservable<A, Type, P>
 {
-  readonly type;
+  readonly type: Type;
   readonly parents;
   private readonly procedure: ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: Set<ObservableId>;
@@ -122,7 +122,7 @@ export class SyncChildObservableClass<
   extends ObservableBaseClass<A, 'sync child', number>
   implements SyncChildObservable<A, Type, P>
 {
-  readonly type;
+  readonly type: Type;
   readonly parents;
 
   constructor({

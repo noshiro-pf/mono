@@ -51,10 +51,10 @@ export const filterByLatest =
 export const filterByAll =
   (
     // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
-    ...conditions: readonly Observable<boolean>[]
+    conditions: readonly Observable<boolean>[]
   ) =>
   <T>(input$: Observable<T>): Observable<T> =>
-    input$.pipe(filterByLatest(every(...conditions)));
+    input$.pipe(filterByLatest(every(conditions)));
 
 export const asValueFrom =
   <T>(from: Observable<T>) =>
@@ -83,6 +83,6 @@ export const probe = <T>(
   });
 
 export const withLatestValuesFrom =
-  <U extends readonly ObservableInput<unknown>[]>(...observables: U) =>
+  <U extends readonly ObservableInput<unknown>[]>(observables: U) =>
   <T>(input$: Observable<T>): Observable<readonly [T, Unwrap<U>]> =>
-    input$.pipe(withLatestFrom(combineLatestTyped(...observables)));
+    input$.pipe(withLatestFrom(combineLatestTyped(observables)));
