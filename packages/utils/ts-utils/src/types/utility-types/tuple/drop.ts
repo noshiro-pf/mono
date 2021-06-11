@@ -3,17 +3,17 @@ import { assertType } from '../test-type';
 import type { TupleHead } from './head';
 import type { ReadonlyTupleTail, TupleTail } from './tail';
 
-type _TupleDrop<
+type TupleDropImpl<
   N extends number,
   T extends readonly unknown[],
   R extends readonly unknown[]
 > = {
   0: T;
-  1: _TupleDrop<N, TupleTail<T>, [TupleHead<T>, ...R]>;
+  1: TupleDropImpl<N, TupleTail<T>, [TupleHead<T>, ...R]>;
 }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
 
 export type TupleSkip<N extends number, T extends readonly unknown[]> =
-  _TupleDrop<N, T, []>;
+  TupleDropImpl<N, T, []>;
 
 assertType<TypeEq<TupleSkip<0, []>, []>>();
 assertType<TypeEq<TupleSkip<1, []>, []>>();

@@ -1,14 +1,11 @@
 import type {
   Paths,
-  ReadonlyRecord,
-  RecordKeyType,
+  ReadonlyRecordBase,
   RecordUpdated,
   RecordValueAtPath,
 } from '../types';
 
 export namespace IRecord {
-  type ReadonlyRecordBase = Readonly<Record<RecordKeyType, unknown>>;
-
   export const get = <R extends ReadonlyRecordBase, K extends keyof R>(
     record: R,
     key: K
@@ -42,36 +39,48 @@ export namespace IRecord {
       readonly [Key in keyof R]: Key extends K ? N : R[Key];
     });
 
-  const UNSAFE_getIn_sub = (
-    valueCurr: ReadonlyRecord<string, unknown>,
-    keys: readonly string[],
+  const UNSAFE_getIn_impl = (
+    obj: ReadonlyRecordBase,
+    keyPath: readonly (number | string)[],
     index: number
   ): unknown =>
-    index >= keys.length
-      ? valueCurr
-      : UNSAFE_getIn_sub(
+    index >= keyPath.length
+      ? obj
+      : UNSAFE_getIn_impl(
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          valueCurr[keys[index]!] as ReadonlyRecord<string, unknown>,
-          keys,
+          obj[keyPath[index]!] as ReadonlyRecordBase,
+          keyPath,
           index + 1
         );
 
-  const UNSAFE_updateIn_sub = (
-    valueCurr: ReadonlyRecord<string, unknown>,
-    keys: readonly string[],
+  const UNSAFE_updateIn_impl = (
+    obj: ReadonlyRecordBase,
+    keyPath: readonly (number | string)[],
     index: number,
     updater: (prev: unknown) => unknown
   ): unknown =>
-    index >= keys.length
+    index >= keyPath.length
       ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        updater(valueCurr)
+        updater(obj)
+      : Array.isArray(obj)
+      ? obj.map((v, i): unknown =>
+          i === keyPath[index]
+            ? UNSAFE_updateIn_impl(
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                obj[keyPath[index]!] as ReadonlyRecordBase,
+                keyPath,
+                index + 1,
+                updater
+              )
+            : v
+        )
       : {
-          ...valueCurr,
+          ...obj,
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          [keys[index]!]: UNSAFE_updateIn_sub(
+          [keyPath[index]!]: UNSAFE_updateIn_impl(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            valueCurr[keys[index]!] as ReadonlyRecord<string, unknown>,
-            keys,
+            obj[keyPath[index]!] as ReadonlyRecordBase,
+            keyPath,
             index + 1,
             updater
           ),
@@ -79,21 +88,22 @@ export namespace IRecord {
 
   export const getIn = <R extends ReadonlyRecordBase, Path extends Paths<R>>(
     record: R,
-    path: Path
+    keyPath: Path
   ): RecordValueAtPath<R, Path> =>
-    UNSAFE_getIn_sub(record, path as readonly string[], 0) as RecordValueAtPath<
-      R,
-      Path
-    >;
+    UNSAFE_getIn_impl(
+      record,
+      keyPath as readonly string[],
+      0
+    ) as RecordValueAtPath<R, Path>;
 
   export const setIn = <R extends ReadonlyRecordBase, Path extends Paths<R>, N>(
     record: R,
-    path: Path,
+    keyPath: Path,
     newValue: N
   ): RecordUpdated<R, Path, N> =>
-    UNSAFE_updateIn_sub(
+    UNSAFE_updateIn_impl(
       record,
-      path as readonly string[],
+      keyPath as readonly string[],
       0,
       () => newValue
     ) as RecordUpdated<R, Path, N>;
@@ -104,12 +114,12 @@ export namespace IRecord {
     N
   >(
     record: R,
-    path: Path,
+    keyPath: Path,
     updater: (prev: RecordValueAtPath<R, Path>) => N
   ): RecordUpdated<R, Path, N> =>
-    UNSAFE_updateIn_sub(
+    UNSAFE_updateIn_impl(
       record,
-      path as readonly string[],
+      keyPath as readonly string[],
       0,
       updater as (prev: unknown) => unknown
     ) as RecordUpdated<R, Path, N>;

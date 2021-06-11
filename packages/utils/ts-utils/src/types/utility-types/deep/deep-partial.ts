@@ -1,10 +1,10 @@
-import type { ReadonlyRecord } from '../readonly-record';
+import type { ReadonlyRecordBase } from '../readonly-record-base';
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 
 export type DeepPartial<T> = T extends (...args: readonly unknown[]) => unknown
   ? T
-  : T extends ReadonlyRecord<string, unknown> | readonly unknown[]
+  : T extends ReadonlyRecordBase | readonly unknown[]
   ? { [P in keyof T]?: DeepPartial<T[P]> }
   : T;
 
