@@ -1,4 +1,4 @@
-import type { IsFiniteList } from '../is-finite-list';
+import type { IsFixedLengthList } from '../is-fixed-length-list';
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ReadonlyTupleReverse, TupleReverse } from '../tuple';
@@ -7,7 +7,7 @@ import type { ListTail, ReadonlyListTail } from './tail';
 
 export type ListReverse<L extends readonly unknown[]> = L extends readonly []
   ? []
-  : IsFiniteList<L> extends true
+  : IsFixedLengthList<L> extends true
   ? TupleReverse<L>
   : L extends readonly [unknown, ...(readonly unknown[])]
   ? [...ListReverse<ListTail<L>>, ListHead<L>]
@@ -22,7 +22,7 @@ assertType<TypeEq<ListReverse<readonly [1, 2, 3]>, [3, 2, 1]>>();
 export type ReadonlyListReverse<L extends readonly unknown[]> =
   L extends readonly []
     ? readonly []
-    : IsFiniteList<L> extends true
+    : IsFixedLengthList<L> extends true
     ? ReadonlyTupleReverse<L>
     : L extends readonly [unknown, ...(readonly unknown[])]
     ? readonly [...ReadonlyListReverse<ReadonlyListTail<L>>, ListHead<L>]

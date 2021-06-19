@@ -207,7 +207,7 @@ describe('setIn', () => {
     });
   }
   {
-    const result = IRecord.setIn(rcd, ['y', 'c', 'd'] as const, 4);
+    const result = IRecord.setIn(rcd, ['y', 'c', 'd'] as const, 999 as const);
     assertType<
       TypeEq<
         typeof result,
@@ -218,7 +218,7 @@ describe('setIn', () => {
           };
           y: {
             c: {
-              d: 4;
+              d: 999;
               4: 5;
             };
           };
@@ -235,7 +235,7 @@ describe('setIn', () => {
         },
         y: {
           c: {
-            d: 4,
+            d: 999,
             4: 5,
           },
         },
@@ -244,7 +244,7 @@ describe('setIn', () => {
     });
   }
   {
-    const result = IRecord.setIn(rcd, ['y', 'c'] as const, 3);
+    const result = IRecord.setIn(rcd, ['y', 'c'] as const, 999 as const);
     assertType<
       TypeEq<
         typeof result,
@@ -254,7 +254,7 @@ describe('setIn', () => {
             b: 2;
           };
           y: {
-            c: 3;
+            c: 999;
           };
           z: [1, 2, 4];
         }>
@@ -268,9 +268,46 @@ describe('setIn', () => {
           b: 2,
         },
         y: {
-          c: 3,
+          c: 999,
         },
         z: [1, 2, 4],
+      });
+    });
+  }
+  {
+    const result = IRecord.setIn(rcd, ['z', 1] as const, 999 as const);
+    assertType<
+      TypeEq<
+        typeof result,
+        DeepReadonly<{
+          x: {
+            a: 1;
+            b: 2;
+          };
+          y: {
+            c: {
+              d: 3;
+              4: 5;
+            };
+          };
+          z: [1, 999, 4];
+        }>
+      >
+    >();
+
+    test('case 4', () => {
+      expect(result).toStrictEqual({
+        x: {
+          a: 1,
+          b: 2,
+        },
+        y: {
+          c: {
+            d: 3,
+            4: 5,
+          },
+        },
+        z: [1, 999, 4],
       });
     });
   }
