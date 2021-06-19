@@ -42,7 +42,11 @@ interface IMapInterface<K, V> {
   entries: () => IterableIterator<readonly [K, V]>;
 
   // Conversion
+  toKeysArray: () => readonly K[];
+  toValuesArray: () => readonly V[];
+  toEntriesArray: () => readonly (readonly [K, V])[];
   toArray: () => readonly (readonly [K, V])[];
+
   toSet: () => ISet<V>;
 }
 
@@ -158,6 +162,18 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
 
   entries(): IterableIterator<readonly [K, V]> {
     return this._map.entries();
+  }
+
+  toKeysArray(): readonly K[] {
+    return [...this.keys()];
+  }
+
+  toValuesArray(): readonly V[] {
+    return [...this.values()];
+  }
+
+  toEntriesArray(): readonly (readonly [K, V])[] {
+    return [...this.entries()];
   }
 
   toArray(): readonly (readonly [K, V])[] {

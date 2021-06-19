@@ -1,8 +1,9 @@
 import type { ReadonlyArrayOfLength, TypeEq, uint32 } from '../types';
 import { assertNotType, assertType } from '../types';
+import { IMap } from './imap';
 import { IList } from './list';
 
-describe('iList.isEmpty', () => {
+describe('IList.isEmpty', () => {
   const xs = [1, 2, 3] as const;
   const result = IList.isEmpty(xs);
 
@@ -13,76 +14,76 @@ describe('iList.isEmpty', () => {
   });
 });
 
-describe('iList.slice', () => {
+describe('IList.slice', () => {
   const list = [0, 1, 2, 3, 4] as const;
   [
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 0 as uint32, 5 as uint32),
       toBe: [0, 1, 2, 3, 4],
     }, // 正常
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 0 as uint32, 6 as uint32),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, -1 as uint32, 5 as uint32),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, -1 as uint32, 6 as uint32),
       toBe: [0, 1, 2, 3, 4],
     }, // 両方オーバー
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 0 as uint32, 3 as uint32),
       toBe: [0, 1, 2],
     }, // 正常
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 1 as uint32, 3 as uint32),
       toBe: [1, 2],
     }, // 正常
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, -1 as uint32, 3 as uint32),
       toBe: [0, 1, 2],
     }, // 片方オーバー
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 3 as uint32, 5 as uint32),
       toBe: [3, 4],
     }, // 正常
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 3 as uint32, 6 as uint32),
       toBe: [3, 4],
     }, // 片方オーバー
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 4 as uint32, 3 as uint32),
       toBe: [],
     }, // start > end
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 0 as uint32, -1 as uint32),
       toBe: [],
     }, // start > end
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, -1 as uint32, -2 as uint32),
       toBe: [],
     }, // start > end
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 6 as uint32, 9 as uint32),
       toBe: [],
     },
     {
-      testName: 'iList.slice',
+      testName: 'IList.slice',
       result: IList.slice(list, 6 as uint32, 3 as uint32),
       toBe: [],
     },
@@ -93,7 +94,7 @@ describe('iList.slice', () => {
   });
 });
 
-describe('iList.head', () => {
+describe('IList.head', () => {
   const xs = [1, 2, 3] as const;
   const head = IList.head(xs);
 
@@ -108,7 +109,7 @@ describe('iList.head', () => {
   });
 });
 
-describe('iList.last', () => {
+describe('IList.last', () => {
   const xs = [1, 2, 3] as const;
   const last = IList.last(xs);
 
@@ -119,7 +120,7 @@ describe('iList.last', () => {
   });
 });
 
-describe('iList.tail', () => {
+describe('IList.tail', () => {
   const xs = [1, 2, 3] as const;
   const tail = IList.tail(xs);
 
@@ -137,7 +138,7 @@ describe('iList.tail', () => {
   });
 });
 
-describe('iList.butLast', () => {
+describe('IList.butLast', () => {
   const xs = [1, 2, 3] as const;
   const butLast = IList.butLast(xs);
 
@@ -152,7 +153,7 @@ describe('iList.butLast', () => {
   });
 });
 
-describe('iList.every', () => {
+describe('IList.every', () => {
   const xs = [1, 2, 3] as const;
 
   if (IList.every(xs, (x): x is 1 => x === 1)) {
@@ -170,7 +171,7 @@ describe('iList.every', () => {
   });
 });
 
-describe('iList.some', () => {
+describe('IList.some', () => {
   const xs = [1, 2, 3] as const;
 
   test('case 1', () => {
@@ -182,7 +183,7 @@ describe('iList.some', () => {
   });
 });
 
-describe('iList.map', () => {
+describe('IList.map', () => {
   const xs = [1, 2, 3] as const;
   const mapped = IList.map(xs, (x, i): number => x * x * i);
 
@@ -193,7 +194,7 @@ describe('iList.map', () => {
   });
 });
 
-describe('iList.flat', () => {
+describe('IList.flat', () => {
   const xs = [1, 2, [3, 4, [5, 6, [7, 8]]]] as const;
   const result = IList.flat(xs, 1);
 
@@ -209,7 +210,7 @@ describe('iList.flat', () => {
   });
 });
 
-describe('iList.flatMap', () => {
+describe('IList.flatMap', () => {
   const xs = [1, 2, 3] as const;
   const mapped = IList.flatMap(xs, (x, i) => [i, x * x]);
 
@@ -220,7 +221,7 @@ describe('iList.flatMap', () => {
   });
 });
 
-describe('iList.zip', () => {
+describe('IList.zip', () => {
   {
     const xs = [1, 2, 3] as const;
     const ys = [4, 5, 6] as const;
@@ -267,7 +268,7 @@ describe('iList.zip', () => {
   }
 });
 
-describe('iList.filter', () => {
+describe('IList.filter', () => {
   {
     const xs = [1, 2, 3] as const;
     const filtered = IList.filter(xs, (x): x is 1 | 3 => x % 2 === 1);
@@ -290,7 +291,7 @@ describe('iList.filter', () => {
   }
 });
 
-describe('iList.filterNot', () => {
+describe('IList.filterNot', () => {
   const xs = [1, 2, 3] as const;
   const filtered = IList.filterNot(xs, (x) => x % 2 === 0);
 
@@ -301,7 +302,7 @@ describe('iList.filterNot', () => {
   });
 });
 
-describe('iList.set', () => {
+describe('IList.set', () => {
   const xs = [1, 2, 3] as const;
   const result = IList.set(xs, 1 as uint32, 4 as const);
 
@@ -312,7 +313,7 @@ describe('iList.set', () => {
   });
 });
 
-describe('iList.update', () => {
+describe('IList.update', () => {
   const xs = [1, 2, 3] as const;
   const result = IList.update(xs, 1 as uint32, (x) => x + 2);
 
@@ -323,7 +324,7 @@ describe('iList.update', () => {
   });
 });
 
-describe('iList.insert', () => {
+describe('IList.insert', () => {
   const xs = [1, 2, 3] as const;
   const result = IList.insert(xs, 1 as uint32, 5);
 
@@ -334,7 +335,7 @@ describe('iList.insert', () => {
   });
 });
 
-describe('iList.remove', () => {
+describe('IList.remove', () => {
   const xs = [1, 2, 3] as const;
   const result = IList.remove(xs, 1 as uint32);
 
@@ -345,7 +346,7 @@ describe('iList.remove', () => {
   });
 });
 
-describe('iList.push', () => {
+describe('IList.push', () => {
   const xs = [1, 2, 3] as const;
   const result = IList.push(xs, 4 as const);
 
@@ -356,7 +357,7 @@ describe('iList.push', () => {
   });
 });
 
-describe('iList.unshift', () => {
+describe('IList.unshift', () => {
   const xs = [1, 2, 3] as const;
   const result = IList.unshift(xs, 4 as const);
 
@@ -367,7 +368,7 @@ describe('iList.unshift', () => {
   });
 });
 
-describe('iList.concat', () => {
+describe('IList.concat', () => {
   const xs = [1, 2, 3] as const;
   const ys = [4, 5] as const;
   const result = IList.concat(xs, ys);
@@ -379,7 +380,7 @@ describe('iList.concat', () => {
   });
 });
 
-describe('iList.reverse', () => {
+describe('IList.reverse', () => {
   {
     const xs = [1, 2, 3] as const;
     const result = IList.reverse(xs);
@@ -402,7 +403,7 @@ describe('iList.reverse', () => {
   }
 });
 
-describe('iList.sort', () => {
+describe('IList.sort', () => {
   {
     const xs = [2, 1, 3] as const;
     const result = IList.sort(xs);
@@ -435,7 +436,7 @@ describe('iList.sort', () => {
   }
 });
 
-describe('iList.sortBy', () => {
+describe('IList.sortBy', () => {
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const sorted = IList.sortBy(xs, (x) => x.v);
@@ -478,7 +479,7 @@ describe('iList.sortBy', () => {
   }
 });
 
-describe('iList.includes', () => {
+describe('IList.includes', () => {
   {
     const xs = [2, 1, 3] as const;
     const result = IList.includes(xs, 2);
@@ -501,7 +502,7 @@ describe('iList.includes', () => {
   }
 });
 
-describe('iList.find', () => {
+describe('IList.find', () => {
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
     const result = IList.find(xs, (x) => x.v === 1);
@@ -533,7 +534,7 @@ describe('iList.find', () => {
   }
 });
 
-describe('iList.min', () => {
+describe('IList.min', () => {
   {
     const xs = [3, 5, 4] as const;
     const result = IList.min(xs);
@@ -566,7 +567,7 @@ describe('iList.min', () => {
   }
 });
 
-describe('iList.max', () => {
+describe('IList.max', () => {
   const xs = [3, 5, 4] as const;
   const result = IList.max(xs, (a, b) => a - b);
 
@@ -577,7 +578,7 @@ describe('iList.max', () => {
   });
 });
 
-describe('iList.minBy', () => {
+describe('IList.minBy', () => {
   const xs = [
     { x: 5, y: 1 },
     { x: 4, y: 1 },
@@ -606,7 +607,7 @@ describe('iList.minBy', () => {
   });
 });
 
-describe('iList.maxBy', () => {
+describe('IList.maxBy', () => {
   const xs = [
     { x: 5, y: 1 },
     { x: 4, y: 1 },
@@ -635,7 +636,7 @@ describe('iList.maxBy', () => {
   });
 });
 
-describe('iList.count', () => {
+describe('IList.count', () => {
   const xs = [
     { x: 1, y: 1 },
     { x: 2, y: 1 },
@@ -654,7 +655,7 @@ describe('iList.count', () => {
   });
 });
 
-describe('iList.countBy', () => {
+describe('IList.countBy', () => {
   const xs = [
     { x: 1, y: 1 },
     { x: 2, y: 1 },
@@ -666,11 +667,11 @@ describe('iList.countBy', () => {
 
   const result = IList.countBy(xs, (a) => a.x);
 
-  assertType<TypeEq<typeof result, ReadonlyMap<1 | 2 | 3, uint32>>>();
+  assertType<TypeEq<typeof result, IMap<1 | 2 | 3, uint32>>>();
 
   test('case 1', () => {
     expect(result).toStrictEqual(
-      new Map<1 | 2 | 3, uint32>([
+      IMap.new<1 | 2 | 3, uint32>([
         [1, 3 as uint32],
         [2, 2 as uint32],
         [3, 1 as uint32],
@@ -679,7 +680,7 @@ describe('iList.countBy', () => {
   });
 });
 
-describe('iList.groupBy', () => {
+describe('IList.groupBy', () => {
   const xs = [
     { x: 1, y: 1 },
     { x: 2, y: 1 },
@@ -694,7 +695,7 @@ describe('iList.groupBy', () => {
   assertType<
     TypeEq<
       typeof result,
-      ReadonlyMap<
+      IMap<
         1 | 2 | 3,
         readonly (
           | { readonly x: 1; readonly y: 1 }
@@ -710,7 +711,7 @@ describe('iList.groupBy', () => {
 
   test('case 1', () => {
     expect(result).toStrictEqual(
-      new Map<
+      IMap.new<
         1 | 2 | 3,
         readonly (
           | { readonly x: 1; readonly y: 1 }
@@ -742,7 +743,7 @@ describe('iList.groupBy', () => {
   });
 });
 
-describe('iList.isSubset', () => {
+describe('IList.isSubset', () => {
   {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2] as const;
@@ -769,7 +770,7 @@ describe('iList.isSubset', () => {
   }
 });
 
-describe('iList.isSuperset', () => {
+describe('IList.isSuperset', () => {
   {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2] as const;

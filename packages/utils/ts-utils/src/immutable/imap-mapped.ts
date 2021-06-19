@@ -43,6 +43,9 @@ interface IMapMappedInterface<K, V, KM extends KeyBaseType> {
   entries: () => IterableIterator<readonly [K, V]>;
 
   // Conversion
+  toKeysArray: () => readonly K[];
+  toValuesArray: () => readonly V[];
+  toEntriesArray: () => readonly (readonly [K, V])[];
   toArray: () => readonly (readonly [K, V])[];
 }
 
@@ -224,6 +227,18 @@ class IMapMappedClass<K, V, KM extends KeyBaseType>
     for (const [km, v] of this._map.entries()) {
       yield [this._fromKey(km), v];
     }
+  }
+
+  toKeysArray(): readonly K[] {
+    return [...this.keys()];
+  }
+
+  toValuesArray(): readonly V[] {
+    return [...this.values()];
+  }
+
+  toEntriesArray(): readonly (readonly [K, V])[] {
+    return [...this.entries()];
   }
 
   toArray(): readonly (readonly [K, V])[] {

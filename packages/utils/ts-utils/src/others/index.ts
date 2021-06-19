@@ -1,6 +1,6 @@
 export * from './download-file';
 export * from './id-fn';
-export * from './ifthen';
+export * from './if-then';
 export * from './is-email-string';
 export * from './is-type';
 export * from './map-nullable';
