@@ -1,9 +1,12 @@
-import type { AnswerJsType, DatetimeSpecificationEnumType } from './types';
+import type {
+  Answer,
+  DatetimeSpecificationEnumType,
+} from '@noshiro/event-schedule-app-api';
 import { datetimeRange2str, iconId2str } from './utils';
 
 export const answerDiffAsString = (
-  before: AnswerJsType,
-  after: AnswerJsType,
+  before: Answer,
+  after: Answer,
   datetimeSpecification: DatetimeSpecificationEnumType
 ): string[] => {
   const result = [];

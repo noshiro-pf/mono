@@ -1,13 +1,16 @@
+import type { Answer } from '@noshiro/event-schedule-app-api';
+import {
+  ANSWER_KEY_CREATED_AT,
+  createAnswerId,
+  fillAnswer,
+  firestorePaths,
+} from '@noshiro/event-schedule-app-api';
 import { Result } from '@noshiro/ts-utils';
-import { firestorePaths } from '../../constants';
 import { dbEvents } from '../../initialize-firebase';
-import type { IAnswer } from '../../types';
-import { answerId, ANSWER_KEY_CREATED_AT, fillAnswer } from '../../types';
-import { IList } from '../../utils';
 
 export const getAnswers = async (
   eventId: string
-): Promise<Result<IList<IAnswer>, 'not-found' | 'others'>> => {
+): Promise<Result<readonly Answer[], 'not-found' | 'others'>> => {
   try {
     const querySnapshot = await dbEvents
       .doc(eventId)
@@ -16,10 +19,8 @@ export const getAnswers = async (
       .get();
 
     return Result.ok(
-      IList<IAnswer>(
-        querySnapshot.docs.map((d) =>
-          fillAnswer({ ...d.data(), id: answerId(d.id) })
-        )
+      querySnapshot.docs.map((d) =>
+        fillAnswer({ ...d.data(), id: createAnswerId(d.id) })
       )
     );
   } catch (e: unknown) {

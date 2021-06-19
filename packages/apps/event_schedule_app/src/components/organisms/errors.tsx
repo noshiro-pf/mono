@@ -1,7 +1,7 @@
+import type { EventScheduleValidation } from '@noshiro/event-schedule-app-api';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { errorFontColor, texts } from '../../constants';
-import type { EventScheduleValidation } from '../../types';
 import { Description } from '../atoms';
 
 const vt = texts.eventSettingsPage;

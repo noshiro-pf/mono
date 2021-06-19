@@ -6,7 +6,7 @@ import { Description } from '../../atoms';
 
 type Props = Readonly<{
   title: string;
-  description?: string;
+  description?: readonly string[];
   show: boolean;
   onToggle: () => void;
   elementToToggle: ReactNode;
@@ -24,9 +24,9 @@ export const ParagraphWithSwitch = memoNamed<Props>(
           onToggle={props.onToggle}
         />
       </SwitchWrapper>
-      {props.description === undefined ? undefined : (
-        <Description text={props.description} />
-      )}
+      {props.description === undefined
+        ? undefined
+        : props.description.map((d, i) => <Description key={i} text={d} />)}
       {props.show === undefined ? undefined : props.elementToToggle}
     </div>
   )

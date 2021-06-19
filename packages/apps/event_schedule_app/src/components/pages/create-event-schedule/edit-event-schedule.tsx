@@ -1,4 +1,5 @@
 import { Icon, Spinner } from '@blueprintjs/core';
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
 import {
   useStream,
   useStreamEffect,
@@ -17,7 +18,6 @@ import styled from 'styled-components';
 import { api } from '../../../api';
 import { descriptionFontColor, texts } from '../../../constants';
 import { useEventId } from '../../../routing';
-import type { IEventSchedule } from '../../../types';
 import { clog } from '../../../utils';
 import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
@@ -30,7 +30,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId$ = useValueAsStream(eventId);
 
   const eventScheduleResult$ = useStream<
-    Result<IEventSchedule, 'not-found' | 'others'> | undefined
+    Result<EventSchedule, 'not-found' | 'others'> | undefined
   >(() =>
     eventId$
       .chain(

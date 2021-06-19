@@ -1,6 +1,6 @@
+import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
 import type { WeekDayEnum } from '@noshiro/ts-utils';
 import { getDay, newDate } from '@noshiro/ts-utils';
-import type { IYearMonthDate } from '../types';
 
-export const ymd2day = (ymd: IYearMonthDate): WeekDayEnum =>
+export const ymd2day = (ymd: YearMonthDate): WeekDayEnum =>
   getDay(newDate(ymd.year, ymd.month, ymd.date));

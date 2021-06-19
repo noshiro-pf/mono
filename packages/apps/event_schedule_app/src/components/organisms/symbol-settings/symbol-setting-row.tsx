@@ -1,23 +1,20 @@
 // import { SelectSymbolPopover } from './select-symbol-popover/select-symbol-popover';
+import type {
+  AnswerSymbol,
+  AnswerSymbolIconId,
+  AnswerSymbolPointEnumType,
+} from '@noshiro/event-schedule-app-api';
 import { BpInput, BpNumericInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import {
-  answerSymbolPointConfig,
-  clampAndRoundAnswerSymbolPoint,
-} from '../../../constants';
-import type {
-  AnswerSymbolIconId,
-  AnswerSymbolPointEnumType,
-  IAnswerSymbol,
-} from '../../../types';
-import type { IList } from '../../../utils';
+import { answerSymbolPointConfig } from '../../../constants';
+import { clampAndRoundAnswerSymbolPoint } from '../../../functions';
 import { CustomIcon } from '../../atoms';
 
 type Props = Readonly<{
-  answerSymbol: IAnswerSymbol;
-  iconsInUse: IList<AnswerSymbolIconId>;
+  answerSymbol: AnswerSymbol;
+  iconsInUse: readonly AnswerSymbolIconId[];
   onDescriptionChange: (value: string) => void;
   onPointChange: (value: AnswerSymbolPointEnumType) => void;
   onDeleteClick: () => void;
@@ -98,5 +95,5 @@ const DescriptionWrapper = styled.div`
 `;
 
 const NumericInputWrapper = styled.div`
-  flex: 0 0 65px;
+  flex: 0 0 75px;
 `;

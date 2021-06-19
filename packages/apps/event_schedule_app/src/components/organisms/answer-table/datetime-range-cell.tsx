@@ -1,15 +1,15 @@
+import type {
+  DatetimeRange,
+  DatetimeSpecificationEnumType,
+} from '@noshiro/event-schedule-app-api';
 import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants';
 import { hm2str, ymd2strWithDay } from '../../../functions';
-import type {
-  DatetimeSpecificationEnumType,
-  IDatetimeRange,
-} from '../../../types';
 
 const vt = texts.date;
 
 type Props = Readonly<{
-  datetimeRange: IDatetimeRange;
+  datetimeRange: DatetimeRange;
   datetimeSpecification: DatetimeSpecificationEnumType;
 }>;
 

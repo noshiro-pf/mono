@@ -1,3 +1,4 @@
+import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-api';
 import {
   useStream,
   useStreamEffect,
@@ -16,19 +17,18 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { isNotUndefined, Result } from '@noshiro/ts-utils';
 import { api } from '../../../api';
-import type { IAnswer, IEventSchedule } from '../../../types';
-import type { IList } from '../../../utils';
 import { clog } from '../../../utils';
 
-type FetchResults = Readonly<{
-  eventSchedule$: Observable<IEventSchedule | undefined>;
-  answers$: Observable<IList<IAnswer> | undefined>;
+type FetchResults = DeepReadonly<{
+  eventSchedule$: Observable<EventSchedule | undefined>;
+  answers$: Observable<readonly Answer[] | undefined>;
   answersResultTimestamp$: Observable<number>;
   errorType:
-    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
-    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
+    | { data: 'answersResult'; type: 'not-found' | 'others' }
+    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
     | undefined;
 }>;
 
@@ -40,7 +40,7 @@ export const useFetchResults = (
   const eventId$ = useValueAsStream(eventId);
 
   const eventScheduleResult$ = useStream<
-    Result<IEventSchedule, 'not-found' | 'others'> | undefined
+    Result<EventSchedule, 'not-found' | 'others'> | undefined
   >(() =>
     combineLatest(fetchEventScheduleThrottled$, eventId$)
       .chain(map(([_, x]) => x))
@@ -54,7 +54,7 @@ export const useFetchResults = (
 
   const answersResult$ = useStream<{
     timestamp: number;
-    value: Result<IList<IAnswer>, 'not-found' | 'others'> | undefined;
+    value: Result<readonly Answer[], 'not-found' | 'others'> | undefined;
   }>(() =>
     combineLatest(fetchAnswersThrottled$, eventId$)
       .chain(map(([_, x]) => x))
@@ -86,14 +86,14 @@ export const useFetchResults = (
       .chain(withInitialValue(Date.now()))
   );
 
-  const eventSchedule$ = useStream<IEventSchedule | undefined>(() =>
+  const eventSchedule$ = useStream<EventSchedule | undefined>(() =>
     eventScheduleResult$
       .chain(filter(isNotUndefined))
       .chain(unwrapResultOk())
       .chain(withInitialValue(undefined))
   );
 
-  const answers$ = useStream<IList<IAnswer> | undefined>(() =>
+  const answers$ = useStream<readonly Answer[] | undefined>(() =>
     answersResult$
       .chain(pluck('value'))
       .chain(filter(isNotUndefined))

@@ -1,6 +1,9 @@
+import {
+  firebaseConfig,
+  firestorePaths,
+} from '@noshiro/event-schedule-app-api';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
-import { firebaseConfig, firestorePaths } from './constants';
 import './index.css';
 import { clog } from './utils';
 // import firebasejson from '../firebase.json';

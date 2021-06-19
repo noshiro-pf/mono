@@ -1,4 +1,5 @@
 import { HTMLTable } from '@blueprintjs/core';
+import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-api';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { uint32 } from '@noshiro/ts-utils';
@@ -6,8 +7,6 @@ import { roundBy } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import type { IAnswer, IEventSchedule } from '../../../types';
-import type { IList } from '../../../utils';
 import { CustomIcon, Td, Th } from '../../atoms';
 import { useAnswerTableHooks } from './answer-table-hooks';
 import { CommentButton } from './comment-button';
@@ -15,9 +14,9 @@ import { DatetimeRangeCell } from './datetime-range-cell';
 import { SortButton } from './sort-button';
 
 type Props = Readonly<{
-  eventSchedule: IEventSchedule;
-  answers: IList<IAnswer>;
-  onAnswerClick: (answer: IAnswer) => void;
+  eventSchedule: EventSchedule;
+  answers: readonly Answer[];
+  onAnswerClick: (answer: Answer) => void;
   isExpired: boolean;
 }>;
 
@@ -39,21 +38,21 @@ export const AnswerTable = memoNamed<Props>(
       <HTMLTable bordered={true}>
         <thead>
           <tr>
-            <Th style={tcellStyle}>
+            <Th style={tCellStyle}>
               <PaddedSpan>{vt.datetime}</PaddedSpan>
               <SortButton onSortChange={onDatetimeSortChange} />
             </Th>
-            <Th style={tcellStyle}>
+            <Th style={tCellStyle}>
               <PaddedSpan>{vt.score}</PaddedSpan>
               <SortButton onSortChange={onScoreSortChange} />
             </Th>
             {answerSymbolList.map((s) => (
-              <Th key={s.iconId} style={tcellStyle}>
+              <Th key={s.iconId} style={tCellStyle}>
                 <CustomIcon iconName={s.iconId} />
               </Th>
             ))}
             {answersWithHandler.map((answer) => (
-              <Th key={answer.id} style={nopadStyle}>
+              <Th key={answer.id} style={noPadStyle}>
                 {isExpired ? (
                   answer.userName
                 ) : (
@@ -76,7 +75,7 @@ export const AnswerTable = memoNamed<Props>(
               key
             ) => (
               <tr key={key} style={style}>
-                <Td style={tcellStyle}>
+                <Td style={tCellStyle}>
                   <DatetimeRangeCell
                     datetimeRange={datetimeRange}
                     datetimeSpecification={datetimeSpecification}
@@ -86,33 +85,46 @@ export const AnswerTable = memoNamed<Props>(
                   <span>{roundBy(2 as uint32, score)}</span>
                 </Td>
                 {answerSummaryRow?.map((s, i) => (
-                  <Td style={tcellStyle} key={i}>
+                  <Td style={tCellStyle} key={i}>
                     <SummaryCellStyle>
                       <span>{s}</span>
                       <SummaryCellUnit>{vt.numAnswersUnit}</SummaryCellUnit>
                     </SummaryCellStyle>
                   </Td>
                 ))}
-                {answerTableRow?.map((iconId, i) => (
-                  <Td style={tcellStyle} key={i}>
+                {answerTableRow?.map(([iconId, weight], i) => (
+                  <Td style={tCellStyle} key={i}>
                     {iconId === undefined ? (
                       ''
                     ) : (
-                      <CustomIcon iconName={iconId} />
+                      <AnswerIconCell>
+                        <CustomIcon iconName={iconId} />
+                        {weight !== 1.0 ? (
+                          <>
+                            <WeightTimes>{vt.times}</WeightTimes>
+                            <WeightValue>{weight}</WeightValue>
+                          </>
+                        ) : undefined}
+                      </AnswerIconCell>
                     )}
                   </Td>
                 ))}
               </tr>
             )
           )}
+
+          {/* コメント行 */}
           <tr>
-            <Td style={tcellStyle}>{vt.comment}</Td>
-            <Td style={tcellStyle}></Td>
+            <Td style={tCellStyle}>{vt.comment}</Td>
+
+            {/* spacer */}
+            <Td style={tCellStyle}></Td>
             {answerSymbolList.map((s) => (
-              <Td key={s.iconId} style={tcellStyle}></Td>
+              <Td key={s.iconId} style={tCellStyle}></Td>
             ))}
+
             {answersWithHandler.map((answer) => (
-              <Td key={answer.id} style={nopadStyle}>
+              <Td key={answer.id} style={noPadStyle}>
                 <div>
                   {answer.comment === '' ? (
                     ''
@@ -129,12 +141,12 @@ export const AnswerTable = memoNamed<Props>(
   }
 );
 
-const tcellStyle: CSSProperties = {
+const tCellStyle: CSSProperties = {
   verticalAlign: 'middle',
   whiteSpace: 'nowrap',
 };
 
-const nopadStyle: CSSProperties = {
+const noPadStyle: CSSProperties = {
   minWidth: '80px',
   maxWidth: '80px',
   overflowX: 'hidden',
@@ -156,4 +168,17 @@ const SummaryCellUnit = styled.span`
 
 const PaddedSpan = styled.span`
   margin-right: 5px;
+`;
+
+const AnswerIconCell = styled.div`
+  display: flex;
+  align-items: flex-end;
+`;
+
+const WeightTimes = styled.span`
+  font-size: x-small;
+`;
+
+const WeightValue = styled.span`
+  font-size: x-small;
 `;

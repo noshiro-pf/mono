@@ -1,3 +1,4 @@
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
 import { useNavigator } from '@noshiro/react-router-utils';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
@@ -5,7 +6,6 @@ import { api } from '../../../api';
 import { texts } from '../../../constants';
 import { createToaster, showToast } from '../../../functions';
 import { routePaths, useEventId } from '../../../routing';
-import type { IEventSchedule } from '../../../types';
 
 type EditEventScheduleHooks = Readonly<{
   editButtonIsEnabled: boolean;
@@ -21,7 +21,7 @@ export const useEditEventScheduleHooks = ({
   newEventSchedule,
   eventScheduleValidationOk,
 }: Readonly<{
-  newEventSchedule: IEventSchedule;
+  newEventSchedule: EventSchedule;
   eventScheduleValidationOk: boolean;
 }>): EditEventScheduleHooks => {
   const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =

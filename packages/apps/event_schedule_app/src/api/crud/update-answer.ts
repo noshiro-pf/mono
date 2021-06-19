@@ -1,15 +1,15 @@
-import { firestorePaths } from '../../constants';
+import type { Answer } from '@noshiro/event-schedule-app-api';
+import { firestorePaths } from '@noshiro/event-schedule-app-api';
 import { dbEvents } from '../../initialize-firebase';
-import type { IAnswer } from '../../types';
 
 export const updateAnswer = async (
   eventId: string,
-  answerId: IAnswer['id'],
-  answer: IAnswer
+  answerId: Answer['id'],
+  answer: Answer
 ): Promise<void> => {
   await dbEvents
     .doc(eventId)
     .collection(firestorePaths.answers)
     .doc(answerId)
-    .set(answer.toJS());
+    .set(answer);
 };

@@ -1,3 +1,5 @@
+import type { AnswerSymbolPointEnumType } from '@noshiro/event-schedule-app-api';
+
 export const texts = {
   aboutThisApp: 'このアプリについて',
   pageNotFound: 'ページが見つかりませんでした。',
@@ -35,8 +37,9 @@ export const texts = {
     section3: {
       otherSettingsTitle: 'その他の設定（3/3）',
       answerDeadline: '回答期限',
-      howAnswerDeadlineIsUsed:
+      howAnswerDeadlineIsUsed: [
         '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
+      ],
       usePassword: '設定編集用パスワードを設定',
       howPasswordIsUsed:
         '日程調整作成後のイベント名や候補日程等の編集時にパスワード入力が求められるようになります。',
@@ -136,7 +139,7 @@ export const texts = {
       editButtonConfirmDialogValidationFailedMessage:
         '登録されているメールアドレスと一致しません。',
     },
-
+    point: (p: AnswerSymbolPointEnumType) => `（${p}点）`,
     answers: {
       title: '回答一覧',
       datetime: '候補日程',
@@ -146,6 +149,8 @@ export const texts = {
       sortAsc: '昇順ソート',
       sortDesc: '降順ソート',
       comment: 'コメント',
+      times: '×',
+      weight: '回答の優先度',
       refresh: '更新',
     },
     myAnswer: {
@@ -157,7 +162,14 @@ export const texts = {
       comments: 'コメント（オプション）：',
       nameIsRequired: '名前は必須項目です',
       theNameIsAlreadyUsed: 'その名前は既に使われています',
-
+      weight: {
+        title: 'この回答の優先度を変更（オプション）',
+        description: [
+          '集計表のスコア計算でこの回答を何人分としてカウントするかを設定できます。',
+          'この回答の優先度を上げたい場合は1より大きい値を、下げたい場合は1より小さい値を設定してください。',
+        ],
+        suffix: '人分としてカウント',
+      },
       submitButton: {
         create: '回答を追加する',
         update: '回答を更新する',

@@ -1,26 +1,18 @@
-import type { HoursMinutes } from '@noshiro/react-blueprintjs-utils';
+import type {
+  DatetimeSpecificationEnumType,
+  HoursMinutes,
+  TimeRange,
+} from '@noshiro/event-schedule-app-api';
 import { BpTimePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import type {
-  DatetimeSpecificationEnumType,
-  IHoursMinutes,
-  ITimeRange,
-} from '../../types';
-import { createIHoursMinutes } from '../../types';
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
-  timeRange: ITimeRange;
-  onRangeStartChange: (hm: IHoursMinutes) => void;
-  onRangeEndChange: (hm: IHoursMinutes) => void;
+  timeRange: TimeRange;
+  onRangeStartChange: (hm: HoursMinutes) => void;
+  onRangeEndChange: (hm: HoursMinutes) => void;
 }>;
-
-const onTimeChangeFn =
-  (onITimeChange: (hm: IHoursMinutes) => void) =>
-  (hm: HoursMinutes): void => {
-    onITimeChange(createIHoursMinutes(hm));
-  };
 
 export const TimeRangeView = memoNamed<Props>('TimeRangeView', (props) => (
   <TimeRangeWrapper>
@@ -28,7 +20,7 @@ export const TimeRangeView = memoNamed<Props>('TimeRangeView', (props) => (
     props.datetimeSpecification === 'startAndEndSpecified' ? (
       <BpTimePicker
         time={props.timeRange.start}
-        onTimeChange={onTimeChangeFn(props.onRangeStartChange)}
+        onTimeChange={props.onRangeStartChange}
       />
     ) : undefined}
     {props.datetimeSpecification !== 'noStartEndSpecified' ? (
@@ -38,7 +30,7 @@ export const TimeRangeView = memoNamed<Props>('TimeRangeView', (props) => (
     props.datetimeSpecification === 'startAndEndSpecified' ? (
       <BpTimePicker
         time={props.timeRange.end}
-        onTimeChange={onTimeChangeFn(props.onRangeEndChange)}
+        onTimeChange={props.onRangeEndChange}
       />
     ) : undefined}
   </TimeRangeWrapper>

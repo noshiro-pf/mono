@@ -1,31 +1,23 @@
-import type { YearMonthDate } from '@noshiro/react-blueprintjs-utils';
+import type {
+  DatetimeRange,
+  DatetimeSpecificationEnumType,
+  HoursMinutes,
+  YearMonthDate,
+} from '@noshiro/event-schedule-app-api';
 import { BpButton, BpDatePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import type {
-  DatetimeSpecificationEnumType,
-  IDatetimeRange,
-  IHoursMinutes,
-  IYearMonthDate,
-} from '../../../../types';
-import { createIYearMonthDate } from '../../../../types';
 import { TimeRangeView } from '../../../molecules';
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
-  datetimeRange: IDatetimeRange;
-  onYmdChange: (ymd: IYearMonthDate | undefined) => void;
-  onRangeStartChange: (hm: IHoursMinutes) => void;
-  onRangeEndChange: (hm: IHoursMinutes) => void;
+  datetimeRange: DatetimeRange;
+  onYmdChange: (ymd: YearMonthDate | undefined) => void;
+  onRangeStartChange: (hm: HoursMinutes) => void;
+  onRangeEndChange: (hm: HoursMinutes) => void;
   onDuplicateClick: () => void;
   onDeleteClick: () => void;
 }>;
-
-const onYmdChangeFn =
-  (onIYmdChange: (iymd: IYearMonthDate | undefined) => void) =>
-  (ymd: YearMonthDate | undefined) => {
-    onIYmdChange(createIYearMonthDate(ymd));
-  };
 
 export const SelectedDatetimeRow = memoNamed<Props>(
   'SelectedDatetimeRow',
@@ -35,7 +27,7 @@ export const SelectedDatetimeRow = memoNamed<Props>(
         <YmdWrapper>
           <BpDatePicker
             ymd={props.datetimeRange.ymd}
-            onYmdChange={onYmdChangeFn(props.onYmdChange)}
+            onYmdChange={props.onYmdChange}
             closeOnSelection={true}
           />
         </YmdWrapper>

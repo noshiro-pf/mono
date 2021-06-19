@@ -1,25 +1,29 @@
+import type {
+  NotificationSettings,
+  Ymdhm,
+} from '@noshiro/event-schedule-app-api';
 import { BpCheckbox, BpEmailInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
+import { IRecord } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { now, ymdhmDateDiff } from '../../../functions';
-import type { INotificationSettings, IYmdHm } from '../../../types';
 import { WidthRestrictedInputWrapper } from '../../styled';
 
 type Props = Readonly<{
-  notificationSettings: INotificationSettings;
-  onNotificationSettingsChange: (value: INotificationSettings) => void;
+  notificationSettings: NotificationSettings;
+  onNotificationSettingsChange: (value: NotificationSettings) => void;
   disabled: boolean;
   useAnswerDeadline: boolean;
-  answerDeadline: IYmdHm | undefined;
+  answerDeadline: Ymdhm | undefined;
   focusEmailInput$: TinyObservable<undefined>;
 }>;
 
 const vt = texts.eventSettingsPage.section3;
 
-export const NotificationSettings = memoNamed<Props>(
+export const NotificationSettingsComponent = memoNamed<Props>(
   'NotificationSettings',
   ({
     notificationSettings,
@@ -31,7 +35,9 @@ export const NotificationSettings = memoNamed<Props>(
   }) => {
     const onEmailChange = useCallback(
       (email: string) => {
-        onNotificationSettingsChange(notificationSettings.set('email', email));
+        onNotificationSettingsChange(
+          IRecord.set(notificationSettings, 'email', email)
+        );
       },
       [notificationSettings, onNotificationSettingsChange]
     );
@@ -39,7 +45,7 @@ export const NotificationSettings = memoNamed<Props>(
     const onNotifyOnAnswerChangeCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsChange(
-          notificationSettings.set('notifyOnAnswerChange', checked)
+          IRecord.set(notificationSettings, 'notifyOnAnswerChange', checked)
         );
       },
       [notificationSettings, onNotificationSettingsChange]
@@ -48,7 +54,11 @@ export const NotificationSettings = memoNamed<Props>(
     const onNotify01daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsChange(
-          notificationSettings.set('notify01daysBeforeAnswerDeadline', checked)
+          IRecord.set(
+            notificationSettings,
+            'notify01daysBeforeAnswerDeadline',
+            checked
+          )
         );
       },
       [notificationSettings, onNotificationSettingsChange]
@@ -56,7 +66,11 @@ export const NotificationSettings = memoNamed<Props>(
     const onNotify03daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsChange(
-          notificationSettings.set('notify03daysBeforeAnswerDeadline', checked)
+          IRecord.set(
+            notificationSettings,
+            'notify03daysBeforeAnswerDeadline',
+            checked
+          )
         );
       },
       [notificationSettings, onNotificationSettingsChange]
@@ -64,7 +78,11 @@ export const NotificationSettings = memoNamed<Props>(
     const onNotify07daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsChange(
-          notificationSettings.set('notify07daysBeforeAnswerDeadline', checked)
+          IRecord.set(
+            notificationSettings,
+            'notify07daysBeforeAnswerDeadline',
+            checked
+          )
         );
       },
       [notificationSettings, onNotificationSettingsChange]
@@ -72,7 +90,11 @@ export const NotificationSettings = memoNamed<Props>(
     const onNotify14daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsChange(
-          notificationSettings.set('notify14daysBeforeAnswerDeadline', checked)
+          IRecord.set(
+            notificationSettings,
+            'notify14daysBeforeAnswerDeadline',
+            checked
+          )
         );
       },
       [notificationSettings, onNotificationSettingsChange]
@@ -80,7 +102,11 @@ export const NotificationSettings = memoNamed<Props>(
     const onNotify28daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsChange(
-          notificationSettings.set('notify28daysBeforeAnswerDeadline', checked)
+          IRecord.set(
+            notificationSettings,
+            'notify28daysBeforeAnswerDeadline',
+            checked
+          )
         );
       },
       [notificationSettings, onNotificationSettingsChange]

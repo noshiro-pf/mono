@@ -4,12 +4,11 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import type { AnswerSymbolIconId } from '../../../../types';
-import type { IList } from '../../../../utils';
 import { SelectSymbolPopoverContent } from './select-symbol-popover-content';
 
 type Props = Readonly<{
   openerIcon: IconName | JSX.Element;
-  iconsInUse: IList<AnswerSymbolIconId>;
+  iconsInUse: readonly AnswerSymbolIconId[];
   onIconSelectSubmit: (id: AnswerSymbolIconId) => void;
 }>;
 

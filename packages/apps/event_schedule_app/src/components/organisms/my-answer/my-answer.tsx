@@ -1,25 +1,31 @@
 import { FormGroup, HTMLTable } from '@blueprintjs/core';
+import type {
+  Answer,
+  EventSchedule,
+  UserName,
+} from '@noshiro/event-schedule-app-api';
 import {
   BpButton,
   BpInput,
   BpTextArea,
 } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import styled from 'styled-components';
 import { texts } from '../../../constants';
-import type { IAnswer, IEventSchedule, UserName } from '../../../types';
-import type { IList } from '../../../utils';
 import { CustomIcon, Td, Th } from '../../atoms';
 import { ButtonsWrapperAlignEnd } from '../../molecules';
 import { WidthRestrictedInputWrapper } from '../../styled';
 import { DatetimeRangeCell } from '../answer-table';
+import { ParagraphWithSwitch } from '../event-settings';
 import { DeleteAnswerButton } from './delete-answer-button';
 import { useMyAnswerHooks } from './my-answer-hooks';
+import { WeightSetting } from './weight-setting';
 
 type Props = Readonly<{
-  eventSchedule: IEventSchedule;
-  answers: IList<IAnswer>;
-  myAnswer: IAnswer;
-  onMyAnswerChange: (answer: IAnswer) => void;
+  eventSchedule: EventSchedule;
+  answers: readonly Answer[];
+  myAnswer: Answer;
+  onMyAnswerUpdate: (updater: (answer: Answer) => Answer) => void;
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
   onSubmitAnswer: () => Promise<void>;
@@ -37,7 +43,7 @@ export const MyAnswer = memoNamed<Props>(
     eventSchedule,
     answers,
     myAnswer,
-    onMyAnswerChange,
+    onMyAnswerUpdate,
     onCancel,
     onDeleteAnswer,
     onSubmitAnswer,
@@ -47,21 +53,21 @@ export const MyAnswer = memoNamed<Props>(
     usernameDuplicateCheckException,
   }) => {
     const {
-      userName,
       showUserNameError,
       theNameIsAlreadyUsed,
       onUserNameBlur,
       onUserNameChange,
-      comment,
       onCommentChange,
       symbolHeader,
       myAnswerList,
+      onWeightChange,
+      toggleWeightSection,
     } = useMyAnswerHooks(
       eventSchedule,
       answers,
       usernameDuplicateCheckException,
       myAnswer,
-      onMyAnswerChange
+      onMyAnswerUpdate
     );
 
     return (
@@ -70,16 +76,20 @@ export const MyAnswer = memoNamed<Props>(
           <FormGroup
             label={vt.yourName}
             helperText={
-              showUserNameError
-                ? theNameIsAlreadyUsed
-                  ? vt.theNameIsAlreadyUsed
-                  : vt.nameIsRequired
-                : undefined
+              showUserNameError ? (
+                theNameIsAlreadyUsed ? (
+                  vt.theNameIsAlreadyUsed
+                ) : (
+                  vt.nameIsRequired
+                )
+              ) : (
+                <Spacer />
+              )
             }
             intent={showUserNameError ? 'danger' : 'primary'}
           >
             <BpInput
-              value={userName}
+              value={myAnswer.userName}
               onValueChange={onUserNameChange as (v: string) => void}
               autoFocus={true}
               onBlur={onUserNameBlur}
@@ -140,12 +150,29 @@ export const MyAnswer = memoNamed<Props>(
         <WidthRestrictedInputWrapper>
           <FormGroup label={vt.comments}>
             <BpTextArea
-              value={comment}
+              value={myAnswer.comment}
               onValueChange={onCommentChange}
               fill={true}
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
+        <ParagraphWithSwitch
+          title={vt.weight.title}
+          description={
+            myAnswer.useWeight
+              ? vt.weight.description
+              : vt.weight.description.slice(0, 1)
+          }
+          show={myAnswer.useWeight}
+          onToggle={toggleWeightSection}
+          elementToToggle={
+            <WeightSetting
+              weight={myAnswer.weight}
+              onWeightChange={onWeightChange}
+              disabled={!myAnswer.useWeight}
+            />
+          }
+        />
         <ButtonsWrapperAlignEnd>
           <BpButton
             intent='none'
@@ -184,3 +211,7 @@ export const MyAnswer = memoNamed<Props>(
 const style = {
   padding: '6px',
 };
+
+const Spacer = styled.div`
+  height: 1rem;
+`;

@@ -1,20 +1,32 @@
-import type { AnswerSymbolIconId, IAnswer } from '../../../types';
-import type { IList } from '../../../utils';
-import { IMap } from '../../../utils';
-import type { IAnswerSelectionMapKey } from './map-key';
-import { createAnswerSelectionMapKey } from './map-key';
+import type {
+  Answer,
+  AnswerSymbolIconId,
+  AnswerTableCellPosition,
+} from '@noshiro/event-schedule-app-api';
+import { IList, IMapMapped } from '@noshiro/ts-utils';
+import type { AnswerSelectionMapKey } from '../../../functions';
+import {
+  answerSelectionFromMapKey,
+  answerSelectionToMapKey,
+} from '../../../functions';
 
 export const createAnswerSelectionMapFromAnswers = (
-  answers: IList<IAnswer>
-): IMap<IAnswerSelectionMapKey, AnswerSymbolIconId | undefined> =>
-  IMap(
-    answers.flatMap(({ id, selection }) =>
+  answers: readonly Answer[]
+): IMapMapped<
+  AnswerTableCellPosition,
+  AnswerSymbolIconId | undefined,
+  AnswerSelectionMapKey
+> =>
+  IMapMapped.new(
+    IList.flatMap(answers, ({ id, selection }) =>
       selection.map((s) => [
-        createAnswerSelectionMapKey({
+        {
           datetimeRange: s.datetimeRange,
           answerId: id,
-        }),
+        },
         s.iconId,
       ])
-    )
+    ),
+    answerSelectionToMapKey,
+    answerSelectionFromMapKey
   );

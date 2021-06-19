@@ -1,21 +1,21 @@
 import type {
   AnswerSymbolIconId,
-  DatetimeRangeJsType,
+  DatetimeRange,
   DatetimeSpecificationEnumType,
-  HoursMinutesType,
-  YearMonthDateType,
-} from '../types';
+  HoursMinutes,
+  YearMonthDate,
+} from '@noshiro/event-schedule-app-api';
 
 export const pad2 = (n: number): string => n.toString().padStart(2, '0');
 
-const ymd2str = (ymd: YearMonthDateType): string =>
+const ymd2str = (ymd: YearMonthDate): string =>
   `${ymd.year}/${pad2(ymd.month)}/${pad2(ymd.date)}`;
 
-const hm2str = (hm: HoursMinutesType): string =>
+const hm2str = (hm: HoursMinutes): string =>
   `${pad2(hm.hours)}:${pad2(hm.minutes)}`;
 
 export const datetimeRange2str = (
-  datetimeRange: DatetimeRangeJsType,
+  datetimeRange: DatetimeRange,
   datetimeSpecification: DatetimeSpecificationEnumType
 ): string => {
   switch (datetimeSpecification) {

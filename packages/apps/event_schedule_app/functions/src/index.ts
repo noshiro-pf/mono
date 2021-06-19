@@ -1,9 +1,9 @@
+import type { Answer } from '@noshiro/event-schedule-app-api';
+import { firestorePaths } from '@noshiro/event-schedule-app-api';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { firestorePaths } from './constants';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
-import type { AnswerJsType } from './types';
 
 admin.initializeApp();
 
@@ -21,7 +21,7 @@ export const answerCreationListener = functions.firestore
       eventType: 'create',
       eventId: context.params[wildcard.eventId] as string,
       answerItemBefore: undefined,
-      answerItemAfter: snapshot.data() as AnswerJsType,
+      answerItemAfter: snapshot.data() as Answer,
     })
   );
 
@@ -31,7 +31,7 @@ export const answerDeletionListener = functions.firestore
     notifyOnAnswerChangeBody({
       eventType: 'delete',
       eventId: context.params[wildcard.eventId] as string,
-      answerItemBefore: snapshot.data() as AnswerJsType,
+      answerItemBefore: snapshot.data() as Answer,
       answerItemAfter: undefined,
     })
   );
@@ -42,8 +42,8 @@ export const answerUpdateListener = functions.firestore
     notifyOnAnswerChangeBody({
       eventType: 'update',
       eventId: context.params[wildcard.eventId] as string,
-      answerItemBefore: change.before.data() as AnswerJsType,
-      answerItemAfter: change.after.data() as AnswerJsType,
+      answerItemBefore: change.before.data() as Answer,
+      answerItemAfter: change.after.data() as Answer,
     })
   );
 

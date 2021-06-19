@@ -1,10 +1,19 @@
-import type { MonthEnum, WeekDayEnum, YearEnum } from '@noshiro/ts-utils';
+import type { DayType, YearMonthDate } from '@noshiro/event-schedule-app-api';
+import {
+  compareYmd,
+  defaultYearMonthDate,
+} from '@noshiro/event-schedule-app-api';
+import type {
+  DeepReadonly,
+  IMapMapped,
+  MonthEnum,
+  WeekDayEnum,
+  YearEnum,
+} from '@noshiro/ts-utils';
+import { IList, ISetMapped } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useReducer } from 'react';
-import { ymd2day } from '../../functions';
-import type { DayType, IYearMonthDate } from '../../types';
-import { compareYmd, createIYearMonthDate } from '../../types';
-import type { IList, IMap } from '../../utils';
-import { ISet } from '../../utils';
+import type { YmdKey } from '../../functions';
+import { ymd2day, ymdFromKey, ymdToKey } from '../../functions';
 import { generateCalendar } from './generate-calendar';
 import type {
   CalendarCurrentPageReducerState,
@@ -16,32 +25,28 @@ import {
   selectedDatesReducer,
 } from './reducers';
 
-type MultipleDatePickerState = Readonly<{
+type MultipleDatePickerState = DeepReadonly<{
   calendarCurrentPage: CalendarCurrentPageReducerState;
   onPrevMonthClick: () => void;
   onNextMonthClick: () => void;
   onYearChange: (year: YearEnum) => void;
   onMonthChange: (month: MonthEnum) => void;
-  calendarCells: IList<
-    IList<
-      Readonly<{
-        ymd: IYearMonthDate;
-        selected: boolean;
-        disabled: boolean;
-        dayType: DayType;
-        holidayJpName: string | undefined;
-      }>
-    >
-  >;
-  onDateClick: (ymd: IYearMonthDate) => void;
+  calendarCells: readonly (readonly {
+    ymd: YearMonthDate;
+    selected: boolean;
+    disabled: boolean;
+    dayType: DayType;
+    holidayJpName: string | undefined;
+  }[])[];
+  onDateClick: (ymd: YearMonthDate) => void;
   onWeekdaysHeaderCellClick: (w: WeekDayEnum) => void;
   onTodayClick: () => void;
 }>;
 
 export const useMultipleDatePickerState = (
-  selectedDates: IList<IYearMonthDate>,
-  onSelectedDatesChange: (value: IList<IYearMonthDate>) => void,
-  holidaysJpDefinition?: IMap<IYearMonthDate, string>
+  selectedDates: readonly YearMonthDate[],
+  onSelectedDatesChange: (value: readonly YearMonthDate[]) => void,
+  holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>
 ): MultipleDatePickerState => {
   /* states */
 
@@ -52,26 +57,24 @@ export const useMultipleDatePickerState = (
 
   /* values */
 
-  const selectedDatesSet = useMemo<ISet<IYearMonthDate>>(
-    () => ISet(selectedDates),
+  const selectedDatesSet = useMemo<ISetMapped<YearMonthDate, YmdKey>>(
+    () => ISetMapped.new(selectedDates, ymdToKey, ymdFromKey),
     [selectedDates]
   );
 
-  const dates = useMemo<IList<IList<IYearMonthDate>>>(
+  const dates = useMemo<readonly (readonly YearMonthDate[])[]>(
     () => generateCalendar(calendarCurrentPage.year, calendarCurrentPage.month),
     [calendarCurrentPage]
   );
 
   const calendarCells = useMemo<
-    IList<
-      IList<{
-        ymd: IYearMonthDate;
-        selected: boolean;
-        disabled: boolean;
-        dayType: DayType;
-        holidayJpName: string | undefined;
-      }>
-    >
+    readonly (readonly Readonly<{
+      ymd: YearMonthDate;
+      selected: boolean;
+      disabled: boolean;
+      dayType: DayType;
+      holidayJpName: string | undefined;
+    }>[])[]
   >(
     () =>
       dates.map((week) =>
@@ -121,14 +124,17 @@ export const useMultipleDatePickerState = (
   const selectedDatesDispatch = useCallback(
     (action: SelectedDatesReducerAction) => {
       onSelectedDatesChange(
-        selectedDatesReducer(selectedDatesSet, action).toList().sort(compareYmd)
+        IList.sort(
+          [...selectedDatesReducer(selectedDatesSet, action)],
+          compareYmd
+        )
       );
     },
     [selectedDatesSet, onSelectedDatesChange]
   );
 
   const onDateClick = useCallback(
-    (ymd: IYearMonthDate) => {
+    (ymd: YearMonthDate) => {
       selectedDatesDispatch({ type: 'flip', dateToFlip: ymd });
     },
     [selectedDatesDispatch]
@@ -139,7 +145,7 @@ export const useMultipleDatePickerState = (
       selectedDatesDispatch({
         type: 'fill-column',
         dates: dates
-          .map((week) => week.get(w) ?? createIYearMonthDate())
+          .map((week) => week[w] ?? defaultYearMonthDate)
           .filter((d) => d?.month === calendarCurrentPage.month),
       });
     },

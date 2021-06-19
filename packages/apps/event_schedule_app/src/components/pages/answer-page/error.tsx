@@ -1,14 +1,15 @@
 import { memoNamed } from '@noshiro/react-utils';
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { errorFontColor, texts } from '../../../constants';
 import { Description } from '../../atoms';
 
 const vt = texts.errorMessages;
 
-type Props = Readonly<{
+type Props = DeepReadonly<{
   errorType:
-    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
-    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>;
+    | { data: 'answersResult'; type: 'not-found' | 'others' }
+    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' };
 }>;
 
 export const AnswerPageError = memoNamed<Props>(

@@ -1,36 +1,46 @@
+import type {
+  Answer,
+  EventSchedule,
+  UserName,
+} from '@noshiro/event-schedule-app-api';
+import { compareYmdhm } from '@noshiro/event-schedule-app-api';
 import { useNavigator } from '@noshiro/react-router-utils';
 import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { useAlive } from '@noshiro/react-utils';
+import type { DeepReadonly } from '@noshiro/ts-utils';
+import { IMapMapped, IRecord } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../../api';
 import { texts } from '../../../constants';
-import { createToaster, now, showToast } from '../../../functions';
+import {
+  createToaster,
+  datetimeRangeFromMapKey,
+  datetimeRangeToMapKey,
+  now,
+  showToast,
+} from '../../../functions';
 import { routePaths, useEventId } from '../../../routing';
-import type { IAnswer, IEventSchedule, UserName } from '../../../types';
-import { compareYmdHm } from '../../../types';
-import type { IList } from '../../../utils';
-import { IMap } from '../../../utils';
 import { useFetchEventStreams } from './use-fetch-event-stream';
 import { useFetchResults } from './use-fetch-results';
 import { useMyAnswer } from './use-my-answer';
 import { useRefreshButtonState } from './use-refresh-button-state';
 
-type AnswerPageState = Readonly<{
+type AnswerPageState = DeepReadonly<{
   eventId: string | undefined;
-  eventSchedule: IEventSchedule | undefined;
+  eventSchedule: EventSchedule | undefined;
   onEditButtonClick: () => void;
-  answers: IList<IAnswer> | undefined;
+  answers: readonly Answer[] | undefined;
   errorType:
-    | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
-    | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
+    | { data: 'answersResult'; type: 'not-found' | 'others' }
+    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
     | undefined;
-  onAnswerClick: (answer: IAnswer) => void;
+  onAnswerClick: (answer: Answer) => void;
   showMyAnswerSection: () => void;
   myAnswerSectionState: 'creating' | 'editing' | 'hidden';
   answerSectionRef: RefObject<HTMLDivElement>;
-  myAnswer: IAnswer;
-  setMyAnswer: (answer: IAnswer) => void;
+  myAnswer: Answer;
+  updateMyAnswer: (updater: (answer: Answer) => Answer) => void;
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
   onSubmitAnswer: () => Promise<void>;
@@ -70,7 +80,8 @@ export const useAnswerPageState = (): AnswerPageState => {
     setSubmitButtonIsLoading,
   ] = useState<boolean>(false);
 
-  const { myAnswer, setMyAnswer, resetMyAnswer } = useMyAnswer(eventSchedule$);
+  const { myAnswer, updateMyAnswer, resetMyAnswer } =
+    useMyAnswer(eventSchedule$);
 
   const [usernameDuplicateCheckException, setUsernameDuplicateCheckException] =
     useState<UserName | undefined>(undefined);
@@ -98,17 +109,19 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const submitButtonIsDisabled = useMemo<boolean>(() => {
     if (eventSchedule === undefined) return true;
-    const myanswerAsMap = IMap(
+    const myAnswerAsMap = IMapMapped.new(
       myAnswer.selection.map(({ datetimeRange, iconId }) => [
         datetimeRange,
         iconId,
-      ])
+      ]),
+      datetimeRangeToMapKey,
+      datetimeRangeFromMapKey
     );
 
     return (
       myAnswer.userName === '' ||
       eventSchedule.datetimeRangeList.some(
-        (d) => myanswerAsMap.get(d) === undefined
+        (d) => myAnswerAsMap.get(d) === undefined
       )
     );
   }, [myAnswer, eventSchedule]);
@@ -128,7 +141,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     switch (myAnswerSectionState) {
       case 'creating':
         await api.answers
-          .add(eventId, myAnswer.set('createdAt', Date.now()))
+          .add(eventId, IRecord.set(myAnswer, 'createdAt', Date.now()))
           .then(() => {
             if (!alive) return;
             setSubmitButtonIsLoading(false);
@@ -193,12 +206,12 @@ export const useAnswerPageState = (): AnswerPageState => {
   }, [myAnswer.id, eventId, alive, fetchAnswers, resetMyAnswer]);
 
   const onAnswerClick = useCallback(
-    (answer: IAnswer) => {
+    (answer: Answer) => {
       setMyAnswerSectionState('editing');
-      setMyAnswer(answer);
+      updateMyAnswer(() => answer);
       setUsernameDuplicateCheckException(answer.userName);
     },
-    [setMyAnswer]
+    [updateMyAnswer]
   );
 
   const { refreshButtonIsLoading, refreshButtonIsDisabled } =
@@ -210,7 +223,7 @@ export const useAnswerPageState = (): AnswerPageState => {
         ? false
         : eventSchedule.useAnswerDeadline &&
           eventSchedule.answerDeadline !== undefined &&
-          compareYmdHm(now(), eventSchedule.answerDeadline) >= 0,
+          compareYmdhm(now(), eventSchedule.answerDeadline) >= 0,
     [eventSchedule]
   );
 
@@ -233,7 +246,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     myAnswerSectionState,
     answerSectionRef,
     myAnswer,
-    setMyAnswer,
+    updateMyAnswer,
     onCancel,
     onDeleteAnswer,
     onSubmitAnswer,

@@ -1,9 +1,9 @@
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../../api';
 import { routePaths } from '../../../routing';
-import type { IEventSchedule } from '../../../types';
 
 type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;
@@ -20,7 +20,7 @@ export const useCreateEventScheduleHooks = ({
   newEventSchedule,
   eventScheduleValidationOk,
 }: Readonly<{
-  newEventSchedule: IEventSchedule;
+  newEventSchedule: EventSchedule;
   eventScheduleValidationOk: boolean;
 }>): CreateEventScheduleHooks => {
   const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =

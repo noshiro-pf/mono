@@ -1,24 +1,32 @@
+import type {
+  AnswerSymbolIconId,
+  DatetimeRange,
+} from '@noshiro/event-schedule-app-api';
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { AnswerSymbolIconId, IDatetimeRange } from '../../../types';
-import type { IList } from '../../../utils';
-import { IMap } from '../../../utils';
+import { IMapMapped } from '@noshiro/ts-utils';
+import type { DatetimeRangeMapKey } from '../../../functions';
+import {
+  datetimeRangeFromMapKey,
+  datetimeRangeToMapKey,
+} from '../../../functions';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {
       type: 'cell';
-      datetimeRange: IDatetimeRange;
+      datetimeRange: DatetimeRange;
       icon: AnswerSymbolIconId | undefined;
     }
   | {
       type: 'header';
       icon: AnswerSymbolIconId | undefined;
-      datetimeRangeList: IList<IDatetimeRange>;
+      datetimeRangeList: readonly DatetimeRange[];
     }
 >;
 
-export type AnswerSelectionReducerState = IMap<
-  IDatetimeRange,
-  AnswerSymbolIconId | undefined
+export type AnswerSelectionReducerState = IMapMapped<
+  DatetimeRange,
+  AnswerSymbolIconId | undefined,
+  DatetimeRangeMapKey
 >;
 
 export const answerSelectionReducer: ReducerType<
@@ -29,6 +37,10 @@ export const answerSelectionReducer: ReducerType<
     case 'cell':
       return state.set(action.datetimeRange, action.icon);
     case 'header':
-      return IMap(action.datetimeRangeList.map((d) => [d, action.icon]));
+      return IMapMapped.new(
+        action.datetimeRangeList.map((d) => [d, action.icon]),
+        datetimeRangeToMapKey,
+        datetimeRangeFromMapKey
+      );
   }
 };

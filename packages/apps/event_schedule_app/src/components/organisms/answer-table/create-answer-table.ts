@@ -1,23 +1,37 @@
 import type {
+  Answer,
   AnswerId,
   AnswerSymbolIconId,
-  IAnswer,
-  IDatetimeRange,
-} from '../../../types';
-import type { IList } from '../../../utils';
-import { IMap } from '../../../utils';
+  DatetimeRange,
+} from '@noshiro/event-schedule-app-api';
+import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
+import type { DatetimeRangeMapKey } from '../../../functions';
+import {
+  datetimeRangeFromMapKey,
+  datetimeRangeToMapKey,
+} from '../../../functions';
 
 export const createAnswerTable = (
   answerSelectionMapFn: (
-    datetimeRange: IDatetimeRange,
+    datetimeRange: DatetimeRange,
     answerId: AnswerId
   ) => AnswerSymbolIconId | undefined,
-  datetimeRangeList: IList<IDatetimeRange>,
-  answers: IList<IAnswer>
-): IMap<IDatetimeRange, IList<AnswerSymbolIconId | undefined>> =>
-  IMap(
-    datetimeRangeList.map((datetimeRange) => [
-      datetimeRange,
-      answers.map((answer) => answerSelectionMapFn(datetimeRange, answer.id)),
-    ])
+  datetimeRangeList: readonly DatetimeRange[],
+  answers: readonly Answer[]
+): IMapMapped<
+  DatetimeRange,
+  readonly (AnswerSymbolIconId | undefined)[],
+  DatetimeRangeMapKey
+> =>
+  IMapMapped.new(
+    IList.map(datetimeRangeList, (datetimeRange) =>
+      ituple(
+        datetimeRange,
+        IList.map(answers, (answer) =>
+          answerSelectionMapFn(datetimeRange, answer.id)
+        )
+      )
+    ),
+    datetimeRangeToMapKey,
+    datetimeRangeFromMapKey
   );

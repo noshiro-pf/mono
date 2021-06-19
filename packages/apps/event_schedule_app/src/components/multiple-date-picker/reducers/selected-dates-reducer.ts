@@ -1,17 +1,18 @@
+import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { IYearMonthDate } from '../../../types';
-import type { IList } from '../../../utils';
-import { ISet } from '../../../utils';
+import { IList, ISetMapped } from '@noshiro/ts-utils';
+import type { YmdKey } from '../../../functions';
+import { ymdFromKey, ymdToKey } from '../../../functions';
 
 export type SelectedDatesReducerAction = Readonly<
-  | { type: 'fill-column'; dates: IList<IYearMonthDate> }
-  | { type: 'flip'; dateToFlip: IYearMonthDate }
+  | { type: 'fill-column'; dates: readonly YearMonthDate[] }
+  | { type: 'flip'; dateToFlip: YearMonthDate }
 >;
 
-export type SelectedDatesReducerState = ISet<IYearMonthDate>;
+export type SelectedDatesReducerState = ISetMapped<YearMonthDate, YmdKey>;
 
 export const selectedDatesReducerInitialState: SelectedDatesReducerState =
-  ISet<IYearMonthDate>();
+  ISetMapped.new([], ymdToKey, ymdFromKey);
 
 export const selectedDatesReducer: ReducerType<
   SelectedDatesReducerState,
@@ -24,8 +25,8 @@ export const selectedDatesReducer: ReducerType<
         : state.add(action.dateToFlip);
 
     case 'fill-column':
-      return action.dates.isSubset(state)
-        ? state.subtract(action.dates)
-        : state.union(action.dates);
+      return IList.isSubset(action.dates, state.toArray())
+        ? state.subtract(ISetMapped.new(action.dates, ymdToKey, ymdFromKey))
+        : state.union(ISetMapped.new(action.dates, ymdToKey, ymdFromKey));
   }
 };

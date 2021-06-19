@@ -1,5 +1,8 @@
+import type {
+  Answer,
+  DatetimeSpecificationEnumType,
+} from '@noshiro/event-schedule-app-api';
 import { answerDiffAsString } from './answer-diff';
-import type { AnswerJsType, DatetimeSpecificationEnumType } from './types';
 
 const urlPrefix = 'https://event-schedule-app.web.app/event';
 
@@ -8,7 +11,7 @@ export const createMailBodyForNewAnswer = ({
   answerItem,
 }: Readonly<{
   eventId: string;
-  answerItem: AnswerJsType;
+  answerItem: Answer;
 }>): string =>
   [
     `${answerItem.userName}さんが回答を追加しました。`,
@@ -22,7 +25,7 @@ export const createMailBodyForAnswerDelete = ({
   answerItem,
 }: Readonly<{
   eventId: string;
-  answerItem: AnswerJsType;
+  answerItem: Answer;
 }>): string =>
   [
     `${answerItem.userName}さんが回答を削除しました。`,
@@ -38,8 +41,8 @@ export const createMailBodyForUpdatedAnswer = ({
   datetimeSpecification,
 }: Readonly<{
   eventId: string;
-  answerItemBefore: AnswerJsType;
-  answerItemAfter: AnswerJsType;
+  answerItemBefore: Answer;
+  answerItemAfter: Answer;
   datetimeSpecification: DatetimeSpecificationEnumType;
 }>): string =>
   [

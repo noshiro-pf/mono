@@ -1,11 +1,11 @@
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
+import { fillEventSchedule } from '@noshiro/event-schedule-app-api';
 import { Result } from '@noshiro/ts-utils';
 import { dbEvents } from '../../initialize-firebase';
-import type { IEventSchedule } from '../../types';
-import { fillEventSchedule } from '../../types';
 
 export const getEventSchedule = async (
   id: string
-): Promise<Result<IEventSchedule, 'not-found' | 'others'>> => {
+): Promise<Result<EventSchedule, 'not-found' | 'others'>> => {
   try {
     const res = await dbEvents.doc(id).get();
     if (!res.exists) {

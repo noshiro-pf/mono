@@ -1,27 +1,28 @@
+import type {
+  DatetimeRange,
+  DatetimeSpecificationEnumType,
+  YearMonthDate,
+} from '@noshiro/event-schedule-app-api';
 import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { texts } from '../../../../constants';
-import type {
-  DatetimeSpecificationEnumType,
-  IDatetimeRange,
-  IYearMonthDate,
-} from '../../../../types';
-import type { IList, IMap } from '../../../../utils';
+import type { YmdKey } from '../../../../functions';
 import { AddElementButton, ButtonsWrapper } from '../../../molecules';
 import { MultipleDatePicker } from '../../../multiple-date-picker';
 import { DeleteAllButton } from '../../button-with-confirm';
 import { SetTimesPopover } from '../set-times-popover';
-import { selctorOptions } from './options';
+import { selectorOptions } from './options';
 import { useSelectDatetimesHooks } from './select-datetimes-hooks';
 import { SelectedDatetimeRow } from './selected-datetime-row';
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
-  datetimeList: IList<IDatetimeRange>;
-  onDatetimeListChange: (list: IList<IDatetimeRange>) => void;
-  holidaysJpDefinition: IMap<IYearMonthDate, string>;
+  datetimeList: readonly DatetimeRange[];
+  onDatetimeListChange: (list: readonly DatetimeRange[]) => void;
+  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
 const vt = texts.eventSettingsPage.section2;
@@ -56,7 +57,7 @@ export const SelectDatetimes = memoNamed<Props>(
             <BpSelect
               value={datetimeSpecification}
               onValueChange={onDatetimeSpecificationChange as CastedHandlerType}
-              options={selctorOptions}
+              options={selectorOptions}
             />
           </DatetimeSpecificationSelectWrapper>
           <DatetimeRangeListWrapper>

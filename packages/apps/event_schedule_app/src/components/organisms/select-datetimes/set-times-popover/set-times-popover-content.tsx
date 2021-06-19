@@ -1,21 +1,21 @@
+import type {
+  DatetimeSpecificationEnumType,
+  HoursMinutes,
+  TimeRange,
+} from '@noshiro/event-schedule-app-api';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../../constants';
-import type {
-  DatetimeSpecificationEnumType,
-  IHoursMinutes,
-  ITimeRange,
-} from '../../../../types';
 import { ButtonsWrapperAlignEnd, TimeRangeView } from '../../../molecules';
 import { timeRangeReducer } from './time-range-reducer';
 
 type Props = Readonly<{
-  initialValue: ITimeRange;
+  initialValue: TimeRange;
   datetimeSpecification: DatetimeSpecificationEnumType;
   onCancelClick: () => void;
-  onOkClick: (timeRange: ITimeRange) => void;
+  onOkClick: (timeRange: TimeRange) => void;
 }>;
 
 export const SetTimesPopoverContent = memoNamed<Props>(
@@ -23,10 +23,10 @@ export const SetTimesPopoverContent = memoNamed<Props>(
   ({ initialValue, datetimeSpecification, onCancelClick, onOkClick }) => {
     const [timeRange, dispatch] = useReducer(timeRangeReducer, initialValue);
 
-    const onRangeStartChange = useCallback((hm: IHoursMinutes) => {
+    const onRangeStartChange = useCallback((hm: HoursMinutes) => {
       dispatch({ type: 'start', hm });
     }, []);
-    const onRangeEndChange = useCallback((hm: IHoursMinutes) => {
+    const onRangeEndChange = useCallback((hm: HoursMinutes) => {
       dispatch({ type: 'end', hm });
     }, []);
 
