@@ -32,7 +32,7 @@ export const defaultAnswerSymbolList: IList<IAnswerSymbol> = IList([
   createIAnswerSymbol({
     iconId: 'handmade-triangle',
     description: texts.symbolDescriptionDefault.triangleUp,
-    point: 5,
+    point: 6,
   }),
   createIAnswerSymbol({
     iconId: 'handmade-cross',

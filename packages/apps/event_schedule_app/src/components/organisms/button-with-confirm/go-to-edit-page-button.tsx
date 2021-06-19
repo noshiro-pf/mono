@@ -144,7 +144,7 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
               onClick={onConfirm}
               disabled={showValidationFailedMessage}
             >
-              {texts.buttonText.deside}
+              {texts.buttonText.decide}
             </BpButton>
           </ButtonsWrapperAlignEnd>
         </div>
