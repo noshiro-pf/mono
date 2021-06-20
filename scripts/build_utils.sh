@@ -3,6 +3,7 @@
 targets=(
   # no local dependency
   "ts-utils"
+  "fast-deep-equal"
 
   # ts-utils dependent
   "syncflow"
@@ -14,7 +15,7 @@ targets=(
   "preact-utils"
   "preact-resize-observer-hooks"
   "react-resize-observer-hooks"
-  
+
   # dependencies: [react-utils, rxjs-utils, ts-utils]
   "react-rxjs-utils"
   "preact-rxjs-utils"
@@ -33,14 +34,14 @@ utils_path="${MONO_ROOT_DIR}/packages/utils"
 echo ${utils_path}
 
 for target in "${targets[@]}" ; do
-    echo "building \"${target}\" ..." 
+    echo "building \"${target}\" ..."
     cd "${utils_path}/${target}"
     yarn build
     echo "done."
     echo ""
 done
 
-echo "building \"lambda_calculus_interpreter_core\" ..." 
+echo "building \"lambda_calculus_interpreter_core\" ..."
 apps_path="${MONO_ROOT_DIR}/packages/apps"
 cd "${apps_path}/lambda_calculus_interpreter_core"
 yarn build
