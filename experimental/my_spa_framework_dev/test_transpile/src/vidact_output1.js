@@ -1,10 +1,10 @@
 import {
-  createText,
-  setContent,
-  createElement,
-  append,
   addPropTransaction,
+  append,
+  createElement,
+  createText,
   propUpdater,
+  setContent,
 } from 'vidact/runtime';
 /*--- Import Vidact Runtime Helpers ---*/
 

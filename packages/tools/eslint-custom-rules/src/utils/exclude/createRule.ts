@@ -4,6 +4,6 @@ import { ESLintUtils } from '@typescript-eslint/experimental-utils';
 const version = require('../../package.json').version;
 
 export const createRule = ESLintUtils.RuleCreator(
-  name =>
-    `https://github.com/typescript-eslint/typescript-eslint/blob/v${version}/packages/eslint-plugin/docs/rules/${name}.md`,
+  (name) =>
+    `https://github.com/typescript-eslint/typescript-eslint/blob/v${version}/packages/eslint-plugin/docs/rules/${name}.md`
 );

@@ -17,11 +17,11 @@ export * from '@typescript-eslint/experimental-utils/dist/ast-utils';
 export function getNameLocationInGlobalDirectiveComment(
   sourceCode: TSESLint.SourceCode,
   comment: TSESTree.Comment,
-  name: string,
+  name: string
 ): TSESTree.SourceLocation {
   const namePattern = new RegExp(
     `[\\s,]${escapeRegExp(name)}(?:$|[\\s,:])`,
-    'gu',
+    'gu'
   );
 
   // To ignore the first text "global".
@@ -32,7 +32,7 @@ export function getNameLocationInGlobalDirectiveComment(
 
   // Convert the index to loc.
   const start = sourceCode.getLocFromIndex(
-    comment.range[0] + '/*'.length + (match ? match.index + 1 : 0),
+    comment.range[0] + '/*'.length + (match ? match.index + 1 : 0)
   );
   const end = {
     line: start.line,
