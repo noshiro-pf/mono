@@ -1,4 +1,4 @@
-import type { DateInputProps, DatePickerShortcut } from '@blueprintjs/datetime';
+import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import type { ReadonlyDate, StrictOmit, Writable } from '@noshiro/ts-utils';
@@ -9,6 +9,7 @@ import {
   getMonth,
   getYear,
 } from '@noshiro/ts-utils';
+import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { Ymdhm } from './types';
 
@@ -21,17 +22,19 @@ const parseDate = (str: string): Date => new Date(str);
 
 const tenYearsLater = new Date(getYear(new Date()) + 99, 11);
 
-type Props = Readonly<{
+type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
+
+export type BpDatetimePickerProps = Readonly<{
   ymdhm: Ymdhm | undefined;
   onYmdhmChange: (ymdhm: Ymdhm | undefined) => void;
   shortcuts?: boolean | readonly DatePickerShortcut[];
 }> &
   StrictOmit<
-    DateInputProps,
+    DateInputPropsOriginal,
     'formatDate' | 'parseDate' | 'shortcuts' | 'timePrecision'
   >;
 
-export const BpDatetimePicker = memoNamed<Props>(
+export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
   'BpDatetimePicker',
   ({
     ymdhm,

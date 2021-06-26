@@ -2,15 +2,19 @@ import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import type { ReadonlyDate } from '@noshiro/ts-utils';
 import { getHours, getMinutes } from '@noshiro/ts-utils';
+import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { HoursMinutes } from './types';
 
-type Props = Readonly<{
+type TimePickerPropsOriginal = ComponentProps<typeof TimePicker>;
+
+export type BpTimePickerProps = Readonly<{
   time: HoursMinutes;
   onTimeChange: (hm: HoursMinutes) => void;
-}>;
+}> &
+  TimePickerPropsOriginal;
 
-export const BpTimePicker = memoNamed<Props>(
+export const BpTimePicker = memoNamed<BpTimePickerProps>(
   'BpTimePicker',
   ({ time, onTimeChange }) => {
     const onChangeHandler = useCallback(

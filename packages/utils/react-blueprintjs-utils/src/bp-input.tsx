@@ -1,19 +1,20 @@
-import type { InputGroupProps2 } from '@blueprintjs/core';
 import { InputGroup } from '@blueprintjs/core';
 import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
 import { createTinyObservable } from '@noshiro/ts-utils';
-import type { ChangeEvent, FormEvent } from 'react';
+import type { ChangeEvent, ComponentProps, FormEvent } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
-type Props = InputGroupProps2 &
+type InputGroupPropsOriginal = ComponentProps<typeof InputGroup>;
+
+export type BpInputProps = InputGroupPropsOriginal &
   Readonly<{
     onValueChange: (value: string) => void;
     autoFocus?: boolean;
     focus$?: TinyObservable<undefined>;
   }>;
 
-export const BpInput = memoNamed<Props>(
+export const BpInput = memoNamed<BpInputProps>(
   'BpInput',
   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
     const onChangeHandler = useCallback(
