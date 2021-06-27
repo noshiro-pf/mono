@@ -1,5 +1,5 @@
 import type { InitializedObservable, Observable } from '@noshiro/syncflow';
-import { source, withInitialValue } from '@noshiro/syncflow';
+import { scan, source, withInitialValue } from '@noshiro/syncflow';
 import { Option } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -84,6 +84,41 @@ export const useStateAsStream = <A>(
   }, []);
 
   return [state$, setter];
+};
+
+export const useReducerAsStream = <S, A>(
+  reducer: (state: S, action: A) => S,
+  initialState: S
+): [InitializedObservable<S>, (action: A) => void] => {
+  const action$ = useMemo(() => source<A>(), []);
+
+  const state$ = useStream<S>(() => action$.chain(scan(reducer, initialState)));
+
+  const dispatch = useCallback((action: A) => {
+    action$.next(action);
+  }, []);
+
+  return [state$, dispatch];
+};
+
+const reducerForUseUpdaterAsStreamHooks = <S>(
+  state: S,
+  updateFn: (prev: S) => S
+): S => updateFn(state);
+
+export const useUpdaterAsStream = <S>(
+  initialState: S
+): [InitializedObservable<S>, (updateFn: (prev: S) => S) => void] => {
+  const [state$, dispatch] = useReducerAsStream<S, (prev: S) => S>(
+    reducerForUseUpdaterAsStreamHooks,
+    initialState
+  );
+
+  const updater = useCallback((updateFn: (prev: S) => S) => {
+    dispatch(updateFn);
+  }, []);
+
+  return [state$, updater];
 };
 
 export const useChangeValueEffect = <A>(
