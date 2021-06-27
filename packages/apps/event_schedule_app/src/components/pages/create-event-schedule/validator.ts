@@ -1,5 +1,5 @@
 import type { StrictOmit } from '@noshiro/ts-utils';
-import { ifthen, isEmailString } from '@noshiro/ts-utils';
+import { ifThen, isEmailString } from '@noshiro/ts-utils';
 import type {
   EventScheduleBaseType,
   EventScheduleValidation,
@@ -26,13 +26,13 @@ export const validateEventSchedule = ({
   >): EventScheduleValidation => ({
   title: title !== '',
   datetimeRangeList: !datetimeRangeList.isEmpty(),
-  answerDeadline: ifthen(useAnswerDeadline, answerDeadline !== undefined),
+  answerDeadline: ifThen(useAnswerDeadline, answerDeadline !== undefined),
   answerSymbolList: answerSymbolList.size >= 2,
-  notificationEmail: ifthen(
+  notificationEmail: ifThen(
     useNotification,
     isEmailString(notificationSettings.email)
   ),
-  notificationItems: ifthen(
+  notificationItems: ifThen(
     useNotification,
     notificationSettings.notifyOnAnswerChange ||
       notificationSettings.notify01daysBeforeAnswerDeadline ||
