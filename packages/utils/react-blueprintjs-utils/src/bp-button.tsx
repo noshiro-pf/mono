@@ -1,24 +1,25 @@
-import type { ButtonProps } from '@blueprintjs/core';
 import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { CSSProperties, HTMLAttributes } from 'react';
+import type { ComponentProps, CSSProperties } from 'react';
 import { useMemo } from 'react';
 
-type Props = ButtonProps &
-  HTMLAttributes<HTMLElement> &
-  Readonly<{
-    nowrap?: boolean;
-  }>;
+type ButtonPropsOriginal = ComponentProps<typeof Button>;
 
-export const BpButton = memoNamed<Props>('BpButton', ({ nowrap, ...props }) => {
-  const style = useMemo<CSSProperties>(
-    () => ({
-      ...props.style,
-      outline: 'none',
-      whiteSpace: nowrap ?? false ? 'nowrap' : 'inherit',
-    }),
-    [props.style, nowrap]
-  );
+export type BpButtonProps = ButtonPropsOriginal &
+  Readonly<{ nowrap?: boolean }>;
 
-  return <Button {...props} style={style} />;
-});
+export const BpButton = memoNamed<BpButtonProps>(
+  'BpButton',
+  ({ nowrap, ...props }) => {
+    const style = useMemo<CSSProperties>(
+      () => ({
+        ...props.style,
+        outline: 'none',
+        whiteSpace: nowrap ?? false ? 'nowrap' : 'inherit',
+      }),
+      [props.style, nowrap]
+    );
+
+    return <Button {...props} style={style} />;
+  }
+);

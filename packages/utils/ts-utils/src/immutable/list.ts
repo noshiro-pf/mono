@@ -12,6 +12,7 @@ import type {
   uint32,
 } from '../types';
 import { assertType } from '../types';
+import { IMap } from './imap';
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
 // type FlatArrayDepth =
@@ -478,14 +479,14 @@ export namespace IList {
   >(
     list: T,
     grouper: (value: T[number], index: uint32) => G
-  ): ReadonlyMap<G, uint32> => {
-    const groups = new Map<G, number>();
+  ): IMap<G, uint32> => {
+    const groups = new Map<G, uint32>();
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index as uint32);
       const curr = groups.get(key) ?? 0;
-      groups.set(key, curr + 1);
+      groups.set(key, ((curr as number) + 1) as uint32);
     }
-    return groups as Map<G, uint32>;
+    return IMap.new(groups);
   };
 
   export const groupBy = <
@@ -494,7 +495,7 @@ export namespace IList {
   >(
     list: T,
     grouper: (value: T[number], index: uint32) => G
-  ): ReadonlyMap<G, readonly T[number][]> => {
+  ): IMap<G, readonly T[number][]> => {
     const groups = new Map<G, T[number][]>();
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index as uint32);
@@ -504,7 +505,7 @@ export namespace IList {
         groups.set(key, [e]);
       }
     }
-    return groups;
+    return IMap.new<G, readonly T[number][]>(groups);
   };
 
   /**
