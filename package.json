@@ -38,7 +38,8 @@
     "presetup:root:scripts": "yarn clean:root:scripts",
     "setup:root:scripts": "tsc --project scripts/tsconfig.json",
     "setup:sub": "yarn workspaces run setup",
-    "test:all": "yarn workspaces run test"
+    "test:all": "yarn workspaces run test",
+    "pub:all": "scripts/publish.sh"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",

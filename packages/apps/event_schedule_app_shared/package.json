@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app-shared",
-  "version": "1.0.4",
+  "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
@@ -23,10 +23,10 @@
     "gi": "yarn _script_genindex ./src  --min-depth 2",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint src/ --ext .ts",
-    "pub": "npm publish --access=public",
     "setup": "echo 'no setup script'",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "testw": "yarn test --watch",
+    "pub": "yarn publish --patch --no-git-tag-version --access=public"
   },
   "config": {
     "root_dir": "../../.."

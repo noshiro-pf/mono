@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/syncflow",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": false,
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
@@ -32,11 +32,11 @@
     "gi": "run-s gi:*",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint \"./{src,test}/**/*\" --ext .ts",
-    "pub": "npm publish --access=public",
     "setup": "echo 'no setup script'",
     "start": "node cjs/test/preview-main.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "testw": "yarn test --watch",
+    "pub": "yarn publish --patch --no-git-tag-version --access=public"
   },
   "config": {
     "root_dir": "../../.."
