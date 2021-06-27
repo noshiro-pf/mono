@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 
 function requiresQuoting(
   name: string,
-  target: ts.ScriptTarget = ts.ScriptTarget.ESNext,
+  target: ts.ScriptTarget = ts.ScriptTarget.ESNext
 ): boolean {
   if (name.length === 0) {
     return true;

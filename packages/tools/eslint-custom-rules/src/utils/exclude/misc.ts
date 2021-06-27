@@ -28,7 +28,7 @@ type Equal<T> = (a: T, b: T) => boolean;
 function arraysAreEqual<T>(
   a: T[] | undefined,
   b: T[] | undefined,
-  eq: (a: T, b: T) => boolean,
+  eq: (a: T, b: T) => boolean
 ): boolean {
   return (
     a === b ||
@@ -42,7 +42,7 @@ function arraysAreEqual<T>(
 /** Returns the first non-`undefined` result. */
 function findFirstResult<T, U>(
   inputs: T[],
-  getResult: (t: T) => U | undefined,
+  getResult: (t: T) => U | undefined
 ): U | undefined {
   for (const element of inputs) {
     const result = getResult(element);
@@ -59,7 +59,7 @@ function findFirstResult<T, U>(
 function getNameFromIndexSignature(node: TSESTree.TSIndexSignature): string {
   const propName: TSESTree.PropertyName | undefined = node.parameters.find(
     (parameter: TSESTree.Parameter): parameter is TSESTree.Identifier =>
-      parameter.type === AST_NODE_TYPES.Identifier,
+      parameter.type === AST_NODE_TYPES.Identifier
   );
   return propName ? propName.name : '(index signature)';
 }
@@ -77,7 +77,7 @@ function getNameFromMember(
     | TSESTree.TSAbstractClassProperty
     | TSESTree.Property
     | TSESTree.TSPropertySignature,
-  sourceCode: TSESLint.SourceCode,
+  sourceCode: TSESLint.SourceCode
 ): string {
   if (member.key.type === AST_NODE_TYPES.Identifier) {
     return member.key.name;
@@ -99,7 +99,7 @@ type RequireKeys<
 > = ExcludeKeys<TObj, TKeys> & { [k in TKeys]-?: Exclude<TObj[k], undefined> };
 
 function getEnumNames<T extends string>(myEnum: Record<T, unknown>): T[] {
-  return Object.keys(myEnum).filter(x => isNaN(parseInt(x))) as T[];
+  return Object.keys(myEnum).filter((x) => isNaN(parseInt(x))) as T[];
 }
 
 export {

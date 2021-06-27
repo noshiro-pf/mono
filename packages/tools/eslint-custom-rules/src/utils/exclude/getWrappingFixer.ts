@@ -31,13 +31,13 @@ interface WrappingFixerParams {
  * @returns Fixer which adds the specified code and parens if necessary.
  */
 export function getWrappingFixer(
-  params: WrappingFixerParams,
+  params: WrappingFixerParams
 ): TSESLint.ReportFixFunction {
   const { sourceCode, node, innerNode = node, wrap } = params;
   const innerNodes = Array.isArray(innerNode) ? innerNode : [innerNode];
 
   return (fixer): TSESLint.RuleFix => {
-    const innerCodes = innerNodes.map(innerNode => {
+    const innerCodes = innerNodes.map((innerNode) => {
       let code = sourceCode.getText(innerNode);
 
       // check the inner expression's precedence
@@ -135,7 +135,7 @@ function isWeakPrecedenceParent(node: TSESTree.Node): boolean {
  */
 function isMissingSemicolonBefore(
   node: TSESTree.Node,
-  sourceCode: SourceCode,
+  sourceCode: SourceCode
 ): boolean {
   for (;;) {
     const parent = node.parent!;

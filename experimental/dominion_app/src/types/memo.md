@@ -27,9 +27,9 @@ export type TXYZ = Record<IXYZ> & Readonly<IXYZ>;
  * - 引数は使いやすさのためPartial<TXYZ>より緩いPartial<IXYZ>にする．
  */
 export const XYZ = (xyz?: Partial<IXYZ>): TXYZ =>
-  Record<IXYZ>({
-    /* default values */
-  })(xyz)
+    Record<IXYZ>({
+        /* default values */
+    })(xyz)
 
 /**
  * - 生JSオブジェクトからImmutableオブジェクトの生成．
@@ -37,7 +37,7 @@ export const XYZ = (xyz?: Partial<IXYZ>): TXYZ =>
  * - ネストしている場合は
  */
 export const XYZFromJS = (xyz: Partial<IXYZJS>): TXYZ => {
-  /* processing */
+    /* processing */
 }
 
 /**
@@ -45,6 +45,6 @@ export const XYZFromJS = (xyz: Partial<IXYZJS>): TXYZ => {
  * - 配列のtoArrayなど
  */
 export const XYZToJS = (xyz: TXYZ): IXYZJS => ({
-  //
+    //
 })
 ```

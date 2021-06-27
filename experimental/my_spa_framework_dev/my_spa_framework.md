@@ -9,74 +9,82 @@
 ## sample input
 
 ```tsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from 'react';
 
 export const App = () => {
-  const [num, setNum] = useState(2);
+    const [num, setNum] = useState(2);
 
-  const suffix = useMemo(() => new Array(num).fill("!").join(""), [num]);
-  const msg = useMemo(() => `world${suffix}`, [suffix]);
+    const suffix = useMemo(() => new Array(num).fill('!').join(''), [num]);
+    const msg = useMemo(() => `world${suffix}`, [suffix]);
 
-  return (
-    <div className='App'>
-      <h1>Hello {msg}</h1>
-      <button onClick={() => setNum((x: number) => x + 1)}>{"+1"}</button>
-      <button onClick={() => setNum((x: number) => Math.max(0, x - 1))}>
-        {"-1"}
-      </button>
-    </div>
-  );
+    return (
+        <div className='App'>
+            <h1>Hello {msg}</h1>
+            <button onClick={() => setNum((x: number) => x + 1)}>{'+1'}</button>
+            <button onClick={() => setNum((x: number) => Math.max(0, x - 1))}>
+                {'-1'}
+            </button>
+        </div>
+    );
 };
 ```
 
 ```tsx
 function component<P, M>(
-  model: (props: P) => M,
-  view: (model: M) => JSX.Element
+    model: (props: P) => M,
+    view: (model: M) => JSX.Element
 ) {}
 interface Props {
-  prefix: string;
+    prefix: string;
 }
 
 export const App = component(
-  (props: Props) => {
-    const [num, setNum] = useState(2);
-    const suffix = new Array(num).fill("!").join("");
-    const msg = `${props.prefix}${suffix}`;
+    (props: Props) => {
+        const [num, setNum] = useState(2);
+        const suffix = new Array(num).fill('!').join('');
+        const msg = `${props.prefix}${suffix}`;
 
-    return { msg, setNum };
-  },
-  (model) => (
-    <div className='App'>
-      <h1>{model.msg}</h1>
-      <button onClick={() => model.setNum((x: number) => x + 1)}>{"+1"}</button>
-      <button onClick={() => model.setNum((x: number) => Math.max(0, x - 1))}>
-        {"-1"}
-      </button>
-    </div>
-  )
+        return { msg, setNum };
+    },
+    (model) => (
+        <div className='App'>
+            <h1>{model.msg}</h1>
+            <button onClick={() => model.setNum((x: number) => x + 1)}>
+                {'+1'}
+            </button>
+            <button
+                onClick={() => model.setNum((x: number) => Math.max(0, x - 1))}
+            >
+                {'-1'}
+            </button>
+        </div>
+    )
 );
 ```
 
 ```tsx
 export const App = component(
-  (prevState: State, action: Action) => {
-    /* action includes props as { type: "set-props1", value: <some-value> } */
-    /* process */
-    return nextState;
-  },
-  (state) => {
-    /* post process */
-  },
-  (model) => (
-    <div className='App'>
-      <h1>{model.msg}</h1>
-      <button onClick={() => model.setNum((x: number) => x + 1)}>{"+1"}</button>
-      <button onClick={() => model.setNum((x: number) => Math.max(0, x - 1))}>
-        {"-1"}
-      </button>
-    </div>
-  )
+    (prevState: State, action: Action) => {
+        /* action includes props as { type: "set-props1", value: <some-value> } */
+        /* process */
+        return nextState;
+    },
+    (state) => {
+        /* post process */
+    },
+    (model) => (
+        <div className='App'>
+            <h1>{model.msg}</h1>
+            <button onClick={() => model.setNum((x: number) => x + 1)}>
+                {'+1'}
+            </button>
+            <button
+                onClick={() => model.setNum((x: number) => Math.max(0, x - 1))}
+            >
+                {'-1'}
+            </button>
+        </div>
+    )
 );
 ```
 
