@@ -6,7 +6,7 @@ import type {
   DatetimeSpecificationEnumType,
   EventSchedule,
   Weight,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import type { DeepReadonly, IMapMapped } from '@noshiro/ts-utils';
 import { IList, mapNullable, pipe } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';

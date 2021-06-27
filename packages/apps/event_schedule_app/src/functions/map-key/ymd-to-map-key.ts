@@ -1,4 +1,4 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
+import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import type {
   ArrayOfLength,
   DateEnum,

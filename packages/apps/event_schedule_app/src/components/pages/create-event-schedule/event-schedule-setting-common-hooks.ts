@@ -7,12 +7,12 @@ import type {
   NotificationSettings,
   YearMonthDate,
   Ymdhm,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import {
   defaultEventSchedule,
   defaultYmdhm,
   ymdFromDate,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useStream, useStreamValue } from '@noshiro/react-syncflow-hooks';
 import {

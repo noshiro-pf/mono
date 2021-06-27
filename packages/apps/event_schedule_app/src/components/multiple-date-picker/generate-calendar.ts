@@ -1,4 +1,4 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
+import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import type { DateEnum, MonthEnum, uint32, YearEnum } from '@noshiro/ts-utils';
 import { getDay, IList, range } from '@noshiro/ts-utils';
 

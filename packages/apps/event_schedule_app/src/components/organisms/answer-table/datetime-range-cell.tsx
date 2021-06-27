@@ -1,7 +1,7 @@
 import type {
   DatetimeRange,
   DatetimeSpecificationEnumType,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants';
 import { hm2str, ymd2strWithDay } from '../../../functions';

@@ -1,6 +1,6 @@
 import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
-import type { AnswerSymbolIconId } from '@noshiro/event-schedule-app-api';
+import type { AnswerSymbolIconId } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons';

@@ -2,7 +2,7 @@ import type {
   AnswerSymbol,
   NotificationSettings,
   Ymdhm,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';

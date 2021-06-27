@@ -28,7 +28,7 @@
     "root_dir": "../../../.."
   },
   "dependencies": {
-    "@noshiro/event-schedule-app-api": "*",
+    "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/ts-utils": "*",
     "firebase-admin": "^9.4.1",
     "firebase-functions": "^3.12.0",

@@ -5,7 +5,7 @@ import type {
   AnswerSymbolPointEnumType,
   DatetimeRange,
   Weight,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { IList, IMap, IMapMapped, ituple, pipe, sum } from '@noshiro/ts-utils';
 import { answerSymbolPointConfig } from '../../../constants';
 import type { DatetimeRangeMapKey } from '../../../functions';

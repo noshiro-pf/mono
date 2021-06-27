@@ -1,5 +1,5 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-api';
-import { firestorePaths } from '@noshiro/event-schedule-app-api';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
+import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import * as admin from 'firebase-admin';
 
 export const getEventItem = async (eventId: string): Promise<EventSchedule> => {

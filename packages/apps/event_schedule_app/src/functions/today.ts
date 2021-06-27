@@ -1,4 +1,4 @@
-import type { Ymdhm } from '@noshiro/event-schedule-app-api';
+import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
 import {
   getDate,
   getHours,

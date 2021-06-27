@@ -3,7 +3,7 @@ import type {
   Answer,
   EventSchedule,
   UserName,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import {
   BpButton,
   BpInput,

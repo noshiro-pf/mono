@@ -3,7 +3,7 @@ import type {
   AnswerSymbol,
   AnswerSymbolIconId,
   AnswerSymbolPointEnumType,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { BpInput, BpNumericInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';

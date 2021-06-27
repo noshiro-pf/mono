@@ -1,4 +1,7 @@
-import type { DatetimeRange, TimeRange } from '@noshiro/event-schedule-app-api';
+import type {
+  DatetimeRange,
+  TimeRange,
+} from '@noshiro/event-schedule-app-shared';
 import type { DeepReadonly } from '@noshiro/ts-utils';
 import { texts } from '../constants';
 import { hm2str, ymd2str } from './ymdhm2str';

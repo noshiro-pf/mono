@@ -1,5 +1,5 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-api';
-import { firestorePaths } from '@noshiro/event-schedule-app-api';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
+import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { tuple } from '@noshiro/ts-utils';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';

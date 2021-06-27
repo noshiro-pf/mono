@@ -2,7 +2,7 @@ import type {
   AnswerSymbol,
   AnswerSymbolIconId,
   AnswerSymbolPointEnumType,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { IMap } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo } from 'react';

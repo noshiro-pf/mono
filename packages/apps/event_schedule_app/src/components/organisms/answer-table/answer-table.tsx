@@ -1,5 +1,5 @@
 import { HTMLTable } from '@blueprintjs/core';
-import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-api';
+import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { uint32 } from '@noshiro/ts-utils';

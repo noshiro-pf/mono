@@ -1,4 +1,4 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
+import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { IMapMapped } from '@noshiro/ts-utils';

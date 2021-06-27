@@ -1,4 +1,7 @@
-import type { DayType, YearMonthDate } from '@noshiro/event-schedule-app-api';
+import type {
+  DayType,
+  YearMonthDate,
+} from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';

@@ -1,4 +1,4 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
+import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import type { WeekDayEnum } from '@noshiro/ts-utils';
 import { getDay, newDate } from '@noshiro/ts-utils';
 

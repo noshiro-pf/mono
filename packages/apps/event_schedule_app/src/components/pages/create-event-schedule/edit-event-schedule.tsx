@@ -1,5 +1,5 @@
 import { Icon, Spinner } from '@blueprintjs/core';
-import type { EventSchedule } from '@noshiro/event-schedule-app-api';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import {
   useStream,
   useStreamEffect,

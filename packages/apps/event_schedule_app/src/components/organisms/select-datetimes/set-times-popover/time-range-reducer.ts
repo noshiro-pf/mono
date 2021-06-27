@@ -1,5 +1,8 @@
-import type { HoursMinutes, TimeRange } from '@noshiro/event-schedule-app-api';
-import { compareHm } from '@noshiro/event-schedule-app-api';
+import type {
+  HoursMinutes,
+  TimeRange,
+} from '@noshiro/event-schedule-app-shared';
+import { compareHm } from '@noshiro/event-schedule-app-shared';
 import type { ReducerType } from '@noshiro/ts-utils';
 import { IRecord, pipe } from '@noshiro/ts-utils';
 

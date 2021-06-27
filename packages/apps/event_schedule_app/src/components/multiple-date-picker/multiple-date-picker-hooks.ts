@@ -1,8 +1,11 @@
-import type { DayType, YearMonthDate } from '@noshiro/event-schedule-app-api';
+import type {
+  DayType,
+  YearMonthDate,
+} from '@noshiro/event-schedule-app-shared';
 import {
   compareYmd,
   defaultYearMonthDate,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import type {
   DeepReadonly,
   IMapMapped,

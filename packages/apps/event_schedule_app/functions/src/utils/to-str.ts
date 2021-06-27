@@ -4,7 +4,7 @@ import type {
   DatetimeSpecificationEnumType,
   HoursMinutes,
   YearMonthDate,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 
 export const pad2 = (n: number): string => n.toString().padStart(2, '0');
 

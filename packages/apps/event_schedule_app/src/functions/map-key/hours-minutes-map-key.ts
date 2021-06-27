@@ -1,5 +1,5 @@
-import type { HoursMinutes } from '@noshiro/event-schedule-app-api';
-import { fillHoursMinutes } from '@noshiro/event-schedule-app-api';
+import type { HoursMinutes } from '@noshiro/event-schedule-app-shared';
+import { fillHoursMinutes } from '@noshiro/event-schedule-app-shared';
 import type { Phantomic } from '@noshiro/ts-utils';
 
 export type HoursMinutesMapKey = Phantomic<string, 'HoursMinutesMapKey'>;

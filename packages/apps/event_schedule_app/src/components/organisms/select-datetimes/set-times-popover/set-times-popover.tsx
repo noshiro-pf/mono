@@ -2,7 +2,7 @@ import { Popover } from '@blueprintjs/core';
 import type {
   DatetimeSpecificationEnumType,
   TimeRange,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';

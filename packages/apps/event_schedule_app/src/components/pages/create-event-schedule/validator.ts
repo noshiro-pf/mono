@@ -1,7 +1,7 @@
 import type {
   EventSchedule,
   EventScheduleValidation,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import type { StrictOmit } from '@noshiro/ts-utils';
 import { ifThen, isEmailString, isEmpty } from '@noshiro/ts-utils';
 

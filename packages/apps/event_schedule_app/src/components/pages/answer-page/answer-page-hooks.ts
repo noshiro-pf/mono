@@ -2,8 +2,8 @@ import type {
   Answer,
   EventSchedule,
   UserName,
-} from '@noshiro/event-schedule-app-api';
-import { compareYmdhm } from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
+import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { useNavigator } from '@noshiro/react-router-utils';
 import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { useAlive } from '@noshiro/react-utils';

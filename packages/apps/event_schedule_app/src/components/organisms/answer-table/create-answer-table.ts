@@ -3,7 +3,7 @@ import type {
   AnswerId,
   AnswerSymbolIconId,
   DatetimeRange,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
 import type { DatetimeRangeMapKey } from '../../../functions';
 import {

@@ -1,7 +1,7 @@
 import {
   firebaseConfig,
   firestorePaths,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import './index.css';

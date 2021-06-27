@@ -2,7 +2,7 @@ import type {
   DatetimeSpecificationEnumType,
   HoursMinutes,
   TimeRange,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { BpTimePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';

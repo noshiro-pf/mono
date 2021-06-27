@@ -1,7 +1,7 @@
 import type {
   Answer,
   DatetimeSpecificationEnumType,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { datetimeRange2str, iconId2str } from './utils';
 
 export const answerDiffAsString = (

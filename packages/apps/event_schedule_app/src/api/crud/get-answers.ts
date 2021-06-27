@@ -1,10 +1,10 @@
-import type { Answer } from '@noshiro/event-schedule-app-api';
+import type { Answer } from '@noshiro/event-schedule-app-shared';
 import {
   ANSWER_KEY_CREATED_AT,
   createAnswerId,
   fillAnswer,
   firestorePaths,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { Result } from '@noshiro/ts-utils';
 import { dbEvents } from '../../initialize-firebase';
 
