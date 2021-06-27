@@ -100,10 +100,10 @@ export const AnswerTable = memoNamed<Props>(
                       <AnswerIconCell>
                         <CustomIcon iconName={iconId} />
                         {weight !== 1.0 ? (
-                          <>
+                          <WeightValue>
                             <WeightTimes>{vt.times}</WeightTimes>
-                            <WeightValue>{weight}</WeightValue>
-                          </>
+                            <div>{weight}</div>
+                          </WeightValue>
                         ) : undefined}
                       </AnswerIconCell>
                     )}
@@ -175,10 +175,12 @@ const AnswerIconCell = styled.div`
   align-items: flex-end;
 `;
 
-const WeightTimes = styled.span`
+const WeightValue = styled.span`
+  margin-left: 3px;
+  display: flex;
   font-size: x-small;
 `;
 
-const WeightValue = styled.span`
-  font-size: x-small;
+const WeightTimes = styled.span`
+  margin: 0 1px;
 `;
