@@ -1,7 +1,7 @@
 import DotenvPlugin from 'dotenv-webpack';
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import 'webpack-dev-server';
-import { rulesMakerCommon } from '../ts/webpack_config_common_maker';
+import { rulesMakerCommon } from '../ts';
 
 const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
   ...rulesMakerCommon(pathToTsconfigJson),
@@ -36,7 +36,9 @@ const rulesMaker = (pathToTsconfigJson: string): webpack.RuleSetRule[] => [
   },
 ];
 
-export const pluginsCommon: webpack.Plugin[] = [new DotenvPlugin()];
+export const pluginsCommon: webpack.WebpackPluginInstance[] = [
+  new DotenvPlugin(),
+];
 
 export const webpackConfigReactCommonMaker = (
   pathToTsconfigJson: string

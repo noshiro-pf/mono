@@ -4,5 +4,10 @@
     "sourceMap": true,
     "allowJs": true
   },
-  "include": ["../packages", "../scripts", "./"]
+  "include": [
+    "../../packages",
+    "../../scripts",
+    "../../config/**/*.ts",
+    "../../config/**/.*.ts"
+  ]
 }

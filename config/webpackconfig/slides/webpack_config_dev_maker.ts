@@ -1,14 +1,14 @@
-import webpack from 'webpack';
-import WebpackDevServer from 'webpack-dev-server';
+import type webpack from 'webpack';
+import 'webpack-dev-server';
 import { merge } from 'webpack-merge';
-import { Paths } from './paths_type';
+import type { Paths } from './paths_type';
 import { webpackConfigSlidesCommonMaker } from './webpack_config_common_maker';
 
 const devServerConfigMaker = (
   paths: Paths,
   host: string,
   port: number
-): WebpackDevServer.Configuration => ({
+): webpack.Configuration['devServer'] => ({
   open: true,
   host,
   port,
@@ -28,15 +28,15 @@ export const webpackConfigSlidesDevMaker = (
   paths: Paths,
   host: string,
   port: number,
-  bundlejsName: string,
-  copyPaths: { from: string; to: string }[]
+  bundleJsName: string,
+  copyPaths: readonly Readonly<{ from: string; to: string }>[]
 ): webpack.Configuration =>
   merge(webpackConfigSlidesCommonMaker(paths, copyPaths, true, false), {
     mode: 'development',
     output: {
       publicPath: paths.publicUrlOrPath,
       pathinfo: true,
-      filename: bundlejsName,
+      filename: bundleJsName,
     },
     devServer: devServerConfigMaker(paths, host, port),
     devtool: 'inline-source-map',

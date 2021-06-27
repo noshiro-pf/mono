@@ -1,14 +1,14 @@
 import TerserPlugin from 'terser-webpack-plugin';
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import 'webpack-dev-server';
 import { merge } from 'webpack-merge';
-import { Paths } from './paths_type';
+import type { Paths } from './paths_type';
 import { webpackConfigSlidesCommonMaker } from './webpack_config_common_maker';
 
 export const webpackConfigSlidesProdMaker = (
   paths: Paths,
-  bundlejsName: string,
-  copyPaths: { from: string; to: string }[],
+  bundleJsName: string,
+  copyPaths: readonly Readonly<{ from: string; to: string }>[],
   useBundleAnalyzer: boolean = false
 ): webpack.Configuration =>
   merge(
@@ -18,7 +18,7 @@ export const webpackConfigSlidesProdMaker = (
       output: {
         path: paths.appBuild,
         publicPath: paths.publicUrlOrPath,
-        filename: bundlejsName,
+        filename: bundleJsName,
       },
       optimization: {
         minimize: true,

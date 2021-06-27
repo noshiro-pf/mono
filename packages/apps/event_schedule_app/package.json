@@ -29,7 +29,7 @@
     "setup": "yarn setup:webpackconfig",
     "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",
     "setup:scripts": "touch ./scripts/service-account-key.json && tsc --project config/tsconfig.scripts.json",
-    "start": "webpack-dev-server --config config/webpack.dev.js",
+    "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "testw": "yarn test --watch"
   },

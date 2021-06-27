@@ -3,7 +3,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import 'webpack-dev-server';
-import { Paths } from './paths_type';
+import type { Paths } from './paths_type';
 
 const rulesMaker = (): webpack.RuleSetRule[] => [
   {
@@ -33,10 +33,10 @@ const rulesMaker = (): webpack.RuleSetRule[] => [
 
 const pluginsMaker = (
   templatePath: string,
-  copyPaths: { from: string; to: string }[],
+  copyPaths: readonly Readonly<{ from: string; to: string }>[],
   hot: boolean,
   useBundleAnalyzer: boolean
-): webpack.Plugin[] =>
+): webpack.WebpackPluginInstance[] =>
   [
     new copyWebpackPlugin({ patterns: copyPaths }),
     new HtmlWebpackPlugin({ template: templatePath }),
@@ -46,7 +46,7 @@ const pluginsMaker = (
 
 export const webpackConfigSlidesCommonMaker = (
   paths: Paths,
-  copyPaths: { from: string; to: string }[],
+  copyPaths: readonly Readonly<{ from: string; to: string }>[],
   hot: boolean,
   useBundleAnalyzer: boolean
 ): webpack.Configuration => ({
