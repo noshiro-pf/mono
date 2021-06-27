@@ -1,51 +1,51 @@
-import { useCallback, useMemo } from 'react';
-import { useFormError } from '../../../functions';
 import type {
+  Answer,
   AnswerSymbolIconId,
-  IAnswer,
-  IDatetimeRange,
-  IEventSchedule,
+  DatetimeRange,
+  EventSchedule,
   UserName,
-} from '../../../types';
-import { createIAnswerSelection } from '../../../types';
-import type { IList } from '../../../utils';
-import { IMap } from '../../../utils';
+  Weight,
+} from '@noshiro/event-schedule-app-api';
+import { createWeight } from '@noshiro/event-schedule-app-api';
+import type { DeepReadonly } from '@noshiro/ts-utils';
+import { IList, IMapMapped, IRecord, ituple, pipe } from '@noshiro/ts-utils';
+import { useCallback, useMemo } from 'react';
+import type { DatetimeRangeMapKey } from '../../../functions';
+import {
+  datetimeRangeFromMapKey,
+  datetimeRangeToMapKey,
+  useFormError,
+} from '../../../functions';
 import type { AnswerSelectionReducerAction } from './answer-selection-reducer';
 import { answerSelectionReducer } from './answer-selection-reducer';
 
-type MyAnswerHooks = Readonly<{
-  userName: UserName;
+type MyAnswerHooks = DeepReadonly<{
   showUserNameError: boolean;
   theNameIsAlreadyUsed: boolean;
   onUserNameBlur: () => void;
   onUserNameChange: (v: UserName) => void;
-  comment: string;
   onCommentChange: (v: string) => void;
-  symbolHeader: IList<
-    Readonly<{
+  symbolHeader: readonly {
+    iconId: AnswerSymbolIconId;
+    symbolDescription: string;
+    onClick: () => void;
+  }[];
+  myAnswerList: readonly {
+    datetimeRange: DatetimeRange;
+    selectedSymbol: AnswerSymbolIconId | undefined;
+    buttons: readonly {
       iconId: AnswerSymbolIconId;
       symbolDescription: string;
       onClick: () => void;
-    }>
-  >;
-  myAnswerList: IList<
-    Readonly<{
-      datetimeRange: IDatetimeRange;
-      selectedSymbol: AnswerSymbolIconId | undefined;
-      buttons: IList<
-        Readonly<{
-          iconId: AnswerSymbolIconId;
-          symbolDescription: string;
-          onClick: () => void;
-        }>
-      >;
-    }>
-  >;
+    }[];
+  }[];
+  onWeightChange: (v: Weight) => void;
+  toggleWeightSection: () => void;
 }>;
 
 const theNameIsAlreadyUsedFn = (
   userName: UserName,
-  answers: IList<IAnswer>,
+  answers: readonly Answer[],
   nameToOmit: UserName | undefined
 ): boolean =>
   userName !== undefined && userName === nameToOmit
@@ -53,17 +53,17 @@ const theNameIsAlreadyUsedFn = (
     : answers.find((a) => a.userName === userName) !== undefined;
 
 export const useMyAnswerHooks = (
-  eventSchedule: IEventSchedule,
-  answers: IList<IAnswer>,
+  eventSchedule: EventSchedule,
+  answers: readonly Answer[],
   usernameDuplicateCheckException: UserName | undefined,
-  myAnswer: IAnswer,
-  onMyAnswerChange: (answer: IAnswer) => void
+  myAnswer: Answer,
+  onMyAnswerUpdate: (updater: (answer: Answer) => Answer) => void
 ): MyAnswerHooks => {
   const onUserNameChange = useCallback(
     (userName) => {
-      onMyAnswerChange(myAnswer.set('userName', userName));
+      onMyAnswerUpdate(() => IRecord.set(myAnswer, 'userName', userName));
     },
-    [myAnswer, onMyAnswerChange]
+    [myAnswer, onMyAnswerUpdate]
   );
 
   const theNameIsAlreadyUsed: boolean = useMemo(
@@ -87,15 +87,24 @@ export const useMyAnswerHooks = (
 
   const onCommentChange = useCallback(
     (comment) => {
-      onMyAnswerChange(myAnswer.set('comment', comment));
+      onMyAnswerUpdate(() => IRecord.set(myAnswer, 'comment', comment));
     },
-    [myAnswer, onMyAnswerChange]
+    [myAnswer, onMyAnswerUpdate]
   );
 
   const answerSelectionMap = useMemo<
-    IMap<IDatetimeRange, AnswerSymbolIconId | undefined>
+    IMapMapped<
+      DatetimeRange,
+      AnswerSymbolIconId | undefined,
+      DatetimeRangeMapKey
+    >
   >(
-    () => IMap(myAnswer.selection.map((s) => [s.datetimeRange, s.iconId])),
+    () =>
+      IMapMapped.new(
+        IList.map(myAnswer.selection, (s) => ituple(s.datetimeRange, s.iconId)),
+        datetimeRangeToMapKey,
+        datetimeRangeFromMapKey
+      ),
     [myAnswer.selection]
   );
 
@@ -105,28 +114,27 @@ export const useMyAnswerHooks = (
         answerSelectionMap,
         action
       );
-      const next: IAnswer = myAnswer.set(
+      const next: Answer = IRecord.set(
+        myAnswer,
         'selection',
         nextAnswerSelectionMap
-          .map((s, d) =>
-            createIAnswerSelection({
-              datetimeRange: d,
-              iconId: s,
-            })
-          )
-          .toList()
+          .map((s, d) => ({
+            datetimeRange: d,
+            iconId: s,
+          }))
+          .toValuesArray()
       );
-      onMyAnswerChange(next);
+      onMyAnswerUpdate(() => next);
     },
-    [answerSelectionMap, myAnswer, onMyAnswerChange]
+    [answerSelectionMap, myAnswer, onMyAnswerUpdate]
   );
 
   const symbolHeader = useMemo<
-    IList<{
+    readonly Readonly<{
       iconId: AnswerSymbolIconId;
       symbolDescription: string;
       onClick: () => void;
-    }>
+    }>[]
   >(
     () =>
       eventSchedule.answerSymbolList.map((s) => ({
@@ -144,15 +152,17 @@ export const useMyAnswerHooks = (
   );
 
   const myAnswerList = useMemo<
-    IList<{
-      datetimeRange: IDatetimeRange;
-      selectedSymbol: AnswerSymbolIconId | undefined;
-      buttons: IList<{
-        iconId: AnswerSymbolIconId;
-        symbolDescription: string;
-        onClick: () => void;
-      }>;
-    }>
+    DeepReadonly<
+      {
+        datetimeRange: DatetimeRange;
+        selectedSymbol: AnswerSymbolIconId | undefined;
+        buttons: readonly {
+          iconId: AnswerSymbolIconId;
+          symbolDescription: string;
+          onClick: () => void;
+        }[];
+      }[]
+    >
   >(
     () =>
       eventSchedule.datetimeRangeList.map((d) => ({
@@ -169,15 +179,33 @@ export const useMyAnswerHooks = (
     [answerSelectionMap, dispatch, eventSchedule]
   );
 
+  const onWeightChange = useCallback(
+    (weight: Weight) => {
+      onMyAnswerUpdate(() => IRecord.set(myAnswer, 'weight', weight));
+    },
+    [myAnswer, onMyAnswerUpdate]
+  );
+
+  const toggleWeightSection = useCallback(() => {
+    onMyAnswerUpdate(
+      (ans) =>
+        pipe(ans)
+          .chain((a) => IRecord.update(a, 'useWeight', (b) => !b))
+          .chain((a) =>
+            a.useWeight ? a : IRecord.set(a, 'weight', createWeight(1))
+          ).value
+    );
+  }, [onMyAnswerUpdate]);
+
   return {
-    userName: myAnswer.userName,
     showUserNameError,
     theNameIsAlreadyUsed,
     onUserNameBlur,
     onUserNameChange: onUserNameChangeLocal,
-    comment: myAnswer.comment,
     onCommentChange,
     symbolHeader,
     myAnswerList,
+    onWeightChange,
+    toggleWeightSection,
   };
 };

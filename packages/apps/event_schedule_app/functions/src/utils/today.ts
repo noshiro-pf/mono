@@ -1,3 +1,4 @@
+import type { YearMonthDate, Ymdhm } from '@noshiro/event-schedule-app-api';
 import type {
   DateEnum,
   HoursEnum,
@@ -5,7 +6,6 @@ import type {
   MonthEnum,
   YearEnum,
 } from '@noshiro/ts-utils';
-import type { YearMonthDateType, YmdHmJsType } from '../types';
 
 export const todayDate = (): Date => {
   const japanLocaleString = new Date().toLocaleString('ja-JP', {
@@ -14,7 +14,7 @@ export const todayDate = (): Date => {
   return new Date(japanLocaleString);
 };
 
-export const today = (): YearMonthDateType => {
+export const today = (): YearMonthDate => {
   const nowDateObj = todayDate();
   return {
     year: nowDateObj.getFullYear() as YearEnum,
@@ -23,13 +23,13 @@ export const today = (): YearMonthDateType => {
   };
 };
 
-export const now = (): YmdHmJsType => {
+export const now = (): Ymdhm => {
   const nowDateObj = todayDate();
   return {
-    ymd: today(),
-    hm: {
-      hours: nowDateObj.getHours() as HoursEnum,
-      minutes: nowDateObj.getMinutes() as MinutesEnum,
-    },
+    year: nowDateObj.getFullYear() as YearEnum,
+    month: (nowDateObj.getMonth() + 1) as MonthEnum,
+    date: nowDateObj.getDate() as DateEnum,
+    hours: nowDateObj.getHours() as HoursEnum,
+    minutes: nowDateObj.getMinutes() as MinutesEnum,
   };
 };

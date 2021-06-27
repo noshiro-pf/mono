@@ -1,9 +1,9 @@
-import type { StrictOmit } from '@noshiro/ts-utils';
-import { ifThen, isEmailString } from '@noshiro/ts-utils';
 import type {
-  EventScheduleBaseType,
+  EventSchedule,
   EventScheduleValidation,
-} from '../../../types';
+} from '@noshiro/event-schedule-app-api';
+import type { StrictOmit } from '@noshiro/ts-utils';
+import { ifThen, isEmailString, isEmpty } from '@noshiro/ts-utils';
 
 export const validateEventSchedule = ({
   title,
@@ -14,10 +14,10 @@ export const validateEventSchedule = ({
   useNotification,
   notificationSettings,
 }: Readonly<{
-  answerDeadline: EventScheduleBaseType['answerDeadline'] | undefined;
+  answerDeadline: EventSchedule['answerDeadline'] | undefined;
 }> &
   StrictOmit<
-    EventScheduleBaseType,
+    EventSchedule,
     | 'answerDeadline'
     | 'customizeSymbolSettings'
     | 'datetimeSpecification'
@@ -25,9 +25,9 @@ export const validateEventSchedule = ({
     | 'timezoneOffsetMinutes'
   >): EventScheduleValidation => ({
   title: title !== '',
-  datetimeRangeList: !datetimeRangeList.isEmpty(),
+  datetimeRangeList: !isEmpty(datetimeRangeList),
   answerDeadline: ifThen(useAnswerDeadline, answerDeadline !== undefined),
-  answerSymbolList: answerSymbolList.size >= 2,
+  answerSymbolList: answerSymbolList.length >= 2,
   notificationEmail: ifThen(
     useNotification,
     isEmailString(notificationSettings.email)

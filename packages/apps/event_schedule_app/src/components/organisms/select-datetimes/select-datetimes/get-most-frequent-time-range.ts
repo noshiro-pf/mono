@@ -1,22 +1,29 @@
-import type { IDatetimeRange, ITimeRange } from '../../../../types';
-import { createIHoursMinutes, createITimeRange } from '../../../../types';
-import type { IList } from '../../../../utils';
+import type { DatetimeRange, TimeRange } from '@noshiro/event-schedule-app-api';
+import { defaultHoursMinutes } from '@noshiro/event-schedule-app-api';
+import { IList, pipe } from '@noshiro/ts-utils';
+import { timeRangeToMapKey } from '../../../../functions';
 
 export const getMostFrequentTimeRange = (
-  datetimeList: IList<IDatetimeRange>
-): ITimeRange => {
-  const startMaxFreq = datetimeList
-    .groupBy((e) => e.timeRange.start)
-    .maxBy((v) => v.count())
-    ?.get(0)?.timeRange.start;
+  datetimeList: readonly DatetimeRange[]
+): TimeRange => {
+  const startMaxFreq = pipe(datetimeList)
+    .chain((list) =>
+      IList.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.start))
+    )
+    .chain((groups) => groups.toValuesArray())
+    .chain((list) => IList.maxBy(list, (g) => g.length))
+    .chain((list) => list?.[0]?.timeRange.start).value;
 
-  const endMaxFreq = datetimeList
-    .groupBy((e) => e.timeRange.end)
-    .maxBy((v) => v.count())
-    ?.get(0)?.timeRange.end;
+  const endMaxFreq = pipe(datetimeList)
+    .chain((list) =>
+      IList.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.end))
+    )
+    .chain((groups) => groups.toValuesArray())
+    .chain((list) => IList.maxBy(list, (g) => g.length))
+    .chain((list) => list?.[0]?.timeRange.end).value;
 
-  return createITimeRange({
-    start: startMaxFreq ?? createIHoursMinutes(),
-    end: endMaxFreq ?? createIHoursMinutes(),
-  });
+  return {
+    start: startMaxFreq ?? defaultHoursMinutes,
+    end: endMaxFreq ?? defaultHoursMinutes,
+  };
 };

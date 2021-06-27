@@ -1,10 +1,10 @@
-import type { ReducerType } from '@noshiro/ts-utils';
 import type {
+  AnswerSymbol,
   AnswerSymbolIconId,
   AnswerSymbolPointEnumType,
-  IAnswerSymbol,
-} from '../../../types';
-import type { IMap } from '../../../utils';
+} from '@noshiro/event-schedule-app-api';
+import type { IMap, ReducerType } from '@noshiro/ts-utils';
+import { IRecord } from '@noshiro/ts-utils';
 
 export type SymbolListReducerAction =
   | {
@@ -18,7 +18,7 @@ export type SymbolListReducerAction =
       point: AnswerSymbolPointEnumType;
     };
 
-export type SymbolListReducerState = IMap<AnswerSymbolIconId, IAnswerSymbol>;
+export type SymbolListReducerState = IMap<AnswerSymbolIconId, AnswerSymbol>;
 
 export const symbolListReducer: ReducerType<
   SymbolListReducerState,
@@ -27,9 +27,11 @@ export const symbolListReducer: ReducerType<
   switch (action.type) {
     case 'update-description':
       return state.update(action.iconId, (e) =>
-        e.set('description', action.description)
+        IRecord.set(e, 'description', action.description)
       );
     case 'update-point':
-      return state.update(action.iconId, (e) => e.set('point', action.point));
+      return state.update(action.iconId, (e) =>
+        IRecord.set(e, 'point', action.point)
+      );
   }
 };

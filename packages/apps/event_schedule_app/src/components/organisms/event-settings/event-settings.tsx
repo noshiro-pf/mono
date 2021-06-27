@@ -1,15 +1,14 @@
+import type {
+  AnswerSymbol,
+  NotificationSettings,
+  Ymdhm,
+} from '@noshiro/event-schedule-app-api';
 import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import type {
-  IAnswerSymbol,
-  INotificationSettings,
-  IYmdHm,
-} from '../../../types';
-import type { IList } from '../../../utils';
 import { AnswerDeadlineDatepicker } from '../answer-deadline';
-import { NotificationSettings } from '../notification-settings';
+import { NotificationSettingsComponent } from '../notification-settings';
 import { SymbolSettings } from '../symbol-settings';
 import { ParagraphWithSwitch } from './paragraph-with-switch';
 
@@ -18,16 +17,16 @@ const vt = texts.eventSettingsPage.section3;
 type Props = Readonly<{
   useAnswerDeadline: boolean;
   onToggleAnswerDeadline: () => void;
-  answerDeadline: IYmdHm | undefined;
-  onAnswerDeadlineChange: (value: IYmdHm | undefined) => void;
+  answerDeadline: Ymdhm | undefined;
+  onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
   customizeSymbolSettings: boolean;
   onToggleCustomizeSymbolSettings: () => void;
-  answerSymbolList: IList<IAnswerSymbol>;
-  onAnswerSymbolListChange: (value: IList<IAnswerSymbol>) => void;
+  answerSymbolList: readonly AnswerSymbol[];
+  onAnswerSymbolListChange: (value: readonly AnswerSymbol[]) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
-  notificationSettings: INotificationSettings;
-  onNotificationSettingsChange: (value: INotificationSettings) => void;
+  notificationSettings: NotificationSettings;
+  onNotificationSettingsChange: (value: NotificationSettings) => void;
 }>;
 
 export const EventSettings = memoNamed<Props>(
@@ -83,7 +82,7 @@ export const EventSettings = memoNamed<Props>(
           show={useNotification}
           onToggle={onToggleUseNotificationLocal}
           elementToToggle={
-            <NotificationSettings
+            <NotificationSettingsComponent
               notificationSettings={notificationSettings}
               onNotificationSettingsChange={onNotificationSettingsChange}
               disabled={!useNotification}

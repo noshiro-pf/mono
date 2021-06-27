@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import type { AnswerSymbolIconId } from '../../../../types';
 import { answerSymbolIconIdsFromBp } from '../../../../types';
-import type { IList } from '../../../../utils';
 import { CircleIcon, CloseIcon, TriangleIcon } from '../../../atoms';
 
 const icons: readonly {
@@ -19,7 +18,7 @@ const icons: readonly {
 ];
 
 type Props = Readonly<{
-  iconsInUse: IList<AnswerSymbolIconId>;
+  iconsInUse: readonly AnswerSymbolIconId[];
   onIconSelect: (iconId: AnswerSymbolIconId) => void;
 }>;
 

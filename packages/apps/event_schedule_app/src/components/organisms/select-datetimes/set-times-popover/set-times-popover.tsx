@@ -1,20 +1,20 @@
 import { Popover } from '@blueprintjs/core';
+import type {
+  DatetimeSpecificationEnumType,
+  TimeRange,
+} from '@noshiro/event-schedule-app-api';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { texts } from '../../../../constants';
-import type {
-  DatetimeSpecificationEnumType,
-  ITimeRange,
-} from '../../../../types';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const vt = texts.eventSettingsPage.section2;
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
-  initialValue: ITimeRange;
-  onSetTimesSubmit: (range: ITimeRange) => void;
+  initialValue: TimeRange;
+  onSetTimesSubmit: (range: TimeRange) => void;
 }>;
 
 export const SetTimesPopover = memoNamed<Props>(
@@ -23,7 +23,7 @@ export const SetTimesPopover = memoNamed<Props>(
     const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
     const onOkClick = useCallback(
-      (range: ITimeRange) => {
+      (range: TimeRange) => {
         onSetTimesSubmit(range);
         handleClose();
       },

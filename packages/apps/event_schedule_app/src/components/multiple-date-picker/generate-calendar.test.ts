@@ -1,6 +1,3 @@
-import type { IYearMonthDate } from '../../types';
-import { createIYearMonthDate } from '../../types';
-import { IList } from '../../utils';
 import { generateCalendar } from './generate-calendar';
 
 test('generate-calendar', () => {
@@ -15,53 +12,51 @@ test('generate-calendar', () => {
    */
   const year = 2020;
   const month = 7;
-  expect(generateCalendar(year, month)).toEqual(
-    IList<IList<IYearMonthDate>>([
-      IList([
-        createIYearMonthDate({ year: 2020, month: 6, date: 28 }),
-        createIYearMonthDate({ year: 2020, month: 6, date: 29 }),
-        createIYearMonthDate({ year: 2020, month: 6, date: 30 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 1 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 2 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 3 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 4 }),
-      ]),
-      IList([
-        createIYearMonthDate({ year: 2020, month: 7, date: 5 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 6 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 7 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 8 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 9 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 10 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 11 }),
-      ]),
-      IList([
-        createIYearMonthDate({ year: 2020, month: 7, date: 12 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 13 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 14 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 15 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 16 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 17 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 18 }),
-      ]),
-      IList([
-        createIYearMonthDate({ year: 2020, month: 7, date: 19 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 20 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 21 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 22 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 23 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 24 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 25 }),
-      ]),
-      IList([
-        createIYearMonthDate({ year: 2020, month: 7, date: 26 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 27 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 28 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 29 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 30 }),
-        createIYearMonthDate({ year: 2020, month: 7, date: 31 }),
-        createIYearMonthDate({ year: 2020, month: 8, date: 1 }),
-      ]),
-    ])
-  );
+  expect(generateCalendar(year, month)).toEqual([
+    [
+      { year: 2020, month: 6, date: 28 },
+      { year: 2020, month: 6, date: 29 },
+      { year: 2020, month: 6, date: 30 },
+      { year: 2020, month: 7, date: 1 },
+      { year: 2020, month: 7, date: 2 },
+      { year: 2020, month: 7, date: 3 },
+      { year: 2020, month: 7, date: 4 },
+    ],
+    [
+      { year: 2020, month: 7, date: 5 },
+      { year: 2020, month: 7, date: 6 },
+      { year: 2020, month: 7, date: 7 },
+      { year: 2020, month: 7, date: 8 },
+      { year: 2020, month: 7, date: 9 },
+      { year: 2020, month: 7, date: 10 },
+      { year: 2020, month: 7, date: 11 },
+    ],
+    [
+      { year: 2020, month: 7, date: 12 },
+      { year: 2020, month: 7, date: 13 },
+      { year: 2020, month: 7, date: 14 },
+      { year: 2020, month: 7, date: 15 },
+      { year: 2020, month: 7, date: 16 },
+      { year: 2020, month: 7, date: 17 },
+      { year: 2020, month: 7, date: 18 },
+    ],
+    [
+      { year: 2020, month: 7, date: 19 },
+      { year: 2020, month: 7, date: 20 },
+      { year: 2020, month: 7, date: 21 },
+      { year: 2020, month: 7, date: 22 },
+      { year: 2020, month: 7, date: 23 },
+      { year: 2020, month: 7, date: 24 },
+      { year: 2020, month: 7, date: 25 },
+    ],
+    [
+      { year: 2020, month: 7, date: 26 },
+      { year: 2020, month: 7, date: 27 },
+      { year: 2020, month: 7, date: 28 },
+      { year: 2020, month: 7, date: 29 },
+      { year: 2020, month: 7, date: 30 },
+      { year: 2020, month: 7, date: 31 },
+      { year: 2020, month: 8, date: 1 },
+    ],
+  ]);
 });

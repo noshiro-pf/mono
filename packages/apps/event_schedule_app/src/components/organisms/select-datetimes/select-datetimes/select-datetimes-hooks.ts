@@ -1,40 +1,39 @@
-import { useCallback, useMemo } from 'react';
 import type {
-  IDatetimeRange,
-  IHoursMinutes,
-  ITimeRange,
-  IYearMonthDate,
-} from '../../../../types';
-import { createIDatetimeRange, createIYearMonthDate } from '../../../../types';
-import type { IList } from '../../../../utils';
+  DatetimeRange,
+  HoursMinutes,
+  TimeRange,
+  YearMonthDate,
+} from '@noshiro/event-schedule-app-api';
+import { defaultYearMonthDate } from '@noshiro/event-schedule-app-api';
+import type { DeepReadonly, uint32 } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
+import { useCallback, useMemo } from 'react';
 import { getMostFrequentTimeRange } from './get-most-frequent-time-range';
 import type { DatetimeListReducerAction } from './select-datetimes-reducer';
 import { datetimeListReducer } from './select-datetimes-reducer';
 
-type SelectDatetimesHooks = Readonly<{
-  selectedDates: IList<IYearMonthDate>;
-  onSelectedDatesChange: (v: IList<IYearMonthDate>) => void;
-  datetimeListWithHandler: IList<
-    Readonly<{
-      id: number;
-      datetimeRange: IDatetimeRange;
-      onYmdChange: (ymd: IYearMonthDate | undefined) => void;
-      onRangeStartChange: (hm: IHoursMinutes) => void;
-      onRangeEndChange: (hm: IHoursMinutes) => void;
-      onDuplicateClick: () => void;
-      onDeleteClick: () => void;
-    }>
-  >;
+type SelectDatetimesHooks = DeepReadonly<{
+  selectedDates: readonly YearMonthDate[];
+  onSelectedDatesChange: (v: readonly YearMonthDate[]) => void;
+  datetimeListWithHandler: readonly {
+    id: number;
+    datetimeRange: DatetimeRange;
+    onYmdChange: (ymd: YearMonthDate | undefined) => void;
+    onRangeStartChange: (hm: HoursMinutes) => void;
+    onRangeEndChange: (hm: HoursMinutes) => void;
+    onDuplicateClick: () => void;
+    onDeleteClick: () => void;
+  }[];
   onAddDatetimeClick: () => void;
   onConfirmDeleteAll: () => void;
-  setTimesPopoverInitialValue: ITimeRange;
-  onSetTimesPopoverSubmit: (timeRange: ITimeRange) => void;
+  setTimesPopoverInitialValue: TimeRange;
+  onSetTimesPopoverSubmit: (timeRange: TimeRange) => void;
   onSortClick: () => void;
 }>;
 
 export const useSelectDatetimesHooks = (
-  datetimeList: IList<IDatetimeRange>,
-  onDatetimeListChange: (list: IList<IDatetimeRange>) => void
+  datetimeList: readonly DatetimeRange[],
+  onDatetimeListChange: (list: readonly DatetimeRange[]) => void
 ): SelectDatetimesHooks => {
   const dispatch = useCallback(
     (action: DatetimeListReducerAction) => {
@@ -43,12 +42,12 @@ export const useSelectDatetimesHooks = (
     [datetimeList, onDatetimeListChange]
   );
 
-  const selectedDates = useMemo<IList<IYearMonthDate>>(
+  const selectedDates = useMemo<readonly YearMonthDate[]>(
     () => datetimeList.map((e) => e.ymd),
     [datetimeList]
   );
 
-  const mostFrequentTimeRange = useMemo<ITimeRange>(
+  const mostFrequentTimeRange = useMemo<TimeRange>(
     () => getMostFrequentTimeRange(datetimeList),
     [datetimeList]
   );
@@ -56,35 +55,35 @@ export const useSelectDatetimesHooks = (
   /* handlers */
 
   const onDatetimeRangeYmdChange = useCallback(
-    (index: number, ymd: IYearMonthDate) => {
+    (index: uint32, ymd: YearMonthDate) => {
       dispatch({ type: 'ymd', index, ymd: ymd });
     },
     [dispatch]
   );
 
   const onDatetimeRangeStartChange = useCallback(
-    (index: number, hm: IHoursMinutes) => {
+    (index: uint32, hm: HoursMinutes) => {
       dispatch({ type: 'start', index, hm: hm });
     },
     [dispatch]
   );
 
   const onDatetimeRangeEndChange = useCallback(
-    (index: number, hm: IHoursMinutes) => {
+    (index: uint32, hm: HoursMinutes) => {
       dispatch({ type: 'end', index, hm: hm });
     },
     [dispatch]
   );
 
   const onDeleteDatetimeClick = useCallback(
-    (index: number) => {
+    (index: uint32) => {
       dispatch({ type: 'delete', index });
     },
     [dispatch]
   );
 
   const onDuplicateDatetimeClick = useCallback(
-    (index: number) => {
+    (index: uint32) => {
       dispatch({ type: 'duplicate', index });
     },
     [dispatch]
@@ -93,10 +92,10 @@ export const useSelectDatetimesHooks = (
   const onAddDatetimeClick = useCallback(() => {
     dispatch({
       type: 'addClick',
-      datetimeRange: createIDatetimeRange({
-        ymd: createIYearMonthDate(),
+      datetimeRange: {
+        ymd: defaultYearMonthDate,
         timeRange: mostFrequentTimeRange,
-      }),
+      },
     });
   }, [mostFrequentTimeRange, dispatch]);
 
@@ -105,7 +104,7 @@ export const useSelectDatetimesHooks = (
   }, [dispatch]);
 
   const onSetTimesAtOneTimeClick = useCallback(
-    (timeRange: ITimeRange) => {
+    (timeRange: TimeRange) => {
       dispatch({ type: 'setTimeAtOneTime', timeRange });
     },
     [dispatch]
@@ -116,7 +115,7 @@ export const useSelectDatetimesHooks = (
   }, [dispatch]);
 
   const onSelectedDatesChange = useCallback(
-    (list: IList<IYearMonthDate>) => {
+    (list: readonly YearMonthDate[]) => {
       dispatch({ type: 'fromCalendar', list, mostFrequentTimeRange });
     },
     [mostFrequentTimeRange, dispatch]
@@ -126,16 +125,16 @@ export const useSelectDatetimesHooks = (
 
   const datetimeListWithHandler = useMemo(
     () =>
-      datetimeList.map((datetimeRange, index) => ({
+      IList.map(datetimeList, (datetimeRange, index) => ({
         id: index,
         datetimeRange,
-        onYmdChange: (ymd: IYearMonthDate | undefined) => {
-          onDatetimeRangeYmdChange(index, ymd ?? createIYearMonthDate());
+        onYmdChange: (ymd: YearMonthDate | undefined) => {
+          onDatetimeRangeYmdChange(index, ymd ?? defaultYearMonthDate);
         },
-        onRangeStartChange: (hm: IHoursMinutes) => {
+        onRangeStartChange: (hm: HoursMinutes) => {
           onDatetimeRangeStartChange(index, hm);
         },
-        onRangeEndChange: (hm: IHoursMinutes) => {
+        onRangeEndChange: (hm: HoursMinutes) => {
           onDatetimeRangeEndChange(index, hm);
         },
         onDuplicateClick: () => {
@@ -156,13 +155,13 @@ export const useSelectDatetimesHooks = (
   );
 
   return {
-    selectedDates: selectedDates,
-    onSelectedDatesChange: onSelectedDatesChange,
-    datetimeListWithHandler: datetimeListWithHandler,
-    onAddDatetimeClick: onAddDatetimeClick,
-    onConfirmDeleteAll: onConfirmDeleteAll,
+    selectedDates,
+    onSelectedDatesChange,
+    datetimeListWithHandler,
+    onAddDatetimeClick,
+    onConfirmDeleteAll,
     setTimesPopoverInitialValue: mostFrequentTimeRange,
     onSetTimesPopoverSubmit: onSetTimesAtOneTimeClick,
-    onSortClick: onSortClick,
+    onSortClick,
   };
 };

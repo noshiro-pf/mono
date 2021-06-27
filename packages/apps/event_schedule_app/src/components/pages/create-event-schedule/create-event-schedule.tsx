@@ -1,32 +1,31 @@
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
-import { createIEventSchedule } from '../../../types';
 import {
-  defaultAnswerDeadline,
-  defaultAnswerSymbolList,
-  defaultDatetimeRangeList,
-  defaultDatetimeSpecification,
-  defaultNotificationSettings,
-} from './default-values';
+  initialAnswerDeadline,
+  initialAnswerSymbolList,
+  initialDatetimeRangeList,
+  initialDatetimeSpecification,
+  initialNotificationSettings,
+  texts,
+} from '../../../constants';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
 const vt = texts.eventSettingsPage;
 
-const initialValues = createIEventSchedule({
+const initialValues = {
   title: '',
   notes: '',
-  datetimeSpecification: defaultDatetimeSpecification,
-  datetimeRangeList: defaultDatetimeRangeList,
+  datetimeSpecification: initialDatetimeSpecification,
+  datetimeRangeList: initialDatetimeRangeList,
   useAnswerDeadline: false,
-  answerDeadline: defaultAnswerDeadline,
+  answerDeadline: initialAnswerDeadline,
   customizeSymbolSettings: false,
-  answerSymbolList: defaultAnswerSymbolList,
+  answerSymbolList: initialAnswerSymbolList,
   useNotification: false,
-  notificationSettings: defaultNotificationSettings,
+  notificationSettings: initialNotificationSettings,
   timezoneOffsetMinutes: new Date().getTimezoneOffset(),
-});
+};
 
 export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => (
   <div>

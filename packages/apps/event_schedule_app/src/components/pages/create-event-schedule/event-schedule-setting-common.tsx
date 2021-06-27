@@ -1,8 +1,8 @@
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import type { IEventSchedule } from '../../../types';
 import { ButtonsWrapperAlignEnd, Section } from '../../molecules';
 import {
   BackToAnswerPageButton,
@@ -20,7 +20,7 @@ const vt = texts.eventSettingsPage;
 
 type Props = Readonly<{
   mode: 'create' | 'edit';
-  initialValues: IEventSchedule;
+  initialValues: EventSchedule;
 }>;
 
 export const EventScheduleSettingCommon = memoNamed<Props>(

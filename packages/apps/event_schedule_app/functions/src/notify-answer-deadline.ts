@@ -1,11 +1,12 @@
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
+import { firestorePaths } from '@noshiro/event-schedule-app-api';
+import { tuple } from '@noshiro/ts-utils';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { firestorePaths } from './constants';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
-import type { EventScheduleJsType } from './types';
-import { pad2, tuple } from './utils';
+import { pad2 } from './utils';
 
 export const notifyAnswerDeadline = async (): Promise<void> => {
   const querySnapshot = await admin
@@ -16,12 +17,17 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
     .get();
 
   const events = querySnapshot.docs.map((doc) =>
-    tuple(doc.id, doc.data() as EventScheduleJsType)
+    tuple(doc.id, doc.data() as EventSchedule)
   );
 
   await Promise.all(
     events.flatMap(([eventId, ev]) => {
       const ns = ev.notificationSettings;
+      const answerDeadline = ev.answerDeadline;
+
+      if (answerDeadline === undefined) {
+        return Promise.resolve();
+      }
 
       return (
         [
@@ -34,7 +40,7 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
       )
         .filter(
           ([flag, diff]) =>
-            flag && todayIsNDaysBeforeDeadline(diff, ev.answerDeadline.ymd)
+            flag && todayIsNDaysBeforeDeadline(diff, answerDeadline)
         )
         .map(([_, diff]) => {
           functions.logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);

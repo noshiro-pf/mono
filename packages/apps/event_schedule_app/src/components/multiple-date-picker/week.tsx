@@ -1,20 +1,18 @@
+import type { DayType, YearMonthDate } from '@noshiro/event-schedule-app-api';
 import { memoNamed } from '@noshiro/react-utils';
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
-import type { DayType, IYearMonthDate } from '../../types';
-import type { IList } from '../../utils';
 import { DatePickerDate } from './date-picker-day';
 
-type Props = Readonly<{
-  week: IList<
-    Readonly<{
-      ymd: IYearMonthDate;
-      selected: boolean;
-      disabled: boolean;
-      dayType: DayType;
-      holidayJpName: string | undefined;
-    }>
-  >;
-  onClick: (ymd: IYearMonthDate) => void;
+type Props = DeepReadonly<{
+  week: readonly {
+    ymd: YearMonthDate;
+    selected: boolean;
+    disabled: boolean;
+    dayType: DayType;
+    holidayJpName: string | undefined;
+  }[];
+  onClick: (ymd: YearMonthDate) => void;
 }>;
 
 export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {

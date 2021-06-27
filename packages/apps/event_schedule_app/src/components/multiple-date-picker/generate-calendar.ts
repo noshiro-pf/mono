@@ -1,9 +1,6 @@
-import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
-import { getDay } from '@noshiro/ts-utils';
-import type { IYearMonthDate } from '../../types';
-import { createIYearMonthDate } from '../../types';
-import type { IList } from '../../utils';
-import { IRange } from '../../utils';
+import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
+import type { DateEnum, MonthEnum, uint32, YearEnum } from '@noshiro/ts-utils';
+import { getDay, IList, range } from '@noshiro/ts-utils';
 
 /**
  * rowsize = 5
@@ -23,33 +20,36 @@ import { IRange } from '../../utils';
 export const generateCalendar = (
   year: YearEnum,
   month: MonthEnum
-): IList<IList<IYearMonthDate>> => {
+): readonly (readonly YearMonthDate[])[] => {
   const numPrevMonthDates = getDay(getFirstDateOfMonth(year, month));
   const numNextMonthDates =
     7 - getDay(getFirstDateOfMonth(year, (month + 1) as MonthEnum));
   const lastDateNumberOfPrevMonth = getLastDateNumberOfMonth(year, month - 1);
   const lastDateNumberOfThisMonth = getLastDateNumberOfMonth(year, month);
 
-  const cells1d = genYmdRangeList(
-    year,
-    (month - 1) as MonthEnum,
-    (lastDateNumberOfPrevMonth - numPrevMonthDates + 1) as DateEnum,
-    lastDateNumberOfPrevMonth
-  ).concat(
-    genYmdRangeList(year, month, 1, lastDateNumberOfThisMonth),
+  const cells1d: readonly YearMonthDate[] = IList.concat(
     genYmdRangeList(
       year,
-      (month + 1) as MonthEnum,
-      1,
-      numNextMonthDates as DateEnum
+      (month - 1) as MonthEnum,
+      (lastDateNumberOfPrevMonth - numPrevMonthDates + 1) as DateEnum,
+      lastDateNumberOfPrevMonth
+    ),
+    IList.concat(
+      genYmdRangeList(year, month, 1, lastDateNumberOfThisMonth),
+      genYmdRangeList(
+        year,
+        (month + 1) as MonthEnum,
+        1,
+        numNextMonthDates as DateEnum
+      )
     )
   );
 
   const rowSize = numWeeks(year, month);
 
-  return IRange(0, rowSize)
-    .map((i) => cells1d.slice(7 * i, 7 * (i + 1)))
-    .toList();
+  return range(0 as uint32, rowSize as uint32).map((i: number) =>
+    cells1d.slice(7 * i, 7 * (i + 1))
+  );
 };
 
 const genYmdRangeList = (
@@ -57,10 +57,12 @@ const genYmdRangeList = (
   month: MonthEnum,
   from: DateEnum,
   to: DateEnum
-): IList<IYearMonthDate> =>
-  IRange(from, to + 1)
-    .map((n) => createIYearMonthDate({ year, month, date: n as DateEnum }))
-    .toList();
+): readonly YearMonthDate[] =>
+  range(from as uint32, (to + 1) as uint32).map((n) => ({
+    year,
+    month,
+    date: n as DateEnum,
+  }));
 
 const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): Date =>
   new Date(year, month - 1, 1);

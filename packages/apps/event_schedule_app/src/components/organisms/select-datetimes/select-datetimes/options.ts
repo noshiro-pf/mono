@@ -1,10 +1,10 @@
-import type { IOptionProps } from '@blueprintjs/core';
+import type { OptionProps } from '@blueprintjs/core';
+import { datetimeSpecificationOptions } from '@noshiro/event-schedule-app-api';
 import { texts } from '../../../../constants';
-import { datetimeSpecificationOptions } from '../../../../types';
 
 const vt = texts.eventSettingsPage.section2;
 
-export const selctorOptions: IOptionProps[] = [
+export const selectorOptions: readonly OptionProps[] = [
   {
     label: vt.datetimeSpecificationOptions.noStartEndSpecified,
     value: datetimeSpecificationOptions.noStartEndSpecified,
@@ -21,4 +21,4 @@ export const selctorOptions: IOptionProps[] = [
     label: vt.datetimeSpecificationOptions.startAndEndSpecified,
     value: datetimeSpecificationOptions.startAndEndSpecified,
   },
-];
+] as const;

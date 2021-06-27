@@ -1,3 +1,19 @@
+import type {
+  AnswerSymbol,
+  DatetimeRange,
+  DatetimeSpecificationEnumType,
+  EventSchedule,
+  EventScheduleValidation,
+  NotificationSettings,
+  YearMonthDate,
+  Ymdhm,
+} from '@noshiro/event-schedule-app-api';
+import {
+  defaultEventSchedule,
+  defaultYmdhm,
+  ymdFromDate,
+} from '@noshiro/event-schedule-app-api';
+import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useStream, useStreamValue } from '@noshiro/react-syncflow-hooks';
 import {
   filter,
@@ -6,30 +22,18 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
-import { isNotUndefined, recordEntries } from '@noshiro/ts-utils';
+import { IMapMapped, isNotUndefined, recordEntries } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { fetchHolidaysJson, ymdFromDate } from '../../../functions';
-import type {
-  DatetimeSpecificationEnumType,
-  EventScheduleValidation,
-  IAnswerSymbol,
-  IDatetimeRange,
-  IEventSchedule,
-  INotificationSettings,
-  IYearMonthDate,
-  IYmdHm,
-} from '../../../types';
-import { createINotificationSettings, createIYmdHm } from '../../../types';
-import type { IList } from '../../../utils';
-import { IMap } from '../../../utils';
-import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
 import {
-  defaultAnswerDeadline,
-  defaultNotificationSettings,
-} from './default-values';
+  initialAnswerDeadline,
+  initialNotificationSettings,
+} from '../../../constants';
+import type { YmdKey } from '../../../functions';
+import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../../../functions';
+import { useToggleSectionState } from '../../organisms';
+import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
 import { useEditEventScheduleHooks } from './edit-event-schedule-hooks';
 import { normalizeEventSchedule } from './normalize-event-schedule';
-import { useToggleSectionState } from './use-toggle-section-state';
 import { validateEventSchedule, validateEventScheduleAll } from './validator';
 
 type EventScheduleSettingCommonHooks = Readonly<{
@@ -39,20 +43,20 @@ type EventScheduleSettingCommonHooks = Readonly<{
   onNotesChange: (value: string) => void;
   datetimeSpecification: DatetimeSpecificationEnumType;
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
-  datetimeRangeList: IList<IDatetimeRange>;
-  onDatetimeListChange: (list: IList<IDatetimeRange>) => void;
+  datetimeRangeList: readonly DatetimeRange[];
+  onDatetimeListChange: (list: readonly DatetimeRange[]) => void;
   useAnswerDeadline: boolean;
   onToggleAnswerDeadline: () => void;
-  answerDeadline: IYmdHm | undefined;
-  onAnswerDeadlineChange: (value: IYmdHm | undefined) => void;
+  answerDeadline: Ymdhm | undefined;
+  onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
   customizeSymbolSettings: boolean;
   onToggleCustomizeSymbolSettings: () => void;
-  answerSymbolList: IList<IAnswerSymbol>;
-  onAnswerSymbolListValueChange: (value: IList<IAnswerSymbol>) => void;
+  answerSymbolList: readonly AnswerSymbol[];
+  onAnswerSymbolListValueChange: (value: readonly AnswerSymbol[]) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
-  notificationSettings: INotificationSettings;
-  onNotificationSettingsChange: (value: INotificationSettings) => void;
+  notificationSettings: NotificationSettings;
+  onNotificationSettingsChange: (value: NotificationSettings) => void;
   eventScheduleValidation: EventScheduleValidation;
   onResetClick: () => void;
   createButtonIsEnabled: boolean;
@@ -68,11 +72,11 @@ type EventScheduleSettingCommonHooks = Readonly<{
   onEditEventClick: () => void;
   onBackToAnswerPageClick: () => void;
   hasNoChanges: boolean;
-  holidaysJpDefinition: IMap<IYearMonthDate, string>;
+  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
 export const useEventScheduleSettingCommonHooks = (
-  initialValuesInput: IEventSchedule
+  initialValuesInput: EventSchedule
 ): EventScheduleSettingCommonHooks => {
   const initialValues = useRef(initialValuesInput);
 
@@ -91,65 +95,66 @@ export const useEventScheduleSettingCommonHooks = (
     // dummy comment to control prettier
     datetimeRangeList,
     onDatetimeListChange,
-  ] = useState<IList<IDatetimeRange>>(initialValues.current.datetimeRangeList);
-
-  const [
-    useAnswerDeadline,
-    setUseAnswerDeadline,
-    onToggleAnswerDeadline,
-    answerDeadline,
-    setAnswerDeadline,
-    resetAnswerDeadline,
-  ] = useToggleSectionState<IYmdHm | undefined>(
-    initialValues.current.useAnswerDeadline,
-    initialValues.current.answerDeadline,
-    undefined,
-    defaultAnswerDeadline
+  ] = useState<readonly DatetimeRange[]>(
+    initialValues.current.datetimeRangeList
   );
 
-  const [
-    customizeSymbolSettings,
-    setCustomizeSymbolSettings,
-    onToggleCustomizeSymbolSettings,
-    answerSymbolList,
-    setAnswerSymbolList,
-    resetAnswerSymbolList,
-  ] = useToggleSectionState<IList<IAnswerSymbol>>(
-    initialValues.current.customizeSymbolSettings,
-    initialValues.current.answerSymbolList,
-    initialValues.current.answerSymbolList
-  );
+  const {
+    useThisConfig: useAnswerDeadline,
+    setUseThisConfig: setUseAnswerDeadline,
+    toggle: onToggleAnswerDeadline,
+    value: answerDeadline,
+    setValue: setAnswerDeadline,
+    resetValue: resetAnswerDeadline,
+  } = useToggleSectionState<Ymdhm | undefined>({
+    initialToggleState: initialValues.current.useAnswerDeadline,
+    defaultValue: initialValues.current.answerDeadline,
+    valueWhenTurnedOff: undefined,
+    valueWhenTurnedOn: initialAnswerDeadline,
+  });
 
-  const [
-    useNotification,
-    setUseNotification,
-    onToggleUseNotification,
-    notificationSettings,
-    setNotificationSettings,
-    resetNotificationSettings,
-  ] = useToggleSectionState<INotificationSettings>(
-    initialValues.current.useNotification,
-    initialValues.current.notificationSettings,
-    createINotificationSettings(),
-    defaultNotificationSettings
-  );
+  const {
+    useThisConfig: customizeSymbolSettings,
+    setUseThisConfig: setCustomizeSymbolSettings,
+    toggle: onToggleCustomizeSymbolSettings,
+    value: answerSymbolList,
+    setValue: setAnswerSymbolList,
+    resetValue: resetAnswerSymbolList,
+  } = useToggleSectionState<readonly AnswerSymbol[]>({
+    initialToggleState: initialValues.current.customizeSymbolSettings,
+    defaultValue: initialValues.current.answerSymbolList,
+    valueWhenTurnedOff: initialValues.current.answerSymbolList,
+  });
 
-  const newEventSchedule: IEventSchedule = useMemo(
+  const {
+    useThisConfig: useNotification,
+    setUseThisConfig: setUseNotification,
+    toggle: onToggleUseNotification,
+    value: notificationSettings,
+    setValue: setNotificationSettings,
+    resetValue: resetNotificationSettings,
+  } = useToggleSectionState<NotificationSettings>({
+    initialToggleState: initialValues.current.useNotification,
+    defaultValue: initialValues.current.notificationSettings,
+    valueWhenTurnedOff: initialNotificationSettings,
+    valueWhenTurnedOn: initialNotificationSettings,
+  });
+
+  const newEventSchedule: EventSchedule = useMemo(
     () =>
-      normalizeEventSchedule(
-        initialValues.current.withMutations((draft) => {
-          draft.set('title', title);
-          draft.set('notes', notes);
-          draft.set('datetimeSpecification', datetimeSpecification);
-          draft.set('datetimeRangeList', datetimeRangeList);
-          draft.set('useAnswerDeadline', useAnswerDeadline);
-          draft.set('answerDeadline', answerDeadline ?? createIYmdHm());
-          draft.set('customizeSymbolSettings', customizeSymbolSettings);
-          draft.set('answerSymbolList', answerSymbolList);
-          draft.set('useNotification', useNotification);
-          draft.set('notificationSettings', notificationSettings);
-        })
-      ),
+      normalizeEventSchedule({
+        title,
+        notes,
+        datetimeSpecification,
+        datetimeRangeList,
+        useAnswerDeadline,
+        answerDeadline: answerDeadline ?? defaultYmdhm,
+        customizeSymbolSettings,
+        answerSymbolList,
+        useNotification,
+        notificationSettings,
+        timezoneOffsetMinutes: defaultEventSchedule.timezoneOffsetMinutes,
+      }),
     [
       title,
       notes,
@@ -165,7 +170,7 @@ export const useEventScheduleSettingCommonHooks = (
   );
 
   const hasNoChanges = useMemo<boolean>(
-    () => initialValues.current.equals(newEventSchedule),
+    () => deepEqual(initialValues.current, newEventSchedule),
     [newEventSchedule]
   );
 
@@ -239,27 +244,30 @@ export const useEventScheduleSettingCommonHooks = (
     resetNotificationSettings,
   ]);
 
-  const holidaysJpDefinition$ = useStream<IMap<IYearMonthDate, string>>(() =>
+  const holidaysJpDefinition$ = useStream<
+    IMapMapped<YearMonthDate, string, YmdKey>
+  >(() =>
     fromPromise(fetchHolidaysJson())
       .chain(unwrapResultOk())
       .chain(filter(isNotUndefined))
       .chain(
         map((record) =>
-          IMap(
+          IMapMapped.new(
             recordEntries(record).map(([key, value]) => [
               ymdFromDate(new Date(key)),
               value,
-            ])
+            ]),
+            ymdToKey,
+            ymdFromKey
           )
         )
       )
-      .chain(withInitialValue(IMap<IYearMonthDate, string>()))
+      .chain(withInitialValue(IMapMapped.new([], ymdToKey, ymdFromKey)))
   );
 
-  const holidaysJpDefinition = useStreamValue<IMap<IYearMonthDate, string>>(
-    holidaysJpDefinition$,
-    IMap<IYearMonthDate, string>()
-  );
+  const holidaysJpDefinition = useStreamValue<
+    IMapMapped<YearMonthDate, string, YmdKey>
+  >(holidaysJpDefinition$, IMapMapped.new([], ymdToKey, ymdFromKey));
 
   return {
     title,

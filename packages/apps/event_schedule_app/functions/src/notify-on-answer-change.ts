@@ -1,3 +1,5 @@
+import type { Answer } from '@noshiro/event-schedule-app-api';
+import { compareYmdhm } from '@noshiro/event-schedule-app-api';
 import * as functions from 'firebase-functions';
 import {
   createMailBodyForAnswerDelete,
@@ -6,8 +8,6 @@ import {
 } from './create-mail-body';
 import { getEventItem } from './get-event-item';
 import { createMailOptions, sendEmail } from './setup-mailer';
-import type { AnswerJsType } from './types';
-import { compareYmdHm } from './types';
 import { now } from './utils';
 
 export const notifyOnAnswerChangeBody = async ({
@@ -18,8 +18,8 @@ export const notifyOnAnswerChangeBody = async ({
 }: Readonly<{
   eventType: 'create' | 'delete' | 'update';
   eventId: string;
-  answerItemBefore: AnswerJsType | undefined;
-  answerItemAfter: AnswerJsType | undefined;
+  answerItemBefore: Answer | undefined;
+  answerItemAfter: Answer | undefined;
 }>): Promise<void> => {
   const eventItem = await getEventItem(eventId);
 
@@ -42,7 +42,8 @@ export const notifyOnAnswerChangeBody = async ({
 
   if (
     eventItem.useAnswerDeadline &&
-    compareYmdHm(eventItem.answerDeadline, now()) <= 0
+    eventItem.answerDeadline !== undefined &&
+    compareYmdhm(eventItem.answerDeadline, now()) <= 0
   ) {
     functions.logger.log(
       'skipped because eventItem.useAnswerDeadline is true and answerDeadline overed.'

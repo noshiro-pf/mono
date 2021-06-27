@@ -1,51 +1,52 @@
+import type {
+  Answer,
+  AnswerSymbol,
+  AnswerSymbolIconId,
+  DatetimeRange,
+  DatetimeSpecificationEnumType,
+  EventSchedule,
+  Weight,
+} from '@noshiro/event-schedule-app-api';
+import type { DeepReadonly, IMapMapped } from '@noshiro/ts-utils';
+import { IList, mapNullable, pipe } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { answerTableColor } from '../../../constants';
-import type {
-  AnswerSymbolIconId,
-  DatetimeSpecificationEnumType,
-  IAnswer,
-  IAnswerSymbol,
-  IDatetimeRange,
-  IEventSchedule,
-} from '../../../types';
-import type { IList, IMap } from '../../../utils';
+import type { DatetimeRangeMapKey } from '../../../functions';
 import { createAnswerSummary, createScore } from './create-answer-summary';
 import { useAnswerTable } from './use-answer-table';
 
-type AnswerTableHooks = Readonly<{
+type AnswerTableHooks = DeepReadonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
-  answerSymbolList: IList<IAnswerSymbol>;
-  answersWithHandler: IList<
-    Readonly<{
-      id: IAnswer['id'];
-      userName: IAnswer['userName'];
-      comment: IAnswer['comment'];
-      onClick: () => void;
-    }>
-  >;
+  answerSymbolList: AnswerSymbol[];
+  answersWithHandler: {
+    id: Answer['id'];
+    userName: Answer['userName'];
+    comment: Answer['comment'];
+    weight: Answer['weight'];
+    onClick: () => void;
+  }[];
   onDatetimeSortChange: (state: 'asc' | 'desc') => void;
   onScoreSortChange: (state: 'asc' | 'desc') => void;
-
-  tableBodyValues: IList<
-    Readonly<{
-      datetimeRange: IDatetimeRange;
-      score: number;
-      answerSummaryRow: IList<number> | undefined;
-      answerTableRow: IList<AnswerSymbolIconId | undefined> | undefined;
-      style: CSSProperties;
-    }>
-  >;
+  tableBodyValues: {
+    datetimeRange: DatetimeRange;
+    score: number;
+    answerSummaryRow: number[] | undefined;
+    answerTableRow: [AnswerSymbolIconId | undefined, Weight][] | undefined;
+    style: CSSProperties;
+  }[];
 }>;
 
 export const useAnswerTableHooks = (
-  eventSchedule: IEventSchedule,
-  answers: IList<IAnswer>,
-  onAnswerClick: (answer: IAnswer) => void
+  eventSchedule: EventSchedule,
+  answers: readonly Answer[],
+  onAnswerClick: (answer: Answer) => void
 ): AnswerTableHooks => {
   const answerTable = useAnswerTable(eventSchedule, answers);
 
-  const answerSummary = useMemo<IMap<IDatetimeRange, IList<number>>>(
+  const answerSummary = useMemo<
+    IMapMapped<DatetimeRange, readonly number[], DatetimeRangeMapKey>
+  >(
     () =>
       createAnswerSummary(
         eventSchedule.datetimeRangeList,
@@ -55,30 +56,31 @@ export const useAnswerTableHooks = (
     [eventSchedule, answerTable]
   );
 
-  const scores = useMemo<IMap<IDatetimeRange, number>>(
+  const scores = useMemo<
+    IMapMapped<DatetimeRange, number, DatetimeRangeMapKey>
+  >(
     () =>
       createScore(
         eventSchedule.datetimeRangeList,
         eventSchedule.answerSymbolList,
         answerSummary,
-        answers.size
+        answerTable,
+        answers
       ),
-    [answerSummary, eventSchedule, answers.size]
+    [answerSummary, eventSchedule, answerTable, answers]
   );
 
   const answersWithHandler = useMemo<
-    IList<{
-      id: IAnswer['id'];
-      userName: IAnswer['userName'];
-      comment: IAnswer['comment'];
-      onClick: () => void;
-    }>
+    readonly (Pick<Answer, 'comment' | 'id' | 'userName' | 'weight'> & {
+      readonly onClick: () => void;
+    })[]
   >(
     () =>
       answers.map((a) => ({
         id: a.id,
         userName: a.userName,
         comment: a.comment,
+        weight: a.weight,
         onClick: () => {
           onAnswerClick(a);
         },
@@ -102,7 +104,7 @@ export const useAnswerTableHooks = (
           break;
         case 'desc':
           setDatetimeRangeListReordered(
-            eventSchedule.datetimeRangeList.reverse()
+            IList.reverse(eventSchedule.datetimeRangeList)
           );
           break;
       }
@@ -115,14 +117,17 @@ export const useAnswerTableHooks = (
       switch (state) {
         case 'asc':
           setDatetimeRangeListReordered(
-            eventSchedule.datetimeRangeList.sortBy((d) => scores.get(d) ?? 0)
+            IList.sortBy(
+              eventSchedule.datetimeRangeList,
+              (d) => scores.get(d) ?? 0
+            )
           );
           break;
         case 'desc':
           setDatetimeRangeListReordered(
-            eventSchedule.datetimeRangeList
-              .sortBy((d) => scores.get(d) ?? 0)
-              .reverse()
+            pipe(eventSchedule.datetimeRangeList)
+              .chain((list) => IList.sortBy(list, (d) => scores.get(d) ?? 0))
+              .chain(IList.reverse).value
           );
           break;
       }
@@ -131,22 +136,34 @@ export const useAnswerTableHooks = (
   );
 
   const tableBodyValues = useMemo<
-    IList<{
-      datetimeRange: IDatetimeRange;
-      score: number;
-      answerSummaryRow: IList<number> | undefined;
-      answerTableRow: IList<AnswerSymbolIconId | undefined> | undefined;
-      style: CSSProperties;
-    }>
+    DeepReadonly<
+      {
+        datetimeRange: DatetimeRange;
+        score: number;
+        answerSummaryRow: number[] | undefined;
+        answerTableRow: [AnswerSymbolIconId | undefined, Weight][] | undefined;
+        style: CSSProperties;
+      }[]
+    >
   >(
     () =>
       datetimeRangeListReordered.map((datetimeRange) => {
         const score = scores.get(datetimeRange) ?? 0;
+
+        const answerTableRow = pipe(answerTable.get(datetimeRange)).chain(
+          mapNullable((row) =>
+            IList.zip(
+              row,
+              answers.map((a) => a.weight)
+            )
+          )
+        ).value;
+
         return {
           datetimeRange,
           score,
           answerSummaryRow: answerSummary.get(datetimeRange),
-          answerTableRow: answerTable.get(datetimeRange),
+          answerTableRow,
           style: {
             backgroundColor:
               score === 1
@@ -157,15 +174,15 @@ export const useAnswerTableHooks = (
           },
         };
       }),
-    [datetimeRangeListReordered, scores, answerSummary, answerTable]
+    [datetimeRangeListReordered, scores, answerSummary, answerTable, answers]
   );
 
   return {
     datetimeSpecification: eventSchedule.datetimeSpecification,
     answerSymbolList: eventSchedule.answerSymbolList,
-    answersWithHandler: answersWithHandler,
-    tableBodyValues: tableBodyValues,
-    onDatetimeSortChange: onDatetimeSortChange,
-    onScoreSortChange: onScoreSortChange,
+    answersWithHandler,
+    tableBodyValues,
+    onDatetimeSortChange,
+    onScoreSortChange,
   };
 };

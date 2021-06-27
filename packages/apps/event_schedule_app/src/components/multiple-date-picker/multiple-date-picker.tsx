@@ -1,17 +1,18 @@
+import type { YearMonthDate } from '@noshiro/event-schedule-app-api';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import type { IYearMonthDate } from '../../types';
-import type { IList, IMap } from '../../utils';
+import type { YmdKey } from '../../functions';
 import { useMultipleDatePickerState } from './multiple-date-picker-hooks';
 import { DatepickerNav } from './navigation';
 import { Week } from './week';
 import { WeekdaysHeader } from './weekdays-header';
 
 type Props = Readonly<{
-  selectedDates: IList<IYearMonthDate>;
-  onSelectedDatesChange: (value: IList<IYearMonthDate>) => void;
-  holidaysJpDefinition?: IMap<IYearMonthDate, string>;
+  selectedDates: readonly YearMonthDate[];
+  onSelectedDatesChange: (value: readonly YearMonthDate[]) => void;
+  holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
 export const MultipleDatePicker = memoNamed<Props>(

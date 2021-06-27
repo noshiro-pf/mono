@@ -1,16 +1,16 @@
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
+import { defaultYmdhm } from '@noshiro/event-schedule-app-api';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../constants';
 import { ymdhm2strWithDay } from '../../functions';
-import type { IEventSchedule } from '../../types';
-import { createIYmdHm } from '../../types';
 import { Description } from '../atoms';
 import { AnswerPageNotes } from './answer-page-notes';
 
 const vt = texts.answerPage;
 
 type Props = Readonly<{
-  eventSchedule: IEventSchedule;
+  eventSchedule: EventSchedule;
   isExpired: boolean;
 }>;
 
@@ -30,9 +30,7 @@ export const AnswerPageEventInfo = memoNamed<Props>(
           {eventSchedule.useAnswerDeadline ? (
             <>
               <div>
-                {ymdhm2strWithDay(
-                  eventSchedule.answerDeadline ?? createIYmdHm()
-                )}
+                {ymdhm2strWithDay(eventSchedule.answerDeadline ?? defaultYmdhm)}
               </div>
               <Description
                 error={isExpired}

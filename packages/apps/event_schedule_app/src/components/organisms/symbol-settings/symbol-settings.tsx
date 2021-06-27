@@ -1,13 +1,13 @@
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
 import type {
+  AnswerSymbol,
   AnswerSymbolIconId,
   AnswerSymbolPointEnumType,
-  IAnswerSymbol,
-} from '../../../types';
-import type { IList } from '../../../utils';
-import { clog, IMap } from '../../../utils';
+} from '@noshiro/event-schedule-app-api';
+import { memoNamed } from '@noshiro/react-utils';
+import { IMap } from '@noshiro/ts-utils';
+import { useCallback, useEffect, useMemo } from 'react';
+import styled from 'styled-components';
+import { clog } from '../../../utils';
 import type {
   SymbolListReducerAction,
   SymbolListReducerState,
@@ -16,8 +16,8 @@ import { symbolListReducer } from './symbol-list-reducer';
 import { AnswerSymbolRow } from './symbol-setting-row';
 
 type Props = Readonly<{
-  answerSymbolList: IList<IAnswerSymbol>;
-  onAnswerSymbolListChange: (value: IList<IAnswerSymbol>) => void;
+  answerSymbolList: readonly AnswerSymbol[];
+  onAnswerSymbolListChange: (value: readonly AnswerSymbol[]) => void;
   disabled: boolean;
 }>;
 
@@ -25,13 +25,13 @@ export const SymbolSettings = memoNamed<Props>(
   'SymbolSettings',
   ({ answerSymbolList, onAnswerSymbolListChange, disabled }) => {
     const answerSymbolListMap = useMemo<SymbolListReducerState>(
-      () => IMap(answerSymbolList.map((e) => [e.iconId, e])),
+      () => IMap.new(answerSymbolList.map((e) => [e.iconId, e])),
       [answerSymbolList]
     );
     const dispatch = useCallback(
       (action: SymbolListReducerAction) => {
         onAnswerSymbolListChange(
-          symbolListReducer(answerSymbolListMap, action).toList()
+          symbolListReducer(answerSymbolListMap, action).toValuesArray()
         );
       },
       [answerSymbolListMap, onAnswerSymbolListChange]
@@ -59,7 +59,7 @@ export const SymbolSettings = memoNamed<Props>(
       clog('onDeleteClick', iconId); // TODO
     }, []);
 
-    const iconsInUse = useMemo<IList<AnswerSymbolIconId>>(
+    const iconsInUse = useMemo<readonly AnswerSymbolIconId[]>(
       () => answerSymbolList.map((e) => e.iconId),
       [answerSymbolList]
     );

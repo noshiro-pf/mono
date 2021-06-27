@@ -1,10 +1,10 @@
-import { firestorePaths } from '../../constants';
+import type { Answer } from '@noshiro/event-schedule-app-api';
+import { firestorePaths } from '@noshiro/event-schedule-app-api';
 import { dbEvents } from '../../initialize-firebase';
-import type { IAnswer } from '../../types';
 
 export const deleteAnswer = async (
   eventId: string,
-  answerId: IAnswer['id']
+  answerId: Answer['id']
 ): Promise<void> => {
   await dbEvents
     .doc(eventId)

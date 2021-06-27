@@ -1,11 +1,11 @@
+import type { DayType, YearMonthDate } from '@noshiro/event-schedule-app-api';
 import { memoNamed } from '@noshiro/react-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import type { DayType, IYearMonthDate } from '../../types';
 
 type Props = Readonly<{
-  ymd: IYearMonthDate;
+  ymd: YearMonthDate;
   onClick: () => void;
   selected: boolean;
   disabled: boolean;

@@ -96,17 +96,6 @@ export const answerSymbolIconIdsFromBp: AnswerSymbolIconIdFromBp[] = [
   'tick-circle',
 ];
 
-const answerSymbolIconIdsHandmade: AnswerSymbolIconHandmade[] = [
-  'handmade-circle',
-  'handmade-triangle',
-  'handmade-cross',
-];
-
-export const answerSymbolIconIdsAll: AnswerSymbolIconId[] = [
-  ...answerSymbolIconIdsHandmade,
-  ...answerSymbolIconIdsFromBp,
-];
-
 // symbol
 assertType<TypeExtends<'circle', IconName>>();
 assertType<TypeExtends<'full-circle', IconName>>();

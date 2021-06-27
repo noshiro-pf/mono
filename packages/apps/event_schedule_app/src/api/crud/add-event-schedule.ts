@@ -1,7 +1,7 @@
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
 import { dbEvents } from '../../initialize-firebase';
-import type { IEventSchedule } from '../../types';
 
-export const addEventSchedule = async (ev: IEventSchedule): Promise<string> => {
-  const docRef = await dbEvents.add(ev.toJS());
+export const addEventSchedule = async (ev: EventSchedule): Promise<string> => {
+  const docRef = await dbEvents.add(ev);
   return docRef.id;
 };

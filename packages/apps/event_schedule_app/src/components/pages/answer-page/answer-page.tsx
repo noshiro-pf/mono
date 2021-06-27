@@ -33,7 +33,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     myAnswerSectionState,
     answerSectionRef,
     myAnswer,
-    setMyAnswer: onMyAnswerChange,
+    updateMyAnswer: onMyAnswerUpdate,
     onCancel,
     onDeleteAnswer,
     onSubmitAnswer,
@@ -117,9 +117,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       <th>
                         <AlignCenter>
                           <CustomIcon iconName={s.iconId} />
-                          <span>{texts.colon}</span>
                         </AlignCenter>
                       </th>
+                      <td>{vt.point(s.point)}</td>
+                      <td>{texts.colon}</td>
                       <td>{s.description}</td>
                     </tr>
                   ))}
@@ -145,12 +146,13 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                     ? vt.myAnswer.title.create
                     : vt.myAnswer.title.update
                 }
+                onCloseClick={onCancel}
               >
                 <MyAnswer
                   eventSchedule={eventSchedule}
                   answers={answers}
                   myAnswer={myAnswer}
-                  onMyAnswerChange={onMyAnswerChange}
+                  onMyAnswerUpdate={onMyAnswerUpdate}
                   onCancel={onCancel}
                   onDeleteAnswer={onDeleteAnswer}
                   onSubmitAnswer={onSubmitAnswer}

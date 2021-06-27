@@ -1,33 +1,40 @@
+import type { HoursMinutes, TimeRange } from '@noshiro/event-schedule-app-api';
+import { compareHm } from '@noshiro/event-schedule-app-api';
 import type { ReducerType } from '@noshiro/ts-utils';
-import type { IHoursMinutes, ITimeRange } from '../../../../types';
-import { compareHm } from '../../../../types';
+import { IRecord, pipe } from '@noshiro/ts-utils';
 
 export type TimeRangeReducerAction = Readonly<{
   type: 'end' | 'start';
-  hm: IHoursMinutes;
+  hm: HoursMinutes;
 }>;
 
-export type TimeRangeReducerState = ITimeRange;
+export type TimeRangeReducerState = TimeRange;
 
 export const timeRangeReducer: ReducerType<
   TimeRangeReducerState,
   TimeRangeReducerAction
 > = (state, action) => {
   switch (action.type) {
-    case 'start':
-      return state.withMutations((draft) => {
-        const newStart = action.hm;
-        draft.set('start', newStart);
-        draft.update('end', (e) =>
-          compareHm(newStart, e) <= 0 ? e : newStart
-        );
-      });
+    case 'start': {
+      const newStart = action.hm;
+      return pipe(state)
+        .chain((r) => IRecord.set(r, 'start', newStart))
+        .chain((r) =>
+          IRecord.update(r, 'end', (e) =>
+            compareHm(newStart, e) <= 0 ? e : newStart
+          )
+        ).value;
+    }
 
-    case 'end':
-      return state.withMutations((draft) => {
-        const newEnd = action.hm;
-        draft.set('end', newEnd);
-        draft.update('start', (s) => (compareHm(s, newEnd) <= 0 ? s : newEnd));
-      });
+    case 'end': {
+      const newEnd = action.hm;
+      return pipe(state)
+        .chain((r) => IRecord.set(r, 'end', newEnd))
+        .chain((r) =>
+          IRecord.update(r, 'start', (s) =>
+            compareHm(s, newEnd) <= 0 ? s : newEnd
+          )
+        ).value;
+    }
   }
 };

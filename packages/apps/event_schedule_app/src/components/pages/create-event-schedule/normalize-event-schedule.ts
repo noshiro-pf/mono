@@ -1,22 +1,21 @@
-import type { IEventSchedule } from '../../../types';
-import { compareDatetimeRange, createIEventSchedule } from '../../../types';
+import type { EventSchedule } from '@noshiro/event-schedule-app-api';
+import { compareDatetimeRange } from '@noshiro/event-schedule-app-api';
+import { IList, pipe, uniq } from '@noshiro/ts-utils';
 
 export const normalizeEventSchedule = (
-  eventSchedule: IEventSchedule
-): IEventSchedule =>
-  createIEventSchedule({
-    title: eventSchedule.title.trim(),
-    notes: eventSchedule.notes.trim().concat('\n'),
-    datetimeSpecification: eventSchedule.datetimeSpecification,
-    datetimeRangeList: eventSchedule.datetimeRangeList
-      .toSet()
-      .toList()
-      .sort(compareDatetimeRange),
-    useAnswerDeadline: eventSchedule.useAnswerDeadline,
-    answerDeadline: eventSchedule.answerDeadline,
-    customizeSymbolSettings: eventSchedule.customizeSymbolSettings,
-    answerSymbolList: eventSchedule.answerSymbolList,
-    useNotification: eventSchedule.useNotification,
-    notificationSettings: eventSchedule.notificationSettings,
-    timezoneOffsetMinutes: eventSchedule.timezoneOffsetMinutes,
-  });
+  eventSchedule: EventSchedule
+): EventSchedule => ({
+  title: eventSchedule.title.trim(),
+  notes: eventSchedule.notes.trim().concat('\n'),
+  datetimeSpecification: eventSchedule.datetimeSpecification,
+  datetimeRangeList: pipe(eventSchedule.datetimeRangeList)
+    .chain((list) => uniq(list))
+    .chain((list) => IList.sort(list, compareDatetimeRange)).value,
+  useAnswerDeadline: eventSchedule.useAnswerDeadline,
+  answerDeadline: eventSchedule.answerDeadline,
+  customizeSymbolSettings: eventSchedule.customizeSymbolSettings,
+  answerSymbolList: eventSchedule.answerSymbolList,
+  useNotification: eventSchedule.useNotification,
+  notificationSettings: eventSchedule.notificationSettings,
+  timezoneOffsetMinutes: eventSchedule.timezoneOffsetMinutes,
+});
