@@ -41,8 +41,10 @@ export type TimerObservable = RootObservable<number, 'Timer'> & {
 
 // InitilaizedSyncChildObservable
 
-export type WithInitialValueOperatorObservable<A, I = A> =
-  InitializedSyncChildObservable<A | I, 'withInitialValue', [A]>;
+export type WithInitialValueOperatorObservable<
+  A,
+  I = A
+> = InitializedSyncChildObservable<A | I, 'withInitialValue', [A]>;
 export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
   B,
   'scan',

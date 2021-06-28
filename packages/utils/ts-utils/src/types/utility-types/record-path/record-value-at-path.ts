@@ -3,17 +3,21 @@ import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { Paths, PathsWithIndex } from './record-paths';
 
-export type RecordValueAtPath<R, Path extends Paths<R>> =
-  Path extends readonly [infer Head, ...infer Rest]
-    ? Head extends keyof R
-      ? Rest extends Paths<R[Head]>
-        ? RecordValueAtPath<R[Head], Rest>
-        : never
+export type RecordValueAtPath<
+  R,
+  Path extends Paths<R>
+> = Path extends readonly [infer Head, ...infer Rest]
+  ? Head extends keyof R
+    ? Rest extends Paths<R[Head]>
+      ? RecordValueAtPath<R[Head], Rest>
       : never
-    : R;
+    : never
+  : R;
 
-export type RecordValueAtPathWithIndex<R, Path extends PathsWithIndex<R>> =
-  RecordValueAtPathWithIndexImpl<R, Path>;
+export type RecordValueAtPathWithIndex<
+  R,
+  Path extends PathsWithIndex<R>
+> = RecordValueAtPathWithIndexImpl<R, Path>;
 
 type RecordValueAtPathWithIndexImpl<
   R,

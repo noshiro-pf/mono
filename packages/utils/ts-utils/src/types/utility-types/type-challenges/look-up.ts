@@ -1,8 +1,10 @@
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 
-export type LookUp<R extends { kind: string }, Kind extends R['kind']> =
-  R extends unknown ? (R['kind'] extends Kind ? R : never) : never;
+export type LookUp<
+  R extends { kind: string },
+  Kind extends R['kind']
+> = R extends unknown ? (R['kind'] extends Kind ? R : never) : never;
 
 type LookUp2<R extends { kind: string }, Kind extends R['kind']> = {
   [K in Kind]: R extends { kind: Kind } ? R : never;

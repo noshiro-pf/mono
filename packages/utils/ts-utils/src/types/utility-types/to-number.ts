@@ -18,12 +18,14 @@ type IsSmallNumber<S extends `${number}`> = IsSmallNumberImpl<
 type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 type Tail<T extends string> = T extends `${Digit}${infer U}` ? U : never;
 
-type IsSmallNumberImpl<S extends string, Counter extends readonly unknown[]> =
-  S extends ''
-    ? true
-    : TypeEq<Counter, readonly []> extends true
-    ? false // reached the limit
-    : IsSmallNumberImpl<Tail<S>, ReadonlyTupleTail<Counter>>;
+type IsSmallNumberImpl<
+  S extends string,
+  Counter extends readonly unknown[]
+> = S extends ''
+  ? true
+  : TypeEq<Counter, readonly []> extends true
+  ? false // reached the limit
+  : IsSmallNumberImpl<Tail<S>, ReadonlyTupleTail<Counter>>;
 
 assertType<TypeEq<ToNumber<'1000'>, 1000>>();
 assertType<TypeEq<ToNumber<'8192'>, 8192>>();

@@ -12,8 +12,10 @@ type TupleDropImpl<
   1: TupleDropImpl<N, TupleTail<T>, [TupleHead<T>, ...R]>;
 }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
 
-export type TupleSkip<N extends number, T extends readonly unknown[]> =
-  TupleDropImpl<N, T, []>;
+export type TupleSkip<
+  N extends number,
+  T extends readonly unknown[]
+> = TupleDropImpl<N, T, []>;
 
 assertType<TypeEq<TupleSkip<0, []>, []>>();
 assertType<TypeEq<TupleSkip<1, []>, []>>();
@@ -30,8 +32,10 @@ type _ReadonlyTupleSkip<
   1: _ReadonlyTupleSkip<N, ReadonlyTupleTail<T>, readonly [TupleHead<T>, ...R]>;
 }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
 
-export type ReadonlyTupleSkip<N extends number, T extends readonly unknown[]> =
-  _ReadonlyTupleSkip<N, T, readonly []>;
+export type ReadonlyTupleSkip<
+  N extends number,
+  T extends readonly unknown[]
+> = _ReadonlyTupleSkip<N, T, readonly []>;
 
 assertType<TypeEq<ReadonlyTupleSkip<0, readonly []>, readonly []>>();
 assertType<TypeEq<ReadonlyTupleSkip<1, readonly []>, readonly []>>();
