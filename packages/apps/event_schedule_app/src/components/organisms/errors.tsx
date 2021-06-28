@@ -1,4 +1,4 @@
-import type { EventScheduleValidation } from '@noshiro/event-schedule-app-api';
+import type { EventScheduleValidation } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { errorFontColor, texts } from '../../constants';

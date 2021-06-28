@@ -1,7 +1,7 @@
 import type {
   Answer,
   DatetimeSpecificationEnumType,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { answerDiffAsString } from './answer-diff';
 
 const urlPrefix = 'https://event-schedule-app.web.app/event';

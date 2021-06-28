@@ -1,5 +1,5 @@
-import type { Ymdhm } from '@noshiro/event-schedule-app-api';
-import { ymdhm2Date } from '@noshiro/event-schedule-app-api';
+import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
+import { ymdhm2Date } from '@noshiro/event-schedule-app-shared';
 import { toMidnightTimestamp } from '@noshiro/ts-utils';
 
 export const ymdhmDateDiff = (a: Ymdhm, b: Ymdhm): number => {

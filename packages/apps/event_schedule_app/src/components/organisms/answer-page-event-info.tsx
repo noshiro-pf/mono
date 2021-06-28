@@ -1,5 +1,5 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-api';
-import { defaultYmdhm } from '@noshiro/event-schedule-app-api';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
+import { defaultYmdhm } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../constants';

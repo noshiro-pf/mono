@@ -1,5 +1,5 @@
-import type { Answer } from '@noshiro/event-schedule-app-api';
-import { firestorePaths } from '@noshiro/event-schedule-app-api';
+import type { Answer } from '@noshiro/event-schedule-app-shared';
+import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { notifyAnswerDeadline } from './notify-answer-deadline';

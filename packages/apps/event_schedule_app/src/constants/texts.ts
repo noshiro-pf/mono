@@ -1,4 +1,4 @@
-import type { AnswerSymbolPointEnumType } from '@noshiro/event-schedule-app-api';
+import type { AnswerSymbolPointEnumType } from '@noshiro/event-schedule-app-shared';
 
 export const texts = {
   aboutThisApp: 'このアプリについて',

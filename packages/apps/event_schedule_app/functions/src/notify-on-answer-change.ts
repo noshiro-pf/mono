@@ -1,5 +1,5 @@
-import type { Answer } from '@noshiro/event-schedule-app-api';
-import { compareYmdhm } from '@noshiro/event-schedule-app-api';
+import type { Answer } from '@noshiro/event-schedule-app-shared';
+import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import * as functions from 'firebase-functions';
 import {
   createMailBodyForAnswerDelete,

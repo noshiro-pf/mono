@@ -1,5 +1,5 @@
 import { FormGroup } from '@blueprintjs/core';
-import type { Ymdhm } from '@noshiro/event-schedule-app-api';
+import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
 import { BpDatetimePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { answerDeadlineShortcuts, texts } from '../../../constants';

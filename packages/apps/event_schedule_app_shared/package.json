@@ -1,6 +1,6 @@
 {
-  "name": "@noshiro/event-schedule-app-api",
-  "version": "1.0.3",
+  "name": "@noshiro/event-schedule-app-shared",
+  "version": "1.0.4",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,

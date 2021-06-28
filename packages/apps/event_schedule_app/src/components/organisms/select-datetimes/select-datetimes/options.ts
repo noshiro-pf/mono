@@ -1,5 +1,5 @@
 import type { OptionProps } from '@blueprintjs/core';
-import { datetimeSpecificationOptions } from '@noshiro/event-schedule-app-api';
+import { datetimeSpecificationOptions } from '@noshiro/event-schedule-app-shared';
 import { texts } from '../../../../constants';
 
 const vt = texts.eventSettingsPage.section2;

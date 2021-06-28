@@ -3,12 +3,12 @@ import type {
   HoursMinutes,
   TimeRange,
   YearMonthDate,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import {
   compareDatetimeRange,
   defaultDatetimeRange,
   defaultTimeRange,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import type { ReducerType, uint32 } from '@noshiro/ts-utils';
 import { IList, IRecord, ISetMapped, pipe } from '@noshiro/ts-utils';
 import type { YmdKey } from '../../../../functions';

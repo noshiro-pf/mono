@@ -5,8 +5,8 @@ import type {
   EventSchedule,
   UserName,
   Weight,
-} from '@noshiro/event-schedule-app-api';
-import { createWeight } from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
+import { createWeight } from '@noshiro/event-schedule-app-shared';
 import type { DeepReadonly } from '@noshiro/ts-utils';
 import { IList, IMapMapped, IRecord, ituple, pipe } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';

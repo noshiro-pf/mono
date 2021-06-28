@@ -1,4 +1,4 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-api';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';

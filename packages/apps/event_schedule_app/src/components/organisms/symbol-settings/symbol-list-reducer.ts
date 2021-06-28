@@ -2,7 +2,7 @@ import type {
   AnswerSymbol,
   AnswerSymbolIconId,
   AnswerSymbolPointEnumType,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import type { IMap, ReducerType } from '@noshiro/ts-utils';
 import { IRecord } from '@noshiro/ts-utils';
 

@@ -1,5 +1,8 @@
-import type { DatetimeRange, TimeRange } from '@noshiro/event-schedule-app-api';
-import { defaultHoursMinutes } from '@noshiro/event-schedule-app-api';
+import type {
+  DatetimeRange,
+  TimeRange,
+} from '@noshiro/event-schedule-app-shared';
+import { defaultHoursMinutes } from '@noshiro/event-schedule-app-shared';
 import { IList, pipe } from '@noshiro/ts-utils';
 import { timeRangeToMapKey } from '../../../../functions';
 

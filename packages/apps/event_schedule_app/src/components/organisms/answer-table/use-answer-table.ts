@@ -5,7 +5,7 @@ import type {
   AnswerTableCellPosition,
   DatetimeRange,
   EventSchedule,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type {

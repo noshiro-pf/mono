@@ -1,5 +1,5 @@
-import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-api';
-import { defaultAnswer } from '@noshiro/event-schedule-app-api';
+import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
+import { defaultAnswer } from '@noshiro/event-schedule-app-shared';
 import {
   useStream,
   useStreamValue,

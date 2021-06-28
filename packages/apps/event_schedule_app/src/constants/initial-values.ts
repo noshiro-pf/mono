@@ -4,12 +4,12 @@ import type {
   DatetimeSpecificationEnumType,
   NotificationSettings,
   Ymdhm,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import {
   defaultAnswerDeadlineRemainingDays,
   defaultNotificationSettings,
   ymdhmFromDate,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import type { DateEnum } from '@noshiro/ts-utils';
 import {
   getDate,

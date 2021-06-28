@@ -2,7 +2,7 @@ import type {
   Answer,
   AnswerSymbolIconId,
   AnswerTableCellPosition,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { IList, IMapMapped } from '@noshiro/ts-utils';
 import type { AnswerSelectionMapKey } from '../../../functions';
 import {

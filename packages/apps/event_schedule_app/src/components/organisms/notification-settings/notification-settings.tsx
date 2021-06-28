@@ -1,7 +1,7 @@
 import type {
   NotificationSettings,
   Ymdhm,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { BpCheckbox, BpEmailInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';

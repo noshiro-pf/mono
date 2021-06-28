@@ -1,5 +1,5 @@
-import type { DatetimeRange } from '@noshiro/event-schedule-app-api';
-import { fillDatetimeRange } from '@noshiro/event-schedule-app-api';
+import type { DatetimeRange } from '@noshiro/event-schedule-app-shared';
+import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
 import type { Phantomic } from '@noshiro/ts-utils';
 
 export type DatetimeRangeMapKey = Phantomic<string, 'DatetimeRangeMapKey'>;

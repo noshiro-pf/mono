@@ -2,7 +2,7 @@ import type {
   HoursMinutes,
   YearMonthDate,
   Ymdhm,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { texts } from '../constants';
 import { pad2 } from '../utils';
 import { ymd2day } from './ymd2day';

@@ -1,9 +1,9 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-api';
-import { firestorePaths } from '@noshiro/event-schedule-app-api';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
+import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 // eslint-disable-next-line import/no-internal-modules
-import type { EventSchedule as EventScheduleV1 } from '@noshiro/event-schedule-app-api/esm/v1';
+import type { EventSchedule as EventScheduleV1 } from '@noshiro/event-schedule-app-shared/esm/v1';
 // eslint-disable-next-line import/no-internal-modules
-import { firestorePaths as firestorePathsV1 } from '@noshiro/event-schedule-app-api/esm/v1';
+import { firestorePaths as firestorePathsV1 } from '@noshiro/event-schedule-app-shared/esm/v1';
 import * as admin from 'firebase-admin';
 import serviceAccount from './service-account-key.json';
 

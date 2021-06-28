@@ -1,4 +1,4 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-api';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { dbEvents } from '../../initialize-firebase';
 
 export const updateEventSchedule = async (

@@ -2,7 +2,7 @@ import type {
   DatetimeRange,
   DatetimeSpecificationEnumType,
   YearMonthDate,
-} from '@noshiro/event-schedule-app-api';
+} from '@noshiro/event-schedule-app-shared';
 import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { IMapMapped } from '@noshiro/ts-utils';
