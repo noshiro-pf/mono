@@ -1,6 +1,5 @@
-import { Configuration, RuleSetRule } from 'webpack';
+import type { Configuration, RuleSetRule } from 'webpack';
 import 'webpack-dev-server';
-// import { absolutePathFromMonoRoot } from '../../scripts/get_mono_root_path';
 
 export const rulesMakerCommon = (pathToTsconfigJson: string): RuleSetRule[] => [
   {

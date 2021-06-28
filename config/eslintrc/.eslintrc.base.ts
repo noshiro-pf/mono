@@ -1,9 +1,11 @@
 import type { Linter } from 'eslint';
 import { readGitignoreFiles } from 'eslint-gitignore';
-import { eslintImportsRules } from './eslintrc-base/eslint-import-rules';
-import { eslintNoshiroCustomRules } from './eslintrc-base/eslint-noshiro-custom';
-import { eslintRules } from './eslintrc-base/eslint-rules';
-import { typescriptEslintRules } from './eslintrc-base/typescript-eslint-rules';
+import {
+  eslintImportsRules,
+  eslintNoshiroCustomRules,
+  eslintRules,
+  typescriptEslintRules,
+} from './eslintrc-base';
 
 /**
  *  links
@@ -43,7 +45,7 @@ const config: Linter.Config = {
     // 'plugin:total-functions/recommended',
 
     /* prettier */
-    'plugin:prettier/recommended', // turn off rules
+    'prettier', // turn off rules
   ],
   root: true,
   env: { browser: true, node: true, es6: true },
@@ -59,7 +61,7 @@ const config: Linter.Config = {
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
-    project: './config/tsconfig.eslint.json',
+    project: './config/tsconfig/tsconfig.eslint.json',
   },
   rules: {
     ...eslintRules.additionalRulesNotIncludedInRecommended.possibleErrors,

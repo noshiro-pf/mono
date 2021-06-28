@@ -1,16 +1,16 @@
 import CompressionPlugin from 'compression-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import 'webpack-dev-server';
 import { merge } from 'webpack-merge';
-import { Paths } from './paths_type';
+import type { Paths } from './paths_type';
 import {
   pluginsCommon,
   webpackConfigReactCommonMaker,
 } from './webpack_config_common_maker';
 
-const plugins: webpack.Plugin[] = [
+const plugins: webpack.WebpackPluginInstance[] = [
   ...pluginsCommon,
   new CompressionPlugin({
     test: /\.(css)|(js)$/u,
@@ -22,7 +22,7 @@ const plugins: webpack.Plugin[] = [
 
 export const webpackConfigReactProdMaker = (
   paths: Paths,
-  bundlejsName: string,
+  bundleJsName: string,
   useBundleAnalyzer: boolean = false
 ): webpack.Configuration =>
   merge(webpackConfigReactCommonMaker(paths.tsconfigJson), {
@@ -31,7 +31,7 @@ export const webpackConfigReactProdMaker = (
     output: {
       path: paths.appBuild,
       publicPath: paths.publicUrlOrPath,
-      filename: bundlejsName,
+      filename: bundleJsName,
     },
     optimization: {
       minimize: true,

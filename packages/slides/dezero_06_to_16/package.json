@@ -17,7 +17,7 @@
     "lint:fix": "yarn lint --fix",
     "setup": "yarn setup:webpackconfig",
     "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",
-    "start": "webpack-dev-server --config config/webpack.dev.js",
+    "start": "webpack serve --config config/webpack.dev.js",
     "test": "echo 'no test script'",
     "watch": "webpack --watch"
   },
