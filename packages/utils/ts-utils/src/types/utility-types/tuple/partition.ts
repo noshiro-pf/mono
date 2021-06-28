@@ -21,8 +21,10 @@ type TuplePartitionImpl<
   ? 1
   : 2];
 
-export type TuplePartition<N extends number, T extends readonly unknown[]> =
-  TuplePartitionImpl<N, T, [], []>;
+export type TuplePartition<
+  N extends number,
+  T extends readonly unknown[]
+> = TuplePartitionImpl<N, T, [], []>;
 
 assertType<TypeEq<TuplePartition<1, []>, []>>();
 assertType<TypeEq<TuplePartition<2, [1, 2, 3]>, [[1, 2], [3]]>>();

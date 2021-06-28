@@ -19,8 +19,11 @@ type TupleSetImpl<
   ? 'setValue'
   : 'next'];
 
-export type TupleSet<T extends readonly unknown[], I extends number, V> =
-  TupleSetImpl<T, I, V, []>;
+export type TupleSet<
+  T extends readonly unknown[],
+  I extends number,
+  V
+> = TupleSetImpl<T, I, V, []>;
 
 assertType<TypeEq<TupleSet<[], 2, 999>, []>>();
 assertType<TypeEq<TupleSet<[1, 2], 2, 999>, [1, 2]>>();

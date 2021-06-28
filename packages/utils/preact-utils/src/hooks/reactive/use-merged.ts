@@ -12,8 +12,9 @@ export function useMerged<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
   value8?: T8 | undefined,
   value9?: T9 | undefined
 ): T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 {
-  const [merged, set] =
-    useState<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>(init);
+  const [merged, set] = useState<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>(
+    init
+  );
   useEffect(() => {
     if (value1 !== undefined) set(value1);
   }, [value1]);

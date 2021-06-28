@@ -6,8 +6,9 @@ export const useCanvasContext2d = (): [
   Ref<HTMLCanvasElement>
 ] => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [ctx, setCtx] =
-    useState<CanvasRenderingContext2D | undefined>(undefined);
+  const [ctx, setCtx] = useState<CanvasRenderingContext2D | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const canvasEl = canvasRef.current;

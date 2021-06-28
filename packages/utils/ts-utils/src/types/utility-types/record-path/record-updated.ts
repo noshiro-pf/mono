@@ -6,14 +6,17 @@ import { assertType } from '../test-type';
 import type { ReadonlyTupleSet } from '../tuple';
 import type { Paths } from './record-paths';
 
-export type RecordUpdated<R, Path extends Paths<R>, ValueAfter> =
-  Path extends readonly []
-    ? ValueAfter
-    : R extends readonly unknown[]
-    ? RecordUpdatedImplTupleCase<R, Path, ValueAfter>
-    : R extends ReadonlyRecordBase
-    ? RecordUpdatedImplRecordCase<R, Path, ValueAfter>
-    : R;
+export type RecordUpdated<
+  R,
+  Path extends Paths<R>,
+  ValueAfter
+> = Path extends readonly []
+  ? ValueAfter
+  : R extends readonly unknown[]
+  ? RecordUpdatedImplTupleCase<R, Path, ValueAfter>
+  : R extends ReadonlyRecordBase
+  ? RecordUpdatedImplRecordCase<R, Path, ValueAfter>
+  : R;
 
 type RecordUpdatedImplRecordCase<
   R extends ReadonlyRecordBase,

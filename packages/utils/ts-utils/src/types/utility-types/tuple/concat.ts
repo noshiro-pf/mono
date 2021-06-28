@@ -14,8 +14,10 @@ type TupleConcatImpl<
   2: TupleConcatImpl<A, TupleTail<B>, [TupleHead<B>, ...R]>;
 }[A extends readonly [] ? (B extends readonly [] ? 0 : 2) : 1];
 
-export type TupleConcat<A extends unknown[], B extends unknown[]> =
-  TupleConcatImpl<A, B, []>;
+export type TupleConcat<
+  A extends unknown[],
+  B extends unknown[]
+> = TupleConcatImpl<A, B, []>;
 
 assertType<TypeEq<TupleConcat<[], []>, []>>();
 assertType<TypeEq<TupleConcat<[1, 2], []>, [1, 2]>>();

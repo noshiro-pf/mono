@@ -2,8 +2,10 @@ import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ReadonlyTuplePartition, TuplePartition } from '../tuple';
 
-export type ListPartition<N extends number, T extends readonly unknown[]> =
-  TuplePartition<N, T>;
+export type ListPartition<
+  N extends number,
+  T extends readonly unknown[]
+> = TuplePartition<N, T>;
 
 assertType<TypeEq<ListPartition<1, []>, []>>();
 assertType<TypeEq<ListPartition<2, [1, 2, 3]>, [[1, 2], [3]]>>();
