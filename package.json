@@ -23,6 +23,7 @@
     "create:util": "scripts/create_new_util.sh",
     "gi:all": "yarn workspaces run gi",
     "fmt:all": "prettier --write . > /dev/null",
+    "fmt:all:print": "prettier --write .",
     "lint:all": "yarn workspaces run lint",
     "lint:apps": "scripts/lint_apps.sh",
     "lint:utils": "scripts/lint_utils.sh",
