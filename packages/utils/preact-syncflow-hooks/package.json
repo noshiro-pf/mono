@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/preact-syncflow-hooks",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
@@ -20,7 +20,8 @@
     "lint:fix": "yarn lint --fix",
     "setup": "echo 'no setup script'",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "testw": "yarn test --watch",
+    "pub": "yarn publish --patch --no-git-tag-version --access=public"
   },
   "config": {
     "root_dir": "../../.."

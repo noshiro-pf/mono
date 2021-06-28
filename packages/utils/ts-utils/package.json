@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/ts-utils",
-  "version": "1.0.6",
+  "version": "1.0.17",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
@@ -25,11 +25,11 @@
     "gi": "yarn _script_genindex ./src",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint src/ --ext .ts",
-    "pub": "npm publish --access=public",
     "setup:genpipetypedef_script": "tsc --project scripts/tsconfig.json",
     "setup": "run-s setup:*",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "testw": "yarn test --watch",
+    "pub": "yarn publish --patch --no-git-tag-version --access=public"
   },
   "config": {
     "pipe_max_length": 12,
