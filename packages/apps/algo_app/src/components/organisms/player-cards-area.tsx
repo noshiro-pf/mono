@@ -60,10 +60,9 @@ export const PlayerCardsArea = memoNamed(
     const cardsWithConfig = useMemo<
       ReadonlyArrayOfLength<
         6,
-        CardWithDisplayValue &
-          Readonly<{
-            onBoundingClientRectChange: (rect: Rect) => void;
-          }>
+        CardWithDisplayValue & {
+          readonly onBoundingClientRectChange: (rect: Rect) => void;
+        }
       >
     >(
       () =>
