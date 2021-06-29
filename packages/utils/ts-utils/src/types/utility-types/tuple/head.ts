@@ -1,8 +1,10 @@
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 
-export type TupleHead<T extends readonly unknown[], D = never> =
-  T extends readonly [infer X, ...(readonly unknown[])] ? X : D;
+export type TupleHead<
+  T extends readonly unknown[],
+  D = never
+> = T extends readonly [infer X, ...(readonly unknown[])] ? X : D;
 
 assertType<TypeEq<TupleHead<[]>, never>>();
 assertType<TypeEq<TupleHead<[1]>, 1>>();

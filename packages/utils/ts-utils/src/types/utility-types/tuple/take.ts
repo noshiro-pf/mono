@@ -13,8 +13,10 @@ type TupleTakeImpl<
   1: TupleTakeImpl<N, TupleTail<T>, [TupleHead<T>, ...R]>;
 }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
 
-export type TupleTake<N extends number, T extends readonly unknown[]> =
-  TupleTakeImpl<N, T, []>;
+export type TupleTake<
+  N extends number,
+  T extends readonly unknown[]
+> = TupleTakeImpl<N, T, []>;
 
 assertType<TypeEq<TupleTake<2, []>, []>>();
 assertType<TypeEq<TupleTake<2, [1, 2]>, [1, 2]>>();
@@ -34,8 +36,10 @@ type ReadonlyTupleTakeImpl<
   >;
 }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
 
-export type ReadonlyTupleTake<N extends number, T extends readonly unknown[]> =
-  ReadonlyTupleTakeImpl<N, T, readonly []>;
+export type ReadonlyTupleTake<
+  N extends number,
+  T extends readonly unknown[]
+> = ReadonlyTupleTakeImpl<N, T, readonly []>;
 
 assertType<TypeEq<ReadonlyTupleTake<2, readonly []>, readonly []>>();
 assertType<TypeEq<ReadonlyTupleTake<2, readonly [1, 2]>, readonly [1, 2]>>();
