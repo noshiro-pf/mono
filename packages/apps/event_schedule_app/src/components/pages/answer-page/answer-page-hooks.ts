@@ -4,6 +4,7 @@ import type {
   UserName,
 } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
+import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useNavigator } from '@noshiro/react-router-utils';
 import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { useAlive } from '@noshiro/react-utils';
@@ -23,7 +24,7 @@ import {
 import { routePaths, useEventId } from '../../../routing';
 import { useFetchEventStreams } from './use-fetch-event-stream';
 import { useFetchResults } from './use-fetch-results';
-import { useMyAnswer } from './use-my-answer';
+import { useAnswerForEditingState } from './use-my-answer';
 import { useRefreshButtonState } from './use-refresh-button-state';
 
 type AnswerPageState = DeepReadonly<{
@@ -36,11 +37,11 @@ type AnswerPageState = DeepReadonly<{
     | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
     | undefined;
   onAnswerClick: (answer: Answer) => void;
-  showMyAnswerSection: () => void;
+  onAddAnswerButtonClick: () => void;
   myAnswerSectionState: 'creating' | 'editing' | 'hidden';
   answerSectionRef: RefObject<HTMLDivElement>;
-  myAnswer: Answer;
-  updateMyAnswer: (updater: (answer: Answer) => Answer) => void;
+  answerForEditing: Answer;
+  updateAnswerForEditing: (updater: (answer: Answer) => Answer) => void;
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
   onSubmitAnswer: () => Promise<void>;
@@ -50,7 +51,7 @@ type AnswerPageState = DeepReadonly<{
   refreshButtonIsLoading: boolean;
   refreshButtonIsDisabled: boolean;
   isExpired: boolean;
-  usernameDuplicateCheckException: UserName | undefined;
+  selectedAnswerUserName: UserName | undefined;
 }>;
 
 const toast = createToaster();
@@ -74,24 +75,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     setMyAnswerSectionState,
   ] = useState<'creating' | 'editing' | 'hidden'>('hidden');
 
-  const [
-    //
-    submitButtonIsLoading,
-    setSubmitButtonIsLoading,
-  ] = useState<boolean>(false);
-
-  const { myAnswer, updateMyAnswer, resetMyAnswer } =
-    useMyAnswer(eventSchedule$);
-
-  const [usernameDuplicateCheckException, setUsernameDuplicateCheckException] =
-    useState<UserName | undefined>(undefined);
-
   const answerSectionRef = useRef<HTMLDivElement>(null);
-
-  const showMyAnswerSection = useCallback(() => {
-    setUsernameDuplicateCheckException(undefined);
-    setMyAnswerSectionState('creating');
-  }, []);
 
   useEffect(() => {
     switch (myAnswerSectionState) {
@@ -104,13 +88,48 @@ export const useAnswerPageState = (): AnswerPageState => {
     }
   }, [myAnswerSectionState]);
 
+  const [
+    //
+    submitButtonIsLoading,
+    setSubmitButtonIsLoading,
+  ] = useState<boolean>(false);
+
+  const { answerForEditing, updateAnswerForEditing, resetAnswerForEditing } =
+    useAnswerForEditingState(eventSchedule$);
+
+  const [
+    //
+    selectedAnswer,
+    setSelectedAnswer,
+  ] = useState<Answer | undefined>(undefined);
+
+  const onAnswerClick = useCallback(
+    (answer: Answer) => {
+      setMyAnswerSectionState('editing');
+      updateAnswerForEditing(() => answer);
+      setSelectedAnswer(answer);
+    },
+    [updateAnswerForEditing]
+  );
+
+  const clearMyAnswerFields = useCallback(() => {
+    resetAnswerForEditing();
+    setSelectedAnswer(undefined);
+  }, [resetAnswerForEditing]);
+
+  const onAddAnswerButtonClick = useCallback(() => {
+    clearMyAnswerFields();
+    setMyAnswerSectionState('creating');
+  }, [clearMyAnswerFields]);
+
   const eventSchedule = useStreamValue(eventSchedule$);
   const answers = useStreamValue(answers$);
 
   const submitButtonIsDisabled = useMemo<boolean>(() => {
     if (eventSchedule === undefined) return true;
+
     const myAnswerAsMap = IMapMapped.new(
-      myAnswer.selection.map(({ datetimeRange, iconId }) => [
+      answerForEditing.selection.map(({ datetimeRange, iconId }) => [
         datetimeRange,
         iconId,
       ]),
@@ -118,20 +137,21 @@ export const useAnswerPageState = (): AnswerPageState => {
       datetimeRangeFromMapKey
     );
 
-    return (
-      myAnswer.userName === '' ||
+    const hasEmptyElement =
+      answerForEditing.userName === '' ||
       eventSchedule.datetimeRangeList.some(
         (d) => myAnswerAsMap.get(d) === undefined
-      )
-    );
-  }, [myAnswer, eventSchedule]);
+      );
+
+    const noDiff = deepEqual(selectedAnswer, answerForEditing);
+
+    return hasEmptyElement || noDiff;
+  }, [answerForEditing, selectedAnswer, eventSchedule]);
 
   const onCancel = useCallback(() => {
-    if (myAnswerSectionState === 'editing') {
-      resetMyAnswer();
-    }
+    clearMyAnswerFields();
     setMyAnswerSectionState('hidden');
-  }, [myAnswerSectionState, resetMyAnswer]);
+  }, [clearMyAnswerFields]);
 
   const alive = useAlive();
   const onSubmitAnswer = useCallback(async () => {
@@ -141,13 +161,13 @@ export const useAnswerPageState = (): AnswerPageState => {
     switch (myAnswerSectionState) {
       case 'creating':
         await api.answers
-          .add(eventId, IRecord.set(myAnswer, 'createdAt', Date.now()))
+          .add(eventId, IRecord.set(answerForEditing, 'createdAt', Date.now()))
           .then(() => {
             if (!alive) return;
             setSubmitButtonIsLoading(false);
             setMyAnswerSectionState('hidden');
             fetchAnswers();
-            resetMyAnswer();
+            clearMyAnswerFields();
             showToast({
               toast,
               message:
@@ -160,13 +180,13 @@ export const useAnswerPageState = (): AnswerPageState => {
         break;
       case 'editing':
         await api.answers
-          .update(eventId, myAnswer.id, myAnswer)
+          .update(eventId, answerForEditing.id, answerForEditing)
           .then(() => {
             if (!alive) return;
             setSubmitButtonIsLoading(false);
             setMyAnswerSectionState('hidden');
             fetchAnswers();
-            resetMyAnswer();
+            clearMyAnswerFields();
             showToast({
               toast,
               message:
@@ -181,12 +201,12 @@ export const useAnswerPageState = (): AnswerPageState => {
         break;
     }
   }, [
-    myAnswer,
+    answerForEditing,
     myAnswerSectionState,
     eventId,
     alive,
     fetchAnswers,
-    resetMyAnswer,
+    clearMyAnswerFields,
   ]);
 
   const onDeleteAnswer = useCallback(async (): Promise<void> => {
@@ -194,25 +214,16 @@ export const useAnswerPageState = (): AnswerPageState => {
     if (!alive) return;
     setSubmitButtonIsLoading(true);
     await api.answers
-      .delete(eventId, myAnswer.id)
+      .delete(eventId, answerForEditing.id)
       .then(() => {
         if (!alive) return;
         setSubmitButtonIsLoading(false);
         setMyAnswerSectionState('hidden');
         fetchAnswers();
-        resetMyAnswer();
+        clearMyAnswerFields();
       })
       .catch(console.error);
-  }, [myAnswer.id, eventId, alive, fetchAnswers, resetMyAnswer]);
-
-  const onAnswerClick = useCallback(
-    (answer: Answer) => {
-      setMyAnswerSectionState('editing');
-      updateMyAnswer(() => answer);
-      setUsernameDuplicateCheckException(answer.userName);
-    },
-    [updateMyAnswer]
-  );
+  }, [answerForEditing.id, eventId, alive, fetchAnswers, clearMyAnswerFields]);
 
   const { refreshButtonIsLoading, refreshButtonIsDisabled } =
     useRefreshButtonState(fetchAnswersThrottled$, answersResultTimestamp$);
@@ -242,11 +253,11 @@ export const useAnswerPageState = (): AnswerPageState => {
     answers,
     errorType,
     onAnswerClick,
-    showMyAnswerSection,
+    onAddAnswerButtonClick,
     myAnswerSectionState,
     answerSectionRef,
-    myAnswer,
-    updateMyAnswer,
+    answerForEditing,
+    updateAnswerForEditing,
     onCancel,
     onDeleteAnswer,
     onSubmitAnswer,
@@ -256,6 +267,6 @@ export const useAnswerPageState = (): AnswerPageState => {
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
-    usernameDuplicateCheckException,
+    selectedAnswerUserName: selectedAnswer?.userName,
   };
 };

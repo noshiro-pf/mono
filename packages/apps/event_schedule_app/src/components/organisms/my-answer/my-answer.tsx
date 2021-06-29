@@ -16,7 +16,7 @@ import { CustomIcon, Td, Th } from '../../atoms';
 import { ButtonsWrapperAlignEnd } from '../../molecules';
 import { WidthRestrictedInputWrapper } from '../../styled';
 import { DatetimeRangeCell } from '../answer-table';
-import { ParagraphWithSwitch } from '../event-settings';
+import { ParagraphWithSwitch } from '../paragraph-with-switch';
 import { DeleteAnswerButton } from './delete-answer-button';
 import { useMyAnswerHooks } from './my-answer-hooks';
 import { WeightSetting } from './weight-setting';
@@ -24,15 +24,15 @@ import { WeightSetting } from './weight-setting';
 type Props = Readonly<{
   eventSchedule: EventSchedule;
   answers: readonly Answer[];
-  myAnswer: Answer;
-  onMyAnswerUpdate: (updater: (answer: Answer) => Answer) => void;
+  answerForEditing: Answer;
+  updateAnswerForEditing: (updater: (answer: Answer) => Answer) => void;
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
   onSubmitAnswer: () => Promise<void>;
   myAnswerSectionState: 'creating' | 'editing' | 'hidden';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
-  usernameDuplicateCheckException: UserName | undefined;
+  selectedAnswerUserName: UserName | undefined;
 }>;
 
 const vt = texts.answerPage.myAnswer;
@@ -42,15 +42,15 @@ export const MyAnswer = memoNamed<Props>(
   ({
     eventSchedule,
     answers,
-    myAnswer,
-    onMyAnswerUpdate,
+    answerForEditing,
+    updateAnswerForEditing,
     onCancel,
     onDeleteAnswer,
     onSubmitAnswer,
     myAnswerSectionState,
     submitButtonIsLoading,
     submitButtonIsDisabled,
-    usernameDuplicateCheckException,
+    selectedAnswerUserName,
   }) => {
     const {
       showUserNameError,
@@ -62,13 +62,13 @@ export const MyAnswer = memoNamed<Props>(
       myAnswerList,
       onWeightChange,
       toggleWeightSection,
-    } = useMyAnswerHooks(
+    } = useMyAnswerHooks({
       eventSchedule,
       answers,
-      usernameDuplicateCheckException,
-      myAnswer,
-      onMyAnswerUpdate
-    );
+      selectedAnswerUserName,
+      answerForEditing,
+      updateAnswerForEditing,
+    });
 
     return (
       <>
@@ -89,7 +89,7 @@ export const MyAnswer = memoNamed<Props>(
             intent={showUserNameError ? 'danger' : 'primary'}
           >
             <BpInput
-              value={myAnswer.userName}
+              value={answerForEditing.userName}
               onValueChange={onUserNameChange as (v: string) => void}
               autoFocus={true}
               onBlur={onUserNameBlur}
@@ -150,7 +150,7 @@ export const MyAnswer = memoNamed<Props>(
         <WidthRestrictedInputWrapper>
           <FormGroup label={vt.comments}>
             <BpTextArea
-              value={myAnswer.comment}
+              value={answerForEditing.comment}
               onValueChange={onCommentChange}
               fill={true}
             />
@@ -159,17 +159,17 @@ export const MyAnswer = memoNamed<Props>(
         <ParagraphWithSwitch
           title={vt.weight.title}
           description={
-            myAnswer.useWeight
+            answerForEditing.useWeight
               ? vt.weight.description
               : vt.weight.description.slice(0, 1)
           }
-          show={myAnswer.useWeight}
+          show={answerForEditing.useWeight}
           onToggle={toggleWeightSection}
           elementToToggle={
             <WeightSetting
-              weight={myAnswer.weight}
+              weight={answerForEditing.weight}
               onWeightChange={onWeightChange}
-              disabled={!myAnswer.useWeight}
+              disabled={!answerForEditing.useWeight}
             />
           }
         />

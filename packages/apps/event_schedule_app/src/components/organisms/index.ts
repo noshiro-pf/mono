@@ -10,5 +10,6 @@ export * from './footer';
 export * from './my-answer';
 export * from './name-and-note';
 export * from './notification-settings';
+export * from './paragraph-with-switch';
 export * from './select-datetimes';
 export * from './symbol-settings';

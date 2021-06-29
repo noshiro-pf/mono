@@ -26,8 +26,6 @@ export const AnswerTable = memoNamed<Props>(
   'AnswerTable',
   ({ eventSchedule, answers, onAnswerClick, isExpired }) => {
     const {
-      datetimeSpecification,
-      answerSymbolList,
       answersWithHandler,
       tableBodyValues,
       onDatetimeSortChange,
@@ -46,7 +44,7 @@ export const AnswerTable = memoNamed<Props>(
               <PaddedSpan>{vt.score}</PaddedSpan>
               <SortButton onSortChange={onScoreSortChange} />
             </Th>
-            {answerSymbolList.map((s) => (
+            {eventSchedule.answerSymbolList.map((s) => (
               <Th key={s.iconId} style={tCellStyle}>
                 <CustomIcon iconName={s.iconId} />
               </Th>
@@ -78,7 +76,7 @@ export const AnswerTable = memoNamed<Props>(
                 <Td style={tCellStyle}>
                   <DatetimeRangeCell
                     datetimeRange={datetimeRange}
-                    datetimeSpecification={datetimeSpecification}
+                    datetimeSpecification={eventSchedule.datetimeSpecification}
                   />
                 </Td>
                 <Td>
@@ -119,7 +117,7 @@ export const AnswerTable = memoNamed<Props>(
 
             {/* spacer */}
             <Td style={tCellStyle}></Td>
-            {answerSymbolList.map((s) => (
+            {eventSchedule.answerSymbolList.map((s) => (
               <Td key={s.iconId} style={tCellStyle}></Td>
             ))}
 

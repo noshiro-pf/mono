@@ -52,44 +52,54 @@ const theNameIsAlreadyUsedFn = (
     ? false
     : answers.find((a) => a.userName === userName) !== undefined;
 
-export const useMyAnswerHooks = (
-  eventSchedule: EventSchedule,
-  answers: readonly Answer[],
-  usernameDuplicateCheckException: UserName | undefined,
-  myAnswer: Answer,
-  onMyAnswerUpdate: (updater: (answer: Answer) => Answer) => void
-): MyAnswerHooks => {
+// フォームの入力値のstateは onMyAnswerUpdate で変更しこのhooks内にはstateを持たない
+export const useMyAnswerHooks = ({
+  eventSchedule,
+  answers,
+  selectedAnswerUserName,
+  answerForEditing,
+  updateAnswerForEditing,
+}: Readonly<{
+  eventSchedule: EventSchedule;
+  answers: readonly Answer[];
+  selectedAnswerUserName: UserName | undefined;
+  answerForEditing: Answer;
+  updateAnswerForEditing: (updater: (answer: Answer) => Answer) => void;
+}>): MyAnswerHooks => {
   const onUserNameChange = useCallback(
     (userName) => {
-      onMyAnswerUpdate(() => IRecord.set(myAnswer, 'userName', userName));
+      updateAnswerForEditing(() =>
+        IRecord.set(answerForEditing, 'userName', userName)
+      );
     },
-    [myAnswer, onMyAnswerUpdate]
+    [answerForEditing, updateAnswerForEditing]
   );
 
   const theNameIsAlreadyUsed: boolean = useMemo(
     () =>
       theNameIsAlreadyUsedFn(
-        myAnswer.userName,
+        answerForEditing.userName,
         answers,
-        usernameDuplicateCheckException
+        selectedAnswerUserName
       ),
-    [answers, myAnswer, usernameDuplicateCheckException]
+    [answers, answerForEditing, selectedAnswerUserName]
   );
 
   const [showUserNameError, onUserNameChangeLocal, onUserNameBlur] =
     useFormError(
-      myAnswer.userName,
+      answerForEditing.userName,
       (v) =>
-        v === '' ||
-        theNameIsAlreadyUsedFn(v, answers, usernameDuplicateCheckException),
+        v === '' || theNameIsAlreadyUsedFn(v, answers, selectedAnswerUserName),
       onUserNameChange
     );
 
   const onCommentChange = useCallback(
     (comment) => {
-      onMyAnswerUpdate(() => IRecord.set(myAnswer, 'comment', comment));
+      updateAnswerForEditing(() =>
+        IRecord.set(answerForEditing, 'comment', comment)
+      );
     },
-    [myAnswer, onMyAnswerUpdate]
+    [answerForEditing, updateAnswerForEditing]
   );
 
   const answerSelectionMap = useMemo<
@@ -101,11 +111,13 @@ export const useMyAnswerHooks = (
   >(
     () =>
       IMapMapped.new(
-        IList.map(myAnswer.selection, (s) => ituple(s.datetimeRange, s.iconId)),
+        IList.map(answerForEditing.selection, (s) =>
+          ituple(s.datetimeRange, s.iconId)
+        ),
         datetimeRangeToMapKey,
         datetimeRangeFromMapKey
       ),
-    [myAnswer.selection]
+    [answerForEditing.selection]
   );
 
   const dispatch = useCallback(
@@ -115,7 +127,7 @@ export const useMyAnswerHooks = (
         action
       );
       const next: Answer = IRecord.set(
-        myAnswer,
+        answerForEditing,
         'selection',
         nextAnswerSelectionMap
           .map((s, d) => ({
@@ -124,9 +136,9 @@ export const useMyAnswerHooks = (
           }))
           .toValuesArray()
       );
-      onMyAnswerUpdate(() => next);
+      updateAnswerForEditing(() => next);
     },
-    [answerSelectionMap, myAnswer, onMyAnswerUpdate]
+    [answerSelectionMap, answerForEditing, updateAnswerForEditing]
   );
 
   const symbolHeader = useMemo<
@@ -181,13 +193,15 @@ export const useMyAnswerHooks = (
 
   const onWeightChange = useCallback(
     (weight: Weight) => {
-      onMyAnswerUpdate(() => IRecord.set(myAnswer, 'weight', weight));
+      updateAnswerForEditing(() =>
+        IRecord.set(answerForEditing, 'weight', weight)
+      );
     },
-    [myAnswer, onMyAnswerUpdate]
+    [answerForEditing, updateAnswerForEditing]
   );
 
   const toggleWeightSection = useCallback(() => {
-    onMyAnswerUpdate(
+    updateAnswerForEditing(
       (ans) =>
         pipe(ans)
           .chain((a) => IRecord.update(a, 'useWeight', (b) => !b))
@@ -195,7 +209,7 @@ export const useMyAnswerHooks = (
             a.useWeight ? a : IRecord.set(a, 'weight', createWeight(1))
           ).value
     );
-  }, [onMyAnswerUpdate]);
+  }, [updateAnswerForEditing]);
 
   return {
     showUserNameError,

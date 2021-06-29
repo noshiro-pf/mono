@@ -1,28 +1,51 @@
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { defaultAnswer } from '@noshiro/event-schedule-app-shared';
+import { deepEqual } from '@noshiro/fast-deep-equal';
 import {
+  useReducerAsStream,
   useStream,
+  useStreamEffect,
   useStreamValue,
-  useUpdaterAsStream,
   useVoidEventAsStream,
 } from '@noshiro/react-syncflow-hooks';
 import type { Observable } from '@noshiro/syncflow';
 import {
+  combineLatest,
+  distinctUntilChanged,
   filter,
   map,
-  merge,
   withInitialValue,
-  withLatestFrom,
 } from '@noshiro/syncflow';
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { IRecord, isNotUndefined } from '@noshiro/ts-utils';
+import { useCallback } from 'react';
 
-export const useMyAnswer = (
+type Action = DeepReadonly<
+  | { type: 'set'; answer: Answer }
+  | { type: 'update'; updateFn: (a: Answer) => Answer }
+>;
+
+const reducer = (state: Answer, action: Action): Answer => {
+  switch (action.type) {
+    case 'set':
+      return action.answer;
+    case 'update':
+      return action.updateFn(state);
+  }
+};
+
+export const useAnswerForEditingState = (
   eventSchedule$: Observable<EventSchedule | undefined>
-): {
-  myAnswer: Answer;
-  resetMyAnswer: () => void;
-  updateMyAnswer: (updater: (a: Answer) => Answer) => void;
-} => {
+): Readonly<{
+  answerForEditing: Answer;
+  resetAnswerForEditing: () => void;
+  updateAnswerForEditing: (updater: (a: Answer) => Answer) => void;
+}> => {
+  const [answerForEditing$, dispatch] = useReducerAsStream(
+    reducer,
+    defaultAnswer
+  );
+
   const emptyAnswerSelection$ = useStream<Answer>(() =>
     eventSchedule$
       .chain(filter(isNotUndefined))
@@ -38,29 +61,34 @@ export const useMyAnswer = (
           )
         )
       )
+      .chain(distinctUntilChanged(deepEqual))
       .chain(withInitialValue(defaultAnswer))
   );
 
-  const [resetMyAnswer$, resetMyAnswer] = useVoidEventAsStream();
-
-  const [myAnswerUserInput$, updateMyAnswer] =
-    useUpdaterAsStream<Answer>(defaultAnswer);
-
-  const myAnswer$ = useStream<Answer>(() =>
-    merge(
-      emptyAnswerSelection$,
-      myAnswerUserInput$,
-      resetMyAnswer$
-        .chain(withLatestFrom(emptyAnswerSelection$))
-        .chain(map(([_, x]) => x))
-    ).chain(withInitialValue(defaultAnswer))
+  const [resetAnswerForEditingAction$, resetAnswerForEditing] =
+    useVoidEventAsStream();
+  const resetAnswerForEditing$ = useStream(() =>
+    combineLatest(emptyAnswerSelection$, resetAnswerForEditingAction$).chain(
+      map(([x, _]) => x)
+    )
   );
 
-  const myAnswer = useStreamValue(myAnswer$);
+  useStreamEffect(resetAnswerForEditing$, (emptyAnswerSelection) => {
+    dispatch({ type: 'set', answer: emptyAnswerSelection });
+  });
+
+  const updateAnswerForEditing = useCallback(
+    (updateFn: (a: Answer) => Answer) => {
+      dispatch({ type: 'update', updateFn });
+    },
+    [dispatch]
+  );
+
+  const answerForEditing = useStreamValue(answerForEditing$);
 
   return {
-    myAnswer,
-    resetMyAnswer,
-    updateMyAnswer,
+    answerForEditing,
+    resetAnswerForEditing,
+    updateAnswerForEditing,
   };
 };

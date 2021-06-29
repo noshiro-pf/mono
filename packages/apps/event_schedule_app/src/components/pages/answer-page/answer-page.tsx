@@ -29,11 +29,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     answers,
     errorType,
     onAnswerClick,
-    showMyAnswerSection,
+    onAddAnswerButtonClick,
     myAnswerSectionState,
     answerSectionRef,
-    myAnswer,
-    updateMyAnswer: onMyAnswerUpdate,
+    answerForEditing,
+    updateAnswerForEditing,
     onCancel,
     onDeleteAnswer,
     onSubmitAnswer,
@@ -43,7 +43,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
-    usernameDuplicateCheckException,
+    selectedAnswerUserName,
   } = useAnswerPageState();
 
   return errorType !== undefined && errorType.type === 'not-found' ? (
@@ -133,7 +133,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   intent='primary'
                   icon='add'
                   text={vt.answers.addAnswer}
-                  onClick={showMyAnswerSection}
+                  onClick={onAddAnswerButtonClick}
                 />
               </ButtonsWrapperAlignEnd>
             ) : undefined}
@@ -151,17 +151,15 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 <MyAnswer
                   eventSchedule={eventSchedule}
                   answers={answers}
-                  myAnswer={myAnswer}
-                  onMyAnswerUpdate={onMyAnswerUpdate}
+                  answerForEditing={answerForEditing}
+                  updateAnswerForEditing={updateAnswerForEditing}
                   onCancel={onCancel}
                   onDeleteAnswer={onDeleteAnswer}
                   onSubmitAnswer={onSubmitAnswer}
                   myAnswerSectionState={myAnswerSectionState}
                   submitButtonIsLoading={submitButtonIsLoading}
                   submitButtonIsDisabled={submitButtonIsDisabled}
-                  usernameDuplicateCheckException={
-                    usernameDuplicateCheckException
-                  }
+                  selectedAnswerUserName={selectedAnswerUserName}
                 />
               </Section>
             )}

@@ -9,8 +9,8 @@ import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { AnswerDeadlineDatepicker } from '../answer-deadline';
 import { NotificationSettingsComponent } from '../notification-settings';
+import { ParagraphWithSwitch } from '../paragraph-with-switch';
 import { SymbolSettings } from '../symbol-settings';
-import { ParagraphWithSwitch } from './paragraph-with-switch';
 
 const vt = texts.eventSettingsPage.section3;
 
