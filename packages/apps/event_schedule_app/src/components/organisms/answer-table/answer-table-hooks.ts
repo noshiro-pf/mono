@@ -1,24 +1,20 @@
 import type {
   Answer,
-  AnswerSymbol,
   AnswerSymbolIconId,
   DatetimeRange,
-  DatetimeSpecificationEnumType,
   EventSchedule,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
 import type { DeepReadonly, IMapMapped } from '@noshiro/ts-utils';
 import { IList, mapNullable, pipe } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { answerTableColor } from '../../../constants';
 import type { DatetimeRangeMapKey } from '../../../functions';
 import { createAnswerSummary, createScore } from './create-answer-summary';
 import { useAnswerTable } from './use-answer-table';
 
 type AnswerTableHooks = DeepReadonly<{
-  datetimeSpecification: DatetimeSpecificationEnumType;
-  answerSymbolList: AnswerSymbol[];
   answersWithHandler: {
     id: Answer['id'];
     userName: Answer['userName'];
@@ -88,51 +84,55 @@ export const useAnswerTableHooks = (
     [answers, onAnswerClick]
   );
 
-  const [datetimeRangeListReordered, setDatetimeRangeListReordered] = useState(
-    eventSchedule.datetimeRangeList
-  );
+  // 4 patterns of sorted lists
 
-  useEffect(() => {
-    setDatetimeRangeListReordered(eventSchedule.datetimeRangeList);
-  }, [eventSchedule.datetimeRangeList]);
+  const datetimeRangeList = eventSchedule.datetimeRangeList;
 
-  const onDatetimeSortChange = useCallback(
-    (state: 'asc' | 'desc') => {
-      switch (state) {
-        case 'asc':
-          setDatetimeRangeListReordered(eventSchedule.datetimeRangeList);
-          break;
-        case 'desc':
-          setDatetimeRangeListReordered(
-            IList.reverse(eventSchedule.datetimeRangeList)
-          );
-          break;
-      }
-    },
+  const datetimeRangeListReversed = useMemo(
+    () => IList.reverse(eventSchedule.datetimeRangeList),
     [eventSchedule.datetimeRangeList]
   );
 
-  const onScoreSortChange = useCallback(
-    (state: 'asc' | 'desc') => {
-      switch (state) {
-        case 'asc':
-          setDatetimeRangeListReordered(
-            IList.sortBy(
-              eventSchedule.datetimeRangeList,
-              (d) => scores.get(d) ?? 0
-            )
-          );
-          break;
-        case 'desc':
-          setDatetimeRangeListReordered(
-            pipe(eventSchedule.datetimeRangeList)
-              .chain((list) => IList.sortBy(list, (d) => scores.get(d) ?? 0))
-              .chain(IList.reverse).value
-          );
-          break;
-      }
-    },
+  const datetimeRangeListSortedByScores = useMemo(
+    () =>
+      IList.sortBy(eventSchedule.datetimeRangeList, (d) => scores.get(d) ?? 0),
     [eventSchedule.datetimeRangeList, scores]
+  );
+
+  const datetimeRangeListSortedByScoresReversed = useMemo(
+    () => IList.reverse(datetimeRangeListSortedByScores),
+    [datetimeRangeListSortedByScores]
+  );
+
+  const [[sortKey, sortOrder], setSortOrderAndKey] = useState<
+    readonly ['date' | 'score', 'asc' | 'desc']
+  >(['date', 'asc']);
+
+  const onDatetimeSortChange = useCallback((state: 'asc' | 'desc') => {
+    setSortOrderAndKey(['date', state]);
+  }, []);
+
+  const onScoreSortChange = useCallback((state: 'asc' | 'desc') => {
+    setSortOrderAndKey(['score', state]);
+  }, []);
+
+  const datetimeRangeListReordered = useMemo(
+    () =>
+      sortKey === 'date'
+        ? sortOrder === 'asc'
+          ? datetimeRangeList
+          : datetimeRangeListReversed
+        : sortOrder === 'asc'
+        ? datetimeRangeListSortedByScores
+        : datetimeRangeListSortedByScoresReversed,
+    [
+      sortKey,
+      sortOrder,
+      datetimeRangeList,
+      datetimeRangeListReversed,
+      datetimeRangeListSortedByScores,
+      datetimeRangeListSortedByScoresReversed,
+    ]
   );
 
   const tableBodyValues = useMemo<
@@ -178,8 +178,6 @@ export const useAnswerTableHooks = (
   );
 
   return {
-    datetimeSpecification: eventSchedule.datetimeSpecification,
-    answerSymbolList: eventSchedule.answerSymbolList,
     answersWithHandler,
     tableBodyValues,
     onDatetimeSortChange,
