@@ -1,0 +1,20 @@
+{
+  "name": "@noshiro/markdown-files",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'no build script'",
+    "clean": "echo 'no clean script'",
+    "gi": "echo 'no gi script'",
+    "lint": "echo 'no lint script'",
+    "lint:fix": "yarn lint --fix",
+    "setup": "echo 'no setup script'",
+    "test": "echo 'no test script'",
+    "marked": "marked",
+    "convert": "node ./convert.js"
+  },
+  "devDependencies": {
+    "highlight.js": "^11.0.1",
+    "marked": "^2.1.3"
+  }
+}
