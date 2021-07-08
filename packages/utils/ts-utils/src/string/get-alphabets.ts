@@ -1,8 +1,12 @@
 import { seq } from '../array';
-import type { uint32 } from '../types';
+import type { LowerAlphabet, uint32, UpperAlphabet } from '../types';
 
-export const getAlphabets = (charCase: 'lower' | 'upper'): string[] => {
+export const getAlphabets = <Case extends 'lower' | 'upper'>(
+  charCase: Case
+): Case extends 'lower' ? LowerAlphabet[] : UpperAlphabet[] => {
   const code = charCase === 'lower' ? 'a'.charCodeAt(0) : 'A'.charCodeAt(0);
-  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-  return seq(26 as uint32).map((i) => String.fromCharCode(code + i));
+  return seq(26 as uint32).map((i) =>
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    String.fromCharCode(code + i)
+  ) as Case extends 'lower' ? LowerAlphabet[] : UpperAlphabet[];
 };

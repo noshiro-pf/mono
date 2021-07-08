@@ -21,10 +21,14 @@ interface IMapMappedInterface<K, V, KM extends KeyBaseType> {
   // Mutation
   delete: (key: K) => IMapMapped<K, V, KM>;
   set: (key: K, value: V) => IMapMapped<K, V, KM>;
-  update: <V2 = V>(
-    key: K,
-    updater: (value: V) => V2
-  ) => IMapMapped<K, V | V2, KM> | IMapMapped<K, V, KM>;
+  update: (key: K, updater: (value: V) => V) => IMapMapped<K, V, KM>;
+  withMutations: (
+    actions: readonly Readonly<
+      | { type: 'delete'; key: K }
+      | { type: 'set'; key: K; value: V }
+      | { type: 'update'; key: K; updater: (value: V) => V }
+    >[]
+  ) => IMapMapped<K, V, KM>;
 
   // Sequence algorithms
   map: <V2>(mapFn: (value: V, key: K) => V2) => IMapMapped<K, V2, KM>;
@@ -154,10 +158,7 @@ class IMapMappedClass<K, V, KM extends KeyBaseType>
     }
   }
 
-  update<V2 = V>(
-    key: K,
-    updater: (value: V) => V2
-  ): IMapMapped<K, V | V2, KM> | IMapMapped<K, V, KM> {
+  update(key: K, updater: (value: V) => V): IMapMapped<K, V, KM> {
     const curr = this.get(key);
     if (curr === undefined) return this;
     const keyMapped = this._toKey(key);
@@ -168,6 +169,39 @@ class IMapMappedClass<K, V, KM extends KeyBaseType>
           ituple(km, Object.is(km, keyMapped) ? updater(curr) : v)
         )
         .map(([km, v]) => ituple(this._fromKey(km), v)),
+      this._toKey,
+      this._fromKey
+    );
+  }
+
+  withMutations(
+    actions: readonly Readonly<
+      | { type: 'delete'; key: K }
+      | { type: 'set'; key: K; value: V }
+      | { type: 'update'; key: K; updater: (value: V) => V }
+    >[]
+  ): IMapMapped<K, V, KM> {
+    const result = new Map<KM, V>(this._map);
+    for (const action of actions) {
+      const key = this._toKey(action.key);
+      switch (action.type) {
+        case 'delete':
+          result.delete(key);
+          break;
+        case 'set':
+          result.set(key, action.value);
+          break;
+        case 'update': {
+          const curr = result.get(key);
+          if (curr !== undefined) {
+            result.set(key, action.updater(curr));
+          }
+          break;
+        }
+      }
+    }
+    return IMapMapped.new<K, V, KM>(
+      [...result].map(([k, v]) => [this._fromKey(k), v]),
       this._toKey,
       this._fromKey
     );

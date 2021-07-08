@@ -21,10 +21,14 @@ interface IMapInterface<K, V> {
   // Mutation
   delete: (key: K) => IMap<K, V>;
   set: (key: K, value: V) => IMap<K, V>;
-  update: <V2 = V>(
-    key: K,
-    updater: (value: V) => V2
-  ) => IMap<K, V | V2> | IMap<K, V>;
+  update: (key: K, updater: (value: V) => V) => IMap<K, V>;
+  withMutations: (
+    actions: readonly Readonly<
+      | { type: 'delete'; key: K }
+      | { type: 'set'; key: K; value: V }
+      | { type: 'update'; key: K; updater: (value: V) => V }
+    >[]
+  ) => IMap<K, V>;
 
   // Sequence algorithms
   map: <V2>(mapFn: (value: V, key: K) => V2) => IMap<K, V2>;
@@ -117,10 +121,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     }
   }
 
-  update<V2 = V>(
-    key: K,
-    updater: (value: V) => V2
-  ): IMap<K, V | V2> | IMap<K, V> {
+  update(key: K, updater: (value: V) => V): IMap<K, V> {
     const curr = this.get(key);
     if (curr === undefined) return this;
     return IMap.new(
@@ -128,6 +129,34 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
         ituple(k, Object.is(k, key) ? updater(curr) : v)
       )
     );
+  }
+
+  withMutations(
+    actions: readonly Readonly<
+      | { type: 'delete'; key: K }
+      | { type: 'set'; key: K; value: V }
+      | { type: 'update'; key: K; updater: (value: V) => V }
+    >[]
+  ): IMap<K, V> {
+    const result = new Map<K, V>(this._map);
+    for (const action of actions) {
+      switch (action.type) {
+        case 'delete':
+          result.delete(action.key);
+          break;
+        case 'set':
+          result.set(action.key, action.value);
+          break;
+        case 'update': {
+          const curr = result.get(action.key);
+          if (curr !== undefined) {
+            result.set(action.key, action.updater(curr));
+          }
+          break;
+        }
+      }
+    }
+    return IMap.new(result);
   }
 
   map<V2>(mapFn: (value: V, key: K) => V2): IMap<K, V2> {

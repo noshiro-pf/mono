@@ -60,7 +60,7 @@ type FullPathsWithIndexImplRecordCase<
   ? readonly [PathHead, ...FullPathsWithIndex<R[PathHead]>]
   : never;
 
-type R1 = DeepReadonly<{
+type R0 = DeepReadonly<{
   x: {
     a: 1;
     b: { x: [number, ...string[]] }[];
@@ -72,11 +72,12 @@ type R1 = DeepReadonly<{
     };
     g: [{ x: number }, ...{ y: string[] }[]];
     h: (a: number) => string;
+    i: (a: string) => number;
   };
   z: [1, 2, { e: 3; f: [6, 7] }];
 }>;
 
-type K0 = FullPaths<R1>;
+type K0 = FullPaths<R0>;
 assertType<
   TypeEq<
     K0,
@@ -86,6 +87,7 @@ assertType<
     | readonly ['y', 'c', 4]
     | readonly ['y', 'g']
     | readonly ['y', 'h']
+    | readonly ['y', 'i']
     | readonly ['z', 0]
     | readonly ['z', 1]
     | readonly ['z', 2, 'e']
@@ -94,7 +96,7 @@ assertType<
   >
 >();
 
-type K1 = FullPathsWithIndex<R1>;
+type K1 = FullPathsWithIndex<R0>;
 assertType<
   TypeEq<
     K1,
@@ -105,6 +107,7 @@ assertType<
     | readonly ['y', 'g', number, 'x']
     | readonly ['y', 'g', number, 'y', number]
     | readonly ['y', 'h']
+    | readonly ['y', 'i']
     | readonly ['z', 0]
     | readonly ['z', 1]
     | readonly ['z', 2, 'e']
@@ -120,7 +123,7 @@ assertType<TypeEq<FullPathsWithIndex<Record<1, unknown>>, readonly [1]>>();
 export type PathsWithIndex<R> = Prefixes<FullPathsWithIndex<R>>;
 export type Paths<R> = Prefixes<FullPaths<R>>;
 
-type K3 = PathsWithIndex<R1>;
+type K3 = PathsWithIndex<R0>;
 assertType<
   TypeEq<
     K3,
@@ -141,6 +144,7 @@ assertType<
     | readonly ['y', 'g', number]
     | readonly ['y', 'g']
     | readonly ['y', 'h']
+    | readonly ['y', 'i']
     | readonly ['y']
     | readonly ['z', 0]
     | readonly ['z', 1]
@@ -154,7 +158,7 @@ assertType<
   >
 >();
 
-type K4 = Paths<R1>;
+type K4 = Paths<R0>;
 assertType<
   TypeEq<
     K4,
@@ -166,6 +170,7 @@ assertType<
     | readonly ['y', 'c']
     | readonly ['y', 'g']
     | readonly ['y', 'h']
+    | readonly ['y', 'i']
     | readonly ['y']
     | readonly ['z', 0]
     | readonly ['z', 1]

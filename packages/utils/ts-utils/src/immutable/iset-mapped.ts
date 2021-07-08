@@ -17,8 +17,13 @@ interface ISetMappedInterface<K, KM extends KeyBaseType> {
   some: (predicate: (key: K) => boolean) => boolean;
 
   // Mutation
-  delete: (key: K) => ISetMapped<K, KM>;
   add: (key: K) => ISetMapped<K, KM>;
+  delete: (key: K) => ISetMapped<K, KM>;
+  withMutations: (
+    actions: readonly Readonly<
+      { type: 'add'; key: K } | { type: 'delete'; key: K }
+    >[]
+  ) => ISetMapped<K, KM>;
 
   // Sequence algorithms
   map: (mapFn: (key: K) => K) => ISetMapped<K, KM>;
@@ -103,6 +108,15 @@ class ISetMappedClass<K, KM extends KeyBaseType>
     return false;
   }
 
+  add(key: K): ISetMapped<K, KM> {
+    if (this.has(key)) return this;
+    return ISetMapped.new(
+      [...this._set, this._toKey(key)].map(this._fromKey),
+      this._toKey,
+      this._fromKey
+    );
+  }
+
   delete(key: K): ISetMapped<K, KM> {
     if (!this.has(key)) return this;
     const keyMapped = this._toKey(key);
@@ -113,10 +127,25 @@ class ISetMappedClass<K, KM extends KeyBaseType>
     );
   }
 
-  add(key: K): ISetMapped<K, KM> {
-    if (this.has(key)) return this;
-    return ISetMapped.new(
-      [...this._set, this._toKey(key)].map(this._fromKey),
+  withMutations(
+    actions: readonly Readonly<
+      { type: 'add'; key: K } | { type: 'delete'; key: K }
+    >[]
+  ): ISetMapped<K, KM> {
+    const result = new Set<KM>(this._set);
+    for (const action of actions) {
+      const key = this._toKey(action.key);
+      switch (action.type) {
+        case 'delete':
+          result.delete(key);
+          break;
+        case 'add':
+          result.add(key);
+          break;
+      }
+    }
+    return ISetMapped.new<K, KM>(
+      [...result].map(this._fromKey),
       this._toKey,
       this._fromKey
     );
