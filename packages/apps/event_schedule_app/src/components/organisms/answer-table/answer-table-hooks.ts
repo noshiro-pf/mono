@@ -151,12 +151,13 @@ export const useAnswerTableHooks = (
         const score = scores.get(datetimeRange) ?? 0;
 
         const answerTableRow = pipe(answerTable.get(datetimeRange)).chain(
-          mapNullable((row) =>
-            IList.zip(
-              row,
-              answers.map((a) => a.weight)
+          (list) =>
+            mapNullable(list, (row) =>
+              IList.zip(
+                row,
+                answers.map((a) => a.weight)
+              )
             )
-          )
         ).value;
 
         return {

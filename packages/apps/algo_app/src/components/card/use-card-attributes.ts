@@ -32,7 +32,7 @@ export const useCardAttributes = (
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 } => {
-  const { width, height } = mapNullable(fillCardSize)(size) ?? defaultCardSize;
+  const { width, height } = mapNullable(size, fillCardSize) ?? defaultCardSize;
 
   const textColor =
     visibilityFromMe === 'faceDownButVisibleToMe'

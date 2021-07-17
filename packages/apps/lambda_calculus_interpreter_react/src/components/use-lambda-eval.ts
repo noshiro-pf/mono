@@ -28,10 +28,12 @@ export const useLambdaEval = (
         (input) =>
           pipe(input)
             .chain(parseLambdaTerm)
-            .chain(mapNullable(evalSequence))
-            .chain(mapNullable((seq) => seq.map(termToString)))
-            .chain(
-              mapNullable((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
+            .chain((a) => mapNullable(a, evalSequence))
+            .chain((a) => mapNullable(a, (seq) => seq.map(termToString)))
+            .chain((a) =>
+              mapNullable(a, (seq) =>
+                seq.map((s, i) => `${i}.\t${s}`).join('\n')
+              )
             ).value
       )
     )
