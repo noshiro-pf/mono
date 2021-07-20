@@ -5,8 +5,5 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "rules": {
-    "noshiro-custom/prefer-readonly-parameter-types": "off"
-  },
   "ignorePatterns": ["*.d.ts", "*.js"]
 }
