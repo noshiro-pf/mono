@@ -1,2 +1,0 @@
--   page: https://my-profile-noshiro.netlify.app/
--   contents repository: https://github.com/noshiro-pf/my_profile_content

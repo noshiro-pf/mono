@@ -61,13 +61,13 @@ export const AppSub = memoNamed<{
       <ContentWrapper>
         <Switch>
           <Route exact={true} path={routes.profile}>
-            <ReactMarkdown source={ProfileMd} />
+            <ReactMarkdown>{ProfileMd}</ReactMarkdown>
           </Route>
           <Route exact={true} path={routes.profile2}>
-            <ReactMarkdown source={Profile2Md} />
+            <ReactMarkdown>{Profile2Md}</ReactMarkdown>
           </Route>
           <Route exact={true} path={routes.skills}>
-            <ReactMarkdown source={SkillsMd} />
+            <ReactMarkdown>{SkillsMd}</ReactMarkdown>
           </Route>
           <Route exact={true} path={routes.products}>
             <Products mobile={mobile} />

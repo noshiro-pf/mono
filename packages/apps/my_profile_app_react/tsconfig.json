@@ -1,8 +1,7 @@
 {
   "extends": "../../../config/tsconfig/tsconfig.react.json",
   "compilerOptions": {
-    "sourceMap": true,
-    "allowJs": true
+    "sourceMap": true
   },
   "include": ["./src", "./scripts", "./config"]
 }
