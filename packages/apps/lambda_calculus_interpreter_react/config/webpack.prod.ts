@@ -1,4 +1,4 @@
-import { webpackConfigReactProdMaker } from '../../../../config/webpackconfig/react/webpack_config_prod_maker';
+import { webpackConfigReactProdMaker } from '../../../../config/webpackconfig/react';
 import { dotenvValues } from './env';
 import { paths } from './paths';
 
