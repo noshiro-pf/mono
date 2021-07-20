@@ -30,7 +30,6 @@
     "@blueprintjs/core": "^3.36.0",
     "@blueprintjs/datetime": "^3.20.0",
     "@blueprintjs/icons": "^3.23.0",
-    "@blueprintjs/table": "^3.8.18",
     "@noshiro/react-resize-observer-hooks": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/react-utils-styled": "*",
