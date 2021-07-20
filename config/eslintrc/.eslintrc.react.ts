@@ -7,7 +7,11 @@ const config: Linter.Config = {
       version: 'detect',
     },
   },
-  extends: ['plugin:react/recommended', './.eslintrc.base.js'],
+  extends: [
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    './.eslintrc.base.js',
+  ],
   plugins: ['react', 'react-hooks'],
   rules: {
     'react-hooks/rules-of-hooks': 'error',
