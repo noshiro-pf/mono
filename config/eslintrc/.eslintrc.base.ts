@@ -26,9 +26,7 @@ const config: Linter.Config = {
   extends: [
     /* recommended */
     'eslint:all',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:@typescript-eslint/all',
 
     /* import */
     'plugin:import/recommended',
@@ -65,9 +63,8 @@ const config: Linter.Config = {
   rules: {
     ...eslintRulesAll.modifiedRules,
     ...eslintRulesAll.disabledRules,
-    ...typescriptEslintRules.additionalRulesNotIncludedInRecommended,
-    ...typescriptEslintRules.modifiedRulesIncludedInRecommended,
-    ...typescriptEslintRules.disabledRulesIncludedInRecommended,
+    ...typescriptEslintRules.modifiedRules,
+    ...typescriptEslintRules.disabledRules,
     ...eslintImportsRules.staticAnalysis,
     ...eslintImportsRules.helpfulWarnings,
     ...eslintImportsRules.moduleSystems,
