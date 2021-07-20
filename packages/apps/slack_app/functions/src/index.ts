@@ -6,7 +6,7 @@ import * as https from 'https';
 admin.initializeApp();
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-const SLACK_API_KEY: string = functions.config()?.slack?.apikey ?? '';
+const SLACK_API_KEY: string = functions.config().slack?.apikey ?? '';
 
 // Take the text parameter passed to this HTTP endpoint and insert it into
 // Cloud Firestore under the path /messages/:documentId/original
@@ -58,7 +58,7 @@ export const makeUppercase = functions.firestore
             resolve(
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
               r?.members?.find(
-                (a: { readonly name: string }) => a?.name === 'noshiro.pf'
+                (a: { readonly name: string }) => a.name === 'noshiro.pf'
               )?.profile?.display_name_normalized
             );
           });

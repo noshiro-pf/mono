@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'preact/compat';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
-  Ref<HTMLCanvasElement>
+  Ref<HTMLCanvasElement | null>
 ] => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [ctx, setCtx] = useState<CanvasRenderingContext2D | undefined>(
     undefined
   );

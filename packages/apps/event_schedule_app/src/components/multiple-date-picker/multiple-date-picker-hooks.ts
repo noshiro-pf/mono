@@ -149,7 +149,7 @@ export const useMultipleDatePickerState = (
         type: 'fill-column',
         dates: dates
           .map((week) => week[w] ?? defaultYearMonthDate)
-          .filter((d) => d?.month === calendarCurrentPage.month),
+          .filter((d) => d.month === calendarCurrentPage.month),
       });
     },
     [selectedDatesDispatch, dates, calendarCurrentPage.month]
