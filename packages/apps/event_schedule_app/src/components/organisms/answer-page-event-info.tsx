@@ -16,38 +16,36 @@ type Props = Readonly<{
 
 export const AnswerPageEventInfo = memoNamed<Props>(
   'AnswerPageEventInfo',
-  ({ eventSchedule, isExpired }) => {
-    return (
-      <Container>
-        <TableLabel1>{vt.eventInfo.eventName}</TableLabel1>
-        <TableValue1>{eventSchedule.title}</TableValue1>
-        <TableLabel2>{vt.eventInfo.notes}</TableLabel2>
-        <TableValue2>
-          <AnswerPageNotes notes={eventSchedule.notes} />
-        </TableValue2>
-        <TableLabel3>{vt.eventInfo.answerDeadline}</TableLabel3>
-        <TableValue3>
-          {eventSchedule.useAnswerDeadline ? (
-            <>
-              <div>
-                {ymdhm2strWithDay(eventSchedule.answerDeadline ?? defaultYmdhm)}
-              </div>
-              <Description
-                error={isExpired}
-                text={
-                  isExpired
-                    ? vt.eventInfo.answerDeadlineIsExpired
-                    : vt.eventInfo.answerDeadlineDescription
-                }
-              />
-            </>
-          ) : (
-            <div>{texts.answerPage.eventInfo.noAnswerDeadline}</div>
-          )}
-        </TableValue3>
-      </Container>
-    );
-  }
+  ({ eventSchedule, isExpired }) => (
+    <Container>
+      <TableLabel1>{vt.eventInfo.eventName}</TableLabel1>
+      <TableValue1>{eventSchedule.title}</TableValue1>
+      <TableLabel2>{vt.eventInfo.notes}</TableLabel2>
+      <TableValue2>
+        <AnswerPageNotes notes={eventSchedule.notes} />
+      </TableValue2>
+      <TableLabel3>{vt.eventInfo.answerDeadline}</TableLabel3>
+      <TableValue3>
+        {eventSchedule.useAnswerDeadline ? (
+          <>
+            <div>
+              {ymdhm2strWithDay(eventSchedule.answerDeadline ?? defaultYmdhm)}
+            </div>
+            <Description
+              error={isExpired}
+              text={
+                isExpired
+                  ? vt.eventInfo.answerDeadlineIsExpired
+                  : vt.eventInfo.answerDeadlineDescription
+              }
+            />
+          </>
+        ) : (
+          <div>{texts.answerPage.eventInfo.noAnswerDeadline}</div>
+        )}
+      </TableValue3>
+    </Container>
+  )
 );
 
 const Container = styled.div`

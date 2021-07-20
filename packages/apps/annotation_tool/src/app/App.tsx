@@ -94,7 +94,7 @@ export const App = memoNamed('App', () => {
         const index = labels.findIndex((l) => l.id === labelId);
         visibleLabelIndiceDispatcher({ type: 'flip', index });
       },
-      selectLabel: selectLabel,
+      selectLabel,
     }),
     [hide, show, selectLabel]
   );

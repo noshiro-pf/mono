@@ -24,7 +24,7 @@ export const useResizeObserverRef = (
     [setSize]
   );
 
-  const targetElRef = useRef<HTMLDivElement>(null);
+  const targetElRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const el = targetElRef.current;
