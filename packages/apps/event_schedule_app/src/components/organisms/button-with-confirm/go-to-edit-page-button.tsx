@@ -50,7 +50,7 @@ type ButtonWithConfirmProps = Readonly<{
 
 const ButtonWithConfirm = memoNamed<ButtonWithConfirmProps>(
   'ButtonWithConfirm',
-  ({ onConfirmClick, emailAnswer: emailAnswer }) => {
+  ({ onConfirmClick, emailAnswer }) => {
     const [isOpen, handleOpen, handleClose] = useBooleanState(false);
 
     return (

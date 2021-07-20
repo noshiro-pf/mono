@@ -56,21 +56,21 @@ export const useSelectDatetimesHooks = (
 
   const onDatetimeRangeYmdChange = useCallback(
     (index: uint32, ymd: YearMonthDate) => {
-      dispatch({ type: 'ymd', index, ymd: ymd });
+      dispatch({ type: 'ymd', index, ymd });
     },
     [dispatch]
   );
 
   const onDatetimeRangeStartChange = useCallback(
     (index: uint32, hm: HoursMinutes) => {
-      dispatch({ type: 'start', index, hm: hm });
+      dispatch({ type: 'start', index, hm });
     },
     [dispatch]
   );
 
   const onDatetimeRangeEndChange = useCallback(
     (index: uint32, hm: HoursMinutes) => {
-      dispatch({ type: 'end', index, hm: hm });
+      dispatch({ type: 'end', index, hm });
     },
     [dispatch]
   );
