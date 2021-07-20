@@ -16,6 +16,11 @@ interface ISetInterface<K> {
   // Mutation
   add: (key: K) => ISet<K>;
   delete: (key: K) => ISet<K>;
+  withMutations: (
+    actions: readonly Readonly<
+      { type: 'add'; key: K } | { type: 'delete'; key: K }
+    >[]
+  ) => ISet<K>;
 
   // Sequence algorithms
   map: <K2>(mapFn: (key: K) => K2) => ISet<K2>;
@@ -80,14 +85,33 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     return false;
   }
 
+  add(key: K): ISet<K> {
+    if (this.has(key)) return this;
+    return ISet.new([...this._set, key]);
+  }
+
   delete(key: K): ISet<K> {
     if (!this.has(key)) return this;
     return ISet.new([...this._set].filter((k) => !Object.is(k, key)));
   }
 
-  add(key: K): ISet<K> {
-    if (this.has(key)) return this;
-    return ISet.new([...this._set, key]);
+  withMutations(
+    actions: readonly Readonly<
+      { type: 'add'; key: K } | { type: 'delete'; key: K }
+    >[]
+  ): ISet<K> {
+    const result = new Set<K>(this._set);
+    for (const action of actions) {
+      switch (action.type) {
+        case 'delete':
+          result.delete(action.key);
+          break;
+        case 'add':
+          result.add(action.key);
+          break;
+      }
+    }
+    return ISet.new(result);
   }
 
   map<K2>(mapFn: (key: K) => K2): ISet<K2> {

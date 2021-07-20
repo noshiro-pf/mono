@@ -1,10 +1,10 @@
 export type JsonValueType =
-  | JsonValueType[]
   | boolean
   | number
   | string
+  | readonly JsonValueType[]
   // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-  | { [key: string]: JsonValueType }
+  | { readonly [key: string]: JsonValueType }
   | null;
 
-export type JsonType = Record<string, JsonValueType>;
+export type JsonType = Readonly<Record<string, JsonValueType>>;

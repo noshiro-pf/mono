@@ -1,7 +1,8 @@
 import type {
+  IsUnion,
+  KeyPathAndValueTypeAtPathTuple,
   Paths,
   ReadonlyRecordBase,
-  RecordUpdated,
   RecordValueAtPath,
 } from '../types';
 
@@ -11,33 +12,17 @@ export namespace IRecord {
     key: K
   ): R[K] => record[key];
 
-  export const set = <R extends ReadonlyRecordBase, K extends keyof R, N>(
+  export const set = <R extends ReadonlyRecordBase, K extends keyof R>(
     record: R,
     key: K,
-    newValue: N
-  ): {
-    readonly [Key in keyof R]: Key extends K ? N : R[Key];
-  } =>
-    ({
-      ...record,
-      [key]: newValue,
-    } as {
-      readonly [Key in keyof R]: Key extends K ? N : R[Key];
-    });
+    newValue: R[K]
+  ): R => ({ ...record, [key]: newValue });
 
-  export const update = <R extends ReadonlyRecordBase, K extends keyof R, N>(
+  export const update = <R extends ReadonlyRecordBase, K extends keyof R>(
     record: R,
     key: K,
-    updater: (prev: R[K]) => N
-  ): {
-    readonly [Key in keyof R]: Key extends K ? N : R[Key];
-  } =>
-    ({
-      ...record,
-      [key]: updater(record[key]),
-    } as {
-      readonly [Key in keyof R]: Key extends K ? N : R[Key];
-    });
+    updater: (prev: R[K]) => R[K]
+  ): R => ({ ...record, [key]: updater(record[key]) });
 
   const UNSAFE_getIn_impl = (
     obj: ReadonlyRecordBase,
@@ -52,6 +37,16 @@ export namespace IRecord {
           keyPath,
           index + 1
         );
+
+  export const getIn = <R extends ReadonlyRecordBase, Path extends Paths<R>>(
+    record: R,
+    keyPath: Path
+  ): RecordValueAtPath<R, Path> =>
+    UNSAFE_getIn_impl(
+      record,
+      keyPath as readonly string[],
+      0
+    ) as RecordValueAtPath<R, Path>;
 
   const UNSAFE_updateIn_impl = (
     obj: ReadonlyRecordBase,
@@ -86,41 +81,28 @@ export namespace IRecord {
           ),
         };
 
-  export const getIn = <R extends ReadonlyRecordBase, Path extends Paths<R>>(
+  export const setIn = <R extends ReadonlyRecordBase>(
     record: R,
-    keyPath: Path
-  ): RecordValueAtPath<R, Path> =>
-    UNSAFE_getIn_impl(
-      record,
-      keyPath as readonly string[],
-      0
-    ) as RecordValueAtPath<R, Path>;
-
-  export const setIn = <R extends ReadonlyRecordBase, Path extends Paths<R>, N>(
-    record: R,
-    keyPath: Path,
-    newValue: N
-  ): RecordUpdated<R, Path, N> =>
+    ...[keyPath, newValue]: KeyPathAndValueTypeAtPathTuple<R>
+  ): R =>
     UNSAFE_updateIn_impl(
       record,
       keyPath as readonly string[],
       0,
       () => newValue
-    ) as RecordUpdated<R, Path, N>;
+    ) as R;
 
-  export const updateIn = <
-    R extends ReadonlyRecordBase,
-    Path extends Paths<R>,
-    N
-  >(
+  export const updateIn = <R extends ReadonlyRecordBase, Path extends Paths<R>>(
     record: R,
-    keyPath: Path,
-    updater: (prev: RecordValueAtPath<R, Path>) => N
-  ): RecordUpdated<R, Path, N> =>
+    keyPath: IsUnion<Path> extends true ? never : Path,
+    updater: IsUnion<Path> extends true
+      ? never
+      : (prev: RecordValueAtPath<R, Path>) => RecordValueAtPath<R, Path>
+  ): R =>
     UNSAFE_updateIn_impl(
       record,
       keyPath as readonly string[],
       0,
       updater as (prev: unknown) => unknown
-    ) as RecordUpdated<R, Path, N>;
+    ) as R;
 }

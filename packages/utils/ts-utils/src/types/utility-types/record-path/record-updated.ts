@@ -63,7 +63,7 @@ assertType<
   >
 >();
 
-type R1 = DeepReadonly<{
+type R0 = DeepReadonly<{
   x: {
     a: 1;
     b: { x: [number, ...string[]] }[];
@@ -74,16 +74,18 @@ type R1 = DeepReadonly<{
       4: 5;
     };
     g: [{ x: number }, ...{ y: string[] }[]];
+    h: (a: number) => string;
+    i: (a: string) => number;
   };
   z: [1, 2, { e: 3; f: [6, 7] }];
 }>;
 
-assertType<TypeEq<RecordUpdated<R1, readonly [], 'changed'>, 'changed'>>();
-assertType<TypeEq<RecordUpdated<R1, readonly [], never>, never>>();
+assertType<TypeEq<RecordUpdated<R0, readonly [], 'changed'>, 'changed'>>();
+assertType<TypeEq<RecordUpdated<R0, readonly [], never>, never>>();
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['x'], 'changed'>,
+    RecordUpdated<R0, readonly ['x'], 'changed'>,
     DeepReadonly<{
       x: 'changed';
       y: {
@@ -92,6 +94,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 7] }];
     }>
@@ -100,7 +104,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['x', 'a'], 'changed'>,
+    RecordUpdated<R0, readonly ['x', 'a'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 'changed';
@@ -112,6 +116,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 7] }];
     }>
@@ -120,7 +126,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['x', 'b'], 'changed'>,
+    RecordUpdated<R0, readonly ['x', 'b'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -132,6 +138,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 7] }];
     }>
@@ -140,7 +148,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['y'], 'changed'>,
+    RecordUpdated<R0, readonly ['y'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -154,7 +162,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['y', 'c'], 'changed'>,
+    RecordUpdated<R0, readonly ['y', 'c'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -163,6 +171,8 @@ assertType<
       y: {
         c: 'changed';
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 7] }];
     }>
@@ -171,7 +181,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['y', 'c', 'd'], 'changed'>,
+    RecordUpdated<R0, readonly ['y', 'c', 'd'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -183,6 +193,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 7] }];
     }>
@@ -191,7 +203,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['y', 'c', 4], 'changed'>,
+    RecordUpdated<R0, readonly ['y', 'c', 4], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -203,6 +215,8 @@ assertType<
           4: 'changed';
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 7] }];
     }>
@@ -211,7 +225,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['y', 'g'], 'changed'>,
+    RecordUpdated<R0, readonly ['y', 'g'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -223,6 +237,8 @@ assertType<
           4: 5;
         };
         g: 'changed';
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 7] }];
     }>
@@ -231,7 +247,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z'], 'changed'>,
+    RecordUpdated<R0, readonly ['z'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -243,6 +259,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: 'changed';
     }>
@@ -251,7 +269,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z', 0], 'changed'>,
+    RecordUpdated<R0, readonly ['z', 0], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -263,6 +281,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: ['changed', 2, { e: 3; f: [6, 7] }];
     }>
@@ -271,7 +291,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z', 1], 'changed'>,
+    RecordUpdated<R0, readonly ['z', 1], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -283,6 +303,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 'changed', { e: 3; f: [6, 7] }];
     }>
@@ -291,7 +313,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z', 2], 'changed'>,
+    RecordUpdated<R0, readonly ['z', 2], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -303,6 +325,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, 'changed'];
     }>
@@ -311,7 +335,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z', 2, 'e'], 'changed'>,
+    RecordUpdated<R0, readonly ['z', 2, 'e'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -323,6 +347,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 'changed'; f: [6, 7] }];
     }>
@@ -331,7 +357,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z', 2, 'f'], 'changed'>,
+    RecordUpdated<R0, readonly ['z', 2, 'f'], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -343,6 +369,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: 'changed' }];
     }>
@@ -351,7 +379,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z', 2, 'f', 0], 'changed'>,
+    RecordUpdated<R0, readonly ['z', 2, 'f', 0], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -363,6 +391,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: ['changed', 7] }];
     }>
@@ -371,7 +401,7 @@ assertType<
 
 assertType<
   TypeEq<
-    RecordUpdated<R1, readonly ['z', 2, 'f', 1], 'changed'>,
+    RecordUpdated<R0, readonly ['z', 2, 'f', 1], 'changed'>,
     DeepReadonly<{
       x: {
         a: 1;
@@ -383,6 +413,8 @@ assertType<
           4: 5;
         };
         g: [{ x: number }, ...{ y: string[] }[]];
+        h: (a: number) => string;
+        i: (a: string) => number;
       };
       z: [1, 2, { e: 3; f: [6, 'changed'] }];
     }>

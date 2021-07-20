@@ -61,20 +61,20 @@ export const AppSub = memoNamed('AppSub', () => {
       };
 
       const paramsAsNumber = {
-        repaymentType: pipe(paramsAsStr.repaymentType).chain(
-          mapNullable(stringToNumber)
+        repaymentType: pipe(paramsAsStr.repaymentType).chain((a) =>
+          mapNullable(a, stringToNumber)
         ).value,
-        downPayment: pipe(paramsAsStr.downPayment).chain(
-          mapNullable(stringToNumber)
+        downPayment: pipe(paramsAsStr.downPayment).chain((a) =>
+          mapNullable(a, stringToNumber)
         ).value,
-        propertyPrice: pipe(paramsAsStr.propertyPrice).chain(
-          mapNullable(stringToNumber)
+        propertyPrice: pipe(paramsAsStr.propertyPrice).chain((a) =>
+          mapNullable(a, stringToNumber)
         ).value,
         borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).chain(
-          mapNullable(stringToNumber)
+          (a) => mapNullable(a, stringToNumber)
         ).value,
         interestRatePerMonth: pipe(paramsAsStr.interestRatePerMonth).chain(
-          mapNullable(stringToNumber)
+          (a) => mapNullable(a, stringToNumber)
         ).value,
       };
 
