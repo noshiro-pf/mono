@@ -49,8 +49,8 @@
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.0",
-    "styled-components": "^5.1.1"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^5.3.0"
   }
 }

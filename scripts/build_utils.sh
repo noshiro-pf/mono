@@ -41,8 +41,14 @@ for target in "${targets[@]}" ; do
     echo ""
 done
 
-echo "building \"lambda_calculus_interpreter_core\" ..."
 apps_path="${MONO_ROOT_DIR}/packages/apps"
+
+echo "building \"lambda_calculus_interpreter_core\" ..."
 cd "${apps_path}/lambda_calculus_interpreter_core"
+yarn build
+echo "done."
+
+echo "building \"event_schedule_app_shared\" ..."
+cd "${apps_path}/event_schedule_app_shared"
 yarn build
 echo "done."

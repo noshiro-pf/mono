@@ -1,8 +1,5 @@
 {
   "extends": "../../../config/tsconfig/tsconfig.base.json",
-  "compilerOptions": {
-    "sourceMap": true
-  },
   "include": ["./src", "./scripts", "./config"],
   "exclude": ["node_modules", "cjs", "esm"]
 }
