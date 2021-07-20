@@ -43,6 +43,7 @@ export function register(config?: Config): void {
 
     window.addEventListener('load', () => {
       const public_url = process.env.PUBLIC_URL;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (public_url === undefined) return;
       const swUrl = `${public_url}/service-worker.js`;
 

@@ -11,7 +11,7 @@ export const CodeArea = memoNamed<{
   const onChange = useCallback(
     // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
     (ev: ChangeEvent<HTMLTextAreaElement>) => {
-      valueChange(ev.target.value ?? '');
+      valueChange(ev.target.value);
     },
     [valueChange]
   );

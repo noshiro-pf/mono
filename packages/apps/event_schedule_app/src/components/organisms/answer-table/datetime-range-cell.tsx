@@ -15,28 +15,34 @@ type Props = Readonly<{
 
 export const DatetimeRangeCell = memoNamed<Props>(
   'DatetimeRangeCell',
-  (props) =>
-    props.datetimeSpecification === 'noStartEndSpecified' ? (
-      <>{ymd2strWithDay(props.datetimeRange.ymd)}</>
-    ) : props.datetimeSpecification === 'startSpecified' ? (
-      <>
-        {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${hm2str(
-          props.datetimeRange.timeRange.start
-        )}${vt.timeRangeTilde}`}
-      </>
-    ) : props.datetimeSpecification === 'endSpecified' ? (
-      <>
-        {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${
-          vt.timeRangeTilde
-        }${hm2str(props.datetimeRange.timeRange.start)}`}
-      </>
-    ) : props.datetimeSpecification === 'startAndEndSpecified' ? (
-      <>
-        {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${hm2str(
-          props.datetimeRange.timeRange.start
-        )}${vt.timeRangeTilde}${hm2str(props.datetimeRange.timeRange.end)}`}
-      </>
-    ) : (
-      <>{ymd2strWithDay(props.datetimeRange.ymd)}</>
-    )
+  (props) => {
+    switch (props.datetimeSpecification) {
+      case 'noStartEndSpecified':
+        return <>{ymd2strWithDay(props.datetimeRange.ymd)}</>;
+      case 'startSpecified':
+        return (
+          <>
+            {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${hm2str(
+              props.datetimeRange.timeRange.start
+            )}${vt.timeRangeTilde}`}
+          </>
+        );
+      case 'endSpecified':
+        return (
+          <>
+            {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${
+              vt.timeRangeTilde
+            }${hm2str(props.datetimeRange.timeRange.start)}`}
+          </>
+        );
+      case 'startAndEndSpecified':
+        return (
+          <>
+            {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${hm2str(
+              props.datetimeRange.timeRange.start
+            )}${vt.timeRangeTilde}${hm2str(props.datetimeRange.timeRange.end)}`}
+          </>
+        );
+    }
+  }
 );

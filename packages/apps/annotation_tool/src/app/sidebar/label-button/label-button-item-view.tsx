@@ -51,7 +51,7 @@ export const LabelButtonItemView = memoNamed<Props>(
 
     const LabelButtonItemBodyComponentConditional = useMemo(
       () =>
-        disabled ?? false
+        disabled
           ? LabelButtonItemBodyDisabledStyled
           : LabelButtonItemBodyStyled,
       [disabled]

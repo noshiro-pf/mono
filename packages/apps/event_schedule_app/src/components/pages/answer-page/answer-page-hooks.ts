@@ -156,14 +156,14 @@ export const useAnswerPageState = (): AnswerPageState => {
   const alive = useAlive();
   const onSubmitAnswer = useCallback(async () => {
     if (eventId === undefined) return;
-    if (!alive) return;
+    if (!alive.current) return;
     setSubmitButtonIsLoading(true);
     switch (myAnswerSectionState) {
       case 'creating':
         await api.answers
           .add(eventId, IRecord.set(answerForEditing, 'createdAt', Date.now()))
           .then(() => {
-            if (!alive) return;
+            if (!alive.current) return;
             setSubmitButtonIsLoading(false);
             setMyAnswerSectionState('hidden');
             fetchAnswers();
@@ -182,7 +182,7 @@ export const useAnswerPageState = (): AnswerPageState => {
         await api.answers
           .update(eventId, answerForEditing.id, answerForEditing)
           .then(() => {
-            if (!alive) return;
+            if (!alive.current) return;
             setSubmitButtonIsLoading(false);
             setMyAnswerSectionState('hidden');
             fetchAnswers();
@@ -211,12 +211,12 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const onDeleteAnswer = useCallback(async (): Promise<void> => {
     if (eventId === undefined) return;
-    if (!alive) return;
+    if (!alive.current) return;
     setSubmitButtonIsLoading(true);
     await api.answers
       .delete(eventId, answerForEditing.id)
       .then(() => {
-        if (!alive) return;
+        if (!alive.current) return;
         setSubmitButtonIsLoading(false);
         setMyAnswerSectionState('hidden');
         fetchAnswers();

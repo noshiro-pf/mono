@@ -9,7 +9,10 @@ export const halfInt = (x: number): number =>
     ? Math.floor(x / 2)
     : Math.ceil(x / 2);
 
-export const binarySearch = (sortedArray: number[], x: number): number => {
+export const binarySearch = (
+  sortedArray: readonly number[],
+  x: number
+): number => {
   if (sortedArray.length === 0) return 0;
   let left = 0;
   let right = sortedArray.length - 1;

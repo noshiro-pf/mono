@@ -37,13 +37,13 @@ export const useCreateEventScheduleHooks = ({
   const alive = useAlive();
   const onCreateEventClick = useCallback(() => {
     if (!eventScheduleValidationOk) return;
-    if (!alive) return;
+    if (!alive.current) return;
     setIsLoadingTrue();
     openCreateResultDialog();
     api.event
       .add(newEventSchedule)
       .then((id) => {
-        if (!alive) return;
+        if (!alive.current) return;
         setIsLoadingFalse();
         setUrl(toAbsolutePath(`..${routePaths.answerPage}/${id}`));
       })
