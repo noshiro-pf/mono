@@ -138,7 +138,7 @@ const getArgs = (): {
   const convertArgs = (
     args: Readonly<{
       example_no: readonly string[];
-      preview: readonly string[];
+      preview: readonly string[] | null;
       case_no: readonly string[];
     }>
   ): {
@@ -151,7 +151,13 @@ const getArgs = (): {
     testCaseIdx: (stringToNumber(args.case_no[0] ?? '0') ?? 0) - 1,
   });
 
-  return convertArgs(parser.parseArgs());
+  return convertArgs(
+    parser.parseArgs() as Readonly<{
+      example_no: readonly string[];
+      preview: readonly string[] | null;
+      case_no: readonly string[];
+    }>
+  );
 };
 
 const main = (): void => {

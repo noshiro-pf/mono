@@ -41,7 +41,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
     const alive = useAlive();
     const onConfirm = useCallback(() => {
-      if (!alive) return;
+      if (!alive.current) return;
       const afterConfirm = (): void => {
         showToast({
           toast,
@@ -53,12 +53,14 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
       const p = onConfirmClick();
       if (p instanceof Promise) {
-        if (!alive) return;
-        p.then(afterConfirm).catch(console.error);
+        p.then(() => {
+          if (!alive.current) return;
+          afterConfirm();
+        }).catch(console.error);
       } else {
         afterConfirm();
       }
-    }, [alive, onConfirmClick, handleClose, toastConfig]);
+    }, [onConfirmClick, handleClose, toastConfig, alive]);
 
     return (
       <>

@@ -33,7 +33,6 @@ export const pickupHighContrastHues = (
   let [i, y] = [0, 0];
 
   const maxValue = max(luminanceDiffAccumulated);
-  if (maxValue === undefined) return undefined;
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
     if (value > y) {
       result[i] = x as Hue;

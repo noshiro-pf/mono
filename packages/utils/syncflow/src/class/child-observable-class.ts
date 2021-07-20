@@ -59,12 +59,12 @@ export class AsyncChildObservableClass<
     parents,
     depth = 1 + maxDepth(parents),
     currentValueInit,
-  }: {
+  }: Readonly<{
     type: Type;
     parents: Wrap<P>;
     depth?: number;
     currentValueInit: AsyncChildObservable<A, Type>['currentValue'];
-  }) {
+  }>) {
     super({
       kind: 'async child',
       type,
@@ -130,12 +130,12 @@ export class SyncChildObservableClass<
     parents,
     depth = 1 + maxDepth(parents),
     currentValueInit,
-  }: {
+  }: Readonly<{
     type: Type;
     parents: Wrap<P>;
     depth?: number;
     currentValueInit: SyncChildObservable<A, Type>['currentValue'];
-  }) {
+  }>) {
     super({
       kind: 'sync child',
       type,
