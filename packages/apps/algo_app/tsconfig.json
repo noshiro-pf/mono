@@ -1,9 +1,7 @@
 {
   "extends": "../../../config/tsconfig/tsconfig.preact.json",
   "compilerOptions": {
-    "sourceMap": true,
-    "outDir": "./build",
-    "allowJs": false
+    "outDir": "./build"
   },
   "include": ["./src", "./scripts", "./config"]
 }
