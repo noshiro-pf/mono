@@ -10,12 +10,8 @@ import {
 } from './functions';
 import type { CanvasAppState } from './state';
 import { canvasAppStateHandlerGenerator, defaultCanvasAppState } from './state';
-import type { AnnotationCanvasStyle, IdType, PixiApp } from './types';
+import type { AnnotationCanvasStyle, IdType, PixiGlobalObjects } from './types';
 import { zIndex } from './z-index';
-
-// Pixi.js global settings
-settings.SORTABLE_CHILDREN = true;
-settings.ROUND_PIXELS = true;
 
 type Props = Readonly<{
   idMaker: () => IdType;
@@ -27,33 +23,52 @@ type Props = Readonly<{
 export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [pixiApp, setPixiApp] = useState<PixiApp>();
+  const [
+    //
+    pixiGlobalObjects,
+    setPixiGlobalObjects,
+  ] = useState<PixiGlobalObjects>();
+
+  const [pixiApp, setPixiApp] = useState<Application>();
 
   useEffect(() => {
+    // Pixi.js global settings
+    settings.SORTABLE_CHILDREN = true;
+    settings.ROUND_PIXELS = true;
+
     // should initialize in useEffect to wait for canvasRef.current initialization
-    const app = new Application({
-      width: props.canvasSize.width,
-      height: props.canvasSize.height,
+    const _app = new Application({
+      width: 100,
+      height: 100,
       transparent: true,
       view: canvasRef.current ?? undefined,
       antialias: false,
     });
 
-    const interactionManager = new InteractionManager(app.renderer);
+    const interactionManager = new InteractionManager(_app.renderer);
     interactionManager.cursorStyles.default = 'crosshair';
 
+    setPixiApp(_app);
+
+    return () => {
+      _app.destroy();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (pixiApp === undefined) return;
     const globalPixiObjects = createGlobalPixiObjects({
-      app,
+      app: pixiApp,
       canvasSize: props.canvasSize,
       canvasStyles: props.canvasStyles,
     });
 
-    setPixiApp({ app, ...globalPixiObjects });
+    setPixiGlobalObjects(globalPixiObjects);
+  }, [pixiApp, props.canvasSize, props.canvasStyles]);
 
-    return () => {
-      app.destroy();
-    };
-  }, [props.canvasSize, props.canvasStyles]);
+  useEffect(() => {
+    pixiApp?.renderer.resize(props.canvasSize.width, props.canvasSize.height);
+  }, [pixiApp, props.canvasSize]);
 
   const newBboxColor = useMemo<{ border: Rgba; face: Rgba }>(
     () => ({
@@ -73,23 +88,35 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
 
   const canvasAppStateHandler = useMemo(
     () =>
-      pixiApp === undefined
+      pixiApp === undefined || pixiGlobalObjects === undefined
         ? undefined
         : canvasAppStateHandlerGenerator(
             pixiApp,
+            pixiGlobalObjects,
             props.idMaker,
             props.canvasStyles,
             newBboxColor
           ),
-    [pixiApp, props.idMaker, props.canvasStyles, newBboxColor]
+    [
+      pixiApp,
+      pixiGlobalObjects,
+      props.idMaker,
+      props.canvasStyles,
+      newBboxColor,
+    ]
   );
 
   useEffect(() => {
-    if (pixiApp === undefined || canvasAppStateHandler === undefined) return;
+    if (
+      pixiApp === undefined ||
+      pixiGlobalObjects === undefined ||
+      canvasAppStateHandler === undefined
+    )
+      return;
 
     const removeEventListner = addGlobalPointerEventListener(
-      pixiApp.app,
-      pixiApp.background,
+      pixiApp,
+      pixiGlobalObjects.background,
       stateRef.current,
       canvasAppStateHandler
     );
@@ -99,6 +126,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
     };
   }, [
     pixiApp,
+    pixiGlobalObjects,
     canvasAppStateHandler,
     newBboxColor,
     props.canvasSize,

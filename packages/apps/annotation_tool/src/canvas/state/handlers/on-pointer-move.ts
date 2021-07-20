@@ -5,17 +5,17 @@ import {
   resizeBbox,
   updateBorderedRectangleGraphics,
 } from '../../functions';
-import type { PixiApp } from '../../types';
+import type { PixiGlobalObjects } from '../../types';
 import type { CanvasAppState } from '../canvas-state-type';
 
 export const onPointerMove = (
   state: CanvasAppState,
   pointerPos: Point,
-  pixiApp: PixiApp
+  pixiGlobalObjects: PixiGlobalObjects
 ): void => {
   state.pointerPos = pointerPos;
-  pixiApp.verticalLine.position.set(pointerPos.x, 0);
-  pixiApp.horizontalLine.position.set(0, pointerPos.y);
+  pixiGlobalObjects.verticalLine.position.set(pointerPos.x, 0);
+  pixiGlobalObjects.horizontalLine.position.set(0, pointerPos.y);
 
   if (state.grabbingObject.type !== undefined) {
     state.dragEndPoint = pointerPos;
@@ -24,11 +24,11 @@ export const onPointerMove = (
   switch (state.grabbingObject.type) {
     case 'background':
       updateBorderedRectangleGraphics(
-        pixiApp.temporaryRect.pixi,
+        pixiGlobalObjects.temporaryRect.pixi,
         rectFrom2Points(state.dragStartPoint, state.dragEndPoint),
-        pixiApp.temporaryRect.style.faceColor,
-        pixiApp.temporaryRect.style.borderWidthPx,
-        pixiApp.temporaryRect.style.borderColor
+        pixiGlobalObjects.temporaryRect.style.faceColor,
+        pixiGlobalObjects.temporaryRect.style.borderWidthPx,
+        pixiGlobalObjects.temporaryRect.style.borderColor
       );
       break;
     case 'bbox-face':

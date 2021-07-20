@@ -3,7 +3,7 @@ import type { Application, Sprite } from 'pixi.js';
 import type { CanvasAppState, CanvasAppStateHandler } from '../state';
 
 export const addGlobalPointerEventListener = (
-  app: Application,
+  pixiApp: Application,
   background: Sprite,
   state: CanvasAppState,
   stateHandler: CanvasAppStateHandler
@@ -25,12 +25,15 @@ export const addGlobalPointerEventListener = (
   background.removeAllListeners();
   background.addListener('pointerdown', pointerdownCallback);
 
-  app.renderer.view.addEventListener('pointermove', pointermoveCallback);
-  app.renderer.view.addEventListener('pointerup', pointerupCallback);
+  pixiApp.renderer.view.addEventListener('pointermove', pointermoveCallback);
+  pixiApp.renderer.view.addEventListener('pointerup', pointerupCallback);
 
   return () => {
     background.removeAllListeners();
-    app.renderer.view.removeEventListener('pointermove', pointermoveCallback);
-    app.renderer.view.removeEventListener('pointerup', pointerupCallback);
+    pixiApp.renderer.view.removeEventListener(
+      'pointermove',
+      pointermoveCallback
+    );
+    pixiApp.renderer.view.removeEventListener('pointerup', pointerupCallback);
   };
 };
