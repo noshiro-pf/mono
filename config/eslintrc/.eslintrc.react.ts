@@ -8,17 +8,17 @@ const config: Linter.Config = {
     },
   },
   extends: [
-    'plugin:react/recommended',
+    'plugin:react/all',
     'plugin:react-hooks/recommended',
     './.eslintrc.base.js',
   ],
   plugins: ['react', 'react-hooks'],
-  rules: {
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-    'react/jsx-uses-react': 'off',
-    'react/react-in-jsx-scope': 'off',
-  },
+  // rules: {
+  //   'react-hooks/rules-of-hooks': 'error',
+  //   'react-hooks/exhaustive-deps': 'warn',
+  //   'react/jsx-uses-react': 'off',
+  //   'react/react-in-jsx-scope': 'off',
+  // },
 };
 
 module.exports = config;

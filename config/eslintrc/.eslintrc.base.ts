@@ -57,6 +57,11 @@ const config: Linter.Config = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
+    ecmaFeatures: {
+      modules: true,
+      impliedStrict: true,
+      jsx: true,
+    },
     sourceType: 'module',
     project: './config/tsconfig/tsconfig.eslint.json',
   },
