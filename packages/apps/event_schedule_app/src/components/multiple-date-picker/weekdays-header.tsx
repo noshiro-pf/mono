@@ -46,8 +46,9 @@ type PropsHeaderCell = Readonly<{
 
 const HeaderCell = memoNamed<PropsHeaderCell>('HeaderCell', (props) => (
   <DivPointer
-    className='DayPicker-Weekday'
-    role='columnheader'
+    // eslint-disable-next-line react/forbid-component-props
+    className={'DayPicker-Weekday'}
+    role={'columnheader'}
     onClick={props.onClick}
   >
     <abbr title={props.title}>{props.abbr}</abbr>

@@ -99,7 +99,7 @@ export const MyAnswer = memoNamed<Props>(
         <HTMLTable bordered={true}>
           <thead>
             <tr>
-              <Th></Th>
+              <Th />
               {symbolHeader.map((s) => (
                 <Th key={s.iconId}>
                   <BpButton

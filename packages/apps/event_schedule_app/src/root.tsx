@@ -1,6 +1,6 @@
-import type { FC } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
+import { memoNamed } from '../../../utils/react-utils/esm';
 import {
   AnswerPage,
   CreateEventSchedule,
@@ -53,7 +53,7 @@ const redirects: readonly (readonly [string, string])[] = [
   ['/', routePaths.createPage],
 ];
 
-export const Root: FC = () => (
+export const Root = memoNamed('Root', () => (
   <Wrapper>
     <BrowserRouter>
       <Switch>
@@ -69,7 +69,7 @@ export const Root: FC = () => (
     </BrowserRouter>
     <Footer />
   </Wrapper>
-);
+));
 
 const Wrapper = styled.div`
   min-height: 100vh;

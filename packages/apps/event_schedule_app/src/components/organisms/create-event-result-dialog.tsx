@@ -33,7 +33,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
           <>
             <p>{vt.description}</p>
             <UrlWrapper>
-              <div>URL: </div>
+              <div>{'URL: '}</div>
               <AnchorWrapper>
                 <Anchor
                   href={props.url}

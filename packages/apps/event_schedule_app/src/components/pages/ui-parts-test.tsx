@@ -79,23 +79,23 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
       </PadWrapper>
       <PadWrapper>
         <Button icon='refresh' rightIcon='duplicate'>
-          default
+          {'default'}
         </Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='primary'>primary</Button>
+        <Button intent='primary'>{'primary'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='success'>success</Button>
+        <Button intent='success'>{'success'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='warning'>warning</Button>
+        <Button intent='warning'>{'warning'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='danger'>danger</Button>
+        <Button intent='danger'>{'danger'}</Button>
       </PadWrapper>
       <PadWrapper>
-        <Button intent='none'>none</Button>
+        <Button intent='none'>{'none'}</Button>
       </PadWrapper>
       <PadWrapper>
         <BpTimePicker time={{ hours: 12, minutes: 34 }} onTimeChange={clog} />
@@ -107,7 +107,7 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
         <BpSwitch
           checked={bpSwitchState}
           onToggle={onBpSwitchChangeHandler}
-          labelElement={<strong>switch</strong>}
+          labelElement={<strong>{'switch'}</strong>}
         />
       </PadWrapper>
     </div>

@@ -53,6 +53,7 @@ export const DatePickerDate = memoNamed<Props>(
 
     return (
       <Cell
+        // eslint-disable-next-line react/forbid-component-props
         className={className}
         tabIndex={-1}
         role='gridcell'

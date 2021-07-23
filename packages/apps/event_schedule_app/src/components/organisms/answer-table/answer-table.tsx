@@ -116,9 +116,9 @@ export const AnswerTable = memoNamed<Props>(
             <Td style={tCellStyle}>{vt.comment}</Td>
 
             {/* spacer */}
-            <Td style={tCellStyle}></Td>
+            <Td style={tCellStyle} />
             {eventSchedule.answerSymbolList.map((s) => (
-              <Td key={s.iconId} style={tCellStyle}></Td>
+              <Td key={s.iconId} style={tCellStyle} />
             ))}
 
             {answersWithHandler.map((answer) => (
