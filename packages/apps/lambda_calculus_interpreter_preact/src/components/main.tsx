@@ -9,10 +9,10 @@ export const Main = memoNamed('Main', () => {
 
   return (
     <Root>
-      <Title>(Untyped) lambda calculus</Title>
-      <Description>expr ::= x | (lambda x. expr) | (expr expr)</Description>
+      <Title>{'(Untyped) lambda calculus'}</Title>
+      <Description>{'expr ::= x | (lambda x. expr) | (expr expr)'}</Description>
       <TextAreaWrapper>
-        <div>Input:</div>
+        <div>{'Input:'}</div>
         <InputAreaStyled
           value={inputAreaString}
           valueChange={setInputAreaString}
@@ -20,7 +20,7 @@ export const Main = memoNamed('Main', () => {
       </TextAreaWrapper>
 
       <TextAreaWrapper>
-        <div>Output:</div>
+        <div>{'Output:'}</div>
         <OutputAreaStyled value={outputAreaString} />
       </TextAreaWrapper>
     </Root>

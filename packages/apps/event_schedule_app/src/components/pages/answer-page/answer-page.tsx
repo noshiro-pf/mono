@@ -51,17 +51,17 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   ) : (
     <div>
       <TitleWrapper>
-        <Title href={'../../'} target='_blank' rel='noopener noreferrer'>
+        <Title href={'../../'} rel='noopener noreferrer' target='_blank'>
           <Icon icon={'timeline-events'} iconSize={28} />
           <div>{vt.title}</div>
         </Title>
         <CreateNewButtonWrapper>
           <AnchorButton
-            intent={'primary'}
             href={'../../'}
-            target='_blank'
-            rel='noopener noreferrer'
             icon='add'
+            intent={'primary'}
+            rel='noopener noreferrer'
+            target='_blank'
           >
             {vt.createNew}
           </AnchorButton>
@@ -91,11 +91,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             {isExpired ? undefined : (
               <SingleButtonWrapper>
                 <BpButton
-                  intent={'none'}
-                  icon={'refresh'}
-                  onClick={refresh}
-                  loading={refreshButtonIsLoading}
                   disabled={refreshButtonIsDisabled}
+                  icon={'refresh'}
+                  intent={'none'}
+                  loading={refreshButtonIsLoading}
+                  onClick={refresh}
                 >
                   {vt.answers.refresh}
                 </BpButton>
@@ -130,8 +130,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             {myAnswerSectionState === 'hidden' && !isExpired ? (
               <ButtonsWrapperAlignEnd>
                 <BpButton
-                  intent='primary'
                   icon='add'
+                  intent='primary'
                   text={vt.answers.addAnswer}
                   onClick={onAddAnswerButtonClick}
                 />
@@ -149,17 +149,17 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 onCloseClick={onCancel}
               >
                 <MyAnswer
-                  eventSchedule={eventSchedule}
-                  answers={answers}
                   answerForEditing={answerForEditing}
+                  answers={answers}
+                  eventSchedule={eventSchedule}
+                  myAnswerSectionState={myAnswerSectionState}
+                  selectedAnswerUserName={selectedAnswerUserName}
+                  submitButtonIsDisabled={submitButtonIsDisabled}
+                  submitButtonIsLoading={submitButtonIsLoading}
                   updateAnswerForEditing={updateAnswerForEditing}
                   onCancel={onCancel}
                   onDeleteAnswer={onDeleteAnswer}
                   onSubmitAnswer={onSubmitAnswer}
-                  myAnswerSectionState={myAnswerSectionState}
-                  submitButtonIsLoading={submitButtonIsLoading}
-                  submitButtonIsDisabled={submitButtonIsDisabled}
-                  selectedAnswerUserName={selectedAnswerUserName}
                 />
               </Section>
             )}

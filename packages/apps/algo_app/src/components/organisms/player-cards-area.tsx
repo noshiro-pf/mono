@@ -83,17 +83,17 @@ export const PlayerCardsArea = memoNamed(
           {cardsWithConfig.map((c, index) => (
             <CardComponent
               key={index}
-              number={c.number}
               color={c.color}
+              float={c.float}
+              isClickable={c.isClickable}
+              number={c.number}
+              outlineColor={c.outlineColor}
+              showOutline={c.showOutline}
               size={cardSize}
               visibilityFromMe={c.visibilityFromMe}
-              isClickable={c.isClickable}
-              float={c.float}
-              showOutline={c.showOutline}
-              outlineColor={c.outlineColor}
-              onClick={c.onClick}
               windowSize={windowSize}
               onBoundingClientRectChange={c.onBoundingClientRectChange}
+              onClick={c.onClick}
             />
           ))}
         </RotateContainer>

@@ -55,9 +55,9 @@ export const SelectDatetimes = memoNamed<Props>(
           <DatetimeSpecificationSelectWrapper>
             <div>{vt.datetimeSpecification}</div>
             <BpSelect
+              options={selectorOptions}
               value={datetimeSpecification}
               onValueChange={onDatetimeSpecificationChange as CastedHandlerType}
-              options={selectorOptions}
             />
           </DatetimeSpecificationSelectWrapper>
           <DatetimeRangeListWrapper>
@@ -73,13 +73,13 @@ export const SelectDatetimes = memoNamed<Props>(
               }) => (
                 <SelectedDatetimeRow
                   key={id}
-                  datetimeSpecification={datetimeSpecification}
                   datetimeRange={datetimeRange}
-                  onYmdChange={onYmdChange}
-                  onRangeStartChange={onRangeStartChange}
-                  onRangeEndChange={onRangeEndChange}
-                  onDuplicateClick={onDuplicateClick}
+                  datetimeSpecification={datetimeSpecification}
                   onDeleteClick={onDeleteClick}
+                  onDuplicateClick={onDuplicateClick}
+                  onRangeEndChange={onRangeEndChange}
+                  onRangeStartChange={onRangeStartChange}
+                  onYmdChange={onYmdChange}
                 />
               )
             )}
@@ -88,22 +88,22 @@ export const SelectDatetimes = memoNamed<Props>(
           <ButtonsWrapper>
             <DeleteAllButton onConfirmDeleteAll={onConfirmDeleteAll} />
             <SetTimesPopover
-              initialValue={setTimesPopoverInitialValue}
               datetimeSpecification={datetimeSpecification}
+              initialValue={setTimesPopoverInitialValue}
               onSetTimesSubmit={onSetTimesPopoverSubmit}
             />
             <BpButton
-              intent='primary'
               icon='sort-asc'
+              intent='primary'
               text={vt.sortDatetimes}
               onClick={onSortClick}
             />
           </ButtonsWrapper>
         </div>
         <MultipleDatePicker
+          holidaysJpDefinition={holidaysJpDefinition}
           selectedDates={selectedDates}
           onSelectedDatesChange={onSelectedDatesChange}
-          holidaysJpDefinition={holidaysJpDefinition}
         />
       </Root>
     );

@@ -26,15 +26,15 @@ export const ConfirmDialog = memoNamed<Props>(
     intent,
   }) => (
     <BpAlert
-      isOpen={isOpen}
-      onConfirm={onConfirm}
-      onCancel={onCancel}
-      cancelButtonText={cancelButtonText}
-      confirmButtonText={confirmButtonText}
-      intent={intent}
-      icon={icon}
       canEscapeKeyCancel={true}
       canOutsideClickCancel={true}
+      cancelButtonText={cancelButtonText}
+      confirmButtonText={confirmButtonText}
+      icon={icon}
+      intent={intent}
+      isOpen={isOpen}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
     >
       <p>{message}</p>
     </BpAlert>

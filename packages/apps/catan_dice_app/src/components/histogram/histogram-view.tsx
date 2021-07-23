@@ -13,7 +13,10 @@ export const HistogramView = memoNamed<Props>(
   ({ xy, max, numSample }) => (
     <Root>
       <NumSampleWrapper>
-        <NumSample>N = {numSample}</NumSample>
+        <NumSample>
+          {'N = '}
+          {numSample}
+        </NumSample>
       </NumSampleWrapper>
       <Main>
         {xy.map(([x, y]) => (

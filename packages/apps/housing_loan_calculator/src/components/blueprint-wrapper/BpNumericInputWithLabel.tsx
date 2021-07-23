@@ -17,11 +17,11 @@ export const BpNumericInputWithLabel = memoNamed<Props>(
       {label}
       <NumericInput
         allowNumericCharactersOnly={true}
-        onValueChange={onValueChange}
-        value={value}
         disabled={disabled}
-        min={min}
         max={max}
+        min={min}
+        value={value}
+        onValueChange={onValueChange}
       />
     </Label>
   )

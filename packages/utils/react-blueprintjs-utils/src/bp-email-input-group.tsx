@@ -33,18 +33,19 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
 
     return (
       <FormGroup
-        label={formGroupLabel}
         helperText={showError ? invalidMessage : undefined}
         intent={showError ? 'danger' : 'primary'}
+        label={formGroupLabel}
       >
         <BpInput
-          type='email'
+          autoFocus={autoFocus}
+          disabled={disabled}
+          focus$={focus$}
           placeholder={placeholder}
+          type='email'
           value={value}
           onValueChange={onValueChange}
-          disabled={disabled}
-          autoFocus={autoFocus}
-          focus$={focus$}
+          // eslint-disable-next-line react/jsx-props-no-spreading
           {...props}
         />
       </FormGroup>

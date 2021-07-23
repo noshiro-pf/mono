@@ -162,24 +162,24 @@ export const AppSub = memoNamed('AppSub', () => {
 
   return (
     <AppView
+      borrowingBalanceYen={borrowingBalanceYen}
+      borrowingPeriodYear={borrowingPeriodYear}
       calculationState={calculationState}
       downPaymentManYen={downPaymentManYen}
-      onDownPaymentManYenChange={setDownPaymentManYen}
-      propertyPriceManYen={propertyPriceManYen}
-      onPropertyPriceManYenChange={setPropertyPriceManYen}
-      borrowingPeriodYear={borrowingPeriodYear}
-      onBorrowingPeriodYearChange={setBorrowingPeriodYear}
+      fixedMonthlyPaymentsYen={fixedMonthlyPaymentsYen}
+      fixedPrincipalYenPerMonth={fixedPrincipalYenPerMonth}
       interestRatePercentPerYear={interestRatePercentPerYear}
-      onInterestRatePercentPerYearChange={setInterestRatePercentPerYear}
-      repaymentType={repaymentType}
-      onRepaymentTypeChange={setRepaymentType}
-      borrowingBalanceYen={borrowingBalanceYen}
+      interestSumManYen={interestSumManYen}
       interestYen={interestYen}
       monthlyPaymentTotalYen={monthlyPaymentTotalYen}
       monthlyPrincipalPaymentYen={monthlyPrincipalPaymentYen}
-      fixedPrincipalYenPerMonth={fixedPrincipalYenPerMonth}
-      fixedMonthlyPaymentsYen={fixedMonthlyPaymentsYen}
-      interestSumManYen={interestSumManYen}
+      propertyPriceManYen={propertyPriceManYen}
+      repaymentType={repaymentType}
+      onBorrowingPeriodYearChange={setBorrowingPeriodYear}
+      onDownPaymentManYenChange={setDownPaymentManYen}
+      onInterestRatePercentPerYearChange={setInterestRatePercentPerYear}
+      onPropertyPriceManYenChange={setPropertyPriceManYen}
+      onRepaymentTypeChange={setRepaymentType}
     />
   );
 });

@@ -24,8 +24,8 @@ export const RepaymentTypeRadioGroup = memoNamed<Props>(
     return (
       <RadioGroup
         label={viewTexts.repaymentType}
-        onChange={onChange}
         selectedValue={repaymentType}
+        onChange={onChange}
       >
         <Radio
           label={viewTexts.principalEqualPayment}

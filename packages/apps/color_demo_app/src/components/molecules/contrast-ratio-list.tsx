@@ -13,11 +13,12 @@ export const ContrastRatioList = memoNamed<Props>(
   'ContrastRatioList',
   (props) => (
     <Root>
-      <div>隣り合う二色のコントラスト比：</div>[
+      <div>{'隣り合う二色のコントラスト比：'}</div>
+      {'['}
       {props.contrastRatioList.map((r, i) => (
         <div key={i}>{`${r.toFixed(2)}, `}&nbsp;</div>
       ))}
-      ]
+      {']'}
     </Root>
   )
 );

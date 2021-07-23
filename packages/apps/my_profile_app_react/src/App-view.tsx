@@ -16,73 +16,74 @@ const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
   return res === -1 ? undefined : res;
 };
 
-export const AppSub = memoNamed<{
-  mobile: boolean;
-}>('AppSub', ({ mobile }) => {
-  const pathName = usePathNameList();
-  const pathNameLast = useMemo(() => last(pathName) ?? '', [pathName]);
+export const AppSub = memoNamed<Readonly<{ mobile: boolean }>>(
+  'AppSub',
+  ({ mobile }) => {
+    const pathName = usePathNameList();
+    const pathNameLast = useMemo(() => last(pathName) ?? '', [pathName]);
 
-  // pathnameと対応させるため、routerを使ってタブ切り替えを制御
-  const tabIndex = useMemo(
-    //
-    () => pathNameLastToIndex(pathNameLast) ?? 0,
-    [pathNameLast]
-  );
+    // pathnameと対応させるため、routerを使ってタブ切り替えを制御
+    const tabIndex = useMemo(
+      //
+      () => pathNameLastToIndex(pathNameLast) ?? 0,
+      [pathNameLast]
+    );
 
-  const routerNavigator = useNavigator();
+    const routerNavigator = useNavigator();
 
-  const tabIndexOnChange = useCallback(
-    (tabIdx: number) => {
-      if (0 <= tabIdx && tabIdx < routeList.length) {
-        const route = routeList[tabIdx];
-        if (route !== undefined) {
-          routerNavigator(route);
+    const tabIndexOnChange = useCallback(
+      (tabIdx: number) => {
+        if (0 <= tabIdx && tabIdx < routeList.length) {
+          const route = routeList[tabIdx];
+          if (route !== undefined) {
+            routerNavigator(route);
+          }
         }
-      }
-    },
-    [routerNavigator]
-  );
+      },
+      [routerNavigator]
+    );
 
-  return (
-    <div>
-      <AppBarFlex position='static' color='default'>
-        <MuiTabsStyled
-          tabIndex={tabIndex}
-          tabIndexChange={tabIndexOnChange}
-          scrollable={true}
-          labels={labelList}
-        />
-      </AppBarFlex>
+    return (
+      <div>
+        <AppBarFlex color='default' position='static'>
+          <MuiTabsStyled
+            labels={labelList}
+            scrollable={true}
+            tabIndex={tabIndex}
+            tabIndexChange={tabIndexOnChange}
+          />
+        </AppBarFlex>
 
-      <LastUpdatedWrapper>
-        <LastUpdated />
-      </LastUpdatedWrapper>
+        <LastUpdatedWrapper>
+          <LastUpdated />
+        </LastUpdatedWrapper>
 
-      <ContentWrapper>
-        <Switch>
-          <Route exact={true} path={routes.profile}>
-            <ReactMarkdown>{ProfileMd}</ReactMarkdown>
-          </Route>
-          <Route exact={true} path={routes.profile2}>
-            <ReactMarkdown>{Profile2Md}</ReactMarkdown>
-          </Route>
-          <Route exact={true} path={routes.skills}>
-            <ReactMarkdown>{SkillsMd}</ReactMarkdown>
-          </Route>
-          <Route exact={true} path={routes.products}>
-            <Products mobile={mobile} />
-          </Route>
-          <Route exact={true} path={routes.writings}>
-            <Writings />
-          </Route>
-          <Route path='*'>
-            <Redirect to={routes.profile} />
-          </Route>
-        </Switch>
-      </ContentWrapper>
-    </div>
-  );
-});
+        <ContentWrapper>
+          <Switch>
+            <Route exact={true} path={routes.profile}>
+              <ReactMarkdown>{ProfileMd}</ReactMarkdown>
+            </Route>
+            <Route exact={true} path={routes.profile2}>
+              <ReactMarkdown>{Profile2Md}</ReactMarkdown>
+            </Route>
+            <Route exact={true} path={routes.skills}>
+              <ReactMarkdown>{SkillsMd}</ReactMarkdown>
+            </Route>
+            <Route exact={true} path={routes.products}>
+              <Products mobile={mobile} />
+            </Route>
+            <Route exact={true} path={routes.writings}>
+              <Writings />
+            </Route>
+            <Route path='*'>
+              <Redirect to={routes.profile} />
+            </Route>
+          </Switch>
+        </ContentWrapper>
+      </div>
+    );
+  }
+);
 
 const LastUpdatedWrapper = styled.div`
   padding: 10px 15px 0 0;

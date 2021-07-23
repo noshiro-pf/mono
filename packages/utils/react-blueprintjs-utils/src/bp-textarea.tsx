@@ -21,6 +21,7 @@ export const BpTextArea = memoNamed<BpTextAreaProps>(
       [onValueChange]
     );
 
+    // eslint-disable-next-line react/jsx-props-no-spreading
     return <TextArea value={value} onChange={onChangeHandler} {...props} />;
   }
 );

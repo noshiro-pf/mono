@@ -95,11 +95,11 @@ export const SymbolSettings = memoNamed<Props>(
             <AnswerSymbolRow
               key={key}
               answerSymbol={value}
+              disabled={disabled}
               iconsInUse={iconsInUse}
+              onDeleteClick={onDeleteClickHandler}
               onDescriptionChange={onDescriptionChangeHandler}
               onPointChange={onPointChangeHandler}
-              onDeleteClick={onDeleteClickHandler}
-              disabled={disabled}
             />
           )
         )}

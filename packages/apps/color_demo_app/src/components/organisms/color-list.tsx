@@ -25,7 +25,7 @@ type Props = Readonly<{
 
 export const ColorList = memoNamed<Props>('ColorList', (props) => (
   <ColorsWrapper>
-    <div>色相リスト</div>
+    <div>{'色相リスト'}</div>
     <Colors>
       {props.hueList.map((hue) => (
         <ColorItemWrapper key={hue}>

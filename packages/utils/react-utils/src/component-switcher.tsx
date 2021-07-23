@@ -14,8 +14,10 @@ export const ComponentSwitcher = memoNamed<Readonly<Props>>(
     <>
       {children.map((c, i) =>
         i === index ? (
+          // eslint-disable-next-line react/no-array-index-key
           <div key={i}>{c}</div>
         ) : (
+          // eslint-disable-next-line react/no-array-index-key
           <div key={i} style={displayNoneStyle}>
             {c}
           </div>

@@ -55,7 +55,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   ) : (
     <div>
       <TitleWrapper>
-        <Title href={'../'} target='_blank' rel='noopener noreferrer'>
+        <Title href={'../'} rel='noopener noreferrer' target='_blank'>
           <Icon icon={'timeline-events'} iconSize={28} />
           <div>{vt.title}</div>
         </Title>
@@ -70,8 +70,8 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
             {`${vt.editSubTitle.prefix}${eventScheduleResult.value.title}${vt.editSubTitle.suffix}`}
           </SubTitle>
           <EventScheduleSettingCommon
-            mode={'edit'}
             initialValues={eventScheduleResult.value}
+            mode={'edit'}
           />
         </>
       )}

@@ -12,11 +12,12 @@ export const BpSwitchWithoutLabel = memoNamed<BpSwitchWithoutLabelProps>(
   'BpSwitchWithoutLabel',
   ({ checked, onToggle, ...props }) => (
     <Switch
-      labelElement={undefined}
-      label={undefined}
-      style={style}
       checked={checked}
+      label={undefined}
+      labelElement={undefined}
+      style={style}
       onChange={onToggle}
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
     />
   )

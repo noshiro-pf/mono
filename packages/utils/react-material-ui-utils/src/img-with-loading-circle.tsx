@@ -58,9 +58,9 @@ export const ImgWithLoadingCircle = memoNamed<Props>(
       <RelativeWrapper>
         <AbsoluteWrapper>
           <Img
-            style={imgStyle}
-            src={src}
             alt={alt}
+            src={src}
+            style={imgStyle}
             onLoad={onLoad}
             onLoadStart={onLoadStart}
           />

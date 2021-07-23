@@ -14,28 +14,28 @@ export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
 
   return (
     <Popover
-      isOpen={isOpen}
-      onClose={handleClose}
       canEscapeKeyClose={true}
-      placement={'top'}
-      minimal={true}
       content={
         <ContentRoot>
           <Comments>{props.comment}</Comments>
           <ButtonsWrapperAlignEnd>
             <BpButton
-              type='button'
               intent='none'
-              onClick={handleClose}
               text={texts.buttonText.close}
+              type='button'
+              onClick={handleClose}
             />
           </ButtonsWrapperAlignEnd>
         </ContentRoot>
       }
+      isOpen={isOpen}
+      minimal={true}
+      placement={'top'}
+      onClose={handleClose}
     >
       <BpButton
-        minimal={true}
         icon={'comment'}
+        minimal={true}
         small={true}
         onClick={handleOpen}
       />

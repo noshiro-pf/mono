@@ -19,8 +19,8 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       <SwitchWrapper>
         <div>{props.title}</div>
         <BpSwitchWithoutLabel
-          inline={true}
           checked={props.show}
+          inline={true}
           onToggle={props.onToggle}
         />
       </SwitchWrapper>

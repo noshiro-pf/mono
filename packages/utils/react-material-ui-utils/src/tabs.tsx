@@ -22,12 +22,12 @@ export const MuiTabs = memoNamed<Props>(
 
     return (
       <Tabs
-        value={tabIndex}
-        onChange={onChange}
         indicatorColor='primary'
-        textColor='primary'
-        variant={scrollable ? 'scrollable' : 'fullWidth'}
         scrollButtons={scrollable ? 'off' : undefined}
+        textColor='primary'
+        value={tabIndex}
+        variant={scrollable ? 'scrollable' : 'fullWidth'}
+        onChange={onChange}
       >
         {labels.map((label) => (
           <Tab key={label} label={label} />

@@ -11,11 +11,11 @@ export const TriangleIcon = memoNamed<Props>(
   'TriangleIcon',
   ({ size: iconSize = 16, color = 'black', style }) => (
     <svg
-      style={style}
-      width={iconSize}
-      height={iconSize}
-      viewBox='0 0 32 32'
       fill='none'
+      height={iconSize}
+      style={style}
+      viewBox='0 0 32 32'
+      width={iconSize}
       xmlns='http://www.w3.org/2000/svg'
     >
       <g>
@@ -27,10 +27,10 @@ export const TriangleIcon = memoNamed<Props>(
       <defs>
         <clipPath id='clip0'>
           <rect
-            width='32'
-            height='32'
             fill='white'
+            height='32'
             transform='translate(32 32) rotate(-180)'
+            width='32'
           />
         </clipPath>
       </defs>

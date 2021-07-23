@@ -27,28 +27,28 @@ export const NameAndNotes = memoNamed<Props>(
     return (
       <Root>
         <FormGroup
-          label={vt.eventName}
           helperText={
             showError
               ? texts.eventSettingsPage.errorMessages.titleIsEmpty
               : undefined
           }
           intent={showError ? 'danger' : 'primary'}
+          label={vt.eventName}
         >
           <BpInput
+            autoFocus={true}
             placeholder={vt.eventNamePlaceholder}
             value={title}
-            onValueChange={onTitleChangeLocal}
-            autoFocus={true}
             onBlur={onBlur}
+            onValueChange={onTitleChangeLocal}
           />
         </FormGroup>
-        <FormGroup label={vt.notes} intent={'primary'}>
+        <FormGroup intent={'primary'} label={vt.notes}>
           <BpTextArea
+            fill={true}
             placeholder={vt.notesPlaceholder}
             value={notes}
             onValueChange={onNotesChange}
-            fill={true}
           />
         </FormGroup>
       </Root>

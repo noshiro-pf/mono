@@ -42,9 +42,10 @@ export const BpInput = memoNamed<BpInputProps>(
 
     return (
       <InputGroup
+        inputRef={inputRef}
         value={value}
         onChange={onChangeHandler}
-        inputRef={inputRef}
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       />
     );

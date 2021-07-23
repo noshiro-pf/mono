@@ -77,17 +77,18 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
 
     return (
       <DateInput
-        value={dateObj}
-        formatDate={formatDate}
-        parseDate={parseDate}
-        onChange={onChangeHandler}
-        placeholder={placeholder}
-        showActionsBar={showActionsBar}
         canClearSelection={canClearSelection}
-        shortcuts={shortcuts as Writable<typeof shortcuts>}
-        reverseMonthAndYearMenus={reverseMonthAndYearMenus}
+        formatDate={formatDate}
         maxDate={maxDate}
+        parseDate={parseDate}
+        placeholder={placeholder}
+        reverseMonthAndYearMenus={reverseMonthAndYearMenus}
+        shortcuts={shortcuts as Writable<typeof shortcuts>}
+        showActionsBar={showActionsBar}
         timePrecision={'minute'}
+        value={dateObj}
+        onChange={onChangeHandler}
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       />
     );

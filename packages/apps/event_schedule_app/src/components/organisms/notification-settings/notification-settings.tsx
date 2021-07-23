@@ -147,61 +147,61 @@ export const NotificationSettingsComponent = memoNamed<Props>(
       <div>
         <WidthRestrictedInputWrapper>
           <BpEmailInput
+            disabled={disabled}
             focus$={focusEmailInput$}
             formGroupLabel={vt.emailAddress}
+            invalidMessage={texts.eventSettingsPage.errorMessages.invalidEmail}
             value={notificationSettings.email}
             onValueChange={onEmailChange}
-            disabled={disabled}
-            invalidMessage={texts.eventSettingsPage.errorMessages.invalidEmail}
           />
         </WidthRestrictedInputWrapper>
         <CheckboxesWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              label={vt.notifyOnAnswerChange}
               checked={notificationSettings.notifyOnAnswerChange}
-              onCheck={onNotifyOnAnswerChangeCheck}
               disabled={disabled}
+              label={vt.notifyOnAnswerChange}
+              onCheck={onNotifyOnAnswerChangeCheck}
             />
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              label={vt.notify01daysBeforeAnswerDeadline}
               checked={notificationSettings.notify01daysBeforeAnswerDeadline}
-              onCheck={onNotify01daysBeforeAnswerDeadlineCheck}
               disabled={disabledDetail.notify01daysBefore}
+              label={vt.notify01daysBeforeAnswerDeadline}
+              onCheck={onNotify01daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              label={vt.notify03daysBeforeAnswerDeadline}
               checked={notificationSettings.notify03daysBeforeAnswerDeadline}
-              onCheck={onNotify03daysBeforeAnswerDeadlineCheck}
               disabled={disabledDetail.notify03daysBefore}
+              label={vt.notify03daysBeforeAnswerDeadline}
+              onCheck={onNotify03daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              label={vt.notify07daysBeforeAnswerDeadline}
               checked={notificationSettings.notify07daysBeforeAnswerDeadline}
-              onCheck={onNotify07daysBeforeAnswerDeadlineCheck}
               disabled={disabledDetail.notify07daysBefore}
+              label={vt.notify07daysBeforeAnswerDeadline}
+              onCheck={onNotify07daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              label={vt.notify14daysBeforeAnswerDeadline}
               checked={notificationSettings.notify14daysBeforeAnswerDeadline}
-              onCheck={onNotify14daysBeforeAnswerDeadlineCheck}
               disabled={disabledDetail.notify14daysBefore}
+              label={vt.notify14daysBeforeAnswerDeadline}
+              onCheck={onNotify14daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              label={vt.notify28daysBeforeAnswerDeadline}
               checked={notificationSettings.notify28daysBeforeAnswerDeadline}
-              onCheck={onNotify28daysBeforeAnswerDeadlineCheck}
               disabled={disabledDetail.notify28daysBefore}
+              label={vt.notify28daysBeforeAnswerDeadline}
+              onCheck={onNotify28daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
         </CheckboxesWrapper>

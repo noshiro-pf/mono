@@ -32,11 +32,11 @@ export const DeleteAnswerButton = memoNamed<Props>(
   'DeleteAnswerButton',
   ({ onConfirmDeleteAnswer, loading }) => (
     <ButtonWithConfirm
-      onConfirmClick={onConfirmDeleteAnswer}
-      loading={loading}
       buttonConfig={buttonConfig}
       dialogConfig={dialogConfig}
+      loading={loading}
       toastConfig={toastConfig}
+      onConfirmClick={onConfirmDeleteAnswer}
     />
   )
 );

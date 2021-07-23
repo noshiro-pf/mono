@@ -47,33 +47,33 @@ export const ConfigSection = memoNamed<Props>(
       <ConfigElement>
         <BpNumericInputWithLabel
           label={viewTexts.downPayment}
-          value={downPaymentManYen}
           min={0}
+          value={downPaymentManYen}
           onValueChange={onDownPaymentManYenChange}
         />
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
           label={viewTexts.propertyPrice}
-          value={propertyPriceManYen}
           min={0}
+          value={propertyPriceManYen}
           onValueChange={onPropertyPriceManYenChange}
         />
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
           label={viewTexts.borrowingPeriodMonth}
-          value={borrowingPeriodYear}
           min={1}
+          value={borrowingPeriodYear}
           onValueChange={onBorrowingPeriodYearChange}
         />
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
           label={viewTexts.interestRatePerMonth}
-          value={interestRatePercentPerYear}
           max={100}
           min={0}
+          value={interestRatePercentPerYear}
           onValueChange={onInterestRatePercentPerYearChange}
         />
       </ConfigElement>

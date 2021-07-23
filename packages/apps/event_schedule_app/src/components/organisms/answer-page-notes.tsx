@@ -10,7 +10,7 @@ const convertUrlStringToAnchorElement = (
   str: string
 ): JSX.IntrinsicElements['a'] | JSX.IntrinsicElements['span'] =>
   urlRegex({ exact: true, strict: false }).test(str) ? (
-    <a href={str} target='_blank' rel='noopener noreferrer'>
+    <a href={str} rel='noopener noreferrer' target='_blank'>
       {str}
     </a>
   ) : (

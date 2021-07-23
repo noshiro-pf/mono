@@ -19,11 +19,11 @@ export const CreateEventResultDialog = memoNamed<Props>(
   'CreateEventResultDialog',
   (props) => (
     <BpDialog
-      isOpen={props.isOpen}
-      hasBackdrop={false}
-      isCloseButtonShown={false}
       canEscapeKeyClose={false}
+      hasBackdrop={false}
       icon='timeline-events'
+      isCloseButtonShown={false}
+      isOpen={props.isOpen}
       title={props.isLoading ? vt.titleLoading : vt.title}
     >
       <div className={Classes.DIALOG_BODY}>
@@ -33,12 +33,12 @@ export const CreateEventResultDialog = memoNamed<Props>(
           <>
             <p>{vt.description}</p>
             <UrlWrapper>
-              <div>URL: </div>
+              <div>{'URL: '}</div>
               <AnchorWrapper>
                 <Anchor
                   href={props.url}
-                  target='_blank'
                   rel='noopener noreferrer'
+                  target='_blank'
                 >
                   {props.url}
                 </Anchor>
@@ -63,10 +63,10 @@ export const CreateEventResultDialog = memoNamed<Props>(
               {vt.back}
             </AnchorButton>
             <AnchorButton
-              intent={'primary'}
               href={props.url}
-              target='_blank'
+              intent={'primary'}
               rel='noopener noreferrer'
+              target='_blank'
             >
               {vt.openEventPageCreated}
             </AnchorButton>

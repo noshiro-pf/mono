@@ -1,3 +1,4 @@
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import type { ProductsInfo } from '../types';
 import {
   CatanDiceImage,
@@ -10,10 +11,10 @@ import {
   ScheduleImage,
 } from './images';
 
-export const products: {
+export const products: DeepReadonly<{
   libraries: ProductsInfo[];
-  webapps: ProductsInfo[];
-} = {
+  webApps: ProductsInfo[];
+}> = {
   libraries: [
     {
       link: 'https://github.com/noshiro-pf/mono/tree/master/packages/utils/syncflow',
@@ -35,7 +36,7 @@ export const products: {
       imageUrl: '',
     },
   ],
-  webapps: [
+  webApps: [
     {
       link: 'https://event-schedule-app.web.app/',
       title: 'イベント日程調整ツール2',

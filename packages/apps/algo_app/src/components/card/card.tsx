@@ -106,24 +106,24 @@ export const CardComponent = memoNamed<Props>(
     return (
       <div ref={ref}>
         <Wrapper
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
           style={wrapperStyle}
           onClick={isClickable ? onClick : undefined}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
         >
           <SvgStyled
-            viewBox='0 0 161 241'
             fill='none'
-            xmlns='http://www.w3.org/2000/svg'
             style={backSideStyle}
+            viewBox='0 0 161 241'
+            xmlns='http://www.w3.org/2000/svg'
           >
             <rect
-              x={4}
-              y={4}
-              width={153}
               height={233}
               rx={18}
               style={rectStyle}
+              width={153}
+              x={4}
+              y={4}
             />
             {visibilityFromMe === 'faceDownButVisibleToMe'
               ? createElement(CardComponents[number], { color, textColor })
@@ -137,11 +137,11 @@ export const CardComponent = memoNamed<Props>(
                   fill={eyeIconColor}
                 />
                 <rect
+                  fill={eyeIconColor}
+                  height='8'
+                  width='7'
                   x='26.481'
                   y='23'
-                  width='7'
-                  height='8'
-                  fill={eyeIconColor}
                 />
                 <path
                   d='M27.8273 34.6269C24.3462 36.7661 18 42.3955 18 55.0055C18 67.5669 24.2972 73.2013 27.7868 75.3593C29.1685 76.2136 30.9301 76.2136 32.3117 75.3593C35.8013 73.2013 42.0986 67.567 42.0986 55.0055C42.0986 42.3955 35.7525 36.7661 32.2713 34.6269C30.9114 33.791 29.1873 33.791 27.8273 34.6269ZM31.2737 45.7729C35.4218 46.3025 38.7673 49.6567 39.2852 53.8062C40.0444 59.889 34.9328 65.0006 28.85 64.2413C24.7006 63.7235 21.3463 60.3778 20.8168 56.2298C20.0382 50.1314 25.1753 44.9944 31.2737 45.7729Z'
@@ -156,18 +156,18 @@ export const CardComponent = memoNamed<Props>(
           </SvgStyled>
 
           <SvgStyled
-            viewBox='0 0 161 241'
             fill='none'
-            xmlns='http://www.w3.org/2000/svg'
             style={frontSideStyle}
+            viewBox='0 0 161 241'
+            xmlns='http://www.w3.org/2000/svg'
           >
             <rect
-              x={4}
-              y={4}
-              width={153}
               height={233}
               rx={18}
               style={rectStyle}
+              width={153}
+              x={4}
+              y={4}
             />
             {visibilityFromMe === 'faceUp'
               ? createElement(CardComponents[number], { color, textColor })

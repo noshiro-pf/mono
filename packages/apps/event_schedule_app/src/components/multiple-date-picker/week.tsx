@@ -35,12 +35,12 @@ export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
       {listWithHandler.map(({ value, handler }, idx) => (
         <DatePickerDate
           key={idx}
+          dayType={value.dayType}
+          disabled={value.disabled}
+          holidayJpName={value.holidayJpName}
+          selected={value.selected}
           ymd={value.ymd}
           onClick={handler}
-          selected={value.selected}
-          disabled={value.disabled}
-          dayType={value.dayType}
-          holidayJpName={value.holidayJpName}
         />
       ))}
     </div>

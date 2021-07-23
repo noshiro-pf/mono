@@ -55,9 +55,9 @@ export const ImgWithPreview = memoNamed<Props>(
       <RelativeWrapper>
         <AbsoluteWrapper>
           <Img
-            style={imgStyle}
-            src={fullImgSrc}
             alt={alt}
+            src={fullImgSrc}
+            style={imgStyle}
             onLoad={onLoad}
             onLoadStart={onLoadStart}
           />
@@ -65,7 +65,7 @@ export const ImgWithPreview = memoNamed<Props>(
         <AbsoluteWrapper>
           {!loaded ? (
             <SmallImgWrapper>
-              <SmallImg src={previewImgSrc} alt={alt} />
+              <SmallImg alt={alt} src={previewImgSrc} />
             </SmallImgWrapper>
           ) : undefined}
         </AbsoluteWrapper>

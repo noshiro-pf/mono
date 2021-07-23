@@ -35,11 +35,11 @@ export const BackToAnswerPageButton = memoNamed<Props>(
       <BpButton onClick={props.onConfirmClick}>{buttonConfig.name}</BpButton>
     ) : (
       <ButtonWithConfirm
-        onConfirmClick={props.onConfirmClick}
         buttonConfig={buttonConfig}
         dialogConfig={dialogConfig}
-        toastConfig={toastConfig}
         disabled={props.disabled}
+        toastConfig={toastConfig}
+        onConfirmClick={props.onConfirmClick}
       />
     )
 );

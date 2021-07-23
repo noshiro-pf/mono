@@ -11,11 +11,11 @@ export const DeleteIcon = memoNamed<Props>(
   'DeleteIcon',
   ({ size = 16, style, color = '#8E8E8E' }) => (
     <svg
-      style={style}
-      width={size}
-      height={size}
-      viewBox='0 0 33 40'
       fill='none'
+      height={size}
+      style={style}
+      viewBox='0 0 33 40'
+      width={size}
       xmlns='http://www.w3.org/2000/svg'
     >
       <path

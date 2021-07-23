@@ -82,13 +82,13 @@ export const Main = memoNamed('Main', () => {
     <MainView
       diceValue1={dice1}
       diceValue2={dice2}
-      sumCount={sumCount}
       opacity={opacity}
-      rollDices={rollDices}
-      undo={undo}
       redo={redo}
-      undoable={undoable}
       redoable={redoable}
+      rollDices={rollDices}
+      sumCount={sumCount}
+      undo={undo}
+      undoable={undoable}
     />
   );
 });

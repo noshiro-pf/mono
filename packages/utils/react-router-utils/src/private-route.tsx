@@ -19,7 +19,7 @@ export const PrivateRoute = memoNamed<Props>(
       case false:
         return <Redirect to={redirectTo} />;
       case true:
-        return <Route exact={exact} path={path} component={component} />;
+        return <Route component={component} exact={exact} path={path} />;
     }
   }
 );

@@ -14,6 +14,7 @@ export const CodeArea = memoNamed<{
     },
     [valueChange]
   );
+  // eslint-disable-next-line react/forbid-component-props
   return <Styled className={className} value={value} onChange={onChange} />;
 });
 
