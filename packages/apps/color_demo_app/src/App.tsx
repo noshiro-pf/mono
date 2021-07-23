@@ -24,7 +24,7 @@ export const App: FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   return (
     <Root>
-      <H1>Color demo</H1>
+      <H1>{'Color demo'}</H1>
       <Paper>
         <MuiTabs
           tabIndex={tabIndex}

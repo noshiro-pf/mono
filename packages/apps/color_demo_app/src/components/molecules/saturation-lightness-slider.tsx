@@ -23,7 +23,7 @@ type Props = Readonly<{
 export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
   <div>
     <SliderWrapper>
-      <div>彩度</div>
+      <div>{'彩度'}</div>
       <MuiSlider
         value={props.saturation}
         onChange={props.saturationOnChange as (s: number) => void}
@@ -34,7 +34,7 @@ export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
       />
     </SliderWrapper>
     <SliderWrapper>
-      <div>明度</div>
+      <div>{'明度'}</div>
       <MuiSlider
         value={props.lightness}
         onChange={props.lightnessOnChange as (l: number) => void}

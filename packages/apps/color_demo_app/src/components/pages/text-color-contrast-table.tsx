@@ -47,7 +47,7 @@ const componentElement = (
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell align='center'>Saturation（彩度）</TableCell>
+            <TableCell align='center'>{'Saturation（彩度）'}</TableCell>
             {SL.map(([sat], i) => (
               <Fragment key={i}>
                 <TableCell align='center'>{sat}</TableCell>
@@ -56,7 +56,7 @@ const componentElement = (
             ))}
           </TableRow>
           <TableRow>
-            <TableCell align='center'>Lightness（輝度）</TableCell>
+            <TableCell align='center'>{'Lightness（輝度）'}</TableCell>
             {SL.map(([_, light], i) => (
               <Fragment key={i}>
                 <TableCell align='center'>{light}</TableCell>
@@ -65,7 +65,7 @@ const componentElement = (
             ))}
           </TableRow>
           <TableRow>
-            <TableCell align='center'>Hue（色相）</TableCell>
+            <TableCell align='center'>{'Hue（色相）'}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
