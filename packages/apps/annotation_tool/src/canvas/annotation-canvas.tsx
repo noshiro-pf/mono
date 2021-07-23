@@ -15,8 +15,8 @@ type Props = Readonly<{
   selectedHue: Hue;
 }>;
 
-export const AnnotataionCanvas = memoNamed<Props>(
-  'AnnotataionCanvas',
+export const AnnotationCanvas = memoNamed<Props>(
+  'AnnotationCanvas',
   (props: Props) => {
     const idMaker = defaultIdMaker;
 

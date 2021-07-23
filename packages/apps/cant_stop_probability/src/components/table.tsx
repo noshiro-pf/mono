@@ -25,26 +25,26 @@ export const ProbabilityTable = memoNamed<Props>(
     onFilterByStringChange,
     filtered,
   }) => (
-    <HTMLTable striped={true} bordered={true}>
+    <HTMLTable bordered={true} striped={true}>
       <thead>
         <tr>
           <Th colSpan={3}>
             <NoWrapBox>
-              <span>選択した列の数字</span>
-              <BpButton minimal={true} icon={'sort'} onClick={sortByDice} />
+              <span>{'選択した列の数字'}</span>
+              <BpButton icon={'sort'} minimal={true} onClick={sortByDice} />
             </NoWrapBox>
           </Th>
           <Th>
             <NoWrapBox>
-              <span>少なくとも1列当たる確率</span>
+              <span>{'少なくとも1列当たる確率'}</span>
               <BpButton
-                minimal={true}
                 icon={'sort'}
+                minimal={true}
                 onClick={sortByProbability}
               />
             </NoWrapBox>
           </Th>
-          <Th colSpan={3}>ちょうどその段数進められる組合せ数</Th>
+          <Th colSpan={3}>{'ちょうどその段数進められる組合せ数'}</Th>
           <Th
             title={[
               'P0 := 〈すべての列が外れてチャラになる確率〉',
@@ -55,39 +55,39 @@ export const ProbabilityTable = memoNamed<Props>(
               'を満たす最大の整数N',
             ].join('\n')}
           >
-            既に合計N段進んでいるときに
+            {'既に合計N段進んでいるときに'}
             <br />
-            あと1回サイコロを振る期待値がプラスになる最大のN
+            {'あと1回サイコロを振る期待値がプラスになる最大のN'}
           </Th>
         </tr>
         <tr>
           <Th colSpan={3}>
             <BpInput
               leftIcon={'filter-list'}
+              onValueChange={onFilterByStringChange}
               placeholder={`"${separator}" 区切りで数字を入力`}
               value={filterByString}
-              onValueChange={onFilterByStringChange}
             />
           </Th>
-          <Th></Th>
-          <Th colSpan={3}></Th>
-          <Th></Th>
+          <Th />
+          <Th colSpan={3} />
+          <Th />
         </tr>
         <tr>
-          <Td>a</Td>
-          <Th>b</Th>
-          <Th>c</Th>
-          <Th></Th>
+          <Td>{'a'}</Td>
+          <Th>{'b'}</Th>
+          <Th>{'c'}</Th>
+          <Th />
           <Th
             title={
               '「(1,1,6,6)で7の列を2段」や「(1,2,6,6)で7と8の列を1段ずつ」のようなケース'
             }
           >
-            2段
+            {'2段'}
           </Th>
-          <Th>1段</Th>
-          <Th>0段</Th>
-          <Th></Th>
+          <Th>{'1段'}</Th>
+          <Th>{'0段'}</Th>
+          <Th />
         </tr>
       </thead>
       <tbody>

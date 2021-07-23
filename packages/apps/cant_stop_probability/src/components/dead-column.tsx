@@ -20,9 +20,9 @@ export const DeadColumn = memoNamed<Props>(
       <ButtonGroup>
         {columnsAliveWithHandler.map(({ columnId, alive, toggle }) => (
           <BpButton
+            active={!alive}
             key={columnId}
             nowrap={true}
-            active={!alive}
             onClick={toggle}
           >
             {alive ? (
@@ -33,7 +33,10 @@ export const DeadColumn = memoNamed<Props>(
           </BpButton>
         ))}
       </ButtonGroup>
-      <ProbabilityText>確率： {hitSomeAliveColumnProbability}</ProbabilityText>
+      <ProbabilityText>
+        {'確率： '}
+        {hitSomeAliveColumnProbability}
+      </ProbabilityText>
     </div>
   )
 );

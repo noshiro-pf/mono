@@ -13,7 +13,7 @@ import { map, pickupHighContrastHues, pipe, zip } from '@noshiro/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
 import type { AnnotationCanvasStyle, IdType, Label } from '../canvas';
-import { AnnotataionCanvas, defaultAnnotationCanvasStyle } from '../canvas';
+import { AnnotationCanvas, defaultAnnotationCanvasStyle } from '../canvas';
 import type { AppEventHandler } from './event-handlers';
 import { Sidebar, visibleLabelsReducer } from './sidebar';
 
@@ -70,7 +70,7 @@ const labelInit: Label = labels[0];
 export const App = memoNamed('App', () => {
   const [hidden, hide, show] = useBooleanState(false);
 
-  const [visibleLabelIndice, visibleLabelIndiceDispatcher] = useReducer(
+  const [visibleLabelIndices, visibleLabelIndicesDispatcher] = useReducer(
     visibleLabelsReducer,
     labels.map(() => true)
   );
@@ -85,26 +85,26 @@ export const App = memoNamed('App', () => {
       collapseLabelList: hide,
       expandLabelList: show,
       showAllLabels: () => {
-        visibleLabelIndiceDispatcher({ type: 'show-all' });
+        visibleLabelIndicesDispatcher({ type: 'show-all' });
       },
       hideAllLabels: () => {
-        visibleLabelIndiceDispatcher({ type: 'hide-all' });
+        visibleLabelIndicesDispatcher({ type: 'hide-all' });
       },
       flipLabelVisibility: (labelId) => {
         const index = labels.findIndex((l) => l.id === labelId);
-        visibleLabelIndiceDispatcher({ type: 'flip', index });
+        visibleLabelIndicesDispatcher({ type: 'flip', index });
       },
       selectLabel,
     }),
     [hide, show, selectLabel]
   );
 
-  const visibleLabels = labels.filter((_, i) => visibleLabelIndice[i]);
+  const visibleLabels = labels.filter((_, i) => visibleLabelIndices[i]);
 
   return (
     <Root>
       <CanvasWrapper>
-        <AnnotataionCanvas
+        <AnnotationCanvas
           canvasSize={canvasSize}
           canvasStyles={canvasStyles}
           selectedHue={selectedLabel.hue}
@@ -112,13 +112,13 @@ export const App = memoNamed('App', () => {
       </CanvasWrapper>
       <SideBarWrapper>
         <Sidebar
-          labels={labels}
-          labelsSaturation={saturationDarker}
-          labelsLightness={lightnessDarker}
-          visibleLabels={visibleLabels}
-          selectedLabel={selectedLabel}
-          hidden={hidden}
           handlers={handlers}
+          hidden={hidden}
+          labels={labels}
+          labelsLightness={lightnessDarker}
+          labelsSaturation={saturationDarker}
+          selectedLabel={selectedLabel}
+          visibleLabels={visibleLabels}
         />
       </SideBarWrapper>
     </Root>
