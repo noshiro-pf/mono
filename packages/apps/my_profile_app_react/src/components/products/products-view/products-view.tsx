@@ -8,9 +8,9 @@ export const ProductsView = memoNamed<{
   libraries: Mappable<ProductsInfo>;
 }>('ProductsView', ({ webapps, libraries }) => (
   <div>
-    <h1>制作物</h1>
-    <h2>ライブラリ</h2>
-    <p>下の方ほどメンテされていない（特にAngular製のものは放置状態）</p>
+    <h1>{'制作物'}</h1>
+    <h2>{'ライブラリ'}</h2>
+    <p>{'下の方ほどメンテされていない（特にAngular製のものは放置状態）'}</p>
     {libraries.map((app, i) => (
       <ProductsElementView
         key={i}
@@ -22,7 +22,7 @@ export const ProductsView = memoNamed<{
         imageUrl={app.imageUrl}
       />
     ))}
-    <h2>ウェブアプリ</h2>
+    <h2>{'ウェブアプリ'}</h2>
     {webapps.map((app, i) => (
       <ProductsElementView
         key={i}

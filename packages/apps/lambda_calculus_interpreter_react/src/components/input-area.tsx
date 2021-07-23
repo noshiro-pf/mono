@@ -6,8 +6,7 @@ import styled from 'styled-components';
 export const CodeArea = memoNamed<{
   value: string;
   valueChange?: (value: string) => void;
-  className?: string;
-}>('CodeArea', ({ value, valueChange = () => undefined, className }) => {
+}>('CodeArea', ({ value, valueChange = () => undefined }) => {
   const onChange = useCallback(
     // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
     (ev: ChangeEvent<HTMLTextAreaElement>) => {
@@ -15,7 +14,7 @@ export const CodeArea = memoNamed<{
     },
     [valueChange]
   );
-  return <Styled className={className} value={value} onChange={onChange} />;
+  return <Styled value={value} onChange={onChange} />;
 });
 
 const Styled = styled.textarea`

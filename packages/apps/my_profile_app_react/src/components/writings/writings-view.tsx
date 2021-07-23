@@ -7,7 +7,7 @@ export const WritingsView = memoNamed<{
   listElements: Mappable<WritingsInfo>;
 }>('WritingsView', ({ listElements }) => (
   <div>
-    <h1>執筆物</h1>
+    <h1>{'執筆物'}</h1>
     {listElements.map((app, i) => (
       <WritingsElement
         key={i}
