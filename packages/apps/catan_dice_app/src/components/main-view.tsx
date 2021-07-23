@@ -12,7 +12,7 @@ import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { DiceIcon, SumIcon } from '../assets';
 import { DiceNumber } from './dicer-number';
-import { Histogram } from './histgram';
+import { Histogram } from './histogram';
 
 type Props = Readonly<{
   diceValue1: number;
@@ -70,7 +70,7 @@ export const MainView = memoNamed<Props>(
         <ButtonsWrapper>
           <ButtonWithMargin>
             <Button variant='contained' color='primary' onClick={rollDices}>
-              Roll dices!!!
+              {'Roll dices!!!'}
             </Button>
           </ButtonWithMargin>
           <ButtonWithMargin>
@@ -80,7 +80,7 @@ export const MainView = memoNamed<Props>(
               disabled={!undoable}
               onClick={undo}
             >
-              Undo
+              {'Undo'}
             </Button>
           </ButtonWithMargin>
           <ButtonWithMargin>
@@ -90,7 +90,7 @@ export const MainView = memoNamed<Props>(
               disabled={!redoable}
               onClick={redo}
             >
-              Redo
+              {'Redo'}
             </Button>
           </ButtonWithMargin>
         </ButtonsWrapper>
