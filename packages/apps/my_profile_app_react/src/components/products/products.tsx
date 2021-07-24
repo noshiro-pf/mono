@@ -3,15 +3,15 @@ import { products } from '../../assets';
 import { ProductsViewMobile } from './products-mobile-view';
 import { ProductsView } from './products-view';
 
-export const Products = memoNamed<{ mobile: boolean }>(
+export const Products = memoNamed<Readonly<{ mobile: boolean }>>(
   'Products',
   ({ mobile }) =>
     mobile ? (
       <ProductsViewMobile
-        webapps={products.webapps}
+        webApps={products.webApps}
         libraries={products.libraries}
       />
     ) : (
-      <ProductsView webapps={products.webapps} libraries={products.libraries} />
+      <ProductsView webApps={products.webApps} libraries={products.libraries} />
     )
 );

@@ -1,3 +1,3 @@
 import type { FunctionalComponent } from 'preact';
 
-export const App: FunctionalComponent = () => <div>Hello</div>;
+export const App: FunctionalComponent = () => <div>{'Hello'}</div>;

@@ -21,14 +21,16 @@ const DividerWithMargin = styled(Divider)`
   margin: 10px;
 `;
 
-export const ProductsElementMobileView = memoNamed<{
-  imageUrl: string;
-  link: string;
-  title: string;
-  subtitle: string;
-  body1: string;
-  body2: string;
-}>(
+export const ProductsElementMobileView = memoNamed<
+  Readonly<{
+    imageUrl: string;
+    link: string;
+    title: string;
+    subtitle: string;
+    body1: string;
+    body2: string;
+  }>
+>(
   'ProductsElementMobileView',
   ({ imageUrl, link, title, subtitle, body1, body2 }) => (
     <CardStyled>

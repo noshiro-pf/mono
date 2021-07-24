@@ -2,16 +2,14 @@ import { Card, CardContent, Typography } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 
-const CardStyled = styled(Card)`
-  margin: 10px;
-`;
-
-export const WritingsElement = memoNamed<{
-  link: string;
-  title: string;
-  subtitle: string;
-  body1: string;
-}>('WritingsElement', ({ link, title, subtitle, body1 }) => (
+export const WritingsElement = memoNamed<
+  Readonly<{
+    link: string;
+    title: string;
+    subtitle: string;
+    body1: string;
+  }>
+>('WritingsElement', ({ link, title, subtitle, body1 }) => (
   <CardStyled>
     <CardContent>
       <Typography component='h5' variant='h5'>
@@ -28,3 +26,7 @@ export const WritingsElement = memoNamed<{
     </CardContent>
   </CardStyled>
 ));
+
+const CardStyled = styled(Card)`
+  margin: 10px;
+`;
