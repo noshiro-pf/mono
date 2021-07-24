@@ -1,5 +1,8 @@
 import type { Linter } from 'eslint';
 
+/**
+ * https://github.com/yannickcr/eslint-plugin-react
+ */
 const config: Linter.Config = {
   root: true,
   settings: {
@@ -14,9 +17,6 @@ const config: Linter.Config = {
   ],
   plugins: ['react', 'react-hooks'],
   rules: {
-    //   'react-hooks/rules-of-hooks': 'error',
-    //   'react-hooks/exhaustive-deps': 'warn',
-
     /* disabled */
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
