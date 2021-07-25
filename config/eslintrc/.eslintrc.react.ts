@@ -32,7 +32,13 @@ const config: Linter.Config = {
     'react/jsx-props-no-spreading': 'warn',
 
     // TODO
-    'react/jsx-sort-props': 'warn',
+    'react/jsx-sort-props': [
+      'warn',
+      {
+        callbacksLast: true,
+        reservedFirst: true,
+      },
+    ],
   },
 };
 
