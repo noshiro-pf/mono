@@ -80,6 +80,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
         maxDate={maxDate}
         timePrecision={undefined}
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       />
     );

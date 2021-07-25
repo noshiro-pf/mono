@@ -20,6 +20,7 @@ export const BpButton = memoNamed<BpButtonProps>(
       [props.style, nowrap]
     );
 
+    // eslint-disable-next-line react/jsx-props-no-spreading
     return <Button {...props} style={style} />;
   }
 );

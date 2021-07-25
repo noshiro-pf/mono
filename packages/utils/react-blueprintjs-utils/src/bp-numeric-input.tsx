@@ -99,6 +99,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
         selectAllOnFocus={selectAllOnFocus}
         fill={fill}
         style={style}
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       />
     );

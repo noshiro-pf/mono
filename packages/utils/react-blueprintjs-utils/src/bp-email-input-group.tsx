@@ -45,6 +45,7 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
           disabled={disabled}
           autoFocus={autoFocus}
           focus$={focus$}
+          // eslint-disable-next-line react/jsx-props-no-spreading
           {...props}
         />
       </FormGroup>
