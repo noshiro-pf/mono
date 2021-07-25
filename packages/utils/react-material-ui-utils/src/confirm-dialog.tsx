@@ -37,10 +37,10 @@ export const ConfirmDialog = memoNamed<Props>(
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelClicked} color='primary'>
-            Cancel
+            {'Cancel'}
           </Button>
           <Button onClick={okClicked} color='secondary'>
-            OK
+            {'OK'}
           </Button>
         </DialogActions>
       </Dialog>
