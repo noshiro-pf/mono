@@ -92,7 +92,7 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
           fill='none'
           xmlns='http://www.w3.org/2000/svg'
         >
-          <circle cx='50' cy='50' r='45.5' stroke='#FF0000' stroke-width='9' />
+          <circle cx='50' cy='50' r='45.5' stroke='#FF0000' strokeWidth='9' />
         </SymbolSvg>
 
         <SymbolSvg

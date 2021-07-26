@@ -1,9 +1,9 @@
 import { useResizeObserver } from '@noshiro/preact-resize-observer-hooks';
-import type { FunctionalComponent } from 'preact';
+import { memoNamed } from '@noshiro/preact-utils';
 import type { JSXInternal } from 'preact/src/jsx';
 import { GameMain } from './game-main';
 
-export const Root: FunctionalComponent = () => {
+export const Root = memoNamed('Root', () => {
   const [windowSize, ref] = useResizeObserver({
     width: 1280,
     height: 720,
@@ -16,7 +16,7 @@ export const Root: FunctionalComponent = () => {
       <GameMain windowSize={windowSize} />
     </div>
   );
-};
+});
 
 const rootStyle: JSXInternal.CSSProperties = {
   width: '100vw',
