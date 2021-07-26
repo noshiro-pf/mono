@@ -9,8 +9,13 @@ const config: Linter.Config = {
       version: 'detect',
     },
   },
+  globals: {
+    expect: true,
+    browser: true,
+    global: true,
+  },
   extends: [
-    'preact',
+    // 'preact',
     'plugin:react/all',
     'plugin:react-hooks/recommended',
     './.eslintrc.base.js',
