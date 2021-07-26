@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint';
+import { eslintReactRules } from './eslintrc-base';
 
 const config: Linter.Config = {
   root: true,
@@ -8,13 +9,14 @@ const config: Linter.Config = {
       version: 'detect',
     },
   },
-  extends: ['preact', './.eslintrc.base.js'],
-  rules: {
-    //   'react-hooks/rules-of-hooks': 'error',
-    //   'react-hooks/exhaustive-deps': 'warn',
-    'react/jsx-uses-react': 'off',
-    'react/react-in-jsx-scope': 'off',
-  },
+  extends: [
+    'preact',
+    'plugin:react/all',
+    'plugin:react-hooks/recommended',
+    './.eslintrc.base.js',
+  ],
+  plugins: ['react', 'react-hooks'],
+  rules: eslintReactRules,
 };
 
 module.exports = config;
