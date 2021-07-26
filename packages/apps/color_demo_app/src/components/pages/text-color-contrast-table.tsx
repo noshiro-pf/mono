@@ -93,9 +93,9 @@ const componentElement = (
                     >
                       <label>
                         <input
-                          type='checkbox'
                           defaultChecked={contrastWhite > contrastBlack}
                           name={hslStyle}
+                          type='checkbox'
                         />
                         {roundAt(contrastWhite, 2)}
                       </label>
@@ -106,9 +106,9 @@ const componentElement = (
                     >
                       <label>
                         <input
-                          type='checkbox'
                           defaultChecked={contrastWhite <= contrastBlack}
                           name={hslStyle}
+                          type='checkbox'
                         />
                         {roundAt(contrastBlack, 2)}
                       </label>

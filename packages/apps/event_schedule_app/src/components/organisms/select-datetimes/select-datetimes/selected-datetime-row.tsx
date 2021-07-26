@@ -26,16 +26,16 @@ export const SelectedDatetimeRow = memoNamed<Props>(
       <DatetimeWrapper>
         <YmdWrapper>
           <BpDatePicker
+            closeOnSelection={true}
             ymd={props.datetimeRange.ymd}
             onYmdChange={props.onYmdChange}
-            closeOnSelection={true}
           />
         </YmdWrapper>
         <TimeRangeView
           datetimeSpecification={props.datetimeSpecification}
           timeRange={props.datetimeRange.timeRange}
-          onRangeStartChange={props.onRangeStartChange}
           onRangeEndChange={props.onRangeEndChange}
+          onRangeStartChange={props.onRangeStartChange}
         />
       </DatetimeWrapper>
 

@@ -14,10 +14,10 @@ export const ProductsViewMobile = memoNamed<
     <h2>{'ライブラリ'}</h2>
     {libraries.map((app, i) => (
       <ProductsElementMobileView
+        key={i}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}
-        key={i}
         link={app.link}
         subtitle={app.subtitle}
         title={app.title}
@@ -26,10 +26,10 @@ export const ProductsViewMobile = memoNamed<
     <h2>{'ウェブアプリ'}</h2>
     {webApps.map((app, i) => (
       <ProductsElementMobileView
+        key={i}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}
-        key={i}
         link={app.link}
         subtitle={app.subtitle}
         title={app.title}

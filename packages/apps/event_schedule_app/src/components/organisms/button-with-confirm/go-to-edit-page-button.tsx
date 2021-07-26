@@ -29,16 +29,16 @@ export const GoToEditPageButton = memoNamed<Props>(
   (props) =>
     props.email === '' ? (
       <BpButton
-        intent={buttonConfig.intent}
         icon={buttonConfig.icon}
+        intent={buttonConfig.intent}
         onClick={props.onConfirmClick}
       >
         {buttonConfig.name}
       </BpButton>
     ) : (
       <ButtonWithConfirm
-        onConfirmClick={props.onConfirmClick}
         emailAnswer={props.email}
+        onConfirmClick={props.onConfirmClick}
       />
     )
 );
@@ -56,16 +56,16 @@ const ButtonWithConfirm = memoNamed<ButtonWithConfirmProps>(
     return (
       <>
         <BpButton
-          text={buttonConfig.name}
-          intent={buttonConfig.intent}
           icon={buttonConfig.icon}
+          intent={buttonConfig.intent}
+          text={buttonConfig.name}
           onClick={handleOpen}
         />
         <ConfirmEmailDialog
-          onConfirmClick={onConfirmClick}
           emailAnswer={emailAnswer}
           isOpen={isOpen}
           onClose={handleClose}
+          onConfirmClick={onConfirmClick}
         />
       </>
     );
@@ -105,31 +105,31 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
 
     return (
       <BpDialog
-        isOpen={isOpen}
-        onClose={onClose}
-        hasBackdrop={true}
-        isCloseButtonShown={true}
         canEscapeKeyClose={true}
         canOutsideClickClose={true}
-        title={vt.editButtonConfirmDialogTitle}
+        hasBackdrop={true}
         icon='key'
+        isCloseButtonShown={true}
+        isOpen={isOpen}
+        title={vt.editButtonConfirmDialogTitle}
+        onClose={onClose}
       >
         <div className={Classes.DIALOG_BODY}>
           <p>{vt.editButtonConfirmDialogMessage}</p>
           <WidthRestrictedInputWrapper>
             <BpEmailInput
+              autoFocus={true}
               formGroupLabel={''}
-              value={email}
-              onValueChange={setEmail}
               invalidMessage={
                 texts.eventSettingsPage.errorMessages.invalidEmail
               }
-              autoFocus={true}
+              value={email}
+              onValueChange={setEmail}
             />
             {showValidationFailedMessage ? (
               <Description
-                text={vt.editButtonConfirmDialogValidationFailedMessage}
                 error={true}
+                text={vt.editButtonConfirmDialogValidationFailedMessage}
               />
             ) : undefined}
           </WidthRestrictedInputWrapper>
@@ -140,9 +140,9 @@ const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
               {texts.buttonText.cancel}
             </BpButton>
             <BpButton
+              disabled={showValidationFailedMessage}
               intent={'primary'}
               onClick={onConfirm}
-              disabled={showValidationFailedMessage}
             >
               {texts.buttonText.decide}
             </BpButton>

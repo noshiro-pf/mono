@@ -69,15 +69,15 @@ export const MainView = memoNamed<Props>(
         </List>
         <ButtonsWrapper>
           <ButtonWithMargin>
-            <Button variant='contained' color='primary' onClick={rollDices}>
+            <Button color='primary' variant='contained' onClick={rollDices}>
               {'Roll dices!!!'}
             </Button>
           </ButtonWithMargin>
           <ButtonWithMargin>
             <Button
-              variant='contained'
               color='default'
               disabled={!undoable}
+              variant='contained'
               onClick={undo}
             >
               {'Undo'}
@@ -85,9 +85,9 @@ export const MainView = memoNamed<Props>(
           </ButtonWithMargin>
           <ButtonWithMargin>
             <Button
-              variant='contained'
               color='default'
               disabled={!redoable}
+              variant='contained'
               onClick={redo}
             >
               {'Redo'}

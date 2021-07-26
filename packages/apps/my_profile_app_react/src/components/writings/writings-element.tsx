@@ -13,14 +13,14 @@ export const WritingsElement = memoNamed<
   <CardStyled>
     <CardContent>
       <Typography component='h5' variant='h5'>
-        <a target='_blank' href={link} rel='noopener noreferrer'>
+        <a href={link} rel='noopener noreferrer' target='_blank'>
           {title}
         </a>
       </Typography>
-      <Typography variant='subtitle1' color='textSecondary'>
+      <Typography color='textSecondary' variant='subtitle1'>
         {subtitle}
       </Typography>
-      <Typography variant='body1' component='p' color='initial'>
+      <Typography color='initial' component='p' variant='body1'>
         {body1}
       </Typography>
     </CardContent>

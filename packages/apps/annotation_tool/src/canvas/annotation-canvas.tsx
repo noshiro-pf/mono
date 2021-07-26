@@ -46,9 +46,9 @@ export const AnnotationCanvas = memoNamed<Props>(
           </AbsoluteWrapper>
           <AbsoluteWrapper>
             <CanvasMain
-              idMaker={idMaker}
-              canvasStyles={props.canvasStyles}
               canvasSize={props.canvasSize}
+              canvasStyles={props.canvasStyles}
+              idMaker={idMaker}
               selectedHue={props.selectedHue}
             />
           </AbsoluteWrapper>

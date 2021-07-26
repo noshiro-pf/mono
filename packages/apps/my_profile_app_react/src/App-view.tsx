@@ -45,12 +45,12 @@ export const AppSub = memoNamed<Readonly<{ mobile: boolean }>>(
 
     return (
       <div>
-        <AppBarFlex position='static' color='default'>
+        <AppBarFlex color='default' position='static'>
           <MuiTabsStyled
+            labels={labelList}
+            scrollable={true}
             tabIndex={tabIndex}
             tabIndexChange={tabIndexOnChange}
-            scrollable={true}
-            labels={labelList}
           />
         </AppBarFlex>
 

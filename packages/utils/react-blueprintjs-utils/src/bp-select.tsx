@@ -26,9 +26,10 @@ export const BpSelect = memoNamed<BpSelectProps>(
 
     return (
       <HTMLSelect
+        options={options as HTMLSelectProps['options']}
         value={value}
         onChange={onChangeHandler}
-        options={options as HTMLSelectProps['options']}
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       />
     );

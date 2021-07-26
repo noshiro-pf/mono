@@ -20,8 +20,8 @@ export const DeadColumn = memoNamed<Props>(
       <ButtonGroup>
         {columnsAliveWithHandler.map(({ columnId, alive, toggle }) => (
           <BpButton
-            active={!alive}
             key={columnId}
+            active={!alive}
             nowrap={true}
             onClick={toggle}
           >

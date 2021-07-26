@@ -81,17 +81,17 @@ export const AppView = memoNamed<Props>(
       <Section>
         <Paper>
           <ConfigSection
-            downPaymentManYen={downPaymentManYen}
-            onDownPaymentManYenChange={onDownPaymentManYenChange}
-            propertyPriceManYen={propertyPriceManYen}
-            onPropertyPriceManYenChange={onPropertyPriceManYenChange}
             borrowingPeriodYear={borrowingPeriodYear}
-            onBorrowingPeriodYearChange={onBorrowingPeriodYearChange}
+            downPaymentManYen={downPaymentManYen}
             interestRatePercentPerYear={interestRatePercentPerYear}
+            propertyPriceManYen={propertyPriceManYen}
+            repaymentType={repaymentType}
+            onBorrowingPeriodYearChange={onBorrowingPeriodYearChange}
+            onDownPaymentManYenChange={onDownPaymentManYenChange}
             onInterestRatePercentPerYearChange={
               onInterestRatePercentPerYearChange
             }
-            repaymentType={repaymentType}
+            onPropertyPriceManYenChange={onPropertyPriceManYenChange}
             onRepaymentTypeChange={onRepaymentTypeChange}
           />
         </Paper>
@@ -104,12 +104,12 @@ export const AppView = memoNamed<Props>(
             </SpinnerWrapper>
           ) : (
             <SummarySection
-              repaymentType={repaymentType}
-              propertyPriceManYen={propertyPriceManYen}
               downPaymentManYen={downPaymentManYen}
-              fixedPrincipalYenPerMonth={fixedPrincipalYenPerMonth}
               fixedMonthlyPaymentsYen={fixedMonthlyPaymentsYen}
+              fixedPrincipalYenPerMonth={fixedPrincipalYenPerMonth}
               interestSumManYen={interestSumManYen}
+              propertyPriceManYen={propertyPriceManYen}
+              repaymentType={repaymentType}
             />
           )}
         </Paper>
@@ -122,11 +122,11 @@ export const AppView = memoNamed<Props>(
             </SpinnerWrapper>
           ) : (
             <PaymentTable
-              repaymentType={repaymentType}
               borrowingBalanceYen={borrowingBalanceYen}
               interestYen={interestYen}
               monthlyPaymentTotalYen={monthlyPaymentTotalYen}
               monthlyPrincipalPaymentYen={monthlyPrincipalPaymentYen}
+              repaymentType={repaymentType}
             />
           )}
         </Paper>

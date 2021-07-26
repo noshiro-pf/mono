@@ -74,7 +74,6 @@ export const MyAnswer = memoNamed<Props>(
       <>
         <WidthRestrictedInputWrapper>
           <FormGroup
-            label={vt.yourName}
             helperText={
               showUserNameError ? (
                 theNameIsAlreadyUsed ? (
@@ -87,12 +86,13 @@ export const MyAnswer = memoNamed<Props>(
               )
             }
             intent={showUserNameError ? 'danger' : 'primary'}
+            label={vt.yourName}
           >
             <BpInput
-              value={answerForEditing.userName}
-              onValueChange={onUserNameChange as (v: string) => void}
               autoFocus={true}
+              value={answerForEditing.userName}
               onBlur={onUserNameBlur}
+              onValueChange={onUserNameChange as (v: string) => void}
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
@@ -103,9 +103,9 @@ export const MyAnswer = memoNamed<Props>(
               {symbolHeader.map((s) => (
                 <Th key={s.iconId}>
                   <BpButton
-                    title={s.symbolDescription}
                     icon={<CustomIcon iconName={s.iconId} />}
                     minimal={true}
+                    title={s.symbolDescription}
                     onClick={s.onClick}
                   />
                 </Th>
@@ -125,19 +125,19 @@ export const MyAnswer = memoNamed<Props>(
                     />
                   </Td>
                   {buttons.map((s) => (
-                    <Td style={style} key={s.iconId}>
+                    <Td key={s.iconId} style={style}>
                       <BpButton
+                        active={s.iconId === selectedSymbol}
                         icon={
                           <CustomIcon
-                            iconName={s.iconId}
                             color={
                               s.iconId === selectedSymbol ? 'blue' : 'gray'
                             }
+                            iconName={s.iconId}
                           />
                         }
-                        title={s.symbolDescription}
-                        active={s.iconId === selectedSymbol}
                         minimal={true}
+                        title={s.symbolDescription}
                         onClick={s.onClick}
                       />
                     </Td>
@@ -150,46 +150,49 @@ export const MyAnswer = memoNamed<Props>(
         <WidthRestrictedInputWrapper>
           <FormGroup label={vt.comments}>
             <BpTextArea
+              fill={true}
               value={answerForEditing.comment}
               onValueChange={onCommentChange}
-              fill={true}
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
         <ParagraphWithSwitch
-          title={vt.weight.title}
           description={
             answerForEditing.useWeight
               ? vt.weight.description
               : vt.weight.description.slice(0, 1)
           }
-          show={answerForEditing.useWeight}
-          onToggle={toggleWeightSection}
           elementToToggle={
             <WeightSetting
+              disabled={!answerForEditing.useWeight}
               weight={answerForEditing.weight}
               onWeightChange={onWeightChange}
-              disabled={!answerForEditing.useWeight}
             />
           }
+          show={answerForEditing.useWeight}
+          title={vt.weight.title}
+          onToggle={toggleWeightSection}
         />
         <ButtonsWrapperAlignEnd>
           <BpButton
+            disabled={submitButtonIsLoading}
             intent='none'
+            nowrap={true}
             text={texts.buttonText.cancel}
             onClick={onCancel}
-            disabled={submitButtonIsLoading}
-            nowrap={true}
           />
           {myAnswerSectionState === 'editing' ? (
             <DeleteAnswerButton
-              onConfirmDeleteAnswer={onDeleteAnswer}
               loading={submitButtonIsLoading}
+              onConfirmDeleteAnswer={onDeleteAnswer}
             />
           ) : undefined}
           <BpButton
-            intent='primary'
+            disabled={submitButtonIsDisabled}
             icon='tick'
+            intent='primary'
+            loading={submitButtonIsLoading}
+            nowrap={true}
             text={
               myAnswerSectionState === 'creating'
                 ? vt.submitButton.create
@@ -198,9 +201,6 @@ export const MyAnswer = memoNamed<Props>(
                 : ''
             }
             onClick={onSubmitAnswer}
-            loading={submitButtonIsLoading}
-            disabled={submitButtonIsDisabled}
-            nowrap={true}
           />
         </ButtonsWrapperAlignEnd>
       </>

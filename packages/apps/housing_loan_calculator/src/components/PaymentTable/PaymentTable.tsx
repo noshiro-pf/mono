@@ -72,7 +72,7 @@ export const PaymentTable = memoNamed<Props>(
     );
 
     return (
-      <HTMLTable condensed={true} striped={true} bordered={true}>
+      <HTMLTable bordered={true} condensed={true} striped={true}>
         <thead>
           <tr>
             <th style={headerCellStyle}>{viewTexts.numPayments}</th>
@@ -89,7 +89,7 @@ export const PaymentTable = memoNamed<Props>(
           {tableData.map((tableRow, rowidx) => (
             <tr key={rowidx}>
               {tableRow.map((cell, colidx) => (
-                <td style={dataCellStyle} key={colidx}>
+                <td key={colidx} style={dataCellStyle}>
                   {cell}
                 </td>
               ))}

@@ -27,11 +27,11 @@ export const AnswerDeadlineDatepicker = memoNamed<Props>(
         intent={showError ? 'danger' : 'primary'}
       >
         <BpDatetimePicker
+          disabled={!useAnswerDeadline}
+          shortcuts={answerDeadlineShortcuts}
+          showActionsBar={false}
           ymdhm={answerDeadline}
           onYmdhmChange={onAnswerDeadlineChange}
-          disabled={!useAnswerDeadline}
-          showActionsBar={false}
-          shortcuts={answerDeadlineShortcuts}
         />
       </FormGroup>
     );

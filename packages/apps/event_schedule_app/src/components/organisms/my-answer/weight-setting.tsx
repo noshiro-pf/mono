@@ -20,16 +20,16 @@ export const WeightSetting = memoNamed<WeightSettingProps>(
     <Wrapper>
       <NumericInputWrapper>
         <BpNumericInput
-          value={weight}
-          onValueChangeFiltered={onWeightChange as (value: number) => void}
-          valueWhenNotParsedAsNumber={1}
           convertValueOnBlurAndEmit={clampAndRoundAnswerWeight}
-          min={weightNumericInputConfig.min}
+          disabled={disabled}
+          majorStepSize={weightNumericInputConfig.majorStep}
           max={weightNumericInputConfig.max}
+          min={weightNumericInputConfig.min}
           minorStepSize={weightNumericInputConfig.minorStep}
           stepSize={weightNumericInputConfig.step}
-          majorStepSize={weightNumericInputConfig.majorStep}
-          disabled={disabled}
+          value={weight}
+          valueWhenNotParsedAsNumber={1}
+          onValueChangeFiltered={onWeightChange as (value: number) => void}
         />
       </NumericInputWrapper>
       <Suffix>{vt.weight.suffix}</Suffix>

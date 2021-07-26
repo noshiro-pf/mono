@@ -39,20 +39,20 @@ export const ProductsElementMobileView = memoNamed<
           {link === '' ? (
             <span>{title}</span>
           ) : (
-            <a target='_blank' href={link} rel='noopener noreferrer'>
+            <a href={link} rel='noopener noreferrer' target='_blank'>
               {title}
             </a>
           )}
         </Typography>
-        <Typography variant='subtitle1' color='textSecondary'>
+        <Typography color='textSecondary' variant='subtitle1'>
           {subtitle}
         </Typography>
         {imageUrl === '' ? undefined : <ImgStyled alt='' src={imageUrl} />}
         <DividerWithMargin />
-        <Typography variant='body1' component='p' color='initial'>
+        <Typography color='initial' component='p' variant='body1'>
           {body1}
         </Typography>
-        <Typography variant='body2' component='p' color='textPrimary'>
+        <Typography color='textPrimary' component='p' variant='body2'>
           {`［実装］：${body2}`}
         </Typography>
       </CardContentStyled>

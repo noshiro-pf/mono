@@ -44,12 +44,12 @@ export const MultipleDatePicker = memoNamed<Props>(
               tabIndex={0}
             >
               <DatepickerNav
-                year={calendarCurrentPage.year}
                 month={calendarCurrentPage.month}
-                onPrevMonthClick={onPrevMonthClick}
-                onNextMonthClick={onNextMonthClick}
-                onYearChange={onYearChange}
+                year={calendarCurrentPage.year}
                 onMonthChange={onMonthChange}
+                onNextMonthClick={onNextMonthClick}
+                onPrevMonthClick={onPrevMonthClick}
+                onYearChange={onYearChange}
               />
               <div className='DayPicker-Months'>
                 <div className='DayPicker-Month' role='grid'>

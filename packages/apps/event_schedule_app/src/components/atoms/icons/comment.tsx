@@ -11,11 +11,11 @@ export const CommentIcon = memoNamed<Props>(
   'CommentIcon',
   ({ size = 16, color = 'black', style }) => (
     <svg
-      style={style}
-      width={size}
-      height={size}
-      viewBox='0 0 35 33'
       fill='none'
+      height={size}
+      style={style}
+      viewBox='0 0 35 33'
+      width={size}
       xmlns='http://www.w3.org/2000/svg'
     >
       <path

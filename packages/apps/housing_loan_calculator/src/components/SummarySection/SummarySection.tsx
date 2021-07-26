@@ -24,29 +24,29 @@ export const SummarySection = memoNamed<Props>(
   }) => (
     <dl>
       <DataItem
-        title={viewTexts.borrowingTotalYen}
         description={`${propertyPriceManYen - downPaymentManYen}万円`}
+        title={viewTexts.borrowingTotalYen}
       />
       {repaymentType === 'principal-equal-payment' ? (
         <DataItem
-          title={viewTexts.monthlyPrincipalPaymentsYen(false)}
           description={`${fixedPrincipalYenPerMonth.toFixed(0)}円`}
+          title={viewTexts.monthlyPrincipalPaymentsYen(false)}
         />
       ) : (
         <DataItem
-          title={viewTexts.monthlyPaymentsYen(false)}
           description={`${fixedMonthlyPaymentsYen.toFixed(0)}円`}
+          title={viewTexts.monthlyPaymentsYen(false)}
         />
       )}
       <DataItem
-        title={viewTexts.interestSum}
         description={`${interestSumManYen.toFixed(2)}万円`}
+        title={viewTexts.interestSum}
       />
       <DataItem
-        title={viewTexts.paymentsSum}
         description={`${(propertyPriceManYen + interestSumManYen).toFixed(
           2
         )}万円`}
+        title={viewTexts.paymentsSum}
       />
     </dl>
   )

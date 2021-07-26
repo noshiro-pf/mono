@@ -37,48 +37,48 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
     <div>
       <div>
         <IconWrapper>
-          <CircleIcon color='black' style={size} />
+          <CircleIcon color={'black'} style={size} />
         </IconWrapper>
         <IconWrapper>
-          <TriangleIcon color='red' style={size} />
+          <TriangleIcon color={'red'} style={size} />
         </IconWrapper>
         <IconWrapper>
-          <CloseIcon color='blue' style={size} />
+          <CloseIcon color={'blue'} style={size} />
         </IconWrapper>
         <IconWrapper>
-          <EditIcon color='lightblue' style={size} />
+          <EditIcon color={'lightblue'} style={size} />
         </IconWrapper>
         <IconWrapper>
-          <DeleteIcon color='gray' style={size} />
+          <DeleteIcon color={'gray'} style={size} />
         </IconWrapper>
         <IconWrapper>
-          <CommentIcon color='green' style={size} />
+          <CommentIcon color={'green'} style={size} />
         </IconWrapper>
         <IconWrapper>
-          <CalendarIcon color='purple' style={size} />
+          <CalendarIcon color={'purple'} style={size} />
         </IconWrapper>
       </div>
       <PadWrapper>
         <BpInput
-          leftIcon='filter'
+          leftIcon={'filter'}
+          placeholder={'Filter histogram...'}
           value={inputValue}
           onValueChange={setInputValue}
-          placeholder='Filter histogram...'
         />
       </PadWrapper>
       <PadWrapper>
         <BpInput
+          placeholder={'Password'}
+          type={'password'}
           value={inputValue}
           onValueChange={setInputValue}
-          placeholder='Password'
-          type='password'
         />
       </PadWrapper>
       <PadWrapper>
         <TextArea fill={true} value={'value'} />
       </PadWrapper>
       <PadWrapper>
-        <Button icon='refresh' rightIcon='duplicate'>
+        <Button icon='refresh' rightIcon={'duplicate'}>
           {'default'}
         </Button>
       </PadWrapper>
@@ -106,8 +106,8 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
       <PadWrapper>
         <BpSwitch
           checked={bpSwitchState}
-          onToggle={onBpSwitchChangeHandler}
           labelElement={<strong>{'switch'}</strong>}
+          onToggle={onBpSwitchChangeHandler}
         />
       </PadWrapper>
     </div>

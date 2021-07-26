@@ -27,8 +27,8 @@ export const WeekdaysHeader = memoNamed<Props>(
           {listWithHandler.map(({ name: title, abbr, onClickHandler }) => (
             <HeaderCell
               key={title}
-              title={title}
               abbr={abbr}
+              title={title}
               onClick={onClickHandler}
             />
           ))}

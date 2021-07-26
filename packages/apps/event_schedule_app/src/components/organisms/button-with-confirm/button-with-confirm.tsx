@@ -65,23 +65,23 @@ export const ButtonWithConfirm = memoNamed<Props>(
     return (
       <>
         <BpButton
-          text={buttonConfig.name}
-          intent={buttonConfig.intent ?? 'none'}
-          icon={buttonConfig.icon}
-          onClick={handleOpen}
           disabled={disabled}
+          icon={buttonConfig.icon}
+          intent={buttonConfig.intent ?? 'none'}
           loading={loading}
           nowrap={true}
+          text={buttonConfig.name}
+          onClick={handleOpen}
         />
         <ConfirmDialog
-          isOpen={isOpen}
-          onCancel={handleClose}
-          onConfirm={onConfirm}
           cancelButtonText={dialogConfig.cancelButtonText}
           confirmButtonText={dialogConfig.confirmButtonText}
-          message={dialogConfig.message}
           icon={dialogConfig.icon}
           intent={dialogConfig.intent ?? 'none'}
+          isOpen={isOpen}
+          message={dialogConfig.message}
+          onCancel={handleClose}
+          onConfirm={onConfirm}
         />
       </>
     );

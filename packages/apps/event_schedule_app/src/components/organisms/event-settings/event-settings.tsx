@@ -64,46 +64,46 @@ export const EventSettings = memoNamed<Props>(
     return (
       <Root>
         <ParagraphWithSwitch
-          title={vt.answerDeadline}
           description={vt.howAnswerDeadlineIsUsed}
-          show={useAnswerDeadline}
-          onToggle={onToggleAnswerDeadline}
           elementToToggle={
             <AnswerDeadlineDatepicker
-              useAnswerDeadline={useAnswerDeadline}
               answerDeadline={answerDeadline}
+              useAnswerDeadline={useAnswerDeadline}
               onAnswerDeadlineChange={onAnswerDeadlineChange}
             />
           }
+          show={useAnswerDeadline}
+          title={vt.answerDeadline}
+          onToggle={onToggleAnswerDeadline}
         />
         <hr />
         <ParagraphWithSwitch
-          title={vt.useNotification}
-          show={useNotification}
-          onToggle={onToggleUseNotificationLocal}
           elementToToggle={
             <NotificationSettingsComponent
-              notificationSettings={notificationSettings}
-              onNotificationSettingsChange={onNotificationSettingsChange}
-              disabled={!useNotification}
-              useAnswerDeadline={useAnswerDeadline}
               answerDeadline={answerDeadline}
+              disabled={!useNotification}
               focusEmailInput$={focusEmailInput$}
+              notificationSettings={notificationSettings}
+              useAnswerDeadline={useAnswerDeadline}
+              onNotificationSettingsChange={onNotificationSettingsChange}
             />
           }
+          show={useNotification}
+          title={vt.useNotification}
+          onToggle={onToggleUseNotificationLocal}
         />
         <hr />
         <ParagraphWithSwitch
-          title={vt.symbolSettings}
-          show={customizeSymbolSettings}
-          onToggle={onToggleCustomizeSymbolSettings}
           elementToToggle={
             <SymbolSettings
               answerSymbolList={answerSymbolList}
-              onAnswerSymbolListChange={onAnswerSymbolListChange}
               disabled={!customizeSymbolSettings}
+              onAnswerSymbolListChange={onAnswerSymbolListChange}
             />
           }
+          show={customizeSymbolSettings}
+          title={vt.symbolSettings}
+          onToggle={onToggleCustomizeSymbolSettings}
         />
       </Root>
     );

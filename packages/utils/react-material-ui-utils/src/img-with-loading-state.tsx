@@ -12,12 +12,12 @@ export const ImgWithLoadingState = memoNamed<Props>(
   'ImgWithLoadingState',
   ({ fullImgSrc, previewImgSrc, alt = '' }: Props) =>
     previewImgSrc === undefined ? (
-      <ImgWithLoadingCircle src={fullImgSrc} alt={alt} />
+      <ImgWithLoadingCircle alt={alt} src={fullImgSrc} />
     ) : (
       <ImgWithPreview
+        alt={alt}
         fullImgSrc={fullImgSrc}
         previewImgSrc={previewImgSrc}
-        alt={alt}
       />
     )
 );

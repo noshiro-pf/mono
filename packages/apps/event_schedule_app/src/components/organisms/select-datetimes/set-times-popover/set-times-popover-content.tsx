@@ -39,21 +39,21 @@ export const SetTimesPopoverContent = memoNamed<Props>(
         <TimeRangeView
           datetimeSpecification={datetimeSpecification}
           timeRange={timeRange}
-          onRangeStartChange={onRangeStartChange}
           onRangeEndChange={onRangeEndChange}
+          onRangeStartChange={onRangeStartChange}
         />
         <ButtonsWrapperAlignEnd>
           <BpButton
-            type='button'
             intent='none'
-            onClick={onCancelClick}
             text={texts.buttonText.cancel}
+            type='button'
+            onClick={onCancelClick}
           />
           <BpButton
-            type='button'
             intent='primary'
-            onClick={onOkClickHandler}
             text={texts.buttonText.decide}
+            type='button'
+            onClick={onOkClickHandler}
           />
         </ButtonsWrapperAlignEnd>
       </Root>

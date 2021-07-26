@@ -10,8 +10,8 @@ export const WritingsView = memoNamed<
     <h1>{'執筆物'}</h1>
     {listElements.map((app, i) => (
       <WritingsElement
-        body1={app.body1}
         key={i}
+        body1={app.body1}
         link={app.link}
         subtitle={app.subtitle}
         title={app.title}

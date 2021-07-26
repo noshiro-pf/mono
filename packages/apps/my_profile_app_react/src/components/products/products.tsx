@@ -8,10 +8,10 @@ export const Products = memoNamed<Readonly<{ mobile: boolean }>>(
   ({ mobile }) =>
     mobile ? (
       <ProductsViewMobile
-        webApps={products.webApps}
         libraries={products.libraries}
+        webApps={products.webApps}
       />
     ) : (
-      <ProductsView webApps={products.webApps} libraries={products.libraries} />
+      <ProductsView libraries={products.libraries} webApps={products.webApps} />
     )
 );

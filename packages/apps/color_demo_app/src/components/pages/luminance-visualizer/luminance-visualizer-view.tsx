@@ -51,14 +51,14 @@ export const LuminanceVisualizerView = memoNamed<Props>(
     <Root>
       <PaperCustomized variant='outlined'>
         <AllSliders
-          saturation={props.saturation}
-          lightness={props.lightness}
-          saturationOnChange={props.saturationOnChange}
-          lightnessOnChange={props.lightnessOnChange}
-          firstHue={props.firstHue}
-          firstHueOnChange={props.firstHueOnChange}
           divisionNumber={props.divisionNumber}
           divisionNumberOnChange={props.divisionNumberOnChange}
+          firstHue={props.firstHue}
+          firstHueOnChange={props.firstHueOnChange}
+          lightness={props.lightness}
+          lightnessOnChange={props.lightnessOnChange}
+          saturation={props.saturation}
+          saturationOnChange={props.saturationOnChange}
         />
       </PaperCustomized>
 
@@ -78,8 +78,8 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         />
         <ColorList
           hueList={props.result1_equallySpaced.pickedUpHues}
-          saturation={props.saturation}
           lightness={props.lightness}
+          saturation={props.saturation}
         />
         <ContrastRatioList
           contrastRatioList={
@@ -108,8 +108,8 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         />
         <ColorList
           hueList={props.result2_weighted.pickedUpHues}
-          saturation={props.saturation}
           lightness={props.lightness}
+          saturation={props.saturation}
         />
         <ContrastRatioList
           contrastRatioList={props.result2_weighted.adjacentContrastRatioList}
@@ -136,8 +136,8 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         />
         <ColorList
           hueList={props.result3_weighted_log.pickedUpHues}
-          saturation={props.saturation}
           lightness={props.lightness}
+          saturation={props.saturation}
         />
         <ContrastRatioList
           contrastRatioList={

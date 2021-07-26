@@ -43,9 +43,9 @@ export const SelectSymbolPopoverContent = memoNamed<Props>(
         {iconsWithHandler.map(({ id, icon, disabled, onClickHandler }) => (
           <BpButton
             key={id}
+            disabled={disabled || true}
             icon={icon}
             minimal={true}
-            disabled={disabled || true}
             onClick={onClickHandler}
           />
         ))}

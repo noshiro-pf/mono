@@ -116,8 +116,8 @@ export const App: FC = memoNamed('App', () => {
       <Navbar>
         <Navbar.Group>
           <Tabs
-            onChange={handleTabChange as (value: string) => void}
             selectedTabId={selectedTabId}
+            onChange={handleTabChange as (value: string) => void}
           >
             <Tab id='table' title='確率表' />
             <Tab id='deadColumnUI' title='残存列確率' />
@@ -129,9 +129,9 @@ export const App: FC = memoNamed('App', () => {
           <ProbabilityTable
             filterByString={filterByString}
             filtered={filtered}
-            onFilterByStringChange={setFilterByString}
             sortByDice={sortByDice}
             sortByProbability={sortByProbability}
+            onFilterByStringChange={setFilterByString}
           />
         ) : undefined}
         {selectedTabId === 'deadColumnUI' ? (

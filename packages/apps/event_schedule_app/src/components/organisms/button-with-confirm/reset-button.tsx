@@ -28,10 +28,10 @@ const toastConfig = {
 
 export const ResetButton = memoNamed<Props>('ResetButton', (props) => (
   <ButtonWithConfirm
-    onConfirmClick={props.onConfirmClick}
     buttonConfig={buttonConfig}
     dialogConfig={dialogConfig}
-    toastConfig={toastConfig}
     disabled={props.disabled}
+    toastConfig={toastConfig}
+    onConfirmClick={props.onConfirmClick}
   />
 ));

@@ -64,9 +64,9 @@ export const ProbabilityTable = memoNamed<Props>(
           <Th colSpan={3}>
             <BpInput
               leftIcon={'filter-list'}
-              onValueChange={onFilterByStringChange}
               placeholder={`"${separator}" 区切りで数字を入力`}
               value={filterByString}
+              onValueChange={onFilterByStringChange}
             />
           </Th>
           <Th />

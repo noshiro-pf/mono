@@ -15,10 +15,10 @@ export const ProductsView = memoNamed<
     <p>{'下の方ほどメンテされていない（特にAngular製のものは放置状態）'}</p>
     {libraries.map((app, i) => (
       <ProductsElementView
+        key={i}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}
-        key={i}
         link={app.link}
         subtitle={app.subtitle}
         title={app.title}
@@ -27,10 +27,10 @@ export const ProductsView = memoNamed<
     <h2>{'ウェブアプリ'}</h2>
     {webApps.map((app, i) => (
       <ProductsElementView
+        key={i}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}
-        key={i}
         link={app.link}
         subtitle={app.subtitle}
         title={app.title}

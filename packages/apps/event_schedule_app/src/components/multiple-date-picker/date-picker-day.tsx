@@ -54,14 +54,15 @@ export const DatePickerDate = memoNamed<Props>(
     return (
       <Cell
         // eslint-disable-next-line react/forbid-component-props
-        className={className}
-        tabIndex={-1}
-        role='gridcell'
-        aria-label={dateString}
         aria-disabled={disabled}
+        aria-label={dateString}
         aria-selected={selected}
-        onClick={disabled ? noop : onClick}
+        // eslint-disable-next-line react/forbid-component-props
+        className={className}
+        role='gridcell'
+        tabIndex={-1}
         title={holidayJpName}
+        onClick={disabled ? noop : onClick}
       >
         <div className='bp3-datepicker-day-wrapper' style={style}>
           {ymd.date}

@@ -78,8 +78,8 @@ export const LabelButtonItemView = memoNamed<Props>(
     return (
       <Root>
         <LabelButtonItemBodyComponentConditional
-          onClick={onLabelClickConditional}
           style={buttonBgStyleConditional}
+          onClick={onLabelClickConditional}
         >
           <Icon icon={'tick'} style={isSelectedIconStyle} />
           <LabelButtonText>{props.labelText}</LabelButtonText>
