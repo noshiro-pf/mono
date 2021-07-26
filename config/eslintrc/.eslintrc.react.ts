@@ -30,8 +30,6 @@ const config: Linter.Config = {
     'react/forbid-component-props': ['error', { forbid: ['className'] }],
     'react/no-array-index-key': 'warn',
     'react/jsx-props-no-spreading': 'warn',
-
-    // TODO
     'react/jsx-sort-props': [
       'warn',
       {
