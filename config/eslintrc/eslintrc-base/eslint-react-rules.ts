@@ -10,6 +10,7 @@ export const eslintReactRules: Linter.Config['rules'] = {
   'react/jsx-boolean-value': 'off',
 
   /* modified */
+  'react/function-component-definition': 'warn',
   'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
   'react/forbid-component-props': ['error', { forbid: ['className'] }],
   'react/no-array-index-key': 'warn',
