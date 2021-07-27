@@ -1,14 +1,14 @@
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 
-type PermutationSub<U, K = U> = [U] extends [never]
+type PermutationImpl<U, K = U> = [U] extends [never]
   ? []
   : K extends unknown
   ? // eslint-disable-next-line @typescript-eslint/ban-types
-    [K, ...PermutationSub<Exclude<U, K>>]
+    [K, ...PermutationImpl<Exclude<U, K>>]
   : never;
 
-export type Permutation<U> = PermutationSub<U>;
+export type Permutation<U> = PermutationImpl<U>;
 
 assertType<
   TypeEq<
