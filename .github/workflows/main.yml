@@ -6,9 +6,8 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches:
-      - main
-      - '!dev'
+    branches-ignore:
+      - 'dev'
     paths-ignore:
       - 'docs/**'
       - 'experimental/**'
@@ -16,9 +15,8 @@ on:
       - '**.txt'
       - '.gitignore'
   pull_request:
-    branches:
-      - main
-      - '!dev'
+    branches-ignore:
+      - 'dev'
     paths-ignore:
       - 'docs/**'
       - 'experimental/**'
