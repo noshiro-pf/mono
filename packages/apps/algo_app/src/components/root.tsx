@@ -12,7 +12,7 @@ export const Root = memoNamed('Root', () => {
   });
 
   return (
-    <div style={rootStyle} ref={ref}>
+    <div ref={ref} style={rootStyle}>
       <GameMain windowSize={windowSize} />
     </div>
   );

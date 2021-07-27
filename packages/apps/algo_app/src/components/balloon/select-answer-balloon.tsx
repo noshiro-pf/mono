@@ -94,9 +94,9 @@ export const SelectAnswerBalloon = memoNamed<Props>(
               {text.cancel}
             </button>
             <button
+              disabled={submitButtonIsDisabled || selectedNumber === undefined}
               type={'button'}
               onClick={submitAnswer}
-              disabled={submitButtonIsDisabled || selectedNumber === undefined}
             >
               {text.submitAnswer}
             </button>

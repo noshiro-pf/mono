@@ -1,3 +1,3 @@
-import type { FunctionalComponent } from 'preact';
+import { memoNamed } from '@noshiro/preact-utils';
 
-export const App: FunctionalComponent = () => <div>{'Hello'}</div>;
+export const App = memoNamed('App', () => <div>{'Hello'}</div>);

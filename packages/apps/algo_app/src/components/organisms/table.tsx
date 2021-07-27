@@ -123,79 +123,79 @@ export const Table = memoNamed(
         <PlayerAreaS>
           <PlayerCardsArea
             areaSize={areaSize}
+            cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
-            rotate={0}
             cards={displayValues.playerCards.S}
             paddingPx={paddingPx}
+            rotate={0}
             windowSize={windowSize}
-            cardPositionsDispatcher={cardPositionsDispatcher}
           />
         </PlayerAreaS>
         <PlayerAreaW>
           <PlayerCardsArea
             areaSize={areaSize}
+            cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
-            rotate={90}
             cards={displayValues.playerCards.W}
             paddingPx={paddingPx}
+            rotate={90}
             windowSize={windowSize}
-            cardPositionsDispatcher={cardPositionsDispatcher}
           />
         </PlayerAreaW>
         <PlayerAreaN>
           <PlayerCardsArea
             areaSize={areaSize}
+            cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
-            rotate={180}
             cards={displayValues.playerCards.N}
             paddingPx={paddingPx}
+            rotate={180}
             windowSize={windowSize}
-            cardPositionsDispatcher={cardPositionsDispatcher}
           />
         </PlayerAreaN>
         <PlayerAreaE>
           <PlayerCardsArea
             areaSize={areaSize}
+            cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
-            rotate={270}
             cards={displayValues.playerCards.E}
             paddingPx={paddingPx}
+            rotate={270}
             windowSize={windowSize}
-            cardPositionsDispatcher={cardPositionsDispatcher}
           />
         </PlayerAreaE>
         <PlayerNameAreaS>
           <PlayerName
+            isInTurn={displayValues.turnPlayer === 'S'}
             playerName={'Player S'}
             rotate={0}
-            isInTurn={displayValues.turnPlayer === 'S'}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.S}
           />
         </PlayerNameAreaS>
         <PlayerNameAreaW>
           <PlayerName
+            isInTurn={displayValues.turnPlayer === 'W'}
             playerName={'Player W'}
             rotate={90}
-            isInTurn={displayValues.turnPlayer === 'W'}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.W}
           />
         </PlayerNameAreaW>
         <PlayerNameAreaN>
           <PlayerName
+            isInTurn={displayValues.turnPlayer === 'N'}
             playerName={'Player N'}
             rotate={180}
-            isInTurn={displayValues.turnPlayer === 'N'}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.N}
           />
         </PlayerNameAreaN>
         <PlayerNameAreaE>
           <PlayerName
+            isInTurn={displayValues.turnPlayer === 'E'}
             playerName={'Player E'}
             rotate={270}
-            isInTurn={displayValues.turnPlayer === 'E'}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.E}
           />
