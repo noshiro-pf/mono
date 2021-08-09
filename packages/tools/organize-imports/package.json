@@ -9,6 +9,7 @@
     "organizeimports": "lib/index.js"
   },
   "scripts": {
+    "build": "echo 'no gi script'",
     "clean": "echo 'no clean script'",
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",

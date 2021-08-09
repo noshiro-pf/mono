@@ -6,11 +6,11 @@
     "packages/**"
   ],
   "scripts": {
+    "build:all": "yarn workspaces run build",
     "build:apps": "scripts/build_apps.sh",
     "build:utils": "scripts/build_utils.sh",
-    "check:after-setup": "run-s build:apps lint:all test:all check:no-changes",
-    "check:full": "yarn clean:all && yarn && run-s setup:ci build:utils check:after-setup",
-    "check:no-changes": "yarn fmt:all && scripts/git_no_changes.sh",
+    "check:all": "run-s setup:all gi:all build:all fmt:all lintfix:all test:all check:no-diff",
+    "check:no-diff": "scripts/git_no_changes.sh",
     "clean:all": "git clean -xfd",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "clean:root": "run-s clean:root:*",
@@ -29,7 +29,6 @@
     "lint:utils": "scripts/lint_utils.sh",
     "lintfix:all": "yarn workspaces run lint:fix",
     "setup:all": "run-s setup:configs setup:custom-eslint build:utils",
-    "setup:ci": "run-s setup:configs setup:custom-eslint",
     "setup:custom-eslint": "yarn workspace eslint-plugin-noshiro-custom build",
     "setup:configs": "run-s setup:root setup:sub",
     "presetup:root": "yarn clean:root",

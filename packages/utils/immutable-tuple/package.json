@@ -10,7 +10,8 @@
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
-    "build": "yarn gi && run-s build:*",
+    "build": "echo 'no build script'",
+    "builddev": "yarn gi && run-s build:*",
     "prebuild:cjs": "yarn clean:build:cjs",
     "build:cjs": "tsc --project config/tsconfig.cjs.json",
     "prebuild:esm": "yarn clean:build:esm",

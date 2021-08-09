@@ -10,9 +10,9 @@ type Size = Readonly<{
   width: number;
 }>;
 
-export const useResizeObserverRef = (
+export const useResizeObserverRef = <E extends Element = Element>(
   setSize: (v: Size) => void
-): RefObject<HTMLDivElement> => {
+): RefObject<E> => {
   const rootResizeObserver = useMemo(
     () =>
       // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
@@ -24,7 +24,7 @@ export const useResizeObserverRef = (
     [setSize]
   );
 
-  const targetElRef = useRef<HTMLDivElement | null>(null);
+  const targetElRef = useRef<E>(null);
 
   useEffect(() => {
     const el = targetElRef.current;
@@ -42,12 +42,12 @@ export const useResizeObserverRef = (
   return targetElRef;
 };
 
-export const useResizeObserver = (
+export const useResizeObserver = <E extends Element = Element>(
   defaultSize: Size = { width: 0, height: 0, left: 0, top: 0 }
-): [Size, RefObject<HTMLDivElement>] => {
+): [Size, RefObject<E>] => {
   const [size, setSize] = useState<Size>(defaultSize);
 
-  const targetElRef = useResizeObserverRef(setSize);
+  const targetElRef = useResizeObserverRef<E>(setSize);
 
   return [size, targetElRef];
 };
