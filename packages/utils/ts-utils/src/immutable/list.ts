@@ -4,6 +4,7 @@ import { ituple } from '../others';
 import type {
   Length,
   PrimitiveType,
+  ReadonlyArrayOfLength,
   ReadonlyListButLast,
   ReadonlyListReverse,
   ReadonlyListTail,
@@ -11,7 +12,7 @@ import type {
   TypeEq,
   uint32,
 } from '../types';
-import { assertType } from '../types';
+import { assertType, isUint32 } from '../types';
 import { IMap } from './imap';
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
@@ -241,6 +242,20 @@ export namespace IList {
     list1: T1,
     list2: T2
   ): readonly [...T1, ...T2] => [...list1, ...list2];
+
+  export const partition = <N extends number, T>(
+    list: readonly T[],
+    n: N
+  ): readonly ReadonlyArrayOfLength<N, readonly T[]>[] | undefined =>
+    isUint32(n)
+      ? seq(n).map(
+          (i: number) =>
+            list.slice(n * i, n * (i + 1)) as unknown as ReadonlyArrayOfLength<
+              N,
+              readonly T[]
+            >
+        )
+      : undefined;
 
   export const reverse = <T extends readonly unknown[]>(
     list: T

@@ -1,4 +1,10 @@
-import type { ReadonlyArrayOfLength, TypeEq, uint32 } from '../types';
+import type {
+  ArrayOfLength,
+  DeepReadonly,
+  ReadonlyArrayOfLength,
+  TypeEq,
+  uint32,
+} from '../types';
 import { assertNotType, assertType } from '../types';
 import { IMap } from './imap';
 import { IList } from './list';
@@ -377,6 +383,27 @@ describe('IList.concat', () => {
 
   test('case 1', () => {
     expect(result).toStrictEqual([1, 2, 3, 4, 5]);
+  });
+});
+
+describe('IList.partition', () => {
+  const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+  const result = IList.partition(xs, 3);
+
+  assertType<
+    TypeEq<
+      typeof result,
+      | DeepReadonly<ArrayOfLength<3, (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)[]>[]>
+      | undefined
+    >
+  >();
+
+  test('case 1', () => {
+    expect(result).toStrictEqual([
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9],
+    ]);
   });
 });
 
