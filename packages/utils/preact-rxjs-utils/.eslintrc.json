@@ -1,8 +1,6 @@
 {
   "extends": "../../../config/eslintrc/.eslintrc.preact.js",
   "parserOptions": {
-    "ecmaVersion": 2018,
-    "sourceType": "module",
     "project": "./tsconfig.json"
   },
   "ignorePatterns": ["*.d.ts", "*.js"]
