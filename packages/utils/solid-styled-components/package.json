@@ -15,6 +15,7 @@
   "scripts": {
     "clean": "echo 'no clean script'",
     "fmt": "echo 'no fmt script'",
+    "build": "echo 'no build script'",
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
     "lint:fix": "yarn lint --fix",

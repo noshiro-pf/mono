@@ -4,7 +4,7 @@ import type { JSXInternal } from 'preact/src/jsx';
 import { GameMain } from './game-main';
 
 export const Root = memoNamed('Root', () => {
-  const [windowSize, ref] = useResizeObserver({
+  const [windowSize, ref] = useResizeObserver<HTMLDivElement>({
     width: 1280,
     height: 720,
     top: 0,

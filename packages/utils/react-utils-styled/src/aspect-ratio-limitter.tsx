@@ -19,10 +19,10 @@ type Props = Readonly<{
   minWidthPerHeight?: number;
 }>;
 
-export const AspectRatioLimitter = memoNamed<Props>(
-  'AspectRatioLimitter',
+export const AspectRatioLimiter = memoNamed<Props>(
+  'AspectRatioLimiter',
   ({ children, maxWidthPerHeight, minWidthPerHeight }: Props) => {
-    const [wrapperSize, ref] = useResizeObserver();
+    const [wrapperSize, ref] = useResizeObserver<HTMLDivElement>();
 
     const padding = useMemo(() => {
       const { width, height } = wrapperSize;

@@ -22,7 +22,8 @@ export const useAsyncDispatchFunction = <S, A>(
 
   // make setState return a promise
   return useCallback(
-    (action: A) => new Promise<S>((resolve, reject) => {
+    (action: A) =>
+      new Promise<S>((resolve, reject) => {
         setState((stateBefore) => {
           try {
             const stateAfter = reducer(stateBefore, action);

@@ -91,7 +91,7 @@ export const CardComponent = memoNamed<Props>(
       outlineColor
     );
 
-    const ref = useRef<HTMLDivElement | null>(null);
+    const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
       const el = ref.current;
       if (

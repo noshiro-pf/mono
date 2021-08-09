@@ -10,7 +10,8 @@
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
-    "build": "yarn gi && run-s build:*",
+    "build": "echo 'no build script'",
+    "builddev": "yarn gi && run-s build:*",
     "prebuild:cjs": "yarn clean:build:cjs",
     "build:cjs": "tsc --project config/tsconfig.cjs.json",
     "prebuild:esm": "yarn clean:build:esm",
@@ -20,7 +21,7 @@
     "clean:build:esm": "rimraf esm",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
-    "gi": "yarn _script_genindex ./src --min-depth 1",
+    "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
     "lint:fix": "yarn lint --fix",
     "setup": "echo 'no setup script'",
