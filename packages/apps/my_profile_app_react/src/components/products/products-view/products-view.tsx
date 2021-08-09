@@ -1,21 +1,15 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
-import type { ProductsInfo } from '../../../types';
+import { products } from '../../../assets';
 import { ProductsElementView } from './products-element-view';
 
-export const ProductsView = memoNamed<
-  DeepReadonly<{
-    webApps: ProductsInfo[];
-    libraries: ProductsInfo[];
-  }>
->('ProductsView', ({ webApps, libraries }) => (
+export const ProductsView = memoNamed('ProductsView', () => (
   <div>
     <h1>{'制作物'}</h1>
     <h2>{'ライブラリ'}</h2>
     <p>{'下の方ほどメンテされていない（特にAngular製のものは放置状態）'}</p>
-    {libraries.map((app, i) => (
+    {products.libraries.map((app) => (
       <ProductsElementView
-        key={i}
+        key={app.id}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}
@@ -25,9 +19,9 @@ export const ProductsView = memoNamed<
       />
     ))}
     <h2>{'ウェブアプリ'}</h2>
-    {webApps.map((app, i) => (
+    {products.webApps.map((app) => (
       <ProductsElementView
-        key={i}
+        key={app.id}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}

@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { DatePickerDate } from './date-picker-day';
 
 type Props = DeepReadonly<{
-  week: readonly {
+  week: {
     ymd: YearMonthDate;
     selected: boolean;
     disabled: boolean;
@@ -21,8 +21,9 @@ type Props = DeepReadonly<{
 export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
   const listWithHandler = useMemo(
     () =>
-      week.map((d) => ({
+      week.map((d, index) => ({
         value: d,
+        index,
         handler: () => {
           onClick(d.ymd);
         },
@@ -32,9 +33,9 @@ export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
 
   return (
     <div className='DayPicker-Week' role='row'>
-      {listWithHandler.map(({ value, handler }, idx) => (
+      {listWithHandler.map(({ value, handler, index }) => (
         <DatePickerDate
-          key={idx}
+          key={index}
           dayType={value.dayType}
           disabled={value.disabled}
           holidayJpName={value.holidayJpName}

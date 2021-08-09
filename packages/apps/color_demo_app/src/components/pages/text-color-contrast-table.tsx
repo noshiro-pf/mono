@@ -7,17 +7,47 @@ import {
   TableRow,
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hue, Percent, uint32 } from '@noshiro/ts-utils';
+import type {
+  DeepReadonly,
+  Hue,
+  Percent,
+  TypeExtends,
+  uint32,
+} from '@noshiro/ts-utils';
 import {
+  assertType,
   blackHsl,
   contrastRatioHsl,
+  IList,
   range,
   roundAt,
   whiteHsl,
-  zip,
 } from '@noshiro/ts-utils';
 import { Fragment } from 'react';
 import styled from 'styled-components';
+
+const hues: readonly Hue[] = range(0 as uint32, 360 as uint32) as Hue[];
+
+const indices = [0, 1, 2] as const;
+const saturationList = [80, 80, 100] as const;
+const lightnessList = [40, 60, 80] as const;
+
+const saturationListWithIndex = IList.zip(saturationList, indices);
+const lightnessListWithIndex = IList.zip(lightnessList, indices);
+
+assertType<TypeExtends<typeof saturationList, readonly Percent[]>>();
+assertType<TypeExtends<typeof lightnessList, readonly Percent[]>>();
+
+const SL = IList.zip(IList.zip(saturationList, lightnessList), indices);
+
+assertType<
+  TypeExtends<typeof SL, DeepReadonly<[[Percent, Percent], number][]>>
+>();
+
+export const TextColorContrastTable = memoNamed(
+  'TextColorContrastTable',
+  () => componentElement
+);
 
 const Root = styled.div`
   width: 100%;
@@ -31,16 +61,6 @@ const PaperCustomized = styled(Paper)`
   padding: 10px;
 `;
 
-const hues: readonly Hue[] = range(0 as uint32, 360 as uint32) as Hue[];
-
-const saturationList: readonly Percent[] = [80, 80, 100] as const;
-const lightnessList: readonly Percent[] = [40, 60, 80] as const;
-
-const SL: readonly (readonly [Percent, Percent])[] = zip(
-  saturationList,
-  lightnessList
-);
-
 const componentElement = (
   <Root>
     <PaperCustomized variant='outlined'>
@@ -48,7 +68,7 @@ const componentElement = (
         <TableHead>
           <TableRow>
             <TableCell align='center'>{'Saturation（彩度）'}</TableCell>
-            {SL.map(([sat], i) => (
+            {saturationListWithIndex.map(([sat, i]) => (
               <Fragment key={i}>
                 <TableCell align='center'>{sat}</TableCell>
                 <TableCell align='center'>{sat}</TableCell>
@@ -57,10 +77,10 @@ const componentElement = (
           </TableRow>
           <TableRow>
             <TableCell align='center'>{'Lightness（輝度）'}</TableCell>
-            {SL.map(([_, light], i) => (
+            {lightnessListWithIndex.map(([lightness, i]) => (
               <Fragment key={i}>
-                <TableCell align='center'>{light}</TableCell>
-                <TableCell align='center'>{light}</TableCell>
+                <TableCell align='center'>{lightness}</TableCell>
+                <TableCell align='center'>{lightness}</TableCell>
               </Fragment>
             ))}
           </TableRow>
@@ -70,9 +90,9 @@ const componentElement = (
         </TableHead>
         <TableBody>
           {hues.map((hue, idx) => (
-            <TableRow key={idx}>
+            <TableRow key={hue}>
               <TableCell align='center'>{idx}</TableCell>
-              {SL.map(([saturation, lightness], i) => {
+              {SL.map(([[saturation, lightness], key]) => {
                 const contrastWhite = contrastRatioHsl(whiteHsl, [
                   hue,
                   saturation,
@@ -86,7 +106,7 @@ const componentElement = (
                 const hslStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 
                 return (
-                  <Fragment key={i}>
+                  <Fragment key={key}>
                     <TableCell
                       align='left'
                       style={{ backgroundColor: hslStyle, color: 'white' }}
@@ -122,9 +142,4 @@ const componentElement = (
       </Table>
     </PaperCustomized>
   </Root>
-);
-
-export const TextColorContrastTable = memoNamed(
-  'TextColorContrastTable',
-  () => componentElement
 );

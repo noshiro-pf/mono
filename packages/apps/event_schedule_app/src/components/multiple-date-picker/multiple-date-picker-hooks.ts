@@ -34,13 +34,16 @@ type MultipleDatePickerState = DeepReadonly<{
   onNextMonthClick: () => void;
   onYearChange: (year: YearEnum) => void;
   onMonthChange: (month: MonthEnum) => void;
-  calendarCells: readonly (readonly {
-    ymd: YearMonthDate;
-    selected: boolean;
-    disabled: boolean;
-    dayType: DayType;
-    holidayJpName: string | undefined;
-  }[])[];
+  calendarCells: {
+    index: number;
+    week: {
+      ymd: YearMonthDate;
+      selected: boolean;
+      disabled: boolean;
+      dayType: DayType;
+      holidayJpName: string | undefined;
+    }[];
+  }[];
   onDateClick: (ymd: YearMonthDate) => void;
   onWeekdaysHeaderCellClick: (w: WeekDayEnum) => void;
   onTodayClick: () => void;
@@ -65,23 +68,29 @@ export const useMultipleDatePickerState = (
     [selectedDates]
   );
 
-  const dates = useMemo<readonly (readonly YearMonthDate[])[]>(
+  const dates = useMemo<DeepReadonly<YearMonthDate[][]>>(
     () => generateCalendar(calendarCurrentPage.year, calendarCurrentPage.month),
     [calendarCurrentPage]
   );
 
   const calendarCells = useMemo<
-    readonly (readonly Readonly<{
-      ymd: YearMonthDate;
-      selected: boolean;
-      disabled: boolean;
-      dayType: DayType;
-      holidayJpName: string | undefined;
-    }>[])[]
+    DeepReadonly<
+      {
+        week: {
+          ymd: YearMonthDate;
+          selected: boolean;
+          disabled: boolean;
+          dayType: DayType;
+          holidayJpName: string | undefined;
+        }[];
+        index: number;
+      }[]
+    >
   >(
     () =>
-      dates.map((week) =>
-        week.map((ymd) => {
+      dates.map((week, index) => ({
+        index,
+        week: week.map((ymd) => {
           const dayValue: WeekDayEnum = ymd2day(ymd);
           return {
             ymd,
@@ -97,8 +106,8 @@ export const useMultipleDatePickerState = (
                 : 'normal',
             holidayJpName: holidaysJpDefinition?.get(ymd),
           };
-        })
-      ),
+        }),
+      })),
     [dates, selectedDatesSet, calendarCurrentPage, holidaysJpDefinition]
   );
 

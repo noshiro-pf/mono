@@ -8,7 +8,7 @@ import {
   variance,
   zip,
 } from '@noshiro/ts-utils';
-import type { ExperimentResult } from '../types';
+import type { ColorResult } from '../types';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
@@ -28,9 +28,9 @@ export const calcAll = ({
   divisionNumber: uint32;
 }>): {
   relativeLuminanceDistribution: [Hsl, number][];
-  result1_equallySpaced: ExperimentResult;
-  result2_weighted: ExperimentResult;
-  result3_weighted_log: ExperimentResult;
+  result1_equallySpaced: ColorResult;
+  result2_weighted: ColorResult;
+  result3_weighted_log: ColorResult;
 } => {
   /* values */
 
@@ -38,7 +38,11 @@ export const calcAll = ({
     (h) => ((h - firstHue + 360) % 360) as Hue
   );
 
-  const hslList: Hsl[] = hueList.map((hue) => [hue, saturation, lightness]);
+  const hslList: readonly Hsl[] = hueList.map((hue) => [
+    hue,
+    saturation,
+    lightness,
+  ]);
 
   const luminanceList = hslList.map(hslToRgb).map(relativeLuminance);
 
@@ -61,7 +65,7 @@ export const calcAll = ({
     lightness
   );
 
-  const result1_equallySpaced: ExperimentResult = {
+  const result1_equallySpaced: ColorResult = {
     accumulatedDistribution: zip(
       hslList,
       hueListDefault.map((i) => i / 360)
@@ -87,7 +91,7 @@ export const calcAll = ({
     lightness
   );
 
-  const result2_weighted: ExperimentResult = {
+  const result2_weighted: ColorResult = {
     accumulatedDistribution: zip(
       hslList,
       normalizeList(getLuminanceListAccumulated(luminanceList, false))
@@ -114,7 +118,7 @@ export const calcAll = ({
     lightness
   );
 
-  const result3_weighted_log: ExperimentResult = {
+  const result3_weighted_log: ColorResult = {
     accumulatedDistribution: zip(
       hslList,
       normalizeList(getLuminanceListAccumulated(luminanceList, true))

@@ -55,8 +55,12 @@ export const MultipleDatePicker = memoNamed<Props>(
                 <div className='DayPicker-Month' role='grid'>
                   <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
                   <div className='DayPicker-Body' role='rowgroup'>
-                    {calendarCells.map((week, idx) => (
-                      <Week key={idx} week={week} onClick={onDateClick} />
+                    {calendarCells.map((week) => (
+                      <Week
+                        key={week.index}
+                        week={week.week}
+                        onClick={onDateClick}
+                      />
                     ))}
                   </div>
                 </div>

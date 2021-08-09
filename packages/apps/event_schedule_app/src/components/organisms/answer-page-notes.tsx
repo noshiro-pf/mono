@@ -1,4 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
+import { IList } from '@noshiro/ts-utils';
 import urlRegex from 'url-regex';
 import { splitStringByWhitespace } from '../../utils';
 
@@ -21,7 +22,7 @@ export const AnswerPageNotes = memoNamed<Props>(
   'AnswerPageNotes',
   ({ notes }) => (
     <>
-      {splitStringByWhitespace(notes).map((str, i) => (
+      {IList.map(splitStringByWhitespace(notes), (str, i) => (
         <span key={i}>{convertUrlStringToAnchorElement(str)} </span>
       ))}
     </>

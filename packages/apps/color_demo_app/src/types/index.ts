@@ -1,1 +1,1 @@
-export * from './experiment-result';
+export * from './color-result';

@@ -31,8 +31,8 @@ export const ColoredDistribution = memoNamed<Props>(
   'ColoredDistribution',
   (props) => (
     <Root>
-      {props.accumulatedDistribution.map(([hsl, value], i) => (
-        <BarWrapper key={i}>
+      {props.accumulatedDistribution.map(([hsl, value]) => (
+        <BarWrapper key={hsl[0]}>
           <Bar
             style={{
               height: `${value * 100}%`,

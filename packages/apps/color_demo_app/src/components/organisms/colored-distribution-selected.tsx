@@ -1,7 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { hslToStr } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import type { ExperimentResult } from '../../types';
+import type { ColorResult } from '../../types';
 
 const Root = styled.div`
   width: 100%;
@@ -24,21 +24,19 @@ const Bar = styled.div`
 `;
 
 type Props = Readonly<{
-  experimentResult: ExperimentResult;
+  colorResult: ColorResult;
 }>;
 
 export const ColoredDistributionSelected = memoNamed<Props>(
   'ColoredDistributionSelected',
   (props) => (
     <Root>
-      {props.experimentResult.accumulatedDistribution.map(([hsl, value], i) => (
-        <BarWrapper key={i}>
+      {props.colorResult.accumulatedDistribution.map(([hsl, value]) => (
+        <BarWrapper key={hsl[0]}>
           <Bar
             style={{
               height: `${value * 95 + 5}%`,
-              backgroundColor: props.experimentResult.pickedUpHues.includes(
-                hsl[0]
-              )
+              backgroundColor: props.colorResult.pickedUpHues.includes(hsl[0])
                 ? hslToStr(hsl)
                 : 'transparent',
             }}

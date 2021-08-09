@@ -1,4 +1,5 @@
 export * from './clamp-value';
+export * from './datetime-range-2-str';
 export * from './datetime-range-to-str';
 export * from './fetch-holidays';
 export * from './map-key';
