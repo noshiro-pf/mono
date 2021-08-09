@@ -90,10 +90,13 @@ export const SelectAnswerBalloon = memoNamed<Props>(
             )}
           </CardsWrapper>
           <Buttons>
-            <button onClick={onCancelClick}>{text.cancel}</button>
+            <button type={'button'} onClick={onCancelClick}>
+              {text.cancel}
+            </button>
             <button
-              onClick={submitAnswer}
               disabled={submitButtonIsDisabled || selectedNumber === undefined}
+              type={'button'}
+              onClick={submitAnswer}
             >
               {text.submitAnswer}
             </button>

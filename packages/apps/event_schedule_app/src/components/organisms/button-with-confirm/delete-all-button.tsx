@@ -29,9 +29,9 @@ const toastConfig = {
 
 export const DeleteAllButton = memoNamed<Props>('DeleteAllButton', (props) => (
   <ButtonWithConfirm
-    onConfirmClick={props.onConfirmDeleteAll}
     buttonConfig={buttonConfig}
     dialogConfig={dialogConfig}
     toastConfig={toastConfig}
+    onConfirmClick={props.onConfirmDeleteAll}
   />
 ));

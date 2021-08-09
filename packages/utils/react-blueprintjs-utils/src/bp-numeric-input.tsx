@@ -93,12 +93,13 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
 
     return (
       <NumericInput
-        value={state}
-        onValueChange={onValueChangeInternal}
-        onBlur={onBlurInternal}
-        selectAllOnFocus={selectAllOnFocus}
         fill={fill}
+        selectAllOnFocus={selectAllOnFocus}
         style={style}
+        value={state}
+        onBlur={onBlurInternal}
+        onValueChange={onValueChangeInternal}
+        // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       />
     );

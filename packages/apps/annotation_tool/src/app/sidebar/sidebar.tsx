@@ -18,13 +18,13 @@ type Props = Readonly<{
 export const Sidebar = memoNamed<Props>('Sidebar', (props) => (
   <Root>
     <LabelButtons
-      labels={props.labels}
-      labelSaturation={props.labelsSaturation}
-      labelLightness={props.labelsLightness}
-      visibleLabels={props.visibleLabels}
-      selectedLabel={props.selectedLabel}
-      hidden={props.hidden}
       handlers={props.handlers}
+      hidden={props.hidden}
+      labelLightness={props.labelsLightness}
+      labelSaturation={props.labelsSaturation}
+      labels={props.labels}
+      selectedLabel={props.selectedLabel}
+      visibleLabels={props.visibleLabels}
     />
   </Root>
 ));

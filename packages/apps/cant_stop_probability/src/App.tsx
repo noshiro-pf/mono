@@ -127,11 +127,11 @@ export const App: FC = memoNamed('App', () => {
       <Wrapper>
         {selectedTabId === 'table' ? (
           <ProbabilityTable
+            filterByString={filterByString}
+            filtered={filtered}
             sortByDice={sortByDice}
             sortByProbability={sortByProbability}
-            filterByString={filterByString}
             onFilterByStringChange={setFilterByString}
-            filtered={filtered}
           />
         ) : undefined}
         {selectedTabId === 'deadColumnUI' ? (

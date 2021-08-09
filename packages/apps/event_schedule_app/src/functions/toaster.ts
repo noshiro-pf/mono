@@ -17,8 +17,8 @@ export const showToast = ({
 }>): void => {
   toast.show({
     timeout: 2000,
-    intent: intent,
-    message: message,
+    intent,
+    message,
     icon: intent === 'success' ? 'tick' : undefined,
   });
 };

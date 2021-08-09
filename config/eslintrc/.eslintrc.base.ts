@@ -3,7 +3,7 @@ import { readGitignoreFiles } from 'eslint-gitignore';
 import {
   eslintImportsRules,
   eslintNoshiroCustomRules,
-  eslintRules,
+  eslintRulesAll,
   typescriptEslintRules,
 } from './eslintrc-base';
 
@@ -25,10 +25,8 @@ import {
 const config: Linter.Config = {
   extends: [
     /* recommended */
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'eslint:all',
+    'plugin:@typescript-eslint/all',
 
     /* import */
     'plugin:import/recommended',
@@ -59,20 +57,19 @@ const config: Linter.Config = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
+    ecmaFeatures: {
+      modules: true,
+      impliedStrict: true,
+      jsx: true,
+    },
     sourceType: 'module',
     project: './config/tsconfig/tsconfig.eslint.json',
   },
   rules: {
-    ...eslintRules.additionalRulesNotIncludedInRecommended.possibleErrors,
-    ...eslintRules.additionalRulesNotIncludedInRecommended.bestPractices,
-    ...eslintRules.additionalRulesNotIncludedInRecommended.variables,
-    ...eslintRules.additionalRulesNotIncludedInRecommended.stylisticIssues,
-    ...eslintRules.additionalRulesNotIncludedInRecommended.ECMAScript6,
-    ...eslintRules.modifiedRulesIncludedInRecommended,
-    ...eslintRules.disabledRulesIncludedInRecommended,
-    ...typescriptEslintRules.additionalRulesNotIncludedInRecommended,
-    ...typescriptEslintRules.modifiedRulesIncludedInRecommended,
-    ...typescriptEslintRules.disabledRulesIncludedInRecommended,
+    ...eslintRulesAll.modifiedRules,
+    ...eslintRulesAll.disabledRules,
+    ...typescriptEslintRules.modifiedRules,
+    ...typescriptEslintRules.disabledRules,
     ...eslintImportsRules.staticAnalysis,
     ...eslintImportsRules.helpfulWarnings,
     ...eslintImportsRules.moduleSystems,

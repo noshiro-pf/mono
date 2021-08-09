@@ -69,35 +69,35 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
       <>
         <Section sectionTitle={vt.section1.titleAndNotesSectionTitle}>
           <NameAndNotes
-            title={title}
-            onTitleChange={onTitleChange}
             notes={notes}
+            title={title}
             onNotesChange={onNotesChange}
+            onTitleChange={onTitleChange}
           />
         </Section>
         <Section sectionTitle={vt.section2.selectDatesSectionTitle}>
           <SelectDatetimes
-            datetimeSpecification={datetimeSpecification}
-            onDatetimeSpecificationChange={onDatetimeSpecificationChange}
             datetimeList={datetimeRangeList}
-            onDatetimeListChange={onDatetimeListChange}
+            datetimeSpecification={datetimeSpecification}
             holidaysJpDefinition={holidaysJpDefinition}
+            onDatetimeListChange={onDatetimeListChange}
+            onDatetimeSpecificationChange={onDatetimeSpecificationChange}
           />
         </Section>
         <Section sectionTitle={vt.section3.otherSettingsTitle}>
           <EventSettings
-            useAnswerDeadline={useAnswerDeadline}
-            onToggleAnswerDeadline={onToggleAnswerDeadline}
             answerDeadline={answerDeadline}
-            onAnswerDeadlineChange={onAnswerDeadlineChange}
-            customizeSymbolSettings={customizeSymbolSettings}
-            onToggleCustomizeSymbolSettings={onToggleCustomizeSymbolSettings}
             answerSymbolList={answerSymbolList}
-            onAnswerSymbolListChange={onAnswerSymbolListValueChange}
-            useNotification={useNotification}
-            onToggleUseNotification={onToggleUseNotification}
+            customizeSymbolSettings={customizeSymbolSettings}
             notificationSettings={notificationSettings}
+            useAnswerDeadline={useAnswerDeadline}
+            useNotification={useNotification}
+            onAnswerDeadlineChange={onAnswerDeadlineChange}
+            onAnswerSymbolListChange={onAnswerSymbolListValueChange}
             onNotificationSettingsChange={onNotificationSettingsChange}
+            onToggleAnswerDeadline={onToggleAnswerDeadline}
+            onToggleCustomizeSymbolSettings={onToggleCustomizeSymbolSettings}
+            onToggleUseNotification={onToggleUseNotification}
           />
         </Section>
         <EventSchedulePropertiesErrors
@@ -107,40 +107,40 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
           {props.mode === 'create' ? (
             <>
               <ResetButton
-                onConfirmClick={onResetClick}
                 disabled={createButtonIsLoading || hasNoChanges}
+                onConfirmClick={onResetClick}
               />
               <BpButton
-                intent='primary'
-                text={vt.createEventButton}
                 disabled={!createButtonIsEnabled}
+                intent={'primary'}
                 loading={createButtonIsLoading}
+                text={vt.createEventButton}
                 onClick={onCreateEventClick}
               />
               <CreateEventResultDialog
-                isOpen={createResultDialogIsOpen}
                 close={closeCreateResultDialog}
-                onClipboardButtonClick={onClipboardButtonClick}
-                url={url}
                 isLoading={isLoading}
+                isOpen={createResultDialogIsOpen}
+                url={url}
+                onClipboardButtonClick={onClipboardButtonClick}
               />
             </>
           ) : (
             <>
               <BackToAnswerPageButton
+                disabled={editButtonIsLoading}
                 hasNoChanges={hasNoChanges}
                 onConfirmClick={onBackToAnswerPageClick}
-                disabled={editButtonIsLoading}
               />
               <ResetEditButton
-                onConfirmClick={onResetClick}
                 disabled={editButtonIsLoading || hasNoChanges}
+                onConfirmClick={onResetClick}
               />
               <BpButton
-                intent='primary'
-                text={vt.editEventButton}
                 disabled={!editButtonIsEnabled}
+                intent={'primary'}
                 loading={editButtonIsLoading}
+                text={vt.editEventButton}
                 onClick={onEditEventClick}
               />
             </>

@@ -19,15 +19,15 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       <SwitchWrapper>
         <div>{props.title}</div>
         <BpSwitchWithoutLabel
-          inline={true}
           checked={props.show}
+          inline={true}
           onToggle={props.onToggle}
         />
       </SwitchWrapper>
       {props.description === undefined
         ? undefined
         : props.description.map((d, i) => <Description key={i} text={d} />)}
-      {props.show === undefined ? undefined : props.elementToToggle}
+      {props.show ? props.elementToToggle : undefined}
     </div>
   )
 );

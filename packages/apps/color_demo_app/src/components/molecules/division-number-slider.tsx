@@ -16,14 +16,14 @@ export const DivisionNumberSlider = memoNamed<Props>(
   'DivisionNumberSlider',
   (props) => (
     <SliderWrapper>
-      <div>分割数</div>
+      <div>{'分割数'}</div>
       <MuiSlider
+        ariaLabelledby='division-number'
+        max={30}
+        min={2}
+        step={1}
         value={props.divisionNumber}
         onChange={props.divisionNumberOnChange as (value: number) => void}
-        ariaLabelledby='division-number'
-        step={1}
-        min={2}
-        max={30}
       />
     </SliderWrapper>
   )

@@ -3,6 +3,7 @@ import type {
   DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
+import { match } from '@noshiro/ts-utils';
 import { texts } from '../../../constants';
 import { hm2str, ymd2strWithDay } from '../../../functions';
 
@@ -15,28 +16,20 @@ type Props = Readonly<{
 
 export const DatetimeRangeCell = memoNamed<Props>(
   'DatetimeRangeCell',
-  (props) =>
-    props.datetimeSpecification === 'noStartEndSpecified' ? (
-      <>{ymd2strWithDay(props.datetimeRange.ymd)}</>
-    ) : props.datetimeSpecification === 'startSpecified' ? (
-      <>
-        {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${hm2str(
-          props.datetimeRange.timeRange.start
-        )}${vt.timeRangeTilde}`}
-      </>
-    ) : props.datetimeSpecification === 'endSpecified' ? (
-      <>
-        {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${
+  ({ datetimeRange, datetimeSpecification }) => (
+    <>
+      {match(datetimeSpecification, {
+        noStartEndSpecified: ymd2strWithDay(datetimeRange.ymd),
+        startSpecified: `${ymd2strWithDay(datetimeRange.ymd)}  ${hm2str(
+          datetimeRange.timeRange.start
+        )}${vt.timeRangeTilde}`,
+        endSpecified: `${ymd2strWithDay(datetimeRange.ymd)}  ${
           vt.timeRangeTilde
-        }${hm2str(props.datetimeRange.timeRange.start)}`}
-      </>
-    ) : props.datetimeSpecification === 'startAndEndSpecified' ? (
-      <>
-        {`${ymd2strWithDay(props.datetimeRange.ymd)}  ${hm2str(
-          props.datetimeRange.timeRange.start
-        )}${vt.timeRangeTilde}${hm2str(props.datetimeRange.timeRange.end)}`}
-      </>
-    ) : (
-      <>{ymd2strWithDay(props.datetimeRange.ymd)}</>
-    )
+        }${hm2str(datetimeRange.timeRange.start)}`,
+        startAndEndSpecified: `${ymd2strWithDay(datetimeRange.ymd)}  ${hm2str(
+          datetimeRange.timeRange.start
+        )}${vt.timeRangeTilde}${hm2str(datetimeRange.timeRange.end)}`,
+      })}
+    </>
+  )
 );

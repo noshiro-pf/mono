@@ -107,10 +107,10 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
 
   return (
     <canvas
-      style={canvasStyle}
       ref={canvasRef}
-      width={props.canvasSize.width}
       height={props.canvasSize.height}
+      style={canvasStyle}
+      width={props.canvasSize.width}
     />
   );
 });

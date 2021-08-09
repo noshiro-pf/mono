@@ -36,11 +36,11 @@ export const LabelButtonItem = memoNamed<Props>('LabelButtonItem', (props) => {
 
   return (
     <LabelButtonItemView
-      index={props.index}
       hsl={hsl}
+      index={props.index}
       isSelected={props.isSelected}
-      labelText={props.label.name}
       isVisible={props.isVisible}
+      labelText={props.label.name}
       onLabelClick={onLabelClick}
       onVisibilityIconClick={onVisibilityIconClick}
     />

@@ -71,7 +71,7 @@ export const PlayerName = memoNamed<Props>(
     const ref = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
       const el = ref.current;
-      if (windowSize !== undefined && el !== null) {
+      if (el !== null) {
         onBoundingClientRectChange(el.getBoundingClientRect());
       }
     }, [windowSize, playerName, onBoundingClientRectChange]);

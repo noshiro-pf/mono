@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 
 const CenteringWrapperDiv = styled.div`
@@ -13,6 +13,7 @@ type Props = Readonly<{
   direction: 'column' | 'row';
 }>;
 
-export const CenteringWrapper: FC<Props> = (props: Props) => (
-  <CenteringWrapperDiv style={{ flexDirection: props.direction }} />
+export const CenteringWrapper = memoNamed<Props>(
+  'CenteringWrapper',
+  (props) => <CenteringWrapperDiv style={{ flexDirection: props.direction }} />
 );

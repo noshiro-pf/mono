@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { memoNamed } from '@noshiro/react-utils';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -53,7 +53,7 @@ const redirects: readonly (readonly [string, string])[] = [
   ['/', routePaths.createPage],
 ];
 
-export const Root: FC = () => (
+export const Root = memoNamed('Root', () => (
   <Wrapper>
     <BrowserRouter>
       <Switch>
@@ -63,13 +63,13 @@ export const Root: FC = () => (
           </Route>
         ))}
         {routeList.map(({ path, exact, component }) => (
-          <Route key={path} exact={exact} path={path} component={component} />
+          <Route key={path} component={component} exact={exact} path={path} />
         ))}
       </Switch>
     </BrowserRouter>
     <Footer />
   </Wrapper>
-);
+));
 
 const Wrapper = styled.div`
   min-height: 100vh;

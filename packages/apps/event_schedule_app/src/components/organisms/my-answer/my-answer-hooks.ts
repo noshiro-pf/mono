@@ -25,15 +25,15 @@ type MyAnswerHooks = DeepReadonly<{
   onUserNameBlur: () => void;
   onUserNameChange: (v: UserName) => void;
   onCommentChange: (v: string) => void;
-  symbolHeader: readonly {
+  symbolHeader: {
     iconId: AnswerSymbolIconId;
     symbolDescription: string;
     onClick: () => void;
   }[];
-  myAnswerList: readonly {
+  myAnswerList: {
     datetimeRange: DatetimeRange;
     selectedSymbol: AnswerSymbolIconId | undefined;
-    buttons: readonly {
+    buttons: {
       iconId: AnswerSymbolIconId;
       symbolDescription: string;
       onClick: () => void;
@@ -48,7 +48,7 @@ const theNameIsAlreadyUsedFn = (
   answers: readonly Answer[],
   nameToOmit: UserName | undefined
 ): boolean =>
-  userName !== undefined && userName === nameToOmit
+  userName === nameToOmit
     ? false
     : answers.find((a) => a.userName === userName) !== undefined;
 
@@ -67,7 +67,7 @@ export const useMyAnswerHooks = ({
   updateAnswerForEditing: (updater: (answer: Answer) => Answer) => void;
 }>): MyAnswerHooks => {
   const onUserNameChange = useCallback(
-    (userName) => {
+    (userName: UserName) => {
       updateAnswerForEditing(() =>
         IRecord.set(answerForEditing, 'userName', userName)
       );
@@ -94,7 +94,7 @@ export const useMyAnswerHooks = ({
     );
 
   const onCommentChange = useCallback(
-    (comment) => {
+    (comment: string) => {
       updateAnswerForEditing(() =>
         IRecord.set(answerForEditing, 'comment', comment)
       );

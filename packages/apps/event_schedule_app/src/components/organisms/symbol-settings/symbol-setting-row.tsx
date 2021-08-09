@@ -47,21 +47,21 @@ export const AnswerSymbolRow = memoNamed<Props>(
         </IconWrapper>
         <DescriptionWrapper>
           <BpInput
+            disabled={disabled}
             value={answerSymbol.description}
             onValueChange={onDescriptionChange}
-            disabled={disabled}
           />
         </DescriptionWrapper>
         <NumericInputWrapper>
           <BpNumericInput
-            value={answerSymbol.point}
-            onValueChange={onPointChangeHandler}
-            min={answerSymbolPointConfig.min}
+            disabled={disabled}
+            majorStepSize={answerSymbolPointConfig.majorStep}
             max={answerSymbolPointConfig.max}
+            min={answerSymbolPointConfig.min}
             minorStepSize={answerSymbolPointConfig.minorStep}
             stepSize={answerSymbolPointConfig.step}
-            majorStepSize={answerSymbolPointConfig.majorStep}
-            disabled={disabled}
+            value={answerSymbol.point}
+            onValueChange={onPointChangeHandler}
           />
         </NumericInputWrapper>
         {/* <ButtonsWrapper>

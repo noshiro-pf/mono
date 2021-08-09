@@ -14,7 +14,7 @@ type Props = Readonly<{
 
 export const Histogram = memoNamed<Props>('Histogram', ({ sumCount }) => {
   const xy = useMemo(() => zip(domain, sumCount), [sumCount]);
-  const mx = useMemo(() => max(sumCount) ?? 0, [sumCount]);
-  const numSample = useMemo(() => sumCount.reduce(add) ?? 0, [sumCount]);
-  return <HistogramView xy={xy} max={mx} numSample={numSample} />;
+  const mx = useMemo(() => max(sumCount), [sumCount]);
+  const numSample = useMemo(() => sumCount.reduce(add, 0), [sumCount]);
+  return <HistogramView max={mx} numSample={numSample} xy={xy} />;
 });

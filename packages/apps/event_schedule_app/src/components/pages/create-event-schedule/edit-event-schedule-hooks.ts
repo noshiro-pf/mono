@@ -41,13 +41,13 @@ export const useEditEventScheduleHooks = ({
   const onEditEventClick = useCallback(() => {
     if (!eventScheduleValidationOk) return;
     if (eventId === undefined) return;
-    if (!alive) return;
+    if (!alive.current) return;
 
     setIsLoadingTrue();
     api.event
       .update(eventId, newEventSchedule)
       .then(() => {
-        if (!alive) return;
+        if (!alive.current) return;
         setIsLoadingFalse();
         onBackToAnswerPage();
         showToast({

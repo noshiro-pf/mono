@@ -15,8 +15,8 @@ type Props = Readonly<{
   selectedHue: Hue;
 }>;
 
-export const AnnotataionCanvas = memoNamed<Props>(
-  'AnnotataionCanvas',
+export const AnnotationCanvas = memoNamed<Props>(
+  'AnnotationCanvas',
   (props: Props) => {
     const idMaker = defaultIdMaker;
 
@@ -46,9 +46,9 @@ export const AnnotataionCanvas = memoNamed<Props>(
           </AbsoluteWrapper>
           <AbsoluteWrapper>
             <CanvasMain
-              idMaker={idMaker}
-              canvasStyles={props.canvasStyles}
               canvasSize={props.canvasSize}
+              canvasStyles={props.canvasStyles}
+              idMaker={idMaker}
               selectedHue={props.selectedHue}
             />
           </AbsoluteWrapper>

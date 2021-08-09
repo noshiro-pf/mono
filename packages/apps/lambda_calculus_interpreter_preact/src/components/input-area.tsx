@@ -10,10 +10,11 @@ export const CodeArea = memoNamed<{
 }>('CodeArea', ({ value, valueChange = () => undefined, className }) => {
   const onChange = useCallback<ChangeEventHandler<HTMLTextAreaElement>>(
     (ev) => {
-      valueChange(ev.target.value ?? '');
+      valueChange(ev.target.value);
     },
     [valueChange]
   );
+  // eslint-disable-next-line react/forbid-component-props
   return <Styled className={className} value={value} onChange={onChange} />;
 });
 

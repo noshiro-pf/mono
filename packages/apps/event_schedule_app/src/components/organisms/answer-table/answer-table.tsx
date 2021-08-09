@@ -83,7 +83,7 @@ export const AnswerTable = memoNamed<Props>(
                   <span>{roundBy(2 as uint32, score)}</span>
                 </Td>
                 {answerSummaryRow?.map((s, i) => (
-                  <Td style={tCellStyle} key={i}>
+                  <Td key={i} style={tCellStyle}>
                     <SummaryCellStyle>
                       <span>{s}</span>
                       <SummaryCellUnit>{vt.numAnswersUnit}</SummaryCellUnit>
@@ -91,7 +91,7 @@ export const AnswerTable = memoNamed<Props>(
                   </Td>
                 ))}
                 {answerTableRow?.map(([iconId, weight], i) => (
-                  <Td style={tCellStyle} key={i}>
+                  <Td key={i} style={tCellStyle}>
                     {iconId === undefined ? (
                       ''
                     ) : (
@@ -116,9 +116,9 @@ export const AnswerTable = memoNamed<Props>(
             <Td style={tCellStyle}>{vt.comment}</Td>
 
             {/* spacer */}
-            <Td style={tCellStyle}></Td>
+            <Td style={tCellStyle} />
             {eventSchedule.answerSymbolList.map((s) => (
-              <Td key={s.iconId} style={tCellStyle}></Td>
+              <Td key={s.iconId} style={tCellStyle} />
             ))}
 
             {answersWithHandler.map((answer) => (

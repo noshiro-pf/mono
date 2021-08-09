@@ -1,16 +1,9 @@
 import { useBooleanState } from '@noshiro/preact-utils';
 import type { RectSize } from '@noshiro/ts-utils';
-import { mapNullable } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import type { CardTextColor, CustomColor } from '../../constants';
-import {
-  darkGray,
-  defaultCardSize,
-  eyeIconColorDef,
-  lightGray,
-  zIndex,
-} from '../../constants';
+import { darkGray, eyeIconColorDef, lightGray, zIndex } from '../../constants';
 import { fillCardSize, flipColor } from '../../functions';
 import type { CardColor, VisibilityFromMe } from '../../types';
 
@@ -32,7 +25,7 @@ export const useCardAttributes = (
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 } => {
-  const { width, height } = mapNullable(size, fillCardSize) ?? defaultCardSize;
+  const { width, height } = useMemo(() => fillCardSize(size), [size]);
 
   const textColor =
     visibilityFromMe === 'faceDownButVisibleToMe'

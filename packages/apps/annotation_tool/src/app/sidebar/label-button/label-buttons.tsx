@@ -48,14 +48,14 @@ export const LabelButtons = memoNamed<Props>('LabelButtons', (props) => {
         <LabelsWrapper>
           {labelsWithVisibleFlag.map(([label, isVisible], index) => (
             <LabelButtonItem
-              index={index}
               key={label.id}
-              label={label}
-              labelsSaturation={props.labelSaturation}
-              labelsLightness={props.labelLightness}
+              handlers={props.handlers}
+              index={index}
               isSelected={label === props.selectedLabel}
               isVisible={isVisible}
-              handlers={props.handlers}
+              label={label}
+              labelsLightness={props.labelLightness}
+              labelsSaturation={props.labelSaturation}
             />
           ))}
         </LabelsWrapper>

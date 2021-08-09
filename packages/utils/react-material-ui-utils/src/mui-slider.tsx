@@ -21,14 +21,14 @@ export const MuiSlider = memoNamed<
 
   return (
     <Slider
-      value={value}
-      onChange={sliderOnChange}
       aria-labelledby={ariaLabelledby}
-      valueLabelDisplay='auto'
       marks={true}
-      step={step}
-      min={min}
       max={max}
+      min={min}
+      step={step}
+      value={value}
+      valueLabelDisplay='auto'
+      onChange={sliderOnChange}
     />
   );
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/compat';
 
-export const useAlive = (): boolean => {
+export const useAlive = (): Readonly<{ current: boolean }> => {
   const [alive, setAlive] = useState<boolean>(true);
 
   useEffect(
@@ -10,5 +10,5 @@ export const useAlive = (): boolean => {
     []
   );
 
-  return alive;
+  return { current: alive };
 };

@@ -1,5 +1,9 @@
 import type { Linter } from 'eslint';
+import { eslintReactRules } from './eslintrc-base';
 
+/**
+ * https://github.com/yannickcr/eslint-plugin-react
+ */
 const config: Linter.Config = {
   root: true,
   settings: {
@@ -7,14 +11,13 @@ const config: Linter.Config = {
       version: 'detect',
     },
   },
-  extends: ['plugin:react/recommended', './.eslintrc.base.js'],
+  extends: [
+    'plugin:react/all',
+    'plugin:react-hooks/recommended',
+    './.eslintrc.base.js',
+  ],
   plugins: ['react', 'react-hooks'],
-  rules: {
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-    'react/jsx-uses-react': 'off',
-    'react/react-in-jsx-scope': 'off',
-  },
+  rules: eslintReactRules,
 };
 
 module.exports = config;

@@ -4,7 +4,7 @@ import { aboutThisAppUrl, texts } from '../../../constants';
 
 export const Footer = memoNamed('Footer', () => (
   <ReleaseNotesUrlWrapper>
-    <a href={aboutThisAppUrl} target='_blank' rel='noopener noreferrer'>
+    <a href={aboutThisAppUrl} rel='noopener noreferrer' target='_blank'>
       {texts.aboutThisApp}
     </a>
   </ReleaseNotesUrlWrapper>

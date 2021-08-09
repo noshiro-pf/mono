@@ -1,4 +1,4 @@
-import { Icon } from '@blueprintjs/core';
+import { Icon, IconSize } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import type { Hsl } from '@noshiro/ts-utils';
 import { higherContrastTextColorHsl, hslToStr } from '@noshiro/ts-utils';
@@ -51,7 +51,7 @@ export const LabelButtonItemView = memoNamed<Props>(
 
     const LabelButtonItemBodyComponentConditional = useMemo(
       () =>
-        disabled ?? false
+        disabled
           ? LabelButtonItemBodyDisabledStyled
           : LabelButtonItemBodyStyled,
       [disabled]
@@ -78,15 +78,15 @@ export const LabelButtonItemView = memoNamed<Props>(
     return (
       <Root>
         <LabelButtonItemBodyComponentConditional
-          onClick={onLabelClickConditional}
           style={buttonBgStyleConditional}
+          onClick={onLabelClickConditional}
         >
           <Icon icon={'tick'} style={isSelectedIconStyle} />
           <LabelButtonText>{props.labelText}</LabelButtonText>
           <EyeIconWrapperConditional onClick={onVisibilityIconClickConditional}>
             <Icon
               icon={props.isVisible ? 'eye-open' : 'eye-off'}
-              iconSize={Icon.SIZE_LARGE}
+              iconSize={IconSize.LARGE}
             />
           </EyeIconWrapperConditional>
         </LabelButtonItemBodyComponentConditional>

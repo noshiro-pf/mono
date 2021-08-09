@@ -20,7 +20,7 @@ export const Card10 = memoNamed('Card10', ({ color, textColor }: CardProps) => (
       d='M113.46 159.021C116.367 155.833 118 151.509 118 147H102.5L87 147C87 151.509 88.633 155.833 91.5398 159.021C94.4467 162.209 98.3891 164 102.5 164C106.611 164 110.553 162.209 113.46 159.021Z'
       fill={color}
     />
-    <rect x='87' y='93' width='31' height='55' fill={color} />
+    <rect fill={color} height='55' width='31' x='87' y='93' />
     <path
       d='M59 56V183H39.4836V92.3569L25 103.314V80.4039L59 56Z'
       fill={textColor}

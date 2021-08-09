@@ -1,4 +1,7 @@
-import type { HoursMinutes } from '@noshiro/event-schedule-app-shared';
+import type {
+  HoursMinutes,
+  PartialHoursMinutes,
+} from '@noshiro/event-schedule-app-shared';
 import { fillHoursMinutes } from '@noshiro/event-schedule-app-shared';
 import type { Phantomic } from '@noshiro/ts-utils';
 
@@ -9,4 +12,4 @@ export const timeRangeToMapKey = (
 ): HoursMinutesMapKey => JSON.stringify(timeRange) as HoursMinutesMapKey;
 
 export const timeRangeFromMapKey = (key: HoursMinutesMapKey): HoursMinutes =>
-  fillHoursMinutes(JSON.parse(key));
+  fillHoursMinutes(JSON.parse(key) as PartialHoursMinutes | undefined);

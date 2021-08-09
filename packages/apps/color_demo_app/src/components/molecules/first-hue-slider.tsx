@@ -14,14 +14,14 @@ type Props = Readonly<{
 
 export const FirstHueSlider = memoNamed<Props>('FirstHueSlider', (props) => (
   <SliderWrapper>
-    <div>色相0°位置</div>
+    <div>{'色相0°位置'}</div>
     <MuiSlider
+      ariaLabelledby='first-hue'
+      max={359}
+      min={0}
+      step={1}
       value={props.firstHue}
       onChange={props.firstHueOnChange as (h: number) => void}
-      ariaLabelledby='first-hue'
-      step={1}
-      min={0}
-      max={359}
     />
   </SliderWrapper>
 ));

@@ -51,33 +51,35 @@ export const LuminanceVisualizerView = memoNamed<Props>(
     <Root>
       <PaperCustomized variant='outlined'>
         <AllSliders
-          saturation={props.saturation}
-          lightness={props.lightness}
-          saturationOnChange={props.saturationOnChange}
-          lightnessOnChange={props.lightnessOnChange}
-          firstHue={props.firstHue}
-          firstHueOnChange={props.firstHueOnChange}
           divisionNumber={props.divisionNumber}
           divisionNumberOnChange={props.divisionNumberOnChange}
+          firstHue={props.firstHue}
+          firstHueOnChange={props.firstHueOnChange}
+          lightness={props.lightness}
+          lightnessOnChange={props.lightnessOnChange}
+          saturation={props.saturation}
+          saturationOnChange={props.saturationOnChange}
         />
       </PaperCustomized>
 
       <PaperCustomized variant='outlined'>
-        <Title>1. 彩度・明度を固定し色相を横軸としたときの相対輝度分布</Title>
+        <Title>
+          {'1. 彩度・明度を固定し色相を横軸としたときの相対輝度分布'}
+        </Title>
         <ColoredDistribution
           accumulatedDistribution={props.relativeLuminanceDistribution}
         />
       </PaperCustomized>
 
       <PaperCustomized variant='outlined'>
-        <Title>2. 色相環から360/n度ずつ選出した場合</Title>
+        <Title>{'2. 色相環から360/n度ずつ選出した場合'}</Title>
         <ColoredDistributionSelected
           experimentResult={props.result1_equallySpaced}
         />
         <ColorList
           hueList={props.result1_equallySpaced.pickedUpHues}
-          saturation={props.saturation}
           lightness={props.lightness}
+          saturation={props.saturation}
         />
         <ContrastRatioList
           contrastRatioList={
@@ -85,13 +87,13 @@ export const LuminanceVisualizerView = memoNamed<Props>(
           }
         />
         <Variance>
-          コントラスト比の分散：
+          {'コントラスト比の分散：'}
           {props.result1_equallySpaced.adjacentContrastRatioVariance}
         </Variance>
       </PaperCustomized>
 
       <PaperCustomized variant='outlined'>
-        <Title>3-a. 相対輝度の変化量の絶対値の累積分布</Title>
+        <Title>{'3-a. 相対輝度の変化量の絶対値の累積分布'}</Title>
         <ColoredDistribution
           accumulatedDistribution={
             props.result2_weighted.accumulatedDistribution
@@ -100,26 +102,26 @@ export const LuminanceVisualizerView = memoNamed<Props>(
       </PaperCustomized>
 
       <PaperCustomized variant='outlined'>
-        <Title>3-b. 3-a.の分布の縦軸をn分割した場合の色相</Title>
+        <Title>{'3-b. 3-a.の分布の縦軸をn分割した場合の色相'}</Title>
         <ColoredDistributionSelected
           experimentResult={props.result2_weighted}
         />
         <ColorList
           hueList={props.result2_weighted.pickedUpHues}
-          saturation={props.saturation}
           lightness={props.lightness}
+          saturation={props.saturation}
         />
         <ContrastRatioList
           contrastRatioList={props.result2_weighted.adjacentContrastRatioList}
         />
         <Variance>
-          コントラスト比の分散：
+          {'コントラスト比の分散：'}
           {props.result2_weighted.adjacentContrastRatioVariance}
         </Variance>
       </PaperCustomized>
 
       <PaperCustomized variant='outlined'>
-        <Title>4-a. 相対輝度の変化量の絶対値のlogの累積分布</Title>
+        <Title>{'4-a. 相対輝度の変化量の絶対値のlogの累積分布'}</Title>
         <ColoredDistribution
           accumulatedDistribution={
             props.result3_weighted_log.accumulatedDistribution
@@ -128,14 +130,14 @@ export const LuminanceVisualizerView = memoNamed<Props>(
       </PaperCustomized>
 
       <PaperCustomized variant='outlined'>
-        <Title>4-b. 4-a.の分布の縦軸をn分割した場合の色相</Title>
+        <Title>{'4-b. 4-a.の分布の縦軸をn分割した場合の色相'}</Title>
         <ColoredDistributionSelected
           experimentResult={props.result3_weighted_log}
         />
         <ColorList
           hueList={props.result3_weighted_log.pickedUpHues}
-          saturation={props.saturation}
           lightness={props.lightness}
+          saturation={props.saturation}
         />
         <ContrastRatioList
           contrastRatioList={
@@ -143,7 +145,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
           }
         />
         <Variance>
-          コントラスト比の分散：
+          {'コントラスト比の分散：'}
           {props.result3_weighted_log.adjacentContrastRatioVariance}
         </Variance>
       </PaperCustomized>

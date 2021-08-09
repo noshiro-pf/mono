@@ -47,11 +47,11 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
       </Header>
       <Main>
         <Table
+          cardPositionsDispatcher={cardPositionsDispatcher}
           displayValues={displayValues}
+          playerNamePositionsDispatcher={playerNamePositionsDispatcher}
           tableSize={tableSize}
           windowSize={windowSize}
-          playerNamePositionsDispatcher={playerNamePositionsDispatcher}
-          cardPositionsDispatcher={cardPositionsDispatcher}
         />
       </Main>
       <Footer style={footerStyle}>

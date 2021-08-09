@@ -41,7 +41,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
     const alive = useAlive();
     const onConfirm = useCallback(() => {
-      if (!alive) return;
+      if (!alive.current) return;
       const afterConfirm = (): void => {
         showToast({
           toast,
@@ -53,33 +53,35 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
       const p = onConfirmClick();
       if (p instanceof Promise) {
-        if (!alive) return;
-        p.then(afterConfirm).catch(console.error);
+        p.then(() => {
+          if (!alive.current) return;
+          afterConfirm();
+        }).catch(console.error);
       } else {
         afterConfirm();
       }
-    }, [alive, onConfirmClick, handleClose, toastConfig]);
+    }, [onConfirmClick, handleClose, toastConfig, alive]);
 
     return (
       <>
         <BpButton
-          text={buttonConfig.name}
-          intent={buttonConfig.intent ?? 'none'}
-          icon={buttonConfig.icon}
-          onClick={handleOpen}
           disabled={disabled}
+          icon={buttonConfig.icon}
+          intent={buttonConfig.intent ?? 'none'}
           loading={loading}
           nowrap={true}
+          text={buttonConfig.name}
+          onClick={handleOpen}
         />
         <ConfirmDialog
-          isOpen={isOpen}
-          onCancel={handleClose}
-          onConfirm={onConfirm}
           cancelButtonText={dialogConfig.cancelButtonText}
           confirmButtonText={dialogConfig.confirmButtonText}
-          message={dialogConfig.message}
           icon={dialogConfig.icon}
           intent={dialogConfig.intent ?? 'none'}
+          isOpen={isOpen}
+          message={dialogConfig.message}
+          onCancel={handleClose}
+          onConfirm={onConfirm}
         />
       </>
     );

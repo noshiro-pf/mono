@@ -12,7 +12,7 @@ export const routes = {
   profile2: '/profile2',
   products: '/products',
   writings: '/writings',
-};
+} as const;
 
 export const labels = {
   profile: 'Profile',
@@ -20,15 +20,15 @@ export const labels = {
   skills: 'Skills',
   products: 'Products',
   writings: 'Writings',
-};
+} as const;
 
-export const tabKeys: (keyof Routes)[] = [
+export const tabKeys: readonly (keyof Routes)[] = [
   'profile',
   'skills',
   'profile2',
   'products',
   'writings',
-];
+] as const;
 
 export const routeList = tabKeys.map((k) => routes[k]);
 export const labelList = tabKeys.map((k) => labels[k]);

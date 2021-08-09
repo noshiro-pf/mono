@@ -38,14 +38,18 @@ export const MultipleDatePicker = memoNamed<Props>(
       <div>
         <div className='bp3-datepicker'>
           <div className='DayPicker' lang='en'>
-            <CenteringWrapper className='DayPicker-wrapper' tabIndex={0}>
+            <CenteringWrapper
+              // eslint-disable-next-line react/forbid-component-props
+              className={'DayPicker-wrapper'}
+              tabIndex={0}
+            >
               <DatepickerNav
-                year={calendarCurrentPage.year}
                 month={calendarCurrentPage.month}
-                onPrevMonthClick={onPrevMonthClick}
-                onNextMonthClick={onNextMonthClick}
-                onYearChange={onYearChange}
+                year={calendarCurrentPage.year}
                 onMonthChange={onMonthChange}
+                onNextMonthClick={onNextMonthClick}
+                onPrevMonthClick={onPrevMonthClick}
+                onYearChange={onYearChange}
               />
               <div className='DayPicker-Months'>
                 <div className='DayPicker-Month' role='grid'>

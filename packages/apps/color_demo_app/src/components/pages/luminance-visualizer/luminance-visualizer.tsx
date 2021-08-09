@@ -33,18 +33,18 @@ export const LuminanceVisualizer = memoNamed('LuminanceVisualizer', () => {
 
   return (
     <LuminanceVisualizerView
-      saturation={saturation}
-      saturationOnChange={setSaturation}
-      lightness={lightness}
-      lightnessOnChange={setLightness}
       divisionNumber={divisionNumber}
       divisionNumberOnChange={setDivisionNumber}
       firstHue={firstHue}
       firstHueOnChange={setFirstHue}
+      lightness={lightness}
+      lightnessOnChange={setLightness}
       relativeLuminanceDistribution={relativeLuminanceDistribution}
       result1_equallySpaced={result1_equallySpaced}
       result2_weighted={result2_weighted}
       result3_weighted_log={result3_weighted_log}
+      saturation={saturation}
+      saturationOnChange={setSaturation}
     />
   );
 });

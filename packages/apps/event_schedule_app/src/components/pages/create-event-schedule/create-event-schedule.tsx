@@ -30,12 +30,12 @@ const initialValues = {
 export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => (
   <div>
     <TitleWrapper>
-      <Title href={'../'} target='_blank' rel='noopener noreferrer'>
+      <Title href={'../'} rel='noopener noreferrer' target='_blank'>
         <Icon icon={'timeline-events'} iconSize={28} />
         <div>{vt.title}</div>
       </Title>
     </TitleWrapper>
-    <EventScheduleSettingCommon mode={'create'} initialValues={initialValues} />
+    <EventScheduleSettingCommon initialValues={initialValues} mode={'create'} />
   </div>
 ));
 
