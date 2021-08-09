@@ -14,15 +14,6 @@ on:
       - '**.md'
       - '**.txt'
       - '.gitignore'
-  pull_request:
-    branches-ignore:
-      - 'dev'
-    paths-ignore:
-      - 'docs/**'
-      - 'experimental/**'
-      - '**.md'
-      - '**.txt'
-      - '.gitignore'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -49,16 +40,22 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: setup
-        run: yarn setup:ci
+        run: yarn setup:all
 
-      - name: build utils
-        run: yarn build:utils
+      - name: generate index.ts
+        run: yarn gi:all
 
-      - name: build apps
-        run: yarn build:apps
+      - name: build
+        run: yarn build:all
 
-      - name: lint
-        run: yarn lint:all
+      - name: format
+        run: yarn fmt:all
+
+      - name: lint fix
+        run: yarn lintfix:all
 
       - name: test
         run: yarn test:all
+
+      - name: no diff
+        run: yarn check:no-diff
