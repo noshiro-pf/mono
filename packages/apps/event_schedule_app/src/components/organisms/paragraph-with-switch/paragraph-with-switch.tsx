@@ -8,6 +8,7 @@ type Props = Readonly<{
   title: string;
   description?: readonly string[];
   show: boolean;
+  disabledInsteadOfHidden: boolean;
   onToggle: () => void;
   elementToToggle: ReactNode;
 }>;
@@ -27,7 +28,11 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       {props.description === undefined
         ? undefined
         : props.description.map((d, i) => <Description key={i} text={d} />)}
-      {props.show ? props.elementToToggle : undefined}
+      {props.disabledInsteadOfHidden
+        ? props.elementToToggle
+        : props.show
+        ? props.elementToToggle
+        : undefined}
     </div>
   )
 );

@@ -65,6 +65,7 @@ export const EventSettings = memoNamed<Props>(
       <Root>
         <ParagraphWithSwitch
           description={vt.howAnswerDeadlineIsUsed}
+          disabledInsteadOfHidden={true}
           elementToToggle={
             <AnswerDeadlineDatepicker
               answerDeadline={answerDeadline}
@@ -78,6 +79,7 @@ export const EventSettings = memoNamed<Props>(
         />
         <hr />
         <ParagraphWithSwitch
+          disabledInsteadOfHidden={true}
           elementToToggle={
             <NotificationSettingsComponent
               answerDeadline={answerDeadline}
@@ -94,6 +96,7 @@ export const EventSettings = memoNamed<Props>(
         />
         <hr />
         <ParagraphWithSwitch
+          disabledInsteadOfHidden={true}
           elementToToggle={
             <SymbolSettings
               answerSymbolList={answerSymbolList}

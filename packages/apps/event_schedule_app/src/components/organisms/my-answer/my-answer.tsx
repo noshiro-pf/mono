@@ -162,6 +162,7 @@ export const MyAnswer = memoNamed<Props>(
               ? vt.weight.description
               : vt.weight.description.slice(0, 1)
           }
+          disabledInsteadOfHidden={false}
           elementToToggle={
             <WeightSetting
               disabled={!answerForEditing.useWeight}
