@@ -13,7 +13,7 @@ export const eslintReactRules: Linter.Config['rules'] = {
   'react/function-component-definition': 'warn',
   'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
   'react/forbid-component-props': ['error', { forbid: ['className'] }],
-  'react/no-array-index-key': 'warn',
+  'react/no-array-index-key': 'error',
   'react/jsx-props-no-spreading': 'warn',
   'react/jsx-sort-props': [
     'warn',

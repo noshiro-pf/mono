@@ -2,33 +2,13 @@ import { Paper } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
 import type { Hsl, Hue, Mappable, Percent, uint32 } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import type { ExperimentResult } from '../../../types';
+import type { ColorResult } from '../../../types';
 import { AllSliders, ContrastRatioList } from '../../molecules';
 import {
   ColoredDistribution,
   ColoredDistributionSelected,
   ColorList,
 } from '../../organisms';
-
-const Root = styled.div`
-  width: 100%;
-  height: 100%;
-  background-color: #c2c2c2;
-  padding: 10px;
-`;
-
-const PaperCustomized = styled(Paper)`
-  margin-top: 10px;
-  padding: 10px;
-`;
-
-const Title = styled.h1`
-  font-size: larger;
-`;
-
-const Variance = styled.div`
-  padding: 10px;
-`;
 
 type Props = Readonly<{
   saturation: Percent;
@@ -40,9 +20,9 @@ type Props = Readonly<{
   firstHue: Hue;
   firstHueOnChange: (v: Hue) => void;
   relativeLuminanceDistribution: Mappable<readonly [Hsl, number]>;
-  result1_equallySpaced: ExperimentResult;
-  result2_weighted: ExperimentResult;
-  result3_weighted_log: ExperimentResult;
+  result1_equallySpaced: ColorResult;
+  result2_weighted: ColorResult;
+  result3_weighted_log: ColorResult;
 }>;
 
 export const LuminanceVisualizerView = memoNamed<Props>(
@@ -74,7 +54,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
       <PaperCustomized variant='outlined'>
         <Title>{'2. 色相環から360/n度ずつ選出した場合'}</Title>
         <ColoredDistributionSelected
-          experimentResult={props.result1_equallySpaced}
+          colorResult={props.result1_equallySpaced}
         />
         <ColorList
           hueList={props.result1_equallySpaced.pickedUpHues}
@@ -103,9 +83,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
 
       <PaperCustomized variant='outlined'>
         <Title>{'3-b. 3-a.の分布の縦軸をn分割した場合の色相'}</Title>
-        <ColoredDistributionSelected
-          experimentResult={props.result2_weighted}
-        />
+        <ColoredDistributionSelected colorResult={props.result2_weighted} />
         <ColorList
           hueList={props.result2_weighted.pickedUpHues}
           lightness={props.lightness}
@@ -131,9 +109,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
 
       <PaperCustomized variant='outlined'>
         <Title>{'4-b. 4-a.の分布の縦軸をn分割した場合の色相'}</Title>
-        <ColoredDistributionSelected
-          experimentResult={props.result3_weighted_log}
-        />
+        <ColoredDistributionSelected colorResult={props.result3_weighted_log} />
         <ColorList
           hueList={props.result3_weighted_log.pickedUpHues}
           lightness={props.lightness}
@@ -152,3 +128,23 @@ export const LuminanceVisualizerView = memoNamed<Props>(
     </Root>
   )
 );
+
+const Root = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: #c2c2c2;
+  padding: 10px;
+`;
+
+const PaperCustomized = styled(Paper)`
+  margin-top: 10px;
+  padding: 10px;
+`;
+
+const Title = styled.h1`
+  font-size: larger;
+`;
+
+const Variance = styled.div`
+  padding: 10px;
+`;

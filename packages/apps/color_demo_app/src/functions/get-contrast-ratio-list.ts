@@ -5,7 +5,7 @@ export const hueListToContrastRatioList = (
   hueList: readonly Hue[],
   saturation: Percent,
   lightness: Percent
-): number[] =>
+): readonly number[] =>
   hueList.map((h, idx) =>
     contrastRatioHsl(
       [h, saturation, lightness],

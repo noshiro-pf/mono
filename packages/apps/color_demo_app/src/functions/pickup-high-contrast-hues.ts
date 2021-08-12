@@ -22,14 +22,12 @@ export const pickupHighContrastHues = (
 ): Hue[] => {
   const hues = huesDefault.map((h) => ((h - firstHue + 360) % 360) as Hue);
 
-  const luminanceList: number[] = hues.map((hue) =>
+  const luminanceList: readonly number[] = hues.map((hue) =>
     relativeLuminance(hslToRgb([hue, saturation, lightness]))
   );
 
-  const luminanceDiffAccumulated: number[] = getLuminanceListAccumulated(
-    luminanceList,
-    useLog
-  );
+  const luminanceDiffAccumulated: readonly number[] =
+    getLuminanceListAccumulated(luminanceList, useLog);
 
   /* pickup n hues */
 

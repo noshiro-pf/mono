@@ -7,11 +7,10 @@ import {
   tuple,
   zeros,
 } from '@noshiro/ts-utils';
-import type { FC } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { DeadColumn, ProbabilityTable } from './components';
-import { denom, selected3List } from './constants';
+import { denom, selected3List, separator } from './constants';
 import {
   calcExpected,
   countSuccess,
@@ -24,6 +23,7 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const count = countSuccess(x, y, z);
   const countSum = (denom - count.noLine) as uint32;
   return {
+    id: `${x}-${y}-${z}`,
     selected: tuple(x, y, z),
     count,
     countSum,
@@ -32,14 +32,12 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   };
 });
 
-const separator = ',';
-
-const resultsSortedByprobability = results
+const resultsSortedByProbability = results
   .slice()
   .sort((a, b) => a.countSum - b.countSum)
   .reverse();
 
-export const App: FC = memoNamed('App', () => {
+export const App = memoNamed('App', () => {
   const [sortBy, setSortBy] = useState<'dice' | 'prob'>('prob');
 
   const sortByDice = useCallback(() => {
@@ -62,7 +60,7 @@ export const App: FC = memoNamed('App', () => {
   );
 
   const sorted = useMemo(
-    () => (sortBy === 'dice' ? results : resultsSortedByprobability),
+    () => (sortBy === 'dice' ? results : resultsSortedByProbability),
     [sortBy]
   );
 

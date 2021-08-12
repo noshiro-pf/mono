@@ -114,8 +114,8 @@ export const MyAnswer = memoNamed<Props>(
           </thead>
           <tbody>
             {myAnswerList.map(
-              ({ datetimeRange, selectedSymbol, buttons }, i) => (
-                <tr key={i}>
+              ({ key, datetimeRange, selectedSymbol, buttons }) => (
+                <tr key={key}>
                   <Td>
                     <DatetimeRangeCell
                       datetimeRange={datetimeRange}

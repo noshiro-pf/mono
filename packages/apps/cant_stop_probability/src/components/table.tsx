@@ -2,11 +2,9 @@ import { HTMLTable } from '@blueprintjs/core';
 import { BpButton, BpInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { denom } from '../constants';
+import { denom, separator } from '../constants';
 import { toPercentString } from '../functions';
 import type { ResultRow } from '../types';
-
-const separator = ',';
 
 type Props = Readonly<{
   sortByDice: () => void;
@@ -91,8 +89,8 @@ export const ProbabilityTable = memoNamed<Props>(
         </tr>
       </thead>
       <tbody>
-        {filtered.map((r, i) => (
-          <tr key={i}>
+        {filtered.map((r) => (
+          <tr key={r.id}>
             <Td>{r.selected[0]} </Td>
             <Td>{r.selected[1]} </Td>
             <Td>{r.selected[2]} </Td>

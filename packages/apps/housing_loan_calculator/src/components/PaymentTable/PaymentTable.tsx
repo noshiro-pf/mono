@@ -1,7 +1,7 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { uint32 } from '@noshiro/ts-utils';
-import { seq } from '@noshiro/ts-utils';
+import type { ArrayOfLength, DeepReadonly, uint32 } from '@noshiro/ts-utils';
+import { IList, seq } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import { viewTexts } from '../../constants';
@@ -60,7 +60,7 @@ export const PaymentTable = memoNamed<Props>(
       ]
     );
 
-    const tableData = useMemo<readonly (readonly string[])[]>(
+    const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
       () =>
         seq(numRows).map((i) => [
           i.toString(),
@@ -86,10 +86,11 @@ export const PaymentTable = memoNamed<Props>(
           </tr>
         </thead>
         <tbody>
-          {tableData.map((tableRow, rowidx) => (
-            <tr key={rowidx}>
-              {tableRow.map((cell, colidx) => (
-                <td key={colidx} style={dataCellStyle}>
+          {IList.map(tableData, (tableRow, rowIdx) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <tr key={rowIdx}>
+              {IList.map(tableRow, (cell, colIdx) => (
+                <td key={colIdx} style={dataCellStyle}>
                   {cell}
                 </td>
               ))}

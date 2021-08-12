@@ -1,20 +1,14 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
-import type { ProductsInfo } from '../../../types';
+import { products } from '../../../assets';
 import { ProductsElementMobileView } from './products-mobile-element-view';
 
-export const ProductsViewMobile = memoNamed<
-  DeepReadonly<{
-    webApps: ProductsInfo[];
-    libraries: ProductsInfo[];
-  }>
->('ProductsViewMobile', ({ webApps, libraries }) => (
+export const ProductsViewMobile = memoNamed('ProductsViewMobile', () => (
   <div>
     <h1>{'制作物'}</h1>
     <h2>{'ライブラリ'}</h2>
-    {libraries.map((app, i) => (
+    {products.libraries.map((app) => (
       <ProductsElementMobileView
-        key={i}
+        key={app.id}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}
@@ -24,9 +18,9 @@ export const ProductsViewMobile = memoNamed<
       />
     ))}
     <h2>{'ウェブアプリ'}</h2>
-    {webApps.map((app, i) => (
+    {products.webApps.map((app) => (
       <ProductsElementMobileView
-        key={i}
+        key={app.id}
         body1={app.body1}
         body2={app.body2}
         imageUrl={app.imageUrl}

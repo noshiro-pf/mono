@@ -1,4 +1,5 @@
 export type ProductsInfo = Readonly<{
+  id: string;
   link: string;
   title: string;
   subtitle: string;

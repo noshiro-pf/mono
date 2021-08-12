@@ -11,6 +11,7 @@ import type { CSSProperties } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { answerTableColor } from '../../../constants';
 import type { DatetimeRangeMapKey } from '../../../functions';
+import { datetimeRange2Str } from '../../../functions';
 import { createAnswerSummary, createScore } from './create-answer-summary';
 import { useAnswerTable } from './use-answer-table';
 
@@ -25,6 +26,7 @@ type AnswerTableHooks = DeepReadonly<{
   onDatetimeSortChange: (state: 'asc' | 'desc') => void;
   onScoreSortChange: (state: 'asc' | 'desc') => void;
   tableBodyValues: {
+    key: string;
     datetimeRange: DatetimeRange;
     score: number;
     answerSummaryRow: number[] | undefined;
@@ -138,6 +140,7 @@ export const useAnswerTableHooks = (
   const tableBodyValues = useMemo<
     DeepReadonly<
       {
+        key: string;
         datetimeRange: DatetimeRange;
         score: number;
         answerSummaryRow: number[] | undefined;
@@ -161,6 +164,7 @@ export const useAnswerTableHooks = (
         ).value;
 
         return {
+          key: datetimeRange2Str(datetimeRange),
           datetimeRange,
           score,
           answerSummaryRow: answerSummary.get(datetimeRange),

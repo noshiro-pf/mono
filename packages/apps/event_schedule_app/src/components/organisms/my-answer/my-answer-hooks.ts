@@ -12,6 +12,7 @@ import { IList, IMapMapped, IRecord, ituple, pipe } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type { DatetimeRangeMapKey } from '../../../functions';
 import {
+  datetimeRange2Str,
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
   useFormError,
@@ -31,6 +32,7 @@ type MyAnswerHooks = DeepReadonly<{
     onClick: () => void;
   }[];
   myAnswerList: {
+    key: string;
     datetimeRange: DatetimeRange;
     selectedSymbol: AnswerSymbolIconId | undefined;
     buttons: {
@@ -166,6 +168,7 @@ export const useMyAnswerHooks = ({
   const myAnswerList = useMemo<
     DeepReadonly<
       {
+        key: string;
         datetimeRange: DatetimeRange;
         selectedSymbol: AnswerSymbolIconId | undefined;
         buttons: readonly {
@@ -178,6 +181,7 @@ export const useMyAnswerHooks = ({
   >(
     () =>
       eventSchedule.datetimeRangeList.map((d) => ({
+        key: datetimeRange2Str(d),
         datetimeRange: d,
         selectedSymbol: answerSelectionMap.get(d),
         buttons: eventSchedule.answerSymbolList.map((s) => ({

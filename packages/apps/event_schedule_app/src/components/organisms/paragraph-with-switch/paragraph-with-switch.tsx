@@ -27,7 +27,8 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       </SwitchWrapper>
       {props.description === undefined
         ? undefined
-        : props.description.map((d, i) => <Description key={i} text={d} />)}
+        : // eslint-disable-next-line react/no-array-index-key
+          props.description.map((d, i) => <Description key={i} text={d} />)}
       {props.disabledInsteadOfHidden
         ? props.elementToToggle
         : props.show

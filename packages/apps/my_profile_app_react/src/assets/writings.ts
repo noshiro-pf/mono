@@ -2,6 +2,7 @@ import type { WritingsInfo } from '../types';
 
 export const writings: WritingsInfo[] = [
   {
+    id: 'about-noUncheckedIndexedAccess',
     link: 'https://www.notion.so/noshiro/TypeScript-v4-1-noUncheckedIndexedAccess-00144ca0b4f44c1cb73f7ca43002aa70',
     title:
       'TypeScript v4.1 で追加されたnoUncheckedIndexedAccessオプションと上手くやっていくには',
@@ -11,6 +12,7 @@ export const writings: WritingsInfo[] = [
     body2: '',
   },
   {
+    id: 'syncflow-slides',
     link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
     title: ' リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
     subtitle:
@@ -20,6 +22,7 @@ export const writings: WritingsInfo[] = [
     body2: '',
   },
   {
+    id: 'color-contrast-qiita',
     link: 'https://qiita.com/pikohideaki/items/59415524503f833ce41e',
     title: ' 見分けやすいN色をうまく選ぶ関数を作ったよ',
     subtitle:
@@ -28,6 +31,7 @@ export const writings: WritingsInfo[] = [
     body2: '',
   },
   {
+    id: 'how-to-create-reactive-programming-library',
     link: 'https://qiita.com/pikohideaki/items/57dab6c6e8d0687a8806',
     title: '簡易リアクティブプログラミングライブラリの作り方（TypeScript）',
     subtitle:
@@ -37,6 +41,7 @@ export const writings: WritingsInfo[] = [
     body2: '',
   },
   {
+    id: 'reactive-programming-introduction-with-rxjs',
     link: 'https://qiita.com/pikohideaki/items/292ab134397f4959e66b',
     title: 'RxJSによるリアクティブプログラミング入門',
     subtitle:
@@ -46,6 +51,7 @@ export const writings: WritingsInfo[] = [
     body2: '',
   },
   {
+    id: 'dezero-slides',
     link: 'https://slides-dezero-06-to-16.web.app/',
     title: 'ゼロから作るディープラーニング3 step06-16',
     subtitle: 'ゼロから作るディープラーニング3の社内輪読会で使用した資料',
@@ -53,7 +59,8 @@ export const writings: WritingsInfo[] = [
     body2: '',
   },
   {
-    link: 'https://slides-dezero-06-to-16.web.app/',
+    id: 'slides-chain-rule',
+    link: 'https://slides-chain-rule.web.app/',
     title: '連鎖律のやや厳密な証明',
     subtitle: '社内輪読会資料',
     body1: 'reveal.jsを用いて作成．',

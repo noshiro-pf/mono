@@ -5,6 +5,7 @@ import { map, pipe } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { zIndex } from '../../constants';
+import { cardToString } from '../../functions';
 import type { CardColor, CardNumber, CardWithDisplayValue } from '../../types';
 import { CardComponent } from '../card';
 
@@ -80,9 +81,9 @@ export const PlayerCardsArea = memoNamed(
     return (
       <Container>
         <RotateContainer style={rotateStyle}>
-          {cardsWithConfig.map((c, index) => (
+          {cardsWithConfig.map((c) => (
             <CardComponent
-              key={index}
+              key={cardToString(c)}
               color={c.color}
               float={c.float}
               isClickable={c.isClickable}

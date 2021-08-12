@@ -4,6 +4,7 @@ import type { ReadonlyArrayOfLength, RectSize } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { darkGray } from '../../constants';
+import { cardToString } from '../../functions';
 import type { Card } from '../../types';
 import { CardComponent } from '../card';
 
@@ -31,9 +32,9 @@ export const MyCards = memoNamed<Props>('MyCards', ({ cards, height }) => {
 
   return (
     <Wrapper style={wrapperStyle}>
-      {cards.map((card, index) => (
+      {cards.map((card) => (
         <CardComponent
-          key={index}
+          key={cardToString(card)}
           color={card.color}
           number={card.number}
           size={cardSize}

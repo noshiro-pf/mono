@@ -17,6 +17,7 @@ export const products: DeepReadonly<{
 }> = {
   libraries: [
     {
+      id: 'syncflow',
       link: 'https://github.com/noshiro-pf/mono/tree/master/packages/utils/syncflow',
       title: 'SyncFlow',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
@@ -26,6 +27,7 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
+      id: 'rnjs',
       link: 'https://github.com/noshiro-pf/mono/tree/master/packages/utils/rnjs',
       title: 'rnjs',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
@@ -38,6 +40,7 @@ export const products: DeepReadonly<{
   ],
   webApps: [
     {
+      id: 'event-schedule-app',
       link: 'https://event-schedule-app.web.app/',
       title: 'イベント日程調整ツール2',
       subtitle: 'イベントのスケジュール調整用アプリケーション',
@@ -47,6 +50,7 @@ export const products: DeepReadonly<{
       imageUrl: EventScheduleApp2Image,
     },
     {
+      id: 'annotation-tool',
       link: 'https://annotation-tool-d8b49.web.app/',
       title: 'アノテーションツール（開発途中）',
       subtitle: '矩形ツールによる画像アノテーションを行うUI',
@@ -57,6 +61,7 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
+      id: 'housing-loan-calculator',
       link: 'https://housing-loan-calculator.web.app',
       title: '住宅ローン返済シミュレータ',
       subtitle: '住宅ローンの月々の返済額などを計算',
@@ -67,6 +72,7 @@ export const products: DeepReadonly<{
       imageUrl: HousingLoanCalculatorImage,
     },
     {
+      id: 'cant-stop-probability',
       link: 'https://cant-stop-probability.web.app/',
       title: "ボードゲーム「Can't Stop」の確率表",
       subtitle: '',
@@ -77,6 +83,7 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
+      id: 'color-demo-app',
       link: 'https://color-demo-app.web.app',
       title: 'Color Contrast Demo',
       subtitle:
@@ -87,6 +94,7 @@ export const products: DeepReadonly<{
       imageUrl: ColorDemoImage,
     },
     {
+      id: 'catan-dice',
       link: 'https://catan-dice-5f3bc.web.app/',
       title: 'CATAN dice',
       subtitle:
@@ -98,6 +106,7 @@ export const products: DeepReadonly<{
       imageUrl: CatanDiceImage,
     },
     {
+      id: 'my-profile-app',
       link: 'https://my-profile-app-ec7bf.web.app',
       title: 'プロフィール',
       subtitle: 'このページ',
@@ -107,6 +116,7 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
+      id: 'lambda-calculus-interpreter',
       link: 'https://lambda-calculus-interpre-70e41.web.app',
       title: 'Lambda Calculus Interpreter',
       subtitle: '簡単な型無しラムダ計算のインタプリタ（おもちゃ）',
@@ -117,6 +127,7 @@ export const products: DeepReadonly<{
       imageUrl: LambdaInterpreterAppImage,
     },
     {
+      id: 'event-schedule-app-old',
       link: 'https://pikoappsproduct.firebaseapp.com/#/',
       title: 'イベント日程調整ツール',
       subtitle: 'イベントのスケジュール調整用アプリケーション',
@@ -127,6 +138,7 @@ export const products: DeepReadonly<{
       imageUrl: ScheduleImage,
     },
     {
+      id: 'mnist-app',
       link: 'https://tools-8af31.firebaseapp.com/#/toybox/mnist',
       title: 'MNIST App',
       subtitle: '手書き数字認識のデモアプリケーション',
@@ -137,6 +149,7 @@ export const products: DeepReadonly<{
       imageUrl: MnistAppImage,
     },
     {
+      id: 'dominion-app',
       link: 'https://dominionapps.firebaseapp.com/#/online-game',
       title: '「ドミニオン」オンライン対戦（要ログイン）',
       subtitle: 'カードゲーム「ドミニオン」のオンライン対戦アプリ',
@@ -147,6 +160,7 @@ export const products: DeepReadonly<{
       imageUrl: DominionOnlineImage,
     },
     {
+      id: 'csv-to-json-app',
       link: 'https://tools-8af31.firebaseapp.com/#/tools-collection/tsv2json',
       title: 'CSV to JSON',
       subtitle: 'CSVテキストデータをJSONデータに変換',
@@ -156,6 +170,7 @@ export const products: DeepReadonly<{
       imageUrl: '',
     },
     {
+      id: 'json-pretty-print-app',
       link: 'https://tools-8af31.firebaseapp.com/#/tools-collection/json-pretty-print',
       title: 'JSON pretty print',
       subtitle: 'JSONテキストデータの整形',

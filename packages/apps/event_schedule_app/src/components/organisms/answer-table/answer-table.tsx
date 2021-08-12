@@ -68,10 +68,14 @@ export const AnswerTable = memoNamed<Props>(
         </thead>
         <tbody>
           {tableBodyValues.map(
-            (
-              { datetimeRange, score, answerSummaryRow, answerTableRow, style },
-              key
-            ) => (
+            ({
+              key,
+              datetimeRange,
+              score,
+              answerSummaryRow,
+              answerTableRow,
+              style,
+            }) => (
               <tr key={key} style={style}>
                 <Td style={tCellStyle}>
                   <DatetimeRangeCell
@@ -83,6 +87,7 @@ export const AnswerTable = memoNamed<Props>(
                   <span>{roundBy(2 as uint32, score)}</span>
                 </Td>
                 {answerSummaryRow?.map((s, i) => (
+                  // eslint-disable-next-line react/no-array-index-key
                   <Td key={i} style={tCellStyle}>
                     <SummaryCellStyle>
                       <span>{s}</span>
@@ -91,6 +96,7 @@ export const AnswerTable = memoNamed<Props>(
                   </Td>
                 ))}
                 {answerTableRow?.map(([iconId, weight], i) => (
+                  // eslint-disable-next-line react/no-array-index-key
                   <Td key={i} style={tCellStyle}>
                     {iconId === undefined ? (
                       ''
