@@ -23,7 +23,7 @@ $  yarn add --dev -W \
 
 ```bash
 $  yarn add --dev -W \
-      @typescript-eslint/parser@latest
+      @typescript-eslint/parser@latest \
       @typescript-eslint/eslint-plugin@latest
 ```
 

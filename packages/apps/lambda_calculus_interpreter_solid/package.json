@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "prebuild": "yarn clean:build",
-    "build": "solid-scripts build",
+    "build": "echo 'build skipped'",
+    "build:dev": "solid-scripts build",
     "clean": "run-s clean:**",
     "clean:build": "rimraf build",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
@@ -27,6 +28,7 @@
     "@noshiro/lambda-calculus-interpreter-core": "*",
     "@noshiro/solid-styled-components": "*",
     "@noshiro/syncflow": "*",
-    "@noshiro/ts-utils": "*"
+    "@noshiro/ts-utils": "*",
+    "solid-js": "^0.23.11"
   }
 }

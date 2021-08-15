@@ -112,27 +112,27 @@ const getArgs = (): {
   testCaseIdx: number;
 } => {
   const parser = new ArgumentParser({
-    version: '0.0.1',
-    addHelp: true,
+    add_help: true,
     description: 'Preview or dump stream test cases.',
   });
 
-  parser.addArgument(['-x', '--example-no'], {
+  parser.add_argument('-x', '--example-no', {
     help: 'Specify the example No.',
     nargs: 1,
     required: false,
-    defaultValue: '-1',
+    default: '-1',
   });
-  parser.addArgument(['-p', '--preview'], {
-    help: 'Run in preview mode',
-    nargs: 0,
-    required: false,
-  });
-  parser.addArgument(['-c', '--case-no'], {
+  parser.add_argument('-c', '--case-no', {
     help: 'Test case No.',
     nargs: 1,
     required: false,
-    defaultValue: '-1',
+    default: '-1',
+  });
+  parser.add_argument('-p', '--preview', {
+    help: 'Runs in preview mode.',
+    action: 'store_const',
+    const: true,
+    required: false,
   });
 
   const convertArgs = (
@@ -152,7 +152,7 @@ const getArgs = (): {
   });
 
   return convertArgs(
-    parser.parseArgs() as Readonly<{
+    parser.parse_args() as Readonly<{
       example_no: readonly string[];
       preview: readonly string[] | null;
       case_no: readonly string[];
