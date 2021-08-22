@@ -42,7 +42,7 @@ export const useFetchResults = (
   const eventScheduleResult$ = useStream<
     Result<EventSchedule, 'not-found' | 'others'> | undefined
   >(() =>
-    combineLatest(fetchEventScheduleThrottled$, eventId$)
+    combineLatest([fetchEventScheduleThrottled$, eventId$] as const)
       .chain(map(([_, x]) => x))
       .chain(
         switchMap((eId) =>
@@ -56,7 +56,7 @@ export const useFetchResults = (
     timestamp: number;
     value: Result<readonly Answer[], 'not-found' | 'others'> | undefined;
   }>(() =>
-    combineLatest(fetchAnswersThrottled$, eventId$)
+    combineLatest([fetchAnswersThrottled$, eventId$] as const)
       .chain(map(([_, x]) => x))
       .chain(
         switchMap((eId) =>
@@ -106,7 +106,7 @@ export const useFetchResults = (
     | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
     | undefined
   >(() =>
-    combineLatest(eventScheduleResult$, answersResult$)
+    combineLatest([eventScheduleResult$, answersResult$] as const)
       .chain(
         map(([esr, ar]) =>
           Result.isErr(esr)

@@ -11,7 +11,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
   extends ObservableBaseClass<A, 'root', 0>
   implements RootObservable<A, Type>
 {
-  readonly type: Type;
+  override readonly type: Type;
   private readonly _procedure: ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: Set<ObservableId>;
 
@@ -33,7 +33,6 @@ export class RootObservableClass<A, Type extends RootObservableType>
     this._descendantsIdSet = new Set<ObservableId>();
   }
 
-  // overload
   addDescendant<B>(child: ChildObservable<B>): void {
     if (this._descendantsIdSet.has(child.id)) return;
     this._descendantsIdSet.add(child.id);

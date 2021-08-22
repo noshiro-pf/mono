@@ -11,7 +11,7 @@ import type {
 } from '../types';
 
 export const merge = <P extends NonEmptyUnknownList>(
-  ...parents: Wrap<P>
+  parents: Wrap<P>
 ): MergeObservable<P> => new MergeObservableClass(parents);
 
 class MergeObservableClass<P extends NonEmptyUnknownList>
@@ -26,8 +26,7 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
     });
   }
 
-  // overload
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const parentToUse = this.parents.find(
       (o) => o.token === token && Option.isSome(o.currentValue)
     );
@@ -43,7 +42,9 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
 
 const r1 = fromArray([1, 2, 3]);
 const r2 = fromArray(['a', 'b', 'c']);
-const c = merge(r1, r2);
+
+const m = merge([r1, r2] as const);
+
 assertType<
-  TypeExtends<typeof c, SyncChildObservable<number | string, 'merge'>>
+  TypeExtends<typeof m, SyncChildObservable<number | string, 'merge'>>
 >();

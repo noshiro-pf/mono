@@ -41,6 +41,34 @@ const registerChild = <A>(
   }
 };
 
+const tryComplete = <A>({
+  hasSubscriber,
+  hasActiveChild,
+  parents,
+  complete,
+}: Readonly<{
+  hasSubscriber: boolean;
+  hasActiveChild: boolean;
+  parents: ChildObservable<A>['parents'];
+  complete: () => void;
+}>): void => {
+  // If there is no working parent node
+  if (parents.every((r) => r.isCompleted)) {
+    complete();
+    return;
+  }
+
+  // If there are no active child node
+  if (!hasSubscriber && !hasActiveChild) {
+    complete();
+  }
+
+  // propagate to parents
+  for (const par of parents) {
+    par.tryComplete();
+  }
+};
+
 export class AsyncChildObservableClass<
     A,
     Type extends AsyncChildObservableType,
@@ -49,7 +77,7 @@ export class AsyncChildObservableClass<
   extends ObservableBaseClass<A, 'async child', number>
   implements AsyncChildObservable<A, Type, P>
 {
-  readonly type: Type;
+  override readonly type: Type;
   readonly parents;
   private readonly procedure: ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: Set<ObservableId>;
@@ -99,18 +127,24 @@ export class AsyncChildObservableClass<
     });
   }
 
-  // overload
-  tryComplete(): void {
-    // When there is no working parent node
-    if (this.parents.every((r) => r.isCompleted)) {
-      this.complete();
-      return;
-    }
+  override complete(): void {
+    super.complete();
 
-    // When there are no child nodes
-    if (this._subscribers.size === 0 && this._children.length === 0) {
-      this.complete();
+    // propagate to parents
+    for (const par of this.parents) {
+      par.tryComplete();
     }
+  }
+
+  override tryComplete(): void {
+    tryComplete({
+      complete: () => {
+        this.complete();
+      },
+      hasActiveChild: this.hasActiveChild(),
+      hasSubscriber: this.hasSubscriber,
+      parents: this.parents,
+    });
   }
 }
 
@@ -122,7 +156,7 @@ export class SyncChildObservableClass<
   extends ObservableBaseClass<A, 'sync child', number>
   implements SyncChildObservable<A, Type, P>
 {
-  readonly type: Type;
+  override readonly type: Type;
   readonly parents;
 
   constructor({
@@ -147,18 +181,22 @@ export class SyncChildObservableClass<
     registerChild(this, parents);
   }
 
-  // overload
-  tryComplete(): void {
-    // When there is no working parent node
-    if (this.parents.every((r) => r.isCompleted)) {
-      this.complete();
-      return;
+  override complete(): void {
+    super.complete();
+    for (const par of this.parents) {
+      par.tryComplete();
     }
+  }
 
-    // When there are no child nodes
-    if (this._subscribers.size === 0 && this._children.length === 0) {
-      this.complete();
-    }
+  override tryComplete(): void {
+    tryComplete({
+      complete: () => {
+        this.complete();
+      },
+      hasActiveChild: this.hasActiveChild(),
+      hasSubscriber: this.hasSubscriber,
+      parents: this.parents,
+    });
   }
 }
 
@@ -184,18 +222,18 @@ export class InitializedSyncChildObservableClass<
     super({ type, parents, depth, currentValueInit });
   }
 
-  get currentValue(): Option.Some<A> {
+  override get currentValue(): Option.Some<A> {
     return super.getCurrentValue() as Option.Some<A>;
   }
 
-  chain<B>(
+  override chain<B>(
     operator:
       | InitializedToInitializedOperator<A, B>
       | ToInitializedOperator<A, B>
   ): InitializedObservable<B>;
 
-  chain<B>(operator: Operator<A, B>): Observable<B>;
-  chain<B>(operator: Operator<A, B>): Observable<B> {
+  override chain<B>(operator: Operator<A, B>): Observable<B>;
+  override chain<B>(operator: Operator<A, B>): Observable<B> {
     return operator(this as unknown as InitializedObservable<A>);
   }
 }

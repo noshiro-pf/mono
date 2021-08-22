@@ -28,8 +28,8 @@ export class ObservableBaseClass<
   readonly kind: Kind;
   readonly type;
   readonly depth: Depth;
-  protected readonly _children: ChildObservable<unknown>[];
-  protected readonly _subscribers: Map<SubscriberId, Subscriber<A>>;
+  private readonly _children: ChildObservable<unknown>[];
+  private readonly _subscribers: Map<SubscriberId, Subscriber<A>>;
   private _currentValue: ObservableBase<A>['currentValue'];
   private _isCompleted: ObservableBase<A>['isCompleted'];
   private _token: ObservableBase<A>['token'];
@@ -76,6 +76,18 @@ export class ObservableBaseClass<
     return this._token;
   }
 
+  get hasSubscriber(): boolean {
+    return this._subscribers.size > 0;
+  }
+
+  get hasChild(): boolean {
+    return this._children.length > 0;
+  }
+
+  hasActiveChild(): boolean {
+    return this._children.some((c) => !c.isCompleted);
+  }
+
   protected setNext(nextValue: A, token: Token): void {
     this._token = token;
     this._currentValue = Option.some(nextValue);
@@ -91,7 +103,9 @@ export class ObservableBaseClass<
   }
 
   tryComplete(): void {
-    this.complete();
+    if (!this.hasSubscriber && !this.hasActiveChild()) {
+      this.complete();
+    }
   }
 
   complete(): void {

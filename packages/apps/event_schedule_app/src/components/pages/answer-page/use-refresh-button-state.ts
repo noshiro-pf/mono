@@ -18,10 +18,10 @@ export const useRefreshButtonState = (
 } => {
   // clog(answersResultTimestamp$);
   const refreshButtonIsLoading$ = useStream<boolean>(() =>
-    merge(
+    merge([
       fetchAnswersThrottled$.chain(mapTo(true)),
-      answersResultTimestamp$.chain(mapTo(false))
-    ).chain(withInitialValue(false))
+      answersResultTimestamp$.chain(mapTo(false)),
+    ] as const).chain(withInitialValue(false))
   );
 
   const refreshButtonIsDisabled$ = useStream<boolean>(() =>

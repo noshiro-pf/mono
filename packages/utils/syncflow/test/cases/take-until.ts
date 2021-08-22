@@ -1,52 +1,55 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { interval, takeUntil, timer } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, take, takeUntil, timer } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
+
+/*
+            0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+  counter   0       1       2       3       4       5       6       7       8       9
+  timer                                         *
+  skip5                                             5       6       7       8       9
+*/
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
-  take5$: Observable<number>;
-} => {
-  const counter$ = interval(tick * 2, true);
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  takeUntil$: Observable<number>;
+}> => {
+  const interval$ = interval(tick * 2, true);
+  const counter$ = interval$.chain(take(10));
 
-  const take5$ = counter$.chain(takeUntil(timer(tick * 9)));
+  const takeUntil$ = counter$.chain(takeUntil(timer(tick * 9)));
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
-    take5$,
+    takeUntil$,
   };
 };
 
-export const takeUntilTestCases: [StreamTestCase<number>] = [
+export const takeUntilTestCases: readonly [StreamTestCase<number>] = [
   {
     name: 'takeUntil case 1',
-    expectedOutput: [0, 1, 2, 3],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, take5$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        take5$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    expectedOutput: [0, 1, 2, 3, 4],
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, takeUntil$ } = createStreams(tick);
+      return getStreamOutputAsPromise(takeUntil$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, take5$ } = createStreams(tick);
+      const { startSource, counter$, takeUntil$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
       });
-      take5$.subscribe((a) => {
-        console.log('take', a);
+      takeUntil$.subscribe((a) => {
+        console.log('takeUntil', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

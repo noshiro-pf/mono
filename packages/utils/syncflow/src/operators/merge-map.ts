@@ -39,7 +39,7 @@ class MergeMapObservableClass<A, B>
     this._subscriptions = [];
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -53,13 +53,13 @@ class MergeMapObservableClass<A, B>
     this._subscriptions.push(subscription);
   }
 
-  // overload
-  complete(): void {
-    this._observables.forEach((o) => {
-      o.complete();
-    });
+  override complete(): void {
     this._subscriptions.forEach((s) => {
       s.unsubscribe();
     });
+    this._observables.forEach((o) => {
+      o.complete();
+    });
+    super.complete();
   }
 }

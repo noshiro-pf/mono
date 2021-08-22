@@ -4,21 +4,21 @@ import { RootObservableClass } from '../class';
 import type { TimerObservable } from '../types';
 
 export const timer = (
-  millisec: number,
+  milliSeconds: number,
   startManually: boolean = false
-): TimerObservable => new TimerObservableClass(millisec, startManually);
+): TimerObservable => new TimerObservableClass(milliSeconds, startManually);
 
 class TimerObservableClass
   extends RootObservableClass<number, 'Timer'>
   implements TimerObservable
 {
-  private readonly _millisec: number;
+  private readonly _milliSeconds: number;
   private _timerId: TimerId | undefined;
   private _isStarted: boolean;
 
-  constructor(millisec: number, startManually: boolean) {
+  constructor(milliSeconds: number, startManually: boolean) {
     super({ type: 'Timer', currentValueInit: Option.none });
-    this._millisec = millisec;
+    this._milliSeconds = milliSeconds;
     this._timerId = undefined;
     this._isStarted = false;
     if (!startManually) {
@@ -32,10 +32,14 @@ class TimerObservableClass
       return this;
     }
     this._isStarted = true;
-    if (this.isCompleted) return this;
+    if (this.isCompleted) {
+      console.warn('cannot restart stopped TimerObservable');
+      return this;
+    }
     this._timerId = setTimeout(() => {
       this.startUpdate(0);
-    }, this._millisec);
+      this.complete();
+    }, this._milliSeconds);
     return this;
   }
 
@@ -45,8 +49,7 @@ class TimerObservableClass
     }
   }
 
-  // overload
-  complete(): void {
+  override complete(): void {
     this.resetTimer();
     super.complete();
   }

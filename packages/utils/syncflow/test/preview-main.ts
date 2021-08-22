@@ -118,7 +118,7 @@ const getArgs = (): {
   });
 
   parser.addArgument(['-x', '--example-no'], {
-    help: 'Example No.',
+    help: 'Specify the example No.',
     nargs: 1,
     required: false,
     defaultValue: '-1',
@@ -195,10 +195,7 @@ const main = (): void => {
   if (isPreviewMode) {
     exampleCase.preview(TICK.preview);
   } else {
-    exampleCase
-      .run(exampleCase.expectedOutput.length, TICK.test)
-      .then(console.log)
-      .catch(console.error);
+    exampleCase.run(TICK.test).then(console.log).catch(console.error);
   }
 };
 

@@ -28,12 +28,12 @@ class MapToObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'mapTo',
-      currentValueInit: Option.some(value),
+      currentValueInit: Option.map(() => value)(parentObservable.currentValue),
     });
     this._value = value;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update

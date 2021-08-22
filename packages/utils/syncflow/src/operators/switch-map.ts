@@ -32,12 +32,12 @@ class SwitchMapObservableClass<A, B>
       type: 'switchMap',
       currentValueInit: Option.none,
     });
+    this._mapToObservable = mapToObservable;
     this._observable = undefined;
     this._subscription = undefined;
-    this._mapToObservable = mapToObservable;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -45,15 +45,18 @@ class SwitchMapObservableClass<A, B>
     this._observable?.complete();
     this._subscription?.unsubscribe();
 
-    this._observable = this._mapToObservable(par.currentValue.value);
-    this._subscription = this._observable.subscribe((curr) => {
+    const observable = this._mapToObservable(par.currentValue.value);
+    this._observable = observable;
+
+    const subscription = observable.subscribe((curr) => {
       this.startUpdate(curr);
     });
+    this._subscription = subscription;
   }
 
-  // overload
-  complete(): void {
-    this._observable?.complete();
+  override complete(): void {
     this._subscription?.unsubscribe();
+    this._observable?.complete();
+    super.complete();
   }
 }

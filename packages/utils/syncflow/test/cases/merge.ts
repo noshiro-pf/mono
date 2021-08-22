@@ -1,6 +1,6 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { filter, interval, map, merge } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { filter, interval, map, merge, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
@@ -11,20 +11,26 @@ import type { StreamTestCase } from '../typedef';
 */
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
   even$: Observable<number>;
   odd$: Observable<string>;
   merged$: Observable<number | string>;
-} => {
-  const counter$ = interval(tick, true);
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(6));
+
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const odd$ = counter$
     .chain(filter((n) => n % 2 === 1))
     .chain(map((a) => a.toString()));
-  const merged$ = merge(even$, odd$);
+  const merged$ = merge([even$, odd$] as const);
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     even$,
     odd$,
@@ -32,25 +38,16 @@ const createStreams = (
   };
 };
 
-export const mergeTestCases: [StreamTestCase<number | string>] = [
+export const mergeTestCases: readonly [StreamTestCase<number | string>] = [
   {
     name: 'merge case 1',
     expectedOutput: [0, '1', 2, '3', 4, '5'],
-    run: (take: number, tick: number): Promise<(number | string)[]> => {
-      const { counter$, merged$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        merged$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly (number | string)[]> => {
+      const { startSource, merged$ } = createStreams(tick);
+      return getStreamOutputAsPromise(merged$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, even$, odd$, merged$ } = createStreams(tick);
+      const { startSource, even$, odd$, merged$ } = createStreams(tick);
       even$.subscribe((a) => {
         console.log('even', a);
       });
@@ -61,7 +58,7 @@ export const mergeTestCases: [StreamTestCase<number | string>] = [
         console.log('merged', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

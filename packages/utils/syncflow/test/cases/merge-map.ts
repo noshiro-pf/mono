@@ -1,40 +1,49 @@
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { tuple } from '@noshiro/ts-utils';
-import type { IntervalObservable, Observable } from '../../src';
-import { filter, interval, map, mergeMap } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, map, mergeMap, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
   counter         0                    1                    2                    3                    4
-  sub counter 1   *     0     0     0     0     0
-  sub counter 2                        *     0     1     2     3     4
-  sub counter 3                                             *     0     2     4     6     8
-  sub counter 4                                                                  *     0     3     6     9     12
-  sub counter 4                                                                                       *     0     4     8     ...
-  i                     0     0     0     0  1  0  1     1     1  2  1  2     2     2  3  2  3     3     3  4  3  4     4
-  mergeMap              0     0     0     0  0  0  1     2     3  0  4  2     4     6  0  8  3     6     9  0  12 4     8
+  sub counter 1   0     0     0     0     0
+  sub counter 2                        0     1     2     3     4
+  sub counter 3                                             0     2     4     6     8
+  sub counter 4                                                                  0     3     6     9     12
+  sub counter 4                                                                                       0     4     8     ...
+  i               0     0     0     0  1  0  1     1     1  2  1  2     2     2  3  2  3     3     3  4  3  4     4
+  mergeMap        0     0     0     0  0  0  1     2     3  0  4  2     4     6  0  8  3     6     9  0  12 4     8
 */
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
-  mergeMap$: Observable<[number, number]>;
-} => {
-  const counter$ = interval(tick * 7, true);
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  mergeMap$: Observable<readonly [number, number]>;
+}> => {
+  const interval$ = interval(tick * 3.5, true);
+  const counter$ = interval$.chain(take(7));
 
-  const mergeMap$ = counter$.chain(
+  const mergeMap$ = counter$.chain(take(5)).chain(
     mergeMap((i) =>
-      interval(tick * 2)
-        .chain(filter((j) => j < 5))
+      interval(tick)
+        .chain(take(5))
         .chain(map((x) => tuple(i, x * i)))
     )
   );
 
-  return { counter$, mergeMap$ };
+  return {
+    startSource: () => {
+      interval$.start();
+    },
+    counter$,
+    mergeMap$,
+  };
 };
 
-export const mergeMapTestCases: [StreamTestCase<[number, number]>] = [
+export const mergeMapTestCases: readonly [StreamTestCase<[number, number]>] = [
   {
     name: 'mergeMap case 1',
     expectedOutput: [
@@ -61,22 +70,14 @@ export const mergeMapTestCases: [StreamTestCase<[number, number]>] = [
       [3, 12],
       [4, 4],
       [4, 8],
+      [4, 12],
     ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, mergeMap$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        mergeMap$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+      const { startSource, mergeMap$ } = createStreams(tick);
+      return getStreamOutputAsPromise(mergeMap$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, mergeMap$ } = createStreams(tick / 3.5);
+      const { startSource, counter$, mergeMap$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -85,7 +86,7 @@ export const mergeMapTestCases: [StreamTestCase<[number, number]>] = [
         console.log('mergeMap', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

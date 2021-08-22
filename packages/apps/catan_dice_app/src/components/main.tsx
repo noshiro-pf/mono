@@ -27,11 +27,11 @@ export const Main = memoNamed('Main', () => {
   const [redo$, redo] = useVoidEventAsStream();
 
   const history$ = useStream(() =>
-    merge(
+    merge([
       rollDices$.chain(mapTo('roll-dices' as const)),
       undo$.chain(mapTo('undo' as const)),
-      redo$.chain(mapTo('redo' as const))
-    ).chain(scan(historyReducer, defaultHistoryState))
+      redo$.chain(mapTo('redo' as const)),
+    ] as const).chain(scan(historyReducer, defaultHistoryState))
   );
 
   const undoable$ = useStream(() =>

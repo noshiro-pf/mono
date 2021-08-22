@@ -38,7 +38,7 @@ class WithIndexObservableClass<A>
     this._index = -1;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update

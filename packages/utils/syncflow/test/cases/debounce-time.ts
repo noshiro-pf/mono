@@ -1,13 +1,15 @@
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { tuple } from '@noshiro/ts-utils';
-import type { IntervalObservable, Observable } from '../../src';
+import type { Observable } from '../../src';
 import {
   combineLatest,
   debounceTime,
   filter,
   interval,
   mapWithIndex,
+  take,
 } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
@@ -18,40 +20,74 @@ import type { StreamTestCase } from '../typedef';
   combined                              x   x       x       x       x       x   x   x       x
 */
 
-const createStreams = (
+const createStreams1 = (
   tick: number
-): {
-  counter$: IntervalObservable;
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
   even$: Observable<number>;
   filtered$: Observable<number>;
   debounced$: Observable<number>;
-  debouncedWithIndex$: Observable<[number, number]>;
-  combined$: Observable<[number, number]>;
-} => {
-  const counter$ = interval(tick, true);
+  debouncedWithIndex$: Observable<readonly [number, number]>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(200));
+
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const filtered$ = counter$.chain(filter((n) => n % 10 < 5));
   const debounced$ = filtered$.chain(debounceTime(tick * 3));
   const debouncedWithIndex$ = filtered$
     .chain(debounceTime(tick * 3))
     .chain(mapWithIndex((v, i) => tuple(i, v)));
-  const combined$ = combineLatest(even$, debounced$);
+
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     even$,
     filtered$,
     debounced$,
     debouncedWithIndex$,
+  };
+};
+
+const createStreams2 = (
+  tick: number
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  even$: Observable<number>;
+  filtered$: Observable<number>;
+  debounced$: Observable<number>;
+  combined$: Observable<readonly [number, number]>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(40));
+
+  const even$ = counter$.chain(filter((n) => n % 2 === 0));
+  const filtered$ = counter$.chain(filter((n) => n % 10 < 5));
+  const debounced$ = filtered$.chain(debounceTime(tick * 3));
+  const combined$ = combineLatest([even$, debounced$] as const);
+
+  return {
+    startSource: () => {
+      interval$.start();
+    },
+    counter$,
+    even$,
+    filtered$,
+    debounced$,
     combined$,
   };
 };
 
-export const debounceTimeTestCases: [
+export const debounceTimeTestCases: readonly [
   StreamTestCase<[number, number]>,
   StreamTestCase<[number, number]>
 ] = [
   {
-    name: 'debounceTime case1',
+    name: 'debounceTime case 1',
     expectedOutput: [
       [0, 4],
       [1, 14],
@@ -74,21 +110,13 @@ export const debounceTimeTestCases: [
       [18, 184],
       [19, 194],
     ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, debouncedWithIndex$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        debouncedWithIndex$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+      const { startSource, debouncedWithIndex$ } = createStreams1(tick);
+      return getStreamOutputAsPromise(debouncedWithIndex$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, filtered$, debounced$ } = createStreams(tick);
+      const { startSource, filtered$, debounced$, debouncedWithIndex$ } =
+        createStreams1(tick);
 
       filtered$.subscribe((a) => {
         console.log('filtered', a);
@@ -96,8 +124,11 @@ export const debounceTimeTestCases: [
       debounced$.subscribe((a) => {
         console.log('debounced', a);
       });
+      debouncedWithIndex$.subscribe((a) => {
+        console.log('debouncedWithIndex', a);
+      });
 
-      counter$.start();
+      startSource();
     },
   },
   {
@@ -124,21 +155,13 @@ export const debounceTimeTestCases: [
       [36, 34],
       [38, 34],
     ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, combined$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        combined$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+      const { startSource, combined$ } = createStreams2(tick);
+      return getStreamOutputAsPromise(combined$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, even$, debounced$, combined$ } = createStreams(tick);
+      const { startSource, even$, debounced$, combined$ } =
+        createStreams2(tick);
 
       even$.subscribe((a) => {
         console.log('even', a);
@@ -150,7 +173,7 @@ export const debounceTimeTestCases: [
         console.log('combined', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

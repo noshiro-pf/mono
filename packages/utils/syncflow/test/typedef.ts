@@ -1,8 +1,10 @@
-export type StreamTestCase<T> = Readonly<{
+import type { DeepReadonly } from '@noshiro/ts-utils';
+
+export type StreamTestCase<T> = StreamTestCaseImpl<T>;
+
+type StreamTestCaseImpl<T, O = DeepReadonly<T[]>> = Readonly<{
   name: string;
-  expectedOutput: readonly T[];
-  run:
-    | ((take: number, tick: number) => Promise<T[]>)
-    | ((take: number) => Promise<T[]>);
-  preview: (() => void) | ((tick: number) => void);
+  expectedOutput: O;
+  run: (tick: number) => Promise<O>;
+  preview: (tick: number) => void;
 }>;

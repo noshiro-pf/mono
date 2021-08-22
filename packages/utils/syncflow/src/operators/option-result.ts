@@ -106,7 +106,7 @@ class UnwrapOptionObservableClass<A>
     });
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -133,7 +133,7 @@ class UnwrapResultOkObservableClass<S, E>
     });
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -160,7 +160,7 @@ class UnwrapResultErrObservableClass<S, E>
     });
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -186,7 +186,7 @@ class MapOptionObservableClass<A, B>
     this._mapFn = mapFn;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -212,7 +212,7 @@ class MapResultOkObservableClass<S, S2, E>
     this._mapFn = mapFn;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -245,7 +245,7 @@ class MapResultErrObservableClass<S, E, E2>
     this._mapFn = mapFn;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update

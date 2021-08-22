@@ -1,28 +1,36 @@
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { tuple } from '@noshiro/ts-utils';
-import type { IntervalObservable, Observable } from '../../src';
-import { interval, mapWithIndex } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, mapWithIndex, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
-  doubleWithIndex$: Observable<[number, number]>;
-} => {
-  const counter$ = interval(tick, true);
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  doubleWithIndex$: Observable<readonly [number, number]>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(11));
 
   const doubleWithIndex$ = counter$.chain(
     mapWithIndex((x, i) => tuple(i, x * 2))
   );
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     doubleWithIndex$,
   };
 };
 
-export const mapWithIndexTestCases: [StreamTestCase<[number, number]>] = [
+export const mapWithIndexTestCases: readonly [
+  StreamTestCase<[number, number]>
+] = [
   {
     name: 'mapWithIndex case 1',
     expectedOutput: [
@@ -38,21 +46,12 @@ export const mapWithIndexTestCases: [StreamTestCase<[number, number]>] = [
       [9, 18],
       [10, 20],
     ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, doubleWithIndex$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        doubleWithIndex$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+      const { startSource, doubleWithIndex$ } = createStreams(tick);
+      return getStreamOutputAsPromise(doubleWithIndex$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, doubleWithIndex$ } = createStreams(tick);
+      const { startSource, counter$, doubleWithIndex$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -61,7 +60,7 @@ export const mapWithIndexTestCases: [StreamTestCase<[number, number]>] = [
         console.log('doubleWithIndex', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

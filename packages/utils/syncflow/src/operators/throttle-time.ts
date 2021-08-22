@@ -10,24 +10,24 @@ import type {
 } from '../types';
 
 export const throttleTime =
-  <A>(millisec: number): ToBaseOperator<A, A> =>
+  <A>(milliSeconds: number): ToBaseOperator<A, A> =>
   (parentObservable: Observable<A>) =>
-    new ThrottleTimeObservableClass(parentObservable, millisec);
+    new ThrottleTimeObservableClass(parentObservable, milliSeconds);
 
 export const throttleTimeI = <A>(
-  millisec: number
+  milliSeconds: number
 ): InitializedToInitializedOperator<A, A> =>
-  throttleTime(millisec) as InitializedToInitializedOperator<A, A>;
+  throttleTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class ThrottleTimeObservableClass<A>
   extends SyncChildObservableClass<A, 'throttleTime', [A]>
   implements ThrottleTimeOperatorObservable<A>
 {
-  private readonly _millisec: number;
+  private readonly _milliSeconds: number;
   private _timerId: TimerId | undefined;
   private _isSkipping: boolean;
 
-  constructor(parentObservable: Observable<A>, millisec: number) {
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
       type: 'throttleTime',
@@ -35,10 +35,10 @@ class ThrottleTimeObservableClass<A>
     });
     this._timerId = undefined;
     this._isSkipping = false;
-    this._millisec = millisec;
+    this._milliSeconds = milliSeconds;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -50,7 +50,7 @@ class ThrottleTimeObservableClass<A>
     // set timer
     this._timerId = setTimeout(() => {
       this._isSkipping = false;
-    }, this._millisec);
+    }, this._milliSeconds);
   }
 
   private resetTimer(): void {
@@ -59,8 +59,7 @@ class ThrottleTimeObservableClass<A>
     }
   }
 
-  // overload
-  complete(): void {
+  override complete(): void {
     this.resetTimer();
     super.complete();
   }
