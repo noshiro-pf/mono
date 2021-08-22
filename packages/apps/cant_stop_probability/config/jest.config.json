@@ -2,7 +2,6 @@
   "moduleNameMapper": {
     "^@noshiro/(.*)$": "<rootDir>/../../utils/$1/src"
   },
-  "moduleFileExtensions": ["ts", "js", "tsx", "jsx"],
   "rootDir": "../",
   "roots": ["<rootDir>/src"],
   "transform": {
