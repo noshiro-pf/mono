@@ -78,8 +78,6 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
               isClickable: false,
               float: 'never',
               showOutline: 'never',
-              outlineColor: undefined,
-              onClick: undefined,
             } as const)}
           </BalloonContent>
         </Balloon>

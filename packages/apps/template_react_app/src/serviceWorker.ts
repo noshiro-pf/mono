@@ -30,8 +30,9 @@ type Config = Readonly<{
 export function register(config?: Config): void {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
-    const PUBLIC_URL = (process as { env: Record<string, string> }).env
-      .PUBLIC_URL;
+    const PUBLIC_URL = (process as { env: Record<string, string> }).env[
+      'PUBLIC_URL'
+    ];
     if (PUBLIC_URL === undefined) return;
     const publicUrl = new URL(PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {

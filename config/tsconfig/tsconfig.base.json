@@ -1,25 +1,56 @@
 {
+  // https://www.typescriptlang.org/ja/tsconfig
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
-    "moduleResolution": "node",
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "importHelpers": true,
-    "newLine": "lf",
-    "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": false,
-    "skipLibCheck": true,
-    "strict": true,
+    // Type Checking
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false, // TODO
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noUncheckedIndexedAccess": true
+    "strict": true,
+    // "alwaysStrict": true,                 // enabled by "strict"
+    // "strictBindCallApply": true,          // enabled by "strict"
+    // "strictFunctionTypes": true,          // enabled by "strict"
+    // "strictNullChecks": true,             // enabled by "strict"
+    // "strictPropertyInitialization": true, // enabled by "strict"
+    // "noImplicitAny": true,                // enabled by "strict"
+    // "noImplicitThis": true,               // enabled by "strict"
+    // "useUnknownInCatchVariables": true,   // enabled by "strict"
+
+    // Modules
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+
+    // Emit
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "importsNotUsedAsValues": "remove",
+    "newLine": "lf",
+    "noEmitOnError": true,
+
+    // JavaScript Support
+    "allowJs": false,
+
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
+    // Language and Environment
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+
+    // Projects
+    "incremental": true,
+
+    // Completeness
+    "skipLibCheck": true // TODO
   }
 }

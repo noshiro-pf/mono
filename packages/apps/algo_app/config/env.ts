@@ -12,9 +12,11 @@ export const dotenvValues: {
   PORT: number | undefined;
   PUBLIC_URL: string | undefined;
 } = {
-  USE_BUNDLE_ANALYZER: dotenvParsed?.USE_BUNDLE_ANALYZER === 'true',
-  HOST: dotenvParsed?.HOST,
+  USE_BUNDLE_ANALYZER: dotenvParsed?.['USE_BUNDLE_ANALYZER'] === 'true',
+  HOST: dotenvParsed?.['HOST'],
   PORT:
-    dotenvParsed?.PORT === undefined ? undefined : Number(dotenvParsed.PORT),
-  PUBLIC_URL: dotenvParsed?.PUBLIC_URL,
+    dotenvParsed?.['PORT'] === undefined
+      ? undefined
+      : Number(dotenvParsed['PORT']),
+  PUBLIC_URL: dotenvParsed?.['PUBLIC_URL'],
 };

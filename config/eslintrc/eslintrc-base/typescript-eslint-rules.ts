@@ -54,6 +54,13 @@ export const typescriptEslintRules: Readonly<
       'error',
       { allowConstantLoopConditions: true },
     ],
+    'dot-notation': 'off',
+    '@typescript-eslint/dot-notation': [
+      'error',
+      {
+        allowIndexSignaturePropertyAccess: true,
+      },
+    ],
   },
   disabledRules: {
     '@typescript-eslint/lines-between-class-members': 'off',

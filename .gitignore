@@ -18,6 +18,7 @@ config/**/*.js
 scripts/**/*.js
 **/*.d.ts
 !**/react-app-env.d.ts
+*.tsbuildinfo
 
 # Logs
 logs

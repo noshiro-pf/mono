@@ -1,5 +1,6 @@
 import type webpack from 'webpack';
 import 'webpack-dev-server';
+import type { Configuration } from 'webpack-dev-server';
 import { merge } from 'webpack-merge';
 import type { Paths } from './paths_type';
 import { webpackConfigSlidesCommonMaker } from './webpack_config_common_maker';
@@ -8,7 +9,7 @@ const devServerConfigMaker = (
   paths: Paths,
   host: string,
   port: number
-): webpack.Configuration['devServer'] => ({
+): Configuration => ({
   open: true,
   host,
   port,

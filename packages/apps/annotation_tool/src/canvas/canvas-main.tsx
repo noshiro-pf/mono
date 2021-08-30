@@ -40,7 +40,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
     });
 
     const interactionManager = new InteractionManager(app.renderer);
-    interactionManager.cursorStyles.default = 'crosshair';
+    interactionManager.cursorStyles['default'] = 'crosshair';
 
     const globalPixiObjects = createGlobalPixiObjects({
       app,

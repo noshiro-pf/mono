@@ -16,6 +16,7 @@
     "clean:root": "run-s clean:root:*",
     "clean:root:config": "rimraf config/**/{*,.*}.js",
     "clean:root:scripts": "rimraf scripts/**/{*,.*}.js",
+    "clean:tsbuildinfo": "rimraf **/{*,.*}.tsbuildinfo",
     "clean:sub": "yarn workspaces run clean",
     "create:preactapp": "scripts/create_new_preact_app.sh",
     "create:reactapp": "scripts/create_new_react_app.sh",
