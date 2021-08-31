@@ -19,7 +19,7 @@ export const mapToI = <A, B>(
   mapTo(value) as InitializedToInitializedOperator<A, B>;
 
 class MapToObservableClass<A, B>
-  extends SyncChildObservableClass<B, 'mapTo', [A]>
+  extends SyncChildObservableClass<B, 'mapTo', readonly [A]>
   implements MapToOperatorObservable<A, B>
 {
   private readonly _value: B;

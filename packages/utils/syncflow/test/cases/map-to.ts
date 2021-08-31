@@ -36,7 +36,7 @@ export const mapToTestCases: readonly [StreamTestCase<string>] = [
       const { startSource, counter$, output$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter ', a);
       });
       output$.subscribe((a) => {
         console.log('constant', a);

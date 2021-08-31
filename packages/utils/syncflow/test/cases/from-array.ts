@@ -8,6 +8,7 @@ const createStream = (): Readonly<{
   output$: Observable<number>;
 }> => {
   const source$ = fromArray([1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
+
   return {
     startSource: () => {
       source$.emit();

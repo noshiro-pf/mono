@@ -5,7 +5,7 @@ import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
-            0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+  (tick)    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
   counter   0       1       2       3       4       5       6
   timer1                *
   timer2                        *
@@ -76,10 +76,10 @@ export const timerTestCases: readonly [
     preview: (tick: number): void => {
       const { timer1$, timer2$, combined$, startSource } = createStreams(tick);
       timer1$.subscribe((a) => {
-        console.log('timer1', a);
+        console.log('timer1  ', a);
       });
       timer2$.subscribe((a) => {
-        console.log('timer2', a);
+        console.log('timer2  ', a);
       });
       combined$.subscribe((a) => {
         console.log('combined', a);

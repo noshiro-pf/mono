@@ -49,10 +49,10 @@ export const mergeTestCases: readonly [StreamTestCase<number | string>] = [
     preview: (tick: number): void => {
       const { startSource, even$, odd$, merged$ } = createStreams(tick);
       even$.subscribe((a) => {
-        console.log('even', a);
+        console.log('even  ', a);
       });
       odd$.subscribe((a) => {
-        console.log('odd', a);
+        console.log('odd   ', a);
       });
       merged$.subscribe((a) => {
         console.log('merged', a);

@@ -9,20 +9,24 @@ import type {
 } from '../types';
 
 export const withIndex =
-  <A>(): ToBaseOperator<A, [number, A]> =>
+  <A>(): ToBaseOperator<A, readonly [number, A]> =>
   (parentObservable: Observable<A>) =>
     new WithIndexObservableClass(parentObservable);
 
 export const withIndexI = <A>(): InitializedToInitializedOperator<
   A,
-  [number, A]
-> => withIndex() as InitializedToInitializedOperator<A, [number, A]>;
+  readonly [number, A]
+> => withIndex() as InitializedToInitializedOperator<A, readonly [number, A]>;
 
 export const attachIndex = withIndex; // alias
 export const attachIndexI = withIndexI; // alias
 
 class WithIndexObservableClass<A>
-  extends SyncChildObservableClass<[number, A], 'withIndex', [A]>
+  extends SyncChildObservableClass<
+    readonly [number, A],
+    'withIndex',
+    readonly [A]
+  >
   implements WithIndexOperatorObservable<A>
 {
   private _index: number;
@@ -31,7 +35,7 @@ class WithIndexObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'withIndex',
-      currentValueInit: Option.map<A, [number, A]>((x) => [-1, x])(
+      currentValueInit: Option.map<A, readonly [number, A]>((x) => [-1, x])(
         parentObservable.currentValue
       ),
     });

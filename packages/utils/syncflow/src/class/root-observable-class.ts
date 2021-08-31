@@ -1,3 +1,5 @@
+import type { uint32 } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import type {
   ChildObservable,
   ObservableId,
@@ -12,7 +14,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
   implements RootObservable<A, Type>
 {
   override readonly type: Type;
-  private readonly _procedure: ChildObservable<unknown>[];
+  private _procedure: readonly ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: Set<ObservableId>;
 
   constructor({
@@ -41,7 +43,8 @@ export class RootObservableClass<A, Type extends RootObservableType>
       this._procedure.map((a) => a.depth),
       child.depth
     );
-    this._procedure.splice(insertPos, 0, child);
+
+    this._procedure = IList.insert(this._procedure, insertPos as uint32, child);
   }
 
   startUpdate(nextValue: A): void {

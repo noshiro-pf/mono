@@ -43,7 +43,7 @@ export const takeUntilTestCases: readonly [StreamTestCase<number>] = [
       const { startSource, counter$, takeUntil$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter  ', a);
       });
       takeUntil$.subscribe((a) => {
         console.log('takeUntil', a);

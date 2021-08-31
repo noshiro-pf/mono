@@ -4,6 +4,8 @@ import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
+  (tick)    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+
   counter   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23
   filtered      1       3   4                       10          13          16  17  18  19  20
   auditTime               3           4                       10          13          18          20
@@ -52,7 +54,7 @@ export const auditTimeTestCases: readonly [
       const { startSource, filtered$, auditTime$ } = createStreams(tick);
 
       filtered$.subscribe((a) => {
-        console.log('filtered', a);
+        console.log('filtered ', a);
       });
       auditTime$.subscribe((a) => {
         console.log('auditTime', a);
@@ -73,13 +75,13 @@ export const auditTimeTestCases: readonly [
         createStreams(tick);
 
       filtered$.subscribe((a) => {
-        console.log('filtered', a);
+        console.log('filtered ', a);
       });
       auditTime$.subscribe((a) => {
         console.log('auditTime', a);
       });
       merged$.subscribe((a) => {
-        console.log('merged', a);
+        console.log('merged   ', a);
       });
 
       startSource();

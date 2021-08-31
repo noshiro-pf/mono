@@ -19,7 +19,7 @@ export const mapWithIndexI = <A, B>(
   mapWithIndex(mapFn) as InitializedToInitializedOperator<A, B>;
 
 class MapWithIndexObservableClass<A, B>
-  extends SyncChildObservableClass<B, 'mapWithIndex', [A]>
+  extends SyncChildObservableClass<B, 'mapWithIndex', readonly [A]>
   implements MapWithIndexOperatorObservable<A, B>
 {
   private readonly _mapFn: (x: A, index: number) => B;

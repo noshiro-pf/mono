@@ -19,7 +19,7 @@ export const takeUntilI = <A>(
   takeUntil(notifier) as InitializedToInitializedOperator<A, A>;
 
 class TakeUntilObservableClass<A>
-  extends SyncChildObservableClass<A, 'takeUntil', [A]>
+  extends SyncChildObservableClass<A, 'takeUntil', readonly [A]>
   implements TakeUntilOperatorObservable<A>
 {
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {

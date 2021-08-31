@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { IList, Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   InitializedObservable,
@@ -11,23 +11,32 @@ import type {
 import { maxDepth } from '../utils';
 
 export const withBufferedFrom =
-  <A, B>(observable: Observable<B>): ToBaseOperator<A, [A, B[]]> =>
+  <A, B>(
+    observable: Observable<B>
+  ): ToBaseOperator<A, readonly [A, readonly B[]]> =>
   (parentObservable: Observable<A>) =>
     new WithBufferedFromObservableClass(parentObservable, observable);
 
 export const withBufferedFromI = <A, B>(
   observable: InitializedObservable<B>
-): InitializedToInitializedOperator<A, [A, B[]]> =>
-  withBuffered(observable) as InitializedToInitializedOperator<A, [A, B[]]>;
+): InitializedToInitializedOperator<A, readonly [A, readonly B[]]> =>
+  withBuffered(observable) as InitializedToInitializedOperator<
+    A,
+    readonly [A, readonly B[]]
+  >;
 
 export const withBuffered = withBufferedFrom; // alias
 export const withBufferedI = withBufferedFromI; // alias
 
 class WithBufferedFromObservableClass<A, B>
-  extends SyncChildObservableClass<[A, B[]], 'withBufferedFrom', [A]>
+  extends SyncChildObservableClass<
+    readonly [A, readonly B[]],
+    'withBufferedFrom',
+    readonly [A]
+  >
   implements WithBufferedFromOperatorObservable<A, B>
 {
-  private readonly _bufferedValues: B[] = [];
+  private _bufferedValues: readonly B[] = [];
 
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {
     super({
@@ -45,7 +54,7 @@ class WithBufferedFromObservableClass<A, B>
     });
 
     observable.subscribe((value) => {
-      this._bufferedValues.push(value);
+      this._bufferedValues = IList.push(this._bufferedValues, value);
     });
   }
 
@@ -59,6 +68,6 @@ class WithBufferedFromObservableClass<A, B>
   }
 
   private clearBuffer(): void {
-    this._bufferedValues.splice(0, this._bufferedValues.length);
+    this._bufferedValues = [];
   }
 }

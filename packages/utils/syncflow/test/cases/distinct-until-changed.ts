@@ -13,7 +13,7 @@ import type { StreamTestCase } from '../typedef';
 /*
   counter                0   1   2   3   4   5   6
   distinctUntilChanged   0           1           2
-  throttleTime           00  1   2   31  4   5   6
+  withLatest             00  1   2   31  4   5   6
 */
 
 const createStreams = (
@@ -63,13 +63,13 @@ export const distinctUntilChangedTestCases: readonly [
         createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter             ', a);
       });
       distinctUntilChanged$.subscribe((a) => {
         console.log('distinctUntilChanged', a);
       });
       withLatest$.subscribe((a) => {
-        console.log('withLatest', a);
+        console.log('withLatest          ', a);
       });
 
       startSource();

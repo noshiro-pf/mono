@@ -11,20 +11,27 @@ import type {
 import { maxDepth } from '../utils';
 
 export const withLatestFrom =
-  <A, B>(observable: Observable<B>): ToBaseOperator<A, [A, B]> =>
+  <A, B>(observable: Observable<B>): ToBaseOperator<A, readonly [A, B]> =>
   (parentObservable: Observable<A>) =>
     new WithLatestFromObservableClass(parentObservable, observable);
 
 export const withLatestFromI = <A, B>(
   observable: InitializedObservable<B>
-): InitializedToInitializedOperator<A, [A, B]> =>
-  withLatestFrom(observable) as InitializedToInitializedOperator<A, [A, B]>;
+): InitializedToInitializedOperator<A, readonly [A, B]> =>
+  withLatestFrom(observable) as InitializedToInitializedOperator<
+    A,
+    readonly [A, B]
+  >;
 
 export const withLatest = withLatestFrom; // alias
 export const withLatestI = withLatestFromI; // alias
 
 class WithLatestFromObservableClass<A, B>
-  extends SyncChildObservableClass<[A, B], 'withLatestFrom', [A]>
+  extends SyncChildObservableClass<
+    readonly [A, B],
+    'withLatestFrom',
+    readonly [A]
+  >
   implements WithLatestFromOperatorObservable<A, B>
 {
   private readonly _observable: Observable<B>;

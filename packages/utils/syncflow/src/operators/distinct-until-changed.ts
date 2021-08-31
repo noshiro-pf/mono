@@ -24,7 +24,7 @@ export const skipUnchanged = distinctUntilChanged; // alias
 export const skipUnchangedI = distinctUntilChangedI; // alias
 
 class DistinctUntilChangedObservableClass<A>
-  extends SyncChildObservableClass<A, 'distinctUntilChanged', [A]>
+  extends SyncChildObservableClass<A, 'distinctUntilChanged', readonly [A]>
   implements DistinctUntilChangedOperatorObservable<A>
 {
   private readonly _compare: (x: A, y: A) => boolean;

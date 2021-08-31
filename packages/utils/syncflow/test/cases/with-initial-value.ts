@@ -71,10 +71,10 @@ export const withInitialValueTestCases: readonly [
         createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter       ', a);
       });
       timer$.subscribe((a) => {
-        console.log('timer', a);
+        console.log('timer         ', a);
       });
       combineLatest1$.subscribe((a) => {
         console.log('combineLatest1', a);
@@ -103,10 +103,10 @@ export const withInitialValueTestCases: readonly [
         createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter       ', a);
       });
       timer$.subscribe((a) => {
-        console.log('timer', a);
+        console.log('timer         ', a);
       });
       combineLatest2$.subscribe((a) => {
         console.log('combineLatest2', a);

@@ -1,4 +1,4 @@
-import { noop, Option } from '@noshiro/ts-utils';
+import { IList, noop, Option } from '@noshiro/ts-utils';
 import type {
   ChildObservable,
   InitializedObservable,
@@ -28,7 +28,7 @@ export class ObservableBaseClass<
   readonly kind: Kind;
   readonly type;
   readonly depth: Depth;
-  private readonly _children: ChildObservable<unknown>[];
+  private _children: readonly ChildObservable<unknown>[];
   private readonly _subscribers: Map<SubscriberId, Subscriber<A>>;
   private _currentValue: ObservableBase<A>['currentValue'];
   private _isCompleted: ObservableBase<A>['isCompleted'];
@@ -57,7 +57,10 @@ export class ObservableBaseClass<
   }
 
   addChild<B>(child: ChildObservable<B>): void {
-    this._children.push(child as ChildObservable<unknown>);
+    this._children = IList.push(
+      this._children,
+      child as ChildObservable<unknown>
+    );
   }
 
   get currentValue(): ObservableBase<A>['currentValue'] {

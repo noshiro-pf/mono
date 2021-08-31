@@ -14,7 +14,7 @@ export const take =
     new TakeObservableClass(parentObservable, n);
 
 class TakeObservableClass<A>
-  extends SyncChildObservableClass<A, 'take', [A]>
+  extends SyncChildObservableClass<A, 'take', readonly [A]>
   implements TakeOperatorObservable<A>
 {
   private readonly _n: number;

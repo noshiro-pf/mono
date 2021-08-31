@@ -36,7 +36,7 @@ export const takeWhileTestCases: readonly [StreamTestCase<number>] = [
       const { startSource, counter$, takeWhile$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter  ', a);
       });
       takeWhile$.subscribe((a) => {
         console.log('takeWhile', a);

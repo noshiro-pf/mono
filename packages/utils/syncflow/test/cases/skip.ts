@@ -39,7 +39,7 @@ export const skipTestCases: readonly [StreamTestCase<number>] = [
         console.log('counter', a);
       });
       skip5$.subscribe((a) => {
-        console.log('skip', a);
+        console.log('skip   ', a);
       });
 
       startSource();

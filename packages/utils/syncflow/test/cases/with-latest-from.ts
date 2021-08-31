@@ -52,7 +52,7 @@ export const withLatestFromTestCases: readonly [
       const { startSource, counter$, withLatest$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter   ', a);
       });
       withLatest$.subscribe((a) => {
         console.log('withLatest', a);

@@ -43,7 +43,7 @@ export const pairwiseTestCases: readonly [StreamTestCase<[number, number]>] = [
       const { startSource, counter$, pairwise$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter ', a);
       });
       pairwise$.subscribe((a) => {
         console.log('pairwise', a);

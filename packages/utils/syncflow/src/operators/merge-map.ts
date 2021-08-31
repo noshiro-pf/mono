@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { IList, Option } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import type {
   MergeMapOperatorObservable,
@@ -18,12 +18,12 @@ export const mergeMap =
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>
-  extends AsyncChildObservableClass<B, 'mergeMap', [A]>
+  extends AsyncChildObservableClass<B, 'mergeMap', readonly [A]>
   implements MergeMapOperatorObservable<A, B>
 {
   private readonly _mapToObservable: (curr: A) => Observable<B>;
-  private readonly _observables: Observable<B>[];
-  private readonly _subscriptions: Subscription[];
+  private _observables: readonly Observable<B>[];
+  private _subscriptions: readonly Subscription[];
 
   constructor(
     parentObservable: Observable<A>,
@@ -45,12 +45,12 @@ class MergeMapObservableClass<A, B>
     if (Option.isNone(par.currentValue)) return; // skip update
 
     const observable = this._mapToObservable(par.currentValue.value);
-    this._observables.push(observable);
+    this._observables = IList.push(this._observables, observable);
 
     const subscription = observable.subscribe((curr) => {
       this.startUpdate(curr);
     });
-    this._subscriptions.push(subscription);
+    this._subscriptions = IList.push(this._subscriptions, subscription);
   }
 
   override complete(): void {
