@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/preact-utils';
 import { styled } from 'goober';
-import { CodeArea } from './input-area';
+import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';
 
 export const Main = memoNamed('Main', () => {
@@ -9,11 +9,13 @@ export const Main = memoNamed('Main', () => {
 
   return (
     <Root>
-      <Title>{'(Untyped) lambda calculus'}</Title>
+      <h2>{'(Untyped) lambda calculus'}</h2>
       <Description>{'expr ::= x | (lambda x. expr) | (expr expr)'}</Description>
       <TextAreaWrapper>
         <div>{'Input:'}</div>
-        <InputAreaStyled
+        <CodeArea
+          maxHeightPx={500}
+          minHeightPx={100}
           value={inputAreaString}
           valueChange={setInputAreaString}
         />
@@ -21,7 +23,11 @@ export const Main = memoNamed('Main', () => {
 
       <TextAreaWrapper>
         <div>{'Output:'}</div>
-        <OutputAreaStyled value={outputAreaString} />
+        <CodeArea
+          maxHeightPx={800}
+          minHeightPx={500}
+          value={outputAreaString}
+        />
       </TextAreaWrapper>
     </Root>
   );
@@ -29,9 +35,9 @@ export const Main = memoNamed('Main', () => {
 
 const Root = styled('div')`
   padding: 10px;
+  height: 100vh;
+  width: 100vw;
 `;
-
-const Title = styled('h2')``;
 
 const Description = styled('div')`
   padding: 10px;
@@ -40,20 +46,4 @@ const Description = styled('div')`
 const TextAreaWrapper = styled('div')`
   padding: 10px;
   width: 100%;
-`;
-
-const CodeAreaStyled = styled(CodeArea)`
-  /* max-width: 100%;
-  min-width: 600px; */
-  width: 100%;
-`;
-
-const InputAreaStyled = styled(CodeAreaStyled)`
-  min-height: 100px;
-  max-height: 500px;
-`;
-
-const OutputAreaStyled = styled(CodeAreaStyled)`
-  min-height: 500px;
-  max-height: 800px;
 `;
