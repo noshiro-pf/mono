@@ -219,11 +219,20 @@ export namespace IList {
     list: readonly A[],
     index: uint32,
     newValue: A
-  ): readonly A[] =>
-    list.flatMap((a, i) => (i === index ? [newValue, a] : [a])) as readonly A[];
+  ): readonly A[] => {
+    const temp = list.slice();
+    temp.splice(index, 0, newValue);
+    return temp;
+  };
 
-  export const remove = <A>(list: readonly A[], index: uint32): readonly A[] =>
-    list.flatMap((a, i) => (i === index ? [] : [a]));
+  export const remove = <A>(
+    list: readonly A[],
+    index: uint32
+  ): readonly A[] => {
+    const temp = list.slice();
+    temp.splice(index, 1);
+    return temp;
+  };
 
   export const push = <T extends readonly unknown[], N = T>(
     list: T,

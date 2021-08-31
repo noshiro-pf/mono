@@ -332,24 +332,93 @@ describe('IList.update', () => {
 
 describe('IList.insert', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.insert(xs, 1 as uint32, 5);
 
-  assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
+  {
+    const result = IList.insert(xs, 1 as uint32, 5);
 
-  test('case 1', () => {
-    expect(result).toStrictEqual([1, 5, 2, 3]);
-  });
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
+
+    test('case 1', () => {
+      expect(result).toStrictEqual([1, 5, 2, 3]);
+    });
+  }
+  {
+    const result = IList.insert(xs, 0 as uint32, 5);
+
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
+
+    test('case 2 (insert head)', () => {
+      expect(result).toStrictEqual([5, 1, 2, 3]);
+    });
+  }
+  {
+    const result = IList.insert(xs, 3 as uint32, 5);
+
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
+
+    test('case 3 (insert tail)', () => {
+      expect(result).toStrictEqual([1, 2, 3, 5]);
+    });
+  }
+  {
+    const result = IList.insert(xs, 999 as uint32, 5);
+
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
+
+    test('case 4 (insert tail)', () => {
+      expect(result).toStrictEqual([1, 2, 3, 5]);
+    });
+  }
 });
 
 describe('IList.remove', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.remove(xs, 1 as uint32);
 
-  assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
+  {
+    const result = IList.remove(xs, 1 as uint32);
 
-  test('case 1', () => {
-    expect(result).toStrictEqual([1, 3]);
-  });
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
+
+    test('case 1', () => {
+      expect(result).toStrictEqual([1, 3]);
+    });
+  }
+  {
+    const result = IList.remove(xs, 0 as uint32);
+
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
+
+    test('case 2 (remove head)', () => {
+      expect(result).toStrictEqual([2, 3]);
+    });
+  }
+  {
+    const result = IList.remove(xs, 2 as uint32);
+
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
+
+    test('case 3 (remove tail)', () => {
+      expect(result).toStrictEqual([1, 2]);
+    });
+  }
+  {
+    const result = IList.remove(xs, 3 as uint32);
+
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
+
+    test('case 3 (noop)', () => {
+      expect(result).toStrictEqual([1, 2, 3]);
+    });
+  }
+  {
+    const result = IList.remove(xs, 5 as uint32);
+
+    assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
+
+    test('case 4 (noop)', () => {
+      expect(result).toStrictEqual([1, 2, 3]);
+    });
+  }
 });
 
 describe('IList.push', () => {
