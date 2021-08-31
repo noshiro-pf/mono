@@ -2,11 +2,10 @@
   "moduleNameMapper": {
     "^@noshiro/(.*)$": "<rootDir>/../$1/src"
   },
-  "moduleFileExtensions": ["ts", "js"],
   "rootDir": "../",
   "roots": ["<rootDir>/src"],
   "transform": {
-    "^.+\\.ts$": "ts-jest"
+    "^.+\\.(ts|tsx)$": "ts-jest"
   },
   "globals": {
     "ts-jest": {
