@@ -1,6 +1,7 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { combineLatest, filter, interval, map } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { DeepReadonly } from '@noshiro/ts-utils';
+import type { Observable } from '../../src';
+import { combineLatest, filter, interval, map, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
@@ -17,29 +18,34 @@ import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
   double$: Observable<number>;
   quad$: Observable<number>;
   square$: Observable<number>;
   squareEven$: Observable<number>;
-  combined$: Observable<[number, number, number, number, number]>;
-} => {
-  const counter$ = interval(tick, true);
+  combined$: Observable<readonly [number, number, number, number, number]>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(10));
 
   const double$ = counter$.chain(map((x) => x * 2));
   const quad$ = counter$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
   const square$ = counter$.chain(map((x) => x * x));
   const squareEven$ = square$.chain(filter((x) => x % 2 === 0));
-  const combined$ = combineLatest(
+  const combined$ = combineLatest([
     counter$,
     double$,
     quad$,
     square$,
-    squareEven$
-  );
+    squareEven$,
+  ] as const);
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     double$,
     quad$,
@@ -52,24 +58,30 @@ const createStreams = (
 const createStreams2 = (
   tick: number
 ): {
-  counter$: IntervalObservable;
+  startSource: () => void;
+  counter$: Observable<number>;
   multiplied$: Observable<number>;
   sum$: Observable<number>;
 } => {
-  const counter$ = interval(tick, true);
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(5));
+
   const multiplied$ = counter$.chain(map((x) => 1000 * x));
-  const sum$ = combineLatest(counter$, multiplied$).chain(
+  const sum$ = combineLatest([counter$, multiplied$] as const).chain(
     map(([a, b]) => a + b)
   );
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     multiplied$,
     sum$,
   };
 };
 
-export const combineLatestTestCases: [
+export const combineLatestTestCases: readonly [
   StreamTestCase<[number, number, number, number, number]>,
   StreamTestCase<number>
 ] = [
@@ -88,24 +100,21 @@ export const combineLatestTestCases: [
       [9, 18, 36, 81, 64],
     ],
     run: (
-      take: number,
       tick: number
-    ): Promise<[number, number, number, number, number][]> => {
-      const { counter$, combined$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        combined$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    ): Promise<DeepReadonly<[number, number, number, number, number][]>> => {
+      const { startSource, combined$ } = createStreams(tick);
+      return getStreamOutputAsPromise(combined$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, double$, quad$, square$, squareEven$, combined$ } =
-        createStreams(tick);
+      const {
+        startSource,
+        counter$,
+        double$,
+        quad$,
+        square$,
+        squareEven$,
+        combined$,
+      } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -126,33 +135,27 @@ export const combineLatestTestCases: [
         console.log('combined', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
   {
     name: 'combineLatest case 2',
     expectedOutput: [0, 1001, 2002, 3003, 4004],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, sum$ } = createStreams2(tick);
-      return getStreamOutputAsPromise(
-        sum$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, sum$ } = createStreams2(tick);
+      return getStreamOutputAsPromise(sum$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, sum$ } = createStreams2(tick);
+      const { startSource, counter$, sum$ } = createStreams2(tick);
 
+      counter$.subscribe((a) => {
+        console.log('counter', a);
+      });
       sum$.subscribe((a) => {
         console.log('sum', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

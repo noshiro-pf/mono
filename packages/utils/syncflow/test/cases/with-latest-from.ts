@@ -1,26 +1,34 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { interval, map, withLatestFrom } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { DeepReadonly } from '@noshiro/ts-utils';
+import type { Observable } from '../../src';
+import { interval, map, take, withLatestFrom } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
-  withLatest$: Observable<[number, number]>;
-} => {
-  const counter$ = interval(tick, true);
-  const double$ = counter$.chain(map((x) => x * 2));
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  withLatest$: Observable<readonly [number, number]>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(11));
 
+  const double$ = counter$.chain(map((x) => x * 2));
   const withLatest$ = counter$.chain(withLatestFrom(double$));
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     withLatest$,
   };
 };
 
-export const withLatestFromTestCases: [StreamTestCase<[number, number]>] = [
+export const withLatestFromTestCases: readonly [
+  StreamTestCase<[number, number]>
+] = [
   {
     name: 'withLatestFrom case 1',
     expectedOutput: [
@@ -36,21 +44,12 @@ export const withLatestFromTestCases: [StreamTestCase<[number, number]>] = [
       [9, 18],
       [10, 20],
     ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, withLatest$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        withLatest$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+      const { startSource, withLatest$ } = createStreams(tick);
+      return getStreamOutputAsPromise(withLatest$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, withLatest$ } = createStreams(tick);
+      const { startSource, counter$, withLatest$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -59,7 +58,7 @@ export const withLatestFromTestCases: [StreamTestCase<[number, number]>] = [
         console.log('withLatest', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

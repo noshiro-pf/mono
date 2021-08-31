@@ -1,27 +1,35 @@
-import type { FromArrayObservable } from '../../src';
+import type { Observable } from '../../src';
 import { fromArray } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
-const createStream = (): FromArrayObservable<number> =>
-  fromArray([1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
+const createStream = (): Readonly<{
+  startSource: () => void;
+  output$: Observable<number>;
+}> => {
+  const source$ = fromArray([1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
+  return {
+    startSource: () => {
+      source$.emit();
+    },
+    output$: source$,
+  };
+};
 
-export const fromArrayTestCases: [StreamTestCase<number>] = [
+export const fromArrayTestCases: readonly [StreamTestCase<number>] = [
   {
     name: 'fromArray case 1',
     expectedOutput: [1, 1, 2, 3, 5, 8, 13, 21, 34, 55],
-    run: (take: number): Promise<number[]> => {
-      const source$ = createStream();
-      return getStreamOutputAsPromise(source$, take, () => {
-        source$.emit();
-      });
+    run: (): Promise<readonly number[]> => {
+      const { output$, startSource } = createStream();
+      return getStreamOutputAsPromise(output$, startSource);
     },
     preview: (): void => {
-      const source$ = createStream();
-      source$.subscribe((a) => {
+      const { output$, startSource } = createStream();
+      output$.subscribe((a) => {
         console.log('fromArray', a);
       });
-      source$.emit();
+      startSource();
     },
   },
 ];

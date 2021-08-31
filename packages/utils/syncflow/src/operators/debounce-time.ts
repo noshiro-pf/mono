@@ -10,33 +10,33 @@ import type {
 } from '../types';
 
 export const debounceTime =
-  <A>(millisec: number): ToBaseOperator<A, A> =>
+  <A>(milliSeconds: number): ToBaseOperator<A, A> =>
   (parentObservable: Observable<A>) =>
-    new DebounceTimeObservableClass(parentObservable, millisec);
+    new DebounceTimeObservableClass(parentObservable, milliSeconds);
 
 export const debounceTimeI = <A>(
-  millisec: number
+  milliSeconds: number
 ): InitializedToInitializedOperator<A, A> =>
-  debounceTime(millisec) as InitializedToInitializedOperator<A, A>;
+  debounceTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class DebounceTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'debounceTime', [A]>
   implements DebounceTimeOperatorObservable<A>
 {
-  private readonly _millisec: number;
+  private readonly _milliSeconds: number;
   private _timerId: TimerId | undefined;
 
-  constructor(parentObservable: Observable<A>, millisec: number) {
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
       type: 'debounceTime',
       currentValueInit: parentObservable.currentValue,
     });
     this._timerId = undefined;
-    this._millisec = millisec;
+    this._milliSeconds = milliSeconds;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -46,7 +46,7 @@ class DebounceTimeObservableClass<A>
     this._timerId = setTimeout(() => {
       if (Option.isNone(par.currentValue)) return;
       this.startUpdate(par.currentValue.value);
-    }, this._millisec);
+    }, this._milliSeconds);
   }
 
   private resetTimer(): void {
@@ -55,8 +55,7 @@ class DebounceTimeObservableClass<A>
     }
   }
 
-  // overload
-  complete(): void {
+  override complete(): void {
     this.resetTimer();
     super.complete();
   }

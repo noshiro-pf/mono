@@ -1,4 +1,5 @@
 import { testStream } from '../test-stream';
 import { timerTestCases } from './timer';
 
-timerTestCases.forEach(testStream);
+testStream(timerTestCases[0]);
+testStream(timerTestCases[1]);

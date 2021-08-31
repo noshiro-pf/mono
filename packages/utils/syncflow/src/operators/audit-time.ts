@@ -10,24 +10,24 @@ import type {
 } from '../types';
 
 export const auditTime =
-  <A>(millisec: number): ToBaseOperator<A, A> =>
+  <A>(milliSeconds: number): ToBaseOperator<A, A> =>
   (parentObservable: Observable<A>) =>
-    new AuditTimeObservableClass(parentObservable, millisec);
+    new AuditTimeObservableClass(parentObservable, milliSeconds);
 
 export const auditTimeI = <A>(
-  millisec: number
+  milliSeconds: number
 ): InitializedToInitializedOperator<A, A> =>
-  auditTime(millisec) as InitializedToInitializedOperator<A, A>;
+  auditTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class AuditTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'auditTime', [A]>
   implements AuditTimeOperatorObservable<A>
 {
-  private readonly _millisec: number;
+  private readonly _milliSeconds: number;
   private _timerId: TimerId | undefined;
   private _isSkipping: boolean;
 
-  constructor(parentObservable: Observable<A>, millisec: number) {
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
       type: 'auditTime',
@@ -35,10 +35,10 @@ class AuditTimeObservableClass<A>
     });
     this._isSkipping = false;
     this._timerId = undefined;
-    this._millisec = millisec;
+    this._milliSeconds = milliSeconds;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
@@ -50,7 +50,7 @@ class AuditTimeObservableClass<A>
       if (Option.isNone(par.currentValue)) return;
       this.startUpdate(par.currentValue.value);
       this._isSkipping = false;
-    }, this._millisec);
+    }, this._milliSeconds);
   }
 
   private resetTimer(): void {
@@ -59,8 +59,7 @@ class AuditTimeObservableClass<A>
     }
   }
 
-  // overload
-  complete(): void {
+  override complete(): void {
     this.resetTimer();
     super.complete();
   }

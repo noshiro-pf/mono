@@ -68,9 +68,10 @@ export const useAnswerForEditingState = (
   const [resetAnswerForEditingAction$, resetAnswerForEditing] =
     useVoidEventAsStream();
   const resetAnswerForEditing$ = useStream(() =>
-    combineLatest(emptyAnswerSelection$, resetAnswerForEditingAction$).chain(
-      map(([x, _]) => x)
-    )
+    combineLatest([
+      emptyAnswerSelection$,
+      resetAnswerForEditingAction$,
+    ] as const).chain(map(([x, _]) => x))
   );
 
   useStreamEffect(resetAnswerForEditing$, (emptyAnswerSelection) => {

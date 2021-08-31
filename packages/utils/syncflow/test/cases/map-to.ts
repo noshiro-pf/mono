@@ -1,52 +1,48 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { interval, mapTo } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, mapTo, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
-  constant$: Observable<string>;
-} => {
-  const counter$ = interval(tick, true);
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  output$: Observable<string>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(5));
 
-  const constant$ = counter$.chain(mapTo('1'));
+  const output$ = counter$.chain(mapTo('1'));
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
-    constant$,
+    output$,
   };
 };
 
-export const mapToTestCases: [StreamTestCase<string>] = [
+export const mapToTestCases: readonly [StreamTestCase<string>] = [
   {
     name: 'mapTo case 1',
     expectedOutput: ['1', '1', '1', '1', '1'],
-    run: (take: number, tick: number): Promise<string[]> => {
-      const { counter$, constant$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        constant$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly string[]> => {
+      const { startSource, output$ } = createStreams(tick);
+      return getStreamOutputAsPromise(output$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, constant$ } = createStreams(tick);
+      const { startSource, counter$, output$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
       });
-      constant$.subscribe((a) => {
+      output$.subscribe((a) => {
         console.log('constant', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

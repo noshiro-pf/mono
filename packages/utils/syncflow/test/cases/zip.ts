@@ -1,6 +1,7 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { filter, interval, zip } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { DeepReadonly } from '@noshiro/ts-utils';
+import type { Observable } from '../../src';
+import { filter, interval, take, zip } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
@@ -11,19 +12,24 @@ import type { StreamTestCase } from '../typedef';
 */
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
   even$: Observable<number>;
   multiplesOf3$: Observable<number>;
-  zipped$: Observable<[number, number]>;
-} => {
-  const counter$ = interval(tick, true);
+  zipped$: Observable<readonly [number, number]>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(23));
+
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const multiplesOf3$ = counter$.chain(filter((n) => n % 3 === 0));
-
-  const zipped$ = zip(even$, multiplesOf3$);
+  const zipped$ = zip([even$, multiplesOf3$] as const);
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     even$,
     multiplesOf3$,
@@ -31,7 +37,7 @@ const createStreams = (
   };
 };
 
-export const zipTestCases: [StreamTestCase<[number, number]>] = [
+export const zipTestCases: readonly [StreamTestCase<[number, number]>] = [
   {
     name: 'zip case 1',
     expectedOutput: [
@@ -43,26 +49,17 @@ export const zipTestCases: [StreamTestCase<[number, number]>] = [
       [10, 15],
       [12, 18],
       [14, 21],
-      [16, 24],
-      [18, 27],
-      [20, 30],
-      [22, 33],
     ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, zipped$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        zipped$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+      const { startSource, zipped$ } = createStreams(tick);
+      return getStreamOutputAsPromise(zipped$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, even$, multiplesOf3$, zipped$ } = createStreams(tick);
+      const { startSource, counter$, even$, multiplesOf3$, zipped$ } =
+        createStreams(tick);
+      counter$.subscribe((a) => {
+        console.log('counter', a);
+      });
       even$.subscribe((a) => {
         console.log('even', a);
       });
@@ -73,7 +70,7 @@ export const zipTestCases: [StreamTestCase<[number, number]>] = [
         console.log('zipped', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

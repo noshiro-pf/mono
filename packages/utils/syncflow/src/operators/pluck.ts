@@ -35,7 +35,7 @@ class PluckObservableClass<A, K extends keyof A>
     this._key = key;
   }
 
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update

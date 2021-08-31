@@ -19,6 +19,8 @@
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
     "prebuild:cjs": "yarn clean:build:cjs",
     "build:cjs": "tsc --project config/tsconfig.cjs.json",
+    "prebuild:cjs:watch": "yarn prebuild:cjs",
+    "build:cjs:watch": "tsc  --watch --project config/tsconfig.cjs.json",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
     "build": "yarn gi && run-s build:*",
@@ -34,7 +36,8 @@
     "lint": "eslint \"./{src,test}/**/*\" --ext .ts",
     "setup": "echo 'no setup script'",
     "start": "node cjs/test/preview-main.js",
-    "test": "jest --config config/jest.config.json --passWithNoTests",
+    "test": "jest --config config/jest.config.json",
+    "test:detectOpenHandles": "jest --config config/jest.config.json --detectOpenHandles",
     "testw": "yarn test --watch",
     "pub": "yarn publish --patch --no-git-tag-version --access=public"
   },

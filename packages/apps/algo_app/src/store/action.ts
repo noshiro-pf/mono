@@ -21,15 +21,15 @@ export const gameStateActionWithTimerExecution$: Observable<GameStateAction> =
     mergeMap((action): Observable<GameStateAction> => {
       switch (action.type) {
         case 'submitAnswer':
-          return merge(
+          return merge([
             of(action),
             timer(time.showJudge).chain(
               mapTo({ type: 'showJudgeOnDecidedAnswer' as const })
             ),
             timer(time.showJudge + time.hideJudge).chain(
               mapTo({ type: 'hideDecidedAnswerBalloon' as const })
-            )
-          );
+            ),
+          ] as const);
         default:
           return of(action);
       }

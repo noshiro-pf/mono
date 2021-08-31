@@ -1,6 +1,6 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { auditTime, filter, interval, merge } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { auditTime, filter, interval, merge, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
@@ -10,18 +10,26 @@ import type { StreamTestCase } from '../typedef';
 */
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
   filtered$: Observable<number>;
   auditTime$: Observable<number>;
   merged$: Observable<number>;
-} => {
+}> => {
   const emitValues = [1, 3, 4, 10, 13, 16, 17, 18, 19, 20];
-  const counter$ = interval(tick * 2, true);
+
+  const interval$ = interval(tick * 2, true);
+  const counter$ = interval$.chain(take(23));
+
   const filtered$ = counter$.chain(filter((n) => emitValues.includes(n)));
   const auditTime$ = filtered$.chain(auditTime(tick * 5));
-  const merged$ = merge(filtered$, auditTime$);
+  const merged$ = merge([filtered$, auditTime$] as const);
+
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     filtered$,
     auditTime$,
@@ -29,28 +37,19 @@ const createStreams = (
   };
 };
 
-export const auditTimeTestCases: [
+export const auditTimeTestCases: readonly [
   StreamTestCase<number>,
   StreamTestCase<number>
 ] = [
   {
     name: 'auditTime case 1',
     expectedOutput: [3, 4, 10, 13, 18, 20],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, auditTime$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        auditTime$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, auditTime$ } = createStreams(tick);
+      return getStreamOutputAsPromise(auditTime$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, filtered$, auditTime$ } = createStreams(tick);
+      const { startSource, filtered$, auditTime$ } = createStreams(tick);
 
       filtered$.subscribe((a) => {
         console.log('filtered', a);
@@ -59,27 +58,19 @@ export const auditTimeTestCases: [
         console.log('auditTime', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
   {
     name: 'auditTime case 2',
     expectedOutput: [1, 3, 3, 4, 4, 10, 10, 13, 13, 16, 17, 18, 18, 19, 20, 20],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, merged$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        merged$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, merged$ } = createStreams(tick);
+      return getStreamOutputAsPromise(merged$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, filtered$, auditTime$, merged$ } = createStreams(tick);
+      const { startSource, filtered$, auditTime$, merged$ } =
+        createStreams(tick);
 
       filtered$.subscribe((a) => {
         console.log('filtered', a);
@@ -91,7 +82,7 @@ export const auditTimeTestCases: [
         console.log('merged', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

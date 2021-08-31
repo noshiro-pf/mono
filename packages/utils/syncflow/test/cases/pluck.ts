@@ -1,45 +1,41 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { interval, map, pluck } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, map, pluck, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
   pluck$: Observable<string>;
-} => {
-  const counter$ = interval(tick, true);
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(5));
 
   const pluck$ = counter$
     .chain(map((i) => ({ x: i.toString() })))
     .chain(pluck('x'));
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     pluck$,
   };
 };
 
-export const pluckTestCases: [StreamTestCase<string>] = [
+export const pluckTestCases: readonly [StreamTestCase<string>] = [
   {
     name: 'pluck case 1',
     expectedOutput: ['0', '1', '2', '3', '4'],
-    run: (take: number, tick: number): Promise<string[]> => {
-      const { counter$, pluck$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        pluck$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly string[]> => {
+      const { startSource, pluck$ } = createStreams(tick);
+      return getStreamOutputAsPromise(pluck$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, pluck$ } = createStreams(tick);
+      const { startSource, counter$, pluck$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -48,7 +44,7 @@ export const pluckTestCases: [StreamTestCase<string>] = [
         console.log('pluck', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

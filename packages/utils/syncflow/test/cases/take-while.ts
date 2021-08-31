@@ -1,52 +1,48 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { interval, takeWhile } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, take, takeWhile } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
-  take5$: Observable<number>;
-} => {
-  const counter$ = interval(tick, true);
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  takeWhile$: Observable<number>;
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(10));
 
-  const take5$ = counter$.chain(takeWhile((i) => i < 5));
+  const takeWhile$ = counter$.chain(takeWhile((i) => i < 5));
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
-    take5$,
+    takeWhile$,
   };
 };
 
-export const takeWhileTestCases: [StreamTestCase<number>] = [
+export const takeWhileTestCases: readonly [StreamTestCase<number>] = [
   {
     name: 'takeWhile case 1',
     expectedOutput: [0, 1, 2, 3, 4],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, take5$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        take5$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, takeWhile$ } = createStreams(tick);
+      return getStreamOutputAsPromise(takeWhile$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, take5$ } = createStreams(tick);
+      const { startSource, counter$, takeWhile$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
       });
-      take5$.subscribe((a) => {
-        console.log('take', a);
+      takeWhile$.subscribe((a) => {
+        console.log('takeWhile', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

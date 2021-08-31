@@ -1,79 +1,86 @@
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { tuple } from '@noshiro/ts-utils';
-import type { IntervalObservable, Observable } from '../../src';
-import { filter, interval, map, switchMap } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, map, switchMap, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
   counter         0                    1                    2                    3                    4
-  sub counter 1   *     0     0     0     0     0
-  sub counter 2                        *     0     1     2     3     4
-  sub counter 3                                             *     0     2     4     6     8
-  sub counter 4                                                                  *     0     3     6     9     12
-  sub counter 4                                                                                       *     0     4     8     ...
-  switchMap             0     0     0        0     1     2        0     2     4        0     3     6        0     4     8
+  sub counter 1   0     0     0     0     0
+  sub counter 2                        0     1     2     3     4
+  sub counter 3                                             0     2     4     6     8
+  sub counter 4                                                                  0     3     6     9     12
+  sub counter 5                                                                                       0     4     8     ...
+  switchMap       0     0     0     0  0     1     2     3  0     2     4     6  0     3     6     9  0     4     8
 */
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
-  switchMap$: Observable<[number, number]>;
-} => {
-  const counter$ = interval(tick * 7, true);
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
+  switchMap$: Observable<readonly [number, number]>;
+}> => {
+  const interval$ = interval(tick * 3.5, true);
+  const counter$ = interval$.chain(take(10));
 
-  const switchMap$ = counter$.chain(
+  const switchMap$ = counter$.chain(take(7)).chain(
     switchMap((i) =>
-      interval(tick * 2)
-        .chain(filter((j) => j < 5))
+      interval(tick)
+        .chain(take(5))
         .chain(map((x) => tuple(i, x * i)))
     )
   );
 
-  return { counter$, switchMap$ };
+  return {
+    startSource: () => {
+      interval$.start();
+    },
+    counter$,
+    switchMap$,
+  };
 };
 
-export const switchMapTestCases: [StreamTestCase<[number, number]>] = [
+export const switchMapTestCases: readonly [StreamTestCase<[number, number]>] = [
   {
     name: 'switchMap case 1',
     expectedOutput: [
       [0, 0],
       [0, 0],
       [0, 0],
+      [0, 0],
       [1, 0],
       [1, 1],
       [1, 2],
+      [1, 3],
       [2, 0],
       [2, 2],
       [2, 4],
+      [2, 6],
       [3, 0],
       [3, 3],
       [3, 6],
+      [3, 9],
       [4, 0],
       [4, 4],
       [4, 8],
+      [4, 12],
       [5, 0],
       [5, 5],
       [5, 10],
+      [5, 15],
       [6, 0],
       [6, 6],
       [6, 12],
+      [6, 18],
     ],
-    run: (take: number, tick: number): Promise<[number, number][]> => {
-      const { counter$, switchMap$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        switchMap$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+      const { startSource, switchMap$ } = createStreams(tick);
+      return getStreamOutputAsPromise(switchMap$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, switchMap$ } = createStreams(tick / 3.5);
+      const { startSource, counter$, switchMap$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -82,7 +89,7 @@ export const switchMapTestCases: [StreamTestCase<[number, number]>] = [
         console.log('switchMap', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];

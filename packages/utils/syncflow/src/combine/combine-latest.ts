@@ -2,9 +2,11 @@ import type { TypeExtends } from '@noshiro/ts-utils';
 import { assertType, Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
+import { withInitialValue } from '../operators';
 import type {
   CombineLatestObservable,
   InitializedCombineLatestObservable,
+  InitializedSyncChildObservable,
   NonEmptyUnknownList,
   SyncChildObservable,
   Token,
@@ -13,11 +15,11 @@ import type {
 } from '../types';
 
 export const combineLatest = <A extends NonEmptyUnknownList>(
-  ...parents: Wrap<A>
+  parents: Wrap<A>
 ): CombineLatestObservable<A> => new CombineLatestObservableClass(parents);
 
 export const combineLatestI = <A extends NonEmptyUnknownList>(
-  ...parents: WrapInitialized<A>
+  parents: WrapInitialized<A>
 ): InitializedCombineLatestObservable<A> =>
   new CombineLatestObservableClass(
     parents as Wrap<A>
@@ -40,8 +42,7 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
     });
   }
 
-  // overload
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     if (this.parents.every((o) => o.token !== token)) return; // all parents are skipped
 
     const parentValues = this.parents.map((a) => a.currentValue);
@@ -56,7 +57,27 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
 
 const r1 = fromArray([1, 2, 3]);
 const r2 = fromArray(['a', 'b', 'c']);
-const cm = combineLatest(r1, r2);
+
+const cm = combineLatest([r1, r2] as const);
+
+const cmi = combineLatestI([
+  r1.chain(withInitialValue(0)),
+  r2.chain(withInitialValue(0)),
+] as const);
+
 assertType<
-  TypeExtends<typeof cm, SyncChildObservable<[number, string], 'combineLatest'>>
+  TypeExtends<
+    typeof cm,
+    SyncChildObservable<readonly [number, string], 'combineLatest'>
+  >
+>();
+
+assertType<
+  TypeExtends<
+    typeof cmi,
+    InitializedSyncChildObservable<
+      readonly [number, number | string],
+      'combineLatest'
+    >
+  >
 >();

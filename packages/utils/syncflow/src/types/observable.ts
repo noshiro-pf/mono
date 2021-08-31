@@ -36,6 +36,9 @@ export type ObservableBase<A> = Readonly<{
   currentValue: Option<A>;
   isCompleted: boolean;
   token: Token;
+  hasSubscriber: boolean;
+  hasChild: boolean;
+  hasActiveChild: () => boolean;
 
   tryUpdate: (token: Token) => void;
   tryComplete: () => void;

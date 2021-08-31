@@ -2,7 +2,9 @@ import type { TypeExtends } from '@noshiro/ts-utils';
 import { assertType, createQueue, Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
+import { withInitialValue } from '../operators';
 import type {
+  InitializedSyncChildObservable,
   InitializedZipObservable,
   NonEmptyUnknownList,
   SyncChildObservable,
@@ -14,11 +16,11 @@ import type {
 } from '../types';
 
 export const zip = <A extends NonEmptyUnknownList>(
-  ...parents: Wrap<A>
+  parents: Wrap<A>
 ): ZipObservable<A> => new ZipObservableClass(parents);
 
 export const zipI = <A extends NonEmptyUnknownList>(
-  ...parents: WrapInitialized<A>
+  parents: WrapInitialized<A>
 ): InitializedZipObservable<A> =>
   new ZipObservableClass(parents as Wrap<A>) as InitializedZipObservable<A>;
 
@@ -41,8 +43,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     this._queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
   }
 
-  // overload
-  tryUpdate(token: Token): void {
+  override tryUpdate(token: Token): void {
     const queues = this._queues;
     this.parents.forEach((par, index) => {
       if (par.token === token) {
@@ -63,7 +64,21 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
 
 const r1 = fromArray([1, 2, 3]);
 const r2 = fromArray(['a', 'b', 'c']);
-const z = zip(r1, r2);
+
+const z = zip([r1, r2] as const);
+
+const zi = zipI([
+  r1.chain(withInitialValue(0)),
+  r2.chain(withInitialValue('0')),
+] as const);
+
 assertType<
-  TypeExtends<typeof z, SyncChildObservable<[number, string], 'zip'>>
+  TypeExtends<typeof z, SyncChildObservable<readonly [number, string], 'zip'>>
+>();
+
+assertType<
+  TypeExtends<
+    typeof zi,
+    InitializedSyncChildObservable<readonly [number, string], 'zip'>
+  >
 >();

@@ -1,23 +1,28 @@
-import type { IntervalObservable, Observable } from '../../src';
-import { interval, map } from '../../src';
-import { getStreamOutputAsPromise } from '../get-strem-output-as-promise';
+import type { Observable } from '../../src';
+import { interval, map, take } from '../../src';
+import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number
-): {
-  counter$: IntervalObservable;
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<number>;
   double$: Observable<number>;
   quad1$: Observable<number>;
   quad2$: Observable<number>;
-} => {
-  const counter$ = interval(tick, true);
+}> => {
+  const interval$ = interval(tick, true);
+  const counter$ = interval$.chain(take(11));
 
   const double$ = counter$.chain(map((x) => x * 2));
   const quad1$ = double$.chain(map((x) => x * 2));
   const quad2$ = counter$.chain(map((x) => x * 2)).chain(map((x) => x * 2));
 
   return {
+    startSource: () => {
+      interval$.start();
+    },
     counter$,
     double$,
     quad1$,
@@ -25,7 +30,7 @@ const createStreams = (
   };
 };
 
-export const mapTestCases: [
+export const mapTestCases: readonly [
   StreamTestCase<number>,
   StreamTestCase<number>,
   StreamTestCase<number>
@@ -33,21 +38,14 @@ export const mapTestCases: [
   {
     name: 'map case 1',
     expectedOutput: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, double$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        double$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, double$ } = createStreams(tick);
+      return getStreamOutputAsPromise(double$, () => {
+        startSource();
+      });
     },
     preview: (tick: number): void => {
-      const { counter$, double$ } = createStreams(tick);
+      const { startSource, counter$, double$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -56,27 +54,18 @@ export const mapTestCases: [
         console.log('double', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
   {
     name: 'map case 2',
     expectedOutput: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, quad1$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        quad1$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, quad1$ } = createStreams(tick);
+      return getStreamOutputAsPromise(quad1$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, quad1$ } = createStreams(tick);
+      const { startSource, counter$, quad1$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -85,27 +74,18 @@ export const mapTestCases: [
         console.log('quad1', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
   {
     name: 'map case 3',
     expectedOutput: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40],
-    run: (take: number, tick: number): Promise<number[]> => {
-      const { counter$, quad1$ } = createStreams(tick);
-      return getStreamOutputAsPromise(
-        quad1$,
-        take,
-        () => {
-          counter$.start();
-        },
-        () => {
-          counter$.complete();
-        }
-      );
+    run: (tick: number): Promise<readonly number[]> => {
+      const { startSource, quad1$ } = createStreams(tick);
+      return getStreamOutputAsPromise(quad1$, startSource);
     },
     preview: (tick: number): void => {
-      const { counter$, quad2$ } = createStreams(tick);
+      const { startSource, counter$, quad2$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
         console.log('counter', a);
@@ -114,7 +94,7 @@ export const mapTestCases: [
         console.log('quad2', a);
       });
 
-      counter$.start();
+      startSource();
     },
   },
 ];
