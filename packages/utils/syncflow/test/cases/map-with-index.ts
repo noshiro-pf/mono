@@ -54,7 +54,7 @@ export const mapWithIndexTestCases: readonly [
       const { startSource, counter$, doubleWithIndex$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter        ', a);
       });
       doubleWithIndex$.subscribe((a) => {
         console.log('doubleWithIndex', a);

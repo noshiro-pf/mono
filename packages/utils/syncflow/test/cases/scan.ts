@@ -39,7 +39,7 @@ export const scanTestCases: readonly [StreamTestCase<number>] = [
         console.log('counter', a);
       });
       scan$.subscribe((a) => {
-        console.log('scan', a);
+        console.log('scan   ', a);
       });
 
       startSource();

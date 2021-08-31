@@ -6,6 +6,7 @@ import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
+  (tick)          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9
   counter         0                    1                    2                    3                    4
   sub counter 1   0     0     0     0     0
   sub counter 2                        0     1     2     3     4
@@ -23,12 +24,12 @@ const createStreams = (
   counter$: Observable<number>;
   mergeMap$: Observable<readonly [number, number]>;
 }> => {
-  const interval$ = interval(tick * 3.5, true);
+  const interval$ = interval(tick * 7, true);
   const counter$ = interval$.chain(take(7));
 
   const mergeMap$ = counter$.chain(take(5)).chain(
     mergeMap((i) =>
-      interval(tick)
+      interval(tick * 2)
         .chain(take(5))
         .chain(map((x) => tuple(i, x * i)))
     )
@@ -80,7 +81,7 @@ export const mergeMapTestCases: readonly [StreamTestCase<[number, number]>] = [
       const { startSource, counter$, mergeMap$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter ', a);
       });
       mergeMap$.subscribe((a) => {
         console.log('mergeMap', a);

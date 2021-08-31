@@ -20,7 +20,7 @@ export const throttleTimeI = <A>(
   throttleTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class ThrottleTimeObservableClass<A>
-  extends SyncChildObservableClass<A, 'throttleTime', [A]>
+  extends SyncChildObservableClass<A, 'throttleTime', readonly [A]>
   implements ThrottleTimeOperatorObservable<A>
 {
   private readonly _milliSeconds: number;

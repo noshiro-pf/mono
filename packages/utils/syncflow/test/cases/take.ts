@@ -39,7 +39,7 @@ export const takeTestCases: readonly [StreamTestCase<number>] = [
         console.log('counter', a);
       });
       take5$.subscribe((a) => {
-        console.log('take', a);
+        console.log('take   ', a);
       });
 
       startSource();

@@ -13,7 +13,11 @@ export const withInitialValue =
     new WithInitialValueObservableClass(parentObservable, initialValue);
 
 class WithInitialValueObservableClass<A, I>
-  extends InitializedSyncChildObservableClass<A | I, 'withInitialValue', [A]>
+  extends InitializedSyncChildObservableClass<
+    A | I,
+    'withInitialValue',
+    readonly [A]
+  >
   implements WithInitialValueOperatorObservable<A, I>
 {
   constructor(parentObservable: Observable<A>, initialValue: I) {

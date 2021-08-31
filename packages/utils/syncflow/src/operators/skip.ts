@@ -16,7 +16,7 @@ export const skip =
       : new SkipObservableClass(parentObservable, n);
 
 class SkipObservableClass<A>
-  extends SyncChildObservableClass<A, 'skip', [A]>
+  extends SyncChildObservableClass<A, 'skip', readonly [A]>
   implements SkipOperatorObservable<A>
 {
   private readonly _n: number;

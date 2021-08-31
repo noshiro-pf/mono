@@ -13,7 +13,7 @@ export const takeWhile =
     new TakeWhileObservableClass(parentObservable, predicate);
 
 class TakeWhileObservableClass<A>
-  extends SyncChildObservableClass<A, 'takeWhile', [A]>
+  extends SyncChildObservableClass<A, 'takeWhile', readonly [A]>
   implements TakeWhileOperatorObservable<A>
 {
   private readonly _predicate: (value: A) => boolean;

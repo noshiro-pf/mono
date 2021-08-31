@@ -51,7 +51,7 @@ export const mapTestCases: readonly [
         console.log('counter', a);
       });
       double$.subscribe((a) => {
-        console.log('double', a);
+        console.log('double ', a);
       });
 
       startSource();
@@ -71,7 +71,7 @@ export const mapTestCases: readonly [
         console.log('counter', a);
       });
       quad1$.subscribe((a) => {
-        console.log('quad1', a);
+        console.log('quad1  ', a);
       });
 
       startSource();
@@ -91,7 +91,7 @@ export const mapTestCases: readonly [
         console.log('counter', a);
       });
       quad2$.subscribe((a) => {
-        console.log('quad2', a);
+        console.log('quad2  ', a);
       });
 
       startSource();

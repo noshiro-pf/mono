@@ -20,7 +20,7 @@ export const debounceTimeI = <A>(
   debounceTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class DebounceTimeObservableClass<A>
-  extends AsyncChildObservableClass<A, 'debounceTime', [A]>
+  extends AsyncChildObservableClass<A, 'debounceTime', readonly [A]>
   implements DebounceTimeOperatorObservable<A>
 {
   private readonly _milliSeconds: number;

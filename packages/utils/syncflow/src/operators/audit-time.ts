@@ -20,7 +20,7 @@ export const auditTimeI = <A>(
   auditTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class AuditTimeObservableClass<A>
-  extends AsyncChildObservableClass<A, 'auditTime', [A]>
+  extends AsyncChildObservableClass<A, 'auditTime', readonly [A]>
   implements AuditTimeOperatorObservable<A>
 {
   private readonly _milliSeconds: number;

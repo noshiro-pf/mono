@@ -13,7 +13,7 @@ export const skipWhile =
     new SkipWhileObservableClass(parentObservable, predicate);
 
 class SkipWhileObservableClass<A>
-  extends SyncChildObservableClass<A, 'skipWhile', [A]>
+  extends SyncChildObservableClass<A, 'skipWhile', readonly [A]>
   implements SkipWhileOperatorObservable<A>
 {
   private readonly _predicate: (value: A) => boolean;

@@ -41,7 +41,7 @@ export const pluckTestCases: readonly [StreamTestCase<string>] = [
         console.log('counter', a);
       });
       pluck$.subscribe((a) => {
-        console.log('pluck', a);
+        console.log('pluck  ', a);
       });
 
       startSource();

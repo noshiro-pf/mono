@@ -58,16 +58,16 @@ export const zipTestCases: readonly [StreamTestCase<[number, number]>] = [
       const { startSource, counter$, even$, multiplesOf3$, zipped$ } =
         createStreams(tick);
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter     ', a);
       });
       even$.subscribe((a) => {
-        console.log('even', a);
+        console.log('even        ', a);
       });
       multiplesOf3$.subscribe((a) => {
         console.log('multiplesOf3', a);
       });
       zipped$.subscribe((a) => {
-        console.log('zipped', a);
+        console.log('zipped      ', a);
       });
 
       startSource();

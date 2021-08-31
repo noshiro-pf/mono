@@ -4,18 +4,28 @@ import { filter, interval, take, withBufferedFrom } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
+/*
+  (tick)            0   1   2   3   4   5   6   7   8   9   10
+  counter           0   1   2   3   4   5   6   7   8   9   10
+  filtered              1   2       4   5       7   8       10
+  sampleCounter     0           1           2           3           4
+  withBufferedFrom
+*/
+
 const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<number>;
+  filtered$: Observable<number>;
+  sampleCounter$: Observable<number>;
   withBufferedFrom$: Observable<DeepReadonly<[number, number[]]>>;
 }> => {
   const interval$ = interval(tick, true);
   const counter$ = interval$.chain(take(11));
 
   const filtered$ = counter$.chain(filter((x) => x % 3 !== 0));
-  const sampleInterval$ = interval(tick * 3);
+  const sampleInterval$ = interval(tick * 3, true);
   const sampleCounter$ = sampleInterval$.chain(take(5));
 
   const withBufferedFrom$ = sampleCounter$.chain(withBufferedFrom(filtered$));
@@ -26,6 +36,8 @@ const createStreams = (
       sampleInterval$.start();
     },
     counter$,
+    filtered$,
+    sampleCounter$,
     withBufferedFrom$,
   };
 };
@@ -34,32 +46,38 @@ export const withBufferedFromTestCases: readonly [
   StreamTestCase<[number, number[]]>
 ] = [
   {
-    name: 'withLatestFrom case 1',
+    name: 'withBufferedFrom case 1',
     expectedOutput: [
-      [0, [1, 2]],
-      [1, [4, 5]],
-      [2, [7, 8]],
-      [3, [10, 11]],
-      [4, [13, 14]],
-      [5, [16, 17]],
-      [6, [19, 20]],
-      [7, [22, 23]],
-      [8, [25, 26]],
-      [9, [28, 29]],
-      [10, [31, 32]],
+      [0, []],
+      [1, [1, 2]],
+      [2, [4, 5]],
+      [3, [7, 8]],
+      [4, [10]],
     ],
     run: (tick: number): Promise<DeepReadonly<[number, number[]][]>> => {
       const { startSource, withBufferedFrom$ } = createStreams(tick);
       return getStreamOutputAsPromise(withBufferedFrom$, startSource);
     },
     preview: (tick: number): void => {
-      const { startSource, counter$, withBufferedFrom$ } = createStreams(tick);
+      const {
+        startSource,
+        counter$,
+        filtered$,
+        sampleCounter$,
+        withBufferedFrom$,
+      } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter          ', a);
+      });
+      filtered$.subscribe((a) => {
+        console.log('filtered         ', a);
+      });
+      sampleCounter$.subscribe((a) => {
+        console.log('sampleCounter    ', a);
       });
       withBufferedFrom$.subscribe((a) => {
-        console.log('withLatest', a);
+        console.log('withBufferedFrom ', a);
       });
 
       startSource();

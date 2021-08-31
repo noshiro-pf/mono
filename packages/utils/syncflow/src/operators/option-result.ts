@@ -93,7 +93,11 @@ export const mapResultErrI = <S, E, E2>(
   >;
 
 class UnwrapOptionObservableClass<A>
-  extends SyncChildObservableClass<A | undefined, 'unwrapOption', [Option<A>]>
+  extends SyncChildObservableClass<
+    A | undefined,
+    'unwrapOption',
+    readonly [Option<A>]
+  >
   implements UnwrapOptionOperatorObservable<A>
 {
   constructor(parentObservable: Observable<Option<A>>) {
@@ -119,7 +123,7 @@ class UnwrapResultOkObservableClass<S, E>
   extends SyncChildObservableClass<
     S | undefined,
     'unwrapResultOk',
-    [Result<S, E>]
+    readonly [Result<S, E>]
   >
   implements UnwrapResultOkOperatorObservable<S, E>
 {
@@ -146,7 +150,7 @@ class UnwrapResultErrObservableClass<S, E>
   extends SyncChildObservableClass<
     E | undefined,
     'unwrapResultErr',
-    [Result<S, E>]
+    readonly [Result<S, E>]
   >
   implements UnwrapResultErrOperatorObservable<S, E>
 {
@@ -170,7 +174,7 @@ class UnwrapResultErrObservableClass<S, E>
 }
 
 class MapOptionObservableClass<A, B>
-  extends SyncChildObservableClass<Option<B>, 'mapOption', [Option<A>]>
+  extends SyncChildObservableClass<Option<B>, 'mapOption', readonly [Option<A>]>
   implements MapOptionOperatorObservable<A, B>
 {
   private readonly _mapFn: (x: A) => B;
@@ -196,7 +200,11 @@ class MapOptionObservableClass<A, B>
 }
 
 class MapResultOkObservableClass<S, S2, E>
-  extends SyncChildObservableClass<Result<S2, E>, 'mapResultOk', [Result<S, E>]>
+  extends SyncChildObservableClass<
+    Result<S2, E>,
+    'mapResultOk',
+    readonly [Result<S, E>]
+  >
   implements MapResultOkOperatorObservable<S, S2, E>
 {
   private readonly _mapFn: (x: S) => S2;
@@ -228,7 +236,7 @@ class MapResultErrObservableClass<S, E, E2>
   extends SyncChildObservableClass<
     Result<S, E2>,
     'mapResultErr',
-    [Result<S, E>]
+    readonly [Result<S, E>]
   >
   implements MapResultErrOperatorObservable<S, E, E2>
 {

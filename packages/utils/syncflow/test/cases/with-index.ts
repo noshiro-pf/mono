@@ -49,7 +49,7 @@ export const withIndexTestCases: readonly [StreamTestCase<[number, number]>] = [
       const { startSource, counter$, doubleWithIndex$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter        ', a);
       });
       doubleWithIndex$.subscribe((a) => {
         console.log('doubleWithIndex', a);

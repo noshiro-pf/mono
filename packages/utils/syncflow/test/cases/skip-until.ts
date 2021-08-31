@@ -4,7 +4,7 @@ import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
 /*
-            0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+  (tick)    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
   counter   0       1       2       3       4       5       6       7       8       9
   timer                                         *
   skipUntil                                         5       6       7       8       9
@@ -48,10 +48,10 @@ export const skipUntilTestCases: readonly [StreamTestCase<number>] = [
       const { startSource, counter$, timer$, skipUntil$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter  ', a);
       });
       timer$.subscribe((a) => {
-        console.log('timer', a);
+        console.log('timer    ', a);
       });
       skipUntil$.subscribe((a) => {
         console.log('skipUntil', a);

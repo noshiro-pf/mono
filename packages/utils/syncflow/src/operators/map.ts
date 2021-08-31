@@ -19,7 +19,7 @@ export const mapI = <A, B>(
   map(mapFn) as InitializedToInitializedOperator<A, B>;
 
 class MapObservableClass<A, B>
-  extends SyncChildObservableClass<B, 'map', [A]>
+  extends SyncChildObservableClass<B, 'map', readonly [A]>
   implements MapOperatorObservable<A, B>
 {
   private readonly _mapFn: (x: A) => B;

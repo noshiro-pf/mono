@@ -1,5 +1,5 @@
-import type { Option } from '@noshiro/ts-utils';
-import { isArrayOfLength1OrMore } from '@noshiro/ts-utils';
+import type { Option, uint32 } from '@noshiro/ts-utils';
+import { IList, isArrayOfLength1OrMore } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
   AsyncChildObservableType,
@@ -79,7 +79,7 @@ export class AsyncChildObservableClass<
 {
   override readonly type: Type;
   readonly parents;
-  private readonly procedure: ChildObservable<unknown>[];
+  private _procedure: readonly ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: Set<ObservableId>;
 
   constructor({
@@ -101,7 +101,7 @@ export class AsyncChildObservableClass<
     });
     this.type = type;
     this.parents = parents;
-    this.procedure = [];
+    this._procedure = [];
     this._descendantsIdSet = new Set<ObservableId>();
     registerChild(this, parents);
   }
@@ -112,17 +112,17 @@ export class AsyncChildObservableClass<
     this._descendantsIdSet.add(child.id);
 
     const insertPos = binarySearch(
-      this.procedure.map((a) => a.depth),
+      this._procedure.map((a) => a.depth),
       child.depth
     );
-    this.procedure.splice(insertPos, 0, child);
+    this._procedure = IList.insert(this._procedure, insertPos as uint32, child);
   }
 
   startUpdate(nextValue: A): void {
     const token = issueToken();
     this.setNext(nextValue, token);
 
-    this.procedure.forEach((p) => {
+    this._procedure.forEach((p) => {
       p.tryUpdate(token);
     });
   }

@@ -39,16 +39,16 @@ export type TimerObservable = RootObservable<number, 'Timer'> & {
   start: () => TimerObservable;
 };
 
-// InitilaizedSyncChildObservable
+// InitializedSyncChildObservable
 
 export type WithInitialValueOperatorObservable<
   A,
   I = A
-> = InitializedSyncChildObservable<A | I, 'withInitialValue', [A]>;
+> = InitializedSyncChildObservable<A | I, 'withInitialValue', readonly [A]>;
 export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
   B,
   'scan',
-  [A]
+  readonly [A]
 >;
 
 // SyncChildObservable
@@ -74,106 +74,118 @@ export type InitializedMergeObservable<P extends NonEmptyUnknownList> =
 export type MergeObservable<P extends NonEmptyUnknownList> =
   SyncChildObservable<ArrayElement<P>, 'merge', P>;
 
-export type MapOperatorObservable<A, B> = SyncChildObservable<B, 'map', [A]>;
+export type MapOperatorObservable<A, B> = SyncChildObservable<
+  B,
+  'map',
+  readonly [A]
+>;
 export type MapWithIndexOperatorObservable<A, B> = SyncChildObservable<
   B,
   'mapWithIndex',
-  [A]
+  readonly [A]
 >;
 export type MapToOperatorObservable<A, B> = SyncChildObservable<
   B,
   'mapTo',
-  [A]
+  readonly [A]
 >;
 export type PluckOperatorObservable<A, K extends keyof A> = SyncChildObservable<
   A[K],
   'pluck',
-  [A]
+  readonly [A]
 >;
 export type UnwrapOptionOperatorObservable<A> = SyncChildObservable<
   A | undefined,
   'unwrapOption',
-  [Option<A>]
+  readonly [Option<A>]
 >;
 export type UnwrapResultOkOperatorObservable<S, E> = SyncChildObservable<
   S | undefined,
   'unwrapResultOk',
-  [Result<S, E>]
+  readonly [Result<S, E>]
 >;
 export type UnwrapResultErrOperatorObservable<S, E> = SyncChildObservable<
   E | undefined,
   'unwrapResultErr',
-  [Result<S, E>]
+  readonly [Result<S, E>]
 >;
 export type MapOptionOperatorObservable<A, B> = SyncChildObservable<
   Option<B>,
   'mapOption',
-  [Option<A>]
+  readonly [Option<A>]
 >;
 export type MapResultOkOperatorObservable<S, S2, E> = SyncChildObservable<
   Result<S2, E>,
   'mapResultOk',
-  [Result<S, E>]
+  readonly [Result<S, E>]
 >;
 export type MapResultErrOperatorObservable<S, E, E2> = SyncChildObservable<
   Result<S, E2>,
   'mapResultErr',
-  [Result<S, E>]
+  readonly [Result<S, E>]
 >;
 export type WithIndexOperatorObservable<A> = SyncChildObservable<
-  [number, A],
+  readonly [number, A],
   'withIndex',
-  [A]
+  readonly [A]
 >;
 export type PairwiseOperatorObservable<A> = SyncChildObservable<
-  [A, A],
+  readonly [A, A],
   'pairwise',
-  [A]
+  readonly [A]
 >;
 
 export type TakeOperatorObservable<A> = SyncChildObservable<A, 'take', [A]>;
 export type TakeWhileOperatorObservable<A> = SyncChildObservable<
   A,
   'takeWhile',
-  [A]
+  readonly [A]
 >;
 export type TakeUntilOperatorObservable<A> = SyncChildObservable<
   A,
   'takeUntil',
-  [A]
+  readonly [A]
 >;
-export type SkipOperatorObservable<A> = SyncChildObservable<A, 'skip', [A]>;
+export type SkipOperatorObservable<A> = SyncChildObservable<
+  A,
+  'skip',
+  readonly [A]
+>;
 export type SkipWhileOperatorObservable<A> = SyncChildObservable<
   A,
   'skipWhile',
-  [A]
+  readonly [A]
 >;
 export type SkipUntilOperatorObservable<A> = SyncChildObservable<
   A,
   'skipUntil',
-  [A]
+  readonly [A]
 >;
 export type WithLatestFromOperatorObservable<A, B> = SyncChildObservable<
-  [A, B],
+  readonly [A, B],
   'withLatestFrom',
-  [A]
+  readonly [A]
 >;
 export type WithBufferedFromOperatorObservable<A, B> = SyncChildObservable<
-  [A, B[]],
+  readonly [A, readonly B[]],
   'withBufferedFrom',
-  [A]
+  readonly [A]
 >;
 
-export type FilterOperatorObservable<A> = SyncChildObservable<A, 'filter', [A]>;
+export type FilterOperatorObservable<A> = SyncChildObservable<
+  A,
+  'filter',
+  readonly [A]
+>;
 export type DistinctUntilChangedOperatorObservable<A> = SyncChildObservable<
   A,
   'distinctUntilChanged',
-  [A]
+  readonly [A]
 >;
 export type ThrottleTimeOperatorObservable<A> = SyncChildObservable<
   A,
   'throttleTime',
-  [A]
+  readonly [A]
 >;
 
 // AsyncChildObservable
@@ -181,20 +193,20 @@ export type ThrottleTimeOperatorObservable<A> = SyncChildObservable<
 export type AuditTimeOperatorObservable<A> = AsyncChildObservable<
   A,
   'auditTime',
-  [A]
+  readonly [A]
 >;
 export type DebounceTimeOperatorObservable<A> = AsyncChildObservable<
   A,
   'debounceTime',
-  [A]
+  readonly [A]
 >;
 export type SwitchMapOperatorObservable<A, B> = AsyncChildObservable<
   B,
   'switchMap',
-  [A]
+  readonly [A]
 >;
 export type MergeMapOperatorObservable<A, B> = AsyncChildObservable<
   B,
   'mergeMap',
-  [A]
+  readonly [A]
 >;

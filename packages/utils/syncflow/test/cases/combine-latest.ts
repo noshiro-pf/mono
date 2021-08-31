@@ -117,22 +117,22 @@ export const combineLatestTestCases: readonly [
       } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter   ', a);
       });
       double$.subscribe((a) => {
-        console.log('double', a);
+        console.log('double    ', a);
       });
       quad$.subscribe((a) => {
-        console.log('quad', a);
+        console.log('quad      ', a);
       });
       square$.subscribe((a) => {
-        console.log('square', a);
+        console.log('square    ', a);
       });
       squareEven$.subscribe((a) => {
         console.log('squareEven', a);
       });
       combined$.subscribe((a) => {
-        console.log('combined', a);
+        console.log('combined  ', a);
       });
 
       startSource();
@@ -152,7 +152,7 @@ export const combineLatestTestCases: readonly [
         console.log('counter', a);
       });
       sum$.subscribe((a) => {
-        console.log('sum', a);
+        console.log('sum    ', a);
       });
 
       startSource();

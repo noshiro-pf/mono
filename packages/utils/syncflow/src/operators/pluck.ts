@@ -19,7 +19,7 @@ export const pluckI = <A, K extends keyof A>(
   pluck(key) as InitializedToInitializedOperator<A, A[K]>;
 
 class PluckObservableClass<A, K extends keyof A>
-  extends SyncChildObservableClass<A[K], 'pluck', [A]>
+  extends SyncChildObservableClass<A[K], 'pluck', readonly [A]>
   implements PluckOperatorObservable<A, K>
 {
   private readonly _key: K;

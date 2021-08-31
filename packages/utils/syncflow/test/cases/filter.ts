@@ -22,6 +22,7 @@ const createStreams = (
 
   const even$ = counter$.chain(filter((n) => n % 2 === 0));
   const filtered$ = counter$.chain(filter((n) => n % 10 < 5));
+
   return {
     startSource: () => {
       interval$.start();
@@ -44,10 +45,10 @@ export const filterTestCases: readonly [StreamTestCase<number>] = [
       const { startSource, counter$, even$, filtered$ } = createStreams(tick);
 
       counter$.subscribe((a) => {
-        console.log('counter', a);
+        console.log('counter ', a);
       });
       even$.subscribe((a) => {
-        console.log('even', a);
+        console.log('even    ', a);
       });
       filtered$.subscribe((a) => {
         console.log('filtered', a);

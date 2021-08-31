@@ -102,7 +102,7 @@ const printSeparator = (): void => {
   console.log('---------------------------------');
 };
 
-const printIsPreviewMode = (isPreviewMode: boolean): void => {
+const printMode = (isPreviewMode: boolean): void => {
   console.log(`mode: ${isPreviewMode ? 'preview' : 'dump'}`);
 };
 
@@ -164,7 +164,7 @@ const main = (): void => {
   const { isPreviewMode, exampleIdx, testCaseIdx } = getArgs();
 
   console.log('');
-  printIsPreviewMode(isPreviewMode);
+  printMode(isPreviewMode);
   console.log('');
   printExamples(exampleIdx);
   console.log('');
