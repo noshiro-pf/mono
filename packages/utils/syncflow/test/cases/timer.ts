@@ -4,6 +4,14 @@ import { combineLatest, interval, take, timer } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
 
+/*
+            0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+  counter   0       1       2       3       4       5       6
+  timer1                *
+  timer2                        *
+  combined                      *   *       *       *       *
+*/
+
 const createStreams = (
   tick: number
 ): Readonly<{
@@ -13,10 +21,10 @@ const createStreams = (
   counter$: Observable<number>;
   combined$: Observable<readonly [number, number, number]>;
 }> => {
-  const timer1$ = timer(tick, true);
-  const timer2$ = timer(tick * 2, true);
-  const interval$ = interval(tick, true);
-  const counter$ = interval$.chain(take(3));
+  const timer1$ = timer(tick * 3, true);
+  const timer2$ = timer(tick * 5, true);
+  const interval$ = interval(tick * 2, true);
+  const counter$ = interval$.chain(take(7));
   const combined$ = combineLatest([timer1$, timer2$, counter$] as const);
 
   return {
@@ -55,8 +63,11 @@ export const timerTestCases: readonly [
   {
     name: 'timer case 1',
     expectedOutput: [
-      [0, 0, 1],
       [0, 0, 2],
+      [0, 0, 3],
+      [0, 0, 4],
+      [0, 0, 5],
+      [0, 0, 6],
     ],
     run: (tick: number): Promise<DeepReadonly<[number, number, number][]>> => {
       const { combined$, startSource } = createStreams(tick);

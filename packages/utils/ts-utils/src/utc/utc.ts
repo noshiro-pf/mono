@@ -106,13 +106,13 @@ export namespace utc {
       seconds,
       milliseconds,
     }: Readonly<{
-      year?: YearEnum;
-      month?: MonthEnum;
-      date?: DateEnum;
-      hours?: HoursEnum;
-      minutes?: MinutesEnum;
-      seconds?: SecondsEnum;
-      milliseconds?: MillisecondsEnum;
+      year: YearEnum | undefined;
+      month: MonthEnum | undefined;
+      date: DateEnum | undefined;
+      hours: HoursEnum | undefined;
+      minutes: MinutesEnum | undefined;
+      seconds: SecondsEnum | undefined;
+      milliseconds: MillisecondsEnum | undefined;
     }>) =>
     (u: UTC): UTC => {
       const d = new Date(u);
@@ -150,13 +150,13 @@ export namespace utc {
       seconds,
       milliseconds,
     }: Readonly<{
-      year?: YearEnum;
-      month?: MonthEnum;
-      date?: DateEnum;
-      hours?: HoursEnum;
-      minutes?: MinutesEnum;
-      seconds?: SecondsEnum;
-      milliseconds?: MillisecondsEnum;
+      year: YearEnum | undefined;
+      month: MonthEnum | undefined;
+      date: DateEnum | undefined;
+      hours: HoursEnum | undefined;
+      minutes: MinutesEnum | undefined;
+      seconds: SecondsEnum | undefined;
+      milliseconds: MillisecondsEnum | undefined;
     }>) =>
     (u: UTC): UTC => {
       const d = new Date(u);
@@ -302,32 +302,38 @@ export namespace utc {
     };
 
   export const toLocaleYMDHM =
-    (YMDdelimiter: string = '/', HMdelimiter: string = ':') =>
+    (YMDDelimiter: string = '/', HMDelimiter: string = ':') =>
     (u: UTC): string =>
-      [toLocaleYMD(YMDdelimiter)(u), toLocaleHM(HMdelimiter)(u)].join(' ');
+      [toLocaleYMD(YMDDelimiter)(u), toLocaleHM(HMDelimiter)(u)].join(' ');
 
   export const toUTCYMDHM =
-    (YMDdelimiter: string = '/', HMdelimiter: string = ':') =>
+    (YMDDelimiter: string = '/', HMDelimiter: string = ':') =>
     (u: UTC): string =>
-      [toUTCYMD(YMDdelimiter)(u), toUTCHM(HMdelimiter)(u)].join(' ');
+      [toUTCYMD(YMDDelimiter)(u), toUTCHM(HMDelimiter)(u)].join(' ');
 
   export const toLocaleYMDHMS =
-    (YMDdelimiter: string = '/', HMSdelimiter: string = ':') =>
+    (YMDDelimiter: string = '/', HMSDelimiter: string = ':') =>
     (u: UTC): string =>
-      [toLocaleYMD(YMDdelimiter)(u), toLocaleHMS(HMSdelimiter)(u)].join(' ');
+      [toLocaleYMD(YMDDelimiter)(u), toLocaleHMS(HMSDelimiter)(u)].join(' ');
 
   export const toUTCYMDHMS =
-    (YMDdelimiter: string = '/', HMSdelimiter: string = ':') =>
+    (YMDDelimiter: string = '/', HMSDelimiter: string = ':') =>
     (u: UTC): string =>
-      [toUTCYMD(YMDdelimiter)(u), toUTCHMS(HMSdelimiter)(u)].join(' ');
+      [toUTCYMD(YMDDelimiter)(u), toUTCHMS(HMSDelimiter)(u)].join(' ');
 
   export const toLocaleMidnight = setLocale({
+    year: undefined,
+    month: undefined,
+    date: undefined,
     hours: 0,
     minutes: 0,
     seconds: 0,
     milliseconds: 0,
   });
   export const toUTCMidnight = setUTC({
+    year: undefined,
+    month: undefined,
+    date: undefined,
     hours: 0,
     minutes: 0,
     seconds: 0,

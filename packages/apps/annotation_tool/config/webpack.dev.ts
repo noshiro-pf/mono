@@ -6,7 +6,7 @@ import { paths } from './paths';
 const webpackConfigMerged = webpackConfigReactDevMaker(
   paths,
   dotenvValues.HOST ?? 'localhost',
-  Number(dotenvValues.PORT ?? 3000),
+  Number(dotenvValues.PORT ?? 8080),
   'bundle.js'
 );
 
