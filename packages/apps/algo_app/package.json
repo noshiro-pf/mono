@@ -45,12 +45,12 @@
   },
   "dependencies": {
     "@noshiro/fast-deep-equal": "*",
+    "@noshiro/goober": "*",
     "@noshiro/preact-resize-observer-hooks": "*",
     "@noshiro/preact-syncflow-hooks": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
-    "goober": "^2.0.5",
     "immer": "^9.0.2",
     "preact": "^10.4.7",
     "preact-router": "^3.2.1"
