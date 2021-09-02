@@ -1,5 +1,5 @@
+import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { styled } from 'goober';
 import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';
 

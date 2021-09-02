@@ -1,4 +1,4 @@
-import { setup } from 'goober';
+import { setup } from '@noshiro/goober';
 import { h, render } from 'preact';
 import { App } from './App';
 import './index.css';
