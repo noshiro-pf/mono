@@ -1,23 +1,25 @@
 import type { ReducerType } from '@noshiro/ts-utils';
 import type { GameState, GameStateAction } from '../../types';
 
-export const decidedAnswerBalloonIsOpenReducer: ReducerType<
-  GameState['decidedAnswerBalloonIsOpen'],
+export const readonlyReducer: ReducerType<
+  GameState['readonly'],
   GameStateAction
 > = (curr, action) => {
   switch (action.type) {
-    case 'submitAnswer':
-      return true;
-    case 'showJudgeOnDecidedAnswer':
+    case 'selectMyCard':
     case 'cancelToss':
     case 'submitToss':
-      return curr;
     case 'selectOpponentCard':
     case 'selectAnswer':
-    case 'selectMyCard':
-    case 'hideDecidedAnswerBalloon':
     case 'cancelAnswer':
+      return curr;
+
     case 'goToNextTurn':
+    case 'hideDecidedAnswerBalloon':
       return false;
+
+    case 'submitAnswer':
+    case 'showJudgeOnDecidedAnswer':
+      return true;
   }
 };

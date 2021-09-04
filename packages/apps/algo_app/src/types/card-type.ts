@@ -20,5 +20,4 @@ export type CardWithDisplayValue = CardWithHandler &
     float: 'always' | 'never' | 'onHover';
     showOutline: 'always' | 'never' | 'onHover';
     outlineColor: CustomColor;
-    showBalloon: boolean;
   }>;

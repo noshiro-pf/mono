@@ -61,15 +61,18 @@ export const PlayerCardsArea = memoNamed(
     const cardsWithConfig = useMemo<
       ReadonlyArrayOfLength<
         6,
-        CardWithDisplayValue & {
-          readonly onBoundingClientRectChange: (rect: Rect) => void;
-        }
+        CardWithDisplayValue &
+          Readonly<{
+            key: string;
+            onBoundingClientRectChange: (rect: Rect) => void;
+          }>
       >
     >(
       () =>
         pipe(cards).chain(
           map((c: CardWithDisplayValue) => ({
             ...c,
+            key: cardToString(c),
             onBoundingClientRectChange: (rect: Rect) => {
               cardPositionsDispatcher([c.color, c.number, rect]);
             },
@@ -83,7 +86,7 @@ export const PlayerCardsArea = memoNamed(
         <RotateContainer style={rotateStyle}>
           {cardsWithConfig.map((c) => (
             <CardComponent
-              key={cardToString(c)}
+              key={c.key}
               color={c.color}
               float={c.float}
               isClickable={c.isClickable}

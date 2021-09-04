@@ -1,11 +1,16 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import type { Rect, RectSize } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils';
 import { match } from '@noshiro/ts-utils';
 import { createElement, Fragment } from 'preact';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
-import { inTurnColor, zIndex } from '../../constants';
+import {
+  inTurnColor,
+  playerNameRectPadding,
+  playerNameRectSize,
+  zIndex,
+} from '../../constants';
 
 type Props = Readonly<{
   playerName: string;
@@ -14,9 +19,6 @@ type Props = Readonly<{
   windowSize: Rect;
   onBoundingClientRectChange: (rect: Readonly<DOMRect>) => void;
 }>;
-
-export const playerNameRectSize: RectSize = { width: 150, height: 65 };
-export const playerNameRectPadding = 10;
 
 export const PlayerName = memoNamed<Props>(
   'PlayerName',

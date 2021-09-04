@@ -7,15 +7,17 @@ export const cardChosenToBeAttackedReducer: ReducerType<
   GameStateAction
 > = (curr, action) => {
   switch (action.type) {
-    case 'selectCardToAnswer':
+    case 'selectOpponentCard':
       return cardEq(curr, action.card) ? undefined : action.card;
-    case 'selectAttackCard':
+    case 'selectMyCard':
+    case 'cancelToss':
+    case 'submitToss':
     case 'selectAnswer':
+    case 'submitAnswer':
     case 'showJudgeOnDecidedAnswer':
-    case 'hideDecidedAnswerBalloon':
       return curr;
     case 'cancelAnswer':
-    case 'submitAnswer':
+    case 'hideDecidedAnswerBalloon':
     case 'goToNextTurn':
       return undefined;
   }

@@ -4,9 +4,10 @@ import type { Rect, RectSize } from '@noshiro/ts-utils';
 import { recordFromEntries } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
+import { playerNameRectSize } from '../../constants';
 import type { CardColor, CardNumber, DisplayValues, NWES } from '../../types';
 import { PlayerCardsArea } from './player-cards-area';
-import { PlayerName, playerNameRectSize } from './player-name';
+import { PlayerName } from './player-name';
 
 type Props = Readonly<{
   displayValues: DisplayValues;

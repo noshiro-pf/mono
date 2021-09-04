@@ -7,7 +7,7 @@ export const goToNextTurn = (
   draft: WritableDraft<GameState>
 ): void => {
   draft.currentPlayerIndex = incrementPlayerIndex(draft.currentPlayerIndex, 1);
-  draft.phase = 'ph000_startOfTheTurn';
+  draft.phase = 'ph010_selectMyCardToToss';
   draft.decidedAnswerBalloonIsOpen = false;
   draft.judgeOnDecidedAnswerIsOpen = false;
 };

@@ -4,6 +4,7 @@ import { getCardDirection } from '../functions';
 import { mapToDisplayValue } from '../state';
 import type {
   CardNumber,
+  ConfirmTossBalloonProps,
   DecidedAnswerBalloonProps,
   DisplayValues,
   SelectAnswerBalloonProps,
@@ -13,10 +14,22 @@ import {
   onAnswerSubmit,
   onCardClick,
   onSelectAnswer,
+  onTossCancel,
+  onTossSubmit,
 } from './action';
 import { gameState$ } from './game-state';
 import { myPlayerIndex$ } from './my-player-index';
 import { cardPositions$, playerNamePositions$ } from './position';
+
+const isMyTurn$: InitializedObservable<boolean> = combineLatestI([
+  gameState$,
+  myPlayerIndex$,
+] as const).chain(
+  mapI(
+    ([gameState, myPlayerIndex]) =>
+      gameState.currentPlayerIndex === myPlayerIndex
+  )
+);
 
 export const displayValues$: InitializedObservable<DisplayValues> =
   combineLatestI([gameState$, myPlayerIndex$] as const).chain(
@@ -36,10 +49,39 @@ export const turnPlayerHighlighterPosition$ = combineLatestI([
   )
 );
 
+export const confirmTossBalloonProps$: InitializedObservable<
+  ConfirmTossBalloonProps | undefined
+> = combineLatestI([isMyTurn$, gameState$, cardPositions$] as const).chain(
+  mapI(([isMyTurn, gameState, cardPositions]) => {
+    if (!isMyTurn) return undefined;
+    if (!gameState.confirmTossBalloonIsOpen) return undefined;
+    if (cardPositions === undefined) return undefined;
+    const anchorCard = gameState.cardChosenToToss;
+    if (anchorCard === undefined) return undefined;
+
+    return {
+      anchorCardRect: cardPositions[anchorCard.color][anchorCard.number],
+      card: anchorCard,
+      cancel: () => {
+        onTossCancel();
+      },
+      submit: () => {
+        onTossSubmit();
+      },
+    };
+  })
+);
+
 export const selectAnswerBalloonProps$: InitializedObservable<
   SelectAnswerBalloonProps | undefined
-> = combineLatestI([gameState$, cardPositions$, displayValues$] as const).chain(
-  mapI(([gameState, cardPositions, displayValues]) => {
+> = combineLatestI([
+  isMyTurn$,
+  gameState$,
+  cardPositions$,
+  displayValues$,
+] as const).chain(
+  mapI(([isMyTurn, gameState, cardPositions, displayValues]) => {
+    if (!isMyTurn) return undefined;
     if (!gameState.selectAnswerBalloonIsOpen) return undefined;
     if (cardPositions === undefined) return undefined;
     const anchorCard = gameState.cardChosenToBeAttacked;
@@ -66,10 +108,11 @@ export const selectAnswerBalloonProps$: InitializedObservable<
 
 export const decidedAnswerBalloonProps$: InitializedObservable<
   DecidedAnswerBalloonProps | undefined
-> = combineLatestI([gameState$, cardPositions$, displayValues$] as const).chain(
-  mapI(([gameState, cardPositions, displayValues]) => {
-    if (!gameState.decidedAnswerBalloonIsOpen) return undefined;
+> = combineLatestI([cardPositions$, gameState$, displayValues$] as const).chain(
+  mapI(([cardPositions, gameState, displayValues]) => {
     if (cardPositions === undefined) return undefined;
+
+    if (!gameState.decidedAnswerBalloonIsOpen) return undefined;
     if (gameState.answerSelected === undefined) return undefined;
     const anchorCard = gameState.cardChosenToBeAttacked;
     if (anchorCard === undefined) return undefined;

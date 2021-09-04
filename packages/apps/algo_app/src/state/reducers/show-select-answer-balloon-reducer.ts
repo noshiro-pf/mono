@@ -6,10 +6,12 @@ export const selectAnswerBalloonIsOpenReducer: ReducerType<
   GameStateAction
 > = (curr, action) => {
   switch (action.type) {
-    case 'selectCardToAnswer':
+    case 'selectOpponentCard':
       return true;
     case 'selectAnswer':
-    case 'selectAttackCard':
+    case 'selectMyCard':
+    case 'cancelToss':
+    case 'submitToss':
       return curr;
     case 'showJudgeOnDecidedAnswer':
     case 'hideDecidedAnswerBalloon':
