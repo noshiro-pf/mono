@@ -39,7 +39,6 @@ type AnswerPageState = DeepReadonly<{
   onAnswerClick: (answer: Answer) => void;
   onAddAnswerButtonClick: () => void;
   myAnswerSectionState: 'creating' | 'editing' | 'hidden';
-  answerSectionRef: RefObject<HTMLDivElement>;
   answerForEditing: Answer;
   updateAnswerForEditing: (updater: (answer: Answer) => Answer) => void;
   onCancel: () => void;
@@ -52,7 +51,9 @@ type AnswerPageState = DeepReadonly<{
   refreshButtonIsDisabled: boolean;
   isExpired: boolean;
   selectedAnswerUserName: UserName | undefined;
-}>;
+}> & {
+  readonly answerSectionRef: RefObject<HTMLDivElement>;
+};
 
 const toast = createToaster();
 
