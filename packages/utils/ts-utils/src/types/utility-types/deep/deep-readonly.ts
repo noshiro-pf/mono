@@ -1,11 +1,18 @@
-import type { ReadonlyRecordBase } from '../readonly-record-base';
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
+import type { Primitive } from './primitive';
 
-export type DeepReadonly<T> = T extends (...args: readonly unknown[]) => unknown
+export type DeepReadonly<T> = T extends Primitive
   ? T
-  : T extends ReadonlyRecordBase | readonly unknown[]
-  ? { readonly [P in keyof T]: DeepReadonly<T[P]> }
+  : T extends Map<infer K, infer V>
+  ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
+  : T extends Set<infer V>
+  ? ReadonlySet<DeepReadonly<V>>
+  : // eslint-disable-next-line @typescript-eslint/ban-types
+  T extends object | readonly unknown[]
+  ? {
+      readonly [K in keyof T]: DeepReadonly<T[K]>;
+    }
   : T;
 
 /* type test */
