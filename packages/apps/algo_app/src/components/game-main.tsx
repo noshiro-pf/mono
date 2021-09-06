@@ -2,19 +2,23 @@ import { styled } from '@noshiro/goober';
 import { useStreamValue } from '@noshiro/preact-syncflow-hooks';
 import { memoNamed } from '@noshiro/preact-utils';
 import type { Rect } from '@noshiro/ts-utils';
-import { createElement } from 'preact';
 import { useEffect } from 'preact/hooks';
 import {
   cardPositionsDispatcher,
+  confirmTossBalloonProps$,
   decidedAnswerBalloonProps$,
   displayValues$,
   playerNamePositionsDispatcher,
   selectAnswerBalloonProps$,
   setMyPlayerIndex,
   turnPlayerHighlighterPosition$,
-} from '../store';
+} from '../observables';
 import type { DisplayValues } from '../types';
-import { DecidedAnswerBalloon, SelectAnswerBalloon } from './balloon';
+import {
+  ConfirmTossBalloon,
+  DecidedAnswerBalloon,
+  SelectAnswerBalloon,
+} from './balloon';
 import {
   GameMessage,
   MyCards,
@@ -37,6 +41,7 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
   const turnPlayerHighlighterPosition = useStreamValue(
     turnPlayerHighlighterPosition$
   );
+  const confirmTossBalloonProps = useStreamValue(confirmTossBalloonProps$);
   const selectAnswerBalloonProps = useStreamValue(selectAnswerBalloonProps$);
   const decidedAnswerBalloonProps = useStreamValue(decidedAnswerBalloonProps$);
 
@@ -62,13 +67,40 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
         <TurnPlayerHighlighter position={turnPlayerHighlighterPosition} />
       ) : undefined}
 
-      {selectAnswerBalloonProps !== undefined
-        ? createElement(SelectAnswerBalloon, selectAnswerBalloonProps)
-        : undefined}
+      {confirmTossBalloonProps !== undefined ? (
+        <ConfirmTossBalloon
+          anchorCardRect={confirmTossBalloonProps.anchorCardRect}
+          cancel={confirmTossBalloonProps.cancel}
+          card={confirmTossBalloonProps.card}
+          submit={confirmTossBalloonProps.submit}
+        />
+      ) : undefined}
 
-      {decidedAnswerBalloonProps !== undefined
-        ? createElement(DecidedAnswerBalloon, decidedAnswerBalloonProps)
-        : undefined}
+      {selectAnswerBalloonProps !== undefined ? (
+        <SelectAnswerBalloon
+          anchorCardRect={selectAnswerBalloonProps.anchorCardRect}
+          arrowDirection={selectAnswerBalloonProps.arrowDirection}
+          cardColor={selectAnswerBalloonProps.cardColor}
+          selectedNumber={selectAnswerBalloonProps.selectedNumber}
+          submitAnswer={selectAnswerBalloonProps.submitAnswer}
+          submitButtonIsDisabled={
+            selectAnswerBalloonProps.submitButtonIsDisabled
+          }
+          onCancelClick={selectAnswerBalloonProps.onCancelClick}
+          onSelectedNumberChange={
+            selectAnswerBalloonProps.onSelectedNumberChange
+          }
+        />
+      ) : undefined}
+
+      {decidedAnswerBalloonProps !== undefined ? (
+        <DecidedAnswerBalloon
+          anchorCardRect={decidedAnswerBalloonProps.anchorCardRect}
+          arrowDirection={decidedAnswerBalloonProps.arrowDirection}
+          card={decidedAnswerBalloonProps.card}
+          showSymbol={decidedAnswerBalloonProps.showSymbol}
+        />
+      ) : undefined}
     </Root>
   );
 });

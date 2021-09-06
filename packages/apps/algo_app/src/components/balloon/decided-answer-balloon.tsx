@@ -2,7 +2,6 @@ import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
 import type { RectSize } from '@noshiro/ts-utils';
 import { match } from '@noshiro/ts-utils';
-import { createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { zIndex } from '../../constants';
@@ -45,12 +44,18 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
       [anchorCardRect, arrowDirection]
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const Balloon = useMemo(
       () =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         match(arrowDirection, {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           S: BalloonWithDownArrow,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           E: BalloonWithRightArrow,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           N: BalloonWithUpArrow,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           W: BalloonWithLeftArrow,
         }),
       [arrowDirection]
@@ -70,15 +75,15 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
       <Wrapper style={positionStyle}>
         <Balloon>
           <BalloonContent>
-            {createElement(CardComponent, {
-              number: card.number,
-              color: card.color,
-              visibilityFromMe: 'faceUp',
-              size: smallCardSize,
-              isClickable: false,
-              float: 'never',
-              showOutline: 'never',
-            } as const)}
+            <CardComponent
+              color={card.color}
+              float={'never'}
+              isClickable={false}
+              number={card.number}
+              showOutline={'never'}
+              size={smallCardSize}
+              visibilityFromMe={'faceUp'}
+            />
           </BalloonContent>
         </Balloon>
 
@@ -122,10 +127,15 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
   }
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonBody = createBalloonBody(balloonSize);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithDownArrow = createBalloonWithDownArrow(BalloonBody);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithUpArrow = createBalloonWithUpArrow(BalloonBody);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithLeftArrow = createBalloonWithLeftArrow(BalloonBody);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 const BalloonWithRightArrow = createBalloonWithRightArrow(BalloonBody);
 
 const BalloonContent = styled('div')`

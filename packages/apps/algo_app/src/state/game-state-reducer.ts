@@ -2,12 +2,15 @@ import type { ReducerType } from '@noshiro/ts-utils';
 import { produce } from 'immer';
 import { cardEq } from '../functions';
 import type { GameState, GameStateAction } from '../types';
-import { faceUpCard, goToNextTurn } from './draft-modifier';
+import { faceUpCard, goToNextTurn, tossCard } from './draft-modifier';
 import {
   answerSelectedReducer,
   cardChosenToAttackReducer,
   cardChosenToBeAttackedReducer,
+  cardChosenToTossReducer,
+  confirmTossBalloonIsOpenReducer,
   decidedAnswerBalloonIsOpenReducer,
+  readonlyReducer,
   selectAnswerBalloonIsOpenReducer,
 } from './reducers';
 
@@ -15,17 +18,33 @@ export const gameStateReducer: ReducerType<GameState, GameStateAction> = (
   state,
   action
 ) =>
-  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
   produce(state, (draft) => {
     draft.answerSelected = answerSelectedReducer(state.answerSelected, action);
 
-    draft.cardChosenToAttack = cardChosenToAttackReducer(
-      state.cardChosenToAttack,
-      action
-    );
+    switch (state.phase) {
+      case 'ph010_selectMyCardToToss':
+        draft.cardChosenToToss = cardChosenToTossReducer(
+          state.cardChosenToToss,
+          action
+        );
+        break;
+
+      case 'ph020_firstAnswer':
+      case 'ph030_continuousAnswer':
+        draft.cardChosenToAttack = cardChosenToAttackReducer(
+          state.cardChosenToAttack,
+          action
+        );
+        break;
+    }
 
     draft.cardChosenToBeAttacked = cardChosenToBeAttackedReducer(
       state.cardChosenToBeAttacked,
+      action
+    );
+
+    draft.confirmTossBalloonIsOpen = confirmTossBalloonIsOpenReducer(
+      state.confirmTossBalloonIsOpen,
       action
     );
 
@@ -39,22 +58,39 @@ export const gameStateReducer: ReducerType<GameState, GameStateAction> = (
       action
     );
 
+    draft.readonly = readonlyReducer(draft.readonly, action);
+
     switch (action.type) {
-      case 'selectAttackCard':
-      case 'selectCardToAnswer':
+      case 'selectMyCard':
+      case 'selectOpponentCard':
       case 'selectAnswer':
+      case 'cancelToss':
       case 'cancelAnswer':
+        break;
+
+      case 'submitToss':
+        if (state.cardChosenToToss === undefined) {
+          console.warn(
+            'gameState.cardChosenToToss should not be undefined here.'
+          );
+          return;
+        }
+        tossCard(draft, state.cardChosenToToss);
+        draft.phase = 'ph020_firstAnswer';
+        break;
+
       case 'submitAnswer':
+        draft.readonly = true;
         break;
 
       case 'showJudgeOnDecidedAnswer':
-        if (state.answerSelected === undefined) {
+        if (draft.answerSelected === undefined) {
           console.warn(
             'gameState.answerSelected should not be undefined here.'
           );
           return;
         }
-        if (state.cardChosenToBeAttacked === undefined) {
+        if (draft.cardChosenToBeAttacked === undefined) {
           console.warn(
             'gameState.cardChosenToBeAttacked should not be undefined here.'
           );
@@ -62,18 +98,18 @@ export const gameStateReducer: ReducerType<GameState, GameStateAction> = (
         }
 
         draft.judgeResult = cardEq(
-          state.answerSelected,
-          state.cardChosenToBeAttacked
+          draft.answerSelected,
+          draft.cardChosenToBeAttacked
         )
           ? 'o'
           : 'x';
 
         switch (draft.judgeResult) {
           case 'o':
-            faceUpCard(draft, state.cardChosenToBeAttacked);
+            faceUpCard(draft, draft.cardChosenToBeAttacked);
             break;
           case 'x':
-            faceUpCard(draft, state.cardChosenToAttack);
+            faceUpCard(draft, draft.cardChosenToAttack);
             break;
         }
         break;
@@ -85,20 +121,12 @@ export const gameStateReducer: ReducerType<GameState, GameStateAction> = (
             goToNextTurn(draft);
             break;
           case 'o':
-            switch (state.phase) {
-              case 'ph030_firstAnswer':
-                // draft.phase = phaseReducer([
-                //   state.phase,
-                //   'ac040_submitFirstAnswerAndSuccess',
-                // ]);
+            switch (draft.phase) {
+              case 'ph020_firstAnswer':
+                draft.phase = 'ph030_continuousAnswer';
                 break;
-              case 'ph040_continuousAnswer':
-                // draft.phase = phaseReducer([
-                //   state.phase,
-                //   'ac070_submitSecondAnswerAndSuccess',
-                // ]);
-                break;
-              default:
+              case 'ph010_selectMyCardToToss':
+              case 'ph030_continuousAnswer':
                 break;
             }
             break;

@@ -37,15 +37,18 @@ export const initialGameState: GameState = {
   ],
 
   // attack and answer
+  cardChosenToToss: undefined,
   cardChosenToAttack: undefined,
   cardChosenToBeAttacked: undefined,
   answerSelected: undefined,
+  confirmTossBalloonIsOpen: false,
   selectAnswerBalloonIsOpen: false,
   decidedAnswerBalloonIsOpen: false,
   judgeOnDecidedAnswerIsOpen: false,
   judgeResult: undefined,
+  readonly: false,
 
   // turn and phase
   currentPlayerIndex: 1,
-  phase: 'ph030_firstAnswer',
+  phase: 'ph010_selectMyCardToToss',
 };

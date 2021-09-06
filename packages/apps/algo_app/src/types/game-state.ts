@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { ReadonlyArrayOfLength, TypeExtends } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
 import type { Card, CardWithVisibility } from './card-type';
@@ -6,8 +5,11 @@ import type { PhaseInTurn } from './phase-in-turn';
 import type { PlayerIndex } from './player-index';
 
 export type GameStateAction = Readonly<
-  | { type: 'selectAttackCard'; card: Card }
-  | { type: 'selectCardToAnswer'; card: Card }
+  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  | { type: 'selectMyCard'; card: Card }
+  | { type: 'cancelToss' }
+  | { type: 'submitToss' }
+  | { type: 'selectOpponentCard'; card: Card }
   | { type: 'selectAnswer'; answer: Card }
   | { type: 'cancelAnswer' }
   | { type: 'submitAnswer' }
@@ -25,13 +27,16 @@ export type GameState = Readonly<{
   >;
 
   // attack and answer
+  cardChosenToToss: Card | undefined;
   cardChosenToAttack: Card | undefined;
   cardChosenToBeAttacked: Card | undefined;
   answerSelected: Card | undefined;
+  confirmTossBalloonIsOpen: boolean;
   selectAnswerBalloonIsOpen: boolean;
   decidedAnswerBalloonIsOpen: boolean;
   judgeOnDecidedAnswerIsOpen: boolean;
   judgeResult: 'o' | 'x' | undefined;
+  readonly: boolean;
 
   // turn and phase
   currentPlayerIndex: PlayerIndex;
