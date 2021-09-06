@@ -1,6 +1,5 @@
 import { MuiSlider } from '@noshiro/react-material-ui-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import type { uint32 } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const SliderWrapper = styled.div`
@@ -9,7 +8,7 @@ const SliderWrapper = styled.div`
 
 type Props = Readonly<{
   divisionNumber: number;
-  divisionNumberOnChange: (value: uint32) => void;
+  divisionNumberOnChange: (value: number) => void;
 }>;
 
 export const DivisionNumberSlider = memoNamed<Props>(

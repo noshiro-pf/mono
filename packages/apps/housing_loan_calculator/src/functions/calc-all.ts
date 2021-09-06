@@ -1,4 +1,4 @@
-import { sum } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import type { RepaymentType } from '../types';
 import { calcPrincipalAndInterestEqualPayment } from './calc-principal-and-interest-equal-repayment';
 import { calcPrincipalEqualPayment } from './calc-principal-equal-payment';
@@ -9,15 +9,15 @@ export const calcAll = (
   propertyPriceManYen: number,
   borrowingPeriodYear: number,
   interestRatePercentPerYear: number
-): {
-  borrowingBalanceYen: number[];
-  interestYen: number[];
-  monthlyPaymentTotalYen: number[];
-  monthlyPrincipalPaymentYen: number[];
+): Readonly<{
+  borrowingBalanceYen: readonly number[];
+  interestYen: readonly number[];
+  monthlyPaymentTotalYen: readonly number[];
+  monthlyPrincipalPaymentYen: readonly number[];
   fixedPrincipalYenPerMonth: number;
   fixedMonthlyPaymentsYen: number;
   interestSumManYen: number;
-} => {
+}> => {
   /**
    * 1 -> 元金均等返済
    * 2 -> 元利均等返済
@@ -59,7 +59,7 @@ export const calcAll = (
   const interestYen =
     repaymentType === 'principal-equal-payment' ? interestYen1 : interestYen2;
 
-  const interestSumManYen = sum(interestYen) / 10000;
+  const interestSumManYen = IList.sum(interestYen) / 10000;
 
   return {
     borrowingBalanceYen,

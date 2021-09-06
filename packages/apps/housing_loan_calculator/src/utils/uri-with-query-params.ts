@@ -1,12 +1,12 @@
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { isNotUndefined } from '@noshiro/ts-utils';
 import { makeUriEndWithSlash } from './make-uri-end-with-slash';
 
 export const uriWithQueryParams = (
   uri: string,
-  queryParameters: readonly (readonly [
-    string,
-    boolean | number | string | undefined
-  ])[]
+  queryParameters: DeepReadonly<
+    [string, boolean | number | string | undefined][]
+  >
 ): string => {
   const nonNullQueryParameters = queryParameters.filter(
     ([_, value]) => value !== undefined

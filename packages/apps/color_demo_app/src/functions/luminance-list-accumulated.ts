@@ -1,33 +1,30 @@
 import type { ReadonlyNonEmptyArray } from '@noshiro/ts-utils';
-import {
-  first,
-  isNonEmpty,
-  ituple,
-  map,
-  pipe,
-  rest,
-  scan,
-} from '@noshiro/ts-utils';
+import { IList, ituple, pipe } from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (
   luminanceList: readonly number[],
   useLog: boolean
-): number[] => {
-  if (!isNonEmpty(luminanceList)) return [];
+): readonly number[] => {
+  if (!IList.isNonEmpty(luminanceList)) return [];
 
   /* +0.05はコントラスト比計算時に足される補正項  */
   const luminanceListCorrected: ReadonlyNonEmptyArray<number> = pipe(
     luminanceList
-  ).chain(map((v: number) => (useLog ? Math.log(v + 0.05) : v + 0.05))).value;
+  ).chain((list) =>
+    IList.map(list, (v: number) => (useLog ? Math.log(v + 0.05) : v + 0.05))
+  ).value;
 
-  const luminanceDiffAccumulated = pipe(rest(luminanceListCorrected))
-    .chain(
-      scan(
+  const luminanceDiffAccumulated = pipe(IList.rest(luminanceListCorrected))
+    .chain((list) =>
+      IList.scan(
+        list,
         ([prev, acc], curr) => ituple(curr, acc + Math.abs(curr - prev)),
-        ituple(first(luminanceListCorrected), 0)
+        ituple(IList.first(luminanceListCorrected), 0)
       )
     )
-    .chain(map(([_, acc]: readonly [number, number]) => acc)).value;
+    .chain((list) =>
+      IList.map(list, ([_, acc]: readonly [number, number]) => acc)
+    ).value;
 
   return luminanceDiffAccumulated;
 };

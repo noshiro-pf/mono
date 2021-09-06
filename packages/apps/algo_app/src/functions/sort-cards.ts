@@ -1,12 +1,12 @@
 import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
-import { pipe, sort } from '@noshiro/ts-utils';
+import { IList, pipe } from '@noshiro/ts-utils';
 import type { Card } from '../types';
 
 export const sortCards = <C extends Card>(
   cards: ReadonlyArrayOfLength<6, C>
 ): ReadonlyArrayOfLength<6, C> =>
-  pipe(cards).chain(
-    sort<C>((a, b) =>
+  pipe(cards).chain((list) =>
+    IList.sort(list, (a, b) =>
       a.number === b.number
         ? a.color === 'black'
           ? -1

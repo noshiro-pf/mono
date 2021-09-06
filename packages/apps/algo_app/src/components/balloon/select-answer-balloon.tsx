@@ -1,11 +1,12 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import type { RectSize, uint32 } from '@noshiro/ts-utils';
-import { match, seq } from '@noshiro/ts-utils';
+import type { RectSize } from '@noshiro/ts-utils';
+import { IList, match } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { outlineColorDef, text } from '../../constants';
 import type { CardNumber, SelectAnswerBalloonProps } from '../../types';
+import { Button } from '../bp';
 import { CardComponent } from '../card';
 import {
   createBalloonBody,
@@ -71,7 +72,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
 
     const cards = useMemo(
       () =>
-        seq(12 as uint32).map(
+        IList.seqThrow(12).map(
           (n) =>
             ({
               key: n,
@@ -114,16 +115,13 @@ export const SelectAnswerBalloon = memoNamed<Props>(
             ))}
           </CardsWrapper>
           <Buttons>
-            <button type={'button'} onClick={onCancelClick}>
-              {text.cancel}
-            </button>
-            <button
+            <Button onClick={onCancelClick}>{text.cancel}</Button>
+            <Button
               disabled={submitButtonIsDisabled || selectedNumber === undefined}
-              type={'button'}
               onClick={submitAnswer}
             >
               {text.submitAnswer}
-            </button>
+            </Button>
           </Buttons>
         </BalloonContent>
       </Balloon>

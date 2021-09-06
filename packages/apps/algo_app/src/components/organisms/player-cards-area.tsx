@@ -1,7 +1,7 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
 import type { ReadonlyArrayOfLength, Rect, RectSize } from '@noshiro/ts-utils';
-import { map, pipe } from '@noshiro/ts-utils';
+import { IList, pipe } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { zIndex } from '../../constants';
@@ -69,8 +69,8 @@ export const PlayerCardsArea = memoNamed(
       >
     >(
       () =>
-        pipe(cards).chain(
-          map((c: CardWithDisplayValue) => ({
+        pipe(cards).chain((list) =>
+          IList.map(list, (c: CardWithDisplayValue) => ({
             ...c,
             key: cardToString(c),
             onBoundingClientRectChange: (rect: Rect) => {

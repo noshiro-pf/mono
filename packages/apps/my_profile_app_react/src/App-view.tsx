@@ -2,7 +2,7 @@ import { AppBar } from '@material-ui/core';
 import { MuiTabs } from '@noshiro/react-material-ui-utils';
 import { useNavigator, usePathNameList } from '@noshiro/react-router-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { last } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Redirect, Route, Switch } from 'react-router-dom';
@@ -20,7 +20,7 @@ export const AppSub = memoNamed<Readonly<{ mobile: boolean }>>(
   'AppSub',
   ({ mobile }) => {
     const pathName = usePathNameList();
-    const pathNameLast = useMemo(() => last(pathName) ?? '', [pathName]);
+    const pathNameLast = useMemo(() => IList.last(pathName) ?? '', [pathName]);
 
     // pathnameと対応させるため、routerを使ってタブ切り替えを制御
     const tabIndex = useMemo(

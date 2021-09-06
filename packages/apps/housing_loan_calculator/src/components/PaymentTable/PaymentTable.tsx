@@ -1,7 +1,7 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { ArrayOfLength, DeepReadonly, uint32 } from '@noshiro/ts-utils';
-import { IList, seq } from '@noshiro/ts-utils';
+import type { ArrayOfLength, DeepReadonly } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import { viewTexts } from '../../constants';
@@ -52,7 +52,7 @@ export const PaymentTable = memoNamed<Props>(
           borrowingBalanceYen.length,
           interestYen.length,
           monthlyPaymentTotalYen.length
-        ) as uint32,
+        ),
       [
         borrowingBalanceYen.length,
         interestYen.length,
@@ -62,7 +62,7 @@ export const PaymentTable = memoNamed<Props>(
 
     const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
       () =>
-        seq(numRows).map((i) => [
+        IList.seqThrow(numRows).map((i) => [
           i.toString(),
           formatYenValue(borrowingBalanceYen[i] ?? 0),
           formatYenValue(interestYen[i] ?? 0),

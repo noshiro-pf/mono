@@ -9,7 +9,7 @@ import {
   defaultDatetimeRange,
   defaultTimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import type { ReducerType, uint32 } from '@noshiro/ts-utils';
+import type { ReducerType } from '@noshiro/ts-utils';
 import { IList, IRecord, ISetMapped, pipe } from '@noshiro/ts-utils';
 import type { YmdKey } from '../../../../functions';
 import { ymdFromKey, ymdToKey } from '../../../../functions';
@@ -22,12 +22,12 @@ export type DatetimeListReducerAction =
       mostFrequentTimeRange: TimeRange;
     }
   | { type: 'addClick'; datetimeRange: DatetimeRange }
-  | { type: 'delete'; index: uint32 }
+  | { type: 'delete'; index: number }
   | { type: 'deleteAll' | 'sort' }
-  | { type: 'duplicate'; index: uint32 }
-  | { type: 'end' | 'start'; index: uint32; hm: HoursMinutes }
+  | { type: 'duplicate'; index: number }
+  | { type: 'end' | 'start'; index: number; hm: HoursMinutes }
   | { type: 'setTimeAtOneTime'; timeRange: TimeRange }
-  | { type: 'ymd'; index: uint32; ymd: YearMonthDate };
+  | { type: 'ymd'; index: number; ymd: YearMonthDate };
 
 export type DatetimeListReducerState = readonly DatetimeRange[];
 

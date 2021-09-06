@@ -12,21 +12,19 @@ import type {
   Hue,
   Percent,
   TypeExtends,
-  uint32,
 } from '@noshiro/ts-utils';
 import {
   assertType,
   blackHsl,
   contrastRatioHsl,
   IList,
-  range,
   roundAt,
   whiteHsl,
 } from '@noshiro/ts-utils';
 import { Fragment } from 'react';
 import styled from 'styled-components';
 
-const hues: readonly Hue[] = range(0 as uint32, 360 as uint32) as Hue[];
+const hues: readonly Hue[] = IList.seqThrow(360) as Hue[];
 
 const indices = [0, 1, 2] as const;
 const saturationList = [80, 80, 100] as const;

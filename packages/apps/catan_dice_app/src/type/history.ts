@@ -1,7 +1,5 @@
-import type { uint32 } from '@noshiro/ts-utils';
-
 export type HistoryState = Readonly<{
-  index: uint32 | -1;
+  index: number;
   history: readonly (readonly [number, number])[];
 }>;
 

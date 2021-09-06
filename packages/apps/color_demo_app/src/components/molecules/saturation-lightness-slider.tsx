@@ -1,6 +1,6 @@
 import { MuiSlider } from '@noshiro/react-material-ui-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hue, Percent, uint32 } from '@noshiro/ts-utils';
+import type { Hue, Percent } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { DivisionNumberSlider } from './division-number-slider';
 import { FirstHueSlider } from './first-hue-slider';
@@ -17,7 +17,7 @@ type Props = Readonly<{
   firstHue: Hue;
   firstHueOnChange: (value: Hue) => void;
   divisionNumber: number;
-  divisionNumberOnChange: (value: uint32) => void;
+  divisionNumberOnChange: (value: number) => void;
 }>;
 
 export const AllSliders = memoNamed<Props>('AllSliders', (props) => (

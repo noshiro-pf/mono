@@ -5,7 +5,7 @@ import type {
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { defaultYearMonthDate } from '@noshiro/event-schedule-app-shared';
-import type { DeepReadonly, uint32 } from '@noshiro/ts-utils';
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { getMostFrequentTimeRange } from './get-most-frequent-time-range';
@@ -55,35 +55,35 @@ export const useSelectDatetimesHooks = (
   /* handlers */
 
   const onDatetimeRangeYmdChange = useCallback(
-    (index: uint32, ymd: YearMonthDate) => {
+    (index: number, ymd: YearMonthDate) => {
       dispatch({ type: 'ymd', index, ymd });
     },
     [dispatch]
   );
 
   const onDatetimeRangeStartChange = useCallback(
-    (index: uint32, hm: HoursMinutes) => {
+    (index: number, hm: HoursMinutes) => {
       dispatch({ type: 'start', index, hm });
     },
     [dispatch]
   );
 
   const onDatetimeRangeEndChange = useCallback(
-    (index: uint32, hm: HoursMinutes) => {
+    (index: number, hm: HoursMinutes) => {
       dispatch({ type: 'end', index, hm });
     },
     [dispatch]
   );
 
   const onDeleteDatetimeClick = useCallback(
-    (index: uint32) => {
+    (index: number) => {
       dispatch({ type: 'delete', index });
     },
     [dispatch]
   );
 
   const onDuplicateDatetimeClick = useCallback(
-    (index: uint32) => {
+    (index: number) => {
       dispatch({ type: 'duplicate', index });
     },
     [dispatch]

@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
-import { max, zip } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import { HistogramView } from './histogram-view';
 
@@ -13,8 +13,8 @@ type Props = Readonly<{
 }>;
 
 export const Histogram = memoNamed<Props>('Histogram', ({ sumCount }) => {
-  const xy = useMemo(() => zip(domain, sumCount), [sumCount]);
-  const mx = useMemo(() => max(sumCount), [sumCount]);
+  const xy = useMemo(() => IList.zip(domain, sumCount), [sumCount]);
+  const mx = useMemo(() => IList.max(sumCount), [sumCount]);
   const numSample = useMemo(() => sumCount.reduce(add, 0), [sumCount]);
   return <HistogramView max={mx} numSample={numSample} xy={xy} />;
 });
