@@ -48,7 +48,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
 
     // Projects
-    "incremental": true,
+    "incremental": false,
 
     // Completeness
     "skipLibCheck": true // TODO
