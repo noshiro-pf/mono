@@ -9,4 +9,5 @@ export type DisplayValues = Readonly<{
   >;
   gameMessage: string;
   turnPlayer: NWES;
+  endTurnButtonDisabled: boolean;
 }>;

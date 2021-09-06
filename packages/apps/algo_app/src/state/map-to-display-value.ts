@@ -166,4 +166,7 @@ export const mapToDisplayValue = ({
     2: directions[decrementPlayerIndex(2, myPlayerIndex)],
     3: directions[decrementPlayerIndex(3, myPlayerIndex)],
   }),
+
+  endTurnButtonDisabled:
+    gameState.phase !== 'ph030_continuousAnswer' || gameState.readonly,
 });

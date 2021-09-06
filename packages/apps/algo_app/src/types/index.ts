@@ -7,4 +7,5 @@ export * from './game-state';
 export * from './phase-in-turn';
 export * from './player-index';
 export * from './props';
+export * from './room';
 export * from './visible-to';
