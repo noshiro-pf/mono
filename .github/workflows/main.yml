@@ -40,7 +40,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: setup
-        run: yarn setup:all
+        run: yarn setup:configs
 
       - name: generate index.ts
         run: yarn gi:all
@@ -52,7 +52,7 @@ jobs:
         run: yarn fmt:all
 
       - name: lint fix
-        run: yarn lintfix:all
+        run: yarn lint:fix:all
 
       - name: test
         run: yarn test:all
