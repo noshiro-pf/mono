@@ -1,5 +1,4 @@
-import { seq } from '../array';
-import type { uint32 } from '../types';
+import { IList } from '../immutable';
 import type { Hsl, Hue } from './types';
 
 export const whiteHsl: Hsl = [0, 0, 100];
@@ -13,13 +12,13 @@ export const [
   redHue,
   orangeHue,
   yellowHue,
-  greenyellowHue,
+  greenYellowHue,
   limeHue,
-  springgreenHue,
+  springGreenHue,
   aquaHue,
-  skyblueHue,
+  skyBlueHue,
   blueHue,
   purpleHue,
   magentaHue, // fuchsia
   roseHue,
-]: readonly Hue[] = seq(12 as uint32).map((i) => (i * 30) as Hue);
+]: readonly Hue[] = IList.seqThrow(12).map((i) => (i * 30) as Hue);

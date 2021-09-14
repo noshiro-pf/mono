@@ -1,5 +1,4 @@
 import { ituple } from '../others';
-import type { uint32 } from '../types';
 import { ISet } from './iset';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -7,7 +6,7 @@ interface IMapInterface<K, V> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: uint32;
+  size: number;
   has: (key: K) => boolean;
   get: (key: K) => V | undefined;
 
@@ -74,8 +73,8 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     this._map = new Map(iterable);
   }
 
-  get size(): uint32 {
-    return this._map.size as uint32;
+  get size(): number {
+    return this._map.size;
   }
 
   has(key: K): boolean {

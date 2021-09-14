@@ -1,4 +1,3 @@
-import type { uint32 } from '../types';
 import type { KeyBaseType } from './key-base-type';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -6,7 +5,7 @@ interface ISetMappedInterface<K, KM extends KeyBaseType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
-  size: uint32;
+  size: number;
   has: (key: K) => boolean;
 
   // Reducing a value
@@ -82,8 +81,8 @@ class ISetMappedClass<K, KM extends KeyBaseType>
     this._fromKey = fromKey;
   }
 
-  get size(): uint32 {
-    return this._set.size as uint32;
+  get size(): number {
+    return this._set.size;
   }
 
   has(key: K): boolean {

@@ -1,4 +1,5 @@
-import { getShuffled, seq } from '../array';
-import type { uint32 } from '../types';
+import { getShuffled } from '../array';
+import { IList } from '../immutable';
 
-export const permutation = (n: uint32): uint32[] => getShuffled(seq(n));
+export const permutation = (n: number): number[] =>
+  getShuffled(IList.seqThrow(n));

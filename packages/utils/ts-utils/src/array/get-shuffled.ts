@@ -1,4 +1,4 @@
-import { ituple } from '../../others';
+import { ituple } from '../others';
 
 export const getShuffled = <T>(arr: readonly T[]): T[] =>
   arr

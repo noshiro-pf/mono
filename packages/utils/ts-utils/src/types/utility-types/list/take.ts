@@ -1,3 +1,4 @@
+import type { IsFixedLengthList } from '../is-fixed-length-list';
 import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ReadonlyTupleTake, TupleTake } from '../tuple';
@@ -15,9 +16,11 @@ assertType<TypeEq<ListTake<0, [1, 2, 3]>, []>>();
 export type ReadonlyListTake<
   N extends number,
   T extends readonly unknown[]
-> = ReadonlyTupleTake<N, T>;
+> = IsFixedLengthList<T> extends true ? ReadonlyTupleTake<N, T> : T;
 
 assertType<TypeEq<ReadonlyListTake<2, readonly []>, readonly []>>();
 assertType<TypeEq<ReadonlyListTake<2, readonly [1, 2]>, readonly [1, 2]>>();
 assertType<TypeEq<ReadonlyListTake<2, readonly [1, 2, 3]>, readonly [1, 2]>>();
 assertType<TypeEq<ReadonlyListTake<0, readonly [1, 2, 3]>, readonly []>>();
+assertType<TypeEq<ReadonlyListTake<2, readonly number[]>, readonly number[]>>();
+assertType<TypeEq<ReadonlyListTake<0, readonly number[]>, readonly number[]>>();
