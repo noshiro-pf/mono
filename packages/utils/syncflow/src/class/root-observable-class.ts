@@ -1,4 +1,3 @@
-import type { uint32 } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
 import type {
   ChildObservable,
@@ -44,7 +43,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
       child.depth
     );
 
-    this._procedure = IList.insert(this._procedure, insertPos as uint32, child);
+    this._procedure = IList.insert(this._procedure, insertPos, child);
   }
 
   startUpdate(nextValue: A): void {

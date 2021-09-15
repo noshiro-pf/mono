@@ -1,4 +1,4 @@
-import type { Option, uint32 } from '@noshiro/ts-utils';
+import type { Option } from '@noshiro/ts-utils';
 import { IList, isArrayOfLength1OrMore } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
@@ -115,7 +115,7 @@ export class AsyncChildObservableClass<
       this._procedure.map((a) => a.depth),
       child.depth
     );
-    this._procedure = IList.insert(this._procedure, insertPos as uint32, child);
+    this._procedure = IList.insert(this._procedure, insertPos, child);
   }
 
   startUpdate(nextValue: A): void {
