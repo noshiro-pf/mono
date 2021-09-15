@@ -21,8 +21,6 @@
     "packages/utils/react-blueprintjs-utils",
     "packages/utils/react-material-ui-utils",
     "packages/utils/goober",
-    "packages/utils/immutable",
-    "packages/utils/immutable-tuple",
     "packages/utils/solid-styled-components",
     "packages/apps/algo_app",
     "packages/apps/annotation_tool",
