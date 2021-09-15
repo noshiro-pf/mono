@@ -31,7 +31,6 @@
     "packages/apps/color_demo_app",
     "packages/apps/event_schedule_app_shared",
     "packages/apps/event_schedule_app",
-    "packages/apps/hanabi_history_app",
     "packages/apps/housing_loan_calculator",
     "packages/apps/lambda_calculus_interpreter_core",
     "packages/apps/lambda_calculus_interpreter_preact",

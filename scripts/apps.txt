@@ -4,7 +4,6 @@ cant_stop_probability
 catan_dice_app
 color_demo_app
 event_schedule_app
-hanabi_history_app
 housing_loan_calculator
 lambda_calculus_interpreter_preact
 lambda_calculus_interpreter_react
