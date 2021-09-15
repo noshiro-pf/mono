@@ -1,9 +1,4 @@
-import type {
-  ArrayOfLength,
-  ReadonlyRecord,
-  Rect,
-  ReducerType,
-} from '@noshiro/ts-utils';
+import type { ReadonlyRecord, Rect } from '@noshiro/ts-utils';
 import { produce } from 'immer';
 import type { CardColor, CardNumber } from '../../types';
 

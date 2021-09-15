@@ -1,4 +1,3 @@
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { uriWithQueryParams } from './uri-with-query-params';
 
 const testUri = (

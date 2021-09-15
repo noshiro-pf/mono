@@ -1,4 +1,3 @@
-import type { TypeEq } from './test-type';
 import { assertType } from './test-type';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

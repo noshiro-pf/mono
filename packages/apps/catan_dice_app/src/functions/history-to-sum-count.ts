@@ -1,4 +1,3 @@
-import type { ArrayOfLength, ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
 import type { HistoryState } from '../type';
 

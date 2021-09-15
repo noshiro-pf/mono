@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import type { ReadonlyArrayOfLength, RectSize } from '@noshiro/ts-utils';
+import type { RectSize } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { darkGray } from '../../constants';

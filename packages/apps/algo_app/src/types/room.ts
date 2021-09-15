@@ -1,4 +1,3 @@
-import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import type { GameStateAction } from './game-state';
 
 export type Room = Readonly<{

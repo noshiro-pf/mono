@@ -1,10 +1,3 @@
-import type {
-  ArrayOfLength,
-  DeepReadonly,
-  NonEmptyArray,
-  ReadonlyArrayOfLength,
-  TypeEq,
-} from '../types';
 import { assertNotType, assertType } from '../types';
 import { IMap } from './imap';
 import { IList } from './list';

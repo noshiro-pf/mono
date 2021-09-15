@@ -1,7 +1,6 @@
 import type { Weight } from '@noshiro/event-schedule-app-shared';
 import { BpNumericInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { texts, weightNumericInputConfig } from '../../../constants';
 import { clampAndRoundAnswerWeight } from '../../../functions';

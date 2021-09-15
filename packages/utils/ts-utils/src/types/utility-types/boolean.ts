@@ -1,4 +1,3 @@
-import type { TypeEq } from './test-type';
 import { assertType } from './test-type';
 
 export type BoolNot<A extends boolean> = A extends true ? false : true;

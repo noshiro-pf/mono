@@ -1,5 +1,3 @@
-import type { DeepReadonly } from '../deep';
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { TupleHead } from './head';
 import type { ReadonlyTupleReverse, TupleReverse } from './reverse';

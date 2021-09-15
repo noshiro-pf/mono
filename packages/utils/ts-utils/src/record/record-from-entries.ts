@@ -1,4 +1,3 @@
-import type { TypeEq } from '../types';
 import { assertType } from '../types';
 
 export const recordFromEntries = <K extends PropertyKey, V>(

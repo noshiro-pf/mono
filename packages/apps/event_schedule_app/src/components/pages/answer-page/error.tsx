@@ -1,5 +1,4 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { errorFontColor, texts } from '../../../constants';
 import { Description } from '../../atoms';

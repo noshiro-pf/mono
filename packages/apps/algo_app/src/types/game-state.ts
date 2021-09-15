@@ -1,4 +1,3 @@
-import type { ReadonlyArrayOfLength, TypeExtends } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
 import type { Card, CardWithVisibility } from './card-type';
 import type { PhaseInTurn } from './phase-in-turn';

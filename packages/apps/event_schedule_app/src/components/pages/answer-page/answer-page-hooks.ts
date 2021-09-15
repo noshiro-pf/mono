@@ -8,7 +8,6 @@ import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useNavigator } from '@noshiro/react-router-utils';
 import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { useAlive } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { IMapMapped, IRecord } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';

@@ -1,10 +1,6 @@
 import { pipe } from '../../../functional';
 import { IList } from '../../../immutable';
-import type {
-  NonEmptyArray,
-  Percent,
-  ReadonlyNonEmptyArray,
-} from '../../../types';
+import type { Percent } from '../../../types';
 import { isUint32 } from '../../../types';
 import type { Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';

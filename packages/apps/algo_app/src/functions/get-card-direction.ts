@@ -1,4 +1,4 @@
-import type { ReadonlyArrayOfLength, ReadonlyRecord } from '@noshiro/ts-utils';
+import type { ReadonlyRecord } from '@noshiro/ts-utils';
 import type { Card, NWES } from '../types';
 import { cardEq } from './card-eq';
 

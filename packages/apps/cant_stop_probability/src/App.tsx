@@ -31,8 +31,7 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   };
 });
 
-const resultsSortedByProbability = results
-  .slice()
+const resultsSortedByProbability = [...results]
   .sort((a, b) => a.countSum - b.countSum)
   .reverse();
 

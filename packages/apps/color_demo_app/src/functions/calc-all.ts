@@ -1,4 +1,4 @@
-import type { DeepReadonly, Hsl, Hue, Percent } from '@noshiro/ts-utils';
+import type { Hsl, Hue, Percent } from '@noshiro/ts-utils';
 import {
   hslToRgb,
   IList,

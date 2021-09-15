@@ -1,4 +1,3 @@
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { isNotUndefined } from '@noshiro/ts-utils';
 import { makeUriEndWithSlash } from './make-uri-end-with-slash';
 

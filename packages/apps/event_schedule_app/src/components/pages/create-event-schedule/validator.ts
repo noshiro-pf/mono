@@ -2,7 +2,6 @@ import type {
   EventSchedule,
   EventScheduleValidation,
 } from '@noshiro/event-schedule-app-shared';
-import type { StrictOmit } from '@noshiro/ts-utils';
 import { ifThen, IList, isEmailString } from '@noshiro/ts-utils';
 
 export const validateEventSchedule = ({

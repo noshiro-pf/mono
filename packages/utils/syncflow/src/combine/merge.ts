@@ -1,4 +1,3 @@
-import type { ArrayElement, TypeExtends } from '@noshiro/ts-utils';
 import { assertType, Option } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';

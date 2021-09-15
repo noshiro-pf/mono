@@ -2,9 +2,6 @@ import { pipe, Result } from '../functional';
 import { clamp } from '../num';
 import { ituple } from '../others';
 import type {
-  Length,
-  PrimitiveType,
-  ReadonlyArrayOfLength,
   ReadonlyListButLast,
   ReadonlyListReverse,
   ReadonlyListSkip,
@@ -13,9 +10,6 @@ import type {
   ReadonlyListTake,
   ReadonlyListTakeLast,
   ReadonlyListZip,
-  ReadonlyNonEmptyArray,
-  ReducerType,
-  TypeEq,
 } from '../types';
 import { assertType, isUint32 } from '../types';
 import { IMap } from './imap';
@@ -89,31 +83,34 @@ export namespace IList {
 
   export const size = length;
 
-  export const zeros = (len: number): Result<0[], string> =>
+  export const zeros = (len: number): Result<readonly 0[], string> =>
     !isUint32(len)
       ? Result.err('len should be uint32')
-      : Result.ok(new Array(len).fill(0));
+      : Result.ok(new Array<0>(len).fill(0));
 
-  export const zerosThrow = (len: number): 0[] =>
+  export const zerosThrow = (len: number): readonly 0[] =>
     Result.unwrapThrow(zeros(len));
 
-  export const seq = (len: number): Result<number[], string> =>
+  export const seq = (len: number): Result<readonly number[], string> =>
     pipe(zeros(len)).chain(Result.map((l) => l.map((_, i) => i))).value;
 
-  export const seqThrow = (len: number): number[] =>
+  export const seqThrow = (len: number): readonly number[] =>
     Result.unwrapThrow(seq(len));
 
-  export const newArray = <T>(len: number, init: T): Result<T[], string> =>
+  export const newArray = <T>(
+    len: number,
+    init: T
+  ): Result<readonly T[], string> =>
     pipe(zeros(len)).chain(Result.map((l) => l.map(() => init))).value;
 
-  export const newArrayThrow = <T>(len: number, init: T): T[] =>
+  export const newArrayThrow = <T>(len: number, init: T): readonly T[] =>
     Result.unwrapThrow(newArray(len, init));
 
   export const range = (
     start: number,
     end: number,
     step: number = 1
-  ): Result<number[], string> =>
+  ): Result<readonly number[], string> =>
     pipe(seq(end - start)).chain(
       Result.map((l) => l.map((n) => n * step + start))
     ).value;
@@ -122,10 +119,10 @@ export namespace IList {
     start: number,
     end: number,
     step: number = 1
-  ): number[] => Result.unwrapThrow(range(start, end, step));
+  ): readonly number[] => Result.unwrapThrow(range(start, end, step));
 
   export const copy = <T extends readonly unknown[]>(list: T): T =>
-    list.slice() as readonly unknown[] as T;
+    list.slice() as T;
   {
     const ar = [1, 2, 3] as const;
     const ar2 = copy(ar);
@@ -167,8 +164,7 @@ export namespace IList {
 
   export const tail = <T extends readonly unknown[]>(
     list: T
-  ): ReadonlyListTail<T> =>
-    list.slice(1) as readonly unknown[] as ReadonlyListTail<T>;
+  ): ReadonlyListTail<T> => list.slice(1) as ReadonlyListTail<T>;
 
   export const rest = tail;
   export const shift = tail;
@@ -176,9 +172,7 @@ export namespace IList {
   export const butLast = <T extends readonly unknown[]>(
     list: T
   ): ReadonlyListButLast<T> =>
-    (isEmpty(list)
-      ? []
-      : list.slice(0, -1)) as readonly unknown[] as ReadonlyListButLast<T>;
+    (isEmpty(list) ? [] : list.slice(0, -1)) as ReadonlyListButLast<T>;
 
   export const take = <T extends readonly unknown[], N extends number>(
     list: T,
@@ -229,7 +223,7 @@ export namespace IList {
     list: T,
     mapFn: (a: T[number], index: number) => B
   ): { readonly [K in keyof T]: B } =>
-    list.map(mapFn as (a: unknown, index: number) => B) as readonly B[] as {
+    list.map(mapFn as (a: unknown, index: number) => B) as {
       readonly [K in keyof T]: B;
     };
 
@@ -311,7 +305,7 @@ export namespace IList {
     index: number,
     newValue: A
   ): readonly A[] => {
-    const temp = list.slice();
+    const temp = [...list];
     temp.splice(index, 0, newValue);
     return temp;
   };
@@ -320,7 +314,7 @@ export namespace IList {
     list: readonly A[],
     index: number
   ): readonly A[] => {
-    const temp = list.slice();
+    const temp = [...list];
     temp.splice(index, 1);
     return temp;
   };
@@ -358,7 +352,7 @@ export namespace IList {
   export const reverse = <T extends readonly unknown[]>(
     list: T
   ): ReadonlyListReverse<T> =>
-    list.slice().reverse() as readonly unknown[] as ReadonlyListReverse<T>;
+    [...list].reverse() as readonly unknown[] as ReadonlyListReverse<T>;
 
   export function sort<T extends readonly number[]>(
     list: T,
@@ -373,7 +367,7 @@ export namespace IList {
     comparator?: (x: T[number], y: T[number]) => number
   ): { readonly [K in keyof T]: T[number] } {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
-    return list.slice().sort(cmp) as readonly unknown[] as {
+    return [...list].sort(cmp) as readonly unknown[] as {
       readonly [K in keyof T]: T[number];
     };
   }
@@ -581,7 +575,7 @@ export namespace IList {
     reducer: ReducerType<B, A>,
     init: B
   ): ReadonlyNonEmptyArray<B> => {
-    const result: B[] = newArrayThrow<B>(list.length + 1, init);
+    const result: B[] = [...newArrayThrow<B>(list.length + 1, init)];
 
     let acc = init;
     for (const [index, value] of list.entries()) {
@@ -601,10 +595,7 @@ export namespace IList {
       0
     );
 
-  export const countBy = <
-    T extends readonly unknown[],
-    G extends PrimitiveType
-  >(
+  export const countBy = <T extends readonly unknown[], G extends Primitive>(
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, number> => {
@@ -617,10 +608,7 @@ export namespace IList {
     return IMap.new(groups);
   };
 
-  export const groupBy = <
-    T extends readonly unknown[],
-    G extends PrimitiveType
-  >(
+  export const groupBy = <T extends readonly unknown[], G extends Primitive>(
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, readonly T[number][]> => {
@@ -679,35 +667,24 @@ export namespace IList {
     list1.length === list2.length && list1.every((v, i) => v === list2[i]);
 
   /** @returns list1 ⊂ list2 */
-  export const isSubset = <
-    A extends PrimitiveType,
-    B extends PrimitiveType = A
-  >(
+  export const isSubset = <A extends Primitive, B extends Primitive = A>(
     list1: readonly A[],
     list2: readonly B[]
   ): boolean => list1.every((a) => list2.includes(a as A & B));
 
   /** @returns list1 ⊃ list2 */
-  export const isSuperset = <
-    A extends PrimitiveType,
-    B extends PrimitiveType = A
-  >(
+  export const isSuperset = <A extends Primitive, B extends Primitive = A>(
     list1: readonly A[],
     list2: readonly B[]
   ): boolean => isSubset(list2, list1);
 
-  export const setIntersection = <
-    A extends PrimitiveType,
-    B extends PrimitiveType = A
-  >(
+  export const setIntersection = <A extends Primitive, B extends Primitive = A>(
     list1: readonly A[],
     list2: readonly B[]
   ): readonly (A & B)[] =>
-    list1.filter((e) =>
-      list2.includes(e as A & B)
-    ) as readonly A[] as readonly (A & B)[];
+    list1.filter((e) => list2.includes(e as A & B)) as readonly (A & B)[];
 
-  export const setDifference = <T extends PrimitiveType>(
+  export const setDifference = <T extends Primitive>(
     sortedList1: readonly T[],
     sortedList2: readonly T[]
   ): readonly T[] => {

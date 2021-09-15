@@ -1,7 +1,5 @@
-import type { DeepReadonly } from '../deep';
 import type { IsNotFixedLengthList } from '../is-fixed-length-list';
 import type { ReadonlyRecordBase } from '../readonly-record-base';
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ToNumber } from '../to-number';
 import type { Prefixes } from './prefix';

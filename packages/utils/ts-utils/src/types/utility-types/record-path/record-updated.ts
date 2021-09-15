@@ -1,7 +1,5 @@
-import type { DeepReadonly } from '../deep';
 import type { IndexOfTuple } from '../index-of-tuple';
 import type { ReadonlyRecordBase } from '../readonly-record-base';
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ReadonlyTupleSet } from '../tuple';
 import type { Paths } from './record-paths';

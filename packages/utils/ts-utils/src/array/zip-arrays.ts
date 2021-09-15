@@ -1,5 +1,4 @@
 import { IList } from '../immutable';
-import type { ArrayElement } from '../types';
 
 type Unwrap<S> = { [P in keyof S]: ArrayElement<S[P]> };
 

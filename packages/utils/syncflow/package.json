@@ -29,7 +29,7 @@
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "clean": "run-s clean:**",
     "fmt": "yarn _prettier .",
-    "gi:src": "yarn _script_genindex ./src",
+    "gi:src": "yarn _script_genindex ./src --min-depth 1",
     "gi:test": "yarn _script_genindex ./test/cases",
     "gi": "run-s gi:*",
     "lint:fix": "yarn lint --fix",

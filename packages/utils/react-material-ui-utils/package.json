@@ -16,7 +16,7 @@
     "clean:build:esm": "rimraf esm",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
-    "gi": "yarn _script_genindex ./src",
+    "gi": "yarn _script_genindex ./src --min-depth 1",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
     "setup": "echo 'no setup script'",

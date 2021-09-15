@@ -1,5 +1,4 @@
 import type { MakeTuple, MakeTupleImpl } from './make-tuple';
-import type { TypeEq } from './test-type';
 import { assertType } from './test-type';
 import type { ReadonlyTupleTail } from './tuple';
 

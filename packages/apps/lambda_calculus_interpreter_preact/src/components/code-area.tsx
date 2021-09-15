@@ -1,6 +1,5 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'preact/compat';
 import type { ChangeEventHandler, CSSProperties } from 'react';
 

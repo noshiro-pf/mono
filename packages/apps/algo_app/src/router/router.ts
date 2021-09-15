@@ -1,4 +1,3 @@
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useState } from 'preact/hooks';
 import { withSlash } from '../constants';
 

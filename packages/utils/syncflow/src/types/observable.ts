@@ -1,4 +1,4 @@
-import type { Option, TypeExtends } from '@noshiro/ts-utils';
+import type { Option } from '@noshiro/ts-utils';
 import { assertNotType, assertType } from '@noshiro/ts-utils';
 import type { ObservableId, Token } from './id';
 import type { ObservableKind } from './observable-kind';

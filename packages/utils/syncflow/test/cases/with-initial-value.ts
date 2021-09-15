@@ -1,4 +1,3 @@
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import type { Observable, TimerObservable } from '../../src';
 import {
   combineLatest,

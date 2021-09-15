@@ -1,4 +1,3 @@
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 
 export type TupleButLast<A extends readonly unknown[]> = A extends readonly []

@@ -1,5 +1,4 @@
 import type { IsFixedLengthList } from '../is-fixed-length-list';
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ReadonlyTupleReverse, TupleReverse } from '../tuple';
 import type { ListHead } from './head';

@@ -1,4 +1,3 @@
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { tuple } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
 import { interval, map, mergeMap, take } from '../../src';

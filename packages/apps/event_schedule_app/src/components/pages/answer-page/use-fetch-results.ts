@@ -17,7 +17,6 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { isNotUndefined, Result } from '@noshiro/ts-utils';
 import { api } from '../../../api';
 import { clog } from '../../../utils';

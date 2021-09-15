@@ -1,4 +1,4 @@
-import type { ArrayElement, Option, Result } from '@noshiro/ts-utils';
+import type { Option, Result } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
   InitializedSyncChildObservable,

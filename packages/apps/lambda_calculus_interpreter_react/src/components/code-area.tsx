@@ -1,5 +1,4 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import type { ChangeEventHandler, CSSProperties } from 'react';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';

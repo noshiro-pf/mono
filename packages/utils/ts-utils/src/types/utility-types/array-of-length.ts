@@ -1,15 +1,4 @@
-import type { TypeEq } from './test-type';
 import { assertType } from './test-type';
-
-export type ArrayOfLength<N extends number, T> = ArrayOfLengthRec<N, T, []>;
-export type ReadonlyArrayOfLength<N extends number, T> = Readonly<
-  ArrayOfLength<N, T>
->;
-
-type ArrayOfLengthRec<Num, Elm, T extends unknown[]> = {
-  0: T;
-  1: ArrayOfLengthRec<Num, Elm, [Elm, ...T]>;
-}[T extends { length: Num } ? 0 : 1];
 
 assertType<TypeEq<[0, 0], ArrayOfLength<2, 0>>>();
 assertType<TypeEq<[0, 0, 0], ArrayOfLength<3, 0>>>();

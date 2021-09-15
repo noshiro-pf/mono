@@ -2,7 +2,6 @@ import type {
   AnswerSymbolIconId,
   DatetimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import type { ReducerType } from '@noshiro/ts-utils';
 import { IMapMapped } from '@noshiro/ts-utils';
 import type { DatetimeRangeMapKey } from '../../../functions';
 import {

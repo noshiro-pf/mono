@@ -1,4 +1,3 @@
-import type { TypeEq } from '../types';
 import { assertType } from '../types';
 import { ISet } from './iset';
 import { IList } from './list';

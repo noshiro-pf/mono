@@ -3,7 +3,6 @@ import type {
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import { DatePickerDate } from './date-picker-day';
 

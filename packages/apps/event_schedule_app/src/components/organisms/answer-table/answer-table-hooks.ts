@@ -5,7 +5,7 @@ import type {
   EventSchedule,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import type { DeepReadonly, IMapMapped } from '@noshiro/ts-utils';
+import type { IMapMapped } from '@noshiro/ts-utils';
 import { IList, mapNullable, pipe } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useCallback, useMemo, useState } from 'react';

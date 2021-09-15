@@ -1,4 +1,3 @@
-import type { PrimitiveType } from '@noshiro/ts-utils';
 import { isNotUndefined } from '@noshiro/ts-utils';
 import type { Observable, ObservableInput, OperatorFunction } from 'rxjs';
 import { filter, map, mapTo, pluck, withLatestFrom } from 'rxjs/operators';
@@ -6,7 +5,7 @@ import { combineLatestTyped } from '../combine-latest';
 import type { Unwrap } from '../unwrap';
 import { every } from './every';
 
-export const mapToConst = <T extends PrimitiveType>(
+export const mapToConst = <T extends Primitive>(
   constant: T
 ): OperatorFunction<unknown, T> => mapTo(constant);
 
@@ -36,7 +35,7 @@ export const filterNotValue = <S, T extends S>(
 export const filterNotUndefined = <T>(): OperatorFunction<
   T,
   // eslint-disable-next-line @typescript-eslint/ban-types
-  Exclude<T, undefined>
+  RelaxedExclude<T, undefined>
 > => filter(isNotUndefined);
 
 export const filterByLatest =

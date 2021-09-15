@@ -1,4 +1,4 @@
-import type { DeepReadonly, Hsl, Hue } from '@noshiro/ts-utils';
+import type { Hsl, Hue } from '@noshiro/ts-utils';
 
 export type ColorResult = DeepReadonly<{
   accumulatedDistribution: [Hsl, number][];

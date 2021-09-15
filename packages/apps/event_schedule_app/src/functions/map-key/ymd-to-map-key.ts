@@ -1,6 +1,5 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import type {
-  ArrayOfLength,
   DateEnum,
   MonthEnum,
   Phantomic,

@@ -1,5 +1,4 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import type { ReducerType } from '@noshiro/ts-utils';
 import { IList, ISetMapped } from '@noshiro/ts-utils';
 import type { YmdKey } from '../../../functions';
 import { ymdFromKey, ymdToKey } from '../../../functions';
