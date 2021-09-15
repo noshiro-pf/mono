@@ -1,0 +1,4 @@
+!dist
+!dist/*.d.ts
+!unchanged
+!unchanged/*.d.ts
