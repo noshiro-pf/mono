@@ -5,7 +5,6 @@ catan_dice_app
 color_demo_app
 event_schedule_app_shared
 event_schedule_app
-hanabi_history_app
 housing_loan_calculator
 lambda_calculus_interpreter_core
 lambda_calculus_interpreter_preact
