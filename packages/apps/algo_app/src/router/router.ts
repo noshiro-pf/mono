@@ -1,20 +1,33 @@
+import { IMap, isArrayOfLength2 } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useState } from 'preact/hooks';
 import { withSlash } from '../constants';
 
 type Router = DeepReadonly<{
   pathname: string;
+  queryParams: QueryParams;
   push: (nextPath: string) => void;
   replace: (nextPath: string) => void;
   back: () => void;
 }>;
 
-export const useRouter = (): Router => {
-  const [pathname, setPathname] = useState<string>(location.pathname);
+export type QueryParams = IMap<string, string>;
 
-  const pathnameWithSlash = withSlash(pathname);
+export const useRouter = (): Router => {
+  const [{ pathname, queryParams }, setLocation] = useState<
+    Readonly<{
+      pathname: string;
+      queryParams: QueryParams;
+    }>
+  >({
+    pathname: location.pathname,
+    queryParams: parseQueryParamsStr(location.search),
+  });
 
   const updatePathname = useCallback(() => {
-    setPathname(location.pathname);
+    setLocation({
+      pathname: location.pathname,
+      queryParams: parseQueryParamsStr(location.search),
+    });
   }, []);
 
   const push = useCallback(
@@ -48,9 +61,31 @@ export const useRouter = (): Router => {
   }, [updatePathname]);
 
   return {
-    pathname: pathnameWithSlash,
+    pathname: withSlash(pathname),
+    queryParams,
     push,
     replace,
     back,
   };
+};
+
+const validateKeyValuePairs = (
+  kvs: DeepReadonly<string[][]>
+): kvs is DeepReadonly<[string, string][]> => kvs.every(isArrayOfLength2);
+
+const parseQueryParamsStr = (queryParamsStr: string): QueryParams => {
+  if (!queryParamsStr.startsWith('?')) {
+    return IMap.new<string, string>([]);
+  }
+
+  const keyValuePairs: DeepReadonly<string[][]> = queryParamsStr
+    .slice(1) // remove "?"
+    .split('&') // "key1=value1&key2=value2" -> ["key1=value1", "key2=value2"]
+    .map((group) => group.split('=')); // "key1=value1" -> ["key1", "value1"]
+
+  if (!validateKeyValuePairs(keyValuePairs)) {
+    return IMap.new<string, string>([]);
+  }
+
+  return IMap.new<string, string>(keyValuePairs);
 };

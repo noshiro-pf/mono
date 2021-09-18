@@ -30,7 +30,13 @@ import {
 } from './organisms';
 import { useWindowSize } from './use-window-size';
 
-type Props = Readonly<{ windowSize: Rect; roomId: string }>;
+type Props = Readonly<{
+  windowSize: Rect;
+  roomId: string;
+  playerId: string;
+  replay: boolean;
+  observe: boolean;
+}>;
 
 export const GameMain = memoNamed<Props>(
   'GameMain',

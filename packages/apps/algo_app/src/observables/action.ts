@@ -1,7 +1,6 @@
 import type { Observable } from '@noshiro/syncflow';
 import {
   combineLatest,
-  filter,
   fromArray,
   interval,
   map,
@@ -13,7 +12,7 @@ import {
   zip,
 } from '@noshiro/syncflow';
 import { IList } from '@noshiro/ts-utils';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { time } from '../constants';
 import { returnFalse } from '../return-boolean';
 import type { Card, GameStateAction, NWES } from '../types';
@@ -21,44 +20,70 @@ import { actionsFromDb$, db, paths, roomId$ } from './database';
 
 const autoPlaySpeedRate = 0.5;
 
-const gameStateActionSource$ = subject<GameStateAction>();
+const localGameStateActionSource$ = subject<GameStateAction>();
 
 const gameStateDispatcher = (action: GameStateAction): void => {
-  gameStateActionSource$.next(action);
+  localGameStateActionSource$.next(action);
 };
 
-export const gameStateActionMerged$: Observable<GameStateAction> = merge([
-  gameStateActionSource$.chain(
-    map((a) => ({ type: 'local', value: a } as const))
-  ),
-  actionsFromDb$.chain(map((a) => ({ type: 'remote', value: a } as const))),
-] as const)
-  .chain(
-    scan<
-      Readonly<
-        | { type: 'local'; value: GameStateAction }
-        | { type: 'remote'; value: readonly GameStateAction[] }
-      >,
-      readonly GameStateAction[]
-    >((state, action) => {
-      switch (action.type) {
-        case 'local':
-          return [...state, action.value];
-        case 'remote':
-          return action.value.length > state.length ? action.value : state; // ローカルの方が進んでいるときは無視
-      }
-    }, [])
-  )
-  .chain(filter(IList.isNonEmpty))
-  .chain(map((list) => IList.last(list)));
+export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
+  merge([
+    localGameStateActionSource$.chain(
+      map((a) => ({ type: 'local', value: a } as const))
+    ),
+    actionsFromDb$.chain(map((a) => ({ type: 'remote', value: a } as const))),
+  ] as const)
+    .chain(
+      scan<
+        DeepReadonly<
+          | { type: 'local'; value: GameStateAction }
+          | { type: 'remote'; value: GameStateAction[] }
+        >,
+        DeepReadonly<{
+          newCommits: GameStateAction[];
+          commitsPlayed: GameStateAction[];
+        }>
+      >(
+        ({ commitsPlayed }, action) => {
+          console.log(commitsPlayed, action);
+          switch (action.type) {
+            case 'local':
+              return {
+                newCommits: [action.value],
+                commitsPlayed: [...commitsPlayed, action.value],
+              };
+            case 'remote':
+              return action.value.length <= commitsPlayed.length
+                ? {
+                    commitsPlayed,
+                    newCommits: [],
+                  } // ローカルの方が進んでいるときは無視
+                : {
+                    newCommits: IList.skip(action.value, commitsPlayed.length),
+                    commitsPlayed: action.value,
+                  };
+          }
+        },
+        {
+          newCommits: [],
+          commitsPlayed: [],
+        }
+      )
+    )
+    .chain(map((s) => s.newCommits));
 
-actionsFromDb$.subscribe(console.log);
+// actionsFromDb$.subscribe(console.log);
+// gameStateActionMerged$.subscribe((merged) => {
+//   console.log({ merged });
+// });
 
-combineLatest([roomId$, gameStateActionSource$] as const).subscribe(
-  ([roomId, action]) => {
-    addDoc(collection(db, paths.rooms, roomId, paths.actions), action)
+combineLatest([roomId$, localGameStateActionSource$] as const).subscribe(
+  ([roomId, localAction]) => {
+    addDoc(collection(db, paths.rooms, roomId, paths.actions), localAction)
       .then(() => {
-        console.log(roomId, action);
+        if (returnFalse()) {
+          console.log(roomId, localAction);
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -67,16 +92,24 @@ combineLatest([roomId$, gameStateActionSource$] as const).subscribe(
 );
 
 export const gameStateAction$: Observable<GameStateAction> =
-  gameStateActionSource$;
+  localGameStateActionSource$;
 
 export const onCardClick = (card: Card, playerDirectionFromMe: NWES): void => {
   switch (playerDirectionFromMe) {
     case 'W':
     case 'E':
-      gameStateDispatcher({ type: 'selectOpponentCard', card });
+      gameStateDispatcher({
+        type: 'selectOpponentCard',
+        timestamp: serverTimestamp(),
+        card,
+      });
       break;
     case 'S':
-      gameStateDispatcher({ type: 'selectMyCard', card });
+      gameStateDispatcher({
+        type: 'selectMyCard',
+        timestamp: serverTimestamp(),
+        card,
+      });
       break;
     case 'N':
       break;
@@ -84,19 +117,32 @@ export const onCardClick = (card: Card, playerDirectionFromMe: NWES): void => {
 };
 
 export const onTossCancel = (): void => {
-  gameStateDispatcher({ type: 'cancelToss' });
+  gameStateDispatcher({
+    type: 'cancelToss',
+    timestamp: serverTimestamp(),
+  });
 };
 
 export const onTossSubmit = (): void => {
-  gameStateDispatcher({ type: 'submitToss' });
+  gameStateDispatcher({
+    type: 'submitToss',
+    timestamp: serverTimestamp(),
+  });
 };
 
 export const onSelectAnswer = (answer: Card): void => {
-  gameStateDispatcher({ type: 'selectAnswer', answer });
+  gameStateDispatcher({
+    type: 'selectAnswer',
+    timestamp: serverTimestamp(),
+    answer,
+  });
 };
 
 export const onAnswerCancel = (): void => {
-  gameStateDispatcher({ type: 'cancelAnswer' });
+  gameStateDispatcher({
+    type: 'cancelAnswer',
+    timestamp: serverTimestamp(),
+  });
 };
 
 /**
@@ -111,19 +157,31 @@ export const onAnswerCancel = (): void => {
  * ```
  */
 export const onAnswerSubmit = (): void => {
-  gameStateDispatcher({ type: 'submitAnswer' });
+  gameStateDispatcher({
+    type: 'submitAnswer',
+    timestamp: serverTimestamp(),
+  });
 
   setTimeout(() => {
-    gameStateDispatcher({ type: 'showJudgeOnDecidedAnswer' });
+    gameStateDispatcher({
+      type: 'showJudgeOnDecidedAnswer',
+      timestamp: serverTimestamp(),
+    });
   }, autoPlaySpeedRate * time.showJudge);
 
   setTimeout(() => {
-    gameStateDispatcher({ type: 'hideDecidedAnswerBalloon' });
+    gameStateDispatcher({
+      type: 'hideDecidedAnswerBalloon',
+      timestamp: serverTimestamp(),
+    });
   }, autoPlaySpeedRate * (time.showJudge + time.hideJudge));
 };
 
 export const onTurnEndClick = (): void => {
-  gameStateDispatcher({ type: 'goToNextTurn' });
+  gameStateDispatcher({
+    type: 'goToNextTurn',
+    timestamp: serverTimestamp(),
+  });
 };
 
 // auto play
@@ -132,97 +190,121 @@ const actionsToAutoPlay = [
   [
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'black', number: 6 },
     },
     {
       type: 'submitToss',
+      timestamp: serverTimestamp(),
     },
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'white', number: 7 },
     },
     {
       type: 'selectOpponentCard',
+      timestamp: serverTimestamp(),
       card: { color: 'black', number: 8 },
     },
     {
       type: 'selectAnswer',
+      timestamp: serverTimestamp(),
       answer: { color: 'black', number: 9 },
     },
     {
       type: 'submitAnswer',
+      timestamp: serverTimestamp(),
     },
   ],
   [
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'white', number: 1 },
     },
     {
       type: 'submitToss',
+      timestamp: serverTimestamp(),
     },
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'black', number: 8 },
     },
     {
       type: 'selectOpponentCard',
+      timestamp: serverTimestamp(),
       card: { color: 'black', number: 6 },
     },
     {
       type: 'selectAnswer',
+      timestamp: serverTimestamp(),
       answer: { color: 'black', number: 7 },
     },
     {
       type: 'submitAnswer',
+      timestamp: serverTimestamp(),
     },
   ],
   [
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'white', number: 8 },
     },
     {
       type: 'submitToss',
+      timestamp: serverTimestamp(),
     },
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'white', number: 3 },
     },
     {
       type: 'selectOpponentCard',
+      timestamp: serverTimestamp(),
       card: { color: 'white', number: 0 },
     },
     {
       type: 'selectAnswer',
+      timestamp: serverTimestamp(),
       answer: { color: 'white', number: 1 },
     },
     {
       type: 'submitAnswer',
+      timestamp: serverTimestamp(),
     },
   ],
   [
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'black', number: 5 },
     },
     {
       type: 'submitToss',
+      timestamp: serverTimestamp(),
     },
     {
       type: 'selectMyCard',
+      timestamp: serverTimestamp(),
       card: { color: 'black', number: 0 },
     },
     {
       type: 'selectOpponentCard',
+      timestamp: serverTimestamp(),
       card: { color: 'black', number: 6 },
     },
     {
       type: 'selectAnswer',
+      timestamp: serverTimestamp(),
       answer: { color: 'black', number: 7 },
     },
     {
       type: 'submitAnswer',
+      timestamp: serverTimestamp(),
     },
   ],
 ] as const;
