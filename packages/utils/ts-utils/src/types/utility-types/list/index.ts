@@ -1,6 +1,5 @@
 export * from './butlast';
 export * from './concat';
-export * from './drop';
 export * from './flatten';
 export * from './head';
 export * from './last';
@@ -8,6 +7,9 @@ export * from './partition';
 export * from './pipe';
 export * from './reverse';
 export * from './set';
+export * from './skip';
+export * from './skip-last';
 export * from './tail';
 export * from './take';
+export * from './take-last';
 export * from './zip';

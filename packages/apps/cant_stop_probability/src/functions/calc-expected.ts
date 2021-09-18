@@ -1,4 +1,3 @@
-import type { uint32 } from '@noshiro/ts-utils';
 import type { Count } from '../types';
 
 /**
@@ -22,7 +21,7 @@ import type { Count } from '../types';
  */
 
 // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
-export const calcExpected = (count: Count): uint32 => {
+export const calcExpected = (count: Count): number => {
   const { noLine, oneLine, twoLine } = count as { [K in keyof Count]: number };
-  return Math.floor((oneLine + 2 * twoLine) / noLine) as uint32;
+  return Math.floor((oneLine + 2 * twoLine) / noLine);
 };

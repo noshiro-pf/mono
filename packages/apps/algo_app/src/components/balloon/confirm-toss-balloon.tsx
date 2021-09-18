@@ -5,6 +5,7 @@ import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { outlineColorDef, text } from '../../constants';
 import type { ConfirmTossBalloonProps } from '../../types';
+import { Button } from '../bp';
 import { CardComponent } from '../card';
 import { createBalloonBody, createBalloonWithDownArrow } from './balloon-base';
 import { calcBalloonPosition } from './calc-balloon-position';
@@ -73,12 +74,12 @@ export const ConfirmTossBalloon = memoNamed<Props>(
             </Message>
           </CardAndMessage>
           <Buttons>
-            <button type={'button'} onClick={cancel}>
-              {text.cancel}
-            </button>
-            <button type={'button'} onClick={submit}>
-              {text.submitToss}
-            </button>
+            <div>
+              <Button onClick={cancel}>{text.cancel}</Button>
+            </div>
+            <div>
+              <Button onClick={submit}>{text.submitToss}</Button>
+            </div>
           </Buttons>
         </BalloonContent>
       </BalloonWithDownArrowTranslated>

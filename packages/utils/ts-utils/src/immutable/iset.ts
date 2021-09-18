@@ -1,11 +1,9 @@
-import type { uint32 } from '../types';
-
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface ISetInterface<K> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: uint32;
+  size: number;
   has: (key: K) => boolean;
 
   // Reducing a value
@@ -61,8 +59,8 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     this._set = new Set(iterable);
   }
 
-  get size(): uint32 {
-    return this._set.size as uint32;
+  get size(): number {
+    return this._set.size;
   }
 
   has(key: K): boolean {

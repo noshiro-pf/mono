@@ -1,5 +1,4 @@
-import { isEmpty } from '../is-empty';
-import { sum } from './sum';
+import { IList } from '../../immutable';
 
 export const average = (array: readonly number[]): number =>
-  isEmpty(array) ? 0 : sum(array) / array.length;
+  IList.isEmpty(array) ? 0 : IList.sum(array) / array.length;

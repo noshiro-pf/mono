@@ -51,8 +51,11 @@
     "@noshiro/preact-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
+    "firebase": "^9.0.2",
     "immer": "^9.0.2",
-    "preact": "^10.4.7",
-    "preact-router": "^3.2.1"
+    "preact": "^10.4.7"
+  },
+  "devDependencies": {
+    "firebase-tools": "^9.18.0"
   }
 }

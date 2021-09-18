@@ -1,12 +1,12 @@
 import type { OptionProps } from '@blueprintjs/core';
 import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import type { MonthEnum, uint32, YearEnum } from '@noshiro/ts-utils';
+import type { MonthEnum, YearEnum } from '@noshiro/ts-utils';
 import {
   getMonth,
   getYear,
+  IList,
   monthsList,
-  range,
   stringToNumber,
   today,
 } from '@noshiro/ts-utils';
@@ -16,11 +16,11 @@ import styled from 'styled-components';
 const thisYear = getYear(today());
 const thisMonth = getMonth(today());
 
-const yearOption: number[] = range(
-  (thisYear - 100) as uint32,
-  (thisYear + 100) as uint32
+const yearOption: readonly number[] = IList.rangeThrow(
+  thisYear - 100,
+  thisYear + 100
 );
-const monthOption: OptionProps[] = monthsList.en.map((e) => ({
+const monthOption: readonly OptionProps[] = monthsList.en.map((e) => ({
   value: e.value,
   label: e.name,
 }));

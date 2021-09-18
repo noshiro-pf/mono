@@ -1,5 +1,4 @@
-import type { uint32 } from '@noshiro/ts-utils';
-import { seq } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import { ithBorrowingBalanceInPIER, monthlyPaymentsInPIER } from './financial';
 
 export const calcPrincipalAndInterestEqualPayment = ({
@@ -10,19 +9,19 @@ export const calcPrincipalAndInterestEqualPayment = ({
   borrowingPeriodMonth: number;
   borrowingTotalYen: number;
   interestRatePerMonth: number;
-}>): {
-  borrowingBalanceYen: number[];
-  interestYen: number[];
-  monthlyPrincipalPaymentYen: number[];
+}>): Readonly<{
+  borrowingBalanceYen: readonly number[];
+  interestYen: readonly number[];
+  monthlyPrincipalPaymentYen: readonly number[];
   fixedMonthlyPaymentsYen: number;
-} => {
+}> => {
   const fixedMonthlyPaymentsYen = monthlyPaymentsInPIER({
     total: borrowingTotal,
     numPayments,
     interestRate,
   });
 
-  const borrowingBalanceYen = seq((numPayments + 1) as uint32).map((ith) =>
+  const borrowingBalanceYen = IList.seqThrow(numPayments + 1).map((ith) =>
     ithBorrowingBalanceInPIER({
       total: borrowingTotal,
       numPayments,

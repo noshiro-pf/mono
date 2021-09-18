@@ -1,4 +1,3 @@
-import type { uint32 } from '@noshiro/ts-utils';
 import { setIntersection } from '@noshiro/ts-utils';
 import { diceValueSet } from '../constants';
 import type { TwoDiceSumValue } from '../types';
@@ -8,7 +7,7 @@ import { possibleTwoDiceSums } from './possible-two-dice-sums';
 export const countSuccessForRemains = (
   // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
   columnsAlive: ReadonlySet<TwoDiceSumValue>
-): uint32 => {
+): number => {
   let count = 0;
 
   for (const a of diceValueSet) {
@@ -26,5 +25,5 @@ export const countSuccessForRemains = (
     }
   }
 
-  return count as uint32;
+  return count;
 };

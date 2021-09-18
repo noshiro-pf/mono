@@ -1,11 +1,10 @@
 import { Navbar, Tab, Tabs } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { uint32 } from '@noshiro/ts-utils';
 import {
+  IList,
   isNotUndefined,
   stringToNumber,
   tuple,
-  zeros,
 } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -21,7 +20,7 @@ import { isTwoDiceSumValue } from './types';
 
 const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const count = countSuccess(x, y, z);
-  const countSum = (denom - count.noLine) as uint32;
+  const countSum = denom - count.noLine;
   return {
     id: `${x}-${y}-${z}`,
     selected: tuple(x, y, z),
@@ -77,7 +76,7 @@ export const App = memoNamed('App', () => {
   ] = useState<'deadColumnUI' | 'table'>('table');
 
   const [columnsAlive, setDeadColumns] = useState<readonly boolean[]>(
-    zeros(11 as uint32).map(() => true)
+    IList.newArrayThrow(11, true)
   );
 
   const columnsAliveWithHandler = useMemo<

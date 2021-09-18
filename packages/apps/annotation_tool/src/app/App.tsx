@@ -6,10 +6,11 @@ import {
 import type {
   Hue,
   Percent,
+  ReadonlyArrayOfLength,
   ReadonlyNonEmptyArray,
   RectSize,
 } from '@noshiro/ts-utils';
-import { map, pickupHighContrastHues, pipe, zip } from '@noshiro/ts-utils';
+import { IList, pickupHighContrastHues, pipe } from '@noshiro/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
 import type { AnnotationCanvasStyle, IdType, Label } from '../canvas';
@@ -48,15 +49,19 @@ const labelNames = [
   'Giraffe',
   'Horse',
 ] as const;
+type LabelLen = typeof labelNames['length'];
 
 const hues = pickupHighContrastHues(
   labelNames.length,
   saturationDarker,
   lightnessDarker
-) as ReadonlyNonEmptyArray<Hue>;
+) as ReadonlyArrayOfLength<LabelLen, Hue>;
 
-const labels: ReadonlyNonEmptyArray<Label> = pipe(zip(hues, labelNames)).chain(
-  map(
+const labels: ReadonlyNonEmptyArray<Label> = pipe(
+  IList.zip(hues, labelNames)
+).chain((list) =>
+  IList.map(
+    list,
     ([hue, labelName]: readonly [Hue, string], index): Label => ({
       id: index.toString(),
       hue,

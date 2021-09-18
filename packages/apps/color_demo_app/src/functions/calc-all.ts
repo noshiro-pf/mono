@@ -1,12 +1,10 @@
-import type { Hsl, Hue, Percent, uint32 } from '@noshiro/ts-utils';
+import type { DeepReadonly, Hsl, Hue, Percent } from '@noshiro/ts-utils';
 import {
   hslToRgb,
-  max,
+  IList,
   relativeLuminance,
   roundToInt,
-  seq,
   variance,
-  zip,
 } from '@noshiro/ts-utils';
 import type { ColorResult } from '../types';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
@@ -14,7 +12,7 @@ import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues';
 
-const hueListDefault = seq(360 as uint32);
+const hueListDefault = IList.seqThrow(360);
 
 export const calcAll = ({
   saturation,
@@ -25,13 +23,13 @@ export const calcAll = ({
   saturation: Percent;
   lightness: Percent;
   firstHue: Hue;
-  divisionNumber: uint32;
-}>): {
+  divisionNumber: number;
+}>): DeepReadonly<{
   relativeLuminanceDistribution: [Hsl, number][];
   result1_equallySpaced: ColorResult;
   result2_weighted: ColorResult;
   result3_weighted_log: ColorResult;
-} => {
+}> => {
   /* values */
 
   const hueList = hueListDefault.map(
@@ -48,14 +46,17 @@ export const calcAll = ({
 
   /* 1. 彩度・明度を固定し色相を横軸としたときの相対輝度分布 */
 
-  const maxLuminanceInList = max(luminanceList) ?? 1;
+  const maxLuminanceInList = IList.max(luminanceList) ?? 1;
   const luminanceListNormalized = luminanceList.map(
     (l) => l / maxLuminanceInList
   );
 
-  const relativeLuminanceDistribution = zip(hslList, luminanceListNormalized);
+  const relativeLuminanceDistribution = IList.zip(
+    hslList,
+    luminanceListNormalized
+  );
 
-  const pickedUpHues_equallySpaced = seq(divisionNumber)
+  const pickedUpHues_equallySpaced = IList.seqThrow(divisionNumber)
     .map((i) => roundToInt((i * 360) / divisionNumber) as Hue)
     .map((h) => ((h - firstHue + 360) % 360) as Hue);
 
@@ -66,7 +67,7 @@ export const calcAll = ({
   );
 
   const result1_equallySpaced: ColorResult = {
-    accumulatedDistribution: zip(
+    accumulatedDistribution: IList.zip(
       hslList,
       hueListDefault.map((i) => i / 360)
     ),
@@ -92,7 +93,7 @@ export const calcAll = ({
   );
 
   const result2_weighted: ColorResult = {
-    accumulatedDistribution: zip(
+    accumulatedDistribution: IList.zip(
       hslList,
       normalizeList(getLuminanceListAccumulated(luminanceList, false))
     ),
@@ -119,7 +120,7 @@ export const calcAll = ({
   );
 
   const result3_weighted_log: ColorResult = {
-    accumulatedDistribution: zip(
+    accumulatedDistribution: IList.zip(
       hslList,
       normalizeList(getLuminanceListAccumulated(luminanceList, true))
     ),

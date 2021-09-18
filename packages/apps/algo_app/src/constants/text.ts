@@ -9,4 +9,25 @@ export const text = {
       'アタックに使う自分のカードを選び、アタックする敵のカードを選んでください。',
     selectYourCardToAttack: 'アタックする敵のカードを選んでください。',
   },
+
+  gameMain: {
+    endTurnButton: 'ターン終了',
+  },
+
+  notFoundPage: {
+    title: 'ページが見つかりません',
+    backToMain: 'メインページに戻る',
+  },
+
+  createRoom: {
+    gamePassword: {
+      label: '部屋のパスワード',
+      placeholder: '(optional)',
+    },
+    username: {
+      label: 'あなたの名前',
+      placeholder: 'algo master',
+    },
+    button: '部屋を作成',
+  },
 } as const;

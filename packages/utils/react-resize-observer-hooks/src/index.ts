@@ -1,4 +1,4 @@
-import { isNonEmpty } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
@@ -17,7 +17,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
     () =>
       // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
       new CustomResizeObserver((entries) => {
-        if (isNonEmpty(entries)) {
+        if (IList.isNonEmpty(entries)) {
           setSize(entries[0].contentRect);
         }
       }),

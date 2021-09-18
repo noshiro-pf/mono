@@ -1,5 +1,5 @@
 import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
-import { map, match, noop, pipe } from '@noshiro/ts-utils';
+import { IList, match, noop, pipe } from '@noshiro/ts-utils';
 import { directions, outlineColorDef, text } from '../constants';
 import {
   cardEq,
@@ -41,8 +41,8 @@ const mapPlayers6CardsToDisplayValue = ({
 }>): ReadonlyArrayOfLength<6, CardWithDisplayValue> =>
   pipe(player6Cards)
     .chain(sortCards)
-    .chain(
-      map<CardWithVisibility, CardWithDisplayValue>((c) => {
+    .chain((list) =>
+      IList.map(list, (c) => {
         const isAns = cardEq(gameState.cardChosenToBeAttacked, c);
         const isAtk = cardEq(gameState.cardChosenToAttack, c);
         const isToss = cardEq(gameState.cardChosenToToss, c);
@@ -54,9 +54,9 @@ const mapPlayers6CardsToDisplayValue = ({
             W: 'faceDownButVisibleToCounter',
             N: 'faceDownButVisibleToMe',
             E: 'faceDownButVisibleToCounter',
-          }),
+          } as const),
           everyone: 'faceUp',
-        });
+        } as const);
 
         const isClickable: boolean = gameState.readonly
           ? false
@@ -86,7 +86,7 @@ const mapPlayers6CardsToDisplayValue = ({
                   ph020_firstAnswer: true,
                   ph030_continuousAnswer: true,
                 }),
-            });
+            } as const);
 
         return {
           ...c,
@@ -98,7 +98,7 @@ const mapPlayers6CardsToDisplayValue = ({
             W: isAns ? 'always' : isClickable ? 'onHover' : 'never',
             N: 'never',
             E: isAns ? 'always' : isClickable ? 'onHover' : 'never',
-          }),
+          } as const),
           outlineColor:
             isAns || isAtk || isToss
               ? outlineColorDef.red
@@ -108,7 +108,7 @@ const mapPlayers6CardsToDisplayValue = ({
             : () => {
                 onCardClick(c, direction);
               },
-        };
+        } as const;
       })
     ).value;
 
@@ -166,4 +166,7 @@ export const mapToDisplayValue = ({
     2: directions[decrementPlayerIndex(2, myPlayerIndex)],
     3: directions[decrementPlayerIndex(3, myPlayerIndex)],
   }),
+
+  endTurnButtonDisabled:
+    gameState.phase !== 'ph030_continuousAnswer' || gameState.readonly,
 });

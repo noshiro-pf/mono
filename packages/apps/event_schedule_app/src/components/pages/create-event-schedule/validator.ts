@@ -3,7 +3,7 @@ import type {
   EventScheduleValidation,
 } from '@noshiro/event-schedule-app-shared';
 import type { StrictOmit } from '@noshiro/ts-utils';
-import { ifThen, isEmailString, isEmpty } from '@noshiro/ts-utils';
+import { ifThen, IList, isEmailString } from '@noshiro/ts-utils';
 
 export const validateEventSchedule = ({
   title,
@@ -25,7 +25,7 @@ export const validateEventSchedule = ({
     | 'timezoneOffsetMinutes'
   >): EventScheduleValidation => ({
   title: title !== '',
-  datetimeRangeList: !isEmpty(datetimeRangeList),
+  datetimeRangeList: !IList.isEmpty(datetimeRangeList),
   answerDeadline: ifThen(useAnswerDeadline, answerDeadline !== undefined),
   answerSymbolList: answerSymbolList.length >= 2,
   notificationEmail: ifThen(

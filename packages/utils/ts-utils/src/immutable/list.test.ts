@@ -1,9 +1,9 @@
 import type {
   ArrayOfLength,
   DeepReadonly,
+  NonEmptyArray,
   ReadonlyArrayOfLength,
   TypeEq,
-  uint32,
 } from '../types';
 import { assertNotType, assertType } from '../types';
 import { IMap } from './imap';
@@ -16,7 +16,26 @@ describe('IList.isEmpty', () => {
   assertType<TypeEq<typeof result, boolean>>();
 
   test('case 1', () => {
-    expect(result).toBe(false);
+    expect(result).toBeFalsy();
+  });
+
+  test('case 2', () => {
+    expect(IList.isEmpty([])).toBeTruthy();
+  });
+});
+
+describe('IList.isNonEmpty', () => {
+  const xs = [1, 2, 3] as const;
+  const result = IList.isNonEmpty(xs);
+
+  assertType<TypeEq<typeof result, boolean>>();
+
+  test('case 1', () => {
+    expect(result).toBeTruthy();
+  });
+
+  test('case 2', () => {
+    expect(IList.isNonEmpty([])).toBeFalsy();
   });
 });
 
@@ -25,72 +44,72 @@ describe('IList.slice', () => {
   [
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 0 as uint32, 5 as uint32),
+      result: IList.slice(list, 0, 5),
       toBe: [0, 1, 2, 3, 4],
     }, // 正常
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 0 as uint32, 6 as uint32),
+      result: IList.slice(list, 0, 6),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
       testName: 'IList.slice',
-      result: IList.slice(list, -1 as uint32, 5 as uint32),
+      result: IList.slice(list, -1, 5),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
       testName: 'IList.slice',
-      result: IList.slice(list, -1 as uint32, 6 as uint32),
+      result: IList.slice(list, -1, 6),
       toBe: [0, 1, 2, 3, 4],
     }, // 両方オーバー
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 0 as uint32, 3 as uint32),
+      result: IList.slice(list, 0, 3),
       toBe: [0, 1, 2],
     }, // 正常
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 1 as uint32, 3 as uint32),
+      result: IList.slice(list, 1, 3),
       toBe: [1, 2],
     }, // 正常
     {
       testName: 'IList.slice',
-      result: IList.slice(list, -1 as uint32, 3 as uint32),
+      result: IList.slice(list, -1, 3),
       toBe: [0, 1, 2],
     }, // 片方オーバー
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 3 as uint32, 5 as uint32),
+      result: IList.slice(list, 3, 5),
       toBe: [3, 4],
     }, // 正常
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 3 as uint32, 6 as uint32),
+      result: IList.slice(list, 3, 6),
       toBe: [3, 4],
     }, // 片方オーバー
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 4 as uint32, 3 as uint32),
+      result: IList.slice(list, 4, 3),
       toBe: [],
     }, // start > end
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 0 as uint32, -1 as uint32),
+      result: IList.slice(list, 0, -1),
       toBe: [],
     }, // start > end
     {
       testName: 'IList.slice',
-      result: IList.slice(list, -1 as uint32, -2 as uint32),
+      result: IList.slice(list, -1, -2),
       toBe: [],
     }, // start > end
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 6 as uint32, 9 as uint32),
+      result: IList.slice(list, 6, 9),
       toBe: [],
     },
     {
       testName: 'IList.slice',
-      result: IList.slice(list, 6 as uint32, 3 as uint32),
+      result: IList.slice(list, 6, 3),
       toBe: [],
     },
   ].forEach(({ testName, result, toBe }) => {
@@ -101,29 +120,91 @@ describe('IList.slice', () => {
 });
 
 describe('IList.head', () => {
-  const xs = [1, 2, 3] as const;
-  const head = IList.head(xs);
+  {
+    const xs = [1, 2, 3] as const;
+    const head = IList.head(xs);
 
-  assertType<TypeEq<typeof head, 1>>();
+    assertType<TypeEq<typeof head, 1>>();
 
-  test('case 1', () => {
-    expect(head).toBe(1);
-  });
+    test('case 1', () => {
+      expect(head).toBe(1);
+    });
+  }
+  {
+    const xs: NonEmptyArray<number> = [1, 2, 3];
+    const head = IList.head(xs);
 
-  test('alias', () => {
-    expect(IList.head).toEqual(IList.first);
-  });
+    assertType<TypeEq<typeof head, number>>();
+
+    test('case 2', () => {
+      expect(head).toBe(1);
+    });
+  }
+  {
+    const xs: number[] = [1, 2, 3];
+    const head = IList.head(xs);
+
+    assertType<TypeEq<typeof head, number | undefined>>();
+
+    test('case 3', () => {
+      expect(head).toBe(1);
+    });
+  }
+  {
+    const xs = [] as const;
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+    const head = IList.head(xs);
+
+    assertType<TypeEq<typeof head, undefined>>();
+
+    test('case 4', () => {
+      expect(head).toBe(undefined);
+    });
+  }
 });
 
 describe('IList.last', () => {
-  const xs = [1, 2, 3] as const;
-  const last = IList.last(xs);
+  {
+    const xs = [1, 2, 3] as const;
+    const last = IList.last(xs);
 
-  assertType<TypeEq<typeof last, 3>>();
+    assertType<TypeEq<typeof last, 3>>();
 
-  test('case 1', () => {
-    expect(last).toBe(3);
-  });
+    test('case 1', () => {
+      expect(last).toBe(3);
+    });
+  }
+  {
+    const xs: NonEmptyArray<number> = [1, 2, 3];
+    const last = IList.last(xs);
+
+    assertType<TypeEq<typeof last, number>>();
+
+    test('case 2', () => {
+      expect(last).toBe(3);
+    });
+  }
+  {
+    const xs: number[] = [1, 2, 3];
+    const last = IList.last(xs);
+
+    assertType<TypeEq<typeof last, number | undefined>>();
+
+    test('case 3', () => {
+      expect(last).toBe(3);
+    });
+  }
+  {
+    const xs = [] as const;
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+    const last = IList.last(xs);
+
+    assertType<TypeEq<typeof last, undefined>>();
+
+    test('case 4', () => {
+      expect(last).toBe(undefined);
+    });
+  }
 });
 
 describe('IList.tail', () => {
@@ -145,18 +226,112 @@ describe('IList.tail', () => {
 });
 
 describe('IList.butLast', () => {
-  const xs = [1, 2, 3] as const;
-  const butLast = IList.butLast(xs);
+  {
+    const xs = [1, 2, 3] as const;
+    const butLast = IList.butLast(xs);
+    assertType<TypeEq<typeof butLast, readonly [1, 2]>>();
 
-  assertType<TypeEq<typeof butLast, readonly [1, 2]>>();
+    test('case 1', () => {
+      expect(butLast).toStrictEqual([1, 2]);
+    });
+  }
+  {
+    const xs: readonly number[] = [1, 2, 3];
+    const butLast = IList.butLast(xs);
+    assertType<TypeEq<typeof butLast, readonly number[]>>();
 
-  test('case 1', () => {
-    expect(butLast).toStrictEqual([1, 2]);
-  });
+    test('case 2', () => {
+      expect(butLast).toStrictEqual([1, 2]);
+    });
+  }
 
   test('alias', () => {
     expect(IList.pop).toEqual(IList.butLast);
   });
+});
+
+describe('IList.take', () => {
+  {
+    const xs = [1, 2, 3] as const;
+    const t = IList.take(xs, 2);
+    assertType<TypeEq<typeof t, readonly [1, 2]>>();
+
+    test('case 1', () => {
+      expect(t).toStrictEqual([1, 2]);
+    });
+  }
+  {
+    const xs: readonly number[] = [1, 2, 3];
+    const t = IList.take(xs, 2);
+    assertType<TypeEq<typeof t, readonly number[]>>();
+
+    test('case 2', () => {
+      expect(t).toStrictEqual([1, 2]);
+    });
+  }
+});
+
+describe('IList.takeLast', () => {
+  {
+    const xs = [1, 2, 3] as const;
+    const t = IList.takeLast(xs, 2);
+    assertType<TypeEq<typeof t, readonly [2, 3]>>();
+
+    test('case 1', () => {
+      expect(t).toStrictEqual([2, 3]);
+    });
+  }
+  {
+    const xs: readonly number[] = [1, 2, 3];
+    const t = IList.takeLast(xs, 2);
+    assertType<TypeEq<typeof t, readonly number[]>>();
+
+    test('case 2', () => {
+      expect(t).toStrictEqual([2, 3]);
+    });
+  }
+});
+
+describe('IList.skip', () => {
+  {
+    const xs = [1, 2, 3] as const;
+    const t = IList.skip(xs, 2);
+    assertType<TypeEq<typeof t, readonly [3]>>();
+
+    test('case 1', () => {
+      expect(t).toStrictEqual([3]);
+    });
+  }
+  {
+    const xs: readonly number[] = [1, 2, 3];
+    const t = IList.skip(xs, 2);
+    assertType<TypeEq<typeof t, readonly number[]>>();
+
+    test('case 2', () => {
+      expect(t).toStrictEqual([3]);
+    });
+  }
+});
+
+describe('IList.skipLast', () => {
+  {
+    const xs = [1, 2, 3] as const;
+    const t = IList.skipLast(xs, 2);
+    assertType<TypeEq<typeof t, readonly [1]>>();
+
+    test('case 1', () => {
+      expect(t).toStrictEqual([1]);
+    });
+  }
+  {
+    const xs: readonly number[] = [1, 2, 3];
+    const t = IList.skipLast(xs, 2);
+    assertType<TypeEq<typeof t, readonly number[]>>();
+
+    test('case 2', () => {
+      expect(t).toStrictEqual([1]);
+    });
+  }
 });
 
 describe('IList.every', () => {
@@ -272,6 +447,46 @@ describe('IList.zip', () => {
       expect(zipped).toStrictEqual([[1, 4]]);
     });
   }
+
+  // testArrayEquality({
+  //   testName: 'zip',
+  //   target: zip([0, 1, 2, 3, 4], [5, 6, 7, 8, 9]),
+  //   toBe: [
+  //     [0, 5],
+  //     [1, 6],
+  //     [2, 7],
+  //     [3, 8],
+  //     [4, 9],
+  //   ],
+  // });
+
+  // testArrayEquality({
+  //   testName: 'zipArrays 2 arrays',
+  //   target: zipArrays([0, 1, 2, 3, 4], [5, 6, 7, 8, 9]),
+  //   toBe: [
+  //     [0, 5],
+  //     [1, 6],
+  //     [2, 7],
+  //     [3, 8],
+  //     [4, 9],
+  //   ],
+  // });
+
+  // testArrayEquality({
+  //   testName: 'zipArrays 3 arrays',
+  //   target: zipArrays(
+  //     [0, 1, 2, 3, 4],
+  //     [5, 6, 7, 8, 9, 999, 999],
+  //     [10, 11, 12, 13, 14, 999]
+  //   ),
+  //   toBe: [
+  //     [0, 5, 10],
+  //     [1, 6, 11],
+  //     [2, 7, 12],
+  //     [3, 8, 13],
+  //     [4, 9, 14],
+  //   ],
+  // });
 });
 
 describe('IList.filter', () => {
@@ -310,7 +525,7 @@ describe('IList.filterNot', () => {
 
 describe('IList.set', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.set(xs, 1 as uint32, 4 as const);
+  const result = IList.set(xs, 1, 4 as const);
 
   assertType<TypeEq<typeof result, readonly [1 | 4, 2 | 4, 3 | 4]>>();
 
@@ -321,7 +536,7 @@ describe('IList.set', () => {
 
 describe('IList.update', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.update(xs, 1 as uint32, (x) => x + 2);
+  const result = IList.update(xs, 1, (x) => x + 2);
 
   assertType<TypeEq<typeof result, readonly [number, number, number]>>();
 
@@ -334,7 +549,7 @@ describe('IList.insert', () => {
   const xs = [1, 2, 3] as const;
 
   {
-    const result = IList.insert(xs, 1 as uint32, 5);
+    const result = IList.insert(xs, 1, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -343,7 +558,7 @@ describe('IList.insert', () => {
     });
   }
   {
-    const result = IList.insert(xs, 0 as uint32, 5);
+    const result = IList.insert(xs, 0, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -352,7 +567,7 @@ describe('IList.insert', () => {
     });
   }
   {
-    const result = IList.insert(xs, 3 as uint32, 5);
+    const result = IList.insert(xs, 3, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -361,7 +576,7 @@ describe('IList.insert', () => {
     });
   }
   {
-    const result = IList.insert(xs, 999 as uint32, 5);
+    const result = IList.insert(xs, 999, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -375,7 +590,7 @@ describe('IList.remove', () => {
   const xs = [1, 2, 3] as const;
 
   {
-    const result = IList.remove(xs, 1 as uint32);
+    const result = IList.remove(xs, 1);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -384,7 +599,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 0 as uint32);
+    const result = IList.remove(xs, 0);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -393,7 +608,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 2 as uint32);
+    const result = IList.remove(xs, 2);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -402,7 +617,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 3 as uint32);
+    const result = IList.remove(xs, 3);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -411,7 +626,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 5 as uint32);
+    const result = IList.remove(xs, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -453,6 +668,36 @@ describe('IList.concat', () => {
   test('case 1', () => {
     expect(result).toStrictEqual([1, 2, 3, 4, 5]);
   });
+
+  // testArrayEquality({
+  //   testName: 'concat 2 arrays',
+  //   target: concat([1, 2, 3], [4, 5, 6]),
+  //   toBe: [1, 2, 3, 4, 5, 6],
+  // });
+
+  // testArrayEquality({
+  //   testName: 'concat 2 arrays',
+  //   target: concat([1, 2, 3], []),
+  //   toBe: [1, 2, 3],
+  // });
+
+  // testArrayEquality({
+  //   testName: 'concat 2 arrays',
+  //   target: concat([], [4, 5, 6]),
+  //   toBe: [4, 5, 6],
+  // });
+
+  // testArrayEquality({
+  //   testName: 'concat 2 arrays',
+  //   target: concat([], []),
+  //   toBe: [],
+  // });
+
+  // testArrayEquality({
+  //   testName: 'concat 2 arrays',
+  //   target: concat(['1', '2', '3'], [4, 5, 6]),
+  //   toBe: ['1', '2', '3', 4, 5, 6],
+  // });
 });
 
 describe('IList.partition', () => {
@@ -744,7 +989,7 @@ describe('IList.count', () => {
 
   const result = IList.count(xs, (a) => a.x === 2);
 
-  assertType<TypeEq<typeof result, uint32>>();
+  assertType<TypeEq<typeof result, number>>();
 
   test('case 1', () => {
     expect(result).toStrictEqual(2);
@@ -763,14 +1008,14 @@ describe('IList.countBy', () => {
 
   const result = IList.countBy(xs, (a) => a.x);
 
-  assertType<TypeEq<typeof result, IMap<1 | 2 | 3, uint32>>>();
+  assertType<TypeEq<typeof result, IMap<1 | 2 | 3, number>>>();
 
   test('case 1', () => {
     expect(result).toStrictEqual(
-      IMap.new<1 | 2 | 3, uint32>([
-        [1, 3 as uint32],
-        [2, 2 as uint32],
-        [3, 1 as uint32],
+      IMap.new<1 | 2 | 3, number>([
+        [1, 3],
+        [2, 2],
+        [3, 1],
       ])
     );
   });
@@ -898,3 +1143,377 @@ describe('IList.isSuperset', () => {
     });
   }
 });
+
+// testArrayEquality({
+//   testName: 'zeros 1',
+//   target: zeros(3),
+//   toBe: [0, 0, 0],
+// });
+
+// testArrayEquality({
+//   testName: 'zeros 2',
+//   target: zeros(0),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'zeros 3',
+//   target: zeros(1),
+//   toBe: [0],
+// });
+
+// testArrayEquality({
+//   testName: 'seq 1',
+//   target: seq(3),
+//   toBe: [0, 1, 2],
+// });
+// testArrayEquality({
+//   testName: 'seq 2',
+//   target: seq(0),
+//   toBe: [],
+// });
+// testArrayEquality({
+//   testName: 'seq 3',
+//   target: seq(1),
+//   toBe: [0],
+// });
+
+// testArrayEquality({
+//   testName: 'range(1, 3)',
+//   target: range((1), (3)),
+//   toBe: [1, 2],
+// });
+
+// testArrayEquality({
+//   testName: 'range(0, 0)',
+//   target: range((0), (0)),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'range 3',
+//   target: range((0), (1)),
+//   toBe: [0],
+// });
+
+// const array1 = newArray((3), 0);
+// assertType<TypeEq<typeof array1, number[]>>();
+
+// const array2 = newArray(3, 0);
+// assertType<TypeEq<typeof array2, number[] | undefined>>();
+
+// testArrayEquality({
+//   testName: 'newArray 1',
+//   target: newArray((3), 0),
+//   toBe: [0, 0, 0],
+// });
+
+// testArrayEquality({
+//   testName: 'newArray 1',
+//   target: newArray((3), 1),
+//   toBe: [1, 1, 1],
+// });
+
+// testArrayEquality({
+//   testName: 'newArray 2',
+//   target: newArray((0), 0),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'newArray 3',
+//   target: newArray((1), 0),
+//   toBe: [0],
+// });
+
+// testArrayEquality({
+//   testName: 'newArray 4',
+//   target: newArray(1.5, 0),
+//   toBe: undefined,
+// });
+
+// testArrayEquality({
+//   testName: 'newArray 4',
+//   target: newArray(-1.5, 0),
+//   toBe: undefined,
+// });
+
+// const target = [0, 1, 2, 3, 4];
+
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (0), (5)),
+//   toBe: target,
+// }); // 正常
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (0), (6)),
+//   toBe: target,
+// }); // 片方オーバー
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (-1), (5)),
+//   toBe: target,
+// }); // 片方オーバー
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (-1), (6)),
+//   toBe: target,
+// }); // 両方オーバー
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (0), (3)),
+//   toBe: [0, 1, 2],
+// }); // 正常
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (-1), (3)),
+//   toBe: [0, 1, 2],
+// }); // 片方オーバー
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (3), (5)),
+//   toBe: [3, 4],
+// }); // 正常
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (3), (6)),
+//   toBe: [3, 4],
+// }); // 片方オーバー
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (4), (3)),
+//   toBe: [],
+// }); // start > end
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (0), (-1)),
+//   toBe: [],
+// }); // start > end
+// testArrayEquality({
+//   testName: 'safeSlice',
+//   target: safeSlice(target, (-1), (-2)),
+//   toBe: [],
+// }); // start > end
+
+// testArrayEquality({
+//   testName: 'take',
+//   target: take([1, 2, 3, 4, 5], (3)),
+//   toBe: [1, 2, 3],
+// });
+// testArrayEquality({
+//   testName: 'take',
+//   target: take([1, 2, 3, 4, 5], (0)),
+//   toBe: [],
+// });
+// testArrayEquality({
+//   testName: 'take',
+//   target: take([1, 2, 3, 4, 5], (-1)),
+//   toBe: [],
+// });
+// testArrayEquality({
+//   testName: 'take',
+//   target: take([1, 2, 3, 4, 5], (5)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+// testArrayEquality({
+//   testName: 'take',
+//   target: take([1, 2, 3, 4, 5], (6)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'takeLast',
+//   target: takeLast([1, 2, 3, 4, 5], (3)),
+//   toBe: [3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'takeLast',
+//   target: takeLast([1, 2, 3, 4, 5], (0)),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'takeLast',
+//   target: takeLast([1, 2, 3, 4, 5], (-1)),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'takeLast',
+//   target: takeLast([1, 2, 3, 4, 5], (5)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'takeLast',
+//   target: takeLast([1, 2, 3, 4, 5], (6)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'skipLast',
+//   target: skip([1, 2, 3, 4, 5], (3)),
+//   toBe: [4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'skip',
+//   target: skip([1, 2, 3, 4, 5], (0)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'skip',
+//   target: skip([1, 2, 3, 4, 5], (-1)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'skip',
+//   target: skip([1, 2, 3, 4, 5], (5)),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'skip',
+//   target: skip([1, 2, 3, 4, 5], (6)),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'skipLast',
+//   target: skipLast([1, 2, 3, 4, 5], (3)),
+//   toBe: [1, 2],
+// });
+
+// testArrayEquality({
+//   testName: 'skipLast',
+//   target: skipLast([1, 2, 3, 4, 5], (0)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'skipLast',
+//   target: skipLast([1, 2, 3, 4, 5], (-1)),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'skipLast',
+//   target: skipLast([1, 2, 3, 4, 5], (5)),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'skipLast',
+//   target: skipLast([1, 2, 3, 4, 5], (6)),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'uniq',
+//   target: uniq([1, 2, 3, 2, 2, 2, 3, 4, 5, 5, 3, 2, 1, 3, 4, 1, 2]),
+//   toBe: [1, 2, 3, 4, 5],
+// });
+
+// testArrayEquality({
+//   testName: 'uniq',
+//   target: uniq([1]),
+//   toBe: [1],
+// });
+
+// testArrayEquality({
+//   testName: 'uniq',
+//   target: uniq([]),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'uniqBy',
+//   target: uniqBy([1, 2, 3, 4, 5, 6], (a: number) => a % 3),
+//   toBe: [1, 2, 3],
+// });
+
+// const cmp = (a: number, b: number): number => a - b;
+
+// testArrayEquality({
+//   testName: 'sort',
+//   target: sort(cmp)([3, 4, 1, 2]),
+//   toBe: [1, 2, 3, 4],
+// });
+
+// testArrayEquality({
+//   testName: 'sort',
+//   target: sort(cmp)([]),
+//   toBe: [],
+// });
+
+// testArrayEquality({
+//   testName: 'sort',
+//   target: sort(cmp)([2, 2, 2]),
+//   toBe: [2, 2, 2],
+// });
+
+// const array: ReadonlyNonEmptyArray<number> = [1, 2, 3] as const;
+// const sorted = sort(cmp)(array);
+// assertType<TypeEq<typeof sorted, ReadonlyNonEmptyArray<number>>>();
+
+// const array2: ReadonlyNonEmptyArray<1 | 2 | 3> = [1, 2, 3] as const;
+// const sorted2 = sort(cmp)(array2);
+// assertType<TypeEq<typeof sorted2, ReadonlyNonEmptyArray<1 | 2 | 3>>>();
+
+// const tuple = [1, 2, 3] as const;
+// const sorted3 = sort(cmp)(tuple);
+// assertType<
+//   TypeEq<typeof sorted3, readonly [1 | 2 | 3, 1 | 2 | 3, 1 | 2 | 3]>
+// >();
+
+// const add = (x: number, y: number): number => x + y;
+
+// testArrayEquality({
+//   testName: 'scan',
+//   target: scan(add, 0)([1, 2, 3]),
+//   toBe: [0, 1, 3, 6],
+// });
+
+// testArrayEquality({
+//   testName: 'scan',
+//   target: scan(add, 1)([1, 2, 3]),
+//   toBe: [1, 2, 4, 7],
+// });
+
+// testArrayEquality({
+//   testName: 'map',
+//   target: map((x: number) => x * x)([1, 2, 3]),
+//   toBe: [1, 4, 9],
+// });
+
+// const array: ReadonlyNonEmptyArray<number> = [1, 2, 3] as const;
+// const mapped = map((x: number) => x * x)(array);
+// assertType<TypeEq<typeof mapped, ReadonlyNonEmptyArray<number>>>();
+
+// const array2: ReadonlyNonEmptyArray<number> = [1, 2, 3] as const;
+// const mapped2 = map((x: number, i) => x * x * i)(array2);
+// assertType<TypeEq<typeof mapped2, ReadonlyNonEmptyArray<number>>>();
+
+// test('sum', () => {
+//   expect(sum([1, 2, 3])).toBe(6);
+// });
+
+// test('sum', () => {
+//   expect(sum([])).toBe(0);
+// });
+
+// test('sum', () => {
+//   expect(sum([1, 2, 3, 4])).toBe(10);
+// });
+
+// const xs = [1, 2, 3] as number[];
+// const s = sum(xs);
+// assertType<TypeEq<typeof s, number>>();
+
+// const ys = [1, 2, 3] as const;
+// const s2 = sum(ys);
+// assertType<TypeEq<typeof s2, number>>();

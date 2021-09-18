@@ -1,4 +1,4 @@
-import { seq } from '../array';
+import { pipe, Result } from '../functional';
 import { clamp } from '../num';
 import { ituple } from '../others';
 import type {
@@ -7,10 +7,15 @@ import type {
   ReadonlyArrayOfLength,
   ReadonlyListButLast,
   ReadonlyListReverse,
+  ReadonlyListSkip,
+  ReadonlyListSkipLast,
   ReadonlyListTail,
+  ReadonlyListTake,
+  ReadonlyListTakeLast,
   ReadonlyListZip,
+  ReadonlyNonEmptyArray,
+  ReducerType,
   TypeEq,
-  uint32,
 } from '../types';
 import { assertType, isUint32 } from '../types';
 import { IMap } from './imap';
@@ -70,38 +75,100 @@ import { IMap } from './imap';
 // }[Depth extends -1 ? 'done' : 'recur'];
 
 export namespace IList {
-  export const isEmpty = (list: readonly unknown[]): list is readonly [] =>
+  export const isEmpty = <T>(list: readonly T[]): list is readonly [] =>
     list.length === 0;
 
+  export const isNonEmpty = <T>(
+    list: readonly T[]
+  ): list is ReadonlyNonEmptyArray<T> => list.length > 0;
+
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  export const length = <T extends readonly unknown[]>(list: T): Length<T> =>
-    list.length;
+  export const length = <T extends readonly unknown[]>(
+    list: T
+  ): Length<T> & number => list.length;
 
   export const size = length;
 
+  export const zeros = (len: number): Result<0[], string> =>
+    !isUint32(len)
+      ? Result.err('len should be uint32')
+      : Result.ok(new Array(len).fill(0));
+
+  export const zerosThrow = (len: number): 0[] =>
+    Result.unwrapThrow(zeros(len));
+
+  export const seq = (len: number): Result<number[], string> =>
+    pipe(zeros(len)).chain(Result.map((l) => l.map((_, i) => i))).value;
+
+  export const seqThrow = (len: number): number[] =>
+    Result.unwrapThrow(seq(len));
+
+  export const newArray = <T>(len: number, init: T): Result<T[], string> =>
+    pipe(zeros(len)).chain(Result.map((l) => l.map(() => init))).value;
+
+  export const newArrayThrow = <T>(len: number, init: T): T[] =>
+    Result.unwrapThrow(newArray(len, init));
+
+  export const range = (
+    start: number,
+    end: number,
+    step: number = 1
+  ): Result<number[], string> =>
+    pipe(seq(end - start)).chain(
+      Result.map((l) => l.map((n) => n * step + start))
+    ).value;
+
+  export const rangeThrow = (
+    start: number,
+    end: number,
+    step: number = 1
+  ): number[] => Result.unwrapThrow(range(start, end, step));
+
+  export const copy = <T extends readonly unknown[]>(list: T): T =>
+    list.slice() as readonly unknown[] as T;
+  {
+    const ar = [1, 2, 3] as const;
+    const ar2 = copy(ar);
+
+    assertType<TypeEq<typeof ar2, readonly [1, 2, 3]>>();
+  }
+
   export const slice = <T>(
     list: readonly T[],
-    start: uint32,
-    end: uint32
+    start: number,
+    end: number
   ): readonly T[] => {
     const startClamped = clamp(0, list.length)(start);
     const endClamped = clamp(startClamped, list.length)(end);
     return list.slice(startClamped, endClamped);
   };
 
-  export const head = <H, R extends readonly unknown[]>(
-    list: readonly [H, ...R]
-  ): H => list[0];
+  export function head(list: readonly []): undefined;
+  export function head<H, L extends readonly unknown[]>(
+    list: readonly [H, ...L]
+  ): H;
+  export function head<T>(list: ReadonlyNonEmptyArray<T>): T;
+  export function head<T>(list: readonly T[]): T | undefined;
+  export function head<T>(list: readonly T[]): T | undefined {
+    return isEmpty(list) ? undefined : list[0];
+  }
 
   export const first = head;
 
-  export const last = <H extends readonly unknown[], L>(
+  export function last(list: readonly []): undefined;
+  export function last<H extends readonly unknown[], L>(
     list: readonly [...H, L]
-  ): L => list[list.length - 1] as L;
+  ): L;
+  export function last<T>(list: ReadonlyNonEmptyArray<T>): T;
+  export function last<T>(list: readonly T[]): T | undefined;
+  export function last<T>(list: readonly T[]): T | undefined {
+    return isEmpty(list) ? undefined : list[list.length - 1];
+  }
 
   export const tail = <T extends readonly unknown[]>(
     list: T
-  ): ReadonlyListTail<T> => list.slice(1) as unknown as ReadonlyListTail<T>;
+  ): ReadonlyListTail<T> =>
+    list.slice(1) as readonly unknown[] as ReadonlyListTail<T>;
 
   export const rest = tail;
   export const shift = tail;
@@ -111,7 +178,30 @@ export namespace IList {
   ): ReadonlyListButLast<T> =>
     (isEmpty(list)
       ? []
-      : list.slice(0, -1)) as unknown as ReadonlyListButLast<T>;
+      : list.slice(0, -1)) as readonly unknown[] as ReadonlyListButLast<T>;
+
+  export const take = <T extends readonly unknown[], N extends number>(
+    list: T,
+    num: N
+  ): ReadonlyListTake<N, T> => slice(list, 0, num) as ReadonlyListTake<N, T>;
+
+  export const takeLast = <T extends readonly unknown[], N extends number>(
+    list: T,
+    num: N
+  ): ReadonlyListTakeLast<N, T> =>
+    slice(list, size(list) - num, size(list)) as ReadonlyListTakeLast<N, T>;
+
+  export const skip = <T extends readonly unknown[], N extends number>(
+    list: T,
+    num: N
+  ): ReadonlyListSkip<N, T> =>
+    slice(list, num, size(list)) as ReadonlyListSkip<N, T>;
+
+  export const skipLast = <T extends readonly unknown[], N extends number>(
+    list: T,
+    num: N
+  ): ReadonlyListSkipLast<N, T> =>
+    slice(list, 0, size(list) - num) as ReadonlyListSkipLast<N, T>;
 
   export const pop = butLast;
 
@@ -132,14 +222,14 @@ export namespace IList {
 
   export const some = <A>(
     list: readonly A[],
-    predicate: (value: A, index: uint32) => boolean
+    predicate: (value: A, index: number) => boolean
   ): boolean => list.some(predicate as (value: A, index: number) => boolean);
 
   export const map = <T extends readonly unknown[], B>(
     list: T,
-    mapFn: (a: T[number], index: uint32) => B
+    mapFn: (a: T[number], index: number) => B
   ): { readonly [K in keyof T]: B } =>
-    list.map(mapFn as (a: unknown, index: number) => B) as unknown as {
+    list.map(mapFn as (a: unknown, index: number) => B) as readonly B[] as {
       readonly [K in keyof T]: B;
     };
 
@@ -151,10 +241,11 @@ export namespace IList {
 
   export const flatMap = <T extends readonly unknown[], M>(
     list: T,
-    mapper: (value: T[number], key: uint32) => readonly M[]
+    mapper: (value: T[number], key: number) => readonly M[]
   ): readonly M[] =>
     list.flatMap(mapper as (value: T[number], key: number) => readonly M[]);
 
+  // // TODO: add an overload of NonEmpty case
   export const zip = <
     T1 extends readonly unknown[],
     T2 extends readonly unknown[]
@@ -162,9 +253,9 @@ export namespace IList {
     list1: T1,
     list2: T2
   ): ReadonlyListZip<T1, T2> => {
-    const len = Math.min(list1.length, list2.length) as uint32;
+    const len = Math.min(list1.length, list2.length);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return seq(len).map((i) => ituple(list1[i]!, list2[i]!));
+    return seqThrow(len).map((i) => ituple(list1[i]!, list2[i]!));
   };
 
   export function filter<T, S extends T>(
@@ -190,14 +281,14 @@ export namespace IList {
 
   export const filterNot = <T extends readonly unknown[]>(
     list: T,
-    predicate: (a: T[number], index: uint32) => boolean
+    predicate: (a: T[number], index: number) => boolean
   ): readonly T[number][] =>
-    list.filter((a, i) => !predicate(a as T[number], i as uint32));
+    list.filter((a, i) => !predicate(a as T[number], i));
 
   // TODO: improve type
   export const set = <T extends readonly unknown[], N>(
     list: T,
-    index: uint32,
+    index: number,
     newValue: N
   ): { [K in keyof T]: N | T[K] } =>
     map(list, (a, i) => (i === index ? newValue : a)) as {
@@ -207,7 +298,7 @@ export namespace IList {
   // TODO: improve type
   export const update = <T extends readonly unknown[], N>(
     list: T,
-    index: uint32,
+    index: number,
     updater: (prev: T[number]) => N
   ): { [K in keyof T]: N | T[K] } =>
     map(list, (a, i) => (i === index ? updater(a) : a)) as {
@@ -217,7 +308,7 @@ export namespace IList {
   // TODO: improve type
   export const insert = <A>(
     list: readonly A[],
-    index: uint32,
+    index: number,
     newValue: A
   ): readonly A[] => {
     const temp = list.slice();
@@ -227,7 +318,7 @@ export namespace IList {
 
   export const remove = <A>(
     list: readonly A[],
-    index: uint32
+    index: number
   ): readonly A[] => {
     const temp = list.slice();
     temp.splice(index, 1);
@@ -256,20 +347,18 @@ export namespace IList {
     list: readonly T[],
     n: N
   ): readonly ReadonlyArrayOfLength<N, readonly T[]>[] | undefined =>
-    isUint32(n)
-      ? seq(n).map(
-          (i: number) =>
-            list.slice(n * i, n * (i + 1)) as unknown as ReadonlyArrayOfLength<
-              N,
-              readonly T[]
-            >
-        )
-      : undefined;
+    seqThrow(n).map(
+      (i: number) =>
+        list.slice(n * i, n * (i + 1)) as unknown as ReadonlyArrayOfLength<
+          N,
+          readonly T[]
+        >
+    );
 
   export const reverse = <T extends readonly unknown[]>(
     list: T
   ): ReadonlyListReverse<T> =>
-    list.slice().reverse() as unknown as ReadonlyListReverse<T>;
+    list.slice().reverse() as readonly unknown[] as ReadonlyListReverse<T>;
 
   export function sort<T extends readonly number[]>(
     list: T,
@@ -284,7 +373,7 @@ export namespace IList {
     comparator?: (x: T[number], y: T[number]) => number
   ): { readonly [K in keyof T]: T[number] } {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
-    return list.slice().sort(cmp) as unknown as {
+    return list.slice().sort(cmp) as readonly unknown[] as {
       readonly [K in keyof T]: T[number];
     };
   }
@@ -318,7 +407,7 @@ export namespace IList {
   // eslint-disable-next-line @typescript-eslint/no-shadow
   export const find = <A>(
     list: readonly A[],
-    predicate: (value: A, index: uint32) => boolean
+    predicate: (value: A, index: number) => boolean
   ): A | undefined =>
     list.find(predicate as (value: A, index: number) => boolean);
 
@@ -444,12 +533,15 @@ export namespace IList {
     );
   }
 
+  export const sum = (list: readonly number[]): number =>
+    list.reduce((prev, curr) => prev + curr, 0);
+
   export const foldl = <T extends readonly unknown[], S>(
     list: T,
     callbackfn: (
       previousValue: S,
       currentValue: T[number],
-      currentIndex: uint32
+      currentIndex: number
     ) => S,
     initialValue: S
   ): S =>
@@ -469,7 +561,7 @@ export namespace IList {
     callbackfn: (
       previousValue: S,
       currentValue: T[number],
-      currentIndex: uint32
+      currentIndex: number
     ) => S,
     initialValue: S
   ): S =>
@@ -484,17 +576,29 @@ export namespace IList {
 
   export const reduceRight = foldr;
 
+  export const scan = <A, B>(
+    list: ReadonlyNonEmptyArray<A> | readonly A[],
+    reducer: ReducerType<B, A>,
+    init: B
+  ): ReadonlyNonEmptyArray<B> => {
+    const result: B[] = newArrayThrow<B>(list.length + 1, init);
+
+    let acc = init;
+    for (const [index, value] of list.entries()) {
+      acc = reducer(acc, value);
+      result[index + 1] = acc;
+    }
+
+    return result as readonly B[] as ReadonlyNonEmptyArray<B>;
+  };
+
   export const count = <A>(
     list: readonly A[],
-    predicate: (value: A, index: uint32) => boolean = () => true
-  ): uint32 =>
-    list.reduce<uint32>(
-      (sum, curr, index) =>
-        predicate(curr, index as uint32)
-          ? (((sum as number) + 1) as uint32)
-          : sum,
-      // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
-      0 as uint32
+    predicate: (value: A, index: number) => boolean = () => true
+  ): number =>
+    list.reduce<number>(
+      (acc, curr, index) => (predicate(curr, index) ? acc + 1 : acc),
+      0
     );
 
   export const countBy = <
@@ -502,13 +606,13 @@ export namespace IList {
     G extends PrimitiveType
   >(
     list: T,
-    grouper: (value: T[number], index: uint32) => G
-  ): IMap<G, uint32> => {
-    const groups = new Map<G, uint32>();
+    grouper: (value: T[number], index: number) => G
+  ): IMap<G, number> => {
+    const groups = new Map<G, number>();
     for (const [index, e] of list.entries()) {
-      const key = grouper(e, index as uint32);
+      const key = grouper(e, index);
       const curr = groups.get(key) ?? 0;
-      groups.set(key, ((curr as number) + 1) as uint32);
+      groups.set(key, curr + 1);
     }
     return IMap.new(groups);
   };
@@ -518,11 +622,11 @@ export namespace IList {
     G extends PrimitiveType
   >(
     list: T,
-    grouper: (value: T[number], index: uint32) => G
+    grouper: (value: T[number], index: number) => G
   ): IMap<G, readonly T[number][]> => {
     const groups = new Map<G, T[number][]>();
     for (const [index, e] of list.entries()) {
-      const key = grouper(e, index as uint32);
+      const key = grouper(e, index);
       if (groups.has(key)) {
         groups.get(key)?.push(e);
       } else {
@@ -533,18 +637,110 @@ export namespace IList {
   };
 
   /**
-   * @description true if `list1` is subset of `list2`
+   * @desc copy and return unique list
+   * @param list target list
+   * @param mapFn perform identity check after mapping by the map function
    */
-  export const isSubset = <A, B = A>(
+  export function uniq<T>(
+    list: ReadonlyNonEmptyArray<T>
+  ): ReadonlyNonEmptyArray<T>;
+  export function uniq<T>(list: readonly T[]): readonly T[];
+  export function uniq<T>(list: readonly T[]): readonly T[] {
+    return [...new Set(list)];
+  }
+
+  export function uniqBy<A, B>(
+    list: ReadonlyNonEmptyArray<A>,
+    mapFn: (value: A) => B
+  ): ReadonlyNonEmptyArray<A>;
+  export function uniqBy<A, B>(
+    list: readonly A[],
+    mapFn: (value: A) => B
+  ): readonly A[];
+  export function uniqBy<A, B>(
+    list: readonly A[],
+    mapFn: (value: A) => B
+  ): readonly A[] {
+    const mappedValues = new Set();
+    return list.filter((val) => {
+      const mappedValue = mapFn(val);
+      if (mappedValues.has(mappedValue)) return false;
+      mappedValues.add(mappedValue);
+      return true;
+    });
+  }
+
+  export const indexIsInRange =
+    <T>(list: readonly T[]) =>
+    (index: number): boolean =>
+      isUint32(index) && 0 <= index && index < list.length;
+
+  export const eq = <T>(list1: readonly T[], list2: readonly T[]): boolean =>
+    list1.length === list2.length && list1.every((v, i) => v === list2[i]);
+
+  /** @returns list1 ⊂ list2 */
+  export const isSubset = <
+    A extends PrimitiveType,
+    B extends PrimitiveType = A
+  >(
     list1: readonly A[],
     list2: readonly B[]
-  ): boolean => list1.every((a) => list2.includes(a as unknown as B));
+  ): boolean => list1.every((a) => list2.includes(a as A & B));
 
-  /**
-   * @description true if `list1` is superset of `list2`
-   */
-  export const isSuperset = <A, B = A>(
+  /** @returns list1 ⊃ list2 */
+  export const isSuperset = <
+    A extends PrimitiveType,
+    B extends PrimitiveType = A
+  >(
     list1: readonly A[],
     list2: readonly B[]
   ): boolean => isSubset(list2, list1);
+
+  export const setIntersection = <
+    A extends PrimitiveType,
+    B extends PrimitiveType = A
+  >(
+    list1: readonly A[],
+    list2: readonly B[]
+  ): readonly (A & B)[] =>
+    list1.filter((e) =>
+      list2.includes(e as A & B)
+    ) as readonly A[] as readonly (A & B)[];
+
+  export const setDifference = <T extends PrimitiveType>(
+    sortedList1: readonly T[],
+    sortedList2: readonly T[]
+  ): readonly T[] => {
+    const result: T[] = [];
+    let it1 = 0; // iterator for sortedArray1
+    let it2 = 0; // iterator for sortedArray2
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    let val1: T = sortedList1[it1]!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    let val2: T = sortedList2[it2]!;
+    while (it1 < sortedList1.length && it2 < sortedList2.length) {
+      if (val1 === val2) {
+        it1 += 1;
+        it2 += 1;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        val1 = sortedList1[it1]!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        val2 = sortedList2[it2]!;
+      } else if (val1 < val2) {
+        result.push(val1);
+        it1 += 1;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        val1 = sortedList1[it1]!;
+      } else {
+        it2 += 1;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        val2 = sortedList2[it2]!;
+      }
+    }
+    for (; it1 < sortedList1.length; it1 += 1) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      result.push(sortedList1[it1]!);
+    }
+    return result;
+  };
 }

@@ -1,25 +1,73 @@
 import type { Observable } from '@noshiro/syncflow';
 import {
+  combineLatest,
+  filter,
   fromArray,
   interval,
   map,
   merge,
+  scan,
   skip,
   subject,
   take,
   zip,
 } from '@noshiro/syncflow';
+import { IList } from '@noshiro/ts-utils';
+import { addDoc, collection } from 'firebase/firestore';
 import { time } from '../constants';
 import { returnFalse } from '../return-boolean';
 import type { Card, GameStateAction, NWES } from '../types';
+import { actionsFromDb$, db, paths, roomId$ } from './database';
 
 const autoPlaySpeedRate = 0.5;
 
-export const gameStateAction$ = subject<GameStateAction>();
+const gameStateActionSource$ = subject<GameStateAction>();
 
 const gameStateDispatcher = (action: GameStateAction): void => {
-  gameStateAction$.next(action);
+  gameStateActionSource$.next(action);
 };
+
+export const gameStateActionMerged$: Observable<GameStateAction> = merge([
+  gameStateActionSource$.chain(
+    map((a) => ({ type: 'local', value: a } as const))
+  ),
+  actionsFromDb$.chain(map((a) => ({ type: 'remote', value: a } as const))),
+] as const)
+  .chain(
+    scan<
+      Readonly<
+        | { type: 'local'; value: GameStateAction }
+        | { type: 'remote'; value: readonly GameStateAction[] }
+      >,
+      readonly GameStateAction[]
+    >((state, action) => {
+      switch (action.type) {
+        case 'local':
+          return [...state, action.value];
+        case 'remote':
+          return action.value.length > state.length ? action.value : state; // ローカルの方が進んでいるときは無視
+      }
+    }, [])
+  )
+  .chain(filter(IList.isNonEmpty))
+  .chain(map((list) => IList.last(list)));
+
+actionsFromDb$.subscribe(console.log);
+
+combineLatest([roomId$, gameStateActionSource$] as const).subscribe(
+  ([roomId, action]) => {
+    addDoc(collection(db, paths.rooms, roomId, paths.actions), action)
+      .then(() => {
+        console.log(roomId, action);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+);
+
+export const gameStateAction$: Observable<GameStateAction> =
+  gameStateActionSource$;
 
 export const onCardClick = (card: Card, playerDirectionFromMe: NWES): void => {
   switch (playerDirectionFromMe) {
@@ -72,6 +120,10 @@ export const onAnswerSubmit = (): void => {
   setTimeout(() => {
     gameStateDispatcher({ type: 'hideDecidedAnswerBalloon' });
   }, autoPlaySpeedRate * (time.showJudge + time.hideJudge));
+};
+
+export const onTurnEndClick = (): void => {
+  gameStateDispatcher({ type: 'goToNextTurn' });
 };
 
 // auto play
@@ -210,7 +262,7 @@ const autoPlay = merge([
       autoPlayMargin +
       actionsToAutoPlay[2].length
   ),
-] as const).chain(take(1000));
+] as const).chain(take(0));
 
 autoPlay.subscribe((action) => {
   if (action.type === 'submitAnswer') {

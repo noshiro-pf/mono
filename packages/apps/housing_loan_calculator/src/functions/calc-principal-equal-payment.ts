@@ -1,5 +1,4 @@
-import type { uint32 } from '@noshiro/ts-utils';
-import { seq } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 
 export const calcPrincipalEqualPayment = ({
   borrowingPeriodMonth: numPayments,
@@ -9,15 +8,15 @@ export const calcPrincipalEqualPayment = ({
   borrowingPeriodMonth: number;
   borrowingTotalYen: number;
   interestRatePerMonth: number;
-}>): {
+}>): Readonly<{
   fixedPrincipalYenPerMonth: number;
-  borrowingBalanceYen: number[];
-  interestYen: number[];
-  monthlyPaymentTotalYen: number[];
-} => {
+  borrowingBalanceYen: readonly number[];
+  interestYen: readonly number[];
+  monthlyPaymentTotalYen: readonly number[];
+}> => {
   const fixedPrincipalYenPerMonth = borrowingTotal / numPayments;
 
-  const borrowingBalanceYen = seq((numPayments + 1) as uint32).map(
+  const borrowingBalanceYen = IList.seqThrow(numPayments + 1).map(
     (i) => borrowingTotal - i * fixedPrincipalYenPerMonth
   );
 

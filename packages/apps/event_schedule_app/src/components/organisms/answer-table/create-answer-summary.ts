@@ -6,7 +6,7 @@ import type {
   DatetimeRange,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMap, IMapMapped, ituple, pipe, sum } from '@noshiro/ts-utils';
+import { IList, IMap, IMapMapped, ituple, pipe } from '@noshiro/ts-utils';
 import { answerSymbolPointConfig } from '../../../constants';
 import type { DatetimeRangeMapKey } from '../../../functions';
 import {
@@ -66,11 +66,11 @@ const calcScoreSum = (
           : (symbolToScoreMap.get(symbolId) ?? 0) * weight
       )
     )
-    .chain(sum).value;
+    .chain(IList.sum).value;
 };
 
 const calcScoreSumMax = (answerWeightList: readonly Weight[]): number =>
-  sum(answerWeightList.map((w) => w * answerSymbolPointConfig.max));
+  IList.sum(answerWeightList.map((w) => w * answerSymbolPointConfig.max));
 
 export const createScore = (
   datetimeRangeList: readonly DatetimeRange[],

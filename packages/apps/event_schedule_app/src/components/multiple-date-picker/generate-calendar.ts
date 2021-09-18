@@ -1,6 +1,6 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import type { DateEnum, MonthEnum, uint32, YearEnum } from '@noshiro/ts-utils';
-import { getDay, IList, range } from '@noshiro/ts-utils';
+import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
+import { getDay, IList } from '@noshiro/ts-utils';
 
 /**
  * rowsize = 5
@@ -47,7 +47,7 @@ export const generateCalendar = (
 
   const rowSize = numWeeks(year, month);
 
-  return range(0 as uint32, rowSize as uint32).map((i: number) =>
+  return IList.rangeThrow(0, rowSize).map((i: number) =>
     cells1d.slice(7 * i, 7 * (i + 1))
   );
 };
@@ -58,7 +58,7 @@ const genYmdRangeList = (
   from: DateEnum,
   to: DateEnum
 ): readonly YearMonthDate[] =>
-  range(from as uint32, (to + 1) as uint32).map((n) => ({
+  IList.rangeThrow(from, to + 1).map((n) => ({
     year,
     month,
     date: n as DateEnum,

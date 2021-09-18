@@ -14,9 +14,9 @@ export const defaultRect: Rect = {
   height: defaultRectSize.height,
 } as const;
 
-export const rectSizeToRect = (rectsize: RectSize): Rect => ({
-  width: rectsize.width,
-  height: rectsize.height,
+export const rectSizeToRect = (rectSize: RectSize): Rect => ({
+  width: rectSize.width,
+  height: rectSize.height,
   top: defaultRect.top,
   left: defaultRect.left,
 });

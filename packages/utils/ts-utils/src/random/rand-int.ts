@@ -1,4 +1,2 @@
-import type { int } from '../types';
-
-export const randInt = (min: int, max: int): int =>
-  ((min as number) + Math.floor((max - min + 1) * Math.random())) as int;
+export const randInt = (min: number, max: number): number =>
+  min + Math.floor((max - min + 1) * Math.random());

@@ -1,11 +1,11 @@
+import type { DeepReadonly } from '@noshiro/ts-utils';
 import { uriWithQueryParams } from './uri-with-query-params';
 
 const testUri = (
   targetUri: string,
-  queryParameters: readonly (readonly [
-    string,
-    boolean | number | string | undefined
-  ])[],
+  queryParameters: DeepReadonly<
+    [string, boolean | number | string | undefined][]
+  >,
   expectedUri: string
 ): void => {
   test('equality', () => {
