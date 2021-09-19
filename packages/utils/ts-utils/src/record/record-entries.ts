@@ -1,5 +1,4 @@
 import { assertType } from '../types';
-import type { GeneralRecord } from './general-record';
 import type { ToObjectKeysValue } from './to-object-keys';
 
 type PickByValue<R, V> = Pick<
@@ -9,15 +8,16 @@ type PickByValue<R, V> = Pick<
   }[keyof R]
 >;
 
-type Entries<R extends GeneralRecord> = R extends R
+type Entries<R extends ReadonlyRecordBase> = R extends R
   ? {
       [K in keyof R]: [ToObjectKeysValue<keyof PickByValue<R, R[K]>>, R[K]];
       // eslint-disable-next-line @typescript-eslint/ban-types
-    }[Exclude<keyof R, symbol>][]
+    }[RelaxedExclude<keyof R, symbol>][]
   : never;
 
-export const recordEntries = <R extends GeneralRecord>(object: R): Entries<R> =>
-  Object.entries(object) as Entries<R>;
+export const recordEntries = <R extends ReadonlyRecordBase>(
+  object: R
+): Entries<R> => Object.entries(object) as Entries<R>;
 
 type RecordType1 = DeepReadonly<{
   x: 1;

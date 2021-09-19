@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '../../types';
 import { toTimestamp } from './to-timestamp';
 
 /**

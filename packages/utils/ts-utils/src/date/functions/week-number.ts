@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '../../types';
 import { getDate, getDay } from './date-wrapper';
 
 /**

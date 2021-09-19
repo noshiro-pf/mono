@@ -1,5 +1,4 @@
 import type { IsNotFixedLengthList } from '../is-fixed-length-list';
-import type { ReadonlyRecordBase } from '../readonly-record-base';
 import { assertType } from '../test-type';
 import type { ToNumber } from '../to-number';
 import type { Prefixes } from './prefix';

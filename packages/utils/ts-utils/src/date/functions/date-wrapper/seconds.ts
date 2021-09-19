@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '../../../types';
 import type { SecondsEnum } from '../../types';
 
 export const getSeconds = (date: ReadonlyDate): SecondsEnum =>

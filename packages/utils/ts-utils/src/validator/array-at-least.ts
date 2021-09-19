@@ -1,4 +1,4 @@
-import { assertNotType, assertType } from './test-type';
+import { assertNotType, assertType } from '../types';
 
 assertNotType<TypeExtends<[0, 1], ArrayAtLeastLen<3, number>>>();
 assertType<TypeExtends<[0, 1, 2], ArrayAtLeastLen<3, number>>>();
