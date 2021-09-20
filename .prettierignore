@@ -17,6 +17,7 @@ yarn.lock
 *.jpeg
 *.xml
 *.ico
+*.d.ts
 .firebaserc
 hosting.YnVpbGQ.cache
 LICENSE
