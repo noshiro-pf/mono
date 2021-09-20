@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.esm.nolib.json",
+  "compilerOptions": {
+    "declaration": true
+  }
+}

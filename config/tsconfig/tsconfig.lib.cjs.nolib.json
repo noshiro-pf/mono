@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.cjs.nolib.json",
+  "compilerOptions": {
+    "declaration": true
+  }
+}

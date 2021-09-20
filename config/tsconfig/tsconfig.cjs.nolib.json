@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.base.nolib.json",
+  "compilerOptions": {
+    "module": "CommonJS"
+  }
+}

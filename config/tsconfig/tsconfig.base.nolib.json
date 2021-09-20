@@ -45,8 +45,8 @@
 
     // Language and Environment
     "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    // "noLib": true,
+    // "lib": ["dom", "dom.iterable", "esnext"],
+    "noLib": true,
 
     // Projects
     "incremental": false,
