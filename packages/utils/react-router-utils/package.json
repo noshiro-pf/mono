@@ -5,6 +5,7 @@
   "author": "noshiro",
   "sideEffects": false,
   "main": "esm/index.js",
+  "module": "esm/index.js",
   "types": "esm/index.d.ts",
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
