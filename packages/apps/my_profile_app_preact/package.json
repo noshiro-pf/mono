@@ -49,8 +49,6 @@
     "@noshiro/ts-utils": "*",
     "preact": "^10.4.7",
     "preact-markdown": "^2.0.0",
-    "preact-media-hook": "^1.0.3",
-    "preact-mui": "^0.1.1",
-    "preact-router": "^3.2.1"
+    "preact-media-hook": "^1.0.3"
   }
 }

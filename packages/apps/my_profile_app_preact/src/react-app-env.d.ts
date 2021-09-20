@@ -72,3 +72,8 @@ declare module '*.module.sass' {
   const classes: Readonly<Record<string, string>>;
   export default classes;
 }
+
+declare module '*.md' {
+  const content: string;
+  export default content;
+}
