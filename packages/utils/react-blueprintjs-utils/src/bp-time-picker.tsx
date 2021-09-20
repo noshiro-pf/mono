@@ -1,6 +1,5 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import type { ReadonlyDate } from '@noshiro/ts-utils';
 import { getHours, getMinutes } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';

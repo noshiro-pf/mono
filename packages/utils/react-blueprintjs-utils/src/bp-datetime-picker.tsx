@@ -1,7 +1,6 @@
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import type { ReadonlyDate } from '@noshiro/ts-utils';
 import {
   getDate,
   getHours,

@@ -3,7 +3,6 @@ import type {
   HoursEnum,
   MinutesEnum,
   MonthEnum,
-  ReadonlyDate,
   YearEnum,
 } from '@noshiro/ts-utils';
 import {

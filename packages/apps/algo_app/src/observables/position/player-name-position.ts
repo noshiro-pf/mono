@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { scan, subject } from '@noshiro/syncflow';
-import type { ReadonlyRecord, Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils';
 import { playerNamePositionsReducer } from '../../state';
 import type { NWES } from '../../types';
 

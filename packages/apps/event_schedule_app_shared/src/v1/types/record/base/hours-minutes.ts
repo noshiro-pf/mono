@@ -1,4 +1,4 @@
-import type { HoursEnum, MinutesEnum, ReadonlyDate } from '@noshiro/ts-utils';
+import type { HoursEnum, MinutesEnum } from '@noshiro/ts-utils';
 import { getHours, getMinutes, sign } from '@noshiro/ts-utils';
 
 export type HoursMinutes = Readonly<{
