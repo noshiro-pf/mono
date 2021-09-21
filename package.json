@@ -13,6 +13,7 @@
     "packages/utils/preact-utils",
     "packages/utils/react-utils",
     "packages/utils/preact-router-utils",
+    "packages/utils/react-router-hooks",
     "packages/utils/react-router-utils",
     "packages/utils/preact-resize-observer-hooks",
     "packages/utils/react-resize-observer-hooks",
