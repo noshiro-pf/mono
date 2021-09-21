@@ -1,12 +1,12 @@
 import { styled } from '@noshiro/goober';
 import { useResizeObserver } from '@noshiro/preact-resize-observer-hooks';
+import { useRouter } from '@noshiro/preact-router-utils';
 import { useStreamEffect } from '@noshiro/preact-syncflow-hooks';
 import { memoNamed } from '@noshiro/preact-utils';
 import { useCallback, useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { getParams, getRoomId, isMainPage, routes, text } from '../constants';
 import { response$ } from '../observables';
-import { useRouter } from '../router';
 import { Button } from './bp';
 import { CreateRoomPage } from './create-room-page';
 import { GameMain } from './game-main';

@@ -1,4 +1,5 @@
-import type { QueryParams } from '../router';
+import type { QueryParams } from '@noshiro/preact-router-utils';
+import { withSlash } from '@noshiro/preact-router-utils';
 
 export const routes = {
   main: '/',
@@ -11,9 +12,6 @@ export const params = {
   replay: 'replay',
   observe: 'observe',
 } as const;
-
-export const withSlash = (path: string): string =>
-  path.endsWith('/') ? path : `${path}/`;
 
 const getRoomIdRegexp = new RegExp(
   `^${routes.rooms}/(?<roomId>[^/]+)/.*$`,
