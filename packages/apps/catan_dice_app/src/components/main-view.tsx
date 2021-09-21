@@ -102,8 +102,7 @@ export const MainView = memoNamed<Props>(
 );
 
 const Root = styled.div`
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   padding: 20px;
   user-select: none;
   -webkit-touch-callout: none;

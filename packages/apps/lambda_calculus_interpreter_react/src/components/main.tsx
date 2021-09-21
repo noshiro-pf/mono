@@ -35,8 +35,7 @@ export const Main = memoNamed('Main', () => {
 
 const Root = styled.div`
   padding: 10px;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
 `;
 
 const Description = styled.div`
