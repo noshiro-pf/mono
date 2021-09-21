@@ -1,5 +1,5 @@
+import { withSlash } from '@noshiro/react-router-hooks';
 import { isNotUndefined } from '@noshiro/ts-utils';
-import { makeUriEndWithSlash } from './make-uri-end-with-slash';
 
 export const uriWithQueryParams = (
   uri: string,
@@ -11,7 +11,7 @@ export const uriWithQueryParams = (
     ([_, value]) => value !== undefined
   );
 
-  const normalizedUri = makeUriEndWithSlash(uri);
+  const normalizedUri = withSlash(uri);
 
   if (nonNullQueryParameters.length === 0) {
     return normalizedUri;
