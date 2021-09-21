@@ -1,4 +1,3 @@
-import type { TimerId } from '@noshiro/ts-utils';
 import { Option } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import type {

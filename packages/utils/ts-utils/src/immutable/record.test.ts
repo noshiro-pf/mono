@@ -1,4 +1,3 @@
-import type { DeepReadonly, TypeEq } from '../types';
 import { assertType } from '../types';
 import { IRecord } from './record';
 

@@ -16,7 +16,6 @@ import {
   map,
   withInitialValue,
 } from '@noshiro/syncflow';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { IRecord, isNotUndefined } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 

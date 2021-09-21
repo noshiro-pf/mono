@@ -1,4 +1,3 @@
-import type { TypeEq } from './test-type';
 import { assertType } from './test-type';
 
 export type Bivariant<F extends (...args: readonly never[]) => unknown> = {

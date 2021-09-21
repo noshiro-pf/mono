@@ -22,7 +22,7 @@
     "fmt": "yarn _prettier .",
     "genpipetypedef": "node scripts/gen_pipe_type_def ${npm_package_config_pipe_max_length} ${npm_package_config_pipe_ts_path}",
     "postgenpipetypedef": "yarn _prettier ${npm_package_config_pipe_ts_path}",
-    "gi": "yarn _script_genindex ./src",
+    "gi": "yarn _script_genindex ./src --min-depth 1",
     "lint:fix": "yarn lint --fix",
     "lint": "eslint src/ --ext .ts",
     "setup:genpipetypedef_script": "tsc --project scripts/tsconfig.json",

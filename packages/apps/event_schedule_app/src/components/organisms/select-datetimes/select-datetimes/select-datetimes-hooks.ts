@@ -5,7 +5,6 @@ import type {
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { defaultYearMonthDate } from '@noshiro/event-schedule-app-shared';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { getMostFrequentTimeRange } from './get-most-frequent-time-range';

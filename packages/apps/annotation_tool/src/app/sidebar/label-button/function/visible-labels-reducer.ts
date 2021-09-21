@@ -1,5 +1,3 @@
-import type { ReducerType } from '@noshiro/ts-utils';
-
 export const visibleLabelsReducer: ReducerType<
   readonly boolean[],
   | { type: 'flip'; index: number }

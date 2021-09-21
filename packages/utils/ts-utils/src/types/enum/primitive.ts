@@ -1,12 +1,3 @@
-export type PrimitiveType =
-  | bigint
-  | boolean
-  | number
-  | string
-  | symbol
-  | null
-  | undefined;
-
 export const isPrimitive = (value: unknown): boolean => {
   switch (typeof value) {
     case 'string':

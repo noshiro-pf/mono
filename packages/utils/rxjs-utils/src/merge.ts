@@ -1,4 +1,3 @@
-import type { ArrayElement } from '@noshiro/ts-utils';
 import type { Observable, ObservableInput } from 'rxjs';
 import { merge } from 'rxjs';
 import type { Unwrap } from './unwrap';

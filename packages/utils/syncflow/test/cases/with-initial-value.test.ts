@@ -1,4 +1,3 @@
-import type { TypeEq } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
 import type { InitializedObservable } from '../../src';
 import { interval, mapI, take, withInitialValue } from '../../src';

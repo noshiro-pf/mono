@@ -7,7 +7,6 @@ import type {
   Weight,
 } from '@noshiro/event-schedule-app-shared';
 import { createWeight } from '@noshiro/event-schedule-app-shared';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { IList, IMapMapped, IRecord, ituple, pipe } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type { DatetimeRangeMapKey } from '../../../functions';

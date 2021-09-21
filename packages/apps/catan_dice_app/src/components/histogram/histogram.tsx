@@ -1,5 +1,4 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import { HistogramView } from './histogram-view';

@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../config/tsconfig/tsconfig.lib.react.json",
+  "extends": "../../../../config/tsconfig/tsconfig.lib.react.nolib.json",
   "compilerOptions": {
     "outDir": "../esm"
   },

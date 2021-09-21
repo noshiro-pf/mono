@@ -1,4 +1,4 @@
-import type { ReadonlyArrayOfLength, ReadonlyRecord } from '@noshiro/ts-utils';
+import type { ReadonlyRecord } from '@noshiro/ts-utils';
 import type { CardWithDisplayValue } from './card-type';
 import type { NWES } from './direction';
 

@@ -1,4 +1,3 @@
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ReadonlyTupleButLast, TupleButLast } from './butlast';
 import type { TupleLast } from './last';

@@ -1,4 +1,3 @@
-import type { TypeExtends } from '../../types';
 import { assertType } from '../../types';
 
 export const months = {

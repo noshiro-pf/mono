@@ -1,7 +1,6 @@
 import { pipe } from '../../../functional';
 import { IList } from '../../../immutable';
 import { ituple } from '../../../others';
-import type { ReadonlyNonEmptyArray } from '../../../types';
 
 export const getLuminanceListAccumulated = (
   luminanceList: ReadonlyNonEmptyArray<number>

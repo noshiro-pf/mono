@@ -1,4 +1,3 @@
-import type { TypeExtends } from '../../types';
 import { assertType } from '../../types';
 import type { WeekdaysNameEnum } from '../types';
 

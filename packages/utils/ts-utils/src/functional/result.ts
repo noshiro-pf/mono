@@ -69,7 +69,7 @@ export namespace Result {
 
   export const fromPromise = <S, E = unknown>(
     promise: Readonly<Promise<S>>
-  ): Promise<_Result<S, E>> => promise.then(ok).catch(err);
+  ): Promise<_Result<S, E>> => promise.then(ok).catch((e) => err(e as E));
 }
 
 export type Result<S, E> = Result._Result<S, E>;

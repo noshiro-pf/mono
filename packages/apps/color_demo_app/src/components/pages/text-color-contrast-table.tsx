@@ -7,12 +7,7 @@ import {
   TableRow,
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type {
-  DeepReadonly,
-  Hue,
-  Percent,
-  TypeExtends,
-} from '@noshiro/ts-utils';
+import type { Hue, Percent } from '@noshiro/ts-utils';
 import {
   assertType,
   blackHsl,

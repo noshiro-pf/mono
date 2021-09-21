@@ -8,7 +8,6 @@ import {
   Paper,
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { DiceIcon, SumIcon } from '../assets';
 import { DiceNumber } from './dicer-number';

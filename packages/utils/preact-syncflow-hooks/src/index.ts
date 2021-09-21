@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+
+/// <reference no-default-lib="true"/>
+/// <reference path="../../stdlib/dist/lib.dom.d.ts" />
+/// <reference path="../../stdlib/dist/lib.esnext.d.ts" />
+/// <reference path="../../stdlib/dist/utils.d.ts" />
+
 import type { InitializedObservable, Observable } from '@noshiro/syncflow';
 import { scan, source, withInitialValue } from '@noshiro/syncflow';
 import { Option } from '@noshiro/ts-utils';

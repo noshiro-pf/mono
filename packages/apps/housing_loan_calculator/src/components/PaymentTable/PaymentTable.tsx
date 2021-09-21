@@ -1,6 +1,5 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { ArrayOfLength, DeepReadonly } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';

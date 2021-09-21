@@ -1,7 +1,6 @@
 import type { IconName, Intent } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useAlive, useBooleanState } from '@noshiro/react-utils';
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import { createToaster, showToast } from '../../../functions';
 import { ConfirmDialog } from './confirm-dialog';

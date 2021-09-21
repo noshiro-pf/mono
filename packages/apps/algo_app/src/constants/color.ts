@@ -1,4 +1,3 @@
-import type { TypeExtends } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
 
 export type CustomColor = '#383838' | 'red' | 'rgb(48, 255, 135)';

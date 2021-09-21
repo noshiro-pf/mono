@@ -1,4 +1,3 @@
-import type { ReadonlyNonEmptyArray } from '@noshiro/ts-utils';
 import { IList, ituple, pipe } from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (

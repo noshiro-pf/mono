@@ -1,4 +1,3 @@
-import type { ReducerType } from '@noshiro/ts-utils';
 import { cardEq } from '../../functions';
 import type { GameState, GameStateAction } from '../../types';
 

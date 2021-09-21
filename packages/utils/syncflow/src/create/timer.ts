@@ -1,4 +1,3 @@
-import type { TimerId } from '@noshiro/ts-utils';
 import { Option } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { TimerObservable } from '../types';

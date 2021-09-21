@@ -9,7 +9,6 @@ import {
   defaultDatetimeRange,
   defaultTimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import type { ReducerType } from '@noshiro/ts-utils';
 import { IList, IRecord, ISetMapped, pipe } from '@noshiro/ts-utils';
 import type { YmdKey } from '../../../../functions';
 import { ymdFromKey, ymdToKey } from '../../../../functions';

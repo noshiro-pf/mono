@@ -7,7 +7,6 @@ import {
   defaultYearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import type {
-  DeepReadonly,
   IMapMapped,
   MonthEnum,
   WeekDayEnum,

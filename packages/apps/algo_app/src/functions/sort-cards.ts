@@ -1,4 +1,3 @@
-import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import { IList, pipe } from '@noshiro/ts-utils';
 import type { Card } from '../types';
 

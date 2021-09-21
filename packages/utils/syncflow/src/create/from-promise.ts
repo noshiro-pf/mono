@@ -18,9 +18,9 @@ class FromPromiseObservableClass<A, E = unknown>
         if (this.isCompleted) return;
         this.startUpdate(Result.ok(value));
       })
-      .catch((error: E) => {
+      .catch((error: unknown) => {
         if (this.isCompleted) return;
-        this.startUpdate(Result.err(error));
+        this.startUpdate(Result.err(error as E));
       })
       .finally(() => {
         this.complete();

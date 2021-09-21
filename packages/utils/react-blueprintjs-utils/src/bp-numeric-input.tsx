@@ -1,6 +1,5 @@
 import { NumericInput } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { StrictOmit } from '@noshiro/ts-utils';
 import { stringToNumber } from '@noshiro/ts-utils';
 import type { ComponentProps, CSSProperties, FocusEventHandler } from 'react';
 import { useCallback, useEffect, useState } from 'react';

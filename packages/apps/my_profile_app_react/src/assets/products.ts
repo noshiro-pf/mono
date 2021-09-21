@@ -1,4 +1,3 @@
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import type { ProductsInfo } from '../types';
 import {
   CatanDiceImage,

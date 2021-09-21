@@ -1,5 +1,4 @@
 import type { IconName } from '@blueprintjs/core';
-import type { TypeExtends } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
 
 type AnswerSymbolIconIdFromBp = IconName &

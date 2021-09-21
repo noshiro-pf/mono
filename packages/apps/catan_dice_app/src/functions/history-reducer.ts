@@ -1,4 +1,3 @@
-import type { ReducerType } from '@noshiro/ts-utils';
 import { IList, match, pipe } from '@noshiro/ts-utils';
 import { produce } from 'immer';
 import type { HistoryState } from '../type';

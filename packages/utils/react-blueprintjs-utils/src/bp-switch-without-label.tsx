@@ -1,6 +1,5 @@
 import { Switch } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { StrictOmit } from '@noshiro/ts-utils';
 import type { ComponentProps, CSSProperties } from 'react';
 
 type SwitchPropsOriginal = ComponentProps<typeof Switch>;

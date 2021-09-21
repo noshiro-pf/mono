@@ -1,4 +1,3 @@
-import type { TypeEq } from '../types';
 import { assertType } from '../types';
 import type { GeneralRecord } from './general-record';
 import type { ToObjectKeysValue } from './to-object-keys';

@@ -1,4 +1,3 @@
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { ReadonlyTupleConcat, TupleConcat } from '../tuple';
 

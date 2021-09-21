@@ -1,12 +1,10 @@
-import type { TypeEq } from '../test-type';
 import { assertType } from '../test-type';
 import type { IsNever } from './is-never';
 
-type IsUnionSub<U, K = U> = [U] extends [never]
+type IsUnionSub<U, K extends U = U> = [U] extends [never]
   ? false
   : K extends unknown
-  ? // eslint-disable-next-line @typescript-eslint/ban-types
-    IsNever<Exclude<U, K>> extends true
+  ? IsNever<StrictExclude<U, K>> extends true
     ? false
     : true
   : never;

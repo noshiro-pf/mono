@@ -3,7 +3,7 @@ import type {
   AnswerSymbolIconId,
   AnswerSymbolPointEnumType,
 } from '@noshiro/event-schedule-app-shared';
-import type { IMap, ReducerType } from '@noshiro/ts-utils';
+import type { IMap } from '@noshiro/ts-utils';
 import { IRecord } from '@noshiro/ts-utils';
 
 export type SymbolListReducerAction =

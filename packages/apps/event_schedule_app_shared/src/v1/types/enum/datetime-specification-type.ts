@@ -1,3 +1,5 @@
+import { assertType } from '@noshiro/ts-utils';
+
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 export type DatetimeSpecificationEnumType =
   | 'noStartEndSpecified'
@@ -11,9 +13,6 @@ export const datetimeSpecificationOptions = {
   endSpecified: 'endSpecified',
   startAndEndSpecified: 'startAndEndSpecified',
 } as const;
-
-import type { TypeExtends } from '@noshiro/ts-utils';
-import { assertType } from '@noshiro/ts-utils';
 
 assertType<
   TypeExtends<

@@ -1,4 +1,3 @@
-import type { TypeExtends } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
 import type { NWES } from '../types';
 

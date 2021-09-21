@@ -3,13 +3,7 @@ import {
   useBooleanState,
   useStateWithMapFn,
 } from '@noshiro/react-utils';
-import type {
-  Hue,
-  Percent,
-  ReadonlyArrayOfLength,
-  ReadonlyNonEmptyArray,
-  RectSize,
-} from '@noshiro/ts-utils';
+import type { Hue, Percent, RectSize } from '@noshiro/ts-utils';
 import { IList, pickupHighContrastHues, pipe } from '@noshiro/ts-utils';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';

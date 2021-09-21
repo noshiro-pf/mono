@@ -14,7 +14,6 @@ import {
   take,
   withInitialValue,
 } from '@noshiro/syncflow';
-import type { ReadonlyArrayOfLength } from '@noshiro/ts-utils';
 import { historyReducer, historyToSumCount } from '../functions';
 import { defaultHistoryState } from '../type';
 import { MainView } from './main-view';

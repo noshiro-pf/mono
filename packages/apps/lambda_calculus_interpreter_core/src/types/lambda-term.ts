@@ -1,4 +1,3 @@
-import type { TypeExtends } from '@noshiro/ts-utils';
 import { assertNotType, assertType } from '@noshiro/ts-utils';
 import type { Variable } from './variable';
 

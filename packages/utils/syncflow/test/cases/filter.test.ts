@@ -1,4 +1,3 @@
-import type { TypeEq } from '@noshiro/ts-utils';
 import { assertType } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
 import { filter, fromArray } from '../../src';

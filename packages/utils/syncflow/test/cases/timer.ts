@@ -1,4 +1,3 @@
-import type { DeepReadonly } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
 import { combineLatest, interval, take, timer } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
