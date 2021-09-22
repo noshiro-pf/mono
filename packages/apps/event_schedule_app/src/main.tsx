@@ -53,8 +53,8 @@ const redirects: readonly (readonly [string, string])[] = [
   ['/', routePaths.createPage],
 ];
 
-export const Root = memoNamed('Root', () => (
-  <Wrapper>
+export const Main = memoNamed('Main', () => (
+  <Root>
     <BrowserRouter>
       <Switch>
         {redirects.map(([from, to]) => (
@@ -68,9 +68,9 @@ export const Root = memoNamed('Root', () => (
       </Switch>
     </BrowserRouter>
     <Footer />
-  </Wrapper>
+  </Root>
 ));
 
-const Wrapper = styled.div`
+const Root = styled.div`
   min-height: 100vh;
 `;

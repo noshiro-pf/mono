@@ -35,7 +35,7 @@ const resultsSortedByProbability = [...results]
   .sort((a, b) => a.countSum - b.countSum)
   .reverse();
 
-export const App = memoNamed('App', () => {
+export const Main = memoNamed('Main', () => {
   const [sortBy, setSortBy] = useState<'dice' | 'prob'>('prob');
 
   const sortByDice = useCallback(() => {

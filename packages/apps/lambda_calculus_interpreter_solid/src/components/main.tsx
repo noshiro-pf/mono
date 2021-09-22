@@ -4,7 +4,7 @@ import { useStateAsStream, useStreamValue } from '../utils';
 import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';
 
-export const App = (): JSX.Element => {
+export const Main = (): JSX.Element => {
   const [inputAreaString$, setInputAreaString] =
     useStateAsStream<string>('((+ 2) 3)');
 

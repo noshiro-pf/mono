@@ -19,7 +19,7 @@ const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
   return res === -1 ? undefined : res;
 };
 
-export const App = memoNamed('App', () => {
+export const Main = memoNamed('Main', () => {
   const { pathname, push, replace } = useRouter();
 
   const pathNameLast = useMemo(
