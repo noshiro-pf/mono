@@ -1,5 +1,4 @@
 import { styled } from '@noshiro/solid-styled-components';
-import type { FunctionType } from '@noshiro/ts-utils';
 import type { JSX } from 'solid-js';
 
 export const CodeArea = ({

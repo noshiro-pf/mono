@@ -1,4 +1,3 @@
-import type { ReadonlyRecord } from '../types';
 import { assertType } from '../types';
 
 export const recordValues = <K extends PropertyKey, V>(

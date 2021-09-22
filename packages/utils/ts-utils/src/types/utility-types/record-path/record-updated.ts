@@ -1,5 +1,4 @@
 import type { IndexOfTuple } from '../index-of-tuple';
-import type { ReadonlyRecordBase } from '../readonly-record-base';
 import { assertType } from '../test-type';
 import type { ReadonlyTupleSet } from '../tuple';
 import type { Paths } from './record-paths';

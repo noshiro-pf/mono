@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '../../../types';
 import type { YearEnum } from '../../types';
 
 export const getYear = (date: ReadonlyDate): YearEnum =>

@@ -1,8 +1,7 @@
 import { assertType } from '../types';
-import type { GeneralRecord } from './general-record';
 import type { ToObjectKeysValue } from './to-object-keys';
 
-export const recordKeys = <R extends GeneralRecord>(
+export const recordKeys = <R extends ReadonlyRecordBase>(
   object: R
 ): ToObjectKeysValue<keyof R>[] =>
   Object.keys(object) as ToObjectKeysValue<keyof R>[];

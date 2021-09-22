@@ -2,7 +2,6 @@ import type {
   IsUnion,
   KeyPathAndValueTypeAtPathTuple,
   Paths,
-  ReadonlyRecordBase,
   RecordValueAtPath,
 } from '../types';
 

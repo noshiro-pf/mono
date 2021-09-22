@@ -1,11 +1,22 @@
-import type { ReadonlyRecord } from '../types';
 import { assertType } from '../types';
+import { hasKey } from '../validator';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const match = <Keys extends keyof any, V>(
-  key: Keys,
-  cases: ReadonlyRecord<Keys, V>
-): V => cases[key];
+export function match<Case extends RecordKeyType, V>(
+  switchCase: Case,
+  cases: ReadonlyRecord<Case, V>
+): V;
+export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
+  switchCase: Case,
+  cases: ReadonlyRecord<CaseSub, V>,
+  defaultCase: V
+): V;
+export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
+  switchCase: Case,
+  cases: ReadonlyRecord<CaseSub, V>,
+  defaultCase?: V
+): V | undefined {
+  return hasKey(cases, switchCase) ? cases[switchCase] : defaultCase;
+}
 
 type Direction = 'E' | 'N' | 'S' | 'W';
 const direction: Direction = 'N';
@@ -16,4 +27,16 @@ const res = match(direction as Direction, {
   W: 5,
 });
 
+const res2 = match(
+  'N' as string,
+  {
+    E: 2,
+    N: 3,
+    S: 4,
+    W: 5,
+  },
+  999
+);
+
 assertType<TypeEq<typeof res, number>>();
+assertType<TypeEq<typeof res2, number>>();

@@ -1,4 +1,4 @@
-import type { ReadonlyRecord, Rect, RectSize } from '@noshiro/ts-utils';
+import type { Rect, RectSize } from '@noshiro/ts-utils';
 import { match, pipe } from '@noshiro/ts-utils';
 import type { NWES } from '../../types';
 

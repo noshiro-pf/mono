@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '../../types';
 import {
   getDate,
   getHours,

@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '@noshiro/ts-utils';
 import { newDate } from '@noshiro/ts-utils';
 import type {
   HoursMinutes,

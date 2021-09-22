@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '../../types';
 import { dateCmp } from './cmp';
 import { today } from './today';
 

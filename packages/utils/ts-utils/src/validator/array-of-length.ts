@@ -1,4 +1,4 @@
-import { assertType } from './test-type';
+import { assertType } from '../types';
 
 assertType<TypeEq<[0, 0], ArrayOfLength<2, 0>>>();
 assertType<TypeEq<[0, 0, 0], ArrayOfLength<3, 0>>>();

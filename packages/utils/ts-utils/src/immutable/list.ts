@@ -11,7 +11,8 @@ import type {
   ReadonlyListTakeLast,
   ReadonlyListZip,
 } from '../types';
-import { assertType, isUint32 } from '../types';
+import { assertType } from '../types';
+import { isUint32 } from '../validator';
 import { IMap } from './imap';
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
@@ -340,13 +341,10 @@ export namespace IList {
   export const partition = <N extends number, T>(
     list: readonly T[],
     n: N
-  ): readonly ReadonlyArrayOfLength<N, readonly T[]>[] | undefined =>
-    seqThrow(n).map(
+  ): readonly ReadonlyArrayOfLength<N, T>[] =>
+    seqThrow(Math.ceil(list.length / n)).map(
       (i: number) =>
-        list.slice(n * i, n * (i + 1)) as unknown as ReadonlyArrayOfLength<
-          N,
-          readonly T[]
-        >
+        list.slice(n * i, n * (i + 1)) as unknown as ReadonlyArrayOfLength<N, T>
     );
 
   export const reverse = <T extends readonly unknown[]>(

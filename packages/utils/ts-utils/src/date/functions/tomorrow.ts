@@ -1,4 +1,3 @@
-import type { ReadonlyDate } from '../../types';
 import type { DateEnum } from '../types';
 import { getDate, setDate } from './date-wrapper';
 import { toTimestamp } from './to-timestamp';

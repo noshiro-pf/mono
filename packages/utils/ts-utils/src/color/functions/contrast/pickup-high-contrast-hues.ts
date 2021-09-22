@@ -1,7 +1,7 @@
 import { pipe } from '../../../functional';
 import { IList } from '../../../immutable';
 import type { Percent } from '../../../types';
-import { isUint32 } from '../../../types';
+import { isUint32 } from '../../../validator';
 import type { Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc';
