@@ -5,18 +5,6 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { LuminanceVisualizer, TextColorContrastTable } from './components';
 
-const Root = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background-color: hsl(0, 0%, 33%);
-  padding: 10px;
-  overflow: auto;
-`;
-
-const H1 = styled.h1`
-  color: white;
-`;
-
 const labels = ['luminance', 'text-color'];
 
 export const App = memoNamed('App', () => {
@@ -38,3 +26,14 @@ export const App = memoNamed('App', () => {
     </Root>
   );
 });
+
+const Root = styled.div`
+  min-height: 100vh;
+  background-color: hsl(0, 0%, 33%);
+  padding: 10px;
+  overflow: auto;
+`;
+
+const H1 = styled.h1`
+  color: white;
+`;

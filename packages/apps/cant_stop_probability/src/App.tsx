@@ -108,7 +108,7 @@ export const App = memoNamed('App', () => {
   );
 
   return (
-    <div>
+    <Root>
       <Navbar>
         <Navbar.Group>
           <Tabs
@@ -137,9 +137,13 @@ export const App = memoNamed('App', () => {
           />
         ) : undefined}
       </Wrapper>
-    </div>
+    </Root>
   );
 });
+
+const Root = styled.div`
+  min-height: 100vh;
+`;
 
 const Wrapper = styled.div`
   padding: 20px;

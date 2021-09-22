@@ -36,6 +36,7 @@ export const App = (): JSX.Element => {
 
 const Root = styled('div')`
   padding: 10px;
+  min-height: 100vh;
 `;
 
 const Title = styled('h2')``;

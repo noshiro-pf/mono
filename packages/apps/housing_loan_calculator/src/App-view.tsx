@@ -6,6 +6,7 @@ import { viewTexts } from './constants';
 import type { CalculatingStateType, RepaymentType } from './types';
 
 const Root = styled.div`
+  min-height: 100vh;
   padding: 10px;
 `;
 
