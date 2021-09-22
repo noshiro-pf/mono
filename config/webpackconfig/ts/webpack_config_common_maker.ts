@@ -49,4 +49,5 @@ export const webpackConfigCommonMaker = (
   optimization: {
     runtimeChunk: true,
   },
+  ignoreWarnings: [/Failed to parse source map/],
 });

@@ -48,4 +48,5 @@ export const webpackConfigReactCommonMaker = (
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
   },
   module: { rules: rulesMaker(pathToTsconfigJson) },
+  ignoreWarnings: [/Failed to parse source map/],
 });
