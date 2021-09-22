@@ -656,10 +656,10 @@ export namespace IList {
     });
   }
 
-  export const indexIsInRange =
-    <T>(list: readonly T[]) =>
-    (index: number): boolean =>
-      isUint32(index) && 0 <= index && index < list.length;
+  export const indexIsInRange = <T>(
+    list: readonly T[],
+    index: number
+  ): boolean => isUint32(index) && 0 <= index && index < list.length;
 
   export const eq = <T>(list1: readonly T[], list2: readonly T[]): boolean =>
     list1.length === list2.length && list1.every((v, i) => v === list2[i]);

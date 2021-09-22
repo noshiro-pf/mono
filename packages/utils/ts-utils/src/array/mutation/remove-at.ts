@@ -7,4 +7,4 @@ import { IList } from '../../immutable';
 
 // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
 export const removeAt = <T>(array: T[], index: number): T | undefined =>
-  !IList.indexIsInRange(array)(index) ? undefined : array.splice(index, 1)[0];
+  !IList.indexIsInRange(array, index) ? undefined : array.splice(index, 1)[0];
