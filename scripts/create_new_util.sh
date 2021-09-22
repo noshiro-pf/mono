@@ -25,4 +25,4 @@ sed -i "s/template-utils/${new_util_name_kebab}/" "${UTILS_DIR}/${new_util_name}
 
 echo "created ${UTILS_DIR}/${new_util_name}"
 
-echo "don't forget to add \"${new_util_name}\" to \"build_utils.sh\" targets!"
+echo "don't forget to add \"${new_util_name}\" to \"build_utils.sh\" targets and yarn workspaces!"

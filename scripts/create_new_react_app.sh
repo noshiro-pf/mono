@@ -28,3 +28,5 @@ echo ${new_app_name} >> ${APPS_TXT}
 sort -o ${APPS_TXT} ${APPS_TXT}
 
 echo "created ${APPS_DIR}/${new_app_name}"
+
+echo "don't forget to add \"${new_app_name}\" to yarn workspaces!"
