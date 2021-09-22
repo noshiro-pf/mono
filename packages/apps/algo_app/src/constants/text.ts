@@ -30,4 +30,14 @@ export const text = {
     },
     button: '部屋を作成',
   },
+
+  joinRoom: {
+    gamePassword: {
+      label: '部屋のパスワード',
+    },
+    username: {
+      label: 'あなたの名前',
+    },
+    button: '入室',
+  },
 } as const;

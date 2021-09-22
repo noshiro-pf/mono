@@ -1,0 +1,57 @@
+import type { PermutationString } from '@noshiro/ts-utils';
+import { getShuffled, IList, isArrayOfLength4, pipe } from '@noshiro/ts-utils';
+import type { Card, Room } from '../types';
+import { sortCards } from './sort-cards';
+
+const allCards: ReadonlyArrayOfLength<24, Card> = [
+  { color: 'black', number: 0 },
+  { color: 'black', number: 1 },
+  { color: 'black', number: 2 },
+  { color: 'black', number: 3 },
+  { color: 'black', number: 4 },
+  { color: 'black', number: 5 },
+  { color: 'black', number: 6 },
+  { color: 'black', number: 7 },
+  { color: 'black', number: 8 },
+  { color: 'black', number: 9 },
+  { color: 'black', number: 10 },
+  { color: 'black', number: 11 },
+  { color: 'white', number: 0 },
+  { color: 'white', number: 1 },
+  { color: 'white', number: 2 },
+  { color: 'white', number: 3 },
+  { color: 'white', number: 4 },
+  { color: 'white', number: 5 },
+  { color: 'white', number: 6 },
+  { color: 'white', number: 7 },
+  { color: 'white', number: 8 },
+  { color: 'white', number: 9 },
+  { color: 'white', number: 10 },
+  { color: 'white', number: 11 },
+];
+
+const randomizePlayerCards = (): DeepReadonly<
+  ArrayOfLength<4, ArrayOfLength<6, Card>>
+> =>
+  pipe(allCards)
+    .chain(getShuffled)
+    .chain((cards) => IList.partition(cards, 6))
+    .chain((cards) => IList.map(cards, sortCards))
+    .chain((listOfCards) => {
+      if (!isArrayOfLength4(listOfCards)) {
+        throw new Error('listOfCards should be of length 4');
+      }
+      return listOfCards;
+    }).value;
+
+export const createRoom = ({
+  password,
+}: Pick<Room, 'password'>): StrictOmit<Room, 'id'> => ({
+  password,
+  players: [],
+  shuffleDef: pipe(IList.seqThrow(4))
+    .chain(getShuffled)
+    .chain((list) => list.join('')).value as PermutationString<'1234'>,
+  state: 'not-started',
+  playerCards: randomizePlayerCards(),
+});

@@ -47,6 +47,7 @@
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/goober": "*",
     "@noshiro/preact-resize-observer-hooks": "*",
+    "@noshiro/preact-router-utils": "*",
     "@noshiro/preact-syncflow-hooks": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/syncflow": "*",

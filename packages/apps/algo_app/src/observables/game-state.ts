@@ -3,10 +3,10 @@ import { pairwise, scan } from '@noshiro/syncflow';
 import { returnFalse } from '../return-boolean';
 import { gameStateReducer, initialGameState } from '../state';
 import type { GameState } from '../types';
-import { gameStateAction$ } from './action';
+import { gameStateActionMerged$ } from './action';
 
 export const gameState$: InitializedObservable<GameState> =
-  gameStateAction$.chain(scan(gameStateReducer, initialGameState));
+  gameStateActionMerged$.chain(scan(gameStateReducer, initialGameState));
 
 gameState$.chain(pairwise()).subscribe(([prev, curr]) => {
   if (returnFalse()) {

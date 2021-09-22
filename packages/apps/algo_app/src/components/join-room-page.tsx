@@ -7,9 +7,20 @@ import { text } from '../constants';
 import { isWaitingResponse$, onCreateRoomClick } from '../observables';
 import { ButtonPrimary, Input, Spinner } from './bp';
 
-const vt = text.createRoom;
+const vt = text.joinRoom;
 
-export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
+type Props = Readonly<{ roomId: string }>;
+
+export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
+  /*
+    TODO:
+    roomIdからRoomを取得
+    loadingの間はボタンdisabled
+
+   */
+
+  console.log(roomId); // TODO
+
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
 
@@ -38,7 +49,6 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
           <Label>{vt.gamePassword.label}</Label>
           <Input
             disabled={loading}
-            placeholder={vt.gamePassword.placeholder}
             type='text'
             value={password}
             onInput={onPasswordInput}
@@ -48,7 +58,6 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
           <Label>{vt.username.label}</Label>
           <Input
             disabled={loading}
-            placeholder={vt.username.placeholder}
             type='text'
             value={username}
             onInput={onUsernameInput}
