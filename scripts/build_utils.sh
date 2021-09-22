@@ -12,6 +12,7 @@ targets=(
   "rxjs-utils"
   "react-utils"
   "react-router-utils"
+  "react-router-hooks"
   "preact-router-utils"
   "preact-utils"
   "preact-resize-observer-hooks"
