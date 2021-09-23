@@ -1,6 +1,7 @@
 import type { Observable } from '@noshiro/syncflow';
 import {
   combineLatest,
+  filter,
   fromArray,
   interval,
   map,
@@ -11,12 +12,12 @@ import {
   take,
   zip,
 } from '@noshiro/syncflow';
-import { IList } from '@noshiro/ts-utils';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { IList, isNotUndefined } from '@noshiro/ts-utils';
+import { serverTimestamp } from 'firebase/firestore';
 import { time } from '../constants';
 import { returnFalse } from '../return-boolean';
 import type { Card, GameStateAction, NWES } from '../types';
-import { actionsFromDb$, db, paths, roomId$ } from './database';
+import { db } from './database';
 
 const autoPlaySpeedRate = 0.5;
 
@@ -31,7 +32,9 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
     localGameStateActionSource$.chain(
       map((a) => ({ type: 'local', value: a } as const))
     ),
-    actionsFromDb$.chain(map((a) => ({ type: 'remote', value: a } as const))),
+    db.actionsFromDb$.chain(
+      map((a) => ({ type: 'remote', value: a } as const))
+    ),
   ] as const)
     .chain(
       scan<
@@ -77,19 +80,20 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
 //   console.log({ merged });
 // });
 
-combineLatest([roomId$, localGameStateActionSource$] as const).subscribe(
-  ([roomId, localAction]) => {
-    addDoc(collection(db, paths.rooms, roomId, paths.actions), localAction)
-      .then(() => {
-        if (returnFalse()) {
-          console.log(roomId, localAction);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-);
+combineLatest([
+  db.room$.chain(filter(isNotUndefined)),
+  localGameStateActionSource$,
+] as const).subscribe(([room, localAction]) => {
+  db.addAction(room.id, localAction)
+    .then(() => {
+      if (returnFalse()) {
+        console.log(room.id, localAction);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+});
 
 export const gameStateAction$: Observable<GameStateAction> =
   localGameStateActionSource$;

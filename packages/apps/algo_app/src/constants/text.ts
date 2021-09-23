@@ -34,6 +34,7 @@ export const text = {
   joinRoom: {
     gamePassword: {
       label: '部屋のパスワード',
+      notMatch: 'パスワードが一致しません。',
     },
     username: {
       label: 'あなたの名前',
