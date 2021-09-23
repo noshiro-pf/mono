@@ -1,4 +1,4 @@
 export * from './blueprint-wrapper';
-export * from './ConfigSection';
-export * from './PaymentTable';
-export * from './SummarySection';
+export * from './config-section';
+export * from './payment-table';
+export * from './summary-section';

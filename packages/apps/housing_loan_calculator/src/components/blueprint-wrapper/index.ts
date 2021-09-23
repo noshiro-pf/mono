@@ -1,1 +1,1 @@
-export * from './BpNumericInputWithLabel';
+export * from './bp-numeric-input-with-label';

@@ -1,27 +1,20 @@
+import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { memoNamed } from '@noshiro/react-utils';
 import { viewTexts } from '../../constants';
-import type { RepaymentType } from '../../types';
-import { DataItem } from './DataItem';
+import { calculatedValues$, store$ } from '../../observables';
+import { DataItem } from './data-item';
 
-type Props = Readonly<{
-  repaymentType: RepaymentType;
-  propertyPriceManYen: number;
-  downPaymentManYen: number;
-  fixedPrincipalYenPerMonth: number;
-  fixedMonthlyPaymentsYen: number;
-  interestSumManYen: number;
-}>;
+export const SummarySection = memoNamed('SummarySection', () => {
+  const { repaymentType, downPaymentManYen, propertyPriceManYen } =
+    useStreamValue(store$);
 
-export const SummarySection = memoNamed<Props>(
-  'SummarySection',
-  ({
-    repaymentType,
-    propertyPriceManYen,
-    downPaymentManYen,
+  const {
     fixedPrincipalYenPerMonth,
     fixedMonthlyPaymentsYen,
     interestSumManYen,
-  }) => (
+  } = useStreamValue(calculatedValues$);
+
+  return (
     <dl>
       <DataItem
         description={`${propertyPriceManYen - downPaymentManYen}万円`}
@@ -49,5 +42,5 @@ export const SummarySection = memoNamed<Props>(
         title={viewTexts.paymentsSum}
       />
     </dl>
-  )
-);
+  );
+});
