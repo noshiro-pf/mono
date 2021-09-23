@@ -1,7 +1,5 @@
-import type { KeyBaseType } from './key-base-type';
-
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-interface ISetMappedInterface<K, KM extends KeyBaseType> {
+interface ISetMappedInterface<K, KM extends RecordKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
@@ -46,16 +44,16 @@ interface ISetMappedInterface<K, KM extends KeyBaseType> {
   toArray: () => readonly K[];
 }
 
-export type ISetMapped<K, KM extends KeyBaseType> = Iterable<K> &
+export type ISetMapped<K, KM extends RecordKeyType> = Iterable<K> &
   Readonly<ISetMappedInterface<K, KM>>;
 
 export const ISetMapped = {
-  new: <K, KM extends KeyBaseType>(
+  new: <K, KM extends RecordKeyType>(
     iterable: Iterable<K>,
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ): ISetMapped<K, KM> => new ISetMappedClass<K, KM>(iterable, toKey, fromKey),
-  equal: <K, KM extends KeyBaseType>(
+  equal: <K, KM extends RecordKeyType>(
     a: ISetMapped<K, KM>,
     b: ISetMapped<K, KM>
   ): boolean => {
@@ -64,7 +62,7 @@ export const ISetMapped = {
   },
 };
 
-class ISetMappedClass<K, KM extends KeyBaseType>
+class ISetMappedClass<K, KM extends RecordKeyType>
   implements ISetMapped<K, KM>, Iterable<K>
 {
   private readonly _set: ReadonlySet<KM>;

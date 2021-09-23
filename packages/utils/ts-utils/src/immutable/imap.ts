@@ -49,7 +49,6 @@ interface IMapInterface<K, V> {
   toValuesArray: () => readonly V[];
   toEntriesArray: () => readonly (readonly [K, V])[];
   toArray: () => readonly (readonly [K, V])[];
-
   toSet: () => ISet<V>;
 }
 

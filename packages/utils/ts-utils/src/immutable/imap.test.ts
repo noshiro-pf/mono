@@ -42,7 +42,7 @@ describe('IMap.has', () => {
     expect(m0.has(6)).toBeTruthy();
   });
   test('case 2', () => {
-    const m0 = IMap.new([
+    const m0 = IMap.new<number, number>([
       [1, 10],
       [3, 30],
       [5, 50],
@@ -80,7 +80,7 @@ describe('IMap.get', () => {
     expect(m0.get(6)).toBe(60);
   });
   test('case 2', () => {
-    const m0 = IMap.new([
+    const m0 = IMap.new<number, number>([
       [1, 10],
       [3, 30],
       [5, 50],
@@ -108,7 +108,7 @@ describe('IMap.get', () => {
 
 describe('IMap.set', () => {
   test('case 1', () => {
-    const m0 = IMap.new([
+    const m0 = IMap.new<number, number>([
       [1, 10],
       [3, 30],
       [5, 50],
@@ -171,7 +171,7 @@ describe('IMap.set', () => {
 
 describe('IMap.update', () => {
   test('case 1', () => {
-    const m0 = IMap.new([
+    const m0 = IMap.new<number, number>([
       [1, 10],
       [3, 30],
       [5, 50],
@@ -233,7 +233,7 @@ describe('IMap.update', () => {
 
 describe('IMap.delete', () => {
   test('case 1', () => {
-    const m0 = IMap.new([
+    const m0 = IMap.new<number, number>([
       [1, 10],
       [3, 30],
       [5, 50],

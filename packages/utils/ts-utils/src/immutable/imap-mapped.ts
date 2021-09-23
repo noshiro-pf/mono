@@ -1,8 +1,7 @@
 import { ituple } from '../others';
-import type { KeyBaseType } from './key-base-type';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-interface IMapMappedInterface<K, V, KM extends KeyBaseType> {
+interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
@@ -52,20 +51,20 @@ interface IMapMappedInterface<K, V, KM extends KeyBaseType> {
   toArray: () => readonly (readonly [K, V])[];
 }
 
-export type IMapMapped<K, V, KM extends KeyBaseType> = Iterable<
+export type IMapMapped<K, V, KM extends RecordKeyType> = Iterable<
   readonly [K, V]
 > &
   Readonly<IMapMappedInterface<K, V, KM>>;
 
 export const IMapMapped = {
-  new: <K, V, KM extends KeyBaseType>(
+  new: <K, V, KM extends RecordKeyType>(
     iterable: Iterable<readonly [K, V]>,
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ): IMapMapped<K, V, KM> =>
     new IMapMappedClass<K, V, KM>(iterable, toKey, fromKey),
 
-  equal: <K, V, KM extends KeyBaseType>(
+  equal: <K, V, KM extends RecordKeyType>(
     a: IMapMapped<K, V, KM>,
     b: IMapMapped<K, V, KM>
   ): boolean => {
@@ -74,7 +73,7 @@ export const IMapMapped = {
   },
 };
 
-class IMapMappedClass<K, V, KM extends KeyBaseType>
+class IMapMappedClass<K, V, KM extends RecordKeyType>
   implements IMapMapped<K, V, KM>, Iterable<readonly [K, V]>
 {
   private readonly _map: ReadonlyMap<KM, V>;
