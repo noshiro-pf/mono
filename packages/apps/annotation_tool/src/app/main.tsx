@@ -66,7 +66,7 @@ const labels: ReadonlyNonEmptyArray<Label> = pipe(
 
 const labelInit: Label = labels[0];
 
-export const App = memoNamed('App', () => {
+export const Main = memoNamed('Main', () => {
   const [hidden, hide, show] = useBooleanState(false);
 
   const [visibleLabelIndices, visibleLabelIndicesDispatcher] = useReducer(
