@@ -37,7 +37,6 @@
     "packages/apps/lambda_calculus_interpreter_react",
     "packages/apps/lambda_calculus_interpreter_solid",
     "packages/apps/my_profile_app_preact",
-    "packages/apps/my_profile_app_react",
     "packages/apps/slack_app",
     "packages/apps/template_preact_app",
     "packages/apps/template_react_app",

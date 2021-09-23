@@ -1,0 +1,129 @@
+# スキル
+
+## 技術スタック
+
+-   Git
+-   bash
+-   Web frontend（最近よく使うものを太字で記した）
+    -   Languages
+        -   **TypeScript** （TSX）
+        -   (JavaScript)
+        -   HTML
+        -   CSS, Sass
+    -   Frameworks
+        -   **React**
+        -   **Preact**
+        -   **Angular**（業務で）
+        -   (Vue) （業務で軽微な修正をした程度）
+        -   (Elm)
+        -   (Solid.js)
+        -   (Cycle.js)
+    -   Libraries
+        -   State
+            -   **RxJS**
+                -   ちょっと複雑な非同期処理を書きやすくするために
+            -   Immutable.js
+                -   Set や Map の key に非 primitive 値を使いたいときなど
+                -   ある程度複雑になりそうなとき、reducer を書きやすくするために
+                -   Undo history が必要なときなど
+            -   Redux
+            -   趣味開発では自作ライブラリ（[**Syncflow**](https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648), [immutable utility](https://www.kabuku.co.jp/developers/typescript%E3%81%AE%E6%96%B0%E6%A9%9F%E8%83%BD%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6immutable%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E5%9E%8B%E4%BB%98%E3%81%91%E3%82%92%E9%A0%91%E5%BC%B5)）
+        -   Routing
+            -   React-router
+            -   [Rocon](https://blog.uhy.ooo/entry/2020-08-10/rocon-alpha/) を試したい
+            -   簡単なルーティングは既存ライブラリは使わず history API ＆ 自作 hooks で済ませることも
+        -   UI Library
+            -   [**Blueprint.js**](https://blueprintjs.com/docs/)
+            -   Material-UI
+        -   CSS in JS
+            -   **styled-components**
+            -   **goober**
+        -   Utilities
+            -   (fp-ts)（TypeScript 用関数型ライブラリだがやややりすぎだと感じるのでお手製ライブラリを使っている）
+            -   (jQuery) 今は使っていない
+        -   Others
+            -   Pixi.js
+                -   2D キャンバスの高速化に
+            -   discord.js
+                -   discord アプリを作った時に
+    -   Development Environment
+        -   Package manager
+            -   **yarn**
+            -   npm
+        -   Build environment
+            -   **Webpack**
+        -   Testing
+            -   **Jest**
+        -   Linters & Formatters
+            -   **ESLint** (TypeScript-eslint)
+            -   **Prettier**
+                -   import 文のソート・整理に [prettier-plugin-organize-imports](https://github.com/simonhaenisch/prettier-plugin-organize-imports#readme) を入れている。
+                    これを見つける前は自作スクリプト [https://qiita.com/pikohideaki/items/9f3843853903fcff392c](https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
+-   Web backend
+    -   Languages
+        -   Node.js
+        -   PHP（数千行程度） 今は使っていない
+        -   MySQL（思い出せば書ける）
+    -   BaaS
+        -   **firebase** (hosting, firestore, functions, auth)
+        -   Netlify
+        -   **Heroku**
+            -   discord bot に使用
+    -   Docker
+    -   express (nodejs) （チュートリアルをやっただけ）
+-   Others
+    -   Languages
+        -   C++（数万行オーダー）
+            -   大学時代の研究や課題で使っていた。
+            -   使用経験があるのは C++11 までで C++14 以降はあまり知らない。
+            -   AtCoder に何度か使用した。
+        -   Rust（数千行オーダー）
+        -   Python3（数千行オーダー）
+            -   それほど使い慣れてはいないが、たまに画像処理やデータ分析等で使う。
+            -   scikit-learn（ちょっとだけ）
+    -   少しだけ使用経験のあるもの
+        -   Haskell
+        -   Ruby（大学の講義）
+        -   Java（就活のコーディングテストで一度だけ）
+        -   D
+        -   Erlang（卒業研究で少し触った）
+        -   Swift（業務で簡素な iOS アプリ構築のため少しだけ書いた）
+        -   Scheme（大学の講義で）
+        -   PowerPC のアセンブリ（大学の講義で）
+    -   [PAST](https://atcoder.jp/contests/past202005-2)
+        -   2020-05-25
+        -   初級（52 点）（最近あまり使わない C++の構文で引っかかって時間をロスしたりしたので低めかも。競技プログラミングはあまりやったことがない。）
+
+### メモ
+
+-   基本的にウェブフロントエンドに興味があり、バックエンドは比較すると知識が少なめ。趣味でアプリを書くときは firebase などで簡単に済んでしまうのでなかなか手で書く機会が少ない。
+-   今後覚えようかと思いつつあまり触れていないもの
+    -   Server Side Rendering, Static Site Generator
+    -   GraphQL
+    -   Recoil
+    -   WASM
+-   watch list
+    -   [deno](https://github.com/denoland/deno)
+    -   [Rome](https://github.com/rome/tools)
+    -   [Solid](https://github.com/ryansolid/solid)
+
+## 開発環境
+
+-   OS
+    -   **Windows**（開発は WSL）
+    -   macOS（2 年くらい使っていた時期はある）
+    -   Linux
+-   マシン
+    -   ThinkPad X1 Extreme
+-   エディタ
+    -   **VSCode**
+    -   Sublime Text（VSCode の前に使っていた）
+    -   vi（サーバーサイドでちょっと書き換えるときとか）
+    -   (Emacs)
+
+## 言語（自然言語）
+
+-   日本語（ネイティブ）
+-   英語
+    -   読み書き：親しみのある分野であれば論文は読める程度。プログラミング関連のドキュメントは普通に読める。
+    -   会話：流暢ではないが最低限は使える

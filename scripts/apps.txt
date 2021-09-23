@@ -11,7 +11,6 @@ lambda_calculus_interpreter_preact
 lambda_calculus_interpreter_react
 lambda_calculus_interpreter_solid
 my_profile_app_preact
-my_profile_app_react
 slack_app
 template_preact_app
 template_react_app

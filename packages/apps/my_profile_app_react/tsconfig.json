@@ -1,4 +1,0 @@
-{
-  "extends": "../../../config/tsconfig/tsconfig.react.nolib.json",
-  "include": ["./src", "./scripts", "./config"]
-}
