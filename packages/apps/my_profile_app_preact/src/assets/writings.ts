@@ -1,6 +1,14 @@
 import type { WritingsInfo } from '../types';
 
-export const writings: WritingsInfo[] = [
+export const writings: readonly WritingsInfo[] = [
+  {
+    id: 'ts4.1-immutable-setin',
+    link: 'https://www.kabuku.co.jp/developers/typescript-union-combination-limit-of-25',
+    title:
+      'Union 型を含むオブジェクト型を代入するときに遭遇しうるTypeScript型チェックの制限について',
+    subtitle: '',
+    body: 'Union型を内部に含むタプルやレコード型の代入可能性判定で遭遇しうる型チェックの制限について、TypeScriptのコンパイラのソースコードを読んで調べたので紹介します。',
+  },
   {
     id: 'type-challenges-introduction',
     link: 'https://docs.google.com/presentation/d/1uyL1tUJkpL8kgoNwpSy28sjCMHNzsYiO1aPC4_yzTYs/edit?usp=sharing',
@@ -10,7 +18,7 @@ export const writings: WritingsInfo[] = [
   },
   {
     id: 'ts4.1-immutable-setin',
-    link: 'https://www.kabuku.co.jp/developers/typescript%E3%81%AE%E6%96%B0%E6%A9%9F%E8%83%BD%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6immutable%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E5%9E%8B%E4%BB%98%E3%81%91%E3%82%92%E9%A0%91%E5%BC%B5',
+    link: 'https://www.kabuku.co.jp/developers/typescript-strictly-typed-immutable-library',
     title:
       'TypeScript v4.3 の機能を使って immutable ライブラリの型付けを頑張る',
     subtitle:
@@ -23,7 +31,7 @@ export const writings: WritingsInfo[] = [
     title:
       'TypeScript v4.1 で追加されたnoUncheckedIndexedAccessオプションと上手くやっていくには',
     subtitle: '',
-    body: 'TSの新コンパイラオプションnoUncheckedIndexedAccessを使う際のノウハウをまとめました。',
+    body: 'TSの新コンパイラオプションnoUncheckedIndexedAccessを使う際の自己流ノウハウをまとめました。',
   },
   {
     id: 'syncflow-slides',
