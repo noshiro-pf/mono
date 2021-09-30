@@ -6,13 +6,15 @@ import Markdown from 'preact-markdown';
 import { useCallback, useEffect, useMemo } from 'preact/hooks';
 import { Profile2Md, ProfileMd, SkillsMd } from './assets';
 import {
+  GithubIconLink,
   LastUpdated,
   MuiAppBar,
   MuiTabs,
   Products,
+  TwitterIconLink,
   Writings,
 } from './components';
-import { labelList, routeList, routes } from './constants';
+import { labelList, links, routeList, routes } from './constants';
 
 const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
   const res = routeList.findIndex((e) => e === `/${pathNameLast}/`);
@@ -61,6 +63,14 @@ export const Main = memoNamed('Main', () => {
           tabIndex={tabIndex ?? 0}
           tabIndexChange={tabIndexOnChange}
         />
+        <IconButtons>
+          <IconButton title={links.twitter}>
+            <TwitterIconLink />
+          </IconButton>
+          <IconButton title={links.github}>
+            <GithubIconLink />
+          </IconButton>
+        </IconButtons>
       </AppBarFlex>
 
       <LastUpdatedWrapper>
@@ -99,5 +109,18 @@ const ContentWrapper = styled('div')`
 const AppBarFlex = styled(MuiAppBar)`
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const IconButtons = styled('div')`
+  display: flex;
+  margin-right: 20px;
+`;
+
+const IconButton = styled('div')`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 8px;
 `;

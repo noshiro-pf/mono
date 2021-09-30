@@ -1,4 +1,4 @@
 export const mediaQueries = {
-  small: '(max-width: 799px)',
-  medium: '(min-width: 800px)',
+  small: '(max-width: 919px)',
+  medium: '(min-width: 920px)',
 } as const;
