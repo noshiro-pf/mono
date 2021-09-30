@@ -8,7 +8,12 @@ on:
   push:
     branches: [main]
     paths:
-      - packages/apps/my_profile_app_preact
+      - .github/workflows/deploy_profile_app.yml
+      - packages/utils/ts-utils/**
+      - packages/utils/preact-utils/**
+      - packages/utils/preact-router-utils/**
+      - packages/utils/preact-resize-observer-hooks/**
+      - packages/apps/my_profile_app_preact/**
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,13 +26,34 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: build
-        run: yarn workspace @noshiro/my-profile-app-preact build
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
 
-      # Runs a set of commands using the runners shell
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: setup
+        run: |
+          yarn setup:root
+          yarn setup:custom-eslint
+          yarn workspace @noshiro/my-profile-app-preact setup
+
+      - name: build dependencies
+        run: |
+          yarn workspace @noshiro/ts-utils build
+          yarn workspace @noshiro/preact-utils build
+          yarn workspace @noshiro/preact-router-utils build
+          yarn workspace @noshiro/preact-resize-observer-hooks build
+
+      - name: lint
+        run: yarn workspace @noshiro/my-profile-app-preact lint
+
+      - name: test
+        run: yarn workspace @noshiro/my-profile-app-preact test
+
       - name: deploy
         run: yarn workspace @noshiro/my-profile-app-preact deploy --token ${{ secrets.FIREBASE_TOKEN }}
