@@ -16,6 +16,7 @@
     "deploy": "firebase deploy",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
+    "fb:login:ci": "firebase login:ci",
     "fmt": "yarn _prettier .",
     "gi": "yarn _script_genindex ./src --min-depth 1 --ignore assets",
     "lint": "eslint src/ --ext .ts,.tsx",
