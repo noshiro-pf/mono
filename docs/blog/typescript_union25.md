@@ -99,7 +99,7 @@ checkBinaryLikeExpressionWorker
 
 `t = s` という代入文における `s` の型が `source` 、 `t` の型が `target` のようです。
 
-余談ですが、最初自分が読んだ時、`@param source` の `The left-hand-side of the relation` という説明を見て`t = s` という代入文における左辺のことかと勘違いして混乱していました。これは "is assignable to" などの型関係における左辺という意味であって、代入文などでは逆になるようにソースコード中の位置関係とは無関係のようです（たとえば `A extends B` のような条件型ではソースコード上の位置関係通りになりそう）。
+余談ですが、最初自分が読んだ時、`@param source` の `The left-hand-side of the relation` という説明を見て`t = s` という代入文における左辺のことかと勘違いして混乱していました。これは "is assignable to" などの型関係における左辺という意味であって、ソースコード中の位置関係とは必ずしも一致していません（代入文などでは左右反転しますが、たとえば `A extends B` のような条件型では同じ位置関係になります）。
 
 試しに、
 
@@ -267,7 +267,7 @@ namespace Example5 {
 }
 ```
 
-おそらくですが、右辺 `S` が Union 型を含むレコード型やタプル型などの場合、 `S` が「そのまま」左辺 `T` に代入できる形ではない場合は、Union が一番外に来る標準形のようなものへの展開を考えて全要素が代入可能か調べる必要があるのですが、その展開したときの組み合わせの数は掛け算で増えてしまうため、展開後のサイズが 25 を超える場合は展開しないように type checker が制限しているようです。
+おそらくですが、右辺 `S` が Union 型を含むレコード型やタプル型などの場合、 `S` が「そのまま」左辺 `T` に代入できる形ではない場合は、Union が一番外に来る標準形のようなもの（ ↓ に示したようなもの）への展開を考えて、それらがすべて `T` に代入可能か調べる必要があるのですが、その展開した Union 型のサイズが掛け算で増えてしまうため、展開後のサイズが 25 を超える場合は展開しないように type checker が制限しているようです。
 
 `assignmentCompatWithDiscriminatedUnion.ts` の例では、`t = s` のチェックは `S` を展開した型である
 
@@ -301,7 +301,7 @@ namespace Example5 {
 | { a: 2, b: 2, c: 2 }
 ```
 
-の各要素 `a` について `isRelatedTo(a, T)` が呼び出されて and を取れば、 `S` が `T` へ代入可能か判定できますが、そのときに `S` のサイズが 27 なので制限を超えてしまうということです。
+の各要素（`a` とします）について `isRelatedTo(a, T)` を呼び出して and を取ることで `S` が `T` へ代入可能か判定できますが、そのときに `S` のサイズが 27 なので制限を超えてしまうということです。
 
 [TS Playground - An online editor for exploring TypeScript and JavaScript](https://www.typescriptlang.org/play?#code/C4TwDgpgBAclC8UAMUA+UCMaoCYDcAUAaJFAMoJQDeUAhgFywA0UARozCwMYdQC+hYuGgAVBASjYaDZC3bMoPWPwlS6jDHI7defVemmMcWhUrh7JB9QvlIdyi2pmc2G++f3VrL+ccW7PQxttf2QVSy9nExclLEcrKNdTI35CABMILgAbWgAnaCyIYCgAZ0YydMyc-KhC4uBGEUFixBLCIA)
 
