@@ -20,21 +20,20 @@
         -   (Solid.js)
         -   (Cycle.js)
     -   Libraries
-        -   State
-            -   global state manager
-                -   趣味開発では自作ライブラリ「[**Syncflow**](https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648)」と専用(P)React hooks
-                -   Recoil（趣味開発では自作ライブラリを使っているが、業務で次に使うならこれかなという気持ち）
-                -   **RxJS**
-                    -   現在業務で使用。自作ライブラリ開発前は趣味開発でもよく使っていた。
-                    -   ちょっと複雑な非同期処理を書きやすくするために
-                -   (Redux)
-            -   immutability
-                -   趣味開発では[自作ライブラリ](https://www.kabuku.co.jp/developers/typescript%E3%81%AE%E6%96%B0%E6%A9%9F%E8%83%BD%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6immutable%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E5%9E%8B%E4%BB%98%E3%81%91%E3%82%92%E9%A0%91%E5%BC%B5)と immer
-                -   immer（業務でも使用）
-                -   Immutable.js（ちょっと前は使っていたが、現在は趣味でも業務でも使っていない）
-                    -   Set や Map の key に非 primitive 値を使いたいときなど
-                    -   ある程度複雑になりそうなとき、reducer を書きやすくするために
-                    -   Undo history が必要なときなど
+        -   Global State Manager
+            -   趣味開発では自作ライブラリ「[**Syncflow**](https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648)」と専用(P)React hooks
+            -   Recoil（趣味開発では自作ライブラリを使っているが、業務で次に使うならこれかなという気持ち）
+            -   **RxJS**
+                -   現在業務で使用。自作ライブラリ開発前は趣味開発でもよく使っていた。
+                -   ちょっと複雑な非同期処理を書きやすくするために
+            -   (Redux)
+        -   Immutability
+            -   趣味開発では[自作ライブラリ](https://www.kabuku.co.jp/developers/typescript%E3%81%AE%E6%96%B0%E6%A9%9F%E8%83%BD%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6immutable%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E5%9E%8B%E4%BB%98%E3%81%91%E3%82%92%E9%A0%91%E5%BC%B5)と immer
+            -   immer（業務でも使用）
+            -   Immutable.js（ちょっと前は使っていたが、現在は趣味でも業務でも使っていない）
+                -   Set や Map の key に非 primitive 値を使いたいときなど
+                -   ある程度複雑になりそうなとき、reducer を書きやすくするために
+                -   Undo history が必要なときなど
         -   Routing
             -   React-router
             -   [Rocon](https://blog.uhy.ooo/entry/2020-08-10/rocon-alpha/) を試したい
@@ -66,7 +65,7 @@
             -   **ESLint** (TypeScript-eslint)
             -   **Prettier**
                 -   import 文のソート・整理に [prettier-plugin-organize-imports](https://github.com/simonhaenisch/prettier-plugin-organize-imports#readme) を入れている。
-                    これを見つける前は自作スクリプト [https://qiita.com/pikohideaki/items/9f3843853903fcff392c](https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
+                    これを見つける前は [自作スクリプト](https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
 -   Web backend
     -   Languages
         -   Node.js
