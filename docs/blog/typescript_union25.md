@@ -15,7 +15,9 @@ type S = ['type01' | 'type02' | ... | 'type25'];
 declare let t: T;
 declare let s: S;
 
-t = s; // これは通る
+// これは通る
+s = t;
+t = s;
 ```
 
 ```ts
@@ -34,11 +36,15 @@ type S = ['type01' | 'type02' | ... | 'type26']; // 追加
 declare let t: T;
 declare let s: S;
 
+// これは通る
+s = t;
+
+// これはエラー！
 // @ts-expect-error
 t = s; // Type 'S' is not assignable to type 'T'.
 ```
 
-[TS Playground - An online editor for exploring TypeScript and JavaScript](https://www.typescriptlang.org/play?#code/C4TwDgpgBAygjFAvFA2gKClAPlA5KSABjlw2zwIkICZTMd9wqBmO8xokshymtnpoVbcKggCz9RRAKySOVAGxzeAdmWCAHOqIBObRDiF9cLvSkHaI+XGFnrEq5TizHTOEteQ4azwa2+4PV9qI2DTdkpqSztI2wimagcYhJcAXQBuNDRKKAAVBEQRFHliXFSiktpys2LeVmryWvEyit5ZBpwmoiUO1BK1Xq6qLUGSvVGnIwm3EmmvKta3esWvCTmDdpWDHq3vFprrEd3xrZD9xvlqWdOFg9jzzsu10820ABMIAGMAGwBDACdoN8IMAoABnOAALlgcEyHx+AKBIKgwCheVhWVRSHBGOyTFg1Gx6GSnH0fF8QjJ4QERGi8SIcRpVCS9KoLhJijJPg5hH8PKCHMMxmp5jgdKZNmMLIl7NZ7mM3LlfLlAtZZzC+iimsZ5kSmtlTOoHgymPxuUJhTugmuVtpDz6dXtQ0Iz1tbKdJR2bsIAy2vI9vBObqF6xMAbctwuTmWwddUbcm2DXvjXl9waOwaDKYgZ3WV3DkC1eZj2b1ecTpZ6mXeXz+gKgwNBYOo0Jg1DhtcRDeRwBbeXbWQA9IOoAABYBggC0EAAHpBPsBp-9-gB7f7ZC3ggdAA)
+[TS Playground - An online editor for exploring TypeScript and JavaScript](https://www.typescriptlang.org/play?#code/C4TwDgpgBAygjFAvFA2gKClAPlA5KSABjlw2zwIkICZTMd9wqBmO8xokshymtnpoVbcKggCz9RRAKySOVAGxzeAdmWCAHOqIBObRDiF9cLvSkHaI+XGFnrEq5TizHTOEteQ4azwa2+4PV9qI2DTdkpqSztI2wimagcYhJcAXQBuNDRKKAAVBEQRFHliXFSiktpys2LeVmryWvEyit5ZBpwmoiUO1BK1Xq6qLUGSvVGnIwm3EmmvKta3esWvCTmDdpWDHq3vFprrEd3xrZD9xvlqWdOFg9jzzsu10820ABMIAGMAGwBDACdoN8IMAoABnOAALlgcEyHx+AKBIKgwCheVhWQhSBRGNR2IhmWyTFg1Gx6GSnH0fF8Qip4QERGi8SIcQZVCSzKoLgpiipPh5hH8AqCPMMxnp5jgTLZNmMHJl3M57mM-KVQqVIs5ZzC+iiutZ5kSusVbOoHgyWRyuVJhTugmudsZDz6dWdQ0Iz0dXLdJR2XsIAy2gp9vBOXrF6xMIbctwuTmW4c9cbcm3DfuTXkD4aO4bDGYgZ3WV2jkD1RYT+aNRdTlZ6hPhf0BUGBoLB1GhMGocK+jaRoOA7byXcxNpRw7QAHoJ1AAALAMEAWggAA9IJ9gEv-v8APb-bKjtuZIA)
 
 それぞれの例における `T` と `S` は、見た目は異なるものの同等の型を表しているはずで、実際 `t = s` や `s = t` という代入文は、要素数が少ないうちは普通に型チェックは通ります。
 
@@ -267,7 +273,7 @@ namespace Example5 {
 }
 ```
 
-おそらくですが、右辺 `S` が Union 型を含むレコード型やタプル型などの場合、 `S` が「そのまま」左辺 `T` に代入できる形ではない場合は、Union が一番外に来る標準形のようなもの（ ↓ に示したようなもの）への展開を考えて、それらがすべて `T` に代入可能か調べる必要があるのですが、その展開した Union 型のサイズが掛け算で増えてしまうため、展開後のサイズが 25 を超える場合は展開しないように type checker が制限しているようです。
+おそらくですが、右辺 `S` が Union 型を含むレコード型やタプル型などの場合、 `S` が「そのまま」左辺 `T` に代入できる形ではない場合は、Union が一番外に来る標準形のようなもの（下に示したようなもの）への展開を考えて、それらがすべて `T` に代入可能か調べる必要があるのですが、その展開した Union 型のサイズが掛け算で増えてしまうため、展開後のサイズが 25 を超えてしまうことが分かった場合は展開を避けるように type checker が制限しているようです。
 
 `assignmentCompatWithDiscriminatedUnion.ts` の例では、`t = s` のチェックは `S` を展開した型である
 
@@ -301,7 +307,7 @@ namespace Example5 {
 | { a: 2, b: 2, c: 2 }
 ```
 
-の各要素（`a` とします）について `isRelatedTo(a, T)` を呼び出して and を取ることで `S` が `T` へ代入可能か判定できますが、そのときに `S` のサイズが 27 なので制限を超えてしまうということです。
+の各要素（`a` とします）について `isRelatedTo(a, T)` を呼び出して and を取ることで `S` が `T` へ代入可能か判定できそうですが、そのときに `S` のサイズが 27 なので制限を超えてしまうため型チェッカーが false を返してしまう、ということです。
 
 [TS Playground - An online editor for exploring TypeScript and JavaScript](https://www.typescriptlang.org/play?#code/C4TwDgpgBAclC8UAMUA+UCMaoCYDcAUAaJFAMoJQDeUAhgFywA0UARozCwMYdQC+hYuGgAVBASjYaDZC3bMoPWPwlS6jDHI7defVemmMcWhUrh7JB9QvlIdyi2pmc2G++f3VrL+ccW7PQxttf2QVSy9nExclLEcrKNdTI35CABMILgAbWgAnaCyIYCgAZ0YydMyc-KhC4uBGEUFixBLCIA)
 
@@ -370,11 +376,11 @@ if (
 }
 ```
 
-に入っているようです。力尽きてしまったのでここも中を細かく読めていませんが、先ほどの `typeRelatedToDiscriminatedType` は呼ばれておらず、Union 型の展開を避ける形での比較をしていそうです。
+に入っているようです。力尽きてしまったのでここも中を細かく読めていませんが、先ほどの `typeRelatedToDiscriminatedType` は呼ばれておらず、Union 型の展開を避ける形での比較をしていそうです（そもそも `T` はこれ以上展開しようが無い型ではあります）。
 
 ## まとめ
 
--   TypeScript において、Union 型を内部に含むタプルやレコード型などの Union 型を展開すると巨大になってしまうとき、代入できるはずのところで代入できないと判定されることがある。これは型チェッカーの意図的な制限である。
--   Union 型を展開しなくても比較可能な場面では、TypeScript が賢く Union 型の展開を回避している場合がある（このため、この制限に遭遇することは結構少ない）。
+-   TypeScript において、Union 型を内部に含むタプルやレコード型などを別の型に代入可能か判定するとき、 Union 型を内部に含まないように展開しなければ比較できないがそうすると要素数が 25 を超える Union 型になってしまう場合は、代入できるはずのところで代入できないと判定されることがある。これは型チェッカーのパフォーマンスを落とさないために設けられた意図的な制限である。
+-   Union 型を展開しなくても比較可能な場面では、TypeScript が賢く Union 型の展開を回避している場合がある（このため、実用上この制限に遭遇することはあまりない）。
 
 以上、 [noshiro](https://twitter.com/noshiro_piko) が書きました。
