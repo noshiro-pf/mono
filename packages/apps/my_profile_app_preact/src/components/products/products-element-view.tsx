@@ -20,7 +20,7 @@ export const ProductsElementView = memoNamed<
           {link === '' ? (
             <span>{title}</span>
           ) : (
-            <a href={link} rel='noopener noreferrer' target='_blank'>
+            <a href={link} rel={'noopener noreferrer'} target={'_blank'}>
               {title}
             </a>
           )}
@@ -31,10 +31,14 @@ export const ProductsElementView = memoNamed<
 
         <BodyWrapper>
           <MuiTypography variant={'body1'}>{description}</MuiTypography>
-          <MuiTypography variant='body2'>{`［実装］：${implementation}`}</MuiTypography>
+          <MuiTypography
+            variant={'body2'}
+          >{`［実装］：${implementation}`}</MuiTypography>
         </BodyWrapper>
 
-        {imageUrl === '' ? undefined : <ImgStyled alt={''} src={imageUrl} />}
+        {imageUrl === '' ? undefined : (
+          <ImgStyled alt={imageUrl} src={imageUrl} />
+        )}
       </CardContentStyled>
     </CardStyled>
   )
@@ -49,17 +53,18 @@ const CardStyled = styled(MuiCard)`
 
 const CardContentStyled = styled(MuiCardContent)`
   flex: auto;
+  overflow: auto;
 `;
 
 const ImgStyled = styled('img')`
-  flex: 0 0 400px;
-  height: 300px;
-  max-width: 400px;
-  object-fit: fill;
+  max-height: 300px;
+  max-width: min(480px, 100%);
+  object-fit: contain;
 
   filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
 `;
 
 const BodyWrapper = styled('div')`
   margin: 10px 0;
+  white-space: pre-wrap;
 `;
