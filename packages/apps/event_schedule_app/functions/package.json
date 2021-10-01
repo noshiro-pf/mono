@@ -35,6 +35,6 @@
     "nodemailer": "^6.4.16"
   },
   "engines": {
-    "node": "12"
+    "node": "14"
   }
 }

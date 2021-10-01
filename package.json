@@ -161,5 +161,8 @@
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.8.0",
     "webpack-node-externals": "^3.0.0"
+  },
+  "engines": {
+    "node": "14"
   }
 }
