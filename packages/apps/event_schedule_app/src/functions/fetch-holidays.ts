@@ -1,7 +1,7 @@
 export const fetchHolidaysJson = (): Promise<Record<string, string>> =>
-  fetch(
-    'https://raw.githubusercontent.com/holidays-jp/api/master/v1/date.json'
-  ).then((res) => res.json() as Promise<Record<string, string>>);
+  fetch('https://holidays-jp.github.io/api/v1/date.json').then(
+    (res) => res.json() as Promise<Record<string, string>>
+  );
 
 /*
  * result example:
