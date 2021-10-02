@@ -3,14 +3,16 @@ export type Subscription = Readonly<{
 }>;
 
 export type TinyObservable<T> = Readonly<{
-  next: (value: T) => void;
   subscribe: (fn: (value: T) => void) => Subscription;
 }>;
+export type TinyObservableSource<T> = MergeIntersection<
+  TinyObservable<T> & { readonly next: (value: T) => void }
+>;
 
-export const createTinyObservable = <T>(): TinyObservable<T> =>
+export const createTinyObservable = <T>(): TinyObservableSource<T> =>
   new TinyObservableClass<T>();
 
-class TinyObservableClass<T> implements TinyObservable<T> {
+class TinyObservableClass<T> implements TinyObservableSource<T> {
   private readonly subscriptions = new Map<symbol, (value: T) => void>();
 
   next(value: T): void {
