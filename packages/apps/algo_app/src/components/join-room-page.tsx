@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
-import { useStreamValue } from '@noshiro/preact-syncflow-hooks';
 import { memoNamed } from '@noshiro/preact-utils';
+import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
 import { useCallback, useState } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';

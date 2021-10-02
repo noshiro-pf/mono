@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
-import { useStreamValue } from '@noshiro/preact-syncflow-hooks';
 import { memoNamed } from '@noshiro/preact-utils';
+import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
 import type { Rect } from '@noshiro/ts-utils';
 import { useEffect } from 'preact/hooks';
 import { text } from '../constants';
