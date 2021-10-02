@@ -1,6 +1,6 @@
-import { useRouter } from '@noshiro/react-router-hooks';
 import { withLatestFrom } from '@noshiro/syncflow';
 import { useStreamEffect, useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useRouter } from '@noshiro/tiny-router-react-hooks';
 import { mapNullable, pipe, stringToNumber } from '@noshiro/ts-utils';
 import { useEffect } from 'react';
 import { queryParams } from './constants';

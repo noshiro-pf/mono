@@ -12,7 +12,7 @@ targets=(
   "preact-utils"
   "react-utils"
   "react-router-utils"
-  "react-router-hooks"
+  "tiny-router-react-hooks"
   "tiny-router-preact-hooks"
   "preact-resize-observer-hooks"
   "react-resize-observer-hooks"

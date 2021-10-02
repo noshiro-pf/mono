@@ -1,4 +1,4 @@
-import { withSlash } from '@noshiro/react-router-hooks';
+import { withSlash } from '@noshiro/tiny-router-react-hooks';
 import { isNotUndefined } from '@noshiro/ts-utils';
 
 export const uriWithQueryParams = (
