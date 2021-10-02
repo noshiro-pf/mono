@@ -1,8 +1,3 @@
-import {
-  useStream,
-  useStreamValue,
-  useVoidEventAsStream,
-} from '@noshiro/react-syncflow-hooks';
 import { memoNamed } from '@noshiro/react-utils';
 import {
   interval,
@@ -14,6 +9,11 @@ import {
   take,
   withInitialValue,
 } from '@noshiro/syncflow';
+import {
+  useStream,
+  useStreamValue,
+  useVoidEventAsStream,
+} from '@noshiro/syncflow-react-hooks';
 import { historyReducer, historyToSumCount } from '../functions';
 import { defaultHistoryState } from '../type';
 import { MainView } from './main-view';

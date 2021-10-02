@@ -1,5 +1,5 @@
-import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { memoNamed } from '@noshiro/react-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { viewTexts } from '../../constants';
 import { calculatedValues$, store$ } from '../../observables';
 import { DataItem } from './data-item';

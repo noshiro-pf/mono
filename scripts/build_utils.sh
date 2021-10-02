@@ -8,7 +8,7 @@ targets=(
   # ts-utils dependent
   "syncflow"
   "syncflow-preact-hooks"
-  "react-syncflow-hooks"
+  "syncflow-react-hooks"
   "preact-utils"
   "react-utils"
   "react-router-utils"

@@ -1,5 +1,5 @@
-import { useStreamValue } from '@noshiro/react-syncflow-hooks';
 import { memoNamed } from '@noshiro/react-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import styled from 'styled-components';
 import { viewTexts } from '../../constants';
 import {
