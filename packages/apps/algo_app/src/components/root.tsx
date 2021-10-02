@@ -1,8 +1,8 @@
 import { styled } from '@noshiro/goober';
 import { useResizeObserver } from '@noshiro/preact-resize-observer-hooks';
-import { useRouter } from '@noshiro/preact-router-utils';
 import { memoNamed } from '@noshiro/preact-utils';
 import { useStreamEffect } from '@noshiro/syncflow-preact-hooks';
+import { useRouter } from '@noshiro/tiny-router-preact-hooks';
 import { useCallback, useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { getParams, getRoomId, isMainPage, routes, text } from '../constants';

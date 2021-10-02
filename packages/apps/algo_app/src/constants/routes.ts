@@ -1,5 +1,5 @@
-import type { QueryParams } from '@noshiro/preact-router-utils';
-import { withSlash } from '@noshiro/preact-router-utils';
+import type { QueryParams } from '@noshiro/tiny-router-preact-hooks';
+import { withSlash } from '@noshiro/tiny-router-preact-hooks';
 
 export const routes = {
   main: '/',
