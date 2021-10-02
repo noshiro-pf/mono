@@ -46,9 +46,9 @@
   "dependencies": {
     "@noshiro/goober": "*",
     "@noshiro/lambda-calculus-interpreter-core": "*",
-    "@noshiro/preact-syncflow-hooks": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/syncflow": "*",
+    "@noshiro/syncflow-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "preact": "^10.4.7"
   }
