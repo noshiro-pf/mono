@@ -2,8 +2,12 @@ import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
 import { useStreamEffect } from '@noshiro/syncflow-preact-hooks';
-import { useRouter } from '@noshiro/tiny-router-preact-hooks';
-import { useCallback, useMemo } from 'preact/hooks';
+import {
+  push,
+  usePathname,
+  useQueryParams,
+} from '@noshiro/tiny-router-preact-hooks';
+import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { getParams, getRoomId, isMainPage, routes, text } from '../constants';
 import { response$ } from '../observables';
@@ -11,6 +15,10 @@ import { Button } from './bp';
 import { CreateRoomPage } from './create-room-page';
 import { GameMain } from './game-main';
 import { JoinRoomPage } from './join-room-page';
+
+const goToMain = (): void => {
+  push(routes.main);
+};
 
 export const Root = memoNamed('Root', () => {
   const [windowSize, ref] = useResizeObserver<HTMLDivElement>({
@@ -20,7 +28,8 @@ export const Root = memoNamed('Root', () => {
     left: 0,
   });
 
-  const { pathname, queryParams, push } = useRouter();
+  const pathname = usePathname();
+  const queryParams = useQueryParams();
 
   const showMain = useMemo(() => isMainPage(pathname), [pathname]);
 
@@ -30,10 +39,6 @@ export const Root = memoNamed('Root', () => {
     () => getParams(queryParams),
     [queryParams]
   );
-
-  const goToMain = useCallback(() => {
-    push(routes.main);
-  }, [push]);
 
   useStreamEffect(response$, (res) => {
     push(`${routes.rooms}/${res.id}`);

@@ -5,6 +5,4 @@
 /// <reference path="../../stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../stdlib/dist/utils.d.ts" />
 
-export { withSlash } from '@noshiro/tiny-router-observable';
-export type { QueryParams, Router } from '@noshiro/tiny-router-observable';
 export * from './router';

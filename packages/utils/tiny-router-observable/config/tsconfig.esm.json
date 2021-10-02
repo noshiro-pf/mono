@@ -1,7 +1,7 @@
 {
-  "extends": "../../../../config/tsconfig/tsconfig.lib.cjs.nolib.json",
+  "extends": "../../../../config/tsconfig/tsconfig.lib.esm.nolib.json",
   "compilerOptions": {
-    "outDir": "../cjs"
+    "outDir": "../esm"
   },
   "include": ["../src"],
   "exclude": ["../src/**/*.test.ts", "node_modules"]

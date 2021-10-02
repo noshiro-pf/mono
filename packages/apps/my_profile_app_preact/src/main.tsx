@@ -1,9 +1,9 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { useRouter } from '@noshiro/tiny-router-preact-hooks';
+import { push, redirect, usePathname } from '@noshiro/tiny-router-preact-hooks';
 import { IList, match } from '@noshiro/ts-utils';
 import Markdown from 'preact-markdown';
-import { useCallback, useEffect, useMemo } from 'preact/hooks';
+import { useEffect, useMemo } from 'preact/hooks';
 import { Profile2Md, ProfileMd, SkillsMd } from './assets';
 import {
   GithubIconLink,
@@ -21,8 +21,17 @@ const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
   return res === -1 ? undefined : res;
 };
 
+const tabIndexOnChange = (tabIdx: number): void => {
+  if (IList.indexIsInRange(routeList, tabIdx)) {
+    const route = routeList[tabIdx];
+    if (route !== undefined) {
+      push(route);
+    }
+  }
+};
+
 export const Main = memoNamed('Main', () => {
-  const { pathname, push, replace } = useRouter();
+  const pathname = usePathname();
 
   const pathNameLast = useMemo(
     () => IList.last(pathname.split('/').filter((s) => s !== '')) ?? '',
@@ -36,23 +45,11 @@ export const Main = memoNamed('Main', () => {
     [pathNameLast]
   );
 
-  const tabIndexOnChange = useCallback(
-    (tabIdx: number) => {
-      if (IList.indexIsInRange(routeList, tabIdx)) {
-        const route = routeList[tabIdx];
-        if (route !== undefined) {
-          push(route);
-        }
-      }
-    },
-    [push]
-  );
-
   useEffect(() => {
     if (tabIndex === undefined) {
-      replace(routes.profile);
+      redirect(routes.profile);
     }
-  }, [pathname, tabIndex, replace]);
+  }, [pathname, tabIndex]);
 
   return (
     <Root>
