@@ -12,7 +12,7 @@ on:
       - packages/utils/ts-utils/**
       - packages/utils/preact-utils/**
       - packages/utils/tiny-router-preact-hooks/**
-      - packages/utils/preact-resize-observer-hooks/**
+      - packages/utils/resize-observer-preact-hooks/**
       - packages/apps/my_profile_app_preact/**
 
   # Allows you to run this workflow manually from the Actions tab
@@ -45,7 +45,7 @@ jobs:
           yarn workspace @noshiro/ts-utils build
           yarn workspace @noshiro/preact-utils build
           yarn workspace @noshiro/tiny-router-preact-hooks build
-          yarn workspace @noshiro/preact-resize-observer-hooks build
+          yarn workspace @noshiro/resize-observer-preact-hooks build
 
       - name: lint
         run: yarn workspace @noshiro/my-profile-app-preact lint

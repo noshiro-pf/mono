@@ -28,9 +28,9 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
-    "@noshiro/react-resize-observer-hooks": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/react-utils-styled": "*",
+    "@noshiro/resize-observer-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "react": "^17.0.2",
     "styled-components": "^5.3.0"

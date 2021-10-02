@@ -46,8 +46,8 @@
   },
   "dependencies": {
     "@noshiro/goober": "*",
-    "@noshiro/preact-resize-observer-hooks": "*",
     "@noshiro/preact-utils": "*",
+    "@noshiro/resize-observer-preact-hooks": "*",
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "preact": "^10.4.7",

@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
-import { useResizeObserver } from '@noshiro/preact-resize-observer-hooks';
 import { memoNamed } from '@noshiro/preact-utils';
+import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
 import { useStreamEffect } from '@noshiro/syncflow-preact-hooks';
 import { useRouter } from '@noshiro/tiny-router-preact-hooks';
 import { useCallback, useMemo } from 'preact/hooks';

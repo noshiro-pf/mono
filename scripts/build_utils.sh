@@ -14,13 +14,13 @@ targets=(
   "react-router-utils"
   "tiny-router-react-hooks"
   "tiny-router-preact-hooks"
-  "preact-resize-observer-hooks"
-  "react-resize-observer-hooks"
+  "resize-observer-preact-hooks"
+  "resize-observer-react-hooks"
 
-  # dependencies: [react-utils, react-resize-observer-hooks, ts-utils]
+  # dependencies: [react-utils, resize-observer-react-hooks, ts-utils]
   "react-utils-styled"
 
-  # dependencies: [react-utils, react-utils-styled, react-resize-observer-hooks, ts-utils]
+  # dependencies: [react-utils, react-utils-styled, resize-observer-react-hooks, ts-utils]
   "react-material-ui-utils"
   "react-blueprintjs-utils"
 )

@@ -46,8 +46,8 @@
   "dependencies": {
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/goober": "*",
-    "@noshiro/preact-resize-observer-hooks": "*",
     "@noshiro/preact-utils": "*",
+    "@noshiro/resize-observer-preact-hooks": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-preact-hooks": "*",
     "@noshiro/tiny-router-preact-hooks": "*",
