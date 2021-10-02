@@ -1,7 +1,6 @@
 {
   "extends": "../config/tsconfig/tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./",
     "isolatedModules": false,
     "module": "commonjs"
   },

@@ -23,10 +23,6 @@ new_app_name_kebab=$(echo "${new_app_name}" | sed "s/_/-/g")
 echo ${new_app_name_kebab}
 sed -i "s/react-app-template/${new_app_name_kebab}/" "${APPS_DIR}/${new_app_name}/package.json"
 
-APPS_TXT="${THIS_SCRIPT_DIR}/apps.txt"
-echo ${new_app_name} >> ${APPS_TXT}
-sort -o ${APPS_TXT} ${APPS_TXT}
-
 echo "created ${APPS_DIR}/${new_app_name}"
 
 echo "don't forget to add \"${new_app_name}\" to yarn workspaces!"
