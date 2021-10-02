@@ -7,14 +7,14 @@ targets=(
 
   # ts-utils dependent
   "syncflow"
-  "react-syncflow-hooks"
-  "preact-syncflow-hooks"
   "rxjs-utils"
+  "preact-syncflow-hooks"
+  "react-syncflow-hooks"
+  "preact-utils"
   "react-utils"
   "react-router-utils"
   "react-router-hooks"
   "preact-router-utils"
-  "preact-utils"
   "preact-resize-observer-hooks"
   "react-resize-observer-hooks"
 
