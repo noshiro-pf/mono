@@ -31,6 +31,7 @@
     "packages/apps/color_demo_app",
     "packages/apps/event_schedule_app_shared",
     "packages/apps/event_schedule_app",
+    "packages/apps/event_schedule_app/functions",
     "packages/apps/housing_loan_calculator",
     "packages/apps/lambda_calculus_interpreter_core",
     "packages/apps/lambda_calculus_interpreter_preact",
@@ -38,6 +39,7 @@
     "packages/apps/lambda_calculus_interpreter_solid",
     "packages/apps/my_profile_app_preact",
     "packages/apps/slack_app",
+    "packages/apps/slack_app/functions",
     "packages/apps/template_preact_app",
     "packages/apps/template_react_app",
     "packages/!(utils|apps)/**"
