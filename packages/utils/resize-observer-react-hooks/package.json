@@ -1,5 +1,5 @@
 {
-  "name": "@noshiro/preact-resize-observer-hooks",
+  "name": "@noshiro/resize-observer-react-hooks",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
-    "preact": "^10.4.7",
+    "react": "^17.0.2",
     "resize-observer": "^1.0.0"
   }
 }

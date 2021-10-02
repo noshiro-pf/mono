@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
-import { useResizeObserver } from '@noshiro/preact-resize-observer-hooks';
 import { memoNamed } from '@noshiro/preact-utils';
+import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
 import { IList } from '@noshiro/ts-utils';
 import type { ComponentChildren } from 'preact';
 import { useMedia } from 'preact-media-hook';
