@@ -14,7 +14,6 @@ import {
   ymdFromDate,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useStream, useStreamValue } from '@noshiro/react-syncflow-hooks';
 import {
   filter,
   fromPromise,
@@ -22,6 +21,7 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
+import { useStream, useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { IMapMapped, isNotUndefined, recordEntries } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {

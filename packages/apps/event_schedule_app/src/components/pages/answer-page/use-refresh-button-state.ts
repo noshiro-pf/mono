@@ -1,4 +1,3 @@
-import { useStream, useStreamValue } from '@noshiro/react-syncflow-hooks';
 import type { Observable } from '@noshiro/syncflow';
 import {
   mapTo,
@@ -7,6 +6,7 @@ import {
   timer,
   withInitialValue,
 } from '@noshiro/syncflow';
+import { useStream, useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { fetchThrottleTime } from '../../../constants';
 
 export const useRefreshButtonState = (

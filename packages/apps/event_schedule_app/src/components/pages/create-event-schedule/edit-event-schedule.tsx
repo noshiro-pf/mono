@@ -1,11 +1,5 @@
 import { Icon, Spinner } from '@blueprintjs/core';
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import {
-  useStream,
-  useStreamEffect,
-  useStreamValue,
-  useValueAsStream,
-} from '@noshiro/react-syncflow-hooks';
 import { memoNamed } from '@noshiro/react-utils';
 import {
   fromPromise,
@@ -13,6 +7,12 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
+import {
+  useStream,
+  useStreamEffect,
+  useStreamValue,
+  useValueAsStream,
+} from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { api } from '../../../api';

@@ -3,12 +3,12 @@ import {
   parseLambdaTerm,
   termToString,
 } from '@noshiro/lambda-calculus-interpreter-core';
+import { debounceTimeI, mapI } from '@noshiro/syncflow';
 import {
   useStateAsStream,
   useStream,
   useStreamValue,
-} from '@noshiro/react-syncflow-hooks';
-import { debounceTimeI, mapI } from '@noshiro/syncflow';
+} from '@noshiro/syncflow-react-hooks';
 import { mapNullable, pipe } from '@noshiro/ts-utils';
 
 export const useLambdaEval = (

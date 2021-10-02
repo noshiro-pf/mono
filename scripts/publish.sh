@@ -20,7 +20,7 @@ function buildAndPublishPkg () {
 buildAndPublishPkg packages/utils/ts-utils
 buildAndPublishPkg packages/utils/syncflow
 buildAndPublishPkg packages/utils/syncflow-preact-hooks
-buildAndPublishPkg packages/utils/react-syncflow-hooks
+buildAndPublishPkg packages/utils/syncflow-react-hooks
 buildAndPublishPkg packages/apps/event_schedule_app_shared
 buildAndPublishPkg packages/utils/ts-utils
 buildAndPublishPkg packages/tools/eslint-custom-rules

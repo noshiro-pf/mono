@@ -1,10 +1,10 @@
+import type { Observable } from '@noshiro/syncflow';
+import { throttleTime } from '@noshiro/syncflow';
 import {
   useStream,
   useStreamEffect,
   useVoidEventAsStream,
-} from '@noshiro/react-syncflow-hooks';
-import type { Observable } from '@noshiro/syncflow';
-import { throttleTime } from '@noshiro/syncflow';
+} from '@noshiro/syncflow-react-hooks';
 import { useEffect } from 'react';
 import { fetchThrottleTime } from '../../../constants';
 import { clog } from '../../../utils';

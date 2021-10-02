@@ -46,9 +46,9 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.2.1",
-    "@noshiro/react-syncflow-hooks": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
+    "@noshiro/syncflow-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "immer": "^9.0.2",
     "react": "^17.0.2",

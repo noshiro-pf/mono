@@ -8,7 +8,7 @@
     "packages/utils/fast-deep-equal",
     "packages/utils/syncflow",
     "packages/utils/syncflow-preact-hooks",
-    "packages/utils/react-syncflow-hooks",
+    "packages/utils/syncflow-react-hooks",
     "packages/utils/preact-utils",
     "packages/utils/react-utils",
     "packages/utils/preact-router-utils",
