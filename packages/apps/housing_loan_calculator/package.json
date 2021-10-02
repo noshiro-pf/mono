@@ -46,10 +46,10 @@
   "dependencies": {
     "@blueprintjs/core": "^3.36.0",
     "@blueprintjs/icons": "^3.23.0",
-    "@noshiro/react-router-hooks": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",
+    "@noshiro/tiny-router-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

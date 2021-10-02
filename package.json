@@ -12,7 +12,7 @@
     "packages/utils/preact-utils",
     "packages/utils/react-utils",
     "packages/utils/tiny-router-preact-hooks",
-    "packages/utils/react-router-hooks",
+    "packages/utils/tiny-router-react-hooks",
     "packages/utils/react-router-utils",
     "packages/utils/preact-resize-observer-hooks",
     "packages/utils/react-resize-observer-hooks",
