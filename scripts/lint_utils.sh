@@ -3,18 +3,21 @@
 targets=(
   # no local dependency
   "ts-utils"
+  "fast-deep-equal"
 
   # ts-utils dependent
   "syncflow"
-  "react-syncflow-hooks"
-  "preact-syncflow-hooks"
   "rxjs-utils"
-  "react-router-utils"
-  "react-utils"
+  "preact-syncflow-hooks"
+  "react-syncflow-hooks"
   "preact-utils"
+  "react-utils"
+  "react-router-utils"
+  "react-router-hooks"
+  "preact-router-utils"
   "preact-resize-observer-hooks"
   "react-resize-observer-hooks"
-  
+
   # dependencies: [react-utils, rxjs-utils, ts-utils]
   "react-rxjs-utils"
   "preact-rxjs-utils"
@@ -33,14 +36,14 @@ utils_path="${MONO_ROOT_DIR}/packages/utils"
 echo ${utils_path}
 
 for target in "${targets[@]}" ; do
-    echo "linting \"${target}\" ..." 
+    echo "linting \"${target}\" ..."
     cd "${utils_path}/${target}"
     yarn lint
     echo "done."
     echo ""
 done
 
-# echo "linting \"lambda_calculus_interpreter_core\" ..." 
+# echo "linting \"lambda_calculus_interpreter_core\" ..."
 # apps_path="${MONO_ROOT_DIR}/packages/apps"
 # cd "${apps_path}/lambda_calculus_interpreter_core"
 # yarn lint
