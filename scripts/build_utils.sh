@@ -7,7 +7,6 @@ targets=(
 
   # ts-utils dependent
   "syncflow"
-  "rxjs-utils"
   "preact-syncflow-hooks"
   "react-syncflow-hooks"
   "preact-utils"
@@ -17,10 +16,6 @@ targets=(
   "preact-router-utils"
   "preact-resize-observer-hooks"
   "react-resize-observer-hooks"
-
-  # dependencies: [react-utils, rxjs-utils, ts-utils]
-  "react-rxjs-utils"
-  "preact-rxjs-utils"
 
   # dependencies: [react-utils, react-resize-observer-hooks, ts-utils]
   "react-utils-styled"
