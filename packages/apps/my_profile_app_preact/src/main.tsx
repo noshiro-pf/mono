@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
-import { useRouter } from '@noshiro/preact-router-utils';
 import { memoNamed } from '@noshiro/preact-utils';
+import { useRouter } from '@noshiro/tiny-router-preact-hooks';
 import { IList, match } from '@noshiro/ts-utils';
 import Markdown from 'preact-markdown';
 import { useCallback, useEffect, useMemo } from 'preact/hooks';

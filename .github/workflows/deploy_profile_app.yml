@@ -11,7 +11,7 @@ on:
       - .github/workflows/deploy_profile_app.yml
       - packages/utils/ts-utils/**
       - packages/utils/preact-utils/**
-      - packages/utils/preact-router-utils/**
+      - packages/utils/tiny-router-preact-hooks/**
       - packages/utils/preact-resize-observer-hooks/**
       - packages/apps/my_profile_app_preact/**
 
@@ -44,7 +44,7 @@ jobs:
         run: |
           yarn workspace @noshiro/ts-utils build
           yarn workspace @noshiro/preact-utils build
-          yarn workspace @noshiro/preact-router-utils build
+          yarn workspace @noshiro/tiny-router-preact-hooks build
           yarn workspace @noshiro/preact-resize-observer-hooks build
 
       - name: lint
