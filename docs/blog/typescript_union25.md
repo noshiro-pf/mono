@@ -103,9 +103,8 @@ checkBinaryLikeExpressionWorker
 
 どうやら、`checkTypeRelatedTo` 関数は `source` と `target` の 2 つの型について、 `identityRelation` , `subtypeRelation` , `assignableRelation` , `comparableRelation` の 4 つのうちいずれかの型関係を判定する関数のようです。代入文のチェックでは `assignableRelation` になるんでしょうか。
 
-`t = s` という代入文における `s` の型が `source` 、 `t` の型が `target` のようです。
-
-余談ですが、最初自分が読んだ時、`@param source` の `The left-hand-side of the relation` という説明を見て`t = s` という代入文における左辺のことかと勘違いして混乱していました。これは "is assignable to" などの型関係における左辺という意味であって、ソースコード中の位置関係とは必ずしも一致していません（代入文などでは左右反転しますが、たとえば `A extends B` のような条件型では同じ位置関係になります）。
+`t = s` という代入文における `s` の型が `source` 、 `t` の型が `target` になります。
+最初自分が読んだ時、`@param source` の `The left-hand-side of the relation` という説明を見て私は `t = s` という代入文における左辺のことかと勘違いして混乱してしまいましたが、これは "is assignable to" などの型関係における左辺という意味であって、ソースコード中の位置関係とは必ずしも一致しないようです（代入文などでは左右反転しますが、たとえば `A extends B` のような条件型では同じ位置関係になります）。
 
 試しに、
 
