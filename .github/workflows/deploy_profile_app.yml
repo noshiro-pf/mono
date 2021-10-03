@@ -12,6 +12,7 @@ on:
       - packages/utils/ts-utils/**
       - packages/utils/preact-utils/**
       - packages/utils/syncflow/**
+      - packages/utils/syncflow-preact-hooks/**
       - packages/utils/tiny-router-observable/**
       - packages/utils/tiny-router-preact-hooks/**
       - packages/utils/resize-observer-preact-hooks/**
@@ -47,6 +48,7 @@ jobs:
           yarn workspace @noshiro/ts-utils build
           yarn workspace @noshiro/preact-utils build
           yarn workspace @noshiro/syncflow build
+          yarn workspace @noshiro/syncflow-preact-hooks build
           yarn workspace @noshiro/tiny-router-observable build
           yarn workspace @noshiro/tiny-router-preact-hooks build
           yarn workspace @noshiro/resize-observer-preact-hooks build
