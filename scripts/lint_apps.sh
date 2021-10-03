@@ -1,44 +1,15 @@
 #!/bin/bash
 
-
 THIS_SCRIPT_DIR=$(cd $(dirname $0); pwd)
 MONO_ROOT_DIR=$(dirname ${THIS_SCRIPT_DIR})
-apps_path="${MONO_ROOT_DIR}/packages/apps"
-echo ${apps_path}
 
-echo "target list: "
-while read target; do
-    if [[ ${target} == \#* ]] ;
-    then
-        echo "  - (skipped) ${target} "
-    else
-        echo "  - ${target}"
-    fi
-done < "${THIS_SCRIPT_DIR}/apps.txt"
-echo
+# convert newline separated string to an array by enclosing it in "()"
+apps_path_list=($(node "${THIS_SCRIPT_DIR}/get-apps-paths.js"))
 
-while read target; do
-    if [[ ${target} == \#* ]] ;
-    then
-        echo "skipped ${target} "
-    else
-        echo "linting \"${target}\" ..." 
-        cd "${apps_path}/${target}"
-        yarn lint
-        echo "done."
-        echo ""
-    fi
-done < "${THIS_SCRIPT_DIR}/apps.txt"
-
-
-echo "linting \"event_schedule_app/functions\" ..." 
-apps_path="${MONO_ROOT_DIR}/packages/apps"
-cd "${apps_path}/event_schedule_app/functions"
-yarn lint
-echo "done."
-
-echo "linting \"slack_app/functions\" ..." 
-apps_path="${MONO_ROOT_DIR}/packages/apps"
-cd "${apps_path}/slack_app/functions"
-yarn lint
-echo "done."
+for apps_path in "${apps_path_list[@]}" ; do
+    echo "linting \"${apps_path}\" ..."
+    cd "${MONO_ROOT_DIR}/${apps_path}"
+    yarn lint
+    echo "done."
+    echo ""
+done
