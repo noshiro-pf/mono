@@ -11,6 +11,7 @@ on:
       - .github/workflows/deploy_profile_app.yml
       - packages/utils/ts-utils/**
       - packages/utils/preact-utils/**
+      - packages/utils/syncflow/**
       - packages/utils/tiny-router-observable/**
       - packages/utils/tiny-router-preact-hooks/**
       - packages/utils/resize-observer-preact-hooks/**
@@ -45,6 +46,7 @@ jobs:
         run: |
           yarn workspace @noshiro/ts-utils build
           yarn workspace @noshiro/preact-utils build
+          yarn workspace @noshiro/syncflow build
           yarn workspace @noshiro/tiny-router-observable build
           yarn workspace @noshiro/tiny-router-preact-hooks build
           yarn workspace @noshiro/resize-observer-preact-hooks build
