@@ -1,6 +1,6 @@
 import { withLatestFrom } from '@noshiro/syncflow';
 import { useStreamEffect, useStreamValue } from '@noshiro/syncflow-react-hooks';
-import { useRouter } from '@noshiro/tiny-router-react-hooks';
+import { push, useQueryParams } from '@noshiro/tiny-router-react-hooks';
 import { mapNullable, pipe, stringToNumber } from '@noshiro/ts-utils';
 import { useEffect } from 'react';
 import { queryParams } from './constants';
@@ -17,7 +17,7 @@ import {
 import { uriWithQueryParams } from './utils';
 
 export const useMainHooks = (): Readonly<{ isCalculating: boolean }> => {
-  const { queryParams: query, push } = useRouter();
+  const query = useQueryParams();
 
   useEffect(() => {
     const paramsAsStr = {

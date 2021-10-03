@@ -1,7 +1,4 @@
 {
-  "moduleNameMapper": {
-    "^@noshiro/(.*)$": "<rootDir>/../../utils/$1/src"
-  },
   "rootDir": "../",
   "roots": ["<rootDir>/src"],
   "transform": {
@@ -12,6 +9,5 @@
       "tsconfig": "<rootDir>/config/tsconfig.test.json"
     }
   },
-  "testMatch": ["<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"],
-  "testEnvironment": "jsdom"
+  "testMatch": ["<rootDir>/src/**/?(*.)+(spec|test).ts"]
 }

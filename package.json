@@ -11,6 +11,7 @@
     "packages/utils/syncflow-react-hooks",
     "packages/utils/preact-utils",
     "packages/utils/react-utils",
+    "packages/utils/tiny-router-observable",
     "packages/utils/tiny-router-preact-hooks",
     "packages/utils/tiny-router-react-hooks",
     "packages/utils/react-router-utils",

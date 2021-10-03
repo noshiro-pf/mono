@@ -1,19 +1,22 @@
 {
-  "name": "@noshiro/tiny-router-preact-hooks",
+  "name": "@noshiro/tiny-router-observable",
   "version": "1.0.0",
   "license": "MIT",
   "author": "noshiro",
-  "sideEffects": true,
-  "main": "esm/index.js",
+  "sideEffects": false,
+  "main": "cjs/index.js",
   "module": "esm/index.js",
   "types": "esm/index.d.ts",
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
-    "build": "yarn build:esm",
+    "build": "run-s build:*",
+    "prebuild:cjs": "yarn clean:build:cjs",
+    "build:cjs": "tsc --project config/tsconfig.cjs.json",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
     "clean": "run-s clean:**",
+    "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
@@ -28,7 +31,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@noshiro/syncflow-preact-hooks": "*",
-    "@noshiro/tiny-router-observable": "*"
+    "@noshiro/syncflow": "*",
+    "@noshiro/ts-utils": "*"
   }
 }
