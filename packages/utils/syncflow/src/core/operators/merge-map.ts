@@ -8,6 +8,7 @@ import type {
   Token,
 } from '../types';
 
+/** @deprecated use `createState` instead */
 export const mergeMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>
@@ -15,6 +16,7 @@ export const mergeMap =
   (parentObservable: Observable<A>) =>
     new MergeMapObservableClass(parentObservable, mapToObservable);
 
+/** @deprecated use `createState` instead */
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>
