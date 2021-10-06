@@ -5,4 +5,5 @@ export * from './answer-table-color';
 export * from './color';
 export * from './fetch-throttle-time';
 export * from './initial-values';
+export * from './routes';
 export * from './texts';

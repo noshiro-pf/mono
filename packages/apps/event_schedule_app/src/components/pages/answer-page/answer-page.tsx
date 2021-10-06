@@ -9,12 +9,7 @@ import {
   Section,
   SingleButtonWrapper,
 } from '../../molecules';
-import {
-  AnswerPageEventInfo,
-  AnswerTable,
-  GoToEditPageButton,
-  MyAnswer,
-} from '../../organisms';
+import { AnswerPageEventInfo, AnswerTable, MyAnswer } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { useAnswerPageState } from './answer-page-hooks';
 import { AnswerPageError } from './error';
@@ -81,10 +76,13 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               isExpired={isExpired}
             />
             <ButtonsWrapperAlignEnd>
-              <GoToEditPageButton
-                email={eventSchedule.notificationSettings.email}
-                onConfirmClick={onEditButtonClick}
-              />
+              <BpButton
+                icon={'cog'}
+                intent={'none'}
+                onClick={onEditButtonClick}
+              >
+                {vt.eventInfo.editButton}
+              </BpButton>
             </ButtonsWrapperAlignEnd>
           </Section>
           <Section sectionTitle={vt.answers.title}>

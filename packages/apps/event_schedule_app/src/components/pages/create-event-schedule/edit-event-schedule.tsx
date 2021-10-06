@@ -1,24 +1,11 @@
 import { Icon, Spinner } from '@blueprintjs/core';
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import {
-  fromPromise,
-  switchMap,
-  unwrapResultOk,
-  withInitialValue,
-} from '@noshiro/syncflow';
-import {
-  useStream,
-  useStreamEffect,
-  useStreamValue,
-  useValueAsStream,
-} from '@noshiro/syncflow-react-hooks';
+import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { api } from '../../../api';
 import { descriptionFontColor, texts } from '../../../constants';
-import { useEventId } from '../../../routing';
-import { clog } from '../../../utils';
+import { eventScheduleResult$, router } from '../../../store';
+import { ConfirmEmailDialog } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
@@ -26,28 +13,15 @@ import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 const vt = texts.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
-  const eventId = useEventId();
-  const eventId$ = useValueAsStream(eventId);
-
-  const eventScheduleResult$ = useStream<
-    Result<EventSchedule, 'not-found' | 'others'> | undefined
-  >(() =>
-    eventId$
-      .chain(
-        switchMap((eId) =>
-          fromPromise(api.event.get(eId ?? '')).chain(unwrapResultOk())
-        )
-      )
-      .chain(withInitialValue(undefined))
-  );
-
-  useStreamEffect(eventScheduleResult$, (e) => {
-    if (Result.isErr(e)) {
-      clog('eventScheduleResult', e);
-    }
-  });
-
+  const eventId = useStreamValue(router.eventId$);
   const eventScheduleResult = useStreamValue(eventScheduleResult$);
+
+  const [editPageIsVisible, showEditPage] = useBooleanState(false);
+
+  const editPageIsHidden: boolean =
+    Result.isErr(eventScheduleResult) ||
+    (eventScheduleResult?.value.notificationSettings.email !== '' &&
+      !editPageIsVisible);
 
   return Result.isErr(eventScheduleResult) &&
     eventScheduleResult.value === 'not-found' ? (
@@ -66,12 +40,23 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
         <Spinner />
       ) : (
         <>
-          <SubTitle>
-            {`${vt.editSubTitle.prefix}${eventScheduleResult.value.title}${vt.editSubTitle.suffix}`}
-          </SubTitle>
-          <EventScheduleSettingCommon
-            initialValues={eventScheduleResult.value}
-            mode={'edit'}
+          {editPageIsHidden ? undefined : (
+            <>
+              <SubTitle>
+                {`${vt.editSubTitle.prefix}${eventScheduleResult.value.title}${vt.editSubTitle.suffix}`}
+              </SubTitle>
+              <EventScheduleSettingCommon
+                initialValues={eventScheduleResult.value}
+                mode={'edit'}
+              />
+            </>
+          )}
+
+          <ConfirmEmailDialog
+            back={router.back}
+            emailAnswer={eventScheduleResult.value.notificationSettings.email}
+            isOpen={editPageIsHidden}
+            onSuccess={showEditPage}
           />
         </>
       )}

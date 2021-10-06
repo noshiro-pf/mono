@@ -36,7 +36,6 @@ export const NameAndNotes = memoNamed<Props>(
           label={vt.eventName}
         >
           <BpInput
-            autoFocus={true}
             placeholder={vt.eventNamePlaceholder}
             value={title}
             onBlur={onBlur}

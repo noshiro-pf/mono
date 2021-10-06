@@ -5,5 +5,4 @@ export * from './edit-event-schedule-hooks';
 export * from './error';
 export * from './event-schedule-setting-common';
 export * from './event-schedule-setting-common-hooks';
-export * from './normalize-event-schedule';
 export * from './validator';

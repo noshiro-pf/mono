@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
@@ -56,15 +56,13 @@
     "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/react-blueprintjs-utils": "*",
-    "@noshiro/react-router-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow-react-hooks": "*",
+    "@noshiro/tiny-router-observable": "*",
     "@noshiro/ts-utils": "*",
     "firebase": "^9.0.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
     "styled-components": "^5.3.0",
     "url-regex": "^5.0.0"
   }

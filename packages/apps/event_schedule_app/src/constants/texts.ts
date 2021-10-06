@@ -133,11 +133,15 @@ export const texts = {
         '回答期限を過ぎると回答の追加・編集ができなくなります。',
       noAnswerDeadline: 'なし',
       editButton: 'イベント設定編集（幹事用）',
-      editButtonConfirmDialogTitle: '',
-      editButtonConfirmDialogMessage:
-        '通知用に設定したメールアドレスを入力してください。',
-      editButtonConfirmDialogValidationFailedMessage:
-        '登録されているメールアドレスと一致しません。',
+      verifyEmailDialog: {
+        editButtonConfirmDialogTitle: '',
+        editButtonConfirmDialogMessage:
+          '通知用に設定したメールアドレスを入力してください。',
+        editButtonConfirmDialogValidationFailedMessage: [
+          '登録されているメールアドレスと一致しません。',
+        ],
+        back: '前のページに戻る',
+      },
     },
     point: (p: AnswerSymbolPointEnumType) => `（${p}点）`,
     answers: {

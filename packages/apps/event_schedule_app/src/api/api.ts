@@ -20,4 +20,4 @@ export const api = {
     update: updateAnswer,
     delete: deleteAnswer,
   },
-};
+} as const;
