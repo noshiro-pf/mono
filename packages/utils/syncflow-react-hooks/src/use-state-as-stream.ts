@@ -1,0 +1,39 @@
+import type { InitializedObservable } from '@noshiro/syncflow';
+import { useCallback } from 'react';
+import { useReducerAsStream } from './use-reducer-as-stream';
+
+type Action<S> = Readonly<
+  { type: 'set'; nextState: S } | { type: 'update'; updateFn: (a: S) => S }
+>;
+
+const reducer = <S>(state: S, action: Action<S>): S => {
+  switch (action.type) {
+    case 'set':
+      return action.nextState;
+    case 'update':
+      return action.updateFn(state);
+  }
+};
+
+export const useStateAsStream = <S>(
+  initialState: S
+): [
+  InitializedObservable<S>,
+  (v: S) => void,
+  (updateFn: (prev: S) => S) => void
+] => {
+  const [state$, dispatch] = useReducerAsStream<S, Action<S>>(
+    reducer,
+    initialState
+  );
+
+  const updateState = useCallback((updateFn: (prev: S) => S): void => {
+    dispatch({ type: 'update', updateFn });
+  }, []);
+
+  const setState = useCallback((nextState: S): void => {
+    dispatch({ type: 'set', nextState });
+  }, []);
+
+  return [state$, setState, updateState];
+};
