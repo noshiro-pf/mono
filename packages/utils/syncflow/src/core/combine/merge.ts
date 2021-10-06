@@ -9,6 +9,7 @@ import type {
   Wrap,
 } from '../types';
 
+/** @deprecated use `createState` instead */
 export const merge = <P extends NonEmptyUnknownList>(
   parents: Wrap<P>
 ): MergeObservable<P> => new MergeObservableClass(parents);

@@ -5,9 +5,5 @@
 /// <reference path="../../stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../stdlib/dist/utils.d.ts" />
 
-export * from './class';
-export * from './combine';
-export * from './create';
-export * from './operators';
-export * from './types';
+export * from './core';
 export * from './utils';

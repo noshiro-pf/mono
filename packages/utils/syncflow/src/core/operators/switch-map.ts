@@ -8,6 +8,7 @@ import type {
   Token,
 } from '../types';
 
+/** @deprecated use `createState` instead */
 export const switchMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>
