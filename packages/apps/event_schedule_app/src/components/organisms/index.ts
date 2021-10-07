@@ -1,3 +1,4 @@
+export * from './answer-being-edited';
 export * from './answer-deadline';
 export * from './answer-page-event-info';
 export * from './answer-page-notes';
@@ -7,7 +8,6 @@ export * from './create-event-result-dialog';
 export * from './errors';
 export * from './event-settings';
 export * from './footer';
-export * from './my-answer';
 export * from './name-and-note';
 export * from './notification-settings';
 export * from './paragraph-with-switch';

@@ -8,8 +8,8 @@ import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../../constants';
+import { timeRangeReducer } from '../../../../functions';
 import { ButtonsWrapperAlignEnd, TimeRangeView } from '../../../molecules';
-import { timeRangeReducer } from './time-range-reducer';
 
 type Props = Readonly<{
   initialValue: TimeRange;

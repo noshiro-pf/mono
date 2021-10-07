@@ -7,12 +7,12 @@ import { memoNamed } from '@noshiro/react-utils';
 import { IMap } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { clog } from '../../../utils';
 import type {
   SymbolListReducerAction,
   SymbolListReducerState,
-} from './symbol-list-reducer';
-import { symbolListReducer } from './symbol-list-reducer';
+} from '../../../functions';
+import { symbolListReducer } from '../../../functions';
+import { clog } from '../../../utils';
 import { AnswerSymbolRow } from './symbol-setting-row';
 
 type Props = Readonly<{

@@ -1,0 +1,236 @@
+import { FormGroup, HTMLTable } from '@blueprintjs/core';
+import type {
+  Answer,
+  EventSchedule,
+  UserName,
+} from '@noshiro/event-schedule-app-shared';
+import {
+  BpButton,
+  BpInput,
+  BpTextArea,
+} from '@noshiro/react-blueprintjs-utils';
+import { memoNamed } from '@noshiro/react-utils';
+import styled from 'styled-components';
+import { texts } from '../../../constants';
+import { useAnswerBeingEditedHooks } from '../../../hooks';
+import { CustomIcon, Td, Th } from '../../atoms';
+import { ButtonsWrapperAlignEnd } from '../../molecules';
+import { WidthRestrictedInputWrapper } from '../../styled';
+import { DatetimeRangeCell } from '../answer-table';
+import { ParagraphWithSwitch } from '../paragraph-with-switch';
+import { DeleteAnswerButton } from './delete-answer-button';
+import { WeightSetting } from './weight-setting';
+
+type Props = Readonly<{
+  eventSchedule: EventSchedule;
+  answers: readonly Answer[];
+  answerBeingEdited: Answer;
+  updateAnswerBeingEdited: (updater: (answer: Answer) => Answer) => void;
+  onCancel: () => void;
+  onDeleteAnswer: () => Promise<void>;
+  onSubmitAnswer: () => Promise<void>;
+  answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden';
+  submitButtonIsLoading: boolean;
+  submitButtonIsDisabled: boolean;
+  selectedAnswerUserName: UserName | undefined;
+}>;
+
+const vt = texts.answerPage.answerBeingEdited;
+
+export const AnswerBeingEdited = memoNamed<Props>(
+  'AnswerBeingEdited',
+  ({
+    eventSchedule,
+    answers,
+    answerBeingEdited,
+    updateAnswerBeingEdited,
+    onCancel,
+    onDeleteAnswer,
+    onSubmitAnswer,
+    answerBeingEditedSectionState,
+    submitButtonIsLoading,
+    submitButtonIsDisabled,
+    selectedAnswerUserName,
+  }) => {
+    const {
+      showUserNameError,
+      theNameIsAlreadyUsed,
+      onUserNameBlur,
+      onUserNameChange,
+      onCommentChange,
+      symbolHeader,
+      answerBeingEditedList,
+      onWeightChange,
+      toggleRequiredSection,
+      toggleWeightSection,
+    } = useAnswerBeingEditedHooks({
+      eventSchedule,
+      answers,
+      selectedAnswerUserName,
+      answerBeingEdited,
+      updateAnswerBeingEdited,
+    });
+
+    return (
+      <>
+        <WidthRestrictedInputWrapper>
+          <FormGroup
+            helperText={
+              showUserNameError ? (
+                theNameIsAlreadyUsed ? (
+                  vt.theNameIsAlreadyUsed
+                ) : (
+                  vt.nameIsRequired
+                )
+              ) : (
+                <Spacer />
+              )
+            }
+            intent={showUserNameError ? 'danger' : 'primary'}
+            label={vt.yourName}
+          >
+            <BpInput
+              autoFocus={true}
+              value={answerBeingEdited.userName}
+              onBlur={onUserNameBlur}
+              onValueChange={onUserNameChange as (v: string) => void}
+            />
+          </FormGroup>
+        </WidthRestrictedInputWrapper>
+        <HTMLTable bordered={true}>
+          <thead>
+            <tr>
+              <Th />
+              {symbolHeader.map((s) => (
+                <Th key={s.iconId}>
+                  <BpButton
+                    icon={<CustomIcon iconName={s.iconId} />}
+                    minimal={true}
+                    title={s.symbolDescription}
+                    onClick={s.onClick}
+                  />
+                </Th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {answerBeingEditedList.map(
+              ({ key, datetimeRange, selectedSymbol, buttons }) => (
+                <tr key={key}>
+                  <Td>
+                    <DatetimeRangeCell
+                      datetimeRange={datetimeRange}
+                      datetimeSpecification={
+                        eventSchedule.datetimeSpecification
+                      }
+                    />
+                  </Td>
+                  {buttons.map((s) => (
+                    <Td key={s.iconId} style={style}>
+                      <BpButton
+                        active={s.iconId === selectedSymbol}
+                        icon={
+                          <CustomIcon
+                            color={
+                              s.iconId === selectedSymbol ? 'blue' : 'gray'
+                            }
+                            iconName={s.iconId}
+                          />
+                        }
+                        minimal={true}
+                        title={s.symbolDescription}
+                        onClick={s.onClick}
+                      />
+                    </Td>
+                  ))}
+                </tr>
+              )
+            )}
+          </tbody>
+        </HTMLTable>
+        <WidthRestrictedInputWrapper>
+          <FormGroup label={vt.comments}>
+            <BpTextArea
+              fill={true}
+              value={answerBeingEdited.comment}
+              onValueChange={onCommentChange}
+            />
+          </FormGroup>
+        </WidthRestrictedInputWrapper>
+        <ParagraphWithSwitchWrapper>
+          <ParagraphWithSwitch
+            description={vt.required.description}
+            disabledInsteadOfHidden={false}
+            elementToToggle={undefined}
+            show={answerBeingEdited.isRequiredParticipants}
+            title={vt.required.title}
+            onToggle={toggleRequiredSection}
+          />
+        </ParagraphWithSwitchWrapper>
+        <ParagraphWithSwitchWrapper>
+          <ParagraphWithSwitch
+            description={
+              answerBeingEdited.useWeight
+                ? vt.weight.description
+                : vt.weight.description.slice(0, 1)
+            }
+            disabledInsteadOfHidden={false}
+            elementToToggle={
+              <WeightSetting
+                disabled={!answerBeingEdited.useWeight}
+                weight={answerBeingEdited.weight}
+                onWeightChange={onWeightChange}
+              />
+            }
+            show={answerBeingEdited.useWeight}
+            title={vt.weight.title}
+            onToggle={toggleWeightSection}
+          />
+        </ParagraphWithSwitchWrapper>
+
+        <ButtonsWrapperAlignEnd>
+          <BpButton
+            disabled={submitButtonIsLoading}
+            intent='none'
+            nowrap={true}
+            text={texts.buttonText.cancel}
+            onClick={onCancel}
+          />
+          {answerBeingEditedSectionState === 'editing' ? (
+            <DeleteAnswerButton
+              loading={submitButtonIsLoading}
+              onConfirmDeleteAnswer={onDeleteAnswer}
+            />
+          ) : undefined}
+          <BpButton
+            disabled={submitButtonIsDisabled}
+            icon='tick'
+            intent='primary'
+            loading={submitButtonIsLoading}
+            nowrap={true}
+            text={
+              answerBeingEditedSectionState === 'creating'
+                ? vt.submitButton.create
+                : answerBeingEditedSectionState === 'editing'
+                ? vt.submitButton.update
+                : ''
+            }
+            onClick={onSubmitAnswer}
+          />
+        </ButtonsWrapperAlignEnd>
+      </>
+    );
+  }
+);
+
+const style = {
+  padding: '6px',
+};
+
+const Spacer = styled.div`
+  height: 1rem;
+`;
+
+const ParagraphWithSwitchWrapper = styled.div`
+  margin: 20px 0;
+`;

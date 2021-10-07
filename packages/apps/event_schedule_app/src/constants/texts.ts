@@ -156,8 +156,12 @@ export const texts = {
       times: '×',
       weight: '回答の優先度',
       refresh: '更新',
+      requiredParticipant: '必須参加者',
     },
-    myAnswer: {
+    requiredParticipantDescription:
+      '（必須参加者が×を付けている日のスコアは0点になります。）',
+
+    answerBeingEdited: {
       title: {
         create: '回答追加',
         update: '回答編集',
@@ -166,6 +170,12 @@ export const texts = {
       comments: 'コメント（オプション）：',
       nameIsRequired: '名前は必須項目です',
       theNameIsAlreadyUsed: 'その名前は既に使われています',
+      required: {
+        title: '私は必須参加者です',
+        description: [
+          'これを有効にした場合、自分一人が×をつけるだけでその候補日程のスコアが0点になり、候補から外されます。',
+        ],
+      },
       weight: {
         title: 'この回答の優先度を変更（オプション）',
         description: [

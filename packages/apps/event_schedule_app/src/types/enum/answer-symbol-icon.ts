@@ -49,10 +49,12 @@ type AnswerSymbolIconHandmade =
   | 'handmade-cross'
   | 'handmade-triangle';
 
+/** @deprecated */
 export type AnswerSymbolIconId =
   | AnswerSymbolIconHandmade
   | AnswerSymbolIconIdFromBp;
 
+/** @deprecated */
 export const answerSymbolIconIdsFromBp: AnswerSymbolIconIdFromBp[] = [
   'circle',
   'full-circle',

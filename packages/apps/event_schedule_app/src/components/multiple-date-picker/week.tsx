@@ -6,14 +6,14 @@ import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
 import { DatePickerDate } from './date-picker-day';
 
-type Props = DeepReadonly<{
-  week: {
+type Props = Readonly<{
+  week: readonly Readonly<{
     ymd: YearMonthDate;
     selected: boolean;
     disabled: boolean;
     dayType: DayType;
     holidayJpName: string | undefined;
-  }[];
+  }>[];
   onClick: (ymd: YearMonthDate) => void;
 }>;
 

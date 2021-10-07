@@ -3,6 +3,7 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
+import { useEventScheduleSettingCommonHooks } from '../../../hooks';
 import { ButtonsWrapperAlignEnd, Section } from '../../molecules';
 import {
   BackToAnswerPageButton,
@@ -14,7 +15,6 @@ import {
   ResetEditButton,
   SelectDatetimes,
 } from '../../organisms';
-import { useEventScheduleSettingCommonHooks } from './event-schedule-setting-common-hooks';
 
 const vt = texts.eventSettingsPage;
 
