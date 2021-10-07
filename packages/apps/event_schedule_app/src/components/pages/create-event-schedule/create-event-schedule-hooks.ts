@@ -3,7 +3,7 @@ import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../../api';
-import { routePaths } from '../../../routing';
+import { routes } from '../../../constants';
 
 type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;
@@ -45,7 +45,7 @@ export const useCreateEventScheduleHooks = ({
       .then((id) => {
         if (!alive.current) return;
         setIsLoadingFalse();
-        setUrl(toAbsolutePath(`..${routePaths.answerPage}/${id}`));
+        setUrl(toAbsolutePath(`..${routes.answerPage(id)}`));
       })
       .catch((error) => {
         console.error('Error creating event schedule: ', error);

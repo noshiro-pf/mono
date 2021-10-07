@@ -10,28 +10,13 @@ import {
   withInitialValue,
 } from '@noshiro/syncflow';
 import {
-  useReducerAsStream,
+  useStateAsStream,
   useStream,
   useStreamEffect,
   useStreamValue,
   useVoidEventAsStream,
 } from '@noshiro/syncflow-react-hooks';
 import { IRecord, isNotUndefined } from '@noshiro/ts-utils';
-import { useCallback } from 'react';
-
-type Action = DeepReadonly<
-  | { type: 'set'; answer: Answer }
-  | { type: 'update'; updateFn: (a: Answer) => Answer }
->;
-
-const reducer = (state: Answer, action: Action): Answer => {
-  switch (action.type) {
-    case 'set':
-      return action.answer;
-    case 'update':
-      return action.updateFn(state);
-  }
-};
 
 export const useAnswerForEditingState = (
   eventSchedule$: Observable<EventSchedule | undefined>
@@ -40,10 +25,8 @@ export const useAnswerForEditingState = (
   resetAnswerForEditing: () => void;
   updateAnswerForEditing: (updater: (a: Answer) => Answer) => void;
 }> => {
-  const [answerForEditing$, dispatch] = useReducerAsStream(
-    reducer,
-    defaultAnswer
-  );
+  const [answerForEditing$, setAnswerForEditing, updateAnswerForEditing] =
+    useStateAsStream(defaultAnswer);
 
   const emptyAnswerSelection$ = useStream<Answer>(() =>
     eventSchedule$
@@ -73,16 +56,7 @@ export const useAnswerForEditingState = (
     ] as const).chain(map(([x, _]) => x))
   );
 
-  useStreamEffect(resetAnswerForEditing$, (emptyAnswerSelection) => {
-    dispatch({ type: 'set', answer: emptyAnswerSelection });
-  });
-
-  const updateAnswerForEditing = useCallback(
-    (updateFn: (a: Answer) => Answer) => {
-      dispatch({ type: 'update', updateFn });
-    },
-    [dispatch]
-  );
+  useStreamEffect(resetAnswerForEditing$, setAnswerForEditing);
 
   const answerForEditing = useStreamValue(answerForEditing$);
 

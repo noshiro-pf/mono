@@ -150,7 +150,9 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             disabled={disabled}
             focus$={focusEmailInput$}
             formGroupLabel={vt.emailAddress}
-            invalidMessage={texts.eventSettingsPage.errorMessages.invalidEmail}
+            invalidEmailMessage={
+              texts.eventSettingsPage.errorMessages.invalidEmail
+            }
             value={notificationSettings.email}
             onValueChange={onEmailChange}
           />

@@ -1,18 +1,17 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { useNavigator } from '@noshiro/react-router-utils';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { useCallback } from 'react';
 import { api } from '../../../api';
-import { texts } from '../../../constants';
+import { routes, texts } from '../../../constants';
 import { createToaster, showToast } from '../../../functions';
-import { routePaths, useEventId } from '../../../routing';
+import { router } from '../../../store';
 
 type EditEventScheduleHooks = Readonly<{
   editButtonIsEnabled: boolean;
   editButtonIsLoading: boolean;
   onEditEventClick: () => void;
   onBackToAnswerPageClick: () => void;
-  isLoading: boolean;
 }>;
 
 const toast = createToaster();
@@ -27,15 +26,13 @@ export const useEditEventScheduleHooks = ({
   const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =
     useBooleanState(false);
 
-  const eventId = useEventId();
+  const eventId = useStreamValue(router.eventId$);
 
-  const routerNavigator = useNavigator();
-
-  const answerPagePath = `${routePaths.answerPage}/${eventId ?? ''}`;
+  const answerPagePath = routes.answerPage(eventId ?? '');
 
   const onBackToAnswerPage = useCallback(() => {
-    routerNavigator(answerPagePath);
-  }, [routerNavigator, answerPagePath]);
+    router.push(answerPagePath);
+  }, [answerPagePath]);
 
   const alive = useAlive();
   const onEditEventClick = useCallback(() => {
@@ -74,6 +71,5 @@ export const useEditEventScheduleHooks = ({
     editButtonIsLoading: isLoading,
     onBackToAnswerPageClick: onBackToAnswerPage,
     onEditEventClick,
-    isLoading,
   };
 };

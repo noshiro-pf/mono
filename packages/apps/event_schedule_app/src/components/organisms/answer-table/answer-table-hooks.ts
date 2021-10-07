@@ -16,15 +16,11 @@ import { createAnswerSummary, createScore } from './create-answer-summary';
 import { useAnswerTable } from './use-answer-table';
 
 type AnswerTableHooks = DeepReadonly<{
-  answersWithHandler: {
-    id: Answer['id'];
-    userName: Answer['userName'];
-    comment: Answer['comment'];
-    weight: Answer['weight'];
-    onClick: () => void;
-  }[];
-  onDatetimeSortChange: (state: 'asc' | 'desc') => void;
-  onScoreSortChange: (state: 'asc' | 'desc') => void;
+  answersWithHandler: MergeIntersection<
+    Pick<Answer, 'comment' | 'id' | 'userName' | 'weight'> & {
+      onClick: () => void;
+    }
+  >[];
   tableBodyValues: {
     key: string;
     datetimeRange: DatetimeRange;
@@ -33,6 +29,8 @@ type AnswerTableHooks = DeepReadonly<{
     answerTableRow: [AnswerSymbolIconId | undefined, Weight][] | undefined;
     style: CSSProperties;
   }[];
+  onDatetimeSortChange: (state: 'asc' | 'desc') => void;
+  onScoreSortChange: (state: 'asc' | 'desc') => void;
 }>;
 
 export const useAnswerTableHooks = (
@@ -106,15 +104,17 @@ export const useAnswerTableHooks = (
     [datetimeRangeListSortedByScores]
   );
 
-  const [[sortKey, sortOrder], setSortOrderAndKey] = useState<
-    readonly ['date' | 'score', 'asc' | 'desc']
-  >(['date', 'asc']);
+  const [
+    //
+    [sortKey, sortOrder],
+    setSortOrderAndKey,
+  ] = useState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
 
-  const onDatetimeSortChange = useCallback((state: 'asc' | 'desc') => {
+  const onDatetimeSortChange = useCallback((state: 'asc' | 'desc'): void => {
     setSortOrderAndKey(['date', state]);
   }, []);
 
-  const onScoreSortChange = useCallback((state: 'asc' | 'desc') => {
+  const onScoreSortChange = useCallback((state: 'asc' | 'desc'): void => {
     setSortOrderAndKey(['score', state]);
   }, []);
 

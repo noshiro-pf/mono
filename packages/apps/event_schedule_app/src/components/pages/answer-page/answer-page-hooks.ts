@@ -5,14 +5,13 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useNavigator } from '@noshiro/react-router-utils';
 import { useAlive } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { IMapMapped, IRecord } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../../api';
-import { texts } from '../../../constants';
+import { routes, texts } from '../../../constants';
 import {
   createToaster,
   datetimeRangeFromMapKey,
@@ -20,11 +19,17 @@ import {
   now,
   showToast,
 } from '../../../functions';
-import { routePaths, useEventId } from '../../../routing';
-import { useFetchEventStreams } from './use-fetch-event-stream';
-import { useFetchResults } from './use-fetch-results';
-import { useAnswerForEditingState } from './use-my-answer';
-import { useRefreshButtonState } from './use-refresh-button-state';
+import {
+  answers$,
+  errorType$,
+  eventSchedule$,
+  fetchAnswers,
+  fetchEventSchedule,
+  refreshButtonIsDisabled$,
+  refreshButtonIsLoading$,
+  router,
+} from '../../../store';
+import { useAnswerForEditingState } from './answer-for-editing-hooks';
 
 type AnswerPageState = DeepReadonly<{
   eventId: string | undefined;
@@ -57,23 +62,25 @@ type AnswerPageState = DeepReadonly<{
 const toast = createToaster();
 
 export const useAnswerPageState = (): AnswerPageState => {
-  const eventId = useEventId();
+  /* state */
 
-  const { fetchEventScheduleThrottled$, fetchAnswersThrottled$, fetchAnswers } =
-    useFetchEventStreams();
-
-  const { eventSchedule$, answers$, answersResultTimestamp$, errorType } =
-    useFetchResults(
-      fetchEventScheduleThrottled$,
-      fetchAnswersThrottled$,
-      eventId
-    );
+  const [myAnswerSectionState, setMyAnswerSectionState] = useState<
+    'creating' | 'editing' | 'hidden'
+  >('hidden');
 
   const [
     //
-    myAnswerSectionState,
-    setMyAnswerSectionState,
-  ] = useState<'creating' | 'editing' | 'hidden'>('hidden');
+    selectedAnswer,
+    setSelectedAnswer,
+  ] = useState<Answer | undefined>(undefined);
+
+  const [submitButtonIsLoading, setSubmitButtonIsLoading] =
+    useState<boolean>(false);
+
+  const { answerForEditing, updateAnswerForEditing, resetAnswerForEditing } =
+    useAnswerForEditingState(eventSchedule$);
+
+  /* effect */
 
   const answerSectionRef = useRef<HTMLDivElement>(null);
 
@@ -88,20 +95,13 @@ export const useAnswerPageState = (): AnswerPageState => {
     }
   }, [myAnswerSectionState]);
 
-  const [
-    //
-    submitButtonIsLoading,
-    setSubmitButtonIsLoading,
-  ] = useState<boolean>(false);
+  // fetch once on the first load
+  useEffect(() => {
+    fetchEventSchedule();
+    fetchAnswers();
+  }, []);
 
-  const { answerForEditing, updateAnswerForEditing, resetAnswerForEditing } =
-    useAnswerForEditingState(eventSchedule$);
-
-  const [
-    //
-    selectedAnswer,
-    setSelectedAnswer,
-  ] = useState<Answer | undefined>(undefined);
+  /* callback functions */
 
   const onAnswerClick = useCallback(
     (answer: Answer) => {
@@ -122,38 +122,16 @@ export const useAnswerPageState = (): AnswerPageState => {
     setMyAnswerSectionState('creating');
   }, [clearMyAnswerFields]);
 
-  const eventSchedule = useStreamValue(eventSchedule$);
-  const answers = useStreamValue(answers$);
-
-  const submitButtonIsDisabled = useMemo<boolean>(() => {
-    if (eventSchedule === undefined) return true;
-
-    const myAnswerAsMap = IMapMapped.new(
-      answerForEditing.selection.map(({ datetimeRange, iconId }) => [
-        datetimeRange,
-        iconId,
-      ]),
-      datetimeRangeToMapKey,
-      datetimeRangeFromMapKey
-    );
-
-    const hasEmptyElement =
-      answerForEditing.userName === '' ||
-      eventSchedule.datetimeRangeList.some(
-        (d) => myAnswerAsMap.get(d) === undefined
-      );
-
-    const noDiff = deepEqual(selectedAnswer, answerForEditing);
-
-    return hasEmptyElement || noDiff;
-  }, [answerForEditing, selectedAnswer, eventSchedule]);
-
   const onCancel = useCallback(() => {
     clearMyAnswerFields();
     setMyAnswerSectionState('hidden');
   }, [clearMyAnswerFields]);
 
+  const eventId = useStreamValue(router.eventId$);
+  const eventSchedule = useStreamValue(eventSchedule$);
+
   const alive = useAlive();
+
   const onSubmitAnswer = useCallback(async () => {
     if (eventId === undefined) return;
     if (!alive.current) return;
@@ -205,7 +183,6 @@ export const useAnswerPageState = (): AnswerPageState => {
     myAnswerSectionState,
     eventId,
     alive,
-    fetchAnswers,
     clearMyAnswerFields,
   ]);
 
@@ -223,10 +200,7 @@ export const useAnswerPageState = (): AnswerPageState => {
         clearMyAnswerFields();
       })
       .catch(console.error);
-  }, [answerForEditing.id, eventId, alive, fetchAnswers, clearMyAnswerFields]);
-
-  const { refreshButtonIsLoading, refreshButtonIsDisabled } =
-    useRefreshButtonState(fetchAnswersThrottled$, answersResultTimestamp$);
+  }, [answerForEditing.id, eventId, alive, clearMyAnswerFields]);
 
   const isExpired = useMemo<boolean>(
     () =>
@@ -238,13 +212,41 @@ export const useAnswerPageState = (): AnswerPageState => {
     [eventSchedule]
   );
 
-  const routerNavigator = useNavigator();
-
   const onEditButtonClick = useCallback(() => {
     if (eventId !== undefined) {
-      routerNavigator(routePaths.editPage(eventId));
+      router.push(routes.editPage(eventId));
     }
-  }, [routerNavigator, eventId]);
+  }, [eventId]);
+
+  /* values */
+
+  const submitButtonIsDisabled = useMemo<boolean>(() => {
+    if (eventSchedule === undefined) return true;
+
+    const myAnswerAsMap = IMapMapped.new(
+      answerForEditing.selection.map(({ datetimeRange, iconId }) => [
+        datetimeRange,
+        iconId,
+      ]),
+      datetimeRangeToMapKey,
+      datetimeRangeFromMapKey
+    );
+
+    const hasEmptyElement =
+      answerForEditing.userName === '' ||
+      eventSchedule.datetimeRangeList.some(
+        (d) => myAnswerAsMap.get(d) === undefined
+      );
+
+    const noDiff = deepEqual(selectedAnswer, answerForEditing);
+
+    return hasEmptyElement || noDiff;
+  }, [answerForEditing, selectedAnswer, eventSchedule]);
+
+  const errorType = useStreamValue(errorType$);
+  const answers = useStreamValue(answers$);
+  const refreshButtonIsLoading = useStreamValue(refreshButtonIsLoading$);
+  const refreshButtonIsDisabled = useStreamValue(refreshButtonIsDisabled$);
 
   return {
     eventId,

@@ -137,7 +137,9 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
                 onConfirmClick={onResetClick}
               />
               <BpButton
-                disabled={!editButtonIsEnabled}
+                disabled={
+                  !editButtonIsEnabled || editButtonIsLoading || hasNoChanges
+                }
                 intent={'primary'}
                 loading={editButtonIsLoading}
                 text={vt.editEventButton}

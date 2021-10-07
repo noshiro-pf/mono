@@ -1,7 +1,8 @@
 import { FormGroup } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
+import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
-import { isEmailString } from '@noshiro/ts-utils';
+import { IList, isEmailString } from '@noshiro/ts-utils';
+import { useCallback } from 'react';
 import type { BpInputProps } from './bp-input';
 import { BpInput } from './bp-input';
 
@@ -9,7 +10,9 @@ export type BpEmailInputProps = BpInputProps &
   Readonly<{
     formGroupLabel: string;
     onValueChange: (value: string) => void;
-    invalidMessage?: string;
+    invalidEmailMessage?: string;
+    showOtherErrorMessages?: boolean;
+    otherErrorMessages?: readonly string[];
     autoFocus?: boolean;
     focus$?: TinyObservable<undefined>;
   }>;
@@ -22,19 +25,56 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
     onValueChange,
     disabled = false,
     placeholder = 'sample@gmail.com',
-    invalidMessage = '有効なメールアドレスではありません',
+    invalidEmailMessage = '有効なメールアドレスではありません',
+    showOtherErrorMessages = false,
+    otherErrorMessages,
     autoFocus,
     focus$,
+    onBlur,
     ...props
   }) => {
     const isEmailAddressResult = isEmailString(value ?? '');
 
-    const showError: boolean = !disabled && !isEmailAddressResult;
+    const [errorsAreHidden, hideErrors, showErrorsIfExists] =
+      useBooleanState(true);
+
+    const blurHandler: React.FocusEventHandler<HTMLInputElement> = useCallback(
+      (ev) => {
+        if (onBlur !== undefined) {
+          onBlur(ev);
+        }
+        showErrorsIfExists();
+      },
+      [onBlur, showErrorsIfExists]
+    );
+
+    const valueChangeHandler = useCallback(
+      (str: string) => {
+        onValueChange(str);
+        hideErrors();
+      },
+      [onValueChange, hideErrors]
+    );
 
     return (
       <FormGroup
-        helperText={showError ? invalidMessage : undefined}
-        intent={showError ? 'danger' : 'primary'}
+        helperText={
+          errorsAreHidden || disabled ? undefined : (
+            <div>
+              {isEmailAddressResult ? undefined : (
+                <div>{invalidEmailMessage}</div>
+              )}
+              {otherErrorMessages === undefined
+                ? undefined
+                : showOtherErrorMessages
+                ? IList.map(otherErrorMessages, (er, index) => (
+                    <div key={index}>{er}</div>
+                  ))
+                : undefined}
+            </div>
+          )
+        }
+        intent={'danger'}
         label={formGroupLabel}
       >
         <BpInput
@@ -44,7 +84,8 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
           placeholder={placeholder}
           type='email'
           value={value}
-          onValueChange={onValueChange}
+          onBlur={blurHandler}
+          onValueChange={valueChangeHandler}
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...props}
         />

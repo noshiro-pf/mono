@@ -3,6 +3,7 @@ export * from './datetime-range-2-str';
 export * from './datetime-range-to-str';
 export * from './fetch-holidays';
 export * from './map-key';
+export * from './normalize-event-schedule';
 export * from './toaster';
 export * from './today';
 export * from './use-form-error-hook';

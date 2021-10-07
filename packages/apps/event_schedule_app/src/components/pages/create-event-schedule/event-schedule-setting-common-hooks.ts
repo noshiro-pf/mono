@@ -11,29 +11,21 @@ import type {
 import {
   defaultEventSchedule,
   defaultYmdhm,
-  ymdFromDate,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import {
-  filter,
-  fromPromise,
-  map,
-  unwrapResultOk,
-  withInitialValue,
-} from '@noshiro/syncflow';
-import { useStream, useStreamValue } from '@noshiro/syncflow-react-hooks';
-import { IMapMapped, isNotUndefined, recordEntries } from '@noshiro/ts-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import type { IMapMapped } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   initialAnswerDeadline,
   initialNotificationSettings,
 } from '../../../constants';
 import type { YmdKey } from '../../../functions';
-import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../../../functions';
+import { normalizeEventSchedule } from '../../../functions';
+import { holidaysJpDefinition$ } from '../../../store';
 import { useToggleSectionState } from '../../organisms';
 import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
 import { useEditEventScheduleHooks } from './edit-event-schedule-hooks';
-import { normalizeEventSchedule } from './normalize-event-schedule';
 import { validateEventSchedule, validateEventScheduleAll } from './validator';
 
 type EventScheduleSettingCommonHooks = Readonly<{
@@ -83,21 +75,14 @@ export const useEventScheduleSettingCommonHooks = (
   const [title, onTitleChange] = useState<string>(initialValues.current.title);
   const [notes, onNotesChange] = useState<string>(initialValues.current.notes);
 
-  const [
-    // dummy comment to control prettier
-    datetimeSpecification,
-    onDatetimeSpecificationChange,
-  ] = useState<DatetimeSpecificationEnumType>(
-    initialValues.current.datetimeSpecification
-  );
+  const [datetimeSpecification, onDatetimeSpecificationChange] =
+    useState<DatetimeSpecificationEnumType>(
+      initialValues.current.datetimeSpecification
+    );
 
-  const [
-    // dummy comment to control prettier
-    datetimeRangeList,
-    onDatetimeListChange,
-  ] = useState<readonly DatetimeRange[]>(
-    initialValues.current.datetimeRangeList
-  );
+  const [datetimeRangeList, onDatetimeListChange] = useState<
+    readonly DatetimeRange[]
+  >(initialValues.current.datetimeRangeList);
 
   const {
     useThisConfig: useAnswerDeadline,
@@ -244,30 +229,9 @@ export const useEventScheduleSettingCommonHooks = (
     resetNotificationSettings,
   ]);
 
-  const holidaysJpDefinition$ = useStream<
-    IMapMapped<YearMonthDate, string, YmdKey>
-  >(() =>
-    fromPromise(fetchHolidaysJson())
-      .chain(unwrapResultOk())
-      .chain(filter(isNotUndefined))
-      .chain(
-        map((record) =>
-          IMapMapped.new(
-            recordEntries(record).map(([key, value]) => [
-              ymdFromDate(new Date(key)),
-              value,
-            ]),
-            ymdToKey,
-            ymdFromKey
-          )
-        )
-      )
-      .chain(withInitialValue(IMapMapped.new([], ymdToKey, ymdFromKey)))
-  );
-
   const holidaysJpDefinition = useStreamValue<
     IMapMapped<YearMonthDate, string, YmdKey>
-  >(holidaysJpDefinition$, IMapMapped.new([], ymdToKey, ymdFromKey));
+  >(holidaysJpDefinition$);
 
   return {
     title,
