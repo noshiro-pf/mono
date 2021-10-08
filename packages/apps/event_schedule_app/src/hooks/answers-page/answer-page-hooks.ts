@@ -2,6 +2,7 @@ import type {
   Answer,
   EventSchedule,
   UserName,
+  YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
@@ -12,6 +13,7 @@ import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api';
 import { routes, texts } from '../../constants';
+import type { YmdKey } from '../../functions';
 import {
   createToaster,
   datetimeRangeFromMapKey,
@@ -25,6 +27,7 @@ import {
   eventSchedule$,
   fetchAnswers,
   fetchEventSchedule,
+  holidaysJpDefinition$,
   refreshButtonIsDisabled$,
   refreshButtonIsLoading$,
   requiredParticipantsExist$,
@@ -57,6 +60,8 @@ type AnswerPageState = DeepReadonly<{
   isExpired: boolean;
   selectedAnswerUserName: UserName | undefined;
   requiredParticipantsExist: boolean;
+  selectedDates: readonly YearMonthDate[];
+  holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>;
 }> & {
   readonly answerSectionRef: RefObject<HTMLDivElement>;
 };
@@ -250,6 +255,13 @@ export const useAnswerPageState = (): AnswerPageState => {
   const refreshButtonIsLoading = useStreamValue(refreshButtonIsLoading$);
   const refreshButtonIsDisabled = useStreamValue(refreshButtonIsDisabled$);
 
+  const selectedDates = useMemo<readonly YearMonthDate[]>(
+    () => eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? [],
+    [eventSchedule]
+  );
+
+  const holidaysJpDefinition = useStreamValue(holidaysJpDefinition$);
+
   return {
     eventId,
     eventSchedule,
@@ -273,5 +285,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     isExpired,
     selectedAnswerUserName: selectedAnswer?.userName,
     requiredParticipantsExist,
+    selectedDates,
+    holidaysJpDefinition,
   };
 };

@@ -1,23 +1,36 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import type { Observable } from '@noshiro/syncflow';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import type { YmdKey } from '../../functions';
-import { useMultipleDatePickerState } from './multiple-date-picker-hooks';
+import type { CalendarCurrentPageReducerState, YmdKey } from '../../functions';
+import { useMultipleDatePickerState } from '../../hooks';
+import {
+  Bp3DatePicker,
+  DatePickerBody,
+  DatePickerMonth,
+  DayPicker,
+} from '../bp';
 import { DatepickerNav } from './navigation';
 import { Week } from './week';
 import { WeekdaysHeader } from './weekdays-header';
 
 type Props = Readonly<{
   selectedDates: readonly YearMonthDate[];
-  onSelectedDatesChange: (value: readonly YearMonthDate[]) => void;
+  onSelectedDatesChange?: (value: readonly YearMonthDate[]) => void;
+  setYearMonth$?: Observable<CalendarCurrentPageReducerState>;
   holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
 export const MultipleDatePicker = memoNamed<Props>(
   'MultipleDatePicker',
-  ({ selectedDates, onSelectedDatesChange, holidaysJpDefinition }) => {
+  ({
+    selectedDates,
+    onSelectedDatesChange,
+    setYearMonth$,
+    holidaysJpDefinition,
+  }) => {
     const {
       calendarCurrentPage,
       onPrevMonthClick,
@@ -31,18 +44,15 @@ export const MultipleDatePicker = memoNamed<Props>(
     } = useMultipleDatePickerState(
       selectedDates,
       onSelectedDatesChange,
+      setYearMonth$,
       holidaysJpDefinition
     );
 
     return (
       <div>
-        <div className='bp3-datepicker'>
-          <div className='DayPicker' lang='en'>
-            <CenteringWrapper
-              // eslint-disable-next-line react/forbid-component-props
-              className={'DayPicker-wrapper'}
-              tabIndex={0}
-            >
+        <Bp3DatePicker>
+          <DayPicker lang='en'>
+            <CenteringWrapper tabIndex={0}>
               <DatepickerNav
                 month={calendarCurrentPage.month}
                 year={calendarCurrentPage.year}
@@ -51,23 +61,21 @@ export const MultipleDatePicker = memoNamed<Props>(
                 onPrevMonthClick={onPrevMonthClick}
                 onYearChange={onYearChange}
               />
-              <div className='DayPicker-Months'>
-                <div className='DayPicker-Month' role='grid'>
-                  <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
-                  <div className='DayPicker-Body' role='rowgroup'>
-                    {calendarCells.map((week) => (
-                      <Week
-                        key={week.index}
-                        week={week.week}
-                        onClick={onDateClick}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <DatePickerMonth role='grid'>
+                <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
+                <DatePickerBody role='rowgroup'>
+                  {calendarCells.map((week) => (
+                    <Week
+                      key={week.index}
+                      week={week.week}
+                      onClick={onDateClick}
+                    />
+                  ))}
+                </DatePickerBody>
+              </DatePickerMonth>
             </CenteringWrapper>
-          </div>
-        </div>
+          </DayPicker>
+        </Bp3DatePicker>
         <TodayWrapper>
           <BpButton onClick={onTodayClick}>{'Today'}</BpButton>
         </TodayWrapper>

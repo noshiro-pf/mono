@@ -6,6 +6,9 @@ import {
   compareYmd,
   defaultYearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
+import type { Observable } from '@noshiro/syncflow';
+import { fromArray } from '@noshiro/syncflow';
+import { useStreamEffect } from '@noshiro/syncflow-react-hooks';
 import type {
   IMapMapped,
   MonthEnum,
@@ -14,18 +17,20 @@ import type {
 } from '@noshiro/ts-utils';
 import { IList, ISetMapped } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useReducer } from 'react';
-import type { YmdKey } from '../../functions';
-import { ymd2day, ymdFromKey, ymdToKey } from '../../functions';
-import { generateCalendar } from './generate-calendar';
 import type {
   CalendarCurrentPageReducerState,
   SelectedDatesReducerAction,
-} from './reducers';
+  YmdKey,
+} from '../functions';
 import {
   calendarCurrentPageInitialState,
   calendarCurrentPageReducer,
+  generateCalendar,
   selectedDatesReducer,
-} from './reducers';
+  ymd2day,
+  ymdFromKey,
+  ymdToKey,
+} from '../functions';
 
 type MultipleDatePickerState = DeepReadonly<{
   calendarCurrentPage: CalendarCurrentPageReducerState;
@@ -38,19 +43,20 @@ type MultipleDatePickerState = DeepReadonly<{
     week: {
       ymd: YearMonthDate;
       selected: boolean;
-      disabled: boolean;
+      outside: boolean;
       dayType: DayType;
       holidayJpName: string | undefined;
     }[];
   }[];
-  onDateClick: (ymd: YearMonthDate) => void;
-  onWeekdaysHeaderCellClick: (w: WeekDayEnum) => void;
+  onDateClick?: (ymd: YearMonthDate) => void;
+  onWeekdaysHeaderCellClick?: (w: WeekDayEnum) => void;
   onTodayClick: () => void;
 }>;
 
 export const useMultipleDatePickerState = (
   selectedDates: readonly YearMonthDate[],
-  onSelectedDatesChange: (value: readonly YearMonthDate[]) => void,
+  onSelectedDatesChange?: (value: readonly YearMonthDate[]) => void,
+  setYearMonth$?: Observable<CalendarCurrentPageReducerState>,
   holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>
 ): MultipleDatePickerState => {
   /* states */
@@ -59,6 +65,14 @@ export const useMultipleDatePickerState = (
     calendarCurrentPageReducer,
     calendarCurrentPageInitialState()
   );
+
+  useStreamEffect(setYearMonth$ ?? fromArray([]), ({ year, month }) => {
+    calendarCurrentPageDispatch({
+      type: 'set-year-month',
+      year,
+      month,
+    });
+  });
 
   /* values */
 
@@ -78,7 +92,7 @@ export const useMultipleDatePickerState = (
         week: {
           ymd: YearMonthDate;
           selected: boolean;
-          disabled: boolean;
+          outside: boolean;
           dayType: DayType;
           holidayJpName: string | undefined;
         }[];
@@ -94,7 +108,7 @@ export const useMultipleDatePickerState = (
           return {
             ymd,
             selected: selectedDatesSet.has(ymd),
-            disabled: ymd.month !== calendarCurrentPage.month,
+            outside: ymd.month !== calendarCurrentPage.month,
             dayType:
               holidaysJpDefinition?.has(ymd) ?? false
                 ? 'holiday'
@@ -132,34 +146,43 @@ export const useMultipleDatePickerState = (
     calendarCurrentPageDispatch({ type: 'today' });
   }, []);
 
-  const selectedDatesDispatch = useCallback(
-    (action: SelectedDatesReducerAction) => {
-      onSelectedDatesChange(
-        IList.sort(
-          [...selectedDatesReducer(selectedDatesSet, action)],
-          compareYmd
-        )
-      );
-    },
+  const selectedDatesDispatch = useMemo(
+    () =>
+      onSelectedDatesChange === undefined
+        ? undefined
+        : (action: SelectedDatesReducerAction) => {
+            onSelectedDatesChange(
+              IList.sort(
+                [...selectedDatesReducer(selectedDatesSet, action)],
+                compareYmd
+              )
+            );
+          },
     [selectedDatesSet, onSelectedDatesChange]
   );
 
-  const onDateClick = useCallback(
-    (ymd: YearMonthDate) => {
-      selectedDatesDispatch({ type: 'flip', dateToFlip: ymd });
-    },
+  const onDateClick = useMemo(
+    () =>
+      selectedDatesDispatch === undefined
+        ? undefined
+        : (ymd: YearMonthDate) => {
+            selectedDatesDispatch({ type: 'flip', dateToFlip: ymd });
+          },
     [selectedDatesDispatch]
   );
 
-  const onWeekdaysHeaderCellClick = useCallback(
-    (w: WeekDayEnum) => {
-      selectedDatesDispatch({
-        type: 'fill-column',
-        dates: dates
-          .map((week) => week[w] ?? defaultYearMonthDate)
-          .filter((d) => d.month === calendarCurrentPage.month),
-      });
-    },
+  const onWeekdaysHeaderCellClick = useMemo(
+    () =>
+      selectedDatesDispatch === undefined
+        ? undefined
+        : (w: WeekDayEnum) => {
+            selectedDatesDispatch({
+              type: 'fill-column',
+              dates: dates
+                .map((week) => week[w] ?? defaultYearMonthDate)
+                .filter((d) => d.month === calendarCurrentPage.month),
+            });
+          },
     [selectedDatesDispatch, dates, calendarCurrentPage.month]
   );
 

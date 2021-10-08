@@ -62,9 +62,9 @@ export const AnswerTable = memoNamed<Props>(
                   </BpButtonOverflowHidden>
                 )}
                 {answer.isRequiredParticipants ? (
-                  <div style={requiredParticipantIconStyle}>
+                  <RequiredParticipantIconStyled>
                     <RequiredParticipantIcon />
-                  </div>
+                  </RequiredParticipantIconStyled>
                 ) : undefined}
               </Th>
             ))}
@@ -165,11 +165,11 @@ const noPadStyle: CSSProperties = {
   position: 'relative',
 } as const;
 
-const requiredParticipantIconStyle: CSSProperties = {
-  position: 'absolute',
-  top: '5px',
-  right: '5px',
-} as const;
+const RequiredParticipantIconStyled = styled.div`
+  position: absolute;
+  top: -5px;
+  left: 5px;
+`;
 
 const BpButtonOverflowHidden = styled(BpButton)`
   overflow-x: hidden;

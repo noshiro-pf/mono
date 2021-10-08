@@ -1,7 +1,7 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { IList, ISetMapped } from '@noshiro/ts-utils';
-import type { YmdKey } from '../../../functions';
-import { ymdFromKey, ymdToKey } from '../../../functions';
+import type { YmdKey } from '../map-key';
+import { ymdFromKey, ymdToKey } from '../map-key';
 
 export type SelectedDatesReducerAction = Readonly<
   | { type: 'fill-column'; dates: readonly YearMonthDate[] }

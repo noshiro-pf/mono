@@ -3,9 +3,15 @@ import type { WeekDayEnum } from '@noshiro/ts-utils';
 import { weekdaysList } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import styled from 'styled-components';
+import {
+  DatePickerWeekday,
+  DatePickerWeekdayReadonly,
+  DatePickerWeekdays,
+  DatePickerWeekdaysRow,
+} from '../bp';
 
 type Props = Readonly<{
-  onClick: (w: WeekDayEnum) => void;
+  onClick?: (w: WeekDayEnum) => void;
 }>;
 
 export const WeekdaysHeader = memoNamed<Props>(
@@ -15,16 +21,19 @@ export const WeekdaysHeader = memoNamed<Props>(
       () =>
         weekdaysList.en.map((w, idx) => ({
           ...w,
-          onClickHandler: () => {
-            onClick(idx as WeekDayEnum);
-          },
+          onClickHandler:
+            onClick === undefined
+              ? undefined
+              : () => {
+                  onClick(idx as WeekDayEnum);
+                },
         })),
       [onClick]
     );
 
     return (
-      <div className='DayPicker-Weekdays' role='rowgroup'>
-        <div className='DayPicker-WeekdaysRow' role='row'>
+      <DatePickerWeekdays role='rowgroup'>
+        <DatePickerWeekdaysRow role='row'>
           {listWithHandler.map(({ name: title, abbr, onClickHandler }) => (
             <HeaderCell
               key={title}
@@ -33,8 +42,8 @@ export const WeekdaysHeader = memoNamed<Props>(
               onClick={onClickHandler}
             />
           ))}
-        </div>
-      </div>
+        </DatePickerWeekdaysRow>
+      </DatePickerWeekdays>
     );
   }
 );
@@ -42,25 +51,28 @@ export const WeekdaysHeader = memoNamed<Props>(
 type PropsHeaderCell = Readonly<{
   title: string;
   abbr: string;
-  onClick: () => void;
+  onClick?: () => void;
 }>;
 
-const HeaderCell = memoNamed<PropsHeaderCell>('HeaderCell', (props) => (
-  <DivPointer
-    // eslint-disable-next-line react/forbid-component-props
-    className={'DayPicker-Weekday'}
-    role={'columnheader'}
-    onClick={props.onClick}
-  >
-    <abbr title={props.title}>{props.abbr}</abbr>
-  </DivPointer>
-));
+const HeaderCell = memoNamed<PropsHeaderCell>(
+  'HeaderCell',
+  ({ title, abbr, onClick }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const DatePickerWeekdayResolved = useMemo(
+      () =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        onClick === undefined ? DatePickerWeekdayReadonly : DatePickerWeekday,
+      [onClick]
+    );
 
-const DivPointer = styled.div`
-  border-radius: 3px;
-  cursor: pointer;
-  outline: none;
-  &:hover {
-    background: #d8e1e8;
+    return (
+      <DatePickerWeekdayResolved role={'columnheader'} onClick={onClick}>
+        <Abbr title={title}>{abbr}</Abbr>
+      </DatePickerWeekdayResolved>
+    );
   }
+);
+
+const Abbr = styled.abbr`
+  text-decoration: none !important;
 `;

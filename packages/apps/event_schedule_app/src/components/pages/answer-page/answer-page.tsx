@@ -4,12 +4,14 @@ import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
+import { setYearMonth$ } from '../../../store';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
 import {
   ButtonsWrapperAlignEnd,
   Section,
   SingleButtonWrapper,
 } from '../../molecules';
+import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
   AnswerBeingEdited,
   AnswerPageEventInfo,
@@ -44,6 +46,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     isExpired,
     selectedAnswerUserName,
     requiredParticipantsExist,
+    selectedDates,
+    holidaysJpDefinition,
   } = useAnswerPageState();
 
   return errorType !== undefined && errorType.type === 'not-found' ? (
@@ -63,10 +67,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             rel='noopener noreferrer'
             target='_blank'
           >
-            {vt.createNew}
+            <NoWrapSpan>{vt.createNew}</NoWrapSpan>
           </AnchorButton>
         </CreateNewButtonWrapper>
       </TitleWrapper>
+
       {errorType !== undefined ? (
         <AnswerPageError errorType={errorType} />
       ) : eventId === undefined ||
@@ -91,6 +96,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             </ButtonsWrapperAlignEnd>
           </Section>
           <Section sectionTitle={vt.answers.title}>
+            <CalendarWrapper>
+              <MultipleDatePicker
+                holidaysJpDefinition={holidaysJpDefinition}
+                selectedDates={selectedDates}
+                setYearMonth$={setYearMonth$}
+              />
+            </CalendarWrapper>
+
             {isExpired ? undefined : (
               <SingleButtonWrapper>
                 <BpButton
@@ -104,6 +117,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 </BpButton>
               </SingleButtonWrapper>
             )}
+
             <TableWrapper>
               <AnswerTable
                 answers={answers}
@@ -112,6 +126,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 onAnswerClick={onAnswerClick}
               />
             </TableWrapper>
+
             <SymbolDescriptionWrapper>
               {requiredParticipantsExist ? (
                 <RequiredParticipantIconWrapper>
@@ -138,6 +153,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 </tbody>
               </table>
             </SymbolDescriptionWrapper>
+
             {answerBeingEditedSectionState === 'hidden' && !isExpired ? (
               <ButtonsWrapperAlignEnd>
                 <BpButton
@@ -149,6 +165,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               </ButtonsWrapperAlignEnd>
             ) : undefined}
           </Section>
+
           <div ref={answerSectionRef}>
             {answerBeingEditedSectionState === 'hidden' ||
             isExpired ? undefined : (
@@ -189,6 +206,10 @@ const TitleWrapper = styled.div`
   align-items: center;
 `;
 
+const NoWrapSpan = styled.span`
+  white-space: nowrap;
+`;
+
 const Title = styled.a`
   display: flex;
   align-items: center;
@@ -211,6 +232,11 @@ const CreateNewButtonWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+`;
+
+const CalendarWrapper = styled.div`
+  margin: 10px;
+  display: flex;
 `;
 
 const TableWrapper = styled.div`
