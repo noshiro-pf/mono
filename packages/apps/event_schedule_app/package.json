@@ -31,7 +31,8 @@
     "setup:scripts": "touch ./scripts/service-account-key.json && tsc --project config/tsconfig.scripts.json",
     "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "testw": "yarn test --watch",
+    "tscw": "tsc --watch"
   },
   "config": {
     "build_dir": "build",

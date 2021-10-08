@@ -16,6 +16,7 @@ export type Answer = Readonly<{
   [ANSWER_KEY_CREATED_AT]: number;
   useWeight: boolean;
   weight: Weight;
+  isRequiredParticipants: boolean;
 }>;
 
 export type PartialAnswer = Partial<
@@ -27,6 +28,7 @@ export type PartialAnswer = Partial<
     [ANSWER_KEY_CREATED_AT]: Answer[typeof ANSWER_KEY_CREATED_AT];
     useWeight: Answer['useWeight'];
     weight: Answer['weight'];
+    isRequiredParticipants: Answer['isRequiredParticipants'];
   }>
 >;
 
@@ -38,6 +40,7 @@ export const defaultAnswer: Answer = {
   [ANSWER_KEY_CREATED_AT]: Date.now(),
   useWeight: false,
   weight: createWeight(1),
+  isRequiredParticipants: false,
 } as const;
 
 const d = defaultAnswer;
@@ -51,4 +54,5 @@ export const fillAnswer = (p?: PartialAnswer): Answer => ({
     d[ANSWER_KEY_CREATED_AT],
   useWeight: p?.useWeight ?? d.useWeight,
   weight: p?.weight ?? d.weight,
+  isRequiredParticipants: p?.isRequiredParticipants ?? d.isRequiredParticipants,
 });

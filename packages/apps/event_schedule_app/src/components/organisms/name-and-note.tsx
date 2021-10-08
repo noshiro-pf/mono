@@ -3,7 +3,7 @@ import { BpInput, BpTextArea } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../constants';
-import { useFormError } from '../../functions';
+import { useFormError } from '../../hooks';
 import { WidthRestrictedInputWrapper } from '../styled';
 
 const vt = texts.eventSettingsPage.section1;

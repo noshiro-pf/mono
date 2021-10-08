@@ -9,12 +9,12 @@ import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { texts } from '../../../../constants';
 import type { YmdKey } from '../../../../functions';
+import { selectorOptions } from '../../../../functions';
+import { useSelectDatetimesHooks } from '../../../../hooks';
 import { AddElementButton, ButtonsWrapper } from '../../../molecules';
 import { MultipleDatePicker } from '../../../multiple-date-picker';
 import { DeleteAllButton } from '../../button-with-confirm';
 import { SetTimesPopover } from '../set-times-popover';
-import { selectorOptions } from './options';
-import { useSelectDatetimesHooks } from './select-datetimes-hooks';
 import { SelectedDatetimeRow } from './selected-datetime-row';
 
 type Props = Readonly<{

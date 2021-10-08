@@ -21,6 +21,7 @@ export const WeekdaysHeader = memoNamed<Props>(
         })),
       [onClick]
     );
+
     return (
       <div className='DayPicker-Weekdays' role='rowgroup'>
         <div className='DayPicker-WeekdaysRow' role='row'>

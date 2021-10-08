@@ -6,8 +6,8 @@ import { roundBy } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import { CustomIcon, Td, Th } from '../../atoms';
-import { useAnswerTableHooks } from './answer-table-hooks';
+import { useAnswerTableHooks } from '../../../hooks';
+import { CustomIcon, RequiredParticipantIcon, Td, Th } from '../../atoms';
 import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
 import { SortButton } from './sort-button';
@@ -61,6 +61,11 @@ export const AnswerTable = memoNamed<Props>(
                     {answer.userName}
                   </BpButtonOverflowHidden>
                 )}
+                {answer.isRequiredParticipants ? (
+                  <div style={requiredParticipantIconStyle}>
+                    <RequiredParticipantIcon />
+                  </div>
+                ) : undefined}
               </Th>
             ))}
           </tr>
@@ -147,15 +152,24 @@ export const AnswerTable = memoNamed<Props>(
 const tCellStyle: CSSProperties = {
   verticalAlign: 'middle',
   whiteSpace: 'nowrap',
-};
+} as const;
+
+const userNameWrapperWidth = 80;
 
 const noPadStyle: CSSProperties = {
-  minWidth: '80px',
-  maxWidth: '80px',
+  minWidth: `${userNameWrapperWidth}px`,
+  maxWidth: `${userNameWrapperWidth}px`,
   overflowX: 'hidden',
   padding: '5px',
   verticalAlign: 'middle',
-};
+  position: 'relative',
+} as const;
+
+const requiredParticipantIconStyle: CSSProperties = {
+  position: 'absolute',
+  top: '5px',
+  right: '5px',
+} as const;
 
 const BpButtonOverflowHidden = styled(BpButton)`
   overflow-x: hidden;

@@ -7,6 +7,7 @@ import {
   distinctUntilChanged,
   filter,
   map,
+  mapI,
   pluck,
   throttleTime,
   unwrapResultOk,
@@ -72,6 +73,11 @@ const answers$: InitializedObservable<readonly Answer[] | undefined> =
     .chain(unwrapResultOk())
     .chain(withInitialValue(undefined));
 
+const requiredParticipantsExist$: InitializedObservable<boolean> =
+  answers$.chain(
+    mapI((answers) => answers?.some((a) => a.isRequiredParticipants) === true)
+  );
+
 const errorType$: InitializedObservable<
   | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
   | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
@@ -134,6 +140,7 @@ export {
   fetchEventSchedule,
   refreshButtonIsLoading$,
   refreshButtonIsDisabled$,
+  requiredParticipantsExist$,
 };
 
 eventScheduleResult$.subscribe((e) => {

@@ -3,15 +3,19 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import { CustomIcon } from '../../atoms';
+import { useAnswerPageState } from '../../../hooks';
+import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
 import {
   ButtonsWrapperAlignEnd,
   Section,
   SingleButtonWrapper,
 } from '../../molecules';
-import { AnswerPageEventInfo, AnswerTable, MyAnswer } from '../../organisms';
+import {
+  AnswerBeingEdited,
+  AnswerPageEventInfo,
+  AnswerTable,
+} from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
-import { useAnswerPageState } from './answer-page-hooks';
 import { AnswerPageError } from './error';
 
 const vt = texts.answerPage;
@@ -25,10 +29,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     errorType,
     onAnswerClick,
     onAddAnswerButtonClick,
-    myAnswerSectionState,
+    answerBeingEditedSectionState,
     answerSectionRef,
-    answerForEditing,
-    updateAnswerForEditing,
+    answerBeingEdited,
+    updateAnswerBeingEdited,
     onCancel,
     onDeleteAnswer,
     onSubmitAnswer,
@@ -39,6 +43,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     refreshButtonIsDisabled,
     isExpired,
     selectedAnswerUserName,
+    requiredParticipantsExist,
   } = useAnswerPageState();
 
   return errorType !== undefined && errorType.type === 'not-found' ? (
@@ -108,6 +113,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               />
             </TableWrapper>
             <SymbolDescriptionWrapper>
+              {requiredParticipantsExist ? (
+                <RequiredParticipantIconWrapper>
+                  <RequiredParticipantIcon />
+                  {texts.colon}
+                  {vt.answers.requiredParticipant}
+                  {vt.requiredParticipantDescription}
+                </RequiredParticipantIconWrapper>
+              ) : undefined}
               <table>
                 <tbody>
                   {eventSchedule.answerSymbolList.map((s) => (
@@ -125,7 +138,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 </tbody>
               </table>
             </SymbolDescriptionWrapper>
-            {myAnswerSectionState === 'hidden' && !isExpired ? (
+            {answerBeingEditedSectionState === 'hidden' && !isExpired ? (
               <ButtonsWrapperAlignEnd>
                 <BpButton
                   icon='add'
@@ -137,24 +150,25 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             ) : undefined}
           </Section>
           <div ref={answerSectionRef}>
-            {myAnswerSectionState === 'hidden' || isExpired ? undefined : (
+            {answerBeingEditedSectionState === 'hidden' ||
+            isExpired ? undefined : (
               <Section
                 sectionTitle={
-                  myAnswerSectionState === 'creating'
-                    ? vt.myAnswer.title.create
-                    : vt.myAnswer.title.update
+                  answerBeingEditedSectionState === 'creating'
+                    ? vt.answerBeingEdited.title.create
+                    : vt.answerBeingEdited.title.update
                 }
                 onCloseClick={onCancel}
               >
-                <MyAnswer
-                  answerForEditing={answerForEditing}
+                <AnswerBeingEdited
+                  answerBeingEdited={answerBeingEdited}
+                  answerBeingEditedSectionState={answerBeingEditedSectionState}
                   answers={answers}
                   eventSchedule={eventSchedule}
-                  myAnswerSectionState={myAnswerSectionState}
                   selectedAnswerUserName={selectedAnswerUserName}
                   submitButtonIsDisabled={submitButtonIsDisabled}
                   submitButtonIsLoading={submitButtonIsLoading}
-                  updateAnswerForEditing={updateAnswerForEditing}
+                  updateAnswerBeingEdited={updateAnswerBeingEdited}
                   onCancel={onCancel}
                   onDeleteAnswer={onDeleteAnswer}
                   onSubmitAnswer={onSubmitAnswer}
@@ -210,4 +224,8 @@ const SymbolDescriptionWrapper = styled.div`
 const AlignCenter = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const RequiredParticipantIconWrapper = styled(AlignCenter)`
+  margin: 10px 3px;
 `;
