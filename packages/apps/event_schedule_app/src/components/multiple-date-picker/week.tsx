@@ -4,17 +4,18 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
+import { DatePickerWeek } from '../bp';
 import { DatePickerDate } from './date-picker-day';
 
 type Props = Readonly<{
   week: readonly Readonly<{
     ymd: YearMonthDate;
     selected: boolean;
-    disabled: boolean;
+    outside: boolean;
     dayType: DayType;
     holidayJpName: string | undefined;
   }>[];
-  onClick: (ymd: YearMonthDate) => void;
+  onClick?: (ymd: YearMonthDate) => void;
 }>;
 
 export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
@@ -23,26 +24,29 @@ export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
       week.map((d, index) => ({
         value: d,
         index,
-        handler: () => {
-          onClick(d.ymd);
-        },
+        handler:
+          onClick === undefined
+            ? undefined
+            : () => {
+                onClick(d.ymd);
+              },
       })),
     [week, onClick]
   );
 
   return (
-    <div className='DayPicker-Week' role='row'>
+    <DatePickerWeek role='row'>
       {listWithHandler.map(({ value, handler, index }) => (
         <DatePickerDate
           key={index}
           dayType={value.dayType}
-          disabled={value.disabled}
           holidayJpName={value.holidayJpName}
+          outside={value.outside}
           selected={value.selected}
           ymd={value.ymd}
           onClick={handler}
         />
       ))}
-    </div>
+    </DatePickerWeek>
   );
 });

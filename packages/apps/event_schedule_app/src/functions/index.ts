@@ -5,6 +5,7 @@ export * from './create-event-schedule-page';
 export * from './datetime-range-to-str';
 export * from './fetch-holidays';
 export * from './map-key';
+export * from './multiple-date-picker';
 export * from './normalize-event-schedule';
 export * from './select-datetimes-component';
 export * from './symbol-settings-component';

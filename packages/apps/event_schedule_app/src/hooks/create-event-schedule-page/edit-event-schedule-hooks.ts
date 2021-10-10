@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { api } from '../../api';
 import { routes, texts } from '../../constants';
 import { createToaster, showToast } from '../../functions';
-import { router } from '../../store';
+import { fetchAnswers, fetchEventSchedule, router } from '../../store';
 
 type EditEventScheduleHooks = Readonly<{
   editButtonIsEnabled: boolean;
@@ -46,6 +46,8 @@ export const useEditEventScheduleHooks = ({
       .then(() => {
         if (!alive.current) return;
         setIsLoadingFalse();
+        fetchAnswers();
+        fetchEventSchedule();
         onBackToAnswerPage();
         showToast({
           toast,

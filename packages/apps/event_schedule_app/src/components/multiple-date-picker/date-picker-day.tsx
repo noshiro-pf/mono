@@ -3,20 +3,26 @@ import type {
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
+import { noop } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
-import styled from 'styled-components';
+import {
+  DatePickerDay,
+  DatePickerDayOutside,
+  DatePickerDayReadonly,
+  DatePickerDaySelected,
+  DatePickerDaySelectedReadonly,
+  DatePickerDayWrapper,
+} from '../bp';
 
 type Props = Readonly<{
   ymd: YearMonthDate;
-  onClick: () => void;
+  onClick?: () => void;
   selected: boolean;
-  disabled: boolean;
+  outside: boolean;
   dayType: DayType;
   holidayJpName: string | undefined;
 }>;
-
-const noop = (): undefined => undefined;
 
 export const DatePickerDate = memoNamed<Props>(
   'DatePickerDate',
@@ -24,7 +30,7 @@ export const DatePickerDate = memoNamed<Props>(
     ymd,
     onClick,
     selected = false,
-    disabled = false,
+    outside = false,
     dayType = 'normal',
     holidayJpName,
   }) => {
@@ -33,12 +39,24 @@ export const DatePickerDate = memoNamed<Props>(
       [ymd]
     );
 
-    const className: string = `DayPicker-Day ${
-      selected ? 'DayPicker-Day--selected' : ''
-    } ${disabled ? 'DayPicker-Day--outside' : ''}`;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const DatePickerDayResolved =
+      onClick === undefined
+        ? selected
+          ? DatePickerDaySelectedReadonly
+          : outside
+          ? DatePickerDayOutside
+          : DatePickerDayReadonly
+        : selected
+        ? outside
+          ? DatePickerDaySelectedReadonly
+          : DatePickerDaySelected
+        : outside
+        ? DatePickerDayOutside
+        : DatePickerDay;
 
     const style = useMemo<CSSProperties>(() => {
-      if (selected || disabled) return {};
+      if (selected || outside) return {};
       switch (dayType) {
         case 'holiday':
         case 'Sunday':
@@ -49,29 +67,21 @@ export const DatePickerDate = memoNamed<Props>(
         default:
           return {};
       }
-    }, [dayType, selected, disabled]);
+    }, [dayType, selected, outside]);
 
     return (
-      <Cell
+      <DatePickerDayResolved
         // eslint-disable-next-line react/forbid-component-props
-        aria-disabled={disabled}
+        aria-disabled={outside}
         aria-label={dateString}
         aria-selected={selected}
-        // eslint-disable-next-line react/forbid-component-props
-        className={className}
         role='gridcell'
         tabIndex={-1}
         title={holidayJpName}
-        onClick={disabled ? noop : onClick}
+        onClick={outside ? noop : onClick}
       >
-        <div className='bp3-datepicker-day-wrapper' style={style}>
-          {ymd.date}
-        </div>
-      </Cell>
+        <DatePickerDayWrapper style={style}>{ymd.date}</DatePickerDayWrapper>
+      </DatePickerDayResolved>
     );
   }
 );
-
-const Cell = styled.div`
-  outline: none;
-`;

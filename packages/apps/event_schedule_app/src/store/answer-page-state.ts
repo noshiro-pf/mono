@@ -1,5 +1,9 @@
-import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import type { InitializedObservable } from '@noshiro/syncflow';
+import type {
+  Answer,
+  EventSchedule,
+  YearMonthDate,
+} from '@noshiro/event-schedule-app-shared';
+import type { InitializedObservable, Observable } from '@noshiro/syncflow';
 import {
   combineLatest,
   createState,
@@ -13,9 +17,10 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
-import { isNotUndefined, Result } from '@noshiro/ts-utils';
+import { IList, isNotUndefined, Result } from '@noshiro/ts-utils';
 import { api } from '../api';
 import { fetchThrottleTime } from '../constants';
+import type { CalendarCurrentPageReducerState } from '../functions';
 import { clog } from '../utils';
 import { router } from './router';
 
@@ -35,17 +40,26 @@ const [eventScheduleResult$, setEventScheduleResult] = createState<
   Result<EventSchedule, 'not-found' | 'others'> | undefined
 >(undefined);
 
-router.eventId$.subscribe((eId) => {
-  if (eId === undefined) return;
-  api.event.get(eId).then(setEventScheduleResult).catch(console.error);
-});
-
 const [answersResult$, setAnswersResult] = createState<
   Readonly<{
     timestamp: number;
     value: Result<readonly Answer[], 'not-found' | 'others'> | undefined;
   }>
 >({ timestamp: Date.now(), value: undefined });
+
+combineLatest([
+  fetchEventScheduleThrottled$,
+  router.eventId$,
+] as const).subscribe(([_, eventId]) => {
+  if (eventId === undefined) return;
+
+  api.event
+    .get(eventId)
+    .then((result) => {
+      setEventScheduleResult(result);
+    })
+    .catch(console.error);
+});
 
 combineLatest([fetchAnswersThrottled$, router.eventId$] as const).subscribe(
   ([_, eventId]) => {
@@ -131,6 +145,23 @@ const [refreshButtonIsDisabled$, setRefreshButtonIsDisabled] =
   });
 }
 
+const selectedDates$: InitializedObservable<readonly YearMonthDate[]> =
+  eventSchedule$.chain(
+    mapI(
+      (eventSchedule) =>
+        eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? []
+    )
+  );
+
+const setYearMonth$: Observable<CalendarCurrentPageReducerState> =
+  selectedDates$
+    .chain(
+      map((selectedDates) =>
+        IList.isNonEmpty(selectedDates) ? selectedDates[0] : undefined
+      )
+    )
+    .chain(filter(isNotUndefined));
+
 export {
   eventScheduleResult$,
   eventSchedule$,
@@ -141,6 +172,8 @@ export {
   refreshButtonIsLoading$,
   refreshButtonIsDisabled$,
   requiredParticipantsExist$,
+  selectedDates$,
+  setYearMonth$,
 };
 
 eventScheduleResult$.subscribe((e) => {
@@ -167,4 +200,12 @@ eventScheduleResult$.subscribe((e) => {
   if (Result.isErr(e)) {
     clog('eventScheduleResult', e);
   }
+});
+
+answers$.subscribe((e) => {
+  clog('answers$', e);
+});
+
+eventSchedule$.subscribe((e) => {
+  clog('eventSchedule$', e);
 });
