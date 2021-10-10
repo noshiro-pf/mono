@@ -1,1 +1,3 @@
 scripts/*.json
+!scripts/example-answer.json
+!scripts/example-event.json

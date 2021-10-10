@@ -1,9 +1,11 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 // eslint-disable-next-line import/no-internal-modules
-import type { EventSchedule as EventScheduleV1 } from '@noshiro/event-schedule-app-shared/esm/v1';
+import type { EventSchedule as EventScheduleCurr } from '@noshiro/event-schedule-app-shared/esm/v1';
 // eslint-disable-next-line import/no-internal-modules
-import { firestorePaths as firestorePathsV1 } from '@noshiro/event-schedule-app-shared/esm/v1';
+import { firestorePaths as firestorePathsCurr } from '@noshiro/event-schedule-app-shared/esm/v1';
+// eslint-disable-next-line import/no-internal-modules
+import type { EventSchedule as EventScheduleNext } from '@noshiro/event-schedule-app-shared/esm/v2';
+// eslint-disable-next-line import/no-internal-modules
+import { firestorePaths as firestorePathsNext } from '@noshiro/event-schedule-app-shared/esm/v2';
 import * as admin from 'firebase-admin';
 import serviceAccount from './service-account-key.json';
 
@@ -13,11 +15,11 @@ const app = admin.initializeApp({
 });
 
 const db = app.firestore();
-const collectionNameV1 = firestorePathsV1.events;
-const collectionNameV2 = firestorePaths.events;
-const subCollectionName = firestorePaths.answers;
+const collectionNameCurr = firestorePathsCurr.events;
+const collectionNameNext = firestorePathsNext.events;
+const subCollectionName = firestorePathsNext.answers;
 
-const migrate = (before: EventScheduleV1): EventSchedule => ({
+const migrate = (before: EventScheduleCurr): EventScheduleNext => ({
   ...before,
   answerDeadline:
     before.answerDeadline === undefined
@@ -29,25 +31,25 @@ const migrate = (before: EventScheduleV1): EventSchedule => ({
 });
 
 const updateStore = async (): Promise<boolean> => {
-  const eventsSnapshotV1 = await db.collection(collectionNameV1).get();
+  const eventsSnapshotV1 = await db.collection(collectionNameCurr).get();
   const writeBatch = db.batch();
 
   for (const doc of eventsSnapshotV1.docs) {
     // read
     const id = doc.id;
-    const eventScheduleV1 = doc.data() as EventScheduleV1;
+    const eventScheduleV1 = doc.data() as EventScheduleCurr;
     // eslint-disable-next-line no-await-in-loop
     const answersSnapshotV1 = await db
-      .collection(`${collectionNameV1}/${id}/${subCollectionName}`)
+      .collection(`${collectionNameCurr}/${id}/${subCollectionName}`)
       .get();
 
     // write
-    const documentRef = db.doc(`${collectionNameV2}/${id}`);
+    const documentRef = db.doc(`${collectionNameNext}/${id}`);
     writeBatch.set(documentRef, migrate(eventScheduleV1));
 
     for (const ans of answersSnapshotV1.docs) {
       const documentRefForAnswers = db.doc(
-        `${collectionNameV2}/${id}/${subCollectionName}/${ans.id}`
+        `${collectionNameNext}/${id}/${subCollectionName}/${ans.id}`
       );
       writeBatch.set(documentRefForAnswers, ans.data());
     }
