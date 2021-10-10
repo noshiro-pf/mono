@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ituple } from '../others';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -134,10 +135,9 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   set(key: K, value: V): IMapMapped<K, V, KM> {
-    const curr = this.get(key);
-    if (curr === value) return this;
+    if (value === this.get(key)) return this; // has no changes
     const keyMapped = this._toKey(key);
-    if (curr === undefined) {
+    if (!this.has(key)) {
       return IMapMapped.new(
         [...this._map, ituple(keyMapped, value)].map(([km, v]) =>
           ituple(this._fromKey(km), v)
@@ -157,8 +157,9 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   update(key: K, updater: (value: V) => V): IMapMapped<K, V, KM> {
-    const curr = this.get(key);
-    if (curr === undefined) return this;
+    if (!this.has(key)) return this;
+
+    const curr = this.get(key)!;
     const keyMapped = this._toKey(key);
 
     return IMapMapped.new(
@@ -190,9 +191,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
           result.set(key, action.value);
           break;
         case 'update': {
-          const curr = result.get(key);
-          if (curr !== undefined) {
-            result.set(key, action.updater(curr));
+          if (result.has(key)) {
+            result.set(key, action.updater(result.get(key)!));
           }
           break;
         }

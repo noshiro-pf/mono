@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ituple } from '../others';
 import { ISet } from './iset';
 
@@ -108,9 +109,8 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   set(key: K, value: V): IMap<K, V> {
-    const curr = this.get(key);
-    if (curr === value) return this;
-    if (curr === undefined) {
+    if (value === this.get(key)) return this; // has no changes
+    if (!this.has(key)) {
       return IMap.new([...this._map, ituple(key, value)]);
     } else {
       return IMap.new(
@@ -120,11 +120,11 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   update(key: K, updater: (value: V) => V): IMap<K, V> {
+    if (!this.has(key)) return this;
     const curr = this.get(key);
-    if (curr === undefined) return this;
     return IMap.new(
       [...this._map].map(([k, v]) =>
-        ituple(k, Object.is(k, key) ? updater(curr) : v)
+        ituple(k, Object.is(k, key) ? updater(curr!) : v)
       )
     );
   }
@@ -146,9 +146,8 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
           result.set(action.key, action.value);
           break;
         case 'update': {
-          const curr = result.get(action.key);
-          if (curr !== undefined) {
-            result.set(action.key, action.updater(curr));
+          if (result.has(action.key)) {
+            result.set(action.key, action.updater(result.get(action.key)!));
           }
           break;
         }
