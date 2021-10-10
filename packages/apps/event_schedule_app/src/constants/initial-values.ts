@@ -2,6 +2,7 @@ import type {
   AnswerSymbol,
   DatetimeRange,
   DatetimeSpecificationEnumType,
+  EventSchedule,
   NotificationSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
@@ -58,3 +59,17 @@ export const initialNotificationSettings: NotificationSettings = IRecord.set(
 
 export const initialDatetimeSpecification: DatetimeSpecificationEnumType =
   'startSpecified';
+
+export const initialEventSchedule: EventSchedule = {
+  title: '',
+  notes: '',
+  datetimeSpecification: initialDatetimeSpecification,
+  datetimeRangeList: initialDatetimeRangeList,
+  useAnswerDeadline: false,
+  answerDeadline: initialAnswerDeadline,
+  customizeSymbolSettings: false,
+  answerSymbolList: initialAnswerSymbolList,
+  useNotification: false,
+  notificationSettings: initialNotificationSettings,
+  timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+};

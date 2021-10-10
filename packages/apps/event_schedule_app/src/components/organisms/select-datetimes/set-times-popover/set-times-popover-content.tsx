@@ -9,7 +9,8 @@ import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../../constants';
 import { timeRangeReducer } from '../../../../functions';
-import { ButtonsWrapperAlignEnd, TimeRangeView } from '../../../molecules';
+import { TimeRangeView } from '../../../molecules';
+import { ButtonsWrapperAlignEnd } from '../../../styled';
 
 type Props = Readonly<{
   initialValue: TimeRange;

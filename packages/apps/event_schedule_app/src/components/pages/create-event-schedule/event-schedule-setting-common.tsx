@@ -4,7 +4,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useEventScheduleSettingCommonHooks } from '../../../hooks';
-import { ButtonsWrapperAlignEnd, Section } from '../../molecules';
+import { Section } from '../../molecules';
 import {
   BackToAnswerPageButton,
   CreateEventResultDialog,
@@ -15,6 +15,7 @@ import {
   ResetEditButton,
   SelectDatetimes,
 } from '../../organisms';
+import { ButtonsWrapperAlignEnd } from '../../styled';
 
 const vt = texts.eventSettingsPage;
 

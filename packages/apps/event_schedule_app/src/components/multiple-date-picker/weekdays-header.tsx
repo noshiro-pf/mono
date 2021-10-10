@@ -58,12 +58,8 @@ const HeaderCell = memoNamed<PropsHeaderCell>(
   'HeaderCell',
   ({ title, abbr, onClick }) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const DatePickerWeekdayResolved = useMemo(
-      () =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        onClick === undefined ? DatePickerWeekdayReadonly : DatePickerWeekday,
-      [onClick]
-    );
+    const DatePickerWeekdayResolved =
+      onClick === undefined ? DatePickerWeekdayReadonly : DatePickerWeekday;
 
     return (
       <DatePickerWeekdayResolved role={'columnheader'} onClick={onClick}>

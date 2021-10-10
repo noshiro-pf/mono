@@ -201,3 +201,9 @@ const WeightValue = styled.span`
 const WeightTimes = styled.span`
   margin: 0 1px;
 `;
+
+// const Tr = styled.tr`
+//   &:hover {
+//     background-color: #e1e1e1;
+//   }
+// `;

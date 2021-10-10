@@ -146,11 +146,13 @@ export const useAnswerBeingEditedHooks = ({
   );
 
   const symbolHeader = useMemo<
-    readonly Readonly<{
-      iconId: AnswerSymbolIconId;
-      symbolDescription: string;
-      onClick: () => void;
-    }>[]
+    DeepReadonly<
+      {
+        iconId: AnswerSymbolIconId;
+        symbolDescription: string;
+        onClick: () => void;
+      }[]
+    >
   >(
     () =>
       eventSchedule.answerSymbolList.map((s) => ({

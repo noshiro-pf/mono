@@ -6,17 +6,14 @@ import { texts } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import { setYearMonth$ } from '../../../store';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
-import {
-  ButtonsWrapperAlignEnd,
-  Section,
-  SingleButtonWrapper,
-} from '../../molecules';
+import { Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
   AnswerBeingEdited,
   AnswerPageEventInfo,
   AnswerTable,
 } from '../../organisms';
+import { ButtonsWrapperAlignEnd, SingleButtonWrapper } from '../../styled';
 import { NotFoundPage } from '../not-found-page';
 import { AnswerPageError } from './error';
 

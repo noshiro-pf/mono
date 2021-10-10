@@ -7,7 +7,7 @@ type Props = Readonly<{
 
 export const AddElementButton = memoNamed<Props>(
   'AddElementButton',
-  (props) => <BpButton fill={true} icon='plus' onClick={props.onClick} />
+  ({ onClick }) => <BpButton fill={true} icon='plus' onClick={onClick} />
 );
 
 // const Box = styled.div`

@@ -103,7 +103,6 @@ export const SymbolSettings = memoNamed<Props>(
             />
           )
         )}
-        {/* <Description text={vt.customizeSymbolDescription} /> */}
       </Root>
     );
   }
