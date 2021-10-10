@@ -1,4 +1,3 @@
-// import { SelectSymbolPopover } from './select-symbol-popover/select-symbol-popover';
 import type {
   AnswerSymbol,
   AnswerSymbolIconId,
@@ -24,10 +23,6 @@ type Props = Readonly<{
 export const AnswerSymbolRow = memoNamed<Props>(
   'AnswerSymbolRow',
   ({ answerSymbol, onDescriptionChange, onPointChange, disabled }) => {
-    // const onIconSelect = useCallback((id: AnswerSymbolIconId) => {
-    //   clog('onIconSelect', id);
-    // }, []);
-
     const onPointChangeHandler = useCallback(
       (value: number) => {
         onPointChange(clampAndRoundAnswerSymbolPoint(value));
@@ -39,11 +34,6 @@ export const AnswerSymbolRow = memoNamed<Props>(
       <Root>
         <IconWrapper>
           <CustomIcon iconName={answerSymbol.iconId} />
-          {/* <SelectSymbolPopover
-            openerIcon={icon}
-            iconsInUse={iconsInUse}
-            onIconSelectSubmit={onIconSelect}
-          /> */}
         </IconWrapper>
         <DescriptionWrapper>
           <BpInput
@@ -64,9 +54,6 @@ export const AnswerSymbolRow = memoNamed<Props>(
             onValueChange={onPointChangeHandler}
           />
         </NumericInputWrapper>
-        {/* <ButtonsWrapper>
-          <BpButton icon={'trash'} minimal={true} onClick={onDeleteClick} />
-        </ButtonsWrapper> */}
       </Root>
     );
   }
