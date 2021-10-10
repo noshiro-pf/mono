@@ -45,6 +45,7 @@ type AnswerBeingEditedHooks = DeepReadonly<{
   onWeightChange: (v: Weight) => void;
   toggleRequiredSection: () => void;
   toggleWeightSection: () => void;
+  hasUnanswered: boolean;
 }>;
 
 const theNameIsAlreadyUsedFn = (
@@ -54,7 +55,7 @@ const theNameIsAlreadyUsedFn = (
 ): boolean =>
   userName === nameToOmit
     ? false
-    : answers.find((a) => a.userName === userName) !== undefined;
+    : answers.some((a) => a.userName === userName);
 
 // フォームの入力値のstateは onAnswerBeingEditedUpdate で変更しこのhooks内にはstateを持たない
 export const useAnswerBeingEditedHooks = ({
@@ -115,13 +116,18 @@ export const useAnswerBeingEditedHooks = ({
   >(
     () =>
       IMapMapped.new(
-        IList.map(answerBeingEdited.selection, (s) =>
-          ituple(s.datetimeRange, s.iconId)
+        IList.concat(
+          IList.map(eventSchedule.datetimeRangeList, (d) =>
+            ituple(d, undefined)
+          ),
+          IList.map(answerBeingEdited.selection, (s) =>
+            ituple(s.datetimeRange, s.iconId)
+          )
         ),
         datetimeRangeToMapKey,
         datetimeRangeFromMapKey
       ),
-    [answerBeingEdited.selection]
+    [answerBeingEdited.selection, eventSchedule.datetimeRangeList]
   );
 
   const dispatch = useCallback(
@@ -225,6 +231,11 @@ export const useAnswerBeingEditedHooks = ({
     );
   }, [updateAnswerBeingEdited]);
 
+  const hasUnanswered = useMemo<boolean>(
+    () => answerBeingEditedList.some((a) => a.selectedSymbol === undefined),
+    [answerBeingEditedList]
+  );
+
   return {
     showUserNameError,
     theNameIsAlreadyUsed,
@@ -236,5 +247,6 @@ export const useAnswerBeingEditedHooks = ({
     onWeightChange,
     toggleRequiredSection,
     toggleWeightSection,
+    hasUnanswered,
   };
 };

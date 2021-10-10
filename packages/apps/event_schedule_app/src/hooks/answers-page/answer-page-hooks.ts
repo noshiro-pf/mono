@@ -8,19 +8,14 @@ import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useAlive } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
-import { IMapMapped, IRecord } from '@noshiro/ts-utils';
+import type { IMapMapped } from '@noshiro/ts-utils';
+import { IRecord } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api';
 import { routes, texts } from '../../constants';
 import type { YmdKey } from '../../functions';
-import {
-  createToaster,
-  datetimeRangeFromMapKey,
-  datetimeRangeToMapKey,
-  now,
-  showToast,
-} from '../../functions';
+import { createToaster, now, showToast } from '../../functions';
 import {
   answers$,
   errorType$,
@@ -142,10 +137,22 @@ export const useAnswerPageState = (): AnswerPageState => {
     if (eventId === undefined) return;
     if (!alive.current) return;
     setSubmitButtonIsLoading(true);
+    const answerBeingEditedWithoutUndefinedSelection = IRecord.update(
+      answerBeingEdited,
+      'selection',
+      (selection) => selection.filter((s) => s.iconId !== undefined)
+    );
     switch (answerBeingEditedSectionState) {
       case 'creating':
         await api.answers
-          .add(eventId, IRecord.set(answerBeingEdited, 'createdAt', Date.now()))
+          .add(
+            eventId,
+            IRecord.set(
+              answerBeingEditedWithoutUndefinedSelection,
+              'createdAt',
+              Date.now()
+            )
+          )
           .then(() => {
             if (!alive.current) return;
             setSubmitButtonIsLoading(false);
@@ -164,7 +171,11 @@ export const useAnswerPageState = (): AnswerPageState => {
         break;
       case 'editing':
         await api.answers
-          .update(eventId, answerBeingEdited.id, answerBeingEdited)
+          .update(
+            eventId,
+            answerBeingEdited.id,
+            answerBeingEditedWithoutUndefinedSelection
+          )
           .then(() => {
             if (!alive.current) return;
             setSubmitButtonIsLoading(false);
@@ -226,28 +237,12 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   /* values */
 
-  const submitButtonIsDisabled = useMemo<boolean>(() => {
-    if (eventSchedule === undefined) return true;
-
-    const answerBeingEditedAsMap = IMapMapped.new(
-      answerBeingEdited.selection.map(({ datetimeRange, iconId }) => [
-        datetimeRange,
-        iconId,
-      ]),
-      datetimeRangeToMapKey,
-      datetimeRangeFromMapKey
-    );
-
-    const hasEmptyElement =
+  const submitButtonIsDisabled = useMemo<boolean>(
+    () =>
       answerBeingEdited.userName === '' ||
-      eventSchedule.datetimeRangeList.some(
-        (d) => answerBeingEditedAsMap.get(d) === undefined
-      );
-
-    const noDiff = deepEqual(selectedAnswer, answerBeingEdited);
-
-    return hasEmptyElement || noDiff;
-  }, [answerBeingEdited, selectedAnswer, eventSchedule]);
+      deepEqual(selectedAnswer, answerBeingEdited),
+    [answerBeingEdited, selectedAnswer]
+  );
 
   const errorType = useStreamValue(errorType$);
   const answers = useStreamValue(answers$);

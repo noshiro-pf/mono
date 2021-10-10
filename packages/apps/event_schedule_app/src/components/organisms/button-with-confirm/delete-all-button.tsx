@@ -2,21 +2,21 @@ import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
-const vt = texts.eventSettingsPage.section2;
-
 type Props = Readonly<{
   onConfirmDeleteAll: () => void;
 }>;
 
+const vt = texts.eventSettingsPage.section2;
+
 const buttonConfig = {
   name: vt.removeAllDates,
-  intent: 'danger',
   icon: 'trash',
+  intent: 'danger',
 } as const;
 
 const dialogConfig = {
-  intent: 'danger',
   icon: 'trash',
+  intent: 'danger',
   message: vt.removeAllConfirmation,
   cancelButtonText: texts.buttonText.cancel,
   confirmButtonText: texts.buttonText.delete,
@@ -27,11 +27,14 @@ const toastConfig = {
   intent: 'none',
 } as const;
 
-export const DeleteAllButton = memoNamed<Props>('DeleteAllButton', (props) => (
-  <ButtonWithConfirm
-    buttonConfig={buttonConfig}
-    dialogConfig={dialogConfig}
-    toastConfig={toastConfig}
-    onConfirmClick={props.onConfirmDeleteAll}
-  />
-));
+export const DeleteAllButton = memoNamed<Props>(
+  'DeleteAllButton',
+  ({ onConfirmDeleteAll }) => (
+    <ButtonWithConfirm
+      buttonConfig={buttonConfig}
+      dialogConfig={dialogConfig}
+      toastConfig={toastConfig}
+      onConfirmClick={onConfirmDeleteAll}
+    />
+  )
+);

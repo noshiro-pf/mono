@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants';
-import { ButtonWithConfirm } from '../button-with-confirm';
+import { ButtonWithConfirm } from './button-with-confirm';
 
 type Props = Readonly<{
   onConfirmDeleteAnswer: () => Promise<void>;
