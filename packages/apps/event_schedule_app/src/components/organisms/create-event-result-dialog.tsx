@@ -3,7 +3,7 @@ import { BpButton, BpDialog } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../constants';
-import { ButtonsWrapperAlignEnd } from '../molecules';
+import { ButtonsWrapperAlignEnd } from '../styled';
 
 const vt = texts.createEventResultDialog;
 

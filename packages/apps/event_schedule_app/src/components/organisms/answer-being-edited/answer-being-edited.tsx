@@ -14,8 +14,10 @@ import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useAnswerBeingEditedHooks } from '../../../hooks';
 import { CustomIcon, Td, Th } from '../../atoms';
-import { ButtonsWrapperAlignEnd } from '../../molecules';
-import { WidthRestrictedInputWrapper } from '../../styled';
+import {
+  ButtonsWrapperAlignEnd,
+  WidthRestrictedInputWrapper,
+} from '../../styled';
 import { DatetimeRangeCell } from '../answer-table';
 import { ParagraphWithSwitch } from '../paragraph-with-switch';
 import { DeleteAnswerButton } from './delete-answer-button';

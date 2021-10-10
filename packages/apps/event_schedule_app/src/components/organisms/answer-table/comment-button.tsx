@@ -3,7 +3,7 @@ import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import { ButtonsWrapperAlignEnd } from '../../molecules';
+import { ButtonsWrapperAlignEnd } from '../../styled';
 
 type Props = Readonly<{
   comment: string;

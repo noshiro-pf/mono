@@ -8,8 +8,10 @@ import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import { ButtonsWrapperAlignEnd } from '../../molecules';
-import { WidthRestrictedInputWrapper } from '../../styled';
+import {
+  ButtonsWrapperAlignEnd,
+  WidthRestrictedInputWrapper,
+} from '../../styled';
 
 const vt = texts.answerPage.eventInfo.verifyEmailDialog;
 
