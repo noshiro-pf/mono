@@ -187,6 +187,8 @@ export const texts = {
       submitButton: {
         create: '回答を追加する',
         update: '回答を更新する',
+        confirmPartiallyUnanswered:
+          '未回答の日程がありますが、このまま提出してもよろしいですか？（後からの回答追加は可能です）',
         createAnswerResultMessage: '追加しました。',
         updateAnswerResultMessage: '更新しました。',
       },

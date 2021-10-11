@@ -30,8 +30,12 @@ export const answerSelectionReducer: ReducerType<
 > = (state, action) => {
   switch (action.type) {
     case 'cell':
-      return state.set(action.datetimeRange, action.icon);
+      return state.update(action.datetimeRange, (prevIcon) =>
+        prevIcon === action.icon ? undefined : action.icon
+      );
     case 'header':
-      return state.map(() => action.icon);
+      return state.every((icon) => icon === action.icon)
+        ? state.map<AnswerSymbolIconId | undefined>(() => undefined)
+        : state.map<AnswerSymbolIconId | undefined>(() => action.icon);
   }
 };

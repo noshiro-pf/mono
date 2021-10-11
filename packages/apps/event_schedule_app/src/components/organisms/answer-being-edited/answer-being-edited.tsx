@@ -19,8 +19,11 @@ import {
   WidthRestrictedInputWrapper,
 } from '../../styled';
 import { DatetimeRangeCell } from '../answer-table';
+import {
+  DeleteAnswerButton,
+  SubmitAnswerButtonWithConfirmation,
+} from '../button-with-confirm';
 import { ParagraphWithSwitch } from '../paragraph-with-switch';
-import { DeleteAnswerButton } from './delete-answer-button';
 import { WeightSetting } from './weight-setting';
 
 type Props = Readonly<{
@@ -31,7 +34,7 @@ type Props = Readonly<{
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
   onSubmitAnswer: () => Promise<void>;
-  answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden';
+  answerBeingEditedSectionState: 'creating' | 'editing';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
   selectedAnswerUserName: UserName | undefined;
@@ -65,6 +68,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
       onWeightChange,
       toggleRequiredSection,
       toggleWeightSection,
+      hasUnanswered,
     } = useAnswerBeingEditedHooks({
       eventSchedule,
       answers,
@@ -204,20 +208,12 @@ export const AnswerBeingEdited = memoNamed<Props>(
               onConfirmDeleteAnswer={onDeleteAnswer}
             />
           ) : undefined}
-          <BpButton
+          <SubmitAnswerButtonWithConfirmation
             disabled={submitButtonIsDisabled}
-            icon='tick'
-            intent='primary'
+            hasUnanswered={hasUnanswered}
             loading={submitButtonIsLoading}
-            nowrap={true}
-            text={
-              answerBeingEditedSectionState === 'creating'
-                ? vt.submitButton.create
-                : answerBeingEditedSectionState === 'editing'
-                ? vt.submitButton.update
-                : ''
-            }
-            onClick={onSubmitAnswer}
+            mode={answerBeingEditedSectionState}
+            onConfirmSubmissionOfAnswer={onSubmitAnswer}
           />
         </ButtonsWrapperAlignEnd>
       </>
