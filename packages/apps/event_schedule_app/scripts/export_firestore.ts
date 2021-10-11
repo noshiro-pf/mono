@@ -1,3 +1,4 @@
+import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import * as admin from 'firebase-admin';
 import serviceAccount from './service-account-key.json';
 
@@ -7,8 +8,8 @@ const app = admin.initializeApp({
 });
 
 const db = app.firestore();
-const collectionName = 'events';
-const subCollectionName = 'answers';
+const collectionName = firestorePaths.events;
+const subCollectionName = firestorePaths.answers;
 
 const printAllEvents = async (): Promise<boolean> => {
   const eventsSnapshot = await db.collection(collectionName).get();

@@ -1,0 +1,167 @@
+{
+  "2epnfPzEPZI5Xfobg9Yb": [
+    {
+      "userName": "のしろ",
+      "comment": "",
+      "isRequiredParticipants": true,
+      "selection": [
+        {
+          "datetimeRange": {
+            "ymd": { "date": 9, "month": 3, "year": 2021 },
+            "timeRange": {
+              "end": { "hours": 0, "minutes": 0 },
+              "start": { "minutes": 0, "hours": 0 }
+            }
+          },
+          "iconId": "handmade-circle"
+        },
+        {
+          "iconId": "handmade-triangle",
+          "datetimeRange": {
+            "ymd": { "month": 3, "year": 2021, "date": 12 },
+            "timeRange": {
+              "end": { "hours": 0, "minutes": 0 },
+              "start": { "hours": 0, "minutes": 0 }
+            }
+          }
+        },
+        {
+          "iconId": "handmade-cross",
+          "datetimeRange": {
+            "timeRange": {
+              "start": { "hours": 0, "minutes": 0 },
+              "end": { "hours": 0, "minutes": 0 }
+            },
+            "ymd": { "date": 17, "year": 2021, "month": 3 }
+          }
+        }
+      ],
+      "createdAt": 1633619187780,
+      "useWeight": false,
+      "weight": 1,
+      "id": "9wsXMDdRzjUZlBb7yXf0"
+    },
+    {
+      "userName": "Carol",
+      "id": "SLuMolYBthCjcHCnvW24",
+      "comment": "",
+      "createdAt": 1624732632134,
+      "useWeight": true,
+      "weight": 0.6,
+      "selection": [
+        {
+          "datetimeRange": {
+            "timeRange": {
+              "end": { "minutes": 0, "hours": 0 },
+              "start": { "hours": 0, "minutes": 0 }
+            },
+            "ymd": { "month": 3, "date": 9, "year": 2021 }
+          },
+          "iconId": "handmade-triangle"
+        },
+        {
+          "iconId": "handmade-circle",
+          "datetimeRange": {
+            "timeRange": {
+              "start": { "hours": 0, "minutes": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            },
+            "ymd": { "date": 12, "year": 2021, "month": 3 }
+          }
+        },
+        {
+          "datetimeRange": {
+            "ymd": { "month": 3, "year": 2021, "date": 17 },
+            "timeRange": {
+              "end": { "minutes": 0, "hours": 0 },
+              "start": { "minutes": 0, "hours": 0 }
+            }
+          },
+          "iconId": "handmade-cross"
+        }
+      ]
+    },
+    {
+      "id": "YWTREKVx4Wf4owicQBoc",
+      "comment": "",
+      "userName": "Bob",
+      "useWeight": false,
+      "createdAt": 1615363320667,
+      "isRequiredParticipants": false,
+      "weight": 1,
+      "selection": [
+        {
+          "iconId": "handmade-triangle",
+          "datetimeRange": {
+            "timeRange": {
+              "end": { "hours": 0, "minutes": 0 },
+              "start": { "minutes": 0, "hours": 0 }
+            },
+            "ymd": { "date": 9, "year": 2021, "month": 3 }
+          }
+        },
+        {
+          "datetimeRange": {
+            "ymd": { "month": 3, "year": 2021, "date": 12 },
+            "timeRange": {
+              "start": { "minutes": 0, "hours": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            }
+          },
+          "iconId": "handmade-circle"
+        },
+        {
+          "datetimeRange": {
+            "ymd": { "year": 2021, "date": 17, "month": 3 },
+            "timeRange": {
+              "start": { "minutes": 0, "hours": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            }
+          },
+          "iconId": "handmade-circle"
+        }
+      ]
+    },
+    {
+      "id": "brTRiK8cUgFtmGcBJW5q",
+      "comment": "",
+      "createdAt": 1615279702147,
+      "userName": "Alice",
+      "weight": 1,
+      "selection": [
+        {
+          "datetimeRange": {
+            "ymd": { "year": 2021, "date": 9, "month": 3 },
+            "timeRange": {
+              "start": { "hours": 0, "minutes": 0 },
+              "end": { "hours": 0, "minutes": 0 }
+            }
+          },
+          "iconId": "handmade-circle"
+        },
+        {
+          "iconId": "handmade-circle",
+          "datetimeRange": {
+            "timeRange": {
+              "start": { "minutes": 0, "hours": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            },
+            "ymd": { "month": 3, "date": 12, "year": 2021 }
+          }
+        },
+        {
+          "iconId": "handmade-triangle",
+          "datetimeRange": {
+            "timeRange": {
+              "end": { "hours": 0, "minutes": 0 },
+              "start": { "hours": 0, "minutes": 0 }
+            },
+            "ymd": { "date": 17, "month": 3, "year": 2021 }
+          }
+        }
+      ],
+      "isRequiredParticipants": false,
+      "useWeight": false
+    }
+  ]
+}
