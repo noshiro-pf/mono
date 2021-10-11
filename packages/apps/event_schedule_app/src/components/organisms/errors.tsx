@@ -12,42 +12,42 @@ type Props = Readonly<{
 
 export const EventSchedulePropertiesErrors = memoNamed<Props>(
   'EventSchedulePropertiesErrors',
-  (props) => (
+  ({ eventScheduleValidation }) => (
     <ErrorMessagesWrapper>
-      {props.eventScheduleValidation.title ? undefined : (
+      {eventScheduleValidation.title ? undefined : (
         <Description
           color={errorFontColor}
           text={vt.errorMessages.titleIsEmpty}
         />
       )}
-      {props.eventScheduleValidation.datetimeRangeList ? undefined : (
+      {eventScheduleValidation.datetimeRangeList ? undefined : (
         <Description
           color={errorFontColor}
           text={vt.errorMessages.datetimeIsEmpty}
         />
       )}
-      {props.eventScheduleValidation.answerDeadline ? undefined : (
+      {eventScheduleValidation.answerDeadline ? undefined : (
         <Description
           color={errorFontColor}
           text={vt.errorMessages.answerDeadlineIsEnabledButEmpty}
         />
       )}
-      {props.eventScheduleValidation.answerSymbolList ? undefined : (
-        <Description
-          color={errorFontColor}
-          text={vt.errorMessages.atLeastTwoSymbolsRequired}
-        />
-      )}
-      {props.eventScheduleValidation.notificationEmail ? undefined : (
+      {eventScheduleValidation.notificationEmail ? undefined : (
         <Description
           color={errorFontColor}
           text={vt.errorMessages.invalidEmail}
         />
       )}
-      {props.eventScheduleValidation.notificationItems ? undefined : (
+      {eventScheduleValidation.notificationItems ? undefined : (
         <Description
           color={errorFontColor}
           text={vt.errorMessages.atLeastOneNotificationCheckRequired}
+        />
+      )}
+      {eventScheduleValidation.answerSymbols ? undefined : (
+        <Description
+          color={errorFontColor}
+          text={vt.errorMessages.answerSymbols}
         />
       )}
     </ErrorMessagesWrapper>

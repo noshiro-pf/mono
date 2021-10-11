@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "private": true,
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
@@ -16,6 +16,8 @@
     "deploy": "firebase deploy",
     "deploy:nobuild": "firebase deploy",
     "deploy:functions": "firebase deploy --only functions",
+    "predeploy:hosting": "yarn build",
+    "deploy:hosting": "firebase deploy --only hosting",
     "fb": "firebase",
     "fb:init": "firebase init",
     "fb:login": "firebase login",

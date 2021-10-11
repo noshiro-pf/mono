@@ -1,9 +1,10 @@
 import type {
   Answer,
-  AnswerSymbolIconId,
+  AnswerSymbolIdWithNone,
+  AnswerSymbolPoint,
   AnswerTableCellPosition,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped } from '@noshiro/ts-utils';
+import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
 import type { AnswerSelectionMapKey } from '../map-key';
 import { answerSelectionFromMapKey, answerSelectionToMapKey } from '../map-key';
 
@@ -11,7 +12,7 @@ export const createAnswerSelectionMapFromAnswers = (
   answers: readonly Answer[]
 ): IMapMapped<
   AnswerTableCellPosition,
-  AnswerSymbolIconId | undefined,
+  readonly [AnswerSymbolIdWithNone, AnswerSymbolPoint],
   AnswerSelectionMapKey
 > =>
   IMapMapped.new(
@@ -21,7 +22,7 @@ export const createAnswerSelectionMapFromAnswers = (
           datetimeRange: s.datetimeRange,
           answerId: id,
         },
-        s.iconId,
+        ituple(s.iconId, s.point),
       ])
     ),
     answerSelectionToMapKey,

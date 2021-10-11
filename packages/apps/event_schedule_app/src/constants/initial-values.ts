@@ -1,9 +1,9 @@
 import type {
-  AnswerSymbol,
   DatetimeRange,
   DatetimeSpecificationEnumType,
   EventSchedule,
   NotificationSettings,
+  SymbolSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import {
@@ -25,23 +25,27 @@ import { texts } from './texts';
 
 export const initialDatetimeRangeList: readonly DatetimeRange[] = [];
 
-export const initialAnswerSymbolList: readonly AnswerSymbol[] = [
-  {
-    iconId: 'handmade-circle',
+export const defaultSymbolPoint = {
+  good: 10,
+  fair: 6,
+  poor: 0,
+  none: 0,
+} as const;
+
+export const initialAnswerSymbols: SymbolSettings = {
+  good: {
     description: texts.symbolDescriptionDefault.circle,
-    point: 10,
+    point: defaultSymbolPoint.good,
   },
-  {
-    iconId: 'handmade-triangle',
+  fair: {
     description: texts.symbolDescriptionDefault.triangleUp,
-    point: 6,
+    point: defaultSymbolPoint.fair,
   },
-  {
-    iconId: 'handmade-cross',
+  poor: {
     description: texts.symbolDescriptionDefault.cross,
-    point: 0,
+    point: defaultSymbolPoint.poor,
   },
-] as const;
+} as const;
 
 export const initialAnswerDeadline: Ymdhm = pipe(today())
   .chain((d) =>
@@ -67,8 +71,7 @@ export const initialEventSchedule: EventSchedule = {
   datetimeRangeList: initialDatetimeRangeList,
   useAnswerDeadline: false,
   answerDeadline: initialAnswerDeadline,
-  customizeSymbolSettings: false,
-  answerSymbolList: initialAnswerSymbolList,
+  answerSymbols: initialAnswerSymbols,
   useNotification: false,
   notificationSettings: initialNotificationSettings,
   timezoneOffsetMinutes: new Date().getTimezoneOffset(),

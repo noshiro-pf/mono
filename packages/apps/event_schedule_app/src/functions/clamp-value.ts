@@ -1,4 +1,8 @@
-import type { AnswerSymbolPointEnumType } from '@noshiro/event-schedule-app-shared';
+import type {
+  AnswerSymbolPoint,
+  Weight,
+} from '@noshiro/event-schedule-app-shared';
+import { createWeight } from '@noshiro/event-schedule-app-shared';
 import {
   answerSymbolPointConfig,
   weightNumericInputConfig,
@@ -6,21 +10,27 @@ import {
 
 const cfg1 = answerSymbolPointConfig;
 
-export const clampAndRoundAnswerSymbolPoint = (
+export const clampAndRoundAnswerFairSymbolPoint = (
   x: number
-): AnswerSymbolPointEnumType =>
-  x < cfg1.min
-    ? cfg1.min
-    : cfg1.max < x
-    ? cfg1.max
+): AnswerSymbolPoint =>
+  !Number.isFinite(x)
+    ? 0
+    : x < cfg1.fair.min
+    ? cfg1.fair.min
+    : cfg1.fair.max < x
+    ? cfg1.fair.max
     : ((Math.round(x * 10 ** cfg1.digit) /
-        10 ** cfg1.digit) as AnswerSymbolPointEnumType);
+        10 ** cfg1.digit) as AnswerSymbolPoint);
 
 const cfg2 = weightNumericInputConfig;
 
-export const clampAndRoundAnswerWeight = (x: number): number =>
-  x < cfg2.min
-    ? cfg2.min
-    : cfg2.max < x
-    ? cfg2.max
-    : Math.round(x * 10 ** cfg2.digit) / 10 ** cfg2.digit;
+export const clampAndRoundAnswerWeight = (x: number): Weight =>
+  createWeight(
+    !Number.isFinite(x)
+      ? 1
+      : x < cfg2.min
+      ? cfg2.min
+      : cfg2.max < x
+      ? cfg2.max
+      : Math.round(x * 10 ** cfg2.digit) / 10 ** cfg2.digit
+  );

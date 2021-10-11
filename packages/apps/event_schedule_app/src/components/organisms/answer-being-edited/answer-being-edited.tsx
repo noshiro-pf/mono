@@ -1,4 +1,4 @@
-import { FormGroup, HTMLTable } from '@blueprintjs/core';
+import { FormGroup } from '@blueprintjs/core';
 import type {
   Answer,
   EventSchedule,
@@ -10,10 +10,17 @@ import {
   BpTextArea,
 } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import { match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useAnswerBeingEditedHooks } from '../../../hooks';
-import { CustomIcon, Td, Th } from '../../atoms';
+import { CustomIcon } from '../../atoms';
+import { BpTableBordered } from '../../bp';
+import {
+  AnswerSymbolFairPointInput,
+  AnswerSymbolGoodPointInputDisabled,
+  AnswerSymbolPoorPointInputDisabled,
+} from '../../molecules';
 import {
   ButtonsWrapperAlignEnd,
   WidthRestrictedInputWrapper,
@@ -103,57 +110,118 @@ export const AnswerBeingEdited = memoNamed<Props>(
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
-        <HTMLTable bordered={true}>
-          <thead>
-            <tr>
-              <Th />
-              {symbolHeader.map((s) => (
-                <Th key={s.iconId}>
+        <TableWrapper>
+          <Table>
+            <thead>
+              <tr>
+                <th />
+                <th>
                   <BpButton
-                    icon={<CustomIcon iconName={s.iconId} />}
+                    icon={<CustomIcon iconName={'good'} />}
                     minimal={true}
-                    title={s.symbolDescription}
-                    onClick={s.onClick}
+                    title={symbolHeader.good.symbolDescription}
+                    onClick={symbolHeader.good.onClick}
                   />
-                </Th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {answerBeingEditedList.map(
-              ({ key, datetimeRange, selectedSymbol, buttons }) => (
-                <tr key={key}>
-                  <Td>
-                    <DatetimeRangeCell
-                      datetimeRange={datetimeRange}
-                      datetimeSpecification={
-                        eventSchedule.datetimeSpecification
-                      }
-                    />
-                  </Td>
-                  {buttons.map((s) => (
-                    <Td key={s.iconId} style={style}>
+                </th>
+                <th>
+                  <BpButton
+                    icon={<CustomIcon iconName={'fair'} />}
+                    minimal={true}
+                    title={symbolHeader.fair.symbolDescription}
+                    onClick={symbolHeader.fair.onClick}
+                  />
+                </th>
+                <th>
+                  <BpButton
+                    icon={<CustomIcon iconName={'poor'} />}
+                    minimal={true}
+                    title={symbolHeader.poor.symbolDescription}
+                    onClick={symbolHeader.poor.onClick}
+                  />
+                </th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {answerBeingEditedList.map(
+                ({
+                  key,
+                  datetimeRange,
+                  answerSelectionValue: { point, iconId },
+                  buttons,
+                  onPointChange,
+                }) => (
+                  <tr key={key}>
+                    <td>
+                      <DatetimeRangeCell
+                        datetimeRange={datetimeRange}
+                        datetimeSpecification={
+                          eventSchedule.datetimeSpecification
+                        }
+                      />
+                    </td>
+                    <td>
                       <BpButton
-                        active={s.iconId === selectedSymbol}
+                        active={iconId === 'good'}
                         icon={
                           <CustomIcon
-                            color={
-                              s.iconId === selectedSymbol ? 'blue' : 'gray'
-                            }
-                            iconName={s.iconId}
+                            color={iconId === 'good' ? 'blue' : 'gray'}
+                            iconName={'good'}
                           />
                         }
                         minimal={true}
-                        title={s.symbolDescription}
-                        onClick={s.onClick}
+                        title={buttons.good.description}
+                        onClick={buttons.good.onClick}
                       />
-                    </Td>
-                  ))}
-                </tr>
-              )
-            )}
-          </tbody>
-        </HTMLTable>
+                    </td>
+                    <td>
+                      <BpButton
+                        active={iconId === 'fair'}
+                        icon={
+                          <CustomIcon
+                            color={iconId === 'fair' ? 'blue' : 'gray'}
+                            iconName={'fair'}
+                          />
+                        }
+                        minimal={true}
+                        title={buttons.fair.description}
+                        onClick={buttons.fair.onClick}
+                      />
+                    </td>
+                    <td>
+                      <BpButton
+                        active={iconId === 'poor'}
+                        icon={
+                          <CustomIcon
+                            color={iconId === 'poor' ? 'blue' : 'gray'}
+                            iconName={'poor'}
+                          />
+                        }
+                        minimal={true}
+                        title={buttons.poor.description}
+                        onClick={buttons.poor.onClick}
+                      />
+                    </td>
+                    <TdWithMaxWidth>
+                      {match(iconId, {
+                        none: undefined,
+                        good: <AnswerSymbolGoodPointInputDisabled />,
+                        poor: <AnswerSymbolPoorPointInputDisabled />,
+                        fair: (
+                          <AnswerSymbolFairPointInput
+                            disabled={false}
+                            value={point}
+                            onValueChange={onPointChange}
+                          />
+                        ),
+                      })}
+                    </TdWithMaxWidth>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </Table>
+        </TableWrapper>
         <WidthRestrictedInputWrapper>
           <FormGroup label={vt.comments}>
             <BpTextArea
@@ -221,9 +289,21 @@ export const AnswerBeingEdited = memoNamed<Props>(
   }
 );
 
-const style = {
-  padding: '6px',
-};
+const TableWrapper = styled.div`
+  overflow-x: auto;
+`;
+
+const Table = styled(BpTableBordered)`
+  th,
+  td {
+    padding: 6px;
+  }
+`;
+
+const TdWithMaxWidth = styled.td`
+  min-width: 87px;
+  max-width: 87px;
+`;
 
 const Spacer = styled.div`
   height: 1rem;

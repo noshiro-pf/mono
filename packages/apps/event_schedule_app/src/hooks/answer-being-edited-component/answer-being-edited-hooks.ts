@@ -1,13 +1,14 @@
 import type {
   Answer,
-  AnswerSymbolIconId,
+  AnswerSymbolId,
+  AnswerSymbolPoint,
   DatetimeRange,
   EventSchedule,
   UserName,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
 import { createWeight } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped, IRecord, ituple, pipe } from '@noshiro/ts-utils';
+import { IList, IMapMapped, IRecord, pipe } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type {
   AnswerSelectionReducerAction,
@@ -19,6 +20,7 @@ import {
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
 } from '../../functions';
+import type { AnswerSelectionValue } from '../../types';
 import { useFormError } from '../use-form-error-hook';
 
 type AnswerBeingEditedHooks = DeepReadonly<{
@@ -27,20 +29,25 @@ type AnswerBeingEditedHooks = DeepReadonly<{
   onUserNameBlur: () => void;
   onUserNameChange: (v: UserName) => void;
   onCommentChange: (v: string) => void;
-  symbolHeader: {
-    iconId: AnswerSymbolIconId;
-    symbolDescription: string;
-    onClick: () => void;
-  }[];
+  symbolHeader: Record<
+    AnswerSymbolId,
+    {
+      symbolDescription: string;
+      onClick: () => void;
+    }
+  >;
   answerBeingEditedList: {
     key: string;
     datetimeRange: DatetimeRange;
-    selectedSymbol: AnswerSymbolIconId | undefined;
-    buttons: {
-      iconId: AnswerSymbolIconId;
-      symbolDescription: string;
-      onClick: () => void;
-    }[];
+    answerSelectionValue: AnswerSelectionValue;
+    buttons: Record<
+      AnswerSymbolId,
+      {
+        description: string;
+        onClick: () => void;
+      }
+    >;
+    onPointChange: (point: AnswerSymbolPoint) => void;
   }[];
   onWeightChange: (v: Weight) => void;
   toggleRequiredSection: () => void;
@@ -108,27 +115,23 @@ export const useAnswerBeingEditedHooks = ({
   );
 
   const answerSelectionMap = useMemo<
-    IMapMapped<
+    IMapMapped<DatetimeRange, AnswerSelectionValue, DatetimeRangeMapKey>
+  >(() => {
+    const entries: DeepReadonly<[DatetimeRange, AnswerSelectionValue][]> =
+      IList.concat(
+        eventSchedule.datetimeRangeList.map((d) => [
+          d,
+          { iconId: 'none', point: 0 } as const,
+        ]),
+        answerBeingEdited.selection.map((s) => [s.datetimeRange, s])
+      );
+
+    return IMapMapped.new<
       DatetimeRange,
-      AnswerSymbolIconId | undefined,
+      AnswerSelectionValue,
       DatetimeRangeMapKey
-    >
-  >(
-    () =>
-      IMapMapped.new(
-        IList.concat(
-          IList.map(eventSchedule.datetimeRangeList, (d) =>
-            ituple(d, undefined)
-          ),
-          IList.map(answerBeingEdited.selection, (s) =>
-            ituple(s.datetimeRange, s.iconId)
-          )
-        ),
-        datetimeRangeToMapKey,
-        datetimeRangeFromMapKey
-      ),
-    [answerBeingEdited.selection, eventSchedule.datetimeRangeList]
-  );
+    >(entries, datetimeRangeToMapKey, datetimeRangeFromMapKey);
+  }, [answerBeingEdited.selection, eventSchedule.datetimeRangeList]);
 
   const dispatch = useCallback(
     (action: AnswerSelectionReducerAction) => {
@@ -140,10 +143,7 @@ export const useAnswerBeingEditedHooks = ({
         answerBeingEdited,
         'selection',
         nextAnswerSelectionMap
-          .map((s, d) => ({
-            datetimeRange: d,
-            iconId: s,
-          }))
+          .map((s, d) => ({ datetimeRange: d, ...s }))
           .toValuesArray()
       );
       updateAnswerBeingEdited(() => next);
@@ -153,25 +153,47 @@ export const useAnswerBeingEditedHooks = ({
 
   const symbolHeader = useMemo<
     DeepReadonly<
-      {
-        iconId: AnswerSymbolIconId;
-        symbolDescription: string;
-        onClick: () => void;
-      }[]
+      Record<
+        AnswerSymbolId,
+        {
+          symbolDescription: string;
+          onClick: () => void;
+        }
+      >
     >
   >(
-    () =>
-      eventSchedule.answerSymbolList.map((s) => ({
-        iconId: s.iconId,
-        symbolDescription: s.description,
+    () => ({
+      good: {
+        symbolDescription: eventSchedule.answerSymbols.good.description,
         onClick: () => {
           dispatch({
             type: 'header',
-            icon: s.iconId,
+            icon: 'good',
             datetimeRangeList: eventSchedule.datetimeRangeList,
           });
         },
-      })),
+      },
+      fair: {
+        symbolDescription: eventSchedule.answerSymbols.fair.description,
+        onClick: () => {
+          dispatch({
+            type: 'header',
+            icon: 'fair',
+            datetimeRangeList: eventSchedule.datetimeRangeList,
+          });
+        },
+      },
+      poor: {
+        symbolDescription: eventSchedule.answerSymbols.poor.description,
+        onClick: () => {
+          dispatch({
+            type: 'header',
+            icon: 'poor',
+            datetimeRangeList: eventSchedule.datetimeRangeList,
+          });
+        },
+      },
+    }),
     [eventSchedule, dispatch]
   );
 
@@ -180,28 +202,65 @@ export const useAnswerBeingEditedHooks = ({
       {
         key: string;
         datetimeRange: DatetimeRange;
-        selectedSymbol: AnswerSymbolIconId | undefined;
-        buttons: readonly {
-          iconId: AnswerSymbolIconId;
-          symbolDescription: string;
-          onClick: () => void;
-        }[];
+        answerSelectionValue: AnswerSelectionValue;
+        buttons: Record<
+          AnswerSymbolId,
+          {
+            description: string;
+            onClick: () => void;
+          }
+        >;
+        onPointChange: (point: AnswerSymbolPoint) => void;
       }[]
     >
   >(
     () =>
-      eventSchedule.datetimeRangeList.map((d) => ({
-        key: datetimeRange2str(d),
-        datetimeRange: d,
-        selectedSymbol: answerSelectionMap.get(d),
-        buttons: eventSchedule.answerSymbolList.map((s) => ({
-          iconId: s.iconId,
-          symbolDescription: s.description,
-          onClick: () => {
-            dispatch({ type: 'cell', datetimeRange: d, icon: s.iconId });
-          },
-        })),
-      })),
+      eventSchedule.datetimeRangeList.map(
+        (d) =>
+          ({
+            key: datetimeRange2str(d),
+            datetimeRange: d,
+            answerSelectionValue: answerSelectionMap.get(d) ?? {
+              iconId: 'none',
+              point: 0,
+            },
+            buttons: {
+              good: {
+                description: eventSchedule.answerSymbols.good.description,
+                onClick: () => {
+                  dispatch({
+                    type: 'cell-icon',
+                    datetimeRange: d,
+                    icon: 'good',
+                  });
+                },
+              },
+              fair: {
+                description: eventSchedule.answerSymbols.fair.description,
+                onClick: () => {
+                  dispatch({
+                    type: 'cell-icon',
+                    datetimeRange: d,
+                    icon: 'fair',
+                  });
+                },
+              },
+              poor: {
+                description: eventSchedule.answerSymbols.poor.description,
+                onClick: () => {
+                  dispatch({
+                    type: 'cell-icon',
+                    datetimeRange: d,
+                    icon: 'poor',
+                  });
+                },
+              },
+            },
+            onPointChange: (point: AnswerSymbolPoint) => {
+              dispatch({ type: 'cell-point', datetimeRange: d, point });
+            },
+          } as const)
+      ),
     [answerSelectionMap, dispatch, eventSchedule]
   );
 
@@ -232,7 +291,10 @@ export const useAnswerBeingEditedHooks = ({
   }, [updateAnswerBeingEdited]);
 
   const hasUnanswered = useMemo<boolean>(
-    () => answerBeingEditedList.some((a) => a.selectedSymbol === undefined),
+    () =>
+      answerBeingEditedList.some(
+        (a) => a.answerSelectionValue.iconId === 'none'
+      ),
     [answerBeingEditedList]
   );
 

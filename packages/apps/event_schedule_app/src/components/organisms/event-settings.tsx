@@ -1,6 +1,6 @@
 import type {
-  AnswerSymbol,
   NotificationSettings,
+  SymbolSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
@@ -10,7 +10,7 @@ import { texts } from '../../constants';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
 import { NotificationSettingsComponent } from './notification-settings';
 import { ParagraphWithSwitch } from './paragraph-with-switch';
-import { SymbolSettings } from './symbol-settings';
+import { SymbolSettingsComponent } from './symbol-settings';
 
 const vt = texts.eventSettingsPage.section3;
 
@@ -19,10 +19,8 @@ type Props = Readonly<{
   onToggleAnswerDeadline: () => void;
   answerDeadline: Ymdhm | undefined;
   onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
-  customizeSymbolSettings: boolean;
-  onToggleCustomizeSymbolSettings: () => void;
-  answerSymbolList: readonly AnswerSymbol[];
-  onAnswerSymbolListChange: (value: readonly AnswerSymbol[]) => void;
+  answerSymbols: SymbolSettings;
+  onAnswerSymbolsChange: (value: SymbolSettings) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
   notificationSettings: NotificationSettings;
@@ -36,10 +34,8 @@ export const EventSettings = memoNamed<Props>(
     onToggleAnswerDeadline,
     answerDeadline,
     onAnswerDeadlineChange,
-    customizeSymbolSettings,
-    onToggleCustomizeSymbolSettings,
-    answerSymbolList,
-    onAnswerSymbolListChange,
+    answerSymbols,
+    onAnswerSymbolsChange,
     useNotification,
     onToggleUseNotification,
     notificationSettings,
@@ -95,18 +91,9 @@ export const EventSettings = memoNamed<Props>(
           onToggle={onToggleUseNotificationLocal}
         />
         <hr />
-        <ParagraphWithSwitch
-          disabledInsteadOfHidden={true}
-          elementToToggle={
-            <SymbolSettings
-              answerSymbolList={answerSymbolList}
-              disabled={!customizeSymbolSettings}
-              onAnswerSymbolListChange={onAnswerSymbolListChange}
-            />
-          }
-          show={customizeSymbolSettings}
-          title={vt.symbolSettings}
-          onToggle={onToggleCustomizeSymbolSettings}
+        <SymbolSettingsComponent
+          answerSymbols={answerSymbols}
+          onAnswerSymbolsChange={onAnswerSymbolsChange}
         />
       </Root>
     );

@@ -20,16 +20,21 @@ export type Answer = Readonly<{
 }>;
 
 export type PartialAnswer = Partial<
-  Readonly<{
-    id: Answer['id'];
-    userName: Answer['userName'];
-    comment: Answer['comment'];
-    selection: readonly PartialAnswerSelection[];
-    [ANSWER_KEY_CREATED_AT]: Answer[typeof ANSWER_KEY_CREATED_AT];
-    useWeight: Answer['useWeight'];
-    weight: Answer['weight'];
-    isRequiredParticipants: Answer['isRequiredParticipants'];
-  }>
+  MergeIntersection<
+    Pick<
+      Answer,
+      | 'comment'
+      | 'id'
+      | 'isRequiredParticipants'
+      | 'userName'
+      | 'useWeight'
+      | 'weight'
+    > &
+      Readonly<{
+        selection: readonly PartialAnswerSelection[];
+        [ANSWER_KEY_CREATED_AT]: Answer[typeof ANSWER_KEY_CREATED_AT];
+      }>
+  >
 >;
 
 export const defaultAnswer: Answer = {

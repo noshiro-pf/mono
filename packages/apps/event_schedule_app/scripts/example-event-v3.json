@@ -1,0 +1,54 @@
+{
+  "2epnfPzEPZI5Xfobg9Yb": {
+    "answerSymbols": {
+      "good": { "point": 10, "description": "参加します" },
+      "fair": { "point": 6, "description": "参加できるかも" },
+      "poor": { "point": 0, "description": "参加できません" }
+    },
+    "useAnswerDeadline": true,
+    "useNotification": false,
+    "datetimeRangeList": [
+      {
+        "ymd": { "month": 3, "date": 9, "year": 2021 },
+        "timeRange": {
+          "start": { "hours": 0, "minutes": 0 },
+          "end": { "hours": 0, "minutes": 0 }
+        }
+      },
+      {
+        "timeRange": {
+          "end": { "hours": 0, "minutes": 0 },
+          "start": { "hours": 0, "minutes": 0 }
+        },
+        "ymd": { "month": 3, "date": 12, "year": 2021 }
+      },
+      {
+        "ymd": { "year": 2021, "date": 17, "month": 3 },
+        "timeRange": {
+          "start": { "minutes": 0, "hours": 0 },
+          "end": { "minutes": 0, "hours": 0 }
+        }
+      }
+    ],
+    "notes": "bbb https://www.google.com/　あああ\n",
+    "title": "aaaaa1",
+    "answerDeadline": {
+      "hours": 23,
+      "date": 28,
+      "year": 2021,
+      "minutes": 59,
+      "month": 11
+    },
+    "notificationSettings": {
+      "notify07daysBeforeAnswerDeadline": false,
+      "notify14daysBeforeAnswerDeadline": false,
+      "email": "",
+      "notify03daysBeforeAnswerDeadline": false,
+      "notifyOnAnswerChange": true,
+      "notify01daysBeforeAnswerDeadline": false,
+      "notify28daysBeforeAnswerDeadline": false
+    },
+    "timezoneOffsetMinutes": -540,
+    "datetimeSpecification": "startSpecified"
+  }
+}

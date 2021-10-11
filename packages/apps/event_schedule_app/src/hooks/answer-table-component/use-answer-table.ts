@@ -1,12 +1,14 @@
 import type {
   Answer,
   AnswerId,
-  AnswerSymbolIconId,
+  AnswerSymbolIdWithNone,
+  AnswerSymbolPoint,
   AnswerTableCellPosition,
   DatetimeRange,
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import type { IMapMapped } from '@noshiro/ts-utils';
+import { ituple } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type {
   AnswerSelectionMapKey,
@@ -22,13 +24,13 @@ export const useAnswerTable = (
   answers: readonly Answer[]
 ): IMapMapped<
   DatetimeRange,
-  readonly (AnswerSymbolIconId | undefined)[],
+  DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
   DatetimeRangeMapKey
 > => {
   const answerSelectionMap = useMemo<
     IMapMapped<
       AnswerTableCellPosition,
-      AnswerSymbolIconId | undefined,
+      readonly [AnswerSymbolIdWithNone, AnswerSymbolPoint],
       AnswerSelectionMapKey
     >
   >(() => createAnswerSelectionMapFromAnswers(answers), [answers]);
@@ -37,15 +39,15 @@ export const useAnswerTable = (
     (
       datetimeRange: DatetimeRange,
       answerId: AnswerId
-    ): AnswerSymbolIconId | undefined =>
-      answerSelectionMap.get({ datetimeRange, answerId }),
+    ): readonly [AnswerSymbolIdWithNone, AnswerSymbolPoint] =>
+      answerSelectionMap.get({ datetimeRange, answerId }) ?? ituple('none', 0),
     [answerSelectionMap]
   );
 
   const answerTable = useMemo<
     IMapMapped<
       DatetimeRange,
-      readonly (AnswerSymbolIconId | undefined)[],
+      DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
       DatetimeRangeMapKey
     >
   >(

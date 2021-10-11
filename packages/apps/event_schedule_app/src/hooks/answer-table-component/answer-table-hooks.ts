@@ -1,12 +1,10 @@
 import type {
   Answer,
-  AnswerSymbolIconId,
   DatetimeRange,
   EventSchedule,
-  Weight,
 } from '@noshiro/event-schedule-app-shared';
 import type { IMapMapped } from '@noshiro/ts-utils';
-import { IList, mapNullable, pipe } from '@noshiro/ts-utils';
+import { IList, mapNullable, match, pipe } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { answerTableColor } from '../../constants';
@@ -16,6 +14,7 @@ import {
   createScore,
   datetimeRange2str,
 } from '../../functions';
+import type { AnswerTableCell } from '../../types';
 import { useAnswerTable } from './use-answer-table';
 
 type AnswerTableHooks = DeepReadonly<{
@@ -32,7 +31,7 @@ type AnswerTableHooks = DeepReadonly<{
     datetimeRange: DatetimeRange;
     score: number;
     answerSummaryRow: number[] | undefined;
-    answerTableRow: [AnswerSymbolIconId | undefined, Weight][] | undefined;
+    answerTableRow: AnswerTableCell[] | undefined;
     style: CSSProperties;
   }[];
   onDatetimeSortChange: (state: 'asc' | 'desc') => void;
@@ -46,15 +45,11 @@ export const useAnswerTableHooks = (
 ): AnswerTableHooks => {
   const answerTable = useAnswerTable(eventSchedule, answers);
 
+  // sum of (good, fair, poor)
   const answerSummary = useMemo<
     IMapMapped<DatetimeRange, readonly number[], DatetimeRangeMapKey>
   >(
-    () =>
-      createAnswerSummary(
-        eventSchedule.datetimeRangeList,
-        eventSchedule.answerSymbolList,
-        answerTable
-      ),
+    () => createAnswerSummary(eventSchedule.datetimeRangeList, answerTable),
     [eventSchedule, answerTable]
   );
 
@@ -64,7 +59,6 @@ export const useAnswerTableHooks = (
     () =>
       createScore(
         eventSchedule.datetimeRangeList,
-        eventSchedule.answerSymbolList,
         answerSummary,
         answerTable,
         answers
@@ -154,7 +148,7 @@ export const useAnswerTableHooks = (
         datetimeRange: DatetimeRange;
         score: number;
         answerSummaryRow: number[] | undefined;
-        answerTableRow: [AnswerSymbolIconId | undefined, Weight][] | undefined;
+        answerTableRow: AnswerTableCell[] | undefined;
         style: CSSProperties;
       }[]
     >
@@ -163,14 +157,25 @@ export const useAnswerTableHooks = (
       datetimeRangeListReordered.map((datetimeRange) => {
         const score = scores.get(datetimeRange) ?? 0;
 
-        const answerTableRow = pipe(answerTable.get(datetimeRange)).chain(
-          (list) =>
-            mapNullable(list, (row) =>
-              IList.zip(
-                row,
-                answers.map((a) => a.weight)
-              )
-            )
+        const answerTableRow: readonly AnswerTableCell[] | undefined = pipe(
+          answerTable.get(datetimeRange)
+        ).chain((list) =>
+          mapNullable(list, (row) =>
+            IList.zip(
+              row,
+              answers.map((a) => a.weight)
+            ).map(([[iconId, point], weight]) => ({
+              iconId,
+              point,
+              showPoint: match(iconId, {
+                good: point !== eventSchedule.answerSymbols.good.point,
+                fair: point !== eventSchedule.answerSymbols.fair.point,
+                poor: point !== eventSchedule.answerSymbols.poor.point,
+                none: false,
+              }),
+              weight,
+            }))
+          )
         ).value;
 
         return {
@@ -189,7 +194,14 @@ export const useAnswerTableHooks = (
           },
         };
       }),
-    [datetimeRangeListReordered, scores, answerSummary, answerTable, answers]
+    [
+      datetimeRangeListReordered,
+      scores,
+      answerSummary,
+      answerTable,
+      eventSchedule.answerSymbols,
+      answers,
+    ]
   );
 
   return {

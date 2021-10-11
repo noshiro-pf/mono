@@ -2,14 +2,15 @@ import type {
   EventSchedule,
   EventScheduleValidation,
 } from '@noshiro/event-schedule-app-shared';
-import { ifThen, IList, isEmailString } from '@noshiro/ts-utils';
+import { ifThen, IList, isEmailString, isInRange } from '@noshiro/ts-utils';
+import { answerSymbolPointConfig } from '../../constants';
 
 export const validateEventSchedule = ({
   title,
   datetimeRangeList,
   useAnswerDeadline,
+  answerSymbols,
   answerDeadline,
-  answerSymbolList,
   useNotification,
   notificationSettings,
 }: Readonly<{
@@ -18,7 +19,6 @@ export const validateEventSchedule = ({
   StrictOmit<
     EventSchedule,
     | 'answerDeadline'
-    | 'customizeSymbolSettings'
     | 'datetimeSpecification'
     | 'notes'
     | 'timezoneOffsetMinutes'
@@ -26,7 +26,14 @@ export const validateEventSchedule = ({
   title: title !== '',
   datetimeRangeList: !IList.isEmpty(datetimeRangeList),
   answerDeadline: ifThen(useAnswerDeadline, answerDeadline !== undefined),
-  answerSymbolList: answerSymbolList.length >= 2,
+  answerSymbols:
+    answerSymbols.good.description === '' ||
+    answerSymbols.fair.description === '' ||
+    answerSymbols.poor.description === '' ||
+    isInRange(
+      answerSymbolPointConfig.fair.min,
+      answerSymbolPointConfig.fair.max
+    )(answerSymbols.fair.point),
   notificationEmail: ifThen(
     useNotification,
     isEmailString(notificationSettings.email)
@@ -48,6 +55,6 @@ export const validateEventScheduleAll = (
   eventScheduleValidation.title &&
   eventScheduleValidation.datetimeRangeList &&
   eventScheduleValidation.answerDeadline &&
-  eventScheduleValidation.answerSymbolList &&
+  eventScheduleValidation.answerSymbols &&
   eventScheduleValidation.notificationEmail &&
   eventScheduleValidation.notificationItems;
