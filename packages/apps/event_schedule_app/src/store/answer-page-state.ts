@@ -9,6 +9,7 @@ import {
   createState,
   createVoidEventEmitter,
   distinctUntilChanged,
+  distinctUntilChangedI,
   filter,
   map,
   mapI,
@@ -175,6 +176,11 @@ export {
   selectedDates$,
   setYearMonth$,
 };
+
+router.eventId$.chain(distinctUntilChangedI()).subscribe(() => {
+  fetchEventSchedule();
+  fetchAnswers();
+});
 
 eventScheduleResult$.subscribe((e) => {
   if (e !== undefined && Result.isErr(e)) {
