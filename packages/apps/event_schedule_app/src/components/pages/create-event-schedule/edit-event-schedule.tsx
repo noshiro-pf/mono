@@ -3,7 +3,7 @@ import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { descriptionFontColor, texts } from '../../../constants';
+import { descriptionFontColor, routes, texts } from '../../../constants';
 import { eventScheduleResult$, router } from '../../../store';
 import { ConfirmEmailDialog } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
@@ -29,7 +29,11 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   ) : (
     <div>
       <TitleWrapper>
-        <Title href={'../'} rel='noopener noreferrer' target='_blank'>
+        <Title
+          href={routes.createPage}
+          rel='noopener noreferrer'
+          target='_blank'
+        >
           <Icon icon={'timeline-events'} iconSize={28} />
           <div>{vt.title}</div>
         </Title>
