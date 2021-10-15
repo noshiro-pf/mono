@@ -2,7 +2,7 @@ import { AnchorButton, Icon, Spinner } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { routes, texts } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import { setYearMonth$ } from '../../../store';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
@@ -52,13 +52,17 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   ) : (
     <div>
       <TitleWrapper>
-        <Title href={'../../'} rel='noopener noreferrer' target='_blank'>
+        <Title
+          href={routes.createPage}
+          rel='noopener noreferrer'
+          target='_blank'
+        >
           <Icon icon={'timeline-events'} iconSize={28} />
           <div>{vt.title}</div>
         </Title>
         <CreateNewButtonWrapper>
           <AnchorButton
-            href={'../../'}
+            href={routes.createPage}
             icon='add'
             intent={'primary'}
             rel='noopener noreferrer'

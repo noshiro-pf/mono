@@ -1,7 +1,7 @@
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { initialEventSchedule, texts } from '../../../constants';
+import { initialEventSchedule, routes, texts } from '../../../constants';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
 const vt = texts.eventSettingsPage;
@@ -9,7 +9,7 @@ const vt = texts.eventSettingsPage;
 export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => (
   <div>
     <TitleWrapper>
-      <Title href={'../'} rel='noopener noreferrer' target='_blank'>
+      <Title href={routes.createPage} rel='noopener noreferrer' target='_blank'>
         <Icon icon={'timeline-events'} iconSize={28} />
         <div>{vt.title}</div>
       </Title>
