@@ -24,6 +24,7 @@
     "packages/utils/solid-styled-components",
     "packages/apps/algo_app",
     "packages/apps/annotation_tool",
+    "packages/apps/blueprintjs-playground",
     "packages/apps/cant_stop_probability",
     "packages/apps/catan_dice_app",
     "packages/apps/color_demo_app",
