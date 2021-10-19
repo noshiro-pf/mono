@@ -157,7 +157,6 @@ export class ObservableBaseClass<
     return {
       unsubscribe: () => {
         this.removeSubscriber(id);
-        this.tryComplete();
       },
     };
   }
