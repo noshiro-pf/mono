@@ -1,11 +1,12 @@
 import { AnchorButton, Icon, Spinner } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import { IList } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { routes, texts } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
-import { setYearMonth$ } from '../../../store';
-import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
+import { refreshAnswers, setYearMonth$ } from '../../../store';
+import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
 import { Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
@@ -37,7 +38,6 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     onSubmitAnswer,
     submitButtonIsLoading,
     submitButtonIsDisabled,
-    fetchAnswers: refresh,
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
@@ -112,7 +112,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   icon={'refresh'}
                   intent={'none'}
                   loading={refreshButtonIsLoading}
-                  onClick={refresh}
+                  onClick={refreshAnswers}
                 >
                   {vt.answers.refresh}
                 </BpButton>
@@ -139,20 +139,46 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               ) : undefined}
               <table>
                 <tbody>
-                  {eventSchedule.answerSymbolList.map((s) => (
-                    <tr key={s.iconId}>
-                      <th>
-                        <AlignCenter>
-                          <CustomIcon iconName={s.iconId} />
-                        </AlignCenter>
-                      </th>
-                      <td>{vt.point(s.point)}</td>
-                      <td>{texts.colon}</td>
-                      <td>{s.description}</td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <th>
+                      <AlignCenter>
+                        <CustomIcon iconName={'good'} />
+                      </AlignCenter>
+                    </th>
+                    <td>{vt.point(eventSchedule.answerSymbols.good.point)}</td>
+                    <td>{texts.colon}</td>
+                    <td>{eventSchedule.answerSymbols.good.description}</td>
+                  </tr>
+                  <tr>
+                    <th>
+                      <AlignCenter>
+                        <CustomIcon iconName={'fair'} />
+                      </AlignCenter>
+                    </th>
+                    <td>{vt.point(eventSchedule.answerSymbols.fair.point)}</td>
+                    <td>{texts.colon}</td>
+                    <td>{eventSchedule.answerSymbols.fair.description}</td>
+                  </tr>
+                  <tr>
+                    <th>
+                      <AlignCenter>
+                        <CustomIcon iconName={'poor'} />
+                      </AlignCenter>
+                    </th>
+                    <td>{vt.point(eventSchedule.answerSymbols.poor.point)}</td>
+                    <td>{texts.colon}</td>
+                    <td>{eventSchedule.answerSymbols.poor.description}</td>
+                  </tr>
                 </tbody>
               </table>
+              <NoteForPointOfFair>
+                {IList.map(
+                  vt.noteForPointOfFair(eventSchedule.answerSymbols.fair.point),
+                  (s, i) => (
+                    <Description key={i} text={s} />
+                  )
+                )}
+              </NoteForPointOfFair>
             </SymbolDescriptionWrapper>
 
             {answerBeingEditedSectionState === 'hidden' && !isExpired ? (
@@ -254,5 +280,9 @@ const AlignCenter = styled.div`
 `;
 
 const RequiredParticipantIconWrapper = styled(AlignCenter)`
+  margin: 10px 3px;
+`;
+
+const NoteForPointOfFair = styled.div`
   margin: 10px 3px;
 `;

@@ -1,0 +1,136 @@
+{
+  "2epnfPzEPZI5Xfobg9Yb": [
+    {
+      "id": "SLuMolYBthCjcHCnvW24",
+      "createdAt": 1624732632134,
+      "userName": "Carol",
+      "comment": "",
+      "isRequiredParticipants": false,
+      "useWeight": true,
+      "weight": 0.6,
+      "selection": [
+        {
+          "iconId": "fair",
+          "point": 6,
+          "datetimeRange": {
+            "ymd": { "month": 3, "date": 9, "year": 2021 },
+            "timeRange": {
+              "end": { "minutes": 0, "hours": 0 },
+              "start": { "hours": 0, "minutes": 0 }
+            }
+          }
+        },
+        {
+          "iconId": "good",
+          "point": 10,
+          "datetimeRange": {
+            "ymd": { "date": 12, "year": 2021, "month": 3 },
+            "timeRange": {
+              "start": { "hours": 0, "minutes": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            }
+          }
+        },
+        {
+          "iconId": "poor",
+          "point": 0,
+          "datetimeRange": {
+            "ymd": { "month": 3, "year": 2021, "date": 17 },
+            "timeRange": {
+              "end": { "minutes": 0, "hours": 0 },
+              "start": { "minutes": 0, "hours": 0 }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "YWTREKVx4Wf4owicQBoc",
+      "createdAt": 1615363320667,
+      "userName": "Bob",
+      "comment": "",
+      "isRequiredParticipants": true,
+      "useWeight": false,
+      "weight": 1,
+      "selection": [
+        {
+          "iconId": "fair",
+          "point": 6,
+          "datetimeRange": {
+            "ymd": { "date": 9, "year": 2021, "month": 3 },
+            "timeRange": {
+              "end": { "hours": 0, "minutes": 0 },
+              "start": { "minutes": 0, "hours": 0 }
+            }
+          }
+        },
+        {
+          "iconId": "good",
+          "point": 10,
+          "datetimeRange": {
+            "ymd": { "month": 3, "year": 2021, "date": 12 },
+            "timeRange": {
+              "start": { "minutes": 0, "hours": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            }
+          }
+        },
+        {
+          "iconId": "good",
+          "point": 10,
+          "datetimeRange": {
+            "ymd": { "year": 2021, "date": 17, "month": 3 },
+            "timeRange": {
+              "start": { "minutes": 0, "hours": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "brTRiK8cUgFtmGcBJW5q",
+      "createdAt": 1615279702147,
+      "userName": "Alice",
+      "comment": "",
+      "isRequiredParticipants": false,
+      "useWeight": false,
+      "weight": 1,
+      "selection": [
+        {
+          "iconId": "good",
+          "point": 10,
+          "datetimeRange": {
+            "ymd": { "year": 2021, "date": 9, "month": 3 },
+            "timeRange": {
+              "start": { "hours": 0, "minutes": 0 },
+              "end": { "hours": 0, "minutes": 0 }
+            }
+          }
+        },
+        {
+          "iconId": "good",
+          "point": 10,
+          "datetimeRange": {
+            "ymd": { "month": 3, "date": 12, "year": 2021 },
+            "timeRange": {
+              "start": { "minutes": 0, "hours": 0 },
+              "end": { "minutes": 0, "hours": 0 }
+            }
+          }
+        },
+        {
+          "iconId": "fair",
+          "point": 6,
+          "datetimeRange": {
+            "ymd": { "date": 17, "month": 3, "year": 2021 },
+            "timeRange": {
+              "end": { "hours": 0, "minutes": 0 },
+              "start": { "hours": 0, "minutes": 0 }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

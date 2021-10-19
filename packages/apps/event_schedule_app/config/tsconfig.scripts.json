@@ -1,7 +1,4 @@
 {
-  "extends": "../../../../config/tsconfig/tsconfig.base.json",
-  "compilerOptions": {
-    "module": "commonjs"
-  },
+  "extends": "../../../../config/tsconfig/tsconfig.cjs.json",
   "include": ["../scripts/*.ts"]
 }

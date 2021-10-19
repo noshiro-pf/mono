@@ -1,108 +1,82 @@
 import type {
-  AnswerSymbol,
-  AnswerSymbolIconId,
-  AnswerSymbolPointEnumType,
+  AnswerSymbolPoint,
+  SymbolSettings,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { IMap } from '@noshiro/ts-utils';
-import { useCallback, useEffect, useMemo } from 'react';
+import { noop } from '@noshiro/ts-utils';
+import { useCallback } from 'react';
 import styled from 'styled-components';
-import type {
-  SymbolListReducerAction,
-  SymbolListReducerState,
-} from '../../../functions';
+import type { SymbolListReducerAction } from '../../../functions';
 import { symbolListReducer } from '../../../functions';
-import { clog } from '../../../utils';
 import { AnswerSymbolRow } from './symbol-setting-row';
 
 type Props = Readonly<{
-  answerSymbolList: readonly AnswerSymbol[];
-  onAnswerSymbolListChange: (value: readonly AnswerSymbol[]) => void;
-  disabled: boolean;
+  answerSymbols: SymbolSettings;
+  onAnswerSymbolsChange: (value: SymbolSettings) => void;
 }>;
 
-export const SymbolSettings = memoNamed<Props>(
+export const SymbolSettingsComponent = memoNamed<Props>(
   'SymbolSettings',
-  ({ answerSymbolList, onAnswerSymbolListChange, disabled }) => {
-    const answerSymbolListMap = useMemo<SymbolListReducerState>(
-      () => IMap.new(answerSymbolList.map((e) => [e.iconId, e])),
-      [answerSymbolList]
-    );
+  ({ answerSymbols, onAnswerSymbolsChange }) => {
     const dispatch = useCallback(
       (action: SymbolListReducerAction) => {
-        onAnswerSymbolListChange(
-          symbolListReducer(answerSymbolListMap, action).toValuesArray()
-        );
+        onAnswerSymbolsChange(symbolListReducer(answerSymbols, action));
       },
-      [answerSymbolListMap, onAnswerSymbolListChange]
+      [answerSymbols, onAnswerSymbolsChange]
     );
 
-    useEffect(() => {
-      onAnswerSymbolListChange(answerSymbolList);
-    }, [onAnswerSymbolListChange, answerSymbolList]);
-
-    const onPointChange = useCallback(
-      (iconId: AnswerSymbolIconId, point: AnswerSymbolPointEnumType) => {
-        dispatch({ type: 'update-point', iconId, point });
+    const onOkDescriptionChange = useCallback(
+      (description: string) => {
+        dispatch({ type: 'update-description', iconId: 'good', description });
       },
       [dispatch]
     );
 
-    const onDescriptionChange = useCallback(
-      (iconId: AnswerSymbolIconId, description: string) => {
-        dispatch({ type: 'update-description', iconId, description });
+    const onNeitherDescriptionChange = useCallback(
+      (description: string) => {
+        dispatch({
+          type: 'update-description',
+          iconId: 'fair',
+          description,
+        });
       },
       [dispatch]
     );
 
-    const onDeleteClick = useCallback((iconId: AnswerSymbolIconId) => {
-      clog('onDeleteClick', iconId); // TODO
-    }, []);
-
-    const iconsInUse = useMemo<readonly AnswerSymbolIconId[]>(
-      () => answerSymbolList.map((e) => e.iconId),
-      [answerSymbolList]
+    const onNeitherPointChange = useCallback(
+      (point: AnswerSymbolPoint) => {
+        dispatch({ type: 'update-point', iconId: 'fair', point });
+      },
+      [dispatch]
     );
 
-    const listWithHandler = useMemo(
-      () =>
-        answerSymbolList.map((s) => ({
-          key: s.iconId,
-          value: s,
-          onDescriptionChangeHandler: (value: string) => {
-            onDescriptionChange(s.iconId, value);
-          },
-          onPointChangeHandler: (value: AnswerSymbolPointEnumType) => {
-            onPointChange(s.iconId, value);
-          },
-          onDeleteClickHandler: () => {
-            onDeleteClick(s.iconId);
-          },
-        })),
-      [answerSymbolList, onDescriptionChange, onPointChange, onDeleteClick]
+    const onNgDescriptionChange = useCallback(
+      (description: string) => {
+        dispatch({ type: 'update-description', iconId: 'poor', description });
+      },
+      [dispatch]
     );
 
     return (
       <Root>
-        {listWithHandler.map(
-          ({
-            key,
-            value,
-            onDescriptionChangeHandler,
-            onPointChangeHandler,
-            onDeleteClickHandler,
-          }) => (
-            <AnswerSymbolRow
-              key={key}
-              answerSymbol={value}
-              disabled={disabled}
-              iconsInUse={iconsInUse}
-              onDeleteClick={onDeleteClickHandler}
-              onDescriptionChange={onDescriptionChangeHandler}
-              onPointChange={onPointChangeHandler}
-            />
-          )
-        )}
+        <AnswerSymbolRow
+          answerSymbol={answerSymbols.good}
+          symbolId={'good'}
+          onDescriptionChange={onOkDescriptionChange}
+          onPointChange={noop}
+        />
+        <AnswerSymbolRow
+          answerSymbol={answerSymbols.fair}
+          symbolId={'fair'}
+          onDescriptionChange={onNeitherDescriptionChange}
+          onPointChange={onNeitherPointChange}
+        />
+        <AnswerSymbolRow
+          answerSymbol={answerSymbols.poor}
+          symbolId={'poor'}
+          onDescriptionChange={onNgDescriptionChange}
+          onPointChange={noop}
+        />
       </Root>
     );
   }

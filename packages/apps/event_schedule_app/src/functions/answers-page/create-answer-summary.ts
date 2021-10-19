@@ -1,72 +1,66 @@
 import type {
   Answer,
-  AnswerSymbol,
-  AnswerSymbolIconId,
-  AnswerSymbolPointEnumType,
+  AnswerSymbolIdWithNone,
+  AnswerSymbolPoint,
   DatetimeRange,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMap, IMapMapped, ituple, pipe } from '@noshiro/ts-utils';
+import type { IMap } from '@noshiro/ts-utils';
+import { IList, IMapMapped, ituple, pipe } from '@noshiro/ts-utils';
 import { answerSymbolPointConfig } from '../../constants';
 import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
 
 export const createAnswerSummary = (
   datetimeRangeList: readonly DatetimeRange[],
-  answerSymbolList: readonly AnswerSymbol[],
   answerTable: IMapMapped<
     DatetimeRange,
-    readonly (AnswerSymbolIconId | undefined)[],
+    DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
     DatetimeRangeMapKey
   >
 ): IMapMapped<DatetimeRange, readonly number[], DatetimeRangeMapKey> =>
   IMapMapped.new(
-    datetimeRangeList.map((datetimeRange) => {
+    IList.map(datetimeRangeList, (datetimeRange) => {
       const answersForThisDatetimeRange:
-        | readonly (AnswerSymbolIconId | undefined)[]
+        | DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>
         | undefined = answerTable.get(datetimeRange);
 
       if (answersForThisDatetimeRange === undefined) {
-        return [datetimeRange, answerSymbolList.map(() => 0)];
+        return ituple(datetimeRange, IList.zerosThrow(3));
       }
 
-      const answerGroups: IMap<AnswerSymbolIconId | undefined, number> = pipe(
-        answersForThisDatetimeRange
+      const answerGroups: IMap<AnswerSymbolIdWithNone, number> = pipe(
+        answersForThisDatetimeRange.map(([iconId, _point]) => iconId)
       )
         .chain((list) => IList.groupBy(list, (x) => x))
         .chain((groups) => groups.map((v) => v.length)).value;
 
-      return ituple(
-        datetimeRange,
-        IList.map(
-          answerSymbolList,
-          (answerSymbol) => answerGroups.get(answerSymbol.iconId) ?? 0
-        )
-      );
+      const counts: readonly number[] = [
+        answerGroups.get('good') ?? 0,
+        answerGroups.get('fair') ?? 0,
+        answerGroups.get('poor') ?? 0,
+      ];
+
+      return ituple(datetimeRange, counts);
     }),
     datetimeRangeToMapKey,
     datetimeRangeFromMapKey
   );
 
 const calcScoreSum = (
-  symbolToScoreMap: IMap<AnswerSymbolIconId, AnswerSymbolPointEnumType>,
-  answerSymbolList: readonly (AnswerSymbolIconId | undefined)[],
+  answerPointList: readonly AnswerSymbolPoint[],
   answerWeightList: readonly Weight[],
   isRequiredParticipantsList: readonly boolean[]
 ): number => {
-  const scores = answerSymbolList.map((symbolId) =>
-    symbolId === undefined ? 0 : symbolToScoreMap.get(symbolId) ?? 0
-  );
-
   const someRequiredParticipantsScoreIs0: boolean = pipe(
-    IList.zip(isRequiredParticipantsList, scores)
+    IList.zip(isRequiredParticipantsList, answerPointList)
   ).chain((list) =>
     list.some(([required, score]) => required && score === 0)
   ).value;
 
   return someRequiredParticipantsScoreIs0
     ? 0
-    : pipe(IList.zip(scores, answerWeightList))
+    : pipe(IList.zip(answerPointList, answerWeightList))
         .chain((list) => IList.map(list, ([score, weight]) => score * weight))
         .chain(IList.sum).value;
 };
@@ -76,7 +70,6 @@ const calcScoreSumMax = (answerWeightList: readonly Weight[]): number =>
 
 export const createScore = (
   datetimeRangeList: readonly DatetimeRange[],
-  symbolList: readonly AnswerSymbol[],
   answerSummary: IMapMapped<
     DatetimeRange,
     readonly number[],
@@ -84,26 +77,23 @@ export const createScore = (
   >,
   answerTable: IMapMapped<
     DatetimeRange,
-    readonly (AnswerSymbolIconId | undefined)[],
+    DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
     DatetimeRangeMapKey
   >,
   answers: readonly Answer[]
-): IMapMapped<DatetimeRange, number, DatetimeRangeMapKey> => {
-  const symbolToScoreMap = IMap.new<
-    AnswerSymbolIconId,
-    AnswerSymbolPointEnumType
-  >(symbolList.map((s) => [s.iconId, s.point]));
-
-  return IMapMapped.new(
+): IMapMapped<DatetimeRange, number, DatetimeRangeMapKey> =>
+  IMapMapped.new(
     datetimeRangeList.map((datetimeRange) => {
       const summaryForThisDatetimeRange: readonly number[] | undefined =
         answerSummary.get(datetimeRange);
 
-      const answerSymbols = answerTable.get(datetimeRange);
+      const answerPointList = answerTable
+        .get(datetimeRange)
+        ?.map(([_iconId, point]) => point);
 
       if (
         summaryForThisDatetimeRange === undefined ||
-        answerSymbols === undefined
+        answerPointList === undefined
       ) {
         return [datetimeRange, 0];
       }
@@ -114,8 +104,7 @@ export const createScore = (
       );
 
       const scoreSum: number = calcScoreSum(
-        symbolToScoreMap,
-        answerSymbols,
+        answerPointList,
         weightList,
         isRequiredParticipantsList
       );
@@ -126,4 +115,3 @@ export const createScore = (
     datetimeRangeToMapKey,
     datetimeRangeFromMapKey
   );
-};

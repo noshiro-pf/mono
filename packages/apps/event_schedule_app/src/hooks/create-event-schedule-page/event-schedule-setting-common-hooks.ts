@@ -1,10 +1,10 @@
 import type {
-  AnswerSymbol,
   DatetimeRange,
   DatetimeSpecificationEnumType,
   EventSchedule,
   EventScheduleValidation,
   NotificationSettings,
+  SymbolSettings,
   YearMonthDate,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
@@ -13,6 +13,7 @@ import {
   defaultYmdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
+import { useStateWithResetter } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -44,10 +45,8 @@ type EventScheduleSettingCommonHooks = Readonly<{
   onToggleAnswerDeadline: () => void;
   answerDeadline: Ymdhm | undefined;
   onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
-  customizeSymbolSettings: boolean;
-  onToggleCustomizeSymbolSettings: () => void;
-  answerSymbolList: readonly AnswerSymbol[];
-  onAnswerSymbolListValueChange: (value: readonly AnswerSymbol[]) => void;
+  answerSymbols: SymbolSettings;
+  onAnswerSymbolsValueChange: (value: SymbolSettings) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
   notificationSettings: NotificationSettings;
@@ -101,18 +100,8 @@ export const useEventScheduleSettingCommonHooks = (
     valueWhenTurnedOn: initialAnswerDeadline,
   });
 
-  const {
-    useThisConfig: customizeSymbolSettings,
-    setUseThisConfig: setCustomizeSymbolSettings,
-    toggle: onToggleCustomizeSymbolSettings,
-    value: answerSymbolList,
-    setValue: setAnswerSymbolList,
-    resetValue: resetAnswerSymbolList,
-  } = useToggleSectionState<readonly AnswerSymbol[]>({
-    initialToggleState: initialValues.current.customizeSymbolSettings,
-    defaultValue: initialValues.current.answerSymbolList,
-    valueWhenTurnedOff: initialValues.current.answerSymbolList,
-  });
+  const [answerSymbols, setAnswerSymbols, resetAnswerSymbols] =
+    useStateWithResetter<SymbolSettings>(initialValues.current.answerSymbols);
 
   const {
     useThisConfig: useNotification,
@@ -137,8 +126,7 @@ export const useEventScheduleSettingCommonHooks = (
         datetimeRangeList,
         useAnswerDeadline,
         answerDeadline: answerDeadline ?? defaultYmdhm,
-        customizeSymbolSettings,
-        answerSymbolList,
+        answerSymbols,
         useNotification,
         notificationSettings,
         timezoneOffsetMinutes: defaultEventSchedule.timezoneOffsetMinutes,
@@ -150,8 +138,7 @@ export const useEventScheduleSettingCommonHooks = (
       datetimeRangeList,
       useAnswerDeadline,
       answerDeadline,
-      customizeSymbolSettings,
-      answerSymbolList,
+      answerSymbols,
       useNotification,
       notificationSettings,
     ]
@@ -169,7 +156,7 @@ export const useEventScheduleSettingCommonHooks = (
         datetimeRangeList,
         useAnswerDeadline,
         answerDeadline,
-        answerSymbolList,
+        answerSymbols,
         useNotification,
         notificationSettings,
       }),
@@ -178,7 +165,7 @@ export const useEventScheduleSettingCommonHooks = (
       datetimeRangeList,
       useAnswerDeadline,
       answerDeadline,
-      answerSymbolList,
+      answerSymbols,
       useNotification,
       notificationSettings,
     ]
@@ -219,15 +206,13 @@ export const useEventScheduleSettingCommonHooks = (
     onDatetimeListChange(initialValues.current.datetimeRangeList);
     setUseAnswerDeadline(initialValues.current.useAnswerDeadline);
     resetAnswerDeadline();
-    setCustomizeSymbolSettings(initialValues.current.customizeSymbolSettings);
-    resetAnswerSymbolList();
+    resetAnswerSymbols();
     setUseNotification(initialValues.current.useNotification);
     resetNotificationSettings();
   }, [
     setUseAnswerDeadline,
     resetAnswerDeadline,
-    setCustomizeSymbolSettings,
-    resetAnswerSymbolList,
+    resetAnswerSymbols,
     setUseNotification,
     resetNotificationSettings,
   ]);
@@ -249,10 +234,8 @@ export const useEventScheduleSettingCommonHooks = (
     onToggleAnswerDeadline,
     answerDeadline,
     onAnswerDeadlineChange: setAnswerDeadline,
-    customizeSymbolSettings,
-    onToggleCustomizeSymbolSettings,
-    answerSymbolList,
-    onAnswerSymbolListValueChange: setAnswerSymbolList,
+    answerSymbols,
+    onAnswerSymbolsValueChange: setAnswerSymbols,
     useNotification,
     onToggleUseNotification,
     notificationSettings,

@@ -22,6 +22,7 @@ export const useAnswerBeingEditedState = (
   eventSchedule$: Observable<EventSchedule | undefined>
 ): Readonly<{
   answerBeingEdited: Answer;
+  setAnswerBeingEdited: (a: Answer) => void;
   resetAnswerBeingEdited: () => void;
   updateAnswerBeingEdited: (updater: (a: Answer) => Answer) => void;
 }> => {
@@ -36,10 +37,14 @@ export const useAnswerBeingEditedState = (
           IRecord.set(
             defaultAnswer,
             'selection',
-            e.datetimeRangeList.map((d) => ({
-              datetimeRange: d,
-              iconId: undefined,
-            }))
+            e.datetimeRangeList.map(
+              (d) =>
+                ({
+                  datetimeRange: d,
+                  iconId: 'none',
+                  point: 0,
+                } as const)
+            )
           )
         )
       )
@@ -49,6 +54,7 @@ export const useAnswerBeingEditedState = (
 
   const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
     useVoidEventAsStream();
+
   const resetAnswerBeingEdited$ = useStream(() =>
     combineLatest([
       emptyAnswerSelection$,
@@ -62,6 +68,7 @@ export const useAnswerBeingEditedState = (
 
   return {
     answerBeingEdited,
+    setAnswerBeingEdited,
     resetAnswerBeingEdited,
     updateAnswerBeingEdited,
   };

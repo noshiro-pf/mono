@@ -8,12 +8,10 @@ import {
   combineLatest,
   createState,
   createVoidEventEmitter,
-  distinctUntilChanged,
   distinctUntilChangedI,
   filter,
   map,
   mapI,
-  pluck,
   throttleTime,
   unwrapResultOk,
   withInitialValue,
@@ -42,11 +40,8 @@ const [eventScheduleResult$, setEventScheduleResult] = createState<
 >(undefined);
 
 const [answersResult$, setAnswersResult] = createState<
-  Readonly<{
-    timestamp: number;
-    value: Result<readonly Answer[], 'not-found' | 'others'> | undefined;
-  }>
->({ timestamp: Date.now(), value: undefined });
+  Result<readonly Answer[], 'not-found' | 'others'> | undefined
+>(undefined);
 
 combineLatest([
   fetchEventScheduleThrottled$,
@@ -69,7 +64,8 @@ combineLatest([fetchAnswersThrottled$, router.eventId$] as const).subscribe(
     api.answers
       .getList(eventId)
       .then((result) => {
-        setAnswersResult({ timestamp: Date.now(), value: result });
+        setAnswersResult(result);
+        setRefreshButtonIsLoading(false);
       })
       .catch(console.error);
   }
@@ -83,7 +79,6 @@ const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
 
 const answers$: InitializedObservable<readonly Answer[] | undefined> =
   answersResult$
-    .chain(pluck('value'))
     .chain(filter(isNotUndefined))
     .chain(unwrapResultOk())
     .chain(withInitialValue(undefined));
@@ -105,10 +100,10 @@ const errorType$: InitializedObservable<
             data: 'eventScheduleResult' as const,
             type: esr.value,
           } as const)
-        : Result.isErr(ar.value)
+        : Result.isErr(ar)
         ? ({
             data: 'answersResult' as const,
-            type: ar.value.value,
+            type: ar.value,
           } as const)
         : undefined
     )
@@ -118,17 +113,10 @@ const errorType$: InitializedObservable<
 const [refreshButtonIsLoading$, setRefreshButtonIsLoading] =
   createState<boolean>(false);
 
-const answersResultTimestamp$: InitializedObservable<number> = answersResult$
-  .chain(pluck('timestamp'))
-  .chain(distinctUntilChanged())
-  .chain(withInitialValue(Date.now()));
-
-fetchAnswersThrottled$.subscribe(() => {
+const refreshAnswers = (): void => {
+  fetchAnswers();
   setRefreshButtonIsLoading(true);
-});
-answersResultTimestamp$.subscribe(() => {
-  setRefreshButtonIsLoading(false);
-});
+};
 
 const [refreshButtonIsDisabled$, setRefreshButtonIsDisabled] =
   createState<boolean>(false);
@@ -169,6 +157,7 @@ export {
   answers$,
   errorType$,
   fetchAnswers,
+  refreshAnswers,
   fetchEventSchedule,
   refreshButtonIsLoading$,
   refreshButtonIsDisabled$,
@@ -189,8 +178,8 @@ eventScheduleResult$.subscribe((e) => {
 });
 
 answersResult$.subscribe((e) => {
-  if (Result.isErr(e.value)) {
-    clog('answersResult', e.value);
+  if (Result.isErr(e)) {
+    clog('answersResult', e);
   }
 });
 

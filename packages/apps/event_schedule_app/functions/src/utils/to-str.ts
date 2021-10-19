@@ -1,5 +1,5 @@
 import type {
-  AnswerSymbolIconId,
+  AnswerSymbolIdWithNone,
   DatetimeRange,
   DatetimeSpecificationEnumType,
   HoursMinutes,
@@ -36,15 +36,15 @@ export const datetimeRange2str = (
   }
 };
 
-export const iconId2str = (iconId: AnswerSymbolIconId | undefined): string => {
+export const iconId2str = (iconId: AnswerSymbolIdWithNone): string => {
   switch (iconId) {
-    case undefined:
+    case 'none':
       return '-';
-    case 'handmade-circle':
+    case 'good':
       return '〇';
-    case 'handmade-triangle':
+    case 'fair':
       return '△';
-    case 'handmade-cross':
+    case 'poor':
       return '×';
   }
 };

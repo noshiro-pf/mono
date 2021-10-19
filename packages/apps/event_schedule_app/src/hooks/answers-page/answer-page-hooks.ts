@@ -49,7 +49,6 @@ type AnswerPageState = DeepReadonly<{
   onSubmitAnswer: () => Promise<void>;
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
-  fetchAnswers: () => void;
   refreshButtonIsLoading: boolean;
   refreshButtonIsDisabled: boolean;
   isExpired: boolean;
@@ -78,8 +77,12 @@ export const useAnswerPageState = (): AnswerPageState => {
   const [submitButtonIsLoading, setSubmitButtonIsLoading] =
     useState<boolean>(false);
 
-  const { answerBeingEdited, updateAnswerBeingEdited, resetAnswerBeingEdited } =
-    useAnswerBeingEditedState(eventSchedule$);
+  const {
+    answerBeingEdited,
+    setAnswerBeingEdited,
+    updateAnswerBeingEdited,
+    resetAnswerBeingEdited,
+  } = useAnswerBeingEditedState(eventSchedule$);
 
   /* effect */
 
@@ -107,10 +110,10 @@ export const useAnswerPageState = (): AnswerPageState => {
   const onAnswerClick = useCallback(
     (answer: Answer) => {
       setAnswerBeingEditedSectionState('editing');
-      updateAnswerBeingEdited(() => answer);
+      setAnswerBeingEdited(answer);
       setSelectedAnswer(answer);
     },
-    [updateAnswerBeingEdited]
+    [setAnswerBeingEdited]
   );
 
   const clearAnswerBeingEditedFields = useCallback(() => {
@@ -137,22 +140,10 @@ export const useAnswerPageState = (): AnswerPageState => {
     if (eventId === undefined) return;
     if (!alive.current) return;
     setSubmitButtonIsLoading(true);
-    const answerBeingEditedWithoutUndefinedSelection = IRecord.update(
-      answerBeingEdited,
-      'selection',
-      (selection) => selection.filter((s) => s.iconId !== undefined)
-    );
     switch (answerBeingEditedSectionState) {
       case 'creating':
         await api.answers
-          .add(
-            eventId,
-            IRecord.set(
-              answerBeingEditedWithoutUndefinedSelection,
-              'createdAt',
-              Date.now()
-            )
-          )
+          .add(eventId, IRecord.set(answerBeingEdited, 'createdAt', Date.now()))
           .then(() => {
             if (!alive.current) return;
             setSubmitButtonIsLoading(false);
@@ -171,11 +162,7 @@ export const useAnswerPageState = (): AnswerPageState => {
         break;
       case 'editing':
         await api.answers
-          .update(
-            eventId,
-            answerBeingEdited.id,
-            answerBeingEditedWithoutUndefinedSelection
-          )
+          .update(eventId, answerBeingEdited.id, answerBeingEdited)
           .then(() => {
             if (!alive.current) return;
             setSubmitButtonIsLoading(false);
@@ -274,7 +261,6 @@ export const useAnswerPageState = (): AnswerPageState => {
     onSubmitAnswer,
     submitButtonIsLoading,
     submitButtonIsDisabled,
-    fetchAnswers,
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,

@@ -1,4 +1,4 @@
-import type { AnswerSymbolPointEnumType } from '@noshiro/event-schedule-app-shared';
+import type { AnswerSymbolPoint } from '@noshiro/event-schedule-app-shared';
 
 export const texts = {
   aboutThisApp: 'このアプリについて',
@@ -62,10 +62,11 @@ export const texts = {
         '回答期限をオンにしていますが空欄になっています。',
       passwordIsEnabledButEmpty:
         'パスワードをオンにしていますが空欄になっています。',
-      atLeastTwoSymbolsRequired: '少なくとも2つの記号を設定してください。',
       invalidEmail: '有効なメールアドレスではありません',
       atLeastOneNotificationCheckRequired:
         '通知設定をオンにする場合は少なくとも1つの通知にチェックをしてください。',
+      answerSymbols:
+        '記号の設定に不備があります。説明に空欄があるか、△の点数が0.1以上9.9以下になっていない可能性があります。',
     },
     createEventButton: '日程調整ページを作成',
     editEventButton: 'イベント設定を更新',
@@ -143,7 +144,7 @@ export const texts = {
         back: '前のページに戻る',
       },
     },
-    point: (p: AnswerSymbolPointEnumType) => `（${p}点）`,
+    point: (p: AnswerSymbolPoint) => `（${p}点）`,
     answers: {
       title: '回答一覧',
       datetime: '候補日程',
@@ -160,6 +161,12 @@ export const texts = {
     },
     requiredParticipantDescription:
       '（必須参加者が×を付けている日のスコアは0点になります。）',
+    noteForPointOfFair: (
+      defaultPoint: AnswerSymbolPoint
+    ): readonly [string, string] => [
+      '回答者が個別に△の点数を設定している場合があります。',
+      `デフォルトの点数（＝${defaultPoint}点）から変更されている場合は、△の右隣に括弧付きでその点数が表示されています。`,
+    ],
 
     answerBeingEdited: {
       title: {
@@ -216,4 +223,8 @@ export const texts = {
     timeRangeTilde: '～',
   },
   colon: '：',
+  brace: {
+    start: '(',
+    end: ')',
+  },
 } as const;

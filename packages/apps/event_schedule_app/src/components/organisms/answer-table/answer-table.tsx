@@ -1,4 +1,3 @@
-import { HTMLTable } from '@blueprintjs/core';
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
@@ -7,7 +6,8 @@ import type { CSSProperties } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useAnswerTableHooks } from '../../../hooks';
-import { CustomIcon, RequiredParticipantIcon, Td, Th } from '../../atoms';
+import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
+import { BpTableBordered } from '../../bp';
 import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
 import { SortButton } from './sort-button';
@@ -32,24 +32,31 @@ export const AnswerTable = memoNamed<Props>(
     } = useAnswerTableHooks(eventSchedule, answers, onAnswerClick);
 
     return (
-      <HTMLTable bordered={true}>
+      <BpTableBordered>
         <thead>
           <tr>
-            <Th style={tCellStyle}>
+            <th>
               <PaddedSpan>{vt.datetime}</PaddedSpan>
               <SortButton onSortChange={onDatetimeSortChange} />
-            </Th>
-            <Th style={tCellStyle}>
+            </th>
+            <th>
               <PaddedSpan>{vt.score}</PaddedSpan>
               <SortButton onSortChange={onScoreSortChange} />
-            </Th>
-            {eventSchedule.answerSymbolList.map((s) => (
-              <Th key={s.iconId} style={tCellStyle}>
-                <CustomIcon iconName={s.iconId} />
-              </Th>
-            ))}
+            </th>
+
+            {/* symbols */}
+            <th>
+              <CustomIcon iconName={'good'} />
+            </th>
+            <th>
+              <CustomIcon iconName={'fair'} />
+            </th>
+            <th>
+              <CustomIcon iconName={'poor'} />
+            </th>
+
             {answersWithHandler.map((answer) => (
-              <Th key={answer.id} style={noPadStyle}>
+              <th key={answer.id} style={noPadStyle}>
                 {isExpired ? (
                   answer.userName
                 ) : (
@@ -66,7 +73,7 @@ export const AnswerTable = memoNamed<Props>(
                     <RequiredParticipantIcon />
                   </RequiredParticipantIconStyled>
                 ) : undefined}
-              </Th>
+              </th>
             ))}
           </tr>
         </thead>
@@ -81,58 +88,67 @@ export const AnswerTable = memoNamed<Props>(
               style,
             }) => (
               <tr key={key} style={style}>
-                <Td style={tCellStyle}>
+                <td>
                   <DatetimeRangeCell
                     datetimeRange={datetimeRange}
                     datetimeSpecification={eventSchedule.datetimeSpecification}
                   />
-                </Td>
-                <Td>
+                </td>
+                <td>
                   <span>{roundBy(2, score)}</span>
-                </Td>
+                </td>
                 {answerSummaryRow?.map((s, i) => (
                   // eslint-disable-next-line react/no-array-index-key
-                  <Td key={i} style={tCellStyle}>
+                  <td key={i}>
                     <SummaryCellStyle>
                       <span>{s}</span>
                       <SummaryCellUnit>{vt.numAnswersUnit}</SummaryCellUnit>
                     </SummaryCellStyle>
-                  </Td>
+                  </td>
                 ))}
-                {answerTableRow?.map(([iconId, weight], i) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Td key={i} style={tCellStyle}>
-                    {iconId === undefined ? (
-                      ''
-                    ) : (
-                      <AnswerIconCell>
-                        <CustomIcon iconName={iconId} />
-                        {weight !== 1.0 ? (
-                          <WeightValue>
-                            <WeightTimes>{vt.times}</WeightTimes>
-                            <div>{weight}</div>
-                          </WeightValue>
-                        ) : undefined}
-                      </AnswerIconCell>
-                    )}
-                  </Td>
-                ))}
+                {answerTableRow?.map(
+                  ({ iconId, point, showPoint, weight }, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <td key={i}>
+                      {iconId === 'none' ? (
+                        ''
+                      ) : (
+                        <AnswerIconCell>
+                          <CustomIcon iconName={iconId} />
+                          {showPoint ? (
+                            <CustomPointValue>
+                              {`${texts.brace.start}${point}${texts.brace.end}`}
+                            </CustomPointValue>
+                          ) : undefined}
+                          {weight !== 1.0 ? (
+                            <WeightValue>
+                              <WeightTimes>{vt.times}</WeightTimes>
+                              <div>{weight}</div>
+                            </WeightValue>
+                          ) : undefined}
+                        </AnswerIconCell>
+                      )}
+                    </td>
+                  )
+                )}
               </tr>
             )
           )}
 
           {/* コメント行 */}
           <tr>
-            <Td style={tCellStyle}>{vt.comment}</Td>
+            <td>{vt.comment}</td>
 
             {/* spacer */}
-            <Td style={tCellStyle} />
-            {eventSchedule.answerSymbolList.map((s) => (
-              <Td key={s.iconId} style={tCellStyle} />
-            ))}
+            <td />
+
+            {/* spacer - symbols */}
+            <td />
+            <td />
+            <td />
 
             {answersWithHandler.map((answer) => (
-              <Td key={answer.id} style={noPadStyle}>
+              <td key={answer.id} style={noPadStyle}>
                 <div>
                   {answer.comment === '' ? (
                     ''
@@ -140,19 +156,14 @@ export const AnswerTable = memoNamed<Props>(
                     <CommentButton comment={answer.comment} />
                   )}
                 </div>
-              </Td>
+              </td>
             ))}
           </tr>
         </tbody>
-      </HTMLTable>
+      </BpTableBordered>
     );
   }
 );
-
-const tCellStyle: CSSProperties = {
-  verticalAlign: 'middle',
-  whiteSpace: 'nowrap',
-} as const;
 
 const userNameWrapperWidth = 80;
 
@@ -161,7 +172,6 @@ const noPadStyle: CSSProperties = {
   maxWidth: `${userNameWrapperWidth}px`,
   overflowX: 'hidden',
   padding: '5px',
-  verticalAlign: 'middle',
   position: 'relative',
 } as const;
 
@@ -190,6 +200,13 @@ const PaddedSpan = styled.span`
 const AnswerIconCell = styled.div`
   display: flex;
   align-items: flex-end;
+  justify-content: center;
+`;
+
+const CustomPointValue = styled.span`
+  margin-left: 3px;
+  display: flex;
+  font-size: x-small;
 `;
 
 const WeightValue = styled.span`
@@ -201,9 +218,3 @@ const WeightValue = styled.span`
 const WeightTimes = styled.span`
   margin: 0 1px;
 `;
-
-// const Tr = styled.tr`
-//   &:hover {
-//     background-color: #e1e1e1;
-//   }
-// `;

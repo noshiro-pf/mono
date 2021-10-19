@@ -1,62 +1,54 @@
 import type {
-  AnswerSymbol,
-  AnswerSymbolIconId,
-  AnswerSymbolPointEnumType,
+  AnswerSymbolId,
+  AnswerSymbolPoint,
+  SymbolSetting,
 } from '@noshiro/event-schedule-app-shared';
-import { BpInput, BpNumericInput } from '@noshiro/react-blueprintjs-utils';
+import { BpInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import { match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { answerSymbolPointConfig } from '../../../constants';
-import { clampAndRoundAnswerSymbolPoint } from '../../../functions';
 import { CustomIcon } from '../../atoms';
+import {
+  AnswerSymbolFairPointInput,
+  AnswerSymbolGoodPointInputDisabled,
+  AnswerSymbolPoorPointInputDisabled,
+} from '../../molecules';
 
 type Props = Readonly<{
-  answerSymbol: AnswerSymbol;
-  iconsInUse: readonly AnswerSymbolIconId[];
+  symbolId: AnswerSymbolId;
+  answerSymbol: SymbolSetting;
   onDescriptionChange: (value: string) => void;
-  onPointChange: (value: AnswerSymbolPointEnumType) => void;
-  onDeleteClick: () => void;
-  disabled: boolean;
+  onPointChange: (value: AnswerSymbolPoint) => void;
 }>;
 
 export const AnswerSymbolRow = memoNamed<Props>(
   'AnswerSymbolRow',
-  ({ answerSymbol, onDescriptionChange, onPointChange, disabled }) => {
-    const onPointChangeHandler = useCallback(
-      (value: number) => {
-        onPointChange(clampAndRoundAnswerSymbolPoint(value));
-      },
-      [onPointChange]
-    );
-
-    return (
-      <Root>
-        <IconWrapper>
-          <CustomIcon iconName={answerSymbol.iconId} />
-        </IconWrapper>
-        <DescriptionWrapper>
-          <BpInput
-            disabled={disabled}
-            value={answerSymbol.description}
-            onValueChange={onDescriptionChange}
-          />
-        </DescriptionWrapper>
-        <NumericInputWrapper>
-          <BpNumericInput
-            disabled={disabled}
-            majorStepSize={answerSymbolPointConfig.majorStep}
-            max={answerSymbolPointConfig.max}
-            min={answerSymbolPointConfig.min}
-            minorStepSize={answerSymbolPointConfig.minorStep}
-            stepSize={answerSymbolPointConfig.step}
-            value={answerSymbol.point}
-            onValueChange={onPointChangeHandler}
-          />
-        </NumericInputWrapper>
-      </Root>
-    );
-  }
+  ({ symbolId, answerSymbol, onDescriptionChange, onPointChange }) => (
+    <Root>
+      <IconWrapper>
+        <CustomIcon iconName={symbolId} />
+      </IconWrapper>
+      <DescriptionWrapper>
+        <BpInput
+          value={answerSymbol.description}
+          onValueChange={onDescriptionChange}
+        />
+      </DescriptionWrapper>
+      <NumericInputWrapper>
+        {match(symbolId, {
+          good: <AnswerSymbolGoodPointInputDisabled />,
+          poor: <AnswerSymbolPoorPointInputDisabled />,
+          fair: (
+            <AnswerSymbolFairPointInput
+              disabled={false}
+              value={answerSymbol.point}
+              onValueChange={onPointChange}
+            />
+          ),
+        })}
+      </NumericInputWrapper>
+    </Root>
+  )
 );
 
 const Root = styled.div`

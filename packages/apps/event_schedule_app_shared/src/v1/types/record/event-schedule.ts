@@ -30,19 +30,24 @@ export type EventSchedule = Readonly<{
 }>;
 
 export type PartialEventSchedule = Partial<
-  Readonly<{
-    title: EventSchedule['title'];
-    notes: EventSchedule['notes'];
-    datetimeSpecification: EventSchedule['datetimeSpecification'];
-    datetimeRangeList: readonly PartialDatetimeRange[];
-    useAnswerDeadline: EventSchedule['useAnswerDeadline'];
-    answerDeadline: PartialYmdhm;
-    customizeSymbolSettings: EventSchedule['customizeSymbolSettings'];
-    answerSymbolList: readonly PartialAnswerSymbol[];
-    useNotification: EventSchedule['useNotification'];
-    notificationSettings: PartialNotificationSettings;
-    timezoneOffsetMinutes: EventSchedule['timezoneOffsetMinutes'];
-  }>
+  MergeIntersection<
+    Pick<
+      EventSchedule,
+      | 'customizeSymbolSettings'
+      | 'datetimeSpecification'
+      | 'notes'
+      | 'timezoneOffsetMinutes'
+      | 'title'
+      | 'useAnswerDeadline'
+      | 'useNotification'
+    > &
+      Readonly<{
+        datetimeRangeList: readonly PartialDatetimeRange[];
+        answerDeadline: PartialYmdhm;
+        answerSymbolList: readonly PartialAnswerSymbol[];
+        notificationSettings: PartialNotificationSettings;
+      }>
+  >
 >;
 
 export const defaultEventSchedule: EventSchedule = {
