@@ -1,0 +1,56 @@
+{
+  "name": "@noshiro/blueprintjs-playground",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
+    "prebuild": "yarn clean:build",
+    "build": "webpack --config config/webpack.prod.js",
+    "postbuild": "cpx \"public/**\" ${npm_package_config_build_dir}",
+    "clean": "run-s clean:**",
+    "clean:build": "rimraf ${npm_package_config_build_dir}",
+    "clean:cache": "rimraf .firebase",
+    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
+    "predeploy": "yarn build",
+    "deploy": "firebase deploy",
+    "fb:init": "firebase init",
+    "fb:login": "firebase login",
+    "fmt": "yarn _prettier .",
+    "gi": "echo 'no gi script'",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "lint:fix": "yarn lint --fix",
+    "serve": "firebase serve",
+    "setup": "yarn setup:webpackconfig",
+    "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",
+    "start": "webpack serve --config config/webpack.dev.js",
+    "test": "jest --config config/jest.config.json --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "build_dir": "build",
+    "root_dir": "../../.."
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@blueprintjs/core": "^3.36.0",
+    "@blueprintjs/datetime": "^3.20.0",
+    "@blueprintjs/icons": "^3.23.0",
+    "@noshiro/react-utils": "*",
+    "@noshiro/ts-utils": "*",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^5.3.0"
+  }
+}
