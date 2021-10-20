@@ -1,0 +1,34 @@
+{
+  "name": "@noshiro/blueprint-css",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": false,
+  "main": "blueprint-min.css",
+  "style": "blueprint-min.css",
+  "files": [
+    "blueprint-min.css",
+    "blueprint-icons.css",
+    "resources/icons/*"
+  ],
+  "scripts": {
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "build": "echo 'no build script'",
+    "clean": "echo 'no clean script'",
+    "fmt": "yarn _prettier .",
+    "gi": "echo 'no gi script'",
+    "lint": "echo 'no lint script'",
+    "lint:fix": "echo 'no lint:fix script'",
+    "setup": "echo 'no setup script'",
+    "test": "echo 'no test script'"
+  },
+  "config": {
+    "root_dir": "../../.."
+  },
+  "devDependencies": {
+    "normalize.css": "^8.0.1"
+  },
+  "peerDependencies": {
+    "normalize.css": "^8.0.1"
+  }
+}
