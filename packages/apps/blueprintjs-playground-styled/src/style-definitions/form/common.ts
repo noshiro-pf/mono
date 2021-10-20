@@ -1,4 +1,5 @@
 import { recordFromEntries } from '@noshiro/ts-utils';
+import { css } from 'styled-components';
 import { buttonColorDisabled, darkButtonColorDisabled } from '../button';
 import {
   black,
@@ -94,7 +95,7 @@ export const inputTransitionShadow = (
     ? [borderShadow(1, color, 1), borderShadow(0.3, color, 3)].join(', ')
     : [borderShadow(0, color, 0), borderShadow(0, color, 0)].join(', ');
 
-export const ptInputPlaceholder = `
+export const ptInputPlaceholder = css`
   &::placeholder {
     color: ${inputPlaceholderColor};
     // normalize.css sets an opacity less than 1, we don't want this
@@ -102,7 +103,7 @@ export const ptInputPlaceholder = `
   }
 `;
 
-export const ptInputDisabled = `
+export const ptInputDisabled = css`
   background: ${inputBackgroundColorDisabled};
   box-shadow: none;
   color: ${inputColorDisabled};
@@ -110,7 +111,7 @@ export const ptInputDisabled = `
   resize: none;
 `;
 
-export const ptInput = `
+export const ptInput = css`
   ${ptInputPlaceholder}
 
   appearance: none;
@@ -149,5 +150,4 @@ export const ptInput = `
   &:disabled {
     ${ptInputDisabled}
   }
-
 `;

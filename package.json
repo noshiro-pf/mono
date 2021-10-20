@@ -26,6 +26,7 @@
     "packages/apps/algo_app",
     "packages/apps/annotation_tool",
     "packages/apps/blueprintjs-playground",
+    "packages/apps/blueprintjs-playground-styled",
     "packages/apps/cant_stop_probability",
     "packages/apps/catan_dice_app",
     "packages/apps/color_demo_app",

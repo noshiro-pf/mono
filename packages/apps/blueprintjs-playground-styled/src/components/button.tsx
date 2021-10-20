@@ -1,10 +1,13 @@
 import styled from 'styled-components';
-import { ptButtonHeightPx } from '../common';
-import { ptButtonBase, ptButtonHeight } from './common';
+import {
+  ptButtonBase,
+  ptButtonHeight,
+} from '../style-definitions/button/common';
+import { ptButtonHeightPx } from '../style-definitions/common';
 
 export const Button = styled.button`
-  ${ptButtonBase};
-  ${ptButtonHeight(ptButtonHeightPx)};
+  ${ptButtonBase}
+  ${ptButtonHeight(ptButtonHeightPx)}
 
   &:empty {
     // override padding from other modifiers (for CSS icon support)
