@@ -4,6 +4,7 @@
   "license": "MIT",
   "workspaces": [
     "packages/utils/template",
+    "packages/utils/blueprint-css",
     "packages/utils/ts-utils",
     "packages/utils/fast-deep-equal",
     "packages/utils/syncflow",
