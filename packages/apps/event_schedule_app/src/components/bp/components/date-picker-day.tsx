@@ -1,19 +1,6 @@
 import styled from 'styled-components';
 
-const FocusVisibleStyledDiv = styled.div`
-  &:focus-visible {
-    outline: -webkit-focus-ring-color auto 1px;
-  }
-`;
-
-const FocusStyledDiv = styled(FocusVisibleStyledDiv)`
-  &:focus {
-    outline: rgba(19, 124, 189, 0.6) auto 2px;
-    outline-offset: 2px;
-  }
-`;
-
-export const Bp3DatePicker = styled(FocusStyledDiv)`
+export const Bp3DatePicker = styled.div`
   background: #ffffff;
   border-radius: 3px;
   display: -webkit-box;
@@ -27,14 +14,14 @@ export const Bp3DatePicker = styled(FocusStyledDiv)`
   user-select: none;
 `;
 
-export const DayPicker = styled(FocusStyledDiv)`
+export const DayPicker = styled.div`
   display: inline-block;
   min-width: 210px;
   position: relative;
   vertical-align: top;
 `;
 
-export const DatePickerMonth = styled(FocusStyledDiv)`
+export const DatePickerMonth = styled.div`
   border-collapse: collapse;
   border-spacing: 0;
   display: inline-table;
@@ -45,15 +32,15 @@ export const DatePickerMonth = styled(FocusStyledDiv)`
   user-select: none;
 `;
 
-export const DatePickerWeekdays = styled(FocusStyledDiv)`
+export const DatePickerWeekdays = styled.div`
   display: table-header-group;
 `;
 
-export const DatePickerWeekdaysRow = styled(FocusStyledDiv)`
+export const DatePickerWeekdaysRow = styled.div`
   display: table-row;
 `;
 
-const DatePickerWeekdayBase = styled(FocusStyledDiv)`
+const DatePickerWeekdayBase = styled.div`
   display: table-cell;
   height: 30px;
   line-height: 1;
@@ -77,15 +64,15 @@ export const DatePickerWeekday = styled(DatePickerWeekdayBase)`
   }
 `;
 
-export const DatePickerBody = styled(FocusStyledDiv)`
+export const DatePickerBody = styled.div`
   display: table-row-group;
 `;
 
-export const DatePickerWeek = styled(FocusStyledDiv)`
+export const DatePickerWeek = styled.div`
   display: table-row;
 `;
 
-const DatePickerDayBase = styled(FocusVisibleStyledDiv)`
+const DatePickerDayBase = styled.div`
   display: table-cell;
   height: 30px;
   line-height: 1;
@@ -137,7 +124,7 @@ export const DatePickerDayOutside = styled(DatePickerDayBase)`
   color: rgba(92, 112, 128, 0.6);
 `;
 
-export const DatePickerDayWrapper = styled(FocusStyledDiv)`
+export const DatePickerDayWrapper = styled.div`
   border-radius: 3px;
   padding: 7px;
 `;

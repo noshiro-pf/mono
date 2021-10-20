@@ -10,7 +10,7 @@ import {
   ptGridSizePx,
   ptHeadingColor,
   ptTextColor,
-} from './common';
+} from '../style-definitions';
 
 const tableRowHeightPx = ptGridSizePx * 4;
 const tableBorderWidthPx = 1;

@@ -8,6 +8,14 @@ import type {
 } from 'react';
 import { useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
+import {
+  ptButton,
+  ptButtonBase,
+  ptButtonHeight,
+  ptButtonHeightPx,
+  ptIconColor,
+  ptInput,
+} from '../../../style-definitions';
 
 type Props = Partial<
   Readonly<{
@@ -81,7 +89,7 @@ export const NumericInputView = memoNamed<Props>(
     return (
       <NumericInputControlGroup fillSpace={fillSpace}>
         <InputGroup disabled={disabled} fillSpace={fillSpace}>
-          <Input
+          <InputAlignedRight
             ref={inputRef}
             autoComplete='off'
             disabled={disabled}
@@ -140,15 +148,6 @@ export const NumericInputView = memoNamed<Props>(
   }
 );
 
-const defaultFocusStyle = css`
-  outline: rgba(19, 124, 189, 0.6) auto 2px;
-  outline-offset: 2px;
-`;
-
-const defaultFocusVisibleStyle = css`
-  outline: -webkit-focus-ring-color auto 1px;
-`;
-
 type StyleProps = Readonly<{ disabled?: boolean; fillSpace?: boolean }>;
 
 const NumericInputControlGroup = styled.div`
@@ -159,11 +158,6 @@ const NumericInputControlGroup = styled.div`
   flex-direction: row;
   -webkit-box-align: stretch;
   align-items: stretch;
-
-  &:focus,
-  &:focus-visible {
-    ${defaultFocusStyle}
-  }
 
   ${(props: StyleProps) =>
     props.fillSpace === true
@@ -185,14 +179,6 @@ const InputGroup = styled.div`
 
   margin-right: -1px;
 
-  &:focus {
-    ${defaultFocusStyle}
-  }
-
-  &:focus-visible {
-    ${defaultFocusVisibleStyle}
-  }
-
   ${(props: StyleProps) =>
     props.disabled === true
       ? css`
@@ -209,59 +195,32 @@ const InputGroup = styled.div`
       : css``}
 `;
 
-const Input = styled.input`
-  font-family: inherit;
-  margin: 0;
+const InputAlignedRight = styled.input`
+  ${ptInput}
 
-  overflow: visible;
-
-  appearance: none;
-  background: #ffffff;
-  border: none;
-  box-shadow: 0 0 0 0 rgb(19 124 189 / 0%), 0 0 0 0 rgb(19 124 189 / 0%),
-    inset 0 0 0 1px rgb(16 22 26 / 15%), inset 0 1px 1px rgb(16 22 26 / 20%);
-  color: #182026;
-  font-size: 14px;
-  font-weight: 400;
-  height: 30px;
-  line-height: 30px;
-  outline: none;
-  padding: 0 10px;
-  transition: box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9),
-    -webkit-box-shadow 100ms cubic-bezier(0.4, 1, 0.75, 0.9);
-  vertical-align: middle;
-
+  /* .bp3-control-group .bp3-input */
   border-radius: inherit;
   z-index: 2;
 
+  /* .bp3-input-group .bp3-input */
   position: relative;
   width: 100%;
 
   &:focus {
+    /* focus states */
     outline-offset: 2px;
-    box-shadow: 0 0 0 1px #137cbd, 0 0 0 3px rgb(19 124 189 / 30%),
-      inset 0 1px 1px rgb(16 22 26 / 20%);
 
+    /* .bp3-control-group .bp3-input:focus */
     border-radius: 3px;
     z-index: 14;
   }
 
-  &:focus-visible {
-    outline-offset: 0px;
+  &:disabled {
+    /* .bp3-control-group .bp3-input:disabled */
+    z-index: 1;
   }
 
-  ${(props: StyleProps) =>
-    props.disabled === true
-      ? css`
-          background: rgba(206, 217, 224, 0.5);
-          box-shadow: none;
-          color: rgba(92, 112, 128, 0.6);
-          cursor: not-allowed;
-          resize: none;
-          z-index: 1;
-        `
-      : css``}
-
+  /* custom style */
   text-align: right;
 `;
 
@@ -282,60 +241,27 @@ const ButtonGroupVerticalFixed = styled.div`
   border-radius: 0 3px 3px 0;
 
   margin-right: -1px;
-
-  &:focus {
-    ${defaultFocusStyle}
-  }
-
-  &:focus-visible {
-    ${defaultFocusVisibleStyle}
-  }
 `;
 
 const Button = styled.button`
-  font-family: inherit;
-  line-height: 1.15;
-  margin: 0;
+  /* .bp3-button */
+  ${ptButtonBase}
 
-  overflow: visible;
+  ${ptButtonHeight(ptButtonHeightPx)}
 
-  text-transform: none;
+  ${ptButton}
 
-  -webkit-appearance: button;
-
-  display: inline-flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-align: center;
-  align-items: center;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  -webkit-box-pack: center;
-  justify-content: center;
-  text-align: left;
-  vertical-align: middle;
-  min-width: 30px;
-
-  background-color: #f5f8fa;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.8),
-    rgba(255, 255, 255, 0)
-  );
-  box-shadow: inset 0 0 0 1px rgb(16 22 26 / 20%),
-    inset 0 -1px 0 rgb(16 22 26 / 10%);
-  color: #182026;
-
+  /* .bp3-control-group .bp3-button */
   position: relative;
 
+  /* .bp3-control-group .bp3-button */
   transform: translateZ(0);
   z-index: 4;
 
+  /* .bp3-button-group.bp3-vertical .bp3-button */
   margin-right: 0 !important;
 
+  /* .bp3-numeric-input .bp3-button-group.bp3-vertical > .bp3-button */
   -webkit-box-flex: 1;
   flex: 1 1 14px;
   min-height: 0;
@@ -343,42 +269,24 @@ const Button = styled.button`
   width: 30px;
 
   &:focus {
-    ${defaultFocusStyle}
+    /* .bp3-control-group .bp3-button:focus, .bp3-control-group .bp3-html-select select:focus, .bp3-control-group .bp3-select select:focus */
     z-index: 5;
   }
 
-  &:focus-visible {
-    ${defaultFocusVisibleStyle}
-  }
-
-  &:active {
-    background-color: #d8e1e8;
-    background-image: none;
-    box-shadow: inset 0 0 0 1px rgb(16 22 26 / 20%),
-      inset 0 1px 2px rgb(16 22 26 / 20%);
-
-    z-index: 7;
-  }
-
   &:hover {
-    background-clip: padding-box;
-    background-color: #ebf1f5;
-    box-shadow: inset 0 0 0 1px rgb(16 22 26 / 20%),
-      inset 0 -1px 0 rgb(16 22 26 / 10%);
+    /* .bp3-control-group .bp3-button:hover, .bp3-control-group .bp3-html-select select:hover, .bp3-control-group .bp3-select select:hover */
     z-index: 6;
   }
 
-  ${(props: StyleProps) =>
-    props.disabled === true
-      ? css`
-          background-color: rgba(206, 217, 224, 0.5);
-          background-image: none;
-          box-shadow: none;
-          color: rgba(92, 112, 128, 0.6);
-          cursor: not-allowed;
-          outline: none;
-        `
-      : css``}
+  &:active {
+    /* .bp3-control-group .bp3-button:active, .bp3-control-group .bp3-html-select select:active, .bp3-control-group .bp3-select select:active */
+    z-index: 7;
+  }
+
+  &:disabled {
+    /* .bp3-control-group .bp3-button[readonly], .bp3-control-group .bp3-button:disabled, .bp3-control-group .bp3-button.bp3-disabled, .bp3-control-group .bp3-html-select select[readonly], .bp3-control-group .bp3-html-select select:disabled, .bp3-control-group .bp3-html-select select.bp3-disabled, .bp3-control-group .bp3-select select[readonly], .bp3-control-group .bp3-select select:disabled, .bp3-control-group .bp3-select select.bp3-disabled */
+    z-index: 3;
+  }
 `;
 
 const ButtonUp = styled(Button)`
@@ -397,7 +305,7 @@ const IconWrapper = styled.span`
   flex: 0 0 auto;
   vertical-align: text-bottom;
 
-  color: #5c7080;
+  color: ${ptIconColor};
 
   margin: 0 -7px;
 `;
