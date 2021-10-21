@@ -1,7 +1,7 @@
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { match } from '@noshiro/ts-utils';
 import { texts } from '../../../constants';
+import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 type Props = Readonly<{
@@ -82,12 +82,11 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
 const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
   'SubmitAnswerButton',
   ({ onConfirmSubmissionOfAnswer, loading, disabled, mode }) => (
-    <BpButton
+    <ButtonNowrapStyled
       disabled={disabled}
       icon='tick'
       intent='primary'
       loading={loading}
-      nowrap={true}
       text={match(mode, {
         creating: vt.submitButton.create,
         editing: vt.submitButton.update,

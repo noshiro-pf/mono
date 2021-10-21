@@ -1,5 +1,5 @@
+import { Button } from '@blueprintjs/core';
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { roundBy } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useAnswerTableHooks } from '../../../hooks';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
-import { BpTableBordered } from '../../bp';
+import { HTMLTableBorderedStyled } from '../../bp';
 import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
 import { SortButton } from './sort-button';
@@ -32,7 +32,7 @@ export const AnswerTable = memoNamed<Props>(
     } = useAnswerTableHooks(eventSchedule, answers, onAnswerClick);
 
     return (
-      <BpTableBordered>
+      <HTMLTableBorderedStyled>
         <thead>
           <tr>
             <th>
@@ -160,7 +160,7 @@ export const AnswerTable = memoNamed<Props>(
             ))}
           </tr>
         </tbody>
-      </BpTableBordered>
+      </HTMLTableBorderedStyled>
     );
   }
 );
@@ -181,7 +181,7 @@ const RequiredParticipantIconStyled = styled.div`
   left: 5px;
 `;
 
-const BpButtonOverflowHidden = styled(BpButton)`
+const BpButtonOverflowHidden = styled(Button)`
   overflow-x: hidden;
 `;
 

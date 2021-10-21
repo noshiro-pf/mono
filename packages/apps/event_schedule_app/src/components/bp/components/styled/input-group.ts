@@ -3,7 +3,7 @@ import {
   ptButtonHeightPx,
   ptButtonHeightSmallerPx,
   ptButtonHeightSmallPx,
-} from '../common';
+} from '../../constants';
 
 // 3px space between small button and regular input
 export const inputButtonHeightPx = ptButtonHeightSmallPx;
@@ -12,7 +12,7 @@ export const inputButtonHeightLargePx = ptButtonHeightPx;
 // 1px space between regular button and small input
 export const inputButtonHeightSmallPx = ptButtonHeightSmallerPx;
 
-export const InputGroup = styled.div`
+export const InputGroupStyled = styled.div`
   display: block;
   position: relative;
 `;

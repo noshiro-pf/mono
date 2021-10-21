@@ -1,8 +1,8 @@
-import { BpSwitchWithoutLabel } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import { Description } from '../atoms';
+import { SwitchWithoutLabelStyled } from '../bp';
 
 type Props = Readonly<{
   title: string;
@@ -19,10 +19,10 @@ export const ParagraphWithSwitch = memoNamed<Props>(
     <div>
       <SwitchWrapper>
         <div>{props.title}</div>
-        <BpSwitchWithoutLabel
+        <SwitchWithoutLabelStyled
           checked={props.show}
           inline={true}
-          onToggle={props.onToggle}
+          onChange={props.onToggle}
         />
       </SwitchWrapper>
       {props.description === undefined

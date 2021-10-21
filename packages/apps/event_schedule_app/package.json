@@ -58,7 +58,6 @@
     "@blueprintjs/icons": "^3.23.0",
     "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/fast-deep-equal": "*",
-    "@noshiro/react-blueprintjs-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow-react-hooks": "*",
     "@noshiro/tiny-router-observable": "*",

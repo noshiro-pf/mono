@@ -1,5 +1,4 @@
-import { AnchorButton, Icon, Spinner } from '@blueprintjs/core';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { AnchorButton, Button, Icon, Spinner } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { IList } from '@noshiro/ts-utils';
 import styled from 'styled-components';
@@ -87,13 +86,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               isExpired={isExpired}
             />
             <ButtonsWrapperAlignEnd>
-              <BpButton
-                icon={'cog'}
-                intent={'none'}
-                onClick={onEditButtonClick}
-              >
+              <Button icon={'cog'} intent={'none'} onClick={onEditButtonClick}>
                 {vt.eventInfo.editButton}
-              </BpButton>
+              </Button>
             </ButtonsWrapperAlignEnd>
           </Section>
           <Section sectionTitle={vt.answers.title}>
@@ -107,7 +102,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
             {isExpired ? undefined : (
               <SingleButtonWrapper>
-                <BpButton
+                <Button
                   disabled={refreshButtonIsDisabled}
                   icon={'refresh'}
                   intent={'none'}
@@ -115,7 +110,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   onClick={refreshAnswers}
                 >
                   {vt.answers.refresh}
-                </BpButton>
+                </Button>
               </SingleButtonWrapper>
             )}
 
@@ -183,7 +178,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
             {answerBeingEditedSectionState === 'hidden' && !isExpired ? (
               <ButtonsWrapperAlignEnd>
-                <BpButton
+                <Button
                   icon='add'
                   intent='primary'
                   text={vt.answers.addAnswer}

@@ -4,7 +4,7 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
-import { DatePickerWeek } from '../bp';
+import { DatePickerWeekStyled } from '../bp';
 import { DatePickerDate } from './date-picker-day';
 
 type Props = Readonly<{
@@ -35,7 +35,7 @@ export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
   );
 
   return (
-    <DatePickerWeek role='row'>
+    <DatePickerWeekStyled role='row'>
       {listWithHandler.map(({ value, handler, index }) => (
         <DatePickerDate
           key={index}
@@ -47,6 +47,6 @@ export const Week = memoNamed<Props>('Week', ({ week, onClick }) => {
           onClick={handler}
         />
       ))}
-    </DatePickerWeek>
+    </DatePickerWeekStyled>
   );
 });

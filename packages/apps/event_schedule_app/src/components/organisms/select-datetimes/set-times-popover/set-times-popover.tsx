@@ -1,9 +1,8 @@
-import { Popover } from '@blueprintjs/core';
+import { Button, Popover } from '@blueprintjs/core';
 import type {
   DatetimeSpecificationEnumType,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { texts } from '../../../../constants';
@@ -44,7 +43,7 @@ export const SetTimesPopover = memoNamed<Props>(
         isOpen={isOpen}
         onClose={handleClose}
       >
-        <BpButton
+        <Button
           intent='success'
           text={vt.setTimesAtOneTime}
           onClick={handleOpen}

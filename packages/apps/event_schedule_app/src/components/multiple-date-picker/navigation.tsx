@@ -1,5 +1,5 @@
 import type { OptionProps } from '@blueprintjs/core';
-import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
+import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import type { MonthEnum, YearEnum } from '@noshiro/ts-utils';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
+import { BpSelect } from '../bp';
 
 const thisYear = getYear(today());
 const thisMonth = getMonth(today());
@@ -60,7 +61,7 @@ export const DatepickerNav = memoNamed<Props>(
 
     return (
       <Nav>
-        <BpButton
+        <Button
           icon={'chevron-left'}
           minimal={true}
           type='button'
@@ -78,7 +79,7 @@ export const DatepickerNav = memoNamed<Props>(
           value={month}
           onValueChange={onMonthChangeHandler}
         />
-        <BpButton
+        <Button
           icon={'chevron-right'}
           minimal={true}
           type='button'

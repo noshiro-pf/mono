@@ -1,8 +1,7 @@
 import styled from 'styled-components';
-import { ptInputHeightPx } from '../common';
-import { ptInput, ptInputPlaceholder } from './common';
+import { ptInput, ptInputHeightPx, ptInputPlaceholder } from '../../constants';
 
-export const Input = styled.input`
+const InputStyled = styled.input`
   ${ptInputPlaceholder}
   ${ptInput}
 
@@ -11,7 +10,7 @@ export const Input = styled.input`
   }
 `;
 
-export const InputGroupInput = styled(Input)`
+export const InputGroupInputStyled = styled(InputStyled)`
   position: relative;
   width: 100%;
 

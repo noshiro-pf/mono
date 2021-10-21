@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type {
   DayType,
   YearMonthDate,
@@ -7,12 +8,12 @@ import { noop } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import {
-  DatePickerDay,
   DatePickerDayOutside,
-  DatePickerDayReadonly,
-  DatePickerDaySelected,
-  DatePickerDaySelectedReadonly,
-  DatePickerDayWrapper,
+  DatePickerDayReadonlyStyled,
+  DatePickerDaySelectedReadonlyStyled,
+  DatePickerDaySelectedStyled,
+  DatePickerDayStyled,
+  DatePickerDayWrapperStyled,
 } from '../bp';
 
 type Props = Readonly<{
@@ -39,21 +40,20 @@ export const DatePickerDate = memoNamed<Props>(
       [ymd]
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const DatePickerDayResolved =
       onClick === undefined
         ? selected
-          ? DatePickerDaySelectedReadonly
+          ? DatePickerDaySelectedReadonlyStyled
           : outside
           ? DatePickerDayOutside
-          : DatePickerDayReadonly
+          : DatePickerDayReadonlyStyled
         : selected
         ? outside
-          ? DatePickerDaySelectedReadonly
-          : DatePickerDaySelected
+          ? DatePickerDaySelectedReadonlyStyled
+          : DatePickerDaySelectedStyled
         : outside
         ? DatePickerDayOutside
-        : DatePickerDay;
+        : DatePickerDayStyled;
 
     const style = useMemo<CSSProperties>(() => {
       if (selected || outside) return {};
@@ -80,7 +80,9 @@ export const DatePickerDate = memoNamed<Props>(
         title={holidayJpName}
         onClick={outside ? noop : onClick}
       >
-        <DatePickerDayWrapper style={style}>{ymd.date}</DatePickerDayWrapper>
+        <DatePickerDayWrapperStyled style={style}>
+          {ymd.date}
+        </DatePickerDayWrapperStyled>
       </DatePickerDayResolved>
     );
   }

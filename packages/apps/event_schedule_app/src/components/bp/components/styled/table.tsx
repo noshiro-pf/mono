@@ -10,13 +10,13 @@ import {
   ptGridSizePx,
   ptHeadingColor,
   ptTextColor,
-} from '../style-definitions';
+} from '../../constants';
 
 const tableRowHeightPx = ptGridSizePx * 4;
 const tableBorderWidthPx = 1;
 const tableBorderColor = ptDividerBlack;
 
-export const BpTable = styled.table`
+export const HTMLTableStyled = styled.table`
   border-spacing: 0;
   font-size: ${ptFontSizePx}px;
 
@@ -48,7 +48,7 @@ export const BpTable = styled.table`
   }
 `;
 
-export const BpTableBordered = styled(BpTable)`
+export const HTMLTableBorderedStyled = styled(HTMLTableStyled)`
   /* bordered */
   th:not(:first-child) {
     box-shadow: inset ${tableBorderWidthPx}px 0 0 0 ${tableBorderColor};

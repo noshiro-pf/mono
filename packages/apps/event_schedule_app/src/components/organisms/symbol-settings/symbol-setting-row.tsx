@@ -3,15 +3,15 @@ import type {
   AnswerSymbolPoint,
   SymbolSetting,
 } from '@noshiro/event-schedule-app-shared';
-import { BpInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { CustomIcon } from '../../atoms';
+import { BpInput } from '../../bp';
 import {
   AnswerSymbolFairPointInput,
-  AnswerSymbolGoodPointInputDisabled,
-  AnswerSymbolPoorPointInputDisabled,
+  AnswerSymbolGoodPoint,
+  AnswerSymbolPoorPoint,
 } from '../../molecules';
 
 type Props = Readonly<{
@@ -36,8 +36,8 @@ export const AnswerSymbolRow = memoNamed<Props>(
       </DescriptionWrapper>
       <NumericInputWrapper>
         {match(symbolId, {
-          good: <AnswerSymbolGoodPointInputDisabled />,
-          poor: <AnswerSymbolPoorPointInputDisabled />,
+          good: <AnswerSymbolGoodPoint />,
+          poor: <AnswerSymbolPoorPoint />,
           fair: (
             <AnswerSymbolFairPointInput
               disabled={false}

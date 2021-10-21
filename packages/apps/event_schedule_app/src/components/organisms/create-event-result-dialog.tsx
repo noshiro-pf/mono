@@ -1,8 +1,14 @@
-import { AnchorButton, Classes, Spinner, Tooltip } from '@blueprintjs/core';
-import { BpButton, BpDialog } from '@noshiro/react-blueprintjs-utils';
+import {
+  AnchorButton,
+  Button,
+  Classes,
+  Spinner,
+  Tooltip,
+} from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../constants';
+import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 
 const vt = texts.createEventResultDialog;
@@ -18,7 +24,7 @@ type Props = Readonly<{
 export const CreateEventResultDialog = memoNamed<Props>(
   'CreateEventResultDialog',
   (props) => (
-    <BpDialog
+    <DialogWithMaxWidth
       canEscapeKeyClose={false}
       hasBackdrop={false}
       icon='timeline-events'
@@ -45,7 +51,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
               </AnchorWrapper>
               <div>
                 <Tooltip content={vt.clipboardButton}>
-                  <BpButton
+                  <Button
                     icon={'clipboard'}
                     minimal={true}
                     onClick={props.onClipboardButtonClick}
@@ -73,7 +79,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
           </ButtonsWrapperAlignEnd>
         </div>
       )}
-    </BpDialog>
+    </DialogWithMaxWidth>
   )
 );
 

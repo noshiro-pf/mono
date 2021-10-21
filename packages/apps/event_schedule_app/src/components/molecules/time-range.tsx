@@ -3,9 +3,9 @@ import type {
   HoursMinutes,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { BpTimePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
+import { BpTimePicker } from '../bp';
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;

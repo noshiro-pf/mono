@@ -1,12 +1,13 @@
+import { Button } from '@blueprintjs/core';
 import type {
   DatetimeRange,
   DatetimeSpecificationEnumType,
   HoursMinutes,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
-import { BpButton, BpDatePicker } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
+import { BpDatePicker } from '../../../bp';
 import { TimeRangeView } from '../../../molecules';
 
 type Props = Readonly<{
@@ -40,12 +41,12 @@ export const SelectedDatetimeRow = memoNamed<Props>(
       </DatetimeWrapper>
 
       <ButtonsWrapper>
-        <BpButton
+        <Button
           icon={'duplicate'}
           minimal={true}
           onClick={props.onDuplicateClick}
         />
-        <BpButton icon={'trash'} minimal={true} onClick={props.onDeleteClick} />
+        <Button icon={'trash'} minimal={true} onClick={props.onDeleteClick} />
       </ButtonsWrapper>
     </Root>
   )

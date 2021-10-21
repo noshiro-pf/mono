@@ -1,11 +1,5 @@
 import type { HTMLSelectProps } from '@blueprintjs/core';
 import { Button, TextArea } from '@blueprintjs/core';
-import {
-  BpInput,
-  BpSelect,
-  BpSwitch,
-  BpTimePicker,
-} from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useToggleState } from '@noshiro/react-utils';
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
@@ -20,6 +14,7 @@ import {
   EditIcon,
   TriangleIcon,
 } from '../atoms';
+import { BpInput, BpSelect, BpSwitch, BpTimePicker } from '../bp';
 
 const size: CSSProperties = { width: '32px', height: '32px' };
 

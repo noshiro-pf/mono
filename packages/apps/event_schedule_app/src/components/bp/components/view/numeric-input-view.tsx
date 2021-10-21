@@ -15,7 +15,7 @@ import {
   ptButtonHeightPx,
   ptIconColor,
   ptInput,
-} from '../../../style-definitions';
+} from '../../constants';
 
 type Props = Partial<
   Readonly<{

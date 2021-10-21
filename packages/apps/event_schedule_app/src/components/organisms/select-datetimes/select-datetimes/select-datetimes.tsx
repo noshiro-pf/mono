@@ -1,9 +1,9 @@
+import { Button } from '@blueprintjs/core';
 import type {
   DatetimeRange,
   DatetimeSpecificationEnumType,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
-import { BpButton, BpSelect } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
@@ -11,6 +11,7 @@ import { texts } from '../../../../constants';
 import type { YmdKey } from '../../../../functions';
 import { selectorOptions } from '../../../../functions';
 import { useSelectDatetimesHooks } from '../../../../hooks';
+import { BpSelect } from '../../../bp';
 import { AddElementButton } from '../../../molecules';
 import { MultipleDatePicker } from '../../../multiple-date-picker';
 import { ButtonsWrapper } from '../../../styled';
@@ -93,7 +94,7 @@ export const SelectDatetimes = memoNamed<Props>(
               initialValue={setTimesPopoverInitialValue}
               onSetTimesSubmit={onSetTimesPopoverSubmit}
             />
-            <BpButton
+            <Button
               icon='sort-asc'
               intent='primary'
               text={vt.sortDatetimes}

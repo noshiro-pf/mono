@@ -1,8 +1,8 @@
 import type { IconName, Intent } from '@blueprintjs/core';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed, useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { createToaster, showToast } from '../../../functions';
+import { ButtonNowrapStyled } from '../../bp';
 import { ConfirmDialog } from './confirm-dialog';
 
 type Props = DeepReadonly<{
@@ -63,12 +63,11 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
     return (
       <>
-        <BpButton
+        <ButtonNowrapStyled
           disabled={disabled}
           icon={buttonConfig.icon}
           intent={buttonConfig.intent ?? 'none'}
           loading={loading}
-          nowrap={true}
           text={buttonConfig.name}
           onClick={handleOpen}
         />

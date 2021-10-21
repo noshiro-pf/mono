@@ -46,3 +46,7 @@ a {
 input[type='number'] {
   text-align: right;
 }
+
+:focus {
+  outline: none;
+}

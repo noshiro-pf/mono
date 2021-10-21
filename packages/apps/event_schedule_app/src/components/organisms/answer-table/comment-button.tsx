@@ -1,5 +1,4 @@
-import { Popover } from '@blueprintjs/core';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { Button, Popover } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
@@ -19,7 +18,7 @@ export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
         <ContentRoot>
           <Comments>{props.comment}</Comments>
           <ButtonsWrapperAlignEnd>
-            <BpButton
+            <Button
               intent='none'
               text={texts.buttonText.close}
               type='button'
@@ -33,7 +32,7 @@ export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
       placement={'top'}
       onClose={handleClose}
     >
-      <BpButton
+      <Button
         icon={'comment'}
         minimal={true}
         small={true}

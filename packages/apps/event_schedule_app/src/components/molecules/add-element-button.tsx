@@ -1,4 +1,4 @@
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 
 type Props = Readonly<{
@@ -7,11 +7,5 @@ type Props = Readonly<{
 
 export const AddElementButton = memoNamed<Props>(
   'AddElementButton',
-  ({ onClick }) => <BpButton fill={true} icon='plus' onClick={onClick} />
+  ({ onClick }) => <Button fill={true} icon='plus' onClick={onClick} />
 );
-
-// const Box = styled.div`
-//   background-color: #f1f1f1;
-//   border: 1px dashed #cccccc;
-//   height: 30px;
-// `;
