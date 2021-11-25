@@ -6,7 +6,7 @@ import { FormGroup } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
 import { IList, isEmailString } from '@noshiro/ts-utils';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { BpInputProps } from './bp-input';
 import { BpInput } from './bp-input';
 
@@ -60,24 +60,35 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
       [onValueChange, hideErrors]
     );
 
+    const helperText = useMemo(
+      () =>
+        errorsAreHidden || disabled ? undefined : (
+          <div>
+            {isEmailAddressResult ? undefined : (
+              <div>{invalidEmailMessage}</div>
+            )}
+            {otherErrorMessages === undefined
+              ? undefined
+              : showOtherErrorMessages
+              ? IList.map(otherErrorMessages, (er, index) => (
+                  <div key={index}>{er}</div>
+                ))
+              : undefined}
+          </div>
+        ),
+      [
+        errorsAreHidden,
+        disabled,
+        isEmailAddressResult,
+        invalidEmailMessage,
+        otherErrorMessages,
+        showOtherErrorMessages,
+      ]
+    );
+
     return (
       <FormGroup
-        helperText={
-          errorsAreHidden || disabled ? undefined : (
-            <div>
-              {isEmailAddressResult ? undefined : (
-                <div>{invalidEmailMessage}</div>
-              )}
-              {otherErrorMessages === undefined
-                ? undefined
-                : showOtherErrorMessages
-                ? IList.map(otherErrorMessages, (er, index) => (
-                    <div key={index}>{er}</div>
-                  ))
-                : undefined}
-            </div>
-          )
-        }
+        helperText={helperText}
         intent={'danger'}
         label={formGroupLabel}
       >
@@ -85,6 +96,7 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
           autoFocus={autoFocus}
           disabled={disabled}
           focus$={focus$}
+          intent={helperText === undefined ? 'primary' : 'danger'}
           placeholder={placeholder}
           type='email'
           value={value}
