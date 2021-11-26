@@ -1,5 +1,4 @@
-import { ButtonGroup, Popover } from '@blueprintjs/core';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { Button, ButtonGroup, Popover } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { texts } from '../../../constants';
@@ -26,19 +25,19 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
       canEscapeKeyClose={true}
       content={
         <ButtonGroup vertical={true}>
-          <BpButton icon='sort-asc' minimal={true} onClick={onSortAscClick}>
+          <Button icon='sort-asc' minimal={true} onClick={onSortAscClick}>
             {texts.answerPage.answers.sortAsc}
-          </BpButton>
-          <BpButton icon='sort-desc' minimal={true} onClick={onSortDescClick}>
+          </Button>
+          <Button icon='sort-desc' minimal={true} onClick={onSortDescClick}>
             {texts.answerPage.answers.sortDesc}
-          </BpButton>
+          </Button>
         </ButtonGroup>
       }
       isOpen={isOpen}
       placement={'bottom'}
       onClose={handleClose}
     >
-      <BpButton
+      <Button
         icon={'chevron-down'}
         minimal={true}
         outlined={true}

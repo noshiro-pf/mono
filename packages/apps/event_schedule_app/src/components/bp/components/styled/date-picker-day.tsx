@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Bp3DatePicker = styled.div`
+export const DatePickerStyled = styled.div`
   background: #ffffff;
   border-radius: 3px;
   display: -webkit-box;
@@ -14,14 +14,14 @@ export const Bp3DatePicker = styled.div`
   user-select: none;
 `;
 
-export const DayPicker = styled.div`
+export const DayPickerStyled = styled.div`
   display: inline-block;
   min-width: 210px;
   position: relative;
   vertical-align: top;
 `;
 
-export const DatePickerMonth = styled.div`
+export const DatePickerMonthStyled = styled.div`
   border-collapse: collapse;
   border-spacing: 0;
   display: inline-table;
@@ -32,15 +32,15 @@ export const DatePickerMonth = styled.div`
   user-select: none;
 `;
 
-export const DatePickerWeekdays = styled.div`
+export const DatePickerWeekdaysStyled = styled.div`
   display: table-header-group;
 `;
 
-export const DatePickerWeekdaysRow = styled.div`
+export const DatePickerWeekdaysRowStyled = styled.div`
   display: table-row;
 `;
 
-const DatePickerWeekdayBase = styled.div`
+const DatePickerWeekdayBaseStyled = styled.div`
   display: table-cell;
   height: 30px;
   line-height: 1;
@@ -55,24 +55,24 @@ const DatePickerWeekdayBase = styled.div`
   border-radius: 3px;
 `;
 
-export const DatePickerWeekdayReadonly = DatePickerWeekdayBase;
+export const DatePickerWeekdayReadonlyStyled = DatePickerWeekdayBaseStyled;
 
-export const DatePickerWeekday = styled(DatePickerWeekdayBase)`
+export const DatePickerWeekdayStyled = styled(DatePickerWeekdayBaseStyled)`
   cursor: pointer;
   &:hover {
     background: #d8e1e8;
   }
 `;
 
-export const DatePickerBody = styled.div`
+export const DatePickerBodyStyled = styled.div`
   display: table-row-group;
 `;
 
-export const DatePickerWeek = styled.div`
+export const DatePickerWeekStyled = styled.div`
   display: table-row;
 `;
 
-const DatePickerDayBase = styled.div`
+const DatePickerDayBaseStyled = styled.div`
   display: table-cell;
   height: 30px;
   line-height: 1;
@@ -83,7 +83,7 @@ const DatePickerDayBase = styled.div`
   outline: none;
 `;
 
-export const DatePickerDay = styled(DatePickerDayBase)`
+export const DatePickerDayStyled = styled(DatePickerDayBaseStyled)`
   cursor: pointer;
 
   &:active {
@@ -101,15 +101,17 @@ export const DatePickerDay = styled(DatePickerDayBase)`
   }
 `;
 
-export const DatePickerDayReadonly = DatePickerDayBase;
+export const DatePickerDayReadonlyStyled = DatePickerDayBaseStyled;
 
-const DatePickerDaySelectedBase = styled(DatePickerDayBase)`
+const DatePickerDaySelectedBaseStyled = styled(DatePickerDayBaseStyled)`
   background-color: #137cbd;
   border-radius: 3px;
   color: #ffffff;
 `;
 
-export const DatePickerDaySelected = styled(DatePickerDaySelectedBase)`
+export const DatePickerDaySelectedStyled = styled(
+  DatePickerDaySelectedBaseStyled
+)`
   cursor: pointer;
 
   &:hover {
@@ -118,13 +120,14 @@ export const DatePickerDaySelected = styled(DatePickerDaySelectedBase)`
   }
 `;
 
-export const DatePickerDaySelectedReadonly = DatePickerDaySelectedBase;
+export const DatePickerDaySelectedReadonlyStyled =
+  DatePickerDaySelectedBaseStyled;
 
-export const DatePickerDayOutside = styled(DatePickerDayBase)`
+export const DatePickerDayOutside = styled(DatePickerDayBaseStyled)`
   color: rgba(92, 112, 128, 0.6);
 `;
 
-export const DatePickerDayWrapper = styled.div`
+export const DatePickerDayWrapperStyled = styled.div`
   border-radius: 3px;
   padding: 7px;
 `;

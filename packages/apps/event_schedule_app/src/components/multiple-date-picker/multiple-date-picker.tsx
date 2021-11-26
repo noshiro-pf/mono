@@ -1,5 +1,5 @@
+import { Button } from '@blueprintjs/core';
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { Observable } from '@noshiro/syncflow';
 import type { IMapMapped } from '@noshiro/ts-utils';
@@ -7,10 +7,10 @@ import styled from 'styled-components';
 import type { CalendarCurrentPageReducerState, YmdKey } from '../../functions';
 import { useMultipleDatePickerState } from '../../hooks';
 import {
-  Bp3DatePicker,
-  DatePickerBody,
-  DatePickerMonth,
-  DayPicker,
+  DatePickerBodyStyled,
+  DatePickerMonthStyled,
+  DatePickerStyled,
+  DayPickerStyled,
 } from '../bp';
 import { DatepickerNav } from './navigation';
 import { Week } from './week';
@@ -50,8 +50,8 @@ export const MultipleDatePicker = memoNamed<Props>(
 
     return (
       <div>
-        <Bp3DatePicker>
-          <DayPicker lang='en'>
+        <DatePickerStyled>
+          <DayPickerStyled lang='en'>
             <CenteringWrapper tabIndex={0}>
               <DatepickerNav
                 month={calendarCurrentPage.month}
@@ -61,9 +61,9 @@ export const MultipleDatePicker = memoNamed<Props>(
                 onPrevMonthClick={onPrevMonthClick}
                 onYearChange={onYearChange}
               />
-              <DatePickerMonth role='grid'>
+              <DatePickerMonthStyled role='grid'>
                 <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
-                <DatePickerBody role='rowgroup'>
+                <DatePickerBodyStyled role='rowgroup'>
                   {calendarCells.map((week) => (
                     <Week
                       key={week.index}
@@ -71,13 +71,13 @@ export const MultipleDatePicker = memoNamed<Props>(
                       onClick={onDateClick}
                     />
                   ))}
-                </DatePickerBody>
-              </DatePickerMonth>
+                </DatePickerBodyStyled>
+              </DatePickerMonthStyled>
             </CenteringWrapper>
-          </DayPicker>
-        </Bp3DatePicker>
+          </DayPickerStyled>
+        </DatePickerStyled>
         <TodayWrapper>
-          <BpButton onClick={onTodayClick}>{'Today'}</BpButton>
+          <Button onClick={onTodayClick}>{'Today'}</Button>
         </TodayWrapper>
       </div>
     );

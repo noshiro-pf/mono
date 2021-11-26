@@ -1,4 +1,4 @@
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { texts } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
@@ -32,7 +32,7 @@ export const BackToAnswerPageButton = memoNamed<Props>(
   'BackToAnswerPageButton',
   (props) =>
     props.hasNoChanges ? (
-      <BpButton onClick={props.onConfirmClick}>{buttonConfig.name}</BpButton>
+      <Button onClick={props.onConfirmClick}>{buttonConfig.name}</Button>
     ) : (
       <ButtonWithConfirm
         buttonConfig={buttonConfig}

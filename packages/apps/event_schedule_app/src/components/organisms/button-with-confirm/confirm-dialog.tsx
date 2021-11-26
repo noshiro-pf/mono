@@ -1,6 +1,6 @@
 import type { IconName, Intent } from '@blueprintjs/core';
-import { BpAlert } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
+import { AlertWithMaxWidth } from '../../bp';
 
 type Props = Readonly<{
   isOpen: boolean;
@@ -25,7 +25,7 @@ export const ConfirmDialog = memoNamed<Props>(
     icon,
     intent,
   }) => (
-    <BpAlert
+    <AlertWithMaxWidth
       canEscapeKeyCancel={true}
       canOutsideClickCancel={true}
       cancelButtonText={cancelButtonText}
@@ -37,6 +37,6 @@ export const ConfirmDialog = memoNamed<Props>(
       onConfirm={onConfirm}
     >
       <p>{message}</p>
-    </BpAlert>
+    </AlertWithMaxWidth>
   )
 );

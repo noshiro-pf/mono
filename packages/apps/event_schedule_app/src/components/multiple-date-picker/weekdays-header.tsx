@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { memoNamed } from '@noshiro/react-utils';
 import type { WeekDayEnum } from '@noshiro/ts-utils';
 import { weekdaysList } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import {
-  DatePickerWeekday,
-  DatePickerWeekdayReadonly,
-  DatePickerWeekdays,
-  DatePickerWeekdaysRow,
+  DatePickerWeekdayReadonlyStyled,
+  DatePickerWeekdaysRowStyled,
+  DatePickerWeekdaysStyled,
+  DatePickerWeekdayStyled,
 } from '../bp';
 
 type Props = Readonly<{
@@ -32,8 +33,8 @@ export const WeekdaysHeader = memoNamed<Props>(
     );
 
     return (
-      <DatePickerWeekdays role='rowgroup'>
-        <DatePickerWeekdaysRow role='row'>
+      <DatePickerWeekdaysStyled role='rowgroup'>
+        <DatePickerWeekdaysRowStyled role='row'>
           {listWithHandler.map(({ name: title, abbr, onClickHandler }) => (
             <HeaderCell
               key={title}
@@ -42,8 +43,8 @@ export const WeekdaysHeader = memoNamed<Props>(
               onClick={onClickHandler}
             />
           ))}
-        </DatePickerWeekdaysRow>
-      </DatePickerWeekdays>
+        </DatePickerWeekdaysRowStyled>
+      </DatePickerWeekdaysStyled>
     );
   }
 );
@@ -57,9 +58,10 @@ type PropsHeaderCell = Readonly<{
 const HeaderCell = memoNamed<PropsHeaderCell>(
   'HeaderCell',
   ({ title, abbr, onClick }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const DatePickerWeekdayResolved =
-      onClick === undefined ? DatePickerWeekdayReadonly : DatePickerWeekday;
+      onClick === undefined
+        ? DatePickerWeekdayReadonlyStyled
+        : DatePickerWeekdayStyled;
 
     return (
       <DatePickerWeekdayResolved role={'columnheader'} onClick={onClick}>

@@ -2,7 +2,6 @@ import type {
   NotificationSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import { BpCheckbox, BpEmailInput } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
 import { IRecord } from '@noshiro/ts-utils';
@@ -10,6 +9,7 @@ import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants';
 import { now, ymdhmDateDiff } from '../../functions';
+import { BpCheckbox, BpEmailInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
 type Props = Readonly<{

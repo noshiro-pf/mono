@@ -1,9 +1,9 @@
+import { Button } from '@blueprintjs/core';
 import type {
   DatetimeSpecificationEnumType,
   HoursMinutes,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
@@ -44,13 +44,13 @@ export const SetTimesPopoverContent = memoNamed<Props>(
           onRangeStartChange={onRangeStartChange}
         />
         <ButtonsWrapperAlignEnd>
-          <BpButton
+          <Button
             intent='none'
             text={texts.buttonText.cancel}
             type='button'
             onClick={onCancelClick}
           />
-          <BpButton
+          <Button
             intent='primary'
             text={texts.buttonText.decide}
             type='button'

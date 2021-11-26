@@ -1,25 +1,25 @@
-import { FormGroup } from '@blueprintjs/core';
+import { Button, FormGroup } from '@blueprintjs/core';
 import type {
   Answer,
   EventSchedule,
   UserName,
 } from '@noshiro/event-schedule-app-shared';
-import {
-  BpButton,
-  BpInput,
-  BpTextArea,
-} from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import { match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useAnswerBeingEditedHooks } from '../../../hooks';
 import { CustomIcon } from '../../atoms';
-import { BpTableBordered } from '../../bp';
+import {
+  BpInput,
+  BpTextArea,
+  ButtonNowrapStyled,
+  HTMLTableBorderedStyled,
+} from '../../bp';
 import {
   AnswerSymbolFairPointInput,
-  AnswerSymbolGoodPointInputDisabled,
-  AnswerSymbolPoorPointInputDisabled,
+  AnswerSymbolGoodPoint,
+  AnswerSymbolPoorPoint,
 } from '../../molecules';
 import {
   ButtonsWrapperAlignEnd,
@@ -116,7 +116,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
               <tr>
                 <th />
                 <th>
-                  <BpButton
+                  <Button
                     icon={<CustomIcon iconName={'good'} />}
                     minimal={true}
                     title={symbolHeader.good.symbolDescription}
@@ -124,7 +124,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   />
                 </th>
                 <th>
-                  <BpButton
+                  <Button
                     icon={<CustomIcon iconName={'fair'} />}
                     minimal={true}
                     title={symbolHeader.fair.symbolDescription}
@@ -132,7 +132,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   />
                 </th>
                 <th>
-                  <BpButton
+                  <Button
                     icon={<CustomIcon iconName={'poor'} />}
                     minimal={true}
                     title={symbolHeader.poor.symbolDescription}
@@ -161,7 +161,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                       />
                     </td>
                     <td>
-                      <BpButton
+                      <Button
                         active={iconId === 'good'}
                         icon={
                           <CustomIcon
@@ -175,7 +175,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                       />
                     </td>
                     <td>
-                      <BpButton
+                      <Button
                         active={iconId === 'fair'}
                         icon={
                           <CustomIcon
@@ -189,7 +189,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                       />
                     </td>
                     <td>
-                      <BpButton
+                      <Button
                         active={iconId === 'poor'}
                         icon={
                           <CustomIcon
@@ -205,8 +205,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
                     <TdWithMaxWidth>
                       {match(iconId, {
                         none: undefined,
-                        good: <AnswerSymbolGoodPointInputDisabled />,
-                        poor: <AnswerSymbolPoorPointInputDisabled />,
+                        good: <AnswerSymbolGoodPoint />,
+                        poor: <AnswerSymbolPoorPoint />,
                         fair: (
                           <AnswerSymbolFairPointInput
                             disabled={false}
@@ -263,10 +263,9 @@ export const AnswerBeingEdited = memoNamed<Props>(
         </ParagraphWithSwitchWrapper>
 
         <ButtonsWrapperAlignEnd>
-          <BpButton
+          <ButtonNowrapStyled
             disabled={submitButtonIsLoading}
             intent='none'
-            nowrap={true}
             text={texts.buttonText.cancel}
             onClick={onCancel}
           />
@@ -293,7 +292,7 @@ const TableWrapper = styled.div`
   overflow-x: auto;
 `;
 
-const Table = styled(BpTableBordered)`
+const Table = styled(HTMLTableBorderedStyled)`
   th,
   td {
     padding: 6px;

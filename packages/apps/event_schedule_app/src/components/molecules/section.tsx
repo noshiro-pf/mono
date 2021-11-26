@@ -1,5 +1,4 @@
-import { Card } from '@blueprintjs/core';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+import { Button, Card } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import type { PropsWithChildren } from 'react';
 import styled from 'styled-components';
@@ -20,7 +19,7 @@ export const Section = memoNamed<PropsWithChildren<Props>>(
             <SectionTitle>{sectionTitle}</SectionTitle>
           )}
           {onCloseClick === undefined ? undefined : (
-            <BpButton icon={'cross'} minimal={true} onClick={onCloseClick} />
+            <Button icon={'cross'} minimal={true} onClick={onCloseClick} />
           )}
         </Header>
         {children}

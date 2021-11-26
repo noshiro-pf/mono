@@ -1,9 +1,9 @@
 import { FormGroup } from '@blueprintjs/core';
-import { BpInput, BpTextArea } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../constants';
 import { useFormError } from '../../hooks';
+import { BpInput, BpTextArea } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
 const vt = texts.eventSettingsPage.section1;

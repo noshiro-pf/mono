@@ -1,13 +1,9 @@
-import { Classes } from '@blueprintjs/core';
-import {
-  BpButton,
-  BpDialog,
-  BpEmailInput,
-} from '@noshiro/react-blueprintjs-utils';
+import { Button, Classes } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
+import { BpEmailInput, DialogWithMaxWidth } from '../../bp';
 import {
   ButtonsWrapperAlignEnd,
   WidthRestrictedInputWrapper,
@@ -45,7 +41,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
     }, []);
 
     return (
-      <BpDialog
+      <DialogWithMaxWidth
         canEscapeKeyClose={false}
         canOutsideClickClose={false}
         hasBackdrop={false}
@@ -75,15 +71,15 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <ButtonsWrapperAlignEnd>
-            <BpButton intent={'none'} onClick={back}>
+            <Button intent={'none'} onClick={back}>
               {vt.back}
-            </BpButton>
-            <BpButton disabled={!ok} intent={'primary'} onClick={onConfirm}>
+            </Button>
+            <Button disabled={!ok} intent={'primary'} onClick={onConfirm}>
               {texts.buttonText.decide}
-            </BpButton>
+            </Button>
           </ButtonsWrapperAlignEnd>
         </div>
-      </BpDialog>
+      </DialogWithMaxWidth>
     );
   }
 );

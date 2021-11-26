@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { newRenderLayer, ptBorderRadiusPx } from '../common';
+import { newRenderLayer, ptBorderRadiusPx } from '../../constants';
 
-export const ControlGroup = styled.div`
+export const ControlGroupStyled = styled.div`
   ${newRenderLayer};
 
   // create a new stacking context to isolate all the z-indices

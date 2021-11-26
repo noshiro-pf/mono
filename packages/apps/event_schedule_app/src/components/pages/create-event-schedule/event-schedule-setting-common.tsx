@@ -1,5 +1,5 @@
+import { Button } from '@blueprintjs/core';
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
@@ -107,7 +107,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
                 disabled={createButtonIsLoading || hasNoChanges}
                 onConfirmClick={onResetClick}
               />
-              <BpButton
+              <Button
                 disabled={!createButtonIsEnabled}
                 intent={'primary'}
                 loading={createButtonIsLoading}
@@ -133,7 +133,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
                 disabled={editButtonIsLoading || hasNoChanges}
                 onConfirmClick={onResetClick}
               />
-              <BpButton
+              <Button
                 disabled={
                   !editButtonIsEnabled || editButtonIsLoading || hasNoChanges
                 }
