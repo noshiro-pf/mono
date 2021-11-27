@@ -8,6 +8,7 @@ export * from './make-tuple';
 export * from './mappable';
 export * from './phantomic';
 export * from './record-path';
+export * from './seq';
 export * from './test-type';
 export * from './to-number';
 export * from './tuple';
