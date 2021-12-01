@@ -53,7 +53,7 @@
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "firebase": "^9.0.2",
-    "immer": "^9.0.2",
+    "immer": "^9.0.7",
     "preact": "^10.4.7"
   }
 }
