@@ -36,7 +36,7 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
           [ns.notify07daysBeforeAnswerDeadline, 7],
           [ns.notify14daysBeforeAnswerDeadline, 14],
           [ns.notify28daysBeforeAnswerDeadline, 28],
-        ] as [boolean, 1 | 3 | 7 | 14 | 28][]
+        ] as const
       )
         .filter(
           ([flag, diff]) =>
