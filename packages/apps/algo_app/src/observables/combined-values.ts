@@ -34,7 +34,11 @@ const isMyTurn$: InitializedObservable<boolean> = combineLatestI([
 export const displayValues$: InitializedObservable<DisplayValues> =
   combineLatestI([gameState$, myPlayerIndex$] as const).chain(
     mapI(([gameState, myPlayerIndex]) =>
-      mapToDisplayValue({ gameState, myPlayerIndex, onCardClick })
+      mapToDisplayValue({
+        gameState,
+        myPlayerIndex: myPlayerIndex ?? 0,
+        onCardClick,
+      })
     )
   );
 

@@ -2,7 +2,6 @@ import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
 import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
 import type { Rect } from '@noshiro/ts-utils';
-import { useEffect } from 'preact/hooks';
 import { text } from '../constants';
 import {
   cardPositionsDispatcher,
@@ -12,7 +11,6 @@ import {
   onTurnEndClick,
   playerNamePositionsDispatcher,
   selectAnswerBalloonProps$,
-  setMyPlayerIndex,
   turnPlayerHighlighterPosition$,
 } from '../observables';
 import type { DisplayValues } from '../types';
@@ -39,10 +37,6 @@ type Props = Readonly<{
 export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
   const { tableSize, footerHeight, headerStyle, footerStyle } =
     useWindowSize(windowSize);
-
-  useEffect(() => {
-    setMyPlayerIndex(1);
-  }, []);
 
   const displayValues: DisplayValues = useStreamValue(displayValues$);
   const turnPlayerHighlighterPosition = useStreamValue(
