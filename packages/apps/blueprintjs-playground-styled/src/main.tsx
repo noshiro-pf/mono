@@ -1,29 +1,30 @@
-import { InputGroup, NumericInput } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { noop } from '@noshiro/ts-utils';
 import styled from 'styled-components';
+import { InputGroupView } from './components/input-group-view';
+import { NumericInputView } from './components/numeric-input-view';
 
 export const Main = memoNamed('Main', () => (
   <Root>
-    <h1>{'Blueprint.js Playground'}</h1>
+    <h1>{'Blueprint.js Playground (styled-components)'}</h1>
 
     <h2>{'NumericInput'}</h2>
     <MarginBox>
-      <NumericInput disabled={false} fill={true} value={0} />
+      <NumericInputView disabled={false} fill={true} value={0} />
     </MarginBox>
     <MarginBox>
-      <NumericInput disabled={true} fill={true} value={0} />
+      <NumericInputView disabled={true} fill={true} value={0} />
     </MarginBox>
 
     <h2>{'InputGroup'}</h2>
     <MarginBox>
-      <InputGroup value={'aaa'} onChange={noop} />
+      <InputGroupView value={'aaa'} onChange={noop} />
     </MarginBox>
     <MarginBox>
-      <InputGroup disabled={true} value={'aaa'} onChange={noop} />
+      <InputGroupView disabled={true} value={'aaa'} onChange={noop} />
     </MarginBox>
     <MarginBox>
-      <InputGroup
+      <InputGroupView
         placeholder={'placeholder'}
         value={undefined}
         onChange={noop}
