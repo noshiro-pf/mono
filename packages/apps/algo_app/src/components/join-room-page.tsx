@@ -4,7 +4,7 @@ import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
 import { useCallback, useState } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
-import { isWaitingResponse$, onCreateRoomClick } from '../observables';
+import { db, joinRoom } from '../observables';
 import { ButtonPrimary, Input, Spinner } from './bp';
 
 const vt = text.joinRoom;
@@ -14,12 +14,9 @@ type Props = Readonly<{ roomId: string }>;
 export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
   /*
     TODO:
-    roomIdからRoomを取得
-    loadingの間はボタンdisabled
-
+    local state に自分の名前を追加
+    roomに自分の名前があればゲーム開始前画面を表示
    */
-
-  console.log(roomId); // TODO
 
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
@@ -36,11 +33,22 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
 
   const disabled: boolean = username === '';
 
-  const onCreateRoomButtonClick = useCallback(() => {
-    onCreateRoomClick(username, password);
-  }, [username, password]);
+  const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
 
-  const loading = useStreamValue(isWaitingResponse$);
+  const room = useStreamValue(db.room$);
+
+  const onJoinRoomButtonClick = useCallback(() => {
+    if (room === undefined) return;
+    if (room.password !== '') {
+      if (room.password !== password) {
+        setShowPasswordError(true);
+        return;
+      }
+    }
+    joinRoom.dispatch(roomId, username).catch(console.error);
+  }, [username, password, roomId, room]);
+
+  const loading = useStreamValue(joinRoom.isWaitingResponse$);
 
   return (
     <Centering>
@@ -53,6 +61,9 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
             value={password}
             onInput={onPasswordInput}
           />
+          {showPasswordError ? (
+            <ErrorMessage>{text.joinRoom.gamePassword.notMatch}</ErrorMessage>
+          ) : undefined}
         </Block>
         <Block>
           <Label>{vt.username.label}</Label>
@@ -67,12 +78,11 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
           <ButtonPrimary
             disabled={disabled || loading}
             type='button'
-            onClick={onCreateRoomButtonClick}
+            onClick={onJoinRoomButtonClick}
           >
-            {vt.button}
+            {loading ? <Spinner size={20} /> : <span>{vt.button}</span>}
           </ButtonPrimary>
         </ButtonWrapper>
-        <SpinnerWrapper>{loading ? <Spinner /> : undefined}</SpinnerWrapper>
       </FormRect>
     </Centering>
   );
@@ -118,6 +128,7 @@ const ButtonWrapper = styled('div')`
   margin: 10px;
 `;
 
-const SpinnerWrapper = styled('div')`
-  margin: 10px;
+const ErrorMessage = styled('div')`
+  font-size: small;
+  color: red;
 `;

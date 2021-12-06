@@ -4,7 +4,7 @@ import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
 import { useCallback, useState } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
-import { isWaitingResponse$, onCreateRoomClick } from '../observables';
+import { createRoom } from '../observables';
 import { ButtonPrimary, Input, Spinner } from './bp';
 
 const vt = text.createRoom;
@@ -26,10 +26,10 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
   const disabled: boolean = username === '';
 
   const onCreateRoomButtonClick = useCallback(() => {
-    onCreateRoomClick(username, password);
+    createRoom.dispatch({ username, password }).catch(console.error);
   }, [username, password]);
 
-  const loading = useStreamValue(isWaitingResponse$);
+  const loading = useStreamValue(createRoom.isWaitingResponse$);
 
   return (
     <Centering>
@@ -60,10 +60,11 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
             type='button'
             onClick={onCreateRoomButtonClick}
           >
-            {vt.button}
+            <ButtonContent>
+              {loading ? <Spinner size={20} /> : <span>{vt.button}</span>}
+            </ButtonContent>
           </ButtonPrimary>
         </ButtonWrapper>
-        <SpinnerWrapper>{loading ? <Spinner /> : undefined}</SpinnerWrapper>
       </FormRect>
     </Centering>
   );
@@ -109,6 +110,6 @@ const ButtonWrapper = styled('div')`
   margin: 10px;
 `;
 
-const SpinnerWrapper = styled('div')`
-  margin: 10px;
+const ButtonContent = styled('div')`
+  width: 70px;
 `;

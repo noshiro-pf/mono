@@ -2,7 +2,6 @@ import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
 import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
 import type { Rect } from '@noshiro/ts-utils';
-import { useEffect } from 'preact/hooks';
 import { text } from '../constants';
 import {
   cardPositionsDispatcher,
@@ -12,8 +11,6 @@ import {
   onTurnEndClick,
   playerNamePositionsDispatcher,
   selectAnswerBalloonProps$,
-  setMyPlayerIndex,
-  setRoomId,
   turnPlayerHighlighterPosition$,
 } from '../observables';
 import type { DisplayValues } from '../types';
@@ -32,107 +29,92 @@ import { useWindowSize } from './use-window-size';
 
 type Props = Readonly<{
   windowSize: Rect;
-  roomId: string;
   playerId: string;
   replay: boolean;
   observe: boolean;
 }>;
 
-export const GameMain = memoNamed<Props>(
-  'GameMain',
-  ({ windowSize, roomId }) => {
-    const { tableSize, footerHeight, headerStyle, footerStyle } =
-      useWindowSize(windowSize);
+export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
+  const { tableSize, footerHeight, headerStyle, footerStyle } =
+    useWindowSize(windowSize);
 
-    useEffect(() => {
-      console.log('roomId: ', roomId);
-      setRoomId(roomId);
-    }, [roomId]);
+  const displayValues: DisplayValues = useStreamValue(displayValues$);
+  const turnPlayerHighlighterPosition = useStreamValue(
+    turnPlayerHighlighterPosition$
+  );
+  const confirmTossBalloonProps = useStreamValue(confirmTossBalloonProps$);
+  const selectAnswerBalloonProps = useStreamValue(selectAnswerBalloonProps$);
+  const decidedAnswerBalloonProps = useStreamValue(decidedAnswerBalloonProps$);
 
-    useEffect(() => {
-      setMyPlayerIndex(1);
-    }, []);
+  return (
+    <Root>
+      <Header style={headerStyle}>
+        <GameMessage message={displayValues.gameMessage} />
+      </Header>
+      <Main>
+        <Table
+          cardPositionsDispatcher={cardPositionsDispatcher}
+          displayValues={displayValues}
+          playerNamePositionsDispatcher={playerNamePositionsDispatcher}
+          tableSize={tableSize}
+          windowSize={windowSize}
+        />
+      </Main>
+      <Footer style={footerStyle}>
+        <MyCards cards={displayValues.playerCards.S} height={footerHeight} />
+      </Footer>
 
-    const displayValues: DisplayValues = useStreamValue(displayValues$);
-    const turnPlayerHighlighterPosition = useStreamValue(
-      turnPlayerHighlighterPosition$
-    );
-    const confirmTossBalloonProps = useStreamValue(confirmTossBalloonProps$);
-    const selectAnswerBalloonProps = useStreamValue(selectAnswerBalloonProps$);
-    const decidedAnswerBalloonProps = useStreamValue(
-      decidedAnswerBalloonProps$
-    );
+      <EndTurnButtonWrapper>
+        <EndTurnButton
+          disabled={displayValues.endTurnButtonDisabled}
+          type='button'
+          onClick={onTurnEndClick}
+        >
+          {text.gameMain.endTurnButton}
+        </EndTurnButton>
+      </EndTurnButtonWrapper>
 
-    return (
-      <Root>
-        <Header style={headerStyle}>
-          <GameMessage message={displayValues.gameMessage} />
-        </Header>
-        <Main>
-          <Table
-            cardPositionsDispatcher={cardPositionsDispatcher}
-            displayValues={displayValues}
-            playerNamePositionsDispatcher={playerNamePositionsDispatcher}
-            tableSize={tableSize}
-            windowSize={windowSize}
-          />
-        </Main>
-        <Footer style={footerStyle}>
-          <MyCards cards={displayValues.playerCards.S} height={footerHeight} />
-        </Footer>
+      {turnPlayerHighlighterPosition !== undefined ? (
+        <TurnPlayerHighlighter position={turnPlayerHighlighterPosition} />
+      ) : undefined}
 
-        <EndTurnButtonWrapper>
-          <EndTurnButton
-            disabled={displayValues.endTurnButtonDisabled}
-            type='button'
-            onClick={onTurnEndClick}
-          >
-            {text.gameMain.endTurnButton}
-          </EndTurnButton>
-        </EndTurnButtonWrapper>
+      {confirmTossBalloonProps !== undefined ? (
+        <ConfirmTossBalloon
+          anchorCardRect={confirmTossBalloonProps.anchorCardRect}
+          cancel={confirmTossBalloonProps.cancel}
+          card={confirmTossBalloonProps.card}
+          submit={confirmTossBalloonProps.submit}
+        />
+      ) : undefined}
 
-        {turnPlayerHighlighterPosition !== undefined ? (
-          <TurnPlayerHighlighter position={turnPlayerHighlighterPosition} />
-        ) : undefined}
+      {selectAnswerBalloonProps !== undefined ? (
+        <SelectAnswerBalloon
+          anchorCardRect={selectAnswerBalloonProps.anchorCardRect}
+          arrowDirection={selectAnswerBalloonProps.arrowDirection}
+          cardColor={selectAnswerBalloonProps.cardColor}
+          selectedNumber={selectAnswerBalloonProps.selectedNumber}
+          submitAnswer={selectAnswerBalloonProps.submitAnswer}
+          submitButtonIsDisabled={
+            selectAnswerBalloonProps.submitButtonIsDisabled
+          }
+          onCancelClick={selectAnswerBalloonProps.onCancelClick}
+          onSelectedNumberChange={
+            selectAnswerBalloonProps.onSelectedNumberChange
+          }
+        />
+      ) : undefined}
 
-        {confirmTossBalloonProps !== undefined ? (
-          <ConfirmTossBalloon
-            anchorCardRect={confirmTossBalloonProps.anchorCardRect}
-            cancel={confirmTossBalloonProps.cancel}
-            card={confirmTossBalloonProps.card}
-            submit={confirmTossBalloonProps.submit}
-          />
-        ) : undefined}
-
-        {selectAnswerBalloonProps !== undefined ? (
-          <SelectAnswerBalloon
-            anchorCardRect={selectAnswerBalloonProps.anchorCardRect}
-            arrowDirection={selectAnswerBalloonProps.arrowDirection}
-            cardColor={selectAnswerBalloonProps.cardColor}
-            selectedNumber={selectAnswerBalloonProps.selectedNumber}
-            submitAnswer={selectAnswerBalloonProps.submitAnswer}
-            submitButtonIsDisabled={
-              selectAnswerBalloonProps.submitButtonIsDisabled
-            }
-            onCancelClick={selectAnswerBalloonProps.onCancelClick}
-            onSelectedNumberChange={
-              selectAnswerBalloonProps.onSelectedNumberChange
-            }
-          />
-        ) : undefined}
-
-        {decidedAnswerBalloonProps !== undefined ? (
-          <DecidedAnswerBalloon
-            anchorCardRect={decidedAnswerBalloonProps.anchorCardRect}
-            arrowDirection={decidedAnswerBalloonProps.arrowDirection}
-            card={decidedAnswerBalloonProps.card}
-            showSymbol={decidedAnswerBalloonProps.showSymbol}
-          />
-        ) : undefined}
-      </Root>
-    );
-  }
-);
+      {decidedAnswerBalloonProps !== undefined ? (
+        <DecidedAnswerBalloon
+          anchorCardRect={decidedAnswerBalloonProps.anchorCardRect}
+          arrowDirection={decidedAnswerBalloonProps.arrowDirection}
+          card={decidedAnswerBalloonProps.card}
+          showSymbol={decidedAnswerBalloonProps.showSymbol}
+        />
+      ) : undefined}
+    </Root>
+  );
+});
 
 const Root = styled('div')`
   display: flex;

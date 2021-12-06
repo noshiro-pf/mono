@@ -44,14 +44,18 @@ const randomizePlayerCards = (): DeepReadonly<
       return listOfCards;
     }).value;
 
-export const createRoom = ({
-  password,
-}: Pick<Room, 'password'>): StrictOmit<Room, 'id'> => ({
-  password,
-  players: [],
-  shuffleDef: pipe(IList.seqThrow(4))
+export const newShuffleDef = (): PermutationString<'0123'> =>
+  pipe(IList.seqThrow(4))
     .chain(getShuffled)
-    .chain((list) => list.join('')).value as PermutationString<'1234'>,
+    .chain((list) => list.join('')).value as PermutationString<'0123'>;
+
+export const newRoom = (
+  password: Room['password'],
+  player: Room['players'][0]
+): StrictOmit<Room, 'id'> => ({
   state: 'not-started',
+  password,
+  players: [player],
   playerCards: randomizePlayerCards(),
+  shuffleDef: newShuffleDef(),
 });

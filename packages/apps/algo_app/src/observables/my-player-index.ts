@@ -1,12 +1,23 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { subject, withInitialValue } from '@noshiro/syncflow';
+import { combineLatestI, mapI } from '@noshiro/syncflow';
 import type { PlayerIndex } from '../types';
+import { db } from './database';
+import { myName$ } from './my-name';
 
-const myPlayerIndexSubject$ = subject<PlayerIndex>();
+export const myPlayerIndex$: InitializedObservable<PlayerIndex | undefined> =
+  combineLatestI([db.room$, myName$] as const).chain(
+    mapI(([room, myName]) => {
+      if (room === undefined || myName === undefined) return undefined;
 
-export const setMyPlayerIndex = (myPlayerIndex: PlayerIndex): void => {
-  myPlayerIndexSubject$.next(myPlayerIndex);
-};
+      const index = room.players.findIndex((p) => p.name === myName);
+      if (index === 0 || index === 1 || index === 2 || index === 3) {
+        return index;
+      }
 
-export const myPlayerIndex$: InitializedObservable<PlayerIndex> =
-  myPlayerIndexSubject$.chain(withInitialValue(0));
+      console.warn(
+        `myName should be one of { 0, 1, 2, 3 }. result is "${index}". `
+      );
+
+      return undefined;
+    })
+  );

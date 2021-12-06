@@ -1,28 +1,33 @@
-import type { InitializedObservable } from '@noshiro/syncflow';
-import {
-  map,
-  mapTo,
-  merge,
-  subject,
-  switchMap,
-  timer,
-  withInitialValue,
-} from '@noshiro/syncflow';
+import { createEventEmitter, createState } from '@noshiro/syncflow';
+import type { Room } from '../types';
+import { db } from './database';
+import { setMyName } from './my-name';
 
-const createRoom$ = subject<Readonly<{ username: string; password: string }>>();
+export namespace createRoom {
+  const [_response$, setResponse] = createEventEmitter<Room>();
 
-export const response$ = createRoom$
-  .chain(switchMap(() => timer(3000)))
-  .chain(map(() => ({ id: 'aaaa' })));
+  export const response$ = _response$;
 
-export const isWaitingResponse$: InitializedObservable<boolean> = merge([
-  createRoom$.chain(mapTo(true)),
-  response$.chain(mapTo(false)),
-] as const).chain(withInitialValue(false));
+  const [_isWaitingResponse$, setIsWaitingResponse] =
+    createState<boolean>(false);
 
-export const onCreateRoomClick = (username: string, password: string): void => {
-  createRoom$.next({
-    username,
-    password,
-  });
-};
+  export const isWaitingResponse$ = _isWaitingResponse$;
+
+  export const dispatch = async (
+    payload: Readonly<{
+      username: string;
+      password: string | undefined;
+    }>
+  ): Promise<Room> => {
+    setIsWaitingResponse(true);
+
+    const res = await db.createRoom(payload);
+
+    setMyName(payload.username);
+
+    setIsWaitingResponse(false);
+    setResponse(res);
+
+    return res;
+  };
+}

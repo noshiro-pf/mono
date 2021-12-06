@@ -7,10 +7,10 @@ import {
   usePathname,
   useQueryParams,
 } from '@noshiro/tiny-router-preact-hooks';
-import { useMemo } from 'preact/hooks';
+import { useEffect, useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { getParams, getRoomId, isMainPage, routes, text } from '../constants';
-import { response$ } from '../observables';
+import { createRoom, db } from '../observables';
 import { Button } from './bp';
 import { CreateRoomPage } from './create-room-page';
 import { GameMain } from './game-main';
@@ -40,7 +40,13 @@ export const Root = memoNamed('Root', () => {
     [queryParams]
   );
 
-  useStreamEffect(response$, (res) => {
+  useEffect(() => {
+    if (roomId !== undefined) {
+      db.setRoomId(roomId);
+    }
+  }, [roomId]);
+
+  useStreamEffect(createRoom.response$, (res) => {
     push(`${routes.rooms}/${res.id}`);
   });
 
@@ -57,7 +63,6 @@ export const Root = memoNamed('Root', () => {
             observe={observe}
             playerId={playerId}
             replay={replay}
-            roomId={roomId}
             windowSize={windowSize}
           />
         )

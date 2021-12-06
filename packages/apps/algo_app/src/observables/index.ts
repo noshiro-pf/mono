@@ -3,5 +3,7 @@ export * from './combined-values';
 export * from './create-room';
 export * from './database';
 export * from './game-state';
+export * from './join-room';
+export * from './my-name';
 export * from './my-player-index';
 export * from './position';
