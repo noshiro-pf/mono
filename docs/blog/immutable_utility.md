@@ -19,24 +19,8 @@ const record2: R = setIn(record0, ['a', 'b', 'c'], '999');
 //                                                 ^ type error
 
 const record3: R = setIn(record0, ['a', 'b', 'e'], 9);
-//                                 ~~~~~~~~~~~~~~~
+//                                 ~~~~~~~~~~~~~
 //                                            ^ type error
-```
-
-関数のインターフェース
-
-```ts
-type RecordKeyType = keyof never; // number | string | symbol
-type ReadonlyRecordBase = Readonly<Record<RecordKeyType, unknown>>;
-
-type KeyPathAndValueTypeAtPathTuple<R> = /* implement here */;
-
-export function setIn<R extends ReadonlyRecordBase>(
-  record: R,
-  ...[keyPath, newValue]: KeyPathAndValueTypeAtPathTuple<R>
-): R {
-    /* implement here */
-}
 ```
 
 ## 前書き
@@ -50,7 +34,7 @@ const currState = { x: 1, y: 2, z: 3 };
 const nextState = { ...currState, x: 999 }; // { x: 999, y: 2, z: 3 }
 ```
 
-これは大体の場合うまくいくのですが、たとえば次の例のようにオブジェクトのネストが深くなっていて深いパスにある値を変更したいとき、パスの深さに比例して記述量が多くなってしまうのが難点です。
+これで済むケースも結構多いのですが、いくつか欠点もあり、その一つに次の例のようにオブジェクトのネストが深くなっていて深いパスにある値を変更したいとき、パスの深さに比例して記述量が多くなってしまうというものがあります。
 
 ```ts
 type State = DeepReadonly<{
@@ -116,25 +100,51 @@ const nextState: State = {
 };
 ```
 
-このようなケースではもう少し気の利いた道具があった方が良さそうです。
+ほかにも次のような欠点もあります。
+例えば以下のようなよくある状態管理における reducer を実装する例を考えます。
+スプレッド演算子`...`を用いて状態更新を行う `reducer` のコードを以下のように書いていたとします。
+
+```ts
+type State = Readonly<{ x: number; y: number; z: number }>;
+
+type Action =
+    | { type: 'setX'; value: number }
+    | { type: 'setY'; value: number }
+    | { type: 'setZ'; value: number };
+
+export const reducer = (state: State, action: Action): State => {
+    // ...
+    switch (action.type) {
+        case 'setX': {
+            const nextState = { ...state, x: action.value };
+            return nextState;
+        }
+        case 'setY': {
+            const nextState = { ...state, y: action.value };
+            return nextState;
+        }
+        case 'setZ': {
+            const nextState = { ...state, z: action.value };
+            return nextState;
+        }
+    }
+};
+```
+
+ここで `State` の型を `Readonly<{ a: number; b: number; c: number }>` のように変えたとします。
+このとき、`nextState` の中の `x`, `y`, `z` はそれぞれ `a`, `b`, `c` に書き換える必要がありますが、実はこのままでも**余剰プロパティ**として扱われるので、型チェックは通ってしまいます（実際に使われるプロパティは何も更新しないコードになってしまいます）。つまり、型エラーが出る箇所のみ修正していたとしたら、ここは修正漏れになってしまいます。
+
+ただし、本題から逸れるためここでは詳しく述べませんが、TypeScript は余剰プロパティチェックという機能を持っており、 `nextState` を直接 return していたり、 `nextState` に直接型注釈 `State` を付けていたりする場合は余剰プロパティに気づくことができます。このため、多くのケースでは問題が顕在化しないのですが、そうはいっても型チェックでエラーになっているわけではないので上の例のような抜け穴が生まれてしまいます。
+
+`...` を使ってプロパティを更新しようとすることの本質的な問題点は、元の `State` のプロパティをすべて展開した上で、それを「上書きする」という形のコードにならざるを得ない点です。このため、この書き方でのプロパティ更新箇所は `State` 型が変わったときに余剰プロパティになってしまう危険を常にはらんでいます。
+
+これらの例を踏まえると、堅牢かつ簡潔な状態更新を行うためのもっと気の利いた道具を使った方が良さそうです。
 
 ---
 
-immutable なオブジェクト操作を行うための既存の TypeScript ライブラリとしては、[Immer](https://immerjs.github.io/immer/) と [Immutable.js](https://immutable-js.github.io/immutable-js/) が有名です。
+immutable なオブジェクト操作を行うための既存の TypeScript ライブラリとしては、 [Immutable.js](https://immutable-js.github.io/immutable-js/) と [Immer](https://immerjs.github.io/immer/) が有名です。
 
-immer を使うと、上の例でやりたいことは非常に簡単に解決できます。
-
-```ts
-import { produce } from 'immer';
-
-const nextState: State = produce(currState, (draft) => {
-    draft.a2.b2.c2.d2.e2 = 999;
-});
-```
-
-immer では `produce` という関数を用いて変更を加えたいオブジェクト `currState` の "draft" に対して変更を加えると、Proxy を通して値の書き換えを検知しコピーオンライトで（元のオブジェクト `currState` を書き換えることなく）新しいオブジェクトを作って返してくれます。
-
-immutable.js の場合は、専用のデータ構造を使う必要がありますが、 `setIn` や `updateIn` というメソッドを使ってレコードを更新することができます。
+**immutable.js** を使う場合、専用のデータ構造を使う必要がありますが、 `setIn` や `updateIn` というメソッドを使って以下のようにオブジェクト（レコード）を更新することができます（少しボイラープレートコードが多いのがこのライブラリの難点ですが、永続データ構造ライブラリという側面が強いため仕方ないところかもしれません）。
 
 ```ts
 import { Record as IRecord } from 'immutable';
@@ -168,13 +178,35 @@ const currState = stateFactory();
 const nextState = currState.setIn(['a2', 'b2', 'c2', 'd2', 'e2'], 999);
 ```
 
-ただ、immutable.js の `setIn` というメソッドは執筆時点の最新版 v4.0.0-rc.12 でも型が以下のようになっており、 `keyPath` の typo がチェックされません。
+ただし、immutable.js の `setIn` というメソッドは執筆時点の最新版 v4.0.0-rc.12 でも型が以下のようになっており、 `keyPath` の typo がチェックされません。
 
 ```ts
 setIn(keyPath: Iterable<any>, value: any): this
 ```
 
-一方 immer の場合は、上の例で言う `draft` という変数の型は `Draft<State>` という型になっており、 `draft` は `currState` を辿るのと全く同じようにキーアクセスできるためこのような問題は起きません。
+```ts
+const nextState = currState.setIn(['a2', 'b2', 'c2', 'd2', 'f2'], 999);
+//                                                         ~~~~
+//                                                         エラーにならない！
+```
+
+これでは肝心の堅牢性が得られません。
+
+---
+
+一方、**immer**を使う場合は以下のように更新箇所だけならたった 3 行で書くことができます。
+
+```ts
+import { produce } from 'immer';
+
+const nextState: State = produce(currState, (draft) => {
+    draft.a2.b2.c2.d2.e2 = 999;
+});
+```
+
+immer では `produce` という関数を用いて変更を加えたいオブジェクト `currState` の "draft" に対して変更を加えると、Proxy を通して値の書き換えを検知しコピーオンライトで（元のオブジェクト `currState` を書き換えることなく）新しいオブジェクトを作って返してくれます。
+
+immer の場合は、上の例で言う `draft` という変数の型は `Draft<State>` というほぼ `State` と同じ型になっており、 `draft` は `currState` を辿るのと全く同じようにキーアクセスできるため、間違ったキーアクセスは型エラーで弾くことができます。この点では immutable.js の `setIn` 関数に安全性の面で勝っていると言えます。
 
 ただし、 `Draft<T>` は `T` から再帰的に `readonly` を外した型になっている（[https://github.com/immerjs/immer/blob/master/src/types/types-external.ts#L35](https://github.com/immerjs/immer/blob/master/src/types/types-external.ts#L35)）ため、以下の例のように `readonly` な値を代入できないという問題が生じることがあります。
 
@@ -189,27 +221,29 @@ const initialState: State = {
     b: ['1', '2', '3'],
 };
 
-const aInitial = [1, 2, 3] as const;
-
 const nextState = produce(initialState, (draft) => {
-    draft.a = aInitial;
-    //  The type 'readonly [1, 2, 3]' is 'readonly' and cannot be assigned to the mutable type 'number[]'.ts(4104)
+    draft.a = initialState.a;
+    //  The type 'readonly number[]' is 'readonly' and cannot be assigned to the mutable type 'number[]'.ts(4104)
 });
 ```
 
-一応以下のように `Writable` でキャストすればエラーを黙らせることはできますが、記述量も増えてしまう上にいちいちキャストが発生するのも少し気持ち悪い気がします。
+一応以下のように右辺を `readonly` を除去した型にキャストすればエラーを黙らせることはできますが、記述量も増えてしまう上にいちいちキャストが発生するのも少し気持ち悪い気がします。
 
 ```ts
 type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
+const castWritable = <T>(a: T): Writable<T> => a as Writable<T>;
+
 const nextState = produce(initialState, (draft) => {
-    draft.a = initialA as Writable<typeof initialA>;
+    draft.a = castWritable(initialState.a);
 });
 ```
 
-このように、 immer を使うと左辺 `draft` が writable な型になるために、右辺に readonly な値を持ってくると型エラーになってしまう場合があるのがデメリットです。
+このように、 immer を使うと左辺 `draft` が readonly の取れた型になるために、右辺に readonly な値を持ってくると型エラーになってしまう場合があるのが、残念なところです。
+しかしながら、immer は状態更新をオブジェクトに対する破壊的更新で書けるようにすることを目的とするライブラリであるため、左辺が mutable な型であるのは仕方が無く、避けようがない問題であるように思われます。
 
-そこで、今回はこのような操作をなるべく型安全に行うユーティリティを作ることにしました。
+そこで、今回はこのような状態更新を限りなく安全に書けるようにすることを目指してユーティリティを作ってみることにしました。
+作るものとしては、 immutable.js の `setIn` メソッドに似た以下のような関数です。これを次章以降で少しずつ作っていきます。
 
 ```ts
 const nextState = setIn(initialState, ['b'], ['4', '5', '6']);
@@ -232,6 +266,8 @@ export function setIn<R extends ReadonlyRecordBase>(
     /* implement here */
 }
 ```
+
+この `setIn` 関数は、第一引数に更新対象のオブジェクト（レコード）を受け取り、その型 `R` を元に存在するパス `keyPath` とそこに格納できる型の値 `newValue` を第 2,3 引数に受け取るようにします。 immutable.js の `setIn` メソッドはこの `keyPath` に正確な型がついていませんでしたが、これを型安全に書き直すことが以降やっていくメインの仕事になります。
 
 1. レコード型 `R` を受け取り、 `R` のパスすべての union を返す `Paths<R>` 型
 2. レコード型 `R` のパス `Path` にある型を取り出す `RecordValueAtPath<R, Path>` 型
@@ -309,19 +345,19 @@ assertType<
 
 `Paths<R>` を
 
--   Step1 : レコード型 `R` の「葉までのパスすべて」の union を返す `FullPaths` 型を実装する
+-   Step1 : レコード型 `R` の「葉までのパスすべて」の union を返す `LeafPaths` 型を実装する
 -   Step2 : タプル型 `T` に対してその prefix すべての union（例えば `[1, 2, 3]` に対して `[] | [1] | [1, 2] | [1, 2, 3]` ） を返す `Prefixes` 型を実装する
--   Step3 : `FullPaths` と `Prefixes` を組み合わせて `Paths` を実装する
+-   Step3 : `LeafPaths` と `Prefixes` を組み合わせて `Paths` を実装する
 
 という 3 ステップで実装していきます。
 
-Step1 の実装が大部分を占めていて、Step2 は比較的軽く、 Step3 も `FullPaths` と `Prefixes` を組み合わせるだけです。
+Step1 の実装が大部分を占めていて、Step2 は比較的軽く、 Step3 も `LeafPaths` と `Prefixes` を組み合わせるだけです。
 
 ---
 
-#### Step 1 : `FullPaths<R>` 型を実装する
+#### Step 1 : `LeafPaths<R>` 型を実装する
 
-まずレコード型 `R` の葉までのパスすべての union を返す `FullPaths<R>` 型を作ります。「葉までの」というのは、以下の例で例えば `["x"]` や `["y", 2, "f"]` などのプレフィックスにあたるパスは除外したもの、という意味です。まずこのような型を作ってから prefix も含む union を作る、という 2 ステップにした方が分かりやすいと考えこのようにしました。
+まずレコード型 `R` の葉までのパスすべての union を返す `LeafPaths<R>` 型を作ります。「葉までの」というのは、以下の例で例えば `["x"]` や `["y", 2, "f"]` などのプレフィックスにあたるパスは除外したもの、という意味です。まずこのような型を作ってから prefix も含む union を作る、という 2 ステップにした方が分かりやすいと考えこのようにしました。
 
 ```ts
 type R0 = DeepReadonly<{
@@ -342,7 +378,7 @@ type R0 = DeepReadonly<{
 ```
 
 ```ts
-type K0 = FullPaths<R0>;
+type K0 = LeafPaths<R0>;
 assertType<
     TypeEq<
         K0,
@@ -361,16 +397,16 @@ assertType<
 >();
 ```
 
-`FullPaths` は結構長くなるのですが以下のようにして実装することができます。
+`LeafPaths` は結構長くなるのですが以下のようにして実装することができます。
 
 ```ts
-export type FullPaths<R> = R extends readonly unknown[]
-  ? FullPathsImplListCase<R>
+export type LeafPaths<R> = R extends readonly unknown[]
+  ? LeafPathsImplListCase<R>
   : R extends ReadonlyRecordBase
-  ? FullPathsImplRecordCase<R>
+  ? LeafPathsImplRecordCase<R>
   : readonly [];
 
-type FullPathsImplListCase<
+type LeafPathsImplListCase<
   T extends readonly unknown[],
   PathHead extends keyof T = keyof T
 > = T extends readonly []
@@ -379,17 +415,17 @@ type FullPathsImplListCase<
   ? readonly []
   : PathHead extends keyof T
   ? PathHead extends `${number}`
-    ? readonly [ToNumber<PathHead>, ...FullPaths<T[PathHead]>]
+    ? readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]
     : never
   : never;
 
-type FullPathsImplRecordCase<
+type LeafPathsImplRecordCase<
   R extends ReadonlyRecordBase,
   PathHead extends keyof R = keyof R
 > = string extends PathHead
   ? readonly []
   : PathHead extends keyof R
-  ? readonly [PathHead, ...FullPaths<R[PathHead]>]
+  ? readonly [PathHead, ...LeafPaths<R[PathHead]>]
   : never;
 
 export type IsInfiniteList<T extends readonly unknown[]> =
@@ -401,9 +437,9 @@ assertType<TypeEq<ToNumber<'8192'>, 8192>>();
 assertType<TypeEq<ToNumber<'9999'>, 9999>>();
 ```
 
-例として `FullPath<R0>` がどう展開されるのかを説明します。
+例として `LeafPaths<R0>` がどう展開されるのかを説明します。
 
-まず、`R0` はレコード型なので `FullPaths` の中の条件 `R0 extends ReadonlyRecordBase` にマッチし `FullPathsImplRecordCase` が呼び出されます。
+まず、`R0` はレコード型なので `LeafPaths` の中の条件 `R0 extends ReadonlyRecordBase` にマッチし `LeafPathsImplRecordCase` が呼び出されます。
 第 2 型引数の `PathHead extends keyof R = keyof R` は引数というよりは型変数 `PathHead` を宣言しておくために置いています。
 `string extends PathHead ? readonly []` のところは index signature の場合を除外する（＝再帰を止める）ためにあります。 `PathHead` = `'a' | 'b'` などは `string` を部分型に含まないためマッチしませんが、 `R` = `Record<string, number>` とかなら `PathHead` = `keyof R` = `string` はこれにマッチして再帰がここで止まります。
 `PathHead extends keyof R` という部分は、 `PathHead` ＝ `keyof R` なので常に true になり一見意味が無さそうに見えますが、 **union distribution** を起こすために挟んでいます。union 型（ここでは `'x' | 'y' | 'z'`）の要素について配列の map のような処理を行いたいときによく使うテクニックです（参考： [TypeScript の型初級 - # conditional type における union distribution](https://qiita.com/uhyo/items/da21e2b3c10c8a03952f#conditional-type%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bunion-distribution)）。
@@ -422,7 +458,7 @@ type A = F<1 | 2 | 3>;
 
 ```ts
 PathHead extends keyof R
-  ? readonly [PathHead, ...FullPaths<R[PathHead]>]
+  ? readonly [PathHead, ...LeafPaths<R[PathHead]>]
   : never;
 ```
 
@@ -430,39 +466,39 @@ PathHead extends keyof R
 
 ```ts
 ('x' extends 'x'
-	? readonly ['x', ...FullPaths<R['x']>]
+	? readonly ['x', ...LeafPaths<R['x']>]
 	: readonly [] ) |
 ('y' extends 'y'
-	? readonly ['y', ...FullPaths<R['y']>]
+	? readonly ['y', ...LeafPaths<R['y']>]
 	: readonly [] ) |
 ('z' extends 'z'
-	? readonly ['z', ...FullPaths<R['z']>]
+	? readonly ['z', ...LeafPaths<R['z']>]
 	: readonly [] )
 ```
 
 という union になり、それぞれ true 部に簡約されて
 
 ```ts
-(readonly ['x', ...FullPaths<R['x']>]) |
-(readonly ['y', ...FullPaths<R['y']>]) |
-(readonly ['z', ...FullPaths<R['z']>])
+(readonly ['x', ...LeafPaths<R['x']>]) |
+(readonly ['y', ...LeafPaths<R['y']>]) |
+(readonly ['z', ...LeafPaths<R['z']>])
 ```
 
 となります。
-それぞれの key について再帰的に `FullPaths` が呼ばれるのですが、ここまでと同様の展開で `'x'` の部分は以下のように簡約されていきます。
+それぞれの key について再帰的に `LeafPaths` が呼ばれるのですが、ここまでと同様の展開で `'x'` の部分は以下のように簡約されていきます。
 
 ```txt
-readonly ['x', ...FullPaths<R['x']>]
+readonly ['x', ...LeafPaths<R['x']>]
  -> readonly ['x', ...(['a'] | ['b'])]
  -> readonly ['x', ...['a']] | readonly ['x', ...['b']]
  -> readonly ['x', 'a'] | readonly ['x', 'b']
 ```
 
 2 行目から 3 行目への簡約は Variadic Tuple Types の union distribution が行われます（[Variadic Tuple Types の PR](https://github.com/microsoft/TypeScript/pull/39094)に `...T` の `T` が union のときは distribute されるという仕様が書かれています）。
-`FullPaths<R['z']>` の方は、 `R['z']` = `readonly [1, 2, { e: 3; f: [6, 7] }]` なので `R extends readonly unknown[]` の配列型のケースにマッチし `FullPathsImplListCase` が呼び出されます。
+`LeafPaths<R['z']>` の方は、 `R['z']` = `readonly [1, 2, { e: 3; f: [6, 7] }]` なので `R extends readonly unknown[]` の配列型のケースにマッチし `LeafPathsImplListCase` が呼び出されます。
 
 ```ts
-type FullPathsImplListCase<
+type LeafPathsImplListCase<
     T extends readonly unknown[],
     PathHead extends keyof T = keyof T
 > = T extends readonly []
@@ -471,7 +507,7 @@ type FullPathsImplListCase<
     ? readonly []
     : PathHead extends keyof T
     ? PathHead extends `${number}`
-        ? readonly [ToNumber<PathHead>, ...FullPaths<T[PathHead]>]
+        ? readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]
         : never
     : never;
 ```
@@ -487,13 +523,13 @@ export type IsInfiniteList<T extends readonly unknown[]> =
 
 その次の行は、タプル型 `T` のキーのうち index の数値を表す文字列になっているもののみをフィルタしています。タプル型のキー集合（ `keyof [1, 2, 3]` など）に含まれている `"0"`, `"1"`, `"2"`, ..., `"toString"` , ... などのキーのうち添え字のキー `"0"`, `"1"`, `"2"` のみを取り出す処理です。
 
-`readonly [ToNumber<PathHead>, ...FullPaths<T[PathHead]>]` の行はレコード型のときとほぼ同じ再帰ですが、 `"0"` → `0` という変換をしてあげるために `ToNumber` をかませています。 `ToNumber` の実装はトリッキーで脇道にそれるのでここでは省略します。以下の記事の実装をほぼそのまま使いました。
+`readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]` の行はレコード型のときとほぼ同じ再帰ですが、 `"0"` → `0` という変換をしてあげるために `ToNumber` をかませています。 `ToNumber` の実装はトリッキーで脇道にそれるのでここでは省略します。以下の記事の実装をほぼそのまま使いました。
 
 [TypeScript にヤバい機能が入りそうなのでひとしきり遊んでみる｜ TechRacho（テックラッチョ）〜エンジニアの「？」を「！」に〜｜ BPS 株式会社](https://techracho.bpsinc.jp/yoshi/2020_09_04/97108)
 
-あとは `"0"`, `"1"`, `"2"` について再帰されるのですが、 `"0"` の再帰は `...FullPaths<T["0"]>` が `T["0"]` = `readonly [1, 2, { e: 3; f: [6, 7] }]["0"]` = `1` より、 `... readonly []` に展開されるため、この再帰の結果のパスは `readonly ['z', 0]` となります。
+あとは `"0"`, `"1"`, `"2"` について再帰されるのですが、 `"0"` の再帰は `...LeafPaths<T["0"]>` が `T["0"]` = `readonly [1, 2, { e: 3; f: [6, 7] }]["0"]` = `1` より、 `... readonly []` に展開されるため、この再帰の結果のパスは `readonly ['z', 0]` となります。
 
-同様にして他のパスも辿られて、最後に union distribute された各パスの union が返されるので、 `FullPaths<R0>` は
+同様にして他のパスも辿られて、最後に union distribute された各パスの union が返されるので、 `LeafPaths<R0>` は
 
 ```ts
 | readonly ['x', 'a']
@@ -515,7 +551,7 @@ export type IsInfiniteList<T extends readonly unknown[]> =
 
 #### Step 2 : `Prefixes<T>` を実装する
 
-`setIn` の第 2 引数 `keyPath` は、オブジェクトの末端までのパスだけでなく途中のパスにもマッチする必要があるため、`FullPaths` の結果の union にそのすべての prefix にあたるパスを追加する必要があります。
+`setIn` の第 2 引数 `keyPath` は、オブジェクトの末端までのパスだけでなく途中のパスにもマッチする必要があるため、`LeafPaths` の結果の union にそのすべての prefix にあたるパスを追加する必要があります。
 
 あるタプル型 `T` を受け取りその prefix すべてからなる union を返す型は以下のように定義できます。
 
@@ -557,7 +593,7 @@ Prefixes<[1,2,3]>
 これは単に
 
 ```ts
-type Paths<R> = Prefixes<FullPaths<R>>;
+type Paths<R> = Prefixes<LeafPaths<R>>;
 ```
 
 とするだけです。これでなぜ良いかというと、 `Prefixes` の引数 `T` に union 型 `A | B | C` が渡ってくると union distribution によりそれぞれの union の要素について `Prefixes` が施された結果の union になるためです。これにより、 `Paths<R0>` の結果は次のようになります。
@@ -752,7 +788,8 @@ export const setIn = <R extends ReadonlyRecordBase>(
 
 ## まとめ
 
-今回はオブジェクトの非破壊更新を行うライブラリを作ってみました。JavaScript のコードとしてはスプレッド演算子を使っているだけの素朴な実装ですが、ウェブフロントエンドのありふれた状態管理コードなどで使用することを想定しているので、型がしっかりついている安心と便利さをまずは重視しました。
+今回はオブジェクトの非破壊更新を行うライブラリを作ってみました。JavaScript のコードとしてはスプレッド演算子を使っているだけの素朴な実装ですが、ウェブフロントエンドの状態管理コードなどで使用することを想定しているので、型がしっかりついている安心と便利さをまずは重視しました。
+このライブラリは十分実用的で、ランタイムが非常に小さい（`setIn の関数本体`の節に書いたコードのみ）点がメリットですが、 immer と比べて機能面で劣っている点もあります（たとえば長さ不定の配列の一部の書き換えには対応していません。実はそのようなライブラリも自作しているのですが本記事では量が膨れすぎるため載せませんでした。）。機能面で不足するのであれば、序章で示したように writable へのキャストを行うことを許容して immer を使うのがリーズナブルかなと思います。
 
 以上、 [noshiro](https://twitter.com/noshiro_piko) が書きました。
 
