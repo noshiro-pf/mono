@@ -3,18 +3,17 @@
 import type {
   Answer as AnswerCurr,
   EventSchedule as EventScheduleCurr,
-} from '@noshiro/event-schedule-app-shared/cjs/v2';
-import { firestorePaths as firestorePathsCurr } from '@noshiro/event-schedule-app-shared/cjs/v2';
+} from '@noshiro/event-schedule-app-shared/cjs/v3';
+import { firestorePaths as firestorePathsCurr } from '@noshiro/event-schedule-app-shared/cjs/v3';
 import type {
   Answer as AnswerNext,
   EventSchedule as EventScheduleNext,
-} from '@noshiro/event-schedule-app-shared/cjs/v3';
+} from '@noshiro/event-schedule-app-shared/cjs/v4';
 import {
   fillAnswer,
   fillEventSchedule,
   firestorePaths as firestorePathsNext,
-} from '@noshiro/event-schedule-app-shared/cjs/v3';
-import { ituple, recordFromEntries } from '@noshiro/ts-utils';
+} from '@noshiro/event-schedule-app-shared/cjs/v4';
 import * as admin from 'firebase-admin';
 import serviceAccount from './service-account-key.json';
 
@@ -29,52 +28,16 @@ const collectionNameNext = firestorePathsNext.events;
 const subCollectionName = firestorePathsNext.answers;
 
 const convertEventSchedule = ({
-  answerSymbolList,
-  customizeSymbolSettings: _,
+  answerSymbols,
   ...curr
 }: EventScheduleCurr): EventScheduleNext =>
   fillEventSchedule({
     ...curr,
-    answerSymbols: recordFromEntries(
-      answerSymbolList.map(({ point, description, iconId }) =>
-        ituple(
-          iconId === 'handmade-circle'
-            ? 'good'
-            : iconId === 'handmade-triangle'
-            ? 'fair'
-            : 'poor',
-          {
-            description,
-            point,
-          }
-        )
-      )
-    ),
+    answerIcons: answerSymbols,
   });
 
-const convertAnswer = (curr: AnswerCurr): AnswerNext =>
-  fillAnswer({
-    ...curr,
-    selection: curr.selection.map(({ iconId, datetimeRange }) => ({
-      datetimeRange,
-      iconId:
-        iconId === 'handmade-triangle'
-          ? 'fair'
-          : iconId === 'handmade-circle'
-          ? 'good'
-          : iconId === 'handmade-cross'
-          ? 'poor'
-          : 'none',
-      point:
-        iconId === 'handmade-triangle'
-          ? 6
-          : iconId === 'handmade-circle'
-          ? 10
-          : iconId === 'handmade-cross'
-          ? 0
-          : 0,
-    })),
-  });
+const convertAnswer = ({ useWeight: _, ...curr }: AnswerCurr): AnswerNext =>
+  fillAnswer(curr);
 
 const updateStore = async (): Promise<boolean> => {
   const eventsSnapshotCurr = await db.collection(collectionNameCurr).get();
