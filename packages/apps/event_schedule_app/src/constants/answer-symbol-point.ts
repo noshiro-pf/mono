@@ -1,5 +1,5 @@
 export const answerSymbolPointConfig = {
-  step: 0.1,
+  step: 1,
   min: 0,
   max: 10,
   fair: {

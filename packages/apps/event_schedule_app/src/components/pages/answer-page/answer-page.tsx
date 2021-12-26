@@ -126,8 +126,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             <SymbolDescriptionWrapper>
               {requiredParticipantsExist ? (
                 <RequiredParticipantIconWrapper>
-                  <RequiredParticipantIcon />
-                  {texts.colon}
+                  <AlignCenter>
+                    <RequiredParticipantIcon />
+                    {texts.colon}
+                  </AlignCenter>
                   {vt.answers.requiredParticipant}
                   {vt.requiredParticipantDescription}
                 </RequiredParticipantIconWrapper>
