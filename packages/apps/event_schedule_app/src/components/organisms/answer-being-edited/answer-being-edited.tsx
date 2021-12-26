@@ -5,11 +5,11 @@ import type {
   UserName,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { match } from '@noshiro/ts-utils';
+import { IList, match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
 import { useAnswerBeingEditedHooks } from '../../../hooks';
-import { CustomIcon } from '../../atoms';
+import { CustomIcon, Description } from '../../atoms';
 import {
   BpInput,
   BpTextArea,
@@ -17,9 +17,9 @@ import {
   HTMLTableBorderedStyled,
 } from '../../bp';
 import {
-  AnswerSymbolFairPointInput,
-  AnswerSymbolGoodPoint,
-  AnswerSymbolPoorPoint,
+  AnswerIconFairPointInput,
+  AnswerIconGoodPoint,
+  AnswerIconPoorPoint,
 } from '../../molecules';
 import {
   ButtonsWrapperAlignEnd,
@@ -70,11 +70,10 @@ export const AnswerBeingEdited = memoNamed<Props>(
       onUserNameBlur,
       onUserNameChange,
       onCommentChange,
-      symbolHeader,
+      iconHeader,
       answerBeingEditedList,
       onWeightChange,
       toggleRequiredSection,
-      toggleWeightSection,
       hasUnanswered,
     } = useAnswerBeingEditedHooks({
       eventSchedule,
@@ -119,24 +118,24 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   <Button
                     icon={<CustomIcon iconName={'good'} />}
                     minimal={true}
-                    title={symbolHeader.good.symbolDescription}
-                    onClick={symbolHeader.good.onClick}
+                    title={iconHeader.good.iconDescription}
+                    onClick={iconHeader.good.onClick}
                   />
                 </th>
                 <th>
                   <Button
                     icon={<CustomIcon iconName={'fair'} />}
                     minimal={true}
-                    title={symbolHeader.fair.symbolDescription}
-                    onClick={symbolHeader.fair.onClick}
+                    title={iconHeader.fair.iconDescription}
+                    onClick={iconHeader.fair.onClick}
                   />
                 </th>
                 <th>
                   <Button
                     icon={<CustomIcon iconName={'poor'} />}
                     minimal={true}
-                    title={symbolHeader.poor.symbolDescription}
-                    onClick={symbolHeader.poor.onClick}
+                    title={iconHeader.poor.iconDescription}
+                    onClick={iconHeader.poor.onClick}
                   />
                 </th>
                 <th />
@@ -205,10 +204,10 @@ export const AnswerBeingEdited = memoNamed<Props>(
                     <TdWithMaxWidth>
                       {match(iconId, {
                         none: undefined,
-                        good: <AnswerSymbolGoodPoint />,
-                        poor: <AnswerSymbolPoorPoint />,
+                        good: <AnswerIconGoodPoint />,
+                        poor: <AnswerIconPoorPoint />,
                         fair: (
-                          <AnswerSymbolFairPointInput
+                          <AnswerIconFairPointInput
                             disabled={false}
                             value={point}
                             onValueChange={onPointChange}
@@ -231,7 +230,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
-        <ParagraphWithSwitchWrapper>
+        <Paragraph>
           <ParagraphWithSwitch
             description={vt.required.description}
             disabledInsteadOfHidden={false}
@@ -240,27 +239,18 @@ export const AnswerBeingEdited = memoNamed<Props>(
             title={vt.required.title}
             onToggle={toggleRequiredSection}
           />
-        </ParagraphWithSwitchWrapper>
-        <ParagraphWithSwitchWrapper>
-          <ParagraphWithSwitch
-            description={
-              answerBeingEdited.useWeight
-                ? vt.weight.description
-                : vt.weight.description.slice(0, 1)
-            }
-            disabledInsteadOfHidden={false}
-            elementToToggle={
-              <WeightSetting
-                disabled={!answerBeingEdited.useWeight}
-                weight={answerBeingEdited.weight}
-                onWeightChange={onWeightChange}
-              />
-            }
-            show={answerBeingEdited.useWeight}
-            title={vt.weight.title}
-            onToggle={toggleWeightSection}
-          />
-        </ParagraphWithSwitchWrapper>
+        </Paragraph>
+        <Paragraph>
+          <WeightSettingWrapper>
+            <WeightSetting
+              weight={answerBeingEdited.weight}
+              onWeightChange={onWeightChange}
+            />
+          </WeightSettingWrapper>
+          {IList.map(vt.weight.description, (d, i) => (
+            <Description key={i} text={d} />
+          ))}
+        </Paragraph>
 
         <ButtonsWrapperAlignEnd>
           <ButtonNowrapStyled
@@ -308,6 +298,10 @@ const Spacer = styled.div`
   height: 1rem;
 `;
 
-const ParagraphWithSwitchWrapper = styled.div`
+const Paragraph = styled.div`
   margin: 20px 0;
+`;
+
+const WeightSettingWrapper = styled.div`
+  margin-bottom: 5px;
 `;

@@ -1,8 +1,8 @@
 import type {
   Answer,
+  AnswerIconIdWithNone,
+  AnswerIconPoint,
   AnswerId,
-  AnswerSymbolIdWithNone,
-  AnswerSymbolPoint,
   AnswerTableCellPosition,
   DatetimeRange,
   EventSchedule,
@@ -24,13 +24,13 @@ export const useAnswerTable = (
   answers: readonly Answer[]
 ): IMapMapped<
   DatetimeRange,
-  DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
+  DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
   DatetimeRangeMapKey
 > => {
   const answerSelectionMap = useMemo<
     IMapMapped<
       AnswerTableCellPosition,
-      readonly [AnswerSymbolIdWithNone, AnswerSymbolPoint],
+      readonly [AnswerIconIdWithNone, AnswerIconPoint],
       AnswerSelectionMapKey
     >
   >(() => createAnswerSelectionMapFromAnswers(answers), [answers]);
@@ -39,7 +39,7 @@ export const useAnswerTable = (
     (
       datetimeRange: DatetimeRange,
       answerId: AnswerId
-    ): readonly [AnswerSymbolIdWithNone, AnswerSymbolPoint] =>
+    ): readonly [AnswerIconIdWithNone, AnswerIconPoint] =>
       answerSelectionMap.get({ datetimeRange, answerId }) ?? ituple('none', 0),
     [answerSelectionMap]
   );
@@ -47,7 +47,7 @@ export const useAnswerTable = (
   const answerTable = useMemo<
     IMapMapped<
       DatetimeRange,
-      DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
+      DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
       DatetimeRangeMapKey
     >
   >(

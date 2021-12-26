@@ -1,14 +1,13 @@
 import type {
   Answer,
-  AnswerSymbolId,
-  AnswerSymbolPoint,
+  AnswerIconId,
+  AnswerIconPoint,
   DatetimeRange,
   EventSchedule,
   UserName,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import { createWeight } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped, IRecord, pipe } from '@noshiro/ts-utils';
+import { IList, IMapMapped, IRecord } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type {
   AnswerSelectionReducerAction,
@@ -29,10 +28,10 @@ type AnswerBeingEditedHooks = DeepReadonly<{
   onUserNameBlur: () => void;
   onUserNameChange: (v: UserName) => void;
   onCommentChange: (v: string) => void;
-  symbolHeader: Record<
-    AnswerSymbolId,
+  iconHeader: Record<
+    AnswerIconId,
     {
-      symbolDescription: string;
+      iconDescription: string;
       onClick: () => void;
     }
   >;
@@ -41,17 +40,16 @@ type AnswerBeingEditedHooks = DeepReadonly<{
     datetimeRange: DatetimeRange;
     answerSelectionValue: AnswerSelectionValue;
     buttons: Record<
-      AnswerSymbolId,
+      AnswerIconId,
       {
         description: string;
         onClick: () => void;
       }
     >;
-    onPointChange: (point: AnswerSymbolPoint) => void;
+    onPointChange: (point: AnswerIconPoint) => void;
   }[];
   onWeightChange: (v: Weight) => void;
   toggleRequiredSection: () => void;
-  toggleWeightSection: () => void;
   hasUnanswered: boolean;
 }>;
 
@@ -151,12 +149,12 @@ export const useAnswerBeingEditedHooks = ({
     [answerSelectionMap, answerBeingEdited, updateAnswerBeingEdited]
   );
 
-  const symbolHeader = useMemo<
+  const iconHeader = useMemo<
     DeepReadonly<
       Record<
-        AnswerSymbolId,
+        AnswerIconId,
         {
-          symbolDescription: string;
+          iconDescription: string;
           onClick: () => void;
         }
       >
@@ -164,7 +162,7 @@ export const useAnswerBeingEditedHooks = ({
   >(
     () => ({
       good: {
-        symbolDescription: eventSchedule.answerSymbols.good.description,
+        iconDescription: eventSchedule.answerIcons.good.description,
         onClick: () => {
           dispatch({
             type: 'header',
@@ -174,7 +172,7 @@ export const useAnswerBeingEditedHooks = ({
         },
       },
       fair: {
-        symbolDescription: eventSchedule.answerSymbols.fair.description,
+        iconDescription: eventSchedule.answerIcons.fair.description,
         onClick: () => {
           dispatch({
             type: 'header',
@@ -184,7 +182,7 @@ export const useAnswerBeingEditedHooks = ({
         },
       },
       poor: {
-        symbolDescription: eventSchedule.answerSymbols.poor.description,
+        iconDescription: eventSchedule.answerIcons.poor.description,
         onClick: () => {
           dispatch({
             type: 'header',
@@ -204,13 +202,13 @@ export const useAnswerBeingEditedHooks = ({
         datetimeRange: DatetimeRange;
         answerSelectionValue: AnswerSelectionValue;
         buttons: Record<
-          AnswerSymbolId,
+          AnswerIconId,
           {
             description: string;
             onClick: () => void;
           }
         >;
-        onPointChange: (point: AnswerSymbolPoint) => void;
+        onPointChange: (point: AnswerIconPoint) => void;
       }[]
     >
   >(
@@ -226,7 +224,7 @@ export const useAnswerBeingEditedHooks = ({
             },
             buttons: {
               good: {
-                description: eventSchedule.answerSymbols.good.description,
+                description: eventSchedule.answerIcons.good.description,
                 onClick: () => {
                   dispatch({
                     type: 'cell-icon',
@@ -236,7 +234,7 @@ export const useAnswerBeingEditedHooks = ({
                 },
               },
               fair: {
-                description: eventSchedule.answerSymbols.fair.description,
+                description: eventSchedule.answerIcons.fair.description,
                 onClick: () => {
                   dispatch({
                     type: 'cell-icon',
@@ -246,7 +244,7 @@ export const useAnswerBeingEditedHooks = ({
                 },
               },
               poor: {
-                description: eventSchedule.answerSymbols.poor.description,
+                description: eventSchedule.answerIcons.poor.description,
                 onClick: () => {
                   dispatch({
                     type: 'cell-icon',
@@ -256,7 +254,7 @@ export const useAnswerBeingEditedHooks = ({
                 },
               },
             },
-            onPointChange: (point: AnswerSymbolPoint) => {
+            onPointChange: (point: AnswerIconPoint) => {
               dispatch({ type: 'cell-point', datetimeRange: d, point });
             },
           } as const)
@@ -279,17 +277,6 @@ export const useAnswerBeingEditedHooks = ({
     );
   }, [updateAnswerBeingEdited]);
 
-  const toggleWeightSection = useCallback(() => {
-    updateAnswerBeingEdited(
-      (ans) =>
-        pipe(ans)
-          .chain((a) => IRecord.update(a, 'useWeight', (b) => !b))
-          .chain((a) =>
-            a.useWeight ? a : IRecord.set(a, 'weight', createWeight(1))
-          ).value
-    );
-  }, [updateAnswerBeingEdited]);
-
   const hasUnanswered = useMemo<boolean>(
     () =>
       answerBeingEditedList.some(
@@ -304,11 +291,10 @@ export const useAnswerBeingEditedHooks = ({
     onUserNameBlur,
     onUserNameChange: onUserNameChangeLocal,
     onCommentChange,
-    symbolHeader,
+    iconHeader,
     answerBeingEditedList,
     onWeightChange,
     toggleRequiredSection,
-    toggleWeightSection,
     hasUnanswered,
   };
 };

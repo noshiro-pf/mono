@@ -1,27 +1,27 @@
 import type {
-  AnswerSymbolId,
-  AnswerSymbolPoint,
-  SymbolSettings,
+  AnswerIconId,
+  AnswerIconPoint,
+  AnswerIconSettings,
 } from '@noshiro/event-schedule-app-shared';
 import { IRecord } from '@noshiro/ts-utils';
 
-export type SymbolListReducerAction =
+export type IconListReducerAction =
   | {
       type: 'update-description';
-      iconId: AnswerSymbolId;
+      iconId: AnswerIconId;
       description: string;
     }
   | {
       type: 'update-point';
-      iconId: AnswerSymbolId;
-      point: AnswerSymbolPoint;
+      iconId: AnswerIconId;
+      point: AnswerIconPoint;
     };
 
-export type SymbolListReducerState = SymbolSettings;
+export type IconListReducerState = AnswerIconSettings;
 
-export const symbolListReducer: ReducerType<
-  SymbolListReducerState,
-  SymbolListReducerAction
+export const iconListReducer: ReducerType<
+  IconListReducerState,
+  IconListReducerAction
 > = (state, action) => {
   switch (action.type) {
     case 'update-description':

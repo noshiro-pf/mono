@@ -1,4 +1,4 @@
-export const answerSymbolPointConfig = {
+export const answerIconPointConfig = {
   step: 1,
   min: 0,
   max: 10,

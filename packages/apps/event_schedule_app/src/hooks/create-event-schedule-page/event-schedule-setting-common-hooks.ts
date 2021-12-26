@@ -1,10 +1,10 @@
 import type {
+  AnswerIconSettings,
   DatetimeRange,
   DatetimeSpecificationEnumType,
   EventSchedule,
   EventScheduleValidation,
   NotificationSettings,
-  SymbolSettings,
   YearMonthDate,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
@@ -45,8 +45,8 @@ type EventScheduleSettingCommonHooks = Readonly<{
   onToggleAnswerDeadline: () => void;
   answerDeadline: Ymdhm | undefined;
   onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
-  answerSymbols: SymbolSettings;
-  onAnswerSymbolsValueChange: (value: SymbolSettings) => void;
+  answerIcons: AnswerIconSettings;
+  onAnswerIconsValueChange: (value: AnswerIconSettings) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
   notificationSettings: NotificationSettings;
@@ -100,8 +100,8 @@ export const useEventScheduleSettingCommonHooks = (
     valueWhenTurnedOn: initialAnswerDeadline,
   });
 
-  const [answerSymbols, setAnswerSymbols, resetAnswerSymbols] =
-    useStateWithResetter<SymbolSettings>(initialValues.current.answerSymbols);
+  const [answerIcons, setAnswerIcons, resetAnswerIcons] =
+    useStateWithResetter<AnswerIconSettings>(initialValues.current.answerIcons);
 
   const {
     useThisConfig: useNotification,
@@ -126,7 +126,7 @@ export const useEventScheduleSettingCommonHooks = (
         datetimeRangeList,
         useAnswerDeadline,
         answerDeadline: answerDeadline ?? defaultYmdhm,
-        answerSymbols,
+        answerIcons,
         useNotification,
         notificationSettings,
         timezoneOffsetMinutes: defaultEventSchedule.timezoneOffsetMinutes,
@@ -138,7 +138,7 @@ export const useEventScheduleSettingCommonHooks = (
       datetimeRangeList,
       useAnswerDeadline,
       answerDeadline,
-      answerSymbols,
+      answerIcons,
       useNotification,
       notificationSettings,
     ]
@@ -156,7 +156,7 @@ export const useEventScheduleSettingCommonHooks = (
         datetimeRangeList,
         useAnswerDeadline,
         answerDeadline,
-        answerSymbols,
+        answerIcons,
         useNotification,
         notificationSettings,
       }),
@@ -165,7 +165,7 @@ export const useEventScheduleSettingCommonHooks = (
       datetimeRangeList,
       useAnswerDeadline,
       answerDeadline,
-      answerSymbols,
+      answerIcons,
       useNotification,
       notificationSettings,
     ]
@@ -206,13 +206,13 @@ export const useEventScheduleSettingCommonHooks = (
     onDatetimeListChange(initialValues.current.datetimeRangeList);
     setUseAnswerDeadline(initialValues.current.useAnswerDeadline);
     resetAnswerDeadline();
-    resetAnswerSymbols();
+    resetAnswerIcons();
     setUseNotification(initialValues.current.useNotification);
     resetNotificationSettings();
   }, [
     setUseAnswerDeadline,
     resetAnswerDeadline,
-    resetAnswerSymbols,
+    resetAnswerIcons,
     setUseNotification,
     resetNotificationSettings,
   ]);
@@ -234,8 +234,8 @@ export const useEventScheduleSettingCommonHooks = (
     onToggleAnswerDeadline,
     answerDeadline,
     onAnswerDeadlineChange: setAnswerDeadline,
-    answerSymbols,
-    onAnswerSymbolsValueChange: setAnswerSymbols,
+    answerIcons,
+    onAnswerIconsValueChange: setAnswerIcons,
     useNotification,
     onToggleUseNotification,
     notificationSettings,

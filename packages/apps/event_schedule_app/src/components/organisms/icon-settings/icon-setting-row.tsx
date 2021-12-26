@@ -1,7 +1,7 @@
 import type {
-  AnswerSymbolId,
-  AnswerSymbolPoint,
-  SymbolSetting,
+  AnswerIconId,
+  AnswerIconPoint,
+  AnswerIconSetting,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { match } from '@noshiro/ts-utils';
@@ -9,39 +9,39 @@ import styled from 'styled-components';
 import { CustomIcon } from '../../atoms';
 import { BpInput } from '../../bp';
 import {
-  AnswerSymbolFairPointInput,
-  AnswerSymbolGoodPoint,
-  AnswerSymbolPoorPoint,
+  AnswerIconFairPointInput,
+  AnswerIconGoodPoint,
+  AnswerIconPoorPoint,
 } from '../../molecules';
 
 type Props = Readonly<{
-  symbolId: AnswerSymbolId;
-  answerSymbol: SymbolSetting;
+  iconId: AnswerIconId;
+  answerIcon: AnswerIconSetting;
   onDescriptionChange: (value: string) => void;
-  onPointChange: (value: AnswerSymbolPoint) => void;
+  onPointChange: (value: AnswerIconPoint) => void;
 }>;
 
-export const AnswerSymbolRow = memoNamed<Props>(
-  'AnswerSymbolRow',
-  ({ symbolId, answerSymbol, onDescriptionChange, onPointChange }) => (
+export const AnswerIconRow = memoNamed<Props>(
+  'AnswerIconRow',
+  ({ iconId, answerIcon, onDescriptionChange, onPointChange }) => (
     <Root>
       <IconWrapper>
-        <CustomIcon iconName={symbolId} />
+        <CustomIcon iconName={iconId} />
       </IconWrapper>
       <DescriptionWrapper>
         <BpInput
-          value={answerSymbol.description}
+          value={answerIcon.description}
           onValueChange={onDescriptionChange}
         />
       </DescriptionWrapper>
       <NumericInputWrapper>
-        {match(symbolId, {
-          good: <AnswerSymbolGoodPoint />,
-          poor: <AnswerSymbolPoorPoint />,
+        {match(iconId, {
+          good: <AnswerIconGoodPoint />,
+          poor: <AnswerIconPoorPoint />,
           fair: (
-            <AnswerSymbolFairPointInput
+            <AnswerIconFairPointInput
               disabled={false}
-              value={answerSymbol.point}
+              value={answerIcon.point}
               onValueChange={onPointChange}
             />
           ),

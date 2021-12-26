@@ -1,5 +1,5 @@
 import type {
-  AnswerSymbolIdWithNone,
+  AnswerIconIdWithNone,
   DatetimeRange,
   DatetimeSpecificationEnumType,
   HoursMinutes,
@@ -36,7 +36,7 @@ export const datetimeRange2str = (
   }
 };
 
-export const iconId2str = (iconId: AnswerSymbolIdWithNone): string => {
+export const iconId2str = (iconId: AnswerIconIdWithNone): string => {
   switch (iconId) {
     case 'none':
       return '-';

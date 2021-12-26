@@ -13,7 +13,7 @@ export const normalizeEventSchedule = (
     .chain((list) => IList.sort(list, compareDatetimeRange)).value,
   useAnswerDeadline: eventSchedule.useAnswerDeadline,
   answerDeadline: eventSchedule.answerDeadline,
-  answerSymbols: eventSchedule.answerSymbols,
+  answerIcons: eventSchedule.answerIcons,
   useNotification: eventSchedule.useNotification,
   notificationSettings: eventSchedule.notificationSettings,
   timezoneOffsetMinutes: eventSchedule.timezoneOffsetMinutes,

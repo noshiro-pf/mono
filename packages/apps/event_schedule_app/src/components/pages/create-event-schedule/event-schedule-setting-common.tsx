@@ -40,8 +40,8 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
       onToggleAnswerDeadline,
       answerDeadline,
       onAnswerDeadlineChange,
-      answerSymbols,
-      onAnswerSymbolsValueChange,
+      answerIcons,
+      onAnswerIconsValueChange,
       useNotification,
       onToggleUseNotification,
       notificationSettings,
@@ -86,12 +86,12 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
         <Section sectionTitle={vt.section3.otherSettingsTitle}>
           <EventSettings
             answerDeadline={answerDeadline}
-            answerSymbols={answerSymbols}
+            answerIcons={answerIcons}
             notificationSettings={notificationSettings}
             useAnswerDeadline={useAnswerDeadline}
             useNotification={useNotification}
             onAnswerDeadlineChange={onAnswerDeadlineChange}
-            onAnswerSymbolsChange={onAnswerSymbolsValueChange}
+            onAnswerIconsChange={onAnswerIconsValueChange}
             onNotificationSettingsChange={onNotificationSettingsChange}
             onToggleAnswerDeadline={onToggleAnswerDeadline}
             onToggleUseNotification={onToggleUseNotification}

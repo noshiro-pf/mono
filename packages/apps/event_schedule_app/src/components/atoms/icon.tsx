@@ -1,11 +1,11 @@
 import { Icon } from '@blueprintjs/core';
-import type { AnswerSymbolIdWithNone } from '@noshiro/event-schedule-app-shared';
+import type { AnswerIconIdWithNone } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { useMemo } from 'react';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons';
 
 type Props = Readonly<{
-  iconName: AnswerSymbolIdWithNone;
+  iconName: AnswerIconIdWithNone;
   color?: string;
   size?: number;
 }>;

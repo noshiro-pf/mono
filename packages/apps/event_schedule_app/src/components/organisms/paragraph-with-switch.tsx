@@ -1,4 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
+import { IList } from '@noshiro/ts-utils';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import { Description } from '../atoms';
@@ -27,8 +28,9 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       </SwitchWrapper>
       {props.description === undefined
         ? undefined
-        : // eslint-disable-next-line react/no-array-index-key
-          props.description.map((d, i) => <Description key={i} text={d} />)}
+        : IList.map(props.description, (d, i) => (
+            <Description key={i} text={d} />
+          ))}
       {props.disabledInsteadOfHidden
         ? props.elementToToggle
         : props.show
