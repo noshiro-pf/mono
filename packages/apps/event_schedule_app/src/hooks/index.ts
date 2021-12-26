@@ -1,6 +1,7 @@
 export * from './answer-being-edited-component';
 export * from './answer-table-component';
 export * from './answers-page';
+export * from './confirm-email-dialog-hook';
 export * from './create-event-schedule-page';
 export * from './multiple-date-picker-hooks';
 export * from './select-datetimes-component';

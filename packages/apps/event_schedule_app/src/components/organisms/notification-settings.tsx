@@ -1,15 +1,16 @@
+import { FormGroup } from '@blueprintjs/core';
 import type {
   NotificationSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
-import { IRecord } from '@noshiro/ts-utils';
+import { IRecord, isEmailString } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants';
 import { now, ymdhmDateDiff } from '../../functions';
-import { BpCheckbox, BpEmailInput } from '../bp';
+import { BpCheckbox, BpInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
 type Props = Readonly<{
@@ -143,19 +144,32 @@ export const NotificationSettingsComponent = memoNamed<Props>(
       [answerDeadline, disabled, useAnswerDeadline]
     );
 
+    const invalidEmail =
+      !disabled && !isEmailString(notificationSettings.email);
+
+    const helperText = invalidEmail
+      ? texts.eventSettingsPage.errorMessages.invalidEmail
+      : '';
+
     return (
       <div>
         <WidthRestrictedInputWrapper>
-          <BpEmailInput
-            disabled={disabled}
-            focus$={focusEmailInput$}
-            formGroupLabel={vt.emailAddress}
-            invalidEmailMessage={
-              texts.eventSettingsPage.errorMessages.invalidEmail
-            }
-            value={notificationSettings.email}
-            onValueChange={onEmailChange}
-          />
+          <FormGroup
+            helperText={helperText}
+            intent={invalidEmail ? 'danger' : 'primary'}
+            label={vt.emailAddress}
+          >
+            <BpInput
+              autoFocus={true}
+              disabled={disabled}
+              focus$={focusEmailInput$}
+              intent={invalidEmail ? 'danger' : 'primary'}
+              placeholder={'sample@gmail.com'}
+              type='email'
+              value={notificationSettings.email}
+              onValueChange={onEmailChange}
+            />
+          </FormGroup>
         </WidthRestrictedInputWrapper>
         <CheckboxesWrapper>
           <CheckboxWrapper>

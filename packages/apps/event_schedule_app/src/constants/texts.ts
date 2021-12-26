@@ -40,12 +40,6 @@ export const texts = {
       howAnswerDeadlineIsUsed: [
         '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
       ],
-      usePassword: '設定編集用パスワードを設定',
-      howPasswordIsUsed:
-        '日程調整作成後のイベント名や候補日程等の編集時にパスワード入力が求められるようになります。',
-      iconSettings: '回答に使う記号をカスタマイズ',
-      customizeIconDescription:
-        '記号の追加機能は今後のアップデートで追加予定です！',
       useNotification: '幹事用通知設定',
       emailAddress: '通知先メールアドレス',
       notifyOnAnswerChange: '回答に更新があったときにメール通知',
@@ -62,7 +56,7 @@ export const texts = {
         '回答期限をオンにしていますが空欄になっています。',
       passwordIsEnabledButEmpty:
         'パスワードをオンにしていますが空欄になっています。',
-      invalidEmail: '有効なメールアドレスではありません',
+      invalidEmail: '有効なメールアドレスではありません。',
       atLeastOneNotificationCheckRequired:
         '通知設定をオンにする場合は少なくとも1つの通知にチェックをしてください。',
       answerIcons:
@@ -114,8 +108,10 @@ export const texts = {
     title: '日程調整ページが作成されました！',
     titleLoading: '日程調整ページを作成中です…',
     clipboardButton: 'クリップボードにコピー',
-    description:
-      'イベントが作成されました。 以下のURLをメール等を使って皆に知らせてあげましょう。 以降、このURLページにて各自の出欠情報を入力してもらいます。',
+    description: [
+      'イベントが作成されました。 以下のURLをメール等を使って皆に知らせてあげましょう。',
+      'このURLページにて各自の出欠情報を入力してもらいます。',
+    ].join(''),
     openEventPageCreated: '日程調整ページを開く',
     discardEventPage: '破棄して作成画面に戻る',
     back: '作成画面に戻る',
@@ -176,7 +172,7 @@ export const texts = {
       yourName: 'あなたの名前：',
       comments: 'コメント（オプション）：',
       nameIsRequired: '名前は必須項目です',
-      theNameIsAlreadyUsed: 'その名前は既に使われています',
+      theNameIsAlreadyUsed: 'その名前は既に使われています。',
       required: {
         title: '私は必須参加者です',
         description: [
