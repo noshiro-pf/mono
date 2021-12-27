@@ -23,6 +23,10 @@ export const notifyOnAnswerChangeBody = async ({
 }>): Promise<void> => {
   const eventItem = await getEventItem(eventId);
 
+  if (eventItem === undefined) {
+    functions.logger.log(`eventItem for id = "${eventId}" not found.`);
+    return;
+  }
   if (!eventItem.useNotification) {
     functions.logger.log('skipped because eventItem.useNotification is false.');
     return;

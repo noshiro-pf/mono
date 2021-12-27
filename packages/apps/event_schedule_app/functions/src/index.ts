@@ -1,9 +1,9 @@
-import type { Answer } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
+import { fillAnswerWithCheck, toStringWithCheck } from './type-check';
 
 admin.initializeApp();
 
@@ -19,9 +19,9 @@ export const answerCreationListener = functions.firestore
   .onCreate((snapshot, context) =>
     notifyOnAnswerChangeBody({
       eventType: 'create',
-      eventId: context.params[wildcard.eventId] as string,
+      eventId: toStringWithCheck(context.params[wildcard.eventId]),
       answerItemBefore: undefined,
-      answerItemAfter: snapshot.data() as Answer,
+      answerItemAfter: fillAnswerWithCheck(snapshot.data()),
     })
   );
 
@@ -30,8 +30,8 @@ export const answerDeletionListener = functions.firestore
   .onDelete((snapshot, context) =>
     notifyOnAnswerChangeBody({
       eventType: 'delete',
-      eventId: context.params[wildcard.eventId] as string,
-      answerItemBefore: snapshot.data() as Answer,
+      eventId: toStringWithCheck(context.params[wildcard.eventId]),
+      answerItemBefore: fillAnswerWithCheck(snapshot.data()),
       answerItemAfter: undefined,
     })
   );
@@ -41,9 +41,9 @@ export const answerUpdateListener = functions.firestore
   .onUpdate((change, context) =>
     notifyOnAnswerChangeBody({
       eventType: 'update',
-      eventId: context.params[wildcard.eventId] as string,
-      answerItemBefore: change.before.data() as Answer,
-      answerItemAfter: change.after.data() as Answer,
+      eventId: toStringWithCheck(context.params[wildcard.eventId]),
+      answerItemBefore: fillAnswerWithCheck(change.before.data()),
+      answerItemAfter: fillAnswerWithCheck(change.after.data()),
     })
   );
 
