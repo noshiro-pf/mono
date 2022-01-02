@@ -21,16 +21,10 @@ import {
   setMinutes,
   today,
 } from '@noshiro/ts-utils';
+import { defaultIconPoint } from './default-icon-point';
 import { texts } from './texts';
 
 export const initialDatetimeRangeList: readonly DatetimeRange[] = [];
-
-export const defaultIconPoint = {
-  good: 10,
-  fair: 6,
-  poor: 0,
-  none: 0,
-} as const;
 
 export const initialAnswerIcons: AnswerIconSettings = {
   good: {

@@ -1,4 +1,5 @@
 import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
+import { defaultIconPoint } from './default-icon-point';
 
 export const texts = {
   aboutThisApp: 'このアプリについて',
@@ -36,18 +37,29 @@ export const texts = {
     },
     section3: {
       otherSettingsTitle: 'その他の設定（3/3）',
-      answerDeadline: '回答期限',
+      answerDeadline: {
+        title: '回答期限',
+        howAnswerDeadlineIsUsed: [
+          '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
+        ],
+      },
       howAnswerDeadlineIsUsed: [
         '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
       ],
-      useNotification: '幹事用通知設定',
-      emailAddress: '通知先メールアドレス',
-      notifyOnAnswerChange: '回答に更新があったときにメール通知',
-      notify01daysBeforeAnswerDeadline: '回答締め切り1日前にメール通知',
-      notify03daysBeforeAnswerDeadline: '回答締め切り3日前にメール通知',
-      notify07daysBeforeAnswerDeadline: '回答締め切り7日前にメール通知',
-      notify14daysBeforeAnswerDeadline: '回答締め切り14日前にメール通知',
-      notify28daysBeforeAnswerDeadline: '回答締め切り28日前にメール通知',
+      notification: {
+        useNotification: '幹事用通知設定',
+        emailAddress: '通知先メールアドレス',
+        notifyOnAnswerChange: '回答に更新があったときにメール通知',
+        notify01daysBeforeAnswerDeadline: '回答締め切り1日前にメール通知',
+        notify03daysBeforeAnswerDeadline: '回答締め切り3日前にメール通知',
+        notify07daysBeforeAnswerDeadline: '回答締め切り7日前にメール通知',
+        notify14daysBeforeAnswerDeadline: '回答締め切り14日前にメール通知',
+        notify28daysBeforeAnswerDeadline: '回答締め切り28日前にメール通知',
+      },
+      iconSettings: {
+        title: '回答に使う記号の設定',
+        description: `右の数字は日程決めのスコア計算に使う点数です（△のデフォルト点数(=${defaultIconPoint.fair})は変更できます）`,
+      },
     },
     errorMessages: {
       titleIsEmpty: 'イベント名は必須項目です。',
