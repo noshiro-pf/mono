@@ -60,7 +60,7 @@ export const EventSettings = memoNamed<Props>(
     return (
       <Root>
         <ParagraphWithSwitch
-          description={vt.howAnswerDeadlineIsUsed}
+          description={vt.answerDeadline.howAnswerDeadlineIsUsed}
           disabledInsteadOfHidden={true}
           elementToToggle={
             <AnswerDeadlineDatepicker
@@ -70,7 +70,7 @@ export const EventSettings = memoNamed<Props>(
             />
           }
           show={useAnswerDeadline}
-          title={vt.answerDeadline}
+          title={vt.answerDeadline.title}
           onToggle={onToggleAnswerDeadline}
         />
         <hr />
@@ -87,7 +87,7 @@ export const EventSettings = memoNamed<Props>(
             />
           }
           show={useNotification}
-          title={vt.useNotification}
+          title={vt.notification.useNotification}
           onToggle={onToggleUseNotificationLocal}
         />
         <hr />
