@@ -44,7 +44,7 @@ export const AnswerTable = memoNamed<Props>(
               <SortButton onSortChange={onScoreSortChange} />
             </th>
 
-            {/* symbols */}
+            {/* icons */}
             <th>
               <CustomIcon iconName={'good'} />
             </th>
@@ -142,7 +142,7 @@ export const AnswerTable = memoNamed<Props>(
             {/* spacer */}
             <td />
 
-            {/* spacer - symbols */}
+            {/* spacer - icons */}
             <td />
             <td />
             <td />

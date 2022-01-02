@@ -44,10 +44,10 @@ export const EventSchedulePropertiesErrors = memoNamed<Props>(
           text={vt.errorMessages.atLeastOneNotificationCheckRequired}
         />
       )}
-      {eventScheduleValidation.answerSymbols ? undefined : (
+      {eventScheduleValidation.answerIcons ? undefined : (
         <Description
           color={errorFontColor}
-          text={vt.errorMessages.answerSymbols}
+          text={vt.errorMessages.answerIcons}
         />
       )}
     </ErrorMessagesWrapper>

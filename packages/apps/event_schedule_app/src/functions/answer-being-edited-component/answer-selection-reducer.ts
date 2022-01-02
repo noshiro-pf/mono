@@ -1,11 +1,11 @@
 import type {
-  AnswerSymbolId,
-  AnswerSymbolPoint,
+  AnswerIconId,
+  AnswerIconPoint,
   DatetimeRange,
 } from '@noshiro/event-schedule-app-shared';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { IRecord, match } from '@noshiro/ts-utils';
-import { defaultSymbolPoint } from '../../constants';
+import { defaultIconPoint } from '../../constants';
 import type { AnswerSelectionValue } from '../../types';
 import type { DatetimeRangeMapKey } from '../map-key';
 
@@ -13,16 +13,16 @@ export type AnswerSelectionReducerAction = Readonly<
   | {
       type: 'cell-icon';
       datetimeRange: DatetimeRange;
-      icon: AnswerSymbolId;
+      icon: AnswerIconId;
     }
   | {
       type: 'cell-point';
       datetimeRange: DatetimeRange;
-      point: AnswerSymbolPoint;
+      point: AnswerIconPoint;
     }
   | {
       type: 'header';
-      icon: AnswerSymbolId;
+      icon: AnswerIconId;
       datetimeRangeList: readonly DatetimeRange[];
     }
 >;
@@ -43,7 +43,7 @@ export const answerSelectionReducer: ReducerType<
         const nextIcon = prevIcon === action.icon ? 'none' : action.icon;
         return {
           iconId: nextIcon,
-          point: match(nextIcon, defaultSymbolPoint),
+          point: match(nextIcon, defaultIconPoint),
         };
       });
 
@@ -60,7 +60,7 @@ export const answerSelectionReducer: ReducerType<
           }))
         : state.map<AnswerSelectionValue>(() => ({
             iconId: action.icon,
-            point: match(action.icon, defaultSymbolPoint),
+            point: match(action.icon, defaultIconPoint),
           }));
   }
 };

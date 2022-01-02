@@ -1,14 +1,11 @@
 import * as functions from 'firebase-functions';
 import { createTransport } from 'nodemailer';
+import { fillGmailConfig } from './type-check';
 
-export const gmailConfig: {
+export const gmailConfig: Readonly<{
   email: string;
   password: string;
-} = (
-  functions.config() as {
-    gmail: { email: string; password: string };
-  }
-).gmail;
+}> = fillGmailConfig(functions.config()).gmail;
 
 export const mailTransport = createTransport({
   service: 'gmail',

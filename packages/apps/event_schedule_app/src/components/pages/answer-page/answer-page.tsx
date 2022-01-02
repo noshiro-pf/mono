@@ -123,7 +123,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               />
             </TableWrapper>
 
-            <SymbolDescriptionWrapper>
+            <IconDescriptionWrapper>
               {requiredParticipantsExist ? (
                 <RequiredParticipantIconWrapper>
                   <AlignCenter>
@@ -142,9 +142,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         <CustomIcon iconName={'good'} />
                       </AlignCenter>
                     </th>
-                    <td>{vt.point(eventSchedule.answerSymbols.good.point)}</td>
+                    <td>{vt.point(eventSchedule.answerIcons.good.point)}</td>
                     <td>{texts.colon}</td>
-                    <td>{eventSchedule.answerSymbols.good.description}</td>
+                    <td>{eventSchedule.answerIcons.good.description}</td>
                   </tr>
                   <tr>
                     <th>
@@ -152,9 +152,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         <CustomIcon iconName={'fair'} />
                       </AlignCenter>
                     </th>
-                    <td>{vt.point(eventSchedule.answerSymbols.fair.point)}</td>
+                    <td>{vt.point(eventSchedule.answerIcons.fair.point)}</td>
                     <td>{texts.colon}</td>
-                    <td>{eventSchedule.answerSymbols.fair.description}</td>
+                    <td>{eventSchedule.answerIcons.fair.description}</td>
                   </tr>
                   <tr>
                     <th>
@@ -162,21 +162,21 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         <CustomIcon iconName={'poor'} />
                       </AlignCenter>
                     </th>
-                    <td>{vt.point(eventSchedule.answerSymbols.poor.point)}</td>
+                    <td>{vt.point(eventSchedule.answerIcons.poor.point)}</td>
                     <td>{texts.colon}</td>
-                    <td>{eventSchedule.answerSymbols.poor.description}</td>
+                    <td>{eventSchedule.answerIcons.poor.description}</td>
                   </tr>
                 </tbody>
               </table>
               <NoteForPointOfFair>
                 {IList.map(
-                  vt.noteForPointOfFair(eventSchedule.answerSymbols.fair.point),
+                  vt.noteForPointOfFair(eventSchedule.answerIcons.fair.point),
                   (s, i) => (
                     <Description key={i} text={s} />
                   )
                 )}
               </NoteForPointOfFair>
-            </SymbolDescriptionWrapper>
+            </IconDescriptionWrapper>
 
             {answerBeingEditedSectionState === 'hidden' && !isExpired ? (
               <ButtonsWrapperAlignEnd>
@@ -267,7 +267,7 @@ const TableWrapper = styled.div`
   overflow-x: auto;
 `;
 
-const SymbolDescriptionWrapper = styled.div`
+const IconDescriptionWrapper = styled.div`
   margin: 10px;
 `;
 

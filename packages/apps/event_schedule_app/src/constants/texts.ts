@@ -1,4 +1,4 @@
-import type { AnswerSymbolPoint } from '@noshiro/event-schedule-app-shared';
+import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
 
 export const texts = {
   aboutThisApp: 'このアプリについて',
@@ -40,12 +40,6 @@ export const texts = {
       howAnswerDeadlineIsUsed: [
         '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
       ],
-      usePassword: '設定編集用パスワードを設定',
-      howPasswordIsUsed:
-        '日程調整作成後のイベント名や候補日程等の編集時にパスワード入力が求められるようになります。',
-      symbolSettings: '回答に使う記号をカスタマイズ',
-      customizeSymbolDescription:
-        '記号の追加機能は今後のアップデートで追加予定です！',
       useNotification: '幹事用通知設定',
       emailAddress: '通知先メールアドレス',
       notifyOnAnswerChange: '回答に更新があったときにメール通知',
@@ -62,10 +56,10 @@ export const texts = {
         '回答期限をオンにしていますが空欄になっています。',
       passwordIsEnabledButEmpty:
         'パスワードをオンにしていますが空欄になっています。',
-      invalidEmail: '有効なメールアドレスではありません',
+      invalidEmail: '有効なメールアドレスではありません。',
       atLeastOneNotificationCheckRequired:
         '通知設定をオンにする場合は少なくとも1つの通知にチェックをしてください。',
-      answerSymbols:
+      answerIcons:
         '記号の設定に不備があります。説明に空欄があるか、△の点数が0.1以上9.9以下になっていない可能性があります。',
     },
     createEventButton: '日程調整ページを作成',
@@ -96,7 +90,7 @@ export const texts = {
     addAnswer: '回答を追加する',
   },
 
-  symbolDescriptionDefault: {
+  iconDescriptionDefault: {
     circle: '参加します',
     triangleUp: '参加できるかも',
     cross: '参加できません',
@@ -114,8 +108,10 @@ export const texts = {
     title: '日程調整ページが作成されました！',
     titleLoading: '日程調整ページを作成中です…',
     clipboardButton: 'クリップボードにコピー',
-    description:
-      'イベントが作成されました。 以下のURLをメール等を使って皆に知らせてあげましょう。 以降、このURLページにて各自の出欠情報を入力してもらいます。',
+    description: [
+      'イベントが作成されました。 以下のURLをメール等を使って皆に知らせてあげましょう。',
+      'このURLページにて各自の出欠情報を入力してもらいます。',
+    ].join(''),
     openEventPageCreated: '日程調整ページを開く',
     discardEventPage: '破棄して作成画面に戻る',
     back: '作成画面に戻る',
@@ -144,7 +140,7 @@ export const texts = {
         back: '前のページに戻る',
       },
     },
-    point: (p: AnswerSymbolPoint) => `（${p}点）`,
+    point: (p: AnswerIconPoint) => `（${p}点）`,
     answers: {
       title: '回答一覧',
       datetime: '候補日程',
@@ -162,7 +158,7 @@ export const texts = {
     requiredParticipantDescription:
       '（必須参加者が×を付けている日のスコアは0点になります。）',
     noteForPointOfFair: (
-      defaultPoint: AnswerSymbolPoint
+      defaultPoint: AnswerIconPoint
     ): readonly [string, string] => [
       '回答者が個別に△の点数を設定している場合があります。',
       `デフォルトの点数（＝${defaultPoint}点）から変更されている場合は、△の右隣に括弧付きでその点数が表示されています。`,
@@ -176,7 +172,7 @@ export const texts = {
       yourName: 'あなたの名前：',
       comments: 'コメント（オプション）：',
       nameIsRequired: '名前は必須項目です',
-      theNameIsAlreadyUsed: 'その名前は既に使われています',
+      theNameIsAlreadyUsed: 'その名前は既に使われています。',
       required: {
         title: '私は必須参加者です',
         description: [
@@ -184,10 +180,10 @@ export const texts = {
         ],
       },
       weight: {
-        title: 'この回答の優先度を変更（オプション）',
+        title: '何人分としてカウントするか',
         description: [
           '集計表のスコア計算でこの回答を何人分としてカウントするかを設定できます。',
-          'この回答の優先度を上げたい場合は1より大きい値を、下げたい場合は1より小さい値を設定してください。',
+          'この回答の優先度を上げたい場合に1より大きい値を、下げたい場合に1より小さい値を設定するという使い方もできます。',
         ],
         suffix: '人分としてカウント',
       },

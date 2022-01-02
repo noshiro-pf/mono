@@ -1,6 +1,6 @@
 import type {
+  AnswerIconSettings,
   NotificationSettings,
-  SymbolSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
@@ -8,9 +8,9 @@ import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../constants';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
+import { AnswerIconSettingsComponent } from './icon-settings';
 import { NotificationSettingsComponent } from './notification-settings';
 import { ParagraphWithSwitch } from './paragraph-with-switch';
-import { SymbolSettingsComponent } from './symbol-settings';
 
 const vt = texts.eventSettingsPage.section3;
 
@@ -19,8 +19,8 @@ type Props = Readonly<{
   onToggleAnswerDeadline: () => void;
   answerDeadline: Ymdhm | undefined;
   onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
-  answerSymbols: SymbolSettings;
-  onAnswerSymbolsChange: (value: SymbolSettings) => void;
+  answerIcons: AnswerIconSettings;
+  onAnswerIconsChange: (value: AnswerIconSettings) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
   notificationSettings: NotificationSettings;
@@ -34,8 +34,8 @@ export const EventSettings = memoNamed<Props>(
     onToggleAnswerDeadline,
     answerDeadline,
     onAnswerDeadlineChange,
-    answerSymbols,
-    onAnswerSymbolsChange,
+    answerIcons,
+    onAnswerIconsChange,
     useNotification,
     onToggleUseNotification,
     notificationSettings,
@@ -91,9 +91,9 @@ export const EventSettings = memoNamed<Props>(
           onToggle={onToggleUseNotificationLocal}
         />
         <hr />
-        <SymbolSettingsComponent
-          answerSymbols={answerSymbols}
-          onAnswerSymbolsChange={onAnswerSymbolsChange}
+        <AnswerIconSettingsComponent
+          answerIcons={answerIcons}
+          onAnswerIconsChange={onAnswerIconsChange}
         />
       </Root>
     );

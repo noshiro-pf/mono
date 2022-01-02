@@ -1,10 +1,10 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { defaultSymbolPoint } from '../../../constants';
+import { defaultIconPoint } from '../../../constants';
 
-const s = defaultSymbolPoint.good.toString();
+const s = defaultIconPoint.good.toString();
 
-export const AnswerSymbolGoodPoint = memoNamed('AnswerSymbolGoodPoint', () => (
+export const AnswerIconGoodPoint = memoNamed('AnswerIconGoodPoint', () => (
   <Div>{s}</Div>
 ));
 

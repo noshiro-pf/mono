@@ -1,18 +1,13 @@
 import type {
-  AnswerSymbolPoint,
+  AnswerIconPoint,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
 import { createWeight } from '@noshiro/event-schedule-app-shared';
-import {
-  answerSymbolPointConfig,
-  weightNumericInputConfig,
-} from '../constants';
+import { answerIconPointConfig, weightNumericInputConfig } from '../constants';
 
-const cfg1 = answerSymbolPointConfig;
+const cfg1 = answerIconPointConfig;
 
-export const clampAndRoundAnswerFairSymbolPoint = (
-  x: number
-): AnswerSymbolPoint =>
+export const clampAndRoundAnswerFairIconPoint = (x: number): AnswerIconPoint =>
   !Number.isFinite(x)
     ? 0
     : x < cfg1.fair.min
@@ -20,7 +15,7 @@ export const clampAndRoundAnswerFairSymbolPoint = (
     : cfg1.fair.max < x
     ? cfg1.fair.max
     : ((Math.round(x * 10 ** cfg1.digit) /
-        10 ** cfg1.digit) as AnswerSymbolPoint);
+        10 ** cfg1.digit) as AnswerIconPoint);
 
 const cfg2 = weightNumericInputConfig;
 

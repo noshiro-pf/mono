@@ -1,30 +1,27 @@
-import type { AnswerSymbolPoint } from '@noshiro/event-schedule-app-shared';
+import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  answerSymbolPointConfig,
-  defaultSymbolPoint,
-} from '../../../constants';
-import { clampAndRoundAnswerFairSymbolPoint } from '../../../functions';
+import { answerIconPointConfig, defaultIconPoint } from '../../../constants';
+import { clampAndRoundAnswerFairIconPoint } from '../../../functions';
 import { NumericInputView } from '../../bp';
 
 type Props = Readonly<{
-  value: AnswerSymbolPoint;
-  onValueChange: (value: AnswerSymbolPoint) => void;
+  value: AnswerIconPoint;
+  onValueChange: (value: AnswerIconPoint) => void;
   disabled: boolean;
 }>;
 
-const { step } = answerSymbolPointConfig;
+const { step } = answerIconPointConfig;
 
-const defaultValue = defaultSymbolPoint.fair;
+const defaultValue = defaultIconPoint.fair;
 
-const sanitizeValue = (value: number): AnswerSymbolPoint =>
+const sanitizeValue = (value: number): AnswerIconPoint =>
   !Number.isFinite(value)
     ? defaultValue
-    : clampAndRoundAnswerFairSymbolPoint(value);
+    : clampAndRoundAnswerFairIconPoint(value);
 
-export const AnswerSymbolFairPointInput = memoNamed<Props>(
-  'AnswerSymbolFairPointInput',
+export const AnswerIconFairPointInput = memoNamed<Props>(
+  'AnswerIconFairPointInput',
   ({ value: valueFromProps, onValueChange, disabled }) => {
     const [valueStr, setValueStr] = useState<string>('');
 
@@ -39,7 +36,7 @@ export const AnswerSymbolFairPointInput = memoNamed<Props>(
     }, [valueFromProps]);
 
     const valueChangeHandler = useCallback(
-      (nextValue: AnswerSymbolPoint) => {
+      (nextValue: AnswerIconPoint) => {
         if (disabled) return;
         setValueStr(nextValue.toString());
         onValueChange(nextValue);

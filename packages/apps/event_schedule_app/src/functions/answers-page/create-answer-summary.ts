@@ -1,13 +1,13 @@
 import type {
   Answer,
-  AnswerSymbolIdWithNone,
-  AnswerSymbolPoint,
+  AnswerIconIdWithNone,
+  AnswerIconPoint,
   DatetimeRange,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
 import type { IMap } from '@noshiro/ts-utils';
 import { IList, IMapMapped, ituple, pipe } from '@noshiro/ts-utils';
-import { answerSymbolPointConfig } from '../../constants';
+import { answerIconPointConfig } from '../../constants';
 import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
 
@@ -15,21 +15,21 @@ export const createAnswerSummary = (
   datetimeRangeList: readonly DatetimeRange[],
   answerTable: IMapMapped<
     DatetimeRange,
-    DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
+    DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
     DatetimeRangeMapKey
   >
 ): IMapMapped<DatetimeRange, readonly number[], DatetimeRangeMapKey> =>
   IMapMapped.new(
     IList.map(datetimeRangeList, (datetimeRange) => {
       const answersForThisDatetimeRange:
-        | DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>
+        | DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>
         | undefined = answerTable.get(datetimeRange);
 
       if (answersForThisDatetimeRange === undefined) {
         return ituple(datetimeRange, IList.zerosThrow(3));
       }
 
-      const answerGroups: IMap<AnswerSymbolIdWithNone, number> = pipe(
+      const answerGroups: IMap<AnswerIconIdWithNone, number> = pipe(
         answersForThisDatetimeRange.map(([iconId, _point]) => iconId)
       )
         .chain((list) => IList.groupBy(list, (x) => x))
@@ -48,7 +48,7 @@ export const createAnswerSummary = (
   );
 
 const calcScoreSum = (
-  answerPointList: readonly AnswerSymbolPoint[],
+  answerPointList: readonly AnswerIconPoint[],
   answerWeightList: readonly Weight[],
   isRequiredParticipantsList: readonly boolean[]
 ): number => {
@@ -66,7 +66,7 @@ const calcScoreSum = (
 };
 
 const calcScoreSumMax = (answerWeightList: readonly Weight[]): number =>
-  IList.sum(answerWeightList.map((w) => w * answerSymbolPointConfig.max));
+  IList.sum(answerWeightList.map((w) => w * answerIconPointConfig.max));
 
 export const createScore = (
   datetimeRangeList: readonly DatetimeRange[],
@@ -77,7 +77,7 @@ export const createScore = (
   >,
   answerTable: IMapMapped<
     DatetimeRange,
-    DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
+    DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
     DatetimeRangeMapKey
   >,
   answers: readonly Answer[]

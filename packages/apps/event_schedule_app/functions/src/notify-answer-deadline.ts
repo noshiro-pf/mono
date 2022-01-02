@@ -1,23 +1,31 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { tuple } from '@noshiro/ts-utils';
+import { assertType, tuple } from '@noshiro/ts-utils';
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
+import { fillEventScheduleWithCheck } from './type-check';
 import { pad2 } from './utils';
+
+const keys = {
+  useNotification: 'useNotification',
+  useAnswerDeadline: 'useAnswerDeadline',
+} as const;
+
+assertType<TypeExtends<ValueOf<typeof keys>, keyof EventSchedule>>();
 
 export const notifyAnswerDeadline = async (): Promise<void> => {
   const querySnapshot = await admin
     .firestore()
     .collection(firestorePaths.events)
-    .where('useNotification', '==', true)
-    .where('useAnswerDeadline', '==', true)
+    .where(keys.useNotification, '==', true)
+    .where(keys.useAnswerDeadline, '==', true)
     .get();
 
   const events = querySnapshot.docs.map((doc) =>
-    tuple(doc.id, doc.data() as EventSchedule)
+    tuple(doc.id, fillEventScheduleWithCheck(doc.data()))
   );
 
   await Promise.all(

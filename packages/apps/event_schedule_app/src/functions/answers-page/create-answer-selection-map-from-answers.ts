@@ -1,7 +1,7 @@
 import type {
   Answer,
-  AnswerSymbolIdWithNone,
-  AnswerSymbolPoint,
+  AnswerIconIdWithNone,
+  AnswerIconPoint,
   AnswerTableCellPosition,
 } from '@noshiro/event-schedule-app-shared';
 import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
@@ -12,7 +12,7 @@ export const createAnswerSelectionMapFromAnswers = (
   answers: readonly Answer[]
 ): IMapMapped<
   AnswerTableCellPosition,
-  readonly [AnswerSymbolIdWithNone, AnswerSymbolPoint],
+  readonly [AnswerIconIdWithNone, AnswerIconPoint],
   AnswerSelectionMapKey
 > =>
   IMapMapped.new(

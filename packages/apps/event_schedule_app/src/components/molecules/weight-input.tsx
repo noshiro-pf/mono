@@ -9,7 +9,6 @@ import { NumericInputView } from '../bp';
 type Props = Readonly<{
   weight: Weight;
   onWeightChange: (value: Weight) => void;
-  disabled: boolean;
 }>;
 
 const { step } = weightNumericInputConfig;
@@ -21,7 +20,7 @@ const sanitizeValue = (value: number): Weight =>
 
 export const WeightNumericInput = memoNamed<Props>(
   'WeightNumericInput',
-  ({ weight: valueFromProps, onWeightChange: onValueChange, disabled }) => {
+  ({ weight: valueFromProps, onWeightChange: onValueChange }) => {
     const [valueStr, setValueStr] = useState<string>('');
 
     const valueParsed = useMemo<number | undefined>(() => {
@@ -36,47 +35,39 @@ export const WeightNumericInput = memoNamed<Props>(
 
     const valueChangeHandler = useCallback(
       (nextValue: Weight) => {
-        if (disabled) return;
         setValueStr(nextValue.toString());
         onValueChange(nextValue);
       },
-      [disabled, onValueChange]
+      [onValueChange]
     );
 
     const onInputBlur = useCallback(() => {
-      if (disabled) return;
-
       const nextValue =
         valueParsed === undefined ? defaultValue : sanitizeValue(valueParsed);
 
       valueChangeHandler(nextValue);
-    }, [disabled, valueParsed, valueChangeHandler]);
+    }, [valueParsed, valueChangeHandler]);
 
     const onIncrementClick = useCallback(() => {
-      if (disabled) return;
-
       const nextValue =
         valueParsed === undefined
           ? defaultValue
           : sanitizeValue(valueParsed + step);
 
       valueChangeHandler(nextValue);
-    }, [disabled, valueParsed, valueChangeHandler]);
+    }, [valueParsed, valueChangeHandler]);
 
     const onDecrementClick = useCallback(() => {
-      if (disabled) return;
-
       const nextValue =
         valueParsed === undefined
           ? defaultValue
           : sanitizeValue(valueParsed - step);
 
       valueChangeHandler(nextValue);
-    }, [disabled, valueParsed, valueChangeHandler]);
+    }, [valueParsed, valueChangeHandler]);
 
     return (
       <NumericInputView
-        disabled={disabled}
         fillSpace={true}
         selectOnFocus={true}
         valueAsStr={valueStr}

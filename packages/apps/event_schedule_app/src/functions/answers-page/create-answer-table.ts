@@ -1,8 +1,8 @@
 import type {
   Answer,
+  AnswerIconIdWithNone,
+  AnswerIconPoint,
   AnswerId,
-  AnswerSymbolIdWithNone,
-  AnswerSymbolPoint,
   DatetimeRange,
 } from '@noshiro/event-schedule-app-shared';
 import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
@@ -13,12 +13,12 @@ export const createAnswerTable = (
   answerSelectionMapFn: (
     datetimeRange: DatetimeRange,
     answerId: AnswerId
-  ) => readonly [AnswerSymbolIdWithNone, AnswerSymbolPoint],
+  ) => readonly [AnswerIconIdWithNone, AnswerIconPoint],
   datetimeRangeList: readonly DatetimeRange[],
   answers: readonly Answer[]
 ): IMapMapped<
   DatetimeRange,
-  DeepReadonly<[AnswerSymbolIdWithNone, AnswerSymbolPoint][]>,
+  DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
   DatetimeRangeMapKey
 > =>
   IMapMapped.new(

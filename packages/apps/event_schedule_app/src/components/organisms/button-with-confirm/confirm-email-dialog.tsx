@@ -1,13 +1,12 @@
-import { Button, Classes } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, useState } from 'react';
+import { Button, Classes, FormGroup } from '@blueprintjs/core';
+import { memoNamed, useKeyEventListener } from '@noshiro/react-utils';
+import { noop } from '@noshiro/ts-utils';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { texts } from '../../../constants';
-import { BpEmailInput, DialogWithMaxWidth } from '../../bp';
-import {
-  ButtonsWrapperAlignEnd,
-  WidthRestrictedInputWrapper,
-} from '../../styled';
+import { useConfirmEmailDialogState } from '../../../hooks';
+import { BpInput, DialogWithMaxWidth } from '../../bp';
+import { ButtonsWrapperAlignEnd } from '../../styled';
 
 const vt = texts.answerPage.eventInfo.verifyEmailDialog;
 
@@ -21,24 +20,25 @@ type ConfirmEmailDialogProps = Readonly<{
 export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
   'ConfirmEmailDialog',
   ({ isOpen, back, onSuccess, emailAnswer }) => {
-    const [emailTemp, setEmailTemp] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
+    const {
+      state,
+      helperText,
+      hasError,
+      cancelClickHandler,
+      enterClickHandler,
+      inputEmailHandler,
+    } = useConfirmEmailDialogState(onSuccess, back, emailAnswer);
 
-    const ok = emailAnswer === email;
+    const onKeyUp = useCallback(
+      (ev: Readonly<KeyboardEvent>) => {
+        if (ev.key === 'Enter') {
+          enterClickHandler();
+        }
+      },
+      [enterClickHandler]
+    );
 
-    const onConfirm = useCallback(() => {
-      if (ok) {
-        onSuccess();
-      }
-    }, [ok, onSuccess]);
-
-    const onBlur = useCallback(() => {
-      setEmail(emailTemp);
-    }, [emailTemp]);
-
-    const onValueChange = useCallback((value: string) => {
-      setEmailTemp(value);
-    }, []);
+    useKeyEventListener(onKeyUp, noop);
 
     return (
       <DialogWithMaxWidth
@@ -52,29 +52,29 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
       >
         <div className={Classes.DIALOG_BODY}>
           <p>{vt.editButtonConfirmDialogMessage}</p>
-          <WidthRestrictedInputWrapperWithMinHeight>
-            <BpEmailInput
-              autoFocus={true}
-              formGroupLabel={''}
-              invalidEmailMessage={
-                texts.eventSettingsPage.errorMessages.invalidEmail
-              }
-              otherErrorMessages={
-                vt.editButtonConfirmDialogValidationFailedMessage
-              }
-              showOtherErrorMessages={!ok}
-              value={emailTemp}
-              onBlur={onBlur}
-              onValueChange={onValueChange}
-            />
-          </WidthRestrictedInputWrapperWithMinHeight>
+          <InputWrapperWithMinHeight>
+            <FormGroup helperText={helperText} intent={'danger'} label={''}>
+              <BpInput
+                autoFocus={true}
+                intent={hasError ? 'danger' : 'primary'}
+                placeholder={'sample@gmail.com'}
+                type='email'
+                value={state.emailBeingInput}
+                onValueChange={inputEmailHandler}
+              />
+            </FormGroup>
+          </InputWrapperWithMinHeight>
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <ButtonsWrapperAlignEnd>
-            <Button intent={'none'} onClick={back}>
+            <Button intent={'none'} onClick={cancelClickHandler}>
               {vt.back}
             </Button>
-            <Button disabled={!ok} intent={'primary'} onClick={onConfirm}>
+            <Button
+              disabled={state.enterButtonDisabled}
+              intent={'primary'}
+              onClick={enterClickHandler}
+            >
               {texts.buttonText.decide}
             </Button>
           </ButtonsWrapperAlignEnd>
@@ -84,8 +84,6 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
   }
 );
 
-const WidthRestrictedInputWrapperWithMinHeight = styled(
-  WidthRestrictedInputWrapper
-)`
+const InputWrapperWithMinHeight = styled('div')`
   min-height: 72px;
 `;

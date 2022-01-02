@@ -168,9 +168,9 @@ export const useAnswerTableHooks = (
               iconId,
               point,
               showPoint: match(iconId, {
-                good: point !== eventSchedule.answerSymbols.good.point,
-                fair: point !== eventSchedule.answerSymbols.fair.point,
-                poor: point !== eventSchedule.answerSymbols.poor.point,
+                good: point !== eventSchedule.answerIcons.good.point,
+                fair: point !== eventSchedule.answerIcons.fair.point,
+                poor: point !== eventSchedule.answerIcons.poor.point,
                 none: false,
               }),
               weight,
@@ -199,7 +199,7 @@ export const useAnswerTableHooks = (
       scores,
       answerSummary,
       answerTable,
-      eventSchedule.answerSymbols,
+      eventSchedule.answerIcons,
       answers,
     ]
   );

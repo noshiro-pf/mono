@@ -1,28 +1,28 @@
 import type {
-  AnswerSymbolPoint,
-  SymbolSettings,
+  AnswerIconPoint,
+  AnswerIconSettings,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { noop } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import type { SymbolListReducerAction } from '../../../functions';
-import { symbolListReducer } from '../../../functions';
-import { AnswerSymbolRow } from './symbol-setting-row';
+import type { IconListReducerAction } from '../../../functions';
+import { iconListReducer } from '../../../functions';
+import { AnswerIconRow } from './icon-setting-row';
 
 type Props = Readonly<{
-  answerSymbols: SymbolSettings;
-  onAnswerSymbolsChange: (value: SymbolSettings) => void;
+  answerIcons: AnswerIconSettings;
+  onAnswerIconsChange: (value: AnswerIconSettings) => void;
 }>;
 
-export const SymbolSettingsComponent = memoNamed<Props>(
-  'SymbolSettings',
-  ({ answerSymbols, onAnswerSymbolsChange }) => {
+export const AnswerIconSettingsComponent = memoNamed<Props>(
+  'AnswerIconSettings',
+  ({ answerIcons, onAnswerIconsChange }) => {
     const dispatch = useCallback(
-      (action: SymbolListReducerAction) => {
-        onAnswerSymbolsChange(symbolListReducer(answerSymbols, action));
+      (action: IconListReducerAction) => {
+        onAnswerIconsChange(iconListReducer(answerIcons, action));
       },
-      [answerSymbols, onAnswerSymbolsChange]
+      [answerIcons, onAnswerIconsChange]
     );
 
     const onOkDescriptionChange = useCallback(
@@ -44,7 +44,7 @@ export const SymbolSettingsComponent = memoNamed<Props>(
     );
 
     const onNeitherPointChange = useCallback(
-      (point: AnswerSymbolPoint) => {
+      (point: AnswerIconPoint) => {
         dispatch({ type: 'update-point', iconId: 'fair', point });
       },
       [dispatch]
@@ -59,21 +59,21 @@ export const SymbolSettingsComponent = memoNamed<Props>(
 
     return (
       <Root>
-        <AnswerSymbolRow
-          answerSymbol={answerSymbols.good}
-          symbolId={'good'}
+        <AnswerIconRow
+          answerIcon={answerIcons.good}
+          iconId={'good'}
           onDescriptionChange={onOkDescriptionChange}
           onPointChange={noop}
         />
-        <AnswerSymbolRow
-          answerSymbol={answerSymbols.fair}
-          symbolId={'fair'}
+        <AnswerIconRow
+          answerIcon={answerIcons.fair}
+          iconId={'fair'}
           onDescriptionChange={onNeitherDescriptionChange}
           onPointChange={onNeitherPointChange}
         />
-        <AnswerSymbolRow
-          answerSymbol={answerSymbols.poor}
-          symbolId={'poor'}
+        <AnswerIconRow
+          answerIcon={answerIcons.poor}
+          iconId={'poor'}
           onDescriptionChange={onNgDescriptionChange}
           onPointChange={noop}
         />

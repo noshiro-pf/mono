@@ -9,19 +9,14 @@ const vt = texts.answerPage.answerBeingEdited;
 export type WeightSettingProps = Readonly<{
   weight: Weight;
   onWeightChange: (v: Weight) => void;
-  disabled: boolean;
 }>;
 
 export const WeightSetting = memoNamed<WeightSettingProps>(
   'WeightSetting',
-  ({ weight, onWeightChange, disabled }) => (
+  ({ weight, onWeightChange }) => (
     <Wrapper>
       <NumericInputWrapper>
-        <WeightNumericInput
-          disabled={disabled}
-          weight={weight}
-          onWeightChange={onWeightChange}
-        />
+        <WeightNumericInput weight={weight} onWeightChange={onWeightChange} />
       </NumericInputWrapper>
       <Suffix>{vt.weight.suffix}</Suffix>
     </Wrapper>
