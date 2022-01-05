@@ -29,6 +29,25 @@ export const answerDiffAsString = (
         )}：${iconId2str(iconBefore)}→${iconId2str(iconAfter)}`
       );
     }
+    {
+      const pointBefore = before.selection[idx]?.point ?? 0;
+      const pointAfter = sel.point;
+
+      if (
+        iconBefore === 'fair' &&
+        iconAfter === 'fair' &&
+        pointBefore !== pointAfter
+      ) {
+        answerChanges.push(
+          `    ・ ${datetimeRange2str(
+            sel.datetimeRange,
+            datetimeSpecification
+          )}：${iconId2str(iconBefore)}(${pointBefore})→${iconId2str(
+            iconAfter
+          )}(${pointAfter})`
+        );
+      }
+    }
   });
 
   if (answerChanges.length > 0) {
