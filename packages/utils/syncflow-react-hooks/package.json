@@ -22,7 +22,7 @@
     "setup": "echo 'no setup script'",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "testw": "yarn test --watch",
-    "pub": "yarn publish --patch --no-git-tag-version --access=public"
+    "pub": "yarn publish --no-git-tag-version --access=public"
   },
   "config": {
     "root_dir": "../../.."
