@@ -34,6 +34,7 @@
     "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "testw": "yarn test --watch",
+    "tsc": "tsc --noEmit",
     "tscw": "tsc --watch --noEmit"
   },
   "config": {
