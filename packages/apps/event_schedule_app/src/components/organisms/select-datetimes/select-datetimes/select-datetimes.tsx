@@ -7,7 +7,7 @@ import type {
 import { memoNamed } from '@noshiro/react-utils';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { texts } from '../../../../constants';
+import { dict } from '../../../../constants';
 import type { YmdKey } from '../../../../functions';
 import { selectorOptions } from '../../../../functions';
 import { useSelectDatetimesHooks } from '../../../../hooks';
@@ -27,7 +27,7 @@ type Props = Readonly<{
   holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
-const vt = texts.eventSettingsPage.section2;
+const vt = dict.eventSettingsPage.section2;
 
 type CastedHandlerType = (value: string) => void;
 

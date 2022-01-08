@@ -1,9 +1,9 @@
 import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
-const vt = texts.eventSettingsPage.backToAnswerPageButton;
+const vt = dict.eventSettingsPage.backToAnswerPageButton;
 
 type Props = Readonly<{
   hasNoChanges: boolean;
@@ -19,7 +19,7 @@ const dialogConfig = {
   intent: 'danger',
   icon: 'reset',
   message: vt.resetConfirmation,
-  cancelButtonText: texts.buttonText.cancel,
+  cancelButtonText: dict.common.buttonText.cancel,
   confirmButtonText: vt.name,
 } as const;
 

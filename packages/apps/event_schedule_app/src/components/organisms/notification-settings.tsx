@@ -8,7 +8,7 @@ import type { TinyObservable } from '@noshiro/ts-utils';
 import { IRecord, isEmailString } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../constants';
+import { dict } from '../../constants';
 import { now, ymdhmDateDiff } from '../../functions';
 import { BpCheckbox, BpInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
@@ -22,7 +22,7 @@ type Props = Readonly<{
   focusEmailInput$: TinyObservable<undefined>;
 }>;
 
-const vt = texts.eventSettingsPage.section3;
+const vt = dict.eventSettingsPage.section3;
 
 export const NotificationSettingsComponent = memoNamed<Props>(
   'NotificationSettings',
@@ -148,7 +148,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
       !disabled && !isEmailString(notificationSettings.email);
 
     const helperText = invalidEmail
-      ? texts.eventSettingsPage.errorMessages.invalidEmail
+      ? dict.eventSettingsPage.errorMessages.invalidEmail
       : '';
 
     return (

@@ -1,12 +1,12 @@
 import { FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../constants';
+import { dict } from '../../constants';
 import { useFormError } from '../../hooks';
 import { BpInput, BpTextArea } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
-const vt = texts.eventSettingsPage.section1;
+const vt = dict.eventSettingsPage.section1;
 
 type Props = Readonly<{
   title: string;
@@ -29,7 +29,7 @@ export const NameAndNotes = memoNamed<Props>(
         <FormGroup
           helperText={
             showError
-              ? texts.eventSettingsPage.errorMessages.titleIsEmpty
+              ? dict.eventSettingsPage.errorMessages.titleIsEmpty
               : undefined
           }
           intent={showError ? 'danger' : 'primary'}

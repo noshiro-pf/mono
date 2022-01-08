@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { match } from '@noshiro/ts-utils';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';
 
@@ -12,7 +12,7 @@ type Props = Readonly<{
   mode: 'creating' | 'editing';
 }>;
 
-const vt = texts.answerPage.answerBeingEdited;
+const vt = dict.answerPage.answerBeingEdited;
 
 const buttonConfigBase = {
   icon: 'tick',
@@ -33,7 +33,7 @@ const dialogConfigBase = {
   icon: 'confirm',
   intent: 'primary',
   message: vt.submitButton.confirmPartiallyUnanswered,
-  cancelButtonText: texts.buttonText.cancel,
+  cancelButtonText: dict.common.buttonText.cancel,
 } as const;
 
 const dialogConfigCreating = {

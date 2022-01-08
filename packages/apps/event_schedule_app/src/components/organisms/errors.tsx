@@ -1,10 +1,10 @@
 import type { EventScheduleValidation } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { errorFontColor, texts } from '../../constants';
+import { dict, errorFontColor } from '../../constants';
 import { Description } from '../atoms';
 
-const vt = texts.eventSettingsPage;
+const vt = dict.eventSettingsPage;
 
 type Props = Readonly<{
   eventScheduleValidation: EventScheduleValidation;

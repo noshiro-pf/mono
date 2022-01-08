@@ -2,12 +2,12 @@ import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { defaultYmdhm } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../constants';
+import { dict } from '../../constants';
 import { ymdhm2strWithDay } from '../../functions';
 import { Description } from '../atoms';
 import { AnswerPageNotes } from './answer-page-notes';
 
-const vt = texts.answerPage;
+const vt = dict.answerPage;
 
 type Props = Readonly<{
   eventSchedule: EventSchedule;
@@ -41,7 +41,7 @@ export const AnswerPageEventInfo = memoNamed<Props>(
             />
           </>
         ) : (
-          <div>{texts.answerPage.eventInfo.noAnswerDeadline}</div>
+          <div>{dict.answerPage.eventInfo.noAnswerDeadline}</div>
         )}
       </TableValue3>
     </Container>

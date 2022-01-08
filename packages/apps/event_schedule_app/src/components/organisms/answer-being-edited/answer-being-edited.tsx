@@ -7,7 +7,7 @@ import type {
 import { memoNamed } from '@noshiro/react-utils';
 import { IList, match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { useAnswerBeingEditedHooks } from '../../../hooks';
 import { CustomIcon, Description } from '../../atoms';
 import {
@@ -47,7 +47,7 @@ type Props = Readonly<{
   selectedAnswerUserName: UserName | undefined;
 }>;
 
-const vt = texts.answerPage.answerBeingEdited;
+const vt = dict.answerPage.answerBeingEdited;
 
 export const AnswerBeingEdited = memoNamed<Props>(
   'AnswerBeingEdited',
@@ -256,7 +256,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           <ButtonNowrapStyled
             disabled={submitButtonIsLoading}
             intent='none'
-            text={texts.buttonText.cancel}
+            text={dict.common.buttonText.cancel}
             onClick={onCancel}
           />
           {answerBeingEditedSectionState === 'editing' ? (

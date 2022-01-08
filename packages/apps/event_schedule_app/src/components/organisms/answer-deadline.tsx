@@ -1,7 +1,7 @@
 import { FormGroup } from '@blueprintjs/core';
 import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { answerDeadlineShortcuts, texts } from '../../constants';
+import { answerDeadlineShortcuts, dict } from '../../constants';
 import { BpDatetimePicker } from '../bp';
 
 type Props = Readonly<{
@@ -20,7 +20,7 @@ export const AnswerDeadlineDatepicker = memoNamed<Props>(
       <FormGroup
         helperText={
           showError
-            ? texts.eventSettingsPage.errorMessages
+            ? dict.eventSettingsPage.errorMessages
                 .answerDeadlineIsEnabledButEmpty
             : undefined
         }

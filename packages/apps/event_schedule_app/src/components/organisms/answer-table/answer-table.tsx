@@ -4,7 +4,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import { roundBy } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { useAnswerTableHooks } from '../../../hooks';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
 import { HTMLTableBorderedStyled } from '../../bp';
@@ -19,7 +19,7 @@ type Props = Readonly<{
   isExpired: boolean;
 }>;
 
-const vt = texts.answerPage.answers;
+const vt = dict.answerPage.answers;
 
 export const AnswerTable = memoNamed<Props>(
   'AnswerTable',
@@ -117,7 +117,7 @@ export const AnswerTable = memoNamed<Props>(
                           <CustomIcon iconName={iconId} />
                           {showPoint ? (
                             <CustomPointValue>
-                              {`${texts.brace.start}${point}${texts.brace.end}`}
+                              {`${dict.common.brace.start}${point}${dict.common.brace.end}`}
                             </CustomPointValue>
                           ) : undefined}
                           {weight !== 1.0 ? (

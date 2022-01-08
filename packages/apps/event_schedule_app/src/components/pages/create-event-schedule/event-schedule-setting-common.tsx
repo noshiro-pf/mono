@@ -2,7 +2,7 @@ import { Button } from '@blueprintjs/core';
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { useEventScheduleSettingCommonHooks } from '../../../hooks';
 import { Section } from '../../molecules';
 import {
@@ -17,7 +17,7 @@ import {
 } from '../../organisms';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
-const vt = texts.eventSettingsPage;
+const vt = dict.eventSettingsPage;
 
 type Props = Readonly<{
   mode: 'create' | 'edit';

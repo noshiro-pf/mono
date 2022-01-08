@@ -1,10 +1,10 @@
 import type { Weight } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { WeightNumericInput } from '../../molecules';
 
-const vt = texts.answerPage.answerBeingEdited;
+const vt = dict.answerPage.answerBeingEdited;
 
 export type WeightSettingProps = Readonly<{
   weight: Weight;

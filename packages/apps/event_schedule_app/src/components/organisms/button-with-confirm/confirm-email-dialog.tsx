@@ -3,12 +3,12 @@ import { memoNamed, useKeyEventListener } from '@noshiro/react-utils';
 import { noop } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { useConfirmEmailDialogState } from '../../../hooks';
 import { BpInput, DialogWithMaxWidth } from '../../bp';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
-const vt = texts.answerPage.eventInfo.verifyEmailDialog;
+const vt = dict.answerPage.eventInfo.verifyEmailDialog;
 
 type ConfirmEmailDialogProps = Readonly<{
   onSuccess: () => void;
@@ -75,7 +75,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
               intent={'primary'}
               onClick={enterClickHandler}
             >
-              {texts.buttonText.decide}
+              {dict.common.buttonText.decide}
             </Button>
           </ButtonsWrapperAlignEnd>
         </div>

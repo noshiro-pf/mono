@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Popover } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 
 type Props = Readonly<{
   onSortChange: (state: 'asc' | 'desc') => void;
@@ -26,10 +26,10 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
       content={
         <ButtonGroup vertical={true}>
           <Button icon='sort-asc' minimal={true} onClick={onSortAscClick}>
-            {texts.answerPage.answers.sortAsc}
+            {dict.answerPage.answers.sortAsc}
           </Button>
           <Button icon='sort-desc' minimal={true} onClick={onSortDescClick}>
-            {texts.answerPage.answers.sortDesc}
+            {dict.answerPage.answers.sortDesc}
           </Button>
         </ButtonGroup>
       }

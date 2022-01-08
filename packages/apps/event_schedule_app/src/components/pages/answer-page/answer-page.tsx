@@ -2,7 +2,7 @@ import { AnchorButton, Button, Icon, Spinner } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { IList } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { routes, texts } from '../../../constants';
+import { dict, routes } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import { refreshAnswers, setYearMonth$ } from '../../../store';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
@@ -17,7 +17,7 @@ import { ButtonsWrapperAlignEnd, SingleButtonWrapper } from '../../styled';
 import { NotFoundPage } from '../not-found-page';
 import { AnswerPageError } from './error';
 
-const vt = texts.answerPage;
+const vt = dict.answerPage;
 
 export const AnswerPage = memoNamed('AnswerPage', () => {
   const {
@@ -128,7 +128,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 <RequiredParticipantIconWrapper>
                   <AlignCenter>
                     <RequiredParticipantIcon />
-                    {texts.colon}
+                    {dict.common.colon}
                   </AlignCenter>
                   {vt.answers.requiredParticipant}
                   {vt.requiredParticipantDescription}
@@ -143,7 +143,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       </AlignCenter>
                     </th>
                     <td>{vt.point(eventSchedule.answerIcons.good.point)}</td>
-                    <td>{texts.colon}</td>
+                    <td>{dict.common.colon}</td>
                     <td>{eventSchedule.answerIcons.good.description}</td>
                   </tr>
                   <tr>
@@ -153,7 +153,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       </AlignCenter>
                     </th>
                     <td>{vt.point(eventSchedule.answerIcons.fair.point)}</td>
-                    <td>{texts.colon}</td>
+                    <td>{dict.common.colon}</td>
                     <td>{eventSchedule.answerIcons.fair.description}</td>
                   </tr>
                   <tr>
@@ -163,7 +163,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       </AlignCenter>
                     </th>
                     <td>{vt.point(eventSchedule.answerIcons.poor.point)}</td>
-                    <td>{texts.colon}</td>
+                    <td>{dict.common.colon}</td>
                     <td>{eventSchedule.answerIcons.poor.description}</td>
                   </tr>
                 </tbody>

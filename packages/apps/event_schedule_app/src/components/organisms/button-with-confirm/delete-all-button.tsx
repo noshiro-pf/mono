@@ -1,12 +1,12 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 type Props = Readonly<{
   onConfirmDeleteAll: () => void;
 }>;
 
-const vt = texts.eventSettingsPage.section2;
+const vt = dict.eventSettingsPage.section2;
 
 const buttonConfig = {
   name: vt.removeAllDates,
@@ -18,8 +18,8 @@ const dialogConfig = {
   icon: 'trash',
   intent: 'danger',
   message: vt.removeAllConfirmation,
-  cancelButtonText: texts.buttonText.cancel,
-  confirmButtonText: texts.buttonText.delete,
+  cancelButtonText: dict.common.buttonText.cancel,
+  confirmButtonText: dict.common.buttonText.delete,
 } as const;
 
 const toastConfig = {
