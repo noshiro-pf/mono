@@ -11,6 +11,7 @@ import { dict } from '../../../../constants';
 import type { YmdKey } from '../../../../functions';
 import { selectorOptions } from '../../../../functions';
 import { useSelectDatetimesHooks } from '../../../../hooks';
+import { setYearMonth$ } from '../../../../store';
 import { BpSelect } from '../../../bp';
 import { AddElementButton } from '../../../molecules';
 import { MultipleDatePicker } from '../../../multiple-date-picker';
@@ -105,6 +106,7 @@ export const SelectDatetimes = memoNamed<Props>(
         <MultipleDatePicker
           holidaysJpDefinition={holidaysJpDefinition}
           selectedDates={selectedDates}
+          setYearMonth$={setYearMonth$}
           onSelectedDatesChange={onSelectedDatesChange}
         />
       </Root>
