@@ -52,19 +52,19 @@ export const eventSettingsPageDictionary = {
     },
     iconSettings: {
       title: '回答に使う記号の設定',
-      description: `右の数字は日程決めのスコア計算に使う点数です（△のデフォルト点数は初期値=${defaultIconPoint.fair}から変更できます）`,
+      description: `右の数字は日程決めのスコア計算に使う点数です（△のデフォルト点数は初期値(=${defaultIconPoint.fair})から変更できます）。`,
     },
   },
   errorMessages: {
     titleIsEmpty: 'イベント名は必須項目です。',
-    datetimeIsEmpty: '少なくとも1つ以上の候補日を選択してください。',
+    datetimeIsEmpty: '少なくとも一つ以上の候補日を選択してください。',
     answerDeadlineIsEnabledButEmpty:
       '回答期限をオンにしていますが空欄になっています。',
     passwordIsEnabledButEmpty:
       'パスワードをオンにしていますが空欄になっています。',
     invalidEmail: '有効なメールアドレスではありません。',
     atLeastOneNotificationCheckRequired:
-      '通知設定をオンにする場合は少なくとも1つの通知にチェックをしてください。',
+      '通知設定をオンにする場合は少なくとも一つの通知にチェックをしてください。',
     answerIcons:
       '記号の設定に不備があります。説明に空欄があるか、△の点数が0.1以上9.9以下になっていない可能性があります。',
   },
