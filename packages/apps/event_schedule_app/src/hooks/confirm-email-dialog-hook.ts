@@ -1,7 +1,7 @@
 import { useAsyncReducer } from '@noshiro/react-utils';
 import type { ReactNode } from 'react';
 import { createElement as h, useCallback, useMemo } from 'react';
-import { texts } from '../constants';
+import { dict } from '../constants';
 import type { ConfirmEmailDialogState } from '../functions';
 import {
   confirmEmailDialogHasError,
@@ -60,14 +60,14 @@ export const useConfirmEmailDialogState = (
           ? h(
               'div',
               { key: 'invalidEmailFormat' },
-              texts.eventSettingsPage.errorMessages.invalidEmail
+              dict.eventSettingsPage.errorMessages.invalidEmail
             )
           : undefined,
         state.showErrorOf.emailDoesNotMatch
           ? h(
               'div',
               { key: 'emailDoesNotMatch' },
-              texts.answerPage.eventInfo.verifyEmailDialog
+              dict.answerPage.eventInfo.verifyEmailDialog
                 .editButtonConfirmDialogValidationFailedMessage
             )
           : undefined,

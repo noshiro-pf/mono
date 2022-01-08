@@ -1,11 +1,11 @@
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { aboutThisAppUrl, texts } from '../../constants';
+import { aboutThisAppUrl, dict } from '../../constants';
 
 export const Footer = memoNamed('Footer', () => (
   <ReleaseNotesUrlWrapper>
     <a href={aboutThisAppUrl} rel='noopener noreferrer' target='_blank'>
-      {texts.aboutThisApp}
+      {dict.aboutThisApp}
     </a>
   </ReleaseNotesUrlWrapper>
 ));

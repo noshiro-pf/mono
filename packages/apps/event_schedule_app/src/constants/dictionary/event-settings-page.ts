@@ -1,0 +1,92 @@
+import { defaultIconPoint } from '../default-icon-point';
+
+export const eventSettingsPageDictionary = {
+  title: '日程調整',
+  editSubTitle: {
+    prefix: 'イベント「',
+    suffix: '」の設定編集',
+  },
+  section1: {
+    titleAndNotesSectionTitle: 'イベント名・ノートを入力してください。（1/3）',
+    eventName: 'イベント名（必須項目）',
+    eventNamePlaceholder: 'ボードゲーム会',
+    notes: 'ノート',
+    notesPlaceholder: '日程を回答してください。',
+  },
+  section2: {
+    selectDatesSectionTitle: '候補日を選択してください。（2/3）',
+    datetimeSpecification: '時刻指定オプション',
+    datetimeSpecificationOptions: {
+      noStartEndSpecified: '時刻なし',
+      startSpecified: '開始時刻のみ',
+      endSpecified: '終了時刻のみ',
+      startAndEndSpecified: '開始時刻～終了時刻',
+    },
+    removeAllDates: '全削除',
+    removeAllConfirmation:
+      '日程を全削除しますか？（この操作は取り消すことができません）',
+    removeAllResultMessage: '削除しました。',
+    setTimesAtOneTime: '時刻一括変更',
+    sortDatetimes: '日時を並べ替える',
+  },
+  section3: {
+    otherSettingsTitle: 'その他の設定（3/3）',
+    answerDeadline: {
+      title: '回答期限',
+      howAnswerDeadlineIsUsed: [
+        '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
+      ],
+    },
+    howAnswerDeadlineIsUsed: [
+      '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
+    ],
+    notification: {
+      useNotification: '幹事用通知設定',
+      emailAddress: '通知先メールアドレス',
+      notifyOnAnswerChange: '回答に更新があったときにメール通知',
+      notify01daysBeforeAnswerDeadline: '回答締め切り1日前にメール通知',
+      notify03daysBeforeAnswerDeadline: '回答締め切り3日前にメール通知',
+      notify07daysBeforeAnswerDeadline: '回答締め切り7日前にメール通知',
+      notify14daysBeforeAnswerDeadline: '回答締め切り14日前にメール通知',
+      notify28daysBeforeAnswerDeadline: '回答締め切り28日前にメール通知',
+    },
+    iconSettings: {
+      title: '回答に使う記号の設定',
+      description: `右の数字は日程決めのスコア計算に使う点数です（△のデフォルト点数は初期値=${defaultIconPoint.fair}から変更できます）`,
+    },
+  },
+  errorMessages: {
+    titleIsEmpty: 'イベント名は必須項目です。',
+    datetimeIsEmpty: '少なくとも1つ以上の候補日を選択してください。',
+    answerDeadlineIsEnabledButEmpty:
+      '回答期限をオンにしていますが空欄になっています。',
+    passwordIsEnabledButEmpty:
+      'パスワードをオンにしていますが空欄になっています。',
+    invalidEmail: '有効なメールアドレスではありません。',
+    atLeastOneNotificationCheckRequired:
+      '通知設定をオンにする場合は少なくとも1つの通知にチェックをしてください。',
+    answerIcons:
+      '記号の設定に不備があります。説明に空欄があるか、△の点数が0.1以上9.9以下になっていない可能性があります。',
+  },
+  createEventButton: '日程調整ページを作成',
+  editEventButton: 'イベント設定を更新',
+  editEventResultMessage: 'イベント設定を更新しました。',
+  resetButton: {
+    name: 'リセット',
+    resetConfirmation:
+      '入力項目をすべてリセットしますか？（この操作は取り消すことができません）',
+    resetResultMessage: 'リセットしました。',
+  },
+  resetEditButton: {
+    name: '編集前の設定に戻す',
+    resetConfirmation:
+      '編集内容をすべて元の設定に戻しますか？（この操作は取り消すことができません）',
+    resetResultMessage: '編集前の設定に戻しました。',
+  },
+  backToAnswerPageButton: {
+    name: '編集せずに回答ページに戻る',
+    resetConfirmation:
+      '編集内容を取り消して回答ページに戻りますか？（この操作は取り消すことができません）',
+    resetResultMessage: '編集をキャンセルしました。',
+  },
+} as const;

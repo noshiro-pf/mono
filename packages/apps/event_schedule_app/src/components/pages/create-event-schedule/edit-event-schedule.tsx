@@ -3,14 +3,14 @@ import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { descriptionFontColor, routes, texts } from '../../../constants';
+import { descriptionFontColor, dict, routes } from '../../../constants';
 import { eventScheduleResult$, router } from '../../../store';
 import { ConfirmEmailDialog } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
-const vt = texts.eventSettingsPage;
+const vt = dict.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useStreamValue(router.eventId$);

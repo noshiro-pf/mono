@@ -1,8 +1,8 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
-const vt = texts.eventSettingsPage.resetButton;
+const vt = dict.eventSettingsPage.resetButton;
 
 type Props = Readonly<{
   onConfirmClick: () => void;
@@ -17,8 +17,8 @@ const dialogConfig = {
   intent: 'danger',
   icon: 'reset',
   message: vt.resetConfirmation,
-  cancelButtonText: texts.buttonText.cancel,
-  confirmButtonText: texts.buttonText.reset,
+  cancelButtonText: dict.common.buttonText.cancel,
+  confirmButtonText: dict.common.buttonText.reset,
 } as const;
 
 const toastConfig = {

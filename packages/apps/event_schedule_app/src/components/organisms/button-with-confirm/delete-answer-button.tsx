@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 type Props = Readonly<{
@@ -7,10 +7,10 @@ type Props = Readonly<{
   loading: boolean;
 }>;
 
-const vt = texts.answerPage.answerBeingEdited.deleteButton;
+const vt = dict.answerPage.answerBeingEdited.deleteButton;
 
 const buttonConfig = {
-  name: texts.buttonText.delete,
+  name: dict.common.buttonText.delete,
   icon: 'trash',
   intent: 'danger',
 } as const;
@@ -19,8 +19,8 @@ const dialogConfig = {
   icon: 'trash',
   intent: 'danger',
   message: vt.deleteAnswerConfirmation,
-  cancelButtonText: texts.buttonText.cancel,
-  confirmButtonText: texts.buttonText.delete,
+  cancelButtonText: dict.common.buttonText.cancel,
+  confirmButtonText: dict.common.buttonText.delete,
 } as const;
 
 const toastConfig = {

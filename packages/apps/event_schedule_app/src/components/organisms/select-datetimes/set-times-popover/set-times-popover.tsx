@@ -5,10 +5,10 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
-import { texts } from '../../../../constants';
+import { dict } from '../../../../constants';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
-const vt = texts.eventSettingsPage.section2;
+const vt = dict.eventSettingsPage.section2;
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;

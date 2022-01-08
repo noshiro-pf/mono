@@ -6,13 +6,13 @@ import { memoNamed } from '@noshiro/react-utils';
 import { noop } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import type { IconListReducerAction } from '../../../functions';
 import { iconListReducer } from '../../../functions';
 import { Description } from '../../atoms';
 import { AnswerIconRow } from './icon-setting-row';
 
-const vt = texts.eventSettingsPage.section3.iconSettings;
+const vt = dict.eventSettingsPage.section3.iconSettings;
 
 type Props = Readonly<{
   answerIcons: AnswerIconSettings;

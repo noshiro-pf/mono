@@ -6,13 +6,13 @@ import type {
 import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../constants';
+import { dict } from '../../constants';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
 import { AnswerIconSettingsComponent } from './icon-settings';
 import { NotificationSettingsComponent } from './notification-settings';
 import { ParagraphWithSwitch } from './paragraph-with-switch';
 
-const vt = texts.eventSettingsPage.section3;
+const vt = dict.eventSettingsPage.section3;
 
 type Props = Readonly<{
   useAnswerDeadline: boolean;

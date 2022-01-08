@@ -1,10 +1,10 @@
 import { Icon } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { initialEventSchedule, routes, texts } from '../../../constants';
+import { dict, initialEventSchedule, routes } from '../../../constants';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
-const vt = texts.eventSettingsPage;
+const vt = dict.eventSettingsPage;
 
 export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => (
   <div>

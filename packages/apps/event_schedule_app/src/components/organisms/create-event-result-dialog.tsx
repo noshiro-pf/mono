@@ -7,11 +7,11 @@ import {
 } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../constants';
+import { dict } from '../../constants';
 import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 
-const vt = texts.createEventResultDialog;
+const vt = dict.createEventResultDialog;
 
 type Props = Readonly<{
   isOpen: boolean;

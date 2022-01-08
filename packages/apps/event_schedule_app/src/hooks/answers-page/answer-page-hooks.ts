@@ -13,7 +13,7 @@ import { IRecord } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api';
-import { routes, texts } from '../../constants';
+import { dict, routes } from '../../constants';
 import type { YmdKey } from '../../functions';
 import { createToaster, now, showToast } from '../../functions';
 import {
@@ -153,7 +153,7 @@ export const useAnswerPageState = (): AnswerPageState => {
             showToast({
               toast,
               message:
-                texts.answerPage.answerBeingEdited.submitButton
+                dict.answerPage.answerBeingEdited.submitButton
                   .createAnswerResultMessage,
               intent: 'success',
             });
@@ -172,7 +172,7 @@ export const useAnswerPageState = (): AnswerPageState => {
             showToast({
               toast,
               message:
-                texts.answerPage.answerBeingEdited.submitButton
+                dict.answerPage.answerBeingEdited.submitButton
                   .updateAnswerResultMessage,
               intent: 'success',
             });

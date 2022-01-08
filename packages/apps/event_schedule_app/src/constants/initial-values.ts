@@ -22,21 +22,21 @@ import {
   today,
 } from '@noshiro/ts-utils';
 import { defaultIconPoint } from './default-icon-point';
-import { texts } from './texts';
+import { dict } from './dictionary';
 
 export const initialDatetimeRangeList: readonly DatetimeRange[] = [];
 
 export const initialAnswerIcons: AnswerIconSettings = {
   good: {
-    description: texts.iconDescriptionDefault.circle,
+    description: dict.iconDescriptionDefault.circle,
     point: defaultIconPoint.good,
   },
   fair: {
-    description: texts.iconDescriptionDefault.triangleUp,
+    description: dict.iconDescriptionDefault.triangleUp,
     point: defaultIconPoint.fair,
   },
   poor: {
-    description: texts.iconDescriptionDefault.cross,
+    description: dict.iconDescriptionDefault.cross,
     point: defaultIconPoint.poor,
   },
 } as const;

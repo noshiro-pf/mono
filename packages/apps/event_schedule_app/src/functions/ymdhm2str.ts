@@ -3,11 +3,11 @@ import type {
   YearMonthDate,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import { texts } from '../constants';
+import { dict } from '../constants';
 import { pad2 } from '../utils';
 import { ymd2day } from './ymd2day';
 
-const { dayList, dayWrapperBrace } = texts.date;
+const { dayList, dayWrapperBrace } = dict.common.date;
 
 const dayListWithBrace: readonly string[] = dayList.map(
   (c) => `${dayWrapperBrace.start}${c}${dayWrapperBrace.end}`

@@ -3,7 +3,7 @@ import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { useCallback } from 'react';
 import { api } from '../../api';
-import { routes, texts } from '../../constants';
+import { dict, routes } from '../../constants';
 import { createToaster, showToast } from '../../functions';
 import { fetchAnswers, fetchEventSchedule, router } from '../../store';
 
@@ -51,7 +51,7 @@ export const useEditEventScheduleHooks = ({
         onBackToAnswerPage();
         showToast({
           toast,
-          message: texts.eventSettingsPage.editEventResultMessage,
+          message: dict.eventSettingsPage.editEventResultMessage,
           intent: 'success',
         });
       })

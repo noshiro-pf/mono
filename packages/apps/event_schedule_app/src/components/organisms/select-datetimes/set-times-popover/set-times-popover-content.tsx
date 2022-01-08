@@ -7,7 +7,7 @@ import type {
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
-import { texts } from '../../../../constants';
+import { dict } from '../../../../constants';
 import { timeRangeReducer } from '../../../../functions';
 import { TimeRangeView } from '../../../molecules';
 import { ButtonsWrapperAlignEnd } from '../../../styled';
@@ -46,13 +46,13 @@ export const SetTimesPopoverContent = memoNamed<Props>(
         <ButtonsWrapperAlignEnd>
           <Button
             intent='none'
-            text={texts.buttonText.cancel}
+            text={dict.common.buttonText.cancel}
             type='button'
             onClick={onCancelClick}
           />
           <Button
             intent='primary'
-            text={texts.buttonText.decide}
+            text={dict.common.buttonText.decide}
             type='button'
             onClick={onOkClickHandler}
           />

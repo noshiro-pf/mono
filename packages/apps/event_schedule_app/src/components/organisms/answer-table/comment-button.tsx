@@ -1,7 +1,7 @@
 import { Button, Popover } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import styled from 'styled-components';
-import { texts } from '../../../constants';
+import { dict } from '../../../constants';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
 type Props = Readonly<{
@@ -20,7 +20,7 @@ export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
           <ButtonsWrapperAlignEnd>
             <Button
               intent='none'
-              text={texts.buttonText.close}
+              text={dict.common.buttonText.close}
               type='button'
               onClick={handleClose}
             />

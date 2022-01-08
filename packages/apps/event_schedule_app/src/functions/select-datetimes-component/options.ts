@@ -1,8 +1,8 @@
 import type { OptionProps } from '@blueprintjs/core';
 import { datetimeSpecificationOptions } from '@noshiro/event-schedule-app-shared';
-import { texts } from '../../constants';
+import { dict } from '../../constants';
 
-const vt = texts.eventSettingsPage.section2;
+const vt = dict.eventSettingsPage.section2;
 
 export const selectorOptions: readonly OptionProps[] = [
   {
