@@ -1,11 +1,11 @@
-import { Icon, Spinner } from '@blueprintjs/core';
+import { Spinner } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { descriptionFontColor, dict, routes } from '../../../constants';
+import { descriptionFontColor, dict } from '../../../constants';
 import { eventScheduleResult$, router } from '../../../store';
-import { ConfirmEmailDialog } from '../../organisms';
+import { ConfirmEmailDialog, Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
@@ -28,16 +28,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
     <NotFoundPage />
   ) : (
     <div>
-      <TitleWrapper>
-        <Title
-          href={routes.createPage}
-          rel='noopener noreferrer'
-          target='_blank'
-        >
-          <Icon icon={'timeline-events'} iconSize={28} />
-          <div>{dc.title}</div>
-        </Title>
-      </TitleWrapper>
+      <Header showCreateNewButton={false} title={dc.title} />
       {Result.isErr(eventScheduleResult) ? (
         <FetchEventScheduleError errorType={eventScheduleResult.value} />
       ) : eventId === undefined || eventScheduleResult === undefined ? (
@@ -47,7 +38,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
           {editPageIsHidden ? undefined : (
             <>
               <SubTitle>
-                {`${dc.editSubTitle.prefix}${eventScheduleResult.value.title}${dc.editSubTitle.suffix}`}
+                {`${dc.editSubTitle(eventScheduleResult.value.title)}`}
               </SubTitle>
               <EventScheduleSettingCommon
                 initialValues={eventScheduleResult.value}
@@ -67,26 +58,6 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
     </div>
   );
 });
-
-const TitleWrapper = styled.div`
-  display: flex;
-`;
-
-const Title = styled.a`
-  display: flex;
-  align-items: center;
-  & > * {
-    margin-right: 10px;
-  }
-
-  margin: 20px;
-
-  /* h1 style */
-  font-size: 2em;
-  font-weight: bold;
-  color: black !important;
-  text-decoration: none !important;
-`;
 
 const SubTitle = styled.div`
   margin: 10px 20px;

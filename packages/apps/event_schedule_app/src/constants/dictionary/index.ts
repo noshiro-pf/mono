@@ -4,5 +4,7 @@ export * from './create-event-result-dialog';
 export * from './dictionary';
 export * from './error-messages';
 export * from './event-settings-page';
+export * from './header';
 export * from './icon-description-default';
+export * from './register-page';
 export * from './result-page';

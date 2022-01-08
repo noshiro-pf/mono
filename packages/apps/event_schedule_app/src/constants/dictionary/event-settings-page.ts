@@ -2,10 +2,7 @@ import { defaultIconPoint } from '../default-icon-point';
 
 export const eventSettingsPageDictionary = {
   title: '日程調整',
-  editSubTitle: {
-    prefix: 'イベント「',
-    suffix: '」の設定編集',
-  },
+  editSubTitle: (title: string) => `イベント「${title}」の設定編集`,
   section1: {
     titleAndNotesSectionTitle: 'イベント名・ノートを入力してください。（1/3）',
     eventName: 'イベント名（必須項目）',
@@ -62,7 +59,6 @@ export const eventSettingsPageDictionary = {
       '回答期限をオンにしていますが空欄になっています。',
     passwordIsEnabledButEmpty:
       'パスワードをオンにしていますが空欄になっています。',
-    invalidEmail: '有効なメールアドレスではありません。',
     atLeastOneNotificationCheckRequired:
       '通知設定をオンにする場合は少なくとも一つの通知にチェックをしてください。',
     answerIcons:

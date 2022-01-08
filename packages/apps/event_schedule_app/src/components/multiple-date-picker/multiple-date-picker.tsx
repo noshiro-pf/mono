@@ -21,6 +21,7 @@ type Props = Readonly<{
   onSelectedDatesChange?: (value: readonly YearMonthDate[]) => void;
   setYearMonth$?: Observable<CalendarCurrentPageReducerState>;
   holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>;
+  useOutlinedSelectedStyle?: boolean;
 }>;
 
 export const MultipleDatePicker = memoNamed<Props>(
@@ -30,6 +31,7 @@ export const MultipleDatePicker = memoNamed<Props>(
     onSelectedDatesChange,
     setYearMonth$,
     holidaysJpDefinition,
+    useOutlinedSelectedStyle,
   }) => {
     const {
       calendarCurrentPage,
@@ -67,6 +69,7 @@ export const MultipleDatePicker = memoNamed<Props>(
                   {calendarCells.map((week) => (
                     <Week
                       key={week.index}
+                      useOutlinedSelectedStyle={useOutlinedSelectedStyle}
                       week={week.week}
                       onClick={onDateClick}
                     />

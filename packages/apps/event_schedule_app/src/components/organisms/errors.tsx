@@ -35,7 +35,7 @@ export const EventSchedulePropertiesErrors = memoNamed<Props>(
       {eventScheduleValidation.notificationEmail ? undefined : (
         <Description
           color={errorFontColor}
-          text={dc.errorMessages.invalidEmail}
+          text={dict.common.error.invalidEmail}
         />
       )}
       {eventScheduleValidation.notificationItems ? undefined : (

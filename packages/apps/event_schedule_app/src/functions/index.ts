@@ -10,6 +10,7 @@ export * from './map-key';
 export * from './multiple-date-picker';
 export * from './normalize-event-schedule';
 export * from './select-datetimes-component';
+export * from './sign-in-register-page';
 export * from './toaster';
 export * from './today';
 export * from './ymd2day';

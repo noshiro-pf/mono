@@ -60,7 +60,7 @@ export const useConfirmEmailDialogState = (
           ? h(
               'div',
               { key: 'invalidEmailFormat' },
-              dict.eventSettingsPage.errorMessages.invalidEmail
+              dict.common.error.invalidEmail
             )
           : undefined,
         state.showErrorOf.emailDoesNotMatch
@@ -75,10 +75,12 @@ export const useConfirmEmailDialogState = (
     [state.showErrorOf]
   );
 
+  const hasError = useMemo(() => confirmEmailDialogHasError(state), [state]);
+
   return {
     state,
     helperText,
-    hasError: confirmEmailDialogHasError(state),
+    hasError,
     enterClickHandler,
     cancelClickHandler,
     inputEmailHandler,

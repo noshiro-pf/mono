@@ -2,7 +2,6 @@ import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
 
 export const answerPageDictionary = {
   title: '日程調整 回答ページ',
-  createNew: '日程調整を新規作成',
   eventInfo: {
     title: '概要',
     eventName: 'イベント名',

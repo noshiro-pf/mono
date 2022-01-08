@@ -29,7 +29,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
       inputEmailHandler,
     } = useConfirmEmailDialogState(onSuccess, back, emailAnswer);
 
-    const onKeyUp = useCallback(
+    const onKeyDown = useCallback(
       (ev: Readonly<KeyboardEvent>) => {
         if (ev.key === 'Enter') {
           enterClickHandler();
@@ -38,7 +38,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
       [enterClickHandler]
     );
 
-    useKeyEventListener(onKeyUp, noop);
+    useKeyEventListener(onKeyDown, noop);
 
     return (
       <DialogWithMaxWidth
@@ -59,7 +59,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
                 intent={hasError ? 'danger' : 'primary'}
                 placeholder={'sample@gmail.com'}
                 type='email'
-                value={state.emailBeingInput}
+                value={state.emailBeingEdited}
                 onValueChange={inputEmailHandler}
               />
             </FormGroup>
@@ -71,7 +71,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
               {dc.back}
             </Button>
             <Button
-              disabled={state.enterButtonDisabled}
+              disabled={hasError}
               intent={'primary'}
               onClick={enterClickHandler}
             >

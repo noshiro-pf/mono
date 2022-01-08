@@ -1,8 +1,8 @@
-import { AnchorButton, Button, Icon, Spinner } from '@blueprintjs/core';
+import { Button, Spinner } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { IList } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { dict, routes } from '../../../constants';
+import { dict } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import { refreshAnswers, setYearMonth$ } from '../../../store';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
@@ -12,6 +12,7 @@ import {
   AnswerBeingEdited,
   AnswerPageEventInfo,
   AnswerTable,
+  Header,
 } from '../../organisms';
 import { ButtonsWrapperAlignEnd, SingleButtonWrapper } from '../../styled';
 import { NotFoundPage } from '../not-found-page';
@@ -50,27 +51,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     <NotFoundPage />
   ) : (
     <div>
-      <TitleWrapper>
-        <Title
-          href={routes.createPage}
-          rel='noopener noreferrer'
-          target='_blank'
-        >
-          <Icon icon={'timeline-events'} iconSize={28} />
-          <div>{dc.title}</div>
-        </Title>
-        <CreateNewButtonWrapper>
-          <AnchorButton
-            href={routes.createPage}
-            icon='add'
-            intent={'primary'}
-            rel='noopener noreferrer'
-            target='_blank'
-          >
-            <NoWrapSpan>{dc.createNew}</NoWrapSpan>
-          </AnchorButton>
-        </CreateNewButtonWrapper>
-      </TitleWrapper>
+      <Header showCreateNewButton={true} title={dc.title} />
 
       {errorType !== undefined ? (
         <AnswerPageError errorType={errorType} />
@@ -97,6 +78,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 holidaysJpDefinition={holidaysJpDefinition}
                 selectedDates={selectedDates}
                 setYearMonth$={setYearMonth$}
+                useOutlinedSelectedStyle={true}
               />
             </CalendarWrapper>
 
@@ -222,41 +204,6 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     </div>
   );
 });
-
-const TitleWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const NoWrapSpan = styled.span`
-  white-space: nowrap;
-`;
-
-const Title = styled.a`
-  display: flex;
-  align-items: center;
-  & > * {
-    margin-right: 10px;
-  }
-
-  margin: 20px;
-
-  /* h1 style */
-  font-size: 2em;
-  font-weight: bold;
-  color: black !important;
-  text-decoration: none !important;
-`;
-
-const CreateNewButtonWrapper = styled.div`
-  flex: 1;
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-`;
 
 const CalendarWrapper = styled.div`
   margin: 10px;

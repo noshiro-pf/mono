@@ -3,6 +3,7 @@ import {
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { collection, getFirestore } from 'firebase/firestore';
 import { clog } from './utils';
 // import firebasejson from '../firebase.json';
@@ -21,3 +22,5 @@ export const db = getFirestore();
 // }
 
 export const dbEvents = collection(db, firestorePaths.events);
+
+export const auth = getAuth();

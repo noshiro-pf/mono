@@ -101,27 +101,64 @@ export const DatePickerDayStyled = styled(DatePickerDayBaseStyled)`
   }
 `;
 
-export const DatePickerDayReadonlyStyled = DatePickerDayBaseStyled;
-
-const DatePickerDaySelectedBaseStyled = styled(DatePickerDayBaseStyled)`
-  background-color: #137cbd;
-  border-radius: 3px;
-  color: #ffffff;
+export const DatePickerDaySaturdayStyled = styled(DatePickerDayStyled)`
+  color: blue;
 `;
 
-export const DatePickerDaySelectedStyled = styled(
-  DatePickerDaySelectedBaseStyled
+export const DatePickerDayHolidayStyled = styled(DatePickerDayStyled)`
+  color: red;
+`;
+
+export const DatePickerDayReadonlyStyled = DatePickerDayBaseStyled;
+
+export const DatePickerDayReadonlySaturdayStyled = styled(
+  DatePickerDayReadonlyStyled
 )`
+  color: blue;
+`;
+
+export const DatePickerDayReadonlyHolidayStyled = styled(
+  DatePickerDayReadonlyStyled
+)`
+  color: red;
+`;
+
+export const DatePickerDaySelectedStyled = styled(DatePickerDayBaseStyled)`
   cursor: pointer;
+  background-color: #137cbd;
+  color: #ffffff;
 
   &:hover {
     background-color: #106ba3;
-    color: #ffffff;
   }
 `;
 
-export const DatePickerDaySelectedReadonlyStyled =
-  DatePickerDaySelectedBaseStyled;
+export const DatePickerDaySelectedReadonlyStyled = styled(
+  DatePickerDayBaseStyled
+)`
+  background-color: #137cbd;
+  color: #ffffff;
+`;
+
+export const DatePickerDayOutlinedSelectedReadonlyStyled = styled(
+  DatePickerDayBaseStyled
+)`
+  outline: rgba(19, 124, 189, 0.6) auto 1px;
+  outline-offset: -2px;
+  border-radius: 50%;
+`;
+
+export const DatePickerDayOutlinedSelectedReadonlySaturdayStyled = styled(
+  DatePickerDayOutlinedSelectedReadonlyStyled
+)`
+  color: blue;
+`;
+
+export const DatePickerDayOutlinedSelectedReadonlyHolidayStyled = styled(
+  DatePickerDayOutlinedSelectedReadonlyStyled
+)`
+  color: red;
+`;
 
 export const DatePickerDayOutside = styled(DatePickerDayBaseStyled)`
   color: rgba(92, 112, 128, 0.6);

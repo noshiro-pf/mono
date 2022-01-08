@@ -20,4 +20,7 @@ export const commonDictionary = {
     reset: 'リセット',
     close: '閉じる',
   },
+  error: {
+    invalidEmail: '有効なメールアドレスではありません。',
+  },
 } as const;
