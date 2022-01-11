@@ -17,7 +17,7 @@ import {
 } from '../../organisms';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
-const vt = dict.eventSettingsPage;
+const dc = dict.eventSettingsPage;
 
 type Props = Readonly<{
   mode: 'create' | 'edit';
@@ -66,7 +66,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
 
     return (
       <>
-        <Section sectionTitle={vt.section1.titleAndNotesSectionTitle}>
+        <Section sectionTitle={dc.section1.titleAndNotesSectionTitle}>
           <NameAndNotes
             notes={notes}
             title={title}
@@ -74,7 +74,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
             onTitleChange={onTitleChange}
           />
         </Section>
-        <Section sectionTitle={vt.section2.selectDatesSectionTitle}>
+        <Section sectionTitle={dc.section2.selectDatesSectionTitle}>
           <SelectDatetimes
             datetimeList={datetimeRangeList}
             datetimeSpecification={datetimeSpecification}
@@ -83,7 +83,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
             onDatetimeSpecificationChange={onDatetimeSpecificationChange}
           />
         </Section>
-        <Section sectionTitle={vt.section3.otherSettingsTitle}>
+        <Section sectionTitle={dc.section3.otherSettingsTitle}>
           <EventSettings
             answerDeadline={answerDeadline}
             answerIcons={answerIcons}
@@ -111,7 +111,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
                 disabled={!createButtonIsEnabled}
                 intent={'primary'}
                 loading={createButtonIsLoading}
-                text={vt.createEventButton}
+                text={dc.createEventButton}
                 onClick={onCreateEventClick}
               />
               <CreateEventResultDialog
@@ -139,7 +139,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
                 }
                 intent={'primary'}
                 loading={editButtonIsLoading}
-                text={vt.editEventButton}
+                text={dc.editEventButton}
                 onClick={onEditEventClick}
               />
             </>

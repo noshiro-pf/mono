@@ -7,7 +7,7 @@ import { match } from '@noshiro/ts-utils';
 import { dict } from '../../../constants';
 import { hm2str, ymd2strWithDay } from '../../../functions';
 
-const vt = dict.common.date;
+const dc = dict.common.date;
 
 type Props = Readonly<{
   datetimeRange: DatetimeRange;
@@ -22,13 +22,13 @@ export const DatetimeRangeCell = memoNamed<Props>(
         noStartEndSpecified: ymd2strWithDay(datetimeRange.ymd),
         startSpecified: `${ymd2strWithDay(datetimeRange.ymd)}  ${hm2str(
           datetimeRange.timeRange.start
-        )}${vt.timeRangeTilde}`,
+        )}${dc.timeRangeTilde}`,
         endSpecified: `${ymd2strWithDay(datetimeRange.ymd)}  ${
-          vt.timeRangeTilde
+          dc.timeRangeTilde
         }${hm2str(datetimeRange.timeRange.start)}`,
         startAndEndSpecified: `${ymd2strWithDay(datetimeRange.ymd)}  ${hm2str(
           datetimeRange.timeRange.start
-        )}${vt.timeRangeTilde}${hm2str(datetimeRange.timeRange.end)}`,
+        )}${dc.timeRangeTilde}${hm2str(datetimeRange.timeRange.end)}`,
       })}
     </>
   )

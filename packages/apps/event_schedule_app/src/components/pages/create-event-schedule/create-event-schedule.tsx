@@ -4,14 +4,14 @@ import styled from 'styled-components';
 import { dict, initialEventSchedule, routes } from '../../../constants';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
-const vt = dict.eventSettingsPage;
+const dc = dict.eventSettingsPage;
 
 export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => (
   <div>
     <TitleWrapper>
       <Title href={routes.createPage} rel='noopener noreferrer' target='_blank'>
         <Icon icon={'timeline-events'} iconSize={28} />
-        <div>{vt.title}</div>
+        <div>{dc.title}</div>
       </Title>
     </TitleWrapper>
     <EventScheduleSettingCommon

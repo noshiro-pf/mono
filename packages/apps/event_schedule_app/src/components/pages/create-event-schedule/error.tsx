@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { dict, errorFontColor } from '../../../constants';
 import { Description } from '../../atoms';
 
-const vt = dict.errorMessages;
+const dc = dict.errorMessages;
 
 type Props = Readonly<{
   errorType: 'not-found' | 'others';
@@ -14,7 +14,7 @@ export const FetchEventScheduleError = memoNamed<Props>(
   ({ errorType }) => (
     <ErrorMessageWrapper>
       {errorType === 'others' ? (
-        <Description color={errorFontColor} text={vt.eventScheduleOtherError} />
+        <Description color={errorFontColor} text={dc.eventScheduleOtherError} />
       ) : undefined}
     </ErrorMessageWrapper>
   )

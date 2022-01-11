@@ -10,7 +10,7 @@ import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
-const vt = dict.eventSettingsPage;
+const dc = dict.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useStreamValue(router.eventId$);
@@ -35,7 +35,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
           target='_blank'
         >
           <Icon icon={'timeline-events'} iconSize={28} />
-          <div>{vt.title}</div>
+          <div>{dc.title}</div>
         </Title>
       </TitleWrapper>
       {Result.isErr(eventScheduleResult) ? (
@@ -47,7 +47,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
           {editPageIsHidden ? undefined : (
             <>
               <SubTitle>
-                {`${vt.editSubTitle.prefix}${eventScheduleResult.value.title}${vt.editSubTitle.suffix}`}
+                {`${dc.editSubTitle.prefix}${eventScheduleResult.value.title}${dc.editSubTitle.suffix}`}
               </SubTitle>
               <EventScheduleSettingCommon
                 initialValues={eventScheduleResult.value}

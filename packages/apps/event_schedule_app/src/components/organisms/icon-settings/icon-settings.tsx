@@ -12,7 +12,7 @@ import { iconListReducer } from '../../../functions';
 import { Description } from '../../atoms';
 import { AnswerIconRow } from './icon-setting-row';
 
-const vt = dict.eventSettingsPage.section3.iconSettings;
+const dc = dict.eventSettingsPage.section3.iconSettings;
 
 type Props = Readonly<{
   answerIcons: AnswerIconSettings;
@@ -63,8 +63,8 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
 
     return (
       <Root>
-        <div>{vt.title}</div>
-        <Description text={vt.description} />
+        <div>{dc.title}</div>
+        <Description text={dc.description} />
         <AnswerIconRow
           answerIcon={answerIcons.good}
           iconId={'good'}

@@ -8,7 +8,7 @@ import { useCallback } from 'react';
 import { dict } from '../../../../constants';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
-const vt = dict.eventSettingsPage.section2;
+const dc = dict.eventSettingsPage.section2;
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
@@ -45,7 +45,7 @@ export const SetTimesPopover = memoNamed<Props>(
       >
         <Button
           intent='success'
-          text={vt.setTimesAtOneTime}
+          text={dc.setTimesAtOneTime}
           onClick={handleOpen}
         />
       </Popover>

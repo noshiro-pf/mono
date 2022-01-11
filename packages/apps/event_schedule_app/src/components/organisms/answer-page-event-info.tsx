@@ -7,7 +7,7 @@ import { ymdhm2strWithDay } from '../../functions';
 import { Description } from '../atoms';
 import { AnswerPageNotes } from './answer-page-notes';
 
-const vt = dict.answerPage;
+const dc = dict.answerPage;
 
 type Props = Readonly<{
   eventSchedule: EventSchedule;
@@ -18,13 +18,13 @@ export const AnswerPageEventInfo = memoNamed<Props>(
   'AnswerPageEventInfo',
   ({ eventSchedule, isExpired }) => (
     <Container>
-      <TableLabel1>{vt.eventInfo.eventName}</TableLabel1>
+      <TableLabel1>{dc.eventInfo.eventName}</TableLabel1>
       <TableValue1>{eventSchedule.title}</TableValue1>
-      <TableLabel2>{vt.eventInfo.notes}</TableLabel2>
+      <TableLabel2>{dc.eventInfo.notes}</TableLabel2>
       <TableValue2>
         <AnswerPageNotes notes={eventSchedule.notes} />
       </TableValue2>
-      <TableLabel3>{vt.eventInfo.answerDeadline}</TableLabel3>
+      <TableLabel3>{dc.eventInfo.answerDeadline}</TableLabel3>
       <TableValue3>
         {eventSchedule.useAnswerDeadline ? (
           <>
@@ -35,8 +35,8 @@ export const AnswerPageEventInfo = memoNamed<Props>(
               error={isExpired}
               text={
                 isExpired
-                  ? vt.eventInfo.answerDeadlineIsExpired
-                  : vt.eventInfo.answerDeadlineDescription
+                  ? dc.eventInfo.answerDeadlineIsExpired
+                  : dc.eventInfo.answerDeadlineDescription
               }
             />
           </>

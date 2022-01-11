@@ -11,7 +11,7 @@ import { dict } from '../../constants';
 import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 
-const vt = dict.createEventResultDialog;
+const dc = dict.createEventResultDialog;
 
 type Props = Readonly<{
   isOpen: boolean;
@@ -30,14 +30,14 @@ export const CreateEventResultDialog = memoNamed<Props>(
       icon='timeline-events'
       isCloseButtonShown={false}
       isOpen={props.isOpen}
-      title={props.isLoading ? vt.titleLoading : vt.title}
+      title={props.isLoading ? dc.titleLoading : dc.title}
     >
       <div className={Classes.DIALOG_BODY}>
         {props.isLoading ? (
           <Spinner />
         ) : (
           <>
-            <p>{vt.description}</p>
+            <p>{dc.description}</p>
             <UrlWrapper>
               <div>{'URL: '}</div>
               <AnchorWrapper>
@@ -50,7 +50,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
                 </Anchor>
               </AnchorWrapper>
               <div>
-                <Tooltip content={vt.clipboardButton}>
+                <Tooltip content={dc.clipboardButton}>
                   <Button
                     icon={'clipboard'}
                     minimal={true}
@@ -66,7 +66,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
         <div className={Classes.DIALOG_FOOTER}>
           <ButtonsWrapperAlignEnd>
             <AnchorButton intent={'none'} onClick={props.close}>
-              {vt.back}
+              {dc.back}
             </AnchorButton>
             <AnchorButton
               href={props.url}
@@ -74,7 +74,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
               rel='noopener noreferrer'
               target='_blank'
             >
-              {vt.openEventPageCreated}
+              {dc.openEventPageCreated}
             </AnchorButton>
           </ButtonsWrapperAlignEnd>
         </div>

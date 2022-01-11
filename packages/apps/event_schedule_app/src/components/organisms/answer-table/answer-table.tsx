@@ -12,14 +12,14 @@ import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
 import { SortButton } from './sort-button';
 
+const dc = dict.answerPage.answers;
+
 type Props = Readonly<{
   eventSchedule: EventSchedule;
   answers: readonly Answer[];
   onAnswerClick: (answer: Answer) => void;
   isExpired: boolean;
 }>;
-
-const vt = dict.answerPage.answers;
 
 export const AnswerTable = memoNamed<Props>(
   'AnswerTable',
@@ -36,11 +36,11 @@ export const AnswerTable = memoNamed<Props>(
         <thead>
           <tr>
             <th>
-              <PaddedSpan>{vt.datetime}</PaddedSpan>
+              <PaddedSpan>{dc.datetime}</PaddedSpan>
               <SortButton onSortChange={onDatetimeSortChange} />
             </th>
             <th>
-              <PaddedSpan>{vt.score}</PaddedSpan>
+              <PaddedSpan>{dc.score}</PaddedSpan>
               <SortButton onSortChange={onScoreSortChange} />
             </th>
 
@@ -102,7 +102,7 @@ export const AnswerTable = memoNamed<Props>(
                   <td key={i}>
                     <SummaryCellStyle>
                       <span>{s}</span>
-                      <SummaryCellUnit>{vt.numAnswersUnit}</SummaryCellUnit>
+                      <SummaryCellUnit>{dc.numAnswersUnit}</SummaryCellUnit>
                     </SummaryCellStyle>
                   </td>
                 ))}
@@ -122,7 +122,7 @@ export const AnswerTable = memoNamed<Props>(
                           ) : undefined}
                           {weight !== 1.0 ? (
                             <WeightValue>
-                              <WeightTimes>{vt.times}</WeightTimes>
+                              <WeightTimes>{dc.times}</WeightTimes>
                               <div>{weight}</div>
                             </WeightValue>
                           ) : undefined}
@@ -137,7 +137,7 @@ export const AnswerTable = memoNamed<Props>(
 
           {/* コメント行 */}
           <tr>
-            <td>{vt.comment}</td>
+            <td>{dc.comment}</td>
 
             {/* spacer */}
             <td />

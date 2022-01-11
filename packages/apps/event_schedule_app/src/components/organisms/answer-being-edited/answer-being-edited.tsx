@@ -33,6 +33,8 @@ import {
 import { ParagraphWithSwitch } from '../paragraph-with-switch';
 import { WeightSetting } from './weight-setting';
 
+const dc = dict.answerPage.answerBeingEdited;
+
 type Props = Readonly<{
   eventSchedule: EventSchedule;
   answers: readonly Answer[];
@@ -46,8 +48,6 @@ type Props = Readonly<{
   submitButtonIsDisabled: boolean;
   selectedAnswerUserName: UserName | undefined;
 }>;
-
-const vt = dict.answerPage.answerBeingEdited;
 
 export const AnswerBeingEdited = memoNamed<Props>(
   'AnswerBeingEdited',
@@ -90,16 +90,16 @@ export const AnswerBeingEdited = memoNamed<Props>(
             helperText={
               showUserNameError ? (
                 theNameIsAlreadyUsed ? (
-                  vt.theNameIsAlreadyUsed
+                  dc.theNameIsAlreadyUsed
                 ) : (
-                  vt.nameIsRequired
+                  dc.nameIsRequired
                 )
               ) : (
                 <Spacer />
               )
             }
             intent={showUserNameError ? 'danger' : 'primary'}
-            label={vt.yourName}
+            label={dc.yourName}
           >
             <BpInput
               autoFocus={true}
@@ -222,7 +222,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           </Table>
         </TableWrapper>
         <WidthRestrictedInputWrapper>
-          <FormGroup label={vt.comments}>
+          <FormGroup label={dc.comments}>
             <BpTextArea
               fill={true}
               value={answerBeingEdited.comment}
@@ -232,11 +232,11 @@ export const AnswerBeingEdited = memoNamed<Props>(
         </WidthRestrictedInputWrapper>
         <Paragraph>
           <ParagraphWithSwitch
-            description={vt.required.description}
+            description={dc.required.description}
             disabledInsteadOfHidden={false}
             elementToToggle={undefined}
             show={answerBeingEdited.isRequiredParticipants}
-            title={vt.required.title}
+            title={dc.required.title}
             onToggle={toggleRequiredSection}
           />
         </Paragraph>
@@ -247,7 +247,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
               onWeightChange={onWeightChange}
             />
           </WeightSettingWrapper>
-          {IList.map(vt.weight.description, (d, i) => (
+          {IList.map(dc.weight.description, (d, i) => (
             <Description key={i} text={d} />
           ))}
         </Paragraph>

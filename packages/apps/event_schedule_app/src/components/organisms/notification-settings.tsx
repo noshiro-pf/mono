@@ -13,6 +13,8 @@ import { now, ymdhmDateDiff } from '../../functions';
 import { BpCheckbox, BpInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
+const dc = dict.eventSettingsPage.section3;
+
 type Props = Readonly<{
   notificationSettings: NotificationSettings;
   onNotificationSettingsChange: (value: NotificationSettings) => void;
@@ -21,8 +23,6 @@ type Props = Readonly<{
   answerDeadline: Ymdhm | undefined;
   focusEmailInput$: TinyObservable<undefined>;
 }>;
-
-const vt = dict.eventSettingsPage.section3;
 
 export const NotificationSettingsComponent = memoNamed<Props>(
   'NotificationSettings',
@@ -157,7 +157,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           <FormGroup
             helperText={helperText}
             intent={invalidEmail ? 'danger' : 'primary'}
-            label={vt.notification.emailAddress}
+            label={dc.notification.emailAddress}
           >
             <BpInput
               autoFocus={true}
@@ -176,7 +176,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             <BpCheckbox
               checked={notificationSettings.notifyOnAnswerChange}
               disabled={disabled}
-              label={vt.notification.notifyOnAnswerChange}
+              label={dc.notification.notifyOnAnswerChange}
               onCheck={onNotifyOnAnswerChangeCheck}
             />
           </CheckboxWrapper>
@@ -184,7 +184,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             <BpCheckbox
               checked={notificationSettings.notify01daysBeforeAnswerDeadline}
               disabled={disabledDetail.notify01daysBefore}
-              label={vt.notification.notify01daysBeforeAnswerDeadline}
+              label={dc.notification.notify01daysBeforeAnswerDeadline}
               onCheck={onNotify01daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
@@ -192,7 +192,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             <BpCheckbox
               checked={notificationSettings.notify03daysBeforeAnswerDeadline}
               disabled={disabledDetail.notify03daysBefore}
-              label={vt.notification.notify03daysBeforeAnswerDeadline}
+              label={dc.notification.notify03daysBeforeAnswerDeadline}
               onCheck={onNotify03daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
@@ -200,7 +200,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             <BpCheckbox
               checked={notificationSettings.notify07daysBeforeAnswerDeadline}
               disabled={disabledDetail.notify07daysBefore}
-              label={vt.notification.notify07daysBeforeAnswerDeadline}
+              label={dc.notification.notify07daysBeforeAnswerDeadline}
               onCheck={onNotify07daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
@@ -208,7 +208,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             <BpCheckbox
               checked={notificationSettings.notify14daysBeforeAnswerDeadline}
               disabled={disabledDetail.notify14daysBefore}
-              label={vt.notification.notify14daysBeforeAnswerDeadline}
+              label={dc.notification.notify14daysBeforeAnswerDeadline}
               onCheck={onNotify14daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
@@ -216,7 +216,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             <BpCheckbox
               checked={notificationSettings.notify28daysBeforeAnswerDeadline}
               disabled={disabledDetail.notify28daysBefore}
-              label={vt.notification.notify28daysBeforeAnswerDeadline}
+              label={dc.notification.notify28daysBeforeAnswerDeadline}
               onCheck={onNotify28daysBeforeAnswerDeadlineCheck}
             />
           </CheckboxWrapper>

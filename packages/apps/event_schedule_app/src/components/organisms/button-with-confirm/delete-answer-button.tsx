@@ -2,12 +2,12 @@ import { memoNamed } from '@noshiro/react-utils';
 import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
+const dc = dict.answerPage.answerBeingEdited.deleteButton;
+
 type Props = Readonly<{
   onConfirmDeleteAnswer: () => Promise<void>;
   loading: boolean;
 }>;
-
-const vt = dict.answerPage.answerBeingEdited.deleteButton;
 
 const buttonConfig = {
   name: dict.common.buttonText.delete,
@@ -18,13 +18,13 @@ const buttonConfig = {
 const dialogConfig = {
   icon: 'trash',
   intent: 'danger',
-  message: vt.deleteAnswerConfirmation,
+  message: dc.deleteAnswerConfirmation,
   cancelButtonText: dict.common.buttonText.cancel,
   confirmButtonText: dict.common.buttonText.delete,
 } as const;
 
 const toastConfig = {
-  message: vt.deleteAnswerResultMessage,
+  message: dc.deleteAnswerResultMessage,
   intent: 'success',
 } as const;
 

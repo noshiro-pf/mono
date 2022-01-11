@@ -2,7 +2,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
-const vt = dict.eventSettingsPage.resetEditButton;
+const dc = dict.eventSettingsPage.resetEditButton;
 
 type Props = Readonly<{
   onConfirmClick: () => void;
@@ -10,19 +10,19 @@ type Props = Readonly<{
 }>;
 
 const buttonConfig = {
-  name: vt.name,
+  name: dc.name,
 } as const;
 
 const dialogConfig = {
   intent: 'danger',
   icon: 'reset',
-  message: vt.resetConfirmation,
+  message: dc.resetConfirmation,
   cancelButtonText: dict.common.buttonText.cancel,
-  confirmButtonText: vt.name,
+  confirmButtonText: dc.name,
 } as const;
 
 const toastConfig = {
-  message: vt.resetResultMessage,
+  message: dc.resetResultMessage,
   intent: 'success',
 } as const;
 

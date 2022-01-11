@@ -6,7 +6,7 @@ import { useFormError } from '../../hooks';
 import { BpInput, BpTextArea } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
-const vt = dict.eventSettingsPage.section1;
+const dc = dict.eventSettingsPage.section1;
 
 type Props = Readonly<{
   title: string;
@@ -33,19 +33,19 @@ export const NameAndNotes = memoNamed<Props>(
               : undefined
           }
           intent={showError ? 'danger' : 'primary'}
-          label={vt.eventName}
+          label={dc.eventName}
         >
           <BpInput
-            placeholder={vt.eventNamePlaceholder}
+            placeholder={dc.eventNamePlaceholder}
             value={title}
             onBlur={onBlur}
             onValueChange={onTitleChangeLocal}
           />
         </FormGroup>
-        <FormGroup intent={'primary'} label={vt.notes}>
+        <FormGroup intent={'primary'} label={dc.notes}>
           <BpTextArea
             fill={true}
-            placeholder={vt.notesPlaceholder}
+            placeholder={dc.notesPlaceholder}
             value={notes}
             onValueChange={onNotesChange}
           />

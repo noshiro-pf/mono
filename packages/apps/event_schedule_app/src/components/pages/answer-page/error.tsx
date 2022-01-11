@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { dict, errorFontColor } from '../../../constants';
 import { Description } from '../../atoms';
 
-const vt = dict.errorMessages;
+const dc = dict.errorMessages;
 
 type Props = DeepReadonly<{
   errorType:
@@ -17,10 +17,10 @@ export const AnswerPageError = memoNamed<Props>(
     <ErrorMessageWrapper>
       {errorType.data === 'eventScheduleResult' &&
       errorType.type === 'others' ? (
-        <Description color={errorFontColor} text={vt.eventScheduleOtherError} />
+        <Description color={errorFontColor} text={dc.eventScheduleOtherError} />
       ) : undefined}
       {errorType.data === 'answersResult' && errorType.type === 'others' ? (
-        <Description color={errorFontColor} text={vt.answersResultOtherError} />
+        <Description color={errorFontColor} text={dc.answersResultOtherError} />
       ) : undefined}
     </ErrorMessageWrapper>
   )

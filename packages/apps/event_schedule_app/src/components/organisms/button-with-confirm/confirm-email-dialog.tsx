@@ -8,7 +8,7 @@ import { useConfirmEmailDialogState } from '../../../hooks';
 import { BpInput, DialogWithMaxWidth } from '../../bp';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
-const vt = dict.answerPage.eventInfo.verifyEmailDialog;
+const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
 type ConfirmEmailDialogProps = Readonly<{
   onSuccess: () => void;
@@ -48,10 +48,10 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
         icon='key'
         isCloseButtonShown={false}
         isOpen={isOpen}
-        title={vt.editButtonConfirmDialogTitle}
+        title={dc.editButtonConfirmDialogTitle}
       >
         <div className={Classes.DIALOG_BODY}>
-          <p>{vt.editButtonConfirmDialogMessage}</p>
+          <p>{dc.editButtonConfirmDialogMessage}</p>
           <InputWrapperWithMinHeight>
             <FormGroup helperText={helperText} intent={'danger'} label={''}>
               <BpInput
@@ -68,7 +68,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
         <div className={Classes.DIALOG_FOOTER}>
           <ButtonsWrapperAlignEnd>
             <Button intent={'none'} onClick={cancelClickHandler}>
-              {vt.back}
+              {dc.back}
             </Button>
             <Button
               disabled={state.enterButtonDisabled}
