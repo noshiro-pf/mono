@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { WeightNumericInput } from '../../molecules';
 
-const vt = dict.answerPage.answerBeingEdited;
+const dc = dict.answerPage.answerBeingEdited;
 
 export type WeightSettingProps = Readonly<{
   weight: Weight;
@@ -18,7 +18,7 @@ export const WeightSetting = memoNamed<WeightSettingProps>(
       <NumericInputWrapper>
         <WeightNumericInput weight={weight} onWeightChange={onWeightChange} />
       </NumericInputWrapper>
-      <Suffix>{vt.weight.suffix}</Suffix>
+      <Suffix>{dc.weight.suffix}</Suffix>
     </Wrapper>
   )
 );

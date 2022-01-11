@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { dict, errorFontColor } from '../../constants';
 import { Description } from '../atoms';
 
-const vt = dict.eventSettingsPage;
+const dc = dict.eventSettingsPage;
 
 type Props = Readonly<{
   eventScheduleValidation: EventScheduleValidation;
@@ -17,37 +17,37 @@ export const EventSchedulePropertiesErrors = memoNamed<Props>(
       {eventScheduleValidation.title ? undefined : (
         <Description
           color={errorFontColor}
-          text={vt.errorMessages.titleIsEmpty}
+          text={dc.errorMessages.titleIsEmpty}
         />
       )}
       {eventScheduleValidation.datetimeRangeList ? undefined : (
         <Description
           color={errorFontColor}
-          text={vt.errorMessages.datetimeIsEmpty}
+          text={dc.errorMessages.datetimeIsEmpty}
         />
       )}
       {eventScheduleValidation.answerDeadline ? undefined : (
         <Description
           color={errorFontColor}
-          text={vt.errorMessages.answerDeadlineIsEnabledButEmpty}
+          text={dc.errorMessages.answerDeadlineIsEnabledButEmpty}
         />
       )}
       {eventScheduleValidation.notificationEmail ? undefined : (
         <Description
           color={errorFontColor}
-          text={vt.errorMessages.invalidEmail}
+          text={dc.errorMessages.invalidEmail}
         />
       )}
       {eventScheduleValidation.notificationItems ? undefined : (
         <Description
           color={errorFontColor}
-          text={vt.errorMessages.atLeastOneNotificationCheckRequired}
+          text={dc.errorMessages.atLeastOneNotificationCheckRequired}
         />
       )}
       {eventScheduleValidation.answerIcons ? undefined : (
         <Description
           color={errorFontColor}
-          text={vt.errorMessages.answerIcons}
+          text={dc.errorMessages.answerIcons}
         />
       )}
     </ErrorMessagesWrapper>

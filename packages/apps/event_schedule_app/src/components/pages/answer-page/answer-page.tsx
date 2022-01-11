@@ -17,7 +17,7 @@ import { ButtonsWrapperAlignEnd, SingleButtonWrapper } from '../../styled';
 import { NotFoundPage } from '../not-found-page';
 import { AnswerPageError } from './error';
 
-const vt = dict.answerPage;
+const dc = dict.answerPage;
 
 export const AnswerPage = memoNamed('AnswerPage', () => {
   const {
@@ -57,7 +57,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
           target='_blank'
         >
           <Icon icon={'timeline-events'} iconSize={28} />
-          <div>{vt.title}</div>
+          <div>{dc.title}</div>
         </Title>
         <CreateNewButtonWrapper>
           <AnchorButton
@@ -67,7 +67,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             rel='noopener noreferrer'
             target='_blank'
           >
-            <NoWrapSpan>{vt.createNew}</NoWrapSpan>
+            <NoWrapSpan>{dc.createNew}</NoWrapSpan>
           </AnchorButton>
         </CreateNewButtonWrapper>
       </TitleWrapper>
@@ -80,18 +80,18 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
         <Spinner />
       ) : (
         <>
-          <Section sectionTitle={vt.eventInfo.title}>
+          <Section sectionTitle={dc.eventInfo.title}>
             <AnswerPageEventInfo
               eventSchedule={eventSchedule}
               isExpired={isExpired}
             />
             <ButtonsWrapperAlignEnd>
               <Button icon={'cog'} intent={'none'} onClick={onEditButtonClick}>
-                {vt.eventInfo.editButton}
+                {dc.eventInfo.editButton}
               </Button>
             </ButtonsWrapperAlignEnd>
           </Section>
-          <Section sectionTitle={vt.answers.title}>
+          <Section sectionTitle={dc.answers.title}>
             <CalendarWrapper>
               <MultipleDatePicker
                 holidaysJpDefinition={holidaysJpDefinition}
@@ -109,7 +109,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   loading={refreshButtonIsLoading}
                   onClick={refreshAnswers}
                 >
-                  {vt.answers.refresh}
+                  {dc.answers.refresh}
                 </Button>
               </SingleButtonWrapper>
             )}
@@ -130,8 +130,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                     <RequiredParticipantIcon />
                     {dict.common.colon}
                   </AlignCenter>
-                  {vt.answers.requiredParticipant}
-                  {vt.requiredParticipantDescription}
+                  {dc.answers.requiredParticipant}
+                  {dc.requiredParticipantDescription}
                 </RequiredParticipantIconWrapper>
               ) : undefined}
               <table>
@@ -142,7 +142,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         <CustomIcon iconName={'good'} />
                       </AlignCenter>
                     </th>
-                    <td>{vt.point(eventSchedule.answerIcons.good.point)}</td>
+                    <td>{dc.point(eventSchedule.answerIcons.good.point)}</td>
                     <td>{dict.common.colon}</td>
                     <td>{eventSchedule.answerIcons.good.description}</td>
                   </tr>
@@ -152,7 +152,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         <CustomIcon iconName={'fair'} />
                       </AlignCenter>
                     </th>
-                    <td>{vt.point(eventSchedule.answerIcons.fair.point)}</td>
+                    <td>{dc.point(eventSchedule.answerIcons.fair.point)}</td>
                     <td>{dict.common.colon}</td>
                     <td>{eventSchedule.answerIcons.fair.description}</td>
                   </tr>
@@ -162,7 +162,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                         <CustomIcon iconName={'poor'} />
                       </AlignCenter>
                     </th>
-                    <td>{vt.point(eventSchedule.answerIcons.poor.point)}</td>
+                    <td>{dc.point(eventSchedule.answerIcons.poor.point)}</td>
                     <td>{dict.common.colon}</td>
                     <td>{eventSchedule.answerIcons.poor.description}</td>
                   </tr>
@@ -170,7 +170,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               </table>
               <NoteForPointOfFair>
                 {IList.map(
-                  vt.noteForPointOfFair(eventSchedule.answerIcons.fair.point),
+                  dc.noteForPointOfFair(eventSchedule.answerIcons.fair.point),
                   (s, i) => (
                     <Description key={i} text={s} />
                   )
@@ -183,7 +183,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 <Button
                   icon='add'
                   intent='primary'
-                  text={vt.answers.addAnswer}
+                  text={dc.answers.addAnswer}
                   onClick={onAddAnswerButtonClick}
                 />
               </ButtonsWrapperAlignEnd>
@@ -196,8 +196,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               <Section
                 sectionTitle={
                   answerBeingEditedSectionState === 'creating'
-                    ? vt.answerBeingEdited.title.create
-                    : vt.answerBeingEdited.title.update
+                    ? dc.answerBeingEdited.title.create
+                    : dc.answerBeingEdited.title.update
                 }
                 onCloseClick={onCancel}
               >

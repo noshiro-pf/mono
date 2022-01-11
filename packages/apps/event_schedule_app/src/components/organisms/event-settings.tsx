@@ -12,7 +12,7 @@ import { AnswerIconSettingsComponent } from './icon-settings';
 import { NotificationSettingsComponent } from './notification-settings';
 import { ParagraphWithSwitch } from './paragraph-with-switch';
 
-const vt = dict.eventSettingsPage.section3;
+const dc = dict.eventSettingsPage.section3;
 
 type Props = Readonly<{
   useAnswerDeadline: boolean;
@@ -60,7 +60,7 @@ export const EventSettings = memoNamed<Props>(
     return (
       <Root>
         <ParagraphWithSwitch
-          description={vt.answerDeadline.howAnswerDeadlineIsUsed}
+          description={dc.answerDeadline.howAnswerDeadlineIsUsed}
           disabledInsteadOfHidden={true}
           elementToToggle={
             <AnswerDeadlineDatepicker
@@ -70,7 +70,7 @@ export const EventSettings = memoNamed<Props>(
             />
           }
           show={useAnswerDeadline}
-          title={vt.answerDeadline.title}
+          title={dc.answerDeadline.title}
           onToggle={onToggleAnswerDeadline}
         />
         <hr />
@@ -87,7 +87,7 @@ export const EventSettings = memoNamed<Props>(
             />
           }
           show={useNotification}
-          title={vt.notification.useNotification}
+          title={dc.notification.useNotification}
           onToggle={onToggleUseNotificationLocal}
         />
         <hr />

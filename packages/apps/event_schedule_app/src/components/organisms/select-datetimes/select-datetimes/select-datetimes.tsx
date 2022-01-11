@@ -20,6 +20,8 @@ import { DeleteAllButton } from '../../button-with-confirm';
 import { SetTimesPopover } from '../set-times-popover';
 import { SelectedDatetimeRow } from './selected-datetime-row';
 
+const dc = dict.eventSettingsPage.section2;
+
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
@@ -27,8 +29,6 @@ type Props = Readonly<{
   onDatetimeListChange: (list: readonly DatetimeRange[]) => void;
   holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
-
-const vt = dict.eventSettingsPage.section2;
 
 type CastedHandlerType = (value: string) => void;
 
@@ -56,7 +56,7 @@ export const SelectDatetimes = memoNamed<Props>(
       <Root>
         <div>
           <DatetimeSpecificationSelectWrapper>
-            <div>{vt.datetimeSpecification}</div>
+            <div>{dc.datetimeSpecification}</div>
             <BpSelect
               options={selectorOptions}
               value={datetimeSpecification}
@@ -98,7 +98,7 @@ export const SelectDatetimes = memoNamed<Props>(
             <Button
               icon='sort-asc'
               intent='primary'
-              text={vt.sortDatetimes}
+              text={dc.sortDatetimes}
               onClick={onSortClick}
             />
           </ButtonsWrapper>

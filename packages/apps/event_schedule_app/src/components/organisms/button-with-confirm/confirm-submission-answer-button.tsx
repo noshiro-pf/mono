@@ -4,6 +4,8 @@ import { dict } from '../../../constants';
 import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';
 
+const dc = dict.answerPage.answerBeingEdited;
+
 type Props = Readonly<{
   hasUnanswered: boolean;
   onConfirmSubmissionOfAnswer: () => Promise<void>;
@@ -12,8 +14,6 @@ type Props = Readonly<{
   mode: 'creating' | 'editing';
 }>;
 
-const vt = dict.answerPage.answerBeingEdited;
-
 const buttonConfigBase = {
   icon: 'tick',
   intent: 'primary',
@@ -21,33 +21,33 @@ const buttonConfigBase = {
 
 const buttonConfigCreating = {
   ...buttonConfigBase,
-  name: vt.submitButton.create,
+  name: dc.submitButton.create,
 } as const;
 
 const buttonConfigEditing = {
   ...buttonConfigBase,
-  name: vt.submitButton.update,
+  name: dc.submitButton.update,
 } as const;
 
 const dialogConfigBase = {
   icon: 'confirm',
   intent: 'primary',
-  message: vt.submitButton.confirmPartiallyUnanswered,
+  message: dc.submitButton.confirmPartiallyUnanswered,
   cancelButtonText: dict.common.buttonText.cancel,
 } as const;
 
 const dialogConfigCreating = {
   ...dialogConfigBase,
-  confirmButtonText: vt.submitButton.create,
+  confirmButtonText: dc.submitButton.create,
 } as const;
 
 const dialogConfigEditing = {
   ...dialogConfigBase,
-  confirmButtonText: vt.submitButton.update,
+  confirmButtonText: dc.submitButton.update,
 } as const;
 
 const toastConfig = {
-  message: vt.deleteButton.deleteAnswerResultMessage,
+  message: dc.deleteButton.deleteAnswerResultMessage,
   intent: 'success',
 } as const;
 
@@ -88,8 +88,8 @@ const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
       intent='primary'
       loading={loading}
       text={match(mode, {
-        creating: vt.submitButton.create,
-        editing: vt.submitButton.update,
+        creating: dc.submitButton.create,
+        editing: dc.submitButton.update,
       })}
       onClick={onConfirmSubmissionOfAnswer}
     />
