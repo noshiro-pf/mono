@@ -15,7 +15,7 @@ export const getEventSchedule = async (
     }
     return Result.ok(fillEventSchedule(res.data()));
   } catch (e: unknown) {
-    console.log(e);
+    console.error(e);
     return Result.err('others');
   }
 };

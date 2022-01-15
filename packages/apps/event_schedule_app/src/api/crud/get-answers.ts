@@ -26,7 +26,7 @@ export const getAnswers = async (
       )
     );
   } catch (e: unknown) {
-    console.log(e);
+    console.error(e);
     return Result.err('others');
   }
 };

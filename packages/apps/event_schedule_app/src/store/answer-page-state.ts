@@ -183,24 +183,8 @@ answersResult$.subscribe((e) => {
   }
 });
 
-fetchEventScheduleThrottled$.subscribe(() => {
-  clog('fetchEventScheduleThrottled$');
-});
-
-fetchAnswersThrottled$.subscribe(() => {
-  clog('fetchAnswers$');
-});
-
 eventScheduleResult$.subscribe((e) => {
   if (Result.isErr(e)) {
     clog('eventScheduleResult', e);
   }
-});
-
-answers$.subscribe((e) => {
-  clog('answers$', e);
-});
-
-eventSchedule$.subscribe((e) => {
-  clog('eventSchedule$', e);
 });
