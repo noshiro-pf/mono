@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useSignInPageState } from '../../hooks';
 import { BpInput } from '../bp';
+import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
 
 const dc = dict.register;
@@ -16,6 +17,8 @@ export const SignInPage = memoNamed('SignInPage', () => {
     enterClickHandler,
     inputEmailHandler,
     inputPasswordHandler,
+    showPassword,
+    handleLockClick,
   } = useSignInPageState();
 
   const emailFormIntent: Intent =
@@ -43,7 +46,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                 disabled={state.isWaitingResponse}
                 intent={emailFormIntent}
                 placeholder={'sample@gmail.com'}
-                type='email'
+                type={'email'}
                 value={state.inputValue.email}
                 onValueChange={inputEmailHandler}
               />
@@ -58,7 +61,14 @@ export const SignInPage = memoNamed('SignInPage', () => {
               <BpInput
                 disabled={state.isWaitingResponse}
                 intent={passwordFormIntent}
-                type='password'
+                rightElement={
+                  <LockButton
+                    disabled={state.isWaitingResponse}
+                    showPassword={showPassword}
+                    onLockClick={handleLockClick}
+                  />
+                }
+                type={showPassword ? 'text' : 'password'}
                 value={state.inputValue.password}
                 onValueChange={inputPasswordHandler}
               />
@@ -70,8 +80,8 @@ export const SignInPage = memoNamed('SignInPage', () => {
           <ButtonWrapper>
             <Button
               disabled={hasError || state.isWaitingResponse}
-              intent='primary'
-              type='submit'
+              intent={'primary'}
+              type={'submit'}
               onClick={enterClickHandler}
             >
               {state.isWaitingResponse ? (

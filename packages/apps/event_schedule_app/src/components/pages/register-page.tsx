@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useRegisterPageState } from '../../hooks';
 import { BpInput } from '../bp';
+import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
 
 const dc = dict.register;
@@ -18,6 +19,8 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
     inputEmailHandler,
     inputPasswordHandler,
     inputPasswordConfirmationHandler,
+    showPassword,
+    handleLockClick,
   } = useRegisterPageState();
 
   const emailFormIntent: Intent =
@@ -43,7 +46,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 autoFocus={true}
                 disabled={state.isWaitingResponse}
                 intent={'primary'}
-                type='text'
+                type={'text'}
                 value={state.inputValue.username}
                 onValueChange={inputUsernameHandler}
               />
@@ -59,7 +62,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 disabled={state.isWaitingResponse}
                 intent={emailFormIntent}
                 placeholder={'sample@gmail.com'}
-                type='email'
+                type={'email'}
                 value={state.inputValue.email}
                 onValueChange={inputEmailHandler}
               />
@@ -74,7 +77,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               <BpInput
                 disabled={state.isWaitingResponse}
                 intent={passwordFormIntent}
-                type='password'
+                type={'password'}
                 value={state.inputValue.password}
                 onValueChange={inputPasswordHandler}
               />
@@ -89,7 +92,14 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               <BpInput
                 disabled={state.isWaitingResponse}
                 intent={passwordFormIntent}
-                type='password'
+                rightElement={
+                  <LockButton
+                    disabled={state.isWaitingResponse}
+                    showPassword={showPassword}
+                    onLockClick={handleLockClick}
+                  />
+                }
+                type={showPassword ? 'text' : 'password'}
                 value={state.inputValue.passwordConfirmation}
                 onValueChange={inputPasswordConfirmationHandler}
               />
@@ -101,8 +111,8 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
           <ButtonWrapper>
             <Button
               disabled={hasError || state.isWaitingResponse}
-              intent='primary'
-              type='submit'
+              intent={'primary'}
+              type={'submit'}
               onClick={enterClickHandler}
             >
               {state.isWaitingResponse ? (

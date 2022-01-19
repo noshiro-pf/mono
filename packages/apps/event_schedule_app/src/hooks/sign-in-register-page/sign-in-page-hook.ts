@@ -1,4 +1,4 @@
-import { useAsyncReducer } from '@noshiro/react-utils';
+import { useAsyncReducer, useToggleState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
@@ -18,6 +18,8 @@ export const useSignInPageState = (): DeepReadonly<{
   enterClickHandler: () => void;
   inputEmailHandler: (value: string) => void;
   inputPasswordHandler: (value: string) => void;
+  showPassword: boolean;
+  handleLockClick: () => void;
 }> => {
   const [state, dispatch] = useAsyncReducer(
     signInPageStateReducer,
@@ -94,11 +96,15 @@ export const useSignInPageState = (): DeepReadonly<{
 
   const hasError = useMemo(() => signInPageHasError(state), [state]);
 
+  const [showPassword, handleLockClick] = useToggleState(false);
+
   return {
     state,
     hasError,
     enterClickHandler,
     inputEmailHandler,
     inputPasswordHandler,
+    showPassword,
+    handleLockClick,
   };
 };
