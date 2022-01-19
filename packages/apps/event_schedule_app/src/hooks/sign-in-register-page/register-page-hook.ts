@@ -19,6 +19,7 @@ export const useRegisterPageState = (): DeepReadonly<{
   inputEmailHandler: (value: string) => void;
   inputPasswordHandler: (value: string) => void;
   inputUsernameHandler: (value: string) => void;
+  inputPasswordConfirmationHandler: (value: string) => void;
 }> => {
   const [state, dispatch] = useAsyncReducer(
     registerPageStateReducer,
@@ -98,6 +99,16 @@ export const useRegisterPageState = (): DeepReadonly<{
       .catch(console.error);
   }, [pageToBack, dispatch]);
 
+  const inputUsernameHandler = useCallback(
+    (value: string) => {
+      dispatch({
+        type: 'inputUsername',
+        payload: value,
+      }).catch(console.error);
+    },
+    [dispatch]
+  );
+
   const inputEmailHandler = useCallback(
     (value: string) => {
       dispatch({
@@ -118,10 +129,10 @@ export const useRegisterPageState = (): DeepReadonly<{
     [dispatch]
   );
 
-  const inputUsernameHandler = useCallback(
+  const inputPasswordConfirmationHandler = useCallback(
     (value: string) => {
       dispatch({
-        type: 'inputUsername',
+        type: 'inputPasswordConfirmation',
         payload: value,
       }).catch(console.error);
     },
@@ -137,5 +148,6 @@ export const useRegisterPageState = (): DeepReadonly<{
     inputEmailHandler,
     inputPasswordHandler,
     inputUsernameHandler,
+    inputPasswordConfirmationHandler,
   };
 };

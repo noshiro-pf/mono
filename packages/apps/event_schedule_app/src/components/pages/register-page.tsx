@@ -14,16 +14,20 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
     state,
     hasError,
     enterClickHandler,
+    inputUsernameHandler,
     inputEmailHandler,
     inputPasswordHandler,
-    inputUsernameHandler,
+    inputPasswordConfirmationHandler,
   } = useRegisterPageState();
 
   const emailFormIntent: Intent =
     state.error.email === undefined ? 'primary' : 'danger';
 
   const passwordFormIntent: Intent =
-    state.error.password === undefined ? 'primary' : 'danger';
+    state.error.password === undefined &&
+    state.error.passwordConfirmation === undefined
+      ? 'primary'
+      : 'danger';
 
   return (
     <Wrapper>
@@ -31,7 +35,20 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
 
       <Centering>
         <FormRect>
+          <Title>{dc.title.register}</Title>
           <FormGroups>
+            <Label>{dc.username}</Label>
+            <FormGroup intent={'none'} label={''}>
+              <BpInput
+                autoFocus={true}
+                disabled={state.isWaitingResponse}
+                intent={'primary'}
+                type='text'
+                value={state.inputValue.username}
+                onValueChange={inputUsernameHandler}
+              />
+            </FormGroup>
+
             <Label>{dc.email}</Label>
             <FormGroup
               helperText={state.error.email}
@@ -39,7 +56,6 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               label={''}
             >
               <BpInput
-                autoFocus={true}
                 disabled={state.isWaitingResponse}
                 intent={emailFormIntent}
                 placeholder={'sample@gmail.com'}
@@ -64,14 +80,18 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               />
             </FormGroup>
 
-            <Label>{dc.username}</Label>
-            <FormGroup intent={'none'} label={''}>
+            <Label>{dc.verifyPassword}</Label>
+            <FormGroup
+              helperText={state.error.passwordConfirmation}
+              intent={passwordFormIntent}
+              label={''}
+            >
               <BpInput
                 disabled={state.isWaitingResponse}
-                intent={'primary'}
-                type='text'
-                value={state.inputValue.username}
-                onValueChange={inputUsernameHandler}
+                intent={passwordFormIntent}
+                type='password'
+                value={state.inputValue.passwordConfirmation}
+                onValueChange={inputPasswordConfirmationHandler}
               />
             </FormGroup>
 
@@ -113,7 +133,8 @@ const Centering = styled.div`
 
 const FormRect = styled.div`
   width: 400px;
-  height: 400px;
+  height: 500px;
+  min-height: max-content;
   border-radius: 10px;
   background-color: white;
   filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
@@ -122,6 +143,10 @@ const FormRect = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const Title = styled.h1`
+  margin-bottom: 20px;
 `;
 
 const FormGroups = styled.div`

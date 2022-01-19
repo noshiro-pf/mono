@@ -30,6 +30,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
 
       <Centering>
         <FormRect>
+          <Title>{dc.title.signIn}</Title>
           <FormGroups>
             <Label>{dc.email}</Label>
             <FormGroup
@@ -102,6 +103,7 @@ const Centering = styled.div`
 const FormRect = styled.div`
   width: 400px;
   height: 400px;
+  min-height: max-content;
   border-radius: 10px;
   background-color: white;
   filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
@@ -110,6 +112,10 @@ const FormRect = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const Title = styled.h1`
+  margin-bottom: 20px;
 `;
 
 const FormGroups = styled.div`

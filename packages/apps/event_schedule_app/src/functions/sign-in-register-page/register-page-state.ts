@@ -10,14 +10,16 @@ import type { SignInPageStateAction } from './sign-in-page-state';
 
 export type RegisterPageState = DeepReadonly<{
   inputValue: {
+    username: string;
     email: string;
     password: string;
-    username: string;
+    passwordConfirmation: string;
   };
   error: {
+    username: string | undefined;
     email: string | undefined;
     password: string | undefined;
-    username: string | undefined;
+    passwordConfirmation: string | undefined;
     others: string | undefined;
   };
   isWaitingResponse: boolean;
@@ -25,14 +27,16 @@ export type RegisterPageState = DeepReadonly<{
 
 export const registerPageInitialState = {
   inputValue: {
+    username: '',
     email: '',
     password: '',
-    username: '',
+    passwordConfirmation: '',
   },
   error: {
+    username: undefined,
     email: undefined,
     password: undefined,
-    username: undefined,
+    passwordConfirmation: undefined,
     others: undefined,
   },
   isWaitingResponse: false,
@@ -47,6 +51,10 @@ export const registerPageHasError = (state: RegisterPageState): boolean =>
 export type RegisterPageStateAction = DeepReadonly<
   | SignInPageStateAction
   | (
+      | {
+          type: 'inputPasswordConfirmation';
+          payload: string;
+        }
       | {
           type: 'inputUsername';
           payload: string;
@@ -66,12 +74,18 @@ export const registerPageStateReducer: Reducer<
 > = (state, action) => {
   switch (action.type) {
     case 'clickEnterButton': {
+      const hasEmailError = !isEmailString(state.inputValue.email);
+      const hasPasswordError =
+        state.inputValue.password !== state.inputValue.passwordConfirmation;
+
       const localErrors: RegisterPageState['error'] = {
-        email: !isEmailString(state.inputValue.email)
-          ? dict.common.error.invalidEmail
-          : undefined,
-        password: undefined,
         username: undefined,
+        email: hasEmailError ? dict.common.error.invalidEmail : undefined,
+        password: undefined,
+        passwordConfirmation:
+          hasPasswordError && !hasEmailError
+            ? dict.common.error.passwordNotMatch
+            : undefined,
         others: undefined,
       };
       return {
@@ -86,9 +100,8 @@ export const registerPageStateReducer: Reducer<
 
       return {
         inputValue: {
+          ...state.inputValue,
           email: emailInputValue,
-          password: state.inputValue.password,
-          username: state.inputValue.username,
         },
         error: emptyError,
         isWaitingResponse: false,
@@ -100,7 +113,7 @@ export const registerPageStateReducer: Reducer<
 
       return {
         inputValue: {
-          email: state.inputValue.email,
+          ...state.inputValue,
           password:
             // if the last operation is backspace
             Object.values(state.error).some(isNotUndefined) &&
@@ -109,7 +122,26 @@ export const registerPageStateReducer: Reducer<
             state.inputValue.password.slice(0, -1) === passwordInputValue
               ? ''
               : passwordInputValue,
-          username: state.inputValue.username,
+        },
+        error: emptyError,
+        isWaitingResponse: false,
+      };
+    }
+
+    case 'inputPasswordConfirmation': {
+      const passwordInputValue = action.payload;
+
+      return {
+        inputValue: {
+          ...state.inputValue,
+          passwordConfirmation:
+            // if the last operation is backspace
+            Object.values(state.error).some(isNotUndefined) &&
+            state.inputValue.password.length ===
+              passwordInputValue.length + 1 &&
+            state.inputValue.password.slice(0, -1) === passwordInputValue
+              ? ''
+              : passwordInputValue,
         },
         error: emptyError,
         isWaitingResponse: false,
@@ -121,8 +153,7 @@ export const registerPageStateReducer: Reducer<
 
       return {
         inputValue: {
-          email: state.inputValue.email,
-          password: state.inputValue.password,
+          ...state.inputValue,
           username: usernameInputValue,
         },
         error: emptyError,
