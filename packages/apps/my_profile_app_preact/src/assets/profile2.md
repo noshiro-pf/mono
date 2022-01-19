@@ -4,12 +4,16 @@
 
 -   Web アプリケーション開発（大学 3 年生くらいから）
     -   React でウェブアプリケーションを作ったり、 discord bot 作ったり。
--   ピアノ（9 歳から、東京大学ピアノの会 OB）
+        → <a href="../products">Products</a>
 -   ゲーム
     -   ボードゲーム
+    -   Splatoon
     -   将棋（将棋ウォーズ二段）
     -   麻雀
-    -   電子ゲームも（Splatoon 2 とか）
+-   ピアノ（9 歳から、東京大学ピアノの会 OB）
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/klYr8LiMLlQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HdkvPGr69z0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## プログラミング関連
 
@@ -42,15 +46,14 @@
     -   ウェブフロントエンドの状態管理ノウハウがあります。アプリケーションの規模や特性に応じた技術選択ができます。
         -   Elm のような React より厳格なフレームワークと比較したときの React の柔軟性と便利さも重要だと思っています。
             基本的に中央集権管理しつつもコンポーネント内部状態も有効な場面では使うことで React のメリットを最大限引き出せる設計を目指しています。
-        -   直近開発した趣味開発の React／Preact アプリでは、自作ライブラリ「SyncFlow」と専用 React hooks を用いて実装しています。あまり詳しくありませんが、 Recoil に似た開発体験だと思います。
-    -   React 上で WebGL ライブラリ Pixi.js を使ってキャンバス操作を高速化した矩形アノテーションツールを作った経験があります（Vdom に頼らない状態管理を実装することができます）。
+        -   直近開発した趣味開発の React／Preact アプリでは、自作ライブラリ「SyncFlow」と専用 React hooks を用いて実装しています。 Recoil に似た開発体験だと思います。
+    -   React 上で WebGL ライブラリ Pixi.js を使ってキャンバス操作を高速化した矩形アノテーションツールを作ったことがあります（VDom に頼らない状態管理を実装したりしました）。 （→ <a href="../products">Products</a> の「アノテーションツール」）
     -   yarn workspaces を使った mono repo の開発環境構築ノウハウがあります。
         -   Node.js 環境・ブラウザ環境両方に対応した TypeScript ライブラリを作り、普段からメンテしています。
-    -   React・Preact のアプリをビルドする webpack config を TypeScript でゼロから書けます。
+        -   webpack config を TypeScript で書いて運用しています。
+        -   CI: 趣味開発では TypeScript のコードはほぼすべて[mono repo](https://github.com/noshiro-pf/mono)で管理しています。このレポジトリ内では GitHub Actions を用いてすべてのパッケージで build, lint, test を走らせるようにしています。
+    -   git: 普段から趣味開発でも業務でもコミットを整理して見やすい PR ・ history を作ることを心がけています。
     -   Angular はあまり好きではありませんが使用できます。
--   git
-    -   普段から趣味開発でも業務でもコミットを整理して見やすい PR ・ history を作ることを心がけています。
-    -   趣味開発では TypeScript のコードはほぼすべて[mono repo](https://github.com/noshiro-pf/mono)で管理しています。このレポジトリ内では GitHub Actions を用いてすべてのパッケージで build, lint, test を走らせるようにしています。
 -   そのほかの言語などの経験
     -   大学時代は C++をメインで書いていたのでメモリ管理や定数倍高速化を意識したコードを書くことができます。
         -   大学の卒論では [ZDD](https://en.wikipedia.org/wiki/Zero-suppressed_decision_diagram) と呼ばれるデータ構造を改造したものを C++でフルスクラッチ実装（数千行程度）して実験に使用したりしていました。当時使ったバージョンは C++11 だったと思います。
@@ -61,4 +64,3 @@
 
 -   マルチタスク（ヘビーなタスクに長期間・長時間持続的に取り組むことは得意だが、切り替えはやや苦手）
 -   ミスをシステマティックに防げない作業、それを改善できない環境（注意力に頼る割合が多い作業は苦手でストレスなので）
--   早起き
