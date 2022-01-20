@@ -1,6 +1,7 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { Result } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
@@ -43,20 +44,30 @@ export const useEditEventScheduleHooks = ({
     setIsLoadingTrue();
     api.event
       .update(eventId, newEventSchedule)
-      .then(() => {
+      .then((res) => {
         if (!alive.current) return;
+
+        if (Result.isErr(res)) {
+          console.error(res.value);
+        }
+
         setIsLoadingFalse();
         fetchAnswers();
         fetchEventSchedule();
         onBackToAnswerPage();
         showToast({
           toast,
-          message: dict.eventSettingsPage.editEventResultMessage,
+          message: dict.eventSettingsPage.editEventResultMessage.success,
           intent: 'success',
         });
       })
       .catch((error) => {
         console.error('Error creating event schedule: ', error);
+        showToast({
+          toast,
+          message: dict.eventSettingsPage.editEventResultMessage.error,
+          intent: 'danger',
+        });
       });
   }, [
     eventScheduleValidationOk,

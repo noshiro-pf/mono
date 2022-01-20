@@ -1,26 +1,20 @@
 import { createState } from '@noshiro/syncflow';
+import type { User } from 'firebase/auth';
 import { routes } from '../constants';
 import { auth } from '../initialize-firebase';
+import { clog } from '../utils';
 import { router } from './router';
 
-export const [user$, setUser] = createState<UserSummary | undefined>(undefined);
+const [user$, setUser] = createState<DeepReadonly<User> | undefined>(undefined);
+export { user$ };
 
-export type UserSummary = DeepReadonly<{
-  id: string;
-  name: string;
-  email: string;
-}>;
+export const emitAuthStateChange = (): void => {
+  setUser(auth.currentUser ?? undefined);
+};
 
 auth.onAuthStateChanged((user) => {
-  setUser(
-    user === null || user.displayName === null || user.email === null
-      ? undefined
-      : {
-          id: user.uid,
-          name: user.displayName,
-          email: user.email,
-        }
-  );
+  clog('onAuthStateChanged', user);
+  setUser(user ?? undefined);
 });
 
 export const signOut = async (): Promise<void> => {

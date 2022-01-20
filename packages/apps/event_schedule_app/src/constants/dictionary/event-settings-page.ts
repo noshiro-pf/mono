@@ -5,7 +5,8 @@ export const eventSettingsPageDictionary = {
   editSubTitle: (title: string) => `イベント「${title}」の設定編集`,
   section1: {
     titleAndNotesSectionTitle: 'イベント名・ノートを入力してください。（1/3）',
-    eventName: 'イベント名（必須項目）',
+    eventName: 'イベント名',
+    eventNameInfo: '（必須項目）',
     eventNamePlaceholder: 'ボードゲーム会',
     notes: 'ノート',
     notesPlaceholder: '日程を回答してください。',
@@ -66,7 +67,10 @@ export const eventSettingsPageDictionary = {
   },
   createEventButton: '日程調整ページを作成',
   editEventButton: 'イベント設定を更新',
-  editEventResultMessage: 'イベント設定を更新しました。',
+  editEventResultMessage: {
+    success: 'イベント設定を更新しました。',
+    error: 'イベント設定の更新中にエラーが発生しました。',
+  },
   resetButton: {
     name: 'リセット',
     resetConfirmation:

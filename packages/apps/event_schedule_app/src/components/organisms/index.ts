@@ -15,3 +15,4 @@ export * from './navbar';
 export * from './notification-settings';
 export * from './paragraph-with-switch';
 export * from './select-datetimes';
+export * from './update-user-info-dialog';

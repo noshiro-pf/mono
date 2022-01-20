@@ -27,7 +27,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
     <DialogWithMaxWidth
       canEscapeKeyClose={false}
       hasBackdrop={false}
-      icon='timeline-events'
+      icon={'timeline-events'}
       isCloseButtonShown={false}
       isOpen={props.isOpen}
       title={props.isLoading ? dc.titleLoading : dc.title}
@@ -43,8 +43,8 @@ export const CreateEventResultDialog = memoNamed<Props>(
               <AnchorWrapper>
                 <Anchor
                   href={props.url}
-                  rel='noopener noreferrer'
-                  target='_blank'
+                  rel={'noopener noreferrer'}
+                  target={'_blank'}
                 >
                   {props.url}
                 </Anchor>
@@ -65,14 +65,19 @@ export const CreateEventResultDialog = memoNamed<Props>(
       {props.isLoading ? undefined : (
         <div className={Classes.DIALOG_FOOTER}>
           <ButtonsWrapperAlignEnd>
-            <AnchorButton intent={'none'} onClick={props.close}>
+            <Button
+              disabled={props.isLoading}
+              intent={'none'}
+              onClick={props.close}
+            >
               {dc.back}
-            </AnchorButton>
+            </Button>
             <AnchorButton
               href={props.url}
               intent={'primary'}
-              rel='noopener noreferrer'
-              target='_blank'
+              loading={props.isLoading}
+              rel={'noopener noreferrer'}
+              target={'_blank'}
             >
               {dc.openEventPageCreated}
             </AnchorButton>

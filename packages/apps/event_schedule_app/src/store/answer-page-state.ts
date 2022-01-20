@@ -36,11 +36,16 @@ const fetchAnswersThrottled$ = fetchAnswers$.chain(
 );
 
 const [eventScheduleResult$, setEventScheduleResult] = createState<
-  Result<EventSchedule, 'not-found' | 'others'> | undefined
+  | Result<
+      EventSchedule,
+      Readonly<{ type: 'not-found' | 'others'; message: string }>
+    >
+  | undefined
 >(undefined);
 
 const [answersResult$, setAnswersResult] = createState<
-  Result<readonly Answer[], 'not-found' | 'others'> | undefined
+  | Result<readonly Answer[], Readonly<{ type: 'others'; message: string }>>
+  | undefined
 >(undefined);
 
 combineLatest([
@@ -89,9 +94,17 @@ const requiredParticipantsExist$: InitializedObservable<boolean> =
   );
 
 const errorType$: InitializedObservable<
-  | Readonly<{ data: 'answersResult'; type: 'not-found' | 'others' }>
-  | Readonly<{ data: 'eventScheduleResult'; type: 'not-found' | 'others' }>
-  | undefined
+  DeepReadonly<
+    | {
+        data: 'answersResult';
+        type: { type: 'others'; message: string };
+      }
+    | {
+        data: 'eventScheduleResult';
+        type: { type: 'not-found' | 'others'; message: string };
+      }
+    | undefined
+  >
 > = combineLatest([eventScheduleResult$, answersResult$] as const)
   .chain(
     map(([esr, ar]) =>
@@ -179,7 +192,7 @@ eventScheduleResult$.subscribe((e) => {
 
 answersResult$.subscribe((e) => {
   if (Result.isErr(e)) {
-    clog('answersResult', e);
+    clog('answersResult', e.value);
   }
 });
 

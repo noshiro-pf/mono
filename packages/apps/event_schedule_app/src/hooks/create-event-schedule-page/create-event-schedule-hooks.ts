@@ -1,6 +1,6 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
-import { toAbsolutePath } from '@noshiro/ts-utils';
+import { Result, toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../api';
 import { routes } from '../../constants';
@@ -42,10 +42,13 @@ export const useCreateEventScheduleHooks = ({
     openCreateResultDialog();
     api.event
       .add(newEventSchedule)
-      .then((id) => {
+      .then((res) => {
         if (!alive.current) return;
+        if (Result.isErr(res)) {
+          console.error(res.value);
+        }
         setIsLoadingFalse();
-        setUrl(toAbsolutePath(`..${routes.answerPage(id)}`));
+        setUrl(toAbsolutePath(`..${routes.answerPage(res.value)}`));
       })
       .catch((error) => {
         console.error('Error creating event schedule: ', error);

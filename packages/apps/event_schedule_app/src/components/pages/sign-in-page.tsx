@@ -1,13 +1,9 @@
-import type { Intent } from '@blueprintjs/core';
-import { Button, FormGroup, Spinner } from '@blueprintjs/core';
-import {
-  memoNamed,
-  useBooleanState,
-  useToggleState,
-} from '@noshiro/react-utils';
+import { Button, FormGroup } from '@blueprintjs/core';
+import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
-import { useSignInPageState } from '../../hooks';
+import { useResetPasswordPageState, useSignInPageState } from '../../hooks';
+import { Label } from '../atoms';
 import { BpInput } from '../bp';
 import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
@@ -16,25 +12,13 @@ const dc = dict.register;
 
 const returnFalse = (): false => false;
 
-export const SignInPage = memoNamed('S ignInPage', () => {
-  const {
-    state,
-    hasError,
-    enterClickHandler,
-    inputEmailHandler,
-    inputPasswordHandler,
-  } = useSignInPageState();
+export const SignInPage = memoNamed('SignInPage', () => {
+  const signInState = useSignInPageState();
 
-  const emailFormIntent: Intent =
-    state.error.email === undefined ? 'primary' : 'danger';
-
-  const passwordFormIntent: Intent =
-    state.error.password === undefined ? 'primary' : 'danger';
-
-  const [showPassword, handleLockClick] = useToggleState(false);
-
-  const [isPasswordResetForm, showPasswordResetForm, hidePasswordResetForm] =
+  const [isPasswordResetForm, passwordIsOpenResetForm, hidePasswordResetForm] =
     useBooleanState(false);
+
+  const resetPasswordState = useResetPasswordPageState();
 
   return (
     <Wrapper>
@@ -43,76 +27,117 @@ export const SignInPage = memoNamed('S ignInPage', () => {
       <Centering>
         <FormRect onSubmit={returnFalse}>
           {isPasswordResetForm ? (
-            <BackButtonWrapper>
-              <Button onClick={hidePasswordResetForm}> {'戻る'}</Button>
-            </BackButtonWrapper>
-          ) : undefined}
-          <Title>{dc.title.signIn}</Title>
-          <FormGroups>
-            <Label>{dc.email}</Label>
-            <FormGroup
-              helperText={state.error.email}
-              intent={emailFormIntent}
-              label={''}
-            >
-              <BpInput
-                autoComplete={'email'}
-                autoFocus={true}
-                disabled={state.isWaitingResponse}
-                intent={emailFormIntent}
-                placeholder={'sample@gmail.com'}
-                type={'email'}
-                value={state.inputValue.email}
-                onValueChange={inputEmailHandler}
-              />
-            </FormGroup>
+            <>
+              <BackButtonWrapper>
+                <Button
+                  icon={'chevron-left'}
+                  intent={'none'}
+                  minimal={true}
+                  onClick={hidePasswordResetForm}
+                >
+                  {dc.resetPasswordMode.back}
+                </Button>
+              </BackButtonWrapper>
 
-            <Label>{dc.password}</Label>
-            <FormGroup
-              helperText={state.error.password}
-              intent={passwordFormIntent}
-              label={''}
-            >
-              <BpInput
-                autoComplete={'current-password'}
-                disabled={state.isWaitingResponse}
-                intent={passwordFormIntent}
-                rightElement={
-                  <LockButton
-                    disabled={state.isWaitingResponse}
-                    showPassword={showPassword}
-                    onLockClick={handleLockClick}
+              <Title>{dc.resetPasswordMode.title}</Title>
+
+              <FormGroups>
+                <FormGroup
+                  helperText={resetPasswordState.state.email.error}
+                  intent={resetPasswordState.emailFormIntent}
+                  label={<Label>{dc.email}</Label>}
+                >
+                  <BpInput
+                    autoComplete={'email'}
+                    autoFocus={true}
+                    disabled={resetPasswordState.state.isWaitingResponse}
+                    intent={resetPasswordState.emailFormIntent}
+                    type={'email'}
+                    value={resetPasswordState.state.email.inputValue}
+                    onValueChange={resetPasswordState.inputEmailHandler}
                   />
-                }
-                type={showPassword ? 'text' : 'password'}
-                value={state.inputValue.password}
-                onValueChange={inputPasswordHandler}
-              />
-            </FormGroup>
+                </FormGroup>
+              </FormGroups>
 
-            <ErrorMessage>{state.error.others}</ErrorMessage>
-          </FormGroups>
+              <ButtonWrapper>
+                <Button
+                  disabled={resetPasswordState.enterButtonDisabled}
+                  intent={'primary'}
+                  loading={resetPasswordState.state.isWaitingResponse}
+                  type={'submit'}
+                  onClick={resetPasswordState.enterClickHandler}
+                >
+                  {dc.resetPasswordMode.submit}
+                </Button>
+              </ButtonWrapper>
+            </>
+          ) : (
+            <>
+              <Title>{dc.title.signIn}</Title>
+              <FormGroups>
+                <FormGroup
+                  helperText={signInState.state.email.error}
+                  intent={signInState.emailFormIntent}
+                  label={<Label>{dc.email}</Label>}
+                >
+                  <BpInput
+                    autoComplete={'email'}
+                    autoFocus={true}
+                    disabled={signInState.state.isWaitingResponse}
+                    intent={signInState.emailFormIntent}
+                    placeholder={'sample@gmail.com'}
+                    type={'email'}
+                    value={signInState.state.email.inputValue}
+                    onValueChange={signInState.inputEmailHandler}
+                  />
+                </FormGroup>
 
-          <PasswordResetWrapper>
-            <PasswordReset onClick={showPasswordResetForm}>
-              {dc.resetPassword}
-            </PasswordReset>
-          </PasswordResetWrapper>
+                <FormGroup
+                  helperText={signInState.state.password.error}
+                  intent={signInState.passwordFormIntent}
+                  label={<Label>{dc.password}</Label>}
+                >
+                  <BpInput
+                    autoComplete={'current-password'}
+                    disabled={signInState.state.isWaitingResponse}
+                    intent={signInState.passwordFormIntent}
+                    rightElement={
+                      <LockButton
+                        disabled={signInState.state.isWaitingResponse}
+                        passwordIsOpen={signInState.passwordIsOpen}
+                        onLockClick={signInState.togglePasswordLock}
+                      />
+                    }
+                    type={signInState.passwordIsOpen ? 'text' : 'password'}
+                    value={signInState.state.password.inputValue}
+                    onValueChange={signInState.inputPasswordHandler}
+                  />
+                </FormGroup>
 
-          <ButtonWrapper>
-            <Button
-              disabled={hasError || state.isWaitingResponse}
-              intent={'primary'}
-              type={'submit'}
-              onClick={enterClickHandler}
-            >
-              {state.isWaitingResponse ? (
-                <Spinner size={20} />
-              ) : (
-                <span>{dc.signInButton}</span>
-              )}
-            </Button>
-          </ButtonWrapper>
+                <OtherErrorMessages>
+                  {signInState.state.otherErrors}
+                </OtherErrorMessages>
+              </FormGroups>
+
+              <PasswordResetWrapper>
+                <PasswordReset onClick={passwordIsOpenResetForm}>
+                  {dc.resetPassword}
+                </PasswordReset>
+              </PasswordResetWrapper>
+
+              <ButtonWrapper>
+                <Button
+                  disabled={signInState.enterButtonDisabled}
+                  intent={'primary'}
+                  loading={signInState.state.isWaitingResponse}
+                  type={'submit'}
+                  onClick={signInState.enterClickHandler}
+                >
+                  {dc.signInButton}
+                </Button>
+              </ButtonWrapper>
+            </>
+          )}
         </FormRect>
       </Centering>
     </Wrapper>
@@ -134,13 +159,13 @@ const Centering = styled.div`
 
 const FormRect = styled.form`
   width: 400px;
-  height: 400px;
+  height: 440px;
   min-height: max-content;
   border-radius: 10px;
   background-color: white;
   filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
 
-  padding: 40px 20px;
+  padding: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,8 +175,8 @@ const FormRect = styled.form`
 
 const BackButtonWrapper = styled.div`
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 10px;
+  left: 10px;
 `;
 
 const Title = styled.h1`
@@ -164,12 +189,6 @@ const FormGroups = styled.div`
   max-width: 220px;
 `;
 
-const Label = styled.div`
-  color: #757575;
-  font-size: 12px;
-  margin-bottom: 5px;
-`;
-
 const PasswordResetWrapper = styled.div`
   margin: 10px;
 `;
@@ -177,14 +196,17 @@ const PasswordResetWrapper = styled.div`
 const PasswordReset = styled.div`
   color: #106ba3;
   cursor: pointer;
+  font-size: 12px;
 `;
 
 const ButtonWrapper = styled.div`
   margin: 10px;
 `;
 
-const ErrorMessage = styled.div`
+const OtherErrorMessages = styled.div`
   color: red;
   font-size: 12px;
   margin: 10px 0;
+  max-height: 50px;
+  overflow-y: auto;
 `;

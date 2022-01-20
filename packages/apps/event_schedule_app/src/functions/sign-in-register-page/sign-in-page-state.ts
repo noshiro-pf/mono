@@ -1,162 +1,118 @@
-import {
-  assertType,
-  isEmailString,
-  isNotUndefined,
-  isUndefined,
-} from '@noshiro/ts-utils';
+import { assertType, IRecord } from '@noshiro/ts-utils';
 import type { Reducer } from 'react';
-import { dict } from '../../constants';
+import type { EmailInputState, InputState } from '../input-state';
+import {
+  emailInputHasError,
+  emailInputInitialState,
+  emailInputStateReducer,
+  inputHasError,
+  inputInitialState,
+  inputStateReducer,
+} from '../input-state';
 
 export type SignInPageState = DeepReadonly<{
-  inputValue: {
-    email: string;
-    password: string;
-  };
-  error: {
-    email: string | undefined;
-    password: string | undefined;
-    others: string | undefined;
-  };
+  email: EmailInputState;
+  password: InputState;
+  otherErrors: string | undefined;
   isWaitingResponse: boolean;
 }>;
 
 export const signInPageInitialState = {
-  inputValue: {
-    email: '',
-    password: '',
-  },
-  error: {
-    email: undefined,
-    password: undefined,
-    others: undefined,
-  },
+  email: emailInputInitialState,
+  password: inputInitialState,
+  otherErrors: undefined,
   isWaitingResponse: false,
 } as const;
 
 assertType<TypeExtends<typeof signInPageInitialState, SignInPageState>>();
 
 export const signInPageHasError = (state: SignInPageState): boolean =>
-  Object.values(state.error).some(isNotUndefined) ||
-  Object.values(state.inputValue).some((s) => s === '');
+  emailInputHasError(state.email) ||
+  inputHasError(state.password) ||
+  state.otherErrors !== undefined;
 
 export type SignInPageStateAction = DeepReadonly<
-  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
-  | {
-      type: 'inputEmail';
-      payload: string;
-    }
-  | {
-      type: 'inputPassword';
-      payload: string;
-    }
-  | {
-      type: 'setEmailError';
-      payload: string;
-    }
-  | {
-      type: 'setPasswordError';
-      payload: string;
-    }
-  | {
-      type: 'setOtherError';
-      payload: string;
-    }
-  | {
-      type: 'clickEnterButton';
-      payload: undefined;
-    }
-  | { type: 'success' }
+  | { type: 'done' }
+  | { type: 'inputEmail'; payload: string }
+  | { type: 'inputPassword'; payload: string }
+  | { type: 'setEmailError'; payload: string }
+  | { type: 'setOtherError'; payload: string }
+  | { type: 'setPasswordError'; payload: string }
+  | { type: 'submit' }
 >;
-
-const emptyError = signInPageInitialState.error;
 
 export const signInPageStateReducer: Reducer<
   SignInPageState,
   SignInPageStateAction
 > = (state, action) => {
   switch (action.type) {
-    case 'clickEnterButton': {
-      const localErrors: SignInPageState['error'] = {
-        email: !isEmailString(state.inputValue.email)
-          ? dict.common.error.invalidEmail
-          : undefined,
-        password: undefined,
-        others: undefined,
-      };
-      return {
-        inputValue: state.inputValue,
-        error: localErrors,
-        isWaitingResponse: Object.values(localErrors).every(isUndefined),
-      };
-    }
-
-    case 'inputEmail': {
-      const emailInputValue = action.payload;
-
-      return {
-        inputValue: {
-          email: emailInputValue,
-          password: state.inputValue.password,
-        },
-        error: emptyError,
-        isWaitingResponse: false,
-      };
-    }
-
-    case 'inputPassword': {
-      const passwordInputValue = action.payload;
-
-      return {
-        inputValue: {
-          email: state.inputValue.email,
-          password:
-            // if the last operation is backspace
-            Object.values(state.error).some(isNotUndefined) &&
-            state.inputValue.password.length ===
-              passwordInputValue.length + 1 &&
-            state.inputValue.password.slice(0, -1) === passwordInputValue
-              ? ''
-              : passwordInputValue,
-        },
-        error: emptyError,
-        isWaitingResponse: false,
-      };
-    }
+    case 'inputEmail':
+      return IRecord.set(
+        state,
+        'email',
+        emailInputStateReducer(state.email, {
+          type: 'input',
+          payload: action.payload,
+        })
+      );
 
     case 'setEmailError':
       return {
-        inputValue: state.inputValue,
-        error: {
-          ...state.error,
-          email: action.payload,
-        },
+        email: emailInputStateReducer(state.email, {
+          type: 'setError',
+          payload: action.payload,
+        }),
+        password: state.password,
+        otherErrors: state.otherErrors,
         isWaitingResponse: false,
       };
 
+    case 'inputPassword':
+      return IRecord.set(
+        state,
+        'password',
+        inputStateReducer(state.password, {
+          type: 'input',
+          payload: action.payload,
+        })
+      );
+
     case 'setPasswordError':
       return {
-        inputValue: state.inputValue,
-        error: {
-          ...state.error,
-          password: action.payload,
-        },
+        email: state.email,
+        password: inputStateReducer(state.password, {
+          type: 'setError',
+          payload: action.payload,
+        }),
+        otherErrors: state.otherErrors,
         isWaitingResponse: false,
       };
 
     case 'setOtherError':
       return {
-        inputValue: state.inputValue,
-        error: {
-          ...state.error,
-          others: action.payload,
-        },
+        email: state.email,
+        password: state.password,
+        otherErrors: action.payload,
         isWaitingResponse: false,
       };
 
-    case 'success':
+    case 'submit': {
+      const emailNextState = emailInputStateReducer(state.email, {
+        type: 'submit',
+      });
+      const passwordNextState = state.password;
+
       return {
-        ...state,
-        isWaitingResponse: false,
+        email: emailNextState,
+        password: passwordNextState,
+        otherErrors: undefined,
+        isWaitingResponse:
+          !emailInputHasError(emailNextState) &&
+          !inputHasError(passwordNextState),
       };
+    }
+
+    case 'done':
+      return IRecord.set(state, 'isWaitingResponse', false);
   }
 };

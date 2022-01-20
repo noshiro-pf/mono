@@ -14,19 +14,19 @@ export type BpPasswordInputProps = BpInputProps &
 export const BpPasswordInput = memoNamed<BpPasswordInputProps>(
   'BpPasswordInput',
   (props) => {
-    const [showPassword, onToggleVisibilityClick] = useToggleState(false);
+    const [passwordIsOpen, onToggleVisibilityClick] = useToggleState(false);
 
     return (
       <BpInput
         disabled={props.disabled}
         rightElement={
           <Button
-            icon={showPassword ? 'eye-open' : 'eye-off'}
+            icon={passwordIsOpen ? 'eye-open' : 'eye-off'}
             minimal={true}
             onClick={onToggleVisibilityClick}
           />
         }
-        type={showPassword ? 'text' : 'password'}
+        type={passwordIsOpen ? 'text' : 'password'}
         value={props.password}
         onValueChange={props.onPasswordChange}
       />

@@ -9,7 +9,7 @@ import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useAlive } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
-import { IRecord } from '@noshiro/ts-utils';
+import { IRecord, Result } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api';
@@ -34,10 +34,16 @@ type AnswerPageState = DeepReadonly<{
   eventId: string | undefined;
   eventSchedule: EventSchedule | undefined;
   onEditButtonClick: () => void;
-  answers: readonly Answer[] | undefined;
+  answers: Answer[] | undefined;
   errorType:
-    | { data: 'answersResult'; type: 'not-found' | 'others' }
-    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
+    | {
+        data: 'answersResult';
+        type: { type: 'others'; message: string };
+      }
+    | {
+        data: 'eventScheduleResult';
+        type: { type: 'not-found' | 'others'; message: string };
+      }
     | undefined;
   onAnswerClick: (answer: Answer) => void;
   onAddAnswerButtonClick: () => void;
@@ -144,8 +150,13 @@ export const useAnswerPageState = (): AnswerPageState => {
       case 'creating':
         await api.answers
           .add(eventId, IRecord.set(answerBeingEdited, 'createdAt', Date.now()))
-          .then(() => {
+          .then((res) => {
             if (!alive.current) return;
+
+            if (Result.isErr(res)) {
+              console.error(res.value);
+            }
+
             setSubmitButtonIsLoading(false);
             setAnswerBeingEditedSectionState('hidden');
             fetchAnswers();
@@ -157,14 +168,17 @@ export const useAnswerPageState = (): AnswerPageState => {
                   .createAnswerResultMessage,
               intent: 'success',
             });
-          })
-          .catch(console.error);
+          });
         break;
       case 'editing':
         await api.answers
           .update(eventId, answerBeingEdited.id, answerBeingEdited)
-          .then(() => {
+          .then((res) => {
             if (!alive.current) return;
+
+            if (Result.isErr(res)) {
+              console.error(res.value);
+            }
             setSubmitButtonIsLoading(false);
             setAnswerBeingEditedSectionState('hidden');
             fetchAnswers();
@@ -176,8 +190,7 @@ export const useAnswerPageState = (): AnswerPageState => {
                   .updateAnswerResultMessage,
               intent: 'success',
             });
-          })
-          .catch(console.error);
+          });
         break;
       case 'hidden':
         break;
@@ -194,16 +207,16 @@ export const useAnswerPageState = (): AnswerPageState => {
     if (eventId === undefined) return;
     if (!alive.current) return;
     setSubmitButtonIsLoading(true);
-    await api.answers
-      .delete(eventId, answerBeingEdited.id)
-      .then(() => {
-        if (!alive.current) return;
-        setSubmitButtonIsLoading(false);
-        setAnswerBeingEditedSectionState('hidden');
-        fetchAnswers();
-        clearAnswerBeingEditedFields();
-      })
-      .catch(console.error);
+    await api.answers.delete(eventId, answerBeingEdited.id).then((res) => {
+      if (!alive.current) return;
+      if (Result.isErr(res)) {
+        console.error(res.value);
+      }
+      setSubmitButtonIsLoading(false);
+      setAnswerBeingEditedSectionState('hidden');
+      fetchAnswers();
+      clearAnswerBeingEditedFields();
+    });
   }, [answerBeingEdited.id, eventId, alive, clearAnswerBeingEditedFields]);
 
   const isExpired = useMemo<boolean>(

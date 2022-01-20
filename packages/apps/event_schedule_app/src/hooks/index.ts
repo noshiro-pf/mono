@@ -6,5 +6,6 @@ export * from './create-event-schedule-page';
 export * from './multiple-date-picker-hooks';
 export * from './select-datetimes-component';
 export * from './sign-in-register-page';
+export * from './update-user-info-dialog';
 export * from './use-form-error-hook';
 export * from './use-toggle-section-state';

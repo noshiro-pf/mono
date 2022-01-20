@@ -3,18 +3,18 @@ import { memoNamed } from '@noshiro/react-utils';
 
 export const LockButton = memoNamed<
   Readonly<{
-    showPassword: boolean;
+    passwordIsOpen: boolean;
     disabled: boolean;
     onLockClick: () => void;
   }>
->('LockButton', ({ showPassword, disabled, onLockClick }) => (
+>('LockButton', ({ passwordIsOpen, disabled, onLockClick }) => (
   <Tooltip
-    content={`${showPassword ? 'Hide' : 'Show'} Password`}
+    content={`${passwordIsOpen ? 'Hide' : 'Show'} Password`}
     disabled={disabled}
   >
     <Button
       disabled={disabled}
-      icon={showPassword ? 'unlock' : 'lock'}
+      icon={passwordIsOpen ? 'unlock' : 'lock'}
       intent={'warning'}
       minimal={true}
       onClick={onLockClick}

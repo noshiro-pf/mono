@@ -1,4 +1,5 @@
-import { useAsyncReducer } from '@noshiro/react-utils';
+import type { Intent } from '@blueprintjs/core';
+import { useAsyncReducer, useToggleState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
@@ -14,10 +15,14 @@ import { router } from '../../store';
 
 export const useSignInPageState = (): DeepReadonly<{
   state: SignInPageState;
-  hasError: boolean;
   enterClickHandler: () => void;
   inputEmailHandler: (value: string) => void;
   inputPasswordHandler: (value: string) => void;
+  emailFormIntent: Intent;
+  passwordFormIntent: Intent;
+  passwordIsOpen: boolean;
+  togglePasswordLock: () => void;
+  enterButtonDisabled: boolean;
 }> => {
   const [state, dispatch] = useAsyncReducer(
     signInPageStateReducer,
@@ -26,51 +31,57 @@ export const useSignInPageState = (): DeepReadonly<{
 
   const pageToBack = useStreamValue(router.pageToBack$);
 
-  const enterClickHandler = useCallback(() => {
-    dispatch({
-      type: 'clickEnterButton',
-      payload: undefined,
-    })
-      .then(async (s) => {
-        if (signInPageHasError(s)) return undefined;
+  const enterButtonDisabled: boolean = useMemo(
+    () => state.isWaitingResponse || signInPageHasError(state),
+    [state]
+  );
 
-        const signInResult = await signIn(
-          s.inputValue.email,
-          s.inputValue.password
-        );
+  const enterClickHandler = useCallback(async () => {
+    if (enterButtonDisabled) return;
 
-        if (Result.isErr(signInResult)) {
-          switch (signInResult.value.code) {
-            case 'auth/user-not-found':
-              return dispatch({
-                type: 'setEmailError',
-                payload: dict.register.error.userNotFound,
-              });
-            case 'auth/wrong-password':
-              return dispatch({
-                type: 'setPasswordError',
-                payload: dict.register.error.wrongPassword,
-              });
-            default:
-              return dispatch({
-                type: 'setOtherError',
-                payload: signInResult.value.message,
-              });
-          }
-        }
+    const s = await dispatch({ type: 'submit' });
 
-        const res = dispatch({ type: 'success' });
+    if (signInPageHasError(s)) return;
 
-        if (pageToBack !== undefined) {
-          router.redirect(pageToBack);
-        } else {
-          router.redirect(routes.createPage);
-        }
+    const signInResult = await signIn(
+      s.email.inputValue,
+      s.password.inputValue
+    );
 
-        return res;
-      })
-      .catch(console.error);
-  }, [pageToBack, dispatch]);
+    if (Result.isErr(signInResult)) {
+      switch (signInResult.value.code) {
+        case 'auth/user-not-found':
+          await dispatch({
+            type: 'setEmailError',
+            payload: dict.register.error.userNotFound,
+          });
+          return;
+
+        case 'auth/wrong-password':
+          await dispatch({
+            type: 'setPasswordError',
+            payload: dict.register.error.wrongPassword,
+          });
+          return;
+
+        default:
+          console.error(signInResult.value);
+          await dispatch({
+            type: 'setOtherError',
+            payload: signInResult.value.message,
+          });
+          return;
+      }
+    }
+
+    await dispatch({ type: 'done' });
+
+    if (pageToBack !== undefined) {
+      router.redirect(pageToBack);
+    } else {
+      router.redirect(routes.createPage);
+    }
+  }, [enterButtonDisabled, pageToBack, dispatch]);
 
   const inputEmailHandler = useCallback(
     (value: string) => {
@@ -92,13 +103,23 @@ export const useSignInPageState = (): DeepReadonly<{
     [dispatch]
   );
 
-  const hasError = useMemo(() => signInPageHasError(state), [state]);
+  const emailFormIntent: Intent =
+    state.email.error === undefined ? 'primary' : 'danger';
+
+  const passwordFormIntent: Intent =
+    state.password.error === undefined ? 'primary' : 'danger';
+
+  const [passwordIsOpen, togglePasswordLock] = useToggleState(false);
 
   return {
     state,
-    hasError,
     enterClickHandler,
     inputEmailHandler,
     inputPasswordHandler,
+    emailFormIntent,
+    passwordFormIntent,
+    passwordIsOpen,
+    togglePasswordLock,
+    enterButtonDisabled,
   };
 };

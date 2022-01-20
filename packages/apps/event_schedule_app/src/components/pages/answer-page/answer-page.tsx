@@ -47,7 +47,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     holidaysJpDefinition,
   } = useAnswerPageState();
 
-  return errorType !== undefined && errorType.type === 'not-found' ? (
+  return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
     <div>

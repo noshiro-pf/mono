@@ -1,4 +1,5 @@
-import { useAsyncReducer } from '@noshiro/react-utils';
+import type { Intent } from '@blueprintjs/core';
+import { useAsyncReducer, useToggleState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
@@ -10,16 +11,21 @@ import {
   registerPageInitialState,
   registerPageStateReducer,
 } from '../../functions';
-import { router, setUser } from '../../store';
+import { router } from '../../store';
 
 export const useRegisterPageState = (): DeepReadonly<{
   state: RegisterPageState;
-  hasError: boolean;
   enterClickHandler: () => void;
   inputEmailHandler: (value: string) => void;
   inputPasswordHandler: (value: string) => void;
   inputUsernameHandler: (value: string) => void;
   inputPasswordConfirmationHandler: (value: string) => void;
+  usernameFormIntent: Intent;
+  emailFormIntent: Intent;
+  passwordFormIntent: Intent;
+  passwordIsOpen: boolean;
+  togglePasswordLock: () => void;
+  enterButtonDisabled: boolean;
 }> => {
   const [state, dispatch] = useAsyncReducer(
     registerPageStateReducer,
@@ -28,76 +34,80 @@ export const useRegisterPageState = (): DeepReadonly<{
 
   const pageToBack = useStreamValue(router.pageToBack$);
 
-  const enterClickHandler = useCallback(() => {
-    dispatch({
-      type: 'clickEnterButton',
-      payload: undefined,
-    })
-      .then(async (s) => {
-        if (registerPageHasError(s)) return undefined;
+  const enterButtonDisabled: boolean = useMemo(
+    () => state.isWaitingResponse || registerPageHasError(state),
+    [state]
+  );
 
-        const createUserResult = await createUser(
-          s.inputValue.email,
-          s.inputValue.password
-        );
+  const enterClickHandler = useCallback(async (): Promise<void> => {
+    if (enterButtonDisabled) return;
 
-        if (Result.isErr(createUserResult)) {
-          switch (createUserResult.value.code) {
-            case 'auth/invalid-email':
-              return dispatch({
-                type: 'setEmailError',
-                payload: dict.register.error.invalidEmail,
-              });
-            case 'auth/email-already-in-use':
-              return dispatch({
-                type: 'setEmailError',
-                payload: dict.register.error.emailAlreadyExists,
-              });
-            case 'auth/weak-password':
-              return dispatch({
-                type: 'setPasswordError',
-                payload: dict.register.error.invalidPassword,
-              });
-            default:
-              return dispatch({
-                type: 'setOtherError',
-                payload: createUserResult.value.message,
-              });
-          }
-        }
+    const s = await dispatch({ type: 'submit' });
 
-        const user = createUserResult.value.user;
+    if (registerPageHasError(s)) return;
 
-        const [updateProfileResult] = await Promise.all([
-          setDisplayName(user, s.inputValue.username),
-          sendEmailVerification(user),
-        ]);
+    const createUserResult = await createUser(
+      s.email.inputValue,
+      s.password.password.inputValue
+    );
 
-        if (Result.isErr(updateProfileResult)) {
-          return dispatch({
-            type: 'setUsernameError',
-            payload: updateProfileResult.value.message,
+    if (Result.isErr(createUserResult)) {
+      switch (createUserResult.value.code) {
+        case 'auth/invalid-email':
+          await dispatch({
+            type: 'setEmailError',
+            payload: dict.register.error.invalidEmail,
           });
-        }
+          return;
 
-        setUser({
-          email: s.inputValue.email,
-          name: s.inputValue.username,
-          id: user.uid,
-        });
+        case 'auth/email-already-in-use':
+          await dispatch({
+            type: 'setEmailError',
+            payload: dict.register.error.emailAlreadyInUse,
+          });
+          return;
 
-        const res = dispatch({ type: 'success' });
+        case 'auth/weak-password':
+          await dispatch({
+            type: 'setPasswordError',
+            payload: dict.register.error.weakPassword,
+          });
+          return;
 
-        if (pageToBack !== undefined) {
-          router.redirect(pageToBack);
-        } else {
-          router.redirect(routes.createPage);
-        }
+        default:
+          console.error(createUserResult.value);
+          await dispatch({
+            type: 'setOtherError',
+            payload: createUserResult.value.message,
+          });
+          return;
+      }
+    }
 
-        return res;
-      })
-      .catch(console.error);
-  }, [pageToBack, dispatch]);
+    const user = createUserResult.value.user;
+
+    const [updateProfileResult] = await Promise.all([
+      setDisplayName(user, s.username.inputValue),
+      sendEmailVerification(user),
+    ]);
+
+    if (Result.isErr(updateProfileResult)) {
+      console.error(updateProfileResult.value);
+      await dispatch({
+        type: 'setUsernameError',
+        payload: updateProfileResult.value.message,
+      });
+      return;
+    }
+
+    await dispatch({ type: 'done' });
+
+    if (pageToBack !== undefined) {
+      router.redirect(pageToBack);
+    } else {
+      router.redirect(routes.createPage);
+    }
+  }, [enterButtonDisabled, pageToBack, dispatch]);
 
   const inputUsernameHandler = useCallback(
     (value: string) => {
@@ -139,15 +149,32 @@ export const useRegisterPageState = (): DeepReadonly<{
     [dispatch]
   );
 
-  const hasError = useMemo(() => registerPageHasError(state), [state]);
+  const usernameFormIntent: Intent =
+    state.username.error === undefined ? 'primary' : 'danger';
+
+  const emailFormIntent: Intent =
+    state.email.error === undefined ? 'primary' : 'danger';
+
+  const passwordFormIntent: Intent =
+    state.password.password.error === undefined &&
+    state.password.passwordConfirmation.error === undefined
+      ? 'primary'
+      : 'danger';
+
+  const [passwordIsOpen, togglePasswordLock] = useToggleState(false);
 
   return {
     state,
-    hasError,
     enterClickHandler,
     inputEmailHandler,
     inputPasswordHandler,
     inputUsernameHandler,
     inputPasswordConfirmationHandler,
+    usernameFormIntent,
+    emailFormIntent,
+    passwordFormIntent,
+    passwordIsOpen,
+    togglePasswordLock,
+    enterButtonDisabled,
   };
 };

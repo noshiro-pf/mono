@@ -1,3 +1,4 @@
+export * from './account-settings';
 export * from './answer-page';
 export * from './common';
 export * from './create-event-result-dialog';

@@ -9,8 +9,11 @@ export const headerDictionary = {
     signIn: 'ログイン',
     register: '新規登録',
     menu: {
-      settings: '設定',
-      accountInfo: 'ユーザー情報',
+      accountSettings: 'アカウント設定',
+      changeDisplayName: 'ユーザー名を変更',
+      changeEmail: 'メールアドレスを変更',
+      changePassword: 'パスワードを変更',
+      deleteAccount: 'アカウントを削除',
       signOut: 'ログアウト',
     },
   },

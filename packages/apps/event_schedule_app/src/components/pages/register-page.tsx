@@ -1,9 +1,9 @@
-import type { Intent } from '@blueprintjs/core';
-import { Button, FormGroup, Spinner } from '@blueprintjs/core';
-import { memoNamed, useToggleState } from '@noshiro/react-utils';
+import { Button, FormGroup } from '@blueprintjs/core';
+import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useRegisterPageState } from '../../hooks';
+import { Label } from '../atoms';
 import { BpInput } from '../bp';
 import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
@@ -15,24 +15,18 @@ const returnFalse = (): false => false;
 export const RegisterPage = memoNamed('RegisterPage', () => {
   const {
     state,
-    hasError,
     enterClickHandler,
     inputUsernameHandler,
     inputEmailHandler,
     inputPasswordHandler,
     inputPasswordConfirmationHandler,
+    usernameFormIntent,
+    emailFormIntent,
+    passwordFormIntent,
+    passwordIsOpen,
+    togglePasswordLock,
+    enterButtonDisabled,
   } = useRegisterPageState();
-
-  const emailFormIntent: Intent =
-    state.error.email === undefined ? 'primary' : 'danger';
-
-  const [showPassword, handleLockClick] = useToggleState(false);
-
-  const passwordFormIntent: Intent =
-    state.error.password === undefined &&
-    state.error.passwordConfirmation === undefined
-      ? 'primary'
-      : 'danger';
 
   return (
     <Wrapper>
@@ -42,24 +36,26 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
         <FormRect onSubmit={returnFalse}>
           <Title>{dc.title.register}</Title>
           <FormGroups>
-            <Label>{dc.username}</Label>
-            <FormGroup intent={'none'} label={''}>
+            <FormGroup
+              helperText={state.username.error}
+              intent={usernameFormIntent}
+              label={<Label>{dc.username}</Label>}
+            >
               <BpInput
                 autoComplete={'username'}
                 autoFocus={true}
                 disabled={state.isWaitingResponse}
-                intent={'primary'}
+                intent={usernameFormIntent}
                 type={'text'}
-                value={state.inputValue.username}
+                value={state.username.inputValue}
                 onValueChange={inputUsernameHandler}
               />
             </FormGroup>
 
-            <Label>{dc.email}</Label>
             <FormGroup
-              helperText={state.error.email}
+              helperText={state.email.error}
               intent={emailFormIntent}
-              label={''}
+              label={<Label>{dc.email}</Label>}
             >
               <BpInput
                 autoComplete={'email'}
@@ -67,32 +63,30 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 intent={emailFormIntent}
                 placeholder={'sample@gmail.com'}
                 type={'email'}
-                value={state.inputValue.email}
+                value={state.email.inputValue}
                 onValueChange={inputEmailHandler}
               />
             </FormGroup>
 
-            <Label>{dc.password}</Label>
             <FormGroup
-              helperText={state.error.password}
+              helperText={state.password.password.error}
               intent={passwordFormIntent}
-              label={''}
+              label={<Label>{dc.password}</Label>}
             >
               <BpInput
                 autoComplete={'new-password'}
                 disabled={state.isWaitingResponse}
                 intent={passwordFormIntent}
                 type={'password'}
-                value={state.inputValue.password}
+                value={state.password.password.inputValue}
                 onValueChange={inputPasswordHandler}
               />
             </FormGroup>
 
-            <Label>{dc.verifyPassword}</Label>
             <FormGroup
-              helperText={state.error.passwordConfirmation}
+              helperText={state.password.passwordConfirmation.error}
               intent={passwordFormIntent}
-              label={''}
+              label={<Label>{dc.verifyPassword}</Label>}
             >
               <BpInput
                 disabled={state.isWaitingResponse}
@@ -100,31 +94,28 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 rightElement={
                   <LockButton
                     disabled={state.isWaitingResponse}
-                    showPassword={showPassword}
-                    onLockClick={handleLockClick}
+                    passwordIsOpen={passwordIsOpen}
+                    onLockClick={togglePasswordLock}
                   />
                 }
-                type={showPassword ? 'text' : 'password'}
-                value={state.inputValue.passwordConfirmation}
+                type={passwordIsOpen ? 'text' : 'password'}
+                value={state.password.passwordConfirmation.inputValue}
                 onValueChange={inputPasswordConfirmationHandler}
               />
             </FormGroup>
 
-            <ErrorMessage>{state.error.others}</ErrorMessage>
+            <OtherErrorMessages>{state.otherErrors}</OtherErrorMessages>
           </FormGroups>
 
           <ButtonWrapper>
             <Button
-              disabled={hasError || state.isWaitingResponse}
+              disabled={enterButtonDisabled}
               intent={'primary'}
+              loading={state.isWaitingResponse}
               type={'submit'}
               onClick={enterClickHandler}
             >
-              {state.isWaitingResponse ? (
-                <Spinner size={20} />
-              ) : (
-                <span>{dc.registerButton}</span>
-              )}
+              {dc.registerButton}
             </Button>
           </ButtonWrapper>
         </FormRect>
@@ -148,13 +139,13 @@ const Centering = styled.div`
 
 const FormRect = styled.form`
   width: 400px;
-  height: 500px;
+  height: 540px;
   min-height: max-content;
   border-radius: 10px;
   background-color: white;
   filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
 
-  padding: 40px 20px;
+  padding: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -170,18 +161,14 @@ const FormGroups = styled.div`
   max-width: 220px;
 `;
 
-const Label = styled.div`
-  color: #757575;
-  font-size: 12px;
-  margin-bottom: 5px;
-`;
-
 const ButtonWrapper = styled.div`
   margin: 10px;
 `;
 
-const ErrorMessage = styled.div`
+const OtherErrorMessages = styled.div`
   color: red;
   font-size: 12px;
   margin: 10px 0;
+  max-height: 50px;
+  overflow-y: auto;
 `;

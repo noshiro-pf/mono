@@ -24,13 +24,13 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
       !editPageIsVisible);
 
   return Result.isErr(eventScheduleResult) &&
-    eventScheduleResult.value === 'not-found' ? (
+    eventScheduleResult.value.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
     <div>
       <Header showCreateNewButton={false} title={dc.title} />
       {Result.isErr(eventScheduleResult) ? (
-        <FetchEventScheduleError errorType={eventScheduleResult.value} />
+        <FetchEventScheduleError errorType={eventScheduleResult.value.type} />
       ) : eventId === undefined || eventScheduleResult === undefined ? (
         <Spinner />
       ) : (

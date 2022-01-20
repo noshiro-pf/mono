@@ -1,52 +1,49 @@
-import {
-  assertType,
-  isEmailString,
-  isNotUndefined,
-  isUndefined,
-} from '@noshiro/ts-utils';
+import { assertType, IRecord } from '@noshiro/ts-utils';
 import type { Reducer } from 'react';
-import { dict } from '../../constants';
+import type {
+  EmailInputState,
+  PasswordWithConfirmationState,
+} from '../input-state';
+import {
+  emailInputHasError,
+  emailInputInitialState,
+  emailInputStateReducer,
+  passwordWithConfirmationHasError,
+  passwordWithConfirmationInitialState,
+  passwordWithConfirmationStateReducer,
+} from '../input-state';
 import type { SignInPageStateAction } from './sign-in-page-state';
 
 export type RegisterPageState = DeepReadonly<{
-  inputValue: {
-    username: string;
-    email: string;
-    password: string;
-    passwordConfirmation: string;
+  username: {
+    inputValue: string;
+    error: string | undefined;
   };
-  error: {
-    username: string | undefined;
-    email: string | undefined;
-    password: string | undefined;
-    passwordConfirmation: string | undefined;
-    others: string | undefined;
-  };
+  email: EmailInputState;
+  password: PasswordWithConfirmationState;
+  otherErrors: string | undefined;
   isWaitingResponse: boolean;
 }>;
 
 export const registerPageInitialState = {
-  inputValue: {
-    username: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
+  username: {
+    inputValue: '',
+    error: undefined,
   },
-  error: {
-    username: undefined,
-    email: undefined,
-    password: undefined,
-    passwordConfirmation: undefined,
-    others: undefined,
-  },
+  email: emailInputInitialState,
+  password: passwordWithConfirmationInitialState,
+  otherErrors: undefined,
   isWaitingResponse: false,
 } as const;
 
 assertType<TypeExtends<typeof registerPageInitialState, RegisterPageState>>();
 
 export const registerPageHasError = (state: RegisterPageState): boolean =>
-  Object.values(state.error).some(isNotUndefined) ||
-  Object.values(state.inputValue).some((s) => s === '');
+  state.username.inputValue === '' ||
+  state.username.error !== undefined ||
+  emailInputHasError(state.email) ||
+  passwordWithConfirmationHasError(state.password) ||
+  state.otherErrors !== undefined;
 
 export type RegisterPageStateAction = DeepReadonly<
   | SignInPageStateAction
@@ -66,145 +63,111 @@ export type RegisterPageStateAction = DeepReadonly<
     )
 >;
 
-const emptyError = registerPageInitialState.error;
-
 export const registerPageStateReducer: Reducer<
   RegisterPageState,
   RegisterPageStateAction
 > = (state, action) => {
   switch (action.type) {
-    case 'clickEnterButton': {
-      const hasEmailError = !isEmailString(state.inputValue.email);
-      const hasPasswordError =
-        state.inputValue.password !== state.inputValue.passwordConfirmation;
-
-      const localErrors: RegisterPageState['error'] = {
-        username: undefined,
-        email: hasEmailError ? dict.common.error.invalidEmail : undefined,
-        password: undefined,
-        passwordConfirmation:
-          hasPasswordError && !hasEmailError
-            ? dict.common.error.passwordNotMatch
-            : undefined,
-        others: undefined,
-      };
-      return {
-        inputValue: state.inputValue,
-        error: localErrors,
-        isWaitingResponse: Object.values(localErrors).every(isUndefined),
-      };
-    }
-
-    case 'inputEmail': {
-      const emailInputValue = action.payload;
-
-      return {
-        inputValue: {
-          ...state.inputValue,
-          email: emailInputValue,
-        },
-        error: emptyError,
-        isWaitingResponse: false,
-      };
-    }
-
-    case 'inputPassword': {
-      const passwordInputValue = action.payload;
-
-      return {
-        inputValue: {
-          ...state.inputValue,
-          password:
-            // if the last operation is backspace
-            Object.values(state.error).some(isNotUndefined) &&
-            state.inputValue.password.length ===
-              passwordInputValue.length + 1 &&
-            state.inputValue.password.slice(0, -1) === passwordInputValue
-              ? ''
-              : passwordInputValue,
-        },
-        error: emptyError,
-        isWaitingResponse: false,
-      };
-    }
-
-    case 'inputPasswordConfirmation': {
-      const passwordInputValue = action.payload;
-
-      return {
-        inputValue: {
-          ...state.inputValue,
-          passwordConfirmation:
-            // if the last operation is backspace
-            Object.values(state.error).some(isNotUndefined) &&
-            state.inputValue.password.length ===
-              passwordInputValue.length + 1 &&
-            state.inputValue.password.slice(0, -1) === passwordInputValue
-              ? ''
-              : passwordInputValue,
-        },
-        error: emptyError,
-        isWaitingResponse: false,
-      };
-    }
-
-    case 'inputUsername': {
-      const usernameInputValue = action.payload;
-
-      return {
-        inputValue: {
-          ...state.inputValue,
-          username: usernameInputValue,
-        },
-        error: emptyError,
-        isWaitingResponse: false,
-      };
-    }
-
-    case 'setEmailError':
-      return {
-        inputValue: state.inputValue,
-        error: {
-          ...state.error,
-          email: action.payload,
-        },
-        isWaitingResponse: false,
-      };
-
-    case 'setPasswordError':
-      return {
-        inputValue: state.inputValue,
-        error: {
-          ...state.error,
-          password: action.payload,
-        },
-        isWaitingResponse: false,
-      };
+    case 'inputUsername':
+      return IRecord.set(state, 'username', {
+        inputValue: action.payload,
+        error: undefined,
+      });
 
     case 'setUsernameError':
       return {
-        inputValue: state.inputValue,
-        error: {
-          ...state.error,
-          username: action.payload,
-        },
+        username: IRecord.set(state.username, 'error', action.payload),
+        email: state.email,
+        password: state.password,
+        otherErrors: state.otherErrors,
         isWaitingResponse: false,
       };
+
+    case 'inputEmail':
+      return IRecord.set(
+        state,
+        'email',
+        emailInputStateReducer(state.email, {
+          type: 'input',
+          payload: action.payload,
+        })
+      );
+
+    case 'setEmailError':
+      return {
+        username: state.username,
+        email: emailInputStateReducer(state.email, {
+          type: 'setError',
+          payload: action.payload,
+        }),
+        password: state.password,
+        otherErrors: state.otherErrors,
+        isWaitingResponse: false,
+      };
+
+    case 'inputPassword':
+      return IRecord.set(
+        state,
+        'password',
+        passwordWithConfirmationStateReducer(state.password, {
+          type: 'inputPassword',
+          payload: action.payload,
+        })
+      );
+
+    case 'setPasswordError':
+      return {
+        username: state.username,
+        email: state.email,
+        password: passwordWithConfirmationStateReducer(state.password, {
+          type: 'setPasswordError',
+          payload: action.payload,
+        }),
+        otherErrors: state.otherErrors,
+        isWaitingResponse: false,
+      };
+
+    case 'inputPasswordConfirmation':
+      return IRecord.set(
+        state,
+        'password',
+        passwordWithConfirmationStateReducer(state.password, {
+          type: 'inputPasswordConfirmation',
+          payload: action.payload,
+        })
+      );
 
     case 'setOtherError':
       return {
-        inputValue: state.inputValue,
-        error: {
-          ...state.error,
-          others: action.payload,
-        },
+        username: state.username,
+        email: state.email,
+        password: state.password,
+        otherErrors: action.payload,
         isWaitingResponse: false,
       };
 
-    case 'success':
+    case 'submit': {
+      const emailNextState = emailInputStateReducer(state.email, {
+        type: 'submit',
+      });
+      const passwordNextState = passwordWithConfirmationStateReducer(
+        state.password,
+        {
+          type: 'submit',
+        }
+      );
       return {
-        ...state,
-        isWaitingResponse: false,
+        username: state.username,
+        email: emailNextState,
+        password: passwordNextState,
+        otherErrors: undefined,
+        isWaitingResponse:
+          !emailInputHasError(emailNextState) &&
+          !passwordWithConfirmationHasError(passwordNextState),
       };
+    }
+
+    case 'done':
+      return IRecord.set(state, 'isWaitingResponse', false);
   }
 };

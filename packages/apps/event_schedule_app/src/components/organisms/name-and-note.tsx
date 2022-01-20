@@ -34,6 +34,7 @@ export const NameAndNotes = memoNamed<Props>(
           }
           intent={showError ? 'danger' : 'primary'}
           label={dc.eventName}
+          labelInfo={dc.eventNameInfo}
         >
           <BpInput
             placeholder={dc.eventNamePlaceholder}

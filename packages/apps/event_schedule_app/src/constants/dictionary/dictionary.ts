@@ -1,3 +1,4 @@
+import { accountSettingsDictionary } from './account-settings';
 import { answerPageDictionary } from './answer-page';
 import { commonDictionary } from './common';
 import { createEventResultDialogDictionary } from './create-event-result-dialog';
@@ -22,4 +23,5 @@ export const dict = {
   errorMessages: errorMessagesDictionary,
   common: commonDictionary,
   register: registerPageDictionary,
+  accountSettings: accountSettingsDictionary,
 } as const;
