@@ -1,6 +1,6 @@
 import type { Intent } from '@blueprintjs/core';
 import { Button, FormGroup, Spinner } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
+import { memoNamed, useToggleState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useRegisterPageState } from '../../hooks';
@@ -9,6 +9,8 @@ import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
 
 const dc = dict.register;
+
+const returnFalse = (): false => false;
 
 export const RegisterPage = memoNamed('RegisterPage', () => {
   const {
@@ -19,12 +21,12 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
     inputEmailHandler,
     inputPasswordHandler,
     inputPasswordConfirmationHandler,
-    showPassword,
-    handleLockClick,
   } = useRegisterPageState();
 
   const emailFormIntent: Intent =
     state.error.email === undefined ? 'primary' : 'danger';
+
+  const [showPassword, handleLockClick] = useToggleState(false);
 
   const passwordFormIntent: Intent =
     state.error.password === undefined &&
@@ -37,12 +39,13 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
       <NavBar />
 
       <Centering>
-        <FormRect>
+        <FormRect onSubmit={returnFalse}>
           <Title>{dc.title.register}</Title>
           <FormGroups>
             <Label>{dc.username}</Label>
             <FormGroup intent={'none'} label={''}>
               <BpInput
+                autoComplete={'username'}
                 autoFocus={true}
                 disabled={state.isWaitingResponse}
                 intent={'primary'}
@@ -59,6 +62,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               label={''}
             >
               <BpInput
+                autoComplete={'email'}
                 disabled={state.isWaitingResponse}
                 intent={emailFormIntent}
                 placeholder={'sample@gmail.com'}
@@ -75,6 +79,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               label={''}
             >
               <BpInput
+                autoComplete={'new-password'}
                 disabled={state.isWaitingResponse}
                 intent={passwordFormIntent}
                 type={'password'}
@@ -141,7 +146,7 @@ const Centering = styled.div`
   flex: 1;
 `;
 
-const FormRect = styled.div`
+const FormRect = styled.form`
   width: 400px;
   height: 500px;
   min-height: max-content;
@@ -166,7 +171,8 @@ const FormGroups = styled.div`
 `;
 
 const Label = styled.div`
-  font-weight: bold;
+  color: #757575;
+  font-size: 12px;
   margin-bottom: 5px;
 `;
 

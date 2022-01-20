@@ -9,6 +9,7 @@ export const registerPageDictionary = {
   },
   registerButton: '新規登録',
   signInButton: 'ログイン',
+  resetPassword: 'パスワードをお忘れの場合',
   error: {
     invalidEmail: '有効なメールアドレスではありません。',
     emailAlreadyExists: 'このメールアドレスは使用されています。',

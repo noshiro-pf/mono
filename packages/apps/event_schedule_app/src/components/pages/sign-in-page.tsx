@@ -1,6 +1,10 @@
 import type { Intent } from '@blueprintjs/core';
 import { Button, FormGroup, Spinner } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
+import {
+  memoNamed,
+  useBooleanState,
+  useToggleState,
+} from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useSignInPageState } from '../../hooks';
@@ -10,15 +14,15 @@ import { NavBar } from '../organisms';
 
 const dc = dict.register;
 
-export const SignInPage = memoNamed('SignInPage', () => {
+const returnFalse = (): false => false;
+
+export const SignInPage = memoNamed('S ignInPage', () => {
   const {
     state,
     hasError,
     enterClickHandler,
     inputEmailHandler,
     inputPasswordHandler,
-    showPassword,
-    handleLockClick,
   } = useSignInPageState();
 
   const emailFormIntent: Intent =
@@ -27,12 +31,22 @@ export const SignInPage = memoNamed('SignInPage', () => {
   const passwordFormIntent: Intent =
     state.error.password === undefined ? 'primary' : 'danger';
 
+  const [showPassword, handleLockClick] = useToggleState(false);
+
+  const [isPasswordResetForm, showPasswordResetForm, hidePasswordResetForm] =
+    useBooleanState(false);
+
   return (
     <Wrapper>
       <NavBar />
 
       <Centering>
-        <FormRect>
+        <FormRect onSubmit={returnFalse}>
+          {isPasswordResetForm ? (
+            <BackButtonWrapper>
+              <Button onClick={hidePasswordResetForm}> {'戻る'}</Button>
+            </BackButtonWrapper>
+          ) : undefined}
           <Title>{dc.title.signIn}</Title>
           <FormGroups>
             <Label>{dc.email}</Label>
@@ -42,6 +56,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
               label={''}
             >
               <BpInput
+                autoComplete={'email'}
                 autoFocus={true}
                 disabled={state.isWaitingResponse}
                 intent={emailFormIntent}
@@ -59,6 +74,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
               label={''}
             >
               <BpInput
+                autoComplete={'current-password'}
                 disabled={state.isWaitingResponse}
                 intent={passwordFormIntent}
                 rightElement={
@@ -76,6 +92,12 @@ export const SignInPage = memoNamed('SignInPage', () => {
 
             <ErrorMessage>{state.error.others}</ErrorMessage>
           </FormGroups>
+
+          <PasswordResetWrapper>
+            <PasswordReset onClick={showPasswordResetForm}>
+              {dc.resetPassword}
+            </PasswordReset>
+          </PasswordResetWrapper>
 
           <ButtonWrapper>
             <Button
@@ -110,7 +132,7 @@ const Centering = styled.div`
   flex: 1;
 `;
 
-const FormRect = styled.div`
+const FormRect = styled.form`
   width: 400px;
   height: 400px;
   min-height: max-content;
@@ -122,6 +144,14 @@ const FormRect = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  position: relative;
+`;
+
+const BackButtonWrapper = styled.div`
+  position: absolute;
+  top: 5px;
+  left: 5px;
 `;
 
 const Title = styled.h1`
@@ -135,8 +165,18 @@ const FormGroups = styled.div`
 `;
 
 const Label = styled.div`
-  font-weight: bold;
+  color: #757575;
+  font-size: 12px;
   margin-bottom: 5px;
+`;
+
+const PasswordResetWrapper = styled.div`
+  margin: 10px;
+`;
+
+const PasswordReset = styled.div`
+  color: #106ba3;
+  cursor: pointer;
 `;
 
 const ButtonWrapper = styled.div`

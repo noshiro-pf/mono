@@ -1,4 +1,4 @@
-import { useAsyncReducer, useToggleState } from '@noshiro/react-utils';
+import { useAsyncReducer } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
@@ -20,8 +20,6 @@ export const useRegisterPageState = (): DeepReadonly<{
   inputPasswordHandler: (value: string) => void;
   inputUsernameHandler: (value: string) => void;
   inputPasswordConfirmationHandler: (value: string) => void;
-  showPassword: boolean;
-  handleLockClick: () => void;
 }> => {
   const [state, dispatch] = useAsyncReducer(
     registerPageStateReducer,
@@ -143,8 +141,6 @@ export const useRegisterPageState = (): DeepReadonly<{
 
   const hasError = useMemo(() => registerPageHasError(state), [state]);
 
-  const [showPassword, handleLockClick] = useToggleState(false);
-
   return {
     state,
     hasError,
@@ -153,7 +149,5 @@ export const useRegisterPageState = (): DeepReadonly<{
     inputPasswordHandler,
     inputUsernameHandler,
     inputPasswordConfirmationHandler,
-    showPassword,
-    handleLockClick,
   };
 };
