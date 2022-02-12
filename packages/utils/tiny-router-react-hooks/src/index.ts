@@ -8,3 +8,4 @@
 export { withSlash } from '@noshiro/tiny-router-observable';
 export type { QueryParams, Router } from '@noshiro/tiny-router-observable';
 export * from './router';
+export * from './use-router-link-click';
