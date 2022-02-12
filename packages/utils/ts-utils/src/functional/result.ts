@@ -35,6 +35,13 @@ export namespace Result {
     (result: _Result<S, E>): _Result<S, E2> =>
       isOk<S, E>(result) ? result : err(mapFn(result.value));
 
+  export const fold =
+    <S, S2, E, E2>(mapFn: (value: S) => S2, mapErrFn: (error: E) => E2) =>
+    (result: _Result<S, E>): _Result<S2, E2> =>
+      isOk<S, E>(result)
+        ? ok(mapFn(result.value))
+        : err(mapErrFn(result.value));
+
   export const unwrapThrow = <S, E>(result: _Result<S, E>): S => {
     if (isErr<S, E>(result)) {
       throw new Error(JSON.stringify(result.value));
@@ -45,18 +52,18 @@ export namespace Result {
   export const unwrapOk = <S, E>(result: _Result<S, E>): S | undefined =>
     isErr<S, E>(result) ? undefined : result.value;
 
-  export const unwrapOkOr =
-    <S, E, D>(defaultValue: D): ((result: _Result<S, E>) => D | S) =>
-    (result: _Result<S, E>): D | S =>
-      isErr<S, E>(result) ? defaultValue : result.value;
+  export const unwrapOkOr = <S, E, D>(
+    result: _Result<S, E>,
+    defaultValue: D
+  ): D | S => (isErr<S, E>(result) ? defaultValue : result.value);
 
   export const unwrapErr = <S, E>(result: _Result<S, E>): E | undefined =>
     isErr<S, E>(result) ? result.value : undefined;
 
-  export const unwrapErrOr =
-    <S, E, D>(defaultValue: D): ((result: _Result<S, E>) => D | E) =>
-    (result: _Result<S, E>): D | E =>
-      isErr<S, E>(result) ? result.value : defaultValue;
+  export const unwrapErrOr = <S, E, D>(
+    result: _Result<S, E>,
+    defaultValue: D
+  ): D | E => (isErr<S, E>(result) ? result.value : defaultValue);
 
   export const expect =
     <S, E>(message: string) =>
