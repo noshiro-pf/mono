@@ -225,6 +225,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           <FormGroup label={dc.comments}>
             <BpTextArea
               fill={true}
+              growVertically={true}
               value={answerBeingEdited.comment}
               onValueChange={onCommentChange}
             />

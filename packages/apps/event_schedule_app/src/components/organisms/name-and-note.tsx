@@ -45,6 +45,7 @@ export const NameAndNotes = memoNamed<Props>(
         <FormGroup intent={'primary'} label={dc.notes}>
           <BpTextArea
             fill={true}
+            growVertically={true}
             placeholder={dc.notesPlaceholder}
             value={notes}
             onValueChange={onNotesChange}
