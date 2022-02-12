@@ -1,5 +1,11 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { filter, map, mapI, pairwise } from '@noshiro/syncflow';
+import {
+  distinctUntilChangedI,
+  filter,
+  map,
+  mapI,
+  pairwise,
+} from '@noshiro/syncflow';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { createRouter } from '@noshiro/tiny-router-observable';
 import { getEventIdFromPathname, isRoute, redirectRules } from '../constants';
@@ -29,13 +35,25 @@ export const router = {
   pageToBack$,
 
   isRoute: {
-    createPage$: pathnameTokens$.chain(mapI(isRoute.createPage)),
-    answerPage$: pathnameTokens$.chain(mapI(isRoute.answerPage)),
-    editPage$: pathnameTokens$.chain(mapI(isRoute.editPage)),
-    registerPage$: pathnameTokens$.chain(mapI(isRoute.registerPage)),
-    signInPage$: pathnameTokens$.chain(mapI(isRoute.signInPage)),
+    createPage$: pathnameTokens$
+      .chain(mapI(isRoute.createPage))
+      .chain(distinctUntilChangedI()),
+    answerPage$: pathnameTokens$
+      .chain(mapI(isRoute.answerPage))
+      .chain(distinctUntilChangedI()),
+    editPage$: pathnameTokens$
+      .chain(mapI(isRoute.editPage))
+      .chain(distinctUntilChangedI()),
+    registerPage$: pathnameTokens$
+      .chain(mapI(isRoute.registerPage))
+      .chain(distinctUntilChangedI()),
+    signInPage$: pathnameTokens$
+      .chain(mapI(isRoute.signInPage))
+      .chain(distinctUntilChangedI()),
   },
-  eventId$: pathnameTokens$.chain(mapI(getEventIdFromPathname)),
+  eventId$: pathnameTokens$
+    .chain(mapI(getEventIdFromPathname))
+    .chain(distinctUntilChangedI()),
 } as const;
 
 export const useShowPage = (): Readonly<{

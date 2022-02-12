@@ -52,15 +52,6 @@ export const passwordWithConfirmationStateReducer: Reducer<
   PasswordWithConfirmationStateAction
 > = (state, action) => {
   switch (action.type) {
-    case 'submit':
-      return IRecord.setIn(
-        state,
-        ['passwordConfirmation', 'error'],
-        state.password.inputValue !== state.passwordConfirmation.inputValue
-          ? dict.common.error.passwordNotMatch
-          : undefined
-      );
-
     case 'inputPassword': {
       const passwordInputValue = action.payload;
 
@@ -121,6 +112,15 @@ export const passwordWithConfirmationStateReducer: Reducer<
         state,
         ['passwordConfirmation', 'error'],
         action.payload
+      );
+
+    case 'submit':
+      return IRecord.setIn(
+        state,
+        ['passwordConfirmation', 'error'],
+        state.password.inputValue !== state.passwordConfirmation.inputValue
+          ? dict.common.error.passwordNotMatch
+          : undefined
       );
   }
 };

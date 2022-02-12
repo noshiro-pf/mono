@@ -31,6 +31,7 @@ export const resetPasswordPageHasError = (
 export type ResetPasswordPageStateAction = DeepReadonly<
   | { type: 'done' }
   | { type: 'inputEmail'; payload: string }
+  | { type: 'reset' }
   | { type: 'setEmailError'; payload: string }
   | { type: 'setOtherError'; payload: string }
   | { type: 'submit' }
@@ -82,5 +83,8 @@ export const resetPasswordPageStateReducer: Reducer<
 
     case 'done':
       return IRecord.set(state, 'isWaitingResponse', false);
+
+    case 'reset':
+      return resetPasswordPageInitialState;
   }
 };

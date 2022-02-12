@@ -3,6 +3,7 @@ import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useRegisterPageState } from '../../hooks';
+import { RegisterPageStore } from '../../store';
 import { Label } from '../atoms';
 import { BpInput } from '../bp';
 import { LockButton } from '../molecules';
@@ -16,15 +17,10 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
   const {
     state,
     enterClickHandler,
-    inputUsernameHandler,
-    inputEmailHandler,
-    inputPasswordHandler,
-    inputPasswordConfirmationHandler,
     usernameFormIntent,
     emailFormIntent,
     passwordFormIntent,
     passwordIsOpen,
-    togglePasswordLock,
     enterButtonDisabled,
   } = useRegisterPageState();
 
@@ -42,13 +38,12 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               label={<Label>{dc.username}</Label>}
             >
               <BpInput
-                autoComplete={'username'}
                 autoFocus={true}
                 disabled={state.isWaitingResponse}
                 intent={usernameFormIntent}
                 type={'text'}
                 value={state.username.inputValue}
-                onValueChange={inputUsernameHandler}
+                onValueChange={RegisterPageStore.inputUsernameHandler}
               />
             </FormGroup>
 
@@ -58,13 +53,13 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               label={<Label>{dc.email}</Label>}
             >
               <BpInput
-                autoComplete={'email'}
+                autoComplete={'username'}
                 disabled={state.isWaitingResponse}
                 intent={emailFormIntent}
                 placeholder={'sample@gmail.com'}
                 type={'email'}
                 value={state.email.inputValue}
-                onValueChange={inputEmailHandler}
+                onValueChange={RegisterPageStore.inputEmailHandler}
               />
             </FormGroup>
 
@@ -79,7 +74,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 intent={passwordFormIntent}
                 type={'password'}
                 value={state.password.password.inputValue}
-                onValueChange={inputPasswordHandler}
+                onValueChange={RegisterPageStore.inputPasswordHandler}
               />
             </FormGroup>
 
@@ -95,12 +90,14 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                   <LockButton
                     disabled={state.isWaitingResponse}
                     passwordIsOpen={passwordIsOpen}
-                    onLockClick={togglePasswordLock}
+                    onLockClick={RegisterPageStore.togglePasswordLock}
                   />
                 }
                 type={passwordIsOpen ? 'text' : 'password'}
                 value={state.password.passwordConfirmation.inputValue}
-                onValueChange={inputPasswordConfirmationHandler}
+                onValueChange={
+                  RegisterPageStore.inputPasswordConfirmationHandler
+                }
               />
             </FormGroup>
 

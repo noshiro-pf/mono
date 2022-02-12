@@ -34,6 +34,7 @@ export const updateDisplayNamePageHasError = (
 export type UpdateDisplayNamePageStateAction = DeepReadonly<
   | { type: 'done' }
   | { type: 'inputDisplayName'; payload: string }
+  | { type: 'reset' }
   | { type: 'setDisplayNameError'; payload: string }
   | { type: 'setOtherError'; payload: string }
   | { type: 'submit' }
@@ -81,5 +82,8 @@ export const updateDisplayNamePageStateReducer: Reducer<
 
     case 'done':
       return IRecord.set(state, 'isWaitingResponse', false);
+
+    case 'reset':
+      return updateDisplayNamePageInitialState;
   }
 };

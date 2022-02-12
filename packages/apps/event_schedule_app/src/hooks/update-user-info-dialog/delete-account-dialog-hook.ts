@@ -2,42 +2,43 @@ import type { Intent } from '@blueprintjs/core';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { User } from 'firebase/auth';
 import { useCallback } from 'react';
-import type { UpdateEmailPageState } from '../../functions';
-import { UpdateEmailPage } from '../../store';
+import type { DeleteAccountPageState } from '../../functions';
+import { DeleteAccountPage, UpdateUserInfoDialogState } from '../../store';
 
-export const useUpdateEmailDialogState = (
+export const useDeleteAccountPageState = (
   user: DeepReadonly<User>
 ): DeepReadonly<{
-  state: UpdateEmailPageState;
+  state: DeleteAccountPageState;
   emailFormIntent: Intent;
   passwordFormIntent: Intent;
   passwordIsOpen: boolean;
   enterButtonDisabled: boolean;
   enterClickHandler: () => void;
 }> => {
-  const state = useStreamValue(UpdateEmailPage.state$);
+  const state = useStreamValue(DeleteAccountPage.state$);
 
   const enterButtonDisabled = useStreamValue(
-    UpdateEmailPage.enterButtonDisabled$
+    DeleteAccountPage.enterButtonDisabled$
   );
 
   const emailFormIntent: Intent = useStreamValue(
-    UpdateEmailPage.emailFormIntent$
+    DeleteAccountPage.emailFormIntent$
   );
 
   const passwordFormIntent: Intent = useStreamValue(
-    UpdateEmailPage.passwordFormIntent$
+    DeleteAccountPage.passwordFormIntent$
   );
 
-  const passwordIsOpen = useStreamValue(UpdateEmailPage.passwordIsOpen$);
+  const passwordIsOpen = useStreamValue(DeleteAccountPage.passwordIsOpen$);
 
   const enterClickHandler = useCallback(async () => {
     if (enterButtonDisabled) return;
 
-    await UpdateEmailPage.submit({
-      newEmail: state.email.inputValue,
-      passwordForCredential: state.password.inputValue,
+    await DeleteAccountPage.submit({
+      email: state.email.inputValue,
+      password: state.password.inputValue,
       user,
+      closeDialog: UpdateUserInfoDialogState.closeDialog,
     });
   }, [state, enterButtonDisabled, user]);
 

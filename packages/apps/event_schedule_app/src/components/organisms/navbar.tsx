@@ -3,13 +3,17 @@ import { AnchorButton, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
-import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { dict, routes } from '../../constants';
 import { isDevelopment } from '../../env';
-import { router, signOut, user$ } from '../../store';
+import { router, signOut, UpdateUserInfoDialogState, user$ } from '../../store';
 import { NoWrapSpan } from '../atoms';
-import { UpdateUserInfoDialog } from './update-user-info-dialog';
+import {
+  DeleteAccountDialog,
+  UpdateDisplayNameDialog,
+  UpdateEmailDialog,
+  UpdatePasswordDialog,
+} from './update-user-info-dialog';
 
 const dc = dict.header;
 
@@ -32,33 +36,9 @@ export const NavBar = memoNamed('NavBar', () => {
     redirectFn: router.redirect,
   });
 
-  const [mode, setMode] = useState<
-    | 'deleteAccount'
-    | 'updateDisplayName'
-    | 'updateEmail'
-    | 'updatePassword'
-    | undefined
-  >(undefined);
-
-  const changeUsername = useCallback(() => {
-    setMode('updateDisplayName');
-  }, []);
-
-  const changeEmail = useCallback(() => {
-    setMode('updateEmail');
-  }, []);
-
-  const changePassword = useCallback(() => {
-    setMode('updatePassword');
-  }, []);
-
-  const deleteAccount = useCallback(() => {
-    setMode('deleteAccount');
-  }, []);
-
-  const closeDialog = useCallback(() => {
-    setMode(undefined);
-  }, []);
+  const openingDialog = useStreamValue(
+    UpdateUserInfoDialogState.openingDialog$
+  );
 
   return (
     <Wrapper>
@@ -99,19 +79,19 @@ export const NavBar = memoNamed('NavBar', () => {
                     <MenuItem text={dc.auth.menu.accountSettings}>
                       <MenuItem
                         text={dc.auth.menu.changeDisplayName}
-                        onClick={changeUsername}
+                        onClick={UpdateUserInfoDialogState.changeUsername}
                       />
                       <MenuItem
                         text={dc.auth.menu.changeEmail}
-                        onClick={changeEmail}
+                        onClick={UpdateUserInfoDialogState.changeEmail}
                       />
                       <MenuItem
                         text={dc.auth.menu.changePassword}
-                        onClick={changePassword}
+                        onClick={UpdateUserInfoDialogState.changePassword}
                       />
                       <MenuItem
                         text={dc.auth.menu.deleteAccount}
-                        onClick={deleteAccount}
+                        onClick={UpdateUserInfoDialogState.deleteAccount}
                       />
                     </MenuItem>
                     <MenuItem text={dc.auth.menu.signOut} onClick={signOut} />
@@ -126,10 +106,21 @@ export const NavBar = memoNamed('NavBar', () => {
               </Popover>
               <span>{dc.auth.userName.suffix}</span>
             </Item>
-            <UpdateUserInfoDialog
-              closeDialog={closeDialog}
-              isOpen={mode !== undefined}
-              mode={mode}
+
+            <UpdateDisplayNameDialog
+              dialogIsOpen={openingDialog === 'updateDisplayName'}
+              user={user}
+            />
+            <UpdateEmailDialog
+              dialogIsOpen={openingDialog === 'updateEmail'}
+              user={user}
+            />
+            <UpdatePasswordDialog
+              dialogIsOpen={openingDialog === 'updatePassword'}
+              user={user}
+            />
+            <DeleteAccountDialog
+              dialogIsOpen={openingDialog === 'deleteAccount'}
               user={user}
             />
           </>

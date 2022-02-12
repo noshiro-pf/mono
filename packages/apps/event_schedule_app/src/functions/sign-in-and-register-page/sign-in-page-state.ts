@@ -35,6 +35,7 @@ export type SignInPageStateAction = DeepReadonly<
   | { type: 'done' }
   | { type: 'inputEmail'; payload: string }
   | { type: 'inputPassword'; payload: string }
+  | { type: 'reset' }
   | { type: 'setEmailError'; payload: string }
   | { type: 'setOtherError'; payload: string }
   | { type: 'setPasswordError'; payload: string }
@@ -100,19 +101,20 @@ export const signInPageStateReducer: Reducer<
       const emailNextState = emailInputStateReducer(state.email, {
         type: 'submit',
       });
-      const passwordNextState = state.password;
 
       return {
         email: emailNextState,
-        password: passwordNextState,
+        password: state.password,
         otherErrors: undefined,
         isWaitingResponse:
-          !emailInputHasError(emailNextState) &&
-          !inputHasError(passwordNextState),
+          !emailInputHasError(emailNextState) && !inputHasError(state.password),
       };
     }
 
     case 'done':
       return IRecord.set(state, 'isWaitingResponse', false);
+
+    case 'reset':
+      return signInPageInitialState;
   }
 };

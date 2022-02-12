@@ -1,4 +1,4 @@
-export const registerPageDictionary = {
+export const signInAndRegisterPageDictionary = {
   username: 'ユーザー名',
   password: 'パスワード',
   verifyPassword: 'パスワード（確認）',
@@ -17,11 +17,22 @@ export const registerPageDictionary = {
       'ご登録頂いたメールアドレスを入力してください。新しいパスワードを発行いたします。',
     submit: '再発行',
   },
-  error: {
-    invalidEmail: '有効なメールアドレスではありません。',
-    emailAlreadyInUse: 'このメールアドレスは使用されています。',
-    weakPassword: 'パスワードは6文字以上で入力してください。',
-    userNotFound: 'ユーザーが見つかりません。',
-    wrongPassword: 'パスワードが間違っています。',
+  message: {
+    success: {
+      register: 'アカウントを作成しました。',
+      signIn: 'ログインしました。',
+      sendPasswordResetEmail: 'パスワードリセットメールを送信しました。',
+    },
+    error: {
+      invalidEmail: '有効なメールアドレスではありません。',
+      emailAlreadyInUse: 'このメールアドレスは使用されています。',
+      weakPassword: 'パスワードは6文字以上で入力してください。',
+      userNotFound: 'ユーザーが見つかりません。',
+      wrongPassword: 'パスワードが間違っています。',
+      unknownErrorOnRegister: 'アカウント作成に失敗しました。',
+      unknownErrorOnSignIn: 'ログインに失敗しました。',
+      unknownErrorOnSendingResetPasswordEmail:
+        'パスワードリセットメールの送信に失敗しました。',
+    },
   },
 } as const;

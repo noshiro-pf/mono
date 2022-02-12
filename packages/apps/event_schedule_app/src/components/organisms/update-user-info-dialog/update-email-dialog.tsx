@@ -4,6 +4,7 @@ import type { User } from 'firebase/auth';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useUpdateEmailDialogState } from '../../../hooks';
+import { UpdateEmailPage, UpdateUserInfoDialogState } from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { LockButton } from '../../molecules';
@@ -13,30 +14,20 @@ const dc = dict.accountSettings;
 
 type Props = DeepReadonly<{
   dialogIsOpen: boolean;
-  closeDialog: () => void;
-  currentEmail: string;
   user: User;
 }>;
 
 export const UpdateEmailDialog = memoNamed<Props>(
   'UpdateEmailDialog',
-  ({ dialogIsOpen, closeDialog, currentEmail, user }) => {
+  ({ dialogIsOpen, user }) => {
     const {
       state,
       enterClickHandler,
-      inputEmailHandler,
-      inputPasswordHandler,
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-      togglePasswordLock,
       enterButtonDisabled,
-    } = useUpdateEmailDialogState(
-      currentEmail,
-      dialogIsOpen,
-      closeDialog,
-      user
-    );
+    } = useUpdateEmailDialogState(user);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -46,12 +37,12 @@ export const UpdateEmailDialog = memoNamed<Props>(
               intent={'none'}
               label={<Label>{dc.updateEmail.currentEmail}</Label>}
             >
-              <div>{currentEmail}</div>
+              <div>{user.email ?? ''}</div>
             </FormGroup>
             <FormGroup
               helperText={state.email.error}
               intent={emailFormIntent}
-              label={<Label>{dc.updateEmail.label}</Label>}
+              label={<Label>{dc.updateEmail.newEmail}</Label>}
             >
               <BpInput
                 autoComplete={'username'}
@@ -60,7 +51,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
                 intent={emailFormIntent}
                 type={'email'}
                 value={state.email.inputValue}
-                onValueChange={inputEmailHandler}
+                onValueChange={UpdateEmailPage.inputEmailHandler}
               />
             </FormGroup>
             <FormGroup
@@ -76,17 +67,17 @@ export const UpdateEmailDialog = memoNamed<Props>(
                   <LockButton
                     disabled={state.isWaitingResponse}
                     passwordIsOpen={passwordIsOpen}
-                    onLockClick={togglePasswordLock}
+                    onLockClick={UpdateEmailPage.togglePasswordLock}
                   />
                 }
                 type={passwordIsOpen ? 'text' : 'password'}
                 value={state.password.inputValue}
-                onValueChange={inputPasswordHandler}
+                onValueChange={UpdateEmailPage.inputPasswordHandler}
               />
             </FormGroup>
           </Content>
         }
-        closeDialog={closeDialog}
+        closeDialog={UpdateUserInfoDialogState.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={state.isWaitingResponse}
         submitButton={

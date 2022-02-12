@@ -7,7 +7,7 @@ const dc = dict.eventSettingsPage;
 
 export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => (
   <div>
-    <Header showCreateNewButton={false} title={dc.title} />
+    <Header title={dc.title} />
     <EventScheduleSettingCommon
       initialValues={initialEventSchedule}
       mode={'create'}

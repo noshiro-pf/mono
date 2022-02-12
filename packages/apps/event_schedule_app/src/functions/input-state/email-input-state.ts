@@ -28,15 +28,6 @@ export const emailInputStateReducer: Reducer<
   EmailInputStateAction
 > = (state, action) => {
   switch (action.type) {
-    case 'submit':
-      return IRecord.set(
-        state,
-        'error',
-        !isEmailString(state.inputValue)
-          ? dict.common.error.invalidEmail
-          : undefined
-      );
-
     case 'input':
       return pipe(state)
         .chain((draft) => IRecord.set(draft, 'inputValue', action.payload))
@@ -46,5 +37,14 @@ export const emailInputStateReducer: Reducer<
 
     case 'setError':
       return IRecord.set(state, 'error', action.payload);
+
+    case 'submit':
+      return IRecord.set(
+        state,
+        'error',
+        !isEmailString(state.inputValue)
+          ? dict.common.error.invalidEmail
+          : undefined
+      );
   }
 };

@@ -2,12 +2,14 @@ import { assertType, IRecord } from '@noshiro/ts-utils';
 import type { Reducer } from 'react';
 import type {
   EmailInputState,
+  InputState,
   PasswordWithConfirmationState,
 } from '../input-state';
 import {
   emailInputHasError,
   emailInputInitialState,
   emailInputStateReducer,
+  inputInitialState,
   passwordWithConfirmationHasError,
   passwordWithConfirmationInitialState,
   passwordWithConfirmationStateReducer,
@@ -15,10 +17,7 @@ import {
 import type { SignInPageStateAction } from './sign-in-page-state';
 
 export type RegisterPageState = DeepReadonly<{
-  username: {
-    inputValue: string;
-    error: string | undefined;
-  };
+  username: InputState;
   email: EmailInputState;
   password: PasswordWithConfirmationState;
   otherErrors: string | undefined;
@@ -26,10 +25,7 @@ export type RegisterPageState = DeepReadonly<{
 }>;
 
 export const registerPageInitialState = {
-  username: {
-    inputValue: '',
-    error: undefined,
-  },
+  username: inputInitialState,
   email: emailInputInitialState,
   password: passwordWithConfirmationInitialState,
   otherErrors: undefined,
@@ -48,18 +44,9 @@ export const registerPageHasError = (state: RegisterPageState): boolean =>
 export type RegisterPageStateAction = DeepReadonly<
   | SignInPageStateAction
   | (
-      | {
-          type: 'inputPasswordConfirmation';
-          payload: string;
-        }
-      | {
-          type: 'inputUsername';
-          payload: string;
-        }
-      | {
-          type: 'setUsernameError';
-          payload: string;
-        }
+      | { type: 'inputPasswordConfirmation'; payload: string }
+      | { type: 'inputUsername'; payload: string }
+      | { type: 'setUsernameError'; payload: string }
     )
 >;
 
@@ -156,6 +143,7 @@ export const registerPageStateReducer: Reducer<
           type: 'submit',
         }
       );
+
       return {
         username: state.username,
         email: emailNextState,
@@ -169,5 +157,8 @@ export const registerPageStateReducer: Reducer<
 
     case 'done':
       return IRecord.set(state, 'isWaitingResponse', false);
+
+    case 'reset':
+      return registerPageInitialState;
   }
 };

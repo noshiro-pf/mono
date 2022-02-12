@@ -3,6 +3,7 @@ import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useResetPasswordPageState, useSignInPageState } from '../../hooks';
+import { ResetPasswordPageStore, SignInPageStore } from '../../store';
 import { Label } from '../atoms';
 import { BpInput } from '../bp';
 import { LockButton } from '../molecules';
@@ -54,7 +55,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                     intent={resetPasswordState.emailFormIntent}
                     type={'email'}
                     value={resetPasswordState.state.email.inputValue}
-                    onValueChange={resetPasswordState.inputEmailHandler}
+                    onValueChange={ResetPasswordPageStore.inputEmailHandler}
                   />
                 </FormGroup>
               </FormGroups>
@@ -88,7 +89,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                     placeholder={'sample@gmail.com'}
                     type={'email'}
                     value={signInState.state.email.inputValue}
-                    onValueChange={signInState.inputEmailHandler}
+                    onValueChange={SignInPageStore.inputEmailHandler}
                   />
                 </FormGroup>
 
@@ -105,12 +106,12 @@ export const SignInPage = memoNamed('SignInPage', () => {
                       <LockButton
                         disabled={signInState.state.isWaitingResponse}
                         passwordIsOpen={signInState.passwordIsOpen}
-                        onLockClick={signInState.togglePasswordLock}
+                        onLockClick={SignInPageStore.togglePasswordLock}
                       />
                     }
                     type={signInState.passwordIsOpen ? 'text' : 'password'}
                     value={signInState.state.password.inputValue}
-                    onValueChange={signInState.inputPasswordHandler}
+                    onValueChange={SignInPageStore.inputPasswordHandler}
                   />
                 </FormGroup>
 

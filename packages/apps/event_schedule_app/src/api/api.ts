@@ -1,4 +1,15 @@
 import {
+  createUser,
+  deleteUser,
+  reauthenticateWithCredential,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signIn,
+  updateDisplayName,
+  updateEmail,
+  updatePassword,
+} from './auth';
+import {
   addAnswer,
   addEventSchedule,
   deleteAnswer,
@@ -9,6 +20,19 @@ import {
 } from './crud';
 
 export const api = {
+  auth: {
+    createUser,
+    deleteUser,
+    reauthenticateWithCredential,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    signIn,
+    update: {
+      displayName: updateDisplayName,
+      email: updateEmail,
+      password: updatePassword,
+    },
+  },
   event: {
     add: addEventSchedule,
     get: getEventSchedule,

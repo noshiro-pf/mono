@@ -10,14 +10,14 @@ import {
   inputStateReducer,
 } from '../input-state';
 
-export type UpdateEmailPageState = DeepReadonly<{
+export type DeleteAccountPageState = DeepReadonly<{
   email: EmailInputState;
   password: InputState;
   otherErrors: string | undefined;
   isWaitingResponse: boolean;
 }>;
 
-export const updateEmailPageInitialState = {
+export const deleteAccountPageInitialState = {
   email: emailInputInitialState,
   password: inputInitialState,
   otherErrors: undefined,
@@ -25,15 +25,17 @@ export const updateEmailPageInitialState = {
 } as const;
 
 assertType<
-  TypeExtends<typeof updateEmailPageInitialState, UpdateEmailPageState>
+  TypeExtends<typeof deleteAccountPageInitialState, DeleteAccountPageState>
 >();
 
-export const updateEmailPageHasError = (state: UpdateEmailPageState): boolean =>
+export const deleteAccountPageHasError = (
+  state: DeleteAccountPageState
+): boolean =>
   emailInputHasError(state.email) ||
   inputHasError(state.password) ||
   state.otherErrors !== undefined;
 
-export type UpdateEmailPageStateAction = DeepReadonly<
+export type DeleteAccountPageStateAction = DeepReadonly<
   | { type: 'done' }
   | { type: 'inputEmail'; payload: string }
   | { type: 'inputPassword'; payload: string }
@@ -44,9 +46,9 @@ export type UpdateEmailPageStateAction = DeepReadonly<
   | { type: 'submit' }
 >;
 
-export const updateEmailPageStateReducer: Reducer<
-  UpdateEmailPageState,
-  UpdateEmailPageStateAction
+export const deleteAccountPageStateReducer: Reducer<
+  DeleteAccountPageState,
+  DeleteAccountPageStateAction
 > = (state, action) => {
   switch (action.type) {
     case 'inputEmail':
@@ -117,6 +119,6 @@ export const updateEmailPageStateReducer: Reducer<
       return IRecord.set(state, 'isWaitingResponse', false);
 
     case 'reset':
-      return updateEmailPageInitialState;
+      return deleteAccountPageInitialState;
   }
 };

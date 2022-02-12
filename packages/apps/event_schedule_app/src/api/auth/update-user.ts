@@ -1,6 +1,7 @@
 import { castWritable, Result } from '@noshiro/ts-utils';
 import type { AuthCredential, User, UserCredential } from 'firebase/auth';
 import {
+  deleteUser as _deleteUser,
   reauthenticateWithCredential as _reauthenticateWithCredential,
   updateEmail as _updateEmail,
   updatePassword as _updatePassword,
@@ -16,19 +17,44 @@ export const updateDisplayName = (
     updateProfile(castWritable(user), {
       displayName,
     })
+  ).then(
+    Result.mapErr((error) => {
+      assertIsCredentialError(error);
+      return error;
+    })
   );
 
 export const updateEmail = (
   user: DeepReadonly<User>,
   email: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_updateEmail(castWritable(user), email));
+  Result.fromPromise(_updateEmail(castWritable(user), email)).then(
+    Result.mapErr((error) => {
+      assertIsCredentialError(error);
+      return error;
+    })
+  );
 
 export const updatePassword = (
   user: DeepReadonly<User>,
   password: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_updatePassword(castWritable(user), password));
+  Result.fromPromise(_updatePassword(castWritable(user), password)).then(
+    Result.mapErr((error) => {
+      assertIsCredentialError(error);
+      return error;
+    })
+  );
+
+export const deleteUser = (
+  user: DeepReadonly<User>
+): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
+  Result.fromPromise(_deleteUser(castWritable(user))).then(
+    Result.mapErr((error) => {
+      assertIsCredentialError(error);
+      return error;
+    })
+  );
 
 export const reauthenticateWithCredential = (
   user: DeepReadonly<User>,

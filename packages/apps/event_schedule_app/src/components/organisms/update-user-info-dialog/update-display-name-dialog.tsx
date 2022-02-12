@@ -4,6 +4,10 @@ import type { User } from 'firebase/auth';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useUpdateDisplayNameDialogState } from '../../../hooks';
+import {
+  UpdateDisplayNamePage,
+  UpdateUserInfoDialogState,
+} from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template';
@@ -12,26 +16,18 @@ const dc = dict.accountSettings;
 
 type Props = DeepReadonly<{
   dialogIsOpen: boolean;
-  closeDialog: () => void;
-  currentDisplayName: string;
   user: User;
 }>;
 
 export const UpdateDisplayNameDialog = memoNamed<Props>(
   'UpdateDisplayNameDialog',
-  ({ dialogIsOpen, closeDialog, currentDisplayName, user }) => {
+  ({ dialogIsOpen, user }) => {
     const {
       state,
       enterClickHandler,
-      inputDisplayNameHandler,
       displayNameFormIntent,
       enterButtonDisabled,
-    } = useUpdateDisplayNameDialogState(
-      currentDisplayName,
-      dialogIsOpen,
-      closeDialog,
-      user
-    );
+    } = useUpdateDisplayNameDialogState(user);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -40,7 +36,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
             <FormGroup
               helperText={state.displayName.error}
               intent={displayNameFormIntent}
-              label={<Label>{dc.updateDisplayName.label}</Label>}
+              label={<Label>{dc.updateDisplayName.newDisplayName}</Label>}
             >
               <BpInput
                 autoFocus={true}
@@ -48,12 +44,12 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
                 intent={displayNameFormIntent}
                 type={'text'}
                 value={state.displayName.inputValue}
-                onValueChange={inputDisplayNameHandler}
+                onValueChange={UpdateDisplayNamePage.inputDisplayNameHandler}
               />
             </FormGroup>
           </Content>
         }
-        closeDialog={closeDialog}
+        closeDialog={UpdateUserInfoDialogState.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={state.isWaitingResponse}
         submitButton={

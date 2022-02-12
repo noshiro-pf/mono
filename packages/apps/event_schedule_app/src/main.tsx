@@ -9,7 +9,6 @@ import {
   RegisterPage,
   SignInPage,
 } from './components';
-import { isDevelopment } from './env';
 import { useShowPage } from './store';
 
 export const Main = memoNamed('Main', () => {
@@ -23,9 +22,9 @@ export const Main = memoNamed('Main', () => {
         <EditEventSchedule />
       ) : show.answerPage ? (
         <AnswerPage />
-      ) : show.registerPage && isDevelopment ? (
+      ) : show.registerPage ? (
         <RegisterPage />
-      ) : show.signInPage && isDevelopment ? (
+      ) : show.signInPage ? (
         <SignInPage />
       ) : (
         <NotFoundPage />

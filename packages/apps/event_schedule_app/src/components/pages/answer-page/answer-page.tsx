@@ -51,7 +51,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     <NotFoundPage />
   ) : (
     <div>
-      <Header showCreateNewButton={true} title={dc.title} />
+      <Header title={dc.title} />
 
       {errorType !== undefined ? (
         <AnswerPageError errorType={errorType} />
