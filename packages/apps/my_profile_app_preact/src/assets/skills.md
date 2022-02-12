@@ -77,6 +77,8 @@
         -   **Heroku**
             -   discord bot に使用
     -   Docker
+    -   Libraries
+        -   nestjs
     -   express (nodejs) （チュートリアルをやっただけ）
 -   Others
     -   Languages
