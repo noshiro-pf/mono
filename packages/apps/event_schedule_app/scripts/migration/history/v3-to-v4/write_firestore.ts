@@ -15,7 +15,7 @@ import {
   firestorePaths as firestorePathsNext,
 } from '@noshiro/event-schedule-app-shared/cjs/v4';
 import * as admin from 'firebase-admin';
-import serviceAccount from './service-account-key.json';
+import serviceAccount from '../../../service-account-key.json';
 
 const app = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
