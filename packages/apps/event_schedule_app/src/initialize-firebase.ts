@@ -5,6 +5,7 @@ import {
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { collection, getFirestore } from 'firebase/firestore';
+import { isDevelopment } from './env';
 import { clog } from './utils';
 // import firebasejson from '../firebase.json';
 
@@ -21,6 +22,9 @@ export const db = getFirestore();
 //   clog(`using firestore emulator. (${host}:${port})`);
 // }
 
-export const dbEvents = collection(db, firestorePaths.events);
+export const dbEvents = collection(
+  db,
+  `${firestorePaths.events}${isDevelopment ? '_dev' : ''}`
+);
 
 export const auth = getAuth();
