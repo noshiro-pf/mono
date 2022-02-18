@@ -1,16 +1,14 @@
 /* eslint-disable import/no-internal-modules */
 import type {
-  AnswerId,
-  UserName,
-  Weight,
-} from '@noshiro/event-schedule-app-shared';
-import type {
   Answer as AnswerV2,
   EventSchedule as EventScheduleV2,
 } from '@noshiro/event-schedule-app-shared/cjs/v2';
 import type {
   Answer as AnswerV3,
+  AnswerId,
   EventSchedule as EventScheduleV3,
+  UserName,
+  Weight,
 } from '@noshiro/event-schedule-app-shared/cjs/v3';
 
 const eventScheduleExampleV2: EventScheduleV2 = {

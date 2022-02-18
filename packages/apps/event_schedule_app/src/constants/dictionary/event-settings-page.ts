@@ -61,7 +61,7 @@ export const eventSettingsPageDictionary = {
     passwordIsEnabledButEmpty:
       'パスワードをオンにしていますが空欄になっています。',
     atLeastOneNotificationCheckRequired:
-      '通知設定をオンにする場合は少なくとも一つの通知にチェックをしてください。',
+      '通知設定をオンにした場合は、少なくとも一つの通知項目にチェックをしてください。',
     answerIcons:
       '記号の設定に不備があります。説明に空欄があるか、△の点数が0.1以上9.9以下になっていない可能性があります。',
   },

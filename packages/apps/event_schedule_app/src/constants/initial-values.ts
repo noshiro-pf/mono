@@ -8,6 +8,7 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import {
   answerDeadlineRemainingDaysDefaultValue,
+  createUserName,
   notificationSettingsDefaultValue,
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
@@ -66,10 +67,12 @@ export const initialEventSchedule: EventSchedule = {
   notes: '',
   datetimeSpecification: initialDatetimeSpecification,
   datetimeRangeList: initialDatetimeRangeList,
-  useAnswerDeadline: false,
-  answerDeadline: initialAnswerDeadline,
+  answerDeadline: 'none',
   answerIcons: initialAnswerIcons,
-  useNotification: false,
-  notificationSettings: initialNotificationSettings,
+  notificationSettings: 'none',
   timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+  author: {
+    id: null,
+    name: createUserName(''),
+  },
 };

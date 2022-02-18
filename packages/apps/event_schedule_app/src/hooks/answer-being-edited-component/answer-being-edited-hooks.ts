@@ -60,7 +60,7 @@ const theNameIsAlreadyUsedFn = (
 ): boolean =>
   userName === nameToOmit
     ? false
-    : answers.some((a) => a.userName === userName);
+    : answers.some((a) => a.user.name === userName);
 
 // フォームの入力値のstateは onAnswerBeingEditedUpdate で変更しこのhooks内にはstateを持たない
 export const useAnswerBeingEditedHooks = ({
@@ -77,9 +77,9 @@ export const useAnswerBeingEditedHooks = ({
   updateAnswerBeingEdited: (updater: (answer: Answer) => Answer) => void;
 }>): AnswerBeingEditedHooks => {
   const onUserNameChange = useCallback(
-    (userName: UserName) => {
+    (userName: string) => {
       updateAnswerBeingEdited(() =>
-        IRecord.set(answerBeingEdited, 'userName', userName)
+        IRecord.setIn(answerBeingEdited, ['user', 'name'], userName)
       );
     },
     [answerBeingEdited, updateAnswerBeingEdited]
@@ -88,7 +88,7 @@ export const useAnswerBeingEditedHooks = ({
   const theNameIsAlreadyUsed: boolean = useMemo(
     () =>
       theNameIsAlreadyUsedFn(
-        answerBeingEdited.userName,
+        answerBeingEdited.user.name,
         answers,
         selectedAnswerUserName
       ),
@@ -97,7 +97,7 @@ export const useAnswerBeingEditedHooks = ({
 
   const [showUserNameError, onUserNameChangeLocal, onUserNameBlur] =
     useFormError(
-      answerBeingEdited.userName,
+      answerBeingEdited.user.name,
       (v) =>
         v === '' || theNameIsAlreadyUsedFn(v, answers, selectedAnswerUserName),
       onUserNameChange

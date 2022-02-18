@@ -20,7 +20,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
 
   const editPageIsHidden: boolean =
     Result.isErr(eventScheduleResult) ||
-    (eventScheduleResult?.value.notificationSettings.email !== '' &&
+    (eventScheduleResult?.value.notificationSettings !== 'none' &&
       !editPageIsVisible);
 
   return Result.isErr(eventScheduleResult) &&
@@ -47,12 +47,15 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
             </>
           )}
 
-          <ConfirmEmailDialog
-            back={router.back}
-            emailAnswer={eventScheduleResult.value.notificationSettings.email}
-            isOpen={editPageIsHidden}
-            onSuccess={showEditPage}
-          />
+          {eventScheduleResult.value.notificationSettings ===
+          'none' ? undefined : (
+            <ConfirmEmailDialog
+              back={router.back}
+              emailAnswer={eventScheduleResult.value.notificationSettings.email}
+              isOpen={editPageIsHidden}
+              onSuccess={showEditPage}
+            />
+          )}
         </>
       )}
     </div>

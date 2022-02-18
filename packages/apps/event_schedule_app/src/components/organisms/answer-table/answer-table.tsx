@@ -58,14 +58,14 @@ export const AnswerTable = memoNamed<Props>(
             {answersWithHandler.map((answer) => (
               <th key={answer.id} style={noPadStyle}>
                 {isExpired ? (
-                  answer.userName
+                  answer.user.name
                 ) : (
                   <BpButtonOverflowHidden
                     minimal={true}
-                    title={answer.userName}
+                    title={answer.user.name}
                     onClick={answer.onClick}
                   >
-                    {answer.userName}
+                    {answer.user.name}
                   </BpButtonOverflowHidden>
                 )}
                 {answer.isRequiredParticipants ? (

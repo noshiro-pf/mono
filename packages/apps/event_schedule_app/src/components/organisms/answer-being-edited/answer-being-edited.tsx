@@ -103,7 +103,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           >
             <BpInput
               autoFocus={true}
-              value={answerBeingEdited.userName}
+              value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
               onValueChange={onUserNameChange as (v: string) => void}
             />

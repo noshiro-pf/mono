@@ -88,10 +88,16 @@ export const CreateEventResultDialog = memoNamed<Props>(
             <Button
               disabled={props.isLoading || !linkIsUsed}
               intent={'none'}
+              title={
+                props.isLoading || !linkIsUsed
+                  ? dc.whyButtonIsDisabled
+                  : undefined
+              }
               onClick={props.close}
             >
               {dc.back}
             </Button>
+
             <AnchorButton
               href={props.url}
               intent={'primary'}

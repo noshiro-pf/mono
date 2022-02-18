@@ -1,91 +1,83 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 // const NULL = Symbol();
 // const isNonNull = <T>(v: T | symbol): v is T => v !== NULL;
 
 export type ToggleSectionState<A> = Readonly<{
-  useThisConfig: boolean;
-  setUseThisConfig: (b: boolean) => void;
+  toggleState: boolean;
   toggle: () => void;
   value: A;
   setValue: (a: A) => void;
-  resetValue: () => void;
-}>;
-
-export type ToggleSectionManagerState = Readonly<{
-  toggle: () => void;
-  resetValue: () => void;
+  resetState: () => void;
 }>;
 
 export const useToggleSectionState = <A>({
   initialToggleState,
-  defaultValue,
-  valueWhenTurnedOff,
-  valueWhenTurnedOn,
+  initialState,
+  valueToBeSetWhenTurnedOff,
+  valueToBeSetWhenTurnedOn,
 }: Readonly<{
   initialToggleState: boolean;
-  defaultValue: A;
-  valueWhenTurnedOff: A;
-  valueWhenTurnedOn?: A;
+  initialState: A;
+  valueToBeSetWhenTurnedOff: A;
+  valueToBeSetWhenTurnedOn?: A;
 }>): ToggleSectionState<A> => {
-  const [useThisConfig, setUseThisConfig] =
-    useState<boolean>(initialToggleState);
+  const [toggleState, setToggleState] = useState<boolean>(initialToggleState);
 
-  const [value, setValue] = useState<A>(defaultValue);
+  const [value, setValue] = useState<A>(initialState);
 
-  const { toggle, resetValue } = useToggleSectionStateManager({
-    defaultValue,
-    valueWhenTurnedOff,
-    valueWhenTurnedOn,
-    useThisConfig,
-    setUseThisConfig,
+  const { toggle, resetState } = useToggleSectionStateManager({
+    initialToggleState,
+    initialState,
+    valueToBeSetWhenTurnedOff,
+    valueToBeSetWhenTurnedOn,
+    toggleState,
+    setToggleState,
     setValue,
   });
 
   return {
-    useThisConfig,
-    setUseThisConfig,
+    toggleState,
     toggle,
     value,
     setValue,
-    resetValue,
+    resetState,
   };
 };
 
-export const useToggleSectionStateManager = <A>({
-  defaultValue,
-  valueWhenTurnedOff,
-  valueWhenTurnedOn,
-  useThisConfig,
-  setUseThisConfig,
+type ToggleSectionManagerState = Readonly<{
+  toggle: () => void;
+  resetState: () => void;
+}>;
+
+const useToggleSectionStateManager = <A>({
+  initialToggleState,
+  initialState,
+  valueToBeSetWhenTurnedOff,
+  valueToBeSetWhenTurnedOn,
+  toggleState: useThisConfig,
+  setToggleState: setUseThisConfig,
   setValue,
 }: Readonly<{
-  defaultValue: A;
-  valueWhenTurnedOff: A;
-  valueWhenTurnedOn?: A;
-  useThisConfig: boolean;
-  setUseThisConfig: (b: boolean) => void;
+  initialToggleState: boolean;
+  initialState: A;
+  valueToBeSetWhenTurnedOff: A;
+  valueToBeSetWhenTurnedOn?: A;
+  toggleState: boolean;
+  setToggleState: (b: boolean) => void;
   setValue: (a: A) => void;
 }>): ToggleSectionManagerState => {
-  const ref = useRef({
-    defaultValue,
-    valueWhenTurnedOn,
-    valueWhenTurnedOff,
-    setUseThisConfig,
-    setValue,
-  });
-
   const turnOn = useCallback(() => {
-    ref.current.setUseThisConfig(true);
-    if (ref.current.valueWhenTurnedOn !== undefined) {
-      ref.current.setValue(ref.current.valueWhenTurnedOn);
+    setUseThisConfig(true);
+    if (valueToBeSetWhenTurnedOn !== undefined) {
+      setValue(valueToBeSetWhenTurnedOn);
     }
-  }, []);
+  }, [valueToBeSetWhenTurnedOn, setUseThisConfig, setValue]);
 
   const turnOff = useCallback(() => {
-    ref.current.setUseThisConfig(false);
-    ref.current.setValue(ref.current.valueWhenTurnedOff);
-  }, []);
+    setUseThisConfig(false);
+    setValue(valueToBeSetWhenTurnedOff);
+  }, [valueToBeSetWhenTurnedOff, setUseThisConfig, setValue]);
 
   const toggle = useCallback(() => {
     if (useThisConfig) {
@@ -95,9 +87,10 @@ export const useToggleSectionStateManager = <A>({
     }
   }, [useThisConfig, turnOff, turnOn]);
 
-  const resetValue = useCallback(() => {
-    ref.current.setValue(ref.current.defaultValue);
-  }, []);
+  const resetState = useCallback(() => {
+    setUseThisConfig(initialToggleState);
+    setValue(initialState);
+  }, [initialToggleState, initialState, setValue, setUseThisConfig]);
 
-  return { toggle, resetValue };
+  return { toggle, resetState };
 };

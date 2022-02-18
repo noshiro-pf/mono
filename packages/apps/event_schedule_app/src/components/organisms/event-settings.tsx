@@ -3,6 +3,7 @@ import type {
   NotificationSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
+import { notificationSettingsDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -23,7 +24,7 @@ type Props = Readonly<{
   onAnswerIconsChange: (value: AnswerIconSettings) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
-  notificationSettings: NotificationSettings;
+  notificationSettings: NotificationSettings | undefined;
   onNotificationSettingsChange: (value: NotificationSettings) => void;
 }>;
 
@@ -81,7 +82,9 @@ export const EventSettings = memoNamed<Props>(
               answerDeadline={answerDeadline}
               disabled={!useNotification}
               focusEmailInput$={focusEmailInput$}
-              notificationSettings={notificationSettings}
+              notificationSettings={
+                notificationSettings ?? notificationSettingsDefaultValue
+              }
               useAnswerDeadline={useAnswerDeadline}
               onNotificationSettingsChange={onNotificationSettingsChange}
             />

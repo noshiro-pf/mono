@@ -26,12 +26,6 @@ export const EventSchedulePropertiesErrors = memoNamed<Props>(
           text={dc.errorMessages.datetimeIsEmpty}
         />
       )}
-      {eventScheduleValidation.answerDeadline ? undefined : (
-        <Description
-          color={errorFontColor}
-          text={dc.errorMessages.answerDeadlineIsEnabledButEmpty}
-        />
-      )}
       {eventScheduleValidation.notificationEmail ? undefined : (
         <Description
           color={errorFontColor}

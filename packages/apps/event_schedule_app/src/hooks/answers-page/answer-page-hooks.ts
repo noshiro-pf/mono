@@ -27,6 +27,7 @@ import {
   refreshButtonIsLoading$,
   requiredParticipantsExist$,
   router,
+  useUser,
 } from '../../store';
 import { useAnswerBeingEditedState } from './answer-being-edited-state-hooks';
 
@@ -142,14 +143,27 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const alive = useAlive();
 
+  const user = useUser();
+
   const onSubmitAnswer = useCallback(async () => {
     if (eventId === undefined) return;
     if (!alive.current) return;
+
+    const answerBeingEditedWithUid = IRecord.setIn(
+      answerBeingEdited,
+      ['user', 'id'],
+      user?.uid ?? null
+    );
+
     setSubmitButtonIsLoading(true);
+
     switch (answerBeingEditedSectionState) {
       case 'creating':
         await api.answers
-          .add(eventId, IRecord.set(answerBeingEdited, 'createdAt', Date.now()))
+          .add(
+            eventId,
+            IRecord.set(answerBeingEditedWithUid, 'createdAt', Date.now())
+          )
           .then((res) => {
             if (!alive.current) return;
 
@@ -170,9 +184,10 @@ export const useAnswerPageState = (): AnswerPageState => {
             });
           });
         break;
+
       case 'editing':
         await api.answers
-          .update(eventId, answerBeingEdited.id, answerBeingEdited)
+          .update(eventId, answerBeingEdited.id, answerBeingEditedWithUid)
           .then((res) => {
             if (!alive.current) return;
 
@@ -199,6 +214,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     answerBeingEdited,
     answerBeingEditedSectionState,
     eventId,
+    user,
     alive,
     clearAnswerBeingEditedFields,
   ]);
@@ -223,8 +239,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     () =>
       eventSchedule === undefined
         ? false
-        : eventSchedule.useAnswerDeadline &&
-          eventSchedule.answerDeadline !== undefined &&
+        : eventSchedule.answerDeadline !== 'none' &&
           compareYmdhm(now(), eventSchedule.answerDeadline) >= 0,
     [eventSchedule]
   );
@@ -239,7 +254,7 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const submitButtonIsDisabled = useMemo<boolean>(
     () =>
-      answerBeingEdited.userName === '' ||
+      answerBeingEdited.user.name === '' ||
       deepEqual(selectedAnswer, answerBeingEdited),
     [answerBeingEdited, selectedAnswer]
   );
@@ -277,7 +292,7 @@ export const useAnswerPageState = (): AnswerPageState => {
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
-    selectedAnswerUserName: selectedAnswer?.userName,
+    selectedAnswerUserName: selectedAnswer?.user.name,
     requiredParticipantsExist,
     selectedDates,
     holidaysJpDefinition,
