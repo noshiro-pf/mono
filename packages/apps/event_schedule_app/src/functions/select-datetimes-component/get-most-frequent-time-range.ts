@@ -2,7 +2,7 @@ import type {
   DatetimeRange,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { defaultHoursMinutes } from '@noshiro/event-schedule-app-shared';
+import { hoursMinutesDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { IList, pipe } from '@noshiro/ts-utils';
 import { timeRangeToMapKey } from '../map-key';
 
@@ -26,7 +26,7 @@ export const getMostFrequentTimeRange = (
     .chain((list) => list?.[0]?.timeRange.end).value;
 
   return {
-    start: startMaxFreq ?? defaultHoursMinutes,
-    end: endMaxFreq ?? defaultHoursMinutes,
+    start: startMaxFreq ?? hoursMinutesDefaultValue,
+    end: endMaxFreq ?? hoursMinutesDefaultValue,
   };
 };

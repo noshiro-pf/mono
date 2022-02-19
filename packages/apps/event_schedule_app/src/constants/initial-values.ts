@@ -7,8 +7,8 @@ import type {
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import {
-  defaultAnswerDeadlineRemainingDays,
-  defaultNotificationSettings,
+  answerDeadlineRemainingDaysDefaultValue,
+  notificationSettingsDefaultValue,
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
 import type { DateEnum } from '@noshiro/ts-utils';
@@ -43,14 +43,17 @@ export const initialAnswerIcons: AnswerIconSettings = {
 
 export const initialAnswerDeadline: Ymdhm = pipe(today())
   .chain((d) =>
-    setDate(d, (getDate(d) + defaultAnswerDeadlineRemainingDays) as DateEnum)
+    setDate(
+      d,
+      (getDate(d) + answerDeadlineRemainingDaysDefaultValue) as DateEnum
+    )
   )
   .chain((d) => setHours(d, 23))
   .chain((d) => setMinutes(d, 59))
   .chain(ymdhmFromDate).value;
 
 export const initialNotificationSettings: NotificationSettings = IRecord.set(
-  defaultNotificationSettings,
+  notificationSettingsDefaultValue,
   'notifyOnAnswerChange',
   true
 );

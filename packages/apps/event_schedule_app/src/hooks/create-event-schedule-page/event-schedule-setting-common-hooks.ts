@@ -9,8 +9,8 @@ import type {
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import {
-  defaultEventSchedule,
-  defaultYmdhm,
+  eventScheduleDefaultValue,
+  ymdhmDefaultValue,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useStateWithResetter } from '@noshiro/react-utils';
@@ -125,11 +125,11 @@ export const useEventScheduleSettingCommonHooks = (
         datetimeSpecification,
         datetimeRangeList,
         useAnswerDeadline,
-        answerDeadline: answerDeadline ?? defaultYmdhm,
+        answerDeadline: answerDeadline ?? ymdhmDefaultValue,
         answerIcons,
         useNotification,
         notificationSettings,
-        timezoneOffsetMinutes: defaultEventSchedule.timezoneOffsetMinutes,
+        timezoneOffsetMinutes: eventScheduleDefaultValue.timezoneOffsetMinutes,
       }),
     [
       title,

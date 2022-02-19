@@ -4,7 +4,7 @@ import type {
   TimeRange,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
-import { defaultYearMonthDate } from '@noshiro/event-schedule-app-shared';
+import { yearMonthDateDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { IList } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type { DatetimeListReducerAction } from '../../functions';
@@ -91,7 +91,7 @@ export const useSelectDatetimesHooks = (
     dispatch({
       type: 'addClick',
       datetimeRange: {
-        ymd: defaultYearMonthDate,
+        ymd: yearMonthDateDefaultValue,
         timeRange: mostFrequentTimeRange,
       },
     });
@@ -127,7 +127,7 @@ export const useSelectDatetimesHooks = (
         id: index,
         datetimeRange,
         onYmdChange: (ymd: YearMonthDate | undefined) => {
-          onDatetimeRangeYmdChange(index, ymd ?? defaultYearMonthDate);
+          onDatetimeRangeYmdChange(index, ymd ?? yearMonthDateDefaultValue);
         },
         onRangeStartChange: (hm: HoursMinutes) => {
           onDatetimeRangeStartChange(index, hm);

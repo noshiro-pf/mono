@@ -6,8 +6,8 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import {
   compareDatetimeRange,
-  defaultDatetimeRange,
-  defaultTimeRange,
+  datetimeRangeDefaultValue,
+  timeRangeDefaultValue,
 } from '@noshiro/event-schedule-app-shared';
 import { IList, IRecord, ISetMapped, pipe } from '@noshiro/ts-utils';
 import type { YmdKey } from '../map-key';
@@ -53,7 +53,9 @@ export const datetimeListReducer: ReducerType<
         .chain((list) =>
           IList.concat(
             list,
-            added.toArray().map((ymd) => ({ ymd, timeRange: defaultTimeRange }))
+            added
+              .toArray()
+              .map((ymd) => ({ ymd, timeRange: timeRangeDefaultValue }))
           )
         )
         .chain((list) => IList.sort(list, compareDatetimeRange)).value;
@@ -74,7 +76,7 @@ export const datetimeListReducer: ReducerType<
       return IList.insert(
         state,
         action.index,
-        state[action.index] ?? defaultDatetimeRange
+        state[action.index] ?? datetimeRangeDefaultValue
       );
 
     case 'delete':

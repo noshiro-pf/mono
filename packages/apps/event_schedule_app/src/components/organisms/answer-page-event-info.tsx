@@ -1,5 +1,5 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { defaultYmdhm } from '@noshiro/event-schedule-app-shared';
+import { ymdhmDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
@@ -29,7 +29,9 @@ export const AnswerPageEventInfo = memoNamed<Props>(
         {eventSchedule.useAnswerDeadline ? (
           <>
             <div>
-              {ymdhm2strWithDay(eventSchedule.answerDeadline ?? defaultYmdhm)}
+              {ymdhm2strWithDay(
+                eventSchedule.answerDeadline ?? ymdhmDefaultValue
+              )}
             </div>
             <Description
               error={isExpired}
