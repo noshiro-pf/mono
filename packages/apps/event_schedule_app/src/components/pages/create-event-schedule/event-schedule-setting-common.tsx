@@ -8,6 +8,7 @@ import { Section } from '../../molecules';
 import {
   BackToAnswerPageButton,
   CreateEventResultDialog,
+  EventScheduleDiff,
   EventSchedulePropertiesErrors,
   EventSettings,
   NameAndNotes,
@@ -60,6 +61,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
       editButtonIsLoading,
       onEditEventClick,
       onBackToAnswerPageClick,
+      diff,
       hasNoChanges,
       holidaysJpDefinition,
     } = useEventScheduleSettingCommonHooks(props.initialValues);
@@ -97,9 +99,11 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
             onToggleUseNotification={onToggleUseNotification}
           />
         </Section>
+
         <EventSchedulePropertiesErrors
           eventScheduleValidation={eventScheduleValidation}
         />
+
         <ButtonsWrapperModified>
           {props.mode === 'create' ? (
             <>
@@ -145,6 +149,8 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
             </>
           )}
         </ButtonsWrapperModified>
+
+        {props.mode === 'edit' ? <EventScheduleDiff diff={diff} /> : undefined}
       </>
     );
   }

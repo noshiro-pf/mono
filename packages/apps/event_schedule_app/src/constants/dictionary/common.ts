@@ -24,4 +24,5 @@ export const commonDictionary = {
     invalidEmail: '有効なメールアドレスではありません。',
     passwordNotMatch: 'パスワードが一致しません。',
   },
+  mapTo: '→',
 } as const;

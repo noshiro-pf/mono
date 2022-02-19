@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app",
-  "version": "3.0.0",
+  "version": "5.0.0",
   "private": true,
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
@@ -15,9 +15,7 @@
     "predeploy": "yarn build",
     "deploy": "firebase deploy",
     "deploy:nobuild": "firebase deploy",
-    "deploy:app": "firebase deploy --only hosting",
     "deploy:functions": "firebase deploy --only functions",
-    "predeploy:hosting": "yarn build",
     "deploy:hosting": "firebase deploy --only hosting",
     "fb": "firebase",
     "fb:init": "firebase init",
@@ -58,7 +56,8 @@
     "@blueprintjs/core": "^3.36.0",
     "@blueprintjs/datetime": "^3.20.0",
     "@blueprintjs/icons": "^3.23.0",
-    "@noshiro/event-schedule-app-shared": "1.0.5",
+    "@noshiro/deep-object-diff": "*",
+    "@noshiro/event-schedule-app-shared": "5.0.1",
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow-react-hooks": "*",

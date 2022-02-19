@@ -1,9 +1,10 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
-import { Result, toAbsolutePath } from '@noshiro/ts-utils';
+import { IRecord, Result, toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../api';
 import { routes } from '../../constants';
+import { useUser } from '../../store';
 
 type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;
@@ -35,13 +36,21 @@ export const useCreateEventScheduleHooks = ({
   const [url, setUrl] = useState<string>('');
 
   const alive = useAlive();
+
+  const user = useUser();
+
   const onCreateEventClick = useCallback(() => {
     if (!eventScheduleValidationOk) return;
     if (!alive.current) return;
     setIsLoadingTrue();
     openCreateResultDialog();
     api.event
-      .add(newEventSchedule)
+      .add(
+        IRecord.set(newEventSchedule, 'author', {
+          id: user?.uid ?? null,
+          name: user?.displayName ?? '',
+        })
+      )
       .then((res) => {
         if (!alive.current) return;
         if (Result.isErr(res)) {
@@ -54,6 +63,7 @@ export const useCreateEventScheduleHooks = ({
         console.error('Error creating event schedule: ', error);
       });
   }, [
+    user,
     eventScheduleValidationOk,
     newEventSchedule,
     setIsLoadingTrue,

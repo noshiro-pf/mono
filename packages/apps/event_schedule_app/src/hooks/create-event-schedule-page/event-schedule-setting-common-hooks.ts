@@ -18,13 +18,14 @@ import {
   initialAnswerDeadline,
   initialNotificationSettings,
 } from '../../constants';
-import type { YmdKey } from '../../functions';
+import type { EventSettingsPageDiffResult, YmdKey } from '../../functions';
 import {
+  collectEventSettingsPageDiff,
   normalizeEventSchedule,
   validateEventSchedule,
   validateEventScheduleAll,
 } from '../../functions';
-import { holidaysJpDefinition$ } from '../../store';
+import { holidaysJpDefinition$, useUser } from '../../store';
 import { mapNoneToUndefined } from '../../utils';
 import { useToggleSectionState } from '../use-toggle-section-state';
 import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
@@ -63,6 +64,7 @@ type EventScheduleSettingCommonHooks = Readonly<{
   editButtonIsLoading: boolean;
   onEditEventClick: () => void;
   onBackToAnswerPageClick: () => void;
+  diff: EventSettingsPageDiffResult;
   hasNoChanges: boolean;
   holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
@@ -115,6 +117,8 @@ export const useEventScheduleSettingCommonHooks = (
     valueToBeSetWhenTurnedOn: initialNotificationSettings,
   });
 
+  const user = useUser();
+
   const newEventSchedule: EventSchedule = useMemo(
     () =>
       normalizeEventSchedule({
@@ -126,7 +130,10 @@ export const useEventScheduleSettingCommonHooks = (
         answerIcons,
         notificationSettings: notificationSettings ?? 'none',
         timezoneOffsetMinutes: eventScheduleDefaultValue.timezoneOffsetMinutes,
-        author: initialValues.current.author,
+        author: {
+          id: user?.uid ?? null,
+          name: user?.displayName ?? '',
+        },
       }),
     [
       title,
@@ -136,7 +143,13 @@ export const useEventScheduleSettingCommonHooks = (
       answerDeadline,
       answerIcons,
       notificationSettings,
+      user,
     ]
+  );
+
+  const diff = useMemo<EventSettingsPageDiffResult>(
+    () => collectEventSettingsPageDiff(initialValues.current, newEventSchedule),
+    [newEventSchedule]
   );
 
   const hasNoChanges = useMemo<boolean>(
@@ -230,6 +243,7 @@ export const useEventScheduleSettingCommonHooks = (
     editButtonIsLoading,
     onEditEventClick,
     onBackToAnswerPageClick,
+    diff,
     hasNoChanges,
     holidaysJpDefinition,
   };

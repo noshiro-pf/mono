@@ -27,8 +27,8 @@ export const notifyOnAnswerChangeBody = async ({
     functions.logger.log(`eventItem for id = "${eventId}" not found.`);
     return;
   }
-  if (!eventItem.useNotification) {
-    functions.logger.log('skipped because eventItem.useNotification is false.');
+  if (eventItem.notificationSettings === 'none') {
+    functions.logger.log('skipped because eventItem.notification === "none".');
     return;
   }
   if (!eventItem.notificationSettings.notifyOnAnswerChange) {
@@ -45,8 +45,7 @@ export const notifyOnAnswerChangeBody = async ({
   }
 
   if (
-    eventItem.useAnswerDeadline &&
-    eventItem.answerDeadline !== undefined &&
+    eventItem.answerDeadline !== 'none' &&
     compareYmdhm(eventItem.answerDeadline, now()) <= 0
   ) {
     functions.logger.log(

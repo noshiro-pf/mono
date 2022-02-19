@@ -6,6 +6,7 @@ export * from './answer-table';
 export * from './button-with-confirm';
 export * from './create-event-result-dialog';
 export * from './errors';
+export * from './event-schedule-diff';
 export * from './event-settings';
 export * from './footer';
 export * from './header';

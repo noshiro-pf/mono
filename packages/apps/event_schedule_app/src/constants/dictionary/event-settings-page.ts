@@ -89,4 +89,44 @@ export const eventSettingsPageDictionary = {
       '編集内容を取り消して回答ページに戻りますか？（この操作は取り消すことができません）',
     resetResultMessage: '編集をキャンセルしました。',
   },
+  diff: {
+    title: '変更差分',
+    values: {
+      none: 'なし',
+    },
+    items: {
+      title: 'イベント名：',
+      notes: 'ノート：',
+      datetimeSpecification: '時刻指定方法：',
+      datetimeRangeList: {
+        title: '候補日程',
+        added: '追加',
+        deleted: '削除',
+      },
+      answerDeadline: '回答締切日：',
+      notificationSettings: {
+        title: '通知設定',
+        on: 'オン',
+        off: 'オフ',
+      },
+      answerIcons: {
+        title: '記号',
+        good: {
+          title: '〇',
+          description: '説明：',
+        },
+        fair: {
+          title: '△',
+          description: '説明：',
+          point: '点：',
+        },
+        poor: {
+          title: '×',
+          description: '説明：',
+        },
+      },
+      author: '作成者：',
+      timezoneOffsetMinutes: 'タイムゾーン：',
+    },
+  },
 } as const;

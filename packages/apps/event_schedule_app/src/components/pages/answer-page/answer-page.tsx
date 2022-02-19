@@ -1,6 +1,6 @@
 import { Button, Spinner } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { IList } from '@noshiro/ts-utils';
+import { IList, match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
@@ -102,8 +102,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             <TableWrapper>
               <AnswerTable
                 answers={answers}
+                editAnswerButtonIsDisabled={
+                  answerBeingEditedSectionState !== 'hidden' || isExpired
+                }
                 eventSchedule={eventSchedule}
-                isExpired={isExpired}
                 onAnswerClick={onAnswerClick}
               />
 
@@ -116,7 +118,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 onClose={closeAlertOnAnswerClick}
                 onConfirm={closeAlertOnAnswerClick}
               >
-                <p>{dc.answerByLoggedInUserIsNotEditable}</p>
+                <p>{dc.protectedAnswerIsNotEditable}</p>
               </AlertWithMaxWidth>
             </TableWrapper>
 
@@ -191,11 +193,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             {answerBeingEditedSectionState === 'hidden' ||
             isExpired ? undefined : (
               <Section
-                sectionTitle={
-                  answerBeingEditedSectionState === 'creating'
-                    ? dc.answerBeingEdited.title.create
-                    : dc.answerBeingEdited.title.update
-                }
+                sectionTitle={match(answerBeingEditedSectionState, {
+                  creating: dc.answerBeingEdited.title.create,
+                  editing: dc.answerBeingEdited.title.update,
+                })}
                 onCloseClick={onCancel}
               >
                 <AnswerBeingEdited

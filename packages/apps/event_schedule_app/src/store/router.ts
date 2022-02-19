@@ -1,11 +1,5 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
-import {
-  distinctUntilChangedI,
-  filter,
-  map,
-  mapI,
-  pairwise,
-} from '@noshiro/syncflow';
+import { distinctUntilChangedI, filter, mapI } from '@noshiro/syncflow';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { createRouter } from '@noshiro/tiny-router-observable';
 import { getEventIdFromPathname, isRoute, redirectRules } from '../constants';
@@ -18,16 +12,13 @@ const toPathnameTokens = (pathname: string): readonly string[] =>
 const pathnameTokens$: InitializedObservable<readonly string[]> =
   _router.pathname$.chain(mapI(toPathnameTokens));
 
-const pageToBack$ = _router.pathname$
-  .chain(
-    filter((pathname) => {
-      const tokens = toPathnameTokens(pathname);
-      // ログインページ・新規登録ページは除外
-      return !isRoute.registerPage(tokens) && !isRoute.signInPage(tokens);
-    })
-  )
-  .chain(pairwise())
-  .chain(map(([prev, _curr]) => prev));
+const pageToBack$ = _router.pathname$.chain(
+  filter((pathname) => {
+    const tokens = toPathnameTokens(pathname);
+    // ログインページ・新規登録ページは除外
+    return !isRoute.registerPage(tokens) && !isRoute.signInPage(tokens);
+  })
+);
 
 export const router = {
   ..._router,

@@ -10,8 +10,8 @@ import { fillEventScheduleWithCheck } from './type-check';
 import { pad2 } from './utils';
 
 const keys = {
-  useNotification: 'useNotification',
-  useAnswerDeadline: 'useAnswerDeadline',
+  notificationSettings: 'notificationSettings',
+  answerDeadline: 'answerDeadline',
 } as const;
 
 assertType<TypeExtends<ValueOf<typeof keys>, keyof EventSchedule>>();
@@ -20,8 +20,8 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
   const querySnapshot = await admin
     .firestore()
     .collection(firestorePaths.events)
-    .where(keys.useNotification, '==', true)
-    .where(keys.useAnswerDeadline, '==', true)
+    .where(keys.notificationSettings, '!=', 'none')
+    .where(keys.answerDeadline, '!=', 'none')
     .get();
 
   const events = querySnapshot.docs.map((doc) =>
@@ -33,7 +33,7 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
       const ns = ev.notificationSettings;
       const answerDeadline = ev.answerDeadline;
 
-      if (answerDeadline === undefined) {
+      if (answerDeadline === 'none' || ns === 'none') {
         return Promise.resolve();
       }
 

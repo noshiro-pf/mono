@@ -19,6 +19,7 @@ import {
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
 } from '../../functions';
+import { useUser } from '../../store';
 import type { AnswerSelectionValue } from '../../types';
 import { useFormError } from '../use-form-error-hook';
 
@@ -50,6 +51,7 @@ type AnswerBeingEditedHooks = DeepReadonly<{
   }[];
   onWeightChange: (v: Weight) => void;
   toggleRequiredSection: () => void;
+  toggleProtectedSection: () => void;
   hasUnanswered: boolean;
 }>;
 
@@ -277,6 +279,20 @@ export const useAnswerBeingEditedHooks = ({
     );
   }, [updateAnswerBeingEdited]);
 
+  const user = useUser();
+
+  const toggleProtectedSection = useCallback(() => {
+    updateAnswerBeingEdited((ans) =>
+      IRecord.set(
+        ans,
+        'user',
+        IRecord.update(ans.user, 'id', (uid) =>
+          uid === null ? user?.uid ?? null : null
+        )
+      )
+    );
+  }, [user, updateAnswerBeingEdited]);
+
   const hasUnanswered = useMemo<boolean>(
     () =>
       answerBeingEditedList.some(
@@ -295,6 +311,7 @@ export const useAnswerBeingEditedHooks = ({
     answerBeingEditedList,
     onWeightChange,
     toggleRequiredSection,
+    toggleProtectedSection,
     hasUnanswered,
   };
 };

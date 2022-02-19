@@ -14,7 +14,7 @@ export const createMailBodyForNewAnswer = ({
   answerItem: Answer;
 }>): string =>
   [
-    `${answerItem.userName}さんが回答を追加しました。`,
+    `${answerItem.user.name}さんが回答を追加しました。`,
     '',
     '回答ページを確認：',
     `${urlPrefix}/${eventId}`,
@@ -28,7 +28,7 @@ export const createMailBodyForAnswerDelete = ({
   answerItem: Answer;
 }>): string =>
   [
-    `${answerItem.userName}さんが回答を削除しました。`,
+    `${answerItem.user.name}さんが回答を削除しました。`,
     '',
     '回答ページを確認：',
     `${urlPrefix}/${eventId}`,
@@ -46,7 +46,7 @@ export const createMailBodyForUpdatedAnswer = ({
   datetimeSpecification: DatetimeSpecificationEnumType;
 }>): string =>
   [
-    `${answerItemAfter.userName}さんが回答を更新しました。`,
+    `${answerItemAfter.user.name}さんが回答を更新しました。`,
     '',
     '回答ページを確認：',
     `${urlPrefix}/${eventId}`,

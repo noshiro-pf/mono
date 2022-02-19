@@ -131,9 +131,7 @@ export const useAnswerPageState = (): AnswerPageState => {
       } else {
         setAnswerBeingEditedSectionState('editing');
         setAnswerBeingEdited(answer);
-        setSelectedAnswerSaved(
-          IRecord.setIn(answer, ['user', 'id'], user?.uid ?? null)
-        );
+        setSelectedAnswerSaved(answer);
       }
     },
     [user, openAlertOnAnswerClick, setAnswerBeingEdited]
@@ -147,7 +145,11 @@ export const useAnswerPageState = (): AnswerPageState => {
   const onAddAnswerButtonClick = useCallback(() => {
     clearAnswerBeingEditedFields();
     setAnswerBeingEditedSectionState('creating');
-  }, [clearAnswerBeingEditedFields]);
+    // automatically set username with user.displayName
+    updateAnswerBeingEdited((prev) =>
+      IRecord.setIn(prev, ['user', 'name'], user?.displayName ?? '')
+    );
+  }, [user, clearAnswerBeingEditedFields, updateAnswerBeingEdited]);
 
   const onCancel = useCallback(() => {
     clearAnswerBeingEditedFields();
@@ -163,21 +165,12 @@ export const useAnswerPageState = (): AnswerPageState => {
     if (eventId === undefined) return;
     if (!alive.current) return;
 
-    const answerBeingEditedWithUid = IRecord.setIn(
-      answerBeingEdited,
-      ['user', 'id'],
-      user?.uid ?? null
-    );
-
     setSubmitButtonIsLoading(true);
 
     switch (answerBeingEditedSectionState) {
       case 'creating':
         await api.answers
-          .add(
-            eventId,
-            IRecord.set(answerBeingEditedWithUid, 'createdAt', Date.now())
-          )
+          .add(eventId, IRecord.set(answerBeingEdited, 'createdAt', Date.now()))
           .then((res) => {
             if (!alive.current) return;
 
@@ -201,7 +194,7 @@ export const useAnswerPageState = (): AnswerPageState => {
 
       case 'editing':
         await api.answers
-          .update(eventId, answerBeingEdited.id, answerBeingEditedWithUid)
+          .update(eventId, answerBeingEdited.id, answerBeingEdited)
           .then((res) => {
             if (!alive.current) return;
 
@@ -228,7 +221,6 @@ export const useAnswerPageState = (): AnswerPageState => {
     answerBeingEdited,
     answerBeingEditedSectionState,
     eventId,
-    user,
     alive,
     clearAnswerBeingEditedFields,
   ]);

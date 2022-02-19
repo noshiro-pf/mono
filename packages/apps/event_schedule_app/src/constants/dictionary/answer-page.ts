@@ -46,8 +46,8 @@ export const answerPageDictionary = {
     `デフォルトの点数（＝${defaultPoint}点）から変更されている場合は、△の右隣に括弧付きでその点数が表示されています。`,
   ],
 
-  answerByLoggedInUserIsNotEditable:
-    'この回答はログインユーザーによるものであるため本人しか編集できません。',
+  protectedAnswerIsNotEditable:
+    'この回答は作成者により保護されているため、本人のアカウントでログイン中のみ編集できます。',
 
   answerBeingEdited: {
     title: {
@@ -71,6 +71,12 @@ export const answerPageDictionary = {
         'この回答の優先度を上げたい場合に1より大きい値を、下げたい場合に1より小さい値を設定するという使い方もできます。',
       ],
       suffix: '人分としてカウント',
+    },
+    protected: {
+      title: 'この回答を保護する',
+      description: [
+        'これを有効にした場合、（現在ログインしている）本人のアカウントでログイン中のみこの回答を編集・削除できるようになります。',
+      ],
     },
     submitButton: {
       create: '回答を追加する',

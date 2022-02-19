@@ -8,7 +8,6 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import {
   answerDeadlineRemainingDaysDefaultValue,
-  createUserName,
   notificationSettingsDefaultValue,
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
@@ -73,6 +72,6 @@ export const initialEventSchedule: EventSchedule = {
   timezoneOffsetMinutes: new Date().getTimezoneOffset(),
   author: {
     id: null,
-    name: createUserName(''),
+    name: '',
   },
 };

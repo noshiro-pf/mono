@@ -4,6 +4,7 @@ export * from './clamp-value';
 export * from './confirm-email-dialog-state';
 export * from './create-event-schedule-page';
 export * from './datetime-range-to-str';
+export * from './event-settings-page-diff';
 export * from './fetch-holidays';
 export * from './icon-settings-component';
 export * from './input-state';
