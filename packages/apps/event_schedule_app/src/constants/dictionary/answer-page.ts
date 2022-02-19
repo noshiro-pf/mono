@@ -46,6 +46,9 @@ export const answerPageDictionary = {
     `デフォルトの点数（＝${defaultPoint}点）から変更されている場合は、△の右隣に括弧付きでその点数が表示されています。`,
   ],
 
+  answerByLoggedInUserIsNotEditable:
+    'この回答はログインユーザーによるものであるため本人しか編集できません。',
+
   answerBeingEdited: {
     title: {
       create: '回答追加',

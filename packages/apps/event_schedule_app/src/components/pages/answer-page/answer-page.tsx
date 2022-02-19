@@ -6,6 +6,7 @@ import { dict } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import { refreshAnswers, setYearMonth$ } from '../../../store';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
+import { AlertWithMaxWidth } from '../../bp';
 import { Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
@@ -45,6 +46,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     requiredParticipantsExist,
     selectedDates,
     holidaysJpDefinition,
+    alertOnAnswerClickIsOpen,
+    closeAlertOnAnswerClick,
   } = useAnswerPageState();
 
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
@@ -103,6 +106,18 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 isExpired={isExpired}
                 onAnswerClick={onAnswerClick}
               />
+
+              <AlertWithMaxWidth
+                canEscapeKeyCancel={true}
+                canOutsideClickCancel={true}
+                icon={'disable'}
+                intent={'danger'}
+                isOpen={alertOnAnswerClickIsOpen}
+                onClose={closeAlertOnAnswerClick}
+                onConfirm={closeAlertOnAnswerClick}
+              >
+                <p>{dc.answerByLoggedInUserIsNotEditable}</p>
+              </AlertWithMaxWidth>
             </TableWrapper>
 
             <IconDescriptionWrapper>

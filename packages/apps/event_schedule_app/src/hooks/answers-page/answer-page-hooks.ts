@@ -6,7 +6,7 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useAlive } from '@noshiro/react-utils';
+import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { IRecord, Result } from '@noshiro/ts-utils';
@@ -63,6 +63,8 @@ type AnswerPageState = DeepReadonly<{
   requiredParticipantsExist: boolean;
   selectedDates: readonly YearMonthDate[];
   holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>;
+  alertOnAnswerClickIsOpen: boolean;
+  closeAlertOnAnswerClick: () => void;
 }> & {
   readonly answerSectionRef: RefObject<HTMLDivElement>;
 };
@@ -71,14 +73,15 @@ const toast = createToaster();
 
 export const useAnswerPageState = (): AnswerPageState => {
   /* state */
+  const user = useUser();
 
   const [answerBeingEditedSectionState, setAnswerBeingEditedSectionState] =
     useState<'creating' | 'editing' | 'hidden'>('hidden');
 
   const [
     //
-    selectedAnswer,
-    setSelectedAnswer,
+    selectedAnswerSaved,
+    setSelectedAnswerSaved,
   ] = useState<Answer | undefined>(undefined);
 
   const [submitButtonIsLoading, setSubmitButtonIsLoading] =
@@ -90,6 +93,12 @@ export const useAnswerPageState = (): AnswerPageState => {
     updateAnswerBeingEdited,
     resetAnswerBeingEdited,
   } = useAnswerBeingEditedState(eventSchedule$);
+
+  const [
+    alertOnAnswerClickIsOpen,
+    openAlertOnAnswerClick,
+    closeAlertOnAnswerClick,
+  ] = useBooleanState(false);
 
   /* effect */
 
@@ -116,16 +125,23 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const onAnswerClick = useCallback(
     (answer: Answer) => {
-      setAnswerBeingEditedSectionState('editing');
-      setAnswerBeingEdited(answer);
-      setSelectedAnswer(answer);
+      // ログインユーザーの回答は本人のみ編集可能にする
+      if (answer.user.id !== null && answer.user.id !== user?.uid) {
+        openAlertOnAnswerClick();
+      } else {
+        setAnswerBeingEditedSectionState('editing');
+        setAnswerBeingEdited(answer);
+        setSelectedAnswerSaved(
+          IRecord.setIn(answer, ['user', 'id'], user?.uid ?? null)
+        );
+      }
     },
-    [setAnswerBeingEdited]
+    [user, openAlertOnAnswerClick, setAnswerBeingEdited]
   );
 
   const clearAnswerBeingEditedFields = useCallback(() => {
     resetAnswerBeingEdited();
-    setSelectedAnswer(undefined);
+    setSelectedAnswerSaved(undefined);
   }, [resetAnswerBeingEdited]);
 
   const onAddAnswerButtonClick = useCallback(() => {
@@ -142,8 +158,6 @@ export const useAnswerPageState = (): AnswerPageState => {
   const eventSchedule = useStreamValue(eventSchedule$);
 
   const alive = useAlive();
-
-  const user = useUser();
 
   const onSubmitAnswer = useCallback(async () => {
     if (eventId === undefined) return;
@@ -255,8 +269,8 @@ export const useAnswerPageState = (): AnswerPageState => {
   const submitButtonIsDisabled = useMemo<boolean>(
     () =>
       answerBeingEdited.user.name === '' ||
-      deepEqual(selectedAnswer, answerBeingEdited),
-    [answerBeingEdited, selectedAnswer]
+      deepEqual(selectedAnswerSaved, answerBeingEdited),
+    [answerBeingEdited, selectedAnswerSaved]
   );
 
   const errorType = useStreamValue(errorType$);
@@ -292,9 +306,11 @@ export const useAnswerPageState = (): AnswerPageState => {
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
-    selectedAnswerUserName: selectedAnswer?.user.name,
+    selectedAnswerUserName: selectedAnswerSaved?.user.name,
     requiredParticipantsExist,
     selectedDates,
     holidaysJpDefinition,
+    alertOnAnswerClickIsOpen,
+    closeAlertOnAnswerClick,
   };
 };
