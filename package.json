@@ -7,6 +7,7 @@
     "packages/utils/blueprint-css",
     "packages/utils/ts-utils",
     "packages/utils/fast-deep-equal",
+    "packages/utils/deep-object-diff",
     "packages/utils/syncflow",
     "packages/utils/syncflow-preact-hooks",
     "packages/utils/syncflow-react-hooks",
