@@ -5,6 +5,4 @@
 /// <reference path="../../stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../stdlib/dist/utils.d.ts" />
 
-import equal from 'fast-deep-equal';
-
-export const deepEqual = <T>(a: T, b: T): boolean => equal(a, b);
+export * from './deep-equal';
