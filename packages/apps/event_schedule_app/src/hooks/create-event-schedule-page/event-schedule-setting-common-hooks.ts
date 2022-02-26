@@ -102,6 +102,16 @@ export const useEventScheduleSettingCommonHooks = (
   const [answerIcons, setAnswerIcons, resetAnswerIcons] =
     useStateWithResetter<AnswerIconSettings>(initialValues.current.answerIcons);
 
+  const user = useUser();
+
+  const initialNotificationSettingsWithEmailFilled = useMemo(
+    () => ({
+      ...initialNotificationSettings,
+      email: user?.email ?? '',
+    }),
+    [user]
+  );
+
   const {
     toggleState: useNotification,
     toggle: onToggleUseNotification,
@@ -114,10 +124,8 @@ export const useEventScheduleSettingCommonHooks = (
       initialValues.current.notificationSettings
     ),
     valueToBeSetWhenTurnedOff: undefined,
-    valueToBeSetWhenTurnedOn: initialNotificationSettings,
+    valueToBeSetWhenTurnedOn: initialNotificationSettingsWithEmailFilled,
   });
-
-  const user = useUser();
 
   const newEventSchedule: EventSchedule = useMemo(
     () =>
