@@ -105,7 +105,6 @@ export const NumericInputView = memoNamed<Props>(
           <ButtonUp
             aria-label='increment'
             disabled={disabled}
-            type='button'
             onClick={onIncrementClick}
           >
             <IconWrapper aria-hidden='true'>
@@ -125,7 +124,6 @@ export const NumericInputView = memoNamed<Props>(
           <ButtonDown
             aria-label='decrement'
             disabled={disabled}
-            type='button'
             onClick={onDecrementClick}
           >
             <IconWrapper aria-hidden='true'>

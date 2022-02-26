@@ -21,7 +21,6 @@ export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
             <Button
               intent='none'
               text={dict.common.buttonText.close}
-              type='button'
               onClick={handleClose}
             />
           </ButtonsWrapperAlignEnd>

@@ -38,7 +38,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
           {editPageIsHidden ? undefined : (
             <>
               <SubTitle>
-                {`${dc.editSubTitle(eventScheduleResult.value.title)}`}
+                {dc.editSubTitle(eventScheduleResult.value.title)}
               </SubTitle>
               <EventScheduleSettingCommon
                 initialValues={eventScheduleResult.value}

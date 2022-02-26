@@ -65,7 +65,6 @@ export const SignInPage = memoNamed('SignInPage', () => {
                   disabled={resetPasswordState.enterButtonDisabled}
                   intent={'primary'}
                   loading={resetPasswordState.state.isWaitingResponse}
-                  type={'submit'}
                   onClick={resetPasswordState.enterClickHandler}
                 >
                   {dc.resetPasswordMode.submit}
@@ -131,7 +130,6 @@ export const SignInPage = memoNamed('SignInPage', () => {
                   disabled={signInState.enterButtonDisabled}
                   intent={'primary'}
                   loading={signInState.state.isWaitingResponse}
-                  type={'submit'}
                   onClick={signInState.enterClickHandler}
                 >
                   {dc.signInButton}

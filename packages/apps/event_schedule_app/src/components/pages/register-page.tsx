@@ -109,7 +109,6 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
               disabled={enterButtonDisabled}
               intent={'primary'}
               loading={state.isWaitingResponse}
-              type={'submit'}
               onClick={enterClickHandler}
             >
               {dc.registerButton}

@@ -64,7 +64,6 @@ export const DatepickerNav = memoNamed<Props>(
         <Button
           icon={'chevron-left'}
           minimal={true}
-          type='button'
           onClick={onPrevMonthClick}
         />
         <BpSelect
@@ -82,7 +81,6 @@ export const DatepickerNav = memoNamed<Props>(
         <Button
           icon={'chevron-right'}
           minimal={true}
-          type='button'
           onClick={onNextMonthClick}
         />
       </Nav>
