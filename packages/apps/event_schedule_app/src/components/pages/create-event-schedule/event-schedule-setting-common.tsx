@@ -15,6 +15,7 @@ import {
   ResetButton,
   ResetEditButton,
   SelectDatetimes,
+  SubmitEditingEventButton,
 } from '../../organisms';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
@@ -62,6 +63,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
       onEditEventClick,
       onBackToAnswerPageClick,
       diff,
+      hasDeletedDatetimeChanges,
       hasNoChanges,
       holidaysJpDefinition,
     } = useEventScheduleSettingCommonHooks(props.initialValues);
@@ -137,14 +139,13 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
                 disabled={editButtonIsLoading || hasNoChanges}
                 onConfirmClick={onResetClick}
               />
-              <Button
+              <SubmitEditingEventButton
                 disabled={
                   !editButtonIsEnabled || editButtonIsLoading || hasNoChanges
                 }
-                intent={'primary'}
                 loading={editButtonIsLoading}
-                text={dc.editEventButton}
-                onClick={onEditEventClick}
+                showConfirmationDialog={hasDeletedDatetimeChanges}
+                onConfirmClick={onEditEventClick}
               />
             </>
           )}
