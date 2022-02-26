@@ -17,4 +17,5 @@ export const headerDictionary = {
       signOut: 'ログアウト',
     },
   },
+  help: 'ヘルプ',
 } as const;
