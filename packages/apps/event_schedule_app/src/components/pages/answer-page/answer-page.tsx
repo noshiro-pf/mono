@@ -1,17 +1,19 @@
-import { AnchorButton, Button, Icon, Spinner } from '@blueprintjs/core';
+import { Button, Spinner } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { IList } from '@noshiro/ts-utils';
+import { IList, match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
-import { dict, routes } from '../../../constants';
+import { dict } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import { refreshAnswers, setYearMonth$ } from '../../../store';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
+import { AlertWithMaxWidth } from '../../bp';
 import { Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
   AnswerBeingEdited,
   AnswerPageEventInfo,
   AnswerTable,
+  Header,
 } from '../../organisms';
 import { ButtonsWrapperAlignEnd, SingleButtonWrapper } from '../../styled';
 import { NotFoundPage } from '../not-found-page';
@@ -44,33 +46,15 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     requiredParticipantsExist,
     selectedDates,
     holidaysJpDefinition,
+    alertOnAnswerClickIsOpen,
+    closeAlertOnAnswerClick,
   } = useAnswerPageState();
 
-  return errorType !== undefined && errorType.type === 'not-found' ? (
+  return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
     <div>
-      <TitleWrapper>
-        <Title
-          href={routes.createPage}
-          rel='noopener noreferrer'
-          target='_blank'
-        >
-          <Icon icon={'timeline-events'} iconSize={28} />
-          <div>{dc.title}</div>
-        </Title>
-        <CreateNewButtonWrapper>
-          <AnchorButton
-            href={routes.createPage}
-            icon='add'
-            intent={'primary'}
-            rel='noopener noreferrer'
-            target='_blank'
-          >
-            <NoWrapSpan>{dc.createNew}</NoWrapSpan>
-          </AnchorButton>
-        </CreateNewButtonWrapper>
-      </TitleWrapper>
+      <Header title={dc.title} />
 
       {errorType !== undefined ? (
         <AnswerPageError errorType={errorType} />
@@ -97,6 +81,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 holidaysJpDefinition={holidaysJpDefinition}
                 selectedDates={selectedDates}
                 setYearMonth$={setYearMonth$}
+                useOutlinedSelectedStyle={true}
               />
             </CalendarWrapper>
 
@@ -117,10 +102,24 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             <TableWrapper>
               <AnswerTable
                 answers={answers}
+                editAnswerButtonIsDisabled={
+                  answerBeingEditedSectionState !== 'hidden' || isExpired
+                }
                 eventSchedule={eventSchedule}
-                isExpired={isExpired}
                 onAnswerClick={onAnswerClick}
               />
+
+              <AlertWithMaxWidth
+                canEscapeKeyCancel={true}
+                canOutsideClickCancel={true}
+                icon={'disable'}
+                intent={'danger'}
+                isOpen={alertOnAnswerClickIsOpen}
+                onClose={closeAlertOnAnswerClick}
+                onConfirm={closeAlertOnAnswerClick}
+              >
+                <p>{dc.protectedAnswerIsNotEditable}</p>
+              </AlertWithMaxWidth>
             </TableWrapper>
 
             <IconDescriptionWrapper>
@@ -194,11 +193,10 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             {answerBeingEditedSectionState === 'hidden' ||
             isExpired ? undefined : (
               <Section
-                sectionTitle={
-                  answerBeingEditedSectionState === 'creating'
-                    ? dc.answerBeingEdited.title.create
-                    : dc.answerBeingEdited.title.update
-                }
+                sectionTitle={match(answerBeingEditedSectionState, {
+                  creating: dc.answerBeingEdited.title.create,
+                  editing: dc.answerBeingEdited.title.update,
+                })}
                 onCloseClick={onCancel}
               >
                 <AnswerBeingEdited
@@ -222,41 +220,6 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     </div>
   );
 });
-
-const TitleWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const NoWrapSpan = styled.span`
-  white-space: nowrap;
-`;
-
-const Title = styled.a`
-  display: flex;
-  align-items: center;
-  & > * {
-    margin-right: 10px;
-  }
-
-  margin: 20px;
-
-  /* h1 style */
-  font-size: 2em;
-  font-weight: bold;
-  color: black !important;
-  text-decoration: none !important;
-`;
-
-const CreateNewButtonWrapper = styled.div`
-  flex: 1;
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-`;
 
 const CalendarWrapper = styled.div`
   margin: 10px;

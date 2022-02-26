@@ -21,7 +21,7 @@ type AnswerTableHooks = DeepReadonly<{
   answersWithHandler: MergeIntersection<
     Pick<
       Answer,
-      'comment' | 'id' | 'isRequiredParticipants' | 'userName' | 'weight'
+      'comment' | 'id' | 'isRequiredParticipants' | 'user' | 'weight'
     > & {
       onClick: () => void;
     }
@@ -69,7 +69,7 @@ export const useAnswerTableHooks = (
   const answersWithHandler = useMemo<
     readonly (Pick<
       Answer,
-      'comment' | 'id' | 'isRequiredParticipants' | 'userName' | 'weight'
+      'comment' | 'id' | 'isRequiredParticipants' | 'user' | 'weight'
     > & {
       readonly onClick: () => void;
     })[]
@@ -77,7 +77,7 @@ export const useAnswerTableHooks = (
     () =>
       answers.map((a) => ({
         id: a.id,
-        userName: a.userName,
+        user: a.user,
         comment: a.comment,
         weight: a.weight,
         isRequiredParticipants: a.isRequiredParticipants,

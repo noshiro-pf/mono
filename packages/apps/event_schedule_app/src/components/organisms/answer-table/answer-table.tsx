@@ -18,12 +18,12 @@ type Props = Readonly<{
   eventSchedule: EventSchedule;
   answers: readonly Answer[];
   onAnswerClick: (answer: Answer) => void;
-  isExpired: boolean;
+  editAnswerButtonIsDisabled: boolean;
 }>;
 
 export const AnswerTable = memoNamed<Props>(
   'AnswerTable',
-  ({ eventSchedule, answers, onAnswerClick, isExpired }) => {
+  ({ eventSchedule, answers, onAnswerClick, editAnswerButtonIsDisabled }) => {
     const {
       answersWithHandler,
       tableBodyValues,
@@ -57,15 +57,15 @@ export const AnswerTable = memoNamed<Props>(
 
             {answersWithHandler.map((answer) => (
               <th key={answer.id} style={noPadStyle}>
-                {isExpired ? (
-                  answer.userName
+                {editAnswerButtonIsDisabled ? (
+                  answer.user.name
                 ) : (
                   <BpButtonOverflowHidden
                     minimal={true}
-                    title={answer.userName}
+                    title={answer.user.name}
                     onClick={answer.onClick}
                   >
-                    {answer.userName}
+                    {answer.user.name}
                   </BpButtonOverflowHidden>
                 )}
                 {answer.isRequiredParticipants ? (

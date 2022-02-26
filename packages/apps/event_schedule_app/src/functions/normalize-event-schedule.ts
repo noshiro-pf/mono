@@ -11,10 +11,9 @@ export const normalizeEventSchedule = (
   datetimeRangeList: pipe(eventSchedule.datetimeRangeList)
     .chain((list) => IList.uniq(list))
     .chain((list) => IList.sort(list, compareDatetimeRange)).value,
-  useAnswerDeadline: eventSchedule.useAnswerDeadline,
   answerDeadline: eventSchedule.answerDeadline,
   answerIcons: eventSchedule.answerIcons,
-  useNotification: eventSchedule.useNotification,
   notificationSettings: eventSchedule.notificationSettings,
   timezoneOffsetMinutes: eventSchedule.timezoneOffsetMinutes,
+  author: eventSchedule.author,
 });

@@ -1,5 +1,5 @@
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { defaultAnswer } from '@noshiro/event-schedule-app-shared';
+import { answerDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import type { Observable } from '@noshiro/syncflow';
 import {
@@ -27,7 +27,7 @@ export const useAnswerBeingEditedState = (
   updateAnswerBeingEdited: (updater: (a: Answer) => Answer) => void;
 }> => {
   const [answerBeingEdited$, setAnswerBeingEdited, updateAnswerBeingEdited] =
-    useStateAsStream(defaultAnswer);
+    useStateAsStream(answerDefaultValue);
 
   const emptyAnswerSelection$ = useStream<Answer>(() =>
     eventSchedule$
@@ -35,7 +35,7 @@ export const useAnswerBeingEditedState = (
       .chain(
         map((e) =>
           IRecord.set(
-            defaultAnswer,
+            answerDefaultValue,
             'selection',
             e.datetimeRangeList.map(
               (d) =>
@@ -49,7 +49,7 @@ export const useAnswerBeingEditedState = (
         )
       )
       .chain(distinctUntilChanged(deepEqual))
-      .chain(withInitialValue(defaultAnswer))
+      .chain(withInitialValue(answerDefaultValue))
   );
 
   const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =

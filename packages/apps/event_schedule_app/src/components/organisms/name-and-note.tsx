@@ -34,6 +34,7 @@ export const NameAndNotes = memoNamed<Props>(
           }
           intent={showError ? 'danger' : 'primary'}
           label={dc.eventName}
+          labelInfo={dc.eventNameInfo}
         >
           <BpInput
             placeholder={dc.eventNamePlaceholder}
@@ -45,6 +46,7 @@ export const NameAndNotes = memoNamed<Props>(
         <FormGroup intent={'primary'} label={dc.notes}>
           <BpTextArea
             fill={true}
+            growVertically={true}
             placeholder={dc.notesPlaceholder}
             value={notes}
             onValueChange={onNotesChange}

@@ -6,16 +6,22 @@ import { dbEvents } from '../../initialize-firebase';
 
 export const getEventSchedule = async (
   id: string
-): Promise<Result<EventSchedule, 'not-found' | 'others'>> => {
+): Promise<
+  Result<
+    EventSchedule,
+    Readonly<{ type: 'not-found' | 'others'; message: string }>
+  >
+> => {
   try {
     const res = await getDoc(doc(dbEvents, id));
     if (!res.exists()) {
-      console.log(`event of id "${id}" not-found`);
-      return Result.err('not-found');
+      return Result.err({
+        type: 'not-found' as const,
+        message: `event of id "${id}" not-found`,
+      });
     }
     return Result.ok(fillEventSchedule(res.data()));
-  } catch (e: unknown) {
-    console.log(e);
-    return Result.err('others');
+  } catch (message: unknown) {
+    return Result.err({ type: 'others' as const, message: String(message) });
   }
 };

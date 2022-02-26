@@ -147,9 +147,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const invalidEmail =
       !disabled && !isEmailString(notificationSettings.email);
 
-    const helperText = invalidEmail
-      ? dict.eventSettingsPage.errorMessages.invalidEmail
-      : '';
+    const helperText = invalidEmail ? dict.common.error.invalidEmail : '';
 
     return (
       <div>

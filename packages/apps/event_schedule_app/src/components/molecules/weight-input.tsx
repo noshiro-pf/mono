@@ -1,5 +1,4 @@
 import type { Weight } from '@noshiro/event-schedule-app-shared';
-import { createWeight } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { weightNumericInputConfig } from '../../constants';
@@ -13,7 +12,7 @@ type Props = Readonly<{
 
 const { step } = weightNumericInputConfig;
 
-const defaultValue = createWeight(1);
+const defaultValue = 1;
 
 const sanitizeValue = (value: number): Weight =>
   !Number.isFinite(value) ? defaultValue : clampAndRoundAnswerWeight(value);

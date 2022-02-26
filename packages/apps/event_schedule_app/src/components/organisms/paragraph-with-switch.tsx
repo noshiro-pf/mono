@@ -31,9 +31,7 @@ export const ParagraphWithSwitch = memoNamed<Props>(
         : IList.map(props.description, (d, i) => (
             <Description key={i} text={d} />
           ))}
-      {props.disabledInsteadOfHidden
-        ? props.elementToToggle
-        : props.show
+      {props.disabledInsteadOfHidden || props.show
         ? props.elementToToggle
         : undefined}
     </div>

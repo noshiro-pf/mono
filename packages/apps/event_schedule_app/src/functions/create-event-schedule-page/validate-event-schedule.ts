@@ -2,30 +2,24 @@ import type {
   EventSchedule,
   EventScheduleValidation,
 } from '@noshiro/event-schedule-app-shared';
-import { ifThen, IList, isEmailString, isInRange } from '@noshiro/ts-utils';
+import { IList, isEmailString, isInRange } from '@noshiro/ts-utils';
 import { answerIconPointConfig } from '../../constants';
 
 export const validateEventSchedule = ({
   title,
   datetimeRangeList,
-  useAnswerDeadline,
   answerIcons,
-  answerDeadline,
-  useNotification,
   notificationSettings,
-}: Readonly<{
-  answerDeadline: EventSchedule['answerDeadline'] | undefined;
-}> &
-  StrictOmit<
-    EventSchedule,
-    | 'answerDeadline'
-    | 'datetimeSpecification'
-    | 'notes'
-    | 'timezoneOffsetMinutes'
-  >): EventScheduleValidation => ({
+}: StrictOmit<
+  EventSchedule,
+  | 'answerDeadline'
+  | 'author'
+  | 'datetimeSpecification'
+  | 'notes'
+  | 'timezoneOffsetMinutes'
+>): EventScheduleValidation => ({
   title: title !== '',
   datetimeRangeList: !IList.isEmpty(datetimeRangeList),
-  answerDeadline: ifThen(useAnswerDeadline, answerDeadline !== undefined),
   answerIcons:
     answerIcons.good.description === '' ||
     answerIcons.fair.description === '' ||
@@ -34,19 +28,17 @@ export const validateEventSchedule = ({
       answerIconPointConfig.fair.min,
       answerIconPointConfig.fair.max
     )(answerIcons.fair.point),
-  notificationEmail: ifThen(
-    useNotification,
-    isEmailString(notificationSettings.email)
-  ),
-  notificationItems: ifThen(
-    useNotification,
+  notificationEmail:
+    notificationSettings === 'none' ||
+    isEmailString(notificationSettings.email),
+  notificationItems:
+    notificationSettings === 'none' ||
     notificationSettings.notifyOnAnswerChange ||
-      notificationSettings.notify01daysBeforeAnswerDeadline ||
-      notificationSettings.notify03daysBeforeAnswerDeadline ||
-      notificationSettings.notify07daysBeforeAnswerDeadline ||
-      notificationSettings.notify14daysBeforeAnswerDeadline ||
-      notificationSettings.notify28daysBeforeAnswerDeadline
-  ),
+    notificationSettings.notify01daysBeforeAnswerDeadline ||
+    notificationSettings.notify03daysBeforeAnswerDeadline ||
+    notificationSettings.notify07daysBeforeAnswerDeadline ||
+    notificationSettings.notify14daysBeforeAnswerDeadline ||
+    notificationSettings.notify28daysBeforeAnswerDeadline,
 });
 
 export const validateEventScheduleAll = (
@@ -54,7 +46,6 @@ export const validateEventScheduleAll = (
 ): boolean =>
   eventScheduleValidation.title &&
   eventScheduleValidation.datetimeRangeList &&
-  eventScheduleValidation.answerDeadline &&
   eventScheduleValidation.answerIcons &&
   eventScheduleValidation.notificationEmail &&
   eventScheduleValidation.notificationItems;

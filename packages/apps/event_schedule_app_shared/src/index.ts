@@ -4,4 +4,4 @@
 /// <reference path="../../../utils/stdlib/dist/lib.dom.d.ts" />
 /// <reference path="../../../utils/stdlib/dist/lib.esnext.d.ts" />
 
-export * from './v4';
+export * from './v5';

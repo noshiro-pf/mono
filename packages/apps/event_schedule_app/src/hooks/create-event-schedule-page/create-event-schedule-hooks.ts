@@ -1,9 +1,10 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
-import { toAbsolutePath } from '@noshiro/ts-utils';
+import { IRecord, Result, toAbsolutePath } from '@noshiro/ts-utils';
 import { useCallback, useState } from 'react';
 import { api } from '../../api';
 import { routes } from '../../constants';
+import { useUser } from '../../store';
 
 type CreateEventScheduleHooks = Readonly<{
   createButtonIsEnabled: boolean;
@@ -35,22 +36,34 @@ export const useCreateEventScheduleHooks = ({
   const [url, setUrl] = useState<string>('');
 
   const alive = useAlive();
+
+  const user = useUser();
+
   const onCreateEventClick = useCallback(() => {
     if (!eventScheduleValidationOk) return;
     if (!alive.current) return;
     setIsLoadingTrue();
     openCreateResultDialog();
     api.event
-      .add(newEventSchedule)
-      .then((id) => {
+      .add(
+        IRecord.set(newEventSchedule, 'author', {
+          id: user?.uid ?? null,
+          name: user?.displayName ?? '',
+        })
+      )
+      .then((res) => {
         if (!alive.current) return;
+        if (Result.isErr(res)) {
+          console.error(res.value);
+        }
         setIsLoadingFalse();
-        setUrl(toAbsolutePath(`..${routes.answerPage(id)}`));
+        setUrl(toAbsolutePath(`..${routes.answerPage(res.value)}`));
       })
       .catch((error) => {
         console.error('Error creating event schedule: ', error);
       });
   }, [
+    user,
     eventScheduleValidationOk,
     newEventSchedule,
     setIsLoadingTrue,

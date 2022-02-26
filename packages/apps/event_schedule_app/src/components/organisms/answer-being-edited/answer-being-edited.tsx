@@ -9,6 +9,7 @@ import { IList, match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useAnswerBeingEditedHooks } from '../../../hooks';
+import { useUser } from '../../../store';
 import { CustomIcon, Description } from '../../atoms';
 import {
   BpInput,
@@ -74,6 +75,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
       answerBeingEditedList,
       onWeightChange,
       toggleRequiredSection,
+      toggleProtectedSection,
       hasUnanswered,
     } = useAnswerBeingEditedHooks({
       eventSchedule,
@@ -82,6 +84,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
       answerBeingEdited,
       updateAnswerBeingEdited,
     });
+
+    const user = useUser();
 
     return (
       <>
@@ -103,7 +107,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           >
             <BpInput
               autoFocus={true}
-              value={answerBeingEdited.userName}
+              value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
               onValueChange={onUserNameChange as (v: string) => void}
             />
@@ -225,6 +229,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           <FormGroup label={dc.comments}>
             <BpTextArea
               fill={true}
+              growVertically={true}
               value={answerBeingEdited.comment}
               onValueChange={onCommentChange}
             />
@@ -251,6 +256,18 @@ export const AnswerBeingEdited = memoNamed<Props>(
             <Description key={i} text={d} />
           ))}
         </Paragraph>
+        {user === undefined ? undefined : (
+          <Paragraph>
+            <ParagraphWithSwitch
+              description={dc.protected.description}
+              disabledInsteadOfHidden={false}
+              elementToToggle={undefined}
+              show={answerBeingEdited.user.id !== null}
+              title={dc.protected.title}
+              onToggle={toggleProtectedSection}
+            />
+          </Paragraph>
+        )}
 
         <ButtonsWrapperAlignEnd>
           <ButtonNowrapStyled

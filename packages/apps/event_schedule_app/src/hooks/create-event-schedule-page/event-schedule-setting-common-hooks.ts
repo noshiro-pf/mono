@@ -8,10 +8,7 @@ import type {
   YearMonthDate,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import {
-  defaultEventSchedule,
-  defaultYmdhm,
-} from '@noshiro/event-schedule-app-shared';
+import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useStateWithResetter } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
@@ -21,13 +18,15 @@ import {
   initialAnswerDeadline,
   initialNotificationSettings,
 } from '../../constants';
-import type { YmdKey } from '../../functions';
+import type { EventSettingsPageDiffResult, YmdKey } from '../../functions';
 import {
+  collectEventSettingsPageDiff,
   normalizeEventSchedule,
   validateEventSchedule,
   validateEventScheduleAll,
 } from '../../functions';
-import { holidaysJpDefinition$ } from '../../store';
+import { holidaysJpDefinition$, useUser } from '../../store';
+import { mapNoneToUndefined } from '../../utils';
 import { useToggleSectionState } from '../use-toggle-section-state';
 import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
 import { useEditEventScheduleHooks } from './edit-event-schedule-hooks';
@@ -49,7 +48,7 @@ type EventScheduleSettingCommonHooks = Readonly<{
   onAnswerIconsValueChange: (value: AnswerIconSettings) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
-  notificationSettings: NotificationSettings;
+  notificationSettings: NotificationSettings | undefined;
   onNotificationSettingsChange: (value: NotificationSettings) => void;
   eventScheduleValidation: EventScheduleValidation;
   onResetClick: () => void;
@@ -65,6 +64,7 @@ type EventScheduleSettingCommonHooks = Readonly<{
   editButtonIsLoading: boolean;
   onEditEventClick: () => void;
   onBackToAnswerPageClick: () => void;
+  diff: EventSettingsPageDiffResult;
   hasNoChanges: boolean;
   holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
@@ -87,34 +87,44 @@ export const useEventScheduleSettingCommonHooks = (
   >(initialValues.current.datetimeRangeList);
 
   const {
-    useThisConfig: useAnswerDeadline,
-    setUseThisConfig: setUseAnswerDeadline,
+    toggleState: useAnswerDeadline,
     toggle: onToggleAnswerDeadline,
     value: answerDeadline,
     setValue: setAnswerDeadline,
-    resetValue: resetAnswerDeadline,
+    resetState: resetAnswerDeadline,
   } = useToggleSectionState<Ymdhm | undefined>({
-    initialToggleState: initialValues.current.useAnswerDeadline,
-    defaultValue: initialValues.current.answerDeadline,
-    valueWhenTurnedOff: undefined,
-    valueWhenTurnedOn: initialAnswerDeadline,
+    initialToggleState: initialValues.current.answerDeadline !== 'none',
+    initialState: mapNoneToUndefined(initialValues.current.answerDeadline),
+    valueToBeSetWhenTurnedOff: undefined,
+    valueToBeSetWhenTurnedOn: initialAnswerDeadline,
   });
 
   const [answerIcons, setAnswerIcons, resetAnswerIcons] =
     useStateWithResetter<AnswerIconSettings>(initialValues.current.answerIcons);
 
+  const user = useUser();
+
+  const initialNotificationSettingsWithEmailFilled = useMemo(
+    () => ({
+      ...initialNotificationSettings,
+      email: user?.email ?? '',
+    }),
+    [user]
+  );
+
   const {
-    useThisConfig: useNotification,
-    setUseThisConfig: setUseNotification,
+    toggleState: useNotification,
     toggle: onToggleUseNotification,
     value: notificationSettings,
     setValue: setNotificationSettings,
-    resetValue: resetNotificationSettings,
-  } = useToggleSectionState<NotificationSettings>({
-    initialToggleState: initialValues.current.useNotification,
-    defaultValue: initialValues.current.notificationSettings,
-    valueWhenTurnedOff: initialNotificationSettings,
-    valueWhenTurnedOn: initialNotificationSettings,
+    resetState: resetNotificationSettings,
+  } = useToggleSectionState<NotificationSettings | undefined>({
+    initialToggleState: initialValues.current.notificationSettings !== 'none',
+    initialState: mapNoneToUndefined(
+      initialValues.current.notificationSettings
+    ),
+    valueToBeSetWhenTurnedOff: undefined,
+    valueToBeSetWhenTurnedOn: initialNotificationSettingsWithEmailFilled,
   });
 
   const newEventSchedule: EventSchedule = useMemo(
@@ -124,24 +134,30 @@ export const useEventScheduleSettingCommonHooks = (
         notes,
         datetimeSpecification,
         datetimeRangeList,
-        useAnswerDeadline,
-        answerDeadline: answerDeadline ?? defaultYmdhm,
+        answerDeadline: answerDeadline ?? 'none',
         answerIcons,
-        useNotification,
-        notificationSettings,
-        timezoneOffsetMinutes: defaultEventSchedule.timezoneOffsetMinutes,
+        notificationSettings: notificationSettings ?? 'none',
+        timezoneOffsetMinutes: eventScheduleDefaultValue.timezoneOffsetMinutes,
+        author: {
+          id: user?.uid ?? null,
+          name: user?.displayName ?? '',
+        },
       }),
     [
       title,
       notes,
       datetimeSpecification,
       datetimeRangeList,
-      useAnswerDeadline,
       answerDeadline,
       answerIcons,
-      useNotification,
       notificationSettings,
+      user,
     ]
+  );
+
+  const diff = useMemo<EventSettingsPageDiffResult>(
+    () => collectEventSettingsPageDiff(initialValues.current, newEventSchedule),
+    [newEventSchedule]
   );
 
   const hasNoChanges = useMemo<boolean>(
@@ -154,21 +170,10 @@ export const useEventScheduleSettingCommonHooks = (
       validateEventSchedule({
         title,
         datetimeRangeList,
-        useAnswerDeadline,
-        answerDeadline,
         answerIcons,
-        useNotification,
-        notificationSettings,
+        notificationSettings: notificationSettings ?? 'none',
       }),
-    [
-      title,
-      datetimeRangeList,
-      useAnswerDeadline,
-      answerDeadline,
-      answerIcons,
-      useNotification,
-      notificationSettings,
-    ]
+    [title, datetimeRangeList, answerIcons, notificationSettings]
   );
 
   const eventScheduleValidationOk = validateEventScheduleAll(
@@ -204,18 +209,10 @@ export const useEventScheduleSettingCommonHooks = (
     onNotesChange(initialValues.current.notes);
     onDatetimeSpecificationChange(initialValues.current.datetimeSpecification);
     onDatetimeListChange(initialValues.current.datetimeRangeList);
-    setUseAnswerDeadline(initialValues.current.useAnswerDeadline);
     resetAnswerDeadline();
-    resetAnswerIcons();
-    setUseNotification(initialValues.current.useNotification);
     resetNotificationSettings();
-  }, [
-    setUseAnswerDeadline,
-    resetAnswerDeadline,
-    resetAnswerIcons,
-    setUseNotification,
-    resetNotificationSettings,
-  ]);
+    resetAnswerIcons();
+  }, [resetAnswerDeadline, resetNotificationSettings, resetAnswerIcons]);
 
   const holidaysJpDefinition = useStreamValue<
     IMapMapped<YearMonthDate, string, YmdKey>
@@ -254,6 +251,7 @@ export const useEventScheduleSettingCommonHooks = (
     editButtonIsLoading,
     onEditEventClick,
     onBackToAnswerPageClick,
+    diff,
     hasNoChanges,
     holidaysJpDefinition,
   };

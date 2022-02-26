@@ -4,7 +4,7 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import {
   compareYmd,
-  defaultYearMonthDate,
+  yearMonthDateDefaultValue,
 } from '@noshiro/event-schedule-app-shared';
 import type { Observable } from '@noshiro/syncflow';
 import { fromArray } from '@noshiro/syncflow';
@@ -179,7 +179,7 @@ export const useMultipleDatePickerState = (
             selectedDatesDispatch({
               type: 'fill-column',
               dates: dates
-                .map((week) => week[w] ?? defaultYearMonthDate)
+                .map((week) => week[w] ?? yearMonthDateDefaultValue)
                 .filter((d) => d.month === calendarCurrentPage.month),
             });
           },

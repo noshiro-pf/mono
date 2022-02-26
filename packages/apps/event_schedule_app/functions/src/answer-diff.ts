@@ -10,8 +10,8 @@ export const answerDiffAsString = (
   datetimeSpecification: DatetimeSpecificationEnumType
 ): string[] => {
   const result = [];
-  if (before.userName !== after.userName) {
-    result.push(`・ 名前の変更（${before.userName}→${after.userName}）`);
+  if (before.user.name !== after.user.name) {
+    result.push(`・ 名前の変更（${before.user.name}→${after.user.name}）`);
     result.push('');
   }
 

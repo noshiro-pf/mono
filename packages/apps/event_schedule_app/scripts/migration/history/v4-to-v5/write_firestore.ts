@@ -3,19 +3,19 @@
 import type {
   Answer as AnswerCurr,
   EventSchedule as EventScheduleCurr,
-} from '@noshiro/event-schedule-app-shared/cjs/v3';
-import { firestorePaths as firestorePathsCurr } from '@noshiro/event-schedule-app-shared/cjs/v3';
+} from '@noshiro/event-schedule-app-shared/cjs/v4';
+import { firestorePaths as firestorePathsCurr } from '@noshiro/event-schedule-app-shared/cjs/v4';
 import type {
   Answer as AnswerNext,
   EventSchedule as EventScheduleNext,
-} from '@noshiro/event-schedule-app-shared/cjs/v4';
+} from '@noshiro/event-schedule-app-shared/cjs/v5';
 import {
   fillAnswer,
   fillEventSchedule,
   firestorePaths as firestorePathsNext,
-} from '@noshiro/event-schedule-app-shared/cjs/v4';
+} from '@noshiro/event-schedule-app-shared/cjs/v5';
 import * as admin from 'firebase-admin';
-import serviceAccount from './service-account-key.json';
+import serviceAccount from '../../../service-account-key.json';
 
 const app = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
@@ -28,16 +28,56 @@ const collectionNameNext = firestorePathsNext.events;
 const subCollectionName = firestorePathsNext.answers;
 
 const convertEventSchedule = ({
-  answerSymbols,
-  ...curr
+  answerDeadline,
+  answerIcons,
+  datetimeRangeList,
+  datetimeSpecification,
+  notes,
+  notificationSettings,
+  timezoneOffsetMinutes,
+  title,
+  useAnswerDeadline,
+  useNotification,
 }: EventScheduleCurr): EventScheduleNext =>
   fillEventSchedule({
-    ...curr,
-    answerIcons: answerSymbols,
+    answerDeadline:
+      !useAnswerDeadline || answerDeadline === undefined
+        ? 'none'
+        : answerDeadline,
+    answerIcons,
+    author: {
+      id: null,
+      name: '',
+    },
+    datetimeRangeList,
+    datetimeSpecification,
+    notes,
+    notificationSettings: !useNotification ? 'none' : notificationSettings,
+    timezoneOffsetMinutes,
+    title,
   });
 
-const convertAnswer = ({ useWeight: _, ...curr }: AnswerCurr): AnswerNext =>
-  fillAnswer(curr);
+const convertAnswer = ({
+  comment,
+  createdAt,
+  id,
+  isRequiredParticipants,
+  selection,
+  userName,
+  weight,
+}: AnswerCurr): AnswerNext =>
+  fillAnswer({
+    comment,
+    createdAt,
+    id,
+    isRequiredParticipants,
+    selection,
+    user: {
+      id: null,
+      name: userName,
+    },
+    weight,
+  });
 
 const updateStore = async (): Promise<boolean> => {
   const eventsSnapshotCurr = await db.collection(collectionNameCurr).get();

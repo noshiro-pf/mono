@@ -6,16 +6,10 @@ import {
   EditEventSchedule,
   Footer,
   NotFoundPage,
+  RegisterPage,
+  SignInPage,
 } from './components';
-import { redirectRules } from './constants';
-import { router, useShowPage } from './store';
-
-router.pathname$.subscribe((pathname) => {
-  const to = redirectRules.get(pathname);
-  if (to !== undefined) {
-    router.redirect(to);
-  }
-});
+import { useShowPage } from './store';
 
 export const Main = memoNamed('Main', () => {
   const show = useShowPage();
@@ -28,6 +22,10 @@ export const Main = memoNamed('Main', () => {
         <EditEventSchedule />
       ) : show.answerPage ? (
         <AnswerPage />
+      ) : show.registerPage ? (
+        <RegisterPage />
+      ) : show.signInPage ? (
+        <SignInPage />
       ) : (
         <NotFoundPage />
       )}

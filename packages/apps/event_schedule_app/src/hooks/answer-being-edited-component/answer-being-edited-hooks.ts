@@ -19,6 +19,7 @@ import {
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
 } from '../../functions';
+import { useUser } from '../../store';
 import type { AnswerSelectionValue } from '../../types';
 import { useFormError } from '../use-form-error-hook';
 
@@ -50,6 +51,7 @@ type AnswerBeingEditedHooks = DeepReadonly<{
   }[];
   onWeightChange: (v: Weight) => void;
   toggleRequiredSection: () => void;
+  toggleProtectedSection: () => void;
   hasUnanswered: boolean;
 }>;
 
@@ -60,7 +62,7 @@ const theNameIsAlreadyUsedFn = (
 ): boolean =>
   userName === nameToOmit
     ? false
-    : answers.some((a) => a.userName === userName);
+    : answers.some((a) => a.user.name === userName);
 
 // フォームの入力値のstateは onAnswerBeingEditedUpdate で変更しこのhooks内にはstateを持たない
 export const useAnswerBeingEditedHooks = ({
@@ -77,9 +79,9 @@ export const useAnswerBeingEditedHooks = ({
   updateAnswerBeingEdited: (updater: (answer: Answer) => Answer) => void;
 }>): AnswerBeingEditedHooks => {
   const onUserNameChange = useCallback(
-    (userName: UserName) => {
+    (userName: string) => {
       updateAnswerBeingEdited(() =>
-        IRecord.set(answerBeingEdited, 'userName', userName)
+        IRecord.setIn(answerBeingEdited, ['user', 'name'], userName)
       );
     },
     [answerBeingEdited, updateAnswerBeingEdited]
@@ -88,7 +90,7 @@ export const useAnswerBeingEditedHooks = ({
   const theNameIsAlreadyUsed: boolean = useMemo(
     () =>
       theNameIsAlreadyUsedFn(
-        answerBeingEdited.userName,
+        answerBeingEdited.user.name,
         answers,
         selectedAnswerUserName
       ),
@@ -97,7 +99,7 @@ export const useAnswerBeingEditedHooks = ({
 
   const [showUserNameError, onUserNameChangeLocal, onUserNameBlur] =
     useFormError(
-      answerBeingEdited.userName,
+      answerBeingEdited.user.name,
       (v) =>
         v === '' || theNameIsAlreadyUsedFn(v, answers, selectedAnswerUserName),
       onUserNameChange
@@ -277,6 +279,20 @@ export const useAnswerBeingEditedHooks = ({
     );
   }, [updateAnswerBeingEdited]);
 
+  const user = useUser();
+
+  const toggleProtectedSection = useCallback(() => {
+    updateAnswerBeingEdited((ans) =>
+      IRecord.set(
+        ans,
+        'user',
+        IRecord.update(ans.user, 'id', (uid) =>
+          uid === null ? user?.uid ?? null : null
+        )
+      )
+    );
+  }, [user, updateAnswerBeingEdited]);
+
   const hasUnanswered = useMemo<boolean>(
     () =>
       answerBeingEditedList.some(
@@ -295,6 +311,7 @@ export const useAnswerBeingEditedHooks = ({
     answerBeingEditedList,
     onWeightChange,
     toggleRequiredSection,
+    toggleProtectedSection,
     hasUnanswered,
   };
 };

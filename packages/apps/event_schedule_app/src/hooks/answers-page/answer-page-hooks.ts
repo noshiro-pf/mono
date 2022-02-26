@@ -6,10 +6,10 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useAlive } from '@noshiro/react-utils';
+import { useAlive, useBooleanState } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
-import { IRecord } from '@noshiro/ts-utils';
+import { IRecord, Result } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../api';
@@ -27,6 +27,7 @@ import {
   refreshButtonIsLoading$,
   requiredParticipantsExist$,
   router,
+  useUser,
 } from '../../store';
 import { useAnswerBeingEditedState } from './answer-being-edited-state-hooks';
 
@@ -34,10 +35,16 @@ type AnswerPageState = DeepReadonly<{
   eventId: string | undefined;
   eventSchedule: EventSchedule | undefined;
   onEditButtonClick: () => void;
-  answers: readonly Answer[] | undefined;
+  answers: Answer[] | undefined;
   errorType:
-    | { data: 'answersResult'; type: 'not-found' | 'others' }
-    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' }
+    | {
+        data: 'answersResult';
+        type: { type: 'others'; message: string };
+      }
+    | {
+        data: 'eventScheduleResult';
+        type: { type: 'not-found' | 'others'; message: string };
+      }
     | undefined;
   onAnswerClick: (answer: Answer) => void;
   onAddAnswerButtonClick: () => void;
@@ -56,6 +63,8 @@ type AnswerPageState = DeepReadonly<{
   requiredParticipantsExist: boolean;
   selectedDates: readonly YearMonthDate[];
   holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>;
+  alertOnAnswerClickIsOpen: boolean;
+  closeAlertOnAnswerClick: () => void;
 }> & {
   readonly answerSectionRef: RefObject<HTMLDivElement>;
 };
@@ -64,14 +73,15 @@ const toast = createToaster();
 
 export const useAnswerPageState = (): AnswerPageState => {
   /* state */
+  const user = useUser();
 
   const [answerBeingEditedSectionState, setAnswerBeingEditedSectionState] =
     useState<'creating' | 'editing' | 'hidden'>('hidden');
 
   const [
     //
-    selectedAnswer,
-    setSelectedAnswer,
+    selectedAnswerSaved,
+    setSelectedAnswerSaved,
   ] = useState<Answer | undefined>(undefined);
 
   const [submitButtonIsLoading, setSubmitButtonIsLoading] =
@@ -83,6 +93,12 @@ export const useAnswerPageState = (): AnswerPageState => {
     updateAnswerBeingEdited,
     resetAnswerBeingEdited,
   } = useAnswerBeingEditedState(eventSchedule$);
+
+  const [
+    alertOnAnswerClickIsOpen,
+    openAlertOnAnswerClick,
+    closeAlertOnAnswerClick,
+  ] = useBooleanState(false);
 
   /* effect */
 
@@ -109,22 +125,31 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const onAnswerClick = useCallback(
     (answer: Answer) => {
-      setAnswerBeingEditedSectionState('editing');
-      setAnswerBeingEdited(answer);
-      setSelectedAnswer(answer);
+      // ログインユーザーの回答は本人のみ編集可能にする
+      if (answer.user.id !== null && answer.user.id !== user?.uid) {
+        openAlertOnAnswerClick();
+      } else {
+        setAnswerBeingEditedSectionState('editing');
+        setAnswerBeingEdited(answer);
+        setSelectedAnswerSaved(answer);
+      }
     },
-    [setAnswerBeingEdited]
+    [user, openAlertOnAnswerClick, setAnswerBeingEdited]
   );
 
   const clearAnswerBeingEditedFields = useCallback(() => {
     resetAnswerBeingEdited();
-    setSelectedAnswer(undefined);
+    setSelectedAnswerSaved(undefined);
   }, [resetAnswerBeingEdited]);
 
   const onAddAnswerButtonClick = useCallback(() => {
     clearAnswerBeingEditedFields();
     setAnswerBeingEditedSectionState('creating');
-  }, [clearAnswerBeingEditedFields]);
+    // automatically set username with user.displayName
+    updateAnswerBeingEdited((prev) =>
+      IRecord.setIn(prev, ['user', 'name'], user?.displayName ?? '')
+    );
+  }, [user, clearAnswerBeingEditedFields, updateAnswerBeingEdited]);
 
   const onCancel = useCallback(() => {
     clearAnswerBeingEditedFields();
@@ -139,13 +164,20 @@ export const useAnswerPageState = (): AnswerPageState => {
   const onSubmitAnswer = useCallback(async () => {
     if (eventId === undefined) return;
     if (!alive.current) return;
+
     setSubmitButtonIsLoading(true);
+
     switch (answerBeingEditedSectionState) {
       case 'creating':
         await api.answers
           .add(eventId, IRecord.set(answerBeingEdited, 'createdAt', Date.now()))
-          .then(() => {
+          .then((res) => {
             if (!alive.current) return;
+
+            if (Result.isErr(res)) {
+              console.error(res.value);
+            }
+
             setSubmitButtonIsLoading(false);
             setAnswerBeingEditedSectionState('hidden');
             fetchAnswers();
@@ -157,14 +189,18 @@ export const useAnswerPageState = (): AnswerPageState => {
                   .createAnswerResultMessage,
               intent: 'success',
             });
-          })
-          .catch(console.error);
+          });
         break;
+
       case 'editing':
         await api.answers
           .update(eventId, answerBeingEdited.id, answerBeingEdited)
-          .then(() => {
+          .then((res) => {
             if (!alive.current) return;
+
+            if (Result.isErr(res)) {
+              console.error(res.value);
+            }
             setSubmitButtonIsLoading(false);
             setAnswerBeingEditedSectionState('hidden');
             fetchAnswers();
@@ -176,8 +212,7 @@ export const useAnswerPageState = (): AnswerPageState => {
                   .updateAnswerResultMessage,
               intent: 'success',
             });
-          })
-          .catch(console.error);
+          });
         break;
       case 'hidden':
         break;
@@ -194,24 +229,23 @@ export const useAnswerPageState = (): AnswerPageState => {
     if (eventId === undefined) return;
     if (!alive.current) return;
     setSubmitButtonIsLoading(true);
-    await api.answers
-      .delete(eventId, answerBeingEdited.id)
-      .then(() => {
-        if (!alive.current) return;
-        setSubmitButtonIsLoading(false);
-        setAnswerBeingEditedSectionState('hidden');
-        fetchAnswers();
-        clearAnswerBeingEditedFields();
-      })
-      .catch(console.error);
+    await api.answers.delete(eventId, answerBeingEdited.id).then((res) => {
+      if (!alive.current) return;
+      if (Result.isErr(res)) {
+        console.error(res.value);
+      }
+      setSubmitButtonIsLoading(false);
+      setAnswerBeingEditedSectionState('hidden');
+      fetchAnswers();
+      clearAnswerBeingEditedFields();
+    });
   }, [answerBeingEdited.id, eventId, alive, clearAnswerBeingEditedFields]);
 
   const isExpired = useMemo<boolean>(
     () =>
       eventSchedule === undefined
         ? false
-        : eventSchedule.useAnswerDeadline &&
-          eventSchedule.answerDeadline !== undefined &&
+        : eventSchedule.answerDeadline !== 'none' &&
           compareYmdhm(now(), eventSchedule.answerDeadline) >= 0,
     [eventSchedule]
   );
@@ -226,9 +260,9 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const submitButtonIsDisabled = useMemo<boolean>(
     () =>
-      answerBeingEdited.userName === '' ||
-      deepEqual(selectedAnswer, answerBeingEdited),
-    [answerBeingEdited, selectedAnswer]
+      answerBeingEdited.user.name === '' ||
+      deepEqual(selectedAnswerSaved, answerBeingEdited),
+    [answerBeingEdited, selectedAnswerSaved]
   );
 
   const errorType = useStreamValue(errorType$);
@@ -264,9 +298,11 @@ export const useAnswerPageState = (): AnswerPageState => {
     refreshButtonIsLoading,
     refreshButtonIsDisabled,
     isExpired,
-    selectedAnswerUserName: selectedAnswer?.userName,
+    selectedAnswerUserName: selectedAnswerSaved?.user.name,
     requiredParticipantsExist,
     selectedDates,
     holidaysJpDefinition,
+    alertOnAnswerClickIsOpen,
+    closeAlertOnAnswerClick,
   };
 };

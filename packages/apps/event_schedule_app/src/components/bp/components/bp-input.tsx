@@ -25,19 +25,20 @@ export const BpInput = memoNamed<BpInputProps>(
     );
 
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const onFocus = useCallback(() => {
+
+    const focusInput = useCallback(() => {
       inputRef.current?.focus();
     }, []);
 
     useEffect(() => {
       if (autoFocus === true) {
-        onFocus();
+        focusInput();
       }
-    }, [autoFocus, onFocus]);
+    }, [autoFocus, focusInput]);
 
     useTinyObservableEffect(
       focus$ ?? createTinyObservable<undefined>(),
-      onFocus
+      focusInput
     );
 
     return (

@@ -9,6 +9,8 @@ const pathToken = {
   createPage: 'create',
   answerPage: 'event',
   editPageSuffix: 'edit',
+  registerUser: 'register',
+  signIn: 'signIn',
 } as const;
 
 export const routes = {
@@ -18,6 +20,9 @@ export const routes = {
 
   editPage: (eventId: string) =>
     `/${pathToken.answerPage}/${eventId}/${pathToken.editPageSuffix}/`,
+
+  registerPage: `/${pathToken.registerUser}/`,
+  signInPage: `/${pathToken.signIn}/`,
 } as const;
 
 export const isRoute = {
@@ -33,6 +38,13 @@ export const isRoute = {
     isArrayOfLength3(pathnameTokens) &&
     pathnameTokens[0] === pathToken.answerPage &&
     pathnameTokens[2] === pathToken.editPageSuffix,
+
+  registerPage: (pathnameTokens: readonly string[]): boolean =>
+    isArrayOfLength1(pathnameTokens) &&
+    pathnameTokens[0] === pathToken.registerUser,
+
+  signInPage: (pathnameTokens: readonly string[]): boolean =>
+    isArrayOfLength1(pathnameTokens) && pathnameTokens[0] === pathToken.signIn,
 } as const;
 
 export const redirectRules = IMap.new<string, string>([

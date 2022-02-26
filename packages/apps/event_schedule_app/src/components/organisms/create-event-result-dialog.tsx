@@ -6,6 +6,7 @@ import {
   Tooltip,
 } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { DialogWithMaxWidth } from '../bp';
@@ -23,64 +24,95 @@ type Props = Readonly<{
 
 export const CreateEventResultDialog = memoNamed<Props>(
   'CreateEventResultDialog',
-  (props) => (
-    <DialogWithMaxWidth
-      canEscapeKeyClose={false}
-      hasBackdrop={false}
-      icon='timeline-events'
-      isCloseButtonShown={false}
-      isOpen={props.isOpen}
-      title={props.isLoading ? dc.titleLoading : dc.title}
-    >
-      <div className={Classes.DIALOG_BODY}>
-        {props.isLoading ? (
-          <Spinner />
-        ) : (
-          <>
-            <p>{dc.description}</p>
-            <UrlWrapper>
-              <div>{'URL: '}</div>
-              <AnchorWrapper>
-                <Anchor
-                  href={props.url}
-                  rel='noopener noreferrer'
-                  target='_blank'
-                >
-                  {props.url}
-                </Anchor>
-              </AnchorWrapper>
-              <div>
-                <Tooltip content={dc.clipboardButton}>
-                  <Button
-                    icon={'clipboard'}
-                    minimal={true}
-                    onClick={props.onClipboardButtonClick}
-                  />
-                </Tooltip>
-              </div>
-            </UrlWrapper>
-          </>
-        )}
-      </div>
-      {props.isLoading ? undefined : (
+  (props) => {
+    const [linkIsUsed, setLinkIsUsed] = useState<boolean>(false);
+
+    const onClipboardButtonClick = useCallback(() => {
+      setLinkIsUsed(true);
+      props.onClipboardButtonClick();
+    }, [props]);
+
+    const onLinkClick = useCallback(() => {
+      setLinkIsUsed(true);
+    }, []);
+
+    useEffect(() => {
+      if (!props.isOpen) {
+        setLinkIsUsed(false);
+      }
+    }, [props.isOpen]);
+
+    return (
+      <DialogWithMaxWidth
+        canEscapeKeyClose={false}
+        hasBackdrop={false}
+        icon={'timeline-events'}
+        isCloseButtonShown={false}
+        isOpen={props.isOpen}
+        title={props.isLoading ? dc.titleLoading : dc.title}
+      >
+        <div className={Classes.DIALOG_BODY}>
+          {props.isLoading ? (
+            <Spinner />
+          ) : (
+            <>
+              <p>{dc.description}</p>
+              <UrlWrapper>
+                <div>{'URL: '}</div>
+                <AnchorWrapper>
+                  <Anchor
+                    href={props.url}
+                    rel={'noopener noreferrer'}
+                    target={'_blank'}
+                    onClick={onLinkClick}
+                  >
+                    {props.url}
+                  </Anchor>
+                </AnchorWrapper>
+                <div>
+                  <Tooltip content={dc.clipboardButton}>
+                    <Button
+                      icon={'clipboard'}
+                      minimal={true}
+                      onClick={onClipboardButtonClick}
+                    />
+                  </Tooltip>
+                </div>
+              </UrlWrapper>
+            </>
+          )}
+        </div>
+
         <div className={Classes.DIALOG_FOOTER}>
           <ButtonsWrapperAlignEnd>
-            <AnchorButton intent={'none'} onClick={props.close}>
+            <Button
+              disabled={props.isLoading || !linkIsUsed}
+              intent={'none'}
+              title={
+                props.isLoading || !linkIsUsed
+                  ? dc.whyButtonIsDisabled
+                  : undefined
+              }
+              onClick={props.close}
+            >
               {dc.back}
-            </AnchorButton>
+            </Button>
+
             <AnchorButton
               href={props.url}
               intent={'primary'}
-              rel='noopener noreferrer'
-              target='_blank'
+              loading={props.isLoading}
+              rel={'noopener noreferrer'}
+              target={'_blank'}
+              onClick={onLinkClick}
             >
               {dc.openEventPageCreated}
             </AnchorButton>
           </ButtonsWrapperAlignEnd>
         </div>
-      )}
-    </DialogWithMaxWidth>
-  )
+      </DialogWithMaxWidth>
+    );
+  }
 );
 
 const UrlWrapper = styled.div`

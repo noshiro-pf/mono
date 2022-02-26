@@ -2,13 +2,11 @@ import { defaultIconPoint } from '../default-icon-point';
 
 export const eventSettingsPageDictionary = {
   title: '日程調整',
-  editSubTitle: {
-    prefix: 'イベント「',
-    suffix: '」の設定編集',
-  },
+  editSubTitle: (title: string) => `イベント「${title}」の設定編集`,
   section1: {
     titleAndNotesSectionTitle: 'イベント名・ノートを入力してください。（1/3）',
-    eventName: 'イベント名（必須項目）',
+    eventName: 'イベント名',
+    eventNameInfo: '（必須項目）',
     eventNamePlaceholder: 'ボードゲーム会',
     notes: 'ノート',
     notesPlaceholder: '日程を回答してください。',
@@ -62,15 +60,17 @@ export const eventSettingsPageDictionary = {
       '回答期限をオンにしていますが空欄になっています。',
     passwordIsEnabledButEmpty:
       'パスワードをオンにしていますが空欄になっています。',
-    invalidEmail: '有効なメールアドレスではありません。',
     atLeastOneNotificationCheckRequired:
-      '通知設定をオンにする場合は少なくとも一つの通知にチェックをしてください。',
+      '通知設定をオンにした場合は、少なくとも一つの通知項目にチェックをしてください。',
     answerIcons:
       '記号の設定に不備があります。説明に空欄があるか、△の点数が0.1以上9.9以下になっていない可能性があります。',
   },
   createEventButton: '日程調整ページを作成',
   editEventButton: 'イベント設定を更新',
-  editEventResultMessage: 'イベント設定を更新しました。',
+  editEventResultMessage: {
+    success: 'イベント設定を更新しました。',
+    error: 'イベント設定の更新中にエラーが発生しました。',
+  },
   resetButton: {
     name: 'リセット',
     resetConfirmation:
@@ -88,5 +88,45 @@ export const eventSettingsPageDictionary = {
     resetConfirmation:
       '編集内容を取り消して回答ページに戻りますか？（この操作は取り消すことができません）',
     resetResultMessage: '編集をキャンセルしました。',
+  },
+  diff: {
+    title: '変更差分',
+    values: {
+      none: 'なし',
+    },
+    items: {
+      title: 'イベント名：',
+      notes: 'ノート：',
+      datetimeSpecification: '時刻指定方法：',
+      datetimeRangeList: {
+        title: '候補日程',
+        added: '追加',
+        deleted: '削除',
+      },
+      answerDeadline: '回答締切日：',
+      notificationSettings: {
+        title: '通知設定',
+        on: 'オン',
+        off: 'オフ',
+      },
+      answerIcons: {
+        title: '記号',
+        good: {
+          title: '〇',
+          description: '説明：',
+        },
+        fair: {
+          title: '△',
+          description: '説明：',
+          point: '点：',
+        },
+        poor: {
+          title: '×',
+          description: '説明：',
+        },
+      },
+      author: '作成者：',
+      timezoneOffsetMinutes: 'タイムゾーン：',
+    },
   },
 } as const;

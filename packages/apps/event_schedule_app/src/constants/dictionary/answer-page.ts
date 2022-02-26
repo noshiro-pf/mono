@@ -2,7 +2,6 @@ import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
 
 export const answerPageDictionary = {
   title: '日程調整 回答ページ',
-  createNew: '日程調整を新規作成',
   eventInfo: {
     title: '概要',
     eventName: 'イベント名',
@@ -47,6 +46,9 @@ export const answerPageDictionary = {
     `デフォルトの点数（＝${defaultPoint}点）から変更されている場合は、△の右隣に括弧付きでその点数が表示されています。`,
   ],
 
+  protectedAnswerIsNotEditable:
+    'この回答は作成者により保護されているため、本人のアカウントでログイン中のみ編集できます。',
+
   answerBeingEdited: {
     title: {
       create: '回答追加',
@@ -69,6 +71,12 @@ export const answerPageDictionary = {
         'この回答の優先度を上げたい場合に1より大きい値を、下げたい場合に1より小さい値を設定するという使い方もできます。',
       ],
       suffix: '人分としてカウント',
+    },
+    protected: {
+      title: 'この回答を保護する',
+      description: [
+        'これを有効にした場合、（現在ログインしている）本人のアカウントでログイン中のみこの回答を編集・削除できるようになります。',
+      ],
     },
     submitButton: {
       create: '回答を追加する',

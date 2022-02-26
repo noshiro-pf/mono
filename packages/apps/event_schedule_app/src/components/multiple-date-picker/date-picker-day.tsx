@@ -1,15 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type {
   DayType,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { noop } from '@noshiro/ts-utils';
-import type { CSSProperties } from 'react';
+import { match, noop } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import {
+  DatePickerDayHolidayStyled,
+  DatePickerDayOutlinedSelectedReadonlyHolidayStyled,
+  DatePickerDayOutlinedSelectedReadonlySaturdayStyled,
+  DatePickerDayOutlinedSelectedReadonlyStyled,
   DatePickerDayOutside,
+  DatePickerDayReadonlyHolidayStyled,
+  DatePickerDayReadonlySaturdayStyled,
   DatePickerDayReadonlyStyled,
+  DatePickerDaySaturdayStyled,
   DatePickerDaySelectedReadonlyStyled,
   DatePickerDaySelectedStyled,
   DatePickerDayStyled,
@@ -20,6 +27,7 @@ type Props = Readonly<{
   ymd: YearMonthDate;
   onClick?: () => void;
   selected: boolean;
+  useOutlinedSelectedStyle?: boolean;
   outside: boolean;
   dayType: DayType;
   holidayJpName: string | undefined;
@@ -32,6 +40,7 @@ export const DatePickerDate = memoNamed<Props>(
     onClick,
     selected = false,
     outside = false,
+    useOutlinedSelectedStyle = false,
     dayType = 'normal',
     holidayJpName,
   }) => {
@@ -40,38 +49,45 @@ export const DatePickerDate = memoNamed<Props>(
       [ymd]
     );
 
-    const DatePickerDayResolved =
-      onClick === undefined
-        ? selected
-          ? DatePickerDaySelectedReadonlyStyled
+    const DatePickerDayResolved = useMemo(() => {
+      if (onClick === undefined) {
+        // readonly
+        return selected
+          ? useOutlinedSelectedStyle
+            ? match(dayType, {
+                holiday: DatePickerDayOutlinedSelectedReadonlyHolidayStyled,
+                Sunday: DatePickerDayOutlinedSelectedReadonlyHolidayStyled,
+                Saturday: DatePickerDayOutlinedSelectedReadonlySaturdayStyled,
+                normal: DatePickerDayOutlinedSelectedReadonlyStyled,
+              })
+            : DatePickerDaySelectedReadonlyStyled
           : outside
           ? DatePickerDayOutside
-          : DatePickerDayReadonlyStyled
-        : selected
-        ? outside
-          ? DatePickerDaySelectedReadonlyStyled
-          : DatePickerDaySelectedStyled
-        : outside
-        ? DatePickerDayOutside
-        : DatePickerDayStyled;
-
-    const style = useMemo<CSSProperties>(() => {
-      if (selected || outside) return {};
-      switch (dayType) {
-        case 'holiday':
-        case 'Sunday':
-          return { color: 'red' };
-        case 'Saturday':
-          return { color: 'blue' };
-        case 'normal':
-        default:
-          return {};
+          : match(dayType, {
+              holiday: DatePickerDayReadonlyHolidayStyled,
+              Sunday: DatePickerDayReadonlyHolidayStyled,
+              Saturday: DatePickerDayReadonlySaturdayStyled,
+              normal: DatePickerDayReadonlyStyled,
+            });
+      } else {
+        // button
+        return selected
+          ? outside
+            ? DatePickerDaySelectedReadonlyStyled
+            : DatePickerDaySelectedStyled
+          : outside
+          ? DatePickerDayOutside
+          : match(dayType, {
+              holiday: DatePickerDayHolidayStyled,
+              Sunday: DatePickerDayHolidayStyled,
+              Saturday: DatePickerDaySaturdayStyled,
+              normal: DatePickerDayStyled,
+            });
       }
-    }, [dayType, selected, outside]);
+    }, [dayType, onClick, selected, outside, useOutlinedSelectedStyle]);
 
     return (
       <DatePickerDayResolved
-        // eslint-disable-next-line react/forbid-component-props
         aria-disabled={outside}
         aria-label={dateString}
         aria-selected={selected}
@@ -80,9 +96,7 @@ export const DatePickerDate = memoNamed<Props>(
         title={holidayJpName}
         onClick={outside ? noop : onClick}
       >
-        <DatePickerDayWrapperStyled style={style}>
-          {ymd.date}
-        </DatePickerDayWrapperStyled>
+        <DatePickerDayWrapperStyled>{ymd.date}</DatePickerDayWrapperStyled>
       </DatePickerDayResolved>
     );
   }

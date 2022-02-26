@@ -7,8 +7,11 @@ const dc = dict.errorMessages;
 
 type Props = DeepReadonly<{
   errorType:
-    | { data: 'answersResult'; type: 'not-found' | 'others' }
-    | { data: 'eventScheduleResult'; type: 'not-found' | 'others' };
+    | {
+        data: 'eventScheduleResult';
+        type: { type: 'not-found' | 'others'; message: string };
+      }
+    | { data: 'answersResult'; type: { type: 'others'; message: string } };
 }>;
 
 export const AnswerPageError = memoNamed<Props>(
@@ -16,10 +19,10 @@ export const AnswerPageError = memoNamed<Props>(
   ({ errorType }) => (
     <ErrorMessageWrapper>
       {errorType.data === 'eventScheduleResult' &&
-      errorType.type === 'others' ? (
+      errorType.type.type === 'others' ? (
         <Description color={errorFontColor} text={dc.eventScheduleOtherError} />
       ) : undefined}
-      {errorType.data === 'answersResult' && errorType.type === 'others' ? (
+      {errorType.data === 'answersResult' ? (
         <Description color={errorFontColor} text={dc.answersResultOtherError} />
       ) : undefined}
     </ErrorMessageWrapper>

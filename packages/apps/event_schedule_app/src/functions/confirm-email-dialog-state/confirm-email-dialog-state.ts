@@ -1,4 +1,4 @@
-import { isEmailString } from '@noshiro/ts-utils';
+import { assertType, isEmailString } from '@noshiro/ts-utils';
 import type { Reducer } from 'react';
 
 export type ConfirmEmailDialogState = DeepReadonly<{
@@ -6,8 +6,7 @@ export type ConfirmEmailDialogState = DeepReadonly<{
     invalidEmailFormat: boolean;
     emailDoesNotMatch: boolean;
   };
-  enterButtonDisabled: boolean;
-  emailBeingInput: string;
+  emailBeingEdited: string;
 }>;
 
 export const confirmEmailDialogInitialState = {
@@ -15,13 +14,18 @@ export const confirmEmailDialogInitialState = {
     invalidEmailFormat: false,
     emailDoesNotMatch: false,
   },
-  enterButtonDisabled: true,
-  emailBeingInput: '',
+  emailBeingEdited: '',
 } as const;
+
+assertType<
+  TypeExtends<typeof confirmEmailDialogInitialState, ConfirmEmailDialogState>
+>();
 
 export const confirmEmailDialogHasError = (
   state: ConfirmEmailDialogState
-): boolean => Object.values(state.showErrorOf).some((b) => b);
+): boolean =>
+  Object.values(state.showErrorOf).some((b) => b) ||
+  state.emailBeingEdited === '';
 
 export type ConfirmEmailDialogStateAction = DeepReadonly<
   | {
@@ -44,8 +48,7 @@ export const confirmEmailDialogStateReducer: Reducer<
   switch (action.type) {
     case 'clickCancelButton':
       return {
-        emailBeingInput: '',
-        enterButtonDisabled: true,
+        emailBeingEdited: '',
         showErrorOf: {
           emailDoesNotMatch: false,
           invalidEmailFormat: false,
@@ -54,28 +57,27 @@ export const confirmEmailDialogStateReducer: Reducer<
 
     case 'clickEnterButton': {
       const showErrorOf = {
-        invalidEmailFormat: !isEmailString(state.emailBeingInput),
-        emailDoesNotMatch: state.emailBeingInput !== action.payload.emailAnswer,
+        invalidEmailFormat: !isEmailString(state.emailBeingEdited),
+        emailDoesNotMatch:
+          state.emailBeingEdited !== action.payload.emailAnswer,
       };
       return {
-        emailBeingInput: state.emailBeingInput,
-        enterButtonDisabled: confirmEmailDialogHasError(state),
+        emailBeingEdited: state.emailBeingEdited,
         showErrorOf,
       };
     }
 
     case 'inputEmail': {
-      const emailBeingInput = action.payload.value;
+      const emailBeingEdited = action.payload.value;
 
       // if the last operation is backspace
       if (
         confirmEmailDialogHasError(state) &&
-        state.emailBeingInput.length === emailBeingInput.length + 1 &&
-        state.emailBeingInput.slice(0, -1) === emailBeingInput
+        state.emailBeingEdited.length === emailBeingEdited.length + 1 &&
+        state.emailBeingEdited.slice(0, -1) === emailBeingEdited
       ) {
         return {
-          emailBeingInput: '',
-          enterButtonDisabled: emailBeingInput === '',
+          emailBeingEdited: '',
           showErrorOf: {
             emailDoesNotMatch: false,
             invalidEmailFormat: false,
@@ -83,8 +85,7 @@ export const confirmEmailDialogStateReducer: Reducer<
         };
       }
       return {
-        emailBeingInput,
-        enterButtonDisabled: emailBeingInput === '',
+        emailBeingEdited,
         showErrorOf: {
           emailDoesNotMatch: false,
           invalidEmailFormat: false,

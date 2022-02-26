@@ -3,15 +3,19 @@ import {
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { initializeApp } from 'firebase/app';
-import { collection, getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { collection, initializeFirestore } from 'firebase/firestore';
+import { isDevelopment } from './env';
 import { clog } from './utils';
 // import firebasejson from '../firebase.json';
 
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 clog('firebase.initializeApp done.');
 
-export const db = getFirestore();
+export const db = initializeFirestore(app, {
+  ignoreUndefinedProperties: true,
+});
 // if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 //   const host = 'localhost';
 //   const port = firebasejson.emulators.firestore.port;
@@ -20,4 +24,9 @@ export const db = getFirestore();
 //   clog(`using firestore emulator. (${host}:${port})`);
 // }
 
-export const dbEvents = collection(db, firestorePaths.events);
+export const dbEvents = collection(
+  db,
+  `${firestorePaths.events}${isDevelopment ? '_dev' : ''}`
+);
+
+export const auth = getAuth();
