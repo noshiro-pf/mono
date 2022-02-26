@@ -5,4 +5,4 @@
 /// <reference path="../../stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../stdlib/dist/utils.d.ts" />
 
-export * from './deep-equal';
+export * from './deep-object-diff';
