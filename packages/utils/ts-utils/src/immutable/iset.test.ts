@@ -158,31 +158,29 @@ describe('ISet.subtract', () => {
   });
 });
 
-describe('ISet.intersect', () => {
+describe('ISet.intersection', () => {
   test('case 1', () => {
-    expect(ISet.new([1, 3, 5, 6, 7]).intersect(ISet.new<number>([]))).toEqual(
-      ISet.new([])
-    );
+    expect(
+      ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([]))
+    ).toEqual(ISet.new([]));
   });
   test('case 2', () => {
-    expect(ISet.new([1, 3, 5, 6, 7]).intersect(ISet.new([1, 2, 3]))).toEqual(
-      ISet.new([1, 3])
-    );
+    expect(
+      ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new([1, 2, 3]))
+    ).toEqual(ISet.new([1, 3]));
   });
 });
 
 describe('ISet.union', () => {
   test('case 1', () => {
-    expect(ISet.new([1, 3, 5, 6, 7]).union(ISet.new<number>([]))).toEqual(
+    expect(ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([]))).toEqual(
       ISet.new([1, 3, 5, 6, 7])
     );
   });
   test('case 2', () => {
     expect(
       IList.sort(
-        ISet.new([1, 3, 5, 6, 7])
-          .union(ISet.new([2, 4, 8]))
-          .toArray()
+        ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new([2, 4, 8])).toArray()
       )
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });

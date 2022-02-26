@@ -1,9 +1,12 @@
+import { assertType } from '../types';
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface ISetInterface<K> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
   size: number;
+  isEmpty: boolean;
   has: (key: K) => boolean;
 
   // Reducing a value
@@ -22,6 +25,12 @@ interface ISetInterface<K> {
 
   // Sequence algorithms
   map: <K2>(mapFn: (key: K) => K2) => ISet<K2>;
+
+  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  filter: (<K2 extends K>(predicate: (key: K) => key is K2) => ISet<K2>) &
+    ((predicate: (key: K) => boolean) => ISet<K>);
+
+  filterNot: (predicate: (key: K) => boolean) => ISet<K>;
 
   // Set operations
   isSubsetOf: (set: ISet<K>) => boolean;
@@ -46,10 +55,23 @@ export type ISet<K> = Iterable<K> & Readonly<ISetInterface<K>>;
 
 export const ISet = {
   new: <K>(iterable: Iterable<K>): ISet<K> => new ISetClass<K>(iterable),
+
   equal: <K>(a: ISet<K>, b: ISet<K>): boolean => {
     if (a.size !== b.size) return false;
     return a.every((e) => b.has(e));
   },
+
+  diff: <K>(
+    oldSet: ISet<K>,
+    newSet: ISet<K>
+  ): ReadonlyRecord<'added' | 'deleted', ISet<K>> => ({
+    deleted: oldSet.subtract(newSet),
+    added: newSet.subtract(oldSet),
+  }),
+
+  intersection: <K>(a: ISet<K>, b: ISet<K>): ISet<K> => a.intersect(b),
+
+  union: <K1, K2>(a: ISet<K1>, b: ISet<K2>): ISet<K1 | K2> => a.union(b),
 } as const;
 
 class ISetClass<K> implements ISet<K>, Iterable<K> {
@@ -61,6 +83,10 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
 
   get size(): number {
     return this._set.size;
+  }
+
+  get isEmpty(): boolean {
+    return this.size === 0;
   }
 
   has(key: K): boolean {
@@ -116,6 +142,18 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     return ISet.new(this.toArray().map(mapFn));
   }
 
+  filter<K2 extends K>(predicate: (key: K) => key is K2): ISet<K2>;
+
+  filter(predicate: (key: K) => boolean): ISet<K>;
+
+  filter(predicate: (key: K) => boolean): ISet<K> {
+    return ISet.new(this.toArray().filter(predicate));
+  }
+
+  filterNot(predicate: (key: K) => boolean): ISet<K> {
+    return ISet.new(this.toArray().filter((e) => !predicate(e)));
+  }
+
   forEach(callbackfn: (key: K) => void): void {
     this._set.forEach(callbackfn);
   }
@@ -159,4 +197,10 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   toArray(): readonly K[] {
     return [...this.values()];
   }
+}
+
+{
+  const s = ISet.new([1, 2, 3] as const);
+  const r = s.filter((x): x is 1 => x === 1);
+  assertType<TypeEq<typeof r, ISet<1>>>();
 }

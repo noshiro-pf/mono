@@ -4,6 +4,7 @@ interface ISetMappedInterface<K, KM extends RecordKeyType> {
 
   // Getting information
   size: number;
+  isEmpty: boolean;
   has: (key: K) => boolean;
 
   // Reducing a value
@@ -24,6 +25,10 @@ interface ISetMappedInterface<K, KM extends RecordKeyType> {
 
   // Sequence algorithms
   map: (mapFn: (key: K) => K) => ISetMapped<K, KM>;
+
+  filter: (predicate: (value: K) => boolean) => ISetMapped<K, KM>;
+
+  filterNot: (predicate: (key: K) => boolean) => ISetMapped<K, KM>;
 
   // Side effects
   forEach: (callbackfn: (key: K) => void) => void;
@@ -53,6 +58,7 @@ export const ISetMapped = {
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ): ISetMapped<K, KM> => new ISetMappedClass<K, KM>(iterable, toKey, fromKey),
+
   equal: <K, KM extends RecordKeyType>(
     a: ISetMapped<K, KM>,
     b: ISetMapped<K, KM>
@@ -60,6 +66,24 @@ export const ISetMapped = {
     if (a.size !== b.size) return false;
     return a.every((e) => b.has(e));
   },
+
+  diff: <K, KM extends RecordKeyType>(
+    oldSet: ISetMapped<K, KM>,
+    newSet: ISetMapped<K, KM>
+  ): ReadonlyRecord<'added' | 'deleted', ISetMapped<K, KM>> => ({
+    deleted: oldSet.subtract(newSet),
+    added: newSet.subtract(oldSet),
+  }),
+
+  intersection: <K, KM extends RecordKeyType>(
+    a: ISetMapped<K, KM>,
+    b: ISetMapped<K, KM>
+  ): ISetMapped<K, KM> => a.intersect(b),
+
+  union: <K, KM extends RecordKeyType>(
+    a: ISetMapped<K, KM>,
+    b: ISetMapped<K, KM>
+  ): ISetMapped<K, KM> => a.union(b),
 };
 
 class ISetMappedClass<K, KM extends RecordKeyType>
@@ -81,6 +105,10 @@ class ISetMappedClass<K, KM extends RecordKeyType>
 
   get size(): number {
     return this._set.size;
+  }
+
+  get isEmpty(): boolean {
+    return this.size === 0;
   }
 
   has(key: K): boolean {
@@ -151,6 +179,22 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   map(mapFn: (key: K) => K): ISetMapped<K, KM> {
     return ISetMapped.new(
       this.toArray().map(mapFn),
+      this._toKey,
+      this._fromKey
+    );
+  }
+
+  filter(predicate: (key: K) => boolean): ISetMapped<K, KM> {
+    return ISetMapped.new(
+      this.toArray().filter(predicate),
+      this._toKey,
+      this._fromKey
+    );
+  }
+
+  filterNot(predicate: (key: K) => boolean): ISetMapped<K, KM> {
+    return ISetMapped.new(
+      this.toArray().filter((k) => !predicate(k)),
       this._toKey,
       this._fromKey
     );
