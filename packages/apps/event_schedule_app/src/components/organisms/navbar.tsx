@@ -5,7 +5,7 @@ import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import styled, { css } from 'styled-components';
 import { aboutThisAppUrl, dict, routes } from '../../constants';
-import { isDevelopment } from '../../env';
+import { experimentalFeature } from '../../env';
 import { router, signOut, UpdateUserInfoDialogState, user$ } from '../../store';
 import { NoWrapSpan } from '../atoms';
 import {
@@ -71,7 +71,9 @@ export const NavBar = memoNamed('NavBar', () => {
             </>
           ) : (
             <>
-              {isDevelopment ? <ItemAnchor>{dc.list}</ItemAnchor> : undefined}
+              {experimentalFeature.eventList === 'hidden' ? undefined : (
+                <ItemAnchor>{dc.list}</ItemAnchor>
+              )}
               <Item>
                 <span>{dc.auth.userName.prefix}</span>
                 <Popover

@@ -1,6 +1,7 @@
 import type { Intent } from '@blueprintjs/core';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { googleSignInWithPopup } from '../../api';
 import type { SignInPageState } from '../../functions';
 import { router, SignInPageStore } from '../../store';
 
@@ -11,6 +12,8 @@ export const useSignInPageState = (): DeepReadonly<{
   passwordFormIntent: Intent;
   passwordIsOpen: boolean;
   enterButtonDisabled: boolean;
+  googleSignInButtonDisabled: boolean;
+  googleSignInClickHandler: () => void;
 }> => {
   const state = useStreamValue(SignInPageStore.state$);
 
@@ -30,11 +33,24 @@ export const useSignInPageState = (): DeepReadonly<{
 
   const pageToBack = useStreamValue(router.pageToBack$);
 
+  // TODO: store に移す
+  const [googleSignInButtonDisabled, setGoogleSignInButtonDisabled] =
+    useState<boolean>(false);
+
   const enterClickHandler = useCallback(async () => {
-    if (enterButtonDisabled) return;
+    if (enterButtonDisabled || googleSignInButtonDisabled) return;
 
     await SignInPageStore.submit(pageToBack);
-  }, [enterButtonDisabled, pageToBack]);
+  }, [enterButtonDisabled, googleSignInButtonDisabled, pageToBack]);
+
+  // TODO: store にロジックを移す
+  const googleSignInClickHandler = useCallback(async () => {
+    if (googleSignInButtonDisabled) return;
+
+    setGoogleSignInButtonDisabled(true);
+    await googleSignInWithPopup();
+    setGoogleSignInButtonDisabled(false);
+  }, [googleSignInButtonDisabled]);
 
   return {
     state,
@@ -43,5 +59,7 @@ export const useSignInPageState = (): DeepReadonly<{
     passwordFormIntent,
     passwordIsOpen,
     enterButtonDisabled,
+    googleSignInButtonDisabled,
+    googleSignInClickHandler,
   };
 };

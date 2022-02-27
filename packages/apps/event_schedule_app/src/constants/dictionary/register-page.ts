@@ -3,10 +3,6 @@ export const signInAndRegisterPageDictionary = {
   password: 'パスワード',
   verifyPassword: 'パスワード（確認）',
   email: 'メールアドレス',
-  title: {
-    register: '新規登録',
-    signIn: 'ログイン',
-  },
   registerButton: '新規登録',
   signInButton: 'ログイン',
   resetPassword: 'パスワードをお忘れの場合',
@@ -16,6 +12,11 @@ export const signInAndRegisterPageDictionary = {
     description:
       'ご登録頂いたメールアドレスを入力してください。新しいパスワードを発行いたします。',
     submit: '再発行',
+  },
+  separator: 'OR',
+  google: {
+    register: 'Googleアカウントで登録',
+    signIn: 'Googleでログイン',
   },
   message: {
     success: {

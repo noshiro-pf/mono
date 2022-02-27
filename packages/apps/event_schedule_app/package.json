@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "private": true,
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",

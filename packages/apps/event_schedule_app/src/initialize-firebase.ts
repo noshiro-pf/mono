@@ -3,7 +3,7 @@ import {
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { collection, initializeFirestore } from 'firebase/firestore';
 import { isDevelopment } from './env';
 import { clog } from './utils';
@@ -30,3 +30,5 @@ export const dbEvents = collection(
 );
 
 export const auth = getAuth();
+
+export const googleAuthProvider = new GoogleAuthProvider();
