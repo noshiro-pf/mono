@@ -47,13 +47,11 @@ export const SetTimesPopoverContent = memoNamed<Props>(
           <Button
             intent='none'
             text={dict.common.buttonText.cancel}
-            type='button'
             onClick={onCancelClick}
           />
           <Button
             intent='primary'
             text={dict.common.buttonText.decide}
-            type='button'
             onClick={onOkClickHandler}
           />
         </ButtonsWrapperAlignEnd>

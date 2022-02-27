@@ -4,7 +4,7 @@ import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { descriptionFontColor, dict } from '../../../constants';
-import { eventScheduleResult$, router } from '../../../store';
+import { eventScheduleResult$, router, useUser } from '../../../store';
 import { ConfirmEmailDialog, Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { FetchEventScheduleError } from './error';
@@ -16,12 +16,16 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useStreamValue(router.eventId$);
   const eventScheduleResult = useStreamValue(eventScheduleResult$);
 
-  const [editPageIsVisible, showEditPage] = useBooleanState(false);
+  const [emailConfirmationHasPassed, makeItPassTheEmailConfirmation] =
+    useBooleanState(false);
+
+  const user = useUser();
 
   const editPageIsHidden: boolean =
-    Result.isErr(eventScheduleResult) ||
-    (eventScheduleResult?.value.notificationSettings !== 'none' &&
-      !editPageIsVisible);
+    Result.isOk(eventScheduleResult) &&
+    eventScheduleResult.value.notificationSettings !== 'none' &&
+    !emailConfirmationHasPassed &&
+    eventScheduleResult.value.notificationSettings.email !== user?.email;
 
   return Result.isErr(eventScheduleResult) &&
     eventScheduleResult.value.type === 'not-found' ? (
@@ -35,17 +39,9 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
         <Spinner />
       ) : (
         <>
-          {editPageIsHidden ? undefined : (
-            <>
-              <SubTitle>
-                {`${dc.editSubTitle(eventScheduleResult.value.title)}`}
-              </SubTitle>
-              <EventScheduleSettingCommon
-                initialValues={eventScheduleResult.value}
-                mode={'edit'}
-              />
-            </>
-          )}
+          <SubTitle>
+            {dc.editSubTitle(eventScheduleResult.value.title)}
+          </SubTitle>
 
           {eventScheduleResult.value.notificationSettings ===
           'none' ? undefined : (
@@ -53,7 +49,14 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
               back={router.back}
               emailAnswer={eventScheduleResult.value.notificationSettings.email}
               isOpen={editPageIsHidden}
-              onSuccess={showEditPage}
+              onSuccess={makeItPassTheEmailConfirmation}
+            />
+          )}
+
+          {editPageIsHidden ? undefined : (
+            <EventScheduleSettingCommon
+              initialValues={eventScheduleResult.value}
+              mode={'edit'}
             />
           )}
         </>

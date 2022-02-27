@@ -12,7 +12,6 @@ import {
   signInPageStateReducer,
 } from '../../functions';
 import { router } from '../router';
-import { UpdateUserInfoDialogState } from '../update-user-info-page-state';
 
 const dc = dict.register;
 
@@ -119,14 +118,14 @@ export namespace SignInPageStore {
     });
   };
 
-  const resetAllDialogState = (): void => {
+  const resetAllState = (): void => {
     dispatch({ type: 'reset' });
     hidePassword();
   };
 
-  UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
-    if (openingDialog === undefined) {
-      resetAllDialogState();
+  router.isRoute.signInPage$.subscribe((isSignInPage) => {
+    if (!isSignInPage) {
+      resetAllState();
     }
   });
 }

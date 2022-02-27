@@ -66,7 +66,12 @@ export const eventSettingsPageDictionary = {
       '記号の設定に不備があります。説明に空欄があるか、△の点数が0.1以上9.9以下になっていない可能性があります。',
   },
   createEventButton: '日程調整ページを作成',
-  editEventButton: 'イベント設定を更新',
+  editEventButton: {
+    name: 'イベント設定を更新',
+    submitEditingConfirmation:
+      '編集項目に日程の削除が含まれています。その日程への回答が既にある場合、その回答は失われてしまいますが、よろしいですか？',
+    cancelResultMessage: '編集をキャンセルしました。',
+  },
   editEventResultMessage: {
     success: 'イベント設定を更新しました。',
     error: 'イベント設定の更新中にエラーが発生しました。',

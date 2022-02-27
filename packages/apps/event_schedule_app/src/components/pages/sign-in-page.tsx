@@ -2,212 +2,146 @@ import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
-import { useResetPasswordPageState, useSignInPageState } from '../../hooks';
-import { ResetPasswordPageStore, SignInPageStore } from '../../store';
-import { Label } from '../atoms';
+import { experimentalFeature } from '../../env';
+import { useSignInPageState } from '../../hooks';
+import { SignInPageStore } from '../../store';
+import { GoogleIcon, Label } from '../atoms';
 import { BpInput } from '../bp';
-import { LockButton } from '../molecules';
+import { LockButton, SignInStyled } from '../molecules';
 import { NavBar } from '../organisms';
+import { ResetPasswordPage } from './reset-password-page';
 
 const dc = dict.register;
 
 const returnFalse = (): false => false;
 
 export const SignInPage = memoNamed('SignInPage', () => {
-  const signInState = useSignInPageState();
+  const {
+    emailFormIntent,
+    enterButtonDisabled,
+    enterClickHandler,
+    googleSignInButtonDisabled,
+    googleSignInClickHandler,
+    passwordFormIntent,
+    passwordIsOpen,
+    state,
+  } = useSignInPageState();
 
   const [isPasswordResetForm, passwordIsOpenResetForm, hidePasswordResetForm] =
     useBooleanState(false);
 
-  const resetPasswordState = useResetPasswordPageState();
-
   return (
-    <Wrapper>
+    <SignInStyled.Wrapper>
       <NavBar />
 
-      <Centering>
-        <FormRect onSubmit={returnFalse}>
-          {isPasswordResetForm ? (
-            <>
-              <BackButtonWrapper>
-                <Button
-                  icon={'chevron-left'}
-                  intent={'none'}
-                  minimal={true}
-                  onClick={hidePasswordResetForm}
-                >
-                  {dc.resetPasswordMode.back}
-                </Button>
-              </BackButtonWrapper>
-
-              <Title>{dc.resetPasswordMode.title}</Title>
-
-              <FormGroups>
+      <SignInStyled.Centering>
+        {isPasswordResetForm ? (
+          <ResetPasswordPage hidePasswordResetForm={hidePasswordResetForm} />
+        ) : (
+          <FormRectWrapper>
+            <SignInStyled.FormRect onSubmit={returnFalse}>
+              <SignInStyled.FormGroups>
                 <FormGroup
-                  helperText={resetPasswordState.state.email.error}
-                  intent={resetPasswordState.emailFormIntent}
+                  helperText={state.email.error}
+                  intent={emailFormIntent}
                   label={<Label>{dc.email}</Label>}
                 >
                   <BpInput
                     autoComplete={'email'}
                     autoFocus={true}
-                    disabled={resetPasswordState.state.isWaitingResponse}
-                    intent={resetPasswordState.emailFormIntent}
-                    type={'email'}
-                    value={resetPasswordState.state.email.inputValue}
-                    onValueChange={ResetPasswordPageStore.inputEmailHandler}
-                  />
-                </FormGroup>
-              </FormGroups>
-
-              <ButtonWrapper>
-                <Button
-                  disabled={resetPasswordState.enterButtonDisabled}
-                  intent={'primary'}
-                  loading={resetPasswordState.state.isWaitingResponse}
-                  type={'submit'}
-                  onClick={resetPasswordState.enterClickHandler}
-                >
-                  {dc.resetPasswordMode.submit}
-                </Button>
-              </ButtonWrapper>
-            </>
-          ) : (
-            <>
-              <Title>{dc.title.signIn}</Title>
-              <FormGroups>
-                <FormGroup
-                  helperText={signInState.state.email.error}
-                  intent={signInState.emailFormIntent}
-                  label={<Label>{dc.email}</Label>}
-                >
-                  <BpInput
-                    autoComplete={'email'}
-                    autoFocus={true}
-                    disabled={signInState.state.isWaitingResponse}
-                    intent={signInState.emailFormIntent}
+                    disabled={state.isWaitingResponse}
+                    fill={true}
+                    intent={emailFormIntent}
                     placeholder={'sample@gmail.com'}
                     type={'email'}
-                    value={signInState.state.email.inputValue}
+                    value={state.email.inputValue}
                     onValueChange={SignInPageStore.inputEmailHandler}
                   />
                 </FormGroup>
 
                 <FormGroup
-                  helperText={signInState.state.password.error}
-                  intent={signInState.passwordFormIntent}
+                  helperText={state.password.error}
+                  intent={passwordFormIntent}
                   label={<Label>{dc.password}</Label>}
                 >
                   <BpInput
                     autoComplete={'current-password'}
-                    disabled={signInState.state.isWaitingResponse}
-                    intent={signInState.passwordFormIntent}
+                    disabled={state.isWaitingResponse}
+                    fill={true}
+                    intent={passwordFormIntent}
                     rightElement={
                       <LockButton
-                        disabled={signInState.state.isWaitingResponse}
-                        passwordIsOpen={signInState.passwordIsOpen}
+                        disabled={state.isWaitingResponse}
+                        passwordIsOpen={passwordIsOpen}
                         onLockClick={SignInPageStore.togglePasswordLock}
                       />
                     }
-                    type={signInState.passwordIsOpen ? 'text' : 'password'}
-                    value={signInState.state.password.inputValue}
+                    type={passwordIsOpen ? 'text' : 'password'}
+                    value={state.password.inputValue}
                     onValueChange={SignInPageStore.inputPasswordHandler}
                   />
                 </FormGroup>
+              </SignInStyled.FormGroups>
 
-                <OtherErrorMessages>
-                  {signInState.state.otherErrors}
-                </OtherErrorMessages>
-              </FormGroups>
-
-              <PasswordResetWrapper>
-                <PasswordReset onClick={passwordIsOpenResetForm}>
+              <SignInStyled.PasswordResetWrapper>
+                <SignInStyled.PasswordReset onClick={passwordIsOpenResetForm}>
                   {dc.resetPassword}
-                </PasswordReset>
-              </PasswordResetWrapper>
+                </SignInStyled.PasswordReset>
+              </SignInStyled.PasswordResetWrapper>
 
-              <ButtonWrapper>
+              <SignInStyled.ButtonWrapper>
                 <Button
-                  disabled={signInState.enterButtonDisabled}
+                  disabled={enterButtonDisabled}
+                  fill={true}
                   intent={'primary'}
-                  loading={signInState.state.isWaitingResponse}
-                  type={'submit'}
-                  onClick={signInState.enterClickHandler}
+                  loading={state.isWaitingResponse}
+                  onClick={enterClickHandler}
                 >
                   {dc.signInButton}
                 </Button>
-              </ButtonWrapper>
-            </>
-          )}
-        </FormRect>
-      </Centering>
-    </Wrapper>
+              </SignInStyled.ButtonWrapper>
+
+              <SignInStyled.OtherErrorMessages>
+                {state.otherErrors}
+              </SignInStyled.OtherErrorMessages>
+            </SignInStyled.FormRect>
+
+            {experimentalFeature.googleAuth === 'hidden' ? undefined : (
+              <>
+                <SignInStyled.SeparatorWrapper>
+                  <SignInStyled.Separator />
+                  <SignInStyled.SepText>{dc.separator}</SignInStyled.SepText>
+                </SignInStyled.SeparatorWrapper>
+
+                <SignInStyled.ButtonWrapper>
+                  <SignInStyled.GoogleButton
+                    disabled={googleSignInButtonDisabled}
+                    fill={true}
+                    intent={'none'}
+                    loading={state.isWaitingResponse}
+                    minimal={true}
+                    outlined={true}
+                    onClick={googleSignInClickHandler}
+                  >
+                    <SignInStyled.GoogleButtonContentWrapper>
+                      <SignInStyled.GoogleIconWrapper>
+                        <GoogleIcon />
+                      </SignInStyled.GoogleIconWrapper>
+                      <SignInStyled.GoogleLoginButtonText>
+                        {dc.google.signIn}
+                      </SignInStyled.GoogleLoginButtonText>
+                    </SignInStyled.GoogleButtonContentWrapper>
+                  </SignInStyled.GoogleButton>
+                </SignInStyled.ButtonWrapper>
+              </>
+            )}
+          </FormRectWrapper>
+        )}
+      </SignInStyled.Centering>
+    </SignInStyled.Wrapper>
   );
 });
 
-const Wrapper = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Centering = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-`;
-
-const FormRect = styled.form`
-  width: 400px;
-  height: 440px;
-  min-height: max-content;
-  border-radius: 10px;
-  background-color: white;
-  filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
-
-  padding: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  position: relative;
-`;
-
-const BackButtonWrapper = styled.div`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-`;
-
-const Title = styled.h1`
-  margin-bottom: 20px;
-`;
-
-const FormGroups = styled.div`
-  margin-bottom: 10px;
-  width: 220px;
-  max-width: 220px;
-`;
-
-const PasswordResetWrapper = styled.div`
-  margin: 10px;
-`;
-
-const PasswordReset = styled.div`
-  color: #106ba3;
-  cursor: pointer;
-  font-size: 12px;
-`;
-
-const ButtonWrapper = styled.div`
-  margin: 10px;
-`;
-
-const OtherErrorMessages = styled.div`
-  color: red;
-  font-size: 12px;
-  margin: 10px 0;
-  max-height: 50px;
-  overflow-y: auto;
+const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
+  height: ${340 + (experimentalFeature.googleAuth === 'shown' ? 80 : 0)}px;
 `;

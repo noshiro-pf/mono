@@ -13,6 +13,7 @@ import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useStateWithResetter } from '@noshiro/react-utils';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   initialAnswerDeadline,
@@ -65,6 +66,7 @@ type EventScheduleSettingCommonHooks = Readonly<{
   onEditEventClick: () => void;
   onBackToAnswerPageClick: () => void;
   diff: EventSettingsPageDiffResult;
+  hasDeletedDatetimeChanges: boolean;
   hasNoChanges: boolean;
   holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
@@ -160,6 +162,13 @@ export const useEventScheduleSettingCommonHooks = (
     [newEventSchedule]
   );
 
+  const hasDeletedDatetimeChanges = useMemo<boolean>(
+    () =>
+      diff.datetimeRangeList?.deleted !== undefined &&
+      IList.isNonEmpty(diff.datetimeRangeList.deleted),
+    [diff.datetimeRangeList]
+  );
+
   const hasNoChanges = useMemo<boolean>(
     () => deepEqual(initialValues.current, newEventSchedule),
     [newEventSchedule]
@@ -252,6 +261,7 @@ export const useEventScheduleSettingCommonHooks = (
     onEditEventClick,
     onBackToAnswerPageClick,
     diff,
+    hasDeletedDatetimeChanges,
     hasNoChanges,
     holidaysJpDefinition,
   };

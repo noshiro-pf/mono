@@ -166,14 +166,14 @@ export namespace RegisterPageStore {
     });
   };
 
-  const resetAllDialogState = (): void => {
+  const resetAllState = (): void => {
     dispatch({ type: 'reset' });
     hidePassword();
   };
 
   router.isRoute.registerPage$.subscribe((isRegisterPage) => {
     if (!isRegisterPage) {
-      resetAllDialogState();
+      resetAllState();
     }
   });
 }

@@ -84,8 +84,8 @@ const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
   ({ onConfirmSubmissionOfAnswer, loading, disabled, mode }) => (
     <ButtonNowrapStyled
       disabled={disabled}
-      icon='tick'
-      intent='primary'
+      icon={'tick'}
+      intent={'primary'}
       loading={loading}
       text={match(mode, {
         creating: dc.submitButton.create,

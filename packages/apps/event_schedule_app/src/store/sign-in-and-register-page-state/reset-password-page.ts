@@ -89,13 +89,13 @@ export namespace ResetPasswordPageStore {
     });
   };
 
-  const resetAllDialogState = (): void => {
+  const resetAllState = (): void => {
     dispatch({ type: 'reset' });
   };
 
   router.isRoute.signInPage$.subscribe((isSignInPage) => {
     if (!isSignInPage) {
-      resetAllDialogState();
+      resetAllState();
     }
   });
 }
