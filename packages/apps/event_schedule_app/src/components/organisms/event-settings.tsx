@@ -62,7 +62,6 @@ export const EventSettings = memoNamed<Props>(
       <Root>
         <ParagraphWithSwitch
           description={dc.answerDeadline.howAnswerDeadlineIsUsed}
-          disabledInsteadOfHidden={true}
           elementToToggle={
             <AnswerDeadlineDatepicker
               answerDeadline={answerDeadline}
@@ -70,13 +69,13 @@ export const EventSettings = memoNamed<Props>(
               onAnswerDeadlineChange={onAnswerDeadlineChange}
             />
           }
-          show={useAnswerDeadline}
+          hideContentIfToggleIsFalse={false}
           title={dc.answerDeadline.title}
+          toggleState={useAnswerDeadline}
           onToggle={onToggleAnswerDeadline}
         />
         <hr />
         <ParagraphWithSwitch
-          disabledInsteadOfHidden={true}
           elementToToggle={
             <NotificationSettingsComponent
               answerDeadline={answerDeadline}
@@ -89,8 +88,9 @@ export const EventSettings = memoNamed<Props>(
               onNotificationSettingsChange={onNotificationSettingsChange}
             />
           }
-          show={useNotification}
+          hideContentIfToggleIsFalse={false}
           title={dc.notification.useNotification}
+          toggleState={useNotification}
           onToggle={onToggleUseNotificationLocal}
         />
         <hr />

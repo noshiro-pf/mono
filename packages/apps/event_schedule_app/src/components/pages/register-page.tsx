@@ -2,7 +2,6 @@ import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
-import { experimentalFeature } from '../../env';
 import { useRegisterPageState } from '../../hooks';
 import { RegisterPageStore } from '../../store';
 import { GoogleIcon, Label } from '../atoms';
@@ -16,7 +15,7 @@ const returnFalse = (): false => false;
 
 export const RegisterPage = memoNamed('RegisterPage', () => {
   const {
-    state,
+    formState,
     enterClickHandler,
     usernameFormIntent,
     emailFormIntent,
@@ -36,68 +35,68 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
           <SignInStyled.FormRect onSubmit={returnFalse}>
             <SignInStyled.FormGroups>
               <FormGroup
-                helperText={state.username.error}
+                helperText={formState.username.error}
                 intent={usernameFormIntent}
                 label={<Label>{dc.username}</Label>}
               >
                 <BpInput
                   autoFocus={true}
-                  disabled={state.isWaitingResponse}
+                  disabled={formState.isWaitingResponse}
                   intent={usernameFormIntent}
                   type={'text'}
-                  value={state.username.inputValue}
+                  value={formState.username.inputValue}
                   onValueChange={RegisterPageStore.inputUsernameHandler}
                 />
               </FormGroup>
 
               <FormGroup
-                helperText={state.email.error}
+                helperText={formState.email.error}
                 intent={emailFormIntent}
                 label={<Label>{dc.email}</Label>}
               >
                 <BpInput
                   autoComplete={'username'}
-                  disabled={state.isWaitingResponse}
+                  disabled={formState.isWaitingResponse}
                   intent={emailFormIntent}
                   placeholder={'sample@gmail.com'}
                   type={'email'}
-                  value={state.email.inputValue}
+                  value={formState.email.inputValue}
                   onValueChange={RegisterPageStore.inputEmailHandler}
                 />
               </FormGroup>
 
               <FormGroup
-                helperText={state.password.password.error}
+                helperText={formState.password.password.error}
                 intent={passwordFormIntent}
                 label={<Label>{dc.password}</Label>}
               >
                 <BpInput
                   autoComplete={'new-password'}
-                  disabled={state.isWaitingResponse}
+                  disabled={formState.isWaitingResponse}
                   intent={passwordFormIntent}
                   type={'password'}
-                  value={state.password.password.inputValue}
+                  value={formState.password.password.inputValue}
                   onValueChange={RegisterPageStore.inputPasswordHandler}
                 />
               </FormGroup>
 
               <FormGroup
-                helperText={state.password.passwordConfirmation.error}
+                helperText={formState.password.passwordConfirmation.error}
                 intent={passwordFormIntent}
                 label={<Label>{dc.verifyPassword}</Label>}
               >
                 <BpInput
-                  disabled={state.isWaitingResponse}
+                  disabled={formState.isWaitingResponse}
                   intent={passwordFormIntent}
                   rightElement={
                     <LockButton
-                      disabled={state.isWaitingResponse}
+                      disabled={formState.isWaitingResponse}
                       passwordIsOpen={passwordIsOpen}
                       onLockClick={RegisterPageStore.togglePasswordLock}
                     />
                   }
                   type={passwordIsOpen ? 'text' : 'password'}
-                  value={state.password.passwordConfirmation.inputValue}
+                  value={formState.password.passwordConfirmation.inputValue}
                   onValueChange={
                     RegisterPageStore.inputPasswordConfirmationHandler
                   }
@@ -110,7 +109,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 disabled={enterButtonDisabled}
                 fill={true}
                 intent={'primary'}
-                loading={state.isWaitingResponse}
+                loading={formState.isWaitingResponse}
                 onClick={enterClickHandler}
               >
                 {dc.registerButton}
@@ -118,11 +117,11 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
             </SignInStyled.ButtonWrapper>
 
             <SignInStyled.OtherErrorMessages>
-              {state.otherErrors}
+              {formState.otherErrors}
             </SignInStyled.OtherErrorMessages>
           </SignInStyled.FormRect>
 
-          {experimentalFeature.googleAuth === 'hidden' ? undefined : (
+          {
             <>
               <SignInStyled.SeparatorWrapper>
                 <SignInStyled.Separator />
@@ -134,7 +133,6 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                   disabled={googleSignInButtonDisabled}
                   fill={true}
                   intent={'none'}
-                  loading={state.isWaitingResponse}
                   minimal={true}
                   outlined={true}
                   onClick={googleSignInClickHandler}
@@ -150,7 +148,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 </SignInStyled.GoogleButton>
               </SignInStyled.ButtonWrapper>
             </>
-          )}
+          }
         </FormRectWrapper>
       </SignInStyled.Centering>
     </SignInStyled.Wrapper>
@@ -158,5 +156,5 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
 });
 
 const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
-  height: ${430 + (experimentalFeature.googleAuth === 'shown' ? 80 : 0)}px;
+  height: 510px;
 `;

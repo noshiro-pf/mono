@@ -238,10 +238,10 @@ export const AnswerBeingEdited = memoNamed<Props>(
         <Paragraph>
           <ParagraphWithSwitch
             description={dc.required.description}
-            disabledInsteadOfHidden={false}
             elementToToggle={undefined}
-            show={answerBeingEdited.isRequiredParticipants}
+            hideContentIfToggleIsFalse={false}
             title={dc.required.title}
+            toggleState={answerBeingEdited.isRequiredParticipants}
             onToggle={toggleRequiredSection}
           />
         </Paragraph>
@@ -260,10 +260,10 @@ export const AnswerBeingEdited = memoNamed<Props>(
           <Paragraph>
             <ParagraphWithSwitch
               description={dc.protected.description}
-              disabledInsteadOfHidden={false}
               elementToToggle={undefined}
-              show={answerBeingEdited.user.id !== null}
+              hideContentIfToggleIsFalse={false}
               title={dc.protected.title}
+              toggleState={answerBeingEdited.user.id !== null}
               onToggle={toggleProtectedSection}
             />
           </Paragraph>

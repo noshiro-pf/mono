@@ -1,4 +1,5 @@
-import { createState } from '@noshiro/syncflow';
+import type { InitializedObservable } from '@noshiro/syncflow';
+import { createState, mapI } from '@noshiro/syncflow';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { User } from 'firebase/auth';
 import { routes } from '../constants';
@@ -11,6 +12,17 @@ export { user$ };
 
 export const useUser = (): DeepReadonly<User> | undefined =>
   useStreamValue(user$);
+
+export const passwordProviderIncluded$: InitializedObservable<boolean> =
+  user$.chain(
+    mapI(
+      (user) =>
+        user?.providerData.some((p) => p.providerId === 'password') ?? false
+    )
+  );
+
+export const usePasswordProviderIncluded = (): boolean =>
+  useStreamValue(passwordProviderIncluded$);
 
 export const emitAuthStateChange = (): void => {
   setUser(auth.currentUser ?? undefined);

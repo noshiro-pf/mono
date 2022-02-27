@@ -1,11 +1,12 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import { noop } from '@noshiro/ts-utils';
 import type { User } from 'firebase/auth';
 import type { CSSProperties } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
-import { useUpdatePasswordDialogState } from '../../../hooks';
 import { UpdatePasswordPage, UpdateUserInfoDialogState } from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
@@ -26,14 +27,19 @@ export const UpdatePasswordDialog = memoNamed<Props>(
   'UpdatePasswordDialog',
   ({ dialogIsOpen, user }) => {
     const {
-      state,
-      enterClickHandler,
+      formState,
+      enterButtonDisabled,
       oldPasswordFormIntent,
       newPasswordFormIntent,
       oldPasswordIsOpen,
       newPasswordIsOpen,
-      enterButtonDisabled,
-    } = useUpdatePasswordDialogState(user);
+    } = useStreamValue(UpdatePasswordPage.state$);
+
+    const enterClickHandler = useCallback(async () => {
+      if (enterButtonDisabled) return;
+
+      await UpdatePasswordPage.submit(user);
+    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -55,61 +61,61 @@ export const UpdatePasswordDialog = memoNamed<Props>(
             </FormGroup>
 
             <FormGroup
-              helperText={state.oldPassword.error}
+              helperText={formState.oldPassword.error}
               intent={oldPasswordFormIntent}
               label={<Label>{dc.updatePassword.oldPassword}</Label>}
             >
               <BpInput
                 autoComplete={'current-password'}
                 autoFocus={true}
-                disabled={state.isWaitingResponse}
+                disabled={formState.isWaitingResponse}
                 intent={oldPasswordFormIntent}
                 rightElement={
                   <LockButton
-                    disabled={state.isWaitingResponse}
+                    disabled={formState.isWaitingResponse}
                     passwordIsOpen={oldPasswordIsOpen}
                     onLockClick={UpdatePasswordPage.toggleOldPasswordLock}
                   />
                 }
                 type={oldPasswordIsOpen ? 'text' : 'password'}
-                value={state.oldPassword.inputValue}
+                value={formState.oldPassword.inputValue}
                 onValueChange={UpdatePasswordPage.inputOldPasswordHandler}
               />
             </FormGroup>
 
             <FormGroup
-              helperText={state.newPassword.password.error}
+              helperText={formState.newPassword.password.error}
               intent={newPasswordFormIntent}
               label={<Label>{dc.updatePassword.newPassword}</Label>}
             >
               <BpInput
                 autoComplete={'new-password'}
-                disabled={state.isWaitingResponse}
+                disabled={formState.isWaitingResponse}
                 intent={newPasswordFormIntent}
                 type={'password'}
-                value={state.newPassword.password.inputValue}
+                value={formState.newPassword.password.inputValue}
                 onValueChange={UpdatePasswordPage.inputNewPasswordHandler}
               />
             </FormGroup>
 
             <FormGroup
-              helperText={state.newPassword.passwordConfirmation.error}
+              helperText={formState.newPassword.passwordConfirmation.error}
               intent={newPasswordFormIntent}
               label={<Label>{dc.updatePassword.verifyNewPassword}</Label>}
             >
               <BpInput
                 autoComplete={'new-password'}
-                disabled={state.isWaitingResponse}
+                disabled={formState.isWaitingResponse}
                 intent={newPasswordFormIntent}
                 rightElement={
                   <LockButton
-                    disabled={state.isWaitingResponse}
+                    disabled={formState.isWaitingResponse}
                     passwordIsOpen={newPasswordIsOpen}
                     onLockClick={UpdatePasswordPage.toggleNewPasswordLock}
                   />
                 }
                 type={newPasswordIsOpen ? 'text' : 'password'}
-                value={state.newPassword.passwordConfirmation.inputValue}
+                value={formState.newPassword.passwordConfirmation.inputValue}
                 onValueChange={
                   UpdatePasswordPage.inputNewPasswordConfirmationHandler
                 }
@@ -119,12 +125,12 @@ export const UpdatePasswordDialog = memoNamed<Props>(
         }
         closeDialog={UpdateUserInfoDialogState.closeDialog}
         dialogIsOpen={dialogIsOpen}
-        isWaitingResponse={state.isWaitingResponse}
+        isWaitingResponse={formState.isWaitingResponse}
         submitButton={
           <Button
             disabled={enterButtonDisabled}
             intent={'primary'}
-            loading={state.isWaitingResponse}
+            loading={formState.isWaitingResponse}
             onClick={enterClickHandler}
           >
             {dc.button.update}

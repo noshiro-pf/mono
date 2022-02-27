@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
 import {
-  UpdateDisplayNamePage,
+  DeleteAccountCreatedWithGoogle,
   UpdateUserInfoDialogState,
 } from '../../../store';
 import { Label } from '../../atoms';
@@ -20,16 +20,20 @@ type Props = DeepReadonly<{
   user: User;
 }>;
 
-export const UpdateDisplayNameDialog = memoNamed<Props>(
-  'UpdateDisplayNameDialog',
+export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
+  'DeleteAccountCreatedWithGoogleDialog',
   ({ dialogIsOpen, user }) => {
-    const { formState, displayNameFormIntent, enterButtonDisabled } =
-      useStreamValue(UpdateDisplayNamePage.state$);
+    const {
+      formState,
+      enterButtonDisabled,
+      isWaitingResponse,
+      emailFormIntent,
+    } = useStreamValue(DeleteAccountCreatedWithGoogle.state$);
 
     const enterClickHandler = useCallback(async () => {
       if (enterButtonDisabled) return;
 
-      await UpdateDisplayNamePage.submit(user);
+      await DeleteAccountCreatedWithGoogle.submit(user);
     }, [enterButtonDisabled, user]);
 
     return (
@@ -37,35 +41,37 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
         body={
           <Content>
             <FormGroup
-              helperText={formState.displayName.error}
-              intent={displayNameFormIntent}
-              label={<Label>{dc.updateDisplayName.newDisplayName}</Label>}
+              helperText={formState.error}
+              intent={emailFormIntent}
+              label={<Label>{dc.deleteAccount.verifyEmail}</Label>}
             >
               <BpInput
+                // suppress auto complete
+                autoComplete={'new-password'}
                 autoFocus={true}
-                disabled={formState.isWaitingResponse}
-                intent={displayNameFormIntent}
-                type={'text'}
-                value={formState.displayName.inputValue}
-                onValueChange={UpdateDisplayNamePage.inputDisplayNameHandler}
+                disabled={isWaitingResponse}
+                intent={emailFormIntent}
+                type={'email'}
+                value={formState.inputValue}
+                onValueChange={DeleteAccountCreatedWithGoogle.inputEmailHandler}
               />
             </FormGroup>
           </Content>
         }
         closeDialog={UpdateUserInfoDialogState.closeDialog}
         dialogIsOpen={dialogIsOpen}
-        isWaitingResponse={formState.isWaitingResponse}
+        isWaitingResponse={isWaitingResponse}
         submitButton={
           <Button
             disabled={enterButtonDisabled}
-            intent={'primary'}
-            loading={formState.isWaitingResponse}
+            intent={'danger'}
+            loading={isWaitingResponse}
             onClick={enterClickHandler}
           >
-            {dc.button.update}
+            {dc.button.deleteAccount}
           </Button>
         }
-        title={dc.updateDisplayName.title}
+        title={dc.deleteAccount.title}
       />
     );
   }
@@ -73,5 +79,5 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
 
 const Content = styled.div`
   width: 300px;
-  height: 80px;
+  height: 100px;
 `;

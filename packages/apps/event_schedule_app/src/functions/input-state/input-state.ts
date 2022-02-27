@@ -17,7 +17,9 @@ export const inputHasError = (state: InputState): boolean =>
   state.error !== undefined || state.inputValue === '';
 
 export type InputStateAction = DeepReadonly<
-  { type: 'input'; payload: string } | { type: 'setError'; payload: string }
+  | { type: 'input'; payload: string }
+  | { type: 'reset' }
+  | { type: 'setError'; payload: string }
 >;
 
 export const inputStateReducer: Reducer<InputState, InputStateAction> = (
@@ -33,5 +35,8 @@ export const inputStateReducer: Reducer<InputState, InputStateAction> = (
 
     case 'setError':
       return IRecord.set(state, 'error', action.payload);
+
+    case 'reset':
+      return inputInitialState;
   }
 };

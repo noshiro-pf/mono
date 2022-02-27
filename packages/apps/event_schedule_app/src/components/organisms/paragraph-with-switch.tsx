@@ -8,9 +8,9 @@ import { SwitchWithoutLabelStyled } from '../bp';
 type Props = Readonly<{
   title: string;
   description?: readonly string[];
-  show: boolean;
-  disabledInsteadOfHidden: boolean;
+  toggleState: boolean;
   onToggle: () => void;
+  hideContentIfToggleIsFalse: boolean;
   elementToToggle: ReactNode;
 }>;
 
@@ -21,7 +21,7 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       <SwitchWrapper>
         <div>{props.title}</div>
         <SwitchWithoutLabelStyled
-          checked={props.show}
+          checked={props.toggleState}
           inline={true}
           onChange={props.onToggle}
         />
@@ -31,9 +31,9 @@ export const ParagraphWithSwitch = memoNamed<Props>(
         : IList.map(props.description, (d, i) => (
             <Description key={i} text={d} />
           ))}
-      {props.disabledInsteadOfHidden || props.show
-        ? props.elementToToggle
-        : undefined}
+      {props.hideContentIfToggleIsFalse && !props.toggleState
+        ? undefined
+        : props.elementToToggle}
     </div>
   )
 );

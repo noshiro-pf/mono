@@ -1,6 +1,6 @@
 import type { Intent } from '@blueprintjs/core';
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { createReducer, mapI } from '@noshiro/syncflow';
+import { combineLatestI, createReducer, mapI } from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
@@ -18,17 +18,29 @@ const dc = dict.register;
 const toast = createToaster();
 
 export namespace ResetPasswordPageStore {
-  export const [state$, dispatch] = createReducer(
+  const [formState$, dispatch] = createReducer(
     resetPasswordPageStateReducer,
     resetPasswordPageInitialState
   );
 
-  export const enterButtonDisabled$ = state$.chain(
+  const enterButtonDisabled$ = formState$.chain(
     mapI((state) => state.isWaitingResponse || resetPasswordPageHasError(state))
   );
 
-  export const emailFormIntent$: InitializedObservable<Intent> = state$.chain(
+  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
     mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+  );
+
+  export const state$ = combineLatestI([
+    formState$,
+    enterButtonDisabled$,
+    emailFormIntent$,
+  ]).chain(
+    mapI(([formState, enterButtonDisabled, emailFormIntent]) => ({
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+    }))
   );
 
   export const submit = async (

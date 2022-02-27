@@ -1,6 +1,11 @@
 import type { Intent } from '@blueprintjs/core';
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { createBooleanState, createReducer, mapI } from '@noshiro/syncflow';
+import {
+  combineLatestI,
+  createBooleanState,
+  createReducer,
+  mapI,
+} from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
@@ -18,41 +23,65 @@ const dc = dict.register;
 const toast = createToaster();
 
 export namespace RegisterPageStore {
-  export const [state$, dispatch] = createReducer(
+  const [formState$, dispatch] = createReducer(
     registerPageStateReducer,
     registerPageInitialState
   );
 
-  export const enterButtonDisabled$ = state$.chain(
+  const enterButtonDisabled$ = formState$.chain(
     mapI((state) => state.isWaitingResponse || registerPageHasError(state))
   );
 
-  export const usernameFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
-      mapI((state) =>
-        state.username.error === undefined ? 'primary' : 'danger'
-      )
-    );
+  const usernameFormIntent$: InitializedObservable<Intent> = formState$.chain(
+    mapI((state) => (state.username.error === undefined ? 'primary' : 'danger'))
+  );
 
-  export const emailFormIntent$: InitializedObservable<Intent> = state$.chain(
+  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
     mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
   );
 
-  export const passwordFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
-      mapI((state) =>
-        state.password.password.error === undefined &&
-        state.password.passwordConfirmation.error === undefined
-          ? 'primary'
-          : 'danger'
-      )
-    );
+  const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
+    mapI((state) =>
+      state.password.password.error === undefined &&
+      state.password.passwordConfirmation.error === undefined
+        ? 'primary'
+        : 'danger'
+    )
+  );
 
-  export const {
-    state$: passwordIsOpen$,
-    toggle: togglePasswordLock,
-    setFalse: hidePassword,
-  } = createBooleanState(false);
+  const passwordIsOpenState = createBooleanState(false);
+
+  export const togglePasswordLock = passwordIsOpenState.toggle;
+
+  const { state$: passwordIsOpen$, setFalse: hidePassword } =
+    passwordIsOpenState;
+
+  export const state$ = combineLatestI([
+    formState$,
+    enterButtonDisabled$,
+    usernameFormIntent$,
+    emailFormIntent$,
+    passwordFormIntent$,
+    passwordIsOpen$,
+  ]).chain(
+    mapI(
+      ([
+        formState,
+        enterButtonDisabled,
+        usernameFormIntent,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      ]) => ({
+        formState,
+        enterButtonDisabled,
+        usernameFormIntent,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      })
+    )
+  );
 
   export const submit = async (
     pageToBack: string | undefined
