@@ -16,7 +16,12 @@ const reducer = <S>(state: S, action: Action<S>): S => {
 
 export const createState = <S>(
   initialState: S
-): [InitializedObservable<S>, (v: S) => S, (updateFn: (prev: S) => S) => S] => {
+): Readonly<{
+  state$: InitializedObservable<S>;
+  setState: (v: S) => S;
+  updateState: (updateFn: (prev: S) => S) => S;
+  resetState: () => S;
+}> => {
   const [state$, dispatch] = createReducer<S, Action<S>>(reducer, initialState);
 
   const updateState = (updateFn: (prev: S) => S): S =>
@@ -24,7 +29,10 @@ export const createState = <S>(
 
   const setState = (nextState: S): S => dispatch({ type: 'set', nextState });
 
-  return [state$, setState, updateState];
+  const resetState = (): S =>
+    dispatch({ type: 'set', nextState: initialState });
+
+  return { state$, setState, updateState, resetState };
 };
 
 export const createBooleanState = (
@@ -33,9 +41,13 @@ export const createBooleanState = (
   state$: InitializedObservable<boolean>;
   setTrue: () => void;
   setFalse: () => void;
+  setState: (next: boolean) => boolean;
   toggle: () => boolean;
+  updateState: (updateFn: (prev: boolean) => boolean) => boolean;
+  reset: () => void;
 } => {
-  const [state$, setState, updateState] = createState(initialState);
+  const { state$, setState, updateState, resetState } =
+    createState(initialState);
 
   return {
     state$,
@@ -46,5 +58,8 @@ export const createBooleanState = (
       setState(false);
     },
     toggle: () => updateState((s) => !s),
+    setState,
+    updateState,
+    reset: resetState,
   };
 };
