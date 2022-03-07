@@ -42,6 +42,7 @@ export const passwordWithConfirmationHasError = (
 export type PasswordWithConfirmationStateAction = DeepReadonly<
   | { type: 'inputPassword'; payload: string }
   | { type: 'inputPasswordConfirmation'; payload: string }
+  | { type: 'reset' }
   | { type: 'setPasswordConfirmationError'; payload: string }
   | { type: 'setPasswordError'; payload: string }
   | { type: 'submit' }
@@ -122,5 +123,8 @@ export const passwordWithConfirmationStateReducer: Reducer<
           ? dict.common.error.passwordNotMatch
           : undefined
       );
+
+    case 'reset':
+      return passwordWithConfirmationInitialState;
   }
 };

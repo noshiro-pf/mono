@@ -3,6 +3,7 @@ import { createState } from '@noshiro/syncflow';
 export namespace UpdateUserInfoDialogState {
   const [_openingDialog$, setOpeningDialog] = createState<
     | 'deleteAccount'
+    | 'deleteAccountCreatedWithGoogle'
     | 'updateDisplayName'
     | 'updateEmail'
     | 'updatePassword'
@@ -25,6 +26,10 @@ export namespace UpdateUserInfoDialogState {
 
   export const deleteAccount = (): void => {
     setOpeningDialog('deleteAccount');
+  };
+
+  export const deleteAccountCreatedWithGoogle = (): void => {
+    setOpeningDialog('deleteAccountCreatedWithGoogle');
   };
 
   export const closeDialog = (): void => {

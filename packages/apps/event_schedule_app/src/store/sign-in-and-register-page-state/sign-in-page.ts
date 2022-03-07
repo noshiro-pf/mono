@@ -1,6 +1,11 @@
 import type { Intent } from '@blueprintjs/core';
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { createBooleanState, createReducer, mapI } from '@noshiro/syncflow';
+import {
+  combineLatestI,
+  createBooleanState,
+  createReducer,
+  mapI,
+} from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
@@ -18,31 +23,53 @@ const dc = dict.register;
 const toast = createToaster();
 
 export namespace SignInPageStore {
-  export const [state$, dispatch] = createReducer(
+  const [formState$, dispatch] = createReducer(
     signInPageStateReducer,
     signInPageInitialState
   );
 
-  export const enterButtonDisabled$ = state$.chain(
+  const enterButtonDisabled$ = formState$.chain(
     mapI((state) => state.isWaitingResponse || signInPageHasError(state))
   );
 
-  export const emailFormIntent$: InitializedObservable<Intent> = state$.chain(
+  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
     mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
   );
 
-  export const passwordFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
-      mapI((state) =>
-        state.password.error === undefined ? 'primary' : 'danger'
-      )
-    );
+  const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
+    mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
+  );
 
-  export const {
-    state$: passwordIsOpen$,
-    toggle: togglePasswordLock,
-    setFalse: hidePassword,
-  } = createBooleanState(false);
+  const passwordIsOpenState = createBooleanState(false);
+
+  export const togglePasswordLock = passwordIsOpenState.toggle;
+
+  const { state$: passwordIsOpen$, setFalse: hidePassword } =
+    passwordIsOpenState;
+
+  export const state$ = combineLatestI([
+    formState$,
+    enterButtonDisabled$,
+    emailFormIntent$,
+    passwordFormIntent$,
+    passwordIsOpen$,
+  ]).chain(
+    mapI(
+      ([
+        formState,
+        enterButtonDisabled,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      ]) => ({
+        formState,
+        enterButtonDisabled,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      })
+    )
+  );
 
   export const submit = async (
     pageToBack: string | undefined
@@ -63,14 +90,14 @@ export namespace SignInPageStore {
             type: 'setEmailError',
             payload: dict.register.message.error.userNotFound,
           });
-          return;
+          break;
 
         case 'auth/wrong-password':
           dispatch({
             type: 'setPasswordError',
             payload: dict.register.message.error.wrongPassword,
           });
-          return;
+          break;
 
         default:
           console.error(signInResult.value);
@@ -85,22 +112,22 @@ export namespace SignInPageStore {
             message: dc.message.error.unknownErrorOnSignIn,
             intent: 'danger',
           });
-          return;
+          break;
       }
-    }
-
-    dispatch({ type: 'done' });
-
-    showToast({
-      toast,
-      message: dc.message.success.signIn,
-      intent: 'success',
-    });
-
-    if (pageToBack !== undefined) {
-      router.redirect(pageToBack);
     } else {
-      router.redirect(routes.createPage);
+      dispatch({ type: 'done' });
+
+      showToast({
+        toast,
+        message: dc.message.success.signIn,
+        intent: 'success',
+      });
+
+      if (pageToBack !== undefined) {
+        router.redirect(pageToBack);
+      } else {
+        router.redirect(routes.createPage);
+      }
     }
   };
 

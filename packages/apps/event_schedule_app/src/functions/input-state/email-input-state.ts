@@ -19,6 +19,7 @@ export const emailInputHasError = (state: EmailInputState): boolean =>
 
 export type EmailInputStateAction = DeepReadonly<
   | { type: 'input'; payload: string }
+  | { type: 'reset' }
   | { type: 'setError'; payload: string }
   | { type: 'submit' }
 >;
@@ -46,5 +47,8 @@ export const emailInputStateReducer: Reducer<
           ? dict.common.error.invalidEmail
           : undefined
       );
+
+    case 'reset':
+      return emailInputInitialState;
   }
 };

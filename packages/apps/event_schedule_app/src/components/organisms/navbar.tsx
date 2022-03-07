@@ -6,9 +6,16 @@ import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import styled, { css } from 'styled-components';
 import { aboutThisAppUrl, dict, routes } from '../../constants';
 import { experimentalFeature } from '../../env';
-import { router, signOut, UpdateUserInfoDialogState, user$ } from '../../store';
+import {
+  router,
+  signOut,
+  UpdateUserInfoDialogState,
+  usePasswordProviderIncluded,
+  user$,
+} from '../../store';
 import { NoWrapSpan } from '../atoms';
 import {
+  DeleteAccountCreatedWithGoogleDialog,
   DeleteAccountDialog,
   UpdateDisplayNameDialog,
   UpdateEmailDialog,
@@ -39,6 +46,8 @@ export const NavBar = memoNamed('NavBar', () => {
   const openingDialog = useStreamValue(
     UpdateUserInfoDialogState.openingDialog$
   );
+
+  const passwordProviderIncluded = usePasswordProviderIncluded();
 
   return (
     <Wrapper>
@@ -84,18 +93,31 @@ export const NavBar = memoNamed('NavBar', () => {
                           text={dc.auth.menu.changeDisplayName}
                           onClick={UpdateUserInfoDialogState.changeUsername}
                         />
-                        <MenuItem
-                          text={dc.auth.menu.changeEmail}
-                          onClick={UpdateUserInfoDialogState.changeEmail}
-                        />
-                        <MenuItem
-                          text={dc.auth.menu.changePassword}
-                          onClick={UpdateUserInfoDialogState.changePassword}
-                        />
-                        <MenuItem
-                          text={dc.auth.menu.deleteAccount}
-                          onClick={UpdateUserInfoDialogState.deleteAccount}
-                        />
+                        {passwordProviderIncluded ? (
+                          <>
+                            <MenuItem
+                              text={dc.auth.menu.changeEmail}
+                              onClick={UpdateUserInfoDialogState.changeEmail}
+                            />
+                            <MenuItem
+                              text={dc.auth.menu.changePassword}
+                              onClick={UpdateUserInfoDialogState.changePassword}
+                            />
+                            <MenuItem
+                              intent={'danger'}
+                              text={dc.auth.menu.deleteAccount}
+                              onClick={UpdateUserInfoDialogState.deleteAccount}
+                            />
+                          </>
+                        ) : (
+                          <MenuItem
+                            intent={'danger'}
+                            text={dc.auth.menu.deleteAccount}
+                            onClick={
+                              UpdateUserInfoDialogState.deleteAccountCreatedWithGoogle
+                            }
+                          />
+                        )}
                       </MenuItem>
                       <MenuItem text={dc.auth.menu.signOut} onClick={signOut} />
                     </Menu>
@@ -124,6 +146,12 @@ export const NavBar = memoNamed('NavBar', () => {
               />
               <DeleteAccountDialog
                 dialogIsOpen={openingDialog === 'deleteAccount'}
+                user={user}
+              />
+              <DeleteAccountCreatedWithGoogleDialog
+                dialogIsOpen={
+                  openingDialog === 'deleteAccountCreatedWithGoogle'
+                }
                 user={user}
               />
             </>

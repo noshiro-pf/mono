@@ -1,12 +1,12 @@
 import type { Intent } from '@blueprintjs/core';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
-import { useCallback, useState } from 'react';
-import { googleSignInWithPopup } from '../../api';
+import { useCallback } from 'react';
 import type { SignInPageState } from '../../functions';
 import { router, SignInPageStore } from '../../store';
+import { useGoogleSignInState } from './google-sign-in-hook';
 
 export const useSignInPageState = (): DeepReadonly<{
-  state: SignInPageState;
+  formState: SignInPageState;
   enterClickHandler: () => void;
   emailFormIntent: Intent;
   passwordFormIntent: Intent;
@@ -15,27 +15,18 @@ export const useSignInPageState = (): DeepReadonly<{
   googleSignInButtonDisabled: boolean;
   googleSignInClickHandler: () => void;
 }> => {
-  const state = useStreamValue(SignInPageStore.state$);
+  const { googleSignInButtonDisabled, googleSignInClickHandler } =
+    useGoogleSignInState();
 
-  const enterButtonDisabled = useStreamValue(
-    SignInPageStore.enterButtonDisabled$
-  );
-
-  const emailFormIntent: Intent = useStreamValue(
-    SignInPageStore.emailFormIntent$
-  );
-
-  const passwordFormIntent: Intent = useStreamValue(
-    SignInPageStore.passwordFormIntent$
-  );
-
-  const passwordIsOpen = useStreamValue(SignInPageStore.passwordIsOpen$);
+  const {
+    formState,
+    enterButtonDisabled,
+    emailFormIntent,
+    passwordFormIntent,
+    passwordIsOpen,
+  } = useStreamValue(SignInPageStore.state$);
 
   const pageToBack = useStreamValue(router.pageToBack$);
-
-  // TODO: store に移す
-  const [googleSignInButtonDisabled, setGoogleSignInButtonDisabled] =
-    useState<boolean>(false);
 
   const enterClickHandler = useCallback(async () => {
     if (enterButtonDisabled || googleSignInButtonDisabled) return;
@@ -43,17 +34,8 @@ export const useSignInPageState = (): DeepReadonly<{
     await SignInPageStore.submit(pageToBack);
   }, [enterButtonDisabled, googleSignInButtonDisabled, pageToBack]);
 
-  // TODO: store にロジックを移す
-  const googleSignInClickHandler = useCallback(async () => {
-    if (googleSignInButtonDisabled) return;
-
-    setGoogleSignInButtonDisabled(true);
-    await googleSignInWithPopup();
-    setGoogleSignInButtonDisabled(false);
-  }, [googleSignInButtonDisabled]);
-
   return {
-    state,
+    formState,
     enterClickHandler,
     emailFormIntent,
     passwordFormIntent,

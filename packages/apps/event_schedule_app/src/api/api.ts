@@ -1,6 +1,7 @@
 import {
   createUser,
   deleteUser,
+  googleSignInWithPopup,
   reauthenticateWithCredential,
   sendEmailVerification,
   sendPasswordResetEmail,
@@ -27,6 +28,7 @@ export const api = {
     sendEmailVerification,
     sendPasswordResetEmail,
     signIn,
+    googleSignInWithPopup,
     update: {
       displayName: updateDisplayName,
       email: updateEmail,

@@ -1,6 +1,7 @@
 import type { Intent } from '@blueprintjs/core';
 import type { InitializedObservable } from '@noshiro/syncflow';
 import {
+  combineLatestI,
   createBooleanState,
   createReducer,
   mapI,
@@ -26,52 +27,65 @@ const dc = dict.accountSettings;
 const toast = createToaster();
 
 export namespace UpdateEmailPage {
-  export const [state$, dispatch] = createReducer(
+  const [formState$, dispatch] = createReducer(
     updateEmailPageStateReducer,
     updateEmailPageInitialState
   );
 
-  export const enterButtonDisabled$ = state$.chain(
+  const enterButtonDisabled$ = formState$.chain(
     mapI((state) => state.isWaitingResponse || updateEmailPageHasError(state))
   );
 
-  export const emailFormIntent$: InitializedObservable<Intent> = state$.chain(
+  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
     mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
   );
 
-  export const passwordFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
-      mapI((state) =>
-        state.password.error === undefined ? 'primary' : 'danger'
-      )
-    );
+  const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
+    mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
+  );
 
-  export const {
-    state$: passwordIsOpen$,
-    toggle: togglePasswordLock,
-    setFalse: hidePassword,
-  } = createBooleanState(false);
+  const passwordIsOpenState = createBooleanState(false);
 
-  export const submit = async (
-    p: DeepReadonly<{
-      newEmail: string;
-      passwordForCredential: string;
-      user: DeepReadonly<User>;
-    }>
-  ): Promise<void> => {
+  export const togglePasswordLock = passwordIsOpenState.toggle;
+
+  const { state$: passwordIsOpen$, setFalse: hidePassword } =
+    passwordIsOpenState;
+
+  export const state$ = combineLatestI([
+    formState$,
+    enterButtonDisabled$,
+    emailFormIntent$,
+    passwordFormIntent$,
+    passwordIsOpen$,
+  ]).chain(
+    mapI(
+      ([
+        formState,
+        enterButtonDisabled,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      ]) => ({
+        formState,
+        enterButtonDisabled,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      })
+    )
+  );
+
+  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updateEmailPageHasError(s)) return;
 
-    const currentEmail = p.user.email ?? '';
+    const currentEmail = user.email ?? '';
 
     const credential: DeepReadonly<AuthCredential> =
-      EmailAuthProvider.credential(currentEmail, p.passwordForCredential);
+      EmailAuthProvider.credential(currentEmail, s.password.inputValue);
 
-    const res1 = await api.auth.reauthenticateWithCredential(
-      p.user,
-      credential
-    );
+    const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 
     if (Result.isErr(res1)) {
       switch (res1.value.code) {
@@ -84,7 +98,7 @@ export namespace UpdateEmailPage {
 
         default:
           console.error(
-            'some error occurred on reauthenticateWithCredential:',
+            'error occurred on reauthenticateWithCredential:',
             res1.value.code,
             res1.value.message
           );
@@ -103,11 +117,11 @@ export namespace UpdateEmailPage {
       return;
     }
 
-    const res2 = await api.auth.update.email(p.user, p.newEmail);
+    const res2 = await api.auth.update.email(user, s.email.inputValue);
 
     if (Result.isErr(res2)) {
       console.error(
-        'some error occurred on updateEmail:',
+        'error occurred on updateEmail:',
         res2.value.code,
         res2.value.message
       );

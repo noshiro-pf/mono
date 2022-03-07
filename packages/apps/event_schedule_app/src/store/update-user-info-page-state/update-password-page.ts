@@ -1,6 +1,11 @@
 import type { Intent } from '@blueprintjs/core';
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { createBooleanState, createReducer, mapI } from '@noshiro/syncflow';
+import {
+  combineLatestI,
+  createBooleanState,
+  createReducer,
+  mapI,
+} from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
 import type { AuthCredential, User } from 'firebase/auth';
 import { EmailAuthProvider } from 'firebase/auth';
@@ -20,26 +25,26 @@ const dc = dict.accountSettings;
 const toast = createToaster();
 
 export namespace UpdatePasswordPage {
-  export const [state$, dispatch] = createReducer(
+  const [formState$, dispatch] = createReducer(
     updatePasswordPageStateReducer,
     updatePasswordPageInitialState
   );
 
-  export const enterButtonDisabled$ = state$.chain(
+  const enterButtonDisabled$ = formState$.chain(
     mapI(
       (state) => state.isWaitingResponse || updatePasswordPageHasError(state)
     )
   );
 
-  export const oldPasswordFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
+  const oldPasswordFormIntent$: InitializedObservable<Intent> =
+    formState$.chain(
       mapI((state) =>
         state.oldPassword.error === undefined ? 'primary' : 'danger'
       )
     );
 
-  export const newPasswordFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
+  const newPasswordFormIntent$: InitializedObservable<Intent> =
+    formState$.chain(
       mapI((state) =>
         state.newPassword.password.error === undefined &&
         state.newPassword.passwordConfirmation.error === undefined
@@ -48,38 +53,58 @@ export namespace UpdatePasswordPage {
       )
     );
 
-  export const {
-    state$: oldPasswordIsOpen$,
-    toggle: toggleOldPasswordLock,
-    setFalse: hideOldPassword,
-  } = createBooleanState(false);
+  const oldPasswordIsOpenState = createBooleanState(false);
 
-  export const {
-    state$: newPasswordIsOpen$,
-    toggle: toggleNewPasswordLock,
-    setFalse: hideNewPassword,
-  } = createBooleanState(false);
+  export const toggleOldPasswordLock = oldPasswordIsOpenState.toggle;
 
-  export const submit = async (
-    p: DeepReadonly<{
-      oldPassword: string;
-      newPassword: string;
-      user: DeepReadonly<User>;
-    }>
-  ): Promise<void> => {
+  const { state$: oldPasswordIsOpen$, setFalse: hideOldPassword } =
+    oldPasswordIsOpenState;
+
+  const newPasswordIsOpenState = createBooleanState(false);
+
+  export const toggleNewPasswordLock = newPasswordIsOpenState.toggle;
+
+  const { state$: newPasswordIsOpen$, setFalse: hideNewPassword } =
+    newPasswordIsOpenState;
+
+  export const state$ = combineLatestI([
+    formState$,
+    enterButtonDisabled$,
+    oldPasswordFormIntent$,
+    newPasswordFormIntent$,
+    oldPasswordIsOpen$,
+    newPasswordIsOpen$,
+  ]).chain(
+    mapI(
+      ([
+        formState,
+        enterButtonDisabled,
+        oldPasswordFormIntent,
+        newPasswordFormIntent,
+        oldPasswordIsOpen,
+        newPasswordIsOpen,
+      ]) => ({
+        formState,
+        enterButtonDisabled,
+        oldPasswordFormIntent,
+        newPasswordFormIntent,
+        oldPasswordIsOpen,
+        newPasswordIsOpen,
+      })
+    )
+  );
+
+  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updatePasswordPageHasError(s)) return;
 
-    const currentEmail: string = p.user.email ?? '';
+    const currentEmail: string = user.email ?? '';
 
     const credential: DeepReadonly<AuthCredential> =
-      EmailAuthProvider.credential(currentEmail, p.oldPassword);
+      EmailAuthProvider.credential(currentEmail, s.oldPassword.inputValue);
 
-    const res1 = await api.auth.reauthenticateWithCredential(
-      p.user,
-      credential
-    );
+    const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 
     if (Result.isErr(res1)) {
       switch (res1.value.code) {
@@ -92,7 +117,7 @@ export namespace UpdatePasswordPage {
 
         default:
           console.error(
-            'some error occurred on reauthenticateWithCredential:',
+            'error occurred on reauthenticateWithCredential:',
             res1.value.code,
             res1.value.message
           );
@@ -111,11 +136,14 @@ export namespace UpdatePasswordPage {
       return;
     }
 
-    const res2 = await api.auth.update.password(p.user, p.newPassword);
+    const res2 = await api.auth.update.password(
+      user,
+      s.newPassword.password.inputValue
+    );
 
     if (Result.isErr(res2)) {
       console.error(
-        'some error occurred on updatePassword:',
+        'error occurred on updatePassword:',
         res2.value.code,
         res2.value.message
       );

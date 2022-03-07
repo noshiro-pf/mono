@@ -1,6 +1,11 @@
 import type { Intent } from '@blueprintjs/core';
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { createReducer, mapI, withLatestFromI } from '@noshiro/syncflow';
+import {
+  combineLatestI,
+  createReducer,
+  mapI,
+  withLatestFromI,
+} from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
 import type { User } from 'firebase/auth';
 import { api } from '../../api';
@@ -20,39 +25,49 @@ const dc = dict.accountSettings;
 const toast = createToaster();
 
 export namespace UpdateDisplayNamePage {
-  export const [state$, dispatch] = createReducer(
+  const [formState$, dispatch] = createReducer(
     updateDisplayNamePageStateReducer,
     updateDisplayNamePageInitialState
   );
 
-  export const enterButtonDisabled$ = state$.chain(
+  const enterButtonDisabled$ = formState$.chain(
     mapI(
       (state) => state.isWaitingResponse || updateDisplayNamePageHasError(state)
     )
   );
 
-  export const displayNameFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
+  const displayNameFormIntent$: InitializedObservable<Intent> =
+    formState$.chain(
       mapI((state) =>
         state.displayName.error === undefined ? 'primary' : 'danger'
       )
     );
 
-  export const submit = async (
-    p: DeepReadonly<{
-      newDisplayName: string;
-      user: DeepReadonly<User>;
-    }>
-  ): Promise<void> => {
+  export const state$ = combineLatestI([
+    formState$,
+    enterButtonDisabled$,
+    displayNameFormIntent$,
+  ]).chain(
+    mapI(([formState, enterButtonDisabled, displayNameFormIntent]) => ({
+      formState,
+      enterButtonDisabled,
+      displayNameFormIntent,
+    }))
+  );
+
+  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updateDisplayNamePageHasError(s)) return;
 
-    const res = await api.auth.update.displayName(p.user, p.newDisplayName);
+    const res = await api.auth.update.displayName(
+      user,
+      s.displayName.inputValue
+    );
 
     if (Result.isErr(res)) {
       console.error(
-        'some error occurred on updateDisplayName:',
+        'error occurred on updateDisplayName:',
         res.value.code,
         res.value.message
       );

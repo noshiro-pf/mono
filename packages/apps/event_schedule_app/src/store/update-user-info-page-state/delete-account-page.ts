@@ -1,6 +1,11 @@
 import type { Intent } from '@blueprintjs/core';
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { createBooleanState, createReducer, mapI } from '@noshiro/syncflow';
+import {
+  combineLatestI,
+  createBooleanState,
+  createReducer,
+  mapI,
+} from '@noshiro/syncflow';
 import { Result } from '@noshiro/ts-utils';
 import type { AuthCredential, User } from 'firebase/auth';
 import { EmailAuthProvider } from 'firebase/auth';
@@ -20,51 +25,63 @@ const dc = dict.accountSettings;
 const toast = createToaster();
 
 export namespace DeleteAccountPage {
-  export const [state$, dispatch] = createReducer(
+  const [formState$, dispatch] = createReducer(
     deleteAccountPageStateReducer,
     deleteAccountPageInitialState
   );
 
-  export const enterButtonDisabled$ = state$.chain(
+  const enterButtonDisabled$ = formState$.chain(
     mapI((state) => state.isWaitingResponse || deleteAccountPageHasError(state))
   );
 
-  export const emailFormIntent$: InitializedObservable<Intent> = state$.chain(
+  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
     mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
   );
 
-  export const passwordFormIntent$: InitializedObservable<Intent> =
-    state$.chain(
-      mapI((state) =>
-        state.password.error === undefined ? 'primary' : 'danger'
-      )
-    );
+  const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
+    mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
+  );
 
-  export const {
-    state$: passwordIsOpen$,
-    toggle: togglePasswordLock,
-    setFalse: hidePassword,
-  } = createBooleanState(false);
+  const passwordIsOpenState = createBooleanState(false);
 
-  export const submit = async (
-    p: DeepReadonly<{
-      email: string;
-      password: string;
-      user: DeepReadonly<User>;
-      closeDialog: () => void;
-    }>
-  ): Promise<void> => {
+  const { state$: passwordIsOpen$, setFalse: hidePassword } =
+    passwordIsOpenState;
+
+  export const togglePasswordLock = passwordIsOpenState.toggle;
+
+  export const state$ = combineLatestI([
+    formState$,
+    enterButtonDisabled$,
+    emailFormIntent$,
+    passwordFormIntent$,
+    passwordIsOpen$,
+  ]).chain(
+    mapI(
+      ([
+        formState,
+        enterButtonDisabled,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      ]) => ({
+        formState,
+        enterButtonDisabled,
+        emailFormIntent,
+        passwordFormIntent,
+        passwordIsOpen,
+      })
+    )
+  );
+
+  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (deleteAccountPageHasError(s)) return;
 
     const credential: DeepReadonly<AuthCredential> =
-      EmailAuthProvider.credential(p.email, p.password);
+      EmailAuthProvider.credential(s.email.inputValue, s.password.inputValue);
 
-    const res1 = await api.auth.reauthenticateWithCredential(
-      p.user,
-      credential
-    );
+    const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 
     if (Result.isErr(res1)) {
       switch (res1.value.code) {
@@ -77,14 +94,14 @@ export namespace DeleteAccountPage {
 
         default:
           console.error(
-            'some error occurred on reauthenticateWithCredential:',
+            'error occurred on reauthenticateWithCredential:',
             res1.value.code,
             res1.value.message
           );
 
           dispatch({ type: 'done' });
 
-          p.closeDialog();
+          UpdateUserInfoDialogState.closeDialog();
 
           showToast({
             toast,
@@ -96,18 +113,18 @@ export namespace DeleteAccountPage {
       return;
     }
 
-    const res2 = await api.auth.deleteUser(p.user);
+    const res2 = await api.auth.deleteUser(user);
 
     if (Result.isErr(res2)) {
       console.error(
-        'some error occurred on deleteUser:',
+        'error occurred on deleteUser:',
         res2.value.code,
         res2.value.message
       );
 
       dispatch({ type: 'done' });
 
-      p.closeDialog();
+      UpdateUserInfoDialogState.closeDialog();
 
       showToast({
         toast,
@@ -119,7 +136,7 @@ export namespace DeleteAccountPage {
 
     dispatch({ type: 'done' });
 
-    p.closeDialog();
+    UpdateUserInfoDialogState.closeDialog();
 
     showToast({
       toast,

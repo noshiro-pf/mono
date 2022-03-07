@@ -1,9 +1,10 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
 import type { User } from 'firebase/auth';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
-import { useUpdateEmailDialogState } from '../../../hooks';
 import { UpdateEmailPage, UpdateUserInfoDialogState } from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
@@ -21,13 +22,18 @@ export const UpdateEmailDialog = memoNamed<Props>(
   'UpdateEmailDialog',
   ({ dialogIsOpen, user }) => {
     const {
-      state,
-      enterClickHandler,
+      formState,
+      enterButtonDisabled,
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-      enterButtonDisabled,
-    } = useUpdateEmailDialogState(user);
+    } = useStreamValue(UpdateEmailPage.state$);
+
+    const enterClickHandler = useCallback(async () => {
+      if (enterButtonDisabled) return;
+
+      await UpdateEmailPage.submit(user);
+    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -40,38 +46,38 @@ export const UpdateEmailDialog = memoNamed<Props>(
               <div>{user.email ?? ''}</div>
             </FormGroup>
             <FormGroup
-              helperText={state.email.error}
+              helperText={formState.email.error}
               intent={emailFormIntent}
               label={<Label>{dc.updateEmail.newEmail}</Label>}
             >
               <BpInput
                 autoComplete={'username'}
                 autoFocus={true}
-                disabled={state.isWaitingResponse}
+                disabled={formState.isWaitingResponse}
                 intent={emailFormIntent}
                 type={'email'}
-                value={state.email.inputValue}
+                value={formState.email.inputValue}
                 onValueChange={UpdateEmailPage.inputEmailHandler}
               />
             </FormGroup>
             <FormGroup
-              helperText={state.password.error}
+              helperText={formState.password.error}
               intent={passwordFormIntent}
               label={<Label>{dc.reauthenticate.password}</Label>}
             >
               <BpInput
                 autoComplete={'current-password'}
-                disabled={state.isWaitingResponse}
+                disabled={formState.isWaitingResponse}
                 intent={passwordFormIntent}
                 rightElement={
                   <LockButton
-                    disabled={state.isWaitingResponse}
+                    disabled={formState.isWaitingResponse}
                     passwordIsOpen={passwordIsOpen}
                     onLockClick={UpdateEmailPage.togglePasswordLock}
                   />
                 }
                 type={passwordIsOpen ? 'text' : 'password'}
-                value={state.password.inputValue}
+                value={formState.password.inputValue}
                 onValueChange={UpdateEmailPage.inputPasswordHandler}
               />
             </FormGroup>
@@ -79,12 +85,12 @@ export const UpdateEmailDialog = memoNamed<Props>(
         }
         closeDialog={UpdateUserInfoDialogState.closeDialog}
         dialogIsOpen={dialogIsOpen}
-        isWaitingResponse={state.isWaitingResponse}
+        isWaitingResponse={formState.isWaitingResponse}
         submitButton={
           <Button
             disabled={enterButtonDisabled}
             intent={'primary'}
-            loading={state.isWaitingResponse}
+            loading={formState.isWaitingResponse}
             onClick={enterClickHandler}
           >
             {dc.button.update}

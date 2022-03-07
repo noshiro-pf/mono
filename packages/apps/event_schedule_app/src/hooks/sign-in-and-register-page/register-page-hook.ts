@@ -1,12 +1,12 @@
 import type { Intent } from '@blueprintjs/core';
 import { useStreamValue } from '@noshiro/syncflow-react-hooks';
-import { useCallback, useState } from 'react';
-import { googleSignInWithPopup } from '../../api';
+import { useCallback } from 'react';
 import type { RegisterPageState } from '../../functions';
 import { RegisterPageStore, router } from '../../store';
+import { useGoogleSignInState } from './google-sign-in-hook';
 
 export const useRegisterPageState = (): DeepReadonly<{
-  state: RegisterPageState;
+  formState: RegisterPageState;
   enterClickHandler: () => void;
   usernameFormIntent: Intent;
   emailFormIntent: Intent;
@@ -16,31 +16,19 @@ export const useRegisterPageState = (): DeepReadonly<{
   googleSignInButtonDisabled: boolean;
   googleSignInClickHandler: () => void;
 }> => {
-  const state = useStreamValue(RegisterPageStore.state$);
+  const { googleSignInButtonDisabled, googleSignInClickHandler } =
+    useGoogleSignInState();
 
-  const enterButtonDisabled = useStreamValue(
-    RegisterPageStore.enterButtonDisabled$
-  );
-
-  const usernameFormIntent: Intent = useStreamValue(
-    RegisterPageStore.usernameFormIntent$
-  );
-
-  const emailFormIntent: Intent = useStreamValue(
-    RegisterPageStore.emailFormIntent$
-  );
-
-  const passwordFormIntent: Intent = useStreamValue(
-    RegisterPageStore.passwordFormIntent$
-  );
-
-  const passwordIsOpen = useStreamValue(RegisterPageStore.passwordIsOpen$);
+  const {
+    formState,
+    enterButtonDisabled,
+    usernameFormIntent,
+    emailFormIntent,
+    passwordFormIntent,
+    passwordIsOpen,
+  } = useStreamValue(RegisterPageStore.state$);
 
   const pageToBack = useStreamValue(router.pageToBack$);
-
-  // TODO: store に移す
-  const [googleSignInButtonDisabled, setGoogleSignInButtonDisabled] =
-    useState<boolean>(false);
 
   const enterClickHandler = useCallback(async (): Promise<void> => {
     if (enterButtonDisabled || googleSignInButtonDisabled) return;
@@ -48,17 +36,8 @@ export const useRegisterPageState = (): DeepReadonly<{
     await RegisterPageStore.submit(pageToBack);
   }, [enterButtonDisabled, googleSignInButtonDisabled, pageToBack]);
 
-  // TODO: store にロジックを移す
-  const googleSignInClickHandler = useCallback(async () => {
-    if (googleSignInButtonDisabled) return;
-
-    setGoogleSignInButtonDisabled(true);
-    await googleSignInWithPopup();
-    setGoogleSignInButtonDisabled(false);
-  }, [googleSignInButtonDisabled]);
-
   return {
-    state,
+    formState,
     enterClickHandler,
     usernameFormIntent,
     emailFormIntent,

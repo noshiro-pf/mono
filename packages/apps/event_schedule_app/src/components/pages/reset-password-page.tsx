@@ -1,9 +1,10 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
+import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../constants';
-import { useResetPasswordPageState } from '../../hooks';
-import { ResetPasswordPageStore } from '../../store';
+import { ResetPasswordPageStore, router } from '../../store';
 import { Label } from '../atoms';
 import { BpInput } from '../bp';
 import { SignInStyled } from '../molecules';
@@ -19,8 +20,17 @@ type Props = Readonly<{
 export const ResetPasswordPage = memoNamed<Props>(
   'ResetPasswordPage',
   ({ hidePasswordResetForm }) => {
-    const { state, emailFormIntent, enterButtonDisabled, enterClickHandler } =
-      useResetPasswordPageState();
+    const { formState, enterButtonDisabled, emailFormIntent } = useStreamValue(
+      ResetPasswordPageStore.state$
+    );
+
+    const pageToBack = useStreamValue(router.pageToBack$);
+
+    const enterClickHandler = useCallback(async (): Promise<void> => {
+      if (enterButtonDisabled) return;
+
+      await ResetPasswordPageStore.submit(pageToBack);
+    }, [enterButtonDisabled, pageToBack]);
 
     return (
       <FormRectWrapper>
@@ -41,17 +51,17 @@ export const ResetPasswordPage = memoNamed<Props>(
 
             <SignInStyled.FormGroups>
               <FormGroup
-                helperText={state.email.error}
+                helperText={formState.email.error}
                 intent={emailFormIntent}
                 label={<Label>{dc.email}</Label>}
               >
                 <BpInput
                   autoComplete={'email'}
                   autoFocus={true}
-                  disabled={state.isWaitingResponse}
+                  disabled={formState.isWaitingResponse}
                   intent={emailFormIntent}
                   type={'email'}
-                  value={state.email.inputValue}
+                  value={formState.email.inputValue}
                   onValueChange={ResetPasswordPageStore.inputEmailHandler}
                 />
               </FormGroup>
@@ -62,7 +72,7 @@ export const ResetPasswordPage = memoNamed<Props>(
                 disabled={enterButtonDisabled}
                 fill={true}
                 intent={'primary'}
-                loading={state.isWaitingResponse}
+                loading={formState.isWaitingResponse}
                 onClick={enterClickHandler}
               >
                 {dc.resetPasswordMode.submit}
