@@ -35,15 +35,16 @@ const fetchAnswersThrottled$ = fetchAnswers$.chain(
   throttleTime(fetchThrottleTime)
 );
 
-const [eventScheduleResult$, setEventScheduleResult] = createState<
-  | Result<
-      EventSchedule,
-      Readonly<{ type: 'not-found' | 'others'; message: string }>
-    >
-  | undefined
->(undefined);
+const { state$: eventScheduleResult$, setState: setEventScheduleResult } =
+  createState<
+    | Result<
+        EventSchedule,
+        Readonly<{ type: 'not-found' | 'others'; message: string }>
+      >
+    | undefined
+  >(undefined);
 
-const [answersResult$, setAnswersResult] = createState<
+const { state$: answersResult$, setState: setAnswersResult } = createState<
   | Result<readonly Answer[], Readonly<{ type: 'others'; message: string }>>
   | undefined
 >(undefined);
@@ -123,7 +124,7 @@ const errorType$: InitializedObservable<
   )
   .chain(withInitialValue(undefined));
 
-const [refreshButtonIsLoading$, setRefreshButtonIsLoading] =
+const { state$: refreshButtonIsLoading$, setState: setRefreshButtonIsLoading } =
   createState<boolean>(false);
 
 const refreshAnswers = (): void => {
@@ -131,8 +132,10 @@ const refreshAnswers = (): void => {
   setRefreshButtonIsLoading(true);
 };
 
-const [refreshButtonIsDisabled$, setRefreshButtonIsDisabled] =
-  createState<boolean>(false);
+const {
+  state$: refreshButtonIsDisabled$,
+  setState: setRefreshButtonIsDisabled,
+} = createState<boolean>(false);
 
 {
   let timer: TimerId | undefined = undefined;

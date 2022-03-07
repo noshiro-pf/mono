@@ -1,7 +1,7 @@
 import { createState } from '@noshiro/syncflow';
 
 export namespace UpdateUserInfoDialogState {
-  const [_openingDialog$, setOpeningDialog] = createState<
+  const { state$: _openingDialog$, setState: setOpeningDialog } = createState<
     | 'deleteAccount'
     | 'deleteAccountCreatedWithGoogle'
     | 'updateDisplayName'

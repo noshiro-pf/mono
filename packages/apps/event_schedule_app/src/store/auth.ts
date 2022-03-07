@@ -7,7 +7,9 @@ import { auth } from '../initialize-firebase';
 import { clog } from '../utils';
 import { router } from './router';
 
-const [user$, setUser] = createState<DeepReadonly<User> | undefined>(undefined);
+const { state$: user$, setState: setUser } = createState<
+  DeepReadonly<User> | undefined
+>(undefined);
 export { user$ };
 
 export const useUser = (): DeepReadonly<User> | undefined =>
