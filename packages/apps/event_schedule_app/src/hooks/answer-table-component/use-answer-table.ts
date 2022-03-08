@@ -3,7 +3,6 @@ import type {
   AnswerIconIdWithNone,
   AnswerIconPoint,
   AnswerId,
-  AnswerTableCellPosition,
   DatetimeRange,
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
@@ -18,6 +17,7 @@ import {
   createAnswerSelectionMapFromAnswers,
   createAnswerTable,
 } from '../../functions';
+import type { AnswerTableCellPosition } from '../../types';
 
 export const useAnswerTable = (
   eventSchedule: EventSchedule,

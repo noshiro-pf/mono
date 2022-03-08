@@ -3,7 +3,6 @@ import type {
   DatetimeRange,
   DatetimeSpecificationEnumType,
   EventSchedule,
-  EventScheduleValidation,
   NotificationSettings,
   YearMonthDate,
   Ymdhm,
@@ -27,6 +26,7 @@ import {
   validateEventScheduleAll,
 } from '../../functions';
 import { holidaysJpDefinition$, useUser } from '../../store';
+import type { EventScheduleValidation } from '../../types';
 import { mapNoneToUndefined } from '../../utils';
 import { useToggleSectionState } from '../use-toggle-section-state';
 import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';

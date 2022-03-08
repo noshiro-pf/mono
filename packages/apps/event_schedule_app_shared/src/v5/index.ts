@@ -50,7 +50,7 @@ export type {
   DatetimeSpecificationEnumType,
   DayType,
   // EventSchedule,
-  // EventScheduleValidation,
+  // EventScheduleValidation, // removed
   HoursMinutes,
   NotificationSettings,
   PartialAnswerIconSetting,
@@ -82,9 +82,7 @@ export {
 export type {
   Answer,
   AnswerId,
-  AnswerTableCellPosition,
   EventSchedule,
-  EventScheduleValidation,
   PartialAnswer,
   PartialEventSchedule,
   PartialUser,

@@ -1,9 +1,7 @@
-import type {
-  EventSchedule,
-  EventScheduleValidation,
-} from '@noshiro/event-schedule-app-shared';
+import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { IList, isEmailString, isInRange } from '@noshiro/ts-utils';
 import { answerIconPointConfig } from '../../constants';
+import type { EventScheduleValidation } from '../../types';
 
 export const validateEventSchedule = ({
   title,
