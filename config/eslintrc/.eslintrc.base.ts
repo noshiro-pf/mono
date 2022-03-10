@@ -2,6 +2,7 @@ import type { Linter } from 'eslint';
 import { readGitignoreFiles } from 'eslint-gitignore';
 import {
   eslintImportsRules,
+  eslintJestRules,
   eslintNoshiroCustomRules,
   eslintRulesAll,
   typescriptEslintRules,
@@ -45,7 +46,7 @@ const config: Linter.Config = {
     'plugin:import/recommended',
     // 'plugin:import/errors',
     // 'plugin:import/warnings',
-    'plugin:import/typescript',
+    'plugin:import/typescript', // needs eslint-import-resolver-typescript to be installed
     'plugin:import/react',
     'plugin:noshiro-custom/all',
 
@@ -54,14 +55,19 @@ const config: Linter.Config = {
     // 'plugin:functional/external-recommended',
     // 'plugin:total-functions/recommended',
 
+    /* jest */
+    'plugin:jest/all',
+    // 'plugin:jest/recommended',
+
     /* prettier */
     'prettier', // turn off rules
   ],
   root: true,
-  env: { browser: true, node: true, es6: true },
+  env: { browser: true, node: true, es6: true, 'jest/globals': true },
   plugins: [
     '@typescript-eslint',
     'import',
+    'jest',
     'noshiro-custom',
     /* functional, total-functions */
     // 'functional',
@@ -76,7 +82,18 @@ const config: Linter.Config = {
       jsx: true,
     },
     sourceType: 'module',
-    project: './config/tsconfig/tsconfig.eslint.json',
+    project: 'config/tsconfig/tsconfig.eslint.json',
+  },
+  settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+        project: 'packages/**/tsconfig.json',
+      },
+    },
   },
   rules: {
     ...eslintRulesAll.modifiedRules,
@@ -87,6 +104,7 @@ const config: Linter.Config = {
     ...eslintImportsRules.helpfulWarnings,
     ...eslintImportsRules.moduleSystems,
     ...eslintImportsRules.styleGuide,
+    ...eslintJestRules,
     ...eslintNoshiroCustomRules,
   },
   ignorePatterns: readGitignoreFiles({ cwd: __dirname }),
