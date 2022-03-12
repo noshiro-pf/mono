@@ -1,6 +1,6 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { noop } from '@noshiro/ts-utils';
 import type { User } from 'firebase/auth';
 import type { CSSProperties } from 'react';
@@ -33,7 +33,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
       newPasswordFormIntent,
       oldPasswordIsOpen,
       newPasswordIsOpen,
-    } = useStreamValue(UpdatePasswordPage.state$);
+    } = useObservableValue(UpdatePasswordPage.state$);
 
     const enterClickHandler = useCallback(async () => {
       if (enterButtonDisabled) return;

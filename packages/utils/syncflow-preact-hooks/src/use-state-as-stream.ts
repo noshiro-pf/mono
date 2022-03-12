@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { useCallback } from 'preact/compat';
-import { useReducerAsStream } from './use-reducer-as-stream';
+import { useObservableReducer } from './use-reducer-as-stream';
 
 type Action<S> = Readonly<
   { type: 'set'; nextState: S } | { type: 'update'; updateFn: (a: S) => S }
@@ -15,14 +15,14 @@ const reducer = <S>(state: S, action: Action<S>): S => {
   }
 };
 
-export const useStateAsStream = <S>(
+export const useObservableState = <S>(
   initialState: S
 ): [
   InitializedObservable<S>,
   (v: S) => void,
   (updateFn: (prev: S) => S) => void
 ] => {
-  const [state$, dispatch] = useReducerAsStream<S, Action<S>>(
+  const [state$, dispatch] = useObservableReducer<S, Action<S>>(
     reducer,
     initialState
   );

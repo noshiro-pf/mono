@@ -1,7 +1,7 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
-import { useStreamEffect } from '@noshiro/syncflow-preact-hooks';
+import { useObservableEffect } from '@noshiro/syncflow-preact-hooks';
 import {
   push,
   usePathname,
@@ -46,7 +46,7 @@ export const Root = memoNamed('Root', () => {
     }
   }, [roomId]);
 
-  useStreamEffect(createRoom.response$, (res) => {
+  useObservableEffect(createRoom.response$, (res) => {
     push(`${routes.rooms}/${res.id}`);
   });
 

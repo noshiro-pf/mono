@@ -1,6 +1,6 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import { api } from '../../api';
@@ -27,7 +27,7 @@ export const useEditEventScheduleHooks = ({
   const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =
     useBooleanState(false);
 
-  const eventId = useStreamValue(router.eventId$);
+  const eventId = useObservableValue(router.eventId$);
 
   const answerPagePath = routes.answerPage(eventId ?? '');
 

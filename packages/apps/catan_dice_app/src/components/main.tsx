@@ -10,9 +10,9 @@ import {
   withInitialValue,
 } from '@noshiro/syncflow';
 import {
-  useStream,
-  useStreamValue,
-  useVoidEventAsStream,
+  useObservable,
+  useObservableValue,
+  useVoidEventObservable,
 } from '@noshiro/syncflow-react-hooks';
 import { historyReducer, historyToSumCount } from '../functions';
 import { defaultHistoryState } from '../type';
@@ -21,11 +21,11 @@ import { MainView } from './main-view';
 const sumCountInitial = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as const;
 
 export const Main = memoNamed('Main', () => {
-  const [rollDices$, rollDices] = useVoidEventAsStream();
-  const [undo$, undo] = useVoidEventAsStream();
-  const [redo$, redo] = useVoidEventAsStream();
+  const [rollDices$, rollDices] = useVoidEventObservable();
+  const [undo$, undo] = useVoidEventObservable();
+  const [redo$, redo] = useVoidEventObservable();
 
-  const history$ = useStream(() =>
+  const history$ = useObservable(() =>
     merge([
       rollDices$.chain(mapTo('roll-dices' as const)),
       undo$.chain(mapTo('undo' as const)),
@@ -33,17 +33,17 @@ export const Main = memoNamed('Main', () => {
     ] as const).chain(scan(historyReducer, defaultHistoryState))
   );
 
-  const undoable$ = useStream(() =>
+  const undoable$ = useObservable(() =>
     history$.chain(map((h) => h.index > -1)).chain(withInitialValue(false))
   );
 
-  const redoable$ = useStream(() =>
+  const redoable$ = useObservable(() =>
     history$
       .chain(map((h) => h.index < h.history.length - 1))
       .chain(withInitialValue(false))
   );
 
-  const diceValues$ = useStream<readonly [number, number]>(() =>
+  const diceValues$ = useObservable<readonly [number, number]>(() =>
     history$
       .chain(
         map(
@@ -53,13 +53,13 @@ export const Main = memoNamed('Main', () => {
       .chain(withInitialValue([0, 0] as const))
   );
 
-  const sumCount$ = useStream<ReadonlyArrayOfLength<11, number>>(() =>
+  const sumCount$ = useObservable<ReadonlyArrayOfLength<11, number>>(() =>
     history$
       .chain(map(historyToSumCount))
       .chain(withInitialValue(sumCountInitial))
   );
 
-  const opacity$ = useStream<number>(() =>
+  const opacity$ = useObservable<number>(() =>
     rollDices$
       .chain(
         switchMap(() =>
@@ -71,11 +71,11 @@ export const Main = memoNamed('Main', () => {
       .chain(withInitialValue(0))
   );
 
-  const [dice1, dice2] = useStreamValue(diceValues$);
-  const sumCount = useStreamValue(sumCount$);
-  const undoable = useStreamValue(undoable$);
-  const redoable = useStreamValue(redoable$);
-  const opacity = useStreamValue(opacity$);
+  const [dice1, dice2] = useObservableValue(diceValues$);
+  const sumCount = useObservableValue(sumCount$);
+  const undoable = useObservableValue(undoable$);
+  const redoable = useObservableValue(redoable$);
+  const opacity = useObservableValue(opacity$);
 
   return (
     <MainView

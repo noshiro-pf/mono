@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { createState, mapI } from '@noshiro/syncflow';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { User } from 'firebase/auth';
 import { routes } from '../constants';
 import { auth } from '../initialize-firebase';
@@ -11,7 +11,7 @@ const [user$, setUser] = createState<DeepReadonly<User> | undefined>(undefined);
 export { user$ };
 
 export const useUser = (): DeepReadonly<User> | undefined =>
-  useStreamValue(user$);
+  useObservableValue(user$);
 
 export const passwordProviderIncluded$: InitializedObservable<boolean> =
   user$.chain(
@@ -22,7 +22,7 @@ export const passwordProviderIncluded$: InitializedObservable<boolean> =
   );
 
 export const usePasswordProviderIncluded = (): boolean =>
-  useStreamValue(passwordProviderIncluded$);
+  useObservableValue(passwordProviderIncluded$);
 
 export const emitAuthStateChange = (): void => {
   setUser(auth.currentUser ?? undefined);

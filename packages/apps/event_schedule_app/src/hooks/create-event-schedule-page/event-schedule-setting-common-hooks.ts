@@ -11,7 +11,7 @@ import type {
 import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useStateWithResetter } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -223,7 +223,7 @@ export const useEventScheduleSettingCommonHooks = (
     resetAnswerIcons();
   }, [resetAnswerDeadline, resetNotificationSettings, resetAnswerIcons]);
 
-  const holidaysJpDefinition = useStreamValue<
+  const holidaysJpDefinition = useObservableValue<
     IMapMapped<YearMonthDate, string, YmdKey>
   >(holidaysJpDefinition$);
 

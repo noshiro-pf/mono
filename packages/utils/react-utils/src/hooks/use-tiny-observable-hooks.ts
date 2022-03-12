@@ -8,12 +8,12 @@ export const useTinyObservable = <T>(): TinyObservableSource<T> => {
 };
 
 export const useTinyObservableEffect = <T>(
-  stream$: TinyObservable<T>,
+  observable$: TinyObservable<T>,
   subscriptionFn: (v: T) => void
 ): void => {
-  const ref = useRef({ stream$, subscriptionFn });
+  const ref = useRef({ observable$, subscriptionFn });
   useEffect(() => {
-    const s = ref.current.stream$.subscribe(ref.current.subscriptionFn);
+    const s = ref.current.observable$.subscribe(ref.current.subscriptionFn);
     return () => {
       s.unsubscribe();
     };
@@ -22,20 +22,20 @@ export const useTinyObservableEffect = <T>(
 
 // Wraps the value with an object to avoid setState's update behavior when T is function type.
 export function useTinyObservableValue<T>(
-  stream$: TinyObservable<T>,
+  observable$: TinyObservable<T>,
   initialValue: T
 ): T;
 export function useTinyObservableValue<T>(
-  stream$: TinyObservable<T>
+  observable$: TinyObservable<T>
 ): T | undefined;
 export function useTinyObservableValue<T>(
-  stream$: TinyObservable<T>,
+  observable$: TinyObservable<T>,
   initialValue?: T
 ): T | undefined {
   const [state, setState] = useState<{ value: T | undefined }>({
     value: initialValue,
   });
-  useTinyObservableEffect(stream$, (value) => {
+  useTinyObservableEffect(observable$, (value) => {
     setState({ value });
   });
   return state.value ?? initialValue;

@@ -3,21 +3,23 @@ import { source, withInitialValue } from '@noshiro/syncflow';
 import { Option } from '@noshiro/ts-utils';
 import { createSignal, onCleanup } from 'solid-js';
 
-export function useStreamValue<A, B = A>(
-  stream$: Observable<A>,
+export function useObservableValue<A, B = A>(
+  observable$: Observable<A>,
   initialValue: B
 ): A | B;
-export function useStreamValue<A>(stream$: InitializedObservable<A>): A;
-export function useStreamValue<A>(stream$: Observable<A>): A | undefined;
-export function useStreamValue<A, B = A>(
-  stream$: Observable<A>,
+export function useObservableValue<A>(observable$: InitializedObservable<A>): A;
+export function useObservableValue<A>(
+  observable$: Observable<A>
+): A | undefined;
+export function useObservableValue<A, B = A>(
+  observable$: Observable<A>,
   initialValue?: B
 ): () => A | B | undefined {
   const [getValue, setValue] = createSignal<A | B | undefined>(
-    Option.unwrap(stream$.currentValue) ?? initialValue
+    Option.unwrap(observable$.currentValue) ?? initialValue
   );
 
-  const subscription = stream$.subscribe(setValue);
+  const subscription = observable$.subscribe(setValue);
   onCleanup(() => {
     subscription.unsubscribe();
   });
@@ -25,7 +27,7 @@ export function useStreamValue<A, B = A>(
   return getValue;
 }
 
-export const useStateAsStream = <A>(
+export const useObservableState = <A>(
   initialValue: A
 ): [InitializedObservable<A>, (v: A) => void] => {
   const src$ = source<A>();

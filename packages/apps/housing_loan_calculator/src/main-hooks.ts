@@ -1,5 +1,8 @@
 import { withLatestFrom } from '@noshiro/syncflow';
-import { useStreamEffect, useStreamValue } from '@noshiro/syncflow-react-hooks';
+import {
+  useObservableEffect,
+  useObservableValue,
+} from '@noshiro/syncflow-react-hooks';
 import { push, useQueryParams } from '@noshiro/tiny-router-react-hooks';
 import { mapNullable, pipe, stringToNumber } from '@noshiro/ts-utils';
 import { useEffect } from 'react';
@@ -66,19 +69,22 @@ export const useMainHooks = (): Readonly<{ isCalculating: boolean }> => {
     }
   }, [query]);
 
-  useStreamEffect(userInput$.chain(withLatestFrom(store$)), ([_, store]) => {
-    push(
-      uriWithQueryParams('/', [
-        [queryParams.repaymentType, store.repaymentType],
-        [queryParams.downPayment, store.downPaymentManYen],
-        [queryParams.propertyPrice, store.propertyPriceManYen],
-        [queryParams.borrowingPeriodMonth, store.borrowingPeriodYear],
-        [queryParams.interestRatePerMonth, store.interestRatePercentPerYear],
-      ])
-    );
-  });
+  useObservableEffect(
+    userInput$.chain(withLatestFrom(store$)),
+    ([_, store]) => {
+      push(
+        uriWithQueryParams('/', [
+          [queryParams.repaymentType, store.repaymentType],
+          [queryParams.downPayment, store.downPaymentManYen],
+          [queryParams.propertyPrice, store.propertyPriceManYen],
+          [queryParams.borrowingPeriodMonth, store.borrowingPeriodYear],
+          [queryParams.interestRatePerMonth, store.interestRatePercentPerYear],
+        ])
+      );
+    }
+  );
 
-  const isCalculating = useStreamValue(isCalculating$);
+  const isCalculating = useObservableValue(isCalculating$);
 
   return {
     isCalculating,

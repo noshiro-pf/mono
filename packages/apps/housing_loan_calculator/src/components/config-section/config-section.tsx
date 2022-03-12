@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import styled from 'styled-components';
 import { viewTexts } from '../../constants';
 import {
@@ -20,7 +20,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
     propertyPriceManYen,
     borrowingPeriodYear,
     interestRatePercentPerYear,
-  } = useStreamValue(store$);
+  } = useObservableValue(store$);
 
   return (
     <>

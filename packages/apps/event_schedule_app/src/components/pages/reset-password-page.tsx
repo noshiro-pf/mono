@@ -1,6 +1,6 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../constants';
@@ -20,11 +20,10 @@ type Props = Readonly<{
 export const ResetPasswordPage = memoNamed<Props>(
   'ResetPasswordPage',
   ({ hidePasswordResetForm }) => {
-    const { formState, enterButtonDisabled, emailFormIntent } = useStreamValue(
-      ResetPasswordPageStore.state$
-    );
+    const { formState, enterButtonDisabled, emailFormIntent } =
+      useObservableValue(ResetPasswordPageStore.state$);
 
-    const pageToBack = useStreamValue(router.pageToBack$);
+    const pageToBack = useObservableValue(router.pageToBack$);
 
     const enterClickHandler = useCallback(async (): Promise<void> => {
       if (enterButtonDisabled) return;

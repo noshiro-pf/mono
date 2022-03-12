@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
+import { useObservableValue } from '@noshiro/syncflow-preact-hooks';
 import { useCallback, useState } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
@@ -35,7 +35,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
 
   const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
 
-  const room = useStreamValue(db.room$);
+  const room = useObservableValue(db.room$);
 
   const onJoinRoomButtonClick = useCallback(() => {
     if (room === undefined) return;
@@ -48,7 +48,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
     joinRoom.dispatch(roomId, username).catch(console.error);
   }, [username, password, roomId, room]);
 
-  const loading = useStreamValue(joinRoom.isWaitingResponse$);
+  const loading = useObservableValue(joinRoom.isWaitingResponse$);
 
   return (
     <Centering>

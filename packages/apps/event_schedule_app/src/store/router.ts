@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { distinctUntilChangedI, filter, mapI } from '@noshiro/syncflow';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { createRouter } from '@noshiro/tiny-router-observable';
 import { getEventIdFromPathname, isRoute, redirectRules } from '../constants';
 
@@ -54,11 +54,11 @@ export const useShowPage = (): Readonly<{
   registerPage: boolean;
   signInPage: boolean;
 }> => {
-  const createPage = useStreamValue(router.isRoute.createPage$);
-  const answerPage = useStreamValue(router.isRoute.answerPage$);
-  const editPage = useStreamValue(router.isRoute.editPage$);
-  const registerPage = useStreamValue(router.isRoute.registerPage$);
-  const signInPage = useStreamValue(router.isRoute.signInPage$);
+  const createPage = useObservableValue(router.isRoute.createPage$);
+  const answerPage = useObservableValue(router.isRoute.answerPage$);
+  const editPage = useObservableValue(router.isRoute.editPage$);
+  const registerPage = useObservableValue(router.isRoute.registerPage$);
+  const signInPage = useObservableValue(router.isRoute.signInPage$);
 
   return {
     createPage,

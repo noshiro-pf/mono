@@ -1,6 +1,6 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { IList } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
@@ -22,14 +22,14 @@ const formatYenValue = (value: number): string =>
   }).format(value);
 
 export const PaymentTable = memoNamed('PaymentTable', () => {
-  const { repaymentType } = useStreamValue(store$);
+  const { repaymentType } = useObservableValue(store$);
 
   const {
     borrowingBalanceYen,
     interestYen,
     monthlyPaymentTotalYen,
     monthlyPrincipalPaymentYen,
-  } = useStreamValue(calculatedValues$);
+  } = useObservableValue(calculatedValues$);
 
   const monthlyPayment = useMemo<readonly number[]>(
     () =>

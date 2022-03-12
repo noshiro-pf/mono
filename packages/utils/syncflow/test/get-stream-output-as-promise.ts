@@ -1,12 +1,12 @@
 import type { Observable } from '../src';
 
 export const getStreamOutputAsPromise = <T>(
-  stream$: Observable<T>,
+  observable$: Observable<T>,
   startSource: () => void
 ): Promise<readonly T[]> => {
   const ret = new Promise<readonly T[]>((resolve) => {
     const output: T[] = [];
-    const subscription = stream$.subscribe(
+    const subscription = observable$.subscribe(
       (a) => {
         output.push(a);
       },

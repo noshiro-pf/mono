@@ -1,6 +1,6 @@
 import { Spinner } from '@blueprintjs/core';
 import { memoNamed, useBooleanState } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { descriptionFontColor, dict } from '../../../constants';
@@ -13,8 +13,8 @@ import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 const dc = dict.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
-  const eventId = useStreamValue(router.eventId$);
-  const eventScheduleResult = useStreamValue(eventScheduleResult$);
+  const eventId = useObservableValue(router.eventId$);
+  const eventScheduleResult = useObservableValue(eventScheduleResult$);
 
   const [emailConfirmationHasPassed, makeItPassTheEmailConfirmation] =
     useBooleanState(false);

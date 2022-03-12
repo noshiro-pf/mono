@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
+import { useObservableValue } from '@noshiro/syncflow-preact-hooks';
 import type { Rect } from '@noshiro/ts-utils';
 import { text } from '../constants';
 import {
@@ -38,13 +38,17 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
   const { tableSize, footerHeight, headerStyle, footerStyle } =
     useWindowSize(windowSize);
 
-  const displayValues: DisplayValues = useStreamValue(displayValues$);
-  const turnPlayerHighlighterPosition = useStreamValue(
+  const displayValues: DisplayValues = useObservableValue(displayValues$);
+  const turnPlayerHighlighterPosition = useObservableValue(
     turnPlayerHighlighterPosition$
   );
-  const confirmTossBalloonProps = useStreamValue(confirmTossBalloonProps$);
-  const selectAnswerBalloonProps = useStreamValue(selectAnswerBalloonProps$);
-  const decidedAnswerBalloonProps = useStreamValue(decidedAnswerBalloonProps$);
+  const confirmTossBalloonProps = useObservableValue(confirmTossBalloonProps$);
+  const selectAnswerBalloonProps = useObservableValue(
+    selectAnswerBalloonProps$
+  );
+  const decidedAnswerBalloonProps = useObservableValue(
+    decidedAnswerBalloonProps$
+  );
 
   return (
     <Root>
