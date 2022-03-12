@@ -1,7 +1,7 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { useAlive, useBooleanState } from '@noshiro/react-utils';
+import { useAlive, useBoolState, useState } from '@noshiro/react-utils';
 import { IRecord, Result, toAbsolutePath } from '@noshiro/ts-utils';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { api } from '../../api';
 import { routes } from '../../constants';
 import { useUser } from '../../store';
@@ -24,16 +24,19 @@ export const useCreateEventScheduleHooks = ({
   newEventSchedule: EventSchedule;
   eventScheduleValidationOk: boolean;
 }>): CreateEventScheduleHooks => {
-  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =
-    useBooleanState(false);
+  const {
+    state: isLoading,
+    setTrue: setIsLoadingTrue,
+    setFalse: setIsLoadingFalse,
+  } = useBoolState(false);
 
-  const [
-    createResultDialogIsOpen,
-    openCreateResultDialog,
-    closeCreateResultDialog,
-  ] = useBooleanState(false);
+  const {
+    state: createResultDialogIsOpen,
+    setTrue: openCreateResultDialog,
+    setFalse: closeCreateResultDialog,
+  } = useBoolState(false);
 
-  const [url, setUrl] = useState<string>('');
+  const { state: url, setState: setUrl } = useState<string>('');
 
   const alive = useAlive();
 
@@ -70,6 +73,7 @@ export const useCreateEventScheduleHooks = ({
     setIsLoadingFalse,
     openCreateResultDialog,
     alive,
+    setUrl,
   ]);
 
   const onClipboardButtonClick = useCallback(() => {

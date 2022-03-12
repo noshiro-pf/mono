@@ -1,9 +1,9 @@
-import { memoNamed } from '@noshiro/react-utils';
+import { memoNamed, useState } from '@noshiro/react-utils';
 import type { Hue, RectSize, Rgba } from '@noshiro/ts-utils';
 import { hslaToRgba } from '@noshiro/ts-utils';
 import { Application, InteractionManager, settings } from 'pixi.js';
 import type { CSSProperties } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   addGlobalPointerEventListener,
   createGlobalPixiObjects,
@@ -27,7 +27,9 @@ type Props = Readonly<{
 export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [pixiApp, setPixiApp] = useState<PixiApp>();
+  const { state: pixiApp, setState: setPixiApp } = useState<
+    PixiApp | undefined
+  >(undefined);
 
   useEffect(() => {
     // should initialize in useEffect to wait for canvasRef.current initialization
@@ -53,7 +55,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
     return () => {
       app.destroy();
     };
-  }, [props.canvasSize, props.canvasStyles]);
+  }, [props.canvasSize, props.canvasStyles, setPixiApp]);
 
   const newBboxColor = useMemo<{ border: Rgba; face: Rgba }>(
     () => ({
@@ -87,7 +89,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   useEffect(() => {
     if (pixiApp === undefined || canvasAppStateHandler === undefined) return;
 
-    const removeEventListner = addGlobalPointerEventListener(
+    const removePointerEventListener = addGlobalPointerEventListener(
       pixiApp.app,
       pixiApp.background,
       stateRef.current,
@@ -95,7 +97,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
     );
 
     return () => {
-      removeEventListner();
+      removePointerEventListener();
     };
   }, [
     pixiApp,

@@ -5,6 +5,48 @@ export const eslintRulesAll: Readonly<
 > = {
   modifiedRules: {
     eqeqeq: ['error', 'always', { null: 'ignore' }],
+    'no-restricted-imports': [
+      'warn',
+      {
+        paths: [
+          {
+            name: 'react',
+            importNames: ['memo'],
+            message: 'use memoNamed from @noshiro/react-utils instead.',
+          },
+          {
+            name: 'preact',
+            importNames: ['memo'],
+            message: 'use memoNamed from @noshiro/preact-utils instead.',
+          },
+          {
+            name: 'react',
+            importNames: ['useState'],
+            message: 'use useRichState from @noshiro/react-utils instead.',
+          },
+          {
+            name: 'preact/hooks',
+            importNames: ['useState'],
+            message: 'use useRichState from @noshiro/preact-utils instead.',
+          },
+          {
+            name: 'preact/compat',
+            importNames: [
+              'useState',
+              'useReducer',
+              'useMemo',
+              'useCallback',
+              'useRef',
+              'useContext',
+              'useEffect',
+              'useLayoutEffect',
+              'useErrorBoundary',
+            ],
+            message: 'use preact/hooks package instead.',
+          },
+        ],
+      },
+    ],
   },
   disabledRules: {
     'capitalized-comments': 'off',

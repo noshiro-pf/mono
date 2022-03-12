@@ -1,8 +1,8 @@
 import { NumericInput } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
+import { memoNamed, useState } from '@noshiro/react-utils';
 import { stringToNumber } from '@noshiro/ts-utils';
 import type { ComponentProps, CSSProperties, FocusEventHandler } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
 type NumericInputPropsOriginal = ComponentProps<typeof NumericInput>;
 
@@ -32,11 +32,11 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
     convertValueOnBlurAndEmit,
     ...props
   }) => {
-    const [state, setState] = useState<string>(value.toString());
+    const { state, setState } = useState<string>(value.toString());
 
     useEffect(() => {
       setState(value.toString());
-    }, [value]);
+    }, [value, setState]);
 
     const onValueChangeInternal = useCallback(
       (
@@ -54,7 +54,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
           onValueChangeFiltered(parsed);
         }
       },
-      [onValueChange, onValueChangeFiltered, parseNumericString]
+      [onValueChange, onValueChangeFiltered, parseNumericString, setState]
     );
 
     const onBlurInternal = useCallback<FocusEventHandler<HTMLInputElement>>(

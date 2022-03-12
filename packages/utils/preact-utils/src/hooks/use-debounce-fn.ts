@@ -1,5 +1,5 @@
-import type { Ref } from 'preact/compat';
-import { useCallback, useEffect, useRef } from 'preact/compat';
+import type { Ref } from 'preact/hooks';
+import { useCallback, useEffect, useRef } from 'preact/hooks';
 
 export const useTimerRef = (): [Ref<number | undefined>, () => void] => {
   const timerRef = useRef<number | undefined>(undefined);

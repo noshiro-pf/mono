@@ -1,4 +1,5 @@
 import type { Observable } from '../../src';
+// eslint-disable-next-line import/no-deprecated
 import { filter, interval, map, merge, take } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
@@ -25,6 +26,7 @@ const createStreams = (
   const odd$ = counter$
     .chain(filter((n) => n % 2 === 1))
     .chain(map((a) => a.toString()));
+  // eslint-disable-next-line import/no-deprecated
   const merged$ = merge([even$, odd$] as const);
 
   return {

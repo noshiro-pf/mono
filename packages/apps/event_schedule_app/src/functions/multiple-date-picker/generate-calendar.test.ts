@@ -12,7 +12,7 @@ test('generate-calendar', () => {
    */
   const year = 2020;
   const month = 7;
-  expect(generateCalendar(year, month)).toEqual([
+  expect(generateCalendar(year, month)).toStrictEqual([
     [
       { year: 2020, month: 6, date: 28 },
       { year: 2020, month: 6, date: 29 },

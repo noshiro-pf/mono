@@ -1,4 +1,4 @@
-import { useEffect } from 'preact/compat';
+import { useEffect } from 'preact/hooks';
 
 export const usePropToUpdateState = <S, P extends S>(
   prop: P,

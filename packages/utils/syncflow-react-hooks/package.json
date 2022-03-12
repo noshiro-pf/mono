@@ -28,7 +28,9 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.2"
   }
 }

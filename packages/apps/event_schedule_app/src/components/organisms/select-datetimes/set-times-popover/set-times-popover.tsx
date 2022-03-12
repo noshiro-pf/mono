@@ -1,9 +1,10 @@
+// eslint-disable-next-line import/no-deprecated
 import { Button, Popover } from '@blueprintjs/core';
 import type {
   DatetimeSpecificationEnumType,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { dict } from '../../../../constants';
 import { SetTimesPopoverContent } from './set-times-popover-content';
@@ -19,7 +20,11 @@ type Props = Readonly<{
 export const SetTimesPopover = memoNamed<Props>(
   'SetTimesPopover',
   ({ datetimeSpecification, initialValue, onSetTimesSubmit }) => {
-    const [isOpen, handleOpen, handleClose] = useBooleanState(false);
+    const {
+      state: isOpen,
+      setTrue: handleOpen,
+      setFalse: handleClose,
+    } = useBoolState(false);
 
     const onOkClick = useCallback(
       (range: TimeRange) => {

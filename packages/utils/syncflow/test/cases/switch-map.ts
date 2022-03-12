@@ -1,5 +1,6 @@
 import { tuple } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
+// eslint-disable-next-line import/no-deprecated
 import { interval, map, switchMap, take } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
@@ -26,6 +27,7 @@ const createStreams = (
   const counter$ = interval$.chain(take(10));
 
   const switchMap$ = counter$.chain(take(7)).chain(
+    // eslint-disable-next-line import/no-deprecated
     switchMap((i) =>
       interval(tick * 2)
         .chain(take(5))

@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useBoolState } from './use-bool-state';
 
 export const useAlive = (): Readonly<{ current: boolean }> => {
-  const [alive, setAlive] = useState<boolean>(true);
+  const { state: alive, setFalse: kill } = useBoolState(true);
 
-  useEffect(
-    () => () => {
-      setAlive(false);
-    },
-    []
-  );
+  useEffect(() => kill, [kill]);
 
   return { current: alive };
 };

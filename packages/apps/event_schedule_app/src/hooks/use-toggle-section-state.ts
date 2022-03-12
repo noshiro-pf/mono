@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useState } from '@noshiro/react-utils';
+import { useCallback } from 'react';
 
 // const NULL = Symbol();
 // const isNonNull = <T>(v: T | symbol): v is T => v !== NULL;
@@ -22,9 +23,10 @@ export const useToggleSectionState = <A>({
   valueToBeSetWhenTurnedOff: A;
   valueToBeSetWhenTurnedOn?: A;
 }>): ToggleSectionState<A> => {
-  const [toggleState, setToggleState] = useState<boolean>(initialToggleState);
+  const { state: toggleState, setState: setToggleState } =
+    useState<boolean>(initialToggleState);
 
-  const [value, setValue] = useState<A>(initialState);
+  const { state: value, setState: setValue } = useState<A>(initialState);
 
   const { toggle, resetState } = useToggleSectionStateManager({
     initialToggleState,

@@ -10,11 +10,11 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useStateWithResetter } from '@noshiro/react-utils';
+import { useState } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { IList } from '@noshiro/ts-utils';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import {
   initialAnswerDeadline,
   initialNotificationSettings,
@@ -76,15 +76,21 @@ export const useEventScheduleSettingCommonHooks = (
 ): EventScheduleSettingCommonHooks => {
   const initialValues = useRef(initialValuesInput);
 
-  const [title, onTitleChange] = useState<string>(initialValues.current.title);
-  const [notes, onNotesChange] = useState<string>(initialValues.current.notes);
+  const { state: title, setState: onTitleChange } = useState<string>(
+    initialValues.current.title
+  );
+  const { state: notes, setState: onNotesChange } = useState<string>(
+    initialValues.current.notes
+  );
 
-  const [datetimeSpecification, onDatetimeSpecificationChange] =
-    useState<DatetimeSpecificationEnumType>(
-      initialValues.current.datetimeSpecification
-    );
+  const {
+    state: datetimeSpecification,
+    setState: onDatetimeSpecificationChange,
+  } = useState<DatetimeSpecificationEnumType>(
+    initialValues.current.datetimeSpecification
+  );
 
-  const [datetimeRangeList, onDatetimeListChange] = useState<
+  const { state: datetimeRangeList, setState: onDatetimeListChange } = useState<
     readonly DatetimeRange[]
   >(initialValues.current.datetimeRangeList);
 
@@ -101,8 +107,11 @@ export const useEventScheduleSettingCommonHooks = (
     valueToBeSetWhenTurnedOn: initialAnswerDeadline,
   });
 
-  const [answerIcons, setAnswerIcons, resetAnswerIcons] =
-    useStateWithResetter<AnswerIconSettings>(initialValues.current.answerIcons);
+  const {
+    state: answerIcons,
+    setState: setAnswerIcons,
+    resetState: resetAnswerIcons,
+  } = useState<AnswerIconSettings>(initialValues.current.answerIcons);
 
   const user = useUser();
 
@@ -221,7 +230,15 @@ export const useEventScheduleSettingCommonHooks = (
     resetAnswerDeadline();
     resetNotificationSettings();
     resetAnswerIcons();
-  }, [resetAnswerDeadline, resetNotificationSettings, resetAnswerIcons]);
+  }, [
+    onTitleChange,
+    onNotesChange,
+    onDatetimeSpecificationChange,
+    onDatetimeListChange,
+    resetAnswerDeadline,
+    resetNotificationSettings,
+    resetAnswerIcons,
+  ]);
 
   const holidaysJpDefinition = useObservableValue<
     IMapMapped<YearMonthDate, string, YmdKey>

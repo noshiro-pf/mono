@@ -18,7 +18,7 @@ describe('IMapMapped[Symbol.iterator]', () => {
       toKey,
       fromKey
     );
-    expect(s0).toEqual(
+    expect(s0).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -128,7 +128,7 @@ describe('IMapMapped.set', () => {
       toKey,
       fromKey
     );
-    expect(s0.set({ v: 5 }, '5')).toEqual(
+    expect(s0.set({ v: 5 }, '5')).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -140,7 +140,7 @@ describe('IMapMapped.set', () => {
         fromKey
       )
     );
-    expect(s0).toEqual(
+    expect(s0).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -162,7 +162,7 @@ describe('IMapMapped.set', () => {
       toKey,
       fromKey
     );
-    expect(s0.set({ v: 3 }, '3')).toEqual(
+    expect(s0.set({ v: 3 }, '3')).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -173,7 +173,7 @@ describe('IMapMapped.set', () => {
         fromKey
       )
     );
-    expect(s0).toEqual(
+    expect(s0).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -187,10 +187,10 @@ describe('IMapMapped.set', () => {
   });
   test('case 3', () => {
     const s0 = IMapMapped.new([], toKey, fromKey);
-    expect(s0.set({ v: 1 }, '1')).toEqual(
+    expect(s0.set({ v: 1 }, '1')).toStrictEqual(
       IMapMapped.new([[{ v: 1 }, '1']], toKey, fromKey)
     );
-    expect(s0).toEqual(IMapMapped.new([], toKey, fromKey));
+    expect(s0).toStrictEqual(IMapMapped.new([], toKey, fromKey));
   });
 });
 
@@ -205,7 +205,7 @@ describe('IMapMapped.delete', () => {
       toKey,
       fromKey
     );
-    expect(s0.delete({ v: 10 })).toEqual(
+    expect(s0.delete({ v: 10 })).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -216,7 +216,7 @@ describe('IMapMapped.delete', () => {
         fromKey
       )
     );
-    expect(s0).toEqual(
+    expect(s0).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -238,7 +238,7 @@ describe('IMapMapped.delete', () => {
       toKey,
       fromKey
     );
-    expect(s0.delete({ v: 3 })).toEqual(
+    expect(s0.delete({ v: 3 })).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -248,7 +248,7 @@ describe('IMapMapped.delete', () => {
         fromKey
       )
     );
-    expect(s0).toEqual(
+    expect(s0).toStrictEqual(
       IMapMapped.new(
         [
           [{ v: 1 }, '1'],
@@ -262,8 +262,10 @@ describe('IMapMapped.delete', () => {
   });
   test('case 3', () => {
     const s0 = IMapMapped.new([], toKey, fromKey);
-    expect(s0.delete({ v: 1 })).toEqual(IMapMapped.new([], toKey, fromKey));
-    expect(s0).toEqual(IMapMapped.new([], toKey, fromKey));
+    expect(s0.delete({ v: 1 })).toStrictEqual(
+      IMapMapped.new([], toKey, fromKey)
+    );
+    expect(s0).toStrictEqual(IMapMapped.new([], toKey, fromKey));
   });
 });
 

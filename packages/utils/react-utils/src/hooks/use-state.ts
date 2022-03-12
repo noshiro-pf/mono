@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { useCallback, useState as _useState } from 'react';
 
 export const useState = <T>(
@@ -5,8 +6,8 @@ export const useState = <T>(
 ): Readonly<{
   state: T;
   setState: (next: T) => void;
-  resetState: () => void;
   updateState: (updateFn: (v: T) => T) => void;
+  resetState: () => void;
 }> => {
   const [state, setState] = _useState<T>(initialState);
 

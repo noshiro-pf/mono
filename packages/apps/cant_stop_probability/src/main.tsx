@@ -1,12 +1,12 @@
 import { Navbar, Tab, Tabs } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
+import { memoNamed, useState } from '@noshiro/react-utils';
 import {
   IList,
   isNotUndefined,
   stringToNumber,
   tuple,
 } from '@noshiro/ts-utils';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { DeadColumn, ProbabilityTable } from './components';
 import { denom, selected3List, separator } from './constants';
@@ -36,17 +36,20 @@ const resultsSortedByProbability = [...results]
   .reverse();
 
 export const Main = memoNamed('Main', () => {
-  const [sortBy, setSortBy] = useState<'dice' | 'prob'>('prob');
+  const { state: sortBy, setState: setSortBy } = useState<'dice' | 'prob'>(
+    'prob'
+  );
 
   const sortByDice = useCallback(() => {
     setSortBy('dice');
-  }, []);
+  }, [setSortBy]);
 
   const sortByProbability = useCallback(() => {
     setSortBy('prob');
-  }, []);
+  }, [setSortBy]);
 
-  const [filterByString, setFilterByString] = useState<string>('');
+  const { state: filterByString, setState: setFilterByString } =
+    useState<string>('');
   const filterBy: TwoDiceSumValue[] = useMemo(
     () =>
       filterByString
@@ -68,15 +71,13 @@ export const Main = memoNamed('Main', () => {
     [sorted, filterBy]
   );
 
-  const [
-    //
-    selectedTabId,
-    handleTabChange,
-  ] = useState<'deadColumnUI' | 'table'>('table');
+  const { state: selectedTabId, setState: handleTabChange } = useState<
+    'deadColumnUI' | 'table'
+  >('table');
 
-  const [columnsAlive, setDeadColumns] = useState<readonly boolean[]>(
-    IList.newArrayThrow(11, true)
-  );
+  const { state: columnsAlive, updateState: updateDeadColumns } = useState<
+    readonly boolean[]
+  >(IList.newArrayThrow(11, true));
 
   const columnsAliveWithHandler = useMemo<
     readonly Readonly<{
@@ -90,11 +91,13 @@ export const Main = memoNamed('Main', () => {
         columnId: (index + 2) as TwoDiceSumValue,
         alive,
         toggle: () => {
-          setDeadColumns((prev) => prev.map((b, i) => (i === index ? !b : b)));
+          updateDeadColumns((prev) =>
+            prev.map((b, i) => (i === index ? !b : b))
+          );
         },
       })),
 
-    [columnsAlive]
+    [columnsAlive, updateDeadColumns]
   );
 
   const hitSomeAliveColumnProbability = useMemo(

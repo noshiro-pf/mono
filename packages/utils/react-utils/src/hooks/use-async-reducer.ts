@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { useState } from './use-state';
 
 type AsyncDispatch<S, A> = (action: A) => Promise<S>;
-type SyncSetState<S> = (updateFn: (prevState: S) => S) => void;
+type UpdateStateFn<S> = (updateFn: (prevState: S) => S) => void;
 
 export const useAsyncDispatchFunction = <S, A>(
   state: S,
   reducer: ReducerType<S, A>,
-  setState: SyncSetState<S>
+  updateState: UpdateStateFn<S>
 ): AsyncDispatch<S, A> => {
   // hold resolution function for all setState calls still unresolved
   const resolvers = useRef<((_state: S) => void)[]>([]);
@@ -23,7 +24,7 @@ export const useAsyncDispatchFunction = <S, A>(
   return useCallback(
     (action: A) =>
       new Promise<S>((resolve, reject) => {
-        setState((stateBefore) => {
+        updateState((stateBefore) => {
           try {
             const stateAfter = reducer(stateBefore, action);
 
@@ -42,7 +43,7 @@ export const useAsyncDispatchFunction = <S, A>(
           }
         });
       }),
-    [setState, reducer]
+    [updateState, reducer]
   );
 };
 
@@ -50,7 +51,7 @@ export const useAsyncReducer = <S, A>(
   reducer: ReducerType<S, A>,
   init: S
 ): [S, AsyncDispatch<S, A>] => {
-  const [state, setState] = useState(init);
-  const dispatchAsync = useAsyncDispatchFunction(state, reducer, setState);
+  const { state, updateState } = useState(init);
+  const dispatchAsync = useAsyncDispatchFunction(state, reducer, updateState);
   return [state, dispatchAsync];
 };

@@ -45,7 +45,7 @@ export namespace Option {
   export const unwrapOr = <S, D>(option: _Option<S>, defaultValue: D): D | S =>
     isNone(option) ? defaultValue : option.value;
 
-  export const expect =
+  export const expectToBe =
     <S>(message: string) =>
     (option: _Option<S>): S => {
       if (isNone(option)) {

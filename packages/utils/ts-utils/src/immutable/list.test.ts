@@ -151,7 +151,7 @@ describe('IList.head', () => {
     assertType<TypeEq<typeof head, undefined>>();
 
     test('case 4', () => {
-      expect(head).toBe(undefined);
+      expect(head).toBeUndefined();
     });
   }
 });
@@ -195,7 +195,7 @@ describe('IList.last', () => {
     assertType<TypeEq<typeof last, undefined>>();
 
     test('case 4', () => {
-      expect(last).toBe(undefined);
+      expect(last).toBeUndefined();
     });
   }
 });
@@ -211,10 +211,10 @@ describe('IList.tail', () => {
   });
 
   test('alias 1', () => {
-    expect(IList.rest).toEqual(IList.tail);
+    expect(IList.rest).toStrictEqual(IList.tail);
   });
   test('alias 2', () => {
-    expect(IList.shift).toEqual(IList.tail);
+    expect(IList.shift).toStrictEqual(IList.tail);
   });
 });
 
@@ -239,7 +239,7 @@ describe('IList.butLast', () => {
   }
 
   test('alias', () => {
-    expect(IList.pop).toEqual(IList.butLast);
+    expect(IList.pop).toStrictEqual(IList.butLast);
   });
 });
 
@@ -847,7 +847,7 @@ describe('IList.includes', () => {
     assertType<TypeEq<typeof result, boolean>>();
 
     test('case 1', () => {
-      expect(result).toStrictEqual(true);
+      expect(result).toBe(true);
     });
   }
   {
@@ -856,8 +856,8 @@ describe('IList.includes', () => {
 
     assertType<TypeEq<typeof result, boolean>>();
 
-    test('case 1', () => {
-      expect(result).toStrictEqual(false);
+    test('case 2', () => {
+      expect(result).toBe(false);
     });
   }
 });
@@ -888,7 +888,7 @@ describe('IList.find', () => {
 
     assertType<TypeEq<typeof result, { readonly v: 1 | 2 | 3 } | undefined>>();
 
-    test('case 1', () => {
+    test('case 2', () => {
       expect(result).toStrictEqual({ v: 1 });
     });
   }
@@ -902,7 +902,7 @@ describe('IList.min', () => {
     assertType<TypeEq<typeof result, 3 | 4 | 5>>();
 
     test('case 1', () => {
-      expect(result).toStrictEqual(3);
+      expect(result).toBe(3);
     });
   }
   {
@@ -912,7 +912,7 @@ describe('IList.min', () => {
     assertType<TypeEq<typeof result, 3 | 4 | 5>>();
 
     test('case 2', () => {
-      expect(result).toStrictEqual(3);
+      expect(result).toBe(3);
     });
   }
   {
@@ -922,7 +922,7 @@ describe('IList.min', () => {
     assertType<TypeEq<typeof result, 3 | 4 | 5 | undefined>>();
 
     test('case 3', () => {
-      expect(result).toStrictEqual(3);
+      expect(result).toBe(3);
     });
   }
 });
@@ -934,7 +934,7 @@ describe('IList.max', () => {
   assertType<TypeEq<typeof result, 3 | 4 | 5>>();
 
   test('case 1', () => {
-    expect(result).toStrictEqual(5);
+    expect(result).toBe(5);
   });
 });
 
@@ -1011,7 +1011,7 @@ describe('IList.count', () => {
   assertType<TypeEq<typeof result, number>>();
 
   test('case 1', () => {
-    expect(result).toStrictEqual(2);
+    expect(result).toBe(2);
   });
 });
 

@@ -1,4 +1,3 @@
-import { describe, test } from '@jest/globals';
 import { combineLatest, map, of, withLatestFrom } from '../src';
 
 describe('graph-structure', () => {

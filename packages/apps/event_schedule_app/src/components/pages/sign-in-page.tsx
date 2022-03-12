@@ -1,5 +1,5 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useSignInPageState } from '../../hooks';
@@ -26,8 +26,11 @@ export const SignInPage = memoNamed('SignInPage', () => {
     passwordIsOpen,
   } = useSignInPageState();
 
-  const [isPasswordResetForm, passwordIsOpenResetForm, hidePasswordResetForm] =
-    useBooleanState(false);
+  const {
+    state: isPasswordResetForm,
+    setTrue: passwordIsOpenResetForm,
+    setFalse: hidePasswordResetForm,
+  } = useBoolState(false);
 
   return (
     <SignInStyled.Wrapper>

@@ -1,5 +1,5 @@
 import { FormGroup } from '@blueprintjs/core';
-import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import type { TinyObservable } from '@noshiro/ts-utils';
 import { IList, isEmailString } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
@@ -35,8 +35,11 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
   }) => {
     const isEmailAddressResult = isEmailString(value ?? '');
 
-    const [errorsAreHidden, hideErrors, showErrorsIfExists] =
-      useBooleanState(true);
+    const {
+      state: errorsAreHidden,
+      setTrue: hideErrors,
+      setFalse: showErrorsIfExists,
+    } = useBoolState(true);
 
     const blurHandler: React.FocusEventHandler<HTMLInputElement> = useCallback(
       (ev) => {

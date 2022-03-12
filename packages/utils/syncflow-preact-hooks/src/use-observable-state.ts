@@ -1,5 +1,5 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
-import { useCallback } from 'preact/compat';
+import { useCallback } from 'preact/hooks';
 import { useObservableReducer } from './use-observable-reducer';
 
 type Action<S> = Readonly<

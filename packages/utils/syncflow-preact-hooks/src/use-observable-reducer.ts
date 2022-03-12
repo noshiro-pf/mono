@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { source, withInitialValue } from '@noshiro/syncflow';
-import { useCallback, useMemo } from 'preact/compat';
+import { useCallback, useMemo } from 'preact/hooks';
 import { useObservable } from './use-observable';
 
 export const useObservableReducer = <S, A>(

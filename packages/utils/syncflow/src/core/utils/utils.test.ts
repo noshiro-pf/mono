@@ -59,45 +59,45 @@ describe('binarySearch', () => {
     expect([0, 1, 2, 3].includes(binarySearch([0, 0, 0], 0))).toBeTruthy();
   });
 
-  test('complicated example', () => {
+  test('complicated example 1', () => {
     expect([2, 3].includes(binarySearch([1, 3, 4, 6, 7, 8], 4))).toBeTruthy();
   });
 
-  test('complicated example', () => {
+  test('complicated example 2', () => {
     expect(
       [2, 3, 4].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 4))
     ).toBeTruthy();
   });
 
-  test('complicated example', () => {
+  test('complicated example 3', () => {
     expect(binarySearch([1, 3, 4, 4, 6, 7, 8], 0)).toBe(0);
   });
 
-  test('complicated example', () => {
+  test('complicated example 4', () => {
     expect(
       [0, 1].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 1))
     ).toBeTruthy();
   });
 
-  test('complicated example', () => {
+  test('complicated example 5', () => {
     expect(
       [0, 1, 2, 3].includes(binarySearch([1, 1, 1, 3, 4, 4, 6, 7, 8], 1))
     ).toBeTruthy();
   });
 
-  test('complicated example', () => {
+  test('complicated example 6', () => {
     expect(
       [5, 6].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 7))
     ).toBeTruthy();
   });
 
-  test('complicated example', () => {
+  test('complicated example 7', () => {
     expect(
       [6, 7].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 8))
     ).toBeTruthy();
   });
 
-  test('complicated example', () => {
+  test('complicated example 8', () => {
     expect(binarySearch([1, 3, 4, 4, 6, 7, 8], 9)).toBe(7);
   });
 });

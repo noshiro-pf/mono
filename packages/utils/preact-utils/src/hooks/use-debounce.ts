@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'preact/compat';
+import { useCallback, useEffect, useRef } from 'preact/hooks';
+import { useState } from './use-state';
 
 export const useDebounce = <ResultValue>(
   fn: () => ResultValue,
   deps: readonly unknown[],
   bufferMilliSec: number = 300
 ): ResultValue => {
-  const timerId = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const timerId = useRef<TimerId | undefined>(undefined);
 
-  const [value, setValue] = useState<ResultValue>(fn);
+  const { state: value, setState: setValue } = useState<ResultValue>(fn());
 
   const clearTimer = useCallback(() => {
     if (timerId.current !== undefined) {

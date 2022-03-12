@@ -4,8 +4,12 @@ import type {
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { notificationSettingsDefaultValue } from '@noshiro/event-schedule-app-shared';
-import { memoNamed, useTinyObservable } from '@noshiro/react-utils';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  memoNamed,
+  useBoolState,
+  useTinyObservable,
+} from '@noshiro/react-utils';
+import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
@@ -44,13 +48,13 @@ export const EventSettings = memoNamed<Props>(
   }) => {
     const focusEmailInput$ = useTinyObservable<undefined>();
 
-    const [clickedMoreThanOnce, setClickedMoreThanOnce] =
-      useState<boolean>(false);
+    const { state: clickedMoreThanOnce, setTrue: setClickedMoreThanOnce } =
+      useBoolState(false);
 
     const onToggleUseNotificationLocal = useCallback(() => {
       onToggleUseNotification();
-      setClickedMoreThanOnce(true);
-    }, [onToggleUseNotification]);
+      setClickedMoreThanOnce();
+    }, [onToggleUseNotification, setClickedMoreThanOnce]);
 
     useEffect(() => {
       if (useNotification && clickedMoreThanOnce) {

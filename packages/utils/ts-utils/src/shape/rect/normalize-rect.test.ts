@@ -12,7 +12,7 @@ const testNormalizeRect = (
         width: before[2],
         height: before[3],
       })
-    ).toEqual({
+    ).toStrictEqual({
       top: after[0],
       left: after[1],
       width: after[2],

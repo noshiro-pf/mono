@@ -1,4 +1,4 @@
-import { useBooleanState } from '@noshiro/react-utils';
+import { useBoolState } from '@noshiro/react-utils';
 import { useCallback, useEffect } from 'react';
 
 export const useFormError = <T>(
@@ -6,7 +6,11 @@ export const useFormError = <T>(
   valueIsInvalid: (v: T) => boolean,
   onValueChange: (v: T) => void
 ): [boolean, (v: T) => void, () => void] => {
-  const [showError, show, hide] = useBooleanState(false);
+  const {
+    state: showError,
+    setTrue: show,
+    setFalse: hide,
+  } = useBoolState(false);
 
   const onBlur = useCallback(() => {
     if (valueIsInvalid(value)) {

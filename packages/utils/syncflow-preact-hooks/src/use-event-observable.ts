@@ -1,6 +1,6 @@
 import type { Observable } from '@noshiro/syncflow';
 import { source } from '@noshiro/syncflow';
-import { useCallback, useMemo } from 'preact/compat';
+import { useCallback, useMemo } from 'preact/hooks';
 
 export const useVoidEventObservable = (): [Observable<void>, () => void] => {
   const src$ = useMemo(() => source<undefined>(), []);

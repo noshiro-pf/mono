@@ -5,13 +5,11 @@ import {
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { hasKey, hasKeyValue, isNonNullObject } from '@noshiro/ts-utils';
-import * as functions from 'firebase-functions';
+import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {
   if (typeof value === 'string') return value;
-  functions.logger.error(
-    `typeof value should be string but was ${typeof value}`
-  );
+  logger.error(`typeof value should be string but was ${typeof value}`);
   return String(value);
 };
 
@@ -20,9 +18,7 @@ export const fillAnswerWithCheck = (
 ): Answer => {
   const filled = fillAnswer(value);
   if (!deepEqual(filled, value)) {
-    functions.logger.error(
-      `There is a difference with the result of fillAnswer`
-    );
+    logger.error(`There is a difference with the result of fillAnswer`);
   }
   return filled;
 };
@@ -32,9 +28,7 @@ export const fillEventScheduleWithCheck = (
 ): EventSchedule => {
   const filled = fillEventSchedule(value);
   if (!deepEqual(filled, value)) {
-    functions.logger.error(
-      `There is a difference with the result of fillEventSchedule`
-    );
+    logger.error(`There is a difference with the result of fillEventSchedule`);
   }
   return filled;
 };
@@ -70,7 +64,7 @@ export const fillGmailConfig = (
   };
 }> => {
   if (!isGmailConfig(config)) {
-    functions.logger.error(`${JSON.stringify(config)} is not GmailConfig`);
+    logger.error(`${JSON.stringify(config)} is not GmailConfig`);
     return { gmail: { email: '', password: '' } };
   }
   return config;

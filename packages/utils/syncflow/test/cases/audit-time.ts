@@ -1,4 +1,5 @@
 import type { Observable } from '../../src';
+// eslint-disable-next-line import/no-deprecated
 import { auditTime, filter, interval, merge, take } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
@@ -26,6 +27,7 @@ const createStreams = (
 
   const filtered$ = counter$.chain(filter((n) => emitValues.includes(n)));
   const auditTime$ = filtered$.chain(auditTime(tick * 5));
+  // eslint-disable-next-line import/no-deprecated
   const merged$ = merge([filtered$, auditTime$] as const);
 
   return {

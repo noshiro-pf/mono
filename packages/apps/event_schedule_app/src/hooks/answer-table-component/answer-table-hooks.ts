@@ -3,10 +3,11 @@ import type {
   DatetimeRange,
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
+import { useState } from '@noshiro/react-utils';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { IList, mapNullable, match, pipe } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { answerTableColor } from '../../constants';
 import type { DatetimeRangeMapKey } from '../../functions';
 import {
@@ -108,19 +109,24 @@ export const useAnswerTableHooks = (
     [datetimeRangeListSortedByScores]
   );
 
-  const [
-    //
-    [sortKey, sortOrder],
-    setSortOrderAndKey,
-  ] = useState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
+  const {
+    state: [sortKey, sortOrder],
+    setState: setSortOrderAndKey,
+  } = useState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
 
-  const onDatetimeSortChange = useCallback((state: 'asc' | 'desc'): void => {
-    setSortOrderAndKey(['date', state]);
-  }, []);
+  const onDatetimeSortChange = useCallback(
+    (state: 'asc' | 'desc'): void => {
+      setSortOrderAndKey(['date', state]);
+    },
+    [setSortOrderAndKey]
+  );
 
-  const onScoreSortChange = useCallback((state: 'asc' | 'desc'): void => {
-    setSortOrderAndKey(['score', state]);
-  }, []);
+  const onScoreSortChange = useCallback(
+    (state: 'asc' | 'desc'): void => {
+      setSortOrderAndKey(['score', state]);
+    },
+    [setSortOrderAndKey]
+  );
 
   const datetimeRangeListReordered = useMemo(
     () =>
