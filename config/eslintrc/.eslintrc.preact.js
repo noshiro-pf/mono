@@ -1,7 +1,13 @@
-import type { Linter } from 'eslint';
-import { eslintReactRules } from './eslintrc-base';
+'use strict';
 
-const config: Linter.Config = {
+// @ts-check
+
+/** @typedef { import("eslint").Linter.Config } LinterConfig */
+
+const { eslintReactRules } = require('./eslintrc-base');
+
+/** @type {LinterConfig} */
+const config = {
   root: true,
   settings: {
     react: {

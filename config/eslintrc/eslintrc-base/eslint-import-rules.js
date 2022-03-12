@@ -1,11 +1,18 @@
-import type { Linter } from 'eslint';
+'use strict';
 
-export const eslintImportsRules: Readonly<{
-  staticAnalysis: Partial<Linter.RulesRecord>;
-  helpfulWarnings: Partial<Linter.RulesRecord>;
-  moduleSystems: Partial<Linter.RulesRecord>;
-  styleGuide: Partial<Linter.RulesRecord>;
-}> = {
+// @ts-check
+
+/** @typedef { import("./rules-record").LinterRulesRecord } LinterRulesRecord */
+
+/**
+ * @type {Readonly<{
+ *   staticAnalysis: Partial<LinterRulesRecord>;
+ *   helpfulWarnings: Partial<LinterRulesRecord>;
+ *   moduleSystems: Partial<LinterRulesRecord>;
+ *   styleGuide: Partial<LinterRulesRecord>;
+ * }>}
+ */
+const eslintImportsRules = {
   staticAnalysis: {
     'import/no-unresolved': 'warn',
     'import/named': 'off',
@@ -87,3 +94,5 @@ export const eslintImportsRules: Readonly<{
     'import/dynamic-import-chunkname': 'warn',
   },
 };
+
+module.exports = eslintImportsRules;

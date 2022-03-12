@@ -5,6 +5,5 @@
   },
   "rules": {
     "noshiro-custom/prefer-readonly-parameter-types": "off"
-  },
-  "ignorePatterns": ["*.d.ts", "*.js"]
+  }
 }

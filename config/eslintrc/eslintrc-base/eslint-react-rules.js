@@ -1,6 +1,11 @@
-import type { Linter } from 'eslint';
+'use strict';
 
-export const eslintReactRules: Linter.Config['rules'] = {
+// @ts-check
+
+/** @typedef { import("./rules-record").LinterRulesRecord } LinterRulesRecord */
+
+/** @type {LinterRulesRecord} */
+const eslintReactRules = {
   /* disabled */
   'react/jsx-uses-react': 'off',
   'react/react-in-jsx-scope': 'off',
@@ -23,3 +28,5 @@ export const eslintReactRules: Linter.Config['rules'] = {
     },
   ],
 };
+
+module.exports = eslintReactRules;

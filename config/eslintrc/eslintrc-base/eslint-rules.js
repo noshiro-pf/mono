@@ -1,8 +1,11 @@
-import type { Linter } from 'eslint';
+'use strict';
 
-export const eslintRulesAll: Readonly<
-  Record<'disabledRules' | 'modifiedRules', Partial<Linter.RulesRecord>>
-> = {
+// @ts-check
+
+/** @typedef { import("./rules-record").EslintRulesAll } EslintRulesAll */
+
+/** @type {EslintRulesAll} */
+const eslintRulesAll = {
   modifiedRules: {
     eqeqeq: ['error', 'always', { null: 'ignore' }],
     'no-restricted-imports': [
@@ -92,3 +95,5 @@ export const eslintRulesAll: Readonly<
     yoda: 'off',
   },
 };
+
+module.exports = eslintRulesAll;
