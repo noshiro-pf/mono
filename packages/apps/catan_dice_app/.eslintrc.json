@@ -2,6 +2,5 @@
   "extends": "../../../config/eslintrc/.eslintrc.react.js",
   "parserOptions": {
     "project": "./tsconfig.json"
-  },
-  "ignorePatterns": ["*.d.ts", "*.js"]
+  }
 }

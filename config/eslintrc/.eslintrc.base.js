@@ -113,7 +113,7 @@ const config = {
     ...eslintJestRules,
     ...eslintNoshiroCustomRules,
   },
-  ignorePatterns: readGitignoreFiles({ cwd: __dirname }),
+  ignorePatterns: [...readGitignoreFiles({ cwd: __dirname }), '*.d.ts', '*.js'],
 };
 
 module.exports = config;

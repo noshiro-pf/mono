@@ -5,6 +5,5 @@
   },
   "rules": {
     "class-methods-use-this": "off"
-  },
-  "ignorePatterns": ["*.d.ts", "*.js"]
+  }
 }
