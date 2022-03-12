@@ -1,8 +1,11 @@
-import type { Linter } from 'eslint';
+'use strict';
 
-export const typescriptEslintRules: Readonly<
-  Record<'disabledRules' | 'modifiedRules', Partial<Linter.RulesRecord>>
-> = {
+// @ts-check
+
+/** @typedef { import("./rules-record").EslintRulesAll } EslintRulesAll */
+
+/** @type {EslintRulesAll} */
+const typescriptEslintRules = {
   modifiedRules: {
     '@typescript-eslint/ban-types': [
       'error',
@@ -76,3 +79,5 @@ export const typescriptEslintRules: Readonly<
     '@typescript-eslint/promise-function-async': 'off',
   },
 };
+
+module.exports = typescriptEslintRules;

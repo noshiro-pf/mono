@@ -1,5 +1,5 @@
 {
-  "extends": "../../../config/eslintrc/.eslintrc.solid.json",
+  "extends": "../../../config/eslintrc/.eslintrc.solid.js",
   "parserOptions": {
     "project": "./tsconfig.json"
   },

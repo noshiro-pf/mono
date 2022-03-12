@@ -71,7 +71,7 @@
     "setup:configs": "run-s setup:root setup:sub",
     "setup:root": "run-s setup:root:configs setup:root:scripts",
     "setup:root:configs": "run-s setup:root:configs:clean setup:root:configs:build",
-    "setup:root:configs:clean": "rimraf config/**/{*,.*}.js",
+    "setup:root:configs:clean": "rimraf config/webpackconfig/**/{*,.*}.js",
     "setup:root:configs:build": "tsc --project config/tsconfig.config.json",
     "setup:root:scripts": "run-s setup:root:scripts:clean setup:root:scripts:build",
     "setup:root:scripts:clean": "rimraf scripts/**/{*,.*}.js",

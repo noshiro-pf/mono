@@ -1,12 +1,17 @@
-import type { Linter } from 'eslint';
-import { readGitignoreFiles } from 'eslint-gitignore';
-import {
+'use strict';
+
+// @ts-check
+
+/** @typedef { import("eslint").Linter.Config } LinterConfig */
+
+const { readGitignoreFiles } = require('eslint-gitignore');
+const {
   eslintImportsRules,
   eslintJestRules,
   eslintNoshiroCustomRules,
   eslintRulesAll,
   typescriptEslintRules,
-} from './eslintrc-base';
+} = require('./eslintrc-base');
 
 /**
  *  - mono/docs/linter-formatter-update-manual.md
@@ -36,7 +41,8 @@ import {
 
 // quotes: ['error', 'single', { avoidEscape: true }],
 
-const config: Linter.Config = {
+/** @type {LinterConfig} */
+const config = {
   extends: [
     /* recommended */
     'eslint:all',

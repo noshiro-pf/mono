@@ -1,6 +1,11 @@
-import type { Linter } from 'eslint';
+'use strict';
 
-export const eslintJestRules: Readonly<Partial<Linter.RulesRecord>> = {
+// @ts-check
+
+/** @typedef { import("./rules-record").LinterRulesRecord } LinterRulesRecord */
+
+/** @type {LinterRulesRecord} */
+const eslintJestRules = {
   'jest/consistent-test-it': ['error', { fn: 'test' }],
   'jest/prefer-expect-assertions': 'off',
   'jest/no-conditional-in-test': 'off',
@@ -11,3 +16,5 @@ export const eslintJestRules: Readonly<Partial<Linter.RulesRecord>> = {
   'jest/no-commented-out-tests': 'off',
   'jest/no-export': 'off',
 };
+
+module.exports = eslintJestRules;
