@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+/** @deprecated */
 export const useBooleanState = (
   init: boolean
 ): [boolean, () => void, () => void] => {

@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'preact/compat';
 
+/** @deprecated */
 export const useBooleanState = (
   init: boolean
 ): [boolean, () => void, () => void] => {
