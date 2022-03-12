@@ -98,7 +98,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ) {
-    this._set = new Set([...iterable].map(toKey));
+    this._set = new Set(Array.from(iterable, toKey));
     this._toKey = toKey;
     this._fromKey = fromKey;
   }
@@ -146,7 +146,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     if (!this.has(key)) return this;
     const keyMapped = this._toKey(key);
     return ISetMapped.new(
-      [...this._set].filter((k) => !Object.is(k, keyMapped)).map(this._fromKey),
+      Array.from(this._set).filter((k) => !Object.is(k, keyMapped)).map(this._fromKey),
       this._toKey,
       this._fromKey
     );
@@ -170,7 +170,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
       }
     }
     return ISetMapped.new<K, KM>(
-      [...result].map(this._fromKey),
+      Array.from(result, this._fromKey),
       this._toKey,
       this._fromKey
     );
@@ -264,6 +264,6 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   }
 
   toArray(): readonly K[] {
-    return [...this.values()];
+    return Array.from(this.values());
   }
 }

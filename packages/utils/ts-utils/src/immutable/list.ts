@@ -306,7 +306,7 @@ export namespace IList {
     index: number,
     newValue: A
   ): readonly A[] => {
-    const temp = [...list];
+    const temp = Array.from(list);
     temp.splice(index, 0, newValue);
     return temp;
   };
@@ -315,7 +315,7 @@ export namespace IList {
     list: readonly A[],
     index: number
   ): readonly A[] => {
-    const temp = [...list];
+    const temp = Array.from(list);
     temp.splice(index, 1);
     return temp;
   };
@@ -350,7 +350,7 @@ export namespace IList {
   export const reverse = <T extends readonly unknown[]>(
     list: T
   ): ReadonlyListReverse<T> =>
-    [...list].reverse() as readonly unknown[] as ReadonlyListReverse<T>;
+    Array.from(list).reverse() as readonly unknown[] as ReadonlyListReverse<T>;
 
   export function sort<T extends readonly number[]>(
     list: T,
@@ -365,7 +365,7 @@ export namespace IList {
     comparator?: (x: T[number], y: T[number]) => number
   ): { readonly [K in keyof T]: T[number] } {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
-    return [...list].sort(cmp) as readonly unknown[] as {
+    return Array.from(list).sort(cmp) as readonly unknown[] as {
       readonly [K in keyof T]: T[number];
     };
   }
@@ -573,7 +573,7 @@ export namespace IList {
     reducer: ReducerType<B, A>,
     init: B
   ): ReadonlyNonEmptyArray<B> => {
-    const result: B[] = [...newArrayThrow<B>(list.length + 1, init)];
+    const result: B[] = Array.from(newArrayThrow<B>(list.length + 1, init));
 
     let acc = init;
     for (const [index, value] of list.entries()) {
@@ -632,7 +632,7 @@ export namespace IList {
   ): ReadonlyNonEmptyArray<T>;
   export function uniq<T>(list: readonly T[]): readonly T[];
   export function uniq<T>(list: readonly T[]): readonly T[] {
-    return [...new Set(list)];
+    return Array.from(new Set(list));
   }
 
   export function uniqBy<A, B>(

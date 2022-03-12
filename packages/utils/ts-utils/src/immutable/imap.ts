@@ -105,7 +105,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
 
   delete(key: K): IMap<K, V> {
     if (!this.has(key)) return this;
-    return IMap.new([...this._map].filter(([k]) => !Object.is(k, key)));
+    return IMap.new(Array.from(this._map).filter(([k]) => !Object.is(k, key)));
   }
 
   set(key: K, value: V): IMap<K, V> {
@@ -114,7 +114,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       return IMap.new([...this._map, ituple(key, value)]);
     } else {
       return IMap.new(
-        [...this._map].map(([k, v]) => ituple(k, Object.is(k, key) ? value : v))
+        Array.from(this._map, ([k, v]) => ituple(k, Object.is(k, key) ? value : v))
       );
     }
   }
@@ -123,7 +123,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     if (!this.has(key)) return this;
     const curr = this.get(key);
     return IMap.new(
-      [...this._map].map(([k, v]) =>
+      Array.from(this._map, ([k, v]) =>
         ituple(k, Object.is(k, key) ? updater(curr!) : v)
       )
     );
@@ -191,19 +191,19 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   toKeysArray(): readonly K[] {
-    return [...this.keys()];
+    return Array.from(this.keys());
   }
 
   toValuesArray(): readonly V[] {
-    return [...this.values()];
+    return Array.from(this.values());
   }
 
   toEntriesArray(): readonly (readonly [K, V])[] {
-    return [...this.entries()];
+    return Array.from(this.entries());
   }
 
   toArray(): readonly (readonly [K, V])[] {
-    return [...this.entries()];
+    return Array.from(this.entries());
   }
 
   toSet(): ISet<V> {

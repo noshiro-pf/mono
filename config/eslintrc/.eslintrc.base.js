@@ -65,6 +65,10 @@ const config = {
     'plugin:jest/all',
     // 'plugin:jest/recommended',
 
+    /* array-func */
+    'plugin:array-func/all',
+    // 'plugin:array-func/recommended',
+
     /* prettier */
     'prettier', // turn off rules
   ],
@@ -74,6 +78,7 @@ const config = {
     '@typescript-eslint',
     'import',
     'jest',
+    'array-func',
     'noshiro-custom',
     /* functional, total-functions */
     // 'functional',
