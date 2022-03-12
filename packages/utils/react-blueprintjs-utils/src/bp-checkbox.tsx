@@ -15,7 +15,7 @@ export const BpCheckbox = memoNamed<BpCheckboxProps>(
   'BpCheckbox',
   ({ checked, onCheck, ...props }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       (ev: FormEvent<HTMLInputElement>) => {
         onCheck(ev.currentTarget.checked);
       },

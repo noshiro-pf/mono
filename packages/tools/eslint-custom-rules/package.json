@@ -6,12 +6,12 @@
   "sideEffects": false,
   "main": "lib/index.js",
   "scripts": {
+    "build_": "tsc --project tsconfig.json",
     "clean": "rimraf lib",
-    "prebuild": "yarn clean",
-    "build": "tsc --project tsconfig.json",
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
     "lint:fix": "yarn lint --fix",
+    "prebuild": "yarn clean",
     "setup": "echo 'no setup script'",
     "test": "echo 'no test script'"
   },

@@ -64,6 +64,10 @@ const typescriptEslintRules = {
         allowIndexSignaturePropertyAccess: true,
       },
     ],
+
+    // WIP
+    '@typescript-eslint/no-redundant-type-constituents': 'warn',
+    '@typescript-eslint/prefer-readonly-parameter-types': 'off',
   },
   disabledRules: {
     '@typescript-eslint/lines-between-class-members': 'off',

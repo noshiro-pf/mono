@@ -16,7 +16,7 @@ export const BpSelect = memoNamed<BpSelectProps>(
   'BpSelect',
   ({ value, onValueChange, options, ...props }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       (ev: ChangeEvent<HTMLSelectElement>) => {
         onValueChange(ev.target.value);
       },

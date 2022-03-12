@@ -13,7 +13,7 @@ export const ComponentSwitcher = memoNamed<Props>(
   ({ children, index }) => (
     <>
       {
-        // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
         children.map((c, i) =>
           i === index ? (
             // eslint-disable-next-line react/no-array-index-key

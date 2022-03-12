@@ -3,7 +3,7 @@ import { cardEq } from '../../functions';
 import type { Card, GameState } from '../../types';
 
 export const tossCard = (
-  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   draft: WritableDraft<GameState>,
   target: Card | undefined
 ): void => {

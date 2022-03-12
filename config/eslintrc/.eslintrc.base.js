@@ -8,7 +8,7 @@ const { readGitignoreFiles } = require('eslint-gitignore');
 const {
   eslintImportsRules,
   eslintJestRules,
-  eslintNoshiroCustomRules,
+  // eslintNoshiroCustomRules,
   eslintRulesAll,
   typescriptEslintRules,
   eslintPromiseRules,
@@ -55,7 +55,6 @@ const config = {
     // 'plugin:import/warnings',
     'plugin:import/typescript', // needs eslint-import-resolver-typescript to be installed
     'plugin:import/react',
-    'plugin:noshiro-custom/all',
 
     /* functional, total-functions */
     // 'plugin:functional/recommended',
@@ -81,7 +80,7 @@ const config = {
     'jest',
     'array-func',
     'promise',
-    'noshiro-custom',
+    // 'noshiro-custom',
     /* functional, total-functions */
     // 'functional',
     // 'total-functions',
@@ -119,7 +118,7 @@ const config = {
     ...eslintImportsRules.styleGuide,
     ...eslintJestRules,
     ...eslintPromiseRules,
-    ...eslintNoshiroCustomRules,
+    // ...eslintNoshiroCustomRules,
   },
   ignorePatterns: [...readGitignoreFiles({ cwd: __dirname }), '*.d.ts', '*.js'],
 };
