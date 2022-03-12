@@ -19,10 +19,10 @@
     "gi": "echo 'no gi script'",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "yarn lint --fix",
+    "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "echo 'no setup script'",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch",
-    "pub": "yarn publish --no-git-tag-version --access=public"
+    "testw": "yarn test --watch"
   },
   "config": {
     "root_dir": "../../.."

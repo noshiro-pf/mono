@@ -10,14 +10,14 @@
   "types": "goober.d.ts",
   "typings": "./goober.d.ts",
   "scripts": {
-    "test": "echo 'no test script'",
+    "build": "echo 'no build script'",
     "clean": "rimraf dist",
+    "fmt": "prettier . --write",
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
     "lint:fix": "yarn lint --fix",
-    "build": "echo 'no build script'",
     "setup": "echo 'no setup script'",
-    "fmt": "prettier . --write"
+    "test": "echo 'no test script'"
   },
   "peerDependencies": {
     "csstype": "^2.6.2"

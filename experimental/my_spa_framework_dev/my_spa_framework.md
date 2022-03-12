@@ -9,7 +9,7 @@
 ## sample input
 
 ```tsx
-import React, { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 export const App = () => {
     const [num, setNum] = useState(2);

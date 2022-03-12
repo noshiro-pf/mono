@@ -41,81 +41,82 @@ export type Room = DeepReadonly<{
 const roomStateList = ['not-started', 'playing', 'finished'] as const;
 assertType<TypeEq<typeof roomStateList[number], Room['state']>>();
 
-export const assertIsRoomRemote: (data: unknown) => asserts data is RoomRemote =
-  (data) => {
-    if (!isNonNullObject(data)) {
-      throw new Error('isNonNullObject failed');
-    }
+export const assertIsRoomRemote: (
+  data: unknown
+) => asserts data is RoomRemote = (data) => {
+  if (!isNonNullObject(data)) {
+    throw new Error('isNonNullObject failed');
+  }
 
-    if (
-      !hasKeyValue(
-        data,
-        'password',
-        (v): v is RoomRemote['password'] => isString(v) || isUndefined(v)
-      )
-    ) {
-      throw new Error('hasKeyValue failed for password');
-    }
+  if (
+    !hasKeyValue(
+      data,
+      'password',
+      (v): v is RoomRemote['password'] => isString(v) || isUndefined(v)
+    )
+  ) {
+    throw new Error('hasKeyValue failed for password');
+  }
 
-    if (
-      !hasKeyValue(
-        data,
-        'players',
-        (v): v is RoomRemote['players'] => Array.isArray(v) && v.every(isPlayer)
-      )
-    ) {
-      throw new Error('hasKeyValue failed for players');
-    }
+  if (
+    !hasKeyValue(
+      data,
+      'players',
+      (v): v is RoomRemote['players'] => Array.isArray(v) && v.every(isPlayer)
+    )
+  ) {
+    throw new Error('hasKeyValue failed for players');
+  }
 
-    if (
-      !hasKeyValue(
-        data,
-        'shuffleDef',
-        (v): v is RoomRemote['shuffleDef'] =>
-          isString(v) && /^[0-3]{4}$/gu.test(v)
-      )
-    ) {
-      throw new Error('hasKeyValue failed for shuffleDef');
-    }
+  if (
+    !hasKeyValue(
+      data,
+      'shuffleDef',
+      (v): v is RoomRemote['shuffleDef'] =>
+        isString(v) && /^[0-3]{4}$/gu.test(v)
+    )
+  ) {
+    throw new Error('hasKeyValue failed for shuffleDef');
+  }
 
-    if (
-      !hasKeyValue(
-        data,
-        'state',
-        (v): v is RoomRemote['state'] =>
-          isString(v) && IList.includes(roomStateList, v)
-      )
-    ) {
-      throw new Error('hasKeyValue failed for state');
-    }
+  if (
+    !hasKeyValue(
+      data,
+      'state',
+      (v): v is RoomRemote['state'] =>
+        isString(v) && IList.includes(roomStateList, v)
+    )
+  ) {
+    throw new Error('hasKeyValue failed for state');
+  }
 
-    if (
-      !hasKeyValue(data, 'playerCards', (v): v is RoomRemote['playerCards'] =>
-        // Array.isArray(v) &&
-        // isArrayOfLength4(v) &&
-        // v.every(
-        //   (a) => Array.isArray(a) && isArrayOfLength6(a) && a.every(isCard)
-        // )
-        {
-          const checkFn = (a: unknown): a is RoomRemote['playerCards']['p0'] =>
-            Array.isArray(a) && isArrayOfLength6(a) && a.every(isCard);
+  if (
+    !hasKeyValue(data, 'playerCards', (v): v is RoomRemote['playerCards'] =>
+      // Array.isArray(v) &&
+      // isArrayOfLength4(v) &&
+      // v.every(
+      //   (a) => Array.isArray(a) && isArrayOfLength6(a) && a.every(isCard)
+      // )
+      {
+        const checkFn = (a: unknown): a is RoomRemote['playerCards']['p0'] =>
+          Array.isArray(a) && isArrayOfLength6(a) && a.every(isCard);
 
-          return (
-            isNonNullObject(v) &&
-            hasKeyValue(v, 'p0', checkFn) &&
-            hasKeyValue(v, 'p1', checkFn) &&
-            hasKeyValue(v, 'p2', checkFn) &&
-            hasKeyValue(v, 'p3', checkFn)
-          );
-        }
-      )
-    ) {
-      throw new Error('hasKeyValue failed for playerCards');
-    }
+        return (
+          isNonNullObject(v) &&
+          hasKeyValue(v, 'p0', checkFn) &&
+          hasKeyValue(v, 'p1', checkFn) &&
+          hasKeyValue(v, 'p2', checkFn) &&
+          hasKeyValue(v, 'p3', checkFn)
+        );
+      }
+    )
+  ) {
+    throw new Error('hasKeyValue failed for playerCards');
+  }
 
-    assertType<TypeExtends<typeof data, RoomRemote>>();
-    assertType<TypeExtends<RoomRemote, typeof data>>();
-  };
+  assertType<TypeExtends<typeof data, RoomRemote>>();
+  assertType<TypeExtends<RoomRemote, typeof data>>();
+};
 
 export const convertRoomRemoteToRoom = (
   roomRemote: RoomRemote,
