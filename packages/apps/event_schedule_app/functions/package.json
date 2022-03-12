@@ -1,7 +1,8 @@
 {
   "name": "@noshiro/event-schedule-app-functions",
   "version": "5.0.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",

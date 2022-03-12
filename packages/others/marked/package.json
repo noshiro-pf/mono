@@ -1,7 +1,8 @@
 {
   "name": "@noshiro/markdown-files",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "build": "echo 'no build script'",
     "clean": "echo 'no clean script'",
