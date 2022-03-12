@@ -19,7 +19,7 @@ export const useLambdaEval = (
   outputAreaString: string;
   setInputAreaString: (input: string) => void;
 } => {
-  const [inputAreaString$, setInputAreaString] =
+  const { state$: inputAreaString$, setState: setInputAreaString } =
     useObservableState<string>(initialInput);
 
   const outputAreaString$ = useObservable<string | undefined>(() =>
