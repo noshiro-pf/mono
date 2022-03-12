@@ -26,8 +26,11 @@ export const useAnswerBeingEditedState = (
   resetAnswerBeingEdited: () => void;
   updateAnswerBeingEdited: (updater: (a: Answer) => Answer) => void;
 }> => {
-  const [answerBeingEdited$, setAnswerBeingEdited, updateAnswerBeingEdited] =
-    useObservableState(answerDefaultValue);
+  const {
+    state$: answerBeingEdited$,
+    setState: setAnswerBeingEdited,
+    updateState: updateAnswerBeingEdited,
+  } = useObservableState(answerDefaultValue);
 
   const emptyAnswerSelection$ = useObservable<Answer>(() =>
     eventSchedule$

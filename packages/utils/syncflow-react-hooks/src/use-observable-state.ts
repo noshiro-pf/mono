@@ -17,23 +17,31 @@ const reducer = <S>(state: S, action: Action<S>): S => {
 
 export const useObservableState = <S>(
   initialState: S
-): [
-  InitializedObservable<S>,
-  (v: S) => void,
-  (updateFn: (prev: S) => S) => void
-] => {
+): Readonly<{
+  state$: InitializedObservable<S>;
+  setState: (v: S) => S;
+  updateState: (updateFn: (prev: S) => S) => S;
+  resetState: () => S;
+}> => {
   const [state$, dispatch] = useObservableReducer<S, Action<S>>(
     reducer,
     initialState
   );
 
-  const updateState = useCallback((updateFn: (prev: S) => S): void => {
-    dispatch({ type: 'update', updateFn });
-  }, []);
+  const updateState = useCallback(
+    (updateFn: (prev: S) => S): S => dispatch({ type: 'update', updateFn }),
+    []
+  );
 
-  const setState = useCallback((nextState: S): void => {
-    dispatch({ type: 'set', nextState });
-  }, []);
+  const setState = useCallback(
+    (nextState: S): S => dispatch({ type: 'set', nextState }),
+    []
+  );
 
-  return [state$, setState, updateState];
+  const resetState = useCallback(
+    (): S => dispatch({ type: 'set', nextState: initialState }),
+    []
+  );
+
+  return { state$, setState, updateState, resetState };
 };
