@@ -1,6 +1,6 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { User } from 'firebase/auth';
 import { useCallback } from 'react';
 import styled from 'styled-components';
@@ -28,7 +28,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
       enterButtonDisabled,
       isWaitingResponse,
       emailFormIntent,
-    } = useStreamValue(DeleteAccountCreatedWithGoogle.state$);
+    } = useObservableValue(DeleteAccountCreatedWithGoogle.state$);
 
     const enterClickHandler = useCallback(async () => {
       if (enterButtonDisabled) return;

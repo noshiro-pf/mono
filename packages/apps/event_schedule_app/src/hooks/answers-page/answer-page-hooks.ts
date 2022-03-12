@@ -7,7 +7,7 @@ import type {
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useAlive, useBooleanState } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { IRecord, Result } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
@@ -156,8 +156,8 @@ export const useAnswerPageState = (): AnswerPageState => {
     setAnswerBeingEditedSectionState('hidden');
   }, [clearAnswerBeingEditedFields]);
 
-  const eventId = useStreamValue(router.eventId$);
-  const eventSchedule = useStreamValue(eventSchedule$);
+  const eventId = useObservableValue(router.eventId$);
+  const eventSchedule = useObservableValue(eventSchedule$);
 
   const alive = useAlive();
 
@@ -265,18 +265,20 @@ export const useAnswerPageState = (): AnswerPageState => {
     [answerBeingEdited, selectedAnswerSaved]
   );
 
-  const errorType = useStreamValue(errorType$);
-  const answers = useStreamValue(answers$);
-  const requiredParticipantsExist = useStreamValue(requiredParticipantsExist$);
-  const refreshButtonIsLoading = useStreamValue(refreshButtonIsLoading$);
-  const refreshButtonIsDisabled = useStreamValue(refreshButtonIsDisabled$);
+  const errorType = useObservableValue(errorType$);
+  const answers = useObservableValue(answers$);
+  const requiredParticipantsExist = useObservableValue(
+    requiredParticipantsExist$
+  );
+  const refreshButtonIsLoading = useObservableValue(refreshButtonIsLoading$);
+  const refreshButtonIsDisabled = useObservableValue(refreshButtonIsDisabled$);
 
   const selectedDates = useMemo<readonly YearMonthDate[]>(
     () => eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? [],
     [eventSchedule]
   );
 
-  const holidaysJpDefinition = useStreamValue(holidaysJpDefinition$);
+  const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
 
   return {
     eventId,

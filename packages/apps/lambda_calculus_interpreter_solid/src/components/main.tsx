@@ -1,18 +1,18 @@
 import { styled } from '@noshiro/solid-styled-components';
 import type { JSX } from 'solid-js';
-import { useStateAsStream, useStreamValue } from '../utils';
+import { useObservableState, useObservableValue } from '../utils';
 import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';
 
 export const Main = (): JSX.Element => {
   const [inputAreaString$, setInputAreaString] =
-    useStateAsStream<string>('((+ 2) 3)');
+    useObservableState<string>('((+ 2) 3)');
 
   const outputAreaString$ = useLambdaEval(inputAreaString$);
 
   /* extract values */
-  const inputAreaString = useStreamValue(inputAreaString$);
-  const outputAreaString = useStreamValue(outputAreaString$, '');
+  const inputAreaString = useObservableValue(inputAreaString$);
+  const outputAreaString = useObservableValue(outputAreaString$, '');
 
   return (
     <Root>

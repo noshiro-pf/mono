@@ -1,6 +1,6 @@
 import type { Observable } from '@noshiro/syncflow';
 import { useEffect } from 'react';
-import { useStateAsStream } from './use-state-as-stream';
+import { useObservableState } from './use-observable-state';
 
 export const useChangeValueEffect = <A>(
   input: A,
@@ -11,8 +11,8 @@ export const useChangeValueEffect = <A>(
   }, [input, callback]);
 };
 
-export const useValueAsStream = <A>(input: A): Observable<A> => {
-  const [value$, setValue] = useStateAsStream<A>(input);
+export const useValueAsObservable = <A>(input: A): Observable<A> => {
+  const [value$, setValue] = useObservableState<A>(input);
   useChangeValueEffect(input, setValue);
   return value$;
 };

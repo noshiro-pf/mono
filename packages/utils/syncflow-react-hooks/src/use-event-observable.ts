@@ -1,8 +1,8 @@
 import type { Observable } from '@noshiro/syncflow';
 import { source } from '@noshiro/syncflow';
-import { useCallback, useMemo } from 'preact/compat';
+import { useCallback, useMemo } from 'react';
 
-export const useVoidEventAsStream = (): [Observable<void>, () => void] => {
+export const useVoidEventObservable = (): [Observable<void>, () => void] => {
   const src$ = useMemo(() => source<undefined>(), []);
 
   const emitter = useCallback(() => {
@@ -12,7 +12,10 @@ export const useVoidEventAsStream = (): [Observable<void>, () => void] => {
   return [src$, emitter];
 };
 
-export const useEventAsStream = <A>(): [Observable<A>, (value: A) => void] => {
+export const useEventObservable = <A>(): [
+  Observable<A>,
+  (value: A) => void
+] => {
   const src$ = useMemo(() => source<A>(), []);
 
   const emitter = useCallback((value: A) => {

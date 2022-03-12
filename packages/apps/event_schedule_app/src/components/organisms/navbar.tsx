@@ -1,7 +1,7 @@
 import type { PopperModifiers } from '@blueprintjs/core';
 import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import styled, { css } from 'styled-components';
 import { aboutThisAppUrl, dict, routes } from '../../constants';
@@ -29,7 +29,7 @@ const popoverModifiers: PopperModifiers = {
 } as const;
 
 export const NavBar = memoNamed('NavBar', () => {
-  const user = useStreamValue(user$);
+  const user = useObservableValue(user$);
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
@@ -43,7 +43,7 @@ export const NavBar = memoNamed('NavBar', () => {
     redirectFn: router.redirect,
   });
 
-  const openingDialog = useStreamValue(
+  const openingDialog = useObservableValue(
     UpdateUserInfoDialogState.openingDialog$
   );
 

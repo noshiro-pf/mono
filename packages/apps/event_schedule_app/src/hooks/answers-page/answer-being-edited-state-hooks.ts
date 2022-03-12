@@ -10,11 +10,11 @@ import {
   withInitialValue,
 } from '@noshiro/syncflow';
 import {
-  useStateAsStream,
-  useStream,
-  useStreamEffect,
-  useStreamValue,
-  useVoidEventAsStream,
+  useObservable,
+  useObservableEffect,
+  useObservableState,
+  useObservableValue,
+  useVoidEventObservable,
 } from '@noshiro/syncflow-react-hooks';
 import { IRecord, isNotUndefined } from '@noshiro/ts-utils';
 
@@ -27,9 +27,9 @@ export const useAnswerBeingEditedState = (
   updateAnswerBeingEdited: (updater: (a: Answer) => Answer) => void;
 }> => {
   const [answerBeingEdited$, setAnswerBeingEdited, updateAnswerBeingEdited] =
-    useStateAsStream(answerDefaultValue);
+    useObservableState(answerDefaultValue);
 
-  const emptyAnswerSelection$ = useStream<Answer>(() =>
+  const emptyAnswerSelection$ = useObservable<Answer>(() =>
     eventSchedule$
       .chain(filter(isNotUndefined))
       .chain(
@@ -53,18 +53,18 @@ export const useAnswerBeingEditedState = (
   );
 
   const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
-    useVoidEventAsStream();
+    useVoidEventObservable();
 
-  const resetAnswerBeingEdited$ = useStream(() =>
+  const resetAnswerBeingEdited$ = useObservable(() =>
     combineLatest([
       emptyAnswerSelection$,
       resetAnswerBeingEditedAction$,
     ] as const).chain(map(([x, _]) => x))
   );
 
-  useStreamEffect(resetAnswerBeingEdited$, setAnswerBeingEdited);
+  useObservableEffect(resetAnswerBeingEdited$, setAnswerBeingEdited);
 
-  const answerBeingEdited = useStreamValue(answerBeingEdited$);
+  const answerBeingEdited = useObservableValue(answerBeingEdited$);
 
   return {
     answerBeingEdited,

@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { useStreamValue } from '@noshiro/syncflow-preact-hooks';
+import { useObservableValue } from '@noshiro/syncflow-preact-hooks';
 import { useCallback, useState } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
@@ -29,7 +29,7 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
     createRoom.dispatch({ username, password }).catch(console.error);
   }, [username, password]);
 
-  const loading = useStreamValue(createRoom.isWaitingResponse$);
+  const loading = useObservableValue(createRoom.isWaitingResponse$);
 
   return (
     <Centering>

@@ -1,6 +1,6 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useStreamValue } from '@noshiro/syncflow-react-hooks';
+import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { User } from 'firebase/auth';
 import { useCallback } from 'react';
 import styled from 'styled-components';
@@ -24,7 +24,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
   'UpdateDisplayNameDialog',
   ({ dialogIsOpen, user }) => {
     const { formState, displayNameFormIntent, enterButtonDisabled } =
-      useStreamValue(UpdateDisplayNamePage.state$);
+      useObservableValue(UpdateDisplayNamePage.state$);
 
     const enterClickHandler = useCallback(async () => {
       if (enterButtonDisabled) return;

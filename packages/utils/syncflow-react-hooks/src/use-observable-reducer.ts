@@ -1,15 +1,17 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { scan, source } from '@noshiro/syncflow';
 import { useCallback, useMemo } from 'react';
-import { useStream } from './use-stream';
+import { useObservable } from './use-observable';
 
-export const useReducerAsStream = <S, A>(
+export const useObservableReducer = <S, A>(
   reducer: (state: S, action: A) => S,
   initialState: S
 ): [InitializedObservable<S>, (action: A) => void] => {
   const action$ = useMemo(() => source<A>(), []);
 
-  const state$ = useStream<S>(() => action$.chain(scan(reducer, initialState)));
+  const state$ = useObservable<S>(() =>
+    action$.chain(scan(reducer, initialState))
+  );
 
   const dispatch = useCallback((action: A) => {
     action$.next(action);

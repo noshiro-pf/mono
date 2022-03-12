@@ -8,7 +8,7 @@ import {
 } from '@noshiro/event-schedule-app-shared';
 import type { Observable } from '@noshiro/syncflow';
 import { fromArray } from '@noshiro/syncflow';
-import { useStreamEffect } from '@noshiro/syncflow-react-hooks';
+import { useObservableEffect } from '@noshiro/syncflow-react-hooks';
 import type {
   IMapMapped,
   MonthEnum,
@@ -66,7 +66,7 @@ export const useMultipleDatePickerState = (
     calendarCurrentPageInitialState()
   );
 
-  useStreamEffect(setYearMonth$ ?? fromArray([]), ({ year, month }) => {
+  useObservableEffect(setYearMonth$ ?? fromArray([]), ({ year, month }) => {
     calendarCurrentPageDispatch({
       type: 'set-year-month',
       year,

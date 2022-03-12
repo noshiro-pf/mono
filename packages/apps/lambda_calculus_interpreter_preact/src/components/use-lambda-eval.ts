@@ -5,9 +5,9 @@ import {
 } from '@noshiro/lambda-calculus-interpreter-core';
 import { debounceTimeI, mapI } from '@noshiro/syncflow';
 import {
-  useStateAsStream,
-  useStream,
-  useStreamValue,
+  useObservable,
+  useObservableState,
+  useObservableValue,
 } from '@noshiro/syncflow-preact-hooks';
 import { mapNullable, pipe } from '@noshiro/ts-utils';
 
@@ -20,9 +20,9 @@ export const useLambdaEval = (
   setInputAreaString: (input: string) => void;
 } => {
   const [inputAreaString$, setInputAreaString] =
-    useStateAsStream<string>(initialInput);
+    useObservableState<string>(initialInput);
 
-  const outputAreaString$ = useStream<string | undefined>(() =>
+  const outputAreaString$ = useObservable<string | undefined>(() =>
     inputAreaString$.chain(debounceTimeI(200 /* ms */)).chain(
       mapI(
         (input) =>
@@ -40,8 +40,8 @@ export const useLambdaEval = (
   );
 
   /* extract values */
-  const inputAreaString = useStreamValue(inputAreaString$);
-  const outputAreaString = useStreamValue(outputAreaString$);
+  const inputAreaString = useObservableValue(inputAreaString$);
+  const outputAreaString = useObservableValue(outputAreaString$);
 
   return {
     inputAreaString,
