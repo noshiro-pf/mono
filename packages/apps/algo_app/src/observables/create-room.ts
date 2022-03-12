@@ -8,7 +8,7 @@ export namespace createRoom {
 
   export const response$ = _response$;
 
-  const [_isWaitingResponse$, setIsWaitingResponse] =
+  const { state$: _isWaitingResponse$, setState: setIsWaitingResponse } =
     createState<boolean>(false);
 
   export const isWaitingResponse$ = _isWaitingResponse$;

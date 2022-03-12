@@ -1,3 +1,5 @@
 import { createState } from '@noshiro/syncflow';
 
-export const [myName$, setMyName] = createState<string | undefined>(undefined);
+export const { state$: myName$, setState: setMyName } = createState<
+  string | undefined
+>(undefined);

@@ -24,9 +24,13 @@ import {
   convertRoomToRoomRemote,
 } from '../types';
 
-const [_roomId$, _setRoomId] = createState<string | undefined>(undefined);
+const { state$: _roomId$, setState: _setRoomId } = createState<
+  string | undefined
+>(undefined);
 
-const [_room$, _setRoom] = createState<Room | undefined>(undefined);
+const { state$: _room$, setState: _setRoom } = createState<Room | undefined>(
+  undefined
+);
 
 const [_actionsFromDb$, _setActionsFromDb] =
   createEventEmitter<readonly GameStateAction[]>();
@@ -46,9 +50,9 @@ export namespace db {
 
   export const room$ = _room$;
 
-  export const [myName$, setMyName] = createState<string | undefined>(
-    undefined
-  );
+  export const { state$: myName$, setState: setMyName } = createState<
+    string | undefined
+  >(undefined);
 
   export const actionsFromDb$ = _actionsFromDb$;
 

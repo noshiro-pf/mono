@@ -3,7 +3,7 @@ import { db } from './database';
 import { setMyName } from './my-name';
 
 export namespace joinRoom {
-  const [_isWaitingResponse$, setIsWaitingResponse] =
+  const { state$: _isWaitingResponse$, setState: setIsWaitingResponse } =
     createState<boolean>(false);
 
   export const isWaitingResponse$ = _isWaitingResponse$;
