@@ -1,7 +1,8 @@
 {
   "name": "@noshiro/goober",
   "version": "2.0.33",
-  "private": true,
+  "private": false,
+  "license": "MIT",
   "sideEffects": false,
   "main": "dist/goober.js",
   "module": "dist/goober.esm.js",

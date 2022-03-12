@@ -1,7 +1,8 @@
 {
   "name": "@noshiro/lambda-interpreter-app-solid",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "prebuild": "yarn clean:build",
     "build": "echo 'build skipped'",
