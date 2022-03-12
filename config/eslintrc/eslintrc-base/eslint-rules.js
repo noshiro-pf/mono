@@ -4,6 +4,47 @@
 
 /** @typedef { import("./rules-record").EslintRulesAll } EslintRulesAll */
 
+/** @typedef { import("./rules-record").RestrictedImportsDef} RestrictedImportsDef */
+
+/** @type {RestrictedImportsDef} */
+const restrictedImports = [
+  {
+    name: 'react',
+    importNames: ['memo'],
+    message: 'use memoNamed from @noshiro/react-utils instead.',
+  },
+  {
+    name: 'preact',
+    importNames: ['memo'],
+    message: 'use memoNamed from @noshiro/preact-utils instead.',
+  },
+  {
+    name: 'react',
+    importNames: ['useState'],
+    message: 'use useRichState from @noshiro/react-utils instead.',
+  },
+  {
+    name: 'preact/hooks',
+    importNames: ['useState'],
+    message: 'use useRichState from @noshiro/preact-utils instead.',
+  },
+  {
+    name: 'preact/compat',
+    importNames: [
+      'useState',
+      'useReducer',
+      'useMemo',
+      'useCallback',
+      'useRef',
+      'useContext',
+      'useEffect',
+      'useLayoutEffect',
+      'useErrorBoundary',
+    ],
+    message: 'use preact/hooks package instead.',
+  },
+];
+
 /** @type {EslintRulesAll} */
 const eslintRulesAll = {
   modifiedRules: {
@@ -11,43 +52,7 @@ const eslintRulesAll = {
     'no-restricted-imports': [
       'warn',
       {
-        paths: [
-          {
-            name: 'react',
-            importNames: ['memo'],
-            message: 'use memoNamed from @noshiro/react-utils instead.',
-          },
-          {
-            name: 'preact',
-            importNames: ['memo'],
-            message: 'use memoNamed from @noshiro/preact-utils instead.',
-          },
-          {
-            name: 'react',
-            importNames: ['useState'],
-            message: 'use useRichState from @noshiro/react-utils instead.',
-          },
-          {
-            name: 'preact/hooks',
-            importNames: ['useState'],
-            message: 'use useRichState from @noshiro/preact-utils instead.',
-          },
-          {
-            name: 'preact/compat',
-            importNames: [
-              'useState',
-              'useReducer',
-              'useMemo',
-              'useCallback',
-              'useRef',
-              'useContext',
-              'useEffect',
-              'useLayoutEffect',
-              'useErrorBoundary',
-            ],
-            message: 'use preact/hooks package instead.',
-          },
-        ],
+        paths: restrictedImports,
       },
     ],
   },
@@ -96,4 +101,4 @@ const eslintRulesAll = {
   },
 };
 
-module.exports = eslintRulesAll;
+module.exports = { eslintRulesAll, restrictedImports };

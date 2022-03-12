@@ -19,7 +19,6 @@
     "seeconfig": "firebase functions:config:get",
     "serve": "yarn build && firebase emulators:start --only functions",
     "setapikey": "firebase functions:config:set slack.apikey=",
-    "setup": "echo 'no setup script'",
     "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell",
     "test": "echo 'no test script'"

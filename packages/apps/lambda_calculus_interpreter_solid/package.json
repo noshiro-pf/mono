@@ -13,7 +13,6 @@
     "gi": "echo 'no gi script'",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
-    "setup": "echo 'no setup script'",
     "start": "solid-scripts start",
     "test": "echo 'no test script'",
     "testw": "solid-scripts test"

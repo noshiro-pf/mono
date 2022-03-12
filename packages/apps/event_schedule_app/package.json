@@ -23,12 +23,10 @@
     "fb:write": "node ./scripts/write_firestore",
     "fmt": "yarn _prettier .",
     "gi": "yarn _script_genindex ./src --min-depth 1 --ignore assets",
+    "postinstall": "touch ./scripts/service-account-key.json && tsc --project config/tsconfig.scripts.json",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
     "serve": "http-server ./build",
-    "setup": "run-s setup:webpackconfig",
-    "setup:scripts": "touch ./scripts/service-account-key.json && tsc --project config/tsconfig.scripts.json",
-    "setup:webpackconfig": "tsc --project config/tsconfig.webpackconfig.json",
     "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "tsc": "tsc --noEmit"

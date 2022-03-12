@@ -4,16 +4,18 @@
 
 /** @typedef { import("./rules-record").EslintRulesAll } EslintRulesAll */
 
+const banTypes = {
+  Omit: 'Use `StrictOmit` instead.',
+  Exclude: 'Use `StrictExclude` instead.',
+};
+
 /** @type {EslintRulesAll} */
 const typescriptEslintRules = {
   modifiedRules: {
     '@typescript-eslint/ban-types': [
       'error',
       {
-        types: {
-          Omit: 'Use `StrictOmit` instead.',
-          Exclude: 'Use `StrictExclude` instead.',
-        },
+        types: banTypes,
         extendDefaults: true,
       },
     ],
@@ -65,9 +67,16 @@ const typescriptEslintRules = {
       },
     ],
 
-    // WIP
     '@typescript-eslint/no-redundant-type-constituents': 'warn',
-    '@typescript-eslint/prefer-readonly-parameter-types': 'off',
+    '@typescript-eslint/prefer-readonly-parameter-types': [
+      'warn',
+      {
+        checkParameterProperties: true,
+        ignoreInferredTypes: true,
+        treatMethodsAsReadonly: true,
+      },
+    ],
+    '@typescript-eslint/no-misused-promises': 'warn',
   },
   disabledRules: {
     '@typescript-eslint/lines-between-class-members': 'off',
@@ -81,7 +90,8 @@ const typescriptEslintRules = {
     '@typescript-eslint/no-type-alias': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/promise-function-async': 'off',
+    '@typescript-eslint/no-unnecessary-type-arguments': 'off',
   },
 };
 
-module.exports = typescriptEslintRules;
+module.exports = { typescriptEslintRules, banTypes };

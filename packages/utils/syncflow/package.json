@@ -35,7 +35,6 @@
     "lint": "eslint \"./{src,test}/**/*\" --ext .ts",
     "lint:fix": "yarn lint --fix",
     "pub": "yarn publish --no-git-tag-version --access=public",
-    "setup": "echo 'no setup script'",
     "start": "node cjs/test/preview-main.js",
     "test": "jest --config config/jest.config.json",
     "test:detectOpenHandles": "jest --config config/jest.config.json --detectOpenHandles",

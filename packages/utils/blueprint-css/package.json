@@ -19,7 +19,6 @@
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
     "lint:fix": "echo 'no lint:fix script'",
-    "setup": "echo 'no setup script'",
     "test": "echo 'no test script'"
   },
   "config": {
