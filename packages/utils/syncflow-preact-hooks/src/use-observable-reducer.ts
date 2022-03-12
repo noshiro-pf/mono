@@ -1,7 +1,7 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { scan, source } from '@noshiro/syncflow';
-import { useCallback, useMemo } from 'react';
-import { useObservable } from './use-stream';
+import { useCallback, useMemo } from 'preact/compat';
+import { useObservable } from './use-observable';
 
 export const useObservableReducer = <S, A>(
   reducer: (state: S, action: A) => S,

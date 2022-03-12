@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { useCallback } from 'react';
-import { useObservableReducer } from './use-reducer-as-stream';
+import { useObservableReducer } from './use-observable-reducer';
 
 type Action<S> = Readonly<
   { type: 'set'; nextState: S } | { type: 'update'; updateFn: (a: S) => S }

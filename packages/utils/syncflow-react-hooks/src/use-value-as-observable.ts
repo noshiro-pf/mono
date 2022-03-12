@@ -1,6 +1,6 @@
 import type { Observable } from '@noshiro/syncflow';
-import { useEffect } from 'preact/compat';
-import { useObservableState } from './use-state-as-stream';
+import { useEffect } from 'react';
+import { useObservableState } from './use-observable-state';
 
 export const useChangeValueEffect = <A>(
   input: A,
