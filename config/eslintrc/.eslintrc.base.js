@@ -11,6 +11,7 @@ const {
   eslintNoshiroCustomRules,
   eslintRulesAll,
   typescriptEslintRules,
+  eslintPromiseRules,
 } = require('./eslintrc-base');
 
 /**
@@ -79,6 +80,7 @@ const config = {
     'import',
     'jest',
     'array-func',
+    'promise',
     'noshiro-custom',
     /* functional, total-functions */
     // 'functional',
@@ -116,6 +118,7 @@ const config = {
     ...eslintImportsRules.moduleSystems,
     ...eslintImportsRules.styleGuide,
     ...eslintJestRules,
+    ...eslintPromiseRules,
     ...eslintNoshiroCustomRules,
   },
   ignorePatterns: [...readGitignoreFiles({ cwd: __dirname }), '*.d.ts', '*.js'],
