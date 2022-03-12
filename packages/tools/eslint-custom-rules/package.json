@@ -16,9 +16,9 @@
     "test": "echo 'no test script'"
   },
   "dependencies": {
-    "@typescript-eslint/experimental-utils": "^4.24.0",
-    "@typescript-eslint/parser": "^4.24.0",
-    "@typescript-eslint/types": "^4.24.0",
+    "@typescript-eslint/experimental-utils": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "@typescript-eslint/types": "^5.14.0",
     "lodash": "^4.17.21",
     "tsutils": "^3.21.0"
   }
