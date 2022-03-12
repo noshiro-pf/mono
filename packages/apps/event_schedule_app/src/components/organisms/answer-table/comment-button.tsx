@@ -1,5 +1,6 @@
+// eslint-disable-next-line import/no-deprecated
 import { Button, Popover } from '@blueprintjs/core';
-import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { ButtonsWrapperAlignEnd } from '../../styled';
@@ -9,7 +10,11 @@ type Props = Readonly<{
 }>;
 
 export const CommentButton = memoNamed<Props>('CommentButton', (props) => {
-  const [isOpen, handleOpen, handleClose] = useBooleanState(false);
+  const {
+    state: isOpen,
+    setTrue: handleOpen,
+    setFalse: handleClose,
+  } = useBoolState(false);
 
   return (
     <Popover

@@ -1,8 +1,7 @@
 import type { HTMLSelectProps } from '@blueprintjs/core';
 import { Button, TextArea } from '@blueprintjs/core';
-import { memoNamed, useToggleState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState, useState } from '@noshiro/react-utils';
 import type { CSSProperties } from 'react';
-import { useState } from 'react';
 import styled from 'styled-components';
 import { clog } from '../../utils';
 import {
@@ -25,8 +24,10 @@ const options: Readonly<HTMLSelectProps['options']> = [
 ];
 
 export const UiPartsTest = memoNamed('UiPartsTest', () => {
-  const [inputValue, setInputValue] = useState<string>('');
-  const [bpSwitchState, onBpSwitchChangeHandler] = useToggleState(false);
+  const { state: inputValue, setState: setInputValue } = useState<string>('');
+
+  const { state: bpSwitchState, toggleState: onBpSwitchChangeHandler } =
+    useBoolState(false);
 
   return (
     <div>

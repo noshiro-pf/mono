@@ -1,8 +1,8 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { assertType, tuple } from '@noshiro/ts-utils';
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
+import { firestore } from 'firebase-admin';
+import { logger } from 'firebase-functions';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
@@ -17,8 +17,7 @@ const keys = {
 assertType<TypeExtends<ValueOf<typeof keys>, keyof EventSchedule>>();
 
 export const notifyAnswerDeadline = async (): Promise<void> => {
-  const querySnapshot = await admin
-    .firestore()
+  const querySnapshot = await firestore()
     .collection(firestorePaths.events)
     .where(keys.notificationSettings, '!=', 'none')
     .where(keys.answerDeadline, '!=', 'none')
@@ -51,7 +50,7 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
             flag && todayIsNDaysBeforeDeadline(diff, answerDeadline)
         )
         .map(([_, diff]) => {
-          functions.logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
+          logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
           return sendEmail(
             createMailOptions({
               to: ns.email,

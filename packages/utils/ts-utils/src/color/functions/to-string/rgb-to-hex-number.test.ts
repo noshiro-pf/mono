@@ -5,7 +5,7 @@ test('rgbToHexNumber', () => {
 });
 
 test('rgbaToHexNumber', () => {
-  expect(rgbaToHexNumber([230, 29, 25, 0.5])).toEqual({
+  expect(rgbaToHexNumber([230, 29, 25, 0.5])).toStrictEqual({
     hex: 0xe61d19,
     alpha: 0.5,
   });

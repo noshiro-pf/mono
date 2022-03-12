@@ -1,21 +1,25 @@
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
-import * as https from 'https';
+import { firestore as admin_firestore, initializeApp } from 'firebase-admin';
+import {
+  config,
+  firestore,
+  https as functions_https,
+  logger,
+} from 'firebase-functions';
+import { get } from 'https';
 
 // The Firebase Admin SDK to access Cloud Firestore.
-admin.initializeApp();
+initializeApp();
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-const SLACK_API_KEY: string = functions.config()['slack']?.apikey ?? '';
+const SLACK_API_KEY: string = config()['slack']?.apikey ?? '';
 
 // Take the text parameter passed to this HTTP endpoint and insert it into
 // Cloud Firestore under the path /messages/:documentId/original
-export const addMessage = functions.https.onRequest(async (req, res) => {
+export const addMessage = functions_https.onRequest(async (req, res) => {
   // Grab the text parameter.
   const original = req.query['text'];
   // Push the new message into Cloud Firestore using the Firebase Admin SDK.
-  const writeResult = await admin
-    .firestore()
+  const writeResult = await admin_firestore()
     .collection('messages')
     .add({ original });
   // Send back a message that we've succesfully written the message
@@ -26,7 +30,7 @@ export const addMessage = functions.https.onRequest(async (req, res) => {
 
 // Listens for new messages added to /messages/:documentId/original and creates an
 // uppercase version of the message to /messages/:documentId/uppercase
-export const makeUppercase = functions.firestore
+export const makeUppercase = firestore
   .document('/messages/{documentId}')
   .onCreate(async (snap, context) => {
     // Grab the current value of what was written to Cloud Firestore.
@@ -34,7 +38,7 @@ export const makeUppercase = functions.firestore
     const original: string = snap.data()['original'];
 
     // Access the parameter `{documentId}` with `context.params`
-    functions.logger.log('Uppercasing', context.params['documentId'], original);
+    logger.log('Uppercasing', context.params['documentId'], original);
 
     const uppercase = original.toUpperCase();
 
@@ -42,7 +46,7 @@ export const makeUppercase = functions.firestore
 
     const result = await new Promise((resolve) => {
       const data: Buffer[] = [];
-      https.get(searchUrl, (res) => {
+      get(searchUrl, (res) => {
         res
           // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
           .on('data', (chunk: Buffer) => {

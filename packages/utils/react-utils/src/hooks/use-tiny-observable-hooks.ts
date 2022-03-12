@@ -1,6 +1,7 @@
 import type { TinyObservable, TinyObservableSource } from '@noshiro/ts-utils';
 import { createTinyObservable } from '@noshiro/ts-utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useState } from './use-state';
 
 export const useTinyObservable = <T>(): TinyObservableSource<T> => {
   const ref = useRef(createTinyObservable<T>());
@@ -32,7 +33,7 @@ export function useTinyObservableValue<T>(
   observable$: TinyObservable<T>,
   initialValue?: T
 ): T | undefined {
-  const [state, setState] = useState<{ value: T | undefined }>({
+  const { state, setState } = useState<{ value: T | undefined }>({
     value: initialValue,
   });
   useTinyObservableEffect(observable$, (value) => {

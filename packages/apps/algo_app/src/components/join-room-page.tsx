@@ -1,7 +1,7 @@
 import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
+import { memoNamed, useState } from '@noshiro/preact-utils';
 import { useObservableValue } from '@noshiro/syncflow-preact-hooks';
-import { useCallback, useState } from 'preact/hooks';
+import { useCallback } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
 import { db, joinRoom } from '../observables';
@@ -18,22 +18,29 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
     roomに自分の名前があればゲーム開始前画面を表示
    */
 
-  const [password, setPassword] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
+  const { state: password, setState: setPassword } = useState<string>('');
+  const { state: username, setState: setUsername } = useState<string>('');
 
   const onPasswordInput: JSXInternal.GenericEventHandler<HTMLInputElement> =
-    useCallback((ev) => {
-      setPassword(ev.currentTarget.value);
-    }, []);
+    useCallback(
+      (ev) => {
+        setPassword(ev.currentTarget.value);
+      },
+      [setPassword]
+    );
 
   const onUsernameInput: JSXInternal.GenericEventHandler<HTMLInputElement> =
-    useCallback((ev) => {
-      setUsername(ev.currentTarget.value);
-    }, []);
+    useCallback(
+      (ev) => {
+        setUsername(ev.currentTarget.value);
+      },
+      [setUsername]
+    );
 
   const disabled: boolean = username === '';
 
-  const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
+  const { state: showPasswordError, setState: setShowPasswordError } =
+    useState<boolean>(false);
 
   const room = useObservableValue(db.room$);
 
@@ -46,7 +53,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
       }
     }
     joinRoom.dispatch(roomId, username).catch(console.error);
-  }, [username, password, roomId, room]);
+  }, [room, roomId, username, password, setShowPasswordError]);
 
   const loading = useObservableValue(joinRoom.isWaitingResponse$);
 

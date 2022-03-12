@@ -1,5 +1,5 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { useAlive, useBooleanState } from '@noshiro/react-utils';
+import { useAlive, useBoolState } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
@@ -24,8 +24,11 @@ export const useEditEventScheduleHooks = ({
   newEventSchedule: EventSchedule;
   eventScheduleValidationOk: boolean;
 }>): EditEventScheduleHooks => {
-  const [isLoading, setIsLoadingTrue, setIsLoadingFalse] =
-    useBooleanState(false);
+  const {
+    state: isLoading,
+    setTrue: setIsLoadingTrue,
+    setFalse: setIsLoadingFalse,
+  } = useBoolState(false);
 
   const eventId = useObservableValue(router.eventId$);
 

@@ -1,6 +1,7 @@
+import { useState } from '@noshiro/preact-utils';
 import { IList } from '@noshiro/ts-utils';
 import type { RefObject } from 'preact';
-import { useEffect, useMemo, useRef, useState } from 'preact/compat';
+import { useEffect, useMemo, useRef } from 'preact/hooks';
 import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
 
 type Size = Readonly<{
@@ -45,7 +46,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
 export const useResizeObserver = <E extends Element = Element>(
   defaultSize: Size = { width: 0, height: 0, left: 0, top: 0 }
 ): [Size, RefObject<E>] => {
-  const [size, setSize] = useState<Size>(defaultSize);
+  const { state: size, setState: setSize } = useState<Size>(defaultSize);
 
   const targetElRef = useResizeObserverRef<E>(setSize);
 

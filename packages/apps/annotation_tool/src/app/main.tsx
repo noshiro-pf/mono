@@ -1,6 +1,6 @@
 import {
   memoNamed,
-  useBooleanState,
+  useBoolState,
   useStateWithMapFn,
 } from '@noshiro/react-utils';
 import type { Hue, Percent, RectSize } from '@noshiro/ts-utils';
@@ -67,7 +67,7 @@ const labels: ReadonlyNonEmptyArray<Label> = pipe(
 const labelInit: Label = labels[0];
 
 export const Main = memoNamed('Main', () => {
-  const [hidden, hide, show] = useBooleanState(false);
+  const { state: hidden, setTrue: hide, setFalse: show } = useBoolState(false);
 
   const [visibleLabelIndices, visibleLabelIndicesDispatcher] = useReducer(
     visibleLabelsReducer,

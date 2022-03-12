@@ -1,4 +1,3 @@
-import { expect, test } from '@jest/globals';
 import { assertNotType, assertType, Option } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,

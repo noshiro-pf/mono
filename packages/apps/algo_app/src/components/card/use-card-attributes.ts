@@ -1,4 +1,4 @@
-import { useBooleanState } from '@noshiro/preact-utils';
+import { useBoolState } from '@noshiro/preact-utils';
 import type { RectSize } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
@@ -37,7 +37,11 @@ export const useCardAttributes = (
   const eyeIconColor =
     color === 'black' ? eyeIconColorDef.light : eyeIconColorDef.dark;
 
-  const [isMouseOver, onMouseEnter, onMouseLeave] = useBooleanState(false);
+  const {
+    state: isMouseOver,
+    setTrue: onMouseEnter,
+    setFalse: onMouseLeave,
+  } = useBoolState(false);
 
   const wrapperStyle = useMemo<JSXInternal.CSSProperties>(
     () => ({

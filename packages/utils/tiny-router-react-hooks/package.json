@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@noshiro/syncflow-react-hooks": "*",
-    "@noshiro/tiny-router-observable": "*"
+    "@noshiro/tiny-router-observable": "*",
+    "react": "^17.0.2"
   }
 }

@@ -1,11 +1,11 @@
-import * as functions from 'firebase-functions';
+import { config, logger } from 'firebase-functions';
 import { createTransport } from 'nodemailer';
 import { fillGmailConfig } from './type-check';
 
 export const gmailConfig: Readonly<{
   email: string;
   password: string;
-}> = fillGmailConfig(functions.config()).gmail;
+}> = fillGmailConfig(config()).gmail;
 
 export const mailTransport = createTransport({
   service: 'gmail',
@@ -38,9 +38,9 @@ export const createMailOptions = ({
 });
 
 export const sendEmail = async (mailOptions: MailOptions): Promise<void> => {
-  await mailTransport.sendMail(mailOptions).catch(functions.logger.error);
+  await mailTransport.sendMail(mailOptions).catch(logger.error);
 
-  functions.logger.log(
+  logger.log(
     `email has successfully sent from ${gmailConfig.email} to ${mailOptions.to}.`
   );
 };

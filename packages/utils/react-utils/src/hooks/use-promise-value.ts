@@ -1,12 +1,13 @@
 import type { PromiseState } from '@noshiro/ts-utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useState } from './use-state';
 
 export const usePromiseValue = <T>(
   promise: Readonly<Promise<T>>
 ): PromiseState<undefined, unknown, T> => {
   const promiseMemoized = useRef(promise);
 
-  const [settledValue, setSettledValue] = useState<
+  const { state: settledValue, setState: setSettledValue } = useState<
     PromiseState<undefined, unknown, T>
   >({
     status: 'pending',
@@ -29,7 +30,7 @@ export const usePromiseValue = <T>(
     return () => {
       alive = false;
     };
-  }, [promiseMemoized]);
+  }, [promiseMemoized, setSettledValue]);
 
   return settledValue;
 };

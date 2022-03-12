@@ -6,12 +6,12 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useAlive, useBooleanState } from '@noshiro/react-utils';
+import { useAlive, useBoolState, useState } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { IMapMapped } from '@noshiro/ts-utils';
 import { IRecord, Result } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
 import type { YmdKey } from '../../functions';
@@ -75,17 +75,16 @@ export const useAnswerPageState = (): AnswerPageState => {
   /* state */
   const user = useUser();
 
-  const [answerBeingEditedSectionState, setAnswerBeingEditedSectionState] =
-    useState<'creating' | 'editing' | 'hidden'>('hidden');
+  const {
+    state: answerBeingEditedSectionState,
+    setState: setAnswerBeingEditedSectionState,
+  } = useState<'creating' | 'editing' | 'hidden'>('hidden');
 
-  const [
-    //
-    selectedAnswerSaved,
-    setSelectedAnswerSaved,
-  ] = useState<Answer | undefined>(undefined);
+  const { state: selectedAnswerSaved, setState: setSelectedAnswerSaved } =
+    useState<Answer | undefined>(undefined);
 
-  const [submitButtonIsLoading, setSubmitButtonIsLoading] =
-    useState<boolean>(false);
+  const { state: submitButtonIsLoading, setState: setSubmitButtonIsLoading } =
+    useBoolState(false);
 
   const {
     answerBeingEdited,
@@ -94,11 +93,11 @@ export const useAnswerPageState = (): AnswerPageState => {
     resetAnswerBeingEdited,
   } = useAnswerBeingEditedState(eventSchedule$);
 
-  const [
-    alertOnAnswerClickIsOpen,
-    openAlertOnAnswerClick,
-    closeAlertOnAnswerClick,
-  ] = useBooleanState(false);
+  const {
+    state: alertOnAnswerClickIsOpen,
+    setTrue: openAlertOnAnswerClick,
+    setFalse: closeAlertOnAnswerClick,
+  } = useBoolState(false);
 
   /* effect */
 
@@ -134,13 +133,19 @@ export const useAnswerPageState = (): AnswerPageState => {
         setSelectedAnswerSaved(answer);
       }
     },
-    [user, openAlertOnAnswerClick, setAnswerBeingEdited]
+    [
+      user?.uid,
+      openAlertOnAnswerClick,
+      setAnswerBeingEditedSectionState,
+      setAnswerBeingEdited,
+      setSelectedAnswerSaved,
+    ]
   );
 
   const clearAnswerBeingEditedFields = useCallback(() => {
     resetAnswerBeingEdited();
     setSelectedAnswerSaved(undefined);
-  }, [resetAnswerBeingEdited]);
+  }, [resetAnswerBeingEdited, setSelectedAnswerSaved]);
 
   const onAddAnswerButtonClick = useCallback(() => {
     clearAnswerBeingEditedFields();
@@ -149,12 +154,17 @@ export const useAnswerPageState = (): AnswerPageState => {
     updateAnswerBeingEdited((prev) =>
       IRecord.setIn(prev, ['user', 'name'], user?.displayName ?? '')
     );
-  }, [user, clearAnswerBeingEditedFields, updateAnswerBeingEdited]);
+  }, [
+    clearAnswerBeingEditedFields,
+    setAnswerBeingEditedSectionState,
+    updateAnswerBeingEdited,
+    user?.displayName,
+  ]);
 
   const onCancel = useCallback(() => {
     clearAnswerBeingEditedFields();
     setAnswerBeingEditedSectionState('hidden');
-  }, [clearAnswerBeingEditedFields]);
+  }, [clearAnswerBeingEditedFields, setAnswerBeingEditedSectionState]);
 
   const eventId = useObservableValue(router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);
@@ -218,10 +228,12 @@ export const useAnswerPageState = (): AnswerPageState => {
         break;
     }
   }, [
-    answerBeingEdited,
-    answerBeingEditedSectionState,
     eventId,
     alive,
+    setSubmitButtonIsLoading,
+    answerBeingEditedSectionState,
+    answerBeingEdited,
+    setAnswerBeingEditedSectionState,
     clearAnswerBeingEditedFields,
   ]);
 
@@ -239,7 +251,14 @@ export const useAnswerPageState = (): AnswerPageState => {
       fetchAnswers();
       clearAnswerBeingEditedFields();
     });
-  }, [answerBeingEdited.id, eventId, alive, clearAnswerBeingEditedFields]);
+  }, [
+    eventId,
+    alive,
+    setSubmitButtonIsLoading,
+    answerBeingEdited.id,
+    setAnswerBeingEditedSectionState,
+    clearAnswerBeingEditedFields,
+  ]);
 
   const isExpired = useMemo<boolean>(
     () =>

@@ -65,7 +65,7 @@ export namespace Result {
     defaultValue: D
   ): D | E => (isErr<S, E>(result) ? result.value : defaultValue);
 
-  export const expect =
+  export const expectToBe =
     <S, E>(message: string) =>
     (result: _Result<S, E>): S => {
       if (isErr<S, E>(result)) {

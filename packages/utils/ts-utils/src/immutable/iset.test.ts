@@ -5,7 +5,7 @@ import { IList } from './list';
 describe('ISet[Symbol.iterator]', () => {
   test('case 1', () => {
     const s0 = ISet.new(ISet.new([1, 2, 3]));
-    expect(s0).toEqual(ISet.new([1, 2, 3]));
+    expect(s0).toStrictEqual(ISet.new([1, 2, 3]));
   });
 });
 
@@ -68,46 +68,46 @@ describe('ISet.some', () => {
 describe('ISet.add', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.add(10)).toEqual(ISet.new([1, 3, 5, 6, 7, 10]));
-    expect(s0).toEqual(ISet.new([1, 3, 5, 6, 7]));
+    expect(s0.add(10)).toStrictEqual(ISet.new([1, 3, 5, 6, 7, 10]));
+    expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.add(3)).toEqual(ISet.new([1, 3, 5, 6, 7]));
-    expect(s0).toEqual(ISet.new([1, 3, 5, 6, 7]));
+    expect(s0.add(3)).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
+    expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
-    expect(s0.add(1)).toEqual(ISet.new([1]));
-    expect(s0).toEqual(ISet.new<number>([]));
+    expect(s0.add(1)).toStrictEqual(ISet.new([1]));
+    expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
     const s0 = ISet.new([1, 2, 3, Number.NaN]);
-    expect(s0.add(Number.NaN)).toEqual(ISet.new([1, 2, 3, Number.NaN]));
-    expect(s0).toEqual(ISet.new([1, 2, 3, Number.NaN]));
+    expect(s0.add(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
+    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
   });
 });
 
 describe('ISet.delete', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.delete(10)).toEqual(ISet.new([1, 3, 5, 6, 7]));
-    expect(s0).toEqual(ISet.new([1, 3, 5, 6, 7]));
+    expect(s0.delete(10)).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
+    expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.delete(3)).toEqual(ISet.new([1, 5, 6, 7]));
-    expect(s0).toEqual(ISet.new([1, 3, 5, 6, 7]));
+    expect(s0.delete(3)).toStrictEqual(ISet.new([1, 5, 6, 7]));
+    expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
-    expect(s0.delete(1)).toEqual(ISet.new([]));
-    expect(s0).toEqual(ISet.new<number>([]));
+    expect(s0.delete(1)).toStrictEqual(ISet.new([]));
+    expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
     const s0 = ISet.new([1, 2, 3, Number.NaN]);
-    expect(s0.delete(Number.NaN)).toEqual(ISet.new([1, 2, 3]));
-    expect(s0).toEqual(ISet.new([1, 2, 3, Number.NaN]));
+    expect(s0.delete(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3]));
+    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
   });
 });
 
@@ -116,8 +116,8 @@ describe('ISet.map', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const result = s0.map((x) => (x * 2).toString());
     assertType<TypeEq<typeof result, ISet<string>>>();
-    expect(result).toEqual(ISet.new(['2', '6', '10', '12', '14']));
-    expect(s0).toEqual(ISet.new([1, 3, 5, 6, 7]));
+    expect(result).toStrictEqual(ISet.new(['2', '6', '10', '12', '14']));
+    expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
 });
 
@@ -147,14 +147,14 @@ describe('ISet.isSupersetOf', () => {
 
 describe('ISet.subtract', () => {
   test('case 1', () => {
-    expect(ISet.new([1, 3, 5, 6, 7]).subtract(ISet.new([1, 3]))).toEqual(
+    expect(ISet.new([1, 3, 5, 6, 7]).subtract(ISet.new([1, 3]))).toStrictEqual(
       ISet.new([5, 6, 7])
     );
   });
   test('case 2', () => {
-    expect(ISet.new([1, 3, 5, 6, 7]).subtract(ISet.new([1, 2, 3]))).toEqual(
-      ISet.new([5, 6, 7])
-    );
+    expect(
+      ISet.new([1, 3, 5, 6, 7]).subtract(ISet.new([1, 2, 3]))
+    ).toStrictEqual(ISet.new([5, 6, 7]));
   });
 });
 
@@ -162,27 +162,27 @@ describe('ISet.intersection', () => {
   test('case 1', () => {
     expect(
       ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([]))
-    ).toEqual(ISet.new([]));
+    ).toStrictEqual(ISet.new([]));
   });
   test('case 2', () => {
     expect(
       ISet.intersection(ISet.new([1, 3, 5, 6, 7]), ISet.new([1, 2, 3]))
-    ).toEqual(ISet.new([1, 3]));
+    ).toStrictEqual(ISet.new([1, 3]));
   });
 });
 
 describe('ISet.union', () => {
   test('case 1', () => {
-    expect(ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([]))).toEqual(
-      ISet.new([1, 3, 5, 6, 7])
-    );
+    expect(
+      ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new<number>([]))
+    ).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 2', () => {
     expect(
       IList.sort(
         ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new([2, 4, 8])).toArray()
       )
-    ).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 });
 
@@ -230,6 +230,6 @@ describe('ISet.entries', () => {
 
 describe('ISet.toArray', () => {
   test('case 1', () => {
-    expect(ISet.new([1, 3, 5, 6, 7]).toArray()).toEqual([1, 3, 5, 6, 7]);
+    expect(ISet.new([1, 3, 5, 6, 7]).toArray()).toStrictEqual([1, 3, 5, 6, 7]);
   });
 });

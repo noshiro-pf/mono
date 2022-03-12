@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Button } from '@blueprintjs/core';
-import { memoNamed, useToggleState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import type { BpInputProps } from './bp-input';
 import { BpInput } from './bp-input';
 
@@ -14,7 +14,8 @@ export type BpPasswordInputProps = BpInputProps &
 export const BpPasswordInput = memoNamed<BpPasswordInputProps>(
   'BpPasswordInput',
   (props) => {
-    const [passwordIsOpen, onToggleVisibilityClick] = useToggleState(false);
+    const { state: passwordIsOpen, toggleState: onToggleVisibilityClick } =
+      useBoolState(false);
 
     return (
       <BpInput

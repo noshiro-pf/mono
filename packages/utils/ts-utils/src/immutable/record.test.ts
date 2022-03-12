@@ -110,7 +110,7 @@ describe('getIn', () => {
     assertType<TypeEq<typeof result, number>>();
 
     test('case 2', () => {
-      expect(result).toStrictEqual(3);
+      expect(result).toBe(3);
     });
   }
 });

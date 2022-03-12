@@ -1,4 +1,8 @@
-import type { DocumentReference, Unsubscribe } from '@firebase/firestore';
+import { createEventEmitter, createState } from '@noshiro/syncflow';
+import type { Result } from '@noshiro/ts-utils';
+import { promiseToResult } from '@noshiro/ts-utils';
+import { initializeApp } from 'firebase/app';
+import type { DocumentReference, Unsubscribe } from 'firebase/firestore';
 import {
   addDoc,
   arrayUnion,
@@ -9,11 +13,7 @@ import {
   orderBy,
   query,
   updateDoc,
-} from '@firebase/firestore';
-import { createEventEmitter, createState } from '@noshiro/syncflow';
-import type { Result } from '@noshiro/ts-utils';
-import { promiseToResult } from '@noshiro/ts-utils';
-import { initializeApp } from 'firebase/app';
+} from 'firebase/firestore';
 import { firebaseConfig } from '../constants';
 import { newRoom } from '../functions';
 import type { GameStateAction, Player, Room } from '../types';

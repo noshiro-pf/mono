@@ -1,7 +1,7 @@
 import { getAllDatesOfMonth } from './get-all-dates-of-month';
 
 test('getAllDatesOfMonth 1', () => {
-  expect(getAllDatesOfMonth(2020, 1)).toEqual([
+  expect(getAllDatesOfMonth(2020, 1)).toStrictEqual([
     new Date('2020/1/1'),
     new Date('2020/1/2'),
     new Date('2020/1/3'),

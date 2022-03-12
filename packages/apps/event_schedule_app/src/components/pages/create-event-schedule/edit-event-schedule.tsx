@@ -1,5 +1,5 @@
 import { Spinner } from '@blueprintjs/core';
-import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { Result } from '@noshiro/ts-utils';
 import styled from 'styled-components';
@@ -16,8 +16,10 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useObservableValue(router.eventId$);
   const eventScheduleResult = useObservableValue(eventScheduleResult$);
 
-  const [emailConfirmationHasPassed, makeItPassTheEmailConfirmation] =
-    useBooleanState(false);
+  const {
+    state: emailConfirmationHasPassed,
+    setTrue: makeItPassTheEmailConfirmation,
+  } = useBoolState(false);
 
   const user = useUser();
 

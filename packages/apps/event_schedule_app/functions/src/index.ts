@@ -1,11 +1,11 @@
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
+import { initializeApp } from 'firebase-admin';
+import { firestore, pubsub } from 'firebase-functions';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
 import { fillAnswerWithCheck, toStringWithCheck } from './type-check';
 
-admin.initializeApp();
+initializeApp();
 
 const wildcard = {
   eventId: 'eventId',
@@ -14,7 +14,7 @@ const wildcard = {
 
 const answerDocPath = `${firestorePaths.events}/{${wildcard.eventId}}/${firestorePaths.answers}/{${wildcard.answerId}}`;
 
-export const answerCreationListener = functions.firestore
+export const answerCreationListener = firestore
   .document(answerDocPath)
   .onCreate((snapshot, context) =>
     notifyOnAnswerChangeBody({
@@ -25,7 +25,7 @@ export const answerCreationListener = functions.firestore
     })
   );
 
-export const answerDeletionListener = functions.firestore
+export const answerDeletionListener = firestore
   .document(answerDocPath)
   .onDelete((snapshot, context) =>
     notifyOnAnswerChangeBody({
@@ -36,7 +36,7 @@ export const answerDeletionListener = functions.firestore
     })
   );
 
-export const answerUpdateListener = functions.firestore
+export const answerUpdateListener = firestore
   .document(answerDocPath)
   .onUpdate((change, context) =>
     notifyOnAnswerChangeBody({
@@ -47,7 +47,7 @@ export const answerUpdateListener = functions.firestore
     })
   );
 
-export const notifyAnswerDeadlineEveryday = functions.pubsub
+export const notifyAnswerDeadlineEveryday = pubsub
   .schedule('00 12 * * *')
   .timeZone('Asia/Tokyo')
   .onRun(notifyAnswerDeadline);

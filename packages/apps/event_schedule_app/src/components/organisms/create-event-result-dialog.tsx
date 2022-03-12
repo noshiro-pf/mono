@@ -3,10 +3,11 @@ import {
   Button,
   Classes,
   Spinner,
+  // eslint-disable-next-line import/no-deprecated
   Tooltip,
 } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, useEffect, useState } from 'react';
+import { memoNamed, useState } from '@noshiro/react-utils';
+import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import { DialogWithMaxWidth } from '../bp';
@@ -25,22 +26,23 @@ type Props = Readonly<{
 export const CreateEventResultDialog = memoNamed<Props>(
   'CreateEventResultDialog',
   (props) => {
-    const [linkIsUsed, setLinkIsUsed] = useState<boolean>(false);
+    const { state: linkIsUsed, setState: setLinkIsUsed } =
+      useState<boolean>(false);
 
     const onClipboardButtonClick = useCallback(() => {
       setLinkIsUsed(true);
       props.onClipboardButtonClick();
-    }, [props]);
+    }, [props, setLinkIsUsed]);
 
     const onLinkClick = useCallback(() => {
       setLinkIsUsed(true);
-    }, []);
+    }, [setLinkIsUsed]);
 
     useEffect(() => {
       if (!props.isOpen) {
         setLinkIsUsed(false);
       }
-    }, [props.isOpen]);
+    }, [props.isOpen, setLinkIsUsed]);
 
     return (
       <DialogWithMaxWidth

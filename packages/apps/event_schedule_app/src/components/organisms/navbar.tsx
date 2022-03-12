@@ -1,4 +1,5 @@
 import type { PopperModifiers } from '@blueprintjs/core';
+// eslint-disable-next-line import/no-deprecated
 import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';

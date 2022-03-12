@@ -1,6 +1,6 @@
 import type { Weight } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memoNamed, useState } from '@noshiro/react-utils';
+import { useCallback, useEffect, useMemo } from 'react';
 import { weightNumericInputConfig } from '../../constants';
 import { clampAndRoundAnswerWeight } from '../../functions';
 import { NumericInputView } from '../bp';
@@ -20,7 +20,7 @@ const sanitizeValue = (value: number): Weight =>
 export const WeightNumericInput = memoNamed<Props>(
   'WeightNumericInput',
   ({ weight: valueFromProps, onWeightChange: onValueChange }) => {
-    const [valueStr, setValueStr] = useState<string>('');
+    const { state: valueStr, setState: setValueStr } = useState<string>('');
 
     const valueParsed = useMemo<number | undefined>(() => {
       const res = parseFloat(valueStr);
@@ -30,14 +30,14 @@ export const WeightNumericInput = memoNamed<Props>(
 
     useEffect(() => {
       setValueStr(valueFromProps.toString());
-    }, [valueFromProps]);
+    }, [valueFromProps, setValueStr]);
 
     const valueChangeHandler = useCallback(
       (nextValue: Weight) => {
         setValueStr(nextValue.toString());
         onValueChange(nextValue);
       },
-      [onValueChange]
+      [setValueStr, onValueChange]
     );
 
     const onInputBlur = useCallback(() => {

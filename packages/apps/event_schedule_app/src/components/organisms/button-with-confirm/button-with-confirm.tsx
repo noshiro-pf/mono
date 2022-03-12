@@ -1,5 +1,5 @@
 import type { IconName, Intent } from '@blueprintjs/core';
-import { memoNamed, useAlive, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useAlive, useBoolState } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 import { createToaster, showToast } from '../../../functions';
 import { ButtonNowrapStyled } from '../../bp';
@@ -36,7 +36,11 @@ export const ButtonWithConfirm = memoNamed<Props>(
     dialogConfig,
     toastConfig,
   }) => {
-    const [isOpen, handleOpen, handleClose] = useBooleanState(false);
+    const {
+      state: isOpen,
+      setTrue: handleOpen,
+      setFalse: handleClose,
+    } = useBoolState(false);
 
     const alive = useAlive();
     const onConfirm = useCallback(() => {

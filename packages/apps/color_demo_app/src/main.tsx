@@ -1,14 +1,13 @@
 import { Paper } from '@material-ui/core';
 import { MuiTabs } from '@noshiro/react-material-ui-utils';
-import { ComponentSwitcher, memoNamed } from '@noshiro/react-utils';
-import { useState } from 'react';
+import { ComponentSwitcher, memoNamed, useState } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { LuminanceVisualizer, TextColorContrastTable } from './components';
 
 const labels = ['luminance', 'text-color'];
 
 export const Main = memoNamed('Main', () => {
-  const [tabIndex, setTabIndex] = useState(0);
+  const { state: tabIndex, setState: setTabIndex } = useState(0);
   return (
     <Root>
       <H1>{'Color demo'}</H1>

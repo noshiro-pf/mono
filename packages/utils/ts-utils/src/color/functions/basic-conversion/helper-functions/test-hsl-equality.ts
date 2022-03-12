@@ -10,8 +10,8 @@ export const testHslEquality = (
   test(testname, () => {
     const [h1, s1, l1] = hsl1;
     const [h2, s2, l2] = hsl2;
-    expect(dist(h1, h2) < epsilon).toBe(true);
-    expect(dist(s1, s2) < epsilon).toBe(true);
-    expect(dist(l1, l2) < epsilon).toBe(true);
+    expect(dist(h1, h2)).toBeLessThan(epsilon);
+    expect(dist(s1, s2)).toBeLessThan(epsilon);
+    expect(dist(l1, l2)).toBeLessThan(epsilon);
   });
 };

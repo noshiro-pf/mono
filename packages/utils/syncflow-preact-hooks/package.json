@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@noshiro/syncflow": "*",
+    "@noshiro/ts-utils": "*",
     "preact": "^10.4.7"
   }
 }

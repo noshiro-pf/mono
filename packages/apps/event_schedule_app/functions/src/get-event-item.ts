@@ -1,13 +1,12 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import * as admin from 'firebase-admin';
+import { firestore } from 'firebase-admin';
 import { fillEventScheduleWithCheck } from './type-check';
 
 export const getEventItem = async (
   eventId: string
 ): Promise<EventSchedule | undefined> => {
-  const res = await admin
-    .firestore()
+  const res = await firestore()
     .collection(firestorePaths.events)
     .doc(eventId)
     .get();

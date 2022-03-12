@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@noshiro/syncflow-preact-hooks": "*",
-    "@noshiro/tiny-router-observable": "*"
+    "@noshiro/tiny-router-observable": "*",
+    "preact": "^10.4.7"
   }
 }

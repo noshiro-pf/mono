@@ -1,6 +1,6 @@
 import type { Answer } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
-import * as functions from 'firebase-functions';
+import { logger } from 'firebase-functions';
 import {
   createMailBodyForAnswerDelete,
   createMailBodyForNewAnswer,
@@ -24,21 +24,21 @@ export const notifyOnAnswerChangeBody = async ({
   const eventItem = await getEventItem(eventId);
 
   if (eventItem === undefined) {
-    functions.logger.log(`eventItem for id = "${eventId}" not found.`);
+    logger.log(`eventItem for id = "${eventId}" not found.`);
     return;
   }
   if (eventItem.notificationSettings === 'none') {
-    functions.logger.log('skipped because eventItem.notification === "none".');
+    logger.log('skipped because eventItem.notification === "none".');
     return;
   }
   if (!eventItem.notificationSettings.notifyOnAnswerChange) {
-    functions.logger.log(
+    logger.log(
       'skipped because eventItem.notificationSettings.notifyOnAnswerChange is empty.'
     );
     return;
   }
   if (eventItem.notificationSettings.email === '') {
-    functions.logger.log(
+    logger.log(
       'skipped because eventItem.notificationSettings.email is empty.'
     );
     return;
@@ -48,7 +48,7 @@ export const notifyOnAnswerChangeBody = async ({
     eventItem.answerDeadline !== 'none' &&
     compareYmdhm(eventItem.answerDeadline, now()) <= 0
   ) {
-    functions.logger.log(
+    logger.log(
       'skipped because eventItem.useAnswerDeadline is true and answerDeadline overed.'
     );
     return; // skip if answerDeadline overed
@@ -57,7 +57,7 @@ export const notifyOnAnswerChangeBody = async ({
   switch (eventType) {
     case 'create':
       if (answerItemAfter === undefined) {
-        functions.logger.log('skipped because answerItemAfter is undefined');
+        logger.log('skipped because answerItemAfter is undefined');
         return;
       }
       await sendEmail(
@@ -73,7 +73,7 @@ export const notifyOnAnswerChangeBody = async ({
       break;
     case 'delete':
       if (answerItemBefore === undefined) {
-        functions.logger.log('skipped because answerItemBefore is undefined');
+        logger.log('skipped because answerItemBefore is undefined');
         return;
       }
       await sendEmail(
@@ -89,7 +89,7 @@ export const notifyOnAnswerChangeBody = async ({
       break;
     case 'update':
       if (answerItemBefore === undefined || answerItemAfter === undefined) {
-        functions.logger.log(
+        logger.log(
           'skipped because answerItemBefore or answerItemBefore is undefined'
         );
         return;

@@ -1,4 +1,4 @@
-import { memoNamed, useBooleanState } from '@noshiro/react-utils';
+import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
@@ -44,7 +44,11 @@ type Props = Readonly<{
 export const ImgWithPreview = memoNamed<Props>(
   'ImgWithPreview',
   ({ previewImgSrc, fullImgSrc, alt = '' }: Props) => {
-    const [loaded, onLoad, onLoadStart] = useBooleanState(false);
+    const {
+      state: loaded,
+      setTrue: onLoad,
+      setFalse: onLoadStart,
+    } = useBoolState(false);
 
     const imgStyle = useMemo<CSSProperties>(
       () => ({ opacity: loaded ? 1 : 0 }),

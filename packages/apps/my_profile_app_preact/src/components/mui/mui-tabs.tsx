@@ -1,10 +1,10 @@
 import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
+import { memoNamed, useState } from '@noshiro/preact-utils';
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
 import { IList } from '@noshiro/ts-utils';
 import type { ComponentChildren } from 'preact';
 import { useMedia } from 'preact-media-hook';
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo } from 'preact/hooks';
 import { mediaQueries } from '../../constants';
 
 type Props = Readonly<{
@@ -25,7 +25,9 @@ export const MuiTabs = memoNamed<Props>(
 
     const tabWidthPx = mobile ? tabWidthSmallPx : tabWidthMediumPx;
 
-    const [tabWidthList, setTabWidthList] = useState<readonly number[]>([]);
+    const { state: tabWidthList, updateState: updateTabWidthList } = useState<
+      readonly number[]
+    >([]);
 
     const tabWidthListWithDefault = useMemo(
       () => labels.map((_, index) => tabWidthList[index] ?? tabWidthPx),
@@ -55,14 +57,14 @@ export const MuiTabs = memoNamed<Props>(
             tabIndexChange(index);
           },
           onResize: (width: number) => {
-            setTabWidthList((prev) => {
+            updateTabWidthList((prev) => {
               const next = [...prev];
               next[index] = width;
               return next;
             });
           },
         })),
-      [labels, tabIndexChange]
+      [labels, tabIndexChange, updateTabWidthList]
     );
 
     return (
