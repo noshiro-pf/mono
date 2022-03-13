@@ -146,7 +146,9 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     if (!this.has(key)) return this;
     const keyMapped = this._toKey(key);
     return ISetMapped.new(
-      Array.from(this._set).filter((k) => !Object.is(k, keyMapped)).map(this._fromKey),
+      Array.from(this._set)
+        .filter((k) => !Object.is(k, keyMapped))
+        .map(this._fromKey),
       this._toKey,
       this._fromKey
     );

@@ -114,7 +114,9 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       return IMap.new([...this._map, ituple(key, value)]);
     } else {
       return IMap.new(
-        Array.from(this._map, ([k, v]) => ituple(k, Object.is(k, key) ? value : v))
+        Array.from(this._map, ([k, v]) =>
+          ituple(k, Object.is(k, key) ? value : v)
+        )
       );
     }
   }
