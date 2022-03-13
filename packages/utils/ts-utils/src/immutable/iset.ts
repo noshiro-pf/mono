@@ -116,7 +116,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
 
   delete(key: K): ISet<K> {
     if (!this.has(key)) return this;
-    return ISet.new([...this._set].filter((k) => !Object.is(k, key)));
+    return ISet.new(Array.from(this._set).filter((k) => !Object.is(k, key)));
   }
 
   withMutations(
@@ -195,7 +195,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   toArray(): readonly K[] {
-    return [...this.values()];
+    return Array.from(this.values());
   }
 }
 

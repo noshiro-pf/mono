@@ -1,3 +1,4 @@
+/* eslint-disable promise/no-nesting */
 /* eslint-disable noshiro-custom/prefer-readonly-parameter-types */
 
 // This optional code is used to register a service worker.

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { pipe } from '../functional';
 import { ituple } from '../others';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -86,7 +87,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ) {
-    this._map = new Map([...iterable].map(([k, v]) => [toKey(k), v]));
+    this._map = new Map(Array.from(iterable, ([k, v]) => [toKey(k), v]));
     this._toKey = toKey;
     this._fromKey = fromKey;
   }
@@ -126,7 +127,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this._toKey(key);
 
     return IMapMapped.new(
-      [...this._map]
+      Array.from(this._map)
         .filter(([km]) => !Object.is(km, keyMapped))
         .map(([km, v]) => ituple(this._fromKey(km), v)),
       this._toKey,
@@ -147,7 +148,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       );
     } else {
       return IMapMapped.new(
-        [...this._map].map(([km, v]) =>
+        Array.from(this._map, ([km, v]) =>
           ituple(this._fromKey(km), Object.is(km, keyMapped) ? value : v)
         ),
         this._toKey,
@@ -163,14 +164,25 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this._toKey(key);
 
     return IMapMapped.new(
-      [...this._map]
-        .map(([km, v]) =>
-          ituple(km, Object.is(km, keyMapped) ? updater(curr) : v)
-        )
-        .map(([km, v]) => ituple(this._fromKey(km), v)),
+      Array.from(
+        this._map.entries(),
+        (keyValue) =>
+          pipe(keyValue)
+            .chain(([km, v]) =>
+              ituple(km, Object.is(km, keyMapped) ? updater(curr) : v)
+            )
+            .chain(([km, v]) => ituple(this._fromKey(km), v)).value
+      ),
       this._toKey,
       this._fromKey
     );
+    // return IMapMapped.new(
+    //   Array.from(this._map.entries(), ([km, v]) => ituple(this._fromKey(km), v))(
+    //     ([km, v]) => ituple(km, Object.is(km, keyMapped) ? updater(curr) : v)
+    //   ),
+    //   this._toKey,
+    //   this._fromKey
+    // );
   }
 
   withMutations(
@@ -199,7 +211,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       }
     }
     return IMapMapped.new<K, V, KM>(
-      [...result].map(([k, v]) => [this._fromKey(k), v]),
+      Array.from(result, ([k, v]) => [this._fromKey(k), v]),
       this._toKey,
       this._fromKey
     );
@@ -262,18 +274,18 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   toKeysArray(): readonly K[] {
-    return [...this.keys()];
+    return Array.from(this.keys());
   }
 
   toValuesArray(): readonly V[] {
-    return [...this.values()];
+    return Array.from(this.values());
   }
 
   toEntriesArray(): readonly (readonly [K, V])[] {
-    return [...this.entries()];
+    return Array.from(this.entries());
   }
 
   toArray(): readonly (readonly [K, V])[] {
-    return [...this.entries()];
+    return Array.from(this.entries());
   }
 }
