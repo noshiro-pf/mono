@@ -18,8 +18,26 @@ const enum Readonlyness {
   /** the type is mutable */
   Mutable = 2,
   /** the type is readonly */
-  Immutable = 3,
+  Readonly = 3,
 }
+
+export interface ReadonlynessOptions {
+  readonly treatMethodsAsReadonly?: boolean;
+}
+
+export const readonlynessOptionsSchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    treatMethodsAsReadonly: {
+      type: 'boolean',
+    },
+  },
+};
+
+export const readonlynessOptionsDefaults: ReadonlynessOptions = {
+  treatMethodsAsReadonly: false,
+};
 
 const checkTypeArguments = (
   checker: ts.TypeChecker,
@@ -31,7 +49,7 @@ const checkTypeArguments = (
   // - tuples require at least 1 type argument
   // - ReadonlyArray requires at least 1 type argument
   /* istanbul ignore if */ if (typeArguments.length === 0) {
-    return Readonlyness.Immutable;
+    return Readonlyness.Readonly;
   }
 
   // validate the element types are also readonly
@@ -46,7 +64,7 @@ const checkTypeArguments = (
   ) {
     return Readonlyness.Mutable;
   }
-  return Readonlyness.Immutable;
+  return Readonlyness.Readonly;
 };
 
 const isTypeReadonlyArrayOrTuple = (
@@ -87,7 +105,7 @@ const isTypeReadonlyObject = (
     const indexInfo = checker.getIndexInfoOfType(type, kind);
     if (indexInfo !== undefined) {
       return indexInfo.isReadonly
-        ? Readonlyness.Immutable
+        ? Readonlyness.Readonly
         : Readonlyness.Mutable;
     }
 
@@ -141,7 +159,7 @@ const isTypeReadonlyObject = (
     return isNumberIndexSigReadonly;
   }
 
-  return Readonlyness.Immutable;
+  return Readonlyness.Readonly;
 };
 
 // a helper function to ensure the seenTypes map is always passed down, except by the external caller
@@ -149,7 +167,7 @@ const isTypeReadonlyRecurser = (
   checker: ts.TypeChecker,
   type: ts.Type,
   seenTypes: Set<ts.Type>,
-): Readonlyness.Immutable | Readonlyness.Mutable => {
+): Readonlyness.Readonly | Readonlyness.Mutable => {
   if (type === undefined || type === null) {
     throw new Error("type shouldn't be nullable");
   }
@@ -160,7 +178,7 @@ const isTypeReadonlyRecurser = (
     return unionTypeParts(type)
       .filter((t) => !seenTypes.has(t))
       .every((t) => isTypeReadonlyRecurser(checker, t, seenTypes))
-      ? Readonlyness.Immutable
+      ? Readonlyness.Readonly
       : Readonlyness.Mutable;
   }
 
@@ -169,14 +187,14 @@ const isTypeReadonlyRecurser = (
     return intersectionTypeParts(type)
       .filter((t) => !seenTypes.has(t))
       .every((t) => isTypeReadonlyRecurser(checker, t, seenTypes))
-      ? Readonlyness.Immutable
+      ? Readonlyness.Readonly
       : Readonlyness.Mutable;
   }
 
   // all non-object, non-intersection types are readonly.
   // this should only be primitive types
   if (!isObjectType(type) && !isUnionOrIntersectionType(type)) {
-    return Readonlyness.Immutable;
+    return Readonlyness.Readonly;
   }
 
   // pure function types are readonly
@@ -184,7 +202,7 @@ const isTypeReadonlyRecurser = (
     type.getCallSignatures().length > 0 &&
     type.getProperties().length === 0
   ) {
-    return Readonlyness.Immutable;
+    return Readonlyness.Readonly;
   }
 
   // Array
@@ -238,4 +256,4 @@ export const isTypeReadonly = (
   checker: ts.TypeChecker,
   type: ts.Type,
 ): boolean =>
-  isTypeReadonlyRecurser(checker, type, new Set()) === Readonlyness.Immutable;
+  isTypeReadonlyRecurser(checker, type, new Set()) === Readonlyness.Readonly;
