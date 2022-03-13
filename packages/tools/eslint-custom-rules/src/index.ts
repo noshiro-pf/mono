@@ -1,7 +1,7 @@
 import {
   preferReadonlyParameterTypesRule,
   preferReadonlyParameterTypesRuleName,
-} from './rules/prefer-readonly-parameter-types';
+} from './rules/prefer-readonly-parameter-types-old';
 
 const thisPluginName = 'noshiro-custom';
 
