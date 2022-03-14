@@ -13,7 +13,7 @@
     "clean": "echo 'no clean script'",
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "echo 'no lint:fix script'",
     "setup": "echo 'no setup script'",
     "test": "echo 'no test script'"
   },

@@ -10,7 +10,7 @@
     "clean": "rimraf lib",
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "echo 'no lint:fix script'",
     "prebuild": "yarn clean",
     "setup": "echo 'no setup script'",
     "test": "echo 'no test script'"

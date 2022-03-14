@@ -9,7 +9,7 @@
     "convert": "node ./convert.js",
     "gi": "echo 'no gi script'",
     "lint": "echo 'no lint script'",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "echo 'no lint:fix script'",
     "marked": "marked",
     "setup": "echo 'no setup script'",
     "test": "echo 'no test script'"
