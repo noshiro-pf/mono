@@ -51,7 +51,6 @@ const eslintImportsRules = {
     'import/no-named-as-default': 'warn',
     'import/no-named-as-default-member': 'warn',
     'import/no-deprecated': 'warn',
-    'import/no-extraneous-dependencies': 'off',
     'import/no-extraneous-dependencies': [
       'warn',
       {
