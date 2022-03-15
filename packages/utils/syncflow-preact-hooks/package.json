@@ -25,6 +25,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/preact-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
     "preact": "^10.4.7"

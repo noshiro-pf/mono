@@ -1,5 +1,7 @@
 'use strict';
 
+const { join } = require('path');
+
 // @ts-check
 
 /** @typedef { import("./rules-record").LinterRulesRecord } LinterRulesRecord */
@@ -50,12 +52,12 @@ const eslintImportsRules = {
     'import/no-named-as-default-member': 'warn',
     'import/no-deprecated': 'warn',
     'import/no-extraneous-dependencies': 'off',
-    // 'import/no-extraneous-dependencies': [
-    //   'warn',
-    //   {
-    //     packageDir: [join(__dirname, '../../../'), '.'],
-    //   },
-    // ],
+    'import/no-extraneous-dependencies': [
+      'warn',
+      {
+        packageDir: [join(__dirname, '../../../'), '.'],
+      },
+    ],
     'import/no-mutable-exports': 'warn',
     'import/no-unused-modules': 'warn',
   },
