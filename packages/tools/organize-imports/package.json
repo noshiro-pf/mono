@@ -8,15 +8,6 @@
   "bin": {
     "organizeimports": "lib/index.js"
   },
-  "scripts": {
-    "build": "echo 'no build script'",
-    "clean": "echo 'no clean script'",
-    "gi": "echo 'no gi script'",
-    "lint": "echo 'no lint script'",
-    "lint:fix": "yarn lint --fix",
-    "setup": "echo 'no setup script'",
-    "test": "echo 'no test script'"
-  },
   "dependencies": {
     "command-line-args": "^5.1.1",
     "command-line-usage": "^6.1.1",

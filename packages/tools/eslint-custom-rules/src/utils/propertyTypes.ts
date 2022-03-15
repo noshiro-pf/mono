@@ -1,4 +1,4 @@
-/* eslint-disable noshiro-custom/prefer-readonly-parameter-types */
+/* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 import ts from 'typescript';
 
 export function getTypeOfPropertyOfName(

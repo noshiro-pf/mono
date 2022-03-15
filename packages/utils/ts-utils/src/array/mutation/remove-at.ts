@@ -5,6 +5,6 @@ import { IList } from '../../immutable';
  * @return the deleted element
  */
 
-// eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+// // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const removeAt = <T>(array: T[], index: number): T | undefined =>
   !IList.indexIsInRange(array, index) ? undefined : array.splice(index, 1)[0];

@@ -1,9 +1,9 @@
 {
   "extends": "../config/tsconfig/tsconfig.base.json",
   "compilerOptions": {
-    "isolatedModules": false,
-    "module": "commonjs"
+    "module": "commonjs",
+    "allowJs": true,
+    "noEmit": true
   },
-  "include": ["./*.ts"],
-  "exclude": ["./*.js"]
+  "include": ["./**/*.js"]
 }

@@ -13,6 +13,7 @@ const eslintReactRules = {
   'react/jsx-curly-brace-presence': 'off',
   'react/jsx-max-depth': 'off',
   'react/jsx-boolean-value': 'off',
+  'react/hook-use-state': 'off',
 
   /* modified */
   'react/function-component-definition': 'warn',

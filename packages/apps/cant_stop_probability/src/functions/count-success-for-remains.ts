@@ -5,7 +5,7 @@ import { possibleTwoDiceSums } from './possible-two-dice-sums';
 
 // 踏破されていない列のいずれかが出る場合の数
 export const countSuccessForRemains = (
-  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   columnsAlive: ReadonlySet<TwoDiceSumValue>
 ): number => {
   let count = 0;

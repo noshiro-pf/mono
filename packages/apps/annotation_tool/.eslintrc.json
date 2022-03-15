@@ -4,6 +4,6 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "noshiro-custom/prefer-readonly-parameter-types": "off"
+    "@typescript-eslint/prefer-readonly-parameter-types": "off"
   }
 }

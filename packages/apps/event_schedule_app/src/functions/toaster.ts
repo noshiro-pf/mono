@@ -5,7 +5,7 @@ import { Toaster } from '@blueprintjs/core';
 export const createToaster = (): IToaster =>
   Toaster.create({ canEscapeKeyClear: true, position: 'top' });
 
-// eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const showToast = ({
   toast,
   message,

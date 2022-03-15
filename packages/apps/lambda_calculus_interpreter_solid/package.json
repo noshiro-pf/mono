@@ -4,18 +4,14 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "prebuild": "yarn clean:build",
-    "build": "echo 'build skipped'",
     "build:dev": "solid-scripts build",
     "clean": "run-s clean:**",
     "clean:build": "rimraf build",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
-    "gi": "echo 'no gi script'",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
-    "setup": "echo 'no setup script'",
+    "prebuild": "yarn clean:build",
     "start": "solid-scripts start",
-    "test": "echo 'no test script'",
     "testw": "solid-scripts test"
   },
   "browserslist": [

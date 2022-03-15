@@ -13,6 +13,10 @@ $  yarn add --dev -W \
       eslint-plugin-import@latest  \
       eslint-plugin-react@latest  \
       eslint-plugin-react-hooks@latest  \
+      eslint-plugin-jest@latest  \
+      eslint-plugin-array-func@latest  \
+      eslint-import-resolver-typescript@latest  \
+      eslint-plugin-promise@latest  \
       eslint-plugin-total-functions@latest
 ```
 

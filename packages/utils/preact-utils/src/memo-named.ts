@@ -3,7 +3,7 @@ import { memo } from 'preact/compat';
 
 export const memoNamed = <Props>(
   displayName: string,
-  // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   fc: FunctionComponent<Readonly<Props>>
 ): FunctionComponent<Readonly<Props>> => {
   const memoizedComponent = memo(fc);

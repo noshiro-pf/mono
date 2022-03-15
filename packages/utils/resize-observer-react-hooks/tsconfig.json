@@ -1,5 +1,5 @@
 {
   "extends": "../../../config/tsconfig/tsconfig.base.nolib.json",
-  "include": ["./src", "./scripts", "./config"],
+  "include": ["./src"],
   "exclude": ["node_modules", "esm"]
 }

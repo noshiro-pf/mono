@@ -16,7 +16,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
 ): RefObject<E> => {
   const rootResizeObserver = useMemo(
     () =>
-      // eslint-disable-next-line noshiro-custom/prefer-readonly-parameter-types
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       new CustomResizeObserver((entries) => {
         if (IList.isNonEmpty(entries)) {
           setSize(entries[0].contentRect);

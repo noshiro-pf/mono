@@ -23,7 +23,6 @@
     "gi": "yarn _script_genindex ./src --min-depth 1",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "yarn lint --fix",
-    "setup": "echo 'no setup script'",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "testw": "yarn test --watch"
   },
