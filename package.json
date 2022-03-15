@@ -8,7 +8,8 @@
   "scripts": {
     "ws-run-base": "wsrun --exclude-missing --fast-exit --prefix",
     "ws-run-parallel": "yarn ws-run-base --parallel",
-    "ws-run-stages": "yarn ws-run-base --serial --ifDependency",
+    "ws-run-stages": "yarn ws-run-base --stages --ifDependency",
+    "ws-run-serial": "yarn ws-run-base --serial --ifDependency",
     "build:all": "yarn ws-run-stages build",
     "build:apps": "scripts/build_apps.sh",
     "build:utils": "scripts/build_utils.sh",
@@ -24,17 +25,18 @@
     "create:util": "scripts/create_new_util.sh",
     "gi:all": "yarn ws-run-parallel gi",
     "fmt:all": "prettier --write . > /dev/null",
-    "lint:all": "yarn ws-run-stages lint",
+    "lint:all": "yarn ws-run-serial lint",
     "lint:apps": "scripts/lint_apps.sh",
     "lint:utils": "scripts/lint_utils.sh",
-    "lint:fix:all": "yarn ws-run-stages lint:fix",
+    "lint:fix:all": "yarn ws-run-serial lint:fix",
     "setup": "run-s build:utils setup:sub",
     "setup:sub": "yarn ws-run-stages --exclude-missing setup",
-    "test:all": "yarn ws-run-stages test",
+    "test:all": "yarn ws-run-serial test",
     "type-check:root": "run-s type-check:root:scripts type-check:root:configs",
     "type-check:root:scripts": "tsc --project scripts/tsconfig.json",
     "type-check:root:configs": "tsc --project config/tsconfig.json",
-    "pub:all": "scripts/publish.sh"
+    "pub:all": "scripts/publish.sh",
+    "aiueo": "yarn workspace @noshiro/stdlib test"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.3",
