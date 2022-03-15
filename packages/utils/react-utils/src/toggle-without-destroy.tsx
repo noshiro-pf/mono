@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { memoNamed } from './memo-named';
 
-type Props = Readonly<{
+type Props = DeepReadonly<{
   condition: boolean;
   childTrue: ReactNode;
   childFalse: ReactNode;

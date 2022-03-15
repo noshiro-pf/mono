@@ -38,6 +38,7 @@ export const pickupHighContrastHues = (
   const maxValue = IList.max(luminanceDiffAccumulated);
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
     if (value > y) {
+      // eslint-disable-next-line functional/immutable-data
       result[i] = x as Hue;
       [i, y] = [i + 1, (maxValue * (i + 1)) / n];
     }

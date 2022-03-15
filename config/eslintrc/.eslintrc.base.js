@@ -9,6 +9,7 @@ const {
   eslintImportsRules,
   eslintJestRules,
   // eslintNoshiroCustomRules,
+  eslintFunctionalRules,
   eslintRulesAll,
   typescriptEslintRules,
   eslintPromiseRules,
@@ -57,8 +58,9 @@ const config = {
     'plugin:import/react',
 
     /* functional, total-functions */
-    // 'plugin:functional/recommended',
     // 'plugin:functional/external-recommended',
+    // 'plugin:functional/recommended',
+    // 'plugin:functional/stylistic',
     // 'plugin:total-functions/recommended',
 
     /* jest */
@@ -82,7 +84,7 @@ const config = {
     'promise',
     // 'noshiro-custom',
     /* functional, total-functions */
-    // 'functional',
+    'functional',
     // 'total-functions',
   ],
   parser: '@typescript-eslint/parser',
@@ -118,6 +120,7 @@ const config = {
     ...eslintImportsRules.styleGuide,
     ...eslintJestRules,
     ...eslintPromiseRules,
+    ...eslintFunctionalRules,
     // ...eslintNoshiroCustomRules,
   },
   ignorePatterns: [...readGitignoreFiles({ cwd: __dirname }), '*.d.ts', '*.js'],

@@ -1,3 +1,5 @@
+/* eslint-disable functional/immutable-data */
+
 export const getImageElementFromUrl = (
   url: string
 ): Promise<HTMLImageElement> =>

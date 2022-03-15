@@ -1,3 +1,5 @@
+/* eslint-disable functional/no-method-signature */
+
 import { assertType } from './test-type';
 
 export type Bivariant<F extends (...args: readonly never[]) => unknown> = {

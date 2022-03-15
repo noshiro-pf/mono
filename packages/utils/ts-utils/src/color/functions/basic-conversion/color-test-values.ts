@@ -7,7 +7,7 @@ type TestColorObject = Readonly<{
 }>;
 
 // [values from google color picker](https://www.google.com/search?q=color+picker&oq=color+picker&aqs=chrome..69i57.1262j0j7&sourceid=chrome&ie=UTF-8)
-export const testColors: TestColorObject[] = [
+export const testColors: readonly TestColorObject[] = [
   {
     HEX: '#32a852',
     rgb: [50, 168, 82],

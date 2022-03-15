@@ -59,7 +59,7 @@ export const useRouterLinkClick = ({
   replace?: boolean;
   redirectFn: (path: string) => void;
   pushFn: (path: string) => void;
-}>): ((ev: DeepReadonly<MouseEvent>) => void) =>
+}>): ((ev: MouseEvent) => void) =>
   useCallback(
     (ev) => {
       const el = ev.target as HTMLAnchorElement;

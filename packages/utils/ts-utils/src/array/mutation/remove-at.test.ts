@@ -33,6 +33,7 @@ test('removeAt out of range case 1', () => {
 });
 
 test('removeAt out of range case 2', () => {
+  // eslint-disable-next-line functional/prefer-readonly-type
   const array: number[] = [];
   const index = 1;
   const result = removeAt(array, index);
