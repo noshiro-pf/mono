@@ -10,13 +10,11 @@
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "build": "yarn build:esm",
-    "prebuild:esm": "echo 'noop'",
     "build:esm": "tsc --project config/tsconfig.esm.json",
     "clean": "run-s clean:**",
     "clean:build:esm": "rimraf esm",
     "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
-    "gi": "echo 'no gi script'",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "yarn lint --fix",
     "test": "jest --config config/jest.config.json --passWithNoTests",

@@ -12,7 +12,6 @@
     "fb": "firebase",
     "firebase": "firebase",
     "get": "node src/get.js",
-    "gi": "echo 'no gi script'",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "yarn lint --fix",
     "logs": "firebase functions:log",
@@ -20,8 +19,7 @@
     "serve": "yarn build && firebase emulators:start --only functions",
     "setapikey": "firebase functions:config:set slack.apikey=",
     "shell": "yarn build && firebase functions:shell",
-    "start": "yarn shell",
-    "test": "echo 'no test script'"
+    "start": "yarn shell"
   },
   "dependencies": {
     "firebase-admin": "^9.4.1",

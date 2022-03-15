@@ -13,13 +13,7 @@
   ],
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
-    "build": "echo 'no build script'",
-    "clean": "echo 'no clean script'",
-    "fmt": "yarn _prettier .",
-    "gi": "echo 'no gi script'",
-    "lint": "echo 'no lint script'",
-    "lint:fix": "echo 'no lint:fix script'",
-    "test": "echo 'no test script'"
+    "fmt": "yarn _prettier ."
   },
   "config": {
     "root_dir": "../../.."

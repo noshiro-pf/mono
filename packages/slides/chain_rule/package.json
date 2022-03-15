@@ -13,11 +13,7 @@
     "deploy": "firebase deploy",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
-    "gi": "echo 'no gi script'",
-    "lint": "echo 'no lint script'",
-    "lint:fix": "echo 'no lint:fix script'",
     "start": "webpack serve --config config/webpack.dev.js",
-    "test": "echo 'no test script'",
     "watch": "webpack --watch"
   },
   "dependencies": {

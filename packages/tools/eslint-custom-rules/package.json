@@ -8,11 +8,7 @@
   "scripts": {
     "build_": "tsc --project tsconfig.json",
     "clean": "rimraf lib",
-    "gi": "echo 'no gi script'",
-    "lint": "echo 'no lint script'",
-    "lint:fix": "echo 'no lint:fix script'",
-    "prebuild": "yarn clean",
-    "test": "echo 'no test script'"
+    "prebuild": "yarn clean"
   },
   "dependencies": {
     "@typescript-eslint/experimental-utils": "^5.14.0",

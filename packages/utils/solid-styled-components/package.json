@@ -13,13 +13,6 @@
     "dist"
   ],
   "scripts": {
-    "build": "echo 'no build script'",
-    "clean": "echo 'no clean script'",
-    "fmt": "echo 'no fmt script'",
-    "gi": "echo 'no gi script'",
-    "lint": "echo 'no lint script'",
-    "lint:fix": "echo 'no lint:fix script'",
-    "test": "echo 'no test script'",
     "test:types": "tsc --project tsconfig.test.json"
   },
   "dependencies": {

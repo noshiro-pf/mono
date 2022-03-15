@@ -21,8 +21,7 @@
     "setconfig": "firebase functions:config:set",
     "shell": "yarn build && firebase functions:shell",
     "showlog": "firebase functions:log",
-    "start": "yarn shell",
-    "test": "echo 'no test script'"
+    "start": "yarn shell"
   },
   "config": {
     "root_dir": "../../../.."
