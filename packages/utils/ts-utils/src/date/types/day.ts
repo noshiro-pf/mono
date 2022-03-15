@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
-export type WeekDayEnum = number & (0 | 1 | 2 | 3 | 4 | 5 | 6);
+export type WeekDayEnum = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type WeekdaysNameEnum =
   | 'Sun'

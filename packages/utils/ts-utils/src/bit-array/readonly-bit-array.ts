@@ -15,7 +15,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
   private readonly _data: Uint8Array;
   private readonly _isInRange;
 
-  constructor(input: (0 | 1)[] | Uint8Array) {
+  constructor(input: Readonly<Uint8Array> | readonly (0 | 1)[]) {
     this._data = new Uint8Array(input);
     this._isInRange = isInRange(0, input.length - 1);
   }
@@ -63,7 +63,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
 }
 
 export const ReadonlyBitArray = (
-  input: (0 | 1)[] | Uint8Array
+  input: Readonly<Uint8Array> | readonly (0 | 1)[]
 ): ReadonlyBitArrayType => new CReadonlyBitArray(input) as ReadonlyBitArrayType;
 
 export const ReadonlyBitArrayFromStr = (bitStr: string): ReadonlyBitArrayType =>
