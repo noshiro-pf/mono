@@ -29,7 +29,7 @@
     "root_dir": "../../../.."
   },
   "dependencies": {
-    "@noshiro/event-schedule-app-shared": "5.0.1",
+    "@noshiro/event-schedule-app-shared": "5.0.2",
     "@noshiro/fast-deep-equal": "1.0.1",
     "@noshiro/ts-utils": "1.2.0",
     "firebase-admin": "^9.12.0",

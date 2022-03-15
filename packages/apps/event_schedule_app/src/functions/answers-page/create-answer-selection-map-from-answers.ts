@@ -2,9 +2,9 @@ import type {
   Answer,
   AnswerIconIdWithNone,
   AnswerIconPoint,
-  AnswerTableCellPosition,
 } from '@noshiro/event-schedule-app-shared';
 import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
+import type { AnswerTableCellPosition } from '../../types';
 import type { AnswerSelectionMapKey } from '../map-key';
 import { answerSelectionFromMapKey, answerSelectionToMapKey } from '../map-key';
 

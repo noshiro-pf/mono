@@ -1,7 +1,7 @@
-import type { EventScheduleValidation } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import styled from 'styled-components';
 import { dict, errorFontColor } from '../../constants';
+import type { EventScheduleValidation } from '../../types';
 import { Description } from '../atoms';
 
 const dc = dict.eventSettingsPage;

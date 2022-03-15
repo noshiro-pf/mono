@@ -1,5 +1,7 @@
-import type { DatetimeRange } from '../../../v4';
-import type { AnswerId } from '../named-primitive-types';
+import type {
+  AnswerId,
+  DatetimeRange,
+} from '@noshiro/event-schedule-app-shared';
 
 export type AnswerTableCellPosition = Readonly<{
   answerId: AnswerId;
