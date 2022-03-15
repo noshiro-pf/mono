@@ -24,6 +24,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/preact-utils": "*",
     "@noshiro/ts-utils": "*",
     "preact": "^10.4.7",
     "resize-observer": "^1.0.0"
