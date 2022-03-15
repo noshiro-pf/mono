@@ -134,6 +134,7 @@ describe('IList.head', () => {
     });
   }
   {
+    // eslint-disable-next-line functional/prefer-readonly-type
     const xs: number[] = [1, 2, 3];
     const head = IList.head(xs);
 
@@ -178,6 +179,7 @@ describe('IList.last', () => {
     });
   }
   {
+    // eslint-disable-next-line functional/prefer-readonly-type
     const xs: number[] = [1, 2, 3];
     const last = IList.last(xs);
 
@@ -702,9 +704,9 @@ describe('IList.partition', () => {
     assertType<
       TypeEq<
         typeof result,
-        DeepReadonly<
-          ArrayOfLength<4, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>[]
-        >
+        readonly Readonly<
+          ArrayOfLength<4, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+        >[]
       >
     >();
 
@@ -723,9 +725,9 @@ describe('IList.partition', () => {
     assertType<
       TypeEq<
         typeof result,
-        DeepReadonly<
-          ArrayOfLength<3, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>[]
-        >
+        readonly Readonly<
+          ArrayOfLength<3, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+        >[]
       >
     >();
 

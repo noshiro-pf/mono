@@ -1,6 +1,6 @@
 import { IList } from '../../immutable';
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,functional/prefer-readonly-type
 export const swap = <T>(array: T[], index1: number, index2: number): void => {
   if (
     IList.indexIsInRange(array, index1) &&

@@ -50,7 +50,7 @@ const AbsoluteWrapper = styled.div`
  * L + W * l = 0  =>  L = -W * l
  */
 
-type Props = Readonly<{
+type Props = DeepReadonly<{
   children: ReactNode;
   cropRectRelative: Rect;
 }>;

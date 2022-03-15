@@ -5,7 +5,7 @@ export type ReadonlyBitArrayType = Readonly<{
   get: (at: number) => 0 | 1 | undefined;
 
   values: () => IterableIterator<0 | 1>;
-  entries: () => IterableIterator<[number, 0 | 1]>;
+  entries: () => IterableIterator<readonly [number, 0 | 1]>;
   map: (fn: (value: 0 | 1, index: number) => 0 | 1) => ReadonlyBitArrayType;
   forEach: (fn: (value: 0 | 1, index: number) => void) => void;
   toString: () => string;
@@ -39,7 +39,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     }
   }
 
-  *entries(): IterableIterator<[number, 0 | 1]> {
+  *entries(): IterableIterator<readonly [number, 0 | 1]> {
     let idx = 0;
     while (idx < this.size) {
       yield [idx, this._data[idx] === 0 ? 0 : 1];

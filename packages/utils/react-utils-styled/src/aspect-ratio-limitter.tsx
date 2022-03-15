@@ -13,7 +13,7 @@ const Root = styled.div`
   justify-content: center;
 `;
 
-type Props = Readonly<{
+type Props = DeepReadonly<{
   children: ReactNode;
   maxWidthPerHeight?: number;
   minWidthPerHeight?: number;

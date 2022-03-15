@@ -1,3 +1,5 @@
+/* eslint-disable functional/immutable-data */
+
 import type { RectSize } from '../types';
 import { getImageSizeFromImageElement } from './get-image-size-from-img-element';
 

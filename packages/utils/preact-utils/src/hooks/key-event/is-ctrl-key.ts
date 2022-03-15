@@ -1,6 +1,6 @@
 import { getPlatform } from '@noshiro/ts-utils';
 
-export const isCtrlKey = (keyEvent: Readonly<KeyboardEvent>): boolean => {
+export const isCtrlKey = (keyEvent: KeyboardEvent): boolean => {
   const os = getPlatform();
   switch (os) {
     case 'mac':
