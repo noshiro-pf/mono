@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/deploy_profile_app.yml
+      - packages/utils/stdlib/**
       - packages/utils/ts-utils/**
       - packages/utils/preact-utils/**
       - packages/utils/syncflow/**
@@ -38,10 +39,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: setup
-        run: |
-          yarn setup:root
-          yarn setup:custom-eslint
-          yarn workspace @noshiro/my-profile-app-preact setup
+        run: yarn workspace @noshiro/my-profile-app-preact setup
 
       - name: build dependencies
         run: |
