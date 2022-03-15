@@ -28,7 +28,7 @@
     "lint:apps": "scripts/lint_apps.sh",
     "lint:utils": "scripts/lint_utils.sh",
     "lint:fix:all": "yarn ws-run-stages lint:fix",
-    "setup": "runs build:utils setup:sub",
+    "setup": "run-s build:utils setup:sub",
     "setup:sub": "yarn ws-run-stages --exclude-missing setup",
     "test:all": "yarn ws-run-stages test",
     "type-check:root": "run-s type-check:root:scripts type-check:root:configs",
