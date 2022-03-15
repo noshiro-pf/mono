@@ -7,7 +7,6 @@
     "build:dev": "solid-scripts build",
     "clean": "run-s clean:**",
     "clean:build": "rimraf build",
-    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "yarn lint --fix",
     "prebuild": "yarn clean:build",
