@@ -25,18 +25,19 @@
     "create:util": "scripts/create_new_util.sh",
     "gi:all": "yarn ws-run-parallel gi",
     "fmt:all": "prettier --write . > /dev/null",
-    "lint:all": "yarn ws-run-serial lint",
+    "lint:all": "run-s lint:sub lint:deps:all",
+    "lint:sub": "yarn ws-run-serial lint",
     "lint:apps": "node scripts/lint-apps.js",
     "lint:utils": "node scripts/lint-utils.js",
     "lint:fix:all": "yarn ws-run-serial lint:fix",
+    "lint:deps:all": "yarn ws-run-serial lint:deps",
     "setup": "run-s build:utils setup:sub",
     "setup:sub": "yarn ws-run-stages --exclude-missing setup",
     "test:all": "yarn ws-run-serial test",
     "type-check:root": "run-s type-check:root:scripts type-check:root:configs",
     "type-check:root:scripts": "tsc --project scripts/tsconfig.json",
     "type-check:root:configs": "tsc --project config/tsconfig.json",
-    "pub:all": "scripts/publish.sh",
-    "aiueo": "yarn workspace @noshiro/stdlib test"
+    "pub:all": "scripts/publish.sh"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.3",

@@ -15,6 +15,7 @@
     "getconfig": "firebase functions:config:get",
     "gi": "yarn _script_genindex ./src --min-depth 1 --ignore assets",
     "lint": "eslint src/ --ext .ts",
+    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "logs": "firebase functions:log",
     "serve": "yarn build && firebase emulators:start --only functions",

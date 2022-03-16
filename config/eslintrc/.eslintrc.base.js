@@ -4,7 +4,6 @@
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 
-const { readGitignoreFiles } = require('eslint-gitignore');
 const {
   eslintImportsRules,
   eslintJestRules,
@@ -47,7 +46,7 @@ const {
 // quotes: ['error', 'single', { avoidEscape: true }],
 
 /** @type {LinterConfig} */
-const config = {
+const defaultConfig = {
   extends: [
     /* recommended */
     'eslint:all',
@@ -76,42 +75,9 @@ const config = {
 
     /* prettier */
     'prettier', // turn off rules
+
+    './.eslintrc.common-settings.js',
   ],
-  root: true,
-  env: { browser: true, node: true, es6: true, 'jest/globals': true },
-  plugins: [
-    '@typescript-eslint',
-    'import',
-    'jest',
-    'array-func',
-    'promise',
-    // 'noshiro-custom',
-    /* functional, total-functions */
-    'functional',
-    // 'total-functions',
-  ],
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 2020,
-    ecmaFeatures: {
-      modules: true,
-      impliedStrict: true,
-      jsx: true,
-    },
-    sourceType: 'module',
-    project: 'config/tsconfig/tsconfig.eslint.json',
-  },
-  settings: {
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
-    },
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
-        project: 'packages/**/tsconfig.json',
-      },
-    },
-  },
   rules: {
     ...eslintRulesAll.modifiedRules,
     ...eslintRulesAll.disabledRules,
@@ -126,7 +92,6 @@ const config = {
     ...eslintFunctionalRules,
     // ...eslintNoshiroCustomRules,
   },
-  ignorePatterns: [...readGitignoreFiles({ cwd: __dirname }), '*.d.ts', '*.js'],
 };
 
-module.exports = config;
+module.exports = defaultConfig;

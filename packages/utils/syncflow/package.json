@@ -32,6 +32,7 @@
     "gi:src": "yarn _script_genindex ./src --min-depth 1",
     "gi:test": "yarn _script_genindex ./test/cases",
     "lint": "eslint \"./{src,test}/**/*\" --ext .ts",
+    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "pub": "yarn publish --no-git-tag-version --access=public",
     "start": "node cjs/test/preview-main.js",
