@@ -12,7 +12,6 @@
     "clean": "run-s clean:**",
     "clean:build": "rimraf ${npm_package_config_build_dir}",
     "clean:cache": "rimraf .firebase",
-    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "predeploy": "yarn build",
     "deploy": "firebase deploy",
     "fb:init": "firebase init",

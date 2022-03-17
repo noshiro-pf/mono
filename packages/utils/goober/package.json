@@ -10,7 +10,6 @@
   "types": "goober.d.ts",
   "typings": "./goober.d.ts",
   "scripts": {
-    "clean": "rimraf dist",
     "fmt": "prettier . --write"
   },
   "peerDependencies": {

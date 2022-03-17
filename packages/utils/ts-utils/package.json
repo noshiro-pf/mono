@@ -18,7 +18,6 @@
     "clean": "run-s clean:**",
     "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
-    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
     "genpipetypedef": "node scripts/gen_pipe_type_def ${npm_package_config_pipe_max_length} ${npm_package_config_pipe_ts_path}",
     "postgenpipetypedef": "yarn _prettier ${npm_package_config_pipe_ts_path}",

@@ -17,7 +17,6 @@
     "clean": "run-s clean:**",
     "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
-    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "yarn lint --fix",

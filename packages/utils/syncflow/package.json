@@ -27,7 +27,6 @@
     "clean": "run-s clean:**",
     "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
-    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fmt": "yarn _prettier .",
     "gi": "run-s gi:*",
     "gi:src": "yarn _script_genindex ./src --min-depth 1",

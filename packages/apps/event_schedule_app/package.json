@@ -12,7 +12,6 @@
     "clean": "run-s clean:**",
     "clean:build": "rimraf ${npm_package_config_build_dir}",
     "clean:cache": "rimraf .firebase",
-    "clean:config": "rimraf config/**/*.js scripts/**/*.js",
     "fb": "firebase",
     "fb:deploy": "firebase deploy",
     "fb:deploy:functions": "firebase deploy --only functions",
