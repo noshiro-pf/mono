@@ -38,18 +38,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: setup
-        run: yarn workspace @noshiro/my-profile-app-preact setup
-
       - name: build dependencies
-        run: |
-          yarn workspace @noshiro/ts-utils build
-          yarn workspace @noshiro/preact-utils build
-          yarn workspace @noshiro/syncflow build
-          yarn workspace @noshiro/syncflow-preact-hooks build
-          yarn workspace @noshiro/tiny-router-observable build
-          yarn workspace @noshiro/tiny-router-preact-hooks build
-          yarn workspace @noshiro/resize-observer-preact-hooks build
+        run: yarn ws-run-stages  --recursive -p @noshiro/my-profile-app-preact -c build
 
       - name: lint
         run: yarn workspace @noshiro/my-profile-app-preact lint
