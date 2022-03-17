@@ -4,12 +4,11 @@
 2. Update packages
 
 ```bash
-$  yarn add --dev -W \
-      @types/eslint@latest \
+$  yarn add --dev -W  \
+      @types/eslint@latest  \
       eslint@latest  \
       eslint-config-preact@latest  \
       eslint-gitignore@latest  \
-      eslint-plugin-functional@latest  \
       eslint-plugin-import@latest  \
       eslint-plugin-react@latest  \
       eslint-plugin-react-hooks@latest  \
@@ -24,11 +23,13 @@ $  yarn add --dev -W \
 
 1.  Check [CHANGELOG](https://github.com/typescript-eslint/typescript-eslint/blob/master/CHANGELOG.md).
 2.  Update packages ([typescript-eslint Installation](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md))
+    -   [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional)
 
 ```bash
-$  yarn add --dev -W \
-      @typescript-eslint/parser@latest \
-      @typescript-eslint/eslint-plugin@latest
+$  yarn add --dev -W  \
+      @typescript-eslint/parser@latest  \
+      @typescript-eslint/eslint-plugin@latest  \
+      eslint-plugin-functional@latest
 ```
 
 3.  Check rules diff https://github.com/typescript-eslint/typescript-eslint/compare/v4.7.0...v4.22.0?short_path=cc13116#diff-cc1311685cd745ae75aac85016dd9090f2193192130da4f84bfed0b9d0df00c8 and fix config
@@ -39,10 +40,10 @@ $  yarn add --dev -W \
 2.  Update packages
 
 ```bash
-$  yarn add --dev -W \
-      eslint-config-prettier@latest \
-      prettier@latest \
-      prettier-plugin-organize-imports@latest \
+$  yarn add --dev -W  \
+      eslint-config-prettier@latest  \
+      prettier@latest  \
+      prettier-plugin-organize-imports@latest  \
       prettier-plugin-packagejson@latest
 ```
 

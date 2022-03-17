@@ -14,7 +14,7 @@ const restrictedImports = [
     message: 'use memoNamed from @noshiro/react-utils instead.',
   },
   {
-    name: 'preact',
+    name: 'preact/compat',
     importNames: ['memo'],
     message: 'use memoNamed from @noshiro/preact-utils instead.',
   },
