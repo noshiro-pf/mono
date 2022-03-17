@@ -13,6 +13,7 @@
     "firebase": "firebase",
     "get": "node src/get.js",
     "lint": "eslint src/ --ext .ts",
+    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "logs": "firebase functions:log",
     "seeconfig": "firebase functions:config:get",
@@ -20,6 +21,9 @@
     "setapikey": "firebase functions:config:set slack.apikey=",
     "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell"
+  },
+  "config": {
+    "root_dir": "../../../.."
   },
   "dependencies": {
     "firebase-admin": "^9.4.1",

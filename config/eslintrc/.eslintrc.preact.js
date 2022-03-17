@@ -4,6 +4,7 @@
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 
+const { plugins } = require('./eslint-plugins');
 const { eslintReactRules } = require('./eslintrc-base');
 
 /** @type {LinterConfig} */
@@ -26,7 +27,7 @@ const config = {
     'plugin:react-hooks/recommended',
     './.eslintrc.base.js',
   ],
-  plugins: ['react', 'react-hooks'],
+  plugins: [plugins.react, plugins.reactHooks],
   rules: eslintReactRules,
 };
 

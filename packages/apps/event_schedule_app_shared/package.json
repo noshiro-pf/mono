@@ -21,6 +21,7 @@
     "fmt": "yarn _prettier .",
     "gi": "yarn _script_genindex ./src  --min-depth 2",
     "lint": "eslint src/ --ext .ts",
+    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "pub": "yarn publish --no-git-tag-version --access=public",
     "test": "jest --config config/jest.config.json --passWithNoTests",
