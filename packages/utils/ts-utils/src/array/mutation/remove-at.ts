@@ -5,7 +5,8 @@ import { IList } from '../../immutable';
  * @return the deleted element
  */
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,functional/prefer-readonly-type
-export const removeAt = <T>(array: T[], index: number): T | undefined =>
-  // eslint-disable-next-line functional/immutable-data
-  !IList.indexIsInRange(array, index) ? undefined : array.splice(index, 1)[0];
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+export const removeAt = <T>(mut_array: T[], index: number): T | undefined =>
+  !IList.indexIsInRange(mut_array, index)
+    ? undefined
+    : mut_array.splice(index, 1)[0];

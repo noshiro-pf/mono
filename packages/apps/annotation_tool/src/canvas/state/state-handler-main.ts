@@ -37,15 +37,15 @@ export const canvasAppStateHandlerGenerator = (
   canvasStyles: AnnotationCanvasStyle,
   newBboxColor: Readonly<{ border: Rgba; face: Rgba }>
 ): CanvasAppStateHandler =>
-  function canvasAppStateHandler(state, action) {
+  function canvasAppStateHandler(mut_state, action) {
     switch (action.type) {
       case 'pointerMove':
-        onPointerMove(state, action.pointerPos, pixiApp);
+        onPointerMove(mut_state, action.pointerPos, pixiApp);
         break;
 
       case 'pointerUp':
         onPointerUpOnBackground(
-          state,
+          mut_state,
           idMaker,
           newBboxColor,
           canvasStyles,
@@ -55,13 +55,13 @@ export const canvasAppStateHandlerGenerator = (
         break;
 
       case 'backgroundPointerDown':
-        state.grabbingObject = { type: 'background' };
-        onPointerDown(state);
-        onPointerDownOnBackground(state, canvasStyles, pixiApp);
+        mut_state.grabbingObject = { type: 'background' };
+        onPointerDown(mut_state);
+        onPointerDownOnBackground(mut_state, canvasStyles, pixiApp);
         break;
 
       case 'bboxFacePointerOver':
-        if (state.grabbingObject.type !== undefined) return;
+        if (mut_state.grabbingObject.type !== undefined) return;
         // highlight on
         turnOnHighlight(action.pixiBbox);
         break;
@@ -71,8 +71,8 @@ export const canvasAppStateHandlerGenerator = (
         break;
 
       case 'bboxFacePointerDown':
-        onPointerDown(state);
-        state.grabbingObject = {
+        onPointerDown(mut_state);
+        mut_state.grabbingObject = {
           type: 'bbox-face',
           pixiBbox: action.pixiBbox,
           rectPrevious: action.pixiBbox.rect,
@@ -80,8 +80,8 @@ export const canvasAppStateHandlerGenerator = (
         break;
 
       case 'bboxPointPointerDown':
-        onPointerDown(state);
-        state.grabbingObject = {
+        onPointerDown(mut_state);
+        mut_state.grabbingObject = {
           type: 'bbox-point',
           pixiBbox: action.pixiBbox,
           rectPrevious: action.pixiBbox.rect,

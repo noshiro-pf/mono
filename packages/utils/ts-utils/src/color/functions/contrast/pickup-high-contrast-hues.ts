@@ -31,18 +31,17 @@ export const pickupHighContrastHues = (
   const luminanceDiffAccumulated = getLuminanceListAccumulated(luminanceList);
 
   /* pickup n hues */
-  const result = IList.zerosThrow(n) as NonEmptyArray<Hue>;
+  const mut_result = IList.zerosThrow(n) as NonEmptyArray<Hue>;
 
   let [i, y] = [0, 0];
 
   const maxValue = IList.max(luminanceDiffAccumulated);
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
     if (value > y) {
-      // eslint-disable-next-line functional/immutable-data
-      result[i] = x as Hue;
+      mut_result[i] = x as Hue;
       [i, y] = [i + 1, (maxValue * (i + 1)) / n];
     }
   }
 
-  return result;
+  return mut_result;
 };

@@ -53,7 +53,7 @@ export const createGlobalPixiObjects = ({
     canvasStyles.crosshairLineColor
   );
 
-  const temporaryRect: PixiTempRect = {
+  const mut_temporaryRect: PixiTempRect = {
     rect: { left: 0, top: 0, width: 1, height: 1 },
     style: {
       borderWidthPx: canvasStyles.temporaryRectBorderWidthPx,
@@ -68,14 +68,19 @@ export const createGlobalPixiObjects = ({
     ),
   };
 
-  temporaryRect.pixi.visible = false;
+  mut_temporaryRect.pixi.visible = false;
 
   app.stage.addChild(
     background,
     verticalLine,
     horizontalLine,
-    temporaryRect.pixi
+    mut_temporaryRect.pixi
   );
 
-  return { background, verticalLine, horizontalLine, temporaryRect };
+  return {
+    background,
+    verticalLine,
+    horizontalLine,
+    temporaryRect: mut_temporaryRect,
+  };
 };

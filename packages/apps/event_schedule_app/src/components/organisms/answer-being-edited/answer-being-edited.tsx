@@ -43,7 +43,7 @@ type Props = Readonly<{
   updateAnswerBeingEdited: (updater: (answer: Answer) => Answer) => void;
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
-  onSubmitAnswer: () => Promise<void>;
+  onSubmitAnswer: () => void;
   answerBeingEditedSectionState: 'creating' | 'editing';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;

@@ -2,9 +2,9 @@ import { render } from 'solid-js/web';
 import { Main } from './main';
 
 test('renders without crashing', () => {
-  const div = document.createElement('div');
-  const dispose = render(Main, div);
-  div.textContent = '';
+  const mut_div = document.createElement('div');
+  const dispose = render(Main, mut_div);
+  mut_div.textContent = '';
   dispose();
   expect(true).toBe(true);
 });

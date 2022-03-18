@@ -31,9 +31,9 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   };
 });
 
-const resultsSortedByProbability = Array.from(results)
-  .sort((a, b) => a.countSum - b.countSum)
-  .reverse();
+const resultsSortedByProbability = Array.from(results).sort(
+  (a, b) => -(a.countSum - b.countSum)
+);
 
 export const Main = memoNamed('Main', () => {
   const { state: sortBy, setState: setSortBy } = useState<'dice' | 'prob'>(

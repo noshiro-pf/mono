@@ -30,10 +30,10 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
       emailFormIntent,
     } = useObservableValue(DeleteAccountCreatedWithGoogle.state$);
 
-    const enterClickHandler = useCallback(async () => {
+    const enterClickHandler = useCallback(() => {
       if (enterButtonDisabled) return;
 
-      await DeleteAccountCreatedWithGoogle.submit(user);
+      DeleteAccountCreatedWithGoogle.submit(user).catch(console.error);
     }, [enterButtonDisabled, user]);
 
     return (

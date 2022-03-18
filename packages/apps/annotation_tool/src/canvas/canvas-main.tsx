@@ -1,7 +1,11 @@
 import { memoNamed, useState } from '@noshiro/react-utils';
 import type { Hue, RectSize, Rgba } from '@noshiro/ts-utils';
 import { hslaToRgba } from '@noshiro/ts-utils';
-import { Application, InteractionManager, settings } from 'pixi.js';
+import {
+  Application,
+  InteractionManager,
+  settings as mut_settings,
+} from 'pixi.js';
 import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import {
@@ -14,8 +18,8 @@ import type { AnnotationCanvasStyle, IdType, PixiApp } from './types';
 import { zIndex } from './z-index';
 
 // Pixi.js global settings
-settings.SORTABLE_CHILDREN = true;
-settings.ROUND_PIXELS = true;
+mut_settings.SORTABLE_CHILDREN = true;
+mut_settings.ROUND_PIXELS = true;
 
 type Props = Readonly<{
   idMaker: () => IdType;
@@ -41,8 +45,8 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
       antialias: false,
     });
 
-    const interactionManager = new InteractionManager(app.renderer);
-    interactionManager.cursorStyles['default'] = 'crosshair';
+    const mut_interactionManager = new InteractionManager(app.renderer);
+    mut_interactionManager.cursorStyles['default'] = 'crosshair';
 
     const globalPixiObjects = createGlobalPixiObjects({
       app,

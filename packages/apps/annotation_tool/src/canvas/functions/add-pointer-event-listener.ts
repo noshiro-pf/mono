@@ -4,7 +4,7 @@ import type { CanvasAppState, CanvasAppStateHandler } from '../state';
 
 export const addGlobalPointerEventListener = (
   app: Application,
-  background: Sprite,
+  mut_background: Sprite,
   state: CanvasAppState,
   stateHandler: CanvasAppStateHandler
 ): (() => void) => {
@@ -21,15 +21,15 @@ export const addGlobalPointerEventListener = (
     stateHandler(state, { type: 'pointerMove', pointerPos });
   };
 
-  background.interactive = true;
-  background.removeAllListeners();
-  background.addListener('pointerdown', pointerdownCallback);
+  mut_background.interactive = true;
+  mut_background.removeAllListeners();
+  mut_background.addListener('pointerdown', pointerdownCallback);
 
   app.renderer.view.addEventListener('pointermove', pointermoveCallback);
   app.renderer.view.addEventListener('pointerup', pointerupCallback);
 
   return () => {
-    background.removeAllListeners();
+    mut_background.removeAllListeners();
     app.renderer.view.removeEventListener('pointermove', pointermoveCallback);
     app.renderer.view.removeEventListener('pointerup', pointerupCallback);
   };

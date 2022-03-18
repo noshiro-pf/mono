@@ -134,9 +134,8 @@ describe('IList.head', () => {
     });
   }
   {
-    // eslint-disable-next-line functional/prefer-readonly-type
-    const xs: number[] = [1, 2, 3];
-    const head = IList.head(xs);
+    const mut_xs: number[] = [1, 2, 3];
+    const head = IList.head(mut_xs);
 
     assertType<TypeEq<typeof head, number | undefined>>();
 
@@ -179,9 +178,8 @@ describe('IList.last', () => {
     });
   }
   {
-    // eslint-disable-next-line functional/prefer-readonly-type
-    const xs: number[] = [1, 2, 3];
-    const last = IList.last(xs);
+    const mut_xs: number[] = [1, 2, 3];
+    const last = IList.last(mut_xs);
 
     assertType<TypeEq<typeof last, number | undefined>>();
 

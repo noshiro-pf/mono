@@ -30,10 +30,10 @@ export const useRegisterPageState = (): DeepReadonly<{
 
   const pageToBack = useObservableValue(router.pageToBack$);
 
-  const enterClickHandler = useCallback(async (): Promise<void> => {
+  const enterClickHandler = useCallback(() => {
     if (enterButtonDisabled || googleSignInButtonDisabled) return;
 
-    await RegisterPageStore.submit(pageToBack);
+    RegisterPageStore.submit(pageToBack).catch(console.error);
   }, [enterButtonDisabled, googleSignInButtonDisabled, pageToBack]);
 
   return {

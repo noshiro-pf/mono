@@ -6,7 +6,7 @@ export const memoNamed = <Props>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   fc: FC<Readonly<Props>>
 ): NamedExoticComponent<Readonly<Props>> => {
-  const memoizedComponent = memo(fc);
-  memoizedComponent.displayName = displayName;
-  return memoizedComponent;
+  const mut_memoizedComponent = memo(fc);
+  mut_memoizedComponent.displayName = displayName;
+  return mut_memoizedComponent;
 };

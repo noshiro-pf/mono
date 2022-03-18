@@ -58,9 +58,9 @@ export const MuiTabs = memoNamed<Props>(
           },
           onResize: (width: number) => {
             updateTabWidthList((prev) => {
-              const next = Array.from(prev);
-              next[index] = width;
-              return next;
+              const mut_next = Array.from(prev);
+              mut_next[index] = width;
+              return mut_next;
             });
           },
         })),

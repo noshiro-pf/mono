@@ -45,15 +45,15 @@ export const makeUppercase = firestore
     const searchUrl = `https://slack.com/api/users.list?token=${SLACK_API_KEY}&pretty=1`;
 
     const result = await new Promise((resolve) => {
-      const data: Buffer[] = [];
+      const mut_data: Buffer[] = [];
       get(searchUrl, (res) => {
         res
           // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
           .on('data', (chunk: Buffer) => {
-            data.push(chunk);
+            mut_data.push(chunk);
           })
           .on('end', () => {
-            const events = Buffer.concat(data);
+            const events = Buffer.concat(mut_data);
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const r = JSON.parse(events.toString());
 

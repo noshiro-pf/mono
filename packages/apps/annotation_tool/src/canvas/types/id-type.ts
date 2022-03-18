@@ -7,5 +7,5 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export type IdType = string;
 
-export const defaultIdMaker = (): IdType => uuidv4();
+export const defaultIdMaker: () => IdType = uuidv4;
 export const defaultId = uuidv4();

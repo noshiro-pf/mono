@@ -10,15 +10,15 @@ import type { NonEmptyUnknownList } from './types';
 // RootObservable
 
 export type SourceObservable<A> = RootObservable<A, 'Source'> & {
-  next: (value: A) => void;
+  readonly next: (value: A) => void;
 };
 
 export type OfObservable<A> = RootObservable<A, 'Of'> & {
-  emit: () => OfObservable<A>;
+  readonly emit: () => OfObservable<A>;
 };
 
 export type FromArrayObservable<A> = RootObservable<A, 'FromArray'> & {
-  emit: () => FromArrayObservable<A>;
+  readonly emit: () => FromArrayObservable<A>;
 };
 
 export type FromPromiseObservable<A, E = unknown> = RootObservable<
@@ -32,11 +32,11 @@ export type FromSubscribableObservable<A, E = unknown> = RootObservable<
 >;
 
 export type IntervalObservable = RootObservable<number, 'Interval'> & {
-  start: () => IntervalObservable;
+  readonly start: () => IntervalObservable;
 };
 
 export type TimerObservable = RootObservable<number, 'Timer'> & {
-  start: () => TimerObservable;
+  readonly start: () => TimerObservable;
 };
 
 // InitializedSyncChildObservable
@@ -135,7 +135,11 @@ export type PairwiseOperatorObservable<A> = SyncChildObservable<
   readonly [A]
 >;
 
-export type TakeOperatorObservable<A> = SyncChildObservable<A, 'take', [A]>;
+export type TakeOperatorObservable<A> = SyncChildObservable<
+  A,
+  'take',
+  readonly [A]
+>;
 export type TakeWhileOperatorObservable<A> = SyncChildObservable<
   A,
   'takeWhile',

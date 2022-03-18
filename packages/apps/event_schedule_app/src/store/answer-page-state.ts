@@ -138,13 +138,13 @@ const {
 } = createState<boolean>(false);
 
 {
-  let timer: TimerId | undefined = undefined;
+  let mut_timer: TimerId | undefined = undefined;
   fetchAnswersThrottled$.subscribe(() => {
-    if (timer !== undefined) {
-      clearTimeout(timer);
+    if (mut_timer !== undefined) {
+      clearTimeout(mut_timer);
     }
     setRefreshButtonIsDisabled(true);
-    timer = setTimeout(() => {
+    mut_timer = setTimeout(() => {
       setRefreshButtonIsDisabled(false);
     }, fetchThrottleTime);
   });

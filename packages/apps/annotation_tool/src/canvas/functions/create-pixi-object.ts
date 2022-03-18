@@ -3,26 +3,26 @@ import { rgbaToHexNumber } from '@noshiro/ts-utils';
 import { Graphics, Sprite, Texture } from 'pixi.js';
 
 export const createDummySpriteRectangle = (rect: Rect): Sprite => {
-  const rectObj = new Sprite(Texture.EMPTY);
-  rectObj.roundPixels = true;
-  rectObj.position.set(rect.left, rect.top);
-  rectObj.width = rect.width;
-  rectObj.height = rect.height;
-  return rectObj;
+  const mut_rectObj = new Sprite(Texture.EMPTY);
+  mut_rectObj.roundPixels = true;
+  mut_rectObj.position.set(rect.left, rect.top);
+  mut_rectObj.width = rect.width;
+  mut_rectObj.height = rect.height;
+  return mut_rectObj;
 };
 
 export const createRectangleSprite = (rect: Rect, faceColor: Rgba): Sprite => {
-  const rectObj = new Sprite(Texture.WHITE);
-  rectObj.roundPixels = true;
-  rectObj.position.set(rect.left, rect.top);
-  rectObj.width = rect.width;
-  rectObj.height = rect.height;
+  const mut_rectObj = new Sprite(Texture.WHITE);
+  mut_rectObj.roundPixels = true;
+  mut_rectObj.position.set(rect.left, rect.top);
+  mut_rectObj.width = rect.width;
+  mut_rectObj.height = rect.height;
   {
     const { hex, alpha } = rgbaToHexNumber(faceColor);
-    rectObj.tint = hex;
-    rectObj.alpha = alpha;
+    mut_rectObj.tint = hex;
+    mut_rectObj.alpha = alpha;
   }
-  return rectObj;
+  return mut_rectObj;
 };
 
 export const getSpriteRect = (sprite: Sprite): Rect => ({

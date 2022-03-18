@@ -8,7 +8,7 @@ import { foreachBboxPoints } from './bbox-points';
 import { createBbox } from './create-pixi-bbox';
 
 export const addBboxToCanvas = (
-  state: CanvasAppState,
+  mut_state: CanvasAppState,
   idMaker: () => IdType,
   bboxRect: Rect,
   bboxColor: Readonly<{ border: Rgba; face: Rgba }>,
@@ -38,10 +38,10 @@ export const addBboxToCanvas = (
     },
   };
 
-  addBboxEventListener(pixiBbox, state, stateHandler);
+  addBboxEventListener(pixiBbox, mut_state, stateHandler);
 
   app.stage.addChild(pixiBboxRect);
   foreachBboxPoints(pixiBboxPoints, (_, p) => app.stage.addChild(p));
 
-  state.bboxList.push(pixiBbox);
+  mut_state.bboxList.push(pixiBbox);
 };

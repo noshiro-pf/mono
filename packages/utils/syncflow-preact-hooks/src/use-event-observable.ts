@@ -1,9 +1,9 @@
-import type { Observable } from '@noshiro/syncflow';
+import type { Observable, SourceObservable } from '@noshiro/syncflow';
 import { source } from '@noshiro/syncflow';
 import { useCallback, useMemo } from 'preact/hooks';
 
 export const useVoidEventObservable = (): [Observable<void>, () => void] => {
-  const src$ = useMemo(() => source<undefined>(), []);
+  const src$ = useMemo<SourceObservable<undefined>>(source, []);
 
   const emitter = useCallback(() => {
     src$.next(undefined);
@@ -16,7 +16,7 @@ export const useEventObservable = <A>(): [
   Observable<A>,
   (value: A) => void
 ] => {
-  const src$ = useMemo(() => source<A>(), []);
+  const src$ = useMemo<SourceObservable<A>>(source, []);
 
   const emitter = useCallback((value: A) => {
     src$.next(value);

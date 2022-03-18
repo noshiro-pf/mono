@@ -39,3 +39,7 @@ export const signOut = async (): Promise<void> => {
   await auth.signOut();
   router.push(routes.signInPage);
 };
+
+export const signOutClick = (): void => {
+  signOut().catch(console.error);
+};

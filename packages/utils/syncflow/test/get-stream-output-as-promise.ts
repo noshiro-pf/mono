@@ -5,14 +5,14 @@ export const getStreamOutputAsPromise = <T>(
   startSource: () => void
 ): Promise<readonly T[]> => {
   const ret = new Promise<readonly T[]>((resolve) => {
-    const output: T[] = [];
+    const mut_output: T[] = [];
     const subscription = observable$.subscribe(
       (a) => {
-        output.push(a);
+        mut_output.push(a);
       },
       () => {
         subscription.unsubscribe();
-        resolve(output);
+        resolve(mut_output);
       }
     );
 

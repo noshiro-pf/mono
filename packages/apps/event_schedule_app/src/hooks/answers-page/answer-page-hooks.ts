@@ -53,7 +53,7 @@ type AnswerPageState = DeepReadonly<{
   updateAnswerBeingEdited: (updater: (answer: Answer) => Answer) => void;
   onCancel: () => void;
   onDeleteAnswer: () => Promise<void>;
-  onSubmitAnswer: () => Promise<void>;
+  onSubmitAnswer: () => void;
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
   refreshButtonIsLoading: boolean;
@@ -171,7 +171,7 @@ export const useAnswerPageState = (): AnswerPageState => {
 
   const alive = useAlive();
 
-  const onSubmitAnswer = useCallback(async () => {
+  const submitAnswerImpl = useCallback(async () => {
     if (eventId === undefined) return;
     if (!alive.current) return;
 
@@ -236,6 +236,10 @@ export const useAnswerPageState = (): AnswerPageState => {
     setAnswerBeingEditedSectionState,
     clearAnswerBeingEditedFields,
   ]);
+
+  const onSubmitAnswer = useCallback(() => {
+    submitAnswerImpl().catch(console.error);
+  }, [submitAnswerImpl]);
 
   const onDeleteAnswer = useCallback(async (): Promise<void> => {
     if (eventId === undefined) return;

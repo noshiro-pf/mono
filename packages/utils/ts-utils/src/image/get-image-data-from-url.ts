@@ -1,13 +1,11 @@
-/* eslint-disable functional/immutable-data */
-
 export const getImageElementFromUrl = (
   url: string
 ): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      resolve(img);
+    const mut_img = new Image();
+    mut_img.onload = () => {
+      resolve(mut_img);
     };
-    img.onerror = reject;
-    img.src = url;
+    mut_img.onerror = reject;
+    mut_img.src = url;
   });

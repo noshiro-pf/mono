@@ -29,10 +29,10 @@ export const UpdateEmailDialog = memoNamed<Props>(
       passwordIsOpen,
     } = useObservableValue(UpdateEmailPage.state$);
 
-    const enterClickHandler = useCallback(async () => {
+    const enterClickHandler = useCallback(() => {
       if (enterButtonDisabled) return;
 
-      await UpdateEmailPage.submit(user);
+      UpdateEmailPage.submit(user).catch(console.error);
     }, [enterButtonDisabled, user]);
 
     return (
