@@ -1,5 +1,5 @@
 export const toAbsolutePath = (relativePath: string): string => {
-  const e = document.createElement('a');
-  e.href = relativePath;
-  return e.href;
+  const mut_element = document.createElement('a');
+  mut_element.href = relativePath;
+  return mut_element.href;
 };

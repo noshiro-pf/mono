@@ -72,27 +72,27 @@ export function register(config?: Config): void {
 }
 
 async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
-  const registration = await navigator.serviceWorker
+  const mut_registration = await navigator.serviceWorker
     .register(swUrl)
     .catch((error) => {
       console.error('Error during service worker registration:', error);
       return undefined;
     });
 
-  if (registration === undefined) return;
+  if (mut_registration === undefined) return;
 
   console.log(
     'ServiceWorker registration successful with scope: ',
-    registration.scope
+    mut_registration.scope
   );
 
-  registration.onupdatefound = () => {
-    const installingWorker = registration.installing;
-    if (installingWorker == null) {
+  mut_registration.onupdatefound = () => {
+    const mut_installingWorker = mut_registration.installing;
+    if (mut_installingWorker == null) {
       return;
     }
-    installingWorker.onstatechange = () => {
-      if (installingWorker.state === 'installed') {
+    mut_installingWorker.onstatechange = () => {
+      if (mut_installingWorker.state === 'installed') {
         if (navigator.serviceWorker.controller !== null) {
           // At this point, the updated precached content has been fetched,
           // but the previous service worker will still serve the older
@@ -104,7 +104,7 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
 
           // Execute callback
           if (config?.onUpdate !== undefined) {
-            config.onUpdate(registration);
+            config.onUpdate(mut_registration);
           }
         } else {
           // At this point, everything has been precached.
@@ -114,7 +114,7 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
 
           // Execute callback
           if (config?.onSuccess !== undefined) {
-            config.onSuccess(registration);
+            config.onSuccess(mut_registration);
           }
         }
       }

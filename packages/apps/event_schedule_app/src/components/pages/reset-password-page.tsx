@@ -25,10 +25,10 @@ export const ResetPasswordPage = memoNamed<Props>(
 
     const pageToBack = useObservableValue(router.pageToBack$);
 
-    const enterClickHandler = useCallback(async (): Promise<void> => {
+    const enterClickHandler = useCallback(() => {
       if (enterButtonDisabled) return;
 
-      await ResetPasswordPageStore.submit(pageToBack);
+      ResetPasswordPageStore.submit(pageToBack).catch(console.error);
     }, [enterButtonDisabled, pageToBack]);
 
     return (

@@ -7,7 +7,7 @@ export const countSuccess = (
   y: TwoDiceSumValue,
   z: TwoDiceSumValue
 ): Count => {
-  const count: { -readonly [K in keyof Count]: number } = {
+  const mut_count: { -readonly [K in keyof Count]: number } = {
     oneLine: 0,
     twoLine: 0,
     noLine: 0,
@@ -27,7 +27,7 @@ export const countSuccess = (
             (pair3[0] === pair3[1] &&
               (x === pair3[0] || y === pair3[0] || z === pair3[0]))
           ) {
-            count.twoLine += 1;
+            mut_count.twoLine += 1;
             continue;
           }
 
@@ -52,19 +52,19 @@ export const countSuccess = (
             (y2 && z2) ||
             (y3 && z3)
           ) {
-            count.twoLine += 1;
+            mut_count.twoLine += 1;
             continue;
           }
 
           if (x1 || x2 || x3 || y1 || y2 || y3 || z1 || z2 || z3) {
-            count.oneLine += 1;
+            mut_count.oneLine += 1;
             continue;
           }
-          count.noLine += 1;
+          mut_count.noLine += 1;
         }
       }
     }
   }
 
-  return count as Count;
+  return mut_count as Count;
 };

@@ -26,10 +26,10 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
     const { formState, displayNameFormIntent, enterButtonDisabled } =
       useObservableValue(UpdateDisplayNamePage.state$);
 
-    const enterClickHandler = useCallback(async () => {
+    const enterClickHandler = useCallback(() => {
       if (enterButtonDisabled) return;
 
-      await UpdateDisplayNamePage.submit(user);
+      UpdateDisplayNamePage.submit(user).catch(console.error);
     }, [enterButtonDisabled, user]);
 
     return (

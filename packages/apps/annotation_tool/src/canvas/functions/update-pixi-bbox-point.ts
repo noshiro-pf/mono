@@ -6,7 +6,7 @@ import type { Direction } from './bbox-points';
 import { updateRectangleGraphics } from './create-pixi-object';
 
 export const updateBboxPoint = (
-  point: Graphics,
+  mut_point: Graphics,
   x: number,
   y: number,
   pointWidthPxHalf: number,
@@ -19,9 +19,14 @@ export const updateBboxPoint = (
     height: pointWidthPxHalf * 2,
   };
 
-  updateRectangleGraphics(point, rect, color);
+  updateRectangleGraphics(mut_point, rect, color);
 
-  point.hitArea = new Rectangle(rect.left, rect.top, rect.width, rect.height);
+  mut_point.hitArea = new Rectangle(
+    rect.left,
+    rect.top,
+    rect.width,
+    rect.height
+  );
 };
 
 export const updatePointOfBbox = (

@@ -5,27 +5,27 @@ import { Rectangle } from 'pixi.js';
 import type { PixiBbox } from '../types';
 
 export const updateBboxRect = (
-  graphics: Graphics,
+  mut_graphics: Graphics,
   rect: Rect,
   borderWidthPx: number,
   borderColor: Rgba,
   faceColor: Rgba | undefined
 ): void => {
-  graphics.clear();
+  mut_graphics.clear();
 
   if (faceColor !== undefined) {
     const { hex, alpha } = rgbaToHexNumber(faceColor);
-    graphics.beginFill(hex, alpha);
+    mut_graphics.beginFill(hex, alpha);
   }
   {
     const { hex, alpha } = rgbaToHexNumber(borderColor);
-    graphics.lineStyle(borderWidthPx, hex, alpha, 0.5);
+    mut_graphics.lineStyle(borderWidthPx, hex, alpha, 0.5);
     const { left, top: top_, width, height } = rect;
-    graphics.drawRect(left, top_, width, height);
-    graphics.hitArea = new Rectangle(left, top_, width, height);
+    mut_graphics.drawRect(left, top_, width, height);
+    mut_graphics.hitArea = new Rectangle(left, top_, width, height);
   }
 
-  graphics.endFill();
+  mut_graphics.endFill();
 };
 
 export const turnOnHighlight = (pixiBbox: PixiBbox): void => {

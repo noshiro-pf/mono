@@ -306,20 +306,18 @@ export namespace IList {
     index: number,
     newValue: A
   ): readonly A[] => {
-    const temp = Array.from(list);
-    // eslint-disable-next-line functional/immutable-data
-    temp.splice(index, 0, newValue);
-    return temp;
+    const mut_temp = Array.from(list);
+    mut_temp.splice(index, 0, newValue);
+    return mut_temp;
   };
 
   export const remove = <A>(
     list: readonly A[],
     index: number
   ): readonly A[] => {
-    const temp = Array.from(list);
-    // eslint-disable-next-line functional/immutable-data
-    temp.splice(index, 1);
-    return temp;
+    const mut_temp = Array.from(list);
+    mut_temp.splice(index, 1);
+    return mut_temp;
   };
 
   export const push = <T extends readonly unknown[], N = T>(
@@ -575,17 +573,15 @@ export namespace IList {
     reducer: ReducerType<B, A>,
     init: B
   ): ReadonlyNonEmptyArray<B> => {
-    // eslint-disable-next-line functional/prefer-readonly-type
-    const result: B[] = Array.from(newArrayThrow<B>(list.length + 1, init));
+    const mut_result: B[] = Array.from(newArrayThrow<B>(list.length + 1, init));
 
     let acc = init;
     for (const [index, value] of list.entries()) {
       acc = reducer(acc, value);
-      // eslint-disable-next-line functional/immutable-data
-      result[index + 1] = acc;
+      mut_result[index + 1] = acc;
     }
 
-    return result as readonly B[] as ReadonlyNonEmptyArray<B>;
+    return mut_result as readonly B[] as ReadonlyNonEmptyArray<B>;
   };
 
   export const count = <A>(
@@ -614,18 +610,17 @@ export namespace IList {
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, readonly T[number][]> => {
-    // eslint-disable-next-line functional/prefer-readonly-type
-    const groups = new Map<G, T[number][]>();
+    const mut_groups = new Map<G, T[number][]>();
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
-      if (groups.has(key)) {
-        // eslint-disable-next-line functional/immutable-data
-        groups.get(key)?.push(e);
+      if (mut_groups.has(key)) {
+        const mut_g = mut_groups.get(key);
+        mut_g?.push(e);
       } else {
-        groups.set(key, [e]);
+        mut_groups.set(key, [e]);
       }
     }
-    return IMap.new<G, readonly T[number][]>(groups);
+    return IMap.new<G, readonly T[number][]>(mut_groups);
   };
 
   /**
@@ -692,8 +687,7 @@ export namespace IList {
     sortedList1: readonly T[],
     sortedList2: readonly T[]
   ): readonly T[] => {
-    // eslint-disable-next-line functional/prefer-readonly-type
-    const result: T[] = [];
+    const mut_result: T[] = [];
     let it1 = 0; // iterator for sortedArray1
     let it2 = 0; // iterator for sortedArray2
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -709,8 +703,7 @@ export namespace IList {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         val2 = sortedList2[it2]!;
       } else if (val1 < val2) {
-        // eslint-disable-next-line functional/immutable-data
-        result.push(val1);
+        mut_result.push(val1);
         it1 += 1;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         val1 = sortedList1[it1]!;
@@ -721,9 +714,9 @@ export namespace IList {
       }
     }
     for (; it1 < sortedList1.length; it1 += 1) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion,functional/immutable-data
-      result.push(sortedList1[it1]!);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      mut_result.push(sortedList1[it1]!);
     }
-    return result;
+    return mut_result;
   };
 }

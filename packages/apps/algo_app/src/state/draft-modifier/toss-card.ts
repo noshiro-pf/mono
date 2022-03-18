@@ -7,10 +7,10 @@ export const tossCard = (
   draft: WritableDraft<GameState>,
   target: Card | undefined
 ): void => {
-  for (const cards of draft.playerCards) {
-    for (const c of cards) {
-      if (cardEq(c, target)) {
-        c.visibleTo = 'pair';
+  for (const mut_cards of draft.playerCards) {
+    for (const mut_c of mut_cards) {
+      if (cardEq(mut_c, target)) {
+        mut_c.visibleTo = 'pair';
       }
     }
   }

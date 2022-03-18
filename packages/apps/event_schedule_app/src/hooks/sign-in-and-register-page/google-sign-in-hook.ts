@@ -12,10 +12,10 @@ export const useGoogleSignInState = (): Readonly<{
 
   const pageToBack = useObservableValue(router.pageToBack$);
 
-  const googleSignInClickHandler = useCallback(async () => {
+  const googleSignInClickHandler = useCallback(() => {
     if (googleSignInButtonDisabled) return;
 
-    await GoogleSignInStore.googleSignInSubmit(pageToBack);
+    GoogleSignInStore.googleSignInSubmit(pageToBack).catch(console.error);
   }, [googleSignInButtonDisabled, pageToBack]);
 
   return {

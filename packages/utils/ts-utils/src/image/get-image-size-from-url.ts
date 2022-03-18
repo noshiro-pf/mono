@@ -1,14 +1,12 @@
-/* eslint-disable functional/immutable-data */
-
 import type { RectSize } from '../types';
 import { getImageSizeFromImageElement } from './get-image-size-from-img-element';
 
 export const getImageSizeFromUrl = (url: string): Promise<RectSize> =>
   new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      resolve(getImageSizeFromImageElement(img));
+    const mut_img = new Image();
+    mut_img.onload = () => {
+      resolve(getImageSizeFromImageElement(mut_img));
     };
-    img.onerror = reject;
-    img.src = url;
+    mut_img.onerror = reject;
+    mut_img.src = url;
   });

@@ -23,8 +23,8 @@ class ThrottleTimeObservableClass<A>
   implements ThrottleTimeOperatorObservable<A>
 {
   private readonly _milliSeconds: number;
-  private _timerId: TimerId | undefined;
-  private _isSkipping: boolean;
+  private _mut_timerId: TimerId | undefined;
+  private _mut_isSkipping: boolean;
 
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
@@ -32,8 +32,8 @@ class ThrottleTimeObservableClass<A>
       type: 'throttleTime',
       currentValueInit: parentObservable.currentValue,
     });
-    this._timerId = undefined;
-    this._isSkipping = false;
+    this._mut_timerId = undefined;
+    this._mut_isSkipping = false;
     this._milliSeconds = milliSeconds;
   }
 
@@ -41,20 +41,20 @@ class ThrottleTimeObservableClass<A>
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
-    if (this._isSkipping) return; // skip update
+    if (this._mut_isSkipping) return; // skip update
 
     this.setNext(par.currentValue.value, token);
 
-    this._isSkipping = true;
+    this._mut_isSkipping = true;
     // set timer
-    this._timerId = setTimeout(() => {
-      this._isSkipping = false;
+    this._mut_timerId = setTimeout(() => {
+      this._mut_isSkipping = false;
     }, this._milliSeconds);
   }
 
   private resetTimer(): void {
-    if (this._timerId !== undefined) {
-      clearTimeout(this._timerId);
+    if (this._mut_timerId !== undefined) {
+      clearTimeout(this._mut_timerId);
     }
   }
 

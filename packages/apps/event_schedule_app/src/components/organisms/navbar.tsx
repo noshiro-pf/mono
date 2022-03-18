@@ -9,7 +9,7 @@ import { aboutThisAppUrl, dict, routes } from '../../constants';
 import { experimentalFeature } from '../../env';
 import {
   router,
-  signOut,
+  signOutClick,
   UpdateUserInfoDialogState,
   usePasswordProviderIncluded,
   user$,
@@ -120,7 +120,10 @@ export const NavBar = memoNamed('NavBar', () => {
                           />
                         )}
                       </MenuItem>
-                      <MenuItem text={dc.auth.menu.signOut} onClick={signOut} />
+                      <MenuItem
+                        text={dc.auth.menu.signOut}
+                        onClick={signOutClick}
+                      />
                     </Menu>
                   }
                   minimal={true}

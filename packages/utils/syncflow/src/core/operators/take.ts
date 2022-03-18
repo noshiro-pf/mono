@@ -18,7 +18,7 @@ class TakeObservableClass<A>
   implements TakeOperatorObservable<A>
 {
   private readonly _n: number;
-  private _counter: number;
+  private _mut_counter: number;
 
   constructor(parentObservable: Observable<A>, n: number) {
     super({
@@ -28,7 +28,7 @@ class TakeObservableClass<A>
         ? Option.none
         : parentObservable.currentValue,
     });
-    this._counter = 0;
+    this._mut_counter = 0;
     this._n = n;
 
     // complete immediately if n is not positive integer
@@ -42,8 +42,8 @@ class TakeObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Option.isNone(par.currentValue)) return; // skip update
 
-    this._counter += 1;
-    if (this._counter > this._n) {
+    this._mut_counter += 1;
+    if (this._mut_counter > this._n) {
       this.complete();
     } else {
       this.setNext(par.currentValue.value, token);

@@ -8,7 +8,7 @@ const dc = dict.answerPage.answerBeingEdited;
 
 type Props = Readonly<{
   hasUnanswered: boolean;
-  onConfirmSubmissionOfAnswer: () => Promise<void>;
+  onConfirmSubmissionOfAnswer: () => void;
   loading: boolean;
   disabled: boolean;
   mode: 'creating' | 'editing';

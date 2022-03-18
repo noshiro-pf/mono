@@ -29,10 +29,10 @@ export const DeleteAccountDialog = memoNamed<Props>(
       passwordIsOpen,
     } = useObservableValue(DeleteAccountPage.state$);
 
-    const enterClickHandler = useCallback(async () => {
+    const enterClickHandler = useCallback(() => {
       if (enterButtonDisabled) return;
 
-      await DeleteAccountPage.submit(user);
+      DeleteAccountPage.submit(user).catch(console.error);
     }, [enterButtonDisabled, user]);
 
     return (

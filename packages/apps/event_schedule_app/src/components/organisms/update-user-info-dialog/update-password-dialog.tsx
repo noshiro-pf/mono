@@ -35,10 +35,10 @@ export const UpdatePasswordDialog = memoNamed<Props>(
       newPasswordIsOpen,
     } = useObservableValue(UpdatePasswordPage.state$);
 
-    const enterClickHandler = useCallback(async () => {
+    const enterClickHandler = useCallback(() => {
       if (enterButtonDisabled) return;
 
-      await UpdatePasswordPage.submit(user);
+      UpdatePasswordPage.submit(user).catch(console.error);
     }, [enterButtonDisabled, user]);
 
     return (

@@ -9,15 +9,15 @@ export const evalSequence = (term: LambdaTerm): LambdaTerm[] => {
   let curr = term;
   // let prev = undefined;
 
-  const seq: LambdaTerm[] = [];
-  seq.push(term);
+  const mut_seq: LambdaTerm[] = [];
+  mut_seq.push(term);
 
   for (let counter = MAX_STEPS; counter > 0; counter -= 1) {
     const next = evaluate1step(curr);
     if (termEq(next, curr)) break;
-    seq.push(next);
+    mut_seq.push(next);
     // prev = curr;
     curr = next;
   }
-  return seq;
+  return mut_seq;
 };

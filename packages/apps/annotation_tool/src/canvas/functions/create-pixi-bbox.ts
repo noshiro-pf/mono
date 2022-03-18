@@ -14,31 +14,31 @@ const createBboxPoint = (
   y: number,
   color: Rgba
 ): Graphics => {
-  const point = new Graphics();
+  const mut_point = new Graphics();
 
-  updateBboxPoint(point, x, y, pointWidthPxHalf, color);
+  updateBboxPoint(mut_point, x, y, pointWidthPxHalf, color);
 
-  point.interactive = true;
-  point.zIndex = zIndex.bboxPoint;
+  mut_point.interactive = true;
+  mut_point.zIndex = zIndex.bboxPoint;
   switch (direction) {
     case 'n_':
     case 's_':
-      point.cursor = 'ns-resize';
+      mut_point.cursor = 'ns-resize';
       break;
     case 'e_':
     case 'w_':
-      point.cursor = 'ew-resize';
+      mut_point.cursor = 'ew-resize';
       break;
     case 'ne':
     case 'sw':
-      point.cursor = 'nesw-resize';
+      mut_point.cursor = 'nesw-resize';
       break;
     case 'nw':
     case 'se':
-      point.cursor = 'nwse-resize';
+      mut_point.cursor = 'nwse-resize';
       break;
   }
-  return point;
+  return mut_point;
 };
 
 const createBboxPoints = (
@@ -57,12 +57,12 @@ export const createBboxRect = (
   borderWidthPx: number,
   borderColor: Rgba
 ): Graphics => {
-  const gr = new Graphics();
-  updateBboxRect(gr, rect, borderWidthPx, borderColor, undefined);
-  gr.zIndex = zIndex.bboxFace;
-  gr.cursor = 'move';
-  gr.interactive = true;
-  return gr;
+  const mut_gr = new Graphics();
+  updateBboxRect(mut_gr, rect, borderWidthPx, borderColor, undefined);
+  mut_gr.zIndex = zIndex.bboxFace;
+  mut_gr.cursor = 'move';
+  mut_gr.interactive = true;
+  return mut_gr;
 };
 
 export const createBbox = (

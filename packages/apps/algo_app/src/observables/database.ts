@@ -104,17 +104,22 @@ export namespace db {
   };
 }
 
-let unsubscribeRoom: Unsubscribe | undefined = undefined;
-let unsubscribeActions: Unsubscribe | undefined = undefined;
+const mut_unsubscribe: {
+  room: Unsubscribe | undefined;
+  actions: Unsubscribe | undefined;
+} = {
+  room: undefined,
+  actions: undefined,
+};
 
 _roomId$.subscribe((roomId) => {
   if (roomId === undefined) return;
 
-  if (unsubscribeRoom !== undefined) {
-    unsubscribeRoom();
+  if (mut_unsubscribe.room !== undefined) {
+    mut_unsubscribe.room();
   }
-  if (unsubscribeActions !== undefined) {
-    unsubscribeActions();
+  if (mut_unsubscribe.actions !== undefined) {
+    mut_unsubscribe.actions();
   }
 
   const roomDoc = doc(db.firestore, db.paths.rooms, roomId);
@@ -124,20 +129,20 @@ _roomId$.subscribe((roomId) => {
     orderBy('timestamp')
   );
 
-  unsubscribeRoom = onSnapshot(roomDoc, (d) => {
+  mut_unsubscribe.room = onSnapshot(roomDoc, (d) => {
     const data = d.data();
     assertIsRoomRemote(data);
     _setRoom(convertRoomRemoteToRoom(data, d.id));
   });
 
-  unsubscribeActions = onSnapshot(actionsColl, (q) => {
-    const actions: GameStateAction[] = [];
+  mut_unsubscribe.actions = onSnapshot(actionsColl, (q) => {
+    const mut_actions: GameStateAction[] = [];
     q.forEach((d) => {
       const data = d.data();
       assertIsGameStateAction(data);
-      actions.push(data);
+      mut_actions.push(data);
     });
 
-    _setActionsFromDb(actions);
+    _setActionsFromDb(mut_actions);
   });
 });

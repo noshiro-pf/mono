@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
 export const useKeyEventListener = (
-  onKeyDown: (ev: Readonly<KeyboardEvent>) => void,
-  onKeyUp: (ev: Readonly<KeyboardEvent>) => void
+  onKeyDown: (ev: KeyboardEvent) => void,
+  onKeyUp: (ev: KeyboardEvent) => void
 ): void => {
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown);

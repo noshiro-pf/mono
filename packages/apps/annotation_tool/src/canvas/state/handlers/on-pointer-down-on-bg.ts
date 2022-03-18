@@ -6,11 +6,11 @@ import type { CanvasAppState } from '../canvas-state-type';
 export const onPointerDownOnBackground = (
   state: CanvasAppState,
   canvasStyles: AnnotationCanvasStyle,
-  pixiApp: PixiApp
+  mut_pixiApp: PixiApp
 ): void => {
-  pixiApp.temporaryRect.pixi.visible = true;
+  mut_pixiApp.temporaryRect.pixi.visible = true;
   updateBorderedRectangleGraphics(
-    pixiApp.temporaryRect.pixi,
+    mut_pixiApp.temporaryRect.pixi,
     rectFrom2Points(state.dragStartPoint, state.dragEndPoint),
     canvasStyles.temporaryRectFaceColor,
     canvasStyles.temporaryRectBorderWidthPx,
