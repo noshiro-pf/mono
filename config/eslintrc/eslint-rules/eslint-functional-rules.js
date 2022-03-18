@@ -2,11 +2,12 @@
 
 // @ts-check
 
-/** @typedef { import("./rules-record").LinterRulesRecord } LinterRulesRecord */
+/** @typedef { import("./rules-type/eslint-functional-rules").EslintFunctionalRules } EslintFunctionalRules */
 
-/** @typedef { import("./rules-record").ImmutableDataOptions } ImmutableDataOptions */
-/** @typedef { import("./rules-record").NoLetOptions } NoLetOptions */
-/** @typedef { import("./rules-record").PreferReadonlyTypeOptions } PreferReadonlyTypeOptions */
+/** @typedef { import("../../types/types").ImmutableDataOptions } ImmutableDataOptions */
+/** @typedef { import("../../types/types").NoLetOptions } NoLetOptions */
+/** @typedef { import("../../types/types").PreferReadonlyTypeOptions } PreferReadonlyTypeOptions */
+/** @typedef { import("../../types/types").PreferTacitOptions } PreferTacitOptions */
 
 const ignorePattern = [
   '^draft', // allow immer.js draft object
@@ -51,7 +52,7 @@ const preferTacitOptions = {
 };
 
 /**
- * @type {LinterRulesRecord}
+ * @type {EslintFunctionalRules}
  * @link {https://github.com/jonaskello/eslint-plugin-functional}
  */
 const eslintFunctionalRules = {
@@ -84,4 +85,11 @@ const eslintFunctionalRules = {
   'functional/prefer-tacit': ['warn', preferTacitOptions],
 };
 
-module.exports = eslintFunctionalRules;
+module.exports = {
+  eslintFunctionalRules,
+  ignorePattern,
+  immutableDataOptions,
+  noLetOptions,
+  preferReadonlyTypeOptions,
+  preferTacitOptions,
+};

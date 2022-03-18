@@ -4,6 +4,7 @@
 
 /** @typedef { import("webpack").WebpackPluginInstance } WebpackPluginInstance */
 /** @typedef { import("webpack").Configuration } Configuration */
+/** @typedef { import("webpack").Configuration["devServer"] } WebpackDevServerConfiguration */
 /** @typedef { import("../../types/paths").Paths } Paths */
 
 const { merge } = require('webpack-merge');
@@ -20,7 +21,7 @@ require('webpack-dev-server');
  * @param {Paths} paths
  * @param {string} host
  * @param {number} port
- * @returns {Configuration}
+ * @returns {WebpackDevServerConfiguration}
  */
 const devServerConfigMaker = (paths, host, port) => ({
   open: false,

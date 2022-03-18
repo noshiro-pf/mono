@@ -10,16 +10,7 @@ const { plugins } = require('./eslint-plugins');
 /** @type {LinterConfig} */
 const config = {
   extends: './.eslintrc.common-settings.js',
-  plugins: [
-    plugins.arrayFunc,
-    plugins.functional,
-    plugins.import,
-    plugins.jest,
-    plugins.promise,
-    plugins.typescriptEslint,
-    plugins.react,
-    plugins.reactHooks,
-  ],
+  plugins: [plugins.react, plugins.reactHooks],
   rules: {
     'import/no-extraneous-dependencies': [
       'error',

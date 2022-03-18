@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "allowJs": true,
+    "checkJs": true,
     "noEmit": true
   },
   "include": ["./**/*.js"]

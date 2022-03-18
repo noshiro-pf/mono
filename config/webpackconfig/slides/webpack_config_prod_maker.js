@@ -4,7 +4,7 @@
 
 /** @typedef { import("webpack").WebpackPluginInstance } WebpackPluginInstance */
 /** @typedef { import("webpack").Configuration } Configuration */
-/** @typedef { import("../../types/slides_paths").SlidesPaths } Paths */
+/** @typedef { import("../../types/slides-paths").SlidesPaths } Paths */
 
 const TerserPlugin = require('terser-webpack-plugin');
 const { merge } = require('webpack-merge');

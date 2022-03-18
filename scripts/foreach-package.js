@@ -11,7 +11,7 @@ const { exec } = require('child_process');
  *   command: string,
  *   wsrunOptions: string
  * }} args
- * @returns {void}
+ * @returns {Promise<void>}
  */
 const forEachPackages = async ({ prefixes, command, wsrunOptions }) => {
   const workspaces = await getWorkspaces();
@@ -35,11 +35,11 @@ const forEachPackages = async ({ prefixes, command, wsrunOptions }) => {
 
   const ps = exec(fullCommand);
 
-  ps.stdout.on('data', (data) => {
+  ps.stdout?.on('data', (data) => {
     console.log(data);
   });
 
-  ps.stderr.on('data', (data) => {
+  ps.stderr?.on('data', (data) => {
     console.error(data);
   });
 

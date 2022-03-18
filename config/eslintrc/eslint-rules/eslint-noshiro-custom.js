@@ -2,7 +2,7 @@
 
 // @ts-check
 
-/** @typedef { import("./rules-record").LinterRulesRecord } LinterRulesRecord */
+/** @typedef { import("../../types/types").LinterRulesRecord } LinterRulesRecord */
 
 /** @type {LinterRulesRecord} */
 const eslintNoshiroCustomRules = {
@@ -22,4 +22,4 @@ const eslintNoshiroCustomRules = {
   ],
 };
 
-module.exports = eslintNoshiroCustomRules;
+module.exports = { eslintNoshiroCustomRules };

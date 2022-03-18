@@ -8,6 +8,7 @@ const plugins = {
   jest: 'jest',
   arrayFunc: 'array-func',
   promise: 'promise',
+  unicorn: 'unicorn',
   functional: 'functional',
   totalFunctions: 'total-functions',
   react: 'react',
