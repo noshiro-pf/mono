@@ -120,7 +120,7 @@ export const AnswerTable = memoNamed<Props>(
                               {`${dict.common.brace.start}${point}${dict.common.brace.end}`}
                             </CustomPointValue>
                           ) : undefined}
-                          {weight !== 1.0 ? (
+                          {weight !== 1 ? (
                             <WeightValue>
                               <WeightTimes>{dc.times}</WeightTimes>
                               <div>{weight}</div>

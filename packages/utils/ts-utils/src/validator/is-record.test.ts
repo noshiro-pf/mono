@@ -15,7 +15,7 @@ describe('isRecord', () => {
       assertType<TypeEq<typeof unk, Record<string, unknown>>>();
     }
 
-    expect(res).toBeTruthy();
+    expect(res).toBe(true);
   });
 
   test('{} is record', () => {
@@ -30,7 +30,7 @@ describe('isRecord', () => {
       assertType<TypeEq<typeof unk, Record<string, unknown>>>();
     }
 
-    expect(res).toBeTruthy();
+    expect(res).toBe(true);
   });
 
   test('[] is not record', () => {
@@ -41,10 +41,11 @@ describe('isRecord', () => {
     assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
     assertType<TypeEq<typeof res, boolean>>();
 
-    expect(res).toBeFalsy();
+    expect(res).toBe(false);
   });
 
   test('null is not record', () => {
+    // eslint-disable-next-line unicorn/no-null
     const obj = null;
     const unk: unknown = obj;
     const res = isRecord(unk);
@@ -52,7 +53,7 @@ describe('isRecord', () => {
     assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
     assertType<TypeEq<typeof res, boolean>>();
 
-    expect(res).toBeFalsy();
+    expect(res).toBe(false);
   });
 
   test('undefined is not record', () => {
@@ -63,7 +64,7 @@ describe('isRecord', () => {
     assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
     assertType<TypeEq<typeof res, boolean>>();
 
-    expect(res).toBeFalsy();
+    expect(res).toBe(false);
   });
 
   test('3 is not record', () => {
@@ -74,7 +75,7 @@ describe('isRecord', () => {
     assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
     assertType<TypeEq<typeof res, boolean>>();
 
-    expect(res).toBeFalsy();
+    expect(res).toBe(false);
   });
 
   test('"str" is not record', () => {
@@ -85,7 +86,7 @@ describe('isRecord', () => {
     assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
     assertType<TypeEq<typeof res, boolean>>();
 
-    expect(res).toBeFalsy();
+    expect(res).toBe(false);
   });
 
   test('Map is not record', () => {
@@ -96,7 +97,7 @@ describe('isRecord', () => {
     assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
     assertType<TypeEq<typeof res, boolean>>();
 
-    expect(res).toBeFalsy();
+    expect(res).toBe(false);
   });
 
   test('Set is not record', () => {
@@ -107,6 +108,6 @@ describe('isRecord', () => {
     assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
     assertType<TypeEq<typeof res, boolean>>();
 
-    expect(res).toBeFalsy();
+    expect(res).toBe(false);
   });
 });

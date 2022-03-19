@@ -26,9 +26,9 @@ class FromArrayObservableClass<A>
 
   emit(): this {
     if (this.isCompleted) return this;
-    this._values.forEach((v) => {
+    for (const v of this._values) {
       this.startUpdate(v);
-    });
+    }
     this.complete();
     return this;
   }

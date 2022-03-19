@@ -10,7 +10,9 @@ export function zipArrays<
   ]
 >(...arrays: T): readonly Unwrap<T>[] {
   const len = IList.min(arrays.map(IList.size));
+
   if (len === undefined) return [];
+
   return IList.seqThrow(len).map((i) =>
     arrays.map((a) => a[i])
   ) as readonly Unwrap<T>[];

@@ -16,6 +16,7 @@ const rcd: R0 = {
 describe('get', () => {
   {
     const result = IRecord.get(rcd, 'x');
+
     assertType<TypeEq<typeof result, DeepReadonly<{ a: number; b: number }>>>();
 
     test('case 1', () => {
@@ -24,6 +25,7 @@ describe('get', () => {
   }
   {
     const result = IRecord.get(rcd, 'y');
+
     assertType<
       TypeEq<typeof result, DeepReadonly<{ c: { d: number; 4: number } }>>
     >();
@@ -37,6 +39,7 @@ describe('get', () => {
 describe('set', () => {
   {
     const result = IRecord.set(rcd, 'x', { a: 0, b: 0 } as const);
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 1', () => {
@@ -49,6 +52,7 @@ describe('set', () => {
   }
   {
     const result = IRecord.set(rcd, 'y', { c: { d: 888, 4: 999 } });
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 2', () => {
@@ -68,6 +72,7 @@ describe('update', () => {
       'x',
       (curr) => ({ a: curr.a + 1, b: curr.b + 2 } as const)
     );
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 1', () => {
@@ -80,6 +85,7 @@ describe('update', () => {
   }
   {
     const result = IRecord.update(rcd, 'y', () => ({ c: { d: 888, 4: 999 } }));
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 2', () => {
@@ -95,6 +101,7 @@ describe('update', () => {
 describe('getIn', () => {
   {
     const result = IRecord.getIn(rcd, [] as const);
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 1', () => {
@@ -107,6 +114,7 @@ describe('getIn', () => {
   }
   {
     const result = IRecord.getIn(rcd, ['y', 'c', 'd'] as const);
+
     assertType<TypeEq<typeof result, number>>();
 
     test('case 2', () => {
@@ -122,6 +130,7 @@ describe('setIn', () => {
       y: { c: { d: 999, 4: 999 } },
       z: [999, 999, 999],
     });
+
     assertType<TypeEq<typeof result, DeepReadonly<R0>>>();
 
     test('case 1', () => {
@@ -134,6 +143,7 @@ describe('setIn', () => {
   }
   {
     const result = IRecord.setIn(rcd, ['y', 'c', 'd'], 999);
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 2', () => {
@@ -146,6 +156,7 @@ describe('setIn', () => {
   }
   {
     const result = IRecord.setIn(rcd, ['y', 'c'], { d: 999, 4: 999 });
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 3', () => {
@@ -158,6 +169,7 @@ describe('setIn', () => {
   }
   {
     const result = IRecord.setIn(rcd, ['z', 1], 999);
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 4', () => {
@@ -173,6 +185,7 @@ describe('setIn', () => {
 describe('updateIn', () => {
   {
     const result = IRecord.updateIn(rcd, [] as const, (curr) => curr);
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 1', () => {
@@ -185,6 +198,7 @@ describe('updateIn', () => {
       ['y', 'c', 'd'] as const,
       (curr) => curr + 1000
     );
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 2', () => {
@@ -200,6 +214,7 @@ describe('updateIn', () => {
       d: curr.d + 1000,
       '4': curr[4] + 2000,
     }));
+
     assertType<TypeEq<typeof result, R0>>();
 
     test('case 3', () => {

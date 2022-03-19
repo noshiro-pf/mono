@@ -7,6 +7,7 @@ import { weekNumber } from './week-number';
 export const numWeeksOfSameMonth = (date: ReadonlyDate): number => {
   const lastDateNumber = getLastDateNumberOfSameMonth(date);
   const lastDate = setDate(date, lastDateNumber);
+
   return weekNumber(lastDate) + 1;
 };
 

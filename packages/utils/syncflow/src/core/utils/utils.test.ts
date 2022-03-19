@@ -48,25 +48,23 @@ describe('binarySearch', () => {
   });
 
   test('array with same value (1)', () => {
-    expect([0, 1].includes(binarySearch([0], 0))).toBeTruthy();
+    expect([0, 1]).toContain(binarySearch([0], 0));
   });
 
   test('array with same value (2)', () => {
-    expect([0, 1, 2].includes(binarySearch([0, 0], 0))).toBeTruthy();
+    expect([0, 1, 2]).toContain(binarySearch([0, 0], 0));
   });
 
   test('array with same value (3)', () => {
-    expect([0, 1, 2, 3].includes(binarySearch([0, 0, 0], 0))).toBeTruthy();
+    expect([0, 1, 2, 3]).toContain(binarySearch([0, 0, 0], 0));
   });
 
   test('complicated example 1', () => {
-    expect([2, 3].includes(binarySearch([1, 3, 4, 6, 7, 8], 4))).toBeTruthy();
+    expect([2, 3]).toContain(binarySearch([1, 3, 4, 6, 7, 8], 4));
   });
 
   test('complicated example 2', () => {
-    expect(
-      [2, 3, 4].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 4))
-    ).toBeTruthy();
+    expect([2, 3, 4]).toContain(binarySearch([1, 3, 4, 4, 6, 7, 8], 4));
   });
 
   test('complicated example 3', () => {
@@ -74,27 +72,21 @@ describe('binarySearch', () => {
   });
 
   test('complicated example 4', () => {
-    expect(
-      [0, 1].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 1))
-    ).toBeTruthy();
+    expect([0, 1]).toContain(binarySearch([1, 3, 4, 4, 6, 7, 8], 1));
   });
 
   test('complicated example 5', () => {
-    expect(
-      [0, 1, 2, 3].includes(binarySearch([1, 1, 1, 3, 4, 4, 6, 7, 8], 1))
-    ).toBeTruthy();
+    expect([0, 1, 2, 3]).toContain(
+      binarySearch([1, 1, 1, 3, 4, 4, 6, 7, 8], 1)
+    );
   });
 
   test('complicated example 6', () => {
-    expect(
-      [5, 6].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 7))
-    ).toBeTruthy();
+    expect([5, 6]).toContain(binarySearch([1, 3, 4, 4, 6, 7, 8], 7));
   });
 
   test('complicated example 7', () => {
-    expect(
-      [6, 7].includes(binarySearch([1, 3, 4, 4, 6, 7, 8], 8))
-    ).toBeTruthy();
+    expect([6, 7]).toContain(binarySearch([1, 3, 4, 4, 6, 7, 8], 8));
   });
 
   test('complicated example 8', () => {

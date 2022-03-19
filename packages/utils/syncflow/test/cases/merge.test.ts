@@ -1,4 +1,6 @@
 import { testStream } from '../test-stream';
 import { mergeTestCases } from './merge';
 
-mergeTestCases.forEach(testStream);
+for (const c of mergeTestCases) {
+  testStream(c);
+}

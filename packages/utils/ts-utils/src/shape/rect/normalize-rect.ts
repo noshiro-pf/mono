@@ -6,6 +6,7 @@ import type { Rect } from '../../types';
  */
 export const normalizeRect = (rect: Rect): Rect => {
   let { top: top_, left, width, height } = rect;
+
   if (width < 0) {
     width *= -1;
     left -= width;

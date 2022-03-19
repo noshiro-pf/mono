@@ -1,7 +1,7 @@
 import { isAbstraction } from './is-lambda-term';
 
 test('isAbstraction 1', () => {
-  expect(isAbstraction('x')).toBeFalsy();
+  expect(isAbstraction('x')).toBe(false);
 });
 
 test('isAbstraction 2', () => {
@@ -10,9 +10,9 @@ test('isAbstraction 2', () => {
       ['x', ['y', 'y']],
       ['x', ['y', 'y']],
     ])
-  ).toBeFalsy();
+  ).toBe(false);
 });
 
 test('isAbstraction 3', () => {
-  expect(isAbstraction(['lambda', 'x', ['x', ['y', 'y']]])).toBeTruthy();
+  expect(isAbstraction(['lambda', 'x', ['x', ['y', 'y']]])).toBe(true);
 });

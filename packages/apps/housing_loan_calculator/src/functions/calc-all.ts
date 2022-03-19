@@ -14,8 +14,8 @@ export const calcAll = ({
    * 1 -> 元金均等返済
    * 2 -> 元利均等返済
    */
-  const downPaymentYen = downPaymentManYen * 10000;
-  const propertyPriceYen = propertyPriceManYen * 10000;
+  const downPaymentYen = downPaymentManYen * 10_000;
+  const propertyPriceYen = propertyPriceManYen * 10_000;
   const borrowingPeriodMonth = borrowingPeriodYear * 12;
   const interestRatePerMonth = interestRatePercentPerYear / (100 * 12);
 
@@ -51,7 +51,7 @@ export const calcAll = ({
   const interestYen =
     repaymentType === 'principal-equal-payment' ? interestYen1 : interestYen2;
 
-  const interestSumManYen = IList.sum(interestYen) / 10000;
+  const interestSumManYen = IList.sum(interestYen) / 10_000;
 
   return {
     borrowingBalanceYen,

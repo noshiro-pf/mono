@@ -20,12 +20,12 @@ const createStreams = (
   auditTime$: Observable<number>;
   merged$: Observable<number>;
 }> => {
-  const emitValues = [1, 3, 4, 10, 13, 16, 17, 18, 19, 20];
+  const emitValues = new Set([1, 3, 4, 10, 13, 16, 17, 18, 19, 20]);
 
   const interval$ = interval(tick * 2, true);
   const counter$ = interval$.chain(take(23));
 
-  const filtered$ = counter$.chain(filter((n) => emitValues.includes(n)));
+  const filtered$ = counter$.chain(filter((n) => emitValues.has(n)));
   const auditTime$ = filtered$.chain(auditTime(tick * 5));
   // eslint-disable-next-line import/no-deprecated
   const merged$ = merge([filtered$, auditTime$] as const);

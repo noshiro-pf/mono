@@ -1,4 +1,6 @@
 import { testStream } from '../test-stream';
 import { mapToTestCases } from './map-to';
 
-mapToTestCases.forEach(testStream);
+for (const c of mapToTestCases) {
+  testStream(c);
+}

@@ -19,11 +19,9 @@ export const betaReduction1step = (term: LambdaTerm): LambdaTerm => {
       return substitute(right, arg, body);
     } else {
       const leftAfter1step = betaReduction1step(left);
-      if (!termEq(leftAfter1step, left)) {
-        return [leftAfter1step, right];
-      } else {
-        return [left, betaReduction1step(right)];
-      }
+      return !termEq(leftAfter1step, left)
+        ? [leftAfter1step, right]
+        : [left, betaReduction1step(right)];
     }
   }
   console.error(`Syntax error: "${JSON.stringify(term)}" is not lambda term.`);

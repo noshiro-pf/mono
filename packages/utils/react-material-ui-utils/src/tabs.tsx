@@ -15,7 +15,7 @@ export const MuiTabs = memoNamed<Props>(
   ({ tabIndex, tabIndexChange, labels, scrollable = false }) => {
     const onChange = useCallback(
       (_event: unknown, value: string) => {
-        tabIndexChange(parseInt(value, 10));
+        tabIndexChange(Number.parseInt(value, 10));
       },
       [tabIndexChange]
     );

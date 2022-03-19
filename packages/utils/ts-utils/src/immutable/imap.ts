@@ -62,6 +62,7 @@ export const IMap = {
 
   equal: <K, V>(a: IMap<K, V>, b: IMap<K, V>): boolean => {
     if (a.size !== b.size) return false;
+
     return a.every((v, k) => b.get(k) === v);
   },
 };
@@ -93,6 +94,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     for (const [k, v] of this.entries()) {
       if (!predicate(v, k)) return false;
     }
+
     return true;
   }
 
@@ -100,11 +102,13 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     for (const [k, v] of this.entries()) {
       if (predicate(v, k)) return true;
     }
+
     return false;
   }
 
   delete(key: K): IMap<K, V> {
     if (!this.has(key)) return this;
+
     return IMap.new(Array.from(this._map).filter(([k]) => !Object.is(k, key)));
   }
 
@@ -124,6 +128,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   update(key: K, updater: (value: V) => V): IMap<K, V> {
     if (!this.has(key)) return this;
     const curr = this.get(key);
+
     return IMap.new(
       Array.from(this._map, ([k, v]) =>
         ituple(k, Object.is(k, key) ? updater(curr!) : v)
@@ -139,6 +144,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     >[]
   ): IMap<K, V> {
     const result = new Map<K, V>(this._map);
+
     for (const action of actions) {
       switch (action.type) {
         case 'delete':
@@ -155,6 +161,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
         }
       }
     }
+
     return IMap.new(result);
   }
 
@@ -173,7 +180,9 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   forEach(callbackfn: (value: V, key: K) => void): void {
-    this._map.forEach(callbackfn);
+    for (const [key, value] of this._map.entries()) {
+      callbackfn(value, key);
+    }
   }
 
   [Symbol.iterator](): Iterator<readonly [K, V]> {

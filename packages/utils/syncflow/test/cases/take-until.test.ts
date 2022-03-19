@@ -1,4 +1,6 @@
 import { testStream } from '../test-stream';
 import { takeUntilTestCases } from './take-until';
 
-takeUntilTestCases.forEach(testStream);
+for (const c of takeUntilTestCases) {
+  testStream(c);
+}

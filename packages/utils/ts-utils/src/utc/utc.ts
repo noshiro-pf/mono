@@ -59,6 +59,7 @@ export namespace utc {
     weekday: WeekDayEnum;
   } => {
     const d = new Date(u);
+
     return {
       year: d.getFullYear() as YearEnum,
       month: d.getMonth() as MonthEnum,
@@ -84,6 +85,7 @@ export namespace utc {
     weekday: WeekDayEnum;
   } => {
     const d = new Date(u);
+
     return {
       year: d.getUTCFullYear() as YearEnum,
       month: d.getUTCMonth() as MonthEnum,
@@ -116,6 +118,7 @@ export namespace utc {
     }>) =>
     (u: UTC): UTC => {
       const d = new Date(u);
+
       if (year !== undefined) {
         d.setFullYear(year);
       }
@@ -137,6 +140,7 @@ export namespace utc {
       if (milliseconds !== undefined) {
         d.setMilliseconds(milliseconds);
       }
+
       return d.getTime() as UTC;
     };
 
@@ -160,6 +164,7 @@ export namespace utc {
     }>) =>
     (u: UTC): UTC => {
       const d = new Date(u);
+
       if (year !== undefined) {
         d.setUTCFullYear(year);
       }
@@ -181,6 +186,7 @@ export namespace utc {
       if (milliseconds !== undefined) {
         d.setUTCMilliseconds(milliseconds);
       }
+
       return d.getTime() as UTC;
     };
 
@@ -266,12 +272,14 @@ export namespace utc {
     (delimiter: string = '/') =>
     (u: UTC): string => {
       const { year, month, date } = getLocale(u);
+
       return [year, pad2(month), pad2(date)].join(delimiter);
     };
   export const toUTCYMD =
     (delimiter: string = '/') =>
     (u: UTC): string => {
       const { year, month, date } = getUTC(u);
+
       return [year, pad2(month), pad2(date)].join(delimiter);
     };
 
@@ -279,12 +287,14 @@ export namespace utc {
     (delimiter: string = ':') =>
     (u: UTC): string => {
       const { hours, minutes } = getLocale(u);
+
       return [pad2(hours), pad2(minutes)].join(delimiter);
     };
   export const toUTCHM =
     (delimiter: string = ':') =>
     (u: UTC): string => {
       const { hours, minutes } = getUTC(u);
+
       return [pad2(hours), pad2(minutes)].join(delimiter);
     };
 
@@ -292,12 +302,14 @@ export namespace utc {
     (delimiter: string = ':') =>
     (u: UTC): string => {
       const { hours, minutes, seconds } = getLocale(u);
+
       return [pad2(hours), pad2(minutes), pad2(seconds)].join(delimiter);
     };
   export const toUTCHMS =
     (delimiter: string = ':') =>
     (u: UTC): string => {
       const { hours, minutes, seconds } = getUTC(u);
+
       return [pad2(hours), pad2(minutes), pad2(seconds)].join(delimiter);
     };
 
@@ -357,11 +369,13 @@ export namespace utc {
   export const weekNumberLocale = (u: UTC): 0 | 1 | 2 | 3 | 4 | 5 => {
     const { date, weekday } = getLocale(u);
     const date0Saturday = date - 1 + (6 - weekday); // 同じ週の土曜日
+
     return Math.floor(date0Saturday / 7) as 0 | 1 | 2 | 3 | 4 | 5;
   };
   export const weekNumberUTC = (u: UTC): 0 | 1 | 2 | 3 | 4 | 5 => {
     const { date, weekday } = getUTC(u);
     const date0Saturday = date - 1 + (6 - weekday); // 同じ週の土曜日
+
     return Math.floor(date0Saturday / 7) as 0 | 1 | 2 | 3 | 4 | 5;
   };
 }

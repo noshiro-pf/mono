@@ -14,8 +14,8 @@ export const ymdToKey = ({ year, month, date }: YearMonthDate): YmdKey =>
 export const ymdFromKey = (ymdKey: YmdKey): YearMonthDate => {
   const [year, month, date] = ymdKey.split('-') as ArrayOfLength<3, string>;
   return {
-    year: parseInt(year, 10) as YearEnum,
-    month: parseInt(month, 10) as MonthEnum,
-    date: parseInt(date, 10) as DateEnum,
+    year: Number.parseInt(year, 10) as YearEnum,
+    month: Number.parseInt(month, 10) as MonthEnum,
+    date: Number.parseInt(date, 10) as DateEnum,
   };
 };

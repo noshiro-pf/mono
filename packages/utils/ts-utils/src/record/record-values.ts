@@ -5,4 +5,5 @@ export const recordValues = <K extends PropertyKey, V>(
 ): V[] => Object.values(object);
 
 const keys = recordValues({ x: 1, y: 2 } as const);
+
 assertType<TypeEq<typeof keys, (1 | 2)[]>>();

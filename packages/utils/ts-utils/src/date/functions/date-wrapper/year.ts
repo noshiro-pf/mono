@@ -5,7 +5,9 @@ export const getYear = (date: ReadonlyDate): YearEnum =>
 
 export const setYear = (curr: ReadonlyDate, year: YearEnum): Date => {
   const copy: Date = new Date(curr as Date);
+
   copy.setFullYear(year);
+
   return copy;
 };
 

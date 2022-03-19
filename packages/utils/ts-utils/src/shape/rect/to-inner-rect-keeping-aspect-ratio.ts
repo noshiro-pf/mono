@@ -34,16 +34,18 @@ export const toInnerRectSizeKeepingAspectRatio = (
     // ow / oh < aspectRatio
     // outerがinnerより縦長のとき
     const padNSx2 = oh - ow / aspectRatio;
+
     return {
-      width: outerRectSize.width,
-      height: outerRectSize.height - padNSx2,
+      width: ow,
+      height: oh - padNSx2,
     };
   } else {
     // outerがinnerより横長のとき
     const padWEx2 = ow - oh * aspectRatio;
+
     return {
-      width: outerRectSize.width - padWEx2,
-      height: outerRectSize.height,
+      width: ow - padWEx2,
+      height: oh,
     };
   }
 };
@@ -52,14 +54,21 @@ export const toInnerRectKeepingAspectRatio = (
   outerRect: Rect,
   aspectRatio: number
 ): Rect => {
-  const { height: outerH, width: outerW } = outerRect;
+  const {
+    height: outerH,
+    width: outerW,
+    top: outerT,
+    left: outerL,
+  } = outerRect;
+
   const { height: innerH, width: innerW } = toInnerRectSizeKeepingAspectRatio(
     { width: outerW, height: outerH },
     aspectRatio
   );
+
   return {
-    top: outerRect.top + (outerH - innerH) / 2,
-    left: outerRect.left + (outerW - innerW) / 2,
+    top: outerT + (outerH - innerH) / 2,
+    left: outerL + (outerW - innerW) / 2,
     width: innerW,
     height: innerH,
   };

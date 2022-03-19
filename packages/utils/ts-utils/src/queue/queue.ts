@@ -10,6 +10,7 @@ export class Queue<T> {
   }
   dequeue(): T | undefined {
     this._size -= 1;
+
     return this._data.pop();
   }
   enqueue(value: T): void {

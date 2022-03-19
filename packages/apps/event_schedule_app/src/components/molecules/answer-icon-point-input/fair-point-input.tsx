@@ -26,7 +26,7 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
     const { state: valueStr, setState: setValueStr } = useState<string>('');
 
     const valueParsed = useMemo<number | undefined>(() => {
-      const res = parseFloat(valueStr);
+      const res = Number.parseFloat(valueStr);
       if (Number.isNaN(res)) return undefined;
       return res;
     }, [valueStr]);

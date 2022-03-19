@@ -7,6 +7,7 @@ describe('changeOriginOfPos', () => {
       { x: 0, y: 0 },
       { x: 200, y: 100 }
     );
+
     expect(changeOriginFn(pos)).toStrictEqual({ x: 100, y: 300 });
   });
 
@@ -16,6 +17,7 @@ describe('changeOriginOfPos', () => {
       { x: 200, y: 100 },
       { x: 0, y: 0 }
     );
+
     expect(changeOriginFn(pos)).toStrictEqual({ x: 700, y: 500 });
   });
 });
@@ -27,6 +29,7 @@ describe('changeOriginOfRect', () => {
       { x: 0, y: 0 },
       { x: 200, y: 100 }
     );
+
     expect(changeOriginFn(rect)).toStrictEqual({
       left: 100,
       top: 300,
@@ -41,6 +44,7 @@ describe('changeOriginOfRect', () => {
       { x: 200, y: 100 },
       { x: 0, y: 0 }
     );
+
     expect(changeOriginFn(rect)).toStrictEqual({
       left: 700,
       top: 500,

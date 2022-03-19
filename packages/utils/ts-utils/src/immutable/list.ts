@@ -87,7 +87,7 @@ export namespace IList {
   export const zeros = (len: number): Result<readonly 0[], string> =>
     !isUint32(len)
       ? Result.err('len should be uint32')
-      : Result.ok(new Array<0>(len).fill(0));
+      : Result.ok(Array.from<0>({ length: len }).fill(0));
 
   export const zerosThrow = (len: number): readonly 0[] =>
     Result.unwrapThrow(zeros(len));
@@ -138,6 +138,7 @@ export namespace IList {
   ): readonly T[] => {
     const startClamped = clamp(0, list.length)(start);
     const endClamped = clamp(startClamped, list.length)(end);
+
     return list.slice(startClamped, endClamped);
   };
 
@@ -249,6 +250,7 @@ export namespace IList {
     list2: T2
   ): ReadonlyListZip<T1, T2> => {
     const len = Math.min(list1.length, list2.length);
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return seqThrow(len).map((i) => ituple(list1[i]!, list2[i]!));
   };
@@ -271,6 +273,7 @@ export namespace IList {
   {
     const a = [1, 2, 3] as const;
     const r = filter(a, (x): x is 1 => x === 1);
+
     assertType<TypeEq<typeof r, readonly 1[]>>();
   }
 
@@ -307,7 +310,9 @@ export namespace IList {
     newValue: A
   ): readonly A[] => {
     const mut_temp = Array.from(list);
+
     mut_temp.splice(index, 0, newValue);
+
     return mut_temp;
   };
 
@@ -316,7 +321,9 @@ export namespace IList {
     index: number
   ): readonly A[] => {
     const mut_temp = Array.from(list);
+
     mut_temp.splice(index, 1);
+
     return mut_temp;
   };
 
@@ -365,6 +372,7 @@ export namespace IList {
     comparator?: (x: T[number], y: T[number]) => number
   ): { readonly [K in keyof T]: T[number] } {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
+
     return Array.from(list).sort(cmp) as readonly unknown[] as {
       readonly [K in keyof T]: T[number];
     };
@@ -424,6 +432,7 @@ export namespace IList {
     comparator?: (x: T[number], y: T[number]) => number
   ): T[number] | undefined {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
+
     return isEmpty(list)
       ? undefined
       : list.reduce((mx, curr) => (cmp(mx, curr) < 0 ? mx : curr), list[0]);
@@ -450,6 +459,7 @@ export namespace IList {
     comparator?: (x: T[number], y: T[number]) => number
   ): T[number] | undefined {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
+
     return min(list, (x, y) => -cmp(x, y));
   }
 
@@ -576,6 +586,7 @@ export namespace IList {
     const mut_result: B[] = Array.from(newArrayThrow<B>(list.length + 1, init));
 
     let acc = init;
+
     for (const [index, value] of list.entries()) {
       acc = reducer(acc, value);
       mut_result[index + 1] = acc;
@@ -598,11 +609,14 @@ export namespace IList {
     grouper: (value: T[number], index: number) => G
   ): IMap<G, number> => {
     const groups = new Map<G, number>();
+
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
       const curr = groups.get(key) ?? 0;
+
       groups.set(key, curr + 1);
     }
+
     return IMap.new(groups);
   };
 
@@ -611,15 +625,19 @@ export namespace IList {
     grouper: (value: T[number], index: number) => G
   ): IMap<G, readonly T[number][]> => {
     const mut_groups = new Map<G, T[number][]>();
+
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
+
       if (mut_groups.has(key)) {
         const mut_g = mut_groups.get(key);
+
         mut_g?.push(e);
       } else {
         mut_groups.set(key, [e]);
       }
     }
+
     return IMap.new<G, readonly T[number][]>(mut_groups);
   };
 
@@ -649,10 +667,13 @@ export namespace IList {
     mapFn: (value: A) => B
   ): readonly A[] {
     const mappedValues = new Set();
+
     return list.filter((val) => {
       const mappedValue = mapFn(val);
+
       if (mappedValues.has(mappedValue)) return false;
       mappedValues.add(mappedValue);
+
       return true;
     });
   }
@@ -694,6 +715,7 @@ export namespace IList {
     let val1: T = sortedList1[it1]!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     let val2: T = sortedList2[it2]!;
+
     while (it1 < sortedList1.length && it2 < sortedList2.length) {
       if (val1 === val2) {
         it1 += 1;
@@ -717,6 +739,7 @@ export namespace IList {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       mut_result.push(sortedList1[it1]!);
     }
+
     return mut_result;
   };
 }

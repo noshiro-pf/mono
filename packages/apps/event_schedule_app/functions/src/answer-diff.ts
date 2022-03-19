@@ -11,14 +11,16 @@ export const answerDiffAsString = (
 ): string[] => {
   const mut_result = [];
   if (before.user.name !== after.user.name) {
-    mut_result.push(`・ 名前の変更（${before.user.name}→${after.user.name}）`);
-    mut_result.push('');
+    mut_result.push(
+      `・ 名前の変更（${before.user.name}→${after.user.name}）`,
+      ''
+    );
   }
 
   const mut_answerChanges: string[] = [];
 
   // Note: assume before.selection and after.selection are the same length and the same order
-  after.selection.forEach((sel, idx) => {
+  for (const [idx, sel] of after.selection.entries()) {
     const iconBefore = before.selection[idx]?.iconId ?? 'none';
     const iconAfter = sel.iconId;
     if (iconBefore !== iconAfter) {
@@ -48,18 +50,18 @@ export const answerDiffAsString = (
         );
       }
     }
-  });
+  }
 
   if (mut_answerChanges.length > 0) {
-    mut_result.push('・ 回答の変更');
-    mut_result.push(...mut_answerChanges);
-    mut_result.push('');
+    mut_result.push('・ 回答の変更', ...mut_answerChanges, '');
   }
 
   if (before.comment !== after.comment) {
-    mut_result.push('・ コメントの変更：');
-    mut_result.push(`    ・ （変更前）：${before.comment}`);
-    mut_result.push(`    ・ （変更後）：${after.comment}`);
+    mut_result.push(
+      '・ コメントの変更：',
+      `    ・ （変更前）：${before.comment}`,
+      `    ・ （変更後）：${after.comment}`
+    );
   }
   return mut_result;
 };

@@ -21,7 +21,7 @@ export const getEventSchedule = async (
       });
     }
     return Result.ok(fillEventSchedule(res.data()));
-  } catch (message: unknown) {
-    return Result.err({ type: 'others' as const, message: String(message) });
+  } catch (error: unknown) {
+    return Result.err({ type: 'others' as const, message: String(error) });
   }
 };

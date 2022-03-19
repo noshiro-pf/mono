@@ -13,4 +13,4 @@ const testClamp = (
 testClamp([0, 2], 2.3, 2);
 testClamp([0, 2], -0.5, 0);
 testClamp([0, 2], 1.5, 1.5);
-testClamp([0, 2], NaN, 0);
+testClamp([0, 2], Number.NaN, 0);

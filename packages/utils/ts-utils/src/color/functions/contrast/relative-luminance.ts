@@ -7,4 +7,4 @@ export const relativeLuminance = ([r, g, b]: Rgb): number =>
   0.2126 * f(r / 255) + 0.7152 * f(g / 255) + 0.0722 * f(b / 255);
 
 const f = (v: number): number =>
-  v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  v <= 0.039_28 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;

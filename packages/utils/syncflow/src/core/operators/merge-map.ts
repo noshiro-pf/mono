@@ -56,12 +56,12 @@ class MergeMapObservableClass<A, B>
   }
 
   override complete(): void {
-    this._subscriptions.forEach((s) => {
+    for (const s of this._subscriptions) {
       s.unsubscribe();
-    });
-    this._observables.forEach((o) => {
+    }
+    for (const o of this._observables) {
       o.complete();
-    });
+    }
     super.complete();
   }
 }

@@ -1,4 +1,6 @@
 import { testStream } from '../test-stream';
 import { zipTestCases } from './zip';
 
-zipTestCases.forEach(testStream);
+for (const c of zipTestCases) {
+  testStream(c);
+}

@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'preact';
-// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { memo } from 'preact/compat';
 
 export const memoNamed = <Props>(

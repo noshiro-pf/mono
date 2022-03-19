@@ -3,6 +3,7 @@ import { numberToRgbValue } from '../from-number';
 
 const hue2rgb = (p: number, q: number, s: number): number => {
   let t = s;
+
   if (t < 0) {
     t += 1;
   }
@@ -13,6 +14,7 @@ const hue2rgb = (p: number, q: number, s: number): number => {
   if (t < 1 / 6) return p + (q - p) * (6 * t);
   if (t < 1 / 2) return q;
   if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+
   return p;
 };
 
@@ -24,6 +26,7 @@ export const hslToRgb = ([h, s, l]: Hsl): Rgb => {
   if (s01 === 0) {
     // achromatic
     const l255 = numberToRgbValue(l01 * 255);
+
     return [l255, l255, l255];
   }
 
@@ -42,5 +45,6 @@ export const hslToRgb = ([h, s, l]: Hsl): Rgb => {
 
 export const hslaToRgba = ([h, s, l, a]: Hsla): Rgba => {
   const [r, g, b] = hslToRgb([h, s, l]);
+
   return [r, g, b, a];
 };

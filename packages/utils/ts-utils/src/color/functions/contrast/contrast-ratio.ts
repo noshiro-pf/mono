@@ -12,6 +12,7 @@ export const contrastRatioRgb = (rgb1: Rgb, rgb2: Rgb): number => {
   const b = relativeLuminance(rgb2);
   const [relativeLuminanceLighter, relativeLuminanceDarker] =
     a < b ? [b, a] : [a, b];
+
   return (relativeLuminanceLighter + 0.05) / (relativeLuminanceDarker + 0.05);
 };
 

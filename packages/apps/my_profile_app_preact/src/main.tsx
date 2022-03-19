@@ -17,6 +17,7 @@ import {
 import { labelList, links, routeList, routes } from './constants';
 
 const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
+  // eslint-disable-next-line unicorn/prefer-array-index-of
   const res = routeList.findIndex((e) => e === `/${pathNameLast}/`);
   return res === -1 ? undefined : res;
 };

@@ -46,11 +46,9 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
 
   const onJoinRoomButtonClick = useCallback(() => {
     if (room === undefined) return;
-    if (room.password !== '') {
-      if (room.password !== password) {
-        setShowPasswordError(true);
-        return;
-      }
+    if (room.password !== '' && room.password !== password) {
+      setShowPasswordError(true);
+      return;
     }
     joinRoom.dispatch(roomId, username).catch(console.error);
   }, [room, roomId, username, password, setShowPasswordError]);

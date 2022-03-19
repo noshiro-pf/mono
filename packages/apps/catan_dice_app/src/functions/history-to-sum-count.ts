@@ -8,8 +8,8 @@ export const historyToSumCount = (
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ];
   const historyFiltered = IList.take(hist.history, hist.index + 1);
-  historyFiltered.forEach(([a, b]) => {
+  for (const [a, b] of historyFiltered) {
     mut_count[a + b - 2] += 1;
-  });
+  }
   return mut_count;
 };

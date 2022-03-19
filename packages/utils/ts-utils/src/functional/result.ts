@@ -46,6 +46,7 @@ export namespace Result {
     if (isErr<S, E>(result)) {
       throw new Error(JSON.stringify(result.value));
     }
+
     return result.value;
   };
 
@@ -71,12 +72,14 @@ export namespace Result {
       if (isErr<S, E>(result)) {
         throw new Error(message);
       }
+
       return result.value;
     };
 
   export const fromPromise = <S, E = unknown>(
     promise: Readonly<Promise<S>>
-  ): Promise<_Result<S, E>> => promise.then(ok).catch((e) => err(e as E));
+  ): Promise<_Result<S, E>> =>
+    promise.then(ok).catch((error) => err(error as E));
 }
 
 export type Result<S, E> = Result._Result<S, E>;

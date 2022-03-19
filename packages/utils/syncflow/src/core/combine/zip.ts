@@ -44,13 +44,11 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
 
   override tryUpdate(token: Token): void {
     const queues = this._queues;
-    this.parents.forEach((par, index) => {
-      if (par.token === token) {
-        if (Option.isSome(par.currentValue)) {
-          queues[index]?.enqueue(par.currentValue.value);
-        }
+    for (const [index, par] of this.parents.entries()) {
+      if (par.token === token && Option.isSome(par.currentValue)) {
+        queues[index]?.enqueue(par.currentValue.value);
       }
-    });
+    }
 
     if (queues.every((list) => !list.isEmpty)) {
       const nextValue = queues.map((q) => q.dequeue()) as unknown as A;

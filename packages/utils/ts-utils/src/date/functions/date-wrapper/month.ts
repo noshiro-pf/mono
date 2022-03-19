@@ -5,7 +5,9 @@ export const getMonth = (date: ReadonlyDate): MonthEnum =>
 
 export const setMonth = (curr: ReadonlyDate, month: MonthEnum): Date => {
   const copy: Date = new Date(curr as Date);
+
   copy.setMonth(month - 1);
+
   return copy;
 };
 

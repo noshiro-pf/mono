@@ -5,5 +5,6 @@ import { getDate, getDay } from './date-wrapper';
  */
 export const weekNumber = (date: ReadonlyDate): number => {
   const date0Saturday = getDate(date) - 1 + (6 - getDay(date)); // 同じ週の土曜日
+
   return Math.floor(date0Saturday / 7);
 };

@@ -2,12 +2,12 @@ import { numberLambdaTerm, PLUStokens, SUCCtokens } from './macro';
 
 export const expandShortcuts = (tokens: readonly string[]): string[] => {
   const mut_expanded: string[] = [];
-  tokens.forEach((token) => {
-    const parsedAsNumber = parseInt(token, 10);
-    if (!isNaN(parsedAsNumber)) {
+  for (const token of tokens) {
+    const parsedAsNumber = Number.parseInt(token, 10);
+    if (!Number.isNaN(parsedAsNumber)) {
       /* 3 => (lambda s. (lambda z. (s(s(s z))))) */
       mut_expanded.push(...numberLambdaTerm(parsedAsNumber));
-      return;
+      continue;
     }
     switch (token) {
       case 'SUCC':
@@ -25,6 +25,6 @@ export const expandShortcuts = (tokens: readonly string[]): string[] => {
         mut_expanded.push(token);
         break;
     }
-  });
+  }
   return mut_expanded;
 };

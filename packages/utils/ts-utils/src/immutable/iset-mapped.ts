@@ -64,6 +64,7 @@ export const ISetMapped = {
     b: ISetMapped<K, KM>
   ): boolean => {
     if (a.size !== b.size) return false;
+
     return a.every((e) => b.has(e));
   },
 
@@ -123,6 +124,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     for (const key of this.values()) {
       if (!predicate(key)) return false;
     }
+
     return true;
   }
 
@@ -130,11 +132,13 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     for (const key of this.values()) {
       if (predicate(key)) return true;
     }
+
     return false;
   }
 
   add(key: K): ISetMapped<K, KM> {
     if (this.has(key)) return this;
+
     return ISetMapped.new(
       [...this._set, this._toKey(key)].map(this._fromKey),
       this._toKey,
@@ -145,6 +149,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   delete(key: K): ISetMapped<K, KM> {
     if (!this.has(key)) return this;
     const keyMapped = this._toKey(key);
+
     return ISetMapped.new(
       Array.from(this._set)
         .filter((k) => !Object.is(k, keyMapped))
@@ -160,8 +165,10 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     >[]
   ): ISetMapped<K, KM> {
     const result = new Set<KM>(this._set);
+
     for (const action of actions) {
       const key = this._toKey(action.key);
+
       switch (action.type) {
         case 'delete':
           result.delete(key);
@@ -171,6 +178,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
           break;
       }
     }
+
     return ISetMapped.new<K, KM>(
       Array.from(result, this._fromKey),
       this._toKey,
@@ -203,9 +211,9 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   }
 
   forEach(callbackfn: (key: K) => void): void {
-    this._set.forEach((km) => {
+    for (const km of this._set) {
       callbackfn(this._fromKey(km));
-    });
+    }
   }
 
   isSubsetOf(set: ISetMapped<K, KM>): boolean {
@@ -261,6 +269,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   *entries(): IterableIterator<readonly [K, K]> {
     for (const km of this._set.keys()) {
       const a = this._fromKey(km);
+
       yield [a, a];
     }
   }
