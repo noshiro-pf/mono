@@ -30,6 +30,10 @@
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
+    "@noshiro/ts-utils-additional": "*",
     "preact": "^10.4.7"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

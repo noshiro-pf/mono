@@ -1,4 +1,4 @@
-import { getPlatform } from '@noshiro/ts-utils';
+import { getPlatform } from '@noshiro/ts-utils-additional';
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const isCtrlKey = (keyEvent: KeyboardEvent): boolean => {

@@ -1,14 +1,4 @@
-import { IList } from '../immutable';
-import type {
-  DateEnum,
-  HoursEnum,
-  MillisecondsEnum,
-  MinutesEnum,
-  MonthEnum,
-  SecondsEnum,
-  WeekDayEnum,
-  YearEnum,
-} from './enum';
+import { IList } from '../collections';
 
 export type IDate = StrictOmit<
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -95,15 +85,15 @@ export namespace IDate {
    * @description Gets the day of the week, using local time.
    * @returns a number from 0 to 6
    */
-  export const getLocaleDayOfWeek = (date: IDate): WeekDayEnum =>
-    getValueHelper(date, (d) => d.getDay()) as WeekDayEnum;
+  export const getLocaleDayOfWeek = (date: IDate): DayOfWeekIndex =>
+    getValueHelper(date, (d) => d.getDay()) as DayOfWeekIndex;
 
   /**
    * @description Gets the day of the week using Universal Coordinated Time (UTC).
    * @returns a number from 0 to 6
    */
-  export const getUTCDayOfWeek = (date: IDate): WeekDayEnum =>
-    getValueHelper(date, (d) => d.getUTCDay()) as WeekDayEnum;
+  export const getUTCDayOfWeek = (date: IDate): DayOfWeekIndex =>
+    getValueHelper(date, (d) => d.getUTCDay()) as DayOfWeekIndex;
 
   /**
    * @description Gets the hours in a date, using local time.

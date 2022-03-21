@@ -2,30 +2,34 @@ export namespace Maybe {
   const SomeTypeSymbol: unique symbol = Symbol('Maybe.some');
   const NoneTypeSymbol: unique symbol = Symbol('Maybe.none');
 
-  export type Some<S> = {
+  /** @internal */
+  export type _Some<S> = {
     readonly type: typeof SomeTypeSymbol;
     readonly value: S;
   };
-  export type None = {
+
+  /** @internal */
+  export type _None = {
     readonly type: typeof NoneTypeSymbol;
   };
 
-  export type _Maybe<S> = None | Some<S>;
+  /** @internal */
+  export type _Maybe<S> = _None | _Some<S>;
 
-  export const some = <S>(value: S): Some<S> => ({
+  export const some = <S>(value: S): _Some<S> => ({
     type: SomeTypeSymbol,
     value,
   });
 
-  export const none: None = { type: NoneTypeSymbol } as const;
+  export const none: _None = { type: NoneTypeSymbol } as const;
 
   export const isSome = <S>(
     option: _Maybe<S> | null | undefined
-  ): option is Some<S> => option?.type === SomeTypeSymbol;
+  ): option is _Some<S> => option?.type === SomeTypeSymbol;
 
   export const isNone = <S>(
     option: _Maybe<S> | null | undefined
-  ): option is None => option?.type === NoneTypeSymbol;
+  ): option is _None => option?.type === NoneTypeSymbol;
 
   export const map =
     <S, S2>(mapFn: (value: S) => S2) =>
@@ -58,3 +62,5 @@ export namespace Maybe {
 }
 
 export type Maybe<S> = Maybe._Maybe<S>;
+export type Some<S> = Maybe._Some<S>;
+export type None = Maybe._None;

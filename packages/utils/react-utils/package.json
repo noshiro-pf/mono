@@ -29,6 +29,10 @@
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
+    "@noshiro/ts-utils-additional": "*",
     "react": "^17.0.2"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

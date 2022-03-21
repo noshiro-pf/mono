@@ -1,5 +1,5 @@
 /* eslint-disable import/no-deprecated */
-import { assertNotType, assertType } from '../types';
+import { assertNotType, assertType } from '../assert-type';
 import { isRecord } from './is-record';
 
 describe('isRecord', () => {

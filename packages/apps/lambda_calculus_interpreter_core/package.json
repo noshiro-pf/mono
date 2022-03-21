@@ -28,6 +28,10 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@noshiro/ts-utils": "*"
+    "@noshiro/ts-utils": "*",
+    "@noshiro/ts-utils-additional": "*"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

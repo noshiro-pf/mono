@@ -1,4 +1,4 @@
-import type { Phantomic } from '@noshiro/ts-utils';
+import type { Phantomic } from '@noshiro/ts-utils-additional';
 
 export type ObservableId = Phantomic<number, 'observable-id'>;
 export type SubscriberId = Phantomic<number, 'subscriber-id'>;

@@ -2,28 +2,32 @@ export namespace Result {
   const OkTypeSymbol: unique symbol = Symbol('Result.ok');
   const ErrTypeSymbol: unique symbol = Symbol('Result.err');
 
-  export type Ok<S> = {
+  /** @internal */
+  export type _Ok<S> = {
     readonly type: typeof OkTypeSymbol;
     readonly value: S;
   };
-  export type Err<E> = {
+
+  /** @internal */
+  export type _Err<E> = {
     readonly type: typeof ErrTypeSymbol;
     readonly value: E;
   };
 
-  export type _Result<S, E> = Err<E> | Ok<S>;
+  /** @internal */
+  export type _Result<S, E> = _Err<E> | _Ok<S>;
 
-  export const ok = <S>(value: S): Ok<S> => ({ type: OkTypeSymbol, value });
+  export const ok = <S>(value: S): _Ok<S> => ({ type: OkTypeSymbol, value });
 
-  export const err = <E>(value: E): Err<E> => ({ type: ErrTypeSymbol, value });
+  export const err = <E>(value: E): _Err<E> => ({ type: ErrTypeSymbol, value });
 
   export const isOk = <S, E>(
     result: _Result<S, E> | null | undefined
-  ): result is Ok<S> => result?.type === OkTypeSymbol;
+  ): result is _Ok<S> => result?.type === OkTypeSymbol;
 
   export const isErr = <S, E>(
     result: _Result<S, E> | null | undefined
-  ): result is Err<E> => result?.type === ErrTypeSymbol;
+  ): result is _Err<E> => result?.type === ErrTypeSymbol;
 
   export const map =
     <S, S2, E>(mapFn: (value: S) => S2) =>
@@ -83,3 +87,5 @@ export namespace Result {
 }
 
 export type Result<S, E> = Result._Result<S, E>;
+export type Ok<S> = Result._Ok<S>;
+export type Err<E> = Result._Err<E>;
