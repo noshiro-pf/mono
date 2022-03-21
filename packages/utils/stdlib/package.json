@@ -1,0 +1,12 @@
+{
+  "name": "@noshiro/stdlib",
+  "version": "1.0.0",
+  "private": false,
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "fmt": "prettier --write .",
+    "test": "yarn type-check",
+    "type-check": "tsc"
+  }
+}

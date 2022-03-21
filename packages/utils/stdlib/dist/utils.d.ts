@@ -47,7 +47,8 @@ type ReadonlyJSONValue =
     }
   | null;
 
-type JSONType = Readonly<Record<string, JsonValueType>>;
+type ReadonlyJSONType = Readonly<Record<string, ReadonlyJSONValue>>;
+type JSONType = Readonly<Record<string, JSONValue>>;
 
 /* Other Utilities */
 
@@ -68,15 +69,6 @@ type UnionToIntersection<T> = (
 type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
 type RecordKeyType = keyof never;
-
-{
-  /** @deprecated @internal */
-  type TestCases = [
-    ExpectTrue<TypeEq<keyof never, keyof any>>,
-    ExpectTrue<TypeEq<keyof never, keyof unknown>>,
-    ExpectTrue<TypeEq<keyof never, PropertyKey>>
-  ];
-}
 
 type ReadonlyRecord<K extends RecordKeyType, V> = Readonly<Record<K, V>>;
 
@@ -100,11 +92,6 @@ type Length<T extends { length: number }> = T['length'];
 
 type ArrayElement<S> = S extends readonly (infer T)[] ? T : never;
 
-{
-  /** @deprecated @internal */
-  type TestCases = [ExpectTrue<TypeEq<Length<readonly [1, 2, 3]>, 3>>];
-}
-
 /* ArrayOfLength */
 
 type ArrayOfLength<N extends number, T> = ArrayOfLengthRec<N, T, []>;
@@ -116,20 +103,6 @@ type ArrayOfLengthRec<Num, Elm, T extends unknown[]> = {
   0: T;
   1: ArrayOfLengthRec<Num, Elm, [Elm, ...T]>;
 }[T extends { length: Num } ? 0 : 1];
-
-{
-  /** @deprecated @internal */
-  type TestCases = [
-    TypeEq<[0, 0], ArrayOfLength<2, 0>>,
-    TypeEq<[0, 0, 0], ArrayOfLength<3, 0>>,
-    TypeEq<[0, 0, 0, 0], ArrayOfLength<4, 0>>,
-    TypeEq<[0, 0, 0, 0, 0], ArrayOfLength<5, 0>>,
-    TypeEq<readonly [0, 0], ReadonlyArrayOfLength<2, 0>>,
-    TypeEq<readonly [0, 0, 0], ReadonlyArrayOfLength<3, 0>>,
-    TypeEq<readonly [0, 0, 0, 0], ReadonlyArrayOfLength<4, 0>>,
-    TypeEq<readonly [0, 0, 0, 0, 0], ReadonlyArrayOfLength<5, 0>>
-  ];
-}
 
 /* ArrayAtLeastLen */
 
@@ -163,37 +136,6 @@ type DeepReadonly<T> = T extends Function | Primitive
     }
   : T;
 
-{
-  /** @deprecated @internal */
-  type TestCases = [
-    ExpectTrue<
-      TypeEq<
-        DeepReadonly<{ a: { b: { c: number[]; 1: 2 } } }>,
-        {
-          readonly a: {
-            readonly b: {
-              readonly c: readonly number[];
-              readonly 1: 2;
-            };
-          };
-        }
-      >
-    >,
-    ExpectTrue<
-      TypeEq<
-        DeepReadonly<{ a: { b: { c: [1, 2, 5] } } }>,
-        {
-          readonly a: {
-            readonly b: {
-              readonly c: readonly [1, 2, 5];
-            };
-          };
-        }
-      >
-    >
-  ];
-}
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 type DeepWritable<T> = T extends Function | Primitive
   ? T
@@ -208,48 +150,6 @@ type DeepWritable<T> = T extends Function | Primitive
     }
   : T;
 
-{
-  /** @deprecated @internal */
-  type TestCases = [
-    ExpectTrue<
-      TypeEq<
-        DeepWritable<{
-          readonly a: {
-            readonly b: {
-              readonly c: [1, 2, 3];
-              readonly d: (xs: readonly number[]) => number;
-              readonly 1: 2;
-            };
-          };
-        }>,
-        {
-          a: {
-            b: {
-              c: [1, 2, 3];
-              d: (xs: readonly number[]) => number;
-              1: 2;
-            };
-          };
-        }
-      >
-    >,
-    ExpectTrue<
-      TypeEq<
-        DeepWritable<{
-          readonly a: { readonly b: { readonly c: readonly [1, 2, 5] } };
-        }>,
-        {
-          a: {
-            b: {
-              c: [1, 2, 5];
-            };
-          };
-        }
-      >
-    >
-  ];
-}
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 type DeepPartial<T> = T extends Function | Primitive
   ? T
@@ -263,39 +163,6 @@ type DeepPartial<T> = T extends Function | Primitive
       [K in keyof T]?: DeepPartial<T[K]>;
     }
   : T;
-
-{
-  /** @deprecated @internal */
-  type TestCases = [
-    ExpectTrue<
-      TypeEq<
-        DeepPartial<{ a: { b: { c: number[]; 1: 2 } } }>,
-        {
-          a?: {
-            b?: {
-              c?: (number | undefined)[];
-              1?: 2;
-            };
-          };
-        }
-      >
-    >,
-    ExpectTrue<
-      TypeEq<
-        DeepPartial<{ a: { b: { c: [1, 2, 5] } } }>,
-        {
-          a?: {
-            b?: {
-              c?:
-                | [(1 | undefined)?, (2 | undefined)?, (5 | undefined)?]
-                | undefined;
-            };
-          };
-        }
-      >
-    >
-  ];
-}
 
 type MergeIntersection<R extends Record<string, unknown>> = {
   [K in keyof R]: R[K];
