@@ -1,0 +1,7 @@
+{
+  "extends": "../../../config/tsconfig/tsconfig.base.nolib.json",
+  "include": ["./type-check"],
+  "compilerOptions": {
+    "noEmit": true
+  }
+}
