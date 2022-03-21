@@ -73,14 +73,14 @@ const exampleList: readonly {
 
 const printExamples = (exampleIdx: number): void => {
   console.log('examples:');
-  exampleList.forEach((example, i) => {
+  for (const [i, example] of exampleList.entries()) {
     const isSelected = exampleIdx === i;
     console.log(
       `  ${isSelected ? '[' : ' '}${(i + 1)
         .toString()
         .padStart(3)}. ${example.name.padEnd(20)}${isSelected ? ']' : ' '}`
     );
-  });
+  }
 };
 
 const printExampleCases = (
@@ -88,14 +88,14 @@ const printExampleCases = (
   testCaseIdx: number
 ): void => {
   console.log('test cases:');
-  exampleCases.forEach((c, i) => {
+  for (const [i, c] of exampleCases.entries()) {
     const isSelected = testCaseIdx === i;
     console.log(
       `  ${isSelected ? '[' : ' '}${(i + 1)
         .toString()
         .padStart(3)}. ${c.name.padEnd(30)}${isSelected ? ']' : ' '}`
     );
-  });
+  }
 };
 
 const printSeparator = (): void => {

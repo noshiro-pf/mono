@@ -2,9 +2,10 @@
 
 // @ts-check
 
-/** @typedef { import("webpack").RuleSetRule } DotEnvValues */
+/** @typedef { import("webpack").RuleSetRule } RuleSetRule */
 /** @typedef { import("webpack").WebpackPluginInstance } WebpackPluginInstance */
 /** @typedef { import("webpack").Configuration } Configuration */
+/** @typedef { import("../../types/slides-paths").SlidesPaths } SlidesPaths */
 
 const copyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -60,7 +61,7 @@ const pluginsMaker = (templatePath, copyPaths, hot, useBundleAnalyzer) =>
 
 /**
  *
- * @param {Paths} paths
+ * @param {SlidesPaths} paths
  * @param {{ from: string; to: string }[]} copyPaths
  * @param {boolean} hot
  * @param {boolean} useBundleAnalyzer

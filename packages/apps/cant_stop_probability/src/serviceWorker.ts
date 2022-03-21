@@ -85,12 +85,12 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
     mut_registration.scope
   );
 
-  mut_registration.onupdatefound = () => {
+  mut_registration.addEventListener('updatefound', () => {
     const mut_installingWorker = mut_registration.installing;
     if (mut_installingWorker == null) {
       return;
     }
-    mut_installingWorker.onstatechange = () => {
+    mut_installingWorker.addEventListener('statechange', () => {
       if (mut_installingWorker.state === 'installed') {
         if (navigator.serviceWorker.controller !== null) {
           // At this point, the updated precached content has been fetched,
@@ -117,8 +117,8 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
           }
         }
       }
-    };
-  };
+    });
+  });
 }
 
 function checkValidServiceWorker(swUrl: string, config?: Config): void {

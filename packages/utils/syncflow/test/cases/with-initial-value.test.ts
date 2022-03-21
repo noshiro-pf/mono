@@ -4,7 +4,9 @@ import { interval, mapI, take, withInitialValue } from '../../src';
 import { testStream } from '../test-stream';
 import { withInitialValueTestCases } from './with-initial-value';
 
-withInitialValueTestCases.forEach(testStream);
+for (const c of withInitialValueTestCases) {
+  testStream(c);
+}
 
 const s0 = interval(1000).chain(take(1));
 const s1 = s0.chain(withInitialValue(0));

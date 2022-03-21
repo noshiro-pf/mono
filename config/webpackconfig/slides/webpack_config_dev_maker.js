@@ -3,7 +3,8 @@
 // @ts-check
 
 /** @typedef { import("webpack").Configuration } Configuration */
-/** @typedef { import("../../types/slides_paths").SlidesPaths } Paths */
+/** @typedef { import("webpack").Configuration["devServer"] } WebpackDevServerConfiguration */
+/** @typedef { import("../../types/slides-paths").SlidesPaths } Paths */
 
 const { merge } = require('webpack-merge');
 const {
@@ -17,7 +18,7 @@ require('webpack-dev-server');
  * @param {Paths} paths
  * @param {string} host
  * @param {number} port
- * @returns {Configuration}
+ * @returns {WebpackDevServerConfiguration}
  */
 const devServerConfigMaker = (paths, host, port) => ({
   open: true,

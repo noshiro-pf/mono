@@ -4,27 +4,18 @@
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 
-const { plugins } = require('./eslint-plugins');
-const { eslintReactRules } = require('./eslintrc-base');
-
 /**
  * https://github.com/yannickcr/eslint-plugin-react
  */
 /** @type {LinterConfig} */
 const config = {
+  extends: ['./.eslintrc.custom-rules-added-react.js'],
   root: true,
   settings: {
     react: {
       version: 'detect',
     },
   },
-  extends: [
-    'plugin:react/all',
-    'plugin:react-hooks/recommended',
-    './.eslintrc.base.js',
-  ],
-  plugins: [plugins.react, plugins.reactHooks],
-  rules: eslintReactRules,
 };
 
 module.exports = config;

@@ -137,6 +137,7 @@ _roomId$.subscribe((roomId) => {
 
   mut_unsubscribe.actions = onSnapshot(actionsColl, (q) => {
     const mut_actions: GameStateAction[] = [];
+    // eslint-disable-next-line unicorn/no-array-for-each
     q.forEach((d) => {
       const data = d.data();
       assertIsGameStateAction(data);

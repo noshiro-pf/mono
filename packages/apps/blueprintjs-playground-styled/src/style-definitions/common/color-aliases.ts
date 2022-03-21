@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-export-from */
 // Copyright 2015 Palantir Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 

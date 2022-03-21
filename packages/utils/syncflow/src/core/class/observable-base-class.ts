@@ -95,9 +95,9 @@ export class ObservableBaseClass<
     this._token = token;
     this._currentValue = Option.some(nextValue);
 
-    this._subscribers.forEach((s) => {
+    for (const s of this._subscribers.values()) {
       s.onNext(nextValue);
-    });
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this,@typescript-eslint/no-empty-function
@@ -118,17 +118,17 @@ export class ObservableBaseClass<
     this._isCompleted = true;
 
     // run subscribers for the current value
-    this._subscribers.forEach((s) => {
+    for (const s of this._subscribers.values()) {
       s.onComplete();
-    });
+    }
 
     // remove all subscribers
     this._subscribers.clear();
 
     // propagate to children
-    this._children.forEach((o) => {
+    for (const o of this._children) {
       o.tryComplete();
-    });
+    }
   }
 
   chain<B>(operator: ToInitializedOperator<A, B>): InitializedObservable<B>;

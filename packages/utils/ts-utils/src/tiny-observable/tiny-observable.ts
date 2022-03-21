@@ -16,14 +16,16 @@ class TinyObservableClass<T> implements TinyObservableSource<T> {
   private readonly subscriptions = new Map<symbol, (value: T) => void>();
 
   next(value: T): void {
-    this.subscriptions.forEach((fn) => {
+    for (const fn of this.subscriptions.values()) {
       fn(value);
-    });
+    }
   }
 
   subscribe(fn: (value: T) => void): Subscription {
     const id = Symbol();
+
     this.subscriptions.set(id, fn);
+
     return {
       unsubscribe: () => {
         this.subscriptions.delete(id);

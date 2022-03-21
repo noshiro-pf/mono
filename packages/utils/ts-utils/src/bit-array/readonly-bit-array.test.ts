@@ -50,6 +50,7 @@ describe('get', () => {
 describe('values', () => {
   test('case 1', () => {
     const rb = ReadonlyBitArray(new Uint8Array([0, 0, 0]));
+
     for (const v of rb.values()) {
       expect(v).toBe(0);
     }
@@ -57,6 +58,7 @@ describe('values', () => {
 
   test('case 2', () => {
     const rb = ReadonlyBitArray(new Uint8Array([2, 3, 4]));
+
     for (const v of rb.values()) {
       expect(v).toBe(1);
     }
@@ -66,6 +68,7 @@ describe('values', () => {
 describe('entries', () => {
   test('case 1', () => {
     const rb = ReadonlyBitArray(new Uint8Array([2, 3, 4]));
+
     for (const [i, v] of rb.entries()) {
       expect(i === 0 || i === 1 || i === 2).toBe(true);
       expect(v).toBe(1);
@@ -76,6 +79,7 @@ describe('entries', () => {
 describe('map', () => {
   test('case 1', () => {
     const rb = ReadonlyBitArray([0, 0, 1]).map((v) => (v === 1 ? 0 : 1));
+
     expect(rb.size).toBe(3);
     expect(rb.get(0)).toBe(1);
     expect(rb.get(1)).toBe(1);
@@ -84,6 +88,7 @@ describe('map', () => {
 
   test('case 2', () => {
     const rb = ReadonlyBitArray([0, 0, 1, 1, 0]);
+
     expect(rb.toString()).toBe('00110');
   });
 });
@@ -91,6 +96,7 @@ describe('map', () => {
 describe('fromStr', () => {
   test('case 1', () => {
     const rb = ReadonlyBitArrayFromStr('12010');
+
     expect(rb.size).toBe(5);
     expect(rb.get(0)).toBe(1);
     expect(rb.get(1)).toBe(1);
@@ -101,6 +107,7 @@ describe('fromStr', () => {
 
   test('case 2', () => {
     const rb = ReadonlyBitArrayFromStr('');
+
     expect(rb.size).toBe(0);
     expect(rb.get(0)).toBeUndefined();
   });

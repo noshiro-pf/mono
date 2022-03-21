@@ -23,7 +23,7 @@ export const ImageElementRenderer = memoNamed<Props>(
     useEffect(() => {
       if (elementRef.current == null) return;
       elementRef.current.innerHTML = ''; // reset
-      elementRef.current.appendChild(imageElement);
+      elementRef.current.append(imageElement);
     }, [imageElement]);
 
     return <Root ref={elementRef} />;

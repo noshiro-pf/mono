@@ -5,5 +5,6 @@ export const setIsSuperset = <T>(
   for (const e of maybeSubset) {
     if (!maybeSuperset.has(e)) return false;
   }
+
   return true;
 };

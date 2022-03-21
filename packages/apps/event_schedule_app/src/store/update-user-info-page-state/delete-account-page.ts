@@ -44,9 +44,6 @@ export namespace DeleteAccountPage {
 
   const passwordIsOpenState = createBooleanState(false);
 
-  const { state$: passwordIsOpen$, setFalse: hidePassword } =
-    passwordIsOpenState;
-
   export const togglePasswordLock = passwordIsOpenState.toggle;
 
   export const state$ = combineLatestI([
@@ -54,7 +51,7 @@ export namespace DeleteAccountPage {
     enterButtonDisabled$,
     emailFormIntent$,
     passwordFormIntent$,
-    passwordIsOpen$,
+    passwordIsOpenState.state$,
   ]).chain(
     mapI(
       ([
@@ -161,7 +158,7 @@ export namespace DeleteAccountPage {
 
   const resetAllDialogState = (): void => {
     dispatch({ type: 'reset' });
-    hidePassword();
+    passwordIsOpenState.setFalse();
   };
 
   UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {

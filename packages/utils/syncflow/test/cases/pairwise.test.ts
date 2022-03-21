@@ -1,4 +1,6 @@
 import { testStream } from '../test-stream';
 import { pairwiseTestCases } from './pairwise';
 
-pairwiseTestCases.forEach(testStream);
+for (const c of pairwiseTestCases) {
+  testStream(c);
+}

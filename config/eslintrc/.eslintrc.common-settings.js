@@ -11,18 +11,24 @@ const { plugins } = require('./eslint-plugins');
 /** @type {LinterConfig} */
 const config = {
   root: true,
-  env: { browser: true, node: true, es6: true, 'jest/globals': true },
+  env: {
+    browser: true,
+    node: true,
+    'jest/globals': true,
+    es2022: true,
+  },
   plugins: [
     plugins.arrayFunc,
     plugins.functional,
     plugins.import,
     plugins.jest,
     plugins.promise,
+    plugins.unicorn,
     plugins.typescriptEslint,
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 'latest',
     ecmaFeatures: {
       modules: true,
       impliedStrict: true,
@@ -40,7 +46,14 @@ const config = {
         alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
         project: 'packages/**/tsconfig.json',
       },
+      // copied from default config
+      node: {
+        extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      },
     },
+    // copied from default config
+    'import/extensions': ['.js', '.jsx'],
+    'import/external-module-folders': ['node_modules', 'node_modules/@types'],
   },
   ignorePatterns: [...readGitignoreFiles({ cwd: __dirname }), '*.d.ts', '*.js'],
 };

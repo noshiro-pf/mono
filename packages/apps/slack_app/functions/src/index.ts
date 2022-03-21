@@ -23,6 +23,7 @@ export const addMessage = functions_https.onRequest(async (req, res) => {
     .collection('messages')
     .add({ original });
   // Send back a message that we've succesfully written the message
+
   res.json({
     result: `Message with ID: ${writeResult.id} added. (${SLACK_API_KEY.length})`,
   });
@@ -46,6 +47,7 @@ export const makeUppercase = firestore
 
     const result = await new Promise((resolve) => {
       const mut_data: Buffer[] = [];
+
       get(searchUrl, (res) => {
         res
           // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

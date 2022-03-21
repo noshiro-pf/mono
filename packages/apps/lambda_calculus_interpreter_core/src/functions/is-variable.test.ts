@@ -1,7 +1,7 @@
 import { isVariable } from './is-variable';
 
 test('isVariable 1', () => {
-  expect(isVariable('x')).toBeTruthy();
+  expect(isVariable('x')).toBe(true);
 });
 
 test('isVariable 2', () => {
@@ -10,9 +10,9 @@ test('isVariable 2', () => {
       ['x', ['y', 'y']],
       ['x', ['y', 'y']],
     ])
-  ).toBeFalsy();
+  ).toBe(false);
 });
 
 test('isVariable 3', () => {
-  expect(isVariable(['lambda', 'x', ['x', ['y', 'y']]])).toBeFalsy();
+  expect(isVariable(['lambda', 'x', ['x', ['y', 'y']]])).toBe(false);
 });

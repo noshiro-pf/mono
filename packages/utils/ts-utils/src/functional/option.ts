@@ -34,8 +34,9 @@ export namespace Option {
 
   export const unwrapThrow = <S>(option: _Option<S>): S => {
     if (isNone(option)) {
-      throw new Error();
+      throw new Error('`unwrapThrow()` has failed because it is `None`');
     }
+
     return option.value;
   };
 
@@ -51,6 +52,7 @@ export namespace Option {
       if (isNone(option)) {
         throw new Error(message);
       }
+
       return option.value;
     };
 }

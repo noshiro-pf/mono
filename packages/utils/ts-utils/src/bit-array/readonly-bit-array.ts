@@ -28,11 +28,13 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     if (!this._isInRange(at)) {
       return undefined;
     }
+
     return this._data[at] === 0 ? 0 : 1;
   }
 
   *values(): IterableIterator<0 | 1> {
     let idx = 0;
+
     while (idx < this.size) {
       yield this._data[idx] === 0 ? 0 : 1;
       idx += 1;
@@ -41,6 +43,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
 
   *entries(): IterableIterator<readonly [number, 0 | 1]> {
     let idx = 0;
+
     while (idx < this.size) {
       yield [idx, this._data[idx] === 0 ? 0 : 1];
       idx += 1;
@@ -52,9 +55,9 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
   }
 
   forEach(fn: (value: 0 | 1, index: number) => void): void {
-    this._data.forEach((v, i) => {
+    for (const [i, v] of this._data.entries()) {
       fn(v === 0 ? 0 : 1, i);
-    });
+    }
   }
 
   toString(): string {

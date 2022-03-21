@@ -57,4 +57,5 @@ assertType<TypeEq<Entries<Record<string, number>>, [string, number][]>>();
 
 const symb = Symbol();
 const entries = recordEntries({ x: 1, y: 2, z: 2, 3: 4, [symb]: 5 } as const);
+
 assertType<TypeEq<typeof entries, (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]>>();

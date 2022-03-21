@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { useCallback, useState as _useState } from 'preact/hooks';
 
 export const useState = <T>(

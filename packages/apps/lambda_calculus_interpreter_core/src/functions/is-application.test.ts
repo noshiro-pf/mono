@@ -1,7 +1,7 @@
 import { isApplication } from './is-lambda-term';
 
 test('isApplication 1', () => {
-  expect(isApplication('x')).toBeFalsy();
+  expect(isApplication('x')).toBe(false);
 });
 
 test('isApplication 2', () => {
@@ -10,9 +10,9 @@ test('isApplication 2', () => {
       ['x', ['y', 'y']],
       ['x', ['y', 'y']],
     ])
-  ).toBeTruthy();
+  ).toBe(true);
 });
 
 test('isApplication 3', () => {
-  expect(isApplication(['lambda', 'x', ['x', ['y', 'y']]])).toBeFalsy();
+  expect(isApplication(['lambda', 'x', ['x', ['y', 'y']]])).toBe(false);
 });

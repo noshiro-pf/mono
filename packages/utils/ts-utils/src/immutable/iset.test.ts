@@ -5,6 +5,7 @@ import { IList } from './list';
 describe('ISet[Symbol.iterator]', () => {
   test('case 1', () => {
     const s0 = ISet.new(ISet.new([1, 2, 3]));
+
     expect(s0).toStrictEqual(ISet.new([1, 2, 3]));
   });
 });
@@ -12,6 +13,7 @@ describe('ISet[Symbol.iterator]', () => {
 describe('ISet.size', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 2, 3]);
+
     expect(s0.size).toBe(3);
   });
 });
@@ -19,70 +21,87 @@ describe('ISet.size', () => {
 describe('ISet.has', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.has(6)).toBeTruthy();
+
+    expect(s0.has(6)).toBe(true);
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.has(8)).toBeFalsy();
+
+    expect(s0.has(8)).toBe(false);
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
-    expect(s0.has(0)).toBeFalsy();
+
+    expect(s0.has(0)).toBe(false);
   });
   test('case 4', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7, Number.NaN]);
-    expect(s0.has(Number.NaN)).toBeTruthy();
+
+    expect(s0.has(Number.NaN)).toBe(true);
   });
 });
 
 describe('ISet.every', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.every((x) => 1 <= x && x <= 7)).toBeTruthy();
+
+    expect(s0.every((x) => 1 <= x && x <= 7)).toBe(true);
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.every((x) => 4 <= x && x <= 5)).toBeFalsy();
+
+    expect(s0.every((x) => 4 <= x && x <= 5)).toBe(false);
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
-    expect(s0.every(() => false)).toBeTruthy();
+
+    expect(s0.every(() => false)).toBe(true);
   });
 });
 
 describe('ISet.some', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.some((x) => x === 3)).toBeTruthy();
+    // eslint-disable-next-line unicorn/prefer-includes
+
+    expect(s0).toContain(3);
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    expect(s0.some((x) => x === 999)).toBeFalsy();
+    // eslint-disable-next-line unicorn/prefer-includes
+
+    expect(s0).not.toContain(999);
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
-    expect(s0.some(() => true)).toBeFalsy();
+    // eslint-disable-next-line unicorn/prefer-includes
+
+    expect(s0.some(() => true)).toBe(false);
   });
 });
 
 describe('ISet.add', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
+
     expect(s0.add(10)).toStrictEqual(ISet.new([1, 3, 5, 6, 7, 10]));
     expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
+
     expect(s0.add(3)).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
     expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
+
     expect(s0.add(1)).toStrictEqual(ISet.new([1]));
     expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
     const s0 = ISet.new([1, 2, 3, Number.NaN]);
+
     expect(s0.add(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
     expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
   });
@@ -91,21 +110,25 @@ describe('ISet.add', () => {
 describe('ISet.delete', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
+
     expect(s0.delete(10)).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
     expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
+
     expect(s0.delete(3)).toStrictEqual(ISet.new([1, 5, 6, 7]));
     expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
+
     expect(s0.delete(1)).toStrictEqual(ISet.new([]));
     expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
     const s0 = ISet.new([1, 2, 3, Number.NaN]);
+
     expect(s0.delete(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3]));
     expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
   });
@@ -115,6 +138,7 @@ describe('ISet.map', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const result = s0.map((x) => (x * 2).toString());
+
     assertType<TypeEq<typeof result, ISet<string>>>();
     expect(result).toStrictEqual(ISet.new(['2', '6', '10', '12', '14']));
     expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
@@ -123,25 +147,23 @@ describe('ISet.map', () => {
 
 describe('ISet.isSubsetOf', () => {
   test('case 1', () => {
-    expect(ISet.new([1, 3]).isSubsetOf(ISet.new([1, 3, 5, 6, 7]))).toBeTruthy();
+    expect(ISet.new([1, 3]).isSubsetOf(ISet.new([1, 3, 5, 6, 7]))).toBe(true);
   });
   test('case 2', () => {
-    expect(
-      ISet.new([1, 2, 3]).isSubsetOf(ISet.new([1, 3, 5, 6, 7]))
-    ).toBeFalsy();
+    expect(ISet.new([1, 2, 3]).isSubsetOf(ISet.new([1, 3, 5, 6, 7]))).toBe(
+      false
+    );
   });
 });
 
 describe('ISet.isSupersetOf', () => {
   test('case 1', () => {
-    expect(
-      ISet.new([1, 3, 5, 6, 7]).isSupersetOf(ISet.new([1, 3]))
-    ).toBeTruthy();
+    expect(ISet.new([1, 3, 5, 6, 7]).isSupersetOf(ISet.new([1, 3]))).toBe(true);
   });
   test('case 2', () => {
-    expect(
-      ISet.new([1, 3, 5, 6, 7]).isSupersetOf(ISet.new([1, 2, 3]))
-    ).toBeFalsy();
+    expect(ISet.new([1, 3, 5, 6, 7]).isSupersetOf(ISet.new([1, 2, 3]))).toBe(
+      false
+    );
   });
 });
 
@@ -190,9 +212,10 @@ describe('ISet.forEach', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const xs = [1, 3, 5, 6, 7];
-    s0.forEach((a) => {
+
+    for (const a of s0) {
       expect(xs).toContain(a);
-    });
+    }
   });
 });
 
@@ -200,6 +223,7 @@ describe('ISet.keys', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const xs = [1, 3, 5, 6, 7];
+
     for (const k of s0.keys()) {
       expect(xs).toContain(k);
     }
@@ -210,6 +234,7 @@ describe('ISet.values', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const xs = [1, 3, 5, 6, 7];
+
     for (const k of s0.values()) {
       expect(xs).toContain(k);
     }
@@ -220,6 +245,7 @@ describe('ISet.entries', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const xs = [1, 3, 5, 6, 7];
+
     for (const [k, v] of s0.entries()) {
       expect(k).toBe(v);
       expect(xs).toContain(k);

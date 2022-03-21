@@ -3,9 +3,10 @@ export const getImageElementFromUrl = (
 ): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const mut_img = new Image();
-    mut_img.onload = () => {
+
+    mut_img.addEventListener('load', () => {
       resolve(mut_img);
-    };
-    mut_img.onerror = reject;
+    });
+    mut_img.addEventListener('error', reject);
     mut_img.src = url;
   });

@@ -4,8 +4,6 @@ import {
   black,
   blue1,
   blue2,
-  darkGray2,
-  darkGray4,
   darkGray5,
   gray2,
   gray3,
@@ -21,7 +19,6 @@ import {
   ptBorderRadiusPx,
   ptButtonHeightLargePx,
   ptButtonHeightPx,
-  ptDarkTextColorDisabled,
   ptFontSizePx,
   ptGridSizePx,
   ptIconSizeLargePx,
@@ -127,10 +124,7 @@ export const buttonBackgroundColorActive = lightGray2;
 export const buttonBackgroundColorDisabled = hexToRgba(lightGray1, 0.5);
 export const buttonBackgroundColorActiveDisabled = hexToRgba(lightGray1, 0.7);
 export const buttonIntentColorDisabled = hexToRgba(white, 0.6);
-export const darkButtonColorDisabled = ptDarkTextColorDisabled;
-export const darkButtonBackgroundColor = darkGray5;
-export const darkButtonBackgroundColorHover = darkGray4;
-export const darkButtonBackgroundColorActive = darkGray2;
+
 export const darkButtonBackgroundColorDisabled = hexToRgba(darkGray5, 0.5);
 export const darkButtonBackgroundColorActiveDisabled = hexToRgba(
   darkGray5,
@@ -568,3 +562,10 @@ export const ptButton = css`
 //     }
 //   }
 // }
+
+export {
+  darkGray2 as darkButtonBackgroundColorActive,
+  darkGray4 as darkButtonBackgroundColorHover,
+  darkGray5 as darkButtonBackgroundColor,
+  ptDarkTextColorDisabled as darkButtonColorDisabled,
+} from '../common';

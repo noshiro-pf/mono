@@ -50,8 +50,8 @@ export class RootObservableClass<A, Type extends RootObservableType>
     const token = issueToken();
     this.setNext(nextValue, token);
 
-    this._procedure.forEach((p) => {
+    for (const p of this._procedure) {
       p.tryUpdate(token);
-    });
+    }
   }
 }

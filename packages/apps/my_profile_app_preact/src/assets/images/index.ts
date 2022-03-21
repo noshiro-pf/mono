@@ -1,23 +1,10 @@
-import AnnotationToolAppImage from './annotation_tool_app.png';
-import CantStopProbabilityAppImage from './cant_stop_probability_app.png';
-import CatanDiceAppImage from './catan_dice_app.png';
-import ColorDemoAppImage from './color_demo_app.png';
-import DominionOnlineAppImage from './dominion_online_app.png';
-import EventScheduleAppImage from './event_schedule_app.png';
-import HousingLoanCalculatorAppImage from './housing_loan_calculator_app.png';
-import LambdaInterpreterAppImage from './lambda_interpreter_app.png';
-import MnistAppImage from './mnist_app.png';
-import MyProfileAppImage from './my_profile_app.png';
-
-export {
-  AnnotationToolAppImage,
-  CantStopProbabilityAppImage,
-  CatanDiceAppImage,
-  ColorDemoAppImage,
-  DominionOnlineAppImage,
-  EventScheduleAppImage,
-  HousingLoanCalculatorAppImage,
-  LambdaInterpreterAppImage,
-  MnistAppImage,
-  MyProfileAppImage,
-};
+export { default as AnnotationToolAppImage } from './annotation_tool_app.png';
+export { default as CantStopProbabilityAppImage } from './cant_stop_probability_app.png';
+export { default as CatanDiceAppImage } from './catan_dice_app.png';
+export { default as ColorDemoAppImage } from './color_demo_app.png';
+export { default as DominionOnlineAppImage } from './dominion_online_app.png';
+export { default as EventScheduleAppImage } from './event_schedule_app.png';
+export { default as HousingLoanCalculatorAppImage } from './housing_loan_calculator_app.png';
+export { default as LambdaInterpreterAppImage } from './lambda_interpreter_app.png';
+export { default as MnistAppImage } from './mnist_app.png';
+export { default as MyProfileAppImage } from './my_profile_app.png';

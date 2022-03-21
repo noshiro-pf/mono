@@ -5,7 +5,9 @@ export const getDate = (date: ReadonlyDate): DateEnum =>
 
 export const setDate = (curr: ReadonlyDate, date: DateEnum): Date => {
   const copy: Date = new Date(curr as Date);
+
   copy.setDate(date);
+
   return copy;
 };
 

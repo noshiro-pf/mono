@@ -43,5 +43,6 @@ const hue2rgb = (m1: number, m2: number, normH: number): number => {
  */
 export const hslaToRgba = ([h, s, l, a]: Hsla): Rgba => {
   const [r, g, b] = hslToRgb([h, s, l]);
+
   return [r, g, b, a];
 };

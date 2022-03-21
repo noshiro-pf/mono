@@ -5,7 +5,9 @@ export const getMinutes = (date: ReadonlyDate): MinutesEnum =>
 
 export const setMinutes = (curr: ReadonlyDate, minutes: MinutesEnum): Date => {
   const copy: Date = new Date(curr as Date);
+
   copy.setMinutes(minutes);
+
   return copy;
 };
 

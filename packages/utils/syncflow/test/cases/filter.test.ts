@@ -4,7 +4,9 @@ import { filter, fromArray } from '../../src';
 import { testStream } from '../test-stream';
 import { filterTestCases } from './filter';
 
-filterTestCases.forEach(testStream);
+for (const c of filterTestCases) {
+  testStream(c);
+}
 
 // type tests
 const obs$ = fromArray([1, '2', 3]).chain(

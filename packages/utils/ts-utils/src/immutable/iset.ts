@@ -58,6 +58,7 @@ export const ISet = {
 
   equal: <K>(a: ISet<K>, b: ISet<K>): boolean => {
     if (a.size !== b.size) return false;
+
     return a.every((e) => b.has(e));
   },
 
@@ -99,6 +100,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     for (const key of this.values()) {
       if (!predicate(key)) return false;
     }
+
     return true;
   }
 
@@ -106,16 +108,19 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     for (const key of this.values()) {
       if (predicate(key)) return true;
     }
+
     return false;
   }
 
   add(key: K): ISet<K> {
     if (this.has(key)) return this;
+
     return ISet.new([...this._set, key]);
   }
 
   delete(key: K): ISet<K> {
     if (!this.has(key)) return this;
+
     return ISet.new(Array.from(this._set).filter((k) => !Object.is(k, key)));
   }
 
@@ -125,6 +130,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     >[]
   ): ISet<K> {
     const result = new Set<K>(this._set);
+
     for (const action of actions) {
       switch (action.type) {
         case 'delete':
@@ -135,6 +141,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
           break;
       }
     }
+
     return ISet.new(result);
   }
 
@@ -155,7 +162,9 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   forEach(callbackfn: (key: K) => void): void {
-    this._set.forEach(callbackfn);
+    for (const v of this._set.values()) {
+      callbackfn(v);
+    }
   }
 
   isSubsetOf(set: ISet<K>): boolean {
@@ -202,5 +211,6 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
 {
   const s = ISet.new([1, 2, 3] as const);
   const r = s.filter((x): x is 1 => x === 1);
+
   assertType<TypeEq<typeof r, ISet<1>>>();
 }

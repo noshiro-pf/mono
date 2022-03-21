@@ -71,6 +71,7 @@ export const IMapMapped = {
     b: IMapMapped<K, V, KM>
   ): boolean => {
     if (a.size !== b.size) return false;
+
     return a.every((v, k) => b.get(k) === v);
   },
 };
@@ -112,6 +113,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     for (const [k, v] of this.entries()) {
       if (!predicate(v, k)) return false;
     }
+
     return true;
   }
 
@@ -119,6 +121,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     for (const [k, v] of this.entries()) {
       if (predicate(v, k)) return true;
     }
+
     return false;
   }
 
@@ -138,6 +141,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   set(key: K, value: V): IMapMapped<K, V, KM> {
     if (value === this.get(key)) return this; // has no changes
     const keyMapped = this._toKey(key);
+
     if (!this.has(key)) {
       return IMapMapped.new(
         [...this._map, ituple(keyMapped, value)].map(([km, v]) =>
@@ -193,8 +197,10 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     >[]
   ): IMapMapped<K, V, KM> {
     const result = new Map<KM, V>(this._map);
+
     for (const action of actions) {
       const key = this._toKey(action.key);
+
       switch (action.type) {
         case 'delete':
           result.delete(key);
@@ -210,6 +216,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
         }
       }
     }
+
     return IMapMapped.new<K, V, KM>(
       Array.from(result, ([k, v]) => [this._fromKey(k), v]),
       this._toKey,
@@ -244,9 +251,9 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   forEach(callbackfn: (value: V, key: K) => void): void {
-    this._map.forEach((value, km) => {
+    for (const [km, value] of this._map.entries()) {
       callbackfn(value, this._fromKey(km));
-    });
+    }
   }
 
   *[Symbol.iterator](): Iterator<readonly [K, V]> {

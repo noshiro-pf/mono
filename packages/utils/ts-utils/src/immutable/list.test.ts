@@ -9,11 +9,11 @@ describe('IList.isEmpty', () => {
   assertType<TypeEq<typeof result, boolean>>();
 
   test('case 1', () => {
-    expect(result).toBeFalsy();
+    expect(result).toBe(false);
   });
 
   test('case 2', () => {
-    expect(IList.isEmpty([])).toBeTruthy();
+    expect(IList.isEmpty([])).toBe(true);
   });
 });
 
@@ -24,17 +24,18 @@ describe('IList.isNonEmpty', () => {
   assertType<TypeEq<typeof result, boolean>>();
 
   test('case 1', () => {
-    expect(result).toBeTruthy();
+    expect(result).toBe(true);
   });
 
   test('case 2', () => {
-    expect(IList.isNonEmpty([])).toBeFalsy();
+    expect(IList.isNonEmpty([])).toBe(false);
   });
 });
 
 describe('IList.slice', () => {
   const list = [0, 1, 2, 3, 4] as const;
-  [
+
+  for (const { testName, result, toBe } of [
     {
       testName: 'IList.slice',
       result: IList.slice(list, 0, 5),
@@ -105,11 +106,11 @@ describe('IList.slice', () => {
       result: IList.slice(list, 6, 3),
       toBe: [],
     },
-  ].forEach(({ testName, result, toBe }) => {
+  ]) {
     test(testName, () => {
       expect(result).toStrictEqual(toBe);
     });
-  });
+  }
 });
 
 describe('IList.head', () => {
@@ -222,6 +223,7 @@ describe('IList.butLast', () => {
   {
     const xs = [1, 2, 3] as const;
     const butLast = IList.butLast(xs);
+
     assertType<TypeEq<typeof butLast, readonly [1, 2]>>();
 
     test('case 1', () => {
@@ -231,6 +233,7 @@ describe('IList.butLast', () => {
   {
     const xs: readonly number[] = [1, 2, 3];
     const butLast = IList.butLast(xs);
+
     assertType<TypeEq<typeof butLast, readonly number[]>>();
 
     test('case 2', () => {
@@ -247,6 +250,7 @@ describe('IList.take', () => {
   {
     const xs = [1, 2, 3] as const;
     const t = IList.take(xs, 2);
+
     assertType<TypeEq<typeof t, readonly [1, 2]>>();
 
     test('case 1', () => {
@@ -256,6 +260,7 @@ describe('IList.take', () => {
   {
     const xs: readonly number[] = [1, 2, 3];
     const t = IList.take(xs, 2);
+
     assertType<TypeEq<typeof t, readonly number[]>>();
 
     test('case 2', () => {
@@ -268,6 +273,7 @@ describe('IList.takeLast', () => {
   {
     const xs = [1, 2, 3] as const;
     const t = IList.takeLast(xs, 2);
+
     assertType<TypeEq<typeof t, readonly [2, 3]>>();
 
     test('case 1', () => {
@@ -277,6 +283,7 @@ describe('IList.takeLast', () => {
   {
     const xs: readonly number[] = [1, 2, 3];
     const t = IList.takeLast(xs, 2);
+
     assertType<TypeEq<typeof t, readonly number[]>>();
 
     test('case 2', () => {
@@ -289,6 +296,7 @@ describe('IList.skip', () => {
   {
     const xs = [1, 2, 3] as const;
     const t = IList.skip(xs, 2);
+
     assertType<TypeEq<typeof t, readonly [3]>>();
 
     test('case 1', () => {
@@ -298,6 +306,7 @@ describe('IList.skip', () => {
   {
     const xs: readonly number[] = [1, 2, 3];
     const t = IList.skip(xs, 2);
+
     assertType<TypeEq<typeof t, readonly number[]>>();
 
     test('case 2', () => {
@@ -310,6 +319,7 @@ describe('IList.skipLast', () => {
   {
     const xs = [1, 2, 3] as const;
     const t = IList.skipLast(xs, 2);
+
     assertType<TypeEq<typeof t, readonly [1]>>();
 
     test('case 1', () => {
@@ -319,6 +329,7 @@ describe('IList.skipLast', () => {
   {
     const xs: readonly number[] = [1, 2, 3];
     const t = IList.skipLast(xs, 2);
+
     assertType<TypeEq<typeof t, readonly number[]>>();
 
     test('case 2', () => {
@@ -337,11 +348,11 @@ describe('IList.every', () => {
   }
 
   test('case 1', () => {
-    expect(IList.every(xs, (x): x is 1 => x === 1)).toBeFalsy();
+    expect(IList.every(xs, (x): x is 1 => x === 1)).toBe(false);
   });
 
   test('case 2', () => {
-    expect(IList.every(xs, (x) => 1 <= x && x <= 3)).toBeTruthy();
+    expect(IList.every(xs, (x) => 1 <= x && x <= 3)).toBe(true);
   });
 });
 
@@ -349,11 +360,11 @@ describe('IList.some', () => {
   const xs = [1, 2, 3] as const;
 
   test('case 1', () => {
-    expect(IList.some(xs, (x): x is 1 => x === 1)).toBeTruthy();
+    expect(IList.some(xs, (x): x is 1 => x === 1)).toBe(true);
   });
 
   test('case 2', () => {
-    expect(IList.some(xs, (x) => x <= 1 && 3 <= x)).toBeFalsy();
+    expect(IList.some(xs, (x) => x <= 1 && 3 <= x)).toBe(false);
   });
 });
 
@@ -1113,7 +1124,7 @@ describe('IList.isSubset', () => {
     assertType<TypeEq<typeof result, boolean>>();
 
     test('case 1', () => {
-      expect(result).toBeTruthy();
+      expect(result).toBe(true);
     });
   }
   {
@@ -1125,7 +1136,7 @@ describe('IList.isSubset', () => {
     assertType<TypeEq<typeof result, boolean>>();
 
     test('case 2', () => {
-      expect(result).toBeFalsy();
+      expect(result).toBe(false);
     });
   }
 });
@@ -1140,13 +1151,13 @@ describe('IList.isSuperset', () => {
     assertType<TypeEq<typeof result, boolean>>();
 
     test('case 1', () => {
-      expect(result).toBeFalsy();
+      expect(result).toBe(false);
     });
 
     const result2 = IList.isSuperset(xs, ys);
 
     test('case 2', () => {
-      expect(result2).toBeTruthy();
+      expect(result2).toBe(true);
     });
   }
   {
@@ -1158,7 +1169,7 @@ describe('IList.isSuperset', () => {
     assertType<TypeEq<typeof result, boolean>>();
 
     test('case 3', () => {
-      expect(result).toBeFalsy();
+      expect(result).toBe(false);
     });
   }
 });

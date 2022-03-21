@@ -1,3 +1,1 @@
-import SampleImage from './sample_image.jpg';
-
-export { SampleImage };
+export { default as SampleImage } from './sample_image.jpg';

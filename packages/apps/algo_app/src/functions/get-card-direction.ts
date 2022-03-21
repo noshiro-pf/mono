@@ -5,10 +5,10 @@ export const getCardDirection = (
   playerCards: ReadonlyRecord<NWES, ReadonlyArrayOfLength<6, Card>>,
   target: Card
 ): NWES =>
-  playerCards.W.find((c) => cardEq(c, target)) !== undefined
+  playerCards.W.some((c) => cardEq(c, target))
     ? 'W'
-    : playerCards.E.find((c) => cardEq(c, target)) !== undefined
+    : playerCards.E.some((c) => cardEq(c, target))
     ? 'E'
-    : playerCards.N.find((c) => cardEq(c, target)) !== undefined
+    : playerCards.N.some((c) => cardEq(c, target))
     ? 'N'
     : 'S';

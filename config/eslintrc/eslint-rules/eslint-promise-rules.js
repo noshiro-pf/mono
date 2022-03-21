@@ -2,9 +2,9 @@
 
 // @ts-check
 
-/** @typedef { import("./rules-record").LinterRulesRecord } LinterRulesRecord */
+/** @typedef { import("./rules-type/eslint-promise-rules").EslintPromiseRules } EslintPromiseRules */
 
-/** @type {LinterRulesRecord} */
+/** @type {EslintPromiseRules} */
 const eslintPromiseRules = {
   'promise/catch-or-return': ['warn', { allowFinally: true }],
   'promise/no-return-wrap': 'warn',
@@ -22,4 +22,4 @@ const eslintPromiseRules = {
   'promise/prefer-await-to-callbacks': 'off',
 };
 
-module.exports = eslintPromiseRules;
+module.exports = { eslintPromiseRules };

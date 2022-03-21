@@ -20,12 +20,12 @@ const createStreams = (
   throttleTime$: Observable<number>;
   merged$: Observable<number>;
 }> => {
-  const emitValues = [1, 2, 3, 7, 9, 10, 12, 13, 16, 17, 18, 19, 20];
+  const emitValues = new Set([1, 2, 3, 7, 9, 10, 12, 13, 16, 17, 18, 19, 20]);
 
   const interval$ = interval(tick * 2, true);
   const counter$ = interval$.chain(take(21));
 
-  const filtered$ = counter$.chain(filter((n) => emitValues.includes(n)));
+  const filtered$ = counter$.chain(filter((n) => emitValues.has(n)));
   const throttleTime$ = filtered$.chain(throttleTime(tick * 5));
   // eslint-disable-next-line import/no-deprecated
   const merged$ = merge([filtered$, throttleTime$] as const);

@@ -4,16 +4,6 @@
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 
-const {
-  eslintImportsRules,
-  eslintJestRules,
-  // eslintNoshiroCustomRules,
-  eslintFunctionalRules,
-  eslintRulesAll,
-  typescriptEslintRules,
-  eslintPromiseRules,
-} = require('./eslintrc-base');
-
 /**
  *  - mono/docs/linter-formatter-update-manual.md
  *  - links
@@ -46,52 +36,8 @@ const {
 // quotes: ['error', 'single', { avoidEscape: true }],
 
 /** @type {LinterConfig} */
-const defaultConfig = {
-  extends: [
-    /* recommended */
-    'eslint:all',
-    'plugin:@typescript-eslint/all',
-
-    /* import */
-    'plugin:import/recommended',
-    // 'plugin:import/errors',
-    // 'plugin:import/warnings',
-    'plugin:import/typescript', // needs eslint-import-resolver-typescript to be installed
-    'plugin:import/react',
-
-    /* functional, total-functions */
-    // 'plugin:functional/external-recommended',
-    // 'plugin:functional/recommended',
-    // 'plugin:functional/stylistic',
-    // 'plugin:total-functions/recommended',
-
-    /* jest */
-    'plugin:jest/all',
-    // 'plugin:jest/recommended',
-
-    /* array-func */
-    'plugin:array-func/all',
-    // 'plugin:array-func/recommended',
-
-    /* prettier */
-    'prettier', // turn off rules
-
-    './.eslintrc.common-settings.js',
-  ],
-  rules: {
-    ...eslintRulesAll.modifiedRules,
-    ...eslintRulesAll.disabledRules,
-    ...typescriptEslintRules.modifiedRules,
-    ...typescriptEslintRules.disabledRules,
-    ...eslintImportsRules.staticAnalysis,
-    ...eslintImportsRules.helpfulWarnings,
-    ...eslintImportsRules.moduleSystems,
-    ...eslintImportsRules.styleGuide,
-    ...eslintJestRules,
-    ...eslintPromiseRules,
-    ...eslintFunctionalRules,
-    // ...eslintNoshiroCustomRules,
-  },
+const config = {
+  extends: ['./.eslintrc.custom-rules-added.js'],
 };
 
-module.exports = defaultConfig;
+module.exports = config;

@@ -1,19 +1,16 @@
 import { recordFromEntries } from '@noshiro/ts-utils';
 import { css } from 'styled-components';
-import { buttonColorDisabled, darkButtonColorDisabled } from '../button';
+import { buttonColorDisabled } from '../button';
 import {
   black,
   borderShadow,
   darkGray5,
   lightGray1,
   ptBorderRadiusPx,
-  ptDarkTextColor,
-  ptDarkTextColorDisabled,
   ptDividerBlack,
   ptDropShadowOpacity,
   ptFontSizePx,
   ptGridSizePx,
-  ptIconSizeLargePx,
   ptIconSizeStandardPx,
   ptInputBoxShadow,
   ptInputHeightPx,
@@ -40,15 +37,8 @@ export const inputBackgroundColor = white;
 export const inputBackgroundColorDisabled = hexToRgba(lightGray1, 0.5);
 export const inputShadowColorFocus = ptIntentPrimary;
 
-export const darkInputColor = ptDarkTextColor;
-export const darkInputColorDisabled = darkButtonColorDisabled;
-export const darkInputPlaceholderColor = ptDarkTextColorDisabled;
 export const darkInputBackgroundColor = hexToRgba(black, 0.3);
 export const darkInputBackgroundColorDisabled = hexToRgba(darkGray5, 0.5);
-export const darkInputShadowColorFocus = ptIntentPrimary;
-
-export const controlIndicatorSizePx = ptIconSizeStandardPx;
-export const controlIndicatorSizeLargePx = ptIconSizeLargePx;
 
 // avoids edge blurriness for light theme focused default input
 // second box-shadow of pt-input-box-shadow
@@ -151,3 +141,12 @@ export const ptInput = css`
     ${ptInputDisabled}
   }
 `;
+
+export { darkButtonColorDisabled as darkInputColorDisabled } from '../button';
+export {
+  ptDarkTextColor as darkInputColor,
+  ptDarkTextColorDisabled as darkInputPlaceholderColor,
+  ptIconSizeLargePx as controlIndicatorSizeLargePx,
+  ptIconSizeStandardPx as controlIndicatorSizePx,
+  ptIntentPrimary as darkInputShadowColorFocus,
+} from '../common';

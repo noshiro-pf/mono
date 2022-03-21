@@ -22,9 +22,9 @@ export const usePromiseValue = <T>(
           setSettledValue({ status: 'success', value: v });
         }
       })
-      .catch((err: unknown) => {
+      .catch((error: unknown) => {
         if (alive) {
-          setSettledValue({ status: 'error', value: err });
+          setSettledValue({ status: 'error', value: error });
         }
       });
     return () => {

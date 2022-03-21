@@ -1,4 +1,6 @@
 import { testStream } from '../test-stream';
 import { switchMapTestCases } from './switch-map';
 
-switchMapTestCases.forEach(testStream);
+for (const c of switchMapTestCases) {
+  testStream(c);
+}

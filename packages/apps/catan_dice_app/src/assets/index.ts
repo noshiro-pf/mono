@@ -1,4 +1,2 @@
-import DiceIcon from './dice-icon.png';
-import SumIcon from './sum-sign.png';
-
-export { DiceIcon, SumIcon };
+export { default as DiceIcon } from './dice-icon.png';
+export { default as SumIcon } from './sum-sign.png';

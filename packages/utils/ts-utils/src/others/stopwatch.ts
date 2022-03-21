@@ -9,13 +9,13 @@ export class Stopwatch {
   }
 
   start(log = false): void {
-    this.startTime = new Date().getTime();
+    this.startTime = Date.now();
     this.time = 0;
     if (log) console.log(`${this.name} started.`);
   }
 
   stop(log = false): void {
-    this.endTime = new Date().getTime();
+    this.endTime = Date.now();
     this.time = this.endTime - this.startTime;
     if (log) console.log(`${this.name} stopped.`);
   }
