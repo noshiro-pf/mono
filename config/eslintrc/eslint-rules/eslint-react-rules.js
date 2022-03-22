@@ -37,7 +37,7 @@ const eslintReactRules = {
   'react/forbid-elements': 'error',
   'react/forbid-foreign-prop-types': 'error',
   'react/forbid-prop-types': 'error',
-  'react/function-component-definition': 'warn', // modified
+  'react/function-component-definition': 'error', // modified
   'react/hook-use-state': 'off', // disabled
   'react/iframe-missing-sandbox': 'error',
   'react/jsx-boolean-value': 'off', // disabled
@@ -57,10 +57,10 @@ const eslintReactRules = {
   'react/jsx-no-undef': 'error',
   'react/jsx-no-useless-fragment': 'error',
   'react/jsx-pascal-case': 'error',
-  'react/jsx-props-no-spreading': 'warn', //   /* modified */
+  'react/jsx-props-no-spreading': 'error', //   /* modified */
   'react/jsx-sort-default-props': 'error',
   'react/jsx-sort-props': [
-    'warn',
+    'error',
     { callbacksLast: true, reservedFirst: true },
   ], // modified
   'react/jsx-uses-react': 'off', // disabled

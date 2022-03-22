@@ -2,6 +2,7 @@ import { getPlatform } from '@noshiro/ts-utils';
 import type { KeyboardEventType } from './key-event-type';
 
 export const isCtrlKey = <T = Element>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   keyEvent: KeyboardEventType<T>
 ): boolean => {
   const os = getPlatform();

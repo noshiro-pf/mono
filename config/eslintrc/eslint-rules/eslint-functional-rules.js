@@ -57,9 +57,9 @@ const preferTacitOptions = {
  */
 const eslintFunctionalRules = {
   // No Mutations Rules
-  'functional/immutable-data': ['warn', immutableDataOptions],
-  'functional/no-let': ['warn', noLetOptions],
-  'functional/no-method-signature': 'warn',
+  'functional/immutable-data': ['error', immutableDataOptions],
+  'functional/no-let': ['error', noLetOptions],
+  'functional/no-method-signature': 'error',
   'functional/prefer-readonly-type': ['off', preferReadonlyTypeOptions],
 
   // No Object-Orientation Rules
@@ -82,7 +82,7 @@ const eslintFunctionalRules = {
   'functional/functional-parameters': 'off',
 
   // Stylistic Rules
-  'functional/prefer-tacit': ['warn', preferTacitOptions],
+  'functional/prefer-tacit': ['error', preferTacitOptions],
 };
 
 module.exports = {

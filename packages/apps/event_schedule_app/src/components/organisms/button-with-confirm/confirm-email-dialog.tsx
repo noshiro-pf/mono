@@ -30,7 +30,8 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
     } = useConfirmEmailDialogState(onSuccess, back, emailAnswer);
 
     const onKeyDown = useCallback(
-      (ev: Readonly<KeyboardEvent>) => {
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      (ev: KeyboardEvent) => {
         if (ev.key === 'Enter') {
           enterClickHandler();
         }

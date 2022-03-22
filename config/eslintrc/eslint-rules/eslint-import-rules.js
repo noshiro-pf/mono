@@ -8,17 +8,17 @@
 const eslintImportsRules = {
   // staticAnalysis
   'import/no-unresolved': [
-    'warn',
+    'error',
     { commonjs: true, caseSensitiveStrict: true },
   ],
   'import/named': 'off',
-  'import/default': 'warn',
-  'import/namespace': 'warn',
+  'import/default': 'error',
+  'import/namespace': 'error',
   'import/no-restricted-paths': 'off', // TODO
-  'import/no-absolute-path': 'warn',
+  'import/no-absolute-path': 'error',
   'import/no-dynamic-require': 'error',
   'import/no-internal-modules': [
-    'warn',
+    'error',
     {
       allow: [
         'rxjs/operators',
@@ -33,41 +33,41 @@ const eslintImportsRules = {
       ],
     },
   ],
-  'import/no-webpack-loader-syntax': 'warn',
+  'import/no-webpack-loader-syntax': 'error',
   'import/no-self-import': 'error',
   'import/no-cycle': 'error',
-  'import/no-useless-path-segments': 'warn',
+  'import/no-useless-path-segments': 'error',
   'import/no-relative-parent-imports': 'off',
-  'import/no-relative-packages': 'warn',
+  'import/no-relative-packages': 'error',
 
   // helpfulWarnings
-  'import/export': 'warn',
-  'import/no-named-as-default': 'warn',
-  'import/no-named-as-default-member': 'warn',
-  'import/no-deprecated': 'warn',
+  'import/export': 'error',
+  'import/no-named-as-default': 'error',
+  'import/no-named-as-default-member': 'error',
+  'import/no-deprecated': 'error',
   'import/no-extraneous-dependencies': 'off',
-  'import/no-mutable-exports': 'warn',
-  'import/no-unused-modules': 'warn',
+  'import/no-mutable-exports': 'error',
+  'import/no-unused-modules': 'error',
 
   // moduleSystems
-  'import/unambiguous': 'warn',
+  'import/unambiguous': 'error',
   'import/no-commonjs': 'off',
-  'import/no-amd': 'warn',
+  'import/no-amd': 'error',
   'import/no-nodejs-modules': 'off',
   'import/no-import-module-exports': 'off',
 
   // styleGuide
-  'import/first': 'warn',
+  'import/first': 'error',
   'import/exports-last': 'off',
-  'import/no-duplicates': 'warn',
-  'import/no-namespace': 'warn',
-  'import/extensions': 'warn',
+  'import/no-duplicates': 'error',
+  'import/no-namespace': 'error',
+  'import/extensions': 'error',
   'import/order': 'off', // using prettier-plugin-organize-imports
-  'import/newline-after-import': 'warn',
+  'import/newline-after-import': 'error',
   'import/prefer-default-export': 'off',
   'import/max-dependencies': 'off',
   'import/no-unassigned-import': [
-    'warn',
+    'error',
     {
       allow: [
         '**/*.css',
@@ -77,11 +77,11 @@ const eslintImportsRules = {
     },
   ],
   'import/no-named-default': 'off',
-  'import/no-default-export': 'warn',
+  'import/no-default-export': 'error',
   'import/no-named-export': 'off',
-  'import/no-anonymous-default-export': 'warn',
+  'import/no-anonymous-default-export': 'error',
   'import/group-exports': 'off',
-  'import/dynamic-import-chunkname': 'warn',
+  'import/dynamic-import-chunkname': 'error',
 
   // deprecated rules
   'import/imports-first': 'off',

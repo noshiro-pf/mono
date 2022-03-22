@@ -59,6 +59,7 @@ export const useRouterLinkClick = ({
   replace?: boolean;
   redirectFn: (path: string) => void;
   pushFn: (path: string) => void;
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 }>): ((ev: MouseEvent) => void) =>
   useCallback(
     (ev) => {
