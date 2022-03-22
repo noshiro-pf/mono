@@ -6,18 +6,18 @@
 
 /** @type {EslintPromiseRules} */
 const eslintPromiseRules = {
-  'promise/catch-or-return': ['warn', { allowFinally: true }],
-  'promise/no-return-wrap': 'warn',
-  'promise/param-names': 'warn',
+  'promise/catch-or-return': ['error', { allowFinally: true }],
+  'promise/no-return-wrap': 'error',
+  'promise/param-names': 'error',
   'promise/always-return': 'off',
   'promise/no-native': 'off',
-  'promise/no-nesting': 'warn',
-  'promise/no-promise-in-callback': 'warn',
-  'promise/no-callback-in-promise': 'warn',
+  'promise/no-nesting': 'error',
+  'promise/no-promise-in-callback': 'error',
+  'promise/no-callback-in-promise': 'error',
   'promise/avoid-new': 'off',
-  'promise/no-new-statics': 'warn',
-  'promise/no-return-in-finally': 'warn',
-  'promise/valid-params': 'warn',
+  'promise/no-new-statics': 'error',
+  'promise/no-return-in-finally': 'error',
+  'promise/valid-params': 'error',
   'promise/prefer-await-to-then': 'off',
   'promise/prefer-await-to-callbacks': 'off',
 };

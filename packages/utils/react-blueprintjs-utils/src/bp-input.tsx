@@ -18,6 +18,7 @@ export const BpInput = memoNamed<BpInputProps>(
   'BpInput',
   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
     const onChangeHandler = useCallback(
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       (ev: ChangeEvent<HTMLInputElement> & FormEvent<HTMLElement>) => {
         onValueChange(ev.target.value);
       },

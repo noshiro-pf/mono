@@ -94,7 +94,7 @@ const typescriptEslintRules = {
     { allowIndexSignaturePropertyAccess: true },
   ], // modified
   '@typescript-eslint/explicit-function-return-type': [
-    'warn',
+    'error',
     {
       allowExpressions: true,
       allowTypedFunctionExpressions: true,
@@ -134,22 +134,22 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-magic-numbers': 'off', // disabled
   '@typescript-eslint/no-meaningless-void-operator': 'error',
   '@typescript-eslint/no-misused-new': 'error',
-  '@typescript-eslint/no-misused-promises': 'warn', // modified
+  '@typescript-eslint/no-misused-promises': 'error', // modified
   '@typescript-eslint/no-namespace': 'off', // disabled
   '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'error',
   '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
   '@typescript-eslint/no-non-null-assertion': 'error',
   '@typescript-eslint/no-parameter-properties': 'error',
   '@typescript-eslint/no-redeclare': 'off', // disabled
-  '@typescript-eslint/no-redundant-type-constituents': 'warn', // modified
+  '@typescript-eslint/no-redundant-type-constituents': 'error', // modified
   '@typescript-eslint/no-require-imports': 'error',
   '@typescript-eslint/no-restricted-imports': [
     // modified
-    'warn',
+    'error',
     restrictedImportsOption,
   ],
   '@typescript-eslint/no-shadow': [
-    'warn',
+    'error',
     {
       allow: ['Option'],
       builtinGlobals: true,
@@ -194,7 +194,7 @@ const typescriptEslintRules = {
   '@typescript-eslint/prefer-optional-chain': 'error',
   '@typescript-eslint/prefer-readonly': 'error',
   '@typescript-eslint/prefer-readonly-parameter-types': [
-    'warn',
+    'error',
     {
       checkParameterProperties: true,
       ignoreInferredTypes: true,

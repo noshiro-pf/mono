@@ -42,6 +42,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
       (
         valueAsNumber: number,
         valueAsString: string,
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
         inputElement: HTMLInputElement | null
       ) => {
         if (onValueChange !== undefined) {

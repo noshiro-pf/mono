@@ -5,7 +5,7 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { IRecord } from '@noshiro/ts-utils';
 
-export type IconListReducerAction =
+export type IconListReducerAction = Readonly<
   | {
       type: 'update-description';
       iconId: AnswerIconId;
@@ -15,7 +15,8 @@ export type IconListReducerAction =
       type: 'update-point';
       iconId: AnswerIconId;
       point: AnswerIconPoint;
-    };
+    }
+>;
 
 export type IconListReducerState = AnswerIconSettings;
 

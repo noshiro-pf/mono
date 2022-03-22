@@ -14,7 +14,7 @@ import type { YmdKey } from '../map-key';
 import { ymdFromKey, ymdToKey } from '../map-key';
 import { timeRangeReducer } from './time-range-reducer';
 
-export type DatetimeListReducerAction =
+export type DatetimeListReducerAction = Readonly<
   | {
       type: 'fromCalendar';
       list: readonly YearMonthDate[];
@@ -26,7 +26,8 @@ export type DatetimeListReducerAction =
   | { type: 'duplicate'; index: number }
   | { type: 'end' | 'start'; index: number; hm: HoursMinutes }
   | { type: 'setTimeAtOneTime'; timeRange: TimeRange }
-  | { type: 'ymd'; index: number; ymd: YearMonthDate };
+  | { type: 'ymd'; index: number; ymd: YearMonthDate }
+>;
 
 export type DatetimeListReducerState = readonly DatetimeRange[];
 
