@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
 
-type Prefixes<L extends readonly unknown[]> = L extends readonly [
-  infer Head,
-  ...infer Rest
-]
-  ? readonly [] | readonly [Head, ...Prefixes<Rest>]
-  : readonly [];
-
 /**
  * @description enforce getter and setter pairs in objects and classes
  * @link https://eslint.org/docs/rules/accessor-pairs
@@ -151,7 +144,8 @@ namespace ArrayBracketSpacing {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -386,7 +380,8 @@ namespace ArrowParens {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -509,7 +504,8 @@ namespace BraceStyle {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -696,7 +692,8 @@ namespace CapitalizedComments {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -914,7 +911,8 @@ namespace CommaStyle {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -1004,7 +1002,8 @@ namespace ComputedPropertySpacing {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -1362,7 +1361,7 @@ namespace Eqeqeq {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, ...Options];
+    | readonly [Linter.RuleLevel, ...Options]; // fixed
 }
 
 /**
@@ -1617,7 +1616,8 @@ namespace FuncStyle {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -2107,7 +2107,8 @@ namespace IdMatch {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -2448,7 +2449,8 @@ namespace Indent {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -4379,7 +4381,8 @@ namespace LinesBetweenClassMembers {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -4669,11 +4672,9 @@ namespace MaxLen {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [
-        Linter.RuleLevel,
-        Options0,
-        ...Prefixes<readonly [Options1, Options2]>
-      ];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1]
+    | readonly [Linter.RuleLevel, Options0, Options1, Options2];
 }
 
 /**
@@ -4936,7 +4937,8 @@ namespace MaxStatements {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -9309,7 +9311,8 @@ namespace NonblockStatementBodyPosition {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -9560,7 +9563,8 @@ namespace ObjectCurlySpacing {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -9919,7 +9923,8 @@ namespace OperatorLinebreak {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -9995,7 +10000,8 @@ namespace PaddedBlocks {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -10446,7 +10452,8 @@ namespace PreferDestructuring {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -10802,7 +10809,8 @@ namespace Quotes {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -11258,7 +11266,8 @@ namespace SortKeys {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -11472,7 +11481,8 @@ namespace SpaceInParens {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -11652,7 +11662,8 @@ namespace SpacedComment {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -12006,7 +12017,8 @@ namespace WrapIife {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -12118,7 +12130,8 @@ namespace Yoda {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 export type EslintRules = {

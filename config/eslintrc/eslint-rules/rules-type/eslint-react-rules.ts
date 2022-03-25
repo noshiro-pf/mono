@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
 
-type Prefixes<L extends readonly unknown[]> = L extends readonly [
-  infer Head,
-  ...infer Rest
-]
-  ? readonly [] | readonly [Head, ...Prefixes<Rest>]
-  : readonly [];
-
 /**
  * @description Enforces consistent naming for boolean props
  * @link https://github.com/yannickcr/eslint-plugin-react/tree/master/docs/rules/boolean-prop-naming.md
@@ -174,7 +167,8 @@ namespace DestructuringAssignment {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -1298,7 +1292,8 @@ namespace JsxIndent {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -3642,7 +3637,8 @@ namespace StaticPropertyPlacement {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**

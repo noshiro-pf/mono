@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
 
-type Prefixes<L extends readonly unknown[]> = L extends readonly [
-  infer Head,
-  ...infer Rest
-]
-  ? readonly [] | readonly [Head, ...Prefixes<Rest>]
-  : readonly [];
-
 /**
  * @description Require that member overloads be consecutive
  * @link https://typescript-eslint.io/rules/adjacent-overload-signatures
@@ -294,7 +287,8 @@ namespace BraceStyle {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -1319,7 +1313,8 @@ namespace Indent {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -12200,7 +12195,8 @@ namespace ObjectCurlySpacing {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**
@@ -12928,7 +12924,8 @@ namespace Quotes {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options0, ...Prefixes<readonly [Options1]>];
+    | readonly [Linter.RuleLevel, Options0]
+    | readonly [Linter.RuleLevel, Options0, Options1];
 }
 
 /**

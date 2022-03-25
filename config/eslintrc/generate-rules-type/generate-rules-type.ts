@@ -133,16 +133,6 @@ const createResult = async (
     '/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */',
     "import type { Linter } from 'eslint';",
     '',
-    schemaList.some(({ schema }) => schema.length >= 2)
-      ? `
-        type Prefixes<L extends readonly unknown[]> = L extends readonly [
-          infer Head,
-          ...infer Rest
-        ]
-          ? readonly [] | readonly [Head, ...Prefixes<Rest>]
-          : readonly [];
-      `
-      : '',
   ];
 
   for (const { ruleName, docs, deprecated, schema, rawSchema } of schemaList) {
@@ -197,17 +187,21 @@ const createResult = async (
             throw new Error(String(error));
           });
 
-          // e.g. "Options2, Options3"
-          const OptionsStr: string = optionsTypeList
-            .map((_, index) => `Options${index}`)
-            .slice(1)
-            .join(', ');
+          // e.g. "Options0, Options1, Options2"
+          const OptionsStrs: readonly `Options${number}`[] =
+            optionsTypeList.map((_, index) => `Options${index}` as const);
 
           mut_resultToWrite.push(
             ...optionsTypeList,
             '',
             '  export type RuleEntry = Linter.RuleLevel',
-            `   | readonly [Linter.RuleLevel, Options0, ...Prefixes<[${OptionsStr}]>];`
+            ...OptionsStrs.map(
+              (_, i) =>
+                `   | readonly [Linter.RuleLevel, ${OptionsStrs.slice(
+                  0,
+                  i + 1
+                ).join(', ')}]`
+            )
           );
           break;
         }
