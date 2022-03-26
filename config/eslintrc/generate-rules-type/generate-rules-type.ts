@@ -130,8 +130,17 @@ const createResult = async (
   ruleNamePrefix: string
 ): Promise<string> => {
   const mut_resultToWrite: string[] = [
+    '/* cSpell:disable */',
     '/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */',
     "import type { Linter } from 'eslint';",
+    ...(schemaList.some(({ schema }) => schema.length === 1)
+      ? [
+          '',
+          '// eslint-disable-next-line @typescript-eslint/no-unused-vars',
+          'type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =',
+          'T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;',
+        ]
+      : []),
     '',
   ];
 
@@ -170,7 +179,7 @@ const createResult = async (
             optionsType,
             '',
             '  export type RuleEntry = Linter.RuleLevel',
-            '   | readonly [Linter.RuleLevel, Options];'
+            '   | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;'
           );
           break;
         }
