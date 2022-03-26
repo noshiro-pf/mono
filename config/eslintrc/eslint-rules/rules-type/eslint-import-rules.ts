@@ -1,5 +1,10 @@
+/* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
  * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-unresolved.md
@@ -55,7 +60,7 @@ namespace NoUnresolved {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -85,7 +90,7 @@ namespace Named {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -131,7 +136,7 @@ namespace Namespace {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -166,7 +171,7 @@ namespace NoNamespace {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -358,7 +363,7 @@ namespace Extensions {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -428,7 +433,7 @@ namespace NoRestrictedPaths {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -481,7 +486,7 @@ namespace NoInternalModules {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -539,7 +544,7 @@ namespace NoRelativePackages {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -586,7 +591,7 @@ namespace NoRelativeParentImports {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -671,7 +676,7 @@ namespace NoCycle {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -786,7 +791,7 @@ namespace NoAnonymousDefaultExport {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -931,7 +936,7 @@ namespace NoUnusedModules {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -994,7 +999,7 @@ namespace NoCommonjs {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1036,7 +1041,7 @@ namespace NoDuplicates {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1063,7 +1068,7 @@ namespace First {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1097,7 +1102,7 @@ namespace MaxDependencies {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1158,7 +1163,7 @@ namespace NoExtraneousDependencies {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1205,7 +1210,7 @@ namespace NoAbsolutePath {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1239,7 +1244,7 @@ namespace NoNodejsModules {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1380,7 +1385,7 @@ namespace Order {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1412,7 +1417,7 @@ namespace NewlineAfterImport {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1475,7 +1480,7 @@ namespace NoDynamicRequire {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1540,7 +1545,7 @@ namespace NoUnassignedImport {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1575,7 +1580,7 @@ namespace NoUselessPathSegments {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1613,7 +1618,7 @@ namespace DynamicImportChunkname {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -1646,7 +1651,7 @@ namespace NoImportModuleExports {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**

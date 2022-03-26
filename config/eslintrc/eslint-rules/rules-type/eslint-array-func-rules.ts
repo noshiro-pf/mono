@@ -1,3 +1,4 @@
+/* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
 

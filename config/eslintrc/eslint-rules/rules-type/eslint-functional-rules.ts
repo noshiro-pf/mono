@@ -1,5 +1,10 @@
+/* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
+  T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
  * @description Enforce functional parameters.
@@ -84,7 +89,7 @@ namespace FunctionalParameters {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -176,7 +181,7 @@ namespace ImmutableData {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -231,7 +236,7 @@ namespace NoConditionalStatement {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -274,7 +279,7 @@ namespace NoExpressionStatement {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -322,7 +327,7 @@ namespace NoLet {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -368,7 +373,7 @@ namespace NoMethodSignature {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -404,7 +409,7 @@ namespace NoMixedType {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -457,7 +462,7 @@ namespace NoReturnVoid {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -502,7 +507,7 @@ namespace NoThrowStatement {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -538,7 +543,7 @@ namespace NoTryStatement {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -612,7 +617,7 @@ namespace PreferReadonlyType {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -680,7 +685,7 @@ namespace PreferTacit {
 
   export type RuleEntry =
     | Linter.RuleLevel
-    | readonly [Linter.RuleLevel, Options];
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 export type EslintFunctionalRules = {
