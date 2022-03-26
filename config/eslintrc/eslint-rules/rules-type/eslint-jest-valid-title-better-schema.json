@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ignoreTypeOfDescribeName": {
+      "type": "boolean"
+    },
+    "disallowedWords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mustNotMatch": {
+      "$ref": "#/definitions/MustMatchType"
+    },
+    "mustMatch": {
+      "$ref": "#/definitions/MustMatchType"
+    }
+  },
+  "definitions": {
+    "MustMatchType": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "minItems": 1,
+          "maxItems": 2
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "describe": {
+              "$ref": "#/definitions/PatternWithOptionalMessage"
+            },
+            "test": {
+              "$ref": "#/definitions/PatternWithOptionalMessage"
+            },
+            "it": {
+              "$ref": "#/definitions/PatternWithOptionalMessage"
+            }
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "PatternWithOptionalMessage": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "minItems": 1,
+          "maxItems": 2
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
