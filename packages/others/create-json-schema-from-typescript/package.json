@@ -1,0 +1,13 @@
+{
+  "name": "@noshiro/create-json-schema-from-typescript",
+  "version": "0.0.0",
+  "private": false,
+  "license": "MIT",
+  "scripts": {
+    "convert": "node convert.js Options > dest.json",
+    "setup": "tsc"
+  },
+  "devDependencies": {
+    "typescript-json-schema": "^0.53.0"
+  }
+}

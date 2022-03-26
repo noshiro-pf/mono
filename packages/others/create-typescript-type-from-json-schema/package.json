@@ -1,0 +1,11 @@
+{
+  "name": "@noshiro/create-typescript-type-from-json-schema",
+  "version": "0.0.0",
+  "private": false,
+  "license": "MIT",
+  "scripts": {
+    "convert": "node convert.js Options > dest.ts",
+    "setup": "tsc"
+  },
+  "devDependencies": {}
+}
