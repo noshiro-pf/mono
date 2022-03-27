@@ -1,0 +1,15 @@
+{
+  "name": "@noshiro/rescript-app",
+  "version": "1.0.0",
+  "private": false,
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "re:build": "rescript",
+    "re:start": "rescript build -w"
+  },
+  "devDependencies": {
+    "@rescript/react": "^0.10.3",
+    "rescript": "^9.1.4"
+  }
+}
