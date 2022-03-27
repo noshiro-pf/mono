@@ -1,0 +1,41 @@
+{
+  "name": "piko-script",
+  "displayName": "piko-script",
+  "version": "0.0.1",
+  "description": "",
+  "categories": [
+    "Programming Languages"
+  ],
+  "repository": {},
+  "license": "MIT",
+  "scripts": {
+    "build": "vsce package",
+    "preinstall-extension": "yarn build",
+    "install-extension": "code --install-extension piko-script-0.0.1.vsix"
+  },
+  "contributes": {
+    "grammars": [
+      {
+        "language": "pikoscript",
+        "scopeName": "source.pikoscript",
+        "path": "./syntaxes/pikoscript.tmLanguage.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "pikoscript",
+        "aliases": [
+          "PikoScript",
+          "pikoscript"
+        ],
+        "extensions": [
+          "ps"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "engines": {
+    "vscode": "^1.65.0"
+  }
+}

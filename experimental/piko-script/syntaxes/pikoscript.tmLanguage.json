@@ -1,0 +1,135 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "PikoScript",
+  "patterns": [
+    { "include": "#statements" },
+    { "include": "#keywords" },
+    { "include": "#strings" },
+    { "include": "#var-declaration" }
+  ],
+  "repository": {
+    "statements": {
+      "patterns": [
+        { "include": "#declaration" },
+        { "include": "#control-statement" },
+        { "include": "#after-operator-block-as-object-literal" },
+        { "include": "#decl-block" },
+        { "include": "#label" },
+        { "include": "#expression" },
+        { "include": "#punctuation-semicolon" },
+        { "include": "#string" },
+        { "include": "#comment" }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.pikoscript",
+          "match": "\\b(if|while|for|return)\\b"
+        },
+        {
+          "name": "keyword.operator.pipeline.pikoscript",
+          "match": "\\b(\\|\\>)\\b"
+        },
+        {
+          "name": "keyword.operator.expression.void.pikoscript",
+          "match": "(?<![_$[:alnum:]])(?:(?<=\\.\\.\\.)|(?<!\\.))void(?![_$[:alnum:]])(?:(?=\\.\\.\\.)|(?!\\.))"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.pikoscript",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.pikoscript",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "var-declaration": {
+      "patterns": [
+        {
+          "match": "\\b(\\S+)\\s+(\\S+)\\s*(:)\\s*(\\S+)\\s*(=)\\s*(\\S+);",
+          "captures": {
+            "1": { "patterns": [{ "include": "#var" }] },
+            "2": { "patterns": [{ "include": "#var-name" }] },
+            "3": { "patterns": [{ "include": "#type-annotation-operator" }] },
+            "4": { "patterns": [{ "include": "#var-type" }] },
+            "5": { "patterns": [{ "include": "#variable-initializer" }] },
+            "6": { "patterns": [{ "include": "#constant" }] }
+          }
+        }
+      ],
+      "repository": {
+        "var": {
+          "patterns": [
+            {
+              "name": "storage.type.pikoscript",
+              "match": "let"
+            }
+          ]
+        },
+        "var-name": {
+          "patterns": [
+            {
+              "name": "variable.other.pikoscript",
+              "match": "[0-9a-zA-Z]+"
+            }
+          ]
+        },
+        "type-annotation-operator": {
+          "patterns": [
+            {
+              "name": "keyword.operator.type.annotation.pikoscript",
+              "match": ":"
+            }
+          ]
+        },
+        "var-type": {
+          "patterns": [
+            {
+              "name": "storage.type.pikoscript",
+              "match": "\\b(int|double|float)\\b"
+            }
+          ]
+        },
+        "variable-initializer": {
+          "patterns": [
+            {
+              "name": "keyword.operator.assignment.pikoscript",
+              "match": "\\="
+            }
+          ]
+        },
+        "constant": {
+          "patterns": [
+            { "include": "#constant_number" },
+            { "include": "#constant_string" }
+          ],
+          "repository": {
+            "constant_number": {
+              "patterns": [
+                {
+                  "name": "constant.numeric.pikoscript",
+                  "match": "-?[0-9]+"
+                }
+              ]
+            },
+            "constant_string": {
+              "patterns": [
+                {
+                  "name": "constant.character.pikoscript",
+                  "begin": "\"",
+                  "end": "\""
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "scopeName": "source.pikoscript"
+}
