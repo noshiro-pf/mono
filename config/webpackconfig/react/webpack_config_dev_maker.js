@@ -48,9 +48,16 @@ const plugins = [...pluginsCommon, new HotModuleReplacementPlugin()];
  * @param {string} host
  * @param {number} port
  * @param {string} bundleJsName
+ * @param {WebpackPluginInstance[]?} additionalPlugins
  * @returns {Configuration}
  */
-const webpackConfigReactDevMaker = (paths, host, port, bundleJsName) =>
+const webpackConfigReactDevMaker = (
+  paths,
+  host,
+  port,
+  bundleJsName,
+  additionalPlugins
+) =>
   merge(webpackConfigReactCommonMaker(paths.tsconfigJson), {
     mode: 'development',
     entry: [
@@ -65,7 +72,7 @@ const webpackConfigReactDevMaker = (paths, host, port, bundleJsName) =>
     },
     devServer: devServerConfigMaker(paths, host, port),
     devtool: 'inline-source-map',
-    plugins,
+    plugins: [...plugins, ...(additionalPlugins ?? [])],
   });
 
 module.exports = { webpackConfigReactDevMaker };

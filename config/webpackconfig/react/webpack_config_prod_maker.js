@@ -33,12 +33,14 @@ const plugins = [
  * @param {Paths} paths
  * @param {string} bundleJsName
  * @param {boolean} useBundleAnalyzer
+ * @param {WebpackPluginInstance[]?} additionalPlugins
  * @returns {Configuration}
  */
 const webpackConfigReactProdMaker = (
   paths,
   bundleJsName,
-  useBundleAnalyzer = false
+  useBundleAnalyzer = false,
+  additionalPlugins
 ) =>
   merge(webpackConfigReactCommonMaker(paths.tsconfigJson), {
     mode: 'production',
@@ -62,9 +64,11 @@ const webpackConfigReactProdMaker = (
       ],
     },
     devtool: 'source-map',
-    plugins: useBundleAnalyzer
-      ? [...plugins, new BundleAnalyzerPlugin()]
-      : plugins,
+    plugins: [
+      ...plugins,
+      ...(additionalPlugins ?? []),
+      ...(useBundleAnalyzer ? [new BundleAnalyzerPlugin()] : []),
+    ],
   });
 
 module.exports = { webpackConfigReactProdMaker };
