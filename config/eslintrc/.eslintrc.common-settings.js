@@ -55,7 +55,12 @@ const config = {
     'import/extensions': ['.js', '.jsx'],
     'import/external-module-folders': ['node_modules', 'node_modules/@types'],
   },
-  ignorePatterns: [...readGitignoreFiles({ cwd: __dirname }), '*.d.ts', '*.js'],
+  ignorePatterns: [
+    ...readGitignoreFiles({ cwd: __dirname }),
+    '*.d.ts',
+    '*.js',
+    '*_bs.ts',
+  ],
 };
 
 module.exports = config;

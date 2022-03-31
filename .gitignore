@@ -80,3 +80,11 @@ build/Release
 
 # Yarn Integrity file
 .yarn-integrity
+
+# ReScript
+.bsb.lock
+.merlin
+*.bs.js
+*.bs.ts
+*_bs.ts
+
