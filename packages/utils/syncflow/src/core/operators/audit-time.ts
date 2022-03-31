@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import type {
   AuditTimeOperatorObservable,
@@ -40,13 +40,13 @@ class AuditTimeObservableClass<A>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
     if (this._isSkipping) return; // skip update
 
     // set timer
     this._isSkipping = true;
     this._timerId = setTimeout(() => {
-      if (Option.isNone(par.currentValue)) return;
+      if (Maybe.isNone(par.currentValue)) return;
       this.startUpdate(par.currentValue.value);
       this._isSkipping = false;
     }, this._milliSeconds);

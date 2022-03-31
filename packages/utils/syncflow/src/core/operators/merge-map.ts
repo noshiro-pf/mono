@@ -1,4 +1,4 @@
-import { IList, Option } from '@noshiro/ts-utils';
+import { IList, Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import type {
   MergeMapOperatorObservable,
@@ -34,7 +34,7 @@ class MergeMapObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'mergeMap',
-      currentValueInit: Option.none,
+      currentValueInit: Maybe.none,
     });
     this._mapToObservable = mapToObservable;
     this._observables = [];
@@ -44,7 +44,7 @@ class MergeMapObservableClass<A, B>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     const observable = this._mapToObservable(par.currentValue.value);
     this._observables = IList.push(this._observables, observable);

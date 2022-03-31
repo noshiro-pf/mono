@@ -151,7 +151,6 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-shadow': [
     'error',
     {
-      allow: ['Option'],
       builtinGlobals: true,
       hoist: 'all',
       ignoreTypeValueShadow: false,

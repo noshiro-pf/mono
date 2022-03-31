@@ -1,4 +1,4 @@
-import { IList, noop, Option } from '@noshiro/ts-utils';
+import { IList, Maybe, noop } from '@noshiro/ts-utils';
 import type {
   ChildObservable,
   InitializedObservable,
@@ -93,7 +93,7 @@ export class ObservableBaseClass<
 
   protected setNext(nextValue: A, token: Token): void {
     this._token = token;
-    this._currentValue = Option.some(nextValue);
+    this._currentValue = Maybe.some(nextValue);
 
     for (const s of this._subscribers.values()) {
       s.onNext(nextValue);
@@ -140,7 +140,7 @@ export class ObservableBaseClass<
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {
     // first emit
     const curr = this.currentValue;
-    if (Option.isSome(curr)) {
+    if (Maybe.isSome(curr)) {
       onNext(curr.value);
     }
 

@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   Observable,
@@ -25,7 +25,7 @@ class TakeObservableClass<A>
       parents: [parentObservable],
       type: 'take',
       currentValueInit: !isPositiveInteger(n)
-        ? Option.none
+        ? Maybe.none
         : parentObservable.currentValue,
     });
     this._mut_counter = 0;
@@ -40,7 +40,7 @@ class TakeObservableClass<A>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this._mut_counter += 1;
     if (this._mut_counter > this._n) {

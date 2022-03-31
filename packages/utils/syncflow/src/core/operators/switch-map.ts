@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import type {
   Observable,
@@ -31,7 +31,7 @@ class SwitchMapObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'switchMap',
-      currentValueInit: Option.none,
+      currentValueInit: Maybe.none,
     });
     this._mapToObservable = mapToObservable;
     this._observable = undefined;
@@ -41,7 +41,7 @@ class SwitchMapObservableClass<A, B>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this._observable?.complete();
     this._subscription?.unsubscribe();

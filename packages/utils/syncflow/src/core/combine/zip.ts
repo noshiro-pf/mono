@@ -1,4 +1,4 @@
-import { assertType, createQueue, Option } from '@noshiro/ts-utils';
+import { assertType, createQueue, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
 import { withInitialValue } from '../operators';
@@ -34,9 +34,9 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     super({
       parents,
       type: 'zip',
-      currentValueInit: parentsValues.every(Option.isSome)
-        ? Option.some(parentsValues.map((c) => c.value) as unknown as A)
-        : Option.none,
+      currentValueInit: parentsValues.every(Maybe.isSome)
+        ? Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
+        : Maybe.none,
     });
 
     this._queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
@@ -45,7 +45,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   override tryUpdate(token: Token): void {
     const queues = this._queues;
     for (const [index, par] of this.parents.entries()) {
-      if (par.token === token && Option.isSome(par.currentValue)) {
+      if (par.token === token && Maybe.isSome(par.currentValue)) {
         queues[index]?.enqueue(par.currentValue.value);
       }
     }

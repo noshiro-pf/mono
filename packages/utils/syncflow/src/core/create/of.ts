@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { OfObservable } from '../types';
 
@@ -14,7 +14,7 @@ class OfObservableClass<A>
   private readonly _value: A;
 
   constructor(value: A, startManually: boolean = false) {
-    super({ type: 'Of', currentValueInit: Option.none });
+    super({ type: 'Of', currentValueInit: Maybe.none });
     this._value = value;
     if (!startManually) {
       setTimeout(() => {

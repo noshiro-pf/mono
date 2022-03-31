@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import type { InitializedObservable } from '../core';
 import { source, withInitialValue } from '../core';
 
@@ -10,7 +10,7 @@ export const createReducer = <S, A>(
 
   const dispatch = (action: A): S => {
     const nextState = reducer(
-      Option.unwrapOr(state$.currentValue, initialState),
+      Maybe.unwrapOr(state$.currentValue, initialState),
       action
     );
     state$.next(nextState);

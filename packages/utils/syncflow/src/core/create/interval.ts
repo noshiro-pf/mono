@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { IntervalObservable } from '../types';
 
@@ -19,7 +19,7 @@ class IntervalObservableClass
   private _isStarted: boolean;
 
   constructor(milliSeconds: number, startManually?: boolean) {
-    super({ type: 'Interval', currentValueInit: Option.none });
+    super({ type: 'Interval', currentValueInit: Maybe.none });
     this._milliSeconds = milliSeconds;
     this._counter = 0;
     this._timerId0 = undefined;

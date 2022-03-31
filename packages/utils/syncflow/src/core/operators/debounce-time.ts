@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import type {
   DebounceTimeOperatorObservable,
@@ -38,12 +38,12 @@ class DebounceTimeObservableClass<A>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this.resetTimer();
     // set timer
     this._timerId = setTimeout(() => {
-      if (Option.isNone(par.currentValue)) return;
+      if (Maybe.isNone(par.currentValue)) return;
       this.startUpdate(par.currentValue.value);
     }, this._milliSeconds);
   }
