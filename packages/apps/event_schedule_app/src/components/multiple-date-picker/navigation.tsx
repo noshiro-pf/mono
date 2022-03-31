@@ -2,20 +2,13 @@ import type { OptionProps } from '@blueprintjs/core';
 import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import type { MonthEnum, YearEnum } from '@noshiro/ts-utils';
-import {
-  getMonth,
-  getYear,
-  IList,
-  monthsList,
-  stringToNumber,
-  today,
-} from '@noshiro/ts-utils';
+import { IDate, IList, monthsList, stringToNumber } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { BpSelect } from '../bp';
 
-const thisYear = getYear(today());
-const thisMonth = getMonth(today());
+const thisYear = IDate.getLocaleYear(IDate.today());
+const thisMonth = IDate.getLocaleMonth(IDate.today());
 
 const yearOption: readonly number[] = IList.rangeThrow(
   thisYear - 100,
@@ -47,7 +40,7 @@ export const DatepickerNav = memoNamed<Props>(
   }) => {
     const onYearChangeHandler = useCallback(
       (value: string) => {
-        onYearChange((stringToNumber(value) ?? thisYear) as YearEnum);
+        onYearChange(stringToNumber(value) ?? thisYear);
       },
       [onYearChange]
     );

@@ -5,15 +5,7 @@ import type {
   MonthEnum,
   YearEnum,
 } from '@noshiro/ts-utils';
-import {
-  getDate,
-  getHours,
-  getMinutes,
-  getMonth,
-  getYear,
-  newDate,
-  sign,
-} from '@noshiro/ts-utils';
+import { IDate, sign } from '@noshiro/ts-utils';
 import { defaultHoursMinutes, defaultYearMonthDate } from '../../../v1';
 
 export type Ymdhm = Readonly<{
@@ -43,16 +35,17 @@ export const fillYmdhm = (p?: PartialYmdhm): Ymdhm => ({
   minutes: p?.minutes ?? d.minutes,
 });
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export const ymdhmFromDate = (date: ReadonlyDate): Ymdhm => ({
-  year: getYear(date),
-  month: getMonth(date),
-  date: getDate(date),
-  hours: getHours(date),
-  minutes: getMinutes(date),
+  year: IDate.getLocaleYear(date),
+  month: IDate.getLocaleMonth(date),
+  date: IDate.getLocaleDate(date),
+  hours: IDate.getLocaleHours(date),
+  minutes: IDate.getLocaleMinutes(date),
 });
 
-export const ymdhm2Date = (ymdhm: Ymdhm): Date =>
-  newDate(ymdhm.year, ymdhm.month, ymdhm.date, ymdhm.hours, ymdhm.minutes);
+export const ymdhm2Date = (ymdhm: Ymdhm): IDate =>
+  IDate.create(ymdhm.year, ymdhm.month, ymdhm.date, ymdhm.hours, ymdhm.minutes);
 
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
   if (a.year !== b.year) return sign(a.year - b.year);
