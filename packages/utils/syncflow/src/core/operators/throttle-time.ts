@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   InitializedToInitializedOperator,
@@ -40,7 +40,7 @@ class ThrottleTimeObservableClass<A>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
     if (this._mut_isSkipping) return; // skip update
 
     this.setNext(par.currentValue.value, token);

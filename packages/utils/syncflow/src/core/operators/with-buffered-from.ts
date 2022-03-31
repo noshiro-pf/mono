@@ -1,4 +1,4 @@
-import { IList, Option } from '@noshiro/ts-utils';
+import { IList, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   InitializedObservable,
@@ -43,11 +43,11 @@ class WithBufferedFromObservableClass<A, B>
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       type: 'withBufferedFrom',
-      currentValueInit: Option.isNone(parentObservable.currentValue)
-        ? Option.none
-        : Option.some([
+      currentValueInit: Maybe.isNone(parentObservable.currentValue)
+        ? Maybe.none
+        : Maybe.some([
             parentObservable.currentValue.value,
-            Option.isNone(observable.currentValue)
+            Maybe.isNone(observable.currentValue)
               ? []
               : [observable.currentValue.value],
           ]),
@@ -61,7 +61,7 @@ class WithBufferedFromObservableClass<A, B>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this.setNext([par.currentValue.value, this._mut_bufferedValues], token);
     this.clearBuffer();

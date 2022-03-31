@@ -1,4 +1,4 @@
-import { assertNotType, assertType, Option } from '@noshiro/ts-utils';
+import { assertNotType, assertType, Maybe } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
   ChildObservable,
@@ -61,7 +61,7 @@ assertNotType<TypeExtends<Observable<number>, Observable<1>>>();
 
 const root = new RootObservableClass({
   type: 'FromArray',
-  currentValueInit: Option.some(0),
+  currentValueInit: Maybe.some(0),
 });
 
 assertType<TypeExtends<typeof root, RootObservable<number, 'FromArray'>>>();
@@ -69,14 +69,14 @@ assertType<TypeExtends<typeof root, RootObservable<number, 'FromArray'>>>();
 const syncChild = new SyncChildObservableClass({
   parents: [root],
   type: 'map',
-  currentValueInit: Option.some(0),
+  currentValueInit: Maybe.some(0),
 });
 assertType<TypeExtends<typeof syncChild, SyncChildObservable<number, 'map'>>>();
 
 const asyncChild = new AsyncChildObservableClass({
   parents: [root],
   type: 'debounceTime',
-  currentValueInit: Option.some(0),
+  currentValueInit: Maybe.some(0),
 });
 assertType<
   TypeExtends<typeof asyncChild, AsyncChildObservable<number, 'debounceTime'>>

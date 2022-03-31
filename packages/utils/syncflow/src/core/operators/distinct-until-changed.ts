@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   DistinctUntilChangedOperatorObservable,
@@ -28,7 +28,7 @@ class DistinctUntilChangedObservableClass<A>
   implements DistinctUntilChangedOperatorObservable<A>
 {
   private readonly _compare: (x: A, y: A) => boolean;
-  private _previousValue: Option<A>;
+  private _previousValue: Maybe<A>;
 
   constructor(
     parentObservable: Observable<A>,
@@ -39,20 +39,20 @@ class DistinctUntilChangedObservableClass<A>
       type: 'distinctUntilChanged',
       currentValueInit: parentObservable.currentValue,
     });
-    this._previousValue = Option.none;
+    this._previousValue = Maybe.none;
     this._compare = compare;
   }
 
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     const prev = this._previousValue;
     this._previousValue = par.currentValue;
 
     if (
-      Option.isNone(prev) ||
+      Maybe.isNone(prev) ||
       !this._compare(prev.value, par.currentValue.value)
     ) {
       this.setNext(par.currentValue.value, token);

@@ -1,4 +1,4 @@
-import { assertType, Option } from '@noshiro/ts-utils';
+import { assertType, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
 import { withInitialValue } from '../operators';
@@ -35,9 +35,9 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
     super({
       parents,
       type: 'combineLatest',
-      currentValueInit: parentsValues.every(Option.isSome)
-        ? Option.some(parentsValues.map((c) => c.value) as unknown as A)
-        : Option.none,
+      currentValueInit: parentsValues.every(Maybe.isSome)
+        ? Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
+        : Maybe.none,
     });
   }
 
@@ -45,7 +45,7 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
     if (this.parents.every((o) => o.token !== token)) return; // all parents are skipped
 
     const parentValues = this.parents.map((a) => a.currentValue);
-    if (parentValues.every(Option.isSome)) {
+    if (parentValues.every(Maybe.isSome)) {
       const nextValue = parentValues.map((a) => a.value) as unknown as A;
       this.setNext(nextValue, token);
     }

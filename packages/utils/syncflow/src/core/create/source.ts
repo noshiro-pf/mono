@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { SourceObservable } from '../types';
 
@@ -12,7 +12,7 @@ class SourceObservableClass<A>
   implements SourceObservable<A>
 {
   constructor() {
-    super({ type: 'Source', currentValueInit: Option.none });
+    super({ type: 'Source', currentValueInit: Maybe.none });
   }
 
   next(nextValue: A): void {

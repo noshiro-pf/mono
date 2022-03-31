@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   InitializedToInitializedOperator,
@@ -32,7 +32,7 @@ class MapWithIndexObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'mapWithIndex',
-      currentValueInit: Option.map<A, B>((x) => mapFn(x, -1))(
+      currentValueInit: Maybe.map<A, B>((x) => mapFn(x, -1))(
         parentObservable.currentValue
       ),
     });
@@ -43,7 +43,7 @@ class MapWithIndexObservableClass<A, B>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this._index += 1;
     this.setNext(this._mapFn(par.currentValue.value, this._index), token);

@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   InitializedObservable,
@@ -42,10 +42,10 @@ class WithLatestFromObservableClass<A, B>
       depth: 1 + maxDepth([parentObservable, observable]),
       type: 'withLatestFrom',
       currentValueInit:
-        Option.isNone(parentObservable.currentValue) ||
-        Option.isNone(observable.currentValue)
-          ? Option.none
-          : Option.some([
+        Maybe.isNone(parentObservable.currentValue) ||
+        Maybe.isNone(observable.currentValue)
+          ? Maybe.none
+          : Maybe.some([
               parentObservable.currentValue.value,
               observable.currentValue.value,
             ]),
@@ -57,10 +57,10 @@ class WithLatestFromObservableClass<A, B>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     const curr = this._observable.currentValue;
-    if (Option.isNone(curr)) return; // skip update
+    if (Maybe.isNone(curr)) return; // skip update
 
     this.setNext([par.currentValue.value, curr.value], token);
   }

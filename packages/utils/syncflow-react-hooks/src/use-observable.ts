@@ -1,6 +1,6 @@
 import { useState } from '@noshiro/react-utils';
 import type { InitializedObservable, Observable } from '@noshiro/syncflow';
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { useEffect, useMemo } from 'react';
 
 export function useObservable<A>(
@@ -49,7 +49,7 @@ export function useObservableValue<A, B = A>(
   initialValue?: B
 ): A | B | undefined {
   const { state, setState } = useState<{ value: A | B | undefined }>({
-    value: Option.unwrap(observable$.currentValue) ?? initialValue,
+    value: Maybe.unwrap(observable$.currentValue) ?? initialValue,
   });
   useObservableEffect(observable$, (value) => {
     setState({ value });

@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { FromArrayObservable } from '../types';
 
@@ -15,7 +15,7 @@ class FromArrayObservableClass<A>
   private readonly _values: readonly A[];
 
   constructor(values: readonly A[], startManually: boolean = false) {
-    super({ type: 'FromArray', currentValueInit: Option.none });
+    super({ type: 'FromArray', currentValueInit: Maybe.none });
     this._values = values;
     if (!startManually) {
       setTimeout(() => {

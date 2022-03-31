@@ -1,4 +1,4 @@
-import type { Option, Result } from '@noshiro/ts-utils';
+import type { Maybe, Result } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
   InitializedSyncChildObservable,
@@ -94,10 +94,10 @@ export type PluckOperatorObservable<A, K extends keyof A> = SyncChildObservable<
   'pluck',
   readonly [A]
 >;
-export type UnwrapOptionOperatorObservable<A> = SyncChildObservable<
+export type UnwrapMaybeOperatorObservable<A> = SyncChildObservable<
   A | undefined,
-  'unwrapOption',
-  readonly [Option<A>]
+  'unwrapMaybe',
+  readonly [Maybe<A>]
 >;
 export type UnwrapResultOkOperatorObservable<S, E> = SyncChildObservable<
   S | undefined,
@@ -109,10 +109,10 @@ export type UnwrapResultErrOperatorObservable<S, E> = SyncChildObservable<
   'unwrapResultErr',
   readonly [Result<S, E>]
 >;
-export type MapOptionOperatorObservable<A, B> = SyncChildObservable<
-  Option<B>,
-  'mapOption',
-  readonly [Option<A>]
+export type MapMaybeOperatorObservable<A, B> = SyncChildObservable<
+  Maybe<B>,
+  'mapMaybe',
+  readonly [Maybe<A>]
 >;
 export type MapResultOkOperatorObservable<S, S2, E> = SyncChildObservable<
   Result<S2, E>,

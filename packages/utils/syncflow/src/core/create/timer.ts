@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { TimerObservable } from '../types';
 
@@ -16,7 +16,7 @@ class TimerObservableClass
   private _isStarted: boolean;
 
   constructor(milliSeconds: number, startManually: boolean) {
-    super({ type: 'Timer', currentValueInit: Option.none });
+    super({ type: 'Timer', currentValueInit: Maybe.none });
     this._milliSeconds = milliSeconds;
     this._timerId = undefined;
     this._isStarted = false;

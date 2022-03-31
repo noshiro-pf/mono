@@ -1,4 +1,4 @@
-import { Option, Result } from '@noshiro/ts-utils';
+import { Maybe, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { FromSubscribableObservable, Subscribable } from '../types';
 
@@ -12,7 +12,7 @@ class FromSubscribableObservableClass<A, E = unknown>
   implements FromSubscribableObservable<A, E>
 {
   constructor(subscribable: Subscribable<A>) {
-    super({ type: 'FromSubscribable', currentValueInit: Option.none });
+    super({ type: 'FromSubscribable', currentValueInit: Maybe.none });
 
     subscribable.subscribe(
       (nextValue) => {

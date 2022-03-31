@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   InitializedToInitializedOperator,
@@ -28,7 +28,7 @@ class PluckObservableClass<A, K extends keyof A>
     super({
       parents: [parentObservable],
       type: 'pluck',
-      currentValueInit: Option.map<A, A[K]>((x) => x[key])(
+      currentValueInit: Maybe.map<A, A[K]>((x) => x[key])(
         parentObservable.currentValue
       ),
     });
@@ -38,7 +38,7 @@ class PluckObservableClass<A, K extends keyof A>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this.setNext(par.currentValue.value[this._key], token);
   }

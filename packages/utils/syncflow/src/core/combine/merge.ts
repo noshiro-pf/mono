@@ -1,4 +1,4 @@
-import { assertType, Option } from '@noshiro/ts-utils';
+import { assertType, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import { fromArray } from '../create';
 import type {
@@ -22,18 +22,16 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
     super({
       parents,
       type: 'merge',
-      currentValueInit: Option.none,
+      currentValueInit: Maybe.none,
     });
   }
 
   override tryUpdate(token: Token): void {
     const parentToUse = this.parents.find(
-      (o) => o.token === token && Option.isSome(o.currentValue)
+      (o) => o.token === token && Maybe.isSome(o.currentValue)
     );
     if (parentToUse === undefined) return;
-    const nextValue = Option.unwrap(
-      parentToUse.currentValue
-    ) as ArrayElement<P>;
+    const nextValue = Maybe.unwrap(parentToUse.currentValue) as ArrayElement<P>;
     this.setNext(nextValue, token);
   }
 }

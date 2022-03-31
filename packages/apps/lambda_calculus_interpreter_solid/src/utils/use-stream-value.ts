@@ -1,6 +1,6 @@
 import type { InitializedObservable, Observable } from '@noshiro/syncflow';
 import { source, withInitialValue } from '@noshiro/syncflow';
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { createSignal, onCleanup } from 'solid-js';
 
 export function useObservableValue<A, B = A>(
@@ -16,7 +16,7 @@ export function useObservableValue<A, B = A>(
   initialValue?: B
 ): () => A | B | undefined {
   const [getValue, setValue] = createSignal<A | B | undefined>(
-    Option.unwrap(observable$.currentValue) ?? initialValue
+    Maybe.unwrap(observable$.currentValue) ?? initialValue
   );
 
   const subscription = observable$.subscribe(setValue);

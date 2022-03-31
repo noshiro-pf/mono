@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   Observable,
@@ -16,13 +16,13 @@ class PairwiseObservableClass<A>
   extends SyncChildObservableClass<readonly [A, A], 'pairwise', readonly [A]>
   implements PairwiseOperatorObservable<A>
 {
-  private _previousValue: Option<A>;
+  private _previousValue: Maybe<A>;
 
   constructor(parentObservable: Observable<A>) {
     super({
       parents: [parentObservable],
       type: 'pairwise',
-      currentValueInit: Option.none,
+      currentValueInit: Maybe.none,
     });
     // parentObservable.currentValue has value
     // if parentObservable is InitializedObservable
@@ -33,12 +33,12 @@ class PairwiseObservableClass<A>
     const par = this.parents[0];
 
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     const prev = this._previousValue;
     this._previousValue = par.currentValue;
 
-    if (Option.isNone(prev)) return; // skip update
+    if (Maybe.isNone(prev)) return; // skip update
 
     this.setNext([prev.value, par.currentValue.value], token);
   }

@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   Observable,
@@ -28,7 +28,7 @@ class SkipObservableClass<A>
       type: 'skip',
       currentValueInit: !isPositiveInteger(n)
         ? parentObservable.currentValue
-        : Option.none,
+        : Maybe.none,
     });
     this._counter = 0;
     this._n = n;
@@ -37,7 +37,7 @@ class SkipObservableClass<A>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this._counter += 1;
     if (this._counter > this._n) {

@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { InitializedSyncChildObservableClass } from '../class';
 import type {
   Observable,
@@ -29,7 +29,7 @@ class ScanObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'scan',
-      currentValueInit: Option.some(initialValue),
+      currentValueInit: Maybe.some(initialValue),
     });
     this._reducer = reducer;
   }
@@ -37,8 +37,8 @@ class ScanObservableClass<A, B>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
-    if (Option.isNone(this.currentValue)) return; // dummy
+    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(this.currentValue)) return; // dummy
 
     this.setNext(
       this._reducer(this.currentValue.value, par.currentValue.value),

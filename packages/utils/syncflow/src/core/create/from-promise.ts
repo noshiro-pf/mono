@@ -1,4 +1,4 @@
-import { Option, Result } from '@noshiro/ts-utils';
+import { Maybe, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import type { FromPromiseObservable } from '../types';
 
@@ -11,7 +11,7 @@ class FromPromiseObservableClass<A, E = unknown>
   implements FromPromiseObservable<A, E>
 {
   constructor(promise: Readonly<Promise<A>>) {
-    super({ type: 'FromPromise', currentValueInit: Option.none });
+    super({ type: 'FromPromise', currentValueInit: Maybe.none });
 
     promise
       .then((value) => {

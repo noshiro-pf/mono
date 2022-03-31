@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   Observable,
@@ -25,11 +25,11 @@ class TakeWhileObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'takeWhile',
-      currentValueInit: Option.isNone(parentObservable.currentValue)
-        ? Option.none
+      currentValueInit: Maybe.isNone(parentObservable.currentValue)
+        ? Maybe.none
         : predicate(parentObservable.currentValue.value)
         ? parentObservable.currentValue
-        : Option.none,
+        : Maybe.none,
     });
     this._predicate = predicate;
   }
@@ -37,7 +37,7 @@ class TakeWhileObservableClass<A>
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     if (this._predicate(par.currentValue.value)) {
       this.setNext(par.currentValue.value, token);

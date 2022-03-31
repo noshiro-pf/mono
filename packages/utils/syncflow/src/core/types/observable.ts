@@ -1,4 +1,4 @@
-import type { Option } from '@noshiro/ts-utils';
+import type { Maybe } from '@noshiro/ts-utils';
 import { assertNotType, assertType } from '@noshiro/ts-utils';
 import type { ObservableId, Token } from './id';
 import type { ObservableKind } from './observable-kind';
@@ -33,7 +33,7 @@ export type ObservableBase<A> = Readonly<{
   addChild: <B>(child: ChildObservable<B>) => void;
 
   // state
-  currentValue: Option<A>;
+  currentValue: Maybe<A>;
   isCompleted: boolean;
   token: Token;
   hasSubscriber: boolean;
@@ -52,7 +52,7 @@ export type ObservableBase<A> = Readonly<{
 }>;
 
 export type InitializedObservableBase<A> = ObservableBase<A> & {
-  readonly currentValue: Option.Some<A>;
+  readonly currentValue: Maybe.Some<A>;
   readonly chain: (<B>(
     operator:
       | InitializedToInitializedOperator<A, B>

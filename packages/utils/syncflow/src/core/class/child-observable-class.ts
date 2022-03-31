@@ -1,4 +1,4 @@
-import type { Option } from '@noshiro/ts-utils';
+import type { Maybe } from '@noshiro/ts-utils';
 import { IList, isArrayOfLength1OrMore } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
@@ -222,8 +222,8 @@ export class InitializedSyncChildObservableClass<
     super({ type, parents, depth, currentValueInit });
   }
 
-  override get currentValue(): Option.Some<A> {
-    return super.getCurrentValue() as Option.Some<A>;
+  override get currentValue(): Maybe.Some<A> {
+    return super.getCurrentValue() as Maybe.Some<A>;
   }
 
   override chain<B>(

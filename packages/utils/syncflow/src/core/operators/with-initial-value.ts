@@ -1,4 +1,4 @@
-import { Option } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { InitializedSyncChildObservableClass } from '../class';
 import type {
   Observable,
@@ -24,14 +24,14 @@ class WithInitialValueObservableClass<A, I>
     super({
       parents: [parentObservable],
       type: 'withInitialValue',
-      currentValueInit: Option.some(initialValue),
+      currentValueInit: Maybe.some(initialValue),
     });
   }
 
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
-    if (Option.isNone(par.currentValue)) return; // skip update
+    if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this.setNext(par.currentValue.value, token);
   }
