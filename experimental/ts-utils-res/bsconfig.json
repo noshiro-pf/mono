@@ -1,0 +1,27 @@
+{
+  "name": "@noshiro/ts-utils-res",
+  "namespace": true,
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    }
+  ],
+  "package-specs": [
+    {
+      "module": "es6",
+      "in-source": false
+    }
+  ],
+  "suffix": ".bs.js",
+  "gentypeconfig": {
+    "language": "typescript",
+    "shims": {},
+    "generatedFileExtension": "_bs.ts",
+    "module": "es6",
+    "debug": {
+      "all": false,
+      "basic": false
+    }
+  }
+}
