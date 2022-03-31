@@ -1,0 +1,38 @@
+{
+  "name": "@noshiro/ts-utils-res",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": false,
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
+  "scripts": {
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "build": "run-s build:*",
+    "prebuild:cjs": "yarn clean:build:cjs",
+    "build:cjs": "tsc --project config/tsconfig.cjs.json",
+    "prebuild:esm": "yarn clean:build:esm",
+    "build:esm": "tsc --project config/tsconfig.esm.json",
+    "clean": "run-s clean:**",
+    "clean:build:cjs": "rimraf cjs",
+    "clean:build:esm": "rimraf esm",
+    "fmt": "yarn _prettier .",
+    "lint": "eslint src/ --ext .ts",
+    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
+    "lint:fix": "yarn lint --fix",
+    "re:build": "rescript",
+    "re:start": "rescript build -w",
+    "test": "jest --config config/jest.config.json --passWithNoTests",
+    "testw": "yarn test --watch"
+  },
+  "config": {
+    "root_dir": "../../.."
+  },
+  "devDependencies": {
+    "@rescript/react": "^0.10.3",
+    "gentype": "^4.3.0",
+    "rescript": "^9.1.4"
+
+  }
+}
