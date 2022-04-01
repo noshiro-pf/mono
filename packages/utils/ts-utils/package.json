@@ -28,7 +28,8 @@
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "testw": "yarn test --watch",
+    "tsc": "tsc --noEmit"
   },
   "config": {
     "pipe_max_length": 12,

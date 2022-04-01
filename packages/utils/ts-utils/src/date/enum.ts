@@ -1,3 +1,23 @@
+import type { Seq } from '../types';
+
+export type YearEnum = number;
+
+export type MonthEnum = StrictExclude<Seq<13>, 0>;
+
+export type DateEnum = StrictExclude<Seq<32>, 0>;
+
+export type WeekDayEnum = Seq<7>;
+
+export type WeekdaysNameEnum =
+  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat';
+
+export type HoursEnum = Seq<24>;
+
+export type MinutesEnum = Seq<60>;
+
+export type SecondsEnum = Seq<60>;
+
 // prettier-ignore
 export type MillisecondsEnum = (
   |   0 |   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9

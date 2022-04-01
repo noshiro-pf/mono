@@ -1,6 +1,6 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
-import { getDay, IList } from '@noshiro/ts-utils';
+import { IDate, IList } from '@noshiro/ts-utils';
 
 /**
  * rowsize = 5
@@ -21,9 +21,15 @@ export const generateCalendar = (
   year: YearEnum,
   month: MonthEnum
 ): readonly (readonly YearMonthDate[])[] => {
-  const numPrevMonthDates = getDay(getFirstDateOfMonth(year, month));
+  const numPrevMonthDates = IDate.getLocaleDayOfWeek(
+    getFirstDateOfMonth(year, month)
+  );
   const numNextMonthDates =
-    7 - getDay(getFirstDateOfMonth(year, (month + 1) as MonthEnum));
+    7 -
+    IDate.getLocaleDayOfWeek(
+      getFirstDateOfMonth(year, (month + 1) as MonthEnum)
+    );
+
   const lastDateNumberOfPrevMonth = getLastDateNumberOfMonth(year, month - 1);
   const lastDateNumberOfThisMonth = getLastDateNumberOfMonth(year, month);
 
@@ -64,6 +70,7 @@ const genYmdRangeList = (
     date: n as DateEnum,
   }));
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): Date =>
   new Date(year, month - 1, 1);
 

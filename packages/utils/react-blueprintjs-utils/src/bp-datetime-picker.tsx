@@ -1,25 +1,22 @@
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import {
-  getDate,
-  getHours,
-  getMinutes,
-  getMonth,
-  getYear,
-} from '@noshiro/ts-utils';
+import { IDate, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { Ymdhm } from './types';
 
-const pad2 = (n: number): string => n.toString().padStart(2, '0');
+// eslint-disable-next-line @typescript-eslint/ban-types
 const formatDate = (date: ReadonlyDate): string =>
-  `${getYear(date)}-${pad2(getMonth(date))}-${pad2(getDate(date))}  ${pad2(
-    getHours(date)
-  )}:${pad2(getMinutes(date))}`;
+  `${IDate.toLocaleYMD(date, '-')}  ${IDate.toLocaleHM(date, ':')}`;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
 const parseDate = (str: string): Date => new Date(str);
 
-const tenYearsLater = new Date(getYear(new Date()) + 99, 11);
+const tenYearsLater = pipe(IDate.today())
+  .chain(IDate.updateLocaleYear((a) => a + 99))
+  .chain(IDate.setLocaleMonth(12))
+  .chain(IDate.toDate).value;
 
 type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
 
@@ -47,6 +44,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     ...props
   }) => {
     const onChangeHandler = useCallback(
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,@typescript-eslint/ban-types
       (dt: Date | null | undefined, isUserChange: boolean) => {
         if (dt == null) {
           onYmdhmChange(undefined);
@@ -54,16 +52,17 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         }
         if (!isUserChange) return;
         onYmdhmChange({
-          year: getYear(dt),
-          month: getMonth(dt),
-          date: getDate(dt),
-          hours: getHours(dt),
-          minutes: getMinutes(dt),
+          year: IDate.getLocaleYear(dt),
+          month: IDate.getLocaleMonth(dt),
+          date: IDate.getLocaleDate(dt),
+          hours: IDate.getLocaleHours(dt),
+          minutes: IDate.getLocaleMinutes(dt),
         });
       },
       [onYmdhmChange]
     );
 
+    // eslint-disable-next-line @typescript-eslint/ban-types
     const dateObj = useMemo<Date | undefined>(
       () =>
         ymdhm === undefined

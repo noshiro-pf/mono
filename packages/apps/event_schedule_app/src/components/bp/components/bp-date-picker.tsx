@@ -3,18 +3,24 @@ import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { getDate, getMonth, getYear } from '@noshiro/ts-utils';
+import { IDate, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 const formatDate = (date: ReadonlyDate): string => date.toLocaleDateString();
+
+// eslint-disable-next-line @typescript-eslint/ban-types
 const parseDate = (str: string): Date => new Date(str);
 
 const inputProps: HTMLInputProps & InputGroupProps2 = {
   style: { width: '90px' },
 };
 
-const tenYearsLater = new Date(getYear(new Date()) + 99, 11);
+const tenYearsLater = pipe(IDate.today())
+  .chain(IDate.updateLocaleYear((y) => y + 99))
+  .chain(IDate.setLocaleMonth(12))
+  .chain(IDate.toDate).value;
 
 type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
 
@@ -42,22 +48,24 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
     ...props
   }) => {
     const onChangeHandler = useCallback(
-      (dt: Date | null | undefined, isUserChange: boolean) => {
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      (dt: ReadonlyDate | null | undefined, isUserChange: boolean) => {
         if (dt == null) {
           onYmdChange(undefined);
           return;
         }
         if (!isUserChange) return;
         onYmdChange({
-          year: getYear(dt),
-          month: getMonth(dt),
-          date: getDate(dt),
+          year: IDate.getLocaleYear(dt),
+          month: IDate.getLocaleMonth(dt),
+          date: IDate.getLocaleDate(dt),
         });
       },
       [onYmdChange]
     );
 
-    const dateObj = useMemo<Date | undefined>(
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    const dateObj = useMemo<ReadonlyDate | undefined>(
       () =>
         ymd === undefined
           ? undefined

@@ -12,15 +12,7 @@ import {
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
 import type { DateEnum } from '@noshiro/ts-utils';
-import {
-  getDate,
-  IRecord,
-  pipe,
-  setDate,
-  setHours,
-  setMinutes,
-  today,
-} from '@noshiro/ts-utils';
+import { IDate, IRecord, pipe } from '@noshiro/ts-utils';
 import { defaultIconPoint } from './default-icon-point';
 import { dict } from './dictionary';
 
@@ -41,15 +33,15 @@ export const initialAnswerIcons: AnswerIconSettings = {
   },
 } as const;
 
-export const initialAnswerDeadline: Ymdhm = pipe(today())
-  .chain((d) =>
-    setDate(
-      d,
-      (getDate(d) + answerDeadlineRemainingDaysDefaultValue) as DateEnum
+export const initialAnswerDeadline: Ymdhm = pipe(IDate.today())
+  .chain(
+    IDate.updateLocaleDate(
+      (a) => (a + answerDeadlineRemainingDaysDefaultValue) as DateEnum
     )
   )
-  .chain((d) => setHours(d, 23))
-  .chain((d) => setMinutes(d, 59))
+  .chain(IDate.setLocaleHours(23))
+  .chain(IDate.setLocaleMinutes(59))
+  .chain(IDate.toDate)
   .chain(ymdhmFromDate).value;
 
 export const initialNotificationSettings: NotificationSettings = IRecord.set(

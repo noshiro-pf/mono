@@ -1,5 +1,5 @@
 import type { HoursEnum, MinutesEnum } from '@noshiro/ts-utils';
-import { getHours, getMinutes, sign } from '@noshiro/ts-utils';
+import { IDate, sign } from '@noshiro/ts-utils';
 
 export type HoursMinutes = Readonly<{
   hours: HoursEnum;
@@ -19,9 +19,9 @@ export const fillHoursMinutes = (a?: PartialHoursMinutes): HoursMinutes => ({
   minutes: a?.minutes ?? d.minutes,
 });
 
-export const hmFromDate = (date: ReadonlyDate): HoursMinutes => ({
-  hours: getHours(date),
-  minutes: getMinutes(date),
+export const hmFromDate = (date: IDate): HoursMinutes => ({
+  hours: IDate.getLocaleHours(date),
+  minutes: IDate.getLocaleMinutes(date),
 });
 
 export const compareHm = (a: HoursMinutes, b: HoursMinutes): -1 | 0 | 1 => {

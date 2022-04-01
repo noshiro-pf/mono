@@ -1,19 +1,13 @@
 import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
-import {
-  getDate,
-  getHours,
-  getMinutes,
-  getMonth,
-  getYear,
-} from '@noshiro/ts-utils';
+import { IDate } from '@noshiro/ts-utils';
 
 export const now = (): Ymdhm => {
-  const nowDateObj = new Date();
+  const nowDateObj = IDate.today();
   return {
-    year: getYear(nowDateObj),
-    month: getMonth(nowDateObj),
-    date: getDate(nowDateObj),
-    hours: getHours(nowDateObj),
-    minutes: getMinutes(nowDateObj),
+    year: IDate.getLocaleYear(nowDateObj),
+    month: IDate.getLocaleMonth(nowDateObj),
+    date: IDate.getLocaleDate(nowDateObj),
+    hours: IDate.getLocaleHours(nowDateObj),
+    minutes: IDate.getLocaleMinutes(nowDateObj),
   };
 };
