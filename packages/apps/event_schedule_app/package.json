@@ -26,7 +26,9 @@
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "serve": "http-server ./build",
-    "setup": "touch ./scripts/service-account-key.json && tsc --project config/tsconfig.scripts.json",
+    "setup": "run-s setup:service-account-key setup:scripts",
+    "setup:scripts": "tsc --project config/tsconfig.scripts.json",
+    "setup:service-account-key": "touch ./scripts/service-account-key.json",
     "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "tsc": "tsc --noEmit"
