@@ -28,8 +28,8 @@ const immutableDataOptions = {
 
 /** @type {NoLetOptions} */
 const noLetOptions = {
-  allowInForLoopInit: true,
-  allowLocalMutation: true,
+  allowInForLoopInit: false,
+  allowLocalMutation: false,
   ignorePattern: ignorePattern.filter((p) => p !== '^draft'),
 };
 
@@ -64,8 +64,8 @@ const eslintFunctionalRules = {
 
   // No Object-Orientation Rules
   'functional/no-class': 'off',
-  'functional/no-mixed-type': 'off', // TODO
-  'functional/no-this-expression': 'off', // TODO
+  'functional/no-mixed-type': 'error',
+  'functional/no-this-expression': 'off',
 
   // No Statements Rules
   'functional/no-conditional-statement': 'off',

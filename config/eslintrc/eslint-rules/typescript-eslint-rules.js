@@ -175,7 +175,14 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-unsafe-member-access': 'error',
   '@typescript-eslint/no-unsafe-return': 'error',
   '@typescript-eslint/no-unused-expressions': 'error',
-  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }], // modified
+  '@typescript-eslint/no-unused-vars': [
+    'error',
+    {
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      args: 'after-used',
+    },
+  ], // modified
   '@typescript-eslint/no-use-before-define': 'off', // disabled
   '@typescript-eslint/no-useless-empty-export': 'error',
   '@typescript-eslint/no-useless-constructor': 'error',
