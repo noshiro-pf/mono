@@ -1,6 +1,8 @@
+import { range } from '@noshiro/ts-utils';
+
 export const splitToTokens = (input: string): string[] => {
-  let spaceInserted = '';
-  for (let i = 0; i < input.length; i += 1) {
+  let mut_spaceInserted = '';
+  for (const i of range(0, input.length)) {
     const char = input.charAt(i);
     switch (char) {
       case '(':
@@ -10,18 +12,18 @@ export const splitToTokens = (input: string): string[] => {
       case '-':
       case '*':
       case '\\':
-        spaceInserted += ` ${char} `;
+        mut_spaceInserted += ` ${char} `;
         break;
 
       case '\t':
       case '\n':
-        spaceInserted += ' ';
+        mut_spaceInserted += ' ';
         break;
 
       default:
-        spaceInserted += char;
+        mut_spaceInserted += char;
         break;
     }
   }
-  return spaceInserted.split(' ').filter((e) => e.length > 0 && e !== ' ');
+  return mut_spaceInserted.split(' ').filter((e) => e.length > 0 && e !== ' ');
 };

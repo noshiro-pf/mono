@@ -15,20 +15,20 @@ export const usePromiseValue = <T>(
   });
 
   useEffect(() => {
-    let alive = true;
+    let mut_alive = true;
     promiseMemoized.current
       .then((v) => {
-        if (alive) {
+        if (mut_alive) {
           setSettledValue({ status: 'success', value: v });
         }
       })
       .catch((error: unknown) => {
-        if (alive) {
+        if (mut_alive) {
           setSettledValue({ status: 'error', value: error });
         }
       });
     return () => {
-      alive = false;
+      mut_alive = false;
     };
   }, [promiseMemoized, setSettledValue]);
 

@@ -15,22 +15,19 @@ export const rgbToHsl = ([r, g, b]: Rgb): Hsl => {
 
   const d = max - min;
 
-  let h = 0;
-
-  switch (max) {
-    case r01:
-      h = (g01 - b01) / d + (g01 < b01 ? 6 : 0);
-      break;
-    case g01:
-      h = (b01 - r01) / d + 2;
-      break;
-    case b01:
-      h = (r01 - g01) / d + 4;
-      break;
-    default:
-      break;
-  }
-  h /= 6;
+  const h =
+    (() => {
+      switch (max) {
+        case r01:
+          return (g01 - b01) / d + (g01 < b01 ? 6 : 0);
+        case g01:
+          return (b01 - r01) / d + 2;
+        case b01:
+          return (r01 - g01) / d + 4;
+        default:
+          return 0;
+      }
+    })() / 6;
 
   return [
     numberToHue(h * 360),

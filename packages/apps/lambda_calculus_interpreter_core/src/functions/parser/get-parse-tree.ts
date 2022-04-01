@@ -1,6 +1,7 @@
 import {
   isArrayOfLength3OrMore,
   isArrayOfLength6OrMore,
+  range,
 } from '@noshiro/ts-utils';
 import type { LambdaTerm } from '../../types';
 import { isVariable } from '../is-variable';
@@ -41,7 +42,7 @@ export const getParseTree = (
     tokens[0] === '(' &&
     tokens[tokens.length - 1] === ')'
   ) {
-    for (let sep = 1; sep < tokens.length - 1; sep += 1) {
+    for (const sep of range(1, tokens.length - 1)) {
       const leftTokens = tokens.slice(1, sep);
       const rightTokens = tokens.slice(sep, -1);
       if (

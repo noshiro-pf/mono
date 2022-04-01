@@ -1,3 +1,4 @@
+import { range } from '@noshiro/ts-utils';
 import { MAX_STEPS } from '../../constants';
 import type { LambdaTerm } from '../../types';
 import { isLambdaTerm } from '../is-lambda-term';
@@ -6,18 +7,18 @@ import { evaluate1step } from './eval-1-step';
 
 export const evalSequence = (term: LambdaTerm): LambdaTerm[] => {
   if (!isLambdaTerm(term)) return [];
-  let curr = term;
+  let mut_curr = term;
   // let prev = undefined;
 
   const mut_seq: LambdaTerm[] = [];
   mut_seq.push(term);
 
-  for (let counter = MAX_STEPS; counter > 0; counter -= 1) {
-    const next = evaluate1step(curr);
-    if (termEq(next, curr)) break;
+  for (const _counter of range(MAX_STEPS, 0, -1)) {
+    const next = evaluate1step(mut_curr);
+    if (termEq(next, mut_curr)) break;
     mut_seq.push(next);
     // prev = curr;
-    curr = next;
+    mut_curr = next;
   }
   return mut_seq;
 };

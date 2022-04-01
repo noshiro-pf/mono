@@ -27,14 +27,15 @@ export const pickupHighContrastHues = (
 
   const mut_result: Hue[] = Array.from(IList.zerosThrow(n));
 
-  let [i, y] = [0, 0];
+  let mut_i = 0;
+  let mut_y = 0;
 
   const maxValue = IList.max(luminanceDiffAccumulated);
   if (maxValue === undefined) return [];
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
-    if (value > y) {
-      mut_result[i] = x as Hue;
-      [i, y] = [i + 1, (maxValue * (i + 1)) / n];
+    if (value > mut_y) {
+      mut_result[mut_i] = x as Hue;
+      [mut_i, mut_y] = [mut_i + 1, (maxValue * (mut_i + 1)) / n];
     }
   }
 
