@@ -18,9 +18,11 @@
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "logs": "firebase functions:log",
-    "serve": "yarn build && firebase emulators:start --only functions",
+    "preserve": "yarn build",
+    "serve": "firebase emulators:start --only functions",
     "setconfig": "firebase functions:config:set",
-    "shell": "yarn build && firebase functions:shell",
+    "preshell": "yarn build",
+    "shell": "firebase functions:shell",
     "showlog": "firebase functions:log",
     "start": "yarn shell"
   },

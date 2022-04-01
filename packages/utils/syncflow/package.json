@@ -35,6 +35,7 @@
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "pub": "yarn publish --no-git-tag-version --access=public",
+    "setup": "yarn build",
     "start": "node cjs/test/preview-main.js",
     "test": "jest --config config/jest.config.json",
     "test:detectOpenHandles": "jest --config config/jest.config.json --detectOpenHandles",
