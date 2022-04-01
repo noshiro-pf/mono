@@ -585,11 +585,11 @@ export namespace IList {
   ): ReadonlyNonEmptyArray<B> => {
     const mut_result: B[] = Array.from(newArrayThrow<B>(list.length + 1, init));
 
-    let acc = init;
+    let mut_acc = init;
 
     for (const [index, value] of list.entries()) {
-      acc = reducer(acc, value);
-      mut_result[index + 1] = acc;
+      mut_acc = reducer(mut_acc, value);
+      mut_result[index + 1] = mut_acc;
     }
 
     return mut_result as readonly B[] as ReadonlyNonEmptyArray<B>;
@@ -709,35 +709,35 @@ export namespace IList {
     sortedList2: readonly T[]
   ): readonly T[] => {
     const mut_result: T[] = [];
-    let it1 = 0; // iterator for sortedArray1
-    let it2 = 0; // iterator for sortedArray2
+    let mut_it1 = 0; // iterator for sortedArray1
+    let mut_it2 = 0; // iterator for sortedArray2
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    let val1: T = sortedList1[it1]!;
+    let mut_val1: T = sortedList1[mut_it1]!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    let val2: T = sortedList2[it2]!;
+    let mut_val2: T = sortedList2[mut_it2]!;
 
-    while (it1 < sortedList1.length && it2 < sortedList2.length) {
-      if (val1 === val2) {
-        it1 += 1;
-        it2 += 1;
+    while (mut_it1 < sortedList1.length && mut_it2 < sortedList2.length) {
+      if (mut_val1 === mut_val2) {
+        mut_it1 += 1;
+        mut_it2 += 1;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        val1 = sortedList1[it1]!;
+        mut_val1 = sortedList1[mut_it1]!;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        val2 = sortedList2[it2]!;
-      } else if (val1 < val2) {
-        mut_result.push(val1);
-        it1 += 1;
+        mut_val2 = sortedList2[mut_it2]!;
+      } else if (mut_val1 < mut_val2) {
+        mut_result.push(mut_val1);
+        mut_it1 += 1;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        val1 = sortedList1[it1]!;
+        mut_val1 = sortedList1[mut_it1]!;
       } else {
-        it2 += 1;
+        mut_it2 += 1;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        val2 = sortedList2[it2]!;
+        mut_val2 = sortedList2[mut_it2]!;
       }
     }
-    for (; it1 < sortedList1.length; it1 += 1) {
+    for (; mut_it1 < sortedList1.length; mut_it1 += 1) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      mut_result.push(sortedList1[it1]!);
+      mut_result.push(sortedList1[mut_it1]!);
     }
 
     return mut_result;

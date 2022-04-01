@@ -7,16 +7,16 @@ export const useInterval = (
 ): number => {
   const { state: counter, updateState: updateCounter } = useState<number>(0);
   useEffect(() => {
-    let intervalTimer: TimerId | undefined = undefined;
+    let mut_intervalTimer: TimerId | undefined = undefined;
     const delayTimer = setTimeout(() => {
-      intervalTimer = setInterval(() => {
+      mut_intervalTimer = setInterval(() => {
         updateCounter((i) => i + 1);
       }, milliSec);
     }, delayMilliSec);
 
     return () => {
-      if (intervalTimer !== undefined) {
-        clearInterval(intervalTimer);
+      if (mut_intervalTimer !== undefined) {
+        clearInterval(mut_intervalTimer);
       }
       clearInterval(delayTimer);
     };

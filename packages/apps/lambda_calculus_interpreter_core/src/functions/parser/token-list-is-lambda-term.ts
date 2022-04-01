@@ -1,3 +1,4 @@
+import { range } from '@noshiro/ts-utils';
 import { isVariable } from '../is-variable';
 
 export const tokensRepresentsLambdaTerm = (
@@ -22,7 +23,7 @@ export const tokensRepresentsLambdaTerm = (
 
   /* (e e)? */
   if (tokens[0] === '(' && tokens[tokens.length - 1] === ')') {
-    for (let sep = 1; sep < tokens.length - 1; sep += 1) {
+    for (const sep of range(1, tokens.length - 1)) {
       if (
         tokensRepresentsLambdaTerm(tokens.slice(1, sep)) &&
         tokensRepresentsLambdaTerm(tokens.slice(sep, -1))

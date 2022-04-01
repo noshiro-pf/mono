@@ -1,10 +1,10 @@
 import type { ObservableId, SubscriberId, Token } from '../types';
 
 function* idMaker(): Generator<number, number, number> {
-  let i = 0;
+  let mut_i = 0;
   while (true) {
-    yield i;
-    i += 1;
+    yield mut_i;
+    mut_i += 1;
   }
 }
 

@@ -8,7 +8,7 @@ export const countSuccessForRemains = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   columnsAlive: ReadonlySet<TwoDiceSumValue>
 ): number => {
-  let count = 0;
+  let mut_count = 0;
 
   for (const a of diceValueSet) {
     for (const b of diceValueSet) {
@@ -18,12 +18,12 @@ export const countSuccessForRemains = (
             setIntersection(columnsAlive, possibleTwoDiceSums(a, b, c, d))
               .size > 0
           ) {
-            count += 1;
+            mut_count += 1;
           }
         }
       }
     }
   }
 
-  return count;
+  return mut_count;
 };

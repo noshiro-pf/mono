@@ -2,14 +2,7 @@ import type { Hsl, Hsla, Rgb, Rgba } from '../../types';
 import { numberToRgbValue } from '../from-number';
 
 const hue2rgb = (p: number, q: number, s: number): number => {
-  let t = s;
-
-  if (t < 0) {
-    t += 1;
-  }
-  if (t > 1) {
-    t -= 1;
-  }
+  const t = s < 0 ? s + 1 : s > 1 ? s - 1 : s;
 
   if (t < 1 / 6) return p + (q - p) * (6 * t);
   if (t < 1 / 2) return q;

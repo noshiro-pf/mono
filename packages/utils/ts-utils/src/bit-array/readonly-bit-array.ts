@@ -1,3 +1,4 @@
+import { range } from '../iterator';
 import { isInRange } from '../num';
 
 export type ReadonlyBitArrayType = Readonly<{
@@ -33,20 +34,14 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
   }
 
   *values(): IterableIterator<0 | 1> {
-    let idx = 0;
-
-    while (idx < this.size) {
+    for (const idx of range(0, this.size)) {
       yield this._data[idx] === 0 ? 0 : 1;
-      idx += 1;
     }
   }
 
   *entries(): IterableIterator<readonly [number, 0 | 1]> {
-    let idx = 0;
-
-    while (idx < this.size) {
+    for (const idx of range(0, this.size)) {
       yield [idx, this._data[idx] === 0 ? 0 : 1];
-      idx += 1;
     }
   }
 
