@@ -5,9 +5,24 @@
 /** @typedef { import("./rules-type/typescript-eslint-rules").TypeScriptEslintRules } TypeScriptEslintRules */
 /** @typedef { import("../../types/types").RestrictedImportsOption} RestrictedImportsOption */
 
+/** @type {Record<string, { message?: string; fixWith?: string; }>} */
 const banTypes = {
-  Omit: 'Use `StrictOmit` instead.',
-  Exclude: 'Use `StrictExclude` instead.',
+  Omit: {
+    message: 'Use `StrictOmit` instead.',
+    fixWith: 'StrictOmit',
+  },
+  Exclude: {
+    message: 'Use `StrictExclude` instead.',
+    fixWith: 'StrictExclude',
+  },
+  Date: {
+    message: 'Use `IDate` instead.',
+    fixWith: 'IDate',
+  },
+  ReadonlyDate: {
+    message: 'Use `IDate` instead.',
+    fixWith: 'IDate',
+  },
 };
 
 const restrictedImportsOption = {

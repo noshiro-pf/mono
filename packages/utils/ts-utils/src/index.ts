@@ -25,5 +25,4 @@ export * from './shape';
 export * from './string';
 export * from './tiny-observable';
 export * from './types';
-export * from './utc';
 export * from './validator';
