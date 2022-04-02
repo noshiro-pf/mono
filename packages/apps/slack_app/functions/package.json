@@ -22,7 +22,8 @@
     "setapikey": "firebase functions:config:set slack.apikey=",
     "preshell": "yarn build",
     "shell": "firebase functions:shell",
-    "start": "yarn shell"
+    "start": "yarn shell",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../../.."

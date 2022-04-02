@@ -13,7 +13,8 @@
     "dist"
   ],
   "scripts": {
-    "test:types": "tsc --project tsconfig.test.json"
+    "test:types": "tsc --project tsconfig.test.json",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "csstype": "^3.0.3",

@@ -25,7 +25,8 @@
     "lint:fix": "yarn lint --fix",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."
