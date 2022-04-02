@@ -24,7 +24,7 @@
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."

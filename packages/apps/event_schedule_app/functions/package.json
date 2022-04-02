@@ -24,7 +24,8 @@
     "preshell": "yarn build",
     "shell": "firebase functions:shell",
     "showlog": "firebase functions:log",
-    "start": "yarn shell"
+    "start": "yarn shell",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../../.."

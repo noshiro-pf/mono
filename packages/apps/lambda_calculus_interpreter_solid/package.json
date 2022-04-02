@@ -12,7 +12,8 @@
     "lint:fix": "yarn lint --fix",
     "prebuild": "yarn clean:build",
     "start": "solid-scripts start",
-    "testw": "solid-scripts test"
+    "testw": "solid-scripts test",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."

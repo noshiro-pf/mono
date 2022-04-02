@@ -31,7 +31,8 @@
     "setup:service-account-key": "touch ./scripts/service-account-key.json",
     "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "build_dir": "build",
