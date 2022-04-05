@@ -12,6 +12,6 @@
       "tsconfig": "<rootDir>/config/tsconfig.test.json"
     }
   },
-  "testMatch": ["<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"],
+  "testMatch": ["<rootDir>/src/**/*.test.{ts,tsx}"],
   "testEnvironment": "jsdom"
 }
