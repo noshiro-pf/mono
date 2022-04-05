@@ -8,6 +8,4 @@
 export const clamp =
   (min: number, max: number) =>
   (target: number): number =>
-    typeof target !== 'number' || !Number.isFinite(target)
-      ? min
-      : Math.max(min, Math.min(max, target));
+    !Number.isFinite(target) ? min : Math.max(min, Math.min(max, target));
