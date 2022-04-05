@@ -1,6 +1,7 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { useAlive, useBoolState, useState } from '@noshiro/react-utils';
-import { IRecord, Result, toAbsolutePath } from '@noshiro/ts-utils';
+import { IRecord, Result } from '@noshiro/ts-utils';
+import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { useCallback } from 'react';
 import { api } from '../../api';
 import { routes } from '../../constants';

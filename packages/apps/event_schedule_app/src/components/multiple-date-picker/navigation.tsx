@@ -1,8 +1,8 @@
 import type { OptionProps } from '@blueprintjs/core';
 import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { MonthEnum, YearEnum } from '@noshiro/ts-utils';
-import { IDate, IList, monthsList, stringToNumber } from '@noshiro/ts-utils';
+import { IDate, IList, Str } from '@noshiro/ts-utils';
+import { monthsList } from '@noshiro/ts-utils-additional';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { BpSelect } from '../bp';
@@ -40,14 +40,14 @@ export const DatepickerNav = memoNamed<Props>(
   }) => {
     const onYearChangeHandler = useCallback(
       (value: string) => {
-        onYearChange(stringToNumber(value) ?? thisYear);
+        onYearChange(Str.toNumber(value) ?? thisYear);
       },
       [onYearChange]
     );
 
     const onMonthChangeHandler = useCallback(
       (value: string) => {
-        onMonthChange((stringToNumber(value) ?? thisMonth) as MonthEnum);
+        onMonthChange((Str.toNumber(value) ?? thisMonth) as MonthEnum);
       },
       [onMonthChange]
     );

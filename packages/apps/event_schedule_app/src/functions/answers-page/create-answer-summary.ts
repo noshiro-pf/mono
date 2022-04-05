@@ -6,7 +6,7 @@ import type {
   Weight,
 } from '@noshiro/event-schedule-app-shared';
 import type { IMap } from '@noshiro/ts-utils';
-import { IList, IMapMapped, ituple, pipe } from '@noshiro/ts-utils';
+import { IList, IMapMapped, pipe, tp } from '@noshiro/ts-utils';
 import { answerIconPointConfig } from '../../constants';
 import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
@@ -26,7 +26,7 @@ export const createAnswerSummary = (
         | undefined = answerTable.get(datetimeRange);
 
       if (answersForThisDatetimeRange === undefined) {
-        return ituple(datetimeRange, IList.zerosThrow(3));
+        return tp(datetimeRange, IList.zerosThrow(3));
       }
 
       const answerGroups: IMap<AnswerIconIdWithNone, number> = pipe(
@@ -41,7 +41,7 @@ export const createAnswerSummary = (
         answerGroups.get('poor') ?? 0,
       ];
 
-      return ituple(datetimeRange, counts);
+      return tp(datetimeRange, counts);
     }),
     datetimeRangeToMapKey,
     datetimeRangeFromMapKey

@@ -9,12 +9,7 @@ import {
 import type { Observable } from '@noshiro/syncflow';
 import { fromArray } from '@noshiro/syncflow';
 import { useObservableEffect } from '@noshiro/syncflow-react-hooks';
-import type {
-  IMapMapped,
-  MonthEnum,
-  WeekDayEnum,
-  YearEnum,
-} from '@noshiro/ts-utils';
+import type { IMapMapped } from '@noshiro/ts-utils';
 import { IList, ISetMapped } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useReducer } from 'react';
 import type {
@@ -49,7 +44,7 @@ type MultipleDatePickerState = DeepReadonly<{
     }[];
   }[];
   onDateClick?: (ymd: YearMonthDate) => void;
-  onWeekdaysHeaderCellClick?: (w: WeekDayEnum) => void;
+  onWeekdaysHeaderCellClick?: (w: DayOfWeekIndex) => void;
   onTodayClick: () => void;
 }>;
 
@@ -104,7 +99,7 @@ export const useMultipleDatePickerState = (
       dates.map((week, index) => ({
         index,
         week: week.map((ymd) => {
-          const dayValue: WeekDayEnum = ymd2day(ymd);
+          const dayValue: DayOfWeekIndex = ymd2day(ymd);
           return {
             ymd,
             selected: selectedDatesSet.has(ymd),
@@ -177,7 +172,7 @@ export const useMultipleDatePickerState = (
     () =>
       selectedDatesDispatch === undefined
         ? undefined
-        : (w: WeekDayEnum) => {
+        : (w: DayOfWeekIndex) => {
             selectedDatesDispatch({
               type: 'fill-column',
               dates: dates

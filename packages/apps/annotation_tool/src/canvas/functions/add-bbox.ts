@@ -1,5 +1,5 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils';
-import { roundToInt } from '@noshiro/ts-utils';
+import { Num } from '@noshiro/ts-utils';
+import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
 import type { Application } from 'pixi.js';
 import type { CanvasAppState, CanvasAppStateHandler } from '../state';
 import type { AnnotationCanvasStyle, IdType, PixiBbox } from '../types';
@@ -30,7 +30,7 @@ export const addBboxToCanvas = (
       borderColor: bboxColor.border,
       borderWidthPx: canvasStyles.bbox.borderWidthPx.notSelected,
       faceHighlightColor: bboxColor.face,
-      pointWidthPxHalf: roundToInt(canvasStyles.bbox.pointWidthPx / 2),
+      pointWidthPxHalf: Num.roundToInt(canvasStyles.bbox.pointWidthPx / 2),
     },
     pixi: {
       face: pixiBboxRect,

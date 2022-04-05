@@ -26,12 +26,12 @@ export const iconListReducer: ReducerType<
 > = (state, action) => {
   switch (action.type) {
     case 'update-description':
-      return IRecord.setIn(
-        state,
-        [action.iconId, 'description'],
-        action.description
+      return IRecord.update(state, action.iconId, (s) =>
+        IRecord.set(s, 'description', action.description)
       );
     case 'update-point':
-      return IRecord.setIn(state, [action.iconId, 'point'], action.point);
+      return IRecord.update(state, action.iconId, (s) =>
+        IRecord.set(s, 'point', action.point)
+      );
   }
 };

@@ -39,6 +39,9 @@
     "firebase-functions": "^3.15.7",
     "nodemailer": "^6.4.16"
   },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
+  },
   "engines": {
     "node": ">=14.0.0"
   }

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { memoNamed } from '@noshiro/react-utils';
-import type { WeekDayEnum } from '@noshiro/ts-utils';
-import { weekdaysList } from '@noshiro/ts-utils';
+import { weekdaysList } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import {
@@ -12,7 +11,7 @@ import {
 } from '../bp';
 
 type Props = Readonly<{
-  onClick?: (w: WeekDayEnum) => void;
+  onClick?: (w: DayOfWeekIndex) => void;
 }>;
 
 export const WeekdaysHeader = memoNamed<Props>(
@@ -26,7 +25,7 @@ export const WeekdaysHeader = memoNamed<Props>(
             onClick === undefined
               ? undefined
               : () => {
-                  onClick(idx as WeekDayEnum);
+                  onClick(idx as DayOfWeekIndex);
                 },
         })),
       [onClick]

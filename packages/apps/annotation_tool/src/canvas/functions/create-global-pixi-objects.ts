@@ -1,4 +1,4 @@
-import type { RectSize } from '@noshiro/ts-utils';
+import type { RectSize } from '@noshiro/ts-utils-additional';
 import type { Application, Sprite } from 'pixi.js';
 import type { AnnotationCanvasStyle, PixiTempRect } from '../types';
 import {

@@ -4,7 +4,7 @@ import {
   useObservableValue,
 } from '@noshiro/syncflow-react-hooks';
 import { push, useQueryParams } from '@noshiro/tiny-router-react-hooks';
-import { mapNullable, pipe, stringToNumber } from '@noshiro/ts-utils';
+import { mapNullable, pipe, Str } from '@noshiro/ts-utils';
 import { useEffect } from 'react';
 import { queryParams } from './constants';
 import {
@@ -33,19 +33,19 @@ export const useMainHooks = (): Readonly<{ isCalculating: boolean }> => {
 
     const paramsAsNumber = {
       repaymentType: pipe(paramsAsStr.repaymentType).chain((a) =>
-        mapNullable(a, stringToNumber)
+        mapNullable(a, Str.toNumber)
       ).value,
       downPayment: pipe(paramsAsStr.downPayment).chain((a) =>
-        mapNullable(a, stringToNumber)
+        mapNullable(a, Str.toNumber)
       ).value,
       propertyPrice: pipe(paramsAsStr.propertyPrice).chain((a) =>
-        mapNullable(a, stringToNumber)
+        mapNullable(a, Str.toNumber)
       ).value,
       borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).chain((a) =>
-        mapNullable(a, stringToNumber)
+        mapNullable(a, Str.toNumber)
       ).value,
       interestRatePerMonth: pipe(paramsAsStr.interestRatePerMonth).chain((a) =>
-        mapNullable(a, stringToNumber)
+        mapNullable(a, Str.toNumber)
       ).value,
     };
 

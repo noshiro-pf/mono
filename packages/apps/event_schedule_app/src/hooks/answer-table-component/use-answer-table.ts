@@ -7,7 +7,7 @@ import type {
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import type { IMapMapped } from '@noshiro/ts-utils';
-import { ituple } from '@noshiro/ts-utils';
+import { tp } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type {
   AnswerSelectionMapKey,
@@ -40,7 +40,7 @@ export const useAnswerTable = (
       datetimeRange: DatetimeRange,
       answerId: AnswerId
     ): readonly [AnswerIconIdWithNone, AnswerIconPoint] =>
-      answerSelectionMap.get({ datetimeRange, answerId }) ?? ituple('none', 0),
+      answerSelectionMap.get({ datetimeRange, answerId }) ?? tp('none', 0),
     [answerSelectionMap]
   );
 

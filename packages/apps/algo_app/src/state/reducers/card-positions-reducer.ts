@@ -1,4 +1,4 @@
-import type { Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils-additional';
 import { produce } from 'immer';
 import type { CardColor, CardNumber } from '../../types';
 

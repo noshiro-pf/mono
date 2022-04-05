@@ -1,4 +1,4 @@
-import type { Alpha, Percent } from '@noshiro/ts-utils';
+import type { Alpha, Percent } from '@noshiro/ts-utils-additional';
 
 export type BboxStyle = Readonly<{
   pointWidthPx: number;

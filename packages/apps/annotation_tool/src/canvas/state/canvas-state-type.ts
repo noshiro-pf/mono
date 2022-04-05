@@ -1,4 +1,4 @@
-import type { Point, Rect } from '@noshiro/ts-utils';
+import type { Point, Rect } from '@noshiro/ts-utils-additional';
 import type { Sprite } from 'pixi.js';
 import type { Direction } from '../functions';
 import type { PixiBbox, PixiTempRect } from '../types';

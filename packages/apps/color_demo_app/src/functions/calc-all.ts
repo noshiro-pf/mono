@@ -1,11 +1,10 @@
-import type { Hsl, Hue, Percent } from '@noshiro/ts-utils';
+import { IList, Num } from '@noshiro/ts-utils';
+import type { Hsl, Hue, Percent } from '@noshiro/ts-utils-additional';
 import {
   hslToRgb,
-  IList,
   relativeLuminance,
-  roundToInt,
   variance,
-} from '@noshiro/ts-utils';
+} from '@noshiro/ts-utils-additional';
 import type { ColorResult } from '../types';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
@@ -57,7 +56,7 @@ export const calcAll = ({
   );
 
   const pickedUpHues_equallySpaced = IList.seqThrow(divisionNumber)
-    .map((i) => roundToInt((i * 360) / divisionNumber) as Hue)
+    .map((i) => Num.roundToInt((i * 360) / divisionNumber) as Hue)
     .map((h) => ((h - firstHue + 360) % 360) as Hue);
 
   const adjacentContrastRatioList_equallySpaced = hueListToContrastRatioList(

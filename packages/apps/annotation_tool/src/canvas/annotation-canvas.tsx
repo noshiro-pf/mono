@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hue, RectSize } from '@noshiro/ts-utils';
+import type { Hue, RectSize } from '@noshiro/ts-utils-additional';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';

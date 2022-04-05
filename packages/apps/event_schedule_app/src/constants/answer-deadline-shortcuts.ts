@@ -1,5 +1,4 @@
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
-import type { DateEnum, MonthEnum } from '@noshiro/ts-utils';
 import { IDate, pipe } from '@noshiro/ts-utils';
 
 // eslint-disable-next-line @typescript-eslint/ban-types

@@ -1,6 +1,6 @@
 import { createEventEmitter, createState } from '@noshiro/syncflow';
 import type { Result } from '@noshiro/ts-utils';
-import { promiseToResult } from '@noshiro/ts-utils';
+import { promiseToResult } from '@noshiro/ts-utils-additional';
 import { initializeApp } from 'firebase/app';
 import type { DocumentReference, Unsubscribe } from 'firebase/firestore';
 import {

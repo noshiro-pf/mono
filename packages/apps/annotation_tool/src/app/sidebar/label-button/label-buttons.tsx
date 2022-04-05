@@ -1,7 +1,7 @@
 import { Button, Collapse } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { Percent } from '@noshiro/ts-utils';
-import { tuple } from '@noshiro/ts-utils';
+import { tp } from '@noshiro/ts-utils';
+import type { Percent } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import type { Label } from '../../../canvas';
@@ -22,7 +22,7 @@ export const LabelButtons = memoNamed<Props>('LabelButtons', (props) => {
   const labelsWithVisibleFlag = useMemo(
     () =>
       props.labels.map((label) =>
-        tuple(label, props.visibleLabels.includes(label))
+        tp(label, props.visibleLabels.includes(label))
       ),
     [props.labels, props.visibleLabels]
   );

@@ -1,5 +1,6 @@
-import type { Hue, Percent } from '@noshiro/ts-utils';
-import { hslToRgb, IList, relativeLuminance } from '@noshiro/ts-utils';
+import { IList } from '@noshiro/ts-utils';
+import type { Hue, Percent } from '@noshiro/ts-utils-additional';
+import { hslToRgb, relativeLuminance } from '@noshiro/ts-utils-additional';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
 const huesDefault = IList.seqThrow(360) as readonly Hue[];

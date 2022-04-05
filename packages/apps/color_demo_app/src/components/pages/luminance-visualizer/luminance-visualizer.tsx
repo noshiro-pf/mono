@@ -1,5 +1,5 @@
 import { memoNamed, useDebounce, useState } from '@noshiro/react-utils';
-import type { Hue, Percent } from '@noshiro/ts-utils';
+import type { Hue, Percent } from '@noshiro/ts-utils-additional';
 import { calcAll } from '../../../functions';
 import { LuminanceVisualizerView } from './luminance-visualizer-view';
 

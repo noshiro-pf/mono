@@ -1,11 +1,6 @@
 import { Navbar, Tab, Tabs } from '@blueprintjs/core';
 import { memoNamed, useState } from '@noshiro/react-utils';
-import {
-  IList,
-  isNotUndefined,
-  stringToNumber,
-  tuple,
-} from '@noshiro/ts-utils';
+import { IList, isNotUndefined, Str, tp } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { DeadColumn, ProbabilityTable } from './components';
@@ -23,7 +18,7 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const countSum = denom - count.noLine;
   return {
     id: `${x}-${y}-${z}`,
-    selected: tuple(x, y, z),
+    selected: tp(x, y, z),
     count,
     countSum,
     probability: countSum / denom,
@@ -54,7 +49,7 @@ export const Main = memoNamed('Main', () => {
     () =>
       filterByString
         .split(separator)
-        .map(stringToNumber)
+        .map(Str.toNumber)
         .filter(isNotUndefined)
         .filter(isTwoDiceSumValue),
     [filterByString]

@@ -1,5 +1,5 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils';
-import { rgbaToHexNumber } from '@noshiro/ts-utils';
+import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
+import { rgbaToHexNumber } from '@noshiro/ts-utils-additional';
 import type { Graphics } from 'pixi.js';
 import { Rectangle } from 'pixi.js';
 import type { PixiBbox } from '../types';

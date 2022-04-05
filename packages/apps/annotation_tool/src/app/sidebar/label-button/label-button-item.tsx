@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hsl, Percent } from '@noshiro/ts-utils';
+import type { Hsl, Percent } from '@noshiro/ts-utils-additional';
 import type { BaseSyntheticEvent } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { Label } from '../../../canvas';

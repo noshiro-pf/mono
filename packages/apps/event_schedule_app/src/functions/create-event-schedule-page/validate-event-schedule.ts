@@ -1,5 +1,6 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { IList, isEmailString, isInRange } from '@noshiro/ts-utils';
+import { IList, Num } from '@noshiro/ts-utils';
+import { isEmailString } from '@noshiro/ts-utils-additional';
 import { answerIconPointConfig } from '../../constants';
 import type { EventScheduleValidation } from '../../types';
 
@@ -22,7 +23,7 @@ export const validateEventSchedule = ({
     answerIcons.good.description === '' ||
     answerIcons.fair.description === '' ||
     answerIcons.poor.description === '' ||
-    isInRange(
+    Num.isInRange(
       answerIconPointConfig.fair.min,
       answerIconPointConfig.fair.max
     )(answerIcons.fair.point),

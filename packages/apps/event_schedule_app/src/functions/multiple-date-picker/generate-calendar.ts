@@ -1,5 +1,4 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
 import { IDate, IList } from '@noshiro/ts-utils';
 
 /**

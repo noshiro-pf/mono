@@ -1,6 +1,6 @@
 import { keyframes, styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { clamp } from '@noshiro/ts-utils';
+import { Num } from '@noshiro/ts-utils';
 import { useMemo } from 'preact/hooks';
 
 type Props = Readonly<{
@@ -45,7 +45,7 @@ export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
   );
 
   const strokeOffset =
-    PATH_LENGTH - PATH_LENGTH * (value == null ? 0.25 : clamp(0, 1)(value));
+    PATH_LENGTH - PATH_LENGTH * (value == null ? 0.25 : Num.clamp(0, 1)(value));
 
   const viewBox = useMemo(() => getViewBox(strokeWidth), [strokeWidth]);
 

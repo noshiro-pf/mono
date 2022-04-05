@@ -49,10 +49,14 @@
     "@noshiro/react-utils": "*",
     "@noshiro/resize-observer-react-hooks": "*",
     "@noshiro/ts-utils": "*",
+    "@noshiro/ts-utils-additional": "*",
     "pixi.js": "^5.3.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "styled-components": "^5.3.0",
     "uuid": "^8.3.0"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

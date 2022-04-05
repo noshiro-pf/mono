@@ -1,4 +1,4 @@
-import type { Point, Rgba } from '@noshiro/ts-utils';
+import type { Point, Rgba } from '@noshiro/ts-utils-additional';
 import type { Direction } from '../functions';
 import { turnOffHighlight, turnOnHighlight } from '../functions';
 import type {

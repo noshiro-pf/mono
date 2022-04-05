@@ -7,15 +7,13 @@ import {
   TableRow,
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hue, Percent } from '@noshiro/ts-utils';
+import { assertType, IList, Num } from '@noshiro/ts-utils';
+import type { Hue, Percent } from '@noshiro/ts-utils-additional';
 import {
-  assertType,
   blackHsl,
   contrastRatioHsl,
-  IList,
-  roundAt,
   whiteHsl,
-} from '@noshiro/ts-utils';
+} from '@noshiro/ts-utils-additional';
 import { Fragment } from 'react';
 import styled from 'styled-components';
 
@@ -110,7 +108,7 @@ const componentElement = (
                           name={hslStyle}
                           type='checkbox'
                         />
-                        {roundAt(contrastWhite, 2)}
+                        {Num.roundAt(contrastWhite, 2)}
                       </label>
                     </TableCell>
                     <TableCell
@@ -123,7 +121,7 @@ const componentElement = (
                           name={hslStyle}
                           type='checkbox'
                         />
-                        {roundAt(contrastBlack, 2)}
+                        {Num.roundAt(contrastBlack, 2)}
                       </label>
                     </TableCell>
                   </Fragment>

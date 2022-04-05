@@ -1,4 +1,3 @@
-import type { PermutationString } from '@noshiro/ts-utils';
 import {
   assertType,
   hasKeyValue,
@@ -8,6 +7,7 @@ import {
   isString,
   isUndefined,
 } from '@noshiro/ts-utils';
+import type { PermutationString } from '@noshiro/ts-utils-additional';
 import type { Card } from './card-type';
 import { isCard } from './card-type';
 import type { Player } from './player';
