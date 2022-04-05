@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build:dev": "solid-scripts build",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build": "rimraf build",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",

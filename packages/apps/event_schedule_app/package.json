@@ -9,7 +9,7 @@
     "prebuild": "yarn clean:build",
     "build": "webpack --config config/webpack.prod.js",
     "postbuild": "cpx \"public/**\" ${npm_package_config_build_dir}",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build": "rimraf ${npm_package_config_build_dir}",
     "clean:cache": "rimraf .firebase",
     "fb": "firebase",

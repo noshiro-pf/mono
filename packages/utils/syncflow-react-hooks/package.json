@@ -9,10 +9,10 @@
   "types": "esm/index.d.ts",
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
-    "build": "run-s build:*",
+    "build": "run-p build:**",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build:esm": "rimraf esm",
     "fmt": "yarn _prettier .",
     "lint": "eslint src/ --ext .ts",

@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "yarn clean:build",
     "build": "webpack --config config/webpack.prod.js",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "predeploy": "yarn build",
     "deploy": "firebase deploy",

@@ -12,7 +12,7 @@
     "build": "yarn build:esm",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build:esm": "rimraf esm",
     "fmt": "yarn _prettier .",
     "gi": "yarn _script_genindex ./src --min-depth 1",
