@@ -5,7 +5,7 @@
   "rootDir": "../",
   "roots": ["<rootDir>/src", "<rootDir>/test"],
   "transform": {
-    "^.+\\.(ts|tsx)$": "ts-jest"
+    "^.+\\.ts$": "ts-jest"
   },
   "globals": {
     "ts-jest": {
