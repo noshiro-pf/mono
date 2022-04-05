@@ -12,5 +12,5 @@
       "tsconfig": "<rootDir>/config/tsconfig.test.json"
     }
   },
-  "testMatch": ["<rootDir>/src/**/?(*.)+(spec|test).ts"]
+  "testMatch": ["<rootDir>/src/**/*.test.ts"]
 }
