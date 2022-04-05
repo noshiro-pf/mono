@@ -26,6 +26,7 @@
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
+    "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
   "config": {

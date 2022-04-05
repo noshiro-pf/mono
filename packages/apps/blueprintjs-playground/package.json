@@ -24,6 +24,7 @@
     "serve": "firebase serve",
     "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
+    "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
   "config": {

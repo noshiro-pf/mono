@@ -21,6 +21,7 @@
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "test": "jest --config config/jest.config.json --passWithNoTests",
+    "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
   "config": {

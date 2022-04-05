@@ -25,6 +25,7 @@
     "shell": "firebase functions:shell",
     "showlog": "firebase functions:log",
     "start": "yarn shell",
+    "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
   "config": {

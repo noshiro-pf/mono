@@ -39,6 +39,7 @@
     "start": "node cjs/test/preview-main.js",
     "test": "jest --config config/jest.config.json",
     "test:detectOpenHandles": "jest --config config/jest.config.json --detectOpenHandles",
+    "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
   "config": {

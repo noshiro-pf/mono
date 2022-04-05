@@ -13,6 +13,7 @@
     "prebuild": "yarn clean:build",
     "start": "solid-scripts start",
     "testw": "solid-scripts test",
+    "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
   "config": {
