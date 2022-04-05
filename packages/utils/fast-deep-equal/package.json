@@ -9,12 +9,12 @@
   "types": "esm/index.d.ts",
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
-    "build": "run-s build:*",
+    "build": "run-p build:**",
     "prebuild:cjs": "yarn clean:build:cjs",
     "build:cjs": "tsc --project config/tsconfig.cjs.json",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
     "fmt": "yarn _prettier .",
@@ -24,7 +24,8 @@
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."

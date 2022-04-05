@@ -10,7 +10,9 @@
   "types": "goober.d.ts",
   "typings": "./goober.d.ts",
   "scripts": {
-    "fmt": "prettier . --write"
+    "fmt": "prettier . --write",
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
     "csstype": "^2.6.2"

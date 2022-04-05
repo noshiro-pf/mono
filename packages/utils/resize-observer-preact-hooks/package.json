@@ -11,7 +11,7 @@
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "build": "yarn build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build:esm": "rimraf esm",
     "fmt": "yarn _prettier .",
     "lint": "eslint src/ --ext .ts",
@@ -19,7 +19,8 @@
     "lint:fix": "yarn lint --fix",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."

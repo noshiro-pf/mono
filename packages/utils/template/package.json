@@ -10,12 +10,12 @@
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
-    "build": "run-s build:*",
+    "build": "run-p build:**",
     "prebuild:cjs": "yarn clean:build:cjs",
     "build:cjs": "tsc --project config/tsconfig.cjs.json",
     "prebuild:esm": "yarn clean:build:esm",
     "build:esm": "tsc --project config/tsconfig.esm.json",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
     "fmt": "yarn _prettier .",
@@ -25,7 +25,8 @@
     "lint:fix": "yarn lint --fix",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "testw": "yarn test --watch"
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."

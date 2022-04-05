@@ -5,14 +5,16 @@
   "license": "MIT",
   "scripts": {
     "build:dev": "solid-scripts build",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build": "rimraf build",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "prebuild": "yarn clean:build",
     "start": "solid-scripts start",
-    "testw": "solid-scripts test"
+    "testw": "solid-scripts test",
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."

@@ -9,7 +9,7 @@
     "prebuild": "yarn clean:build",
     "build": "webpack --config config/webpack.prod.js",
     "postbuild": "cpx \"public/**\" ${npm_package_config_build_dir}",
-    "clean": "run-s clean:**",
+    "clean": "run-p clean:**",
     "clean:build": "rimraf ${npm_package_config_build_dir}",
     "clean:cache": "rimraf .firebase",
     "fb": "firebase",
@@ -31,7 +31,8 @@
     "setup:service-account-key": "touch ./scripts/service-account-key.json",
     "start": "webpack serve --config config/webpack.dev.js",
     "test": "jest --config config/jest.config.json --passWithNoTests",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
   },
   "config": {
     "build_dir": "build",
