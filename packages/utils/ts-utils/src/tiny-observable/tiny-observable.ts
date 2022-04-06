@@ -1,3 +1,5 @@
+import { MutableMap } from '../others';
+
 export type Subscription = Readonly<{
   unsubscribe: () => void;
 }>;
@@ -13,7 +15,7 @@ export const createTinyObservable = <T>(): TinyObservableSource<T> =>
   new TinyObservableClass<T>();
 
 class TinyObservableClass<T> implements TinyObservableSource<T> {
-  private readonly subscriptions = new Map<symbol, (value: T) => void>();
+  private readonly subscriptions = new MutableMap<symbol, (value: T) => void>();
 
   next(value: T): void {
     for (const fn of this.subscriptions.values()) {

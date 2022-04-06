@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { assertType, IRecord } from '@noshiro/ts-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import type { Reducer } from 'react';
 
@@ -25,7 +25,7 @@ assertType<
 export const confirmEmailDialogHasError = (
   state: ConfirmEmailDialogState
 ): boolean =>
-  Object.values(state.showErrorOf).some((b) => b) ||
+  IRecord.values(state.showErrorOf).some((b) => b) ||
   state.emailBeingEdited === '';
 
 export type ConfirmEmailDialogStateAction = DeepReadonly<

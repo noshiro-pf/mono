@@ -1,3 +1,4 @@
+import { ISet } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
 // eslint-disable-next-line import/no-deprecated
 import { filter, interval, merge, take, throttleTime } from '../../src';
@@ -20,7 +21,7 @@ const createStreams = (
   throttleTime$: Observable<number>;
   merged$: Observable<number>;
 }> => {
-  const emitValues = new Set([1, 2, 3, 7, 9, 10, 12, 13, 16, 17, 18, 19, 20]);
+  const emitValues = ISet.new([1, 2, 3, 7, 9, 10, 12, 13, 16, 17, 18, 19, 20]);
 
   const interval$ = interval(tick * 2, true);
   const counter$ = interval$.chain(take(21));

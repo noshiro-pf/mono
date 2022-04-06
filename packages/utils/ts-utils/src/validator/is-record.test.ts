@@ -1,5 +1,6 @@
 /* eslint-disable import/no-deprecated */
 import { assertNotType, assertType } from '../assert-type';
+import { MutableMap, MutableSet } from '../others';
 import { isRecord } from './is-record';
 
 describe('isRecord', () => {
@@ -90,7 +91,7 @@ describe('isRecord', () => {
   });
 
   test('Map is not record', () => {
-    const obj = new Map();
+    const obj = new MutableMap();
     const unk: unknown = obj;
     const res = isRecord(unk);
 
@@ -101,7 +102,7 @@ describe('isRecord', () => {
   });
 
   test('Set is not record', () => {
-    const obj = new Set();
+    const obj = new MutableSet();
     const unk: unknown = obj;
     const res = isRecord(unk);
 

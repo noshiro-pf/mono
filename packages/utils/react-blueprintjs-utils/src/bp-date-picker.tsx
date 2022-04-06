@@ -7,11 +7,10 @@ import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { YearMonthDate } from './types';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-const formatDate = (date: ReadonlyDate): string => date.toLocaleDateString();
+const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 
-// eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
-const parseDate = (str: string): Date => new Date(str);
+const parseDate = (str: string): RawDateType =>
+  pipe(IDate.from(str)).chain(IDate.toDate).value;
 
 const inputProps: HTMLInputProps & InputGroupProps2 = {
   style: { width: '90px' },
@@ -48,8 +47,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
     ...props
   }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      (dt: ReadonlyDate | null | undefined, isUserChange: boolean) => {
+      (dt: RawDateType | null | undefined, isUserChange: boolean) => {
         if (dt == null) {
           onYmdChange(undefined);
           return;
@@ -64,8 +62,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
       [onYmdChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
-    const dateObj = useMemo<Date | undefined>(
+    const dateObj = useMemo<RawDateType | undefined>(
       () =>
         ymd === undefined
           ? undefined

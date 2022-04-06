@@ -78,10 +78,9 @@ export const controlGroupStackZIndex: ReadonlyRecord<
 
 export const inputTransitionShadow = (
   color: string = inputShadowColorFocus,
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  focus: boolean = false
+  focused: boolean = false
 ): string =>
-  focus
+  focused
     ? [borderShadow(1, color, 1), borderShadow(0.3, color, 3)].join(', ')
     : [borderShadow(0, color, 0), borderShadow(0, color, 0)].join(', ');
 

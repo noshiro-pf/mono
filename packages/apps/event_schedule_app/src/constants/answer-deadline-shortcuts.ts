@@ -1,8 +1,7 @@
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { IDate, idfn, pipe } from '@noshiro/ts-utils';
 
-// eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
-const createDate = (modifier: (d: IDate) => IDate): Date =>
+const createDate = (modifier: (d: IDate) => IDate): RawDateType =>
   pipe(IDate.today())
     .chain(modifier)
     .chain(IDate.setLocaleHours(23))

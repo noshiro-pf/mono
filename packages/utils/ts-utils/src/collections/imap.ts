@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { tp } from '../others';
+import { MutableMap, objectIs, tp } from '../others';
 import { ISet } from './iset';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -57,6 +56,9 @@ interface IMapInterface<K, V> {
 export type IMap<K, V> = Iterable<readonly [K, V]> &
   Readonly<IMapInterface<K, V>>;
 
+// eslint-disable-next-line no-restricted-globals
+const ArrayFrom = Array.from;
+
 export const IMap = {
   new: <K, V>(iterable: Iterable<readonly [K, V]>): IMap<K, V> =>
     new IMapClass<K, V>(iterable),
@@ -72,7 +74,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   private readonly _map: ReadonlyMap<K, V>;
 
   constructor(iterable: Iterable<readonly [K, V]>) {
-    this._map = new Map(iterable);
+    this._map = new MutableMap(iterable);
   }
 
   get size(): number {
@@ -110,7 +112,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   delete(key: K): IMap<K, V> {
     if (!this.has(key)) return this;
 
-    return IMap.new(Array.from(this._map).filter(([k]) => !Object.is(k, key)));
+    return IMap.new(ArrayFrom(this._map).filter(([k]) => !objectIs(k, key)));
   }
 
   set(key: K, value: V): IMap<K, V> {
@@ -119,7 +121,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       return IMap.new([...this._map, tp(key, value)]);
     } else {
       return IMap.new(
-        Array.from(this._map, ([k, v]) => tp(k, Object.is(k, key) ? value : v))
+        ArrayFrom(this._map, ([k, v]) => tp(k, objectIs(k, key) ? value : v))
       );
     }
   }
@@ -129,8 +131,9 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     const curr = this.get(key);
 
     return IMap.new(
-      Array.from(this._map, ([k, v]) =>
-        tp(k, Object.is(k, key) ? updater(curr!) : v)
+      ArrayFrom(this._map, ([k, v]) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        tp(k, objectIs(k, key) ? updater(curr!) : v)
       )
     );
   }
@@ -142,7 +145,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       | { type: 'update'; key: K; updater: (value: V) => V }
     >[]
   ): IMap<K, V> {
-    const result = new Map<K, V>(this._map);
+    const result = new MutableMap<K, V>(this._map);
 
     for (const action of actions) {
       switch (action.type) {
@@ -154,6 +157,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
           break;
         case 'update': {
           if (result.has(action.key)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             result.set(action.key, action.updater(result.get(action.key)!));
           }
           break;
@@ -201,19 +205,19 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   toKeysArray(): readonly K[] {
-    return Array.from(this.keys());
+    return ArrayFrom(this.keys());
   }
 
   toValuesArray(): readonly V[] {
-    return Array.from(this.values());
+    return ArrayFrom(this.values());
   }
 
   toEntriesArray(): readonly (readonly [K, V])[] {
-    return Array.from(this.entries());
+    return ArrayFrom(this.entries());
   }
 
   toArray(): readonly (readonly [K, V])[] {
-    return Array.from(this.entries());
+    return ArrayFrom(this.entries());
   }
 
   toSet(): ISet<V> {

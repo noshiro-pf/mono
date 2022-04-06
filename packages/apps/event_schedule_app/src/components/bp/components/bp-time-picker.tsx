@@ -17,8 +17,7 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
   'BpTimePicker',
   ({ time, onTimeChange, ...props }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      (date: ReadonlyDate) => {
+      (date: RawDateType) => {
         onTimeChange({
           hours: IDate.getLocaleHours(date),
           minutes: IDate.getLocaleMinutes(date),
@@ -27,8 +26,7 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
       [onTimeChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
-    const dateObj = useMemo<Date>(
+    const dateObj = useMemo<RawDateType>(
       () =>
         pipe(IDate.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
           IDate.toDate

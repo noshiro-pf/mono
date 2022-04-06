@@ -1,5 +1,5 @@
 import type { Some } from '@noshiro/ts-utils';
-import { IList, isArrayOfLength1OrMore } from '@noshiro/ts-utils';
+import { IList, MutableSet, pipe } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
   AsyncChildObservableType,
@@ -28,15 +28,16 @@ const registerChild = <A>(
     p.addChild(child);
   }
   // register child to all reachable ManagerObservables
-  const rest = parents.slice();
-  while (isArrayOfLength1OrMore(rest)) {
-    const p = rest.pop();
+  const mut_rest = pipe(parents).chain(IList.from).chain(IList.asMut).value;
+
+  while (mut_rest.length >= 1) {
+    const p = mut_rest.pop();
     if (p === undefined) break;
     if (isManagerObservable(p)) {
       p.addDescendant(child);
     } else {
       // trace back dependency graph
-      rest.push(...p.parents);
+      mut_rest.push(...p.parents);
     }
   }
 };
@@ -80,7 +81,7 @@ export class AsyncChildObservableClass<
   override readonly type: Type;
   readonly parents;
   private _procedure: readonly ChildObservable<unknown>[];
-  protected readonly _descendantsIdSet: Set<ObservableId>;
+  protected readonly _descendantsIdSet: MutableSet<ObservableId>;
 
   constructor({
     type,
@@ -102,7 +103,7 @@ export class AsyncChildObservableClass<
     this.type = type;
     this.parents = parents;
     this._procedure = [];
-    this._descendantsIdSet = new Set<ObservableId>();
+    this._descendantsIdSet = new MutableSet<ObservableId>();
     registerChild(this, parents);
   }
 

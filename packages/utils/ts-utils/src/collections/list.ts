@@ -1,7 +1,7 @@
 import { assertType } from '../assert-type';
 import { pipe, Result } from '../functional';
 import { Num } from '../num';
-import { tp } from '../others';
+import { MutableMap, MutableSet, tp } from '../others';
 import { IMap } from './imap';
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
@@ -59,6 +59,9 @@ import { IMap } from './imap';
 // }[Depth extends -1 ? 'done' : 'recur'];
 
 export namespace IList {
+  // eslint-disable-next-line no-restricted-globals
+  const ArrayFrom = Array.from;
+
   export const isArray = (a: unknown): a is readonly unknown[] =>
     // eslint-disable-next-line no-restricted-globals
     Array.isArray(a);
@@ -129,9 +132,8 @@ export namespace IList {
    * Creates an array from an iterable object.
    * @param iterable An iterable object to convert to an array.
    */
-  export const from = <T>(iterable: ArrayLike<T> | Iterable<T>): readonly T[] =>
-    // eslint-disable-next-line no-restricted-globals
-    Array.from(iterable);
+  export const from: <T>(iterable: ArrayLike<T> | Iterable<T>) => readonly T[] =
+    ArrayFrom;
 
   export const asMut = <T>(list: readonly T[]): T[] => list as T[];
 
@@ -141,17 +143,16 @@ export namespace IList {
    * @param mapfn A mapping function to call on every element of the array.
    * @param thisArg Value of 'this' used to invoke the mapfn.
    */
-  export const fromMapped = <T, U>(
+  export const fromMapped: <T, U>(
     iterable: ArrayLike<T> | Iterable<T>,
     mapfn: (v: T, k: number) => U
-    // eslint-disable-next-line no-restricted-globals
-  ): readonly U[] => Array.from(iterable, mapfn);
+  ) => readonly U[] = ArrayFrom;
 
   export const zeros = (len: number): Result<readonly 0[], string> =>
     !Num.isUint32(len)
       ? Result.err('len should be uint32')
-      : // eslint-disable-next-line no-restricted-globals
-        Result.ok(Array.from<0>({ length: len }).fill(0));
+      : // eslint-disable-next-line functional/immutable-data
+        Result.ok(ArrayFrom<0>({ length: len }).fill(0));
 
   export const zerosThrow = (len: number): readonly 0[] =>
     Result.unwrapThrow(zeros(len));
@@ -372,7 +373,7 @@ export namespace IList {
     index: number,
     newValue: A
   ): readonly A[] => {
-    const mut_temp = Array.from(list);
+    const mut_temp = ArrayFrom(list);
 
     mut_temp.splice(index, 0, newValue);
 
@@ -383,7 +384,8 @@ export namespace IList {
     list: readonly A[],
     index: number
   ): readonly A[] => {
-    const mut_temp = Array.from(list);
+    // eslint-disable-next-line no-restricted-globals
+    const mut_temp = ArrayFrom(list);
 
     mut_temp.splice(index, 1);
 
@@ -420,7 +422,8 @@ export namespace IList {
   export const reverse = <T extends readonly unknown[]>(
     list: T
   ): ListType.Reverse<T> =>
-    Array.from(list).reverse() as readonly unknown[] as ListType.Reverse<T>;
+    // eslint-disable-next-line functional/immutable-data
+    ArrayFrom(list).reverse() as readonly unknown[] as ListType.Reverse<T>;
 
   export function sort<T extends readonly number[]>(
     list: T,
@@ -436,7 +439,8 @@ export namespace IList {
   ): { readonly [K in keyof T]: T[number] } {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
 
-    return Array.from(list).sort(cmp) as readonly unknown[] as {
+    // eslint-disable-next-line functional/immutable-data
+    return ArrayFrom(list).sort(cmp) as readonly unknown[] as {
       readonly [K in keyof T]: T[number];
     };
   }
@@ -646,7 +650,7 @@ export namespace IList {
     reducer: ReducerType<B, A>,
     init: B
   ): ReadonlyNonEmptyArray<B> => {
-    const mut_result: B[] = Array.from(newArrayThrow<B>(list.length + 1, init));
+    const mut_result: B[] = ArrayFrom(newArrayThrow<B>(list.length + 1, init));
 
     let mut_acc = init;
 
@@ -671,7 +675,7 @@ export namespace IList {
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, number> => {
-    const groups = new Map<G, number>();
+    const groups = new MutableMap<G, number>();
 
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
@@ -687,7 +691,7 @@ export namespace IList {
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, readonly T[number][]> => {
-    const mut_groups = new Map<G, T[number][]>();
+    const mut_groups = new MutableMap<G, T[number][]>();
 
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
@@ -714,7 +718,7 @@ export namespace IList {
   ): ReadonlyNonEmptyArray<T>;
   export function uniq<T>(list: readonly T[]): readonly T[];
   export function uniq<T>(list: readonly T[]): readonly T[] {
-    return Array.from(new Set(list));
+    return ArrayFrom(new MutableSet(list));
   }
 
   export function uniqBy<A, B>(
@@ -729,7 +733,7 @@ export namespace IList {
     list: readonly A[],
     mapFn: (value: A) => B
   ): readonly A[] {
-    const mappedValues = new Set();
+    const mappedValues = new MutableSet();
 
     return list.filter((val) => {
       const mappedValue = mapFn(val);

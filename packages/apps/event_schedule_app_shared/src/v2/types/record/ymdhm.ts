@@ -28,8 +28,7 @@ export const fillYmdhm = (p?: PartialYmdhm): Ymdhm => ({
   minutes: p?.minutes ?? d.minutes,
 });
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const ymdhmFromDate = (date: ReadonlyDate): Ymdhm => ({
+export const ymdhmFromDate = (date: RawDateType): Ymdhm => ({
   year: IDate.getLocaleYear(date),
   month: IDate.getLocaleMonth(date),
   date: IDate.getLocaleDate(date),

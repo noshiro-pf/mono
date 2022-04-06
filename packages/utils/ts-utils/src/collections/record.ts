@@ -1,3 +1,5 @@
+import { IList } from './list';
+
 export namespace IRecord {
   export const get = <R extends ReadonlyRecordBase, K extends keyof R>(
     record: R,
@@ -49,7 +51,7 @@ export namespace IRecord {
     index >= keyPath.length
       ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         updater(obj)
-      : Array.isArray(obj)
+      : IList.isArray(obj)
       ? obj.map((v, i): unknown =>
           i === keyPath[index]
             ? UNSAFE_updateIn_impl(
@@ -101,18 +103,22 @@ export namespace IRecord {
   export const keys = <R extends ReadonlyRecordBase>(
     object: R
   ): ToObjectKeysValue<keyof R>[] =>
+    // eslint-disable-next-line no-restricted-globals
     Object.keys(object) as ToObjectKeysValue<keyof R>[];
 
   export const values = <K extends PropertyKey, V>(
     object: ReadonlyRecord<K, V>
+    // eslint-disable-next-line no-restricted-globals
   ): V[] => Object.values(object);
 
   export const fromEntries = <K extends PropertyKey, V>(
     entries_: Iterable<readonly [K, V]>
+    // eslint-disable-next-line no-restricted-globals
   ): Record<K, V> => Object.fromEntries(entries_) as Record<K, V>;
 
   export const entries = <R extends ReadonlyRecordBase>(
     object: R
+    // eslint-disable-next-line no-restricted-globals
   ): Entries<R> => Object.entries(object) as Entries<R>;
 
   /* @internal */

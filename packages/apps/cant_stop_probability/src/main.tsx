@@ -1,6 +1,6 @@
 import { Navbar, Tab, Tabs } from '@blueprintjs/core';
 import { memoNamed, useState } from '@noshiro/react-utils';
-import { IList, isNotUndefined, Str, tp } from '@noshiro/ts-utils';
+import { IList, ISet, isNotUndefined, pipe, Str, tp } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { DeadColumn, ProbabilityTable } from './components';
@@ -26,9 +26,9 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   };
 });
 
-const resultsSortedByProbability = Array.from(results).sort(
-  (a, b) => -(a.countSum - b.countSum)
-);
+const resultsSortedByProbability = pipe(IList.from(results)).chain((list) =>
+  IList.sort(list, (a, b) => -(a.countSum - b.countSum))
+).value;
 
 export const Main = memoNamed('Main', () => {
   const { state: sortBy, setState: setSortBy } = useState<'dice' | 'prob'>(
@@ -98,7 +98,7 @@ export const Main = memoNamed('Main', () => {
   const hitSomeAliveColumnProbability = useMemo(
     () =>
       countSuccessForRemains(
-        new Set(
+        ISet.new(
           columnsAliveWithHandler.filter((a) => a.alive).map((a) => a.columnId)
         )
       ) / denom,

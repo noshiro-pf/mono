@@ -1,6 +1,6 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import { IDate } from '@noshiro/ts-utils';
+import { IDate, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { HoursMinutes } from './types';
@@ -17,8 +17,7 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
   'BpTimePicker',
   ({ time, onTimeChange }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      (date: ReadonlyDate) => {
+      (date: RawDateType) => {
         onTimeChange({
           hours: IDate.getLocaleHours(date),
           minutes: IDate.getLocaleMinutes(date),
@@ -27,10 +26,11 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
       [onTimeChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
-    const dateObj = useMemo<Date>(
-      // eslint-disable-next-line no-restricted-globals
-      () => new Date(`1970/1/1 ${time.hours}:${time.minutes}:11`),
+    const dateObj = useMemo<RawDateType>(
+      () =>
+        pipe(IDate.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
+          IDate.toDate
+        ).value,
       [time]
     );
 

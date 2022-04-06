@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { pipe } from '../functional';
-import { tp } from '../others';
+import { objectIs, tp } from '../others';
+import { IList } from './list';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
@@ -89,7 +90,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ) {
-    this._map = new Map(Array.from(iterable, ([k, v]) => [toKey(k), v]));
+    // eslint-disable-next-line no-restricted-globals
+    this._map = new Map(IList.fromMapped(iterable, ([k, v]) => [toKey(k), v]));
     this._toKey = toKey;
     this._fromKey = fromKey;
   }
@@ -131,8 +133,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this._toKey(key);
 
     return IMapMapped.new(
-      Array.from(this._map)
-        .filter(([km]) => !Object.is(km, keyMapped))
+      IList.from(this._map)
+        .filter(([km]) => !objectIs(km, keyMapped))
         .map(([km, v]) => tp(this._fromKey(km), v)),
       this._toKey,
       this._fromKey
@@ -153,8 +155,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       );
     } else {
       return IMapMapped.new(
-        Array.from(this._map, ([km, v]) =>
-          tp(this._fromKey(km), Object.is(km, keyMapped) ? value : v)
+        IList.fromMapped(this._map, ([km, v]) =>
+          tp(this._fromKey(km), objectIs(km, keyMapped) ? value : v)
         ),
         this._toKey,
         this._fromKey
@@ -169,12 +171,12 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this._toKey(key);
 
     return IMapMapped.new(
-      Array.from(
+      IList.fromMapped(
         this._map.entries(),
         (keyValue) =>
           pipe(keyValue)
             .chain(([km, v]) =>
-              tp(km, Object.is(km, keyMapped) ? updater(curr) : v)
+              tp(km, objectIs(km, keyMapped) ? updater(curr) : v)
             )
             .chain(([km, v]) => tp(this._fromKey(km), v)).value
       ),
@@ -183,7 +185,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     );
     // return IMapMapped.new(
     //   Array.from(this._map.entries(), ([km, v]) => tp(this._fromKey(km), v))(
-    //     ([km, v]) => tp(km, Object.is(km, keyMapped) ? updater(curr) : v)
+    //     ([km, v]) => tp(km, objectIs(km, keyMapped) ? updater(curr) : v)
     //   ),
     //   this._toKey,
     //   this._fromKey
@@ -197,6 +199,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       | { type: 'update'; key: K; updater: (value: V) => V }
     >[]
   ): IMapMapped<K, V, KM> {
+    // eslint-disable-next-line no-restricted-globals
     const result = new Map<KM, V>(this._map);
 
     for (const action of actions) {
@@ -219,7 +222,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     }
 
     return IMapMapped.new<K, V, KM>(
-      Array.from(result, ([k, v]) => [this._fromKey(k), v]),
+      IList.fromMapped(result, ([k, v]) => [this._fromKey(k), v]),
       this._toKey,
       this._fromKey
     );
@@ -282,19 +285,19 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   toKeysArray(): readonly K[] {
-    return Array.from(this.keys());
+    return IList.from(this.keys());
   }
 
   toValuesArray(): readonly V[] {
-    return Array.from(this.values());
+    return IList.from(this.values());
   }
 
   toEntriesArray(): readonly (readonly [K, V])[] {
-    return Array.from(this.entries());
+    return IList.from(this.entries());
   }
 
   toArray(): readonly (readonly [K, V])[] {
-    return Array.from(this.entries());
+    return IList.from(this.entries());
   }
 
   toRawMap(): ReadonlyMap<KM, V> {

@@ -1,5 +1,3 @@
-/* eslint-disable no-lone-blocks */
-
 /* Type Test Utilities */
 
 // https://github.com/microsoft/TypeScript/issues/27024
