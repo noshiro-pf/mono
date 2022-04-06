@@ -1,7 +1,7 @@
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
-import { IDate, pipe } from '@noshiro/ts-utils';
+import { IDate, idfn, pipe } from '@noshiro/ts-utils';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
 const createDate = (modifier: (d: IDate) => IDate): Date =>
   pipe(IDate.today())
     .chain(modifier)
@@ -11,7 +11,7 @@ const createDate = (modifier: (d: IDate) => IDate): Date =>
 
 export const answerDeadlineShortcuts: readonly DatePickerShortcut[] = [
   {
-    date: createDate(IDate.updateLocaleDate((v) => v)),
+    date: createDate(idfn),
     label: 'Today',
     includeTime: true,
   },

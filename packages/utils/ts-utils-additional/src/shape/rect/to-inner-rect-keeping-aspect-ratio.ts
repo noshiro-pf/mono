@@ -1,3 +1,4 @@
+import { Num } from '@noshiro/ts-utils';
 import type { Rect, RectSize } from '../../types';
 
 /**
@@ -24,7 +25,7 @@ export const toInnerRectSizeKeepingAspectRatio = (
   outerRectSize: RectSize,
   aspectRatio: number
 ): RectSize => {
-  if (aspectRatio <= 0 || !Number.isFinite(aspectRatio)) {
+  if (aspectRatio <= 0 || !Num.isFinite(aspectRatio)) {
     return outerRectSize;
   }
 

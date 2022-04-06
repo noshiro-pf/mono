@@ -1,3 +1,4 @@
+import { IDate } from '@noshiro/ts-utils';
 import type { AnswerId, UserName, Weight } from '../../../v3';
 import {
   ANSWER_KEY_CREATED_AT,
@@ -39,7 +40,7 @@ export const defaultAnswer: Answer = {
   userName: createUserName(''),
   comment: '',
   selection: [],
-  [ANSWER_KEY_CREATED_AT]: Date.now(),
+  [ANSWER_KEY_CREATED_AT]: IDate.now(),
   weight: createWeight(1),
   isRequiredParticipants: false,
 } as const;

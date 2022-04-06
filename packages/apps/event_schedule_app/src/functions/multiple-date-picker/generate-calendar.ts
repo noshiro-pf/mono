@@ -70,17 +70,21 @@ const genYmdRangeList = (
   }));
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): Date =>
+const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): IDate =>
+  // eslint-disable-next-line no-restricted-globals
   new Date(year, month - 1, 1);
 
 const getLastDateNumberOfMonth = (
   year: YearEnum,
   month: number // 0 - 13
-): DateEnum & (28 | 29 | 30 | 31) =>
-  new Date(year, month, 0).getDate() as DateEnum & (28 | 29 | 30 | 31);
+): 28 | 29 | 30 | 31 =>
+  // eslint-disable-next-line no-restricted-globals
+  new Date(year, month, 0).getDate() as Extract<DateEnum, 28 | 29 | 30 | 31>;
 
 const numWeeks = (year: YearEnum, month: MonthEnum): 4 | 5 | 6 => {
   const firstDate = getFirstDateOfMonth(year, month);
   const lastDateNumber = getLastDateNumberOfMonth(year, month);
-  return Math.ceil((firstDate.getDay() + lastDateNumber) / 7) as 4 | 5 | 6;
+  return Math.ceil(
+    (IDate.getLocaleDayOfWeek(firstDate) + lastDateNumber) / 7
+  ) as 4 | 5 | 6;
 };

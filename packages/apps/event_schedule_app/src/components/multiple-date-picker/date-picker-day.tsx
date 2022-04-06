@@ -5,7 +5,7 @@ import type {
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { match, noop } from '@noshiro/ts-utils';
+import { IDate, match, noop } from '@noshiro/ts-utils';
 import { useMemo } from 'react';
 import {
   DatePickerDayHolidayStyled,
@@ -45,7 +45,7 @@ export const DatePickerDate = memoNamed<Props>(
     holidayJpName,
   }) => {
     const dateString = useMemo<string>(
-      () => new Date(ymd.year, ymd.month - 1, ymd.date).toString(),
+      () => IDate.create(ymd.year, ymd.month, ymd.date).toString(),
       [ymd]
     );
 

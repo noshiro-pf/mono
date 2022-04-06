@@ -8,6 +8,7 @@ export namespace Num {
 
   /** @description check value with Number.isInteger and check range */
   export const isUint32 = (a: number): boolean =>
+    // eslint-disable-next-line no-restricted-globals
     Number.isInteger(a) && isUint32Range(a);
 
   /**
@@ -20,6 +21,7 @@ export namespace Num {
   export const clamp =
     (min: number, max: number) =>
     (target: number): number =>
+      // eslint-disable-next-line no-restricted-globals
       !Number.isFinite(target) ? min : Math.max(min, Math.min(max, target));
 
   export const divInt = (a: number, b: number): number =>
@@ -55,19 +57,22 @@ export namespace Num {
    * that is representable as a Number value, which is approximately:
    * 2.2204460492503130808472633361816 x 10‍−‍16.
    */
+  // eslint-disable-next-line no-restricted-globals
   export const EPSILON = Number.EPSILON;
 
   /**
    * A value that is not a number.
    * In equality comparisons, NaN does not equal any value, including itself. To test whether a value is equivalent to NaN, use the isNaN function.
    */
-  // eslint-disable-next-line no-shadow-restricted-names,@typescript-eslint/no-shadow
+  // eslint-disable-next-line no-shadow-restricted-names,@typescript-eslint/no-shadow,no-restricted-globals
   export const NaN: number = Number.NaN;
 
   /** The largest number that can be represented in JavaScript. Equal to approximately 1.79E+308. */
+  // eslint-disable-next-line no-restricted-globals
   export const MAX_VALUE: number = Number.MAX_VALUE;
 
   /** The closest number to zero that can be represented in JavaScript. Equal to approximately 5.00E-324. */
+  // eslint-disable-next-line no-restricted-globals
   export const MIN_VALUE: number = Number.MIN_VALUE;
 
   /**
@@ -75,6 +80,7 @@ export namespace Num {
    * a Number value.
    * The value of Number.MAX_SAFE_INTEGER is 9007199254740991 2^53 − 1.
    */
+  // eslint-disable-next-line no-restricted-globals
   export const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER;
 
   /**
@@ -82,30 +88,35 @@ export namespace Num {
    * a Number value.
    * The value of Number.MIN_SAFE_INTEGER is −9007199254740991 (−(2^53 − 1)).
    */
+  // eslint-disable-next-line no-restricted-globals
   export const MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER;
 
   /**
    * A value that is less than the largest negative number that can be represented in JavaScript.
    * JavaScript displays NEGATIVE_INFINITY values as -infinity.
    */
+  // eslint-disable-next-line no-restricted-globals
   export const NEGATIVE_INFINITY: number = Number.NEGATIVE_INFINITY;
 
   /**
    * A value greater than the largest number that can be represented in JavaScript.
    * JavaScript displays POSITIVE_INFINITY values as infinity.
    */
+  // eslint-disable-next-line no-restricted-globals
   export const POSITIVE_INFINITY: number = Number.POSITIVE_INFINITY;
 
   /**
    * Returns true if the value passed is an integer, false otherwise.
    * @param number A numeric value.
    */
+  // eslint-disable-next-line no-restricted-globals
   export const isInt = (a: number): boolean => Number.isInteger(a);
 
   /**
    * Returns true if the value passed is a safe integer.
    * @param number A numeric value.
    */
+  // eslint-disable-next-line no-restricted-globals
   export const isSafeInt = (a: number): boolean => Number.isSafeInteger(a);
 
   /**
@@ -114,7 +125,7 @@ export namespace Num {
    * to a number. Only values of the type number, that are also NaN, result in true.
    * @param number A numeric value.
    */
-  // eslint-disable-next-line @typescript-eslint/no-shadow
+  // eslint-disable-next-line no-restricted-globals, @typescript-eslint/no-shadow
   export const isNaN: (a: number) => boolean = Number.isNaN;
 
   /**
@@ -123,7 +134,7 @@ export namespace Num {
    * to a number. Only values of the type number, that are also NaN, result in true.
    * @param number A numeric value.
    */
-  // eslint-disable-next-line @typescript-eslint/no-shadow
+  // eslint-disable-next-line no-restricted-globals, @typescript-eslint/no-shadow
   export const isFinite: (a: number) => boolean = Number.isFinite;
 
   /**
@@ -132,6 +143,7 @@ export namespace Num {
    */
   // eslint-disable-next-line @typescript-eslint/no-shadow
   export const parseFloat = (str: string): number | undefined => {
+    // eslint-disable-next-line no-restricted-globals
     const result = Number.parseFloat(str);
 
     return isNaN(result) ? undefined : result;
@@ -146,6 +158,7 @@ export namespace Num {
    */
   // eslint-disable-next-line @typescript-eslint/no-shadow
   export const parseInt = (str: string, radix?: number): number | undefined => {
+    // eslint-disable-next-line no-restricted-globals
     const result = Number.parseInt(str, radix);
 
     return isNaN(result) ? undefined : result;

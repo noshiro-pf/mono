@@ -1,4 +1,5 @@
 import { assertType } from '../assert-type';
+import { Num } from '../num';
 import { ISet } from './iset';
 import { IList } from './list';
 
@@ -35,9 +36,9 @@ describe('ISet.has', () => {
     expect(s0.has(0)).toBe(false);
   });
   test('case 4', () => {
-    const s0 = ISet.new([1, 3, 5, 6, 7, Number.NaN]);
+    const s0 = ISet.new([1, 3, 5, 6, 7, Num.NaN]);
 
-    expect(s0.has(Number.NaN)).toBe(true);
+    expect(s0.has(Num.NaN)).toBe(true);
   });
 });
 
@@ -100,10 +101,10 @@ describe('ISet.add', () => {
     expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
-    const s0 = ISet.new([1, 2, 3, Number.NaN]);
+    const s0 = ISet.new([1, 2, 3, Num.NaN]);
 
-    expect(s0.add(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
-    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
+    expect(s0.add(Num.NaN)).toStrictEqual(ISet.new([1, 2, 3, Num.NaN]));
+    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Num.NaN]));
   });
 });
 
@@ -127,10 +128,10 @@ describe('ISet.delete', () => {
     expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
-    const s0 = ISet.new([1, 2, 3, Number.NaN]);
+    const s0 = ISet.new([1, 2, 3, Num.NaN]);
 
-    expect(s0.delete(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3]));
-    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
+    expect(s0.delete(Num.NaN)).toStrictEqual(ISet.new([1, 2, 3]));
+    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Num.NaN]));
   });
 });
 

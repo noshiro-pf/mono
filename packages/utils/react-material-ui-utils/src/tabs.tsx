@@ -1,5 +1,6 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
+import { Num } from '@noshiro/ts-utils';
 import type { Mappable } from '@noshiro/ts-utils-additional';
 import { useCallback } from 'react';
 
@@ -15,7 +16,10 @@ export const MuiTabs = memoNamed<Props>(
   ({ tabIndex, tabIndexChange, labels, scrollable = false }) => {
     const onChange = useCallback(
       (_event: unknown, value: string) => {
-        tabIndexChange(Number.parseInt(value, 10));
+        const idx = Num.parseInt(value, 10);
+        if (idx !== undefined) {
+          tabIndexChange(idx);
+        }
       },
       [tabIndexChange]
     );

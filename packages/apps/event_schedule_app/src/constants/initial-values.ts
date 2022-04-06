@@ -60,7 +60,7 @@ export const initialEventSchedule: EventSchedule = {
   answerDeadline: 'none',
   answerIcons: initialAnswerIcons,
   notificationSettings: 'none',
-  timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+  timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
   author: {
     id: null,
     name: '',

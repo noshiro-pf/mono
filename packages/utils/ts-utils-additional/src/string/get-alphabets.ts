@@ -1,4 +1,4 @@
-import { IList } from '@noshiro/ts-utils';
+import { IList, Str } from '@noshiro/ts-utils';
 import type { LowerAlphabet, UpperAlphabet } from '../types';
 
 export const getAlphabets = <Case extends 'lower' | 'upper'>(
@@ -9,6 +9,6 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
 
   return IList.seqThrow(26).map((i) =>
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    String.fromCodePoint(code + i)
+    Str.fromCodePoint(code + i)
   ) as Case extends 'lower' ? LowerAlphabet[] : UpperAlphabet[];
 };

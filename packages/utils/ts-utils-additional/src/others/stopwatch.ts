@@ -1,3 +1,5 @@
+import { IDate } from '@noshiro/ts-utils';
+
 export class Stopwatch {
   private startTime = 0;
   private endTime = 0;
@@ -9,15 +11,19 @@ export class Stopwatch {
   }
 
   start(log = false): void {
-    this.startTime = Date.now();
+    this.startTime = IDate.now();
     this.time = 0;
-    if (log) console.log(`${this.name} started.`);
+    if (log) {
+      console.log(`${this.name} started.`);
+    }
   }
 
   stop(log = false): void {
-    this.endTime = Date.now();
+    this.endTime = IDate.now();
     this.time = this.endTime - this.startTime;
-    if (log) console.log(`${this.name} stopped.`);
+    if (log) {
+      console.log(`${this.name} stopped.`);
+    }
   }
 
   result(): number {
