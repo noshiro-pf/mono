@@ -14,8 +14,7 @@
   "scripts": {
     "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
     "fmt": "yarn _prettier .",
-    "tsc": "tsc --noEmit",
-    "type-check": "tsc --noEmit"
+    "tsc": "tsc --noEmit"
   },
   "config": {
     "root_dir": "../../.."

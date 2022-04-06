@@ -11,8 +11,7 @@
   "typings": "./goober.d.ts",
   "scripts": {
     "fmt": "prettier . --write",
-    "tsc": "tsc --noEmit",
-    "type-check": "tsc --noEmit"
+    "tsc": "tsc --noEmit"
   },
   "peerDependencies": {
     "csstype": "^2.6.2"
