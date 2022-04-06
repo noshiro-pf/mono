@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { pluckI, subject, withInitialValue } from '@noshiro/syncflow';
-import { IMap, isArrayOfLength2 } from '@noshiro/ts-utils';
+import { IList, IMap } from '@noshiro/ts-utils';
 
 export type QueryParams = IMap<string, string>;
 
@@ -80,7 +80,7 @@ export const createRouter = (): Router => {
 
 const validateKeyValuePairs = (
   kvs: DeepReadonly<string[][]>
-): kvs is DeepReadonly<[string, string][]> => kvs.every(isArrayOfLength2);
+): kvs is DeepReadonly<[string, string][]> => kvs.every(IList.isArrayOfLength2);
 
 const parseQueryParamsStr = (queryParamsStr: string): QueryParams => {
   if (!queryParamsStr.startsWith('?')) {

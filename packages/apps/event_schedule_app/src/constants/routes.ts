@@ -1,9 +1,4 @@
-import {
-  IMap,
-  isArrayOfLength1,
-  isArrayOfLength2,
-  isArrayOfLength3,
-} from '@noshiro/ts-utils';
+import { IList, IMap } from '@noshiro/ts-utils';
 
 const pathToken = {
   createPage: 'create',
@@ -27,24 +22,25 @@ export const routes = {
 
 export const isRoute = {
   createPage: (pathnameTokens: readonly string[]): boolean =>
-    isArrayOfLength1(pathnameTokens) &&
+    IList.isArrayOfLength1(pathnameTokens) &&
     pathnameTokens[0] === pathToken.createPage,
 
   answerPage: (pathnameTokens: readonly string[]): boolean =>
-    isArrayOfLength2(pathnameTokens) &&
+    IList.isArrayOfLength2(pathnameTokens) &&
     pathnameTokens[0] === pathToken.answerPage,
 
   editPage: (pathnameTokens: readonly string[]): boolean =>
-    isArrayOfLength3(pathnameTokens) &&
+    IList.isArrayOfLength3(pathnameTokens) &&
     pathnameTokens[0] === pathToken.answerPage &&
     pathnameTokens[2] === pathToken.editPageSuffix,
 
   registerPage: (pathnameTokens: readonly string[]): boolean =>
-    isArrayOfLength1(pathnameTokens) &&
+    IList.isArrayOfLength1(pathnameTokens) &&
     pathnameTokens[0] === pathToken.registerUser,
 
   signInPage: (pathnameTokens: readonly string[]): boolean =>
-    isArrayOfLength1(pathnameTokens) && pathnameTokens[0] === pathToken.signIn,
+    IList.isArrayOfLength1(pathnameTokens) &&
+    pathnameTokens[0] === pathToken.signIn,
 } as const;
 
 export const redirectRules = IMap.new<string, string>([

@@ -2,7 +2,6 @@ import {
   assertType,
   hasKeyValue,
   IList,
-  isArrayOfLength6,
   isNonNullObject,
   isString,
   isUndefined,
@@ -62,7 +61,7 @@ export const assertIsRoomRemote: (
     !hasKeyValue(
       data,
       'players',
-      (v): v is RoomRemote['players'] => Array.isArray(v) && v.every(isPlayer)
+      (v): v is RoomRemote['players'] => IList.isArray(v) && v.every(isPlayer)
     )
   ) {
     throw new Error('hasKeyValue failed for players');
@@ -92,14 +91,14 @@ export const assertIsRoomRemote: (
 
   if (
     !hasKeyValue(data, 'playerCards', (v): v is RoomRemote['playerCards'] =>
-      // Array.isArray(v) &&
+      // IList.isArray(v) &&
       // isArrayOfLength4(v) &&
       // v.every(
-      //   (a) => Array.isArray(a) && isArrayOfLength6(a) && a.every(isCard)
+      //   (a) => IList.isArray(a) && isArrayOfLength6(a) && a.every(isCard)
       // )
       {
         const checkFn = (a: unknown): a is RoomRemote['playerCards']['p0'] =>
-          Array.isArray(a) && isArrayOfLength6(a) && a.every(isCard);
+          IList.isArray(a) && IList.isArrayOfLength6(a) && a.every(isCard);
 
         return (
           isNonNullObject(v) &&

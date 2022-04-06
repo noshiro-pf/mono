@@ -59,12 +59,64 @@ import { IMap } from './imap';
 // }[Depth extends -1 ? 'done' : 'recur'];
 
 export namespace IList {
+  export const isArray = (a: unknown): a is readonly unknown[] =>
+    // eslint-disable-next-line no-restricted-globals
+    Array.isArray(a);
+
   export const isEmpty = <T>(list: readonly T[]): list is readonly [] =>
     list.length === 0;
 
   export const isNonEmpty = <T>(
     list: readonly T[]
   ): list is ReadonlyNonEmptyArray<T> => list.length > 0;
+
+  export const isArrayOfLength1 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<1, T> => array.length === 1;
+
+  export const isArrayOfLength2 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<2, T> => array.length === 2;
+
+  export const isArrayOfLength3 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<3, T> => array.length === 3;
+
+  export const isArrayOfLength4 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<4, T> => array.length === 4;
+
+  export const isArrayOfLength5 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<5, T> => array.length === 5;
+
+  export const isArrayOfLength6 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<6, T> => array.length === 6;
+
+  export const isArrayOfLength1OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<1, T> => array.length >= 1;
+
+  export const isArrayOfLength2OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<2, T> => array.length >= 2;
+
+  export const isArrayOfLength3OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<3, T> => array.length >= 3;
+
+  export const isArrayOfLength4OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<4, T> => array.length >= 4;
+
+  export const isArrayOfLength5OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<5, T> => array.length >= 5;
+
+  export const isArrayOfLength6OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<6, T> => array.length >= 6;
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   export const length = <T extends readonly unknown[]>(
@@ -98,7 +150,8 @@ export namespace IList {
   export const zeros = (len: number): Result<readonly 0[], string> =>
     !Num.isUint32(len)
       ? Result.err('len should be uint32')
-      : Result.ok(Array.from<0>({ length: len }).fill(0));
+      : // eslint-disable-next-line no-restricted-globals
+        Result.ok(Array.from<0>({ length: len }).fill(0));
 
   export const zerosThrow = (len: number): readonly 0[] =>
     Result.unwrapThrow(zeros(len));
