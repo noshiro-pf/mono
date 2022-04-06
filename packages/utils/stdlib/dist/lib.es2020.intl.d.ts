@@ -282,11 +282,11 @@ declare namespace Intl {
     };
 
     interface NumberFormatOptions {
-        compactDisplay?: string;
-        notation?: string;
-        signDisplay?: string;
-        unit?: string;
-        unitDisplay?: string;
+        readonly compactDisplay?: string;
+        readonly notation?: string;
+        readonly signDisplay?: string;
+        readonly unit?: string;
+        readonly unitDisplay?: string;
     }
 
     interface ResolvedNumberFormatOptions {

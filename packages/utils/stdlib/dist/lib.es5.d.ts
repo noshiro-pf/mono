@@ -4319,17 +4319,17 @@ declare namespace Intl {
     };
 
     interface NumberFormatOptions {
-        localeMatcher?: string;
-        style?: string;
-        currency?: string;
-        currencyDisplay?: string;
-        currencySign?: string;
-        useGrouping?: boolean;
-        minimumIntegerDigits?: number;
-        minimumFractionDigits?: number;
-        maximumFractionDigits?: number;
-        minimumSignificantDigits?: number;
-        maximumSignificantDigits?: number;
+        readonly localeMatcher?: string;
+        readonly style?: string;
+        readonly currency?: string;
+        readonly currencyDisplay?: string;
+        readonly currencySign?: string;
+        readonly useGrouping?: boolean;
+        readonly minimumIntegerDigits?: number;
+        readonly minimumFractionDigits?: number;
+        readonly maximumFractionDigits?: number;
+        readonly minimumSignificantDigits?: number;
+        readonly maximumSignificantDigits?: number;
     }
 
     interface ResolvedNumberFormatOptions {
