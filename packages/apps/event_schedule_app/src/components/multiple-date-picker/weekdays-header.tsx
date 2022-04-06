@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { memoNamed } from '@noshiro/react-utils';
-import { weekdaysList } from '@noshiro/ts-utils-additional';
+import { daysOfWeekList } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import {
@@ -19,7 +19,7 @@ export const WeekdaysHeader = memoNamed<Props>(
   ({ onClick }) => {
     const listWithHandler = useMemo(
       () =>
-        weekdaysList.en.map((w, idx) => ({
+        daysOfWeekList.en.map((w, idx) => ({
           ...w,
           onClickHandler:
             onClick === undefined

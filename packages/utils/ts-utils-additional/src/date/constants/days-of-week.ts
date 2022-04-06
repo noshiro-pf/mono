@@ -1,6 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
 
-export const weekdays = {
+export const daysOfWeek = {
   en: {
     Sun: { name: 'Sunday', abbr: 'Su' },
     Mon: { name: 'Monday', abbr: 'Mo' },
@@ -21,7 +21,7 @@ export const weekdays = {
   },
 } as const;
 
-export const weekdaysList = {
+export const daysOfWeekList = {
   en: [
     { name: 'Sunday', abbr: 'Su' },
     { name: 'Monday', abbr: 'Mo' },
@@ -56,8 +56,8 @@ type WeekdaysType = readonly [
   Readonly<{ name: string; abbr: string }>
 ];
 
-assertType<TypeExtends<typeof weekdays.en, MonthsType>>();
-assertType<TypeExtends<typeof weekdays.jp, MonthsType>>();
+assertType<TypeExtends<typeof daysOfWeek.en, MonthsType>>();
+assertType<TypeExtends<typeof daysOfWeek.jp, MonthsType>>();
 
-assertType<TypeExtends<typeof weekdaysList.en, WeekdaysType>>();
-assertType<TypeExtends<typeof weekdaysList.jp, WeekdaysType>>();
+assertType<TypeExtends<typeof daysOfWeekList.en, WeekdaysType>>();
+assertType<TypeExtends<typeof daysOfWeekList.jp, WeekdaysType>>();
