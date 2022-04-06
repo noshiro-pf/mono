@@ -3,8 +3,8 @@ import type { HistoryState } from '../type';
 
 export const historyToSumCount = (
   hist: HistoryState
-): ReadonlyArrayOfLength<11, number> => {
-  const mut_count: ArrayOfLength<11, number> = [
+): ArrayOfLength<11, number> => {
+  const mut_count: MutableArrayOfLength<11, number> = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ];
   const historyFiltered = IList.take(hist.history, hist.index + 1);

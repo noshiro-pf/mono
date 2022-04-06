@@ -25,7 +25,7 @@ const mapPlayers6CardsToDisplayValue = ({
   onCardClick,
 }: Readonly<{
   direction: NWES;
-  player6Cards: ReadonlyArrayOfLength<6, CardWithVisibility>;
+  player6Cards: ArrayOfLength<6, CardWithVisibility>;
   gameState: Pick<
     GameState,
     | 'cardChosenToAttack'
@@ -37,7 +37,7 @@ const mapPlayers6CardsToDisplayValue = ({
   >;
   myPlayerIndex: PlayerIndex;
   onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
-}>): ReadonlyArrayOfLength<6, CardWithDisplayValue> =>
+}>): ArrayOfLength<6, CardWithDisplayValue> =>
   pipe(player6Cards)
     .chain(sortCards)
     .chain((list) =>

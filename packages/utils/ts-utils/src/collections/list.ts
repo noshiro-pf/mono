@@ -336,10 +336,10 @@ export namespace IList {
   export const partition = <N extends number, T>(
     list: readonly T[],
     n: N
-  ): readonly ReadonlyArrayOfLength<N, T>[] =>
+  ): readonly ArrayOfLength<N, T>[] =>
     seqThrow(Math.ceil(list.length / n)).map(
       (i: number) =>
-        list.slice(n * i, n * (i + 1)) as unknown as ReadonlyArrayOfLength<N, T>
+        list.slice(n * i, n * (i + 1)) as unknown as ArrayOfLength<N, T>
     );
 
   export const reverse = <T extends readonly unknown[]>(

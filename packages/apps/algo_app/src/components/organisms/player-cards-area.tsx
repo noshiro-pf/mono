@@ -13,7 +13,7 @@ type Props = Readonly<{
   areaSize: RectSize;
   cardSize: RectSize;
   rotate: 0 | 90 | 180 | 270;
-  cards: ReadonlyArrayOfLength<6, CardWithDisplayValue>;
+  cards: ArrayOfLength<6, CardWithDisplayValue>;
   paddingPx: number;
   windowSize: RectSize;
   cardPositionsDispatcher: (
@@ -59,7 +59,7 @@ export const PlayerCardsArea = memoNamed(
     }, [rotate, paddingPx, areaSize]);
 
     const cardsWithConfig = useMemo<
-      ReadonlyArrayOfLength<
+      ArrayOfLength<
         6,
         CardWithDisplayValue &
           Readonly<{

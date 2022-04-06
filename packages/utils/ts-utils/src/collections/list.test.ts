@@ -372,7 +372,7 @@ describe('IList.map', () => {
   const xs = [1, 2, 3] as const;
   const mapped = IList.map(xs, (x, i): number => x * x * i);
 
-  assertType<TypeEq<typeof mapped, ReadonlyArrayOfLength<3, number>>>();
+  assertType<TypeEq<typeof mapped, ArrayOfLength<3, number>>>();
 
   test('case 1', () => {
     expect(mapped).toStrictEqual([0, 4, 18]);
@@ -713,8 +713,9 @@ describe('IList.partition', () => {
     assertType<
       TypeEq<
         typeof result,
-        readonly Readonly<
-          ArrayOfLength<4, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+        readonly ArrayOfLength<
+          4,
+          1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
         >[]
       >
     >();
@@ -734,8 +735,9 @@ describe('IList.partition', () => {
     assertType<
       TypeEq<
         typeof result,
-        readonly Readonly<
-          ArrayOfLength<3, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+        readonly ArrayOfLength<
+          3,
+          1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
         >[]
       >
     >();
@@ -779,7 +781,7 @@ describe('IList.sort', () => {
     const xs = [2, 1, 3] as const;
     const result = IList.sort(xs);
 
-    assertType<TypeEq<typeof result, ReadonlyArrayOfLength<3, 1 | 2 | 3>>>();
+    assertType<TypeEq<typeof result, ArrayOfLength<3, 1 | 2 | 3>>>();
 
     test('case 1', () => {
       expect(result).toStrictEqual([1, 2, 3]);
@@ -789,7 +791,7 @@ describe('IList.sort', () => {
     const xs = [2, 1, 3] as const;
     const result = IList.sort(xs, (a, b) => a - b);
 
-    assertType<TypeEq<typeof result, ReadonlyArrayOfLength<3, 1 | 2 | 3>>>();
+    assertType<TypeEq<typeof result, ArrayOfLength<3, 1 | 2 | 3>>>();
 
     test('case 2', () => {
       expect(result).toStrictEqual([1, 2, 3]);
@@ -799,7 +801,7 @@ describe('IList.sort', () => {
     const xs = [2, 1, 3] as const;
     const result = IList.sort(xs, (a, b) => b - a);
 
-    assertType<TypeEq<typeof result, ReadonlyArrayOfLength<3, 1 | 2 | 3>>>();
+    assertType<TypeEq<typeof result, ArrayOfLength<3, 1 | 2 | 3>>>();
 
     test('case 3', () => {
       expect(result).toStrictEqual([3, 2, 1]);
@@ -815,7 +817,7 @@ describe('IList.sortBy', () => {
     assertType<
       TypeEq<
         typeof sorted,
-        ReadonlyArrayOfLength<
+        ArrayOfLength<
           3,
           { readonly v: 1 } | { readonly v: 2 } | { readonly v: 3 }
         >
@@ -837,7 +839,7 @@ describe('IList.sortBy', () => {
     assertType<
       TypeEq<
         typeof sorted,
-        ReadonlyArrayOfLength<
+        ArrayOfLength<
           3,
           { readonly v: 1 } | { readonly v: 2 } | { readonly v: 3 }
         >

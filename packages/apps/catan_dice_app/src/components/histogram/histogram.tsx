@@ -8,7 +8,7 @@ const domain = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 const add = (a: number, b: number): number => a + b;
 
 type Props = Readonly<{
-  sumCount: ReadonlyArrayOfLength<11, number>;
+  sumCount: ArrayOfLength<11, number>;
 }>;
 
 export const Histogram = memoNamed<Props>('Histogram', ({ sumCount }) => {

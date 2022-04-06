@@ -50,7 +50,7 @@ const hues = pickupHighContrastHues(
   labelNames.length,
   saturationDarker,
   lightnessDarker
-) as ReadonlyArrayOfLength<LabelLen, Hue>;
+) as ArrayOfLength<LabelLen, Hue>;
 
 const labels: ReadonlyNonEmptyArray<Label> = pipe(
   IList.zip(hues, labelNames)

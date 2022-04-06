@@ -56,7 +56,7 @@ export const Main = memoNamed('Main', () => {
       .chain(withInitialValue([0, 0] as const))
   );
 
-  const sumCount$ = useObservable<ReadonlyArrayOfLength<11, number>>(() =>
+  const sumCount$ = useObservable<ArrayOfLength<11, number>>(() =>
     history$
       .chain(map(historyToSumCount))
       .chain(withInitialValue(sumCountInitial))

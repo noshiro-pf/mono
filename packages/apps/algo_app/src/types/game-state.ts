@@ -3,10 +3,7 @@ import type { PhaseInTurn } from './phase-in-turn';
 import type { PlayerIndex } from './player-index';
 
 export type GameState = Readonly<{
-  playerCards: ReadonlyArrayOfLength<
-    4,
-    ReadonlyArrayOfLength<6, CardWithVisibility>
-  >;
+  playerCards: ArrayOfLength<4, ArrayOfLength<6, CardWithVisibility>>;
 
   // attack and answer
   cardChosenToToss: Card | undefined;
