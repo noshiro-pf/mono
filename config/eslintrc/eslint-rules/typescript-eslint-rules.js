@@ -19,9 +19,11 @@ const banTypes = {
     message: 'Use `IDate` instead.',
     fixWith: 'IDate',
   },
-  ReadonlyDate: {
-    message: 'Use `IDate` instead.',
-    fixWith: 'IDate',
+  Set: {
+    message: 'Use `ISet` or `MutableSet` instead.',
+  },
+  Map: {
+    message: 'Use `IMap` or `MutableMap` instead.',
   },
 };
 
