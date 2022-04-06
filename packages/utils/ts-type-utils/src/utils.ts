@@ -113,37 +113,44 @@ export type ArrayElement<S> = S extends readonly (infer T)[] ? T : never;
 
 /* ArrayOfLength */
 
-export type ArrayOfLength<N extends number, T> = ArrayOfLengthRec<N, T, []>;
+export type MutableArrayOfLength<N extends number, T> = MutableArrayOfLengthRec<
+  N,
+  T,
+  []
+>;
 
-export type ReadonlyArrayOfLength<N extends number, T> = Readonly<
-  ArrayOfLength<N, T>
+export type ArrayOfLength<N extends number, T> = Readonly<
+  MutableArrayOfLength<N, T>
 >;
 
 /** @internal */
-type ArrayOfLengthRec<Num, Elm, T extends unknown[]> = {
+type MutableArrayOfLengthRec<Num, Elm, T extends unknown[]> = {
   0: T;
-  1: ArrayOfLengthRec<Num, Elm, [Elm, ...T]>;
+  1: MutableArrayOfLengthRec<Num, Elm, [Elm, ...T]>;
 }[T extends { length: Num } ? 0 : 1];
 
 /* ArrayAtLeastLen */
 
 // https://qiita.com/uhyo/items/80ce7c00f413c1d1be56
 
-export type ArrayAtLeastLen<N extends number, T> = ArrayAtLeastLenRec<
-  N,
-  T,
-  T[],
-  []
->;
+export type MutableArrayAtLeastLen<
+  N extends number,
+  T
+> = MutableArrayAtLeastLenRec<N, T, T[], []>;
 
-export type ReadonlyArrayAtLeastLen<N extends number, T> = Readonly<
-  ArrayAtLeastLen<N, T>
+export type ArrayAtLeastLen<N extends number, T> = Readonly<
+  MutableArrayAtLeastLen<N, T>
 >;
 
 /** @internal */
-type ArrayAtLeastLenRec<Num, Elm, T extends unknown[], C extends unknown[]> = {
+type MutableArrayAtLeastLenRec<
+  Num,
+  Elm,
+  T extends unknown[],
+  C extends unknown[]
+> = {
   0: T;
-  1: ArrayAtLeastLenRec<Num, Elm, [Elm, ...T], [unknown, ...C]>;
+  1: MutableArrayAtLeastLenRec<Num, Elm, [Elm, ...T], [unknown, ...C]>;
 }[C extends { length: Num } ? 0 : 1];
 
 export type MergeIntersection<R extends Record<string, unknown>> = {

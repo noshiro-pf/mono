@@ -2,8 +2,8 @@ import { IList, pipe } from '@noshiro/ts-utils';
 import type { Card } from '../types';
 
 export const sortCards = <C extends Card>(
-  cards: ReadonlyArrayOfLength<6, C>
-): ReadonlyArrayOfLength<6, C> =>
+  cards: ArrayOfLength<6, C>
+): ArrayOfLength<6, C> =>
   pipe(cards).chain((list) =>
     IList.sort(list, (a, b) =>
       a.number === b.number

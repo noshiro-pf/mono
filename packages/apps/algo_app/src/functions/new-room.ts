@@ -4,7 +4,7 @@ import { getShuffled } from '@noshiro/ts-utils-additional';
 import type { Card, Room } from '../types';
 import { sortCards } from './sort-cards';
 
-const allCards: ReadonlyArrayOfLength<24, Card> = [
+const allCards: ArrayOfLength<24, Card> = [
   { color: 'black', number: 0 },
   { color: 'black', number: 1 },
   { color: 'black', number: 2 },

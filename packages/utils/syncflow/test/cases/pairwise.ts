@@ -45,7 +45,7 @@ const createStreams2 = (
   };
 };
 
-export const pairwiseTestCases: ReadonlyArrayOfLength<
+export const pairwiseTestCases: ArrayOfLength<
   2,
   StreamTestCase<[number, number]>
 > = [

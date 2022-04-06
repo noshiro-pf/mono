@@ -9,7 +9,7 @@ import type { Card } from '../../types';
 import { CardComponent } from '../card';
 
 type Props = Readonly<{
-  cards: ReadonlyArrayOfLength<6, Card>;
+  cards: ArrayOfLength<6, Card>;
   height: number;
 }>;
 
