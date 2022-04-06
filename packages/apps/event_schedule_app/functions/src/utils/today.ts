@@ -2,10 +2,10 @@ import type { YearMonthDate, Ymdhm } from '@noshiro/event-schedule-app-shared';
 import { IDate, pipe } from '@noshiro/ts-utils';
 
 const todayDate = (): IDate => {
-  const japanLocaleString = new Date().toLocaleString('ja-JP', {
+  const japanLocaleString = IDate.today().toLocaleString('ja-JP', {
     timeZone: 'Asia/Tokyo',
   });
-  return new Date(japanLocaleString);
+  return IDate.from(japanLocaleString);
 };
 
 export const today = (): YearMonthDate => ({

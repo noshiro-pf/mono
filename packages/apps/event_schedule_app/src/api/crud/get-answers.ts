@@ -4,7 +4,7 @@ import {
   fillAnswer,
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
-import { Result } from '@noshiro/ts-utils';
+import { Result, Str } from '@noshiro/ts-utils';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 
@@ -24,6 +24,6 @@ export const getAnswers = (
     Result.fold(
       (querySnapshot) =>
         querySnapshot.docs.map((d) => fillAnswer({ ...d.data(), id: d.id })),
-      (message) => ({ type: 'others', message: String(message) })
+      (message) => ({ type: 'others', message: Str.from(message) })
     )
   );

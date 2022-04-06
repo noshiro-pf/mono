@@ -1,5 +1,6 @@
 import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
 import { memoNamed, useState } from '@noshiro/react-utils';
+import { Num } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo } from 'react';
 import { answerIconPointConfig, defaultIconPoint } from '../../../constants';
 import { clampAndRoundAnswerFairIconPoint } from '../../../functions';
@@ -16,9 +17,7 @@ const { step } = answerIconPointConfig;
 const defaultValue = defaultIconPoint.fair;
 
 const sanitizeValue = (value: number): AnswerIconPoint =>
-  !Number.isFinite(value)
-    ? defaultValue
-    : clampAndRoundAnswerFairIconPoint(value);
+  !Num.isFinite(value) ? defaultValue : clampAndRoundAnswerFairIconPoint(value);
 
 export const AnswerIconFairPointInput = memoNamed<Props>(
   'AnswerIconFairPointInput',
@@ -26,8 +25,8 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
     const { state: valueStr, setState: setValueStr } = useState<string>('');
 
     const valueParsed = useMemo<number | undefined>(() => {
-      const res = Number.parseFloat(valueStr);
-      if (Number.isNaN(res)) return undefined;
+      const res = Num.parseFloat(valueStr);
+      if (res === undefined || Num.isNaN(res)) return undefined;
       return res;
     }, [valueStr]);
 

@@ -1,3 +1,4 @@
+import { IDate } from '@noshiro/ts-utils';
 import type { DatetimeSpecificationEnumType } from '../enum';
 import type {
   AnswerSymbol,
@@ -61,7 +62,7 @@ export const defaultEventSchedule: EventSchedule = {
   answerSymbolList: [],
   useNotification: false,
   notificationSettings: defaultNotificationSettings,
-  timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+  timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
 } as const;
 
 const d = defaultEventSchedule;

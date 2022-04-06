@@ -1,7 +1,7 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import type { HoursMinutes } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { IDate } from '@noshiro/ts-utils';
+import { IDate, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 
@@ -27,9 +27,12 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
       [onTimeChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
     const dateObj = useMemo<Date>(
-      () => new Date(`1970/1/1 ${time.hours}:${time.minutes}:11`),
+      () =>
+        pipe(IDate.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
+          IDate.toDate
+        ).value,
       [time]
     );
 

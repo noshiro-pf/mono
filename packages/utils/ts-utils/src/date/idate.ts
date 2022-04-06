@@ -1,4 +1,5 @@
 import { IList } from '../collections';
+import { Num } from '../num';
 
 export type IDate = StrictOmit<
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -159,7 +160,7 @@ export namespace IDate {
       setFn: (date: ReadonlyDate) => void
     ) =>
     (curr: IDate): IDate => {
-      // eslint-disable-next-line @typescript-eslint/ban-types
+      // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
       const copy: ReadonlyDate = new Date(curr as Date);
       setFn(copy);
       return copy;
@@ -335,8 +336,10 @@ export namespace IDate {
 
   /* create  */
 
+  // eslint-disable-next-line no-restricted-globals
   export const today = (): IDate => new Date();
 
+  // eslint-disable-next-line no-restricted-globals
   export const now = (): number => Date.now();
 
   export const create = (
@@ -347,18 +350,21 @@ export namespace IDate {
     minutes: MinutesEnum = 0,
     seconds: SecondsEnum = 0,
     ms: number = 0
+    // eslint-disable-next-line no-restricted-globals
   ): IDate => new Date(year, month - 1, date, hours, minutes, seconds, ms);
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   export const from = (value: ReadonlyDate | number | string): IDate =>
+    // eslint-disable-next-line no-restricted-globals
     new Date(value);
 
   /* timestamp */
 
   /** Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970. */
   export const parse = (str: string): number | undefined => {
+    // eslint-disable-next-line no-restricted-globals
     const res = Date.parse(str);
-    return Number.isNaN(res) ? undefined : res;
+    return Num.isNaN(res) ? undefined : res;
   };
 
   /** Gets the time value in milliseconds. */
@@ -375,13 +381,13 @@ export namespace IDate {
   /* convert */
 
   export const toMidnight = (date: IDate): IDate => {
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
     const midnight = new Date(date as Date);
     midnight.setHours(0, 0, 0, 0);
     return midnight;
   };
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
   export const toDate = (date: IDate): Date => date as Date;
 
   /**

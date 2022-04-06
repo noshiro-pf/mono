@@ -1,3 +1,4 @@
+import { Num } from '../num';
 import { IMap } from './imap';
 
 describe('IMap[Symbol.iterator]', () => {
@@ -67,10 +68,10 @@ describe('IMap.has', () => {
       [5, 50],
       [6, 60],
       [7, 70],
-      [Number.NaN, 0],
+      [Num.NaN, 0],
     ] as const);
 
-    expect(m0.has(Number.NaN)).toBe(true);
+    expect(m0.has(Num.NaN)).toBe(true);
   });
 });
 
@@ -109,10 +110,10 @@ describe('IMap.get', () => {
       [5, 50],
       [6, 60],
       [7, 70],
-      [Number.NaN, 100],
+      [Num.NaN, 100],
     ] as const);
 
-    expect(m0.get(Number.NaN)).toBe(100);
+    expect(m0.get(Num.NaN)).toBe(100);
   });
 });
 

@@ -1,6 +1,6 @@
 import type { Answer } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { Result } from '@noshiro/ts-utils';
+import { Result, Str } from '@noshiro/ts-utils';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 
@@ -10,4 +10,4 @@ export const deleteAnswer = (
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     deleteDoc(doc(dbEvents, eventId, firestorePaths.answers, answerId))
-  ).then(Result.fold(() => undefined, String));
+  ).then(Result.fold(() => undefined, Str.from));

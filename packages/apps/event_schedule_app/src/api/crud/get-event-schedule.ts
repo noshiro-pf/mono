@@ -1,6 +1,6 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { fillEventSchedule } from '@noshiro/event-schedule-app-shared';
-import { Result } from '@noshiro/ts-utils';
+import { Result, Str } from '@noshiro/ts-utils';
 import { doc, getDoc } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 
@@ -22,6 +22,6 @@ export const getEventSchedule = async (
     }
     return Result.ok(fillEventSchedule(res.data()));
   } catch (error: unknown) {
-    return Result.err({ type: 'others' as const, message: String(error) });
+    return Result.err({ type: 'others' as const, message: Str.from(error) });
   }
 };

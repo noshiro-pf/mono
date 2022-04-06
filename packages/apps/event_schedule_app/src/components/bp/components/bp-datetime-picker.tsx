@@ -10,7 +10,7 @@ import { useCallback, useMemo } from 'react';
 const formatDate = (date: ReadonlyDate): string =>
   `${IDate.toLocaleYMD(date, '-')}  ${IDate.toLocaleHM(date, ':')}`;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
 const parseDate = (str: string): Date => new Date(str);
 
 const tenYearsLater = pipe(IDate.today())
@@ -67,9 +67,11 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
       () =>
         ymdhm === undefined
           ? undefined
-          : new Date(
-              `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
-            ),
+          : pipe(
+              IDate.from(
+                `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
+              )
+            ).chain(IDate.toDate).value,
       [ymdhm]
     );
 

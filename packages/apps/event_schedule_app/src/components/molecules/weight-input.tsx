@@ -1,5 +1,6 @@
 import type { Weight } from '@noshiro/event-schedule-app-shared';
 import { memoNamed, useState } from '@noshiro/react-utils';
+import { Num } from '@noshiro/ts-utils';
 import { useCallback, useEffect, useMemo } from 'react';
 import { weightNumericInputConfig } from '../../constants';
 import { clampAndRoundAnswerWeight } from '../../functions';
@@ -15,7 +16,7 @@ const { step } = weightNumericInputConfig;
 const defaultValue = 1;
 
 const sanitizeValue = (value: number): Weight =>
-  !Number.isFinite(value) ? defaultValue : clampAndRoundAnswerWeight(value);
+  !Num.isFinite(value) ? defaultValue : clampAndRoundAnswerWeight(value);
 
 export const WeightNumericInput = memoNamed<Props>(
   'WeightNumericInput',
@@ -23,8 +24,8 @@ export const WeightNumericInput = memoNamed<Props>(
     const { state: valueStr, setState: setValueStr } = useState<string>('');
 
     const valueParsed = useMemo<number | undefined>(() => {
-      const res = Number.parseFloat(valueStr);
-      if (Number.isNaN(res)) return undefined;
+      const res = Num.parseFloat(valueStr);
+      if (res === undefined || Num.isNaN(res)) return undefined;
       return res;
     }, [valueStr]);
 

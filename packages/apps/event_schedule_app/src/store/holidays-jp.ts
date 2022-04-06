@@ -8,7 +8,7 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
-import { IMapMapped, IRecord, isNotUndefined } from '@noshiro/ts-utils';
+import { IDate, IMapMapped, IRecord, isNotUndefined } from '@noshiro/ts-utils';
 import type { YmdKey } from '../functions';
 import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../functions';
 
@@ -21,7 +21,7 @@ export const holidaysJpDefinition$: InitializedObservable<
     map((record) =>
       IMapMapped.new(
         IRecord.entries(record).map(([key, value]) => [
-          ymdFromDate(new Date(key)),
+          ymdFromDate(IDate.from(key)),
           value,
         ]),
         ymdToKey,

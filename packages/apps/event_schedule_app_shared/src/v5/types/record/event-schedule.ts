@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { assertType, IDate } from '@noshiro/ts-utils';
 import type {
   AnswerIconSettings,
   DatetimeRange,
@@ -68,7 +68,7 @@ export const eventScheduleDefaultValue: EventSchedule = {
     poor: defaultAnswerIconSetting,
   },
   notificationSettings: 'none',
-  timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+  timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
   author: userDefaultValue,
 } as const;
 

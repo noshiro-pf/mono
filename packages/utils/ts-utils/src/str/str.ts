@@ -27,6 +27,7 @@ export namespace Str {
    * If length is 0, the empty string is returned.
    */
   export const fromCodePoint = (...codePoints: readonly number[]): string =>
+    // eslint-disable-next-line no-restricted-globals
     String.fromCodePoint(...codePoints);
 
   /**
@@ -41,7 +42,8 @@ export namespace Str {
   export const raw = (
     template: { readonly raw: ArrayLike<string> | readonly string[] },
     ...substitutions: readonly unknown[]
-  ): string => String.raw(template, ...substitutions);
+  ): // eslint-disable-next-line no-restricted-globals
+  string => String.raw(template, ...substitutions);
 
   /* methods for instances */
 

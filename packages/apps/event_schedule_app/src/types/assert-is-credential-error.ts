@@ -1,4 +1,4 @@
-import { hasKeyValue, isNonNullObject, isString } from '@noshiro/ts-utils';
+import { hasKeyValue, isNonNullObject, isString, Str } from '@noshiro/ts-utils';
 
 export const assertIsCredentialError: (
   e: unknown
@@ -10,6 +10,6 @@ export const assertIsCredentialError: (
       hasKeyValue(e, 'message', isString)
     )
   ) {
-    throw new Error(`object is not credential error type: ${String(e)}`);
+    throw new Error(`object is not credential error type: ${Str.from(e)}`);
   }
 };

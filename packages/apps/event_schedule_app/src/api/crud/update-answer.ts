@@ -1,6 +1,6 @@
 import type { Answer } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { Result } from '@noshiro/ts-utils';
+import { Result, Str } from '@noshiro/ts-utils';
 import { doc, setDoc } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 
@@ -11,4 +11,4 @@ export const updateAnswer = (
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     setDoc(doc(dbEvents, eventId, firestorePaths.answers, answerId), answer)
-  ).then(Result.fold(() => undefined, String));
+  ).then(Result.fold(() => undefined, Str.from));

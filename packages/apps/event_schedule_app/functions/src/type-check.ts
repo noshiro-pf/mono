@@ -4,13 +4,13 @@ import {
   fillEventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { hasKey, hasKeyValue, isNonNullObject } from '@noshiro/ts-utils';
+import { hasKey, hasKeyValue, isNonNullObject, Str } from '@noshiro/ts-utils';
 import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {
   if (typeof value === 'string') return value;
   logger.error(`typeof value should be string but was ${typeof value}`);
-  return String(value);
+  return Str.from(value);
 };
 
 export const fillAnswerWithCheck = (

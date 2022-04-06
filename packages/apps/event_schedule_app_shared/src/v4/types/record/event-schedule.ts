@@ -1,3 +1,4 @@
+import { IDate } from '@noshiro/ts-utils';
 import type {
   DatetimeRange,
   DatetimeSpecificationEnumType,
@@ -68,7 +69,7 @@ export const defaultEventSchedule: EventSchedule = {
   },
   useNotification: false,
   notificationSettings: defaultNotificationSettings,
-  timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+  timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
 } as const;
 
 const d = defaultEventSchedule;

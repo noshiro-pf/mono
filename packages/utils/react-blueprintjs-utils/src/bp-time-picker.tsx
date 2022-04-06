@@ -27,8 +27,9 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
       [onTimeChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
     const dateObj = useMemo<Date>(
+      // eslint-disable-next-line no-restricted-globals
       () => new Date(`1970/1/1 ${time.hours}:${time.minutes}:11`),
       [time]
     );

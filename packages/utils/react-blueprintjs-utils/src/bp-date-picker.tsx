@@ -10,7 +10,7 @@ import type { YearMonthDate } from './types';
 // eslint-disable-next-line @typescript-eslint/ban-types
 const formatDate = (date: ReadonlyDate): string => date.toLocaleDateString();
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
 const parseDate = (str: string): Date => new Date(str);
 
 const inputProps: HTMLInputProps & InputGroupProps2 = {
@@ -64,12 +64,14 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
       [onYmdChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
     const dateObj = useMemo<Date | undefined>(
       () =>
         ymd === undefined
           ? undefined
-          : new Date(`${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`),
+          : pipe(
+              IDate.from(`${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`)
+            ).chain(IDate.toDate).value,
       [ymd]
     );
 

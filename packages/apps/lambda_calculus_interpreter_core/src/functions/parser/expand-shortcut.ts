@@ -1,10 +1,11 @@
+import { Num } from '@noshiro/ts-utils';
 import { numberLambdaTerm, PLUStokens, SUCCtokens } from './macro';
 
 export const expandShortcuts = (tokens: readonly string[]): string[] => {
   const mut_expanded: string[] = [];
   for (const token of tokens) {
-    const parsedAsNumber = Number.parseInt(token, 10);
-    if (!Number.isNaN(parsedAsNumber)) {
+    const parsedAsNumber = Num.parseInt(token, 10);
+    if (parsedAsNumber !== undefined && !Num.isNaN(parsedAsNumber)) {
       /* 3 => (lambda s. (lambda z. (s(s(s z))))) */
       mut_expanded.push(...numberLambdaTerm(parsedAsNumber));
       continue;
