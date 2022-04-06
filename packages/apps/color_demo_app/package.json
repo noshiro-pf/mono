@@ -12,8 +12,8 @@
     "clean": "run-p clean:**",
     "clean:build": "rimraf ${npm_package_config_build_dir}",
     "clean:cache": "rimraf .firebase",
-    "predeploy": "yarn build",
-    "deploy": "firebase deploy",
+    "fb": "firebase",
+    "fb:deploy": "firebase deploy",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fmt": "yarn _prettier .",
@@ -48,8 +48,12 @@
     "@noshiro/react-material-ui-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/ts-utils": "*",
+    "@noshiro/ts-utils-additional": "*",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "styled-components": "^5.3.0"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

@@ -1,4 +1,4 @@
-import { tuple } from '@noshiro/ts-utils';
+import { tp } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
 import { interval, mapWithIndex, take } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
@@ -14,9 +14,7 @@ const createStreams = (
   const interval$ = interval(tick, true);
   const counter$ = interval$.chain(take(11));
 
-  const doubleWithIndex$ = counter$.chain(
-    mapWithIndex((x, i) => tuple(i, x * 2))
-  );
+  const doubleWithIndex$ = counter$.chain(mapWithIndex((x, i) => tp(i, x * 2)));
 
   return {
     startSource: () => {

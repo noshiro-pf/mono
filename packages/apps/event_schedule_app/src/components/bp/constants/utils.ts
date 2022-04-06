@@ -1,4 +1,4 @@
-import { hexToRgb } from '@noshiro/ts-utils';
+import { hexToRgb } from '@noshiro/ts-utils-additional';
 
 export const hexToRgba = (
   hex: string,

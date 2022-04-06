@@ -33,6 +33,9 @@
     "firebase-admin": "^9.4.1",
     "firebase-functions": "^3.12.0"
   },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
+  },
   "engines": {
     "node": ">=14.0.0"
   }

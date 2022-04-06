@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils-additional';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';

@@ -1,4 +1,4 @@
-import type { RectSize } from '@noshiro/ts-utils';
+import type { RectSize } from '@noshiro/ts-utils-additional';
 
 export const defaultCardSize: RectSize = {
   width: 145,

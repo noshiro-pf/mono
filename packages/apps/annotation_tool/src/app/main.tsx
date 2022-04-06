@@ -3,8 +3,9 @@ import {
   useBoolState,
   useStateWithMapFn,
 } from '@noshiro/react-utils';
-import type { Hue, Percent, RectSize } from '@noshiro/ts-utils';
-import { IList, pickupHighContrastHues, pipe } from '@noshiro/ts-utils';
+import { IList, pipe } from '@noshiro/ts-utils';
+import type { Hue, Percent, RectSize } from '@noshiro/ts-utils-additional';
+import { pickupHighContrastHues } from '@noshiro/ts-utils-additional';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
 import type { AnnotationCanvasStyle, IdType, Label } from '../canvas';

@@ -5,7 +5,7 @@ import type {
   AnswerId,
   DatetimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
+import { IList, IMapMapped, tp } from '@noshiro/ts-utils';
 import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
 
@@ -23,7 +23,7 @@ export const createAnswerTable = (
 > =>
   IMapMapped.new(
     IList.map(datetimeRangeList, (datetimeRange) =>
-      ituple(
+      tp(
         datetimeRange,
         IList.map(answers, (answer) =>
           answerSelectionMapFn(datetimeRange, answer.id)

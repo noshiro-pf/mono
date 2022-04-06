@@ -1,5 +1,4 @@
-import type { DateEnum, MonthEnum, YearEnum } from '@noshiro/ts-utils';
-import { IDate, pipe, sign } from '@noshiro/ts-utils';
+import { IDate, Num, pipe } from '@noshiro/ts-utils';
 
 export type YearMonthDate = Readonly<{
   year: YearEnum;
@@ -29,8 +28,8 @@ export const ymdFromDate = (date: IDate): YearMonthDate => ({
 });
 
 export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {
-  if (a.year !== b.year) return sign(a.year - b.year);
-  if (a.month !== b.month) return sign(a.month - b.month);
-  if (a.date !== b.date) return sign(a.date - b.date);
+  if (a.year !== b.year) return Num.sign(a.year - b.year);
+  if (a.month !== b.month) return Num.sign(a.month - b.month);
+  if (a.date !== b.date) return Num.sign(a.date - b.date);
   return 0;
 };

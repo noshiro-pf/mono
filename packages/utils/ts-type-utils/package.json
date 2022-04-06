@@ -1,0 +1,23 @@
+{
+  "name": "@noshiro/ts-type-utils",
+  "version": "1.0.0",
+  "private": false,
+  "license": "MIT",
+  "sideEffects": false,
+  "types": "ts-type-utils.d.ts",
+  "scripts": {
+    "prebuild": "yarn clean",
+    "build": "run-s build:step1 build:step2 build:step3 build:step4 build:step5",
+    "build:step1": "tsc",
+    "build:step2": "sed -i.bak ./types/*.d.ts -e 's/^import.*$//g' -e 's/export //g'",
+    "build:step3": "rimraf ./types/*.bak",
+    "build:step4": "rimraf ./types/index.d.ts",
+    "build:step5": "ls types/*.d.ts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ts-type-utils.d.ts",
+    "clean": "run-p clean:*",
+    "clean:types": "rimraf ./types",
+    "fmt": "prettier --write .",
+    "setup": "yarn build",
+    "test": "yarn type-check",
+    "type-check": "tsc -p tsconfig.type-check.json"
+  }
+}

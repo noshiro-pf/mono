@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hsl, Mappable } from '@noshiro/ts-utils';
-import { hslToStr } from '@noshiro/ts-utils';
+import type { Hsl, Mappable } from '@noshiro/ts-utils-additional';
+import { hslToStr } from '@noshiro/ts-utils-additional';
 import styled from 'styled-components';
 
 const Root = styled.div`

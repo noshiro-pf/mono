@@ -31,6 +31,10 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/ts-utils": "*",
     "fast-deep-equal": "^3.1.3"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

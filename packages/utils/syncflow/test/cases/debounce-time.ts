@@ -1,4 +1,4 @@
-import { tuple } from '@noshiro/ts-utils';
+import { tp } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
 import {
   combineLatest,
@@ -38,7 +38,7 @@ const createStreams1 = (
   const debounced$ = filtered$.chain(debounceTime(tick * 3));
   const debouncedWithIndex$ = filtered$
     .chain(debounceTime(tick * 3))
-    .chain(mapWithIndex((v, i) => tuple(i, v)));
+    .chain(mapWithIndex((v, i) => tp(i, v)));
 
   return {
     startSource: () => {

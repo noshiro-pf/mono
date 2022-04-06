@@ -1,4 +1,4 @@
-import type { PromiseState } from '@noshiro/ts-utils';
+import type { PromiseState } from '@noshiro/ts-utils-additional';
 import { useEffect, useRef } from 'react';
 import { useState } from './use-state';
 

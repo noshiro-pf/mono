@@ -1,4 +1,4 @@
-import { rectFrom2Points } from '@noshiro/ts-utils';
+import { rectFrom2Points } from '@noshiro/ts-utils-additional';
 import { updateBorderedRectangleGraphics } from '../../functions';
 import type { AnnotationCanvasStyle, PixiApp } from '../../types';
 import type { CanvasAppState } from '../canvas-state-type';

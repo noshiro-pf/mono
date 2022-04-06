@@ -3,7 +3,7 @@ import type {
   DatetimeRange,
 } from '@noshiro/event-schedule-app-shared';
 import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
-import type { Phantomic } from '@noshiro/ts-utils';
+import type { Phantomic } from '@noshiro/ts-utils-additional';
 
 export type AnswerSelectionMapKey = Phantomic<string, 'AnswerSelectionMapKey'>;
 

@@ -1,7 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { roundBy } from '@noshiro/ts-utils';
+import { Num } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../../constants';
@@ -95,7 +95,7 @@ export const AnswerTable = memoNamed<Props>(
                   />
                 </td>
                 <td>
-                  <span>{roundBy(2, score)}</span>
+                  <span>{Num.roundBy(2, score)}</span>
                 </td>
                 {answerSummaryRow?.map((s, i) => (
                   // eslint-disable-next-line react/no-array-index-key

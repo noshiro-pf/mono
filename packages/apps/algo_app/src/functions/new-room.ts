@@ -1,5 +1,6 @@
-import type { PermutationString } from '@noshiro/ts-utils';
-import { getShuffled, IList, isArrayOfLength4, pipe } from '@noshiro/ts-utils';
+import { IList, isArrayOfLength4, pipe } from '@noshiro/ts-utils';
+import type { PermutationString } from '@noshiro/ts-utils-additional';
+import { getShuffled } from '@noshiro/ts-utils-additional';
 import type { Card, Room } from '../types';
 import { sortCards } from './sort-cards';
 

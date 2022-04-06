@@ -1,5 +1,5 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils';
-import { roundToInt } from '@noshiro/ts-utils';
+import { Num } from '@noshiro/ts-utils';
+import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
 import { Graphics } from 'pixi.js';
 import { zIndex } from '../z-index';
 import type { Direction } from './bbox-points';
@@ -46,7 +46,7 @@ const createBboxPoints = (
   pointWidthPx: number,
   color: Rgba
 ): { [key in Direction]: Graphics } => {
-  const pointWidthPxHalf = roundToInt(pointWidthPx / 2);
+  const pointWidthPxHalf = Num.roundToInt(pointWidthPx / 2);
   return mapBboxPoints(bboxPointsFromRect(rect), (direction, p) =>
     createBboxPoint(direction, pointWidthPxHalf, p.x, p.y, color)
   );

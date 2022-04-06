@@ -36,7 +36,11 @@
     "@noshiro/react-utils-styled": "*",
     "@noshiro/resize-observer-react-hooks": "*",
     "@noshiro/ts-utils": "*",
+    "@noshiro/ts-utils-additional": "*",
     "react": "^17.0.2",
     "styled-components": "^5.3.0"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

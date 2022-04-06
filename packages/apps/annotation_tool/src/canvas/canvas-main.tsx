@@ -1,6 +1,6 @@
 import { memoNamed, useState } from '@noshiro/react-utils';
-import type { Hue, RectSize, Rgba } from '@noshiro/ts-utils';
-import { hslaToRgba } from '@noshiro/ts-utils';
+import type { Hue, RectSize, Rgba } from '@noshiro/ts-utils-additional';
+import { hslaToRgba } from '@noshiro/ts-utils-additional';
 import {
   Application,
   InteractionManager,

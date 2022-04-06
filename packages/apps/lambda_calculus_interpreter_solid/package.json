@@ -32,5 +32,8 @@
     "@noshiro/syncflow": "*",
     "@noshiro/ts-utils": "*",
     "solid-js": "^0.23.11"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

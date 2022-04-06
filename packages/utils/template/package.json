@@ -30,5 +30,11 @@
   },
   "config": {
     "root_dir": "../../.."
+  },
+  "dependencies": {
+    "@noshiro/ts-utils": "*"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

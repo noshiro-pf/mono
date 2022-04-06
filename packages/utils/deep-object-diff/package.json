@@ -32,6 +32,10 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/ts-utils": "*",
     "deep-object-diff": "^1.1.7"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

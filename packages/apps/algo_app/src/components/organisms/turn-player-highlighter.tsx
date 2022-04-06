@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import type { Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils-additional';
 import { inTurnColor, playerNameRectPadding, zIndex } from '../../constants';
 
 type Props = Readonly<{

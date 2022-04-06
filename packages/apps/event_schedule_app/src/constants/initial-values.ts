@@ -11,7 +11,6 @@ import {
   notificationSettingsDefaultValue,
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
-import type { DateEnum } from '@noshiro/ts-utils';
 import { IDate, IRecord, pipe } from '@noshiro/ts-utils';
 import { defaultIconPoint } from './default-icon-point';
 import { dict } from './dictionary';

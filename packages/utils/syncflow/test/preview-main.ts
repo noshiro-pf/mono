@@ -1,4 +1,4 @@
-import { IList, stringToNumber } from '@noshiro/ts-utils';
+import { IList, Str } from '@noshiro/ts-utils';
 import { ArgumentParser } from 'argparse';
 import {
   auditTimeTestCases,
@@ -146,9 +146,9 @@ const getArgs = (): {
     isPreviewMode: boolean;
     testCaseIdx: number;
   } => ({
-    exampleIdx: (stringToNumber(args.example_no[0] ?? '0') ?? 0) - 1,
+    exampleIdx: (Str.toNumber(args.example_no[0] ?? '0') ?? 0) - 1,
     isPreviewMode: args.preview != null,
-    testCaseIdx: (stringToNumber(args.case_no[0] ?? '0') ?? 0) - 1,
+    testCaseIdx: (Str.toNumber(args.case_no[0] ?? '0') ?? 0) - 1,
   });
 
   return convertArgs(

@@ -3,14 +3,12 @@ import type {
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import type { Paths, RecordValueAtPath } from '@noshiro/ts-utils';
 import {
   assertType,
   IList,
   IRecord,
   ISetMapped,
   match,
-  recordKeys,
 } from '@noshiro/ts-utils';
 import { dict } from '../constants';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from './map-key';
@@ -131,7 +129,7 @@ const notificationSettingsDiff = (
       map(a === 'none' ? ndc.off : ndc.on, b === 'none' ? ndc.off : ndc.on),
     ];
 
-  const collectedDiff = recordKeys(a).reduce<readonly string[]>(
+  const collectedDiff = IRecord.keys(a).reduce<readonly string[]>(
     (acc, key) =>
       a[key] === b[key]
         ? acc

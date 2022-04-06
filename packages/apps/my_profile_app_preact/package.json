@@ -53,5 +53,8 @@
     "preact": "^10.4.7",
     "preact-markdown": "^2.0.0",
     "preact-media-hook": "^1.0.3"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

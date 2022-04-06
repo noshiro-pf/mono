@@ -1,4 +1,5 @@
-import { assertType, IRecord, isEmailString, pipe } from '@noshiro/ts-utils';
+import { assertType, IRecord, pipe } from '@noshiro/ts-utils';
+import { isEmailString } from '@noshiro/ts-utils-additional';
 import type { Reducer } from 'react';
 import { dict } from '../../constants';
 

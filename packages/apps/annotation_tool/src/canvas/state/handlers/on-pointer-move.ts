@@ -1,5 +1,5 @@
-import type { Point } from '@noshiro/ts-utils';
-import { rectFrom2Points } from '@noshiro/ts-utils';
+import type { Point } from '@noshiro/ts-utils-additional';
+import { rectFrom2Points } from '@noshiro/ts-utils-additional';
 import {
   moveBbox,
   resizeBbox,

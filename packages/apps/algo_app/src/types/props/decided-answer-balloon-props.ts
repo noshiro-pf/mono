@@ -1,4 +1,4 @@
-import type { Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils-additional';
 import type { Card } from '../card-type';
 import type { NWES } from '../direction';
 

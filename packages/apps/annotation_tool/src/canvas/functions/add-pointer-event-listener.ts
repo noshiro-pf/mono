@@ -1,4 +1,4 @@
-import { roundToInt } from '@noshiro/ts-utils';
+import { Num } from '@noshiro/ts-utils';
 import type { Application, Sprite } from 'pixi.js';
 import type { CanvasAppState, CanvasAppStateHandler } from '../state';
 
@@ -17,7 +17,10 @@ export const addGlobalPointerEventListener = (
   };
 
   const pointermoveCallback = (ev: Readonly<PointerEvent>): void => {
-    const pointerPos = { x: roundToInt(ev.offsetX), y: roundToInt(ev.offsetY) };
+    const pointerPos = {
+      x: Num.roundToInt(ev.offsetX),
+      y: Num.roundToInt(ev.offsetY),
+    };
     stateHandler(state, { type: 'pointerMove', pointerPos });
   };
 

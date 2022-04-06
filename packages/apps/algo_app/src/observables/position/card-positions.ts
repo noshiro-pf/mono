@@ -1,6 +1,6 @@
 import type { InitializedObservable } from '@noshiro/syncflow';
 import { scan, subject } from '@noshiro/syncflow';
-import type { Rect } from '@noshiro/ts-utils';
+import type { Rect } from '@noshiro/ts-utils-additional';
 import { cardPositionsReducer } from '../../state';
 import type { CardColor, CardNumber } from '../../types';
 

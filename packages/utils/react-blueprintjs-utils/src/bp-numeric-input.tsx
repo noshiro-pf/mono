@@ -1,6 +1,6 @@
 import { NumericInput } from '@blueprintjs/core';
 import { memoNamed, useState } from '@noshiro/react-utils';
-import { stringToNumber } from '@noshiro/ts-utils';
+import { Str } from '@noshiro/ts-utils';
 import type { ComponentProps, CSSProperties, FocusEventHandler } from 'react';
 import { useCallback, useEffect } from 'react';
 
@@ -26,7 +26,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
     onValueChangeFiltered,
     selectAllOnFocus = true,
     fill = true,
-    parseNumericString = stringToNumber,
+    parseNumericString = Str.toNumber,
     valueWhenNotParsedAsNumber = 0,
     onBlur,
     convertValueOnBlurAndEmit,

@@ -1,6 +1,6 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { assertType, tuple } from '@noshiro/ts-utils';
+import { assertType, tp } from '@noshiro/ts-utils';
 import { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
@@ -24,7 +24,7 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
     .get();
 
   const events = querySnapshot.docs.map((doc) =>
-    tuple(doc.id, fillEventScheduleWithCheck(doc.data()))
+    tp(doc.id, fillEventScheduleWithCheck(doc.data()))
   );
 
   await Promise.all(

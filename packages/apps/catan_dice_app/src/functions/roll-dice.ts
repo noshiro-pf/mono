@@ -1,6 +1,6 @@
-import { randInt } from '@noshiro/ts-utils';
+import { Num } from '@noshiro/ts-utils';
 
 export const rollTwoDices = (): [number, number] => [
-  randInt(1, 6),
-  randInt(1, 6),
+  Num.randInt(1, 6),
+  Num.randInt(1, 6),
 ];

@@ -1,4 +1,4 @@
-import type { Hue } from '@noshiro/ts-utils';
+import type { Hue } from '@noshiro/ts-utils-additional';
 import type { IdType } from './id-type';
 import { defaultIdMaker } from './id-type';
 

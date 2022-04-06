@@ -1,4 +1,4 @@
+export * from './match';
 export * from './maybe';
-export * from './pipe-class';
-export * from './pipe-overload';
+export * from './pipe';
 export * from './result';

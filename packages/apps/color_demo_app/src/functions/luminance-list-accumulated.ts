@@ -1,4 +1,4 @@
-import { IList, ituple, pipe } from '@noshiro/ts-utils';
+import { IList, pipe, tp } from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (
   luminanceList: readonly number[],
@@ -17,8 +17,8 @@ export const getLuminanceListAccumulated = (
     .chain((list) =>
       IList.scan(
         list,
-        ([prev, acc], curr) => ituple(curr, acc + Math.abs(curr - prev)),
-        ituple(IList.first(luminanceListCorrected), 0)
+        ([prev, acc], curr) => tp(curr, acc + Math.abs(curr - prev)),
+        tp(IList.first(luminanceListCorrected), 0)
       )
     )
     .chain((list) =>

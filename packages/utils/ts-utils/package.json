@@ -19,21 +19,19 @@
     "clean:build:cjs": "rimraf cjs",
     "clean:build:esm": "rimraf esm",
     "fmt": "yarn _prettier .",
-    "genpipetypedef": "node scripts/gen_pipe_type_def ${npm_package_config_pipe_max_length} ${npm_package_config_pipe_ts_path}",
-    "postgenpipetypedef": "yarn _prettier ${npm_package_config_pipe_ts_path}",
     "gi": "yarn _script_genindex ./src --min-depth 1",
     "lint": "eslint src/ --ext .ts",
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
-    "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
   "config": {
-    "pipe_max_length": 12,
-    "pipe_ts_path": "src/functional/pipe.ts",
     "root_dir": "../../.."
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

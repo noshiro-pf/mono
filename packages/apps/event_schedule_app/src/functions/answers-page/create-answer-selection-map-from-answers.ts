@@ -3,7 +3,7 @@ import type {
   AnswerIconIdWithNone,
   AnswerIconPoint,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped, ituple } from '@noshiro/ts-utils';
+import { IList, IMapMapped, tp } from '@noshiro/ts-utils';
 import type { AnswerTableCellPosition } from '../../types';
 import type { AnswerSelectionMapKey } from '../map-key';
 import { answerSelectionFromMapKey, answerSelectionToMapKey } from '../map-key';
@@ -22,7 +22,7 @@ export const createAnswerSelectionMapFromAnswers = (
           datetimeRange: s.datetimeRange,
           answerId: id,
         },
-        ituple(s.iconId, s.point),
+        tp(s.iconId, s.point),
       ])
     ),
     answerSelectionToMapKey,

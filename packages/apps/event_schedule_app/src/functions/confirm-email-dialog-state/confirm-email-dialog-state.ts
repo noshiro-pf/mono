@@ -1,4 +1,5 @@
-import { assertType, isEmailString } from '@noshiro/ts-utils';
+import { assertType } from '@noshiro/ts-utils';
+import { isEmailString } from '@noshiro/ts-utils-additional';
 import type { Reducer } from 'react';
 
 export type ConfirmEmailDialogState = DeepReadonly<{

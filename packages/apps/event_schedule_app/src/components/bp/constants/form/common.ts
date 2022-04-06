@@ -1,4 +1,4 @@
-import { recordFromEntries } from '@noshiro/ts-utils';
+import { IRecord } from '@noshiro/ts-utils';
 import { css } from 'styled-components';
 import { buttonColorDisabled } from '../button';
 import {
@@ -74,7 +74,7 @@ export const controlGroupStack = [
 export const controlGroupStackZIndex: ReadonlyRecord<
   typeof controlGroupStack[number],
   number
-> = recordFromEntries(controlGroupStack.map((key, index) => [key, index]));
+> = IRecord.fromEntries(controlGroupStack.map((key, index) => [key, index]));
 
 export const inputTransitionShadow = (
   color: string = inputShadowColorFocus,

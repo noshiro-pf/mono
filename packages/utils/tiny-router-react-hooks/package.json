@@ -31,6 +31,10 @@
   "dependencies": {
     "@noshiro/syncflow-react-hooks": "*",
     "@noshiro/tiny-router-observable": "*",
+    "@noshiro/ts-utils": "*",
     "react": "^17.0.2"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*"
   }
 }

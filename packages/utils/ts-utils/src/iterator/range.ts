@@ -1,4 +1,4 @@
-import { isSafeInt } from '../validator';
+import { Num } from '../num';
 
 /**
  * @throws Will throw an error if the argument is not safe integer.
@@ -11,13 +11,13 @@ export function* range(
   end: number,
   step: number = 1
 ): Generator<number, void, unknown> {
-  if (!isSafeInt(start)) {
+  if (!Num.isSafeInt(start)) {
     throw new Error('start must be a safe integer.');
   }
-  if (!isSafeInt(end)) {
+  if (!Num.isSafeInt(end)) {
     throw new Error('end must be a safe integer.');
   }
-  if (!isSafeInt(step)) {
+  if (!Num.isSafeInt(step)) {
     throw new Error('step must be a safe integer.');
   }
   // eslint-disable-next-line functional/no-let

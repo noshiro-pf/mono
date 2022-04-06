@@ -1,11 +1,4 @@
-import type {
-  DateEnum,
-  HoursEnum,
-  MinutesEnum,
-  MonthEnum,
-  YearEnum,
-} from '@noshiro/ts-utils';
-import { IDate, sign } from '@noshiro/ts-utils';
+import { IDate, Num } from '@noshiro/ts-utils';
 import { defaultHoursMinutes, defaultYearMonthDate } from '../../../v1';
 
 export type Ymdhm = Readonly<{
@@ -48,10 +41,10 @@ export const ymdhm2Date = (ymdhm: Ymdhm): IDate =>
   IDate.create(ymdhm.year, ymdhm.month, ymdhm.date, ymdhm.hours, ymdhm.minutes);
 
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
-  if (a.year !== b.year) return sign(a.year - b.year);
-  if (a.month !== b.month) return sign(a.month - b.month);
-  if (a.date !== b.date) return sign(a.date - b.date);
-  if (a.hours !== b.hours) return sign(a.hours - b.hours);
-  if (a.minutes !== b.minutes) return sign(a.minutes - b.minutes);
+  if (a.year !== b.year) return Num.sign(a.year - b.year);
+  if (a.month !== b.month) return Num.sign(a.month - b.month);
+  if (a.date !== b.date) return Num.sign(a.date - b.date);
+  if (a.hours !== b.hours) return Num.sign(a.hours - b.hours);
+  if (a.minutes !== b.minutes) return Num.sign(a.minutes - b.minutes);
   return 0;
 };

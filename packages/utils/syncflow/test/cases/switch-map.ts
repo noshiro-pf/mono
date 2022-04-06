@@ -1,4 +1,4 @@
-import { tuple } from '@noshiro/ts-utils';
+import { tp } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
 // eslint-disable-next-line import/no-deprecated
 import { interval, map, switchMap, take } from '../../src';
@@ -31,7 +31,7 @@ const createStreams = (
     switchMap((i) =>
       interval(tick * 2)
         .chain(take(5))
-        .chain(map((x) => tuple(i, x * i)))
+        .chain(map((x) => tp(i, x * i)))
     )
   );
 

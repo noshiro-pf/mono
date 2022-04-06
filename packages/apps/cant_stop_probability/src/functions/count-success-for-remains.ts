@@ -1,4 +1,4 @@
-import { setIntersection } from '@noshiro/ts-utils';
+import { setIntersection } from '@noshiro/ts-utils-additional';
 import { diceValueSet } from '../constants';
 import type { TwoDiceSumValue } from '../types';
 import { possibleTwoDiceSums } from './possible-two-dice-sums';

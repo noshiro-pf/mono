@@ -1,17 +1,3 @@
-import { assertNotType, assertType } from '../types';
-
-assertNotType<TypeExtends<[0, 1], ArrayAtLeastLen<3, number>>>();
-assertType<TypeExtends<[0, 1, 2], ArrayAtLeastLen<3, number>>>();
-assertNotType<TypeExtends<[0, 1, 2], ArrayAtLeastLen<5, number>>>();
-assertType<TypeExtends<[0, 1, 2, 3, 4], ArrayAtLeastLen<5, number>>>();
-
-assertType<TypeExtends<readonly [0, 0], ReadonlyArrayAtLeastLen<2, 0>>>();
-assertType<TypeExtends<readonly [0, 0, 0], ReadonlyArrayAtLeastLen<3, 0>>>();
-assertType<TypeExtends<readonly [0, 0, 0, 0], ReadonlyArrayAtLeastLen<4, 0>>>();
-assertType<
-  TypeExtends<readonly [0, 0, 0, 0, 0], ReadonlyArrayAtLeastLen<5, 0>>
->();
-
 export const isArrayOfLength1OrMore = <T>(
   array: readonly T[]
 ): array is ArrayAtLeastLen<1, T> => array.length >= 1;
