@@ -16,7 +16,6 @@ export * from './others';
 export * from './promise';
 export * from './promise-result';
 export * from './random';
-export * from './set';
 export * from './shape';
 export * from './string';
 export * from './types';
