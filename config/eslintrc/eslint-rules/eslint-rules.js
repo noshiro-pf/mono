@@ -252,7 +252,7 @@ const eslintRules = {
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
   'no-restricted-exports': 'error',
-  'no-restricted-globals': 'error',
+  'no-restricted-globals': ['error', 'Number', 'String', 'Date'],
   'no-restricted-modules': 'off',
   'no-restricted-properties': 'error',
   'no-restricted-syntax': 'error',
