@@ -1,12 +1,13 @@
 import { MutableMap } from '../others';
 
-export type Subscription = Readonly<{
-  unsubscribe: () => void;
-}>;
+export type Subscription = {
+  readonly unsubscribe: () => void;
+};
 
-export type TinyObservable<T> = Readonly<{
-  subscribe: (fn: (value: T) => void) => Subscription;
-}>;
+export type TinyObservable<T> = {
+  readonly subscribe: (fn: (value: T) => void) => Subscription;
+};
+
 export type TinyObservableSource<T> = MergeIntersection<
   TinyObservable<T> & { readonly next: (value: T) => void }
 >;
