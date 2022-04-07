@@ -1,0 +1,42 @@
+{
+  "name": "@noshiro/global-preact",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "noshiro",
+  "sideEffects": true,
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
+  "scripts": {
+    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
+    "build": "run-p build:**",
+    "prebuild:cjs": "yarn clean:build:cjs",
+    "build:cjs": "tsc --project config/tsconfig.cjs.json",
+    "prebuild:esm": "yarn clean:build:esm",
+    "build:esm": "tsc --project config/tsconfig.esm.json",
+    "clean": "run-p clean:**",
+    "clean:build:cjs": "rimraf cjs",
+    "clean:build:esm": "rimraf esm",
+    "fmt": "yarn _prettier .",
+    "lint": "eslint src/ --ext .ts",
+    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
+    "lint:fix": "yarn lint --fix",
+    "setup": "run-s setup:**",
+    "setup:1": "node ./scripts/gen.js",
+    "setup:2": "yarn _prettier ./src",
+    "setup:3": "yarn build",
+    "tsc": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "config": {
+    "root_dir": "../../.."
+  },
+  "dependencies": {
+    "@noshiro/ts-utils": "*",
+    "preact": "^10.4.7"
+  },
+  "devDependencies": {
+    "@noshiro/ts-type-utils": "*",
+    "react": "^17.0.2"
+  }
+}
