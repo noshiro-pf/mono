@@ -1,5 +1,3 @@
-import { IList, pipe, tp } from '@noshiro/ts-utils';
-
 export const getLuminanceListAccumulated = (
   luminanceList: readonly number[],
   useLog: boolean

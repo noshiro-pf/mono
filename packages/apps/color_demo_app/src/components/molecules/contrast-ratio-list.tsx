@@ -1,5 +1,4 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { IList } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const Root = styled.div`
