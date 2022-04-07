@@ -73,6 +73,28 @@ export namespace IList {
 
   export const size = length;
 
+  /**
+   * Creates an array from an iterable object.
+   * @param iterable An iterable object to convert to an array.
+   */
+  export const from = <T>(iterable: ArrayLike<T> | Iterable<T>): readonly T[] =>
+    // eslint-disable-next-line no-restricted-globals
+    Array.from(iterable);
+
+  export const asMut = <T>(list: readonly T[]): T[] => list as T[];
+
+  /**
+   * Creates an array from an iterable object.
+   * @param iterable An iterable object to convert to an array.
+   * @param mapfn A mapping function to call on every element of the array.
+   * @param thisArg Value of 'this' used to invoke the mapfn.
+   */
+  export const fromMapped = <T, U>(
+    iterable: ArrayLike<T> | Iterable<T>,
+    mapfn: (v: T, k: number) => U
+    // eslint-disable-next-line no-restricted-globals
+  ): readonly U[] => Array.from(iterable, mapfn);
+
   export const zeros = (len: number): Result<readonly 0[], string> =>
     !Num.isUint32(len)
       ? Result.err('len should be uint32')
