@@ -18,16 +18,9 @@ export type TypeExtends<A, B> = A extends B ? true : false;
 
 export type StrictExclude<T, U extends T> = T extends U ? never : T;
 
-export type RelaxedExclude<T, U> = T extends U ? never : T;
-
 export type StrictOmit<T, K extends keyof T> = Pick<
   T,
   StrictExclude<keyof T, K>
->;
-
-export type RelaxedOmit<T, K extends keyof never> = Pick<
-  T,
-  RelaxedExclude<keyof T, K>
 >;
 
 /* type constants */
@@ -97,9 +90,6 @@ export type ReadonlyRecordBase = ReadonlyRecord<RecordKeyType, unknown>;
 export type FunctionType<A, B> = (value: A) => B;
 
 export type MonoTypeFunction<X> = (value: X) => X;
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type ReadonlyDate = Readonly<Date>;
 
 /* Array utilities */
 
