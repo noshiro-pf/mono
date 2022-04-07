@@ -44,6 +44,7 @@
     ]
   },
   "dependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/goober": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/ts-utils": "*",

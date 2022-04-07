@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@noshiro/blueprint-css": "*",
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",

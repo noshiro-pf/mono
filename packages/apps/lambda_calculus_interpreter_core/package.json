@@ -28,6 +28,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*"
   },

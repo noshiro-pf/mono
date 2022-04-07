@@ -46,6 +46,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.36.0",
     "@blueprintjs/icons": "^3.23.0",
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",

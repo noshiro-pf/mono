@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.36.0",
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/react-blueprintjs-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/ts-utils": "*",

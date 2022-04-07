@@ -57,6 +57,7 @@
     "@noshiro/deep-object-diff": "*",
     "@noshiro/event-schedule-app-shared": "5.0.2",
     "@noshiro/fast-deep-equal": "*",
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",
