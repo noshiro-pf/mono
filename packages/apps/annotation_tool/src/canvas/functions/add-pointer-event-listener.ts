@@ -1,4 +1,3 @@
-import { Num } from '@noshiro/ts-utils';
 import type { Application, Sprite } from 'pixi.js';
 import type { CanvasAppState, CanvasAppStateHandler } from '../state';
 

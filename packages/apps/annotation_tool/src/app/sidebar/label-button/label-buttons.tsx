@@ -1,6 +1,5 @@
 import { Button, Collapse } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { tp } from '@noshiro/ts-utils';
 import type { Percent } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'react';
 import styled from 'styled-components';

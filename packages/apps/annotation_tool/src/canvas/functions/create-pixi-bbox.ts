@@ -1,4 +1,3 @@
-import { Num } from '@noshiro/ts-utils';
 import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
 import { Graphics } from 'pixi.js';
 import { zIndex } from '../z-index';
