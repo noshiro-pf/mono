@@ -69,9 +69,8 @@ export namespace IList {
   export const isEmpty = <T>(list: readonly T[]): list is readonly [] =>
     list.length === 0;
 
-  export const isNonEmpty = <T>(
-    list: readonly T[]
-  ): list is ReadonlyNonEmptyArray<T> => list.length > 0;
+  export const isNonEmpty = <T>(list: readonly T[]): list is NonEmptyArray<T> =>
+    list.length > 0;
 
   export const isArrayOfLength1 = <T>(
     array: readonly T[]
@@ -211,7 +210,7 @@ export namespace IList {
   export function head<H, L extends readonly unknown[]>(
     list: readonly [H, ...L]
   ): H;
-  export function head<T>(list: ReadonlyNonEmptyArray<T>): T;
+  export function head<T>(list: NonEmptyArray<T>): T;
   export function head<T>(list: readonly T[]): T | undefined;
   export function head<T>(list: readonly T[]): T | undefined {
     return isEmpty(list) ? undefined : list[0];
@@ -223,7 +222,7 @@ export namespace IList {
   export function last<H extends readonly unknown[], L>(
     list: readonly [...H, L]
   ): L;
-  export function last<T>(list: ReadonlyNonEmptyArray<T>): T;
+  export function last<T>(list: NonEmptyArray<T>): T;
   export function last<T>(list: readonly T[]): T | undefined;
   export function last<T>(list: readonly T[]): T | undefined {
     return isEmpty(list) ? undefined : list[list.length - 1];
@@ -646,10 +645,10 @@ export namespace IList {
   export const reduceRight = foldr;
 
   export const scan = <A, B>(
-    list: ReadonlyNonEmptyArray<A> | readonly A[],
+    list: NonEmptyArray<A> | readonly A[],
     reducer: ReducerType<B, A>,
     init: B
-  ): ReadonlyNonEmptyArray<B> => {
+  ): NonEmptyArray<B> => {
     const mut_result: B[] = ArrayFrom(newArrayThrow<B>(list.length + 1, init));
 
     let mut_acc = init;
@@ -659,7 +658,7 @@ export namespace IList {
       mut_result[index + 1] = mut_acc;
     }
 
-    return mut_result as readonly B[] as ReadonlyNonEmptyArray<B>;
+    return mut_result as readonly B[] as NonEmptyArray<B>;
   };
 
   export const count = <A>(
@@ -713,18 +712,16 @@ export namespace IList {
    * @param list target list
    * @param mapFn perform identity check after mapping by the map function
    */
-  export function uniq<T>(
-    list: ReadonlyNonEmptyArray<T>
-  ): ReadonlyNonEmptyArray<T>;
+  export function uniq<T>(list: NonEmptyArray<T>): NonEmptyArray<T>;
   export function uniq<T>(list: readonly T[]): readonly T[];
   export function uniq<T>(list: readonly T[]): readonly T[] {
     return ArrayFrom(new MutableSet(list));
   }
 
   export function uniqBy<A, B>(
-    list: ReadonlyNonEmptyArray<A>,
+    list: NonEmptyArray<A>,
     mapFn: (value: A) => B
-  ): ReadonlyNonEmptyArray<A>;
+  ): NonEmptyArray<A>;
   export function uniqBy<A, B>(
     list: readonly A[],
     mapFn: (value: A) => B

@@ -91,9 +91,9 @@ export type MonoTypeFunction<X> = (value: X) => X;
 
 /* Array utilities */
 
-export type NonEmptyArray<A> = [A, ...A[]];
+export type MutableNonEmptyArray<A> = [A, ...A[]];
 
-export type ReadonlyNonEmptyArray<A> = readonly [A, ...(readonly A[])];
+export type NonEmptyArray<A> = readonly [A, ...(readonly A[])];
 
 export type Length<T extends { length: number }> = T['length'];
 

@@ -125,7 +125,7 @@ describe('IList.head', () => {
     });
   }
   {
-    const xs: NonEmptyArray<number> = [1, 2, 3];
+    const xs: MutableNonEmptyArray<number> = [1, 2, 3];
     const head = IList.head(xs);
 
     assertType<TypeEq<typeof head, number>>();
@@ -169,7 +169,7 @@ describe('IList.last', () => {
     });
   }
   {
-    const xs: NonEmptyArray<number> = [1, 2, 3];
+    const xs: MutableNonEmptyArray<number> = [1, 2, 3];
     const last = IList.last(xs);
 
     assertType<TypeEq<typeof last, number>>();
@@ -1488,13 +1488,13 @@ describe('IList.isSuperset', () => {
 //   toBe: [2, 2, 2],
 // });
 
-// const array: ReadonlyNonEmptyArray<number> = [1, 2, 3] as const;
+// const array: NonEmptyArray<number> = [1, 2, 3] as const;
 // const sorted = sort(cmp)(array);
-// assertType<TypeEq<typeof sorted, ReadonlyNonEmptyArray<number>>>();
+// assertType<TypeEq<typeof sorted, NonEmptyArray<number>>>();
 
-// const array2: ReadonlyNonEmptyArray<1 | 2 | 3> = [1, 2, 3] as const;
+// const array2: NonEmptyArray<1 | 2 | 3> = [1, 2, 3] as const;
 // const sorted2 = sort(cmp)(array2);
-// assertType<TypeEq<typeof sorted2, ReadonlyNonEmptyArray<1 | 2 | 3>>>();
+// assertType<TypeEq<typeof sorted2, NonEmptyArray<1 | 2 | 3>>>();
 
 // const tuple = [1, 2, 3] as const;
 // const sorted3 = sort(cmp)(tuple);
@@ -1522,13 +1522,13 @@ describe('IList.isSuperset', () => {
 //   toBe: [1, 4, 9],
 // });
 
-// const array: ReadonlyNonEmptyArray<number> = [1, 2, 3] as const;
+// const array: NonEmptyArray<number> = [1, 2, 3] as const;
 // const mapped = map((x: number) => x * x)(array);
-// assertType<TypeEq<typeof mapped, ReadonlyNonEmptyArray<number>>>();
+// assertType<TypeEq<typeof mapped, NonEmptyArray<number>>>();
 
-// const array2: ReadonlyNonEmptyArray<number> = [1, 2, 3] as const;
+// const array2: NonEmptyArray<number> = [1, 2, 3] as const;
 // const mapped2 = map((x: number, i) => x * x * i)(array2);
-// assertType<TypeEq<typeof mapped2, ReadonlyNonEmptyArray<number>>>();
+// assertType<TypeEq<typeof mapped2, NonEmptyArray<number>>>();
 
 // test('sum', () => {
 //   expect(sum([1, 2, 3])).toBe(6);
