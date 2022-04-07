@@ -1,4 +1,3 @@
-import { ISet } from '@noshiro/ts-utils';
 import { diceValueSet } from '../constants';
 import type { TwoDiceSumValue } from '../types';
 import { possibleTwoDiceSums } from './possible-two-dice-sums';

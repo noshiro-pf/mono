@@ -1,4 +1,3 @@
-import { ISet } from '@noshiro/ts-utils';
 import type { DiceValue, TwoDiceSumValue } from '../types';
 
 export const possibleTwoDiceSums = (

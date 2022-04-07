@@ -1,4 +1,3 @@
-import { ISet } from '@noshiro/ts-utils';
 import { possibleTwoDiceSums } from './possible-two-dice-sums';
 
 test('{1, 1, 1, 1} -> {2}', () => {

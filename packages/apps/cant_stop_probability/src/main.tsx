@@ -1,6 +1,5 @@
 import { Navbar, Tab, Tabs } from '@blueprintjs/core';
 import { memoNamed, useState } from '@noshiro/react-utils';
-import { IList, ISet, isNotUndefined, pipe, Str, tp } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { DeadColumn, ProbabilityTable } from './components';
