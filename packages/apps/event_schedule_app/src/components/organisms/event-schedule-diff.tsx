@@ -1,6 +1,5 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { assertType, mapNullable } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { dict } from '../../constants';
 import type { EventSettingsPageDiffResult } from '../../functions';

@@ -1,4 +1,3 @@
-import { castWritable, Result } from '@noshiro/ts-utils';
 import type { FirebaseError } from 'firebase/app';
 import type { OAuthCredential, UserCredential } from 'firebase/auth';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';

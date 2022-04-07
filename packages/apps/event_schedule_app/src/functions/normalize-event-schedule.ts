@@ -1,6 +1,5 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { compareDatetimeRange } from '@noshiro/event-schedule-app-shared';
-import { IList, pipe } from '@noshiro/ts-utils';
 
 export const normalizeEventSchedule = (
   eventSchedule: EventSchedule

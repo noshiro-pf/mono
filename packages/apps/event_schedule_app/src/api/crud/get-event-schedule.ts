@@ -1,6 +1,5 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { fillEventSchedule } from '@noshiro/event-schedule-app-shared';
-import { Result, Str } from '@noshiro/ts-utils';
 import { doc, getDoc } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 

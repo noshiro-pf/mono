@@ -5,7 +5,6 @@ import type {
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { dict } from '../../../../constants';
 import type { YmdKey } from '../../../../functions';

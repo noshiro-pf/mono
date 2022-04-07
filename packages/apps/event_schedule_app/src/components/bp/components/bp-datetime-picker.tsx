@@ -2,7 +2,6 @@ import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
 import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { IDate, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 

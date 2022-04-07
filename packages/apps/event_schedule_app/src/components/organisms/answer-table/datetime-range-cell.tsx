@@ -3,7 +3,6 @@ import type {
   DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { match } from '@noshiro/ts-utils';
 import { dict } from '../../../constants';
 import { hm2str, ymd2strWithDay } from '../../../functions';
 

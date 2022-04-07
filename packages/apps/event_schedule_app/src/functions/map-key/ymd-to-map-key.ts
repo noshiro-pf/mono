@@ -1,5 +1,4 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import { Num } from '@noshiro/ts-utils';
 import type { Phantomic } from '@noshiro/ts-utils-additional';
 
 export type YmdKey = Phantomic<string, 'YmdKey'>;

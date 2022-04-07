@@ -4,8 +4,6 @@ import type {
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import type { TinyObservable } from '@noshiro/ts-utils';
-import { IRecord } from '@noshiro/ts-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';

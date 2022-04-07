@@ -2,7 +2,6 @@ import { Button } from '@blueprintjs/core';
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
 import type { Observable } from '@noshiro/syncflow';
-import type { IMapMapped } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import type { CalendarCurrentPageReducerState, YmdKey } from '../../functions';
 import { useMultipleDatePickerState } from '../../hooks';

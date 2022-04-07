@@ -1,5 +1,4 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { match } from '@noshiro/ts-utils';
 import { dict } from '../../../constants';
 import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';

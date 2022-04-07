@@ -2,7 +2,6 @@ import type {
   AnswerIconPoint,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import { Num } from '@noshiro/ts-utils';
 import { answerIconPointConfig, weightNumericInputConfig } from '../constants';
 
 const cfg1 = answerIconPointConfig;

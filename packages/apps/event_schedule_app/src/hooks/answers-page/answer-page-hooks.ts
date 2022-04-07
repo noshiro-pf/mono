@@ -8,8 +8,6 @@ import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useAlive, useBoolState, useState } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import type { IMapMapped } from '@noshiro/ts-utils';
-import { IDate, IRecord, Result } from '@noshiro/ts-utils';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { api } from '../../api';

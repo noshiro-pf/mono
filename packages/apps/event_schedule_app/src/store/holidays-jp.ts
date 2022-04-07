@@ -8,7 +8,6 @@ import {
   unwrapResultOk,
   withInitialValue,
 } from '@noshiro/syncflow';
-import { IDate, IMapMapped, IRecord, isNotUndefined } from '@noshiro/ts-utils';
 import type { YmdKey } from '../functions';
 import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../functions';
 

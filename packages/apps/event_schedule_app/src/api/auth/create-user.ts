@@ -1,4 +1,3 @@
-import { Result } from '@noshiro/ts-utils';
 import type { UserCredential } from 'firebase/auth';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../initialize-firebase';

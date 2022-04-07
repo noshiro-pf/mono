@@ -9,8 +9,6 @@ import {
 import type { Observable } from '@noshiro/syncflow';
 import { fromArray } from '@noshiro/syncflow';
 import { useObservableEffect } from '@noshiro/syncflow-react-hooks';
-import type { IMapMapped } from '@noshiro/ts-utils';
-import { IList, ISetMapped } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useReducer } from 'react';
 import type {
   CalendarCurrentPageReducerState,

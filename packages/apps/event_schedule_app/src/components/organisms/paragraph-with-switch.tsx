@@ -1,5 +1,4 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { IList } from '@noshiro/ts-utils';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import { Description } from '../atoms';

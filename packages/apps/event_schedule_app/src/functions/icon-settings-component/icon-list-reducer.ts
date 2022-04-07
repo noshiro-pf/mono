@@ -3,7 +3,6 @@ import type {
   AnswerIconPoint,
   AnswerIconSettings,
 } from '@noshiro/event-schedule-app-shared';
-import { IRecord } from '@noshiro/ts-utils';
 
 export type IconListReducerAction = Readonly<
   | {

@@ -1,7 +1,6 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import type { HoursMinutes } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { IDate, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 

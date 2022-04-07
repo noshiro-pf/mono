@@ -1,5 +1,3 @@
-import { IList, IMap } from '@noshiro/ts-utils';
-
 const pathToken = {
   createPage: 'create',
   answerPage: 'event',

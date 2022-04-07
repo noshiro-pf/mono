@@ -1,5 +1,4 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import { IDate, IList } from '@noshiro/ts-utils';
 
 /**
  * rowsize = 5

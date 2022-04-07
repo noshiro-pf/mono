@@ -3,7 +3,6 @@ import type {
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
 import { compareHm } from '@noshiro/event-schedule-app-shared';
-import { IRecord, pipe } from '@noshiro/ts-utils';
 
 export type TimeRangeReducerAction = Readonly<{
   type: 'end' | 'start';
