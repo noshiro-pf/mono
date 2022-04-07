@@ -1,4 +1,3 @@
-import { IList, match, pipe } from '@noshiro/ts-utils';
 import { produce } from 'immer';
 import type { HistoryState } from '../type';
 import { rollTwoDices } from './roll-dice';
