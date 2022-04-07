@@ -1,4 +1,3 @@
-import { IList } from '@noshiro/ts-utils';
 import { ithBorrowingBalanceInPIER, monthlyPaymentsInPIER } from './financial';
 
 export const calcPrincipalAndInterestEqualPayment = ({
