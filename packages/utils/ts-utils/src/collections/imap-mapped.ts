@@ -51,6 +51,7 @@ interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
   toValuesArray: () => readonly V[];
   toEntriesArray: () => readonly (readonly [K, V])[];
   toArray: () => readonly (readonly [K, V])[];
+  toRawMap: () => ReadonlyMap<KM, V>;
 }
 
 export type IMapMapped<K, V, KM extends RecordKeyType> = Iterable<
@@ -294,5 +295,9 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
 
   toArray(): readonly (readonly [K, V])[] {
     return Array.from(this.entries());
+  }
+
+  toRawMap(): ReadonlyMap<KM, V> {
+    return this._map;
   }
 }

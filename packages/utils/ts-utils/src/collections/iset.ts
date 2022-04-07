@@ -49,6 +49,7 @@ interface ISetInterface<K> {
 
   // Conversion
   toArray: () => readonly K[];
+  toRawSet: () => ReadonlySet<K>;
 }
 
 export type ISet<K> = Iterable<K> & Readonly<ISetInterface<K>>;
@@ -205,6 +206,10 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
 
   toArray(): readonly K[] {
     return Array.from(this.values());
+  }
+
+  toRawSet(): ReadonlySet<K> {
+    return this._set;
   }
 }
 

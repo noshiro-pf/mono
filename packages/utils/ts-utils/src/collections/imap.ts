@@ -51,6 +51,7 @@ interface IMapInterface<K, V> {
   toEntriesArray: () => readonly (readonly [K, V])[];
   toArray: () => readonly (readonly [K, V])[];
   toSet: () => ISet<V>;
+  toRawMap: () => ReadonlyMap<K, V>;
 }
 
 export type IMap<K, V> = Iterable<readonly [K, V]> &
@@ -217,5 +218,9 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
 
   toSet(): ISet<V> {
     return ISet.new(this.values());
+  }
+
+  toRawMap(): ReadonlyMap<K, V> {
+    return this._map;
   }
 }

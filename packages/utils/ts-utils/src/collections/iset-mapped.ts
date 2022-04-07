@@ -47,6 +47,7 @@ interface ISetMappedInterface<K, KM extends RecordKeyType> {
 
   // Conversion
   toArray: () => readonly K[];
+  toRawSet: () => ReadonlySet<KM>;
 }
 
 export type ISetMapped<K, KM extends RecordKeyType> = Iterable<K> &
@@ -276,5 +277,9 @@ class ISetMappedClass<K, KM extends RecordKeyType>
 
   toArray(): readonly K[] {
     return Array.from(this.values());
+  }
+
+  toRawSet(): ReadonlySet<KM> {
+    return this._set;
   }
 }
