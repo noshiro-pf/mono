@@ -54,9 +54,9 @@ export type ReadonlyJSONValue =
     }
   | null;
 
-export type ReadonlyJSONType = Readonly<Record<string, ReadonlyJSONValue>>;
+export type ReadonlyJSONType = ReadonlyRecord<string, ReadonlyJSONValue>;
 
-export type JSONType = Readonly<Record<string, JSONValue>>;
+export type JSONType = ReadonlyRecord<string, JSONValue>;
 
 /* Other Utilities */
 
