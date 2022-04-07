@@ -1,6 +1,5 @@
 import { InputGroup, NumericInput } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { noop } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 export const Main = memoNamed('Main', () => (
