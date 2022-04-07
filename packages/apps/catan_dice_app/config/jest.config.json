@@ -13,5 +13,6 @@
     }
   },
   "testMatch": ["<rootDir>/src/**/*.test.{ts,tsx}"],
-  "testEnvironment": "jsdom"
+  "testEnvironment": "jsdom",
+  "setupFiles": ["@noshiro/global-ts-utils"]
 }
