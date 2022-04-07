@@ -1,5 +1,3 @@
-import { range } from '@noshiro/ts-utils';
-
 export const splitToTokens = (input: string): string[] => {
   let mut_spaceInserted = '';
   for (const i of range(0, input.length)) {

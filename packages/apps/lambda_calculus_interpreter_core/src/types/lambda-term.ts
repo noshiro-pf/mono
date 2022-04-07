@@ -1,4 +1,3 @@
-import { assertNotType, assertType } from '@noshiro/ts-utils';
 import type { Variable } from './variable';
 
 // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members

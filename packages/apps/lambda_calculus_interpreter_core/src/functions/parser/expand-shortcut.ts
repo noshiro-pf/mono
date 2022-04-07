@@ -1,4 +1,3 @@
-import { Num } from '@noshiro/ts-utils';
 import { numberLambdaTerm, PLUStokens, SUCCtokens } from './macro';
 
 export const expandShortcuts = (tokens: readonly string[]): string[] => {
