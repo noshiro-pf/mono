@@ -1,6 +1,5 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { IRecord } from '@noshiro/ts-utils';
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';

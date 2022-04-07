@@ -1,4 +1,3 @@
-import { hasKeyValue, isNonNullObject } from '@noshiro/ts-utils';
 import type { CustomColor } from '../constants';
 import type { CardColor } from './card-color';
 import { isCardColor } from './card-color';

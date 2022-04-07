@@ -1,4 +1,3 @@
-import { IList, pipe } from '@noshiro/ts-utils';
 import type { Card } from '../types';
 
 export const sortCards = <C extends Card>(

@@ -1,4 +1,3 @@
-import { match, pipe } from '@noshiro/ts-utils';
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
 import type { NWES } from '../../types';
 

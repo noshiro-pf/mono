@@ -1,4 +1,3 @@
-import { IList, pipe } from '@noshiro/ts-utils';
 import type { PermutationString } from '@noshiro/ts-utils-additional';
 import { getShuffled } from '@noshiro/ts-utils-additional';
 import type { Card, Room } from '../types';
