@@ -12,7 +12,6 @@ import {
   mapI,
   withInitialValue,
 } from '@noshiro/syncflow';
-import { isNotUndefined } from '@noshiro/ts-utils';
 
 export const useLambdaEval = (
   input$: InitializedObservable<string>
