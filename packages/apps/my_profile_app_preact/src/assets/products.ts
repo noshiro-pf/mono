@@ -122,6 +122,7 @@ export const products: DeepReadonly<{
         '（→ 後にmarkdownファイルも直接bundleするように変更）。',
         'タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）',
         ' → 2021-09-22 に Preact 化した。ルーティングも自作ライブラリに置き換えた。',
+        'Github Actions で main branch 更新時に自動でデプロイするよう設定。',
       ].join(''),
       imageUrl: MyProfileAppImage,
     },

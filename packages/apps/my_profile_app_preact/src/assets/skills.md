@@ -11,6 +11,7 @@
         -   (JavaScript)
         -   HTML
         -   CSS, Sass
+        -   ReScript (ReasonML)
     -   Frameworks
         -   **React**
         -   **Preact**
