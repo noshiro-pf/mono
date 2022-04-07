@@ -6,12 +6,11 @@ import { IDate, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-const formatDate = (date: ReadonlyDate): string =>
+const formatDate = (date: RawDateType): string =>
   `${IDate.toLocaleYMD(date, '-')}  ${IDate.toLocaleHM(date, ':')}`;
 
-// eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
-const parseDate = (str: string): Date => new Date(str);
+const parseDate = (str: string): RawDateType =>
+  pipe(IDate.from(str)).chain(IDate.toDate).value;
 
 const tenYearsLater = pipe(IDate.today())
   .chain(IDate.updateLocaleYear((a) => a + 99))
@@ -44,8 +43,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     ...props
   }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      (dt: ReadonlyDate | null | undefined, isUserChange: boolean) => {
+      (dt: RawDateType | null | undefined, isUserChange: boolean) => {
         if (dt == null) {
           onYmdhmChange(undefined);
           return;
@@ -62,8 +60,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
       [onYmdhmChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    const dateObj = useMemo<ReadonlyDate | undefined>(
+    const dateObj = useMemo<RawDateType | undefined>(
       () =>
         ymdhm === undefined
           ? undefined

@@ -63,19 +63,16 @@ describe('ISet.every', () => {
 describe('ISet.some', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    // eslint-disable-next-line unicorn/prefer-includes
 
     expect(s0).toContain(3);
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
-    // eslint-disable-next-line unicorn/prefer-includes
 
     expect(s0).not.toContain(999);
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
-    // eslint-disable-next-line unicorn/prefer-includes
 
     expect(s0.some(() => true)).toBe(false);
   });

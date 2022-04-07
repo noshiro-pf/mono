@@ -141,8 +141,7 @@ export namespace Str {
    */
   export const replaceWithFn =
     (
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      searchValue: RegExp | string,
+      searchValue: DeepReadonly<RegExp> | string,
       replacer: (substr: string, ...args: readonly never[]) => string
     ) =>
     (str: string): string =>

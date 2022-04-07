@@ -1,8 +1,8 @@
 import { IList, pipe, tp } from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (
-  luminanceList: ReadonlyNonEmptyArray<number>
-): ReadonlyNonEmptyArray<number> => {
+  luminanceList: NonEmptyArray<number>
+): NonEmptyArray<number> => {
   /* +0.05はコントラスト比計算時に足される補正項  */
   const luminanceListCorrected = pipe(luminanceList).chain((list) =>
     IList.map(list, (v: number) => Math.log(v + 0.05))

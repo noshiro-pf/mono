@@ -1,4 +1,4 @@
-import { IList } from '@noshiro/ts-utils';
+import { IList, MutableSet } from '@noshiro/ts-utils';
 import type {
   ChildObservable,
   ObservableId,
@@ -14,7 +14,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
 {
   override readonly type: Type;
   private _procedure: readonly ChildObservable<unknown>[];
-  protected readonly _descendantsIdSet: Set<ObservableId>;
+  protected readonly _descendantsIdSet: MutableSet<ObservableId>;
 
   constructor({
     type,
@@ -31,7 +31,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
     });
     this.type = type;
     this._procedure = [];
-    this._descendantsIdSet = new Set<ObservableId>();
+    this._descendantsIdSet = new MutableSet<ObservableId>();
   }
 
   addDescendant<B>(child: ChildObservable<B>): void {

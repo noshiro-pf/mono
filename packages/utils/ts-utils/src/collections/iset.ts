@@ -1,4 +1,5 @@
 import { assertType } from '../assert-type';
+import { MutableSet, objectIs } from '../others';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface ISetInterface<K> {
@@ -49,9 +50,13 @@ interface ISetInterface<K> {
 
   // Conversion
   toArray: () => readonly K[];
+  toRawSet: () => ReadonlySet<K>;
 }
 
 export type ISet<K> = Iterable<K> & Readonly<ISetInterface<K>>;
+
+// eslint-disable-next-line no-restricted-globals
+const ArrayFrom = Array.from;
 
 export const ISet = {
   new: <K>(iterable: Iterable<K>): ISet<K> => new ISetClass<K>(iterable),
@@ -79,7 +84,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   private readonly _set: ReadonlySet<K>;
 
   constructor(iterable: Iterable<K>) {
-    this._set = new Set(iterable);
+    this._set = new MutableSet(iterable);
   }
 
   get size(): number {
@@ -121,7 +126,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   delete(key: K): ISet<K> {
     if (!this.has(key)) return this;
 
-    return ISet.new(Array.from(this._set).filter((k) => !Object.is(k, key)));
+    return ISet.new(ArrayFrom(this._set).filter((k) => !objectIs(k, key)));
   }
 
   withMutations(
@@ -129,7 +134,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
       { type: 'add'; key: K } | { type: 'delete'; key: K }
     >[]
   ): ISet<K> {
-    const result = new Set<K>(this._set);
+    const result = new MutableSet<K>(this._set);
 
     for (const action of actions) {
       switch (action.type) {
@@ -204,7 +209,11 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   toArray(): readonly K[] {
-    return Array.from(this.values());
+    return ArrayFrom(this.values());
+  }
+
+  toRawSet(): ReadonlySet<K> {
+    return this._set;
   }
 }
 

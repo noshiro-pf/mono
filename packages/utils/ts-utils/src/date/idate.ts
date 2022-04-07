@@ -2,8 +2,7 @@ import { IList } from '../collections';
 import { Num } from '../num';
 
 export type IDate = StrictOmit<
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  ReadonlyDate,
+  RawDateType,
   | 'getDate'
   | 'getDay'
   | 'getFullYear'
@@ -41,10 +40,8 @@ export namespace IDate {
 
   const getValueHelper = (
     date: IDate,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    getFn: (d: ReadonlyDate) => number
-    // eslint-disable-next-line @typescript-eslint/ban-types
-  ): number => getFn(date as ReadonlyDate);
+    getFn: (d: RawDateType) => number
+  ): number => getFn(date as RawDateType);
 
   /** Gets the year, using local time. */
   export const getLocaleYear = (date: IDate): YearEnum =>
@@ -155,13 +152,10 @@ export namespace IDate {
   /* set */
 
   const setValueHelper =
-    (
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      setFn: (date: ReadonlyDate) => void
-    ) =>
+    (setFn: (date: RawDateType) => void) =>
     (curr: IDate): IDate => {
-      // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
-      const copy: ReadonlyDate = new Date(curr as Date);
+      // eslint-disable-next-line no-restricted-globals
+      const copy = new Date(curr as RawDateType);
       setFn(copy);
       return copy;
     };
@@ -353,8 +347,7 @@ export namespace IDate {
     // eslint-disable-next-line no-restricted-globals
   ): IDate => new Date(year, month - 1, date, hours, minutes, seconds, ms);
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  export const from = (value: ReadonlyDate | number | string): IDate =>
+  export const from = (value: RawDateType | number | string): IDate =>
     // eslint-disable-next-line no-restricted-globals
     new Date(value);
 
@@ -381,14 +374,13 @@ export namespace IDate {
   /* convert */
 
   export const toMidnight = (date: IDate): IDate => {
-    // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
-    const midnight = new Date(date as Date);
+    // eslint-disable-next-line no-restricted-globals
+    const midnight = new Date(date as RawDateType);
     midnight.setHours(0, 0, 0, 0);
     return midnight;
   };
 
-  // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
-  export const toDate = (date: IDate): Date => date as Date;
+  export const toDate = (date: IDate): RawDateType => date as RawDateType;
 
   /**
    * ```

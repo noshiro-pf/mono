@@ -26,7 +26,7 @@ export const pickupHighContrastHues = (
 
   /* pickup n hues */
 
-  const mut_result: Hue[] = Array.from(IList.zerosThrow(n));
+  const mut_result: Hue[] = IList.asMut(IList.zerosThrow(n));
 
   let mut_i = 0;
   let mut_y = 0;

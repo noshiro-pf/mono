@@ -1,8 +1,4 @@
-import {
-  isArrayOfLength3OrMore,
-  isArrayOfLength6OrMore,
-  range,
-} from '@noshiro/ts-utils';
+import { IList, range } from '@noshiro/ts-utils';
 import type { LambdaTerm } from '../../types';
 import { isVariable } from '../is-variable';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term';
@@ -23,7 +19,7 @@ export const getParseTree = (
 
   /* (lambda x.e)? */
   if (
-    isArrayOfLength6OrMore(tokens) &&
+    IList.isArrayOfLength6OrMore(tokens) &&
     tokens[0] === '(' &&
     tokens[1] === 'lambda' &&
     isVariable(tokens[2]) &&
@@ -38,7 +34,7 @@ export const getParseTree = (
 
   /* (e e)? */
   if (
-    isArrayOfLength3OrMore(tokens) &&
+    IList.isArrayOfLength3OrMore(tokens) &&
     tokens[0] === '(' &&
     tokens[tokens.length - 1] === ')'
   ) {

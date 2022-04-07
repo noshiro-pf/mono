@@ -6,12 +6,11 @@ import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { Ymdhm } from './types';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-const formatDate = (date: ReadonlyDate): string =>
+const formatDate = (date: RawDateType): string =>
   `${IDate.toLocaleYMD(date, '-')}  ${IDate.toLocaleHM(date, ':')}`;
 
-// eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
-const parseDate = (str: string): Date => new Date(str);
+const parseDate = (str: string): RawDateType =>
+  pipe(IDate.from(str)).chain(IDate.toDate).value;
 
 const tenYearsLater = pipe(IDate.today())
   .chain(IDate.updateLocaleYear((a) => a + 99))
@@ -44,8 +43,8 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     ...props
   }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,@typescript-eslint/ban-types,no-restricted-globals
-      (dt: Date | null | undefined, isUserChange: boolean) => {
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      (dt: RawDateType | null | undefined, isUserChange: boolean) => {
         if (dt == null) {
           onYmdhmChange(undefined);
           return;
@@ -62,15 +61,15 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
       [onYmdhmChange]
     );
 
-    // eslint-disable-next-line @typescript-eslint/ban-types, no-restricted-globals
-    const dateObj = useMemo<Date | undefined>(
+    const dateObj = useMemo<RawDateType | undefined>(
       () =>
         ymdhm === undefined
           ? undefined
-          : // eslint-disable-next-line no-restricted-globals
-            new Date(
-              `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
-            ),
+          : pipe(
+              IDate.from(
+                `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
+              )
+            ).chain(IDate.toDate).value,
       [ymdhm]
     );
 

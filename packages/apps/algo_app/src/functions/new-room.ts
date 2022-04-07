@@ -1,4 +1,4 @@
-import { IList, isArrayOfLength4, pipe } from '@noshiro/ts-utils';
+import { IList, pipe } from '@noshiro/ts-utils';
 import type { PermutationString } from '@noshiro/ts-utils-additional';
 import { getShuffled } from '@noshiro/ts-utils-additional';
 import type { Card, Room } from '../types';
@@ -39,7 +39,7 @@ const randomizePlayerCards = (): DeepReadonly<
     .chain((cards) => IList.partition(cards, 6))
     .chain((cards) => IList.map(cards, sortCards))
     .chain((listOfCards) => {
-      if (!isArrayOfLength4(listOfCards)) {
+      if (!IList.isArrayOfLength4(listOfCards)) {
         throw new Error('listOfCards should be of length 4');
       }
       return listOfCards;

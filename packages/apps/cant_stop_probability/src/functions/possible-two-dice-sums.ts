@@ -1,3 +1,4 @@
+import { ISet } from '@noshiro/ts-utils';
 import type { DiceValue, TwoDiceSumValue } from '../types';
 
 export const possibleTwoDiceSums = (
@@ -5,5 +6,5 @@ export const possibleTwoDiceSums = (
   b: DiceValue,
   c: DiceValue,
   d: DiceValue
-): Set<TwoDiceSumValue> =>
-  new Set([a + b, a + c, a + d, b + c, b + d, c + d] as TwoDiceSumValue[]);
+): ISet<TwoDiceSumValue> =>
+  ISet.new([a + b, a + c, a + d, b + c, b + d, c + d] as TwoDiceSumValue[]);

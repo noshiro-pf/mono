@@ -1,1 +1,1 @@
-export type Count = Readonly<Record<'noLine' | 'oneLine' | 'twoLine', number>>;
+export type Count = ReadonlyRecord<'noLine' | 'oneLine' | 'twoLine', number>;

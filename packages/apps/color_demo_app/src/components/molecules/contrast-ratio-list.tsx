@@ -1,5 +1,5 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { Mappable } from '@noshiro/ts-utils-additional';
+import { IList } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 
 const Root = styled.div`
@@ -7,7 +7,7 @@ const Root = styled.div`
   display: flex;
 `;
 
-type Props = Readonly<{ contrastRatioList: Mappable<number> }>;
+type Props = Readonly<{ contrastRatioList: readonly number[] }>;
 
 export const ContrastRatioList = memoNamed<Props>(
   'ContrastRatioList',
@@ -15,8 +15,7 @@ export const ContrastRatioList = memoNamed<Props>(
     <Root>
       <div>{'隣り合う二色のコントラスト比：'}</div>
       {'['}
-      {props.contrastRatioList.map((r, i) => (
-        // eslint-disable-next-line react/no-array-index-key
+      {IList.map(props.contrastRatioList, (r, i) => (
         <div key={i}>{`${r.toFixed(2)}, `}&nbsp;</div>
       ))}
       {']'}

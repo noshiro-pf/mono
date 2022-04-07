@@ -15,13 +15,12 @@
 
 const localhostRegex =
   /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/u;
-const isLocalhost = Boolean(
+const isLocalhost: boolean =
   window.location.hostname === 'localhost' ||
-    // [::1] is the IPv6 localhost address.
-    window.location.hostname === '[::1]' ||
-    // 127.0.0.1/8 is considered localhost for IPv4.
-    localhostRegex.test(window.location.hostname)
-);
+  // [::1] is the IPv6 localhost address.
+  window.location.hostname === '[::1]' ||
+  // 127.0.0.1/8 is considered localhost for IPv4.
+  localhostRegex.test(window.location.hostname);
 
 type Config = Readonly<{
   onSuccess?: (registration: ServiceWorkerRegistration) => void;

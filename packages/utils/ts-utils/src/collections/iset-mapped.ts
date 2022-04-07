@@ -1,3 +1,5 @@
+import { objectIs } from '../others';
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface ISetMappedInterface<K, KM extends RecordKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
@@ -47,6 +49,7 @@ interface ISetMappedInterface<K, KM extends RecordKeyType> {
 
   // Conversion
   toArray: () => readonly K[];
+  toRawSet: () => ReadonlySet<KM>;
 }
 
 export type ISetMapped<K, KM extends RecordKeyType> = Iterable<K> &
@@ -99,6 +102,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ) {
+    // eslint-disable-next-line no-restricted-globals
     this._set = new Set(Array.from(iterable, toKey));
     this._toKey = toKey;
     this._fromKey = fromKey;
@@ -151,8 +155,9 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     const keyMapped = this._toKey(key);
 
     return ISetMapped.new(
+      // eslint-disable-next-line no-restricted-globals
       Array.from(this._set)
-        .filter((k) => !Object.is(k, keyMapped))
+        .filter((k) => !objectIs(k, keyMapped))
         .map(this._fromKey),
       this._toKey,
       this._fromKey
@@ -164,6 +169,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
       { type: 'add'; key: K } | { type: 'delete'; key: K }
     >[]
   ): ISetMapped<K, KM> {
+    // eslint-disable-next-line no-restricted-globals
     const result = new Set<KM>(this._set);
 
     for (const action of actions) {
@@ -180,6 +186,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     }
 
     return ISetMapped.new<K, KM>(
+      // eslint-disable-next-line no-restricted-globals
       Array.from(result, this._fromKey),
       this._toKey,
       this._fromKey
@@ -275,6 +282,11 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   }
 
   toArray(): readonly K[] {
+    // eslint-disable-next-line no-restricted-globals
     return Array.from(this.values());
+  }
+
+  toRawSet(): ReadonlySet<KM> {
+    return this._set;
   }
 }

@@ -1,10 +1,13 @@
-export type Subscription = Readonly<{
-  unsubscribe: () => void;
-}>;
+import { MutableMap } from '../others';
 
-export type TinyObservable<T> = Readonly<{
-  subscribe: (fn: (value: T) => void) => Subscription;
-}>;
+export type Subscription = {
+  readonly unsubscribe: () => void;
+};
+
+export type TinyObservable<T> = {
+  readonly subscribe: (fn: (value: T) => void) => Subscription;
+};
+
 export type TinyObservableSource<T> = MergeIntersection<
   TinyObservable<T> & { readonly next: (value: T) => void }
 >;
@@ -13,7 +16,7 @@ export const createTinyObservable = <T>(): TinyObservableSource<T> =>
   new TinyObservableClass<T>();
 
 class TinyObservableClass<T> implements TinyObservableSource<T> {
-  private readonly subscriptions = new Map<symbol, (value: T) => void>();
+  private readonly subscriptions = new MutableMap<symbol, (value: T) => void>();
 
   next(value: T): void {
     for (const fn of this.subscriptions.values()) {

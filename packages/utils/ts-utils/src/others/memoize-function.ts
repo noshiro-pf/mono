@@ -1,8 +1,10 @@
+import { MutableMap } from './aliases';
+
 export const memoizeFunction = <A extends unknown[], R, K>(
   fn: (...args: A) => R,
   argsToCacheKey: (...args: A) => K
 ): ((...args: A) => R) => {
-  const cache = new Map<K, R>();
+  const cache = new MutableMap<K, R>();
 
   return (...args: A): R => {
     const key = argsToCacheKey(...args);

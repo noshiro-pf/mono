@@ -1,7 +1,7 @@
 import { assertType } from '../assert-type';
 import { pipe, Result } from '../functional';
 import { Num } from '../num';
-import { tp } from '../others';
+import { MutableMap, MutableSet, tp } from '../others';
 import { IMap } from './imap';
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
@@ -59,12 +59,66 @@ import { IMap } from './imap';
 // }[Depth extends -1 ? 'done' : 'recur'];
 
 export namespace IList {
+  // eslint-disable-next-line no-restricted-globals
+  const ArrayFrom = Array.from;
+
+  export const isArray = (a: unknown): a is readonly unknown[] =>
+    // eslint-disable-next-line no-restricted-globals
+    Array.isArray(a);
+
   export const isEmpty = <T>(list: readonly T[]): list is readonly [] =>
     list.length === 0;
 
-  export const isNonEmpty = <T>(
-    list: readonly T[]
-  ): list is ReadonlyNonEmptyArray<T> => list.length > 0;
+  export const isNonEmpty = <T>(list: readonly T[]): list is NonEmptyArray<T> =>
+    list.length > 0;
+
+  export const isArrayOfLength1 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<1, T> => array.length === 1;
+
+  export const isArrayOfLength2 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<2, T> => array.length === 2;
+
+  export const isArrayOfLength3 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<3, T> => array.length === 3;
+
+  export const isArrayOfLength4 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<4, T> => array.length === 4;
+
+  export const isArrayOfLength5 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<5, T> => array.length === 5;
+
+  export const isArrayOfLength6 = <T>(
+    array: readonly T[]
+  ): array is ArrayOfLength<6, T> => array.length === 6;
+
+  export const isArrayOfLength1OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<1, T> => array.length >= 1;
+
+  export const isArrayOfLength2OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<2, T> => array.length >= 2;
+
+  export const isArrayOfLength3OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<3, T> => array.length >= 3;
+
+  export const isArrayOfLength4OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<4, T> => array.length >= 4;
+
+  export const isArrayOfLength5OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<5, T> => array.length >= 5;
+
+  export const isArrayOfLength6OrMore = <T>(
+    array: readonly T[]
+  ): array is ArrayAtLeastLen<6, T> => array.length >= 6;
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   export const length = <T extends readonly unknown[]>(
@@ -73,10 +127,31 @@ export namespace IList {
 
   export const size = length;
 
+  /**
+   * Creates an array from an iterable object.
+   * @param iterable An iterable object to convert to an array.
+   */
+  export const from: <T>(iterable: ArrayLike<T> | Iterable<T>) => readonly T[] =
+    ArrayFrom;
+
+  export const asMut = <T>(list: readonly T[]): T[] => list as T[];
+
+  /**
+   * Creates an array from an iterable object.
+   * @param iterable An iterable object to convert to an array.
+   * @param mapfn A mapping function to call on every element of the array.
+   * @param thisArg Value of 'this' used to invoke the mapfn.
+   */
+  export const fromMapped: <T, U>(
+    iterable: ArrayLike<T> | Iterable<T>,
+    mapfn: (v: T, k: number) => U
+  ) => readonly U[] = ArrayFrom;
+
   export const zeros = (len: number): Result<readonly 0[], string> =>
     !Num.isUint32(len)
       ? Result.err('len should be uint32')
-      : Result.ok(Array.from<0>({ length: len }).fill(0));
+      : // eslint-disable-next-line functional/immutable-data
+        Result.ok(ArrayFrom<0>({ length: len }).fill(0));
 
   export const zerosThrow = (len: number): readonly 0[] =>
     Result.unwrapThrow(zeros(len));
@@ -135,7 +210,7 @@ export namespace IList {
   export function head<H, L extends readonly unknown[]>(
     list: readonly [H, ...L]
   ): H;
-  export function head<T>(list: ReadonlyNonEmptyArray<T>): T;
+  export function head<T>(list: NonEmptyArray<T>): T;
   export function head<T>(list: readonly T[]): T | undefined;
   export function head<T>(list: readonly T[]): T | undefined {
     return isEmpty(list) ? undefined : list[0];
@@ -147,7 +222,7 @@ export namespace IList {
   export function last<H extends readonly unknown[], L>(
     list: readonly [...H, L]
   ): L;
-  export function last<T>(list: ReadonlyNonEmptyArray<T>): T;
+  export function last<T>(list: NonEmptyArray<T>): T;
   export function last<T>(list: readonly T[]): T | undefined;
   export function last<T>(list: readonly T[]): T | undefined {
     return isEmpty(list) ? undefined : list[list.length - 1];
@@ -297,7 +372,7 @@ export namespace IList {
     index: number,
     newValue: A
   ): readonly A[] => {
-    const mut_temp = Array.from(list);
+    const mut_temp = ArrayFrom(list);
 
     mut_temp.splice(index, 0, newValue);
 
@@ -308,7 +383,8 @@ export namespace IList {
     list: readonly A[],
     index: number
   ): readonly A[] => {
-    const mut_temp = Array.from(list);
+    // eslint-disable-next-line no-restricted-globals
+    const mut_temp = ArrayFrom(list);
 
     mut_temp.splice(index, 1);
 
@@ -345,7 +421,8 @@ export namespace IList {
   export const reverse = <T extends readonly unknown[]>(
     list: T
   ): ListType.Reverse<T> =>
-    Array.from(list).reverse() as readonly unknown[] as ListType.Reverse<T>;
+    // eslint-disable-next-line functional/immutable-data
+    ArrayFrom(list).reverse() as readonly unknown[] as ListType.Reverse<T>;
 
   export function sort<T extends readonly number[]>(
     list: T,
@@ -361,7 +438,8 @@ export namespace IList {
   ): { readonly [K in keyof T]: T[number] } {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
 
-    return Array.from(list).sort(cmp) as readonly unknown[] as {
+    // eslint-disable-next-line functional/immutable-data
+    return ArrayFrom(list).sort(cmp) as readonly unknown[] as {
       readonly [K in keyof T]: T[number];
     };
   }
@@ -567,11 +645,11 @@ export namespace IList {
   export const reduceRight = foldr;
 
   export const scan = <A, B>(
-    list: ReadonlyNonEmptyArray<A> | readonly A[],
+    list: NonEmptyArray<A> | readonly A[],
     reducer: ReducerType<B, A>,
     init: B
-  ): ReadonlyNonEmptyArray<B> => {
-    const mut_result: B[] = Array.from(newArrayThrow<B>(list.length + 1, init));
+  ): NonEmptyArray<B> => {
+    const mut_result: B[] = ArrayFrom(newArrayThrow<B>(list.length + 1, init));
 
     let mut_acc = init;
 
@@ -580,7 +658,7 @@ export namespace IList {
       mut_result[index + 1] = mut_acc;
     }
 
-    return mut_result as readonly B[] as ReadonlyNonEmptyArray<B>;
+    return mut_result as readonly B[] as NonEmptyArray<B>;
   };
 
   export const count = <A>(
@@ -596,7 +674,7 @@ export namespace IList {
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, number> => {
-    const groups = new Map<G, number>();
+    const groups = new MutableMap<G, number>();
 
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
@@ -612,7 +690,7 @@ export namespace IList {
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, readonly T[number][]> => {
-    const mut_groups = new Map<G, T[number][]>();
+    const mut_groups = new MutableMap<G, T[number][]>();
 
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
@@ -634,18 +712,16 @@ export namespace IList {
    * @param list target list
    * @param mapFn perform identity check after mapping by the map function
    */
-  export function uniq<T>(
-    list: ReadonlyNonEmptyArray<T>
-  ): ReadonlyNonEmptyArray<T>;
+  export function uniq<T>(list: NonEmptyArray<T>): NonEmptyArray<T>;
   export function uniq<T>(list: readonly T[]): readonly T[];
   export function uniq<T>(list: readonly T[]): readonly T[] {
-    return Array.from(new Set(list));
+    return ArrayFrom(new MutableSet(list));
   }
 
   export function uniqBy<A, B>(
-    list: ReadonlyNonEmptyArray<A>,
+    list: NonEmptyArray<A>,
     mapFn: (value: A) => B
-  ): ReadonlyNonEmptyArray<A>;
+  ): NonEmptyArray<A>;
   export function uniqBy<A, B>(
     list: readonly A[],
     mapFn: (value: A) => B
@@ -654,7 +730,7 @@ export namespace IList {
     list: readonly A[],
     mapFn: (value: A) => B
   ): readonly A[] {
-    const mappedValues = new Set();
+    const mappedValues = new MutableSet();
 
     return list.filter((val) => {
       const mappedValue = mapFn(val);

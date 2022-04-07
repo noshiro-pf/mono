@@ -7,7 +7,7 @@ export const getLuminanceListAccumulated = (
   if (!IList.isNonEmpty(luminanceList)) return [];
 
   /* +0.05はコントラスト比計算時に足される補正項  */
-  const luminanceListCorrected: ReadonlyNonEmptyArray<number> = pipe(
+  const luminanceListCorrected: NonEmptyArray<number> = pipe(
     luminanceList
   ).chain((list) =>
     IList.map(list, (v: number) => (useLog ? Math.log(v + 0.05) : v + 0.05))

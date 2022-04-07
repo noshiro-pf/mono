@@ -1,4 +1,4 @@
-import { IList, Maybe, noop } from '@noshiro/ts-utils';
+import { IList, Maybe, MutableMap, noop } from '@noshiro/ts-utils';
 import type {
   ChildObservable,
   InitializedObservable,
@@ -29,7 +29,7 @@ export class ObservableBaseClass<
   readonly type;
   readonly depth: Depth;
   private _children: readonly ChildObservable<unknown>[];
-  private readonly _subscribers: Map<SubscriberId, Subscriber<A>>;
+  private readonly _subscribers: MutableMap<SubscriberId, Subscriber<A>>;
   private _currentValue: ObservableBase<A>['currentValue'];
   private _isCompleted: ObservableBase<A>['isCompleted'];
   private _token: ObservableBase<A>['token'];
@@ -51,7 +51,7 @@ export class ObservableBaseClass<
     this.id = issueObservableId();
     this._currentValue = currentValueInit;
     this._children = [];
-    this._subscribers = new Map<SubscriberId, Subscriber<A>>();
+    this._subscribers = new MutableMap<SubscriberId, Subscriber<A>>();
     this._isCompleted = false;
     this._token = issueToken();
   }

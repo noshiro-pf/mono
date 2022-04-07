@@ -69,7 +69,6 @@ const genYmdRangeList = (
     date: n as DateEnum,
   }));
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): IDate =>
   // eslint-disable-next-line no-restricted-globals
   new Date(year, month - 1, 1);

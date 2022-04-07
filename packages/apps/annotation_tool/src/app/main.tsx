@@ -52,17 +52,16 @@ const hues = pickupHighContrastHues(
   lightnessDarker
 ) as ArrayOfLength<LabelLen, Hue>;
 
-const labels: ReadonlyNonEmptyArray<Label> = pipe(
-  IList.zip(hues, labelNames)
-).chain((list) =>
-  IList.map(
-    list,
-    ([hue, labelName]: readonly [Hue, string], index): Label => ({
-      id: index.toString(),
-      hue,
-      name: labelName,
-    })
-  )
+const labels: NonEmptyArray<Label> = pipe(IList.zip(hues, labelNames)).chain(
+  (list) =>
+    IList.map(
+      list,
+      ([hue, labelName]: readonly [Hue, string], index): Label => ({
+        id: index.toString(),
+        hue,
+        name: labelName,
+      })
+    )
 ).value;
 
 const labelInit: Label = labels[0];
