@@ -4,8 +4,6 @@ import type {
   DatetimeSpecificationEnumType,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import { useCallback } from 'react';
 import { dict } from '../../../../constants';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 

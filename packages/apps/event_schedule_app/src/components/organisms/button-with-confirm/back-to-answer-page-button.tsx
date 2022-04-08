@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 

@@ -1,8 +1,5 @@
 import { Button } from '@blueprintjs/core';
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import type { CSSProperties } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useAnswerTableHooks } from '../../../hooks';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';

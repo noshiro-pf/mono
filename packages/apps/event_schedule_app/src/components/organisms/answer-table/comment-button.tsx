@@ -1,7 +1,5 @@
 // eslint-disable-next-line import/no-deprecated
 import { Button, Popover } from '@blueprintjs/core';
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 

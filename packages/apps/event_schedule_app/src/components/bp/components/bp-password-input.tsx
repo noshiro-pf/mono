@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Button } from '@blueprintjs/core';
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import type { BpInputProps } from './bp-input';
 import { BpInput } from './bp-input';
 

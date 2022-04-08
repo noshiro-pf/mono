@@ -3,8 +3,6 @@ import type {
   HoursMinutes,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { BpTimePicker } from '../bp';
 
 type Props = Readonly<{

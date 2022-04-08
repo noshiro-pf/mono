@@ -1,5 +1,4 @@
 import { Icon } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 
 const iconSize = 12;
 

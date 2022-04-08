@@ -4,8 +4,6 @@ import type {
   EventSchedule,
   UserName,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useAnswerBeingEditedHooks } from '../../../hooks';
 import { useUser } from '../../../store';

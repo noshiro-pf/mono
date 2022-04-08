@@ -1,6 +1,3 @@
-import type { InitializedObservable } from '@noshiro/syncflow';
-import { distinctUntilChangedI, filter, mapI } from '@noshiro/syncflow';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { createRouter } from '@noshiro/tiny-router-observable';
 import { getEventIdFromPathname, isRoute, redirectRules } from '../constants';
 

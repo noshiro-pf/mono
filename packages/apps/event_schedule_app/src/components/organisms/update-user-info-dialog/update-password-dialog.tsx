@@ -1,10 +1,5 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { User } from 'firebase/auth';
-import type { CSSProperties } from 'react';
-import { useCallback } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { UpdatePasswordPage, UpdateUserInfoDialogState } from '../../../store';
 import { Label } from '../../atoms';

@@ -6,10 +6,7 @@ import {
   compareYmd,
   yearMonthDateDefaultValue,
 } from '@noshiro/event-schedule-app-shared';
-import type { Observable } from '@noshiro/syncflow';
 import { fromArray } from '@noshiro/syncflow';
-import { useObservableEffect } from '@noshiro/syncflow-react-hooks';
-import { useCallback, useMemo, useReducer } from 'react';
 import type {
   CalendarCurrentPageReducerState,
   SelectedDatesReducerAction,

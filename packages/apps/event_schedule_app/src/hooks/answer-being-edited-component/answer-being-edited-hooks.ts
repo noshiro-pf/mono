@@ -7,7 +7,6 @@ import type {
   UserName,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import { useCallback, useMemo } from 'react';
 import type {
   AnswerSelectionReducerAction,
   DatetimeRangeMapKey,

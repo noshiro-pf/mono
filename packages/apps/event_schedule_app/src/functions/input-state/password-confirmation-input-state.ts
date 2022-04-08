@@ -1,4 +1,3 @@
-import type { Reducer } from 'react';
 import { dict } from '../../constants';
 
 export type PasswordWithConfirmationState = DeepReadonly<{

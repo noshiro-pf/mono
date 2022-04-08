@@ -1,5 +1,4 @@
 import type { IconName, Intent } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import { AlertWithMaxWidth } from '../../bp';
 
 type Props = Readonly<{

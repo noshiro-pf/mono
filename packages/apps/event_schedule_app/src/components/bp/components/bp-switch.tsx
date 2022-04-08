@@ -1,7 +1,5 @@
 import { Switch } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import type { ComponentProps } from 'react';
-import { useCallback } from 'react';
 
 type SwitchPropsOriginal = ComponentProps<typeof Switch>;
 

@@ -1,7 +1,5 @@
 import { Button, Classes, FormGroup } from '@blueprintjs/core';
-import { memoNamed, useKeyEventListener } from '@noshiro/react-utils';
-import { useCallback } from 'react';
-import styled from 'styled-components';
+import { useKeyEventListener } from '@noshiro/react-utils';
 import { dict } from '../../../constants';
 import { useConfirmEmailDialogState } from '../../../hooks';
 import { BpInput, DialogWithMaxWidth } from '../../bp';

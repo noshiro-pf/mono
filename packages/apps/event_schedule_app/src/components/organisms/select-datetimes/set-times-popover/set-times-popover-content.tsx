@@ -4,9 +4,6 @@ import type {
   HoursMinutes,
   TimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, useReducer } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../../../constants';
 import { timeRangeReducer } from '../../../../functions';
 import { TimeRangeView } from '../../../molecules';

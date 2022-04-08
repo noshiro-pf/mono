@@ -9,9 +9,7 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useState } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import { useCallback, useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import {
   initialAnswerDeadline,
   initialNotificationSettings,

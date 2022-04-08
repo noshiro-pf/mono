@@ -1,5 +1,4 @@
 import { AnchorButton, NonIdealState } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { dict, routes } from '../../constants';
 import { router } from '../../store';

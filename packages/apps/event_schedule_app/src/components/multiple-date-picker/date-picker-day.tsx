@@ -4,8 +4,6 @@ import type {
   DayType,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import { useMemo } from 'react';
 import {
   DatePickerDayHolidayStyled,
   DatePickerDayOutlinedSelectedReadonlyHolidayStyled,

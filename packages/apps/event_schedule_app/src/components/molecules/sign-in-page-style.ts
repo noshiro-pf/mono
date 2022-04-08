@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import styled from 'styled-components';
 
 export namespace SignInStyled {
   export const Wrapper = styled.div`

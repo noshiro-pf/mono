@@ -2,8 +2,6 @@ import type {
   DayType,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import { useMemo } from 'react';
 import { DatePickerWeekStyled } from '../bp';
 import { DatePickerDate } from './date-picker-day';
 

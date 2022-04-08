@@ -1,5 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-
 /**
  * @link https://developers.google.com/identity/branding-guidelines?hl=ja
  */

@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 // 3px space between small button and regular input
 
 // 5px space between regular button and large input

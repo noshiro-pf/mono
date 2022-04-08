@@ -1,13 +1,5 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { ymdFromDate } from '@noshiro/event-schedule-app-shared';
-import type { InitializedObservable } from '@noshiro/syncflow';
-import {
-  filter,
-  fromPromise,
-  map,
-  unwrapResultOk,
-  withInitialValue,
-} from '@noshiro/syncflow';
 import type { YmdKey } from '../functions';
 import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../functions';
 

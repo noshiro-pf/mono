@@ -1,13 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { memoNamed } from '@noshiro/react-utils';
+
 import type {
   ChangeEventHandler,
   DetailedHTMLProps,
   FocusEventHandler,
   InputHTMLAttributes,
 } from 'react';
-import { useCallback, useRef } from 'react';
-import styled, { css } from 'styled-components';
+import { useRef } from 'react';
+import { css } from 'styled-components';
 
 type Props = Partial<
   Readonly<{

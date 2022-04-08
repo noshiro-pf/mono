@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { memoNamed } from '@noshiro/react-utils';
+
 import { daysOfWeekList } from '@noshiro/ts-utils-additional';
-import { useMemo } from 'react';
-import styled from 'styled-components';
 import {
   DatePickerWeekdayReadonlyStyled,
   DatePickerWeekdaysRowStyled,

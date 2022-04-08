@@ -1,4 +1,3 @@
-import type { Reducer } from 'react';
 import type { InputState } from '../input-state';
 import {
   inputHasError,

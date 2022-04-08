@@ -3,8 +3,6 @@ import type {
   AnswerIconPoint,
   AnswerIconSetting,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { CustomIcon } from '../../atoms';
 import { BpInput } from '../../bp';
 import {

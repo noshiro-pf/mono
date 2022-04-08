@@ -1,6 +1,4 @@
 import { Button, Spinner } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import { refreshAnswers, setYearMonth$ } from '../../../store';
