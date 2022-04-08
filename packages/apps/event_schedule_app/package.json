@@ -71,6 +71,11 @@
     "url-regex": "^5.0.0"
   },
   "devDependencies": {
+    "@noshiro/global-react": "*",
+    "@noshiro/global-react-utils": "*",
+    "@noshiro/global-styled-components": "*",
+    "@noshiro/global-syncflow": "*",
+    "@noshiro/global-syncflow-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }

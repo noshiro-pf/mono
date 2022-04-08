@@ -14,5 +14,11 @@
   },
   "testMatch": ["<rootDir>/src/**/*.test.{ts,tsx}"],
   "testEnvironment": "jsdom",
-  "setupFiles": ["@noshiro/global-ts-utils"]
+  "setupFiles": [
+    "@noshiro/global-ts-utils",
+    "@noshiro/global-react-utils",
+    "@noshiro/global-syncflow-react-hooks",
+    "@noshiro/global-react",
+    "@noshiro/global-styled-components"
+  ]
 }
