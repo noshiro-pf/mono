@@ -1,4 +1,3 @@
-import { IList } from '@noshiro/ts-utils';
 import type {
   LambdaAbstraction,
   LambdaApplication,

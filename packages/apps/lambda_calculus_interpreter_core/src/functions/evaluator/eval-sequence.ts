@@ -1,4 +1,3 @@
-import { range } from '@noshiro/ts-utils';
 import { MAX_STEPS } from '../../constants';
 import type { LambdaTerm } from '../../types';
 import { isLambdaTerm } from '../is-lambda-term';

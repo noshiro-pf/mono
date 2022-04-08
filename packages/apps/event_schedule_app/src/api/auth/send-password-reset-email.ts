@@ -1,4 +1,3 @@
-import { Result } from '@noshiro/ts-utils';
 import { sendPasswordResetEmail as _sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../initialize-firebase';
 import { assertIsCredentialError } from '../../types';

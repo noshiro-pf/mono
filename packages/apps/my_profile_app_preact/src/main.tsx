@@ -1,7 +1,6 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
 import { push, redirect, usePathname } from '@noshiro/tiny-router-preact-hooks';
-import { IList, match } from '@noshiro/ts-utils';
 import Markdown from 'preact-markdown';
 import { useEffect, useMemo } from 'preact/hooks';
 import { Profile2Md, ProfileMd, SkillsMd } from './assets';

@@ -1,7 +1,6 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import { IList } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import { viewTexts } from '../../constants';

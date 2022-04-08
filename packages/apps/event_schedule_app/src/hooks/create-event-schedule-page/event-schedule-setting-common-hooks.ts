@@ -11,8 +11,6 @@ import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useState } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import type { IMapMapped } from '@noshiro/ts-utils';
-import { IList } from '@noshiro/ts-utils';
 import { useCallback, useMemo, useRef } from 'react';
 import {
   initialAnswerDeadline,

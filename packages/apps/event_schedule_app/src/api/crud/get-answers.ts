@@ -4,7 +4,6 @@ import {
   fillAnswer,
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
-import { Result, Str } from '@noshiro/ts-utils';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 

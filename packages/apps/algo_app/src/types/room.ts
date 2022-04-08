@@ -1,11 +1,3 @@
-import {
-  assertType,
-  hasKeyValue,
-  IList,
-  isNonNullObject,
-  isString,
-  isUndefined,
-} from '@noshiro/ts-utils';
 import type { PermutationString } from '@noshiro/ts-utils-additional';
 import type { Card } from './card-type';
 import { isCard } from './card-type';

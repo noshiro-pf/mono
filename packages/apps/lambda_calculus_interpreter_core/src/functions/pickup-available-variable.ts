@@ -1,4 +1,3 @@
-import { IList } from '@noshiro/ts-utils';
 import { ALPHABETS } from '../constants';
 import type { Variable } from '../types';
 

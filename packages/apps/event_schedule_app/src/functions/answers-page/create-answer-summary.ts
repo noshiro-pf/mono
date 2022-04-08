@@ -5,8 +5,6 @@ import type {
   DatetimeRange,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import type { IMap } from '@noshiro/ts-utils';
-import { IList, IMapMapped, pipe, tp } from '@noshiro/ts-utils';
 import { answerIconPointConfig } from '../../constants';
 import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';

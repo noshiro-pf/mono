@@ -5,7 +5,6 @@ import type {
   AnswerId,
   DatetimeRange,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped, tp } from '@noshiro/ts-utils';
 import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
 

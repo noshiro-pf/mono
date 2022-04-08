@@ -3,13 +3,6 @@ import type {
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import {
-  assertType,
-  IList,
-  IRecord,
-  ISetMapped,
-  match,
-} from '@noshiro/ts-utils';
 import { dict } from '../constants';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from './map-key';
 import { hm2str, ymd2str, ymdhm2str } from './ymdhm2str';

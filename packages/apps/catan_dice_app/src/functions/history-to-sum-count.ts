@@ -1,4 +1,3 @@
-import { IList } from '@noshiro/ts-utils';
 import type { HistoryState } from '../type';
 
 export const historyToSumCount = (

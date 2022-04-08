@@ -1,7 +1,6 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import { noop } from '@noshiro/ts-utils';
 import type { User } from 'firebase/auth';
 import type { CSSProperties } from 'react';
 import { useCallback } from 'react';

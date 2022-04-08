@@ -1,5 +1,4 @@
 import { memoNamed } from '@noshiro/react-utils';
-import { noop } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { InputGroupView } from './components/input-group-view';
 import { NumericInputView } from './components/numeric-input-view';

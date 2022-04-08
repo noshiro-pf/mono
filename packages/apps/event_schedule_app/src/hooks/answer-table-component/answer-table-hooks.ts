@@ -4,8 +4,6 @@ import type {
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { useState } from '@noshiro/react-utils';
-import type { IMapMapped } from '@noshiro/ts-utils';
-import { IList, mapNullable, match, pipe } from '@noshiro/ts-utils';
 import type { CSSProperties } from 'react';
 import { useCallback, useMemo } from 'react';
 import { answerTableColor } from '../../constants';

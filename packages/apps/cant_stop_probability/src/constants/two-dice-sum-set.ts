@@ -1,4 +1,3 @@
-import { ISet } from '@noshiro/ts-utils';
 import type { TwoDiceSumValue } from '../types';
 
 export const twoDiceSumSet = (): ISet<TwoDiceSumValue> =>

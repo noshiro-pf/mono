@@ -1,4 +1,3 @@
-import { IList } from '@noshiro/ts-utils';
 import type { Hue, Percent } from '@noshiro/ts-utils-additional';
 import { hslToRgb, relativeLuminance } from '@noshiro/ts-utils-additional';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';

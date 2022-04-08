@@ -46,6 +46,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.2.1",
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
     "@noshiro/syncflow-react-hooks": "*",

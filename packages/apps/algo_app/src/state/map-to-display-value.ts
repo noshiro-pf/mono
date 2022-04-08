@@ -1,4 +1,3 @@
-import { IList, match, noop, pipe } from '@noshiro/ts-utils';
 import { directions, outlineColorDef, text } from '../constants';
 import {
   cardEq,

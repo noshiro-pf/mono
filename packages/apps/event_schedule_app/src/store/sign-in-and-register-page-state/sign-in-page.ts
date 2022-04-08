@@ -6,7 +6,6 @@ import {
   createReducer,
   mapI,
 } from '@noshiro/syncflow';
-import { Result } from '@noshiro/ts-utils';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
 import {

@@ -3,7 +3,6 @@ import type {
   AnswerIconSettings,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { noop } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../../constants';

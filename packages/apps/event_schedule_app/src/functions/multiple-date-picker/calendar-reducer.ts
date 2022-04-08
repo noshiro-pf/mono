@@ -1,5 +1,3 @@
-import { IDate } from '@noshiro/ts-utils';
-
 export type CalendarCurrentPageReducerState = Readonly<{
   year: YearEnum;
   month: MonthEnum;

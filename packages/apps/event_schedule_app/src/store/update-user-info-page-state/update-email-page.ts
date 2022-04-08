@@ -7,7 +7,6 @@ import {
   mapI,
   withLatestFromI,
 } from '@noshiro/syncflow';
-import { Result } from '@noshiro/ts-utils';
 import type { AuthCredential, User } from 'firebase/auth';
 import { EmailAuthProvider } from 'firebase/auth';
 import { api } from '../../api';

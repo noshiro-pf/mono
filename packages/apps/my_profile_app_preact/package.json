@@ -45,6 +45,7 @@
     ]
   },
   "dependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/goober": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/resize-observer-preact-hooks": "*",

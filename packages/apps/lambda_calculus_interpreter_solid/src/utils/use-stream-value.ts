@@ -1,6 +1,5 @@
 import type { InitializedObservable, Observable } from '@noshiro/syncflow';
 import { source, withInitialValue } from '@noshiro/syncflow';
-import { Maybe } from '@noshiro/ts-utils';
 import { createSignal, onCleanup } from 'solid-js';
 
 export function useObservableValue<A, B = A>(

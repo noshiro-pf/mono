@@ -1,6 +1,5 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import { match } from '@noshiro/ts-utils';
 import type { Rect } from '@noshiro/ts-utils-additional';
 import { createElement, Fragment } from 'preact';
 import { useEffect, useMemo, useRef } from 'preact/hooks';

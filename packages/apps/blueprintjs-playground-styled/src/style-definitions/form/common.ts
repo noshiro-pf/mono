@@ -1,4 +1,3 @@
-import { IRecord } from '@noshiro/ts-utils';
 import { css } from 'styled-components';
 import { buttonColorDisabled } from '../button';
 import {

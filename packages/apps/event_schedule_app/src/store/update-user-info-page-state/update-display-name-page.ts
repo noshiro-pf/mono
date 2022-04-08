@@ -6,7 +6,6 @@ import {
   mapI,
   withLatestFromI,
 } from '@noshiro/syncflow';
-import { Result } from '@noshiro/ts-utils';
 import type { User } from 'firebase/auth';
 import { api } from '../../api';
 import { dict } from '../../constants';

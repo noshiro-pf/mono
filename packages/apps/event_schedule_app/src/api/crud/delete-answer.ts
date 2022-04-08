@@ -1,6 +1,5 @@
 import type { Answer } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { Result, Str } from '@noshiro/ts-utils';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 

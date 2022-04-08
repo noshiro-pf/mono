@@ -1,5 +1,3 @@
-import { hasKeyValue, isNonNullObject, isString, Str } from '@noshiro/ts-utils';
-
 export const assertIsCredentialError: (
   e: unknown
 ) => asserts e is { code: string; message: string } = (e) => {

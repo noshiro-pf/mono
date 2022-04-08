@@ -1,5 +1,8 @@
 'use strict';
 
+const { ProvidePlugin } = require('webpack');
+const { providePluginTsUtilsDef } = require('@noshiro/global-ts-utils');
+
 // @ts-check
 
 const {
@@ -14,7 +17,8 @@ const webpackConfigMerged = webpackConfigReactDevMaker(
   paths,
   dotenvValues.HOST ?? 'localhost',
   Number(dotenvValues.PORT ?? 8080),
-  'bundle.js'
+  'bundle.js',
+  [new ProvidePlugin(providePluginTsUtilsDef)]
 );
 
 module.exports = webpackConfigMerged;

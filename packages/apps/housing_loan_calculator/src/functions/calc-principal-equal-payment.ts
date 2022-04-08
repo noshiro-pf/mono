@@ -1,5 +1,3 @@
-import { IList } from '@noshiro/ts-utils';
-
 export const calcPrincipalEqualPayment = ({
   borrowingPeriodMonth: numPayments,
   borrowingTotalYen: borrowingTotal,

@@ -4,7 +4,6 @@ import type {
   AnswerIconSetting,
 } from '@noshiro/event-schedule-app-shared';
 import { memoNamed } from '@noshiro/react-utils';
-import { match } from '@noshiro/ts-utils';
 import styled from 'styled-components';
 import { CustomIcon } from '../../atoms';
 import { BpInput } from '../../bp';

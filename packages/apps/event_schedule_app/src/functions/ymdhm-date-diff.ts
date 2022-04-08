@@ -1,6 +1,5 @@
 import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
 import { ymdhm2Date } from '@noshiro/event-schedule-app-shared';
-import { IDate, pipe } from '@noshiro/ts-utils';
 
 export const ymdhmDateDiff = (a: Ymdhm, b: Ymdhm): number => {
   const diff =

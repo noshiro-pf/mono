@@ -1,6 +1,5 @@
 import { Button, Classes, FormGroup } from '@blueprintjs/core';
 import { memoNamed, useKeyEventListener } from '@noshiro/react-utils';
-import { noop } from '@noshiro/ts-utils';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import { dict } from '../../../constants';

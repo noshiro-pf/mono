@@ -1,5 +1,4 @@
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
-import { IDate, idfn, pipe } from '@noshiro/ts-utils';
 
 const createDate = (modifier: (d: IDate) => IDate): RawDateType =>
   pipe(IDate.today())

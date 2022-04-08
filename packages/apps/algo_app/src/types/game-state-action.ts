@@ -1,9 +1,3 @@
-import {
-  assertType,
-  hasKeyValue,
-  IList,
-  isNonNullObject,
-} from '@noshiro/ts-utils';
 import { FieldValue } from 'firebase/firestore';
 import type { Card } from './card-type';
 import { isCard } from './card-type';

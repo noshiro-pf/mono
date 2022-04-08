@@ -1,4 +1,3 @@
-import { IList, Num } from '@noshiro/ts-utils';
 import type { Hsl, Hue, Percent } from '@noshiro/ts-utils-additional';
 import {
   hslToRgb,

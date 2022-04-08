@@ -7,7 +7,6 @@ import type {
   UserName,
   Weight,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped, IRecord } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import type {
   AnswerSelectionReducerAction,

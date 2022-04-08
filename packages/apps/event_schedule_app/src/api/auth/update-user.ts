@@ -1,4 +1,3 @@
-import { castWritable, Result } from '@noshiro/ts-utils';
 import type { AuthCredential, User, UserCredential } from 'firebase/auth';
 import {
   deleteUser as _deleteUser,

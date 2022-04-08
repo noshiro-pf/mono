@@ -1,4 +1,3 @@
-import { Num } from '@noshiro/ts-utils';
 import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
 import type { Application } from 'pixi.js';
 import type { CanvasAppState, CanvasAppStateHandler } from '../state';
