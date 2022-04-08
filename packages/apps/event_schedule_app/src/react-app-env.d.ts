@@ -5,6 +5,13 @@
 /// <reference path="../../../utils/stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../../utils/ts-type-utils/ts-type-utils.d.ts" />
 /// <reference path="../../../utils/global-ts-utils/esm/globals-decl.d.ts" />
+/// <reference path="../../../utils/global-react-utils/esm/globals-decl.d.ts" />
+/// <reference path="../../../utils/global-syncflow/esm/globals-decl.d.ts" />
+/// <reference path="../../../utils/global-syncflow-react-hooks/esm/globals-decl.d.ts" />
+/// <reference path="../../../utils/global-react/esm/globals-decl.d.ts" />
+/// <reference path="../../../utils/global-styled-components/esm/globals-decl.d.ts" />
+
+
 
 /// <reference types="node" />
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
