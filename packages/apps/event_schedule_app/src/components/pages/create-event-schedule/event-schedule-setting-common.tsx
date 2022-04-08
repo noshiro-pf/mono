@@ -1,7 +1,5 @@
 import { Button } from '@blueprintjs/core';
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict } from '../../../constants';
 import { useEventScheduleSettingCommonHooks } from '../../../hooks';
 import { Section } from '../../molecules';

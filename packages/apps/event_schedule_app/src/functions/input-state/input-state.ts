@@ -1,5 +1,3 @@
-import type { Reducer } from 'react';
-
 export type InputState = DeepReadonly<{
   inputValue: string;
   error: string | undefined;

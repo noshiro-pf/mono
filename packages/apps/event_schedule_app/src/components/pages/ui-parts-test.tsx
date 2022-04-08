@@ -1,8 +1,5 @@
 import type { HTMLSelectProps } from '@blueprintjs/core';
 import { Button, TextArea } from '@blueprintjs/core';
-import { memoNamed, useBoolState, useState } from '@noshiro/react-utils';
-import type { CSSProperties } from 'react';
-import styled from 'styled-components';
 import { clog } from '../../utils';
 import {
   CalendarIcon,

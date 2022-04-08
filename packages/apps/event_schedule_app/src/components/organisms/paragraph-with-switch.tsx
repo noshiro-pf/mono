@@ -1,6 +1,4 @@
-import { memoNamed } from '@noshiro/react-utils';
 import type { ReactNode } from 'react';
-import styled from 'styled-components';
 import { Description } from '../atoms';
 import { SwitchWithoutLabelStyled } from '../bp';
 

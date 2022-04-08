@@ -6,9 +6,6 @@ import {
   // eslint-disable-next-line import/no-deprecated
   Tooltip,
 } from '@blueprintjs/core';
-import { memoNamed, useState } from '@noshiro/react-utils';
-import { useCallback, useEffect } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../constants';
 import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';

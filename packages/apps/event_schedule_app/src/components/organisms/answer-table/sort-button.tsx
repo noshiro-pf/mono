@@ -1,7 +1,5 @@
 // eslint-disable-next-line import/no-deprecated
 import { Button, ButtonGroup, Popover } from '@blueprintjs/core';
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import { useCallback } from 'react';
 import { dict } from '../../../constants';
 
 type Props = Readonly<{

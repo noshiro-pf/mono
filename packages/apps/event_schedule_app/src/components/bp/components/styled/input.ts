@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import { ptInput, ptInputHeightPx, ptInputPlaceholder } from '../../constants';
 
 const InputStyled = styled.input`

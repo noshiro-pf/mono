@@ -1,4 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
 import urlRegex from 'url-regex';
 import { splitStringByWhitespace } from '../../utils';
 

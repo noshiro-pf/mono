@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 export const SingleButtonWrapper = styled.div`
   margin: 5px;
 `;

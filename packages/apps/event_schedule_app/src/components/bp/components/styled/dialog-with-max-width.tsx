@@ -1,5 +1,4 @@
 import { Alert, Dialog } from '@blueprintjs/core';
-import styled from 'styled-components';
 
 export const DialogWithMaxWidth = styled(Dialog)`
   width: unset;

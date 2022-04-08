@@ -1,5 +1,3 @@
-import { createState } from '@noshiro/syncflow';
-
 export namespace UpdateUserInfoDialogState {
   const { state$: _openingDialog$, setState: setOpeningDialog } = createState<
     | 'deleteAccount'

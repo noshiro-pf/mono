@@ -1,12 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import type { InitializedObservable } from '@noshiro/syncflow';
-import {
-  combineLatestI,
-  createBooleanState,
-  createReducer,
-  mapI,
-  withLatestFromI,
-} from '@noshiro/syncflow';
 import type { AuthCredential, User } from 'firebase/auth';
 import { EmailAuthProvider } from 'firebase/auth';
 import { api } from '../../api';

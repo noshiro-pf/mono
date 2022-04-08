@@ -1,5 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { defaultIconPoint } from '../../../constants';
 
 const s = defaultIconPoint.poor.toString();

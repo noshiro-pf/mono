@@ -1,4 +1,3 @@
-import type { Reducer } from 'react';
 import type { EmailInputState } from '../input-state';
 import {
   emailInputHasError,

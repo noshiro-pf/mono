@@ -1,5 +1,4 @@
 import { isEmailString } from '@noshiro/ts-utils-additional';
-import type { Reducer } from 'react';
 
 export type ConfirmEmailDialogState = DeepReadonly<{
   showErrorOf: {

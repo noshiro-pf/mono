@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 export const DatePickerStyled = styled.div`
   background: #ffffff;
   border-radius: 3px;

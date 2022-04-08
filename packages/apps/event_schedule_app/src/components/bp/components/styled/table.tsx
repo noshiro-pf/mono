@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import styled from 'styled-components';
 import {
   centeredTextPaddingPx,
   ptDividerBlack,

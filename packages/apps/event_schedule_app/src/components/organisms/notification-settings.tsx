@@ -3,10 +3,7 @@ import type {
   NotificationSettings,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
-import { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../constants';
 import { now, ymdhmDateDiff } from '../../functions';
 import { BpCheckbox, BpInput } from '../bp';

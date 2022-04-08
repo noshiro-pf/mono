@@ -3,19 +3,6 @@ import type {
   EventSchedule,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
-import type { InitializedObservable, Observable } from '@noshiro/syncflow';
-import {
-  combineLatest,
-  createState,
-  createVoidEventEmitter,
-  distinctUntilChangedI,
-  filter,
-  map,
-  mapI,
-  throttleTime,
-  unwrapResultOk,
-  withInitialValue,
-} from '@noshiro/syncflow';
 import { api } from '../api';
 import { fetchThrottleTime } from '../constants';
 import type { CalendarCurrentPageReducerState } from '../functions';

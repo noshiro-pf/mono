@@ -1,8 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import { useCallback } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../constants';
 import { ResetPasswordPageStore, router } from '../../store';
 import { Label } from '../atoms';

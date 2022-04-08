@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import { newRenderLayer, ptBorderRadiusPx } from '../../constants';
 
 export const ControlGroupStyled = styled.div`

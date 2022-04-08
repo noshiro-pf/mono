@@ -1,11 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import type { InitializedObservable } from '@noshiro/syncflow';
-import {
-  combineLatestI,
-  createBooleanState,
-  createReducer,
-  mapI,
-} from '@noshiro/syncflow';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
 import {

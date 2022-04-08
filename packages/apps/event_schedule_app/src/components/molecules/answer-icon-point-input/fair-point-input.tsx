@@ -1,6 +1,4 @@
 import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
-import { memoNamed, useState } from '@noshiro/react-utils';
-import { useCallback, useEffect, useMemo } from 'react';
 import { answerIconPointConfig, defaultIconPoint } from '../../../constants';
 import { clampAndRoundAnswerFairIconPoint } from '../../../functions';
 import { NumericInputView } from '../../bp';

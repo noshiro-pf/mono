@@ -6,10 +6,8 @@ import type {
 } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { useAlive, useBoolState, useState } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
 import type { YmdKey } from '../../functions';

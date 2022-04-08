@@ -1,5 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import {
   AnswerPage,
   CreateEventSchedule,

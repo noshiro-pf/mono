@@ -1,5 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict, errorFontColor } from '../../../constants';
 import { Description } from '../../atoms';
 

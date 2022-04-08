@@ -1,6 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useRegisterPageState } from '../../hooks';
 import { RegisterPageStore } from '../../store';

@@ -1,10 +1,8 @@
 import type { PopperModifiers } from '@blueprintjs/core';
 // eslint-disable-next-line import/no-deprecated
 import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components';
 import { aboutThisAppUrl, dict, routes } from '../../constants';
 import { experimentalFeature } from '../../env';
 import {

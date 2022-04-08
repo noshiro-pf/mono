@@ -1,7 +1,5 @@
 import { TextArea } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import type { ChangeEvent, ComponentProps } from 'react';
-import { useCallback } from 'react';
 
 type TextAreaPropsOriginal = ComponentProps<typeof TextArea>;
 

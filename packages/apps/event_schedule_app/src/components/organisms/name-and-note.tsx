@@ -1,6 +1,4 @@
 import { FormGroup } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict } from '../../constants';
 import { useFormError } from '../../hooks';
 import { BpInput, BpTextArea } from '../bp';

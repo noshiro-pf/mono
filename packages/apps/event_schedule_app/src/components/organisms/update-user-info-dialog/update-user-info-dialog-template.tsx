@@ -1,5 +1,4 @@
 import { Button, Classes } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import type { ReactNode } from 'react';
 import { dict } from '../../../constants';
 import { DialogWithMaxWidth } from '../../bp';

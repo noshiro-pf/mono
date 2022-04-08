@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 
 type Props = Readonly<{
   onClick: () => void;

@@ -1,11 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import type { InitializedObservable } from '@noshiro/syncflow';
-import {
-  combineLatestI,
-  createReducer,
-  mapI,
-  withLatestFromI,
-} from '@noshiro/syncflow';
 import type { User } from 'firebase/auth';
 import { api } from '../../api';
 import { dict } from '../../constants';

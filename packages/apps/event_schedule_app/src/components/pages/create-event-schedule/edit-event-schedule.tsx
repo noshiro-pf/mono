@@ -1,7 +1,4 @@
 import { Spinner } from '@blueprintjs/core';
-import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import styled from 'styled-components';
 import { descriptionFontColor, dict } from '../../../constants';
 import { eventScheduleResult$, router, useUser } from '../../../store';
 import { ConfirmEmailDialog, Header } from '../../organisms';

@@ -3,9 +3,6 @@ import type {
   DatetimeRange,
   EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
-import { useState } from '@noshiro/react-utils';
-import type { CSSProperties } from 'react';
-import { useCallback, useMemo } from 'react';
 import { answerTableColor } from '../../constants';
 import type { DatetimeRangeMapKey } from '../../functions';
 import {

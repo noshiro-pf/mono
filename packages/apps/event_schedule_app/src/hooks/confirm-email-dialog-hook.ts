@@ -1,6 +1,6 @@
 import { useAsyncReducer } from '@noshiro/react-utils';
 import type { ReactNode } from 'react';
-import { createElement as h, useCallback, useMemo } from 'react';
+import { createElement as h } from 'react';
 import { dict } from '../constants';
 import type { ConfirmEmailDialogState } from '../functions';
 import {

@@ -1,6 +1,4 @@
 import { Icon } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { routes } from '../../constants';
 import { NavBar } from './navbar';
 

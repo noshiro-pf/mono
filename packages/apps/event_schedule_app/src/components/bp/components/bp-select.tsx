@@ -1,8 +1,6 @@
 import type { HTMLSelectProps } from '@blueprintjs/core';
 import { HTMLSelect } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import type { ChangeEvent, ComponentProps } from 'react';
-import { useCallback } from 'react';
 
 type HTMLSelectPropsOriginal = ComponentProps<typeof HTMLSelect>;
 

@@ -1,6 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import { useCallback } from 'react';
 import type { RegisterPageState } from '../../functions';
 import { RegisterPageStore, router } from '../../store';
 import { useGoogleSignInState } from './google-sign-in-hook';

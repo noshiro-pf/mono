@@ -2,9 +2,6 @@ import type {
   AnswerIconPoint,
   AnswerIconSettings,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../../constants';
 import type { IconListReducerAction } from '../../../functions';
 import { iconListReducer } from '../../../functions';

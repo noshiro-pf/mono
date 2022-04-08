@@ -4,8 +4,6 @@ import type {
   DatetimeSpecificationEnumType,
   YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { dict } from '../../../../constants';
 import type { YmdKey } from '../../../../functions';
 import { selectorOptions } from '../../../../functions';

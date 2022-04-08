@@ -4,13 +4,6 @@ import type {
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { notificationSettingsDefaultValue } from '@noshiro/event-schedule-app-shared';
-import {
-  memoNamed,
-  useBoolState,
-  useTinyObservable,
-} from '@noshiro/react-utils';
-import { useCallback, useEffect } from 'react';
-import styled from 'styled-components';
 import { dict } from '../../constants';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
 import { AnswerIconSettingsComponent } from './icon-settings';

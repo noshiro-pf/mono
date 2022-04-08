@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-deprecated
 import { Button, Tooltip } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 
 export const LockButton = memoNamed<
   Readonly<{

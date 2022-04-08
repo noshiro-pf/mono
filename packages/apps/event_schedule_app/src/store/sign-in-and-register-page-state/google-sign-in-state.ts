@@ -1,4 +1,3 @@
-import { createBooleanState } from '@noshiro/syncflow';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
 import { createToaster, showToast } from '../../functions';
