@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../config/tsconfig/tsconfig.lib.react.nolib.json",
+  "extends": "../../../../config/tsconfig/tsconfig.base.nolib.json",
   "include": ["../src"],
-  "exclude": ["../node_modules", "../esm"]
+  "exclude": ["../node_modules", "../cjs", "../esm"]
 }
