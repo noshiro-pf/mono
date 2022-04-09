@@ -1,7 +1,6 @@
-import { IRecord, tp } from '@noshiro/ts-utils';
-
-export const providePluginTsUtilsDef = IRecord.fromEntries(
-  [
+export const eslintNoRestrictedImportsTsUtilsDef = {
+  name: '@noshiro/ts-utils',
+  importNames: [
     'assertNotType',
     'assertNotUndefined',
     'assertType',
@@ -47,5 +46,21 @@ export const providePluginTsUtilsDef = IRecord.fromEntries(
     'Str',
     'toBoolean',
     'tp',
-  ].map((key) => tp(key, ['@noshiro/ts-utils', key]))
-);
+    'Err',
+    'IDate',
+    'IMap',
+    'IMapMapped',
+    'ISet',
+    'ISetMapped',
+    'Maybe',
+    'None',
+    'Ok',
+    'Queue',
+    'Result',
+    'Some',
+    'Subscription',
+    'TinyObservable',
+    'TinyObservableSource',
+  ],
+  message: 'use global variable instead.',
+};
