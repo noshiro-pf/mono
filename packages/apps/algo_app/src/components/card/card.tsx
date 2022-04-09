@@ -1,8 +1,7 @@
 import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
 import { createElement } from 'preact';
-import { useEffect, useRef } from 'preact/hooks';
+import { useRef } from 'preact/hooks';
 import type { CustomColor } from '../../constants';
 import { outlineColorDef } from '../../constants';
 import type { CardColor, CardNumber, VisibilityFromMe } from '../../types';

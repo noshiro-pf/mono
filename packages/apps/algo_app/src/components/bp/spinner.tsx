@@ -1,6 +1,4 @@
 import { keyframes, styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
-import { useMemo } from 'preact/hooks';
 
 type Props = Readonly<{
   size: number;

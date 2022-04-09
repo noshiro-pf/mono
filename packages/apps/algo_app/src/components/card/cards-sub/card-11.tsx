@@ -1,4 +1,3 @@
-import { memoNamed } from '@noshiro/preact-utils';
 import type { CardProps } from './card-props';
 
 export const Card11 = memoNamed('Card11', ({ textColor }: CardProps) => (

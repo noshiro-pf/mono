@@ -1,5 +1,4 @@
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
-import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 
 export const useWindowSize = (

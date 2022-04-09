@@ -1,10 +1,8 @@
-import type { InitializedObservable } from '@noshiro/syncflow';
-import { scan, subject } from '@noshiro/syncflow';
 import type { Rect } from '@noshiro/ts-utils-additional';
 import { playerNamePositionsReducer } from '../../state';
 import type { NWES } from '../../types';
 
-const playerNamePositionsAction$ = subject<readonly [NWES, Rect]>();
+const playerNamePositionsAction$ = source<readonly [NWES, Rect]>();
 
 export const playerNamePositionsDispatcher = (
   action: readonly [NWES, Rect]

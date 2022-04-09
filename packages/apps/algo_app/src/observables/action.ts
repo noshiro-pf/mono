@@ -1,17 +1,9 @@
-import type { Observable } from '@noshiro/syncflow';
 import {
-  combineLatest,
-  filter,
   fromArray,
   interval,
-  map,
   // eslint-disable-next-line import/no-deprecated
   merge,
-  scan,
-  skip,
-  subject,
   take,
-  zip,
 } from '@noshiro/syncflow';
 import { serverTimestamp } from 'firebase/firestore';
 import { time } from '../constants';
@@ -21,7 +13,7 @@ import { db } from './database';
 
 const autoPlaySpeedRate = 0.5;
 
-const localGameStateActionSource$ = subject<GameStateAction>();
+const localGameStateActionSource$ = source<GameStateAction>();
 
 const gameStateDispatcher = (action: GameStateAction): void => {
   localGameStateActionSource$.next(action);

@@ -1,8 +1,7 @@
 import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
 import type { Rect } from '@noshiro/ts-utils-additional';
 import { createElement, Fragment } from 'preact';
-import { useEffect, useMemo, useRef } from 'preact/hooks';
+import { useRef } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import {
   inTurnColor,

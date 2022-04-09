@@ -1,6 +1,4 @@
 import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
-import { useObservableValue } from '@noshiro/syncflow-preact-hooks';
 import type { Rect } from '@noshiro/ts-utils-additional';
 import { text } from '../constants';
 import {

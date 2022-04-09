@@ -1,5 +1,3 @@
-import type { InitializedObservable } from '@noshiro/syncflow';
-import { combineLatestI, mapI } from '@noshiro/syncflow';
 import { getCardDirection } from '../functions';
 import { mapToDisplayValue } from '../state';
 import type {

@@ -1,6 +1,4 @@
-import { useBoolState } from '@noshiro/preact-utils';
 import type { RectSize } from '@noshiro/ts-utils-additional';
-import { useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import type { CardTextColor, CustomColor } from '../../constants';
 import { darkGray, eyeIconColorDef, lightGray, zIndex } from '../../constants';

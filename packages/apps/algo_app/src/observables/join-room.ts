@@ -1,4 +1,3 @@
-import { createState } from '@noshiro/syncflow';
 import { db } from './database';
 import { setMyName } from './my-name';
 
