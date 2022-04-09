@@ -282,7 +282,7 @@ export namespace IList {
   export const some = <A>(
     list: readonly A[],
     predicate: (value: A, index: number) => boolean
-  ): boolean => list.some(predicate as (value: A, index: number) => boolean);
+  ): boolean => list.some(predicate);
 
   export const map = <T extends readonly unknown[], B>(
     list: T,
