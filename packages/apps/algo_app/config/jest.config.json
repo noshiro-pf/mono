@@ -14,5 +14,12 @@
   },
   "testMatch": ["<rootDir>/src/**/*.test.{ts,tsx}"],
   "testEnvironment": "jsdom",
-  "setupFiles": ["@noshiro/global-ts-utils"]
+  "setupFiles": [
+    "@noshiro/global-ts-utils",
+    "@noshiro/global-preact-utils",
+    "@noshiro/global-syncflow",
+    "@noshiro/global-syncflow-preact-hooks",
+    "@noshiro/global-tiny-router-preact-hooks",
+    "@noshiro/global-preact"
+  ]
 }

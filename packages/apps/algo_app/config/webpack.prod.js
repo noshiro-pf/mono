@@ -1,9 +1,26 @@
 'use strict';
+// @ts-check
 
 const { ProvidePlugin } = require('webpack');
-const { providePluginTsUtilsDef } = require('@noshiro/global-ts-utils');
 
-// @ts-check
+const {
+  providePluginPreactDef,
+} = require('@noshiro/global-preact/cjs/provide-plugin-def');
+const {
+  providePluginPreactUtilsDef,
+} = require('@noshiro/global-preact-utils/cjs/provide-plugin-def');
+const {
+  providePluginSyncflowDef,
+} = require('@noshiro/global-syncflow/cjs/provide-plugin-def');
+const {
+  providePluginSyncflowReactHooksDef,
+} = require('@noshiro/global-syncflow-preact-hooks/cjs/provide-plugin-def');
+const {
+  providePluginTsUtilsDef,
+} = require('@noshiro/global-ts-utils/cjs/provide-plugin-def');
+const {
+  providePluginTinyRouterPreactHooksDef,
+} = require('@noshiro/global-tiny-router-preact-hooks/cjs/provide-plugin-def');
 
 const {
   webpackConfigReactProdMaker,
@@ -17,7 +34,16 @@ const webpackConfigMerged = webpackConfigReactProdMaker(
   paths,
   'bundle.js',
   dotenvValues.USE_BUNDLE_ANALYZER,
-  [new ProvidePlugin(providePluginTsUtilsDef)]
+  [
+    new ProvidePlugin({
+      ...providePluginPreactDef,
+      ...providePluginPreactUtilsDef,
+      ...providePluginSyncflowDef,
+      ...providePluginSyncflowReactHooksDef,
+      ...providePluginTsUtilsDef,
+      ...providePluginTinyRouterPreactHooksDef,
+    }),
+  ]
 );
 
 module.exports = webpackConfigMerged;
