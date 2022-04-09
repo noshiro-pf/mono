@@ -44,7 +44,6 @@
     ]
   },
   "dependencies": {
-    "@noshiro/global-ts-utils": "*",
     "@noshiro/lambda-calculus-interpreter-core": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
@@ -55,6 +54,7 @@
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
 }

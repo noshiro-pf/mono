@@ -44,7 +44,6 @@
     ]
   },
   "dependencies": {
-    "@noshiro/global-ts-utils": "*",
     "@noshiro/goober": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/ts-utils": "*",
@@ -52,6 +51,7 @@
     "preact-router": "^3.2.1"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
 }

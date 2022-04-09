@@ -45,7 +45,6 @@
     ]
   },
   "dependencies": {
-    "@noshiro/global-ts-utils": "*",
     "@noshiro/goober": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/resize-observer-preact-hooks": "*",
@@ -56,6 +55,7 @@
     "preact-media-hook": "^1.0.3"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
 }

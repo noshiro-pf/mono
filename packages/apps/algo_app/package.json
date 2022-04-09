@@ -45,7 +45,6 @@
   },
   "dependencies": {
     "@noshiro/fast-deep-equal": "*",
-    "@noshiro/global-ts-utils": "*",
     "@noshiro/goober": "*",
     "@noshiro/preact-utils": "*",
     "@noshiro/resize-observer-preact-hooks": "*",
@@ -59,6 +58,7 @@
     "preact": "^10.4.7"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
 }

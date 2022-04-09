@@ -27,7 +27,6 @@
     "Node 10"
   ],
   "dependencies": {
-    "@noshiro/global-ts-utils": "*",
     "@noshiro/lambda-calculus-interpreter-core": "*",
     "@noshiro/solid-styled-components": "*",
     "@noshiro/syncflow": "*",
@@ -35,6 +34,7 @@
     "solid-js": "^0.23.11"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
 }
