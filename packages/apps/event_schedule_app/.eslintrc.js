@@ -47,7 +47,30 @@ const config = {
           eslintNoRestrictedImportsSyncflowReactHooksDef,
           eslintNoRestrictedImportsReactDef,
           eslintNoRestrictedImportsStyledComponentsDef,
+          {
+            name: 'firebase/auth',
+            importNames: [
+              'AuthCredential',
+              'OAuthCredential',
+              'UserCredential',
+              'User',
+            ],
+            message: 'use AuthCredential from src/types instead.',
+          },
         ],
+      },
+    ],
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        types: {
+          ...banTypes,
+          'DeepReadonly<AuthCredential>': 'use AuthCredential instead',
+          'DeepReadonly<OAuthCredential>': 'use OAuthCredential instead',
+          'DeepReadonly<UserCredential>': 'use UserCredential instead',
+          'DeepReadonly<User>': 'use User instead',
+        },
+        extendDefaults: true,
       },
     ],
   },

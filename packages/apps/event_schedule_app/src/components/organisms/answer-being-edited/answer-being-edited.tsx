@@ -5,8 +5,22 @@ import type {
   UserName,
 } from '@noshiro/event-schedule-app-shared';
 import { dict } from '../../../constants';
-import { useAnswerBeingEditedHooks } from '../../../hooks';
-import { useUser } from '../../../store';
+import { theNameIsAlreadyUsedFn } from '../../../functions';
+import { useFormError } from '../../../hooks';
+import {
+  answerBeingEditedList$,
+  hasUnanswered$,
+  iconHeader$,
+  onCancelEditingAnswer,
+  onCommentChange,
+  onDeleteAnswer,
+  onUserNameChange,
+  onWeightChange,
+  theNameIsAlreadyUsed$,
+  toggleProtectedSection,
+  toggleRequiredSection,
+  useUser,
+} from '../../../store';
 import { CustomIcon, Description } from '../../atoms';
 import {
   BpInput,
@@ -37,10 +51,6 @@ type Props = Readonly<{
   eventSchedule: EventSchedule;
   answers: readonly Answer[];
   answerBeingEdited: Answer;
-  updateAnswerBeingEdited: (updater: (answer: Answer) => Answer) => void;
-  onCancel: () => void;
-  onDeleteAnswer: () => Promise<void>;
-  onSubmitAnswer: () => void;
   answerBeingEditedSectionState: 'creating' | 'editing';
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
@@ -53,34 +63,24 @@ export const AnswerBeingEdited = memoNamed<Props>(
     eventSchedule,
     answers,
     answerBeingEdited,
-    updateAnswerBeingEdited,
-    onCancel,
-    onDeleteAnswer,
-    onSubmitAnswer,
     answerBeingEditedSectionState,
     submitButtonIsLoading,
     submitButtonIsDisabled,
     selectedAnswerUserName,
   }) => {
-    const {
-      showUserNameError,
-      theNameIsAlreadyUsed,
-      onUserNameBlur,
-      onUserNameChange,
-      onCommentChange,
-      iconHeader,
-      answerBeingEditedList,
-      onWeightChange,
-      toggleRequiredSection,
-      toggleProtectedSection,
-      hasUnanswered,
-    } = useAnswerBeingEditedHooks({
-      eventSchedule,
-      answers,
-      selectedAnswerUserName,
-      answerBeingEdited,
-      updateAnswerBeingEdited,
-    });
+    const [showUserNameError, onUserNameChangeLocal, onUserNameBlur] =
+      useFormError(
+        answerBeingEdited.user.name,
+        (v) =>
+          v === '' ||
+          theNameIsAlreadyUsedFn(v, answers, selectedAnswerUserName),
+        onUserNameChange
+      );
+
+    const theNameIsAlreadyUsed = useObservableValue(theNameIsAlreadyUsed$);
+    const iconHeader = useObservableValue(iconHeader$);
+    const answerBeingEditedList = useObservableValue(answerBeingEditedList$);
+    const hasUnanswered = useObservableValue(hasUnanswered$);
 
     const user = useUser();
 
@@ -106,41 +106,43 @@ export const AnswerBeingEdited = memoNamed<Props>(
               autoFocus={true}
               value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
-              onValueChange={onUserNameChange as (v: string) => void}
+              onValueChange={onUserNameChangeLocal as (v: string) => void}
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
         <TableWrapper>
           <Table>
             <thead>
-              <tr>
-                <th />
-                <th>
-                  <Button
-                    icon={<CustomIcon iconName={'good'} />}
-                    minimal={true}
-                    title={iconHeader.good.iconDescription}
-                    onClick={iconHeader.good.onClick}
-                  />
-                </th>
-                <th>
-                  <Button
-                    icon={<CustomIcon iconName={'fair'} />}
-                    minimal={true}
-                    title={iconHeader.fair.iconDescription}
-                    onClick={iconHeader.fair.onClick}
-                  />
-                </th>
-                <th>
-                  <Button
-                    icon={<CustomIcon iconName={'poor'} />}
-                    minimal={true}
-                    title={iconHeader.poor.iconDescription}
-                    onClick={iconHeader.poor.onClick}
-                  />
-                </th>
-                <th />
-              </tr>
+              {iconHeader === undefined ? undefined : (
+                <tr>
+                  <th />
+                  <th>
+                    <Button
+                      icon={<CustomIcon iconName={'good'} />}
+                      minimal={true}
+                      title={iconHeader.good.iconDescription}
+                      onClick={iconHeader.good.onClick}
+                    />
+                  </th>
+                  <th>
+                    <Button
+                      icon={<CustomIcon iconName={'fair'} />}
+                      minimal={true}
+                      title={iconHeader.fair.iconDescription}
+                      onClick={iconHeader.fair.onClick}
+                    />
+                  </th>
+                  <th>
+                    <Button
+                      icon={<CustomIcon iconName={'poor'} />}
+                      minimal={true}
+                      title={iconHeader.poor.iconDescription}
+                      onClick={iconHeader.poor.onClick}
+                    />
+                  </th>
+                  <th />
+                </tr>
+              )}
             </thead>
             <tbody>
               {answerBeingEditedList.map(
@@ -271,7 +273,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             disabled={submitButtonIsLoading}
             intent='none'
             text={dict.common.buttonText.cancel}
-            onClick={onCancel}
+            onClick={onCancelEditingAnswer}
           />
           {answerBeingEditedSectionState === 'editing' ? (
             <DeleteAnswerButton
@@ -284,7 +286,6 @@ export const AnswerBeingEdited = memoNamed<Props>(
             hasUnanswered={hasUnanswered}
             loading={submitButtonIsLoading}
             mode={answerBeingEditedSectionState}
-            onConfirmSubmissionOfAnswer={onSubmitAnswer}
           />
         </ButtonsWrapperAlignEnd>
       </>

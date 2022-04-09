@@ -14,7 +14,7 @@ export namespace GoogleSignInStore {
     setFalse: enableGoogleSignInButton,
   } = createBooleanState(false);
 
-  export const googleSignInSubmit = async (
+  const googleSignInSubmit = async (
     pageToBack: string | undefined
   ): Promise<void> => {
     disableGoogleSignInButton();
@@ -42,5 +42,27 @@ export namespace GoogleSignInStore {
         router.redirect(routes.createPage);
       }
     }
+  };
+
+  const mut_subscribedValues: {
+    googleSignInButtonDisabled: boolean;
+    pageToBack: string | undefined;
+  } = {
+    googleSignInButtonDisabled: true,
+    pageToBack: undefined,
+  };
+
+  googleSignInButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.googleSignInButtonDisabled = v;
+  });
+
+  router.pageToBack$.subscribe((v) => {
+    mut_subscribedValues.pageToBack = v;
+  });
+
+  export const googleSignInClickHandler = (): void => {
+    if (mut_subscribedValues.googleSignInButtonDisabled) return;
+
+    googleSignInSubmit(mut_subscribedValues.pageToBack).catch(console.error);
   };
 }

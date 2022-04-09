@@ -13,6 +13,7 @@ export * from './multiple-date-picker';
 export * from './normalize-event-schedule';
 export * from './select-datetimes-component';
 export * from './sign-in-and-register-page';
+export * from './the-name-is-already-used';
 export * from './toaster';
 export * from './today';
 export * from './update-user-info-dialog-state';

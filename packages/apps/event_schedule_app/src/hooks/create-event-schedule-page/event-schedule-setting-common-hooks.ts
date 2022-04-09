@@ -4,7 +4,6 @@ import type {
   DatetimeSpecificationEnumType,
   EventSchedule,
   NotificationSettings,
-  YearMonthDate,
   Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
@@ -14,88 +13,62 @@ import {
   initialAnswerDeadline,
   initialNotificationSettings,
 } from '../../constants';
-import type { EventSettingsPageDiffResult, YmdKey } from '../../functions';
 import {
-  collectEventSettingsPageDiff,
   normalizeEventSchedule,
   validateEventSchedule,
   validateEventScheduleAll,
 } from '../../functions';
-import { holidaysJpDefinition$, useUser } from '../../store';
-import type { EventScheduleValidation } from '../../types';
+import { useUser } from '../../store';
+import type {
+  EventScheduleSettingCommonState,
+  EventScheduleSettingCommonStateHandler,
+  EventScheduleValidation,
+} from '../../types';
 import { mapNoneToUndefined } from '../../utils';
 import { useToggleSectionState } from '../use-toggle-section-state';
-import { useCreateEventScheduleHooks } from './create-event-schedule-hooks';
-import { useEditEventScheduleHooks } from './edit-event-schedule-hooks';
-
-type EventScheduleSettingCommonHooks = Readonly<{
-  title: string;
-  onTitleChange: (value: string) => void;
-  notes: string;
-  onNotesChange: (value: string) => void;
-  datetimeSpecification: DatetimeSpecificationEnumType;
-  onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
-  datetimeRangeList: readonly DatetimeRange[];
-  onDatetimeListChange: (list: readonly DatetimeRange[]) => void;
-  useAnswerDeadline: boolean;
-  onToggleAnswerDeadline: () => void;
-  answerDeadline: Ymdhm | undefined;
-  onAnswerDeadlineChange: (value: Ymdhm | undefined) => void;
-  answerIcons: AnswerIconSettings;
-  onAnswerIconsValueChange: (value: AnswerIconSettings) => void;
-  useNotification: boolean;
-  onToggleUseNotification: () => void;
-  notificationSettings: NotificationSettings | undefined;
-  onNotificationSettingsChange: (value: NotificationSettings) => void;
-  eventScheduleValidation: EventScheduleValidation;
-  onResetClick: () => void;
-  createButtonIsEnabled: boolean;
-  createButtonIsLoading: boolean;
-  onCreateEventClick: () => void;
-  createResultDialogIsOpen: boolean;
-  closeCreateResultDialog: () => void;
-  onClipboardButtonClick: () => void;
-  url: string;
-  isLoading: boolean;
-  editButtonIsEnabled: boolean;
-  editButtonIsLoading: boolean;
-  onEditEventClick: () => void;
-  onBackToAnswerPageClick: () => void;
-  diff: EventSettingsPageDiffResult;
-  hasDeletedDatetimeChanges: boolean;
-  hasNoChanges: boolean;
-  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
-}>;
 
 export const useEventScheduleSettingCommonHooks = (
   initialValuesInput: EventSchedule
-): EventScheduleSettingCommonHooks => {
+): Readonly<{
+  state: EventScheduleSettingCommonState;
+  handlers: EventScheduleSettingCommonStateHandler;
+}> => {
   const initialValues = useRef(initialValuesInput);
 
-  const { state: title, setState: onTitleChange } = useState<string>(
-    initialValues.current.title
-  );
-  const { state: notes, setState: onNotesChange } = useState<string>(
-    initialValues.current.notes
-  );
+  const {
+    state: title,
+    setState: setTitle,
+    resetState: resetTitle,
+  } = useState<string>(initialValues.current.title);
+
+  const {
+    state: notes,
+    setState: setNotes,
+    resetState: resetNotes,
+  } = useState<string>(initialValues.current.notes);
 
   const {
     state: datetimeSpecification,
-    setState: onDatetimeSpecificationChange,
+    setState: setDatetimeSpecification,
+    resetState: resetDatetimeSpecification,
   } = useState<DatetimeSpecificationEnumType>(
     initialValues.current.datetimeSpecification
   );
 
-  const { state: datetimeRangeList, setState: onDatetimeListChange } = useState<
-    readonly DatetimeRange[]
-  >(initialValues.current.datetimeRangeList);
+  const {
+    state: datetimeRangeList,
+    setState: setDatetimeRangeList,
+    resetState: resetDatetimeRangeList,
+  } = useState<readonly DatetimeRange[]>(
+    initialValues.current.datetimeRangeList
+  );
 
   const {
     toggleState: useAnswerDeadline,
-    toggle: onToggleAnswerDeadline,
+    toggle: toggleAnswerDeadlineSection,
     value: answerDeadline,
     setValue: setAnswerDeadline,
-    resetState: resetAnswerDeadline,
+    resetState: resetAnswerDeadlineSection,
   } = useToggleSectionState<Ymdhm | undefined>({
     initialToggleState: initialValues.current.answerDeadline !== 'none',
     initialState: mapNoneToUndefined(initialValues.current.answerDeadline),
@@ -121,10 +94,10 @@ export const useEventScheduleSettingCommonHooks = (
 
   const {
     toggleState: useNotification,
-    toggle: onToggleUseNotification,
+    toggle: toggleNotificationSection,
     value: notificationSettings,
     setValue: setNotificationSettings,
-    resetState: resetNotificationSettings,
+    resetState: resetNotificationSettingsSection,
   } = useToggleSectionState<NotificationSettings | undefined>({
     initialToggleState: initialValues.current.notificationSettings !== 'none',
     initialState: mapNoneToUndefined(
@@ -162,18 +135,6 @@ export const useEventScheduleSettingCommonHooks = (
     ]
   );
 
-  const diff = useMemo<EventSettingsPageDiffResult>(
-    () => collectEventSettingsPageDiff(initialValues.current, newEventSchedule),
-    [newEventSchedule]
-  );
-
-  const hasDeletedDatetimeChanges = useMemo<boolean>(
-    () =>
-      diff.datetimeRangeList?.deleted !== undefined &&
-      IList.isNonEmpty(diff.datetimeRangeList.deleted),
-    [diff.datetimeRangeList]
-  );
-
   const hasNoChanges = useMemo<boolean>(
     () => deepEqual(initialValues.current, newEventSchedule),
     [newEventSchedule]
@@ -194,88 +155,45 @@ export const useEventScheduleSettingCommonHooks = (
     eventScheduleValidation
   );
 
-  const {
-    createButtonIsEnabled,
-    createButtonIsLoading,
-    onCreateEventClick,
-    createResultDialogIsOpen,
-    closeCreateResultDialog,
-    onClipboardButtonClick,
-    url,
-    isLoading,
-  } = useCreateEventScheduleHooks({
-    newEventSchedule,
-    eventScheduleValidationOk,
-  });
-
-  const {
-    editButtonIsEnabled,
-    editButtonIsLoading,
-    onEditEventClick,
-    onBackToAnswerPageClick,
-  } = useEditEventScheduleHooks({
-    newEventSchedule,
-    eventScheduleValidationOk,
-  });
-
-  const onResetClick = useCallback(() => {
-    onTitleChange(initialValues.current.title);
-    onNotesChange(initialValues.current.notes);
-    onDatetimeSpecificationChange(initialValues.current.datetimeSpecification);
-    onDatetimeListChange(initialValues.current.datetimeRangeList);
-    resetAnswerDeadline();
-    resetNotificationSettings();
-    resetAnswerIcons();
-  }, [
-    onTitleChange,
-    onNotesChange,
-    onDatetimeSpecificationChange,
-    onDatetimeListChange,
-    resetAnswerDeadline,
-    resetNotificationSettings,
-    resetAnswerIcons,
-  ]);
-
-  const holidaysJpDefinition = useObservableValue<
-    IMapMapped<YearMonthDate, string, YmdKey>
-  >(holidaysJpDefinition$);
-
   return {
-    title,
-    onTitleChange,
-    notes,
-    onNotesChange,
-    datetimeSpecification,
-    onDatetimeSpecificationChange,
-    datetimeRangeList,
-    onDatetimeListChange,
-    useAnswerDeadline,
-    onToggleAnswerDeadline,
-    answerDeadline,
-    onAnswerDeadlineChange: setAnswerDeadline,
-    answerIcons,
-    onAnswerIconsValueChange: setAnswerIcons,
-    useNotification,
-    onToggleUseNotification,
-    notificationSettings,
-    onNotificationSettingsChange: setNotificationSettings,
-    eventScheduleValidation,
-    createButtonIsEnabled,
-    createButtonIsLoading,
-    onCreateEventClick,
-    createResultDialogIsOpen,
-    onResetClick,
-    closeCreateResultDialog,
-    onClipboardButtonClick,
-    url,
-    isLoading,
-    editButtonIsEnabled,
-    editButtonIsLoading,
-    onEditEventClick,
-    onBackToAnswerPageClick,
-    diff,
-    hasDeletedDatetimeChanges,
-    hasNoChanges,
-    holidaysJpDefinition,
+    state: {
+      title,
+      notes,
+      datetimeSpecification,
+      datetimeRangeList,
+      useAnswerDeadline,
+      answerDeadline,
+      answerIcons,
+      useNotification,
+      notificationSettings,
+      eventScheduleValidation,
+      hasNoChanges,
+      newEventSchedule,
+      eventScheduleValidationOk,
+    },
+    handlers: {
+      setTitle,
+      resetTitle,
+
+      setNotes,
+      resetNotes,
+
+      setDatetimeSpecification,
+      resetDatetimeSpecification,
+
+      setDatetimeRangeList,
+      resetDatetimeRangeList,
+
+      toggleAnswerDeadlineSection,
+      setAnswerDeadline,
+      resetAnswerDeadlineSection,
+
+      setAnswerIcons,
+      resetAnswerIcons,
+
+      toggleNotificationSection,
+      setNotificationSettings,
+      resetNotificationSettingsSection,
+    },
   };
 };

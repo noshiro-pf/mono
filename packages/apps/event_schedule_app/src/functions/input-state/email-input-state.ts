@@ -1,7 +1,7 @@
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { dict } from '../../constants';
 
-export type EmailInputState = DeepReadonly<{
+export type EmailInputState = Readonly<{
   inputValue: string;
   error: string | undefined;
 }>;
@@ -16,7 +16,7 @@ assertType<TypeExtends<typeof emailInputInitialState, EmailInputState>>();
 export const emailInputHasError = (state: EmailInputState): boolean =>
   state.error !== undefined || state.inputValue === '';
 
-export type EmailInputStateAction = DeepReadonly<
+export type EmailInputStateAction = Readonly<
   | { type: 'input'; payload: string }
   | { type: 'reset' }
   | { type: 'setError'; payload: string }

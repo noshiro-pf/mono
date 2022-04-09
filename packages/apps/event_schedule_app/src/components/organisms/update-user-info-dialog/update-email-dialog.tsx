@@ -1,7 +1,7 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import type { User } from 'firebase/auth';
 import { dict } from '../../../constants';
 import { UpdateEmailPage, UpdateUserInfoDialogState } from '../../../store';
+import type { User } from '../../../types';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { LockButton } from '../../molecules';
@@ -9,7 +9,7 @@ import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template
 
 const dc = dict.accountSettings;
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   dialogIsOpen: boolean;
   user: User;
 }>;

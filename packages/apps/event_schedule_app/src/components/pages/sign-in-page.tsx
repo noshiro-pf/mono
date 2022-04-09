@@ -1,11 +1,11 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { dict } from '../../constants';
-import { useSignInPageState } from '../../hooks';
-import { SignInPageStore } from '../../store';
+import { GoogleSignInStore, SignInPageStore } from '../../store';
 import { GoogleIcon, Label } from '../atoms';
 import { BpInput } from '../bp';
-import { LockButton, SignInStyled } from '../molecules';
+import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
+import { SignInStyled } from '../styled';
 import { ResetPasswordPage } from './reset-password-page';
 
 const dc = dict.register;
@@ -13,16 +13,17 @@ const dc = dict.register;
 const returnFalse = (): false => false;
 
 export const SignInPage = memoNamed('SignInPage', () => {
+  const googleSignInButtonDisabled = useObservableValue(
+    GoogleSignInStore.googleSignInButtonDisabled$
+  );
+
   const {
     formState,
-    emailFormIntent,
     enterButtonDisabled,
-    enterClickHandler,
-    googleSignInButtonDisabled,
-    googleSignInClickHandler,
+    emailFormIntent,
     passwordFormIntent,
     passwordIsOpen,
-  } = useSignInPageState();
+  } = useObservableValue(SignInPageStore.state$);
 
   const {
     state: isPasswordResetForm,
@@ -95,7 +96,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                   fill={true}
                   intent={'primary'}
                   loading={formState.isWaitingResponse}
-                  onClick={enterClickHandler}
+                  onClick={SignInPageStore.enterClickHandler}
                 >
                   {dc.signInButton}
                 </Button>
@@ -120,7 +121,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
                     intent={'none'}
                     minimal={true}
                     outlined={true}
-                    onClick={googleSignInClickHandler}
+                    onClick={GoogleSignInStore.googleSignInClickHandler}
                   >
                     <SignInStyled.GoogleButtonContentWrapper>
                       <SignInStyled.GoogleIconWrapper>

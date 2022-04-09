@@ -1,5 +1,9 @@
 export namespace UpdateUserInfoDialogState {
-  const { state$: _openingDialog$, setState: setOpeningDialog } = createState<
+  const {
+    state$: _openingDialog$,
+    setState: setOpeningDialog,
+    resetState: _closeDialog,
+  } = createState<
     | 'deleteAccount'
     | 'deleteAccountCreatedWithGoogle'
     | 'updateDisplayName'
@@ -30,7 +34,5 @@ export namespace UpdateUserInfoDialogState {
     setOpeningDialog('deleteAccountCreatedWithGoogle');
   };
 
-  export const closeDialog = (): void => {
-    setOpeningDialog(undefined);
-  };
+  export const closeDialog = _closeDialog;
 }

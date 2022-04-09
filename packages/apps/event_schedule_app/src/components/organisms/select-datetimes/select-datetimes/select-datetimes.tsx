@@ -2,13 +2,11 @@ import { Button } from '@blueprintjs/core';
 import type {
   DatetimeRange,
   DatetimeSpecificationEnumType,
-  YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 import { dict } from '../../../../constants';
-import type { YmdKey } from '../../../../functions';
 import { selectorOptions } from '../../../../functions';
 import { useSelectDatetimesHooks } from '../../../../hooks';
-import { setYearMonth$ } from '../../../../store';
+import { holidaysJpDefinition$, setYearMonth$ } from '../../../../store';
 import { BpSelect } from '../../../bp';
 import { AddElementButton } from '../../../molecules';
 import { MultipleDatePicker } from '../../../multiple-date-picker';
@@ -24,7 +22,6 @@ type Props = Readonly<{
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
   datetimeList: readonly DatetimeRange[];
   onDatetimeListChange: (list: readonly DatetimeRange[]) => void;
-  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
 type CastedHandlerType = (value: string) => void;
@@ -36,7 +33,6 @@ export const SelectDatetimes = memoNamed<Props>(
     onDatetimeSpecificationChange,
     datetimeList,
     onDatetimeListChange,
-    holidaysJpDefinition,
   }) => {
     const {
       selectedDates,
@@ -48,6 +44,8 @@ export const SelectDatetimes = memoNamed<Props>(
       onSetTimesPopoverSubmit,
       onSortClick,
     } = useSelectDatetimesHooks(datetimeList, onDatetimeListChange);
+
+    const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
 
     return (
       <Root>

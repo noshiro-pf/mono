@@ -1,5 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import type { AuthCredential, User } from 'firebase/auth';
 import { api } from '../../api';
 import { dict } from '../../constants';
 import {
@@ -9,6 +8,7 @@ import {
   emailInputStateReducer,
   showToast,
 } from '../../functions';
+import type { AuthCredential, User } from '../../types';
 import { user$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
@@ -57,7 +57,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     )
   );
 
-  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
+  export const submit = async (user: User): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (emailInputHasError(s)) return;
@@ -74,8 +74,7 @@ export namespace DeleteAccountCreatedWithGoogle {
       return;
     }
 
-    const credential: DeepReadonly<AuthCredential> | undefined =
-      signInResult.value;
+    const credential: AuthCredential | undefined = signInResult.value;
 
     if (credential === undefined) return;
 

@@ -8,7 +8,7 @@ import {
   inputStateReducer,
 } from '../input-state';
 
-export type DeleteAccountPageState = DeepReadonly<{
+export type DeleteAccountPageState = Readonly<{
   email: EmailInputState;
   password: InputState;
   otherErrors: string | undefined;
@@ -33,7 +33,7 @@ export const deleteAccountPageHasError = (
   inputHasError(state.password) ||
   state.otherErrors !== undefined;
 
-export type DeleteAccountPageStateAction = DeepReadonly<
+export type DeleteAccountPageStateAction = Readonly<
   | { type: 'done' }
   | { type: 'inputEmail'; payload: string }
   | { type: 'inputPassword'; payload: string }

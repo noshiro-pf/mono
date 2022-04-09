@@ -1,4 +1,3 @@
-import type { AuthCredential, User, UserCredential } from 'firebase/auth';
 import {
   deleteUser as _deleteUser,
   reauthenticateWithCredential as _reauthenticateWithCredential,
@@ -6,10 +5,11 @@ import {
   updatePassword as _updatePassword,
   updateProfile,
 } from 'firebase/auth';
+import type { AuthCredential, User, UserCredential } from '../../types';
 import { assertIsCredentialError } from '../../types';
 
 export const updateDisplayName = (
-  user: DeepReadonly<User>,
+  user: User,
   displayName: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(
@@ -24,7 +24,7 @@ export const updateDisplayName = (
   );
 
 export const updateEmail = (
-  user: DeepReadonly<User>,
+  user: User,
   email: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(_updateEmail(castWritable(user), email)).then(
@@ -35,7 +35,7 @@ export const updateEmail = (
   );
 
 export const updatePassword = (
-  user: DeepReadonly<User>,
+  user: User,
   password: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(_updatePassword(castWritable(user), password)).then(
@@ -46,7 +46,7 @@ export const updatePassword = (
   );
 
 export const deleteUser = (
-  user: DeepReadonly<User>
+  user: User
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(_deleteUser(castWritable(user))).then(
     Result.mapErr((error) => {
@@ -56,13 +56,10 @@ export const deleteUser = (
   );
 
 export const reauthenticateWithCredential = (
-  user: DeepReadonly<User>,
-  authCredential: DeepReadonly<AuthCredential>
+  user: User,
+  authCredential: AuthCredential
 ): Promise<
-  Result<
-    DeepReadonly<UserCredential>,
-    Readonly<{ code: string; message: string }>
-  >
+  Result<UserCredential, Readonly<{ code: string; message: string }>>
 > =>
   Result.fromPromise(
     _reauthenticateWithCredential(

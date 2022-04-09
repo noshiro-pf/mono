@@ -115,5 +115,3 @@ const IconWrapper = styled.div`
   display: inline-block;
   padding: 5px;
 `;
-
-const noop = (): void => undefined;

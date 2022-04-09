@@ -1,7 +1,12 @@
 import { Button } from '@blueprintjs/core';
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { dict } from '../../../constants';
-import { useAnswerTableHooks } from '../../../hooks';
+import {
+  onAnswerClick,
+  onDatetimeSortChange,
+  onScoreSortChange,
+  tableBodyValues$,
+} from '../../../store';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
 import { HTMLTableBorderedStyled } from '../../bp';
 import { CommentButton } from './comment-button';
@@ -11,21 +16,37 @@ import { SortButton } from './sort-button';
 const dc = dict.answerPage.answers;
 
 type Props = Readonly<{
-  eventSchedule: EventSchedule;
+  datetimeSpecification: EventSchedule['datetimeSpecification'];
   answers: readonly Answer[];
-  onAnswerClick: (answer: Answer) => void;
   editAnswerButtonIsDisabled: boolean;
 }>;
 
 export const AnswerTable = memoNamed<Props>(
   'AnswerTable',
-  ({ eventSchedule, answers, onAnswerClick, editAnswerButtonIsDisabled }) => {
-    const {
-      answersWithHandler,
-      tableBodyValues,
-      onDatetimeSortChange,
-      onScoreSortChange,
-    } = useAnswerTableHooks(eventSchedule, answers, onAnswerClick);
+  ({ datetimeSpecification, answers, editAnswerButtonIsDisabled }) => {
+    const answersWithHandler = useMemo<
+      readonly (Pick<
+        Answer,
+        'comment' | 'id' | 'isRequiredParticipants' | 'user' | 'weight'
+      > & {
+        readonly onClick: () => void;
+      })[]
+    >(
+      () =>
+        answers.map((a) => ({
+          id: a.id,
+          user: a.user,
+          comment: a.comment,
+          weight: a.weight,
+          isRequiredParticipants: a.isRequiredParticipants,
+          onClick: () => {
+            onAnswerClick(a);
+          },
+        })),
+      [answers]
+    );
+
+    const tableBodyValues = useObservableValue(tableBodyValues$);
 
     return (
       <HTMLTableBorderedStyled>
@@ -87,7 +108,7 @@ export const AnswerTable = memoNamed<Props>(
                 <td>
                   <DatetimeRangeCell
                     datetimeRange={datetimeRange}
-                    datetimeSpecification={eventSchedule.datetimeSpecification}
+                    datetimeSpecification={datetimeSpecification}
                   />
                 </td>
                 <td>

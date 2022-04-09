@@ -1,5 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import type { AuthCredential, User } from 'firebase/auth';
 import { EmailAuthProvider } from 'firebase/auth';
 import { api } from '../../api';
 import { dict } from '../../constants';
@@ -10,6 +9,7 @@ import {
   updatePasswordPageInitialState,
   updatePasswordPageStateReducer,
 } from '../../functions';
+import type { AuthCredential, User } from '../../types';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -86,15 +86,17 @@ export namespace UpdatePasswordPage {
     )
   );
 
-  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
+  export const submit = async (user: User): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updatePasswordPageHasError(s)) return;
 
     const currentEmail: string = user.email ?? '';
 
-    const credential: DeepReadonly<AuthCredential> =
-      EmailAuthProvider.credential(currentEmail, s.oldPassword.inputValue);
+    const credential: AuthCredential = EmailAuthProvider.credential(
+      currentEmail,
+      s.oldPassword.inputValue
+    );
 
     const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 

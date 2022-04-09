@@ -8,7 +8,7 @@ import {
   inputStateReducer,
 } from '../input-state';
 
-export type UpdateEmailPageState = DeepReadonly<{
+export type UpdateEmailPageState = Readonly<{
   email: EmailInputState;
   password: InputState;
   otherErrors: string | undefined;
@@ -31,7 +31,7 @@ export const updateEmailPageHasError = (state: UpdateEmailPageState): boolean =>
   inputHasError(state.password) ||
   state.otherErrors !== undefined;
 
-export type UpdateEmailPageStateAction = DeepReadonly<
+export type UpdateEmailPageStateAction = Readonly<
   | { type: 'done' }
   | { type: 'inputEmail'; payload: string }
   | { type: 'inputPassword'; payload: string }

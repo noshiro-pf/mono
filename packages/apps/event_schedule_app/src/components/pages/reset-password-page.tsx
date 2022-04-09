@@ -3,7 +3,7 @@ import { dict } from '../../constants';
 import { ResetPasswordPageStore, router } from '../../store';
 import { Label } from '../atoms';
 import { BpInput } from '../bp';
-import { SignInStyled } from '../molecules';
+import { SignInStyled } from '../styled';
 
 const dc = dict.register;
 

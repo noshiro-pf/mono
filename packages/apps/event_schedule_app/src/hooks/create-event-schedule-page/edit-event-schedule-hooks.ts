@@ -1,25 +1,51 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { api } from '../../api';
 import { dict, routes } from '../../constants';
-import { createToaster, showToast } from '../../functions';
+import type { EventSettingsPageDiffResult } from '../../functions';
+import {
+  collectEventSettingsPageDiff,
+  createToaster,
+  showToast,
+} from '../../functions';
 import { fetchAnswers, fetchEventSchedule, router } from '../../store';
+import type {
+  EventScheduleSettingCommonState,
+  EventScheduleSettingCommonStateHandler,
+} from '../../types';
+import { useEventScheduleSettingCommonHooks } from './event-schedule-setting-common-hooks';
 
 type EditEventScheduleHooks = Readonly<{
+  commonState: EventScheduleSettingCommonState;
+  commonStateHandlers: EventScheduleSettingCommonStateHandler;
+  resetAllState: () => void;
   editButtonIsEnabled: boolean;
   editButtonIsLoading: boolean;
+  diff: EventSettingsPageDiffResult;
+  hasDeletedDatetimeChanges: boolean;
   onEditEventClick: () => void;
   onBackToAnswerPageClick: () => void;
 }>;
 
 const toast = createToaster();
 
-export const useEditEventScheduleHooks = ({
-  newEventSchedule,
-  eventScheduleValidationOk,
-}: Readonly<{
-  newEventSchedule: EventSchedule;
-  eventScheduleValidationOk: boolean;
-}>): EditEventScheduleHooks => {
+export const useEditEventScheduleHooks = (
+  eventSchedule: EventSchedule
+): EditEventScheduleHooks => {
+  const { state: commonState, handlers: commonStateHandlers } =
+    useEventScheduleSettingCommonHooks(eventSchedule);
+
+  const resetAllState = useCallback(() => {
+    commonStateHandlers.resetTitle();
+    commonStateHandlers.resetNotes();
+    commonStateHandlers.resetDatetimeSpecification();
+    commonStateHandlers.resetDatetimeRangeList();
+    commonStateHandlers.resetAnswerDeadlineSection();
+    commonStateHandlers.resetNotificationSettingsSection();
+    commonStateHandlers.resetAnswerIcons();
+  }, [commonStateHandlers]);
+
+  const { newEventSchedule, eventScheduleValidationOk } = commonState;
+
   const {
     state: isLoading,
     setTrue: setIsLoadingTrue,
@@ -35,39 +61,32 @@ export const useEditEventScheduleHooks = ({
   }, [answerPagePath]);
 
   const alive = useAlive();
-  const onEditEventClick = useCallback(() => {
-    if (!eventScheduleValidationOk) return;
-    if (eventId === undefined) return;
-    if (!alive.current) return;
+
+  const editEvent = useCallback(async () => {
+    if (!eventScheduleValidationOk || eventId === undefined || !alive.current)
+      return;
 
     setIsLoadingTrue();
-    api.event
-      .update(eventId, newEventSchedule)
-      .then((res) => {
-        if (!alive.current) return;
+    const res = await api.event.update(eventId, newEventSchedule);
 
-        if (Result.isErr(res)) {
-          console.error(res.value);
-        }
-
-        setIsLoadingFalse();
-        fetchAnswers();
-        fetchEventSchedule();
-        onBackToAnswerPage();
-        showToast({
-          toast,
-          message: dict.eventSettingsPage.editEventResultMessage.success,
-          intent: 'success',
-        });
-      })
-      .catch((error) => {
-        console.error('Error creating event schedule: ', error);
-        showToast({
-          toast,
-          message: dict.eventSettingsPage.editEventResultMessage.error,
-          intent: 'danger',
-        });
+    if (Result.isErr(res)) {
+      console.error('Error creating event schedule: ', res.value);
+      showToast({
+        toast,
+        message: dict.eventSettingsPage.editEventResultMessage.error,
+        intent: 'danger',
       });
+    }
+
+    setIsLoadingFalse();
+    fetchAnswers();
+    fetchEventSchedule();
+    onBackToAnswerPage();
+    showToast({
+      toast,
+      message: dict.eventSettingsPage.editEventResultMessage.success,
+      intent: 'success',
+    });
   }, [
     eventScheduleValidationOk,
     newEventSchedule,
@@ -78,9 +97,30 @@ export const useEditEventScheduleHooks = ({
     alive,
   ]);
 
+  const onEditEventClick = useCallback(() => {
+    editEvent().catch(console.error);
+  }, [editEvent]);
+
+  const diff = useMemo<EventSettingsPageDiffResult>(
+    () => collectEventSettingsPageDiff(eventSchedule, newEventSchedule),
+    [eventSchedule, newEventSchedule]
+  );
+
+  const hasDeletedDatetimeChanges = useMemo<boolean>(
+    () =>
+      diff.datetimeRangeList?.deleted !== undefined &&
+      IList.isNonEmpty(diff.datetimeRangeList.deleted),
+    [diff.datetimeRangeList]
+  );
+
   return {
+    commonState,
+    commonStateHandlers,
+    resetAllState,
     editButtonIsEnabled: eventScheduleValidationOk,
     editButtonIsLoading: isLoading,
+    diff,
+    hasDeletedDatetimeChanges,
     onBackToAnswerPageClick: onBackToAnswerPage,
     onEditEventClick,
   };

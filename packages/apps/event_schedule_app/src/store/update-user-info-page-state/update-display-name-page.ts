@@ -1,5 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import type { User } from 'firebase/auth';
 import { api } from '../../api';
 import { dict } from '../../constants';
 import {
@@ -9,6 +8,7 @@ import {
   updateDisplayNamePageInitialState,
   updateDisplayNamePageStateReducer,
 } from '../../functions';
+import type { User } from '../../types';
 import { emitAuthStateChange, user$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
@@ -47,7 +47,7 @@ export namespace UpdateDisplayNamePage {
     }))
   );
 
-  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
+  export const submit = async (user: User): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updateDisplayNamePageHasError(s)) return;

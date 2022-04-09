@@ -1,10 +1,17 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
-import { routes } from '../../constants';
+import { initialEventSchedule, routes } from '../../constants';
 import { useUser } from '../../store';
+import type {
+  EventScheduleSettingCommonState,
+  EventScheduleSettingCommonStateHandler,
+} from '../../types';
+import { useEventScheduleSettingCommonHooks } from './event-schedule-setting-common-hooks';
 
 type CreateEventScheduleHooks = Readonly<{
+  commonState: EventScheduleSettingCommonState;
+  commonStateHandlers: EventScheduleSettingCommonStateHandler;
+  resetAllState: () => void;
   createButtonIsEnabled: boolean;
   createButtonIsLoading: boolean;
   onCreateEventClick: () => void;
@@ -15,13 +22,22 @@ type CreateEventScheduleHooks = Readonly<{
   isLoading: boolean;
 }>;
 
-export const useCreateEventScheduleHooks = ({
-  newEventSchedule,
-  eventScheduleValidationOk,
-}: Readonly<{
-  newEventSchedule: EventSchedule;
-  eventScheduleValidationOk: boolean;
-}>): CreateEventScheduleHooks => {
+export const useCreateEventScheduleHooks = (): CreateEventScheduleHooks => {
+  const { state: commonState, handlers: commonStateHandlers } =
+    useEventScheduleSettingCommonHooks(initialEventSchedule);
+
+  const resetAllState = useCallback(() => {
+    commonStateHandlers.resetTitle();
+    commonStateHandlers.resetNotes();
+    commonStateHandlers.resetDatetimeSpecification();
+    commonStateHandlers.resetDatetimeRangeList();
+    commonStateHandlers.resetAnswerDeadlineSection();
+    commonStateHandlers.resetNotificationSettingsSection();
+    commonStateHandlers.resetAnswerIcons();
+  }, [commonStateHandlers]);
+
+  const { newEventSchedule, eventScheduleValidationOk } = commonState;
+
   const {
     state: isLoading,
     setTrue: setIsLoadingTrue,
@@ -40,29 +56,25 @@ export const useCreateEventScheduleHooks = ({
 
   const user = useUser();
 
-  const onCreateEventClick = useCallback(() => {
-    if (!eventScheduleValidationOk) return;
-    if (!alive.current) return;
+  const createEvent = useCallback(async () => {
+    if (!eventScheduleValidationOk || !alive.current) return;
+
     setIsLoadingTrue();
+
     openCreateResultDialog();
-    api.event
-      .add(
-        IRecord.set(newEventSchedule, 'author', {
-          id: user?.uid ?? null,
-          name: user?.displayName ?? '',
-        })
-      )
-      .then((res) => {
-        if (!alive.current) return;
-        if (Result.isErr(res)) {
-          console.error(res.value);
-        }
-        setIsLoadingFalse();
-        setUrl(toAbsolutePath(`..${routes.answerPage(res.value)}`));
+
+    const res = await api.event.add(
+      IRecord.set(newEventSchedule, 'author', {
+        id: user?.uid ?? null,
+        name: user?.displayName ?? '',
       })
-      .catch((error) => {
-        console.error('Error creating event schedule: ', error);
-      });
+    );
+
+    if (Result.isErr(res)) {
+      console.error(res.value);
+    }
+    setIsLoadingFalse();
+    setUrl(toAbsolutePath(`..${routes.answerPage(res.value)}`));
   }, [
     user,
     eventScheduleValidationOk,
@@ -74,11 +86,18 @@ export const useCreateEventScheduleHooks = ({
     setUrl,
   ]);
 
+  const onCreateEventClick = useCallback(() => {
+    createEvent().catch(console.error);
+  }, [createEvent]);
+
   const onClipboardButtonClick = useCallback(() => {
     navigator.clipboard.writeText(url).catch(console.error);
   }, [url]);
 
   return {
+    commonState,
+    commonStateHandlers,
+    resetAllState,
     createButtonIsEnabled: eventScheduleValidationOk,
     createButtonIsLoading: isLoading,
     onCreateEventClick,

@@ -37,7 +37,7 @@ export const passwordWithConfirmationHasError = (
   state.password.error !== undefined ||
   state.passwordConfirmation.error !== undefined;
 
-export type PasswordWithConfirmationStateAction = DeepReadonly<
+export type PasswordWithConfirmationStateAction = Readonly<
   | { type: 'inputPassword'; payload: string }
   | { type: 'inputPasswordConfirmation'; payload: string }
   | { type: 'reset' }

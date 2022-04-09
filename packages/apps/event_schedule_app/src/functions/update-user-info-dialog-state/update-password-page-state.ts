@@ -8,7 +8,7 @@ import {
   passwordWithConfirmationStateReducer,
 } from '../input-state';
 
-export type UpdatePasswordPageState = DeepReadonly<{
+export type UpdatePasswordPageState = Readonly<{
   oldPassword: InputState;
   newPassword: PasswordWithConfirmationState;
   otherErrors: string | undefined;
@@ -33,7 +33,7 @@ export const updatePasswordPageHasError = (
   passwordWithConfirmationHasError(state.newPassword) ||
   state.otherErrors !== undefined;
 
-export type UpdatePasswordPageStateAction = DeepReadonly<
+export type UpdatePasswordPageStateAction = Readonly<
   | { type: 'done' }
   | { type: 'inputNewPassword'; payload: string }
   | { type: 'inputNewPasswordConfirmation'; payload: string }

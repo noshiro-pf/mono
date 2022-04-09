@@ -4,7 +4,7 @@ import { dict } from '../../../constants';
 import { DialogWithMaxWidth } from '../../bp';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   body: ReactNode;
   submitButton: ReactNode;
   dialogIsOpen: boolean;

@@ -1,5 +1,4 @@
 import type { Intent } from '@blueprintjs/core';
-import type { AuthCredential, User } from 'firebase/auth';
 import { EmailAuthProvider } from 'firebase/auth';
 import { api } from '../../api';
 import { dict } from '../../constants';
@@ -10,6 +9,7 @@ import {
   deleteAccountPageStateReducer,
   showToast,
 } from '../../functions';
+import type { AuthCredential, User } from '../../types';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -62,13 +62,15 @@ export namespace DeleteAccountPage {
     )
   );
 
-  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
+  export const submit = async (user: User): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (deleteAccountPageHasError(s)) return;
 
-    const credential: DeepReadonly<AuthCredential> =
-      EmailAuthProvider.credential(s.email.inputValue, s.password.inputValue);
+    const credential: AuthCredential = EmailAuthProvider.credential(
+      s.email.inputValue,
+      s.password.inputValue
+    );
 
     const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 

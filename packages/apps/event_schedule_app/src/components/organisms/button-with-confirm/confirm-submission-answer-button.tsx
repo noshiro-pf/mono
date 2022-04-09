@@ -1,4 +1,5 @@
 import { dict } from '../../../constants';
+import { onSubmitAnswerClick } from '../../../store';
 import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';
 
@@ -6,7 +7,6 @@ const dc = dict.answerPage.answerBeingEdited;
 
 type Props = Readonly<{
   hasUnanswered: boolean;
-  onConfirmSubmissionOfAnswer: () => void;
   loading: boolean;
   disabled: boolean;
   mode: 'creating' | 'editing';
@@ -51,7 +51,7 @@ const toastConfig = {
 
 export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
   'SubmitAnswerButtonWithConfirmation',
-  ({ hasUnanswered, onConfirmSubmissionOfAnswer, loading, disabled, mode }) =>
+  ({ hasUnanswered, loading, disabled, mode }) =>
     hasUnanswered ? (
       <ButtonWithConfirm
         buttonConfig={match(mode, {
@@ -65,21 +65,16 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
         disabled={disabled}
         loading={loading}
         toastConfig={toastConfig}
-        onConfirmClick={onConfirmSubmissionOfAnswer}
+        onConfirmClick={onSubmitAnswerClick}
       />
     ) : (
-      <SubmitAnswerButton
-        disabled={disabled}
-        loading={loading}
-        mode={mode}
-        onConfirmSubmissionOfAnswer={onConfirmSubmissionOfAnswer}
-      />
+      <SubmitAnswerButton disabled={disabled} loading={loading} mode={mode} />
     )
 );
 
 const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
   'SubmitAnswerButton',
-  ({ onConfirmSubmissionOfAnswer, loading, disabled, mode }) => (
+  ({ loading, disabled, mode }) => (
     <ButtonNowrapStyled
       disabled={disabled}
       icon={'tick'}
@@ -89,7 +84,7 @@ const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
         creating: dc.submitButton.create,
         editing: dc.submitButton.update,
       })}
-      onClick={onConfirmSubmissionOfAnswer}
+      onClick={onSubmitAnswerClick}
     />
   )
 );

@@ -13,7 +13,7 @@ export const useConfirmEmailDialogState = (
   onSuccess: () => void,
   back: () => void,
   emailAnswer: string
-): DeepReadonly<{
+): Readonly<{
   state: ConfirmEmailDialogState;
   helperText: ReactNode;
   hasError: boolean;
