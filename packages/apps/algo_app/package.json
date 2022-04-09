@@ -58,6 +58,11 @@
     "preact": "^10.4.7"
   },
   "devDependencies": {
+    "@noshiro/global-preact": "*",
+    "@noshiro/global-preact-utils": "*",
+    "@noshiro/global-syncflow": "*",
+    "@noshiro/global-syncflow-react-hooks": "*",
+    "@noshiro/global-tiny-router-preact-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
