@@ -1,13 +1,5 @@
 import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
-import { useObservableEffect } from '@noshiro/syncflow-preact-hooks';
-import {
-  push,
-  usePathname,
-  useQueryParams,
-} from '@noshiro/tiny-router-preact-hooks';
-import { useEffect, useMemo } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { getParams, getRoomId, isMainPage, routes, text } from '../constants';
 import { createRoom, db } from '../observables';

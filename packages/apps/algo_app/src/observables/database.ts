@@ -1,5 +1,3 @@
-import { createEventEmitter, createState } from '@noshiro/syncflow';
-import { promiseToResult } from '@noshiro/ts-utils-additional';
 import { initializeApp } from 'firebase/app';
 import type { DocumentReference, Unsubscribe } from 'firebase/firestore';
 import {
@@ -59,7 +57,7 @@ export namespace db {
     roomId: string,
     localAction: GameStateAction
   ): Promise<Result<DocumentReference, unknown>> =>
-    promiseToResult(
+    Result.fromPromise(
       addDoc(
         collection(firestore, paths.rooms, roomId, paths.actions),
         localAction
@@ -77,7 +75,7 @@ export namespace db {
       online: true,
     };
 
-    return promiseToResult(
+    return Result.fromPromise(
       updateDoc(ref, {
         players: arrayUnion(player),
       })

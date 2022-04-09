@@ -1,6 +1,3 @@
-import type { QueryParams } from '@noshiro/tiny-router-preact-hooks';
-import { withSlash } from '@noshiro/tiny-router-preact-hooks';
-
 export const routes = {
   main: '/',
   createRoom: '/create',

@@ -1,5 +1,3 @@
-import type { InitializedObservable } from '@noshiro/syncflow';
-import { combineLatestI, mapI } from '@noshiro/syncflow';
 import type { PlayerIndex } from '../types';
 import { db } from './database';
 import { myName$ } from './my-name';

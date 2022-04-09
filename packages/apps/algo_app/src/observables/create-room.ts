@@ -1,4 +1,3 @@
-import { createEventEmitter, createState } from '@noshiro/syncflow';
 import type { Room } from '../types';
 import { db } from './database';
 import { setMyName } from './my-name';

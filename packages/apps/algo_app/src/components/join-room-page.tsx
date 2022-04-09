@@ -1,7 +1,4 @@
 import { styled } from '@noshiro/goober';
-import { memoNamed, useState } from '@noshiro/preact-utils';
-import { useObservableValue } from '@noshiro/syncflow-preact-hooks';
-import { useCallback } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
 import { db, joinRoom } from '../observables';
