@@ -21,7 +21,10 @@
     "lint": "eslint src/ --ext .ts",
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
-    "setup": "yarn build",
+    "setup": "run-s setup:**",
+    "setup:1": "node ./scripts/gen.js",
+    "setup:2": "yarn _prettier ./src",
+    "setup:3": "yarn build",
     "tsc": "tsc --noEmit",
     "type-check": "tsc --noEmit"
   },
