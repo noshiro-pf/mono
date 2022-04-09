@@ -44,7 +44,6 @@
     ]
   },
   "dependencies": {
-    "@noshiro/global-ts-utils": "*",
     "@noshiro/goober": "*",
     "@noshiro/lambda-calculus-interpreter-core": "*",
     "@noshiro/preact-utils": "*",
@@ -54,6 +53,7 @@
     "preact": "^10.4.7"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
 }

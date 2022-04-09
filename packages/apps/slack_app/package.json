@@ -44,7 +44,6 @@
     ]
   },
   "dependencies": {
-    "@noshiro/global-ts-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/ts-utils": "*",
     "react": "^17.0.2",
@@ -52,6 +51,7 @@
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   }
 }
