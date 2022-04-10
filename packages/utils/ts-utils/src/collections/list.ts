@@ -768,7 +768,12 @@ export namespace IList {
   ): readonly (A & B)[] =>
     list1.filter((e) => list2.includes(e as A & B)) as readonly (A & B)[];
 
-  export const setDifference = <T extends Primitive>(
+  export const setDifference = <A extends Primitive>(
+    list1: readonly A[],
+    list2: readonly A[]
+  ): readonly A[] => list1.filter((e) => !list2.includes(e));
+
+  export const sortedNumSetDifference = <T extends number>(
     sortedList1: readonly T[],
     sortedList2: readonly T[]
   ): readonly T[] => {
