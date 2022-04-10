@@ -12,50 +12,50 @@ export type ReadonlyBitArrayType = Readonly<{
 }>;
 
 class CReadonlyBitArray implements ReadonlyBitArrayType {
-  private readonly _data: Uint8Array;
-  private readonly _isInRange;
+  readonly #data: Uint8Array;
+  readonly #isInRange;
 
   constructor(input: Readonly<Uint8Array> | readonly (0 | 1)[]) {
-    this._data = new Uint8Array(input);
-    this._isInRange = Num.isInRange(0, input.length - 1);
+    this.#data = new Uint8Array(input);
+    this.#isInRange = Num.isInRange(0, input.length - 1);
   }
 
   get size(): number {
-    return this._data.length;
+    return this.#data.length;
   }
 
   get(at: number): 0 | 1 | undefined {
-    if (!this._isInRange(at)) {
+    if (!this.#isInRange(at)) {
       return undefined;
     }
 
-    return this._data[at] === 0 ? 0 : 1;
+    return this.#data[at] === 0 ? 0 : 1;
   }
 
   *values(): IterableIterator<0 | 1> {
     for (const idx of range(0, this.size)) {
-      yield this._data[idx] === 0 ? 0 : 1;
+      yield this.#data[idx] === 0 ? 0 : 1;
     }
   }
 
   *entries(): IterableIterator<readonly [number, 0 | 1]> {
     for (const idx of range(0, this.size)) {
-      yield [idx, this._data[idx] === 0 ? 0 : 1];
+      yield [idx, this.#data[idx] === 0 ? 0 : 1];
     }
   }
 
   map(fn: (value: 0 | 1, index: number) => 0 | 1): ReadonlyBitArrayType {
-    return ReadonlyBitArray(this._data.map((v, i) => fn(v === 0 ? 0 : 1, i)));
+    return ReadonlyBitArray(this.#data.map((v, i) => fn(v === 0 ? 0 : 1, i)));
   }
 
   forEach(fn: (value: 0 | 1, index: number) => void): void {
-    for (const [i, v] of this._data.entries()) {
+    for (const [i, v] of this.#data.entries()) {
       fn(v === 0 ? 0 : 1, i);
     }
   }
 
   toString(): string {
-    return this._data.map((v) => (v === 0 ? 0 : 1)).join('');
+    return this.#data.map((v) => (v === 0 ? 0 : 1)).join('');
   }
 }
 

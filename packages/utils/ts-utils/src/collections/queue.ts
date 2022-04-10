@@ -6,23 +6,23 @@ export type Queue<T> = Readonly<{
 }>;
 
 class QueueClass<T> implements Queue<T> {
-  private readonly _data: T[] = [];
-  private _size: number = 0;
+  readonly #data: T[] = [];
+  #size: number = 0;
 
   get isEmpty(): boolean {
     return this.size === 0;
   }
   get size(): number {
-    return this._size;
+    return this.#size;
   }
   dequeue(): T | undefined {
-    this._size -= 1;
+    this.#size -= 1;
 
-    return this._data.pop();
+    return this.#data.pop();
   }
   enqueue(value: T): void {
-    this._size += 1;
-    this._data.unshift(value);
+    this.#size += 1;
+    this.#data.unshift(value);
   }
 }
 

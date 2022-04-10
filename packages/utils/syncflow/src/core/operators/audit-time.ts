@@ -22,9 +22,9 @@ class AuditTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'auditTime', readonly [A]>
   implements AuditTimeOperatorObservable<A>
 {
-  private readonly _milliSeconds: number;
-  private _timerId: TimerId | undefined;
-  private _isSkipping: boolean;
+  readonly #milliSeconds: number;
+  #timerId: TimerId | undefined;
+  #isSkipping: boolean;
 
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
@@ -32,34 +32,34 @@ class AuditTimeObservableClass<A>
       type: 'auditTime',
       currentValueInit: parentObservable.currentValue,
     });
-    this._isSkipping = false;
-    this._timerId = undefined;
-    this._milliSeconds = milliSeconds;
+    this.#isSkipping = false;
+    this.#timerId = undefined;
+    this.#milliSeconds = milliSeconds;
   }
 
   override tryUpdate(token: Token): void {
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
-    if (this._isSkipping) return; // skip update
+    if (this.#isSkipping) return; // skip update
 
     // set timer
-    this._isSkipping = true;
-    this._timerId = setTimeout(() => {
+    this.#isSkipping = true;
+    this.#timerId = setTimeout(() => {
       if (Maybe.isNone(par.currentValue)) return;
       this.startUpdate(par.currentValue.value);
-      this._isSkipping = false;
-    }, this._milliSeconds);
+      this.#isSkipping = false;
+    }, this.#milliSeconds);
   }
 
-  private resetTimer(): void {
-    if (this._timerId !== undefined) {
-      clearTimeout(this._timerId);
+  #resetTimer(): void {
+    if (this.#timerId !== undefined) {
+      clearTimeout(this.#timerId);
     }
   }
 
   override complete(): void {
-    this.resetTimer();
+    this.#resetTimer();
     super.complete();
   }
 }

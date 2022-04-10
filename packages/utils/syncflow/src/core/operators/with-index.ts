@@ -29,7 +29,7 @@ class WithIndexObservableClass<A>
   >
   implements WithIndexOperatorObservable<A>
 {
-  private _mut_index: number;
+  #mut_index: number;
 
   constructor(parentObservable: Observable<A>) {
     super({
@@ -39,7 +39,7 @@ class WithIndexObservableClass<A>
         parentObservable.currentValue
       ),
     });
-    this._mut_index = -1;
+    this.#mut_index = -1;
   }
 
   override tryUpdate(token: Token): void {
@@ -47,7 +47,7 @@ class WithIndexObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this._mut_index += 1;
-    this.setNext([this._mut_index, par.currentValue.value], token);
+    this.#mut_index += 1;
+    this.setNext([this.#mut_index, par.currentValue.value], token);
   }
 }

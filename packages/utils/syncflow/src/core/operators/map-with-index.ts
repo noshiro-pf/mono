@@ -22,8 +22,8 @@ class MapWithIndexObservableClass<A, B>
   extends SyncChildObservableClass<B, 'mapWithIndex', readonly [A]>
   implements MapWithIndexOperatorObservable<A, B>
 {
-  private readonly _mapFn: (x: A, index: number) => B;
-  private _index: number;
+  readonly #mapFn: (x: A, index: number) => B;
+  #index: number;
 
   constructor(
     parentObservable: Observable<A>,
@@ -36,8 +36,8 @@ class MapWithIndexObservableClass<A, B>
         parentObservable.currentValue
       ),
     });
-    this._index = -1;
-    this._mapFn = mapFn;
+    this.#index = -1;
+    this.#mapFn = mapFn;
   }
 
   override tryUpdate(token: Token): void {
@@ -45,7 +45,7 @@ class MapWithIndexObservableClass<A, B>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this._index += 1;
-    this.setNext(this._mapFn(par.currentValue.value, this._index), token);
+    this.#index += 1;
+    this.setNext(this.#mapFn(par.currentValue.value, this.#index), token);
   }
 }

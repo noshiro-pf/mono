@@ -11,11 +11,11 @@ class OfObservableClass<A>
   extends RootObservableClass<A, 'Of'>
   implements OfObservable<A>
 {
-  private readonly _value: A;
+  readonly #value: A;
 
   constructor(value: A, startManually: boolean = false) {
     super({ type: 'Of', currentValueInit: Maybe.none });
-    this._value = value;
+    this.#value = value;
     if (!startManually) {
       setTimeout(() => {
         this.emit();
@@ -25,7 +25,7 @@ class OfObservableClass<A>
 
   emit(): this {
     if (this.isCompleted) return this;
-    this.startUpdate(this._value);
+    this.startUpdate(this.#value);
     this.complete();
     return this;
   }

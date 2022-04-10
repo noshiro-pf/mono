@@ -12,11 +12,11 @@ class FromArrayObservableClass<A>
   extends RootObservableClass<A, 'FromArray'>
   implements FromArrayObservable<A>
 {
-  private readonly _values: readonly A[];
+  readonly #values: readonly A[];
 
   constructor(values: readonly A[], startManually: boolean = false) {
     super({ type: 'FromArray', currentValueInit: Maybe.none });
-    this._values = values;
+    this.#values = values;
     if (!startManually) {
       setTimeout(() => {
         this.emit();
@@ -26,7 +26,7 @@ class FromArrayObservableClass<A>
 
   emit(): this {
     if (this.isCompleted) return this;
-    for (const v of this._values) {
+    for (const v of this.#values) {
       this.startUpdate(v);
     }
     this.complete();

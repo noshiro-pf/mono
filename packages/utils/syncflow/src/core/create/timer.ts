@@ -11,45 +11,45 @@ class TimerObservableClass
   extends RootObservableClass<number, 'Timer'>
   implements TimerObservable
 {
-  private readonly _milliSeconds: number;
-  private _timerId: TimerId | undefined;
-  private _isStarted: boolean;
+  readonly #milliSeconds: number;
+  #timerId: TimerId | undefined;
+  #isStarted: boolean;
 
   constructor(milliSeconds: number, startManually: boolean) {
     super({ type: 'Timer', currentValueInit: Maybe.none });
-    this._milliSeconds = milliSeconds;
-    this._timerId = undefined;
-    this._isStarted = false;
+    this.#milliSeconds = milliSeconds;
+    this.#timerId = undefined;
+    this.#isStarted = false;
     if (!startManually) {
       this.start();
     }
   }
 
   start(): this {
-    if (this._isStarted) {
+    if (this.#isStarted) {
       console.warn('cannot start twice');
       return this;
     }
-    this._isStarted = true;
+    this.#isStarted = true;
     if (this.isCompleted) {
       console.warn('cannot restart stopped TimerObservable');
       return this;
     }
-    this._timerId = setTimeout(() => {
+    this.#timerId = setTimeout(() => {
       this.startUpdate(0);
       this.complete();
-    }, this._milliSeconds);
+    }, this.#milliSeconds);
     return this;
   }
 
-  private resetTimer(): void {
-    if (this._timerId !== undefined) {
-      clearTimeout(this._timerId);
+  #resetTimer(): void {
+    if (this.#timerId !== undefined) {
+      clearTimeout(this.#timerId);
     }
   }
 
   override complete(): void {
-    this.resetTimer();
+    this.#resetTimer();
     super.complete();
   }
 }

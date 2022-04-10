@@ -22,8 +22,8 @@ class DebounceTimeObservableClass<A>
   extends AsyncChildObservableClass<A, 'debounceTime', readonly [A]>
   implements DebounceTimeOperatorObservable<A>
 {
-  private readonly _milliSeconds: number;
-  private _timerId: TimerId | undefined;
+  readonly #milliSeconds: number;
+  #timerId: TimerId | undefined;
 
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
@@ -31,8 +31,8 @@ class DebounceTimeObservableClass<A>
       type: 'debounceTime',
       currentValueInit: parentObservable.currentValue,
     });
-    this._timerId = undefined;
-    this._milliSeconds = milliSeconds;
+    this.#timerId = undefined;
+    this.#milliSeconds = milliSeconds;
   }
 
   override tryUpdate(token: Token): void {
@@ -40,22 +40,22 @@ class DebounceTimeObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this.resetTimer();
+    this.#resetTimer();
     // set timer
-    this._timerId = setTimeout(() => {
+    this.#timerId = setTimeout(() => {
       if (Maybe.isNone(par.currentValue)) return;
       this.startUpdate(par.currentValue.value);
-    }, this._milliSeconds);
+    }, this.#milliSeconds);
   }
 
-  private resetTimer(): void {
-    if (this._timerId !== undefined) {
-      clearTimeout(this._timerId);
+  #resetTimer(): void {
+    if (this.#timerId !== undefined) {
+      clearTimeout(this.#timerId);
     }
   }
 
   override complete(): void {
-    this.resetTimer();
+    this.#resetTimer();
     super.complete();
   }
 }

@@ -6,16 +6,16 @@ type Pipe<A> = Readonly<{
 }>;
 
 class PipeClass<A> implements Pipe<A> {
-  private readonly a: A;
+  readonly #a: A;
   constructor(a: A) {
-    this.a = a;
+    this.#a = a;
   }
 
   chain<B>(fn: (a: A) => B): PipeClass<B> {
-    return new PipeClass(fn(this.a));
+    return new PipeClass(fn(this.#a));
   }
 
   get value(): A {
-    return this.a;
+    return this.#a;
   }
 }

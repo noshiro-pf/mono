@@ -19,7 +19,7 @@ class ScanObservableClass<A, B>
   extends InitializedSyncChildObservableClass<B, 'scan', readonly [A]>
   implements ScanOperatorObservable<A, B>
 {
-  private readonly _reducer: (acc: B, curr: A) => B;
+  readonly #reducer: (acc: B, curr: A) => B;
 
   constructor(
     parentObservable: Observable<A>,
@@ -31,7 +31,7 @@ class ScanObservableClass<A, B>
       type: 'scan',
       currentValueInit: Maybe.some(initialValue),
     });
-    this._reducer = reducer;
+    this.#reducer = reducer;
   }
 
   override tryUpdate(token: Token): void {
@@ -41,7 +41,7 @@ class ScanObservableClass<A, B>
     if (Maybe.isNone(this.currentValue)) return; // dummy
 
     this.setNext(
-      this._reducer(this.currentValue.value, par.currentValue.value),
+      this.#reducer(this.currentValue.value, par.currentValue.value),
       token
     );
   }

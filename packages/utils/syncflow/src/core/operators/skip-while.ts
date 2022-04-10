@@ -16,7 +16,7 @@ class SkipWhileObservableClass<A>
   extends SyncChildObservableClass<A, 'skipWhile', readonly [A]>
   implements SkipWhileOperatorObservable<A>
 {
-  private readonly _predicate: (value: A) => boolean;
+  readonly #predicate: (value: A) => boolean;
 
   constructor(
     parentObservable: Observable<A>,
@@ -31,7 +31,7 @@ class SkipWhileObservableClass<A>
         ? Maybe.none
         : parentObservable.currentValue,
     });
-    this._predicate = predicate;
+    this.#predicate = predicate;
   }
 
   override tryUpdate(token: Token): void {
@@ -39,7 +39,7 @@ class SkipWhileObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    if (!this._predicate(par.currentValue.value)) {
+    if (!this.#predicate(par.currentValue.value)) {
       this.setNext(par.currentValue.value, token);
     }
   }

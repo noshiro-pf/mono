@@ -16,7 +16,7 @@ class SkipUntilObservableClass<A>
   extends SyncChildObservableClass<A, 'skipUntil', [A]>
   implements SkipUntilOperatorObservable<A>
 {
-  private _isSkipping: boolean;
+  #isSkipping: boolean;
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
       parents: [parentObservable],
@@ -24,14 +24,14 @@ class SkipUntilObservableClass<A>
       currentValueInit: Maybe.none,
     });
 
-    this._isSkipping = true;
+    this.#isSkipping = true;
 
     notifier.subscribe(
       () => {
-        this._isSkipping = false;
+        this.#isSkipping = false;
       },
       () => {
-        this._isSkipping = false;
+        this.#isSkipping = false;
       }
     );
   }
@@ -40,7 +40,7 @@ class SkipUntilObservableClass<A>
     const par = this.parents[0];
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
-    if (this._isSkipping) return;
+    if (this.#isSkipping) return;
 
     this.setNext(par.currentValue.value, token);
   }

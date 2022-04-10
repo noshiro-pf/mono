@@ -174,7 +174,7 @@ class MapMaybeObservableClass<A, B>
   extends SyncChildObservableClass<Maybe<B>, 'mapMaybe', readonly [Maybe<A>]>
   implements MapMaybeOperatorObservable<A, B>
 {
-  private readonly _mapFn: (x: A) => B;
+  readonly #mapFn: (x: A) => B;
 
   constructor(parentObservable: Observable<Maybe<A>>, mapFn: (x: A) => B) {
     super({
@@ -184,7 +184,7 @@ class MapMaybeObservableClass<A, B>
         parentObservable.currentValue
       ),
     });
-    this._mapFn = mapFn;
+    this.#mapFn = mapFn;
   }
 
   override tryUpdate(token: Token): void {
@@ -192,7 +192,7 @@ class MapMaybeObservableClass<A, B>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(Maybe.map(this._mapFn)(par.currentValue.value), token);
+    this.setNext(Maybe.map(this.#mapFn)(par.currentValue.value), token);
   }
 }
 
@@ -204,7 +204,7 @@ class MapResultOkObservableClass<S, S2, E>
   >
   implements MapResultOkOperatorObservable<S, S2, E>
 {
-  private readonly _mapFn: (x: S) => S2;
+  readonly #mapFn: (x: S) => S2;
 
   constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: S) => S2) {
     super({
@@ -214,7 +214,7 @@ class MapResultOkObservableClass<S, S2, E>
         parentObservable.currentValue
       ),
     });
-    this._mapFn = mapFn;
+    this.#mapFn = mapFn;
   }
 
   override tryUpdate(token: Token): void {
@@ -223,7 +223,7 @@ class MapResultOkObservableClass<S, S2, E>
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this.setNext(
-      Result.map<S, S2, E>(this._mapFn)(par.currentValue.value),
+      Result.map<S, S2, E>(this.#mapFn)(par.currentValue.value),
       token
     );
   }
@@ -237,7 +237,7 @@ class MapResultErrObservableClass<S, E, E2>
   >
   implements MapResultErrOperatorObservable<S, E, E2>
 {
-  private readonly _mapFn: (x: E) => E2;
+  readonly #mapFn: (x: E) => E2;
 
   constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: E) => E2) {
     super({
@@ -247,7 +247,7 @@ class MapResultErrObservableClass<S, E, E2>
         parentObservable.currentValue
       ),
     });
-    this._mapFn = mapFn;
+    this.#mapFn = mapFn;
   }
 
   override tryUpdate(token: Token): void {
@@ -256,7 +256,7 @@ class MapResultErrObservableClass<S, E, E2>
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
     this.setNext(
-      Result.mapErr<S, E, E2>(this._mapFn)(par.currentValue.value),
+      Result.mapErr<S, E, E2>(this.#mapFn)(par.currentValue.value),
       token
     );
   }

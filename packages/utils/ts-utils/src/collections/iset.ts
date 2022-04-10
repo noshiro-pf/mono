@@ -81,14 +81,14 @@ export const ISet = {
 } as const;
 
 class ISetClass<K> implements ISet<K>, Iterable<K> {
-  private readonly _set: ReadonlySet<K>;
+  readonly #set: ReadonlySet<K>;
 
   constructor(iterable: Iterable<K>) {
-    this._set = new MutableSet(iterable);
+    this.#set = new MutableSet(iterable);
   }
 
   get size(): number {
-    return this._set.size;
+    return this.#set.size;
   }
 
   get isEmpty(): boolean {
@@ -96,7 +96,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   has(key: K): boolean {
-    return this._set.has(key);
+    return this.#set.has(key);
   }
 
   every<L extends K>(predicate: (key: K) => key is L): this is ISet<L>;
@@ -120,13 +120,13 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   add(key: K): ISet<K> {
     if (this.has(key)) return this;
 
-    return ISet.new([...this._set, key]);
+    return ISet.new([...this.#set, key]);
   }
 
   delete(key: K): ISet<K> {
     if (!this.has(key)) return this;
 
-    return ISet.new(ArrayFrom(this._set).filter((k) => !objectIs(k, key)));
+    return ISet.new(ArrayFrom(this.#set).filter((k) => !objectIs(k, key)));
   }
 
   withMutations(
@@ -134,7 +134,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
       { type: 'add'; key: K } | { type: 'delete'; key: K }
     >[]
   ): ISet<K> {
-    const result = new MutableSet<K>(this._set);
+    const result = new MutableSet<K>(this.#set);
 
     for (const action of actions) {
       switch (action.type) {
@@ -167,7 +167,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   forEach(callbackfn: (key: K) => void): void {
-    for (const v of this._set.values()) {
+    for (const v of this.#set.values()) {
       callbackfn(v);
     }
   }
@@ -193,19 +193,19 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   [Symbol.iterator](): Iterator<K> {
-    return this._set[Symbol.iterator]();
+    return this.#set[Symbol.iterator]();
   }
 
   keys(): IterableIterator<K> {
-    return this._set.keys();
+    return this.#set.keys();
   }
 
   values(): IterableIterator<K> {
-    return this._set.values();
+    return this.#set.values();
   }
 
   entries(): IterableIterator<readonly [K, K]> {
-    return this._set.entries();
+    return this.#set.entries();
   }
 
   toArray(): readonly K[] {
@@ -213,7 +213,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   toRawSet(): ReadonlySet<K> {
-    return this._set;
+    return this.#set;
   }
 }
 

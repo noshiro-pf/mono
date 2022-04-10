@@ -23,9 +23,9 @@ class MergeMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'mergeMap', readonly [A]>
   implements MergeMapOperatorObservable<A, B>
 {
-  private readonly _mapToObservable: (curr: A) => Observable<B>;
-  private _observables: readonly Observable<B>[];
-  private _subscriptions: readonly Subscription[];
+  readonly #mapToObservable: (curr: A) => Observable<B>;
+  #observables: readonly Observable<B>[];
+  #subscriptions: readonly Subscription[];
 
   constructor(
     parentObservable: Observable<A>,
@@ -36,9 +36,9 @@ class MergeMapObservableClass<A, B>
       type: 'mergeMap',
       currentValueInit: Maybe.none,
     });
-    this._mapToObservable = mapToObservable;
-    this._observables = [];
-    this._subscriptions = [];
+    this.#mapToObservable = mapToObservable;
+    this.#observables = [];
+    this.#subscriptions = [];
   }
 
   override tryUpdate(token: Token): void {
@@ -46,20 +46,20 @@ class MergeMapObservableClass<A, B>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    const observable = this._mapToObservable(par.currentValue.value);
-    this._observables = IList.push(this._observables, observable);
+    const observable = this.#mapToObservable(par.currentValue.value);
+    this.#observables = IList.push(this.#observables, observable);
 
     const subscription = observable.subscribe((curr) => {
       this.startUpdate(curr);
     });
-    this._subscriptions = IList.push(this._subscriptions, subscription);
+    this.#subscriptions = IList.push(this.#subscriptions, subscription);
   }
 
   override complete(): void {
-    for (const s of this._subscriptions) {
+    for (const s of this.#subscriptions) {
       s.unsubscribe();
     }
-    for (const o of this._observables) {
+    for (const o of this.#observables) {
       o.complete();
     }
     super.complete();

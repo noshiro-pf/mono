@@ -27,7 +27,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, 'zip', A>
   implements ZipObservable<A>
 {
-  private readonly _queues: TupleToQueueTuple<A>;
+  readonly #queues: TupleToQueueTuple<A>;
 
   constructor(parents: Wrap<A>) {
     const parentsValues = parents.map((p) => p.currentValue);
@@ -39,11 +39,11 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
         : Maybe.none,
     });
 
-    this._queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
+    this.#queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
   }
 
   override tryUpdate(token: Token): void {
-    const queues = this._queues;
+    const queues = this.#queues;
     for (const [index, par] of this.parents.entries()) {
       if (par.token === token && Maybe.isSome(par.currentValue)) {
         queues[index]?.enqueue(par.currentValue.value);

@@ -20,9 +20,9 @@ class SwitchMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, 'switchMap', readonly [A]>
   implements SwitchMapOperatorObservable<A, B>
 {
-  private readonly _mapToObservable: (curr: A) => Observable<B>;
-  private _observable: Observable<B> | undefined;
-  private _subscription: Subscription | undefined;
+  readonly #mapToObservable: (curr: A) => Observable<B>;
+  #observable: Observable<B> | undefined;
+  #subscription: Subscription | undefined;
 
   constructor(
     parentObservable: Observable<A>,
@@ -33,9 +33,9 @@ class SwitchMapObservableClass<A, B>
       type: 'switchMap',
       currentValueInit: Maybe.none,
     });
-    this._mapToObservable = mapToObservable;
-    this._observable = undefined;
-    this._subscription = undefined;
+    this.#mapToObservable = mapToObservable;
+    this.#observable = undefined;
+    this.#subscription = undefined;
   }
 
   override tryUpdate(token: Token): void {
@@ -43,21 +43,21 @@ class SwitchMapObservableClass<A, B>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this._observable?.complete();
-    this._subscription?.unsubscribe();
+    this.#observable?.complete();
+    this.#subscription?.unsubscribe();
 
-    const observable = this._mapToObservable(par.currentValue.value);
-    this._observable = observable;
+    const observable = this.#mapToObservable(par.currentValue.value);
+    this.#observable = observable;
 
     const subscription = observable.subscribe((curr) => {
       this.startUpdate(curr);
     });
-    this._subscription = subscription;
+    this.#subscription = subscription;
   }
 
   override complete(): void {
-    this._subscription?.unsubscribe();
-    this._observable?.complete();
+    this.#subscription?.unsubscribe();
+    this.#observable?.complete();
     super.complete();
   }
 }

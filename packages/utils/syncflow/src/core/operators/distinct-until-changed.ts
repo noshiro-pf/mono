@@ -27,8 +27,8 @@ class DistinctUntilChangedObservableClass<A>
   extends SyncChildObservableClass<A, 'distinctUntilChanged', readonly [A]>
   implements DistinctUntilChangedOperatorObservable<A>
 {
-  private readonly _compare: (x: A, y: A) => boolean;
-  private _previousValue: Maybe<A>;
+  readonly #compare: (x: A, y: A) => boolean;
+  #previousValue: Maybe<A>;
 
   constructor(
     parentObservable: Observable<A>,
@@ -39,8 +39,8 @@ class DistinctUntilChangedObservableClass<A>
       type: 'distinctUntilChanged',
       currentValueInit: parentObservable.currentValue,
     });
-    this._previousValue = Maybe.none;
-    this._compare = compare;
+    this.#previousValue = Maybe.none;
+    this.#compare = compare;
   }
 
   override tryUpdate(token: Token): void {
@@ -48,12 +48,12 @@ class DistinctUntilChangedObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    const prev = this._previousValue;
-    this._previousValue = par.currentValue;
+    const prev = this.#previousValue;
+    this.#previousValue = par.currentValue;
 
     if (
       Maybe.isNone(prev) ||
-      !this._compare(prev.value, par.currentValue.value)
+      !this.#compare(prev.value, par.currentValue.value)
     ) {
       this.setNext(par.currentValue.value, token);
     }
