@@ -26,6 +26,9 @@ const {
 const {
   eslintNoRestrictedImportsTinyRouterPreactHooksDef,
 } = require('@noshiro/global-tiny-router-preact-hooks/cjs/eslint-no-restricted-imports-def');
+const {
+  eslintNoRestrictedImportsGooberDef,
+} = require('@noshiro/global-goober/cjs/eslint-no-restricted-imports-def');
 
 /** @type {LinterConfig} */
 const config = {
@@ -45,6 +48,7 @@ const config = {
           eslintNoRestrictedImportsSyncflowPreactHooksDef,
           eslintNoRestrictedImportsPreactDef,
           eslintNoRestrictedImportsTinyRouterPreactHooksDef,
+          eslintNoRestrictedImportsGooberDef,
         ],
       },
     ],

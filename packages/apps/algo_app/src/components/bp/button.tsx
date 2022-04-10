@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-
 export const Button = styled('button')`
   text-transform: none;
   font-family: inherit;

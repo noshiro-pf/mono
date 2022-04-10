@@ -1,4 +1,3 @@
-import { styled } from '@noshiro/goober';
 import type { RectSize } from '@noshiro/ts-utils-additional';
 import type { JSXInternal } from 'preact/src/jsx';
 import { outlineColorDef, text } from '../../constants';

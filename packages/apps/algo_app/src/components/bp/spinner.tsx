@@ -1,4 +1,4 @@
-import { keyframes, styled } from '@noshiro/goober';
+import { keyframes } from '@noshiro/goober';
 
 type Props = Readonly<{
   size: number;

@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-
 export const Input = styled('input')`
   appearance: none;
   background: #fff;

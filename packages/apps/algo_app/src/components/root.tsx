@@ -1,4 +1,3 @@
-import { styled } from '@noshiro/goober';
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
 import type { JSXInternal } from 'preact/src/jsx';
 import { getParams, getRoomId, isMainPage, routes, text } from '../constants';
