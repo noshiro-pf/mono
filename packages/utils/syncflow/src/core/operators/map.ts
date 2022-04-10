@@ -22,7 +22,7 @@ class MapObservableClass<A, B>
   extends SyncChildObservableClass<B, 'map', readonly [A]>
   implements MapOperatorObservable<A, B>
 {
-  private readonly _mapFn: (x: A) => B;
+  readonly #mapFn: (x: A) => B;
 
   constructor(parentObservable: Observable<A>, mapFn: (x: A) => B) {
     super({
@@ -30,7 +30,7 @@ class MapObservableClass<A, B>
       type: 'map',
       currentValueInit: Maybe.map(mapFn)(parentObservable.currentValue),
     });
-    this._mapFn = mapFn;
+    this.#mapFn = mapFn;
   }
 
   override tryUpdate(token: Token): void {
@@ -38,6 +38,6 @@ class MapObservableClass<A, B>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(this._mapFn(par.currentValue.value), token);
+    this.setNext(this.#mapFn(par.currentValue.value), token);
   }
 }

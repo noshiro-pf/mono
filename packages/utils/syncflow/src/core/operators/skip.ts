@@ -19,8 +19,8 @@ class SkipObservableClass<A>
   extends SyncChildObservableClass<A, 'skip', readonly [A]>
   implements SkipOperatorObservable<A>
 {
-  private readonly _n: number;
-  private _counter: number;
+  readonly #n: number;
+  #counter: number;
 
   constructor(parentObservable: Observable<A>, n: number) {
     super({
@@ -30,8 +30,8 @@ class SkipObservableClass<A>
         ? parentObservable.currentValue
         : Maybe.none,
     });
-    this._counter = 0;
-    this._n = n;
+    this.#counter = 0;
+    this.#n = n;
   }
 
   override tryUpdate(token: Token): void {
@@ -39,8 +39,8 @@ class SkipObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this._counter += 1;
-    if (this._counter > this._n) {
+    this.#counter += 1;
+    if (this.#counter > this.#n) {
       this.setNext(par.currentValue.value, token);
     }
   }

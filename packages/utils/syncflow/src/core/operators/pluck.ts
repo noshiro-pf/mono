@@ -22,7 +22,7 @@ class PluckObservableClass<A, K extends keyof A>
   extends SyncChildObservableClass<A[K], 'pluck', readonly [A]>
   implements PluckOperatorObservable<A, K>
 {
-  private readonly _key: K;
+  readonly #key: K;
 
   constructor(parentObservable: Observable<A>, key: K) {
     super({
@@ -32,7 +32,7 @@ class PluckObservableClass<A, K extends keyof A>
         parentObservable.currentValue
       ),
     });
-    this._key = key;
+    this.#key = key;
   }
 
   override tryUpdate(token: Token): void {
@@ -40,6 +40,6 @@ class PluckObservableClass<A, K extends keyof A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this.setNext(par.currentValue.value[this._key], token);
+    this.setNext(par.currentValue.value[this.#key], token);
   }
 }

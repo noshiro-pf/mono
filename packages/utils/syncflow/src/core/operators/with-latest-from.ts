@@ -34,7 +34,7 @@ class WithLatestFromObservableClass<A, B>
   >
   implements WithLatestFromOperatorObservable<A, B>
 {
-  private readonly _observable: Observable<B>;
+  readonly #observable: Observable<B>;
 
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {
     super({
@@ -51,7 +51,7 @@ class WithLatestFromObservableClass<A, B>
             ]),
     });
 
-    this._observable = observable;
+    this.#observable = observable;
   }
 
   override tryUpdate(token: Token): void {
@@ -59,7 +59,7 @@ class WithLatestFromObservableClass<A, B>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    const curr = this._observable.currentValue;
+    const curr = this.#observable.currentValue;
     if (Maybe.isNone(curr)) return; // skip update
 
     this.setNext([par.currentValue.value, curr.value], token);

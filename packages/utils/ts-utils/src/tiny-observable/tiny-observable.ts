@@ -16,10 +16,10 @@ export const createTinyObservable = <T>(): TinyObservableSource<T> =>
   new TinyObservableClass<T>();
 
 class TinyObservableClass<T> implements TinyObservableSource<T> {
-  private readonly subscriptions = new MutableMap<symbol, (value: T) => void>();
+  readonly #subscriptions = new MutableMap<symbol, (value: T) => void>();
 
   next(value: T): void {
-    for (const fn of this.subscriptions.values()) {
+    for (const fn of this.#subscriptions.values()) {
       fn(value);
     }
   }
@@ -27,11 +27,11 @@ class TinyObservableClass<T> implements TinyObservableSource<T> {
   subscribe(fn: (value: T) => void): Subscription {
     const id = Symbol();
 
-    this.subscriptions.set(id, fn);
+    this.#subscriptions.set(id, fn);
 
     return {
       unsubscribe: () => {
-        this.subscriptions.delete(id);
+        this.#subscriptions.delete(id);
       },
     };
   }

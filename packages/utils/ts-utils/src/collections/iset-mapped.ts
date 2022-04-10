@@ -93,9 +93,9 @@ export const ISetMapped = {
 class ISetMappedClass<K, KM extends RecordKeyType>
   implements ISetMapped<K, KM>, Iterable<K>
 {
-  private readonly _set: ReadonlySet<KM>;
-  private readonly _toKey: (a: K) => KM;
-  private readonly _fromKey: (k: KM) => K;
+  readonly #set: ReadonlySet<KM>;
+  readonly #toKey: (a: K) => KM;
+  readonly #fromKey: (k: KM) => K;
 
   constructor(
     iterable: Iterable<K>,
@@ -103,13 +103,13 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     fromKey: (k: KM) => K
   ) {
     // eslint-disable-next-line no-restricted-globals
-    this._set = new Set(Array.from(iterable, toKey));
-    this._toKey = toKey;
-    this._fromKey = fromKey;
+    this.#set = new Set(Array.from(iterable, toKey));
+    this.#toKey = toKey;
+    this.#fromKey = fromKey;
   }
 
   get size(): number {
-    return this._set.size;
+    return this.#set.size;
   }
 
   get isEmpty(): boolean {
@@ -117,7 +117,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   }
 
   has(key: K): boolean {
-    return this._set.has(this._toKey(key));
+    return this.#set.has(this.#toKey(key));
   }
 
   every<L extends K>(
@@ -144,23 +144,23 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     if (this.has(key)) return this;
 
     return ISetMapped.new(
-      [...this._set, this._toKey(key)].map(this._fromKey),
-      this._toKey,
-      this._fromKey
+      [...this.#set, this.#toKey(key)].map(this.#fromKey),
+      this.#toKey,
+      this.#fromKey
     );
   }
 
   delete(key: K): ISetMapped<K, KM> {
     if (!this.has(key)) return this;
-    const keyMapped = this._toKey(key);
+    const keyMapped = this.#toKey(key);
 
     return ISetMapped.new(
       // eslint-disable-next-line no-restricted-globals
-      Array.from(this._set)
+      Array.from(this.#set)
         .filter((k) => !objectIs(k, keyMapped))
-        .map(this._fromKey),
-      this._toKey,
-      this._fromKey
+        .map(this.#fromKey),
+      this.#toKey,
+      this.#fromKey
     );
   }
 
@@ -170,10 +170,10 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     >[]
   ): ISetMapped<K, KM> {
     // eslint-disable-next-line no-restricted-globals
-    const result = new Set<KM>(this._set);
+    const result = new Set<KM>(this.#set);
 
     for (const action of actions) {
-      const key = this._toKey(action.key);
+      const key = this.#toKey(action.key);
 
       switch (action.type) {
         case 'delete':
@@ -187,39 +187,39 @@ class ISetMappedClass<K, KM extends RecordKeyType>
 
     return ISetMapped.new<K, KM>(
       // eslint-disable-next-line no-restricted-globals
-      Array.from(result, this._fromKey),
-      this._toKey,
-      this._fromKey
+      Array.from(result, this.#fromKey),
+      this.#toKey,
+      this.#fromKey
     );
   }
 
   map(mapFn: (key: K) => K): ISetMapped<K, KM> {
     return ISetMapped.new(
       this.toArray().map(mapFn),
-      this._toKey,
-      this._fromKey
+      this.#toKey,
+      this.#fromKey
     );
   }
 
   filter(predicate: (key: K) => boolean): ISetMapped<K, KM> {
     return ISetMapped.new(
       this.toArray().filter(predicate),
-      this._toKey,
-      this._fromKey
+      this.#toKey,
+      this.#fromKey
     );
   }
 
   filterNot(predicate: (key: K) => boolean): ISetMapped<K, KM> {
     return ISetMapped.new(
       this.toArray().filter((k) => !predicate(k)),
-      this._toKey,
-      this._fromKey
+      this.#toKey,
+      this.#fromKey
     );
   }
 
   forEach(callbackfn: (key: K) => void): void {
-    for (const km of this._set) {
-      callbackfn(this._fromKey(km));
+    for (const km of this.#set) {
+      callbackfn(this.#fromKey(km));
     }
   }
 
@@ -234,24 +234,24 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   subtract(set: ISetMapped<K, KM>): ISetMapped<K, KM> {
     return ISetMapped.new(
       this.toArray().filter((k) => !set.has(k)),
-      this._toKey,
-      this._fromKey
+      this.#toKey,
+      this.#fromKey
     );
   }
 
   intersect(set: ISetMapped<K, KM>): ISetMapped<K, KM> {
     return ISetMapped.new(
       this.toArray().filter((k) => set.has(k)),
-      this._toKey,
-      this._fromKey
+      this.#toKey,
+      this.#fromKey
     );
   }
 
   union(set: ISetMapped<K, KM>): ISetMapped<K, KM> {
     return ISetMapped.new(
       [...this.values(), ...set.values()],
-      this._toKey,
-      this._fromKey
+      this.#toKey,
+      this.#fromKey
     );
   }
 
@@ -262,20 +262,20 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   }
 
   *keys(): IterableIterator<K> {
-    for (const km of this._set.keys()) {
-      yield this._fromKey(km);
+    for (const km of this.#set.keys()) {
+      yield this.#fromKey(km);
     }
   }
 
   *values(): IterableIterator<K> {
-    for (const km of this._set.keys()) {
-      yield this._fromKey(km);
+    for (const km of this.#set.keys()) {
+      yield this.#fromKey(km);
     }
   }
 
   *entries(): IterableIterator<readonly [K, K]> {
-    for (const km of this._set.keys()) {
-      const a = this._fromKey(km);
+    for (const km of this.#set.keys()) {
+      const a = this.#fromKey(km);
 
       yield [a, a];
     }
@@ -287,6 +287,6 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   }
 
   toRawSet(): ReadonlySet<KM> {
-    return this._set;
+    return this.#set;
   }
 }

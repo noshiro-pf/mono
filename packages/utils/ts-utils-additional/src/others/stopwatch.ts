@@ -1,36 +1,36 @@
 import { IDate } from '@noshiro/ts-utils';
 
 export class Stopwatch {
-  private startTime = 0;
-  private endTime = 0;
-  private time = 0;
-  private readonly name;
+  #startTime = 0;
+  #endTime = 0;
+  #time = 0;
+  readonly #name;
 
   constructor(timerName = '') {
-    this.name = timerName;
+    this.#name = timerName;
   }
 
   start(log = false): void {
-    this.startTime = IDate.now();
-    this.time = 0;
+    this.#startTime = IDate.now();
+    this.#time = 0;
     if (log) {
-      console.log(`${this.name} started.`);
+      console.log(`${this.#name} started.`);
     }
   }
 
   stop(log = false): void {
-    this.endTime = IDate.now();
-    this.time = this.endTime - this.startTime;
+    this.#endTime = IDate.now();
+    this.#time = this.#endTime - this.#startTime;
     if (log) {
-      console.log(`${this.name} stopped.`);
+      console.log(`${this.#name} stopped.`);
     }
   }
 
   result(): number {
-    return this.time;
+    return this.#time;
   }
 
   printResult(): void {
-    console.log(`${this.name} ${this.time} msec`);
+    console.log(`${this.#name} ${this.#time} msec`);
   }
 }

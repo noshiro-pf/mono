@@ -24,7 +24,7 @@ class FilterObservableClass<A>
   extends SyncChildObservableClass<A, 'filter', readonly [A]>
   implements FilterOperatorObservable<A>
 {
-  private readonly _predicate: (x: A) => boolean;
+  readonly #predicate: (x: A) => boolean;
 
   constructor(parentObservable: Observable<A>, predicate: (x: A) => boolean) {
     super({
@@ -36,7 +36,7 @@ class FilterObservableClass<A>
         ? parentObservable.currentValue
         : Maybe.none,
     });
-    this._predicate = predicate;
+    this.#predicate = predicate;
   }
 
   override tryUpdate(token: Token): void {
@@ -44,7 +44,7 @@ class FilterObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    if (this._predicate(par.currentValue.value)) {
+    if (this.#predicate(par.currentValue.value)) {
       this.setNext(par.currentValue.value, token);
     }
   }

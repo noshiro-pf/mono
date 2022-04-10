@@ -16,7 +16,7 @@ class PairwiseObservableClass<A>
   extends SyncChildObservableClass<readonly [A, A], 'pairwise', readonly [A]>
   implements PairwiseOperatorObservable<A>
 {
-  private _previousValue: Maybe<A>;
+  #previousValue: Maybe<A>;
 
   constructor(parentObservable: Observable<A>) {
     super({
@@ -26,7 +26,7 @@ class PairwiseObservableClass<A>
     });
     // parentObservable.currentValue has value
     // if parentObservable is InitializedObservable
-    this._previousValue = parentObservable.currentValue;
+    this.#previousValue = parentObservable.currentValue;
   }
 
   override tryUpdate(token: Token): void {
@@ -35,8 +35,8 @@ class PairwiseObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    const prev = this._previousValue;
-    this._previousValue = par.currentValue;
+    const prev = this.#previousValue;
+    this.#previousValue = par.currentValue;
 
     if (Maybe.isNone(prev)) return; // skip update
 

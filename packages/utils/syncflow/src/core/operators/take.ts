@@ -17,8 +17,8 @@ class TakeObservableClass<A>
   extends SyncChildObservableClass<A, 'take', readonly [A]>
   implements TakeOperatorObservable<A>
 {
-  private readonly _n: number;
-  private _mut_counter: number;
+  readonly #n: number;
+  #mut_counter: number;
 
   constructor(parentObservable: Observable<A>, n: number) {
     super({
@@ -28,8 +28,8 @@ class TakeObservableClass<A>
         ? Maybe.none
         : parentObservable.currentValue,
     });
-    this._mut_counter = 0;
-    this._n = n;
+    this.#mut_counter = 0;
+    this.#n = n;
 
     // complete immediately if n is not positive integer
     if (!isPositiveInteger(n)) {
@@ -42,8 +42,8 @@ class TakeObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this._mut_counter += 1;
-    if (this._mut_counter > this._n) {
+    this.#mut_counter += 1;
+    if (this.#mut_counter > this.#n) {
       this.complete();
     } else {
       this.setNext(par.currentValue.value, token);

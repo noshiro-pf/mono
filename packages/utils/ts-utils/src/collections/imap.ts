@@ -71,22 +71,22 @@ export const IMap = {
 };
 
 class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
-  private readonly _map: ReadonlyMap<K, V>;
+  readonly #map: ReadonlyMap<K, V>;
 
   constructor(iterable: Iterable<readonly [K, V]>) {
-    this._map = new MutableMap(iterable);
+    this.#map = new MutableMap(iterable);
   }
 
   get size(): number {
-    return this._map.size;
+    return this.#map.size;
   }
 
   has(key: K): boolean {
-    return this._map.has(key);
+    return this.#map.has(key);
   }
 
   get(key: K): V | undefined {
-    return this._map.get(key);
+    return this.#map.get(key);
   }
 
   every<W extends V>(
@@ -112,16 +112,16 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   delete(key: K): IMap<K, V> {
     if (!this.has(key)) return this;
 
-    return IMap.new(ArrayFrom(this._map).filter(([k]) => !objectIs(k, key)));
+    return IMap.new(ArrayFrom(this.#map).filter(([k]) => !objectIs(k, key)));
   }
 
   set(key: K, value: V): IMap<K, V> {
     if (value === this.get(key)) return this; // has no changes
     if (!this.has(key)) {
-      return IMap.new([...this._map, tp(key, value)]);
+      return IMap.new([...this.#map, tp(key, value)]);
     } else {
       return IMap.new(
-        ArrayFrom(this._map, ([k, v]) => tp(k, objectIs(k, key) ? value : v))
+        ArrayFrom(this.#map, ([k, v]) => tp(k, objectIs(k, key) ? value : v))
       );
     }
   }
@@ -131,7 +131,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     const curr = this.get(key);
 
     return IMap.new(
-      ArrayFrom(this._map, ([k, v]) =>
+      ArrayFrom(this.#map, ([k, v]) =>
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         tp(k, objectIs(k, key) ? updater(curr!) : v)
       )
@@ -145,7 +145,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       | { type: 'update'; key: K; updater: (value: V) => V }
     >[]
   ): IMap<K, V> {
-    const result = new MutableMap<K, V>(this._map);
+    const result = new MutableMap<K, V>(this.#map);
 
     for (const action of actions) {
       switch (action.type) {
@@ -183,25 +183,25 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   forEach(callbackfn: (value: V, key: K) => void): void {
-    for (const [key, value] of this._map.entries()) {
+    for (const [key, value] of this.#map.entries()) {
       callbackfn(value, key);
     }
   }
 
   [Symbol.iterator](): Iterator<readonly [K, V]> {
-    return this._map[Symbol.iterator]();
+    return this.#map[Symbol.iterator]();
   }
 
   keys(): IterableIterator<K> {
-    return this._map.keys();
+    return this.#map.keys();
   }
 
   values(): IterableIterator<V> {
-    return this._map.values();
+    return this.#map.values();
   }
 
   entries(): IterableIterator<readonly [K, V]> {
-    return this._map.entries();
+    return this.#map.entries();
   }
 
   toKeysArray(): readonly K[] {
@@ -225,6 +225,6 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   toRawMap(): ReadonlyMap<K, V> {
-    return this._map;
+    return this.#map;
   }
 }

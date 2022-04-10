@@ -13,7 +13,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
   implements RootObservable<A, Type>
 {
   override readonly type: Type;
-  private _procedure: readonly ChildObservable<unknown>[];
+  #procedure: readonly ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: MutableSet<ObservableId>;
 
   constructor({
@@ -30,7 +30,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
       currentValueInit,
     });
     this.type = type;
-    this._procedure = [];
+    this.#procedure = [];
     this._descendantsIdSet = new MutableSet<ObservableId>();
   }
 
@@ -39,18 +39,18 @@ export class RootObservableClass<A, Type extends RootObservableType>
     this._descendantsIdSet.add(child.id);
 
     const insertPos = binarySearch(
-      this._procedure.map((a) => a.depth),
+      this.#procedure.map((a) => a.depth),
       child.depth
     );
 
-    this._procedure = IList.insert(this._procedure, insertPos, child);
+    this.#procedure = IList.insert(this.#procedure, insertPos, child);
   }
 
   startUpdate(nextValue: A): void {
     const token = issueToken();
     this.setNext(nextValue, token);
 
-    for (const p of this._procedure) {
+    for (const p of this.#procedure) {
       p.tryUpdate(token);
     }
   }

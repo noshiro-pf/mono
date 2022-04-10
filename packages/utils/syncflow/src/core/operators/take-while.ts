@@ -16,7 +16,7 @@ class TakeWhileObservableClass<A>
   extends SyncChildObservableClass<A, 'takeWhile', readonly [A]>
   implements TakeWhileOperatorObservable<A>
 {
-  private readonly _predicate: (value: A) => boolean;
+  readonly #predicate: (value: A) => boolean;
 
   constructor(
     parentObservable: Observable<A>,
@@ -31,7 +31,7 @@ class TakeWhileObservableClass<A>
         ? parentObservable.currentValue
         : Maybe.none,
     });
-    this._predicate = predicate;
+    this.#predicate = predicate;
   }
 
   override tryUpdate(token: Token): void {
@@ -39,7 +39,7 @@ class TakeWhileObservableClass<A>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    if (this._predicate(par.currentValue.value)) {
+    if (this.#predicate(par.currentValue.value)) {
       this.setNext(par.currentValue.value, token);
     } else {
       this.complete();

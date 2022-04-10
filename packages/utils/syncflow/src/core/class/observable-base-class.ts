@@ -28,11 +28,11 @@ export class ObservableBaseClass<
   readonly kind: Kind;
   readonly type;
   readonly depth: Depth;
-  private _children: readonly ChildObservable<unknown>[];
-  private readonly _subscribers: MutableMap<SubscriberId, Subscriber<A>>;
-  private _currentValue: ObservableBase<A>['currentValue'];
-  private _isCompleted: ObservableBase<A>['isCompleted'];
-  private _token: ObservableBase<A>['token'];
+  #children: readonly ChildObservable<unknown>[];
+  readonly #subscribers: MutableMap<SubscriberId, Subscriber<A>>;
+  #currentValue: ObservableBase<A>['currentValue'];
+  #isCompleted: ObservableBase<A>['isCompleted'];
+  #token: ObservableBase<A>['token'];
 
   constructor({
     kind,
@@ -49,53 +49,53 @@ export class ObservableBaseClass<
     this.type = type;
     this.depth = depth;
     this.id = issueObservableId();
-    this._currentValue = currentValueInit;
-    this._children = [];
-    this._subscribers = new MutableMap<SubscriberId, Subscriber<A>>();
-    this._isCompleted = false;
-    this._token = issueToken();
+    this.#currentValue = currentValueInit;
+    this.#children = [];
+    this.#subscribers = new MutableMap<SubscriberId, Subscriber<A>>();
+    this.#isCompleted = false;
+    this.#token = issueToken();
   }
 
   addChild<B>(child: ChildObservable<B>): void {
-    this._children = IList.push(
-      this._children,
+    this.#children = IList.push(
+      this.#children,
       child as ChildObservable<unknown>
     );
   }
 
   get currentValue(): ObservableBase<A>['currentValue'] {
-    return this._currentValue;
+    return this.#currentValue;
   }
 
   protected getCurrentValue(): ObservableBase<A>['currentValue'] {
-    return this._currentValue;
+    return this.#currentValue;
   }
 
   get isCompleted(): boolean {
-    return this._isCompleted;
+    return this.#isCompleted;
   }
 
   get token(): Token {
-    return this._token;
+    return this.#token;
   }
 
   get hasSubscriber(): boolean {
-    return this._subscribers.size > 0;
+    return this.#subscribers.size > 0;
   }
 
   get hasChild(): boolean {
-    return this._children.length > 0;
+    return this.#children.length > 0;
   }
 
   hasActiveChild(): boolean {
-    return this._children.some((c) => !c.isCompleted);
+    return this.#children.some((c) => !c.isCompleted);
   }
 
   protected setNext(nextValue: A, token: Token): void {
-    this._token = token;
-    this._currentValue = Maybe.some(nextValue);
+    this.#token = token;
+    this.#currentValue = Maybe.some(nextValue);
 
-    for (const s of this._subscribers.values()) {
+    for (const s of this.#subscribers.values()) {
       s.onNext(nextValue);
     }
   }
@@ -115,18 +115,18 @@ export class ObservableBaseClass<
     if (this.isCompleted) return; // terminate only once
 
     // change state
-    this._isCompleted = true;
+    this.#isCompleted = true;
 
     // run subscribers for the current value
-    for (const s of this._subscribers.values()) {
+    for (const s of this.#subscribers.values()) {
       s.onComplete();
     }
 
     // remove all subscribers
-    this._subscribers.clear();
+    this.#subscribers.clear();
 
     // propagate to children
-    for (const o of this._children) {
+    for (const o of this.#children) {
       o.tryComplete();
     }
   }
@@ -151,24 +151,24 @@ export class ObservableBaseClass<
       return { unsubscribe: noop };
     }
 
-    const id: SubscriberId = this.addSubscriber(
+    const id: SubscriberId = this.#addSubscriber(
       toSubscriber(onNext, onComplete)
     );
     return {
       unsubscribe: () => {
-        this.removeSubscriber(id);
+        this.#removeSubscriber(id);
       },
     };
   }
 
-  private addSubscriber(s: Subscriber<A>): SubscriberId {
+  #addSubscriber(s: Subscriber<A>): SubscriberId {
     // return the id of added subscriber
     const id = issueSubscriberId();
-    this._subscribers.set(id, s);
+    this.#subscribers.set(id, s);
     return id;
   }
 
-  private removeSubscriber(id: SubscriberId): void {
-    this._subscribers.delete(id);
+  #removeSubscriber(id: SubscriberId): void {
+    this.#subscribers.delete(id);
   }
 }

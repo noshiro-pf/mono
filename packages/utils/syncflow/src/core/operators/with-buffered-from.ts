@@ -36,7 +36,7 @@ class WithBufferedFromObservableClass<A, B>
   >
   implements WithBufferedFromOperatorObservable<A, B>
 {
-  private _mut_bufferedValues: readonly B[] = [];
+  #mut_bufferedValues: readonly B[] = [];
 
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {
     super({
@@ -54,7 +54,7 @@ class WithBufferedFromObservableClass<A, B>
     });
 
     observable.subscribe((value) => {
-      this._mut_bufferedValues = IList.push(this._mut_bufferedValues, value);
+      this.#mut_bufferedValues = IList.push(this.#mut_bufferedValues, value);
     });
   }
 
@@ -63,11 +63,11 @@ class WithBufferedFromObservableClass<A, B>
     if (par.token !== token) return; // skip update
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
-    this.setNext([par.currentValue.value, this._mut_bufferedValues], token);
-    this.clearBuffer();
+    this.setNext([par.currentValue.value, this.#mut_bufferedValues], token);
+    this.#clearBuffer();
   }
 
-  private clearBuffer(): void {
-    this._mut_bufferedValues = [];
+  #clearBuffer(): void {
+    this.#mut_bufferedValues = [];
   }
 }

@@ -1,3 +1,5 @@
+import { Str } from '../str';
+
 export namespace Result {
   const OkTypeSymbol: unique symbol = Symbol('Result.ok');
   const ErrTypeSymbol: unique symbol = Symbol('Result.err');
@@ -46,9 +48,12 @@ export namespace Result {
         ? ok(mapFn(result.value))
         : err(mapErrFn(result.value));
 
-  export const unwrapThrow = <S, E>(result: _Result<S, E>): S => {
+  export const unwrapThrow = <S, E>(
+    result: _Result<S, E>,
+    toStr: (e: E) => string = Str.from
+  ): S => {
     if (isErr<S, E>(result)) {
-      throw new Error(JSON.stringify(result.value));
+      throw new Error(toStr(result.value));
     }
 
     return result.value;
