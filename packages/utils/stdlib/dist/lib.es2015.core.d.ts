@@ -80,7 +80,7 @@ interface ArrayConstructor {
    * Creates an array from an array-like object.
    * @param arrayLike An array-like object to convert to an array.
    */
-  from<T>(arrayLike: ArrayLike<T>): readonly T[];
+  from<T>(arrayLike: ArrayLike<T>): T[];
 
   /**
    * Creates an array from an iterable object.
@@ -92,13 +92,13 @@ interface ArrayConstructor {
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => U,
     thisArg?: unknown
-  ): readonly U[];
+  ): U[];
 
   /**
    * Returns a new array from a set of elements.
    * @param items A set of elements to include in the new array object.
    */
-  of<T>(...items: readonly T[]): readonly T[];
+  of<T>(...items: readonly T[]): T[];
 }
 
 interface DateConstructor {

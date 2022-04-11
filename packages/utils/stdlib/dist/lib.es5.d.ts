@@ -1704,7 +1704,7 @@ interface Array<T> {
     initialValue: U
   ): U;
 
-  readonly [n: number]: T;
+  [n: number]: T;
 }
 
 interface ArrayConstructor {
@@ -1715,7 +1715,7 @@ interface ArrayConstructor {
   <T>(arrayLength: number): readonly T[];
   <T>(...items: readonly T[]): readonly T[];
   isArray(arg: unknown): arg is readonly unknown[];
-  readonly prototype: readonly unknown[];
+  readonly prototype: unknown[];
 }
 
 declare const Array: ArrayConstructor;
@@ -1820,7 +1820,7 @@ type Awaited<T> = T extends null | undefined
 
 interface ArrayLike<T> {
   readonly length: number;
-  readonly [n: number]: T;
+  [n: number]: T;
 }
 
 /**

@@ -79,7 +79,7 @@ interface ArrayConstructor {
    * Creates an array from an iterable object.
    * @param iterable An iterable object to convert to an array.
    */
-  from<T>(iterable: Iterable<T> | ArrayLike<T>): readonly T[];
+  from<T>(iterable: Iterable<T> | ArrayLike<T>): T[];
 
   /**
    * Creates an array from an iterable object.
@@ -91,7 +91,7 @@ interface ArrayConstructor {
     iterable: Iterable<T> | ArrayLike<T>,
     mapfn: (v: T, k: number) => U,
     thisArg?: unknown
-  ): readonly U[];
+  ): U[];
 }
 
 interface ReadonlyArray<T> {
@@ -160,8 +160,8 @@ interface ReadonlyMap<K, V> {
 }
 
 interface MapConstructor {
-  new (): ReadonlyMap<unknown, unknown>;
-  new <K, V>(iterable?: Iterable<readonly [K, V]> | null): ReadonlyMap<K, V>;
+  new (): Map<unknown, unknown>;
+  new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
 }
 
 interface WeakMap<K extends object, V> {}
@@ -209,7 +209,7 @@ interface ReadonlySet<T> {
 }
 
 interface SetConstructor {
-  new <T>(iterable?: Iterable<T> | null): ReadonlySet<T>;
+  new <T>(iterable?: Iterable<T> | null): Set<T>;
 }
 
 interface WeakSet<T extends object> {}

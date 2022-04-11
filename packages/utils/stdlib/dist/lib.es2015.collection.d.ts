@@ -29,9 +29,9 @@ interface Map<K, V> {
 }
 
 interface MapConstructor {
-  new (): ReadonlyMap<unknown, unknown>;
-  new <K, V>(entries?: readonly (readonly [K, V])[] | null): ReadonlyMap<K, V>;
-  readonly prototype: ReadonlyMap<unknown, unknown>;
+  new (): Map<unknown, unknown>;
+  new <K, V>(entries?: readonly (readonly [K, V])[] | null): Map<K, V>;
+  readonly prototype: Map<unknown, unknown>;
 }
 declare const Map: MapConstructor;
 
@@ -73,8 +73,8 @@ interface Set<T> {
 }
 
 interface SetConstructor {
-  new <T = unknown>(values?: readonly T[] | null): ReadonlySet<T>;
-  readonly prototype: ReadonlySet<unknown>;
+  new <T = unknown>(values?: readonly T[] | null): Set<T>;
+  readonly prototype: Set<unknown>;
 }
 declare const Set: SetConstructor;
 
