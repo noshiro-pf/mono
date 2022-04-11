@@ -1,14 +1,4 @@
-import type {
-  AnswerIconIdWithNone,
-  AnswerIconPoint,
-  AnswerId,
-  DatetimeRange,
-} from '@noshiro/event-schedule-app-shared';
 import { answerTableColor } from '../../constants';
-import type {
-  AnswerSelectionMapKey,
-  DatetimeRangeMapKey,
-} from '../../functions';
 import {
   createAnswerSelectionMapFromAnswers,
   createAnswerSummary,

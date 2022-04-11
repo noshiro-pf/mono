@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Description } from '../atoms';
 import { SwitchWithoutLabelStyled } from '../bp';
 

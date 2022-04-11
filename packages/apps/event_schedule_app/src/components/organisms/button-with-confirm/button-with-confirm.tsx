@@ -1,4 +1,3 @@
-import type { IconName, Intent } from '@blueprintjs/core';
 import { createToaster, showToast } from '../../../functions';
 import { ButtonNowrapStyled } from '../../bp';
 import { ConfirmDialog } from './confirm-dialog';

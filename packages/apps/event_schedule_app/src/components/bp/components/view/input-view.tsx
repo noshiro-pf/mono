@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import type {
   ChangeEventHandler,
   DetailedHTMLProps,
@@ -85,6 +84,7 @@ export const InputView = memoNamed<Props>(
             onBlur={onInputBlur}
             onChange={inputValueChangeHandler}
             onFocus={inputFocusHandler}
+            // eslint-disable-next-line react/jsx-props-no-spreading
             {...inputProps}
           />
         </InputGroup>

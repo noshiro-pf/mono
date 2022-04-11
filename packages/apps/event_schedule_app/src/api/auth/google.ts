@@ -1,7 +1,6 @@
 import type { FirebaseError } from 'firebase/app';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth, googleAuthProvider } from '../../initialize-firebase';
-import type { OAuthCredential, UserCredential } from '../../types';
 
 export const googleSignInWithPopup = (): Promise<
   Result<OAuthCredential | undefined, OAuthCredential | undefined>

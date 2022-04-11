@@ -1,4 +1,3 @@
-import type { HTMLSelectProps } from '@blueprintjs/core';
 import { Button, TextArea } from '@blueprintjs/core';
 import { clog } from '../../utils';
 import {

@@ -1,7 +1,4 @@
-import type { HTMLInputProps, InputGroupProps2 } from '@blueprintjs/core';
-import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
-import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import type { ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();

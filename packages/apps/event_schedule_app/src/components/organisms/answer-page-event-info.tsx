@@ -1,5 +1,3 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../constants';
 import { ymdhm2strWithDay } from '../../functions';
 import { Description } from '../atoms';
 import { AnswerPageNotes } from './answer-page-notes';

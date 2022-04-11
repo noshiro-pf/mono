@@ -1,4 +1,3 @@
-import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { api } from '../api';
 import { fetchThrottleTime } from '../constants';
 import { clog } from '../utils';

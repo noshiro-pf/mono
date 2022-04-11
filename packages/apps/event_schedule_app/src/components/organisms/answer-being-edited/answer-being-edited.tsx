@@ -1,10 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import type {
-  Answer,
-  EventSchedule,
-  UserName,
-} from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../constants';
 import { theNameIsAlreadyUsedFn } from '../../../functions';
 import { useFormError } from '../../../hooks';
 import {

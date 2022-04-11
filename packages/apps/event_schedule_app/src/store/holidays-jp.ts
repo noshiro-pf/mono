@@ -1,6 +1,4 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { ymdFromDate } from '@noshiro/event-schedule-app-shared';
-import type { YmdKey } from '../functions';
 import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../functions';
 
 export const holidaysJpDefinition$: InitializedObservable<

@@ -1,7 +1,5 @@
-import type { Intent } from '@blueprintjs/core';
 import { EmailAuthProvider } from 'firebase/auth';
 import { api } from '../../api';
-import { dict } from '../../constants';
 import {
   createToaster,
   deleteAccountPageHasError,
@@ -9,7 +7,6 @@ import {
   deleteAccountPageStateReducer,
   showToast,
 } from '../../functions';
-import type { AuthCredential, User } from '../../types';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -62,7 +59,7 @@ export namespace DeleteAccountPage {
     )
   );
 
-  export const submit = async (user: User): Promise<void> => {
+  export const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (deleteAccountPageHasError(s)) return;

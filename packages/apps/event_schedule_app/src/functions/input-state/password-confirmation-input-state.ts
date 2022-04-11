@@ -1,5 +1,3 @@
-import { dict } from '../../constants';
-
 export type PasswordWithConfirmationState = DeepReadonly<{
   password: {
     inputValue: string;

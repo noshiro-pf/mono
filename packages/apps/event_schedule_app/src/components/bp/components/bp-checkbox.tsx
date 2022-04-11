@@ -1,5 +1,5 @@
 import { Checkbox } from '@blueprintjs/core';
-import type { ComponentProps, FormEvent } from 'react';
+import type { ComponentProps } from 'react';
 
 type CheckboxPropsOriginal = ComponentProps<typeof Checkbox>;
 

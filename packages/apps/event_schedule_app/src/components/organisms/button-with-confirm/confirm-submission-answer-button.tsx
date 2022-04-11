@@ -1,4 +1,3 @@
-import { dict } from '../../../constants';
 import { onSubmitAnswerClick } from '../../../store';
 import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';

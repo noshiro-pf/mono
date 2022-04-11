@@ -1,4 +1,3 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { answerIconPointConfig } from '../../constants';
 import type { EventScheduleValidation } from '../../types';

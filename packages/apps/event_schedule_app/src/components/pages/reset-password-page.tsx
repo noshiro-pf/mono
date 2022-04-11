@@ -1,5 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { dict } from '../../constants';
 import { ResetPasswordPageStore, router } from '../../store';
 import { Label } from '../atoms';
 import { BpInput } from '../bp';

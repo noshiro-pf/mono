@@ -1,10 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import type {
-  DatetimeSpecificationEnumType,
-  HoursMinutes,
-  TimeRange,
-} from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../../constants';
 import { timeRangeReducer } from '../../../../functions';
 import { TimeRangeView } from '../../../molecules';
 import { ButtonsWrapperAlignEnd } from '../../../styled';

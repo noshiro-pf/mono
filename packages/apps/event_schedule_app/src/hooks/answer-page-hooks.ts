@@ -1,10 +1,3 @@
-import type {
-  Answer,
-  EventSchedule,
-  UserName,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
-import type { RefObject } from 'react';
 import { useRef } from 'react';
 import {
   alertOnAnswerClickIsOpen$,

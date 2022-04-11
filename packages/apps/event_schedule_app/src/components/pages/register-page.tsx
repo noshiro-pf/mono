@@ -1,5 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { dict } from '../../constants';
 import { GoogleSignInStore, RegisterPageStore } from '../../store';
 import { GoogleIcon, Label } from '../atoms';
 import { BpInput } from '../bp';

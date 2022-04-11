@@ -1,7 +1,5 @@
-import type { Intent } from '@blueprintjs/core';
 import { EmailAuthProvider } from 'firebase/auth';
 import { api } from '../../api';
-import { dict } from '../../constants';
 import {
   createToaster,
   showToast,
@@ -9,7 +7,6 @@ import {
   updateEmailPageInitialState,
   updateEmailPageStateReducer,
 } from '../../functions';
-import type { AuthCredential, User } from '../../types';
 import { user$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
@@ -66,7 +63,7 @@ export namespace UpdateEmailPage {
     )
   );
 
-  export const submit = async (user: User): Promise<void> => {
+  export const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updateEmailPageHasError(s)) return;

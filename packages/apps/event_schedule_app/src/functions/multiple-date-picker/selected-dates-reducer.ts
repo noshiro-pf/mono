@@ -1,5 +1,3 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import type { YmdKey } from '../map-key';
 import { ymdFromKey, ymdToKey } from '../map-key';
 
 export type SelectedDatesReducerAction = Readonly<

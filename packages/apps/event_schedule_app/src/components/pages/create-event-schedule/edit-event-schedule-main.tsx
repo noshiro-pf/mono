@@ -1,5 +1,4 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { descriptionFontColor, dict } from '../../../constants';
+import { descriptionFontColor } from '../../../constants';
 import { useEditEventScheduleHooks } from '../../../hooks';
 import { router } from '../../../store';
 import {

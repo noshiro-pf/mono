@@ -1,4 +1,8 @@
 import { render } from 'react-dom';
+// eslint-disable-next-line import/no-unassigned-import,import/no-internal-modules
+import './global/globals';
+// eslint-disable-next-line import/no-unassigned-import,import/no-internal-modules
+import './global/globals-decl';
 import './index.css';
 import { Main } from './main';
 import { unregister } from './serviceWorker';

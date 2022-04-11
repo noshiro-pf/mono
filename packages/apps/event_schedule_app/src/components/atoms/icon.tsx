@@ -1,5 +1,4 @@
 import { Icon } from '@blueprintjs/core';
-import type { AnswerIconIdWithNone } from '@noshiro/event-schedule-app-shared';
 import { CircleIcon, CloseIcon, TriangleIcon } from './icons';
 
 type Props = Readonly<{

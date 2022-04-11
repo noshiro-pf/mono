@@ -1,4 +1,4 @@
-import { dict, errorFontColor } from '../../../constants';
+import { errorFontColor } from '../../../constants';
 import { Description } from '../../atoms';
 
 const dc = dict.errorMessages;

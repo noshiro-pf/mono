@@ -1,9 +1,3 @@
-import type {
-  DatetimeSpecificationEnumType,
-  HoursMinutes,
-  TimeRange,
-} from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../constants';
 import { BpTimePicker } from '../bp';
 
 type Props = Readonly<{

@@ -1,5 +1,3 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-
 /**
  * rowsize = 5
  * numPrevMonthDate = 3

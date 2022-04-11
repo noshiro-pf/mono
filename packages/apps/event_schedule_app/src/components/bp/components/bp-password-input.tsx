@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Button } from '@blueprintjs/core';
 import type { BpInputProps } from './bp-input';
 import { BpInput } from './bp-input';

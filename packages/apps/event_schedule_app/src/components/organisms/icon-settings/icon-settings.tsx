@@ -1,8 +1,3 @@
-import type {
-  AnswerIconPoint,
-  AnswerIconSettings,
-} from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../constants';
 import type { IconListReducerAction } from '../../../functions';
 import { iconListReducer } from '../../../functions';
 import { Description } from '../../atoms';

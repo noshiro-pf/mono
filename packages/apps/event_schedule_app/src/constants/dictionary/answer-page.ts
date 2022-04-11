@@ -1,5 +1,3 @@
-import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
-
 export const answerPageDictionary = {
   title: '日程調整 回答ページ',
   eventInfo: {

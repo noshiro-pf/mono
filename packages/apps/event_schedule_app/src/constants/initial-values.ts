@@ -1,11 +1,3 @@
-import type {
-  AnswerIconSettings,
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-  EventSchedule,
-  NotificationSettings,
-  Ymdhm,
-} from '@noshiro/event-schedule-app-shared';
 import {
   answerDeadlineRemainingDaysDefaultValue,
   notificationSettingsDefaultValue,

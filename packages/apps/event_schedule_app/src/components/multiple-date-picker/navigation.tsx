@@ -1,4 +1,3 @@
-import type { OptionProps } from '@blueprintjs/core';
 import { Button } from '@blueprintjs/core';
 import { monthsList } from '@noshiro/ts-utils-additional';
 import { BpSelect } from '../bp';

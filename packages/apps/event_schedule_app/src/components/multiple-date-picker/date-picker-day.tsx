@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import type {
-  DayType,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
 import {
   DatePickerDayHolidayStyled,
   DatePickerDayOutlinedSelectedReadonlyHolidayStyled,

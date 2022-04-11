@@ -1,9 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import type {
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-} from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../../constants';
 import { selectorOptions } from '../../../../functions';
 import { useSelectDatetimesHooks } from '../../../../hooks';
 import { holidaysJpDefinition$, setYearMonth$ } from '../../../../store';

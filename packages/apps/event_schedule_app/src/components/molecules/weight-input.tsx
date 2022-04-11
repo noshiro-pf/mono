@@ -1,4 +1,3 @@
-import type { Weight } from '@noshiro/event-schedule-app-shared';
 import { weightNumericInputConfig } from '../../constants';
 import { clampAndRoundAnswerWeight } from '../../functions';
 import { NumericInputView } from '../bp';

@@ -1,6 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../constants';
 import {
   onAnswerClick,
   onDatetimeSortChange,

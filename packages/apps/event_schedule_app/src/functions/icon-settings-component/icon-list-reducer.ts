@@ -1,9 +1,3 @@
-import type {
-  AnswerIconId,
-  AnswerIconPoint,
-  AnswerIconSettings,
-} from '@noshiro/event-schedule-app-shared';
-
 export type IconListReducerAction = Readonly<
   | {
       type: 'update-description';

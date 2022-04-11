@@ -1,5 +1,4 @@
 import { Spinner } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 import { eventScheduleResult$, router, useUser } from '../../../store';
 import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';

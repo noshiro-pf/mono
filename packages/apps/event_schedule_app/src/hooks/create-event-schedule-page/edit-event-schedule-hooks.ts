@@ -1,6 +1,5 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { api } from '../../api';
-import { dict, routes } from '../../constants';
+import { routes } from '../../constants';
 import type { EventSettingsPageDiffResult } from '../../functions';
 import {
   collectEventSettingsPageDiff,

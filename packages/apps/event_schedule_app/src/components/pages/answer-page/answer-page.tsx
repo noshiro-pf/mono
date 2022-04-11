@@ -1,5 +1,4 @@
 import { Button, Spinner } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 import { useAnswerPageState } from '../../../hooks';
 import {
   closeAlertOnAnswerClick,

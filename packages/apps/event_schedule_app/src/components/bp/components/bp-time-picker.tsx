@@ -1,5 +1,4 @@
 import { TimePicker } from '@blueprintjs/datetime';
-import type { HoursMinutes } from '@noshiro/event-schedule-app-shared';
 import type { ComponentProps } from 'react';
 
 type TimePickerPropsOriginal = ComponentProps<typeof TimePicker>;

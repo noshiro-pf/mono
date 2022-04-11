@@ -1,5 +1,5 @@
 import { TextArea } from '@blueprintjs/core';
-import type { ChangeEvent, ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
 type TextAreaPropsOriginal = ComponentProps<typeof TextArea>;
 

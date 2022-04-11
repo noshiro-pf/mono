@@ -1,5 +1,3 @@
-import type { Weight } from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../constants';
 import { WeightNumericInput } from '../../molecules';
 
 const dc = dict.answerPage.answerBeingEdited;

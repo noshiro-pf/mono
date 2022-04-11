@@ -1,10 +1,8 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 import {
   DeleteAccountCreatedWithGoogle,
   UpdateUserInfoDialogState,
 } from '../../../store';
-import type { User } from '../../../types';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template';
@@ -13,7 +11,7 @@ const dc = dict.accountSettings;
 
 type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: User;
+  user: FireAuthUser;
 }>;
 
 export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(

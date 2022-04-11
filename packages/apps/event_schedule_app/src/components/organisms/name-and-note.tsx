@@ -1,5 +1,4 @@
 import { FormGroup } from '@blueprintjs/core';
-import { dict } from '../../constants';
 import { useFormError } from '../../hooks';
 import { BpInput, BpTextArea } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';

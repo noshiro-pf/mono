@@ -1,11 +1,3 @@
-import type {
-  AnswerIconSettings,
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-  EventSchedule,
-  NotificationSettings,
-  Ymdhm,
-} from '@noshiro/event-schedule-app-shared';
 import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { useRef } from 'react';

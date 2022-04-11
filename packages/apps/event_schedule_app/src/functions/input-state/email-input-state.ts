@@ -1,5 +1,4 @@
 import { isEmailString } from '@noshiro/ts-utils-additional';
-import { dict } from '../../constants';
 
 export type EmailInputState = Readonly<{
   inputValue: string;

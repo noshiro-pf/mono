@@ -1,4 +1,3 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { compareDatetimeRange } from '@noshiro/event-schedule-app-shared';
 
 export const normalizeEventSchedule = (

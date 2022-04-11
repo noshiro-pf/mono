@@ -1,6 +1,4 @@
-import type { Intent } from '@blueprintjs/core';
 import { api } from '../../api';
-import { dict } from '../../constants';
 import {
   createToaster,
   emailInputHasError,
@@ -8,7 +6,6 @@ import {
   emailInputStateReducer,
   showToast,
 } from '../../functions';
-import type { AuthCredential, User } from '../../types';
 import { user$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
@@ -57,7 +54,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     )
   );
 
-  export const submit = async (user: User): Promise<void> => {
+  export const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (emailInputHasError(s)) return;

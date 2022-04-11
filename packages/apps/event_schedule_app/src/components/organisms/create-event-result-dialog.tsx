@@ -6,7 +6,6 @@ import {
   // eslint-disable-next-line import/no-deprecated
   Tooltip,
 } from '@blueprintjs/core';
-import { dict } from '../../constants';
 import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 

@@ -1,6 +1,4 @@
-import type { OptionProps } from '@blueprintjs/core';
 import { datetimeSpecificationOptions } from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../constants';
 
 const dc = dict.eventSettingsPage.section2;
 

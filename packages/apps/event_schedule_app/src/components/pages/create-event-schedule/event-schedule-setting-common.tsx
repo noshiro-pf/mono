@@ -1,4 +1,3 @@
-import { dict } from '../../../constants';
 import type {
   EventScheduleSettingCommonState,
   EventScheduleSettingCommonStateHandler,

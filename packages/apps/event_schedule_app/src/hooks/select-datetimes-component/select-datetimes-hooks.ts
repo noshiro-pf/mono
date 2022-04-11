@@ -1,9 +1,3 @@
-import type {
-  DatetimeRange,
-  HoursMinutes,
-  TimeRange,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
 import { yearMonthDateDefaultValue } from '@noshiro/event-schedule-app-shared';
 import type { DatetimeListReducerAction } from '../../functions';
 import { datetimeListReducer, getMostFrequentTimeRange } from '../../functions';

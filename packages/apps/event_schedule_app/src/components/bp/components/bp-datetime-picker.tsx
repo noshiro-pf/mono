@@ -1,6 +1,4 @@
-import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
-import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
 import type { ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string =>

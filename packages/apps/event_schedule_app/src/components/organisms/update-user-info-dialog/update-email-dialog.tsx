@@ -1,7 +1,5 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 import { UpdateEmailPage, UpdateUserInfoDialogState } from '../../../store';
-import type { User } from '../../../types';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { LockButton } from '../../molecules';
@@ -11,7 +9,7 @@ const dc = dict.accountSettings;
 
 type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: User;
+  user: FireAuthUser;
 }>;
 
 export const UpdateEmailDialog = memoNamed<Props>(

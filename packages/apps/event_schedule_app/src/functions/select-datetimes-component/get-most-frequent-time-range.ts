@@ -1,7 +1,3 @@
-import type {
-  DatetimeRange,
-  TimeRange,
-} from '@noshiro/event-schedule-app-shared';
 import { hoursMinutesDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { timeRangeToMapKey } from '../map-key';
 

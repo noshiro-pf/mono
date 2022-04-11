@@ -1,12 +1,4 @@
-import type {
-  Answer,
-  AnswerIconIdWithNone,
-  AnswerIconPoint,
-  DatetimeRange,
-  Weight,
-} from '@noshiro/event-schedule-app-shared';
 import { answerIconPointConfig } from '../../constants';
-import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
 
 export const createAnswerSummary = (

@@ -5,11 +5,10 @@ import {
   updatePassword as _updatePassword,
   updateProfile,
 } from 'firebase/auth';
-import type { AuthCredential, User, UserCredential } from '../../types';
 import { assertIsCredentialError } from '../../types';
 
 export const updateDisplayName = (
-  user: User,
+  user: FireAuthUser,
   displayName: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(
@@ -24,7 +23,7 @@ export const updateDisplayName = (
   );
 
 export const updateEmail = (
-  user: User,
+  user: FireAuthUser,
   email: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(_updateEmail(castWritable(user), email)).then(
@@ -35,7 +34,7 @@ export const updateEmail = (
   );
 
 export const updatePassword = (
-  user: User,
+  user: FireAuthUser,
   password: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(_updatePassword(castWritable(user), password)).then(
@@ -46,7 +45,7 @@ export const updatePassword = (
   );
 
 export const deleteUser = (
-  user: User
+  user: FireAuthUser
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
   Result.fromPromise(_deleteUser(castWritable(user))).then(
     Result.mapErr((error) => {
@@ -56,7 +55,7 @@ export const deleteUser = (
   );
 
 export const reauthenticateWithCredential = (
-  user: User,
+  user: FireAuthUser,
   authCredential: AuthCredential
 ): Promise<
   Result<UserCredential, Readonly<{ code: string; message: string }>>

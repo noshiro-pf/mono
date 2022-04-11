@@ -1,6 +1,5 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../initialize-firebase';
-import type { UserCredential } from '../../types';
 import { assertIsCredentialError } from '../../types';
 
 export const createUser = (

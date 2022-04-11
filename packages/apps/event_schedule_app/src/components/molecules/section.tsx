@@ -1,5 +1,4 @@
 import { Button, Card } from '@blueprintjs/core';
-import type { PropsWithChildren } from 'react';
 import { SectionTitle } from '../atoms';
 
 type Props = Readonly<{

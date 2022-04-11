@@ -21,7 +21,7 @@
     "fb:login": "firebase login",
     "fb:write": "node ./scripts/write_firestore",
     "fmt": "yarn _prettier .",
-    "gi": "yarn _script_genindex ./src --min-depth 1 --ignore assets",
+    "gi": "yarn _script_genindex ./src --min-depth 1 --ignore \"(assets|global)\"",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",

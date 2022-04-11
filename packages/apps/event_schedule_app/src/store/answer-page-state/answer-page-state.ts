@@ -1,22 +1,13 @@
-import type {
-  Answer,
-  AnswerIconId,
-  AnswerIconPoint,
-  DatetimeRange,
-  Weight,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
 import {
   answerDefaultValue,
   compareYmdhm,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
-import { dict, routes } from '../../constants';
+import { routes } from '../../constants';
 import type {
   AnswerSelectionReducerAction,
   CalendarCurrentPageReducerState,
-  DatetimeRangeMapKey,
 } from '../../functions';
 import {
   answerSelectionReducer,
@@ -28,7 +19,7 @@ import {
   showToast,
   theNameIsAlreadyUsedFn,
 } from '../../functions';
-import type { AnswerSelectionValue, User } from '../../types';
+import type { AnswerSelectionValue } from '../../types';
 import { user$ } from '../auth';
 import {
   answers$,
@@ -217,7 +208,10 @@ const toggleRequiredSection = (): void => {
 /* callbacks impl */
 
 /* @internal */
-const onAnswerClickImpl = (answer: Answer, user: User | undefined): void => {
+const onAnswerClickImpl = (
+  answer: Answer,
+  user: FireAuthUser | undefined
+): void => {
   // ログインユーザーの回答は本人のみ編集可能にする
   if (answer.user.id !== null && answer.user.id !== user?.uid) {
     openAlertOnAnswerClick();
@@ -229,7 +223,7 @@ const onAnswerClickImpl = (answer: Answer, user: User | undefined): void => {
 };
 
 /* @internal */
-const onAddAnswerButtonClickImpl = (user: User | undefined): void => {
+const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
   clearAnswerBeingEditedFields();
   setAnswerBeingEditedSectionState('creating');
   // automatically set username with user.displayName
@@ -348,7 +342,7 @@ const answerBeingEditedDispatchImpl = (
   );
 };
 
-const toggleProtectedSectionImpl = (user: User | undefined): void => {
+const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
   updateAnswerBeingEdited((ans) =>
     IRecord.set(
       ans,
@@ -378,7 +372,7 @@ const mut_subscribedValues: {
   eventId: string | undefined;
   answerBeingEdited: Answer;
   answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden';
-  user: User | undefined;
+  user: FireAuthUser | undefined;
   answerSelectionMap: IMapMapped<
     DatetimeRange,
     AnswerSelectionValue,

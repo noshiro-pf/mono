@@ -1,6 +1,5 @@
-import type { Intent } from '@blueprintjs/core';
 import { api } from '../../api';
-import { dict, routes } from '../../constants';
+import { routes } from '../../constants';
 import {
   createToaster,
   showToast,

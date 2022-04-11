@@ -1,10 +1,5 @@
 import { FormGroup } from '@blueprintjs/core';
-import type {
-  NotificationSettings,
-  Ymdhm,
-} from '@noshiro/event-schedule-app-shared';
 import { isEmailString } from '@noshiro/ts-utils-additional';
-import { dict } from '../../constants';
 import { now, ymdhmDateDiff } from '../../functions';
 import { BpCheckbox, BpInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';

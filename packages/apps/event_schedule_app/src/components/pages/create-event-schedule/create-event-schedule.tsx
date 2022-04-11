@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 import { useCreateEventScheduleHooks } from '../../../hooks';
 import { CreateEventResultDialog, Header, ResetButton } from '../../organisms';
 import { ButtonsWrapperForEventSettingsPage } from '../../styled';

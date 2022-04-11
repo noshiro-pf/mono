@@ -1,16 +1,16 @@
 import { routes } from '../constants';
 import { auth } from '../initialize-firebase';
-import type { User } from '../types';
 import { clog } from '../utils';
 import { router } from './router';
 
-const { state$: user$, setState: setUser } = createState<User | undefined>(
-  undefined
-);
+const { state$: user$, setState: setUser } = createState<
+  FireAuthUser | undefined
+>(undefined);
 
 export { user$ };
 
-export const useUser = (): User | undefined => useObservableValue(user$);
+export const useUser = (): FireAuthUser | undefined =>
+  useObservableValue(user$);
 
 export const passwordProviderIncluded$: InitializedObservable<boolean> =
   user$.chain(

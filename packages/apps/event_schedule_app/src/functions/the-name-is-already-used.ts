@@ -1,5 +1,3 @@
-import type { Answer, UserName } from '@noshiro/event-schedule-app-shared';
-
 export const theNameIsAlreadyUsedFn = (
   userName: UserName,
   answers: readonly Answer[],
