@@ -15,26 +15,11 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 
-declare namespace Intl {
-  type DateTimeFormatPartTypes =
-    | 'day'
-    | 'dayPeriod'
-    | 'era'
-    | 'hour'
-    | 'literal'
-    | 'minute'
-    | 'month'
-    | 'second'
-    | 'timeZoneName'
-    | 'weekday'
-    | 'year';
-
-  interface DateTimeFormatPart {
-    readonly type: DateTimeFormatPartTypes;
-    readonly value: string;
-  }
-
-  interface DateTimeFormat {
-    formatToParts(date?: Date | number): readonly DateTimeFormatPart[];
-  }
+interface ObjectConstructor {
+  /**
+   * Determines whether an object has a property with the specified name.
+   * @param o An object.
+   * @param v A property name.
+   */
+  hasOwn(o: object, v: PropertyKey): boolean;
 }

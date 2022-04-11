@@ -13,20 +13,8 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
 
-
 declare namespace Intl {
-    type NumberFormatPartTypes = "compact" | "currency" | "decimal" | "exponentInteger" | "exponentMinusSign" | "exponentSeparator" | "fraction" | "group" | "infinity" | "integer" | "literal" | "minusSign" | "nan" | "plusSign" | "percentSign" | "unit" | "unknown";
-
-    interface NumberFormatPart {
-        type: NumberFormatPartTypes;
-        value: string;
-    }
-
-    interface NumberFormat {
-        formatToParts(number?: number | bigint): NumberFormatPart[];
-    }
+  // Empty for now
 }

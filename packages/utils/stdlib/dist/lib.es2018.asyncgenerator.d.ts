@@ -13,67 +13,69 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
 
+/// <reference path="./lib.es2018.asynciterable.d.ts" />
 
-/// <reference path="lib.es2018.asynciterable.d.ts" />
-
-interface AsyncGenerator<T = unknown, TReturn = any, TNext = unknown> extends AsyncIterator<T, TReturn, TNext> {
-    // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
-    next(...args: readonly [] | readonly [TNext]): Promise<IteratorResult<T, TReturn>>;
-    return(value: TReturn | PromiseLike<TReturn>): Promise<IteratorResult<T, TReturn>>;
-    throw(e: unknown): Promise<IteratorResult<T, TReturn>>;
-    [Symbol.asyncIterator](): AsyncGenerator<T, TReturn, TNext>;
+interface AsyncGenerator<T = unknown, TReturn = any, TNext = unknown>
+  extends AsyncIterator<T, TReturn, TNext> {
+  // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
+  next(
+    ...args: readonly [] | readonly [TNext]
+  ): Promise<IteratorResult<T, TReturn>>;
+  return(
+    value: TReturn | PromiseLike<TReturn>
+  ): Promise<IteratorResult<T, TReturn>>;
+  throw(e: unknown): Promise<IteratorResult<T, TReturn>>;
+  [Symbol.asyncIterator](): AsyncGenerator<T, TReturn, TNext>;
 }
 
 interface AsyncGeneratorFunction {
-    /**
-     * Creates a new AsyncGenerator object.
-     * @param args A list of arguments the function accepts.
-     */
-    new (...args: readonly unknown[]): AsyncGenerator;
-    /**
-     * Creates a new AsyncGenerator object.
-     * @param args A list of arguments the function accepts.
-     */
-    (...args: readonly unknown[]): AsyncGenerator;
-    /**
-     * The length of the arguments.
-     */
-    readonly length: number;
-    /**
-     * Returns the name of the function.
-     */
-    readonly name: string;
-    /**
-     * A reference to the prototype.
-     */
-    readonly prototype: AsyncGenerator;
+  /**
+   * Creates a new AsyncGenerator object.
+   * @param args A list of arguments the function accepts.
+   */
+  new (...args: readonly never[]): AsyncGenerator;
+  /**
+   * Creates a new AsyncGenerator object.
+   * @param args A list of arguments the function accepts.
+   */
+  (...args: readonly never[]): AsyncGenerator;
+  /**
+   * The length of the arguments.
+   */
+  readonly length: number;
+  /**
+   * Returns the name of the function.
+   */
+  readonly name: string;
+  /**
+   * A reference to the prototype.
+   */
+  readonly prototype: AsyncGenerator;
 }
 
 interface AsyncGeneratorFunctionConstructor {
-    /**
-     * Creates a new AsyncGenerator function.
-     * @param args A list of arguments the function accepts.
-     */
-    new (...args: readonly string[]): AsyncGeneratorFunction;
-    /**
-     * Creates a new AsyncGenerator function.
-     * @param args A list of arguments the function accepts.
-     */
-    (...args: readonly string[]): AsyncGeneratorFunction;
-    /**
-     * The length of the arguments.
-     */
-    readonly length: number;
-    /**
-     * Returns the name of the function.
-     */
-    readonly name: string;
-    /**
-     * A reference to the prototype.
-     */
-    readonly prototype: AsyncGeneratorFunction;
+  /**
+   * Creates a new AsyncGenerator function.
+   * @param args A list of arguments the function accepts.
+   */
+  new (...args: readonly string[]): AsyncGeneratorFunction;
+  /**
+   * Creates a new AsyncGenerator function.
+   * @param args A list of arguments the function accepts.
+   */
+  (...args: readonly string[]): AsyncGeneratorFunction;
+  /**
+   * The length of the arguments.
+   */
+  readonly length: number;
+  /**
+   * Returns the name of the function.
+   */
+  readonly name: string;
+  /**
+   * A reference to the prototype.
+   */
+  readonly prototype: AsyncGeneratorFunction;
 }

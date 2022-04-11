@@ -13,13 +13,10 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
 
-
-/// <reference path="lib.es2018.d.ts" />
-/// <reference path="lib.es2019.array.d.ts" />
-/// <reference path="lib.es2019.object.d.ts" />
-/// <reference path="lib.es2019.string.d.ts" />
-/// <reference path="lib.es2019.symbol.d.ts" />
+/// <reference path="./lib.es2018.d.ts" />
+/// <reference path="./lib.es2019.array.d.ts" />
+/// <reference path="./lib.es2019.object.d.ts" />
+/// <reference path="./lib.es2019.string.d.ts" />
+/// <reference path="./lib.es2019.symbol.d.ts" />

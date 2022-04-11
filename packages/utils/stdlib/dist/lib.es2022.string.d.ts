@@ -15,26 +15,10 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 
-declare namespace Intl {
-  type DateTimeFormatPartTypes =
-    | 'day'
-    | 'dayPeriod'
-    | 'era'
-    | 'hour'
-    | 'literal'
-    | 'minute'
-    | 'month'
-    | 'second'
-    | 'timeZoneName'
-    | 'weekday'
-    | 'year';
-
-  interface DateTimeFormatPart {
-    readonly type: DateTimeFormatPartTypes;
-    readonly value: string;
-  }
-
-  interface DateTimeFormat {
-    formatToParts(date?: Date | number): readonly DateTimeFormatPart[];
-  }
+interface String {
+  /**
+   * Returns a new String consisting of the single UTF-16 code unit located at the specified index.
+   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   */
+  at(index: number): string | undefined;
 }

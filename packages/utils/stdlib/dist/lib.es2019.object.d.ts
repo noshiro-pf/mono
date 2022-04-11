@@ -13,23 +13,22 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
 
-
-/// <reference path="lib.es2015.iterable.d.ts" />
+/// <reference path="./lib.es2015.iterable.d.ts" />
 
 interface ObjectConstructor {
-    /**
-     * Returns an object created by key-value entries for properties and methods
-     * @param entries An iterable object that contains key-value entries for properties and methods.
-     */
-    fromEntries<T = unknown>(entries: Iterable<readonly [PropertyKey, T]>): { [k: string]: T };
+  /**
+   * Returns an object created by key-value entries for properties and methods
+   * @param entries An iterable object that contains key-value entries for properties and methods.
+   */
+  fromEntries<T = unknown>(
+    entries: Iterable<readonly [PropertyKey, T]>
+  ): { readonly [k: string]: T };
 
-    /**
-     * Returns an object created by key-value entries for properties and methods
-     * @param entries An iterable object that contains key-value entries for properties and methods.
-     */
-    fromEntries(entries: Iterable<readonly unknown[]>): unknown;
+  /**
+   * Returns an object created by key-value entries for properties and methods
+   * @param entries An iterable object that contains key-value entries for properties and methods.
+   */
+  fromEntries(entries: Iterable<readonly unknown[]>): unknown;
 }

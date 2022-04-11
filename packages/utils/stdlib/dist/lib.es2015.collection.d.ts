@@ -13,77 +13,88 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
 
-
 interface Map<K, V> {
-    clear(): void;
-    delete(key: K): boolean;
-    forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void;
-    get(key: K): V | undefined;
-    has(key: K): boolean;
-    set(key: K, value: V): this;
-    readonly size: number;
+  clear(): void;
+  delete(key: K): boolean;
+  forEach(
+    callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void,
+    thisArg?: unknown
+  ): void;
+  get(key: K): V | undefined;
+  has(key: K): boolean;
+  set(key: K, value: V): this;
+  readonly size: number;
 }
 
 interface MapConstructor {
-    new(): Map<unknown, unknown>;
-    new<K, V>(entries?: readonly (readonly [K, V])[] | null): Map<K, V>;
-    readonly prototype: Map<unknown, unknown>;
+  new (): ReadonlyMap<unknown, unknown>;
+  new <K, V>(entries?: readonly (readonly [K, V])[] | null): ReadonlyMap<K, V>;
+  readonly prototype: ReadonlyMap<unknown, unknown>;
 }
 declare const Map: MapConstructor;
 
 interface ReadonlyMap<K, V> {
-    forEach(callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void, thisArg?: unknown): void;
-    get(key: K): V | undefined;
-    has(key: K): boolean;
-    readonly size: number;
+  forEach(
+    callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void,
+    thisArg?: unknown
+  ): void;
+  get(key: K): V | undefined;
+  has(key: K): boolean;
+  readonly size: number;
 }
 
 interface WeakMap<K extends object, V> {
-    delete(key: K): boolean;
-    get(key: K): V | undefined;
-    has(key: K): boolean;
-    set(key: K, value: V): this;
+  delete(key: K): boolean;
+  get(key: K): V | undefined;
+  has(key: K): boolean;
+  set(key: K, value: V): this;
 }
 
 interface WeakMapConstructor {
-    new <K extends object = object, V = unknown>(entries?: readonly (readonly [K, V])[] | null): WeakMap<K, V>;
-    readonly prototype: WeakMap<object, unknown>;
+  new <K extends object = object, V = unknown>(
+    entries?: readonly (readonly [K, V])[] | null
+  ): WeakMap<K, V>;
+  readonly prototype: WeakMap<object, unknown>;
 }
 declare const WeakMap: WeakMapConstructor;
 
 interface Set<T> {
-    add(value: T): this;
-    clear(): void;
-    delete(value: T): boolean;
-    forEach(callbackfn: (value: T, value2: T, set: Set<T>) => void, thisArg?: unknown): void;
-    has(value: T): boolean;
-    readonly size: number;
+  add(value: T): this;
+  clear(): void;
+  delete(value: T): boolean;
+  forEach(
+    callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
+    thisArg?: unknown
+  ): void;
+  has(value: T): boolean;
+  readonly size: number;
 }
 
 interface SetConstructor {
-    new <T = unknown>(values?: readonly T[] | null): Set<T>;
-    readonly prototype: Set<unknown>;
+  new <T = unknown>(values?: readonly T[] | null): ReadonlySet<T>;
+  readonly prototype: ReadonlySet<unknown>;
 }
 declare const Set: SetConstructor;
 
 interface ReadonlySet<T> {
-    forEach(callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void, thisArg?: unknown): void;
-    has(value: T): boolean;
-    readonly size: number;
+  forEach(
+    callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
+    thisArg?: unknown
+  ): void;
+  has(value: T): boolean;
+  readonly size: number;
 }
 
 interface WeakSet<T extends object> {
-    add(value: T): this;
-    delete(value: T): boolean;
-    has(value: T): boolean;
+  add(value: T): this;
+  delete(value: T): boolean;
+  has(value: T): boolean;
 }
 
 interface WeakSetConstructor {
-    new <T extends object = object>(values?: readonly T[] | null): WeakSet<T>;
-    readonly prototype: WeakSet<object>;
+  new <T extends object = object>(values?: readonly T[] | null): WeakSet<T>;
+  readonly prototype: WeakSet<object>;
 }
 declare const WeakSet: WeakSetConstructor;

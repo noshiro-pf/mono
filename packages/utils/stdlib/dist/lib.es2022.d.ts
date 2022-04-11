@@ -15,26 +15,8 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 
-declare namespace Intl {
-  type DateTimeFormatPartTypes =
-    | 'day'
-    | 'dayPeriod'
-    | 'era'
-    | 'hour'
-    | 'literal'
-    | 'minute'
-    | 'month'
-    | 'second'
-    | 'timeZoneName'
-    | 'weekday'
-    | 'year';
-
-  interface DateTimeFormatPart {
-    readonly type: DateTimeFormatPartTypes;
-    readonly value: string;
-  }
-
-  interface DateTimeFormat {
-    formatToParts(date?: Date | number): readonly DateTimeFormatPart[];
-  }
-}
+/// <reference path="./lib.es2021.d.ts" />
+/// <reference path="./lib.es2022.array.d.ts" />
+/// <reference path="./lib.es2022.error.d.ts" />
+/// <reference path="./lib.es2022.object.d.ts" />
+/// <reference path="./lib.es2022.string.d.ts" />
