@@ -7,6 +7,11 @@ export const eslintNoRestrictedImportsReactDef = {
     'useReducer',
     'Reducer',
     'CSSProperties',
+    'PropsWithChildren',
+    'ReactNode',
+    'RefObject',
+    'ChangeEvent',
+    'FormEvent',
   ],
   message: 'use global variable instead.',
 };
