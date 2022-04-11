@@ -18,8 +18,11 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 
-/// <reference lib="es2020" />
-/// <reference lib="es2021.promise" />
-/// <reference lib="es2021.string" />
-/// <reference lib="es2021.weakref" />
-/// <reference lib="es2021.intl" />
+interface ObjectConstructor {
+    /**
+     * Determines whether an object has a property with the specified name.
+     * @param o An object.
+     * @param v A property name.
+     */
+    hasOwn(o: object, v: PropertyKey): boolean;
+}

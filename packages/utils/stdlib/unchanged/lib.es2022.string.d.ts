@@ -18,8 +18,10 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 
-/// <reference lib="es2020" />
-/// <reference lib="es2021.promise" />
-/// <reference lib="es2021.string" />
-/// <reference lib="es2021.weakref" />
-/// <reference lib="es2021.intl" />
+interface String {
+    /**
+     * Returns a new String consisting of the single UTF-16 code unit located at the specified index.
+     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+     */
+    at(index: number): string | undefined;
+}
