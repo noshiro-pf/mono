@@ -1,4 +1,3 @@
-import { styled } from '@noshiro/goober';
 import type { Rect } from '@noshiro/ts-utils-additional';
 import { text } from '../constants';
 import {

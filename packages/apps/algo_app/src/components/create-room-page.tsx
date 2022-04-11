@@ -1,4 +1,3 @@
-import { styled } from '@noshiro/goober';
 import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
 import { createRoom } from '../observables';

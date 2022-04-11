@@ -1,4 +1,3 @@
-import { styled } from '@noshiro/goober';
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
 import type { JSXInternal } from 'preact/src/jsx';
 import { zIndex } from '../../constants';

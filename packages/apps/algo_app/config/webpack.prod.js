@@ -13,7 +13,7 @@ const {
   providePluginSyncflowDef,
 } = require('@noshiro/global-syncflow/cjs/provide-plugin-def');
 const {
-  providePluginSyncflowReactHooksDef,
+  providePluginSyncflowPreactHooksDef,
 } = require('@noshiro/global-syncflow-preact-hooks/cjs/provide-plugin-def');
 const {
   providePluginTsUtilsDef,
@@ -21,6 +21,9 @@ const {
 const {
   providePluginTinyRouterPreactHooksDef,
 } = require('@noshiro/global-tiny-router-preact-hooks/cjs/provide-plugin-def');
+const {
+  providePluginGooberDef,
+} = require('@noshiro/global-goober/cjs/provide-plugin-def');
 
 const {
   webpackConfigReactProdMaker,
@@ -39,9 +42,10 @@ const webpackConfigMerged = webpackConfigReactProdMaker(
       ...providePluginPreactDef,
       ...providePluginPreactUtilsDef,
       ...providePluginSyncflowDef,
-      ...providePluginSyncflowReactHooksDef,
+      ...providePluginSyncflowPreactHooksDef,
       ...providePluginTsUtilsDef,
       ...providePluginTinyRouterPreactHooksDef,
+      ...providePluginGooberDef,
     }),
   ]
 );

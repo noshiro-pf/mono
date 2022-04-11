@@ -58,6 +58,7 @@
     "preact": "^10.4.7"
   },
   "devDependencies": {
+    "@noshiro/global-goober": "*",
     "@noshiro/global-preact": "*",
     "@noshiro/global-preact-utils": "*",
     "@noshiro/global-syncflow": "*",

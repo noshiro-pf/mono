@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-
 type Props = Readonly<{ message: string }>;
 
 export const GameMessage = memoNamed<Props>('GameMessage', ({ message }) => (

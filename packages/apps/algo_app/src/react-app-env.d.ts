@@ -11,6 +11,7 @@
 /// <reference path="../../../utils/global-preact/esm/globals-decl.d.ts" />
 /// <reference path="../../../utils/global-tiny-router-observable/esm/globals-decl.d.ts" />
 /// <reference path="../../../utils/global-tiny-router-preact-hooks/esm/globals-decl.d.ts" />
+/// <reference path="../../../utils/global-goober/esm/globals-decl.d.ts" />
 
 
 /// <reference types="node" />

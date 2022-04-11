@@ -20,6 +20,7 @@
     "@noshiro/global-syncflow",
     "@noshiro/global-syncflow-preact-hooks",
     "@noshiro/global-tiny-router-preact-hooks",
-    "@noshiro/global-preact"
+    "@noshiro/global-preact",
+    "@noshiro/global-goober"
   ]
 }
