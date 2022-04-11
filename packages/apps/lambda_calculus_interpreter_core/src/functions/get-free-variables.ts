@@ -2,7 +2,7 @@ import type { LambdaTerm, Variable } from '../types';
 import { isAbstraction, isApplication } from './is-lambda-term';
 import { isVariable } from './is-variable';
 
-export const getFreeVariables = (term: LambdaTerm): Variable[] => {
+export const getFreeVariables = (term: LambdaTerm): readonly Variable[] => {
   if (isVariable(term)) return [term];
   if (isAbstraction(term)) {
     return getFreeVariables(term[2]).filter((ch) => ch !== term[1]);

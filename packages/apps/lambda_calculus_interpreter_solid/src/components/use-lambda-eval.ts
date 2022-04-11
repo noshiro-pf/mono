@@ -26,9 +26,8 @@ export const useLambdaEval = (
     .chain(map(evalSequence))
     .chain(withInitialValue([]));
 
-  const evalSeqToStr$: InitializedObservable<string[]> = evalSequence$.chain(
-    mapI((seq) => seq.map(termToString))
-  );
+  const evalSeqToStr$: InitializedObservable<readonly string[]> =
+    evalSequence$.chain(mapI((seq) => seq.map(termToString)));
 
   const output$: InitializedObservable<string> = evalSeqToStr$.chain(
     mapI((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))

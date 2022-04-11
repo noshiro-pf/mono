@@ -40,7 +40,7 @@ export namespace Str {
    * @param substitutions A set of substitution values.
    */
   export const raw = (
-    template: { readonly raw: ArrayLike<string> | readonly string[] },
+    template: { readonly raw: Readonly<ArrayLike<string>> | readonly string[] },
     ...substitutions: readonly unknown[]
   ): // eslint-disable-next-line no-restricted-globals
   string => String.raw(template, ...substitutions);
@@ -174,7 +174,7 @@ export namespace Str {
    */
   export const split =
     (separator: DeepReadonly<RegExp> | string, limit?: number) =>
-    (str: string): string[] =>
+    (str: string): readonly string[] =>
       str.split(separator, limit);
 
   /**

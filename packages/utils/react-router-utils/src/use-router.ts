@@ -52,7 +52,7 @@ const usePathName = <
 
 export const usePathNameList = <
   RouteParam extends { [K in keyof RouteParam]?: string | undefined }
->(): string[] => {
+>(): readonly string[] => {
   const pathname = usePathName<RouteParam>();
   return useMemo(() => pathnameToPathList(pathname), [pathname]);
 };

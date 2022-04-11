@@ -1,2 +1,2 @@
-export const splitStringByWhitespace = (str: string): string[] =>
+export const splitStringByWhitespace = (str: string): readonly string[] =>
   str.split(/\s+/u);

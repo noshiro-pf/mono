@@ -255,7 +255,7 @@ describe('IRecord', () => {
     test('case 1', () => {
       const values = IRecord.values({ x: 1, y: 2 } as const);
 
-      assertType<TypeEq<typeof values, (1 | 2)[]>>();
+      assertType<TypeEq<typeof values, readonly (1 | 2)[]>>();
 
       expect(values).toStrictEqual([1, 2]);
     });
