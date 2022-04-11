@@ -1,6 +1,0 @@
-{
-  "extends": "../../../config/eslintrc/.eslintrc.preact.js",
-  "parserOptions": {
-    "project": "./tsconfig.json"
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "extends": "../../../config/eslintrc/.eslintrc.react.js",
-  "parserOptions": {
-    "project": "./tsconfig.json"
-  },
-  "rules": {
-    "@typescript-eslint/prefer-readonly-parameter-types": "off"
-  }
-}
