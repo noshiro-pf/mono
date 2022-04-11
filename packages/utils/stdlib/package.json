@@ -5,6 +5,8 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write .",
+    "gen": "./gen.sh",
+    "lint": "eslint dist/ --ext .d.ts"
   }
 }
