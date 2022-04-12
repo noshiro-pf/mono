@@ -18,7 +18,7 @@ done
 
 rm -rf "dist"/*.bak
 
-yarn lint --fix
+yarn autofix
 
 # fix manually the `eslint --fix` results
 for file in "./dist"/*; do
