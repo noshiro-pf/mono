@@ -152,27 +152,7 @@ export namespace Num {
   export const toLocaleString =
     (
       locales?: string | readonly string[],
-      options?: Partial<
-        Readonly<{
-          localeMatcher: string;
-          style: string;
-          currency: string;
-          currencyDisplay: string;
-          currencySign: string;
-          useGrouping: boolean;
-          minimumIntegerDigits: number;
-          minimumFractionDigits: number;
-          maximumFractionDigits: number;
-          minimumSignificantDigits: number;
-          maximumSignificantDigits: number;
-
-          compactDisplay: string;
-          notation: string;
-          signDisplay: string;
-          unit: string;
-          unitDisplay: string;
-        }>
-      >
+      options?: Intl.NumberFormatOptions
     ) =>
     (n: number): string =>
       n.toLocaleString(locales, options);

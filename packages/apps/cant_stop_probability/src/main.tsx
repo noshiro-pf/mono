@@ -44,7 +44,7 @@ export const Main = memoNamed('Main', () => {
 
   const { state: filterByString, setState: setFilterByString } =
     useState<string>('');
-  const filterBy: TwoDiceSumValue[] = useMemo(
+  const filterBy: readonly TwoDiceSumValue[] = useMemo(
     () =>
       filterByString
         .split(separator)

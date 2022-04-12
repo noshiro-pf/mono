@@ -13,63 +13,60 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
 
-
 interface WeakRef<T extends object> {
-    readonly [Symbol.toStringTag]: "WeakRef";
+  readonly [Symbol.toStringTag]: 'WeakRef';
 
-    /**
-     * Returns the WeakRef instance's target object, or undefined if the target object has been
-     * reclaimed.
-     */
-    deref(): T | undefined;
+  /**
+   * Returns the WeakRef instance's target object, or undefined if the target object has been
+   * reclaimed.
+   */
+  deref(): T | undefined;
 }
 
 interface WeakRefConstructor {
-    readonly prototype: WeakRef<unknown>;
+  readonly prototype: WeakRef<unknown>;
 
-    /**
-     * Creates a WeakRef instance for the given target object.
-     * @param target The target object for the WeakRef instance.
-     */
-    new<T extends object>(target: T): WeakRef<T>;
+  /**
+   * Creates a WeakRef instance for the given target object.
+   * @param target The target object for the WeakRef instance.
+   */
+  new <T extends object>(target: T): WeakRef<T>;
 }
 
 declare const WeakRef: WeakRefConstructor;
 
 interface FinalizationRegistry<T> {
-    readonly [Symbol.toStringTag]: "FinalizationRegistry";
+  readonly [Symbol.toStringTag]: 'FinalizationRegistry';
 
-    /**
-     * Registers an object with the registry.
-     * @param target The target object to register.
-     * @param heldValue The value to pass to the finalizer for this object. This cannot be the
-     * target object.
-     * @param unregisterToken The token to pass to the unregister method to unregister the target
-     * object. If provided (and not undefined), this must be an object. If not provided, the target
-     * cannot be unregistered.
-     */
-    register(target: object, heldValue: T, unregisterToken?: object): void;
+  /**
+   * Registers an object with the registry.
+   * @param target The target object to register.
+   * @param heldValue The value to pass to the finalizer for this object. This cannot be the
+   * target object.
+   * @param unregisterToken The token to pass to the unregister method to unregister the target
+   * object. If provided (and not undefined), this must be an object. If not provided, the target
+   * cannot be unregistered.
+   */
+  register(target: object, heldValue: T, unregisterToken?: object): void;
 
-    /**
-     * Unregisters an object from the registry.
-     * @param unregisterToken The token that was used as the unregisterToken argument when calling
-     * register to register the target object.
-     */
-    unregister(unregisterToken: object): void;
+  /**
+   * Unregisters an object from the registry.
+   * @param unregisterToken The token that was used as the unregisterToken argument when calling
+   * register to register the target object.
+   */
+  unregister(unregisterToken: object): void;
 }
 
 interface FinalizationRegistryConstructor {
-    readonly prototype: FinalizationRegistry<unknown>;
+  readonly prototype: FinalizationRegistry<unknown>;
 
-    /**
-     * Creates a finalization registry with an associated cleanup callback
-     * @param cleanupCallback The callback to call after an object in the registry has been reclaimed.
-     */
-    new<T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
+  /**
+   * Creates a finalization registry with an associated cleanup callback
+   * @param cleanupCallback The callback to call after an object in the registry has been reclaimed.
+   */
+  new <T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
 }
 
 declare const FinalizationRegistry: FinalizationRegistryConstructor;

@@ -13,12 +13,10 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
 
-
-/// <reference path="lib.es2020.d.ts" />
-/// <reference path="lib.es2021.promise.d.ts" />
-/// <reference path="lib.es2021.string.d.ts" />
-/// <reference path="lib.es2021.weakref.d.ts" />
+/// <reference path="./lib.es2020.d.ts" />
+/// <reference path="./lib.es2021.promise.d.ts" />
+/// <reference path="./lib.es2021.string.d.ts" />
+/// <reference path="./lib.es2021.weakref.d.ts" />
+/// <reference path="./lib.es2021.intl.d.ts" />

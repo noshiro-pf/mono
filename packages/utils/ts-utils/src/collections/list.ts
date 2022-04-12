@@ -131,8 +131,9 @@ export namespace IList {
    * Creates an array from an iterable object.
    * @param iterable An iterable object to convert to an array.
    */
-  export const from: <T>(iterable: ArrayLike<T> | Iterable<T>) => readonly T[] =
-    ArrayFrom;
+  export const from: <T>(
+    iterable: Iterable<T> | Readonly<ArrayLike<T>>
+  ) => readonly T[] = ArrayFrom;
 
   export const asMut = <T>(list: readonly T[]): T[] => list as T[];
 
@@ -143,7 +144,7 @@ export namespace IList {
    * @param thisArg Value of 'this' used to invoke the mapfn.
    */
   export const fromMapped: <T, U>(
-    iterable: ArrayLike<T> | Iterable<T>,
+    iterable: Iterable<T> | Readonly<ArrayLike<T>>,
     mapfn: (v: T, k: number) => U
   ) => readonly U[] = ArrayFrom;
 
@@ -422,7 +423,7 @@ export namespace IList {
     list: T
   ): ListType.Reverse<T> =>
     // eslint-disable-next-line functional/immutable-data
-    ArrayFrom(list).reverse() as readonly unknown[] as ListType.Reverse<T>;
+    ArrayFrom(list).reverse() as ListType.Reverse<T>;
 
   export function sort<T extends readonly number[]>(
     list: T,
@@ -439,7 +440,7 @@ export namespace IList {
     const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
 
     // eslint-disable-next-line functional/immutable-data
-    return ArrayFrom(list).sort(cmp) as readonly unknown[] as {
+    return ArrayFrom(list).sort(cmp) as {
       readonly [K in keyof T]: T[number];
     };
   }

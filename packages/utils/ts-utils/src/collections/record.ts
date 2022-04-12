@@ -109,12 +109,13 @@ export namespace IRecord {
   export const values = <K extends PropertyKey, V>(
     object: ReadonlyRecord<K, V>
     // eslint-disable-next-line no-restricted-globals
-  ): V[] => Object.values(object);
+  ): readonly V[] => Object.values(object);
 
   export const fromEntries = <K extends PropertyKey, V>(
     entries_: Iterable<readonly [K, V]>
+  ): ReadonlyRecord<K, V> =>
     // eslint-disable-next-line no-restricted-globals
-  ): Record<K, V> => Object.fromEntries(entries_) as Record<K, V>;
+    Object.fromEntries(entries_) as ReadonlyRecord<K, V>;
 
   export const entries = <R extends ReadonlyRecordBase>(
     object: R
@@ -124,7 +125,10 @@ export namespace IRecord {
   /* @internal */
   export type Entries<R extends ReadonlyRecordBase> = R extends R
     ? {
-        [K in keyof R]: [ToObjectKeysValue<keyof PickByValue<R, R[K]>>, R[K]];
+        readonly [K in keyof R]: [
+          ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
+          R[K]
+        ];
         // eslint-disable-next-line @typescript-eslint/ban-types
       }[RelaxedExclude<keyof R, symbol>][]
     : never;

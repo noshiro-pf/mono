@@ -1,5 +1,5 @@
 export const toAbsolutePath = (relativePath: string): string => {
-  const mut_element = document.createElement('a');
+  const mut_element: Writable<HTMLAnchorElement> = document.createElement('a');
 
   mut_element.href = relativePath;
 

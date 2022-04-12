@@ -2,7 +2,7 @@ export const getImageElementFromUrl = (
   url: string
 ): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
-    const mut_img = new Image();
+    const mut_img: Writable<HTMLImageElement> = new Image();
 
     mut_img.addEventListener('load', () => {
       resolve(mut_img);
