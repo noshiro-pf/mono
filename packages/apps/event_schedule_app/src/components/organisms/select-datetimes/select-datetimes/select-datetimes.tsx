@@ -53,7 +53,7 @@ export const SelectDatetimes = memoNamed<Props>(
               onValueChange={onDatetimeSpecificationChange as CastedHandlerType}
             />
           </DatetimeSpecificationSelectWrapper>
-          <DatetimeRangeListWrapper>
+          <DatetimeRangeListWrapper data-cy={'datetime-list'}>
             {datetimeListWithHandler.map(
               ({
                 id,
@@ -86,8 +86,8 @@ export const SelectDatetimes = memoNamed<Props>(
               onSetTimesSubmit={onSetTimesPopoverSubmit}
             />
             <Button
-              icon='sort-asc'
-              intent='primary'
+              icon={'sort-asc'}
+              intent={'primary'}
               text={dc.sortDatetimes}
               onClick={onSortClick}
             />

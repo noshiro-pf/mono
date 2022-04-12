@@ -98,6 +98,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           >
             <BpInput
               autoFocus={true}
+              data-cy={'username'}
               value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
               onValueChange={onUserNameChangeLocal as (v: string) => void}
@@ -112,6 +113,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   <th />
                   <th>
                     <Button
+                      data-cy={'col-good-button'}
                       icon={<CustomIcon iconName={'good'} />}
                       minimal={true}
                       title={iconHeader.good.iconDescription}
@@ -120,6 +122,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   </th>
                   <th>
                     <Button
+                      data-cy={'col-fair-button'}
                       icon={<CustomIcon iconName={'fair'} />}
                       minimal={true}
                       title={iconHeader.fair.iconDescription}
@@ -128,6 +131,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   </th>
                   <th>
                     <Button
+                      data-cy={'col-poor-button'}
                       icon={<CustomIcon iconName={'poor'} />}
                       minimal={true}
                       title={iconHeader.poor.iconDescription}
@@ -262,7 +266,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
           </Paragraph>
         )}
 
-        <ButtonsWrapperAlignEnd>
+        <ButtonsWrapperAlignEnd data-cy={'buttons'}>
           <ButtonNowrapStyled
             disabled={submitButtonIsLoading}
             intent='none'

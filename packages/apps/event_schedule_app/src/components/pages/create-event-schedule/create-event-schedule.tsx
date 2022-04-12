@@ -24,7 +24,7 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
   const { hasNoChanges } = commonState;
 
   return (
-    <div>
+    <div data-cy={'create-page'}>
       <Header title={dc.title} />
       <EventScheduleSettingCommon
         handlers={commonStateHandlers}
@@ -36,6 +36,7 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
           onConfirmClick={resetAllState}
         />
         <Button
+          data-cy={'create-button'}
           disabled={!createButtonIsEnabled}
           intent={'primary'}
           loading={createButtonIsLoading}

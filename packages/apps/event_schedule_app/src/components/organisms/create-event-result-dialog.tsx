@@ -49,13 +49,16 @@ export const CreateEventResultDialog = memoNamed<Props>(
         isOpen={props.isOpen}
         title={props.isLoading ? dc.titleLoading : dc.title}
       >
-        <div className={Classes.DIALOG_BODY}>
+        <div
+          className={Classes.DIALOG_BODY}
+          data-cy={'create-event-result-dialog-body'}
+        >
           {props.isLoading ? (
             <Spinner />
           ) : (
             <>
               <p>{dc.description}</p>
-              <UrlWrapper>
+              <UrlWrapper data-cy={'url-wrapper'}>
                 <div>{'URL: '}</div>
                 <AnchorWrapper>
                   <Anchor
@@ -70,6 +73,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
                 <div>
                   <Tooltip content={dc.clipboardButton}>
                     <Button
+                      data-cy={'clipboard-button'}
                       icon={'clipboard'}
                       minimal={true}
                       onClick={onClipboardButtonClick}
@@ -81,9 +85,13 @@ export const CreateEventResultDialog = memoNamed<Props>(
           )}
         </div>
 
-        <div className={Classes.DIALOG_FOOTER}>
+        <div
+          className={Classes.DIALOG_FOOTER}
+          data-cy={'create-event-result-dialog-footer'}
+        >
           <ButtonsWrapperAlignEnd>
             <Button
+              data-cy={'back-button'}
               disabled={props.isLoading || !linkIsUsed}
               intent={'none'}
               title={
@@ -97,6 +105,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
             </Button>
 
             <AnchorButton
+              data-cy={'open-answer-page-button'}
               href={props.url}
               intent={'primary'}
               loading={props.isLoading}

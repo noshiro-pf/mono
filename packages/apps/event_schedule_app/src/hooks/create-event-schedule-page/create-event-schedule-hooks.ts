@@ -91,7 +91,10 @@ export const useCreateEventScheduleHooks = (): CreateEventScheduleHooks => {
   }, [createEvent]);
 
   const onClipboardButtonClick = useCallback(() => {
-    navigator.clipboard.writeText(url).catch(console.error);
+    // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
+    if (isNotUndefined(navigator.clipboard) && window.isSecureContext) {
+      navigator.clipboard.writeText(url).catch(console.error);
+    }
   }, [url]);
 
   return {

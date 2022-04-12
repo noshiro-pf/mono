@@ -50,7 +50,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
-    <div>
+    <div data-cy={'answer-page'}>
       <Header title={dc.title} />
 
       {errorType !== undefined ? (
@@ -178,6 +178,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             !isStateAfterDeadline ? (
               <ButtonsWrapperAlignEnd>
                 <Button
+                  data-cy={'add-answer-button'}
                   icon='add'
                   intent='primary'
                   text={dc.answers.addAnswer}
@@ -187,7 +188,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             ) : undefined}
           </Section>
 
-          <div ref={answerSectionRef}>
+          <div ref={answerSectionRef} data-cy={'answer-being-edited-section'}>
             {answerBeingEditedSectionState === 'hidden' ||
             isStateAfterDeadline ? undefined : (
               <Section
