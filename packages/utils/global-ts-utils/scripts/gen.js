@@ -45,6 +45,7 @@ const importsList = [
   'isString',
   'isSymbol',
   'isUndefined',
+  'Json',
   'mapNullable',
   'mapNullableC',
   'match',

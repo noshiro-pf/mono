@@ -9,7 +9,9 @@ export const getParseTree = (
   tokens: readonly string[]
 ): LambdaTerm | undefined => {
   if (tokens.length < 1) {
-    console.error(`invalid tokens passed: "${JSON.stringify(tokens)}"`);
+    console.error(
+      `invalid tokens passed: "${Result.unwrapThrow(Json.stringify(tokens))}"`
+    );
     return undefined;
   }
 

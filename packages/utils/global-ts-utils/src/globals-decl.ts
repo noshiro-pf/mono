@@ -31,6 +31,7 @@ import type {
   isString as _isString,
   isSymbol as _isSymbol,
   isUndefined as _isUndefined,
+  Json as _Json,
   mapNullable as _mapNullable,
   mapNullableC as _mapNullableC,
   match as _match,
@@ -102,6 +103,7 @@ declare global {
   const isString: typeof _isString;
   const isSymbol: typeof _isSymbol;
   const isUndefined: typeof _isUndefined;
+  const Json: typeof _Json;
   const mapNullable: typeof _mapNullable;
   const mapNullableC: typeof _mapNullableC;
   const match: typeof _match;

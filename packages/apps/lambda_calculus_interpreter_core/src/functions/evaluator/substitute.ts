@@ -41,6 +41,10 @@ export const substitute = (
       return substitute(to, from, converted);
     }
   }
-  console.error(`Syntax error: "${JSON.stringify(term)}" is not lambda term.`);
+  console.error(
+    `Syntax error: "${Result.unwrapThrow(
+      Json.stringify(term)
+    )}" is not lambda term.`
+  );
   return term;
 };

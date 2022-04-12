@@ -4,7 +4,14 @@ import {
   fillEventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { hasKey, hasKeyValue, isNonNullObject, Str } from '@noshiro/ts-utils';
+import {
+  hasKey,
+  hasKeyValue,
+  isNonNullObject,
+  Json,
+  Result,
+  Str,
+} from '@noshiro/ts-utils';
 import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {
@@ -64,7 +71,9 @@ export const fillGmailConfig = (
   };
 }> => {
   if (!isGmailConfig(config)) {
-    logger.error(`${JSON.stringify(config)} is not GmailConfig`);
+    logger.error(
+      `${Result.unwrapThrow(Json.stringify(config))} is not GmailConfig`
+    );
     return { gmail: { email: '', password: '' } };
   }
   return config;
