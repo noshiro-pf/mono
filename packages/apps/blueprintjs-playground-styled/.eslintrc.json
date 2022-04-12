@@ -1,9 +1,0 @@
-{
-  "extends": "../../../config/eslintrc/.eslintrc.react.js",
-  "rules": {
-    "import/no-internal-modules": "off"
-  },
-  "parserOptions": {
-    "project": "./tsconfig.json"
-  }
-}

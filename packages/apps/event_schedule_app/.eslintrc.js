@@ -33,6 +33,7 @@ const config = {
   extends: '../../../config/eslintrc/.eslintrc.react.js',
   parserOptions: {
     project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
   },
   rules: {
     '@typescript-eslint/no-restricted-imports': [
