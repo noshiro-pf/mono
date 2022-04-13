@@ -34,6 +34,7 @@ import {
   isString,
   isSymbol,
   isUndefined,
+  Json,
   mapNullable,
   mapNullableC,
   match,
@@ -81,6 +82,7 @@ import {
 (global as any).isString = isString;
 (global as any).isSymbol = isSymbol;
 (global as any).isUndefined = isUndefined;
+(global as any).Json = Json;
 (global as any).mapNullable = mapNullable;
 (global as any).mapNullableC = mapNullableC;
 (global as any).match = match;

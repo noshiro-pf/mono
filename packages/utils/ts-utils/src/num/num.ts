@@ -121,7 +121,7 @@ export namespace Num {
    */
   // eslint-disable-next-line @typescript-eslint/no-shadow
   export const toString =
-    (radix?: number) =>
+    (radix?: StrictExclude<Seq<36>, 0 | 1>) =>
     (n: number): string =>
       n.toString(radix);
 
@@ -130,7 +130,7 @@ export namespace Num {
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
   export const toFixed =
-    (fractionDigits?: number) =>
+    (fractionDigits?: Seq<20>) =>
     (n: number): string =>
       n.toFixed(fractionDigits);
 
@@ -142,6 +142,15 @@ export namespace Num {
     (fractionDigits?: number) =>
     (n: number): string =>
       n.toExponential(fractionDigits);
+
+  /**
+   * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.
+   * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
+   */
+  export const toPrecision =
+    (precision?: StrictExclude<Seq<21>, 0>) =>
+    (n: number): string =>
+      n.toExponential(precision);
 
   /**
    * Converts a number to a string by using the current or specified locale.

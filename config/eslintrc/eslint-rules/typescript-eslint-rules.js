@@ -16,14 +16,17 @@ const banTypes = {
     fixWith: 'StrictExclude',
   },
   Date: {
-    message: 'Use `IDate` instead.',
+    message: 'Use `IDate` from @noshiro/ts-utils instead.',
     fixWith: 'IDate',
   },
   Set: {
-    message: 'Use `ISet` or `MutableSet` instead.',
+    message: 'Use `ISet` or `MutableSet` from @noshiro/ts-utils instead.',
   },
   Map: {
-    message: 'Use `IMap` or `MutableMap` instead.',
+    message: 'Use `IMap` or `MutableMap` from @noshiro/ts-utils instead.',
+  },
+  JSON: {
+    message: 'Use `Json` from @noshiro/ts-utils instead.',
   },
 };
 

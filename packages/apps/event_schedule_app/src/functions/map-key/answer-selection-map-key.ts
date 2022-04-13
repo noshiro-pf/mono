@@ -15,12 +15,12 @@ type AnswerSelectionData = Readonly<{
 export const answerSelectionToMapKey = (
   answerSelection: AnswerSelectionData
 ): AnswerSelectionMapKey =>
-  JSON.stringify(answerSelection) as AnswerSelectionMapKey;
+  Result.unwrapThrow(Json.stringify(answerSelection)) as AnswerSelectionMapKey;
 
 export const answerSelectionFromMapKey = (
   key: AnswerSelectionMapKey
 ): AnswerSelectionData => {
-  const parsed = JSON.parse(key) as {
+  const parsed = Result.unwrapThrow(Json.parse(key)) as {
     answerId: AnswerId;
     datetimeRange: DatetimeRange;
   };

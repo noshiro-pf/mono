@@ -1,5 +1,3 @@
-import { Str } from '../str';
-
 export namespace Result {
   const OkTypeSymbol: unique symbol = Symbol('Result.ok');
   const ErrTypeSymbol: unique symbol = Symbol('Result.err');
@@ -50,7 +48,8 @@ export namespace Result {
 
   export const unwrapThrow = <S, E>(
     result: _Result<S, E>,
-    toStr: (e: E) => string = Str.from
+    // eslint-disable-next-line no-restricted-globals
+    toStr: (e: E) => string = String
   ): S => {
     if (isErr<S, E>(result)) {
       throw new Error(toStr(result.value));

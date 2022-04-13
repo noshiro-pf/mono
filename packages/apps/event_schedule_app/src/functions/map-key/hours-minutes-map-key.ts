@@ -9,7 +9,10 @@ export type HoursMinutesMapKey = Phantomic<string, 'HoursMinutesMapKey'>;
 
 export const timeRangeToMapKey = (
   timeRange: HoursMinutes
-): HoursMinutesMapKey => JSON.stringify(timeRange) as HoursMinutesMapKey;
+): HoursMinutesMapKey =>
+  Result.unwrapThrow(Json.stringify(timeRange)) as HoursMinutesMapKey;
 
 export const timeRangeFromMapKey = (key: HoursMinutesMapKey): HoursMinutes =>
-  fillHoursMinutes(JSON.parse(key) as PartialHoursMinutes | undefined);
+  fillHoursMinutes(
+    Result.unwrapThrow(Json.parse(key)) as PartialHoursMinutes | undefined
+  );

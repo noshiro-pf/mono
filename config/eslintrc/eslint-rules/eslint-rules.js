@@ -257,6 +257,7 @@ const eslintRules = {
     { name: 'Array', message: 'use IList instead.' },
     { name: 'Boolean', message: 'use toBoolean instead.' },
     { name: 'Date', message: 'use IDate instead.' },
+    { name: 'JSON', message: 'use Json instead.' },
     'eval',
     'Function',
     'globalThis',

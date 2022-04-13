@@ -33,6 +33,7 @@ export const providePluginTsUtilsDef = IRecord.fromEntries(
     'isString',
     'isSymbol',
     'isUndefined',
+    'Json',
     'mapNullable',
     'mapNullableC',
     'match',

@@ -32,6 +32,7 @@ export const eslintNoRestrictedImportsTsUtilsDef = {
     'isString',
     'isSymbol',
     'isUndefined',
+    'Json',
     'mapNullable',
     'mapNullableC',
     'match',

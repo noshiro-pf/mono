@@ -9,8 +9,12 @@ export type DatetimeRangeMapKey = Phantomic<string, 'DatetimeRangeMapKey'>;
 
 export const datetimeRangeToMapKey = (
   datetimeRange: DatetimeRange
-): DatetimeRangeMapKey => JSON.stringify(datetimeRange) as DatetimeRangeMapKey;
+): DatetimeRangeMapKey =>
+  Result.unwrapThrow(Json.stringify(datetimeRange)) as DatetimeRangeMapKey;
 
 export const datetimeRangeFromMapKey = (
   key: DatetimeRangeMapKey
-): DatetimeRange => fillDatetimeRange(JSON.parse(key) as PartialDatetimeRange);
+): DatetimeRange =>
+  fillDatetimeRange(
+    Result.unwrapThrow(Json.parse(key)) as PartialDatetimeRange
+  );

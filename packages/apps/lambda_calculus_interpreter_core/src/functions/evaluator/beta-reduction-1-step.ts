@@ -24,6 +24,10 @@ export const betaReduction1step = (term: LambdaTerm): LambdaTerm => {
         : [left, betaReduction1step(right)];
     }
   }
-  console.error(`Syntax error: "${JSON.stringify(term)}" is not lambda term.`);
+  console.error(
+    `Syntax error: "${Result.unwrapThrow(
+      Json.stringify(term)
+    )}" is not lambda term.`
+  );
   return term;
 };

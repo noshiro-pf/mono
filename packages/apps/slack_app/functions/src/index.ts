@@ -1,3 +1,4 @@
+import { Json } from '@noshiro/ts-utils';
 import { firestore as admin_firestore, initializeApp } from 'firebase-admin';
 import {
   config,
@@ -56,8 +57,8 @@ export const makeUppercase = firestore
           })
           .on('end', () => {
             const events = Buffer.concat(mut_data);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const r = JSON.parse(events.toString());
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
+            const r = Json.parse(events.toString()) as any;
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             console.log(r?.messages?.matches[0].ts);

@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-internal-modules
+import { Result } from '../functional/result';
 import { Num } from '../num';
 
 export namespace Str {
@@ -194,8 +196,13 @@ export namespace Str {
   /** Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. */
   export const toLocaleLowerCase =
     (locales?: string | readonly string[]) =>
-    (str: string): string =>
-      str.toLocaleLowerCase(locales);
+    (str: string): Result<string, RangeError | TypeError> => {
+      try {
+        return Result.ok(str.toLocaleLowerCase(locales));
+      } catch (error) {
+        return Result.err(error as RangeError | TypeError);
+      }
+    };
 
   /** Converts all the alphabetic characters in a string to uppercase. */
   export const toUpperCase = (str: string): string => str.toUpperCase();
@@ -203,8 +210,13 @@ export namespace Str {
   /** Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale. */
   export const toLocaleUpperCase =
     (locales?: string | readonly string[]) =>
-    (str: string): string =>
-      str.toLocaleUpperCase(locales);
+    (str: string): Result<string, RangeError | TypeError> => {
+      try {
+        return Result.ok(str.toLocaleUpperCase(locales));
+      } catch (error) {
+        return Result.err(error as RangeError | TypeError);
+      }
+    };
 
   /** Removes the leading and trailing white space and line terminator characters from a string. */
   export const trim = (str: string): string => str.trim();
@@ -261,8 +273,13 @@ export namespace Str {
    */
   export const repeat =
     (count: number) =>
-    (str: string): string =>
-      str.repeat(count);
+    (str: string): Result<string, string> => {
+      try {
+        return Result.ok(str.repeat(count));
+      } catch (error) {
+        return Result.err(from(error));
+      }
+    };
 
   /**
    * Returns true if the sequence of elements of searchString converted to a String is the
