@@ -1,6 +1,8 @@
 export type ToggleSectionState<A> = Readonly<{
   toggleState$: InitializedObservable<boolean>;
   toggle: () => void;
+  turnOn: () => void;
+  turnOff: () => void;
   value$: InitializedObservable<A>;
   setValue: (a: A) => void;
   resetState: () => void;
@@ -21,13 +23,14 @@ export const createToggleSectionState = <A>({
 
   const { state$: value$, setState: setValue } = createState<A>(initialState);
 
-  const { toggle, resetState } = createToggleSectionStateManager<A>({
-    toggleState,
-    initialState,
-    valueToBeSetWhenTurnedOff,
-    valueToBeSetWhenTurnedOn,
-    setValue,
-  });
+  const { toggle, resetState, turnOff, turnOn } =
+    createToggleSectionStateManager<A>({
+      toggleState,
+      initialState,
+      valueToBeSetWhenTurnedOff,
+      valueToBeSetWhenTurnedOn,
+      setValue,
+    });
 
   return {
     toggleState$: toggleState.state$,
@@ -35,11 +38,15 @@ export const createToggleSectionState = <A>({
     value$,
     setValue,
     resetState,
+    turnOff,
+    turnOn,
   };
 };
 
 type ToggleSectionManagerState = Readonly<{
   toggle: () => void;
+  turnOn: () => void;
+  turnOff: () => void;
   resetState: () => void;
 }>;
 
@@ -78,5 +85,10 @@ const createToggleSectionStateManager = <A>({
     setValue(initialState);
   };
 
-  return { toggle, resetState };
+  return {
+    toggle,
+    resetState,
+    turnOff: toggleState.setFalse,
+    turnOn: toggleState.setTrue,
+  };
 };

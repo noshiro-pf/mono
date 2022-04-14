@@ -61,6 +61,8 @@ export const useEventScheduleSettingCommonHooks = (
     value: answerDeadline,
     setValue: setAnswerDeadline,
     resetState: resetAnswerDeadlineSection,
+    turnOff: turnOffAnswerDeadlineSection,
+    turnOn: turnOnAnswerDeadlineSection,
   } = useToggleSectionState<Ymdhm | undefined>({
     initialToggleState: initialValues.current.answerDeadline !== 'none',
     initialState: mapNoneToUndefined(initialValues.current.answerDeadline),
@@ -90,6 +92,8 @@ export const useEventScheduleSettingCommonHooks = (
     value: notificationSettings,
     setValue: setNotificationSettings,
     resetState: resetNotificationSettingsSection,
+    turnOff: turnOffNotificationSection,
+    turnOn: turnOnNotificationSection,
   } = useToggleSectionState<NotificationSettings | undefined>({
     initialToggleState: initialValues.current.notificationSettings !== 'none',
     initialState: mapNoneToUndefined(
@@ -179,6 +183,8 @@ export const useEventScheduleSettingCommonHooks = (
       toggleAnswerDeadlineSection,
       setAnswerDeadline,
       resetAnswerDeadlineSection,
+      turnOffAnswerDeadlineSection,
+      turnOnAnswerDeadlineSection,
 
       setAnswerIcons,
       resetAnswerIcons,
@@ -186,6 +192,8 @@ export const useEventScheduleSettingCommonHooks = (
       toggleNotificationSection,
       setNotificationSettings,
       resetNotificationSettingsSection,
+      turnOffNotificationSection,
+      turnOnNotificationSection,
     },
   };
 };

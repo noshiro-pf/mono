@@ -32,6 +32,8 @@ export type EventScheduleSettingCommonStateHandler = Readonly<{
   toggleAnswerDeadlineSection: () => void;
   setAnswerDeadline: (value: Ymdhm | undefined) => void;
   resetAnswerDeadlineSection: () => void;
+  turnOffAnswerDeadlineSection: () => void;
+  turnOnAnswerDeadlineSection: () => void;
 
   setAnswerIcons: (value: AnswerIconSettings) => void;
   resetAnswerIcons: () => void;
@@ -39,4 +41,6 @@ export type EventScheduleSettingCommonStateHandler = Readonly<{
   toggleNotificationSection: () => void;
   setNotificationSettings: (value: NotificationSettings) => void;
   resetNotificationSettingsSection: () => void;
+  turnOffNotificationSection: () => void;
+  turnOnNotificationSection: () => void;
 }>;

@@ -59,6 +59,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     value$: answerDeadline$,
     setValue: setAnswerDeadline,
     resetState: resetAnswerDeadlineSection,
+    turnOff: turnOffAnswerDeadlineSection,
+    turnOn: turnOnAnswerDeadlineSection,
   } = createToggleSectionState<Ymdhm | undefined>({
     initialToggleState: initialEventSchedule.answerDeadline !== 'none',
     initialState: mapNoneToUndefined(initialEventSchedule.answerDeadline),
@@ -85,6 +87,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     value$: notificationSettings$,
     setValue: setNotificationSettings,
     resetState: resetNotificationSettingsSection,
+    turnOff: turnOffNotificationSection,
+    turnOn: turnOnNotificationSection,
   } = createToggleSectionState<NotificationSettings | undefined>({
     initialToggleState: initialEventSchedule.notificationSettings !== 'none',
     initialState: mapNoneToUndefined(initialEventSchedule.notificationSettings),
@@ -225,6 +229,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     toggleAnswerDeadlineSection,
     setAnswerDeadline,
     resetAnswerDeadlineSection,
+    turnOffAnswerDeadlineSection,
+    turnOnAnswerDeadlineSection,
 
     setAnswerIcons,
     resetAnswerIcons,
@@ -232,6 +238,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     toggleNotificationSection,
     setNotificationSettings,
     resetNotificationSettingsSection,
+    turnOffNotificationSection,
+    turnOnNotificationSection,
   };
 
   return {

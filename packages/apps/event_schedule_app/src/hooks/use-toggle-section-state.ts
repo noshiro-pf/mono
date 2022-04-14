@@ -4,6 +4,8 @@
 export type ToggleSectionState<A> = Readonly<{
   toggleState: boolean;
   toggle: () => void;
+  turnOn: () => void;
+  turnOff: () => void;
   value: A;
   setValue: (a: A) => void;
   resetState: () => void;
@@ -25,7 +27,7 @@ export const useToggleSectionState = <A>({
 
   const { state: value, setState: setValue } = useState<A>(initialState);
 
-  const { toggle, resetState } = useToggleSectionStateManager({
+  const { toggle, resetState, turnOff, turnOn } = useToggleSectionStateManager({
     initialToggleState,
     initialState,
     valueToBeSetWhenTurnedOff,
@@ -41,11 +43,15 @@ export const useToggleSectionState = <A>({
     value,
     setValue,
     resetState,
+    turnOn,
+    turnOff,
   };
 };
 
 type ToggleSectionManagerState = Readonly<{
   toggle: () => void;
+  turnOn: () => void;
+  turnOff: () => void;
   resetState: () => void;
 }>;
 
@@ -91,5 +97,5 @@ const useToggleSectionStateManager = <A>({
     setValue(initialState);
   }, [initialToggleState, initialState, setValue, setUseThisConfig]);
 
-  return { toggle, resetState };
+  return { toggle, resetState, turnOn, turnOff };
 };

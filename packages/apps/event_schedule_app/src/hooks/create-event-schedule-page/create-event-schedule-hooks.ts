@@ -1,6 +1,7 @@
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
 import { initialEventSchedule, routes } from '../../constants';
+import { EventScheduleAppLocalStorage } from '../../functions';
 import { useUser } from '../../store';
 import type {
   EventScheduleSettingCommonState,
@@ -25,6 +26,52 @@ type CreateEventScheduleHooks = Readonly<{
 export const useCreateEventScheduleHooks = (): CreateEventScheduleHooks => {
   const { state: commonState, handlers: commonStateHandlers } =
     useEventScheduleSettingCommonHooks(initialEventSchedule);
+
+  useEffect(() => {
+    const fromStorage =
+      EventScheduleAppLocalStorage.restoreCreateEventPageTemp();
+
+    if (Result.isOk(fromStorage)) {
+      const ev = fromStorage.value;
+      if (ev === undefined) return;
+
+      commonStateHandlers.setTitle(ev.title);
+      commonStateHandlers.setNotes(ev.notes);
+      commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
+      commonStateHandlers.setDatetimeRangeList(ev.datetimeRangeList);
+      commonStateHandlers.setAnswerIcons(ev.answerIcons);
+
+      if (ev.answerDeadline === 'none') {
+        commonStateHandlers.turnOffAnswerDeadlineSection();
+      } else {
+        commonStateHandlers.turnOnAnswerDeadlineSection();
+        commonStateHandlers.setAnswerDeadline(ev.answerDeadline);
+      }
+
+      if (ev.notificationSettings === 'none') {
+        commonStateHandlers.turnOffNotificationSection();
+      } else {
+        commonStateHandlers.turnOnNotificationSection();
+        commonStateHandlers.setNotificationSettings(ev.notificationSettings);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const saveResult = EventScheduleAppLocalStorage.saveCreateEventPageTemp({
+      answerDeadline: commonState.answerDeadline ?? 'none',
+      answerIcons: commonState.answerIcons,
+      datetimeRangeList: commonState.datetimeRangeList,
+      datetimeSpecification: commonState.datetimeSpecification,
+      notes: commonState.notes,
+      notificationSettings: commonState.notificationSettings ?? 'none',
+      title: commonState.title,
+    });
+    if (Result.isErr(saveResult)) {
+      console.warn(saveResult.value);
+    }
+  }, [commonState]);
 
   const resetAllState = useCallback(() => {
     commonStateHandlers.resetTitle();
