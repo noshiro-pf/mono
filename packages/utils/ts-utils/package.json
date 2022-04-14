@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/ts-utils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
@@ -23,6 +23,7 @@
     "lint": "eslint src/ --ext .ts",
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
+    "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "jest --config config/jest.config.json --passWithNoTests",
     "tsc": "tsc --noEmit",
