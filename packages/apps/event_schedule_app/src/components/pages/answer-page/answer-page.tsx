@@ -1,13 +1,30 @@
 import { Button, Spinner } from '@blueprintjs/core';
-import { useAnswerPageState } from '../../../hooks';
+import { useRef } from 'react';
 import {
+  alertOnAnswerClickIsOpen$,
+  answerBeingEdited$,
+  answerBeingEditedSectionState$,
+  answers$,
   closeAlertOnAnswerClick,
+  errorType$,
+  eventSchedule$,
+  fetchAnswers,
+  fetchEventSchedule,
   holidaysJpDefinition$,
+  isStateAfterDeadline$,
   onAddAnswerButtonClick,
   onCancelEditingAnswer,
   onEditButtonClick,
   refreshAnswers,
+  refreshButtonIsDisabled$,
+  refreshButtonIsLoading$,
+  requiredParticipantsExist$,
+  router,
+  selectedAnswerUserName$,
+  selectedDates$,
   setYearMonth$,
+  submitButtonIsDisabled$,
+  submitButtonIsLoading$,
 } from '../../../store';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
 import { AlertWithMaxWidth } from '../../bp';
@@ -26,24 +43,50 @@ import { AnswerPageError } from './error';
 const dc = dict.answerPage;
 
 export const AnswerPage = memoNamed('AnswerPage', () => {
-  const {
-    alertOnAnswerClickIsOpen,
-    answerBeingEdited,
-    answerBeingEditedSectionState,
-    answers,
-    answerSectionRef,
-    errorType,
-    eventId,
-    eventSchedule,
-    isStateAfterDeadline,
-    refreshButtonIsDisabled,
-    refreshButtonIsLoading,
-    requiredParticipantsExist,
-    selectedAnswerUserName,
-    selectedDates,
-    submitButtonIsDisabled,
-    submitButtonIsLoading,
-  } = useAnswerPageState();
+  /* values */
+
+  const alertOnAnswerClickIsOpen = useObservableValue(
+    alertOnAnswerClickIsOpen$
+  );
+  const answerBeingEdited = useObservableValue(answerBeingEdited$);
+  const answerBeingEditedSectionState = useObservableValue(
+    answerBeingEditedSectionState$
+  );
+  const answers = useObservableValue(answers$);
+  const errorType = useObservableValue(errorType$);
+  const eventId = useObservableValue(router.eventId$);
+  const eventSchedule = useObservableValue(eventSchedule$);
+  const isStateAfterDeadline = useObservableValue(isStateAfterDeadline$);
+  const refreshButtonIsDisabled = useObservableValue(refreshButtonIsDisabled$);
+  const refreshButtonIsLoading = useObservableValue(refreshButtonIsLoading$);
+  const requiredParticipantsExist = useObservableValue(
+    requiredParticipantsExist$
+  );
+  const selectedAnswerUserName = useObservableValue(selectedAnswerUserName$);
+  const selectedDates = useObservableValue(selectedDates$);
+  const submitButtonIsDisabled = useObservableValue(submitButtonIsDisabled$);
+  const submitButtonIsLoading = useObservableValue(submitButtonIsLoading$);
+
+  /* effect */
+
+  // fetch once on the first load
+  useEffect(() => {
+    fetchEventSchedule();
+    fetchAnswers();
+  }, []);
+
+  const answerSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    switch (answerBeingEditedSectionState) {
+      case 'creating':
+      case 'editing':
+        answerSectionRef.current?.scrollIntoView();
+        break;
+      case 'hidden':
+        break;
+    }
+  }, [answerBeingEditedSectionState]);
 
   const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
 

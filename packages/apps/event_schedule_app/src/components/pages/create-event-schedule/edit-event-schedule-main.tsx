@@ -1,6 +1,5 @@
 import { descriptionFontColor } from '../../../constants';
-import { useEditEventScheduleHooks } from '../../../hooks';
-import { router } from '../../../store';
+import { EditEventScheduleStore, router } from '../../../store';
 import {
   BackToAnswerPageButton,
   ConfirmEmailDialog,
@@ -22,19 +21,20 @@ type Props = Readonly<{
 export const EditEventScheduleOk = memoNamed<Props>(
   'EditEventScheduleOk',
   ({ eventSchedule, editPageIsHidden, makeItPassTheEmailConfirmation }) => {
-    const {
-      commonState,
-      commonStateHandlers,
-      resetAllState,
-      editButtonIsEnabled,
-      editButtonIsLoading,
-      diff,
-      hasDeletedDatetimeChanges,
-      onEditEventClick,
-      onBackToAnswerPageClick,
-    } = useEditEventScheduleHooks(eventSchedule);
+    const commonState = useObservableValue(EditEventScheduleStore.commonState$);
 
-    const { hasNoChanges } = commonState;
+    const editButtonIsLoading = useObservableValue(
+      EditEventScheduleStore.isLoading$
+    );
+
+    const diff = useObservableValue(EditEventScheduleStore.diff$);
+
+    const hasDeletedDatetimeChanges = useObservableValue(
+      EditEventScheduleStore.hasDeletedDatetimeChanges$
+    );
+
+    const { hasNoChanges, eventScheduleValidationOk: editButtonIsEnabled } =
+      commonState;
 
     return (
       <>
@@ -52,18 +52,18 @@ export const EditEventScheduleOk = memoNamed<Props>(
         {editPageIsHidden ? undefined : (
           <>
             <EventScheduleSettingCommon
-              handlers={commonStateHandlers}
+              handlers={EditEventScheduleStore.commonStateHandlers}
               state={commonState}
             />
             <ButtonsWrapperForEventSettingsPage>
               <BackToAnswerPageButton
                 disabled={editButtonIsLoading}
                 hasNoChanges={hasNoChanges}
-                onConfirmClick={onBackToAnswerPageClick}
+                onConfirmClick={EditEventScheduleStore.onBackToAnswerPage}
               />
               <ResetEditButton
                 disabled={editButtonIsLoading || hasNoChanges}
-                onConfirmClick={resetAllState}
+                onConfirmClick={EditEventScheduleStore.resetAllState}
               />
               <SubmitEditingEventButton
                 disabled={
@@ -71,7 +71,7 @@ export const EditEventScheduleOk = memoNamed<Props>(
                 }
                 loading={editButtonIsLoading}
                 showConfirmationDialog={hasDeletedDatetimeChanges}
-                onConfirmClick={onEditEventClick}
+                onConfirmClick={EditEventScheduleStore.onEditEventClick}
               />
             </ButtonsWrapperForEventSettingsPage>
             <EventScheduleDiff diff={diff} />

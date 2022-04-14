@@ -44,7 +44,7 @@ export namespace UpdateDisplayNamePage {
     }))
   );
 
-  export const submit = async (user: FireAuthUser): Promise<void> => {
+  const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updateDisplayNamePageHasError(s)) return;
@@ -86,6 +86,14 @@ export namespace UpdateDisplayNamePage {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+
+    if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+    submit(fireAuthUser).catch(console.error);
+  };
+
   export const inputDisplayNameHandler = (value: string): void => {
     dispatch({
       type: 'inputDisplayName',
@@ -96,6 +104,24 @@ export namespace UpdateDisplayNamePage {
   const resetAllDialogState = (): void => {
     dispatch({ type: 'reset' });
   };
+
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    fireAuthUser: FireAuthUser | undefined;
+  } = {
+    enterButtonDisabled: true,
+    fireAuthUser: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  user$.subscribe((v) => {
+    mut_subscribedValues.fireAuthUser = v;
+  });
 
   UpdateUserInfoDialogState.openingDialog$
     .chain(withLatestFromI(user$))

@@ -9,12 +9,11 @@ const dc = dict.accountSettings;
 
 type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: FireAuthUser;
 }>;
 
 export const DeleteAccountDialog = memoNamed<Props>(
   'DeleteAccountDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen }) => {
     const {
       formState,
       enterButtonDisabled,
@@ -22,12 +21,6 @@ export const DeleteAccountDialog = memoNamed<Props>(
       passwordFormIntent,
       passwordIsOpen,
     } = useObservableValue(DeleteAccountPage.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      DeleteAccountPage.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -81,7 +74,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'danger'}
             loading={formState.isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={DeleteAccountPage.enterClickHandler}
           >
             {dc.button.deleteAccount}
           </Button>

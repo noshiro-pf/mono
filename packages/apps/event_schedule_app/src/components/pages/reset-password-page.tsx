@@ -1,5 +1,5 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { ResetPasswordPageStore, router } from '../../store';
+import { ResetPasswordPageStore } from '../../store';
 import { Label } from '../atoms';
 import { BpInput } from '../bp';
 import { SignInStyled } from '../styled';
@@ -17,14 +17,6 @@ export const ResetPasswordPage = memoNamed<Props>(
   ({ hidePasswordResetForm }) => {
     const { formState, enterButtonDisabled, emailFormIntent } =
       useObservableValue(ResetPasswordPageStore.state$);
-
-    const pageToBack = useObservableValue(router.pageToBack$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      ResetPasswordPageStore.submit(pageToBack).catch(console.error);
-    }, [enterButtonDisabled, pageToBack]);
 
     return (
       <FormRectWrapper>
@@ -67,7 +59,7 @@ export const ResetPasswordPage = memoNamed<Props>(
                 fill={true}
                 intent={'primary'}
                 loading={formState.isWaitingResponse}
-                onClick={enterClickHandler}
+                onClick={ResetPasswordPageStore.enterClickHandler}
               >
                 {dc.resetPasswordMode.submit}
               </Button>

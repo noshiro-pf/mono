@@ -9,7 +9,7 @@ import {
   signOutClick,
   UpdateUserInfoDialogState,
   usePasswordProviderIncluded,
-  user$,
+  useUser,
 } from '../../store';
 import { NoWrapSpan } from '../atoms';
 import {
@@ -27,7 +27,7 @@ const popoverModifiers: PopperModifiers = {
 } as const;
 
 export const NavBar = memoNamed('NavBar', () => {
-  const user = useObservableValue(user$);
+  const user = useUser();
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
@@ -135,25 +135,22 @@ export const NavBar = memoNamed('NavBar', () => {
 
               <UpdateDisplayNameDialog
                 dialogIsOpen={openingDialog === 'updateDisplayName'}
-                user={user}
               />
               <UpdateEmailDialog
+                currentEmail={user.email}
                 dialogIsOpen={openingDialog === 'updateEmail'}
-                user={user}
               />
               <UpdatePasswordDialog
+                currentEmail={user.email}
                 dialogIsOpen={openingDialog === 'updatePassword'}
-                user={user}
               />
               <DeleteAccountDialog
                 dialogIsOpen={openingDialog === 'deleteAccount'}
-                user={user}
               />
               <DeleteAccountCreatedWithGoogleDialog
                 dialogIsOpen={
                   openingDialog === 'deleteAccountCreatedWithGoogle'
                 }
-                user={user}
               />
             </>
           )}

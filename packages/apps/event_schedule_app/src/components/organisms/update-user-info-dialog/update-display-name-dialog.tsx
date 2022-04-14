@@ -11,20 +11,13 @@ const dc = dict.accountSettings;
 
 type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: FireAuthUser;
 }>;
 
 export const UpdateDisplayNameDialog = memoNamed<Props>(
   'UpdateDisplayNameDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen }) => {
     const { formState, displayNameFormIntent, enterButtonDisabled } =
       useObservableValue(UpdateDisplayNamePage.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      UpdateDisplayNamePage.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -54,7 +47,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={UpdateDisplayNamePage.enterClickHandler}
           >
             {dc.button.update}
           </Button>

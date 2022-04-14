@@ -7,6 +7,7 @@ import {
   updatePasswordPageInitialState,
   updatePasswordPageStateReducer,
 } from '../../functions';
+import { user$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -83,7 +84,7 @@ export namespace UpdatePasswordPage {
     )
   );
 
-  export const submit = async (user: FireAuthUser): Promise<void> => {
+  const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updatePasswordPageHasError(s)) return;
@@ -162,6 +163,14 @@ export namespace UpdatePasswordPage {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+
+    if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+    submit(fireAuthUser).catch(console.error);
+  };
+
   export const inputOldPasswordHandler = (value: string): void => {
     dispatch({
       type: 'inputOldPassword',
@@ -188,6 +197,24 @@ export namespace UpdatePasswordPage {
     hideOldPassword();
     hideNewPassword();
   };
+
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    fireAuthUser: FireAuthUser | undefined;
+  } = {
+    enterButtonDisabled: true,
+    fireAuthUser: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  user$.subscribe((v) => {
+    mut_subscribedValues.fireAuthUser = v;
+  });
 
   UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {

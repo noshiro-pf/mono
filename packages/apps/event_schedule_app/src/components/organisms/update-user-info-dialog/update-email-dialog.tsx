@@ -9,12 +9,12 @@ const dc = dict.accountSettings;
 
 type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: FireAuthUser;
+  currentEmail: string | null;
 }>;
 
 export const UpdateEmailDialog = memoNamed<Props>(
   'UpdateEmailDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen, currentEmail }) => {
     const {
       formState,
       enterButtonDisabled,
@@ -22,12 +22,6 @@ export const UpdateEmailDialog = memoNamed<Props>(
       passwordFormIntent,
       passwordIsOpen,
     } = useObservableValue(UpdateEmailPage.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      UpdateEmailPage.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -37,7 +31,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
               intent={'none'}
               label={<Label>{dc.updateEmail.currentEmail}</Label>}
             >
-              <div>{user.email ?? ''}</div>
+              <div>{currentEmail ?? ''}</div>
             </FormGroup>
             <FormGroup
               helperText={formState.email.error}
@@ -85,7 +79,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={UpdateEmailPage.enterClickHandler}
           >
             {dc.button.update}
           </Button>

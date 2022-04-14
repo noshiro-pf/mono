@@ -9,7 +9,7 @@ const dc = dict.accountSettings;
 
 type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: FireAuthUser;
+  currentEmail: string | null;
 }>;
 
 // https://yuzu441.hateblo.jp/entry/2020/11/16/190229
@@ -17,7 +17,7 @@ const hideStyle: CSSProperties = { display: 'none' };
 
 export const UpdatePasswordDialog = memoNamed<Props>(
   'UpdatePasswordDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen, currentEmail }) => {
     const {
       formState,
       enterButtonDisabled,
@@ -26,12 +26,6 @@ export const UpdatePasswordDialog = memoNamed<Props>(
       oldPasswordIsOpen,
       newPasswordIsOpen,
     } = useObservableValue(UpdatePasswordPage.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      UpdatePasswordPage.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -47,7 +41,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
                 disabled={false}
                 intent={'none'}
                 type={'email'}
-                value={user.email ?? ''}
+                value={currentEmail ?? ''}
                 onValueChange={noop}
               />
             </FormGroup>
@@ -123,7 +117,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={UpdatePasswordPage.enterClickHandler}
           >
             {dc.button.update}
           </Button>

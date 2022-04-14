@@ -135,6 +135,23 @@ export namespace SignInPageStore {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    if (
+      mut_subscribedValues.enterButtonDisabled ||
+      mut_subscribedValues.googleSignInButtonDisabled
+    )
+      return;
+
+    submit(mut_subscribedValues.pageToBack).catch(console.error);
+  };
+
+  const resetAllState = (): void => {
+    dispatch({ type: 'reset' });
+    hidePassword();
+  };
+
+  /* subscriptions */
+
   const mut_subscribedValues: {
     enterButtonDisabled: boolean;
     googleSignInButtonDisabled: boolean;
@@ -156,21 +173,6 @@ export namespace SignInPageStore {
   router.pageToBack$.subscribe((v) => {
     mut_subscribedValues.pageToBack = v;
   });
-
-  export const enterClickHandler = (): void => {
-    if (
-      mut_subscribedValues.enterButtonDisabled ||
-      mut_subscribedValues.googleSignInButtonDisabled
-    )
-      return;
-
-    submit(mut_subscribedValues.pageToBack).catch(console.error);
-  };
-
-  const resetAllState = (): void => {
-    dispatch({ type: 'reset' });
-    hidePassword();
-  };
 
   router.isRoute.signInPage$.subscribe((isSignInPage) => {
     if (!isSignInPage) {

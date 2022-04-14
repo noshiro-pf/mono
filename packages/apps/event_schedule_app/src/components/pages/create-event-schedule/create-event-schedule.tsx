@@ -1,5 +1,5 @@
 import { Button } from '@blueprintjs/core';
-import { useCreateEventScheduleHooks } from '../../../hooks';
+import { CreateEventScheduleStore } from '../../../store';
 import { CreateEventResultDialog, Header, ResetButton } from '../../organisms';
 import { ButtonsWrapperForEventSettingsPage } from '../../styled';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common';
@@ -7,19 +7,23 @@ import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 const dc = dict.eventSettingsPage;
 
 export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
-  const {
-    commonState,
-    commonStateHandlers,
-    resetAllState,
-    createButtonIsEnabled,
-    createButtonIsLoading,
-    onCreateEventClick,
-    createResultDialogIsOpen,
-    closeCreateResultDialog,
-    onClipboardButtonClick,
-    url,
-    isLoading,
-  } = useCreateEventScheduleHooks();
+  const commonState = useObservableValue(CreateEventScheduleStore.commonState$);
+
+  useEffect(() => {
+    CreateEventScheduleStore.restoreFromLocalStorage();
+  }, []);
+
+  const { eventScheduleValidationOk: createButtonIsEnabled } = commonState;
+
+  const createButtonIsLoading = useObservableValue(
+    CreateEventScheduleStore.isLoading$
+  );
+
+  const createResultDialogIsOpen = useObservableValue(
+    CreateEventScheduleStore.createResultDialogIsOpen$
+  );
+
+  const url = useObservableValue(CreateEventScheduleStore.url$);
 
   const { hasNoChanges } = commonState;
 
@@ -27,13 +31,13 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
     <div data-cy={'create-page'}>
       <Header title={dc.title} />
       <EventScheduleSettingCommon
-        handlers={commonStateHandlers}
+        handlers={CreateEventScheduleStore.commonStateHandlers}
         state={commonState}
       />
       <ButtonsWrapperForEventSettingsPage>
         <ResetButton
           disabled={createButtonIsLoading || hasNoChanges}
-          onConfirmClick={resetAllState}
+          onConfirmClick={CreateEventScheduleStore.resetAllState}
         />
         <Button
           data-cy={'create-button'}
@@ -41,14 +45,12 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
           intent={'primary'}
           loading={createButtonIsLoading}
           text={dc.createEventButton}
-          onClick={onCreateEventClick}
+          onClick={CreateEventScheduleStore.onCreateEventClick}
         />
         <CreateEventResultDialog
-          close={closeCreateResultDialog}
-          isLoading={isLoading}
+          isLoading={createButtonIsLoading}
           isOpen={createResultDialogIsOpen}
           url={url}
-          onClipboardButtonClick={onClipboardButtonClick}
         />
       </ButtonsWrapperForEventSettingsPage>
     </div>

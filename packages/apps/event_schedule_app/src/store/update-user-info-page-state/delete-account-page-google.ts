@@ -54,7 +54,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     )
   );
 
-  export const submit = async (user: FireAuthUser): Promise<void> => {
+  const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (emailInputHasError(s)) return;
@@ -125,6 +125,14 @@ export namespace DeleteAccountCreatedWithGoogle {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+
+    if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+    submit(fireAuthUser).catch(console.error);
+  };
+
   export const inputEmailHandler = (value: string): void => {
     dispatch({
       type: 'input',
@@ -136,6 +144,24 @@ export namespace DeleteAccountCreatedWithGoogle {
     dispatch({ type: 'reset' });
     setFalseIsWaitingResponse();
   };
+
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    fireAuthUser: FireAuthUser | undefined;
+  } = {
+    enterButtonDisabled: true,
+    fireAuthUser: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  user$.subscribe((v) => {
+    mut_subscribedValues.fireAuthUser = v;
+  });
 
   UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {

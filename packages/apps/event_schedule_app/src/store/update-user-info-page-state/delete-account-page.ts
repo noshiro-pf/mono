@@ -7,6 +7,7 @@ import {
   deleteAccountPageStateReducer,
   showToast,
 } from '../../functions';
+import { user$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -59,7 +60,7 @@ export namespace DeleteAccountPage {
     )
   );
 
-  export const submit = async (user: FireAuthUser): Promise<void> => {
+  const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (deleteAccountPageHasError(s)) return;
@@ -133,6 +134,14 @@ export namespace DeleteAccountPage {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+
+    if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+    submit(fireAuthUser).catch(console.error);
+  };
+
   export const inputEmailHandler = (value: string): void => {
     dispatch({
       type: 'inputEmail',
@@ -151,6 +160,24 @@ export namespace DeleteAccountPage {
     dispatch({ type: 'reset' });
     passwordIsOpenState.setFalse();
   };
+
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    fireAuthUser: FireAuthUser | undefined;
+  } = {
+    enterButtonDisabled: true,
+    fireAuthUser: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  user$.subscribe((v) => {
+    mut_subscribedValues.fireAuthUser = v;
+  });
 
   UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {

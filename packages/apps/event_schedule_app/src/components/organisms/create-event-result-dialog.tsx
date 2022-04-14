@@ -6,6 +6,7 @@ import {
   // eslint-disable-next-line import/no-deprecated
   Tooltip,
 } from '@blueprintjs/core';
+import { CreateEventScheduleStore } from '../../store';
 import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 
@@ -13,32 +14,30 @@ const dc = dict.createEventResultDialog;
 
 type Props = Readonly<{
   isOpen: boolean;
-  close: () => void;
   url: string;
-  onClipboardButtonClick: () => void;
   isLoading: boolean;
 }>;
 
 export const CreateEventResultDialog = memoNamed<Props>(
   'CreateEventResultDialog',
-  (props) => {
+  ({ isLoading, isOpen, url }) => {
     const { state: linkIsUsed, setState: setLinkIsUsed } =
       useState<boolean>(false);
 
     const onClipboardButtonClick = useCallback(() => {
       setLinkIsUsed(true);
-      props.onClipboardButtonClick();
-    }, [props, setLinkIsUsed]);
+      CreateEventScheduleStore.onClipboardButtonClick();
+    }, [setLinkIsUsed]);
 
     const onLinkClick = useCallback(() => {
       setLinkIsUsed(true);
     }, [setLinkIsUsed]);
 
     useEffect(() => {
-      if (!props.isOpen) {
+      if (!isOpen) {
         setLinkIsUsed(false);
       }
-    }, [props.isOpen, setLinkIsUsed]);
+    }, [isOpen, setLinkIsUsed]);
 
     return (
       <DialogWithMaxWidth
@@ -46,14 +45,14 @@ export const CreateEventResultDialog = memoNamed<Props>(
         hasBackdrop={false}
         icon={'timeline-events'}
         isCloseButtonShown={false}
-        isOpen={props.isOpen}
-        title={props.isLoading ? dc.titleLoading : dc.title}
+        isOpen={isOpen}
+        title={isLoading ? dc.titleLoading : dc.title}
       >
         <div
           className={Classes.DIALOG_BODY}
           data-cy={'create-event-result-dialog-body'}
         >
-          {props.isLoading ? (
+          {isLoading ? (
             <Spinner />
           ) : (
             <>
@@ -62,12 +61,12 @@ export const CreateEventResultDialog = memoNamed<Props>(
                 <div>{'URL: '}</div>
                 <AnchorWrapper>
                   <Anchor
-                    href={props.url}
+                    href={url}
                     rel={'noopener noreferrer'}
                     target={'_blank'}
                     onClick={onLinkClick}
                   >
-                    {props.url}
+                    {url}
                   </Anchor>
                 </AnchorWrapper>
                 <div>
@@ -92,23 +91,21 @@ export const CreateEventResultDialog = memoNamed<Props>(
           <ButtonsWrapperAlignEnd>
             <Button
               data-cy={'back-button'}
-              disabled={props.isLoading || !linkIsUsed}
+              disabled={isLoading || !linkIsUsed}
               intent={'none'}
               title={
-                props.isLoading || !linkIsUsed
-                  ? dc.whyButtonIsDisabled
-                  : undefined
+                isLoading || !linkIsUsed ? dc.whyButtonIsDisabled : undefined
               }
-              onClick={props.close}
+              onClick={CreateEventScheduleStore.closeCreateResultDialog}
             >
               {dc.back}
             </Button>
 
             <AnchorButton
               data-cy={'open-answer-page-button'}
-              href={props.url}
+              href={url}
               intent={'primary'}
-              loading={props.isLoading}
+              loading={isLoading}
               rel={'noopener noreferrer'}
               target={'_blank'}
               onClick={onLinkClick}

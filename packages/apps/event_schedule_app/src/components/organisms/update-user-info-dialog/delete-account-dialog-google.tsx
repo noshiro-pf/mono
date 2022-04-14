@@ -11,24 +11,17 @@ const dc = dict.accountSettings;
 
 type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: FireAuthUser;
 }>;
 
 export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
   'DeleteAccountCreatedWithGoogleDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen }) => {
     const {
       formState,
       enterButtonDisabled,
       isWaitingResponse,
       emailFormIntent,
     } = useObservableValue(DeleteAccountCreatedWithGoogle.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      DeleteAccountCreatedWithGoogle.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -60,7 +53,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'danger'}
             loading={isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={DeleteAccountCreatedWithGoogle.enterClickHandler}
           >
             {dc.button.deleteAccount}
           </Button>
