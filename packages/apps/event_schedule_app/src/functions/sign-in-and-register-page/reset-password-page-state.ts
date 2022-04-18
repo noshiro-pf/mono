@@ -5,7 +5,7 @@ import {
   emailInputStateReducer,
 } from '../input-state';
 
-export type ResetPasswordPageState = DeepReadonly<{
+export type ResetPasswordPageState = Readonly<{
   email: EmailInputState;
   otherErrors: string | undefined;
   isWaitingResponse: boolean;
@@ -26,7 +26,7 @@ export const resetPasswordPageHasError = (
 ): boolean =>
   emailInputHasError(state.email) || state.otherErrors !== undefined;
 
-export type ResetPasswordPageStateAction = DeepReadonly<
+export type ResetPasswordPageStateAction = Readonly<
   | { type: 'done' }
   | { type: 'inputEmail'; payload: string }
   | { type: 'reset' }

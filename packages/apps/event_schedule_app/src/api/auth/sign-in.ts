@@ -1,4 +1,3 @@
-import type { UserCredential } from 'firebase/auth';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../initialize-firebase';
 import { assertIsCredentialError } from '../../types';

@@ -1,6 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import type { User } from 'firebase/auth';
-import { dict } from '../../../constants';
 import {
   DeleteAccountCreatedWithGoogle,
   UpdateUserInfoDialogState,
@@ -11,26 +9,19 @@ import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template
 
 const dc = dict.accountSettings;
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: User;
 }>;
 
 export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
   'DeleteAccountCreatedWithGoogleDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen }) => {
     const {
       formState,
       enterButtonDisabled,
       isWaitingResponse,
       emailFormIntent,
     } = useObservableValue(DeleteAccountCreatedWithGoogle.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      DeleteAccountCreatedWithGoogle.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -62,7 +53,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'danger'}
             loading={isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={DeleteAccountCreatedWithGoogle.enterClickHandler}
           >
             {dc.button.deleteAccount}
           </Button>

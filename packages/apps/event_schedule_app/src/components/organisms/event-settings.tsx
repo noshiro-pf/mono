@@ -1,10 +1,4 @@
-import type {
-  AnswerIconSettings,
-  NotificationSettings,
-  Ymdhm,
-} from '@noshiro/event-schedule-app-shared';
 import { notificationSettingsDefaultValue } from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../constants';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
 import { AnswerIconSettingsComponent } from './icon-settings';
 import { NotificationSettingsComponent } from './notification-settings';
@@ -58,6 +52,7 @@ export const EventSettings = memoNamed<Props>(
     return (
       <Root>
         <ParagraphWithSwitch
+          data-cy={'create-page--settings--'}
           description={dc.answerDeadline.howAnswerDeadlineIsUsed}
           elementToToggle={
             <AnswerDeadlineDatepicker

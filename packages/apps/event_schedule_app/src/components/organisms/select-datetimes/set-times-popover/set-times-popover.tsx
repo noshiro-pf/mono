@@ -1,10 +1,5 @@
 // eslint-disable-next-line import/no-deprecated
 import { Button, Popover } from '@blueprintjs/core';
-import type {
-  DatetimeSpecificationEnumType,
-  TimeRange,
-} from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../../constants';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const dc = dict.eventSettingsPage.section2;

@@ -1,6 +1,6 @@
 import { AnchorButton, NonIdealState } from '@blueprintjs/core';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
-import { dict, routes } from '../../constants';
+import { routes } from '../../constants';
 import { router } from '../../store';
 
 export const NotFoundPage = memoNamed('NotFoundPage', () => {

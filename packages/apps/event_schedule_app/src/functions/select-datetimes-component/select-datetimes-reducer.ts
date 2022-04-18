@@ -1,15 +1,8 @@
-import type {
-  DatetimeRange,
-  HoursMinutes,
-  TimeRange,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
 import {
   compareDatetimeRange,
   datetimeRangeDefaultValue,
   timeRangeDefaultValue,
 } from '@noshiro/event-schedule-app-shared';
-import type { YmdKey } from '../map-key';
 import { ymdFromKey, ymdToKey } from '../map-key';
 import { timeRangeReducer } from './time-range-reducer';
 

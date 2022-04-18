@@ -1,4 +1,4 @@
-export type InputState = DeepReadonly<{
+export type InputState = Readonly<{
   inputValue: string;
   error: string | undefined;
 }>;
@@ -13,7 +13,7 @@ assertType<TypeExtends<typeof inputInitialState, InputState>>();
 export const inputHasError = (state: InputState): boolean =>
   state.error !== undefined || state.inputValue === '';
 
-export type InputStateAction = DeepReadonly<
+export type InputStateAction = Readonly<
   | { type: 'input'; payload: string }
   | { type: 'reset' }
   | { type: 'setError'; payload: string }

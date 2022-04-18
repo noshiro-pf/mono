@@ -1,6 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import type { User } from 'firebase/auth';
-import { dict } from '../../../constants';
 import { DeleteAccountPage, UpdateUserInfoDialogState } from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
@@ -9,14 +7,13 @@ import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template
 
 const dc = dict.accountSettings;
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: User;
 }>;
 
 export const DeleteAccountDialog = memoNamed<Props>(
   'DeleteAccountDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen }) => {
     const {
       formState,
       enterButtonDisabled,
@@ -24,12 +21,6 @@ export const DeleteAccountDialog = memoNamed<Props>(
       passwordFormIntent,
       passwordIsOpen,
     } = useObservableValue(DeleteAccountPage.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      DeleteAccountPage.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -83,7 +74,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'danger'}
             loading={formState.isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={DeleteAccountPage.enterClickHandler}
           >
             {dc.button.deleteAccount}
           </Button>

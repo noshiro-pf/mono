@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-deprecated
 import { Button, ButtonGroup, Popover } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 
 type Props = Readonly<{
   onSortChange: (state: 'asc' | 'desc') => void;

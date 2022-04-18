@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 import { daysOfWeekList } from '@noshiro/ts-utils-additional';
 import {
   DatePickerWeekdayReadonlyStyled,

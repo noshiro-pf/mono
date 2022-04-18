@@ -1,11 +1,5 @@
-import type {
-  Answer,
-  EventSchedule,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
 import { api } from '../api';
 import { fetchThrottleTime } from '../constants';
-import type { CalendarCurrentPageReducerState } from '../functions';
 import { clog } from '../utils';
 import { router } from './router';
 
@@ -75,11 +69,6 @@ const answers$: InitializedObservable<readonly Answer[] | undefined> =
     .chain(unwrapResultOk())
     .chain(withInitialValue(undefined));
 
-const requiredParticipantsExist$: InitializedObservable<boolean> =
-  answers$.chain(
-    mapI((answers) => answers?.some((a) => a.isRequiredParticipants) === true)
-  );
-
 const errorType$: InitializedObservable<
   DeepReadonly<
     | {
@@ -136,23 +125,6 @@ const {
   });
 }
 
-const selectedDates$: InitializedObservable<readonly YearMonthDate[]> =
-  eventSchedule$.chain(
-    mapI(
-      (eventSchedule) =>
-        eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? []
-    )
-  );
-
-const setYearMonth$: Observable<CalendarCurrentPageReducerState> =
-  selectedDates$
-    .chain(
-      map((selectedDates) =>
-        IList.isNonEmpty(selectedDates) ? selectedDates[0] : undefined
-      )
-    )
-    .chain(filter(isNotUndefined));
-
 export {
   eventScheduleResult$,
   eventSchedule$,
@@ -163,9 +135,6 @@ export {
   fetchEventSchedule,
   refreshButtonIsLoading$,
   refreshButtonIsDisabled$,
-  requiredParticipantsExist$,
-  selectedDates$,
-  setYearMonth$,
 };
 
 router.eventId$.chain(distinctUntilChangedI()).subscribe(() => {

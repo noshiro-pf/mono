@@ -1,6 +1,5 @@
 import { FormGroup } from '@blueprintjs/core';
-import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
-import { answerDeadlineShortcuts, dict } from '../../constants';
+import { answerDeadlineShortcuts } from '../../constants';
 import { BpDatetimePicker } from '../bp';
 
 type Props = Readonly<{

@@ -1,10 +1,4 @@
-import type {
-  Answer,
-  AnswerIconIdWithNone,
-  AnswerIconPoint,
-} from '@noshiro/event-schedule-app-shared';
 import type { AnswerTableCellPosition } from '../../types';
-import type { AnswerSelectionMapKey } from '../map-key';
 import { answerSelectionFromMapKey, answerSelectionToMapKey } from '../map-key';
 
 export const createAnswerSelectionMapFromAnswers = (

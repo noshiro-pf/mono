@@ -1,7 +1,3 @@
-import type {
-  DayType,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
 import { DatePickerWeekStyled } from '../bp';
 import { DatePickerDate } from './date-picker-day';
 

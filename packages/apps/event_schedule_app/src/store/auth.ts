@@ -1,19 +1,19 @@
-import type { User } from 'firebase/auth';
 import { routes } from '../constants';
 import { auth } from '../initialize-firebase';
 import { clog } from '../utils';
 import { router } from './router';
 
-const { state$: user$, setState: setUser } = createState<
-  DeepReadonly<User> | undefined
+const { state$: fireAuthUser$, setState: setUser } = createState<
+  FireAuthUser | undefined
 >(undefined);
-export { user$ };
 
-export const useUser = (): DeepReadonly<User> | undefined =>
-  useObservableValue(user$);
+export { fireAuthUser$ };
+
+export const useFireAuthUser = (): FireAuthUser | undefined =>
+  useObservableValue(fireAuthUser$);
 
 export const passwordProviderIncluded$: InitializedObservable<boolean> =
-  user$.chain(
+  fireAuthUser$.chain(
     mapI(
       (user) =>
         user?.providerData.some((p) => p.providerId === 'password') ?? false

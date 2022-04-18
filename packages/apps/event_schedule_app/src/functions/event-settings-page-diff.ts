@@ -1,9 +1,4 @@
-import type {
-  DatetimeRange,
-  EventSchedule,
-} from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { dict } from '../constants';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from './map-key';
 import { hm2str, ymd2str, ymdhm2str } from './ymdhm2str';
 

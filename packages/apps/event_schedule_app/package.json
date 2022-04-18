@@ -12,6 +12,8 @@
     "clean": "run-p clean:**",
     "clean:build": "rimraf ${npm_package_config_build_dir}",
     "clean:cache": "rimraf .firebase",
+    "cy:open": "cypress open",
+    "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
     "fb": "firebase",
     "fb:deploy": "firebase deploy",
     "fb:deploy:functions": "firebase deploy --only functions",
@@ -21,7 +23,7 @@
     "fb:login": "firebase login",
     "fb:write": "node ./scripts/write_firestore",
     "fmt": "yarn _prettier .",
-    "gi": "yarn _script_genindex ./src --min-depth 1 --ignore assets",
+    "gi": "yarn _script_genindex ./src --min-depth 1 --ignore \"(assets|global)\"",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
@@ -77,6 +79,7 @@
     "@noshiro/global-syncflow": "*",
     "@noshiro/global-syncflow-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
-    "@noshiro/ts-type-utils": "*"
+    "@noshiro/ts-type-utils": "*",
+    "cypress": "^9.5.4"
   }
 }

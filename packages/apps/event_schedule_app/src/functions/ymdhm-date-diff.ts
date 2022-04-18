@@ -1,4 +1,3 @@
-import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
 import { ymdhm2Date } from '@noshiro/event-schedule-app-shared';
 
 export const ymdhmDateDiff = (a: Ymdhm, b: Ymdhm): number => {

@@ -1,8 +1,3 @@
-import type {
-  DatetimeSpecificationEnumType,
-  HoursMinutes,
-  TimeRange,
-} from '@noshiro/event-schedule-app-shared';
 import { BpTimePicker } from '../bp';
 
 type Props = Readonly<{
@@ -22,7 +17,7 @@ export const TimeRangeView = memoNamed<Props>('TimeRangeView', (props) => (
       />
     ) : undefined}
     {props.datetimeSpecification !== 'noStartEndSpecified' ? (
-      <div>{'～'}</div>
+      <div>{dict.common.date.timeRangeTilde}</div>
     ) : undefined}
     {props.datetimeSpecification === 'endSpecified' ||
     props.datetimeSpecification === 'startAndEndSpecified' ? (

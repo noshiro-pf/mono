@@ -1,16 +1,15 @@
-import type { PopperModifiers } from '@blueprintjs/core';
 // eslint-disable-next-line import/no-deprecated
 import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { css } from 'styled-components';
-import { aboutThisAppUrl, dict, routes } from '../../constants';
+import { aboutThisAppUrl, routes } from '../../constants';
 import { experimentalFeature } from '../../env';
 import {
   router,
   signOutClick,
   UpdateUserInfoDialogState,
+  useFireAuthUser,
   usePasswordProviderIncluded,
-  user$,
 } from '../../store';
 import { NoWrapSpan } from '../atoms';
 import {
@@ -28,7 +27,7 @@ const popoverModifiers: PopperModifiers = {
 } as const;
 
 export const NavBar = memoNamed('NavBar', () => {
-  const user = useObservableValue(user$);
+  const user = useFireAuthUser();
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
@@ -136,25 +135,22 @@ export const NavBar = memoNamed('NavBar', () => {
 
               <UpdateDisplayNameDialog
                 dialogIsOpen={openingDialog === 'updateDisplayName'}
-                user={user}
               />
               <UpdateEmailDialog
+                currentEmail={user.email}
                 dialogIsOpen={openingDialog === 'updateEmail'}
-                user={user}
               />
               <UpdatePasswordDialog
+                currentEmail={user.email}
                 dialogIsOpen={openingDialog === 'updatePassword'}
-                user={user}
               />
               <DeleteAccountDialog
                 dialogIsOpen={openingDialog === 'deleteAccount'}
-                user={user}
               />
               <DeleteAccountCreatedWithGoogleDialog
                 dialogIsOpen={
                   openingDialog === 'deleteAccountCreatedWithGoogle'
                 }
-                user={user}
               />
             </>
           )}

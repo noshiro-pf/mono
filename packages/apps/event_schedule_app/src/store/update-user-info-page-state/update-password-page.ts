@@ -1,8 +1,5 @@
-import type { Intent } from '@blueprintjs/core';
-import type { AuthCredential, User } from 'firebase/auth';
 import { EmailAuthProvider } from 'firebase/auth';
 import { api } from '../../api';
-import { dict } from '../../constants';
 import {
   createToaster,
   showToast,
@@ -10,6 +7,7 @@ import {
   updatePasswordPageInitialState,
   updatePasswordPageStateReducer,
 } from '../../functions';
+import { fireAuthUser$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -86,15 +84,17 @@ export namespace UpdatePasswordPage {
     )
   );
 
-  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
+  const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updatePasswordPageHasError(s)) return;
 
     const currentEmail: string = user.email ?? '';
 
-    const credential: DeepReadonly<AuthCredential> =
-      EmailAuthProvider.credential(currentEmail, s.oldPassword.inputValue);
+    const credential: AuthCredential = EmailAuthProvider.credential(
+      currentEmail,
+      s.oldPassword.inputValue
+    );
 
     const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 
@@ -163,6 +163,14 @@ export namespace UpdatePasswordPage {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+
+    if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+    submit(fireAuthUser).catch(console.error);
+  };
+
   export const inputOldPasswordHandler = (value: string): void => {
     dispatch({
       type: 'inputOldPassword',
@@ -189,6 +197,24 @@ export namespace UpdatePasswordPage {
     hideOldPassword();
     hideNewPassword();
   };
+
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    fireAuthUser: FireAuthUser | undefined;
+  } = {
+    enterButtonDisabled: true,
+    fireAuthUser: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  fireAuthUser$.subscribe((v) => {
+    mut_subscribedValues.fireAuthUser = v;
+  });
 
   UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {

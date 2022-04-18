@@ -1,5 +1,3 @@
-import type { Ymdhm } from '@noshiro/event-schedule-app-shared';
-
 export const now = (): Ymdhm => {
   const nowDateObj = IDate.today();
   return {

@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-deprecated
 import { Button, Popover } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
 type Props = Readonly<{

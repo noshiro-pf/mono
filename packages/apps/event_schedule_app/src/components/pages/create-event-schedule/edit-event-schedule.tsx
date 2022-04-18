@@ -1,10 +1,9 @@
 import { Spinner } from '@blueprintjs/core';
-import { descriptionFontColor, dict } from '../../../constants';
-import { eventScheduleResult$, router, useUser } from '../../../store';
-import { ConfirmEmailDialog, Header } from '../../organisms';
+import { eventScheduleResult$, router, useFireAuthUser } from '../../../store';
+import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
+import { EditEventScheduleOk } from './edit-event-schedule-main';
 import { FetchEventScheduleError } from './error';
-import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 
 const dc = dict.eventSettingsPage;
 
@@ -17,7 +16,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
     setTrue: makeItPassTheEmailConfirmation,
   } = useBoolState(false);
 
-  const user = useUser();
+  const user = useFireAuthUser();
 
   const editPageIsHidden: boolean =
     Result.isOk(eventScheduleResult) &&
@@ -36,34 +35,12 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
       ) : eventId === undefined || eventScheduleResult === undefined ? (
         <Spinner />
       ) : (
-        <>
-          <SubTitle>
-            {dc.editSubTitle(eventScheduleResult.value.title)}
-          </SubTitle>
-
-          {eventScheduleResult.value.notificationSettings ===
-          'none' ? undefined : (
-            <ConfirmEmailDialog
-              back={router.back}
-              emailAnswer={eventScheduleResult.value.notificationSettings.email}
-              isOpen={editPageIsHidden}
-              onSuccess={makeItPassTheEmailConfirmation}
-            />
-          )}
-
-          {editPageIsHidden ? undefined : (
-            <EventScheduleSettingCommon
-              initialValues={eventScheduleResult.value}
-              mode={'edit'}
-            />
-          )}
-        </>
+        <EditEventScheduleOk
+          editPageIsHidden={editPageIsHidden}
+          eventSchedule={eventScheduleResult.value}
+          makeItPassTheEmailConfirmation={makeItPassTheEmailConfirmation}
+        />
       )}
     </div>
   );
 });
-
-const SubTitle = styled.div`
-  margin: 10px 20px;
-  color: ${descriptionFontColor.normal};
-`;

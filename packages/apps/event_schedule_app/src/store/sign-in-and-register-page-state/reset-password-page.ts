@@ -1,6 +1,5 @@
-import type { Intent } from '@blueprintjs/core';
 import { api } from '../../api';
-import { dict, routes } from '../../constants';
+import { routes } from '../../constants';
 import {
   createToaster,
   resetPasswordPageHasError,
@@ -40,9 +39,7 @@ export namespace ResetPasswordPageStore {
     }))
   );
 
-  export const submit = async (
-    pageToBack: string | undefined
-  ): Promise<void> => {
+  const submit = async (pageToBack: string | undefined): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (resetPasswordPageHasError(s)) return;
@@ -91,6 +88,12 @@ export namespace ResetPasswordPageStore {
     }
   };
 
+  export const enterClickHandler = (): void => {
+    if (mut_subscribedValues.enterButtonDisabled) return;
+
+    submit(mut_subscribedValues.pageToBack).catch(console.error);
+  };
+
   export const inputEmailHandler = (value: string): void => {
     dispatch({
       type: 'inputEmail',
@@ -101,6 +104,24 @@ export namespace ResetPasswordPageStore {
   const resetAllState = (): void => {
     dispatch({ type: 'reset' });
   };
+
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    pageToBack: string | undefined;
+  } = {
+    enterButtonDisabled: true,
+    pageToBack: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  router.pageToBack$.subscribe((v) => {
+    mut_subscribedValues.pageToBack = v;
+  });
 
   router.isRoute.signInPage$.subscribe((isSignInPage) => {
     if (!isSignInPage) {

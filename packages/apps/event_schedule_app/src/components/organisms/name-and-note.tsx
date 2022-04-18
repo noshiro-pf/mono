@@ -1,5 +1,4 @@
 import { FormGroup } from '@blueprintjs/core';
-import { dict } from '../../constants';
 import { useFormError } from '../../hooks';
 import { BpInput, BpTextArea } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
@@ -35,6 +34,7 @@ export const NameAndNotes = memoNamed<Props>(
           labelInfo={dc.eventNameInfo}
         >
           <BpInput
+            data-cy={'title'}
             placeholder={dc.eventNamePlaceholder}
             value={title}
             onBlur={onBlur}
@@ -43,6 +43,7 @@ export const NameAndNotes = memoNamed<Props>(
         </FormGroup>
         <FormGroup intent={'primary'} label={dc.notes}>
           <BpTextArea
+            data-cy={'note'}
             fill={true}
             growVertically={true}
             placeholder={dc.notesPlaceholder}

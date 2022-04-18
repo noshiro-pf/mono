@@ -1,11 +1,3 @@
-import type {
-  Answer,
-  AnswerIconIdWithNone,
-  AnswerIconPoint,
-  AnswerId,
-  DatetimeRange,
-} from '@noshiro/event-schedule-app-shared';
-import type { DatetimeRangeMapKey } from '../map-key';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
 
 export const createAnswerTable = (

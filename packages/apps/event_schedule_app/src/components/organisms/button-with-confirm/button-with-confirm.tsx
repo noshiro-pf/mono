@@ -1,4 +1,3 @@
-import type { IconName, Intent } from '@blueprintjs/core';
 import { createToaster, showToast } from '../../../functions';
 import { ButtonNowrapStyled } from '../../bp';
 import { ConfirmDialog } from './confirm-dialog';
@@ -66,6 +65,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
     return (
       <>
         <ButtonNowrapStyled
+          data-cy={'button-with-confirmation'}
           disabled={disabled}
           icon={buttonConfig.icon}
           intent={buttonConfig.intent ?? 'none'}

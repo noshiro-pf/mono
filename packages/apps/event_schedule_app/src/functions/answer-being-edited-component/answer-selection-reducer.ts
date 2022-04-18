@@ -1,11 +1,5 @@
-import type {
-  AnswerIconId,
-  AnswerIconPoint,
-  DatetimeRange,
-} from '@noshiro/event-schedule-app-shared';
 import { defaultIconPoint } from '../../constants';
 import type { AnswerSelectionValue } from '../../types';
-import type { DatetimeRangeMapKey } from '../map-key';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {

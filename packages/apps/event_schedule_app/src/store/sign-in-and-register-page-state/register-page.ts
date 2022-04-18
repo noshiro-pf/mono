@@ -1,6 +1,5 @@
-import type { Intent } from '@blueprintjs/core';
 import { api } from '../../api';
-import { dict, routes } from '../../constants';
+import { routes } from '../../constants';
 import {
   createToaster,
   registerPageHasError,
@@ -9,6 +8,7 @@ import {
   showToast,
 } from '../../functions';
 import { router } from '../router';
+import { GoogleSignInStore } from './google-sign-in-state';
 
 const dc = dict.register;
 
@@ -75,9 +75,7 @@ export namespace RegisterPageStore {
     )
   );
 
-  export const submit = async (
-    pageToBack: string | undefined
-  ): Promise<void> => {
+  const submit = async (pageToBack: string | undefined): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (registerPageHasError(s)) return;
@@ -185,6 +183,38 @@ export namespace RegisterPageStore {
       type: 'inputPasswordConfirmation',
       payload: value,
     });
+  };
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    googleSignInButtonDisabled: boolean;
+    pageToBack: string | undefined;
+  } = {
+    enterButtonDisabled: true,
+    googleSignInButtonDisabled: true,
+    pageToBack: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  GoogleSignInStore.googleSignInButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.googleSignInButtonDisabled = v;
+  });
+
+  router.pageToBack$.subscribe((v) => {
+    mut_subscribedValues.pageToBack = v;
+  });
+
+  export const enterClickHandler = (): void => {
+    if (
+      mut_subscribedValues.enterButtonDisabled ||
+      mut_subscribedValues.googleSignInButtonDisabled
+    )
+      return;
+
+    submit(mut_subscribedValues.pageToBack).catch(console.error);
   };
 
   const resetAllState = (): void => {

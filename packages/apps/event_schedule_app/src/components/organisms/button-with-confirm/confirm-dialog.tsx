@@ -1,4 +1,3 @@
-import type { IconName, Intent } from '@blueprintjs/core';
 import { AlertWithMaxWidth } from '../../bp';
 
 type Props = Readonly<{

@@ -1,5 +1,5 @@
 import { InputGroup } from '@blueprintjs/core';
-import type { ChangeEvent, ComponentProps, FormEvent } from 'react';
+import type { ChangeEventHandler, ComponentProps } from 'react';
 import { useRef } from 'react';
 
 type InputGroupPropsOriginal = ComponentProps<typeof InputGroup>;
@@ -14,9 +14,8 @@ export type BpInputProps = InputGroupPropsOriginal &
 export const BpInput = memoNamed<BpInputProps>(
   'BpInput',
   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
-    const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: ChangeEvent<HTMLInputElement> & FormEvent<HTMLElement>) => {
+    const onChangeHandler: ChangeEventHandler<HTMLInputElement> = useCallback(
+      (ev) => {
         onValueChange(ev.target.value);
       },
       [onValueChange]

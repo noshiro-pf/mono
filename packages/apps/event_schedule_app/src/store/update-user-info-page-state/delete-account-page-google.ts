@@ -1,7 +1,4 @@
-import type { Intent } from '@blueprintjs/core';
-import type { AuthCredential, User } from 'firebase/auth';
 import { api } from '../../api';
-import { dict } from '../../constants';
 import {
   createToaster,
   emailInputHasError,
@@ -9,7 +6,7 @@ import {
   emailInputStateReducer,
   showToast,
 } from '../../functions';
-import { user$ } from '../auth';
+import { fireAuthUser$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -22,9 +19,10 @@ export namespace DeleteAccountCreatedWithGoogle {
     emailInputInitialState
   );
 
-  const enterButtonDisabled$ = combineLatestI([formState$, user$]).chain(
-    mapI(([formState, user]) => formState.inputValue !== user?.email)
-  );
+  const enterButtonDisabled$ = combineLatestI([
+    formState$,
+    fireAuthUser$,
+  ]).chain(mapI(([formState, user]) => formState.inputValue !== user?.email));
 
   const {
     setFalse: setFalseIsWaitingResponse,
@@ -57,7 +55,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     )
   );
 
-  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
+  const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (emailInputHasError(s)) return;
@@ -74,8 +72,7 @@ export namespace DeleteAccountCreatedWithGoogle {
       return;
     }
 
-    const credential: DeepReadonly<AuthCredential> | undefined =
-      signInResult.value;
+    const credential: AuthCredential | undefined = signInResult.value;
 
     if (credential === undefined) return;
 
@@ -129,6 +126,14 @@ export namespace DeleteAccountCreatedWithGoogle {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+
+    if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+    submit(fireAuthUser).catch(console.error);
+  };
+
   export const inputEmailHandler = (value: string): void => {
     dispatch({
       type: 'input',
@@ -140,6 +145,24 @@ export namespace DeleteAccountCreatedWithGoogle {
     dispatch({ type: 'reset' });
     setFalseIsWaitingResponse();
   };
+
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    fireAuthUser: FireAuthUser | undefined;
+  } = {
+    enterButtonDisabled: true,
+    fireAuthUser: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  fireAuthUser$.subscribe((v) => {
+    mut_subscribedValues.fireAuthUser = v;
+  });
 
   UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {

@@ -1,4 +1,3 @@
-import type { AnswerIconPoint } from '@noshiro/event-schedule-app-shared';
 import { answerIconPointConfig, defaultIconPoint } from '../../../constants';
 import { clampAndRoundAnswerFairIconPoint } from '../../../functions';
 import { NumericInputView } from '../../bp';

@@ -1,5 +1,3 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../constants';
 import type { EventSettingsPageDiffResult } from '../../functions';
 
 type Props = Readonly<{

@@ -1,4 +1,3 @@
-import type { Answer } from '@noshiro/event-schedule-app-shared';
 import {
   ANSWER_KEY_CREATED_AT,
   fillAnswer,

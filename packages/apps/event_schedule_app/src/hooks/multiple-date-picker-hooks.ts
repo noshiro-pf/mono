@@ -1,7 +1,3 @@
-import type {
-  DayType,
-  YearMonthDate,
-} from '@noshiro/event-schedule-app-shared';
 import {
   compareYmd,
   yearMonthDateDefaultValue,
@@ -10,7 +6,6 @@ import { fromArray } from '@noshiro/syncflow';
 import type {
   CalendarCurrentPageReducerState,
   SelectedDatesReducerAction,
-  YmdKey,
 } from '../functions';
 import {
   calendarCurrentPageInitialState,

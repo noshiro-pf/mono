@@ -5,7 +5,7 @@ import {
   inputStateReducer,
 } from '../input-state';
 
-export type UpdateDisplayNamePageState = DeepReadonly<{
+export type UpdateDisplayNamePageState = Readonly<{
   displayName: InputState;
   otherErrors: string | undefined;
   isWaitingResponse: boolean;
@@ -29,7 +29,7 @@ export const updateDisplayNamePageHasError = (
 ): boolean =>
   inputHasError(state.displayName) || state.otherErrors !== undefined;
 
-export type UpdateDisplayNamePageStateAction = DeepReadonly<
+export type UpdateDisplayNamePageStateAction = Readonly<
   | { type: 'done' }
   | { type: 'inputDisplayName'; payload: string }
   | { type: 'reset' }

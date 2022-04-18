@@ -1,7 +1,4 @@
-import type { Intent } from '@blueprintjs/core';
-import type { User } from 'firebase/auth';
 import { api } from '../../api';
-import { dict } from '../../constants';
 import {
   createToaster,
   showToast,
@@ -9,7 +6,7 @@ import {
   updateDisplayNamePageInitialState,
   updateDisplayNamePageStateReducer,
 } from '../../functions';
-import { emitAuthStateChange, user$ } from '../auth';
+import { emitAuthStateChange, fireAuthUser$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -47,7 +44,7 @@ export namespace UpdateDisplayNamePage {
     }))
   );
 
-  export const submit = async (user: DeepReadonly<User>): Promise<void> => {
+  const submit = async (user: FireAuthUser): Promise<void> => {
     const s = dispatch({ type: 'submit' });
 
     if (updateDisplayNamePageHasError(s)) return;
@@ -89,6 +86,14 @@ export namespace UpdateDisplayNamePage {
     });
   };
 
+  export const enterClickHandler = (): void => {
+    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+
+    if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+    submit(fireAuthUser).catch(console.error);
+  };
+
   export const inputDisplayNameHandler = (value: string): void => {
     dispatch({
       type: 'inputDisplayName',
@@ -100,8 +105,26 @@ export namespace UpdateDisplayNamePage {
     dispatch({ type: 'reset' });
   };
 
+  /* subscriptions */
+
+  const mut_subscribedValues: {
+    enterButtonDisabled: boolean;
+    fireAuthUser: FireAuthUser | undefined;
+  } = {
+    enterButtonDisabled: true,
+    fireAuthUser: undefined,
+  };
+
+  enterButtonDisabled$.subscribe((v) => {
+    mut_subscribedValues.enterButtonDisabled = v;
+  });
+
+  fireAuthUser$.subscribe((v) => {
+    mut_subscribedValues.fireAuthUser = v;
+  });
+
   UpdateUserInfoDialogState.openingDialog$
-    .chain(withLatestFromI(user$))
+    .chain(withLatestFromI(fireAuthUser$))
     .subscribe(([openingDialog, user]) => {
       if (openingDialog === undefined) {
         resetAllDialogState();

@@ -1,9 +1,5 @@
-import type {
-  DatetimeRange,
-  PartialDatetimeRange,
-} from '@noshiro/event-schedule-app-shared';
+import type { PartialDatetimeRange } from '@noshiro/event-schedule-app-shared';
 import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
-import type { Phantomic } from '@noshiro/ts-utils-additional';
 
 export type DatetimeRangeMapKey = Phantomic<string, 'DatetimeRangeMapKey'>;
 

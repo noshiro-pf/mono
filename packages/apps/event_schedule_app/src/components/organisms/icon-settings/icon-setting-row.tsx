@@ -1,8 +1,3 @@
-import type {
-  AnswerIconId,
-  AnswerIconPoint,
-  AnswerIconSetting,
-} from '@noshiro/event-schedule-app-shared';
 import { CustomIcon } from '../../atoms';
 import { BpInput } from '../../bp';
 import {

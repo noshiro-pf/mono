@@ -14,7 +14,7 @@ import {
 } from '../input-state';
 import type { SignInPageStateAction } from './sign-in-page-state';
 
-export type RegisterPageState = DeepReadonly<{
+export type RegisterPageState = Readonly<{
   username: InputState;
   email: EmailInputState;
   password: PasswordWithConfirmationState;
@@ -39,7 +39,7 @@ export const registerPageHasError = (state: RegisterPageState): boolean =>
   passwordWithConfirmationHasError(state.password) ||
   state.otherErrors !== undefined;
 
-export type RegisterPageStateAction = DeepReadonly<
+export type RegisterPageStateAction = Readonly<
   | SignInPageStateAction
   | (
       | { type: 'inputPasswordConfirmation'; payload: string }

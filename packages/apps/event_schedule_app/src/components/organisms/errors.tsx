@@ -1,4 +1,4 @@
-import { dict, errorFontColor } from '../../constants';
+import { errorFontColor } from '../../constants';
 import type { EventScheduleValidation } from '../../types';
 import { Description } from '../atoms';
 

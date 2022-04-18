@@ -1,6 +1,3 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
-import type { Phantomic } from '@noshiro/ts-utils-additional';
-
 export type YmdKey = Phantomic<string, 'YmdKey'>;
 
 export const ymdToKey = ({ year, month, date }: YearMonthDate): YmdKey =>

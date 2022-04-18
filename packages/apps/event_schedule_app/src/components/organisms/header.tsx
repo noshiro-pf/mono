@@ -2,7 +2,7 @@ import { Icon } from '@blueprintjs/core';
 import { routes } from '../../constants';
 import { NavBar } from './navbar';
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   title: string;
 }>;
 

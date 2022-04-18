@@ -1,28 +1,28 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { dict } from '../../constants';
-import { useRegisterPageState } from '../../hooks';
-import { RegisterPageStore } from '../../store';
+import { GoogleSignInStore, RegisterPageStore } from '../../store';
 import { GoogleIcon, Label } from '../atoms';
 import { BpInput } from '../bp';
-import { LockButton, SignInStyled } from '../molecules';
+import { LockButton } from '../molecules';
 import { NavBar } from '../organisms';
+import { SignInStyled } from '../styled';
 
 const dc = dict.register;
 
 const returnFalse = (): false => false;
 
 export const RegisterPage = memoNamed('RegisterPage', () => {
+  const googleSignInButtonDisabled = useObservableValue(
+    GoogleSignInStore.googleSignInButtonDisabled$
+  );
+
   const {
     formState,
-    enterClickHandler,
+    enterButtonDisabled,
     usernameFormIntent,
     emailFormIntent,
     passwordFormIntent,
     passwordIsOpen,
-    enterButtonDisabled,
-    googleSignInButtonDisabled,
-    googleSignInClickHandler,
-  } = useRegisterPageState();
+  } = useObservableValue(RegisterPageStore.state$);
 
   return (
     <SignInStyled.Wrapper>
@@ -108,7 +108,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                 fill={true}
                 intent={'primary'}
                 loading={formState.isWaitingResponse}
-                onClick={enterClickHandler}
+                onClick={RegisterPageStore.enterClickHandler}
               >
                 {dc.registerButton}
               </Button>
@@ -133,7 +133,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
                   intent={'none'}
                   minimal={true}
                   outlined={true}
-                  onClick={googleSignInClickHandler}
+                  onClick={GoogleSignInStore.googleSignInClickHandler}
                 >
                   <SignInStyled.GoogleButtonContentWrapper>
                     <SignInStyled.GoogleIconWrapper>

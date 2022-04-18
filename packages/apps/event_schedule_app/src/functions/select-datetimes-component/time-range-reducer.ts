@@ -1,7 +1,3 @@
-import type {
-  HoursMinutes,
-  TimeRange,
-} from '@noshiro/event-schedule-app-shared';
 import { compareHm } from '@noshiro/event-schedule-app-shared';
 
 export type TimeRangeReducerAction = Readonly<{

@@ -1,8 +1,3 @@
-import type {
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-} from '@noshiro/event-schedule-app-shared';
-import { dict } from '../../../constants';
 import { hm2str, ymd2strWithDay } from '../../../functions';
 
 const dc = dict.common.date;

@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import { dict } from '../../../constants';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 const dc = dict.eventSettingsPage;

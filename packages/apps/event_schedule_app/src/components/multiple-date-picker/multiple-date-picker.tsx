@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import type { CalendarCurrentPageReducerState, YmdKey } from '../../functions';
 import { useMultipleDatePickerState } from '../../hooks';
 import {

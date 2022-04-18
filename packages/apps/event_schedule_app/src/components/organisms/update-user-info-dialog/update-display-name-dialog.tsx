@@ -1,6 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import type { User } from 'firebase/auth';
-import { dict } from '../../../constants';
 import {
   UpdateDisplayNamePage,
   UpdateUserInfoDialogState,
@@ -11,22 +9,15 @@ import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template
 
 const dc = dict.accountSettings;
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: User;
 }>;
 
 export const UpdateDisplayNameDialog = memoNamed<Props>(
   'UpdateDisplayNameDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen }) => {
     const { formState, displayNameFormIntent, enterButtonDisabled } =
       useObservableValue(UpdateDisplayNamePage.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      UpdateDisplayNamePage.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -56,7 +47,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={UpdateDisplayNamePage.enterClickHandler}
           >
             {dc.button.update}
           </Button>

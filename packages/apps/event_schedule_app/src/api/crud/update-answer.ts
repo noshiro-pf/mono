@@ -1,4 +1,3 @@
-import type { Answer } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { doc, setDoc } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';

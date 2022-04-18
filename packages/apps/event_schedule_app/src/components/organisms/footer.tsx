@@ -1,4 +1,4 @@
-import { aboutThisAppUrl, dict } from '../../constants';
+import { aboutThisAppUrl } from '../../constants';
 
 export const Footer = memoNamed('Footer', () => (
   <ReleaseNotesUrlWrapper>

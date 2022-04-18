@@ -19,6 +19,7 @@
     "@noshiro/global-react-utils",
     "@noshiro/global-syncflow-react-hooks",
     "@noshiro/global-react",
-    "@noshiro/global-styled-components"
+    "@noshiro/global-styled-components",
+    "<rootDir>/src/global/globals.ts"
   ]
 }

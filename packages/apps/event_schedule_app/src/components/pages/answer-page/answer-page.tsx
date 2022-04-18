@@ -1,7 +1,31 @@
 import { Button, Spinner } from '@blueprintjs/core';
-import { dict } from '../../../constants';
-import { useAnswerPageState } from '../../../hooks';
-import { refreshAnswers, setYearMonth$ } from '../../../store';
+import { useRef } from 'react';
+import {
+  alertOnAnswerClickIsOpen$,
+  answerBeingEdited$,
+  answerBeingEditedSectionState$,
+  answers$,
+  closeAlertOnAnswerClick,
+  errorType$,
+  eventSchedule$,
+  fetchAnswers,
+  fetchEventSchedule,
+  holidaysJpDefinition$,
+  isStateAfterDeadline$,
+  onAddAnswerButtonClick,
+  onCancelEditingAnswer,
+  onEditButtonClick,
+  refreshAnswers,
+  refreshButtonIsDisabled$,
+  refreshButtonIsLoading$,
+  requiredParticipantsExist$,
+  router,
+  selectedAnswerUserName$,
+  selectedDates$,
+  setYearMonth$,
+  submitButtonIsDisabled$,
+  submitButtonIsLoading$,
+} from '../../../store';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
 import { AlertWithMaxWidth } from '../../bp';
 import { Section } from '../../molecules';
@@ -19,38 +43,57 @@ import { AnswerPageError } from './error';
 const dc = dict.answerPage;
 
 export const AnswerPage = memoNamed('AnswerPage', () => {
-  const {
-    eventId,
-    eventSchedule,
-    onEditButtonClick,
-    answers,
-    errorType,
-    onAnswerClick,
-    onAddAnswerButtonClick,
-    answerBeingEditedSectionState,
-    answerSectionRef,
-    answerBeingEdited,
-    updateAnswerBeingEdited,
-    onCancel,
-    onDeleteAnswer,
-    onSubmitAnswer,
-    submitButtonIsLoading,
-    submitButtonIsDisabled,
-    refreshButtonIsLoading,
-    refreshButtonIsDisabled,
-    isExpired,
-    selectedAnswerUserName,
-    requiredParticipantsExist,
-    selectedDates,
-    holidaysJpDefinition,
-    alertOnAnswerClickIsOpen,
-    closeAlertOnAnswerClick,
-  } = useAnswerPageState();
+  /* values */
+
+  const alertOnAnswerClickIsOpen = useObservableValue(
+    alertOnAnswerClickIsOpen$
+  );
+  const answerBeingEdited = useObservableValue(answerBeingEdited$);
+  const answerBeingEditedSectionState = useObservableValue(
+    answerBeingEditedSectionState$
+  );
+  const answers = useObservableValue(answers$);
+  const errorType = useObservableValue(errorType$);
+  const eventId = useObservableValue(router.eventId$);
+  const eventSchedule = useObservableValue(eventSchedule$);
+  const isStateAfterDeadline = useObservableValue(isStateAfterDeadline$);
+  const refreshButtonIsDisabled = useObservableValue(refreshButtonIsDisabled$);
+  const refreshButtonIsLoading = useObservableValue(refreshButtonIsLoading$);
+  const requiredParticipantsExist = useObservableValue(
+    requiredParticipantsExist$
+  );
+  const selectedAnswerUserName = useObservableValue(selectedAnswerUserName$);
+  const selectedDates = useObservableValue(selectedDates$);
+  const submitButtonIsDisabled = useObservableValue(submitButtonIsDisabled$);
+  const submitButtonIsLoading = useObservableValue(submitButtonIsLoading$);
+
+  /* effect */
+
+  // fetch once on the first load
+  useEffect(() => {
+    fetchEventSchedule();
+    fetchAnswers();
+  }, []);
+
+  const answerSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    switch (answerBeingEditedSectionState) {
+      case 'creating':
+      case 'editing':
+        answerSectionRef.current?.scrollIntoView();
+        break;
+      case 'hidden':
+        break;
+    }
+  }, [answerBeingEditedSectionState]);
+
+  const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
 
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
-    <div>
+    <div data-cy={'answer-page'}>
       <Header title={dc.title} />
 
       {errorType !== undefined ? (
@@ -64,7 +107,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
           <Section sectionTitle={dc.eventInfo.title}>
             <AnswerPageEventInfo
               eventSchedule={eventSchedule}
-              isExpired={isExpired}
+              isExpired={isStateAfterDeadline}
             />
             <ButtonsWrapperAlignEnd>
               <Button icon={'cog'} intent={'none'} onClick={onEditButtonClick}>
@@ -82,7 +125,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               />
             </CalendarWrapper>
 
-            {isExpired ? undefined : (
+            {isStateAfterDeadline ? undefined : (
               <SingleButtonWrapper>
                 <Button
                   disabled={refreshButtonIsDisabled}
@@ -99,11 +142,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             <TableWrapper>
               <AnswerTable
                 answers={answers}
+                datetimeSpecification={eventSchedule.datetimeSpecification}
                 editAnswerButtonIsDisabled={
-                  answerBeingEditedSectionState !== 'hidden' || isExpired
+                  answerBeingEditedSectionState !== 'hidden' ||
+                  isStateAfterDeadline
                 }
-                eventSchedule={eventSchedule}
-                onAnswerClick={onAnswerClick}
               />
 
               <AlertWithMaxWidth
@@ -174,9 +217,11 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               </NoteForPointOfFair>
             </IconDescriptionWrapper>
 
-            {answerBeingEditedSectionState === 'hidden' && !isExpired ? (
+            {answerBeingEditedSectionState === 'hidden' &&
+            !isStateAfterDeadline ? (
               <ButtonsWrapperAlignEnd>
                 <Button
+                  data-cy={'add-answer-button'}
                   icon='add'
                   intent='primary'
                   text={dc.answers.addAnswer}
@@ -186,15 +231,15 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             ) : undefined}
           </Section>
 
-          <div ref={answerSectionRef}>
+          <div ref={answerSectionRef} data-cy={'answer-being-edited-section'}>
             {answerBeingEditedSectionState === 'hidden' ||
-            isExpired ? undefined : (
+            isStateAfterDeadline ? undefined : (
               <Section
                 sectionTitle={match(answerBeingEditedSectionState, {
                   creating: dc.answerBeingEdited.title.create,
                   editing: dc.answerBeingEdited.title.update,
                 })}
-                onCloseClick={onCancel}
+                onCloseClick={onCancelEditingAnswer}
               >
                 <AnswerBeingEdited
                   answerBeingEdited={answerBeingEdited}
@@ -204,10 +249,6 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   selectedAnswerUserName={selectedAnswerUserName}
                   submitButtonIsDisabled={submitButtonIsDisabled}
                   submitButtonIsLoading={submitButtonIsLoading}
-                  updateAnswerBeingEdited={updateAnswerBeingEdited}
-                  onCancel={onCancel}
-                  onDeleteAnswer={onDeleteAnswer}
-                  onSubmitAnswer={onSubmitAnswer}
                 />
               </Section>
             )}

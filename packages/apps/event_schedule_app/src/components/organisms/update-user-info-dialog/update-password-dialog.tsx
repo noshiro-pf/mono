@@ -1,6 +1,4 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import type { User } from 'firebase/auth';
-import { dict } from '../../../constants';
 import { UpdatePasswordPage, UpdateUserInfoDialogState } from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
@@ -9,9 +7,9 @@ import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template
 
 const dc = dict.accountSettings;
 
-type Props = DeepReadonly<{
+type Props = Readonly<{
   dialogIsOpen: boolean;
-  user: User;
+  currentEmail: string | null;
 }>;
 
 // https://yuzu441.hateblo.jp/entry/2020/11/16/190229
@@ -19,7 +17,7 @@ const hideStyle: CSSProperties = { display: 'none' };
 
 export const UpdatePasswordDialog = memoNamed<Props>(
   'UpdatePasswordDialog',
-  ({ dialogIsOpen, user }) => {
+  ({ dialogIsOpen, currentEmail }) => {
     const {
       formState,
       enterButtonDisabled,
@@ -28,12 +26,6 @@ export const UpdatePasswordDialog = memoNamed<Props>(
       oldPasswordIsOpen,
       newPasswordIsOpen,
     } = useObservableValue(UpdatePasswordPage.state$);
-
-    const enterClickHandler = useCallback(() => {
-      if (enterButtonDisabled) return;
-
-      UpdatePasswordPage.submit(user).catch(console.error);
-    }, [enterButtonDisabled, user]);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -49,7 +41,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
                 disabled={false}
                 intent={'none'}
                 type={'email'}
-                value={user.email ?? ''}
+                value={currentEmail ?? ''}
                 onValueChange={noop}
               />
             </FormGroup>
@@ -125,7 +117,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={enterClickHandler}
+            onClick={UpdatePasswordPage.enterClickHandler}
           >
             {dc.button.update}
           </Button>
