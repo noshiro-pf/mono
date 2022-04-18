@@ -2,6 +2,13 @@ import type { WritingsInfo } from '../types';
 
 export const writings: readonly WritingsInfo[] = [
   {
+    id: 'ReScript-TypeScript',
+    link: 'https://noshiro.notion.site/ReScript-TypeScript-44f051af3fd94c9489058c6a77826049',
+    title: 'ReScript で既存の TypeScript コード置き換えを試みた感想',
+    subtitle: '',
+    body: '',
+  },
+  {
     id: 'ts4.1-immutable-setin',
     link: 'https://www.kabuku.co.jp/developers/typescript-union-combination-limit-of-25',
     title:

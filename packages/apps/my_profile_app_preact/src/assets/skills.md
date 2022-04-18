@@ -23,7 +23,7 @@
     -   Libraries
         -   Global State Manager
             -   趣味開発では自作ライブラリ「[**Syncflow**](https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648)」と専用(P)React hooks
-            -   Recoil（趣味開発では自作ライブラリを使っているが、業務で次に使うならこれかなという気持ち）
+            -   Recoil
             -   **RxJS**
                 -   現在業務で使用。自作ライブラリ開発前は趣味開発でもよく使っていた。
                 -   ちょっと複雑な非同期処理を書きやすくするために
@@ -62,12 +62,13 @@
             -   esbuild 試したい
         -   Testing
             -   **Jest**
+            -   **Cypress**
         -   Linters & Formatters
             -   **ESLint** (TypeScript-eslint)
             -   **Prettier**
                 -   import 文のソート・整理に [prettier-plugin-organize-imports](https://github.com/simonhaenisch/prettier-plugin-organize-imports#readme) を入れている。
                     これを見つける前は [自作スクリプト](https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
--   Web backend
+-   Web backend（これまで趣味・業務共にウェブフロントエンドを触る時間が圧倒的に多かったため、バックエンドは比較すると知識が少なめ）
     -   Languages
         -   Node.js
         -   PHP（数千行程度） 今は使っていない
@@ -94,7 +95,7 @@
     -   少しだけ使用経験のあるもの
         -   Haskell
         -   Ruby（大学の講義）
-        -   Java（就活のコーディングテストで一度だけ）
+        -   Java（新卒就活のときコーディングテストで一度だけ触った）
         -   D
         -   Erlang（卒業研究で少し触った）
         -   Swift（業務で簡素な iOS アプリ構築のため少しだけ書いた）
@@ -102,20 +103,7 @@
         -   PowerPC のアセンブリ（大学の講義で）
     -   [PAST](https://atcoder.jp/contests/past202005-2)
         -   2020-05-25
-        -   初級（52 点）（最近あまり使わない C++の構文で引っかかって時間をロスしたりしたので低めかも。競技プログラミングはあまりやったことがない。）
-
-### メモ
-
--   基本的にウェブフロントエンドに興味があり、バックエンドは比較すると知識が少なめ。趣味でアプリを書くときは firebase などで簡単に済んでしまうのでなかなか手で書く機会が少ない。
--   今後覚えようかと思いつつあまり触れていないもの
-    -   Server Side Rendering, Static Site Generator
-    -   GraphQL
-    -   Recoil
-    -   wasm
--   watch list
-    -   [deno](https://github.com/denoland/deno)
-    -   [Rome](https://github.com/rome/tools)
-    -   [Solid](https://github.com/ryansolid/solid)
+        -   初級（52 点）（久々に C++ を使用して受験した）
 
 ## 開発環境
 
