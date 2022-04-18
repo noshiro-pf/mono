@@ -20,7 +20,7 @@ import {
   theNameIsAlreadyUsedFn,
 } from '../../functions';
 import type { AnswerSelectionValue } from '../../types';
-import { user$ } from '../auth';
+import { fireAuthUser$ } from '../auth';
 import {
   answers$,
   eventSchedule$,
@@ -397,7 +397,7 @@ answerBeingEditedSectionState$.subscribe((v) => {
   mut_subscribedValues.answerBeingEditedSectionState = v;
 });
 
-user$.subscribe((u) => {
+fireAuthUser$.subscribe((u) => {
   mut_subscribedValues.user = u;
 });
 

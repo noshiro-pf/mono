@@ -6,7 +6,7 @@ import {
   updateDisplayNamePageInitialState,
   updateDisplayNamePageStateReducer,
 } from '../../functions';
-import { emitAuthStateChange, user$ } from '../auth';
+import { emitAuthStateChange, fireAuthUser$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -119,12 +119,12 @@ export namespace UpdateDisplayNamePage {
     mut_subscribedValues.enterButtonDisabled = v;
   });
 
-  user$.subscribe((v) => {
+  fireAuthUser$.subscribe((v) => {
     mut_subscribedValues.fireAuthUser = v;
   });
 
   UpdateUserInfoDialogState.openingDialog$
-    .chain(withLatestFromI(user$))
+    .chain(withLatestFromI(fireAuthUser$))
     .subscribe(([openingDialog, user]) => {
       if (openingDialog === undefined) {
         resetAllDialogState();

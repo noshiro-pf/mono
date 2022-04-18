@@ -7,7 +7,7 @@ import {
   updatePasswordPageInitialState,
   updatePasswordPageStateReducer,
 } from '../../functions';
-import { user$ } from '../auth';
+import { fireAuthUser$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -212,7 +212,7 @@ export namespace UpdatePasswordPage {
     mut_subscribedValues.enterButtonDisabled = v;
   });
 
-  user$.subscribe((v) => {
+  fireAuthUser$.subscribe((v) => {
     mut_subscribedValues.fireAuthUser = v;
   });
 

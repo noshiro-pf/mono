@@ -7,7 +7,7 @@ import {
   deleteAccountPageStateReducer,
   showToast,
 } from '../../functions';
-import { user$ } from '../auth';
+import { fireAuthUser$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -175,7 +175,7 @@ export namespace DeleteAccountPage {
     mut_subscribedValues.enterButtonDisabled = v;
   });
 
-  user$.subscribe((v) => {
+  fireAuthUser$.subscribe((v) => {
     mut_subscribedValues.fireAuthUser = v;
   });
 

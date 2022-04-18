@@ -3,7 +3,7 @@ import { api } from '../../api';
 import { initialEventSchedule, routes } from '../../constants';
 import { EventScheduleAppLocalStorage } from '../../functions';
 import type { EventScheduleSettingCommonState } from '../../types';
-import { user$ } from '../auth';
+import { fireAuthUser$ } from '../auth';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';
 
 export namespace CreateEventScheduleStore {
@@ -152,7 +152,7 @@ export namespace CreateEventScheduleStore {
     mut_subscribedValues.commonState = commonState;
   });
 
-  user$.subscribe((user) => {
+  fireAuthUser$.subscribe((user) => {
     mut_subscribedValues.fireAuthUser = user;
   });
 }

@@ -13,7 +13,7 @@ import {
   theNameIsAlreadyUsed$,
   toggleProtectedSection,
   toggleRequiredSection,
-  useUser,
+  useFireAuthUser,
 } from '../../../store';
 import { CustomIcon, Description } from '../../atoms';
 import {
@@ -76,7 +76,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
     const answerBeingEditedList = useObservableValue(answerBeingEditedList$);
     const hasUnanswered = useObservableValue(hasUnanswered$);
 
-    const user = useUser();
+    const user = useFireAuthUser();
 
     return (
       <>

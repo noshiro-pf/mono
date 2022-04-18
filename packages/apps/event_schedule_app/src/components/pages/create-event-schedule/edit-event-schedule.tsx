@@ -1,5 +1,5 @@
 import { Spinner } from '@blueprintjs/core';
-import { eventScheduleResult$, router, useUser } from '../../../store';
+import { eventScheduleResult$, router, useFireAuthUser } from '../../../store';
 import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { EditEventScheduleOk } from './edit-event-schedule-main';
@@ -16,7 +16,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
     setTrue: makeItPassTheEmailConfirmation,
   } = useBoolState(false);
 
-  const user = useUser();
+  const user = useFireAuthUser();
 
   const editPageIsHidden: boolean =
     Result.isOk(eventScheduleResult) &&

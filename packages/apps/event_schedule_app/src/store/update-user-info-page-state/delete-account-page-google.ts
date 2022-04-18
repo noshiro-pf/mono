@@ -6,7 +6,7 @@ import {
   emailInputStateReducer,
   showToast,
 } from '../../functions';
-import { user$ } from '../auth';
+import { fireAuthUser$ } from '../auth';
 import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
@@ -19,9 +19,10 @@ export namespace DeleteAccountCreatedWithGoogle {
     emailInputInitialState
   );
 
-  const enterButtonDisabled$ = combineLatestI([formState$, user$]).chain(
-    mapI(([formState, user]) => formState.inputValue !== user?.email)
-  );
+  const enterButtonDisabled$ = combineLatestI([
+    formState$,
+    fireAuthUser$,
+  ]).chain(mapI(([formState, user]) => formState.inputValue !== user?.email));
 
   const {
     setFalse: setFalseIsWaitingResponse,
@@ -159,7 +160,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     mut_subscribedValues.enterButtonDisabled = v;
   });
 
-  user$.subscribe((v) => {
+  fireAuthUser$.subscribe((v) => {
     mut_subscribedValues.fireAuthUser = v;
   });
 

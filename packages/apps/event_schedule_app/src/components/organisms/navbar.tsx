@@ -8,8 +8,8 @@ import {
   router,
   signOutClick,
   UpdateUserInfoDialogState,
+  useFireAuthUser,
   usePasswordProviderIncluded,
-  useUser,
 } from '../../store';
 import { NoWrapSpan } from '../atoms';
 import {
@@ -27,7 +27,7 @@ const popoverModifiers: PopperModifiers = {
 } as const;
 
 export const NavBar = memoNamed('NavBar', () => {
-  const user = useUser();
+  const user = useFireAuthUser();
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
