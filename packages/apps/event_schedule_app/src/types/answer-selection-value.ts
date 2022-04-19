@@ -1,1 +1,4 @@
-export type AnswerSelectionValue = Pick<AnswerSelection, 'iconId' | 'point'>;
+export type AnswerSelectionValue = Pick<
+  AnswerSelection,
+  'comment' | 'iconId' | 'point'
+>;

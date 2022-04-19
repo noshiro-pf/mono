@@ -120,6 +120,7 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
               datetimeRange: d,
               iconId: 'none',
               point: 0,
+              comment: '',
             } as const)
         )
       )
@@ -156,7 +157,7 @@ const answerSelectionMap$: InitializedObservable<
       IList.concat(
         datetimeRangeList.map((d) => [
           d,
-          { iconId: 'none', point: 0 } as const,
+          { iconId: 'none', point: 0, comment: '' } as const,
         ]),
         selection.map((s) => [s.datetimeRange, s])
       );
@@ -527,6 +528,7 @@ const answerBeingEditedList$: InitializedObservable<
               answerSelectionValue: answerSelectionMap.get(d) ?? {
                 iconId: 'none',
                 point: 0,
+                comment: '',
               },
               buttons: {
                 good: {

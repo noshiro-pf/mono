@@ -31,13 +31,17 @@ export const answerSelectionReducer: ReducerType<
 > = (state, action) => {
   switch (action.type) {
     case 'cell-icon':
-      return state.update(action.datetimeRange, ({ iconId: prevIcon }) => {
-        const nextIcon = prevIcon === action.icon ? 'none' : action.icon;
-        return {
-          iconId: nextIcon,
-          point: match(nextIcon, defaultIconPoint),
-        };
-      });
+      return state.update(
+        action.datetimeRange,
+        ({ iconId: prevIcon, comment }) => {
+          const nextIcon = prevIcon === action.icon ? 'none' : action.icon;
+          return {
+            iconId: nextIcon,
+            point: match(nextIcon, defaultIconPoint),
+            comment,
+          };
+        }
+      );
 
     case 'cell-point':
       return state.update(action.datetimeRange, (prev) =>
@@ -46,13 +50,15 @@ export const answerSelectionReducer: ReducerType<
 
     case 'header':
       return state.every(({ iconId }) => iconId === action.icon)
-        ? state.map<AnswerSelectionValue>(() => ({
+        ? state.map<AnswerSelectionValue>(({ comment }) => ({
             iconId: 'none',
             point: 0,
+            comment,
           }))
-        : state.map<AnswerSelectionValue>(() => ({
+        : state.map<AnswerSelectionValue>(({ comment }) => ({
             iconId: action.icon,
             point: match(action.icon, defaultIconPoint),
+            comment,
           }));
   }
 };
