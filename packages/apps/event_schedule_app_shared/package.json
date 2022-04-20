@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app-shared",
-  "version": "5.0.2",
+  "version": "5.0.4",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
@@ -33,9 +33,8 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@noshiro/global-ts-utils": "*",
-    "@noshiro/ts-utils": "*",
-    "@noshiro/ts-utils-additional": "*"
+    "@noshiro/ts-utils": "2.0.0",
+    "@noshiro/ts-utils-additional": "1.0.0"
   },
   "devDependencies": {
     "@noshiro/ts-type-utils": "*"

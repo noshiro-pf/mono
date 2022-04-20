@@ -1,11 +1,16 @@
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { initializeApp } from 'firebase-admin';
-import { firestore, pubsub } from 'firebase-functions';
+// initializeApp must be imported as default import.
+// https://github.com/firebase/firebase-admin-node/issues/593
+import admin from 'firebase-admin';
+import { auth, firestore, pubsub } from 'firebase-functions';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
+import { onUserDelete } from './on-user-delete';
 import { fillAnswerWithCheck, toStringWithCheck } from './type-check';
 
-initializeApp();
+admin.initializeApp();
+
+const db = admin.firestore();
 
 const wildcard = {
   eventId: 'eventId',
@@ -70,3 +75,7 @@ export const notifyAnswerDeadlineEveryday = pubsub
 //     result: `onRequest test`,
 //   });
 // });
+
+export const userDeletionListener = auth.user().onDelete((user) => {
+  onUserDelete(db, user).catch(console.error);
+});

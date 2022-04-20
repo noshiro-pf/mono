@@ -57,7 +57,7 @@
     "@blueprintjs/datetime": "^4.1.2",
     "@blueprintjs/icons": "^4.2.3",
     "@noshiro/deep-object-diff": "*",
-    "@noshiro/event-schedule-app-shared": "5.0.2",
+    "@noshiro/event-schedule-app-shared": "5.0.4",
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",

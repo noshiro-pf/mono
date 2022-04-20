@@ -16,6 +16,7 @@
     "clean": "run-p clean:*",
     "clean:types": "rimraf ./types",
     "fmt": "prettier --write .",
+    "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "yarn type-check",
     "type-check": "tsc -p tsconfig.type-check.json"
