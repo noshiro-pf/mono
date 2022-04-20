@@ -4,12 +4,18 @@ export const createAnswerTable = (
   answerSelectionMapFn: (
     datetimeRange: DatetimeRange,
     answerId: AnswerId
-  ) => readonly [AnswerIconIdWithNone, AnswerIconPoint],
+  ) => readonly [
+    iconId: AnswerIconIdWithNone,
+    point: AnswerIconPoint,
+    comment: string
+  ],
   datetimeRangeList: readonly DatetimeRange[],
   answers: readonly Answer[]
 ): IMapMapped<
   DatetimeRange,
-  DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
+  DeepReadonly<
+    [iconId: AnswerIconIdWithNone, point: AnswerIconPoint, comment: string][]
+  >,
   DatetimeRangeMapKey
 > =>
   IMapMapped.new(

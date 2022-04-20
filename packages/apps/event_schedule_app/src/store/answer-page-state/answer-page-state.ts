@@ -516,6 +516,7 @@ const answerBeingEditedList$: InitializedObservable<
         }
       >;
       onPointChange: (point: AnswerIconPoint) => void;
+      onCommentChange: (comment: string) => void;
     }[]
   >
 > = combineLatestI([eventSchedule$, answerSelectionMap$]).chain(
@@ -569,6 +570,13 @@ const answerBeingEditedList$: InitializedObservable<
                   type: 'cell-point',
                   datetimeRange: d,
                   point,
+                });
+              },
+              onCommentChange: (comment: string) => {
+                answerBeingEditedDispatch({
+                  type: 'cell-comment',
+                  datetimeRange: d,
+                  comment,
                 });
               },
             } as const)

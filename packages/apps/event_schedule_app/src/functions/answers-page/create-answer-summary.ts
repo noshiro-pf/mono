@@ -5,14 +5,22 @@ export const createAnswerSummary = (
   datetimeRangeList: readonly DatetimeRange[],
   answerTable: IMapMapped<
     DatetimeRange,
-    DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
+    DeepReadonly<
+      [iconId: AnswerIconIdWithNone, point: AnswerIconPoint, comment: string][]
+    >,
     DatetimeRangeMapKey
   >
 ): IMapMapped<DatetimeRange, readonly number[], DatetimeRangeMapKey> =>
   IMapMapped.new(
     IList.map(datetimeRangeList, (datetimeRange) => {
       const answersForThisDatetimeRange:
-        | DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>
+        | DeepReadonly<
+            [
+              iconId: AnswerIconIdWithNone,
+              point: AnswerIconPoint,
+              comment: string
+            ][]
+          >
         | undefined = answerTable.get(datetimeRange);
 
       if (answersForThisDatetimeRange === undefined) {
@@ -67,7 +75,9 @@ export const createScore = (
   >,
   answerTable: IMapMapped<
     DatetimeRange,
-    DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
+    DeepReadonly<
+      [iconId: AnswerIconIdWithNone, point: AnswerIconPoint, comment: string][]
+    >,
     DatetimeRangeMapKey
   >,
   answers: readonly Answer[]

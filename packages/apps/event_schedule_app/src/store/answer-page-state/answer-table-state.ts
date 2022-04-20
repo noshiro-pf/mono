@@ -12,7 +12,11 @@ import { answers$, eventSchedule$ } from '../fetched-values-state';
 const answerSelectionMap$: InitializedObservable<
   | IMapMapped<
       AnswerTableCellPosition,
-      readonly [AnswerIconIdWithNone, AnswerIconPoint],
+      readonly [
+        iconId: AnswerIconIdWithNone,
+        point: AnswerIconPoint,
+        comment: string
+      ],
       AnswerSelectionMapKey
     >
   | undefined
@@ -26,15 +30,26 @@ const answerSelectionMapFn$ = answerSelectionMap$.chain(
       (
         datetimeRange: DatetimeRange,
         answerId: AnswerId
-      ): readonly [AnswerIconIdWithNone, AnswerIconPoint] =>
-        answerSelectionMap?.get({ datetimeRange, answerId }) ?? tp('none', 0)
+      ): readonly [
+        iconId: AnswerIconIdWithNone,
+        point: AnswerIconPoint,
+        comment: string
+      ] =>
+        answerSelectionMap?.get({ datetimeRange, answerId }) ??
+        tp('none', 0, '')
   )
 );
 
 const answerTable$: InitializedObservable<
   | IMapMapped<
       DatetimeRange,
-      DeepReadonly<[AnswerIconIdWithNone, AnswerIconPoint][]>,
+      DeepReadonly<
+        [
+          iconId: AnswerIconIdWithNone,
+          point: AnswerIconPoint,
+          comment: string
+        ][]
+      >,
       DatetimeRangeMapKey
     >
   | undefined
@@ -195,7 +210,7 @@ export const tableBodyValues$: InitializedObservable<
                 IList.zip(
                   row,
                   answers.map((a) => a.weight)
-                ).map(([[iconId, point], weight]) => ({
+                ).map(([[iconId, point, comment], weight]) => ({
                   iconId,
                   point,
                   showPoint: match(iconId, {
@@ -205,6 +220,7 @@ export const tableBodyValues$: InitializedObservable<
                     none: false,
                   }),
                   weight,
+                  comment,
                 }))
               )
             ).value;

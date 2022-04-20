@@ -3,6 +3,11 @@ import type { AnswerSelectionValue } from '../../types';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {
+      type: 'cell-comment';
+      datetimeRange: DatetimeRange;
+      comment: string;
+    }
+  | {
       type: 'cell-icon';
       datetimeRange: DatetimeRange;
       icon: AnswerIconId;
@@ -46,6 +51,11 @@ export const answerSelectionReducer: ReducerType<
     case 'cell-point':
       return state.update(action.datetimeRange, (prev) =>
         IRecord.set(prev, 'point', action.point)
+      );
+
+    case 'cell-comment':
+      return state.update(action.datetimeRange, (prev) =>
+        IRecord.set(prev, 'comment', action.comment)
       );
 
     case 'header':
