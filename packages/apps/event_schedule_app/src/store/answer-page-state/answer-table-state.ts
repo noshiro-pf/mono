@@ -8,6 +8,7 @@ import {
 } from '../../functions';
 import type { AnswerTableCell, AnswerTableCellPosition } from '../../types';
 import { answers$, eventSchedule$ } from '../fetched-values-state';
+import { AnswerTableFilteringAndSortingManager } from './answer-table-filtering-state-manager';
 
 const answerSelectionMap$: InitializedObservable<
   | IMapMapped<
@@ -67,7 +68,8 @@ const answerTable$: InitializedObservable<
 
 // sum of (good, fair, poor)
 const answerSummary$: InitializedObservable<
-  IMapMapped<DatetimeRange, readonly number[], DatetimeRangeMapKey> | undefined
+  | IMapMapped<DatetimeRange, ArrayOfLength<3, number>, DatetimeRangeMapKey>
+  | undefined
 > = combineLatestI([eventSchedule$, answerTable$]).chain(
   mapI(([eventSchedule, answerTable]) =>
     eventSchedule === undefined || answerTable === undefined
@@ -127,20 +129,8 @@ const datetimeRangeListSortedByScoresReversed$ =
     )
   );
 
-const { state$: sortKeyAndOrder$, setState: setSortOrderAndKey } = createState<
-  readonly ['date' | 'score', 'asc' | 'desc']
->(['date', 'asc']);
-
-export const onDatetimeSortChange = (state: 'asc' | 'desc'): void => {
-  setSortOrderAndKey(['date', state]);
-};
-
-export const onScoreSortChange = (state: 'asc' | 'desc'): void => {
-  setSortOrderAndKey(['score', state]);
-};
-
 const datetimeRangeListReordered$ = combineLatestI([
-  sortKeyAndOrder$,
+  AnswerTableFilteringAndSortingManager.sortKeyAndOrder$,
 
   datetimeRangeList$,
   datetimeRangeListReversed$,
@@ -165,19 +155,21 @@ const datetimeRangeListReordered$ = combineLatestI([
   )
 );
 
-export const tableBodyValues$: InitializedObservable<
-  DeepReadonly<
-    {
-      key: string;
-      datetimeRange: DatetimeRange;
-      score: number;
-      answerSummaryRow: number[] | undefined;
-      answerTableRow: AnswerTableCell[] | undefined;
-      style: CSSProperties;
-    }[]
-  >
+export const datetimeRangeToTableRowValuesMap$: InitializedObservable<
+  | IMap<
+      DatetimeRange,
+      DeepReadonly<{
+        key: string;
+        datetimeRange: DatetimeRange;
+        score: number;
+        answerSummaryRow: ArrayOfLength<3, number> | undefined;
+        answerTableRow: AnswerTableCell[] | undefined;
+        style: CSSProperties;
+      }>
+    >
+  | undefined
 > = combineLatestI([
-  datetimeRangeListReordered$,
+  datetimeRangeList$,
   scores$,
   answerSummary$,
   answerTable$,
@@ -186,60 +178,120 @@ export const tableBodyValues$: InitializedObservable<
 ]).chain(
   mapI(
     ([
-      datetimeRangeListReordered,
+      datetimeRangeList,
       scores,
       answerSummary,
       answerTable,
       eventSchedule,
       answers,
     ]) =>
-      datetimeRangeListReordered === undefined ||
+      datetimeRangeList === undefined ||
       scores === undefined ||
       answerSummary === undefined ||
       answerTable === undefined ||
       eventSchedule === undefined ||
       answers === undefined
-        ? []
-        : datetimeRangeListReordered.map((datetimeRange) => {
-            const score = scores.get(datetimeRange) ?? 0;
+        ? undefined
+        : IMap.new(
+            datetimeRangeList.map((datetimeRange) => {
+              const score = scores.get(datetimeRange) ?? 0;
 
-            const answerTableRow: readonly AnswerTableCell[] | undefined = pipe(
-              answerTable.get(datetimeRange)
-            ).chain((list) =>
-              mapNullable(list, (row) =>
-                IList.zip(
-                  row,
-                  answers.map((a) => a.weight)
-                ).map(([[iconId, point, comment], weight]) => ({
-                  iconId,
-                  point,
-                  showPoint: match(iconId, {
-                    good: point !== eventSchedule.answerIcons.good.point,
-                    fair: point !== eventSchedule.answerIcons.fair.point,
-                    poor: point !== eventSchedule.answerIcons.poor.point,
-                    none: false,
-                  }),
-                  weight,
-                  comment,
-                }))
-              )
-            ).value;
+              const answerTableRow: readonly AnswerTableCell[] | undefined =
+                pipe(answerTable.get(datetimeRange)).chain((list) =>
+                  mapNullable(list, (row) =>
+                    IList.zip(
+                      row,
+                      answers.map((a) => a.weight)
+                    ).map(([[iconId, point, comment], weight]) => ({
+                      iconId,
+                      point,
+                      showPoint: match(iconId, {
+                        good: point !== eventSchedule.answerIcons.good.point,
+                        fair: point !== eventSchedule.answerIcons.fair.point,
+                        poor: point !== eventSchedule.answerIcons.poor.point,
+                        none: false,
+                      }),
+                      weight,
+                      comment,
+                    }))
+                  )
+                ).value;
 
-            return {
-              key: datetimeRange2str(datetimeRange),
-              datetimeRange,
-              score,
-              answerSummaryRow: answerSummary.get(datetimeRange),
-              answerTableRow,
-              style: {
-                backgroundColor:
-                  score === 1
-                    ? answerTableColor.perfectColor
-                    : score >= answerTableColor.goodThreshold
-                    ? answerTableColor.goodColor
-                    : undefined,
-              },
-            };
-          })
+              const value: DeepReadonly<{
+                key: string;
+                datetimeRange: DatetimeRange;
+                score: number;
+                answerSummaryRow: ArrayOfLength<3, number> | undefined;
+                answerTableRow: AnswerTableCell[] | undefined;
+                style: CSSProperties;
+              }> = {
+                key: datetimeRange2str(datetimeRange),
+                datetimeRange,
+                score,
+                answerSummaryRow: answerSummary.get(datetimeRange),
+                answerTableRow,
+                style: {
+                  backgroundColor:
+                    score === 1
+                      ? answerTableColor.perfectColor
+                      : score >= answerTableColor.goodThreshold
+                      ? answerTableColor.goodColor
+                      : undefined,
+                },
+              } as const;
+
+              return tp(datetimeRange, value);
+            })
+          )
+  )
+);
+
+export const tableBodyValues$: InitializedObservable<
+  DeepReadonly<
+    {
+      key: string;
+      datetimeRange: DatetimeRange;
+      score: number;
+      answerSummaryRow: ArrayOfLength<3, number> | undefined;
+      answerTableRow: AnswerTableCell[] | undefined;
+      style: CSSProperties;
+    }[]
+  >
+> = combineLatestI([
+  datetimeRangeListReordered$,
+  datetimeRangeToTableRowValuesMap$,
+]).chain(
+  mapI(([datetimeRangeListReordered, datetimeRangeToTableRowValuesMap]) =>
+    datetimeRangeListReordered === undefined ||
+    datetimeRangeToTableRowValuesMap === undefined
+      ? []
+      : datetimeRangeListReordered.map(
+          (datetimeRange) =>
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            datetimeRangeToTableRowValuesMap.get(datetimeRange)!
+        )
+  )
+);
+
+export const tableBodyValuesFiltered$ = combineLatestI([
+  tableBodyValues$,
+  AnswerTableFilteringAndSortingManager.answerTableFilteringState$,
+]).chain(
+  mapI(([tableBodyValues, answerTableFilteringState]) =>
+    tableBodyValues.filter((row) => {
+      if (row.answerSummaryRow === undefined) return false;
+      const [good, fair, poor] = row.answerSummaryRow;
+      const {
+        good: goodBounds,
+        fair: fairBounds,
+        poor: poorBounds,
+      } = answerTableFilteringState;
+
+      return (
+        Num.isInRange(goodBounds.min, goodBounds.max)(good) &&
+        Num.isInRange(fairBounds.min, fairBounds.max)(fair) &&
+        Num.isInRange(poorBounds.min, poorBounds.max)(poor)
+      );
+    })
   )
 );

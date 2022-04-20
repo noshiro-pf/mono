@@ -10,7 +10,7 @@ export const createAnswerSummary = (
     >,
     DatetimeRangeMapKey
   >
-): IMapMapped<DatetimeRange, readonly number[], DatetimeRangeMapKey> =>
+): IMapMapped<DatetimeRange, ArrayOfLength<3, number>, DatetimeRangeMapKey> =>
   IMapMapped.new(
     IList.map(datetimeRangeList, (datetimeRange) => {
       const answersForThisDatetimeRange:
@@ -24,7 +24,7 @@ export const createAnswerSummary = (
         | undefined = answerTable.get(datetimeRange);
 
       if (answersForThisDatetimeRange === undefined) {
-        return tp(datetimeRange, IList.zerosThrow(3));
+        return tp(datetimeRange, tp(0, 0, 0));
       }
 
       const answerGroups: IMap<AnswerIconIdWithNone, number> = pipe(
@@ -33,11 +33,11 @@ export const createAnswerSummary = (
         .chain((list) => IList.groupBy(list, (x) => x))
         .chain((groups) => groups.map((v) => v.length)).value;
 
-      const counts: readonly number[] = [
+      const counts = tp(
         answerGroups.get('good') ?? 0,
         answerGroups.get('fair') ?? 0,
-        answerGroups.get('poor') ?? 0,
-      ];
+        answerGroups.get('poor') ?? 0
+      );
 
       return tp(datetimeRange, counts);
     }),
@@ -70,7 +70,7 @@ export const createScore = (
   datetimeRangeList: readonly DatetimeRange[],
   answerSummary: IMapMapped<
     DatetimeRange,
-    readonly number[],
+    ArrayOfLength<3, number>,
     DatetimeRangeMapKey
   >,
   answerTable: IMapMapped<
@@ -84,7 +84,7 @@ export const createScore = (
 ): IMapMapped<DatetimeRange, number, DatetimeRangeMapKey> =>
   IMapMapped.new(
     datetimeRangeList.map((datetimeRange) => {
-      const summaryForThisDatetimeRange: readonly number[] | undefined =
+      const summaryForThisDatetimeRange: ArrayOfLength<3, number> | undefined =
         answerSummary.get(datetimeRange);
 
       const answerPointList = answerTable

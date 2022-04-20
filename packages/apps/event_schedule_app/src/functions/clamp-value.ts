@@ -1,10 +1,15 @@
-import { answerIconPointConfig, weightNumericInputConfig } from '../constants';
+import {
+  answerIconPointConfig,
+  defaultIconPoint,
+  iconFilterNumericInputConfig,
+  weightNumericInputConfig,
+} from '../constants';
 
 const cfg1 = answerIconPointConfig;
 
 export const clampAndRoundAnswerFairIconPoint = (x: number): AnswerIconPoint =>
   !Num.isFinite(x)
-    ? 0
+    ? defaultIconPoint.fair
     : x < cfg1.fair.min
     ? cfg1.fair.min
     : cfg1.fair.max < x
@@ -22,3 +27,14 @@ export const clampAndRoundAnswerWeight = (x: number): Weight =>
     : cfg2.max < x
     ? cfg2.max
     : Math.round(x * 10 ** cfg2.digit) / 10 ** cfg2.digit;
+
+const cfg3 = iconFilterNumericInputConfig;
+
+export const clampAndRoundNumIcons = (x: number, upperLimit: number): number =>
+  !Num.isFinite(x)
+    ? 0
+    : x < cfg3.min
+    ? cfg3.min
+    : upperLimit < x
+    ? upperLimit
+    : Math.round(x);

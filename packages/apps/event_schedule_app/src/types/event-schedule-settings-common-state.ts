@@ -12,7 +12,7 @@ export type EventScheduleSettingCommonState = Readonly<{
   notificationSettings: NotificationSettings | undefined;
   eventScheduleValidation: EventScheduleValidation;
   hasNoChanges: boolean;
-  newEventSchedule: EventSchedule;
+  eventScheduleNormalized: EventSchedule;
   eventScheduleValidationOk: boolean;
 }>;
 

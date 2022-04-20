@@ -87,7 +87,7 @@ export namespace CreateEventScheduleStore {
 
     if (commonState === undefined) return;
 
-    const { newEventSchedule, eventScheduleValidationOk } = commonState;
+    const { eventScheduleNormalized, eventScheduleValidationOk } = commonState;
 
     if (!eventScheduleValidationOk) return;
 
@@ -96,7 +96,7 @@ export namespace CreateEventScheduleStore {
     openCreateResultDialog();
 
     const res = await api.event.add(
-      IRecord.set(newEventSchedule, 'author', {
+      IRecord.set(eventScheduleNormalized, 'author', {
         id: fireAuthUser?.uid ?? null,
         name: fireAuthUser?.displayName ?? '',
       })

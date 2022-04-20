@@ -23,6 +23,10 @@ export const EditEventScheduleOk = memoNamed<Props>(
   ({ eventSchedule, editPageIsHidden, makeItPassTheEmailConfirmation }) => {
     const commonState = useObservableValue(EditEventScheduleStore.commonState$);
 
+    useEffect(() => {
+      EditEventScheduleStore.setEventSchedule(eventSchedule);
+    }, [eventSchedule]);
+
     const editButtonIsLoading = useObservableValue(
       EditEventScheduleStore.isLoading$
     );

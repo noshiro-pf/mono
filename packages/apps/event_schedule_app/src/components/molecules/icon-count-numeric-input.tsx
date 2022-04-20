@@ -1,22 +1,18 @@
-import { answerIconPointConfig, defaultIconPoint } from '../../../constants';
-import { clampAndRoundAnswerFairIconPoint } from '../../../functions';
-import { NumericInputView } from '../../bp';
+import { clampAndRoundNumIcons } from '../../functions';
+import { NumericInputView } from '../bp';
 
 type Props = Readonly<{
-  value: AnswerIconPoint;
-  onValueChange: (value: AnswerIconPoint) => void;
+  count: number;
+  max: number;
   disabled: boolean;
+  onCountChange: (value: number) => void;
 }>;
 
-const { step } = answerIconPointConfig;
+const defaultValue = 0;
 
-const defaultValue = defaultIconPoint.fair;
-
-const sanitizeValue = clampAndRoundAnswerFairIconPoint;
-
-export const AnswerIconFairPointInput = memoNamed<Props>(
-  'AnswerIconFairPointInput',
-  ({ value: valueFromProps, onValueChange, disabled }) => {
+export const IconCountNumericInput = memoNamed<Props>(
+  'IconCountNumericInput',
+  ({ count: valueFromProps, max, disabled, onCountChange: onValueChange }) => {
     const { state: valueStr, setState: setValueStr } = useState<string>('');
 
     const valueParsed = useMemo<number | undefined>(() => {
@@ -30,49 +26,50 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
     }, [valueFromProps, setValueStr]);
 
     const valueChangeHandler = useCallback(
-      (nextValue: AnswerIconPoint) => {
-        if (disabled) return;
+      (nextValue: Weight) => {
         setValueStr(nextValue.toString());
         onValueChange(nextValue);
       },
-      [disabled, onValueChange, setValueStr]
+      [setValueStr, onValueChange]
+    );
+
+    const sanitizeValue = useCallback(
+      (value: number): number => clampAndRoundNumIcons(value, max),
+      [max]
     );
 
     const onInputBlur = useCallback(() => {
-      if (disabled) return;
-
       const nextValue =
         valueParsed === undefined ? defaultValue : sanitizeValue(valueParsed);
 
       valueChangeHandler(nextValue);
-    }, [disabled, valueParsed, valueChangeHandler]);
+    }, [valueParsed, valueChangeHandler, sanitizeValue]);
 
     const onIncrementClick = useCallback(() => {
-      if (disabled) return;
-
       const nextValue =
         valueParsed === undefined
           ? defaultValue
-          : sanitizeValue(valueParsed + step);
+          : sanitizeValue(valueParsed + 1);
 
       valueChangeHandler(nextValue);
-    }, [disabled, valueParsed, valueChangeHandler]);
+    }, [valueParsed, valueChangeHandler, sanitizeValue]);
 
     const onDecrementClick = useCallback(() => {
-      if (disabled) return;
-
       const nextValue =
         valueParsed === undefined
           ? defaultValue
-          : sanitizeValue(valueParsed - step);
+          : sanitizeValue(valueParsed - 1);
 
       valueChangeHandler(nextValue);
-    }, [disabled, valueParsed, valueChangeHandler]);
+    }, [valueParsed, valueChangeHandler, sanitizeValue]);
+
+    const inputProps = useMemo(() => ({ min: 0, max }), [max]);
 
     return (
       <NumericInputView
         disabled={disabled}
         fillSpace={true}
+        inputProps={inputProps}
         selectOnFocus={true}
         valueAsStr={valueStr}
         onDecrementClick={onDecrementClick}

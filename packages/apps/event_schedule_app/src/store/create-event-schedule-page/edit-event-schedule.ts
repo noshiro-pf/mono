@@ -18,6 +18,11 @@ export namespace EditEventScheduleStore {
   export const { commonState$, commonStateHandlers } =
     createEventScheduleSettingStore();
 
+  const {
+    state$: eventScheduleFromDatabase$,
+    setState: setEventScheduleFromDatabase,
+  } = createState<EventSchedule | undefined>(undefined);
+
   export const resetAllState = (): void => {
     commonStateHandlers.resetTitle();
     commonStateHandlers.resetNotes();
@@ -28,10 +33,37 @@ export namespace EditEventScheduleStore {
     commonStateHandlers.resetAnswerIcons();
   };
 
+  export const setEventSchedule = (ev: EventSchedule): void => {
+    setEventScheduleFromDatabase(ev);
+
+    commonStateHandlers.setTitle(ev.title);
+    commonStateHandlers.setNotes(ev.notes);
+    commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
+    commonStateHandlers.setDatetimeRangeList(ev.datetimeRangeList);
+    commonStateHandlers.setAnswerIcons(ev.answerIcons);
+
+    if (ev.answerDeadline === 'none') {
+      commonStateHandlers.turnOffAnswerDeadlineSection();
+    } else {
+      commonStateHandlers.turnOnAnswerDeadlineSection();
+      commonStateHandlers.setAnswerDeadline(ev.answerDeadline);
+    }
+
+    if (ev.notificationSettings === 'none') {
+      commonStateHandlers.turnOffNotificationSection();
+    } else {
+      commonStateHandlers.turnOnNotificationSection();
+      commonStateHandlers.setNotificationSettings(ev.notificationSettings);
+    }
+  };
+
   export const diff$: InitializedObservable<EventSettingsPageDiffResult> =
-    commonState$.chain(
-      mapI(({ newEventSchedule }) =>
-        collectEventSettingsPageDiff(initialEventSchedule, newEventSchedule)
+    combineLatestI([eventScheduleFromDatabase$, commonState$]).chain(
+      mapI(([eventScheduleFromDatabase, { eventScheduleNormalized }]) =>
+        collectEventSettingsPageDiff(
+          eventScheduleFromDatabase ?? initialEventSchedule,
+          eventScheduleNormalized
+        )
       )
     );
 
@@ -44,12 +76,14 @@ export namespace EditEventScheduleStore {
       )
     );
 
-  export const hasNoChanges$: InitializedObservable<boolean> =
-    commonState$.chain(
-      mapI(({ newEventSchedule }) =>
-        deepEqual(initialEventSchedule, newEventSchedule)
-      )
-    );
+  export const hasNoChanges$: InitializedObservable<boolean> = combineLatestI([
+    eventScheduleFromDatabase$,
+    commonState$,
+  ]).chain(
+    mapI(([eventScheduleFromDatabase, { eventScheduleNormalized }]) =>
+      deepEqual(eventScheduleFromDatabase, eventScheduleNormalized)
+    )
+  );
 
   const answerPagePath$ = router.eventId$.chain(
     mapI((eventId) => routes.answerPage(eventId ?? ''))
@@ -62,17 +96,17 @@ export namespace EditEventScheduleStore {
     }
   };
 
-  export const editEvent = async (): Promise<void> => {
+  export const saveToDatabase = async (): Promise<void> => {
     const { commonState, eventId } = mut_subscribedValues;
 
     if (commonState === undefined) return;
 
-    const { newEventSchedule, eventScheduleValidationOk } = commonState;
+    const { eventScheduleNormalized, eventScheduleValidationOk } = commonState;
 
     if (!eventScheduleValidationOk || eventId === undefined) return;
 
     setIsLoadingTrue();
-    const res = await api.event.update(eventId, newEventSchedule);
+    const res = await api.event.update(eventId, eventScheduleNormalized);
 
     if (Result.isErr(res)) {
       console.error('Error creating event schedule: ', res.value);
@@ -95,7 +129,7 @@ export namespace EditEventScheduleStore {
   };
 
   export const onEditEventClick = (): void => {
-    editEvent().catch(console.error);
+    saveToDatabase().catch(console.error);
   };
 
   export const {

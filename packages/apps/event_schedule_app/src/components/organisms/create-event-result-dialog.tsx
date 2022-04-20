@@ -1,11 +1,5 @@
-import {
-  AnchorButton,
-  Button,
-  Classes,
-  Spinner,
-  // eslint-disable-next-line import/no-deprecated
-  Tooltip,
-} from '@blueprintjs/core';
+import { AnchorButton, Button, Classes, Spinner } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import { CreateEventScheduleStore } from '../../store';
 import { DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
@@ -70,14 +64,14 @@ export const CreateEventResultDialog = memoNamed<Props>(
                   </Anchor>
                 </AnchorWrapper>
                 <div>
-                  <Tooltip content={dc.clipboardButton}>
+                  <Tooltip2 content={dc.clipboardButton}>
                     <Button
                       data-cy={'clipboard-button'}
                       icon={'clipboard'}
                       minimal={true}
                       onClick={onClipboardButtonClick}
                     />
-                  </Tooltip>
+                  </Tooltip2>
                 </div>
               </UrlWrapper>
             </>

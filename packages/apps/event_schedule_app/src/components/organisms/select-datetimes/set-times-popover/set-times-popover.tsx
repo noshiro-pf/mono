@@ -1,5 +1,5 @@
-// eslint-disable-next-line import/no-deprecated
-import { Button, Popover } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
+import { Popover2 } from '@blueprintjs/popover2';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const dc = dict.eventSettingsPage.section2;
@@ -28,7 +28,7 @@ export const SetTimesPopover = memoNamed<Props>(
     );
 
     return (
-      <Popover
+      <Popover2
         canEscapeKeyClose={true}
         content={
           <SetTimesPopoverContent
@@ -46,7 +46,7 @@ export const SetTimesPopover = memoNamed<Props>(
           text={dc.setTimesAtOneTime}
           onClick={handleOpen}
         />
-      </Popover>
+      </Popover2>
     );
   }
 );

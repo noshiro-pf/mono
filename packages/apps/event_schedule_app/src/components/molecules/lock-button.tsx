@@ -1,5 +1,5 @@
-// eslint-disable-next-line import/no-deprecated
-import { Button, Tooltip } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 
 export const LockButton = memoNamed<
   Readonly<{
@@ -8,7 +8,7 @@ export const LockButton = memoNamed<
     onLockClick: () => void;
   }>
 >('LockButton', ({ passwordIsOpen, disabled, onLockClick }) => (
-  <Tooltip
+  <Tooltip2
     content={`${passwordIsOpen ? 'Hide' : 'Show'} Password`}
     disabled={disabled}
   >
@@ -19,5 +19,5 @@ export const LockButton = memoNamed<
       minimal={true}
       onClick={onLockClick}
     />
-  </Tooltip>
+  </Tooltip2>
 ));

@@ -6,6 +6,19 @@ const pathToken = {
   signIn: 'signIn',
 } as const;
 
+export const queryParamKey = {
+  answerTableState: {
+    goodMin: 'good-min',
+    goodMax: 'good-max',
+    fairMin: 'fair-min',
+    fairMax: 'fair-max',
+    poorMin: 'poor-min',
+    poorMax: 'poor-max',
+    sortBy: 'sort-by',
+    sortOrder: 'sort-order',
+  },
+} as const;
+
 export const routes = {
   createPage: `/${pathToken.createPage}/`,
 
