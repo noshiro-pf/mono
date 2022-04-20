@@ -96,17 +96,6 @@ const isStateAfterDeadline$: InitializedObservable<boolean> =
     )
   );
 
-const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
-  answerBeingEdited$,
-  selectedAnswerSaved$,
-]).chain(
-  mapI(
-    ([answerBeingEdited, selectedAnswerSaved]) =>
-      answerBeingEdited.user.name === '' ||
-      deepEqual(selectedAnswerSaved, answerBeingEdited)
-  )
-);
-
 const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
   .chain(filter(isNotUndefined))
   .chain(
@@ -120,6 +109,7 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
               datetimeRange: d,
               iconId: 'none',
               point: 0,
+              comment: '',
             } as const)
         )
       )
@@ -142,6 +132,19 @@ const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combineLatestI([
   )
 );
 
+const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
+  answerBeingEdited$,
+  selectedAnswerSaved$,
+  theNameIsAlreadyUsed$,
+]).chain(
+  mapI(
+    ([answerBeingEdited, selectedAnswerSaved, theNameIsAlreadyUsed]) =>
+      answerBeingEdited.user.name === '' ||
+      deepEqual(selectedAnswerSaved, answerBeingEdited) ||
+      theNameIsAlreadyUsed
+  )
+);
+
 const answerSelectionMap$: InitializedObservable<
   IMapMapped<DatetimeRange, AnswerSelectionValue, DatetimeRangeMapKey>
 > = combineLatestI([
@@ -156,7 +159,7 @@ const answerSelectionMap$: InitializedObservable<
       IList.concat(
         datetimeRangeList.map((d) => [
           d,
-          { iconId: 'none', point: 0 } as const,
+          { iconId: 'none', point: 0, comment: '' } as const,
         ]),
         selection.map((s) => [s.datetimeRange, s])
       );
@@ -513,6 +516,7 @@ const answerBeingEditedList$: InitializedObservable<
         }
       >;
       onPointChange: (point: AnswerIconPoint) => void;
+      onCommentChange: (comment: string) => void;
     }[]
   >
 > = combineLatestI([eventSchedule$, answerSelectionMap$]).chain(
@@ -527,6 +531,7 @@ const answerBeingEditedList$: InitializedObservable<
               answerSelectionValue: answerSelectionMap.get(d) ?? {
                 iconId: 'none',
                 point: 0,
+                comment: '',
               },
               buttons: {
                 good: {
@@ -565,6 +570,13 @@ const answerBeingEditedList$: InitializedObservable<
                   type: 'cell-point',
                   datetimeRange: d,
                   point,
+                });
+              },
+              onCommentChange: (comment: string) => {
+                answerBeingEditedDispatch({
+                  type: 'cell-comment',
+                  datetimeRange: d,
+                  comment,
                 });
               },
             } as const)

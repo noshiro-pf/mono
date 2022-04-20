@@ -147,9 +147,10 @@ export const AnswerBeingEdited = memoNamed<Props>(
                 ({
                   key,
                   datetimeRange,
-                  answerSelectionValue: { point, iconId },
+                  answerSelectionValue: { point, iconId, comment },
                   buttons,
                   onPointChange,
+                  onCommentChange: onCellCommentChange,
                 }) => (
                   <tr key={key}>
                     <td>
@@ -216,6 +217,13 @@ export const AnswerBeingEdited = memoNamed<Props>(
                         ),
                       })}
                     </TdWithMaxWidth>
+                    <td>
+                      <TextArea
+                        rows={1}
+                        value={comment}
+                        onValueChange={onCellCommentChange}
+                      />
+                    </td>
                   </tr>
                 )
               )}
@@ -305,6 +313,11 @@ const Table = styled(HTMLTableBorderedStyled)`
 const TdWithMaxWidth = styled.td`
   min-width: 87px;
   max-width: 87px;
+`;
+
+const TextArea = styled(BpTextArea)`
+  resize: vertical;
+  min-height: 38px;
 `;
 
 const Spacer = styled.div`

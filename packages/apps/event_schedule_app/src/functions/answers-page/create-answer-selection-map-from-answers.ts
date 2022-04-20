@@ -5,7 +5,11 @@ export const createAnswerSelectionMapFromAnswers = (
   answers: readonly Answer[]
 ): IMapMapped<
   AnswerTableCellPosition,
-  readonly [AnswerIconIdWithNone, AnswerIconPoint],
+  readonly [
+    iconId: AnswerIconIdWithNone,
+    point: AnswerIconPoint,
+    comment: string
+  ],
   AnswerSelectionMapKey
 > =>
   IMapMapped.new(
@@ -15,7 +19,7 @@ export const createAnswerSelectionMapFromAnswers = (
           datetimeRange: s.datetimeRange,
           answerId: id,
         },
-        tp(s.iconId, s.point),
+        tp(s.iconId, s.point, s.comment),
       ])
     ),
     answerSelectionToMapKey,

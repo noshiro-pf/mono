@@ -3,4 +3,5 @@ export type AnswerTableCell = Readonly<{
   point: AnswerIconPoint;
   showPoint: boolean;
   weight: Weight;
+  comment: string;
 }>;

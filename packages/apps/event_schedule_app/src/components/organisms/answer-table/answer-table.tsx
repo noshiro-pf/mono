@@ -122,7 +122,7 @@ export const AnswerTable = memoNamed<Props>(
                   </td>
                 ))}
                 {answerTableRow?.map(
-                  ({ iconId, point, showPoint, weight }, i) => (
+                  ({ iconId, point, showPoint, weight, comment }, i) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <td key={i}>
                       {iconId === 'none' ? (
@@ -141,6 +141,11 @@ export const AnswerTable = memoNamed<Props>(
                               <div>{weight}</div>
                             </WeightValue>
                           ) : undefined}
+                          <CellCommentWrapper>
+                            {comment === '' ? undefined : (
+                              <CommentButton comment={comment} />
+                            )}
+                          </CellCommentWrapper>
                         </AnswerIconCell>
                       )}
                     </td>
@@ -232,4 +237,8 @@ const WeightValue = styled.span`
 
 const WeightTimes = styled.span`
   margin: 0 1px;
+`;
+
+const CellCommentWrapper = styled.span`
+  margin-left: 3px;
 `;

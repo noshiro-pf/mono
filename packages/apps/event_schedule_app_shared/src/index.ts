@@ -5,4 +5,4 @@
 /// <reference path="../../../utils/stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../../utils/ts-type-utils/ts-type-utils.d.ts" />
 
-export * from './v5';
+export * from './v6';
