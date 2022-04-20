@@ -1,5 +1,5 @@
-// eslint-disable-next-line import/no-deprecated
-import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
+import { AnchorButton, Icon, Menu, MenuItem } from '@blueprintjs/core';
+import { Popover2 } from '@blueprintjs/popover2';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { css } from 'styled-components';
 import { aboutThisAppUrl, routes } from '../../constants';
@@ -22,7 +22,7 @@ import {
 
 const dc = dict.header;
 
-const popoverModifiers: PopperModifiers = {
+const popoverModifiers = {
   arrow: undefined,
 } as const;
 
@@ -83,7 +83,7 @@ export const NavBar = memoNamed('NavBar', () => {
               )}
               <Item>
                 <span>{dc.auth.userName.prefix}</span>
-                <Popover
+                <Popover2
                   content={
                     <Menu>
                       <MenuItem text={dc.auth.menu.accountSettings}>
@@ -129,7 +129,7 @@ export const NavBar = memoNamed('NavBar', () => {
                   transitionDuration={50}
                 >
                   <Anchor>{user.displayName}</Anchor>
-                </Popover>
+                </Popover2>
                 <span>{dc.auth.userName.suffix}</span>
               </Item>
 

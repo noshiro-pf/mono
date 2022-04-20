@@ -56,6 +56,7 @@
     "@blueprintjs/core": "^4.1.2",
     "@blueprintjs/datetime": "^4.1.2",
     "@blueprintjs/icons": "^4.2.3",
+    "@blueprintjs/popover2": "^1.1.4",
     "@noshiro/deep-object-diff": "*",
     "@noshiro/event-schedule-app-shared": "6.0.0",
     "@noshiro/fast-deep-equal": "*",

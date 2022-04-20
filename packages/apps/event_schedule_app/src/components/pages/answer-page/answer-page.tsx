@@ -1,10 +1,12 @@
-import { Button, Spinner } from '@blueprintjs/core';
+import type { TagProps } from '@blueprintjs/core';
+import { Button, Spinner, TagInput } from '@blueprintjs/core';
 import { useRef } from 'react';
 import {
   alertOnAnswerClickIsOpen$,
   answerBeingEdited$,
   answerBeingEditedSectionState$,
   answers$,
+  AnswerTableFilteringAndSortingManager,
   closeAlertOnAnswerClick,
   errorType$,
   eventSchedule$,
@@ -73,6 +75,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   useEffect(() => {
     fetchEventSchedule();
     fetchAnswers();
+    AnswerTableFilteringAndSortingManager.restoreAnswerTableFilteringStateFromQueryParams();
+    AnswerTableFilteringAndSortingManager.initializeAnswerTableFilteringStateUpperLimit();
   }, []);
 
   const answerSectionRef = useRef<HTMLDivElement>(null);
@@ -89,6 +93,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   }, [answerBeingEditedSectionState]);
 
   const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
+
+  const tagValues = useObservableValue(
+    AnswerTableFilteringAndSortingManager.tagValues$
+  );
+
+  const tagProps = useObservableValue(
+    AnswerTableFilteringAndSortingManager.tagProps$
+  );
 
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
@@ -137,6 +149,30 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   {dc.answers.refresh}
                 </Button>
               </SingleButtonWrapper>
+            )}
+
+            {IList.isEmpty(tagValues) ? undefined : (
+              <TableTopWrapper>
+                <TagInput
+                  addOnBlur={false}
+                  addOnPaste={false}
+                  leftIcon={'filter-list'}
+                  rightElement={
+                    <Button
+                      icon={'cross'}
+                      minimal={true}
+                      onClick={AnswerTableFilteringAndSortingManager.clearTags}
+                    />
+                  }
+                  tagProps={
+                    tagProps as (
+                      value: DeepReadonly<ReactNode>,
+                      index: number
+                    ) => TagProps
+                  }
+                  values={tagValues}
+                />
+              </TableTopWrapper>
             )}
 
             <TableWrapper>
@@ -262,6 +298,12 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 const CalendarWrapper = styled.div`
   margin: 10px;
   display: flex;
+`;
+
+const TableTopWrapper = styled.div`
+  margin: 5px;
+  display: flex;
+  align-items: center;
 `;
 
 const TableWrapper = styled.div`

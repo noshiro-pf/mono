@@ -97,7 +97,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       initialNotificationSettingsWithEmailFilled$.currentValue.value,
   });
 
-  const newEventSchedule$: InitializedObservable<EventSchedule> =
+  const eventScheduleNormalized$: InitializedObservable<EventSchedule> =
     combineLatestI([
       title$,
       notes$,
@@ -158,11 +158,12 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     mapI(validateEventScheduleAll)
   );
 
-  const hasNoChanges$: InitializedObservable<boolean> = newEventSchedule$.chain(
-    mapI((newEventSchedule) =>
-      deepEqual(initialEventSchedule, newEventSchedule)
-    )
-  );
+  const hasNoChanges$: InitializedObservable<boolean> =
+    eventScheduleNormalized$.chain(
+      mapI((eventScheduleNormalized) =>
+        deepEqual(initialEventSchedule, eventScheduleNormalized)
+      )
+    );
 
   const commonState$: InitializedObservable<EventScheduleSettingCommonState> =
     combineLatestI([
@@ -177,7 +178,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       notificationSettings$,
       eventScheduleValidation$,
       hasNoChanges$,
-      newEventSchedule$,
+      eventScheduleNormalized$,
       eventScheduleValidationOk$,
     ]).chain(
       mapI(
@@ -193,7 +194,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           notificationSettings,
           eventScheduleValidation,
           hasNoChanges,
-          newEventSchedule,
+          eventScheduleNormalized,
           eventScheduleValidationOk,
         ]) => ({
           title,
@@ -207,7 +208,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           notificationSettings,
           eventScheduleValidation,
           hasNoChanges,
-          newEventSchedule,
+          eventScheduleNormalized,
           eventScheduleValidationOk,
         })
       )

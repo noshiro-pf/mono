@@ -7,12 +7,9 @@ type Props = Readonly<{
   onWeightChange: (value: Weight) => void;
 }>;
 
-const { step } = weightNumericInputConfig;
+const { step, defaultValue } = weightNumericInputConfig;
 
-const defaultValue = 1;
-
-const sanitizeValue = (value: number): Weight =>
-  !Num.isFinite(value) ? defaultValue : clampAndRoundAnswerWeight(value);
+const sanitizeValue = clampAndRoundAnswerWeight;
 
 export const WeightNumericInput = memoNamed<Props>(
   'WeightNumericInput',

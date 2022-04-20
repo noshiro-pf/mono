@@ -1,5 +1,5 @@
-// eslint-disable-next-line import/no-deprecated
-import { Button, ButtonGroup, Popover } from '@blueprintjs/core';
+import { Button, ButtonGroup } from '@blueprintjs/core';
+import { Popover2 } from '@blueprintjs/popover2';
 
 type Props = Readonly<{
   onSortChange: (state: 'asc' | 'desc') => void;
@@ -23,7 +23,7 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
   }, [onSortChange, handleClose]);
 
   return (
-    <Popover
+    <Popover2
       canEscapeKeyClose={true}
       content={
         <ButtonGroup vertical={true}>
@@ -46,6 +46,6 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
         small={true}
         onClick={handleOpen}
       />
-    </Popover>
+    </Popover2>
   );
 });

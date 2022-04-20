@@ -1,14 +1,14 @@
 import { Button } from '@blueprintjs/core';
 import {
+  AnswerTableFilteringAndSortingManager,
   onAnswerClick,
-  onDatetimeSortChange,
-  onScoreSortChange,
-  tableBodyValues$,
+  tableBodyValuesFiltered$,
 } from '../../../store';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
 import { HTMLTableBorderedStyled } from '../../bp';
 import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
+import { FilterByIconPopover } from './filter-by-icon-popover';
 import { SortButton } from './sort-button';
 
 const dc = dict.answerPage.answers;
@@ -44,7 +44,9 @@ export const AnswerTable = memoNamed<Props>(
       [answers]
     );
 
-    const tableBodyValues = useObservableValue(tableBodyValues$);
+    const tableBodyValuesFiltered = useObservableValue(
+      tableBodyValuesFiltered$
+    );
 
     return (
       <HTMLTableBorderedStyled>
@@ -52,23 +54,38 @@ export const AnswerTable = memoNamed<Props>(
           <tr>
             <th>
               <PaddedSpan>{dc.datetime}</PaddedSpan>
-              <SortButton onSortChange={onDatetimeSortChange} />
+              <SortButton
+                onSortChange={
+                  AnswerTableFilteringAndSortingManager.onDatetimeSortChange
+                }
+              />
             </th>
             <th>
               <PaddedSpan>{dc.score}</PaddedSpan>
-              <SortButton onSortChange={onScoreSortChange} />
+              <SortButton
+                onSortChange={
+                  AnswerTableFilteringAndSortingManager.onScoreSortChange
+                }
+              />
             </th>
 
             {/* icons */}
-            <th>
-              <CustomIcon iconName={'good'} />
-            </th>
-            <th>
-              <CustomIcon iconName={'fair'} />
-            </th>
-            <th>
-              <CustomIcon iconName={'poor'} />
-            </th>
+
+            <IconHeaderCell>
+              <Centering>
+                <FilterByIconPopover answerIconId={'good'} />
+              </Centering>
+            </IconHeaderCell>
+            <IconHeaderCell>
+              <Centering>
+                <FilterByIconPopover answerIconId={'fair'} />
+              </Centering>
+            </IconHeaderCell>
+            <IconHeaderCell>
+              <Centering>
+                <FilterByIconPopover answerIconId={'poor'} />
+              </Centering>
+            </IconHeaderCell>
 
             {answersWithHandler.map((answer) => (
               <th key={answer.id} style={noPadStyle}>
@@ -93,7 +110,7 @@ export const AnswerTable = memoNamed<Props>(
           </tr>
         </thead>
         <tbody>
-          {tableBodyValues.map(
+          {tableBodyValuesFiltered.map(
             ({
               key,
               datetimeRange,
@@ -129,21 +146,26 @@ export const AnswerTable = memoNamed<Props>(
                         ''
                       ) : (
                         <AnswerIconCell>
-                          <CustomIcon iconName={iconId} />
-                          {showPoint ? (
-                            <CustomPointValue>
-                              {`${dict.common.brace.start}${point}${dict.common.brace.end}`}
-                            </CustomPointValue>
-                          ) : undefined}
-                          {weight !== 1 ? (
-                            <WeightValue>
-                              <WeightTimes>{dc.times}</WeightTimes>
-                              <div>{weight}</div>
-                            </WeightValue>
-                          ) : undefined}
+                          <IconAndString>
+                            <CustomIcon iconName={iconId} />
+                            {showPoint ? (
+                              <CustomPointValue>
+                                {`${dict.common.brace.start}${point}${dict.common.brace.end}`}
+                              </CustomPointValue>
+                            ) : undefined}
+                            {weight !== 1 ? (
+                              <WeightValue>
+                                <WeightTimes>{dc.times}</WeightTimes>
+                                <div>{weight}</div>
+                              </WeightValue>
+                            ) : undefined}
+                          </IconAndString>
                           <CellCommentWrapper>
                             {comment === '' ? undefined : (
-                              <CommentButton comment={comment} />
+                              <CommentButton
+                                comment={comment}
+                                useSmallButton={true}
+                              />
                             )}
                           </CellCommentWrapper>
                         </AnswerIconCell>
@@ -219,6 +241,12 @@ const PaddedSpan = styled.span`
 
 const AnswerIconCell = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const IconAndString = styled.div`
+  display: flex;
   align-items: flex-end;
   justify-content: center;
 `;
@@ -241,4 +269,14 @@ const WeightTimes = styled.span`
 
 const CellCommentWrapper = styled.span`
   margin-left: 3px;
+`;
+
+const IconHeaderCell = styled.th`
+  padding: 0 !important;
+`;
+
+const Centering = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
