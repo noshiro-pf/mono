@@ -29,12 +29,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Save build folder
-        uses: actions/upload-artifact@v2
-        with:
-          name: build
-          if-no-files-found: error
-          path: packages/apps/event_schedule_app
+      # - name: Save build folder
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: build
+      #     if-no-files-found: error
+      #     path: packages/apps/event_schedule_app
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
@@ -42,50 +42,53 @@ jobs:
       - name: setup
         run: yarn ws:setup
 
-      - name: Cypress install
-        uses: cypress-io/github-action@v2
-        with:
-          # Disable running of tests within install job
-          runTests: false
-          install: false
-          working-directory: packages/apps/event_schedule_app
-          build: yarn build
+      # - name: Cypress install
+      #   uses: cypress-io/github-action@v2
+      #   with:
+      #     # Disable running of tests within install job
+      #     runTests: false
+      #     install: false
+      #     working-directory: packages/apps/event_schedule_app
+      #     build: yarn build
 
-      - name: Download the build folders
-        uses: actions/download-artifact@v2
-        with:
-          name: build
-          path: packages/apps/event_schedule_app
+      # - name: Download the build folders
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: build
+      #     path: packages/apps/event_schedule_app
 
-      - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v2
-        with:
-          group: 'UI - Chrome'
-          browser: chrome
-          install: false
-          working-directory: packages/apps/event_schedule_app
-          spec: cypress/integration/*
-          build: yarn build
-          start: yarn start
-          wait-on: 'http://localhost:8080'
-          wait-on-timeout: 120
-          record: true
-          parallel: true
-        env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          # Recommended: pass the GitHub token lets this action correctly
-          # determine the unique run id necessary to re-run the checks
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Start App
+      #   run: yarn workspace @noshiro/event-schedule-app start &
+
+      # - name: Cypress run on Chrome
+      #   uses: cypress-io/github-action@v2
+      #   with:
+      #     # group: 'UI - Chrome'
+      #     browser: chrome
+      #     install: false
+      #     working-directory: packages/apps/event_schedule_app
+      #     # spec: cypress/integration/*
+      #     # build: yarn build
+      #     start: yarn start
+      #     wait-on: 'http://localhost:8080'
+      #     wait-on-timeout: 120
+      #     record: true
+      #     parallel: true
+      #   env:
+      #     CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      #     # Recommended: pass the GitHub token lets this action correctly
+      #     # determine the unique run id necessary to re-run the checks
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cypress run on Firefox
         uses: cypress-io/github-action@v2
         with:
-          group: 'UI - Firefox'
+          # group: 'UI - Firefox'
           browser: firefox
           install: false
           working-directory: packages/apps/event_schedule_app
-          spec: cypress/integration/*
-          build: yarn build
+          # spec: cypress/integration/*
+          # build: yarn build
           start: yarn start
           wait-on: 'http://localhost:8080'
           wait-on-timeout: 120
