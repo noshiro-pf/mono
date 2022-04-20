@@ -96,17 +96,6 @@ const isStateAfterDeadline$: InitializedObservable<boolean> =
     )
   );
 
-const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
-  answerBeingEdited$,
-  selectedAnswerSaved$,
-]).chain(
-  mapI(
-    ([answerBeingEdited, selectedAnswerSaved]) =>
-      answerBeingEdited.user.name === '' ||
-      deepEqual(selectedAnswerSaved, answerBeingEdited)
-  )
-);
-
 const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
   .chain(filter(isNotUndefined))
   .chain(
@@ -140,6 +129,19 @@ const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combineLatestI([
       answers ?? [],
       selectedAnswerUserName
     )
+  )
+);
+
+const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
+  answerBeingEdited$,
+  selectedAnswerSaved$,
+  theNameIsAlreadyUsed$,
+]).chain(
+  mapI(
+    ([answerBeingEdited, selectedAnswerSaved, theNameIsAlreadyUsed]) =>
+      answerBeingEdited.user.name === '' ||
+      deepEqual(selectedAnswerSaved, answerBeingEdited) ||
+      theNameIsAlreadyUsed
   )
 );
 
