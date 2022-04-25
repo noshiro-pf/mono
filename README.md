@@ -5,8 +5,7 @@ A monorepo for nodejs projects.
 ## setup
 
 ```
-$  yarn
-$  yarn ws:setup
+$  yarn setup:all
 ```
 
 ## memo
