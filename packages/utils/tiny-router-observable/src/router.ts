@@ -13,6 +13,11 @@ export type Router = Readonly<{
   pathname$: InitializedObservable<string>;
   queryParams$: InitializedObservable<QueryParams>;
   push: (nextPath: string) => void;
+  updateQueryParams: (
+    recipe: (urlSearchParams: DeepReadonly<URLSearchParams>) => void,
+    pushState: boolean,
+    sortParams?: boolean
+  ) => void;
   back: () => void;
   redirect: (nextPath: string) => void;
   removeListener: () => void;
@@ -53,6 +58,34 @@ export const createRouter = (): Router => {
     updatePathname();
   };
 
+  const updateQueryParams = (
+    recipe: (urlSearchParams: DeepReadonly<URLSearchParams>) => void,
+    pushState: boolean = true,
+    sortParams: boolean = true
+  ): void => {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    recipe(searchParams);
+
+    if (sortParams) {
+      searchParams.sort();
+    }
+
+    const p =
+      searchParams.toString() === ''
+        ? withSlash(window.location.pathname)
+        : [withSlash(window.location.pathname), searchParams.toString()].join(
+            '?'
+          );
+
+    if (pushState) {
+      window.history.pushState({}, '', p);
+    } else {
+      window.history.replaceState({}, '', p);
+    }
+    updatePathname();
+  };
+
   const back = (): void => {
     window.history.back();
     updatePathname();
@@ -68,6 +101,7 @@ export const createRouter = (): Router => {
 
   return {
     push,
+    updateQueryParams,
     back,
     redirect,
     pathname$,
