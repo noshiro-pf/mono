@@ -15,7 +15,7 @@ type Props = Readonly<{
 export const SelectedDatetimeRow = memoNamed<Props>(
   'SelectedDatetimeRow',
   (props) => (
-    <Root>
+    <Root data-cy={'selected-datetime-row'}>
       <DatetimeWrapper>
         <YmdWrapper>
           <BpDatePicker

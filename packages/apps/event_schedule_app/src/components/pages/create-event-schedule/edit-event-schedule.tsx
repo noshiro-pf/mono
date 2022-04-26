@@ -28,7 +28,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
     eventScheduleResult.value.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
-    <div>
+    <div data-cy={'edit-event-schedule-page'}>
       <Header title={dc.title} />
       {Result.isErr(eventScheduleResult) ? (
         <FetchEventScheduleError errorType={eventScheduleResult.value.type} />

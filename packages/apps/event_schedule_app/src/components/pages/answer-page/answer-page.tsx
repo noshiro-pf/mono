@@ -122,7 +122,12 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               isExpired={isStateAfterDeadline}
             />
             <ButtonsWrapperAlignEnd>
-              <Button icon={'cog'} intent={'none'} onClick={onEditButtonClick}>
+              <Button
+                data-cy={'edit-event-settings'}
+                icon={'cog'}
+                intent={'none'}
+                onClick={onEditButtonClick}
+              >
                 {dc.eventInfo.editButton}
               </Button>
             </ButtonsWrapperAlignEnd>

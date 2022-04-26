@@ -53,7 +53,7 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
     );
 
     return (
-      <Root>
+      <Root data-cy={'icon-settings'}>
         <div>{dc.title}</div>
         <Description text={dc.description} />
         <AnswerIconRow

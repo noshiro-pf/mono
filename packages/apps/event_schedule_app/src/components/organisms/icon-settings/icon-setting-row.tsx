@@ -31,11 +31,13 @@ export const AnswerIconRow = memoNamed<Props>(
           good: <AnswerIconGoodPoint />,
           poor: <AnswerIconPoorPoint />,
           fair: (
-            <AnswerIconFairPointInput
-              disabled={false}
-              value={answerIcon.point}
-              onValueChange={onPointChange}
-            />
+            <div data-cy={'fair-point-input'}>
+              <AnswerIconFairPointInput
+                disabled={false}
+                value={answerIcon.point}
+                onValueChange={onPointChange}
+              />
+            </div>
           ),
         })}
       </NumericInputWrapper>

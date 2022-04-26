@@ -69,14 +69,18 @@ export const EditEventScheduleOk = memoNamed<Props>(
                 disabled={editButtonIsLoading || hasNoChanges}
                 onConfirmClick={EditEventScheduleStore.resetAllState}
               />
-              <SubmitEditingEventButton
-                disabled={
-                  !editButtonIsEnabled || editButtonIsLoading || hasNoChanges
-                }
-                loading={editButtonIsLoading}
-                showConfirmationDialog={hasDeletedDatetimeChanges}
-                onConfirmClick={EditEventScheduleStore.onEditEventClick}
-              />
+              <div data-cy={'submit-button'}>
+                <SubmitEditingEventButton
+                  disabled={
+                    !eventScheduleValidationOk ||
+                    editButtonIsLoading ||
+                    hasNoChanges
+                  }
+                  loading={editButtonIsLoading}
+                  showConfirmationDialog={hasDeletedDatetimeChanges}
+                  onConfirmClick={EditEventScheduleStore.onEditEventClick}
+                />
+              </div>
             </ButtonsWrapperForEventSettingsPage>
             <EventScheduleDiff diff={diff} />
           </>

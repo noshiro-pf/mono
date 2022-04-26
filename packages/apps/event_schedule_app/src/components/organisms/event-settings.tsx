@@ -52,7 +52,6 @@ export const EventSettings = memoNamed<Props>(
     return (
       <Root>
         <ParagraphWithSwitch
-          data-cy={'create-page--settings--'}
           description={dc.answerDeadline.howAnswerDeadlineIsUsed}
           elementToToggle={
             <AnswerDeadlineDatepicker
