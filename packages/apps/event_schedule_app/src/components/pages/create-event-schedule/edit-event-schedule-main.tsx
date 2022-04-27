@@ -22,6 +22,9 @@ export const EditEventScheduleOk = memoNamed<Props>(
   'EditEventScheduleOk',
   ({ eventSchedule, editPageIsHidden, makeItPassTheEmailConfirmation }) => {
     const commonState = useObservableValue(EditEventScheduleStore.commonState$);
+    const hasNoChanges = useObservableValue(
+      EditEventScheduleStore.hasNoChanges$
+    );
 
     useEffect(() => {
       EditEventScheduleStore.setEventSchedule(eventSchedule);
@@ -37,8 +40,7 @@ export const EditEventScheduleOk = memoNamed<Props>(
       EditEventScheduleStore.hasDeletedDatetimeChanges$
     );
 
-    const { hasNoChanges, eventScheduleValidationOk: editButtonIsEnabled } =
-      commonState;
+    const { eventScheduleValidationOk } = commonState;
 
     return (
       <>
