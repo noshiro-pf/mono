@@ -13,7 +13,7 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
     CreateEventScheduleStore.restoreFromLocalStorage();
   }, []);
 
-  const { eventScheduleValidationOk: createButtonIsEnabled } = commonState;
+  const { eventScheduleValidationOk } = commonState;
 
   const createButtonIsLoading = useObservableValue(
     CreateEventScheduleStore.isLoading$
@@ -25,7 +25,9 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
 
   const url = useObservableValue(CreateEventScheduleStore.url$);
 
-  const { hasNoChanges } = commonState;
+  const hasNoChanges = useObservableValue(
+    CreateEventScheduleStore.hasNoChanges$
+  );
 
   return (
     <div data-cy={'create-page'}>
@@ -41,7 +43,7 @@ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
         />
         <Button
           data-cy={'create-button'}
-          disabled={!createButtonIsEnabled}
+          disabled={!eventScheduleValidationOk}
           intent={'primary'}
           loading={createButtonIsLoading}
           text={dc.createEventButton}

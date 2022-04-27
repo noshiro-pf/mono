@@ -1,3 +1,4 @@
+import { deepEqual } from '@noshiro/fast-deep-equal';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
 import { initialEventSchedule, routes } from '../../constants';
@@ -9,6 +10,13 @@ import { createEventScheduleSettingStore } from './event-schedule-setting-common
 export namespace CreateEventScheduleStore {
   export const { commonState$, commonStateHandlers } =
     createEventScheduleSettingStore();
+
+  export const hasNoChanges$: InitializedObservable<boolean> =
+    commonState$.chain(
+      mapI(({ eventScheduleNormalized }) =>
+        deepEqual(initialEventSchedule, eventScheduleNormalized)
+      )
+    );
 
   export const resetAllState = (): void => {
     commonStateHandlers.resetTitle();

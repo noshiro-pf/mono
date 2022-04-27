@@ -1,5 +1,4 @@
 import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
-import { deepEqual } from '@noshiro/fast-deep-equal';
 import {
   initialAnswerDeadline,
   initialEventSchedule,
@@ -158,13 +157,6 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     mapI(validateEventScheduleAll)
   );
 
-  const hasNoChanges$: InitializedObservable<boolean> =
-    eventScheduleNormalized$.chain(
-      mapI((eventScheduleNormalized) =>
-        deepEqual(initialEventSchedule, eventScheduleNormalized)
-      )
-    );
-
   const commonState$: InitializedObservable<EventScheduleSettingCommonState> =
     combineLatestI([
       title$,
@@ -177,7 +169,6 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       useNotification$,
       notificationSettings$,
       eventScheduleValidation$,
-      hasNoChanges$,
       eventScheduleNormalized$,
       eventScheduleValidationOk$,
     ]).chain(
@@ -193,7 +184,6 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           useNotification,
           notificationSettings,
           eventScheduleValidation,
-          hasNoChanges,
           eventScheduleNormalized,
           eventScheduleValidationOk,
         ]) => ({
@@ -207,7 +197,6 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           useNotification,
           notificationSettings,
           eventScheduleValidation,
-          hasNoChanges,
           eventScheduleNormalized,
           eventScheduleValidationOk,
         })
