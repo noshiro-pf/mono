@@ -15,4 +15,5 @@ export const normalizeEventSchedule = (
   notificationSettings: eventSchedule.notificationSettings,
   timezoneOffsetMinutes: eventSchedule.timezoneOffsetMinutes,
   author: eventSchedule.author,
+  archivedBy: eventSchedule.archivedBy,
 });

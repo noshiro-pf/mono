@@ -45,7 +45,7 @@ export type {
   AnswerIconSettings,
   // AnswerId, // remove phantom types
   AnswerSelection,
-  // AnswerTableCellPosition, // remove phantom types
+  // AnswerTableCellPosition, // remove
   DatetimeRange,
   DatetimeSpecificationEnumType,
   DayType,

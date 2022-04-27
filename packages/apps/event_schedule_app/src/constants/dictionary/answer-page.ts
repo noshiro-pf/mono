@@ -5,7 +5,7 @@ const genTagName =
       ? `${icon}の個数 = ${min}`
       : min === 0
       ? max === Num.POSITIVE_INFINITY
-        ? `${icon}の個数 ≦ ∞` // fallback
+        ? `${icon}の個数 ≦ ∞` // dummy
         : `${icon}の個数 ≦ ${max}`
       : max === Num.POSITIVE_INFINITY
       ? `${min} ≦ ${icon}の個数`
@@ -13,6 +13,19 @@ const genTagName =
 
 export const answerPageDictionary = {
   title: '日程調整 回答ページ',
+  answerLater: {
+    button: '後で回答する',
+    confirmButton: '仮登録する',
+    message: '全日程が空欄の状態で回答を仮登録します。',
+    description: [
+      '仮登録してこの日程調整をアカウントと紐づけることで、日程調整一覧に表示されるようになります。',
+      '後で回答するのを忘れないようにしてください。',
+    ].join(''),
+    result: {
+      success: '仮登録しました。',
+    },
+  },
+
   eventInfo: {
     title: '概要',
     eventName: 'イベント名',
@@ -115,9 +128,17 @@ export const answerPageDictionary = {
     },
     protected: {
       title: 'この回答を保護する',
-      description: [
-        'これを有効にした場合、（現在ログインしている）本人のアカウントでログイン中のみこの回答を編集・削除できるようになります。',
-      ],
+      description: {
+        enabled: [
+          '回答を他のユーザーが編集・削除できないように保護します。',
+          'この回答はログインしていない状態では編集できなくなります。',
+        ],
+        disabled: [
+          '回答を誰でも編集・削除できるようにします。',
+          'この回答はアカウントとの紐づけがされず、ログインしていない状態で作成したときと同じように扱われます。',
+          'このため、回答一覧にも表示されなくなります。',
+        ],
+      },
     },
     submitButton: {
       create: '回答を追加する',

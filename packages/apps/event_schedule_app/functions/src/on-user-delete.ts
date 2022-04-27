@@ -1,11 +1,8 @@
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { IRecord } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import type { auth } from 'firebase-functions';
-
-const collectionName = firestorePaths.events;
-const subCollectionName = firestorePaths.answers;
+import { collectionPath } from './firestore-paths';
 
 const removeAuthorIdFromEventSchedule = (
   eventSchedule: EventSchedule,
@@ -29,13 +26,13 @@ export const onUserDelete = async (
 ): Promise<void> => {
   const userIdToBeRemoved = user.uid;
 
-  const eventsSnapshot = await db.collection(collectionName).get();
+  const eventsSnapshot = await db.collection(collectionPath.events).get();
   const writeBatch = db.batch();
 
   for (const doc of eventsSnapshot.docs) {
     const id = doc.id;
 
-    const documentRef = db.doc(`${collectionName}/${id}`);
+    const documentRef = db.doc(`${collectionPath.events}/${id}`);
 
     writeBatch.set(
       documentRef,
@@ -47,12 +44,12 @@ export const onUserDelete = async (
 
     // eslint-disable-next-line no-await-in-loop
     const answersSnapshotCurr = await db
-      .collection(`${collectionName}/${id}/${subCollectionName}`)
+      .collection(`${collectionPath.events}/${id}/${collectionPath.answers}`)
       .get();
 
     for (const ans of answersSnapshotCurr.docs) {
       const documentRefForAnswers = db.doc(
-        `${collectionName}/${id}/${subCollectionName}/${ans.id}`
+        `${collectionPath.events}/${id}/${collectionPath.answers}/${ans.id}`
       );
 
       writeBatch.set(

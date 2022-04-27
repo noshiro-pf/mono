@@ -1,25 +1,22 @@
 import type { TagProps } from '@blueprintjs/core';
 import { Button, Spinner, TagInput } from '@blueprintjs/core';
 import { useRef } from 'react';
+import { eventIsAfterDeadline } from '../../../functions';
 import {
   alertOnAnswerClickIsOpen$,
   answerBeingEdited$,
   answerBeingEditedSectionState$,
   answers$,
+  AnswersFetchState,
   AnswerTableFilteringAndSortingManager,
   closeAlertOnAnswerClick,
   errorType$,
   eventSchedule$,
-  fetchAnswers,
-  fetchEventSchedule,
+  EventScheduleFetchState,
   holidaysJpDefinition$,
-  isStateAfterDeadline$,
   onAddAnswerButtonClick,
   onCancelEditingAnswer,
   onEditButtonClick,
-  refreshAnswers,
-  refreshButtonIsDisabled$,
-  refreshButtonIsLoading$,
   requiredParticipantsExist$,
   router,
   selectedAnswerUserName$,
@@ -27,6 +24,7 @@ import {
   setYearMonth$,
   submitButtonIsDisabled$,
   submitButtonIsLoading$,
+  useFireAuthUser,
 } from '../../../store';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
 import { AlertWithMaxWidth } from '../../bp';
@@ -34,6 +32,7 @@ import { Section } from '../../molecules';
 import { MultipleDatePicker } from '../../multiple-date-picker';
 import {
   AnswerBeingEdited,
+  AnswerLaterButtonWithConfirmation,
   AnswerPageEventInfo,
   AnswerTable,
   Header,
@@ -58,9 +57,12 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   const errorType = useObservableValue(errorType$);
   const eventId = useObservableValue(router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);
-  const isStateAfterDeadline = useObservableValue(isStateAfterDeadline$);
-  const refreshButtonIsDisabled = useObservableValue(refreshButtonIsDisabled$);
-  const refreshButtonIsLoading = useObservableValue(refreshButtonIsLoading$);
+  const refreshButtonIsDisabled = useObservableValue(
+    AnswersFetchState.refreshButtonIsDisabled$
+  );
+  const refreshButtonIsLoading = useObservableValue(
+    AnswersFetchState.refreshButtonIsLoading$
+  );
   const requiredParticipantsExist = useObservableValue(
     requiredParticipantsExist$
   );
@@ -69,12 +71,17 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   const submitButtonIsDisabled = useObservableValue(submitButtonIsDisabled$);
   const submitButtonIsLoading = useObservableValue(submitButtonIsLoading$);
 
+  const afterDeadline = useMemo(
+    () => eventIsAfterDeadline(eventSchedule),
+    [eventSchedule]
+  );
+
   /* effect */
 
   // fetch once on the first load
   useEffect(() => {
-    fetchEventSchedule();
-    fetchAnswers();
+    EventScheduleFetchState.fetchEventSchedule();
+    AnswersFetchState.fetchAnswers();
     AnswerTableFilteringAndSortingManager.restoreAnswerTableFilteringStateFromQueryParams();
     AnswerTableFilteringAndSortingManager.initializeAnswerTableFilteringStateUpperLimit();
   }, []);
@@ -102,6 +109,16 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
     AnswerTableFilteringAndSortingManager.tagProps$
   );
 
+  const fireAuthUser = useFireAuthUser();
+
+  const showAnswerLaterButton = useMemo<boolean>(
+    () =>
+      (fireAuthUser?.uid !== undefined &&
+        answers?.every((ans) => ans.user.id !== fireAuthUser.uid)) ??
+      false,
+    [fireAuthUser, answers]
+  );
+
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
   ) : (
@@ -116,11 +133,16 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
         <Spinner />
       ) : (
         <>
+          <AnswerLaterWrapper>
+            {showAnswerLaterButton ? (
+              <AnswerLaterButtonWithConfirmation
+                disabled={false}
+                loading={false}
+              />
+            ) : undefined}
+          </AnswerLaterWrapper>
           <Section sectionTitle={dc.eventInfo.title}>
-            <AnswerPageEventInfo
-              eventSchedule={eventSchedule}
-              isExpired={isStateAfterDeadline}
-            />
+            <AnswerPageEventInfo eventSchedule={eventSchedule} />
             <ButtonsWrapperAlignEnd>
               <Button
                 data-cy={'edit-event-settings'}
@@ -142,14 +164,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               />
             </CalendarWrapper>
 
-            {isStateAfterDeadline ? undefined : (
+            {afterDeadline ? undefined : (
               <SingleButtonWrapper>
                 <Button
                   disabled={refreshButtonIsDisabled}
                   icon={'refresh'}
                   intent={'none'}
                   loading={refreshButtonIsLoading}
-                  onClick={refreshAnswers}
+                  onClick={AnswersFetchState.refreshAnswers}
                 >
                   {dc.answers.refresh}
                 </Button>
@@ -185,8 +207,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 answers={answers}
                 datetimeSpecification={eventSchedule.datetimeSpecification}
                 editAnswerButtonIsDisabled={
-                  answerBeingEditedSectionState !== 'hidden' ||
-                  isStateAfterDeadline
+                  answerBeingEditedSectionState !== 'hidden' || afterDeadline
                 }
               />
 
@@ -258,8 +279,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               </NoteForPointOfFair>
             </IconDescriptionWrapper>
 
-            {answerBeingEditedSectionState === 'hidden' &&
-            !isStateAfterDeadline ? (
+            {answerBeingEditedSectionState === 'hidden' && !afterDeadline ? (
               <ButtonsWrapperAlignEnd>
                 <Button
                   data-cy={'add-answer-button'}
@@ -274,7 +294,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
           <div ref={answerSectionRef} data-cy={'answer-being-edited-section'}>
             {answerBeingEditedSectionState === 'hidden' ||
-            isStateAfterDeadline ? undefined : (
+            afterDeadline ? undefined : (
               <Section
                 sectionTitle={match(answerBeingEditedSectionState, {
                   creating: dc.answerBeingEdited.title.create,
@@ -330,4 +350,8 @@ const RequiredParticipantIconWrapper = styled(AlignCenter)`
 
 const NoteForPointOfFair = styled.div`
   margin: 10px 3px;
+`;
+
+const AnswerLaterWrapper = styled.div`
+  margin: 20px;
 `;

@@ -99,6 +99,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             <BpInput
               autoFocus={true}
               data-cy={'username'}
+              intent={showUserNameError ? 'danger' : 'primary'}
               value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
               onValueChange={onUserNameChangeLocal as (v: string) => void}
@@ -264,7 +265,11 @@ export const AnswerBeingEdited = memoNamed<Props>(
         {user === undefined ? undefined : (
           <Paragraph>
             <ParagraphWithSwitch
-              description={dc.protected.description}
+              description={
+                dc.protected.description[
+                  answerBeingEdited.user.id === null ? 'disabled' : 'enabled'
+                ]
+              }
               elementToToggle={undefined}
               hideContentIfToggleIsFalse={false}
               title={dc.protected.title}
@@ -301,6 +306,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
 
 const TableWrapper = styled.div`
   overflow-x: auto;
+  margin-bottom: 15px;
 `;
 
 const Table = styled(HTMLTableBorderedStyled)`

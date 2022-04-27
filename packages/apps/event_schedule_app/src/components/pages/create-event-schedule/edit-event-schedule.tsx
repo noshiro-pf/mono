@@ -1,5 +1,9 @@
 import { Spinner } from '@blueprintjs/core';
-import { eventScheduleResult$, router, useFireAuthUser } from '../../../store';
+import {
+  EventScheduleFetchState,
+  router,
+  useFireAuthUser,
+} from '../../../store';
 import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { EditEventScheduleOk } from './edit-event-schedule-main';
@@ -9,7 +13,9 @@ const dc = dict.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useObservableValue(router.eventId$);
-  const eventScheduleResult = useObservableValue(eventScheduleResult$);
+  const eventScheduleResult = useObservableValue(
+    EventScheduleFetchState.result$
+  );
 
   const {
     state: emailConfirmationHasPassed,

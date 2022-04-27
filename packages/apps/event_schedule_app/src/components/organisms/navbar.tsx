@@ -3,7 +3,6 @@ import { Popover2 } from '@blueprintjs/popover2';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { css } from 'styled-components';
 import { aboutThisAppUrl, routes } from '../../constants';
-import { experimentalFeature } from '../../env';
 import {
   router,
   signOutClick,
@@ -84,9 +83,12 @@ export const NavBar = memoNamed('NavBar', () => {
             </>
           ) : (
             <>
-              {experimentalFeature.eventList === 'hidden' ? undefined : (
-                <ItemAnchor>{dc.list}</ItemAnchor>
-              )}
+              <ItemAnchor
+                href={routes.eventListPage}
+                onClick={handleEventListButtonClick}
+              >
+                {dc.list}
+              </ItemAnchor>
               <Item>
                 <span>{dc.auth.userName.prefix}</span>
                 <Popover2

@@ -11,13 +11,13 @@ export type BpPasswordInputProps = BpInputProps &
 
 export const BpPasswordInput = memoNamed<BpPasswordInputProps>(
   'BpPasswordInput',
-  (props) => {
+  ({ disabled, onPasswordChange, password }) => {
     const { state: passwordIsOpen, toggleState: onToggleVisibilityClick } =
       useBoolState(false);
 
     return (
       <BpInput
-        disabled={props.disabled}
+        disabled={disabled}
         rightElement={
           <Button
             icon={passwordIsOpen ? 'eye-open' : 'eye-off'}
@@ -26,8 +26,8 @@ export const BpPasswordInput = memoNamed<BpPasswordInputProps>(
           />
         }
         type={passwordIsOpen ? 'text' : 'password'}
-        value={props.password}
-        onValueChange={props.onPasswordChange}
+        value={password}
+        onValueChange={onPasswordChange}
       />
     );
   }

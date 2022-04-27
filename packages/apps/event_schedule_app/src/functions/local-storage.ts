@@ -4,12 +4,14 @@ type EventSchedulePicked = Pick<
   EventSchedule,
   | 'answerDeadline'
   | 'answerIcons'
-  | 'datetimeRangeList'
   | 'datetimeSpecification'
   | 'notes'
   | 'notificationSettings'
   | 'title'
->;
+> &
+  Readonly<{
+    datetimeRangeList: readonly DatetimeRange[];
+  }>;
 
 export namespace EventScheduleAppLocalStorage {
   const attachSuffix = (key: string): string =>

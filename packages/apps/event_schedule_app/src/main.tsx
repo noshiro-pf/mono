@@ -2,6 +2,7 @@ import {
   AnswerPage,
   CreateEventSchedule,
   EditEventSchedule,
+  EventListPage,
   Footer,
   NotFoundPage,
   RegisterPage,
@@ -20,6 +21,8 @@ export const Main = memoNamed('Main', () => {
         <EditEventSchedule />
       ) : show.answerPage ? (
         <AnswerPage />
+      ) : show.eventListPage ? (
+        <EventListPage />
       ) : show.registerPage ? (
         <RegisterPage />
       ) : show.signInPage ? (

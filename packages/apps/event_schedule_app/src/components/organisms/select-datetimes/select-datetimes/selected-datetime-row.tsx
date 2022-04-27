@@ -14,31 +14,35 @@ type Props = Readonly<{
 
 export const SelectedDatetimeRow = memoNamed<Props>(
   'SelectedDatetimeRow',
-  (props) => (
+  ({
+    datetimeRange,
+    onYmdChange,
+    datetimeSpecification,
+    onRangeEndChange,
+    onRangeStartChange,
+    onDuplicateClick,
+    onDeleteClick,
+  }) => (
     <Root data-cy={'selected-datetime-row'}>
       <DatetimeWrapper>
         <YmdWrapper>
           <BpDatePicker
             closeOnSelection={true}
-            ymd={props.datetimeRange.ymd}
-            onYmdChange={props.onYmdChange}
+            ymd={datetimeRange.ymd}
+            onYmdChange={onYmdChange}
           />
         </YmdWrapper>
         <TimeRangeView
-          datetimeSpecification={props.datetimeSpecification}
-          timeRange={props.datetimeRange.timeRange}
-          onRangeEndChange={props.onRangeEndChange}
-          onRangeStartChange={props.onRangeStartChange}
+          datetimeSpecification={datetimeSpecification}
+          timeRange={datetimeRange.timeRange}
+          onRangeEndChange={onRangeEndChange}
+          onRangeStartChange={onRangeStartChange}
         />
       </DatetimeWrapper>
 
       <ButtonsWrapper>
-        <Button
-          icon={'duplicate'}
-          minimal={true}
-          onClick={props.onDuplicateClick}
-        />
-        <Button icon={'trash'} minimal={true} onClick={props.onDeleteClick} />
+        <Button icon={'duplicate'} minimal={true} onClick={onDuplicateClick} />
+        <Button icon={'trash'} minimal={true} onClick={onDeleteClick} />
       </ButtonsWrapper>
     </Root>
   )

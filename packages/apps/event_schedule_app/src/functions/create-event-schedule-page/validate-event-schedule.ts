@@ -7,14 +7,19 @@ export const validateEventSchedule = ({
   datetimeRangeList,
   answerIcons,
   notificationSettings,
-}: StrictOmit<
-  EventSchedule,
-  | 'answerDeadline'
-  | 'author'
-  | 'datetimeSpecification'
-  | 'notes'
-  | 'timezoneOffsetMinutes'
->): EventScheduleValidation => ({
+}: Readonly<{
+  datetimeRangeList: readonly DatetimeRange[]; // allow an empty array
+}> &
+  StrictOmit<
+    EventSchedule,
+    | 'answerDeadline'
+    | 'archivedBy'
+    | 'author'
+    | 'datetimeRangeList'
+    | 'datetimeSpecification'
+    | 'notes'
+    | 'timezoneOffsetMinutes'
+  >): EventScheduleValidation => ({
   title: title !== '',
   datetimeRangeList: !IList.isEmpty(datetimeRangeList),
   answerIcons:

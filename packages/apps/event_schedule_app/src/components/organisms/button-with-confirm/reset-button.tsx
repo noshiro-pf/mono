@@ -24,12 +24,15 @@ const toastConfig = {
   intent: 'success',
 } as const;
 
-export const ResetButton = memoNamed<Props>('ResetButton', (props) => (
-  <ButtonWithConfirm
-    buttonConfig={buttonConfig}
-    dialogConfig={dialogConfig}
-    disabled={props.disabled}
-    toastConfig={toastConfig}
-    onConfirmClick={props.onConfirmClick}
-  />
-));
+export const ResetButton = memoNamed<Props>(
+  'ResetButton',
+  ({ onConfirmClick, disabled }) => (
+    <ButtonWithConfirm
+      buttonConfig={buttonConfig}
+      dialogConfig={dialogConfig}
+      disabled={disabled}
+      toastConfig={toastConfig}
+      onConfirmClick={onConfirmClick}
+    />
+  )
+);

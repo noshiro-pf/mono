@@ -1,9 +1,9 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { assertType, tp } from '@noshiro/ts-utils';
 import { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
+import { collectionPath } from './firestore-paths';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
 import { fillEventScheduleWithCheck } from './type-check';
@@ -18,7 +18,7 @@ assertType<TypeExtends<ValueOf<typeof keys>, keyof EventSchedule>>();
 
 export const notifyAnswerDeadline = async (): Promise<void> => {
   const querySnapshot = await firestore()
-    .collection(firestorePaths.events)
+    .collection(collectionPath.events)
     .where(keys.notificationSettings, '!=', 'none')
     .where(keys.answerDeadline, '!=', 'none')
     .get();

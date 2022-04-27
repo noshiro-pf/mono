@@ -1,4 +1,4 @@
-import { ymdhm2strWithDay } from '../../functions';
+import { eventIsAfterDeadline, ymdhm2strWithDay } from '../../functions';
 import { Description } from '../atoms';
 import { AnswerPageNotes } from './answer-page-notes';
 
@@ -6,39 +6,45 @@ const dc = dict.answerPage;
 
 type Props = Readonly<{
   eventSchedule: EventSchedule;
-  isExpired: boolean;
 }>;
 
 export const AnswerPageEventInfo = memoNamed<Props>(
   'AnswerPageEventInfo',
-  ({ eventSchedule, isExpired }) => (
-    <Container>
-      <TableLabel1>{dc.eventInfo.eventName}</TableLabel1>
-      <TableValue1>{eventSchedule.title}</TableValue1>
-      <TableLabel2>{dc.eventInfo.notes}</TableLabel2>
-      <TableValue2>
-        <AnswerPageNotes notes={eventSchedule.notes} />
-      </TableValue2>
-      <TableLabel3>{dc.eventInfo.answerDeadline}</TableLabel3>
-      <TableValue3>
-        {eventSchedule.answerDeadline !== 'none' ? (
-          <>
-            <div>{ymdhm2strWithDay(eventSchedule.answerDeadline)}</div>
-            <Description
-              error={isExpired}
-              text={
-                isExpired
-                  ? dc.eventInfo.answerDeadlineIsExpired
-                  : dc.eventInfo.answerDeadlineDescription
-              }
-            />
-          </>
-        ) : (
-          <div>{dict.answerPage.eventInfo.noAnswerDeadline}</div>
-        )}
-      </TableValue3>
-    </Container>
-  )
+  ({ eventSchedule }) => {
+    const afterDeadline = useMemo(
+      () => eventIsAfterDeadline(eventSchedule),
+      [eventSchedule]
+    );
+
+    return (
+      <Container>
+        <TableLabel1>{dc.eventInfo.eventName}</TableLabel1>
+        <TableValue1>{eventSchedule.title}</TableValue1>
+        <TableLabel2>{dc.eventInfo.notes}</TableLabel2>
+        <TableValue2>
+          <AnswerPageNotes notes={eventSchedule.notes} />
+        </TableValue2>
+        <TableLabel3>{dc.eventInfo.answerDeadline}</TableLabel3>
+        <TableValue3>
+          {eventSchedule.answerDeadline === 'none' ? (
+            <div>{dict.answerPage.eventInfo.noAnswerDeadline}</div>
+          ) : (
+            <>
+              <div>{ymdhm2strWithDay(eventSchedule.answerDeadline)}</div>
+              <Description
+                error={afterDeadline}
+                text={
+                  afterDeadline
+                    ? dc.eventInfo.answerDeadlineIsExpired
+                    : dc.eventInfo.answerDeadlineDescription
+                }
+              />
+            </>
+          )}
+        </TableValue3>
+      </Container>
+    );
+  }
 );
 
 const Container = styled.div`
@@ -51,12 +57,16 @@ const Container = styled.div`
     'label3 value3';
 `;
 
-const TableLabel = styled.div`
-  grid-area: label;
+const TableCell = styled.div`
+  padding-top: 3px;
+  padding-bottom: 3px;
   text-align: left;
   vertical-align: text-top;
+`;
+
+const TableLabel = styled(TableCell)`
+  grid-area: label;
   white-space: nowrap;
-  padding-bottom: 5px;
   padding-right: 10px;
   font-weight: bolder;
 `;
@@ -71,12 +81,9 @@ const TableLabel3 = styled(TableLabel)`
   grid-area: label3;
 `;
 
-const TableValue = styled.div`
+const TableValue = styled(TableCell)`
   grid-area: value;
-  text-align: left;
-  vertical-align: text-top;
   white-space: pre-line;
-  padding-bottom: 10px;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

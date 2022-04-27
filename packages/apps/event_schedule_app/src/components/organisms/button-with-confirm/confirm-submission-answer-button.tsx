@@ -43,11 +43,6 @@ const dialogConfigEditing = {
   confirmButtonText: dc.submitButton.update,
 } as const;
 
-const toastConfig = {
-  message: dc.deleteButton.deleteAnswerResultMessage,
-  intent: 'success',
-} as const;
-
 export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
   'SubmitAnswerButtonWithConfirmation',
   ({ hasUnanswered, loading, disabled, mode }) =>
@@ -63,7 +58,6 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
         })}
         disabled={disabled}
         loading={loading}
-        toastConfig={toastConfig}
         onConfirmClick={onSubmitAnswerClick}
       />
     ) : (

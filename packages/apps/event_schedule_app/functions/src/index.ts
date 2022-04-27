@@ -1,8 +1,15 @@
-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 // initializeApp must be imported as default import.
 // https://github.com/firebase/firebase-admin-node/issues/593
+import {
+  hasKeyValue,
+  isBoolean,
+  isNonNullObject,
+  isString,
+} from '@noshiro/ts-utils';
 import admin from 'firebase-admin';
-import { auth, firestore, pubsub } from 'firebase-functions';
+import { auth, firestore, https, pubsub } from 'firebase-functions';
+import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
+import { collectionPath } from './firestore-paths';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
 import { onUserDelete } from './on-user-delete';
@@ -17,7 +24,7 @@ const wildcard = {
   answerId: 'answerId',
 } as const;
 
-const answerDocPath = `${firestorePaths.events}/{${wildcard.eventId}}/${firestorePaths.answers}/{${wildcard.answerId}}`;
+const answerDocPath = `${collectionPath.events}/{${wildcard.eventId}}/${collectionPath.answers}/{${wildcard.answerId}}`;
 
 export const answerCreationListener = firestore
   .document(answerDocPath)
@@ -78,4 +85,28 @@ export const notifyAnswerDeadlineEveryday = pubsub
 
 export const userDeletionListener = auth.user().onDelete((user) => {
   onUserDelete(db, user).catch(console.error);
+});
+
+export const fetchEventListOfUser = https.onCall((payload, context) => {
+  if (
+    !(
+      isNonNullObject(payload) &&
+      hasKeyValue(payload, 'filterText', isString) &&
+      hasKeyValue(
+        payload,
+        'filterOptionState',
+        (v: unknown): v is 'archive' | 'inProgress' =>
+          v === 'archive' || v === 'inProgress'
+      ) &&
+      hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
+      hasKeyValue(payload, 'showOnlyEventSchedulesICreated', isBoolean)
+    )
+  ) {
+    throw new https.HttpsError(
+      'invalid-argument',
+      'The payload type is invalid.'
+    );
+  }
+
+  return fetchEventListOfUserImpl(db, payload, context);
 });

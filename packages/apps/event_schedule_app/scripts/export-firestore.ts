@@ -1,5 +1,7 @@
-import { firestorePaths } from '@noshiro/event-schedule-app-shared/cjs/v4';
-import * as admin from 'firebase-admin';
+// eslint-disable-next-line import/no-internal-modules
+import { firestorePaths } from '@noshiro/event-schedule-app-shared/cjs/v5';
+// eslint-disable-next-line import/no-namespace
+import admin from 'firebase-admin';
 import serviceAccount from './service-account-key.json';
 
 const app = admin.initializeApp({

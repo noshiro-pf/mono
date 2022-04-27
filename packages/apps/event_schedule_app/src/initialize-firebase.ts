@@ -18,8 +18,6 @@ const app = initializeApp(firebaseConfig);
 
 clog('firebase.initializeApp done.');
 
-clog(hasKey(window, 'Cypress'));
-
 export const db = initializeFirestore(app, {
   ignoreUndefinedProperties: true,
   // https://zenn.dev/cauchye/articles/20210816_yutaro-elk
@@ -42,21 +40,23 @@ export const auth = getAuth();
 
 export const googleAuthProvider = new GoogleAuthProvider();
 
+export const functions = getFunctions(app);
+
 if (isDevelopment) {
   connectFirestoreEmulator(
     db,
     'localhost',
     firebaseJson.emulators.firestore.port
   );
-  // connectAuthEmulator(
-  //   auth,
-  //   `localhost:${firebaseJson.emulators.auth.port.toString()}`
-  // );
 
-  const functions = getFunctions(app);
   connectFunctionsEmulator(
     functions,
     'localhost',
     firebaseJson.emulators.functions.port
   );
+
+  // connectAuthEmulator(
+  //   auth,
+  //   `localhost:${firebaseJson.emulators.auth.port.toString()}`
+  // );
 }
