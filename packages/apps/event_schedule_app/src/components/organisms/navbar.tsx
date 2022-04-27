@@ -41,6 +41,12 @@ export const NavBar = memoNamed('NavBar', () => {
     redirectFn: router.redirect,
   });
 
+  const handleEventListButtonClick = useRouterLinkClick({
+    replace: false,
+    pushFn: router.push,
+    redirectFn: router.redirect,
+  });
+
   const openingDialog = useObservableValue(
     UpdateUserInfoDialogState.openingDialog$
   );
