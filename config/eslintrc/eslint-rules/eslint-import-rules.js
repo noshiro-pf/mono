@@ -61,7 +61,13 @@ const eslintImportsRules = {
   'import/exports-last': 'off',
   'import/no-duplicates': 'error',
   'import/no-namespace': 'error',
-  'import/extensions': 'error',
+  'import/extensions': [
+    'error',
+    'never',
+    {
+      pattern: { json: 'always' },
+    },
+  ],
   'import/order': 'off', // using prettier-plugin-organize-imports
   'import/newline-after-import': 'error',
   'import/prefer-default-export': 'off',
