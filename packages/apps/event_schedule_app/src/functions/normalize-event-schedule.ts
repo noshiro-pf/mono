@@ -1,4 +1,5 @@
 import { compareDatetimeRange } from '@noshiro/event-schedule-app-shared';
+import { datetimeRange2str } from './datetime-range-to-str';
 
 export const normalizeEventSchedule = (
   eventSchedule: EventSchedule
@@ -7,7 +8,7 @@ export const normalizeEventSchedule = (
   notes: eventSchedule.notes.trim().concat('\n'),
   datetimeSpecification: eventSchedule.datetimeSpecification,
   datetimeRangeList: pipe(eventSchedule.datetimeRangeList)
-    .chain((list) => IList.uniq(list))
+    .chain((list) => IList.uniqBy(list, datetimeRange2str))
     .chain((list) => IList.sort(list, compareDatetimeRange)).value,
   answerDeadline: eventSchedule.answerDeadline,
   answerIcons: eventSchedule.answerIcons,
