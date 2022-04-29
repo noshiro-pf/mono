@@ -3,5 +3,5 @@ export const hasKey = <K extends PropertyKey>(
   rec: object,
   key: K
 ): rec is ReadonlyRecord<K, unknown> =>
-  // eslint-disable-next-line no-prototype-builtins
-  rec.hasOwnProperty(key);
+  // eslint-disable-next-line no-restricted-globals
+  Object.hasOwn(rec, key);
