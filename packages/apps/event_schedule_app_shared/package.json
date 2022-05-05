@@ -33,7 +33,7 @@
     "root_dir": "../../.."
   },
   "dependencies": {
-    "@noshiro/ts-utils": "2.0.0",
+    "@noshiro/ts-utils": "2.0.1",
     "@noshiro/ts-utils-additional": "1.0.0"
   },
   "devDependencies": {
