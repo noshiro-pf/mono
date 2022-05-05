@@ -2,7 +2,7 @@ import { AnchorButton, Icon, Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { css } from 'styled-components';
-import { aboutThisAppUrl, routes } from '../../constants';
+import { aboutThisAppUrl, feedbackUrl, routes } from '../../constants';
 import {
   router,
   signOutClick,
@@ -164,16 +164,29 @@ export const NavBar = memoNamed('NavBar', () => {
           )}
         </UserAccount>
 
-        <Item>
-          <AnchorButton
-            href={aboutThisAppUrl}
-            icon={<Icon color={'white'} icon={'help'} />}
-            minimal={true}
-            rel={'noopener noreferrer'}
-            target={'_blank'}
-            title={dc.help}
-          />
-        </Item>
+        <IconButtons>
+          <Item>
+            <AnchorButton
+              href={feedbackUrl}
+              icon={<Icon color={'white'} icon={'send-message'} />}
+              minimal={true}
+              rel={'noopener noreferrer'}
+              target={'_blank'}
+              title={dc.feedback}
+            />
+          </Item>
+
+          <Item>
+            <AnchorButton
+              href={aboutThisAppUrl}
+              icon={<Icon color={'white'} icon={'help'} />}
+              minimal={true}
+              rel={'noopener noreferrer'}
+              target={'_blank'}
+              title={dc.help}
+            />
+          </Item>
+        </IconButtons>
       </Row2>
     </Wrapper>
   );
@@ -231,4 +244,8 @@ const ItemAnchor = styled(Anchor)`
     text-decoration: none;
     background-color: rgba(255, 255, 255, 0.15);
   }
+`;
+
+const IconButtons = styled.div`
+  display: flex;
 `;
