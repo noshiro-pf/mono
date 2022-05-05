@@ -22,7 +22,7 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     container:
-      image: cypress/browsers:node16.5.0-chrome97-ff96
+      image: cypress/browsers:node16.13.2-chrome100-ff98
       options: --user 1001
 
     steps:
