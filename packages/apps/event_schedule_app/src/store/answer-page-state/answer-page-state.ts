@@ -21,11 +21,7 @@ import {
 } from '../../functions';
 import type { AnswerSelectionValue } from '../../types';
 import { fireAuthUser$ } from '../auth';
-import {
-  answers$,
-  eventSchedule$,
-  fetchAnswers,
-} from '../fetched-values-state';
+import { answers$, AnswersFetchState, eventSchedule$ } from '../fetch-state';
 import { router } from '../router';
 
 const toast = createToaster();
@@ -46,7 +42,7 @@ const {
 
 const {
   state$: answerBeingEditedSectionState$,
-  setState: setAnswerBeingEditedSectionState,
+  setState: _setAnswerBeingEditedSectionState,
 } = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
 const {
@@ -54,6 +50,21 @@ const {
   setState: setAnswerBeingEdited,
   updateState: updateAnswerBeingEdited,
 } = createState(answerDefaultValue);
+
+const setAnswerBeingEditedSectionState = (
+  nextState: 'creating' | 'editing' | 'hidden'
+): void => {
+  _setAnswerBeingEditedSectionState(nextState);
+
+  // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
+  if (nextState === 'creating') {
+    const user = mut_subscribedValues.user;
+
+    updateAnswerBeingEdited((ans) =>
+      IRecord.set(ans, 'user', IRecord.set(ans.user, 'id', user?.uid ?? null))
+    );
+  }
+};
 
 const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
   createVoidEventEmitter();
@@ -256,7 +267,7 @@ const onSubmitAnswerImpl = async (
 
           setSubmitButtonIsLoading(false);
           setAnswerBeingEditedSectionState('hidden');
-          fetchAnswers();
+          AnswersFetchState.fetchAnswers();
           clearAnswerBeingEditedFields();
           showToast({
             toast,
@@ -277,7 +288,7 @@ const onSubmitAnswerImpl = async (
           }
           setSubmitButtonIsLoading(false);
           setAnswerBeingEditedSectionState('hidden');
-          fetchAnswers();
+          AnswersFetchState.fetchAnswers();
           clearAnswerBeingEditedFields();
           showToast({
             toast,
@@ -291,6 +302,45 @@ const onSubmitAnswerImpl = async (
     case 'hidden':
       break;
   }
+};
+
+/* @internal */
+const onSubmitEmptyAnswerImpl = async (
+  eventId: string | undefined,
+  user: FireAuthUser | undefined
+): Promise<void> => {
+  if (eventId === undefined) return;
+  if (user === undefined) return;
+
+  setSubmitButtonIsLoading(true);
+
+  await api.answers
+    .add(
+      eventId,
+      pipe(answerDefaultValue)
+        .chain((a) => IRecord.set(a, 'createdAt', IDate.now()))
+        .chain((a) =>
+          IRecord.set(a, 'user', {
+            id: user.uid,
+            name: user.displayName ?? '',
+          })
+        ).value
+    )
+    .then((res) => {
+      if (Result.isErr(res)) {
+        console.error(res.value);
+      }
+
+      setSubmitButtonIsLoading(false);
+      setAnswerBeingEditedSectionState('hidden');
+      AnswersFetchState.fetchAnswers();
+      clearAnswerBeingEditedFields();
+      showToast({
+        toast,
+        message: dict.answerPage.answerLater.result.success,
+        intent: 'success',
+      });
+    });
 };
 
 /* @internal */
@@ -308,7 +358,7 @@ const onDeleteAnswerImpl = async (
     }
     setSubmitButtonIsLoading(false);
     setAnswerBeingEditedSectionState('hidden');
-    fetchAnswers();
+    AnswersFetchState.fetchAnswers();
     clearAnswerBeingEditedFields();
   });
 };
@@ -388,6 +438,7 @@ const mut_subscribedValues: {
   user: undefined,
   answerSelectionMap: answerSelectionMapDefaultValue,
 };
+
 router.eventId$.subscribe((id) => {
   mut_subscribedValues.eventId = id;
 });
@@ -429,8 +480,18 @@ const onSubmitAnswer = (): Promise<void> =>
     mut_subscribedValues.answerBeingEditedSectionState
   );
 
+const onSubmitEmptyAnswer = (): Promise<void> =>
+  onSubmitEmptyAnswerImpl(
+    mut_subscribedValues.eventId,
+    mut_subscribedValues.user
+  );
+
 const onSubmitAnswerClick = (): void => {
-  onSubmitAnswer().catch(console.error);
+  onSubmitAnswer().catch(noop);
+};
+
+const onSubmitEmptyAnswerClick = (): void => {
+  onSubmitEmptyAnswer().catch(noop);
 };
 
 const onDeleteAnswer = (): Promise<void> =>
@@ -621,6 +682,7 @@ export {
   onEditButtonClick,
   onSubmitAnswer,
   onSubmitAnswerClick,
+  onSubmitEmptyAnswerClick,
   setSubmitButtonIsLoading,
   onUserNameChange,
   onCommentChange,

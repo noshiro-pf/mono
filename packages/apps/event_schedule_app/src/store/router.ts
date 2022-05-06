@@ -32,6 +32,9 @@ export const router = {
     editPage$: pathnameTokens$
       .chain(mapI(isRoute.editPage))
       .chain(distinctUntilChangedI()),
+    eventListPage$: pathnameTokens$
+      .chain(mapI(isRoute.eventListPage))
+      .chain(distinctUntilChangedI()),
     registerPage$: pathnameTokens$
       .chain(mapI(isRoute.registerPage))
       .chain(distinctUntilChangedI()),
@@ -48,12 +51,14 @@ export const useShowPage = (): Readonly<{
   createPage: boolean;
   answerPage: boolean;
   editPage: boolean;
+  eventListPage: boolean;
   registerPage: boolean;
   signInPage: boolean;
 }> => {
   const createPage = useObservableValue(router.isRoute.createPage$);
   const answerPage = useObservableValue(router.isRoute.answerPage$);
   const editPage = useObservableValue(router.isRoute.editPage$);
+  const eventListPage = useObservableValue(router.isRoute.eventListPage$);
   const registerPage = useObservableValue(router.isRoute.registerPage$);
   const signInPage = useObservableValue(router.isRoute.signInPage$);
 
@@ -61,6 +66,7 @@ export const useShowPage = (): Readonly<{
     createPage,
     answerPage,
     editPage,
+    eventListPage,
     registerPage,
     signInPage,
   };

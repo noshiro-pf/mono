@@ -3,6 +3,7 @@ import { answerPageDictionary } from './answer-page';
 import { commonDictionary } from './common';
 import { createEventResultDialogDictionary } from './create-event-result-dialog';
 import { errorMessagesDictionary } from './error-messages';
+import { eventListPageDictionary } from './event-list-page';
 import { eventSettingsPageDictionary } from './event-settings-page';
 import { headerDictionary } from './header';
 import { iconDescriptionDefaultDictionary } from './icon-description-default';
@@ -15,6 +16,7 @@ export const dict = {
   topPage: 'トップページ',
 
   header: headerDictionary,
+  eventListPage: eventListPageDictionary,
   eventSettingsPage: eventSettingsPageDictionary,
   resultPage: resultPageDictionary,
   iconDescriptionDefault: iconDescriptionDefaultDictionary,

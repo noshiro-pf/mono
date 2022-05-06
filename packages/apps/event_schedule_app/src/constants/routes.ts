@@ -2,6 +2,7 @@ const pathToken = {
   createPage: 'create',
   answerPage: 'event',
   editPageSuffix: 'edit',
+  eventListPage: 'event-list',
   registerUser: 'register',
   signIn: 'signIn',
 } as const;
@@ -27,6 +28,8 @@ export const routes = {
   editPage: (eventId: string) =>
     `/${pathToken.answerPage}/${eventId}/${pathToken.editPageSuffix}/`,
 
+  eventListPage: `/${pathToken.eventListPage}/`,
+
   registerPage: `/${pathToken.registerUser}/`,
   signInPage: `/${pathToken.signIn}/`,
 } as const;
@@ -44,6 +47,10 @@ export const isRoute = {
     IList.isArrayOfLength3(pathnameTokens) &&
     pathnameTokens[0] === pathToken.answerPage &&
     pathnameTokens[2] === pathToken.editPageSuffix,
+
+  eventListPage: (pathnameTokens: readonly string[]): boolean =>
+    IList.isArrayOfLength1(pathnameTokens) &&
+    pathnameTokens[0] === pathToken.eventListPage,
 
   registerPage: (pathnameTokens: readonly string[]): boolean =>
     IList.isArrayOfLength1(pathnameTokens) &&

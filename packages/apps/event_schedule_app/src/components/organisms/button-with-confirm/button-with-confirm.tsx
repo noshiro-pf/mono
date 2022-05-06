@@ -7,18 +7,21 @@ type Props = DeepReadonly<{
   disabled?: boolean;
   loading?: boolean;
   buttonConfig: {
-    name: string;
+    name: string | undefined;
     intent?: Intent;
     icon?: IconName;
+    color?: string;
+    minimal?: boolean;
   };
   dialogConfig: {
     icon?: IconName;
     intent?: Intent;
     message: string;
+    description?: string;
     cancelButtonText: string;
     confirmButtonText: string;
   };
-  toastConfig: { message: string; intent: Intent };
+  toastConfig?: { message: string; intent: Intent };
 }>;
 
 const toast = createToaster();
@@ -43,11 +46,13 @@ export const ButtonWithConfirm = memoNamed<Props>(
     const onConfirm = useCallback(() => {
       if (!alive.current) return;
       const afterConfirm = (): void => {
-        showToast({
-          toast,
-          message: toastConfig.message,
-          intent: toastConfig.intent,
-        });
+        if (toastConfig !== undefined) {
+          showToast({
+            toast,
+            message: toastConfig.message,
+            intent: toastConfig.intent,
+          });
+        }
         handleClose();
       };
 
@@ -65,17 +70,20 @@ export const ButtonWithConfirm = memoNamed<Props>(
     return (
       <>
         <ButtonNowrapStyled
+          color={buttonConfig.color}
           data-cy={'button-with-confirmation'}
           disabled={disabled}
           icon={buttonConfig.icon}
           intent={buttonConfig.intent ?? 'none'}
           loading={loading}
+          minimal={buttonConfig.minimal}
           text={buttonConfig.name}
           onClick={handleOpen}
         />
         <ConfirmDialog
           cancelButtonText={dialogConfig.cancelButtonText}
           confirmButtonText={dialogConfig.confirmButtonText}
+          description={dialogConfig.description}
           icon={dialogConfig.icon}
           intent={dialogConfig.intent ?? 'none'}
           isOpen={isOpen}

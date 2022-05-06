@@ -13,9 +13,12 @@ import {
 import {
   addAnswer,
   addEventSchedule,
+  archiveEventSchedule,
   deleteAnswer,
+  fetchEventListOfUser,
   getAnswers,
   getEventSchedule,
+  unarchiveEventSchedule,
   updateAnswer,
   updateEventSchedule,
 } from './crud';
@@ -39,11 +42,16 @@ export const api = {
     add: addEventSchedule,
     get: getEventSchedule,
     update: updateEventSchedule,
+    archive: archiveEventSchedule,
+    unarchive: unarchiveEventSchedule,
   },
   answers: {
     add: addAnswer,
     getList: getAnswers,
     update: updateAnswer,
     delete: deleteAnswer,
+  },
+  eventList: {
+    get: fetchEventListOfUser,
   },
 } as const;

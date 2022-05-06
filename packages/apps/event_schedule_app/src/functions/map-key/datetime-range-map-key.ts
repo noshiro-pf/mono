@@ -1,4 +1,3 @@
-import type { PartialDatetimeRange } from '@noshiro/event-schedule-app-shared';
 import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
 
 export type DatetimeRangeMapKey = Phantomic<string, 'DatetimeRangeMapKey'>;
@@ -10,7 +9,4 @@ export const datetimeRangeToMapKey = (
 
 export const datetimeRangeFromMapKey = (
   key: DatetimeRangeMapKey
-): DatetimeRange =>
-  fillDatetimeRange(
-    Result.unwrapThrow(Json.parse(key)) as PartialDatetimeRange
-  );
+): DatetimeRange => fillDatetimeRange(Result.unwrapThrow(Json.parse(key)));

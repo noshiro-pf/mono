@@ -28,16 +28,16 @@ const toastConfig = {
 
 export const BackToAnswerPageButton = memoNamed<Props>(
   'BackToAnswerPageButton',
-  (props) =>
-    props.hasNoChanges ? (
-      <Button onClick={props.onConfirmClick}>{buttonConfig.name}</Button>
+  ({ hasNoChanges, onConfirmClick, disabled }) =>
+    hasNoChanges ? (
+      <Button onClick={onConfirmClick}>{buttonConfig.name}</Button>
     ) : (
       <ButtonWithConfirm
         buttonConfig={buttonConfig}
         dialogConfig={dialogConfig}
-        disabled={props.disabled}
+        disabled={disabled}
         toastConfig={toastConfig}
-        onConfirmClick={props.onConfirmClick}
+        onConfirmClick={onConfirmClick}
       />
     )
 );

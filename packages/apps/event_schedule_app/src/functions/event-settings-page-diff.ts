@@ -67,6 +67,7 @@ type EventSchedulePaths = StrictExclude<Paths<EventSchedule>, readonly []>;
         | ['answerIcons', 'poor', 'point']
         | ['answerIcons', 'poor']
         | ['answerIcons']
+        | ['archivedBy']
         | ['author', 'id']
         | ['author', 'name']
         | ['author']
@@ -136,7 +137,7 @@ const notificationSettingsDiff = (
   return collectedDiff;
 };
 
-const tilde = dict.common.date.timeRangeTilde;
+const tilde = dict.common.tilde;
 
 const datetimeRange2str = (
   datetimeSpecification: EventSchedule['datetimeSpecification'],

@@ -12,24 +12,27 @@ type Props = Readonly<{
 
 export const ParagraphWithSwitch = memoNamed<Props>(
   'ParagraphWithSwitch',
-  (props) => (
+  ({
+    elementToToggle,
+    hideContentIfToggleIsFalse,
+    onToggle,
+    title,
+    toggleState,
+    description,
+  }) => (
     <div>
       <SwitchWrapper>
-        <div>{props.title}</div>
+        <div>{title}</div>
         <SwitchWithoutLabelStyled
-          checked={props.toggleState}
+          checked={toggleState}
           inline={true}
-          onChange={props.onToggle}
+          onChange={onToggle}
         />
       </SwitchWrapper>
-      {props.description === undefined
+      {description === undefined
         ? undefined
-        : IList.map(props.description, (d, i) => (
-            <Description key={i} text={d} />
-          ))}
-      {props.hideContentIfToggleIsFalse && !props.toggleState
-        ? undefined
-        : props.elementToToggle}
+        : IList.map(description, (d, i) => <Description key={i} text={d} />)}
+      {hideContentIfToggleIsFalse && !toggleState ? undefined : elementToToggle}
     </div>
   )
 );

@@ -8,9 +8,14 @@ export const commonDictionary = {
     timeRangeTilde: '～',
   },
   colon: '：',
+  tilde: '～',
   brace: {
     start: '(',
     end: ')',
+  },
+  braceJp: {
+    start: '（',
+    end: '）',
   },
   buttonText: {
     decide: '決定',

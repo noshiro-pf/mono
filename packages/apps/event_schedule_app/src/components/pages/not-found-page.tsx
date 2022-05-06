@@ -1,7 +1,8 @@
-import { AnchorButton, NonIdealState } from '@blueprintjs/core';
+import { Icon, NonIdealState } from '@blueprintjs/core';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { routes } from '../../constants';
 import { router } from '../../store';
+import { Anchor } from '../bp';
 
 export const NotFoundPage = memoNamed('NotFoundPage', () => {
   const onClick = useRouterLinkClick({
@@ -13,9 +14,10 @@ export const NotFoundPage = memoNamed('NotFoundPage', () => {
   return (
     <NonIdealState
       action={
-        <AnchorButton href={routes.createPage} icon={'home'} onClick={onClick}>
+        <Anchor href={routes.createPage} onClick={onClick}>
+          <Icon icon={'home'} />
           {dict.topPage}
-        </AnchorButton>
+        </Anchor>
       }
       icon={'search'}
       title={dict.pageNotFound}

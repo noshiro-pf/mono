@@ -1,5 +1,4 @@
 import { Icon } from '@blueprintjs/core';
-import { routes } from '../../constants';
 import { NavBar } from './navbar';
 
 type Props = Readonly<{
@@ -10,7 +9,7 @@ export const Header = memoNamed<Props>('Header', ({ title }) => (
   <div>
     <NavBar />
     <Wrapper>
-      <Title href={routes.createPage} rel='noopener noreferrer' target='_blank'>
+      <Title>
         <Icon icon={'timeline-events'} iconSize={28} />
         <div>{title}</div>
       </Title>
@@ -26,7 +25,7 @@ const Wrapper = styled.div`
   margin: 0 20px;
 `;
 
-const Title = styled.a`
+const Title = styled.span`
   display: flex;
   align-items: center;
   & > * {

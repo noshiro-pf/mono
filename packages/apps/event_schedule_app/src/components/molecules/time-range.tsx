@@ -7,27 +7,32 @@ type Props = Readonly<{
   onRangeEndChange: (hm: HoursMinutes) => void;
 }>;
 
-export const TimeRangeView = memoNamed<Props>('TimeRangeView', (props) => (
-  <TimeRangeWrapper>
-    {props.datetimeSpecification === 'startSpecified' ||
-    props.datetimeSpecification === 'startAndEndSpecified' ? (
-      <BpTimePicker
-        time={props.timeRange.start}
-        onTimeChange={props.onRangeStartChange}
-      />
-    ) : undefined}
-    {props.datetimeSpecification !== 'noStartEndSpecified' ? (
-      <div>{dict.common.date.timeRangeTilde}</div>
-    ) : undefined}
-    {props.datetimeSpecification === 'endSpecified' ||
-    props.datetimeSpecification === 'startAndEndSpecified' ? (
-      <BpTimePicker
-        time={props.timeRange.end}
-        onTimeChange={props.onRangeEndChange}
-      />
-    ) : undefined}
-  </TimeRangeWrapper>
-));
+export const TimeRangeView = memoNamed<Props>(
+  'TimeRangeView',
+  ({
+    datetimeSpecification,
+    onRangeEndChange,
+    onRangeStartChange,
+    timeRange,
+  }) => (
+    <TimeRangeWrapper>
+      {datetimeSpecification === 'startSpecified' ||
+      datetimeSpecification === 'startAndEndSpecified' ? (
+        <BpTimePicker
+          time={timeRange.start}
+          onTimeChange={onRangeStartChange}
+        />
+      ) : undefined}
+      {datetimeSpecification !== 'noStartEndSpecified' ? (
+        <div>{dict.common.tilde}</div>
+      ) : undefined}
+      {datetimeSpecification === 'endSpecified' ||
+      datetimeSpecification === 'startAndEndSpecified' ? (
+        <BpTimePicker time={timeRange.end} onTimeChange={onRangeEndChange} />
+      ) : undefined}
+    </TimeRangeWrapper>
+  )
+);
 
 const TimeRangeWrapper = styled.div`
   display: flex;

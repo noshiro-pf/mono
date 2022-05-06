@@ -1,6 +1,13 @@
 # v6
 
 -   `AnswerSelection` 型に `comment` フィールドを追加。各日程に対する回答にコメントを追加できるようにするため。
+-   `EventListItem` 追加
+
+## v6.1
+
+-   各 fill 関数の引数の型を `unknown` に変更
+-   変更が多くなったため一旦 types 配下を ~v5 から引き継がずに再作成
+-   `EventSchedule` に `archivedBy` を追加
 
 # v5
 
@@ -10,6 +17,7 @@
 -   `Answer` の `userName: string` プロパティを削除し `user: User` に変更
 -   `defaultX` -> `XDefaultValues` にリネーム
 -   phantom types の使用を中止（型ユーティリティが望ましくない挙動をしてしまうので）
+-   `EventScheduleValidation`と`AnswerTableCellPosition` の削除（frontend でしか使わない型なので）
 
 # v4
 

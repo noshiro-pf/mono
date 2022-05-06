@@ -8,6 +8,7 @@ export * from './event-settings-page-diff';
 export * from './fetch-holidays';
 export * from './icon-settings-component';
 export * from './input-state';
+export * from './is-after-deadline';
 export * from './local-storage';
 export * from './map-key';
 export * from './multiple-date-picker';

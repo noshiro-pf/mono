@@ -7,7 +7,7 @@ import {
   datetimeRange2str,
 } from '../../functions';
 import type { AnswerTableCell, AnswerTableCellPosition } from '../../types';
-import { answers$, eventSchedule$ } from '../fetched-values-state';
+import { answers$, eventSchedule$ } from '../fetch-state';
 import { AnswerTableFilteringAndSortingManager } from './answer-table-filtering-state-manager';
 
 const answerSelectionMap$: InitializedObservable<

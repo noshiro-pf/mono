@@ -1,12 +1,15 @@
 import {
   answerDeadlineRemainingDaysDefaultValue,
+  datetimeRangeDefaultValue,
   notificationSettingsDefaultValue,
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
 import { defaultIconPoint } from './default-icon-point';
 import { dict } from './dictionary';
 
-export const initialDatetimeRangeList: readonly DatetimeRange[] = [];
+export const initialDatetimeRangeList: NonEmptyArray<DatetimeRange> = [
+  datetimeRangeDefaultValue,
+];
 
 export const initialAnswerIcons: AnswerIconSettings = {
   good: {
@@ -56,4 +59,5 @@ export const initialEventSchedule: EventSchedule = {
     id: null,
     name: '',
   },
+  archivedBy: [],
 };

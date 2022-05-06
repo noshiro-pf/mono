@@ -1,3 +1,4 @@
+import { Description } from '../../atoms';
 import { AlertWithMaxWidth } from '../../bp';
 
 type Props = Readonly<{
@@ -7,6 +8,7 @@ type Props = Readonly<{
   cancelButtonText: string;
   confirmButtonText: string;
   message: string;
+  description?: string;
   icon: IconName | undefined;
   intent: Intent;
 }>;
@@ -20,6 +22,7 @@ export const ConfirmDialog = memoNamed<Props>(
     cancelButtonText,
     confirmButtonText,
     message,
+    description,
     icon,
     intent,
   }) => (
@@ -35,6 +38,9 @@ export const ConfirmDialog = memoNamed<Props>(
       onConfirm={onConfirm}
     >
       <p>{message}</p>
+      {description === undefined ? undefined : (
+        <Description text={description} />
+      )}
     </AlertWithMaxWidth>
   )
 );

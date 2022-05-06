@@ -18,4 +18,5 @@ export const headerDictionary = {
     },
   },
   help: 'ヘルプ',
+  feedback: 'フィードバック',
 } as const;

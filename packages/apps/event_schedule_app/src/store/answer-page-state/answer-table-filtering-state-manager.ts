@@ -1,7 +1,7 @@
 import type { TagProps } from '@blueprintjs/core';
 import { queryParamKey as queryParamKeys } from '../../constants';
 import type { AnswerTableFilteringState } from '../../types';
-import { answers$ } from '../fetched-values-state';
+import { answers$ } from '../fetch-state';
 import { router } from '../router';
 import { AnswerTableFilteringStateReducer } from './answer-table-filtering-state-reducer';
 

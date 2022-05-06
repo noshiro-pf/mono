@@ -8,7 +8,7 @@ import {
   showToast,
 } from '../../functions';
 import type { EventScheduleSettingCommonState } from '../../types';
-import { fetchAnswers, fetchEventSchedule } from '../fetched-values-state';
+import { AnswersFetchState, EventScheduleFetchState } from '../fetch-state';
 import { router } from '../router';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';
 
@@ -118,8 +118,8 @@ export namespace EditEventScheduleStore {
     }
 
     setIsLoadingFalse();
-    fetchAnswers();
-    fetchEventSchedule();
+    AnswersFetchState.fetchAnswers();
+    EventScheduleFetchState.fetchEventSchedule();
     onBackToAnswerPage();
     showToast({
       toast,

@@ -122,7 +122,9 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             title,
             notes,
             datetimeSpecification,
-            datetimeRangeList,
+            datetimeRangeList: IList.isArrayOfLength1OrMore(datetimeRangeList)
+              ? datetimeRangeList
+              : eventScheduleDefaultValue.datetimeRangeList,
             answerDeadline: answerDeadline ?? 'none',
             answerIcons,
             notificationSettings: notificationSettings ?? 'none',
@@ -132,6 +134,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
               id: user?.uid ?? null,
               name: user?.displayName ?? '',
             },
+            archivedBy: [],
           })
       )
     );
