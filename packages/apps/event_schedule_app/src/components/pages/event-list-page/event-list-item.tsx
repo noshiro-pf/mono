@@ -93,63 +93,59 @@ export const EventListItemComponent = memoNamed<Props>(
     );
 
     return (
-      <ListItemWrapper key={eventId}>
-        <ListItem onClick={onLinkClick}>
-          <Header>
-            <SectionTitle>{dc.listItem.name(eventSchedule.title)}</SectionTitle>
-            <Info>
-              <UpdatedAtWrapper>
-                <UpdatedAt>
-                  <span>
-                    {dc.listItem.lastUpdate}
-                    {dict.common.colon}
-                  </span>
-                  <span>{lastUpdateStr}</span>
-                </UpdatedAt>
-              </UpdatedAtWrapper>
-              <ArchiveButtonWrapper>
-                <ArchiveEventButton
-                  archiveOrUnArchive={archiveOrUnArchive}
-                  onConfirm={archiveEventButtonHandler}
-                />
-              </ArchiveButtonWrapper>
-            </Info>
-          </Header>
-          <TableContainer>
-            <TableLabel1>{dc.listItem.answerDeadline}</TableLabel1>
-            <TableValue1>
-              {eventSchedule.answerDeadline === 'none' ? (
-                <div>{dict.answerPage.eventInfo.noAnswerDeadline}</div>
-              ) : (
-                <div>
-                  <span>{ymdhm2strWithDay(eventSchedule.answerDeadline)}</span>
-                  {afterDeadline ? (
-                    <AlertText>
-                      {`${dict.common.braceJp.start}${dc.listItem.expired}${dict.common.braceJp.end}`}
-                    </AlertText>
-                  ) : undefined}
-                </div>
-              )}
-            </TableValue1>
-            <TableLabel2>{dc.listItem.datetimeOptions}</TableLabel2>
-            <TableValue2>
-              {datetimeOptionsSummary}
-              {hasUnanswered ? (
-                <AlertText>{dc.listItem.hasUnanswered}</AlertText>
-              ) : undefined}
-            </TableValue2>
-            <TableLabel3>{dc.listItem.author}</TableLabel3>
-            <TableValue3>{authorName}</TableValue3>
-          </TableContainer>
-        </ListItem>
-      </ListItemWrapper>
+      <ListItem onClick={onLinkClick}>
+        <Header>
+          <SectionTitleFlex title={dc.listItem.name(eventSchedule.title)}>
+            {dc.listItem.name(eventSchedule.title)}
+          </SectionTitleFlex>
+          <Info>
+            <UpdatedAtWrapper>
+              <UpdatedAt>
+                <span>
+                  {dc.listItem.lastUpdate}
+                  {dict.common.colon}
+                </span>
+                <span>{lastUpdateStr}</span>
+              </UpdatedAt>
+            </UpdatedAtWrapper>
+            <ArchiveButtonWrapper>
+              <ArchiveEventButton
+                archiveOrUnArchive={archiveOrUnArchive}
+                onConfirm={archiveEventButtonHandler}
+              />
+            </ArchiveButtonWrapper>
+          </Info>
+        </Header>
+        <TableContainer>
+          <TableLabel1>{dc.listItem.answerDeadline}</TableLabel1>
+          <TableValue1>
+            {eventSchedule.answerDeadline === 'none' ? (
+              <div>{dict.answerPage.eventInfo.noAnswerDeadline}</div>
+            ) : (
+              <div>
+                <span>{ymdhm2strWithDay(eventSchedule.answerDeadline)}</span>
+                {afterDeadline ? (
+                  <AlertText>
+                    {`${dict.common.braceJp.start}${dc.listItem.expired}${dict.common.braceJp.end}`}
+                  </AlertText>
+                ) : undefined}
+              </div>
+            )}
+          </TableValue1>
+          <TableLabel2>{dc.listItem.datetimeOptions}</TableLabel2>
+          <TableValue2>
+            {datetimeOptionsSummary}
+            {hasUnanswered ? (
+              <AlertText>{dc.listItem.hasUnanswered}</AlertText>
+            ) : undefined}
+          </TableValue2>
+          <TableLabel3>{dc.listItem.author}</TableLabel3>
+          <TableValue3>{authorName}</TableValue3>
+        </TableContainer>
+      </ListItem>
     );
   }
 );
-
-const ListItemWrapper = styled.div`
-  margin: 10px 0;
-`;
 
 const ListItem = styled.div`
   /* reset anchor element default styles */
@@ -191,7 +187,14 @@ const Header = styled.div`
   white-space: nowrap;
 `;
 
+const SectionTitleFlex = styled(SectionTitle)`
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
 const Info = styled.div`
+  flex: 0;
   display: flex;
   align-items: center;
   color: ${eventListItemTextColor};

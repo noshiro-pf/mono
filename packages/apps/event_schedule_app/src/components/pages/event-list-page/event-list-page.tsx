@@ -182,16 +182,18 @@ export const EventListPage = memoNamed('EventListPage', () => {
             </Button>
           </ItemCountAndRefresh>
 
-          {eventListWithHandler.map(([eventListItem, archive, unarchive]) => (
-            <EventListItemComponent
-              key={eventListItem.eventScheduleMetadata.id}
-              archiveOrUnArchive={archiveOrUnArchive}
-              eventListItem={eventListItem}
-              fireAuthUser={fireAuthUser}
-              onConfirmArchiving={archive}
-              onConfirmUnArchiving={unarchive}
-            />
-          ))}
+          <ListItemsWrapper>
+            {eventListWithHandler.map(([eventListItem, archive, unarchive]) => (
+              <EventListItemComponent
+                key={eventListItem.eventScheduleMetadata.id}
+                archiveOrUnArchive={archiveOrUnArchive}
+                eventListItem={eventListItem}
+                fireAuthUser={fireAuthUser}
+                onConfirmArchiving={archive}
+                onConfirmUnArchiving={unarchive}
+              />
+            ))}
+          </ListItemsWrapper>
         </Body>
       )}
     </div>
@@ -215,4 +217,10 @@ const FilterByArea = styled.div`
 
 const ItemCountAndRefresh = styled(FilterByArea)`
   justify-content: space-between;
+`;
+
+const ListItemsWrapper = styled.div`
+  > * {
+    margin: 10px 0;
+  }
 `;
