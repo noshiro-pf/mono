@@ -1,8 +1,8 @@
-import { descriptionFontColor } from '../../../constants';
-import { EditEventScheduleStore, router } from '../../../store';
+import { descriptionFontColor, errorFontColor } from '../../../constants';
+import { EditEventScheduleStore } from '../../../store';
+import { Description } from '../../atoms';
 import {
   BackToAnswerPageButton,
-  ConfirmEmailDialog,
   EventScheduleDiff,
   ResetEditButton,
   SubmitEditingEventButton,
@@ -13,22 +13,20 @@ import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 const dc = dict.eventSettingsPage;
 
 type Props = Readonly<{
-  eventSchedule: EventSchedule;
-  editPageIsHidden: boolean;
-  makeItPassTheEmailConfirmation: () => void;
+  eventScheduleSaved: EventSchedule;
 }>;
 
 export const EditEventScheduleOk = memoNamed<Props>(
   'EditEventScheduleOk',
-  ({ eventSchedule, editPageIsHidden, makeItPassTheEmailConfirmation }) => {
+  ({ eventScheduleSaved }) => {
     const commonState = useObservableValue(EditEventScheduleStore.commonState$);
     const hasNoChanges = useObservableValue(
       EditEventScheduleStore.hasNoChanges$
     );
 
     useEffect(() => {
-      EditEventScheduleStore.setEventSchedule(eventSchedule);
-    }, [eventSchedule]);
+      EditEventScheduleStore.setEventSchedule(eventScheduleSaved);
+    }, [eventScheduleSaved]);
 
     const editButtonIsLoading = useObservableValue(
       EditEventScheduleStore.isLoading$
@@ -40,53 +38,55 @@ export const EditEventScheduleOk = memoNamed<Props>(
       EditEventScheduleStore.hasDeletedDatetimeChanges$
     );
 
-    const { eventScheduleValidationOk } = commonState;
+    const {
+      eventScheduleValidationOk,
+      notificationSettings,
+      eventScheduleValidation,
+    } = commonState;
 
     return (
       <>
-        <SubTitle>{dc.editSubTitle(eventSchedule.title)}</SubTitle>
+        <SubTitle>{dc.editSubTitle(eventScheduleSaved.title)}</SubTitle>
 
-        {eventSchedule.notificationSettings === 'none' ? undefined : (
-          <ConfirmEmailDialog
-            back={router.back}
-            emailAnswer={eventSchedule.notificationSettings.email}
-            isOpen={editPageIsHidden}
-            onSuccess={makeItPassTheEmailConfirmation}
-          />
-        )}
+        <EventScheduleSettingCommon
+          handlers={EditEventScheduleStore.commonStateHandlers}
+          state={commonState}
+        />
 
-        {editPageIsHidden ? undefined : (
-          <>
-            <EventScheduleSettingCommon
-              handlers={EditEventScheduleStore.commonStateHandlers}
-              state={commonState}
+        {notificationSettings !== undefined &&
+        !eventScheduleValidation.notificationEmail ? (
+          <ErrorMessagesWrapper>
+            <Description
+              color={errorFontColor}
+              text={dc.noteOnEmailInEditPage}
             />
-            <ButtonsWrapperForEventSettingsPage>
-              <BackToAnswerPageButton
-                disabled={editButtonIsLoading}
-                hasNoChanges={hasNoChanges}
-                onConfirmClick={EditEventScheduleStore.onBackToAnswerPage}
-              />
-              <ResetEditButton
-                disabled={editButtonIsLoading || hasNoChanges}
-                onConfirmClick={EditEventScheduleStore.resetAllState}
-              />
-              <div data-cy={'submit-button'}>
-                <SubmitEditingEventButton
-                  disabled={
-                    !eventScheduleValidationOk ||
-                    editButtonIsLoading ||
-                    hasNoChanges
-                  }
-                  loading={editButtonIsLoading}
-                  showConfirmationDialog={hasDeletedDatetimeChanges}
-                  onConfirmClick={EditEventScheduleStore.onEditEventClick}
-                />
-              </div>
-            </ButtonsWrapperForEventSettingsPage>
-            <EventScheduleDiff diff={diff} />
-          </>
-        )}
+          </ErrorMessagesWrapper>
+        ) : undefined}
+
+        <ButtonsWrapperForEventSettingsPage>
+          <BackToAnswerPageButton
+            disabled={editButtonIsLoading}
+            hasNoChanges={hasNoChanges}
+            onConfirmClick={EditEventScheduleStore.onBackToAnswerPage}
+          />
+          <ResetEditButton
+            disabled={editButtonIsLoading || hasNoChanges}
+            onConfirmClick={EditEventScheduleStore.resetAllState}
+          />
+          <div data-cy={'submit-button'}>
+            <SubmitEditingEventButton
+              disabled={
+                !eventScheduleValidationOk ||
+                editButtonIsLoading ||
+                hasNoChanges
+              }
+              loading={editButtonIsLoading}
+              showConfirmationDialog={hasDeletedDatetimeChanges}
+              onConfirmClick={EditEventScheduleStore.onEditEventClick}
+            />
+          </div>
+        </ButtonsWrapperForEventSettingsPage>
+        <EventScheduleDiff diff={diff} />
       </>
     );
   }
@@ -95,4 +95,8 @@ export const EditEventScheduleOk = memoNamed<Props>(
 const SubTitle = styled('div')`
   margin: 10px 20px;
   color: ${descriptionFontColor.normal};
+`;
+
+const ErrorMessagesWrapper = styled.div`
+  margin: 10px;
 `;

@@ -1,9 +1,5 @@
 import { Spinner } from '@blueprintjs/core';
-import {
-  EventScheduleFetchState,
-  router,
-  useFireAuthUser,
-} from '../../../store';
+import { EventScheduleFetchState, router } from '../../../store';
 import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { EditEventScheduleOk } from './edit-event-schedule-main';
@@ -17,19 +13,6 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
     EventScheduleFetchState.result$
   );
 
-  const {
-    state: emailConfirmationHasPassed,
-    setTrue: makeItPassTheEmailConfirmation,
-  } = useBoolState(false);
-
-  const user = useFireAuthUser();
-
-  const editPageIsHidden: boolean =
-    Result.isOk(eventScheduleResult) &&
-    eventScheduleResult.value.notificationSettings !== 'none' &&
-    !emailConfirmationHasPassed &&
-    eventScheduleResult.value.notificationSettings.email !== user?.email;
-
   return Result.isErr(eventScheduleResult) &&
     eventScheduleResult.value.type === 'not-found' ? (
     <NotFoundPage />
@@ -41,11 +24,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
       ) : eventId === undefined || eventScheduleResult === undefined ? (
         <Spinner />
       ) : (
-        <EditEventScheduleOk
-          editPageIsHidden={editPageIsHidden}
-          eventSchedule={eventScheduleResult.value}
-          makeItPassTheEmailConfirmation={makeItPassTheEmailConfirmation}
-        />
+        <EditEventScheduleOk eventScheduleSaved={eventScheduleResult.value} />
       )}
     </div>
   );

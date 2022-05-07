@@ -9,6 +9,7 @@ import {
 import admin from 'firebase-admin';
 import { auth, firestore, https, pubsub } from 'firebase-functions';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
+import { fetchEventOfIdImpl } from './fetch-event-schedule';
 import { collectionPath } from './firestore-paths';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
@@ -109,4 +110,15 @@ export const fetchEventListOfUser = https.onCall((payload, context) => {
   }
 
   return fetchEventListOfUserImpl(db, payload, context);
+});
+
+export const fetchEventOfId = https.onCall((payload, _context) => {
+  if (!(isNonNullObject(payload) && hasKeyValue(payload, 'id', isString))) {
+    throw new https.HttpsError(
+      'invalid-argument',
+      'The payload type is invalid.'
+    );
+  }
+
+  return fetchEventOfIdImpl(db, payload.id);
 });

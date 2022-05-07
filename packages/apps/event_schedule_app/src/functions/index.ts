@@ -1,7 +1,6 @@
 export * from './answer-being-edited-component';
 export * from './answers-page';
 export * from './clamp-value';
-export * from './confirm-email-dialog-state';
 export * from './create-event-schedule-page';
 export * from './datetime-range-to-str';
 export * from './event-settings-page-diff';
