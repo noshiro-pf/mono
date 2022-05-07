@@ -39,7 +39,6 @@ export const EventListItemComponent = memoNamed<Props>(
   }) => {
     const onLinkClick = useCallback(() => {
       router.push(routes.answerPage(eventId));
-      console.log('onLinkClick');
     }, [eventId]);
 
     const hasUnanswered = useMemo<boolean>(
