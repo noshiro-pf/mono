@@ -6,7 +6,9 @@ name: E2E test for event-schedule-app
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [main]
+    branches:
+      - main
+      - add-a-step-to-install-java
     paths-ignore:
       - 'docs/**'
       - 'experimental/**'
