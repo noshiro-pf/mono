@@ -40,7 +40,7 @@ export const auth = getAuth();
 
 export const googleAuthProvider = new GoogleAuthProvider();
 
-export const functions = getFunctions(app);
+export const functions = getFunctions(app, 'asia-northeast2');
 
 if (isDevelopment) {
   connectFirestoreEmulator(

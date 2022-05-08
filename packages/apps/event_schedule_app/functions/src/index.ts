@@ -7,7 +7,7 @@ import {
   isString,
 } from '@noshiro/ts-utils';
 import admin from 'firebase-admin';
-import { auth, firestore, https, pubsub } from 'firebase-functions';
+import { https, region } from 'firebase-functions';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
 import { fetchEventOfIdImpl } from './fetch-event-schedule';
 import { collectionPath } from './firestore-paths';
@@ -18,6 +18,8 @@ import { fillAnswerWithCheck, toStringWithCheck } from './type-check';
 
 admin.initializeApp();
 
+const regionSelected = region('asia-northeast2');
+
 const db = admin.firestore();
 
 const wildcard = {
@@ -27,7 +29,7 @@ const wildcard = {
 
 const answerDocPath = `${collectionPath.events}/{${wildcard.eventId}}/${collectionPath.answers}/{${wildcard.answerId}}`;
 
-export const answerCreationListener = firestore
+export const answerCreationListener = regionSelected.firestore
   .document(answerDocPath)
   .onCreate((snapshot, context) =>
     notifyOnAnswerChangeBody({
@@ -38,7 +40,7 @@ export const answerCreationListener = firestore
     })
   );
 
-export const answerDeletionListener = firestore
+export const answerDeletionListener = regionSelected.firestore
   .document(answerDocPath)
   .onDelete((snapshot, context) =>
     notifyOnAnswerChangeBody({
@@ -49,7 +51,7 @@ export const answerDeletionListener = firestore
     })
   );
 
-export const answerUpdateListener = firestore
+export const answerUpdateListener = regionSelected.firestore
   .document(answerDocPath)
   .onUpdate((change, context) =>
     notifyOnAnswerChangeBody({
@@ -60,7 +62,7 @@ export const answerUpdateListener = firestore
     })
   );
 
-export const notifyAnswerDeadlineEveryday = pubsub
+export const notifyAnswerDeadlineEveryday = regionSelected.pubsub
   .schedule('00 12 * * *')
   .timeZone('Asia/Tokyo')
   .onRun(notifyAnswerDeadline);
@@ -84,41 +86,47 @@ export const notifyAnswerDeadlineEveryday = pubsub
 //   });
 // });
 
-export const userDeletionListener = auth.user().onDelete((user) => {
-  onUserDelete(db, user).catch(console.error);
-});
+export const userDeletionListener = regionSelected.auth
+  .user()
+  .onDelete((user) => {
+    onUserDelete(db, user).catch(console.error);
+  });
 
-export const fetchEventListOfUser = https.onCall((payload, context) => {
-  if (
-    !(
-      isNonNullObject(payload) &&
-      hasKeyValue(payload, 'filterText', isString) &&
-      hasKeyValue(
-        payload,
-        'filterOptionState',
-        (v: unknown): v is 'archive' | 'inProgress' =>
-          v === 'archive' || v === 'inProgress'
-      ) &&
-      hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
-      hasKeyValue(payload, 'showOnlyEventSchedulesICreated', isBoolean)
-    )
-  ) {
-    throw new https.HttpsError(
-      'invalid-argument',
-      'The payload type is invalid.'
-    );
+export const fetchEventListOfUser = region('asia-northeast2').https.onCall(
+  (payload, context) => {
+    if (
+      !(
+        isNonNullObject(payload) &&
+        hasKeyValue(payload, 'filterText', isString) &&
+        hasKeyValue(
+          payload,
+          'filterOptionState',
+          (v: unknown): v is 'archive' | 'inProgress' =>
+            v === 'archive' || v === 'inProgress'
+        ) &&
+        hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
+        hasKeyValue(payload, 'showOnlyEventSchedulesICreated', isBoolean)
+      )
+    ) {
+      throw new https.HttpsError(
+        'invalid-argument',
+        'The payload type is invalid.'
+      );
+    }
+
+    return fetchEventListOfUserImpl(db, payload, context);
   }
+);
 
-  return fetchEventListOfUserImpl(db, payload, context);
-});
+export const fetchEventOfId = region('asia-northeast2').https.onCall(
+  (payload, _context) => {
+    if (!(isNonNullObject(payload) && hasKeyValue(payload, 'id', isString))) {
+      throw new https.HttpsError(
+        'invalid-argument',
+        'The payload type is invalid.'
+      );
+    }
 
-export const fetchEventOfId = https.onCall((payload, _context) => {
-  if (!(isNonNullObject(payload) && hasKeyValue(payload, 'id', isString))) {
-    throw new https.HttpsError(
-      'invalid-argument',
-      'The payload type is invalid.'
-    );
+    return fetchEventOfIdImpl(db, payload.id);
   }
-
-  return fetchEventOfIdImpl(db, payload.id);
-});
+);
