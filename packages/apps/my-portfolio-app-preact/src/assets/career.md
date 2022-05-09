@@ -1,4 +1,12 @@
-# プロフィール
+# Links
+
+-   Github： https://github.com/noshiro-pf
+-   forkwell jobs： https://portfolio.forkwell.com/@Hideaki_Noshiro
+-   Wantedly： https://www.wantedly.com/id/hideaki_noshiro
+-   Twitter： https://twitter.com/noshiro_piko
+-   居住地： Tokyo
+
+# 経歴
 
 ## 職歴
 
@@ -25,16 +33,11 @@
 
 ## 学会発表
 
--   「複数の巡査の協力による指定地点の警邏について」（修士）
+-   [「複数の巡査の協力による指定地点の警邏について」](https://jglobal.jst.go.jp/detail?JGLOBAL_ID=201602274789933209)（修士）
     -   「警邏問題」と呼ばれる離散数学の問題の計算量クラスの解析（多項式時間アルゴリズムの構成や NP 困難性の証明）
     -   情報処理学会（2016 年 9 月，徳島）
     -   電子情報通信学会大会（2017 年 3 月，名古屋）
 -   「ZDD による RNA 二次構造集合の表現と頻出構造マイニング」（卒業研究）
+    -   ZDD と呼ばれるデータ構造を用いて RNA の二次構造の集合を効率良く表現し、頻出構造のマイニングを行う手法について
+        -   ZDD に独自の改変を加えて計算実験を行うために、C++でゼロから実装した。
     -   第 39 回日本分子生物学会年会（2016 年 11 月，横浜）
-
-## Links
-
--   Github: https://github.com/noshiro-pf
--   forkwell jobs: https://portfolio.forkwell.com/@Hideaki_Noshiro
--   Wantedly: https://www.wantedly.com/id/hideaki_noshiro
--   居住地： Tokyo

@@ -3,7 +3,7 @@ import { memoNamed } from '@noshiro/preact-utils';
 import { push, redirect, usePathname } from '@noshiro/tiny-router-preact-hooks';
 import Markdown from 'preact-markdown';
 import { useEffect, useMemo } from 'preact/hooks';
-import { Profile2Md, ProfileMd, SkillsMd } from './assets';
+import { BiographyMd, CareerMd, CatIconImage, SkillsMd } from './assets';
 import {
   GithubIconLink,
   LastUpdated,
@@ -30,6 +30,20 @@ const tabIndexOnChange = (tabIdx: number): void => {
   }
 };
 
+const LiSpacedBlock = styled('div')`
+  li {
+    margin: 7px 0;
+  }
+`;
+
+const pages = {
+  [routes.career]: <LiSpacedBlock>{Markdown(CareerMd)}</LiSpacedBlock>,
+  [routes.biography]: <LiSpacedBlock>{Markdown(BiographyMd)}</LiSpacedBlock>,
+  [routes.skills]: Markdown(SkillsMd),
+  [routes.products]: <Products />,
+  [routes.writings]: <Writings />,
+};
+
 export const Main = memoNamed('Main', () => {
   const pathname = usePathname();
 
@@ -47,19 +61,26 @@ export const Main = memoNamed('Main', () => {
 
   useEffect(() => {
     if (tabIndex === undefined) {
-      redirect(routes.profile);
+      redirect(routes.career);
     }
   }, [pathname, tabIndex]);
 
   return (
     <Root>
       <AppBarFlex>
+        <IconButtons>
+          <IconButton title={'ねこかわいい'}>
+            <ImgStyled src={CatIconImage} />
+          </IconButton>
+        </IconButtons>
+
         <MuiTabs
           labels={labelList}
           scrollable={true}
           tabIndex={tabIndex ?? 0}
           tabIndexChange={tabIndexOnChange}
         />
+
         <IconButtons>
           <IconButton title={links.twitter}>
             <TwitterIconLink />
@@ -74,15 +95,7 @@ export const Main = memoNamed('Main', () => {
         <LastUpdated />
       </LastUpdatedWrapper>
 
-      <ContentWrapper>
-        {match(pathname, {
-          [routes.profile]: Markdown(ProfileMd),
-          [routes.profile2]: Markdown(Profile2Md),
-          [routes.skills]: Markdown(SkillsMd),
-          [routes.products]: <Products />,
-          [routes.writings]: <Writings />,
-        })}
-      </ContentWrapper>
+      <ContentWrapper>{match(pathname, pages)}</ContentWrapper>
     </Root>
   );
 });
@@ -120,4 +133,10 @@ const IconButton = styled('div')`
   justify-content: center;
   align-items: center;
   margin: 0 8px;
+`;
+
+const ImgStyled = styled('img')`
+  width: 32px;
+  object-fit: contain;
+  border-radius: 50%;
 `;

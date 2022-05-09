@@ -9,7 +9,7 @@ import {
   HousingLoanCalculatorAppImage,
   LambdaInterpreterAppImage,
   MnistAppImage,
-  MyProfileAppImage,
+  MyPortfolioAppImage,
 } from './images';
 
 export const products: DeepReadonly<{
@@ -20,10 +20,10 @@ export const products: DeepReadonly<{
     {
       id: 'syncflow',
       link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/syncflow',
-      title: 'SyncFlow',
+      title: '★ SyncFlow',
       subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
       description:
-        'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。priority queueを使わずtopological sortによりObservable全体のDAGの依存関係を前計算してglitchを回避した。',
+        'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。priority queueを使わず、topological sortによりObservable全体のDAGの依存関係を事前に計算して更新を実行することでglitchを回避するようにし、都度queueを挟む実装より高速に実行できるようにした。',
       implementation: 'TypeScriptで実装。（最終更新：2021年9月22日）',
       imageUrl: '',
     },
@@ -43,7 +43,7 @@ export const products: DeepReadonly<{
     {
       id: 'event-schedule-app',
       link: 'https://event-schedule-app.web.app/',
-      title: 'イベント日程調整ツール',
+      title: '★ イベント日程調整ツール',
       subtitle: 'イベントのスケジュール調整用アプリケーション',
       description:
         '説明ページ → https://www.notion.so/noshiro/c40d53907f204a3e9961a4a2b623ca22',
@@ -111,9 +111,9 @@ export const products: DeepReadonly<{
       imageUrl: CatanDiceAppImage,
     },
     {
-      id: 'my-profile-app',
-      link: 'https://my-profile-app-ec7bf.web.app',
-      title: 'プロフィール',
+      id: 'my-portfolio-app',
+      link: 'https://my-portfolio-app-4f8be.web.app/',
+      title: 'ポートフォリオ',
       subtitle: 'このページ',
       description: '',
       implementation: [
@@ -124,7 +124,7 @@ export const products: DeepReadonly<{
         ' → 2021-09-22 に Preact 化した。ルーティングも自作ライブラリに置き換えた。',
         'Github Actions で main branch 更新時に自動でデプロイするよう設定。',
       ].join(''),
-      imageUrl: MyProfileAppImage,
+      imageUrl: MyPortfolioAppImage,
     },
     {
       id: 'lambda-calculus-interpreter',

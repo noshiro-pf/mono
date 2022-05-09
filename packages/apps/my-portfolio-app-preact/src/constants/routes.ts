@@ -1,31 +1,31 @@
 export type Routes = Readonly<{
-  profile: string;
+  career: string;
   skills: string;
-  profile2: string;
+  biography: string;
   products: string;
   writings: string;
 }>;
 
 export const routes = {
-  profile: '/profile/',
+  career: '/career/',
   skills: '/skills/',
-  profile2: '/profile2/',
+  biography: '/biography/',
   products: '/products/',
   writings: '/writings/',
 } as const;
 
 export const labels = {
-  profile: 'Profile',
-  profile2: 'Profile2',
-  skills: 'Skills',
-  products: 'Products',
-  writings: 'Writings',
+  career: '経歴',
+  biography: '自己紹介',
+  skills: 'スキル',
+  products: '製作物',
+  writings: '執筆物',
 } as const;
 
 export const tabKeys: readonly (keyof Routes)[] = [
-  'profile',
+  'career',
+  'biography',
   'skills',
-  'profile2',
   'products',
   'writings',
 ] as const;

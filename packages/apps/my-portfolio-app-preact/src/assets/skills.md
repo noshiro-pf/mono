@@ -72,7 +72,7 @@
     -   Languages
         -   Node.js
         -   PHP（数千行程度） 今は使っていない
-        -   MySQL（思い出せば書ける）
+        -   MySQL
     -   BaaS
         -   **firebase** (hosting, firestore, functions, auth)
         -   Netlify
@@ -81,7 +81,7 @@
     -   Docker
     -   Libraries
         -   nestjs
-    -   express (nodejs) （チュートリアルをやっただけ）
+    -   express (nodejs)
 -   Others
     -   Languages
         -   C++（数万行オーダー）
@@ -90,12 +90,12 @@
             -   AtCoder に何度か使用した。
         -   Rust（数千行オーダー）
         -   Python3（数千行オーダー）
-            -   それほど使い慣れてはいないが、たまに画像処理やデータ分析等で使う。
+            -   それほど使い慣れてはいないが、たまに画像処理やデータ分析等で使った。
             -   scikit-learn（ちょっとだけ）
     -   少しだけ使用経験のあるもの
         -   Haskell
         -   Ruby（大学の講義）
-        -   Java（新卒就活のときコーディングテストで一度だけ触った）
+        -   Java（新卒就活のときコーディングテストで一度だけ触ったのみ）
         -   D
         -   Erlang（卒業研究で少し触った）
         -   Swift（業務で簡素な iOS アプリ構築のため少しだけ書いた）
