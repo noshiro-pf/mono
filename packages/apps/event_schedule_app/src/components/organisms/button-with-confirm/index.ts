@@ -3,7 +3,6 @@ export * from './back-to-answer-page-button';
 export * from './button-with-confirm';
 export * from './confirm-answer-later-button';
 export * from './confirm-dialog';
-export * from './confirm-email-dialog';
 export * from './confirm-submission-answer-button';
 export * from './delete-all-button';
 export * from './delete-answer-button';

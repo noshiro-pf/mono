@@ -134,11 +134,12 @@ export namespace CreateEventScheduleStore {
 
   export const onClipboardButtonClick = (): void => {
     const url = mut_subscribedValues.url;
+
     // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
     if (
       isNotUndefined(navigator.clipboard) &&
       window.isSecureContext &&
-      url !== undefined
+      isNotUndefined(url)
     ) {
       navigator.clipboard.writeText(url).catch(console.error);
     }
@@ -162,5 +163,9 @@ export namespace CreateEventScheduleStore {
 
   fireAuthUser$.subscribe((user) => {
     mut_subscribedValues.fireAuthUser = user;
+  });
+
+  url$.subscribe((url) => {
+    mut_subscribedValues.url = url;
   });
 }

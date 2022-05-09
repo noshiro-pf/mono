@@ -53,6 +53,7 @@ export const eventSettingsPageDictionary = {
       description: `右の数字は日程決めのスコア計算に使う点数です（△のデフォルト点数は初期値(=${defaultIconPoint.fair})から変更できます）。`,
     },
   },
+  noteOnEmailInEditPage: '※ E-mailアドレスのみ再入力が必要です。',
   errorMessages: {
     titleIsEmpty: 'イベント名は必須項目です。',
     datetimeIsEmpty: '少なくとも一つ以上の候補日を選択してください。',
