@@ -10,6 +10,8 @@
     "clean": "rimraf build .firebase",
     "cy:open": "cypress open",
     "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
+    "cy:run:chrome": "cypress run --headed --browser chrome",
+    "cy:run:firefox": "cypress run --headed --browser firefox",
     "fb:deploy": "wireit",
     "fb:deploy:functions": "firebase deploy --only functions",
     "fb:deploy:hosting": "firebase deploy --only hosting",
