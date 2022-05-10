@@ -127,7 +127,7 @@ export const eventSettingsPageDictionary = {
           point: '点：',
         },
         poor: {
-          title: '×',
+          title: '✕',
           description: '説明：',
         },
       },

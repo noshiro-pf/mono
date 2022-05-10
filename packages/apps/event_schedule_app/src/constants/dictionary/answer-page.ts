@@ -1,5 +1,5 @@
 const genTagName =
-  (icon: '×' | '△' | '〇') =>
+  (icon: '△' | '✕' | '〇') =>
   (min: number, max: number): string =>
     min === max
       ? `${icon}の個数 = ${min}`
@@ -62,7 +62,7 @@ export const answerPageDictionary = {
 
       good: genTagName('〇'),
       fair: genTagName('△'),
-      poor: genTagName('×'),
+      poor: genTagName('✕'),
     },
 
     datetime: '候補日程',
@@ -72,7 +72,7 @@ export const answerPageDictionary = {
     sortAsc: '昇順ソート',
     sortDesc: '降順ソート',
     comment: 'コメント',
-    times: '×',
+    times: '✕',
     weight: '回答の優先度',
     refresh: '更新',
     requiredParticipant: '必須参加者',
@@ -87,12 +87,12 @@ export const answerPageDictionary = {
         title: '△の個数でフィルタ',
       },
       poor: {
-        title: '×の個数でフィルタ',
+        title: '✕の個数でフィルタ',
       },
     },
   },
   requiredParticipantDescription:
-    '（必須参加者が×を付けている日のスコアは0点になります。）',
+    '（必須参加者が✕を付けている日のスコアは0点になります。）',
   noteForPointOfFair: (
     defaultPoint: AnswerIconPoint
   ): readonly [string, string] => [
@@ -115,7 +115,7 @@ export const answerPageDictionary = {
     required: {
       title: '私は必須参加者です',
       description: [
-        'これを有効にした場合、自分一人が×をつけるだけでその候補日程のスコアが0点になり、候補から外されます。',
+        'これを有効にした場合、自分一人が✕をつけるだけでその候補日程のスコアが0点になり、候補から外されます。',
       ],
     },
     weight: {
