@@ -5,11 +5,6 @@ import { https } from 'firebase-functions';
 import { collectionPath } from './firestore-paths';
 import { removeEmailFromEventSchedule } from './remove-email';
 
-/**
- * eventSchedule.author.id === uid であるか、
- * answers に uid が含まれているもの（＝自分が関わっているEventSchedule）
- * のみを返す。
- */
 export const fetchEventOfIdImpl = async (
   db: firestore.Firestore,
   eventId: string
