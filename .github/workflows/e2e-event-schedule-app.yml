@@ -6,8 +6,9 @@ name: E2E test for event-schedule-app
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches:
-      - main
+    branches-ignore:
+      - 'dev'
+      - 'annotation-tool-dev'
     paths-ignore:
       - 'docs/**'
       - 'experimental/**'
@@ -96,7 +97,7 @@ jobs:
           working-directory: packages/apps/event_schedule_app
           # spec: cypress/integration/*
           # build: yarn build
-          start: yarn start
+          start: yarn start:dev-server, yarn start:emulators
           wait-on: 'http://localhost:8080'
           wait-on-timeout: 120
           record: true
