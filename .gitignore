@@ -88,3 +88,5 @@ build/Release
 *.bs.ts
 *_bs.ts
 
+# wireit
+**/.wireit
