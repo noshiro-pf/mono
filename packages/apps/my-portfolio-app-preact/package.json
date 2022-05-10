@@ -1,5 +1,5 @@
 {
-  "name": "@noshiro/my-profile-app-preact",
+  "name": "@noshiro/my-portfolio-app-preact",
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
@@ -12,7 +12,6 @@
     "clean": "run-p clean:**",
     "clean:build": "rimraf ${npm_package_config_build_dir}",
     "clean:cache": "rimraf .firebase",
-    "predeploy": "yarn build",
     "deploy": "firebase deploy",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
@@ -51,7 +50,7 @@
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "preact": "^10.4.7",
-    "preact-markdown": "^2.0.0",
+    "preact-markdown": "^2.1.0",
     "preact-media-hook": "^1.0.3"
   },
   "devDependencies": {

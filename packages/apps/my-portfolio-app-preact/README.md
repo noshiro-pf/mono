@@ -1,4 +1,4 @@
--   page: https://my-profile-app-ec7bf.web.app/profile
+-   page: https://my-portfolio-app-4f8be.web.app/
 
 ## GitHub Actions のデプロイ設定メモ
 

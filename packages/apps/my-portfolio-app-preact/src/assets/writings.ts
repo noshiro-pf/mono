@@ -2,11 +2,19 @@ import type { WritingsInfo } from '../types';
 
 export const writings: readonly WritingsInfo[] = [
   {
+    id: 'event-schedule-app',
+    link: 'https://noshiro.notion.site/dbeaa55d698c434ab04a0dbb34ffdf98',
+    title: '★ 自作アプリ「イベント日程調整アプリ」の紹介',
+    subtitle:
+      'イベント日程調整アプリ（https://event-schedule-app.web.app/）の機能の紹介ページ',
+    body: '',
+  },
+  {
     id: 'ReScript-TypeScript',
     link: 'https://noshiro.notion.site/ReScript-TypeScript-44f051af3fd94c9489058c6a77826049',
     title: 'ReScript で既存の TypeScript コード置き換えを試みた感想',
     subtitle: '',
-    body: '',
+    body: 'ReScriptを使ってみた感想をまとめました。',
   },
   {
     id: 'ts4.1-immutable-setin',
@@ -19,7 +27,7 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'type-challenges-introduction',
     link: 'https://docs.google.com/presentation/d/1uyL1tUJkpL8kgoNwpSy28sjCMHNzsYiO1aPC4_yzTYs/edit?usp=sharing',
-    title: 'type challenges の紹介',
+    title: '★ type challenges の紹介',
     subtitle: '',
     body: 'TypeScriptの型パズル集から、個人的に役に立った知識が多く詰まった問題を1問選んで解説してみました。',
   },
@@ -27,7 +35,7 @@ export const writings: readonly WritingsInfo[] = [
     id: 'ts4.1-immutable-setin',
     link: 'https://www.kabuku.co.jp/developers/typescript-strictly-typed-immutable-library',
     title:
-      'TypeScript v4.3 の機能を使って immutable ライブラリの型付けを頑張る',
+      '★ TypeScript v4.3 の機能を使って immutable ライブラリの型付けを頑張る',
     subtitle:
       'immutable.js や immer の課題を解決するための自作TypeScriptライブラリ紹介',
     body: 'TypeScript v4.3 の新機能と型レベルプログラミングを駆使して、ウェブフロントエンド開発において頻繁に行う immutable なオブジェクトの状態更新を行うための安全なライブラリの作り方を紹介します。',
@@ -43,7 +51,7 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'syncflow-slides',
     link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
-    title: ' リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
+    title: '★ リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
     subtitle:
       'RxJSで発生するglitchという不健全な挙動と、拙作「SyncFlow」の紹介',
     body: 'RxJSで発生するglitchという現象の発生原因とその対処法、他のglitch-freeリアクティブプログラミングライブラリがどう解決しているかを論文等を参照しつつ紹介。最後に拙作「SyncFlow」の実装概要を説明。',
@@ -51,7 +59,7 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'color-contrast-qiita',
     link: 'https://qiita.com/pikohideaki/items/59415524503f833ce41e',
-    title: ' 見分けやすいN色をうまく選ぶ関数を作ったよ',
+    title: '★ 見分けやすいN色をうまく選ぶ関数を作ったよ',
     subtitle:
       'コントラスト比を考慮した見分けやすいN色を選ぶアルゴリズムについての記事',
     body: '',
@@ -67,7 +75,7 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'reactive-programming-introduction-with-rxjs',
     link: 'https://qiita.com/pikohideaki/items/292ab134397f4959e66b',
-    title: 'RxJSによるリアクティブプログラミング入門',
+    title: '★ RxJSによるリアクティブプログラミング入門',
     subtitle:
       'RxJSを用いたリアクティブプログラミングについての入門者向け解説記事',
     body: 'リアクティブプログラミングとは何なのか・どうやって使うのか・使うと何が嬉しいのかをなるべく予備知識なく分かるように解説してみたもの。',

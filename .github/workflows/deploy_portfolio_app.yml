@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Deploy my-profile-app-preact
+name: Deploy my-portfolio-app-preact
 
 # Controls when the workflow will run
 on:
@@ -8,7 +8,7 @@ on:
   push:
     branches: [main]
     paths:
-      - .github/workflows/deploy_profile_app.yml
+      - .github/workflows/deploy_portfolio_app.yml
       - packages/utils/stdlib/**
       - packages/utils/ts-utils/**
       - packages/utils/preact-utils/**
@@ -17,7 +17,7 @@ on:
       - packages/utils/tiny-router-observable/**
       - packages/utils/tiny-router-preact-hooks/**
       - packages/utils/resize-observer-preact-hooks/**
-      - packages/apps/my_profile_app_preact/**
+      - packages/apps/my-portfolio-app-preact/**
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -39,13 +39,13 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: build dependencies
-        run: yarn ws-run-stages  --recursive -p @noshiro/my-profile-app-preact -c build
+        run: yarn ws-run-stages  --recursive -p @noshiro/my-portfolio-app-preact -c build
 
       - name: lint
-        run: yarn workspace @noshiro/my-profile-app-preact lint
+        run: yarn workspace @noshiro/my-portfolio-app-preact lint
 
       - name: test
-        run: yarn workspace @noshiro/my-profile-app-preact test
+        run: yarn workspace @noshiro/my-portfolio-app-preact test
 
       - name: deploy
-        run: yarn workspace @noshiro/my-profile-app-preact deploy --token ${{ secrets.FIREBASE_TOKEN }}
+        run: yarn workspace @noshiro/my-portfolio-app-preact deploy --token ${{ secrets.FIREBASE_TOKEN }}

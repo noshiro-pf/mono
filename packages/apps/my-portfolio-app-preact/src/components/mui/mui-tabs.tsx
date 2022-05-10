@@ -14,13 +14,12 @@ type Props = Readonly<{
 }>;
 
 const tabWidthSmallPx = 72;
-const tabWidthMediumPx = 160;
+const tabWidthMediumPx = 100;
 
 export const MuiTabs = memoNamed<Props>(
   'MuiTabs',
   ({ labels, tabIndex, scrollable = false, tabIndexChange }) => {
     const { matches: mobile } = useMedia(mediaQueries.small);
-    // const mobile = false;
 
     const tabWidthPx = mobile ? tabWidthSmallPx : tabWidthMediumPx;
 
@@ -133,6 +132,7 @@ const Tab = memoNamed<{
   const style = useMemo(
     () => ({
       minWidth: `${tabWidthPx}px`,
+      maxWidth: `${tabWidthPx}px`,
       color: selected ? '#3f51b5' : undefined,
     }),
     [selected, tabWidthPx]
@@ -185,7 +185,6 @@ const TabStyled = styled('button')`
   overflow: hidden;
   position: relative;
   font-size: 0.875rem;
-  max-width: 264px;
   box-sizing: border-box;
   min-height: 48px;
   text-align: center;
@@ -193,7 +192,7 @@ const TabStyled = styled('button')`
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
   font-weight: 500;
   line-height: 1.75;
-  white-space: normal;
+  white-space: nowrap;
   letter-spacing: 0.02857em;
 
   color: rgba(0, 0, 0, 0.54);
