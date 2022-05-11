@@ -21,6 +21,7 @@
     "preserve": "yarn build",
     "serve": "firebase emulators:start --only functions",
     "setconfig": "firebase functions:config:set",
+    "setup": "yarn build",
     "preshell": "yarn build",
     "shell": "firebase functions:shell",
     "showlog": "firebase functions:log",

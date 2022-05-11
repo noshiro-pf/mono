@@ -21,7 +21,7 @@
     "fb:deploy:functions": "firebase deploy --only functions",
     "fb:deploy:hosting": "firebase deploy --only hosting",
     "fb:emulators:gen-runtimeconfig": "firebase functions:config:get > functions/.runtimeconfig.json",
-    "fb:emulators:start": "firebase emulators:start  --import firebase-emulator-exports --export-on-exit",
+    "fb:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
     "fb:export": "node ./scripts/export-firestore > ./scripts/firestore_backup.json",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
