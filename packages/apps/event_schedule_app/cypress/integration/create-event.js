@@ -89,7 +89,7 @@ describe('create page', () => {
 const createAnswer = (username) => {
   cy.get(e('answer-page')).within(() => {
     // create answer
-    cy.get(e('add-answer-button')).click({ timeout: 15000 });
+    cy.get(e('add-answer-button'), { timeout: 15000 }).click();
 
     cy.get(e('answer-being-edited-section')).should('be.visible');
 
