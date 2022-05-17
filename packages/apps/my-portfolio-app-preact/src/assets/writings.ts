@@ -3,7 +3,7 @@ import type { WritingsInfo } from '../types';
 export const writings: readonly WritingsInfo[] = [
   {
     id: 'event-schedule-app',
-    link: 'https://noshiro.notion.site/dbeaa55d698c434ab04a0dbb34ffdf98',
+    link: 'https://noshiro.notion.site/899268cf44c54eefa564543c63864f2a',
     title: '★ 自作アプリ「イベント日程調整アプリ」の紹介',
     subtitle:
       'イベント日程調整アプリ（https://event-schedule-app.web.app/）の機能の紹介ページ',
