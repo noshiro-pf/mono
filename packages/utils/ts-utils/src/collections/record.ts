@@ -132,6 +132,56 @@ export namespace IRecord {
         // eslint-disable-next-line @typescript-eslint/ban-types
       }[RelaxedExclude<keyof R, symbol>][]
     : never;
+
+  export function hasKey<R extends ReadonlyRecordBase, K extends keyof R>(
+    rec: R,
+    key: K
+  ): rec is R & ReadonlyRecord<K, R[K]>;
+
+  export function hasKey<R extends ReadonlyRecordBase, K extends PropertyKey>(
+    rec: R,
+    key: K
+  ): rec is R & ReadonlyRecord<K, R[K]>;
+
+  export function hasKey<R extends ReadonlyRecordBase, K extends PropertyKey>(
+    rec: R,
+    key: K
+  ): rec is R & ReadonlyRecord<K, R[K]> {
+    // eslint-disable-next-line no-restricted-globals, prefer-object-has-own
+    return Object.prototype.hasOwnProperty.call(rec, key);
+  }
+
+  export function hasKeyValue<
+    R extends ReadonlyRecordBase,
+    K extends keyof R,
+    V extends R[K]
+  >(
+    rec: R,
+    key: K,
+    valueChecker: (v: R[K]) => v is V
+  ): rec is R & ReadonlyRecord<K, V>;
+
+  export function hasKeyValue<
+    R extends ReadonlyRecordBase,
+    K extends PropertyKey,
+    V extends R[K]
+  >(
+    rec: R,
+    key: K,
+    valueChecker: (v: R[K]) => v is V
+  ): rec is R & ReadonlyRecord<K, V>;
+
+  export function hasKeyValue<
+    R extends ReadonlyRecordBase,
+    K extends PropertyKey,
+    V extends R[K]
+  >(
+    rec: R,
+    key: K,
+    valueChecker: (v: R[K]) => v is V
+  ): rec is R & ReadonlyRecord<K, V> {
+    return hasKey(rec, key) && valueChecker(rec[key]);
+  }
 }
 
 type ToObjectKeysValue<A> = A extends string
