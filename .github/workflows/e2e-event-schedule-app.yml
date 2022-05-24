@@ -50,6 +50,9 @@ jobs:
       - name: setup
         run: yarn ws:setup
 
+      - name: create runtimeconfig
+        run: yarn workspace @noshiro/event-schedule-app fb:emulators:gen-dummy-runtimeconfig
+
       # - name: Cypress install
       #   uses: cypress-io/github-action@v2
       #   with:
