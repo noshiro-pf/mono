@@ -20,6 +20,7 @@
     "fb:deploy": "firebase deploy",
     "fb:deploy:functions": "firebase deploy --only functions",
     "fb:deploy:hosting": "firebase deploy --only hosting",
+    "fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\" } }' > functions/.runtimeconfig.json",
     "fb:emulators:gen-runtimeconfig": "firebase functions:config:get > functions/.runtimeconfig.json",
     "fb:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
     "fb:export": "node ./scripts/export-firestore > ./scripts/firestore_backup.json",
@@ -88,6 +89,6 @@
     "@noshiro/global-syncflow-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*",
-    "cypress": "^9.5.4"
+    "cypress": "^9.7.0"
   }
 }
