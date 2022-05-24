@@ -100,6 +100,7 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.29.3",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-security": "^1.5.0",
     "eslint-plugin-total-functions": "^5.0.1",
     "eslint-plugin-unicorn": "^41.0.1",
     "file-loader": "^6.2.0",
