@@ -141,6 +141,7 @@
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.8.0",
     "webpack-node-externals": "^3.0.0",
+    "wireit": "^0.4.0",
     "wsrun": "^5.2.4"
   },
   "engines": {
