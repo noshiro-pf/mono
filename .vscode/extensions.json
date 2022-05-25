@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "google.wireit",
+    "timonwong.shellcheck",
+    "unional.vscode-sort-package-json",
+    "redhat.vscode-yaml",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "editorconfig.editorconfig",
+    "shakram02.bash-beautify",
+    "sbrink.elm",
+    "streetsidesoftware.code-spell-checker",
+    "dbaeumer.vscode-eslint",
+    "tomoyukim.vscode-mermaid-editor",
+    "esbenp.prettier-vscode"
+  ]
+}
