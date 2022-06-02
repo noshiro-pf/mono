@@ -9,6 +9,8 @@ on:
     branches-ignore:
       - 'dev'
       - 'annotation-tool-dev'
+      - 'implement-goober-with-typescript'
+      - 'update-custom-eslint'
     paths-ignore:
       - 'docs/**'
       - 'experimental/**'
