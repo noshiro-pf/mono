@@ -4,20 +4,13 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
-    "_script_genindex": "bash ${npm_package_config_root_dir}/scripts/index_ts_generator.sh",
-    "prebuild": "yarn clean:build",
-    "build": "run-p build:**",
-    "postbuild": "cpx \"public/**\" ${npm_package_config_build_dir}",
-    "build:app": "webpack --config config/webpack.prod.js",
-    "build:functions": "cd ./functions && yarn build",
-    "clean": "run-p clean:**",
-    "clean:build": "rimraf ${npm_package_config_build_dir}",
-    "clean:cache": "rimraf .firebase",
+    "build": "run-s build:bundle build:copy-public",
+    "build:bundle": "wireit",
+    "build:copy-public": "wireit",
+    "clean": "rimraf build .firebase",
     "cy:open": "cypress open",
     "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
-    "fb": "firebase",
-    "fb:deploy": "firebase deploy",
+    "fb:deploy": "wireit",
     "fb:deploy:functions": "firebase deploy --only functions",
     "fb:deploy:hosting": "firebase deploy --only hosting",
     "fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\" } }' > functions/.runtimeconfig.json",
@@ -26,27 +19,23 @@
     "fb:export": "node ./scripts/export-firestore > ./scripts/firestore_backup.json",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
+    "fb:login:ci": "firebase login:ci",
     "fb:write": "node ./scripts/write_firestore",
-    "fmt": "yarn _prettier .",
-    "gi": "yarn _script_genindex ./src --min-depth 1 --ignore \"(assets|global)\"",
-    "lint": "eslint src/ --ext .ts,.tsx",
-    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
+    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "gi": "wireit",
+    "lint": "wireit",
+    "lint:deps": "wireit",
     "lint:fix": "yarn lint --fix",
     "serve": "http-server ./build",
-    "setup": "run-s setup:service-account-key setup:scripts",
-    "setup:scripts": "tsc --project config/tsconfig.scripts.json",
-    "setup:service-account-key": "touch ./scripts/service-account-key.json",
-    "start": "run-p start:**",
-    "start:build-functions": "tsc --watch --project ./functions/tsconfig.json ",
+    "setup": "run-p setup:**",
+    "setup:scripts": "wireit",
+    "setup:service-account-key": "wireit",
+    "start:build-functions": "cd functions && yarn watch",
     "start:dev-server": "webpack serve --config config/webpack.dev.js",
     "start:emulators": "yarn fb:emulators:start",
-    "test": "jest --config config/jest.config.json --passWithNoTests",
-    "tsc": "tsc --noEmit",
-    "type-check": "tsc --noEmit"
-  },
-  "config": {
-    "build_dir": "build",
-    "root_dir": "../../.."
+    "test": "wireit",
+    "tsc": "yarn type-check",
+    "type-check": "wireit"
   },
   "browserslist": {
     "production": [
@@ -90,5 +79,124 @@
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "cypress": "^9.7.0"
+  },
+  "wireit": {
+    "setup:service-account-key": {
+      "command": "touch ./scripts/service-account-key.json"
+    },
+    "setup:scripts": {
+      "command": "tsc --project config/tsconfig.scripts.json",
+      "dependencies": [
+        "setup:service-account-key"
+      ]
+    },
+    "type-check": {
+      "command": "tsc --noEmit",
+      "files": [
+        "src/**/*.{ts,tsx}",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "build:bundle": {
+      "command": "webpack --config config/webpack.prod.js",
+      "dependencies": [
+        "../event_schedule_app_shared:build"
+      ],
+      "files": [
+        "src/**/*",
+        "tsconfig.json",
+        "config/webpack.prod.js",
+        "config/env.js",
+        "config/paths.js",
+        "../../../config/webpackconfig/react",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [
+        "build/**"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "build:copy-public": {
+      "command": "cpx \"public/**\" build"
+    },
+    "fb:deploy": {
+      "command": "firebase deploy",
+      "dependencies": [
+        "build",
+        "./functions:build"
+      ]
+    },
+    "gi": {
+      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1  --ignore \"(assets|global)\"",
+      "clean": false,
+      "files": [
+        "../../../scripts/index_ts_generator.sh",
+        "src/**"
+      ],
+      "packageLocks": []
+    },
+    "lint": {
+      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache ",
+      "dependencies": [
+        "fmt",
+        "type-check"
+      ],
+      "files": [
+        "src/**/*.{ts,tsx}",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "lint:deps": {
+      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache-deps --no-eslintrc --config ../../../config/eslintrc/.eslintrc-no-extraneous-dependency.js",
+      "dependencies": [
+        "fmt"
+      ],
+      "files": [
+        "src/**/*.{ts,tsx}",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "../../../package.json",
+        "package.json",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "test": {
+      "command": "jest --config config/jest.config.json --passWithNoTests",
+      "dependencies": [
+        "type-check"
+      ],
+      "files": [
+        "config/jest.config.json",
+        "src/**"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    }
   }
 }

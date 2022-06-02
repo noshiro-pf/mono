@@ -4,7 +4,13 @@
 
 https://event-schedule-app.web.app
 
-## functions
+## Setup
+
+```
+yarn setup
+```
+
+### env
 
 ```
 {
@@ -15,6 +21,6 @@ https://event-schedule-app.web.app
 }
 ```
 
-## scripts
+### service-account-key.json
 
-service-account-key.json を置く（最初は tsc を通すために空ファイルが自動生成されているので中身を更新する）
+最初は tsc を通すために空ファイルが自動生成されているので中身を更新する。

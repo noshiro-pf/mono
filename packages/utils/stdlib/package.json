@@ -5,8 +5,28 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
-    "autofix": "eslint dist/ --ext .d.ts --fix",
-    "fmt": "prettier --write .",
+    "autofix": "wireit",
+    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gen": "./gen.sh"
+  },
+  "wireit": {
+    "autofix": {
+      "command": "eslint dist/ --ext .d.ts --fix --color --cache --cache-location .eslintcache ",
+      "dependencies": [
+        "fmt"
+      ],
+      "files": [
+        "dist/**/*.d.ts",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../config/eslintrc/**"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    }
   }
 }

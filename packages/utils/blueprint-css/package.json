@@ -12,17 +12,26 @@
     "resources/icons/*"
   ],
   "scripts": {
-    "_prettier": "prettier --ignore-path ${npm_package_config_root_dir}/.prettierignore  --write",
-    "fmt": "yarn _prettier .",
-    "tsc": "tsc --noEmit"
-  },
-  "config": {
-    "root_dir": "../../.."
+    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "tsc": "yarn type-check",
+    "type-check": "wireit"
   },
   "devDependencies": {
     "normalize.css": "^8.0.1"
   },
   "peerDependencies": {
     "normalize.css": "^8.0.1"
+  },
+  "wireit": {
+    "type-check": {
+      "command": "tsc --noEmit",
+      "files": [
+        "src/**/*.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    }
   }
 }

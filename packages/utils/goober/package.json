@@ -10,10 +10,23 @@
   "types": "goober.d.ts",
   "typings": "./goober.d.ts",
   "scripts": {
-    "fmt": "prettier . --write",
-    "tsc": "tsc --noEmit"
+    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "tsc": "yarn type-check",
+    "type-check": "wireit"
   },
   "peerDependencies": {
     "csstype": "^2.6.2"
+  },
+  "wireit": {
+    "type-check": {
+      "command": "tsc --noEmit",
+      "files": [
+        "src/**/*.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    }
   }
 }
