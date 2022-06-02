@@ -39,7 +39,7 @@ const config = {
   },
   settings: {
     'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
+      '@typescript-eslint/parser': ['.test.ts', '.ts', '.tsx'],
     },
     'import/resolver': {
       typescript: {
@@ -48,17 +48,27 @@ const config = {
       },
       // copied from default config
       node: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx'],
+        extensions: [
+          '.test.ts',
+          '.ts',
+          '.cts',
+          '.mts',
+          '.tsx',
+          '.jsx',
+          '.js',
+          '.cjs',
+          '.mjs',
+        ],
       },
     },
     // copied from default config
-    'import/extensions': ['.js', '.jsx'],
+    'import/extensions': ['.jsx', '.js', '.cjs', '.mjs'],
     'import/external-module-folders': ['node_modules', 'node_modules/@types'],
   },
   ignorePatterns: [
     ...readGitignoreFiles({ cwd: __dirname }),
     '*.d.ts',
-    '*.js',
+    '.eslintrc.cjs',
     '*_bs.ts',
   ],
 };
