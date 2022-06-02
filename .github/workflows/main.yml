@@ -9,6 +9,9 @@ on:
     branches-ignore:
       - 'dev'
       - 'annotation-tool-dev'
+      - 'implement-goober-with-typescript'
+      - 'update-custom-eslint'
+      - 'update-poll-discord-app'
     paths-ignore:
       - 'docs/**'
       - 'experimental/**'
