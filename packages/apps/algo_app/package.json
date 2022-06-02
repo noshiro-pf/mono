@@ -62,7 +62,8 @@
     "@noshiro/global-preact": "*",
     "@noshiro/global-preact-utils": "*",
     "@noshiro/global-syncflow": "*",
-    "@noshiro/global-syncflow-react-hooks": "*",
+    "@noshiro/global-syncflow-preact-hooks": "*",
+    "@noshiro/global-tiny-router-observable": "*",
     "@noshiro/global-tiny-router-preact-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
