@@ -31,6 +31,7 @@ import {
   isNull,
   isNumber,
   isPrimitive,
+  isRecord,
   isString,
   isSymbol,
   isUndefined,
@@ -79,6 +80,7 @@ import {
 (global as any).isNull = isNull;
 (global as any).isNumber = isNumber;
 (global as any).isPrimitive = isPrimitive;
+(global as any).isRecord = isRecord;
 (global as any).isString = isString;
 (global as any).isSymbol = isSymbol;
 (global as any).isUndefined = isUndefined;

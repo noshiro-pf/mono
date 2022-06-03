@@ -29,6 +29,7 @@ export const eslintNoRestrictedImportsTsUtilsDef = {
     'isNull',
     'isNumber',
     'isPrimitive',
+    'isRecord',
     'isString',
     'isSymbol',
     'isUndefined',

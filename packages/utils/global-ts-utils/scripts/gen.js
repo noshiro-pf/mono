@@ -42,6 +42,7 @@ const importsList = [
   'isNull',
   'isNumber',
   'isPrimitive',
+  'isRecord',
   'isString',
   'isSymbol',
   'isUndefined',
