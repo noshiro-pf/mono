@@ -4,20 +4,17 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "build:dev": "solid-scripts build",
+    "build:dev": "wireit",
     "clean": "run-p clean:**",
-    "clean:build": "rimraf build",
-    "lint": "eslint src/ --ext .ts,.tsx",
-    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
+    "clean:build": "wireit",
+    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "lint": "wireit",
+    "lint:deps": "wireit",
     "lint:fix": "yarn lint --fix",
-    "prebuild": "yarn clean:build",
     "start": "solid-scripts start",
-    "testw": "solid-scripts test",
-    "tsc": "tsc --noEmit",
-    "type-check": "tsc --noEmit"
-  },
-  "config": {
-    "root_dir": "../../.."
+    "test:dev": "solid-scripts test",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "wireit"
   },
   "browserslist": [
     "Chrome 74",
@@ -36,5 +33,83 @@
   "devDependencies": {
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
+  },
+  "wireit": {
+    "type-check": {
+      "command": "tsc --noEmit",
+      "files": [
+        "src/**/*.{ts,tsx}",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "build:dev": {
+      "command": "solid-scripts build",
+      "dependencies": [
+        "../lambda_calculus_interpreter_core:build:esm"
+      ],
+      "files": [
+        "src/**/*",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [
+        "build/**"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "clean:build": {
+      "command": "rimraf build",
+      "packageLocks": []
+    },
+    "lint": {
+      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache ",
+      "dependencies": [
+        "fmt",
+        "type-check"
+      ],
+      "files": [
+        "src/**/*.{ts,tsx}",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "lint:deps": {
+      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache-deps --no-eslintrc --config ../../../config/eslintrc/.eslintrc-no-extraneous-dependency.js",
+      "dependencies": [
+        "fmt"
+      ],
+      "files": [
+        "src/**/*.{ts,tsx}",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "../../../package.json",
+        "package.json",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    }
   }
 }

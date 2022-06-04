@@ -71,6 +71,7 @@ build/Release
 
 # Optional eslint cache
 .eslintcache
+.eslintcache-deps
 
 # Optional REPL history
 .node_repl_history

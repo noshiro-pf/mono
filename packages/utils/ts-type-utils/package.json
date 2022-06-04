@@ -6,19 +6,47 @@
   "sideEffects": false,
   "types": "ts-type-utils.d.ts",
   "scripts": {
-    "prebuild": "yarn clean",
     "build": "run-s build:step1 build:step2 build:step3 build:step4 build:step5",
-    "build:step1": "tsc",
+    "build:step1": "wireit",
     "build:step2": "sed -i.bak ./types/*.d.ts -e 's/^import.*$//g' -e 's/export //g'",
     "build:step3": "rimraf ./types/*.bak",
     "build:step4": "rimraf ./types/index.d.ts",
     "build:step5": "ls types/*.d.ts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ts-type-utils.d.ts",
-    "clean": "run-p clean:*",
-    "clean:types": "rimraf ./types",
-    "fmt": "prettier --write .",
+    "clean": "rimraf ./types",
+    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "yarn type-check",
-    "type-check": "tsc -p tsconfig.type-check.json"
+    "type-check": "wireit"
+  },
+  "wireit": {
+    "type-check": {
+      "command": "tsc -p tsconfig.type-check.json",
+      "files": [
+        "src/**/*.ts",
+        "tsconfig.type-check.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "build:step1": {
+      "command": "tsc --pretty --project tsconfig.json",
+      "files": [
+        "src/**/*.ts",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json"
+      ],
+      "output": [
+        "types/**",
+        ".tsbuildinfo"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    }
   }
 }

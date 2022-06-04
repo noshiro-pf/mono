@@ -35,6 +35,9 @@ jobs:
         with:
           node-version: '16'
 
+      # Set up GitHub Actions caching for Wireit.
+      - uses: google/wireit@setup-github-actions-caching/v1
+
       - name: Install dependencies
         run: yarn --frozen-lockfile
 

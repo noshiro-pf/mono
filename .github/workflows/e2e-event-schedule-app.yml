@@ -44,10 +44,13 @@ jobs:
       #     if-no-files-found: error
       #     path: packages/apps/event_schedule_app
 
+      # Set up GitHub Actions caching for Wireit.
+      # - uses: google/wireit@setup-github-actions-caching/v1
+
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: setup
+      - name: ws:setup
         run: yarn ws:setup
 
       - name: create runtimeconfig
@@ -72,17 +75,20 @@ jobs:
       #   run: yarn workspace @noshiro/event-schedule-app start &
 
       - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           # group: 'UI - Chrome'
           browser: chrome
           install: false
           working-directory: packages/apps/event_schedule_app
-          # spec: cypress/integration/*
-          # build: yarn build
-          start: yarn start:dev-server, yarn start:emulators
+          spec: cypress/integration/**/*.js
+          start: |
+            yarn start:emulators
+            yarn start:dev-server
+          # wait-on: 'http://localhost:8080, http://localhost:8081, http://localhost:5001'
           wait-on: 'http://localhost:8080'
           wait-on-timeout: 120
+          headless: true
           record: true
           parallel: true
         env:
