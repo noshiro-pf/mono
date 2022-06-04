@@ -22,8 +22,8 @@ on:
       - '**.md'
       - '**.txt'
       - '.gitignore'
-  schedule:
-    - cron: '33 9 * * 4'
+  # schedule:
+  #   - cron: '33 9 * * 4'
 
 jobs:
   analyze:
