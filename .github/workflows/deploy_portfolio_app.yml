@@ -51,4 +51,4 @@ jobs:
         run: yarn workspace @noshiro/my-portfolio-app-preact test
 
       - name: deploy
-        run: yarn workspace @noshiro/my-portfolio-app-preact deploy --token ${{ secrets.FIREBASE_TOKEN }}
+        run: yarn workspace @noshiro/my-portfolio-app-preact fb:deploy --token ${{ secrets.FIREBASE_TOKEN }}
