@@ -15,7 +15,7 @@
     -   Frameworks
         -   **React**
         -   **Preact**
-        -   **Angular**（業務で）
+        -   Angular（業務で使用。昔は趣味開発でも使っていたが今は React）
         -   (Vue) （業務で軽微な修正をした程度）
         -   (Elm)
         -   (Solid.js)
@@ -26,14 +26,14 @@
             -   Recoil
             -   **RxJS**
                 -   現在業務で使用。自作ライブラリ開発前は趣味開発でもよく使っていた。
-                -   ちょっと複雑な非同期処理を書きやすくするために
+                -   ちょっと複雑な非同期処理を書きやすくするために使用
             -   (Redux)
         -   Immutability
             -   趣味開発では[自作ライブラリ](https://www.kabuku.co.jp/developers/typescript%E3%81%AE%E6%96%B0%E6%A9%9F%E8%83%BD%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6immutable%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E5%9E%8B%E4%BB%98%E3%81%91%E3%82%92%E9%A0%91%E5%BC%B5)と immer
             -   immer（業務でも使用）
             -   Immutable.js（ちょっと前は使っていたが、現在は趣味でも業務でも使っていない）
                 -   Set や Map の key に非 primitive 値を使いたいときなど
-                -   ある程度複雑になりそうなとき、reducer を書きやすくするために
+                -   ある程度複雑になりそうなとき、reducer を書きやすくするために使用
                 -   Undo history が必要なときなど
         -   Routing
             -   React-router
@@ -50,24 +50,41 @@
             -   (jQuery) 今は使っていない
         -   Others
             -   Pixi.js
-                -   2D キャンバスの高速化に
+                -   アノテーションツールを作った時に 2D キャンバスの高速化に使用した
             -   discord.js
-                -   discord アプリを作った時に
+                -   discord アプリを作った時に使用した
     -   Development Environment
         -   Package manager
             -   **yarn**
             -   npm
         -   Build environment
             -   **Webpack**
-            -   esbuild 試したい
+            -   esbuild とかも試したい
+            -   **[Wireit](https://github.com/google/wireit)**
+                -   ビルド結果のキャッシュ
         -   Testing
             -   **Jest**
             -   **Cypress**
         -   Linters & Formatters
-            -   **ESLint** (TypeScript-eslint)
+            -   **ESLint**
+                -   @typescript-eslint
+                -   eslint-plugin-array-func
+                -   eslint-plugin-functional
+                -   eslint-plugin-import
+                -   eslint-plugin-jest
+                -   eslint-plugin-promise
+                -   eslint-plugin-react
+                -   eslint-plugin-react-hooks
+                -   eslint-plugin-security
+                -   eslint-plugin-total-functions
+                -   eslint-plugin-unicorn
             -   **Prettier**
-                -   import 文のソート・整理に [prettier-plugin-organize-imports](https://github.com/simonhaenisch/prettier-plugin-organize-imports#readme) を入れている。
-                    これを見つける前は [自作スクリプト](https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
+                -   よく使う plugin
+                    -   [prettier-plugin-organize-imports](https://github.com/simonhaenisch/prettier-plugin-organize-imports#readme)
+                        -   import 文のソート・整理
+                        -   これを見つける前は [自作スクリプト](https://qiita.com/pikohideaki/items/9f3843853903fcff392c) をプリプロセスで走らせていた。
+                    -   [prettier-package-json](https://www.npmjs.com/package/prettier-package-json)
+                        -   package.json のフォーマット
 -   Web backend（これまで趣味・業務共にウェブフロントエンドを触る時間が圧倒的に多かったため、バックエンドは比較すると知識が少なめ）
     -   Languages
         -   Node.js
@@ -104,20 +121,6 @@
     -   [PAST](https://atcoder.jp/contests/past202005-2)
         -   2020-05-25
         -   初級（52 点）（久々に C++ を使用して受験した）
-
-## 開発環境
-
--   OS
-    -   **Windows**（開発は WSL）
-    -   macOS（2 年くらい使っていた時期はある）
-    -   Linux
--   マシン
-    -   ThinkPad X1 Extreme
--   エディタ
-    -   **VSCode**
-    -   Sublime Text（VSCode の前に使っていた）
-    -   vi（サーバーサイドでちょっと書き換えるときとか）
-    -   (Emacs)
 
 ## 言語（自然言語）
 

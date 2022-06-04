@@ -1,20 +1,22 @@
 # Links
 
 -   Github： https://github.com/noshiro-pf
--   forkwell jobs： https://portfolio.forkwell.com/@Hideaki_Noshiro
+-   Forkwell Jobs： https://portfolio.forkwell.com/@Hideaki_Noshiro
 -   Wantedly： https://www.wantedly.com/id/hideaki_noshiro
 -   Twitter： https://twitter.com/noshiro_piko
 -   居住地： Tokyo
 
-# 経歴
+# 略歴
 
 ## 職歴
 
 -   カブク株式会社
     -   2020 年 11 月～現在
+    -   職種：ウェブフロントエンド・バックエンドエンジニア
     -   クラウド加工原価見積りサービス「CostPRO」の開発
 -   LeapMind 株式会社
     -   2019 年 4 月〜2020 年 10 月
+    -   職種：ウェブフロントエンドエンジニア
     -   アノテーションツールの社内ライブラリとしての開発と、それを使用した数件のプロジェクト
 -   日本電信電話株式会社
     -   2018 年 4 月～ 2019 年 3 月
@@ -39,5 +41,4 @@
     -   電子情報通信学会大会（2017 年 3 月，名古屋）
 -   「ZDD による RNA 二次構造集合の表現と頻出構造マイニング」（卒業研究）
     -   ZDD と呼ばれるデータ構造を用いて RNA の二次構造の集合を効率良く表現し、頻出構造のマイニングを行う手法について
-        -   ZDD に独自の改変を加えて計算実験を行うために、C++でゼロから実装した。
     -   第 39 回日本分子生物学会年会（2016 年 11 月，横浜）

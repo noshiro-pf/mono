@@ -5,6 +5,7 @@ import { ProductsElementView } from './products-element-view';
 export const Products = memoNamed('Products', () => (
   <div>
     <h1>{'制作物'}</h1>
+    <p>{'★は特に時間をかけたものを表しています。'}</p>
     <h2>{'ライブラリ'}</h2>
     {products.libraries.map((app) => (
       <ProductsElementView

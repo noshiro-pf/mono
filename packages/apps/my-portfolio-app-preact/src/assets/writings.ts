@@ -50,7 +50,7 @@ export const writings: readonly WritingsInfo[] = [
   },
   {
     id: 'syncflow-slides',
-    link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
+    link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.p',
     title: '★ リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
     subtitle:
       'RxJSで発生するglitchという不健全な挙動と、拙作「SyncFlow」の紹介',
