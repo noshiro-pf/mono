@@ -1,5 +1,5 @@
 {
-  "name": "@noshiro/lambda-calculus-interpreter-preact",
+  "name": "@noshiro/catan-dice-app",
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
@@ -37,13 +37,17 @@
     ]
   },
   "dependencies": {
-    "@noshiro/goober": "*",
-    "@noshiro/lambda-calculus-interpreter-core": "*",
-    "@noshiro/preact-utils": "*",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.2.1",
+    "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
-    "@noshiro/syncflow-preact-hooks": "*",
+    "@noshiro/syncflow-react-hooks": "*",
     "@noshiro/ts-utils": "*",
-    "preact": "^10.4.7"
+    "@noshiro/ts-utils-additional": "*",
+    "immer": "^9.0.7",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^5.3.0"
   },
   "devDependencies": {
     "@noshiro/global-ts-utils": "*",
@@ -55,7 +59,7 @@
       "files": [
         "src/**/*.{ts,tsx}",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.preact.nolib.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [],
@@ -65,9 +69,6 @@
     },
     "build:bundle": {
       "command": "webpack --config config/webpack.prod.js",
-      "dependencies": [
-        "../lambda_calculus_interpreter_core:build:esm"
-      ],
       "files": [
         "src/**/*",
         "tsconfig.json",
@@ -75,7 +76,7 @@
         "config/env.js",
         "config/paths.js",
         "../../../config/webpackconfig/react",
-        "../../../config/tsconfig/tsconfig.preact.nolib.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [
@@ -114,7 +115,7 @@
         ".eslintignore",
         ".eslintrc.cjs",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.preact.nolib.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
         "../../../config/eslintrc/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
@@ -135,7 +136,7 @@
         "../../../package.json",
         "package.json",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.preact.nolib.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
         "../../../config/eslintrc/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],

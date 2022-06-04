@@ -5,15 +5,15 @@
 THIS_SCRIPT_DIR=$(cd $(dirname $0); pwd)
 MONO_ROOT_DIR=$(dirname ${THIS_SCRIPT_DIR})
 
-TEMPLATE_DIR_NAME="template_react_app"
+TEMPLATE_DIR_NAME="template-react-app"
 APPS_DIR="${MONO_ROOT_DIR}/packages/apps"
 TEMPLATE_DIR="${APPS_DIR}/${TEMPLATE_DIR_NAME}"
 
 new_app_name=$1
 
 if [ -z ${new_app_name} ]; then
-  echo "app name is required."
-  exit 1
+    echo "app name is required."
+    exit 1
 fi
 
 mkdir -p "${APPS_DIR}/${new_app_name}"

@@ -42,7 +42,7 @@ jobs:
       #   with:
       #     name: build
       #     if-no-files-found: error
-      #     path: packages/apps/event_schedule_app
+      #     path: packages/apps/event-schedule-app
 
       # Set up GitHub Actions caching for Wireit.
       # - uses: google/wireit@setup-github-actions-caching/v1
@@ -62,14 +62,14 @@ jobs:
       #     # Disable running of tests within install job
       #     runTests: false
       #     install: false
-      #     working-directory: packages/apps/event_schedule_app
+      #     working-directory: packages/apps/event-schedule-app
       #     build: yarn build
 
       # - name: Download the build folders
       #   uses: actions/download-artifact@v2
       #   with:
       #     name: build
-      #     path: packages/apps/event_schedule_app
+      #     path: packages/apps/event-schedule-app
 
       # - name: Start App
       #   run: yarn workspace @noshiro/event-schedule-app start &
@@ -80,7 +80,7 @@ jobs:
           # group: 'UI - Chrome'
           browser: chrome
           install: false
-          working-directory: packages/apps/event_schedule_app
+          working-directory: packages/apps/event-schedule-app
           spec: cypress/integration/**/*.js
           start: |
             yarn start:emulators
@@ -103,7 +103,7 @@ jobs:
       #     # group: 'UI - Firefox'
       #     browser: firefox
       #     install: false
-      #     working-directory: packages/apps/event_schedule_app
+      #     working-directory: packages/apps/event-schedule-app
       #     # spec: cypress/integration/*
       #     # build: yarn build
       #     start: yarn start:dev-server, yarn start:emulators
