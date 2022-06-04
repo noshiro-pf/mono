@@ -17,8 +17,8 @@ export const getEventSchedule = async (
       const err = result.value;
 
       if (
-        isNonNullObject(err) &&
-        hasKeyValue(err, 'code', isString) &&
+        isRecord(err) &&
+        IRecord.hasKeyValue(err, 'code', isString) &&
         err.code === 'functions/not-found'
       ) {
         return Result.err({

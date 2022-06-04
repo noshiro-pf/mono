@@ -30,6 +30,6 @@ export type CardWithDisplayValue = MergeIntersection<
 >;
 
 export const isCard = (data: unknown): data is Card =>
-  isNonNullObject(data) &&
-  hasKeyValue(data, 'color', isCardColor) &&
-  hasKeyValue(data, 'number', isCardNumber);
+  isRecord(data) &&
+  IRecord.hasKeyValue(data, 'color', isCardColor) &&
+  IRecord.hasKeyValue(data, 'number', isCardNumber);

@@ -3,9 +3,9 @@ export const assertIsCredentialError: (
 ) => asserts e is { code: string; message: string } = (e) => {
   if (
     !(
-      isNonNullObject(e) &&
-      hasKeyValue(e, 'code', isString) &&
-      hasKeyValue(e, 'message', isString)
+      isRecord(e) &&
+      IRecord.hasKeyValue(e, 'code', isString) &&
+      IRecord.hasKeyValue(e, 'message', isString)
     )
   ) {
     throw new Error(`object is not credential error type: ${Str.from(e)}`);
