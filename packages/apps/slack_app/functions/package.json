@@ -25,7 +25,7 @@
     "shell": "firebase functions:shell",
     "showlog": "firebase functions:log",
     "start": "yarn shell",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "dependencies": {

@@ -31,7 +31,7 @@
     "start": "node cjs/test/preview-main.js",
     "test": "wireit",
     "test:detectOpenHandles": "yarn test --detectOpenHandles",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "dependencies": {

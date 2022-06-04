@@ -34,7 +34,7 @@
     "start:dev-server": "webpack serve --config config/webpack.dev.js",
     "start:emulators": "yarn fb:emulators:start",
     "test": "wireit",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "browserslist": {

@@ -19,7 +19,7 @@
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "wireit",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "dependencies": {

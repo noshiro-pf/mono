@@ -17,7 +17,7 @@
     "lint:deps": "wireit",
     "lint:fix": "yarn lint --fix",
     "setup": "yarn build",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "dependencies": {

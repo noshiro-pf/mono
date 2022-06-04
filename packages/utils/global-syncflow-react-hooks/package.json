@@ -23,7 +23,7 @@
     "setup:1": "node ./scripts/gen.js",
     "setup:2": "yarn fmt:src",
     "setup:3": "yarn build",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "dependencies": {

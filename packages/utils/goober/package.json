@@ -11,7 +11,7 @@
   "typings": "./goober.d.ts",
   "scripts": {
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "peerDependencies": {

@@ -13,7 +13,7 @@
     "lint:fix": "yarn lint --fix",
     "start": "solid-scripts start",
     "test:dev": "solid-scripts test",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "browserslist": [

@@ -21,7 +21,7 @@
     "start": "run-p start:**",
     "start:dev-server": "webpack serve --config config/webpack.dev.js",
     "test": "wireit",
-    "tsc": "yarn type-check",
+    "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "browserslist": {
