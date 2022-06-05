@@ -40,13 +40,13 @@ const isFieldValue = (data: unknown): data is FieldValue =>
 export const assertIsGameStateAction: (
   data: unknown
 ) => asserts data is GameStateAction = (data) => {
-  if (!isNonNullObject(data)) {
-    throw new Error('isNonNullObject failed');
+  if (!isRecord(data)) {
+    throw new Error('data is not a Record');
   }
   if (
     !(
-      hasKeyValue(data, 'type', isActionType) &&
-      hasKeyValue(data, 'timestamp', isFieldValue)
+      IRecord.hasKeyValue(data, 'type', isActionType) &&
+      IRecord.hasKeyValue(data, 'timestamp', isFieldValue)
     )
   ) {
     throw new Error('hasKeyValue failed');
@@ -62,13 +62,13 @@ export const assertIsGameStateAction: (
   switch (data.type) {
     case 'selectMyCard':
     case 'selectOpponentCard':
-      if (!hasKeyValue(data, 'card', isCard)) {
+      if (!IRecord.hasKeyValue(data, 'card', isCard)) {
         throw new Error('hasKeyValue failed');
       }
       break;
 
     case 'selectAnswer':
-      if (!hasKeyValue(data, 'answer', isCard)) {
+      if (!IRecord.hasKeyValue(data, 'answer', isCard)) {
         throw new Error('hasKeyValue failed');
       }
       break;

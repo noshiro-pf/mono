@@ -1,8 +1,8 @@
 import {
-  hasKeyValue,
   IDate,
-  isNonNullObject,
+  IRecord,
   isNumber,
+  isRecord,
   Num,
   pipe,
 } from '@noshiro/ts-utils';
@@ -29,20 +29,20 @@ export const isDateEnum = (a: unknown): a is DateEnum =>
   isNumber(a) && Num.isInt(a) && Num.isInRange(1, 31)(a);
 
 export const isYearMonthDate = (a: unknown): a is YearMonthDate =>
-  isNonNullObject(a) &&
-  hasKeyValue(a, 'year', isYearEnum) &&
-  hasKeyValue(a, 'month', isMonthEnum) &&
-  hasKeyValue(a, 'date', isDateEnum);
+  isRecord(a) &&
+  IRecord.hasKeyValue(a, 'year', isYearEnum) &&
+  IRecord.hasKeyValue(a, 'month', isMonthEnum) &&
+  IRecord.hasKeyValue(a, 'date', isDateEnum);
 
 const d = yearMonthDateDefaultValue;
 
 export const fillYearMonthDate = (a?: unknown): YearMonthDate =>
-  !isNonNullObject(a)
+  a === undefined || !isRecord(a)
     ? d
     : {
-        year: hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
-        month: hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
-        date: hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
+        year: IRecord.hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
+        month: IRecord.hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
+        date: IRecord.hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
       };
 
 export const ymdFromDate = (date: IDate): YearMonthDate => ({

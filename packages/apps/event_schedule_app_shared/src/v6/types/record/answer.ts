@@ -1,11 +1,10 @@
 import {
-  hasKey,
-  hasKeyValue,
   IDate,
   IList,
+  IRecord,
   isBoolean,
-  isNonNullObject,
   isNumber,
+  isRecord,
   isString,
 } from '@noshiro/ts-utils';
 import type { AnswerId, Weight } from '../named-primitive-types';
@@ -38,45 +37,53 @@ export const answerDefaultValue: Answer = {
 } as const;
 
 export const isAnswer = (a: unknown): a is Answer =>
-  isNonNullObject(a) &&
-  hasKeyValue(a, 'id', isAnswerId) &&
-  hasKeyValue(a, 'user', isUser) &&
-  hasKeyValue(a, 'comment', isString) &&
-  hasKeyValue(
+  isRecord(a) &&
+  IRecord.hasKeyValue(a, 'id', isAnswerId) &&
+  IRecord.hasKeyValue(a, 'user', isUser) &&
+  IRecord.hasKeyValue(a, 'comment', isString) &&
+  IRecord.hasKeyValue(
     a,
     'selection',
     (e: unknown): e is AnswerSelection[] =>
       IList.isArray(e) && e.every(isAnswerSelection)
   ) &&
-  hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber) &&
-  hasKeyValue(a, 'weight', isWeight) &&
-  hasKeyValue(a, 'isRequiredParticipants', isBoolean);
+  IRecord.hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber) &&
+  IRecord.hasKeyValue(a, 'weight', isWeight) &&
+  IRecord.hasKeyValue(a, 'isRequiredParticipants', isBoolean);
 
 const d = answerDefaultValue;
 
 export const fillAnswer = (a?: unknown): Answer =>
-  !isNonNullObject(a)
+  a === undefined || !isRecord(a)
     ? d
     : {
-        id: hasKeyValue(a, 'id', isAnswerId) ? a.id : d.id,
+        id: IRecord.hasKeyValue(a, 'id', isAnswerId) ? a.id : d.id,
 
-        user: hasKey(a, 'user') ? fillUser(a.user) : d.user,
+        user: IRecord.hasKey(a, 'user') ? fillUser(a.user) : d.user,
 
-        comment: hasKeyValue(a, 'comment', isString) ? a.comment : d.comment,
+        comment: IRecord.hasKeyValue(a, 'comment', isString)
+          ? a.comment
+          : d.comment,
 
-        selection: hasKey(a, 'selection')
+        selection: IRecord.hasKey(a, 'selection')
           ? IList.isArray(a.selection)
             ? a.selection.map(fillAnswerSelection)
             : d.selection
           : d.selection,
 
-        [ANSWER_KEY_CREATED_AT]: hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber)
+        [ANSWER_KEY_CREATED_AT]: IRecord.hasKeyValue(
+          a,
+          ANSWER_KEY_CREATED_AT,
+          isNumber
+        )
           ? a[ANSWER_KEY_CREATED_AT]
           : d[ANSWER_KEY_CREATED_AT],
 
-        weight: hasKeyValue(a, 'weight', isWeight) ? a.weight : d.weight,
+        weight: IRecord.hasKeyValue(a, 'weight', isWeight)
+          ? a.weight
+          : d.weight,
 
-        isRequiredParticipants: hasKeyValue(
+        isRequiredParticipants: IRecord.hasKeyValue(
           a,
           'isRequiredParticipants',
           isBoolean

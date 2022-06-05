@@ -30,6 +30,7 @@ export const providePluginTsUtilsDef = IRecord.fromEntries(
     'isNull',
     'isNumber',
     'isPrimitive',
+    'isRecord',
     'isString',
     'isSymbol',
     'isUndefined',

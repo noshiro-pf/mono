@@ -1,9 +1,4 @@
-import {
-  hasKey,
-  hasKeyValue,
-  isNonNullObject,
-  isString,
-} from '@noshiro/ts-utils';
+import { IRecord, isRecord, isString } from '@noshiro/ts-utils';
 import type { AnswerIconIdWithNone, AnswerIconPoint } from '../enum';
 import { isAnswerIconIdWithNone, isAnswerIconPoint } from '../enum';
 import type { DatetimeRange } from './datetime-range';
@@ -28,27 +23,31 @@ export const answerSelectionDefaultValue: AnswerSelection = {
 } as const;
 
 export const isAnswerSelection = (a: unknown): a is AnswerSelection =>
-  isNonNullObject(a) &&
-  hasKeyValue(a, 'datetimeRange', isDatetimeRange) &&
-  hasKeyValue(a, 'iconId', isAnswerIconIdWithNone) &&
-  hasKeyValue(a, 'point', isAnswerIconPoint) &&
-  hasKeyValue(a, 'comment', isString);
+  isRecord(a) &&
+  IRecord.hasKeyValue(a, 'datetimeRange', isDatetimeRange) &&
+  IRecord.hasKeyValue(a, 'iconId', isAnswerIconIdWithNone) &&
+  IRecord.hasKeyValue(a, 'point', isAnswerIconPoint) &&
+  IRecord.hasKeyValue(a, 'comment', isString);
 
 const d = answerSelectionDefaultValue;
 
 export const fillAnswerSelection = (a?: unknown): AnswerSelection =>
-  !isNonNullObject(a)
+  a === undefined || !isRecord(a)
     ? d
     : {
-        datetimeRange: hasKey(a, 'datetimeRange')
+        datetimeRange: IRecord.hasKey(a, 'datetimeRange')
           ? fillDatetimeRange(a.datetimeRange)
           : d.datetimeRange,
 
-        iconId: hasKeyValue(a, 'iconId', isAnswerIconIdWithNone)
+        iconId: IRecord.hasKeyValue(a, 'iconId', isAnswerIconIdWithNone)
           ? a.iconId
           : d.iconId,
 
-        point: hasKeyValue(a, 'point', isAnswerIconPoint) ? a.point : d.point,
+        point: IRecord.hasKeyValue(a, 'point', isAnswerIconPoint)
+          ? a.point
+          : d.point,
 
-        comment: hasKeyValue(a, 'comment', isString) ? a.comment : d.comment,
+        comment: IRecord.hasKeyValue(a, 'comment', isString)
+          ? a.comment
+          : d.comment,
       };

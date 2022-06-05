@@ -1,11 +1,6 @@
 // initializeApp must be imported as default import.
 // https://github.com/firebase/firebase-admin-node/issues/593
-import {
-  hasKeyValue,
-  isBoolean,
-  isNonNullObject,
-  isString,
-} from '@noshiro/ts-utils';
+import { IRecord, isBoolean, isRecord, isString } from '@noshiro/ts-utils';
 import admin from 'firebase-admin';
 import { https, region } from 'firebase-functions';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
@@ -93,19 +88,23 @@ export const userDeletionListener = regionSelected.auth
   });
 
 export const fetchEventListOfUser = region('asia-northeast2').https.onCall(
-  (payload, context) => {
+  (payload: unknown, context) => {
     if (
       !(
-        isNonNullObject(payload) &&
-        hasKeyValue(payload, 'filterText', isString) &&
-        hasKeyValue(
+        isRecord(payload) &&
+        IRecord.hasKeyValue(payload, 'filterText', isString) &&
+        IRecord.hasKeyValue(
           payload,
           'filterOptionState',
           (v: unknown): v is 'archive' | 'inProgress' =>
             v === 'archive' || v === 'inProgress'
         ) &&
-        hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
-        hasKeyValue(payload, 'showOnlyEventSchedulesICreated', isBoolean)
+        IRecord.hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
+        IRecord.hasKeyValue(
+          payload,
+          'showOnlyEventSchedulesICreated',
+          isBoolean
+        )
       )
     ) {
       throw new https.HttpsError(
@@ -119,8 +118,8 @@ export const fetchEventListOfUser = region('asia-northeast2').https.onCall(
 );
 
 export const fetchEventOfId = region('asia-northeast2').https.onCall(
-  (payload, _context) => {
-    if (!(isNonNullObject(payload) && hasKeyValue(payload, 'id', isString))) {
+  (payload: unknown, _context) => {
+    if (!(isRecord(payload) && IRecord.hasKeyValue(payload, 'id', isString))) {
       throw new https.HttpsError(
         'invalid-argument',
         'The payload type is invalid.'

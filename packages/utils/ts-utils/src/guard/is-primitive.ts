@@ -1,5 +1,5 @@
-export const isPrimitive = (value: unknown): boolean => {
-  switch (typeof value) {
+export const isPrimitive = (a: unknown): boolean => {
+  switch (typeof a) {
     case 'string':
     case 'number':
     case 'boolean':

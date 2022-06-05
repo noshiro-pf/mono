@@ -1,10 +1,4 @@
-import {
-  hasKeyValue,
-  IDate,
-  isNonNullObject,
-  isNumber,
-  Num,
-} from '@noshiro/ts-utils';
+import { IDate, IRecord, isNumber, isRecord, Num } from '@noshiro/ts-utils';
 
 export type HoursMinutes = Readonly<{
   hours: HoursEnum;
@@ -23,18 +17,18 @@ export const isMinutesEnum = (a: unknown): a is MinutesEnum =>
   isNumber(a) && Num.isInt(a) && Num.isInRange(0, 59)(a);
 
 export const isHoursMinutes = (a: unknown): a is HoursMinutes =>
-  isNonNullObject(a) &&
-  hasKeyValue(a, 'hours', isHoursEnum) &&
-  hasKeyValue(a, 'minutes', isMinutesEnum);
+  isRecord(a) &&
+  IRecord.hasKeyValue(a, 'hours', isHoursEnum) &&
+  IRecord.hasKeyValue(a, 'minutes', isMinutesEnum);
 
 const d = hoursMinutesDefaultValue;
 
 export const fillHoursMinutes = (a?: unknown): HoursMinutes =>
-  !isNonNullObject(a)
+  a === undefined || !isRecord(a)
     ? d
     : {
-        hours: hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
-        minutes: hasKeyValue(a, 'minutes', isMinutesEnum)
+        hours: IRecord.hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
+        minutes: IRecord.hasKeyValue(a, 'minutes', isMinutesEnum)
           ? a.minutes
           : d.minutes,
       };

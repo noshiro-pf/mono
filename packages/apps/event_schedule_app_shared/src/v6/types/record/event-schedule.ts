@@ -1,10 +1,9 @@
 import {
-  hasKey,
-  hasKeyValue,
   IDate,
   IList,
-  isNonNullObject,
+  IRecord,
   isNumber,
+  isRecord,
   isString,
 } from '@noshiro/ts-utils';
 import type { DatetimeSpecificationEnumType } from '../enum';
@@ -78,29 +77,61 @@ const isDatetimeRangeList = (e: unknown): e is DatetimeRange[] =>
 const isUserList = (e: unknown): e is User[] =>
   IList.isArray(e) && e.every(isUser);
 
+// memo: isEventScheduleImpl{1,2} is used to avoid a ts error
+// "Expression produces a union type that is too complex to represent.".
+const isEventScheduleImpl1 = (
+  a: ReadonlyRecord<string, unknown>
+): a is Pick<
+  EventSchedule,
+  | 'answerDeadline'
+  | 'datetimeRangeList'
+  | 'datetimeSpecification'
+  | 'notes'
+  | 'title'
+> =>
+  IRecord.hasKeyValue(a, 'title', isString) &&
+  IRecord.hasKeyValue(a, 'notes', isString) &&
+  IRecord.hasKeyValue(
+    a,
+    'datetimeSpecification',
+    isDatetimeSpecificationEnumType
+  ) &&
+  IRecord.hasKeyValue(a, 'datetimeRangeList', isDatetimeRangeList) &&
+  IRecord.hasKeyValue(a, 'answerDeadline', isAnswerDeadline);
+
+const isEventScheduleImpl2 = (
+  a: ReadonlyRecord<string, unknown>
+): a is Pick<
+  EventSchedule,
+  | 'answerIcons'
+  | 'archivedBy'
+  | 'author'
+  | 'notificationSettings'
+  | 'timezoneOffsetMinutes'
+> =>
+  IRecord.hasKeyValue(a, 'answerIcons', isAnswerIconSettings) &&
+  IRecord.hasKeyValue(
+    a,
+    'notificationSettings',
+    isNotificationSettingsWithNone
+  ) &&
+  IRecord.hasKeyValue(a, 'timezoneOffsetMinutes', isNumber) &&
+  IRecord.hasKeyValue(a, 'author', isUser) &&
+  IRecord.hasKeyValue(a, 'archivedBy', isUserList);
+
 export const isEventSchedule = (a: unknown): a is EventSchedule =>
-  isNonNullObject(a) &&
-  hasKeyValue(a, 'title', isString) &&
-  hasKeyValue(a, 'notes', isString) &&
-  hasKeyValue(a, 'datetimeSpecification', isDatetimeSpecificationEnumType) &&
-  hasKeyValue(a, 'datetimeRangeList', isDatetimeRangeList) &&
-  hasKeyValue(a, 'answerDeadline', isAnswerDeadline) &&
-  hasKeyValue(a, 'answerIcons', isAnswerIconSettings) &&
-  hasKeyValue(a, 'notificationSettings', isNotificationSettingsWithNone) &&
-  hasKeyValue(a, 'timezoneOffsetMinutes', isNumber) &&
-  hasKeyValue(a, 'author', isUser) &&
-  hasKeyValue(a, 'archivedBy', isUserList);
+  isRecord(a) && isEventScheduleImpl1(a) && isEventScheduleImpl2(a);
 
 const d = eventScheduleDefaultValue;
 
 export const fillEventSchedule = (a?: unknown): EventSchedule =>
-  !isNonNullObject(a)
+  a === undefined || !isRecord(a)
     ? d
     : {
-        title: hasKeyValue(a, 'title', isString) ? a.title : d.title,
-        notes: hasKeyValue(a, 'notes', isString) ? a.notes : d.notes,
+        title: IRecord.hasKeyValue(a, 'title', isString) ? a.title : d.title,
+        notes: IRecord.hasKeyValue(a, 'notes', isString) ? a.notes : d.notes,
 
-        datetimeSpecification: hasKeyValue(
+        datetimeSpecification: IRecord.hasKeyValue(
           a,
           'datetimeSpecification',
           isDatetimeSpecificationEnumType
@@ -108,36 +139,40 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
           ? a.datetimeSpecification
           : d.datetimeSpecification,
 
-        datetimeRangeList: hasKey(a, 'datetimeRangeList')
+        datetimeRangeList: IRecord.hasKey(a, 'datetimeRangeList')
           ? IList.isArray(a.datetimeRangeList) &&
             IList.isArrayOfLength1OrMore(a.datetimeRangeList)
             ? IList.map(a.datetimeRangeList, fillDatetimeRange)
             : d.datetimeRangeList
           : d.datetimeRangeList,
 
-        answerDeadline: hasKey(a, 'answerDeadline')
+        answerDeadline: IRecord.hasKey(a, 'answerDeadline')
           ? a.answerDeadline === 'none'
             ? 'none'
             : fillYmdhm(a.answerDeadline)
           : d.answerDeadline,
 
-        answerIcons: hasKey(a, 'answerIcons')
+        answerIcons: IRecord.hasKey(a, 'answerIcons')
           ? fillAnswerIconSettings(a.answerIcons)
           : d.answerIcons,
 
-        notificationSettings: hasKey(a, 'notificationSettings')
+        notificationSettings: IRecord.hasKey(a, 'notificationSettings')
           ? a.notificationSettings === 'none'
             ? 'none'
             : fillNotificationSettings(a.notificationSettings)
           : d.notificationSettings,
 
-        timezoneOffsetMinutes: hasKeyValue(a, 'timezoneOffsetMinutes', isNumber)
+        timezoneOffsetMinutes: IRecord.hasKeyValue(
+          a,
+          'timezoneOffsetMinutes',
+          isNumber
+        )
           ? a.timezoneOffsetMinutes
           : d.timezoneOffsetMinutes,
 
-        author: hasKey(a, 'author') ? fillUser(a.author) : d.author,
+        author: IRecord.hasKey(a, 'author') ? fillUser(a.author) : d.author,
 
-        archivedBy: hasKey(a, 'archivedBy')
+        archivedBy: IRecord.hasKey(a, 'archivedBy')
           ? IList.isArray(a.archivedBy)
             ? IList.map(a.archivedBy, fillUser)
             : d.archivedBy

@@ -1,9 +1,4 @@
-import {
-  hasKeyValue,
-  isBoolean,
-  isNonNullObject,
-  isString,
-} from '@noshiro/ts-utils';
+import { IRecord, isBoolean, isRecord, isString } from '@noshiro/ts-utils';
 
 export type NotificationSettings = Readonly<{
   email: string;
@@ -26,54 +21,58 @@ export const notificationSettingsDefaultValue: NotificationSettings = {
 } as const;
 
 export const isNotificationSettings = (a: unknown): a is NotificationSettings =>
-  isNonNullObject(a) &&
-  hasKeyValue(a, 'email', isString) &&
-  hasKeyValue(a, 'notifyOnAnswerChange', isBoolean) &&
-  hasKeyValue(a, 'notify01daysBeforeAnswerDeadline', isBoolean) &&
-  hasKeyValue(a, 'notify03daysBeforeAnswerDeadline', isBoolean) &&
-  hasKeyValue(a, 'notify07daysBeforeAnswerDeadline', isBoolean) &&
-  hasKeyValue(a, 'notify14daysBeforeAnswerDeadline', isBoolean) &&
-  hasKeyValue(a, 'notify28daysBeforeAnswerDeadline', isBoolean);
+  isRecord(a) &&
+  IRecord.hasKeyValue(a, 'email', isString) &&
+  IRecord.hasKeyValue(a, 'notifyOnAnswerChange', isBoolean) &&
+  IRecord.hasKeyValue(a, 'notify01daysBeforeAnswerDeadline', isBoolean) &&
+  IRecord.hasKeyValue(a, 'notify03daysBeforeAnswerDeadline', isBoolean) &&
+  IRecord.hasKeyValue(a, 'notify07daysBeforeAnswerDeadline', isBoolean) &&
+  IRecord.hasKeyValue(a, 'notify14daysBeforeAnswerDeadline', isBoolean) &&
+  IRecord.hasKeyValue(a, 'notify28daysBeforeAnswerDeadline', isBoolean);
 
 const d = notificationSettingsDefaultValue;
 
 export const fillNotificationSettings = (a?: unknown): NotificationSettings =>
-  !isNonNullObject(a)
+  a === undefined || !isRecord(a)
     ? d
     : {
-        email: hasKeyValue(a, 'email', isString) ? a.email : d.email,
-        notifyOnAnswerChange: hasKeyValue(a, 'notifyOnAnswerChange', isBoolean)
+        email: IRecord.hasKeyValue(a, 'email', isString) ? a.email : d.email,
+        notifyOnAnswerChange: IRecord.hasKeyValue(
+          a,
+          'notifyOnAnswerChange',
+          isBoolean
+        )
           ? a.notifyOnAnswerChange
           : d.notifyOnAnswerChange,
-        notify01daysBeforeAnswerDeadline: hasKeyValue(
+        notify01daysBeforeAnswerDeadline: IRecord.hasKeyValue(
           a,
           'notify01daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify01daysBeforeAnswerDeadline
           : d.notify01daysBeforeAnswerDeadline,
-        notify03daysBeforeAnswerDeadline: hasKeyValue(
+        notify03daysBeforeAnswerDeadline: IRecord.hasKeyValue(
           a,
           'notify03daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify03daysBeforeAnswerDeadline
           : d.notify03daysBeforeAnswerDeadline,
-        notify07daysBeforeAnswerDeadline: hasKeyValue(
+        notify07daysBeforeAnswerDeadline: IRecord.hasKeyValue(
           a,
           'notify07daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify07daysBeforeAnswerDeadline
           : d.notify07daysBeforeAnswerDeadline,
-        notify14daysBeforeAnswerDeadline: hasKeyValue(
+        notify14daysBeforeAnswerDeadline: IRecord.hasKeyValue(
           a,
           'notify14daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify14daysBeforeAnswerDeadline
           : d.notify14daysBeforeAnswerDeadline,
-        notify28daysBeforeAnswerDeadline: hasKeyValue(
+        notify28daysBeforeAnswerDeadline: IRecord.hasKeyValue(
           a,
           'notify28daysBeforeAnswerDeadline',
           isBoolean

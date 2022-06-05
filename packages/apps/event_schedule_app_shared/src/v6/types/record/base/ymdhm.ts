@@ -1,4 +1,4 @@
-import { hasKeyValue, IDate, isNonNullObject, Num } from '@noshiro/ts-utils';
+import { IDate, IRecord, isRecord, Num } from '@noshiro/ts-utils';
 import {
   hoursMinutesDefaultValue,
   isHoursEnum,
@@ -28,24 +28,24 @@ export const ymdhmDefaultValue: Ymdhm = {
 };
 
 export const isYmdhm = (a: unknown): a is Ymdhm =>
-  isNonNullObject(a) &&
-  hasKeyValue(a, 'year', isYearEnum) &&
-  hasKeyValue(a, 'month', isMonthEnum) &&
-  hasKeyValue(a, 'date', isDateEnum) &&
-  hasKeyValue(a, 'hours', isHoursEnum) &&
-  hasKeyValue(a, 'minutes', isMinutesEnum);
+  isRecord(a) &&
+  IRecord.hasKeyValue(a, 'year', isYearEnum) &&
+  IRecord.hasKeyValue(a, 'month', isMonthEnum) &&
+  IRecord.hasKeyValue(a, 'date', isDateEnum) &&
+  IRecord.hasKeyValue(a, 'hours', isHoursEnum) &&
+  IRecord.hasKeyValue(a, 'minutes', isMinutesEnum);
 
 const d = ymdhmDefaultValue;
 
 export const fillYmdhm = (a?: unknown): Ymdhm =>
-  !isNonNullObject(a)
+  a === undefined || !isRecord(a)
     ? d
     : {
-        year: hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
-        month: hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
-        date: hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
-        hours: hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
-        minutes: hasKeyValue(a, 'minutes', isMinutesEnum)
+        year: IRecord.hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
+        month: IRecord.hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
+        date: IRecord.hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
+        hours: IRecord.hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
+        minutes: IRecord.hasKeyValue(a, 'minutes', isMinutesEnum)
           ? a.minutes
           : d.minutes,
       };

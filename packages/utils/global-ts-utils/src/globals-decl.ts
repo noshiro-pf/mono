@@ -28,6 +28,7 @@ import type {
   isNull as _isNull,
   isNumber as _isNumber,
   isPrimitive as _isPrimitive,
+  isRecord as _isRecord,
   isString as _isString,
   isSymbol as _isSymbol,
   isUndefined as _isUndefined,
@@ -100,6 +101,7 @@ declare global {
   const isNull: typeof _isNull;
   const isNumber: typeof _isNumber;
   const isPrimitive: typeof _isPrimitive;
+  const isRecord: typeof _isRecord;
   const isString: typeof _isString;
   const isSymbol: typeof _isSymbol;
   const isUndefined: typeof _isUndefined;
