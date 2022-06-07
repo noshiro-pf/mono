@@ -59,7 +59,7 @@
       "command": "tsc --incremental --pretty --project tsconfig.json",
       "clean": "if-file-deleted",
       "dependencies": [
-        "../../event_schedule_app_shared:build:cjs"
+        "../../event-schedule-app-shared:build:cjs"
       ],
       "files": [
         "src/**/*.ts",

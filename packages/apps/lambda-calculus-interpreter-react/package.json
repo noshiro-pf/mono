@@ -67,7 +67,7 @@
     "build:bundle": {
       "command": "webpack --config config/webpack.prod.js",
       "dependencies": [
-        "../lambda_calculus_interpreter_core:build:esm"
+        "../lambda-calculus-interpreter-core:build:esm"
       ],
       "files": [
         "src/**/*",

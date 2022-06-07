@@ -108,7 +108,7 @@
     "build:bundle": {
       "command": "webpack --config config/webpack.prod.js",
       "dependencies": [
-        "../event_schedule_app_shared:build"
+        "../event-schedule-app-shared:build"
       ],
       "files": [
         "src/**/*",
