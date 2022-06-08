@@ -3,7 +3,7 @@ import type { WritingsInfo } from '../types';
 export const writings: readonly WritingsInfo[] = [
   {
     id: 'event-schedule-app',
-    link: 'https://noshiro.notion.site/dbeaa55d698c434ab04a0dbb34ffdf98',
+    link: 'https://noshiro.notion.site/899268cf44c54eefa564543c63864f2a',
     title: '★ 自作アプリ「イベント日程調整アプリ」の紹介',
     subtitle:
       'イベント日程調整アプリ（https://event-schedule-app.web.app/）の機能の紹介ページ',
@@ -50,7 +50,7 @@ export const writings: readonly WritingsInfo[] = [
   },
   {
     id: 'syncflow-slides',
-    link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.gc229ea533d_0_648',
+    link: 'https://docs.google.com/presentation/d/1y9F5jxD6e1bFzLOs3BVAzIqhW806OfmLzIYaaU1j7yM/edit#slide=id.p',
     title: '★ リアクティブプログラミングライブラリ「SyncFlow」を自作した話',
     subtitle:
       'RxJSで発生するglitchという不健全な挙動と、拙作「SyncFlow」の紹介',

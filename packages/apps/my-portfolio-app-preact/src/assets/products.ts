@@ -154,7 +154,7 @@ export const products: DeepReadonly<{
     {
       id: 'dominion-app',
       link: 'https://dominionapps.firebaseapp.com/#/online-game',
-      title: '「ドミニオン」オンライン対戦（要ログイン）',
+      title: '★「ドミニオン」オンライン対戦（要ログイン）',
       subtitle: 'カードゲーム「ドミニオン」のオンライン対戦アプリ',
       description:
         'ブラウザで2～4人の対戦に対応。LINE風のチャット機能付き。ゲーム結果は集計表で確認できる。基本セットを中心に実装が簡単なカードのみ実装した。ToDo: パフォーマンスチューニング、拡張セットの実装。（開発停止中）',
