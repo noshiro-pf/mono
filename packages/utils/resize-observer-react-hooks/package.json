@@ -74,7 +74,6 @@
     "lint": {
       "command": "eslint src/ --ext .ts --color --cache --cache-location .eslintcache ",
       "dependencies": [
-        "fmt",
         "type-check"
       ],
       "files": [
@@ -93,9 +92,6 @@
     },
     "lint:deps": {
       "command": "eslint src/ --ext .ts --color --cache --cache-location .eslintcache-deps --no-eslintrc --config ../../../config/eslintrc/.eslintrc-no-extraneous-dependency.js",
-      "dependencies": [
-        "fmt"
-      ],
       "files": [
         "src/**/*.ts",
         ".eslintignore",
