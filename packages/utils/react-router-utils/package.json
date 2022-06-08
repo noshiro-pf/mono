@@ -14,7 +14,6 @@
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gi": "wireit",
     "lint": "wireit",
-    "lint:deps": "wireit",
     "lint:fix": "yarn lint --fix",
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
@@ -76,22 +75,6 @@
       "dependencies": [
         "type-check"
       ],
-      "files": [
-        "src/**/*.{ts,tsx}",
-        ".eslintignore",
-        ".eslintrc.cjs",
-        "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.react.nolib.json",
-        "../../../config/eslintrc/**",
-        "../ts-type-utils/ts-type-utils.d.ts"
-      ],
-      "output": [],
-      "packageLocks": [
-        "yarn.lock"
-      ]
-    },
-    "lint:deps": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache-deps --no-eslintrc --config ../../../config/eslintrc/.eslintrc-no-extraneous-dependency.js",
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",

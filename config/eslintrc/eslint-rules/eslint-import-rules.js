@@ -1,5 +1,7 @@
 'use strict';
 
+const { join } = require('path');
+
 // @ts-check
 
 /** @typedef { import("./rules-type/eslint-import-rules").EslintImportsRules } EslintImportsRules */
@@ -45,7 +47,12 @@ const eslintImportsRules = {
   'import/no-named-as-default': 'error',
   'import/no-named-as-default-member': 'error',
   'import/no-deprecated': 'error',
-  'import/no-extraneous-dependencies': 'off',
+  'import/no-extraneous-dependencies': [
+    'error',
+    {
+      packageDir: [join(__dirname, '../../../'), '.'],
+    },
+  ],
   'import/no-mutable-exports': 'error',
   'import/no-unused-modules': 'error',
 

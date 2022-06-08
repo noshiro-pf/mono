@@ -12,7 +12,6 @@
     "heroku:bash": "heroku run bash --app poll-discord-app",
     "heroku:logs": "heroku logs --tail --app poll-discord-app",
     "lint": "wireit",
-    "lint:deps": "wireit",
     "lint:fix": "yarn lint --fix",
     "setup": "run-p setup:**",
     "setup:dbjson": "echo '{ \"polls\": [] }' > ./db.json",
@@ -78,19 +77,6 @@
     },
     "lint": {
       "command": "eslint src/ --ext .ts --color --cache --cache-location .eslintcache ",
-      "files": [
-        "src/**/*.ts",
-        ".eslintignore",
-        ".eslintrc.cjs",
-        "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json",
-        "../../../config/eslintrc/**",
-        "../../utils/ts-type-utils/ts-type-utils.d.ts"
-      ],
-      "output": []
-    },
-    "lint:deps": {
-      "command": "eslint src/ --ext .ts --color --cache --cache-location .eslintcache-deps --no-eslintrc --config ../../../config/eslintrc/.eslintrc-no-extraneous-dependency.js",
       "files": [
         "src/**/*.ts",
         ".eslintignore",

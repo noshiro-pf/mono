@@ -19,7 +19,6 @@
     "clean:build:esm": "rimraf esm",
     "fmt": "yarn _prettier .",
     "lint": "eslint src/ --ext .ts",
-    "lint:deps": "yarn lint --no-eslintrc --config ${npm_package_config_root_dir}/config/eslintrc/.eslintrc-no-extraneous-dependency.js",
     "lint:fix": "yarn lint --fix",
     "re:build": "rescript",
     "re:start": "rescript build -w",

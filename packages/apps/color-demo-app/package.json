@@ -15,7 +15,6 @@
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gi": "wireit",
     "lint": "wireit",
-    "lint:deps": "wireit",
     "lint:fix": "yarn lint --fix",
     "serve": "firebase serve",
     "start": "run-p start:**",
@@ -106,22 +105,6 @@
       "dependencies": [
         "type-check"
       ],
-      "files": [
-        "src/**/*.{ts,tsx}",
-        ".eslintignore",
-        ".eslintrc.cjs",
-        "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.react.nolib.json",
-        "../../../config/eslintrc/**",
-        "../../utils/ts-type-utils/ts-type-utils.d.ts"
-      ],
-      "output": [],
-      "packageLocks": [
-        "yarn.lock"
-      ]
-    },
-    "lint:deps": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache-deps --no-eslintrc --config ../../../config/eslintrc/.eslintrc-no-extraneous-dependency.js",
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
