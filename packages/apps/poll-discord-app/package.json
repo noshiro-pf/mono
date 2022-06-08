@@ -76,7 +76,7 @@
       "packageLocks": []
     },
     "lint": {
-      "command": "eslint src/ --ext .ts --color --cache --cache-location .eslintcache ",
+      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
       "files": [
         "src/**/*.ts",
         ".eslintignore",

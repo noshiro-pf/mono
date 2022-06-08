@@ -11,7 +11,7 @@
   },
   "wireit": {
     "autofix": {
-      "command": "eslint dist/ --ext .d.ts --fix --color --cache --cache-location .eslintcache ",
+      "command": "eslint dist/ --ext .d.ts --fix --color --cache --cache-location .eslintcache",
       "files": [
         "dist/**/*.d.ts",
         ".eslintignore",
