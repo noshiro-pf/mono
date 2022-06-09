@@ -78,8 +78,7 @@
     "@noshiro/global-syncflow": "*",
     "@noshiro/global-syncflow-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
-    "@noshiro/ts-type-utils": "*",
-    "cypress": "^9.7.0"
+    "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
     "setup:service-account-key": {
