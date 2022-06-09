@@ -77,18 +77,8 @@ const isDatetimeRangeList = (e: unknown): e is DatetimeRange[] =>
 const isUserList = (e: unknown): e is User[] =>
   IList.isArray(e) && e.every(isUser);
 
-// memo: isEventScheduleImpl{1,2} is used to avoid a ts error
-// "Expression produces a union type that is too complex to represent.".
-const isEventScheduleImpl1 = (
-  a: ReadonlyRecord<string, unknown>
-): a is Pick<
-  EventSchedule,
-  | 'answerDeadline'
-  | 'datetimeRangeList'
-  | 'datetimeSpecification'
-  | 'notes'
-  | 'title'
-> =>
+export const isEventSchedule = (a: unknown): a is EventSchedule =>
+  isRecord(a) &&
   IRecord.hasKeyValue(a, 'title', isString) &&
   IRecord.hasKeyValue(a, 'notes', isString) &&
   IRecord.hasKeyValue(
@@ -97,18 +87,7 @@ const isEventScheduleImpl1 = (
     isDatetimeSpecificationEnumType
   ) &&
   IRecord.hasKeyValue(a, 'datetimeRangeList', isDatetimeRangeList) &&
-  IRecord.hasKeyValue(a, 'answerDeadline', isAnswerDeadline);
-
-const isEventScheduleImpl2 = (
-  a: ReadonlyRecord<string, unknown>
-): a is Pick<
-  EventSchedule,
-  | 'answerIcons'
-  | 'archivedBy'
-  | 'author'
-  | 'notificationSettings'
-  | 'timezoneOffsetMinutes'
-> =>
+  IRecord.hasKeyValue(a, 'answerDeadline', isAnswerDeadline) &&
   IRecord.hasKeyValue(a, 'answerIcons', isAnswerIconSettings) &&
   IRecord.hasKeyValue(
     a,
@@ -118,9 +97,6 @@ const isEventScheduleImpl2 = (
   IRecord.hasKeyValue(a, 'timezoneOffsetMinutes', isNumber) &&
   IRecord.hasKeyValue(a, 'author', isUser) &&
   IRecord.hasKeyValue(a, 'archivedBy', isUserList);
-
-export const isEventSchedule = (a: unknown): a is EventSchedule =>
-  isRecord(a) && isEventScheduleImpl1(a) && isEventScheduleImpl2(a);
 
 const d = eventScheduleDefaultValue;
 

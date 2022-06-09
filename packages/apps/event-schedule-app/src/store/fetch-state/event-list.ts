@@ -72,7 +72,7 @@ export namespace EventListFetchState {
       setRefreshButtonIsLoading(true);
 
       api.eventList
-        .get({
+        .fetch({
           filterText,
           filterOptionState,
           showAllPastDaysEvent,

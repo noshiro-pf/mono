@@ -29,7 +29,7 @@ export namespace EventScheduleFetchState {
     if (eventId === undefined) return;
 
     api.event
-      .get(eventId)
+      .fetch(eventId)
       .then((result) => {
         setEventScheduleResult(result);
       })

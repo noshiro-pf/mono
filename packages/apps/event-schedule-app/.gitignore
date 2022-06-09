@@ -1,8 +1,4 @@
 scripts/*.json
-!scripts/example-answer-v2.json
-!scripts/example-answer-v3.json
-!scripts/example-event-v2.json
-!scripts/example-event-v3.json
 firestore_backup.json
 cypress/videos
 functions/.runtimeconfig.json

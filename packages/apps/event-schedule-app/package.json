@@ -13,12 +13,12 @@
     "cy:run:chrome": "cypress run --headed --browser chrome",
     "cy:run:firefox": "cypress run --headed --browser firefox",
     "fb:deploy": "wireit",
-    "fb:deploy:functions": "firebase deploy --only functions",
-    "fb:deploy:hosting": "firebase deploy --only hosting",
+    "fb:deploy:functions": "wireit",
+    "fb:deploy:hosting": "wireit",
     "fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\" } }' > functions/.runtimeconfig.json",
     "fb:emulators:gen-runtimeconfig": "firebase functions:config:get > functions/.runtimeconfig.json",
     "fb:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
-    "fb:export": "node ./scripts/export-firestore > ./scripts/firestore_backup.json",
+    "fb:export": "wireit",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fb:login:ci": "firebase login:ci",
@@ -56,7 +56,7 @@
     "@blueprintjs/icons": "^4.2.3",
     "@blueprintjs/popover2": "^1.1.4",
     "@noshiro/deep-object-diff": "*",
-    "@noshiro/event-schedule-app-shared": "6.2.0",
+    "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/fast-deep-equal": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
@@ -133,6 +133,24 @@
       "dependencies": [
         "build",
         "./functions:build"
+      ]
+    },
+    "fb:deploy:functions": {
+      "command": "firebase deploy --only functions",
+      "dependencies": [
+        "./functions:build"
+      ]
+    },
+    "fb:deploy:hosting": {
+      "command": "firebase deploy --only hosting",
+      "dependencies": [
+        "build"
+      ]
+    },
+    "fb:export": {
+      "command": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --write ./scripts/firestore_backup.json",
+      "dependencies": [
+        "setup:scripts"
       ]
     },
     "gi": {

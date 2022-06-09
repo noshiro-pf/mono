@@ -1,3 +1,7 @@
+# v7
+
+-   EventSchedule.notificationSettings.email を削除（sub collection に移動）
+
 # v6
 
 -   `AnswerSelection` 型に `comment` フィールドを追加。各日程に対する回答にコメントを追加できるようにするため。

@@ -1,9 +1,10 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { assertType, tp } from '@noshiro/ts-utils';
-import { firestore } from 'firebase-admin';
+import { assertType, IList, tp } from '@noshiro/ts-utils';
+import type { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
 import { collectionPath } from './firestore-paths';
+import { getEmail } from './get-event-item';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
 import { fillEventScheduleWithCheck } from './type-check';
@@ -16,8 +17,10 @@ const keys = {
 
 assertType<TypeExtends<ValueOf<typeof keys>, keyof EventSchedule>>();
 
-export const notifyAnswerDeadline = async (): Promise<void> => {
-  const querySnapshot = await firestore()
+export const notifyAnswerDeadline = async (
+  db: firestore.Firestore
+): Promise<void> => {
+  const querySnapshot = await db
     .collection(collectionPath.events)
     .where(keys.notificationSettings, '!=', 'none')
     .where(keys.answerDeadline, '!=', 'none')
@@ -27,12 +30,18 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
     tp(doc.id, fillEventScheduleWithCheck(doc.data()))
   );
 
+  const emails = await Promise.all(
+    events.map(([eventId]) => getEmail(db, eventId))
+  );
+
+  const eventsWithEmail = IList.zip(events, emails);
+
   await Promise.all(
-    events.flatMap(([eventId, ev]) => {
+    eventsWithEmail.flatMap(([[eventId, ev], email]) => {
       const ns = ev.notificationSettings;
       const answerDeadline = ev.answerDeadline;
 
-      if (answerDeadline === 'none' || ns === 'none') {
+      if (answerDeadline === 'none' || ns === 'none' || email === '') {
         return Promise.resolve();
       }
 
@@ -47,13 +56,15 @@ export const notifyAnswerDeadline = async (): Promise<void> => {
       )
         .filter(
           ([flag, diff]) =>
-            flag && todayIsNDaysBeforeDeadline(diff, answerDeadline)
+            flag &&
+            todayIsNDaysBeforeDeadline(diff, answerDeadline) &&
+            email !== ''
         )
         .map(([_, diff]) => {
           logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
           return sendEmail(
             createMailOptions({
-              to: ns.email,
+              to: email,
               subject: `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
               text: createMailBodyForAnswerDeadline({ eventId, diff }),
             })

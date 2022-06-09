@@ -1,14 +1,17 @@
 import { FormGroup } from '@blueprintjs/core';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { now, ymdhmDateDiff } from '../../functions';
+import type { NotificationSettingsWithEmail } from '../../types';
 import { BpCheckbox, BpInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 
 const dc = dict.eventSettingsPage.section3;
 
 type Props = Readonly<{
-  notificationSettings: NotificationSettings;
-  onNotificationSettingsChange: (value: NotificationSettings) => void;
+  notificationSettingsWithEmail: NotificationSettingsWithEmail;
+  onNotificationSettingsWithEmailChange: (
+    value: NotificationSettingsWithEmail
+  ) => void;
   disabled: boolean;
   useAnswerDeadline: boolean;
   answerDeadline: Ymdhm | undefined;
@@ -18,8 +21,8 @@ type Props = Readonly<{
 export const NotificationSettingsComponent = memoNamed<Props>(
   'NotificationSettings',
   ({
-    notificationSettings,
-    onNotificationSettingsChange,
+    notificationSettingsWithEmail,
+    onNotificationSettingsWithEmailChange,
     disabled,
     useAnswerDeadline,
     answerDeadline,
@@ -27,81 +30,85 @@ export const NotificationSettingsComponent = memoNamed<Props>(
   }) => {
     const onEmailChange = useCallback(
       (email: string) => {
-        onNotificationSettingsChange(
-          IRecord.set(notificationSettings, 'email', email)
+        onNotificationSettingsWithEmailChange(
+          IRecord.set(notificationSettingsWithEmail, 'email', email)
         );
       },
-      [notificationSettings, onNotificationSettingsChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
 
     const onNotifyOnAnswerChangeCheck = useCallback(
       (checked: boolean) => {
-        onNotificationSettingsChange(
-          IRecord.set(notificationSettings, 'notifyOnAnswerChange', checked)
+        onNotificationSettingsWithEmailChange(
+          IRecord.set(
+            notificationSettingsWithEmail,
+            'notifyOnAnswerChange',
+            checked
+          )
         );
       },
-      [notificationSettings, onNotificationSettingsChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
 
     const onNotify01daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
-        onNotificationSettingsChange(
+        onNotificationSettingsWithEmailChange(
           IRecord.set(
-            notificationSettings,
+            notificationSettingsWithEmail,
             'notify01daysBeforeAnswerDeadline',
             checked
           )
         );
       },
-      [notificationSettings, onNotificationSettingsChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
     const onNotify03daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
-        onNotificationSettingsChange(
+        onNotificationSettingsWithEmailChange(
           IRecord.set(
-            notificationSettings,
+            notificationSettingsWithEmail,
             'notify03daysBeforeAnswerDeadline',
             checked
           )
         );
       },
-      [notificationSettings, onNotificationSettingsChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
     const onNotify07daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
-        onNotificationSettingsChange(
+        onNotificationSettingsWithEmailChange(
           IRecord.set(
-            notificationSettings,
+            notificationSettingsWithEmail,
             'notify07daysBeforeAnswerDeadline',
             checked
           )
         );
       },
-      [notificationSettings, onNotificationSettingsChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
     const onNotify14daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
-        onNotificationSettingsChange(
+        onNotificationSettingsWithEmailChange(
           IRecord.set(
-            notificationSettings,
+            notificationSettingsWithEmail,
             'notify14daysBeforeAnswerDeadline',
             checked
           )
         );
       },
-      [notificationSettings, onNotificationSettingsChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
     const onNotify28daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
-        onNotificationSettingsChange(
+        onNotificationSettingsWithEmailChange(
           IRecord.set(
-            notificationSettings,
+            notificationSettingsWithEmail,
             'notify28daysBeforeAnswerDeadline',
             checked
           )
         );
       },
-      [notificationSettings, onNotificationSettingsChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
 
     const disabledDetail = useMemo(
@@ -136,7 +143,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     );
 
     const invalidEmail =
-      !disabled && !isEmailString(notificationSettings.email);
+      !disabled && !isEmailString(notificationSettingsWithEmail.email);
 
     const helperText = invalidEmail ? dict.common.error.invalidEmail : '';
 
@@ -155,7 +162,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               intent={invalidEmail ? 'danger' : 'primary'}
               placeholder={'sample@gmail.com'}
               type='email'
-              value={notificationSettings.email}
+              value={notificationSettingsWithEmail.email}
               onValueChange={onEmailChange}
             />
           </FormGroup>
@@ -163,7 +170,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
         <CheckboxesWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              checked={notificationSettings.notifyOnAnswerChange}
+              checked={notificationSettingsWithEmail.notifyOnAnswerChange}
               disabled={disabled}
               label={dc.notification.notifyOnAnswerChange}
               onCheck={onNotifyOnAnswerChangeCheck}
@@ -171,7 +178,9 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              checked={notificationSettings.notify01daysBeforeAnswerDeadline}
+              checked={
+                notificationSettingsWithEmail.notify01daysBeforeAnswerDeadline
+              }
               disabled={disabledDetail.notify01daysBefore}
               label={dc.notification.notify01daysBeforeAnswerDeadline}
               onCheck={onNotify01daysBeforeAnswerDeadlineCheck}
@@ -179,7 +188,9 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              checked={notificationSettings.notify03daysBeforeAnswerDeadline}
+              checked={
+                notificationSettingsWithEmail.notify03daysBeforeAnswerDeadline
+              }
               disabled={disabledDetail.notify03daysBefore}
               label={dc.notification.notify03daysBeforeAnswerDeadline}
               onCheck={onNotify03daysBeforeAnswerDeadlineCheck}
@@ -187,7 +198,9 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              checked={notificationSettings.notify07daysBeforeAnswerDeadline}
+              checked={
+                notificationSettingsWithEmail.notify07daysBeforeAnswerDeadline
+              }
               disabled={disabledDetail.notify07daysBefore}
               label={dc.notification.notify07daysBeforeAnswerDeadline}
               onCheck={onNotify07daysBeforeAnswerDeadlineCheck}
@@ -195,7 +208,9 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              checked={notificationSettings.notify14daysBeforeAnswerDeadline}
+              checked={
+                notificationSettingsWithEmail.notify14daysBeforeAnswerDeadline
+              }
               disabled={disabledDetail.notify14daysBefore}
               label={dc.notification.notify14daysBeforeAnswerDeadline}
               onCheck={onNotify14daysBeforeAnswerDeadlineCheck}
@@ -203,7 +218,9 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           </CheckboxWrapper>
           <CheckboxWrapper>
             <BpCheckbox
-              checked={notificationSettings.notify28daysBeforeAnswerDeadline}
+              checked={
+                notificationSettingsWithEmail.notify28daysBeforeAnswerDeadline
+              }
               disabled={disabledDetail.notify28daysBefore}
               label={dc.notification.notify28daysBeforeAnswerDeadline}
               onCheck={onNotify28daysBeforeAnswerDeadlineCheck}

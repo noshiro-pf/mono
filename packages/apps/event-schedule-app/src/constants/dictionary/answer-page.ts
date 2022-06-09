@@ -40,10 +40,11 @@ export const answerPageDictionary = {
       editButtonConfirmDialogTitle: '',
       editButtonConfirmDialogMessage:
         '通知用に設定したメールアドレスを入力してください。',
-      editButtonConfirmDialogValidationFailedMessage: [
+      editButtonConfirmDialogValidationFailedMessage:
         '登録されているメールアドレスと一致しません。',
-      ],
       back: '前のページに戻る',
+      error: 'メールアドレスの照合中にエラーが発生しました。',
+      success: 'メールアドレスが確認できました。',
     },
   },
   point: (p: AnswerIconPoint): string => `（${p}点）`,

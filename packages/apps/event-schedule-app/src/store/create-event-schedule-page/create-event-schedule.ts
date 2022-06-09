@@ -1,13 +1,20 @@
+import { fillNotificationSettings } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
 import { initialEventSchedule, routes } from '../../constants';
-import { EventScheduleAppLocalStorage } from '../../functions';
+import {
+  createToaster,
+  EventScheduleAppLocalStorage,
+  showToast,
+} from '../../functions';
 import type { EventScheduleSettingCommonState } from '../../types';
 import { fireAuthUser$ } from '../auth';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';
 
 export namespace CreateEventScheduleStore {
+  const toast = createToaster();
+
   export const { commonState$, commonStateHandlers } =
     createEventScheduleSettingStore();
 
@@ -58,17 +65,19 @@ export namespace CreateEventScheduleStore {
     }
   };
 
-  export const saveToLocalStorage = (): void => {
-    const { commonState } = mut_subscribedValues;
-    if (commonState === undefined) return;
-
+  export const saveToLocalStorage = (
+    commonState: EventScheduleSettingCommonState
+  ): void => {
     const saveResult = EventScheduleAppLocalStorage.saveCreateEventPageTemp({
       answerDeadline: commonState.answerDeadline ?? 'none',
       answerIcons: commonState.answerIcons,
       datetimeRangeList: commonState.datetimeRangeList,
       datetimeSpecification: commonState.datetimeSpecification,
       notes: commonState.notes,
-      notificationSettings: commonState.notificationSettings ?? 'none',
+      notificationSettings:
+        pipe(commonState.notificationSettingsWithEmail).chainNullable(
+          fillNotificationSettings
+        ).value ?? 'none',
       title: commonState.title,
     });
     if (Result.isErr(saveResult)) {
@@ -90,14 +99,20 @@ export namespace CreateEventScheduleStore {
 
   export const { state$: url$, setState: setUrl } = createState<string>('');
 
-  export const createEvent = async (): Promise<void> => {
+  export const createEvent = async (): Promise<Result<undefined, string>> => {
     const { commonState, fireAuthUser } = mut_subscribedValues;
 
-    if (commonState === undefined) return;
+    if (commonState === undefined) return Result.ok(undefined);
 
-    const { eventScheduleNormalized, eventScheduleValidationOk } = commonState;
+    const {
+      eventScheduleNormalized,
+      eventScheduleValidationOk,
+      notificationSettingsWithEmail,
+    } = commonState;
 
-    if (!eventScheduleValidationOk) return;
+    const email = notificationSettingsWithEmail?.email ?? '';
+
+    if (!eventScheduleValidationOk) return Result.ok(undefined);
 
     setIsLoadingTrue();
 
@@ -111,10 +126,20 @@ export namespace CreateEventScheduleStore {
     );
 
     if (Result.isErr(res)) {
-      console.error(res.value);
+      return Result.err(res.value);
     }
+
+    const eventId = res.value;
+
+    if (email !== '') {
+      const res2 = await api.event.setAuthorsEmail(eventId, email);
+      if (Result.isErr(res2)) {
+        return Result.err(res2.value);
+      }
+    }
+
     setIsLoadingFalse();
-    setUrl(toAbsolutePath(`..${routes.answerPage(res.value)}`));
+    setUrl(toAbsolutePath(`..${routes.answerPage(eventId)}`));
 
     // reset local storage
     EventScheduleAppLocalStorage.saveCreateEventPageTemp({
@@ -126,10 +151,23 @@ export namespace CreateEventScheduleStore {
       notificationSettings: initialEventSchedule.notificationSettings,
       title: initialEventSchedule.title,
     });
+
+    return Result.ok(undefined);
   };
 
   export const onCreateEventClick = (): void => {
-    createEvent().catch(console.error);
+    createEvent()
+      .then((res) => {
+        if (Result.isErr(res)) {
+          console.error(res.value);
+          showToast({
+            toast,
+            message: dict.eventSettingsPage.createEventResultMessage.error,
+            intent: 'danger',
+          });
+        }
+      })
+      .catch(noop);
   };
 
   export const onClipboardButtonClick = (): void => {
@@ -160,6 +198,12 @@ export namespace CreateEventScheduleStore {
   commonState$.subscribe((commonState) => {
     mut_subscribedValues.commonState = commonState;
   });
+
+  commonState$
+    .chain(debounceTime(500))
+    .chain(skip(1))
+    .chain(filter(isNotUndefined))
+    .subscribe(saveToLocalStorage);
 
   fireAuthUser$.subscribe((user) => {
     mut_subscribedValues.fireAuthUser = user;

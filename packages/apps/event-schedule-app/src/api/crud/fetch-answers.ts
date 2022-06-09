@@ -6,7 +6,7 @@ import {
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { dbEvents } from '../../initialize-firebase';
 
-export const getAnswers = (
+export const fetchAnswers = (
   eventId: string
 ): Promise<
   Result<readonly Answer[], Readonly<{ type: 'others'; message: string }>>

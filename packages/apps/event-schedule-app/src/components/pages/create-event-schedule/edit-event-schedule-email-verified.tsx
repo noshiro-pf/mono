@@ -1,6 +1,5 @@
-import { descriptionFontColor, errorFontColor } from '../../../constants';
+import { descriptionFontColor } from '../../../constants';
 import { EditEventScheduleStore } from '../../../store';
-import { Description } from '../../atoms';
 import {
   BackToAnswerPageButton,
   EventScheduleDiff,
@@ -13,20 +12,24 @@ import { EventScheduleSettingCommon } from './event-schedule-setting-common';
 const dc = dict.eventSettingsPage;
 
 type Props = Readonly<{
-  eventScheduleSaved: EventSchedule;
+  eventScheduleFromDb: EventSchedule;
+  emailVerified: string | undefined;
 }>;
 
-export const EditEventScheduleOk = memoNamed<Props>(
-  'EditEventScheduleOk',
-  ({ eventScheduleSaved }) => {
+export const EditEventScheduleEmailVerified = memoNamed<Props>(
+  'EditEventScheduleEmailVerified',
+  ({ eventScheduleFromDb, emailVerified }) => {
     const commonState = useObservableValue(EditEventScheduleStore.commonState$);
     const hasNoChanges = useObservableValue(
       EditEventScheduleStore.hasNoChanges$
     );
 
     useEffect(() => {
-      EditEventScheduleStore.setEventSchedule(eventScheduleSaved);
-    }, [eventScheduleSaved]);
+      EditEventScheduleStore.setEventSchedule(
+        eventScheduleFromDb,
+        emailVerified
+      );
+    }, [eventScheduleFromDb, emailVerified]);
 
     const editButtonIsLoading = useObservableValue(
       EditEventScheduleStore.isLoading$
@@ -38,30 +41,16 @@ export const EditEventScheduleOk = memoNamed<Props>(
       EditEventScheduleStore.hasDeletedDatetimeChanges$
     );
 
-    const {
-      eventScheduleValidationOk,
-      notificationSettings,
-      eventScheduleValidation,
-    } = commonState;
+    const { eventScheduleValidationOk } = commonState;
 
     return (
       <>
-        <SubTitle>{dc.editSubTitle(eventScheduleSaved.title)}</SubTitle>
+        <SubTitle>{dc.editSubTitle(eventScheduleFromDb.title)}</SubTitle>
 
         <EventScheduleSettingCommon
           handlers={EditEventScheduleStore.commonStateHandlers}
           state={commonState}
         />
-
-        {notificationSettings !== undefined &&
-        !eventScheduleValidation.notificationEmail ? (
-          <ErrorMessagesWrapper>
-            <Description
-              color={errorFontColor}
-              text={dc.noteOnEmailInEditPage}
-            />
-          </ErrorMessagesWrapper>
-        ) : undefined}
 
         <ButtonsWrapperForEventSettingsPage>
           <BackToAnswerPageButton
@@ -95,8 +84,4 @@ export const EditEventScheduleOk = memoNamed<Props>(
 const SubTitle = styled('div')`
   margin: 10px 20px;
   color: ${descriptionFontColor.normal};
-`;
-
-const ErrorMessagesWrapper = styled.div`
-  margin: 10px;
 `;

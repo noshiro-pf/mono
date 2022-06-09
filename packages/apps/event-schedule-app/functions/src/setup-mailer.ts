@@ -5,13 +5,14 @@ import { fillGmailConfig } from './type-check';
 export const gmailConfig: Readonly<{
   email: string;
   password: string;
+  'app-password': string;
 }> = fillGmailConfig(config()).gmail;
 
 export const mailTransport = createTransport({
   service: 'gmail',
   auth: {
     user: gmailConfig.email,
-    pass: gmailConfig.password,
+    pass: gmailConfig['app-password'],
   },
 });
 

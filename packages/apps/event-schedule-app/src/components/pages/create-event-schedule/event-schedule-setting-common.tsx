@@ -29,7 +29,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
       answerDeadline,
       answerIcons,
       useNotification,
-      notificationSettings,
+      notificationSettingsWithEmail,
       eventScheduleValidation,
     },
     handlers: {
@@ -41,7 +41,7 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
       setAnswerDeadline,
       setAnswerIcons,
       toggleNotificationSection,
-      setNotificationSettings,
+      setNotificationSettingsWithEmail,
     },
   }) => (
     <>
@@ -65,12 +65,14 @@ export const EventScheduleSettingCommon = memoNamed<Props>(
         <EventSettings
           answerDeadline={answerDeadline}
           answerIcons={answerIcons}
-          notificationSettings={notificationSettings}
+          notificationSettingsWithEmail={notificationSettingsWithEmail}
           useAnswerDeadline={useAnswerDeadline}
           useNotification={useNotification}
           onAnswerDeadlineChange={setAnswerDeadline}
           onAnswerIconsChange={setAnswerIcons}
-          onNotificationSettingsChange={setNotificationSettings}
+          onNotificationSettingsWithEmailChange={
+            setNotificationSettingsWithEmail
+          }
           onToggleAnswerDeadline={toggleAnswerDeadlineSection}
           onToggleUseNotification={toggleNotificationSection}
         />

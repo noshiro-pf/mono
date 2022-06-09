@@ -5,6 +5,7 @@ export type ToggleSectionState<A> = Readonly<{
   turnOff: () => void;
   value$: InitializedObservable<A>;
   setValue: (a: A) => void;
+  updateValue: (fn: (a: A) => A) => void;
   resetState: () => void;
 }>;
 
@@ -21,7 +22,11 @@ export const createToggleSectionState = <A>({
 }>): ToggleSectionState<A> => {
   const toggleState = createBooleanState(initialToggleState);
 
-  const { state$: value$, setState: setValue } = createState<A>(initialState);
+  const {
+    state$: value$,
+    setState: setValue,
+    updateState: updateValue,
+  } = createState<A>(initialState);
 
   const { toggle, resetState, turnOff, turnOn } =
     createToggleSectionStateManager<A>({
@@ -37,6 +42,7 @@ export const createToggleSectionState = <A>({
     toggle,
     value$,
     setValue,
+    updateValue,
     resetState,
     turnOff,
     turnOn,

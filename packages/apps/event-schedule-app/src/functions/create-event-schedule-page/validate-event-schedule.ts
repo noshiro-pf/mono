@@ -1,14 +1,18 @@
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { answerIconPointConfig } from '../../constants';
-import type { EventScheduleValidation } from '../../types';
+import type {
+  EventScheduleValidation,
+  NotificationSettingsWithEmail,
+} from '../../types';
 
 export const validateEventSchedule = ({
   title,
   datetimeRangeList,
   answerIcons,
-  notificationSettings,
+  notificationSettingsWithEmail,
 }: Readonly<{
   datetimeRangeList: readonly DatetimeRange[]; // allow an empty array
+  notificationSettingsWithEmail: NotificationSettingsWithEmail | 'none';
 }> &
   StrictOmit<
     EventSchedule,
@@ -18,6 +22,7 @@ export const validateEventSchedule = ({
     | 'datetimeRangeList'
     | 'datetimeSpecification'
     | 'notes'
+    | 'notificationSettings'
     | 'timezoneOffsetMinutes'
   >): EventScheduleValidation => ({
   title: title !== '',
@@ -31,16 +36,16 @@ export const validateEventSchedule = ({
       answerIconPointConfig.fair.max
     )(answerIcons.fair.point),
   notificationEmail:
-    notificationSettings === 'none' ||
-    isEmailString(notificationSettings.email),
+    notificationSettingsWithEmail === 'none' ||
+    isEmailString(notificationSettingsWithEmail.email),
   notificationItems:
-    notificationSettings === 'none' ||
-    notificationSettings.notifyOnAnswerChange ||
-    notificationSettings.notify01daysBeforeAnswerDeadline ||
-    notificationSettings.notify03daysBeforeAnswerDeadline ||
-    notificationSettings.notify07daysBeforeAnswerDeadline ||
-    notificationSettings.notify14daysBeforeAnswerDeadline ||
-    notificationSettings.notify28daysBeforeAnswerDeadline,
+    notificationSettingsWithEmail === 'none' ||
+    notificationSettingsWithEmail.notifyOnAnswerChange ||
+    notificationSettingsWithEmail.notify01daysBeforeAnswerDeadline ||
+    notificationSettingsWithEmail.notify03daysBeforeAnswerDeadline ||
+    notificationSettingsWithEmail.notify07daysBeforeAnswerDeadline ||
+    notificationSettingsWithEmail.notify14daysBeforeAnswerDeadline ||
+    notificationSettingsWithEmail.notify28daysBeforeAnswerDeadline,
 });
 
 export const validateEventScheduleAll = (
