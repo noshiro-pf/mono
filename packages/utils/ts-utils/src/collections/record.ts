@@ -100,6 +100,43 @@ export namespace IRecord {
       updater as (prev: unknown) => unknown
     ) as R;
 
+  export const removeProperties = <
+    R extends ReadonlyRecordBase,
+    K extends keyof R
+  >(
+    record: R,
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    keys: readonly K[]
+  ): Readonly<{
+    [Key in StrictExclude<keyof R, K>]: R[Key];
+  }> => {
+    // eslint-disable-next-line no-restricted-globals
+    const keysSet = new Set<keyof R>(keys);
+    return fromEntries(
+      entries(record).filter(([k, _v]) => !keysSet.has(k))
+    ) as never;
+  };
+
+  /**
+   * Merge `record1` and `record2` with `...`.
+   *
+   * If `record1` and `record2` share some properties,
+   * `record2` value have priority.
+   */
+  export const merge = <
+    R1 extends ReadonlyRecordBase,
+    R2 extends ReadonlyRecordBase
+  >(
+    record1: R1,
+    record2: R2
+  ): Readonly<{
+    [Key in keyof R1 | keyof R2]: Key extends keyof R2
+      ? R2[Key]
+      : Key extends keyof R1
+      ? R1[Key]
+      : never;
+  }> => ({ ...record1, ...record2 } as never);
+
   export const keys = <R extends ReadonlyRecordBase>(
     object: R
   ): ToObjectKeysValue<keyof R>[] =>

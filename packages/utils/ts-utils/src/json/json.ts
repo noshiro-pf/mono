@@ -1,4 +1,6 @@
-import { Result } from '../functional';
+import { IList, IRecord } from '../collections';
+import { pipe, Result } from '../functional';
+import { isRecord } from '../guard';
 import { Str } from '../str';
 
 export namespace Json {
@@ -66,4 +68,43 @@ export namespace Json {
       return Result.err(Str.from(error));
     }
   };
+
+  export const stringifySortedKey = (
+    value: ReadonlyRecordBase,
+    space?: number | string
+  ): Result<string, string> => {
+    const allKeys = pipe(keysDeep(value))
+      .chain((keys) => IList.uniq(keys))
+      .chain((ks) => IList.sort(ks, Str.cmp)).value;
+
+    return stringifySelected(value, allKeys, space);
+  };
 }
+
+const keysDeepImpl = (
+  obj: ReadonlyRecordBase,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  mut_keys: string[]
+): void => {
+  for (const k of IRecord.keys(obj)) {
+    mut_keys.push(k);
+    const o = obj[k];
+    if (isRecord(o)) {
+      keysDeepImpl(o, mut_keys);
+    }
+    // eslint-disable-next-line no-restricted-globals
+    if (Array.isArray(o)) {
+      for (const li of o) {
+        if (isRecord(li)) {
+          keysDeepImpl(li, mut_keys);
+        }
+      }
+    }
+  }
+};
+
+const keysDeep = (obj: ReadonlyRecordBase): readonly string[] => {
+  const mut_keys: string[] = [];
+  keysDeepImpl(obj, mut_keys);
+  return mut_keys;
+};

@@ -21,7 +21,7 @@
     "type-check": "wireit"
   },
   "dependencies": {
-    "@noshiro/ts-utils": "2.0.1",
+    "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
     "discord.js": "^13.7.0",
     "dotenv": "^16.0.1",

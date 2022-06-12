@@ -11,6 +11,7 @@ export * from './date';
 export * from './functional';
 export * from './guard';
 export * from './iterator';
+export * from './json';
 export * from './num';
 export * from './others';
 export * from './str';
