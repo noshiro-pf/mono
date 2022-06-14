@@ -232,6 +232,104 @@ describe('IRecord', () => {
     }
   });
 
+  describe('removeProperties', () => {
+    {
+      const result = IRecord.removeProperties(rcd, ['x'] as const);
+
+      assertType<
+        TypeEq<
+          typeof result,
+          DeepReadonly<{
+            y: { c: { d: number; 4: number } };
+            z: [number, number, number];
+          }>
+        >
+      >();
+
+      test('case 1', () => {
+        expect(result).toStrictEqual({
+          y: { c: { d: 3, 4: 5 } },
+          z: [1, 2, 4],
+        });
+      });
+    }
+    {
+      const result = IRecord.removeProperties(rcd, ['y', 'z'] as const);
+
+      assertType<
+        TypeEq<
+          typeof result,
+          DeepReadonly<{
+            x: { a: number; b: number };
+          }>
+        >
+      >();
+
+      test('case 2', () => {
+        expect(result).toStrictEqual({
+          x: { a: 1, b: 2 },
+        });
+      });
+    }
+  });
+
+  describe('merge', () => {
+    {
+      const result = IRecord.merge(rcd, { a: 1, b: 2 } as const);
+
+      assertType<
+        TypeEq<
+          typeof result,
+          DeepReadonly<{
+            x: { a: number; b: number };
+            y: { c: { d: number; 4: number } };
+            z: [number, number, number];
+            a: 1;
+            b: 2;
+          }>
+        >
+      >();
+
+      test('case 1', () => {
+        expect(result).toStrictEqual({
+          x: { a: 1, b: 2 },
+          y: { c: { d: 3, 4: 5 } },
+          z: [1, 2, 4],
+          a: 1,
+          b: 2,
+        });
+      });
+    }
+    {
+      const result = IRecord.merge(rcd, {
+        x: 1,
+        y: { p: '3', q: '4' },
+        a: 1,
+      } as const);
+
+      assertType<
+        TypeEq<
+          typeof result,
+          DeepReadonly<{
+            x: 1;
+            y: { p: '3'; q: '4' };
+            z: [number, number, number];
+            a: 1;
+          }>
+        >
+      >();
+
+      test('case 2', () => {
+        expect(result).toStrictEqual({
+          x: 1,
+          y: { p: '3', q: '4' },
+          z: [1, 2, 4],
+          a: 1,
+        });
+      });
+    }
+  });
+
   describe('keys', () => {
     test('case 1', () => {
       const keys = IRecord.keys({ x: 1, y: 2 });

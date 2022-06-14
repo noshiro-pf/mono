@@ -29,7 +29,7 @@
   "dependencies": {
     "@noshiro/event-schedule-app-shared": "6.2.0",
     "@noshiro/fast-deep-equal": "1.0.1",
-    "@noshiro/ts-utils": "2.0.1",
+    "@noshiro/ts-utils": "*",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.20.1",
     "nodemailer": "^6.4.16"
