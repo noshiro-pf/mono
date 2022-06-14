@@ -81,7 +81,7 @@ jobs:
           browser: chrome
           install: false
           working-directory: packages/apps/event-schedule-app
-          spec: cypress/integration/**/*.js
+          spec: cypress/e2e/**/*.js
           start: |
             yarn start:emulators
             yarn start:dev-server
@@ -104,7 +104,7 @@ jobs:
       #     browser: firefox
       #     install: false
       #     working-directory: packages/apps/event-schedule-app
-      #     # spec: cypress/integration/*
+      #     # spec: cypress/e2e/*
       #     # build: yarn build
       #     start: yarn start:dev-server, yarn start:emulators
       #     wait-on: 'http://localhost:8080'
