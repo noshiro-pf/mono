@@ -113,7 +113,9 @@ const LastUpdatedWrapper = styled('div')`
 const ContentWrapper = styled('div')`
   padding: 0 20px 20px 20px;
 
-  overflow: auto;
+  max-width: 100vw;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
 `;
 
 const AppBarFlex = styled(MuiAppBar)`
