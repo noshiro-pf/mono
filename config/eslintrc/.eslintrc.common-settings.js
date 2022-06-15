@@ -44,7 +44,8 @@ const config = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
-        project: 'packages/**/tsconfig.json',
+        // project: ['packages/**/tsconfig.json', 'config/tsconfig.json'],
+        project: ['packages/**/tsconfig.json'],
       },
       // copied from default config
       node: {
