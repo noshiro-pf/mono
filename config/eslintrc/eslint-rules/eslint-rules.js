@@ -336,6 +336,7 @@ const eslintRules = {
   'valid-jsdoc': 'off',
   'vars-on-top': 'error',
   yoda: 'off', // disabled
+  'no-constant-binary-expression': 'error',
 };
 
 module.exports = { eslintRules };

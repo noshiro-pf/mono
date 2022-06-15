@@ -20,7 +20,7 @@ export namespace Str {
       : target.includes(key);
 
   // eslint-disable-next-line no-restricted-globals
-  export const from = (v: unknown): string => String(v);
+  export const from: (v: unknown) => string = String;
 
   /* static methods of String */
 

@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-mixed-type */
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
@@ -7,7 +8,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-unresolved.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-unresolved.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -64,7 +65,7 @@ namespace NoUnresolved {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/named.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/named.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -94,7 +95,7 @@ namespace Named {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/default.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/default.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -105,7 +106,7 @@ namespace Default {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/namespace.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/namespace.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -140,7 +141,7 @@ namespace Namespace {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-namespace.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-namespace.md
  *
  *  | key     | value      |
  *  | :------ | :--------- |
@@ -175,7 +176,7 @@ namespace NoNamespace {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/export.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -186,7 +187,7 @@ namespace Export {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-mutable-exports.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-mutable-exports.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -197,7 +198,7 @@ namespace NoMutableExports {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/extensions.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/extensions.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -367,7 +368,7 @@ namespace Extensions {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-restricted-paths.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-restricted-paths.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -437,7 +438,7 @@ namespace NoRestrictedPaths {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-internal-modules.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-internal-modules.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -490,7 +491,7 @@ namespace NoInternalModules {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/group-exports.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/group-exports.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -501,11 +502,12 @@ namespace GroupExports {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-relative-packages.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-relative-packages.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key     | value      |
+ *  | :------ | :--------- |
+ *  | type    | suggestion |
+ *  | fixable | code       |
  */
 namespace NoRelativePackages {
   /**
@@ -548,7 +550,7 @@ namespace NoRelativePackages {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-relative-parent-imports.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-relative-parent-imports.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -596,7 +598,7 @@ namespace NoRelativeParentImports {
 
 /**
  * @description Forbid a module from importing itself
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-self-import.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-self-import.md
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -608,7 +610,7 @@ namespace NoSelfImport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-cycle.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-cycle.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -680,7 +682,7 @@ namespace NoCycle {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-named-default.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-default.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -691,7 +693,7 @@ namespace NoNamedDefault {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-named-as-default.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-as-default.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -702,7 +704,7 @@ namespace NoNamedAsDefault {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-named-as-default-member.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-as-default-member.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -713,7 +715,7 @@ namespace NoNamedAsDefaultMember {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-anonymous-default-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-anonymous-default-export.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -795,7 +797,7 @@ namespace NoAnonymousDefaultExport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-unused-modules.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-unused-modules.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -940,7 +942,7 @@ namespace NoUnusedModules {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-commonjs.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-commonjs.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1003,7 +1005,7 @@ namespace NoCommonjs {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-amd.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-amd.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1014,7 +1016,7 @@ namespace NoAmd {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-duplicates.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-duplicates.md
  *
  *  | key     | value   |
  *  | :------ | :------ |
@@ -1045,7 +1047,7 @@ namespace NoDuplicates {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/first.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/first.md
  *
  *  | key     | value      |
  *  | :------ | :--------- |
@@ -1072,7 +1074,7 @@ namespace First {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/max-dependencies.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/max-dependencies.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1106,7 +1108,7 @@ namespace MaxDependencies {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-extraneous-dependencies.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-extraneous-dependencies.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -1167,7 +1169,7 @@ namespace NoExtraneousDependencies {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-absolute-path.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-absolute-path.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1214,7 +1216,7 @@ namespace NoAbsolutePath {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-nodejs-modules.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-nodejs-modules.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1248,7 +1250,7 @@ namespace NoNodejsModules {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-webpack-loader-syntax.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-webpack-loader-syntax.md
  *
  *  | key  | value   |
  *  | :--- | :------ |
@@ -1259,7 +1261,7 @@ namespace NoWebpackLoaderSyntax {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/order.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/order.md
  *
  *  | key     | value      |
  *  | :------ | :--------- |
@@ -1389,7 +1391,7 @@ namespace Order {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/newline-after-import.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/newline-after-import.md
  *
  *  | key     | value      |
  *  | :------ | :--------- |
@@ -1421,7 +1423,7 @@ namespace NewlineAfterImport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/prefer-default-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/prefer-default-export.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1432,7 +1434,7 @@ namespace PreferDefaultExport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-default-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-default-export.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1443,7 +1445,7 @@ namespace NoDefaultExport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-named-export.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-export.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1454,7 +1456,7 @@ namespace NoNamedExport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-dynamic-require.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-dynamic-require.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1484,7 +1486,7 @@ namespace NoDynamicRequire {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/unambiguous.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/unambiguous.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1495,7 +1497,7 @@ namespace Unambiguous {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-unassigned-import.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-unassigned-import.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1549,7 +1551,7 @@ namespace NoUnassignedImport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-useless-path-segments.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-useless-path-segments.md
  *
  *  | key     | value      |
  *  | :------ | :--------- |
@@ -1584,7 +1586,7 @@ namespace NoUselessPathSegments {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/dynamic-import-chunkname.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/dynamic-import-chunkname.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1655,7 +1657,7 @@ namespace NoImportModuleExports {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/exports-last.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/exports-last.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |
@@ -1666,7 +1668,7 @@ namespace ExportsLast {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-deprecated.md
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-deprecated.md
  *
  *  | key  | value      |
  *  | :--- | :--------- |

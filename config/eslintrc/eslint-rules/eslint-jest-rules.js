@@ -59,6 +59,7 @@ const eslintJestRules = {
   'jest/valid-expect-in-promise': 'error',
   'jest/valid-expect': 'error',
   'jest/valid-title': 'off',
+  'jest/prefer-hooks-in-order': 'error',
 };
 
 module.exports = { eslintJestRules };

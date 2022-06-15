@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-mixed-type */
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
 import type { Linter } from 'eslint';
@@ -20,14 +21,14 @@ namespace AdjacentOverloadSignatures {
 }
 
 /**
- * @description Requires using either `T[]` or `Array<T>` for arrays
+ * @description Require using either `T[]` or `Array<T>` for arrays
  * @link https://typescript-eslint.io/rules/array-type
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | fixable     | code       |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace ArrayType {
   /**
@@ -65,7 +66,7 @@ namespace ArrayType {
 }
 
 /**
- * @description Disallows awaiting a value that is not a Thenable
+ * @description Disallow awaiting a value that is not a Thenable
  * @link https://typescript-eslint.io/rules/await-thenable
  *
  *  | key                  | value   |
@@ -79,7 +80,7 @@ namespace AwaitThenable {
 }
 
 /**
- * @description Bans `@ts-<directive>` comments from being used or requires descriptions after directive
+ * @description Disallow `@ts-<directive>` comments or require descriptions after directive
  * @link https://typescript-eslint.io/rules/ban-ts-comment
  *
  *  | key         | value   |
@@ -103,6 +104,14 @@ namespace BanTsComment {
    *             "enum": [
    *               "allow-with-description"
    *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "descriptionFormat": {
+   *                 "type": "string"
+   *               }
+   *             }
    *           }
    *         ]
    *       },
@@ -116,6 +125,14 @@ namespace BanTsComment {
    *             "enum": [
    *               "allow-with-description"
    *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "descriptionFormat": {
+   *                 "type": "string"
+   *               }
+   *             }
    *           }
    *         ]
    *       },
@@ -129,6 +146,14 @@ namespace BanTsComment {
    *             "enum": [
    *               "allow-with-description"
    *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "descriptionFormat": {
+   *                 "type": "string"
+   *               }
+   *             }
    *           }
    *         ]
    *       },
@@ -142,6 +167,14 @@ namespace BanTsComment {
    *             "enum": [
    *               "allow-with-description"
    *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "descriptionFormat": {
+   *                 "type": "string"
+   *               }
+   *             }
    *           }
    *         ]
    *       },
@@ -155,10 +188,34 @@ namespace BanTsComment {
    * ]
    */
   export type Options = {
-    readonly 'ts-expect-error'?: boolean | 'allow-with-description';
-    readonly 'ts-ignore'?: boolean | 'allow-with-description';
-    readonly 'ts-nocheck'?: boolean | 'allow-with-description';
-    readonly 'ts-check'?: boolean | 'allow-with-description';
+    readonly 'ts-expect-error'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+          readonly [k: string]: unknown;
+        };
+    readonly 'ts-ignore'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+          readonly [k: string]: unknown;
+        };
+    readonly 'ts-nocheck'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+          readonly [k: string]: unknown;
+        };
+    readonly 'ts-check'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+          readonly [k: string]: unknown;
+        };
     readonly minimumDescriptionLength?: number;
   };
 
@@ -168,21 +225,21 @@ namespace BanTsComment {
 }
 
 /**
- * @description Bans `// tslint:<rule-flag>` comments from being used
+ * @description Disallow `// tslint:<rule-flag>` comments
  * @link https://typescript-eslint.io/rules/ban-tslint-comment
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | fixable     | code       |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace BanTslintComment {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Bans specific types from being used
+ * @description Disallow certain types
  * @link https://typescript-eslint.io/rules/ban-types
  *
  *  | key         | value      |
@@ -297,14 +354,14 @@ namespace BraceStyle {
 }
 
 /**
- * @description Ensures that literals on classes are exposed in a consistent style
+ * @description Enforce that literals on classes are exposed in a consistent style
  * @link https://typescript-eslint.io/rules/class-literal-property-style
  *
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | fixable     | code    |
- *  | recommended | false   |
+ *  | recommended | strict  |
  */
 namespace ClassLiteralPropertyStyle {
   /**
@@ -325,7 +382,7 @@ namespace ClassLiteralPropertyStyle {
 }
 
 /**
- * @description Require or disallow trailing comma
+ * @description Require or disallow trailing commas
  * @link https://typescript-eslint.io/rules/comma-dangle
  *
  *  | key         | value  |
@@ -432,7 +489,7 @@ namespace CommaDangle {
 }
 
 /**
- * @description Enforces consistent spacing before and after commas
+ * @description Enforce consistent spacing before and after commas
  * @link https://typescript-eslint.io/rules/comma-spacing
  *
  *  | key         | value      |
@@ -471,14 +528,42 @@ namespace CommaSpacing {
 }
 
 /**
- * @description Enforce or disallow the use of the record type
+ * @description Enforce specifying generic type arguments on type annotation or constructor name of a constructor call
+ * @link https://typescript-eslint.io/rules/consistent-generic-constructors
+ *
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | fixable     | code       |
+ *  | recommended | strict     |
+ */
+namespace ConsistentGenericConstructors {
+  /**
+   * [
+   *   {
+   *     "enum": [
+   *       "type-annotation",
+   *       "constructor"
+   *     ]
+   *   }
+   * ]
+   */
+  export type Options = 'type-annotation' | 'constructor';
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Require or disallow the `Record` type
  * @link https://typescript-eslint.io/rules/consistent-indexed-object-style
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | fixable     | code       |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace ConsistentIndexedObjectStyle {
   /**
@@ -499,13 +584,13 @@ namespace ConsistentIndexedObjectStyle {
 }
 
 /**
- * @description Enforces consistent usage of type assertions
+ * @description Enforce consistent usage of type assertions
  * @link https://typescript-eslint.io/rules/consistent-type-assertions
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace ConsistentTypeAssertions {
   /**
@@ -570,14 +655,14 @@ namespace ConsistentTypeAssertions {
 }
 
 /**
- * @description Consistent with type definition either `interface` or `type`
+ * @description Enforce type definitions to consistently use either `interface` or `type`
  * @link https://typescript-eslint.io/rules/consistent-type-definitions
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | fixable     | code       |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace ConsistentTypeDefinitions {
   /**
@@ -598,7 +683,7 @@ namespace ConsistentTypeDefinitions {
 }
 
 /**
- * @description Enforces consistent usage of type exports
+ * @description Enforce consistent usage of type exports
  * @link https://typescript-eslint.io/rules/consistent-type-exports
  *
  *  | key                  | value      |
@@ -632,7 +717,7 @@ namespace ConsistentTypeExports {
 }
 
 /**
- * @description Enforces consistent usage of type imports
+ * @description Enforce consistent usage of type imports
  * @link https://typescript-eslint.io/rules/consistent-type-imports
  *
  *  | key         | value      |
@@ -685,14 +770,14 @@ namespace DefaultParamLast {
 }
 
 /**
- * @description enforce dot notation whenever possible
+ * @description Enforce dot notation whenever possible
  * @link https://typescript-eslint.io/rules/dot-notation
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace DotNotation {
@@ -1323,7 +1408,7 @@ namespace Indent {
 }
 
 /**
- * @description require or disallow initialization in variable declarations
+ * @description Require or disallow initialization in variable declarations
  * @link https://typescript-eslint.io/rules/init-declarations
  *
  *  | key         | value      |
@@ -5679,7 +5764,7 @@ namespace MemberOrdering {
 }
 
 /**
- * @description Enforces using a particular method signature syntax.
+ * @description Enforce using a particular method signature syntax
  * @link https://typescript-eslint.io/rules/method-signature-style
  *
  *  | key         | value      |
@@ -5707,7 +5792,7 @@ namespace MethodSignatureStyle {
 }
 
 /**
- * @description Enforces naming conventions for everything across a codebase
+ * @description Enforce naming conventions for everything across a codebase
  * @link https://typescript-eslint.io/rules/naming-convention
  *
  *  | key                  | value      |
@@ -10232,13 +10317,13 @@ namespace NoArrayConstructor {
 }
 
 /**
- * @description Requires that `.toString()` is only called on objects which provide useful information when stringified
+ * @description Require `.toString()` to only be called on objects which provide useful information when stringified
  * @link https://typescript-eslint.io/rules/no-base-to-string
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace NoBaseToString {
@@ -10276,14 +10361,14 @@ namespace NoBaseToString {
  *  | type           | problem |
  *  | fixable        | code    |
  *  | hasSuggestions | true    |
- *  | recommended    | false   |
+ *  | recommended    | strict  |
  */
 namespace NoConfusingNonNullAssertion {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Requires expressions of type void to appear in statement position
+ * @description Require expressions of type void to appear in statement position
  * @link https://typescript-eslint.io/rules/no-confusing-void-expression
  *
  *  | key                  | value   |
@@ -10335,12 +10420,27 @@ namespace NoDupeClassMembers {
 }
 
 /**
+ * @description Disallow duplicate enum member values
+ * @link https://typescript-eslint.io/rules/no-duplicate-enum-values
+ *
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | strict  |
+ */
+namespace NoDuplicateEnumValues {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * @description Disallow duplicate imports
  * @link https://typescript-eslint.io/rules/no-duplicate-imports
  *
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | true    |
  *  | recommended | false   |
  */
 namespace NoDuplicateImports {
@@ -10358,24 +10458,18 @@ namespace NoDuplicateImports {
    *   }
    * ]
    */
-  export type Options = {
-    readonly includeExports?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 'off';
 }
 
 /**
- * @description Disallow the delete operator with computed key expressions
+ * @description Disallow using the `delete` operator on computed key expressions
  * @link https://typescript-eslint.io/rules/no-dynamic-delete
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | fixable     | code       |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace NoDynamicDelete {
   export type RuleEntry = Linter.RuleLevel;
@@ -10412,7 +10506,8 @@ namespace NoEmptyFunction {
    *             "protected-constructors",
    *             "asyncFunctions",
    *             "asyncMethods",
-   *             "decoratedFunctions"
+   *             "decoratedFunctions",
+   *             "overrideMethods"
    *           ]
    *         },
    *         "uniqueItems": true
@@ -10437,6 +10532,7 @@ namespace NoEmptyFunction {
       | 'asyncFunctions'
       | 'asyncMethods'
       | 'decoratedFunctions'
+      | 'overrideMethods'
     )[];
   };
 
@@ -10481,7 +10577,7 @@ namespace NoEmptyInterface {
 }
 
 /**
- * @description Disallow usage of the `any` type
+ * @description Disallow the `any` type
  * @link https://typescript-eslint.io/rules/no-explicit-any
  *
  *  | key            | value      |
@@ -10648,13 +10744,13 @@ namespace NoExtraSemi {
 }
 
 /**
- * @description Forbids the use of classes as namespaces
+ * @description Disallow classes used as namespaces
  * @link https://typescript-eslint.io/rules/no-extraneous-class
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace NoExtraneousClass {
   /**
@@ -10692,7 +10788,7 @@ namespace NoExtraneousClass {
 }
 
 /**
- * @description Requires Promise-like values to be handled appropriately
+ * @description Require Promise-like statements to be handled appropriately
  * @link https://typescript-eslint.io/rules/no-floating-promises
  *
  *  | key                  | value   |
@@ -10789,7 +10885,7 @@ namespace NoImpliedEval {
 }
 
 /**
- * @description Disallows explicit type declarations for variables or parameters initialized to a number, string, or boolean
+ * @description Disallow explicit type declarations for variables or parameters initialized to a number, string, or boolean
  * @link https://typescript-eslint.io/rules/no-inferrable-types
  *
  *  | key         | value      |
@@ -10859,13 +10955,13 @@ namespace NoInvalidThis {
 }
 
 /**
- * @description Disallows usage of `void` type outside of generic or return types
+ * @description Disallow `void` type outside of generic or return types
  * @link https://typescript-eslint.io/rules/no-invalid-void-type
  *
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | recommended | false   |
+ *  | recommended | strict  |
  */
 namespace NoInvalidVoidType {
   /**
@@ -10985,6 +11081,9 @@ namespace NoMagicNumbers {
    *       },
    *       "ignoreReadonlyClassProperties": {
    *         "type": "boolean"
+   *       },
+   *       "ignoreTypeIndexes": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11000,6 +11099,7 @@ namespace NoMagicNumbers {
     readonly ignoreNumericLiteralTypes?: boolean;
     readonly ignoreEnums?: boolean;
     readonly ignoreReadonlyClassProperties?: boolean;
+    readonly ignoreTypeIndexes?: boolean;
   };
 
   export type RuleEntry =
@@ -11016,7 +11116,7 @@ namespace NoMagicNumbers {
  *  | type                 | suggestion |
  *  | fixable              | code       |
  *  | hasSuggestions       | true       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  *  | suggestion           | true       |
  */
@@ -11058,7 +11158,7 @@ namespace NoMisusedNew {
 }
 
 /**
- * @description Avoid using promises in places not designed to handle them
+ * @description Disallow Promises in places not designed to handle them
  * @link https://typescript-eslint.io/rules/no-misused-promises
  *
  *  | key                  | value   |
@@ -11103,6 +11203,9 @@ namespace NoMisusedPromises {
    *             "type": "object"
    *           }
    *         ]
+   *       },
+   *       "checksSpreads": {
+   *         "type": "boolean"
    *       }
    *     }
    *   }
@@ -11119,6 +11222,7 @@ namespace NoMisusedPromises {
           readonly returns?: boolean;
           readonly variables?: boolean;
         };
+    readonly checksSpreads?: boolean;
     readonly [k: string]: unknown;
   };
 
@@ -11128,7 +11232,7 @@ namespace NoMisusedPromises {
 }
 
 /**
- * @description Disallow the use of custom TypeScript modules and namespaces
+ * @description Disallow custom TypeScript modules and namespaces
  * @link https://typescript-eslint.io/rules/no-namespace
  *
  *  | key         | value      |
@@ -11164,21 +11268,21 @@ namespace NoNamespace {
 }
 
 /**
- * @description Disallows using a non-null assertion in the left operand of the nullish coalescing operator
+ * @description Disallow non-null assertions in the left operand of a nullish coalescing operator
  * @link https://typescript-eslint.io/rules/no-non-null-asserted-nullish-coalescing
  *
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
  *  | hasSuggestions | true    |
- *  | recommended    | false   |
+ *  | recommended    | strict  |
  */
 namespace NoNonNullAssertedNullishCoalescing {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Disallows using a non-null assertion after an optional chain expression
+ * @description Disallow non-null assertions after an optional chain expression
  * @link https://typescript-eslint.io/rules/no-non-null-asserted-optional-chain
  *
  *  | key            | value   |
@@ -11193,7 +11297,7 @@ namespace NoNonNullAssertedOptionalChain {
 }
 
 /**
- * @description Disallows non-null assertions using the `!` postfix operator
+ * @description Disallow non-null assertions using the `!` postfix operator
  * @link https://typescript-eslint.io/rules/no-non-null-assertion
  *
  *  | key            | value   |
@@ -11214,6 +11318,7 @@ namespace NoNonNullAssertion {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
+ *  | deprecated  | true    |
  *  | recommended | false   |
  */
 namespace NoParameterProperties {
@@ -11242,32 +11347,7 @@ namespace NoParameterProperties {
    *   }
    * ]
    */
-  export type Options = {
-    readonly allows?: readonly [
-      (
-        | 'readonly'
-        | 'private'
-        | 'protected'
-        | 'public'
-        | 'private readonly'
-        | 'protected readonly'
-        | 'public readonly'
-      ),
-      ...(readonly (
-        | 'readonly'
-        | 'private'
-        | 'protected'
-        | 'public'
-        | 'private readonly'
-        | 'protected readonly'
-        | 'public readonly'
-      )[])
-    ];
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 'off';
 }
 
 /**
@@ -11321,7 +11401,7 @@ namespace NoRedundantTypeConstituents {
 }
 
 /**
- * @description Disallows invocation of `require()`
+ * @description Disallow invocation of `require()`
  * @link https://typescript-eslint.io/rules/no-require-imports
  *
  *  | key         | value   |
@@ -11467,6 +11547,9 @@ namespace NoShadow {
    *           "type": "string"
    *         }
    *       },
+   *       "ignoreOnInitialization": {
+   *         "type": "boolean"
+   *       },
    *       "ignoreTypeValueShadow": {
    *         "type": "boolean"
    *       },
@@ -11482,6 +11565,7 @@ namespace NoShadow {
     readonly builtinGlobals?: boolean;
     readonly hoist?: 'all' | 'functions' | 'never';
     readonly allow?: readonly string[];
+    readonly ignoreOnInitialization?: boolean;
     readonly ignoreTypeValueShadow?: boolean;
     readonly ignoreFunctionTypeParameterNameValueShadow?: boolean;
   };
@@ -11537,7 +11621,7 @@ namespace NoThisAlias {
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
- *  | recommended          | false   |
+ *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  */
 namespace NoThrowLiteral {
@@ -11568,7 +11652,7 @@ namespace NoThrowLiteral {
 }
 
 /**
- * @description Disallow the use of type aliases
+ * @description Disallow type aliases
  * @link https://typescript-eslint.io/rules/no-type-alias
  *
  *  | key         | value      |
@@ -11684,14 +11768,14 @@ namespace NoTypeAlias {
 }
 
 /**
- * @description Flags unnecessary equality comparisons against boolean literals
+ * @description Disallow unnecessary equality comparisons against boolean literals
  * @link https://typescript-eslint.io/rules/no-unnecessary-boolean-literal-compare
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace NoUnnecessaryBooleanLiteralCompare {
@@ -11722,14 +11806,14 @@ namespace NoUnnecessaryBooleanLiteralCompare {
 }
 
 /**
- * @description Prevents conditionals where the type is always truthy or always falsy
+ * @description Disallow conditionals where the type is always truthy or always falsy
  * @link https://typescript-eslint.io/rules/no-unnecessary-condition
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace NoUnnecessaryCondition {
@@ -11760,7 +11844,7 @@ namespace NoUnnecessaryCondition {
 }
 
 /**
- * @description Warns when a namespace qualifier is unnecessary
+ * @description Disallow unnecessary namespace qualifiers
  * @link https://typescript-eslint.io/rules/no-unnecessary-qualifier
  *
  *  | key                  | value      |
@@ -11775,14 +11859,14 @@ namespace NoUnnecessaryQualifier {
 }
 
 /**
- * @description Enforces that type arguments will not be used if not required
+ * @description Disallow type arguments that are equal to the default
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-arguments
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace NoUnnecessaryTypeArguments {
@@ -11790,7 +11874,7 @@ namespace NoUnnecessaryTypeArguments {
 }
 
 /**
- * @description Warns if a type assertion does not change the type of an expression
+ * @description Disallow type assertions that do not change the type of an expression
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-assertion
  *
  *  | key                  | value      |
@@ -11827,22 +11911,22 @@ namespace NoUnnecessaryTypeAssertion {
 }
 
 /**
- * @description Disallows unnecessary constraints on generic types
+ * @description Disallow unnecessary constraints on generic types
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-constraint
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | error      |
- *  | suggestion  | true       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | error      |
+ *  | suggestion     | true       |
  */
 namespace NoUnnecessaryTypeConstraint {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Disallows calling a function with an any type value
+ * @description Disallow calling a function with a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-argument
  *
  *  | key                  | value   |
@@ -11856,7 +11940,7 @@ namespace NoUnsafeArgument {
 }
 
 /**
- * @description Disallows assigning any to variables and properties
+ * @description Disallow assigning a value with type `any` to variables and properties
  * @link https://typescript-eslint.io/rules/no-unsafe-assignment
  *
  *  | key                  | value   |
@@ -11870,7 +11954,7 @@ namespace NoUnsafeAssignment {
 }
 
 /**
- * @description Disallows calling an any type value
+ * @description Disallow calling a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-call
  *
  *  | key                  | value   |
@@ -11884,7 +11968,7 @@ namespace NoUnsafeCall {
 }
 
 /**
- * @description Disallows member access on any typed variables
+ * @description Disallow member access on a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-member-access
  *
  *  | key                  | value   |
@@ -11898,7 +11982,7 @@ namespace NoUnsafeMemberAccess {
 }
 
 /**
- * @description Disallows returning any from a function
+ * @description Disallow returning a value with type `any` from a function
  * @link https://typescript-eslint.io/rules/no-unsafe-return
  *
  *  | key                  | value   |
@@ -12012,6 +12096,9 @@ namespace NoUnusedVars {
    *           },
    *           "caughtErrorsIgnorePattern": {
    *             "type": "string"
+   *           },
+   *           "destructuredArrayIgnorePattern": {
+   *             "type": "string"
    *           }
    *         },
    *         "additionalProperties": false
@@ -12030,6 +12117,7 @@ namespace NoUnusedVars {
         readonly argsIgnorePattern?: string;
         readonly caughtErrors?: 'all' | 'none';
         readonly caughtErrorsIgnorePattern?: string;
+        readonly destructuredArrayIgnorePattern?: string;
       };
 
   export type RuleEntry =
@@ -12107,7 +12195,7 @@ namespace NoUseBeforeDefine {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | recommended | false   |
+ *  | recommended | strict  |
  */
 namespace NoUselessConstructor {
   export type RuleEntry = Linter.RuleLevel;
@@ -12130,7 +12218,7 @@ namespace NoUselessEmptyExport {
 }
 
 /**
- * @description Disallows the use of require statements except in import statements
+ * @description Disallow `require` statements except in import statements
  * @link https://typescript-eslint.io/rules/no-var-requires
  *
  *  | key         | value   |
@@ -12143,14 +12231,14 @@ namespace NoVarRequires {
 }
 
 /**
- * @description Prefers a non-null assertion over explicit type cast when possible
+ * @description Enforce non-null assertions over explicit type casts
  * @link https://typescript-eslint.io/rules/non-nullable-type-assertion-style
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  *  | suggestion           | true       |
  */
@@ -12205,7 +12293,7 @@ namespace ObjectCurlySpacing {
 }
 
 /**
- * @description require or disallow padding lines between statements
+ * @description Require or disallow padding lines between statements
  * @link https://typescript-eslint.io/rules/padding-line-between-statements
  *
  *  | key            | value      |
@@ -12491,7 +12579,77 @@ namespace PaddingLineBetweenStatements {
 }
 
 /**
- * @description Prefer usage of `as const` over literal type
+ * @description Require or disallow parameter properties in class constructors
+ * @link https://typescript-eslint.io/rules/parameter-properties
+ *
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | recommended | false   |
+ */
+namespace ParameterProperties {
+  /**
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allow": {
+   *         "type": "array",
+   *         "items": {
+   *           "enum": [
+   *             "readonly",
+   *             "private",
+   *             "protected",
+   *             "public",
+   *             "private readonly",
+   *             "protected readonly",
+   *             "public readonly"
+   *           ]
+   *         },
+   *         "minItems": 1
+   *       },
+   *       "prefer": {
+   *         "enum": [
+   *           "class-property",
+   *           "parameter-property"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   */
+  export type Options = {
+    readonly allow?: readonly [
+      (
+        | 'readonly'
+        | 'private'
+        | 'protected'
+        | 'public'
+        | 'private readonly'
+        | 'protected readonly'
+        | 'public readonly'
+      ),
+      ...(readonly (
+        | 'readonly'
+        | 'private'
+        | 'protected'
+        | 'public'
+        | 'private readonly'
+        | 'protected readonly'
+        | 'public readonly'
+      )[])
+    ];
+    readonly prefer?: 'class-property' | 'parameter-property';
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Enforce the use of `as const` over literal type
  * @link https://typescript-eslint.io/rules/prefer-as-const
  *
  *  | key            | value      |
@@ -12507,7 +12665,7 @@ namespace PreferAsConst {
 }
 
 /**
- * @description Prefer initializing each enums member value
+ * @description Require each enum member value to be explicitly initialized
  * @link https://typescript-eslint.io/rules/prefer-enum-initializers
  *
  *  | key            | value      |
@@ -12522,27 +12680,27 @@ namespace PreferEnumInitializers {
 }
 
 /**
- * @description Prefer a ‘for-of’ loop over a standard ‘for’ loop if the index is only used to access the array being iterated
+ * @description Enforce the use of `for-of` loop over the standard `for` loop where possible
  * @link https://typescript-eslint.io/rules/prefer-for-of
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace PreferForOf {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Use function types instead of interfaces with call signatures
+ * @description Enforce using function types instead of interfaces with call signatures
  * @link https://typescript-eslint.io/rules/prefer-function-type
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | fixable     | code       |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace PreferFunctionType {
   export type RuleEntry = Linter.RuleLevel;
@@ -12556,7 +12714,7 @@ namespace PreferFunctionType {
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace PreferIncludes {
@@ -12564,13 +12722,13 @@ namespace PreferIncludes {
 }
 
 /**
- * @description Require that all enum members be literal values to prevent unintended enum member name shadow issues
+ * @description Require all enum members to be literal values
  * @link https://typescript-eslint.io/rules/prefer-literal-enum-member
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | false      |
  */
 namespace PreferLiteralEnumMember {
@@ -12597,7 +12755,7 @@ namespace PreferLiteralEnumMember {
 }
 
 /**
- * @description Require the use of the `namespace` keyword instead of the `module` keyword to declare custom TypeScript modules
+ * @description Require using `namespace` keyword over `module` keyword to declare custom TypeScript modules
  * @link https://typescript-eslint.io/rules/prefer-namespace-keyword
  *
  *  | key         | value      |
@@ -12611,14 +12769,14 @@ namespace PreferNamespaceKeyword {
 }
 
 /**
- * @description Enforce the usage of the nullish coalescing operator instead of logical chaining
+ * @description Enforce using the nullish coalescing operator instead of logical chaining
  * @link https://typescript-eslint.io/rules/prefer-nullish-coalescing
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | hasSuggestions       | true       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  *  | suggestion           | true       |
  */
@@ -12654,14 +12812,14 @@ namespace PreferNullishCoalescing {
 }
 
 /**
- * @description Prefer using concise optional chain expressions instead of chained logical ands
+ * @description Enforce using concise optional chain expressions instead of chained logical ands
  * @link https://typescript-eslint.io/rules/prefer-optional-chain
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
  *  | type           | suggestion |
  *  | hasSuggestions | true       |
- *  | recommended    | false      |
+ *  | recommended    | strict     |
  *  | suggestion     | true       |
  */
 namespace PreferOptionalChain {
@@ -12669,7 +12827,7 @@ namespace PreferOptionalChain {
 }
 
 /**
- * @description Requires that private members are marked as `readonly` if they're never modified outside of the constructor
+ * @description Require private members to be marked as `readonly` if they're never modified outside of the constructor
  * @link https://typescript-eslint.io/rules/prefer-readonly
  *
  *  | key                  | value      |
@@ -12704,7 +12862,7 @@ namespace PreferReadonly {
 }
 
 /**
- * @description Requires that function parameters are typed as readonly to prevent accidental mutation of inputs
+ * @description Require function parameters to be typed as `readonly` to prevent accidental mutation of inputs
  * @link https://typescript-eslint.io/rules/prefer-readonly-parameter-types
  *
  *  | key                  | value      |
@@ -12745,14 +12903,14 @@ namespace PreferReadonlyParameterTypes {
 }
 
 /**
- * @description Prefer using type parameter when calling `Array#reduce` instead of casting
+ * @description Enforce using type parameter when calling `Array#reduce` instead of casting
  * @link https://typescript-eslint.io/rules/prefer-reduce-type-parameter
  *
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
  *  | fixable              | code    |
- *  | recommended          | false   |
+ *  | recommended          | strict  |
  *  | requiresTypeChecking | true    |
  */
 namespace PreferReduceTypeParameter {
@@ -12760,7 +12918,7 @@ namespace PreferReduceTypeParameter {
 }
 
 /**
- * @description Enforce that `RegExp#exec` is used instead of `String#match` if no global flag is provided
+ * @description Enforce `RegExp#exec` over `String#match` if no global flag is provided
  * @link https://typescript-eslint.io/rules/prefer-regexp-exec
  *
  *  | key                  | value      |
@@ -12782,7 +12940,7 @@ namespace PreferRegexpExec {
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace PreferReturnThisType {
@@ -12790,14 +12948,14 @@ namespace PreferReturnThisType {
 }
 
 /**
- * @description Enforce the use of `String#startsWith` and `String#endsWith` instead of other equivalent methods of checking substrings
+ * @description Enforce using `String#startsWith` and `String#endsWith` over other equivalent methods of checking substrings
  * @link https://typescript-eslint.io/rules/prefer-string-starts-ends-with
  *
  *  | key                  | value      |
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | fixable              | code       |
- *  | recommended          | false      |
+ *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  */
 namespace PreferStringStartsEndsWith {
@@ -12805,21 +12963,21 @@ namespace PreferStringStartsEndsWith {
 }
 
 /**
- * @description Recommends using `@ts-expect-error` over `@ts-ignore`
+ * @description Enforce using `@ts-expect-error` over `@ts-ignore`
  * @link https://typescript-eslint.io/rules/prefer-ts-expect-error
  *
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | fixable     | code    |
- *  | recommended | false   |
+ *  | recommended | strict  |
  */
 namespace PreferTsExpectError {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Requires any function or method that returns a Promise to be marked async
+ * @description Require any function or method that returns a Promise to be marked async
  * @link https://typescript-eslint.io/rules/promise-function-async
  *
  *  | key                  | value      |
@@ -12934,7 +13092,7 @@ namespace Quotes {
 }
 
 /**
- * @description Requires `Array#sort` calls to always provide a `compareFunction`
+ * @description Require `Array#sort` calls to always provide a `compareFunction`
  * @link https://typescript-eslint.io/rules/require-array-sort-compare
  *
  *  | key                  | value   |
@@ -12981,7 +13139,7 @@ namespace RequireAwait {
 }
 
 /**
- * @description When adding two variables, operands must both be of type number or of type string
+ * @description Require both operands of addition to have type `number` or `string`
  * @link https://typescript-eslint.io/rules/restrict-plus-operands
  *
  *  | key                  | value   |
@@ -13018,7 +13176,7 @@ namespace RestrictPlusOperands {
 }
 
 /**
- * @description Enforce template literal expressions to be of string type
+ * @description Enforce template literal expressions to be of `string` type
  * @link https://typescript-eslint.io/rules/restrict-template-expressions
  *
  *  | key                  | value   |
@@ -13067,7 +13225,7 @@ namespace RestrictTemplateExpressions {
 }
 
 /**
- * @description Enforces consistent returning of awaited values
+ * @description Enforce consistent returning of awaited values
  * @link https://typescript-eslint.io/rules/return-await
  *
  *  | key                  | value   |
@@ -13187,7 +13345,7 @@ namespace Semi {
 }
 
 /**
- * @description Enforces that members of a type union/intersection are sorted alphabetically
+ * @description Enforce members of a type union/intersection to be sorted alphabetically
  * @link https://typescript-eslint.io/rules/sort-type-union-intersection-members
  *
  *  | key            | value      |
@@ -13259,7 +13417,7 @@ namespace SortTypeUnionIntersectionMembers {
 }
 
 /**
- * @description Enforces consistent spacing before blocks
+ * @description Enforce consistent spacing before blocks
  * @link https://typescript-eslint.io/rules/space-before-blocks
  *
  *  | key         | value      |
@@ -13324,7 +13482,7 @@ namespace SpaceBeforeBlocks {
 }
 
 /**
- * @description Enforces consistent spacing before function parenthesis
+ * @description Enforce consistent spacing before function parenthesis
  * @link https://typescript-eslint.io/rules/space-before-function-paren
  *
  *  | key         | value      |
@@ -13389,7 +13547,7 @@ namespace SpaceBeforeFunctionParen {
 }
 
 /**
- * @description This rule is aimed at ensuring there are spaces around infix operators.
+ * @description Require spacing around infix operators
  * @link https://typescript-eslint.io/rules/space-infix-ops
  *
  *  | key         | value      |
@@ -13423,7 +13581,7 @@ namespace SpaceInfixOps {
 }
 
 /**
- * @description Restricts the types allowed in boolean expressions
+ * @description Disallow certain types in boolean expressions
  * @link https://typescript-eslint.io/rules/strict-boolean-expressions
  *
  *  | key                  | value      |
@@ -13486,7 +13644,7 @@ namespace StrictBooleanExpressions {
 }
 
 /**
- * @description Exhaustiveness checking in switch with union type
+ * @description Require switch-case statements to be exhaustive with union type
  * @link https://typescript-eslint.io/rules/switch-exhaustiveness-check
  *
  *  | key                  | value      |
@@ -13502,7 +13660,7 @@ namespace SwitchExhaustivenessCheck {
 }
 
 /**
- * @description Sets preference level for triple slash directives versus ES6-style import declarations
+ * @description Disallow certain triple slash directives in favor of ES6-style import declarations
  * @link https://typescript-eslint.io/rules/triple-slash-reference
  *
  *  | key         | value      |
@@ -13693,7 +13851,7 @@ namespace TypeAnnotationSpacing {
 }
 
 /**
- * @description Requires type annotations to exist
+ * @description Require type annotations in certain places
  * @link https://typescript-eslint.io/rules/typedef
  *
  *  | key         | value      |
@@ -13753,7 +13911,7 @@ namespace Typedef {
 }
 
 /**
- * @description Enforces unbound methods are called with their expected scope
+ * @description Enforce unbound methods are called with their expected scope
  * @link https://typescript-eslint.io/rules/unbound-method
  *
  *  | key                  | value   |
@@ -13786,16 +13944,35 @@ namespace UnboundMethod {
 }
 
 /**
- * @description Warns for any two overloads that could be unified into one by using a union or an optional/rest parameter
+ * @description Disallow two overloads that could be unified into one with a union or an optional/rest parameter
  * @link https://typescript-eslint.io/rules/unified-signatures
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
- *  | recommended | false      |
+ *  | recommended | strict     |
  */
 namespace UnifiedSignatures {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "ignoreDifferentlyNamedParameters": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   */
+  export type Options = {
+    readonly ignoreDifferentlyNamedParameters?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 export type TypeScriptEslintRules = {
@@ -13809,6 +13986,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.RuleEntry;
   readonly '@typescript-eslint/comma-dangle': CommaDangle.RuleEntry;
   readonly '@typescript-eslint/comma-spacing': CommaSpacing.RuleEntry;
+  readonly '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.RuleEntry;
   readonly '@typescript-eslint/consistent-indexed-object-style': ConsistentIndexedObjectStyle.RuleEntry;
   readonly '@typescript-eslint/consistent-type-assertions': ConsistentTypeAssertions.RuleEntry;
   readonly '@typescript-eslint/consistent-type-definitions': ConsistentTypeDefinitions.RuleEntry;
@@ -13833,6 +14011,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-confusing-non-null-assertion': NoConfusingNonNullAssertion.RuleEntry;
   readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.RuleEntry;
   readonly '@typescript-eslint/no-dupe-class-members': NoDupeClassMembers.RuleEntry;
+  readonly '@typescript-eslint/no-duplicate-enum-values': NoDuplicateEnumValues.RuleEntry;
   readonly '@typescript-eslint/no-duplicate-imports': NoDuplicateImports.RuleEntry;
   readonly '@typescript-eslint/no-dynamic-delete': NoDynamicDelete.RuleEntry;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.RuleEntry;
@@ -13888,6 +14067,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/non-nullable-type-assertion-style': NonNullableTypeAssertionStyle.RuleEntry;
   readonly '@typescript-eslint/object-curly-spacing': ObjectCurlySpacing.RuleEntry;
   readonly '@typescript-eslint/padding-line-between-statements': PaddingLineBetweenStatements.RuleEntry;
+  readonly '@typescript-eslint/parameter-properties': ParameterProperties.RuleEntry;
   readonly '@typescript-eslint/prefer-as-const': PreferAsConst.RuleEntry;
   readonly '@typescript-eslint/prefer-enum-initializers': PreferEnumInitializers.RuleEntry;
   readonly '@typescript-eslint/prefer-for-of': PreferForOf.RuleEntry;
