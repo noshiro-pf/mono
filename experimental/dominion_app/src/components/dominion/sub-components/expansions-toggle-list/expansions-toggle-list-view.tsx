@@ -1,6 +1,6 @@
 import { Button, Checkbox, FormControlLabel } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { CSSProperties, memo, useCallback } from 'react'
+import { CSSProperties, memo, useCallback } from 'react'
 
 const buttonStyle: CSSProperties = {
   margin: '5px',

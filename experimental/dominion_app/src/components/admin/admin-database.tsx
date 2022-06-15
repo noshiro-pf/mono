@@ -1,5 +1,5 @@
 import { Button } from '@material-ui/core'
-import React, { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useRNValue } from 'rnjs-hooks'
 import { fbPaths } from '~/constants/firebase-config'
 import * as fb from '~/firebase/firebase-worker'

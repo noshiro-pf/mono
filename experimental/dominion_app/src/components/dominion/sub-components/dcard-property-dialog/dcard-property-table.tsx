@@ -1,6 +1,6 @@
 import { Paper, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { TDCardProperty } from '~/types/dcard-property'
 import { properties } from './properties'
 

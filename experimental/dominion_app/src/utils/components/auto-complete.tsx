@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 // import CreatableSelect from 'react-select/src/Creatable';
 // import { ValueType } from 'react-select/lib/types';
 

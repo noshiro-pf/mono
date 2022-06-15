@@ -1,6 +1,6 @@
 import { TableBody, TableCell, TableRow } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { TPlayerResultRanked } from '~/types/player-result-ranked'
 
 export const PlayerResultTableBodyNormal = memo(

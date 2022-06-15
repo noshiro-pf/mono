@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { RN } from 'rnjs'
 import { useRNValue } from 'rnjs-hooks'
 import * as fbc from '~/firebase/firebase-combined-values'

@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { timer } from 'rnjs'
 import { useRN, useRNValue } from 'rnjs-hooks'
 import { myName$ } from '~/local-storage-api'

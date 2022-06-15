@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { MyInput } from '~/utils/components/native-input'
 
 export const GameResultMemo = memo(

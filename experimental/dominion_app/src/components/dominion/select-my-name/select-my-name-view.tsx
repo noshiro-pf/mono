@@ -1,6 +1,6 @@
 import { CircularProgress, Divider, Paper } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import styled from 'styled-components'
 import { ComponentSwitcher } from '~/utils/components/component-switcher'
 import { MyTabs } from '~/utils/components/tabs'

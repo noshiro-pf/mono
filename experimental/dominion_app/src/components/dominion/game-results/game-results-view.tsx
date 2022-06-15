@@ -1,6 +1,6 @@
 import { Divider, Paper } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo, useState } from 'react'
+import { memo, useState } from 'react'
 import styled from 'styled-components'
 import { TGameResult } from '~/types/game-result'
 import { ComponentSwitcher } from '~/utils/components/component-switcher'

@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useRNValue } from 'rnjs-hooks'
 import * as fb from '~/firebase/firebase-worker'
 import { TDCardProperty } from '~/types/dcard-property'

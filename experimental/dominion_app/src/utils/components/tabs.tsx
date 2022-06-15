@@ -1,5 +1,5 @@
 import { Tab, Tabs } from '@material-ui/core'
-import React, { memo, useCallback } from 'react'
+import { memo, useCallback } from 'react'
 import { useValueWithDefault } from '../hooks/use-prop-with-default'
 
 export const MyTabs = memo(

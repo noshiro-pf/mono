@@ -1,6 +1,6 @@
 import { Button, FormControl, FormHelperText } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import styled from 'styled-components'
 import { MySelect } from '~/utils/components/native-select'
 

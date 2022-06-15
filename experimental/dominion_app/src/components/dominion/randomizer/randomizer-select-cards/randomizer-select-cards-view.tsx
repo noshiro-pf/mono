@@ -1,6 +1,6 @@
 import { Button, Paper } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import styled from 'styled-components'
 import { TSelectedCards } from '~/types/selected-cards'
 import { ExpansionsToggleList } from '../../sub-components/expansions-toggle-list/expansions-toggle-list'

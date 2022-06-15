@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useRNValue } from 'rnjs-hooks'
 import { placeListFromGameResults$ } from '~/firebase/firebase-combined-values'
 import { TPlayerResultChange } from '~/types/player-result-change'

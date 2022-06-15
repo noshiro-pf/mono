@@ -1,5 +1,5 @@
 import { Chip } from '@material-ui/core'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import styled from 'styled-components'
 
 const ChipWrapper = styled.div`

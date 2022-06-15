@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { ImgWithLoader } from '~/utils/components/img-with-loader'
 import { Loading } from './loading'
 

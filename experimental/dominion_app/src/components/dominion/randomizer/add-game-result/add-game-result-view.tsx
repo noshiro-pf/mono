@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import styled from 'styled-components'
 import { TPlayerResultChange } from '~/types/player-result-change'
 import { TPlayerResultRanked } from '~/types/player-result-ranked'

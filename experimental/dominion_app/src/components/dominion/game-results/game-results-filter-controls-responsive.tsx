@@ -6,7 +6,7 @@ import {
   FormLabel,
 } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo, useCallback } from 'react'
+import { memo, useCallback } from 'react'
 import styled from 'styled-components'
 import { Centering } from '~/utils/components/centering'
 import { MyInput } from '~/utils/components/native-input'

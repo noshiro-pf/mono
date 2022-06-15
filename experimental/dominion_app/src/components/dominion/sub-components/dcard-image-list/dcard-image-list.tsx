@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import styled from 'styled-components'
 import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
 import { DCardImage } from '../dcard-image/dcard-image'
