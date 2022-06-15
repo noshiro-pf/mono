@@ -2,7 +2,7 @@ import { Spinner } from '@blueprintjs/core';
 import { EventScheduleFetchState, router } from '../../../store';
 import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
-import { EditEventScheduleOk } from './edit-event-schedule-main';
+import { EditEventScheduleOk } from './edit-event-schedule-ok';
 import { FetchEventScheduleError } from './error';
 
 const dc = dict.eventSettingsPage;
@@ -24,7 +24,7 @@ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
       ) : eventId === undefined || eventScheduleResult === undefined ? (
         <Spinner />
       ) : (
-        <EditEventScheduleOk eventScheduleSaved={eventScheduleResult.value} />
+        <EditEventScheduleOk eventScheduleFromDb={eventScheduleResult.value} />
       )}
     </div>
   );

@@ -15,12 +15,15 @@ import {
   addEventSchedule,
   archiveEventSchedule,
   deleteAnswer,
+  fetchAnswers,
   fetchEventListOfUser,
-  getAnswers,
-  getEventSchedule,
+  fetchEventSchedule,
+  setAuthorsEmail,
   unarchiveEventSchedule,
   updateAnswer,
+  updateAuthorsEmail,
   updateEventSchedule,
+  verifyEmail,
 } from './crud';
 
 export const api = {
@@ -40,18 +43,21 @@ export const api = {
   },
   event: {
     add: addEventSchedule,
-    get: getEventSchedule,
+    fetch: fetchEventSchedule,
     update: updateEventSchedule,
     archive: archiveEventSchedule,
     unarchive: unarchiveEventSchedule,
+    setAuthorsEmail,
+    updateAuthorsEmail,
+    verifyEmail,
   },
   answers: {
     add: addAnswer,
-    getList: getAnswers,
+    fetchList: fetchAnswers,
     update: updateAnswer,
     delete: deleteAnswer,
   },
   eventList: {
-    get: fetchEventListOfUser,
+    fetch: fetchEventListOfUser,
   },
 } as const;

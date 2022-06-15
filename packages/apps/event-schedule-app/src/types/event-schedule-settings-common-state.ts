@@ -1,4 +1,5 @@
 import type { EventScheduleValidation } from './event-schedule-validation';
+import type { NotificationSettingsWithEmail } from './notification-with-email';
 
 export type EventScheduleSettingCommonState = Readonly<{
   title: string;
@@ -9,7 +10,7 @@ export type EventScheduleSettingCommonState = Readonly<{
   answerDeadline: Ymdhm | undefined;
   answerIcons: AnswerIconSettings;
   useNotification: boolean;
-  notificationSettings: NotificationSettings | undefined;
+  notificationSettingsWithEmail: NotificationSettingsWithEmail | undefined;
   eventScheduleValidation: EventScheduleValidation;
   eventScheduleNormalized: EventSchedule;
   eventScheduleValidationOk: boolean;
@@ -39,6 +40,9 @@ export type EventScheduleSettingCommonStateHandler = Readonly<{
 
   toggleNotificationSection: () => void;
   setNotificationSettings: (value: NotificationSettings) => void;
+  setNotificationSettingsWithEmail: (
+    value: NotificationSettingsWithEmail
+  ) => void;
   resetNotificationSettingsSection: () => void;
   turnOffNotificationSection: () => void;
   turnOnNotificationSection: () => void;

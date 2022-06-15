@@ -4,11 +4,18 @@ import {
   fillEventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { IRecord, isRecord, Json, Result, Str } from '@noshiro/ts-utils';
+import {
+  IRecord,
+  isRecord,
+  isString,
+  Json,
+  Result,
+  Str,
+} from '@noshiro/ts-utils';
 import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {
-  if (typeof value === 'string') return value;
+  if (isString(value)) return value;
   logger.error(`typeof value should be string but was ${typeof value}`);
   return Str.from(value);
 };
@@ -39,21 +46,15 @@ const isGmailConfig = (
   gmail: {
     email: string;
     password: string;
+    'app-password': string;
   };
 }> =>
   isRecord(config) &&
   IRecord.hasKey(config, 'gmail') &&
   isRecord(config.gmail) &&
-  IRecord.hasKeyValue(
-    config.gmail,
-    'email',
-    (v): v is string => typeof v === 'string'
-  ) &&
-  IRecord.hasKeyValue(
-    config.gmail,
-    'password',
-    (v): v is string => typeof v === 'string'
-  );
+  IRecord.hasKeyValue(config.gmail, 'email', isString) &&
+  IRecord.hasKeyValue(config.gmail, 'password', isString) &&
+  IRecord.hasKeyValue(config.gmail, 'app-password', isString);
 
 export const fillGmailConfig = (
   config: ReadonlyJSONValue
@@ -61,13 +62,14 @@ export const fillGmailConfig = (
   gmail: {
     email: string;
     password: string;
+    'app-password': string;
   };
 }> => {
   if (!isGmailConfig(config)) {
     logger.error(
       `${Result.unwrapThrow(Json.stringify(config))} is not GmailConfig`
     );
-    return { gmail: { email: '', password: '' } };
+    return { gmail: { email: '', password: '', 'app-password': '' } };
   }
   return config;
 };

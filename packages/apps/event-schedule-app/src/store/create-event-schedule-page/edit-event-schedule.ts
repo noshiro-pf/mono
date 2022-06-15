@@ -23,6 +23,12 @@ export namespace EditEventScheduleStore {
     setState: setEventScheduleFromDatabase,
   } = createState<EventSchedule | undefined>(undefined);
 
+  export const {
+    state$: emailVerified$,
+    setState: setEmailVerified,
+    resetState: resetEmailVerified,
+  } = createState<string | undefined>(undefined);
+
   export const resetAllState = (): void => {
     commonStateHandlers.resetTitle();
     commonStateHandlers.resetNotes();
@@ -33,7 +39,10 @@ export namespace EditEventScheduleStore {
     commonStateHandlers.resetAnswerIcons();
   };
 
-  export const setEventSchedule = (ev: EventSchedule): void => {
+  export const setEventSchedule = (
+    ev: EventSchedule,
+    emailVerified: string | undefined
+  ): void => {
     setEventScheduleFromDatabase(ev);
 
     commonStateHandlers.setTitle(ev.title);
@@ -53,17 +62,30 @@ export namespace EditEventScheduleStore {
       commonStateHandlers.turnOffNotificationSection();
     } else {
       commonStateHandlers.turnOnNotificationSection();
-      commonStateHandlers.setNotificationSettings(ev.notificationSettings);
+      commonStateHandlers.setNotificationSettingsWithEmail(
+        IRecord.merge(ev.notificationSettings, { email: emailVerified ?? '' })
+      );
     }
   };
 
   export const diff$: InitializedObservable<EventSettingsPageDiffResult> =
-    combineLatestI([eventScheduleFromDatabase$, commonState$]).chain(
-      mapI(([eventScheduleFromDatabase, { eventScheduleNormalized }]) =>
-        collectEventSettingsPageDiff(
-          eventScheduleFromDatabase ?? initialEventSchedule,
-          eventScheduleNormalized
-        )
+    combineLatestI([
+      emailVerified$,
+      eventScheduleFromDatabase$,
+      commonState$,
+    ]).chain(
+      mapI(
+        ([
+          emailVerified,
+          eventScheduleFromDatabase,
+          { eventScheduleNormalized, notificationSettingsWithEmail },
+        ]) =>
+          collectEventSettingsPageDiff(
+            eventScheduleFromDatabase ?? initialEventSchedule,
+            eventScheduleNormalized,
+            emailVerified,
+            notificationSettingsWithEmail?.email
+          )
       )
     );
 
@@ -101,31 +123,55 @@ export namespace EditEventScheduleStore {
 
     if (commonState === undefined) return;
 
-    const { eventScheduleNormalized, eventScheduleValidationOk } = commonState;
+    const {
+      eventScheduleNormalized,
+      eventScheduleValidationOk,
+      notificationSettingsWithEmail,
+    } = commonState;
+
+    const email = notificationSettingsWithEmail?.email ?? '';
 
     if (!eventScheduleValidationOk || eventId === undefined) return;
 
     setIsLoadingTrue();
+
     const res = await api.event.update(eventId, eventScheduleNormalized);
 
+    const res2 =
+      email === ''
+        ? undefined
+        : await api.event.updateAuthorsEmail(eventId, email);
+
+    setIsLoadingFalse();
+
     if (Result.isErr(res)) {
-      console.error('Error creating event schedule: ', res.value);
+      console.error('Error occurred on updating event schedule: ', res.value);
       showToast({
         toast,
         message: dict.eventSettingsPage.editEventResultMessage.error,
         intent: 'danger',
       });
+      return;
     }
 
-    setIsLoadingFalse();
-    AnswersFetchState.fetchAnswers();
-    EventScheduleFetchState.fetchEventSchedule();
-    onBackToAnswerPage();
+    if (Result.isErr(res2)) {
+      console.error('Error occurred on updating email: ', res2.value);
+      showToast({
+        toast,
+        message: dict.eventSettingsPage.editEventResultMessage.error,
+        intent: 'danger',
+      });
+      return;
+    }
+
     showToast({
       toast,
       message: dict.eventSettingsPage.editEventResultMessage.success,
       intent: 'success',
     });
+    AnswersFetchState.fetchAnswers();
+    EventScheduleFetchState.fetchEventSchedule();
+    onBackToAnswerPage();
   };
 
   export const onEditEventClick = (): void => {
@@ -145,11 +191,13 @@ export namespace EditEventScheduleStore {
     answerPagePath: string | undefined;
     url: string | undefined;
     eventId: string | undefined;
+    emailVerified: string | undefined;
   } = {
     commonState: undefined,
     answerPagePath: undefined,
     url: undefined,
     eventId: undefined,
+    emailVerified: undefined,
   };
 
   commonState$.subscribe((commonState) => {
@@ -162,5 +210,9 @@ export namespace EditEventScheduleStore {
 
   router.eventId$.subscribe((user) => {
     mut_subscribedValues.eventId = user;
+  });
+
+  emailVerified$.subscribe((v) => {
+    mut_subscribedValues.emailVerified = v;
   });
 }

@@ -74,7 +74,6 @@ type EventSchedulePaths = StrictExclude<Paths<EventSchedule>, readonly []>;
         | ['datetimeRangeList']
         | ['datetimeSpecification']
         | ['notes']
-        | ['notificationSettings', 'email']
         | ['notificationSettings', 'notify01daysBeforeAnswerDeadline']
         | ['notificationSettings', 'notify03daysBeforeAnswerDeadline']
         | ['notificationSettings', 'notify07daysBeforeAnswerDeadline']
@@ -109,29 +108,33 @@ const notificationSettings = dict.eventSettingsPage.section3.notification;
 
 const notificationSettingsDiff = (
   a: EventSchedule['notificationSettings'],
-  b: EventSchedule['notificationSettings']
+  b: EventSchedule['notificationSettings'],
+  emailPrev: string | undefined,
+  emailCurr: string | undefined
 ): readonly string[] | undefined => {
   if (deepEqual(a, b)) return undefined;
 
-  if (a === 'none' || b === 'none')
+  if (a === 'none' || b === 'none') {
     return [
       map(a === 'none' ? ndc.off : ndc.on, b === 'none' ? ndc.off : ndc.on),
     ];
+  }
 
-  const collectedDiff = IRecord.keys(a).reduce<readonly string[]>(
-    (acc, key) =>
-      a[key] === b[key]
-        ? acc
-        : key === 'email'
-        ? IList.push(acc, map(a[key], b[key]))
-        : IList.push(
-            acc,
-            `${notificationSettings[key]}${dict.common.colon} ${map(
-              a[key] ? ndc.on : ndc.off,
-              b[key] ? ndc.on : ndc.off
-            )}`
-          ),
-    []
+  const collectedDiff = IList.concat(
+    emailPrev === emailCurr ? [] : [map(emailPrev ?? '', emailCurr ?? '')],
+    IRecord.keys(a).reduce<readonly string[]>(
+      (acc, key) =>
+        a[key] === b[key]
+          ? acc
+          : IList.push(
+              acc,
+              `${notificationSettings[key]}${dict.common.colon} ${map(
+                a[key] ? ndc.on : ndc.off,
+                b[key] ? ndc.on : ndc.off
+              )}`
+            ),
+      []
+    )
   );
 
   return collectedDiff;
@@ -191,7 +194,9 @@ const datetimeRangeListDiff = (
 
 export const collectEventSettingsPageDiff = (
   prev: EventSchedule,
-  curr: EventSchedule
+  curr: EventSchedule,
+  emailPrev: string | undefined,
+  emailCurr: string | undefined
 ): EventSettingsPageDiffResult => ({
   title: createDiffResult(prev, curr, ['title'], map),
   notes: createDiffResult(prev, curr, ['notes'], map),
@@ -215,7 +220,9 @@ export const collectEventSettingsPageDiff = (
 
   notificationSettings: notificationSettingsDiff(
     prev.notificationSettings,
-    curr.notificationSettings
+    curr.notificationSettings,
+    emailPrev,
+    emailCurr
   ),
 
   answerIcons: {

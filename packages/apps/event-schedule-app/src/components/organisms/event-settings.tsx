@@ -1,4 +1,5 @@
-import { notificationSettingsDefaultValue } from '@noshiro/event-schedule-app-shared';
+import { notificationSettingsWithEmailDefaultValue } from '../../constants';
+import type { NotificationSettingsWithEmail } from '../../types';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
 import { AnswerIconSettingsComponent } from './icon-settings';
 import { NotificationSettingsComponent } from './notification-settings';
@@ -15,8 +16,10 @@ type Props = Readonly<{
   onAnswerIconsChange: (value: AnswerIconSettings) => void;
   useNotification: boolean;
   onToggleUseNotification: () => void;
-  notificationSettings: NotificationSettings | undefined;
-  onNotificationSettingsChange: (value: NotificationSettings) => void;
+  notificationSettingsWithEmail: NotificationSettingsWithEmail | undefined;
+  onNotificationSettingsWithEmailChange: (
+    value: NotificationSettingsWithEmail
+  ) => void;
 }>;
 
 export const EventSettings = memoNamed<Props>(
@@ -30,8 +33,8 @@ export const EventSettings = memoNamed<Props>(
     onAnswerIconsChange,
     useNotification,
     onToggleUseNotification,
-    notificationSettings,
-    onNotificationSettingsChange,
+    notificationSettingsWithEmail,
+    onNotificationSettingsWithEmailChange,
   }) => {
     const focusEmailInput$ = useTinyObservable<undefined>();
 
@@ -72,11 +75,14 @@ export const EventSettings = memoNamed<Props>(
               answerDeadline={answerDeadline}
               disabled={!useNotification}
               focusEmailInput$={focusEmailInput$}
-              notificationSettings={
-                notificationSettings ?? notificationSettingsDefaultValue
+              notificationSettingsWithEmail={
+                notificationSettingsWithEmail ??
+                notificationSettingsWithEmailDefaultValue
               }
               useAnswerDeadline={useAnswerDeadline}
-              onNotificationSettingsChange={onNotificationSettingsChange}
+              onNotificationSettingsWithEmailChange={
+                onNotificationSettingsWithEmailChange
+              }
             />
           }
           hideContentIfToggleIsFalse={false}

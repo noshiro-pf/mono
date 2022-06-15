@@ -42,7 +42,7 @@ export namespace AnswersFetchState {
       setRefreshButtonIsLoading(true);
 
       api.answers
-        .getList(eventId)
+        .fetchList(eventId)
         .then((result) => {
           setAnswersResult(result);
           setRefreshButtonIsLoading(false);

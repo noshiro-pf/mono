@@ -13,6 +13,7 @@ import type {
   EventScheduleSettingCommonState,
   EventScheduleSettingCommonStateHandler,
   EventScheduleValidation,
+  NotificationSettingsWithEmail,
 } from '../../types';
 import { mapNoneToUndefined } from '../../utils';
 import { fireAuthUser$ } from '../auth';
@@ -83,18 +84,31 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
   const {
     toggleState$: useNotification$,
     toggle: toggleNotificationSection,
-    value$: notificationSettings$,
-    setValue: setNotificationSettings,
+    value$: notificationSettingsWithEmail$,
+    setValue: setNotificationSettingsWithEmail,
+    updateValue: updateNotificationSettingsWithEmail,
     resetState: resetNotificationSettingsSection,
     turnOff: turnOffNotificationSection,
     turnOn: turnOnNotificationSection,
-  } = createToggleSectionState<NotificationSettings | undefined>({
+  } = createToggleSectionState<NotificationSettingsWithEmail | undefined>({
     initialToggleState: initialEventSchedule.notificationSettings !== 'none',
-    initialState: mapNoneToUndefined(initialEventSchedule.notificationSettings),
+    initialState: pipe(
+      mapNoneToUndefined(initialEventSchedule.notificationSettings)
+    ).chainNullable((a) => ({
+      ...a,
+      email: '',
+    })).value,
     valueToBeSetWhenTurnedOff: () => undefined,
     valueToBeSetWhenTurnedOn: () =>
       initialNotificationSettingsWithEmailFilled$.currentValue.value,
   });
+
+  const setNotificationSettings = (a: NotificationSettings): void => {
+    updateNotificationSettingsWithEmail((b) => ({
+      ...a,
+      email: b?.email ?? '',
+    }));
+  };
 
   const eventScheduleNormalized$: InitializedObservable<EventSchedule> =
     combineLatestI([
@@ -104,7 +118,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       datetimeRangeList$,
       answerDeadline$,
       answerIcons$,
-      notificationSettings$,
+      notificationSettingsWithEmail$,
       fireAuthUser$,
     ]).chain(
       mapI(
@@ -115,7 +129,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           datetimeRangeList,
           answerDeadline,
           answerIcons,
-          notificationSettings,
+          notificationSettingsWithEmail,
           user,
         ]) =>
           normalizeEventSchedule({
@@ -127,7 +141,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
               : eventScheduleDefaultValue.datetimeRangeList,
             answerDeadline: answerDeadline ?? 'none',
             answerIcons,
-            notificationSettings: notificationSettings ?? 'none',
+            notificationSettings: notificationSettingsWithEmail ?? 'none',
             timezoneOffsetMinutes:
               eventScheduleDefaultValue.timezoneOffsetMinutes,
             author: {
@@ -144,15 +158,22 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       title$,
       datetimeRangeList$,
       answerIcons$,
-      notificationSettings$,
+      notificationSettingsWithEmail$,
     ]).chain(
-      mapI(([title, datetimeRangeList, answerIcons, notificationSettings]) =>
-        validateEventSchedule({
+      mapI(
+        ([
           title,
           datetimeRangeList,
           answerIcons,
-          notificationSettings: notificationSettings ?? 'none',
-        })
+          notificationSettingsWithEmail,
+        ]) =>
+          validateEventSchedule({
+            title,
+            datetimeRangeList,
+            answerIcons,
+            notificationSettingsWithEmail:
+              notificationSettingsWithEmail ?? 'none',
+          })
       )
     );
 
@@ -170,7 +191,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       answerDeadline$,
       answerIcons$,
       useNotification$,
-      notificationSettings$,
+      notificationSettingsWithEmail$,
       eventScheduleValidation$,
       eventScheduleNormalized$,
       eventScheduleValidationOk$,
@@ -185,7 +206,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           answerDeadline,
           answerIcons,
           useNotification,
-          notificationSettings,
+          notificationSettingsWithEmail,
           eventScheduleValidation,
           eventScheduleNormalized,
           eventScheduleValidationOk,
@@ -198,7 +219,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           answerDeadline,
           answerIcons,
           useNotification,
-          notificationSettings,
+          notificationSettingsWithEmail,
           eventScheduleValidation,
           eventScheduleNormalized,
           eventScheduleValidationOk,
@@ -230,6 +251,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
 
     toggleNotificationSection,
     setNotificationSettings,
+    setNotificationSettingsWithEmail,
     resetNotificationSettingsSection,
     turnOffNotificationSection,
     turnOnNotificationSection,

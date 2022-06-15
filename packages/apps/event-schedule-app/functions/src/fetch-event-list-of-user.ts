@@ -5,12 +5,11 @@ import {
   fillAnswer,
   fillEventSchedule,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMap, IRecord, pipe, tp } from '@noshiro/ts-utils';
+import { IList, IMap, pipe, tp } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
 import type { CallableContext } from 'firebase-functions/v1/https';
 import { collectionPath } from './firestore-paths';
-import { removeEmailFromEventSchedule } from './remove-email';
 import { today } from './utils';
 
 /**
@@ -147,13 +146,9 @@ export const fetchEventListOfUserImpl = async (
       };
     });
 
-  return eventListItems
-    .filter(
-      ({ eventSchedule, answers }) =>
-        eventSchedule.author.id === uid ||
-        answers.some(({ user }) => user.id === uid)
-    )
-    .map((a) =>
-      IRecord.update(a, 'eventSchedule', removeEmailFromEventSchedule)
-    );
+  return eventListItems.filter(
+    ({ eventSchedule, answers }) =>
+      eventSchedule.author.id === uid ||
+      answers.some(({ user }) => user.id === uid)
+  );
 };

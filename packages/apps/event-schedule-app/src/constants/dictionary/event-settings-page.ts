@@ -25,7 +25,7 @@ export const eventSettingsPageDictionary = {
       '日程を全削除しますか？（この操作は取り消すことができません）',
     removeAllResultMessage: '削除しました。',
     setTimesAtOneTime: '時刻一括変更',
-    sortDatetimes: '日時を並べ替える',
+    sortDatetimes: '日時を昇順に並べ替える',
   },
   section3: {
     otherSettingsTitle: 'その他の設定（3/3）',
@@ -53,7 +53,6 @@ export const eventSettingsPageDictionary = {
       description: `右の数字は日程決めのスコア計算に使う点数です（△のデフォルト点数は初期値(=${defaultIconPoint.fair})から変更できます）。`,
     },
   },
-  noteOnEmailInEditPage: '※ E-mailアドレスのみ再入力が必要です。',
   errorMessages: {
     titleIsEmpty: 'イベント名は必須項目です。',
     datetimeIsEmpty: '少なくとも一つ以上の候補日を選択してください。',
@@ -72,6 +71,10 @@ export const eventSettingsPageDictionary = {
     submitEditingConfirmation:
       '編集項目に日程の削除が含まれています。その日程への回答が既にある場合、その回答は失われてしまいますが、よろしいですか？',
     cancelResultMessage: '編集をキャンセルしました。',
+  },
+  createEventResultMessage: {
+    success: 'イベント設定を作成しました。',
+    error: 'イベント設定の作成中にエラーが発生しました。',
   },
   editEventResultMessage: {
     success: 'イベント設定を更新しました。',

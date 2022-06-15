@@ -4,11 +4,11 @@ import { IRecord, isBoolean, isRecord, isString } from '@noshiro/ts-utils';
 import admin from 'firebase-admin';
 import { https, region } from 'firebase-functions';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
-import { fetchEventOfIdImpl } from './fetch-event-schedule';
 import { collectionPath } from './firestore-paths';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
 import { onUserDelete } from './on-user-delete';
+import { testEmailImpl as verifyEmailImpl } from './test-email';
 import { fillAnswerWithCheck, toStringWithCheck } from './type-check';
 
 admin.initializeApp();
@@ -27,7 +27,7 @@ const answerDocPath = `${collectionPath.events}/{${wildcard.eventId}}/${collecti
 export const answerCreationListener = regionSelected.firestore
   .document(answerDocPath)
   .onCreate((snapshot, context) =>
-    notifyOnAnswerChangeBody({
+    notifyOnAnswerChangeBody(db, {
       eventType: 'create',
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
       answerItemBefore: undefined,
@@ -38,7 +38,7 @@ export const answerCreationListener = regionSelected.firestore
 export const answerDeletionListener = regionSelected.firestore
   .document(answerDocPath)
   .onDelete((snapshot, context) =>
-    notifyOnAnswerChangeBody({
+    notifyOnAnswerChangeBody(db, {
       eventType: 'delete',
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
       answerItemBefore: fillAnswerWithCheck(snapshot.data()),
@@ -49,7 +49,7 @@ export const answerDeletionListener = regionSelected.firestore
 export const answerUpdateListener = regionSelected.firestore
   .document(answerDocPath)
   .onUpdate((change, context) =>
-    notifyOnAnswerChangeBody({
+    notifyOnAnswerChangeBody(db, {
       eventType: 'update',
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
       answerItemBefore: fillAnswerWithCheck(change.before.data()),
@@ -60,7 +60,7 @@ export const answerUpdateListener = regionSelected.firestore
 export const notifyAnswerDeadlineEveryday = regionSelected.pubsub
   .schedule('00 12 * * *')
   .timeZone('Asia/Tokyo')
-  .onRun(notifyAnswerDeadline);
+  .onRun(() => notifyAnswerDeadline(db));
 
 // export const answerPagePreRender = functions
 //   .region('asia-northeast2')
@@ -87,7 +87,7 @@ export const userDeletionListener = regionSelected.auth
     onUserDelete(db, user).catch(console.error);
   });
 
-export const fetchEventListOfUser = region('asia-northeast2').https.onCall(
+export const fetchEventListOfUser = regionSelected.https.onCall(
   (payload: unknown, context) => {
     if (
       !(
@@ -117,15 +117,21 @@ export const fetchEventListOfUser = region('asia-northeast2').https.onCall(
   }
 );
 
-export const fetchEventOfId = region('asia-northeast2').https.onCall(
+export const verifyEmail = regionSelected.https.onCall(
   (payload: unknown, _context) => {
-    if (!(isRecord(payload) && IRecord.hasKeyValue(payload, 'id', isString))) {
+    if (
+      !(
+        isRecord(payload) &&
+        IRecord.hasKeyValue(payload, 'eventId', isString) &&
+        IRecord.hasKeyValue(payload, 'email', isString)
+      )
+    ) {
       throw new https.HttpsError(
         'invalid-argument',
         'The payload type is invalid.'
       );
     }
 
-    return fetchEventOfIdImpl(db, payload.id);
+    return verifyEmailImpl(db, payload);
   }
 );

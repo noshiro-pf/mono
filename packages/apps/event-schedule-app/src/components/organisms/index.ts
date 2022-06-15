@@ -4,6 +4,7 @@ export * from './answer-page-event-info';
 export * from './answer-page-notes';
 export * from './answer-table';
 export * from './button-with-confirm';
+export * from './confirm-email-dialog';
 export * from './create-event-result-dialog';
 export * from './errors';
 export * from './event-schedule-diff';

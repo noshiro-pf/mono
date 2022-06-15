@@ -7,4 +7,5 @@ export * from './default-icon-point';
 export * from './dictionary';
 export * from './fetch-throttle-time';
 export * from './initial-values';
+export * from './notification-settings-with-email';
 export * from './routes';

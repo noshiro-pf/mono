@@ -1,30 +1,37 @@
 import type { Answer } from '@noshiro/event-schedule-app-shared';
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
+import type { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import {
   createMailBodyForAnswerDelete,
   createMailBodyForNewAnswer,
   createMailBodyForUpdatedAnswer,
 } from './create-mail-body';
-import { getEventItem } from './get-event-item';
+import { getEmail, getEventItem } from './get-event-item';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { now } from './utils';
 
-export const notifyOnAnswerChangeBody = async ({
-  eventType,
-  eventId,
-  answerItemBefore,
-  answerItemAfter,
-}: Readonly<{
-  eventType: 'create' | 'delete' | 'update';
-  eventId: string;
-  answerItemBefore: Answer | undefined;
-  answerItemAfter: Answer | undefined;
-}>): Promise<void> => {
-  const eventItem = await getEventItem(eventId);
+export const notifyOnAnswerChangeBody = async (
+  db: firestore.Firestore,
+  {
+    eventType,
+    eventId,
+    answerItemBefore,
+    answerItemAfter,
+  }: Readonly<{
+    eventType: 'create' | 'delete' | 'update';
+    eventId: string;
+    answerItemBefore: Answer | undefined;
+    answerItemAfter: Answer | undefined;
+  }>
+): Promise<void> => {
+  const [eventItem, email] = await Promise.all([
+    getEventItem(db, eventId),
+    getEmail(db, eventId),
+  ]);
 
   if (eventItem === undefined) {
-    logger.log(`eventItem for id = "${eventId}" not found.`);
+    logger.log(`eventItem of id = "${eventId}" not found.`);
     return;
   }
   if (eventItem.notificationSettings === 'none') {
@@ -37,10 +44,8 @@ export const notifyOnAnswerChangeBody = async ({
     );
     return;
   }
-  if (eventItem.notificationSettings.email === '') {
-    logger.log(
-      'skipped because eventItem.notificationSettings.email is empty.'
-    );
+  if (email === '') {
+    logger.log('skipped because email is empty.');
     return;
   }
 
@@ -62,7 +67,7 @@ export const notifyOnAnswerChangeBody = async ({
       }
       await sendEmail(
         createMailOptions({
-          to: eventItem.notificationSettings.email,
+          to: email,
           subject: `イベント「${eventItem.title}」の日程調整に回答が追加されました。`,
           text: createMailBodyForNewAnswer({
             eventId,
@@ -78,7 +83,7 @@ export const notifyOnAnswerChangeBody = async ({
       }
       await sendEmail(
         createMailOptions({
-          to: eventItem.notificationSettings.email,
+          to: email,
           subject: `イベント「${eventItem.title}」の日程調整の回答が削除されました。`,
           text: createMailBodyForAnswerDelete({
             eventId,
@@ -96,7 +101,7 @@ export const notifyOnAnswerChangeBody = async ({
       }
       await sendEmail(
         createMailOptions({
-          to: eventItem.notificationSettings.email,
+          to: email,
           subject: `イベント「${eventItem.title}」の日程調整の回答が更新されました。`,
           text: createMailBodyForUpdatedAnswer({
             eventId,

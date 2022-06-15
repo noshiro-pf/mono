@@ -6,4 +6,5 @@ export * from './assert-is-credential-error';
 export * from './event-schedule-settings-common-state';
 export * from './event-schedule-validation';
 export * from './firebase-types-wrapper';
+export * from './notification-with-email';
 export * from './num-icon-filter-state';
