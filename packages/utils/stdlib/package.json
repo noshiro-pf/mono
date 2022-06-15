@@ -6,7 +6,7 @@
   "sideEffects": false,
   "scripts": {
     "autofix": "wireit",
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "fmt": "prettier --ignore-path ./.prettierignore  --write .",
     "gen": "./gen.sh"
   },
   "wireit": {

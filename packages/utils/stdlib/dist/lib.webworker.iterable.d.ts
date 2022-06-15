@@ -108,12 +108,12 @@ interface SubtleCrypto {
   generateKey(
     algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
     extractable: boolean,
-    keyUsages: readonly KeyUsage[]
+    keyUsages: ReadonlyArray<KeyUsage>
   ): Promise<CryptoKeyPair>;
   generateKey(
     algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params,
     extractable: boolean,
-    keyUsages: readonly KeyUsage[]
+    keyUsages: ReadonlyArray<KeyUsage>
   ): Promise<CryptoKey>;
   generateKey(
     algorithm: AlgorithmIdentifier,
@@ -130,7 +130,7 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: readonly KeyUsage[]
+    keyUsages: ReadonlyArray<KeyUsage>
   ): Promise<CryptoKey>;
   importKey(
     format: Exclude<KeyFormat, 'jwk'>,

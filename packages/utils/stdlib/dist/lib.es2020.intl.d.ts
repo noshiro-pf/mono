@@ -75,6 +75,17 @@ declare namespace Intl {
   type BCP47LanguageTag = string;
 
   /**
+   * The locale(s) to use
+   *
+   * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument).
+   */
+  type LocalesArgument =
+    | UnicodeBCP47LocaleIdentifier
+    | Locale
+    | readonly (UnicodeBCP47LocaleIdentifier | Locale)[]
+    | undefined;
+
+  /**
    * An object with some or all of properties of `options` parameter
    * of `Intl.RelativeTimeFormat` constructor.
    *
@@ -287,6 +298,10 @@ declare namespace Intl {
   }
 
   interface Locale extends LocaleOptions {
+    /** A string containing the language, and the script and region if available. */
+    readonly baseName: string;
+    /** The primary language subtag associated with the locale. */
+    readonly language: string;
     /** Gets the most likely values for the language, script, and region of the locale based on existing values. */
     maximize(): Locale;
     /** Attempts to remove information about the locale that would be added by calling `Locale.maximize()`. */
@@ -310,15 +325,35 @@ declare namespace Intl {
    * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale).
    */
   const Locale: {
-    new (tag?: BCP47LanguageTag, options?: LocaleOptions): Locale;
+    new (tag: BCP47LanguageTag | Locale, options?: LocaleOptions): Locale;
   };
 
+  type DisplayNamesFallback = 'code' | 'none';
+
+  type DisplayNamesType =
+    | 'language'
+    | 'region'
+    | 'script'
+    | 'calendar'
+    | 'dateTimeField'
+    | 'currency';
+
+  type DisplayNamesLanguageDisplay = 'dialect' | 'standard';
+
   interface DisplayNamesOptions {
+    readonly localeMatcher?: RelativeTimeFormatLocaleMatcher;
+    readonly style?: RelativeTimeFormatStyle;
+    readonly type: DisplayNamesType;
+    readonly languageDisplay?: DisplayNamesLanguageDisplay;
+    readonly fallback?: DisplayNamesFallback;
+  }
+
+  interface ResolvedDisplayNamesOptions {
     readonly locale: UnicodeBCP47LocaleIdentifier;
-    readonly localeMatcher: RelativeTimeFormatLocaleMatcher;
     readonly style: RelativeTimeFormatStyle;
-    readonly type: 'language' | 'region' | 'script' | 'currency';
-    readonly fallback: 'code' | 'none';
+    readonly type: DisplayNamesType;
+    readonly fallback: DisplayNamesFallback;
+    readonly languageDisplay?: DisplayNamesLanguageDisplay;
   }
 
   interface DisplayNames {
@@ -344,7 +379,7 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames/resolvedOptions).
      */
-    resolvedOptions(): DisplayNamesOptions;
+    resolvedOptions(): ResolvedDisplayNamesOptions;
   }
 
   /**
@@ -365,10 +400,7 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames/DisplayNames).
      */
-    new (
-      locales?: BCP47LanguageTag | readonly BCP47LanguageTag[],
-      options?: Partial<DisplayNamesOptions>
-    ): DisplayNames;
+    new (locales: LocalesArgument, options: DisplayNamesOptions): DisplayNames;
 
     /**
      * Returns an array containing those of the provided locales that are supported in display names without having to fall back to the runtime's default locale.
@@ -384,8 +416,8 @@ declare namespace Intl {
      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames/supportedLocalesOf).
      */
     supportedLocalesOf(
-      locales: BCP47LanguageTag | readonly BCP47LanguageTag[],
-      options?: { readonly localeMatcher: RelativeTimeFormatLocaleMatcher }
+      locales?: LocalesArgument,
+      options?: { readonly localeMatcher?: RelativeTimeFormatLocaleMatcher }
     ): readonly BCP47LanguageTag[];
   };
 }

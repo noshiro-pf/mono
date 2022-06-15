@@ -69,13 +69,13 @@ declare function decodeURIComponent(encodedURIComponent: string): string;
 
 /**
  * Encodes a text string as a valid Uniform Resource Identifier (URI)
- * @param uri A value representing an encoded URI.
+ * @param uri A value representing an unencoded URI.
  */
 declare function encodeURI(uri: string): string;
 
 /**
  * Encodes a text string as a valid component of a Uniform Resource Identifier (URI).
- * @param uriComponent A value representing an encoded URI component.
+ * @param uriComponent A value representing an unencoded URI component.
  */
 declare function encodeURIComponent(
   uriComponent: string | number | boolean
@@ -237,6 +237,17 @@ interface ObjectConstructor {
    * @param f Object on which to lock the attributes.
    */
   freeze<T extends Function>(f: T): T;
+
+  /**
+   * Prevents the modification of existing property attributes and values, and prevents the addition of new properties.
+   * @param o Object on which to lock the attributes.
+   */
+  freeze<
+    T extends { readonly [idx: string]: U | null | undefined | object },
+    U extends string | bigint | number | boolean | symbol
+  >(
+    o: T
+  ): Readonly<T>;
 
   /**
    * Prevents the modification of existing property attributes and values, and prevents the addition of new properties.
@@ -1993,6 +2004,7 @@ interface DataView {
    * Gets the Float32 value at the specified byte offset from the start of the view. There is
    * no alignment constraint; multi-byte values may be fetched from any offset.
    * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getFloat32(byteOffset: number, littleEndian?: boolean): number;
 
@@ -2000,6 +2012,7 @@ interface DataView {
    * Gets the Float64 value at the specified byte offset from the start of the view. There is
    * no alignment constraint; multi-byte values may be fetched from any offset.
    * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getFloat64(byteOffset: number, littleEndian?: boolean): number;
 
@@ -2014,12 +2027,14 @@ interface DataView {
    * Gets the Int16 value at the specified byte offset from the start of the view. There is
    * no alignment constraint; multi-byte values may be fetched from any offset.
    * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getInt16(byteOffset: number, littleEndian?: boolean): number;
   /**
    * Gets the Int32 value at the specified byte offset from the start of the view. There is
    * no alignment constraint; multi-byte values may be fetched from any offset.
    * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getInt32(byteOffset: number, littleEndian?: boolean): number;
 
@@ -2034,6 +2049,7 @@ interface DataView {
    * Gets the Uint16 value at the specified byte offset from the start of the view. There is
    * no alignment constraint; multi-byte values may be fetched from any offset.
    * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getUint16(byteOffset: number, littleEndian?: boolean): number;
 
@@ -2041,6 +2057,7 @@ interface DataView {
    * Gets the Uint32 value at the specified byte offset from the start of the view. There is
    * no alignment constraint; multi-byte values may be fetched from any offset.
    * @param byteOffset The place in the buffer at which the value should be retrieved.
+   * @param littleEndian If false or undefined, a big-endian value should be read.
    */
   getUint32(byteOffset: number, littleEndian?: boolean): number;
 
@@ -2048,8 +2065,7 @@ interface DataView {
    * Stores an Float32 value at the specified byte offset from the start of the view.
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be written,
-   * otherwise a little-endian value should be written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setFloat32(byteOffset: number, value: number, littleEndian?: boolean): void;
 
@@ -2057,8 +2073,7 @@ interface DataView {
    * Stores an Float64 value at the specified byte offset from the start of the view.
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be written,
-   * otherwise a little-endian value should be written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setFloat64(byteOffset: number, value: number, littleEndian?: boolean): void;
 
@@ -2073,8 +2088,7 @@ interface DataView {
    * Stores an Int16 value at the specified byte offset from the start of the view.
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be written,
-   * otherwise a little-endian value should be written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setInt16(byteOffset: number, value: number, littleEndian?: boolean): void;
 
@@ -2082,8 +2096,7 @@ interface DataView {
    * Stores an Int32 value at the specified byte offset from the start of the view.
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be written,
-   * otherwise a little-endian value should be written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setInt32(byteOffset: number, value: number, littleEndian?: boolean): void;
 
@@ -2098,8 +2111,7 @@ interface DataView {
    * Stores an Uint16 value at the specified byte offset from the start of the view.
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be written,
-   * otherwise a little-endian value should be written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setUint16(byteOffset: number, value: number, littleEndian?: boolean): void;
 
@@ -2107,8 +2119,7 @@ interface DataView {
    * Stores an Uint32 value at the specified byte offset from the start of the view.
    * @param byteOffset The place in the buffer at which the value should be set.
    * @param value The value to set.
-   * @param littleEndian If false or undefined, a big-endian value should be written,
-   * otherwise a little-endian value should be written.
+   * @param littleEndian If false or undefined, a big-endian value should be written.
    */
   setUint32(byteOffset: number, value: number, littleEndian?: boolean): void;
 }
@@ -5425,6 +5436,7 @@ declare namespace Intl {
       locales: string | readonly string[],
       options?: NumberFormatOptions
     ): readonly string[];
+    readonly prototype: NumberFormat;
   };
 
   interface DateTimeFormatOptions {
@@ -5443,7 +5455,14 @@ declare namespace Intl {
     readonly hour?: 'numeric' | '2-digit' | undefined;
     readonly minute?: 'numeric' | '2-digit' | undefined;
     readonly second?: 'numeric' | '2-digit' | undefined;
-    readonly timeZoneName?: 'long' | 'short' | undefined;
+    readonly timeZoneName?:
+      | 'short'
+      | 'long'
+      | 'shortOffset'
+      | 'longOffset'
+      | 'shortGeneric'
+      | 'longGeneric'
+      | undefined;
     readonly formatMatcher?: 'best fit' | 'basic' | undefined;
     readonly hour12?: boolean | undefined;
     readonly timeZone?: string | undefined;
@@ -5483,6 +5502,7 @@ declare namespace Intl {
       locales: string | readonly string[],
       options?: DateTimeFormatOptions
     ): readonly string[];
+    readonly prototype: DateTimeFormat;
   };
 }
 
