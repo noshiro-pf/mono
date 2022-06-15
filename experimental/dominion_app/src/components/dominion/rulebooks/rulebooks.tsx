@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { combine, fromPromise, RN } from 'rnjs'
 import { useRN, useRNValue } from 'rnjs-hooks'
 import { rulebooksPath } from '~/constants/route'

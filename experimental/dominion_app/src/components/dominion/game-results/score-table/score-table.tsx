@@ -1,6 +1,6 @@
 import { CircularProgress } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { ColumnSetting, DataTable, TableSettings } from 'react-data-table'
 import { useRNValue } from 'rnjs-hooks'
 import styled from 'styled-components'

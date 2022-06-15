@@ -136,7 +136,6 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-confusing-non-null-assertion': 'error',
   '@typescript-eslint/no-confusing-void-expression': 'error',
   '@typescript-eslint/no-dupe-class-members': 'error',
-  '@typescript-eslint/no-duplicate-imports': 'error',
   '@typescript-eslint/no-dynamic-delete': 'error',
   '@typescript-eslint/no-empty-function': 'error',
   '@typescript-eslint/no-empty-interface': 'off', // disabled
@@ -159,7 +158,6 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-non-null-asserted-nullish-coalescing': 'error',
   '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
   '@typescript-eslint/no-non-null-assertion': 'error',
-  '@typescript-eslint/no-parameter-properties': 'error',
   '@typescript-eslint/no-redeclare': 'off', // disabled
   '@typescript-eslint/no-redundant-type-constituents': 'error', // modified
   '@typescript-eslint/no-require-imports': 'error',
@@ -255,7 +253,13 @@ const typescriptEslintRules = {
   '@typescript-eslint/unbound-method': 'error',
   '@typescript-eslint/unified-signatures': 'error',
 
+  '@typescript-eslint/consistent-generic-constructors': 'error',
+  '@typescript-eslint/no-duplicate-enum-values': 'error',
+  '@typescript-eslint/parameter-properties': 'error',
+
   // deprecated
+  '@typescript-eslint/no-duplicate-imports': 'off', // deprecated
+  '@typescript-eslint/no-parameter-properties': 'off', // deprecated
   '@typescript-eslint/no-implicit-any-catch': 'off',
 };
 

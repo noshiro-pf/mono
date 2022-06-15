@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { ImgWithFrame } from './img-with-frame'
 
 export const DCardImageSub = memo(

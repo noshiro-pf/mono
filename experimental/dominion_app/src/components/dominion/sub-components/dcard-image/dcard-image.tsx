@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import { isWideCard, TDCardProperty } from '~/types/dcard-property'
 import { DCardImageView } from './dcard-image-view'
 

@@ -6,7 +6,7 @@ import {
   Typography,
 } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { main } from '~/constants/default-styles'
 import { TRulebook } from '~/types/rulebook'
 

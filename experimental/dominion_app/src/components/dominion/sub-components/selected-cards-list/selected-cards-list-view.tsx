@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { CSSProperties, Fragment, memo, useCallback } from 'react'
+import { CSSProperties, Fragment, memo, useCallback } from 'react'
 import styled from 'styled-components'
 import { dcardCostToStr } from '~/types/card-cost'
 import { DCardProperty, TDCardProperty } from '~/types/dcard-property'

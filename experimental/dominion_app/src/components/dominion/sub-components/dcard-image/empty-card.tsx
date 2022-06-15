@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { DCardImageSub } from './dcard-image-sub'
 
 const noop = () => 0

@@ -1,6 +1,6 @@
 import { Card, CardContent, Typography } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { main } from '../constants/default-styles'
 

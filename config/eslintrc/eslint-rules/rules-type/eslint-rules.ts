@@ -5534,6 +5534,19 @@ namespace NoConstAssign {
 }
 
 /**
+ * @description disallow expressions where the operation doesn't affect the value
+ * @link https://eslint.org/docs/rules/no-constant-binary-expression
+ *
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | recommended | false   |
+ */
+namespace NoConstantBinaryExpression {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * @description disallow constant expressions in conditions
  * @link https://eslint.org/docs/rules/no-constant-condition
  *
@@ -6484,7 +6497,7 @@ namespace NoInvalidRegexp {
 }
 
 /**
- * @description disallow `this` keywords outside of classes or class-like objects
+ * @description disallow use of `this` in contexts where the value of `this` is `undefined`
  * @link https://eslint.org/docs/rules/no-invalid-this
  *
  *  | key         | value      |
@@ -6749,10 +6762,11 @@ namespace NoMagicNumbers {
  * @description disallow characters which are made with multiple code points in character class syntax
  * @link https://eslint.org/docs/rules/no-misleading-character-class
  *
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | true    |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
  */
 namespace NoMisleadingCharacterClass {
   export type RuleEntry = Linter.RuleLevel;
@@ -8519,6 +8533,10 @@ namespace NoUnderscoreDangle {
    *       "allowFunctionParams": {
    *         "type": "boolean",
    *         "default": true
+   *       },
+   *       "enforceInClassFields": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -8532,6 +8550,7 @@ namespace NoUnderscoreDangle {
     readonly allowAfterThisConstructor?: boolean;
     readonly enforceInMethodNames?: boolean;
     readonly allowFunctionParams?: boolean;
+    readonly enforceInClassFields?: boolean;
   };
 
   export type RuleEntry =
@@ -8927,6 +8946,9 @@ namespace NoUseBeforeDefine {
    *           },
    *           "variables": {
    *             "type": "boolean"
+   *           },
+   *           "allowNamedExports": {
+   *             "type": "boolean"
    *           }
    *         },
    *         "additionalProperties": false
@@ -8941,6 +8963,7 @@ namespace NoUseBeforeDefine {
         readonly functions?: boolean;
         readonly classes?: boolean;
         readonly variables?: boolean;
+        readonly allowNamedExports?: boolean;
       };
 
   export type RuleEntry =
@@ -10119,8 +10142,7 @@ namespace PaddingLineBetweenStatements {
    *             ]
    *           },
    *           "minItems": 1,
-   *           "uniqueItems": true,
-   *           "additionalItems": false
+   *           "uniqueItems": true
    *         }
    *       ]
    *     }
@@ -10145,8 +10167,7 @@ namespace PaddingLineBetweenStatements {
    *       "prev",
    *       "next"
    *     ]
-   *   },
-   *   "additionalItems": false
+   *   }
    * }
    */
   export type PaddingType = 'any' | 'never' | 'always';
@@ -12231,6 +12252,7 @@ export type EslintRules = {
   readonly 'no-confusing-arrow': NoConfusingArrow.RuleEntry;
   readonly 'no-console': NoConsole.RuleEntry;
   readonly 'no-const-assign': NoConstAssign.RuleEntry;
+  readonly 'no-constant-binary-expression': NoConstantBinaryExpression.RuleEntry;
   readonly 'no-constant-condition': NoConstantCondition.RuleEntry;
   readonly 'no-constructor-return': NoConstructorReturn.RuleEntry;
   readonly 'no-continue': NoContinue.RuleEntry;

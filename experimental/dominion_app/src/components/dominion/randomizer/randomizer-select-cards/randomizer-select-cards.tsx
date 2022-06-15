@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { merge, RN } from 'rnjs'
 import {
   useEventAsStream,

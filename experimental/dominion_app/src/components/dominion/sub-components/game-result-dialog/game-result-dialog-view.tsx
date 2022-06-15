@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit'
 import * as I from 'immutable'
-import React, { CSSProperties, memo } from 'react'
+import { CSSProperties, memo } from 'react'
 import styled from 'styled-components'
 import { TDCardProperty } from '~/types/dcard-property'
 import { TPlayerResultChange } from '~/types/player-result-change'

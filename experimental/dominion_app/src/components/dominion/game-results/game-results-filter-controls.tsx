@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import * as date from 'typescript-utils/functions/date'
 import { GameResultFilterControlsView } from './game-results-filter-controls-responsive'
 

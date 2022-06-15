@@ -1,10 +1,4 @@
-import React, {
-  CSSProperties,
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
+import { CSSProperties, memo, useCallback, useEffect, useState } from 'react'
 
 export const ImgWithLoader = memo(
   ({

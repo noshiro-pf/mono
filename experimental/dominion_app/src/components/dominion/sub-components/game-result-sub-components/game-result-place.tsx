@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { AutoComplete } from '~/utils/components/auto-complete'
 
 // import { TextField } from '@material-ui/core';

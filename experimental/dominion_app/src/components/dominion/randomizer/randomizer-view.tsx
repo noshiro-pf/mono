@@ -1,5 +1,5 @@
 import { Paper } from '@material-ui/core'
-import React, { memo, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { ComponentSwitcher } from '~/utils/components/component-switcher'
 import { MyTabs } from '~/utils/components/tabs'
 import { AddGameResult } from './add-game-result/add-game-result'

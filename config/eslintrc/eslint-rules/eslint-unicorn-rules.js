@@ -144,6 +144,10 @@ const eslintUnicornRules = {
   'unicorn/prefer-text-content': 'off',
   'unicorn/prefer-trim-start-end': 'off',
   'unicorn/regex-shorthand': 'off',
+  'unicorn/no-unreadable-iife': 'error',
+  'unicorn/no-useless-switch-case': 'error',
+  'unicorn/prefer-modern-math-apis': 'error',
+  'unicorn/prefer-native-coercion-functions': 'error',
 };
 
 module.exports = { eslintUnicornRules };

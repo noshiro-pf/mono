@@ -1,6 +1,6 @@
 import { Snackbar } from '@material-ui/core'
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { AdminDatabase } from './components/admin/admin-database'
 import { CardList } from './components/dominion/cardlist/cardlist'

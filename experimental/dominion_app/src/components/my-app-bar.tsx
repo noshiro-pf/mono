@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { useRNValue } from 'rnjs-hooks'
 import { myName$ } from '~/local-storage-api'
 import { MyAppBarView } from './my-app-bar-view'

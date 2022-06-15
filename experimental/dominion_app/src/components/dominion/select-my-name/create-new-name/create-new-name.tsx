@@ -1,5 +1,5 @@
 import { Button } from '@material-ui/core'
-import React, { memo, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import styled from 'styled-components'
 import { MyInput } from '~/utils/components/native-input'
 

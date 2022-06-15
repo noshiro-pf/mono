@@ -8,7 +8,7 @@ import {
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import * as I from 'immutable'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import styled from 'styled-components'
 import { isWideCard, TDCardProperty } from '~/types/dcard-property'
 import { Spacer } from '~/utils/components/spacer'

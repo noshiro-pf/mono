@@ -1,6 +1,6 @@
 import { Chip } from '@material-ui/core'
 import * as I from 'immutable'
-import React, { CSSProperties, memo } from 'react'
+import { CSSProperties, memo } from 'react'
 
 const chipStyle: CSSProperties = {
   margin: '5px',

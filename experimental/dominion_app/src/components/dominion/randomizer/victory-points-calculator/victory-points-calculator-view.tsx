@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 // import * as I from "immutable"
 // import { TNumVictoryCards } from 'projects/dominion-dev/src/types/dominion/number-of-victory-cards';
 // import { TDCardProperty } from 'projects/dominion-dev/src/types/dominion/dcard-property';

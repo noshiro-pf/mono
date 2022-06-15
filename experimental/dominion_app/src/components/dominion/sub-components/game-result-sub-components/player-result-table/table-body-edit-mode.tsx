@@ -8,7 +8,7 @@ import {
 import AddIcon from '@material-ui/icons/Add'
 import RemoveIcon from '@material-ui/icons/Remove'
 import * as I from 'immutable'
-import React, { memo, useCallback } from 'react'
+import { memo, useCallback } from 'react'
 import styled from 'styled-components'
 import {
   PlayerResultChange,
