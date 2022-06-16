@@ -16,5 +16,11 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 declare namespace Intl {
-  // Empty for now
+  interface NumberFormat {
+    formatRange(start: number | bigint, end: number | bigint): string;
+    formatRangeToParts(
+      start: number | bigint,
+      end: number | bigint
+    ): readonly NumberFormatPart[];
+  }
 }

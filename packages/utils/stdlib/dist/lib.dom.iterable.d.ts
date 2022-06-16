@@ -76,6 +76,8 @@ interface DataTransferItemList {
   [Symbol.iterator](): IterableIterator<DataTransferItem>;
 }
 
+interface EventCounts extends ReadonlyMap<string, number> {}
+
 interface FileList {
   [Symbol.iterator](): IterableIterator<File>;
 }
@@ -142,6 +144,14 @@ interface IDBObjectStore {
     options?: IDBIndexParameters
   ): IDBIndex;
 }
+
+interface MIDIInputMap extends ReadonlyMap<string, MIDIInput> {}
+
+interface MIDIOutput {
+  send(data: Iterable<number>, timestamp?: DOMHighResTimeStamp): void;
+}
+
+interface MIDIOutputMap extends ReadonlyMap<string, MIDIOutput> {}
 
 interface MediaKeyStatusMap {
   [Symbol.iterator](): IterableIterator<
@@ -277,12 +287,12 @@ interface SubtleCrypto {
   generateKey(
     algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
     extractable: boolean,
-    keyUsages: readonly KeyUsage[]
+    keyUsages: ReadonlyArray<KeyUsage>
   ): Promise<CryptoKeyPair>;
   generateKey(
     algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params,
     extractable: boolean,
-    keyUsages: readonly KeyUsage[]
+    keyUsages: ReadonlyArray<KeyUsage>
   ): Promise<CryptoKey>;
   generateKey(
     algorithm: AlgorithmIdentifier,
@@ -299,7 +309,7 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: readonly KeyUsage[]
+    keyUsages: ReadonlyArray<KeyUsage>
   ): Promise<CryptoKey>;
   importKey(
     format: Exclude<KeyFormat, 'jwk'>,

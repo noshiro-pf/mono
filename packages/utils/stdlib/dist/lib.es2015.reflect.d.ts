@@ -52,7 +52,7 @@ declare namespace Reflect {
   function defineProperty(
     target: object,
     propertyKey: PropertyKey,
-    attributes: PropertyDescriptor
+    attributes: PropertyDescriptor & ThisType<unknown>
   ): boolean;
 
   /**
