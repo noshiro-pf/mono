@@ -11,7 +11,7 @@
     "build": "run-p build:**",
     "build:cjs": "wireit",
     "build:esm": "wireit",
-    "clean": "rimraf cjs esm",
+    "clean": "rimraf cjs esm .wireit",
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "fmt:src": "prettier --ignore-path ../../../.prettierignore  --write ./src",
     "gi": "wireit",
