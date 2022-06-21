@@ -91,6 +91,7 @@ export namespace ResetPasswordPageStore {
   export const enterClickHandler = (): void => {
     if (mut_subscribedValues.enterButtonDisabled) return;
 
+    // TODO: use toast
     submit(mut_subscribedValues.pageToBack).catch(console.error);
   };
 

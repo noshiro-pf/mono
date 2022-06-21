@@ -63,6 +63,7 @@ export namespace GoogleSignInStore {
   export const googleSignInClickHandler = (): void => {
     if (mut_subscribedValues.googleSignInButtonDisabled) return;
 
+    // TODO: use toast
     googleSignInSubmit(mut_subscribedValues.pageToBack).catch(console.error);
   };
 }

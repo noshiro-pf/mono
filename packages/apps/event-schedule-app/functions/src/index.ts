@@ -87,8 +87,12 @@ export const userDeletionListener = regionSelected.auth
     onUserDelete(db, user).catch(console.error);
   });
 
-export const fetchEventListOfUser = regionSelected.https.onCall(
-  (payload: unknown, context) => {
+// https://firebase.google.com/docs/functions/manage-functions?hl=ja
+export const fetchEventListOfUser = regionSelected
+  .runWith({
+    memory: '1GB',
+  })
+  .https.onCall((payload: unknown, context) => {
     if (
       !(
         isRecord(payload) &&
@@ -114,8 +118,7 @@ export const fetchEventListOfUser = regionSelected.https.onCall(
     }
 
     return fetchEventListOfUserImpl(db, payload, context);
-  }
-);
+  });
 
 export const verifyEmail = regionSelected.https.onCall(
   (payload: unknown, _context) => {

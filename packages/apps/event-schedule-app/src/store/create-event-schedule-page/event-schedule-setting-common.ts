@@ -1,8 +1,9 @@
 import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
 import {
-  initialAnswerDeadline,
-  initialEventSchedule,
-  initialNotificationSettings,
+  answerDeadlineInitialValue,
+  datetimeRangeListInitialValue,
+  eventScheduleInitialValue,
+  notificationSettingsInitialValue,
 } from '../../constants';
 import {
   normalizeEventSchedule,
@@ -29,20 +30,20 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     state$: title$,
     setState: setTitle,
     resetState: resetTitle,
-  } = createState<string>(initialEventSchedule.title);
+  } = createState<string>(eventScheduleInitialValue.title);
 
   const {
     state$: notes$,
     setState: setNotes,
     resetState: resetNotes,
-  } = createState<string>(initialEventSchedule.notes);
+  } = createState<string>(eventScheduleInitialValue.notes);
 
   const {
     state$: datetimeSpecification$,
     setState: setDatetimeSpecification,
     resetState: resetDatetimeSpecification,
   } = createState<DatetimeSpecificationEnumType>(
-    initialEventSchedule.datetimeSpecification
+    eventScheduleInitialValue.datetimeSpecification
   );
 
   const {
@@ -50,7 +51,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     setState: setDatetimeRangeList,
     resetState: resetDatetimeRangeList,
   } = createState<readonly DatetimeRange[]>(
-    initialEventSchedule.datetimeRangeList
+    eventScheduleInitialValue.datetimeRangeList
   );
 
   const {
@@ -62,21 +63,21 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     turnOff: turnOffAnswerDeadlineSection,
     turnOn: turnOnAnswerDeadlineSection,
   } = createToggleSectionState<Ymdhm | undefined>({
-    initialToggleState: initialEventSchedule.answerDeadline !== 'none',
-    initialState: mapNoneToUndefined(initialEventSchedule.answerDeadline),
+    initialToggleState: eventScheduleInitialValue.answerDeadline !== 'none',
+    initialState: mapNoneToUndefined(eventScheduleInitialValue.answerDeadline),
     valueToBeSetWhenTurnedOff: () => undefined,
-    valueToBeSetWhenTurnedOn: () => initialAnswerDeadline,
+    valueToBeSetWhenTurnedOn: () => answerDeadlineInitialValue,
   });
 
   const {
     state$: answerIcons$,
     setState: setAnswerIcons,
     resetState: resetAnswerIcons,
-  } = createState<AnswerIconSettings>(initialEventSchedule.answerIcons);
+  } = createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
 
   const initialNotificationSettingsWithEmailFilled$ = fireAuthUser$.chain(
     mapI((user) => ({
-      ...initialNotificationSettings,
+      ...notificationSettingsInitialValue,
       email: user?.email ?? '',
     }))
   );
@@ -91,9 +92,10 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     turnOff: turnOffNotificationSection,
     turnOn: turnOnNotificationSection,
   } = createToggleSectionState<NotificationSettingsWithEmail | undefined>({
-    initialToggleState: initialEventSchedule.notificationSettings !== 'none',
+    initialToggleState:
+      eventScheduleInitialValue.notificationSettings !== 'none',
     initialState: pipe(
-      mapNoneToUndefined(initialEventSchedule.notificationSettings)
+      mapNoneToUndefined(eventScheduleInitialValue.notificationSettings)
     ).chainNullable((a) => ({
       ...a,
       email: '',
@@ -136,9 +138,9 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             title,
             notes,
             datetimeSpecification,
-            datetimeRangeList: IList.isArrayOfLength1OrMore(datetimeRangeList)
+            datetimeRangeList: IList.isNonEmpty(datetimeRangeList)
               ? datetimeRangeList
-              : eventScheduleDefaultValue.datetimeRangeList,
+              : datetimeRangeListInitialValue,
             answerDeadline: answerDeadline ?? 'none',
             answerIcons,
             notificationSettings: notificationSettingsWithEmail ?? 'none',

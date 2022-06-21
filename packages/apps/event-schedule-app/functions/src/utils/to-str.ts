@@ -39,12 +39,12 @@ export const datetimeRange2str = (
 export const iconId2str = (iconId: AnswerIconIdWithNone): string => {
   switch (iconId) {
     case 'none':
-      return '-';
+      return 'ー';
     case 'good':
       return '〇';
     case 'fair':
       return '△';
     case 'poor':
-      return '×';
+      return '✕';
   }
 };

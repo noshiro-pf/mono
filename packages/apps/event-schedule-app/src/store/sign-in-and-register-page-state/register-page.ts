@@ -134,6 +134,7 @@ export namespace RegisterPageStore {
     ]);
 
     if (Result.isErr(updateProfileResult)) {
+      // TODO: use toast
       console.error(updateProfileResult.value);
       dispatch({
         type: 'setUsernameError',
@@ -214,6 +215,7 @@ export namespace RegisterPageStore {
     )
       return;
 
+    // TODO: use toast
     submit(mut_subscribedValues.pageToBack).catch(console.error);
   };
 

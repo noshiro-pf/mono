@@ -2,7 +2,7 @@ import { fillNotificationSettings } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
-import { initialEventSchedule, routes } from '../../constants';
+import { eventScheduleInitialValue, routes } from '../../constants';
 import {
   createToaster,
   EventScheduleAppLocalStorage,
@@ -21,7 +21,7 @@ export namespace CreateEventScheduleStore {
   export const hasNoChanges$: InitializedObservable<boolean> =
     commonState$.chain(
       mapI(({ eventScheduleNormalized }) =>
-        deepEqual(initialEventSchedule, eventScheduleNormalized)
+        deepEqual(eventScheduleInitialValue, eventScheduleNormalized)
       )
     );
 
@@ -143,13 +143,13 @@ export namespace CreateEventScheduleStore {
 
     // reset local storage
     EventScheduleAppLocalStorage.saveCreateEventPageTemp({
-      answerDeadline: initialEventSchedule.answerDeadline,
-      answerIcons: initialEventSchedule.answerIcons,
-      datetimeRangeList: initialEventSchedule.datetimeRangeList,
-      datetimeSpecification: initialEventSchedule.datetimeSpecification,
-      notes: initialEventSchedule.notes,
-      notificationSettings: initialEventSchedule.notificationSettings,
-      title: initialEventSchedule.title,
+      answerDeadline: eventScheduleInitialValue.answerDeadline,
+      answerIcons: eventScheduleInitialValue.answerIcons,
+      datetimeRangeList: eventScheduleInitialValue.datetimeRangeList,
+      datetimeSpecification: eventScheduleInitialValue.datetimeSpecification,
+      notes: eventScheduleInitialValue.notes,
+      notificationSettings: eventScheduleInitialValue.notificationSettings,
+      title: eventScheduleInitialValue.title,
     });
 
     return Result.ok(undefined);
@@ -179,6 +179,7 @@ export namespace CreateEventScheduleStore {
       window.isSecureContext &&
       isNotUndefined(url)
     ) {
+      // TODO: use toast
       navigator.clipboard.writeText(url).catch(console.error);
     }
   };

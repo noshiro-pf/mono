@@ -88,6 +88,7 @@ export namespace EventListFetchState {
 
   result$.subscribe((e) => {
     if (Result.isErr(e)) {
+      // TODO: use toast
       console.error('eventListResult', e);
     }
   });

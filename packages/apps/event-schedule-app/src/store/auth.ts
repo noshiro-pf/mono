@@ -38,5 +38,6 @@ export const signOut = async (): Promise<void> => {
 };
 
 export const signOutClick = (): void => {
+  // TODO: use toast
   signOut().catch(console.error);
 };
