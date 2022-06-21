@@ -1,18 +1,12 @@
 import type { Type, Typeof } from './type';
 
-type MapUnion<T extends Type<unknown, unknown>> = T extends T
-  ? Typeof<T>
-  : never;
+type MapUnion<T extends Type<unknown>> = T extends T ? Typeof<T> : never;
 
-export const union = <
-  A extends readonly Type<unknown, unknown>[],
-  D extends A[number]
->({
+export const union = <A extends readonly Type<unknown>[]>({
   types,
   defaultType,
-}: Readonly<{ types: A; defaultType: D }>): Type<
-  MapUnion<A[number]>,
-  MapUnion<D> extends MapUnion<A[number]> ? MapUnion<D> : never
+}: Readonly<{ types: A; defaultType: A[number] }>): Type<
+  MapUnion<A[number]>
 > => {
   const is = (value: unknown): value is MapUnion<A[number]> =>
     types.some((t) => t.is(value));
@@ -21,11 +15,7 @@ export const union = <
     is(value) ? value : (defaultType.fill(value) as MapUnion<A[number]>);
 
   return {
-    defaultValue: defaultType.defaultValue as MapUnion<D> extends MapUnion<
-      A[number]
-    >
-      ? MapUnion<D>
-      : never,
+    defaultValue: defaultType.defaultValue as MapUnion<A[number]>,
     is,
     fill,
   };

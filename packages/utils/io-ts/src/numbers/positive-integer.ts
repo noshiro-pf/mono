@@ -4,9 +4,9 @@ import type { Type } from '../type';
 
 type PositiveInteger = number;
 
-export const positiveInteger = <D extends PositiveInteger>(
-  defaultValue: D
-): Type<PositiveInteger, D> =>
+export const positiveInteger = (
+  defaultValue: PositiveInteger
+): Type<PositiveInteger> =>
   createPrimitiveType({
     is: (a: unknown): a is PositiveInteger =>
       isNumber(a) && Num.isInt(a) && a >= 0,

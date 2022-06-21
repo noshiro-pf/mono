@@ -4,9 +4,9 @@ import type { Type } from '../type';
 
 type NonNegativeNumber = number;
 
-export const nonNegativeNumber = <D extends NonNegativeNumber>(
-  defaultValue: D
-): Type<NonNegativeNumber, D> =>
+export const nonNegativeNumber = (
+  defaultValue: NonNegativeNumber
+): Type<NonNegativeNumber> =>
   createPrimitiveType({
     is: (a: unknown): a is NonNegativeNumber => isNumber(a) && a >= 0,
     defaultValue,

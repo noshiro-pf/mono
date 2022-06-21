@@ -10,18 +10,16 @@ describe('enumType', () => {
 
   type TargetType = Typeof<typeof targetType>;
 
-  type D = typeof targetType.defaultValue;
-
   assertType<TypeEq<TargetType, '2' | 'a' | 3>>();
 
-  assertType<TypeEq<D, 3>>();
+  assertType<TypeEq<typeof targetType.defaultValue, TargetType>>();
 
   describe('validate', () => {
     test('truthy case', () => {
       const x: number | string = Math.random() >= 0 ? 3 : '0'; // the value is always 1
 
       if (targetType.is(x)) {
-        assertType<TypeEq<typeof x, '2' | 'a' | 3>>();
+        assertType<TypeEq<typeof x, TargetType>>();
       } else {
         assertType<TypeEq<typeof x, number | string>>();
       }
@@ -33,7 +31,7 @@ describe('enumType', () => {
       const x: number | string = Math.random() >= 0 ? 5 : '0'; // the value is always 5
 
       if (targetType.is(x)) {
-        assertType<TypeEq<typeof x, '2' | 'a' | 3>>();
+        assertType<TypeEq<typeof x, TargetType>>();
       } else {
         assertType<TypeEq<typeof x, number | string>>();
       }

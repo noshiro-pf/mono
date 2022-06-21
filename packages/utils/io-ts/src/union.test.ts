@@ -16,8 +16,6 @@ describe('union', () => {
 
   type TargetType = Typeof<typeof targetType>;
 
-  type D = typeof targetType.defaultValue;
-
   assertType<
     TypeEq<
       TargetType,
@@ -30,24 +28,14 @@ describe('union', () => {
     >
   >();
 
-  assertType<TypeEq<D, 3>>();
+  assertType<TypeEq<typeof targetType.defaultValue, TargetType>>();
 
   describe('validate', () => {
     test('truthy case', () => {
       const x: unknown = Math.random() >= 0 ? 3 : '0'; // the value is always 1
 
       if (targetType.is(x)) {
-        assertType<
-          TypeEq<
-            typeof x,
-            | Readonly<{
-                x: number;
-                y: number;
-              }>
-            | '2'
-            | 3
-          >
-        >();
+        assertType<TypeEq<typeof x, TargetType>>();
       } else {
         assertType<TypeEq<typeof x, unknown>>();
       }
@@ -59,17 +47,7 @@ describe('union', () => {
       const x: unknown = { x: 1, y: 2 };
 
       if (targetType.is(x)) {
-        assertType<
-          TypeEq<
-            typeof x,
-            | Readonly<{
-                x: number;
-                y: number;
-              }>
-            | '2'
-            | 3
-          >
-        >();
+        assertType<TypeEq<typeof x, TargetType>>();
       } else {
         assertType<TypeEq<typeof x, unknown>>();
       }
@@ -81,17 +59,7 @@ describe('union', () => {
       const x: unknown = Math.random() >= 0 ? 5 : '0'; // the value is always 5
 
       if (targetType.is(x)) {
-        assertType<
-          TypeEq<
-            typeof x,
-            | Readonly<{
-                x: number;
-                y: number;
-              }>
-            | '2'
-            | 3
-          >
-        >();
+        assertType<TypeEq<typeof x, TargetType>>();
       } else {
         assertType<TypeEq<typeof x, unknown>>();
       }

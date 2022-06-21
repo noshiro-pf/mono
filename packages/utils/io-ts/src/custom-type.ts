@@ -1,9 +1,9 @@
 import type { Type } from './type';
 
-export const createCustomType = <A, D extends A>(
+export const createCustomType = <A>(
   props: Readonly<{
-    defaultValue: D;
+    defaultValue: A;
     is: (value: unknown) => value is A;
     fill: (value: unknown) => A;
   }>
-): Type<A, D> => props;
+): Type<A> => props;

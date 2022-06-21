@@ -8,18 +8,16 @@ describe('array', () => {
 
   type Xs = Typeof<typeof xs>;
 
-  type D = typeof xs.defaultValue;
-
   assertType<TypeEq<Xs, readonly number[]>>();
 
-  assertType<TypeEq<D, readonly number[]>>();
+  assertType<TypeEq<typeof xs.defaultValue, Xs>>();
 
   describe('validate', () => {
     test('truthy case', () => {
       const ys: unknown = [1, 2, 3];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, readonly number[]>>();
+        assertType<TypeEq<typeof ys, Xs>>();
       } else {
         assertType<TypeEq<typeof ys, unknown>>();
       }
@@ -31,7 +29,7 @@ describe('array', () => {
       const ys: unknown = ['1', '', 3];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, readonly number[]>>();
+        assertType<TypeEq<typeof ys, Xs>>();
       } else {
         assertType<TypeEq<typeof ys, unknown>>();
       }

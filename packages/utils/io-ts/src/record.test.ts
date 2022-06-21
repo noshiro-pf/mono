@@ -12,13 +12,11 @@ describe('record', () => {
 
   type Ymd = Typeof<typeof ymd>;
 
-  type D = typeof ymd.defaultValue;
-
   assertType<
     TypeEq<Ymd, Readonly<{ year: number; month: number; date: number }>>
   >();
 
-  assertType<TypeEq<D, Readonly<{ year: 1900; month: 1; date: 1 }>>>();
+  assertType<TypeEq<typeof ymd.defaultValue, Ymd>>();
 
   describe('validate', () => {
     test('truthy case', () => {
@@ -29,12 +27,7 @@ describe('record', () => {
       };
 
       if (ymd.is(x)) {
-        assertType<
-          TypeEq<
-            typeof x,
-            Readonly<{ year: number; month: number; date: number }>
-          >
-        >();
+        assertType<TypeEq<typeof x, Ymd>>();
       } else {
         assertType<TypeEq<typeof x, ReadonlyRecordBase>>();
       }
@@ -50,12 +43,7 @@ describe('record', () => {
       };
 
       if (ymd.is(x)) {
-        assertType<
-          TypeEq<
-            typeof x,
-            Readonly<{ year: number; month: number; date: number }>
-          >
-        >();
+        assertType<TypeEq<typeof x, Ymd>>();
       } else {
         assertType<TypeEq<typeof x, ReadonlyRecordBase>>();
       }

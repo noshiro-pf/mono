@@ -4,22 +4,14 @@ import type { Type, Typeof } from './type';
 type RecordResultType<A extends ReadonlyRecord<string, Type<unknown>>> =
   Readonly<{ [key in keyof A]: Typeof<A[key]> }>;
 
-type DefaultValueRecordType<A extends ReadonlyRecord<string, Type<unknown>>> =
-  Readonly<{ [key in keyof A]: A[key]['defaultValue'] }>;
-
-export const record = <
-  A extends ReadonlyRecord<string, Type<unknown>>,
-  D extends RecordResultType<A> = DefaultValueRecordType<A> extends RecordResultType<A>
-    ? DefaultValueRecordType<A>
-    : never
->(
+export const record = <A extends ReadonlyRecord<string, Type<unknown>>>(
   recordType: A
-): Type<RecordResultType<A>, D> => {
+): Type<RecordResultType<A>> => {
   const defaultValue = IRecord.fromEntries(
     IRecord.entries(recordType).map(([key, value]) =>
       tp(key, value.defaultValue)
     )
-  ) as D;
+  ) as RecordResultType<A>;
 
   const is = (a: unknown): a is RecordResultType<A> =>
     isRecord(a) &&

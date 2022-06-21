@@ -8,18 +8,16 @@ describe('nonEmptyArray', () => {
 
   type Xs = Typeof<typeof xs>;
 
-  type D = typeof xs.defaultValue;
-
   assertType<TypeEq<Xs, NonEmptyArray<number>>>();
 
-  assertType<TypeEq<D, NonEmptyArray<number>>>();
+  assertType<TypeEq<typeof xs.defaultValue, Xs>>();
 
   describe('validate', () => {
     test('truthy case', () => {
       const ys: unknown = [1, 2, 3];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, NonEmptyArray<number>>>();
+        assertType<TypeEq<typeof ys, Xs>>();
       } else {
         assertType<TypeEq<typeof ys, unknown>>();
       }
@@ -31,7 +29,7 @@ describe('nonEmptyArray', () => {
       const ys: unknown = ['1', '', 3];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, NonEmptyArray<number>>>();
+        assertType<TypeEq<typeof ys, Xs>>();
       } else {
         assertType<TypeEq<typeof ys, unknown>>();
       }

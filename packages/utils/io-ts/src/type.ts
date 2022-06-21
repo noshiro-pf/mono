@@ -1,5 +1,5 @@
-export type Type<A, D extends A = A> = Readonly<{
-  defaultValue: D;
+export type Type<A> = Readonly<{
+  defaultValue: A;
   is: (value: unknown) => value is A;
   fill: (value: unknown) => A;
 }>;

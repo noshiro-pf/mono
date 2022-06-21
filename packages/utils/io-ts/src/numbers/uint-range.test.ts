@@ -7,20 +7,16 @@ describe('uintRange', () => {
 
   type Month = Typeof<typeof month>;
 
-  type D = typeof month.defaultValue;
-
   assertType<TypeEq<Month, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>>();
 
-  assertType<TypeEq<D, 1>>();
+  assertType<TypeEq<typeof month.defaultValue, Month>>();
 
   describe('validate', () => {
     test('truthy case', () => {
       const x: number = Math.random() >= 0 ? 1 : 0; // the value is always 1
 
       if (month.is(x)) {
-        assertType<
-          TypeEq<typeof x, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
-        >();
+        assertType<TypeEq<typeof x, Month>>();
       } else {
         assertType<TypeEq<typeof x, number>>();
       }
@@ -32,9 +28,7 @@ describe('uintRange', () => {
       const x: number = Math.random() >= 0 ? 13 : 0; // the value is always 13
 
       if (month.is(x)) {
-        assertType<
-          TypeEq<typeof x, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
-        >();
+        assertType<TypeEq<typeof x, Month>>();
       } else {
         assertType<TypeEq<typeof x, number>>();
       }

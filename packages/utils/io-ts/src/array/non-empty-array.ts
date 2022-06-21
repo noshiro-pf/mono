@@ -1,13 +1,13 @@
 import { IList } from '@noshiro/ts-utils';
 import type { Type } from '../type';
 
-export const nonEmptyArray = <A, D extends A>({
+export const nonEmptyArray = <A>({
   elementType,
   defaultValue,
 }: Readonly<{
-  elementType: Type<A, D>;
+  elementType: Type<A>;
   defaultValue: NonEmptyArray<A>;
-}>): Type<NonEmptyArray<A>, NonEmptyArray<A>> => {
+}>): Type<NonEmptyArray<A>> => {
   const is = (a: unknown): a is NonEmptyArray<A> =>
     IList.isArray(a) &&
     IList.isNonEmpty(a) &&

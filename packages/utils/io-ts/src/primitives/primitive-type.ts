@@ -1,12 +1,12 @@
 import type { Type } from '../type';
 
-export const createPrimitiveType = <A, D extends A>({
+export const createPrimitiveType = <A>({
   defaultValue,
   is,
 }: Readonly<{
-  defaultValue: D;
+  defaultValue: A;
   is: (value: unknown) => value is A;
-}>): Type<A, D> => ({
+}>): Type<A> => ({
   defaultValue,
   is,
   fill: (value: unknown): A => (is(value) ? value : defaultValue),

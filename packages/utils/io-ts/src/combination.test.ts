@@ -17,8 +17,6 @@ describe('nested record', () => {
 
   type NestedRecord = Typeof<typeof nestedRecord>;
 
-  type D = typeof nestedRecord.defaultValue;
-
   assertType<
     TypeEq<
       NestedRecord,
@@ -33,19 +31,7 @@ describe('nested record', () => {
     >
   >();
 
-  assertType<
-    TypeEq<
-      D,
-      Readonly<{
-        xs: readonly number[];
-        rec: Readonly<{
-          a: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-          b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-        }>;
-        meta: 100;
-      }>
-    >
-  >();
+  assertType<TypeEq<typeof nestedRecord.defaultValue, NestedRecord>>();
 
   describe('validate', () => {
     test('truthy case', () => {
@@ -59,19 +45,7 @@ describe('nested record', () => {
       };
 
       if (nestedRecord.is(x)) {
-        assertType<
-          TypeEq<
-            typeof x,
-            Readonly<{
-              xs: readonly number[];
-              rec: Readonly<{
-                a: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-                b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-              }>;
-              meta: number;
-            }>
-          >
-        >();
+        assertType<TypeEq<typeof x, NestedRecord>>();
       } else {
         assertType<TypeEq<typeof x, ReadonlyRecordBase>>();
       }
@@ -90,19 +64,7 @@ describe('nested record', () => {
       };
 
       if (nestedRecord.is(x)) {
-        assertType<
-          TypeEq<
-            typeof x,
-            Readonly<{
-              xs: readonly number[];
-              rec: Readonly<{
-                a: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-                b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-              }>;
-              meta: number;
-            }>
-          >
-        >();
+        assertType<TypeEq<typeof x, NestedRecord>>();
       } else {
         assertType<TypeEq<typeof x, ReadonlyRecordBase>>();
       }
