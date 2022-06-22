@@ -125,7 +125,7 @@ const typescriptEslintRules = {
     'error',
     { accessibility: 'no-public' },
   ], // modified
-  '@typescript-eslint/explicit-module-boundary-types': 'error',
+  '@typescript-eslint/explicit-module-boundary-types': 'off', // preferred to use explicit-function-return-type
   '@typescript-eslint/init-declarations': 'error',
   '@typescript-eslint/lines-between-class-members': 'off', // disabled
   '@typescript-eslint/member-ordering': 'off', // disabled
