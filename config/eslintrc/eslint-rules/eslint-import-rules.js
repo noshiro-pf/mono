@@ -67,7 +67,7 @@ const eslintImportsRules = {
   'import/first': 'error',
   'import/exports-last': 'off',
   'import/no-duplicates': 'error',
-  'import/no-namespace': 'error',
+  'import/no-namespace': ['error', { ignore: ['@noshiro/io-ts'] }],
   'import/extensions': [
     'error',
     'never',
