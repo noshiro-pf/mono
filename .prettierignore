@@ -33,3 +33,4 @@ firestore.rules
 .editorconfig
 .vscodeignore
 *.svelte
+packages/utils/syncflow/docs/**/*.js
