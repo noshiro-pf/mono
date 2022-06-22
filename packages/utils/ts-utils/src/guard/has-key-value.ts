@@ -7,4 +7,4 @@ export const hasKeyValue = <K extends PropertyKey, V>(
   valueChecker: (v: unknown) => v is V
 ): obj is ReadonlyRecord<K, V> =>
   // eslint-disable-next-line no-prototype-builtins
-  hasKey(obj, key) && valueChecker((obj as Record<K, unknown>)[key]);
+  hasKey(obj, key) && valueChecker(obj[key]);
