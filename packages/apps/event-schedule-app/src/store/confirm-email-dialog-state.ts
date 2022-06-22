@@ -116,6 +116,7 @@ export namespace ConfirmEmailDialogStore {
       throw new Error('eventId and email input value must be non null string');
     }
 
+    // TODO: use toast
     submit(eventId, email).catch(console.error);
   };
 

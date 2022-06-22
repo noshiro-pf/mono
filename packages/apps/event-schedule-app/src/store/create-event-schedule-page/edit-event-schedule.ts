@@ -1,6 +1,6 @@
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
-import { initialEventSchedule, routes } from '../../constants';
+import { eventScheduleInitialValue, routes } from '../../constants';
 import type { EventSettingsPageDiffResult } from '../../functions';
 import {
   collectEventSettingsPageDiff,
@@ -81,7 +81,7 @@ export namespace EditEventScheduleStore {
           { eventScheduleNormalized, notificationSettingsWithEmail },
         ]) =>
           collectEventSettingsPageDiff(
-            eventScheduleFromDatabase ?? initialEventSchedule,
+            eventScheduleFromDatabase ?? eventScheduleInitialValue,
             eventScheduleNormalized,
             emailVerified,
             notificationSettingsWithEmail?.email
@@ -175,6 +175,7 @@ export namespace EditEventScheduleStore {
   };
 
   export const onEditEventClick = (): void => {
+    // TODO: use toast
     saveToDatabase().catch(console.error);
   };
 

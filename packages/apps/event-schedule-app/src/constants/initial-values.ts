@@ -1,17 +1,28 @@
 import {
   answerDeadlineRemainingDaysDefaultValue,
-  datetimeRangeDefaultValue,
   notificationSettingsDefaultValue,
+  timeRangeDefaultValue,
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
 import { defaultIconPoint } from './default-icon-point';
 import { dict } from './dictionary';
 
-export const initialDatetimeRangeList: NonEmptyArray<DatetimeRange> = [
-  datetimeRangeDefaultValue,
+export const yearMonthDateInitialValue: YearMonthDate = {
+  year: IDate.getLocaleYear(IDate.today()),
+  month: IDate.getLocaleMonth(IDate.today()),
+  date: IDate.getLocaleDate(IDate.today()),
+};
+
+export const datetimeRangeInitialValue: DatetimeRange = {
+  ymd: yearMonthDateInitialValue,
+  timeRange: timeRangeDefaultValue,
+};
+
+export const datetimeRangeListInitialValue: NonEmptyArray<DatetimeRange> = [
+  datetimeRangeInitialValue,
 ];
 
-export const initialAnswerIcons: AnswerIconSettings = {
+export const answerIconsInitialValue: AnswerIconSettings = {
   good: {
     description: dict.iconDescriptionDefault.circle,
     point: defaultIconPoint.good,
@@ -26,7 +37,7 @@ export const initialAnswerIcons: AnswerIconSettings = {
   },
 } as const;
 
-export const initialAnswerDeadline: Ymdhm = pipe(IDate.today())
+export const answerDeadlineInitialValue: Ymdhm = pipe(IDate.today())
   .chain(
     IDate.updateLocaleDate(
       (a) => (a + answerDeadlineRemainingDaysDefaultValue) as DateEnum
@@ -37,22 +48,19 @@ export const initialAnswerDeadline: Ymdhm = pipe(IDate.today())
   .chain(IDate.toDate)
   .chain(ymdhmFromDate).value;
 
-export const initialNotificationSettings: NotificationSettings = IRecord.set(
-  notificationSettingsDefaultValue,
-  'notifyOnAnswerChange',
-  true
-);
+export const notificationSettingsInitialValue: NotificationSettings =
+  IRecord.set(notificationSettingsDefaultValue, 'notifyOnAnswerChange', true);
 
-export const initialDatetimeSpecification: DatetimeSpecificationEnumType =
+export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =
   'startSpecified';
 
-export const initialEventSchedule: EventSchedule = {
+export const eventScheduleInitialValue: EventSchedule = {
   title: '',
   notes: '',
-  datetimeSpecification: initialDatetimeSpecification,
-  datetimeRangeList: initialDatetimeRangeList,
+  datetimeSpecification: datetimeSpecificationInitialValue,
+  datetimeRangeList: datetimeRangeListInitialValue,
   answerDeadline: 'none',
-  answerIcons: initialAnswerIcons,
+  answerIcons: answerIconsInitialValue,
   notificationSettings: 'none',
   timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
   author: {

@@ -139,6 +139,7 @@ export namespace DeleteAccountPage {
 
     if (enterButtonDisabled || fireAuthUser === undefined) return;
 
+    // TODO: use toast
     submit(fireAuthUser).catch(console.error);
   };
 

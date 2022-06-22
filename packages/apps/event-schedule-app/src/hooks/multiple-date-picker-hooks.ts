@@ -1,8 +1,6 @@
-import {
-  compareYmd,
-  yearMonthDateDefaultValue,
-} from '@noshiro/event-schedule-app-shared';
+import { compareYmd } from '@noshiro/event-schedule-app-shared';
 import { fromArray } from '@noshiro/syncflow';
+import { yearMonthDateInitialValue } from '../constants';
 import type {
   CalendarCurrentPageReducerState,
   SelectedDatesReducerAction,
@@ -166,7 +164,7 @@ export const useMultipleDatePickerState = (
             selectedDatesDispatch({
               type: 'fill-column',
               dates: dates
-                .map((week) => week[w] ?? yearMonthDateDefaultValue)
+                .map((week) => week[w] ?? yearMonthDateInitialValue)
                 .filter((d) => d.month === calendarCurrentPage.month),
             });
           },

@@ -144,6 +144,7 @@ export namespace UpdateEmailPage {
 
     if (enterButtonDisabled || fireAuthUser === undefined) return;
 
+    // TODO: use toast
     submit(fireAuthUser).catch(console.error);
   };
 

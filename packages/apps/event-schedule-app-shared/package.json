@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/event-schedule-app-shared",
-  "version": "7.0.1",
+  "version": "7.1.0",
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
@@ -19,10 +19,12 @@
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "wireit",
+    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "dependencies": {
+    "@noshiro/io-ts": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "1.0.0"
   },

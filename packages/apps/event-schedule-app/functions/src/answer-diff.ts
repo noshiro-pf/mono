@@ -63,5 +63,21 @@ export const answerDiffAsString = (
       `    ・ （変更後）：${after.comment}`
     );
   }
+
+  if (before.isRequiredParticipants !== after.isRequiredParticipants) {
+    mut_result.push(
+      '・ 必須参加者チェックの変更：',
+      `    ・ （変更前）：${before.isRequiredParticipants ? 'オン' : 'オフ'}`,
+      `    ・ （変更後）：${after.isRequiredParticipants ? 'オン' : 'オフ'}`
+    );
+  }
+
+  if (before.weight !== after.weight) {
+    mut_result.push(
+      '・ 回答の重みの変更：',
+      `    ・ （変更前）：${before.weight}人分としてカウント`,
+      `    ・ （変更後）：${after.weight}人分としてカウント`
+    );
+  }
   return mut_result;
 };

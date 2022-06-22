@@ -262,6 +262,7 @@ const onSubmitAnswerImpl = async (
         .add(eventId, IRecord.set(answerBeingEdited, 'createdAt', IDate.now()))
         .then((res) => {
           if (Result.isErr(res)) {
+            // TODO: use toast
             console.error(res.value);
           }
 
@@ -284,6 +285,7 @@ const onSubmitAnswerImpl = async (
         .update(eventId, answerBeingEdited.id, answerBeingEdited)
         .then((res) => {
           if (Result.isErr(res)) {
+            // TODO: use toast
             console.error(res.value);
           }
           setSubmitButtonIsLoading(false);
@@ -328,6 +330,7 @@ const onSubmitEmptyAnswerImpl = async (
     )
     .then((res) => {
       if (Result.isErr(res)) {
+        // TODO: use toast
         console.error(res.value);
       }
 
@@ -354,6 +357,7 @@ const onDeleteAnswerImpl = async (
 
   await api.answers.delete(eventId, answerBeingEdited.id).then((res) => {
     if (Result.isErr(res)) {
+      // TODO: use toast
       console.error(res.value);
     }
     setSubmitButtonIsLoading(false);

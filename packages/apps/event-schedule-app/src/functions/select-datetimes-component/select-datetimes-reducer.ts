@@ -1,8 +1,8 @@
 import {
   compareDatetimeRange,
-  datetimeRangeDefaultValue,
   timeRangeDefaultValue,
 } from '@noshiro/event-schedule-app-shared';
+import { datetimeRangeInitialValue } from '../../constants';
 import { ymdFromKey, ymdToKey } from '../map-key';
 import { timeRangeReducer } from './time-range-reducer';
 
@@ -69,7 +69,7 @@ export const datetimeListReducer: ReducerType<
       return IList.insert(
         state,
         action.index,
-        state[action.index] ?? datetimeRangeDefaultValue
+        state[action.index] ?? datetimeRangeInitialValue
       );
 
     case 'delete':

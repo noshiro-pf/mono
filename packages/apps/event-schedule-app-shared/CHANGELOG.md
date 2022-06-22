@@ -1,17 +1,22 @@
+# v7.1
+
+-   io-ts を使うように書き換え
+-   テスト追加に伴い `IDate.today()` や `IDate.now()` を使用しないように変更。
+
 # v7
 
 -   EventSchedule.notificationSettings.email を削除（sub collection に移動）
-
-# v6
-
--   `AnswerSelection` 型に `comment` フィールドを追加。各日程に対する回答にコメントを追加できるようにするため。
--   `EventListItem` 追加
 
 ## v6.1
 
 -   各 fill 関数の引数の型を `unknown` に変更
 -   変更が多くなったため一旦 types 配下を ~v5 から引き継がずに再作成
 -   `EventSchedule` に `archivedBy` を追加
+
+# v6
+
+-   `AnswerSelection` 型に `comment` フィールドを追加。各日程に対する回答にコメントを追加できるようにするため。
+-   `EventListItem` 追加
 
 # v5
 

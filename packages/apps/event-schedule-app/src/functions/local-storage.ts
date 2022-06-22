@@ -43,7 +43,7 @@ export namespace EventScheduleAppLocalStorage {
     const obj = Json.parse(fromDb);
     return Result.isErr(obj)
       ? Result.err(obj.value)
-      : Result.ok(fillEventSchedule(obj.value as Partial<EventSchedulePicked>));
+      : Result.ok(fillEventSchedule(obj.value));
   };
 
   export const saveCreateEventPageTemp = (

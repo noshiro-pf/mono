@@ -65,6 +65,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     const signInResult = await api.auth.googleSignInWithPopup();
 
     if (Result.isErr(signInResult)) {
+      // TODO: use toast
       console.error(
         'error occurred on googleSignInWithPopup:',
         signInResult.value
@@ -131,6 +132,7 @@ export namespace DeleteAccountCreatedWithGoogle {
 
     if (enterButtonDisabled || fireAuthUser === undefined) return;
 
+    // TODO: use toast
     submit(fireAuthUser).catch(console.error);
   };
 
