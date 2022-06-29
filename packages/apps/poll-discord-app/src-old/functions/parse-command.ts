@@ -1,11 +1,13 @@
 import type { NumGroups } from '../types';
-import { maxNumGroups } from '../types';
+import { isNumGroups } from '../types';
 
 export const rpParseCommand = (command: string): readonly string[] =>
   command
     .split('"')
     .filter((_, i) => i % 2 === 1)
     .map((s) => s.replace(/\n/gu, ' ').replace(/\t/gu, ' '));
+
+const rangeCheckFn = Num.isInRange(0, 30);
 
 export const rp3060ParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
@@ -33,7 +35,7 @@ export const rp3060ParseCommand = (
 
   const arg1AsNumber = Num.parseInt(begin, 10);
   const arg2AsNumber = Num.parseInt(end, 10);
-  const rangeCheckFn = Num.isInRange(0, 30);
+
   if (
     isUndefined(arg1AsNumber) ||
     isUndefined(arg2AsNumber) ||
@@ -79,7 +81,6 @@ export const rp3060dParseCommand = (
 
   const arg1AsNumber = Num.parseInt(begin, 10);
   const arg2AsNumber = Num.parseInt(end, 10);
-  const rangeCheckFn = Num.isInRange(0, 30);
   if (
     isUndefined(arg1AsNumber) ||
     isUndefined(arg2AsNumber) ||
@@ -103,12 +104,10 @@ export const gpParseGroupingCommandArgument = (
   commandArguments: string
 ): Result<readonly [NumGroups, readonly string[]], undefined> => {
   const numGroups = Num.parseInt(commandArguments, 10);
-  if (isUndefined(numGroups) || Num.isNaN(numGroups))
-    return Result.err(undefined);
-  if (numGroups < 2 || maxNumGroups < numGroups) return Result.err(undefined);
+  if (!isNumGroups(numGroups)) return Result.err(undefined);
 
   return Result.ok([
-    numGroups as NumGroups,
+    numGroups,
     commandArguments
       .split('"')
       .filter((_, i) => i % 2 === 1)
@@ -120,8 +119,8 @@ export const gpParseRandCommandArgument = (
   commandArguments: string
 ): Result<number, undefined> => {
   const n = Num.parseInt(commandArguments, 10);
-  if (isUndefined(n) || Num.isNaN(n)) return Result.err(undefined);
-  if (n < 2 || !Num.isSafeInt(n)) return Result.err(undefined);
+  if (isUndefined(n) || Num.isNaN(n) || n < 2 || !Num.isSafeInt(n))
+    return Result.err(undefined);
 
   return Result.ok(n);
 };

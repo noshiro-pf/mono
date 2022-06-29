@@ -15,6 +15,7 @@ export const initDiscordClient = (): Promise<Result<DiscordClient, unknown>> =>
     });
 
     Promise.all([
+      Result.fromPromise(discordClient.login(DISCORD_TOKEN)),
       new Promise<Result<undefined, unknown>>((resolve) => {
         discordClient.once('ready', () => {
           try {
@@ -37,9 +38,8 @@ export const initDiscordClient = (): Promise<Result<DiscordClient, unknown>> =>
           }
         });
       }),
-      Result.fromPromise(discordClient.login(DISCORD_TOKEN)),
     ])
-      .then(([ready, login]) => {
+      .then(([login, ready]) => {
         if (Result.isErr(ready)) {
           resolveAll(Result.err(ready));
         } else {
@@ -50,8 +50,8 @@ export const initDiscordClient = (): Promise<Result<DiscordClient, unknown>> =>
           }
         }
       })
-      .catch(() => {
-        resolveAll(Result.err(undefined));
+      .catch((error) => {
+        resolveAll(Result.err(error));
       });
   });
 
@@ -66,13 +66,16 @@ export const startDiscordListener = (
       ? await mayBePartialReaction.fetch()
       : mayBePartialReaction;
 
-    onMessageReactionAdd(databaseRef, psqlClient, reaction, user)
-      .then((result) => {
-        if (Result.isErr(result)) {
-          console.error('on messageReactionAdd error:', result);
-        }
-      })
-      .catch(console.error);
+    const result = await onMessageReactionAdd(
+      databaseRef,
+      psqlClient,
+      reaction,
+      user
+    );
+
+    if (Result.isErr(result)) {
+      console.error('on messageReactionAdd error:', result);
+    }
   });
 
   discordClient.on(
@@ -82,33 +85,42 @@ export const startDiscordListener = (
         ? await mayBePartialReaction.fetch()
         : mayBePartialReaction;
 
-      onMessageReactionRemove(databaseRef, psqlClient, reaction, user)
-        .then((result) => {
-          if (Result.isErr(result)) {
-            console.error('on messageReactionRemove error:', result);
-          }
-        })
-        .catch(console.error);
+      const result = await onMessageReactionRemove(
+        databaseRef,
+        psqlClient,
+        reaction,
+        user
+      );
+
+      if (Result.isErr(result)) {
+        console.error('on messageReactionRemove error:', result);
+      }
     }
   );
 
-  discordClient.on('messageUpdate', (_oldMessage, newMessage) => {
-    updatePollTitle(databaseRef, psqlClient, newMessage)
-      .then((result) => {
-        if (Result.isErr(result)) {
-          console.error('on message error:', result);
-        }
-      })
-      .catch(console.error);
+  discordClient.on('messageUpdate', async (_oldMessage, newMessage) => {
+    const result = await updatePollTitle(databaseRef, psqlClient, newMessage);
+
+    if (Result.isErr(result)) {
+      console.error('on message error:', result);
+    }
   });
 
-  discordClient.on('message', (message) => {
-    sendMessageMain(databaseRef, psqlClient, message)
-      .then((result) => {
-        if (Result.isErr(result)) {
-          console.error('on message error:', result);
-        }
-      })
-      .catch(console.error);
+  discordClient.on('message', async (message) => {
+    console.log(message);
+    const result = await sendMessageMain(databaseRef, psqlClient, message);
+
+    if (Result.isErr(result)) {
+      console.error('on message error:', result);
+    }
   });
+
+  // discordClient.on('interactionCreate', async (interaction) => {
+  //   console.log(interaction);
+  //   const result = await sendMessageMain(databaseRef, psqlClient, interaction);
+
+  //   if (Result.isErr(result)) {
+  //     console.error('on message error:', result);
+  //   }
+  // });
 };

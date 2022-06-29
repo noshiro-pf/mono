@@ -7,14 +7,19 @@
 /// <reference path="../../../utils/stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../../utils/ts-type-utils/ts-type-utils.d.ts" />
 /// <reference path="../../../utils/global-ts-utils/esm/globals-decl.d.ts" />
-/// <reference path="../../../utils/global-syncflow/esm/globals-decl.d.ts" />
+
+// eslint-disable-next-line import/no-unassigned-import
+import '@noshiro/global-ts-utils';
 
 import { main } from './main';
 
-main()
-  .then((res) => {
-    if (Result.isErr(res)) {
-      process.exit(1);
-    }
-  })
-  .catch(() => undefined);
+// main()
+//   .then((res) => {
+//     if (Result.isErr(res)) {
+//       console.error(res.value);
+//       process.exit(1);
+//     }
+//   })
+//   .catch(noop);
+
+main();

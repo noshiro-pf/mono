@@ -1,5 +1,5 @@
 import type { MessageReaction, PartialUser, User } from 'discord.js';
-import { emojis } from '../constants';
+import { emojis, numMessagesToFetch } from '../constants';
 import {
   createUserIdToDisplayNameMap,
   getUserIdsFromAnswers,
@@ -17,7 +17,8 @@ const onRefreshClick = async (
   reactionFilled: MessageReaction
 ): Promise<Result<undefined, string>> => {
   const messages = await reactionFilled.message.channel.messages.fetch({
-    around: reactionFilled.message.id,
+    after: reactionFilled.message.id,
+    limit: numMessagesToFetch,
   });
 
   const poll: Poll | undefined = databaseRef.db.polls.get(
@@ -60,7 +61,7 @@ const onRefreshClick = async (
   return Result.ok(undefined);
 };
 
-export const onMessageReactCommon = async (
+const onMessageReactCommon = async (
   databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   action: Readonly<{
@@ -91,6 +92,7 @@ export const onMessageReactCommon = async (
     }),
     reaction.message.channel.messages.fetch({
       after: dateOptionId,
+      limit: numMessagesToFetch,
     }),
   ]);
 

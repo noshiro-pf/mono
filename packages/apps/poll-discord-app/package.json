@@ -16,22 +16,27 @@
     "setup": "run-p setup:**",
     "setup:dbjson": "echo '{ \"polls\": [] }' > ./db.json",
     "start:dev": "export NODE_ENV='development' && node ./dist/index.js",
+    "start:dev:psql": "sudo /etc/init.d/postgresql restart",
     "start:prod": "node ./dist/index.js",
+    "start:watch": "tsc --watch",
+    "test": "wireit",
+    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
   "dependencies": {
+    "@discordjs/rest": "^1.0.1",
     "@keyv/postgres": "^1.2.1",
+    "@noshiro/io-ts": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "discord.js": "^13.7.0",
+    "discord.js": "^14.1.2",
     "dotenv": "^16.0.1",
     "keyv": "^4.3.2",
     "pg": "^8.7.3",
     "tslib": "^2.1.0"
   },
   "devDependencies": {
-    "@noshiro/global-syncflow": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@types/pg": "^8.6.5"
@@ -91,6 +96,19 @@
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": []
+    },
+    "test": {
+      "command": "jest --config config/jest.config.json --passWithNoTests",
+      "dependencies": [
+        "type-check"
+      ],
+      "files": [
+        "config/jest.config.json",
+        "src/**"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
     }
   }
 }

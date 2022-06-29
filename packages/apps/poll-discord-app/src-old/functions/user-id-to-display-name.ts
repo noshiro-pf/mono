@@ -13,7 +13,7 @@ export const createUserIdToDisplayNameMap = async (
     | undefined = await Result.fromPromise(
     (userIds === undefined
       ? guild?.members.fetch()
-      : guild?.members.fetch({ user: userIds as Writable<typeof userIds> })) ??
+      : guild?.members.fetch({ user: castWritable(userIds) })) ??
       Promise.reject(new Error('guild is undefined'))
   );
 

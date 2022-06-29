@@ -1,13 +1,16 @@
+import Keyv from 'keyv';
 import { Client } from 'pg';
 import { psqlRowId, psqlRowType, psqlTableName } from './constants';
 import type { PsqlClient, PsqlRow } from './types';
 import { databaseDefaultValue } from './types';
 
+export const keyv = new Keyv();
+
 export namespace psql {
-  // export const setTlsRejectUnauthorized0 = (): void => {
-  //   // eslint-disable-next-line @typescript-eslint/dot-notation,functional/immutable-data
-  //   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-  // };
+  export const setTlsRejectUnauthorized0 = (): void => {
+    // eslint-disable-next-line @typescript-eslint/dot-notation,functional/immutable-data
+    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+  };
 
   export const initClient = async (
     connectionString: string | undefined
