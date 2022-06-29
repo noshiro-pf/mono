@@ -37,3 +37,5 @@ export const psqlRowType = {
 } as const;
 
 export const psqlRowId = '2021-03-20_16:35';
+
+export const numMessagesToFetch = 200;

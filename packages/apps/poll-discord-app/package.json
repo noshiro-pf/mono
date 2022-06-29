@@ -17,6 +17,7 @@
     "lint": "yarn z:lint:src:wireit",
     "lint:fix": "yarn z:lint:fix:src:wireit",
     "start:dev": "export NODE_ENV='development' && node ./dist/index.js",
+    "start:dev:psql": "sudo /etc/init.d/postgresql restart",
     "start:prod": "node ./dist/index.js",
     "tsc": "yarn z:type-check:wireit",
     "tscw": "yarn z:type-check:impl --watch",
@@ -41,17 +42,18 @@
     "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
   },
   "dependencies": {
+    "@discordjs/rest": "^1.0.1",
     "@keyv/postgres": "^1.2.1",
+    "@noshiro/io-ts": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "discord.js": "^13.7.0",
+    "discord.js": "^14.1.2",
     "dotenv": "^16.0.1",
     "keyv": "^4.3.2",
     "pg": "^8.7.3",
     "tslib": "^2.1.0"
   },
   "devDependencies": {
-    "@noshiro/global-syncflow": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@types/pg": "^8.6.5"

@@ -1,5 +1,5 @@
-import { type Message, type PartialMessage } from 'discord.js';
-import { triggerCommand } from '../constants';
+import type { Message, PartialMessage } from 'discord.js';
+import { numMessagesToFetch, triggerCommand } from '../constants';
 import {
   createTitleString,
   createUserIdToDisplayNameMap,
@@ -51,6 +51,7 @@ export const updatePollTitle = async (
     ),
     messageFilled.channel.messages.fetch({
       after: messageFilled.id,
+      limit: numMessagesToFetch,
     }),
   ]);
 

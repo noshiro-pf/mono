@@ -1,5 +1,5 @@
 DISCORD_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 # LOCAL_DATABASE_URL="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME";
-PGDATABASE="richpoll"
+PGDATABASE="poll-app"
 PGUSER="postgres"
 PGPASSWORD="aaa"

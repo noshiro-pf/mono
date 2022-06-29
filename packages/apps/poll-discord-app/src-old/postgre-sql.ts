@@ -1,11 +1,14 @@
+import Keyv from 'keyv';
 import { Client } from 'pg';
 import { psqlRowId, psqlRowType, psqlTableName } from './constants';
 import { databaseDefaultValue, type PsqlClient, type PsqlRow } from './types';
 
-//  const setTlsRejectUnauthorized0 = (): void => {
-//   // eslint-disable-next-line @typescript-eslint/dot-notation,functional/immutable-data
-//   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-// };
+export const keyv = new Keyv();
+
+export const setTlsRejectUnauthorized0 = (): void => {
+  // eslint-disable-next-line @typescript-eslint/dot-notation,functional/immutable-data
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+};
 
 const initClient = async (
   connectionString: string | undefined
