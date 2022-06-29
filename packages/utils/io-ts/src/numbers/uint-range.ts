@@ -1,10 +1,6 @@
 import { isNumber, Num } from '@noshiro/ts-utils';
 import type { Type } from '../type';
 
-type UintRange<Min extends number, Max extends number> =
-  | Max
-  | RelaxedExclude<Seq<Max>, Seq<Min>>;
-
 export const uintRange = <Max extends Seq<100>, Min extends Seq<Max>>(
   min: Min,
   max: Max,
