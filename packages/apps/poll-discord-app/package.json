@@ -21,10 +21,12 @@
     "type-check": "wireit"
   },
   "dependencies": {
+    "@keyv/postgres": "^1.2.1",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
     "discord.js": "^13.7.0",
     "dotenv": "^16.0.1",
+    "keyv": "^4.3.2",
     "pg": "^8.7.3",
     "tslib": "^2.1.0"
   },
