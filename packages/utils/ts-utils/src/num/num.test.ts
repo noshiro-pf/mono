@@ -1,3 +1,4 @@
+import { assertType } from '../assert-type';
 import { Num } from './num';
 
 const testClamp = (
@@ -29,6 +30,30 @@ describe('Num', () => {
 
     test('case 3', () => {
       expect(Num.sign(2)).toBe(1);
+    });
+  });
+
+  describe('isUintInRange', () => {
+    test('truthy case', () => {
+      const f = Num.isUintInRange(0, 3);
+      const x: number = 2;
+      if (f(x)) {
+        assertType<TypeEq<typeof x, 0 | 1 | 2 | 3>>();
+      } else {
+        assertType<TypeEq<typeof x, number>>();
+      }
+      expect(f(x)).toBe(true);
+    });
+
+    test('falsy case', () => {
+      const f = Num.isUintInRange(0, 3);
+      const x: number = 100;
+      if (f(x)) {
+        assertType<TypeEq<typeof x, 0 | 1 | 2 | 3>>();
+      } else {
+        assertType<TypeEq<typeof x, number>>();
+      }
+      expect(f(x)).toBe(false);
     });
   });
 });

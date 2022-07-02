@@ -173,6 +173,11 @@ export namespace Num {
     (target: number): boolean =>
       min <= target && target <= max;
 
+  export const isUintInRange =
+    <Min extends number, Max extends number>(min: Min, max: Max) =>
+    (target: number): target is UintRange<Min, Max> =>
+      min <= target && target <= max;
+
   const isUint32Range = isInRange(0, 2 ** 32 - 1);
 
   /** @description check value with Number.isInteger and check range */
