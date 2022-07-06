@@ -6,7 +6,7 @@ import { aboutThisAppUrl, feedbackUrl, routes } from '../../constants';
 import {
   router,
   signOutClick,
-  UpdateUserInfoDialogState,
+  UpdateUserInfoDialogStore,
   useFireAuthUser,
   usePasswordProviderIncluded,
 } from '../../store';
@@ -47,7 +47,7 @@ export const NavBar = memoNamed('NavBar', () => {
   });
 
   const openingDialog = useObservableValue(
-    UpdateUserInfoDialogState.openingDialog$
+    UpdateUserInfoDialogStore.openingDialog$
   );
 
   const passwordProviderIncluded = usePasswordProviderIncluded();
@@ -97,22 +97,22 @@ export const NavBar = memoNamed('NavBar', () => {
                       <MenuItem text={dc.auth.menu.accountSettings}>
                         <MenuItem
                           text={dc.auth.menu.changeDisplayName}
-                          onClick={UpdateUserInfoDialogState.changeUsername}
+                          onClick={UpdateUserInfoDialogStore.changeUsername}
                         />
                         {passwordProviderIncluded ? (
                           <>
                             <MenuItem
                               text={dc.auth.menu.changeEmail}
-                              onClick={UpdateUserInfoDialogState.changeEmail}
+                              onClick={UpdateUserInfoDialogStore.changeEmail}
                             />
                             <MenuItem
                               text={dc.auth.menu.changePassword}
-                              onClick={UpdateUserInfoDialogState.changePassword}
+                              onClick={UpdateUserInfoDialogStore.changePassword}
                             />
                             <MenuItem
                               intent={'danger'}
                               text={dc.auth.menu.deleteAccount}
-                              onClick={UpdateUserInfoDialogState.deleteAccount}
+                              onClick={UpdateUserInfoDialogStore.deleteAccount}
                             />
                           </>
                         ) : (
@@ -120,7 +120,7 @@ export const NavBar = memoNamed('NavBar', () => {
                             intent={'danger'}
                             text={dc.auth.menu.deleteAccount}
                             onClick={
-                              UpdateUserInfoDialogState.deleteAccountCreatedWithGoogle
+                              UpdateUserInfoDialogStore.deleteAccountCreatedWithGoogle
                             }
                           />
                         )}

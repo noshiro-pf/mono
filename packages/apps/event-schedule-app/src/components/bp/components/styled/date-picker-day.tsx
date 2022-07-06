@@ -1,14 +1,11 @@
+import { calendarDateColor } from '../../../../constants';
+
 export const DatePickerStyled = styled.div`
   background: #ffffff;
   border-radius: 3px;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   padding: 5px;
   position: relative;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 `;
 
@@ -24,9 +21,6 @@ export const DatePickerMonthStyled = styled.div`
   border-spacing: 0;
   display: inline-table;
   margin: 0 5px 5px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 `;
 
@@ -100,11 +94,11 @@ export const DatePickerDayStyled = styled(DatePickerDayBaseStyled)`
 `;
 
 export const DatePickerDaySaturdayStyled = styled(DatePickerDayStyled)`
-  color: blue;
+  color: ${calendarDateColor.saturday};
 `;
 
 export const DatePickerDayHolidayStyled = styled(DatePickerDayStyled)`
-  color: red;
+  color: ${calendarDateColor.sunday};
 `;
 
 export const DatePickerDayReadonlyStyled = DatePickerDayBaseStyled;
@@ -112,13 +106,13 @@ export const DatePickerDayReadonlyStyled = DatePickerDayBaseStyled;
 export const DatePickerDayReadonlySaturdayStyled = styled(
   DatePickerDayReadonlyStyled
 )`
-  color: blue;
+  color: ${calendarDateColor.saturday};
 `;
 
 export const DatePickerDayReadonlyHolidayStyled = styled(
   DatePickerDayReadonlyStyled
 )`
-  color: red;
+  color: ${calendarDateColor.sunday};
 `;
 
 export const DatePickerDaySelectedStyled = styled(DatePickerDayBaseStyled)`
@@ -149,13 +143,13 @@ export const DatePickerDayOutlinedSelectedReadonlyStyled = styled(
 export const DatePickerDayOutlinedSelectedReadonlySaturdayStyled = styled(
   DatePickerDayOutlinedSelectedReadonlyStyled
 )`
-  color: blue;
+  color: ${calendarDateColor.saturday};
 `;
 
 export const DatePickerDayOutlinedSelectedReadonlyHolidayStyled = styled(
   DatePickerDayOutlinedSelectedReadonlyStyled
 )`
-  color: red;
+  color: ${calendarDateColor.sunday};
 `;
 
 export const DatePickerDayOutside = styled(DatePickerDayBaseStyled)`

@@ -10,10 +10,10 @@ import {
   calendarCurrentPageReducer,
   generateCalendar,
   selectedDatesReducer,
-  ymd2day,
   ymdFromKey,
   ymdToKey,
 } from '../functions';
+import { ymd2day } from '../utils';
 
 type MultipleDatePickerState = DeepReadonly<{
   calendarCurrentPage: CalendarCurrentPageReducerState;

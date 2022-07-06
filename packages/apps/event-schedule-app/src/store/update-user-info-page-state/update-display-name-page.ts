@@ -7,13 +7,13 @@ import {
   updateDisplayNamePageStateReducer,
 } from '../../functions';
 import { emitAuthStateChange, fireAuthUser$ } from '../auth';
-import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
+import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-export namespace UpdateDisplayNamePage {
+export namespace UpdateDisplayNamePageStore {
   const [formState$, dispatch] = createReducer(
     updateDisplayNamePageStateReducer,
     updateDisplayNamePageInitialState
@@ -63,7 +63,7 @@ export namespace UpdateDisplayNamePage {
 
       dispatch({ type: 'done' });
 
-      UpdateUserInfoDialogState.closeDialog();
+      UpdateUserInfoDialogStore.closeDialog();
 
       showToast({
         toast,
@@ -77,7 +77,7 @@ export namespace UpdateDisplayNamePage {
 
     dispatch({ type: 'done' });
 
-    UpdateUserInfoDialogState.closeDialog();
+    UpdateUserInfoDialogStore.closeDialog();
 
     showToast({
       toast,
@@ -124,7 +124,7 @@ export namespace UpdateDisplayNamePage {
     mut_subscribedValues.fireAuthUser = v;
   });
 
-  UpdateUserInfoDialogState.openingDialog$
+  UpdateUserInfoDialogStore.openingDialog$
     .chain(withLatestFromI(fireAuthUser$))
     .subscribe(([openingDialog, user]) => {
       if (openingDialog === undefined) {

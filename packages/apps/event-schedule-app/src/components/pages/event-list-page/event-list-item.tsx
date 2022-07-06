@@ -3,12 +3,10 @@ import {
   errorFontColor,
   eventListItemTextColor,
   routes,
-} from '../../../constants';
-import {
-  eventIsAfterDeadline,
   ymd2str,
   ymdhm2strWithDay,
-} from '../../../functions';
+} from '../../../constants';
+import { eventIsAfterDeadline } from '../../../functions';
 import { router } from '../../../store';
 import { SectionTitle } from '../../atoms';
 import { ArchiveEventButton } from '../../organisms';

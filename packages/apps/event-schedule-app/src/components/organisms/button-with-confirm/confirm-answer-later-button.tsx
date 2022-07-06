@@ -1,4 +1,4 @@
-import { onSubmitEmptyAnswerClick } from '../../../store';
+import { AnswerPageStore } from '../../../store';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 const dc = dict.answerPage.answerLater;
@@ -31,7 +31,7 @@ export const AnswerLaterButtonWithConfirmation = memoNamed<Props>(
       dialogConfig={dialogConfig}
       disabled={disabled}
       loading={loading}
-      onConfirmClick={onSubmitEmptyAnswerClick}
+      onConfirmClick={AnswerPageStore.onSubmitEmptyAnswerClick}
     />
   )
 );

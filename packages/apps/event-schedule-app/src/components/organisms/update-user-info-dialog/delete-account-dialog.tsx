@@ -1,5 +1,8 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { DeleteAccountPage, UpdateUserInfoDialogState } from '../../../store';
+import {
+  DeleteAccountPageStore,
+  UpdateUserInfoDialogStore,
+} from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { LockButton } from '../../molecules';
@@ -20,7 +23,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-    } = useObservableValue(DeleteAccountPage.state$);
+    } = useObservableValue(DeleteAccountPageStore.state$);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -39,7 +42,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
                 intent={emailFormIntent}
                 type={'email'}
                 value={formState.email.inputValue}
-                onValueChange={DeleteAccountPage.inputEmailHandler}
+                onValueChange={DeleteAccountPageStore.inputEmailHandler}
               />
             </FormGroup>
             <FormGroup
@@ -56,17 +59,17 @@ export const DeleteAccountDialog = memoNamed<Props>(
                   <LockButton
                     disabled={formState.isWaitingResponse}
                     passwordIsOpen={passwordIsOpen}
-                    onLockClick={DeleteAccountPage.togglePasswordLock}
+                    onLockClick={DeleteAccountPageStore.togglePasswordLock}
                   />
                 }
                 type={passwordIsOpen ? 'text' : 'password'}
                 value={formState.password.inputValue}
-                onValueChange={DeleteAccountPage.inputPasswordHandler}
+                onValueChange={DeleteAccountPageStore.inputPasswordHandler}
               />
             </FormGroup>
           </Content>
         }
-        closeDialog={UpdateUserInfoDialogState.closeDialog}
+        closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={formState.isWaitingResponse}
         submitButton={
@@ -74,7 +77,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'danger'}
             loading={formState.isWaitingResponse}
-            onClick={DeleteAccountPage.enterClickHandler}
+            onClick={DeleteAccountPageStore.enterClickHandler}
           >
             {dc.button.deleteAccount}
           </Button>

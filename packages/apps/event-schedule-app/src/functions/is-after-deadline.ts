@@ -1,5 +1,5 @@
 import { compareYmdhm } from '@noshiro/event-schedule-app-shared';
-import { now } from './today';
+import { now } from '../utils';
 
 export const eventIsAfterDeadline = (
   eventSchedule: EventSchedule | undefined

@@ -1,26 +1,13 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { theNameIsAlreadyUsedFn } from '../../../functions';
 import { useFormError } from '../../../hooks';
-import {
-  answerBeingEditedList$,
-  hasUnanswered$,
-  iconHeader$,
-  onCancelEditingAnswer,
-  onCommentChange,
-  onDeleteAnswer,
-  onUserNameChange,
-  onWeightChange,
-  theNameIsAlreadyUsed$,
-  toggleProtectedSection,
-  toggleRequiredSection,
-  useFireAuthUser,
-} from '../../../store';
+import { AnswerPageStore, useFireAuthUser } from '../../../store';
 import { CustomIcon, Description } from '../../atoms';
 import {
   BpInput,
   BpTextArea,
   ButtonNowrapStyled,
-  HTMLTableBorderedStyled,
+  HTMLTableBorderedStyled2,
 } from '../../bp';
 import {
   AnswerIconFairPointInput,
@@ -49,6 +36,7 @@ type Props = Readonly<{
   submitButtonIsLoading: boolean;
   submitButtonIsDisabled: boolean;
   selectedAnswerUserName: UserName | undefined;
+  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
 export const AnswerBeingEdited = memoNamed<Props>(
@@ -61,6 +49,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
     submitButtonIsLoading,
     submitButtonIsDisabled,
     selectedAnswerUserName,
+    holidaysJpDefinition,
   }) => {
     const [showUserNameError, onUserNameChangeLocal, onUserNameBlur] =
       useFormError(
@@ -68,13 +57,17 @@ export const AnswerBeingEdited = memoNamed<Props>(
         (v) =>
           v === '' ||
           theNameIsAlreadyUsedFn(v, answers, selectedAnswerUserName),
-        onUserNameChange
+        AnswerPageStore.onUserNameChange
       );
 
-    const theNameIsAlreadyUsed = useObservableValue(theNameIsAlreadyUsed$);
-    const iconHeader = useObservableValue(iconHeader$);
-    const answerBeingEditedList = useObservableValue(answerBeingEditedList$);
-    const hasUnanswered = useObservableValue(hasUnanswered$);
+    const theNameIsAlreadyUsed = useObservableValue(
+      AnswerPageStore.theNameIsAlreadyUsed$
+    );
+    const iconHeader = useObservableValue(AnswerPageStore.iconHeader$);
+    const answerBeingEditedList = useObservableValue(
+      AnswerPageStore.answerBeingEditedList$
+    );
+    const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
 
     const user = useFireAuthUser();
 
@@ -160,6 +153,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
                         datetimeSpecification={
                           eventSchedule.datetimeSpecification
                         }
+                        holidaysJpDefinition={holidaysJpDefinition}
+                        tableMinimized={false}
                       />
                     </td>
                     <td>
@@ -237,7 +232,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
               fill={true}
               growVertically={true}
               value={answerBeingEdited.comment}
-              onValueChange={onCommentChange}
+              onValueChange={AnswerPageStore.onCommentChange}
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
@@ -248,14 +243,14 @@ export const AnswerBeingEdited = memoNamed<Props>(
             hideContentIfToggleIsFalse={false}
             title={dc.required.title}
             toggleState={answerBeingEdited.isRequiredParticipants}
-            onToggle={toggleRequiredSection}
+            onToggle={AnswerPageStore.toggleRequiredSection}
           />
         </Paragraph>
         <Paragraph>
           <WeightSettingWrapper>
             <WeightSetting
               weight={answerBeingEdited.weight}
-              onWeightChange={onWeightChange}
+              onWeightChange={AnswerPageStore.onWeightChange}
             />
           </WeightSettingWrapper>
           {IList.map(dc.weight.description, (d, i) => (
@@ -274,7 +269,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
               hideContentIfToggleIsFalse={false}
               title={dc.protected.title}
               toggleState={answerBeingEdited.user.id !== null}
-              onToggle={toggleProtectedSection}
+              onToggle={AnswerPageStore.toggleProtectedSection}
             />
           </Paragraph>
         )}
@@ -284,12 +279,12 @@ export const AnswerBeingEdited = memoNamed<Props>(
             disabled={submitButtonIsLoading}
             intent='none'
             text={dict.common.buttonText.cancel}
-            onClick={onCancelEditingAnswer}
+            onClick={AnswerPageStore.onCancelEditingAnswer}
           />
           {answerBeingEditedSectionState === 'editing' ? (
             <DeleteAnswerButton
               loading={submitButtonIsLoading}
-              onConfirmDeleteAnswer={onDeleteAnswer}
+              onConfirmDeleteAnswer={AnswerPageStore.onDeleteAnswerClick}
             />
           ) : undefined}
           <SubmitAnswerButtonWithConfirmation
@@ -309,7 +304,7 @@ const TableWrapper = styled.div`
   margin-bottom: 15px;
 `;
 
-const Table = styled(HTMLTableBorderedStyled)`
+const Table = styled(HTMLTableBorderedStyled2)`
   th,
   td {
     padding: 6px;

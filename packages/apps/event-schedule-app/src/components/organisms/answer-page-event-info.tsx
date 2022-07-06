@@ -1,4 +1,5 @@
-import { eventIsAfterDeadline, ymdhm2strWithDay } from '../../functions';
+import { ymdhm2strWithDay } from '../../constants';
+import { eventIsAfterDeadline } from '../../functions';
 import { Description } from '../atoms';
 import { AnswerPageNotes } from './answer-page-notes';
 

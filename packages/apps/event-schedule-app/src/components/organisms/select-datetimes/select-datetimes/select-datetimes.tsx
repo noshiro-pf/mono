@@ -1,7 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import { selectorOptions } from '../../../../functions';
 import { useSelectDatetimesHooks } from '../../../../hooks';
-import { holidaysJpDefinition$, setYearMonth$ } from '../../../../store';
+import { AnswerPageStore, holidaysJpDefinition$ } from '../../../../store';
 import { BpSelect } from '../../../bp';
 import { AddElementButton } from '../../../molecules';
 import { MultipleDatePicker } from '../../../multiple-date-picker';
@@ -96,7 +96,7 @@ export const SelectDatetimes = memoNamed<Props>(
         <MultipleDatePicker
           holidaysJpDefinition={holidaysJpDefinition}
           selectedDates={selectedDates}
-          setYearMonth$={setYearMonth$}
+          setYearMonth$={AnswerPageStore.setYearMonth$}
           onSelectedDatesChange={onSelectedDatesChange}
         />
       </Root>

@@ -1,6 +1,6 @@
 import { deepEqual } from '@noshiro/fast-deep-equal';
+import { hm2str, ymd2str, ymdhm2str } from '../constants';
 import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from './map-key';
-import { hm2str, ymd2str, ymdhm2str } from './ymdhm2str';
 
 export type EventSettingsPageDiffResult = DeepReadonly<{
   title: string | undefined;

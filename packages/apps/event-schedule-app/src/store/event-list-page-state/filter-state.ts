@@ -1,4 +1,4 @@
-export namespace EventListPageFilteringState {
+export namespace EventListPageFilterStore {
   export const { state$: filterOptionState$, setState: setFilterOptionState } =
     createState<'archive' | 'inProgress'>('inProgress');
 

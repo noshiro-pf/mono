@@ -1,7 +1,7 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import {
-  DeleteAccountCreatedWithGoogle,
-  UpdateUserInfoDialogState,
+  DeleteAccountCreatedWithGoogleStore,
+  UpdateUserInfoDialogStore,
 } from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
@@ -21,7 +21,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
       enterButtonDisabled,
       isWaitingResponse,
       emailFormIntent,
-    } = useObservableValue(DeleteAccountCreatedWithGoogle.state$);
+    } = useObservableValue(DeleteAccountCreatedWithGoogleStore.state$);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -40,12 +40,14 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
                 intent={emailFormIntent}
                 type={'email'}
                 value={formState.inputValue}
-                onValueChange={DeleteAccountCreatedWithGoogle.inputEmailHandler}
+                onValueChange={
+                  DeleteAccountCreatedWithGoogleStore.inputEmailHandler
+                }
               />
             </FormGroup>
           </Content>
         }
-        closeDialog={UpdateUserInfoDialogState.closeDialog}
+        closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={isWaitingResponse}
         submitButton={
@@ -53,7 +55,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'danger'}
             loading={isWaitingResponse}
-            onClick={DeleteAccountCreatedWithGoogle.enterClickHandler}
+            onClick={DeleteAccountCreatedWithGoogleStore.enterClickHandler}
           >
             {dc.button.deleteAccount}
           </Button>

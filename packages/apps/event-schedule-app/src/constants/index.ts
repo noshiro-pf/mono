@@ -1,6 +1,5 @@
 export * from './about-this-app-url';
 export * from './answer-deadline-shortcuts';
-export * from './answer-icon-point';
 export * from './answer-table-color';
 export * from './color';
 export * from './default-icon-point';
@@ -8,4 +7,5 @@ export * from './dictionary';
 export * from './fetch-throttle-time';
 export * from './initial-values';
 export * from './notification-settings-with-email';
+export * from './numeric-input-configs';
 export * from './routes';

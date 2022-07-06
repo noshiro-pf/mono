@@ -7,13 +7,13 @@ import {
   showToast,
 } from '../../functions';
 import { fireAuthUser$ } from '../auth';
-import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
+import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-export namespace DeleteAccountCreatedWithGoogle {
+export namespace DeleteAccountCreatedWithGoogleStore {
   const [formState$, dispatch] = createReducer(
     emailInputStateReducer,
     emailInputInitialState
@@ -87,7 +87,7 @@ export namespace DeleteAccountCreatedWithGoogle {
       );
 
       setFalseIsWaitingResponse();
-      UpdateUserInfoDialogState.closeDialog();
+      UpdateUserInfoDialogStore.closeDialog();
 
       showToast({
         toast,
@@ -107,7 +107,7 @@ export namespace DeleteAccountCreatedWithGoogle {
       );
 
       setFalseIsWaitingResponse();
-      UpdateUserInfoDialogState.closeDialog();
+      UpdateUserInfoDialogStore.closeDialog();
 
       showToast({
         toast,
@@ -118,7 +118,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     }
 
     setFalseIsWaitingResponse();
-    UpdateUserInfoDialogState.closeDialog();
+    UpdateUserInfoDialogStore.closeDialog();
 
     showToast({
       toast,
@@ -166,7 +166,7 @@ export namespace DeleteAccountCreatedWithGoogle {
     mut_subscribedValues.fireAuthUser = v;
   });
 
-  UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
+  UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {
       resetAllDialogState();
     }

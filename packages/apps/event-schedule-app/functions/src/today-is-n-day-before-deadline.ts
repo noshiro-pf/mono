@@ -1,5 +1,6 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { IDate } from '@noshiro/ts-utils';
+import { today } from './utils';
 
 const ymd2Date = (ymd: YearMonthDate): IDate =>
   IDate.create(ymd.year, ymd.month, ymd.date);
@@ -11,7 +12,8 @@ export const todayIsNDaysBeforeDeadline = (
   answerDeadlineYmd: YearMonthDate
 ): boolean => {
   const answerDeadlineDate = ymd2Date(answerDeadlineYmd);
+  const todayDate = ymd2Date(today());
   const daysDiff: number =
-    (answerDeadlineDate.getTime() - IDate.today().getTime()) / millisecOfADay;
+    (answerDeadlineDate.getTime() - todayDate.getTime()) / millisecOfADay;
   return daysDiff === n;
 };

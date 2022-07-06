@@ -1,5 +1,6 @@
 import type {
   AnswerIconIdWithNone,
+  AnswerIconPoint,
   DatetimeRange,
   DatetimeSpecificationEnumType,
   HoursMinutes,
@@ -36,14 +37,17 @@ export const datetimeRange2str = (
   }
 };
 
-export const iconId2str = (iconId: AnswerIconIdWithNone): string => {
+export const iconId2str = (
+  iconId: AnswerIconIdWithNone,
+  point: AnswerIconPoint
+): string => {
   switch (iconId) {
     case 'none':
       return 'ー';
     case 'good':
       return '〇';
     case 'fair':
-      return '△';
+      return `△(${point})`;
     case 'poor':
       return '✕';
   }

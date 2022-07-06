@@ -1,5 +1,6 @@
 export * from './bp-checkbox';
 export * from './bp-date-picker';
+export * from './bp-date-range-input';
 export * from './bp-datetime-picker';
 export * from './bp-input';
 export * from './bp-password-input';
@@ -7,5 +8,6 @@ export * from './bp-select';
 export * from './bp-switch';
 export * from './bp-textarea';
 export * from './bp-time-picker';
+export * from './slider';
 export * from './styled';
 export * from './view';

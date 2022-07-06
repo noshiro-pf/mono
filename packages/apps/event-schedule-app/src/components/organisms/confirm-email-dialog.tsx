@@ -1,6 +1,6 @@
 import { Button, Classes, FormGroup } from '@blueprintjs/core';
 import { useKeyEventListener } from '@noshiro/react-utils';
-import { ConfirmEmailDialogStore } from '../../store';
+import { ConfirmEmailDialogStore, useFireAuthUser } from '../../store';
 import { BpInput, DialogWithMaxWidth } from '../bp';
 import { ButtonsWrapperAlignEnd } from '../styled';
 
@@ -33,6 +33,19 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
     );
 
     useKeyEventListener(onKeyDown, noop);
+
+    const fireAuthUser = useFireAuthUser();
+
+    /**
+     * ログイン済みならemailを自動入力してsubmit
+     */
+    useEffect(() => {
+      const email = fireAuthUser?.email;
+      if (isString(email)) {
+        ConfirmEmailDialogStore.inputEmailHandler(email);
+        ConfirmEmailDialogStore.enterClickHandler();
+      }
+    }, [fireAuthUser?.email]);
 
     return (
       <DialogWithMaxWidth

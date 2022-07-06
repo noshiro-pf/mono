@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^4.1.2",
-    "@blueprintjs/datetime": "^4.1.2",
+    "@blueprintjs/datetime": "^4.3.3",
     "@blueprintjs/icons": "^4.2.3",
     "@noshiro/react-utils": "*",
     "@noshiro/react-utils-styled": "*",

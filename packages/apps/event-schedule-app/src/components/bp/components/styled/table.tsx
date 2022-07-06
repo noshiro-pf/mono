@@ -11,7 +11,7 @@ const tableRowHeightPx = ptGridSizePx * 4;
 const tableBorderWidthPx = 1;
 const tableBorderColor = ptDividerBlack;
 
-export const HTMLTableStyled = styled.table`
+const HTMLTableStyledBase = styled.table`
   border-spacing: 0;
   font-size: ${ptFontSizePx}px;
 
@@ -33,7 +33,9 @@ export const HTMLTableStyled = styled.table`
   td {
     color: ${ptTextColor};
   }
+`;
 
+export const HTMLTableStyled = styled(HTMLTableStyledBase)`
   tbody tr:first-child,
   tfoot tr:first-child {
     th,
@@ -56,6 +58,34 @@ export const HTMLTableBorderedStyled = styled(HTMLTableStyled)`
     &:not(:first-child) {
       box-shadow: inset ${tableBorderWidthPx}px ${tableBorderWidthPx}px 0 0
         ${tableBorderColor};
+    }
+  }
+`;
+
+export const HTMLTableBorderedStyled2 = styled(HTMLTableStyledBase)`
+  thead tr:first-child {
+    th,
+    td {
+      border-bottom: ${tableBorderWidthPx}px solid ${tableBorderColor};
+    }
+  }
+  thead tr:not(:last-child),
+  tbody tr:not(:last-child),
+  tfoot tr:not(:last-child) {
+    th,
+    td {
+      border-bottom: ${tableBorderWidthPx}px solid ${tableBorderColor};
+    }
+  }
+
+  thead tr,
+  tbody tr,
+  tfoot tr {
+    th,
+    td {
+      &:not(:last-child) {
+        border-right: ${tableBorderWidthPx}px solid ${tableBorderColor};
+      }
     }
   }
 `;

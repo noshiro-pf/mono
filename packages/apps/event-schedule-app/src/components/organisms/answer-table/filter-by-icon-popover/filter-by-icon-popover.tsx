@@ -1,6 +1,6 @@
 import { Button } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
-import { AnswerTableFilteringAndSortingManager } from '../../../../store';
+import { AnswerFilterAndSortStore } from '../../../../store';
 import { CustomIcon } from '../../../atoms';
 import { FilterByIconPopoverContent } from './filter-by-icon-popover-content';
 
@@ -20,43 +20,31 @@ export const FilterByIconPopover = memoNamed<Props>(
     } = useBoolState(false);
 
     const turnOnFilteringEnabled = useCallback(() => {
-      AnswerTableFilteringAndSortingManager.enableFilteringAnswerTableOfIcon(
-        answerIconId
-      );
+      AnswerFilterAndSortStore.enableFilteringByIcon(answerIconId);
     }, [answerIconId]);
 
     const turnOffFilteringEnabled = useCallback(() => {
-      AnswerTableFilteringAndSortingManager.disableFilteringAnswerTableOfIcon(
-        answerIconId
-      );
-      AnswerTableFilteringAndSortingManager.disableFilteringAnswerTableOfIcon(
-        answerIconId
-      );
+      AnswerFilterAndSortStore.disableFilteringByIcon(answerIconId);
+      AnswerFilterAndSortStore.disableFilteringByIcon(answerIconId);
     }, [answerIconId]);
 
-    const answerTableFilteringState = useObservableValue(
-      AnswerTableFilteringAndSortingManager.answerTableFilteringState$
+    const filterState = useObservableValue(
+      AnswerFilterAndSortStore.filterState$
     );
 
-    const state = answerTableFilteringState[answerIconId];
-    const upperLimit = answerTableFilteringState.upperLimit;
+    const state = filterState.iconState[answerIconId];
+    const upperLimit = filterState.iconState.upperLimit;
 
     const onMinChange = useCallback(
       (value: number) => {
-        AnswerTableFilteringAndSortingManager.setMinCountOfIconAnswerTable(
-          answerIconId,
-          value
-        );
+        AnswerFilterAndSortStore.setMinCountOfIcon(answerIconId, value);
       },
       [answerIconId]
     );
 
     const onMaxChange = useCallback(
       (value: number) => {
-        AnswerTableFilteringAndSortingManager.setStateAnswerTableFilteringIconMax(
-          answerIconId,
-          value
-        );
+        AnswerFilterAndSortStore.setMaxCountOfIcon(answerIconId, value);
       },
       [answerIconId]
     );
@@ -81,7 +69,7 @@ export const FilterByIconPopover = memoNamed<Props>(
         onClose={handleClose}
       >
         <Button
-          active={state.filteringEnabled}
+          active={state.enabled}
           icon={<CustomIcon iconName={answerIconId} />}
           minimal={true}
           outlined={true}

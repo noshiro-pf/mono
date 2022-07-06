@@ -1,19 +1,28 @@
-import { weightNumericInputConfig } from '../../constants';
-import { clampAndRoundAnswerWeight } from '../../functions';
+import {
+  clampAndRoundAnswerWeight,
+  weightNumericInputConfig,
+} from '../../constants';
 import { NumericInputView } from '../bp';
 
 type Props = Readonly<{
   weight: Weight;
   onWeightChange: (value: Weight) => void;
+  disabled?: boolean;
 }>;
 
-const { step, defaultValue } = weightNumericInputConfig;
+const { step, defaultValue, min, max } = weightNumericInputConfig;
+
+const inputProps = { min, max, step };
 
 const sanitizeValue = clampAndRoundAnswerWeight;
 
 export const WeightNumericInput = memoNamed<Props>(
   'WeightNumericInput',
-  ({ weight: valueFromProps, onWeightChange: onValueChange }) => {
+  ({
+    weight: valueFromProps,
+    disabled = false,
+    onWeightChange: onValueChange,
+  }) => {
     const { state: valueStr, setState: setValueStr } = useState<string>('');
 
     const valueParsed = useMemo<number | undefined>(() => {
@@ -27,41 +36,39 @@ export const WeightNumericInput = memoNamed<Props>(
     }, [valueFromProps, setValueStr]);
 
     const valueChangeHandler = useCallback(
-      (nextValue: Weight) => {
-        setValueStr(nextValue.toString());
-        onValueChange(nextValue);
+      (nextValue: number | undefined) => {
+        if (disabled) return;
+
+        const valueSanitized =
+          nextValue === undefined ? defaultValue : sanitizeValue(nextValue);
+
+        setValueStr(valueSanitized.toString());
+        onValueChange(valueSanitized);
       },
-      [setValueStr, onValueChange]
+      [disabled, setValueStr, onValueChange]
     );
 
     const onInputBlur = useCallback(() => {
-      const nextValue =
-        valueParsed === undefined ? defaultValue : sanitizeValue(valueParsed);
-
-      valueChangeHandler(nextValue);
+      valueChangeHandler(valueParsed);
     }, [valueParsed, valueChangeHandler]);
 
     const onIncrementClick = useCallback(() => {
-      const nextValue =
-        valueParsed === undefined
-          ? defaultValue
-          : sanitizeValue(valueParsed + step);
-
-      valueChangeHandler(nextValue);
+      valueChangeHandler(
+        pipe(valueParsed).chainNullable((x) => x + step).value
+      );
     }, [valueParsed, valueChangeHandler]);
 
     const onDecrementClick = useCallback(() => {
-      const nextValue =
-        valueParsed === undefined
-          ? defaultValue
-          : sanitizeValue(valueParsed - step);
-
-      valueChangeHandler(nextValue);
+      valueChangeHandler(
+        pipe(valueParsed).chainNullable((x) => x - step).value
+      );
     }, [valueParsed, valueChangeHandler]);
 
     return (
       <NumericInputView
+        disabled={disabled}
         fillSpace={true}
+        inputProps={inputProps}
         selectOnFocus={true}
         valueAsStr={valueStr}
         onDecrementClick={onDecrementClick}

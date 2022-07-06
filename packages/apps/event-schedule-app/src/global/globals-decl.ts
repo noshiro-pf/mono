@@ -11,7 +11,7 @@ import type {
   OptionProps as _OptionProps,
   PopperModifiers as _PopperModifiers,
 } from '@blueprintjs/core';
-import type { DatePickerShortcut as _DatePickerShortcut } from '@blueprintjs/datetime';
+import type { DateInput2Props } from '@blueprintjs/datetime2';
 import type {
   Answer as _Answer,
   AnswerIconId as _AnswerIconId,
@@ -61,7 +61,11 @@ declare global {
   type PopperModifiers = _PopperModifiers;
 
   /* @blueprintjs/datetime */
-  type DatePickerShortcut = _DatePickerShortcut;
+  type DatePickerShortcut = Readonly<
+    ArrayElement<
+      StrictExclude<DateInput2Props['shortcuts'], boolean | undefined>
+    >
+  >;
 
   /* @noshiro/event-schedule-app-shared */
   type Answer = _Answer;
