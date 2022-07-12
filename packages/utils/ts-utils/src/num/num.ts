@@ -121,7 +121,7 @@ export namespace Num {
    */
   // eslint-disable-next-line @typescript-eslint/no-shadow
   export const toString =
-    (radix?: StrictExclude<Seq<36>, 0 | 1>) =>
+    (radix?: UintRange<2, 36>) =>
     (n: number): string =>
       n.toString(radix);
 
@@ -130,7 +130,7 @@ export namespace Num {
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
   export const toFixed =
-    (fractionDigits?: Seq<20>) =>
+    (fractionDigits?: UintRange<0, 20>) =>
     (n: number): string =>
       n.toFixed(fractionDigits);
 
@@ -148,9 +148,9 @@ export namespace Num {
    * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
    */
   export const toPrecision =
-    (precision?: StrictExclude<Seq<21>, 0>) =>
+    (precision?: UintRange<1, 21>) =>
     (n: number): string =>
-      n.toExponential(precision);
+      n.toPrecision(precision);
 
   /**
    * Converts a number to a string by using the current or specified locale.
@@ -215,4 +215,7 @@ export namespace Num {
 
   export const sign = (value: number): -1 | 0 | 1 =>
     value === 0 ? 0 : value < 0 ? -1 : 1;
+
+  export const mapNaN2Undefined = (value: number): number | undefined =>
+    isNaN(value) ? undefined : value;
 }
