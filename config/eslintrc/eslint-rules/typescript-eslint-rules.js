@@ -218,7 +218,7 @@ const typescriptEslintRules = {
   '@typescript-eslint/prefer-optional-chain': 'error',
   '@typescript-eslint/prefer-readonly': 'error',
   '@typescript-eslint/prefer-readonly-parameter-types': [
-    'error',
+    'warn',
     {
       checkParameterProperties: true,
       ignoreInferredTypes: true,
