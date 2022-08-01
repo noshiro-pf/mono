@@ -1,6 +1,6 @@
 {
   "name": "@noshiro/syncflow",
-  "version": "1.0.11",
+  "version": "1.1.1",
   "private": false,
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "license": "MIT",
@@ -30,6 +30,7 @@
     "start": "node cjs/test/preview-main.js",
     "test": "wireit",
     "test:detectOpenHandles": "yarn test --detectOpenHandles",
+    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
