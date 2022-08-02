@@ -36,10 +36,11 @@ class PairwiseObservableClass<A>
     if (Maybe.isNone(par.currentValue)) return; // skip update
 
     const prev = this.#previousValue;
+
+    if (!Maybe.isNone(prev)) {
+      this.setNext([prev.value, par.currentValue.value], token);
+    }
+
     this.#previousValue = par.currentValue;
-
-    if (Maybe.isNone(prev)) return; // skip update
-
-    this.setNext([prev.value, par.currentValue.value], token);
   }
 }
