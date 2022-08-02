@@ -1,31 +1,22 @@
 import type { TagProps } from '@blueprintjs/core';
-import { Button, Spinner, TagInput } from '@blueprintjs/core';
+import { Button, Icon, Spinner, TagInput } from '@blueprintjs/core';
+import html2canvas from 'html2canvas';
 import { useRef } from 'react';
 import { eventIsAfterDeadline } from '../../../functions';
 import {
-  alertOnAnswerClickIsOpen$,
-  answerBeingEdited$,
-  answerBeingEditedSectionState$,
+  AnswerFilterAndSortStore,
+  AnswerPageStore,
   answers$,
-  AnswersFetchState,
-  AnswerTableFilteringAndSortingManager,
-  closeAlertOnAnswerClick,
+  AnswersStore,
+  AnswerTableStore,
   errorType$,
   eventSchedule$,
-  EventScheduleFetchState,
+  EventScheduleStore,
   holidaysJpDefinition$,
-  onAddAnswerButtonClick,
-  onCancelEditingAnswer,
-  onEditButtonClick,
-  requiredParticipantsExist$,
   router,
-  selectedAnswerUserName$,
-  selectedDates$,
-  setYearMonth$,
-  submitButtonIsDisabled$,
-  submitButtonIsLoading$,
   useFireAuthUser,
 } from '../../../store';
+import { toClassName } from '../../../utils';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
 import { AlertWithMaxWidth } from '../../bp';
 import { Section } from '../../molecules';
@@ -35,41 +26,77 @@ import {
   AnswerLaterButtonWithConfirmation,
   AnswerPageEventInfo,
   AnswerTable,
+  DetailedFilterCollapse,
   Header,
 } from '../../organisms';
-import { ButtonsWrapperAlignEnd, SingleButtonWrapper } from '../../styled';
+import { ButtonsWrapperAlignEnd, ButtonsWrapperNowrap } from '../../styled';
 import { NotFoundPage } from '../not-found-page';
 import { AnswerPageError } from './error';
 
 const dc = dict.answerPage;
 
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const saveAsImage = (canvas: HTMLCanvasElement): void => {
+  const targetImgUri: string = canvas.toDataURL('img/png');
+
+  const downloadLink = document.createElement('a');
+
+  if (typeof downloadLink.download === 'string') {
+    const mut_downloadLink = castWritable(downloadLink);
+
+    mut_downloadLink.href = targetImgUri;
+
+    mut_downloadLink.download = 'answers.png';
+
+    document.body.append(downloadLink);
+
+    downloadLink.click();
+  } else {
+    window.open(targetImgUri);
+  }
+
+  downloadLink.remove();
+};
+
 export const AnswerPage = memoNamed('AnswerPage', () => {
   /* values */
 
   const alertOnAnswerClickIsOpen = useObservableValue(
-    alertOnAnswerClickIsOpen$
+    AnswerPageStore.alertOnAnswerClickIsOpen$
   );
-  const answerBeingEdited = useObservableValue(answerBeingEdited$);
+  const answerBeingEdited = useObservableValue(
+    AnswerPageStore.answerBeingEdited$
+  );
   const answerBeingEditedSectionState = useObservableValue(
-    answerBeingEditedSectionState$
+    AnswerPageStore.answerBeingEditedSectionState$
   );
   const answers = useObservableValue(answers$);
   const errorType = useObservableValue(errorType$);
   const eventId = useObservableValue(router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);
   const refreshButtonIsDisabled = useObservableValue(
-    AnswersFetchState.refreshButtonIsDisabled$
+    AnswersStore.refreshButtonIsDisabled$
   );
   const refreshButtonIsLoading = useObservableValue(
-    AnswersFetchState.refreshButtonIsLoading$
+    AnswersStore.refreshButtonIsLoading$
   );
   const requiredParticipantsExist = useObservableValue(
-    requiredParticipantsExist$
+    AnswerPageStore.requiredParticipantsExist$
   );
-  const selectedAnswerUserName = useObservableValue(selectedAnswerUserName$);
-  const selectedDates = useObservableValue(selectedDates$);
-  const submitButtonIsDisabled = useObservableValue(submitButtonIsDisabled$);
-  const submitButtonIsLoading = useObservableValue(submitButtonIsLoading$);
+  const selectedAnswerUserName = useObservableValue(
+    AnswerPageStore.selectedAnswerUserName$
+  );
+  const selectedDates = useObservableValue(AnswerPageStore.selectedDates$);
+  const submitButtonIsDisabled = useObservableValue(
+    AnswerPageStore.submitButtonIsDisabled$
+  );
+  const submitButtonIsLoading = useObservableValue(
+    AnswerPageStore.submitButtonIsLoading$
+  );
+
+  const detailedFilterDialogIsDisplayed = useObservableValue(
+    AnswerTableStore.detailedFilterIsOpen$
+  );
 
   const afterDeadline = useMemo(
     () => eventIsAfterDeadline(eventSchedule),
@@ -80,10 +107,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
   // fetch once on the first load
   useEffect(() => {
-    EventScheduleFetchState.fetchEventSchedule();
-    AnswersFetchState.fetchAnswers();
-    AnswerTableFilteringAndSortingManager.restoreAnswerTableFilteringStateFromQueryParams();
-    AnswerTableFilteringAndSortingManager.initializeAnswerTableFilteringStateUpperLimit();
+    EventScheduleStore.fetchEventSchedule();
+    AnswersStore.fetchAnswers();
+    AnswerFilterAndSortStore.restoreFromQueryParams();
   }, []);
 
   const answerSectionRef = useRef<HTMLDivElement>(null);
@@ -101,13 +127,9 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
   const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
 
-  const tagValues = useObservableValue(
-    AnswerTableFilteringAndSortingManager.tagValues$
-  );
+  const tagValues = useObservableValue(AnswerFilterAndSortStore.tagValues$);
 
-  const tagProps = useObservableValue(
-    AnswerTableFilteringAndSortingManager.tagProps$
-  );
+  const tagProps = useObservableValue(AnswerFilterAndSortStore.tagProps$);
 
   const fireAuthUser = useFireAuthUser();
 
@@ -118,6 +140,28 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
       false,
     [fireAuthUser, answers]
   );
+
+  const screenShotAreaRef = useRef<HTMLDivElement>(null);
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
+
+  const saveScreenShot = useCallback(() => {
+    const el = screenShotAreaRef.current;
+
+    if (el !== null) {
+      html2canvas(el, {
+        width: Math.max(
+          el.scrollWidth,
+          tableWrapperRef.current?.scrollWidth ?? 0
+        ),
+        height: Math.max(
+          el.scrollHeight,
+          tableWrapperRef.current?.scrollHeight ?? 0
+        ),
+      })
+        .then(saveAsImage)
+        .catch(console.error);
+    }
+  }, []);
 
   return errorType !== undefined && errorType.type.type === 'not-found' ? (
     <NotFoundPage />
@@ -148,7 +192,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 data-cy={'edit-event-settings'}
                 icon={'cog'}
                 intent={'none'}
-                onClick={onEditButtonClick}
+                onClick={AnswerPageStore.onEditButtonClick}
               >
                 {dc.eventInfo.editButton}
               </Button>
@@ -159,70 +203,97 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
               <MultipleDatePicker
                 holidaysJpDefinition={holidaysJpDefinition}
                 selectedDates={selectedDates}
-                setYearMonth$={setYearMonth$}
+                setYearMonth$={AnswerPageStore.setYearMonth$}
                 useOutlinedSelectedStyle={true}
               />
             </CalendarWrapper>
 
-            {afterDeadline ? undefined : (
-              <SingleButtonWrapper>
+            <ButtonsWrapperNowrapPadChanged>
+              {afterDeadline ? undefined : (
                 <Button
                   disabled={refreshButtonIsDisabled}
                   icon={'refresh'}
                   intent={'none'}
                   loading={refreshButtonIsLoading}
-                  onClick={AnswersFetchState.refreshAnswers}
+                  onClick={AnswersStore.refreshAnswers}
                 >
                   {dc.answers.refresh}
                 </Button>
-              </SingleButtonWrapper>
-            )}
+              )}
+              <Button icon={'camera'} intent={'none'} onClick={saveScreenShot}>
+                {dc.answers.saveScreenShot}
+              </Button>
+            </ButtonsWrapperNowrapPadChanged>
 
-            {IList.isEmpty(tagValues) ? undefined : (
-              <TableTopWrapper>
-                <TagInput
-                  addOnBlur={false}
-                  addOnPaste={false}
-                  leftIcon={'filter-list'}
-                  rightElement={
-                    <Button
-                      icon={'cross'}
-                      minimal={true}
-                      onClick={AnswerTableFilteringAndSortingManager.clearTags}
+            <ScreenShotAreaWrapper>
+              <ScreenShotArea ref={screenShotAreaRef}>
+                <TableTopWrapper>
+                  <TagInputWrapper>
+                    <TagInput
+                      addOnBlur={false}
+                      addOnPaste={false}
+                      leftIcon={'filter-list'}
+                      rightElement={
+                        <Button
+                          icon={'cross'}
+                          minimal={true}
+                          onClick={AnswerFilterAndSortStore.clearTags}
+                        />
+                      }
+                      tagProps={
+                        tagProps as (
+                          value: DeepReadonly<ReactNode>,
+                          index: number
+                        ) => TagProps
+                      }
+                      values={tagValues}
                     />
-                  }
-                  tagProps={
-                    tagProps as (
-                      value: DeepReadonly<ReactNode>,
-                      index: number
-                    ) => TagProps
-                  }
-                  values={tagValues}
-                />
-              </TableTopWrapper>
-            )}
+                  </TagInputWrapper>
 
-            <TableWrapper>
-              <AnswerTable
-                answers={answers}
-                datetimeSpecification={eventSchedule.datetimeSpecification}
-                editAnswerButtonIsDisabled={
-                  answerBeingEditedSectionState !== 'hidden' || afterDeadline
-                }
-              />
+                  <ToggleDetailedFilterSettingsLabel
+                    onClick={AnswerTableStore.toggleDetailedFilter}
+                  >
+                    <ToggleDetailedFilterSettingsButton>
+                      <ToggleDetailedFilterSettingsIcon
+                        // eslint-disable-next-line react/forbid-component-props
+                        className={toClassName({
+                          open: detailedFilterDialogIsDisplayed,
+                        })}
+                        icon={'plus'}
+                      />
+                    </ToggleDetailedFilterSettingsButton>
+                    <span>{dc.answers.detailedFilterSettingsButton}</span>
+                  </ToggleDetailedFilterSettingsLabel>
+                  <DetailedFilterCollapse
+                    isOpen={detailedFilterDialogIsDisplayed}
+                  />
+                </TableTopWrapper>
 
-              <AlertWithMaxWidth
-                canEscapeKeyCancel={true}
-                canOutsideClickCancel={true}
-                icon={'disable'}
-                intent={'danger'}
-                isOpen={alertOnAnswerClickIsOpen}
-                onClose={closeAlertOnAnswerClick}
-                onConfirm={closeAlertOnAnswerClick}
-              >
-                <p>{dc.protectedAnswerIsNotEditable}</p>
-              </AlertWithMaxWidth>
-            </TableWrapper>
+                <TableWrapper ref={tableWrapperRef}>
+                  <AnswerTable
+                    answers={answers}
+                    datetimeSpecification={eventSchedule.datetimeSpecification}
+                    editAnswerButtonIsDisabled={
+                      answerBeingEditedSectionState !== 'hidden' ||
+                      afterDeadline
+                    }
+                    holidaysJpDefinition={holidaysJpDefinition}
+                  />
+
+                  <AlertWithMaxWidth
+                    canEscapeKeyCancel={true}
+                    canOutsideClickCancel={true}
+                    icon={'disable'}
+                    intent={'danger'}
+                    isOpen={alertOnAnswerClickIsOpen}
+                    onClose={AnswerPageStore.closeAlertOnAnswerClick}
+                    onConfirm={AnswerPageStore.closeAlertOnAnswerClick}
+                  >
+                    <p>{dc.protectedAnswerIsNotEditable}</p>
+                  </AlertWithMaxWidth>
+                </TableWrapper>
+              </ScreenShotArea>
+            </ScreenShotAreaWrapper>
 
             <IconDescriptionWrapper>
               {requiredParticipantsExist ? (
@@ -278,7 +349,6 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 )}
               </NoteForPointOfFair>
             </IconDescriptionWrapper>
-
             {answerBeingEditedSectionState === 'hidden' && !afterDeadline ? (
               <ButtonsWrapperAlignEnd>
                 <Button
@@ -286,7 +356,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   icon='add'
                   intent='primary'
                   text={dc.answers.addAnswer}
-                  onClick={onAddAnswerButtonClick}
+                  onClick={AnswerPageStore.onAddAnswerButtonClick}
                 />
               </ButtonsWrapperAlignEnd>
             ) : undefined}
@@ -300,13 +370,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                   creating: dc.answerBeingEdited.title.create,
                   editing: dc.answerBeingEdited.title.update,
                 })}
-                onCloseClick={onCancelEditingAnswer}
+                onCloseClick={AnswerPageStore.onCancelEditingAnswer}
               >
                 <AnswerBeingEdited
                   answerBeingEdited={answerBeingEdited}
                   answerBeingEditedSectionState={answerBeingEditedSectionState}
                   answers={answers}
                   eventSchedule={eventSchedule}
+                  holidaysJpDefinition={holidaysJpDefinition}
                   selectedAnswerUserName={selectedAnswerUserName}
                   submitButtonIsDisabled={submitButtonIsDisabled}
                   submitButtonIsLoading={submitButtonIsLoading}
@@ -325,14 +396,53 @@ const CalendarWrapper = styled.div`
   display: flex;
 `;
 
+const ButtonsWrapperNowrapPadChanged = styled(ButtonsWrapperNowrap)`
+  margin-left: 10px;
+`;
+
 const TableTopWrapper = styled.div`
   margin: 5px;
+`;
+
+const TagInputWrapper = styled.div`
+  margin-bottom: 5px;
   display: flex;
   align-items: center;
 `;
 
+// const DetailedFilterSettingsSwitchWrapper = styled.div`
+//   display: flex;
+// `;
+
+// const DetailedFilterSettingsButton = styled.span`
+//   cursor: pointer;
+//   text-decoration: underline;
+//   font-size: smaller;
+//   color: ${descriptionFontColor.normal};
+//   &:hover {
+//     color: black;
+//   }
+// `;
+
 const TableWrapper = styled.div`
-  overflow-x: auto;
+  margin: 5px;
+  overflow-x: scroll;
+
+  &::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgb(165, 165, 165);
+    border-radius: 7px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: rgb(220, 220, 220);
+    border-radius: 7px;
+  }
+  &::-webkit-scrollbar-corner {
+    display: none;
+  }
 `;
 
 const IconDescriptionWrapper = styled.div`
@@ -354,4 +464,34 @@ const NoteForPointOfFair = styled.div`
 
 const AnswerLaterWrapper = styled.div`
   margin: 20px;
+`;
+
+const ScreenShotAreaWrapper = styled.div`
+  display: flex;
+`;
+
+const ScreenShotArea = styled.div`
+  padding: 5px;
+  max-width: 100%;
+`;
+
+const ToggleDetailedFilterSettingsLabel = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const ToggleDetailedFilterSettingsButton = styled.div`
+  margin: 5px;
+`;
+
+const ToggleDetailedFilterSettingsIcon = styled(Icon)`
+  transition: all 0.3s ease;
+  top: 0;
+  left: 0;
+  transform-origin: center;
+
+  &.open {
+    transform: rotate(135deg);
+  }
 `;

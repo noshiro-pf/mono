@@ -1,5 +1,5 @@
 import { Spinner } from '@blueprintjs/core';
-import { EventScheduleFetchState, router } from '../../../store';
+import { EventScheduleStore, router } from '../../../store';
 import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { EditEventScheduleOk } from './edit-event-schedule-ok';
@@ -9,9 +9,7 @@ const dc = dict.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
   const eventId = useObservableValue(router.eventId$);
-  const eventScheduleResult = useObservableValue(
-    EventScheduleFetchState.result$
-  );
+  const eventScheduleResult = useObservableValue(EventScheduleStore.result$);
 
   return Result.isErr(eventScheduleResult) &&
     eventScheduleResult.value.type === 'not-found' ? (

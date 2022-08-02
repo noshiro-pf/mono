@@ -9,15 +9,41 @@ const pathToken = {
 
 export const queryParamKey = {
   answerTableState: {
-    goodMin: 'good-min',
-    goodMax: 'good-max',
-    fairMin: 'fair-min',
-    fairMax: 'fair-max',
-    poorMin: 'poor-min',
-    poorMax: 'poor-max',
     sortBy: 'sort-by',
     sortOrder: 'sort-order',
+    score: 'score',
+    date: 'date',
+    dayOfWeek: 'day',
+    filledDateOnly: 'filled-date-only',
+    good: 'good',
+    fair: 'fair',
+    poor: 'poor',
+    goodPlusFair: 'good-fair',
+    fairPlusPoor: 'fair-poor',
   },
+} as const;
+
+export const queryParamValue = {
+  sortBy: {
+    score: 'score',
+    date: 'date',
+  },
+  sortOrder: {
+    desc: 'desc',
+    asc: 'asc',
+  },
+  dayAbbrDef: {
+    Sun: 'su',
+    Mon: 'mo',
+    Tue: 'tu',
+    Wed: 'we',
+    Thr: 'th',
+    Fri: 'fr',
+    Sat: 'sa',
+  },
+  dayElementDelim: '-',
+  rangeDelim: '--',
+  filledDateOnlyEnabled: 'true',
 } as const;
 
 export const routes = {

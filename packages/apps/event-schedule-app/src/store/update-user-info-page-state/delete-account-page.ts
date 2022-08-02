@@ -8,13 +8,13 @@ import {
   showToast,
 } from '../../functions';
 import { fireAuthUser$ } from '../auth';
-import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
+import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-export namespace DeleteAccountPage {
+export namespace DeleteAccountPageStore {
   const [formState$, dispatch] = createReducer(
     deleteAccountPageStateReducer,
     deleteAccountPageInitialState
@@ -90,7 +90,7 @@ export namespace DeleteAccountPage {
 
           dispatch({ type: 'done' });
 
-          UpdateUserInfoDialogState.closeDialog();
+          UpdateUserInfoDialogStore.closeDialog();
 
           showToast({
             toast,
@@ -113,7 +113,7 @@ export namespace DeleteAccountPage {
 
       dispatch({ type: 'done' });
 
-      UpdateUserInfoDialogState.closeDialog();
+      UpdateUserInfoDialogStore.closeDialog();
 
       showToast({
         toast,
@@ -125,7 +125,7 @@ export namespace DeleteAccountPage {
 
     dispatch({ type: 'done' });
 
-    UpdateUserInfoDialogState.closeDialog();
+    UpdateUserInfoDialogStore.closeDialog();
 
     showToast({
       toast,
@@ -180,7 +180,7 @@ export namespace DeleteAccountPage {
     mut_subscribedValues.fireAuthUser = v;
   });
 
-  UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
+  UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {
       resetAllDialogState();
     }

@@ -44,7 +44,7 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
           <NumericInputWrapper>
             <IconCountNumericInput
               count={state.min}
-              disabled={!state.filteringEnabled}
+              disabled={!state.enabled}
               max={upperLimit}
               onCountChange={onMinChange}
             />
@@ -55,7 +55,7 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
           <NumericInputWrapper>
             <IconCountNumericInput
               count={state.max}
-              disabled={!state.filteringEnabled}
+              disabled={!state.enabled}
               max={upperLimit}
               onCountChange={onMaxChange}
             />
@@ -66,7 +66,7 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
         <Footer>
           <SwitchWrapper>
             <SwitchWithoutLabelStyled
-              checked={state.filteringEnabled}
+              checked={state.enabled}
               label={dc.enableFilteringSwitchLabel}
               onChange={switchHandler}
             />

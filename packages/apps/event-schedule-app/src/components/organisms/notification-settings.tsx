@@ -1,7 +1,7 @@
 import { FormGroup } from '@blueprintjs/core';
 import { isEmailString } from '@noshiro/ts-utils-additional';
-import { now, ymdhmDateDiff } from '../../functions';
 import type { NotificationSettingsWithEmail } from '../../types';
+import { now, ymdhmDateDiff } from '../../utils';
 import { BpCheckbox, BpInput } from '../bp';
 import { WidthRestrictedInputWrapper } from '../styled';
 

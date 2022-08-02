@@ -1,4 +1,4 @@
-import { onSubmitAnswerClick } from '../../../store';
+import { AnswerPageStore } from '../../../store';
 import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';
 
@@ -58,7 +58,7 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
         })}
         disabled={disabled}
         loading={loading}
-        onConfirmClick={onSubmitAnswerClick}
+        onConfirmClick={AnswerPageStore.onSubmitAnswerClick}
       />
     ) : (
       <SubmitAnswerButton disabled={disabled} loading={loading} mode={mode} />
@@ -78,7 +78,7 @@ const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
         creating: dc.submitButton.create,
         editing: dc.submitButton.update,
       })}
-      onClick={onSubmitAnswerClick}
+      onClick={AnswerPageStore.onSubmitAnswerClick}
     />
   )
 );

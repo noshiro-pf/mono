@@ -1,4 +1,7 @@
-import { fillNotificationSettings } from '@noshiro/event-schedule-app-shared';
+import {
+  compareYmd,
+  fillNotificationSettings,
+} from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
@@ -9,6 +12,7 @@ import {
   showToast,
 } from '../../functions';
 import type { EventScheduleSettingCommonState } from '../../types';
+import { now } from '../../utils';
 import { fireAuthUser$ } from '../auth';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';
 
@@ -46,7 +50,10 @@ export namespace CreateEventScheduleStore {
       commonStateHandlers.setTitle(ev.title);
       commonStateHandlers.setNotes(ev.notes);
       commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
-      commonStateHandlers.setDatetimeRangeList(ev.datetimeRangeList);
+      // 過去日は復元しない
+      commonStateHandlers.setDatetimeRangeList(
+        ev.datetimeRangeList.filter((d) => compareYmd(d.ymd, now()) >= 0)
+      );
       commonStateHandlers.setAnswerIcons(ev.answerIcons);
 
       if (ev.answerDeadline === 'none') {

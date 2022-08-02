@@ -1,4 +1,5 @@
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
+// eslint-disable-next-line import/no-deprecated
 import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { IDate, pipe } from '@noshiro/ts-utils';
@@ -17,6 +18,7 @@ const tenYearsLater = pipe(IDate.today())
   .chain(IDate.setLocaleMonth(12))
   .chain(IDate.toDate).value;
 
+// eslint-disable-next-line import/no-deprecated
 type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
 
 export type BpDatetimePickerProps = Readonly<{

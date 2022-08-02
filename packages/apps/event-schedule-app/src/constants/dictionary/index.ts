@@ -2,6 +2,8 @@ export * from './account-settings';
 export * from './answer-page';
 export * from './common';
 export * from './create-event-result-dialog';
+export * from './datetime';
+export * from './detailed-filter-dialog';
 export * from './dictionary';
 export * from './error-messages';
 export * from './event-list-page';

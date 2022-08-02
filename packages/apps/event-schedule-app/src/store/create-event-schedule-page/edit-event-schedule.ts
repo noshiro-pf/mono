@@ -8,7 +8,7 @@ import {
   showToast,
 } from '../../functions';
 import type { EventScheduleSettingCommonState } from '../../types';
-import { AnswersFetchState, EventScheduleFetchState } from '../fetch-state';
+import { AnswersStore, EventScheduleStore } from '../fetching-state';
 import { router } from '../router';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';
 
@@ -169,8 +169,8 @@ export namespace EditEventScheduleStore {
       message: dict.eventSettingsPage.editEventResultMessage.success,
       intent: 'success',
     });
-    AnswersFetchState.fetchAnswers();
-    EventScheduleFetchState.fetchEventSchedule();
+    AnswersStore.fetchAnswers();
+    EventScheduleStore.fetchEventSchedule();
     onBackToAnswerPage();
   };
 

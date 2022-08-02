@@ -8,13 +8,13 @@ import {
   updatePasswordPageStateReducer,
 } from '../../functions';
 import { fireAuthUser$ } from '../auth';
-import { UpdateUserInfoDialogState } from './update-user-info-dialog-state';
+import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-export namespace UpdatePasswordPage {
+export namespace UpdatePasswordPageStore {
   const [formState$, dispatch] = createReducer(
     updatePasswordPageStateReducer,
     updatePasswordPageInitialState
@@ -116,7 +116,7 @@ export namespace UpdatePasswordPage {
 
           dispatch({ type: 'done' });
 
-          UpdateUserInfoDialogState.closeDialog();
+          UpdateUserInfoDialogStore.closeDialog();
 
           showToast({
             toast,
@@ -142,7 +142,7 @@ export namespace UpdatePasswordPage {
 
       dispatch({ type: 'done' });
 
-      UpdateUserInfoDialogState.closeDialog();
+      UpdateUserInfoDialogStore.closeDialog();
 
       showToast({
         toast,
@@ -154,7 +154,7 @@ export namespace UpdatePasswordPage {
 
     dispatch({ type: 'done' });
 
-    UpdateUserInfoDialogState.closeDialog();
+    UpdateUserInfoDialogStore.closeDialog();
 
     showToast({
       toast,
@@ -217,7 +217,7 @@ export namespace UpdatePasswordPage {
     mut_subscribedValues.fireAuthUser = v;
   });
 
-  UpdateUserInfoDialogState.openingDialog$.subscribe((openingDialog) => {
+  UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
     if (openingDialog === undefined) {
       resetAllDialogState();
     }

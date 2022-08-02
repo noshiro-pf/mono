@@ -4,8 +4,8 @@ import { api } from '../../../api';
 import { createToaster, showToast } from '../../../functions';
 import {
   eventList$,
-  EventListFetchState,
-  EventListPageFilteringState,
+  EventListPageFilterStore,
+  EventListStore,
   useFireAuthUser,
 } from '../../../store';
 import { BpCheckbox, BpInput } from '../../bp';
@@ -19,7 +19,7 @@ const filterOptionStateChangeHandler: ChangeEventHandler<HTMLSelectElement> = (
 ) => {
   const v = ev.target.value;
   if (v === 'archive' || v === 'inProgress') {
-    EventListPageFilteringState.setFilterOptionState(v);
+    EventListPageFilterStore.setFilterOptionState(v);
   }
 };
 
@@ -47,7 +47,7 @@ const archiveOrUnarchiveHandler =
         intent: 'success',
       });
 
-      EventListFetchState.fetchEventList();
+      EventListStore.fetchEventList();
     }
   };
 
@@ -57,7 +57,7 @@ const unarchiveEventScheduleHandler = archiveOrUnarchiveHandler('unarchive');
 
 export const EventListPage = memoNamed('EventListPage', () => {
   useEffect(() => {
-    EventListFetchState.fetchEventList();
+    EventListStore.fetchEventList();
   }, []);
 
   const eventList = useObservableValue(eventList$);
@@ -90,23 +90,21 @@ export const EventListPage = memoNamed('EventListPage', () => {
   );
 
   const refreshButtonIsDisabled = useObservableValue(
-    EventListFetchState.refreshButtonIsDisabled$
+    EventListStore.refreshButtonIsDisabled$
   );
   const refreshButtonIsLoading = useObservableValue(
-    EventListFetchState.refreshButtonIsLoading$
+    EventListStore.refreshButtonIsLoading$
   );
   const filterOptionState = useObservableValue(
-    EventListPageFilteringState.filterOptionState$
+    EventListPageFilterStore.filterOptionState$
   );
   const showOnlyEventSchedulesICreated = useObservableValue(
-    EventListPageFilteringState.showOnlyEventSchedulesICreated$
+    EventListPageFilterStore.showOnlyEventSchedulesICreated$
   );
   const showAllPastDaysEvent = useObservableValue(
-    EventListPageFilteringState.showAllPastDaysEvent$
+    EventListPageFilterStore.showAllPastDaysEvent$
   );
-  const filterText = useObservableValue(
-    EventListPageFilteringState.filterText$
-  );
+  const filterText = useObservableValue(EventListPageFilterStore.filterText$);
 
   const formElementsAreDisabled =
     refreshButtonIsDisabled || refreshButtonIsLoading;
@@ -141,14 +139,14 @@ export const EventListPage = memoNamed('EventListPage', () => {
               disabled={formElementsAreDisabled}
               label={dc.filter.showOnlyEventSchedulesICreated}
               onCheck={
-                EventListPageFilteringState.setShowOnlyEventSchedulesICreated
+                EventListPageFilterStore.setShowOnlyEventSchedulesICreated
               }
             />
             <BpCheckbox
               checked={showAllPastDaysEvent}
               disabled={formElementsAreDisabled}
               label={dc.filter.showAllPastDaysEvent}
-              onCheck={EventListPageFilteringState.setShowAllPastDaysEvent}
+              onCheck={EventListPageFilterStore.setShowAllPastDaysEvent}
             />
             <ControlGroup>
               <BpInput
@@ -156,11 +154,11 @@ export const EventListPage = memoNamed('EventListPage', () => {
                 placeholder={dc.filter.searchInput}
                 type={'search'}
                 value={filterText}
-                onValueChange={EventListPageFilteringState.setFilterText}
+                onValueChange={EventListPageFilterStore.setFilterText}
               />
               <Button
                 disabled={formElementsAreDisabled}
-                onClick={EventListPageFilteringState.filterByText}
+                onClick={EventListPageFilterStore.filterByText}
               >
                 {dc.search}
               </Button>
@@ -176,7 +174,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
               icon={'refresh'}
               intent={'none'}
               loading={refreshButtonIsLoading}
-              onClick={EventListFetchState.refreshEventList}
+              onClick={EventListStore.refreshEventList}
             >
               {dc.refresh}
             </Button>

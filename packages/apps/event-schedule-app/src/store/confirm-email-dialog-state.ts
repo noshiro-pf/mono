@@ -8,7 +8,7 @@ import {
   showToast,
 } from '../functions';
 import { EditEventScheduleStore } from './create-event-schedule-page';
-import { eventSchedule$ } from './fetch-state';
+import { eventSchedule$ } from './fetching-state';
 import { router } from './router';
 
 const dc = dict.answerPage.eventInfo.verifyEmailDialog;

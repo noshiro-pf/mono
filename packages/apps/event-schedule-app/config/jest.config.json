@@ -1,5 +1,6 @@
 {
   "moduleNameMapper": {
+    "^@noshiro/event-schedule-app-shared$": "<rootDir>/../event-schedule-app-shared/src",
     "^@noshiro/(.*)$": "<rootDir>/../../utils/$1/src"
   },
   "rootDir": "../",
@@ -17,6 +18,7 @@
   "setupFiles": [
     "@noshiro/global-ts-utils",
     "@noshiro/global-react-utils",
+    "@noshiro/global-syncflow",
     "@noshiro/global-syncflow-react-hooks",
     "@noshiro/global-react",
     "@noshiro/global-styled-components",

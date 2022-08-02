@@ -2,7 +2,7 @@ import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
 import { router } from '../router';
 
-export namespace AnswersFetchState {
+export namespace AnswersStore {
   const [fetchAnswers$, _fetchAnswers] = createVoidEventEmitter();
 
   export const fetchAnswers = _fetchAnswers;
@@ -23,10 +23,11 @@ export namespace AnswersFetchState {
     setState: setRefreshButtonIsLoading,
   } = createState<boolean>(false);
 
-  export const {
-    state$: refreshButtonIsDisabled$,
+  const {
+    state$: _refreshButtonIsDisabled$,
     setState: setRefreshButtonIsDisabled,
   } = createState<boolean>(false);
+  export const refreshButtonIsDisabled$ = _refreshButtonIsDisabled$;
 
   export const refreshAnswers = (): void => {
     fetchAnswers();
@@ -73,7 +74,7 @@ export namespace AnswersFetchState {
 }
 
 export const answers$: InitializedObservable<readonly Answer[] | undefined> =
-  AnswersFetchState.result$
+  AnswersStore.result$
     .chain(filter(isNotUndefined))
     .chain(unwrapResultOk())
     .chain(withInitialValue(undefined));

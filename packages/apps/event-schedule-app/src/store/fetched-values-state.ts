@@ -1,9 +1,9 @@
 import { fireAuthUser$ } from './auth';
 import {
-  AnswersFetchState,
-  EventListFetchState,
-  EventScheduleFetchState,
-} from './fetch-state';
+  AnswersStore,
+  EventListStore,
+  EventScheduleStore,
+} from './fetching-state';
 import { router } from './router';
 
 export const errorType$: InitializedObservable<
@@ -18,10 +18,7 @@ export const errorType$: InitializedObservable<
       }
     | undefined
   >
-> = combineLatest([
-  EventScheduleFetchState.result$,
-  AnswersFetchState.result$,
-] as const)
+> = combineLatest([EventScheduleStore.result$, AnswersStore.result$] as const)
   .chain(
     map(([esr, ar]) =>
       Result.isErr(esr)
@@ -39,14 +36,14 @@ export const errorType$: InitializedObservable<
   )
   .chain(withInitialValue(undefined));
 
-router.eventId$.chain(distinctUntilChangedI()).subscribe(() => {
-  EventScheduleFetchState.fetchEventSchedule();
-  AnswersFetchState.fetchAnswers();
+router.eventId$.subscribe(() => {
+  EventScheduleStore.fetchEventSchedule();
+  AnswersStore.fetchAnswers();
 });
 
 fireAuthUser$
   .chain(mapI((u) => mapNullable(u, (a) => a.uid)))
   .chain(distinctUntilChangedI())
   .subscribe(() => {
-    EventListFetchState.fetchEventList();
+    EventListStore.fetchEventList();
   });

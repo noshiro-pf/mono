@@ -1,5 +1,8 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { UpdateEmailPage, UpdateUserInfoDialogState } from '../../../store';
+import {
+  UpdateEmailPageStore,
+  UpdateUserInfoDialogStore,
+} from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { LockButton } from '../../molecules';
@@ -21,7 +24,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-    } = useObservableValue(UpdateEmailPage.state$);
+    } = useObservableValue(UpdateEmailPageStore.state$);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -45,7 +48,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
                 intent={emailFormIntent}
                 type={'email'}
                 value={formState.email.inputValue}
-                onValueChange={UpdateEmailPage.inputEmailHandler}
+                onValueChange={UpdateEmailPageStore.inputEmailHandler}
               />
             </FormGroup>
             <FormGroup
@@ -61,17 +64,17 @@ export const UpdateEmailDialog = memoNamed<Props>(
                   <LockButton
                     disabled={formState.isWaitingResponse}
                     passwordIsOpen={passwordIsOpen}
-                    onLockClick={UpdateEmailPage.togglePasswordLock}
+                    onLockClick={UpdateEmailPageStore.togglePasswordLock}
                   />
                 }
                 type={passwordIsOpen ? 'text' : 'password'}
                 value={formState.password.inputValue}
-                onValueChange={UpdateEmailPage.inputPasswordHandler}
+                onValueChange={UpdateEmailPageStore.inputPasswordHandler}
               />
             </FormGroup>
           </Content>
         }
-        closeDialog={UpdateUserInfoDialogState.closeDialog}
+        closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={formState.isWaitingResponse}
         submitButton={
@@ -79,7 +82,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={UpdateEmailPage.enterClickHandler}
+            onClick={UpdateEmailPageStore.enterClickHandler}
           >
             {dc.button.update}
           </Button>

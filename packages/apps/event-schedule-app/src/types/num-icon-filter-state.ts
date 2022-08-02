@@ -1,5 +1,5 @@
 export type NumIconFilterState = Readonly<{
-  filteringEnabled: boolean;
+  enabled: boolean;
   min: number;
   max: number;
 }>;

@@ -1,7 +1,7 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import {
-  UpdateDisplayNamePage,
-  UpdateUserInfoDialogState,
+  UpdateDisplayNamePageStore,
+  UpdateUserInfoDialogStore,
 } from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
@@ -17,7 +17,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
   'UpdateDisplayNameDialog',
   ({ dialogIsOpen }) => {
     const { formState, displayNameFormIntent, enterButtonDisabled } =
-      useObservableValue(UpdateDisplayNamePage.state$);
+      useObservableValue(UpdateDisplayNamePageStore.state$);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -34,12 +34,14 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
                 intent={displayNameFormIntent}
                 type={'text'}
                 value={formState.displayName.inputValue}
-                onValueChange={UpdateDisplayNamePage.inputDisplayNameHandler}
+                onValueChange={
+                  UpdateDisplayNamePageStore.inputDisplayNameHandler
+                }
               />
             </FormGroup>
           </Content>
         }
-        closeDialog={UpdateUserInfoDialogState.closeDialog}
+        closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={formState.isWaitingResponse}
         submitButton={
@@ -47,7 +49,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={UpdateDisplayNamePage.enterClickHandler}
+            onClick={UpdateDisplayNamePageStore.enterClickHandler}
           >
             {dc.button.update}
           </Button>

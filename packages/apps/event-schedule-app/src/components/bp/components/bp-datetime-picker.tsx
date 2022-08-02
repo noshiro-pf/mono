@@ -1,4 +1,4 @@
-import { DateInput } from '@blueprintjs/datetime';
+import { DateInput2 } from '@blueprintjs/datetime2';
 import type { ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string =>
@@ -12,7 +12,7 @@ const tenYearsLater = pipe(IDate.today())
   .chain(IDate.setLocaleMonth(12))
   .chain(IDate.toDate).value;
 
-type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
+type DateInputPropsOriginal = ComponentProps<typeof DateInput2>;
 
 export type BpDatetimePickerProps = Readonly<{
   ymdhm: Ymdhm | undefined;
@@ -38,12 +38,13 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     ...props
   }) => {
     const onChangeHandler = useCallback(
-      (dt: RawDateType | null | undefined, isUserChange: boolean) => {
-        if (dt == null) {
+      (dateStr: string | null, isUserChange?: boolean) => {
+        if (dateStr == null) {
           onYmdhmChange(undefined);
           return;
         }
-        if (!isUserChange) return;
+        if (isUserChange !== true) return;
+        const dt = parseDate(dateStr);
         onYmdhmChange({
           year: IDate.getLocaleYear(dt),
           month: IDate.getLocaleMonth(dt),
@@ -55,20 +56,18 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
       [onYmdhmChange]
     );
 
-    const dateObj = useMemo<RawDateType | undefined>(
+    const date = useMemo<string | undefined>(
       () =>
         ymdhm === undefined
           ? undefined
-          : pipe(
-              IDate.from(
-                `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
-              )
-            ).chain(IDate.toDate).value,
+          : IDate.from(
+              `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
+            ).toLocaleString(),
       [ymdhm]
     );
 
     return (
-      <DateInput
+      <DateInput2
         canClearSelection={canClearSelection}
         formatDate={formatDate}
         maxDate={maxDate}
@@ -78,7 +77,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         shortcuts={shortcuts as Writable<typeof shortcuts>}
         showActionsBar={showActionsBar}
         timePrecision={'minute'}
-        value={dateObj}
+        value={date}
         onChange={onChangeHandler}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}

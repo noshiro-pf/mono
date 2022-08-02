@@ -1,4 +1,4 @@
-export namespace UpdateUserInfoDialogState {
+export namespace UpdateUserInfoDialogStore {
   const {
     state$: _openingDialog$,
     setState: setOpeningDialog,

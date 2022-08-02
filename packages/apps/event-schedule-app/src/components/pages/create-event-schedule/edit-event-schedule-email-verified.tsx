@@ -43,6 +43,13 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
 
     const { eventScheduleValidationOk } = commonState;
 
+    const resetState = useCallback(() => {
+      EditEventScheduleStore.setEventSchedule(
+        eventScheduleFromDb,
+        emailVerified
+      );
+    }, [eventScheduleFromDb, emailVerified]);
+
     return (
       <>
         <SubTitle>{dc.editSubTitle(eventScheduleFromDb.title)}</SubTitle>
@@ -60,7 +67,7 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
           />
           <ResetEditButton
             disabled={editButtonIsLoading || hasNoChanges}
-            onConfirmClick={EditEventScheduleStore.resetAllState}
+            onConfirmClick={resetState}
           />
           <div data-cy={'submit-button'}>
             <SubmitEditingEventButton

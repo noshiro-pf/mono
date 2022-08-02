@@ -1,1 +1,1 @@
-export * from './filtering-state';
+export * from './filter-state';

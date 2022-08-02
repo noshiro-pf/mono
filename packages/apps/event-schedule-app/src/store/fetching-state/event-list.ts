@@ -3,9 +3,9 @@ import { withLatestI } from '@noshiro/syncflow';
 import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
 import { fireAuthUser$ } from '../auth';
-import { EventListPageFilteringState } from '../event-list-page-state';
+import { EventListPageFilterStore } from '../event-list-page-state';
 
-export namespace EventListFetchState {
+export namespace EventListStore {
   const [fetchEventList$, _fetchEventList] = createVoidEventEmitter();
 
   export const fetchEventList = _fetchEventList;
@@ -47,13 +47,13 @@ export namespace EventListFetchState {
       fetchEventListThrottled$,
       fireAuthUser$,
 
-      EventListPageFilteringState.filterByText$
+      EventListPageFilterStore.filterByText$
         .chain(withInitialValue(undefined))
-        .chain(withLatestI(EventListPageFilteringState.filterText$))
+        .chain(withLatestI(EventListPageFilterStore.filterText$))
         .chain(mapI(([_, filterText]) => filterText)),
-      EventListPageFilteringState.filterOptionState$,
-      EventListPageFilteringState.showAllPastDaysEvent$,
-      EventListPageFilteringState.showOnlyEventSchedulesICreated$
+      EventListPageFilterStore.filterOptionState$,
+      EventListPageFilterStore.showAllPastDaysEvent$,
+      EventListPageFilterStore.showOnlyEventSchedulesICreated$
     )
   ).subscribe(
     ([
@@ -109,7 +109,7 @@ export namespace EventListFetchState {
 
 export const eventList$: InitializedObservable<
   readonly EventListItem[] | undefined
-> = EventListFetchState.result$
+> = EventListStore.result$
   .chain(filter(isNotUndefined))
   .chain(unwrapResultOk())
   .chain(withInitialValue(undefined));

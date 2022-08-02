@@ -1,5 +1,8 @@
 import { Button, FormGroup } from '@blueprintjs/core';
-import { UpdatePasswordPage, UpdateUserInfoDialogState } from '../../../store';
+import {
+  UpdatePasswordPageStore,
+  UpdateUserInfoDialogStore,
+} from '../../../store';
 import { Label } from '../../atoms';
 import { BpInput } from '../../bp';
 import { LockButton } from '../../molecules';
@@ -25,7 +28,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
       newPasswordFormIntent,
       oldPasswordIsOpen,
       newPasswordIsOpen,
-    } = useObservableValue(UpdatePasswordPage.state$);
+    } = useObservableValue(UpdatePasswordPageStore.state$);
 
     return (
       <UpdateUserInfoDialogTemplate
@@ -60,12 +63,12 @@ export const UpdatePasswordDialog = memoNamed<Props>(
                   <LockButton
                     disabled={formState.isWaitingResponse}
                     passwordIsOpen={oldPasswordIsOpen}
-                    onLockClick={UpdatePasswordPage.toggleOldPasswordLock}
+                    onLockClick={UpdatePasswordPageStore.toggleOldPasswordLock}
                   />
                 }
                 type={oldPasswordIsOpen ? 'text' : 'password'}
                 value={formState.oldPassword.inputValue}
-                onValueChange={UpdatePasswordPage.inputOldPasswordHandler}
+                onValueChange={UpdatePasswordPageStore.inputOldPasswordHandler}
               />
             </FormGroup>
 
@@ -80,7 +83,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
                 intent={newPasswordFormIntent}
                 type={'password'}
                 value={formState.newPassword.password.inputValue}
-                onValueChange={UpdatePasswordPage.inputNewPasswordHandler}
+                onValueChange={UpdatePasswordPageStore.inputNewPasswordHandler}
               />
             </FormGroup>
 
@@ -97,19 +100,19 @@ export const UpdatePasswordDialog = memoNamed<Props>(
                   <LockButton
                     disabled={formState.isWaitingResponse}
                     passwordIsOpen={newPasswordIsOpen}
-                    onLockClick={UpdatePasswordPage.toggleNewPasswordLock}
+                    onLockClick={UpdatePasswordPageStore.toggleNewPasswordLock}
                   />
                 }
                 type={newPasswordIsOpen ? 'text' : 'password'}
                 value={formState.newPassword.passwordConfirmation.inputValue}
                 onValueChange={
-                  UpdatePasswordPage.inputNewPasswordConfirmationHandler
+                  UpdatePasswordPageStore.inputNewPasswordConfirmationHandler
                 }
               />
             </FormGroup>
           </Content>
         }
-        closeDialog={UpdateUserInfoDialogState.closeDialog}
+        closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
         isWaitingResponse={formState.isWaitingResponse}
         submitButton={
@@ -117,7 +120,7 @@ export const UpdatePasswordDialog = memoNamed<Props>(
             disabled={enterButtonDisabled}
             intent={'primary'}
             loading={formState.isWaitingResponse}
-            onClick={UpdatePasswordPage.enterClickHandler}
+            onClick={UpdatePasswordPageStore.enterClickHandler}
           >
             {dc.button.update}
           </Button>

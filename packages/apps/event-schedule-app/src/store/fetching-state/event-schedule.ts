@@ -2,7 +2,7 @@ import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
 import { router } from '../router';
 
-export namespace EventScheduleFetchState {
+export namespace EventScheduleStore {
   const [fetchEventSchedule$, _fetchEventSchedule] = createVoidEventEmitter();
 
   export const fetchEventSchedule = _fetchEventSchedule;
@@ -45,7 +45,7 @@ export namespace EventScheduleFetchState {
 }
 
 export const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
-  EventScheduleFetchState.result$
+  EventScheduleStore.result$
     .chain(filter(isNotUndefined))
     .chain(unwrapResultOk())
     .chain(withInitialValue(undefined));

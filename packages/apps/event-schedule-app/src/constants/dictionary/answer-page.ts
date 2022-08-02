@@ -1,3 +1,7 @@
+import { commonDictionary } from './common';
+import { ymd2str } from './datetime';
+import { detailedFilterDictionary } from './detailed-filter-dialog';
+
 const genTagName =
   (icon: '△' | '✕' | '〇') =>
   (min: number, max: number): string =>
@@ -10,6 +14,19 @@ const genTagName =
       : max === Num.POSITIVE_INFINITY
       ? `${min} ≦ ${icon}の個数`
       : `${min} ≦ ${icon}の個数 ≦ ${max}`;
+
+const genTagNameAdded =
+  (...[icon1, icon2]: readonly ['△', '✕'] | readonly ['〇', '△']) =>
+  (min: number, max: number): string =>
+    min === max
+      ? `${icon1}の個数+${icon2}の個数 = ${min}`
+      : min === 0
+      ? max === Num.POSITIVE_INFINITY
+        ? `${icon1}の個数+${icon2}の個数 ≦ ∞` // dummy
+        : `${icon1}の個数+${icon2}の個数 ≦ ${max}`
+      : max === Num.POSITIVE_INFINITY
+      ? `${min} ≦ ${icon1}の個数+${icon2}の個数`
+      : `${min} ≦ ${icon1}の個数+${icon2}の個数 ≦ ${max}`;
 
 export const answerPageDictionary = {
   title: '日程調整 回答ページ',
@@ -48,6 +65,9 @@ export const answerPageDictionary = {
     },
   },
   point: (p: AnswerIconPoint): string => `（${p}点）`,
+
+  detailedFilter: detailedFilterDictionary,
+
   answers: {
     title: '回答一覧',
 
@@ -64,6 +84,45 @@ export const answerPageDictionary = {
       good: genTagName('〇'),
       fair: genTagName('△'),
       poor: genTagName('✕'),
+      goodPlusFair: genTagNameAdded('〇', '△'),
+      fairPlusPoor: genTagNameAdded('△', '✕'),
+
+      scoreRange: ({ min, max }: Readonly<{ min: number; max: number }>) =>
+        `${min.toFixed(2)} ≦ スコア ≦ ${max.toFixed(2)}`,
+
+      dateRange: (start: YearMonthDate, end: YearMonthDate) =>
+        `日程：${ymd2str(start)} ～ ${ymd2str(end)}`,
+
+      dayOfWeek: ({
+        Sun,
+        Mon,
+        Tue,
+        Wed,
+        Thr,
+        Fri,
+        Sat,
+      }: Readonly<{
+        Sun: boolean;
+        Mon: boolean;
+        Tue: boolean;
+        Wed: boolean;
+        Thr: boolean;
+        Fri: boolean;
+        Sat: boolean;
+      }>) =>
+        pipe(
+          IList.zip(
+            [Sun, Mon, Tue, Wed, Thr, Fri, Sat] as const,
+            commonDictionary.date.dayList
+          )
+            .filter(([checked, _displayName]) => checked)
+
+            .map(([_, displayName]) => displayName)
+        ).chain((list) =>
+          IList.isEmpty(list) ? '曜日：なし' : `${list.join('・')}のみ`
+        ).value,
+
+      iconOfSpecifiedRespondent: '回答者の記号で絞り込み（詳細設定）',
     },
 
     datetime: '候補日程',
@@ -76,6 +135,8 @@ export const answerPageDictionary = {
     times: '✕',
     weight: '回答の優先度',
     refresh: '更新',
+    saveScreenShot: '画像として保存',
+    detailedFilterSettingsButton: '日程絞り込みの詳細設定',
     requiredParticipant: '必須参加者',
     iconHeaderFilter: {
       ge: '個以上',

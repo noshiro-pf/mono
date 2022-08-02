@@ -1,11 +1,11 @@
 import { Button } from '@blueprintjs/core';
 import {
-  AnswerTableFilteringAndSortingManager,
-  onAnswerClick,
-  tableBodyValuesFiltered$,
+  AnswerFilterAndSortStore,
+  AnswerPageStore,
+  AnswerTableStore,
 } from '../../../store';
 import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
-import { HTMLTableBorderedStyled } from '../../bp';
+import { HTMLTableBorderedStyled2 } from '../../bp';
 import { CommentButton } from './comment-button';
 import { DatetimeRangeCell } from './datetime-range-cell';
 import { FilterByIconPopover } from './filter-by-icon-popover';
@@ -17,11 +17,17 @@ type Props = Readonly<{
   datetimeSpecification: EventSchedule['datetimeSpecification'];
   answers: readonly Answer[];
   editAnswerButtonIsDisabled: boolean;
+  holidaysJpDefinition: IMapMapped<YearMonthDate, string, YmdKey>;
 }>;
 
 export const AnswerTable = memoNamed<Props>(
   'AnswerTable',
-  ({ datetimeSpecification, answers, editAnswerButtonIsDisabled }) => {
+  ({
+    datetimeSpecification,
+    answers,
+    editAnswerButtonIsDisabled,
+    holidaysJpDefinition,
+  }) => {
     const answersWithHandler = useMemo<
       readonly (Pick<
         Answer,
@@ -38,34 +44,55 @@ export const AnswerTable = memoNamed<Props>(
           weight: a.weight,
           isRequiredParticipants: a.isRequiredParticipants,
           onClick: () => {
-            onAnswerClick(a);
+            AnswerPageStore.onAnswerClick(a);
           },
         })),
       [answers]
     );
 
     const tableBodyValuesFiltered = useObservableValue(
-      tableBodyValuesFiltered$
+      AnswerTableStore.tableBodyValuesFiltered$
     );
 
+    const tableMinimized = useObservableValue(AnswerTableStore.tableMinimized$);
+
     return (
-      <HTMLTableBorderedStyled>
+      <StickyHeaderTable
+        // eslint-disable-next-line react/forbid-component-props
+        className={tableMinimized ? 'minimized' : ''}
+      >
         <thead>
           <tr>
-            <th>
-              <PaddedSpan>{dc.datetime}</PaddedSpan>
-              <SortButton
-                onSortChange={
-                  AnswerTableFilteringAndSortingManager.onDatetimeSortChange
-                }
-              />
+            <th className='sticky horizontal'>
+              <TableTopLeftCell>
+                <MinimizeTableButton>
+                  <Button
+                    icon={tableMinimized ? 'maximize' : 'minimize'}
+                    minimal={true}
+                    outlined={true}
+                    onClick={
+                      tableMinimized
+                        ? AnswerTableStore.maximizeTable
+                        : AnswerTableStore.minimizeTable
+                    }
+                  />
+                </MinimizeTableButton>
+                <DatetimeHeaderCell>
+                  {tableMinimized ? undefined : (
+                    <PaddedSpan>{dc.datetime}</PaddedSpan>
+                  )}
+                  <SortButton
+                    onSortChange={
+                      AnswerFilterAndSortStore.onDatetimeSortOrderChange
+                    }
+                  />
+                </DatetimeHeaderCell>
+              </TableTopLeftCell>
             </th>
             <th>
-              <PaddedSpan>{dc.score}</PaddedSpan>
+              {tableMinimized ? undefined : <PaddedSpan>{dc.score}</PaddedSpan>}
               <SortButton
-                onSortChange={
-                  AnswerTableFilteringAndSortingManager.onScoreSortChange
-                }
+                onSortChange={AnswerFilterAndSortStore.onScoreSortOrderChange}
               />
             </th>
 
@@ -88,7 +115,10 @@ export const AnswerTable = memoNamed<Props>(
             </IconHeaderCell>
 
             {answersWithHandler.map((answer) => (
-              <th key={answer.id} style={noPadStyle}>
+              <th
+                key={answer.id}
+                style={tableMinimized ? answerCellThinStyle : answerCellStyle}
+              >
                 {editAnswerButtonIsDisabled ? (
                   answer.user.name
                 ) : (
@@ -120,10 +150,12 @@ export const AnswerTable = memoNamed<Props>(
               style,
             }) => (
               <tr key={key} style={style}>
-                <td>
+                <td className='sticky horizontal'>
                   <DatetimeRangeCell
                     datetimeRange={datetimeRange}
                     datetimeSpecification={datetimeSpecification}
+                    holidaysJpDefinition={holidaysJpDefinition}
+                    tableMinimized={tableMinimized}
                   />
                 </td>
                 <td>
@@ -140,8 +172,13 @@ export const AnswerTable = memoNamed<Props>(
                 ))}
                 {answerTableRow?.map(
                   ({ iconId, point, showPoint, weight, comment }, i) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <td key={i}>
+                    <td
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={i}
+                      style={
+                        tableMinimized ? answerCellThinStyle : answerCellStyle
+                      }
+                    >
                       {iconId === 'none' ? (
                         ''
                       ) : (
@@ -153,21 +190,21 @@ export const AnswerTable = memoNamed<Props>(
                                 {`${dict.common.brace.start}${point}${dict.common.brace.end}`}
                               </CustomPointValue>
                             ) : undefined}
-                            {weight !== 1 ? (
+                            {weight === 1 || tableMinimized ? undefined : (
                               <WeightValue>
                                 <WeightTimes>{dc.times}</WeightTimes>
                                 <div>{weight}</div>
                               </WeightValue>
-                            ) : undefined}
+                            )}
                           </IconAndString>
-                          <CellCommentWrapper>
-                            {comment === '' ? undefined : (
+                          {comment === '' || tableMinimized ? undefined : (
+                            <CellCommentWrapper>
                               <CommentButton
                                 comment={comment}
                                 useSmallButton={true}
                               />
-                            )}
-                          </CellCommentWrapper>
+                            </CellCommentWrapper>
+                          )}
                         </AnswerIconCell>
                       )}
                     </td>
@@ -179,7 +216,7 @@ export const AnswerTable = memoNamed<Props>(
 
           {/* コメント行 */}
           <tr>
-            <td>{dc.comment}</td>
+            <td className='sticky horizontal'>{dc.comment}</td>
 
             {/* spacer */}
             <td />
@@ -190,7 +227,10 @@ export const AnswerTable = memoNamed<Props>(
             <td />
 
             {answersWithHandler.map((answer) => (
-              <td key={answer.id} style={noPadStyle}>
+              <td
+                key={answer.id}
+                style={tableMinimized ? answerCellThinStyle : answerCellStyle}
+              >
                 <div>
                   {answer.comment === '' ? (
                     ''
@@ -202,18 +242,27 @@ export const AnswerTable = memoNamed<Props>(
             ))}
           </tr>
         </tbody>
-      </HTMLTableBorderedStyled>
+      </StickyHeaderTable>
     );
   }
 );
 
 const userNameWrapperWidth = 80;
+const userNameWrapperThinWidth = 45;
 
-const noPadStyle: CSSProperties = {
+const answerCellStyle: CSSProperties = {
   minWidth: `${userNameWrapperWidth}px`,
   maxWidth: `${userNameWrapperWidth}px`,
   overflowX: 'hidden',
   padding: '5px',
+  position: 'relative',
+} as const;
+
+const answerCellThinStyle: CSSProperties = {
+  minWidth: `${userNameWrapperThinWidth}px`,
+  maxWidth: `${userNameWrapperThinWidth}px`,
+  overflowX: 'hidden',
+  padding: '3px',
   position: 'relative',
 } as const;
 
@@ -224,6 +273,7 @@ const RequiredParticipantIconStyled = styled.div`
 `;
 
 const BpButtonOverflowHidden = styled(Button)`
+  max-width: 100%;
   overflow-x: hidden;
 `;
 
@@ -236,7 +286,7 @@ const SummaryCellUnit = styled.span`
 `;
 
 const PaddedSpan = styled.span`
-  margin-right: 5px;
+  margin: 0 5px;
 `;
 
 const AnswerIconCell = styled.div`
@@ -279,4 +329,34 @@ const Centering = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const StickyHeaderTable = styled(HTMLTableBorderedStyled2)`
+  .sticky {
+    position: sticky;
+    z-index: 1;
+    background-color: white;
+
+    &.horizontal {
+      left: 0;
+    }
+  }
+
+  &.minimized {
+    td,
+    th {
+      padding: 5px;
+    }
+  }
+`;
+
+const TableTopLeftCell = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const MinimizeTableButton = styled.div`
+  flex: 0;
+`;
+const DatetimeHeaderCell = styled(Centering)`
+  flex: 1;
 `;

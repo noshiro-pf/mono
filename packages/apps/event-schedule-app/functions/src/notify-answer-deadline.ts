@@ -23,12 +23,11 @@ export const notifyAnswerDeadline = async (
   const querySnapshot = await db
     .collection(collectionPath.events)
     .where(keys.notificationSettings, '!=', 'none')
-    .where(keys.answerDeadline, '!=', 'none')
     .get();
 
-  const events = querySnapshot.docs.map((doc) =>
-    tp(doc.id, fillEventScheduleWithCheck(doc.data()))
-  );
+  const events = querySnapshot.docs
+    .map((doc) => tp(doc.id, fillEventScheduleWithCheck(doc.data())))
+    .filter(([_id, ev]) => ev.answerDeadline !== 'none');
 
   const emails = await Promise.all(
     events.map(([eventId]) => getEmail(db, eventId))
