@@ -2,31 +2,39 @@ import { commonDictionary } from './common';
 import { ymd2str } from './datetime';
 import { detailedFilterDictionary } from './detailed-filter-dialog';
 
-const genTagName =
-  (icon: '△' | '✕' | '〇') =>
-  (min: number, max: number): string =>
-    min === max
-      ? `${icon}の個数 = ${min}`
-      : min === 0
-      ? max === Num.POSITIVE_INFINITY
-        ? `${icon}の個数 ≦ ∞` // dummy
-        : `${icon}の個数 ≦ ${max}`
-      : max === Num.POSITIVE_INFINITY
-      ? `${min} ≦ ${icon}の個数`
-      : `${min} ≦ ${icon}の個数 ≦ ${max}`;
+const genTagName = (
+  icon: '△' | '✕' | '〇'
+): ((min: number, max: number) => string) => {
+  const commonText = `${icon}の個数`;
 
-const genTagNameAdded =
-  (...[icon1, icon2]: readonly ['△', '✕'] | readonly ['〇', '△']) =>
-  (min: number, max: number): string =>
+  return (min: number, max: number): string =>
     min === max
-      ? `${icon1}の個数+${icon2}の個数 = ${min}`
+      ? `${commonText} = ${min}`
       : min === 0
       ? max === Num.POSITIVE_INFINITY
-        ? `${icon1}の個数+${icon2}の個数 ≦ ∞` // dummy
-        : `${icon1}の個数+${icon2}の個数 ≦ ${max}`
+        ? `${commonText} ≦ ∞` // dummy
+        : `${commonText} ≦ ${max}`
       : max === Num.POSITIVE_INFINITY
-      ? `${min} ≦ ${icon1}の個数+${icon2}の個数`
-      : `${min} ≦ ${icon1}の個数+${icon2}の個数 ≦ ${max}`;
+      ? `${min} ≦ ${commonText}`
+      : `${min} ≦ ${commonText} ≦ ${max}`;
+};
+
+const genTagNameAdded = (
+  ...[icon1, icon2]: readonly ['△', '✕'] | readonly ['〇', '△']
+): ((min: number, max: number) => string) => {
+  const commonText = `${icon1}の個数+${icon2}の個数`;
+
+  return (min: number, max: number): string =>
+    min === max
+      ? `${commonText} = ${min}`
+      : min === 0
+      ? max === Num.POSITIVE_INFINITY
+        ? `${commonText} ≦ ∞` // dummy
+        : `${commonText} ≦ ${max}`
+      : max === Num.POSITIVE_INFINITY
+      ? `${min} ≦ ${commonText}`
+      : `${min} ≦ ${commonText} ≦ ${max}`;
+};
 
 export const answerPageDictionary = {
   title: '日程調整 回答ページ',

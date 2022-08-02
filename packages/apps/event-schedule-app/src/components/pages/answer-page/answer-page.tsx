@@ -410,20 +410,6 @@ const TagInputWrapper = styled.div`
   align-items: center;
 `;
 
-// const DetailedFilterSettingsSwitchWrapper = styled.div`
-//   display: flex;
-// `;
-
-// const DetailedFilterSettingsButton = styled.span`
-//   cursor: pointer;
-//   text-decoration: underline;
-//   font-size: smaller;
-//   color: ${descriptionFontColor.normal};
-//   &:hover {
-//     color: black;
-//   }
-// `;
-
 const TableWrapper = styled.div`
   margin: 5px;
   overflow-x: scroll;
