@@ -15,4 +15,5 @@ export * from './record-path';
 export * from './seq';
 export * from './to-number';
 export * from './tuple';
+export * from './uint-range';
 export * from './utils';
