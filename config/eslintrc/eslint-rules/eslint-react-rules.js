@@ -37,7 +37,10 @@ const eslintReactRules = {
   'react/forbid-elements': 'error',
   'react/forbid-foreign-prop-types': 'error',
   'react/forbid-prop-types': 'error',
-  'react/function-component-definition': 'error', // modified
+  'react/function-component-definition': [
+    'error',
+    { unnamedComponents: 'arrow-function', namedComponents: 'arrow-function' },
+  ], // modified
   'react/hook-use-state': 'off', // disabled
   'react/iframe-missing-sandbox': 'error',
   'react/jsx-boolean-value': 'off', // disabled
