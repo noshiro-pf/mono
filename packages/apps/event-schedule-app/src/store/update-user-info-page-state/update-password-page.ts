@@ -213,8 +213,8 @@ export namespace UpdatePasswordPageStore {
     mut_subscribedValues.enterButtonDisabled = v;
   });
 
-  fireAuthUser$.subscribe((v) => {
-    mut_subscribedValues.fireAuthUser = v;
+  fireAuthUser$.subscribe((u) => {
+    mut_subscribedValues.fireAuthUser = u;
   });
 
   UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {

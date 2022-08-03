@@ -126,14 +126,14 @@ export namespace UpdateDisplayNamePageStore {
 
   UpdateUserInfoDialogStore.openingDialog$
     .chain(withLatestFromI(fireAuthUser$))
-    .subscribe(([openingDialog, user]) => {
+    .subscribe(([openingDialog, fireAuthUser]) => {
       if (openingDialog === undefined) {
         resetAllDialogState();
       }
       if (openingDialog === 'updateDisplayName') {
         dispatch({
           type: 'inputDisplayName',
-          payload: user?.displayName ?? '',
+          payload: fireAuthUser?.displayName ?? '',
         });
       }
     });

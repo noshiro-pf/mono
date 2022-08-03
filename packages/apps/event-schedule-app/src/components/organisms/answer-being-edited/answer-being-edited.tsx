@@ -69,7 +69,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
     );
     const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
 
-    const user = useFireAuthUser();
+    const fireAuthUser = useFireAuthUser();
 
     return (
       <>
@@ -257,7 +257,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             <Description key={i} text={d} />
           ))}
         </Paragraph>
-        {user === undefined ? undefined : (
+        {fireAuthUser === undefined ? undefined : (
           <Paragraph>
             <ParagraphWithSwitch
               description={

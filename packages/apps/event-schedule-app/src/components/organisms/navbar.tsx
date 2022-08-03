@@ -26,7 +26,7 @@ const popoverModifiers = {
 } as const;
 
 export const NavBar = memoNamed('NavBar', () => {
-  const user = useFireAuthUser();
+  const fireAuthUser = useFireAuthUser();
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
@@ -69,7 +69,7 @@ export const NavBar = memoNamed('NavBar', () => {
       </Row>
       <Row2>
         <UserAccount>
-          {user === undefined ? (
+          {fireAuthUser === undefined ? (
             <>
               <ItemAnchor href={routes.signInPage} onClick={handleSignInClick}>
                 {dc.auth.signIn}
@@ -136,7 +136,7 @@ export const NavBar = memoNamed('NavBar', () => {
                   position={'bottom-left'}
                   transitionDuration={50}
                 >
-                  <Anchor>{user.displayName}</Anchor>
+                  <Anchor>{fireAuthUser.displayName}</Anchor>
                 </Popover2>
                 <span>{dc.auth.userName.suffix}</span>
               </Item>
@@ -145,11 +145,11 @@ export const NavBar = memoNamed('NavBar', () => {
                 dialogIsOpen={openingDialog === 'updateDisplayName'}
               />
               <UpdateEmailDialog
-                currentEmail={user.email}
+                currentEmail={fireAuthUser.email}
                 dialogIsOpen={openingDialog === 'updateEmail'}
               />
               <UpdatePasswordDialog
-                currentEmail={user.email}
+                currentEmail={fireAuthUser.email}
                 dialogIsOpen={openingDialog === 'updatePassword'}
               />
               <DeleteAccountDialog

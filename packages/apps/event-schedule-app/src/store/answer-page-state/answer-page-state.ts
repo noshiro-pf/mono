@@ -61,7 +61,7 @@ export namespace AnswerPageStore {
 
     // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
     if (nextState === 'creating') {
-      const user = mut_subscribedValues.user;
+      const user = mut_subscribedValues.fireAuthUser;
 
       updateAnswerBeingEdited((ans) =>
         IRecord.set(ans, 'user', IRecord.set(ans.user, 'id', user?.uid ?? null))
@@ -307,10 +307,10 @@ export namespace AnswerPageStore {
   /* @internal */
   const onSubmitEmptyAnswerImpl = async (
     eventId: string | undefined,
-    user: FireAuthUser | undefined
+    fireAuthUser: FireAuthUser | undefined
   ): Promise<void> => {
     if (eventId === undefined) return;
-    if (user === undefined) return;
+    if (fireAuthUser === undefined) return;
 
     setSubmitButtonIsLoading(true);
 
@@ -321,8 +321,8 @@ export namespace AnswerPageStore {
           .chain((a) => IRecord.set(a, 'createdAt', IDate.now()))
           .chain((a) =>
             IRecord.set(a, 'user', {
-              id: user.uid,
-              name: user.displayName ?? '',
+              id: fireAuthUser.uid,
+              name: fireAuthUser.displayName ?? '',
             })
           ).value
       )
@@ -427,7 +427,7 @@ export namespace AnswerPageStore {
     eventId: string | undefined;
     answerBeingEdited: Answer;
     answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden';
-    user: FireAuthUser | undefined;
+    fireAuthUser: FireAuthUser | undefined;
     answerSelectionMap: IMapMapped<
       DatetimeRange,
       AnswerSelectionValue,
@@ -437,7 +437,7 @@ export namespace AnswerPageStore {
     eventId: undefined,
     answerBeingEdited: answerDefaultValue,
     answerBeingEditedSectionState: 'hidden',
-    user: undefined,
+    fireAuthUser: undefined,
     answerSelectionMap: answerSelectionMapDefaultValue,
   };
 
@@ -454,7 +454,7 @@ export namespace AnswerPageStore {
   });
 
   fireAuthUser$.subscribe((u) => {
-    mut_subscribedValues.user = u;
+    mut_subscribedValues.fireAuthUser = u;
   });
 
   answerSelectionMap$.subscribe((u) => {
@@ -464,11 +464,11 @@ export namespace AnswerPageStore {
   /* callbacks using subscribed values */
 
   export const onAnswerClick = (answer: Answer): void => {
-    onAnswerClickImpl(answer, mut_subscribedValues.user);
+    onAnswerClickImpl(answer, mut_subscribedValues.fireAuthUser);
   };
 
   export const onAddAnswerButtonClick = (): void => {
-    onAddAnswerButtonClickImpl(mut_subscribedValues.user);
+    onAddAnswerButtonClickImpl(mut_subscribedValues.fireAuthUser);
   };
 
   export const onEditButtonClick = (): void => {
@@ -486,7 +486,7 @@ export namespace AnswerPageStore {
   export const onSubmitEmptyAnswerClick = (): void => {
     onSubmitEmptyAnswerImpl(
       mut_subscribedValues.eventId,
-      mut_subscribedValues.user
+      mut_subscribedValues.fireAuthUser
     ).catch(noop);
   };
 
@@ -506,7 +506,7 @@ export namespace AnswerPageStore {
   };
 
   export const toggleProtectedSection = (): void => {
-    toggleProtectedSectionImpl(mut_subscribedValues.user);
+    toggleProtectedSectionImpl(mut_subscribedValues.fireAuthUser);
   };
 
   /* combined values */
