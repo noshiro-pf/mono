@@ -25,7 +25,7 @@ export const IconCountNumericInput = memoNamed<Props>(
       setValueStr(valueFromProps.toString());
     }, [valueFromProps, setValueStr]);
 
-    const sanitizeValue = useCallback(
+    const normalizeValue = useCallback(
       (value: number): number => clampAndRoundNumIcons(value, max),
       [max]
     );
@@ -34,13 +34,13 @@ export const IconCountNumericInput = memoNamed<Props>(
       (nextValue: number | undefined) => {
         if (disabled) return;
 
-        const valueSanitized =
-          nextValue === undefined ? defaultValue : sanitizeValue(nextValue);
+        const valueNormalized =
+          nextValue === undefined ? defaultValue : normalizeValue(nextValue);
 
-        setValueStr(valueSanitized.toString());
-        onCountChange(valueSanitized);
+        setValueStr(valueNormalized.toString());
+        onCountChange(valueNormalized);
       },
-      [disabled, sanitizeValue, setValueStr, onCountChange]
+      [disabled, normalizeValue, setValueStr, onCountChange]
     );
 
     const onInputBlur = useCallback(() => {

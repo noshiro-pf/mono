@@ -29,7 +29,7 @@ export const ScoreNumericInput = memoNamed<Props>(
 
     const inputProps = useMemo(() => ({ min, max, step }), [min, max]);
 
-    const sanitizeValue = useCallback(
+    const normalizeValue = useCallback(
       (value: number) => clampAndRoundAnswersScore(Num.clamp(min, max)(value)),
       [min, max]
     );
@@ -48,13 +48,13 @@ export const ScoreNumericInput = memoNamed<Props>(
       (nextValue: number | undefined) => {
         if (disabled) return;
 
-        const valueSanitized =
-          nextValue === undefined ? defaultValue : sanitizeValue(nextValue);
+        const valueNormalized =
+          nextValue === undefined ? defaultValue : normalizeValue(nextValue);
 
-        setValueStr(valueSanitized.toString());
-        onValueChange(valueSanitized);
+        setValueStr(valueNormalized.toString());
+        onValueChange(valueNormalized);
       },
-      [disabled, sanitizeValue, setValueStr, onValueChange]
+      [disabled, normalizeValue, setValueStr, onValueChange]
     );
 
     const onInputBlur = useCallback(() => {

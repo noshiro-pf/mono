@@ -17,7 +17,7 @@ const {
 
 const inputProps = { min, max, step };
 
-const sanitizeValue = clampAndRoundAnswerFairIconPoint;
+const normalizeValue = clampAndRoundAnswerFairIconPoint;
 
 export const AnswerIconFairPointInput = memoNamed<Props>(
   'AnswerIconFairPointInput',
@@ -38,11 +38,11 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
       (nextValue: number | undefined) => {
         if (disabled) return;
 
-        const valueSanitized =
-          nextValue === undefined ? defaultValue : sanitizeValue(nextValue);
+        const valueNormalized =
+          nextValue === undefined ? defaultValue : normalizeValue(nextValue);
 
-        setValueStr(valueSanitized.toString());
-        onValueChange(valueSanitized);
+        setValueStr(valueNormalized.toString());
+        onValueChange(valueNormalized);
       },
       [disabled, onValueChange, setValueStr]
     );

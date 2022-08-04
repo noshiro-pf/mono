@@ -14,7 +14,7 @@ const { step, defaultValue, min, max } = weightNumericInputConfig;
 
 const inputProps = { min, max, step };
 
-const sanitizeValue = clampAndRoundAnswerWeight;
+const normalizeValue = clampAndRoundAnswerWeight;
 
 export const WeightNumericInput = memoNamed<Props>(
   'WeightNumericInput',
@@ -39,11 +39,11 @@ export const WeightNumericInput = memoNamed<Props>(
       (nextValue: number | undefined) => {
         if (disabled) return;
 
-        const valueSanitized =
-          nextValue === undefined ? defaultValue : sanitizeValue(nextValue);
+        const valueNormalized =
+          nextValue === undefined ? defaultValue : normalizeValue(nextValue);
 
-        setValueStr(valueSanitized.toString());
-        onValueChange(valueSanitized);
+        setValueStr(valueNormalized.toString());
+        onValueChange(valueNormalized);
       },
       [disabled, setValueStr, onValueChange]
     );
