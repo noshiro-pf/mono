@@ -475,6 +475,13 @@ export namespace AnswerPageStore {
     onEditButtonClickImpl(mut_subscribedValues.eventId);
   };
 
+  export const onSubmitAnswerClickPromise = (): Promise<void> =>
+    onSubmitAnswerImpl(
+      mut_subscribedValues.eventId,
+      mut_subscribedValues.answerBeingEdited,
+      mut_subscribedValues.answerBeingEditedSectionState
+    );
+
   export const onSubmitAnswerClick = (): void => {
     onSubmitAnswerImpl(
       mut_subscribedValues.eventId,
@@ -483,12 +490,11 @@ export namespace AnswerPageStore {
     ).catch(noop);
   };
 
-  export const onSubmitEmptyAnswerClick = (): void => {
+  export const onSubmitEmptyAnswerClick = (): Promise<void> =>
     onSubmitEmptyAnswerImpl(
       mut_subscribedValues.eventId,
       mut_subscribedValues.fireAuthUser
-    ).catch(noop);
-  };
+    );
 
   export const onDeleteAnswerClick = (): Promise<void> =>
     onDeleteAnswerImpl(

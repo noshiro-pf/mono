@@ -42,6 +42,12 @@ export const ButtonWithConfirm = memoNamed<Props>(
       setFalse: handleClose,
     } = useBoolState(false);
 
+    const {
+      state: loadingLocal,
+      setTrue: setTrueLoadingLocal,
+      setFalse: setFalseLoadingLocal,
+    } = useBoolState(false);
+
     const alive = useAlive();
     const onConfirm = useCallback(() => {
       if (!alive.current) return;
@@ -58,14 +64,23 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
       const p = onConfirmClick();
       if (p instanceof Promise) {
+        setTrueLoadingLocal();
         p.then(() => {
           if (!alive.current) return;
           afterConfirm();
+          setFalseLoadingLocal();
         }).catch(console.error);
       } else {
         afterConfirm();
       }
-    }, [onConfirmClick, handleClose, toastConfig, alive]);
+    }, [
+      onConfirmClick,
+      handleClose,
+      toastConfig,
+      alive,
+      setTrueLoadingLocal,
+      setFalseLoadingLocal,
+    ]);
 
     return (
       <>
@@ -75,7 +90,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
           disabled={disabled}
           icon={buttonConfig.icon}
           intent={buttonConfig.intent ?? 'none'}
-          loading={loading}
+          loading={loading ?? loadingLocal}
           minimal={buttonConfig.minimal}
           text={buttonConfig.name}
           onClick={handleOpen}
@@ -87,6 +102,7 @@ export const ButtonWithConfirm = memoNamed<Props>(
           icon={dialogConfig.icon}
           intent={dialogConfig.intent ?? 'none'}
           isOpen={isOpen}
+          loading={loading ?? loadingLocal}
           message={dialogConfig.message}
           onCancel={handleClose}
           onConfirm={onConfirm}

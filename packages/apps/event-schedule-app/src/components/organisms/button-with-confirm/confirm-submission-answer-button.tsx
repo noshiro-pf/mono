@@ -58,7 +58,7 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
         })}
         disabled={disabled}
         loading={loading}
-        onConfirmClick={AnswerPageStore.onSubmitAnswerClick}
+        onConfirmClick={AnswerPageStore.onSubmitAnswerClickPromise}
       />
     ) : (
       <SubmitAnswerButton disabled={disabled} loading={loading} mode={mode} />
