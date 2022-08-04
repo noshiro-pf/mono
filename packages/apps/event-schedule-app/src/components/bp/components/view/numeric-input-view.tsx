@@ -40,8 +40,10 @@ type Props = Partial<
     onInputChange: ChangeEventHandler<HTMLInputElement>;
 
     fillSpace: boolean;
-    onDecrementClick: () => void;
     onIncrementClick: () => void;
+    onIncrementMouseDown: () => void;
+    onDecrementClick: () => void;
+    onDecrementMouseDown: () => void;
     selectOnFocus: boolean;
   }>
 >;
@@ -59,8 +61,10 @@ export const NumericInputView = memoNamed<Props>(
     onInputChange,
 
     fillSpace,
-    onDecrementClick,
     onIncrementClick,
+    onIncrementMouseDown,
+    onDecrementClick,
+    onDecrementMouseDown,
     selectOnFocus,
   }) => {
     const inputValueChangeHandler: ChangeEventHandler<HTMLInputElement> =
@@ -105,6 +109,7 @@ export const NumericInputView = memoNamed<Props>(
             aria-label='increment'
             disabled={disabled}
             onClick={onIncrementClick}
+            onMouseDown={onIncrementMouseDown}
           >
             <IconWrapper aria-hidden='true'>
               <ChevronUpDownIcon
@@ -124,6 +129,7 @@ export const NumericInputView = memoNamed<Props>(
             aria-label='decrement'
             disabled={disabled}
             onClick={onDecrementClick}
+            onMouseDown={onDecrementMouseDown}
           >
             <IconWrapper aria-hidden='true'>
               <ChevronUpDownIcon

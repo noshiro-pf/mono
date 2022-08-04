@@ -1,2 +1,2 @@
-export const numericInputContinuousChangeDelay = 300;
-export const numericInputContinuousChangeInterval = 100;
+export const numericInputContinuousChangeDelay = 400;
+export const numericInputContinuousChangeInterval = 40;
