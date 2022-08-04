@@ -11,6 +11,7 @@ import {
   usePasswordProviderIncluded,
 } from '../../store';
 import { NoWrapSpan } from '../atoms';
+import { ForNonLoggedInUserDialog } from './button-with-confirm';
 import {
   DeleteAccountCreatedWithGoogleDialog,
   DeleteAccountDialog,
@@ -52,6 +53,8 @@ export const NavBar = memoNamed('NavBar', () => {
 
   const passwordProviderIncluded = usePasswordProviderIncluded();
 
+  const forNonLoggedInUserDialogState = useBoolState(false);
+
   return (
     <Wrapper>
       <Row>
@@ -71,6 +74,14 @@ export const NavBar = memoNamed('NavBar', () => {
         <UserAccount>
           {fireAuthUser === undefined ? (
             <>
+              <ItemAnchor onClick={forNonLoggedInUserDialogState.setTrue}>
+                {dc.list}
+              </ItemAnchor>
+              <ForNonLoggedInUserDialog
+                cancel={forNonLoggedInUserDialogState.setFalse}
+                isOpen={forNonLoggedInUserDialogState.state}
+              />
+
               <ItemAnchor href={routes.signInPage} onClick={handleSignInClick}>
                 {dc.auth.signIn}
               </ItemAnchor>

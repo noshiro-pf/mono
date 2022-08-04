@@ -21,6 +21,7 @@ import {
 import { DatetimeRangeCell } from '../answer-table';
 import {
   DeleteAnswerButton,
+  ForNonLoggedInUserDialog,
   SubmitAnswerButtonWithConfirmation,
 } from '../button-with-confirm';
 import { ParagraphWithSwitch } from '../paragraph-with-switch';
@@ -70,6 +71,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
     const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
 
     const fireAuthUser = useFireAuthUser();
+
+    const forNonLoggedInUserDialogState = useBoolState(false);
 
     return (
       <>
@@ -257,8 +260,24 @@ export const AnswerBeingEdited = memoNamed<Props>(
             <Description key={i} text={d} />
           ))}
         </Paragraph>
-        {fireAuthUser === undefined ? undefined : (
-          <Paragraph>
+
+        <Paragraph>
+          {fireAuthUser === undefined ? (
+            <>
+              <ParagraphWithSwitch
+                description={dc.protected.description.disabled}
+                elementToToggle={undefined}
+                hideContentIfToggleIsFalse={false}
+                title={dc.protected.title}
+                toggleState={false}
+                onToggle={forNonLoggedInUserDialogState.setTrue}
+              />
+              <ForNonLoggedInUserDialog
+                cancel={forNonLoggedInUserDialogState.setFalse}
+                isOpen={forNonLoggedInUserDialogState.state}
+              />
+            </>
+          ) : (
             <ParagraphWithSwitch
               description={
                 dc.protected.description[
@@ -271,8 +290,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
               toggleState={answerBeingEdited.user.id !== null}
               onToggle={AnswerPageStore.toggleProtectedSection}
             />
-          </Paragraph>
-        )}
+          )}
+        </Paragraph>
 
         <ButtonsWrapperAlignEnd data-cy={'buttons'}>
           <ButtonNowrapStyled

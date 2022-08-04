@@ -5,6 +5,7 @@ import { createEventResultDialogDictionary } from './create-event-result-dialog'
 import { errorMessagesDictionary } from './error-messages';
 import { eventListPageDictionary } from './event-list-page';
 import { eventSettingsPageDictionary } from './event-settings-page';
+import { forNonLoggedInUserDictionary } from './for-non-logged-in-user-dialog';
 import { headerDictionary } from './header';
 import { iconDescriptionDefaultDictionary } from './icon-description-default';
 import { signInAndRegisterPageDictionary } from './register-page';
@@ -26,4 +27,5 @@ export const dict = {
   common: commonDictionary,
   register: signInAndRegisterPageDictionary,
   accountSettings: accountSettingsDictionary,
+  forNonLoggedInUser: forNonLoggedInUserDictionary,
 } as const;

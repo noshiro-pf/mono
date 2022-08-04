@@ -133,11 +133,14 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
   const fireAuthUser = useFireAuthUser();
 
+  // ログイン済み且つ回答済みの場合のみ非表示、それ以外の場合は表示
   const showAnswerLaterButton = useMemo<boolean>(
     () =>
-      (fireAuthUser?.uid !== undefined &&
-        answers?.every((ans) => ans.user.id !== fireAuthUser.uid)) ??
-      false,
+      !(
+        fireAuthUser?.uid !== undefined &&
+        answers !== undefined &&
+        answers.some((ans) => ans.user.id === fireAuthUser.uid)
+      ),
     [fireAuthUser, answers]
   );
 
@@ -180,8 +183,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
           <AnswerLaterWrapper>
             {showAnswerLaterButton ? (
               <AnswerLaterButtonWithConfirmation
-                disabled={false}
-                loading={false}
+                loading={submitButtonIsLoading}
+                loggedIn={fireAuthUser?.uid !== undefined}
               />
             ) : undefined}
           </AnswerLaterWrapper>
