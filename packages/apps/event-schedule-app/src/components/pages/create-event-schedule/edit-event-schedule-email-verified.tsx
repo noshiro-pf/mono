@@ -78,7 +78,6 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
               }
               loading={editButtonIsLoading}
               showConfirmationDialog={hasDeletedDatetimeChanges}
-              onConfirmClick={EditEventScheduleStore.onEditEventClick}
             />
           </div>
         </ButtonsWrapperForEventSettingsPage>

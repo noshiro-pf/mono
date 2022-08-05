@@ -2,31 +2,39 @@ import { commonDictionary } from './common';
 import { ymd2str } from './datetime';
 import { detailedFilterDictionary } from './detailed-filter-dialog';
 
-const genTagName =
-  (icon: '△' | '✕' | '〇') =>
-  (min: number, max: number): string =>
-    min === max
-      ? `${icon}の個数 = ${min}`
-      : min === 0
-      ? max === Num.POSITIVE_INFINITY
-        ? `${icon}の個数 ≦ ∞` // dummy
-        : `${icon}の個数 ≦ ${max}`
-      : max === Num.POSITIVE_INFINITY
-      ? `${min} ≦ ${icon}の個数`
-      : `${min} ≦ ${icon}の個数 ≦ ${max}`;
+const genTagName = (
+  icon: '△' | '✕' | '〇'
+): ((min: number, max: number) => string) => {
+  const commonText = `${icon}の個数`;
 
-const genTagNameAdded =
-  (...[icon1, icon2]: readonly ['△', '✕'] | readonly ['〇', '△']) =>
-  (min: number, max: number): string =>
+  return (min: number, max: number): string =>
     min === max
-      ? `${icon1}の個数+${icon2}の個数 = ${min}`
+      ? `${commonText} = ${min}`
       : min === 0
       ? max === Num.POSITIVE_INFINITY
-        ? `${icon1}の個数+${icon2}の個数 ≦ ∞` // dummy
-        : `${icon1}の個数+${icon2}の個数 ≦ ${max}`
+        ? `${commonText} ≦ ∞` // dummy
+        : `${commonText} ≦ ${max}`
       : max === Num.POSITIVE_INFINITY
-      ? `${min} ≦ ${icon1}の個数+${icon2}の個数`
-      : `${min} ≦ ${icon1}の個数+${icon2}の個数 ≦ ${max}`;
+      ? `${min} ≦ ${commonText}`
+      : `${min} ≦ ${commonText} ≦ ${max}`;
+};
+
+const genTagNameAdded = (
+  ...[icon1, icon2]: readonly ['△', '✕'] | readonly ['〇', '△']
+): ((min: number, max: number) => string) => {
+  const commonText = `${icon1}の個数+${icon2}の個数`;
+
+  return (min: number, max: number): string =>
+    min === max
+      ? `${commonText} = ${min}`
+      : min === 0
+      ? max === Num.POSITIVE_INFINITY
+        ? `${commonText} ≦ ∞` // dummy
+        : `${commonText} ≦ ${max}`
+      : max === Num.POSITIVE_INFINITY
+      ? `${min} ≦ ${commonText}`
+      : `${min} ≦ ${commonText} ≦ ${max}`;
+};
 
 export const answerPageDictionary = {
   title: '日程調整 回答ページ',
@@ -35,7 +43,8 @@ export const answerPageDictionary = {
     confirmButton: '仮登録する',
     message: '全日程が空欄の状態で回答を仮登録します。',
     description: [
-      '仮登録してこの日程調整をアカウントと紐づけることで、日程調整一覧に表示されるようになります。',
+      '仮登録することで幹事にとりあえず参加意思があることを伝えることができます。',
+      'また、仮登録によりこの日程調整とアカウントが紐づくことで、日程調整一覧に表示されるようになります。',
       '後で回答するのを忘れないようにしてください。',
     ].join(''),
     result: {
@@ -192,13 +201,14 @@ export const answerPageDictionary = {
       title: 'この回答を保護する',
       description: {
         enabled: [
-          '回答を他のユーザーが編集・削除できないように保護します。',
+          'この回答は他のユーザーが編集・削除できないように保護されます。',
           'この回答はログインしていない状態では編集できなくなります。',
+          'また、日程調整とアカウントと紐づけられ、日程調整一覧に表示されるようにもなります。',
         ],
         disabled: [
-          '回答を誰でも編集・削除できるようにします。',
-          'この回答はアカウントとの紐づけがされず、ログインしていない状態で作成したときと同じように扱われます。',
-          'このため、回答一覧にも表示されなくなります。',
+          'この回答は誰でも編集・削除できるようになります（保護されません）。',
+          'この回答はログインしていない状態でも編集できるようになります。',
+          'この回答はアカウントとの紐づけがされず、日程調整一覧にも表示されなくなります。',
         ],
       },
     },

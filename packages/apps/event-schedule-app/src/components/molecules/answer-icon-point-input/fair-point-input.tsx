@@ -1,8 +1,9 @@
+// eslint-disable-next-line import/no-deprecated
 import {
   answerIconPointConfig,
   clampAndRoundAnswerFairIconPoint,
 } from '../../../constants';
-import { NumericInputView } from '../../bp';
+import { NumericInputView, useNumericInputState } from '../../bp';
 
 type Props = Readonly<{
   value: AnswerIconPoint;
@@ -15,53 +16,33 @@ const {
   fair: { defaultValue, max, min },
 } = answerIconPointConfig;
 
-const inputProps = { min, max, step };
-
-const sanitizeValue = clampAndRoundAnswerFairIconPoint;
-
 export const AnswerIconFairPointInput = memoNamed<Props>(
   'AnswerIconFairPointInput',
   ({ value: valueFromProps, onValueChange, disabled }) => {
-    const { state: valueStr, setState: setValueStr } = useState<string>('');
+    const {
+      valueAsStr,
+      setValueStr,
+      onDecrementMouseDown,
+      onIncrementMouseDown,
+      onInputBlur,
+      onKeyDown,
+    } = useNumericInputState({
+      onValueChange,
+      defaultValue,
+      normalizeValue: clampAndRoundAnswerFairIconPoint,
+      valueFromProps,
+      step,
+    });
 
-    const valueParsed = useMemo<number | undefined>(() => {
-      const res = Num.parseFloat(valueStr);
-      if (res === undefined || Num.isNaN(res)) return undefined;
-      return res;
-    }, [valueStr]);
-
-    useEffect(() => {
-      setValueStr(valueFromProps.toString());
-    }, [valueFromProps, setValueStr]);
-
-    const valueChangeHandler = useCallback(
-      (nextValue: number | undefined) => {
-        if (disabled) return;
-
-        const valueSanitized =
-          nextValue === undefined ? defaultValue : sanitizeValue(nextValue);
-
-        setValueStr(valueSanitized.toString());
-        onValueChange(valueSanitized);
-      },
-      [disabled, onValueChange, setValueStr]
+    const inputProps = useMemo(
+      () => ({
+        min,
+        max,
+        step,
+        onKeyDown,
+      }),
+      [onKeyDown]
     );
-
-    const onInputBlur = useCallback(() => {
-      valueChangeHandler(valueParsed);
-    }, [valueParsed, valueChangeHandler]);
-
-    const onIncrementClick = useCallback(() => {
-      valueChangeHandler(
-        pipe(valueParsed).chainNullable((x) => x + step).value
-      );
-    }, [valueParsed, valueChangeHandler]);
-
-    const onDecrementClick = useCallback(() => {
-      valueChangeHandler(
-        pipe(valueParsed).chainNullable((x) => x - step).value
-      );
-    }, [valueParsed, valueChangeHandler]);
 
     return (
       <NumericInputView
@@ -69,9 +50,9 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
         fillSpace={true}
         inputProps={inputProps}
         selectOnFocus={true}
-        valueAsStr={valueStr}
-        onDecrementClick={onDecrementClick}
-        onIncrementClick={onIncrementClick}
+        valueAsStr={valueAsStr}
+        onDecrementMouseDown={onDecrementMouseDown}
+        onIncrementMouseDown={onIncrementMouseDown}
         onInputBlur={onInputBlur}
         onInputStringChange={setValueStr}
       />

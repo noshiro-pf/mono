@@ -1,11 +1,13 @@
 import { AnswerPageStore } from '../../../store';
+import { ButtonNowrapStyled } from '../../bp';
 import { ButtonWithConfirm } from './button-with-confirm';
+import { ForNonLoggedInUserDialog } from './for-non-logged-in-user-button';
 
 const dc = dict.answerPage.answerLater;
 
 type Props = Readonly<{
   loading: boolean;
-  disabled: boolean;
+  loggedIn: boolean;
 }>;
 
 const buttonConfig = {
@@ -25,13 +27,33 @@ const dialogConfig = {
 
 export const AnswerLaterButtonWithConfirmation = memoNamed<Props>(
   'AnswerLaterButtonWithConfirmation',
-  ({ loading, disabled }) => (
-    <ButtonWithConfirm
-      buttonConfig={buttonConfig}
-      dialogConfig={dialogConfig}
-      disabled={disabled}
-      loading={loading}
-      onConfirmClick={AnswerPageStore.onSubmitEmptyAnswerClick}
-    />
-  )
+  ({ loading, loggedIn }) => {
+    const {
+      state: isOpen,
+      setTrue: openDialog,
+      setFalse: closeDialog,
+    } = useBoolState(false);
+
+    return loggedIn ? (
+      <ButtonWithConfirm
+        buttonConfig={buttonConfig}
+        dialogConfig={dialogConfig}
+        disabled={false}
+        loading={loading}
+        onConfirmClick={AnswerPageStore.onSubmitEmptyAnswerClick}
+      />
+    ) : (
+      <>
+        <ButtonNowrapStyled
+          data-cy={'button-with-confirmation'}
+          icon={buttonConfig.icon}
+          intent={buttonConfig.intent}
+          loading={loading}
+          text={buttonConfig.name}
+          onClick={openDialog}
+        />
+        <ForNonLoggedInUserDialog cancel={closeDialog} isOpen={isOpen} />
+      </>
+    );
+  }
 );

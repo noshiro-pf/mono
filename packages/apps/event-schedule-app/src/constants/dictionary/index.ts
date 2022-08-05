@@ -8,6 +8,7 @@ export * from './dictionary';
 export * from './error-messages';
 export * from './event-list-page';
 export * from './event-settings-page';
+export * from './for-non-logged-in-user-dialog';
 export * from './header';
 export * from './icon-description-default';
 export * from './register-page';

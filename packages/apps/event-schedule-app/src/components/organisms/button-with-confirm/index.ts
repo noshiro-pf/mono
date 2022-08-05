@@ -6,6 +6,7 @@ export * from './confirm-dialog';
 export * from './confirm-submission-answer-button';
 export * from './delete-all-button';
 export * from './delete-answer-button';
+export * from './for-non-logged-in-user-button';
 export * from './reset-button';
 export * from './reset-edit-button';
 export * from './submit-editing-event-button';

@@ -34,7 +34,7 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
       max: answersScoreNumericInputConfig.max,
     });
 
-    const sliderStateSanitized = useMemo(
+    const sliderStateNormalized = useMemo(
       () => ({
         min: clampAndRoundAnswersScore(sliderState.min),
         max: clampAndRoundAnswersScore(sliderState.max),
@@ -43,8 +43,8 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
     );
 
     const onRelease = useCallback(() => {
-      AnswerFilterAndSortStore.setScoreRange(sliderStateSanitized);
-    }, [sliderStateSanitized]);
+      AnswerFilterAndSortStore.setScoreRange(sliderStateNormalized);
+    }, [sliderStateNormalized]);
 
     const onMinChange = useCallback(
       (value: AnswersScore) => {
@@ -99,7 +99,7 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
               disabled={!enabled}
               max={answersScoreNumericInputConfig.max}
               min={answersScoreNumericInputConfig.min}
-              range={sliderStateSanitized}
+              range={sliderStateNormalized}
               stepSize={answersScoreNumericInputConfig.step}
               onChange={setSliderState}
               onRelease={onRelease}

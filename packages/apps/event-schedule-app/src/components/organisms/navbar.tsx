@@ -11,6 +11,7 @@ import {
   usePasswordProviderIncluded,
 } from '../../store';
 import { NoWrapSpan } from '../atoms';
+import { ForNonLoggedInUserDialog } from './button-with-confirm';
 import {
   DeleteAccountCreatedWithGoogleDialog,
   DeleteAccountDialog,
@@ -26,7 +27,7 @@ const popoverModifiers = {
 } as const;
 
 export const NavBar = memoNamed('NavBar', () => {
-  const user = useFireAuthUser();
+  const fireAuthUser = useFireAuthUser();
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
@@ -52,6 +53,8 @@ export const NavBar = memoNamed('NavBar', () => {
 
   const passwordProviderIncluded = usePasswordProviderIncluded();
 
+  const forNonLoggedInUserDialogState = useBoolState(false);
+
   return (
     <Wrapper>
       <Row>
@@ -69,8 +72,16 @@ export const NavBar = memoNamed('NavBar', () => {
       </Row>
       <Row2>
         <UserAccount>
-          {user === undefined ? (
+          {fireAuthUser === undefined ? (
             <>
+              <ItemAnchor onClick={forNonLoggedInUserDialogState.setTrue}>
+                {dc.list}
+              </ItemAnchor>
+              <ForNonLoggedInUserDialog
+                cancel={forNonLoggedInUserDialogState.setFalse}
+                isOpen={forNonLoggedInUserDialogState.state}
+              />
+
               <ItemAnchor href={routes.signInPage} onClick={handleSignInClick}>
                 {dc.auth.signIn}
               </ItemAnchor>
@@ -136,7 +147,7 @@ export const NavBar = memoNamed('NavBar', () => {
                   position={'bottom-left'}
                   transitionDuration={50}
                 >
-                  <Anchor>{user.displayName}</Anchor>
+                  <Anchor>{fireAuthUser.displayName}</Anchor>
                 </Popover2>
                 <span>{dc.auth.userName.suffix}</span>
               </Item>
@@ -145,11 +156,11 @@ export const NavBar = memoNamed('NavBar', () => {
                 dialogIsOpen={openingDialog === 'updateDisplayName'}
               />
               <UpdateEmailDialog
-                currentEmail={user.email}
+                currentEmail={fireAuthUser.email}
                 dialogIsOpen={openingDialog === 'updateEmail'}
               />
               <UpdatePasswordDialog
-                currentEmail={user.email}
+                currentEmail={fireAuthUser.email}
                 dialogIsOpen={openingDialog === 'updatePassword'}
               />
               <DeleteAccountDialog

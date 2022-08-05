@@ -1,4 +1,5 @@
 import { Button } from '@blueprintjs/core';
+import { EditEventScheduleStore } from '../../../store';
 import { ButtonWithConfirm } from './button-with-confirm';
 
 const dc = dict.eventSettingsPage;
@@ -7,7 +8,6 @@ type Props = Readonly<{
   loading: boolean;
   showConfirmationDialog: boolean;
   disabled: boolean;
-  onConfirmClick: () => void;
 }>;
 
 const buttonConfig = {
@@ -30,7 +30,7 @@ const toastConfig = {
 
 export const SubmitEditingEventButton = memoNamed<Props>(
   'SubmitEditingEventButton',
-  ({ showConfirmationDialog, loading, disabled, onConfirmClick }) =>
+  ({ showConfirmationDialog, loading, disabled }) =>
     showConfirmationDialog ? (
       <ButtonWithConfirm
         buttonConfig={buttonConfig}
@@ -38,7 +38,7 @@ export const SubmitEditingEventButton = memoNamed<Props>(
         disabled={disabled}
         loading={loading}
         toastConfig={toastConfig}
-        onConfirmClick={onConfirmClick}
+        onConfirmClick={EditEventScheduleStore.onEditEventClickPromise}
       />
     ) : (
       <Button
@@ -46,7 +46,7 @@ export const SubmitEditingEventButton = memoNamed<Props>(
         intent={'primary'}
         loading={loading}
         text={dc.editEventButton.name}
-        onClick={onConfirmClick}
+        onClick={EditEventScheduleStore.onEditEventClick}
       />
     )
 );

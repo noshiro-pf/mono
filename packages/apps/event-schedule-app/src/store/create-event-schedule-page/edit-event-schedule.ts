@@ -174,9 +174,9 @@ export namespace EditEventScheduleStore {
     onBackToAnswerPage();
   };
 
+  export const onEditEventClickPromise = saveToDatabase;
   export const onEditEventClick = (): void => {
-    // TODO: use toast
-    saveToDatabase().catch(console.error);
+    saveToDatabase().catch(noop);
   };
 
   export const {

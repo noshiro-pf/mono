@@ -11,6 +11,7 @@ type Props = Readonly<{
   description?: string;
   icon: IconName | undefined;
   intent: Intent;
+  loading?: boolean;
 }>;
 
 export const ConfirmDialog = memoNamed<Props>(
@@ -25,6 +26,7 @@ export const ConfirmDialog = memoNamed<Props>(
     description,
     icon,
     intent,
+    loading,
   }) => (
     <AlertWithMaxWidth
       canEscapeKeyCancel={true}
@@ -34,6 +36,7 @@ export const ConfirmDialog = memoNamed<Props>(
       icon={icon}
       intent={intent}
       isOpen={isOpen}
+      loading={loading}
       onCancel={onCancel}
       onConfirm={onConfirm}
     >

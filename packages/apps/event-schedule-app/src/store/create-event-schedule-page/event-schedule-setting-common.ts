@@ -132,7 +132,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
           answerDeadline,
           answerIcons,
           notificationSettingsWithEmail,
-          user,
+          fireAuthUser,
         ]) =>
           normalizeEventSchedule({
             title,
@@ -152,8 +152,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             timezoneOffsetMinutes:
               eventScheduleDefaultValue.timezoneOffsetMinutes,
             author: {
-              id: user?.uid ?? null,
-              name: user?.displayName ?? '',
+              id: fireAuthUser?.uid ?? null,
+              name: fireAuthUser?.displayName ?? '',
             },
             archivedBy: [],
           })

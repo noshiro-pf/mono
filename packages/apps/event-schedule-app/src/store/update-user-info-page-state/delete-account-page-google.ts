@@ -22,7 +22,12 @@ export namespace DeleteAccountCreatedWithGoogleStore {
   const enterButtonDisabled$ = combineLatestI([
     formState$,
     fireAuthUser$,
-  ]).chain(mapI(([formState, user]) => formState.inputValue !== user?.email));
+  ]).chain(
+    mapI(
+      ([formState, fireAuthUser]) =>
+        formState.inputValue !== fireAuthUser?.email
+    )
+  );
 
   const {
     setFalse: setFalseIsWaitingResponse,
@@ -162,8 +167,8 @@ export namespace DeleteAccountCreatedWithGoogleStore {
     mut_subscribedValues.enterButtonDisabled = v;
   });
 
-  fireAuthUser$.subscribe((v) => {
-    mut_subscribedValues.fireAuthUser = v;
+  fireAuthUser$.subscribe((u) => {
+    mut_subscribedValues.fireAuthUser = u;
   });
 
   UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
