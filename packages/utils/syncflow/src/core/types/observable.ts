@@ -1,5 +1,4 @@
 import type { Maybe, Some } from '@noshiro/ts-utils';
-import { assertNotType, assertType } from '@noshiro/ts-utils';
 import type { ObservableId, Token } from './id';
 import type { ObservableKind } from './observable-kind';
 import type {
@@ -179,27 +178,3 @@ export type Wrap<A extends readonly unknown[]> = {
 export type WrapInitialized<A extends readonly unknown[]> = {
   readonly [P in keyof A]: InitializedObservable<A[P]>;
 };
-
-assertType<TypeExtends<number, ObservableValue<Observable<number>>>>();
-assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
-
-assertType<
-  TypeExtends<
-    readonly [number, string],
-    Unwrap<readonly [Observable<number>, Observable<string>]>
-  >
->();
-assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
-
-assertType<
-  TypeExtends<
-    readonly [Observable<number>, Observable<number>],
-    Wrap<readonly [number, number]>
-  >
->();
-assertNotType<
-  TypeExtends<
-    readonly [Observable<number>, Observable<string>],
-    Wrap<readonly [number, number]>
-  >
->();
