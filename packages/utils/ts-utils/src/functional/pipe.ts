@@ -21,7 +21,7 @@ class PipeClass<A> implements Pipe<A> {
 
   chainNullable<B>(fn: (a: NonNullable<A>) => B): PipeClass<B | undefined> {
     const v = this.#a;
-    return new PipeClass(v == null ? undefined : fn(v as NonNullable<A>));
+    return new PipeClass(v == null ? undefined : fn(v));
   }
 
   get value(): A {

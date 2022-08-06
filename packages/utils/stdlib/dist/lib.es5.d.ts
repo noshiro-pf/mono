@@ -351,10 +351,7 @@ declare const Function: FunctionConstructor;
 /**
  * Extracts the type of the 'this' parameter of a function type, or 'unknown' if the function type has no 'this' parameter.
  */
-type ThisParameterType<T> = T extends (
-  this: infer U,
-  ...args: readonly never[]
-) => unknown
+type ThisParameterType<T> = T extends (this: infer U, ...args: never) => unknown
   ? U
   : unknown;
 
@@ -1453,12 +1450,12 @@ interface ReadonlyArray<T> {
     initialValue: U
   ): U;
 
-  readonly [n: number]: T;
+  [n: number]: T;
 }
 
 interface ConcatArray<T> {
   readonly length: number;
-  readonly [n: number]: T;
+  [n: number]: T;
   join(separator?: string): string;
   slice(start?: number, end?: number): readonly T[];
 }
@@ -1838,7 +1835,7 @@ interface ArrayLike<T> {
  * Make all properties in T optional
  */
 type Partial<T> = {
-  readonly [P in keyof T]?: T[P];
+  [P in keyof T]?: T[P];
 };
 
 /**
@@ -1887,7 +1884,7 @@ type Omit<T, K extends keyof never> = Pick<T, Exclude<keyof T, K>>;
 /**
  * Exclude null and undefined from T
  */
-type NonNullable<T> = T extends null | undefined ? never : T;
+type NonNullable<T> = T & {};
 
 /**
  * Obtain the parameters of a function type in a tuple

@@ -15,6 +15,7 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 
+/// <reference path="./lib.es2018.intl.d.ts" />
 declare namespace Intl {
   /**
    * [Unicode BCP 47 Locale Identifiers](https://unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identifiers) definition.
@@ -45,6 +46,25 @@ declare namespace Intl {
     | 'minutes'
     | 'second'
     | 'seconds';
+
+  /**
+   * Value of the `unit` property in objects returned by
+   * `Intl.RelativeTimeFormat.prototype.formatToParts()`. `formatToParts` and
+   * `format` methods accept either singular or plural unit names as input,
+   * but `formatToParts` only outputs singular (e.g. "day") not plural (e.g.
+   * "days").
+   *
+   * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/formatToParts#Using_formatToParts).
+   */
+  type RelativeTimeFormatUnitSingular =
+    | 'year'
+    | 'quarter'
+    | 'month'
+    | 'week'
+    | 'day'
+    | 'hour'
+    | 'minute'
+    | 'second';
 
   /**
    * The locale matching algorithm to use.
@@ -120,11 +140,16 @@ declare namespace Intl {
    *
    * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/formatToParts#Using_formatToParts).
    */
-  interface RelativeTimeFormatPart {
-    readonly type: string;
-    readonly value: string;
-    readonly unit?: RelativeTimeFormatUnit;
-  }
+  type RelativeTimeFormatPart =
+    | {
+        readonly type: 'literal';
+        readonly value: string;
+      }
+    | {
+        readonly type: Exclude<NumberFormatPartTypes, 'literal'>;
+        readonly value: string;
+        readonly unit: RelativeTimeFormatUnitSingular;
+      };
 
   interface RelativeTimeFormat {
     /**

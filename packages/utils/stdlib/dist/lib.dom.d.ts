@@ -587,6 +587,10 @@ interface IDBObjectStoreParameters {
   readonly keyPath?: string | readonly string[] | null;
 }
 
+interface IDBTransactionOptions {
+  readonly durability?: IDBTransactionDurability;
+}
+
 interface IDBVersionChangeEventInit extends EventInit {
   readonly newVersion?: number | null;
   readonly oldVersion?: number;
@@ -716,19 +720,6 @@ interface LockOptions {
   readonly mode?: LockMode;
   readonly signal?: AbortSignal;
   readonly steal?: boolean;
-}
-
-interface MIDIConnectionEventInit extends EventInit {
-  readonly port?: MIDIPort;
-}
-
-interface MIDIMessageEventInit extends EventInit {
-  readonly data?: Uint8Array;
-}
-
-interface MIDIOptions {
-  readonly software?: boolean;
-  readonly sysex?: boolean;
 }
 
 interface MediaCapabilitiesDecodingInfo extends MediaCapabilitiesInfo {
@@ -1514,12 +1505,12 @@ interface RTCTransportStats extends RTCStats {
   readonly tlsVersion?: string;
 }
 
-interface ReadableStreamDefaultReadDoneResult {
+interface ReadableStreamReadDoneResult {
   readonly done: true;
   readonly value?: undefined;
 }
 
-interface ReadableStreamDefaultReadValueResult<T> {
+interface ReadableStreamReadValueResult<T> {
   readonly done: false;
   readonly value: T;
 }
@@ -1813,6 +1804,19 @@ interface UnderlyingSource<R = unknown> {
   readonly pull?: UnderlyingSourcePullCallback<R>;
   readonly start?: UnderlyingSourceStartCallback<R>;
   readonly type?: undefined;
+}
+
+interface ValidityStateFlags {
+  readonly badInput?: boolean;
+  readonly customError?: boolean;
+  readonly patternMismatch?: boolean;
+  readonly rangeOverflow?: boolean;
+  readonly rangeUnderflow?: boolean;
+  readonly stepMismatch?: boolean;
+  readonly tooLong?: boolean;
+  readonly tooShort?: boolean;
+  readonly typeMismatch?: boolean;
+  readonly valueMissing?: boolean;
 }
 
 interface VideoColorSpaceInit {
@@ -2301,6 +2305,7 @@ declare const AudioBufferSourceNode: {
 /** An audio-processing graph built from audio modules linked together, each represented by an AudioNode. */
 interface AudioContext extends BaseAudioContext {
   readonly baseLatency: number;
+  readonly outputLatency: number;
   close(): Promise<void>;
   createMediaElementSource(
     mediaElement: HTMLMediaElement
@@ -3148,7 +3153,6 @@ interface CSSStyleDeclaration {
   readonly columns: string;
   readonly contain: string;
   readonly content: string;
-  readonly contentVisibility: string;
   readonly counterIncrement: string;
   readonly counterReset: string;
   readonly counterSet: string;
@@ -3522,6 +3526,8 @@ interface CSSStyleDeclaration {
   /** @deprecated This is a legacy alias of `perspectiveOrigin`. */
   readonly webkitPerspectiveOrigin: string;
   readonly webkitTextFillColor: string;
+  /** @deprecated This is a legacy alias of `textSizeAdjust`. */
+  readonly webkitTextSizeAdjust: string;
   readonly webkitTextStroke: string;
   readonly webkitTextStrokeColor: string;
   readonly webkitTextStrokeWidth: string;
@@ -3589,6 +3595,8 @@ interface CSSStyleSheet extends StyleSheet {
   insertRule(rule: string, index?: number): number;
   /** @deprecated */
   removeRule(index?: number): void;
+  replace(text: string): Promise<CSSStyleSheet>;
+  replaceSync(text: string): void;
 }
 
 declare const CSSStyleSheet: {
@@ -4276,6 +4284,7 @@ declare const CustomEvent: {
 
 /** An abnormal event (called an exception) which occurs as a result of calling a method or accessing a property of a web API. */
 interface DOMException extends Error {
+  /** @deprecated */
   readonly code: number;
   readonly message: string;
   readonly name: string;
@@ -5120,8 +5129,6 @@ interface Document
   createEvent(eventInterface: 'IDBVersionChangeEvent'): IDBVersionChangeEvent;
   createEvent(eventInterface: 'InputEvent'): InputEvent;
   createEvent(eventInterface: 'KeyboardEvent'): KeyboardEvent;
-  createEvent(eventInterface: 'MIDIConnectionEvent'): MIDIConnectionEvent;
-  createEvent(eventInterface: 'MIDIMessageEvent'): MIDIMessageEvent;
   createEvent(eventInterface: 'MediaEncryptedEvent'): MediaEncryptedEvent;
   createEvent(eventInterface: 'MediaKeyMessageEvent'): MediaKeyMessageEvent;
   createEvent(eventInterface: 'MediaQueryListEvent'): MediaQueryListEvent;
@@ -5417,6 +5424,7 @@ interface DocumentOrShadowRoot {
    * Similarly, when the focused element is in a different node tree than documentOrShadowRoot, the element returned will be the host that's located in the same node tree as documentOrShadowRoot if documentOrShadowRoot is a shadow-including inclusive ancestor of the focused element, and null if not.
    */
   readonly activeElement: Element | null;
+  readonly adoptedStyleSheets: readonly CSSStyleSheet[];
   /** Returns document's fullscreen element. */
   readonly fullscreenElement: Element | null;
   readonly pictureInPictureElement: Element | null;
@@ -5710,8 +5718,16 @@ interface ElementInternals extends ARIAMixin {
   readonly labels: NodeList;
   /** Returns the ShadowRoot for internals's target element, if the target element is a shadow host, or null otherwise. */
   readonly shadowRoot: ShadowRoot | null;
+  /** Returns the error message that would be shown to the user if internals's target element was to be checked for validity. */
+  readonly validationMessage: string;
+  /** Returns the ValidityState object for internals's target element. */
+  readonly validity: ValidityState;
   /** Returns true if internals's target element will be validated when the form is submitted; false otherwise. */
   readonly willValidate: boolean;
+  /** Returns true if internals's target element has no validity problems; false otherwise. Fires an invalid event at the element in the latter case. */
+  checkValidity(): boolean;
+  /** Returns true if internals's target element has no validity problems; otherwise, returns false, fires an invalid event at the element, and (if the event isn't canceled) reports the problem to the user. */
+  reportValidity(): boolean;
   /**
    * Sets both the state and submission value of internals's target element to value.
    *
@@ -5720,6 +5736,12 @@ interface ElementInternals extends ARIAMixin {
   setFormValue(
     value: File | string | FormData | null,
     state?: File | string | FormData | null
+  ): void;
+  /** Marks internals's target element as suffering from the constraints indicated by the flags argument, and sets the element's validation message to message. If anchor is specified, the user agent might use it to indicate problems with the constraints of internals's target element when the form owner is validated interactively or reportValidity() is called. */
+  setValidity(
+    flags?: ValidityStateFlags,
+    message?: string,
+    anchor?: HTMLElement
   ): void;
 }
 
@@ -7201,9 +7223,7 @@ declare const HTMLBaseElement: {
 
 interface HTMLBodyElementEventMap
   extends HTMLElementEventMap,
-    WindowEventHandlersEventMap {
-  readonly orientationchange: Event;
-}
+    WindowEventHandlersEventMap {}
 
 /** Provides special properties (beyond those inherited from the regular HTMLElement interface) for manipulating <body> elements. */
 interface HTMLBodyElement extends HTMLElement, WindowEventHandlers {
@@ -7215,10 +7235,6 @@ interface HTMLBodyElement extends HTMLElement, WindowEventHandlers {
   readonly bgColor: string;
   /** @deprecated */
   readonly link: string;
-  /** @deprecated */
-  readonly onorientationchange:
-    | ((this: HTMLBodyElement, ev: Event) => unknown)
-    | null;
   /** @deprecated */
   readonly text: string;
   /** @deprecated */
@@ -7692,6 +7708,7 @@ interface HTMLElement
   readonly dir: string;
   readonly draggable: boolean;
   readonly hidden: boolean;
+  readonly inert: boolean;
   readonly innerText: string;
   readonly lang: string;
   readonly offsetHeight: number;
@@ -8585,6 +8602,7 @@ interface HTMLInputElement extends HTMLElement {
     end: number | null,
     direction?: 'forward' | 'backward' | 'none'
   ): void;
+  showPicker(): void;
   /**
    * Decrements a range input control's value by the value given by the Step attribute. If the optional parameter is used, it will decrement the input control's step value multiplied by the parameter's value.
    * @param n Value to decrement the value by.
@@ -8928,6 +8946,7 @@ interface HTMLMediaElement extends HTMLElement {
   readonly played: TimeRanges;
   /** Gets or sets a value indicating what data should be preloaded, if any. */
   readonly preload: 'none' | 'metadata' | 'auto' | '';
+  readonly preservesPitch: boolean;
   readonly readyState: number;
   readonly remote: RemotePlayback;
   /** Returns a TimeRanges object that represents the ranges of the current media resource that can be seeked. */
@@ -9495,16 +9514,25 @@ declare const HTMLParagraphElement: {
   new (): HTMLParagraphElement;
 };
 
-/** Provides special properties (beyond those of the regular HTMLElement object interface it inherits) for manipulating <param> elements, representing a pair of a key and a value that acts as a parameter for an <object> element. */
+/**
+ * Provides special properties (beyond those of the regular HTMLElement object interface it inherits) for manipulating <param> elements, representing a pair of a key and a value that acts as a parameter for an <object> element.
+ * @deprecated
+ */
 interface HTMLParamElement extends HTMLElement {
-  /** Sets or retrieves the name of an input parameter for an element. */
+  /**
+   * Sets or retrieves the name of an input parameter for an element.
+   * @deprecated
+   */
   readonly name: string;
   /**
    * Sets or retrieves the content type of the resource designated by the value attribute.
    * @deprecated
    */
   readonly type: string;
-  /** Sets or retrieves the value of an input parameter for an element. */
+  /**
+   * Sets or retrieves the value of an input parameter for an element.
+   * @deprecated
+   */
   readonly value: string;
   /**
    * Sets or retrieves the data type of the value attribute.
@@ -9533,6 +9561,7 @@ interface HTMLParamElement extends HTMLElement {
   ): void;
 }
 
+/** @deprecated */
 declare const HTMLParamElement: {
   readonly prototype: HTMLParamElement;
   new (): HTMLParamElement;
@@ -10934,7 +10963,8 @@ interface IDBDatabase extends EventTarget {
   /** Returns a new transaction with the given mode ("readonly" or "readwrite") and scope which can be a single object store name or an array of names. */
   transaction(
     storeNames: string | readonly string[],
-    mode?: IDBTransactionMode
+    mode?: IDBTransactionMode,
+    options?: IDBTransactionOptions
   ): IDBTransaction;
   addEventListener<K extends keyof IDBDatabaseEventMap>(
     type: K,
@@ -11661,199 +11691,6 @@ interface LockManager {
 declare const LockManager: {
   readonly prototype: LockManager;
   new (): LockManager;
-};
-
-interface MIDIAccessEventMap {
-  readonly statechange: Event;
-}
-
-/** Available only in secure contexts. */
-interface MIDIAccess extends EventTarget {
-  readonly inputs: MIDIInputMap;
-  readonly onstatechange: ((this: MIDIAccess, ev: Event) => unknown) | null;
-  readonly outputs: MIDIOutputMap;
-  readonly sysexEnabled: boolean;
-  addEventListener<K extends keyof MIDIAccessEventMap>(
-    type: K,
-    listener: (this: MIDIAccess, ev: MIDIAccessEventMap[K]) => unknown,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  removeEventListener<K extends keyof MIDIAccessEventMap>(
-    type: K,
-    listener: (this: MIDIAccess, ev: MIDIAccessEventMap[K]) => unknown,
-    options?: boolean | EventListenerOptions
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
-  ): void;
-}
-
-declare const MIDIAccess: {
-  readonly prototype: MIDIAccess;
-  new (): MIDIAccess;
-};
-
-/** Available only in secure contexts. */
-interface MIDIConnectionEvent extends Event {
-  readonly port: MIDIPort;
-}
-
-declare const MIDIConnectionEvent: {
-  readonly prototype: MIDIConnectionEvent;
-  new (
-    type: string,
-    eventInitDict?: MIDIConnectionEventInit
-  ): MIDIConnectionEvent;
-};
-
-interface MIDIInputEventMap extends MIDIPortEventMap {
-  readonly midimessage: Event;
-}
-
-/** Available only in secure contexts. */
-interface MIDIInput extends MIDIPort {
-  readonly onmidimessage: ((this: MIDIInput, ev: Event) => unknown) | null;
-  addEventListener<K extends keyof MIDIInputEventMap>(
-    type: K,
-    listener: (this: MIDIInput, ev: MIDIInputEventMap[K]) => unknown,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  removeEventListener<K extends keyof MIDIInputEventMap>(
-    type: K,
-    listener: (this: MIDIInput, ev: MIDIInputEventMap[K]) => unknown,
-    options?: boolean | EventListenerOptions
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
-  ): void;
-}
-
-declare const MIDIInput: {
-  readonly prototype: MIDIInput;
-  new (): MIDIInput;
-};
-
-/** Available only in secure contexts. */
-interface MIDIInputMap {
-  forEach(
-    callbackfn: (value: MIDIInput, key: string, parent: MIDIInputMap) => void,
-    thisArg?: unknown
-  ): void;
-}
-
-declare const MIDIInputMap: {
-  readonly prototype: MIDIInputMap;
-  new (): MIDIInputMap;
-};
-
-/** Available only in secure contexts. */
-interface MIDIMessageEvent extends Event {
-  readonly data: Uint8Array;
-}
-
-declare const MIDIMessageEvent: {
-  readonly prototype: MIDIMessageEvent;
-  new (type: string, eventInitDict?: MIDIMessageEventInit): MIDIMessageEvent;
-};
-
-/** Available only in secure contexts. */
-interface MIDIOutput extends MIDIPort {
-  send(data: readonly number[], timestamp?: DOMHighResTimeStamp): void;
-  addEventListener<K extends keyof MIDIPortEventMap>(
-    type: K,
-    listener: (this: MIDIOutput, ev: MIDIPortEventMap[K]) => unknown,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  removeEventListener<K extends keyof MIDIPortEventMap>(
-    type: K,
-    listener: (this: MIDIOutput, ev: MIDIPortEventMap[K]) => unknown,
-    options?: boolean | EventListenerOptions
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
-  ): void;
-}
-
-declare const MIDIOutput: {
-  readonly prototype: MIDIOutput;
-  new (): MIDIOutput;
-};
-
-/** Available only in secure contexts. */
-interface MIDIOutputMap {
-  forEach(
-    callbackfn: (value: MIDIOutput, key: string, parent: MIDIOutputMap) => void,
-    thisArg?: unknown
-  ): void;
-}
-
-declare const MIDIOutputMap: {
-  readonly prototype: MIDIOutputMap;
-  new (): MIDIOutputMap;
-};
-
-interface MIDIPortEventMap {
-  readonly statechange: Event;
-}
-
-/** Available only in secure contexts. */
-interface MIDIPort extends EventTarget {
-  readonly connection: MIDIPortConnectionState;
-  readonly id: string;
-  readonly manufacturer: string | null;
-  readonly name: string | null;
-  readonly onstatechange: ((this: MIDIPort, ev: Event) => unknown) | null;
-  readonly state: MIDIPortDeviceState;
-  readonly type: MIDIPortType;
-  readonly version: string | null;
-  close(): Promise<MIDIPort>;
-  open(): Promise<MIDIPort>;
-  addEventListener<K extends keyof MIDIPortEventMap>(
-    type: K,
-    listener: (this: MIDIPort, ev: MIDIPortEventMap[K]) => unknown,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  removeEventListener<K extends keyof MIDIPortEventMap>(
-    type: K,
-    listener: (this: MIDIPort, ev: MIDIPortEventMap[K]) => unknown,
-    options?: boolean | EventListenerOptions
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
-  ): void;
-}
-
-declare const MIDIPort: {
-  readonly prototype: MIDIPort;
-  new (): MIDIPort;
 };
 
 interface MathMLElementEventMap
@@ -12827,7 +12664,6 @@ interface Navigator
     NavigatorID,
     NavigatorLanguage,
     NavigatorLocks,
-    NavigatorNetworkInformation,
     NavigatorOnLine,
     NavigatorPlugins,
     NavigatorStorage {
@@ -12848,8 +12684,6 @@ interface Navigator
   /** Available only in secure contexts. */
   canShare(data?: ShareData): boolean;
   getGamepads(): readonly (Gamepad | null)[];
-  /** Available only in secure contexts. */
-  requestMIDIAccess(options?: MIDIOptions): Promise<MIDIAccess>;
   /** Available only in secure contexts. */
   requestMediaKeySystemAccess(
     keySystem: string,
@@ -12890,7 +12724,6 @@ interface NavigatorID {
   readonly appName: string;
   /** @deprecated */
   readonly appVersion: string;
-  /** @deprecated */
   readonly platform: string;
   /** @deprecated */
   readonly product: string;
@@ -12912,10 +12745,6 @@ interface NavigatorLocks {
   readonly locks: LockManager;
 }
 
-interface NavigatorNetworkInformation {
-  readonly connection: NetworkInformation;
-}
-
 interface NavigatorOnLine {
   readonly onLine: boolean;
 }
@@ -12934,15 +12763,6 @@ interface NavigatorPlugins {
 interface NavigatorStorage {
   readonly storage: StorageManager;
 }
-
-interface NetworkInformation extends EventTarget {
-  readonly type: ConnectionType;
-}
-
-declare const NetworkInformation: {
-  readonly prototype: NetworkInformation;
-  new (): NetworkInformation;
-};
 
 /** Node is an interface from which a number of DOM API object types inherit. It allows those types to be treated similarly; for example, inheriting the same set of methods, or being tested in the same way. */
 interface Node extends EventTarget {
@@ -14096,6 +13916,7 @@ declare const PushManager: {
  */
 interface PushSubscription {
   readonly endpoint: string;
+  readonly expirationTime: EpochTimeStamp | null;
   readonly options: PushSubscriptionOptions;
   getKey(name: PushEncryptionKeyName): ArrayBuffer | null;
   toJSON(): PushSubscriptionJSON;
@@ -14776,6 +14597,19 @@ declare const Range: {
   toString(): string;
 };
 
+interface ReadableByteStreamController {
+  readonly byobRequest: ReadableStreamBYOBRequest | null;
+  readonly desiredSize: number | null;
+  close(): void;
+  enqueue(chunk: ArrayBufferView): void;
+  error(e?: unknown): void;
+}
+
+declare const ReadableByteStreamController: {
+  readonly prototype: ReadableByteStreamController;
+  new (): ReadableByteStreamController;
+};
+
 /** This Streams API interface represents a readable stream of byte data. The Fetch API offers a concrete instance of a ReadableStream through the body property of a Response object. */
 interface ReadableStream<R = unknown> {
   readonly locked: boolean;
@@ -14800,6 +14634,29 @@ declare const ReadableStream: {
   ): ReadableStream<R>;
 };
 
+interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
+  read(
+    view: ArrayBufferView
+  ): Promise<ReadableStreamReadResult<ArrayBufferView>>;
+  releaseLock(): void;
+}
+
+declare const ReadableStreamBYOBReader: {
+  readonly prototype: ReadableStreamBYOBReader;
+  new (stream: ReadableStream): ReadableStreamBYOBReader;
+};
+
+interface ReadableStreamBYOBRequest {
+  readonly view: ArrayBufferView | null;
+  respond(bytesWritten: number): void;
+  respondWithNewView(view: ArrayBufferView): void;
+}
+
+declare const ReadableStreamBYOBRequest: {
+  readonly prototype: ReadableStreamBYOBRequest;
+  new (): ReadableStreamBYOBRequest;
+};
+
 interface ReadableStreamDefaultController<R = unknown> {
   readonly desiredSize: number | null;
   close(): void;
@@ -14814,7 +14671,7 @@ declare const ReadableStreamDefaultController: {
 
 interface ReadableStreamDefaultReader<R = unknown>
   extends ReadableStreamGenericReader {
-  read(): Promise<ReadableStreamDefaultReadResult<R>>;
+  read(): Promise<ReadableStreamReadResult<R>>;
   releaseLock(): void;
 }
 
@@ -22756,7 +22613,7 @@ interface Window
   /** Returns true if the toolbar is visible; otherwise, returns false. */
   readonly toolbar: BarProp;
   readonly top: WindowProxy | null;
-  readonly visualViewport: VisualViewport;
+  readonly visualViewport: VisualViewport | null;
   readonly window: Window & typeof globalThis;
   alert(message?: unknown): void;
   blur(): void;
@@ -22959,8 +22816,8 @@ interface WindowOrWorkerGlobalScope {
   readonly performance: Performance;
   atob(data: string): string;
   btoa(data: string): string;
-  clearInterval(id?: number): void;
-  clearTimeout(id?: number): void;
+  clearInterval(id: number | undefined): void;
+  clearTimeout(id: number | undefined): void;
   createImageBitmap(
     image: ImageBitmapSource,
     options?: ImageBitmapOptions
@@ -23072,6 +22929,7 @@ declare const WritableStream: {
 
 /** This Streams API interface represents a controller allowing control of a WritableStream's state. When constructing a WritableStream, the underlying sink is given a corresponding WritableStreamDefaultController instance to manipulate. */
 interface WritableStreamDefaultController {
+  readonly signal: AbortSignal;
   error(e?: unknown): void;
 }
 
@@ -23836,7 +23694,6 @@ interface HTMLElementTagNameMap {
   readonly details: HTMLDetailsElement;
   readonly dfn: HTMLElement;
   readonly dialog: HTMLDialogElement;
-  readonly dir: HTMLDirectoryElement;
   readonly div: HTMLDivElement;
   readonly dl: HTMLDListElement;
   readonly dt: HTMLElement;
@@ -23845,11 +23702,8 @@ interface HTMLElementTagNameMap {
   readonly fieldset: HTMLFieldSetElement;
   readonly figcaption: HTMLElement;
   readonly figure: HTMLElement;
-  readonly font: HTMLFontElement;
   readonly footer: HTMLElement;
   readonly form: HTMLFormElement;
-  readonly frame: HTMLFrameElement;
-  readonly frameset: HTMLFrameSetElement;
   readonly h1: HTMLHeadingElement;
   readonly h2: HTMLHeadingElement;
   readonly h3: HTMLHeadingElement;
@@ -23874,7 +23728,6 @@ interface HTMLElementTagNameMap {
   readonly main: HTMLElement;
   readonly map: HTMLMapElement;
   readonly mark: HTMLElement;
-  readonly marquee: HTMLMarqueeElement;
   readonly menu: HTMLMenuElement;
   readonly meta: HTMLMetaElement;
   readonly meter: HTMLMeterElement;
@@ -23886,7 +23739,6 @@ interface HTMLElementTagNameMap {
   readonly option: HTMLOptionElement;
   readonly output: HTMLOutputElement;
   readonly p: HTMLParagraphElement;
-  readonly param: HTMLParamElement;
   readonly picture: HTMLPictureElement;
   readonly pre: HTMLPreElement;
   readonly progress: HTMLProgressElement;
@@ -23928,7 +23780,34 @@ interface HTMLElementTagNameMap {
 }
 
 interface HTMLElementDeprecatedTagNameMap {
+  readonly acronym: HTMLElement;
+  readonly applet: HTMLUnknownElement;
+  readonly basefont: HTMLElement;
+  readonly bgsound: HTMLUnknownElement;
+  readonly big: HTMLElement;
+  readonly blink: HTMLUnknownElement;
+  readonly center: HTMLElement;
+  readonly dir: HTMLDirectoryElement;
+  readonly font: HTMLFontElement;
+  readonly frame: HTMLFrameElement;
+  readonly frameset: HTMLFrameSetElement;
+  readonly isindex: HTMLUnknownElement;
+  readonly keygen: HTMLUnknownElement;
   readonly listing: HTMLPreElement;
+  readonly marquee: HTMLMarqueeElement;
+  readonly menuitem: HTMLElement;
+  readonly multicol: HTMLUnknownElement;
+  readonly nextid: HTMLUnknownElement;
+  readonly nobr: HTMLElement;
+  readonly noembed: HTMLElement;
+  readonly noframes: HTMLElement;
+  readonly param: HTMLParamElement;
+  readonly plaintext: HTMLElement;
+  readonly rb: HTMLElement;
+  readonly rtc: HTMLElement;
+  readonly spacer: HTMLUnknownElement;
+  readonly strike: HTMLElement;
+  readonly tt: HTMLElement;
   readonly xmp: HTMLPreElement;
 }
 
@@ -24092,7 +23971,7 @@ declare const statusbar: BarProp;
 /** Returns true if the toolbar is visible; otherwise, returns false. */
 declare const toolbar: BarProp;
 declare const top: WindowProxy | null;
-declare const visualViewport: VisualViewport;
+declare const visualViewport: VisualViewport | null;
 declare const window: Window & typeof globalThis;
 declare function alert(message?: unknown): void;
 declare function blur(): void;
@@ -24537,8 +24416,8 @@ declare const origin: string;
 declare const performance: Performance;
 declare function atob(data: string): string;
 declare function btoa(data: string): string;
-declare function clearInterval(id?: number): void;
-declare function clearTimeout(id?: number): void;
+declare function clearInterval(id: number | undefined): void;
+declare function clearTimeout(id: number | undefined): void;
 declare function createImageBitmap(
   image: ImageBitmapSource,
   options?: ImageBitmapOptions
@@ -24635,7 +24514,7 @@ type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
 type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
 type HashAlgorithmIdentifier = AlgorithmIdentifier;
 type HeadersInit =
-  | readonly (readonly string[])[]
+  | readonly (readonly [string, string])[]
   | Record<string, string>
   | Headers;
 type IDBValidKey =
@@ -24656,9 +24535,9 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
 type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
 type PerformanceEntryList = readonly PerformanceEntry[];
 type ReadableStreamController<T> = ReadableStreamDefaultController<T>;
-type ReadableStreamDefaultReadResult<T> =
-  | ReadableStreamDefaultReadValueResult<T>
-  | ReadableStreamDefaultReadDoneResult;
+type ReadableStreamReadResult<T> =
+  | ReadableStreamReadValueResult<T>
+  | ReadableStreamReadDoneResult;
 type ReadableStreamReader<T> = ReadableStreamDefaultReader<T>;
 type RenderingContext =
   | CanvasRenderingContext2D
@@ -24754,15 +24633,6 @@ type ColorGamut = 'p3' | 'rec2020' | 'srgb';
 type ColorSpaceConversion = 'default' | 'none';
 type CompositeOperation = 'accumulate' | 'add' | 'replace';
 type CompositeOperationOrAuto = 'accumulate' | 'add' | 'auto' | 'replace';
-type ConnectionType =
-  | 'bluetooth'
-  | 'cellular'
-  | 'ethernet'
-  | 'mixed'
-  | 'none'
-  | 'other'
-  | 'unknown'
-  | 'wifi';
 type CredentialMediationRequirement = 'optional' | 'required' | 'silent';
 type DOMParserSupportedType =
   | 'application/xhtml+xml'
@@ -24771,11 +24641,7 @@ type DOMParserSupportedType =
   | 'text/html'
   | 'text/xml';
 type DirectionSetting = '' | 'lr' | 'rl';
-type DisplayCaptureSurfaceType =
-  | 'application'
-  | 'browser'
-  | 'monitor'
-  | 'window';
+type DisplayCaptureSurfaceType = 'browser' | 'monitor' | 'window';
 type DistanceModelType = 'exponential' | 'inverse' | 'linear';
 type DocumentReadyState = 'complete' | 'interactive' | 'loading';
 type DocumentVisibilityState = 'hidden' | 'visible';
@@ -24836,9 +24702,6 @@ type KeyUsage =
   | 'wrapKey';
 type LineAlignSetting = 'center' | 'end' | 'start';
 type LockMode = 'exclusive' | 'shared';
-type MIDIPortConnectionState = 'closed' | 'open' | 'pending';
-type MIDIPortDeviceState = 'connected' | 'disconnected';
-type MIDIPortType = 'input' | 'output';
 type MediaDecodingType = 'file' | 'media-source' | 'webrtc';
 type MediaDeviceKind = 'audioinput' | 'audiooutput' | 'videoinput';
 type MediaEncodingType = 'record' | 'webrtc';

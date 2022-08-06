@@ -267,6 +267,10 @@ interface IDBObjectStoreParameters {
   readonly keyPath?: string | readonly string[] | null;
 }
 
+interface IDBTransactionOptions {
+  readonly durability?: IDBTransactionDurability;
+}
+
 interface IDBVersionChangeEventInit extends EventInit {
   readonly newVersion?: number | null;
   readonly oldVersion?: number;
@@ -492,12 +496,12 @@ interface RTCEncodedVideoFrameMetadata {
   readonly width?: number;
 }
 
-interface ReadableStreamDefaultReadDoneResult {
+interface ReadableStreamReadDoneResult {
   readonly done: true;
   readonly value?: undefined;
 }
 
-interface ReadableStreamDefaultReadValueResult<T> {
+interface ReadableStreamReadValueResult<T> {
   readonly done: false;
   readonly value: T;
 }
@@ -1114,6 +1118,7 @@ declare const CustomEvent: {
 
 /** An abnormal event (called an exception) which occurs as a result of calling a method or accessing a property of a web API. */
 interface DOMException extends Error {
+  /** @deprecated */
   readonly code: number;
   readonly message: string;
   readonly name: string;
@@ -1676,7 +1681,7 @@ declare const EventTarget: {
 
 /** Extends the lifetime of the install and activate events dispatched on the global scope as part of the service worker lifecycle. This ensures that any functional events (like FetchEvent) are not dispatched until it upgrades database schemas and deletes the outdated cache entries. */
 interface ExtendableEvent extends Event {
-  waitUntil(f: unknown): void;
+  waitUntil(f: Promise<unknown>): void;
 }
 
 declare const ExtendableEvent: {
@@ -2097,7 +2102,8 @@ interface IDBDatabase extends EventTarget {
   /** Returns a new transaction with the given mode ("readonly" or "readwrite") and scope which can be a single object store name or an array of names. */
   transaction(
     storeNames: string | readonly string[],
-    mode?: IDBTransactionMode
+    mode?: IDBTransactionMode,
+    options?: IDBTransactionOptions
   ): IDBTransaction;
   addEventListener<K extends keyof IDBDatabaseEventMap>(
     type: K,
@@ -2732,7 +2738,6 @@ interface NavigatorID {
   readonly appName: string;
   /** @deprecated */
   readonly appVersion: string;
-  /** @deprecated */
   readonly platform: string;
   /** @deprecated */
   readonly product: string;
@@ -2749,10 +2754,6 @@ interface NavigatorLocks {
   readonly locks: LockManager;
 }
 
-interface NavigatorNetworkInformation {
-  readonly connection: NetworkInformation;
-}
-
 interface NavigatorOnLine {
   readonly onLine: boolean;
 }
@@ -2761,15 +2762,6 @@ interface NavigatorOnLine {
 interface NavigatorStorage {
   readonly storage: StorageManager;
 }
-
-interface NetworkInformation extends EventTarget {
-  readonly type: ConnectionType;
-}
-
-declare const NetworkInformation: {
-  readonly prototype: NetworkInformation;
-  new (): NetworkInformation;
-};
 
 interface NotificationEventMap {
   readonly click: Event;
@@ -3169,6 +3161,7 @@ declare const PushMessageData: {
  */
 interface PushSubscription {
   readonly endpoint: string;
+  readonly expirationTime: EpochTimeStamp | null;
   readonly options: PushSubscriptionOptions;
   getKey(name: PushEncryptionKeyName): ArrayBuffer | null;
   toJSON(): PushSubscriptionJSON;
@@ -3213,6 +3206,19 @@ declare const RTCEncodedVideoFrame: {
   new (): RTCEncodedVideoFrame;
 };
 
+interface ReadableByteStreamController {
+  readonly byobRequest: ReadableStreamBYOBRequest | null;
+  readonly desiredSize: number | null;
+  close(): void;
+  enqueue(chunk: ArrayBufferView): void;
+  error(e?: unknown): void;
+}
+
+declare const ReadableByteStreamController: {
+  readonly prototype: ReadableByteStreamController;
+  new (): ReadableByteStreamController;
+};
+
 /** This Streams API interface represents a readable stream of byte data. The Fetch API offers a concrete instance of a ReadableStream through the body property of a Response object. */
 interface ReadableStream<R = unknown> {
   readonly locked: boolean;
@@ -3237,6 +3243,29 @@ declare const ReadableStream: {
   ): ReadableStream<R>;
 };
 
+interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
+  read(
+    view: ArrayBufferView
+  ): Promise<ReadableStreamReadResult<ArrayBufferView>>;
+  releaseLock(): void;
+}
+
+declare const ReadableStreamBYOBReader: {
+  readonly prototype: ReadableStreamBYOBReader;
+  new (stream: ReadableStream): ReadableStreamBYOBReader;
+};
+
+interface ReadableStreamBYOBRequest {
+  readonly view: ArrayBufferView | null;
+  respond(bytesWritten: number): void;
+  respondWithNewView(view: ArrayBufferView): void;
+}
+
+declare const ReadableStreamBYOBRequest: {
+  readonly prototype: ReadableStreamBYOBRequest;
+  new (): ReadableStreamBYOBRequest;
+};
+
 interface ReadableStreamDefaultController<R = unknown> {
   readonly desiredSize: number | null;
   close(): void;
@@ -3251,7 +3280,7 @@ declare const ReadableStreamDefaultController: {
 
 interface ReadableStreamDefaultReader<R = unknown>
   extends ReadableStreamGenericReader {
-  read(): Promise<ReadableStreamDefaultReadResult<R>>;
+  read(): Promise<ReadableStreamReadResult<R>>;
   releaseLock(): void;
 }
 
@@ -3488,6 +3517,7 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
     | ((this: ServiceWorkerGlobalScope, ev: PushEvent) => unknown)
     | null;
   readonly registration: ServiceWorkerRegistration;
+  readonly serviceWorker: ServiceWorker;
   skipWaiting(): Promise<void>;
   addEventListener<K extends keyof ServiceWorkerGlobalScopeEventMap>(
     type: K,
@@ -6943,8 +6973,8 @@ interface WindowOrWorkerGlobalScope {
   readonly performance: Performance;
   atob(data: string): string;
   btoa(data: string): string;
-  clearInterval(id?: number): void;
-  clearTimeout(id?: number): void;
+  clearInterval(id: number | undefined): void;
+  clearTimeout(id: number | undefined): void;
   createImageBitmap(
     image: ImageBitmapSource,
     options?: ImageBitmapOptions
@@ -7111,7 +7141,6 @@ interface WorkerNavigator
     NavigatorID,
     NavigatorLanguage,
     NavigatorLocks,
-    NavigatorNetworkInformation,
     NavigatorOnLine,
     NavigatorStorage {
   readonly mediaCapabilities: MediaCapabilities;
@@ -7140,6 +7169,7 @@ declare const WritableStream: {
 
 /** This Streams API interface represents a controller allowing control of a WritableStream's state. When constructing a WritableStream, the underlying sink is given a corresponding WritableStreamDefaultController instance to manipulate. */
 interface WritableStreamDefaultController {
+  readonly signal: AbortSignal;
   error(e?: unknown): void;
 }
 
@@ -7696,8 +7726,8 @@ declare const origin: string;
 declare const performance: Performance;
 declare function atob(data: string): string;
 declare function btoa(data: string): string;
-declare function clearInterval(id?: number): void;
-declare function clearTimeout(id?: number): void;
+declare function clearInterval(id: number | undefined): void;
+declare function clearTimeout(id: number | undefined): void;
 declare function createImageBitmap(
   image: ImageBitmapSource,
   options?: ImageBitmapOptions
@@ -7788,7 +7818,7 @@ type GLuint = number;
 type GLuint64 = number;
 type HashAlgorithmIdentifier = AlgorithmIdentifier;
 type HeadersInit =
-  | readonly (readonly string[])[]
+  | readonly (readonly [string, string])[]
   | Record<string, string>
   | Headers;
 type IDBValidKey =
@@ -7805,9 +7835,9 @@ type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
 type PerformanceEntryList = readonly PerformanceEntry[];
 type PushMessageDataInit = BufferSource | string;
 type ReadableStreamController<T> = ReadableStreamDefaultController<T>;
-type ReadableStreamDefaultReadResult<T> =
-  | ReadableStreamDefaultReadValueResult<T>
-  | ReadableStreamDefaultReadDoneResult;
+type ReadableStreamReadResult<T> =
+  | ReadableStreamReadValueResult<T>
+  | ReadableStreamReadDoneResult;
 type ReadableStreamReader<T> = ReadableStreamDefaultReader<T>;
 type RequestInfo = Request | string;
 type TexImageSource = ImageBitmap | ImageData | OffscreenCanvas;
@@ -7825,15 +7855,6 @@ type BinaryType = 'arraybuffer' | 'blob';
 type ClientTypes = 'all' | 'sharedworker' | 'window' | 'worker';
 type ColorGamut = 'p3' | 'rec2020' | 'srgb';
 type ColorSpaceConversion = 'default' | 'none';
-type ConnectionType =
-  | 'bluetooth'
-  | 'cellular'
-  | 'ethernet'
-  | 'mixed'
-  | 'none'
-  | 'other'
-  | 'unknown'
-  | 'wifi';
 type DocumentVisibilityState = 'hidden' | 'visible';
 type EndingType = 'native' | 'transparent';
 type FileSystemHandleKind = 'directory' | 'file';
