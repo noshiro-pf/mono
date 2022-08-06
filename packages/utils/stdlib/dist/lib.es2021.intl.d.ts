@@ -21,7 +21,11 @@ declare namespace Intl {
     readonly dateStyle?: 'full' | 'long' | 'medium' | 'short' | undefined;
     readonly timeStyle?: 'full' | 'long' | 'medium' | 'short' | undefined;
     readonly dayPeriod?: 'narrow' | 'short' | 'long' | undefined;
-    readonly fractionalSecondDigits?: 0 | 1 | 2 | 3 | undefined;
+    readonly fractionalSecondDigits?: 1 | 2 | 3 | undefined;
+  }
+
+  interface DateTimeRangeFormatPart extends DateTimeFormatPart {
+    readonly source: 'startRange' | 'endRange' | 'shared';
   }
 
   interface DateTimeFormat {
@@ -32,7 +36,7 @@ declare namespace Intl {
     formatRangeToParts(
       startDate: Date | number | bigint,
       endDate: Date | number | bigint
-    ): readonly DateTimeFormatPart[];
+    ): readonly DateTimeRangeFormatPart[];
   }
 
   interface ResolvedDateTimeFormatOptions {
@@ -41,7 +45,7 @@ declare namespace Intl {
     readonly timeStyle?: 'full' | 'long' | 'medium' | 'short';
     readonly hourCycle?: 'h11' | 'h12' | 'h23' | 'h24';
     readonly dayPeriod?: 'narrow' | 'short' | 'long';
-    readonly fractionalSecondDigits?: 0 | 1 | 2 | 3;
+    readonly fractionalSecondDigits?: 1 | 2 | 3;
   }
 
   /**
@@ -104,7 +108,9 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/formatToParts).
      */
-    formatToParts(list: Iterable<string>): readonly {
+    formatToParts(
+      list: Iterable<string>
+    ): readonly {
       readonly type: 'element' | 'literal';
       readonly value: string;
     }[];
