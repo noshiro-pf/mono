@@ -10,6 +10,20 @@ https://event-schedule-app.web.app
 yarn setup
 ```
 
+## Start
+
+```sh
+yarn start:build-functions
+```
+
+```sh
+yarn start:emulators
+```
+
+```sh
+yarn start:dev-server
+```
+
 ### env
 
 ```
