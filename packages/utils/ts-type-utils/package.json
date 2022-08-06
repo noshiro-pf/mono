@@ -34,10 +34,10 @@
       ]
     },
     "build:step1": {
-      "command": "tsc --pretty --project tsconfig.json",
+      "command": "tsc --pretty --project tsconfig.build.json",
       "files": [
         "src/**/*.ts",
-        "tsconfig.json",
+        "tsconfig.build.json",
         "../../../config/tsconfig/tsconfig.base.nolib.json"
       ],
       "output": [
