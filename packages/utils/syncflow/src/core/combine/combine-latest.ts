@@ -1,13 +1,9 @@
-import { assertType, Maybe } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import { fromArray } from '../create';
-import { withInitialValue } from '../operators';
 import type {
   CombineLatestObservable,
   InitializedCombineLatestObservable,
-  InitializedSyncChildObservable,
   NonEmptyUnknownList,
-  SyncChildObservable,
   Token,
   Wrap,
   WrapInitialized,
@@ -51,32 +47,3 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
     }
   }
 }
-
-// type tests
-
-const r1 = fromArray([1, 2, 3]);
-const r2 = fromArray(['a', 'b', 'c']);
-
-const cm = combineLatest([r1, r2] as const);
-
-const cmi = combineLatestI([
-  r1.chain(withInitialValue(0)),
-  r2.chain(withInitialValue(0)),
-] as const);
-
-assertType<
-  TypeExtends<
-    typeof cm,
-    SyncChildObservable<readonly [number, string], 'combineLatest'>
-  >
->();
-
-assertType<
-  TypeExtends<
-    typeof cmi,
-    InitializedSyncChildObservable<
-      readonly [number, number | string],
-      'combineLatest'
-    >
-  >
->();

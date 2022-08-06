@@ -1,10 +1,8 @@
-import { assertType, Maybe } from '@noshiro/ts-utils';
+import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import { fromArray } from '../create';
 import type {
   MergeObservable,
   NonEmptyUnknownList,
-  SyncChildObservable,
   Token,
   Wrap,
 } from '../types';
@@ -35,14 +33,3 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
     this.setNext(nextValue, token);
   }
 }
-
-// type tests
-
-const r1 = fromArray([1, 2, 3]);
-const r2 = fromArray(['a', 'b', 'c']);
-
-const m = merge([r1, r2] as const);
-
-assertType<
-  TypeExtends<typeof m, SyncChildObservable<number | string, 'merge'>>
->();

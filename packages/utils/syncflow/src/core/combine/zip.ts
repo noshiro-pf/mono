@@ -1,12 +1,8 @@
-import { assertType, createQueue, Maybe } from '@noshiro/ts-utils';
+import { createQueue, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import { fromArray } from '../create';
-import { withInitialValue } from '../operators';
 import type {
-  InitializedSyncChildObservable,
   InitializedZipObservable,
   NonEmptyUnknownList,
-  SyncChildObservable,
   Token,
   TupleToQueueTuple,
   Wrap,
@@ -56,26 +52,3 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     }
   }
 }
-
-// type tests
-
-const r1 = fromArray([1, 2, 3]);
-const r2 = fromArray(['a', 'b', 'c']);
-
-const z = zip([r1, r2] as const);
-
-const zi = zipI([
-  r1.chain(withInitialValue(0)),
-  r2.chain(withInitialValue('0')),
-] as const);
-
-assertType<
-  TypeExtends<typeof z, SyncChildObservable<readonly [number, string], 'zip'>>
->();
-
-assertType<
-  TypeExtends<
-    typeof zi,
-    InitializedSyncChildObservable<readonly [number, string], 'zip'>
-  >
->();
