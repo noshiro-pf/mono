@@ -1,9 +1,15 @@
 import * as t from '@noshiro/io-ts';
 import { cardTypeDef } from './card-type';
 import { firestoreTimestampTypeDef } from './firestore-timestamp-type';
+import { playerCardsTypeDef } from './game-state';
 
 const gameStateActionTypeDef = t.union(
   [
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('initializePlayerCards'),
+      cards: playerCardsTypeDef,
+    }),
     t.record({
       timestamp: firestoreTimestampTypeDef,
       type: t.stringLiteral('selectMyCard'),
@@ -49,20 +55,24 @@ const gameStateActionTypeDef = t.union(
     }),
   ],
   {
-    typeName: 'GameStateAction',
     defaultType: t.record({
       timestamp: firestoreTimestampTypeDef,
-      type: t.stringLiteral('selectMyCard'),
-      card: cardTypeDef,
+      type: t.stringLiteral('initializePlayerCards'),
+      cards: playerCardsTypeDef,
     }),
   },
 );
 
 export type GameStateAction = t.TypeOf<typeof gameStateActionTypeDef>;
 
-export const assertIsGameStateAction: (
-  a: unknown,
-) => asserts a is GameStateAction = gameStateActionTypeDef.assertIs;
+const gameStateActionArrayTypeDef = t.array(gameStateActionTypeDef);
+
+export const validateGameStateActionArray =
+  gameStateActionArrayTypeDef.validate;
+
+export const keyForOrderingGameActions = 'timestamp';
+
+expectType<typeof keyForOrderingGameActions, keyof GameStateAction>('<=');
 
 expectType<GameStateAction, Readonly<{ type: string }>>('<=');
 
@@ -72,6 +82,7 @@ expectType<
   | 'cancelToss'
   | 'goToNextTurn'
   | 'hideDecidedAnswerBalloon'
+  | 'initializePlayerCards'
   | 'selectAnswer'
   | 'selectMyCard'
   | 'selectOpponentCard'

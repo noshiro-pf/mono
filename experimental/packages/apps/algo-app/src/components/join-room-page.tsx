@@ -1,133 +1,69 @@
 import { dictionary } from '../constants';
-import { db, joinRoom } from '../store';
+import { JoinRoom } from '../store';
 import { ButtonPrimary, Input, Spinner } from './bp';
+import { MainPage } from './styled';
 
 const dc = dictionary.joinRoom;
 
-type Props = Readonly<{ roomId: string }>;
-
-export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
+/** TODO hooks から store に移動 */
+export const JoinRoomPage = memoNamed('JoinRoomPage', () => {
   /*
     TODO:
     local state に自分の名前を追加
     roomに自分の名前があればゲーム開始前画面を表示
    */
 
-  const [password, setPassword] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
-
-  const onPasswordInput: preact.JSX.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setPassword(ev.currentTarget.value);
-      },
-      [setPassword],
-    );
-
-  const onUsernameInput: preact.JSX.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setUsername(ev.currentTarget.value);
-      },
-      [setUsername],
-    );
+  const roomPassword = useObservableValue(JoinRoom.roomPassword$);
+  const username = useObservableValue(JoinRoom.username$);
+  const showPasswordError = useObservableValue(JoinRoom.showPasswordError$);
 
   const disabled: boolean = username === '';
 
-  const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
-
-  const room = db.useRoom();
-
-  const onJoinRoomButtonClick = useCallback(() => {
-    if (room === undefined) return;
-    if (room.password !== '' && room.password !== password) {
-      setShowPasswordError(true);
-      return;
-    }
-    joinRoom.dispatch(roomId, username).catch(console.error);
-  }, [room, roomId, username, password, setShowPasswordError]);
-
-  const loading = joinRoom.useIsWaitingResponse();
+  const loading = useObservableValue(JoinRoom.isWaitingResponse$);
 
   return (
-    <Centering>
-      <FormRect>
-        <Block>
-          <Label>{dc.gamePassword.label}</Label>
-          <Input
-            disabled={loading}
-            type={'text'}
-            value={password}
-            onInput={onPasswordInput}
-          />
-          {showPasswordError ? (
-            <ErrorMessage>
-              {dictionary.joinRoom.gamePassword.notMatch}
-            </ErrorMessage>
-          ) : undefined}
-        </Block>
-        <Block>
-          <Label>{dc.username.label}</Label>
-          <Input
-            disabled={loading}
-            type={'text'}
-            value={username}
-            onInput={onUsernameInput}
-          />
-        </Block>
-        <ButtonWrapper>
-          <ButtonPrimary
-            disabled={disabled || loading}
-            type={'button'}
-            onClick={onJoinRoomButtonClick}
-          >
-            {loading ? <Spinner size={20} /> : <span>{dc.button}</span>}
-          </ButtonPrimary>
-        </ButtonWrapper>
-      </FormRect>
-    </Centering>
+    <MainPage.Centering>
+      <MainPage.FormRect>
+        <MainPage.BodyWrapper>
+          <MainPage.BodyStyled>
+            <MainPage.Block>
+              <MainPage.Label>{dc.roomPassword.label}</MainPage.Label>
+              <Input
+                disabled={loading}
+                type='text'
+                value={roomPassword}
+                onInput={JoinRoom.onPasswordInput}
+              />
+              {showPasswordError ? (
+                <ErrorMessage>
+                  {dictionary.joinRoom.roomPassword.notMatch}
+                </ErrorMessage>
+              ) : undefined}
+            </MainPage.Block>
+            <MainPage.Block>
+              <MainPage.Label>{dc.username.label}</MainPage.Label>
+              <Input
+                disabled={loading}
+                type='text'
+                value={username}
+                onInput={JoinRoom.onUsernameInput}
+              />
+            </MainPage.Block>
+            <MainPage.ButtonWrapper>
+              <ButtonPrimary
+                disabled={disabled || loading}
+                type='button'
+                onClick={JoinRoom.onJoinRoomButtonClick}
+              >
+                {loading ? <Spinner size={20} /> : <span>{dc.button}</span>}
+              </ButtonPrimary>
+            </MainPage.ButtonWrapper>
+          </MainPage.BodyStyled>
+        </MainPage.BodyWrapper>
+      </MainPage.FormRect>
+    </MainPage.Centering>
   );
 });
-
-const Centering = styled('div')`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgb(255 255 255) 0%,
-    rgb(202 202 202) 100%
-  );
-`;
-
-const FormRect = styled('div')`
-  width: 400px;
-  height: 500px;
-  border-radius: 10px;
-  background-color: white;
-  filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
-
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Block = styled('div')`
-  margin: 10px;
-  padding: 10px;
-`;
-
-const Label = styled('div')`
-  font-weight: bold;
-  margin-bottom: 5px;
-`;
-
-const ButtonWrapper = styled('div')`
-  margin: 10px;
-`;
 
 const ErrorMessage = styled('div')`
   font-size: small;
