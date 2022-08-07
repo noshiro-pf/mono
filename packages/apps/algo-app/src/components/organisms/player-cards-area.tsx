@@ -15,6 +15,7 @@ type Props = Readonly<{
   cards: ArrayOfLength<6, CardWithDisplayValue>;
   paddingPx: number;
   windowSize: RectSize;
+  cardsAreHidden: boolean;
   cardPositionsDispatcher: (
     action: readonly [CardColor, CardNumber, Rect],
   ) => void;
@@ -29,6 +30,7 @@ export const PlayerCardsArea = memoNamed(
     cards,
     paddingPx,
     windowSize,
+    cardsAreHidden,
     cardPositionsDispatcher,
   }: Props) => {
     const rotateStyle = useMemo<preact.JSX.CSSProperties>(() => {
@@ -88,6 +90,7 @@ export const PlayerCardsArea = memoNamed(
               key={c.key}
               color={c.color}
               float={c.float}
+              hidden={cardsAreHidden}
               isClickable={c.isClickable}
               number={c.number}
               outlineColor={c.outlineColor}

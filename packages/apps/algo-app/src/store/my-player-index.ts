@@ -1,19 +1,25 @@
+import { getShuffledPlayers } from '../functions';
 import { type PlayerIndex } from '../types';
-import { db } from './database';
-import { myName$ } from './my-name';
+import { DB } from './database';
+import { QueryParams } from './query-params';
 
 export const myPlayerIndex$: InitializedObservable<PlayerIndex | undefined> =
-  combine([db.room$, myName$]).chain(
-    map(([room, myName]) => {
-      if (room === undefined || myName === undefined) return undefined;
+  combine([DB.room$, DB.players$, QueryParams.myPlayerId$] as const).chain(
+    map(([room, players, playerId]) => {
+      if (room === undefined || Arr.isEmpty(players) || playerId === undefined)
+        return undefined;
 
-      const index: number = room.players.findIndex((p) => p.name === myName);
+      const index: number = getShuffledPlayers(
+        players,
+        room.shuffleDef,
+      ).findIndex((p) => p?.id === playerId);
+
       if (index === 0 || index === 1 || index === 2 || index === 3) {
         return index;
       }
 
       console.warn(
-        `myName should be one of { 0, 1, 2, 3 }. result is "${index}". `,
+        `myPlayerIndex is expected to be one of { 0, 1, 2, 3 }. result is "${index}". `,
       );
 
       return undefined;

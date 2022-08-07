@@ -15,6 +15,7 @@ export const cardChosenToBeAttackedReducer: Reducer<
     case 'submitAnswer':
     case 'showJudgeOnDecidedAnswer':
       return curr;
+    case 'initializePlayerCards':
     case 'cancelAnswer':
     case 'hideDecidedAnswerBalloon':
     case 'goToNextTurn':

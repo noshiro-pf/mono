@@ -1,10 +1,12 @@
-import { type Rect } from '@noshiro/ts-utils-additional';
-import { dictionary } from '../constants';
+import { css } from '@noshiro/goober';
+import { dictionary, Routes, zIndex } from '../constants';
 import {
   cardPositionsDispatcher,
   confirmTossBalloonProps$,
   decidedAnswerBalloonProps$,
   displayValues$,
+  ElementSize,
+  GameMainState,
   onTurnEndClick,
   playerNamePositionsDispatcher,
   selectAnswerBalloonProps$,
@@ -22,18 +24,12 @@ import {
   Table,
   TurnPlayerHighlighter,
 } from './organisms';
-import { useWindowSize } from './use-window-size';
 
-type Props = Readonly<{
-  windowSize: Rect;
-  playerId: string;
-  replay: boolean;
-  observe: boolean;
-}>;
+export const GameMain = memoNamed('GameMain', () => {
+  const elementsSize = useObservableValue(ElementSize.elementsSize$);
 
-export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
-  const { tableSize, footerHeight, headerStyle, footerStyle } =
-    useWindowSize(windowSize);
+  // const isReplayMode = useObservableValue(router.isReplayMode$);
+  // const isSpectatorMode = useObservableValue(router.isSpectatorMode$);
 
   const displayValues: DisplayValues = useObservableValue(displayValues$);
   const turnPlayerHighlighterPosition = useObservableValue(
@@ -47,72 +43,151 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
     decidedAnswerBalloonProps$,
   );
 
+  const shuffleSeatsButtonDisabled = useObservableValue(
+    combine([
+      GameMainState.shuffleSeatsWaitingState.state,
+      GameMainState.startGameWaitingState.state,
+    ]).chain(map(([a, b]) => a || b)),
+  );
+
   return (
     <Root>
-      <Header style={headerStyle}>
-        <GameMessage message={displayValues.gameMessage} />
-      </Header>
-      <Main>
-        <Table
-          cardPositionsDispatcher={cardPositionsDispatcher}
-          displayValues={displayValues}
-          playerNamePositionsDispatcher={playerNamePositionsDispatcher}
-          tableSize={tableSize}
-          windowSize={windowSize}
-        />
-      </Main>
-      <Footer style={footerStyle}>
-        <MyCards cards={displayValues.playerCards.S} height={footerHeight} />
-      </Footer>
+      {elementsSize === undefined ? (
+        <div>{dictionary.gameMain.loading}</div>
+      ) : (
+        <>
+          <NorthWestButtons>
+            <ButtonWrapper>
+              <a
+                className={floatButtonStyle}
+                href={Routes.routes.main}
+                rel={'noopener noreferrer'}
+                target={'_blank'}
+              >
+                {dictionary.gameMain.newGame}
+              </a>
+            </ButtonWrapper>
+          </NorthWestButtons>
 
-      <EndTurnButtonWrapper>
-        <EndTurnButton
-          disabled={displayValues.endTurnButtonDisabled}
-          type={'button'}
-          onClick={onTurnEndClick}
-        >
-          {dictionary.gameMain.endTurnButton}
-        </EndTurnButton>
-      </EndTurnButtonWrapper>
+          <SouthEastButtons>
+            {displayValues.roomState === 'not-started' ? (
+              <>
+                <CopyLinkButtonWrapper>
+                  <button
+                    className={floatButtonStyle}
+                    type='button'
+                    onClick={GameMainState.onClipboardButtonClick}
+                  >
+                    <div>{dictionary.gameMain.copyLink[0]}</div>
+                    <div>{dictionary.gameMain.copyLink[1]}</div>
+                  </button>
+                </CopyLinkButtonWrapper>
+                <ShuffleSeatsButtonWrapper>
+                  <button
+                    className={floatButtonStyle}
+                    disabled={shuffleSeatsButtonDisabled}
+                    type='button'
+                    onClick={GameMainState.onShuffleSeatsClick}
+                  >
+                    <div>{dictionary.gameMain.shuffleSeats[0]}</div>
+                    <div>{dictionary.gameMain.shuffleSeats[1]}</div>
+                  </button>
+                </ShuffleSeatsButtonWrapper>
+                <ButtonWrapper>
+                  <button
+                    className={floatButtonStyle}
+                    type='button'
+                    onClick={GameMainState.onExitClick}
+                  >
+                    {dictionary.gameMain.exit}
+                  </button>
+                </ButtonWrapper>
+              </>
+            ) : undefined}
 
-      {turnPlayerHighlighterPosition !== undefined ? (
-        <TurnPlayerHighlighter position={turnPlayerHighlighterPosition} />
-      ) : undefined}
+            <ButtonWrapper>
+              {displayValues.roomState === 'not-started' ? (
+                <button
+                  className={floatButtonStyle}
+                  disabled={displayValues.startGameButtonState === 'disabled'}
+                  type='button'
+                  onClick={GameMainState.onStartGameClick}
+                >
+                  {dictionary.gameMain.startGame}
+                </button>
+              ) : (
+                <button
+                  className={floatButtonStyle}
+                  disabled={displayValues.endTurnButtonDisabled}
+                  type='button'
+                  onClick={onTurnEndClick}
+                >
+                  {dictionary.gameMain.endTurnButton}
+                </button>
+              )}
+            </ButtonWrapper>
+          </SouthEastButtons>
 
-      {confirmTossBalloonProps !== undefined ? (
-        <ConfirmTossBalloon
-          anchorCardRect={confirmTossBalloonProps.anchorCardRect}
-          cancel={confirmTossBalloonProps.cancel}
-          card={confirmTossBalloonProps.card}
-          submit={confirmTossBalloonProps.submit}
-        />
-      ) : undefined}
+          <Header style={elementsSize.headerStyle}>
+            <GameMessage message={displayValues.gameMessage} />
+          </Header>
+          <Main>
+            <Table
+              cardPositionsDispatcher={cardPositionsDispatcher}
+              displayValues={displayValues}
+              playerNamePositionsDispatcher={playerNamePositionsDispatcher}
+              tableSize={elementsSize.tableSize}
+              windowSize={elementsSize.windowSize}
+            />
+          </Main>
+          <Footer style={elementsSize.footerStyle}>
+            <MyCards
+              cards={displayValues.playerCards.S}
+              cardsAreHidden={displayValues.cardsAreHidden}
+              height={elementsSize.footerHeight}
+            />
+          </Footer>
 
-      {selectAnswerBalloonProps !== undefined ? (
-        <SelectAnswerBalloon
-          anchorCardRect={selectAnswerBalloonProps.anchorCardRect}
-          arrowDirection={selectAnswerBalloonProps.arrowDirection}
-          cardColor={selectAnswerBalloonProps.cardColor}
-          selectedNumber={selectAnswerBalloonProps.selectedNumber}
-          submitAnswer={selectAnswerBalloonProps.submitAnswer}
-          submitButtonIsDisabled={
-            selectAnswerBalloonProps.submitButtonIsDisabled
-          }
-          onCancelClick={selectAnswerBalloonProps.onCancelClick}
-          onSelectedNumberChange={
-            selectAnswerBalloonProps.onSelectedNumberChange
-          }
-        />
-      ) : undefined}
+          {turnPlayerHighlighterPosition !== undefined ? (
+            <TurnPlayerHighlighter position={turnPlayerHighlighterPosition} />
+          ) : undefined}
 
-      {decidedAnswerBalloonProps !== undefined ? (
-        <DecidedAnswerBalloon
-          anchorCardRect={decidedAnswerBalloonProps.anchorCardRect}
-          arrowDirection={decidedAnswerBalloonProps.arrowDirection}
-          card={decidedAnswerBalloonProps.card}
-          showSymbol={decidedAnswerBalloonProps.showSymbol}
-        />
-      ) : undefined}
+          {confirmTossBalloonProps !== undefined ? (
+            <ConfirmTossBalloon
+              anchorCardRect={confirmTossBalloonProps.anchorCardRect}
+              cancel={confirmTossBalloonProps.cancel}
+              card={confirmTossBalloonProps.card}
+              submit={confirmTossBalloonProps.submit}
+            />
+          ) : undefined}
+
+          {selectAnswerBalloonProps !== undefined ? (
+            <SelectAnswerBalloon
+              anchorCardRect={selectAnswerBalloonProps.anchorCardRect}
+              arrowDirection={selectAnswerBalloonProps.arrowDirection}
+              cardColor={selectAnswerBalloonProps.cardColor}
+              selectedNumber={selectAnswerBalloonProps.selectedNumber}
+              submitAnswer={selectAnswerBalloonProps.submitAnswer}
+              submitButtonIsDisabled={
+                selectAnswerBalloonProps.submitButtonIsDisabled
+              }
+              onCancelClick={selectAnswerBalloonProps.onCancelClick}
+              onSelectedNumberChange={
+                selectAnswerBalloonProps.onSelectedNumberChange
+              }
+            />
+          ) : undefined}
+
+          {decidedAnswerBalloonProps !== undefined ? (
+            <DecidedAnswerBalloon
+              anchorCardRect={decidedAnswerBalloonProps.anchorCardRect}
+              arrowDirection={decidedAnswerBalloonProps.arrowDirection}
+              card={decidedAnswerBalloonProps.card}
+              showSymbol={decidedAnswerBalloonProps.showSymbol}
+            />
+          ) : undefined}
+        </>
+      )}
     </Root>
   );
 });
@@ -125,6 +200,47 @@ const Root = styled('div')`
   width: 100%;
   height: 100%;
   position: relative;
+`;
+
+const buttonAreaMarginPx = 20;
+
+const FloatButtons = styled('div')`
+  position: absolute;
+
+  > * {
+    margin: ${buttonAreaMarginPx}px;
+  }
+`;
+
+const NorthWestButtons = styled(FloatButtons)`
+  left: 0;
+  top: 0;
+`;
+
+const SouthEastButtons = styled(FloatButtons)`
+  right: 0;
+  bottom: 0;
+`;
+
+const ButtonWrapper = styled('div')`
+  width: 120px;
+  height: 60px;
+`;
+
+const CopyLinkButtonWrapper = styled(ButtonWrapper)`
+  > button {
+    display: block;
+    font-size: 14px;
+    white-space: normal;
+  }
+`;
+
+const ShuffleSeatsButtonWrapper = styled(ButtonWrapper)`
+  > button {
+    display: block;
+    font-size: 16px;
+    white-space: normal;
+  }
 `;
 
 const Header = styled('div')`
@@ -142,15 +258,7 @@ const Footer = styled('div')`
   flex: 0;
 `;
 
-const EndTurnButtonWrapper = styled('div')`
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  width: 120px;
-  height: 60px;
-`;
-
-const EndTurnButton = styled('button')`
+const buttonStyle = css`
   transition: background 0.3s ease 0s;
   text-transform: uppercase;
   font-family: 'Bebas Neue', sans-serif;
@@ -165,12 +273,15 @@ const EndTurnButton = styled('button')`
   font-weight: 400;
   font-size: 18px;
   border-radius: 5px;
-  position: absolute;
   background: rgb(60 60 60);
-  z-index: 1;
   left: 0px;
+  user-select: none;
 
-  &:active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:active&:not(:disabled) {
     transform: translate(5px, 5px);
   }
 
@@ -181,3 +292,9 @@ const EndTurnButton = styled('button')`
     cursor: not-allowed;
   }
 `;
+
+const floatStyle = css`
+  z-index: ${zIndex.button};
+`;
+
+const floatButtonStyle = [buttonStyle, floatStyle].join(' ');

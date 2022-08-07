@@ -16,6 +16,7 @@ export const confirmTossBalloonIsOpenReducer: Reducer<
     case 'submitAnswer':
       return curr;
 
+    case 'initializePlayerCards':
     case 'cancelToss':
     case 'submitToss':
     case 'goToNextTurn':

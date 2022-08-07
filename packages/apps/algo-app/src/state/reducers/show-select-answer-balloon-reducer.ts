@@ -12,6 +12,7 @@ export const selectAnswerBalloonIsOpenReducer: Reducer<
     case 'cancelToss':
     case 'submitToss':
       return curr;
+    case 'initializePlayerCards':
     case 'showJudgeOnDecidedAnswer':
     case 'hideDecidedAnswerBalloon':
     case 'cancelAnswer':
