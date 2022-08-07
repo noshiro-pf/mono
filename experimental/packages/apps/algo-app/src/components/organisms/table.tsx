@@ -19,9 +19,7 @@ type Props = Readonly<{
   ) => void;
 }>;
 
-const paddingPx = 5;
 const sidesWidth = playerNameRectSize.height;
-const containerPaddingPx = 7;
 
 /**
  * ```txt
@@ -79,6 +77,9 @@ export const Table = memoNamed(
     playerNamePositionsDispatcher,
     cardPositionsDispatcher,
   }: Props) => {
+    const paddingPx = Math.round(tableSize.width / 500);
+    const containerPaddingPx = Math.round(tableSize.width / 100);
+
     const { areaSize, cardSize } = useMemo<{
       areaSize: RectSize;
       cardSize: RectSize;
@@ -97,7 +98,7 @@ export const Table = memoNamed(
         areaSize: { width: areaWidth, height: areaHeight },
         cardSize: { width: w, height: h },
       };
-    }, [tableSize]);
+    }, [tableSize, paddingPx, containerPaddingPx]);
 
     const tableStyle = useMemo<preact.JSX.CSSProperties>(
       () => ({
@@ -107,7 +108,7 @@ export const Table = memoNamed(
         gridTemplateColumns: `${sidesWidth}px ${areaSize.height}px auto ${areaSize.height}px ${sidesWidth}px`,
         padding: `${containerPaddingPx}px`,
       }),
-      [tableSize, areaSize],
+      [tableSize, areaSize, containerPaddingPx],
     );
 
     const onBoundingClientRectChange = useMemo(
@@ -135,6 +136,7 @@ export const Table = memoNamed(
             cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
             cards={displayValues.playerCards.S}
+            cardsAreHidden={displayValues.cardsAreHidden}
             paddingPx={paddingPx}
             rotate={0}
             windowSize={windowSize}
@@ -146,6 +148,7 @@ export const Table = memoNamed(
             cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
             cards={displayValues.playerCards.W}
+            cardsAreHidden={displayValues.cardsAreHidden}
             paddingPx={paddingPx}
             rotate={90}
             windowSize={windowSize}
@@ -157,6 +160,7 @@ export const Table = memoNamed(
             cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
             cards={displayValues.playerCards.N}
+            cardsAreHidden={displayValues.cardsAreHidden}
             paddingPx={paddingPx}
             rotate={180}
             windowSize={windowSize}
@@ -168,6 +172,7 @@ export const Table = memoNamed(
             cardPositionsDispatcher={cardPositionsDispatcher}
             cardSize={cardSize}
             cards={displayValues.playerCards.E}
+            cardsAreHidden={displayValues.cardsAreHidden}
             paddingPx={paddingPx}
             rotate={270}
             windowSize={windowSize}
@@ -176,7 +181,7 @@ export const Table = memoNamed(
         <PlayerNameAreaS>
           <PlayerName
             isInTurn={displayValues.turnPlayer === 'S'}
-            playerName={'Player S'}
+            playerName={displayValues.playerNames.S}
             rotate={0}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.S}
@@ -185,7 +190,7 @@ export const Table = memoNamed(
         <PlayerNameAreaW>
           <PlayerName
             isInTurn={displayValues.turnPlayer === 'W'}
-            playerName={'Player W'}
+            playerName={displayValues.playerNames.W}
             rotate={90}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.W}
@@ -194,7 +199,7 @@ export const Table = memoNamed(
         <PlayerNameAreaN>
           <PlayerName
             isInTurn={displayValues.turnPlayer === 'N'}
-            playerName={'Player N'}
+            playerName={displayValues.playerNames.N}
             rotate={180}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.N}
@@ -203,7 +208,7 @@ export const Table = memoNamed(
         <PlayerNameAreaE>
           <PlayerName
             isInTurn={displayValues.turnPlayer === 'E'}
-            playerName={'Player E'}
+            playerName={displayValues.playerNames.E}
             rotate={270}
             windowSize={windowSize}
             onBoundingClientRectChange={onBoundingClientRectChange.E}

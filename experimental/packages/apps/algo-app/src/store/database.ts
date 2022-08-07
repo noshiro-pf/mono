@@ -1,152 +1,99 @@
-import { initializeApp } from 'firebase/app';
-import {
-  addDoc,
-  arrayUnion,
-  collection,
-  doc,
-  getFirestore,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-  type DocumentReference,
-  type Unsubscribe,
-} from 'firebase/firestore';
-import { firebaseConfig } from '../constants';
-import { newRoom } from '../functions';
-import {
-  assertIsGameStateAction,
-  assertIsRoomRemote,
-  convertRoomRemoteToRoom,
-  convertRoomToRoomRemote,
-  type GameStateAction,
-  type Player,
-  type Room,
-} from '../types';
+import { api } from '../api';
+import { isDevelopment } from '../env';
+import { type GameStateAction, type PlayerWithId, type Room } from '../types';
+import { router } from './router';
 
-const { state: roomId$, setState: setRoomId } = createState<string | undefined>(
-  undefined,
-);
-
-const {
-  useCurrentValue: useRoom,
-  state: room$,
-  setState: setRoom,
-} = createState<Room | undefined>(undefined);
-
-const [actionsFromDb$, setActionsFromDb_] =
-  createEventEmitter<readonly GameStateAction[]>();
-
-const fbApp = initializeApp(firebaseConfig);
-
-const firestore = getFirestore();
-
-const paths = {
-  rooms: 'rooms',
-  actions: 'actions',
-  players: 'players',
-} as const;
-
-const addAction = (
-  roomId: string,
-  localAction: GameStateAction,
-): Promise<Result<DocumentReference, unknown>> =>
-  Result.fromPromise(
-    addDoc(
-      collection(firestore, paths.rooms, roomId, paths.actions),
-      localAction,
-    ),
+export namespace DB {
+  const { state: room_$, setState: setRoom_ } = createState<Room | undefined>(
+    undefined,
   );
 
-const addPlayer = (
-  roomId: string,
-  username: string,
-): Promise<Result<void, unknown>> => {
-  const ref: DocumentReference = doc(firestore, paths.rooms, roomId);
+  export const room$ = room_$;
 
-  const player: Player = {
-    name: username,
-    online: true,
+  const { state: players_$, setState: setPlayers_ } = createState<
+    readonly PlayerWithId[]
+  >([]);
+
+  export const players$ = players_$;
+
+  const [actionsFromDb_$, setActionsFromDb_] =
+    createEventEmitter<readonly GameStateAction[]>();
+
+  export const { state: myName$, setState: setMyName } = createState<
+    string | undefined
+  >(undefined);
+
+  export const actionsFromDb$ = actionsFromDb_$;
+
+  const mut_unsubscribe: {
+    room: () => void;
+    actions: () => void;
+    players: () => void;
+  } = {
+    room: noop,
+    actions: noop,
+    players: noop,
   };
 
-  return Result.fromPromise(
-    updateDoc(ref, {
-      players: arrayUnion(player),
-    }),
-  );
-};
+  router.roomId$.subscribe((roomId) => {
+    if (roomId === undefined) return;
 
-const createRoom = async ({
-  username,
-  password,
-}: Readonly<{
-  username: string;
-  password: string | undefined;
-}>): Promise<Room> => {
-  const room = newRoom(password, { name: username, online: true });
-  const res = await addDoc(
-    collection(firestore, paths.rooms),
-    convertRoomToRoomRemote(room),
-  );
-
-  const id = res.id;
-
-  return { ...room, id };
-};
-
-export const db = {
-  setRoomId,
-  room$,
-  useRoom,
-  actionsFromDb$,
-  fbApp,
-  paths,
-  firestore,
-  addAction,
-  addPlayer,
-  createRoom,
-} as const;
-
-const mut_unsubscribe: {
-  room: Unsubscribe | undefined;
-  actions: Unsubscribe | undefined;
-} = {
-  room: undefined,
-  actions: undefined,
-};
-
-roomId$.subscribe((roomId) => {
-  if (roomId === undefined) return;
-
-  if (mut_unsubscribe.room !== undefined) {
     mut_unsubscribe.room();
-  }
-  if (mut_unsubscribe.actions !== undefined) {
     mut_unsubscribe.actions();
-  }
+    mut_unsubscribe.players();
 
-  const roomDoc = doc(db.firestore, db.paths.rooms, roomId);
+    {
+      const { roomStream$, unsubscribeRoomSnapshot } =
+        api.getRoomStream(roomId);
+      mut_unsubscribe.room = unsubscribeRoomSnapshot;
 
-  const actionsColl = query(
-    collection(db.firestore, db.paths.rooms, roomId, db.paths.actions),
-    orderBy('timestamp'),
-  );
+      roomStream$.subscribe((room) => {
+        if (Result.isOk(room)) {
+          if (isDevelopment) {
+            console.log({ room: room.value });
+          }
+          setRoom_(room.value);
+        } else {
+          // TODO: show errors in the window
+          console.error(room.value);
+        }
+      });
+    }
+    {
+      const { playersStream$, unsubscribePlayersSnapshot } =
+        api.getPlayersStream(roomId);
 
-  mut_unsubscribe.room = onSnapshot(roomDoc, (d) => {
-    const data = d.data();
-    assertIsRoomRemote(data);
-    setRoom(convertRoomRemoteToRoom(data, d.id));
+      mut_unsubscribe.players = unsubscribePlayersSnapshot;
+
+      playersStream$.subscribe((players) => {
+        if (Result.isOk(players)) {
+          if (isDevelopment) {
+            console.log({ players: players.value });
+          }
+          setPlayers_(players.value);
+        } else {
+          // TODO: show errors in the window
+          console.error(players.value);
+        }
+      });
+    }
+    {
+      const { gameActionsStream$, unsubscribeActionsSnapshot } =
+        api.getActionsStream(roomId);
+
+      mut_unsubscribe.actions = unsubscribeActionsSnapshot;
+
+      gameActionsStream$.subscribe((actions) => {
+        if (Result.isOk(actions)) {
+          if (isDevelopment) {
+            console.log({ actions: actions.value });
+          }
+          setActionsFromDb_(actions.value);
+        } else {
+          // TODO: show errors in the window
+          console.error(actions.value);
+        }
+      });
+    }
   });
-
-  mut_unsubscribe.actions = onSnapshot(actionsColl, (q) => {
-    const mut_actions: GameStateAction[] = [];
-    // eslint-disable-next-line unicorn/no-array-for-each
-    q.forEach((d) => {
-      const data = d.data();
-      assertIsGameStateAction(data);
-      mut_actions.push(data);
-    });
-
-    setActionsFromDb_(mut_actions);
-  });
-});
+}

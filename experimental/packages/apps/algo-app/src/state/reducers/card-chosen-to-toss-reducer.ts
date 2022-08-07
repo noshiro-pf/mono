@@ -15,6 +15,7 @@ export const cardChosenToTossReducer: Reducer<
     case 'showJudgeOnDecidedAnswer':
     case 'hideDecidedAnswerBalloon':
       return curr;
+    case 'initializePlayerCards':
     case 'cancelToss':
     case 'submitToss':
     case 'goToNextTurn':

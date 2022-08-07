@@ -2,6 +2,7 @@ import { dictionary, directions, outlineColorDef } from '../constants';
 import {
   cardEq,
   decrementPlayerIndex,
+  getShuffledPlayers,
   incrementPlayerIndex,
   sortCards,
 } from '../functions';
@@ -13,18 +14,23 @@ import {
   type GameState,
   type NWES,
   type PlayerIndex,
+  type PlayerWithId,
+  type RoomRemote,
+  type ShuffleDef,
   type VisibilityFromMe,
 } from '../types';
 
 const mapPlayers6CardsToDisplayValue = ({
   direction,
   player6Cards,
+  roomState,
   gameState,
   myPlayerIndex,
   onCardClick,
 }: Readonly<{
   direction: NWES;
   player6Cards: ArrayOfLength<6, CardWithVisibility>;
+  roomState: RoomRemote['state'];
   gameState: Pick<
     GameState,
     | 'cardChosenToAttack'
@@ -88,6 +94,7 @@ const mapPlayers6CardsToDisplayValue = ({
 
         return {
           ...c,
+          disabled: roomState === 'not-started',
           visibilityFromMe,
           isClickable,
           float: isAtk || isToss ? 'always' : 'never',
@@ -111,11 +118,17 @@ const mapPlayers6CardsToDisplayValue = ({
     ).value;
 
 export const mapToDisplayValue = ({
+  roomState,
   gameState,
+  shuffleDef,
+  players,
   myPlayerIndex,
   onCardClick,
 }: Readonly<{
+  roomState: RoomRemote['state'];
   gameState: GameState;
+  shuffleDef: ShuffleDef;
+  players: readonly PlayerWithId[];
   myPlayerIndex: PlayerIndex;
   onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
 }>): DisplayValues => ({
@@ -123,6 +136,7 @@ export const mapToDisplayValue = ({
     S: mapPlayers6CardsToDisplayValue({
       direction: 'S',
       player6Cards: gameState.playerCards[myPlayerIndex],
+      roomState,
       gameState,
       myPlayerIndex,
       onCardClick,
@@ -131,6 +145,7 @@ export const mapToDisplayValue = ({
       direction: 'W',
       player6Cards:
         gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 1)],
+      roomState,
       gameState,
       myPlayerIndex,
       onCardClick,
@@ -139,6 +154,7 @@ export const mapToDisplayValue = ({
       direction: 'N',
       player6Cards:
         gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 2)],
+      roomState,
       gameState,
       myPlayerIndex,
       onCardClick,
@@ -147,16 +163,32 @@ export const mapToDisplayValue = ({
       direction: 'E',
       player6Cards:
         gameState.playerCards[incrementPlayerIndex(myPlayerIndex, 3)],
+      roomState,
       gameState,
       myPlayerIndex,
       onCardClick,
     }),
   },
 
-  gameMessage: match(gameState.phase, {
-    ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
-    ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
-    ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
+  playerNames: pipe(players)
+    .chain((ps) => getShuffledPlayers(ps, shuffleDef))
+    .chain((ps) => ({
+      S: ps[myPlayerIndex]?.name,
+      W: ps[incrementPlayerIndex(myPlayerIndex, 1)]?.name,
+      N: ps[incrementPlayerIndex(myPlayerIndex, 2)]?.name,
+      E: ps[incrementPlayerIndex(myPlayerIndex, 3)]?.name,
+    })).value,
+
+  cardsAreHidden: roomState === 'not-started',
+
+  gameMessage: match(roomState, {
+    'not-started': dictionary.gameMessage.startGame,
+    finished: dictionary.gameMessage.gameEnded.youWin, // TODO
+    playing: match(gameState.phase, {
+      ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
+      ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
+      ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
+    }),
   }),
   turnPlayer: match(gameState.currentPlayerIndex, {
     0: directions[decrementPlayerIndex(0, myPlayerIndex)],
@@ -164,6 +196,15 @@ export const mapToDisplayValue = ({
     2: directions[decrementPlayerIndex(2, myPlayerIndex)],
     3: directions[decrementPlayerIndex(3, myPlayerIndex)],
   }),
+
+  roomState,
+
+  startGameButtonState:
+    roomState !== 'not-started'
+      ? 'hidden'
+      : players.length === 4 // ready
+        ? 'shown'
+        : 'disabled',
 
   endTurnButtonDisabled:
     gameState.phase !== 'ph030_continuousAnswer' || gameState.readonly,

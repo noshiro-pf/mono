@@ -1,5 +1,6 @@
 import { getShuffled } from '@noshiro/ts-utils-additional';
-import { toShuffleDef, type Card, type Room, type ShuffleDef } from '../types';
+import { type Card, type Room } from '../types';
+import { newShuffleDef } from './new-shuffle-def';
 import { sortCards } from './sort-cards';
 
 const allCards: ArrayOfLength<24, Card> = [
@@ -27,7 +28,7 @@ const allCards: ArrayOfLength<24, Card> = [
   { color: 'white', number: 9 },
   { color: 'white', number: 10 },
   { color: 'white', number: 11 },
-];
+] as const;
 
 const randomizePlayerCards = (): DeepReadonly<
   ArrayOfLength<4, ArrayOfLength<6, Card>>
@@ -43,19 +44,10 @@ const randomizePlayerCards = (): DeepReadonly<
       return listOfCards;
     }).value;
 
-export const newShuffleDef = (): ShuffleDef =>
-  pipe(Arr.seq(4))
-    .chain(getShuffled)
-    .chain((list) => list.join(''))
-    .chain(toShuffleDef).value;
-
-export const newRoom = (
-  password: Room['password'],
-  player: Room['players'][0],
-): Omit<Room, 'id'> => ({
+export const newRoom = (password: Room['password']): Omit<Room, 'id'> => ({
   state: 'not-started',
   password,
-  players: [player],
   playerCards: randomizePlayerCards(),
   shuffleDef: newShuffleDef(),
+  players: [],
 });

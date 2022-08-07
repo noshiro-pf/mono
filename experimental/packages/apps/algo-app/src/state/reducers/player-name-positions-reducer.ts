@@ -1,5 +1,4 @@
 import { type Rect } from '@noshiro/ts-utils-additional';
-import { produce } from 'immer';
 import { type NWES } from '../../types';
 
 const initialState = (): Record<NWES, Rect> => ({
@@ -13,6 +12,4 @@ export const playerNamePositionsReducer: Reducer<
   Record<NWES, Rect> | undefined,
   readonly [NWES, Rect]
 > = (state, [direction, rect]) =>
-  produce(state ?? initialState(), (draft) => {
-    draft[direction] = rect;
-  });
+  Obj.set(state ?? initialState(), direction, rect);

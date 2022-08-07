@@ -15,6 +15,7 @@ export const answerSelectedReducer: Reducer<
     case 'submitAnswer':
     case 'showJudgeOnDecidedAnswer':
       return curr;
+    case 'initializePlayerCards':
     case 'hideDecidedAnswerBalloon':
     case 'cancelAnswer':
     case 'goToNextTurn':

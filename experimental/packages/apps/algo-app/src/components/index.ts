@@ -6,4 +6,4 @@ export * from './game-main';
 export * from './join-room-page';
 export * from './organisms';
 export * from './root';
-export * from './use-window-size';
+export * from './styled';
