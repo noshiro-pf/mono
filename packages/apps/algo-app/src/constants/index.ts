@@ -4,7 +4,6 @@ export * from './dictionary';
 export * from './directions';
 export * from './firebase';
 export * from './routes';
-export * from './text';
 export * from './time';
 export * from './view';
 export * from './z-index';
