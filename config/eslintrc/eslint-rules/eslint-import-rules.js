@@ -29,6 +29,7 @@ const eslintImportsRules = {
         'preact/**',
         'immer/**',
         'firebase/*',
+        'firebase-functions/**',
         '@blueprintjs/*',
         '@material-ui/*',
         'resize-observer/lib/ResizeObserverEntry',
