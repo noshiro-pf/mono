@@ -1,7 +1,7 @@
 import { assertType } from '@noshiro/ts-utils';
-import { number } from './primitives';
+import { number } from '../primitives';
+import type { TypeOf } from '../type';
 import { record } from './record';
-import type { Typeof } from './type';
 
 describe('record', () => {
   const ymd = record({
@@ -10,7 +10,7 @@ describe('record', () => {
     date: number(1),
   });
 
-  type Ymd = Typeof<typeof ymd>;
+  type Ymd = TypeOf<typeof ymd>;
 
   assertType<
     TypeEq<Ymd, Readonly<{ year: number; month: number; date: number }>>
@@ -18,7 +18,7 @@ describe('record', () => {
 
   assertType<TypeEq<typeof ymd.defaultValue, Ymd>>();
 
-  describe('validate', () => {
+  describe('is', () => {
     test('truthy case', () => {
       const x: ReadonlyRecordBase = {
         year: 2000,
@@ -49,6 +49,21 @@ describe('record', () => {
       }
 
       expect(ymd.is(x)).toBe(false);
+    });
+  });
+
+  describe('validate', () => {
+    test('falsy case', () => {
+      const x: ReadonlyRecordBase = {
+        year: 2000,
+        month: 'ab',
+        date: 'cd',
+      };
+
+      expect(ymd.validate(x).value).toStrictEqual([
+        `The value at record key "month" is expected to be <number>, but it is actually '"ab"'.`,
+        `The value is expected to be <number>, but it is actually '"ab"'.`,
+      ]);
     });
   });
 

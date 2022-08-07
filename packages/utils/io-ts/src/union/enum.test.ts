@@ -1,6 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
+import type { TypeOf } from '../type';
 import { enumType } from './enum';
-import type { Typeof } from './type';
 
 describe('enumType', () => {
   const targetType = enumType({
@@ -8,13 +8,13 @@ describe('enumType', () => {
     defaultValue: 3,
   } as const);
 
-  type TargetType = Typeof<typeof targetType>;
+  type TargetType = TypeOf<typeof targetType>;
 
   assertType<TypeEq<TargetType, '2' | 'a' | 3>>();
 
   assertType<TypeEq<typeof targetType.defaultValue, TargetType>>();
 
-  describe('validate', () => {
+  describe('is', () => {
     test('truthy case', () => {
       const x: number | string = Math.random() >= 0 ? 3 : '0'; // the value is always 1
 
@@ -37,6 +37,14 @@ describe('enumType', () => {
       }
 
       expect(targetType.is(x)).toBe(false);
+    });
+  });
+
+  describe('validate', () => {
+    test('falsy case', () => {
+      expect(targetType.validate(5).value).toStrictEqual([
+        "The value is expected to be one of the elements contained in { 3, 2, a }, but it is actually '5'.",
+      ]);
     });
   });
 

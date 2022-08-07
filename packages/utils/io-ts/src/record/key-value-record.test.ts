@@ -1,7 +1,7 @@
 import { assertType } from '@noshiro/ts-utils';
+import { number, string } from '../primitives';
+import type { TypeOf } from '../type';
 import { keyValueRecord } from './key-value-record';
-import { number, string } from './primitives';
-import type { Typeof } from './type';
 
 describe('keyValueRecord', () => {
   const strNumRecord = keyValueRecord({
@@ -9,13 +9,13 @@ describe('keyValueRecord', () => {
     valueType: number(0),
   });
 
-  type StrNumRecord = Typeof<typeof strNumRecord>;
+  type StrNumRecord = TypeOf<typeof strNumRecord>;
 
   assertType<TypeEq<StrNumRecord, Readonly<Record<string, number>>>>();
 
   assertType<TypeEq<typeof strNumRecord.defaultValue, StrNumRecord>>();
 
-  describe('validate', () => {
+  describe('is', () => {
     test('truthy case', () => {
       const x: ReadonlyRecordBase = {
         year: 2000,
@@ -46,6 +46,21 @@ describe('keyValueRecord', () => {
       }
 
       expect(strNumRecord.is(x)).toBe(false);
+    });
+  });
+
+  describe('validate', () => {
+    test('falsy case', () => {
+      const x: ReadonlyRecordBase = {
+        year: 2000,
+        month: 'ab',
+        date: 'cd',
+      };
+
+      expect(strNumRecord.validate(x).value).toStrictEqual([
+        `The value of the record is expected to be <number>, but it is actually '"ab"'.`,
+        `The value is expected to be <number>, but it is actually '"ab"'.`,
+      ]);
     });
   });
 

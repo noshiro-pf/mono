@@ -1,11 +1,12 @@
 import { isNumber, Num } from '@noshiro/ts-utils';
-import { createPrimitiveType } from '../primitives';
 import type { Type } from '../type';
+import { createPrimitiveType } from '../utils';
 
 type Int = number;
 
 export const int = (defaultValue: Int): Type<Int> =>
   createPrimitiveType({
-    is: (a: unknown): a is Int => isNumber(a) && Num.isInt(a),
+    typeName: 'int',
     defaultValue,
+    is: (a: unknown): a is Int => isNumber(a) && Num.isInt(a),
   });

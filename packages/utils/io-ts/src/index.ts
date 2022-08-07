@@ -6,12 +6,9 @@
 /// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />
 
 export * from './array';
-export * from './custom-type';
-export * from './enum';
-export * from './key-value-record';
 export * from './numbers';
 export * from './primitives';
 export * from './record';
-export * from './tuple';
 export * from './type';
 export * from './union';
+export * from './utils';
