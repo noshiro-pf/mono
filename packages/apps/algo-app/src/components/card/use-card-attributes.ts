@@ -3,7 +3,7 @@ import {
   darkGray,
   eyeIconColorDef,
   lightGray,
-  zIndex,
+  playerHolderCardColor,
   type CardTextColor,
   type CustomColor,
 } from '../../constants';
@@ -15,10 +15,11 @@ export const useCardAttributes = (
   size: Partial<RectSize> | undefined,
   visibilityFromMe: VisibilityFromMe,
   isClickable: boolean,
+  isPlaceholder: boolean,
   float: 'always' | 'never' | 'onHover',
   showOutline: 'always' | 'never' | 'onHover',
   outlineColor: CustomColor,
-): {
+): Readonly<{
   textColor: CardTextColor;
   eyeIconColor: string;
   wrapperStyle: preact.JSX.CSSProperties;
@@ -27,7 +28,7 @@ export const useCardAttributes = (
   rectStyle: preact.JSX.CSSProperties;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-} => {
+}> => {
   const { width, height } = useMemo(() => fillCardSize(size), [size]);
 
   const textColor =
@@ -48,14 +49,12 @@ export const useCardAttributes = (
 
   const wrapperStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({
-      display: 'block',
       cursor: isClickable ? 'pointer' : 'default',
       transform: `translateY(${
         float === 'always' || (float === 'onHover' && isMouseOver) ? -20 : 0
       }px)`,
       height: `${height}px`,
       width: `${width}px`,
-      zIndex: zIndex.cards,
     }),
     [isClickable, float, isMouseOver, height, width],
   );
@@ -83,9 +82,9 @@ export const useCardAttributes = (
     () => ({
       stroke: _showOutline ? outlineColor : '',
       strokeWidth: _showOutline ? 8 : 0,
-      fill: color,
+      fill: isPlaceholder ? playerHolderCardColor : color,
     }),
-    [_showOutline, color, outlineColor],
+    [_showOutline, isPlaceholder, color, outlineColor],
   );
 
   return {

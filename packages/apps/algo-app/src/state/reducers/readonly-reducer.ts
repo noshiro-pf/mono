@@ -5,6 +5,7 @@ export const readonlyReducer: Reducer<
   GameStateAction
 > = (curr, action) => {
   switch (action.type) {
+    case 'initializePlayerCards':
     case 'selectMyCard':
     case 'cancelToss':
     case 'submitToss':
