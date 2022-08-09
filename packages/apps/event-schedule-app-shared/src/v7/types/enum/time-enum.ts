@@ -5,20 +5,12 @@ export const yearsTypeDef = t.positiveInteger(
   // pipe(IDate.today()).chain(IDate.getLocaleYear).value
 );
 
-export const monthsTypeDef = t.uintRange(
-  1,
-  12,
-  1
-  // pipe(IDate.today()).chain(IDate.getLocaleMonth).value
-);
+export const monthsTypeDef = t.uintRange({ min: 1, max: 12, defaultValue: 1 });
+// pipe(IDate.today()).chain(IDate.getLocaleMonth).value
 
-export const datesTypeDef = t.uintRange(
-  1,
-  31,
-  1
-  // pipe(IDate.today()).chain(IDate.getLocaleDate).value
-);
+export const datesTypeDef = t.uintRange({ min: 1, max: 31, defaultValue: 1 });
+// pipe(IDate.today()).chain(IDate.getLocaleDate).value
 
-export const hoursTypeDef = t.uintRange(0, 23, 0);
+export const hoursTypeDef = t.uintRange({ min: 0, max: 23, defaultValue: 0 });
 
-export const minutesTypeDef = t.uintRange(0, 59, 0);
+export const minutesTypeDef = t.uintRange({ min: 0, max: 59, defaultValue: 0 });
