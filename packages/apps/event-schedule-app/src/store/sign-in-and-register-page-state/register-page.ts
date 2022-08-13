@@ -1,5 +1,5 @@
 import { api } from '../../api';
-import { routes } from '../../constants';
+import { Routes } from '../../constants';
 import {
   createToaster,
   registerPageHasError,
@@ -154,7 +154,7 @@ export namespace RegisterPageStore {
     if (pageToBack !== undefined) {
       router.redirect(pageToBack);
     } else {
-      router.redirect(routes.createPage);
+      router.redirect(Routes.routes.createPage);
     }
   };
 

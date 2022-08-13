@@ -1,6 +1,6 @@
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
-import { eventScheduleInitialValue, routes } from '../../constants';
+import { eventScheduleInitialValue, Routes } from '../../constants';
 import type { EventSettingsPageDiffResult } from '../../functions';
 import {
   collectEventSettingsPageDiff,
@@ -108,7 +108,7 @@ export namespace EditEventScheduleStore {
   );
 
   const answerPagePath$ = router.eventId$.chain(
-    mapI((eventId) => routes.answerPage(eventId ?? ''))
+    mapI((eventId) => Routes.routes.answerPage(eventId ?? ''))
   );
 
   export const onBackToAnswerPage = (): void => {

@@ -2,7 +2,7 @@ import { AnchorButton, Icon, Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { css } from 'styled-components';
-import { aboutThisAppUrl, feedbackUrl, routes } from '../../constants';
+import { aboutThisAppUrl, feedbackUrl, Routes } from '../../constants';
 import {
   router,
   signOutClick,
@@ -60,7 +60,7 @@ export const NavBar = memoNamed('NavBar', () => {
       <Row>
         <Item>
           <AnchorButton
-            href={routes.createPage}
+            href={Routes.routes.createPage}
             icon={'add'}
             intent={'primary'}
             rel={'noopener noreferrer'}
@@ -82,11 +82,14 @@ export const NavBar = memoNamed('NavBar', () => {
                 isOpen={forNonLoggedInUserDialogState.state}
               />
 
-              <ItemAnchor href={routes.signInPage} onClick={handleSignInClick}>
+              <ItemAnchor
+                href={Routes.routes.signInPage}
+                onClick={handleSignInClick}
+              >
                 {dc.auth.signIn}
               </ItemAnchor>
               <ItemAnchor
-                href={routes.registerPage}
+                href={Routes.routes.registerPage}
                 onClick={handleRegisterClick}
               >
                 {dc.auth.register}
@@ -95,7 +98,7 @@ export const NavBar = memoNamed('NavBar', () => {
           ) : (
             <>
               <ItemAnchor
-                href={routes.eventListPage}
+                href={Routes.routes.eventListPage}
                 onClick={handleEventListButtonClick}
               >
                 {dc.list}

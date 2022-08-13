@@ -2,7 +2,7 @@ import type { EventListItem } from '@noshiro/event-schedule-app-shared';
 import {
   errorFontColor,
   eventListItemTextColor,
-  routes,
+  Routes,
   ymd2str,
   ymdhm2strWithDay,
 } from '../../../constants';
@@ -36,7 +36,7 @@ export const EventListItemComponent = memoNamed<Props>(
     onConfirmUnArchiving,
   }) => {
     const onLinkClick = useCallback(() => {
-      router.push(routes.answerPage(eventId));
+      router.push(Routes.routes.answerPage(eventId));
     }, [eventId]);
 
     const hasUnanswered = useMemo<boolean>(

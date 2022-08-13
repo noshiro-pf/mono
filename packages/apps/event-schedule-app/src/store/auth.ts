@@ -1,4 +1,4 @@
-import { routes } from '../constants';
+import { Routes } from '../constants';
 import { auth } from '../initialize-firebase';
 import { clog } from '../utils';
 import { router } from './router';
@@ -34,7 +34,7 @@ auth.onAuthStateChanged((user) => {
 
 export const signOut = async (): Promise<void> => {
   await auth.signOut();
-  router.push(routes.signInPage);
+  router.push(Routes.routes.signInPage);
 };
 
 export const signOutClick = (): void => {
