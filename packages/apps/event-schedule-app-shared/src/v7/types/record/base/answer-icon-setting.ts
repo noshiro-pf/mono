@@ -13,7 +13,7 @@ export const answerIconSettingTypeDef = <D extends AnswerIconPoint>(
 
 const answerIconSettingTypeDef0 = answerIconSettingTypeDef(0);
 
-export type AnswerIconSetting = t.Typeof<typeof answerIconSettingTypeDef0>;
+export type AnswerIconSetting = t.TypeOf<typeof answerIconSettingTypeDef0>;
 
 export const answerIconSettingDefaultValue =
   answerIconSettingTypeDef0.defaultValue;

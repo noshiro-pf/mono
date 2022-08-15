@@ -30,7 +30,7 @@ export const eventScheduleTypeDef = t.record({
   archivedBy: t.array({ elementType: userTypeDef }),
 });
 
-export type EventSchedule = t.Typeof<typeof eventScheduleTypeDef>;
+export type EventSchedule = t.TypeOf<typeof eventScheduleTypeDef>;
 
 export const eventScheduleDefaultValue = eventScheduleTypeDef.defaultValue;
 

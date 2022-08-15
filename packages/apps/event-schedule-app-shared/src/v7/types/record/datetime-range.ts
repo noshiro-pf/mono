@@ -7,7 +7,7 @@ export const datetimeRangeTypeDef = t.record({
   timeRange: timeRangeTypeDef,
 });
 
-export type DatetimeRange = t.Typeof<typeof datetimeRangeTypeDef>;
+export type DatetimeRange = t.TypeOf<typeof datetimeRangeTypeDef>;
 
 export const datetimeRangeDefaultValue = datetimeRangeTypeDef.defaultValue;
 

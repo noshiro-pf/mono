@@ -16,7 +16,7 @@ export const ymdhmTypeDef = t.record({
   minutes: minutesTypeDef,
 });
 
-export type Ymdhm = t.Typeof<typeof ymdhmTypeDef>;
+export type Ymdhm = t.TypeOf<typeof ymdhmTypeDef>;
 
 export const ymdhmDefaultValue = ymdhmTypeDef.defaultValue;
 

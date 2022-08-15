@@ -15,7 +15,7 @@ export const answerTypeDef = t.record({
   isRequiredParticipants: t.boolean(false),
 });
 
-export type Answer = t.Typeof<typeof answerTypeDef>;
+export type Answer = t.TypeOf<typeof answerTypeDef>;
 
 export const answerDefaultValue = answerTypeDef.defaultValue;
 

@@ -6,7 +6,7 @@ export const userTypeDef = t.record({
   name: userNameTypeDef,
 });
 
-export type User = t.Typeof<typeof userTypeDef>;
+export type User = t.TypeOf<typeof userTypeDef>;
 
 export const userDefaultValue = userTypeDef.defaultValue;
 
