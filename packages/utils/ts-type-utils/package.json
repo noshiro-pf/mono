@@ -24,6 +24,7 @@
       "command": "tsc -p tsconfig.type-check.json",
       "files": [
         "src/**/*.ts",
+        "tests/**/*.ts",
         "tsconfig.type-check.json",
         "../../../config/tsconfig/tsconfig.base.nolib.json",
         "../ts-type-utils/ts-type-utils.d.ts"
