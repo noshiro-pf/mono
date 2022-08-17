@@ -4,7 +4,7 @@ A monorepo for nodejs projects.
 
 ## setup
 
-```
+```sh
 $  yarn setup:all
 ```
 
