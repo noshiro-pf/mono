@@ -19,6 +19,7 @@
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "wireit",
+    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },

@@ -20,6 +20,7 @@
     "start": "run-p start:**",
     "start:dev-server": "webpack serve --config config/webpack.dev.js",
     "test": "wireit",
+    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
