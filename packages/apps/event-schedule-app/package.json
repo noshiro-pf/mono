@@ -37,6 +37,7 @@
     "start:dev-server": "webpack serve --config config/webpack.dev.js",
     "start:emulators": "yarn fb:emulators:start",
     "test": "wireit",
+    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
     "type-check": "wireit"
   },
