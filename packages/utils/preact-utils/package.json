@@ -78,6 +78,8 @@
         "src/**/*.{ts,tsx}",
         ".eslintignore",
         ".eslintrc.cjs",
+        "../../../package.json",
+        "package.json",
         "tsconfig.json",
         "../../../config/tsconfig/tsconfig.preact.nolib.json",
         "../../../config/eslintrc/**",
