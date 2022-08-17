@@ -8,7 +8,7 @@ export const yearMonthDateTypeDef = t.record({
   date: datesTypeDef,
 });
 
-export type YearMonthDate = t.Typeof<typeof yearMonthDateTypeDef>;
+export type YearMonthDate = t.TypeOf<typeof yearMonthDateTypeDef>;
 
 export const yearMonthDateDefaultValue = yearMonthDateTypeDef.defaultValue;
 

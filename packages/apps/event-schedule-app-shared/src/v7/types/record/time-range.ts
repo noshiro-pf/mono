@@ -6,7 +6,7 @@ export const timeRangeTypeDef = t.record({
   end: hoursMinutesTypeDef,
 });
 
-export type TimeRange = t.Typeof<typeof timeRangeTypeDef>;
+export type TimeRange = t.TypeOf<typeof timeRangeTypeDef>;
 
 export const timeRangeDefaultValue = timeRangeTypeDef.defaultValue;
 

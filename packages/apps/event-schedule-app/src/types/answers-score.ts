@@ -20,6 +20,6 @@ const answersScoreTypeDef = t.union({
   ] as const).map(t.numberLiteral)
 })
 
-export type AnswersScore = t.Typeof<typeof answersScoreTypeDef>;
+export type AnswersScore = t.TypeOf<typeof answersScoreTypeDef>;
 
 export const isAnswersScore = answersScoreTypeDef.is;

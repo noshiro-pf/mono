@@ -16,7 +16,7 @@ export const eventListItemTypeDef = t.record({
   }),
 });
 
-export type EventListItem = t.Typeof<typeof eventListItemTypeDef>;
+export type EventListItem = t.TypeOf<typeof eventListItemTypeDef>;
 
 export const eventListItemDefaultValue = eventListItemTypeDef.defaultValue;
 

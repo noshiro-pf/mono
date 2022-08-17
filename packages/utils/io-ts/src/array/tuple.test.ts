@@ -1,8 +1,8 @@
 import { assertType } from '@noshiro/ts-utils';
-import { number, numberLiteral, stringLiteral } from './primitives';
-import { record } from './record';
+import { number, numberLiteral, stringLiteral } from '../primitives';
+import { record } from '../record';
+import type { TypeOf } from '../type';
 import { tuple } from './tuple';
-import type { Typeof } from './type';
 
 describe('tuple', () => {
   const targetType = tuple({
@@ -13,7 +13,7 @@ describe('tuple', () => {
     ],
   } as const);
 
-  type TargetType = Typeof<typeof targetType>;
+  type TargetType = TypeOf<typeof targetType>;
 
   assertType<
     TypeEq<
@@ -31,7 +31,7 @@ describe('tuple', () => {
 
   assertType<TypeEq<typeof targetType.defaultValue, TargetType>>();
 
-  describe('validate', () => {
+  describe('is', () => {
     test('truthy case', () => {
       const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
 
@@ -54,6 +54,18 @@ describe('tuple', () => {
       }
 
       expect(targetType.is(x)).toBe(false);
+    });
+  });
+
+  describe('validate', () => {
+    test('falsy case', () => {
+      const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'];
+
+      expect(targetType.validate(x).value).toStrictEqual([
+        `The tuple element at 0 is expected to be <{ x: number, y: number }>, but it is actually '{"x":"str","y":"str"}'.`,
+        `The value at record key "x" is expected to be <number>, but it is actually '"str"'.`,
+        `The value is expected to be <number>, but it is actually '"str"'.`,
+      ]);
     });
   });
 

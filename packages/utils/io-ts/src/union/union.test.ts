@@ -1,7 +1,7 @@
 import { assertType } from '@noshiro/ts-utils';
-import { number, numberLiteral, stringLiteral } from './primitives';
-import { record } from './record';
-import type { Typeof } from './type';
+import { number, numberLiteral, stringLiteral } from '../primitives';
+import { record } from '../record';
+import type { TypeOf } from '../type';
 import { union } from './union';
 
 describe('union', () => {
@@ -14,7 +14,7 @@ describe('union', () => {
     ],
   } as const);
 
-  type TargetType = Typeof<typeof targetType>;
+  type TargetType = TypeOf<typeof targetType>;
 
   assertType<
     TypeEq<
@@ -30,7 +30,7 @@ describe('union', () => {
 
   assertType<TypeEq<typeof targetType.defaultValue, TargetType>>();
 
-  describe('validate', () => {
+  describe('is', () => {
     test('truthy case', () => {
       const x: unknown = Math.random() >= 0 ? 3 : '0'; // the value is always 1
 
@@ -65,6 +65,14 @@ describe('union', () => {
       }
 
       expect(targetType.is(x)).toBe(false);
+    });
+  });
+
+  describe('validate', () => {
+    test('falsy case', () => {
+      expect(targetType.validate(5).value).toStrictEqual([
+        "The type of value is expected to be one of the elements contained in { { x: number, y: number }, numberLiteral(3), stringLiteral(2) }, but it is actually '5'.",
+      ]);
     });
   });
 

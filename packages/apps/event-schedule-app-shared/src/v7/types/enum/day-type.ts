@@ -5,6 +5,6 @@ const dayTypeDef = t.enumType({
   defaultValue: 'normal',
 });
 
-export type DayType = t.Typeof<typeof dayTypeDef>;
+export type DayType = t.TypeOf<typeof dayTypeDef>;
 
 export const isDayType = dayTypeDef.is;

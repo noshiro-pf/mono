@@ -11,7 +11,7 @@ export const datetimeSpecificationTypeDef = t.enumType({
   defaultValue: 'noStartEndSpecified',
 });
 
-export type DatetimeSpecificationEnumType = t.Typeof<
+export type DatetimeSpecificationEnumType = t.TypeOf<
   typeof datetimeSpecificationTypeDef
 >;
 

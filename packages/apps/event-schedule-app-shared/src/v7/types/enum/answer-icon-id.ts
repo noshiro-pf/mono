@@ -10,9 +10,9 @@ export const answerIconIdWithNoneTypeDef = t.enumType({
   values: ['fair', 'good', 'poor', 'none'],
 } as const);
 
-export type AnswerIconId = t.Typeof<typeof answerIconIdTypeDef>;
+export type AnswerIconId = t.TypeOf<typeof answerIconIdTypeDef>;
 
-export type AnswerIconIdWithNone = t.Typeof<typeof answerIconIdWithNoneTypeDef>;
+export type AnswerIconIdWithNone = t.TypeOf<typeof answerIconIdWithNoneTypeDef>;
 
 export const isAnswerIconId = answerIconIdTypeDef.is;
 

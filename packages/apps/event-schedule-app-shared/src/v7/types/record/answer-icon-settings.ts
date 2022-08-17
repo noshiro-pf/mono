@@ -7,7 +7,7 @@ export const answerIconSettingsTypeDef = t.record({
   poor: answerIconSettingTypeDef(0),
 });
 
-export type AnswerIconSettings = t.Typeof<typeof answerIconSettingsTypeDef>;
+export type AnswerIconSettings = t.TypeOf<typeof answerIconSettingsTypeDef>;
 
 export const answerIconSettingsDefaultValue =
   answerIconSettingsTypeDef.defaultValue;

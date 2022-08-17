@@ -7,7 +7,7 @@ export const hoursMinutesTypeDef = t.record({
   minutes: minutesTypeDef,
 });
 
-export type HoursMinutes = t.Typeof<typeof hoursMinutesTypeDef>;
+export type HoursMinutes = t.TypeOf<typeof hoursMinutesTypeDef>;
 
 export const hoursMinutesDefaultValue = hoursMinutesTypeDef.defaultValue;
 

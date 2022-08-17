@@ -1,18 +1,22 @@
 import { assertType } from '@noshiro/ts-utils';
 import { number } from '../primitives';
-import type { Typeof } from '../type';
+import type { TypeOf } from '../type';
 import { array } from './array';
 
 describe('array', () => {
-  const xs = array({ elementType: number(0), defaultValue: [] });
+  const xs = array({
+    typeName: 'xs',
+    elementType: number(0),
+    defaultValue: [],
+  });
 
-  type Xs = Typeof<typeof xs>;
+  type Xs = TypeOf<typeof xs>;
 
   assertType<TypeEq<Xs, readonly number[]>>();
 
   assertType<TypeEq<typeof xs.defaultValue, Xs>>();
 
-  describe('validate', () => {
+  describe('is', () => {
     test('truthy case', () => {
       const ys: unknown = [1, 2, 3];
 
@@ -35,6 +39,18 @@ describe('array', () => {
       }
 
       expect(xs.is(ys)).toBe(false);
+    });
+  });
+
+  describe('validate', () => {
+    test('falsy case', () => {
+      const ys: unknown = ['1', '', 3];
+
+      expect(xs.is(ys)).toBe(false);
+      expect(xs.validate(ys).value).toStrictEqual([
+        `The array element is expected to be <number>, but the actual value at index 0 is '"1"'.`,
+        `The value is expected to be <number>, but it is actually '"1"'.`,
+      ]);
     });
   });
 

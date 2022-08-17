@@ -9,7 +9,7 @@ export const answerSelectionTypeDef = t.record({
   comment: t.string(''),
 });
 
-export type AnswerSelection = t.Typeof<typeof answerSelectionTypeDef>;
+export type AnswerSelection = t.TypeOf<typeof answerSelectionTypeDef>;
 
 export const answerSelectionDefaultValue = answerSelectionTypeDef.defaultValue;
 

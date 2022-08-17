@@ -8,6 +8,7 @@ export const answerIconPointTypeDef = (
     defaultValue,
     is: (a: unknown): a is AnswerIconPoint =>
       isNumber(a) && 0 <= a && a <= 10 && Num.isSafeInt(a * 10),
+    typeName: 'AnswerIconPoint',
   });
 
 // prettier-ignore
