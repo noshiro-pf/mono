@@ -1,5 +1,5 @@
 import { api } from '../../api';
-import { routes } from '../../constants';
+import { Routes } from '../../constants';
 import {
   createToaster,
   showToast,
@@ -116,7 +116,7 @@ export namespace SignInPageStore {
       if (pageToBack !== undefined) {
         router.redirect(pageToBack);
       } else {
-        router.redirect(routes.createPage);
+        router.redirect(Routes.routes.createPage);
       }
     }
   };

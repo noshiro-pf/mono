@@ -1,5 +1,5 @@
 import { createRouter } from '@noshiro/tiny-router-observable';
-import { getEventIdFromPathname, isRoute, redirectRules } from '../constants';
+import { Routes } from '../constants';
 
 const _router = createRouter();
 
@@ -13,7 +13,9 @@ const pageToBack$ = _router.pathname$.chain(
   filter((pathname) => {
     const tokens = toPathnameTokens(pathname);
     // ログインページ・新規登録ページは除外
-    return !isRoute.registerPage(tokens) && !isRoute.signInPage(tokens);
+    return (
+      !Routes.isRoute.registerPage(tokens) && !Routes.isRoute.signInPage(tokens)
+    );
   })
 );
 
@@ -24,26 +26,26 @@ export const router = {
 
   isRoute: {
     createPage$: pathnameTokens$
-      .chain(mapI(isRoute.createPage))
+      .chain(mapI(Routes.isRoute.createPage))
       .chain(distinctUntilChangedI()),
     answerPage$: pathnameTokens$
-      .chain(mapI(isRoute.answerPage))
+      .chain(mapI(Routes.isRoute.answerPage))
       .chain(distinctUntilChangedI()),
     editPage$: pathnameTokens$
-      .chain(mapI(isRoute.editPage))
+      .chain(mapI(Routes.isRoute.editPage))
       .chain(distinctUntilChangedI()),
     eventListPage$: pathnameTokens$
-      .chain(mapI(isRoute.eventListPage))
+      .chain(mapI(Routes.isRoute.eventListPage))
       .chain(distinctUntilChangedI()),
     registerPage$: pathnameTokens$
-      .chain(mapI(isRoute.registerPage))
+      .chain(mapI(Routes.isRoute.registerPage))
       .chain(distinctUntilChangedI()),
     signInPage$: pathnameTokens$
-      .chain(mapI(isRoute.signInPage))
+      .chain(mapI(Routes.isRoute.signInPage))
       .chain(distinctUntilChangedI()),
   },
   eventId$: pathnameTokens$
-    .chain(mapI(getEventIdFromPathname))
+    .chain(mapI(Routes.getEventIdFromPathname))
     .chain(distinctUntilChangedI()),
 } as const;
 
@@ -73,7 +75,7 @@ export const useShowPage = (): Readonly<{
 };
 
 router.pathname$.subscribe((pathname) => {
-  const to = redirectRules.get(pathname);
+  const to = Routes.redirectRules.get(pathname);
   if (to !== undefined) {
     router.redirect(to);
   }

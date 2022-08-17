@@ -1,7 +1,7 @@
 import { answerDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
-import { datetimeRange2str, routes } from '../../constants';
+import { datetimeRange2str, Routes } from '../../constants';
 import type {
   AnswerSelectionReducerAction,
   CalendarCurrentPageReducerState,
@@ -368,7 +368,7 @@ export namespace AnswerPageStore {
   /* @internal */
   const onEditButtonClickImpl = (eventId: string | undefined): void => {
     if (eventId !== undefined) {
-      router.push(routes.editPage(eventId));
+      router.push(Routes.routes.editPage(eventId));
     }
   };
 

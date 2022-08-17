@@ -1,4 +1,4 @@
-import { introductionUrl, routes } from '../../../constants';
+import { introductionUrl, Routes } from '../../../constants';
 import { router } from '../../../store';
 import { AlertWithMaxWidth } from '../../bp';
 
@@ -10,7 +10,7 @@ type Props = Readonly<{
 }>;
 
 const onConfirmClick = (): void => {
-  router.push(routes.signInPage);
+  router.push(Routes.routes.signInPage);
 };
 
 export const ForNonLoggedInUserDialog = memoNamed<Props>(

@@ -5,7 +5,7 @@ import {
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
-import { eventScheduleInitialValue, routes } from '../../constants';
+import { eventScheduleInitialValue, Routes } from '../../constants';
 import {
   createToaster,
   EventScheduleAppLocalStorage,
@@ -146,7 +146,7 @@ export namespace CreateEventScheduleStore {
     }
 
     setIsLoadingFalse();
-    setUrl(toAbsolutePath(`..${routes.answerPage(eventId)}`));
+    setUrl(toAbsolutePath(`..${Routes.routes.answerPage(eventId)}`));
 
     // reset local storage
     EventScheduleAppLocalStorage.saveCreateEventPageTemp({

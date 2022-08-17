@@ -1,5 +1,5 @@
 import { api } from '../../api';
-import { routes } from '../../constants';
+import { Routes } from '../../constants';
 import {
   createToaster,
   resetPasswordPageHasError,
@@ -84,7 +84,7 @@ export namespace ResetPasswordPageStore {
     if (pageToBack !== undefined) {
       router.redirect(pageToBack);
     } else {
-      router.redirect(routes.createPage);
+      router.redirect(Routes.routes.createPage);
     }
   };
 

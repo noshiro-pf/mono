@@ -1,12 +1,12 @@
 import { isYearMonthDate } from '@noshiro/event-schedule-app-shared';
-import { queryParamKey, queryParamValue } from '../../constants';
+import { Routes } from '../../constants';
 import type { AnswerFilterState } from '../../functions';
 import type { AnswersScore } from '../../types';
 import { isAnswersScore } from '../../types';
 import { router } from '../router';
 
 export namespace AnswerFilterQueryParam {
-  const keyDef = queryParamKey.answerTableState;
+  const keyDef = Routes.queryParamKey.answerTableState;
 
   export const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
     'date' | 'score',
@@ -58,10 +58,10 @@ export namespace AnswerFilterQueryParam {
     }>
   ): string =>
     (['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'] as const)
-      .map((key) => tp(queryParamValue.dayAbbrDef[key], value[key]))
+      .map((key) => tp(Routes.queryParamValue.dayAbbrDef[key], value[key]))
       .filter(([_key, checked]) => checked)
       .map(([key]) => key)
-      .join(queryParamValue.dayElementDelim);
+      .join(Routes.queryParamValue.dayElementDelim);
 
   const dayOfWeekFromStr = (
     str: string
@@ -74,34 +74,36 @@ export namespace AnswerFilterQueryParam {
     Fri: boolean;
     Sat: boolean;
   }> => {
-    const set = ISet.new(Str.split(queryParamValue.dayElementDelim)(str));
+    const set = ISet.new(
+      Str.split(Routes.queryParamValue.dayElementDelim)(str)
+    );
 
     return {
-      Sun: set.has(queryParamValue.dayAbbrDef.Sun),
-      Mon: set.has(queryParamValue.dayAbbrDef.Mon),
-      Tue: set.has(queryParamValue.dayAbbrDef.Tue),
-      Wed: set.has(queryParamValue.dayAbbrDef.Wed),
-      Thr: set.has(queryParamValue.dayAbbrDef.Thr),
-      Fri: set.has(queryParamValue.dayAbbrDef.Fri),
-      Sat: set.has(queryParamValue.dayAbbrDef.Sat),
+      Sun: set.has(Routes.queryParamValue.dayAbbrDef.Sun),
+      Mon: set.has(Routes.queryParamValue.dayAbbrDef.Mon),
+      Tue: set.has(Routes.queryParamValue.dayAbbrDef.Tue),
+      Wed: set.has(Routes.queryParamValue.dayAbbrDef.Wed),
+      Thr: set.has(Routes.queryParamValue.dayAbbrDef.Thr),
+      Fri: set.has(Routes.queryParamValue.dayAbbrDef.Fri),
+      Sat: set.has(Routes.queryParamValue.dayAbbrDef.Sat),
     };
   };
 
   const range2str = (a: string, b: string): string =>
-    `${a}${queryParamValue.rangeDelim}${b}`;
+    `${a}${Routes.queryParamValue.rangeDelim}${b}`;
 
   const rangeFromStr = (
     rangeStr: string
   ): Readonly<{ a: string; b: string }> | undefined => {
-    const res = rangeStr.split(queryParamValue.rangeDelim);
+    const res = rangeStr.split(Routes.queryParamValue.rangeDelim);
     return IList.isArrayOfLength2(res) ? { a: res[0], b: res[1] } : undefined;
   };
 
   const filledDateOnlyToStr = (value: boolean): string =>
-    value ? queryParamValue.filledDateOnlyEnabled : '';
+    value ? Routes.queryParamValue.filledDateOnlyEnabled : '';
 
   const filledDateOnlyFromStr = (value: string): boolean =>
-    value === queryParamValue.filledDateOnlyEnabled;
+    value === Routes.queryParamValue.filledDateOnlyEnabled;
 
   export const saveFilterStateToQueryParams = ({
     iconState,
@@ -218,12 +220,13 @@ export namespace AnswerFilterQueryParam {
     if (queryParams === undefined) return;
 
     const sortKey =
-      queryParams.get(keyDef.sortBy) === queryParamValue.sortBy.score
+      queryParams.get(keyDef.sortBy) === Routes.queryParamValue.sortBy.score
         ? 'score'
         : 'date';
 
     const sortOrder =
-      queryParams.get(keyDef.sortOrder) === queryParamValue.sortOrder.desc
+      queryParams.get(keyDef.sortOrder) ===
+      Routes.queryParamValue.sortOrder.desc
         ? 'desc'
         : 'asc';
 

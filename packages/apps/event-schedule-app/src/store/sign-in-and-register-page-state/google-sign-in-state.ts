@@ -1,5 +1,5 @@
 import { api } from '../../api';
-import { routes } from '../../constants';
+import { Routes } from '../../constants';
 import { createToaster, showToast } from '../../functions';
 import { router } from '../router';
 
@@ -39,7 +39,7 @@ export namespace GoogleSignInStore {
       if (pageToBack !== undefined) {
         router.redirect(pageToBack);
       } else {
-        router.redirect(routes.createPage);
+        router.redirect(Routes.routes.createPage);
       }
     }
   };
