@@ -10,12 +10,13 @@ type MapTuple<T extends readonly Type<unknown>[]> = {
   readonly [K in keyof T]: TypeOf<T[K]>;
 };
 
-export const tuple = <A extends readonly Type<unknown>[]>({
-  types,
-  typeName = 'tuple',
-}: Readonly<{ types: A; typeName?: string }>): Type<MapTuple<A>> => {
+export const tuple = <A extends readonly Type<unknown>[]>(
+  types: A,
+  options?: Partial<Readonly<{ typeName?: string }>>
+): Type<MapTuple<A>> => {
   type T = MapTuple<A>;
 
+  const { typeName = 'tuple' } = options ?? {};
   const defaultValue = types.map((t) => t.defaultValue) as MapTuple<A>;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -44,7 +45,7 @@ export const tuple = <A extends readonly Type<unknown>[]>({
       }
     }
 
-    return Result.ok(undefined);
+    return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>

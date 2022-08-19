@@ -4,10 +4,7 @@ import type { TypeOf } from '../type';
 import { keyValueRecord } from './key-value-record';
 
 describe('keyValueRecord', () => {
-  const strNumRecord = keyValueRecord({
-    keyType: string(''),
-    valueType: number(0),
-  });
+  const strNumRecord = keyValueRecord(string(''), number(0));
 
   type StrNumRecord = TypeOf<typeof strNumRecord>;
 

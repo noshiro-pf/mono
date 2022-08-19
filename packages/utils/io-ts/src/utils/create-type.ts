@@ -1,4 +1,3 @@
-import type { Result } from '@noshiro/ts-utils';
 import type { Type } from '../type';
 import { createAssertFunction } from './create-assert-function';
 import { createIsFnFromValidateFn } from './create-is-fn-from-validate-fn';
@@ -11,8 +10,8 @@ export const createType = <A>({
 }: Readonly<{
   typeName: string;
   defaultValue: A;
-  validate: (a: unknown) => Result<void, readonly string[]>;
-  fill?: (a: unknown) => A;
+  validate: Type<A>['validate'];
+  fill?: Type<A>['fill'];
 }>): Type<A> => {
   const is = createIsFnFromValidateFn<A>(validate);
 

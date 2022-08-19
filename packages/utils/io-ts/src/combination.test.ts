@@ -7,7 +7,7 @@ import type { TypeOf } from './type';
 
 describe('nested record', () => {
   const nestedRecord = record({
-    xs: array({ elementType: int(2) }),
+    xs: array(int(2)),
     rec: record({
       a: uintRange({ min: 0, max: 10, defaultValue: 0 }),
       b: uintRange({ min: 0, max: 10, defaultValue: 0 }),
@@ -213,7 +213,7 @@ describe('ymd', () => {
       assertType<TypeEq<typeof x.month, number>>(); // no type error
     };
 
-    expect(f).toThrow('The record is expected to have key "month".');
+    expect(f).toThrow('The record is expected to have the key "month".');
   });
 
   test('validation function', () => {
@@ -226,7 +226,7 @@ describe('ymd', () => {
     expect(Result.isErr(result)).toBe(true);
 
     expect(result.value).toStrictEqual([
-      'The record is expected to have key "month".',
+      'The record is expected to have the key "month".',
     ]);
   });
 });

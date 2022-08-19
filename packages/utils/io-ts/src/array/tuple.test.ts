@@ -5,13 +5,11 @@ import type { TypeOf } from '../type';
 import { tuple } from './tuple';
 
 describe('tuple', () => {
-  const targetType = tuple({
-    types: [
-      record({ x: number(0), y: number(0) }),
-      numberLiteral(3),
-      stringLiteral('2'),
-    ],
-  } as const);
+  const targetType = tuple([
+    record({ x: number(0), y: number(0) }),
+    numberLiteral(3),
+    stringLiteral('2'),
+  ] as const);
 
   type TargetType = TypeOf<typeof targetType>;
 

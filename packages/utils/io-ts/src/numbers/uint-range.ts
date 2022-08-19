@@ -34,7 +34,7 @@ export const uintRange = <Max extends Seq<100>, Min extends Seq<Max>>({
       return Result.err([`${prefix}, but it is actually '${str}'.`]);
     }
 
-    return Result.ok(undefined);
+    return Result.ok(a as T);
   };
 
   const is = createIsFnFromValidateFn<T>(validate);
