@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../initialize-firebase';
+import { fbAuth } from '../../initialize-firebase';
 import { assertIsCredentialError } from '../../types';
 
 export const createUser = (
@@ -9,7 +9,7 @@ export const createUser = (
   Result<UserCredential, Readonly<{ code: string; message: string }>>
 > =>
   Result.fromPromise(
-    createUserWithEmailAndPassword(auth, email, password)
+    createUserWithEmailAndPassword(fbAuth, email, password)
   ).then(
     Result.mapErr((error) => {
       assertIsCredentialError(error);

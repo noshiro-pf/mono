@@ -14,11 +14,11 @@ import firebaseJson from '../firebase.json';
 import { isDevelopment } from './env';
 import { clog } from './utils';
 
-const app = initializeApp(firebaseConfig);
+const fbApp = initializeApp(firebaseConfig);
 
 clog('firebase.initializeApp done.');
 
-export const db = initializeFirestore(app, {
+const firestore = initializeFirestore(fbApp, {
   ignoreUndefinedProperties: true,
   // https://zenn.dev/cauchye/articles/20210816_yutaro-elk
   experimentalForceLongPolling: hasKey(window, 'Cypress'),
@@ -31,26 +31,26 @@ export const db = initializeFirestore(app, {
 //   clog(`using firestore emulator. (${host}:${port})`);
 // }
 
-export const dbEvents = collection(
-  db,
+export const firestoreEvents = collection(
+  firestore,
   `${firestorePaths.events}${isDevelopment ? '_dev' : ''}`
 );
 
-export const auth = getAuth();
+export const fbAuth = getAuth();
 
 export const googleAuthProvider = new GoogleAuthProvider();
 
-export const functions = getFunctions(app, 'asia-northeast2');
+export const fbFunctions = getFunctions(fbApp, 'asia-northeast2');
 
 if (isDevelopment) {
   connectFirestoreEmulator(
-    db,
+    firestore,
     'localhost',
     firebaseJson.emulators.firestore.port
   );
 
   connectFunctionsEmulator(
-    functions,
+    fbFunctions,
     'localhost',
     firebaseJson.emulators.functions.port
   );

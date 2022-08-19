@@ -1,5 +1,5 @@
 import { Routes } from '../constants';
-import { auth } from '../initialize-firebase';
+import { fbAuth } from '../initialize-firebase';
 import { clog } from '../utils';
 import { router } from './router';
 
@@ -24,16 +24,16 @@ export const usePasswordProviderIncluded = (): boolean =>
   useObservableValue(passwordProviderIncluded$);
 
 export const emitAuthStateChange = (): void => {
-  setUser(auth.currentUser ?? undefined);
+  setUser(fbAuth.currentUser ?? undefined);
 };
 
-auth.onAuthStateChanged((user) => {
+fbAuth.onAuthStateChanged((user) => {
   clog('onAuthStateChanged', user);
   setUser(user ?? undefined);
 });
 
 export const signOut = async (): Promise<void> => {
-  await auth.signOut();
+  await fbAuth.signOut();
   router.push(Routes.routes.signInPage);
 };
 

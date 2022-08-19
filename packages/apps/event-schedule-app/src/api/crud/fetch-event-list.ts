@@ -1,9 +1,12 @@
 import type { EventListItem } from '@noshiro/event-schedule-app-shared';
 import { isEventListItem } from '@noshiro/event-schedule-app-shared';
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '../../initialize-firebase';
+import { fbFunctions } from '../../initialize-firebase';
 
-const fbFetchEventListOfUser = httpsCallable(functions, 'fetchEventListOfUser');
+const fbFetchEventListOfUser = httpsCallable(
+  fbFunctions,
+  'fetchEventListOfUser'
+);
 
 export const fetchEventListOfUser = ({
   filterText,

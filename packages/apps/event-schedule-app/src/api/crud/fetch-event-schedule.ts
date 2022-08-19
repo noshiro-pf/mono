@@ -1,6 +1,6 @@
 import { fillEventSchedule } from '@noshiro/event-schedule-app-shared';
 import { doc, getDoc } from 'firebase/firestore';
-import { dbEvents } from '../../initialize-firebase';
+import { firestoreEvents } from '../../initialize-firebase';
 
 // import { httpsCallable } from 'firebase/functions';
 // import { functions } from '../../initialize-firebase';
@@ -50,7 +50,7 @@ export const fetchEventSchedule = async (
   >
 > => {
   try {
-    const res = await getDoc(doc(dbEvents, id));
+    const res = await getDoc(doc(firestoreEvents, id));
     if (!res.exists()) {
       return Result.err({
         type: 'not-found' as const,

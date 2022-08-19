@@ -1,7 +1,7 @@
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '../../initialize-firebase';
+import { fbFunctions } from '../../initialize-firebase';
 
-const fbVerifyEmail = httpsCallable(functions, 'verifyEmail');
+const fbVerifyEmail = httpsCallable(fbFunctions, 'verifyEmail');
 
 export const verifyEmail = async (
   eventId: string,
