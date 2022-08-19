@@ -21,17 +21,55 @@ export const products: DeepReadonly<{
       id: 'syncflow',
       link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/syncflow',
       title: '★ SyncFlow',
-      subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
+      subtitle: 'リアクティブプログラミング用のTypeScriptのライブラリ',
       description:
         'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。priority queueを使わず、topological sortによりObservable全体のDAGの依存関係を事前に計算して更新を実行することでglitchを回避するようにし、都度queueを挟む実装より高速に実行できるようにした。',
-      implementation: 'TypeScriptで実装。（最終更新：2021年9月22日）',
+      implementation: 'TypeScriptで実装。（最終更新：2022年8月19日）',
+      imageUrl: '',
+    },
+    {
+      id: 'io-ts',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/io-ts',
+      title: '@noshiro/io-ts',
+      subtitle:
+        '外界から来た値の型チェックをより便利に行うためのTypeScriptライブラリ',
+      description:
+        '説明ページ → https://docs.google.com/presentation/d/19YwEkeNl8x3IWglTv8YjcOZPyMVympXn0qyDLf2mXUI/edit#slide=id.p',
+      implementation: 'TypeScriptで実装。（最終更新：2022年8月19日）',
+      imageUrl: '',
+    },
+    {
+      id: 'ts-type-utils',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils',
+      title: '@noshiro/ts-type-utils',
+      subtitle: 'TypeScriptの型ユーティリティ集',
+      description: '`UintRange<1, 5> = 1 | 2 | 3 | 4 | 5` などの型を提供',
+      implementation: 'TypeScriptで実装。（最終更新：2022年8月17日）',
+      imageUrl: '',
+    },
+    {
+      id: 'ts-utils',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-utils',
+      title: '@noshiro/ts-utils',
+      subtitle: 'TypeScriptのユーティリティ集',
+      description: 'Result型などの頻繁に使用するユーティリティを提供',
+      implementation: 'TypeScriptで実装。（最終更新：2022年8月7日）',
+      imageUrl: '',
+    },
+    {
+      id: 'tiny-router-observable',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/tiny-router-observable',
+      title: '@noshiro/tiny-router-observable',
+      subtitle: '簡易的なRouterライブラリ',
+      description: 'React Router より簡単なAPIのライブラリが欲しかったので自作',
+      implementation: 'TypeScriptで実装。（最終更新：2022年4月1日）',
       imageUrl: '',
     },
     {
       id: 'rnjs',
       link: 'https://github.com/noshiro-pf/mono/tree/main/experimental/rnjs',
       title: 'rnjs',
-      subtitle: 'リアクティブプログラミング用のJavaScriptのライブラリ',
+      subtitle: 'リアクティブプログラミング用のTypeScriptのライブラリ',
       description:
         'RxJS風の構文のリアクティブプログラミングライブラリ。RxJSで発生しうる「グリッチ」という現象が起きないようにしたもの（Observableの発火をpriority queueで管理している）。',
       implementation:

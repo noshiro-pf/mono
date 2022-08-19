@@ -2,6 +2,13 @@ import type { WritingsInfo } from '../types';
 
 export const writings: readonly WritingsInfo[] = [
   {
+    id: 'io-ts',
+    link: 'https://docs.google.com/presentation/d/19YwEkeNl8x3IWglTv8YjcOZPyMVympXn0qyDLf2mXUI/edit#slide=id.p',
+    title: 'io-ts のようなライブラリを 自作した',
+    subtitle: '自作ライブラリ "@noshiro/io-ts" の紹介スライド',
+    body: '',
+  },
+  {
     id: 'event-schedule-app',
     link: 'https://noshiro.notion.site/899268cf44c54eefa564543c63864f2a',
     title: '★ 自作アプリ「イベント日程調整アプリ」の紹介',
