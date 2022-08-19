@@ -39,7 +39,7 @@
     "@noshiro/ts-utils-additional": "*"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.0.0-beta.21",
+    "@docusaurus/module-type-aliases": "^2.0.1",
     "@noshiro/ts-type-utils": "*",
     "@tsconfig/docusaurus": "^1.0.6"
   },
