@@ -9,7 +9,7 @@ export const answerTypeDef = t.record({
   id: answerIdTypeDef,
   user: userTypeDef,
   comment: t.string(''),
-  selection: t.array({ elementType: answerSelectionTypeDef }),
+  selection: t.array(answerSelectionTypeDef),
   [ANSWER_KEY_CREATED_AT]: t.number(0),
   weight: weightTypeDef,
   isRequiredParticipants: t.boolean(false),

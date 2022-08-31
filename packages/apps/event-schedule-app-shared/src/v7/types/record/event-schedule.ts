@@ -12,10 +12,9 @@ export const eventScheduleTypeDef = t.record({
   title: t.string(''),
   notes: t.string(''),
   datetimeSpecification: datetimeSpecificationTypeDef,
-  datetimeRangeList: t.nonEmptyArray({
-    elementType: datetimeRangeTypeDef,
-    defaultValue: [datetimeRangeDefaultValue],
-  }),
+  datetimeRangeList: t.nonEmptyArray(datetimeRangeTypeDef, [
+    datetimeRangeDefaultValue,
+  ]),
   answerDeadline: t.union({
     types: [t.stringLiteral('none'), ymdhmTypeDef],
     defaultType: t.stringLiteral('none'),
@@ -27,7 +26,7 @@ export const eventScheduleTypeDef = t.record({
   }),
   timezoneOffsetMinutes: t.number(IDate.today().getTimezoneOffset()),
   author: userTypeDef,
-  archivedBy: t.array({ elementType: userTypeDef }),
+  archivedBy: t.array(userTypeDef),
 });
 
 export type EventSchedule = t.TypeOf<typeof eventScheduleTypeDef>;
