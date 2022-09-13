@@ -84,11 +84,13 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
         <FilterItemContent>
           <NumericInputsWrapper>
             <ScoreNumericInput
+              disabled={!enabled}
               max={rangeFromProps.max}
               value={rangeFromProps.min}
               onValueChange={onMinChange}
             />
             <ScoreNumericInput
+              disabled={!enabled}
               min={rangeFromProps.min}
               value={rangeFromProps.max}
               onValueChange={onMaxChange}
