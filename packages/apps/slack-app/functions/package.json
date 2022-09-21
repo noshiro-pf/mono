@@ -49,7 +49,7 @@
   "dependencies": {
     "@noshiro/io-ts": "*",
     "@noshiro/ts-utils": "*",
-    "firebase-admin": "^10.2.0",
+    "firebase-admin": "^11.0.1",
     "firebase-functions": "^3.21.0"
   },
   "devDependencies": {
