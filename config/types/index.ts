@@ -7,5 +7,5 @@
 
 export * from './dotenv-values';
 export * from './paths';
-export * from './types';
 export * from './slides-paths';
+export * from './types';
