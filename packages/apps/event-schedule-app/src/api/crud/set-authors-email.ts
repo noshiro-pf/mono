@@ -1,6 +1,6 @@
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
-import { dbEvents } from '../../initialize-firebase';
+import { firestoreEvents } from '../../initialize-firebase';
 
 export const setAuthorsEmail = (
   eventId: string,
@@ -8,7 +8,12 @@ export const setAuthorsEmail = (
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     setDoc(
-      doc(dbEvents, eventId, firestorePaths.internal, firestorePaths.values),
+      doc(
+        firestoreEvents,
+        eventId,
+        firestorePaths.internal,
+        firestorePaths.values
+      ),
       {
         [firestorePaths.email]: email,
       }
@@ -21,7 +26,12 @@ export const updateAuthorsEmail = (
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     updateDoc(
-      doc(dbEvents, eventId, firestorePaths.internal, firestorePaths.values),
+      doc(
+        firestoreEvents,
+        eventId,
+        firestorePaths.internal,
+        firestorePaths.values
+      ),
       {
         [firestorePaths.email]: email,
       }

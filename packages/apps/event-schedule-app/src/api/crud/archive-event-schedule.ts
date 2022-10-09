@@ -1,5 +1,5 @@
 import { arrayRemove, arrayUnion, doc, updateDoc } from 'firebase/firestore';
-import { dbEvents } from '../../initialize-firebase';
+import { firestoreEvents } from '../../initialize-firebase';
 
 type KeyType = 'archivedBy';
 const key: KeyType = 'archivedBy';
@@ -12,7 +12,7 @@ export const archiveEventSchedule = (
   user: User
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
-    updateDoc(doc(dbEvents, eventId), {
+    updateDoc(doc(firestoreEvents, eventId), {
       [key]: arrayUnion(user),
     })
   ).then(Result.fold(() => undefined, Str.from));
@@ -22,7 +22,7 @@ export const unarchiveEventSchedule = (
   user: User
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
-    updateDoc(doc(dbEvents, eventId), {
+    updateDoc(doc(firestoreEvents, eventId), {
       archivedBy: arrayRemove(user),
     })
   ).then(Result.fold(() => undefined, Str.from));

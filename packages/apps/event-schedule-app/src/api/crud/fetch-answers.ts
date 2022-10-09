@@ -4,7 +4,7 @@ import {
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { dbEvents } from '../../initialize-firebase';
+import { firestoreEvents } from '../../initialize-firebase';
 
 export const fetchAnswers = (
   eventId: string
@@ -14,7 +14,7 @@ export const fetchAnswers = (
   Result.fromPromise(
     getDocs(
       query(
-        collection(dbEvents, eventId, firestorePaths.answers),
+        collection(firestoreEvents, eventId, firestorePaths.answers),
         orderBy(ANSWER_KEY_CREATED_AT, 'asc')
       )
     )

@@ -1,11 +1,11 @@
 import type { FirebaseError } from 'firebase/app';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth, googleAuthProvider } from '../../initialize-firebase';
+import { fbAuth, googleAuthProvider } from '../../initialize-firebase';
 
 export const googleSignInWithPopup = (): Promise<
   Result<OAuthCredential | undefined, OAuthCredential | undefined>
 > =>
-  Result.fromPromise(signInWithPopup(auth, googleAuthProvider)).then(
+  Result.fromPromise(signInWithPopup(fbAuth, googleAuthProvider)).then(
     Result.fold(
       (result: UserCredential) =>
         // This gives you a Google Access Token. You can use it to access the Google API.
