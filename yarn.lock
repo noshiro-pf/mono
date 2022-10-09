@@ -5091,10 +5091,10 @@
   resolved "https://registry.npmjs.org/@trysound/sax/-/sax-0.2.0.tgz"
   integrity sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==
 
-"@ts-morph/common@~0.16.0":
-  version "0.16.0"
-  resolved "https://registry.npmjs.org/@ts-morph/common/-/common-0.16.0.tgz"
-  integrity sha512-SgJpzkTgZKLKqQniCjLaE3c2L2sdL7UShvmTmPBejAKd2OKV/yfMpQ2IWpAuA+VY5wy7PkSUaEObIqEK6afFuw==
+"@ts-morph/common@~0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@ts-morph/common/-/common-0.17.0.tgz#de0d405df10857907469fef8d9363893b4163fd1"
+  integrity sha512-RMSSvSfs9kb0VzkvQ2NWobwnj7TxCA9vI/IjR9bDHqgAyVbu2T0DN4wiKVqomyDWqO7dPr/tErSfq7urQ1Q37g==
   dependencies:
     fast-glob "^3.2.11"
     minimatch "^5.1.0"
@@ -8612,12 +8612,10 @@ code-block-writer@^10.1.1:
   resolved "https://registry.npmjs.org/code-block-writer/-/code-block-writer-10.1.1.tgz"
   integrity sha512-67ueh2IRGst/51p0n6FvPrnRjAGHY5F8xdjkgrYE7DDzpJe6qA07RYQ9VcoUeo5ATOjSOiWpSL3SWBRRbempMw==
 
-code-block-writer@^11.0.0:
-  version "11.0.0"
-  resolved "https://registry.npmjs.org/code-block-writer/-/code-block-writer-11.0.0.tgz"
-  integrity sha512-GEqWvEWWsOvER+g9keO4ohFoD3ymwyCnqY3hoTr7GZipYFwEhMHJw+TtV0rfgRhNImM6QWZGO2XYjlJVyYT62w==
-  dependencies:
-    tslib "2.3.1"
+code-block-writer@^11.0.3:
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/code-block-writer/-/code-block-writer-11.0.3.tgz#9eec2993edfb79bfae845fbc093758c0a0b73b76"
+  integrity sha512-NiujjUFB4SwScJq2bwbYUtXbZhBSlY6vYzm++3Q6oC+U+injTqfPYFK8wS9COOmb2lueqp0ZRB4nK1VYeHgNyw==
 
 code-point-at@^1.0.0:
   version "1.1.0"
@@ -22624,13 +22622,13 @@ ts-mixer@^6.0.1:
   resolved "https://registry.npmjs.org/ts-mixer/-/ts-mixer-6.0.1.tgz"
   integrity sha512-hvE+ZYXuINrx6Ei6D6hz+PTim0Uf++dYbK9FFifLNwQj+RwKquhQpn868yZsCtJYiclZF1u8l6WZxxKi+vv7Rg==
 
-ts-morph@^15.1.0:
-  version "15.1.0"
-  resolved "https://registry.yarnpkg.com/ts-morph/-/ts-morph-15.1.0.tgz#53deea5296d967ff6eba8f15f99d378aa7074a4e"
-  integrity sha512-RBsGE2sDzUXFTnv8Ba22QfeuKbgvAGJFuTN7HfmIRUkgT/NaVLfDM/8OFm2NlFkGlWEXdpW5OaFIp1jvqdDuOg==
+ts-morph@^16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/ts-morph/-/ts-morph-16.0.0.tgz#35caca7c286dd70e09e5f72af47536bf3b6a27af"
+  integrity sha512-jGNF0GVpFj0orFw55LTsQxVYEUOCWBAbR5Ls7fTYE5pQsbW18ssTb/6UXx/GYAEjS+DQTp8VoTw0vqYMiaaQuw==
   dependencies:
-    "@ts-morph/common" "~0.16.0"
-    code-block-writer "^11.0.0"
+    "@ts-morph/common" "~0.17.0"
+    code-block-writer "^11.0.3"
 
 ts-morph@^9.1.0:
   version "9.1.0"
@@ -22689,11 +22687,6 @@ tsconfig-paths@^3.14.1:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tslib@2.3.1, tslib@~2.3.1:
-  version "2.3.1"
-  resolved "https://registry.npmjs.org/tslib/-/tslib-2.3.1.tgz"
-  integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
-
 tslib@^1.8.1, tslib@^1.9.0:
   version "1.14.1"
   resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
@@ -22708,6 +22701,11 @@ tslib@^2.1.0, tslib@^2.3.1, tslib@^2.4.0:
   version "2.4.0"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.4.0.tgz"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
+
+tslib@~2.3.1:
+  version "2.3.1"
+  resolved "https://registry.npmjs.org/tslib/-/tslib-2.3.1.tgz"
+  integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
 
 tsutils@^3.17.1, tsutils@^3.21.0:
   version "3.21.0"
@@ -22838,11 +22836,6 @@ typescript-json-schema@^0.53.0:
     ts-node "^10.2.1"
     typescript "~4.6.0"
     yargs "^17.1.1"
-
-typescript@^4.8.0-beta:
-  version "4.8.0-dev.20220806"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.0-dev.20220806.tgz#56aa600a120a64d6ff3c81cfec1f0fb4072ed0d1"
-  integrity sha512-2056Nd/YIT7diqjcGhk4ACI4Z8avTsJP59tKFp4vpopZhvkUmbTxk2TB6r1En1FnurMUCmzaMXa/rcO1VDDp8Q==
 
 typescript@^4.8.3:
   version "4.8.3"
