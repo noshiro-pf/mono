@@ -49,7 +49,6 @@ $  yarn add --dev -W  \
 $  yarn add --dev -W     \
         typescript@latest  \
         ts-morph@latest    \
-        ts-jest@latest     \
         ts-node@latest     \
         tslib@latest
 ```
