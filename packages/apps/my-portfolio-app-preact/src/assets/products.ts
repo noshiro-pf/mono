@@ -43,7 +43,8 @@ export const products: DeepReadonly<{
       link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-type-utils',
       title: '@noshiro/ts-type-utils',
       subtitle: 'TypeScriptの型ユーティリティ集',
-      description: '`UintRange<1, 5> = 1 | 2 | 3 | 4 | 5` などの型を提供',
+      description:
+        '`type UintRange<1, 5> = 1 | 2 | 3 | 4 | 5` のような型ユーティリティのライブラリ',
       implementation: 'TypeScriptで実装。（最終更新：2022年8月17日）',
       imageUrl: '',
     },
@@ -52,7 +53,7 @@ export const products: DeepReadonly<{
       link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-utils',
       title: '@noshiro/ts-utils',
       subtitle: 'TypeScriptのユーティリティ集',
-      description: 'Result型などの頻繁に使用するユーティリティを提供',
+      description: 'Result型や配列・オブジェクト操作ユーティリティなど',
       implementation: 'TypeScriptで実装。（最終更新：2022年8月7日）',
       imageUrl: '',
     },
@@ -85,7 +86,7 @@ export const products: DeepReadonly<{
       subtitle: 'イベントのスケジュール調整用アプリケーション',
       description:
         '説明ページ → https://www.notion.so/noshiro/c40d53907f204a3e9961a4a2b623ca22',
-      implementation: `React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（制作日：2020年1月05日、最終更新：2021年9月22日）
+      implementation: `React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（制作日：2020年1月5日、最終更新：2021年9月22日）
         → 2021-03-10にRxJSを自作ライブラリ SyncFlow に差し替えた。Immutable.js も自作ライブラリに差し替えた。`,
       imageUrl: EventScheduleAppImage,
     },
@@ -130,7 +131,7 @@ export const products: DeepReadonly<{
         '色のコントラストなどについて書いた記事（https://qiita.com/pikohideaki/items/59415524503f833ce41e）のために作ったデモアプリ。',
       description: '',
       implementation:
-        'React・TypeScriptで実装。CSSライブラリに material-UI を使用。（制作日：2019年12月07日、最終更新：2020年1月27日）',
+        'React・TypeScriptで実装。CSSライブラリに material-UI を使用。（制作日：2019年12月7日、最終更新：2020年1月27日）',
       imageUrl: ColorDemoAppImage,
     },
     {
