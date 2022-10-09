@@ -12,25 +12,24 @@ export const union = <A extends readonly Type<unknown>[]>({
   typeName = 'union',
   types,
   defaultType,
-}: Readonly<{ typeName?: string; types: A; defaultType: A[number] }>): Type<
-  MapUnion<A[number]>
-> => {
+}: Readonly<{
+  typeName?: string;
+  types: A;
+  defaultType: A[number];
+}>): Type<MapUnion<A[number]>> => {
   type T = MapUnion<A[number]>;
 
-  const validate: Type<T>['validate'] = (a) => {
-    if (!types.some((t) => t.is(a))) {
-      const valuesStr = types.map((t) => t.typeName).join(', ');
-
-      return Result.err([
-        validationErrorMessage(
-          a,
-          `The type of value is expected to be one of the elements contained in { ${valuesStr} }`
-        ),
-      ]);
-    }
-
-    return Result.ok(undefined);
-  };
+  const validate: Type<T>['validate'] = (a) =>
+    types.some((t) => t.is(a))
+      ? Result.ok(a as T)
+      : Result.err([
+          validationErrorMessage(
+            a,
+            `The type of value is expected to be one of the elements contained in { ${types
+              .map((t) => t.typeName)
+              .join(', ')} }`
+          ),
+        ]);
 
   const is = createIsFnFromValidateFn<T>(validate);
 

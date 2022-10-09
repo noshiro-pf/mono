@@ -10,7 +10,7 @@ export const eventListItemTypeDef = t.record({
     updatedAt: t.string(''),
   }),
 
-  answers: t.array({ elementType: answerTypeDef }),
+  answers: t.array(answerTypeDef),
   answersMetadata: t.record({
     lastUpdate: t.string(''),
   }),

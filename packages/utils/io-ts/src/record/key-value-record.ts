@@ -11,17 +11,14 @@ type RecordResultType<
   V extends Type<unknown>
 > = Readonly<Record<TypeOf<K>, TypeOf<V>>>;
 
-export const keyValueRecord = <
-  K extends Type<string>,
-  V extends Type<unknown>
->({
-  typeName = 'key-value-record',
-  keyType,
-  valueType,
-}: Readonly<{ typeName?: string; keyType: K; valueType: V }>): Type<
-  RecordResultType<K, V>
-> => {
+export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
+  keyType: K,
+  valueType: V,
+  options?: Readonly<{ typeName?: string }>
+): Type<RecordResultType<K, V>> => {
   type T = RecordResultType<K, V>;
+
+  const { typeName = 'key-value-record' } = options ?? {};
 
   const defaultValue = {} as T;
 
@@ -59,7 +56,7 @@ export const keyValueRecord = <
       }
     }
 
-    return Result.ok(undefined);
+    return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>

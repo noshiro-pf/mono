@@ -6,16 +6,16 @@ import {
   validationErrorMessage,
 } from '../utils';
 
-export const nonEmptyArray = <A>({
-  typeName,
-  elementType,
-  defaultValue,
-}: Readonly<{
-  typeName?: string;
-  elementType: Type<A>;
-  defaultValue: NonEmptyArray<A>;
-}>): Type<NonEmptyArray<A>> => {
+export const nonEmptyArray = <A>(
+  elementType: Type<A>,
+  defaultValue: NonEmptyArray<A>,
+  options?: Readonly<{
+    typeName?: string;
+  }>
+): Type<NonEmptyArray<A>> => {
   type T = NonEmptyArray<A>;
+
+  const { typeName } = options ?? {};
 
   const typeNameFilled: string =
     typeName ?? `NonEmptyArray<${elementType.typeName}>`;
@@ -47,7 +47,7 @@ export const nonEmptyArray = <A>({
       }
     }
 
-    return Result.ok(undefined);
+    return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>

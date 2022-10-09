@@ -4,9 +4,8 @@ import type { TypeOf } from '../type';
 import { array } from './array';
 
 describe('array', () => {
-  const xs = array({
+  const xs = array(number(0), {
     typeName: 'xs',
-    elementType: number(0),
     defaultValue: [],
   });
 

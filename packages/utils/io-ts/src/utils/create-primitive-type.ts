@@ -12,15 +12,15 @@ export const createPrimitiveType = <A>({
   defaultValue: A;
   is: (value: unknown) => value is A;
 }>): Type<A> => {
-  const validate: Type<A>['validate'] = (a) => {
-    if (!is(a)) {
-      return Result.err([
-        validationErrorMessage(a, `The value is expected to be <${typeName}>`),
-      ]);
-    }
-
-    return Result.ok(undefined);
-  };
+  const validate: Type<A>['validate'] = (a) =>
+    is(a)
+      ? Result.ok(a)
+      : Result.err([
+          validationErrorMessage(
+            a,
+            `The value is expected to be <${typeName}>`
+          ),
+        ]);
 
   return {
     typeName,

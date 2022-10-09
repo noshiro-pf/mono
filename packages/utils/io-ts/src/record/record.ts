@@ -36,7 +36,7 @@ export const record = <A extends ReadonlyRecord<string, Type<unknown>>>(
 
     for (const [k, valueType] of IRecord.entries(recordType)) {
       if (!hasKey(a, k)) {
-        return Result.err([`The record is expected to have key "${k}".`]);
+        return Result.err([`The record is expected to have the key "${k}".`]);
       }
 
       const v = a[k];
@@ -52,7 +52,7 @@ export const record = <A extends ReadonlyRecord<string, Type<unknown>>>(
       }
     }
 
-    return Result.ok(undefined);
+    return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
