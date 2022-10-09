@@ -18,6 +18,8 @@ export type Router = Readonly<{
     pushState: boolean,
     sortParams?: boolean
   ) => void;
+  go: (delta?: number | undefined) => void;
+  forward: () => void;
   back: () => void;
   redirect: (nextPath: string) => void;
   removeListener: () => void;
@@ -86,6 +88,16 @@ export const createRouter = (): Router => {
     updatePathname();
   };
 
+  const go = (delta?: number | undefined): void => {
+    window.history.go(delta);
+    updatePathname();
+  };
+
+  const forward = (): void => {
+    window.history.forward();
+    updatePathname();
+  };
+
   const back = (): void => {
     window.history.back();
     updatePathname();
@@ -102,6 +114,8 @@ export const createRouter = (): Router => {
   return {
     push,
     updateQueryParams,
+    go,
+    forward,
     back,
     redirect,
     pathname$,
@@ -134,4 +148,10 @@ const parseQueryParamsStr = (queryParamsStr: string): QueryParams => {
 };
 
 export const withSlash = (path: string): string =>
-  path.endsWith('/') ? path : `${path}/`;
+  path.endsWith('/')
+    ? path
+    : path.includes('/?')
+    ? path
+    : path.includes('?')
+    ? path.split('?').join('/?')
+    : `${path}/`;
