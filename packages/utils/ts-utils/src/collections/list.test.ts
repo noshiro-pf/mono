@@ -1,4 +1,5 @@
 import { assertNotType, assertType } from '../assert-type';
+import { Result } from '../functional';
 import { IMap } from './imap';
 import { IList } from './list';
 
@@ -13,6 +14,33 @@ describe('IList.isEmpty', () => {
   });
 
   test('case 2', () => {
+    expect(IList.isEmpty([])).toBe(true);
+  });
+});
+
+describe('IList.zeros', () => {
+  test('fixed length', () => {
+    const result = IList.zeros(3);
+
+    assertType<TypeEq<typeof result, Result<readonly [0, 0, 0], string>>>();
+
+    expect(result).toStrictEqual(Result.ok([0, 0, 0]));
+  });
+
+  test('fixed length (empty)', () => {
+    const result = IList.zeros(0);
+
+    assertType<TypeEq<typeof result, Result<readonly [], string>>>();
+
+    expect(result).toStrictEqual(Result.ok([]));
+  });
+
+  test('unknown length', () => {
+    const n: number = (() => 3)();
+    const result = IList.zeros(n);
+
+    assertType<TypeEq<typeof result, Result<readonly 0[], string>>>();
+
     expect(IList.isEmpty([])).toBe(true);
   });
 });

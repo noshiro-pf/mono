@@ -148,29 +148,64 @@ export namespace IList {
     mapfn: (v: T, k: number) => U
   ) => readonly U[] = ArrayFrom;
 
-  export const zeros = (len: number): Result<readonly 0[], string> =>
-    !Num.isUint32(len)
+  type Uint8 = Seq<256>;
+
+  export function zeros<N extends Uint8>(
+    len: N
+  ): Result<ArrayOfLength<N, 0>, string>;
+  export function zeros(len: number): Result<readonly 0[], string>;
+  export function zeros(len: number): Result<readonly 0[], string> {
+    return !Num.isUint32(len)
       ? Result.err('len should be uint32')
-      : // eslint-disable-next-line functional/immutable-data
-        Result.ok(ArrayFrom<0>({ length: len }).fill(0));
+      : Result.ok(
+          // eslint-disable-next-line functional/immutable-data
+          ArrayFrom<0>({ length: len }).fill(0)
+        );
+  }
 
-  export const zerosThrow = (len: number): readonly 0[] =>
-    Result.unwrapThrow(zeros(len));
+  export function zerosThrow<N extends Uint8>(len: N): ArrayOfLength<N, 0>;
+  export function zerosThrow(len: number): readonly 0[];
+  export function zerosThrow(len: number): readonly 0[] {
+    return Result.unwrapThrow(zeros(len));
+  }
 
-  export const seq = (len: number): Result<readonly number[], string> =>
-    pipe(zeros(len)).chain(Result.map((l) => l.map((_, i) => i))).value;
+  export function seq<N extends Uint8>(
+    len: N
+  ): Result<ArrayOfLength<N, 0>, string>;
+  export function seq(len: number): Result<readonly number[], string>;
+  export function seq(len: number): Result<readonly number[], string> {
+    return pipe(zeros(len)).chain(Result.map((l) => map(l, (_, i) => i))).value;
+  }
 
-  export const seqThrow = (len: number): readonly number[] =>
-    Result.unwrapThrow(seq(len));
+  export function seqThrow<N extends Uint8>(len: N): ArrayOfLength<N, number>;
+  export function seqThrow(len: number): readonly number[];
+  export function seqThrow(len: number): readonly number[] {
+    return Result.unwrapThrow(seq(len));
+  }
 
-  export const newArray = <T>(
+  export function newArray<T, N extends Uint8>(
+    len: N,
+    init: T
+  ): Result<ArrayOfLength<N, T>, string>;
+  export function newArray<T>(
     len: number,
     init: T
-  ): Result<readonly T[], string> =>
-    pipe(zeros(len)).chain(Result.map((l) => l.map(() => init))).value;
+  ): Result<readonly T[], string>;
+  export function newArray<T>(
+    len: number,
+    init: T
+  ): Result<readonly T[], string> {
+    return pipe(zeros(len)).chain(Result.map((l) => l.map(() => init))).value;
+  }
 
-  export const newArrayThrow = <T>(len: number, init: T): readonly T[] =>
-    Result.unwrapThrow(newArray(len, init));
+  export function newArrayThrow<T, N extends Uint8>(
+    len: number,
+    init: T
+  ): ArrayOfLength<N, T>;
+  export function newArrayThrow<T>(len: number, init: T): readonly T[];
+  export function newArrayThrow<T>(len: number, init: T): readonly T[] {
+    return Result.unwrapThrow(newArray(len, init));
+  }
 
   export const range = (
     start: number,
@@ -305,7 +340,7 @@ export namespace IList {
   ): readonly M[] =>
     list.flatMap(mapper as (value: T[number], key: number) => readonly M[]);
 
-  // // TODO: add an overload of NonEmpty case
+  // TODO: add an overload of NonEmpty case
   export const zip = <
     T1 extends readonly unknown[],
     T2 extends readonly unknown[]
