@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage: yarn newapp <new-app-name>
+# usage: yarn create:react-app <new-app-name>
 
 THIS_SCRIPT_DIR=$(cd $(dirname $0); pwd)
 MONO_ROOT_DIR=$(dirname ${THIS_SCRIPT_DIR})
