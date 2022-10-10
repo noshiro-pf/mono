@@ -145,27 +145,30 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       | { type: 'update'; key: K; updater: (value: V) => V }
     >[]
   ): IMap<K, V> {
-    const result = new MutableMap<K, V>(this.#map);
+    const mut_result = new MutableMap<K, V>(this.#map);
 
     for (const action of actions) {
       switch (action.type) {
         case 'delete':
-          result.delete(action.key);
+          mut_result.delete(action.key);
           break;
         case 'set':
-          result.set(action.key, action.value);
+          mut_result.set(action.key, action.value);
           break;
         case 'update': {
-          if (result.has(action.key)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            result.set(action.key, action.updater(result.get(action.key)!));
+          if (mut_result.has(action.key)) {
+            mut_result.set(
+              action.key,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              action.updater(mut_result.get(action.key)!)
+            );
           }
           break;
         }
       }
     }
 
-    return IMap.new(result);
+    return IMap.new(mut_result);
   }
 
   map<V2>(mapFn: (value: V, key: K) => V2): IMap<K, V2> {

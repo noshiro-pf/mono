@@ -175,6 +175,7 @@ export type Unwrap<A extends readonly Observable<unknown>[]> = {
 export type Wrap<A extends readonly unknown[]> = {
   readonly [P in keyof A]: Observable<A[P]>;
 };
+
 export type WrapInitialized<A extends readonly unknown[]> = {
   readonly [P in keyof A]: InitializedObservable<A[P]>;
 };

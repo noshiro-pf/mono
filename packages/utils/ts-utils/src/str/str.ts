@@ -65,19 +65,23 @@ export namespace Str {
   /**
    * Returns the character at the specified index.
    * @param pos The zero-based index of the desired character.
+   * @deprecated Prefer `String#at(…)` over `String#charAt(…)`. eslint(unicorn/prefer-at)
    */
   export const charAt =
     (pos: number) =>
     (str: string): string | undefined =>
+      // eslint-disable-next-line unicorn/prefer-at
       str.charAt(pos);
 
   /**
    * Returns a string that contains the concatenation of two or more strings.
    * @param strings The strings to append to the end of the string.
+   * @deprecated Prefer the spread operator over `Array#concat(…)`. eslint(unicorn/prefer-spread)
    */
   export const concat =
     (...strings: readonly string[]) =>
     (str: string): string =>
+      // eslint-disable-next-line unicorn/prefer-spread
       str.concat(...strings);
 
   /**

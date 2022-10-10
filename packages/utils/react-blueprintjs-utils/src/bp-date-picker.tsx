@@ -1,6 +1,5 @@
 import type { HTMLInputProps, InputGroupProps2 } from '@blueprintjs/core';
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
-// eslint-disable-next-line import/no-deprecated
 import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { IDate, pipe } from '@noshiro/ts-utils';
@@ -22,7 +21,7 @@ const tenYearsLater = pipe(IDate.today())
   .chain(IDate.setLocaleMonth(12))
   .chain(IDate.toDate).value;
 
-// eslint-disable-next-line import/no-deprecated
+// eslint-disable-next-line deprecation/deprecation
 type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
 
 export type BpDatePickerProps = Readonly<{
@@ -75,6 +74,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
     );
 
     return (
+      // eslint-disable-next-line deprecation/deprecation
       <DateInput
         canClearSelection={canClearSelection}
         formatDate={formatDate}

@@ -56,6 +56,7 @@ declare global {
   type IconName = _IconName;
   type InputGroupProps2 = _InputGroupProps2;
   type Intent = _Intent;
+  // eslint-disable-next-line deprecation/deprecation
   type IToaster = _IToaster;
   type OptionProps = _OptionProps;
   type PopperModifiers = _PopperModifiers;
