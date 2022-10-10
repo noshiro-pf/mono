@@ -3,11 +3,11 @@ import type { Hsl } from '../../../types';
 import { epsilon } from '../color-test-values';
 
 export const testHslEquality = (
-  testname: string,
+  testName: string,
   hsl1: Hsl,
   hsl2: Hsl
 ): void => {
-  test(testname, () => {
+  test(testName, () => {
     const [h1, s1, l1] = hsl1;
     const [h2, s2, l2] = hsl2;
 

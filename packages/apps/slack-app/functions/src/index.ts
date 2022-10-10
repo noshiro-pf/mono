@@ -23,7 +23,7 @@ export const addMessage = functions_https.onRequest(async (req, res) => {
   const writeResult = await admin_firestore()
     .collection('messages')
     .add({ original });
-  // Send back a message that we've succesfully written the message
+  // Send back a message that we've successfully written the message
 
   res.json({
     result: `Message with ID: ${writeResult.id} added. (${SLACK_API_KEY.length})`,

@@ -1,4 +1,5 @@
 ---
+# cSpell:disable
 slug: long-blog-post
 title: Long Blog Post
 authors: endi
