@@ -137,7 +137,7 @@
   dependencies:
     "@jridgewell/trace-mapping" "^0.3.0"
 
-"@apidevtools/json-schema-ref-parser@9.0.9", "@apidevtools/json-schema-ref-parser@^9.0.3":
+"@apidevtools/json-schema-ref-parser@^9.0.3":
   version "9.0.9"
   resolved "https://registry.npmjs.org/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-9.0.9.tgz"
   integrity sha512-GBD2Le9w2+lVFoc4vswGI/TjkNIZSVp7+9xPf+X3uidBfWnAeUWmquteSyt0+VCrhNMWj/FTABISQrD3Z/YA+w==
@@ -2459,6 +2459,16 @@
     "@babel/helper-string-parser" "^7.18.10"
     "@babel/helper-validator-identifier" "^7.18.6"
     to-fast-properties "^2.0.0"
+
+"@bcherny/json-schema-ref-parser@9.0.9":
+  version "9.0.9"
+  resolved "https://registry.yarnpkg.com/@bcherny/json-schema-ref-parser/-/json-schema-ref-parser-9.0.9.tgz#09899d405bc708c0acac0066ae8db5b94d465ca4"
+  integrity sha512-vmEmnJCfpkLdas++9OYg6riIezTYqTHpqUTODJzHLzs5UnXujbOJW9VwcVCnyo1mVRt32FRr23iXBx/sX8YbeQ==
+  dependencies:
+    "@jsdevtools/ono" "^7.1.3"
+    "@types/json-schema" "^7.0.6"
+    call-me-maybe "^1.0.1"
+    js-yaml "^4.1.0"
 
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
@@ -5321,18 +5331,18 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
-"@types/glob@*":
-  version "7.1.4"
-  resolved "https://registry.npmjs.org/@types/glob/-/glob-7.1.4.tgz"
-  integrity sha512-w+LsMxKyYQm347Otw+IfBXOv9UWVjpHpCDdbBMt8Kz/xbvCYNjP+0qPh91Km3iKfSRLBB0P7fAMf0KHrPu+MyA==
-  dependencies:
-    "@types/minimatch" "*"
-    "@types/node" "*"
-
 "@types/glob@^7.1.1":
   version "7.1.3"
   resolved "https://registry.npmjs.org/@types/glob/-/glob-7.1.3.tgz"
   integrity sha512-SEYeGAIQIQX8NN6LDKprLjbrd5dARM5EXsd8GI/A5l0apYI1fGMWgPHSe4ZKL4eozlAyI+doUE9XbYS4xCkQ1w==
+  dependencies:
+    "@types/minimatch" "*"
+    "@types/node" "*"
+
+"@types/glob@^7.1.3":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.2.0.tgz#bc1b5bf3aa92f25bd5dd39f35c57361bdce5b2eb"
+  integrity sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==
   dependencies:
     "@types/minimatch" "*"
     "@types/node" "*"
@@ -5420,7 +5430,7 @@
     "@types/parse5" "*"
     "@types/tough-cookie" "*"
 
-"@types/json-schema@*", "@types/json-schema@^7.0.4", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.6", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
+"@types/json-schema@*", "@types/json-schema@^7.0.11", "@types/json-schema@^7.0.4", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.6", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.11.tgz"
   integrity sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==
@@ -5435,10 +5445,10 @@
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.170.tgz"
   integrity sha512-bpcvu/MKHHeYX+qeEN8GE7DIravODWdACVA1ctevD8CN24RhPZIKMn9ntfAsrvLfSX3cR5RrBKAbYm9bGs0A+Q==
 
-"@types/lodash@^4.14.168":
-  version "4.14.180"
-  resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.180.tgz"
-  integrity sha512-XOKXa1KIxtNXgASAnwj7cnttJxS4fksBRywK/9LzRV5YxrF80BXZIGeQSuoESQ/VkUj30Ae0+YcuHc15wJCB2g==
+"@types/lodash@^4.14.182":
+  version "4.14.186"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.186.tgz#862e5514dd7bd66ada6c70ee5fce844b06c8ee97"
+  integrity sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==
 
 "@types/long@^4.0.0", "@types/long@^4.0.1":
   version "4.0.1"
@@ -5555,6 +5565,11 @@
   version "2.3.2"
   resolved "https://registry.npmjs.org/@types/prettier/-/prettier-2.3.2.tgz"
   integrity sha512-eI5Yrz3Qv4KPUa/nSIAi0h+qX0XyewOliug5F2QAtuRg6Kjg6jfmxe1GIwoIRhZspD1A0RP8ANrPwvEXXtRFog==
+
+"@types/prettier@^2.6.1":
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.1.tgz#dfd20e2dc35f027cdd6c1908e80a5ddc7499670e"
+  integrity sha512-ri0UmynRRvZiiUJdiz38MmIblKK+oH30MztdBVR95dv/Ubw6neWSb8u1XpRb72L4qsZOhz+L+z9JD40SJmfWow==
 
 "@types/prop-types@*":
   version "15.7.3"
@@ -8452,17 +8467,6 @@ cli-boxes@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/cli-boxes/-/cli-boxes-3.0.0.tgz"
   integrity sha512-/lzGpEWL/8PfI0BmBOPRwp0c/wFNX1RdUML3jK/RcSBA9T8mZDdQpqYBKtCFTOfQbwPqWEOpjqW+Fnayc0969g==
-
-cli-color@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.npmjs.org/cli-color/-/cli-color-2.0.1.tgz"
-  integrity sha512-eBbxZF6fqPUNnf7CLAFOersUnyYzv83tHFLSlts+OAHsNendaqv2tHCq+/MO+b3Y+9JeoUlIvobyxG/Z8GNeOg==
-  dependencies:
-    d "^1.0.1"
-    es5-ext "^0.10.53"
-    es6-iterator "^2.0.3"
-    memoizee "^0.4.15"
-    timers-ext "^0.1.7"
 
 cli-color@^2.0.2:
   version "2.0.2"
@@ -12549,12 +12553,12 @@ glob-parent@^6.0.1:
   dependencies:
     is-glob "^4.0.3"
 
-glob-promise@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.npmjs.org/glob-promise/-/glob-promise-3.4.0.tgz"
-  integrity sha512-q08RJ6O+eJn+dVanerAndJwIcumgbDdYiUT7zFQl3Wm1xD6fBKtah7H8ZJChj4wP+8C+QfeVy8xautR7rdmKEw==
+glob-promise@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/glob-promise/-/glob-promise-4.2.2.tgz#15f44bcba0e14219cd93af36da6bb905ff007877"
+  integrity sha512-xcUzJ8NWN5bktoTIX7eOclO1Npxd/dyVqUJxlLIDasT4C7KZyqlPIwkdJ0Ypiy3p2ZKahTjK4M9uC3sNSfNMzw==
   dependencies:
-    "@types/glob" "*"
+    "@types/glob" "^7.1.3"
 
 glob-slash@^1.0.0:
   version "1.0.0"
@@ -15563,33 +15567,25 @@ json-ptr@^3.0.1:
   resolved "https://registry.npmjs.org/json-ptr/-/json-ptr-3.1.0.tgz"
   integrity sha512-KMsG905wFbHHTnvd66MHCNo0E43UPalKt2zQUbBtWrDYKk/3vE/4u8lfWDdIyPEoMXxOFJO1lsBs6xPBXKxeVw==
 
-json-schema-ref-parser@^9.0.6:
-  version "9.0.9"
-  resolved "https://registry.npmjs.org/json-schema-ref-parser/-/json-schema-ref-parser-9.0.9.tgz"
-  integrity sha512-qcP2lmGy+JUoQJ4DOQeLaZDqH9qSkeGCK3suKWxJXS82dg728Mn3j97azDMaOUmJAN4uCq91LdPx4K7E8F1a7Q==
+json-schema-to-typescript@^11.0.2:
+  version "11.0.2"
+  resolved "https://registry.yarnpkg.com/json-schema-to-typescript/-/json-schema-to-typescript-11.0.2.tgz#80348391abb4ffb75daf312380c2f01c552ffba8"
+  integrity sha512-XRyeXBJeo/IH4eTP5D1ptX78vCvH86nMDt2k3AxO28C3uYWEDmy4mgPyMpb8bLJ/pJMElOGuQbnKR5Y6NSh3QQ==
   dependencies:
-    "@apidevtools/json-schema-ref-parser" "9.0.9"
-
-json-schema-to-typescript@^10.1.5:
-  version "10.1.5"
-  resolved "https://registry.npmjs.org/json-schema-to-typescript/-/json-schema-to-typescript-10.1.5.tgz"
-  integrity sha512-X8bNNksfCQo6LhEuqNxmZr4eZpPjXZajmimciuk8eWXzZlif9Brq7WuMGD/SOhBKcRKP2SGVDNZbC28WQqx9Rg==
-  dependencies:
-    "@types/json-schema" "^7.0.6"
-    "@types/lodash" "^4.14.168"
-    "@types/prettier" "^2.1.5"
-    cli-color "^2.0.0"
+    "@bcherny/json-schema-ref-parser" "9.0.9"
+    "@types/json-schema" "^7.0.11"
+    "@types/lodash" "^4.14.182"
+    "@types/prettier" "^2.6.1"
+    cli-color "^2.0.2"
     get-stdin "^8.0.0"
     glob "^7.1.6"
-    glob-promise "^3.4.0"
-    is-glob "^4.0.1"
-    json-schema-ref-parser "^9.0.6"
-    json-stringify-safe "^5.0.1"
-    lodash "^4.17.20"
-    minimist "^1.2.5"
+    glob-promise "^4.2.2"
+    is-glob "^4.0.3"
+    lodash "^4.17.21"
+    minimist "^1.2.6"
     mkdirp "^1.0.4"
     mz "^2.7.0"
-    prettier "^2.2.0"
+    prettier "^2.6.2"
 
 json-schema-traverse@^0.4.1:
   version "0.4.1"
@@ -15623,7 +15619,7 @@ json-stable-stringify@^1.0.1:
   dependencies:
     jsonify "~0.0.0"
 
-json-stringify-safe@^5.0.1, json-stringify-safe@~5.0.1:
+json-stringify-safe@~5.0.1:
   version "5.0.1"
   resolved "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
   integrity sha1-Epai1Y/UXxmg9s4B1lcB4sc1tus=
@@ -19265,12 +19261,7 @@ prettier-plugin-packagejson@^2.2.18:
   dependencies:
     sort-package-json "1.57.0"
 
-prettier@^2.2.0:
-  version "2.6.0"
-  resolved "https://registry.npmjs.org/prettier/-/prettier-2.6.0.tgz"
-  integrity sha512-m2FgJibYrBGGgQXNzfd0PuDGShJgRavjUoRCw1mZERIWVSXF0iLzLm+aOqTAbLnC3n6JzUhAA8uZnFVghHJ86A==
-
-prettier@^2.7.1:
+prettier@^2.6.2, prettier@^2.7.1:
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.7.1.tgz#e235806850d057f97bb08368a4f7d899f7760c64"
   integrity sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==
