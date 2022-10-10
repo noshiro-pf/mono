@@ -32,6 +32,9 @@ namespace RulesOfHooks {
  */
 namespace ExhaustiveDeps {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -47,6 +50,7 @@ namespace ExhaustiveDeps {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly additionalHooks?: string;

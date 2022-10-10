@@ -26,6 +26,9 @@ namespace ParamNames {
  */
 namespace NoReturnWrap {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -37,6 +40,7 @@ namespace NoReturnWrap {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowReject?: boolean;
@@ -67,6 +71,9 @@ namespace AlwaysReturn {
  */
 namespace CatchOrReturn {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -94,6 +101,7 @@ namespace CatchOrReturn {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowFinally?: boolean;
@@ -148,6 +156,9 @@ namespace NoNative {
  */
 namespace NoCallbackInPromise {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -162,6 +173,7 @@ namespace NoCallbackInPromise {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly exceptions?: readonly string[];

@@ -1,10 +1,4 @@
-import {
-  fromArray,
-  interval,
-  // eslint-disable-next-line import/no-deprecated
-  merge,
-  take,
-} from '@noshiro/syncflow';
+import { fromArray, interval, merge, take } from '@noshiro/syncflow';
 import { serverTimestamp } from 'firebase/firestore';
 import { time } from '../constants';
 import { returnFalse } from '../return-boolean';
@@ -20,7 +14,7 @@ const gameStateDispatcher = (action: GameStateAction): void => {
 };
 
 export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
-  // eslint-disable-next-line import/no-deprecated
+  // eslint-disable-next-line deprecation/deprecation
   merge([
     localGameStateActionSource$.chain(
       map((a) => ({ type: 'local', value: a } as const))
@@ -319,7 +313,7 @@ const actionsToAutoPlayStream = <T>(
     fromArray(actions),
   ] as const).chain(map(([, action]) => action));
 
-// eslint-disable-next-line import/no-deprecated
+// eslint-disable-next-line deprecation/deprecation
 const autoPlay = merge([
   actionsToAutoPlayStream(actionsToAutoPlay[0], 0),
   actionsToAutoPlayStream(

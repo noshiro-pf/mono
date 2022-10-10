@@ -6,19 +6,19 @@
 
 /** @type {EslintSecurityRules} */
 const eslintSecurityRules = {
-  'security/detect-unsafe-regex': 'warn',
-  'security/detect-non-literal-regexp': 'warn',
-  'security/detect-non-literal-require': 'warn',
-  'security/detect-non-literal-fs-filename': 'warn',
-  'security/detect-eval-with-expression': 'warn',
-  'security/detect-pseudoRandomBytes': 'warn',
-  'security/detect-possible-timing-attacks': 'warn',
-  'security/detect-no-csrf-before-method-override': 'warn',
-  'security/detect-buffer-noassert': 'warn',
-  'security/detect-child-process': 'warn',
-  'security/detect-disable-mustache-escape': 'warn',
-  'security/detect-object-injection': 'warn',
-  'security/detect-new-buffer': 'warn',
+  'security/detect-unsafe-regex': 'error',
+  'security/detect-non-literal-regexp': 'error',
+  'security/detect-non-literal-require': 'error',
+  'security/detect-non-literal-fs-filename': 'error',
+  'security/detect-eval-with-expression': 'error',
+  'security/detect-pseudoRandomBytes': 'error',
+  'security/detect-possible-timing-attacks': 'error',
+  'security/detect-no-csrf-before-method-override': 'error',
+  'security/detect-buffer-noassert': 'error',
+  'security/detect-child-process': 'error',
+  'security/detect-disable-mustache-escape': 'error',
+  'security/detect-object-injection': 'off', // too many false positives
+  'security/detect-new-buffer': 'error',
 };
 
 module.exports = { eslintSecurityRules };

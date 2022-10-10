@@ -52,6 +52,7 @@ const saveAsImage = (canvas: HTMLCanvasElement): void => {
 
     downloadLink.click();
   } else {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     window.open(targetImgUri);
   }
 

@@ -46,6 +46,11 @@ export type PreferReadonlyTypeOptions = StrictExclude<
   Linter.RuleLevel
 >[1];
 
+export type NoExpressionStatementOptions = StrictExclude<
+  EslintFunctionalRules['functional/no-expression-statement'],
+  Linter.RuleLevel
+>[1];
+
 export type PreferTacitOptions = StrictExclude<
   EslintFunctionalRules['functional/prefer-tacit'],
   Linter.RuleLevel

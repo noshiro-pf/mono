@@ -10,6 +10,7 @@ export const params = {
   observe: 'observe',
 } as const;
 
+// eslint-disable-next-line security/detect-non-literal-regexp
 const getRoomIdRegexp = new RegExp(
   `^${routes.rooms}/(?<roomId>[^/]+)/.*$`,
   'u'

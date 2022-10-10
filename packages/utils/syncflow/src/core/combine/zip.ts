@@ -11,10 +11,12 @@ import type {
 } from '../types';
 
 export const zip = <A extends NonEmptyUnknownList>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   parents: Wrap<A>
 ): ZipObservable<A> => new ZipObservableClass(parents);
 
 export const zipI = <A extends NonEmptyUnknownList>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   parents: WrapInitialized<A>
 ): InitializedZipObservable<A> =>
   new ZipObservableClass(parents as Wrap<A>) as InitializedZipObservable<A>;
@@ -25,6 +27,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
 {
   readonly #queues: TupleToQueueTuple<A>;
 
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor(parents: Wrap<A>) {
     const parentsValues = parents.map((p) => p.currentValue);
     super({

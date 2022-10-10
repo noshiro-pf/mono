@@ -30,7 +30,6 @@ const eslintUnicornRules = {
       ignore: ['serviceWorker.ts', 'setupTests.ts'],
     },
   ],
-  'unicorn/import-index': 'off',
   'unicorn/import-style': 'error',
   'unicorn/new-for-builtins': 'error',
   'unicorn/no-abusive-eslint-disable': 'error',
@@ -58,8 +57,8 @@ const eslintUnicornRules = {
   'unicorn/no-thenable': 'error',
   'unicorn/no-this-assignment': 'error',
   'unicorn/no-unreadable-array-destructuring': 'error',
-  'unicorn/no-unsafe-regex': 'off',
-  'unicorn/no-unused-properties': 'off',
+  'unicorn/no-unsafe-regex': 'off', // dup of "security/detect-unsafe-regex"
+  'unicorn/no-unused-properties': 'error',
   'unicorn/no-useless-fallback-in-spread': 'error',
   'unicorn/no-useless-length-check': 'error',
   'unicorn/no-useless-promise-resolve-reject': 'error',
@@ -75,9 +74,9 @@ const eslintUnicornRules = {
   'unicorn/prefer-array-some': 'error',
   // TODO: Enable this by default when targeting a Node.js version that supports `Array#at`.
   'unicorn/prefer-at': [
-    'off',
+    'error',
     {
-      checkAllIndexAccess: true,
+      checkAllIndexAccess: false,
     },
   ],
   'unicorn/prefer-code-point': 'error',
@@ -104,9 +103,9 @@ const eslintUnicornRules = {
   'unicorn/prefer-reflect-apply': 'error',
   'unicorn/prefer-regexp-test': 'error',
   'unicorn/prefer-set-has': 'error',
-  'unicorn/prefer-spread': 'off',
+  'unicorn/prefer-spread': 'off', // prefer array-func/prefer-array-from
   // TODO: Enable this by default when targeting Node.js 16.
-  'unicorn/prefer-string-replace-all': 'off',
+  'unicorn/prefer-string-replace-all': 'error',
   'unicorn/prefer-string-slice': 'error',
   'unicorn/prefer-string-starts-ends-with': 'error',
   'unicorn/prefer-string-trim-start-end': 'error',
@@ -122,13 +121,19 @@ const eslintUnicornRules = {
   // Turned off because we can't distinguish `widow.postMessage` and `{Worker,MessagePort,Client,BroadcastChannel}#postMessage()`
   // See #1396
   'unicorn/require-post-message-target-origin': 'off',
-  'unicorn/string-content': 'off',
+  'unicorn/string-content': 'error',
   'unicorn/template-indent': 'error',
   'unicorn/text-encoding-identifier-case': 'error',
   'unicorn/throw-new-error': 'error',
+  'unicorn/no-unreadable-iife': 'error',
+  'unicorn/no-useless-switch-case': 'error',
+  'unicorn/prefer-modern-math-apis': 'error',
+  'unicorn/prefer-native-coercion-functions': 'error',
+  'unicorn/prefer-event-target': 'error',
+  'unicorn/prefer-logical-operator-over-ternary': 'error',
 
   // deprecated rules
-
+  'unicorn/import-index': 'off',
   'unicorn/no-array-instanceof': 'off',
   'unicorn/no-fn-reference-in-iterator': 'off',
   'unicorn/no-reduce': 'off',
@@ -144,10 +149,6 @@ const eslintUnicornRules = {
   'unicorn/prefer-text-content': 'off',
   'unicorn/prefer-trim-start-end': 'off',
   'unicorn/regex-shorthand': 'off',
-  'unicorn/no-unreadable-iife': 'error',
-  'unicorn/no-useless-switch-case': 'error',
-  'unicorn/prefer-modern-math-apis': 'error',
-  'unicorn/prefer-native-coercion-functions': 'error',
 };
 
 module.exports = { eslintUnicornRules };

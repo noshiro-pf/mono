@@ -19,10 +19,12 @@ const config = {
   },
   plugins: [
     plugins.arrayFunc,
+    plugins.deprecation,
     plugins.functional,
     plugins.import,
     plugins.jest,
     plugins.promise,
+    plugins.security,
     plugins.unicorn,
     plugins.typescriptEslint,
   ],

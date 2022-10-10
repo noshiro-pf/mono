@@ -2,6 +2,7 @@
 
 'use strict';
 
+const { eslintDeprecationRules } = require('./eslint-deprecation-rules');
 const { eslintImportsRules } = require('./eslint-import-rules');
 const { eslintJestRules } = require('./eslint-jest-rules');
 const { eslintNoshiroCustomRules } = require('./eslint-noshiro-custom');
@@ -19,6 +20,7 @@ const { eslintReactRules } = require('./eslint-react-rules');
 const { eslintReactHooksRules } = require('./eslint-react-hooks-rules');
 const { eslintArrayFuncRules } = require('./eslint-array-func-rules');
 const { eslintRules } = require('./eslint-rules');
+const { eslintSecurityRules } = require('./eslint-security-rules');
 const {
   typescriptEslintRules,
   banTypes,
@@ -26,6 +28,7 @@ const {
 } = require('./typescript-eslint-rules');
 
 module.exports = {
+  eslintDeprecationRules,
   eslintImportsRules,
   eslintJestRules,
   eslintNoshiroCustomRules,
@@ -35,6 +38,7 @@ module.exports = {
   eslintReactHooksRules,
   eslintArrayFuncRules,
   eslintRules,
+  eslintSecurityRules,
 
   /* eslint-functional-rules */
   eslintFunctionalRules,

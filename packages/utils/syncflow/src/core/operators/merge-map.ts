@@ -17,6 +17,7 @@ export const mergeMap =
     new MergeMapObservableClass(parentObservable, mapToObservable);
 
 /** @deprecated use `createState` instead */
+// eslint-disable-next-line deprecation/deprecation
 export const flatMap = mergeMap;
 
 class MergeMapObservableClass<A, B>

@@ -200,21 +200,21 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     >[]
   ): IMapMapped<K, V, KM> {
     // eslint-disable-next-line no-restricted-globals
-    const result = new Map<KM, V>(this.#map);
+    const mut_result = new Map<KM, V>(this.#map);
 
     for (const action of actions) {
       const key = this.#toKey(action.key);
 
       switch (action.type) {
         case 'delete':
-          result.delete(key);
+          mut_result.delete(key);
           break;
         case 'set':
-          result.set(key, action.value);
+          mut_result.set(key, action.value);
           break;
         case 'update': {
-          if (result.has(key)) {
-            result.set(key, action.updater(result.get(key)!));
+          if (mut_result.has(key)) {
+            mut_result.set(key, action.updater(mut_result.get(key)!));
           }
           break;
         }
@@ -222,7 +222,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     }
 
     return IMapMapped.new<K, V, KM>(
-      IList.fromMapped(result, ([k, v]) => [this.#fromKey(k), v]),
+      IList.fromMapped(mut_result, ([k, v]) => [this.#fromKey(k), v]),
       this.#toKey,
       this.#fromKey
     );

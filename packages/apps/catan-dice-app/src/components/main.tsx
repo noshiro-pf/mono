@@ -3,10 +3,8 @@ import {
   interval,
   map,
   mapTo,
-  // eslint-disable-next-line import/no-deprecated
   merge,
   scan,
-  // eslint-disable-next-line import/no-deprecated
   switchMap,
   take,
   withInitialValue,
@@ -28,7 +26,7 @@ export const Main = memoNamed('Main', () => {
   const [redo$, redo] = useVoidEventObservable();
 
   const history$ = useObservable(() =>
-    // eslint-disable-next-line import/no-deprecated
+    // eslint-disable-next-line deprecation/deprecation
     merge([
       rollDices$.chain(mapTo('roll-dices' as const)),
       undo$.chain(mapTo('undo' as const)),
@@ -65,7 +63,7 @@ export const Main = memoNamed('Main', () => {
   const opacity$ = useObservable<number>(() =>
     rollDices$
       .chain(
-        // eslint-disable-next-line import/no-deprecated
+        // eslint-disable-next-line deprecation/deprecation
         switchMap(() =>
           interval(50)
             .chain(take(11))
