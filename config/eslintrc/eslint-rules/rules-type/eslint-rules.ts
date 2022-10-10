@@ -7,7 +7,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * @description enforce getter and setter pairs in objects and classes
+ * @description Enforce getter and setter pairs in objects and classes
  * @link https://eslint.org/docs/rules/accessor-pairs
  *
  *  | key         | value      |
@@ -17,6 +17,9 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  */
 namespace AccessorPairs {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -37,6 +40,7 @@ namespace AccessorPairs {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly getWithoutSet?: boolean;
@@ -50,7 +54,7 @@ namespace AccessorPairs {
 }
 
 /**
- * @description enforce linebreaks after opening and before closing array brackets
+ * @description Enforce linebreaks after opening and before closing array brackets
  * @link https://eslint.org/docs/rules/array-bracket-newline
  *
  *  | key         | value      |
@@ -61,6 +65,9 @@ namespace AccessorPairs {
  */
 namespace ArrayBracketNewline {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -90,6 +97,7 @@ namespace ArrayBracketNewline {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('always' | 'never' | 'consistent')
@@ -104,7 +112,7 @@ namespace ArrayBracketNewline {
 }
 
 /**
- * @description enforce consistent spacing inside array brackets
+ * @description Enforce consistent spacing inside array brackets
  * @link https://eslint.org/docs/rules/array-bracket-spacing
  *
  *  | key         | value      |
@@ -115,6 +123,9 @@ namespace ArrayBracketNewline {
  */
 namespace ArrayBracketSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -138,6 +149,7 @@ namespace ArrayBracketSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -154,7 +166,7 @@ namespace ArrayBracketSpacing {
 }
 
 /**
- * @description enforce `return` statements in callbacks of array methods
+ * @description Enforce `return` statements in callbacks of array methods
  * @link https://eslint.org/docs/rules/array-callback-return
  *
  *  | key         | value   |
@@ -164,6 +176,9 @@ namespace ArrayBracketSpacing {
  */
 namespace ArrayCallbackReturn {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -180,6 +195,7 @@ namespace ArrayCallbackReturn {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowImplicit?: boolean;
@@ -192,7 +208,7 @@ namespace ArrayCallbackReturn {
 }
 
 /**
- * @description enforce line breaks after each array element
+ * @description Enforce line breaks after each array element
  * @link https://eslint.org/docs/rules/array-element-newline
  *
  *  | key         | value      |
@@ -203,6 +219,9 @@ namespace ArrayCallbackReturn {
  */
 namespace ArrayElementNewline {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "definitions": {
    *     "basicConfig": {
@@ -256,6 +275,7 @@ namespace ArrayElementNewline {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -279,7 +299,7 @@ namespace ArrayElementNewline {
 }
 
 /**
- * @description require braces around arrow function bodies
+ * @description Require braces around arrow function bodies
  * @link https://eslint.org/docs/rules/arrow-body-style
  *
  *  | key         | value      |
@@ -290,6 +310,9 @@ namespace ArrayElementNewline {
  */
 namespace ArrowBodyStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -328,6 +351,7 @@ namespace ArrowBodyStyle {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -347,7 +371,7 @@ namespace ArrowBodyStyle {
 }
 
 /**
- * @description require parentheses around arrow function arguments
+ * @description Require parentheses around arrow function arguments
  * @link https://eslint.org/docs/rules/arrow-parens
  *
  *  | key         | value  |
@@ -358,6 +382,9 @@ namespace ArrowBodyStyle {
  */
 namespace ArrowParens {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -376,6 +403,7 @@ namespace ArrowParens {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'as-needed';
 
@@ -390,7 +418,7 @@ namespace ArrowParens {
 }
 
 /**
- * @description enforce consistent spacing before and after the arrow in arrow functions
+ * @description Enforce consistent spacing before and after the arrow in arrow functions
  * @link https://eslint.org/docs/rules/arrow-spacing
  *
  *  | key         | value      |
@@ -401,6 +429,9 @@ namespace ArrowParens {
  */
 namespace ArrowSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -417,6 +448,7 @@ namespace ArrowSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -429,7 +461,7 @@ namespace ArrowSpacing {
 }
 
 /**
- * @description enforce the use of variables within the scope they are defined
+ * @description Enforce the use of variables within the scope they are defined
  * @link https://eslint.org/docs/rules/block-scoped-var
  *
  *  | key         | value      |
@@ -442,7 +474,7 @@ namespace BlockScopedVar {
 }
 
 /**
- * @description disallow or enforce spaces inside of blocks after opening block and before closing block
+ * @description Disallow or enforce spaces inside of blocks after opening block and before closing block
  * @link https://eslint.org/docs/rules/block-spacing
  *
  *  | key         | value      |
@@ -453,6 +485,9 @@ namespace BlockScopedVar {
  */
 namespace BlockSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -461,6 +496,7 @@ namespace BlockSpacing {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never';
 
@@ -470,7 +506,7 @@ namespace BlockSpacing {
 }
 
 /**
- * @description enforce consistent brace style for blocks
+ * @description Enforce consistent brace style for blocks
  * @link https://eslint.org/docs/rules/brace-style
  *
  *  | key         | value      |
@@ -481,6 +517,9 @@ namespace BlockSpacing {
  */
 namespace BraceStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -500,6 +539,7 @@ namespace BraceStyle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = '1tbs' | 'stroustrup' | 'allman';
 
@@ -514,7 +554,7 @@ namespace BraceStyle {
 }
 
 /**
- * @description require `return` statements after callbacks
+ * @description Require `return` statements after callbacks
  * @link https://eslint.org/docs/rules/callback-return
  *
  *  | key         | value      |
@@ -525,6 +565,9 @@ namespace BraceStyle {
  */
 namespace CallbackReturn {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "array",
@@ -533,12 +576,13 @@ namespace CallbackReturn {
    *     }
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description enforce camelcase naming convention
+ * @description Enforce camelcase naming convention
  * @link https://eslint.org/docs/rules/camelcase
  *
  *  | key         | value      |
@@ -548,6 +592,9 @@ namespace CallbackReturn {
  */
 namespace Camelcase {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -584,12 +631,16 @@ namespace Camelcase {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreDestructuring?: boolean;
     readonly ignoreImports?: boolean;
     readonly ignoreGlobals?: boolean;
     readonly properties?: 'always' | 'never';
+    /**
+     * @minItems 0
+     */
     readonly allow?: readonly [] | readonly [string];
   };
 
@@ -599,7 +650,7 @@ namespace Camelcase {
 }
 
 /**
- * @description enforce or disallow capitalization of the first letter of a comment
+ * @description Enforce or disallow capitalization of the first letter of a comment
  * @link https://eslint.org/docs/rules/capitalized-comments
  *
  *  | key         | value      |
@@ -610,6 +661,9 @@ namespace Camelcase {
  */
 namespace CapitalizedComments {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -673,6 +727,7 @@ namespace CapitalizedComments {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -702,7 +757,7 @@ namespace CapitalizedComments {
 }
 
 /**
- * @description enforce that class methods utilize `this`
+ * @description Enforce that class methods utilize `this`
  * @link https://eslint.org/docs/rules/class-methods-use-this
  *
  *  | key         | value      |
@@ -712,6 +767,9 @@ namespace CapitalizedComments {
  */
 namespace ClassMethodsUseThis {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -730,6 +788,7 @@ namespace ClassMethodsUseThis {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly exceptMethods?: readonly string[];
@@ -742,7 +801,7 @@ namespace ClassMethodsUseThis {
 }
 
 /**
- * @description require or disallow trailing commas
+ * @description Require or disallow trailing commas
  * @link https://eslint.org/docs/rules/comma-dangle
  *
  *  | key         | value  |
@@ -753,6 +812,9 @@ namespace ClassMethodsUseThis {
  */
 namespace CommaDangle {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "definitions": {
    *     "value": {
@@ -806,6 +868,7 @@ namespace CommaDangle {
    *   ],
    *   "additionalItems": false
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -837,7 +900,7 @@ namespace CommaDangle {
 }
 
 /**
- * @description enforce consistent spacing before and after commas
+ * @description Enforce consistent spacing before and after commas
  * @link https://eslint.org/docs/rules/comma-spacing
  *
  *  | key         | value      |
@@ -848,6 +911,9 @@ namespace CommaDangle {
  */
 namespace CommaSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -864,6 +930,7 @@ namespace CommaSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -876,7 +943,7 @@ namespace CommaSpacing {
 }
 
 /**
- * @description enforce consistent comma style
+ * @description Enforce consistent comma style
  * @link https://eslint.org/docs/rules/comma-style
  *
  *  | key         | value  |
@@ -887,6 +954,9 @@ namespace CommaSpacing {
  */
 namespace CommaStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -907,6 +977,7 @@ namespace CommaStyle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'first' | 'last';
 
@@ -921,7 +992,7 @@ namespace CommaStyle {
 }
 
 /**
- * @description enforce a maximum cyclomatic complexity allowed in a program
+ * @description Enforce a maximum cyclomatic complexity allowed in a program
  * @link https://eslint.org/docs/rules/complexity
  *
  *  | key         | value      |
@@ -931,6 +1002,9 @@ namespace CommaStyle {
  */
 namespace Complexity {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -955,6 +1029,7 @@ namespace Complexity {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | number
@@ -969,7 +1044,7 @@ namespace Complexity {
 }
 
 /**
- * @description enforce consistent spacing inside computed property brackets
+ * @description Enforce consistent spacing inside computed property brackets
  * @link https://eslint.org/docs/rules/computed-property-spacing
  *
  *  | key         | value      |
@@ -980,6 +1055,9 @@ namespace Complexity {
  */
 namespace ComputedPropertySpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -998,6 +1076,7 @@ namespace ComputedPropertySpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -1012,7 +1091,7 @@ namespace ComputedPropertySpacing {
 }
 
 /**
- * @description require `return` statements to either always or never specify values
+ * @description Require `return` statements to either always or never specify values
  * @link https://eslint.org/docs/rules/consistent-return
  *
  *  | key         | value      |
@@ -1022,6 +1101,9 @@ namespace ComputedPropertySpacing {
  */
 namespace ConsistentReturn {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1034,6 +1116,7 @@ namespace ConsistentReturn {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly treatUndefinedAsUnspecified?: boolean;
@@ -1045,7 +1128,7 @@ namespace ConsistentReturn {
 }
 
 /**
- * @description enforce consistent naming when capturing the current execution context
+ * @description Enforce consistent naming when capturing the current execution context
  * @link https://eslint.org/docs/rules/consistent-this
  *
  *  | key         | value      |
@@ -1055,6 +1138,9 @@ namespace ConsistentReturn {
  */
 namespace ConsistentThis {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "type": "array",
    *   "items": {
@@ -1063,6 +1149,7 @@ namespace ConsistentThis {
    *   },
    *   "uniqueItems": true
    * }
+   * ```
    */
   export type Options = readonly string[];
 
@@ -1072,7 +1159,7 @@ namespace ConsistentThis {
 }
 
 /**
- * @description require `super()` calls in constructors
+ * @description Require `super()` calls in constructors
  * @link https://eslint.org/docs/rules/constructor-super
  *
  *  | key         | value   |
@@ -1085,7 +1172,7 @@ namespace ConstructorSuper {
 }
 
 /**
- * @description enforce consistent brace style for all control statements
+ * @description Enforce consistent brace style for all control statements
  * @link https://eslint.org/docs/rules/curly
  *
  *  | key         | value      |
@@ -1096,6 +1183,9 @@ namespace ConstructorSuper {
  */
 namespace Curly {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -1131,6 +1221,7 @@ namespace Curly {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1145,7 +1236,7 @@ namespace Curly {
 }
 
 /**
- * @description require `default` cases in `switch` statements
+ * @description Require `default` cases in `switch` statements
  * @link https://eslint.org/docs/rules/default-case
  *
  *  | key         | value      |
@@ -1155,6 +1246,9 @@ namespace Curly {
  */
 namespace DefaultCase {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1166,6 +1260,7 @@ namespace DefaultCase {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commentPattern?: string;
@@ -1177,7 +1272,7 @@ namespace DefaultCase {
 }
 
 /**
- * @description enforce default clauses in switch statements to be last
+ * @description Enforce default clauses in switch statements to be last
  * @link https://eslint.org/docs/rules/default-case-last
  *
  *  | key         | value      |
@@ -1190,7 +1285,7 @@ namespace DefaultCaseLast {
 }
 
 /**
- * @description enforce default parameters to be last
+ * @description Enforce default parameters to be last
  * @link https://eslint.org/docs/rules/default-param-last
  *
  *  | key         | value      |
@@ -1203,7 +1298,7 @@ namespace DefaultParamLast {
 }
 
 /**
- * @description enforce consistent newlines before and after dots
+ * @description Enforce consistent newlines before and after dots
  * @link https://eslint.org/docs/rules/dot-location
  *
  *  | key         | value  |
@@ -1214,6 +1309,9 @@ namespace DefaultParamLast {
  */
 namespace DotLocation {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -1222,6 +1320,7 @@ namespace DotLocation {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'object' | 'property';
 
@@ -1231,7 +1330,7 @@ namespace DotLocation {
 }
 
 /**
- * @description enforce dot notation whenever possible
+ * @description Enforce dot notation whenever possible
  * @link https://eslint.org/docs/rules/dot-notation
  *
  *  | key         | value      |
@@ -1242,6 +1341,9 @@ namespace DotLocation {
  */
 namespace DotNotation {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1258,6 +1360,7 @@ namespace DotNotation {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowKeywords?: boolean;
@@ -1270,7 +1373,7 @@ namespace DotNotation {
 }
 
 /**
- * @description require or disallow newline at the end of files
+ * @description Require or disallow newline at the end of files
  * @link https://eslint.org/docs/rules/eol-last
  *
  *  | key         | value      |
@@ -1281,6 +1384,9 @@ namespace DotNotation {
  */
 namespace EolLast {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -1291,6 +1397,7 @@ namespace EolLast {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never' | 'unix' | 'windows';
 
@@ -1300,7 +1407,7 @@ namespace EolLast {
 }
 
 /**
- * @description require the use of `===` and `!==`
+ * @description Require the use of `===` and `!==`
  * @link https://eslint.org/docs/rules/eqeqeq
  *
  *  | key         | value      |
@@ -1311,6 +1418,9 @@ namespace EolLast {
  */
 namespace Eqeqeq {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -1351,6 +1461,7 @@ namespace Eqeqeq {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1370,7 +1481,7 @@ namespace Eqeqeq {
 }
 
 /**
- * @description enforce "for" loop update clause moving the counter in the right direction.
+ * @description Enforce "for" loop update clause moving the counter in the right direction.
  * @link https://eslint.org/docs/rules/for-direction
  *
  *  | key         | value   |
@@ -1383,7 +1494,7 @@ namespace ForDirection {
 }
 
 /**
- * @description require or disallow spacing between function identifiers and their invocations
+ * @description Require or disallow spacing between function identifiers and their invocations
  * @link https://eslint.org/docs/rules/func-call-spacing
  *
  *  | key         | value      |
@@ -1394,6 +1505,9 @@ namespace ForDirection {
  */
 namespace FuncCallSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -1431,6 +1545,7 @@ namespace FuncCallSpacing {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1450,7 +1565,7 @@ namespace FuncCallSpacing {
 }
 
 /**
- * @description require function names to match the name of the variable or property to which they are assigned
+ * @description Require function names to match the name of the variable or property to which they are assigned
  * @link https://eslint.org/docs/rules/func-name-matching
  *
  *  | key         | value      |
@@ -1460,6 +1575,9 @@ namespace FuncCallSpacing {
  */
 namespace FuncNameMatching {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -1506,6 +1624,7 @@ namespace FuncNameMatching {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1531,7 +1650,7 @@ namespace FuncNameMatching {
 }
 
 /**
- * @description require or disallow named `function` expressions
+ * @description Require or disallow named `function` expressions
  * @link https://eslint.org/docs/rules/func-names
  *
  *  | key         | value      |
@@ -1541,6 +1660,9 @@ namespace FuncNameMatching {
  */
 namespace FuncNames {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "definitions": {
    *     "value": {
@@ -1566,6 +1688,7 @@ namespace FuncNames {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1584,7 +1707,7 @@ namespace FuncNames {
 }
 
 /**
- * @description enforce the consistent use of either `function` declarations or expressions
+ * @description Enforce the consistent use of either `function` declarations or expressions
  * @link https://eslint.org/docs/rules/func-style
  *
  *  | key         | value      |
@@ -1594,6 +1717,9 @@ namespace FuncNames {
  */
 namespace FuncStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -1612,6 +1738,7 @@ namespace FuncStyle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'declaration' | 'expression';
 
@@ -1626,7 +1753,7 @@ namespace FuncStyle {
 }
 
 /**
- * @description enforce line breaks between arguments of a function call
+ * @description Enforce line breaks between arguments of a function call
  * @link https://eslint.org/docs/rules/function-call-argument-newline
  *
  *  | key         | value      |
@@ -1637,6 +1764,9 @@ namespace FuncStyle {
  */
 namespace FunctionCallArgumentNewline {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -1646,6 +1776,7 @@ namespace FunctionCallArgumentNewline {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never' | 'consistent';
 
@@ -1655,7 +1786,7 @@ namespace FunctionCallArgumentNewline {
 }
 
 /**
- * @description enforce consistent line breaks inside function parentheses
+ * @description Enforce consistent line breaks inside function parentheses
  * @link https://eslint.org/docs/rules/function-paren-newline
  *
  *  | key         | value      |
@@ -1666,6 +1797,9 @@ namespace FunctionCallArgumentNewline {
  */
 namespace FunctionParenNewline {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -1691,6 +1825,7 @@ namespace FunctionParenNewline {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('always' | 'never' | 'consistent' | 'multiline' | 'multiline-arguments')
@@ -1704,7 +1839,7 @@ namespace FunctionParenNewline {
 }
 
 /**
- * @description enforce consistent spacing around `*` operators in generator functions
+ * @description Enforce consistent spacing around `*` operators in generator functions
  * @link https://eslint.org/docs/rules/generator-star-spacing
  *
  *  | key         | value      |
@@ -1715,6 +1850,9 @@ namespace FunctionParenNewline {
  */
 namespace GeneratorStarSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -1813,6 +1951,7 @@ namespace GeneratorStarSpacing {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('before' | 'after' | 'both' | 'neither')
@@ -1845,7 +1984,7 @@ namespace GeneratorStarSpacing {
 }
 
 /**
- * @description enforce `return` statements in getters
+ * @description Enforce `return` statements in getters
  * @link https://eslint.org/docs/rules/getter-return
  *
  *  | key         | value   |
@@ -1855,6 +1994,9 @@ namespace GeneratorStarSpacing {
  */
 namespace GetterReturn {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1867,6 +2009,7 @@ namespace GetterReturn {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowImplicit?: boolean;
@@ -1878,7 +2021,7 @@ namespace GetterReturn {
 }
 
 /**
- * @description require `require()` calls to be placed at top-level module scope
+ * @description Require `require()` calls to be placed at top-level module scope
  * @link https://eslint.org/docs/rules/global-require
  *
  *  | key         | value      |
@@ -1892,7 +2035,7 @@ namespace GlobalRequire {
 }
 
 /**
- * @description require grouped accessor pairs in object literals and classes
+ * @description Require grouped accessor pairs in object literals and classes
  * @link https://eslint.org/docs/rules/grouped-accessor-pairs
  *
  *  | key         | value      |
@@ -1902,6 +2045,9 @@ namespace GlobalRequire {
  */
 namespace GroupedAccessorPairs {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -1911,6 +2057,7 @@ namespace GroupedAccessorPairs {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'anyOrder' | 'getBeforeSet' | 'setBeforeGet';
 
@@ -1920,7 +2067,7 @@ namespace GroupedAccessorPairs {
 }
 
 /**
- * @description require `for-in` loops to include an `if` statement
+ * @description Require `for-in` loops to include an `if` statement
  * @link https://eslint.org/docs/rules/guard-for-in
  *
  *  | key         | value      |
@@ -1933,7 +2080,7 @@ namespace GuardForIn {
 }
 
 /**
- * @description require error handling in callbacks
+ * @description Require error handling in callbacks
  * @link https://eslint.org/docs/rules/handle-callback-err
  *
  *  | key         | value      |
@@ -1944,17 +2091,21 @@ namespace GuardForIn {
  */
 namespace HandleCallbackErr {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "string"
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description disallow specified identifiers
+ * @description Disallow specified identifiers
  * @link https://eslint.org/docs/rules/id-blacklist
  *
  *  | key         | value      |
@@ -1965,6 +2116,9 @@ namespace HandleCallbackErr {
  */
 namespace IdBlacklist {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "type": "array",
    *   "items": {
@@ -1972,12 +2126,13 @@ namespace IdBlacklist {
    *   },
    *   "uniqueItems": true
    * }
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description disallow specified identifiers
+ * @description Disallow specified identifiers
  * @link https://eslint.org/docs/rules/id-denylist
  *
  *  | key         | value      |
@@ -1987,6 +2142,9 @@ namespace IdBlacklist {
  */
 namespace IdDenylist {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "type": "array",
    *   "items": {
@@ -1994,6 +2152,7 @@ namespace IdDenylist {
    *   },
    *   "uniqueItems": true
    * }
+   * ```
    */
   export type Options = readonly string[];
 
@@ -2003,7 +2162,7 @@ namespace IdDenylist {
 }
 
 /**
- * @description enforce minimum and maximum identifier lengths
+ * @description Enforce minimum and maximum identifier lengths
  * @link https://eslint.org/docs/rules/id-length
  *
  *  | key         | value      |
@@ -2013,6 +2172,9 @@ namespace IdDenylist {
  */
 namespace IdLength {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -2048,6 +2210,7 @@ namespace IdLength {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly min?: number;
@@ -2063,7 +2226,7 @@ namespace IdLength {
 }
 
 /**
- * @description require identifiers to match a specified regular expression
+ * @description Require identifiers to match a specified regular expression
  * @link https://eslint.org/docs/rules/id-match
  *
  *  | key         | value      |
@@ -2073,6 +2236,9 @@ namespace IdLength {
  */
 namespace IdMatch {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "string"
@@ -2100,6 +2266,7 @@ namespace IdMatch {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = string;
 
@@ -2117,7 +2284,7 @@ namespace IdMatch {
 }
 
 /**
- * @description enforce the location of arrow function bodies
+ * @description Enforce the location of arrow function bodies
  * @link https://eslint.org/docs/rules/implicit-arrow-linebreak
  *
  *  | key         | value      |
@@ -2128,6 +2295,9 @@ namespace IdMatch {
  */
 namespace ImplicitArrowLinebreak {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -2136,6 +2306,7 @@ namespace ImplicitArrowLinebreak {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'beside' | 'below';
 
@@ -2145,7 +2316,7 @@ namespace ImplicitArrowLinebreak {
 }
 
 /**
- * @description enforce consistent indentation
+ * @description Enforce consistent indentation
  * @link https://eslint.org/docs/rules/indent
  *
  *  | key         | value      |
@@ -2156,6 +2327,9 @@ namespace ImplicitArrowLinebreak {
  */
 namespace Indent {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -2415,6 +2589,7 @@ namespace Indent {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'tab' | number;
 
@@ -2459,7 +2634,7 @@ namespace Indent {
 }
 
 /**
- * @description enforce consistent indentation
+ * @description Enforce consistent indentation
  * @link https://eslint.org/docs/rules/indent-legacy
  *
  *  | key         | value      |
@@ -2471,6 +2646,9 @@ namespace Indent {
  */
 namespace IndentLegacy {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -2617,12 +2795,13 @@ namespace IndentLegacy {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description require or disallow initialization in variable declarations
+ * @description Require or disallow initialization in variable declarations
  * @link https://eslint.org/docs/rules/init-declarations
  *
  *  | key         | value      |
@@ -2632,6 +2811,9 @@ namespace IndentLegacy {
  */
 namespace InitDeclarations {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -2669,6 +2851,7 @@ namespace InitDeclarations {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -2688,7 +2871,7 @@ namespace InitDeclarations {
 }
 
 /**
- * @description enforce the consistent use of either double or single quotes in JSX attributes
+ * @description Enforce the consistent use of either double or single quotes in JSX attributes
  * @link https://eslint.org/docs/rules/jsx-quotes
  *
  *  | key         | value      |
@@ -2699,6 +2882,9 @@ namespace InitDeclarations {
  */
 namespace JsxQuotes {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -2707,6 +2893,7 @@ namespace JsxQuotes {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'prefer-single' | 'prefer-double';
 
@@ -2716,7 +2903,7 @@ namespace JsxQuotes {
 }
 
 /**
- * @description enforce consistent spacing between keys and values in object literal properties
+ * @description Enforce consistent spacing between keys and values in object literal properties
  * @link https://eslint.org/docs/rules/key-spacing
  *
  *  | key         | value      |
@@ -2727,6 +2914,9 @@ namespace JsxQuotes {
  */
 namespace KeySpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "anyOf": [
@@ -2927,6 +3117,7 @@ namespace KeySpacing {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | {
@@ -2987,7 +3178,7 @@ namespace KeySpacing {
 }
 
 /**
- * @description enforce consistent spacing before and after keywords
+ * @description Enforce consistent spacing before and after keywords
  * @link https://eslint.org/docs/rules/keyword-spacing
  *
  *  | key         | value      |
@@ -2998,6 +3189,9 @@ namespace KeySpacing {
  */
 namespace KeywordSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -3836,6 +4030,7 @@ namespace KeywordSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -4122,7 +4317,7 @@ namespace KeywordSpacing {
 }
 
 /**
- * @description enforce position of line comments
+ * @description Enforce position of line comments
  * @link https://eslint.org/docs/rules/line-comment-position
  *
  *  | key         | value  |
@@ -4132,6 +4327,9 @@ namespace KeywordSpacing {
  */
 namespace LineCommentPosition {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4165,6 +4363,7 @@ namespace LineCommentPosition {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('above' | 'beside')
@@ -4181,7 +4380,7 @@ namespace LineCommentPosition {
 }
 
 /**
- * @description enforce consistent linebreak style
+ * @description Enforce consistent linebreak style
  * @link https://eslint.org/docs/rules/linebreak-style
  *
  *  | key         | value      |
@@ -4192,6 +4391,9 @@ namespace LineCommentPosition {
  */
 namespace LinebreakStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -4200,6 +4402,7 @@ namespace LinebreakStyle {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'unix' | 'windows';
 
@@ -4209,7 +4412,7 @@ namespace LinebreakStyle {
 }
 
 /**
- * @description require empty lines around comments
+ * @description Require empty lines around comments
  * @link https://eslint.org/docs/rules/lines-around-comment
  *
  *  | key         | value      |
@@ -4220,6 +4423,9 @@ namespace LinebreakStyle {
  */
 namespace LinesAroundComment {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -4276,6 +4482,7 @@ namespace LinesAroundComment {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly beforeBlockComment?: boolean;
@@ -4300,7 +4507,7 @@ namespace LinesAroundComment {
 }
 
 /**
- * @description require or disallow newlines around directives
+ * @description Require or disallow newlines around directives
  * @link https://eslint.org/docs/rules/lines-around-directive
  *
  *  | key         | value      |
@@ -4312,6 +4519,9 @@ namespace LinesAroundComment {
  */
 namespace LinesAroundDirective {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4343,12 +4553,13 @@ namespace LinesAroundDirective {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description require or disallow an empty line between class members
+ * @description Require or disallow an empty line between class members
  * @link https://eslint.org/docs/rules/lines-between-class-members
  *
  *  | key         | value      |
@@ -4359,6 +4570,9 @@ namespace LinesAroundDirective {
  */
 namespace LinesBetweenClassMembers {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -4377,6 +4591,7 @@ namespace LinesBetweenClassMembers {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -4391,7 +4606,7 @@ namespace LinesBetweenClassMembers {
 }
 
 /**
- * @description enforce a maximum number of classes per file
+ * @description Enforce a maximum number of classes per file
  * @link https://eslint.org/docs/rules/max-classes-per-file
  *
  *  | key         | value      |
@@ -4401,6 +4616,9 @@ namespace LinesBetweenClassMembers {
  */
 namespace MaxClassesPerFile {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4424,6 +4642,7 @@ namespace MaxClassesPerFile {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | number
@@ -4438,7 +4657,7 @@ namespace MaxClassesPerFile {
 }
 
 /**
- * @description enforce a maximum depth that blocks can be nested
+ * @description Enforce a maximum depth that blocks can be nested
  * @link https://eslint.org/docs/rules/max-depth
  *
  *  | key         | value      |
@@ -4448,6 +4667,9 @@ namespace MaxClassesPerFile {
  */
 namespace MaxDepth {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4472,6 +4694,7 @@ namespace MaxDepth {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | number
@@ -4486,7 +4709,7 @@ namespace MaxDepth {
 }
 
 /**
- * @description enforce a maximum line length
+ * @description Enforce a maximum line length
  * @link https://eslint.org/docs/rules/max-len
  *
  *  | key         | value  |
@@ -4496,6 +4719,9 @@ namespace MaxDepth {
  */
 namespace MaxLen {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "anyOf": [
@@ -4631,6 +4857,7 @@ namespace MaxLen {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 =
     | {
@@ -4683,7 +4910,7 @@ namespace MaxLen {
 }
 
 /**
- * @description enforce a maximum number of lines per file
+ * @description Enforce a maximum number of lines per file
  * @link https://eslint.org/docs/rules/max-lines
  *
  *  | key         | value      |
@@ -4693,6 +4920,9 @@ namespace MaxLen {
  */
 namespace MaxLines {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4719,6 +4949,7 @@ namespace MaxLines {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | number
@@ -4734,7 +4965,7 @@ namespace MaxLines {
 }
 
 /**
- * @description enforce a maximum number of lines of code in a function
+ * @description Enforce a maximum number of lines of code in a function
  * @link https://eslint.org/docs/rules/max-lines-per-function
  *
  *  | key         | value      |
@@ -4744,6 +4975,9 @@ namespace MaxLines {
  */
 namespace MaxLinesPerFunction {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4773,6 +5007,7 @@ namespace MaxLinesPerFunction {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | {
@@ -4789,7 +5024,7 @@ namespace MaxLinesPerFunction {
 }
 
 /**
- * @description enforce a maximum depth that callbacks can be nested
+ * @description Enforce a maximum depth that callbacks can be nested
  * @link https://eslint.org/docs/rules/max-nested-callbacks
  *
  *  | key         | value      |
@@ -4799,6 +5034,9 @@ namespace MaxLinesPerFunction {
  */
 namespace MaxNestedCallbacks {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4823,6 +5061,7 @@ namespace MaxNestedCallbacks {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | number
@@ -4837,7 +5076,7 @@ namespace MaxNestedCallbacks {
 }
 
 /**
- * @description enforce a maximum number of parameters in function definitions
+ * @description Enforce a maximum number of parameters in function definitions
  * @link https://eslint.org/docs/rules/max-params
  *
  *  | key         | value      |
@@ -4847,6 +5086,9 @@ namespace MaxNestedCallbacks {
  */
 namespace MaxParams {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4871,6 +5113,7 @@ namespace MaxParams {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | number
@@ -4885,7 +5128,7 @@ namespace MaxParams {
 }
 
 /**
- * @description enforce a maximum number of statements allowed in function blocks
+ * @description Enforce a maximum number of statements allowed in function blocks
  * @link https://eslint.org/docs/rules/max-statements
  *
  *  | key         | value      |
@@ -4895,6 +5138,9 @@ namespace MaxParams {
  */
 namespace MaxStatements {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -4928,6 +5174,7 @@ namespace MaxStatements {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 =
     | number
@@ -4947,7 +5194,7 @@ namespace MaxStatements {
 }
 
 /**
- * @description enforce a maximum number of statements allowed per line
+ * @description Enforce a maximum number of statements allowed per line
  * @link https://eslint.org/docs/rules/max-statements-per-line
  *
  *  | key         | value  |
@@ -4957,6 +5204,9 @@ namespace MaxStatements {
  */
 namespace MaxStatementsPerLine {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -4970,6 +5220,7 @@ namespace MaxStatementsPerLine {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly max?: number;
@@ -4981,7 +5232,7 @@ namespace MaxStatementsPerLine {
 }
 
 /**
- * @description enforce a particular style for multiline comments
+ * @description Enforce a particular style for multiline comments
  * @link https://eslint.org/docs/rules/multiline-comment-style
  *
  *  | key         | value      |
@@ -4992,6 +5243,9 @@ namespace MaxStatementsPerLine {
  */
 namespace MultilineCommentStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -5001,6 +5255,7 @@ namespace MultilineCommentStyle {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'starred-block' | 'separate-lines' | 'bare-block';
 
@@ -5010,7 +5265,7 @@ namespace MultilineCommentStyle {
 }
 
 /**
- * @description enforce newlines between operands of ternary expressions
+ * @description Enforce newlines between operands of ternary expressions
  * @link https://eslint.org/docs/rules/multiline-ternary
  *
  *  | key         | value      |
@@ -5021,6 +5276,9 @@ namespace MultilineCommentStyle {
  */
 namespace MultilineTernary {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -5030,6 +5288,7 @@ namespace MultilineTernary {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'always-multiline' | 'never';
 
@@ -5039,7 +5298,7 @@ namespace MultilineTernary {
 }
 
 /**
- * @description require constructor names to begin with a capital letter
+ * @description Require constructor names to begin with a capital letter
  * @link https://eslint.org/docs/rules/new-cap
  *
  *  | key         | value      |
@@ -5049,6 +5308,9 @@ namespace MultilineTernary {
  */
 namespace NewCap {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5087,6 +5349,7 @@ namespace NewCap {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly newIsCap?: boolean;
@@ -5104,7 +5367,7 @@ namespace NewCap {
 }
 
 /**
- * @description enforce or disallow parentheses when invoking a constructor with no arguments
+ * @description Enforce or disallow parentheses when invoking a constructor with no arguments
  * @link https://eslint.org/docs/rules/new-parens
  *
  *  | key         | value  |
@@ -5115,6 +5378,9 @@ namespace NewCap {
  */
 namespace NewParens {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -5132,6 +5398,7 @@ namespace NewParens {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options = readonly [] | readonly ['always' | 'never'];
 
@@ -5141,7 +5408,7 @@ namespace NewParens {
 }
 
 /**
- * @description require or disallow an empty line after variable declarations
+ * @description Require or disallow an empty line after variable declarations
  * @link https://eslint.org/docs/rules/newline-after-var
  *
  *  | key         | value      |
@@ -5153,6 +5420,9 @@ namespace NewParens {
  */
 namespace NewlineAfterVar {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -5161,12 +5431,13 @@ namespace NewlineAfterVar {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description require an empty line before `return` statements
+ * @description Require an empty line before `return` statements
  * @link https://eslint.org/docs/rules/newline-before-return
  *
  *  | key         | value      |
@@ -5181,7 +5452,7 @@ namespace NewlineBeforeReturn {
 }
 
 /**
- * @description require a newline after each call in a method chain
+ * @description Require a newline after each call in a method chain
  * @link https://eslint.org/docs/rules/newline-per-chained-call
  *
  *  | key         | value      |
@@ -5192,6 +5463,9 @@ namespace NewlineBeforeReturn {
  */
 namespace NewlinePerChainedCall {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5206,6 +5480,7 @@ namespace NewlinePerChainedCall {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreChainWithDepth?: number;
@@ -5217,7 +5492,7 @@ namespace NewlinePerChainedCall {
 }
 
 /**
- * @description disallow the use of `alert`, `confirm`, and `prompt`
+ * @description Disallow the use of `alert`, `confirm`, and `prompt`
  * @link https://eslint.org/docs/rules/no-alert
  *
  *  | key         | value      |
@@ -5230,7 +5505,7 @@ namespace NoAlert {
 }
 
 /**
- * @description disallow `Array` constructors
+ * @description Disallow `Array` constructors
  * @link https://eslint.org/docs/rules/no-array-constructor
  *
  *  | key         | value      |
@@ -5243,7 +5518,7 @@ namespace NoArrayConstructor {
 }
 
 /**
- * @description disallow using an async function as a Promise executor
+ * @description Disallow using an async function as a Promise executor
  * @link https://eslint.org/docs/rules/no-async-promise-executor
  *
  *  | key         | value   |
@@ -5256,7 +5531,7 @@ namespace NoAsyncPromiseExecutor {
 }
 
 /**
- * @description disallow `await` inside of loops
+ * @description Disallow `await` inside of loops
  * @link https://eslint.org/docs/rules/no-await-in-loop
  *
  *  | key         | value   |
@@ -5269,7 +5544,7 @@ namespace NoAwaitInLoop {
 }
 
 /**
- * @description disallow bitwise operators
+ * @description Disallow bitwise operators
  * @link https://eslint.org/docs/rules/no-bitwise
  *
  *  | key         | value      |
@@ -5279,6 +5554,9 @@ namespace NoAwaitInLoop {
  */
 namespace NoBitwise {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5312,6 +5590,7 @@ namespace NoBitwise {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allow?: readonly (
@@ -5338,7 +5617,7 @@ namespace NoBitwise {
 }
 
 /**
- * @description disallow use of the `Buffer()` constructor
+ * @description Disallow use of the `Buffer()` constructor
  * @link https://eslint.org/docs/rules/no-buffer-constructor
  *
  *  | key         | value   |
@@ -5352,7 +5631,7 @@ namespace NoBufferConstructor {
 }
 
 /**
- * @description disallow the use of `arguments.caller` or `arguments.callee`
+ * @description Disallow the use of `arguments.caller` or `arguments.callee`
  * @link https://eslint.org/docs/rules/no-caller
  *
  *  | key         | value      |
@@ -5365,7 +5644,7 @@ namespace NoCaller {
 }
 
 /**
- * @description disallow lexical declarations in case clauses
+ * @description Disallow lexical declarations in case clauses
  * @link https://eslint.org/docs/rules/no-case-declarations
  *
  *  | key         | value      |
@@ -5378,7 +5657,7 @@ namespace NoCaseDeclarations {
 }
 
 /**
- * @description disallow `catch` clause parameters from shadowing variables in the outer scope
+ * @description Disallow `catch` clause parameters from shadowing variables in the outer scope
  * @link https://eslint.org/docs/rules/no-catch-shadow
  *
  *  | key         | value      |
@@ -5392,7 +5671,7 @@ namespace NoCatchShadow {
 }
 
 /**
- * @description disallow reassigning class members
+ * @description Disallow reassigning class members
  * @link https://eslint.org/docs/rules/no-class-assign
  *
  *  | key         | value   |
@@ -5405,7 +5684,7 @@ namespace NoClassAssign {
 }
 
 /**
- * @description disallow comparing against -0
+ * @description Disallow comparing against -0
  * @link https://eslint.org/docs/rules/no-compare-neg-zero
  *
  *  | key         | value   |
@@ -5418,7 +5697,7 @@ namespace NoCompareNegZero {
 }
 
 /**
- * @description disallow assignment operators in conditional expressions
+ * @description Disallow assignment operators in conditional expressions
  * @link https://eslint.org/docs/rules/no-cond-assign
  *
  *  | key         | value   |
@@ -5428,6 +5707,9 @@ namespace NoCompareNegZero {
  */
 namespace NoCondAssign {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -5436,6 +5718,7 @@ namespace NoCondAssign {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'except-parens' | 'always';
 
@@ -5445,7 +5728,7 @@ namespace NoCondAssign {
 }
 
 /**
- * @description disallow arrow functions where they could be confused with comparisons
+ * @description Disallow arrow functions where they could be confused with comparisons
  * @link https://eslint.org/docs/rules/no-confusing-arrow
  *
  *  | key         | value      |
@@ -5456,6 +5739,9 @@ namespace NoCondAssign {
  */
 namespace NoConfusingArrow {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5472,6 +5758,7 @@ namespace NoConfusingArrow {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowParens?: boolean;
@@ -5484,7 +5771,7 @@ namespace NoConfusingArrow {
 }
 
 /**
- * @description disallow the use of `console`
+ * @description Disallow the use of `console`
  * @link https://eslint.org/docs/rules/no-console
  *
  *  | key         | value      |
@@ -5494,6 +5781,9 @@ namespace NoConfusingArrow {
  */
 namespace NoConsole {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5510,8 +5800,12 @@ namespace NoConsole {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * @minItems 1
+     */
     readonly allow?: readonly [string, ...(readonly string[])];
   };
 
@@ -5521,7 +5815,7 @@ namespace NoConsole {
 }
 
 /**
- * @description disallow reassigning `const` variables
+ * @description Disallow reassigning `const` variables
  * @link https://eslint.org/docs/rules/no-const-assign
  *
  *  | key         | value   |
@@ -5534,7 +5828,7 @@ namespace NoConstAssign {
 }
 
 /**
- * @description disallow expressions where the operation doesn't affect the value
+ * @description Disallow expressions where the operation doesn't affect the value
  * @link https://eslint.org/docs/rules/no-constant-binary-expression
  *
  *  | key         | value   |
@@ -5547,7 +5841,7 @@ namespace NoConstantBinaryExpression {
 }
 
 /**
- * @description disallow constant expressions in conditions
+ * @description Disallow constant expressions in conditions
  * @link https://eslint.org/docs/rules/no-constant-condition
  *
  *  | key         | value   |
@@ -5557,6 +5851,9 @@ namespace NoConstantBinaryExpression {
  */
 namespace NoConstantCondition {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5569,6 +5866,7 @@ namespace NoConstantCondition {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly checkLoops?: boolean;
@@ -5580,7 +5878,7 @@ namespace NoConstantCondition {
 }
 
 /**
- * @description disallow returning value from constructor
+ * @description Disallow returning value from constructor
  * @link https://eslint.org/docs/rules/no-constructor-return
  *
  *  | key         | value   |
@@ -5590,7 +5888,11 @@ namespace NoConstantCondition {
  */
 namespace NoConstructorReturn {
   /**
+   * ### schema
+   *
+   * ```json
    * {}
+   * ```
    */
   export type Options = Readonly<Record<string, unknown>>;
 
@@ -5600,7 +5902,7 @@ namespace NoConstructorReturn {
 }
 
 /**
- * @description disallow `continue` statements
+ * @description Disallow `continue` statements
  * @link https://eslint.org/docs/rules/no-continue
  *
  *  | key         | value      |
@@ -5613,7 +5915,7 @@ namespace NoContinue {
 }
 
 /**
- * @description disallow control characters in regular expressions
+ * @description Disallow control characters in regular expressions
  * @link https://eslint.org/docs/rules/no-control-regex
  *
  *  | key         | value   |
@@ -5626,7 +5928,7 @@ namespace NoControlRegex {
 }
 
 /**
- * @description disallow the use of `debugger`
+ * @description Disallow the use of `debugger`
  * @link https://eslint.org/docs/rules/no-debugger
  *
  *  | key         | value   |
@@ -5639,7 +5941,7 @@ namespace NoDebugger {
 }
 
 /**
- * @description disallow deleting variables
+ * @description Disallow deleting variables
  * @link https://eslint.org/docs/rules/no-delete-var
  *
  *  | key         | value      |
@@ -5652,7 +5954,7 @@ namespace NoDeleteVar {
 }
 
 /**
- * @description disallow division operators explicitly at the beginning of regular expressions
+ * @description Disallow division operators explicitly at the beginning of regular expressions
  * @link https://eslint.org/docs/rules/no-div-regex
  *
  *  | key         | value      |
@@ -5666,7 +5968,7 @@ namespace NoDivRegex {
 }
 
 /**
- * @description disallow duplicate arguments in `function` definitions
+ * @description Disallow duplicate arguments in `function` definitions
  * @link https://eslint.org/docs/rules/no-dupe-args
  *
  *  | key         | value   |
@@ -5679,7 +5981,7 @@ namespace NoDupeArgs {
 }
 
 /**
- * @description disallow duplicate class members
+ * @description Disallow duplicate class members
  * @link https://eslint.org/docs/rules/no-dupe-class-members
  *
  *  | key         | value   |
@@ -5692,7 +5994,7 @@ namespace NoDupeClassMembers {
 }
 
 /**
- * @description disallow duplicate conditions in if-else-if chains
+ * @description Disallow duplicate conditions in if-else-if chains
  * @link https://eslint.org/docs/rules/no-dupe-else-if
  *
  *  | key         | value   |
@@ -5705,7 +6007,7 @@ namespace NoDupeElseIf {
 }
 
 /**
- * @description disallow duplicate keys in object literals
+ * @description Disallow duplicate keys in object literals
  * @link https://eslint.org/docs/rules/no-dupe-keys
  *
  *  | key         | value   |
@@ -5718,7 +6020,7 @@ namespace NoDupeKeys {
 }
 
 /**
- * @description disallow duplicate case labels
+ * @description Disallow duplicate case labels
  * @link https://eslint.org/docs/rules/no-duplicate-case
  *
  *  | key         | value   |
@@ -5731,7 +6033,7 @@ namespace NoDuplicateCase {
 }
 
 /**
- * @description disallow duplicate module imports
+ * @description Disallow duplicate module imports
  * @link https://eslint.org/docs/rules/no-duplicate-imports
  *
  *  | key         | value   |
@@ -5741,6 +6043,9 @@ namespace NoDuplicateCase {
  */
 namespace NoDuplicateImports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5753,6 +6058,7 @@ namespace NoDuplicateImports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly includeExports?: boolean;
@@ -5764,7 +6070,7 @@ namespace NoDuplicateImports {
 }
 
 /**
- * @description disallow `else` blocks after `return` statements in `if` statements
+ * @description Disallow `else` blocks after `return` statements in `if` statements
  * @link https://eslint.org/docs/rules/no-else-return
  *
  *  | key         | value      |
@@ -5775,6 +6081,9 @@ namespace NoDuplicateImports {
  */
 namespace NoElseReturn {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5787,6 +6096,7 @@ namespace NoElseReturn {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowElseIf?: boolean;
@@ -5798,7 +6108,7 @@ namespace NoElseReturn {
 }
 
 /**
- * @description disallow empty block statements
+ * @description Disallow empty block statements
  * @link https://eslint.org/docs/rules/no-empty
  *
  *  | key         | value      |
@@ -5808,6 +6118,9 @@ namespace NoElseReturn {
  */
 namespace NoEmpty {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5820,6 +6133,7 @@ namespace NoEmpty {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowEmptyCatch?: boolean;
@@ -5831,7 +6145,7 @@ namespace NoEmpty {
 }
 
 /**
- * @description disallow empty character classes in regular expressions
+ * @description Disallow empty character classes in regular expressions
  * @link https://eslint.org/docs/rules/no-empty-character-class
  *
  *  | key         | value   |
@@ -5844,7 +6158,7 @@ namespace NoEmptyCharacterClass {
 }
 
 /**
- * @description disallow empty functions
+ * @description Disallow empty functions
  * @link https://eslint.org/docs/rules/no-empty-function
  *
  *  | key         | value      |
@@ -5854,6 +6168,9 @@ namespace NoEmptyCharacterClass {
  */
 namespace NoEmptyFunction {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5880,6 +6197,7 @@ namespace NoEmptyFunction {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allow?: readonly (
@@ -5902,7 +6220,7 @@ namespace NoEmptyFunction {
 }
 
 /**
- * @description disallow empty destructuring patterns
+ * @description Disallow empty destructuring patterns
  * @link https://eslint.org/docs/rules/no-empty-pattern
  *
  *  | key         | value   |
@@ -5915,7 +6233,7 @@ namespace NoEmptyPattern {
 }
 
 /**
- * @description disallow `null` comparisons without type-checking operators
+ * @description Disallow `null` comparisons without type-checking operators
  * @link https://eslint.org/docs/rules/no-eq-null
  *
  *  | key         | value      |
@@ -5928,7 +6246,7 @@ namespace NoEqNull {
 }
 
 /**
- * @description disallow the use of `eval()`
+ * @description Disallow the use of `eval()`
  * @link https://eslint.org/docs/rules/no-eval
  *
  *  | key         | value      |
@@ -5938,6 +6256,9 @@ namespace NoEqNull {
  */
 namespace NoEval {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5950,6 +6271,7 @@ namespace NoEval {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowIndirect?: boolean;
@@ -5961,7 +6283,7 @@ namespace NoEval {
 }
 
 /**
- * @description disallow reassigning exceptions in `catch` clauses
+ * @description Disallow reassigning exceptions in `catch` clauses
  * @link https://eslint.org/docs/rules/no-ex-assign
  *
  *  | key         | value   |
@@ -5974,7 +6296,7 @@ namespace NoExAssign {
 }
 
 /**
- * @description disallow extending native types
+ * @description Disallow extending native types
  * @link https://eslint.org/docs/rules/no-extend-native
  *
  *  | key         | value      |
@@ -5984,6 +6306,9 @@ namespace NoExAssign {
  */
 namespace NoExtendNative {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -5999,6 +6324,7 @@ namespace NoExtendNative {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly exceptions?: readonly string[];
@@ -6010,7 +6336,7 @@ namespace NoExtendNative {
 }
 
 /**
- * @description disallow unnecessary calls to `.bind()`
+ * @description Disallow unnecessary calls to `.bind()`
  * @link https://eslint.org/docs/rules/no-extra-bind
  *
  *  | key         | value      |
@@ -6024,7 +6350,7 @@ namespace NoExtraBind {
 }
 
 /**
- * @description disallow unnecessary boolean casts
+ * @description Disallow unnecessary boolean casts
  * @link https://eslint.org/docs/rules/no-extra-boolean-cast
  *
  *  | key         | value      |
@@ -6035,6 +6361,9 @@ namespace NoExtraBind {
  */
 namespace NoExtraBooleanCast {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6047,6 +6376,7 @@ namespace NoExtraBooleanCast {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly enforceForLogicalOperands?: boolean;
@@ -6058,7 +6388,7 @@ namespace NoExtraBooleanCast {
 }
 
 /**
- * @description disallow unnecessary labels
+ * @description Disallow unnecessary labels
  * @link https://eslint.org/docs/rules/no-extra-label
  *
  *  | key         | value      |
@@ -6072,7 +6402,7 @@ namespace NoExtraLabel {
 }
 
 /**
- * @description disallow unnecessary parentheses
+ * @description Disallow unnecessary parentheses
  * @link https://eslint.org/docs/rules/no-extra-parens
  *
  *  | key         | value  |
@@ -6083,6 +6413,9 @@ namespace NoExtraLabel {
  */
 namespace NoExtraParens {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -6146,6 +6479,7 @@ namespace NoExtraParens {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -6172,7 +6506,7 @@ namespace NoExtraParens {
 }
 
 /**
- * @description disallow unnecessary semicolons
+ * @description Disallow unnecessary semicolons
  * @link https://eslint.org/docs/rules/no-extra-semi
  *
  *  | key         | value      |
@@ -6186,7 +6520,7 @@ namespace NoExtraSemi {
 }
 
 /**
- * @description disallow fallthrough of `case` statements
+ * @description Disallow fallthrough of `case` statements
  * @link https://eslint.org/docs/rules/no-fallthrough
  *
  *  | key         | value   |
@@ -6196,6 +6530,9 @@ namespace NoExtraSemi {
  */
 namespace NoFallthrough {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6203,14 +6540,20 @@ namespace NoFallthrough {
    *       "commentPattern": {
    *         "type": "string",
    *         "default": ""
+   *       },
+   *       "allowEmptyCase": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commentPattern?: string;
+    readonly allowEmptyCase?: boolean;
   };
 
   export type RuleEntry =
@@ -6219,7 +6562,7 @@ namespace NoFallthrough {
 }
 
 /**
- * @description disallow leading or trailing decimal points in numeric literals
+ * @description Disallow leading or trailing decimal points in numeric literals
  * @link https://eslint.org/docs/rules/no-floating-decimal
  *
  *  | key         | value      |
@@ -6233,7 +6576,7 @@ namespace NoFloatingDecimal {
 }
 
 /**
- * @description disallow reassigning `function` declarations
+ * @description Disallow reassigning `function` declarations
  * @link https://eslint.org/docs/rules/no-func-assign
  *
  *  | key         | value   |
@@ -6246,7 +6589,7 @@ namespace NoFuncAssign {
 }
 
 /**
- * @description disallow assignments to native objects or read-only global variables
+ * @description Disallow assignments to native objects or read-only global variables
  * @link https://eslint.org/docs/rules/no-global-assign
  *
  *  | key         | value      |
@@ -6256,6 +6599,9 @@ namespace NoFuncAssign {
  */
 namespace NoGlobalAssign {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6271,6 +6617,7 @@ namespace NoGlobalAssign {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly exceptions?: readonly string[];
@@ -6282,7 +6629,7 @@ namespace NoGlobalAssign {
 }
 
 /**
- * @description disallow shorthand type conversions
+ * @description Disallow shorthand type conversions
  * @link https://eslint.org/docs/rules/no-implicit-coercion
  *
  *  | key         | value      |
@@ -6293,6 +6640,9 @@ namespace NoGlobalAssign {
  */
 namespace NoImplicitCoercion {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6329,6 +6679,7 @@ namespace NoImplicitCoercion {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly boolean?: boolean;
@@ -6344,7 +6695,7 @@ namespace NoImplicitCoercion {
 }
 
 /**
- * @description disallow declarations in the global scope
+ * @description Disallow declarations in the global scope
  * @link https://eslint.org/docs/rules/no-implicit-globals
  *
  *  | key         | value      |
@@ -6354,6 +6705,9 @@ namespace NoImplicitCoercion {
  */
 namespace NoImplicitGlobals {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6366,6 +6720,7 @@ namespace NoImplicitGlobals {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly lexicalBindings?: boolean;
@@ -6377,7 +6732,7 @@ namespace NoImplicitGlobals {
 }
 
 /**
- * @description disallow the use of `eval()`-like methods
+ * @description Disallow the use of `eval()`-like methods
  * @link https://eslint.org/docs/rules/no-implied-eval
  *
  *  | key         | value      |
@@ -6390,7 +6745,7 @@ namespace NoImpliedEval {
 }
 
 /**
- * @description disallow assigning to imported bindings
+ * @description Disallow assigning to imported bindings
  * @link https://eslint.org/docs/rules/no-import-assign
  *
  *  | key         | value   |
@@ -6403,7 +6758,7 @@ namespace NoImportAssign {
 }
 
 /**
- * @description disallow inline comments after code
+ * @description Disallow inline comments after code
  * @link https://eslint.org/docs/rules/no-inline-comments
  *
  *  | key         | value      |
@@ -6413,6 +6768,9 @@ namespace NoImportAssign {
  */
 namespace NoInlineComments {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6424,6 +6782,7 @@ namespace NoInlineComments {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignorePattern?: string;
@@ -6435,7 +6794,7 @@ namespace NoInlineComments {
 }
 
 /**
- * @description disallow variable or `function` declarations in nested blocks
+ * @description Disallow variable or `function` declarations in nested blocks
  * @link https://eslint.org/docs/rules/no-inner-declarations
  *
  *  | key         | value   |
@@ -6445,6 +6804,9 @@ namespace NoInlineComments {
  */
 namespace NoInnerDeclarations {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -6453,6 +6815,7 @@ namespace NoInnerDeclarations {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'functions' | 'both';
 
@@ -6462,7 +6825,7 @@ namespace NoInnerDeclarations {
 }
 
 /**
- * @description disallow invalid regular expression strings in `RegExp` constructors
+ * @description Disallow invalid regular expression strings in `RegExp` constructors
  * @link https://eslint.org/docs/rules/no-invalid-regexp
  *
  *  | key         | value   |
@@ -6472,6 +6835,9 @@ namespace NoInnerDeclarations {
  */
 namespace NoInvalidRegexp {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6486,6 +6852,7 @@ namespace NoInvalidRegexp {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowConstructorFlags?: readonly string[];
@@ -6497,7 +6864,7 @@ namespace NoInvalidRegexp {
 }
 
 /**
- * @description disallow use of `this` in contexts where the value of `this` is `undefined`
+ * @description Disallow use of `this` in contexts where the value of `this` is `undefined`
  * @link https://eslint.org/docs/rules/no-invalid-this
  *
  *  | key         | value      |
@@ -6507,6 +6874,9 @@ namespace NoInvalidRegexp {
  */
 namespace NoInvalidThis {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6519,6 +6889,7 @@ namespace NoInvalidThis {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly capIsConstructor?: boolean;
@@ -6530,7 +6901,7 @@ namespace NoInvalidThis {
 }
 
 /**
- * @description disallow irregular whitespace
+ * @description Disallow irregular whitespace
  * @link https://eslint.org/docs/rules/no-irregular-whitespace
  *
  *  | key         | value   |
@@ -6540,6 +6911,9 @@ namespace NoInvalidThis {
  */
 namespace NoIrregularWhitespace {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6564,6 +6938,7 @@ namespace NoIrregularWhitespace {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly skipComments?: boolean;
@@ -6578,7 +6953,7 @@ namespace NoIrregularWhitespace {
 }
 
 /**
- * @description disallow the use of the `__iterator__` property
+ * @description Disallow the use of the `__iterator__` property
  * @link https://eslint.org/docs/rules/no-iterator
  *
  *  | key         | value      |
@@ -6591,7 +6966,7 @@ namespace NoIterator {
 }
 
 /**
- * @description disallow labels that share a name with a variable
+ * @description Disallow labels that share a name with a variable
  * @link https://eslint.org/docs/rules/no-label-var
  *
  *  | key         | value      |
@@ -6604,7 +6979,7 @@ namespace NoLabelVar {
 }
 
 /**
- * @description disallow labeled statements
+ * @description Disallow labeled statements
  * @link https://eslint.org/docs/rules/no-labels
  *
  *  | key         | value      |
@@ -6614,6 +6989,9 @@ namespace NoLabelVar {
  */
 namespace NoLabels {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6630,6 +7008,7 @@ namespace NoLabels {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowLoop?: boolean;
@@ -6642,7 +7021,7 @@ namespace NoLabels {
 }
 
 /**
- * @description disallow unnecessary nested blocks
+ * @description Disallow unnecessary nested blocks
  * @link https://eslint.org/docs/rules/no-lone-blocks
  *
  *  | key         | value      |
@@ -6655,7 +7034,7 @@ namespace NoLoneBlocks {
 }
 
 /**
- * @description disallow `if` statements as the only statement in `else` blocks
+ * @description Disallow `if` statements as the only statement in `else` blocks
  * @link https://eslint.org/docs/rules/no-lonely-if
  *
  *  | key         | value      |
@@ -6669,7 +7048,7 @@ namespace NoLonelyIf {
 }
 
 /**
- * @description disallow function declarations that contain unsafe references inside loop statements
+ * @description Disallow function declarations that contain unsafe references inside loop statements
  * @link https://eslint.org/docs/rules/no-loop-func
  *
  *  | key         | value      |
@@ -6682,7 +7061,7 @@ namespace NoLoopFunc {
 }
 
 /**
- * @description disallow literal numbers that lose precision
+ * @description Disallow literal numbers that lose precision
  * @link https://eslint.org/docs/rules/no-loss-of-precision
  *
  *  | key         | value   |
@@ -6695,7 +7074,7 @@ namespace NoLossOfPrecision {
 }
 
 /**
- * @description disallow magic numbers
+ * @description Disallow magic numbers
  * @link https://eslint.org/docs/rules/no-magic-numbers
  *
  *  | key         | value      |
@@ -6705,6 +7084,9 @@ namespace NoLossOfPrecision {
  */
 namespace NoMagicNumbers {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6744,6 +7126,7 @@ namespace NoMagicNumbers {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly detectObjects?: boolean;
@@ -6759,7 +7142,7 @@ namespace NoMagicNumbers {
 }
 
 /**
- * @description disallow characters which are made with multiple code points in character class syntax
+ * @description Disallow characters which are made with multiple code points in character class syntax
  * @link https://eslint.org/docs/rules/no-misleading-character-class
  *
  *  | key            | value   |
@@ -6773,7 +7156,7 @@ namespace NoMisleadingCharacterClass {
 }
 
 /**
- * @description disallow mixed binary operators
+ * @description Disallow mixed binary operators
  * @link https://eslint.org/docs/rules/no-mixed-operators
  *
  *  | key         | value      |
@@ -6783,6 +7166,9 @@ namespace NoMisleadingCharacterClass {
  */
 namespace NoMixedOperators {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -6835,6 +7221,7 @@ namespace NoMixedOperators {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly groups?: readonly (readonly [
@@ -6935,7 +7322,7 @@ namespace NoMixedOperators {
 }
 
 /**
- * @description disallow `require` calls to be mixed with regular variable declarations
+ * @description Disallow `require` calls to be mixed with regular variable declarations
  * @link https://eslint.org/docs/rules/no-mixed-requires
  *
  *  | key         | value      |
@@ -6946,6 +7333,9 @@ namespace NoMixedOperators {
  */
 namespace NoMixedRequires {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -6967,12 +7357,13 @@ namespace NoMixedRequires {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description disallow mixed spaces and tabs for indentation
+ * @description Disallow mixed spaces and tabs for indentation
  * @link https://eslint.org/docs/rules/no-mixed-spaces-and-tabs
  *
  *  | key         | value  |
@@ -6982,6 +7373,9 @@ namespace NoMixedRequires {
  */
 namespace NoMixedSpacesAndTabs {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -6991,6 +7385,7 @@ namespace NoMixedSpacesAndTabs {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'smart-tabs' | true | false;
 
@@ -7000,7 +7395,7 @@ namespace NoMixedSpacesAndTabs {
 }
 
 /**
- * @description disallow use of chained assignment expressions
+ * @description Disallow use of chained assignment expressions
  * @link https://eslint.org/docs/rules/no-multi-assign
  *
  *  | key         | value      |
@@ -7010,6 +7405,9 @@ namespace NoMixedSpacesAndTabs {
  */
 namespace NoMultiAssign {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -7022,6 +7420,7 @@ namespace NoMultiAssign {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreNonDeclaration?: boolean;
@@ -7033,7 +7432,7 @@ namespace NoMultiAssign {
 }
 
 /**
- * @description disallow multiple spaces
+ * @description Disallow multiple spaces
  * @link https://eslint.org/docs/rules/no-multi-spaces
  *
  *  | key         | value      |
@@ -7044,6 +7443,9 @@ namespace NoMultiAssign {
  */
 namespace NoMultiSpaces {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -7065,6 +7467,7 @@ namespace NoMultiSpaces {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly exceptions?: Record<string, boolean>;
@@ -7077,7 +7480,7 @@ namespace NoMultiSpaces {
 }
 
 /**
- * @description disallow multiline strings
+ * @description Disallow multiline strings
  * @link https://eslint.org/docs/rules/no-multi-str
  *
  *  | key         | value      |
@@ -7090,7 +7493,7 @@ namespace NoMultiStr {
 }
 
 /**
- * @description disallow multiple empty lines
+ * @description Disallow multiple empty lines
  * @link https://eslint.org/docs/rules/no-multiple-empty-lines
  *
  *  | key         | value      |
@@ -7101,6 +7504,9 @@ namespace NoMultiStr {
  */
 namespace NoMultipleEmptyLines {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -7124,6 +7530,7 @@ namespace NoMultipleEmptyLines {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly max: number;
@@ -7137,7 +7544,7 @@ namespace NoMultipleEmptyLines {
 }
 
 /**
- * @description disallow assignments to native objects or read-only global variables
+ * @description Disallow assignments to native objects or read-only global variables
  * @link https://eslint.org/docs/rules/no-native-reassign
  *
  *  | key         | value      |
@@ -7148,6 +7555,9 @@ namespace NoMultipleEmptyLines {
  */
 namespace NoNativeReassign {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -7163,12 +7573,13 @@ namespace NoNativeReassign {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description disallow negated conditions
+ * @description Disallow negated conditions
  * @link https://eslint.org/docs/rules/no-negated-condition
  *
  *  | key         | value      |
@@ -7181,7 +7592,7 @@ namespace NoNegatedCondition {
 }
 
 /**
- * @description disallow negating the left operand in `in` expressions
+ * @description Disallow negating the left operand in `in` expressions
  * @link https://eslint.org/docs/rules/no-negated-in-lhs
  *
  *  | key         | value   |
@@ -7195,7 +7606,7 @@ namespace NoNegatedInLhs {
 }
 
 /**
- * @description disallow nested ternary expressions
+ * @description Disallow nested ternary expressions
  * @link https://eslint.org/docs/rules/no-nested-ternary
  *
  *  | key         | value      |
@@ -7208,7 +7619,7 @@ namespace NoNestedTernary {
 }
 
 /**
- * @description disallow `new` operators outside of assignments or comparisons
+ * @description Disallow `new` operators outside of assignments or comparisons
  * @link https://eslint.org/docs/rules/no-new
  *
  *  | key         | value      |
@@ -7221,7 +7632,7 @@ namespace NoNew {
 }
 
 /**
- * @description disallow `new` operators with the `Function` object
+ * @description Disallow `new` operators with the `Function` object
  * @link https://eslint.org/docs/rules/no-new-func
  *
  *  | key         | value      |
@@ -7234,7 +7645,7 @@ namespace NoNewFunc {
 }
 
 /**
- * @description disallow `Object` constructors
+ * @description Disallow `Object` constructors
  * @link https://eslint.org/docs/rules/no-new-object
  *
  *  | key         | value      |
@@ -7247,7 +7658,7 @@ namespace NoNewObject {
 }
 
 /**
- * @description disallow `new` operators with calls to `require`
+ * @description Disallow `new` operators with calls to `require`
  * @link https://eslint.org/docs/rules/no-new-require
  *
  *  | key         | value      |
@@ -7261,7 +7672,7 @@ namespace NoNewRequire {
 }
 
 /**
- * @description disallow `new` operators with the `Symbol` object
+ * @description Disallow `new` operators with the `Symbol` object
  * @link https://eslint.org/docs/rules/no-new-symbol
  *
  *  | key         | value   |
@@ -7274,7 +7685,7 @@ namespace NoNewSymbol {
 }
 
 /**
- * @description disallow `new` operators with the `String`, `Number`, and `Boolean` objects
+ * @description Disallow `new` operators with the `String`, `Number`, and `Boolean` objects
  * @link https://eslint.org/docs/rules/no-new-wrappers
  *
  *  | key         | value      |
@@ -7287,7 +7698,7 @@ namespace NoNewWrappers {
 }
 
 /**
- * @description disallow `\8` and `\9` escape sequences in string literals
+ * @description Disallow `\8` and `\9` escape sequences in string literals
  * @link https://eslint.org/docs/rules/no-nonoctal-decimal-escape
  *
  *  | key            | value      |
@@ -7301,7 +7712,7 @@ namespace NoNonoctalDecimalEscape {
 }
 
 /**
- * @description disallow calling global object properties as functions
+ * @description Disallow calling global object properties as functions
  * @link https://eslint.org/docs/rules/no-obj-calls
  *
  *  | key         | value   |
@@ -7314,7 +7725,7 @@ namespace NoObjCalls {
 }
 
 /**
- * @description disallow octal literals
+ * @description Disallow octal literals
  * @link https://eslint.org/docs/rules/no-octal
  *
  *  | key         | value      |
@@ -7327,7 +7738,7 @@ namespace NoOctal {
 }
 
 /**
- * @description disallow octal escape sequences in string literals
+ * @description Disallow octal escape sequences in string literals
  * @link https://eslint.org/docs/rules/no-octal-escape
  *
  *  | key         | value      |
@@ -7340,7 +7751,7 @@ namespace NoOctalEscape {
 }
 
 /**
- * @description disallow reassigning `function` parameters
+ * @description Disallow reassigning `function` parameters
  * @link https://eslint.org/docs/rules/no-param-reassign
  *
  *  | key         | value      |
@@ -7350,6 +7761,9 @@ namespace NoOctalEscape {
  */
 namespace NoParamReassign {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -7392,6 +7806,7 @@ namespace NoParamReassign {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | {
@@ -7409,7 +7824,7 @@ namespace NoParamReassign {
 }
 
 /**
- * @description disallow string concatenation with `__dirname` and `__filename`
+ * @description Disallow string concatenation with `__dirname` and `__filename`
  * @link https://eslint.org/docs/rules/no-path-concat
  *
  *  | key         | value      |
@@ -7423,7 +7838,7 @@ namespace NoPathConcat {
 }
 
 /**
- * @description disallow the unary operators `++` and `--`
+ * @description Disallow the unary operators `++` and `--`
  * @link https://eslint.org/docs/rules/no-plusplus
  *
  *  | key         | value      |
@@ -7433,6 +7848,9 @@ namespace NoPathConcat {
  */
 namespace NoPlusplus {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -7445,6 +7863,7 @@ namespace NoPlusplus {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowForLoopAfterthoughts?: boolean;
@@ -7456,7 +7875,7 @@ namespace NoPlusplus {
 }
 
 /**
- * @description disallow the use of `process.env`
+ * @description Disallow the use of `process.env`
  * @link https://eslint.org/docs/rules/no-process-env
  *
  *  | key         | value      |
@@ -7470,7 +7889,7 @@ namespace NoProcessEnv {
 }
 
 /**
- * @description disallow the use of `process.exit()`
+ * @description Disallow the use of `process.exit()`
  * @link https://eslint.org/docs/rules/no-process-exit
  *
  *  | key         | value      |
@@ -7484,7 +7903,7 @@ namespace NoProcessExit {
 }
 
 /**
- * @description disallow returning values from Promise executor functions
+ * @description Disallow returning values from Promise executor functions
  * @link https://eslint.org/docs/rules/no-promise-executor-return
  *
  *  | key         | value   |
@@ -7497,7 +7916,7 @@ namespace NoPromiseExecutorReturn {
 }
 
 /**
- * @description disallow the use of the `__proto__` property
+ * @description Disallow the use of the `__proto__` property
  * @link https://eslint.org/docs/rules/no-proto
  *
  *  | key         | value      |
@@ -7510,7 +7929,7 @@ namespace NoProto {
 }
 
 /**
- * @description disallow calling some `Object.prototype` methods directly on objects
+ * @description Disallow calling some `Object.prototype` methods directly on objects
  * @link https://eslint.org/docs/rules/no-prototype-builtins
  *
  *  | key         | value   |
@@ -7523,7 +7942,7 @@ namespace NoPrototypeBuiltins {
 }
 
 /**
- * @description disallow variable redeclaration
+ * @description Disallow variable redeclaration
  * @link https://eslint.org/docs/rules/no-redeclare
  *
  *  | key         | value      |
@@ -7533,6 +7952,9 @@ namespace NoPrototypeBuiltins {
  */
 namespace NoRedeclare {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -7545,6 +7967,7 @@ namespace NoRedeclare {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly builtinGlobals?: boolean;
@@ -7556,7 +7979,7 @@ namespace NoRedeclare {
 }
 
 /**
- * @description disallow multiple spaces in regular expressions
+ * @description Disallow multiple spaces in regular expressions
  * @link https://eslint.org/docs/rules/no-regex-spaces
  *
  *  | key         | value      |
@@ -7570,7 +7993,7 @@ namespace NoRegexSpaces {
 }
 
 /**
- * @description disallow specified names in exports
+ * @description Disallow specified names in exports
  * @link https://eslint.org/docs/rules/no-restricted-exports
  *
  *  | key         | value      |
@@ -7580,6 +8003,9 @@ namespace NoRegexSpaces {
  */
 namespace NoRestrictedExports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -7595,6 +8021,7 @@ namespace NoRestrictedExports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly restrictedNamedExports?: readonly string[];
@@ -7606,7 +8033,7 @@ namespace NoRestrictedExports {
 }
 
 /**
- * @description disallow specified global variables
+ * @description Disallow specified global variables
  * @link https://eslint.org/docs/rules/no-restricted-globals
  *
  *  | key         | value      |
@@ -7616,6 +8043,9 @@ namespace NoRestrictedExports {
  */
 namespace NoRestrictedGlobals {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "type": "array",
    *   "items": {
@@ -7643,6 +8073,10 @@ namespace NoRestrictedGlobals {
    *   "uniqueItems": true,
    *   "minItems": 0
    * }
+   * ```
+   */
+  /**
+   * @minItems 0
    */
   export type Options = readonly (
     | string
@@ -7658,7 +8092,7 @@ namespace NoRestrictedGlobals {
 }
 
 /**
- * @description disallow specified modules when loaded by `import`
+ * @description Disallow specified modules when loaded by `import`
  * @link https://eslint.org/docs/rules/no-restricted-imports
  *
  *  | key         | value      |
@@ -7668,6 +8102,9 @@ namespace NoRestrictedGlobals {
  */
 namespace NoRestrictedImports {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -7756,6 +8193,14 @@ namespace NoRestrictedImports {
    *                   "items": {
    *                     "type": "object",
    *                     "properties": {
+   *                       "importNames": {
+   *                         "type": "array",
+   *                         "items": {
+   *                           "type": "string"
+   *                         },
+   *                         "minItems": 1,
+   *                         "uniqueItems": true
+   *                       },
    *                       "group": {
    *                         "type": "array",
    *                         "items": {
@@ -7789,6 +8234,7 @@ namespace NoRestrictedImports {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly (
@@ -7813,6 +8259,16 @@ namespace NoRestrictedImports {
           readonly patterns?:
             | readonly string[]
             | readonly {
+                /**
+                 * @minItems 1
+                 */
+                readonly importNames?: readonly [
+                  string,
+                  ...(readonly string[])
+                ];
+                /**
+                 * @minItems 1
+                 */
                 readonly group: readonly [string, ...(readonly string[])];
                 readonly message?: string;
                 readonly caseSensitive?: boolean;
@@ -7826,7 +8282,7 @@ namespace NoRestrictedImports {
 }
 
 /**
- * @description disallow specified modules when loaded by `require`
+ * @description Disallow specified modules when loaded by `require`
  * @link https://eslint.org/docs/rules/no-restricted-modules
  *
  *  | key         | value      |
@@ -7837,6 +8293,9 @@ namespace NoRestrictedImports {
  */
 namespace NoRestrictedModules {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -7912,12 +8371,13 @@ namespace NoRestrictedModules {
    *     }
    *   ]
    * }
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description disallow certain properties on certain objects
+ * @description Disallow certain properties on certain objects
  * @link https://eslint.org/docs/rules/no-restricted-properties
  *
  *  | key         | value      |
@@ -7927,6 +8387,9 @@ namespace NoRestrictedModules {
  */
 namespace NoRestrictedProperties {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "type": "array",
    *   "items": {
@@ -7971,6 +8434,7 @@ namespace NoRestrictedProperties {
    *   },
    *   "uniqueItems": true
    * }
+   * ```
    */
   export type Options = readonly (
     | {
@@ -7991,7 +8455,7 @@ namespace NoRestrictedProperties {
 }
 
 /**
- * @description disallow specified syntax
+ * @description Disallow specified syntax
  * @link https://eslint.org/docs/rules/no-restricted-syntax
  *
  *  | key         | value      |
@@ -8001,6 +8465,9 @@ namespace NoRestrictedProperties {
  */
 namespace NoRestrictedSyntax {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "type": "array",
    *   "items": {
@@ -8028,6 +8495,10 @@ namespace NoRestrictedSyntax {
    *   "uniqueItems": true,
    *   "minItems": 0
    * }
+   * ```
+   */
+  /**
+   * @minItems 0
    */
   export type Options = readonly (
     | string
@@ -8043,7 +8514,7 @@ namespace NoRestrictedSyntax {
 }
 
 /**
- * @description disallow assignment operators in `return` statements
+ * @description Disallow assignment operators in `return` statements
  * @link https://eslint.org/docs/rules/no-return-assign
  *
  *  | key         | value      |
@@ -8053,6 +8524,9 @@ namespace NoRestrictedSyntax {
  */
 namespace NoReturnAssign {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -8061,6 +8535,7 @@ namespace NoReturnAssign {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'except-parens' | 'always';
 
@@ -8070,7 +8545,7 @@ namespace NoReturnAssign {
 }
 
 /**
- * @description disallow unnecessary `return await`
+ * @description Disallow unnecessary `return await`
  * @link https://eslint.org/docs/rules/no-return-await
  *
  *  | key         | value      |
@@ -8083,7 +8558,7 @@ namespace NoReturnAwait {
 }
 
 /**
- * @description disallow `javascript:` urls
+ * @description Disallow `javascript:` urls
  * @link https://eslint.org/docs/rules/no-script-url
  *
  *  | key         | value      |
@@ -8096,7 +8571,7 @@ namespace NoScriptUrl {
 }
 
 /**
- * @description disallow assignments where both sides are exactly the same
+ * @description Disallow assignments where both sides are exactly the same
  * @link https://eslint.org/docs/rules/no-self-assign
  *
  *  | key         | value   |
@@ -8106,6 +8581,9 @@ namespace NoScriptUrl {
  */
 namespace NoSelfAssign {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8118,6 +8596,7 @@ namespace NoSelfAssign {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly props?: boolean;
@@ -8129,7 +8608,7 @@ namespace NoSelfAssign {
 }
 
 /**
- * @description disallow comparisons where both sides are exactly the same
+ * @description Disallow comparisons where both sides are exactly the same
  * @link https://eslint.org/docs/rules/no-self-compare
  *
  *  | key         | value   |
@@ -8142,7 +8621,7 @@ namespace NoSelfCompare {
 }
 
 /**
- * @description disallow comma operators
+ * @description Disallow comma operators
  * @link https://eslint.org/docs/rules/no-sequences
  *
  *  | key         | value      |
@@ -8152,6 +8631,9 @@ namespace NoSelfCompare {
  */
 namespace NoSequences {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "properties": {
@@ -8163,6 +8645,7 @@ namespace NoSequences {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowInParentheses?: boolean;
@@ -8174,7 +8657,7 @@ namespace NoSequences {
 }
 
 /**
- * @description disallow returning values from setters
+ * @description Disallow returning values from setters
  * @link https://eslint.org/docs/rules/no-setter-return
  *
  *  | key         | value   |
@@ -8187,7 +8670,7 @@ namespace NoSetterReturn {
 }
 
 /**
- * @description disallow variable declarations from shadowing variables declared in the outer scope
+ * @description Disallow variable declarations from shadowing variables declared in the outer scope
  * @link https://eslint.org/docs/rules/no-shadow
  *
  *  | key         | value      |
@@ -8197,6 +8680,9 @@ namespace NoSetterReturn {
  */
 namespace NoShadow {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8227,6 +8713,7 @@ namespace NoShadow {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly builtinGlobals?: boolean;
@@ -8241,7 +8728,7 @@ namespace NoShadow {
 }
 
 /**
- * @description disallow identifiers from shadowing restricted names
+ * @description Disallow identifiers from shadowing restricted names
  * @link https://eslint.org/docs/rules/no-shadow-restricted-names
  *
  *  | key         | value      |
@@ -8254,7 +8741,7 @@ namespace NoShadowRestrictedNames {
 }
 
 /**
- * @description disallow spacing between function identifiers and their applications (deprecated)
+ * @description Disallow spacing between function identifiers and their applications (deprecated)
  * @link https://eslint.org/docs/rules/no-spaced-func
  *
  *  | key         | value      |
@@ -8269,7 +8756,7 @@ namespace NoSpacedFunc {
 }
 
 /**
- * @description disallow sparse arrays
+ * @description Disallow sparse arrays
  * @link https://eslint.org/docs/rules/no-sparse-arrays
  *
  *  | key         | value   |
@@ -8282,7 +8769,7 @@ namespace NoSparseArrays {
 }
 
 /**
- * @description disallow synchronous methods
+ * @description Disallow synchronous methods
  * @link https://eslint.org/docs/rules/no-sync
  *
  *  | key         | value      |
@@ -8293,6 +8780,9 @@ namespace NoSparseArrays {
  */
 namespace NoSync {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8305,12 +8795,13 @@ namespace NoSync {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description disallow all tabs
+ * @description Disallow all tabs
  * @link https://eslint.org/docs/rules/no-tabs
  *
  *  | key         | value  |
@@ -8320,6 +8811,9 @@ namespace NoSync {
  */
 namespace NoTabs {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8332,6 +8826,7 @@ namespace NoTabs {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowIndentationTabs?: boolean;
@@ -8343,7 +8838,7 @@ namespace NoTabs {
 }
 
 /**
- * @description disallow template literal placeholder syntax in regular strings
+ * @description Disallow template literal placeholder syntax in regular strings
  * @link https://eslint.org/docs/rules/no-template-curly-in-string
  *
  *  | key         | value   |
@@ -8356,7 +8851,7 @@ namespace NoTemplateCurlyInString {
 }
 
 /**
- * @description disallow ternary operators
+ * @description Disallow ternary operators
  * @link https://eslint.org/docs/rules/no-ternary
  *
  *  | key         | value      |
@@ -8369,7 +8864,7 @@ namespace NoTernary {
 }
 
 /**
- * @description disallow `this`/`super` before calling `super()` in constructors
+ * @description Disallow `this`/`super` before calling `super()` in constructors
  * @link https://eslint.org/docs/rules/no-this-before-super
  *
  *  | key         | value   |
@@ -8382,7 +8877,7 @@ namespace NoThisBeforeSuper {
 }
 
 /**
- * @description disallow throwing literals as exceptions
+ * @description Disallow throwing literals as exceptions
  * @link https://eslint.org/docs/rules/no-throw-literal
  *
  *  | key         | value      |
@@ -8395,7 +8890,7 @@ namespace NoThrowLiteral {
 }
 
 /**
- * @description disallow trailing whitespace at the end of lines
+ * @description Disallow trailing whitespace at the end of lines
  * @link https://eslint.org/docs/rules/no-trailing-spaces
  *
  *  | key         | value      |
@@ -8406,6 +8901,9 @@ namespace NoThrowLiteral {
  */
 namespace NoTrailingSpaces {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8422,6 +8920,7 @@ namespace NoTrailingSpaces {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly skipBlankLines?: boolean;
@@ -8434,7 +8933,7 @@ namespace NoTrailingSpaces {
 }
 
 /**
- * @description disallow the use of undeclared variables unless mentioned in ` global  ` comments
+ * @description Disallow the use of undeclared variables unless mentioned in ` global  ` comments
  * @link https://eslint.org/docs/rules/no-undef
  *
  *  | key         | value   |
@@ -8444,6 +8943,9 @@ namespace NoTrailingSpaces {
  */
 namespace NoUndef {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8456,6 +8958,7 @@ namespace NoUndef {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly typeof?: boolean;
@@ -8467,7 +8970,7 @@ namespace NoUndef {
 }
 
 /**
- * @description disallow initializing variables to `undefined`
+ * @description Disallow initializing variables to `undefined`
  * @link https://eslint.org/docs/rules/no-undef-init
  *
  *  | key         | value      |
@@ -8481,7 +8984,7 @@ namespace NoUndefInit {
 }
 
 /**
- * @description disallow the use of `undefined` as an identifier
+ * @description Disallow the use of `undefined` as an identifier
  * @link https://eslint.org/docs/rules/no-undefined
  *
  *  | key         | value      |
@@ -8494,7 +8997,7 @@ namespace NoUndefined {
 }
 
 /**
- * @description disallow dangling underscores in identifiers
+ * @description Disallow dangling underscores in identifiers
  * @link https://eslint.org/docs/rules/no-underscore-dangle
  *
  *  | key         | value      |
@@ -8504,6 +9007,9 @@ namespace NoUndefined {
  */
 namespace NoUnderscoreDangle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8542,6 +9048,7 @@ namespace NoUnderscoreDangle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allow?: readonly string[];
@@ -8559,7 +9066,7 @@ namespace NoUnderscoreDangle {
 }
 
 /**
- * @description disallow confusing multiline expressions
+ * @description Disallow confusing multiline expressions
  * @link https://eslint.org/docs/rules/no-unexpected-multiline
  *
  *  | key         | value   |
@@ -8572,7 +9079,7 @@ namespace NoUnexpectedMultiline {
 }
 
 /**
- * @description disallow unmodified loop conditions
+ * @description Disallow unmodified loop conditions
  * @link https://eslint.org/docs/rules/no-unmodified-loop-condition
  *
  *  | key         | value   |
@@ -8585,7 +9092,7 @@ namespace NoUnmodifiedLoopCondition {
 }
 
 /**
- * @description disallow ternary operators when simpler alternatives exist
+ * @description Disallow ternary operators when simpler alternatives exist
  * @link https://eslint.org/docs/rules/no-unneeded-ternary
  *
  *  | key         | value      |
@@ -8596,6 +9103,9 @@ namespace NoUnmodifiedLoopCondition {
  */
 namespace NoUnneededTernary {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8608,6 +9118,7 @@ namespace NoUnneededTernary {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly defaultAssignment?: boolean;
@@ -8619,7 +9130,7 @@ namespace NoUnneededTernary {
 }
 
 /**
- * @description disallow unreachable code after `return`, `throw`, `continue`, and `break` statements
+ * @description Disallow unreachable code after `return`, `throw`, `continue`, and `break` statements
  * @link https://eslint.org/docs/rules/no-unreachable
  *
  *  | key         | value   |
@@ -8632,7 +9143,7 @@ namespace NoUnreachable {
 }
 
 /**
- * @description disallow loops with a body that allows only one iteration
+ * @description Disallow loops with a body that allows only one iteration
  * @link https://eslint.org/docs/rules/no-unreachable-loop
  *
  *  | key         | value   |
@@ -8642,6 +9153,9 @@ namespace NoUnreachable {
  */
 namespace NoUnreachableLoop {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8663,6 +9177,7 @@ namespace NoUnreachableLoop {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignore?: readonly (
@@ -8680,7 +9195,7 @@ namespace NoUnreachableLoop {
 }
 
 /**
- * @description disallow control flow statements in `finally` blocks
+ * @description Disallow control flow statements in `finally` blocks
  * @link https://eslint.org/docs/rules/no-unsafe-finally
  *
  *  | key         | value   |
@@ -8693,7 +9208,7 @@ namespace NoUnsafeFinally {
 }
 
 /**
- * @description disallow negating the left operand of relational operators
+ * @description Disallow negating the left operand of relational operators
  * @link https://eslint.org/docs/rules/no-unsafe-negation
  *
  *  | key            | value   |
@@ -8704,6 +9219,9 @@ namespace NoUnsafeFinally {
  */
 namespace NoUnsafeNegation {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8716,6 +9234,7 @@ namespace NoUnsafeNegation {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly enforceForOrderingRelations?: boolean;
@@ -8727,7 +9246,7 @@ namespace NoUnsafeNegation {
 }
 
 /**
- * @description disallow use of optional chaining in contexts where the `undefined` value is not allowed
+ * @description Disallow use of optional chaining in contexts where the `undefined` value is not allowed
  * @link https://eslint.org/docs/rules/no-unsafe-optional-chaining
  *
  *  | key         | value   |
@@ -8737,6 +9256,9 @@ namespace NoUnsafeNegation {
  */
 namespace NoUnsafeOptionalChaining {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8749,6 +9271,7 @@ namespace NoUnsafeOptionalChaining {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly disallowArithmeticOperators?: boolean;
@@ -8760,7 +9283,7 @@ namespace NoUnsafeOptionalChaining {
 }
 
 /**
- * @description disallow unused expressions
+ * @description Disallow unused expressions
  * @link https://eslint.org/docs/rules/no-unused-expressions
  *
  *  | key         | value      |
@@ -8770,6 +9293,9 @@ namespace NoUnsafeOptionalChaining {
  */
 namespace NoUnusedExpressions {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -8794,6 +9320,7 @@ namespace NoUnusedExpressions {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowShortCircuit?: boolean;
@@ -8808,7 +9335,7 @@ namespace NoUnusedExpressions {
 }
 
 /**
- * @description disallow unused labels
+ * @description Disallow unused labels
  * @link https://eslint.org/docs/rules/no-unused-labels
  *
  *  | key         | value      |
@@ -8822,7 +9349,7 @@ namespace NoUnusedLabels {
 }
 
 /**
- * @description disallow unused private class members
+ * @description Disallow unused private class members
  * @link https://eslint.org/docs/rules/no-unused-private-class-members
  *
  *  | key         | value   |
@@ -8835,7 +9362,7 @@ namespace NoUnusedPrivateClassMembers {
 }
 
 /**
- * @description disallow unused variables
+ * @description Disallow unused variables
  * @link https://eslint.org/docs/rules/no-unused-vars
  *
  *  | key         | value   |
@@ -8845,6 +9372,9 @@ namespace NoUnusedPrivateClassMembers {
  */
 namespace NoUnusedVars {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -8897,6 +9427,7 @@ namespace NoUnusedVars {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('all' | 'local')
@@ -8917,7 +9448,7 @@ namespace NoUnusedVars {
 }
 
 /**
- * @description disallow the use of variables before they are defined
+ * @description Disallow the use of variables before they are defined
  * @link https://eslint.org/docs/rules/no-use-before-define
  *
  *  | key         | value   |
@@ -8927,6 +9458,9 @@ namespace NoUnusedVars {
  */
 namespace NoUseBeforeDefine {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -8956,6 +9490,7 @@ namespace NoUseBeforeDefine {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | 'nofunc'
@@ -8972,7 +9507,7 @@ namespace NoUseBeforeDefine {
 }
 
 /**
- * @description disallow useless backreferences in regular expressions
+ * @description Disallow useless backreferences in regular expressions
  * @link https://eslint.org/docs/rules/no-useless-backreference
  *
  *  | key         | value   |
@@ -8985,7 +9520,7 @@ namespace NoUselessBackreference {
 }
 
 /**
- * @description disallow unnecessary calls to `.call()` and `.apply()`
+ * @description Disallow unnecessary calls to `.call()` and `.apply()`
  * @link https://eslint.org/docs/rules/no-useless-call
  *
  *  | key         | value      |
@@ -8998,7 +9533,7 @@ namespace NoUselessCall {
 }
 
 /**
- * @description disallow unnecessary `catch` clauses
+ * @description Disallow unnecessary `catch` clauses
  * @link https://eslint.org/docs/rules/no-useless-catch
  *
  *  | key         | value      |
@@ -9011,7 +9546,7 @@ namespace NoUselessCatch {
 }
 
 /**
- * @description disallow unnecessary computed property keys in objects and classes
+ * @description Disallow unnecessary computed property keys in objects and classes
  * @link https://eslint.org/docs/rules/no-useless-computed-key
  *
  *  | key         | value      |
@@ -9022,6 +9557,9 @@ namespace NoUselessCatch {
  */
 namespace NoUselessComputedKey {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -9034,6 +9572,7 @@ namespace NoUselessComputedKey {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly enforceForClassMembers?: boolean;
@@ -9045,7 +9584,7 @@ namespace NoUselessComputedKey {
 }
 
 /**
- * @description disallow unnecessary concatenation of literals or template literals
+ * @description Disallow unnecessary concatenation of literals or template literals
  * @link https://eslint.org/docs/rules/no-useless-concat
  *
  *  | key         | value      |
@@ -9058,7 +9597,7 @@ namespace NoUselessConcat {
 }
 
 /**
- * @description disallow unnecessary constructors
+ * @description Disallow unnecessary constructors
  * @link https://eslint.org/docs/rules/no-useless-constructor
  *
  *  | key         | value      |
@@ -9071,7 +9610,7 @@ namespace NoUselessConstructor {
 }
 
 /**
- * @description disallow unnecessary escape characters
+ * @description Disallow unnecessary escape characters
  * @link https://eslint.org/docs/rules/no-useless-escape
  *
  *  | key            | value      |
@@ -9085,7 +9624,7 @@ namespace NoUselessEscape {
 }
 
 /**
- * @description disallow renaming import, export, and destructured assignments to the same name
+ * @description Disallow renaming import, export, and destructured assignments to the same name
  * @link https://eslint.org/docs/rules/no-useless-rename
  *
  *  | key         | value      |
@@ -9096,6 +9635,9 @@ namespace NoUselessEscape {
  */
 namespace NoUselessRename {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -9116,6 +9658,7 @@ namespace NoUselessRename {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreDestructuring?: boolean;
@@ -9129,7 +9672,7 @@ namespace NoUselessRename {
 }
 
 /**
- * @description disallow redundant return statements
+ * @description Disallow redundant return statements
  * @link https://eslint.org/docs/rules/no-useless-return
  *
  *  | key         | value      |
@@ -9143,7 +9686,7 @@ namespace NoUselessReturn {
 }
 
 /**
- * @description require `let` or `const` instead of `var`
+ * @description Require `let` or `const` instead of `var`
  * @link https://eslint.org/docs/rules/no-var
  *
  *  | key         | value      |
@@ -9157,7 +9700,7 @@ namespace NoVar {
 }
 
 /**
- * @description disallow `void` operators
+ * @description Disallow `void` operators
  * @link https://eslint.org/docs/rules/no-void
  *
  *  | key         | value      |
@@ -9167,6 +9710,9 @@ namespace NoVar {
  */
 namespace NoVoid {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -9179,6 +9725,7 @@ namespace NoVoid {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowAsStatement?: boolean;
@@ -9190,7 +9737,7 @@ namespace NoVoid {
 }
 
 /**
- * @description disallow specified warning terms in comments
+ * @description Disallow specified warning terms in comments
  * @link https://eslint.org/docs/rules/no-warning-comments
  *
  *  | key         | value      |
@@ -9200,6 +9747,9 @@ namespace NoVoid {
  */
 namespace NoWarningComments {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -9215,15 +9765,29 @@ namespace NoWarningComments {
    *           "start",
    *           "anywhere"
    *         ]
+   *       },
+   *       "decoration": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string",
+   *           "pattern": "^\\S$"
+   *         },
+   *         "minItems": 1,
+   *         "uniqueItems": true
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly terms?: readonly string[];
     readonly location?: 'start' | 'anywhere';
+    /**
+     * @minItems 1
+     */
+    readonly decoration?: readonly [string, ...(readonly string[])];
   };
 
   export type RuleEntry =
@@ -9232,7 +9796,7 @@ namespace NoWarningComments {
 }
 
 /**
- * @description disallow whitespace before properties
+ * @description Disallow whitespace before properties
  * @link https://eslint.org/docs/rules/no-whitespace-before-property
  *
  *  | key         | value      |
@@ -9246,7 +9810,7 @@ namespace NoWhitespaceBeforeProperty {
 }
 
 /**
- * @description disallow `with` statements
+ * @description Disallow `with` statements
  * @link https://eslint.org/docs/rules/no-with
  *
  *  | key         | value      |
@@ -9259,7 +9823,7 @@ namespace NoWith {
 }
 
 /**
- * @description enforce the location of single-line statements
+ * @description Enforce the location of single-line statements
  * @link https://eslint.org/docs/rules/nonblock-statement-body-position
  *
  *  | key         | value      |
@@ -9270,6 +9834,9 @@ namespace NoWith {
  */
 namespace NonblockStatementBodyPosition {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -9324,6 +9891,7 @@ namespace NonblockStatementBodyPosition {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'beside' | 'below' | 'any';
 
@@ -9344,7 +9912,7 @@ namespace NonblockStatementBodyPosition {
 }
 
 /**
- * @description enforce consistent line breaks after opening and before closing braces
+ * @description Enforce consistent line breaks after opening and before closing braces
  * @link https://eslint.org/docs/rules/object-curly-newline
  *
  *  | key         | value      |
@@ -9355,6 +9923,9 @@ namespace NonblockStatementBodyPosition {
  */
 namespace ObjectCurlyNewline {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -9503,6 +10074,7 @@ namespace ObjectCurlyNewline {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | (
@@ -9550,7 +10122,7 @@ namespace ObjectCurlyNewline {
 }
 
 /**
- * @description enforce consistent spacing inside braces
+ * @description Enforce consistent spacing inside braces
  * @link https://eslint.org/docs/rules/object-curly-spacing
  *
  *  | key         | value      |
@@ -9561,6 +10133,9 @@ namespace ObjectCurlyNewline {
  */
 namespace ObjectCurlySpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -9581,6 +10156,7 @@ namespace ObjectCurlySpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -9596,7 +10172,7 @@ namespace ObjectCurlySpacing {
 }
 
 /**
- * @description enforce placing object properties on separate lines
+ * @description Enforce placing object properties on separate lines
  * @link https://eslint.org/docs/rules/object-property-newline
  *
  *  | key         | value      |
@@ -9607,6 +10183,9 @@ namespace ObjectCurlySpacing {
  */
 namespace ObjectPropertyNewline {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -9623,6 +10202,7 @@ namespace ObjectPropertyNewline {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowAllPropertiesOnSameLine?: boolean;
@@ -9635,7 +10215,7 @@ namespace ObjectPropertyNewline {
 }
 
 /**
- * @description require or disallow method and property shorthand syntax for object literals
+ * @description Require or disallow method and property shorthand syntax for object literals
  * @link https://eslint.org/docs/rules/object-shorthand
  *
  *  | key         | value      |
@@ -9646,6 +10226,9 @@ namespace ObjectPropertyNewline {
  */
 namespace ObjectShorthand {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -9703,6 +10286,9 @@ namespace ObjectShorthand {
    *             "ignoreConstructors": {
    *               "type": "boolean"
    *             },
+   *             "methodsIgnorePattern": {
+   *               "type": "string"
+   *             },
    *             "avoidQuotes": {
    *               "type": "boolean"
    *             },
@@ -9718,6 +10304,7 @@ namespace ObjectShorthand {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -9743,6 +10330,7 @@ namespace ObjectShorthand {
         'always' | 'methods',
         {
           readonly ignoreConstructors?: boolean;
+          readonly methodsIgnorePattern?: string;
           readonly avoidQuotes?: boolean;
           readonly avoidExplicitReturnArrows?: boolean;
         }
@@ -9754,7 +10342,7 @@ namespace ObjectShorthand {
 }
 
 /**
- * @description enforce variables to be declared either together or separately in functions
+ * @description Enforce variables to be declared either together or separately in functions
  * @link https://eslint.org/docs/rules/one-var
  *
  *  | key         | value      |
@@ -9765,6 +10353,9 @@ namespace ObjectShorthand {
  */
 namespace OneVar {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -9828,6 +10419,7 @@ namespace OneVar {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('always' | 'never' | 'consecutive')
@@ -9848,7 +10440,7 @@ namespace OneVar {
 }
 
 /**
- * @description require or disallow newlines around variable declarations
+ * @description Require or disallow newlines around variable declarations
  * @link https://eslint.org/docs/rules/one-var-declaration-per-line
  *
  *  | key         | value      |
@@ -9859,6 +10451,9 @@ namespace OneVar {
  */
 namespace OneVarDeclarationPerLine {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -9867,6 +10462,7 @@ namespace OneVarDeclarationPerLine {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'initializations';
 
@@ -9876,7 +10472,7 @@ namespace OneVarDeclarationPerLine {
 }
 
 /**
- * @description require or disallow assignment operator shorthand where possible
+ * @description Require or disallow assignment operator shorthand where possible
  * @link https://eslint.org/docs/rules/operator-assignment
  *
  *  | key         | value      |
@@ -9887,6 +10483,9 @@ namespace OneVarDeclarationPerLine {
  */
 namespace OperatorAssignment {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -9895,6 +10494,7 @@ namespace OperatorAssignment {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never';
 
@@ -9904,7 +10504,7 @@ namespace OperatorAssignment {
 }
 
 /**
- * @description enforce consistent linebreak style for operators
+ * @description Enforce consistent linebreak style for operators
  * @link https://eslint.org/docs/rules/operator-linebreak
  *
  *  | key         | value  |
@@ -9915,6 +10515,9 @@ namespace OperatorAssignment {
  */
 namespace OperatorLinebreak {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -9942,6 +10545,7 @@ namespace OperatorLinebreak {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'after' | 'before' | 'none' | null;
 
@@ -9956,7 +10560,7 @@ namespace OperatorLinebreak {
 }
 
 /**
- * @description require or disallow padding within blocks
+ * @description Require or disallow padding within blocks
  * @link https://eslint.org/docs/rules/padded-blocks
  *
  *  | key         | value      |
@@ -9967,6 +10571,9 @@ namespace OperatorLinebreak {
  */
 namespace PaddedBlocks {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -10013,6 +10620,7 @@ namespace PaddedBlocks {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 =
     | ('always' | 'never')
@@ -10033,7 +10641,7 @@ namespace PaddedBlocks {
 }
 
 /**
- * @description require or disallow padding lines between statements
+ * @description Require or disallow padding lines between statements
  * @link https://eslint.org/docs/rules/padding-line-between-statements
  *
  *  | key         | value      |
@@ -10044,6 +10652,9 @@ namespace PaddedBlocks {
  */
 namespace PaddingLineBetweenStatements {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "definitions": {
    *     "paddingType": {
@@ -10169,6 +10780,7 @@ namespace PaddingLineBetweenStatements {
    *     ]
    *   }
    * }
+   * ```
    */
   export type PaddingType = 'any' | 'never' | 'always';
   export type StatementType =
@@ -10306,7 +10918,7 @@ namespace PaddingLineBetweenStatements {
 }
 
 /**
- * @description require using arrow functions for callbacks
+ * @description Require using arrow functions for callbacks
  * @link https://eslint.org/docs/rules/prefer-arrow-callback
  *
  *  | key         | value      |
@@ -10317,6 +10929,9 @@ namespace PaddingLineBetweenStatements {
  */
 namespace PreferArrowCallback {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10333,6 +10948,7 @@ namespace PreferArrowCallback {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowNamedFunctions?: boolean;
@@ -10345,7 +10961,7 @@ namespace PreferArrowCallback {
 }
 
 /**
- * @description require `const` declarations for variables that are never reassigned after declared
+ * @description Require `const` declarations for variables that are never reassigned after declared
  * @link https://eslint.org/docs/rules/prefer-const
  *
  *  | key         | value      |
@@ -10356,6 +10972,9 @@ namespace PreferArrowCallback {
  */
 namespace PreferConst {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10375,6 +10994,7 @@ namespace PreferConst {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly destructuring?: 'any' | 'all';
@@ -10387,7 +11007,7 @@ namespace PreferConst {
 }
 
 /**
- * @description require destructuring from arrays and/or objects
+ * @description Require destructuring from arrays and/or objects
  * @link https://eslint.org/docs/rules/prefer-destructuring
  *
  *  | key         | value      |
@@ -10398,6 +11018,9 @@ namespace PreferConst {
  */
 namespace PreferDestructuring {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -10455,6 +11078,7 @@ namespace PreferDestructuring {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 =
     | {
@@ -10483,7 +11107,7 @@ namespace PreferDestructuring {
 }
 
 /**
- * @description disallow the use of `Math.pow` in favor of the `**` operator
+ * @description Disallow the use of `Math.pow` in favor of the `**` operator
  * @link https://eslint.org/docs/rules/prefer-exponentiation-operator
  *
  *  | key         | value      |
@@ -10497,7 +11121,7 @@ namespace PreferExponentiationOperator {
 }
 
 /**
- * @description enforce using named capture group in regular expression
+ * @description Enforce using named capture group in regular expression
  * @link https://eslint.org/docs/rules/prefer-named-capture-group
  *
  *  | key         | value      |
@@ -10510,7 +11134,7 @@ namespace PreferNamedCaptureGroup {
 }
 
 /**
- * @description disallow `parseInt()` and `Number.parseInt()` in favor of binary, octal, and hexadecimal literals
+ * @description Disallow `parseInt()` and `Number.parseInt()` in favor of binary, octal, and hexadecimal literals
  * @link https://eslint.org/docs/rules/prefer-numeric-literals
  *
  *  | key         | value      |
@@ -10524,7 +11148,7 @@ namespace PreferNumericLiterals {
 }
 
 /**
- * @description disallow use of `Object.prototype.hasOwnProperty.call()` and prefer use of `Object.hasOwn()`
+ * @description Disallow use of `Object.prototype.hasOwnProperty.call()` and prefer use of `Object.hasOwn()`
  * @link https://eslint.org/docs/rules/prefer-object-has-own
  *
  *  | key         | value      |
@@ -10538,7 +11162,7 @@ namespace PreferObjectHasOwn {
 }
 
 /**
- * @description disallow using Object.assign with an object literal as the first argument and prefer the use of object spread instead.
+ * @description Disallow using Object.assign with an object literal as the first argument and prefer the use of object spread instead.
  * @link https://eslint.org/docs/rules/prefer-object-spread
  *
  *  | key         | value      |
@@ -10552,7 +11176,7 @@ namespace PreferObjectSpread {
 }
 
 /**
- * @description require using Error objects as Promise rejection reasons
+ * @description Require using Error objects as Promise rejection reasons
  * @link https://eslint.org/docs/rules/prefer-promise-reject-errors
  *
  *  | key         | value      |
@@ -10562,6 +11186,9 @@ namespace PreferObjectSpread {
  */
 namespace PreferPromiseRejectErrors {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10574,6 +11201,7 @@ namespace PreferPromiseRejectErrors {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowEmptyReject?: boolean;
@@ -10585,7 +11213,7 @@ namespace PreferPromiseRejectErrors {
 }
 
 /**
- * @description require `Reflect` methods where applicable
+ * @description Require `Reflect` methods where applicable
  * @link https://eslint.org/docs/rules/prefer-reflect
  *
  *  | key         | value      |
@@ -10596,6 +11224,9 @@ namespace PreferPromiseRejectErrors {
  */
 namespace PreferReflect {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10622,12 +11253,13 @@ namespace PreferReflect {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description disallow use of the `RegExp` constructor in favor of regular expression literals
+ * @description Disallow use of the `RegExp` constructor in favor of regular expression literals
  * @link https://eslint.org/docs/rules/prefer-regex-literals
  *
  *  | key            | value      |
@@ -10638,6 +11270,9 @@ namespace PreferReflect {
  */
 namespace PreferRegexLiterals {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10650,6 +11285,7 @@ namespace PreferRegexLiterals {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly disallowRedundantWrapping?: boolean;
@@ -10661,7 +11297,7 @@ namespace PreferRegexLiterals {
 }
 
 /**
- * @description require rest parameters instead of `arguments`
+ * @description Require rest parameters instead of `arguments`
  * @link https://eslint.org/docs/rules/prefer-rest-params
  *
  *  | key         | value      |
@@ -10674,7 +11310,7 @@ namespace PreferRestParams {
 }
 
 /**
- * @description require spread operators instead of `.apply()`
+ * @description Require spread operators instead of `.apply()`
  * @link https://eslint.org/docs/rules/prefer-spread
  *
  *  | key         | value      |
@@ -10687,7 +11323,7 @@ namespace PreferSpread {
 }
 
 /**
- * @description require template literals instead of string concatenation
+ * @description Require template literals instead of string concatenation
  * @link https://eslint.org/docs/rules/prefer-template
  *
  *  | key         | value      |
@@ -10701,7 +11337,7 @@ namespace PreferTemplate {
 }
 
 /**
- * @description require quotes around object literal property names
+ * @description Require quotes around object literal property names
  * @link https://eslint.org/docs/rules/quote-props
  *
  *  | key         | value      |
@@ -10712,6 +11348,9 @@ namespace PreferTemplate {
  */
 namespace QuoteProps {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -10761,6 +11400,7 @@ namespace QuoteProps {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -10782,7 +11422,7 @@ namespace QuoteProps {
 }
 
 /**
- * @description enforce the consistent use of either backticks, double, or single quotes
+ * @description Enforce the consistent use of either backticks, double, or single quotes
  * @link https://eslint.org/docs/rules/quotes
  *
  *  | key         | value  |
@@ -10793,6 +11433,9 @@ namespace QuoteProps {
  */
 namespace Quotes {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -10823,6 +11466,7 @@ namespace Quotes {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'single' | 'double' | 'backtick';
 
@@ -10840,7 +11484,7 @@ namespace Quotes {
 }
 
 /**
- * @description enforce the consistent use of the radix argument when using `parseInt()`
+ * @description Enforce the consistent use of the radix argument when using `parseInt()`
  * @link https://eslint.org/docs/rules/radix
  *
  *  | key            | value      |
@@ -10851,6 +11495,9 @@ namespace Quotes {
  */
 namespace Radix {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -10859,6 +11506,7 @@ namespace Radix {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'as-needed';
 
@@ -10868,7 +11516,7 @@ namespace Radix {
 }
 
 /**
- * @description disallow assignments that can lead to race conditions due to usage of `await` or `yield`
+ * @description Disallow assignments that can lead to race conditions due to usage of `await` or `yield`
  * @link https://eslint.org/docs/rules/require-atomic-updates
  *
  *  | key         | value   |
@@ -10878,6 +11526,9 @@ namespace Radix {
  */
 namespace RequireAtomicUpdates {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10890,6 +11541,7 @@ namespace RequireAtomicUpdates {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowProperties?: boolean;
@@ -10901,7 +11553,7 @@ namespace RequireAtomicUpdates {
 }
 
 /**
- * @description disallow async functions which have no `await` expression
+ * @description Disallow async functions which have no `await` expression
  * @link https://eslint.org/docs/rules/require-await
  *
  *  | key         | value      |
@@ -10914,7 +11566,7 @@ namespace RequireAwait {
 }
 
 /**
- * @description require JSDoc comments
+ * @description Require JSDoc comments
  * @link https://eslint.org/docs/rules/require-jsdoc
  *
  *  | key         | value      |
@@ -10925,6 +11577,9 @@ namespace RequireAwait {
  */
 namespace RequireJsdoc {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10960,12 +11615,13 @@ namespace RequireJsdoc {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description enforce the use of `u` flag on RegExp
+ * @description Enforce the use of `u` flag on RegExp
  * @link https://eslint.org/docs/rules/require-unicode-regexp
  *
  *  | key         | value      |
@@ -10978,7 +11634,7 @@ namespace RequireUnicodeRegexp {
 }
 
 /**
- * @description require generator functions to contain `yield`
+ * @description Require generator functions to contain `yield`
  * @link https://eslint.org/docs/rules/require-yield
  *
  *  | key         | value      |
@@ -10991,7 +11647,7 @@ namespace RequireYield {
 }
 
 /**
- * @description enforce spacing between rest and spread operators and their expressions
+ * @description Enforce spacing between rest and spread operators and their expressions
  * @link https://eslint.org/docs/rules/rest-spread-spacing
  *
  *  | key         | value      |
@@ -11002,6 +11658,9 @@ namespace RequireYield {
  */
 namespace RestSpreadSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11010,6 +11669,7 @@ namespace RestSpreadSpacing {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never';
 
@@ -11019,7 +11679,7 @@ namespace RestSpreadSpacing {
 }
 
 /**
- * @description require or disallow semicolons instead of ASI
+ * @description Require or disallow semicolons instead of ASI
  * @link https://eslint.org/docs/rules/semi
  *
  *  | key         | value  |
@@ -11030,6 +11690,9 @@ namespace RestSpreadSpacing {
  */
 namespace Semi {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -11080,6 +11743,7 @@ namespace Semi {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -11108,7 +11772,7 @@ namespace Semi {
 }
 
 /**
- * @description enforce consistent spacing before and after semicolons
+ * @description Enforce consistent spacing before and after semicolons
  * @link https://eslint.org/docs/rules/semi-spacing
  *
  *  | key         | value      |
@@ -11119,6 +11783,9 @@ namespace Semi {
  */
 namespace SemiSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11135,6 +11802,7 @@ namespace SemiSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -11147,7 +11815,7 @@ namespace SemiSpacing {
 }
 
 /**
- * @description enforce location of semicolons
+ * @description Enforce location of semicolons
  * @link https://eslint.org/docs/rules/semi-style
  *
  *  | key         | value      |
@@ -11158,6 +11826,9 @@ namespace SemiSpacing {
  */
 namespace SemiStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11166,6 +11837,7 @@ namespace SemiStyle {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'last' | 'first';
 
@@ -11175,7 +11847,7 @@ namespace SemiStyle {
 }
 
 /**
- * @description enforce sorted import declarations within modules
+ * @description Enforce sorted import declarations within modules
  * @link https://eslint.org/docs/rules/sort-imports
  *
  *  | key         | value      |
@@ -11186,6 +11858,9 @@ namespace SemiStyle {
  */
 namespace SortImports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11224,9 +11899,14 @@ namespace SortImports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreCase?: boolean;
+    /**
+     * @minItems 4
+     * @maxItems 4
+     */
     readonly memberSyntaxSortOrder?: readonly [
       'none' | 'all' | 'multiple' | 'single',
       'none' | 'all' | 'multiple' | 'single',
@@ -11244,7 +11924,7 @@ namespace SortImports {
 }
 
 /**
- * @description require object keys to be sorted
+ * @description Require object keys to be sorted
  * @link https://eslint.org/docs/rules/sort-keys
  *
  *  | key         | value      |
@@ -11254,6 +11934,9 @@ namespace SortImports {
  */
 namespace SortKeys {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11276,11 +11959,16 @@ namespace SortKeys {
    *         "type": "integer",
    *         "minimum": 2,
    *         "default": 2
+   *       },
+   *       "allowLineSeparatedGroups": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'asc' | 'desc';
 
@@ -11288,6 +11976,7 @@ namespace SortKeys {
     readonly caseSensitive?: boolean;
     readonly natural?: boolean;
     readonly minKeys?: number;
+    readonly allowLineSeparatedGroups?: boolean;
   };
 
   export type RuleEntry =
@@ -11297,7 +11986,7 @@ namespace SortKeys {
 }
 
 /**
- * @description require variables within the same declaration block to be sorted
+ * @description Require variables within the same declaration block to be sorted
  * @link https://eslint.org/docs/rules/sort-vars
  *
  *  | key         | value      |
@@ -11308,6 +11997,9 @@ namespace SortKeys {
  */
 namespace SortVars {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11320,6 +12012,7 @@ namespace SortVars {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreCase?: boolean;
@@ -11331,7 +12024,7 @@ namespace SortVars {
 }
 
 /**
- * @description enforce consistent spacing before blocks
+ * @description Enforce consistent spacing before blocks
  * @link https://eslint.org/docs/rules/space-before-blocks
  *
  *  | key         | value      |
@@ -11342,6 +12035,9 @@ namespace SortVars {
  */
 namespace SpaceBeforeBlocks {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -11381,6 +12077,7 @@ namespace SpaceBeforeBlocks {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('always' | 'never')
@@ -11396,7 +12093,7 @@ namespace SpaceBeforeBlocks {
 }
 
 /**
- * @description enforce consistent spacing before `function` definition opening parenthesis
+ * @description Enforce consistent spacing before `function` definition opening parenthesis
  * @link https://eslint.org/docs/rules/space-before-function-paren
  *
  *  | key         | value      |
@@ -11407,6 +12104,9 @@ namespace SpaceBeforeBlocks {
  */
 namespace SpaceBeforeFunctionParen {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -11446,6 +12146,7 @@ namespace SpaceBeforeFunctionParen {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('always' | 'never')
@@ -11461,7 +12162,7 @@ namespace SpaceBeforeFunctionParen {
 }
 
 /**
- * @description enforce consistent spacing inside parentheses
+ * @description Enforce consistent spacing inside parentheses
  * @link https://eslint.org/docs/rules/space-in-parens
  *
  *  | key         | value      |
@@ -11472,6 +12173,9 @@ namespace SpaceBeforeFunctionParen {
  */
 namespace SpaceInParens {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11498,6 +12202,7 @@ namespace SpaceInParens {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -11512,7 +12217,7 @@ namespace SpaceInParens {
 }
 
 /**
- * @description require spacing around infix operators
+ * @description Require spacing around infix operators
  * @link https://eslint.org/docs/rules/space-infix-ops
  *
  *  | key         | value      |
@@ -11523,6 +12228,9 @@ namespace SpaceInParens {
  */
 namespace SpaceInfixOps {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11535,6 +12243,7 @@ namespace SpaceInfixOps {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly int32Hint?: boolean;
@@ -11546,7 +12255,7 @@ namespace SpaceInfixOps {
 }
 
 /**
- * @description enforce consistent spacing before or after unary operators
+ * @description Enforce consistent spacing before or after unary operators
  * @link https://eslint.org/docs/rules/space-unary-ops
  *
  *  | key         | value      |
@@ -11557,6 +12266,9 @@ namespace SpaceInfixOps {
  */
 namespace SpaceUnaryOps {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11579,6 +12291,7 @@ namespace SpaceUnaryOps {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly words?: boolean;
@@ -11592,7 +12305,7 @@ namespace SpaceUnaryOps {
 }
 
 /**
- * @description enforce consistent spacing after the `//` or ` ` in a comment
+ * @description Enforce consistent spacing after the `//` or ` ` in a comment
  * @link https://eslint.org/docs/rules/spaced-comment
  *
  *  | key         | value      |
@@ -11603,6 +12316,9 @@ namespace SpaceUnaryOps {
  */
 namespace SpacedComment {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11669,6 +12385,7 @@ namespace SpacedComment {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -11693,7 +12410,7 @@ namespace SpacedComment {
 }
 
 /**
- * @description require or disallow strict mode directives
+ * @description Require or disallow strict mode directives
  * @link https://eslint.org/docs/rules/strict
  *
  *  | key         | value      |
@@ -11704,6 +12421,9 @@ namespace SpacedComment {
  */
 namespace Strict {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11714,6 +12434,7 @@ namespace Strict {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'never' | 'global' | 'function' | 'safe';
 
@@ -11723,7 +12444,7 @@ namespace Strict {
 }
 
 /**
- * @description enforce spacing around colons of switch statements
+ * @description Enforce spacing around colons of switch statements
  * @link https://eslint.org/docs/rules/switch-colon-spacing
  *
  *  | key         | value      |
@@ -11734,6 +12455,9 @@ namespace Strict {
  */
 namespace SwitchColonSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11750,6 +12474,7 @@ namespace SwitchColonSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -11762,7 +12487,7 @@ namespace SwitchColonSpacing {
 }
 
 /**
- * @description require symbol descriptions
+ * @description Require symbol descriptions
  * @link https://eslint.org/docs/rules/symbol-description
  *
  *  | key         | value      |
@@ -11775,7 +12500,7 @@ namespace SymbolDescription {
 }
 
 /**
- * @description require or disallow spacing around embedded expressions of template strings
+ * @description Require or disallow spacing around embedded expressions of template strings
  * @link https://eslint.org/docs/rules/template-curly-spacing
  *
  *  | key         | value      |
@@ -11786,6 +12511,9 @@ namespace SymbolDescription {
  */
 namespace TemplateCurlySpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11794,6 +12522,7 @@ namespace TemplateCurlySpacing {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never';
 
@@ -11803,7 +12532,7 @@ namespace TemplateCurlySpacing {
 }
 
 /**
- * @description require or disallow spacing between template tags and their literals
+ * @description Require or disallow spacing between template tags and their literals
  * @link https://eslint.org/docs/rules/template-tag-spacing
  *
  *  | key         | value      |
@@ -11814,6 +12543,9 @@ namespace TemplateCurlySpacing {
  */
 namespace TemplateTagSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11822,6 +12554,7 @@ namespace TemplateTagSpacing {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never';
 
@@ -11831,7 +12564,7 @@ namespace TemplateTagSpacing {
 }
 
 /**
- * @description require or disallow Unicode byte order mark (BOM)
+ * @description Require or disallow Unicode byte order mark (BOM)
  * @link https://eslint.org/docs/rules/unicode-bom
  *
  *  | key         | value      |
@@ -11842,6 +12575,9 @@ namespace TemplateTagSpacing {
  */
 namespace UnicodeBom {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -11850,6 +12586,7 @@ namespace UnicodeBom {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'never';
 
@@ -11859,7 +12596,7 @@ namespace UnicodeBom {
 }
 
 /**
- * @description require calls to `isNaN()` when checking for `NaN`
+ * @description Require calls to `isNaN()` when checking for `NaN`
  * @link https://eslint.org/docs/rules/use-isnan
  *
  *  | key         | value   |
@@ -11869,6 +12606,9 @@ namespace UnicodeBom {
  */
 namespace UseIsnan {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11885,6 +12625,7 @@ namespace UseIsnan {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly enforceForSwitchCase?: boolean;
@@ -11897,7 +12638,7 @@ namespace UseIsnan {
 }
 
 /**
- * @description enforce valid JSDoc comments
+ * @description Enforce valid JSDoc comments
  * @link https://eslint.org/docs/rules/valid-jsdoc
  *
  *  | key         | value      |
@@ -11909,6 +12650,9 @@ namespace UseIsnan {
  */
 namespace ValidJsdoc {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11952,12 +12696,13 @@ namespace ValidJsdoc {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
 
 /**
- * @description enforce comparing `typeof` expressions against valid strings
+ * @description Enforce comparing `typeof` expressions against valid strings
  * @link https://eslint.org/docs/rules/valid-typeof
  *
  *  | key            | value   |
@@ -11968,6 +12713,9 @@ namespace ValidJsdoc {
  */
 namespace ValidTypeof {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11980,6 +12728,7 @@ namespace ValidTypeof {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly requireStringLiterals?: boolean;
@@ -11991,7 +12740,7 @@ namespace ValidTypeof {
 }
 
 /**
- * @description require `var` declarations be placed at the top of their containing scope
+ * @description Require `var` declarations be placed at the top of their containing scope
  * @link https://eslint.org/docs/rules/vars-on-top
  *
  *  | key         | value      |
@@ -12004,7 +12753,7 @@ namespace VarsOnTop {
 }
 
 /**
- * @description require parentheses around immediate `function` invocations
+ * @description Require parentheses around immediate `function` invocations
  * @link https://eslint.org/docs/rules/wrap-iife
  *
  *  | key         | value  |
@@ -12015,6 +12764,9 @@ namespace VarsOnTop {
  */
 namespace WrapIife {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -12034,6 +12786,7 @@ namespace WrapIife {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'outside' | 'inside' | 'any';
 
@@ -12048,7 +12801,7 @@ namespace WrapIife {
 }
 
 /**
- * @description require parenthesis around regex literals
+ * @description Require parenthesis around regex literals
  * @link https://eslint.org/docs/rules/wrap-regex
  *
  *  | key         | value  |
@@ -12062,7 +12815,7 @@ namespace WrapRegex {
 }
 
 /**
- * @description require or disallow spacing around the `*` in `yield*` expressions
+ * @description Require or disallow spacing around the `*` in `yield*` expressions
  * @link https://eslint.org/docs/rules/yield-star-spacing
  *
  *  | key         | value      |
@@ -12073,6 +12826,9 @@ namespace WrapRegex {
  */
 namespace YieldStarSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -12099,6 +12855,7 @@ namespace YieldStarSpacing {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('before' | 'after' | 'both' | 'neither')
@@ -12113,7 +12870,7 @@ namespace YieldStarSpacing {
 }
 
 /**
- * @description require or disallow "Yoda" conditions
+ * @description Require or disallow "Yoda" conditions
  * @link https://eslint.org/docs/rules/yoda
  *
  *  | key         | value      |
@@ -12124,6 +12881,9 @@ namespace YieldStarSpacing {
  */
 namespace Yoda {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -12146,6 +12906,7 @@ namespace Yoda {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -12172,7 +12933,6 @@ export type EslintRules = {
   readonly 'block-scoped-var': BlockScopedVar.RuleEntry;
   readonly 'block-spacing': BlockSpacing.RuleEntry;
   readonly 'brace-style': BraceStyle.RuleEntry;
-  readonly 'callback-return': CallbackReturn.RuleEntry;
   readonly camelcase: Camelcase.RuleEntry;
   readonly 'capitalized-comments': CapitalizedComments.RuleEntry;
   readonly 'class-methods-use-this': ClassMethodsUseThis.RuleEntry;
@@ -12201,17 +12961,13 @@ export type EslintRules = {
   readonly 'function-paren-newline': FunctionParenNewline.RuleEntry;
   readonly 'generator-star-spacing': GeneratorStarSpacing.RuleEntry;
   readonly 'getter-return': GetterReturn.RuleEntry;
-  readonly 'global-require': GlobalRequire.RuleEntry;
   readonly 'grouped-accessor-pairs': GroupedAccessorPairs.RuleEntry;
   readonly 'guard-for-in': GuardForIn.RuleEntry;
-  readonly 'handle-callback-err': HandleCallbackErr.RuleEntry;
-  readonly 'id-blacklist': IdBlacklist.RuleEntry;
   readonly 'id-denylist': IdDenylist.RuleEntry;
   readonly 'id-length': IdLength.RuleEntry;
   readonly 'id-match': IdMatch.RuleEntry;
   readonly 'implicit-arrow-linebreak': ImplicitArrowLinebreak.RuleEntry;
   readonly indent: Indent.RuleEntry;
-  readonly 'indent-legacy': IndentLegacy.RuleEntry;
   readonly 'init-declarations': InitDeclarations.RuleEntry;
   readonly 'jsx-quotes': JsxQuotes.RuleEntry;
   readonly 'key-spacing': KeySpacing.RuleEntry;
@@ -12219,7 +12975,6 @@ export type EslintRules = {
   readonly 'line-comment-position': LineCommentPosition.RuleEntry;
   readonly 'linebreak-style': LinebreakStyle.RuleEntry;
   readonly 'lines-around-comment': LinesAroundComment.RuleEntry;
-  readonly 'lines-around-directive': LinesAroundDirective.RuleEntry;
   readonly 'lines-between-class-members': LinesBetweenClassMembers.RuleEntry;
   readonly 'max-classes-per-file': MaxClassesPerFile.RuleEntry;
   readonly 'max-depth': MaxDepth.RuleEntry;
@@ -12234,18 +12989,14 @@ export type EslintRules = {
   readonly 'multiline-ternary': MultilineTernary.RuleEntry;
   readonly 'new-cap': NewCap.RuleEntry;
   readonly 'new-parens': NewParens.RuleEntry;
-  readonly 'newline-after-var': NewlineAfterVar.RuleEntry;
-  readonly 'newline-before-return': NewlineBeforeReturn.RuleEntry;
   readonly 'newline-per-chained-call': NewlinePerChainedCall.RuleEntry;
   readonly 'no-alert': NoAlert.RuleEntry;
   readonly 'no-array-constructor': NoArrayConstructor.RuleEntry;
   readonly 'no-async-promise-executor': NoAsyncPromiseExecutor.RuleEntry;
   readonly 'no-await-in-loop': NoAwaitInLoop.RuleEntry;
   readonly 'no-bitwise': NoBitwise.RuleEntry;
-  readonly 'no-buffer-constructor': NoBufferConstructor.RuleEntry;
   readonly 'no-caller': NoCaller.RuleEntry;
   readonly 'no-case-declarations': NoCaseDeclarations.RuleEntry;
-  readonly 'no-catch-shadow': NoCatchShadow.RuleEntry;
   readonly 'no-class-assign': NoClassAssign.RuleEntry;
   readonly 'no-compare-neg-zero': NoCompareNegZero.RuleEntry;
   readonly 'no-cond-assign': NoCondAssign.RuleEntry;
@@ -12303,20 +13054,16 @@ export type EslintRules = {
   readonly 'no-magic-numbers': NoMagicNumbers.RuleEntry;
   readonly 'no-misleading-character-class': NoMisleadingCharacterClass.RuleEntry;
   readonly 'no-mixed-operators': NoMixedOperators.RuleEntry;
-  readonly 'no-mixed-requires': NoMixedRequires.RuleEntry;
   readonly 'no-mixed-spaces-and-tabs': NoMixedSpacesAndTabs.RuleEntry;
   readonly 'no-multi-assign': NoMultiAssign.RuleEntry;
   readonly 'no-multi-spaces': NoMultiSpaces.RuleEntry;
   readonly 'no-multi-str': NoMultiStr.RuleEntry;
   readonly 'no-multiple-empty-lines': NoMultipleEmptyLines.RuleEntry;
-  readonly 'no-native-reassign': NoNativeReassign.RuleEntry;
   readonly 'no-negated-condition': NoNegatedCondition.RuleEntry;
-  readonly 'no-negated-in-lhs': NoNegatedInLhs.RuleEntry;
   readonly 'no-nested-ternary': NoNestedTernary.RuleEntry;
   readonly 'no-new': NoNew.RuleEntry;
   readonly 'no-new-func': NoNewFunc.RuleEntry;
   readonly 'no-new-object': NoNewObject.RuleEntry;
-  readonly 'no-new-require': NoNewRequire.RuleEntry;
   readonly 'no-new-symbol': NoNewSymbol.RuleEntry;
   readonly 'no-new-wrappers': NoNewWrappers.RuleEntry;
   readonly 'no-nonoctal-decimal-escape': NoNonoctalDecimalEscape.RuleEntry;
@@ -12324,10 +13071,7 @@ export type EslintRules = {
   readonly 'no-octal': NoOctal.RuleEntry;
   readonly 'no-octal-escape': NoOctalEscape.RuleEntry;
   readonly 'no-param-reassign': NoParamReassign.RuleEntry;
-  readonly 'no-path-concat': NoPathConcat.RuleEntry;
   readonly 'no-plusplus': NoPlusplus.RuleEntry;
-  readonly 'no-process-env': NoProcessEnv.RuleEntry;
-  readonly 'no-process-exit': NoProcessExit.RuleEntry;
   readonly 'no-promise-executor-return': NoPromiseExecutorReturn.RuleEntry;
   readonly 'no-proto': NoProto.RuleEntry;
   readonly 'no-prototype-builtins': NoPrototypeBuiltins.RuleEntry;
@@ -12336,7 +13080,6 @@ export type EslintRules = {
   readonly 'no-restricted-exports': NoRestrictedExports.RuleEntry;
   readonly 'no-restricted-globals': NoRestrictedGlobals.RuleEntry;
   readonly 'no-restricted-imports': NoRestrictedImports.RuleEntry;
-  readonly 'no-restricted-modules': NoRestrictedModules.RuleEntry;
   readonly 'no-restricted-properties': NoRestrictedProperties.RuleEntry;
   readonly 'no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
   readonly 'no-return-assign': NoReturnAssign.RuleEntry;
@@ -12348,9 +13091,7 @@ export type EslintRules = {
   readonly 'no-setter-return': NoSetterReturn.RuleEntry;
   readonly 'no-shadow': NoShadow.RuleEntry;
   readonly 'no-shadow-restricted-names': NoShadowRestrictedNames.RuleEntry;
-  readonly 'no-spaced-func': NoSpacedFunc.RuleEntry;
   readonly 'no-sparse-arrays': NoSparseArrays.RuleEntry;
-  readonly 'no-sync': NoSync.RuleEntry;
   readonly 'no-tabs': NoTabs.RuleEntry;
   readonly 'no-template-curly-in-string': NoTemplateCurlyInString.RuleEntry;
   readonly 'no-ternary': NoTernary.RuleEntry;
@@ -12408,7 +13149,6 @@ export type EslintRules = {
   readonly 'prefer-object-has-own': PreferObjectHasOwn.RuleEntry;
   readonly 'prefer-object-spread': PreferObjectSpread.RuleEntry;
   readonly 'prefer-promise-reject-errors': PreferPromiseRejectErrors.RuleEntry;
-  readonly 'prefer-reflect': PreferReflect.RuleEntry;
   readonly 'prefer-regex-literals': PreferRegexLiterals.RuleEntry;
   readonly 'prefer-rest-params': PreferRestParams.RuleEntry;
   readonly 'prefer-spread': PreferSpread.RuleEntry;
@@ -12418,7 +13158,6 @@ export type EslintRules = {
   readonly radix: Radix.RuleEntry;
   readonly 'require-atomic-updates': RequireAtomicUpdates.RuleEntry;
   readonly 'require-await': RequireAwait.RuleEntry;
-  readonly 'require-jsdoc': RequireJsdoc.RuleEntry;
   readonly 'require-unicode-regexp': RequireUnicodeRegexp.RuleEntry;
   readonly 'require-yield': RequireYield.RuleEntry;
   readonly 'rest-spread-spacing': RestSpreadSpacing.RuleEntry;
@@ -12441,11 +13180,35 @@ export type EslintRules = {
   readonly 'template-tag-spacing': TemplateTagSpacing.RuleEntry;
   readonly 'unicode-bom': UnicodeBom.RuleEntry;
   readonly 'use-isnan': UseIsnan.RuleEntry;
-  readonly 'valid-jsdoc': ValidJsdoc.RuleEntry;
   readonly 'valid-typeof': ValidTypeof.RuleEntry;
   readonly 'vars-on-top': VarsOnTop.RuleEntry;
   readonly 'wrap-iife': WrapIife.RuleEntry;
   readonly 'wrap-regex': WrapRegex.RuleEntry;
   readonly 'yield-star-spacing': YieldStarSpacing.RuleEntry;
   readonly yoda: Yoda.RuleEntry;
+
+  // deprecated
+  readonly 'callback-return': CallbackReturn.RuleEntry;
+  readonly 'global-require': GlobalRequire.RuleEntry;
+  readonly 'handle-callback-err': HandleCallbackErr.RuleEntry;
+  readonly 'id-blacklist': IdBlacklist.RuleEntry;
+  readonly 'indent-legacy': IndentLegacy.RuleEntry;
+  readonly 'lines-around-directive': LinesAroundDirective.RuleEntry;
+  readonly 'newline-after-var': NewlineAfterVar.RuleEntry;
+  readonly 'newline-before-return': NewlineBeforeReturn.RuleEntry;
+  readonly 'no-buffer-constructor': NoBufferConstructor.RuleEntry;
+  readonly 'no-catch-shadow': NoCatchShadow.RuleEntry;
+  readonly 'no-mixed-requires': NoMixedRequires.RuleEntry;
+  readonly 'no-native-reassign': NoNativeReassign.RuleEntry;
+  readonly 'no-negated-in-lhs': NoNegatedInLhs.RuleEntry;
+  readonly 'no-new-require': NoNewRequire.RuleEntry;
+  readonly 'no-path-concat': NoPathConcat.RuleEntry;
+  readonly 'no-process-env': NoProcessEnv.RuleEntry;
+  readonly 'no-process-exit': NoProcessExit.RuleEntry;
+  readonly 'no-restricted-modules': NoRestrictedModules.RuleEntry;
+  readonly 'no-spaced-func': NoSpacedFunc.RuleEntry;
+  readonly 'no-sync': NoSync.RuleEntry;
+  readonly 'prefer-reflect': PreferReflect.RuleEntry;
+  readonly 'require-jsdoc': RequireJsdoc.RuleEntry;
+  readonly 'valid-jsdoc': ValidJsdoc.RuleEntry;
 };

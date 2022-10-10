@@ -5,6 +5,7 @@
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 
 const {
+  eslintDeprecationRules,
   eslintImportsRules,
   eslintJestRules,
   eslintFunctionalRules,
@@ -13,6 +14,7 @@ const {
   typescriptEslintRules,
   eslintPromiseRules,
   eslintUnicornRules,
+  eslintSecurityRules,
   // eslintNoshiroCustomRules,
 } = require('./eslint-rules');
 
@@ -59,6 +61,8 @@ const config = {
     ...eslintUnicornRules,
     ...eslintArrayFuncRules,
     ...typescriptEslintRules,
+    ...eslintDeprecationRules,
+    ...eslintSecurityRules,
     // ...eslintNoshiroCustomRules,
   },
 };

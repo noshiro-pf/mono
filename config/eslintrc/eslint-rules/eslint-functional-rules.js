@@ -7,6 +7,7 @@
 /** @typedef { import("../../types/types").ImmutableDataOptions } ImmutableDataOptions */
 /** @typedef { import("../../types/types").NoLetOptions } NoLetOptions */
 /** @typedef { import("../../types/types").PreferReadonlyTypeOptions } PreferReadonlyTypeOptions */
+/** @typedef { import("../../types/types").NoExpressionStatementOptions } NoExpressionStatementOptions */
 /** @typedef { import("../../types/types").PreferTacitOptions } PreferTacitOptions */
 
 const ignorePattern = [
@@ -44,6 +45,19 @@ const preferReadonlyTypeOptions = {
   ignorePattern,
 };
 
+// /** @type {NoExpressionStatementOptions} */
+// const noExpressionStatementOptions = {
+//   ignoreVoid: true,
+//   ignorePattern: [
+//     '^this\\..*',
+//     'yield',
+//     'dispatch',
+//     '^set.*',
+//     '.*subscribe.*',
+//     ...ignorePattern,
+//   ],
+// };
+
 /** @type {PreferTacitOptions} */
 const preferTacitOptions = {
   assumeTypes: {
@@ -60,7 +74,8 @@ const eslintFunctionalRules = {
   'functional/immutable-data': ['error', immutableDataOptions],
   'functional/no-let': ['error', noLetOptions],
   'functional/no-method-signature': 'error',
-  'functional/prefer-readonly-type': ['off', preferReadonlyTypeOptions],
+  // 'functional/prefer-readonly-type': ['warn', preferReadonlyTypeOptions],
+  'functional/prefer-readonly-type': 'off',
 
   // No Object-Orientation Rules
   'functional/no-class': 'off',
@@ -69,6 +84,7 @@ const eslintFunctionalRules = {
 
   // No Statements Rules
   'functional/no-conditional-statement': 'off',
+  // 'functional/no-expression-statement': ['warn', noExpressionStatementOptions],
   'functional/no-expression-statement': 'off',
   'functional/no-loop-statement': 'off',
   'functional/no-return-void': 'off',
@@ -82,7 +98,8 @@ const eslintFunctionalRules = {
   'functional/functional-parameters': 'off',
 
   // Stylistic Rules
-  'functional/prefer-tacit': ['error', preferTacitOptions],
+  // 'functional/prefer-tacit': ['warn', preferTacitOptions],
+  'functional/prefer-tacit': 'off', // false positives
 };
 
 module.exports = {

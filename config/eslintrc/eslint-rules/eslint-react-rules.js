@@ -25,7 +25,6 @@ const eslintReactRules = {
   'react/jsx-props-no-multi-spaces': 'off',
   'react/jsx-tag-spacing': 'off',
   'react/jsx-wrap-multilines': 'off',
-  'react/jsx-space-before-closing': 'off', // deprecated
 
   'react/boolean-prop-naming': 'error',
   'react/button-has-type': 'error',
@@ -115,6 +114,9 @@ const eslintReactRules = {
   'react/style-prop-object': 'error',
   'react/void-dom-elements-no-children': 'error',
   'react/jsx-no-leaked-render': 'error',
+
+  // deprecated
+  'react/jsx-space-before-closing': 'off',
 };
 
 module.exports = { eslintReactRules };

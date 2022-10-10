@@ -32,32 +32,48 @@ namespace AdjacentOverloadSignatures {
  */
 namespace ArrayType {
   /**
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "default": {
-   *         "enum": [
-   *           "array",
-   *           "generic",
-   *           "array-simple"
-   *         ]
-   *       },
-   *       "readonly": {
-   *         "enum": [
-   *           "array",
-   *           "generic",
-   *           "array-simple"
-   *         ]
-   *       }
+   * ### schema
+   *
+   * ```json
+   * {
+   *   "$defs": {
+   *     "arrayOption": {
+   *       "enum": [
+   *         "array",
+   *         "generic",
+   *         "array-simple"
+   *       ]
    *     }
-   *   }
-   * ]
+   *   },
+   *   "prefixItems": [
+   *     {
+   *       "properties": {
+   *         "default": {
+   *           "$ref": "#/$defs/arrayOption",
+   *           "description": "The array type expected for mutable cases..."
+   *         },
+   *         "readonly": {
+   *           "$ref": "#/$defs/arrayOption",
+   *           "description": "The array type expected for readonly cases. If omitted, the value for `default` will be used."
+   *         }
+   *       },
+   *       "type": "object"
+   *     }
+   *   ],
+   *   "type": "array"
+   * }
+   * ```
    */
+  // modified
   export type Options = {
+    /**
+     * The array type expected for mutable cases...
+     */
     readonly default?: 'array' | 'generic' | 'array-simple';
+    /**
+     * The array type expected for readonly cases. If omitted, the value for `default` will be used.
+     */
     readonly readonly?: 'array' | 'generic' | 'array-simple';
-    readonly [k: string]: unknown;
   };
 
   export type RuleEntry =
@@ -90,134 +106,75 @@ namespace AwaitThenable {
  */
 namespace BanTsComment {
   /**
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "ts-expect-error": {
-   *         "oneOf": [
-   *           {
-   *             "type": "boolean",
-   *             "default": true
-   *           },
-   *           {
-   *             "enum": [
-   *               "allow-with-description"
-   *             ]
-   *           },
-   *           {
-   *             "type": "object",
-   *             "properties": {
-   *               "descriptionFormat": {
-   *                 "type": "string"
-   *               }
+   * ### schema
+   *
+   * ```json
+   * {
+   *   "$defs": {
+   *     "directiveConfigSchema": {
+   *       "oneOf": [
+   *         {
+   *           "type": "boolean",
+   *           "default": true
+   *         },
+   *         {
+   *           "enum": [
+   *             "allow-with-description"
+   *           ]
+   *         },
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "descriptionFormat": {
+   *               "type": "string"
    *             }
    *           }
-   *         ]
+   *         }
+   *       ]
+   *     }
+   *   },
+   *   "prefixItems": [
+   *     {
+   *       "properties": {
+   *         "ts-expect-error": {
+   *           "$ref": "#/$defs/directiveConfigSchema"
+   *         },
+   *         "ts-ignore": {
+   *           "$ref": "#/$defs/directiveConfigSchema"
+   *         },
+   *         "ts-nocheck": {
+   *           "$ref": "#/$defs/directiveConfigSchema"
+   *         },
+   *         "ts-check": {
+   *           "$ref": "#/$defs/directiveConfigSchema"
+   *         },
+   *         "minimumDescriptionLength": {
+   *           "type": "number",
+   *           "default": 3
+   *         }
    *       },
-   *       "ts-ignore": {
-   *         "oneOf": [
-   *           {
-   *             "type": "boolean",
-   *             "default": true
-   *           },
-   *           {
-   *             "enum": [
-   *               "allow-with-description"
-   *             ]
-   *           },
-   *           {
-   *             "type": "object",
-   *             "properties": {
-   *               "descriptionFormat": {
-   *                 "type": "string"
-   *               }
-   *             }
-   *           }
-   *         ]
-   *       },
-   *       "ts-nocheck": {
-   *         "oneOf": [
-   *           {
-   *             "type": "boolean",
-   *             "default": true
-   *           },
-   *           {
-   *             "enum": [
-   *               "allow-with-description"
-   *             ]
-   *           },
-   *           {
-   *             "type": "object",
-   *             "properties": {
-   *               "descriptionFormat": {
-   *                 "type": "string"
-   *               }
-   *             }
-   *           }
-   *         ]
-   *       },
-   *       "ts-check": {
-   *         "oneOf": [
-   *           {
-   *             "type": "boolean",
-   *             "default": true
-   *           },
-   *           {
-   *             "enum": [
-   *               "allow-with-description"
-   *             ]
-   *           },
-   *           {
-   *             "type": "object",
-   *             "properties": {
-   *               "descriptionFormat": {
-   *                 "type": "string"
-   *               }
-   *             }
-   *           }
-   *         ]
-   *       },
-   *       "minimumDescriptionLength": {
-   *         "type": "number",
-   *         "default": 3
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
+   *       "additionalProperties": false
+   *     }
+   *   ],
+   *   "type": "array"
+   * }
+   * ```
    */
-  export type Options = {
-    readonly 'ts-expect-error'?:
-      | boolean
-      | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-          readonly [k: string]: unknown;
-        };
-    readonly 'ts-ignore'?:
-      | boolean
-      | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-          readonly [k: string]: unknown;
-        };
-    readonly 'ts-nocheck'?:
-      | boolean
-      | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-          readonly [k: string]: unknown;
-        };
-    readonly 'ts-check'?:
-      | boolean
-      | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-          readonly [k: string]: unknown;
-        };
-    readonly minimumDescriptionLength?: number;
-  };
+  // modified
+  export type Options = Readonly<{
+    'ts-expect-error'?: DirectiveConfigSchema;
+    'ts-ignore'?: DirectiveConfigSchema;
+    'ts-nocheck'?: DirectiveConfigSchema;
+    'ts-check'?: DirectiveConfigSchema;
+    minimumDescriptionLength?: number;
+  }>;
+
+  type DirectiveConfigSchema =
+    | boolean
+    | 'allow-with-description'
+    | {
+        readonly descriptionFormat?: string;
+      };
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -250,6 +207,9 @@ namespace BanTslintComment {
  */
 namespace BanTypes {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -289,6 +249,7 @@ namespace BanTypes {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly types?: Record<
@@ -321,6 +282,9 @@ namespace BanTypes {
  */
 namespace BraceStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -340,6 +304,7 @@ namespace BraceStyle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = '1tbs' | 'stroustrup' | 'allman';
 
@@ -365,6 +330,9 @@ namespace BraceStyle {
  */
 namespace ClassLiteralPropertyStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -373,6 +341,7 @@ namespace ClassLiteralPropertyStyle {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'fields' | 'getters';
 
@@ -393,8 +362,11 @@ namespace ClassLiteralPropertyStyle {
  */
 namespace CommaDangle {
   /**
+   * ### schema
+   *
+   * ```json
    * {
-   *   "definitions": {
+   *   "$defs": {
    *     "value": {
    *       "enum": [
    *         "always-multiline",
@@ -418,34 +390,34 @@ namespace CommaDangle {
    *     {
    *       "oneOf": [
    *         {
-   *           "$ref": "#/definitions/value"
+   *           "$ref": "#/$defs/value"
    *         },
    *         {
    *           "type": "object",
    *           "properties": {
    *             "arrays": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             },
    *             "objects": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             },
    *             "imports": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             },
    *             "exports": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             },
    *             "functions": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             },
    *             "enums": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             },
    *             "generics": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             },
    *             "tuples": {
-   *               "$ref": "#/definitions/valueWithIgnore"
+   *               "$ref": "#/$defs/valueWithIgnore"
    *             }
    *           },
    *           "additionalProperties": false
@@ -455,6 +427,7 @@ namespace CommaDangle {
    *   ],
    *   "additionalProperties": false
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -500,6 +473,9 @@ namespace CommaDangle {
  */
 namespace CommaSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -516,6 +492,7 @@ namespace CommaSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -539,6 +516,9 @@ namespace CommaSpacing {
  */
 namespace ConsistentGenericConstructors {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -547,6 +527,7 @@ namespace ConsistentGenericConstructors {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'type-annotation' | 'constructor';
 
@@ -567,6 +548,9 @@ namespace ConsistentGenericConstructors {
  */
 namespace ConsistentIndexedObjectStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -575,6 +559,7 @@ namespace ConsistentIndexedObjectStyle {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'record' | 'index-signature';
 
@@ -594,6 +579,9 @@ namespace ConsistentIndexedObjectStyle {
  */
 namespace ConsistentTypeAssertions {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -636,6 +624,7 @@ namespace ConsistentTypeAssertions {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | {
@@ -666,6 +655,9 @@ namespace ConsistentTypeAssertions {
  */
 namespace ConsistentTypeDefinitions {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -674,6 +666,7 @@ namespace ConsistentTypeDefinitions {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'interface' | 'type';
 
@@ -695,6 +688,9 @@ namespace ConsistentTypeDefinitions {
  */
 namespace ConsistentTypeExports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -706,6 +702,7 @@ namespace ConsistentTypeExports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly fixMixedExportsWithInlineTypeSpecifier?: boolean;
@@ -728,6 +725,9 @@ namespace ConsistentTypeExports {
  */
 namespace ConsistentTypeImports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -745,6 +745,7 @@ namespace ConsistentTypeImports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly prefer?: 'type-imports' | 'no-type-imports';
@@ -782,6 +783,9 @@ namespace DefaultParamLast {
  */
 namespace DotNotation {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -810,6 +814,7 @@ namespace DotNotation {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowKeywords?: boolean;
@@ -835,42 +840,70 @@ namespace DotNotation {
  */
 namespace ExplicitFunctionReturnType {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "allowExpressions": {
+   *       "allowConciseArrowFunctionExpressionsStartingWithVoid": {
+   *         "description": "Whether to allow arrow functions that start with the `void` keyword.",
    *         "type": "boolean"
    *       },
-   *       "allowTypedFunctionExpressions": {
+   *       "allowExpressions": {
+   *         "description": "Whether to ignore function expressions (functions which are not part of a declaration).",
    *         "type": "boolean"
    *       },
    *       "allowHigherOrderFunctions": {
+   *         "description": "Whether to ignore functions immediately returning another function expression.",
+   *         "type": "boolean"
+   *       },
+   *       "allowTypedFunctionExpressions": {
+   *         "description": "Whether to ignore type annotations on the variable of function expressions.",
    *         "type": "boolean"
    *       },
    *       "allowDirectConstAssertionInArrowFunctions": {
-   *         "type": "boolean"
-   *       },
-   *       "allowConciseArrowFunctionExpressionsStartingWithVoid": {
+   *         "description": "Whether to ignore arrow functions immediately returning a `as const` value.",
    *         "type": "boolean"
    *       },
    *       "allowedNames": {
-   *         "type": "array",
+   *         "description": "An array of function/method names that will not have their arguments or return values checked.",
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "type": "array"
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
-    readonly allowExpressions?: boolean;
-    readonly allowTypedFunctionExpressions?: boolean;
-    readonly allowHigherOrderFunctions?: boolean;
-    readonly allowDirectConstAssertionInArrowFunctions?: boolean;
+    /**
+     * Whether to allow arrow functions that start with the `void` keyword.
+     */
     readonly allowConciseArrowFunctionExpressionsStartingWithVoid?: boolean;
+    /**
+     * Whether to ignore function expressions (functions which are not part of a declaration).
+     */
+    readonly allowExpressions?: boolean;
+    /**
+     * Whether to ignore functions immediately returning another function expression.
+     */
+    readonly allowHigherOrderFunctions?: boolean;
+    /**
+     * Whether to ignore type annotations on the variable of function expressions.
+     */
+    readonly allowTypedFunctionExpressions?: boolean;
+    /**
+     * Whether to ignore arrow functions immediately returning a `as const` value.
+     */
+    readonly allowDirectConstAssertionInArrowFunctions?: boolean;
+    /**
+     * An array of function/method names that will not have their arguments or return values checked.
+     */
     readonly allowedNames?: readonly string[];
   };
 
@@ -883,88 +916,93 @@ namespace ExplicitFunctionReturnType {
  * @description Require explicit accessibility modifiers on class properties and methods
  * @link https://typescript-eslint.io/rules/explicit-member-accessibility
  *
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | fixable     | code    |
- *  | recommended | false   |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
  */
 namespace ExplicitMemberAccessibility {
   /**
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "accessibility": {
-   *         "enum": [
-   *           "explicit",
-   *           "no-public",
-   *           "off"
-   *         ]
-   *       },
-   *       "overrides": {
-   *         "type": "object",
-   *         "properties": {
-   *           "accessors": {
-   *             "enum": [
-   *               "explicit",
-   *               "no-public",
-   *               "off"
-   *             ]
-   *           },
-   *           "constructors": {
-   *             "enum": [
-   *               "explicit",
-   *               "no-public",
-   *               "off"
-   *             ]
-   *           },
-   *           "methods": {
-   *             "enum": [
-   *               "explicit",
-   *               "no-public",
-   *               "off"
-   *             ]
-   *           },
-   *           "properties": {
-   *             "enum": [
-   *               "explicit",
-   *               "no-public",
-   *               "off"
-   *             ]
-   *           },
-   *           "parameterProperties": {
-   *             "enum": [
-   *               "explicit",
-   *               "no-public",
-   *               "off"
-   *             ]
-   *           }
+   * ### schema
+   *
+   * ```json
+   * {
+   *   "$defs": {
+   *     "accessibilityLevel": {
+   *       "oneOf": [
+   *         {
+   *           "const": "explicit",
+   *           "description": "Always require an accessor."
    *         },
-   *         "additionalProperties": false
-   *       },
-   *       "ignoredMethodNames": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string"
+   *         {
+   *           "const": "no-public",
+   *           "description": "Require an accessor except when public."
+   *         },
+   *         {
+   *           "const": "off",
+   *           "description": "Never check whether there is an accessor."
    *         }
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
+   *       ]
+   *     }
+   *   },
+   *   "prefixItems": [
+   *     {
+   *       "type": "object",
+   *       "properties": {
+   *         "accessibility": {
+   *           "$ref": "#/$defs/accessibilityLevel"
+   *         },
+   *         "overrides": {
+   *           "type": "object",
+   *           "properties": {
+   *             "accessors": {
+   *               "$ref": "#/$defs/accessibilityLevel"
+   *             },
+   *             "constructors": {
+   *               "$ref": "#/$defs/accessibilityLevel"
+   *             },
+   *             "methods": {
+   *               "$ref": "#/$defs/accessibilityLevel"
+   *             },
+   *             "properties": {
+   *               "$ref": "#/$defs/accessibilityLevel"
+   *             },
+   *             "parameterProperties": {
+   *               "$ref": "#/$defs/accessibilityLevel"
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         },
+   *         "ignoredMethodNames": {
+   *           "type": "array",
+   *           "items": {
+   *             "type": "string"
+   *           }
+   *         }
+   *       },
+   *       "additionalProperties": false
+   *     }
+   *   ],
+   *   "type": "array"
+   * }
+   * ```
    */
-  export type Options = {
-    readonly accessibility?: 'explicit' | 'no-public' | 'off';
-    readonly overrides?: {
-      readonly accessors?: 'explicit' | 'no-public' | 'off';
-      readonly constructors?: 'explicit' | 'no-public' | 'off';
-      readonly methods?: 'explicit' | 'no-public' | 'off';
-      readonly properties?: 'explicit' | 'no-public' | 'off';
-      readonly parameterProperties?: 'explicit' | 'no-public' | 'off';
-    };
-    readonly ignoredMethodNames?: readonly string[];
-  };
+  // modified
+  export type Options = Readonly<{
+    accessibility?: AccessibilityLevel;
+    overrides?: Readonly<{
+      accessors?: AccessibilityLevel;
+      constructors?: AccessibilityLevel;
+      methods?: AccessibilityLevel;
+      properties?: AccessibilityLevel;
+      parameterProperties?: AccessibilityLevel;
+    }>;
+    ignoredMethodNames?: readonly string[];
+  }>;
+
+  type AccessibilityLevel = 'explicit' | 'no-public' | 'off';
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -982,26 +1020,34 @@ namespace ExplicitMemberAccessibility {
  */
 namespace ExplicitModuleBoundaryTypes {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "allowArgumentsExplicitlyTypedAsAny": {
+   *         "description": "Whether to ignore arguments that are explicitly typed as `any`.",
    *         "type": "boolean"
    *       },
    *       "allowDirectConstAssertionInArrowFunctions": {
+   *         "description": "Whether to ignore return type annotations on body-less arrow functions that return an `as const` type assertion.\nYou must still type the parameters of the function.",
    *         "type": "boolean"
    *       },
    *       "allowedNames": {
-   *         "type": "array",
+   *         "description": "An array of function/method names that will not have their arguments or return values checked.",
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "type": "array"
    *       },
    *       "allowHigherOrderFunctions": {
+   *         "description": "Whether to ignore return type annotations on functions immediately returning another function expression.\nYou must still type the parameters of the function.",
    *         "type": "boolean"
    *       },
    *       "allowTypedFunctionExpressions": {
+   *         "description": "Whether to ignore type annotations on the variable of a function expresion.",
    *         "type": "boolean"
    *       },
    *       "shouldTrackReferences": {
@@ -1011,12 +1057,30 @@ namespace ExplicitModuleBoundaryTypes {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to ignore arguments that are explicitly typed as `any`.
+     */
     readonly allowArgumentsExplicitlyTypedAsAny?: boolean;
+    /**
+     * Whether to ignore return type annotations on body-less arrow functions that return an `as const` type assertion.
+     * You must still type the parameters of the function.
+     */
     readonly allowDirectConstAssertionInArrowFunctions?: boolean;
+    /**
+     * An array of function/method names that will not have their arguments or return values checked.
+     */
     readonly allowedNames?: readonly string[];
+    /**
+     * Whether to ignore return type annotations on functions immediately returning another function expression.
+     * You must still type the parameters of the function.
+     */
     readonly allowHigherOrderFunctions?: boolean;
+    /**
+     * Whether to ignore type annotations on the variable of a function expresion.
+     */
     readonly allowTypedFunctionExpressions?: boolean;
     readonly shouldTrackReferences?: boolean;
   };
@@ -1038,6 +1102,9 @@ namespace ExplicitModuleBoundaryTypes {
  */
 namespace FuncCallSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -1075,6 +1142,7 @@ namespace FuncCallSpacing {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1105,6 +1173,9 @@ namespace FuncCallSpacing {
  */
 namespace Indent {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -1364,6 +1435,7 @@ namespace Indent {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'tab' | number;
 
@@ -1418,6 +1490,9 @@ namespace Indent {
  */
 namespace InitDeclarations {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -1455,6 +1530,7 @@ namespace InitDeclarations {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1485,6 +1561,9 @@ namespace InitDeclarations {
  */
 namespace KeywordSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -2323,6 +2402,7 @@ namespace KeywordSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -2620,6 +2700,9 @@ namespace KeywordSpacing {
  */
 namespace LinesBetweenClassMembers {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "0": {
    *     "enum": [
@@ -2642,6 +2725,7 @@ namespace LinesBetweenClassMembers {
    *     }
    *   }
    * }
+   * ```
    */
   export type Options = Readonly<Record<string, unknown>>;
 
@@ -2662,6 +2746,9 @@ namespace LinesBetweenClassMembers {
  */
 namespace MemberDelimiterStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -2787,6 +2874,7 @@ namespace MemberDelimiterStyle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly multiline?: {
@@ -2838,6 +2926,9 @@ namespace MemberDelimiterStyle {
  */
 namespace MemberOrdering {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -2956,7 +3047,20 @@ namespace MemberOrdering {
    *                     "private-decorated-set",
    *                     "private-static-set",
    *                     "private-instance-set",
-   *                     "private-abstract-set"
+   *                     "private-abstract-set",
+   *                     "static-initialization",
+   *                     "static-static-initialization",
+   *                     "public-static-static-initialization",
+   *                     "instance-static-initialization",
+   *                     "public-instance-static-initialization",
+   *                     "abstract-static-initialization",
+   *                     "public-abstract-static-initialization",
+   *                     "protected-static-static-initialization",
+   *                     "protected-instance-static-initialization",
+   *                     "protected-abstract-static-initialization",
+   *                     "private-static-static-initialization",
+   *                     "private-instance-static-initialization",
+   *                     "private-abstract-static-initialization"
    *                   ]
    *                 },
    *                 {
@@ -3063,7 +3167,20 @@ namespace MemberOrdering {
    *                       "private-decorated-set",
    *                       "private-static-set",
    *                       "private-instance-set",
-   *                       "private-abstract-set"
+   *                       "private-abstract-set",
+   *                       "static-initialization",
+   *                       "static-static-initialization",
+   *                       "public-static-static-initialization",
+   *                       "instance-static-initialization",
+   *                       "public-instance-static-initialization",
+   *                       "abstract-static-initialization",
+   *                       "public-abstract-static-initialization",
+   *                       "protected-static-static-initialization",
+   *                       "protected-instance-static-initialization",
+   *                       "protected-abstract-static-initialization",
+   *                       "private-static-static-initialization",
+   *                       "private-instance-static-initialization",
+   *                       "private-abstract-static-initialization"
    *                     ]
    *                   }
    *                 }
@@ -3181,7 +3298,20 @@ namespace MemberOrdering {
    *                             "private-decorated-set",
    *                             "private-static-set",
    *                             "private-instance-set",
-   *                             "private-abstract-set"
+   *                             "private-abstract-set",
+   *                             "static-initialization",
+   *                             "static-static-initialization",
+   *                             "public-static-static-initialization",
+   *                             "instance-static-initialization",
+   *                             "public-instance-static-initialization",
+   *                             "abstract-static-initialization",
+   *                             "public-abstract-static-initialization",
+   *                             "protected-static-static-initialization",
+   *                             "protected-instance-static-initialization",
+   *                             "protected-abstract-static-initialization",
+   *                             "private-static-static-initialization",
+   *                             "private-instance-static-initialization",
+   *                             "private-abstract-static-initialization"
    *                           ]
    *                         },
    *                         {
@@ -3288,7 +3418,20 @@ namespace MemberOrdering {
    *                               "private-decorated-set",
    *                               "private-static-set",
    *                               "private-instance-set",
-   *                               "private-abstract-set"
+   *                               "private-abstract-set",
+   *                               "static-initialization",
+   *                               "static-static-initialization",
+   *                               "public-static-static-initialization",
+   *                               "instance-static-initialization",
+   *                               "public-instance-static-initialization",
+   *                               "abstract-static-initialization",
+   *                               "public-abstract-static-initialization",
+   *                               "protected-static-static-initialization",
+   *                               "protected-instance-static-initialization",
+   *                               "protected-abstract-static-initialization",
+   *                               "private-static-static-initialization",
+   *                               "private-instance-static-initialization",
+   *                               "private-abstract-static-initialization"
    *                             ]
    *                           }
    *                         }
@@ -3430,7 +3573,20 @@ namespace MemberOrdering {
    *                     "private-decorated-set",
    *                     "private-static-set",
    *                     "private-instance-set",
-   *                     "private-abstract-set"
+   *                     "private-abstract-set",
+   *                     "static-initialization",
+   *                     "static-static-initialization",
+   *                     "public-static-static-initialization",
+   *                     "instance-static-initialization",
+   *                     "public-instance-static-initialization",
+   *                     "abstract-static-initialization",
+   *                     "public-abstract-static-initialization",
+   *                     "protected-static-static-initialization",
+   *                     "protected-instance-static-initialization",
+   *                     "protected-abstract-static-initialization",
+   *                     "private-static-static-initialization",
+   *                     "private-instance-static-initialization",
+   *                     "private-abstract-static-initialization"
    *                   ]
    *                 },
    *                 {
@@ -3537,7 +3693,20 @@ namespace MemberOrdering {
    *                       "private-decorated-set",
    *                       "private-static-set",
    *                       "private-instance-set",
-   *                       "private-abstract-set"
+   *                       "private-abstract-set",
+   *                       "static-initialization",
+   *                       "static-static-initialization",
+   *                       "public-static-static-initialization",
+   *                       "instance-static-initialization",
+   *                       "public-instance-static-initialization",
+   *                       "abstract-static-initialization",
+   *                       "public-abstract-static-initialization",
+   *                       "protected-static-static-initialization",
+   *                       "protected-instance-static-initialization",
+   *                       "protected-abstract-static-initialization",
+   *                       "private-static-static-initialization",
+   *                       "private-instance-static-initialization",
+   *                       "private-abstract-static-initialization"
    *                     ]
    *                   }
    *                 }
@@ -3655,7 +3824,20 @@ namespace MemberOrdering {
    *                             "private-decorated-set",
    *                             "private-static-set",
    *                             "private-instance-set",
-   *                             "private-abstract-set"
+   *                             "private-abstract-set",
+   *                             "static-initialization",
+   *                             "static-static-initialization",
+   *                             "public-static-static-initialization",
+   *                             "instance-static-initialization",
+   *                             "public-instance-static-initialization",
+   *                             "abstract-static-initialization",
+   *                             "public-abstract-static-initialization",
+   *                             "protected-static-static-initialization",
+   *                             "protected-instance-static-initialization",
+   *                             "protected-abstract-static-initialization",
+   *                             "private-static-static-initialization",
+   *                             "private-instance-static-initialization",
+   *                             "private-abstract-static-initialization"
    *                           ]
    *                         },
    *                         {
@@ -3762,7 +3944,20 @@ namespace MemberOrdering {
    *                               "private-decorated-set",
    *                               "private-static-set",
    *                               "private-instance-set",
-   *                               "private-abstract-set"
+   *                               "private-abstract-set",
+   *                               "static-initialization",
+   *                               "static-static-initialization",
+   *                               "public-static-static-initialization",
+   *                               "instance-static-initialization",
+   *                               "public-instance-static-initialization",
+   *                               "abstract-static-initialization",
+   *                               "public-abstract-static-initialization",
+   *                               "protected-static-static-initialization",
+   *                               "protected-instance-static-initialization",
+   *                               "protected-abstract-static-initialization",
+   *                               "private-static-static-initialization",
+   *                               "private-instance-static-initialization",
+   *                               "private-abstract-static-initialization"
    *                             ]
    *                           }
    *                         }
@@ -3904,7 +4099,20 @@ namespace MemberOrdering {
    *                     "private-decorated-set",
    *                     "private-static-set",
    *                     "private-instance-set",
-   *                     "private-abstract-set"
+   *                     "private-abstract-set",
+   *                     "static-initialization",
+   *                     "static-static-initialization",
+   *                     "public-static-static-initialization",
+   *                     "instance-static-initialization",
+   *                     "public-instance-static-initialization",
+   *                     "abstract-static-initialization",
+   *                     "public-abstract-static-initialization",
+   *                     "protected-static-static-initialization",
+   *                     "protected-instance-static-initialization",
+   *                     "protected-abstract-static-initialization",
+   *                     "private-static-static-initialization",
+   *                     "private-instance-static-initialization",
+   *                     "private-abstract-static-initialization"
    *                   ]
    *                 },
    *                 {
@@ -4011,7 +4219,20 @@ namespace MemberOrdering {
    *                       "private-decorated-set",
    *                       "private-static-set",
    *                       "private-instance-set",
-   *                       "private-abstract-set"
+   *                       "private-abstract-set",
+   *                       "static-initialization",
+   *                       "static-static-initialization",
+   *                       "public-static-static-initialization",
+   *                       "instance-static-initialization",
+   *                       "public-instance-static-initialization",
+   *                       "abstract-static-initialization",
+   *                       "public-abstract-static-initialization",
+   *                       "protected-static-static-initialization",
+   *                       "protected-instance-static-initialization",
+   *                       "protected-abstract-static-initialization",
+   *                       "private-static-static-initialization",
+   *                       "private-instance-static-initialization",
+   *                       "private-abstract-static-initialization"
    *                     ]
    *                   }
    *                 }
@@ -4129,7 +4350,20 @@ namespace MemberOrdering {
    *                             "private-decorated-set",
    *                             "private-static-set",
    *                             "private-instance-set",
-   *                             "private-abstract-set"
+   *                             "private-abstract-set",
+   *                             "static-initialization",
+   *                             "static-static-initialization",
+   *                             "public-static-static-initialization",
+   *                             "instance-static-initialization",
+   *                             "public-instance-static-initialization",
+   *                             "abstract-static-initialization",
+   *                             "public-abstract-static-initialization",
+   *                             "protected-static-static-initialization",
+   *                             "protected-instance-static-initialization",
+   *                             "protected-abstract-static-initialization",
+   *                             "private-static-static-initialization",
+   *                             "private-instance-static-initialization",
+   *                             "private-abstract-static-initialization"
    *                           ]
    *                         },
    *                         {
@@ -4236,7 +4470,20 @@ namespace MemberOrdering {
    *                               "private-decorated-set",
    *                               "private-static-set",
    *                               "private-instance-set",
-   *                               "private-abstract-set"
+   *                               "private-abstract-set",
+   *                               "static-initialization",
+   *                               "static-static-initialization",
+   *                               "public-static-static-initialization",
+   *                               "instance-static-initialization",
+   *                               "public-instance-static-initialization",
+   *                               "abstract-static-initialization",
+   *                               "public-abstract-static-initialization",
+   *                               "protected-static-static-initialization",
+   *                               "protected-instance-static-initialization",
+   *                               "protected-abstract-static-initialization",
+   *                               "private-static-static-initialization",
+   *                               "private-instance-static-initialization",
+   *                               "private-abstract-static-initialization"
    *                             ]
    *                           }
    *                         }
@@ -4440,6 +4687,7 @@ namespace MemberOrdering {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly default?:
@@ -4547,6 +4795,19 @@ namespace MemberOrdering {
               | 'private-static-set'
               | 'private-instance-set'
               | 'private-abstract-set'
+              | 'static-initialization'
+              | 'static-static-initialization'
+              | 'public-static-static-initialization'
+              | 'instance-static-initialization'
+              | 'public-instance-static-initialization'
+              | 'abstract-static-initialization'
+              | 'public-abstract-static-initialization'
+              | 'protected-static-static-initialization'
+              | 'protected-instance-static-initialization'
+              | 'protected-abstract-static-initialization'
+              | 'private-static-static-initialization'
+              | 'private-instance-static-initialization'
+              | 'private-abstract-static-initialization'
             )
           | readonly (
               | 'signature'
@@ -4650,6 +4911,19 @@ namespace MemberOrdering {
               | 'private-static-set'
               | 'private-instance-set'
               | 'private-abstract-set'
+              | 'static-initialization'
+              | 'static-static-initialization'
+              | 'public-static-static-initialization'
+              | 'instance-static-initialization'
+              | 'public-instance-static-initialization'
+              | 'abstract-static-initialization'
+              | 'public-abstract-static-initialization'
+              | 'protected-static-static-initialization'
+              | 'protected-instance-static-initialization'
+              | 'protected-abstract-static-initialization'
+              | 'private-static-static-initialization'
+              | 'private-instance-static-initialization'
+              | 'private-abstract-static-initialization'
             )[]
         )[]
       | {
@@ -4757,6 +5031,19 @@ namespace MemberOrdering {
                     | 'private-static-set'
                     | 'private-instance-set'
                     | 'private-abstract-set'
+                    | 'static-initialization'
+                    | 'static-static-initialization'
+                    | 'public-static-static-initialization'
+                    | 'instance-static-initialization'
+                    | 'public-instance-static-initialization'
+                    | 'abstract-static-initialization'
+                    | 'public-abstract-static-initialization'
+                    | 'protected-static-static-initialization'
+                    | 'protected-instance-static-initialization'
+                    | 'protected-abstract-static-initialization'
+                    | 'private-static-static-initialization'
+                    | 'private-instance-static-initialization'
+                    | 'private-abstract-static-initialization'
                   )
                 | readonly (
                     | 'signature'
@@ -4860,6 +5147,19 @@ namespace MemberOrdering {
                     | 'private-static-set'
                     | 'private-instance-set'
                     | 'private-abstract-set'
+                    | 'static-initialization'
+                    | 'static-static-initialization'
+                    | 'public-static-static-initialization'
+                    | 'instance-static-initialization'
+                    | 'public-instance-static-initialization'
+                    | 'abstract-static-initialization'
+                    | 'public-abstract-static-initialization'
+                    | 'protected-static-static-initialization'
+                    | 'protected-instance-static-initialization'
+                    | 'protected-abstract-static-initialization'
+                    | 'private-static-static-initialization'
+                    | 'private-instance-static-initialization'
+                    | 'private-abstract-static-initialization'
                   )[]
               )[]
             | 'never';
@@ -4973,6 +5273,19 @@ namespace MemberOrdering {
               | 'private-static-set'
               | 'private-instance-set'
               | 'private-abstract-set'
+              | 'static-initialization'
+              | 'static-static-initialization'
+              | 'public-static-static-initialization'
+              | 'instance-static-initialization'
+              | 'public-instance-static-initialization'
+              | 'abstract-static-initialization'
+              | 'public-abstract-static-initialization'
+              | 'protected-static-static-initialization'
+              | 'protected-instance-static-initialization'
+              | 'protected-abstract-static-initialization'
+              | 'private-static-static-initialization'
+              | 'private-instance-static-initialization'
+              | 'private-abstract-static-initialization'
             )
           | readonly (
               | 'signature'
@@ -5076,6 +5389,19 @@ namespace MemberOrdering {
               | 'private-static-set'
               | 'private-instance-set'
               | 'private-abstract-set'
+              | 'static-initialization'
+              | 'static-static-initialization'
+              | 'public-static-static-initialization'
+              | 'instance-static-initialization'
+              | 'public-instance-static-initialization'
+              | 'abstract-static-initialization'
+              | 'public-abstract-static-initialization'
+              | 'protected-static-static-initialization'
+              | 'protected-instance-static-initialization'
+              | 'protected-abstract-static-initialization'
+              | 'private-static-static-initialization'
+              | 'private-instance-static-initialization'
+              | 'private-abstract-static-initialization'
             )[]
         )[]
       | {
@@ -5183,6 +5509,19 @@ namespace MemberOrdering {
                     | 'private-static-set'
                     | 'private-instance-set'
                     | 'private-abstract-set'
+                    | 'static-initialization'
+                    | 'static-static-initialization'
+                    | 'public-static-static-initialization'
+                    | 'instance-static-initialization'
+                    | 'public-instance-static-initialization'
+                    | 'abstract-static-initialization'
+                    | 'public-abstract-static-initialization'
+                    | 'protected-static-static-initialization'
+                    | 'protected-instance-static-initialization'
+                    | 'protected-abstract-static-initialization'
+                    | 'private-static-static-initialization'
+                    | 'private-instance-static-initialization'
+                    | 'private-abstract-static-initialization'
                   )
                 | readonly (
                     | 'signature'
@@ -5286,6 +5625,19 @@ namespace MemberOrdering {
                     | 'private-static-set'
                     | 'private-instance-set'
                     | 'private-abstract-set'
+                    | 'static-initialization'
+                    | 'static-static-initialization'
+                    | 'public-static-static-initialization'
+                    | 'instance-static-initialization'
+                    | 'public-instance-static-initialization'
+                    | 'abstract-static-initialization'
+                    | 'public-abstract-static-initialization'
+                    | 'protected-static-static-initialization'
+                    | 'protected-instance-static-initialization'
+                    | 'protected-abstract-static-initialization'
+                    | 'private-static-static-initialization'
+                    | 'private-instance-static-initialization'
+                    | 'private-abstract-static-initialization'
                   )[]
               )[]
             | 'never';
@@ -5399,6 +5751,19 @@ namespace MemberOrdering {
               | 'private-static-set'
               | 'private-instance-set'
               | 'private-abstract-set'
+              | 'static-initialization'
+              | 'static-static-initialization'
+              | 'public-static-static-initialization'
+              | 'instance-static-initialization'
+              | 'public-instance-static-initialization'
+              | 'abstract-static-initialization'
+              | 'public-abstract-static-initialization'
+              | 'protected-static-static-initialization'
+              | 'protected-instance-static-initialization'
+              | 'protected-abstract-static-initialization'
+              | 'private-static-static-initialization'
+              | 'private-instance-static-initialization'
+              | 'private-abstract-static-initialization'
             )
           | readonly (
               | 'signature'
@@ -5502,6 +5867,19 @@ namespace MemberOrdering {
               | 'private-static-set'
               | 'private-instance-set'
               | 'private-abstract-set'
+              | 'static-initialization'
+              | 'static-static-initialization'
+              | 'public-static-static-initialization'
+              | 'instance-static-initialization'
+              | 'public-instance-static-initialization'
+              | 'abstract-static-initialization'
+              | 'public-abstract-static-initialization'
+              | 'protected-static-static-initialization'
+              | 'protected-instance-static-initialization'
+              | 'protected-abstract-static-initialization'
+              | 'private-static-static-initialization'
+              | 'private-instance-static-initialization'
+              | 'private-abstract-static-initialization'
             )[]
         )[]
       | {
@@ -5609,6 +5987,19 @@ namespace MemberOrdering {
                     | 'private-static-set'
                     | 'private-instance-set'
                     | 'private-abstract-set'
+                    | 'static-initialization'
+                    | 'static-static-initialization'
+                    | 'public-static-static-initialization'
+                    | 'instance-static-initialization'
+                    | 'public-instance-static-initialization'
+                    | 'abstract-static-initialization'
+                    | 'public-abstract-static-initialization'
+                    | 'protected-static-static-initialization'
+                    | 'protected-instance-static-initialization'
+                    | 'protected-abstract-static-initialization'
+                    | 'private-static-static-initialization'
+                    | 'private-instance-static-initialization'
+                    | 'private-abstract-static-initialization'
                   )
                 | readonly (
                     | 'signature'
@@ -5712,6 +6103,19 @@ namespace MemberOrdering {
                     | 'private-static-set'
                     | 'private-instance-set'
                     | 'private-abstract-set'
+                    | 'static-initialization'
+                    | 'static-static-initialization'
+                    | 'public-static-static-initialization'
+                    | 'instance-static-initialization'
+                    | 'public-instance-static-initialization'
+                    | 'abstract-static-initialization'
+                    | 'public-abstract-static-initialization'
+                    | 'protected-static-static-initialization'
+                    | 'protected-instance-static-initialization'
+                    | 'protected-abstract-static-initialization'
+                    | 'private-static-static-initialization'
+                    | 'private-instance-static-initialization'
+                    | 'private-abstract-static-initialization'
                   )[]
               )[]
             | 'never';
@@ -5775,6 +6179,9 @@ namespace MemberOrdering {
  */
 namespace MethodSignatureStyle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -5783,6 +6190,7 @@ namespace MethodSignatureStyle {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'property' | 'method';
 
@@ -5803,6 +6211,9 @@ namespace MethodSignatureStyle {
  */
 namespace NamingConvention {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "type": "array",
    *   "items": {
@@ -9088,6 +9499,7 @@ namespace NamingConvention {
    *   },
    *   "additionalItems": false
    * }
+   * ```
    */
   export type Options = readonly (
     | {
@@ -10328,6 +10740,9 @@ namespace NoArrayConstructor {
  */
 namespace NoBaseToString {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10342,6 +10757,7 @@ namespace NoBaseToString {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoredTypeNames?: readonly string[];
@@ -10381,6 +10797,9 @@ namespace NoConfusingNonNullAssertion {
  */
 namespace NoConfusingVoidExpression {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10395,6 +10814,7 @@ namespace NoConfusingVoidExpression {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreArrowShorthand?: boolean;
@@ -10426,7 +10846,7 @@ namespace NoDupeClassMembers {
  *  | key            | value   |
  *  | :------------- | :------ |
  *  | type           | problem |
- *  | hasSuggestions | true    |
+ *  | hasSuggestions | false   |
  *  | recommended    | strict  |
  */
 namespace NoDuplicateEnumValues {
@@ -10445,6 +10865,9 @@ namespace NoDuplicateEnumValues {
  */
 namespace NoDuplicateImports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10457,6 +10880,7 @@ namespace NoDuplicateImports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
@@ -10486,6 +10910,9 @@ namespace NoDynamicDelete {
  */
 namespace NoEmptyFunction {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10516,6 +10943,7 @@ namespace NoEmptyFunction {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allow?: readonly (
@@ -10551,10 +10979,12 @@ namespace NoEmptyFunction {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | error      |
- *  | suggestion     | true       |
  */
 namespace NoEmptyInterface {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10566,6 +10996,7 @@ namespace NoEmptyInterface {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowSingleExtends?: boolean;
@@ -10586,27 +11017,38 @@ namespace NoEmptyInterface {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | warn       |
- *  | suggestion     | true       |
  */
 namespace NoExplicitAny {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "fixToUnknown": {
+   *         "description": "Whether to enable auto-fixing in which the `any` type is converted to the `unknown` type.",
    *         "type": "boolean"
    *       },
    *       "ignoreRestArgs": {
+   *         "description": "Whether to ignore rest parameter arrays.",
    *         "type": "boolean"
    *       }
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to enable auto-fixing in which the `any` type is converted to the `unknown` type.
+     */
     readonly fixToUnknown?: boolean;
+    /**
+     * Whether to ignore rest parameter arrays.
+     */
     readonly ignoreRestArgs?: boolean;
   };
 
@@ -10641,6 +11083,9 @@ namespace NoExtraNonNullAssertion {
  */
 namespace NoExtraParens {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -10704,6 +11149,7 @@ namespace NoExtraParens {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -10754,31 +11200,51 @@ namespace NoExtraSemi {
  */
 namespace NoExtraneousClass {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowConstructorOnly": {
+   *         "description": "Whether to allow extraneous classes that contain only a constructor.",
    *         "type": "boolean"
    *       },
    *       "allowEmpty": {
+   *         "description": "Whether to allow extraneous classes that have no body (i.e. are empty).",
    *         "type": "boolean"
    *       },
    *       "allowStaticOnly": {
+   *         "description": "Whether to allow extraneous classes that only contain static members.",
    *         "type": "boolean"
    *       },
    *       "allowWithDecorator": {
+   *         "description": "Whether to allow extraneous classes that include a decorator.",
    *         "type": "boolean"
    *       }
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to allow extraneous classes that contain only a constructor.
+     */
     readonly allowConstructorOnly?: boolean;
+    /**
+     * Whether to allow extraneous classes that have no body (i.e. are empty).
+     */
     readonly allowEmpty?: boolean;
+    /**
+     * Whether to allow extraneous classes that only contain static members.
+     */
     readonly allowStaticOnly?: boolean;
+    /**
+     * Whether to allow extraneous classes that include a decorator.
+     */
     readonly allowWithDecorator?: boolean;
   };
 
@@ -10797,27 +11263,38 @@ namespace NoExtraneousClass {
  *  | hasSuggestions       | true    |
  *  | recommended          | error   |
  *  | requiresTypeChecking | true    |
- *  | suggestion           | true    |
  */
 namespace NoFloatingPromises {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "ignoreVoid": {
+   *         "description": "Whether to ignore `void` expressions.",
    *         "type": "boolean"
    *       },
    *       "ignoreIIFE": {
+   *         "description": "Whether to ignore async IIFEs (Immediately Invocated Function Expressions).",
    *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to ignore `void` expressions.
+     */
     readonly ignoreVoid?: boolean;
+    /**
+     * Whether to ignore async IIFEs (Immediately Invocated Function Expressions).
+     */
     readonly ignoreIIFE?: boolean;
   };
 
@@ -10851,21 +11328,25 @@ namespace NoForInArray {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
- *  | suggestion     | true       |
  */
 namespace NoImplicitAnyCatch {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowExplicitAny": {
+   *         "description": "Whether to disallow specifying `: any` as the error type as well. See also `no-explicit-any`.",
    *         "type": "boolean"
    *       }
    *     }
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
@@ -10896,6 +11377,9 @@ namespace NoImpliedEval {
  */
 namespace NoInferrableTypes {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10910,6 +11394,7 @@ namespace NoInferrableTypes {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreParameters?: boolean;
@@ -10932,6 +11417,9 @@ namespace NoInferrableTypes {
  */
 namespace NoInvalidThis {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10944,6 +11432,7 @@ namespace NoInvalidThis {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly capIsConstructor?: boolean;
@@ -10965,6 +11454,9 @@ namespace NoInvalidThis {
  */
 namespace NoInvalidVoidType {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -10990,6 +11482,7 @@ namespace NoInvalidVoidType {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowInGenericTypeArguments?: boolean | readonly string[];
@@ -11038,6 +11531,9 @@ namespace NoLossOfPrecision {
  */
 namespace NoMagicNumbers {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11089,6 +11585,7 @@ namespace NoMagicNumbers {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly detectObjects?: boolean;
@@ -11118,10 +11615,12 @@ namespace NoMagicNumbers {
  *  | hasSuggestions       | true       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
- *  | suggestion           | true       |
  */
 namespace NoMeaninglessVoidOperator {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11134,6 +11633,7 @@ namespace NoMeaninglessVoidOperator {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly checkNever?: boolean;
@@ -11169,6 +11669,9 @@ namespace NoMisusedNew {
  */
 namespace NoMisusedPromises {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11210,6 +11713,7 @@ namespace NoMisusedPromises {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly checksConditionals?: boolean;
@@ -11242,23 +11746,35 @@ namespace NoMisusedPromises {
  */
 namespace NoNamespace {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "allowDeclarations": {
+   *         "description": "Whether to allow `declare` with custom TypeScript namespaces.",
    *         "type": "boolean"
    *       },
    *       "allowDefinitionFiles": {
+   *         "description": "Whether to allow `declare` with custom TypeScript namespaces inside definition files.",
    *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to allow `declare` with custom TypeScript namespaces.
+     */
     readonly allowDeclarations?: boolean;
+    /**
+     * Whether to allow `declare` with custom TypeScript namespaces inside definition files.
+     */
     readonly allowDefinitionFiles?: boolean;
   };
 
@@ -11290,7 +11806,6 @@ namespace NoNonNullAssertedNullishCoalescing {
  *  | type           | problem |
  *  | hasSuggestions | true    |
  *  | recommended    | error   |
- *  | suggestion     | true    |
  */
 namespace NoNonNullAssertedOptionalChain {
   export type RuleEntry = Linter.RuleLevel;
@@ -11305,7 +11820,6 @@ namespace NoNonNullAssertedOptionalChain {
  *  | type           | problem |
  *  | hasSuggestions | true    |
  *  | recommended    | warn    |
- *  | suggestion     | true    |
  */
 namespace NoNonNullAssertion {
   export type RuleEntry = Linter.RuleLevel;
@@ -11323,6 +11837,9 @@ namespace NoNonNullAssertion {
  */
 namespace NoParameterProperties {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11346,6 +11863,7 @@ namespace NoParameterProperties {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
@@ -11361,6 +11879,9 @@ namespace NoParameterProperties {
  */
 namespace NoRedeclare {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11375,6 +11896,7 @@ namespace NoRedeclare {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly builtinGlobals?: boolean;
@@ -11424,6 +11946,9 @@ namespace NoRequireImports {
  */
 namespace NoRestrictedImports {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -11479,6 +12004,7 @@ namespace NoRestrictedImports {
    *     }
    *   ]
    * }
+   * ```
    */
   // modified
   export type Options =
@@ -11527,6 +12053,9 @@ namespace NoRestrictedImports {
  */
 namespace NoShadow {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11560,6 +12089,7 @@ namespace NoShadow {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly builtinGlobals?: boolean;
@@ -11586,15 +12116,20 @@ namespace NoShadow {
  */
 namespace NoThisAlias {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowDestructuring": {
+   *         "description": "Whether to ignore destructurings, such as `const { props, state } = this`.",
    *         "type": "boolean"
    *       },
    *       "allowedNames": {
+   *         "description": "Names to ignore, such as [\"self\"] for `const self = this;`.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -11603,9 +12138,16 @@ namespace NoThisAlias {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to ignore destructurings, such as `const { props, state } = this`.
+     */
     readonly allowDestructuring?: boolean;
+    /**
+     * Names to ignore, such as ["self"] for `const self = this;`.
+     */
     readonly allowedNames?: readonly string[];
   };
 
@@ -11626,6 +12168,9 @@ namespace NoThisAlias {
  */
 namespace NoThrowLiteral {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -11640,6 +12185,7 @@ namespace NoThrowLiteral {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowThrowingAny?: boolean;
@@ -11662,11 +12208,15 @@ namespace NoThrowLiteral {
  */
 namespace NoTypeAlias {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "allowAliases": {
+   *         "description": "Whether to allow direct one-to-one type aliases.",
    *         "enum": [
    *           "always",
    *           "never",
@@ -11676,24 +12226,28 @@ namespace NoTypeAlias {
    *         ]
    *       },
    *       "allowCallbacks": {
+   *         "description": "Whether to allow type aliases for callbacks.",
    *         "enum": [
    *           "always",
    *           "never"
    *         ]
    *       },
    *       "allowConditionalTypes": {
+   *         "description": "Whether to allow type aliases for conditional types.",
    *         "enum": [
    *           "always",
    *           "never"
    *         ]
    *       },
    *       "allowConstructors": {
+   *         "description": "Whether to allow type aliases with constructors.",
    *         "enum": [
    *           "always",
    *           "never"
    *         ]
    *       },
    *       "allowLiterals": {
+   *         "description": "Whether to allow type aliases with object literal types.",
    *         "enum": [
    *           "always",
    *           "never",
@@ -11703,6 +12257,7 @@ namespace NoTypeAlias {
    *         ]
    *       },
    *       "allowMappedTypes": {
+   *         "description": "Whether to allow type aliases with mapped types.",
    *         "enum": [
    *           "always",
    *           "never",
@@ -11712,6 +12267,7 @@ namespace NoTypeAlias {
    *         ]
    *       },
    *       "allowTupleTypes": {
+   *         "description": "Whether to allow type aliases with tuple types.",
    *         "enum": [
    *           "always",
    *           "never",
@@ -11721,6 +12277,7 @@ namespace NoTypeAlias {
    *         ]
    *       },
    *       "allowGenerics": {
+   *         "description": "Whether to allow type aliases with generic types.",
    *         "enum": [
    *           "always",
    *           "never"
@@ -11730,35 +12287,60 @@ namespace NoTypeAlias {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to allow direct one-to-one type aliases.
+     */
     readonly allowAliases?:
       | 'always'
       | 'never'
       | 'in-unions'
       | 'in-intersections'
       | 'in-unions-and-intersections';
+    /**
+     * Whether to allow type aliases for callbacks.
+     */
     readonly allowCallbacks?: 'always' | 'never';
+    /**
+     * Whether to allow type aliases for conditional types.
+     */
     readonly allowConditionalTypes?: 'always' | 'never';
+    /**
+     * Whether to allow type aliases with constructors.
+     */
     readonly allowConstructors?: 'always' | 'never';
+    /**
+     * Whether to allow type aliases with object literal types.
+     */
     readonly allowLiterals?:
       | 'always'
       | 'never'
       | 'in-unions'
       | 'in-intersections'
       | 'in-unions-and-intersections';
+    /**
+     * Whether to allow type aliases with mapped types.
+     */
     readonly allowMappedTypes?:
       | 'always'
       | 'never'
       | 'in-unions'
       | 'in-intersections'
       | 'in-unions-and-intersections';
+    /**
+     * Whether to allow type aliases with tuple types.
+     */
     readonly allowTupleTypes?:
       | 'always'
       | 'never'
       | 'in-unions'
       | 'in-intersections'
       | 'in-unions-and-intersections';
+    /**
+     * Whether to allow type aliases with generic types.
+     */
     readonly allowGenerics?: 'always' | 'never';
   };
 
@@ -11780,23 +12362,35 @@ namespace NoTypeAlias {
  */
 namespace NoUnnecessaryBooleanLiteralCompare {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "allowComparingNullableBooleansToTrue": {
+   *         "description": "Whether to allow comparisons between nullable boolean variables and `true`.",
    *         "type": "boolean"
    *       },
    *       "allowComparingNullableBooleansToFalse": {
+   *         "description": "Whether to allow comparisons between nullable boolean variables and `false`.",
    *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to allow comparisons between nullable boolean variables and `true`.
+     */
     readonly allowComparingNullableBooleansToTrue?: boolean;
+    /**
+     * Whether to allow comparisons between nullable boolean variables and `false`.
+     */
     readonly allowComparingNullableBooleansToFalse?: boolean;
   };
 
@@ -11818,23 +12412,35 @@ namespace NoUnnecessaryBooleanLiteralCompare {
  */
 namespace NoUnnecessaryCondition {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "allowConstantLoopConditions": {
+   *         "description": "Whether to ignore constant loop conditions, such as `while (true)`.",
    *         "type": "boolean"
    *       },
    *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
+   *         "description": "Whether to not error when running with a tsconfig that has strictNullChecks turned.",
    *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to ignore constant loop conditions, such as `while (true)`.
+     */
     readonly allowConstantLoopConditions?: boolean;
+    /**
+     * Whether to not error when running with a tsconfig that has strictNullChecks turned.
+     */
     readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
   };
 
@@ -11886,11 +12492,15 @@ namespace NoUnnecessaryTypeArguments {
  */
 namespace NoUnnecessaryTypeAssertion {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "typesToIgnore": {
+   *         "description": "A list of type names to ignore.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -11899,8 +12509,12 @@ namespace NoUnnecessaryTypeAssertion {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * A list of type names to ignore.
+     */
     readonly typesToIgnore?: readonly string[];
     readonly [k: string]: unknown;
   };
@@ -11919,7 +12533,6 @@ namespace NoUnnecessaryTypeAssertion {
  *  | type           | suggestion |
  *  | hasSuggestions | true       |
  *  | recommended    | error      |
- *  | suggestion     | true       |
  */
 namespace NoUnnecessaryTypeConstraint {
   export type RuleEntry = Linter.RuleLevel;
@@ -12006,6 +12619,9 @@ namespace NoUnsafeReturn {
  */
 namespace NoUnusedExpressions {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -12030,6 +12646,7 @@ namespace NoUnusedExpressions {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowShortCircuit?: boolean;
@@ -12054,6 +12671,9 @@ namespace NoUnusedExpressions {
  */
 namespace NoUnusedVars {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -12106,6 +12726,7 @@ namespace NoUnusedVars {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('all' | 'local')
@@ -12136,6 +12757,9 @@ namespace NoUnusedVars {
  */
 namespace NoUseBeforeDefine {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -12164,6 +12788,9 @@ namespace NoUseBeforeDefine {
    *           },
    *           "ignoreTypeReferences": {
    *             "type": "boolean"
+   *           },
+   *           "allowNamedExports": {
+   *             "type": "boolean"
    *           }
    *         },
    *         "additionalProperties": false
@@ -12171,6 +12798,7 @@ namespace NoUseBeforeDefine {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | 'nofunc'
@@ -12181,6 +12809,7 @@ namespace NoUseBeforeDefine {
         readonly variables?: boolean;
         readonly typedefs?: boolean;
         readonly ignoreTypeReferences?: boolean;
+        readonly allowNamedExports?: boolean;
       };
 
   export type RuleEntry =
@@ -12209,9 +12838,8 @@ namespace NoUselessConstructor {
  *  | :------------- | :--------- |
  *  | type           | suggestion |
  *  | fixable        | code       |
- *  | hasSuggestions | true       |
+ *  | hasSuggestions | false      |
  *  | recommended    | false      |
- *  | suggestion     | true       |
  */
 namespace NoUselessEmptyExport {
   export type RuleEntry = Linter.RuleLevel;
@@ -12240,7 +12868,6 @@ namespace NoVarRequires {
  *  | fixable              | code       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
- *  | suggestion           | true       |
  */
 namespace NonNullableTypeAssertionStyle {
   export type RuleEntry = Linter.RuleLevel;
@@ -12258,6 +12885,9 @@ namespace NonNullableTypeAssertionStyle {
  */
 namespace ObjectCurlySpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -12278,6 +12908,7 @@ namespace ObjectCurlySpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'always' | 'never';
 
@@ -12300,13 +12931,16 @@ namespace ObjectCurlySpacing {
  *  | :------------- | :--------- |
  *  | type           | layout     |
  *  | fixable        | whitespace |
- *  | hasSuggestions | true       |
+ *  | hasSuggestions | false      |
  *  | recommended    | false      |
  */
 namespace PaddingLineBetweenStatements {
   /**
+   * ### schema
+   *
+   * ```json
    * {
-   *   "definitions": {
+   *   "$defs": {
    *     "paddingType": {
    *       "enum": [
    *         "any",
@@ -12418,13 +13052,13 @@ namespace PaddingLineBetweenStatements {
    *     "type": "object",
    *     "properties": {
    *       "blankLine": {
-   *         "$ref": "#/definitions/paddingType"
+   *         "$ref": "#/$defs/paddingType"
    *       },
    *       "prev": {
-   *         "$ref": "#/definitions/statementType"
+   *         "$ref": "#/$defs/statementType"
    *       },
    *       "next": {
-   *         "$ref": "#/definitions/statementType"
+   *         "$ref": "#/$defs/statementType"
    *       }
    *     },
    *     "additionalProperties": false,
@@ -12436,6 +13070,7 @@ namespace PaddingLineBetweenStatements {
    *   },
    *   "additionalItems": false
    * }
+   * ```
    */
   export type PaddingType = 'any' | 'never' | 'always';
   export type StatementType =
@@ -12589,59 +13224,62 @@ namespace PaddingLineBetweenStatements {
  */
 namespace ParameterProperties {
   /**
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "allow": {
-   *         "type": "array",
-   *         "items": {
-   *           "enum": [
-   *             "readonly",
-   *             "private",
-   *             "protected",
-   *             "public",
-   *             "private readonly",
-   *             "protected readonly",
-   *             "public readonly"
-   *           ]
+   * ### schema
+   *
+   * ```json
+   * {
+   *   "$defs": {
+   *     "modifier": {
+   *       "enum": [
+   *         "readonly",
+   *         "private",
+   *         "protected",
+   *         "public",
+   *         "private readonly",
+   *         "protected readonly",
+   *         "public readonly"
+   *       ]
+   *     }
+   *   },
+   *   "prefixItems": [
+   *     {
+   *       "type": "object",
+   *       "properties": {
+   *         "allow": {
+   *           "type": "array",
+   *           "items": {
+   *             "$ref": "#/$defs/modifier"
+   *           },
+   *           "minItems": 1
    *         },
-   *         "minItems": 1
+   *         "prefer": {
+   *           "enum": [
+   *             "class-property",
+   *             "parameter-property"
+   *           ]
+   *         }
    *       },
-   *       "prefer": {
-   *         "enum": [
-   *           "class-property",
-   *           "parameter-property"
-   *         ]
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
+   *       "additionalProperties": false
+   *     }
+   *   ],
+   *   "type": "array"
+   * }
+   * ```
    */
+  // modified
   export type Options = {
-    readonly allow?: readonly [
-      (
-        | 'readonly'
-        | 'private'
-        | 'protected'
-        | 'public'
-        | 'private readonly'
-        | 'protected readonly'
-        | 'public readonly'
-      ),
-      ...(readonly (
-        | 'readonly'
-        | 'private'
-        | 'protected'
-        | 'public'
-        | 'private readonly'
-        | 'protected readonly'
-        | 'public readonly'
-      )[])
-    ];
+    readonly allow?: readonly [Modifier, ...Modifier[]];
     readonly prefer?: 'class-property' | 'parameter-property';
   };
+
+  type Modifier =
+    | 'readonly'
+    | 'private'
+    | 'protected'
+    | 'public'
+    | 'private readonly'
+    | 'protected readonly'
+    | 'public readonly';
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -12658,7 +13296,6 @@ namespace ParameterProperties {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  | recommended    | error      |
- *  | suggestion     | true       |
  */
 namespace PreferAsConst {
   export type RuleEntry = Linter.RuleLevel;
@@ -12673,7 +13310,6 @@ namespace PreferAsConst {
  *  | type           | suggestion |
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
- *  | suggestion     | true       |
  */
 namespace PreferEnumInitializers {
   export type RuleEntry = Linter.RuleLevel;
@@ -12733,6 +13369,9 @@ namespace PreferIncludes {
  */
 namespace PreferLiteralEnumMember {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -12744,6 +13383,7 @@ namespace PreferLiteralEnumMember {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowBitwiseExpressions?: boolean;
@@ -12778,15 +13418,20 @@ namespace PreferNamespaceKeyword {
  *  | hasSuggestions       | true       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
- *  | suggestion           | true       |
  */
 namespace PreferNullishCoalescing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "ignoreConditionalTests": {
+   *         "type": "boolean"
+   *       },
+   *       "ignoreTernaryTests": {
    *         "type": "boolean"
    *       },
    *       "ignoreMixedLogicalExpressions": {
@@ -12799,9 +13444,11 @@ namespace PreferNullishCoalescing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreConditionalTests?: boolean;
+    readonly ignoreTernaryTests?: boolean;
     readonly ignoreMixedLogicalExpressions?: boolean;
     readonly forceSuggestionFixer?: boolean;
   };
@@ -12820,7 +13467,6 @@ namespace PreferNullishCoalescing {
  *  | type           | suggestion |
  *  | hasSuggestions | true       |
  *  | recommended    | strict     |
- *  | suggestion     | true       |
  */
 namespace PreferOptionalChain {
   export type RuleEntry = Linter.RuleLevel;
@@ -12839,6 +13485,9 @@ namespace PreferOptionalChain {
  */
 namespace PreferReadonly {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "allowAdditionalProperties": false,
@@ -12850,6 +13499,7 @@ namespace PreferReadonly {
    *     "type": "object"
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly onlyInlineLambdas?: boolean;
@@ -12873,6 +13523,9 @@ namespace PreferReadonly {
  */
 namespace PreferReadonlyParameterTypes {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -12890,6 +13543,7 @@ namespace PreferReadonlyParameterTypes {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly checkParameterProperties?: boolean;
@@ -12989,14 +13643,19 @@ namespace PreferTsExpectError {
  */
 namespace PromiseFunctionAsync {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "allowAny": {
+   *         "description": "Whether to consider `any` and `unknown` to be Promises.",
    *         "type": "boolean"
    *       },
    *       "allowedPromiseNames": {
+   *         "description": "Any extra names of classes or interfaces to be considered Promises.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -13018,9 +13677,16 @@ namespace PromiseFunctionAsync {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to consider `any` and `unknown` to be Promises.
+     */
     readonly allowAny?: boolean;
+    /**
+     * Any extra names of classes or interfaces to be considered Promises.
+     */
     readonly allowedPromiseNames?: readonly string[];
     readonly checkArrowFunctions?: boolean;
     readonly checkFunctionDeclarations?: boolean;
@@ -13045,6 +13711,9 @@ namespace PromiseFunctionAsync {
  */
 namespace Quotes {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -13075,6 +13744,7 @@ namespace Quotes {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options0 = 'single' | 'double' | 'backtick';
 
@@ -13103,18 +13773,26 @@ namespace Quotes {
  */
 namespace RequireArraySortCompare {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "ignoreStringArrays": {
+   *         "description": "Whether to ignore arrays in which all elements are strings.",
    *         "type": "boolean"
    *       }
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to ignore arrays in which all elements are strings.
+     */
     readonly ignoreStringArrays?: boolean;
     readonly [k: string]: unknown;
   };
@@ -13150,23 +13828,35 @@ namespace RequireAwait {
  */
 namespace RestrictPlusOperands {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
    *       "checkCompoundAssignments": {
+   *         "description": "Whether to check compound assignments such as `+=`.",
    *         "type": "boolean"
    *       },
    *       "allowAny": {
+   *         "description": "Whether to allow `any` typed values.",
    *         "type": "boolean"
    *       }
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to check compound assignments such as `+=`.
+     */
     readonly checkCompoundAssignments?: boolean;
+    /**
+     * Whether to allow `any` typed values.
+     */
     readonly allowAny?: boolean;
   };
 
@@ -13187,34 +13877,58 @@ namespace RestrictPlusOperands {
  */
 namespace RestrictTemplateExpressions {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "allowNumber": {
+   *         "description": "Whether to allow `number` typed values in template expressions.",
    *         "type": "boolean"
    *       },
    *       "allowBoolean": {
+   *         "description": "Whether to allow `boolean` typed values in template expressions.",
    *         "type": "boolean"
    *       },
    *       "allowAny": {
+   *         "description": "Whether to allow `any` typed values in template expressions.",
    *         "type": "boolean"
    *       },
    *       "allowNullish": {
+   *         "description": "Whether to allow `nullish` typed values in template expressions.",
    *         "type": "boolean"
    *       },
    *       "allowRegExp": {
+   *         "description": "Whether to allow `regexp` typed values in template expressions.",
    *         "type": "boolean"
    *       }
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to allow `number` typed values in template expressions.
+     */
     readonly allowNumber?: boolean;
+    /**
+     * Whether to allow `boolean` typed values in template expressions.
+     */
     readonly allowBoolean?: boolean;
+    /**
+     * Whether to allow `any` typed values in template expressions.
+     */
     readonly allowAny?: boolean;
+    /**
+     * Whether to allow `nullish` typed values in template expressions.
+     */
     readonly allowNullish?: boolean;
+    /**
+     * Whether to allow `regexp` typed values in template expressions.
+     */
     readonly allowRegExp?: boolean;
     readonly [k: string]: unknown;
   };
@@ -13238,6 +13952,9 @@ namespace RestrictTemplateExpressions {
  */
 namespace ReturnAwait {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "enum": [
@@ -13247,6 +13964,7 @@ namespace ReturnAwait {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'in-try-catch' | 'always' | 'never';
 
@@ -13267,6 +13985,9 @@ namespace ReturnAwait {
  */
 namespace Semi {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -13317,6 +14038,7 @@ namespace Semi {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -13357,17 +14079,23 @@ namespace Semi {
  */
 namespace SortTypeUnionIntersectionMembers {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "checkIntersections": {
+   *         "description": "Whether to check intersection types.",
    *         "type": "boolean"
    *       },
    *       "checkUnions": {
+   *         "description": "Whether to check union types.",
    *         "type": "boolean"
    *       },
    *       "groupOrder": {
+   *         "description": "Ordering of the groups.",
    *         "type": "array",
    *         "items": {
    *           "type": "string",
@@ -13390,10 +14118,20 @@ namespace SortTypeUnionIntersectionMembers {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to check intersection types.
+     */
     readonly checkIntersections?: boolean;
+    /**
+     * Whether to check union types.
+     */
     readonly checkUnions?: boolean;
+    /**
+     * Ordering of the groups.
+     */
     readonly groupOrder?: readonly (
       | 'conditional'
       | 'function'
@@ -13428,6 +14166,9 @@ namespace SortTypeUnionIntersectionMembers {
  */
 namespace SpaceBeforeBlocks {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -13467,6 +14208,7 @@ namespace SpaceBeforeBlocks {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('always' | 'never')
@@ -13493,6 +14235,9 @@ namespace SpaceBeforeBlocks {
  */
 namespace SpaceBeforeFunctionParen {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -13532,6 +14277,7 @@ namespace SpaceBeforeFunctionParen {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | ('always' | 'never')
@@ -13558,6 +14304,9 @@ namespace SpaceBeforeFunctionParen {
  */
 namespace SpaceInfixOps {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -13570,6 +14319,7 @@ namespace SpaceInfixOps {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly int32Hint?: boolean;
@@ -13594,6 +14344,9 @@ namespace SpaceInfixOps {
  */
 namespace StrictBooleanExpressions {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -13626,6 +14379,7 @@ namespace StrictBooleanExpressions {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowString?: boolean;
@@ -13653,7 +14407,6 @@ namespace StrictBooleanExpressions {
  *  | hasSuggestions       | true       |
  *  | recommended          | false      |
  *  | requiresTypeChecking | true       |
- *  | suggestion           | true       |
  */
 namespace SwitchExhaustivenessCheck {
   export type RuleEntry = Linter.RuleLevel;
@@ -13670,6 +14423,9 @@ namespace SwitchExhaustivenessCheck {
  */
 namespace TripleSlashReference {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -13697,6 +14453,7 @@ namespace TripleSlashReference {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly lib?: 'always' | 'never';
@@ -13721,6 +14478,9 @@ namespace TripleSlashReference {
  */
 namespace TypeAnnotationSpacing {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -13813,6 +14573,7 @@ namespace TypeAnnotationSpacing {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly before?: boolean;
@@ -13861,6 +14622,9 @@ namespace TypeAnnotationSpacing {
  */
 namespace Typedef {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -13892,6 +14656,7 @@ namespace Typedef {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly arrayDestructuring?: boolean;
@@ -13922,19 +14687,27 @@ namespace Typedef {
  */
 namespace UnboundMethod {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "ignoreStatic": {
+   *         "description": "Whether to skip checking whether `static` methods are correctly bound.",
    *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to skip checking whether `static` methods are correctly bound.
+     */
     readonly ignoreStatic?: boolean;
   };
 
@@ -13954,19 +14727,27 @@ namespace UnboundMethod {
  */
 namespace UnifiedSignatures {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreDifferentlyNamedParameters": {
+   *         "description": "Whether two parameters with different names at the same index should be considered different even if their types are the same.",
    *         "type": "boolean"
    *       }
    *     },
    *     "type": "object"
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether two parameters with different names at the same index should be considered different even if their types are the same.
+     */
     readonly ignoreDifferentlyNamedParameters?: boolean;
   };
 
@@ -14012,7 +14793,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.RuleEntry;
   readonly '@typescript-eslint/no-dupe-class-members': NoDupeClassMembers.RuleEntry;
   readonly '@typescript-eslint/no-duplicate-enum-values': NoDuplicateEnumValues.RuleEntry;
-  readonly '@typescript-eslint/no-duplicate-imports': NoDuplicateImports.RuleEntry;
   readonly '@typescript-eslint/no-dynamic-delete': NoDynamicDelete.RuleEntry;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.RuleEntry;
   readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
@@ -14023,7 +14803,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-extraneous-class': NoExtraneousClass.RuleEntry;
   readonly '@typescript-eslint/no-floating-promises': NoFloatingPromises.RuleEntry;
   readonly '@typescript-eslint/no-for-in-array': NoForInArray.RuleEntry;
-  readonly '@typescript-eslint/no-implicit-any-catch': NoImplicitAnyCatch.RuleEntry;
   readonly '@typescript-eslint/no-implied-eval': NoImpliedEval.RuleEntry;
   readonly '@typescript-eslint/no-inferrable-types': NoInferrableTypes.RuleEntry;
   readonly '@typescript-eslint/no-invalid-this': NoInvalidThis.RuleEntry;
@@ -14038,7 +14817,6 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-non-null-asserted-nullish-coalescing': NoNonNullAssertedNullishCoalescing.RuleEntry;
   readonly '@typescript-eslint/no-non-null-asserted-optional-chain': NoNonNullAssertedOptionalChain.RuleEntry;
   readonly '@typescript-eslint/no-non-null-assertion': NoNonNullAssertion.RuleEntry;
-  readonly '@typescript-eslint/no-parameter-properties': NoParameterProperties.RuleEntry;
   readonly '@typescript-eslint/no-redeclare': NoRedeclare.RuleEntry;
   readonly '@typescript-eslint/no-redundant-type-constituents': NoRedundantTypeConstituents.RuleEntry;
   readonly '@typescript-eslint/no-require-imports': NoRequireImports.RuleEntry;
@@ -14103,4 +14881,9 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/typedef': Typedef.RuleEntry;
   readonly '@typescript-eslint/unbound-method': UnboundMethod.RuleEntry;
   readonly '@typescript-eslint/unified-signatures': UnifiedSignatures.RuleEntry;
+
+  // deprecated
+  readonly '@typescript-eslint/no-duplicate-imports': NoDuplicateImports.RuleEntry;
+  readonly '@typescript-eslint/no-implicit-any-catch': NoImplicitAnyCatch.RuleEntry;
+  readonly '@typescript-eslint/no-parameter-properties': NoParameterProperties.RuleEntry;
 };

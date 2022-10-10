@@ -137,15 +137,12 @@ const eslintRules = {
   'padding-line-between-statements': 'off',
   'require-await': 'off',
   'no-return-await': 'off',
-  'indent-legacy': 'off', // deprecated
-  'no-spaced-func': 'off', // deprecated
 
   // customized
   'accessor-pairs': 'error',
   'array-callback-return': 'error',
   'arrow-body-style': 'error',
   'block-scoped-var': 'error',
-  'callback-return': 'off',
   camelcase: 'off', // disabled
   'capitalized-comments': 'off', // disabled
   'class-methods-use-this': 'error',
@@ -159,16 +156,12 @@ const eslintRules = {
   'func-name-matching': 'error',
   'func-names': 'error',
   'func-style': 'off', // on にしてもよいかも
-  'global-require': 'off',
   'grouped-accessor-pairs': 'error',
   'guard-for-in': 'error',
-  'handle-callback-err': 'off',
-  'id-blacklist': 'off',
   'id-denylist': 'error',
   'id-length': 'off', // disabled
   'id-match': 'error',
   'line-comment-position': 'off', // disabled
-  'lines-around-directive': 'off',
   'max-classes-per-file': 'off', // disabled
   'max-depth': 'off', // disabled
   'max-lines-per-function': 'off', // disabled
@@ -179,16 +172,12 @@ const eslintRules = {
   'max-statements': 'off', // disabled
   'multiline-comment-style': 'off', // disabled
   'new-cap': 'off', // disabled
-  'newline-after-var': 'off',
-  'newline-before-return': 'off',
   'no-alert': 'error',
   'no-async-promise-executor': 'error',
   'no-await-in-loop': 'error',
   'no-bitwise': 'off', // disabled
-  'no-buffer-constructor': 'off',
   'no-caller': 'error',
   'no-case-declarations': 'error',
-  'no-catch-shadow': 'off',
   'no-class-assign': 'error',
   'no-compare-neg-zero': 'error',
   'no-cond-assign': 'error',
@@ -227,33 +216,26 @@ const eslintRules = {
   'no-lone-blocks': 'off', // disabled
   'no-lonely-if': 'off', // disabled
   'no-misleading-character-class': 'error',
-  'no-mixed-requires': 'off',
   'no-multi-assign': 'error',
   'no-multi-str': 'error',
-  'no-native-reassign': 'off',
   'no-negated-condition': 'off', // disabled
-  'no-negated-in-lhs': 'off',
   'no-nested-ternary': 'off', // unicorn/no-nested-ternary
   'no-new-func': 'error',
   'no-new-object': 'error',
-  'no-new-require': 'off',
   'no-new-wrappers': 'error',
   'no-new': 'error',
   'no-nonoctal-decimal-escape': 'error',
   'no-octal-escape': 'error',
   'no-octal': 'error',
   'no-param-reassign': 'error',
-  'no-path-concat': 'off',
   'no-plusplus': 'error',
-  'no-process-env': 'off',
-  'no-process-exit': 'off',
   'no-promise-executor-return': 'error',
   'no-proto': 'error',
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
   'no-restricted-exports': 'error',
   'no-restricted-globals': [
-    'warn',
+    'error',
     { name: 'Array', message: 'use IList instead.' },
     { name: 'Boolean', message: 'use toBoolean instead.' },
     { name: 'Date', message: 'use IDate instead.' },
@@ -273,7 +255,6 @@ const eslintRules = {
     { name: 'Set', message: 'use ISet or MutableSet instead.' },
     { name: 'String', message: 'use Str instead.' },
   ],
-  'no-restricted-modules': 'off',
   'no-restricted-properties': 'error',
   'no-restricted-syntax': 'error',
   'no-return-assign': 'error',
@@ -283,7 +264,6 @@ const eslintRules = {
   'no-sequences': 'error',
   'no-shadow-restricted-names': 'error',
   'no-sparse-arrays': 'error',
-  'no-sync': 'off',
   'no-template-curly-in-string': 'error',
   'no-ternary': 'off', // disabled
   'no-undef-init': 'off', // disabled
@@ -318,12 +298,10 @@ const eslintRules = {
   'prefer-object-has-own': 'error',
   'prefer-object-spread': 'error',
   'prefer-promise-reject-errors': 'error',
-  'prefer-reflect': 'off',
   'prefer-regex-literals': 'error',
   'prefer-template': 'error',
   radix: 'error',
   'require-atomic-updates': 'error',
-  'require-jsdoc': 'off',
   'require-unicode-regexp': 'error',
   'require-yield': 'error',
   'sort-imports': 'off', // disabled
@@ -333,10 +311,34 @@ const eslintRules = {
   strict: 'error',
   'symbol-description': 'off', // disabled
   'use-isnan': 'error',
-  'valid-jsdoc': 'off',
   'vars-on-top': 'error',
   yoda: 'off', // disabled
   'no-constant-binary-expression': 'error',
+
+  // deprecated
+  'callback-return': 'off',
+  'global-require': 'off',
+  'handle-callback-err': 'off',
+  'id-blacklist': 'off',
+  'indent-legacy': 'off',
+  'lines-around-directive': 'off',
+  'newline-after-var': 'off',
+  'newline-before-return': 'off',
+  'no-buffer-constructor': 'off',
+  'no-catch-shadow': 'off',
+  'no-mixed-requires': 'off',
+  'no-native-reassign': 'off',
+  'no-negated-in-lhs': 'off',
+  'no-new-require': 'off',
+  'no-path-concat': 'off',
+  'no-process-env': 'off',
+  'no-process-exit': 'off',
+  'no-restricted-modules': 'off',
+  'no-spaced-func': 'off',
+  'no-sync': 'off',
+  'prefer-reflect': 'off',
+  'require-jsdoc': 'off',
+  'valid-jsdoc': 'off',
 };
 
 module.exports = { eslintRules };

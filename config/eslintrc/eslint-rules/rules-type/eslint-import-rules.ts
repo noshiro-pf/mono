@@ -16,6 +16,9 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  */
 namespace NoUnresolved {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -49,11 +52,15 @@ namespace NoUnresolved {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commonjs?: boolean;
     readonly amd?: boolean;
     readonly esmodule?: boolean;
+    /**
+     * @minItems 1
+     */
     readonly ignore?: readonly [string, ...(readonly string[])];
     readonly caseSensitive?: boolean;
     readonly caseSensitiveStrict?: boolean;
@@ -73,6 +80,9 @@ namespace NoUnresolved {
  */
 namespace Named {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -84,6 +94,7 @@ namespace Named {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commonjs?: boolean;
@@ -114,6 +125,9 @@ namespace Default {
  */
 namespace Namespace {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -127,6 +141,7 @@ namespace Namespace {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     /**
@@ -150,6 +165,9 @@ namespace Namespace {
  */
 namespace NoNamespace {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -164,6 +182,7 @@ namespace NoNamespace {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignore?: readonly string[];
@@ -206,6 +225,9 @@ namespace NoMutableExports {
  */
 namespace Extensions {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -325,6 +347,7 @@ namespace Extensions {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -376,6 +399,9 @@ namespace Extensions {
  */
 namespace NoRestrictedPaths {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -413,8 +439,12 @@ namespace NoRestrictedPaths {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * @minItems 1
+     */
     readonly zones?: readonly [
       {
         readonly target?: string;
@@ -446,6 +476,9 @@ namespace NoRestrictedPaths {
  */
 namespace NoInternalModules {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "oneOf": [
@@ -476,6 +509,7 @@ namespace NoInternalModules {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options =
     | {
@@ -511,6 +545,9 @@ namespace GroupExports {
  */
 namespace NoRelativePackages {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -536,11 +573,15 @@ namespace NoRelativePackages {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commonjs?: boolean;
     readonly amd?: boolean;
     readonly esmodule?: boolean;
+    /**
+     * @minItems 1
+     */
     readonly ignore?: readonly [string, ...(readonly string[])];
   };
 
@@ -558,6 +599,9 @@ namespace NoRelativePackages {
  */
 namespace NoRelativeParentImports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -583,11 +627,15 @@ namespace NoRelativeParentImports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commonjs?: boolean;
     readonly amd?: boolean;
     readonly esmodule?: boolean;
+    /**
+     * @minItems 1
+     */
     readonly ignore?: readonly [string, ...(readonly string[])];
   };
 
@@ -618,6 +666,9 @@ namespace NoSelfImport {
  */
 namespace NoCycle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -663,11 +714,15 @@ namespace NoCycle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commonjs?: boolean;
     readonly amd?: boolean;
     readonly esmodule?: boolean;
+    /**
+     * @minItems 1
+     */
     readonly ignore?: readonly [string, ...(readonly string[])];
     readonly maxDepth?: number | '∞';
     /**
@@ -723,6 +778,9 @@ namespace NoNamedAsDefaultMember {
  */
 namespace NoAnonymousDefaultExport {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -759,6 +817,7 @@ namespace NoAnonymousDefaultExport {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     /**
@@ -805,6 +864,9 @@ namespace NoAnonymousDefaultExport {
  */
 namespace NoUnusedModules {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "properties": {
@@ -905,6 +967,7 @@ namespace NoUnusedModules {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = (
     | Record<string, unknown>
@@ -919,10 +982,14 @@ namespace NoUnusedModules {
   ) & {
     /**
      * files/paths to be analyzed (only for unused exports)
+     *
+     * @minItems 1
      */
     readonly src?: readonly [string, ...(readonly string[])];
     /**
      * files/paths for which unused exports will not be reported (e.g module entry points)
+     *
+     * @minItems 1
      */
     readonly ignoreExports?: readonly [string, ...(readonly string[])];
     /**
@@ -950,6 +1017,9 @@ namespace NoUnusedModules {
  */
 namespace NoCommonjs {
   /**
+   * ### schema
+   *
+   * ```json
    * {
    *   "anyOf": [
    *     {
@@ -986,6 +1056,7 @@ namespace NoCommonjs {
    *     }
    *   ]
    * }
+   * ```
    */
   export type Options =
     | readonly []
@@ -1025,6 +1096,9 @@ namespace NoAmd {
  */
 namespace NoDuplicates {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1036,6 +1110,7 @@ namespace NoDuplicates {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly considerQueryString?: boolean;
@@ -1056,6 +1131,9 @@ namespace NoDuplicates {
  */
 namespace First {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "string",
@@ -1065,6 +1143,7 @@ namespace First {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'absolute-first' | 'disable-absolute-first';
 
@@ -1082,6 +1161,9 @@ namespace First {
  */
 namespace MaxDependencies {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1096,6 +1178,7 @@ namespace MaxDependencies {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly max?: number;
@@ -1116,6 +1199,9 @@ namespace MaxDependencies {
  */
 namespace NoExtraneousDependencies {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1154,6 +1240,7 @@ namespace NoExtraneousDependencies {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly devDependencies?: boolean | readonly unknown[];
@@ -1177,6 +1264,9 @@ namespace NoExtraneousDependencies {
  */
 namespace NoAbsolutePath {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1202,11 +1292,15 @@ namespace NoAbsolutePath {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commonjs?: boolean;
     readonly amd?: boolean;
     readonly esmodule?: boolean;
+    /**
+     * @minItems 1
+     */
     readonly ignore?: readonly [string, ...(readonly string[])];
   };
 
@@ -1224,6 +1318,9 @@ namespace NoAbsolutePath {
  */
 namespace NoNodejsModules {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1239,6 +1336,7 @@ namespace NoNodejsModules {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allow?: readonly string[];
@@ -1270,6 +1368,9 @@ namespace NoWebpackLoaderSyntax {
  */
 namespace Order {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1353,6 +1454,7 @@ namespace Order {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly groups?: readonly unknown[];
@@ -1400,6 +1502,9 @@ namespace Order {
  */
 namespace NewlineAfterImport {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1412,6 +1517,7 @@ namespace NewlineAfterImport {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly count?: number;
@@ -1464,6 +1570,9 @@ namespace NoNamedExport {
  */
 namespace NoDynamicRequire {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1475,6 +1584,7 @@ namespace NoDynamicRequire {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly esmodule?: boolean;
@@ -1505,6 +1615,9 @@ namespace Unambiguous {
  */
 namespace NoUnassignedImport {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1537,6 +1650,7 @@ namespace NoUnassignedImport {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly devDependencies?: boolean | readonly unknown[];
@@ -1560,6 +1674,9 @@ namespace NoUnassignedImport {
  */
 namespace NoUselessPathSegments {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1574,6 +1691,7 @@ namespace NoUselessPathSegments {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly commonjs?: boolean;
@@ -1594,6 +1712,9 @@ namespace NoUselessPathSegments {
  */
 namespace DynamicImportChunkname {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1611,6 +1732,7 @@ namespace DynamicImportChunkname {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly importFunctions?: readonly string[];
@@ -1635,6 +1757,9 @@ namespace DynamicImportChunkname {
  */
 namespace NoImportModuleExports {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1646,6 +1771,7 @@ namespace NoImportModuleExports {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly exceptions?: readonly unknown[];
@@ -1689,16 +1815,19 @@ namespace NoDeprecated {
  */
 namespace ImportsFirst {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "string",
    *     "enum": [
    *       "absolute-first",
    *       "disable-absolute-first"
-   *     ],
-   *     "id": "Options"
+   *     ]
    *   }
    * ]
+   * ```
    */
   export type RuleEntry = 'off';
 }
@@ -1746,5 +1875,7 @@ export type EslintImportsRules = {
   readonly 'import/no-import-module-exports': NoImportModuleExports.RuleEntry;
   readonly 'import/exports-last': ExportsLast.RuleEntry;
   readonly 'import/no-deprecated': NoDeprecated.RuleEntry;
+
+  // deprecated
   readonly 'import/imports-first': ImportsFirst.RuleEntry;
 };
