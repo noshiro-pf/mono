@@ -4,7 +4,7 @@ import type {
   InitializedToInitializedOperator,
   Observable,
   ToBaseOperator,
-  Token,
+  UpdaterSymbol,
   WithIndexOperatorObservable,
 } from '../types';
 
@@ -42,12 +42,13 @@ class WithIndexObservableClass<A>
     this.#mut_index = -1;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     this.#mut_index += 1;
-    this.setNext([this.#mut_index, par.currentValue.value], token);
+    this.setNext([this.#mut_index, par.currentValue.value], updaterSymbol);
   }
 }

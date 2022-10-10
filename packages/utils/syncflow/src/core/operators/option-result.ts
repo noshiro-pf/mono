@@ -7,10 +7,10 @@ import type {
   MapResultOkOperatorObservable,
   Observable,
   ToBaseOperator,
-  Token,
   UnwrapMaybeOperatorObservable,
   UnwrapResultErrOperatorObservable,
   UnwrapResultOkOperatorObservable,
+  UpdaterSymbol,
 } from '../types';
 
 export const unwrapMaybe =
@@ -107,12 +107,13 @@ class UnwrapMaybeObservableClass<A>
     });
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
-    this.setNext(Maybe.unwrap(par.currentValue.value), token);
+    this.setNext(Maybe.unwrap(par.currentValue.value), updaterSymbol);
   }
 }
 
@@ -134,12 +135,13 @@ class UnwrapResultOkObservableClass<S, E>
     });
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
-    this.setNext(Result.unwrapOk(par.currentValue.value), token);
+    this.setNext(Result.unwrapOk(par.currentValue.value), updaterSymbol);
   }
 }
 
@@ -161,12 +163,13 @@ class UnwrapResultErrObservableClass<S, E>
     });
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
-    this.setNext(Result.unwrapErr(par.currentValue.value), token);
+    this.setNext(Result.unwrapErr(par.currentValue.value), updaterSymbol);
   }
 }
 
@@ -187,12 +190,13 @@ class MapMaybeObservableClass<A, B>
     this.#mapFn = mapFn;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
-    this.setNext(Maybe.map(this.#mapFn)(par.currentValue.value), token);
+    this.setNext(Maybe.map(this.#mapFn)(par.currentValue.value), updaterSymbol);
   }
 }
 
@@ -217,14 +221,15 @@ class MapResultOkObservableClass<S, S2, E>
     this.#mapFn = mapFn;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     this.setNext(
       Result.map<S, S2, E>(this.#mapFn)(par.currentValue.value),
-      token
+      updaterSymbol
     );
   }
 }
@@ -250,14 +255,15 @@ class MapResultErrObservableClass<S, E, E2>
     this.#mapFn = mapFn;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     this.setNext(
       Result.mapErr<S, E, E2>(this.#mapFn)(par.currentValue.value),
-      token
+      updaterSymbol
     );
   }
 }

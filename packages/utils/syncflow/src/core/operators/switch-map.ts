@@ -5,7 +5,7 @@ import type {
   RemoveInitializedOperator,
   Subscription,
   SwitchMapOperatorObservable,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 
 /** @deprecated use `createState` instead */
@@ -38,10 +38,11 @@ class SwitchMapObservableClass<A, B>
     this.#subscription = undefined;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     this.#observable?.complete();
     this.#subscription?.unsubscribe();

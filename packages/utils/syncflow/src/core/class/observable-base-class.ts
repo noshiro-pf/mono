@@ -9,12 +9,12 @@ import type {
   SubscriberId,
   Subscription,
   ToInitializedOperator,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 import {
   issueObservableId,
   issueSubscriberId,
-  issueToken,
+  issueUpdaterSymbol,
   toSubscriber,
 } from '../utils';
 
@@ -32,7 +32,7 @@ export class ObservableBaseClass<
   readonly #subscribers: MutableMap<SubscriberId, Subscriber<A>>;
   #currentValue: ObservableBase<A>['currentValue'];
   #isCompleted: ObservableBase<A>['isCompleted'];
-  #token: ObservableBase<A>['token'];
+  #updaterSymbol: ObservableBase<A>['updaterSymbol'];
 
   constructor({
     kind,
@@ -53,7 +53,7 @@ export class ObservableBaseClass<
     this.#children = [];
     this.#subscribers = new MutableMap<SubscriberId, Subscriber<A>>();
     this.#isCompleted = false;
-    this.#token = issueToken();
+    this.#updaterSymbol = issueUpdaterSymbol();
   }
 
   addChild<B>(child: ChildObservable<B>): void {
@@ -75,8 +75,8 @@ export class ObservableBaseClass<
     return this.#isCompleted;
   }
 
-  get token(): Token {
-    return this.#token;
+  get updaterSymbol(): UpdaterSymbol {
+    return this.#updaterSymbol;
   }
 
   get hasSubscriber(): boolean {
@@ -91,8 +91,8 @@ export class ObservableBaseClass<
     return this.#children.some((c) => !c.isCompleted);
   }
 
-  protected setNext(nextValue: A, token: Token): void {
-    this.#token = token;
+  protected setNext(nextValue: A, updaterSymbol: UpdaterSymbol): void {
+    this.#updaterSymbol = updaterSymbol;
     this.#currentValue = Maybe.some(nextValue);
 
     for (const s of this.#subscribers.values()) {
@@ -101,7 +101,7 @@ export class ObservableBaseClass<
   }
 
   // eslint-disable-next-line class-methods-use-this,@typescript-eslint/no-empty-function
-  tryUpdate(_token: Token): void {
+  tryUpdate(_updaterSymbol: UpdaterSymbol): void {
     throw new Error('not implemented');
   }
 

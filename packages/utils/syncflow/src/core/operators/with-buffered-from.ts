@@ -5,7 +5,7 @@ import type {
   InitializedToInitializedOperator,
   Observable,
   ToBaseOperator,
-  Token,
+  UpdaterSymbol,
   WithBufferedFromOperatorObservable,
 } from '../types';
 import { maxDepth } from '../utils';
@@ -58,12 +58,16 @@ class WithBufferedFromObservableClass<A, B>
     });
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
-    this.setNext([par.currentValue.value, this.#mut_bufferedValues], token);
+    this.setNext(
+      [par.currentValue.value, this.#mut_bufferedValues],
+      updaterSymbol
+    );
     this.#clearBuffer();
   }
 

@@ -5,7 +5,7 @@ import type {
   Observable,
   PluckOperatorObservable,
   ToBaseOperator,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 
 export const pluck =
@@ -35,11 +35,12 @@ class PluckObservableClass<A, K extends keyof A>
     this.#key = key;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
-    this.setNext(par.currentValue.value[this.#key], token);
+    this.setNext(par.currentValue.value[this.#key], updaterSymbol);
   }
 }

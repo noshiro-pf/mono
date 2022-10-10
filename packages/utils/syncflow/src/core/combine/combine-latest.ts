@@ -4,7 +4,7 @@ import type {
   CombineLatestObservable,
   InitializedCombineLatestObservable,
   NonEmptyUnknownList,
-  Token,
+  UpdaterSymbol,
   Wrap,
   WrapInitialized,
 } from '../types';
@@ -37,13 +37,13 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
     });
   }
 
-  override tryUpdate(token: Token): void {
-    if (this.parents.every((o) => o.token !== token)) return; // all parents are skipped
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+    if (this.parents.every((o) => o.updaterSymbol !== updaterSymbol)) return; // all parents are skipped
 
     const parentValues = this.parents.map((a) => a.currentValue);
     if (parentValues.every(Maybe.isSome)) {
       const nextValue = parentValues.map((a) => a.value) as unknown as A;
-      this.setNext(nextValue, token);
+      this.setNext(nextValue, updaterSymbol);
     }
   }
 }

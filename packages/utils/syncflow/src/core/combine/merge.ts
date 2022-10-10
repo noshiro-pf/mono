@@ -3,7 +3,7 @@ import { SyncChildObservableClass } from '../class';
 import type {
   MergeObservable,
   NonEmptyUnknownList,
-  Token,
+  UpdaterSymbol,
   Wrap,
 } from '../types';
 
@@ -24,12 +24,12 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
     });
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const parentToUse = this.parents.find(
-      (o) => o.token === token && Maybe.isSome(o.currentValue)
+      (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.currentValue)
     );
     if (parentToUse === undefined) return;
     const nextValue = Maybe.unwrap(parentToUse.currentValue) as ArrayElement<P>;
-    this.setNext(nextValue, token);
+    this.setNext(nextValue, updaterSymbol);
   }
 }

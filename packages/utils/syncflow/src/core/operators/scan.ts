@@ -4,7 +4,7 @@ import type {
   Observable,
   ScanOperatorObservable,
   ToInitializedOperator,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 
 export const scan =
@@ -34,15 +34,19 @@ class ScanObservableClass<A, B>
     this.#reducer = reducer;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
-    if (Maybe.isNone(this.currentValue)) return; // dummy
+    if (
+      par.updaterSymbol !== updaterSymbol ||
+      Maybe.isNone(par.currentValue) ||
+      Maybe.isNone(this.currentValue)
+    ) {
+      return; // skip update
+    }
 
     this.setNext(
       this.#reducer(this.currentValue.value, par.currentValue.value),
-      token
+      updaterSymbol
     );
   }
 }

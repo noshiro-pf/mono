@@ -5,7 +5,7 @@ import type {
   InitializedToInitializedOperator,
   Observable,
   ToBaseOperator,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 
 export const distinctUntilChanged =
@@ -40,16 +40,17 @@ class DistinctUntilChangedObservableClass<A>
     this.#eq = eq;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
 
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     const prev = this.#previousValue;
 
     if (Maybe.isNone(prev) || !this.#eq(prev.value, par.currentValue.value)) {
-      this.setNext(par.currentValue.value, token);
+      this.setNext(par.currentValue.value, updaterSymbol);
     }
     this.#previousValue = par.currentValue;
   }

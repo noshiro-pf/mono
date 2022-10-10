@@ -1,5 +1,5 @@
 import type { Maybe, Some } from '@noshiro/ts-utils';
-import type { ObservableId, Token } from './id';
+import type { ObservableId, UpdaterSymbol } from './id';
 import type { ObservableKind } from './observable-kind';
 import type {
   AsyncChildObservableType,
@@ -34,12 +34,12 @@ export type ObservableBase<A> = Readonly<{
   // state
   currentValue: Maybe<A>;
   isCompleted: boolean;
-  token: Token;
+  updaterSymbol: UpdaterSymbol;
   hasSubscriber: boolean;
   hasChild: boolean;
   hasActiveChild: () => boolean;
 
-  tryUpdate: (token: Token) => void;
+  tryUpdate: (updaterSymbol: UpdaterSymbol) => void;
   tryComplete: () => void;
   complete: () => void;
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;

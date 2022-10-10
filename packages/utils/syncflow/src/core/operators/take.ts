@@ -4,7 +4,7 @@ import type {
   Observable,
   RemoveInitializedOperator,
   TakeOperatorObservable,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 import { isPositiveInteger } from '../utils';
 
@@ -37,16 +37,17 @@ class TakeObservableClass<A>
     }
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     this.#mut_counter += 1;
     if (this.#mut_counter > this.#n) {
       this.complete();
     } else {
-      this.setNext(par.currentValue.value, token);
+      this.setNext(par.currentValue.value, updaterSymbol);
     }
   }
 }
