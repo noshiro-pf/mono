@@ -5,12 +5,12 @@
   "rootDir": "../",
   "roots": ["<rootDir>/src", "<rootDir>/test"],
   "transform": {
-    "^.+\\.ts$": "ts-jest"
-  },
-  "globals": {
-    "ts-jest": {
-      "tsconfig": "<rootDir>/config/tsconfig.test.json"
-    }
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        "tsconfig": "<rootDir>/config/tsconfig.test.json"
+      }
+    ]
   },
   "testMatch": ["<rootDir>/(test|src)/**/*.test.ts"],
   "testTimeout": 30000
