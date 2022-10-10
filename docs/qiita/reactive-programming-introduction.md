@@ -11,7 +11,7 @@
 本記事は、リアクティブプログラミングを知らない人向けに、代表的なライブラリの一つである RxJS について、そのメリットを実例を通して具体的に紹介することが目的です。
 
 RxJS はリアクティブプログラミングをするための JavaScript のライブラリです。
-（**R**eactive E**x**tension for **J**ava**S**cript の略）
+（**R**eactive E**x**tension for **J**ava**S**cript の略） <!-- cspell:disable-line -->
 
 どういうときに役に立つかというと、「データ取得やテキストボックス・ボタン入力などの多数のイベントが発生する複雑な GUI アプリケーションを実装するとき」「非同期処理をより間違いの起きにくいプログラミングスタイルで実装したいとき」に嬉しいライブラリと言えます。
 
@@ -567,7 +567,7 @@ RxJS を利用したリアクティブプログラミングのメリット・デ
 
 -   本記事では状態管理の実装に生の JavaScript と RxJS をあえて使いましたが、例えば React を使えば React hooks などによりリアクティビティが実現できるため、今回のデータテーブルくらいのものであれば RxJS などのライブラリは使わずともシンプルに実装できます。とはいえ、React を使っていても Recoil のような外部ライブラリを使ってリアクティブな状態管理を実装した方がよい場合もあります。
 -   RxJS の Observable を使ったプログラムでは、実は"glitch"と呼ばれる現象が発生することがあります。これによるバグが発生するケースが存在しますが、残念ながら"glitch"は RxJS の仕様であるため、プログラマーが工夫して避けるしかありません。ほとんどのケースでは顕在化しませんが、本格的に RxJS を使用する場合には理解しておく必要があります。
-    -   参考： [André Staltz - Rx glitches aren't actually a problem](https://staltz.com/rx-glitches-arent-actually-a-problem.html)
+    -   参考： [André Staltz - Rx glitches aren't actually a problem](https://staltz.com/rx-glitches-arent-actually-a-problem.html) <!-- cspell:disable-line -->
 -   RxJS の Observable には、"hot"なものと"cold"なものがあります。本記事では触れませんでしたがそれぞれ動作が異なるため注意が必要です。場合によっては cold Observable を hot 変換した方がよいときがあります。
     -   参考： [Rx の Hot と Cold について](https://qiita.com/toRisouP/items/f6088963037bfda658d3)
 
@@ -589,7 +589,7 @@ https://github.com/noshiro-pf/mono/tree/main/packages/utils/syncflow
     -   RxJS のオペレータの動作を視覚的に学べるサイト
 -   [RxJS Github](https://github.com/ReactiveX/rxjs)
     -   RxJS のソースコード
--   [mockadoo](https://mockaroo.com/)
+-   [mockadoo](https://mockaroo.com/) <!-- cspell:disable-line -->
     -   CSV ダミーデータの生成
 -   [Material Design Lite](https://getmdl.io/components/index.html#textfields-section)
     -   テキストボックスのデザインに使ったライブラリ

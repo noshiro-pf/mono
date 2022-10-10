@@ -525,7 +525,7 @@ export type IsInfiniteList<T extends readonly unknown[]> =
 
 `readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]` の行はレコード型のときとほぼ同じ再帰ですが、 `"0"` → `0` という変換をしてあげるために `ToNumber` をかませています。 `ToNumber` の実装はトリッキーで脇道にそれるのでここでは省略します。以下の記事の実装をほぼそのまま使いました。
 
-[TypeScript にヤバい機能が入りそうなのでひとしきり遊んでみる｜ TechRacho（テックラッチョ）〜エンジニアの「？」を「！」に〜｜ BPS 株式会社](https://techracho.bpsinc.jp/yoshi/2020_09_04/97108)
+[TypeScript にヤバい機能が入りそうなのでひとしきり遊んでみる｜ TechRacho（テックラッチョ）〜エンジニアの「？」を「！」に〜｜ BPS 株式会社](https://techracho.bpsinc.jp/yoshi/2020_09_04/97108) <!-- cspell:disable-line -->
 
 あとは `"0"`, `"1"`, `"2"` について再帰されるのですが、 `"0"` の再帰は `...LeafPaths<T["0"]>` が `T["0"]` = `readonly [1, 2, { e: 3; f: [6, 7] }]["0"]` = `1` より、 `... readonly []` に展開されるため、この再帰の結果のパスは `readonly ['z', 0]` となります。
 
@@ -797,5 +797,5 @@ export const setIn = <R extends ReadonlyRecordBase>(
 
 -   [Immer](https://immerjs.github.io/immer/)
 -   [Immutable.js](https://immutable-js.github.io/immutable-js/docs/#/List/isSubset)
--   [Variadic tuple types by ahejlsberg · Pull Request #39094 · microsoft/TypeScript](https://github.com/microsoft/TypeScript/pull/39094)
+-   [Variadic tuple types by ahejlsberg · Pull Request #39094 · microsoft/TypeScript](https://github.com/microsoft/TypeScript/pull/39094) <!-- cspell:disable-line -->
 -   [type-challenges/type-challenges](https://github.com/type-challenges/type-challenges)
