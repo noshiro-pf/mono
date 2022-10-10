@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage: yarn newapp <new-app-name>
+# usage: yarn create:util <new-util-name>
 
 THIS_SCRIPT_DIR=$(cd $(dirname $0); pwd)
 MONO_ROOT_DIR=$(dirname ${THIS_SCRIPT_DIR})
@@ -12,8 +12,8 @@ TEMPLATE_DIR="${UTILS_DIR}/${TEMPLATE_DIR_NAME}"
 new_util_name=$1
 
 if [ -z ${new_util_name} ]; then
-  echo "util name is required."
-  exit 1
+    echo "util name is required."
+    exit 1
 fi
 
 mkdir -p "${UTILS_DIR}/${new_util_name}"
