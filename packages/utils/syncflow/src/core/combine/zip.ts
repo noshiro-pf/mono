@@ -3,8 +3,8 @@ import { SyncChildObservableClass } from '../class';
 import type {
   InitializedZipObservable,
   NonEmptyUnknownList,
-  Token,
   TupleToQueueTuple,
+  UpdaterSymbol,
   Wrap,
   WrapInitialized,
   ZipObservable,
@@ -38,17 +38,20 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     this.#queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const queues = this.#queues;
     for (const [index, par] of this.parents.entries()) {
-      if (par.token === token && Maybe.isSome(par.currentValue)) {
+      if (
+        par.updaterSymbol === updaterSymbol &&
+        Maybe.isSome(par.currentValue)
+      ) {
         queues[index]?.enqueue(par.currentValue.value);
       }
     }
 
     if (queues.every((list) => !list.isEmpty)) {
       const nextValue = queues.map((q) => q.dequeue()) as unknown as A;
-      this.setNext(nextValue, token);
+      this.setNext(nextValue, updaterSymbol);
     }
   }
 }

@@ -17,7 +17,7 @@ import type {
   Wrap,
 } from '../types';
 import { isManagerObservable } from '../types';
-import { binarySearch, issueToken, maxDepth } from '../utils';
+import { binarySearch, issueUpdaterSymbol, maxDepth } from '../utils';
 import { ObservableBaseClass } from './observable-base-class';
 
 const registerChild = <A>(
@@ -120,11 +120,11 @@ export class AsyncChildObservableClass<
   }
 
   startUpdate(nextValue: A): void {
-    const token = issueToken();
-    this.setNext(nextValue, token);
+    const updaterSymbol = issueUpdaterSymbol();
+    this.setNext(nextValue, updaterSymbol);
 
     for (const p of this.#procedure) {
-      p.tryUpdate(token);
+      p.tryUpdate(updaterSymbol);
     }
   }
 

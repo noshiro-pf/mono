@@ -4,7 +4,7 @@ import type {
   Observable,
   PairwiseOperatorObservable,
   RemoveInitializedOperator,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 
 export const pairwise =
@@ -29,16 +29,17 @@ class PairwiseObservableClass<A>
     this.#previousValue = parentObservable.currentValue;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
 
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     const prev = this.#previousValue;
 
     if (!Maybe.isNone(prev)) {
-      this.setNext([prev.value, par.currentValue.value], token);
+      this.setNext([prev.value, par.currentValue.value], updaterSymbol);
     }
 
     this.#previousValue = par.currentValue;

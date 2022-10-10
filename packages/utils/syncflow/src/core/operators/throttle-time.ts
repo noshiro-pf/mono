@@ -5,7 +5,7 @@ import type {
   Observable,
   ThrottleTimeOperatorObservable,
   ToBaseOperator,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 
 export const throttleTime =
@@ -37,13 +37,17 @@ class ThrottleTimeObservableClass<A>
     this.#milliSeconds = milliSeconds;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
-    if (this.#mut_isSkipping) return; // skip update
+    if (
+      par.updaterSymbol !== updaterSymbol ||
+      Maybe.isNone(par.currentValue) ||
+      this.#mut_isSkipping
+    ) {
+      return; // skip update
+    }
 
-    this.setNext(par.currentValue.value, token);
+    this.setNext(par.currentValue.value, updaterSymbol);
 
     this.#mut_isSkipping = true;
     // set timer

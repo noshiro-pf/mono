@@ -1,16 +1,16 @@
-import type { ObservableId, SubscriberId, Token } from '../types';
+import type { ObservableId, SubscriberId, UpdaterSymbol } from '../types';
 
-function* idMaker<T extends number>(): Generator<T, T, T> {
-  let mut_i: T = 0 as T;
+function* idMaker<T extends symbol>(): Generator<T, T, T> {
+  let mut_i = 0;
   while (true) {
-    yield mut_i;
-    mut_i = (mut_i + 1) as T;
+    yield Symbol(mut_i.toString()) as T;
+    mut_i += 1;
   }
 }
 
 const observableIdMaker = idMaker<ObservableId>();
 const subscriberIdMaker = idMaker<SubscriberId>();
-const tokenMaker = idMaker<Token>();
+const updaterSymbolMaker = idMaker<UpdaterSymbol>();
 
 export const issueObservableId = (): ObservableId =>
   observableIdMaker.next().value;
@@ -18,4 +18,5 @@ export const issueObservableId = (): ObservableId =>
 export const issueSubscriberId = (): SubscriberId =>
   subscriberIdMaker.next().value;
 
-export const issueToken = (): Token => tokenMaker.next().value;
+export const issueUpdaterSymbol = (): UpdaterSymbol =>
+  updaterSymbolMaker.next().value;

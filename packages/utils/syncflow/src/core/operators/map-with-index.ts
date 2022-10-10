@@ -5,7 +5,7 @@ import type {
   MapWithIndexOperatorObservable,
   Observable,
   ToBaseOperator,
-  Token,
+  UpdaterSymbol,
 } from '../types';
 
 export const mapWithIndex =
@@ -40,12 +40,16 @@ class MapWithIndexObservableClass<A, B>
     this.#mapFn = mapFn;
   }
 
-  override tryUpdate(token: Token): void {
+  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.token !== token) return; // skip update
-    if (Maybe.isNone(par.currentValue)) return; // skip update
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+      return; // skip update
+    }
 
     this.#index += 1;
-    this.setNext(this.#mapFn(par.currentValue.value, this.#index), token);
+    this.setNext(
+      this.#mapFn(par.currentValue.value, this.#index),
+      updaterSymbol
+    );
   }
 }

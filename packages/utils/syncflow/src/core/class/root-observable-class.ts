@@ -5,7 +5,7 @@ import type {
   RootObservable,
   RootObservableType,
 } from '../types';
-import { binarySearch, issueToken } from '../utils';
+import { binarySearch, issueUpdaterSymbol } from '../utils';
 import { ObservableBaseClass } from './observable-base-class';
 
 export class RootObservableClass<A, Type extends RootObservableType>
@@ -47,11 +47,11 @@ export class RootObservableClass<A, Type extends RootObservableType>
   }
 
   startUpdate(nextValue: A): void {
-    const token = issueToken();
-    this.setNext(nextValue, token);
+    const updaterSymbol = issueUpdaterSymbol();
+    this.setNext(nextValue, updaterSymbol);
 
     for (const p of this.#procedure) {
-      p.tryUpdate(token);
+      p.tryUpdate(updaterSymbol);
     }
   }
 }
