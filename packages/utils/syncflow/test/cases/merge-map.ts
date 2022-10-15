@@ -1,6 +1,5 @@
 import { tp } from '@noshiro/ts-utils';
 import type { Observable } from '../../src';
-// eslint-disable-next-line import/no-deprecated
 import { interval, map, mergeMap, take } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import type { StreamTestCase } from '../typedef';
@@ -28,7 +27,7 @@ const createStreams = (
   const counter$ = interval$.chain(take(7));
 
   const mergeMap$ = counter$.chain(take(5)).chain(
-    // eslint-disable-next-line import/no-deprecated
+    // eslint-disable-next-line deprecation/deprecation
     mergeMap((i) =>
       interval(tick * 2)
         .chain(take(5))

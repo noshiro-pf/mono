@@ -60,10 +60,10 @@ describe('IList.isNonEmpty', () => {
   });
 });
 
-describe('IList.slice', () => {
+{
   const list = [0, 1, 2, 3, 4] as const;
 
-  for (const { testName, result, toBe } of [
+  describe.each([
     {
       testName: 'IList.slice',
       result: IList.slice(list, 0, 5),
@@ -134,12 +134,12 @@ describe('IList.slice', () => {
       result: IList.slice(list, 6, 3),
       toBe: [],
     },
-  ]) {
+  ])('IList.slice', ({ result, testName, toBe }) => {
     test(testName, () => {
       expect(result).toStrictEqual(toBe);
     });
-  }
-});
+  });
+}
 
 describe('IList.head', () => {
   {

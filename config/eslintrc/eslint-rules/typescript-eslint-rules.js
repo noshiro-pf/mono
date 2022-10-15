@@ -76,7 +76,15 @@ const typescriptEslintRules = {
    * disable in favor of prettier
    * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
    */
-  '@typescript-eslint/quotes': 'off',
+  // The following rules can be used in some cases. See the README for more
+  // information. (These are marked with `0` instead of `"off"` so that a
+  // script can distinguish them.)
+  '@typescript-eslint/quotes': 0,
+
+  /**
+   * disable in favor of prettier
+   * @link https://github.com/prettier/eslint-config-prettier/blob/main/index.js
+   */
   '@typescript-eslint/brace-style': 'off',
   '@typescript-eslint/comma-dangle': 'off',
   '@typescript-eslint/comma-spacing': 'off',
@@ -218,7 +226,7 @@ const typescriptEslintRules = {
   '@typescript-eslint/prefer-optional-chain': 'error',
   '@typescript-eslint/prefer-readonly': 'error',
   '@typescript-eslint/prefer-readonly-parameter-types': [
-    'warn',
+    'error',
     {
       checkParameterProperties: true,
       ignoreInferredTypes: true,
@@ -258,9 +266,9 @@ const typescriptEslintRules = {
   '@typescript-eslint/parameter-properties': 'error',
 
   // deprecated
-  '@typescript-eslint/no-duplicate-imports': 'off', // deprecated
-  '@typescript-eslint/no-parameter-properties': 'off', // deprecated
+  '@typescript-eslint/no-duplicate-imports': 'off',
   '@typescript-eslint/no-implicit-any-catch': 'off',
+  '@typescript-eslint/no-parameter-properties': 'off',
 };
 
 module.exports = { typescriptEslintRules, banTypes, restrictedImportsOption };

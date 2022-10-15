@@ -23,15 +23,17 @@ const toCapitalCase = (str: string): string =>
 const normalizeToSchemaArray = (
   schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined
 ): DeepReadonly<JSONSchema4[]> =>
-  (schema === undefined
+  schema === undefined
     ? []
-    : Array.isArray(schema)
+    : // eslint-disable-next-line no-restricted-globals
+    Array.isArray(schema)
     ? schema
-    : [schema]) as DeepReadonly<JSONSchema4[]>;
+    : [schema];
 
 const removeMultiLineCommentCharacter = (str: string): string =>
   str.replace('/*', ' ').replace('*/', ' ');
 
+// eslint-disable-next-line no-restricted-globals
 const deepCopy = <T>(obj: T): T => JSON.parse(JSON.stringify(obj)) as T;
 
 const metaToString = (meta: Meta): string => {
@@ -61,6 +63,7 @@ const metaToString = (meta: Meta): string => {
     .filter(([_key, value]) => value != null)
     .map(([key, value]) => [
       key,
+      // eslint-disable-next-line no-restricted-globals
       removeMultiLineCommentCharacter(String(value ?? '')),
     ]);
 
@@ -109,10 +112,15 @@ const rawSchemaToString = (
     ? []
     : [
         '  /**',
+        '   * ### schema',
+        '   *',
+        '   * ```json',
+        // eslint-disable-next-line no-restricted-globals
         JSON.stringify(rawSchema, null, 2)
           .split('\n')
           .map((line) => `  * ${line}`)
           .join('\n'),
+        '  * ```',
         '  */',
       ];
 
@@ -172,6 +180,7 @@ const createResult = async (
             'Options',
             compilerConfig
           ).catch((error) => {
+            // eslint-disable-next-line no-restricted-globals
             throw new Error(String(error));
           });
 
@@ -193,6 +202,7 @@ const createResult = async (
               compile(s as JSONSchema4, `Options${index}`, compilerConfig)
             )
           ).catch((error) => {
+            // eslint-disable-next-line no-restricted-globals
             throw new Error(String(error));
           });
 
@@ -219,12 +229,33 @@ const createResult = async (
     mut_resultToWrite.push('}', '\n');
   }
 
+  const deprecatedSchemaList = schemaList.filter((s) => s.deprecated);
+
   mut_resultToWrite.push(
     `export type ${typeName} = {`,
-    ...schemaList.map(
-      ({ ruleName }) =>
-        `'${ruleNamePrefix}${ruleName}': ${toCapitalCase(ruleName)}.RuleEntry;`
-    ),
+
+    ...schemaList
+      .filter((s) => !s.deprecated)
+      .map(
+        ({ ruleName }) =>
+          `'${ruleNamePrefix}${ruleName}': ${toCapitalCase(
+            ruleName
+          )}.RuleEntry;`
+      ),
+
+    ...(deprecatedSchemaList.length === 0
+      ? []
+      : [
+          '',
+          '  // deprecated',
+          ...deprecatedSchemaList.map(
+            ({ ruleName }) =>
+              `'${ruleNamePrefix}${ruleName}': ${toCapitalCase(
+                ruleName
+              )}.RuleEntry;`
+          ),
+        ]),
+
     '}'
   );
 
@@ -251,12 +282,13 @@ const generateRulesType = async (
   > =
     pluginName === 'eslint'
       ? deepCopy(
+          // eslint-disable-next-line no-restricted-globals
           Array.from(
             // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-require-imports,import/no-internal-modules,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,unicorn/prefer-module
             require('eslint/use-at-your-own-risk')?.builtinRules.entries() ?? []
           )
         )
-      : // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-require-imports,import/no-internal-modules,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,unicorn/prefer-module,import/no-dynamic-require
+      : // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-require-imports,import/no-internal-modules,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,unicorn/prefer-module,import/no-dynamic-require,no-restricted-globals
         Object.entries(require(pluginName).rules);
 
   const schemaList: DeepReadonly<
@@ -273,7 +305,7 @@ const generateRulesType = async (
       value.meta.schema as DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined
     ),
     deprecated: value.meta.deprecated ?? false,
-    rawSchema: value.meta.schema as DeepReadonly<JSONSchema4 | JSONSchema4[]>,
+    rawSchema: value.meta.schema,
     docs: metaToString(value.meta),
   }));
 

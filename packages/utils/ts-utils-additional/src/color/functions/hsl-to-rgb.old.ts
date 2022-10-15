@@ -42,6 +42,7 @@ const hue2rgb = (m1: number, m2: number, normH: number): number => {
  * @deprecated
  */
 export const hslaToRgba = ([h, s, l, a]: Hsla): Rgba => {
+  // eslint-disable-next-line deprecation/deprecation
   const [r, g, b] = hslToRgb([h, s, l]);
 
   return [r, g, b, a];

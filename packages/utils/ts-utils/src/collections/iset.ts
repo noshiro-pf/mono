@@ -134,20 +134,20 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
       { type: 'add'; key: K } | { type: 'delete'; key: K }
     >[]
   ): ISet<K> {
-    const result = new MutableSet<K>(this.#set);
+    const mut_result = new MutableSet<K>(this.#set);
 
     for (const action of actions) {
       switch (action.type) {
         case 'delete':
-          result.delete(action.key);
+          mut_result.delete(action.key);
           break;
         case 'add':
-          result.add(action.key);
+          mut_result.add(action.key);
           break;
       }
     }
 
-    return ISet.new(result);
+    return ISet.new(mut_result);
   }
 
   map<K2>(mapFn: (key: K) => K2): ISet<K2> {

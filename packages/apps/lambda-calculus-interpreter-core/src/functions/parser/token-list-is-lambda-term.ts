@@ -16,12 +16,12 @@ export const tokensRepresentsLambdaTerm = (
     isVariable(tokens[2]) &&
     tokens[3] === '.' &&
     tokensRepresentsLambdaTerm(tokens.slice(4, -1)) &&
-    tokens[tokens.length - 1] === ')'
+    IList.last(tokens) === ')'
   )
     return true;
 
   /* (e e)? */
-  if (tokens[0] === '(' && tokens[tokens.length - 1] === ')') {
+  if (tokens[0] === '(' && IList.last(tokens) === ')') {
     for (const sep of range(1, tokens.length - 1)) {
       if (
         tokensRepresentsLambdaTerm(tokens.slice(1, sep)) &&

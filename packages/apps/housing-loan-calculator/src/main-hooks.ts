@@ -28,25 +28,20 @@ export const useMainHooks = (): Readonly<{ isCalculating: boolean }> => {
       propertyPrice: query.get(queryParams.propertyPrice),
       borrowingPeriodMonth: query.get(queryParams.borrowingPeriodMonth),
       interestRatePerMonth: query.get(queryParams.interestRatePerMonth),
-    };
+    } as const;
 
     const paramsAsNumber = {
-      repaymentType: pipe(paramsAsStr.repaymentType).chain((a) =>
-        mapNullable(a, Str.toNumber)
-      ).value,
-      downPayment: pipe(paramsAsStr.downPayment).chain((a) =>
-        mapNullable(a, Str.toNumber)
-      ).value,
-      propertyPrice: pipe(paramsAsStr.propertyPrice).chain((a) =>
-        mapNullable(a, Str.toNumber)
-      ).value,
-      borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).chain((a) =>
-        mapNullable(a, Str.toNumber)
-      ).value,
-      interestRatePerMonth: pipe(paramsAsStr.interestRatePerMonth).chain((a) =>
-        mapNullable(a, Str.toNumber)
-      ).value,
-    };
+      downPayment: mapNullable(paramsAsStr.downPayment, Str.toNumber),
+      propertyPrice: mapNullable(paramsAsStr.propertyPrice, Str.toNumber),
+      borrowingPeriodMonth: mapNullable(
+        paramsAsStr.borrowingPeriodMonth,
+        Str.toNumber
+      ),
+      interestRatePerMonth: mapNullable(
+        paramsAsStr.interestRatePerMonth,
+        Str.toNumber
+      ),
+    } as const;
 
     if (
       paramsAsStr.repaymentType === 'principal-and-interest-equal-repayment' ||

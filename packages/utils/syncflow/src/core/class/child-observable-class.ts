@@ -83,6 +83,7 @@ export class AsyncChildObservableClass<
   #procedure: readonly ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: MutableSet<ObservableId>;
 
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor({
     type,
     parents,
@@ -160,6 +161,7 @@ export class SyncChildObservableClass<
   override readonly type: Type;
   readonly parents;
 
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor({
     type,
     parents,
@@ -209,6 +211,7 @@ export class InitializedSyncChildObservableClass<
   extends SyncChildObservableClass<A, Type, P>
   implements InitializedSyncChildObservable<A, Type, P>
 {
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor({
     type,
     parents,

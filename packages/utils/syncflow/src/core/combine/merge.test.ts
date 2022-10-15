@@ -1,7 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
 import { fromArray } from '../create';
 import type { SyncChildObservable } from '../types';
-// eslint-disable-next-line import/no-deprecated
 import { merge } from './merge';
 
 // type tests
@@ -9,7 +8,7 @@ import { merge } from './merge';
 const r1 = fromArray([1, 2, 3]);
 const r2 = fromArray(['a', 'b', 'c']);
 
-// eslint-disable-next-line import/no-deprecated
+// eslint-disable-next-line deprecation/deprecation
 const m = merge([r1, r2] as const);
 
 assertType<

@@ -162,98 +162,98 @@ export namespace IDate {
 
   /** Sets the year of the Date object using local time. */
   export const setLocaleYear = (year: YearEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setFullYear(year);
+    setValueHelper((mut_copy) => {
+      mut_copy.setFullYear(year);
     });
 
   /** Sets the year value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCYear = (year: YearEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setUTCFullYear(year);
+    setValueHelper((mut_copy) => {
+      mut_copy.setUTCFullYear(year);
     });
 
   /** Sets the month value in the Date object using local time. */
   export const setLocaleMonth = (month: MonthEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setMonth(month - 1);
+    setValueHelper((mut_copy) => {
+      mut_copy.setMonth(month - 1);
     });
 
   /** Sets the month value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCMonth = (month: MonthEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setUTCMonth(month - 1);
+    setValueHelper((mut_copy) => {
+      mut_copy.setUTCMonth(month - 1);
     });
 
   /** Sets the numeric day-of-the-month value of the Date object using local time. */
   export const setLocaleDate = (date: DateEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setDate(date);
+    setValueHelper((mut_copy) => {
+      mut_copy.setDate(date);
     });
 
   /** ets the numeric day of the month in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCDate = (date: DateEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setUTCDate(date);
+    setValueHelper((mut_copy) => {
+      mut_copy.setUTCDate(date);
     });
 
   /** Sets the hour value in the Date object using local time. */
   export const setLocaleHours = (hours: HoursEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setHours(hours);
+    setValueHelper((mut_copy) => {
+      mut_copy.setHours(hours);
     });
 
   /** Sets the hours value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCHours = (hours: HoursEnum): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setUTCHours(hours);
+    setValueHelper((mut_copy) => {
+      mut_copy.setUTCHours(hours);
     });
 
   /** Sets the minutes value in the Date object using local time. */
   export const setLocaleMinutes = (
     minutes: MinutesEnum
   ): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setMinutes(minutes);
+    setValueHelper((mut_copy) => {
+      mut_copy.setMinutes(minutes);
     });
 
   /** Sets the minutes value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCMinutes = (
     minutes: MinutesEnum
   ): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setUTCMinutes(minutes);
+    setValueHelper((mut_copy) => {
+      mut_copy.setUTCMinutes(minutes);
     });
 
   /** Sets the seconds value in the Date object using local time. */
   export const setLocaleSeconds = (
     seconds: SecondsEnum
   ): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setSeconds(seconds);
+    setValueHelper((mut_copy) => {
+      mut_copy.setSeconds(seconds);
     });
 
   /** Sets the seconds value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCSeconds = (
     seconds: SecondsEnum
   ): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setUTCSeconds(seconds);
+    setValueHelper((mut_copy) => {
+      mut_copy.setUTCSeconds(seconds);
     });
 
   /** Sets the milliseconds value in the Date object using local time. */
   export const setLocaleMilliseconds = (
     milliseconds: MillisecondsEnum
   ): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setMilliseconds(milliseconds);
+    setValueHelper((mut_copy) => {
+      mut_copy.setMilliseconds(milliseconds);
     });
 
   /** Sets the milliseconds value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCMilliseconds = (
     milliseconds: MillisecondsEnum
   ): ((curr: IDate) => IDate) =>
-    setValueHelper((copy) => {
-      copy.setUTCMilliseconds(milliseconds);
+    setValueHelper((mut_copy) => {
+      mut_copy.setUTCMilliseconds(milliseconds);
     });
 
   /* update */
@@ -375,9 +375,9 @@ export namespace IDate {
 
   export const toMidnight = (date: IDate): IDate => {
     // eslint-disable-next-line no-restricted-globals
-    const midnight = new Date(date as RawDateType);
-    midnight.setHours(0, 0, 0, 0);
-    return midnight;
+    const mut_midnight = new Date(date as RawDateType);
+    mut_midnight.setHours(0, 0, 0, 0);
+    return mut_midnight;
   };
 
   export const toDate = (date: IDate): RawDateType => date as RawDateType;

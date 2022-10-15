@@ -47,7 +47,11 @@ const eslintImportsRules = {
   'import/export': 'error',
   'import/no-named-as-default': 'error',
   'import/no-named-as-default-member': 'error',
-  'import/no-deprecated': 'error',
+
+  // prefer eslint-plugin-deprecation
+  // https://github.com/import-js/eslint-plugin-import/issues/1532
+  'import/no-deprecated': 'off',
+
   'import/no-extraneous-dependencies': [
     'error',
     {

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-deprecated */
 import { assertNotType, assertType } from '../assert-type';
 import { isRecord } from './is-record';
 

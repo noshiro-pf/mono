@@ -10,10 +10,12 @@ import type {
 } from '../types';
 
 export const combineLatest = <A extends NonEmptyUnknownList>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   parents: Wrap<A>
 ): CombineLatestObservable<A> => new CombineLatestObservableClass(parents);
 
 export const combineLatestI = <A extends NonEmptyUnknownList>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   parents: WrapInitialized<A>
 ): InitializedCombineLatestObservable<A> =>
   new CombineLatestObservableClass(
@@ -26,6 +28,7 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, 'combineLatest', A>
   implements CombineLatestObservable<A>
 {
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor(parents: Wrap<A>) {
     const parentsValues = parents.map((p) => p.currentValue);
     super({

@@ -8,7 +8,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
 
 /**
  * @description Have control over `test` and `it` usages
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/consistent-test-it.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/consistent-test-it.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -19,6 +19,9 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  */
 namespace ConsistentTestIt {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -39,6 +42,7 @@ namespace ConsistentTestIt {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly fn?: 'it' | 'test';
@@ -52,7 +56,7 @@ namespace ConsistentTestIt {
 
 /**
  * @description Enforce assertion to be made in a test body
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/expect-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/expect-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -62,6 +66,9 @@ namespace ConsistentTestIt {
  */
 namespace ExpectExpect {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -84,6 +91,7 @@ namespace ExpectExpect {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly assertFunctionNames?: readonly [] | readonly [string];
@@ -96,8 +104,46 @@ namespace ExpectExpect {
 }
 
 /**
+ * @description Enforces a maximum number assertion calls in a test body
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/max-expects.md
+ *
+ *  | key         | value          |
+ *  | :---------- | :------------- |
+ *  | type        | suggestion     |
+ *  | category    | Best Practices |
+ *  | recommended | false          |
+ */
+namespace MaxExpects {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "max": {
+   *         "type": "integer",
+   *         "minimum": 1
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly max?: number;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * @description Enforces a maximum depth to nested describe calls
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/max-nested-describe.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/max-nested-describe.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -107,6 +153,9 @@ namespace ExpectExpect {
  */
 namespace MaxNestedDescribe {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -119,6 +168,7 @@ namespace MaxNestedDescribe {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly max?: number;
@@ -131,14 +181,14 @@ namespace MaxNestedDescribe {
 
 /**
  * @description Disallow alias methods
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-alias-methods.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-alias-methods.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
  *  | type        | suggestion     |
  *  | fixable     | code           |
  *  | category    | Best Practices |
- *  | recommended | false          |
+ *  | recommended | error          |
  */
 namespace NoAliasMethods {
   export type RuleEntry = Linter.RuleLevel;
@@ -146,7 +196,7 @@ namespace NoAliasMethods {
 
 /**
  * @description Disallow commented out tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-commented-out-tests.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-commented-out-tests.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -160,7 +210,7 @@ namespace NoCommentedOutTests {
 
 /**
  * @description Prevent calling `expect` conditionally
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-conditional-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-conditional-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -174,7 +224,7 @@ namespace NoConditionalExpect {
 
 /**
  * @description Disallow conditional logic in tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-conditional-in-test.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-conditional-in-test.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -188,7 +238,7 @@ namespace NoConditionalInTest {
 
 /**
  * @description Disallow use of deprecated functions
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-deprecated-functions.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-deprecated-functions.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -203,7 +253,7 @@ namespace NoDeprecatedFunctions {
 
 /**
  * @description Disallow disabled tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-disabled-tests.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-disabled-tests.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -217,7 +267,7 @@ namespace NoDisabledTests {
 
 /**
  * @description Avoid using a callback in asynchronous tests and hooks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-done-callback.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-done-callback.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -225,7 +275,6 @@ namespace NoDisabledTests {
  *  | hasSuggestions | true           |
  *  | category       | Best Practices |
  *  | recommended    | error          |
- *  | suggestion     | true           |
  */
 namespace NoDoneCallback {
   export type RuleEntry = Linter.RuleLevel;
@@ -233,7 +282,7 @@ namespace NoDoneCallback {
 
 /**
  * @description Disallow duplicate setup and teardown hooks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-duplicate-hooks.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-duplicate-hooks.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -247,7 +296,7 @@ namespace NoDuplicateHooks {
 
 /**
  * @description Disallow using `exports` in files containing tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-export.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-export.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -261,7 +310,7 @@ namespace NoExport {
 
 /**
  * @description Disallow focused tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-focused-tests.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-focused-tests.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -269,7 +318,6 @@ namespace NoExport {
  *  | hasSuggestions | true           |
  *  | category       | Best Practices |
  *  | recommended    | error          |
- *  | suggestion     | true           |
  */
 namespace NoFocusedTests {
   export type RuleEntry = Linter.RuleLevel;
@@ -277,7 +325,7 @@ namespace NoFocusedTests {
 
 /**
  * @description Disallow setup and teardown hooks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-hooks.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-hooks.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -287,6 +335,9 @@ namespace NoFocusedTests {
  */
 namespace NoHooks {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -304,6 +355,7 @@ namespace NoHooks {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allow?: readonly unknown[];
@@ -316,7 +368,7 @@ namespace NoHooks {
 
 /**
  * @description Disallow identical titles
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-identical-title.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-identical-title.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -330,7 +382,7 @@ namespace NoIdenticalTitle {
 
 /**
  * @description Disallow conditional logic
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-if.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-if.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -345,7 +397,7 @@ namespace NoIf {
 
 /**
  * @description Disallow string interpolation inside snapshots
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-interpolation-in-snapshots.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-interpolation-in-snapshots.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -359,7 +411,7 @@ namespace NoInterpolationInSnapshots {
 
 /**
  * @description Disallow Jasmine globals
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-jasmine-globals.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-jasmine-globals.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -373,22 +425,8 @@ namespace NoJasmineGlobals {
 }
 
 /**
- * @description Disallow importing Jest
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-jest-import.md
- *
- *  | key         | value          |
- *  | :---------- | :------------- |
- *  | type        | problem        |
- *  | category    | Best Practices |
- *  | recommended | error          |
- */
-namespace NoJestImport {
-  export type RuleEntry = Linter.RuleLevel;
-}
-
-/**
  * @description disallow large snapshots
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-large-snapshots.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-large-snapshots.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -398,6 +436,9 @@ namespace NoJestImport {
  */
 namespace NoLargeSnapshots {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -418,6 +459,7 @@ namespace NoLargeSnapshots {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly maxSize?: number;
@@ -432,7 +474,7 @@ namespace NoLargeSnapshots {
 
 /**
  * @description Disallow manually importing from `__mocks__`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-mocks-import.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-mocks-import.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -446,7 +488,7 @@ namespace NoMocksImport {
 
 /**
  * @description Disallow specific matchers & modifiers
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-restricted-matchers.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-restricted-matchers.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -456,6 +498,9 @@ namespace NoMocksImport {
  */
 namespace NoRestrictedMatchers {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -467,6 +512,7 @@ namespace NoRestrictedMatchers {
    *     }
    *   }
    * ]
+   * ```
    */
   export type Options = Readonly<Record<string, string | null>>;
 
@@ -477,7 +523,7 @@ namespace NoRestrictedMatchers {
 
 /**
  * @description Disallow using `expect` outside of `it` or `test` blocks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-standalone-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-standalone-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -487,6 +533,9 @@ namespace NoRestrictedMatchers {
  */
 namespace NoStandaloneExpect {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "properties": {
@@ -500,6 +549,7 @@ namespace NoStandaloneExpect {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly additionalTestBlockFunctions?: readonly string[];
@@ -512,7 +562,7 @@ namespace NoStandaloneExpect {
 
 /**
  * @description Use `.only` and `.skip` over `f` and `x`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-test-prefixes.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-test-prefixes.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -527,7 +577,7 @@ namespace NoTestPrefixes {
 
 /**
  * @description Disallow explicitly returning from tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/no-test-return-statement.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-test-return-statement.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -541,7 +591,7 @@ namespace NoTestReturnStatement {
 
 /**
  * @description Suggest using `toBeCalledWith()` or `toHaveBeenCalledWith()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-called-with.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-called-with.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -555,7 +605,7 @@ namespace PreferCalledWith {
 
 /**
  * @description Suggest using the built-in comparison matchers
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-comparison-matcher.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-comparison-matcher.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -569,8 +619,22 @@ namespace PreferComparisonMatcher {
 }
 
 /**
+ * @description Prefer using `.each` rather than manual loops
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-each.md
+ *
+ *  | key         | value          |
+ *  | :---------- | :------------- |
+ *  | type        | suggestion     |
+ *  | category    | Best Practices |
+ *  | recommended | false          |
+ */
+namespace PreferEach {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * @description Suggest using the built-in equality matchers
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-equality-matcher.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-equality-matcher.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -578,7 +642,6 @@ namespace PreferComparisonMatcher {
  *  | hasSuggestions | true           |
  *  | category       | Best Practices |
  *  | recommended    | false          |
- *  | suggestion     | true           |
  */
 namespace PreferEqualityMatcher {
   export type RuleEntry = Linter.RuleLevel;
@@ -586,7 +649,7 @@ namespace PreferEqualityMatcher {
 
 /**
  * @description Suggest using `expect.assertions()` OR `expect.hasAssertions()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-expect-assertions.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-expect-assertions.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -594,10 +657,12 @@ namespace PreferEqualityMatcher {
  *  | hasSuggestions | true           |
  *  | category       | Best Practices |
  *  | recommended    | false          |
- *  | suggestion     | true           |
  */
 namespace PreferExpectAssertions {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -615,6 +680,7 @@ namespace PreferExpectAssertions {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly onlyFunctionsWithAsyncKeyword?: boolean;
@@ -629,7 +695,7 @@ namespace PreferExpectAssertions {
 
 /**
  * @description Prefer `await expect(...).resolves` over `expect(await ...)` syntax
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-expect-resolves.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-expect-resolves.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -644,7 +710,7 @@ namespace PreferExpectResolves {
 
 /**
  * @description Prefer having hooks in a consistent order
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-hooks-in-order.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-hooks-in-order.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -658,7 +724,7 @@ namespace PreferHooksInOrder {
 
 /**
  * @description Suggest having hooks before any test cases
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-hooks-on-top.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-hooks-on-top.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -672,7 +738,7 @@ namespace PreferHooksOnTop {
 
 /**
  * @description Enforce lowercase test names
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-lowercase-title.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-lowercase-title.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -683,6 +749,9 @@ namespace PreferHooksOnTop {
  */
 namespace PreferLowercaseTitle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -713,6 +782,7 @@ namespace PreferLowercaseTitle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignore?: readonly ('describe' | 'test' | 'it')[];
@@ -726,8 +796,23 @@ namespace PreferLowercaseTitle {
 }
 
 /**
+ * @description Prefer mock resolved/rejected shorthands for promises
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-mock-promise-shorthand.md
+ *
+ *  | key         | value          |
+ *  | :---------- | :------------- |
+ *  | type        | suggestion     |
+ *  | fixable     | code           |
+ *  | category    | Best Practices |
+ *  | recommended | false          |
+ */
+namespace PreferMockPromiseShorthand {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * @description Prefer including a hint with external snapshots
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-snapshot-hint.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-snapshot-hint.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -737,6 +822,9 @@ namespace PreferLowercaseTitle {
  */
 namespace PreferSnapshotHint {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "string",
@@ -746,6 +834,7 @@ namespace PreferSnapshotHint {
    *     ]
    *   }
    * ]
+   * ```
    */
   export type Options = 'always' | 'multi';
 
@@ -756,7 +845,7 @@ namespace PreferSnapshotHint {
 
 /**
  * @description Suggest using `jest.spyOn()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-spy-on.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-spy-on.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -771,7 +860,7 @@ namespace PreferSpyOn {
 
 /**
  * @description Suggest using `toStrictEqual()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-strict-equal.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-strict-equal.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -779,7 +868,6 @@ namespace PreferSpyOn {
  *  | hasSuggestions | true           |
  *  | category       | Best Practices |
  *  | recommended    | false          |
- *  | suggestion     | true           |
  */
 namespace PreferStrictEqual {
   export type RuleEntry = Linter.RuleLevel;
@@ -787,7 +875,7 @@ namespace PreferStrictEqual {
 
 /**
  * @description Suggest using `toBe()` for primitive literals
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-to-be.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-to-be.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -802,7 +890,7 @@ namespace PreferToBe {
 
 /**
  * @description Suggest using `toContain()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-to-contain.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-to-contain.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -817,7 +905,7 @@ namespace PreferToContain {
 
 /**
  * @description Suggest using `toHaveLength()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-to-have-length.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-to-have-length.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -832,7 +920,7 @@ namespace PreferToHaveLength {
 
 /**
  * @description Suggest using `test.todo`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/prefer-todo.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-todo.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -847,7 +935,7 @@ namespace PreferTodo {
 
 /**
  * @description Require setup and teardown code to be within a hook
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/require-hook.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/require-hook.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -857,6 +945,9 @@ namespace PreferTodo {
  */
 namespace RequireHook {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -871,6 +962,7 @@ namespace RequireHook {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowedFunctionCalls?: readonly string[];
@@ -883,7 +975,7 @@ namespace RequireHook {
 
 /**
  * @description Require a message for `toThrow()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/require-to-throw-message.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/require-to-throw-message.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -897,7 +989,7 @@ namespace RequireToThrowMessage {
 
 /**
  * @description Require test cases and hooks to be inside a `describe` block
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/require-top-level-describe.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/require-top-level-describe.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -907,6 +999,9 @@ namespace RequireToThrowMessage {
  */
 namespace RequireTopLevelDescribe {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -919,6 +1014,7 @@ namespace RequireTopLevelDescribe {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly maxNumberOfTopLevelDescribes?: number;
@@ -931,7 +1027,7 @@ namespace RequireTopLevelDescribe {
 
 /**
  * @description Enforce unbound methods are called with their expected scope
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/unbound-method.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/unbound-method.md
  *
  *  | key                  | value          |
  *  | :------------------- | :------------- |
@@ -942,19 +1038,27 @@ namespace RequireTopLevelDescribe {
  */
 namespace UnboundMethod {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "ignoreStatic": {
+   *         "description": "Whether to skip checking whether `static` methods are correctly bound.",
    *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
+    /**
+     * Whether to skip checking whether `static` methods are correctly bound.
+     */
     readonly ignoreStatic?: boolean;
   };
 
@@ -965,7 +1069,7 @@ namespace UnboundMethod {
 
 /**
  * @description Enforce valid `describe()` callback
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/valid-describe-callback.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-describe-callback.md
  *
  *  | key         | value           |
  *  | :---------- | :-------------- |
@@ -979,7 +1083,7 @@ namespace ValidDescribeCallback {
 
 /**
  * @description Ensure promises that have expectations in their chain are valid
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/valid-expect-in-promise.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-expect-in-promise.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -993,7 +1097,7 @@ namespace ValidExpectInPromise {
 
 /**
  * @description Enforce valid `expect()` usage
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/valid-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -1003,6 +1107,9 @@ namespace ValidExpectInPromise {
  */
 namespace ValidExpect {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1029,6 +1136,7 @@ namespace ValidExpect {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly alwaysAwait?: boolean;
@@ -1044,7 +1152,7 @@ namespace ValidExpect {
 
 /**
  * @description Enforce valid titles
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v26.5.3/docs/rules/valid-title.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-title.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -1055,6 +1163,9 @@ namespace ValidExpect {
  */
 namespace ValidTitle {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -1117,7 +1228,9 @@ namespace ValidTitle {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
+  // modified
   export type Options = {
     readonly ignoreTypeOfDescribeName?: boolean;
     readonly disallowedWords?: readonly string[];
@@ -1137,6 +1250,7 @@ namespace ValidTitle {
 export type EslintJestRules = {
   readonly 'jest/consistent-test-it': ConsistentTestIt.RuleEntry;
   readonly 'jest/expect-expect': ExpectExpect.RuleEntry;
+  readonly 'jest/max-expects': MaxExpects.RuleEntry;
   readonly 'jest/max-nested-describe': MaxNestedDescribe.RuleEntry;
   readonly 'jest/no-alias-methods': NoAliasMethods.RuleEntry;
   readonly 'jest/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
@@ -1150,10 +1264,8 @@ export type EslintJestRules = {
   readonly 'jest/no-focused-tests': NoFocusedTests.RuleEntry;
   readonly 'jest/no-hooks': NoHooks.RuleEntry;
   readonly 'jest/no-identical-title': NoIdenticalTitle.RuleEntry;
-  readonly 'jest/no-if': NoIf.RuleEntry;
   readonly 'jest/no-interpolation-in-snapshots': NoInterpolationInSnapshots.RuleEntry;
   readonly 'jest/no-jasmine-globals': NoJasmineGlobals.RuleEntry;
-  readonly 'jest/no-jest-import': NoJestImport.RuleEntry;
   readonly 'jest/no-large-snapshots': NoLargeSnapshots.RuleEntry;
   readonly 'jest/no-mocks-import': NoMocksImport.RuleEntry;
   readonly 'jest/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
@@ -1162,12 +1274,14 @@ export type EslintJestRules = {
   readonly 'jest/no-test-return-statement': NoTestReturnStatement.RuleEntry;
   readonly 'jest/prefer-called-with': PreferCalledWith.RuleEntry;
   readonly 'jest/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
+  readonly 'jest/prefer-each': PreferEach.RuleEntry;
   readonly 'jest/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
   readonly 'jest/prefer-expect-assertions': PreferExpectAssertions.RuleEntry;
   readonly 'jest/prefer-expect-resolves': PreferExpectResolves.RuleEntry;
   readonly 'jest/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
   readonly 'jest/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
   readonly 'jest/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
+  readonly 'jest/prefer-mock-promise-shorthand': PreferMockPromiseShorthand.RuleEntry;
   readonly 'jest/prefer-snapshot-hint': PreferSnapshotHint.RuleEntry;
   readonly 'jest/prefer-spy-on': PreferSpyOn.RuleEntry;
   readonly 'jest/prefer-strict-equal': PreferStrictEqual.RuleEntry;
@@ -1183,4 +1297,7 @@ export type EslintJestRules = {
   readonly 'jest/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
   readonly 'jest/valid-expect': ValidExpect.RuleEntry;
   readonly 'jest/valid-title': ValidTitle.RuleEntry;
+
+  // deprecated
+  readonly 'jest/no-if': NoIf.RuleEntry;
 };

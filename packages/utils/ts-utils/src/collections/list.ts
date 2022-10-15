@@ -261,7 +261,7 @@ export namespace IList {
   export function last<T>(list: NonEmptyArray<T>): T;
   export function last<T>(list: readonly T[]): T | undefined;
   export function last<T>(list: readonly T[]): T | undefined {
-    return isEmpty(list) ? undefined : list[list.length - 1];
+    return list.at(-1);
   }
 
   export const tail = <T extends readonly unknown[]>(
@@ -710,16 +710,16 @@ export namespace IList {
     list: T,
     grouper: (value: T[number], index: number) => G
   ): IMap<G, number> => {
-    const groups = new MutableMap<G, number>();
+    const mut_groups = new MutableMap<G, number>();
 
     for (const [index, e] of list.entries()) {
       const key = grouper(e, index);
-      const curr = groups.get(key) ?? 0;
+      const curr = mut_groups.get(key) ?? 0;
 
-      groups.set(key, curr + 1);
+      mut_groups.set(key, curr + 1);
     }
 
-    return IMap.new(groups);
+    return IMap.new(mut_groups);
   };
 
   export const groupBy = <T extends readonly unknown[], G extends Primitive>(
@@ -766,13 +766,13 @@ export namespace IList {
     list: readonly A[],
     mapFn: (value: A) => B
   ): readonly A[] {
-    const mappedValues = new MutableSet();
+    const mut_mappedValues = new MutableSet();
 
     return list.filter((val) => {
       const mappedValue = mapFn(val);
 
-      if (mappedValues.has(mappedValue)) return false;
-      mappedValues.add(mappedValue);
+      if (mut_mappedValues.has(mappedValue)) return false;
+      mut_mappedValues.add(mappedValue);
 
       return true;
     });

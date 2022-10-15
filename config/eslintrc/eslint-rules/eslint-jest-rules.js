@@ -21,10 +21,8 @@ const eslintJestRules = {
   'jest/no-focused-tests': 'error',
   'jest/no-hooks': 'error',
   'jest/no-identical-title': 'error',
-  'jest/no-if': 'off',
   'jest/no-interpolation-in-snapshots': 'error',
   'jest/no-jasmine-globals': 'error',
-  'jest/no-jest-import': 'error',
   'jest/no-large-snapshots': 'error',
   'jest/no-mocks-import': 'error',
   'jest/no-restricted-matchers': [
@@ -60,6 +58,12 @@ const eslintJestRules = {
   'jest/valid-expect': 'error',
   'jest/valid-title': 'off',
   'jest/prefer-hooks-in-order': 'error',
+  'jest/max-expects': 'off',
+  'jest/prefer-each': 'error',
+  'jest/prefer-mock-promise-shorthand': 'error',
+
+  // deprecated
+  'jest/no-if': 'off',
 };
 
 module.exports = { eslintJestRules };

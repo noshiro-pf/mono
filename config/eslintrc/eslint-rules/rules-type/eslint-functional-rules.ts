@@ -8,7 +8,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
 
 /**
  * @description Enforce functional parameters.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/functional-parameters.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/functional-parameters.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -17,11 +17,23 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
  */
 namespace FunctionalParameters {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
    *     "properties": {
    *       "ignorePattern": {
+   *         "type": [
+   *           "string",
+   *           "array"
+   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "ignorePrefixSelector": {
    *         "type": [
    *           "string",
    *           "array"
@@ -73,9 +85,11 @@ namespace FunctionalParameters {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignorePattern?: string | readonly string[];
+    readonly ignorePrefixSelector?: string | readonly string[];
     readonly allowRestParameter?: boolean;
     readonly allowArgumentsKeyword?: boolean;
     readonly enforceParameterCount?:
@@ -94,7 +108,7 @@ namespace FunctionalParameters {
 
 /**
  * @description Enforce treating data as immutable.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/immutable-data.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/immutable-data.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -103,6 +117,9 @@ namespace FunctionalParameters {
  */
 namespace ImmutableData {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -114,8 +131,7 @@ namespace ImmutableData {
    *         ],
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "minItems": 0
+   *         }
    *       },
    *       "ignoreAccessorPattern": {
    *         "type": [
@@ -165,6 +181,7 @@ namespace ImmutableData {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignorePattern?: string | readonly string[];
@@ -186,7 +203,7 @@ namespace ImmutableData {
 
 /**
  * @description Disallow classes.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-class.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-class.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -199,7 +216,7 @@ namespace NoClass {
 
 /**
  * @description Disallow conditional statements.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-conditional-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-conditional-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -208,6 +225,9 @@ namespace NoClass {
  */
 namespace NoConditionalStatement {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -229,6 +249,7 @@ namespace NoConditionalStatement {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowReturningBranches?: boolean | 'ifExhaustive';
@@ -241,7 +262,7 @@ namespace NoConditionalStatement {
 
 /**
  * @description Disallow expression statements.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-expression-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-expression-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -250,6 +271,9 @@ namespace NoConditionalStatement {
  */
 namespace NoExpressionStatement {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -261,8 +285,7 @@ namespace NoExpressionStatement {
    *         ],
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "minItems": 0
+   *         }
    *       },
    *       "ignoreVoid": {
    *         "type": "boolean"
@@ -271,6 +294,7 @@ namespace NoExpressionStatement {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignorePattern?: string | readonly string[];
@@ -284,7 +308,7 @@ namespace NoExpressionStatement {
 
 /**
  * @description Disallow mutable variables.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-let.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-let.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -294,6 +318,9 @@ namespace NoExpressionStatement {
  */
 namespace NoLet {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -308,8 +335,7 @@ namespace NoLet {
    *         ],
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "minItems": 0
+   *         }
    *       },
    *       "allowInForLoopInit": {
    *         "type": "boolean"
@@ -318,6 +344,7 @@ namespace NoLet {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowLocalMutation?: boolean;
@@ -332,7 +359,7 @@ namespace NoLet {
 
 /**
  * @description Disallow imperative loops.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-loop-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-loop-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -345,7 +372,7 @@ namespace NoLoopStatement {
 
 /**
  * @description Prefer property signatures with readonly modifiers over method signatures.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-method-signature.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-method-signature.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -354,6 +381,9 @@ namespace NoLoopStatement {
  */
 namespace NoMethodSignature {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -366,6 +396,7 @@ namespace NoMethodSignature {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignoreIfReadonly?: boolean;
@@ -378,7 +409,7 @@ namespace NoMethodSignature {
 
 /**
  * @description Restrict types so that only members of the same kind of are allowed in them.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-mixed-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-mixed-type.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -387,6 +418,9 @@ namespace NoMethodSignature {
  */
 namespace NoMixedType {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -401,6 +435,7 @@ namespace NoMixedType {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly checkInterfaces?: boolean;
@@ -414,7 +449,7 @@ namespace NoMixedType {
 
 /**
  * @description Disallow try-catch[-finally] and try-finally patterns.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-promise-reject.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-promise-reject.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -427,7 +462,7 @@ namespace NoPromiseReject {
 
 /**
  * @description Disallow functions that don't return anything.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-return-void.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-return-void.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -436,6 +471,9 @@ namespace NoPromiseReject {
  */
 namespace NoReturnVoid {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -453,6 +491,7 @@ namespace NoReturnVoid {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowNull?: boolean;
@@ -467,7 +506,7 @@ namespace NoReturnVoid {
 
 /**
  * @description Disallow this access.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-this-expression.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-this-expression.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -480,7 +519,7 @@ namespace NoThisExpression {
 
 /**
  * @description Disallow throwing exceptions.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-throw-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-throw-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -489,6 +528,9 @@ namespace NoThisExpression {
  */
 namespace NoThrowStatement {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -500,6 +542,7 @@ namespace NoThrowStatement {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowInAsyncFunctions?: boolean;
@@ -512,7 +555,7 @@ namespace NoThrowStatement {
 
 /**
  * @description Disallow try-catch[-finally] and try-finally patterns.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/no-try-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-try-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -521,6 +564,9 @@ namespace NoThrowStatement {
  */
 namespace NoTryStatement {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -535,6 +581,7 @@ namespace NoTryStatement {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowCatch?: boolean;
@@ -548,7 +595,7 @@ namespace NoTryStatement {
 
 /**
  * @description Prefer readonly array over mutable arrays.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/prefer-readonly-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/prefer-readonly-type.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -558,6 +605,9 @@ namespace NoTryStatement {
  */
 namespace PreferReadonlyType {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -572,8 +622,7 @@ namespace PreferReadonlyType {
    *         ],
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "minItems": 0
+   *         }
    *       },
    *       "ignoreClass": {
    *         "oneOf": [
@@ -604,6 +653,7 @@ namespace PreferReadonlyType {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly allowLocalMutation?: boolean;
@@ -622,7 +672,7 @@ namespace PreferReadonlyType {
 
 /**
  * @description Replaces `x => f(x)` with just `f`.
- * @link https://github.com/jonaskello/eslint-plugin-functional/blob/v4.2.1/docs/rules/prefer-tacit.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/prefer-tacit.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -632,6 +682,9 @@ namespace PreferReadonlyType {
  */
 namespace PreferTacit {
   /**
+   * ### schema
+   *
+   * ```json
    * [
    *   {
    *     "type": "object",
@@ -643,8 +696,7 @@ namespace PreferTacit {
    *         ],
    *         "items": {
    *           "type": "string"
-   *         },
-   *         "minItems": 0
+   *         }
    *       },
    *       "ignoreImmediateMutation": {
    *         "type": "boolean"
@@ -672,6 +724,7 @@ namespace PreferTacit {
    *     "additionalProperties": false
    *   }
    * ]
+   * ```
    */
   export type Options = {
     readonly ignorePattern?: string | readonly string[];

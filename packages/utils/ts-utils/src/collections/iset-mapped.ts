@@ -170,24 +170,24 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     >[]
   ): ISetMapped<K, KM> {
     // eslint-disable-next-line no-restricted-globals
-    const result = new Set<KM>(this.#set);
+    const mut_result = new Set<KM>(this.#set);
 
     for (const action of actions) {
       const key = this.#toKey(action.key);
 
       switch (action.type) {
         case 'delete':
-          result.delete(key);
+          mut_result.delete(key);
           break;
         case 'add':
-          result.add(key);
+          mut_result.add(key);
           break;
       }
     }
 
     return ISetMapped.new<K, KM>(
       // eslint-disable-next-line no-restricted-globals
-      Array.from(result, this.#fromKey),
+      Array.from(mut_result, this.#fromKey),
       this.#toKey,
       this.#fromKey
     );

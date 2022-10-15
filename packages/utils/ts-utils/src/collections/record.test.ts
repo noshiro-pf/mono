@@ -217,6 +217,7 @@ describe('IRecord', () => {
     {
       const result = IRecord.updateIn(rcd, ['y', 'c'] as const, (curr) => ({
         d: curr.d + 1000,
+        // eslint-disable-next-line unicorn/prefer-at
         '4': curr[4] + 2000,
       }));
 

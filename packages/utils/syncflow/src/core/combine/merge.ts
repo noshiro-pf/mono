@@ -9,6 +9,7 @@ import type {
 
 /** @deprecated use `createState` instead */
 export const merge = <P extends NonEmptyUnknownList>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   parents: Wrap<P>
 ): MergeObservable<P> => new MergeObservableClass(parents);
 
@@ -16,6 +17,7 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
   extends SyncChildObservableClass<ArrayElement<P>, 'merge', P>
   implements MergeObservable<P>
 {
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor(parents: Wrap<P>) {
     super({
       parents,
