@@ -10,7 +10,7 @@ export const writings: readonly WritingsInfo[] = [
   },
   {
     id: 'event-schedule-app',
-    link: 'https://noshiro.notion.site/899268cf44c54eefa564543c63864f2a',
+    link: 'https://noshiro.notion.site/71b7d1ccf29945c0a1a086e1a030a91a',
     title: '★ 自作アプリ「イベント日程調整アプリ」の紹介',
     subtitle:
       'イベント日程調整アプリ（https://event-schedule-app.web.app/）の機能の紹介ページ',
@@ -51,9 +51,9 @@ export const writings: readonly WritingsInfo[] = [
     id: 'about-noUncheckedIndexedAccess',
     link: 'https://www.notion.so/noshiro/TypeScript-v4-1-noUncheckedIndexedAccess-00144ca0b4f44c1cb73f7ca43002aa70',
     title:
-      'TypeScript v4.1 で追加されたnoUncheckedIndexedAccessオプションと上手くやっていくには',
+      'TypeScript v4.1 で追加されたnoUncheckedIndexedAccessオプションを有効にして使いこなす方法',
     subtitle: '',
-    body: 'TSの新コンパイラオプションnoUncheckedIndexedAccessを使う際の自己流ノウハウをまとめました。',
+    body: 'TSの新コンパイラオプションnoUncheckedIndexedAccessを使う際に便利なユーティリティの紹介です。',
   },
   {
     id: 'syncflow-slides',
