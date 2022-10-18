@@ -6,7 +6,7 @@ import { useEffect, useMemo } from 'preact/hooks';
 import { BiographyMd, CareerMd, CatIconImage, SkillsMd } from './assets';
 import {
   GithubIconLink,
-  LastUpdated,
+  LastUpdatedAt,
   MuiAppBar,
   MuiTabs,
   Products,
@@ -92,7 +92,7 @@ export const Main = memoNamed('Main', () => {
       </AppBarFlex>
 
       <LastUpdatedWrapper>
-        <LastUpdated />
+        <LastUpdatedAt />
       </LastUpdatedWrapper>
 
       <ContentWrapper>{match(pathname, pages)}</ContentWrapper>

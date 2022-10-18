@@ -89,16 +89,16 @@
     -   Languages
         -   Node.js
         -   PHP（数千行程度） 今は使っていない
-        -   MySQL
+    -   MySQL, PostgreSQL
+    -   Libraries
+        -   nestjs
+        -   express (nodejs)
     -   BaaS
         -   **firebase** (hosting, firestore, functions, auth)
         -   Netlify
         -   **Heroku**
             -   discord bot に使用
     -   Docker
-    -   Libraries
-        -   nestjs
-    -   express (nodejs)
 -   Others
     -   Languages
         -   C++（数万行オーダー）
