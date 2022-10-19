@@ -4606,6 +4606,73 @@ namespace LinesBetweenClassMembers {
 }
 
 /**
+ * @description Require or disallow logical assignment logical operator shorthand
+ * @link https://eslint.org/docs/rules/logical-assignment-operators
+ *
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ */
+namespace LogicalAssignmentOperators {
+  /**
+   * ### schema
+   *
+   * ```json
+   * {
+   *   "type": "array",
+   *   "oneOf": [
+   *     {
+   *       "items": [
+   *         {
+   *           "const": "always"
+   *         },
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "enforceForIfStatements": {
+   *               "type": "boolean"
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         }
+   *       ],
+   *       "minItems": 0,
+   *       "maxItems": 2
+   *     },
+   *     {
+   *       "items": [
+   *         {
+   *           "const": "never"
+   *         }
+   *       ],
+   *       "minItems": 1,
+   *       "maxItems": 1
+   *     }
+   *   ]
+   * }
+   * ```
+   */
+  /* modified */
+  export type Options =
+    | readonly []
+    | readonly ['always']
+    | readonly [
+        'always',
+        {
+          readonly enforceForIfStatements?: boolean;
+        }
+      ]
+    | readonly ['never'];
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * @description Enforce a maximum number of classes per file
  * @link https://eslint.org/docs/rules/max-classes-per-file
  *
@@ -12976,6 +13043,7 @@ export type EslintRules = {
   readonly 'linebreak-style': LinebreakStyle.RuleEntry;
   readonly 'lines-around-comment': LinesAroundComment.RuleEntry;
   readonly 'lines-between-class-members': LinesBetweenClassMembers.RuleEntry;
+  readonly 'logical-assignment-operators': LogicalAssignmentOperators.RuleEntry;
   readonly 'max-classes-per-file': MaxClassesPerFile.RuleEntry;
   readonly 'max-depth': MaxDepth.RuleEntry;
   readonly 'max-len': MaxLen.RuleEntry;

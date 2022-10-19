@@ -8,7 +8,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
 
 /**
  * @description Have control over `test` and `it` usages
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/consistent-test-it.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/consistent-test-it.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -56,7 +56,7 @@ namespace ConsistentTestIt {
 
 /**
  * @description Enforce assertion to be made in a test body
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/expect-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/expect-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -105,7 +105,7 @@ namespace ExpectExpect {
 
 /**
  * @description Enforces a maximum number assertion calls in a test body
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/max-expects.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/max-expects.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -143,7 +143,7 @@ namespace MaxExpects {
 
 /**
  * @description Enforces a maximum depth to nested describe calls
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/max-nested-describe.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/max-nested-describe.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -181,7 +181,7 @@ namespace MaxNestedDescribe {
 
 /**
  * @description Disallow alias methods
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-alias-methods.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-alias-methods.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -196,7 +196,7 @@ namespace NoAliasMethods {
 
 /**
  * @description Disallow commented out tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-commented-out-tests.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-commented-out-tests.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -210,7 +210,7 @@ namespace NoCommentedOutTests {
 
 /**
  * @description Prevent calling `expect` conditionally
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-conditional-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-conditional-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -224,7 +224,7 @@ namespace NoConditionalExpect {
 
 /**
  * @description Disallow conditional logic in tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-conditional-in-test.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-conditional-in-test.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -238,7 +238,7 @@ namespace NoConditionalInTest {
 
 /**
  * @description Disallow use of deprecated functions
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-deprecated-functions.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-deprecated-functions.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -253,7 +253,7 @@ namespace NoDeprecatedFunctions {
 
 /**
  * @description Disallow disabled tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-disabled-tests.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-disabled-tests.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -267,7 +267,7 @@ namespace NoDisabledTests {
 
 /**
  * @description Avoid using a callback in asynchronous tests and hooks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-done-callback.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-done-callback.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -282,7 +282,7 @@ namespace NoDoneCallback {
 
 /**
  * @description Disallow duplicate setup and teardown hooks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-duplicate-hooks.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-duplicate-hooks.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -296,7 +296,7 @@ namespace NoDuplicateHooks {
 
 /**
  * @description Disallow using `exports` in files containing tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-export.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-export.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -310,7 +310,7 @@ namespace NoExport {
 
 /**
  * @description Disallow focused tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-focused-tests.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-focused-tests.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -325,7 +325,7 @@ namespace NoFocusedTests {
 
 /**
  * @description Disallow setup and teardown hooks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-hooks.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-hooks.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -368,7 +368,7 @@ namespace NoHooks {
 
 /**
  * @description Disallow identical titles
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-identical-title.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-identical-title.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -382,7 +382,7 @@ namespace NoIdenticalTitle {
 
 /**
  * @description Disallow conditional logic
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-if.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-if.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -397,7 +397,7 @@ namespace NoIf {
 
 /**
  * @description Disallow string interpolation inside snapshots
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-interpolation-in-snapshots.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-interpolation-in-snapshots.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -411,7 +411,7 @@ namespace NoInterpolationInSnapshots {
 
 /**
  * @description Disallow Jasmine globals
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-jasmine-globals.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-jasmine-globals.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -426,7 +426,7 @@ namespace NoJasmineGlobals {
 
 /**
  * @description disallow large snapshots
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-large-snapshots.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-large-snapshots.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -474,7 +474,7 @@ namespace NoLargeSnapshots {
 
 /**
  * @description Disallow manually importing from `__mocks__`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-mocks-import.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-mocks-import.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -487,8 +487,43 @@ namespace NoMocksImport {
 }
 
 /**
+ * @description Disallow specific `jest.` methods
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-restricted-jest-methods.md
+ *
+ *  | key         | value          |
+ *  | :---------- | :------------- |
+ *  | type        | suggestion     |
+ *  | category    | Best Practices |
+ *  | recommended | false          |
+ */
+namespace NoRestrictedJestMethods {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": {
+   *       "type": [
+   *         "string",
+   *         "null"
+   *       ]
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<Record<string, string | null>>;
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * @description Disallow specific matchers & modifiers
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-restricted-matchers.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-restricted-matchers.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -523,7 +558,7 @@ namespace NoRestrictedMatchers {
 
 /**
  * @description Disallow using `expect` outside of `it` or `test` blocks
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-standalone-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-standalone-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -562,7 +597,7 @@ namespace NoStandaloneExpect {
 
 /**
  * @description Use `.only` and `.skip` over `f` and `x`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-test-prefixes.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-test-prefixes.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -577,7 +612,7 @@ namespace NoTestPrefixes {
 
 /**
  * @description Disallow explicitly returning from tests
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/no-test-return-statement.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/no-test-return-statement.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -591,7 +626,7 @@ namespace NoTestReturnStatement {
 
 /**
  * @description Suggest using `toBeCalledWith()` or `toHaveBeenCalledWith()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-called-with.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-called-with.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -605,7 +640,7 @@ namespace PreferCalledWith {
 
 /**
  * @description Suggest using the built-in comparison matchers
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-comparison-matcher.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-comparison-matcher.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -620,7 +655,7 @@ namespace PreferComparisonMatcher {
 
 /**
  * @description Prefer using `.each` rather than manual loops
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-each.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-each.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -634,7 +669,7 @@ namespace PreferEach {
 
 /**
  * @description Suggest using the built-in equality matchers
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-equality-matcher.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-equality-matcher.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -649,7 +684,7 @@ namespace PreferEqualityMatcher {
 
 /**
  * @description Suggest using `expect.assertions()` OR `expect.hasAssertions()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-expect-assertions.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-expect-assertions.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -695,7 +730,7 @@ namespace PreferExpectAssertions {
 
 /**
  * @description Prefer `await expect(...).resolves` over `expect(await ...)` syntax
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-expect-resolves.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-expect-resolves.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -710,7 +745,7 @@ namespace PreferExpectResolves {
 
 /**
  * @description Prefer having hooks in a consistent order
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-hooks-in-order.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-hooks-in-order.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -724,7 +759,7 @@ namespace PreferHooksInOrder {
 
 /**
  * @description Suggest having hooks before any test cases
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-hooks-on-top.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-hooks-on-top.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -738,7 +773,7 @@ namespace PreferHooksOnTop {
 
 /**
  * @description Enforce lowercase test names
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-lowercase-title.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-lowercase-title.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -797,7 +832,7 @@ namespace PreferLowercaseTitle {
 
 /**
  * @description Prefer mock resolved/rejected shorthands for promises
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-mock-promise-shorthand.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-mock-promise-shorthand.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -812,7 +847,7 @@ namespace PreferMockPromiseShorthand {
 
 /**
  * @description Prefer including a hint with external snapshots
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-snapshot-hint.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-snapshot-hint.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -845,7 +880,7 @@ namespace PreferSnapshotHint {
 
 /**
  * @description Suggest using `jest.spyOn()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-spy-on.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-spy-on.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -860,7 +895,7 @@ namespace PreferSpyOn {
 
 /**
  * @description Suggest using `toStrictEqual()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-strict-equal.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-strict-equal.md
  *
  *  | key            | value          |
  *  | :------------- | :------------- |
@@ -875,7 +910,7 @@ namespace PreferStrictEqual {
 
 /**
  * @description Suggest using `toBe()` for primitive literals
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-to-be.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-to-be.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -890,7 +925,7 @@ namespace PreferToBe {
 
 /**
  * @description Suggest using `toContain()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-to-contain.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-to-contain.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -905,7 +940,7 @@ namespace PreferToContain {
 
 /**
  * @description Suggest using `toHaveLength()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-to-have-length.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-to-have-length.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -920,7 +955,7 @@ namespace PreferToHaveLength {
 
 /**
  * @description Suggest using `test.todo`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/prefer-todo.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/prefer-todo.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -935,7 +970,7 @@ namespace PreferTodo {
 
 /**
  * @description Require setup and teardown code to be within a hook
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/require-hook.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/require-hook.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -975,7 +1010,7 @@ namespace RequireHook {
 
 /**
  * @description Require a message for `toThrow()`
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/require-to-throw-message.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/require-to-throw-message.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -989,7 +1024,7 @@ namespace RequireToThrowMessage {
 
 /**
  * @description Require test cases and hooks to be inside a `describe` block
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/require-top-level-describe.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/require-top-level-describe.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -1027,7 +1062,7 @@ namespace RequireTopLevelDescribe {
 
 /**
  * @description Enforce unbound methods are called with their expected scope
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/unbound-method.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/unbound-method.md
  *
  *  | key                  | value          |
  *  | :------------------- | :------------- |
@@ -1069,7 +1104,7 @@ namespace UnboundMethod {
 
 /**
  * @description Enforce valid `describe()` callback
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-describe-callback.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/valid-describe-callback.md
  *
  *  | key         | value           |
  *  | :---------- | :-------------- |
@@ -1083,7 +1118,7 @@ namespace ValidDescribeCallback {
 
 /**
  * @description Ensure promises that have expectations in their chain are valid
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-expect-in-promise.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/valid-expect-in-promise.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -1097,7 +1132,7 @@ namespace ValidExpectInPromise {
 
 /**
  * @description Enforce valid `expect()` usage
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-expect.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/valid-expect.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -1152,7 +1187,7 @@ namespace ValidExpect {
 
 /**
  * @description Enforce valid titles
- * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.0.4/docs/rules/valid-title.md
+ * @link https://github.com/jest-community/eslint-plugin-jest/blob/v27.1.1/docs/rules/valid-title.md
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
@@ -1268,6 +1303,7 @@ export type EslintJestRules = {
   readonly 'jest/no-jasmine-globals': NoJasmineGlobals.RuleEntry;
   readonly 'jest/no-large-snapshots': NoLargeSnapshots.RuleEntry;
   readonly 'jest/no-mocks-import': NoMocksImport.RuleEntry;
+  readonly 'jest/no-restricted-jest-methods': NoRestrictedJestMethods.RuleEntry;
   readonly 'jest/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
   readonly 'jest/no-standalone-expect': NoStandaloneExpect.RuleEntry;
   readonly 'jest/no-test-prefixes': NoTestPrefixes.RuleEntry;

@@ -8,6 +8,7 @@
 const eslintJestRules = {
   'jest/consistent-test-it': ['error', { fn: 'test' }],
   'jest/expect-expect': 'error',
+  'jest/max-expects': 'off',
   'jest/max-nested-describe': 'error',
   'jest/no-alias-methods': 'error',
   'jest/no-commented-out-tests': 'off',
@@ -25,6 +26,13 @@ const eslintJestRules = {
   'jest/no-jasmine-globals': 'error',
   'jest/no-large-snapshots': 'error',
   'jest/no-mocks-import': 'error',
+  'jest/no-restricted-jest-methods': [
+    'error',
+    {
+      advanceTimersByTime: null,
+      spyOn: null,
+    },
+  ],
   'jest/no-restricted-matchers': [
     'error',
     {
@@ -37,11 +45,14 @@ const eslintJestRules = {
   'jest/no-test-return-statement': 'error',
   'jest/prefer-called-with': 'error',
   'jest/prefer-comparison-matcher': 'error',
+  'jest/prefer-each': 'error',
   'jest/prefer-equality-matcher': 'error',
   'jest/prefer-expect-assertions': 'off',
   'jest/prefer-expect-resolves': 'error',
+  'jest/prefer-hooks-in-order': 'error',
   'jest/prefer-hooks-on-top': 'error',
   'jest/prefer-lowercase-title': 'off',
+  'jest/prefer-mock-promise-shorthand': 'error',
   'jest/prefer-snapshot-hint': 'error',
   'jest/prefer-spy-on': 'error',
   'jest/prefer-strict-equal': 'error',
@@ -57,10 +68,6 @@ const eslintJestRules = {
   'jest/valid-expect-in-promise': 'error',
   'jest/valid-expect': 'error',
   'jest/valid-title': 'off',
-  'jest/prefer-hooks-in-order': 'error',
-  'jest/max-expects': 'off',
-  'jest/prefer-each': 'error',
-  'jest/prefer-mock-promise-shorthand': 'error',
 
   // deprecated
   'jest/no-if': 'off',
