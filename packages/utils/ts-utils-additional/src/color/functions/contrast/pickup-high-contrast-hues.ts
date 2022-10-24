@@ -6,7 +6,7 @@ import { getLuminanceListAccumulated } from './get-luminance-list-acc';
 import { relativeLuminance } from './relative-luminance';
 
 // constants
-const hues = IList.seqThrow(360) as readonly Hue[] as NonEmptyArray<Hue>;
+const hues = IList.seqUnwrapped(360) as readonly Hue[] as NonEmptyArray<Hue>;
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す
@@ -27,7 +27,7 @@ export const pickupHighContrastHues = (
   const luminanceDiffAccumulated = getLuminanceListAccumulated(luminanceList);
 
   /* pickup n hues */
-  const mut_result = IList.zerosThrow(n) as MutableNonEmptyArray<Hue>;
+  const mut_result = IList.zerosUnwrapped(n) as MutableNonEmptyArray<Hue>;
 
   let mut_i = 0;
   let mut_y = 0;
