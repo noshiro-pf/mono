@@ -2,7 +2,7 @@ import { isNumber, Json, Num, Result } from '@noshiro/ts-utils';
 import type { Type } from '../type';
 import { createAssertFunction, createIsFnFromValidateFn } from '../utils';
 
-export const uintRange = <Max extends Seq<100>, Min extends Seq<Max>>({
+export const uintRange = <Max extends Index<100>, Min extends Index<Max>>({
   defaultValue,
   max,
   min,

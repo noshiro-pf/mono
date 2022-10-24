@@ -1,1 +1,1 @@
-export type Uint8 = Seq<256>;
+export type Uint8 = Index<256>;
