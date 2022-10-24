@@ -1,13 +1,14 @@
 import { IList, Result } from '@noshiro/ts-utils';
 import type { Type } from '../type';
-import type { Uint8 } from '../utils';
 import {
   createAssertFunction,
   createIsFnFromValidateFn,
   validationErrorMessage,
 } from '../utils';
 
-export const arrayOfLength = <A, N extends Uint8>(
+type Index1000 = Index<1000>;
+
+export const arrayOfLength = <A, N extends Index1000>(
   size: N,
   elementType: Type<A>,
   options?: Readonly<{
