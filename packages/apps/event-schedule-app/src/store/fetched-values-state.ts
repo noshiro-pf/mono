@@ -42,7 +42,7 @@ router.eventId$.subscribe(() => {
 });
 
 fireAuthUser$
-  .chain(mapI((u) => mapNullable(u, (a) => a.uid)))
+  .chain(mapI((u) => mapOptional(u, (a) => a.uid)))
   .chain(distinctUntilChangedI())
   .subscribe(() => {
     EventListStore.fetchEventList();

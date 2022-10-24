@@ -530,7 +530,7 @@ export namespace AnswerPageStore {
     | undefined
   > = eventSchedule$.chain(
     mapI((e) =>
-      mapNullable(e, (eventSchedule) => ({
+      mapOptional(e, (eventSchedule) => ({
         good: {
           iconDescription: eventSchedule.answerIcons.good.description,
           onClick: () => {
@@ -585,7 +585,7 @@ export namespace AnswerPageStore {
   > = combineLatestI([eventSchedule$, answerSelectionMap$]).chain(
     mapI(
       ([e, answerSelectionMap]) =>
-        mapNullable(e, (eventSchedule) =>
+        mapOptional(e, (eventSchedule) =>
           eventSchedule.datetimeRangeList.map(
             (d) =>
               ({

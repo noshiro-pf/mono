@@ -21,7 +21,7 @@ export const EventScheduleDiff = memoNamed<Props>(
         <Title>{dc.title}</Title>
         <ul>
           {list1.map((li) =>
-            mapNullable(diff[li], (s) => (
+            mapOptional(diff[li], (s) => (
               <li key={li}>
                 {dc.items[li]}
                 {s}
@@ -63,7 +63,7 @@ export const EventScheduleDiff = memoNamed<Props>(
           )}
 
           {list2.map((li) =>
-            mapNullable(diff[li], (s) => (
+            mapOptional(diff[li], (s) => (
               <li key={li}>
                 {dc.items[li]}
                 {s}
@@ -79,7 +79,7 @@ export const EventScheduleDiff = memoNamed<Props>(
             <li>
               {dc.items.answerIcons.title}
               <ul>
-                {mapNullable(diff.answerIcons.good.description, (s) => (
+                {mapOptional(diff.answerIcons.good.description, (s) => (
                   <li>
                     {dc.items.answerIcons.good.title}
                     <ul>
@@ -96,13 +96,13 @@ export const EventScheduleDiff = memoNamed<Props>(
                   <li>
                     {dc.items.answerIcons.fair.title}
                     <ul>
-                      {mapNullable(diff.answerIcons.fair.description, (s) => (
+                      {mapOptional(diff.answerIcons.fair.description, (s) => (
                         <li>
                           {dc.items.answerIcons.fair.description}
                           {s}
                         </li>
                       ))}
-                      {mapNullable(diff.answerIcons.fair.point, (s) => (
+                      {mapOptional(diff.answerIcons.fair.point, (s) => (
                         <li>
                           {dc.items.answerIcons.fair.point}
                           {s}
@@ -112,7 +112,7 @@ export const EventScheduleDiff = memoNamed<Props>(
                   </li>
                 )}
 
-                {mapNullable(diff.answerIcons.poor.description, (s) => (
+                {mapOptional(diff.answerIcons.poor.description, (s) => (
                   <li>
                     {dc.items.answerIcons.poor.title}
                     <ul>

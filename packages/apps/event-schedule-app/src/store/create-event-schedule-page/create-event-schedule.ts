@@ -82,7 +82,7 @@ export namespace CreateEventScheduleStore {
       datetimeSpecification: commonState.datetimeSpecification,
       notes: commonState.notes,
       notificationSettings:
-        pipe(commonState.notificationSettingsWithEmail).chainNullable(
+        pipe(commonState.notificationSettingsWithEmail).chainOptional(
           fillNotificationSettings
         ).value ?? 'none',
       title: commonState.title,

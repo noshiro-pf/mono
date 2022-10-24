@@ -31,13 +31,13 @@ export const useMainHooks = (): Readonly<{ isCalculating: boolean }> => {
     } as const;
 
     const paramsAsNumber = {
-      downPayment: mapNullable(paramsAsStr.downPayment, Str.toNumber),
-      propertyPrice: mapNullable(paramsAsStr.propertyPrice, Str.toNumber),
-      borrowingPeriodMonth: mapNullable(
+      downPayment: mapOptional(paramsAsStr.downPayment, Str.toNumber),
+      propertyPrice: mapOptional(paramsAsStr.propertyPrice, Str.toNumber),
+      borrowingPeriodMonth: mapOptional(
         paramsAsStr.borrowingPeriodMonth,
         Str.toNumber
       ),
-      interestRatePerMonth: mapNullable(
+      interestRatePerMonth: mapOptional(
         paramsAsStr.interestRatePerMonth,
         Str.toNumber
       ),

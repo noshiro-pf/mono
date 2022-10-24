@@ -36,8 +36,8 @@ import {
   isSymbol,
   isUndefined,
   Json,
-  mapNullable,
-  mapNullableC,
+  mapOptional,
+  mapOptionalC,
   match,
   Maybe,
   memoizeFunction,
@@ -85,8 +85,8 @@ import {
 (global as any).isSymbol = isSymbol;
 (global as any).isUndefined = isUndefined;
 (global as any).Json = Json;
-(global as any).mapNullable = mapNullable;
-(global as any).mapNullableC = mapNullableC;
+(global as any).mapOptional = mapOptional;
+(global as any).mapOptionalC = mapOptionalC;
 (global as any).match = match;
 (global as any).Maybe = Maybe;
 (global as any).memoizeFunction = memoizeFunction;
