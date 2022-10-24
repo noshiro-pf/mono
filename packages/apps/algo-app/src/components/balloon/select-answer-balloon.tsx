@@ -1,7 +1,7 @@
 import type { RectSize } from '@noshiro/ts-utils-additional';
 import type { JSXInternal } from 'preact/src/jsx';
 import { outlineColorDef, text } from '../../constants';
-import type { CardNumber, SelectAnswerBalloonProps } from '../../types';
+import type { SelectAnswerBalloonProps } from '../../types';
 import { Button } from '../bp';
 import { CardComponent } from '../card';
 import {
@@ -72,7 +72,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
           (n) =>
             ({
               key: n,
-              number: n as CardNumber,
+              number: n,
               color: cardColor,
               visibilityFromMe: 'faceUp',
               size: smallestCardSize,
@@ -84,7 +84,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
                   ? outlineColorDef.red
                   : outlineColorDef.green,
               onClick: () => {
-                onSelectedNumberChange(n as CardNumber);
+                onSelectedNumberChange(n);
               },
             } as const)
         ),
