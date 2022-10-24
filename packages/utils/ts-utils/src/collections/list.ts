@@ -148,9 +148,9 @@ export namespace IList {
     mapfn: (v: T, k: number) => U
   ) => readonly U[] = ArrayFrom;
 
-  type Uint8 = Index<256>;
+  type Index1000 = Index<1000>;
 
-  export function zeros<N extends Uint8>(
+  export function zeros<N extends Index1000>(
     len: N
   ): Result<ArrayOfLength<N, 0>, string>;
   export function zeros(len: number): Result<readonly 0[], string>;
@@ -163,29 +163,27 @@ export namespace IList {
         );
   }
 
-  export function zerosUnwrapped<N extends Uint8>(len: N): ArrayOfLength<N, 0>;
+  export function zerosUnwrapped<N extends Index1000>(
+    len: N
+  ): ArrayOfLength<N, 0>;
   export function zerosUnwrapped(len: number): readonly 0[];
   export function zerosUnwrapped(len: number): readonly 0[] {
     return Result.unwrapThrow(zeros(len));
   }
 
-  export function seq<N extends Uint8>(
-    len: N
-  ): Result<ArrayOfLength<N, 0>, string>;
+  export function seq<N extends Index1000>(len: N): Result<Seq<N>, string>;
   export function seq(len: number): Result<readonly number[], string>;
   export function seq(len: number): Result<readonly number[], string> {
     return pipe(zeros(len)).chain(Result.map((l) => map(l, (_, i) => i))).value;
   }
 
-  export function seqUnwrapped<N extends Uint8>(
-    len: N
-  ): ArrayOfLength<N, number>;
+  export function seqUnwrapped<N extends Index1000>(len: N): Seq<N>;
   export function seqUnwrapped(len: number): readonly number[];
   export function seqUnwrapped(len: number): readonly number[] {
     return Result.unwrapThrow(seq(len));
   }
 
-  export function newArray<T, N extends Uint8>(
+  export function newArray<T, N extends Index1000>(
     len: N,
     init: T
   ): Result<ArrayOfLength<N, T>, string>;
@@ -200,7 +198,7 @@ export namespace IList {
     return pipe(zeros(len)).chain(Result.map((l) => l.map(() => init))).value;
   }
 
-  export function newArrayThrow<T, N extends Uint8>(
+  export function newArrayThrow<T, N extends Index1000>(
     len: number,
     init: T
   ): ArrayOfLength<N, T>;
