@@ -13,6 +13,7 @@ export * from './is-union';
 export * from './list';
 export * from './make-tuple';
 export * from './record-path';
+export * from './seq';
 export * from './to-number';
 export * from './tuple';
 export * from './uint-range';
