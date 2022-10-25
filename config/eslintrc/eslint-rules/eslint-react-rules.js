@@ -59,8 +59,8 @@ const eslintReactRules = {
   'react/jsx-no-undef': 'error',
   'react/jsx-no-useless-fragment': 'error',
   'react/jsx-pascal-case': 'error',
-  'react/jsx-props-no-spreading': 'error', //   /* modified */
-  'react/jsx-sort-default-props': 'error',
+  'react/jsx-props-no-spreading': 'error', // modified
+  'react/jsx-sort-default-props': 'off', // deprecated
   'react/jsx-sort-props': [
     'error',
     { callbacksLast: true, reservedFirst: true },

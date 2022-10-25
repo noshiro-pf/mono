@@ -63,7 +63,7 @@ const eslintUnicornRules = {
   'unicorn/no-useless-length-check': 'error',
   'unicorn/no-useless-promise-resolve-reject': 'error',
   'unicorn/no-useless-spread': 'error',
-  'unicorn/no-useless-undefined': 'off', // conflicts with @typescript-eslint/init-declarations
+  'unicorn/no-useless-undefined': 'off', // this conflicts with @typescript-eslint/init-declarations
   'unicorn/no-zero-fractions': 'error',
   'unicorn/numeric-separators-style': 'error',
   'unicorn/prefer-add-event-listener': 'error',

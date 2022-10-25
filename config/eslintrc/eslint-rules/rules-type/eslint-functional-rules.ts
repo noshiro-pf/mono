@@ -8,7 +8,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
 
 /**
  * @description Enforce functional parameters.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/functional-parameters.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/functional-parameters.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -108,7 +108,7 @@ namespace FunctionalParameters {
 
 /**
  * @description Enforce treating data as immutable.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/immutable-data.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/immutable-data.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -203,7 +203,7 @@ namespace ImmutableData {
 
 /**
  * @description Disallow classes.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-class.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-class.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -216,7 +216,7 @@ namespace NoClass {
 
 /**
  * @description Disallow conditional statements.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-conditional-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-conditional-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -262,7 +262,7 @@ namespace NoConditionalStatement {
 
 /**
  * @description Disallow expression statements.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-expression-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-expression-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -308,7 +308,7 @@ namespace NoExpressionStatement {
 
 /**
  * @description Disallow mutable variables.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-let.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-let.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -359,7 +359,7 @@ namespace NoLet {
 
 /**
  * @description Disallow imperative loops.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-loop-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-loop-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -372,7 +372,7 @@ namespace NoLoopStatement {
 
 /**
  * @description Prefer property signatures with readonly modifiers over method signatures.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-method-signature.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-method-signature.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -409,7 +409,7 @@ namespace NoMethodSignature {
 
 /**
  * @description Restrict types so that only members of the same kind of are allowed in them.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-mixed-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-mixed-type.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -449,7 +449,7 @@ namespace NoMixedType {
 
 /**
  * @description Disallow try-catch[-finally] and try-finally patterns.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-promise-reject.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-promise-reject.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -462,7 +462,7 @@ namespace NoPromiseReject {
 
 /**
  * @description Disallow functions that don't return anything.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-return-void.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-return-void.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -506,7 +506,7 @@ namespace NoReturnVoid {
 
 /**
  * @description Disallow this access.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-this-expression.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-this-expression.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -519,7 +519,7 @@ namespace NoThisExpression {
 
 /**
  * @description Disallow throwing exceptions.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-throw-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-throw-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -555,7 +555,7 @@ namespace NoThrowStatement {
 
 /**
  * @description Disallow try-catch[-finally] and try-finally patterns.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/no-try-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-try-statement.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -595,7 +595,7 @@ namespace NoTryStatement {
 
 /**
  * @description Prefer readonly array over mutable arrays.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/prefer-readonly-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/prefer-readonly-type.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -672,7 +672,7 @@ namespace PreferReadonlyType {
 
 /**
  * @description Replaces `x => f(x)` with just `f`.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.0/docs/rules/prefer-tacit.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/prefer-tacit.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |

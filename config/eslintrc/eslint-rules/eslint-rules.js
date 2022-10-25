@@ -162,6 +162,11 @@ const eslintRules = {
   'id-length': 'off', // disabled
   'id-match': 'error',
   'line-comment-position': 'off', // disabled
+  'logical-assignment-operators': [
+    'warn',
+    'always',
+    { enforceForIfStatements: true },
+  ],
   'max-classes-per-file': 'off', // disabled
   'max-depth': 'off', // disabled
   'max-lines-per-function': 'off', // disabled
@@ -182,6 +187,7 @@ const eslintRules = {
   'no-compare-neg-zero': 'error',
   'no-cond-assign': 'error',
   'no-console': 'off', // disabled
+  'no-constant-binary-expression': 'error',
   'no-constant-condition': 'error',
   'no-constructor-return': 'error',
   'no-continue': 'off', // disabled
@@ -313,7 +319,6 @@ const eslintRules = {
   'use-isnan': 'error',
   'vars-on-top': 'error',
   yoda: 'off', // disabled
-  'no-constant-binary-expression': 'error',
 
   // deprecated
   'callback-return': 'off',
