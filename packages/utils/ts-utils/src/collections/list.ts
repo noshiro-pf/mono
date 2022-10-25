@@ -148,7 +148,7 @@ export namespace IList {
     mapfn: (v: T, k: number) => U
   ) => readonly U[] = ArrayFrom;
 
-  type Uint8 = Seq<256>;
+  type Uint8 = Index<256>;
 
   export function zeros<N extends Uint8>(
     len: N

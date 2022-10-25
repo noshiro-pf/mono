@@ -6,6 +6,7 @@
 
 export * from './deep';
 export * from './index-of-tuple';
+export * from './index-type';
 export * from './is-fixed-length-list';
 export * from './is-never';
 export * from './is-union';
