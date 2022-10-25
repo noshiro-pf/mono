@@ -41,7 +41,39 @@ describe('IList.zeros', () => {
 
     assertType<TypeEq<typeof result, Result<readonly 0[], string>>>();
 
-    expect(IList.isEmpty([])).toBe(true);
+    expect(result).toStrictEqual(Result.ok([0, 0, 0]));
+  });
+});
+
+describe('IList.seq', () => {
+  test('fixed length', () => {
+    const result = IList.seq(10);
+
+    assertType<
+      TypeEq<
+        typeof result,
+        Result<readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], string>
+      >
+    >();
+
+    expect(result).toStrictEqual(Result.ok([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
+  });
+
+  test('fixed length (empty)', () => {
+    const result = IList.seq(0);
+
+    assertType<TypeEq<typeof result, Result<readonly [], string>>>();
+
+    expect(result).toStrictEqual(Result.ok([]));
+  });
+
+  test('unknown length', () => {
+    const n: number = (() => 3)();
+    const result = IList.seq(n);
+
+    assertType<TypeEq<typeof result, Result<readonly number[], string>>>();
+
+    expect(result).toStrictEqual(Result.ok([0, 1, 2]));
   });
 });
 

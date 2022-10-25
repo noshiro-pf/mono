@@ -1,4 +1,4 @@
-import { IList, Num, pipe } from '@noshiro/ts-utils';
+import { castWritable, IList, Num, pipe } from '@noshiro/ts-utils';
 import type { Percent } from '../../../types';
 import type { Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
@@ -6,7 +6,7 @@ import { getLuminanceListAccumulated } from './get-luminance-list-acc';
 import { relativeLuminance } from './relative-luminance';
 
 // constants
-const hues = IList.seqUnwrapped(360) as readonly Hue[] as NonEmptyArray<Hue>;
+const hues = IList.seqUnwrapped(360);
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す
@@ -27,7 +27,7 @@ export const pickupHighContrastHues = (
   const luminanceDiffAccumulated = getLuminanceListAccumulated(luminanceList);
 
   /* pickup n hues */
-  const mut_result = IList.zerosUnwrapped(n) as MutableNonEmptyArray<Hue>;
+  const mut_result: Hue[] = castWritable(IList.zerosUnwrapped(n));
 
   let mut_i = 0;
   let mut_y = 0;
@@ -41,5 +41,5 @@ export const pickupHighContrastHues = (
     }
   }
 
-  return mut_result;
+  return mut_result as MutableNonEmptyArray<Hue>; // n >= 1 なので
 };

@@ -2,7 +2,7 @@ import type { Hue, Percent } from '@noshiro/ts-utils-additional';
 import { hslToRgb, relativeLuminance } from '@noshiro/ts-utils-additional';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
-const huesDefault = IList.seqUnwrapped(360) as readonly Hue[];
+const huesDefault = IList.seqUnwrapped(360);
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（＝hue）を返す
