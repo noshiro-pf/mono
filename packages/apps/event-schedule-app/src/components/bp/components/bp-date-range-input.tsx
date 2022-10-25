@@ -49,7 +49,7 @@ export const BpDateRangeInput = memoNamed<Props>(
       () =>
         castWritable(
           tp(
-            pipe(dateRange.start).chainNullable((d) =>
+            pipe(dateRange.start).chainOptional((d) =>
               IDate.toDate(
                 ymdhm2Date({
                   ...d,
@@ -59,7 +59,7 @@ export const BpDateRangeInput = memoNamed<Props>(
               )
             ).value ?? null,
 
-            pipe(dateRange.end).chainNullable((d) =>
+            pipe(dateRange.end).chainOptional((d) =>
               IDate.toDate(
                 ymdhm2Date({
                   ...d,
@@ -76,7 +76,7 @@ export const BpDateRangeInput = memoNamed<Props>(
     const minDate: RawDateMutType | undefined = useMemo(
       () =>
         castWritable(
-          pipe(_minDate).chainNullable((d) =>
+          pipe(_minDate).chainOptional((d) =>
             IDate.toDate(
               ymdhm2Date({
                 ...d,
@@ -92,7 +92,7 @@ export const BpDateRangeInput = memoNamed<Props>(
     const maxDate: RawDateMutType | undefined = useMemo(
       () =>
         castWritable(
-          pipe(_maxDate).chainNullable((d) =>
+          pipe(_maxDate).chainOptional((d) =>
             IDate.toDate(
               ymdhm2Date({
                 ...d,
@@ -108,8 +108,8 @@ export const BpDateRangeInput = memoNamed<Props>(
     const onChange = useCallback(
       ([start, end]: Readonly<DateRange>) => {
         onDateRangeChange({
-          start: pipe(start).chainNullable(ymdFromDate).value ?? undefined,
-          end: pipe(end).chainNullable(ymdFromDate).value ?? undefined,
+          start: pipe(start).chainOptional(ymdFromDate).value ?? undefined,
+          end: pipe(end).chainOptional(ymdFromDate).value ?? undefined,
         });
       },
       [onDateRangeChange]

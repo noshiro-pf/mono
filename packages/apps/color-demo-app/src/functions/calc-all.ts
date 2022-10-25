@@ -10,7 +10,7 @@ import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues';
 
-const hueListDefault = IList.seqThrow(360);
+const hueListDefault = IList.seqUnwrapped(360);
 
 export const calcAll = ({
   saturation,
@@ -54,7 +54,7 @@ export const calcAll = ({
     luminanceListNormalized
   );
 
-  const pickedUpHues_equallySpaced = IList.seqThrow(divisionNumber)
+  const pickedUpHues_equallySpaced = IList.seqUnwrapped(divisionNumber)
     .map((i) => Num.roundToInt((i * 360) / divisionNumber) as Hue)
     .map((h) => ((h - firstHue + 360) % 360) as Hue);
 

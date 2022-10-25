@@ -68,7 +68,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
 
     const cards = useMemo(
       () =>
-        IList.seqThrow(12).map(
+        IList.seqUnwrapped(12).map(
           (n) =>
             ({
               key: n,

@@ -26,7 +26,7 @@ export namespace NumericInputState {
     toValueNormalized: (valueStr: string) => NumericValue;
   }> => {
     const toValueNormalized = (valueStr: string): NumericValue =>
-      pipe(valueStr).chain(parseValue).chainNullable(normalizeValue).value ??
+      pipe(valueStr).chain(parseValue).chainOptional(normalizeValue).value ??
       config.defaultValue;
 
     const reducer: ReducerType<string, Action> = (state, action) => {
@@ -42,13 +42,13 @@ export namespace NumericInputState {
           const valueParsed = parseValue(state);
           const nextValue =
             pipe(valueParsed)
-              .chainNullable((v) =>
+              .chainOptional((v) =>
                 match(action.type, {
                   decrement: v - config.step,
                   increment: v + config.step,
                 })
               )
-              .chainNullable(normalizeValue).value ?? config.defaultValue;
+              .chainOptional(normalizeValue).value ?? config.defaultValue;
 
           return nextValue.toString();
         }

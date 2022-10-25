@@ -241,8 +241,8 @@ export namespace AnswerFilterQueryParam {
       type: 'setFromUrlQueryParams',
       values: {
         dateRange: pipe(queryParams.get(keyDef.date))
-          .chainNullable(rangeFromStr)
-          .chainNullable((range) => ({
+          .chainOptional(rangeFromStr)
+          .chainOptional((range) => ({
             start: ymdFromStr(range.a),
             end: ymdFromStr(range.b),
           })).value ?? {
@@ -250,13 +250,13 @@ export namespace AnswerFilterQueryParam {
           end: undefined,
         },
 
-        dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).chainNullable(
+        dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).chainOptional(
           dayOfWeekFromStr
         ).value,
 
         scoreRange: pipe(queryParams.get(keyDef.score))
-          .chainNullable(rangeFromStr)
-          .chainNullable((range) => ({
+          .chainOptional(rangeFromStr)
+          .chainOptional((range) => ({
             min: parseScore(range.a),
             max: parseScore(range.b),
           })).value ?? {
@@ -266,12 +266,12 @@ export namespace AnswerFilterQueryParam {
 
         filledDateOnly: pipe(
           queryParams.get(keyDef.filledDateOnly)
-        ).chainNullable(filledDateOnlyFromStr).value,
+        ).chainOptional(filledDateOnlyFromStr).value,
 
         iconState: {
           good: pipe(queryParams.get(keyDef.good))
-            .chainNullable(rangeFromStr)
-            .chainNullable((range) => ({
+            .chainOptional(rangeFromStr)
+            .chainOptional((range) => ({
               min: Num.parseInt(range.a),
               max: Num.parseInt(range.b),
             })).value ?? {
@@ -279,8 +279,8 @@ export namespace AnswerFilterQueryParam {
             max: undefined,
           },
           fair: pipe(queryParams.get(keyDef.fair))
-            .chainNullable(rangeFromStr)
-            .chainNullable((range) => ({
+            .chainOptional(rangeFromStr)
+            .chainOptional((range) => ({
               min: Num.parseInt(range.a),
               max: Num.parseInt(range.b),
             })).value ?? {
@@ -288,8 +288,8 @@ export namespace AnswerFilterQueryParam {
             max: undefined,
           },
           poor: pipe(queryParams.get(keyDef.poor))
-            .chainNullable(rangeFromStr)
-            .chainNullable((range) => ({
+            .chainOptional(rangeFromStr)
+            .chainOptional((range) => ({
               min: Num.parseInt(range.a),
               max: Num.parseInt(range.b),
             })).value ?? {
@@ -297,8 +297,8 @@ export namespace AnswerFilterQueryParam {
             max: undefined,
           },
           goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
-            .chainNullable(rangeFromStr)
-            .chainNullable((range) => ({
+            .chainOptional(rangeFromStr)
+            .chainOptional((range) => ({
               min: Num.parseInt(range.a),
               max: Num.parseInt(range.b),
             })).value ?? {
@@ -306,8 +306,8 @@ export namespace AnswerFilterQueryParam {
             max: undefined,
           },
           fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
-            .chainNullable(rangeFromStr)
-            .chainNullable((range) => ({
+            .chainOptional(rangeFromStr)
+            .chainOptional((range) => ({
               min: Num.parseInt(range.a),
               max: Num.parseInt(range.b),
             })).value ?? {

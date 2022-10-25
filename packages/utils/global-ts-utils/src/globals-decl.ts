@@ -33,8 +33,8 @@ import type {
   isSymbol as _isSymbol,
   isUndefined as _isUndefined,
   Json as _Json,
-  mapNullable as _mapNullable,
-  mapNullableC as _mapNullableC,
+  mapOptional as _mapOptional,
+  mapOptionalC as _mapOptionalC,
   match as _match,
   Maybe as _Maybe,
   memoizeFunction as _memoizeFunction,
@@ -106,8 +106,8 @@ declare global {
   const isSymbol: typeof _isSymbol;
   const isUndefined: typeof _isUndefined;
   const Json: typeof _Json;
-  const mapNullable: typeof _mapNullable;
-  const mapNullableC: typeof _mapNullableC;
+  const mapOptional: typeof _mapOptional;
+  const mapOptionalC: typeof _mapOptionalC;
   const match: typeof _match;
   const Maybe: typeof _Maybe;
   const memoizeFunction: typeof _memoizeFunction;

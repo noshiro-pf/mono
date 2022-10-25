@@ -36,8 +36,8 @@ export const fillDatabase = (o?: unknown): Database =>
     : {
         polls: IRecord.hasKeyValue(o, 'polls', isRecord)
           ? pipe(o.polls)
-              .chainNullable(IRecord.entries)
-              .chainNullable((entries) =>
+              .chainOptional(IRecord.entries)
+              .chainOptional((entries) =>
                 IMap.new<PollId, Poll>(
                   entries.map(([k, v]) => [createPollId(k), fillPoll(v)])
                 )
@@ -46,15 +46,15 @@ export const fillDatabase = (o?: unknown): Database =>
 
         dateToPollIdMap: IRecord.hasKeyValue(o, 'dateToPollIdMap', isRecord)
           ? pipe(o.dateToPollIdMap)
-              .chainNullable(IRecord.entries)
-              .chainNullable((entries) =>
+              .chainOptional(IRecord.entries)
+              .chainOptional((entries) =>
                 entries
                   .filter((entry): entry is [typeof entry[0], string] =>
                     isString(entry[1])
                   )
                   .map(([k, v]) => tp(createDateOptionId(k), v))
               )
-              .chainNullable((entries) =>
+              .chainOptional((entries) =>
                 IMap.new<DateOptionId, PollId>(entries)
               ).value ?? d.dateToPollIdMap
           : d.dateToPollIdMap,
@@ -65,15 +65,15 @@ export const fillDatabase = (o?: unknown): Database =>
           isRecord
         )
           ? pipe(o.commandMessageIdToPollIdMap)
-              .chainNullable(IRecord.entries)
-              .chainNullable((entries) =>
+              .chainOptional(IRecord.entries)
+              .chainOptional((entries) =>
                 entries
                   .filter((entry): entry is [typeof entry[0], string] =>
                     isString(entry[1])
                   )
                   .map(([k, v]) => tp(createCommandMessageId(k), v))
               )
-              .chainNullable((entries) =>
+              .chainOptional((entries) =>
                 IMap.new<CommandMessageId, PollId>(entries)
               ).value ?? d.commandMessageIdToPollIdMap
           : d.commandMessageIdToPollIdMap,

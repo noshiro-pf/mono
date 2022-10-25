@@ -149,7 +149,7 @@ export const onMessageReactionAdd = (
     psqlClient,
     {
       type: 'add',
-      value: mapNullable(reaction.emoji.name, mapReactionEmojiNameToAnswerType),
+      value: mapOptional(reaction.emoji.name, mapReactionEmojiNameToAnswerType),
     },
     reaction,
     user
@@ -168,7 +168,7 @@ export const onMessageReactionRemove = (
     psqlClient,
     {
       type: 'remove',
-      value: mapNullable(reaction.emoji.name, mapReactionEmojiNameToAnswerType),
+      value: mapOptional(reaction.emoji.name, mapReactionEmojiNameToAnswerType),
     },
     reaction,
     user

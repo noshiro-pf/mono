@@ -163,9 +163,9 @@ export namespace IList {
         );
   }
 
-  export function zerosThrow<N extends Uint8>(len: N): ArrayOfLength<N, 0>;
-  export function zerosThrow(len: number): readonly 0[];
-  export function zerosThrow(len: number): readonly 0[] {
+  export function zerosUnwrapped<N extends Uint8>(len: N): ArrayOfLength<N, 0>;
+  export function zerosUnwrapped(len: number): readonly 0[];
+  export function zerosUnwrapped(len: number): readonly 0[] {
     return Result.unwrapThrow(zeros(len));
   }
 
@@ -177,9 +177,11 @@ export namespace IList {
     return pipe(zeros(len)).chain(Result.map((l) => map(l, (_, i) => i))).value;
   }
 
-  export function seqThrow<N extends Uint8>(len: N): ArrayOfLength<N, number>;
-  export function seqThrow(len: number): readonly number[];
-  export function seqThrow(len: number): readonly number[] {
+  export function seqUnwrapped<N extends Uint8>(
+    len: N
+  ): ArrayOfLength<N, number>;
+  export function seqUnwrapped(len: number): readonly number[];
+  export function seqUnwrapped(len: number): readonly number[] {
     return Result.unwrapThrow(seq(len));
   }
 
@@ -351,7 +353,7 @@ export namespace IList {
     const len = Math.min(list1.length, list2.length);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return seqThrow(len).map((i) => tp(list1[i]!, list2[i]!));
+    return seqUnwrapped(len).map((i) => tp(list1[i]!, list2[i]!));
   };
 
   export function filter<T, S extends T>(
@@ -449,7 +451,7 @@ export namespace IList {
     list: readonly T[],
     n: N
   ): readonly ArrayOfLength<N, T>[] =>
-    seqThrow(Math.ceil(list.length / n)).map(
+    seqUnwrapped(Math.ceil(list.length / n)).map(
       (i: number) =>
         list.slice(n * i, n * (i + 1)) as unknown as ArrayOfLength<N, T>
     );

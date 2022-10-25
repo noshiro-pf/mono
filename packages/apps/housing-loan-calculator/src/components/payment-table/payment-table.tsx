@@ -54,7 +54,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
 
   const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
     () =>
-      IList.seqThrow(numRows).map((i) => [
+      IList.seqUnwrapped(numRows).map((i) => [
         i.toString(),
         formatYenValue(borrowingBalanceYen[i] ?? 0),
         formatYenValue(interestYen[i] ?? 0),

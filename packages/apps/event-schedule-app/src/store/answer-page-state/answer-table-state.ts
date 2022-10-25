@@ -24,7 +24,7 @@ export namespace AnswerTableStore {
       >
     | undefined
   > = answers$.chain(
-    mapI((answers) => mapNullable(answers, createAnswerSelectionMapFromAnswers))
+    mapI((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers))
   );
 
   const answerSelectionMapFn$ = answerSelectionMap$.chain(
@@ -109,7 +109,7 @@ export namespace AnswerTableStore {
 
   const datetimeRangeListReversed$ = eventSchedule$.chain(
     mapI((eventSchedule) =>
-      mapNullable(eventSchedule?.datetimeRangeList, IList.reverse)
+      mapOptional(eventSchedule?.datetimeRangeList, IList.reverse)
     )
   );
 
@@ -130,7 +130,7 @@ export namespace AnswerTableStore {
   const datetimeRangeListSortedByScoresReversed$ =
     datetimeRangeListSortedByScores$.chain(
       mapI((datetimeRangeListSortedByScores) =>
-        mapNullable(datetimeRangeListSortedByScores, IList.reverse)
+        mapOptional(datetimeRangeListSortedByScores, IList.reverse)
       )
     );
 
@@ -203,7 +203,7 @@ export namespace AnswerTableStore {
 
                 const answerTableRow: readonly AnswerTableCell[] | undefined =
                   pipe(answerTable.get(datetimeRange)).chain((list) =>
-                    mapNullable(list, (row) =>
+                    mapOptional(list, (row) =>
                       IList.zip(
                         row,
                         answers.map((a) => a.weight)

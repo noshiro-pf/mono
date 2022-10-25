@@ -17,7 +17,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
 
     const helperText = useMemo(
       () =>
-        pipe(state.formState.email.error).chainNullable((s) => <div>{s}</div>)
+        pipe(state.formState.email.error).chainOptional((s) => <div>{s}</div>)
           .value,
       [state.formState.email.error]
     );

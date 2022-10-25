@@ -5,7 +5,7 @@ export const pipe = <A>(a: A): Pipe<A> => new PipeClass(a);
 type Pipe<A> = Readonly<{
   chain: <B>(fn: (a: A) => B) => Pipe<B>;
   value: A;
-  chainNullable: <B>(fn: (a: NonNullable<A>) => B) => Pipe<B | undefined>;
+  chainOptional: <B>(fn: (a: NonNullable<A>) => B) => Pipe<B | undefined>;
 }>;
 
 class PipeClass<A> implements Pipe<A> {
@@ -19,7 +19,7 @@ class PipeClass<A> implements Pipe<A> {
     return new PipeClass(fn(this.#a));
   }
 
-  chainNullable<B>(fn: (a: NonNullable<A>) => B): PipeClass<B | undefined> {
+  chainOptional<B>(fn: (a: NonNullable<A>) => B): PipeClass<B | undefined> {
     const v = this.#a;
     return new PipeClass(v == null ? undefined : fn(v));
   }
@@ -32,7 +32,7 @@ class PipeClass<A> implements Pipe<A> {
 const y: number | undefined = (() => 1 as number | undefined)();
 
 const z = pipe(y)
-  .chainNullable((x) => x + 1)
-  .chainNullable((x) => `${x}`).value;
+  .chainOptional((x) => x + 1)
+  .chainOptional((x) => `${x}`).value;
 
 assertType<TypeEq<typeof z, string | undefined>>();

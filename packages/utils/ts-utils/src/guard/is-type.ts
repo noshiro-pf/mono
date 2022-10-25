@@ -33,6 +33,6 @@ export const isNull = (a: unknown): a is null => a === null;
 
 export const isNotNull = <T>(a: T | null): a is T => a !== null;
 
-export const isNullable = (a: unknown): a is null | undefined => a == null;
+export const isNullish = (a: unknown): a is null | undefined => a == null;
 
-export const isNotNullable = <T>(a: T): a is NonNullable<T> => a != null;
+export const isNonNullish = <T>(a: T): a is NonNullable<T> => a != null;

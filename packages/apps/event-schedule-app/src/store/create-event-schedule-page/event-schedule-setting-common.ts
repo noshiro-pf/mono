@@ -96,7 +96,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       eventScheduleInitialValue.notificationSettings !== 'none',
     initialState: pipe(
       mapNoneToUndefined(eventScheduleInitialValue.notificationSettings)
-    ).chainNullable((a) => ({
+    ).chainOptional((a) => ({
       ...a,
       email: '',
     })).value,

@@ -19,12 +19,12 @@ export const arrayOfLength = <A, N extends Uint8>(
 
   const {
     typeName,
-    defaultValue = IList.zerosThrow(size as number).map(
+    defaultValue = IList.zerosUnwrapped(size as number).map(
       () => elementType.defaultValue
     ) as unknown as ArrayOfLength<N, A>,
   } = options ?? {};
 
-  const zs = IList.zerosThrow(size as number);
+  const zs = IList.zerosUnwrapped(size as number);
 
   const typeNameFilled: string =
     typeName ?? `[${zs.map(() => elementType.typeName).join(', ')}]`;
