@@ -1,18 +1,12 @@
-import { config, logger } from 'firebase-functions';
+import { logger } from 'firebase-functions';
 import { createTransport } from 'nodemailer';
-import { fillGmailConfig } from './type-check';
-
-export const gmailConfig: Readonly<{
-  email: string;
-  password: string;
-  'app-password': string;
-}> = fillGmailConfig(config()).gmail;
+import { firebaseConfig } from './env';
 
 export const mailTransport = createTransport({
   service: 'gmail',
   auth: {
-    user: gmailConfig.email,
-    pass: gmailConfig['app-password'],
+    user: firebaseConfig.gmail.email,
+    pass: firebaseConfig.gmail['app-password'],
   },
 });
 
@@ -32,7 +26,7 @@ export const createMailOptions = ({
   to: string;
   subject: string;
 }>): MailOptions => ({
-  from: `event-schedule-app <${gmailConfig.email}>`,
+  from: `event-schedule-app <${firebaseConfig.gmail.email}>`,
   to,
   subject,
   text,
@@ -42,6 +36,6 @@ export const sendEmail = async (mailOptions: MailOptions): Promise<void> => {
   await mailTransport.sendMail(mailOptions).catch(logger.error);
 
   logger.log(
-    `email has successfully sent from ${gmailConfig.email} to ${mailOptions.to}.`
+    `email has successfully sent from ${firebaseConfig.gmail.email} to ${mailOptions.to}.`
   );
 };

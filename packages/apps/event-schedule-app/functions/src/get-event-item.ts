@@ -1,9 +1,9 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { isRecord, isString, Obj } from '@noshiro/ts-utils';
+import { mapOptional } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
-import { collectionPath } from './firestore-paths';
-import { fillEventScheduleWithCheck } from './type-check';
+import { collectionPath } from './constants';
+import { fillEventScheduleWithCheck, isEmailData } from './types';
 
 export const getEventItem = async (
   db: firestore.Firestore,
@@ -11,7 +11,7 @@ export const getEventItem = async (
 ): Promise<EventSchedule | undefined> => {
   const res = await db.collection(collectionPath.events).doc(eventId).get();
   const data = res.data();
-  return data === undefined ? undefined : fillEventScheduleWithCheck(data);
+  return mapOptional(data, fillEventScheduleWithCheck);
 };
 
 export const getEmail = async (
@@ -26,7 +26,7 @@ export const getEmail = async (
     .get();
 
   const data = res.data();
-  if (isRecord(data) && Obj.hasKeyValue(data, firestorePaths.email, isString)) {
+  if (isEmailData(data)) {
     return data.email;
   }
 

@@ -2,12 +2,14 @@ import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { Arr, assertType, tp } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
-import { createMailBodyForAnswerDeadline } from './create-mail-body';
-import { collectionPath } from './firestore-paths';
+import { collectionPath } from './constants';
+import {
+  createMailBodyForAnswerDeadline,
+  todayIsNDaysBeforeDeadline,
+} from './functions';
 import { getEmail } from './get-event-item';
 import { createMailOptions, sendEmail } from './setup-mailer';
-import { todayIsNDaysBeforeDeadline } from './today-is-n-day-before-deadline';
-import { fillEventScheduleWithCheck } from './type-check';
+import { fillEventScheduleWithCheck } from './types';
 import { pad2 } from './utils';
 
 const keys = {

@@ -18,6 +18,7 @@ import {
   fetchAnswers,
   fetchEventListOfUser,
   fetchEventSchedule,
+  sendReport,
   setAuthorsEmail,
   unarchiveEventSchedule,
   updateAnswer,
@@ -60,4 +61,5 @@ export const api = {
   eventList: {
     fetch: fetchEventListOfUser,
   },
+  sendReport,
 } as const;
