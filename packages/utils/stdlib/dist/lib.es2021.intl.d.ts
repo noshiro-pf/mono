@@ -16,6 +16,10 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 declare namespace Intl {
+  interface DateTimeFormatPartTypesRegistry {
+    readonly fractionalSecond: unknown;
+  }
+
   interface DateTimeFormatOptions {
     readonly formatMatcher?: 'basic' | 'best fit' | 'best fit' | undefined;
     readonly dateStyle?: 'full' | 'long' | 'medium' | 'short' | undefined;

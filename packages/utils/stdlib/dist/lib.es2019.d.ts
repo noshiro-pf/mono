@@ -20,3 +20,4 @@ and limitations under the License.
 /// <reference path="./lib.es2019.object.d.ts" />
 /// <reference path="./lib.es2019.string.d.ts" />
 /// <reference path="./lib.es2019.symbol.d.ts" />
+/// <reference path="./lib.es2019.intl.d.ts" />
