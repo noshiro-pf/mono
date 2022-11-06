@@ -179,6 +179,12 @@ export const answerPageDictionary = {
       create: '回答追加',
       update: '回答編集',
     },
+    table: {
+      header: {
+        score: 'スコア',
+        comment: 'コメント',
+      },
+    },
     yourName: 'あなたの名前：',
     comments: 'コメント（任意）：',
     nameIsRequired: '名前は必須項目です',
