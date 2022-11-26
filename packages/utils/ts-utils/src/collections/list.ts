@@ -746,7 +746,6 @@ export namespace IList {
   /**
    * @desc copy and return unique list
    * @param list target list
-   * @param mapFn perform identity check after mapping by the map function
    */
   export function uniq<T>(list: NonEmptyArray<T>): NonEmptyArray<T>;
   export function uniq<T>(list: readonly T[]): readonly T[];
@@ -754,6 +753,11 @@ export namespace IList {
     return ArrayFrom(new MutableSet(list));
   }
 
+  /**
+   * @desc copy and return unique list
+   * @param list target list
+   * @param mapFn perform identity check after mapping by the map function
+   */
   export function uniqBy<A, B>(
     list: NonEmptyArray<A>,
     mapFn: (value: A) => B
