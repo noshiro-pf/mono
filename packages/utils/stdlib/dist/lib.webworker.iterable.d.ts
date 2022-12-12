@@ -23,6 +23,20 @@ interface Cache {
   addAll(requests: Iterable<RequestInfo>): Promise<void>;
 }
 
+interface CanvasPath {
+  roundRect(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    radii?: number | DOMPointInit | Iterable<number | DOMPointInit>
+  ): void;
+}
+
+interface CanvasPathDrawingStyles {
+  setLineDash(segments: Iterable<number>): void;
+}
+
 interface DOMStringList {
   [Symbol.iterator](): IterableIterator<string>;
 }
@@ -201,7 +215,7 @@ interface WEBGL_multi_draw {
   ): void;
   multiDrawElementsInstancedWEBGL(
     mode: GLenum,
-    countsList: Int32Array | Iterable<GLint>,
+    countsList: Int32Array | Iterable<GLsizei>,
     countsOffset: GLuint,
     type: GLenum,
     offsetsList: Int32Array | Iterable<GLsizei>,
@@ -212,7 +226,7 @@ interface WEBGL_multi_draw {
   ): void;
   multiDrawElementsWEBGL(
     mode: GLenum,
-    countsList: Int32Array | Iterable<GLint>,
+    countsList: Int32Array | Iterable<GLsizei>,
     countsOffset: GLuint,
     type: GLenum,
     offsetsList: Int32Array | Iterable<GLsizei>,

@@ -496,9 +496,18 @@ interface RTCEncodedVideoFrameMetadata {
   readonly width?: number;
 }
 
-interface ReadableStreamReadDoneResult {
+interface ReadableStreamGetReaderOptions {
+  /**
+   * Creates a ReadableStreamBYOBReader and locks the stream to the new reader.
+   *
+   * This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle "bring your own buffer" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation.
+   */
+  readonly mode?: ReadableStreamReaderMode;
+}
+
+interface ReadableStreamReadDoneResult<T> {
   readonly done: true;
-  readonly value?: undefined;
+  readonly value?: T;
 }
 
 interface ReadableStreamReadValueResult<T> {
@@ -654,6 +663,25 @@ interface Transformer<I = unknown, O = unknown> {
   readonly writableType?: undefined;
 }
 
+interface UnderlyingByteSource {
+  readonly autoAllocateChunkSize?: number;
+  readonly cancel?: UnderlyingSourceCancelCallback;
+  readonly pull?: (
+    controller: ReadableByteStreamController
+  ) => void | PromiseLike<void>;
+  readonly start?: (controller: ReadableByteStreamController) => unknown;
+  readonly type: 'bytes';
+}
+
+interface UnderlyingDefaultSource<R = unknown> {
+  readonly cancel?: UnderlyingSourceCancelCallback;
+  readonly pull?: (
+    controller: ReadableStreamDefaultController<R>
+  ) => void | PromiseLike<void>;
+  readonly start?: (controller: ReadableStreamDefaultController<R>) => unknown;
+  readonly type?: undefined;
+}
+
 interface UnderlyingSink<W = unknown> {
   readonly abort?: UnderlyingSinkAbortCallback;
   readonly close?: UnderlyingSinkCloseCallback;
@@ -663,17 +691,18 @@ interface UnderlyingSink<W = unknown> {
 }
 
 interface UnderlyingSource<R = unknown> {
+  readonly autoAllocateChunkSize?: number;
   readonly cancel?: UnderlyingSourceCancelCallback;
   readonly pull?: UnderlyingSourcePullCallback<R>;
   readonly start?: UnderlyingSourceStartCallback<R>;
-  readonly type?: undefined;
+  readonly type?: ReadableStreamType;
 }
 
 interface VideoColorSpaceInit {
-  readonly fullRange?: boolean;
-  readonly matrix?: VideoMatrixCoefficients;
-  readonly primaries?: VideoColorPrimaries;
-  readonly transfer?: VideoTransferCharacteristics;
+  readonly fullRange?: boolean | null;
+  readonly matrix?: VideoMatrixCoefficients | null;
+  readonly primaries?: VideoColorPrimaries | null;
+  readonly transfer?: VideoTransferCharacteristics | null;
 }
 
 interface VideoConfiguration {
@@ -734,7 +763,7 @@ interface AbortController {
   /** Returns the AbortSignal object associated with this object. */
   readonly signal: AbortSignal;
   /** Invoking this method will set this object's AbortSignal's aborted flag and signal to any observers that the associated activity is to be aborted. */
-  // abort(): AbortSignal; - To be re-added in the future
+  abort(reason?: unknown): void;
 }
 
 declare const AbortController: {
@@ -779,6 +808,7 @@ declare const AbortSignal: {
   readonly prototype: AbortSignal;
   new (): AbortSignal;
   abort(reason?: unknown): AbortSignal;
+  timeout(milliseconds: number): AbortSignal;
 };
 
 interface AbstractWorkerEventMap {
@@ -952,6 +982,80 @@ declare const CacheStorage: {
   new (): CacheStorage;
 };
 
+interface CanvasCompositing {
+  readonly globalAlpha: number;
+  readonly globalCompositeOperation: GlobalCompositeOperation;
+}
+
+interface CanvasDrawImage {
+  drawImage(image: CanvasImageSource, dx: number, dy: number): void;
+  drawImage(
+    image: CanvasImageSource,
+    dx: number,
+    dy: number,
+    dw: number,
+    dh: number
+  ): void;
+  drawImage(
+    image: CanvasImageSource,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    dx: number,
+    dy: number,
+    dw: number,
+    dh: number
+  ): void;
+}
+
+interface CanvasDrawPath {
+  beginPath(): void;
+  clip(fillRule?: CanvasFillRule): void;
+  clip(path: Path2D, fillRule?: CanvasFillRule): void;
+  fill(fillRule?: CanvasFillRule): void;
+  fill(path: Path2D, fillRule?: CanvasFillRule): void;
+  isPointInPath(x: number, y: number, fillRule?: CanvasFillRule): boolean;
+  isPointInPath(
+    path: Path2D,
+    x: number,
+    y: number,
+    fillRule?: CanvasFillRule
+  ): boolean;
+  isPointInStroke(x: number, y: number): boolean;
+  isPointInStroke(path: Path2D, x: number, y: number): boolean;
+  stroke(): void;
+  stroke(path: Path2D): void;
+}
+
+interface CanvasFillStrokeStyles {
+  readonly fillStyle: string | CanvasGradient | CanvasPattern;
+  readonly strokeStyle: string | CanvasGradient | CanvasPattern;
+  createConicGradient(startAngle: number, x: number, y: number): CanvasGradient;
+  createLinearGradient(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number
+  ): CanvasGradient;
+  createPattern(
+    image: CanvasImageSource,
+    repetition: string | null
+  ): CanvasPattern | null;
+  createRadialGradient(
+    x0: number,
+    y0: number,
+    r0: number,
+    x1: number,
+    y1: number,
+    r1: number
+  ): CanvasGradient;
+}
+
+interface CanvasFilters {
+  readonly filter: string;
+}
+
 /** An opaque object describing a gradient. It is returned by the methods CanvasRenderingContext2D.createLinearGradient() or CanvasRenderingContext2D.createRadialGradient(). */
 interface CanvasGradient {
   /**
@@ -966,6 +1070,37 @@ declare const CanvasGradient: {
   readonly prototype: CanvasGradient;
   new (): CanvasGradient;
 };
+
+interface CanvasImageData {
+  createImageData(
+    sw: number,
+    sh: number,
+    settings?: ImageDataSettings
+  ): ImageData;
+  createImageData(imagedata: ImageData): ImageData;
+  getImageData(
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    settings?: ImageDataSettings
+  ): ImageData;
+  putImageData(imagedata: ImageData, dx: number, dy: number): void;
+  putImageData(
+    imagedata: ImageData,
+    dx: number,
+    dy: number,
+    dirtyX: number,
+    dirtyY: number,
+    dirtyWidth: number,
+    dirtyHeight: number
+  ): void;
+}
+
+interface CanvasImageSmoothing {
+  readonly imageSmoothingEnabled: boolean;
+  readonly imageSmoothingQuality: ImageSmoothingQuality;
+}
 
 interface CanvasPath {
   arc(
@@ -1000,6 +1135,23 @@ interface CanvasPath {
   moveTo(x: number, y: number): void;
   quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
   rect(x: number, y: number, w: number, h: number): void;
+  roundRect(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    radii?: number | DOMPointInit | readonly (number | DOMPointInit)[]
+  ): void;
+}
+
+interface CanvasPathDrawingStyles {
+  readonly lineCap: CanvasLineCap;
+  readonly lineDashOffset: number;
+  readonly lineJoin: CanvasLineJoin;
+  readonly lineWidth: number;
+  readonly miterLimit: number;
+  getLineDash(): readonly number[];
+  setLineDash(segments: readonly number[]): void;
 }
 
 /** An opaque object describing a pattern, based on an image, a canvas, or a video, created by the CanvasRenderingContext2D.createPattern() method. */
@@ -1012,6 +1164,63 @@ declare const CanvasPattern: {
   readonly prototype: CanvasPattern;
   new (): CanvasPattern;
 };
+
+interface CanvasRect {
+  clearRect(x: number, y: number, w: number, h: number): void;
+  fillRect(x: number, y: number, w: number, h: number): void;
+  strokeRect(x: number, y: number, w: number, h: number): void;
+}
+
+interface CanvasShadowStyles {
+  readonly shadowBlur: number;
+  readonly shadowColor: string;
+  readonly shadowOffsetX: number;
+  readonly shadowOffsetY: number;
+}
+
+interface CanvasState {
+  restore(): void;
+  save(): void;
+}
+
+interface CanvasText {
+  fillText(text: string, x: number, y: number, maxWidth?: number): void;
+  measureText(text: string): TextMetrics;
+  strokeText(text: string, x: number, y: number, maxWidth?: number): void;
+}
+
+interface CanvasTextDrawingStyles {
+  readonly direction: CanvasDirection;
+  readonly font: string;
+  readonly fontKerning: CanvasFontKerning;
+  readonly textAlign: CanvasTextAlign;
+  readonly textBaseline: CanvasTextBaseline;
+}
+
+interface CanvasTransform {
+  getTransform(): DOMMatrix;
+  resetTransform(): void;
+  rotate(angle: number): void;
+  scale(x: number, y: number): void;
+  setTransform(
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    e: number,
+    f: number
+  ): void;
+  setTransform(transform?: DOMMatrix2DInit): void;
+  transform(
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    e: number,
+    f: number
+  ): void;
+  translate(x: number, y: number): void;
+}
 
 /** The Client interface represents an executable context such as a Worker, or a SharedWorker. Window clients are represented by the more-specific WindowClient. You can get Client/WindowClient objects from methods such as Clients.matchAll() and Clients.get(). */
 interface Client {
@@ -1494,6 +1703,13 @@ interface EXT_sRGB {
 
 interface EXT_shader_texture_lod {}
 
+interface EXT_texture_compression_bptc {
+  readonly COMPRESSED_RGBA_BPTC_UNORM_EXT: GLenum;
+  readonly COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT: GLenum;
+  readonly COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT: GLenum;
+  readonly COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT: GLenum;
+}
+
 interface EXT_texture_compression_rgtc {
   readonly COMPRESSED_RED_GREEN_RGTC2_EXT: GLenum;
   readonly COMPRESSED_RED_RGTC1_EXT: GLenum;
@@ -1505,6 +1721,17 @@ interface EXT_texture_compression_rgtc {
 interface EXT_texture_filter_anisotropic {
   readonly MAX_TEXTURE_MAX_ANISOTROPY_EXT: GLenum;
   readonly TEXTURE_MAX_ANISOTROPY_EXT: GLenum;
+}
+
+interface EXT_texture_norm16 {
+  readonly R16_EXT: GLenum;
+  readonly R16_SNORM_EXT: GLenum;
+  readonly RG16_EXT: GLenum;
+  readonly RG16_SNORM_EXT: GLenum;
+  readonly RGB16_EXT: GLenum;
+  readonly RGB16_SNORM_EXT: GLenum;
+  readonly RGBA16_EXT: GLenum;
+  readonly RGBA16_SNORM_EXT: GLenum;
 }
 
 /** Events providing information related to errors in scripts or in files. */
@@ -1525,6 +1752,7 @@ declare const ErrorEvent: {
 interface Event {
   /** Returns true or false depending on how event was initialized. True if event goes through its target's ancestors in reverse tree order, and false otherwise. */
   readonly bubbles: boolean;
+  /** @deprecated */
   readonly cancelBubble: boolean;
   /** Returns true or false depending on how event was initialized. Its return value does not always carry meaning, but true can indicate that part of the operation during which event was dispatched, can be canceled by invoking the preventDefault() method. */
   readonly cancelable: boolean;
@@ -2377,13 +2605,15 @@ declare const IDBObjectStore: {
 };
 
 interface IDBOpenDBRequestEventMap extends IDBRequestEventMap {
-  readonly blocked: Event;
+  readonly blocked: IDBVersionChangeEvent;
   readonly upgradeneeded: IDBVersionChangeEvent;
 }
 
 /** Also inherits methods from its parents IDBRequest and EventTarget. */
 interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
-  readonly onblocked: ((this: IDBOpenDBRequest, ev: Event) => unknown) | null;
+  readonly onblocked:
+    | ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => unknown)
+    | null;
   readonly onupgradeneeded:
     | ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => unknown)
     | null;
@@ -2738,6 +2968,7 @@ interface NavigatorID {
   readonly appName: string;
   /** @deprecated */
   readonly appVersion: string;
+  /** @deprecated */
   readonly platform: string;
   /** @deprecated */
   readonly product: string;
@@ -2823,6 +3054,32 @@ declare const NotificationEvent: {
   new (type: string, eventInitDict: NotificationEventInit): NotificationEvent;
 };
 
+interface OES_draw_buffers_indexed {
+  blendEquationSeparateiOES(
+    buf: GLuint,
+    modeRGB: GLenum,
+    modeAlpha: GLenum
+  ): void;
+  blendEquationiOES(buf: GLuint, mode: GLenum): void;
+  blendFuncSeparateiOES(
+    buf: GLuint,
+    srcRGB: GLenum,
+    dstRGB: GLenum,
+    srcAlpha: GLenum,
+    dstAlpha: GLenum
+  ): void;
+  blendFunciOES(buf: GLuint, src: GLenum, dst: GLenum): void;
+  colorMaskiOES(
+    buf: GLuint,
+    r: GLboolean,
+    g: GLboolean,
+    b: GLboolean,
+    a: GLboolean
+  ): void;
+  disableiOES(target: GLenum, index: GLuint): void;
+  enableiOES(target: GLenum, index: GLuint): void;
+}
+
 /** The OES_element_index_uint extension is part of the WebGL API and adds support for gl.UNSIGNED_INT types to WebGLRenderingContext.drawElements(). */
 interface OES_element_index_uint {}
 
@@ -2870,8 +3127,100 @@ interface OVR_multiview2 {
   readonly MAX_VIEWS_OVR: GLenum;
 }
 
-/** @deprecated this is not available in most browsers */
-interface OffscreenCanvas extends EventTarget {}
+interface OffscreenCanvasEventMap {
+  readonly contextlost: Event;
+  readonly contextrestored: Event;
+}
+
+interface OffscreenCanvas extends EventTarget {
+  /**
+   * These attributes return the dimensions of the OffscreenCanvas object's bitmap.
+   *
+   * They can be set, to replace the bitmap with a new, transparent black bitmap of the specified dimensions (effectively resizing it).
+   */
+  readonly height: number;
+  readonly oncontextlost:
+    | ((this: OffscreenCanvas, ev: Event) => unknown)
+    | null;
+  readonly oncontextrestored:
+    | ((this: OffscreenCanvas, ev: Event) => unknown)
+    | null;
+  /**
+   * These attributes return the dimensions of the OffscreenCanvas object's bitmap.
+   *
+   * They can be set, to replace the bitmap with a new, transparent black bitmap of the specified dimensions (effectively resizing it).
+   */
+  readonly width: number;
+  /**
+   * Returns an object that exposes an API for drawing on the OffscreenCanvas object. contextId specifies the desired API: "2d", "bitmaprenderer", "webgl", or "webgl2". options is handled by that API.
+   *
+   * This specification defines the "2d" context below, which is similar but distinct from the "2d" context that is created from a canvas element. The WebGL specifications define the "webgl" and "webgl2" contexts. [WEBGL]
+   *
+   * Returns null if the canvas has already been initialized with another context type (e.g., trying to get a "2d" context after getting a "webgl" context).
+   */
+  getContext(
+    contextId: OffscreenRenderingContextId,
+    options?: unknown
+  ): OffscreenRenderingContext | null;
+  /** Returns a newly created ImageBitmap object with the image in the OffscreenCanvas object. The image in the OffscreenCanvas object is replaced with a new blank image. */
+  transferToImageBitmap(): ImageBitmap;
+  addEventListener<K extends keyof OffscreenCanvasEventMap>(
+    type: K,
+    listener: (
+      this: OffscreenCanvas,
+      ev: OffscreenCanvasEventMap[K]
+    ) => unknown,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+  removeEventListener<K extends keyof OffscreenCanvasEventMap>(
+    type: K,
+    listener: (
+      this: OffscreenCanvas,
+      ev: OffscreenCanvasEventMap[K]
+    ) => unknown,
+    options?: boolean | EventListenerOptions
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions
+  ): void;
+}
+
+declare const OffscreenCanvas: {
+  readonly prototype: OffscreenCanvas;
+  new (width: number, height: number): OffscreenCanvas;
+};
+
+interface OffscreenCanvasRenderingContext2D
+  extends CanvasCompositing,
+    CanvasDrawImage,
+    CanvasDrawPath,
+    CanvasFillStrokeStyles,
+    CanvasFilters,
+    CanvasImageData,
+    CanvasImageSmoothing,
+    CanvasPath,
+    CanvasPathDrawingStyles,
+    CanvasRect,
+    CanvasShadowStyles,
+    CanvasState,
+    CanvasText,
+    CanvasTextDrawingStyles,
+    CanvasTransform {
+  readonly canvas: OffscreenCanvas;
+  commit(): void;
+}
+
+declare const OffscreenCanvasRenderingContext2D: {
+  readonly prototype: OffscreenCanvasRenderingContext2D;
+  new (): OffscreenCanvasRenderingContext2D;
+};
 
 /** This Canvas 2D API interface is used to declare a path that can then be used on a CanvasRenderingContext2D object. The path methods of the CanvasRenderingContext2D interface are also present on this interface, which gives you the convenience of being able to retain and replay your path whenever desired. */
 interface Path2D extends CanvasPath {
@@ -3038,6 +3387,7 @@ interface PermissionStatusEventMap {
 }
 
 interface PermissionStatus extends EventTarget {
+  readonly name: string;
   readonly onchange: ((this: PermissionStatus, ev: Event) => unknown) | null;
   readonly state: PermissionState;
   addEventListener<K extends keyof PermissionStatusEventMap>(
@@ -3176,6 +3526,7 @@ declare const PushSubscription: {
 /** Available only in secure contexts. */
 interface PushSubscriptionOptions {
   readonly applicationServerKey: ArrayBuffer | null;
+  readonly userVisibleOnly: boolean;
 }
 
 declare const PushSubscriptionOptions: {
@@ -3223,7 +3574,9 @@ declare const ReadableByteStreamController: {
 interface ReadableStream<R = unknown> {
   readonly locked: boolean;
   cancel(reason?: unknown): Promise<void>;
+  getReader(options: { readonly mode: 'byob' }): ReadableStreamBYOBReader;
   getReader(): ReadableStreamDefaultReader<R>;
+  getReader(options?: ReadableStreamGetReaderOptions): ReadableStreamReader<R>;
   pipeThrough<T>(
     transform: ReadableWritablePair<T, R>,
     options?: StreamPipeOptions
@@ -3237,6 +3590,14 @@ interface ReadableStream<R = unknown> {
 
 declare const ReadableStream: {
   readonly prototype: ReadableStream;
+  new (
+    underlyingSource: UnderlyingByteSource,
+    strategy?: { readonly highWaterMark?: number }
+  ): ReadableStream<Uint8Array>;
+  new <R = unknown>(
+    underlyingSource: UnderlyingDefaultSource<R>,
+    strategy?: QueuingStrategy<R>
+  ): ReadableStream<R>;
   new <R = unknown>(
     underlyingSource?: UnderlyingSource<R>,
     strategy?: QueuingStrategy<R>
@@ -3244,9 +3605,9 @@ declare const ReadableStream: {
 };
 
 interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
-  read(
-    view: ArrayBufferView
-  ): Promise<ReadableStreamReadResult<ArrayBufferView>>;
+  read<T extends ArrayBufferView>(
+    view: T
+  ): Promise<ReadableStreamReadResult<T>>;
   releaseLock(): void;
 }
 
@@ -3487,6 +3848,7 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
   readonly notificationclick: NotificationEvent;
   readonly notificationclose: NotificationEvent;
   readonly push: PushEvent;
+  readonly pushsubscriptionchange: Event;
 }
 
 /** This ServiceWorker API interface represents the global execution context of a service worker. */
@@ -3515,6 +3877,9 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
     | null;
   readonly onpush:
     | ((this: ServiceWorkerGlobalScope, ev: PushEvent) => unknown)
+    | null;
+  readonly onpushsubscriptionchange:
+    | ((this: ServiceWorkerGlobalScope, ev: Event) => unknown)
     | null;
   readonly registration: ServiceWorkerRegistration;
   readonly serviceWorker: ServiceWorker;
@@ -3681,7 +4046,7 @@ interface SubtleCrypto {
       | AesGcmParams,
     key: CryptoKey,
     data: BufferSource
-  ): Promise<unknown>;
+  ): Promise<ArrayBuffer>;
   deriveBits(
     algorithm:
       | AlgorithmIdentifier
@@ -3720,7 +4085,7 @@ interface SubtleCrypto {
       | AesGcmParams,
     key: CryptoKey,
     data: BufferSource
-  ): Promise<unknown>;
+  ): Promise<ArrayBuffer>;
   exportKey(format: 'jwk', key: CryptoKey): Promise<JsonWebKey>;
   exportKey(
     format: Exclude<KeyFormat, 'jwk'>,
@@ -4156,7 +4521,7 @@ interface WEBGL_multi_draw {
   ): void;
   multiDrawElementsInstancedWEBGL(
     mode: GLenum,
-    countsList: Int32Array | readonly GLint[],
+    countsList: Int32Array | readonly GLsizei[],
     countsOffset: GLuint,
     type: GLenum,
     offsetsList: Int32Array | readonly GLsizei[],
@@ -4167,7 +4532,7 @@ interface WEBGL_multi_draw {
   ): void;
   multiDrawElementsWEBGL(
     mode: GLenum,
-    countsList: Int32Array | readonly GLint[],
+    countsList: Int32Array | readonly GLsizei[],
     countsOffset: GLuint,
     type: GLenum,
     offsetsList: Int32Array | readonly GLsizei[],
@@ -6221,6 +6586,9 @@ interface WebGLRenderingContextBase {
   getBufferParameter(target: GLenum, pname: GLenum): unknown;
   getContextAttributes(): WebGLContextAttributes | null;
   getError(): GLenum;
+  getExtension(
+    extensionName: 'ANGLE_instanced_arrays'
+  ): ANGLE_instanced_arrays | null;
   getExtension(extensionName: 'EXT_blend_minmax'): EXT_blend_minmax | null;
   getExtension(
     extensionName: 'EXT_color_buffer_float'
@@ -6229,17 +6597,42 @@ interface WebGLRenderingContextBase {
     extensionName: 'EXT_color_buffer_half_float'
   ): EXT_color_buffer_half_float | null;
   getExtension(extensionName: 'EXT_float_blend'): EXT_float_blend | null;
-  getExtension(
-    extensionName: 'EXT_texture_filter_anisotropic'
-  ): EXT_texture_filter_anisotropic | null;
   getExtension(extensionName: 'EXT_frag_depth'): EXT_frag_depth | null;
+  getExtension(extensionName: 'EXT_sRGB'): EXT_sRGB | null;
   getExtension(
     extensionName: 'EXT_shader_texture_lod'
   ): EXT_shader_texture_lod | null;
-  getExtension(extensionName: 'EXT_sRGB'): EXT_sRGB | null;
+  getExtension(
+    extensionName: 'EXT_texture_compression_bptc'
+  ): EXT_texture_compression_bptc | null;
+  getExtension(
+    extensionName: 'EXT_texture_compression_rgtc'
+  ): EXT_texture_compression_rgtc | null;
+  getExtension(
+    extensionName: 'EXT_texture_filter_anisotropic'
+  ): EXT_texture_filter_anisotropic | null;
   getExtension(
     extensionName: 'KHR_parallel_shader_compile'
   ): KHR_parallel_shader_compile | null;
+  getExtension(
+    extensionName: 'OES_element_index_uint'
+  ): OES_element_index_uint | null;
+  getExtension(
+    extensionName: 'OES_fbo_render_mipmap'
+  ): OES_fbo_render_mipmap | null;
+  getExtension(
+    extensionName: 'OES_standard_derivatives'
+  ): OES_standard_derivatives | null;
+  getExtension(extensionName: 'OES_texture_float'): OES_texture_float | null;
+  getExtension(
+    extensionName: 'OES_texture_float_linear'
+  ): OES_texture_float_linear | null;
+  getExtension(
+    extensionName: 'OES_texture_half_float'
+  ): OES_texture_half_float | null;
+  getExtension(
+    extensionName: 'OES_texture_half_float_linear'
+  ): OES_texture_half_float_linear | null;
   getExtension(
     extensionName: 'OES_vertex_array_object'
   ): OES_vertex_array_object | null;
@@ -6257,41 +6650,23 @@ interface WebGLRenderingContextBase {
     extensionName: 'WEBGL_compressed_texture_etc1'
   ): WEBGL_compressed_texture_etc1 | null;
   getExtension(
+    extensionName: 'WEBGL_compressed_texture_s3tc'
+  ): WEBGL_compressed_texture_s3tc | null;
+  getExtension(
     extensionName: 'WEBGL_compressed_texture_s3tc_srgb'
   ): WEBGL_compressed_texture_s3tc_srgb | null;
-  getExtension(
-    extensionName: 'WEBGL_debug_shaders'
-  ): WEBGL_debug_shaders | null;
-  getExtension(extensionName: 'WEBGL_draw_buffers'): WEBGL_draw_buffers | null;
-  getExtension(extensionName: 'WEBGL_lose_context'): WEBGL_lose_context | null;
-  getExtension(
-    extensionName: 'WEBGL_depth_texture'
-  ): WEBGL_depth_texture | null;
   getExtension(
     extensionName: 'WEBGL_debug_renderer_info'
   ): WEBGL_debug_renderer_info | null;
   getExtension(
-    extensionName: 'WEBGL_compressed_texture_s3tc'
-  ): WEBGL_compressed_texture_s3tc | null;
+    extensionName: 'WEBGL_debug_shaders'
+  ): WEBGL_debug_shaders | null;
   getExtension(
-    extensionName: 'OES_texture_half_float_linear'
-  ): OES_texture_half_float_linear | null;
-  getExtension(
-    extensionName: 'OES_texture_half_float'
-  ): OES_texture_half_float | null;
-  getExtension(
-    extensionName: 'OES_texture_float_linear'
-  ): OES_texture_float_linear | null;
-  getExtension(extensionName: 'OES_texture_float'): OES_texture_float | null;
-  getExtension(
-    extensionName: 'OES_standard_derivatives'
-  ): OES_standard_derivatives | null;
-  getExtension(
-    extensionName: 'OES_element_index_uint'
-  ): OES_element_index_uint | null;
-  getExtension(
-    extensionName: 'ANGLE_instanced_arrays'
-  ): ANGLE_instanced_arrays | null;
+    extensionName: 'WEBGL_depth_texture'
+  ): WEBGL_depth_texture | null;
+  getExtension(extensionName: 'WEBGL_draw_buffers'): WEBGL_draw_buffers | null;
+  getExtension(extensionName: 'WEBGL_lose_context'): WEBGL_lose_context | null;
+  getExtension(extensionName: 'WEBGL_multi_draw'): WEBGL_multi_draw | null;
   getExtension(name: string): unknown;
   getFramebufferAttachmentParameter(
     target: GLenum,
@@ -7831,18 +8206,34 @@ type ImageBitmapSource = CanvasImageSource | Blob | ImageData;
 type Int32List = Int32Array | readonly GLint[];
 type MessageEventSource = MessagePort | ServiceWorker;
 type NamedCurve = string;
+type OffscreenRenderingContext =
+  | OffscreenCanvasRenderingContext2D
+  | ImageBitmapRenderingContext
+  | WebGLRenderingContext
+  | WebGL2RenderingContext;
 type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
 type PerformanceEntryList = readonly PerformanceEntry[];
 type PushMessageDataInit = BufferSource | string;
-type ReadableStreamController<T> = ReadableStreamDefaultController<T>;
+type ReadableStreamController<T> =
+  | ReadableStreamDefaultController<T>
+  | ReadableByteStreamController;
 type ReadableStreamReadResult<T> =
   | ReadableStreamReadValueResult<T>
-  | ReadableStreamReadDoneResult;
-type ReadableStreamReader<T> = ReadableStreamDefaultReader<T>;
+  | ReadableStreamReadDoneResult<T>;
+type ReadableStreamReader<T> =
+  | ReadableStreamDefaultReader<T>
+  | ReadableStreamBYOBReader;
 type RequestInfo = Request | string;
 type TexImageSource = ImageBitmap | ImageData | OffscreenCanvas;
 type TimerHandler = string | Function;
-type Transferable = ArrayBuffer | MessagePort | ImageBitmap;
+type Transferable =
+  | OffscreenCanvas
+  | ImageBitmap
+  | MessagePort
+  | ReadableStream
+  | WritableStream
+  | TransformStream
+  | ArrayBuffer;
 type Uint32List = Uint32Array | readonly GLuint[];
 type VibratePattern = number | readonly number[];
 type XMLHttpRequestBodyInit =
@@ -7852,6 +8243,42 @@ type XMLHttpRequestBodyInit =
   | URLSearchParams
   | string;
 type BinaryType = 'arraybuffer' | 'blob';
+type CanvasDirection = 'inherit' | 'ltr' | 'rtl';
+type CanvasFillRule = 'evenodd' | 'nonzero';
+type CanvasFontKerning = 'auto' | 'none' | 'normal';
+type CanvasFontStretch =
+  | 'condensed'
+  | 'expanded'
+  | 'extra-condensed'
+  | 'extra-expanded'
+  | 'normal'
+  | 'semi-condensed'
+  | 'semi-expanded'
+  | 'ultra-condensed'
+  | 'ultra-expanded';
+type CanvasFontVariantCaps =
+  | 'all-petite-caps'
+  | 'all-small-caps'
+  | 'normal'
+  | 'petite-caps'
+  | 'small-caps'
+  | 'titling-caps'
+  | 'unicase';
+type CanvasLineCap = 'butt' | 'round' | 'square';
+type CanvasLineJoin = 'bevel' | 'miter' | 'round';
+type CanvasTextAlign = 'center' | 'end' | 'left' | 'right' | 'start';
+type CanvasTextBaseline =
+  | 'alphabetic'
+  | 'bottom'
+  | 'hanging'
+  | 'ideographic'
+  | 'middle'
+  | 'top';
+type CanvasTextRendering =
+  | 'auto'
+  | 'geometricPrecision'
+  | 'optimizeLegibility'
+  | 'optimizeSpeed';
 type ClientTypes = 'all' | 'sharedworker' | 'window' | 'worker';
 type ColorGamut = 'p3' | 'rec2020' | 'srgb';
 type ColorSpaceConversion = 'default' | 'none';
@@ -7861,12 +8288,40 @@ type FileSystemHandleKind = 'directory' | 'file';
 type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
 type FontFaceSetLoadStatus = 'loaded' | 'loading';
 type FrameType = 'auxiliary' | 'nested' | 'none' | 'top-level';
+type GlobalCompositeOperation =
+  | 'color'
+  | 'color-burn'
+  | 'color-dodge'
+  | 'copy'
+  | 'darken'
+  | 'destination-atop'
+  | 'destination-in'
+  | 'destination-out'
+  | 'destination-over'
+  | 'difference'
+  | 'exclusion'
+  | 'hard-light'
+  | 'hue'
+  | 'lighten'
+  | 'lighter'
+  | 'luminosity'
+  | 'multiply'
+  | 'overlay'
+  | 'saturation'
+  | 'screen'
+  | 'soft-light'
+  | 'source-atop'
+  | 'source-in'
+  | 'source-out'
+  | 'source-over'
+  | 'xor';
 type HdrMetadataType = 'smpteSt2086' | 'smpteSt2094-10' | 'smpteSt2094-40';
 type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
 type IDBRequestReadyState = 'done' | 'pending';
 type IDBTransactionDurability = 'default' | 'relaxed' | 'strict';
 type IDBTransactionMode = 'readonly' | 'readwrite' | 'versionchange';
 type ImageOrientation = 'flipY' | 'none';
+type ImageSmoothingQuality = 'high' | 'low' | 'medium';
 type KeyFormat = 'jwk' | 'pkcs8' | 'raw' | 'spki';
 type KeyType = 'private' | 'public' | 'secret';
 type KeyUsage =
@@ -7883,6 +8338,12 @@ type MediaDecodingType = 'file' | 'media-source' | 'webrtc';
 type MediaEncodingType = 'record' | 'webrtc';
 type NotificationDirection = 'auto' | 'ltr' | 'rtl';
 type NotificationPermission = 'default' | 'denied' | 'granted';
+type OffscreenRenderingContextId =
+  | '2d'
+  | 'bitmaprenderer'
+  | 'webgl'
+  | 'webgl2'
+  | 'webgpu';
 type PermissionName =
   | 'geolocation'
   | 'notifications'
@@ -7895,6 +8356,8 @@ type PredefinedColorSpace = 'display-p3' | 'srgb';
 type PremultiplyAlpha = 'default' | 'none' | 'premultiply';
 type PushEncryptionKeyName = 'auth' | 'p256dh';
 type RTCEncodedVideoFrameType = 'delta' | 'empty' | 'key';
+type ReadableStreamReaderMode = 'byob';
+type ReadableStreamType = 'bytes';
 type ReferrerPolicy =
   | ''
   | 'no-referrer'

@@ -16,11 +16,11 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 
 interface ErrorOptions {
-  readonly cause?: Error;
+  readonly cause?: unknown;
 }
 
 interface Error {
-  readonly cause?: Error;
+  readonly cause?: unknown;
 }
 
 interface ErrorConstructor {
