@@ -28,6 +28,34 @@ const rulesMakerCommon = (pathToTsconfigJson) => [
     enforce: 'pre',
     use: ['source-map-loader'],
   },
+
+  /**
+   * https://www.wantedly.com/companies/wantedly/post_articles/408339
+   * https://webpack.js.org/loaders/babel-loader/
+   */
+  {
+    test: /\.m?js$/,
+    exclude: /(node_modules|bower_components)/,
+    use: {
+      loader: 'babel-loader',
+      options: {
+        presets: ['@babel/preset-env'],
+        plugins: [
+          [
+            '@babel/plugin-polyfill-corejs3',
+            {
+              // entry-global, usage-global, usage-pure のいずれかを指定
+              method: 'usage-pure',
+              // core-jsのバージョン情報を与えると、より最適な結果を出してくれる
+              version: '^3.27.1',
+            },
+          ],
+          '@babel/plugin-transform-runtime',
+        ],
+      },
+    },
+  },
+
   {
     test: /\.(txt|md)$/u,
     use: {
