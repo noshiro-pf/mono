@@ -396,7 +396,11 @@ describe('IRecord', () => {
     assertType<
       TypeEq<
         IRecord.Entries<RecordType1>,
-        (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
+        readonly (
+          | readonly ['3', 4]
+          | readonly ['x', 1]
+          | readonly ['y' | 'z', 2]
+        )[]
       >
     >();
 
@@ -418,13 +422,24 @@ describe('IRecord', () => {
     assertType<
       TypeEq<
         IRecord.Entries<RecordType2>,
-        | (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
-        | (['9', 40] | ['a', 10] | ['b' | 'c', 20])[]
+        | readonly (
+            | readonly ['3', 4]
+            | readonly ['x', 1]
+            | readonly ['y' | 'z', 2]
+          )[]
+        | readonly (
+            | readonly ['9', 40]
+            | readonly ['a', 10]
+            | readonly ['b' | 'c', 20]
+          )[]
       >
     >();
 
     assertType<
-      TypeEq<IRecord.Entries<Record<string, number>>, [string, number][]>
+      TypeEq<
+        IRecord.Entries<Record<string, number>>,
+        readonly (readonly [string, number])[]
+      >
     >();
 
     test('case 1', () => {
@@ -453,7 +468,14 @@ describe('IRecord', () => {
       >();
 
       assertType<
-        TypeEq<typeof entries1, (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]>
+        TypeEq<
+          typeof entries1,
+          readonly (
+            | readonly ['3', 4]
+            | readonly ['x', 1]
+            | readonly ['y' | 'z', 2]
+          )[]
+        >
       >();
     });
   });
