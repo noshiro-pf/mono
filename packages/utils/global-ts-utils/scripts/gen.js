@@ -57,7 +57,6 @@ const importsList = [
   'noop',
   'Num',
   'Obj',
-  'objectIs',
   'pipe',
   'range',
   'RecordUtils',

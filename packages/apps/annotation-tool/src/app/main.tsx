@@ -97,7 +97,8 @@ export const Main = memoNamed('Main', () => {
     [hide, show, selectLabel]
   );
 
-  const visibleLabels = labels.filter((_, i) => visibleLabelIndices[i]);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const visibleLabels = labels.filter((_, i) => visibleLabelIndices[i]!);
 
   return (
     <Root>

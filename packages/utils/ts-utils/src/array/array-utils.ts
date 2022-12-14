@@ -427,7 +427,6 @@ export namespace ArrayUtils {
     list: readonly A[],
     index: number
   ): readonly A[] => {
-    // eslint-disable-next-line no-restricted-globals
     const mut_temp = ArrayFrom(list);
 
     mut_temp.splice(index, 1);

@@ -152,12 +152,11 @@ export namespace RecordUtils {
   export const keys = <R extends ReadonlyRecordBase>(
     object: R
   ): ToObjectKeysValue<keyof R>[] =>
-    // eslint-disable-next-line no-restricted-globals
+    // eslint-disable-next-line no-restricted-syntax
     Object.keys(object) as ToObjectKeysValue<keyof R>[];
 
   export const values = <K extends PropertyKey, V>(
     object: ReadonlyRecord<K, V>
-    // eslint-disable-next-line no-restricted-globals
   ): readonly V[] => Object.values(object);
 
   /**
@@ -182,7 +181,7 @@ export namespace RecordUtils {
   export const fromEntries = <K extends PropertyKey, V>(
     entries_: Iterable<readonly [K, V]>
   ): ReadonlyRecord<K, V> =>
-    // eslint-disable-next-line no-restricted-globals
+    // eslint-disable-next-line no-restricted-syntax
     Object.fromEntries(entries_) as ReadonlyRecord<K, V>;
 
   /**
@@ -205,7 +204,7 @@ export namespace RecordUtils {
    */
   export const entries = <R extends ReadonlyRecordBase>(
     object: R
-    // eslint-disable-next-line no-restricted-globals
+    // eslint-disable-next-line no-restricted-syntax
   ): Entries<R> => Object.entries(object) as Entries<R>;
 
   /**
@@ -235,7 +234,7 @@ export namespace RecordUtils {
     rec: R,
     key: K
   ): rec is R & ReadonlyRecord<K, R[K]> {
-    // eslint-disable-next-line no-restricted-globals, prefer-object-has-own
+    // eslint-disable-next-line prefer-object-has-own, no-restricted-syntax
     return Object.prototype.hasOwnProperty.call(rec, key);
   }
 

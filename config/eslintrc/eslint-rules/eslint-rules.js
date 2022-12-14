@@ -242,27 +242,107 @@ const eslintRules = {
   'no-restricted-exports': 'error',
   'no-restricted-globals': [
     'error',
-    { name: 'Array', message: 'use Arr instead.' },
-    { name: 'Boolean', message: 'use toBoolean instead.' },
-    { name: 'Date', message: 'use DateUtils instead.' },
-    { name: 'JSON', message: 'use Json instead.' },
+    {
+      name: 'Array',
+      message: "use Arr from '@noshiro/ts-utils' instead.",
+    },
+    {
+      name: 'Boolean',
+      message: "use toBoolean from '@noshiro/ts-utils' instead.",
+    },
+    {
+      name: 'Date',
+      message: "use DateUtils from '@noshiro/ts-utils' instead.",
+    },
+    { name: 'JSON', message: "use Json from '@noshiro/ts-utils' instead." },
     'eval',
     'Function',
     'globalThis',
-    { name: 'Infinity', message: 'use Num.Infinity instead.' },
-    { name: 'isFinite', message: 'use Num.isFinite instead.' },
-    { name: 'isNaN', message: 'use Num.isNaN instead.' },
-    { name: 'Map', message: 'use IMap or MutableMap instead.' },
-    { name: 'NaN', message: 'use Num.NaN instead.' },
-    { name: 'Number', message: 'use Num instead.' },
-    'Object',
-    { name: 'parseFloat', message: 'use Num.parseFloat instead.' },
-    { name: 'parseInt', message: 'use Num.parseInt instead.' },
-    { name: 'Set', message: 'use ISet or MutableSet instead.' },
-    { name: 'String', message: 'use Str instead.' },
+    {
+      // react-router の location との曖昧性回避のため
+      name: 'location',
+      message: "use 'window.location' instead.",
+    },
+    {
+      // react-router の history との曖昧性回避のため
+      name: 'history',
+      message: "use 'window.history' instead.",
+    },
+    {
+      // react-router の navigator との曖昧性回避のため
+      name: 'navigator',
+      message: "use 'window.navigator' instead.",
+    },
+    {
+      name: 'Infinity',
+      message: "use 'Num.Infinity' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      name: 'isFinite',
+      message: "use 'Num.isFinite' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      name: 'isNaN',
+      message: "use 'Num.isNaN' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      name: 'Map',
+      message: "use 'IMap' or 'MutableMap' from '@noshiro/ts-utils' instead.",
+    },
+    { name: 'NaN', message: "use 'Num.NaN' from '@noshiro/ts-utils' instead." },
+    { name: 'Number', message: "use 'Num' from '@noshiro/ts-utils' instead." },
+    {
+      name: 'parseFloat',
+      message:
+        "use 'Num.parseFloat' from @noshiro/ts-utils from '@noshiro/ts-utils' instead.",
+    },
+    {
+      name: 'parseInt',
+      message: "use 'Num.parseInt' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      name: 'Set',
+      message: "use 'ISet' or 'MutableSet' from '@noshiro/ts-utils' instead.",
+    },
+    { name: 'String', message: "use 'Str' from '@noshiro/ts-utils' instead." },
   ],
   'no-restricted-properties': 'error',
-  'no-restricted-syntax': 'error',
+  'no-restricted-syntax': [
+    'error',
+    {
+      // ban Object.keys
+      selector: "MemberExpression[object.name='Object'][property.name='keys']",
+      message: "use 'Obj.keys' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      // ban Object.fromEntries
+      selector:
+        "MemberExpression[object.name='Object'][property.name='fromEntries']",
+      message: "use 'Obj.fromEntries' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      // ban Object.entries
+      selector:
+        "MemberExpression[object.name='Object'][property.name='entries']",
+      message: "use 'Obj.entries' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      // ban "in" operator
+      selector: "BinaryExpression[operator='in']",
+      message: "use 'haskey' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      // ban Object.prototype.hasOwnProperty.call
+      selector:
+        "MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']",
+      message: "use 'haskey' from '@noshiro/ts-utils' instead.",
+    },
+    {
+      // ban "new Array" expression
+      selector: "NewExpression[callee.name='Array]",
+      message: "use Array.from or 'zeros' from '@noshiro/ts-utils' instead.",
+    },
+  ],
   'no-return-assign': 'error',
   'no-script-url': 'error',
   'no-self-assign': 'error',

@@ -29,7 +29,11 @@ type Config = Readonly<{
 }>;
 
 export function register(config?: Config): void {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if (
+    process.env.NODE_ENV === 'production' &&
+    // eslint-disable-next-line no-restricted-syntax
+    'serviceWorker' in window.navigator
+  ) {
     // The URL constructor is available in all browsers that support SW.
     const PUBLIC_URL = (process as { env: Record<string, string> }).env[
       'PUBLIC_URL'
@@ -55,7 +59,7 @@ export function register(config?: Config): void {
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
-        navigator.serviceWorker.ready
+        window.navigator.serviceWorker.ready
           .then(() => {
             console.log(
               'This web app is being served cache-first by a service ' +
@@ -72,7 +76,7 @@ export function register(config?: Config): void {
 }
 
 async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
-  const mut_registration = await navigator.serviceWorker
+  const mut_registration = await window.navigator.serviceWorker
     .register(swUrl)
     .catch((error) => {
       console.error('Error during service worker registration:', error);
@@ -92,7 +96,7 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
     }
     mut_installingWorker.addEventListener('statechange', () => {
       if (mut_installingWorker.state === 'installed') {
-        if (navigator.serviceWorker.controller !== null) {
+        if (window.navigator.serviceWorker.controller !== null) {
           // At this point, the updated precached content has been fetched,
           // but the previous service worker will still serve the older
           // content until all client tabs are closed.
@@ -132,7 +136,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
         contentType?.includes('javascript') === true
       ) {
         // No service worker found. Probably a different app. Reload the page.
-        navigator.serviceWorker.ready
+        window.navigator.serviceWorker.ready
           .then((registration) =>
             registration.unregister().then(() => {
               window.location.reload();
@@ -152,8 +156,11 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
 }
 
 export function unregister(): void {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready
+  if (
+    // eslint-disable-next-line no-restricted-syntax
+    'serviceWorker' in window.navigator
+  ) {
+    window.navigator.serviceWorker.ready
       .then((registration) => registration.unregister())
       .catch(console.error);
   }

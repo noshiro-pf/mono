@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { pipe } from '../functional';
-import { objectIs, tp } from '../others';
+import { tp } from '../others';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
@@ -77,6 +77,9 @@ export const IMapMapped = {
   },
 };
 
+// eslint-disable-next-line no-restricted-globals
+const ArrayFrom = Array.from;
+
 class IMapMappedClass<K, V, KM extends RecordKeyType>
   implements IMapMapped<K, V, KM>, Iterable<readonly [K, V]>
 {
@@ -90,10 +93,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     fromKey: (k: KM) => K
   ) {
     // eslint-disable-next-line no-restricted-globals
-    this.#map = new Map(
-      // eslint-disable-next-line no-restricted-globals
-      Array.from(iterable, ([k, v]) => [toKey(k), v])
-    );
+    this.#map = new Map(ArrayFrom(iterable, ([k, v]) => [toKey(k), v]));
     this.#toKey = toKey;
     this.#fromKey = fromKey;
   }
@@ -135,9 +135,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this.#toKey(key);
 
     return IMapMapped.new(
-      // eslint-disable-next-line no-restricted-globals
-      Array.from(this.#map)
-        .filter(([km]) => !objectIs(km, keyMapped))
+      ArrayFrom(this.#map)
+        .filter(([km]) => !Object.is(km, keyMapped))
         .map(([km, v]) => tp(this.#fromKey(km), v)),
       this.#toKey,
       this.#fromKey
@@ -158,9 +157,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       );
     } else {
       return IMapMapped.new(
-        // eslint-disable-next-line no-restricted-globals
-        Array.from(this.#map, ([km, v]) =>
-          tp(this.#fromKey(km), objectIs(km, keyMapped) ? value : v)
+        ArrayFrom(this.#map, ([km, v]) =>
+          tp(this.#fromKey(km), Object.is(km, keyMapped) ? value : v)
         ),
         this.#toKey,
         this.#fromKey
@@ -175,13 +173,12 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this.#toKey(key);
 
     return IMapMapped.new(
-      // eslint-disable-next-line no-restricted-globals
-      Array.from(
+      ArrayFrom(
         this.#map.entries(),
         (keyValue) =>
           pipe(keyValue)
             .chain(([km, v]) =>
-              tp(km, objectIs(km, keyMapped) ? updater(curr) : v)
+              tp(km, Object.is(km, keyMapped) ? updater(curr) : v)
             )
             .chain(([km, v]) => tp(this.#fromKey(km), v)).value
       ),
@@ -189,8 +186,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       this.#fromKey
     );
     // return IMapMapped.new(
-    //   Array.from(this._map.entries(), ([km, v]) => tp(this._fromKey(km), v))(
-    //     ([km, v]) => tp(km, objectIs(km, keyMapped) ? updater(curr) : v)
+    //   ArrayFrom(this._map.entries(), ([km, v]) => tp(this._fromKey(km), v))(
+    //     ([km, v]) => tp(km, Object.is(km, keyMapped) ? updater(curr) : v)
     //   ),
     //   this._toKey,
     //   this._fromKey
@@ -227,8 +224,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     }
 
     return IMapMapped.new<K, V, KM>(
-      // eslint-disable-next-line no-restricted-globals
-      Array.from(mut_result, ([k, v]) => [this.#fromKey(k), v]),
+      ArrayFrom(mut_result, ([k, v]) => [this.#fromKey(k), v]),
       this.#toKey,
       this.#fromKey
     );
@@ -291,23 +287,19 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   toKeysArray(): readonly K[] {
-    // eslint-disable-next-line no-restricted-globals
-    return Array.from(this.keys());
+    return ArrayFrom(this.keys());
   }
 
   toValuesArray(): readonly V[] {
-    // eslint-disable-next-line no-restricted-globals
-    return Array.from(this.values());
+    return ArrayFrom(this.values());
   }
 
   toEntriesArray(): readonly (readonly [K, V])[] {
-    // eslint-disable-next-line no-restricted-globals
-    return Array.from(this.entries());
+    return ArrayFrom(this.entries());
   }
 
   toArray(): readonly (readonly [K, V])[] {
-    // eslint-disable-next-line no-restricted-globals
-    return Array.from(this.entries());
+    return ArrayFrom(this.entries());
   }
 
   toRawMap(): ReadonlyMap<KM, V> {

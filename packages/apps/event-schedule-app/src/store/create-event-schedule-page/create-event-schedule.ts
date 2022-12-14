@@ -182,12 +182,12 @@ export namespace CreateEventScheduleStore {
 
     // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
     if (
-      isNotUndefined(navigator.clipboard) &&
+      isNotUndefined(window.navigator.clipboard) &&
       window.isSecureContext &&
       isNotUndefined(url)
     ) {
       // TODO: use toast
-      navigator.clipboard.writeText(url).catch(console.error);
+      window.navigator.clipboard.writeText(url).catch(console.error);
     }
   };
 

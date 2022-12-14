@@ -368,7 +368,7 @@ describe('RecordUtils', () => {
       [4, 3],
     ] as const;
 
-    // eslint-disable-next-line no-restricted-globals
+    // eslint-disable-next-line no-restricted-syntax
     const obj0 = Object.fromEntries(entries);
     const obj1 = RecordUtils.fromEntries(entries);
 
@@ -452,7 +452,7 @@ describe('RecordUtils', () => {
         [symb]: 5,
       } as const;
 
-      // eslint-disable-next-line no-restricted-globals
+      // eslint-disable-next-line no-restricted-syntax
       const entries0 = Object.entries(obj);
       const entries1 = RecordUtils.entries(obj);
 

@@ -46,7 +46,6 @@ import {
   noop,
   Num,
   Obj,
-  objectIs,
   pipe,
   range,
   RecordUtils,
@@ -99,7 +98,6 @@ import {
 (global as any).noop = noop;
 (global as any).Num = Num;
 (global as any).Obj = Obj;
-(global as any).objectIs = objectIs;
 (global as any).pipe = pipe;
 (global as any).range = range;
 (global as any).RecordUtils = RecordUtils;
