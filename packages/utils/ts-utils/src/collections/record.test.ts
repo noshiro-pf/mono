@@ -368,12 +368,15 @@ describe('IRecord', () => {
       [4, 3],
     ] as const;
 
-    const obj = IRecord.fromEntries(entries);
+    // eslint-disable-next-line no-restricted-globals
+    const obj0 = Object.fromEntries(entries);
+    const obj1 = IRecord.fromEntries(entries);
 
-    assertType<TypeEq<typeof obj, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>>();
+    assertType<TypeEq<typeof obj0, Record<string, 1 | 2 | 3>>>();
+    assertType<TypeEq<typeof obj1, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>>();
 
     test('case 1', () => {
-      expect(obj).toStrictEqual({
+      expect(obj1).toStrictEqual({
         x: 1,
         y: 2,
         z: 3,
@@ -426,15 +429,19 @@ describe('IRecord', () => {
 
     test('case 1', () => {
       const symb = Symbol();
-      const entries = IRecord.entries({
+      const obj = {
         x: 1,
         y: 2,
         z: 2,
         3: 4,
         [symb]: 5,
-      } as const);
+      } as const;
 
-      expect(entries).toStrictEqual([
+      // eslint-disable-next-line no-restricted-globals
+      const entries0 = Object.entries(obj);
+      const entries1 = IRecord.entries(obj);
+
+      expect(entries1).toStrictEqual([
         ['3', 4],
         ['x', 1],
         ['y', 2],
@@ -442,7 +449,11 @@ describe('IRecord', () => {
       ]);
 
       assertType<
-        TypeEq<typeof entries, (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]>
+        TypeEq<typeof entries0, readonly (readonly [string, 1 | 2 | 4])[]>
+      >();
+
+      assertType<
+        TypeEq<typeof entries1, (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]>
       >();
     });
   });
