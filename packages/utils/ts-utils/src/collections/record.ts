@@ -213,8 +213,8 @@ export namespace IRecord {
    * @internal
    */
   export type Entries<R extends ReadonlyRecordBase> = R extends R
-    ? {
-        readonly [K in keyof R]: [
+    ? readonly {
+        readonly [K in keyof R]: readonly [
           ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
           R[K]
         ];
