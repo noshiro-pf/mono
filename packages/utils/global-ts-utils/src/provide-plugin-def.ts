@@ -40,6 +40,8 @@ export const providePluginTsUtilsDef = IRecord.fromEntries(
     'match',
     'Maybe',
     'memoizeFunction',
+    'MutableMap',
+    'MutableSet',
     'noop',
     'Num',
     'objectIs',

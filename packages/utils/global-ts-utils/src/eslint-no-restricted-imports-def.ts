@@ -39,6 +39,8 @@ export const eslintNoRestrictedImportsTsUtilsDef = {
     'match',
     'Maybe',
     'memoizeFunction',
+    'MutableMap',
+    'MutableSet',
     'noop',
     'Num',
     'objectIs',

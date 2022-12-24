@@ -38,6 +38,8 @@ import type {
   match as _match,
   Maybe as _Maybe,
   memoizeFunction as _memoizeFunction,
+  MutableMap as _MutableMap,
+  MutableSet as _MutableSet,
   None as _None,
   noop as _noop,
   Num as _Num,
@@ -111,6 +113,8 @@ declare global {
   const match: typeof _match;
   const Maybe: typeof _Maybe;
   const memoizeFunction: typeof _memoizeFunction;
+  const MutableMap: typeof _MutableMap;
+  const MutableSet: typeof _MutableSet;
   const noop: typeof _noop;
   const Num: typeof _Num;
   const objectIs: typeof _objectIs;
