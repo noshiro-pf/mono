@@ -52,6 +52,8 @@ const importsList = [
   'match',
   'Maybe',
   'memoizeFunction',
+  'MutableMap',
+  'MutableSet',
   'noop',
   'Num',
   'objectIs',
