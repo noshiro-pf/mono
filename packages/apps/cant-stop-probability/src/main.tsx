@@ -71,7 +71,7 @@ export const Main = memoNamed('Main', () => {
 
   const { state: columnsAlive, updateState: updateDeadColumns } = useState<
     readonly boolean[]
-  >(IList.newArrayThrow(11, true));
+  >(IList.newArrayUnwrapped(11, true));
 
   const columnsAliveWithHandler = useMemo<
     readonly Readonly<{

@@ -198,12 +198,12 @@ export namespace IList {
     return pipe(zeros(len)).chain(Result.map((l) => l.map(() => init))).value;
   }
 
-  export function newArrayThrow<T, N extends Index1000>(
-    len: number,
+  export function newArrayUnwrapped<T, N extends Index1000>(
+    len: N,
     init: T
   ): ArrayOfLength<N, T>;
-  export function newArrayThrow<T>(len: number, init: T): readonly T[];
-  export function newArrayThrow<T>(len: number, init: T): readonly T[] {
+  export function newArrayUnwrapped<T>(len: number, init: T): readonly T[];
+  export function newArrayUnwrapped<T>(len: number, init: T): readonly T[] {
     return Result.unwrapThrow(newArray(len, init));
   }
 
@@ -216,7 +216,7 @@ export namespace IList {
       Result.map((l) => l.map((n) => n * step + start))
     ).value;
 
-  export const rangeThrow = (
+  export const rangeUnwrapped = (
     start: number,
     end: number,
     step: number = 1
@@ -685,7 +685,9 @@ export namespace IList {
     reducer: ReducerType<B, A>,
     init: B
   ): NonEmptyArray<B> => {
-    const mut_result: B[] = ArrayFrom(newArrayThrow<B>(list.length + 1, init));
+    const mut_result: B[] = ArrayFrom(
+      newArrayUnwrapped<B>(list.length + 1, init)
+    );
 
     let mut_acc = init;
 
