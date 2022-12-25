@@ -513,6 +513,12 @@ export namespace IList {
   ): A | undefined =>
     list.find(predicate as (value: A, index: number) => boolean);
 
+  export const findIndex = <A>(
+    list: readonly A[],
+    predicate: (value: A, index: number) => boolean
+  ): number =>
+    list.findIndex(predicate as (value: A, index: number) => boolean);
+
   export function min<T extends readonly [number, ...(readonly number[])]>(
     list: T,
     comparator?: (x: T[number], y: T[number]) => number
