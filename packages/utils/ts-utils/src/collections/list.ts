@@ -300,6 +300,13 @@ export namespace IList {
 
   export const pop = butLast;
 
+  /**
+   * Returns the item located at the specified index.
+   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   */
+  export const at = <A>(list: readonly A[], index: number): A | undefined =>
+    list.at(index);
+
   export function every<A, B extends A>(
     list: readonly A[],
     predicate: (value: A, index: number) => value is B
