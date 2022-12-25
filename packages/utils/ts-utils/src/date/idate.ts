@@ -429,8 +429,8 @@ export namespace IDate {
     year: YearEnum,
     month: MonthEnum
   ): readonly IDate[] =>
-    IList.rangeThrow(1, getLastDateNumberOfMonth(year, month) + 1).map((date) =>
-      create(year, month, date as DateEnum)
+    IList.rangeUnwrapped(1, getLastDateNumberOfMonth(year, month) + 1).map(
+      (date) => create(year, month, date as DateEnum)
     );
 
   export const numWeeksOfMonth = (year: YearEnum, month: MonthEnum): number => {

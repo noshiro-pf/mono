@@ -5,7 +5,7 @@ import { BpSelect } from '../bp';
 const thisYear = IDate.getLocaleYear(IDate.today());
 const thisMonth = IDate.getLocaleMonth(IDate.today());
 
-const yearOption: readonly number[] = IList.rangeThrow(
+const yearOption: readonly number[] = IList.rangeUnwrapped(
   thisYear - 100,
   thisYear + 100
 );

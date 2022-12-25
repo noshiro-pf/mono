@@ -49,7 +49,7 @@ export const generateCalendar = (
 
   const rowSize = numWeeks(year, month);
 
-  return IList.rangeThrow(0, rowSize).map((i: number) =>
+  return IList.rangeUnwrapped(0, rowSize).map((i: number) =>
     cells1d.slice(7 * i, 7 * (i + 1))
   );
 };
@@ -60,7 +60,7 @@ const genYmdRangeList = (
   from: DateEnum,
   to: DateEnum
 ): readonly YearMonthDate[] =>
-  IList.rangeThrow(from, to + 1).map((n) => ({
+  IList.rangeUnwrapped(from, to + 1).map((n) => ({
     year,
     month,
     date: n as DateEnum,
