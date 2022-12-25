@@ -135,7 +135,8 @@ export namespace IList {
     iterable: Iterable<T> | Readonly<ArrayLike<T>>
   ) => readonly T[] = ArrayFrom;
 
-  export const asMut = <T>(list: readonly T[]): T[] => list as T[];
+  export const asMut = <T extends readonly unknown[]>(list: T): Writable<T> =>
+    list as Writable<T>;
 
   /**
    * Creates an array from an iterable object.
