@@ -1,8 +1,9 @@
 export const asyncFilter = async <T>(
   array: readonly T[],
-  asyncFn: <S>(a: T) => S
+  asyncFn: (a: T) => Promise<boolean>
 ): Promise<readonly T[]> => {
   const result = await Promise.all(array.map(asyncFn));
 
-  return array.filter((_, i) => result[i]);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return array.filter((_, i) => result[i]!);
 };

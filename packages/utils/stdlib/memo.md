@@ -22,3 +22,6 @@
             -   `Array.of` の return type
             -   ` readonly [n: number]: T;` -> ` [n: number]: T;`
                 -   ArrayLike も
+        -   `predicate` の返り値を `unknown` -> `boolean` に変更
+            -   `predicate: \(.*unknown` と `predicate: \(\n` で検索
+        -   `Array.sort` の `compareFn` を必須引数に変更
