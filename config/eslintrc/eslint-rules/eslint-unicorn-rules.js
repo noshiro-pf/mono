@@ -16,7 +16,9 @@ const eslintUnicornRules = {
 
   'unicorn/better-regex': 'error',
   'unicorn/catch-error-name': 'error',
+
   'unicorn/consistent-destructuring': 'error',
+
   'unicorn/consistent-function-scoping': 'error',
   'unicorn/custom-error-definition': 'off',
   'unicorn/error-message': 'error',

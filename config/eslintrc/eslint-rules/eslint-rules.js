@@ -307,6 +307,13 @@ const eslintRules = {
     { name: 'String', message: "use 'Str' from '@noshiro/ts-utils' instead." },
   ],
   'no-restricted-properties': 'error',
+
+  /**
+   * 他ルールで実現しづらい禁止したい構文をここに書く。
+   * 以下のAST checker を用いて selector をどう書くべきか調べることができる。
+   *
+   * AST checker: https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es
+   */
   'no-restricted-syntax': [
     'error',
     {
@@ -385,6 +392,15 @@ const eslintRules = {
   'prefer-object-spread': 'error',
   'prefer-promise-reject-errors': 'error',
   'prefer-regex-literals': 'error',
+
+  /**
+   * `+` の曖昧性回避のため使用。
+   * restrict-plus-operands で bigint, number, string 同士にしか使用できないように制限し、
+   * prefer-template で文字列の連結に `+` を使うことも禁止する。
+   * 修正方法： template literal を使うか、文字列の配列を `join("")` で結合する。
+   *  - a + b -> `${a}${b}`
+   *  - s_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
+   */
   'prefer-template': 'error',
   radix: 'error',
   'require-atomic-updates': 'error',
