@@ -11,7 +11,7 @@ export const playerNamePositionsDispatcher = (
 };
 
 export const playerNamePositions$: InitializedObservable<
-  ReadonlyRecord<NWES, Rect> | undefined
+  Record<NWES, Rect> | undefined
 > = playerNamePositionsAction$.chain(
   scan(playerNamePositionsReducer, undefined)
 );

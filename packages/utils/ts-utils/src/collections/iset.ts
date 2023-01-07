@@ -70,7 +70,7 @@ export const ISet = {
   diff: <K>(
     oldSet: ISet<K>,
     newSet: ISet<K>
-  ): ReadonlyRecord<'added' | 'deleted', ISet<K>> => ({
+  ): Record<'added' | 'deleted', ISet<K>> => ({
     deleted: oldSet.subtract(newSet),
     added: newSet.subtract(oldSet),
   }),

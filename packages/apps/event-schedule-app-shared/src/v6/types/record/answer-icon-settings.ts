@@ -3,10 +3,7 @@ import type { AnswerIconId } from '../enum';
 import type { AnswerIconSetting } from './base';
 import { fillAnswerIconSetting, isAnswerIconSetting } from './base';
 
-export type AnswerIconSettings = ReadonlyRecord<
-  AnswerIconId,
-  AnswerIconSetting
->;
+export type AnswerIconSettings = Record<AnswerIconId, AnswerIconSetting>;
 
 export const answerIconSettingsDefaultValue: AnswerIconSettings = {
   good: { description: '', point: 10 },

@@ -2,7 +2,7 @@ import type { IndexOfTuple } from './index-of-tuple';
 import type { IsNotFixedLengthList } from './is-fixed-length-list';
 import type { ToNumber } from './to-number';
 import type { Tuple } from './tuple';
-import type { ReadonlyRecordBase } from './utils';
+import type { RecordBase } from './utils';
 
 export type PathsWithIndex<R> = Prefixes<LeafPathsWithIndex<R>>;
 export type Paths<R> = Prefixes<LeafPaths<R>>;
@@ -26,7 +26,7 @@ export type KeyPathAndValueTypeAtPathTuple<R> = AttachValueTypeAtPath<
 
 export type LeafPaths<R> = R extends readonly unknown[]
   ? LeafPathsImplListCase<R>
-  : R extends ReadonlyRecordBase
+  : R extends RecordBase
   ? LeafPathsImplRecordCase<R>
   : readonly [];
 
@@ -46,7 +46,7 @@ type LeafPathsImplListCase<
 
 /** @internal */
 type LeafPathsImplRecordCase<
-  R extends ReadonlyRecordBase,
+  R extends RecordBase,
   PathHead extends keyof R = keyof R
 > = string extends PathHead
   ? readonly []
@@ -56,7 +56,7 @@ type LeafPathsImplRecordCase<
 
 export type LeafPathsWithIndex<R> = R extends readonly unknown[]
   ? _LeafPathsWithIndexImplListCase<R>
-  : R extends ReadonlyRecordBase
+  : R extends RecordBase
   ? LeafPathsWithIndexImplRecordCase<R>
   : readonly [];
 
@@ -76,7 +76,7 @@ type _LeafPathsWithIndexImplListCase<
 
 /** @internal */
 type LeafPathsWithIndexImplRecordCase<
-  R extends ReadonlyRecordBase,
+  R extends RecordBase,
   PathHead extends keyof R = keyof R
 > = PathHead extends keyof R
   ? readonly [PathHead, ...LeafPathsWithIndex<R[PathHead]>]
@@ -90,13 +90,13 @@ export type RecordUpdated<
   ? ValueAfter
   : R extends readonly unknown[]
   ? RecordUpdatedImplTupleCase<R, Path, ValueAfter>
-  : R extends ReadonlyRecordBase
+  : R extends RecordBase
   ? RecordUpdatedImplRecordCase<R, Path, ValueAfter>
   : R;
 
 /** @internal */
 type RecordUpdatedImplRecordCase<
-  R extends ReadonlyRecordBase,
+  R extends RecordBase,
   Path extends Paths<R>,
   ValueAfter
 > = Path extends readonly [infer Head, ...infer Rest]

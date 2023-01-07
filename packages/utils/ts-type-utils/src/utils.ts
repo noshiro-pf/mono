@@ -54,9 +54,9 @@ export type ReadonlyJSONValue =
     }
   | null;
 
-export type ReadonlyJSONType = ReadonlyRecord<string, ReadonlyJSONValue>;
+export type ReadonlyJSONType = Record<string, ReadonlyJSONValue>;
 
-export type JSONType = ReadonlyRecord<string, JSONValue>;
+export type JSONType = Record<string, JSONValue>;
 
 /* Other Utilities */
 
@@ -81,9 +81,11 @@ export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
 export type RecordKeyType = keyof never;
 
-export type ReadonlyRecord<K extends RecordKeyType, V> = Readonly<Record<K, V>>;
+export type MutableRecord<K extends RecordKeyType, V> = {
+  [P in K]: V;
+};
 
-export type ReadonlyRecordBase = ReadonlyRecord<RecordKeyType, unknown>;
+export type RecordBase = Record<RecordKeyType, unknown>;
 
 export type FunctionType<A, B> = (value: A) => B;
 

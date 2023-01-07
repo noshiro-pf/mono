@@ -1,23 +1,23 @@
 export namespace RecordUtils {
-  export const get = <R extends ReadonlyRecordBase, K extends keyof R>(
+  export const get = <R extends RecordBase, K extends keyof R>(
     record: R,
     key: K
   ): R[K] => record[key];
 
-  export const set = <R extends ReadonlyRecordBase, K extends keyof R>(
+  export const set = <R extends RecordBase, K extends keyof R>(
     record: R,
     key: K,
     newValue: R[K]
   ): R => ({ ...record, [key]: newValue });
 
-  export const update = <R extends ReadonlyRecordBase, K extends keyof R>(
+  export const update = <R extends RecordBase, K extends keyof R>(
     record: R,
     key: K,
     updater: (prev: R[K]) => R[K]
   ): R => ({ ...record, [key]: updater(record[key]) });
 
   const UNSAFE_getIn_impl = (
-    obj: ReadonlyRecordBase,
+    obj: RecordBase,
     keyPath: readonly (number | string)[],
     index: number
   ): unknown =>
@@ -25,12 +25,12 @@ export namespace RecordUtils {
       ? obj
       : UNSAFE_getIn_impl(
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          obj[keyPath[index]!] as ReadonlyRecordBase,
+          obj[keyPath[index]!] as RecordBase,
           keyPath,
           index + 1
         );
 
-  export const getIn = <R extends ReadonlyRecordBase, Path extends Paths<R>>(
+  export const getIn = <R extends RecordBase, Path extends Paths<R>>(
     record: R,
     keyPath: Path
   ): RecordValueAtPath<R, Path> =>
@@ -41,7 +41,7 @@ export namespace RecordUtils {
     ) as RecordValueAtPath<R, Path>;
 
   const UNSAFE_updateIn_impl = (
-    obj: ReadonlyRecordBase,
+    obj: RecordBase,
     keyPath: readonly (number | string)[],
     index: number,
     updater: (prev: unknown) => unknown
@@ -55,7 +55,7 @@ export namespace RecordUtils {
           i === keyPath[index]
             ? UNSAFE_updateIn_impl(
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                obj[keyPath[index]!] as ReadonlyRecordBase,
+                obj[keyPath[index]!] as RecordBase,
                 keyPath,
                 index + 1,
                 updater
@@ -67,14 +67,14 @@ export namespace RecordUtils {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           [keyPath[index]!]: UNSAFE_updateIn_impl(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            obj[keyPath[index]!] as ReadonlyRecordBase,
+            obj[keyPath[index]!] as RecordBase,
             keyPath,
             index + 1,
             updater
           ),
         };
 
-  export const setIn = <R extends ReadonlyRecordBase>(
+  export const setIn = <R extends RecordBase>(
     record: R,
     ...[keyPath, newValue]: KeyPathAndValueTypeAtPathTuple<R>
   ): R =>
@@ -85,7 +85,7 @@ export namespace RecordUtils {
       () => newValue
     ) as R;
 
-  export const updateIn = <R extends ReadonlyRecordBase, Path extends Paths<R>>(
+  export const updateIn = <R extends RecordBase, Path extends Paths<R>>(
     record: R,
     keyPath: IsUnion<Path> extends true ? never : Path,
     updater: IsUnion<Path> extends true
@@ -99,10 +99,7 @@ export namespace RecordUtils {
       updater as (prev: unknown) => unknown
     ) as R;
 
-  export const removeProperties = <
-    R extends ReadonlyRecordBase,
-    K extends keyof R
-  >(
+  export const removeProperties = <R extends RecordBase, K extends keyof R>(
     record: R,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     keys: readonly K[]
@@ -122,10 +119,7 @@ export namespace RecordUtils {
    * If `record1` and `record2` share some properties,
    * `record2` value have priority.
    */
-  export const merge = <
-    R1 extends ReadonlyRecordBase,
-    R2 extends ReadonlyRecordBase
-  >(
+  export const merge = <R1 extends RecordBase, R2 extends RecordBase>(
     record1: R1,
     record2: R2
   ): Readonly<{
@@ -149,14 +143,14 @@ export namespace RecordUtils {
    * const keys2 = RecordUtil.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z')[]
    * ```
    */
-  export const keys = <R extends ReadonlyRecordBase>(
+  export const keys = <R extends RecordBase>(
     object: R
   ): ToObjectKeysValue<keyof R>[] =>
     // eslint-disable-next-line no-restricted-syntax
     Object.keys(object) as ToObjectKeysValue<keyof R>[];
 
   export const values = <K extends PropertyKey, V>(
-    object: ReadonlyRecord<K, V>
+    object: Record<K, V>
   ): readonly V[] => Object.values(object);
 
   /**
@@ -180,9 +174,9 @@ export namespace RecordUtils {
    */
   export const fromEntries = <K extends PropertyKey, V>(
     entries_: Iterable<readonly [K, V]>
-  ): ReadonlyRecord<K, V> =>
+  ): Record<K, V> =>
     // eslint-disable-next-line no-restricted-syntax
-    Object.fromEntries(entries_) as ReadonlyRecord<K, V>;
+    Object.fromEntries(entries_) as Record<K, V>;
 
   /**
    * `Object.entries` の返り値型を改善したもの。
@@ -202,7 +196,7 @@ export namespace RecordUtils {
    * const entries2 = RecordUtil.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
    * ```
    */
-  export const entries = <R extends ReadonlyRecordBase>(
+  export const entries = <R extends RecordBase>(
     object: R
     // eslint-disable-next-line no-restricted-syntax
   ): Entries<R> => Object.entries(object) as Entries<R>;
@@ -210,7 +204,7 @@ export namespace RecordUtils {
   /**
    * @internal
    */
-  export type Entries<R extends ReadonlyRecordBase> = R extends R
+  export type Entries<R extends RecordBase> = R extends R
     ? readonly {
         readonly [K in keyof R]: readonly [
           ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
@@ -220,53 +214,45 @@ export namespace RecordUtils {
       }[RelaxedExclude<keyof R, symbol>][]
     : never;
 
-  export function hasKey<R extends ReadonlyRecordBase, K extends keyof R>(
+  export function hasKey<R extends RecordBase, K extends keyof R>(
     rec: R,
     key: K
-  ): rec is R & ReadonlyRecord<K, R[K]>;
+  ): rec is R & Record<K, R[K]>;
 
-  export function hasKey<R extends ReadonlyRecordBase, K extends PropertyKey>(
+  export function hasKey<R extends RecordBase, K extends PropertyKey>(
     rec: R,
     key: K
-  ): rec is R & ReadonlyRecord<K, R[K]>;
+  ): rec is R & Record<K, R[K]>;
 
-  export function hasKey<R extends ReadonlyRecordBase, K extends PropertyKey>(
+  export function hasKey<R extends RecordBase, K extends PropertyKey>(
     rec: R,
     key: K
-  ): rec is R & ReadonlyRecord<K, R[K]> {
+  ): rec is R & Record<K, R[K]> {
     // eslint-disable-next-line prefer-object-has-own, no-restricted-syntax
     return Object.prototype.hasOwnProperty.call(rec, key);
   }
 
   export function hasKeyValue<
-    R extends ReadonlyRecordBase,
+    R extends RecordBase,
     K extends keyof R,
     V extends R[K]
-  >(
-    rec: R,
-    key: K,
-    valueChecker: (v: R[K]) => v is V
-  ): rec is R & ReadonlyRecord<K, V>;
+  >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V>;
 
   export function hasKeyValue<
-    R extends ReadonlyRecordBase,
+    R extends RecordBase,
+    K extends PropertyKey,
+    V extends R[K]
+  >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V>;
+
+  export function hasKeyValue<
+    R extends RecordBase,
     K extends PropertyKey,
     V extends R[K]
   >(
     rec: R,
     key: K,
     valueChecker: (v: R[K]) => v is V
-  ): rec is R & ReadonlyRecord<K, V>;
-
-  export function hasKeyValue<
-    R extends ReadonlyRecordBase,
-    K extends PropertyKey,
-    V extends R[K]
-  >(
-    rec: R,
-    key: K,
-    valueChecker: (v: R[K]) => v is V
-  ): rec is R & ReadonlyRecord<K, V> {
+  ): rec is R & Record<K, V> {
     return hasKey(rec, key) && valueChecker(rec[key]);
   }
 }

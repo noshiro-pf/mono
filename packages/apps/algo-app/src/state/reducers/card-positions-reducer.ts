@@ -36,7 +36,7 @@ const initialState = (): Record<CardColor, ArrayOfLength<12, Rect>> => ({
 });
 
 export const cardPositionsReducer: ReducerType<
-  ReadonlyRecord<CardColor, ArrayOfLength<12, Rect>> | undefined,
+  Record<CardColor, ArrayOfLength<12, Rect>> | undefined,
   readonly [CardColor, CardNumber, Rect]
 > = (state, [color, number, rect]) =>
   produce(state === undefined ? initialState() : state, (draft) => {

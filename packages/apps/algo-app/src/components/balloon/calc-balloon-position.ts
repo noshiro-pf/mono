@@ -11,7 +11,7 @@ export const calcBalloonPosition = ({
   arrowDirection: NWES;
   balloonSize: RectSize;
   marginBetweenCardAndBalloon: number;
-}>): ReadonlyRecord<'left' | 'top', `${number}px`> =>
+}>): Record<'left' | 'top', `${number}px`> =>
   pipe(
     match(arrowDirection, {
       W: {

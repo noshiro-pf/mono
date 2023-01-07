@@ -6,10 +6,11 @@ import {
   validationErrorMessage,
 } from '../utils';
 
-type RecordResultType<A extends ReadonlyRecord<string, Type<unknown>>> =
-  Readonly<{ [key in keyof A]: TypeOf<A[key]> }>;
+type RecordResultType<A extends Record<string, Type<unknown>>> = Readonly<{
+  [key in keyof A]: TypeOf<A[key]>;
+}>;
 
-export const record = <A extends ReadonlyRecord<string, Type<unknown>>>(
+export const record = <A extends Record<string, Type<unknown>>>(
   recordType: A,
   typeName?: string
 ): Type<RecordResultType<A>> => {

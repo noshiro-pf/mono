@@ -16,18 +16,18 @@ assertType<TypeEq<IsLiteralType<'aa' | 32>, true>>();
 
 export function match<Case extends RecordKeyType, V>(
   switchCase: Case,
-  cases: ReadonlyRecord<Case, V>
+  cases: Record<Case, V>
 ): IsLiteralType<Case> extends true ? V : V | undefined;
 
 export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
   switchCase: Case,
-  cases: ReadonlyRecord<CaseSub, V>,
+  cases: Record<CaseSub, V>,
   defaultCase: V
 ): V;
 
 export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
   switchCase: Case,
-  cases: ReadonlyRecord<CaseSub, V>,
+  cases: Record<CaseSub, V>,
   defaultCase?: V
 ): V | undefined {
   return hasKey(cases, switchCase) ? cases[switchCase] : defaultCase;

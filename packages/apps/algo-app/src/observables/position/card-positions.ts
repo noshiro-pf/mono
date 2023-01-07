@@ -11,5 +11,5 @@ export const cardPositionsDispatcher = (
 };
 
 export const cardPositions$: InitializedObservable<
-  ReadonlyRecord<CardColor, ArrayOfLength<12, Rect>> | undefined
+  Record<CardColor, ArrayOfLength<12, Rect>> | undefined
 > = cardPositionsAction$.chain(scan(cardPositionsReducer, undefined));
