@@ -15,7 +15,7 @@ on:
   push:
     branches-ignore:
       - 'dev'
-      - 'annotation-tool-dev'
+      - 'archive/**'
     paths-ignore:
       - 'docs/**'
       - 'experimental/**'
