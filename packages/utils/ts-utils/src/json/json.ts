@@ -13,7 +13,7 @@ export namespace Json {
    */
   export const parse = (
     text: string,
-    reviver?: (this: unknown, key: string, value: ReadonlyJSONValue) => unknown
+    reviver?: (this: unknown, key: string, value: JSONValue) => unknown
   ): Result<JSONValue, string> => {
     try {
       return Result.ok(

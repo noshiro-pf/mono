@@ -39,8 +39,8 @@ export namespace psql {
 
   export const setJsonData = (
     psqlClient: PsqlClient,
-    jsonData: ReadonlyJSONType
-  ): Promise<Result<undefined, ReadonlyJSONValue>> => {
+    jsonData: JSONType
+  ): Promise<Result<undefined, JSONValue>> => {
     const query = `update ${psqlTableName} SET ${
       psqlRowType.data
     } = '${Result.unwrapThrow(Json.stringify(jsonData))}', ${
@@ -49,7 +49,7 @@ export namespace psql {
     return new Promise((resolve) => {
       psqlClient.query(query, (error) => {
         if (toBoolean(error)) {
-          resolve(Result.err(error as unknown as ReadonlyJSONValue));
+          resolve(Result.err(error as unknown as JSONValue));
         } else {
           resolve(Result.ok(undefined));
         }

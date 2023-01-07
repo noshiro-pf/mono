@@ -8,8 +8,7 @@
 -   `eslint --fix` で `readonly` を追加
 -   `any[]` -> `never[]`
 -   `declare var` -> `declare const`
-<!-- -   use `JSONValue` in `JSON.parse`
--   use `ReadonlyJSONValue` in `JSON.parse` -->
+-   use `JSONValue` in `JSON.parse` -->
 -   手動修正
     -   `readonly` 削除
         -   `Partial`

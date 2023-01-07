@@ -34,29 +34,29 @@ export type Primitive =
 
 /* JSONValue */
 
+export type MutableJSONValue =
+  | MutableJSONValue[]
+  | boolean
+  | number
+  | string
+  | {
+      [K in string]?: MutableJSONValue;
+    }
+  | null;
+
 export type JSONValue =
-  | JSONValue[]
   | boolean
   | number
   | string
+  | readonly JSONValue[]
   | {
-      [K in string]?: JSONValue;
+      readonly [K in string]?: JSONValue;
     }
   | null;
-
-export type ReadonlyJSONValue =
-  | boolean
-  | number
-  | string
-  | readonly ReadonlyJSONValue[]
-  | {
-      readonly [K in string]?: ReadonlyJSONValue;
-    }
-  | null;
-
-export type ReadonlyJSONType = Record<string, ReadonlyJSONValue>;
 
 export type JSONType = Record<string, JSONValue>;
+
+export type MutableJSONType = MutableRecord<string, MutableJSONValue>;
 
 /* Other Utilities */
 

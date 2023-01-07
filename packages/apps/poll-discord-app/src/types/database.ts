@@ -20,7 +20,7 @@ export type DatabaseJson = DeepReadonly<{
   commandMessageIdToPollIdMap: Record<CommandMessageId, PollId>;
 }>;
 
-assertType<TypeExtends<DatabaseJson, ReadonlyJSONType>>();
+assertType<TypeExtends<DatabaseJson, JSONType>>();
 
 export const databaseDefaultValue: Database = {
   polls: IMap.new<PollId, Poll>([]),

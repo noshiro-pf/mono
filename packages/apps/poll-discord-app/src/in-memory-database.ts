@@ -24,7 +24,7 @@ export const addPoll = (
   psqlClient: PsqlClient,
   poll: Poll,
   messageId: CommandMessageId
-): Promise<Result<undefined, ReadonlyJSONValue>> =>
+): Promise<Result<undefined, JSONValue>> =>
   setDatabase(
     ref,
     psqlClient,
@@ -54,7 +54,7 @@ export const updatePoll = (
   ref: DatabaseRef,
   psqlClient: PsqlClient,
   poll: Poll
-): Promise<Result<undefined, ReadonlyJSONValue>> =>
+): Promise<Result<undefined, JSONValue>> =>
   setDatabase(
     ref,
     psqlClient,
@@ -133,7 +133,7 @@ const setDatabase = (
   mut_ref: DatabaseMutRef,
   psqlClient: DeepReadonly<PsqlClient>,
   next: Database
-): Promise<Result<undefined, ReadonlyJSONValue>> => {
+): Promise<Result<undefined, JSONValue>> => {
   mut_ref.db = next;
   return psql.setJsonData(psqlClient, databaseToJson(next));
 };
