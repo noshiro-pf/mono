@@ -11,7 +11,7 @@ $  yarn setup:all
 ## memo
 
 -   ディレクトリ
-    -   `/experimental` ： ノーメンテのコード置き場
+    -   `/experimental` ： メンテナンス対象外のコード置き場
     -   `/packages` ： メンテしているコード置き場
         -   `/apps` ： React などで作成されたアプリ
         -   `/utils` ： TypeScript や React などで使うライブラリ
