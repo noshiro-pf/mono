@@ -41,6 +41,8 @@ import {
   match,
   Maybe,
   memoizeFunction,
+  MutableMap,
+  MutableSet,
   noop,
   Num,
   objectIs,
@@ -90,6 +92,8 @@ import {
 (global as any).match = match;
 (global as any).Maybe = Maybe;
 (global as any).memoizeFunction = memoizeFunction;
+(global as any).MutableMap = MutableMap;
+(global as any).MutableSet = MutableSet;
 (global as any).noop = noop;
 (global as any).Num = Num;
 (global as any).objectIs = objectIs;

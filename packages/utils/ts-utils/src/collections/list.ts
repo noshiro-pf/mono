@@ -135,7 +135,8 @@ export namespace IList {
     iterable: Iterable<T> | Readonly<ArrayLike<T>>
   ) => readonly T[] = ArrayFrom;
 
-  export const asMut = <T>(list: readonly T[]): T[] => list as T[];
+  export const asMut = <T extends readonly unknown[]>(list: T): Writable<T> =>
+    list as Writable<T>;
 
   /**
    * Creates an array from an iterable object.
@@ -299,6 +300,13 @@ export namespace IList {
     slice(list, 0, size(list) - num) as ListType.SkipLast<N, T>;
 
   export const pop = butLast;
+
+  /**
+   * Returns the item located at the specified index.
+   * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+   */
+  export const at = <A>(list: readonly A[], index: number): A | undefined =>
+    list.at(index);
 
   export function every<A, B extends A>(
     list: readonly A[],
@@ -512,6 +520,12 @@ export namespace IList {
     predicate: (value: A, index: number) => boolean
   ): A | undefined =>
     list.find(predicate as (value: A, index: number) => boolean);
+
+  export const findIndex = <A>(
+    list: readonly A[],
+    predicate: (value: A, index: number) => boolean
+  ): number =>
+    list.findIndex(predicate as (value: A, index: number) => boolean);
 
   export function min<T extends readonly [number, ...(readonly number[])]>(
     list: T,
