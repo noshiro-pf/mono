@@ -1,4 +1,4 @@
-import { IList } from '../collections';
+import { Arr } from '../array';
 import { Num } from '../num';
 
 export type IDate = StrictOmit<
@@ -429,7 +429,7 @@ export namespace IDate {
     year: YearEnum,
     month: MonthEnum
   ): readonly IDate[] =>
-    IList.rangeUnwrapped(1, getLastDateNumberOfMonth(year, month) + 1).map(
+    Arr.rangeUnwrapped(1, getLastDateNumberOfMonth(year, month) + 1).map(
       (date) => create(year, month, date as DateEnum)
     );
 

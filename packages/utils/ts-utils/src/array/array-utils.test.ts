@@ -1,11 +1,11 @@
 import { assertNotType, assertType } from '../assert-type';
+import { IMap } from '../collections';
 import { Result } from '../functional';
-import { IMap } from './imap';
-import { IList } from './list';
+import { ArrayUtils } from './array-utils';
 
-describe('IList.isEmpty', () => {
+describe('ArrayUtils.isEmpty', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.isEmpty(xs);
+  const result = ArrayUtils.isEmpty(xs);
 
   assertType<TypeEq<typeof result, boolean>>();
 
@@ -14,13 +14,13 @@ describe('IList.isEmpty', () => {
   });
 
   test('case 2', () => {
-    expect(IList.isEmpty([])).toBe(true);
+    expect(ArrayUtils.isEmpty([])).toBe(true);
   });
 });
 
-describe('IList.zeros', () => {
+describe('ArrayUtils.zeros', () => {
   test('fixed length', () => {
-    const result = IList.zeros(3);
+    const result = ArrayUtils.zeros(3);
 
     assertType<TypeEq<typeof result, Result<readonly [0, 0, 0], string>>>();
 
@@ -28,7 +28,7 @@ describe('IList.zeros', () => {
   });
 
   test('fixed length (empty)', () => {
-    const result = IList.zeros(0);
+    const result = ArrayUtils.zeros(0);
 
     assertType<TypeEq<typeof result, Result<readonly [], string>>>();
 
@@ -37,7 +37,7 @@ describe('IList.zeros', () => {
 
   test('unknown length', () => {
     const n: number = (() => 3)();
-    const result = IList.zeros(n);
+    const result = ArrayUtils.zeros(n);
 
     assertType<TypeEq<typeof result, Result<readonly 0[], string>>>();
 
@@ -45,9 +45,9 @@ describe('IList.zeros', () => {
   });
 });
 
-describe('IList.seq', () => {
+describe('ArrayUtils.seq', () => {
   test('fixed length', () => {
-    const result = IList.seq(10);
+    const result = ArrayUtils.seq(10);
 
     assertType<
       TypeEq<
@@ -60,7 +60,7 @@ describe('IList.seq', () => {
   });
 
   test('fixed length (empty)', () => {
-    const result = IList.seq(0);
+    const result = ArrayUtils.seq(0);
 
     assertType<TypeEq<typeof result, Result<readonly [], string>>>();
 
@@ -69,7 +69,7 @@ describe('IList.seq', () => {
 
   test('unknown length', () => {
     const n: number = (() => 3)();
-    const result = IList.seq(n);
+    const result = ArrayUtils.seq(n);
 
     assertType<TypeEq<typeof result, Result<readonly number[], string>>>();
 
@@ -77,9 +77,9 @@ describe('IList.seq', () => {
   });
 });
 
-describe('IList.isNonEmpty', () => {
+describe('ArrayUtils.isNonEmpty', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.isNonEmpty(xs);
+  const result = ArrayUtils.isNonEmpty(xs);
 
   assertType<TypeEq<typeof result, boolean>>();
 
@@ -88,7 +88,7 @@ describe('IList.isNonEmpty', () => {
   });
 
   test('case 2', () => {
-    expect(IList.isNonEmpty([])).toBe(false);
+    expect(ArrayUtils.isNonEmpty([])).toBe(false);
   });
 });
 
@@ -97,86 +97,86 @@ describe('IList.isNonEmpty', () => {
 
   describe.each([
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 0, 5),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 0, 5),
       toBe: [0, 1, 2, 3, 4],
     }, // 正常
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 0, 6),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 0, 6),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, -1, 5),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, -1, 5),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, -1, 6),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, -1, 6),
       toBe: [0, 1, 2, 3, 4],
     }, // 両方オーバー
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 0, 3),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 0, 3),
       toBe: [0, 1, 2],
     }, // 正常
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 1, 3),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 1, 3),
       toBe: [1, 2],
     }, // 正常
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, -1, 3),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, -1, 3),
       toBe: [0, 1, 2],
     }, // 片方オーバー
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 3, 5),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 3, 5),
       toBe: [3, 4],
     }, // 正常
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 3, 6),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 3, 6),
       toBe: [3, 4],
     }, // 片方オーバー
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 4, 3),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 4, 3),
       toBe: [],
     }, // start > end
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 0, -1),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 0, -1),
       toBe: [],
     }, // start > end
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, -1, -2),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, -1, -2),
       toBe: [],
     }, // start > end
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 6, 9),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 6, 9),
       toBe: [],
     },
     {
-      testName: 'IList.slice',
-      result: IList.slice(list, 6, 3),
+      testName: 'ArrayUtils.slice',
+      result: ArrayUtils.slice(list, 6, 3),
       toBe: [],
     },
-  ])('IList.slice', ({ result, testName, toBe }) => {
+  ])('ArrayUtils.slice', ({ result, testName, toBe }) => {
     test(testName, () => {
       expect(result).toStrictEqual(toBe);
     });
   });
 }
 
-describe('IList.head', () => {
+describe('ArrayUtils.head', () => {
   {
     const xs = [1, 2, 3] as const;
-    const head = IList.head(xs);
+    const head = ArrayUtils.head(xs);
 
     assertType<TypeEq<typeof head, 1>>();
 
@@ -186,7 +186,7 @@ describe('IList.head', () => {
   }
   {
     const xs: MutableNonEmptyArray<number> = [1, 2, 3];
-    const head = IList.head(xs);
+    const head = ArrayUtils.head(xs);
 
     assertType<TypeEq<typeof head, number>>();
 
@@ -196,7 +196,7 @@ describe('IList.head', () => {
   }
   {
     const mut_xs: number[] = [1, 2, 3];
-    const head = IList.head(mut_xs);
+    const head = ArrayUtils.head(mut_xs);
 
     assertType<TypeEq<typeof head, number | undefined>>();
 
@@ -207,7 +207,7 @@ describe('IList.head', () => {
   {
     const xs = [] as const;
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    const head = IList.head(xs);
+    const head = ArrayUtils.head(xs);
 
     assertType<TypeEq<typeof head, undefined>>();
 
@@ -217,10 +217,10 @@ describe('IList.head', () => {
   }
 });
 
-describe('IList.last', () => {
+describe('ArrayUtils.last', () => {
   {
     const xs = [1, 2, 3] as const;
-    const last = IList.last(xs);
+    const last = ArrayUtils.last(xs);
 
     assertType<TypeEq<typeof last, 3>>();
 
@@ -230,7 +230,7 @@ describe('IList.last', () => {
   }
   {
     const xs: MutableNonEmptyArray<number> = [1, 2, 3];
-    const last = IList.last(xs);
+    const last = ArrayUtils.last(xs);
 
     assertType<TypeEq<typeof last, number>>();
 
@@ -240,7 +240,7 @@ describe('IList.last', () => {
   }
   {
     const mut_xs: number[] = [1, 2, 3];
-    const last = IList.last(mut_xs);
+    const last = ArrayUtils.last(mut_xs);
 
     assertType<TypeEq<typeof last, number | undefined>>();
 
@@ -251,7 +251,7 @@ describe('IList.last', () => {
   {
     const xs = [] as const;
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    const last = IList.last(xs);
+    const last = ArrayUtils.last(xs);
 
     assertType<TypeEq<typeof last, undefined>>();
 
@@ -261,9 +261,9 @@ describe('IList.last', () => {
   }
 });
 
-describe('IList.tail', () => {
+describe('ArrayUtils.tail', () => {
   const xs = [1, 2, 3] as const;
-  const tail = IList.tail(xs);
+  const tail = ArrayUtils.tail(xs);
 
   assertType<TypeEq<typeof tail, readonly [2, 3]>>();
 
@@ -272,17 +272,17 @@ describe('IList.tail', () => {
   });
 
   test('alias 1', () => {
-    expect(IList.rest).toStrictEqual(IList.tail);
+    expect(ArrayUtils.rest).toStrictEqual(ArrayUtils.tail);
   });
   test('alias 2', () => {
-    expect(IList.shift).toStrictEqual(IList.tail);
+    expect(ArrayUtils.shift).toStrictEqual(ArrayUtils.tail);
   });
 });
 
-describe('IList.butLast', () => {
+describe('ArrayUtils.butLast', () => {
   {
     const xs = [1, 2, 3] as const;
-    const butLast = IList.butLast(xs);
+    const butLast = ArrayUtils.butLast(xs);
 
     assertType<TypeEq<typeof butLast, readonly [1, 2]>>();
 
@@ -292,7 +292,7 @@ describe('IList.butLast', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const butLast = IList.butLast(xs);
+    const butLast = ArrayUtils.butLast(xs);
 
     assertType<TypeEq<typeof butLast, readonly number[]>>();
 
@@ -302,14 +302,14 @@ describe('IList.butLast', () => {
   }
 
   test('alias', () => {
-    expect(IList.pop).toStrictEqual(IList.butLast);
+    expect(ArrayUtils.pop).toStrictEqual(ArrayUtils.butLast);
   });
 });
 
-describe('IList.take', () => {
+describe('ArrayUtils.take', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = IList.take(xs, 2);
+    const t = ArrayUtils.take(xs, 2);
 
     assertType<TypeEq<typeof t, readonly [1, 2]>>();
 
@@ -319,7 +319,7 @@ describe('IList.take', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = IList.take(xs, 2);
+    const t = ArrayUtils.take(xs, 2);
 
     assertType<TypeEq<typeof t, readonly number[]>>();
 
@@ -329,10 +329,10 @@ describe('IList.take', () => {
   }
 });
 
-describe('IList.takeLast', () => {
+describe('ArrayUtils.takeLast', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = IList.takeLast(xs, 2);
+    const t = ArrayUtils.takeLast(xs, 2);
 
     assertType<TypeEq<typeof t, readonly [2, 3]>>();
 
@@ -342,7 +342,7 @@ describe('IList.takeLast', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = IList.takeLast(xs, 2);
+    const t = ArrayUtils.takeLast(xs, 2);
 
     assertType<TypeEq<typeof t, readonly number[]>>();
 
@@ -352,10 +352,10 @@ describe('IList.takeLast', () => {
   }
 });
 
-describe('IList.skip', () => {
+describe('ArrayUtils.skip', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = IList.skip(xs, 2);
+    const t = ArrayUtils.skip(xs, 2);
 
     assertType<TypeEq<typeof t, readonly [3]>>();
 
@@ -365,7 +365,7 @@ describe('IList.skip', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = IList.skip(xs, 2);
+    const t = ArrayUtils.skip(xs, 2);
 
     assertType<TypeEq<typeof t, readonly number[]>>();
 
@@ -375,10 +375,10 @@ describe('IList.skip', () => {
   }
 });
 
-describe('IList.skipLast', () => {
+describe('ArrayUtils.skipLast', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = IList.skipLast(xs, 2);
+    const t = ArrayUtils.skipLast(xs, 2);
 
     assertType<TypeEq<typeof t, readonly [1]>>();
 
@@ -388,7 +388,7 @@ describe('IList.skipLast', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = IList.skipLast(xs, 2);
+    const t = ArrayUtils.skipLast(xs, 2);
 
     assertType<TypeEq<typeof t, readonly number[]>>();
 
@@ -398,39 +398,39 @@ describe('IList.skipLast', () => {
   }
 });
 
-describe('IList.every', () => {
+describe('ArrayUtils.every', () => {
   const xs = [1, 2, 3] as const;
 
-  if (IList.every(xs, (x): x is 1 => x === 1)) {
+  if (ArrayUtils.every(xs, (x): x is 1 => x === 1)) {
     assertType<TypeEq<typeof xs, readonly [1, 2, 3] & readonly 1[]>>();
   } else {
     assertNotType<TypeEq<typeof xs, readonly [1, 2, 3] & readonly 1[]>>();
   }
 
   test('case 1', () => {
-    expect(IList.every(xs, (x): x is 1 => x === 1)).toBe(false);
+    expect(ArrayUtils.every(xs, (x): x is 1 => x === 1)).toBe(false);
   });
 
   test('case 2', () => {
-    expect(IList.every(xs, (x) => 1 <= x && x <= 3)).toBe(true);
+    expect(ArrayUtils.every(xs, (x) => 1 <= x && x <= 3)).toBe(true);
   });
 });
 
-describe('IList.some', () => {
+describe('ArrayUtils.some', () => {
   const xs = [1, 2, 3] as const;
 
   test('case 1', () => {
-    expect(IList.some(xs, (x): x is 1 => x === 1)).toBe(true);
+    expect(ArrayUtils.some(xs, (x): x is 1 => x === 1)).toBe(true);
   });
 
   test('case 2', () => {
-    expect(IList.some(xs, (x) => x <= 1 && 3 <= x)).toBe(false);
+    expect(ArrayUtils.some(xs, (x) => x <= 1 && 3 <= x)).toBe(false);
   });
 });
 
-describe('IList.map', () => {
+describe('ArrayUtils.map', () => {
   const xs = [1, 2, 3] as const;
-  const mapped = IList.map(xs, (x, i): number => x * x * i);
+  const mapped = ArrayUtils.map(xs, (x, i): number => x * x * i);
 
   assertType<TypeEq<typeof mapped, ArrayOfLength<3, number>>>();
 
@@ -439,9 +439,9 @@ describe('IList.map', () => {
   });
 });
 
-describe('IList.flat', () => {
+describe('ArrayUtils.flat', () => {
   const xs = [1, 2, [3, 4, [5, 6, [7, 8]]]] as const;
-  const result = IList.flat(xs, 1);
+  const result = ArrayUtils.flat(xs, 1);
 
   assertType<
     TypeEq<
@@ -455,9 +455,9 @@ describe('IList.flat', () => {
   });
 });
 
-describe('IList.flatMap', () => {
+describe('ArrayUtils.flatMap', () => {
   const xs = [1, 2, 3] as const;
-  const mapped = IList.flatMap(xs, (x, i) => [i, x * x]);
+  const mapped = ArrayUtils.flatMap(xs, (x, i) => [i, x * x]);
 
   assertType<TypeEq<typeof mapped, readonly number[]>>();
 
@@ -466,11 +466,11 @@ describe('IList.flatMap', () => {
   });
 });
 
-describe('IList.zip', () => {
+describe('ArrayUtils.zip', () => {
   {
     const xs = [1, 2, 3] as const;
     const ys = [4, 5, 6] as const;
-    const zipped = IList.zip(xs, ys);
+    const zipped = ArrayUtils.zip(xs, ys);
 
     assertType<
       TypeEq<
@@ -490,7 +490,7 @@ describe('IList.zip', () => {
   {
     const xs: readonly number[] = [1, 2, 3];
     const ys: readonly number[] = [4];
-    const zipped = IList.zip(xs, ys);
+    const zipped = ArrayUtils.zip(xs, ys);
 
     assertType<TypeEq<typeof zipped, readonly (readonly [number, number])[]>>();
 
@@ -501,7 +501,7 @@ describe('IList.zip', () => {
   {
     const xs = [1] as const;
     const ys: readonly number[] = [4, 5, 6];
-    const zipped = IList.zip(xs, ys);
+    const zipped = ArrayUtils.zip(xs, ys);
 
     assertType<
       TypeEq<typeof zipped, readonly [readonly [1, number | undefined]]>
@@ -553,10 +553,10 @@ describe('IList.zip', () => {
   // });
 });
 
-describe('IList.filter', () => {
+describe('ArrayUtils.filter', () => {
   {
     const xs = [1, 2, 3] as const;
-    const filtered = IList.filter(xs, (x): x is 1 | 3 => x % 2 === 1);
+    const filtered = ArrayUtils.filter(xs, (x): x is 1 | 3 => x % 2 === 1);
 
     assertType<TypeEq<typeof filtered, readonly (1 | 3)[]>>();
 
@@ -566,7 +566,7 @@ describe('IList.filter', () => {
   }
   {
     const xs = [1, 2, 3] as const;
-    const filtered = IList.filter(xs, (x) => x % 2 === 1);
+    const filtered = ArrayUtils.filter(xs, (x) => x % 2 === 1);
 
     assertType<TypeEq<typeof filtered, readonly (1 | 2 | 3)[]>>();
 
@@ -576,9 +576,9 @@ describe('IList.filter', () => {
   }
 });
 
-describe('IList.filterNot', () => {
+describe('ArrayUtils.filterNot', () => {
   const xs = [1, 2, 3] as const;
-  const filtered = IList.filterNot(xs, (x) => x % 2 === 0);
+  const filtered = ArrayUtils.filterNot(xs, (x) => x % 2 === 0);
 
   assertType<TypeEq<typeof filtered, readonly (1 | 2 | 3)[]>>();
 
@@ -587,9 +587,9 @@ describe('IList.filterNot', () => {
   });
 });
 
-describe('IList.set', () => {
+describe('ArrayUtils.set', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.set(xs, 1, 4 as const);
+  const result = ArrayUtils.set(xs, 1, 4 as const);
 
   assertType<TypeEq<typeof result, readonly [1 | 4, 2 | 4, 3 | 4]>>();
 
@@ -598,9 +598,9 @@ describe('IList.set', () => {
   });
 });
 
-describe('IList.update', () => {
+describe('ArrayUtils.update', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.update(xs, 1, (x) => x + 2);
+  const result = ArrayUtils.update(xs, 1, (x) => x + 2);
 
   assertType<TypeEq<typeof result, readonly [number, number, number]>>();
 
@@ -609,11 +609,11 @@ describe('IList.update', () => {
   });
 });
 
-describe('IList.insert', () => {
+describe('ArrayUtils.insert', () => {
   const xs = [1, 2, 3] as const;
 
   {
-    const result = IList.insert(xs, 1, 5);
+    const result = ArrayUtils.insert(xs, 1, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -622,7 +622,7 @@ describe('IList.insert', () => {
     });
   }
   {
-    const result = IList.insert(xs, 0, 5);
+    const result = ArrayUtils.insert(xs, 0, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -631,7 +631,7 @@ describe('IList.insert', () => {
     });
   }
   {
-    const result = IList.insert(xs, 3, 5);
+    const result = ArrayUtils.insert(xs, 3, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -640,7 +640,7 @@ describe('IList.insert', () => {
     });
   }
   {
-    const result = IList.insert(xs, 999, 5);
+    const result = ArrayUtils.insert(xs, 999, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3 | 5)[]>>();
 
@@ -650,11 +650,11 @@ describe('IList.insert', () => {
   }
 });
 
-describe('IList.remove', () => {
+describe('ArrayUtils.remove', () => {
   const xs = [1, 2, 3] as const;
 
   {
-    const result = IList.remove(xs, 1);
+    const result = ArrayUtils.remove(xs, 1);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -663,7 +663,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 0);
+    const result = ArrayUtils.remove(xs, 0);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -672,7 +672,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 2);
+    const result = ArrayUtils.remove(xs, 2);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -681,7 +681,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 3);
+    const result = ArrayUtils.remove(xs, 3);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -690,7 +690,7 @@ describe('IList.remove', () => {
     });
   }
   {
-    const result = IList.remove(xs, 5);
+    const result = ArrayUtils.remove(xs, 5);
 
     assertType<TypeEq<typeof result, readonly (1 | 2 | 3)[]>>();
 
@@ -700,9 +700,9 @@ describe('IList.remove', () => {
   }
 });
 
-describe('IList.push', () => {
+describe('ArrayUtils.push', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.push(xs, 4 as const);
+  const result = ArrayUtils.push(xs, 4 as const);
 
   assertType<TypeEq<typeof result, readonly [1, 2, 3, 4]>>();
 
@@ -711,9 +711,9 @@ describe('IList.push', () => {
   });
 });
 
-describe('IList.unshift', () => {
+describe('ArrayUtils.unshift', () => {
   const xs = [1, 2, 3] as const;
-  const result = IList.unshift(xs, 4 as const);
+  const result = ArrayUtils.unshift(xs, 4 as const);
 
   assertType<TypeEq<typeof result, readonly [4, 1, 2, 3]>>();
 
@@ -722,10 +722,10 @@ describe('IList.unshift', () => {
   });
 });
 
-describe('IList.concat', () => {
+describe('ArrayUtils.concat', () => {
   const xs = [1, 2, 3] as const;
   const ys = [4, 5] as const;
-  const result = IList.concat(xs, ys);
+  const result = ArrayUtils.concat(xs, ys);
 
   assertType<TypeEq<typeof result, readonly [1, 2, 3, 4, 5]>>();
 
@@ -764,11 +764,11 @@ describe('IList.concat', () => {
   // });
 });
 
-describe('IList.partition', () => {
+describe('ArrayUtils.partition', () => {
   const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
   {
-    const result = IList.partition(xs, 4);
+    const result = ArrayUtils.partition(xs, 4);
 
     assertType<
       TypeEq<
@@ -790,7 +790,7 @@ describe('IList.partition', () => {
   }
 
   {
-    const result = IList.partition(xs, 3);
+    const result = ArrayUtils.partition(xs, 3);
 
     assertType<
       TypeEq<
@@ -813,10 +813,10 @@ describe('IList.partition', () => {
   }
 });
 
-describe('IList.reverse', () => {
+describe('ArrayUtils.reverse', () => {
   {
     const xs = [1, 2, 3] as const;
-    const result = IList.reverse(xs);
+    const result = ArrayUtils.reverse(xs);
 
     assertType<TypeEq<typeof result, readonly [3, 2, 1]>>();
 
@@ -826,7 +826,7 @@ describe('IList.reverse', () => {
   }
   {
     const xs: readonly number[] = [4, 5, 6];
-    const result = IList.reverse(xs);
+    const result = ArrayUtils.reverse(xs);
 
     assertType<TypeEq<typeof result, readonly number[]>>();
 
@@ -836,10 +836,10 @@ describe('IList.reverse', () => {
   }
 });
 
-describe('IList.sort', () => {
+describe('ArrayUtils.sort', () => {
   {
     const xs = [2, 1, 3] as const;
-    const result = IList.sort(xs);
+    const result = ArrayUtils.sort(xs);
 
     assertType<TypeEq<typeof result, ArrayOfLength<3, 1 | 2 | 3>>>();
 
@@ -849,7 +849,7 @@ describe('IList.sort', () => {
   }
   {
     const xs = [2, 1, 3] as const;
-    const result = IList.sort(xs, (a, b) => a - b);
+    const result = ArrayUtils.sort(xs, (a, b) => a - b);
 
     assertType<TypeEq<typeof result, ArrayOfLength<3, 1 | 2 | 3>>>();
 
@@ -859,7 +859,7 @@ describe('IList.sort', () => {
   }
   {
     const xs = [2, 1, 3] as const;
-    const result = IList.sort(xs, (a, b) => b - a);
+    const result = ArrayUtils.sort(xs, (a, b) => b - a);
 
     assertType<TypeEq<typeof result, ArrayOfLength<3, 1 | 2 | 3>>>();
 
@@ -869,10 +869,10 @@ describe('IList.sort', () => {
   }
 });
 
-describe('IList.sortBy', () => {
+describe('ArrayUtils.sortBy', () => {
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const sorted = IList.sortBy(xs, (x) => x.v);
+    const sorted = ArrayUtils.sortBy(xs, (x) => x.v);
 
     assertType<
       TypeEq<
@@ -890,7 +890,7 @@ describe('IList.sortBy', () => {
   }
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const sorted = IList.sortBy(
+    const sorted = ArrayUtils.sortBy(
       xs,
       (x) => x.v,
       (a, b) => a - b
@@ -912,10 +912,10 @@ describe('IList.sortBy', () => {
   }
 });
 
-describe('IList.includes', () => {
+describe('ArrayUtils.includes', () => {
   {
     const xs = [2, 1, 3] as const;
-    const result = IList.includes(xs, 2);
+    const result = ArrayUtils.includes(xs, 2);
 
     assertType<TypeEq<typeof result, boolean>>();
 
@@ -925,7 +925,7 @@ describe('IList.includes', () => {
   }
   {
     const xs: readonly number[] = [2, 1, 3];
-    const result = IList.includes(xs, 4);
+    const result = ArrayUtils.includes(xs, 4);
 
     assertType<TypeEq<typeof result, boolean>>();
 
@@ -935,10 +935,10 @@ describe('IList.includes', () => {
   }
 });
 
-describe('IList.find', () => {
+describe('ArrayUtils.find', () => {
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const result = IList.find(xs, (x) => x.v === 1);
+    const result = ArrayUtils.find(xs, (x) => x.v === 1);
 
     assertType<
       TypeEq<
@@ -957,7 +957,7 @@ describe('IList.find', () => {
       { v: 1 },
       { v: 3 },
     ] as const;
-    const result = IList.find(xs, (x) => x.v === 1);
+    const result = ArrayUtils.find(xs, (x) => x.v === 1);
 
     assertType<TypeEq<typeof result, { readonly v: 1 | 2 | 3 } | undefined>>();
 
@@ -967,10 +967,10 @@ describe('IList.find', () => {
   }
 });
 
-describe('IList.min', () => {
+describe('ArrayUtils.min', () => {
   {
     const xs = [3, 5, 4] as const;
-    const result = IList.min(xs);
+    const result = ArrayUtils.min(xs);
 
     assertType<TypeEq<typeof result, 3 | 4 | 5>>();
 
@@ -980,7 +980,7 @@ describe('IList.min', () => {
   }
   {
     const xs = [3, 5, 4] as const;
-    const result = IList.min(xs, (a, b) => a - b);
+    const result = ArrayUtils.min(xs, (a, b) => a - b);
 
     assertType<TypeEq<typeof result, 3 | 4 | 5>>();
 
@@ -990,7 +990,7 @@ describe('IList.min', () => {
   }
   {
     const xs: readonly (3 | 4 | 5)[] = [3, 5, 4] as const;
-    const result = IList.min(xs, (a, b) => a - b);
+    const result = ArrayUtils.min(xs, (a, b) => a - b);
 
     assertType<TypeEq<typeof result, 3 | 4 | 5 | undefined>>();
 
@@ -1000,9 +1000,9 @@ describe('IList.min', () => {
   }
 });
 
-describe('IList.max', () => {
+describe('ArrayUtils.max', () => {
   const xs = [3, 5, 4] as const;
-  const result = IList.max(xs, (a, b) => a - b);
+  const result = ArrayUtils.max(xs, (a, b) => a - b);
 
   assertType<TypeEq<typeof result, 3 | 4 | 5>>();
 
@@ -1011,7 +1011,7 @@ describe('IList.max', () => {
   });
 });
 
-describe('IList.minBy', () => {
+describe('ArrayUtils.minBy', () => {
   const xs = [
     { x: 5, y: 1 },
     { x: 4, y: 1 },
@@ -1021,7 +1021,7 @@ describe('IList.minBy', () => {
     { x: 2, y: 3 },
   ] as const;
 
-  const result = IList.minBy(xs, (a) => a.x);
+  const result = ArrayUtils.minBy(xs, (a) => a.x);
 
   assertType<
     TypeEq<
@@ -1040,7 +1040,7 @@ describe('IList.minBy', () => {
   });
 });
 
-describe('IList.maxBy', () => {
+describe('ArrayUtils.maxBy', () => {
   const xs = [
     { x: 5, y: 1 },
     { x: 4, y: 1 },
@@ -1050,7 +1050,7 @@ describe('IList.maxBy', () => {
     { x: 2, y: 3 },
   ] as const;
 
-  const result = IList.maxBy(xs, (a) => a.x);
+  const result = ArrayUtils.maxBy(xs, (a) => a.x);
 
   assertType<
     TypeEq<
@@ -1069,7 +1069,7 @@ describe('IList.maxBy', () => {
   });
 });
 
-describe('IList.count', () => {
+describe('ArrayUtils.count', () => {
   const xs = [
     { x: 1, y: 1 },
     { x: 2, y: 1 },
@@ -1079,7 +1079,7 @@ describe('IList.count', () => {
     { x: 1, y: 3 },
   ] as const;
 
-  const result = IList.count(xs, (a) => a.x === 2);
+  const result = ArrayUtils.count(xs, (a) => a.x === 2);
 
   assertType<TypeEq<typeof result, number>>();
 
@@ -1088,7 +1088,7 @@ describe('IList.count', () => {
   });
 });
 
-describe('IList.countBy', () => {
+describe('ArrayUtils.countBy', () => {
   const xs = [
     { x: 1, y: 1 },
     { x: 2, y: 1 },
@@ -1098,7 +1098,7 @@ describe('IList.countBy', () => {
     { x: 1, y: 3 },
   ] as const;
 
-  const result = IList.countBy(xs, (a) => a.x);
+  const result = ArrayUtils.countBy(xs, (a) => a.x);
 
   assertType<TypeEq<typeof result, IMap<1 | 2 | 3, number>>>();
 
@@ -1113,7 +1113,7 @@ describe('IList.countBy', () => {
   });
 });
 
-describe('IList.groupBy', () => {
+describe('ArrayUtils.groupBy', () => {
   const xs = [
     { x: 1, y: 1 },
     { x: 2, y: 1 },
@@ -1123,7 +1123,7 @@ describe('IList.groupBy', () => {
     { x: 1, y: 3 },
   ] as const;
 
-  const result = IList.groupBy(xs, (a) => a.x);
+  const result = ArrayUtils.groupBy(xs, (a) => a.x);
 
   assertType<
     TypeEq<
@@ -1176,12 +1176,12 @@ describe('IList.groupBy', () => {
   });
 });
 
-describe('IList.isSubset', () => {
+describe('ArrayUtils.isSubset', () => {
   {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2] as const;
 
-    const result = IList.isSubset(ys, xs);
+    const result = ArrayUtils.isSubset(ys, xs);
 
     assertType<TypeEq<typeof result, boolean>>();
 
@@ -1193,7 +1193,7 @@ describe('IList.isSubset', () => {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2, 4] as const;
 
-    const result = IList.isSubset(ys, xs);
+    const result = ArrayUtils.isSubset(ys, xs);
 
     assertType<TypeEq<typeof result, boolean>>();
 
@@ -1203,12 +1203,12 @@ describe('IList.isSubset', () => {
   }
 });
 
-describe('IList.isSuperset', () => {
+describe('ArrayUtils.isSuperset', () => {
   {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2] as const;
 
-    const result = IList.isSuperset(ys, xs);
+    const result = ArrayUtils.isSuperset(ys, xs);
 
     assertType<TypeEq<typeof result, boolean>>();
 
@@ -1216,7 +1216,7 @@ describe('IList.isSuperset', () => {
       expect(result).toBe(false);
     });
 
-    const result2 = IList.isSuperset(xs, ys);
+    const result2 = ArrayUtils.isSuperset(xs, ys);
 
     test('case 2', () => {
       expect(result2).toBe(true);
@@ -1226,7 +1226,7 @@ describe('IList.isSuperset', () => {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2, 4] as const;
 
-    const result = IList.isSuperset(ys, xs);
+    const result = ArrayUtils.isSuperset(ys, xs);
 
     assertType<TypeEq<typeof result, boolean>>();
 

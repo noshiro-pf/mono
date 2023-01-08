@@ -1,7 +1,6 @@
 import { assertType } from '../assert-type';
 import { Num } from '../num';
 import { ISet } from './iset';
-import { IList } from './list';
 
 describe('ISet[Symbol.iterator]', () => {
   test('case 1', () => {
@@ -199,9 +198,10 @@ describe('ISet.union', () => {
   });
   test('case 2', () => {
     expect(
-      IList.sort(
+      // eslint-disable-next-line no-restricted-globals
+      Array.from(
         ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new([2, 4, 8])).toArray()
-      )
+      ).sort((a, b) => a - b)
     ).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 });

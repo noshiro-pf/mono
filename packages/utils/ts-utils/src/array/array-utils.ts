@@ -1,8 +1,8 @@
 import { assertType } from '../assert-type';
+import { IMap } from '../collections';
 import { pipe, Result } from '../functional';
 import { Num } from '../num';
 import { MutableMap, MutableSet, tp } from '../others';
-import { IMap } from './imap';
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
 // type FlatArrayDepth =
@@ -58,7 +58,7 @@ import { IMap } from './imap';
 //     : Readonly<Arr>;
 // }[Depth extends -1 ? 'done' : 'recur'];
 
-export namespace IList {
+export namespace ArrayUtils {
   // eslint-disable-next-line no-restricted-globals
   const ArrayFrom = Array.from;
 

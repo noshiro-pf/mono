@@ -5,6 +5,7 @@
 /// <reference path="../../stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />
 
+export * from './array';
 export * from './assert-type';
 export * from './collections';
 export * from './date';
