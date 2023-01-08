@@ -1,4 +1,4 @@
-export namespace IRecord {
+export namespace RecordUtils {
   export const get = <R extends ReadonlyRecordBase, K extends keyof R>(
     record: R,
     key: K
@@ -192,7 +192,7 @@ export namespace IRecord {
    *
    * @example
    * ```ts
-   * const entries = IRecord.entries({
+   * const entries = RecordUtils.entries({
    *   x: 1,
    *   y: 2,
    *   z: 2,

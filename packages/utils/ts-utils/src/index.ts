@@ -15,5 +15,6 @@ export * from './iterator';
 export * from './json';
 export * from './num';
 export * from './others';
+export * from './record';
 export * from './str';
 export * from './tiny-observable';

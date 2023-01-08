@@ -1,7 +1,7 @@
 import { Arr } from '../array';
-import { IRecord } from '../collections';
 import { pipe, Result } from '../functional';
 import { isRecord } from '../guard';
+import { Obj } from '../record';
 import { Str } from '../str';
 
 export namespace Json {
@@ -87,7 +87,7 @@ const keysDeepImpl = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_keys: string[]
 ): void => {
-  for (const k of IRecord.keys(obj)) {
+  for (const k of Obj.keys(obj)) {
     mut_keys.push(k);
     const o = obj[k];
     if (isRecord(o)) {
