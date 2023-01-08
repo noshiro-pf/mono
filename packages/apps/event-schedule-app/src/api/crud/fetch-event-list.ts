@@ -41,7 +41,7 @@ export const fetchEventListOfUser = ({
 
     const response = result.value.data;
 
-    if (!IList.isArray(response) || !response.every(isEventListItem)) {
+    if (!Arr.isArray(response) || !response.every(isEventListItem)) {
       return Result.err({
         type: 'wrong-type-response' as const,
         message: `response should be an array of EventListItem.`,

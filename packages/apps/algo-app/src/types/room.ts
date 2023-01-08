@@ -40,7 +40,7 @@ export const assertIsRoomRemote: (
   }
 
   if (
-    !IRecord.hasKeyValue(
+    !Obj.hasKeyValue(
       data,
       'password',
       (v): v is RoomRemote['password'] => isString(v) || isUndefined(v)
@@ -50,17 +50,17 @@ export const assertIsRoomRemote: (
   }
 
   if (
-    !IRecord.hasKeyValue(
+    !Obj.hasKeyValue(
       data,
       'players',
-      (v): v is RoomRemote['players'] => IList.isArray(v) && v.every(isPlayer)
+      (v): v is RoomRemote['players'] => Arr.isArray(v) && v.every(isPlayer)
     )
   ) {
     throw new Error('hasKeyValue failed for players');
   }
 
   if (
-    !IRecord.hasKeyValue(
+    !Obj.hasKeyValue(
       data,
       'shuffleDef',
       (v): v is RoomRemote['shuffleDef'] =>
@@ -71,38 +71,35 @@ export const assertIsRoomRemote: (
   }
 
   if (
-    !IRecord.hasKeyValue(
+    !Obj.hasKeyValue(
       data,
       'state',
       (v): v is RoomRemote['state'] =>
-        isString(v) && IList.includes(roomStateList, v)
+        isString(v) && Arr.includes(roomStateList, v)
     )
   ) {
     throw new Error('hasKeyValue failed for state');
   }
 
   if (
-    !IRecord.hasKeyValue(
-      data,
-      'playerCards',
-      (v): v is RoomRemote['playerCards'] =>
-        // IList.isArray(v) &&
-        // isArrayOfLength4(v) &&
-        // v.every(
-        //   (a) => IList.isArray(a) && isArrayOfLength6(a) && a.every(isCard)
-        // )
-        {
-          const checkFn = (a: unknown): a is RoomRemote['playerCards']['p0'] =>
-            IList.isArray(a) && IList.isArrayOfLength6(a) && a.every(isCard);
+    !Obj.hasKeyValue(data, 'playerCards', (v): v is RoomRemote['playerCards'] =>
+      // Arr.isArray(v) &&
+      // isArrayOfLength4(v) &&
+      // v.every(
+      //   (a) => Arr.isArray(a) && isArrayOfLength6(a) && a.every(isCard)
+      // )
+      {
+        const checkFn = (a: unknown): a is RoomRemote['playerCards']['p0'] =>
+          Arr.isArray(a) && Arr.isArrayOfLength6(a) && a.every(isCard);
 
-          return (
-            isRecord(v) &&
-            IRecord.hasKeyValue(v, 'p0', checkFn) &&
-            IRecord.hasKeyValue(v, 'p1', checkFn) &&
-            IRecord.hasKeyValue(v, 'p2', checkFn) &&
-            IRecord.hasKeyValue(v, 'p3', checkFn)
-          );
-        }
+        return (
+          isRecord(v) &&
+          Obj.hasKeyValue(v, 'p0', checkFn) &&
+          Obj.hasKeyValue(v, 'p1', checkFn) &&
+          Obj.hasKeyValue(v, 'p2', checkFn) &&
+          Obj.hasKeyValue(v, 'p3', checkFn)
+        );
+      }
     )
   ) {
     throw new Error('hasKeyValue failed for playerCards');

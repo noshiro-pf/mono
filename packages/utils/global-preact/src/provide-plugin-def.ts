@@ -1,6 +1,6 @@
-import { IRecord, tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginPreactDef = IRecord.fromEntries(
+export const providePluginPreactDef = Obj.fromEntries(
   ['useCallback', 'useEffect', 'useMemo', 'useReducer'].map((key) =>
     tp(key, ['preact/hooks', key])
   )

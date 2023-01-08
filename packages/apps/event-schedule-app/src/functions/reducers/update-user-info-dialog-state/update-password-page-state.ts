@@ -52,7 +52,7 @@ export const updatePasswordPageStateReducer: Reducer<
 > = (state, action) => {
   switch (action.type) {
     case 'inputOldPassword':
-      return IRecord.set(
+      return Obj.set(
         state,
         'oldPassword',
         inputStateReducer(state.oldPassword, {
@@ -62,7 +62,7 @@ export const updatePasswordPageStateReducer: Reducer<
       );
 
     case 'inputNewPassword':
-      return IRecord.set(
+      return Obj.set(
         state,
         'newPassword',
         passwordWithConfirmationStateReducer(state.newPassword, {
@@ -72,7 +72,7 @@ export const updatePasswordPageStateReducer: Reducer<
       );
 
     case 'inputNewPasswordConfirmation':
-      return IRecord.set(
+      return Obj.set(
         state,
         'newPassword',
         passwordWithConfirmationStateReducer(state.newPassword, {
@@ -141,7 +141,7 @@ export const updatePasswordPageStateReducer: Reducer<
     }
 
     case 'done':
-      return IRecord.set(state, 'isWaitingResponse', false);
+      return Obj.set(state, 'isWaitingResponse', false);
 
     case 'reset':
       return updatePasswordPageInitialState;

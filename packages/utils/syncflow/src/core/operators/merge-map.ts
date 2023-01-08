@@ -1,4 +1,4 @@
-import { IList, Maybe } from '@noshiro/ts-utils';
+import { Arr, Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
 import type {
   MergeMapOperatorObservable,
@@ -49,12 +49,12 @@ class MergeMapObservableClass<A, B>
     }
 
     const observable = this.#mapToObservable(par.currentValue.value);
-    this.#observables = IList.push(this.#observables, observable);
+    this.#observables = Arr.push(this.#observables, observable);
 
     const subscription = observable.subscribe((curr) => {
       this.startUpdate(curr);
     });
-    this.#subscriptions = IList.push(this.#subscriptions, subscription);
+    this.#subscriptions = Arr.push(this.#subscriptions, subscription);
   }
 
   override complete(): void {

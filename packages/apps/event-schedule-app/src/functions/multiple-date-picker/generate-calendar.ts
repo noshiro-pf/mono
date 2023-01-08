@@ -17,26 +17,26 @@ export const generateCalendar = (
   year: YearEnum,
   month: MonthEnum
 ): readonly (readonly YearMonthDate[])[] => {
-  const numPrevMonthDates = IDate.getLocaleDayOfWeek(
+  const numPrevMonthDates = DateUtils.getLocaleDayOfWeek(
     getFirstDateOfMonth(year, month)
   );
   const numNextMonthDates =
     7 -
-    IDate.getLocaleDayOfWeek(
+    DateUtils.getLocaleDayOfWeek(
       getFirstDateOfMonth(year, (month + 1) as MonthEnum)
     );
 
   const lastDateNumberOfPrevMonth = getLastDateNumberOfMonth(year, month - 1);
   const lastDateNumberOfThisMonth = getLastDateNumberOfMonth(year, month);
 
-  const cells1d: readonly YearMonthDate[] = IList.concat(
+  const cells1d: readonly YearMonthDate[] = Arr.concat(
     genYmdRangeList(
       year,
       (month - 1) as MonthEnum,
       (lastDateNumberOfPrevMonth - numPrevMonthDates + 1) as DateEnum,
       lastDateNumberOfPrevMonth
     ),
-    IList.concat(
+    Arr.concat(
       genYmdRangeList(year, month, 1, lastDateNumberOfThisMonth),
       genYmdRangeList(
         year,
@@ -49,7 +49,7 @@ export const generateCalendar = (
 
   const rowSize = numWeeks(year, month);
 
-  return IList.rangeUnwrapped(0, rowSize).map((i: number) =>
+  return Arr.rangeUnwrapped(0, rowSize).map((i: number) =>
     cells1d.slice(7 * i, 7 * (i + 1))
   );
 };
@@ -60,13 +60,13 @@ const genYmdRangeList = (
   from: DateEnum,
   to: DateEnum
 ): readonly YearMonthDate[] =>
-  IList.rangeUnwrapped(from, to + 1).map((n) => ({
+  Arr.rangeUnwrapped(from, to + 1).map((n) => ({
     year,
     month,
     date: n as DateEnum,
   }));
 
-const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): IDate =>
+const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): DateUtils =>
   // eslint-disable-next-line no-restricted-globals
   new Date(year, month - 1, 1);
 
@@ -81,6 +81,6 @@ const numWeeks = (year: YearEnum, month: MonthEnum): 4 | 5 | 6 => {
   const firstDate = getFirstDateOfMonth(year, month);
   const lastDateNumber = getLastDateNumberOfMonth(year, month);
   return Math.ceil(
-    (IDate.getLocaleDayOfWeek(firstDate) + lastDateNumber) / 7
+    (DateUtils.getLocaleDayOfWeek(firstDate) + lastDateNumber) / 7
   ) as 4 | 5 | 6;
 };

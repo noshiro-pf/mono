@@ -46,7 +46,7 @@ export const signInPageStateReducer: Reducer<
 > = (state, action) => {
   switch (action.type) {
     case 'inputEmail':
-      return IRecord.set(
+      return Obj.set(
         state,
         'email',
         emailInputStateReducer(state.email, {
@@ -67,7 +67,7 @@ export const signInPageStateReducer: Reducer<
       };
 
     case 'inputPassword':
-      return IRecord.set(
+      return Obj.set(
         state,
         'password',
         inputStateReducer(state.password, {
@@ -110,7 +110,7 @@ export const signInPageStateReducer: Reducer<
     }
 
     case 'done':
-      return IRecord.set(state, 'isWaitingResponse', false);
+      return Obj.set(state, 'isWaitingResponse', false);
 
     case 'reset':
       return signInPageInitialState;

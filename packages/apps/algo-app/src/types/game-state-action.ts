@@ -32,7 +32,7 @@ const actionTypes = [
 assertType<TypeEq<typeof actionTypes[number], GameStateAction['type']>>();
 
 const isActionType = (data: unknown): data is GameStateAction['type'] =>
-  IList.includes(actionTypes, data);
+  Arr.includes(actionTypes, data);
 
 const isFieldValue = (data: unknown): data is FieldValue =>
   data instanceof FieldValue;
@@ -45,8 +45,8 @@ export const assertIsGameStateAction: (
   }
   if (
     !(
-      IRecord.hasKeyValue(data, 'type', isActionType) &&
-      IRecord.hasKeyValue(data, 'timestamp', isFieldValue)
+      Obj.hasKeyValue(data, 'type', isActionType) &&
+      Obj.hasKeyValue(data, 'timestamp', isFieldValue)
     )
   ) {
     throw new Error('hasKeyValue failed');
@@ -62,13 +62,13 @@ export const assertIsGameStateAction: (
   switch (data.type) {
     case 'selectMyCard':
     case 'selectOpponentCard':
-      if (!IRecord.hasKeyValue(data, 'card', isCard)) {
+      if (!Obj.hasKeyValue(data, 'card', isCard)) {
         throw new Error('hasKeyValue failed');
       }
       break;
 
     case 'selectAnswer':
-      if (!IRecord.hasKeyValue(data, 'answer', isCard)) {
+      if (!Obj.hasKeyValue(data, 'answer', isCard)) {
         throw new Error('hasKeyValue failed');
       }
       break;

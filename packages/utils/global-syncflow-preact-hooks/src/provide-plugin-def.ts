@@ -1,6 +1,6 @@
-import { IRecord, tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginSyncflowPreactHooksDef = IRecord.fromEntries(
+export const providePluginSyncflowPreactHooksDef = Obj.fromEntries(
   [
     'useEventObservable',
     'useObservable',

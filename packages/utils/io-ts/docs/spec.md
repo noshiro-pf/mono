@@ -4,8 +4,8 @@
 
 ```ts
 import {
-    IDate,
-    IRecord,
+    DateUtils,
+    RecordUtils,
     isNumber,
     isRecord,
     Num,
@@ -19,9 +19,9 @@ export type YearMonthDate = Readonly<{
 }>;
 
 export const yearMonthDateDefaultValue: YearMonthDate = {
-    year: pipe(IDate.today()).chain(IDate.getLocaleYear).value,
-    month: pipe(IDate.today()).chain(IDate.getLocaleMonth).value,
-    date: pipe(IDate.today()).chain(IDate.getLocaleDate).value,
+    year: pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value,
+    month: pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value,
+    date: pipe(DateUtils.today()).chain(DateUtils.getLocaleDate).value,
 } as const;
 
 export const isYearEnum = (a: unknown): a is YearEnum =>
@@ -35,9 +35,9 @@ export const isDateEnum = (a: unknown): a is DateEnum =>
 
 export const isYearMonthDate = (a: unknown): a is YearMonthDate =>
     isRecord(a) &&
-    IRecord.hasKeyValue(a, 'year', isYearEnum) &&
-    IRecord.hasKeyValue(a, 'month', isMonthEnum) &&
-    IRecord.hasKeyValue(a, 'date', isDateEnum);
+    RecordUtils.hasKeyValue(a, 'year', isYearEnum) &&
+    RecordUtils.hasKeyValue(a, 'month', isMonthEnum) &&
+    RecordUtils.hasKeyValue(a, 'date', isDateEnum);
 
 const d = yearMonthDateDefaultValue;
 
@@ -45,13 +45,13 @@ export const fillYearMonthDate = (a?: unknown): YearMonthDate =>
     a === undefined || !isRecord(a)
         ? d
         : {
-              year: IRecord.hasKeyValue(a, 'year', isYearEnum)
+              year: RecordUtils.hasKeyValue(a, 'year', isYearEnum)
                   ? a.year
                   : d.year,
-              month: IRecord.hasKeyValue(a, 'month', isMonthEnum)
+              month: RecordUtils.hasKeyValue(a, 'month', isMonthEnum)
                   ? a.month
                   : d.month,
-              date: IRecord.hasKeyValue(a, 'date', isDateEnum)
+              date: RecordUtils.hasKeyValue(a, 'date', isDateEnum)
                   ? a.date
                   : d.date,
           };

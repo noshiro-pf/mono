@@ -44,7 +44,7 @@ export const updateDisplayNamePageStateReducer: Reducer<
 > = (state, action) => {
   switch (action.type) {
     case 'inputDisplayName':
-      return IRecord.set(
+      return Obj.set(
         state,
         'displayName',
         inputStateReducer(state.displayName, {
@@ -79,7 +79,7 @@ export const updateDisplayNamePageStateReducer: Reducer<
     }
 
     case 'done':
-      return IRecord.set(state, 'isWaitingResponse', false);
+      return Obj.set(state, 'isWaitingResponse', false);
 
     case 'reset':
       return updateDisplayNamePageInitialState;

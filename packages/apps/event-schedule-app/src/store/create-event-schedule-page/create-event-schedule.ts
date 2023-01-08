@@ -126,7 +126,7 @@ export namespace CreateEventScheduleStore {
     openCreateResultDialog();
 
     const res = await api.event.add(
-      IRecord.set(eventScheduleNormalized, 'author', {
+      Obj.set(eventScheduleNormalized, 'author', {
         id: fireAuthUser?.uid ?? null,
         name: fireAuthUser?.displayName ?? '',
       })

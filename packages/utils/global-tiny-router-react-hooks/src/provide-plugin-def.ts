@@ -1,6 +1,6 @@
-import { IRecord, tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginTinyRouterReactHooksDef = IRecord.fromEntries(
+export const providePluginTinyRouterReactHooksDef = Obj.fromEntries(
   [
     'back',
     'pathname$',

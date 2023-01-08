@@ -16,19 +16,19 @@ import {
 import { Fragment } from 'react';
 import styled from 'styled-components';
 
-const hues: readonly Hue[] = IList.seqUnwrapped(360);
+const hues: readonly Hue[] = Arr.seqUnwrapped(360);
 
 const indices = [0, 1, 2] as const;
 const saturationList = [80, 80, 100] as const;
 const lightnessList = [40, 60, 80] as const;
 
-const saturationListWithIndex = IList.zip(saturationList, indices);
-const lightnessListWithIndex = IList.zip(lightnessList, indices);
+const saturationListWithIndex = Arr.zip(saturationList, indices);
+const lightnessListWithIndex = Arr.zip(lightnessList, indices);
 
 assertType<TypeExtends<typeof saturationList, readonly Percent[]>>();
 assertType<TypeExtends<typeof lightnessList, readonly Percent[]>>();
 
-const SL = IList.zip(IList.zip(saturationList, lightnessList), indices);
+const SL = Arr.zip(Arr.zip(saturationList, lightnessList), indices);
 
 assertType<
   TypeExtends<typeof SL, DeepReadonly<[[Percent, Percent], number][]>>

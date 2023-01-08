@@ -1,6 +1,6 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
 import { firestorePaths } from '@noshiro/event-schedule-app-shared';
-import { IRecord, isRecord, isString } from '@noshiro/ts-utils';
+import { isRecord, isString, Obj } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { collectionPath } from './firestore-paths';
 import { fillEventScheduleWithCheck } from './type-check';
@@ -26,10 +26,7 @@ export const getEmail = async (
     .get();
 
   const data = res.data();
-  if (
-    isRecord(data) &&
-    IRecord.hasKeyValue(data, firestorePaths.email, isString)
-  ) {
+  if (isRecord(data) && Obj.hasKeyValue(data, firestorePaths.email, isString)) {
     return data.email;
   }
 

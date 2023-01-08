@@ -54,7 +54,7 @@ export const passwordWithConfirmationStateReducer: Reducer<
 
       return pipe(state)
         .chain((draft) =>
-          IRecord.setIn(
+          Obj.setIn(
             draft,
             ['password', 'inputValue'],
             // if the last operation is backspace
@@ -67,11 +67,9 @@ export const passwordWithConfirmationStateReducer: Reducer<
               : passwordInputValue
           )
         )
+        .chain((draft) => Obj.setIn(draft, ['password', 'error'], undefined))
         .chain((draft) =>
-          IRecord.setIn(draft, ['password', 'error'], undefined)
-        )
-        .chain((draft) =>
-          IRecord.setIn(draft, ['passwordConfirmation', 'error'], undefined)
+          Obj.setIn(draft, ['passwordConfirmation', 'error'], undefined)
         ).value;
     }
 
@@ -80,7 +78,7 @@ export const passwordWithConfirmationStateReducer: Reducer<
 
       return pipe(state)
         .chain((draft) =>
-          IRecord.setIn(
+          Obj.setIn(
             draft,
             ['passwordConfirmation', 'inputValue'],
             // if the last operation is backspace
@@ -93,26 +91,24 @@ export const passwordWithConfirmationStateReducer: Reducer<
               : passwordInputValue
           )
         )
+        .chain((draft) => Obj.setIn(draft, ['password', 'error'], undefined))
         .chain((draft) =>
-          IRecord.setIn(draft, ['password', 'error'], undefined)
-        )
-        .chain((draft) =>
-          IRecord.setIn(draft, ['passwordConfirmation', 'error'], undefined)
+          Obj.setIn(draft, ['passwordConfirmation', 'error'], undefined)
         ).value;
     }
 
     case 'setPasswordError':
-      return IRecord.setIn(state, ['password', 'error'], action.payload);
+      return Obj.setIn(state, ['password', 'error'], action.payload);
 
     case 'setPasswordConfirmationError':
-      return IRecord.setIn(
+      return Obj.setIn(
         state,
         ['passwordConfirmation', 'error'],
         action.payload
       );
 
     case 'submit':
-      return IRecord.setIn(
+      return Obj.setIn(
         state,
         ['passwordConfirmation', 'error'],
         state.password.inputValue !== state.passwordConfirmation.inputValue

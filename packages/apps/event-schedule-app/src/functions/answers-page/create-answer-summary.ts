@@ -12,7 +12,7 @@ export const createAnswerSummary = (
   >
 ): IMapMapped<DatetimeRange, ArrayOfLength<3, number>, DatetimeRangeMapKey> =>
   IMapMapped.new(
-    IList.map(datetimeRangeList, (datetimeRange) => {
+    Arr.map(datetimeRangeList, (datetimeRange) => {
       const answersForThisDatetimeRange:
         | DeepReadonly<
             [
@@ -30,7 +30,7 @@ export const createAnswerSummary = (
       const answerGroups: IMap<AnswerIconIdWithNone, number> = pipe(
         answersForThisDatetimeRange.map(([iconId, _point]) => iconId)
       )
-        .chain((list) => IList.groupBy(list, (x) => x))
+        .chain((list) => Arr.groupBy(list, (x) => x))
         .chain((groups) => groups.map((v) => v.length)).value;
 
       const counts = tp(
@@ -51,20 +51,20 @@ const calcScoreSum = (
   isRequiredParticipantsList: readonly boolean[]
 ): number => {
   const someRequiredParticipantsScoreIs0: boolean = pipe(
-    IList.zip(isRequiredParticipantsList, answerPointList)
+    Arr.zip(isRequiredParticipantsList, answerPointList)
   ).chain((list) =>
     list.some(([required, score]) => required && score === 0)
   ).value;
 
   return someRequiredParticipantsScoreIs0
     ? 0
-    : pipe(IList.zip(answerPointList, answerWeightList))
-        .chain((list) => IList.map(list, ([score, weight]) => score * weight))
-        .chain(IList.sum).value;
+    : pipe(Arr.zip(answerPointList, answerWeightList))
+        .chain((list) => Arr.map(list, ([score, weight]) => score * weight))
+        .chain(Arr.sum).value;
 };
 
 const calcScoreSumMax = (answerWeightList: readonly Weight[]): number =>
-  IList.sum(answerWeightList.map((w) => w * answerIconPointConfig.max));
+  Arr.sum(answerWeightList.map((w) => w * answerIconPointConfig.max));
 
 export const createScore = (
   datetimeRangeList: readonly DatetimeRange[],

@@ -1,10 +1,10 @@
 import {
-  IDate,
-  IList,
-  IRecord,
+  Arr,
+  DateUtils,
   isNumber,
   isRecord,
   isString,
+  Obj,
 } from '@noshiro/ts-utils';
 import type { DatetimeSpecificationEnumType } from '../enum';
 import { isDatetimeSpecificationEnumType } from '../enum';
@@ -56,7 +56,7 @@ export const eventScheduleDefaultValue: EventSchedule = {
     poor: answerIconSettingDefaultValue,
   },
   notificationSettings: 'none',
-  timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
+  timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
   author: userDefaultValue,
   archivedBy: [],
 } as const;
@@ -70,33 +70,27 @@ const isNotificationSettingsWithNone = (
   e === 'none' || isNotificationSettings(e);
 
 const isDatetimeRangeList = (e: unknown): e is DatetimeRange[] =>
-  IList.isArray(e) &&
-  IList.isArrayOfLength1OrMore(e) &&
-  e.every(isDatetimeRange);
+  Arr.isArray(e) && Arr.isArrayOfLength1OrMore(e) && e.every(isDatetimeRange);
 
 const isUserList = (e: unknown): e is User[] =>
-  IList.isArray(e) && e.every(isUser);
+  Arr.isArray(e) && e.every(isUser);
 
 export const isEventSchedule = (a: unknown): a is EventSchedule =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'title', isString) &&
-  IRecord.hasKeyValue(a, 'notes', isString) &&
-  IRecord.hasKeyValue(
+  Obj.hasKeyValue(a, 'title', isString) &&
+  Obj.hasKeyValue(a, 'notes', isString) &&
+  Obj.hasKeyValue(
     a,
     'datetimeSpecification',
     isDatetimeSpecificationEnumType
   ) &&
-  IRecord.hasKeyValue(a, 'datetimeRangeList', isDatetimeRangeList) &&
-  IRecord.hasKeyValue(a, 'answerDeadline', isAnswerDeadline) &&
-  IRecord.hasKeyValue(a, 'answerIcons', isAnswerIconSettings) &&
-  IRecord.hasKeyValue(
-    a,
-    'notificationSettings',
-    isNotificationSettingsWithNone
-  ) &&
-  IRecord.hasKeyValue(a, 'timezoneOffsetMinutes', isNumber) &&
-  IRecord.hasKeyValue(a, 'author', isUser) &&
-  IRecord.hasKeyValue(a, 'archivedBy', isUserList);
+  Obj.hasKeyValue(a, 'datetimeRangeList', isDatetimeRangeList) &&
+  Obj.hasKeyValue(a, 'answerDeadline', isAnswerDeadline) &&
+  Obj.hasKeyValue(a, 'answerIcons', isAnswerIconSettings) &&
+  Obj.hasKeyValue(a, 'notificationSettings', isNotificationSettingsWithNone) &&
+  Obj.hasKeyValue(a, 'timezoneOffsetMinutes', isNumber) &&
+  Obj.hasKeyValue(a, 'author', isUser) &&
+  Obj.hasKeyValue(a, 'archivedBy', isUserList);
 
 const d = eventScheduleDefaultValue;
 
@@ -104,10 +98,10 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        title: IRecord.hasKeyValue(a, 'title', isString) ? a.title : d.title,
-        notes: IRecord.hasKeyValue(a, 'notes', isString) ? a.notes : d.notes,
+        title: Obj.hasKeyValue(a, 'title', isString) ? a.title : d.title,
+        notes: Obj.hasKeyValue(a, 'notes', isString) ? a.notes : d.notes,
 
-        datetimeSpecification: IRecord.hasKeyValue(
+        datetimeSpecification: Obj.hasKeyValue(
           a,
           'datetimeSpecification',
           isDatetimeSpecificationEnumType
@@ -115,30 +109,30 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
           ? a.datetimeSpecification
           : d.datetimeSpecification,
 
-        datetimeRangeList: IRecord.hasKey(a, 'datetimeRangeList')
-          ? IList.isArray(a.datetimeRangeList) &&
-            IList.isArrayOfLength1OrMore(a.datetimeRangeList)
-            ? IList.map(a.datetimeRangeList, fillDatetimeRange)
+        datetimeRangeList: Obj.hasKey(a, 'datetimeRangeList')
+          ? Arr.isArray(a.datetimeRangeList) &&
+            Arr.isArrayOfLength1OrMore(a.datetimeRangeList)
+            ? Arr.map(a.datetimeRangeList, fillDatetimeRange)
             : d.datetimeRangeList
           : d.datetimeRangeList,
 
-        answerDeadline: IRecord.hasKey(a, 'answerDeadline')
+        answerDeadline: Obj.hasKey(a, 'answerDeadline')
           ? a.answerDeadline === 'none'
             ? 'none'
             : fillYmdhm(a.answerDeadline)
           : d.answerDeadline,
 
-        answerIcons: IRecord.hasKey(a, 'answerIcons')
+        answerIcons: Obj.hasKey(a, 'answerIcons')
           ? fillAnswerIconSettings(a.answerIcons)
           : d.answerIcons,
 
-        notificationSettings: IRecord.hasKey(a, 'notificationSettings')
+        notificationSettings: Obj.hasKey(a, 'notificationSettings')
           ? a.notificationSettings === 'none'
             ? 'none'
             : fillNotificationSettings(a.notificationSettings)
           : d.notificationSettings,
 
-        timezoneOffsetMinutes: IRecord.hasKeyValue(
+        timezoneOffsetMinutes: Obj.hasKeyValue(
           a,
           'timezoneOffsetMinutes',
           isNumber
@@ -146,11 +140,11 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
           ? a.timezoneOffsetMinutes
           : d.timezoneOffsetMinutes,
 
-        author: IRecord.hasKey(a, 'author') ? fillUser(a.author) : d.author,
+        author: Obj.hasKey(a, 'author') ? fillUser(a.author) : d.author,
 
-        archivedBy: IRecord.hasKey(a, 'archivedBy')
-          ? IList.isArray(a.archivedBy)
-            ? IList.map(a.archivedBy, fillUser)
+        archivedBy: Obj.hasKey(a, 'archivedBy')
+          ? Arr.isArray(a.archivedBy)
+            ? Arr.map(a.archivedBy, fillUser)
             : d.archivedBy
           : d.archivedBy,
       };

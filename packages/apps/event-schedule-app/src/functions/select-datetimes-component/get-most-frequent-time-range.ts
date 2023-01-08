@@ -6,18 +6,18 @@ export const getMostFrequentTimeRange = (
 ): TimeRange => {
   const startMaxFreq = pipe(datetimeList)
     .chain((list) =>
-      IList.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.start))
+      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.start))
     )
     .chain((groups) => groups.toValuesArray())
-    .chain((list) => IList.maxBy(list, (g) => g.length))
+    .chain((list) => Arr.maxBy(list, (g) => g.length))
     .chain((list) => list?.[0]?.timeRange.start).value;
 
   const endMaxFreq = pipe(datetimeList)
     .chain((list) =>
-      IList.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.end))
+      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.end))
     )
     .chain((groups) => groups.toValuesArray())
-    .chain((list) => IList.maxBy(list, (g) => g.length))
+    .chain((list) => Arr.maxBy(list, (g) => g.length))
     .chain((list) => list?.[0]?.timeRange.end).value;
 
   return {

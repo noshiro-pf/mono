@@ -42,49 +42,49 @@ export const datetimeListReducer: ReducerType<
       const removed = datetimeSet.subtract(dateSetFromCalendar);
       const added = dateSetFromCalendar.subtract(datetimeSet);
       return pipe(state)
-        .chain((list) => IList.filterNot(list, (e) => removed.has(e.ymd)))
+        .chain((list) => Arr.filterNot(list, (e) => removed.has(e.ymd)))
         .chain((list) =>
-          IList.concat(
+          Arr.concat(
             list,
             added
               .toArray()
               .map((ymd) => ({ ymd, timeRange: timeRangeDefaultValue }))
           )
         )
-        .chain((list) => IList.sort(list, compareDatetimeRange)).value;
+        .chain((list) => Arr.sort(list, compareDatetimeRange)).value;
     }
 
     case 'ymd':
-      return IList.update(state, action.index, (val) =>
-        IRecord.set(val, action.type, action.ymd)
+      return Arr.update(state, action.index, (val) =>
+        Obj.set(val, action.type, action.ymd)
       );
 
     case 'start':
     case 'end':
-      return IList.update(state, action.index, (val) =>
-        IRecord.update(val, 'timeRange', (v) => timeRangeReducer(v, action))
+      return Arr.update(state, action.index, (val) =>
+        Obj.update(val, 'timeRange', (v) => timeRangeReducer(v, action))
       );
 
     case 'duplicate':
-      return IList.insert(
+      return Arr.insert(
         state,
         action.index,
         state[action.index] ?? datetimeRangeInitialValue
       );
 
     case 'delete':
-      return IList.remove(state, action.index);
+      return Arr.remove(state, action.index);
 
     case 'addClick':
-      return IList.push(state, action.datetimeRange);
+      return Arr.push(state, action.datetimeRange);
 
     case 'deleteAll':
       return [];
 
     case 'setTimeAtOneTime':
-      return state.map((el) => IRecord.set(el, 'timeRange', action.timeRange));
+      return state.map((el) => Obj.set(el, 'timeRange', action.timeRange));
 
     case 'sort':
-      return IList.sort(state, compareDatetimeRange);
+      return Arr.sort(state, compareDatetimeRange);
   }
 };

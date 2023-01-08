@@ -30,10 +30,10 @@ export const addPoll = (
     psqlClient,
     pipe(ref.db)
       .chain((db) =>
-        IRecord.update(db, 'polls', (polls) => polls.set(poll.id, poll))
+        Obj.update(db, 'polls', (polls) => polls.set(poll.id, poll))
       )
       .chain((db) =>
-        IRecord.update(db, 'dateToPollIdMap', (dateToPollIdMap) =>
+        Obj.update(db, 'dateToPollIdMap', (dateToPollIdMap) =>
           dateToPollIdMap.withMutations(
             poll.dateOptions.map((d) => ({
               type: 'set',
@@ -44,7 +44,7 @@ export const addPoll = (
         )
       )
       .chain((db) =>
-        IRecord.update(db, 'commandMessageIdToPollIdMap', (map) =>
+        Obj.update(db, 'commandMessageIdToPollIdMap', (map) =>
           map.set(messageId, poll.id)
         )
       ).value
@@ -58,7 +58,7 @@ export const updatePoll = (
   setDatabase(
     ref,
     psqlClient,
-    IRecord.update(ref.db, 'polls', (polls) => polls.set(poll.id, poll))
+    Obj.update(ref.db, 'polls', (polls) => polls.set(poll.id, poll))
   );
 
 export const getPollByDateId = (
@@ -90,18 +90,18 @@ export const updateVote = async (
 
   const next = pipe(curr)
     .chain((poll) =>
-      IRecord.set(poll, 'updatedAt', createTimestamp(IDate.now()))
+      Obj.set(poll, 'updatedAt', createTimestamp(DateUtils.now()))
     )
     .chain((poll) =>
-      IRecord.update(poll, 'answers', (answers) =>
+      Obj.update(poll, 'answers', (answers) =>
         answers.update(dateOptionId, (answerOfDate): AnswerOfDate => {
           switch (action.type) {
             case 'add':
-              return IRecord.update(answerOfDate, action.value, (set) =>
+              return Obj.update(answerOfDate, action.value, (set) =>
                 set.add(userId)
               );
             case 'remove': {
-              return IRecord.update(answerOfDate, action.value, (set) =>
+              return Obj.update(answerOfDate, action.value, (set) =>
                 set.delete(userId)
               );
             }
@@ -115,7 +115,7 @@ export const updateVote = async (
   const res = await setDatabase(
     ref,
     psqlClient,
-    IRecord.update(ref.db, 'polls', (polls) => polls.set(pollId, next))
+    Obj.update(ref.db, 'polls', (polls) => polls.set(pollId, next))
   );
   if (Result.isErr(res)) {
     return Result.err(

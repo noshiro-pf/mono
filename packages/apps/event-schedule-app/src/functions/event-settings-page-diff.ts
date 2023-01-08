@@ -98,8 +98,8 @@ const createDiffResult = <P extends EventSchedulePaths, R>(
     c: RecordValueAtPath<EventSchedule, P>
   ) => RelaxedExclude<R, undefined>
 ): R | undefined => {
-  const a = IRecord.getIn(prev, path);
-  const b = IRecord.getIn(curr, path);
+  const a = Obj.getIn(prev, path);
+  const b = Obj.getIn(curr, path);
   return deepEqual(a, b) ? undefined : makeResult(a, b);
 };
 
@@ -120,13 +120,13 @@ const notificationSettingsDiff = (
     ];
   }
 
-  const collectedDiff = IList.concat(
+  const collectedDiff = Arr.concat(
     emailPrev === emailCurr ? [] : [map(emailPrev ?? '', emailCurr ?? '')],
-    IRecord.keys(a).reduce<readonly string[]>(
+    Obj.keys(a).reduce<readonly string[]>(
       (acc, key) =>
         a[key] === b[key]
           ? acc
-          : IList.push(
+          : Arr.push(
               acc,
               `${notificationSettings[key]}${dict.common.colon} ${map(
                 a[key] ? ndc.on : ndc.off,

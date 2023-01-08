@@ -2,7 +2,7 @@ import type { Hue, Percent } from '@noshiro/ts-utils-additional';
 import { hslToRgb, relativeLuminance } from '@noshiro/ts-utils-additional';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
-const huesDefault = IList.seqUnwrapped(360);
+const huesDefault = Arr.seqUnwrapped(360);
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（＝hue）を返す
@@ -25,12 +25,12 @@ export const pickupHighContrastHues = (
 
   /* pickup n hues */
 
-  const mut_result: Hue[] = IList.asMut(IList.zerosUnwrapped(n));
+  const mut_result: Hue[] = Arr.asMut(Arr.zerosUnwrapped(n));
 
   let mut_i = 0;
   let mut_y = 0;
 
-  const maxValue = IList.max(luminanceDiffAccumulated);
+  const maxValue = Arr.max(luminanceDiffAccumulated);
   if (maxValue === undefined) return [];
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
     if (value > mut_y) {

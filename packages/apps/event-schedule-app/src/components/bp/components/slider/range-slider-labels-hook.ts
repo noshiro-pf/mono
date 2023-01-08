@@ -31,7 +31,7 @@ export const useRangeSliderLabels = ({
       return [];
     }
     return pipe(customLabelValues)
-      .chain((list) => IList.uniq(list))
+      .chain((list) => Arr.uniq(list))
       .chain((list) =>
         list.map((x) => ({
           value: x,

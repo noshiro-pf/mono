@@ -115,7 +115,7 @@ export const useSelectDatetimesHooks = (
 
   const datetimeListWithHandler = useMemo(
     () =>
-      IList.map(datetimeList, (datetimeRange, index) => ({
+      Arr.map(datetimeList, (datetimeRange, index) => ({
         id: index,
         datetimeRange,
         onYmdChange: (ymd: YearMonthDate | undefined) => {

@@ -1,4 +1,4 @@
-import { IList, Maybe, MutableMap, noop } from '@noshiro/ts-utils';
+import { Arr, Maybe, MutableMap, noop } from '@noshiro/ts-utils';
 import type {
   ChildObservable,
   InitializedObservable,
@@ -57,7 +57,7 @@ export class ObservableBaseClass<
   }
 
   addChild<B>(child: ChildObservable<B>): void {
-    this.#children = IList.push(
+    this.#children = Arr.push(
       this.#children,
       child as ChildObservable<unknown>
     );

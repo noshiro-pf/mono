@@ -242,9 +242,9 @@ const eslintRules = {
   'no-restricted-exports': 'error',
   'no-restricted-globals': [
     'error',
-    { name: 'Array', message: 'use IList instead.' },
+    { name: 'Array', message: 'use Arr instead.' },
     { name: 'Boolean', message: 'use toBoolean instead.' },
-    { name: 'Date', message: 'use IDate instead.' },
+    { name: 'Date', message: 'use DateUtils instead.' },
     { name: 'JSON', message: 'use Json instead.' },
     'eval',
     'Function',

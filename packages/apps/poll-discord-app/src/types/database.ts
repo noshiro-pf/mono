@@ -34,9 +34,9 @@ export const fillDatabase = (o?: unknown): Database =>
   o === undefined || !isRecord(o)
     ? d
     : {
-        polls: IRecord.hasKeyValue(o, 'polls', isRecord)
+        polls: Obj.hasKeyValue(o, 'polls', isRecord)
           ? pipe(o.polls)
-              .chainOptional(IRecord.entries)
+              .chainOptional(Obj.entries)
               .chainOptional((entries) =>
                 IMap.new<PollId, Poll>(
                   entries.map(([k, v]) => [createPollId(k), fillPoll(v)])
@@ -44,9 +44,9 @@ export const fillDatabase = (o?: unknown): Database =>
               ).value ?? d.polls
           : d.polls,
 
-        dateToPollIdMap: IRecord.hasKeyValue(o, 'dateToPollIdMap', isRecord)
+        dateToPollIdMap: Obj.hasKeyValue(o, 'dateToPollIdMap', isRecord)
           ? pipe(o.dateToPollIdMap)
-              .chainOptional(IRecord.entries)
+              .chainOptional(Obj.entries)
               .chainOptional((entries) =>
                 entries
                   .filter((entry): entry is [typeof entry[0], string] =>
@@ -59,13 +59,13 @@ export const fillDatabase = (o?: unknown): Database =>
               ).value ?? d.dateToPollIdMap
           : d.dateToPollIdMap,
 
-        commandMessageIdToPollIdMap: IRecord.hasKeyValue(
+        commandMessageIdToPollIdMap: Obj.hasKeyValue(
           o,
           'commandMessageIdToPollIdMap',
           isRecord
         )
           ? pipe(o.commandMessageIdToPollIdMap)
-              .chainOptional(IRecord.entries)
+              .chainOptional(Obj.entries)
               .chainOptional((entries) =>
                 entries
                   .filter((entry): entry is [typeof entry[0], string] =>
@@ -80,11 +80,9 @@ export const fillDatabase = (o?: unknown): Database =>
       };
 
 export const databaseToJson = (database: Database): DatabaseJson => ({
-  polls: IRecord.fromEntries(database.polls.map(pollToJson).toEntriesArray()),
-  dateToPollIdMap: IRecord.fromEntries(
-    database.dateToPollIdMap.toEntriesArray()
-  ),
-  commandMessageIdToPollIdMap: IRecord.fromEntries(
+  polls: Obj.fromEntries(database.polls.map(pollToJson).toEntriesArray()),
+  dateToPollIdMap: Obj.fromEntries(database.dateToPollIdMap.toEntriesArray()),
+  commandMessageIdToPollIdMap: Obj.fromEntries(
     database.commandMessageIdToPollIdMap.toEntriesArray()
   ),
 });

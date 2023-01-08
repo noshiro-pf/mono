@@ -1,4 +1,4 @@
-import { IRecord, isRecord } from '@noshiro/ts-utils';
+import { isRecord, Obj } from '@noshiro/ts-utils';
 import type { HoursMinutes } from './base';
 import {
   compareHm,
@@ -19,8 +19,8 @@ export const timeRangeDefaultValue: TimeRange = {
 
 export const isTimeRange = (a: unknown): a is TimeRange =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'start', isHoursMinutes) &&
-  IRecord.hasKeyValue(a, 'end', isHoursMinutes);
+  Obj.hasKeyValue(a, 'start', isHoursMinutes) &&
+  Obj.hasKeyValue(a, 'end', isHoursMinutes);
 
 const d = timeRangeDefaultValue;
 
@@ -28,8 +28,8 @@ export const fillTimeRange = (a?: unknown): TimeRange =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        start: IRecord.hasKey(a, 'start') ? fillHoursMinutes(a.start) : d.start,
-        end: IRecord.hasKey(a, 'end') ? fillHoursMinutes(a.end) : d.end,
+        start: Obj.hasKey(a, 'start') ? fillHoursMinutes(a.start) : d.start,
+        end: Obj.hasKey(a, 'end') ? fillHoursMinutes(a.end) : d.end,
       };
 
 export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {

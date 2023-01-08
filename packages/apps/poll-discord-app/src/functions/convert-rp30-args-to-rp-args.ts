@@ -10,9 +10,9 @@ export const convertRp60ArgToRpArgsShared = (
   string
 > => {
   const argsConverted: readonly string[] = pipe(
-    IList.rangeUnwrapped(arg1AsNumber, arg2AsNumber)
+    Arr.rangeUnwrapped(arg1AsNumber, arg2AsNumber)
   ).chain((list) =>
-    IList.map(list, (hour: number) => `${hour}:00-${hour + 1}:00`)
+    Arr.map(list, (hour: number) => `${hour}:00-${hour + 1}:00`)
   ).value;
 
   return Result.ok({ title, args: argsConverted });
@@ -50,10 +50,10 @@ export const convertRp60dArgToRpArgs = (
 
   const [arg1AsNumber, arg2AsNumber] = res.value;
 
-  const td = IDate.today();
-  const title = `${IDate.getLocaleMonth(td)}/${IDate.getLocaleDate(td)}（${
-    daysOfWeekList.jp[IDate.getLocaleDayOfWeek(td)].abbr
-  }）`;
+  const td = DateUtils.today();
+  const title = `${DateUtils.getLocaleMonth(td)}/${DateUtils.getLocaleDate(
+    td
+  )}（${daysOfWeekList.jp[DateUtils.getLocaleDayOfWeek(td)].abbr}）`;
 
   return convertRp60ArgToRpArgsShared(title, arg1AsNumber, arg2AsNumber);
 };
@@ -67,9 +67,9 @@ export const convertRp30ArgToRpArgsShared = (
   string
 > => {
   const argsConverted: readonly string[] = pipe(
-    IList.rangeUnwrapped(arg1AsNumber, arg2AsNumber)
+    Arr.rangeUnwrapped(arg1AsNumber, arg2AsNumber)
   ).chain((list) =>
-    IList.flatMap(list, (hour: number) => [
+    Arr.flatMap(list, (hour: number) => [
       `${hour}:00-${hour}:30`,
       `${hour}:30-${hour + 1}:00`,
     ])
@@ -107,10 +107,10 @@ export const convertRp30dArgToRpArgs = (
 
   const [arg1AsNumber, arg2AsNumber] = res.value;
 
-  const td = IDate.today();
-  const title = `${IDate.getLocaleMonth(td)}/${IDate.getLocaleDate(td)}（${
-    daysOfWeekList.jp[IDate.getLocaleDayOfWeek(td)].abbr
-  }）`;
+  const td = DateUtils.today();
+  const title = `${DateUtils.getLocaleMonth(td)}/${DateUtils.getLocaleDate(
+    td
+  )}（${daysOfWeekList.jp[DateUtils.getLocaleDayOfWeek(td)].abbr}）`;
 
   return convertRp30ArgToRpArgsShared(title, arg1AsNumber, arg2AsNumber);
 };

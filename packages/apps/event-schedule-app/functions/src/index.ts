@@ -1,6 +1,6 @@
 // initializeApp must be imported as default import.
 // https://github.com/firebase/firebase-admin-node/issues/593
-import { IRecord, isBoolean, isRecord, isString } from '@noshiro/ts-utils';
+import { isBoolean, isRecord, isString, Obj } from '@noshiro/ts-utils';
 import admin from 'firebase-admin';
 import { https, region } from 'firebase-functions';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
@@ -96,19 +96,15 @@ export const fetchEventListOfUser = regionSelected
     if (
       !(
         isRecord(payload) &&
-        IRecord.hasKeyValue(payload, 'filterText', isString) &&
-        IRecord.hasKeyValue(
+        Obj.hasKeyValue(payload, 'filterText', isString) &&
+        Obj.hasKeyValue(
           payload,
           'filterOptionState',
           (v: unknown): v is 'archive' | 'inProgress' =>
             v === 'archive' || v === 'inProgress'
         ) &&
-        IRecord.hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
-        IRecord.hasKeyValue(
-          payload,
-          'showOnlyEventSchedulesICreated',
-          isBoolean
-        )
+        Obj.hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
+        Obj.hasKeyValue(payload, 'showOnlyEventSchedulesICreated', isBoolean)
       )
     ) {
       throw new https.HttpsError(
@@ -125,8 +121,8 @@ export const verifyEmail = regionSelected.https.onCall(
     if (
       !(
         isRecord(payload) &&
-        IRecord.hasKeyValue(payload, 'eventId', isString) &&
-        IRecord.hasKeyValue(payload, 'email', isString)
+        Obj.hasKeyValue(payload, 'eventId', isString) &&
+        Obj.hasKeyValue(payload, 'email', isString)
       )
     ) {
       throw new https.HttpsError(

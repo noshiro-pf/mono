@@ -26,7 +26,7 @@ export const validateEventSchedule = ({
     | 'timezoneOffsetMinutes'
   >): EventScheduleValidation => ({
   title: title !== '',
-  datetimeRangeList: !IList.isEmpty(datetimeRangeList),
+  datetimeRangeList: !Arr.isEmpty(datetimeRangeList),
   answerIcons:
     answerIcons.good.description === '' ||
     answerIcons.fair.description === '' ||

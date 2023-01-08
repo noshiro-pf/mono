@@ -1,5 +1,5 @@
 import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { IRecord } from '@noshiro/ts-utils';
+import { Obj } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import type { auth } from 'firebase-functions';
 import { collectionPath } from './firestore-paths';
@@ -8,16 +8,16 @@ const removeAuthorIdFromEventSchedule = (
   eventSchedule: EventSchedule,
   userIdToBeRemoved: string
 ): EventSchedule =>
-  IRecord.update(eventSchedule, 'author', (author) =>
-    IRecord.update(author, 'id', (id) => (id === userIdToBeRemoved ? null : id))
+  Obj.update(eventSchedule, 'author', (author) =>
+    Obj.update(author, 'id', (id) => (id === userIdToBeRemoved ? null : id))
   );
 
 const removeUserIdFromAnswer = (
   answer: Answer,
   userIdToBeRemoved: string
 ): Answer =>
-  IRecord.update(answer, 'user', (user) =>
-    IRecord.update(user, 'id', (id) => (id === userIdToBeRemoved ? null : id))
+  Obj.update(answer, 'user', (user) =>
+    Obj.update(user, 'id', (id) => (id === userIdToBeRemoved ? null : id))
   );
 
 export const onUserDelete = async (

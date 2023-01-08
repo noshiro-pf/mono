@@ -26,12 +26,12 @@ export const inputStateReducer: Reducer<InputState, InputStateAction> = (
   switch (action.type) {
     case 'input':
       return pipe(state)
-        .chain((draft) => IRecord.set(draft, 'inputValue', action.payload))
-        .chain((draft) => IRecord.set(draft, 'error', inputInitialState.error))
+        .chain((draft) => Obj.set(draft, 'inputValue', action.payload))
+        .chain((draft) => Obj.set(draft, 'error', inputInitialState.error))
         .value;
 
     case 'setError':
-      return IRecord.set(state, 'error', action.payload);
+      return Obj.set(state, 'error', action.payload);
 
     case 'reset':
       return inputInitialState;

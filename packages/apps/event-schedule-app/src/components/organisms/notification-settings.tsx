@@ -31,7 +31,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onEmailChange = useCallback(
       (email: string) => {
         onNotificationSettingsWithEmailChange(
-          IRecord.set(notificationSettingsWithEmail, 'email', email)
+          Obj.set(notificationSettingsWithEmail, 'email', email)
         );
       },
       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
@@ -40,7 +40,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onNotifyOnAnswerChangeCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsWithEmailChange(
-          IRecord.set(
+          Obj.set(
             notificationSettingsWithEmail,
             'notifyOnAnswerChange',
             checked
@@ -53,7 +53,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onNotify01daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsWithEmailChange(
-          IRecord.set(
+          Obj.set(
             notificationSettingsWithEmail,
             'notify01daysBeforeAnswerDeadline',
             checked
@@ -65,7 +65,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onNotify03daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsWithEmailChange(
-          IRecord.set(
+          Obj.set(
             notificationSettingsWithEmail,
             'notify03daysBeforeAnswerDeadline',
             checked
@@ -77,7 +77,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onNotify07daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsWithEmailChange(
-          IRecord.set(
+          Obj.set(
             notificationSettingsWithEmail,
             'notify07daysBeforeAnswerDeadline',
             checked
@@ -89,7 +89,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onNotify14daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsWithEmailChange(
-          IRecord.set(
+          Obj.set(
             notificationSettingsWithEmail,
             'notify14daysBeforeAnswerDeadline',
             checked
@@ -101,7 +101,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onNotify28daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsWithEmailChange(
-          IRecord.set(
+          Obj.set(
             notificationSettingsWithEmail,
             'notify28daysBeforeAnswerDeadline',
             checked

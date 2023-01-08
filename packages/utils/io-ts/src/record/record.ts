@@ -1,4 +1,4 @@
-import { hasKey, IRecord, isRecord, Result, tp } from '@noshiro/ts-utils';
+import { hasKey, isRecord, Obj, Result, tp } from '@noshiro/ts-utils';
 import type { Type, TypeOf } from '../type';
 import {
   createAssertFunction,
@@ -17,14 +17,12 @@ export const record = <A extends ReadonlyRecord<string, Type<unknown>>>(
 
   const typeNameFilled: string =
     typeName ??
-    `{ ${IRecord.entries(recordType)
+    `{ ${Obj.entries(recordType)
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
 
-  const defaultValue = IRecord.fromEntries(
-    IRecord.entries(recordType).map(([key, value]) =>
-      tp(key, value.defaultValue)
-    )
+  const defaultValue = Obj.fromEntries(
+    Obj.entries(recordType).map(([key, value]) => tp(key, value.defaultValue))
   ) as T;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -34,7 +32,7 @@ export const record = <A extends ReadonlyRecord<string, Type<unknown>>>(
       ]);
     }
 
-    for (const [k, valueType] of IRecord.entries(recordType)) {
+    for (const [k, valueType] of Obj.entries(recordType)) {
       if (!hasKey(a, k)) {
         return Result.err([`The record is expected to have the key "${k}".`]);
       }
@@ -57,8 +55,8 @@ export const record = <A extends ReadonlyRecord<string, Type<unknown>>>(
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? (IRecord.fromEntries(
-          IRecord.entries(recordType).map(([k, v]) =>
+      ? (Obj.fromEntries(
+          Obj.entries(recordType).map(([k, v]) =>
             tp(k, hasKey(a, k) ? v.fill(a[k]) : v.defaultValue)
           )
         ) as T)

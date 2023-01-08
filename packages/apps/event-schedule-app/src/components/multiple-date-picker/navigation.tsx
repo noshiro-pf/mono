@@ -2,10 +2,10 @@ import { Button } from '@blueprintjs/core';
 import { monthsList } from '@noshiro/ts-utils-additional';
 import { BpSelect } from '../bp';
 
-const thisYear = IDate.getLocaleYear(IDate.today());
-const thisMonth = IDate.getLocaleMonth(IDate.today());
+const thisYear = DateUtils.getLocaleYear(DateUtils.today());
+const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());
 
-const yearOption: readonly number[] = IList.rangeUnwrapped(
+const yearOption: readonly number[] = Arr.rangeUnwrapped(
   thisYear - 100,
   thisYear + 100
 );

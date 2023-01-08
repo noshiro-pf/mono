@@ -1,8 +1,8 @@
-import { IList } from '@noshiro/ts-utils';
+import { Arr } from '@noshiro/ts-utils';
 import { testColors } from './color-test-values';
 import { rgbToHex } from './rgb-to-hex';
 
-describe.each(IList.from(testColors.entries()))(
+describe.each(Arr.from(testColors.entries()))(
   'rgbToHex',
   (index, testColor) => {
     test(`rgbToHex test No. ${index}`, () => {

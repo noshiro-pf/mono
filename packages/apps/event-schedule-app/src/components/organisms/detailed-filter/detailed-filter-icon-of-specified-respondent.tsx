@@ -57,7 +57,7 @@ export const DetailedFilterIconOfSpecifiedRespondent = memoNamed<Props>(
       </FilterItem>
 
       <FilterItemContent>
-        {IList.map(checkState, (respondent, index) => (
+        {Arr.map(checkState, (respondent, index) => (
           <Row key={index}>
             <Username>{respondent.username}</Username>
             <HorizontalCheckboxesWrapper>

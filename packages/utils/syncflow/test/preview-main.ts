@@ -1,4 +1,4 @@
-import { IList, Str } from '@noshiro/ts-utils';
+import { Arr, Str } from '@noshiro/ts-utils';
 import { ArgumentParser } from 'argparse';
 import {
   auditTimeTestCases,
@@ -169,7 +169,7 @@ const main = (): void => {
   printExamples(exampleIdx);
   console.log('');
 
-  if (!IList.indexIsInRange(exampleList, exampleIdx)) {
+  if (!Arr.indexIsInRange(exampleList, exampleIdx)) {
     console.error(
       `example-no must be a value from 1 to ${exampleList.length}.`
     );
@@ -183,7 +183,7 @@ const main = (): void => {
   printSeparator();
   console.log('');
 
-  if (!IList.indexIsInRange(example.cases, testCaseIdx)) {
+  if (!Arr.indexIsInRange(example.cases, testCaseIdx)) {
     console.error(
       `case-no must be a value from 1 to ${example.cases.length} for this example.`
     );

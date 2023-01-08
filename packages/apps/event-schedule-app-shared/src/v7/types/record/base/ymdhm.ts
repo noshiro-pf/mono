@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { IDate, Num } from '@noshiro/ts-utils';
+import { DateUtils, Num } from '@noshiro/ts-utils';
 import {
   datesTypeDef,
   hoursTypeDef,
@@ -25,15 +25,21 @@ export const isYmdhm = ymdhmTypeDef.is;
 export const fillYmdhm = ymdhmTypeDef.fill;
 
 export const ymdhmFromDate = (date: RawDateType): Ymdhm => ({
-  year: IDate.getLocaleYear(date),
-  month: IDate.getLocaleMonth(date),
-  date: IDate.getLocaleDate(date),
-  hours: IDate.getLocaleHours(date),
-  minutes: IDate.getLocaleMinutes(date),
+  year: DateUtils.getLocaleYear(date),
+  month: DateUtils.getLocaleMonth(date),
+  date: DateUtils.getLocaleDate(date),
+  hours: DateUtils.getLocaleHours(date),
+  minutes: DateUtils.getLocaleMinutes(date),
 });
 
-export const ymdhm2Date = (ymdhm: Ymdhm): IDate =>
-  IDate.create(ymdhm.year, ymdhm.month, ymdhm.date, ymdhm.hours, ymdhm.minutes);
+export const ymdhm2Date = (ymdhm: Ymdhm): DateUtils =>
+  DateUtils.create(
+    ymdhm.year,
+    ymdhm.month,
+    ymdhm.date,
+    ymdhm.hours,
+    ymdhm.minutes
+  );
 
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
   if (a.year !== b.year) return Num.sign(a.year - b.year);

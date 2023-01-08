@@ -1,4 +1,4 @@
-import { IList, Maybe } from '@noshiro/ts-utils';
+import { Arr, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import type {
   InitializedObservable,
@@ -54,7 +54,7 @@ class WithBufferedFromObservableClass<A, B>
     });
 
     observable.subscribe((value) => {
-      this.#mut_bufferedValues = IList.push(this.#mut_bufferedValues, value);
+      this.#mut_bufferedValues = Arr.push(this.#mut_bufferedValues, value);
     });
   }
 

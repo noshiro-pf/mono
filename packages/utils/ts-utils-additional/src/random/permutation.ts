@@ -1,5 +1,5 @@
-import { IList } from '@noshiro/ts-utils';
+import { Arr } from '@noshiro/ts-utils';
 import { getShuffled } from '../array';
 
 export const permutation = (n: number): readonly number[] =>
-  getShuffled(IList.seqUnwrapped(n));
+  getShuffled(Arr.seqUnwrapped(n));

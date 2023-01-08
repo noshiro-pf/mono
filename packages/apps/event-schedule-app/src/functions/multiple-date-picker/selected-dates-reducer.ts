@@ -21,7 +21,7 @@ export const selectedDatesReducer: ReducerType<
         : state.add(action.dateToFlip);
 
     case 'fill-column':
-      return IList.isSubset(
+      return Arr.isSubset(
         action.dates.map(ymdToKey),
         state.toArray().map(ymdToKey)
       )

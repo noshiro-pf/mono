@@ -1,4 +1,4 @@
-import { IList, Result } from '@noshiro/ts-utils';
+import { Arr, Result } from '@noshiro/ts-utils';
 import type { Type, TypeOf } from '../type';
 import {
   createAssertFunction,
@@ -20,7 +20,7 @@ export const tuple = <A extends readonly Type<unknown>[]>(
   const defaultValue = types.map((t) => t.defaultValue) as MapTuple<A>;
 
   const validate: Type<T>['validate'] = (a) => {
-    if (!IList.isArray(a)) {
+    if (!Arr.isArray(a)) {
       return Result.err([
         validationErrorMessage(a, 'The value is expected to be an array'),
       ]);
@@ -32,7 +32,7 @@ export const tuple = <A extends readonly Type<unknown>[]>(
       ]);
     }
 
-    for (const [index, [typeDef, el]] of IList.zip(types, a).entries()) {
+    for (const [index, [typeDef, el]] of Arr.zip(types, a).entries()) {
       const res = typeDef.validate(el);
 
       if (Result.isErr(res)) {
@@ -49,7 +49,7 @@ export const tuple = <A extends readonly Type<unknown>[]>(
   };
 
   const fill: Type<T>['fill'] = (a) =>
-    !IList.isArray(a)
+    !Arr.isArray(a)
       ? defaultValue
       : (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 

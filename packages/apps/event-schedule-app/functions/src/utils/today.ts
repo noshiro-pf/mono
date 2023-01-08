@@ -1,23 +1,23 @@
 import type { YearMonthDate, Ymdhm } from '@noshiro/event-schedule-app-shared';
-import { IDate, pipe } from '@noshiro/ts-utils';
+import { DateUtils, pipe } from '@noshiro/ts-utils';
 
-const todayDate = (): IDate => {
-  const japanLocaleString = IDate.today().toLocaleString('ja-JP', {
+const todayDate = (): DateUtils => {
+  const japanLocaleString = DateUtils.today().toLocaleString('ja-JP', {
     timeZone: 'Asia/Tokyo',
   });
-  return IDate.from(japanLocaleString);
+  return DateUtils.from(japanLocaleString);
 };
 
 export const today = (): YearMonthDate => ({
-  year: pipe(todayDate()).chain(IDate.getLocaleYear).value,
-  month: pipe(todayDate()).chain(IDate.getLocaleMonth).value,
-  date: pipe(todayDate()).chain(IDate.getLocaleDate).value,
+  year: pipe(todayDate()).chain(DateUtils.getLocaleYear).value,
+  month: pipe(todayDate()).chain(DateUtils.getLocaleMonth).value,
+  date: pipe(todayDate()).chain(DateUtils.getLocaleDate).value,
 });
 
 export const now = (): Ymdhm => ({
-  year: pipe(todayDate()).chain(IDate.getLocaleYear).value,
-  month: pipe(todayDate()).chain(IDate.getLocaleMonth).value,
-  date: pipe(todayDate()).chain(IDate.getLocaleDate).value,
-  hours: pipe(todayDate()).chain(IDate.getLocaleHours).value,
-  minutes: pipe(todayDate()).chain(IDate.getLocaleMinutes).value,
+  year: pipe(todayDate()).chain(DateUtils.getLocaleYear).value,
+  month: pipe(todayDate()).chain(DateUtils.getLocaleMonth).value,
+  date: pipe(todayDate()).chain(DateUtils.getLocaleDate).value,
+  hours: pipe(todayDate()).chain(DateUtils.getLocaleHours).value,
+  minutes: pipe(todayDate()).chain(DateUtils.getLocaleMinutes).value,
 });

@@ -1,4 +1,4 @@
-import { IRecord, isBoolean, isRecord, isString } from '@noshiro/ts-utils';
+import { isBoolean, isRecord, isString, Obj } from '@noshiro/ts-utils';
 
 export type NotificationSettings = Readonly<{
   email: string;
@@ -22,13 +22,13 @@ export const notificationSettingsDefaultValue: NotificationSettings = {
 
 export const isNotificationSettings = (a: unknown): a is NotificationSettings =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'email', isString) &&
-  IRecord.hasKeyValue(a, 'notifyOnAnswerChange', isBoolean) &&
-  IRecord.hasKeyValue(a, 'notify01daysBeforeAnswerDeadline', isBoolean) &&
-  IRecord.hasKeyValue(a, 'notify03daysBeforeAnswerDeadline', isBoolean) &&
-  IRecord.hasKeyValue(a, 'notify07daysBeforeAnswerDeadline', isBoolean) &&
-  IRecord.hasKeyValue(a, 'notify14daysBeforeAnswerDeadline', isBoolean) &&
-  IRecord.hasKeyValue(a, 'notify28daysBeforeAnswerDeadline', isBoolean);
+  Obj.hasKeyValue(a, 'email', isString) &&
+  Obj.hasKeyValue(a, 'notifyOnAnswerChange', isBoolean) &&
+  Obj.hasKeyValue(a, 'notify01daysBeforeAnswerDeadline', isBoolean) &&
+  Obj.hasKeyValue(a, 'notify03daysBeforeAnswerDeadline', isBoolean) &&
+  Obj.hasKeyValue(a, 'notify07daysBeforeAnswerDeadline', isBoolean) &&
+  Obj.hasKeyValue(a, 'notify14daysBeforeAnswerDeadline', isBoolean) &&
+  Obj.hasKeyValue(a, 'notify28daysBeforeAnswerDeadline', isBoolean);
 
 const d = notificationSettingsDefaultValue;
 
@@ -36,43 +36,43 @@ export const fillNotificationSettings = (a?: unknown): NotificationSettings =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        email: IRecord.hasKeyValue(a, 'email', isString) ? a.email : d.email,
-        notifyOnAnswerChange: IRecord.hasKeyValue(
+        email: Obj.hasKeyValue(a, 'email', isString) ? a.email : d.email,
+        notifyOnAnswerChange: Obj.hasKeyValue(
           a,
           'notifyOnAnswerChange',
           isBoolean
         )
           ? a.notifyOnAnswerChange
           : d.notifyOnAnswerChange,
-        notify01daysBeforeAnswerDeadline: IRecord.hasKeyValue(
+        notify01daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify01daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify01daysBeforeAnswerDeadline
           : d.notify01daysBeforeAnswerDeadline,
-        notify03daysBeforeAnswerDeadline: IRecord.hasKeyValue(
+        notify03daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify03daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify03daysBeforeAnswerDeadline
           : d.notify03daysBeforeAnswerDeadline,
-        notify07daysBeforeAnswerDeadline: IRecord.hasKeyValue(
+        notify07daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify07daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify07daysBeforeAnswerDeadline
           : d.notify07daysBeforeAnswerDeadline,
-        notify14daysBeforeAnswerDeadline: IRecord.hasKeyValue(
+        notify14daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify14daysBeforeAnswerDeadline',
           isBoolean
         )
           ? a.notify14daysBeforeAnswerDeadline
           : d.notify14daysBeforeAnswerDeadline,
-        notify28daysBeforeAnswerDeadline: IRecord.hasKeyValue(
+        notify28daysBeforeAnswerDeadline: Obj.hasKeyValue(
           a,
           'notify28daysBeforeAnswerDeadline',
           isBoolean

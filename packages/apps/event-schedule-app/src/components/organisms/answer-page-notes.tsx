@@ -20,7 +20,7 @@ export const AnswerPageNotes = memoNamed<Props>(
   'AnswerPageNotes',
   ({ notes }) => (
     <>
-      {IList.map(splitStringByWhitespace(notes), (str, i) => (
+      {Arr.map(splitStringByWhitespace(notes), (str, i) => (
         <span key={i}>{convertUrlStringToAnchorElement(str)} </span>
       ))}
     </>

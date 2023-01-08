@@ -8,8 +8,8 @@ export const normalizeEventSchedule = (
   notes: eventSchedule.notes.trim().concat('\n'),
   datetimeSpecification: eventSchedule.datetimeSpecification,
   datetimeRangeList: pipe(eventSchedule.datetimeRangeList)
-    .chain((list) => IList.uniqBy(list, datetimeRange2str))
-    .chain((list) => IList.sort(list, compareDatetimeRange)).value,
+    .chain((list) => Arr.uniqBy(list, datetimeRange2str))
+    .chain((list) => Arr.sort(list, compareDatetimeRange)).value,
   answerDeadline: eventSchedule.answerDeadline,
   answerIcons: eventSchedule.answerIcons,
   notificationSettings: eventSchedule.notificationSettings,

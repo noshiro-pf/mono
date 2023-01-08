@@ -2,15 +2,15 @@ import { DateInput2 } from '@blueprintjs/datetime2';
 import type { ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string =>
-  `${IDate.toLocaleYMD(date, '-')}  ${IDate.toLocaleHM(date, ':')}`;
+  `${DateUtils.toLocaleYMD(date, '-')}  ${DateUtils.toLocaleHM(date, ':')}`;
 
 const parseDate = (str: string): RawDateType =>
-  pipe(IDate.from(str)).chain(IDate.toDate).value;
+  pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
-const tenYearsLater = pipe(IDate.today())
-  .chain(IDate.updateLocaleYear((a) => a + 99))
-  .chain(IDate.setLocaleMonth(12))
-  .chain(IDate.toDate).value;
+const tenYearsLater = pipe(DateUtils.today())
+  .chain(DateUtils.updateLocaleYear((a) => a + 99))
+  .chain(DateUtils.setLocaleMonth(12))
+  .chain(DateUtils.toDate).value;
 
 type DateInputPropsOriginal = ComponentProps<typeof DateInput2>;
 
@@ -46,11 +46,11 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         if (isUserChange !== true) return;
         const dt = parseDate(dateStr);
         onYmdhmChange({
-          year: IDate.getLocaleYear(dt),
-          month: IDate.getLocaleMonth(dt),
-          date: IDate.getLocaleDate(dt),
-          hours: IDate.getLocaleHours(dt),
-          minutes: IDate.getLocaleMinutes(dt),
+          year: DateUtils.getLocaleYear(dt),
+          month: DateUtils.getLocaleMonth(dt),
+          date: DateUtils.getLocaleDate(dt),
+          hours: DateUtils.getLocaleHours(dt),
+          minutes: DateUtils.getLocaleMinutes(dt),
         });
       },
       [onYmdhmChange]
@@ -60,7 +60,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
       () =>
         ymdhm === undefined
           ? undefined
-          : IDate.from(
+          : DateUtils.from(
               `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
             ).toLocaleString(),
       [ymdhm]

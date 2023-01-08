@@ -50,7 +50,7 @@ export const calcAll = ({
   const interestYen =
     repaymentType === 'principal-equal-payment' ? interestYen1 : interestYen2;
 
-  const interestSumManYen = IList.sum(interestYen) / 10_000;
+  const interestSumManYen = Arr.sum(interestYen) / 10_000;
 
   return {
     borrowingBalanceYen,

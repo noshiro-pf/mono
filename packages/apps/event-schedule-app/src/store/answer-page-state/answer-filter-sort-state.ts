@@ -585,8 +585,8 @@ export namespace AnswerFilterAndSortStore {
     .chain(filter(isNotUndefined))
     .chain(
       map((eventSchedule) => ({
-        start: IList.first(eventSchedule.datetimeRangeList).ymd,
-        end: IList.last(eventSchedule.datetimeRangeList).ymd,
+        start: Arr.first(eventSchedule.datetimeRangeList).ymd,
+        end: Arr.last(eventSchedule.datetimeRangeList).ymd,
       }))
     )
     .chain(distinctUntilChanged(deepEqual))

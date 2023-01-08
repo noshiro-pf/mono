@@ -21,7 +21,7 @@ import { firestoreEvents } from '../../initialize-firebase';
 
 //       if (
 //         isRecord(err) &&
-//         IRecord.hasKeyValue(err, 'code', isString) &&
+//         Obj.hasKeyValue(err, 'code', isString) &&
 //         err.code === 'functions/not-found'
 //       ) {
 //         return Result.err({

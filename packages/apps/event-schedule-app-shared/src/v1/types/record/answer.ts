@@ -1,4 +1,4 @@
-import { IDate } from '@noshiro/ts-utils';
+import { DateUtils } from '@noshiro/ts-utils';
 import type { AnswerId, UserName, Weight } from '../phantom';
 import { createAnswerId, createUserName, createWeight } from '../phantom';
 import type {
@@ -43,7 +43,7 @@ export const defaultAnswer: Answer = {
   userName: createUserName(''),
   comment: '',
   selection: [],
-  [ANSWER_KEY_CREATED_AT]: IDate.now(),
+  [ANSWER_KEY_CREATED_AT]: DateUtils.now(),
   useWeight: false,
   weight: createWeight(1),
   isRequiredParticipants: false,

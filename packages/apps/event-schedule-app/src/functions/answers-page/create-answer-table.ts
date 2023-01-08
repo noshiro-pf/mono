@@ -19,10 +19,10 @@ export const createAnswerTable = (
   DatetimeRangeMapKey
 > =>
   IMapMapped.new(
-    IList.map(datetimeRangeList, (datetimeRange) =>
+    Arr.map(datetimeRangeList, (datetimeRange) =>
       tp(
         datetimeRange,
-        IList.map(answers, (answer) =>
+        Arr.map(answers, (answer) =>
           answerSelectionMapFn(datetimeRange, answer.id)
         )
       )

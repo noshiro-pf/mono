@@ -104,7 +104,7 @@ export const Table = memoNamed(
 
     const onBoundingClientRectChange = useMemo(
       () =>
-        IRecord.fromEntries(
+        Obj.fromEntries(
           (['N', 'W', 'E', 'S'] as const).map((d) => [
             d,
             (rect: Readonly<DOMRect>) => {

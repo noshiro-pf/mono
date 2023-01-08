@@ -15,8 +15,8 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
     const onChangeHandler = useCallback(
       (date: RawDateType) => {
         onTimeChange({
-          hours: IDate.getLocaleHours(date),
-          minutes: IDate.getLocaleMinutes(date),
+          hours: DateUtils.getLocaleHours(date),
+          minutes: DateUtils.getLocaleMinutes(date),
         });
       },
       [onTimeChange]
@@ -24,8 +24,8 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
 
     const dateObj = useMemo<RawDateType>(
       () =>
-        pipe(IDate.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
-          IDate.toDate
+        pipe(DateUtils.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
+          DateUtils.toDate
         ).value,
       [time]
     );

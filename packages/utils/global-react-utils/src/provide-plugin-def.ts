@@ -1,6 +1,6 @@
-import { IRecord, tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginReactUtilsDef = IRecord.fromEntries(
+export const providePluginReactUtilsDef = Obj.fromEntries(
   [
     'memoNamed',
     'useAlive',

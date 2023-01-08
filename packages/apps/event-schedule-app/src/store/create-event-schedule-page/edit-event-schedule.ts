@@ -63,7 +63,7 @@ export namespace EditEventScheduleStore {
     } else {
       commonStateHandlers.turnOnNotificationSection();
       commonStateHandlers.setNotificationSettingsWithEmail(
-        IRecord.merge(ev.notificationSettings, { email: emailVerified ?? '' })
+        Obj.merge(ev.notificationSettings, { email: emailVerified ?? '' })
       );
     }
   };
@@ -94,7 +94,7 @@ export namespace EditEventScheduleStore {
       mapI(
         (diff) =>
           diff.datetimeRangeList?.deleted !== undefined &&
-          IList.isNonEmpty(diff.datetimeRangeList.deleted)
+          Arr.isNonEmpty(diff.datetimeRangeList.deleted)
       )
     );
 

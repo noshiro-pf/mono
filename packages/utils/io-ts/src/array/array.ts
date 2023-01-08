@@ -1,4 +1,4 @@
-import { IList, Result } from '@noshiro/ts-utils';
+import { Arr, Result } from '@noshiro/ts-utils';
 import type { Type } from '../type';
 import {
   createAssertFunction,
@@ -22,7 +22,7 @@ export const array = <A>(
   const typeNameFilled: string = typeName ?? `${elementType.typeName}[]`;
 
   const validate: Type<T>['validate'] = (a) => {
-    if (!IList.isArray(a)) {
+    if (!Arr.isArray(a)) {
       return Result.err([
         validationErrorMessage(a, 'The value is expected to be an array'),
       ]);
@@ -46,7 +46,7 @@ export const array = <A>(
   };
 
   const fill: Type<T>['fill'] = (a) =>
-    IList.isArray(a) ? IList.map(a, (e) => elementType.fill(e)) : defaultValue;
+    Arr.isArray(a) ? Arr.map(a, (e) => elementType.fill(e)) : defaultValue;
 
   return {
     typeName: typeNameFilled,

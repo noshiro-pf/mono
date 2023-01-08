@@ -14,8 +14,8 @@ export type CalendarCurrentPageReducerAction = Readonly<
 
 export const calendarCurrentPageInitialState =
   (): CalendarCurrentPageReducerState => ({
-    year: IDate.getLocaleYear(IDate.today()),
-    month: IDate.getLocaleMonth(IDate.today()),
+    year: DateUtils.getLocaleYear(DateUtils.today()),
+    month: DateUtils.getLocaleMonth(DateUtils.today()),
   });
 
 export const calendarCurrentPageReducer: ReducerType<

@@ -1,5 +1,5 @@
 import type { Some } from '@noshiro/ts-utils';
-import { IList, MutableSet, pipe } from '@noshiro/ts-utils';
+import { Arr, MutableSet, pipe } from '@noshiro/ts-utils';
 import type {
   AsyncChildObservable,
   AsyncChildObservableType,
@@ -28,7 +28,7 @@ const registerChild = <A>(
     p.addChild(child);
   }
   // register child to all reachable ManagerObservables
-  const mut_rest = pipe(parents).chain(IList.from).chain(IList.asMut).value;
+  const mut_rest = pipe(parents).chain(Arr.from).chain(Arr.asMut).value;
 
   while (mut_rest.length >= 1) {
     const p = mut_rest.pop();
@@ -117,7 +117,7 @@ export class AsyncChildObservableClass<
       this.#procedure.map((a) => a.depth),
       child.depth
     );
-    this.#procedure = IList.insert(this.#procedure, insertPos, child);
+    this.#procedure = Arr.insert(this.#procedure, insertPos, child);
   }
 
   startUpdate(nextValue: A): void {

@@ -1,4 +1,4 @@
-import { IDate, Num, pipe } from '@noshiro/ts-utils';
+import { DateUtils, Num, pipe } from '@noshiro/ts-utils';
 
 export type YearMonthDate = Readonly<{
   year: YearEnum;
@@ -9,9 +9,9 @@ export type YearMonthDate = Readonly<{
 export type PartialYearMonthDate = Partial<YearMonthDate>;
 
 export const defaultYearMonthDate: YearMonthDate = {
-  year: pipe(IDate.today()).chain(IDate.getLocaleYear).value,
-  month: pipe(IDate.today()).chain(IDate.getLocaleMonth).value,
-  date: pipe(IDate.today()).chain(IDate.getLocaleDate).value,
+  year: pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value,
+  month: pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value,
+  date: pipe(DateUtils.today()).chain(DateUtils.getLocaleDate).value,
 } as const;
 
 const d = defaultYearMonthDate;
@@ -21,10 +21,10 @@ export const fillYearMonthDate = (a?: PartialYearMonthDate): YearMonthDate => ({
   date: a?.date ?? d.date,
 });
 
-export const ymdFromDate = (date: IDate): YearMonthDate => ({
-  year: IDate.getLocaleYear(date),
-  month: IDate.getLocaleMonth(date),
-  date: IDate.getLocaleDate(date),
+export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
+  year: DateUtils.getLocaleYear(date),
+  month: DateUtils.getLocaleMonth(date),
+  date: DateUtils.getLocaleDate(date),
 });
 
 export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {

@@ -44,7 +44,7 @@ export const confirmEmailDialogFormStateReducer: Reducer<
 > = (state, action) => {
   switch (action.type) {
     case 'inputEmail':
-      return IRecord.set(
+      return Obj.set(
         state,
         'email',
         emailInputStateReducer(state.email, {
@@ -56,7 +56,7 @@ export const confirmEmailDialogFormStateReducer: Reducer<
     case 'setEmailDoesNotMatchError':
       return pipe(state)
         .chain((draft) =>
-          IRecord.update(draft, 'email', (email) =>
+          Obj.update(draft, 'email', (email) =>
             emailInputStateReducer(email, {
               type: 'setError',
               payload:
@@ -65,12 +65,12 @@ export const confirmEmailDialogFormStateReducer: Reducer<
             })
           )
         )
-        .chain((draft) => IRecord.set(draft, 'isWaitingResponse', false)).value;
+        .chain((draft) => Obj.set(draft, 'isWaitingResponse', false)).value;
 
     case 'setOtherError':
       return pipe(state)
-        .chain((draft) => IRecord.set(draft, 'otherErrors', action.payload))
-        .chain((draft) => IRecord.set(draft, 'isWaitingResponse', false)).value;
+        .chain((draft) => Obj.set(draft, 'otherErrors', action.payload))
+        .chain((draft) => Obj.set(draft, 'isWaitingResponse', false)).value;
 
     case 'submit': {
       const emailNextState = emailInputStateReducer(state.email, {
@@ -78,10 +78,10 @@ export const confirmEmailDialogFormStateReducer: Reducer<
       });
 
       return pipe(state)
-        .chain((draft) => IRecord.set(draft, 'email', emailNextState))
-        .chain((draft) => IRecord.set(draft, 'otherErrors', undefined))
+        .chain((draft) => Obj.set(draft, 'email', emailNextState))
+        .chain((draft) => Obj.set(draft, 'otherErrors', undefined))
         .chain((draft) =>
-          IRecord.set(
+          Obj.set(
             draft,
             'isWaitingResponse',
             !emailInputHasError(emailNextState)
@@ -90,7 +90,7 @@ export const confirmEmailDialogFormStateReducer: Reducer<
     }
 
     case 'done':
-      return IRecord.set(state, 'isWaitingResponse', false);
+      return Obj.set(state, 'isWaitingResponse', false);
 
     case 'reset':
       return confirmEmailDialogFormInitialState;

@@ -50,12 +50,12 @@ export const answerSelectionReducer: ReducerType<
 
     case 'cell-point':
       return state.update(action.datetimeRange, (prev) =>
-        IRecord.set(prev, 'point', action.point)
+        Obj.set(prev, 'point', action.point)
       );
 
     case 'cell-comment':
       return state.update(action.datetimeRange, (prev) =>
-        IRecord.set(prev, 'comment', action.comment)
+        Obj.set(prev, 'comment', action.comment)
       );
 
     case 'header':
