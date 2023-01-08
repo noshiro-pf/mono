@@ -1,1 +1,1 @@
-export * from './idate';
+export * from './date-utils';

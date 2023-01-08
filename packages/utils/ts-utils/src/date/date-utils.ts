@@ -1,7 +1,7 @@
 import { Arr } from '../array';
 import { Num } from '../num';
 
-export type IDate = StrictOmit<
+export type DateUtils = StrictOmit<
   RawDateType,
   | 'getDate'
   | 'getDay'
@@ -35,125 +35,125 @@ export type IDate = StrictOmit<
   | 'setUTCSeconds'
 >;
 
-export namespace IDate {
+export namespace DateUtils {
   /* get */
 
   const getValueHelper = (
-    date: IDate,
+    date: DateUtils,
     getFn: (d: RawDateType) => number
   ): number => getFn(date as RawDateType);
 
   /** Gets the year, using local time. */
-  export const getLocaleYear = (date: IDate): YearEnum =>
+  export const getLocaleYear = (date: DateUtils): YearEnum =>
     getValueHelper(date, (d) => d.getFullYear());
 
   /** Gets the year using Universal Coordinated Time (UTC). */
-  export const getUTCYear = (date: IDate): YearEnum =>
+  export const getUTCYear = (date: DateUtils): YearEnum =>
     getValueHelper(date, (d) => d.getUTCFullYear());
 
   /**
    * @description Gets the month, using local time.
    * @returns a number from 1 to 12
    */
-  export const getLocaleMonth = (date: IDate): MonthEnum =>
+  export const getLocaleMonth = (date: DateUtils): MonthEnum =>
     getValueHelper(date, (d) => d.getMonth() + 1) as MonthEnum;
 
   /**
    * @description Gets the month of a Date object using Universal Coordinated Time (UTC).
    * @returns a number from 1 to 12
    */
-  export const getUTCMonth = (date: IDate): MonthEnum =>
+  export const getUTCMonth = (date: DateUtils): MonthEnum =>
     getValueHelper(date, (d) => d.getUTCMonth() + 1) as MonthEnum;
 
   /**
    * @description Gets the day-of-the-month, using local time.
    * @returns a number from 1 to 31
    */
-  export const getLocaleDate = (date: IDate): DateEnum =>
+  export const getLocaleDate = (date: DateUtils): DateEnum =>
     getValueHelper(date, (d) => d.getDate()) as DateEnum;
 
   /**
    * @description Gets the day-of-the-month, using Universal Coordinated Time (UTC).
    * @returns a number from 1 to 31
    */
-  export const getUTCDate = (date: IDate): DateEnum =>
+  export const getUTCDate = (date: DateUtils): DateEnum =>
     getValueHelper(date, (d) => d.getUTCDate()) as DateEnum;
 
   /**
    * @description Gets the day of the week, using local time.
    * @returns a number from 0 to 6
    */
-  export const getLocaleDayOfWeek = (date: IDate): DayOfWeekIndex =>
+  export const getLocaleDayOfWeek = (date: DateUtils): DayOfWeekIndex =>
     getValueHelper(date, (d) => d.getDay()) as DayOfWeekIndex;
 
   /**
    * @description Gets the day of the week using Universal Coordinated Time (UTC).
    * @returns a number from 0 to 6
    */
-  export const getUTCDayOfWeek = (date: IDate): DayOfWeekIndex =>
+  export const getUTCDayOfWeek = (date: DateUtils): DayOfWeekIndex =>
     getValueHelper(date, (d) => d.getUTCDay()) as DayOfWeekIndex;
 
   /**
    * @description Gets the hours in a date, using local time.
    * @returns a number from 0 to 23
    */
-  export const getLocaleHours = (date: IDate): HoursEnum =>
+  export const getLocaleHours = (date: DateUtils): HoursEnum =>
     getValueHelper(date, (d) => d.getHours()) as HoursEnum;
 
   /**
    * @description Gets the hours value in a Date object using Universal Coordinated Time (UTC).
    * @returns a number from 0 to 23
    */
-  export const getUTCHours = (date: IDate): HoursEnum =>
+  export const getUTCHours = (date: DateUtils): HoursEnum =>
     getValueHelper(date, (d) => d.getUTCHours()) as HoursEnum;
 
   /**
    * @description Gets the minutes of a Date object, using local time.
    * @returns a number from 0 to 59
    */
-  export const getLocaleMinutes = (date: IDate): MinutesEnum =>
+  export const getLocaleMinutes = (date: DateUtils): MinutesEnum =>
     getValueHelper(date, (d) => d.getMinutes()) as MinutesEnum;
 
   /**
    * @description Gets the minutes of a Date object using Universal Coordinated Time (UTC).
    * @returns a number from 0 to 59
    */
-  export const getUTCMinutes = (date: IDate): MinutesEnum =>
+  export const getUTCMinutes = (date: DateUtils): MinutesEnum =>
     getValueHelper(date, (d) => d.getUTCMinutes()) as MinutesEnum;
 
   /**
    * @description Gets the seconds of a Date object, using local time.
    * @returns a number from 0 to 59
    */
-  export const getLocaleSeconds = (date: IDate): SecondsEnum =>
+  export const getLocaleSeconds = (date: DateUtils): SecondsEnum =>
     getValueHelper(date, (d) => d.getSeconds()) as SecondsEnum;
 
   /**
    * @description Gets the seconds of a Date object using Universal Coordinated Time (UTC).
    * @returns a number from 0 to 999
    */
-  export const getUTCSeconds = (date: IDate): SecondsEnum =>
+  export const getUTCSeconds = (date: DateUtils): SecondsEnum =>
     getValueHelper(date, (d) => d.getUTCSeconds()) as SecondsEnum;
 
   /**
    * @description Gets the milliseconds of a Date, using local time.
    * @returns a number from 0 to 999
    */
-  export const getLocaleMilliseconds = (date: IDate): SecondsEnum =>
+  export const getLocaleMilliseconds = (date: DateUtils): SecondsEnum =>
     getValueHelper(date, (d) => d.getMilliseconds()) as SecondsEnum;
 
   /**
    * @description Gets the milliseconds of a Date object using Universal Coordinated Time (UTC).
    * @returns a number from 0 to 999
    */
-  export const getUTCMilliseconds = (date: IDate): SecondsEnum =>
+  export const getUTCMilliseconds = (date: DateUtils): SecondsEnum =>
     getValueHelper(date, (d) => d.getUTCMilliseconds()) as SecondsEnum;
 
   /* set */
 
   const setValueHelper =
     (setFn: (date: RawDateType) => void) =>
-    (curr: IDate): IDate => {
+    (curr: DateUtils): DateUtils => {
       // eslint-disable-next-line no-restricted-globals
       const copy = new Date(curr as RawDateType);
       setFn(copy);
@@ -161,49 +161,65 @@ export namespace IDate {
     };
 
   /** Sets the year of the Date object using local time. */
-  export const setLocaleYear = (year: YearEnum): ((curr: IDate) => IDate) =>
+  export const setLocaleYear = (
+    year: YearEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setFullYear(year);
     });
 
   /** Sets the year value in the Date object using Universal Coordinated Time (UTC). */
-  export const setUTCYear = (year: YearEnum): ((curr: IDate) => IDate) =>
+  export const setUTCYear = (
+    year: YearEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setUTCFullYear(year);
     });
 
   /** Sets the month value in the Date object using local time. */
-  export const setLocaleMonth = (month: MonthEnum): ((curr: IDate) => IDate) =>
+  export const setLocaleMonth = (
+    month: MonthEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setMonth(month - 1);
     });
 
   /** Sets the month value in the Date object using Universal Coordinated Time (UTC). */
-  export const setUTCMonth = (month: MonthEnum): ((curr: IDate) => IDate) =>
+  export const setUTCMonth = (
+    month: MonthEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setUTCMonth(month - 1);
     });
 
   /** Sets the numeric day-of-the-month value of the Date object using local time. */
-  export const setLocaleDate = (date: DateEnum): ((curr: IDate) => IDate) =>
+  export const setLocaleDate = (
+    date: DateEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setDate(date);
     });
 
   /** ets the numeric day of the month in the Date object using Universal Coordinated Time (UTC). */
-  export const setUTCDate = (date: DateEnum): ((curr: IDate) => IDate) =>
+  export const setUTCDate = (
+    date: DateEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setUTCDate(date);
     });
 
   /** Sets the hour value in the Date object using local time. */
-  export const setLocaleHours = (hours: HoursEnum): ((curr: IDate) => IDate) =>
+  export const setLocaleHours = (
+    hours: HoursEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setHours(hours);
     });
 
   /** Sets the hours value in the Date object using Universal Coordinated Time (UTC). */
-  export const setUTCHours = (hours: HoursEnum): ((curr: IDate) => IDate) =>
+  export const setUTCHours = (
+    hours: HoursEnum
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setUTCHours(hours);
     });
@@ -211,7 +227,7 @@ export namespace IDate {
   /** Sets the minutes value in the Date object using local time. */
   export const setLocaleMinutes = (
     minutes: MinutesEnum
-  ): ((curr: IDate) => IDate) =>
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setMinutes(minutes);
     });
@@ -219,7 +235,7 @@ export namespace IDate {
   /** Sets the minutes value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCMinutes = (
     minutes: MinutesEnum
-  ): ((curr: IDate) => IDate) =>
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setUTCMinutes(minutes);
     });
@@ -227,7 +243,7 @@ export namespace IDate {
   /** Sets the seconds value in the Date object using local time. */
   export const setLocaleSeconds = (
     seconds: SecondsEnum
-  ): ((curr: IDate) => IDate) =>
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setSeconds(seconds);
     });
@@ -235,7 +251,7 @@ export namespace IDate {
   /** Sets the seconds value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCSeconds = (
     seconds: SecondsEnum
-  ): ((curr: IDate) => IDate) =>
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setUTCSeconds(seconds);
     });
@@ -243,7 +259,7 @@ export namespace IDate {
   /** Sets the milliseconds value in the Date object using local time. */
   export const setLocaleMilliseconds = (
     milliseconds: MillisecondsEnum
-  ): ((curr: IDate) => IDate) =>
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setMilliseconds(milliseconds);
     });
@@ -251,7 +267,7 @@ export namespace IDate {
   /** Sets the milliseconds value in the Date object using Universal Coordinated Time (UTC). */
   export const setUTCMilliseconds = (
     milliseconds: MillisecondsEnum
-  ): ((curr: IDate) => IDate) =>
+  ): ((curr: DateUtils) => DateUtils) =>
     setValueHelper((mut_copy) => {
       mut_copy.setUTCMilliseconds(milliseconds);
     });
@@ -260,78 +276,78 @@ export namespace IDate {
 
   export const updateLocaleYear =
     (updater: (year: YearEnum) => YearEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setLocaleYear(updater(getLocaleYear(curr)))(curr);
 
   export const updateUTCYear =
     (updater: (year: YearEnum) => YearEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setUTCYear(updater(getUTCYear(curr)))(curr);
 
   export const updateLocaleMonth =
     (updater: (month: MonthEnum) => MonthEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setLocaleMonth(updater(getLocaleMonth(curr)))(curr);
 
   export const updateUTCMonth =
     (updater: (month: MonthEnum) => MonthEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setUTCMonth(updater(getUTCMonth(curr)))(curr);
 
   export const updateLocaleDate =
     (updater: (date: DateEnum) => DateEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setLocaleDate(updater(getLocaleDate(curr)))(curr);
 
   export const updateUTCDate =
     (updater: (date: DateEnum) => DateEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setUTCDate(updater(getUTCDate(curr)))(curr);
 
   export const updateLocaleHours =
     (updater: (hour: HoursEnum) => HoursEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setLocaleHours(updater(getLocaleHours(curr)))(curr);
 
   export const updateUTCHours =
     (updater: (hour: HoursEnum) => HoursEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setUTCHours(updater(getUTCHours(curr)))(curr);
 
   export const updateLocaleMinutes =
     (updater: (minutes: MinutesEnum) => MinutesEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setLocaleMinutes(updater(getLocaleMinutes(curr)))(curr);
 
   export const updateUTCMinutes =
     (updater: (minutes: MinutesEnum) => MinutesEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setUTCMinutes(updater(getUTCMinutes(curr)))(curr);
 
   export const updateLocaleSeconds =
     (updater: (seconds: SecondsEnum) => SecondsEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setLocaleSeconds(updater(getLocaleSeconds(curr)))(curr);
 
   export const updateUTCSeconds =
     (updater: (seconds: SecondsEnum) => SecondsEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setUTCSeconds(updater(getUTCSeconds(curr)))(curr);
 
   export const updateLocaleMilliseconds =
     (updater: (milliseconds: MillisecondsEnum) => MillisecondsEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setLocaleMilliseconds(updater(getLocaleMilliseconds(curr)))(curr);
 
   export const updateUTCMilliseconds =
     (updater: (milliseconds: MillisecondsEnum) => MillisecondsEnum) =>
-    (curr: IDate): IDate =>
+    (curr: DateUtils): DateUtils =>
       setUTCMilliseconds(updater(getUTCMilliseconds(curr)))(curr);
 
   /* create  */
 
   // eslint-disable-next-line no-restricted-globals
-  export const today = (): IDate => new Date();
+  export const today = (): DateUtils => new Date();
 
   // eslint-disable-next-line no-restricted-globals
   export const now = (): number => Date.now();
@@ -345,9 +361,9 @@ export namespace IDate {
     seconds: SecondsEnum = 0,
     ms: number = 0
     // eslint-disable-next-line no-restricted-globals
-  ): IDate => new Date(year, month - 1, date, hours, minutes, seconds, ms);
+  ): DateUtils => new Date(year, month - 1, date, hours, minutes, seconds, ms);
 
-  export const from = (value: RawDateType | number | string): IDate =>
+  export const from = (value: RawDateType | number | string): DateUtils =>
     // eslint-disable-next-line no-restricted-globals
     new Date(value);
 
@@ -361,7 +377,7 @@ export namespace IDate {
   };
 
   /** Gets the time value in milliseconds. */
-  export const toTimestamp = (d: IDate): number => d.getTime();
+  export const toTimestamp = (d: DateUtils): number => d.getTime();
 
   /* yesterday & tomorrow */
 
@@ -373,14 +389,14 @@ export namespace IDate {
 
   /* convert */
 
-  export const toMidnight = (date: IDate): IDate => {
+  export const toMidnight = (date: DateUtils): DateUtils => {
     // eslint-disable-next-line no-restricted-globals
     const mut_midnight = new Date(date as RawDateType);
     mut_midnight.setHours(0, 0, 0, 0);
     return mut_midnight;
   };
 
-  export const toDate = (date: IDate): RawDateType => date as RawDateType;
+  export const toDate = (date: DateUtils): RawDateType => date as RawDateType;
 
   /**
    * ```
@@ -389,7 +405,7 @@ export namespace IDate {
    * date1 === date2 -->  0
    * ```
    */
-  export const cmp = (x: IDate, y: IDate): -1 | 0 | 1 => {
+  export const cmp = (x: DateUtils, y: DateUtils): -1 | 0 | 1 => {
     const date1value = toTimestamp(x);
     const date2value = toTimestamp(y);
 
@@ -399,10 +415,10 @@ export namespace IDate {
     return 0;
   };
 
-  export const isToday = (date: IDate): boolean => cmp(date, today()) === 0;
+  export const isToday = (date: DateUtils): boolean => cmp(date, today()) === 0;
 
   /** @description 何週目か(0-origin)を返す */
-  export const weekNumberLocale = (date: IDate): 0 | 1 | 2 | 3 | 4 | 5 => {
+  export const weekNumberLocale = (date: DateUtils): 0 | 1 | 2 | 3 | 4 | 5 => {
     const date0Saturday =
       getLocaleDate(date) - 1 + (6 - getLocaleDayOfWeek(date)); // 同じ週の土曜日
 
@@ -410,7 +426,7 @@ export namespace IDate {
   };
 
   /** @description 何週目か(0-origin)を返す */
-  export const weekNumberUTC = (date: IDate): 0 | 1 | 2 | 3 | 4 | 5 => {
+  export const weekNumberUTC = (date: DateUtils): 0 | 1 | 2 | 3 | 4 | 5 => {
     const date0Saturday = getUTCDate(date) - 1 + (6 - getLocaleDayOfWeek(date)); // 同じ週の土曜日
 
     return Math.floor(date0Saturday / 7) as 0 | 1 | 2 | 3 | 4 | 5;
@@ -428,7 +444,7 @@ export namespace IDate {
   export const getAllDatesOfMonth = (
     year: YearEnum,
     month: MonthEnum
-  ): readonly IDate[] =>
+  ): readonly DateUtils[] =>
     Arr.rangeUnwrapped(1, getLastDateNumberOfMonth(year, month) + 1).map(
       (date) => create(year, month, date as DateEnum)
     );
@@ -444,17 +460,26 @@ export namespace IDate {
 
   const pad2 = (str: number): string => str.toString().padStart(2, '0');
 
-  export const toLocaleYMD = (date: IDate, delimiter: string = '/'): string =>
+  export const toLocaleYMD = (
+    date: DateUtils,
+    delimiter: string = '/'
+  ): string =>
     [
       getLocaleYear(date),
       pad2(getLocaleMonth(date)),
       pad2(getLocaleDate(date)),
     ].join(delimiter);
 
-  export const toLocaleHM = (date: IDate, delimiter: string = ':'): string =>
+  export const toLocaleHM = (
+    date: DateUtils,
+    delimiter: string = ':'
+  ): string =>
     [pad2(getLocaleHours(date)), pad2(getLocaleMinutes(date))].join(delimiter);
 
-  export const toLocaleHMS = (date: IDate, delimiter: string = ':'): string =>
+  export const toLocaleHMS = (
+    date: DateUtils,
+    delimiter: string = ':'
+  ): string =>
     [
       pad2(getLocaleHours(date)),
       pad2(getLocaleMinutes(date)),
@@ -462,7 +487,7 @@ export namespace IDate {
     ].join(delimiter);
 
   export const toLocaleYMDHMS = (
-    date: IDate,
+    date: DateUtils,
     delimiterForYMD: string = '/',
     delimiterForHMS: string = ':'
   ): string =>
