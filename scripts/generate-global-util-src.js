@@ -67,9 +67,9 @@ const generateGlobalsDecl = (packageName, importsList, typeImportsList) =>
  */
 const generateProvidePluginDef = (packageName, importsList, varName) =>
   [
-    "import { IRecord, tp } from '@noshiro/ts-utils';",
+    "import { Obj, tp } from '@noshiro/ts-utils';",
     '',
-    `export const providePlugin${varName}Def = IRecord.fromEntries(`,
+    `export const providePlugin${varName}Def = Obj.fromEntries(`,
     '[',
     ...importsList.map((s) => `'${s}',`),
     `].map((key) => tp(key, ['${packageName}', key]))`,

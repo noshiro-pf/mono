@@ -1,20 +1,20 @@
 import type {
+  Arr as _Arr,
+  ArrayUtils as _ArrayUtils,
   assertNotType as _assertNotType,
   assertNotUndefined as _assertNotUndefined,
   assertType as _assertType,
   castWritable as _castWritable,
   createQueue as _createQueue,
   createTinyObservable as _createTinyObservable,
+  DateUtils as _DateUtils,
   Err as _Err,
   hasKey as _hasKey,
   hasKeyValue as _hasKeyValue,
-  IDate as _IDate,
   idfn as _idfn,
   ifThen as _ifThen,
-  IList as _IList,
   IMap as _IMap,
   IMapMapped as _IMapMapped,
-  IRecord as _IRecord,
   isBoolean as _isBoolean,
   ISet as _ISet,
   ISetMapped as _ISetMapped,
@@ -43,11 +43,13 @@ import type {
   None as _None,
   noop as _noop,
   Num as _Num,
+  Obj as _Obj,
   objectIs as _objectIs,
   Ok as _Ok,
   pipe as _pipe,
   Queue as _Queue,
   range as _range,
+  RecordUtils as _RecordUtils,
   Result as _Result,
   Some as _Some,
   Str as _Str,
@@ -60,7 +62,7 @@ import type {
 
 declare global {
   type Err<E> = _Err<E>;
-  type IDate = _IDate;
+  type DateUtils = _DateUtils;
   type IMap<K, V> = _IMap<K, V>;
   type IMapMapped<K, V, KM extends RecordKeyType> = _IMapMapped<K, V, KM>;
   type ISet<S> = _ISet<S>;
@@ -75,21 +77,21 @@ declare global {
   type TinyObservable<T> = _TinyObservable<T>;
   type TinyObservableSource<T> = _TinyObservableSource<T>;
 
+  const Arr: typeof _Arr;
+  const ArrayUtils: typeof _ArrayUtils;
   const assertNotType: typeof _assertNotType;
   const assertNotUndefined: typeof _assertNotUndefined;
   const assertType: typeof _assertType;
   const castWritable: typeof _castWritable;
   const createQueue: typeof _createQueue;
   const createTinyObservable: typeof _createTinyObservable;
+  const DateUtils: typeof _DateUtils;
   const hasKey: typeof _hasKey;
   const hasKeyValue: typeof _hasKeyValue;
-  const IDate: typeof _IDate;
   const idfn: typeof _idfn;
   const ifThen: typeof _ifThen;
-  const IList: typeof _IList;
   const IMap: typeof _IMap;
   const IMapMapped: typeof _IMapMapped;
-  const IRecord: typeof _IRecord;
   const isBoolean: typeof _isBoolean;
   const ISet: typeof _ISet;
   const ISetMapped: typeof _ISetMapped;
@@ -117,9 +119,11 @@ declare global {
   const MutableSet: typeof _MutableSet;
   const noop: typeof _noop;
   const Num: typeof _Num;
+  const Obj: typeof _Obj;
   const objectIs: typeof _objectIs;
   const pipe: typeof _pipe;
   const range: typeof _range;
+  const RecordUtils: typeof _RecordUtils;
   const Result: typeof _Result;
   const Str: typeof _Str;
   const toBoolean: typeof _toBoolean;

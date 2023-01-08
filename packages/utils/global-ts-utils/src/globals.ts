@@ -3,21 +3,21 @@
 /* eslint-disable functional/immutable-data */
 
 import {
+  Arr,
+  ArrayUtils,
   assertNotType,
   assertNotUndefined,
   assertType,
   castWritable,
   createQueue,
   createTinyObservable,
+  DateUtils,
   hasKey,
   hasKeyValue,
-  IDate,
   idfn,
   ifThen,
-  IList,
   IMap,
   IMapMapped,
-  IRecord,
   isBoolean,
   ISet,
   ISetMapped,
@@ -45,30 +45,32 @@ import {
   MutableSet,
   noop,
   Num,
+  Obj,
   objectIs,
   pipe,
   range,
+  RecordUtils,
   Result,
   Str,
   toBoolean,
   tp,
 } from '@noshiro/ts-utils';
 
+(global as any).Arr = Arr;
+(global as any).ArrayUtils = ArrayUtils;
 (global as any).assertNotType = assertNotType;
 (global as any).assertNotUndefined = assertNotUndefined;
 (global as any).assertType = assertType;
 (global as any).castWritable = castWritable;
 (global as any).createQueue = createQueue;
 (global as any).createTinyObservable = createTinyObservable;
+(global as any).DateUtils = DateUtils;
 (global as any).hasKey = hasKey;
 (global as any).hasKeyValue = hasKeyValue;
-(global as any).IDate = IDate;
 (global as any).idfn = idfn;
 (global as any).ifThen = ifThen;
-(global as any).IList = IList;
 (global as any).IMap = IMap;
 (global as any).IMapMapped = IMapMapped;
-(global as any).IRecord = IRecord;
 (global as any).isBoolean = isBoolean;
 (global as any).ISet = ISet;
 (global as any).ISetMapped = ISetMapped;
@@ -96,9 +98,11 @@ import {
 (global as any).MutableSet = MutableSet;
 (global as any).noop = noop;
 (global as any).Num = Num;
+(global as any).Obj = Obj;
 (global as any).objectIs = objectIs;
 (global as any).pipe = pipe;
 (global as any).range = range;
+(global as any).RecordUtils = RecordUtils;
 (global as any).Result = Result;
 (global as any).Str = Str;
 (global as any).toBoolean = toBoolean;

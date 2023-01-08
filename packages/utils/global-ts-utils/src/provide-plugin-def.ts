@@ -1,22 +1,22 @@
-import { IRecord, tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginTsUtilsDef = IRecord.fromEntries(
+export const providePluginTsUtilsDef = Obj.fromEntries(
   [
+    'Arr',
+    'ArrayUtils',
     'assertNotType',
     'assertNotUndefined',
     'assertType',
     'castWritable',
     'createQueue',
     'createTinyObservable',
+    'DateUtils',
     'hasKey',
     'hasKeyValue',
-    'IDate',
     'idfn',
     'ifThen',
-    'IList',
     'IMap',
     'IMapMapped',
-    'IRecord',
     'isBoolean',
     'ISet',
     'ISetMapped',
@@ -44,9 +44,11 @@ export const providePluginTsUtilsDef = IRecord.fromEntries(
     'MutableSet',
     'noop',
     'Num',
+    'Obj',
     'objectIs',
     'pipe',
     'range',
+    'RecordUtils',
     'Result',
     'Str',
     'toBoolean',
