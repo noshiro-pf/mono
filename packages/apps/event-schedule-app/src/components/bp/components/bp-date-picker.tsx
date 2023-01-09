@@ -4,16 +4,16 @@ import type { ComponentProps } from 'react';
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 
 const parseDate = (str: string): RawDateType =>
-  pipe(IDate.from(str)).chain(IDate.toDate).value;
+  pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
 const inputProps: HTMLInputProps & InputGroupProps2 = {
   style: { width: '90px' },
 };
 
-const tenYearsLater = pipe(IDate.today())
-  .chain(IDate.updateLocaleYear((y) => y + 99))
-  .chain(IDate.setLocaleMonth(12))
-  .chain(IDate.toDate).value;
+const tenYearsLater = pipe(DateUtils.today())
+  .chain(DateUtils.updateLocaleYear((y) => y + 99))
+  .chain(DateUtils.setLocaleMonth(12))
+  .chain(DateUtils.toDate).value;
 
 type DateInputPropsOriginal = ComponentProps<typeof DateInput2>;
 
@@ -49,9 +49,9 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         if (isUserChange !== true) return;
         const dt = parseDate(dateStr);
         onYmdChange({
-          year: IDate.getLocaleYear(dt),
-          month: IDate.getLocaleMonth(dt),
-          date: IDate.getLocaleDate(dt),
+          year: DateUtils.getLocaleYear(dt),
+          month: DateUtils.getLocaleMonth(dt),
+          date: DateUtils.getLocaleDate(dt),
         });
       },
       [onYmdChange]
@@ -61,7 +61,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
       () =>
         ymd === undefined
           ? undefined
-          : IDate.from(
+          : DateUtils.from(
               `${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`
             ).toLocaleString(),
       [ymd]

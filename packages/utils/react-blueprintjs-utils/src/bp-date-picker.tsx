@@ -2,7 +2,7 @@ import type { HTMLInputProps, InputGroupProps2 } from '@blueprintjs/core';
 import type { DatePickerShortcut } from '@blueprintjs/datetime';
 import { DateInput } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import { IDate, pipe } from '@noshiro/ts-utils';
+import { DateUtils, pipe } from '@noshiro/ts-utils';
 import type { ComponentProps } from 'react';
 import { useCallback, useMemo } from 'react';
 import type { YearMonthDate } from './types';
@@ -10,16 +10,16 @@ import type { YearMonthDate } from './types';
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 
 const parseDate = (str: string): RawDateType =>
-  pipe(IDate.from(str)).chain(IDate.toDate).value;
+  pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
 const inputProps: HTMLInputProps & InputGroupProps2 = {
   style: { width: '90px' },
 };
 
-const tenYearsLater = pipe(IDate.today())
-  .chain(IDate.updateLocaleYear((a) => a + 99))
-  .chain(IDate.setLocaleMonth(12))
-  .chain(IDate.toDate).value;
+const tenYearsLater = pipe(DateUtils.today())
+  .chain(DateUtils.updateLocaleYear((a) => a + 99))
+  .chain(DateUtils.setLocaleMonth(12))
+  .chain(DateUtils.toDate).value;
 
 // eslint-disable-next-line deprecation/deprecation
 type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
@@ -55,9 +55,9 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         }
         if (!isUserChange) return;
         onYmdChange({
-          year: IDate.getLocaleYear(dt),
-          month: IDate.getLocaleMonth(dt),
-          date: IDate.getLocaleDate(dt),
+          year: DateUtils.getLocaleYear(dt),
+          month: DateUtils.getLocaleMonth(dt),
+          date: DateUtils.getLocaleDate(dt),
         });
       },
       [onYmdChange]
@@ -68,8 +68,8 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         ymd === undefined
           ? undefined
           : pipe(
-              IDate.from(`${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`)
-            ).chain(IDate.toDate).value,
+              DateUtils.from(`${ymd.year}/${ymd.month}/${ymd.date} 12:34:56`)
+            ).chain(DateUtils.toDate).value,
       [ymd]
     );
 

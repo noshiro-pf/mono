@@ -6,7 +6,7 @@ import type {
   DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
 import { compareDatetimeRange } from '@noshiro/event-schedule-app-shared';
-import { IList, IMapMapped, ISetMapped, tp } from '@noshiro/ts-utils';
+import { Arr, IMapMapped, ISetMapped, tp } from '@noshiro/ts-utils';
 import {
   datetimeRange2str,
   datetimeRangeFromMapKey,
@@ -63,7 +63,7 @@ export const answerDiffAsString = (
       datetimeRangeFromMapKey
     );
 
-    const allDatetimeRangeSorted = IList.sort(
+    const allDatetimeRangeSorted = Arr.sort(
       allDatetimeRangeSet.toArray(),
       compareDatetimeRange
     );

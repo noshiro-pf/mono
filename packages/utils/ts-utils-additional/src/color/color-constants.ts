@@ -1,4 +1,4 @@
-import { IList } from '@noshiro/ts-utils';
+import { Arr } from '@noshiro/ts-utils';
 import type { Hsl, Hue } from './types';
 
 export const whiteHsl: Hsl = [0, 0, 100];
@@ -21,4 +21,4 @@ export const [
   purpleHue,
   magentaHue, // fuchsia
   roseHue,
-]: readonly Hue[] = IList.seqUnwrapped(12).map((i) => (i * 30) as Hue);
+]: readonly Hue[] = Arr.seqUnwrapped(12).map((i) => (i * 30) as Hue);

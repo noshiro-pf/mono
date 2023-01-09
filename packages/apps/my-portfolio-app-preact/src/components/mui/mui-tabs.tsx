@@ -33,7 +33,7 @@ export const MuiTabs = memoNamed<Props>(
     );
 
     const tabWidthAccumulated = useMemo(
-      () => IList.scan(tabWidthListWithDefault, (acc, curr) => acc + curr, 0),
+      () => Arr.scan(tabWidthListWithDefault, (acc, curr) => acc + curr, 0),
       [tabWidthListWithDefault]
     );
 
@@ -55,7 +55,7 @@ export const MuiTabs = memoNamed<Props>(
             tabIndexChange(index);
           },
           onResize: (width: number) => {
-            updateTabWidthList((prev) => IList.set(prev, index, width));
+            updateTabWidthList((prev) => Arr.set(prev, index, width));
           },
         })),
       [labels, tabIndexChange, updateTabWidthList]

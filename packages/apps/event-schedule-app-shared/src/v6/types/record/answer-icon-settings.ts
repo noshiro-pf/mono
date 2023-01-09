@@ -1,4 +1,4 @@
-import { IRecord, isRecord } from '@noshiro/ts-utils';
+import { isRecord, Obj } from '@noshiro/ts-utils';
 import type { AnswerIconId } from '../enum';
 import type { AnswerIconSetting } from './base';
 import { fillAnswerIconSetting, isAnswerIconSetting } from './base';
@@ -16,9 +16,9 @@ export const answerIconSettingsDefaultValue: AnswerIconSettings = {
 
 export const isAnswerIconSettings = (a: unknown): a is AnswerIconSettings =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'good', isAnswerIconSetting) &&
-  IRecord.hasKeyValue(a, 'fair', isAnswerIconSetting) &&
-  IRecord.hasKeyValue(a, 'poor', isAnswerIconSetting);
+  Obj.hasKeyValue(a, 'good', isAnswerIconSetting) &&
+  Obj.hasKeyValue(a, 'fair', isAnswerIconSetting) &&
+  Obj.hasKeyValue(a, 'poor', isAnswerIconSetting);
 
 const d = answerIconSettingsDefaultValue;
 
@@ -26,13 +26,7 @@ export const fillAnswerIconSettings = (a?: unknown): AnswerIconSettings =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        good: IRecord.hasKey(a, 'good')
-          ? fillAnswerIconSetting(a.good)
-          : d.good,
-        fair: IRecord.hasKey(a, 'fair')
-          ? fillAnswerIconSetting(a.fair)
-          : d.fair,
-        poor: IRecord.hasKey(a, 'poor')
-          ? fillAnswerIconSetting(a.poor)
-          : d.poor,
+        good: Obj.hasKey(a, 'good') ? fillAnswerIconSetting(a.good) : d.good,
+        fair: Obj.hasKey(a, 'fair') ? fillAnswerIconSetting(a.fair) : d.fair,
+        poor: Obj.hasKey(a, 'poor') ? fillAnswerIconSetting(a.poor) : d.poor,
       };

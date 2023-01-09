@@ -1,4 +1,4 @@
-import { IRecord, isRecord, Result } from '@noshiro/ts-utils';
+import { isRecord, Obj, Result } from '@noshiro/ts-utils';
 import type { Type, TypeOf } from '../type';
 import {
   createAssertFunction,
@@ -29,7 +29,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
       ]);
     }
 
-    for (const [k, v] of IRecord.entries(a)) {
+    for (const [k, v] of Obj.entries(a)) {
       {
         const res = keyType.validate(k);
 
@@ -61,10 +61,8 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? (IRecord.fromEntries(
-          IRecord.entries(a).filter(
-            ([k, v]) => keyType.is(k) && valueType.is(v)
-          )
+      ? (Obj.fromEntries(
+          Obj.entries(a).filter(([k, v]) => keyType.is(k) && valueType.is(v))
         ) as T)
       : defaultValue;
 

@@ -1,7 +1,7 @@
 # v7.1
 
 -   io-ts を使うように書き換え
--   テスト追加に伴い `IDate.today()` や `IDate.now()` を使用しないように変更。
+-   テスト追加に伴い `DateUtils.today()` や `DateUtils.now()` を使用しないように変更。
 
 # v7
 

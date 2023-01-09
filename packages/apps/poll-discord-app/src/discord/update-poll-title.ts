@@ -57,7 +57,7 @@ export const updatePollTitle = async (
 
   const userIdToDisplayName = userIdToDisplayNameResult.value;
 
-  const newPoll = IRecord.set(poll, 'title', title);
+  const newPoll = Obj.set(poll, 'title', title);
 
   const [updateSummaryMessageResult, updateTitleMessageResult] =
     await Promise.all([

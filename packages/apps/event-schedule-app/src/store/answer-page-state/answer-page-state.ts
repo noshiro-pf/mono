@@ -64,7 +64,7 @@ export namespace AnswerPageStore {
       const user = mut_subscribedValues.fireAuthUser;
 
       updateAnswerBeingEdited((ans) =>
-        IRecord.set(ans, 'user', IRecord.set(ans.user, 'id', user?.uid ?? null))
+        Obj.set(ans, 'user', Obj.set(ans.user, 'id', user?.uid ?? null))
       );
     }
   };
@@ -95,7 +95,7 @@ export namespace AnswerPageStore {
     selectedDates$
       .chain(
         map((selectedDates) =>
-          IList.isNonEmpty(selectedDates) ? selectedDates[0] : undefined
+          Arr.isNonEmpty(selectedDates) ? selectedDates[0] : undefined
         )
       )
       .chain(filter(isNotUndefined));
@@ -104,7 +104,7 @@ export namespace AnswerPageStore {
     .chain(filter(isNotUndefined))
     .chain(
       map((e) =>
-        IRecord.set(
+        Obj.set(
           answerDefaultValue,
           'selection',
           e.datetimeRangeList.map(
@@ -162,7 +162,7 @@ export namespace AnswerPageStore {
   ]).chain(
     mapI(([selection, datetimeRangeList]) => {
       const entries: DeepReadonly<[DatetimeRange, AnswerSelectionValue][]> =
-        IList.concat(
+        Arr.concat(
           datetimeRangeList.map((d) => [
             d,
             { iconId: 'none', point: 0, comment: '' } as const,
@@ -192,25 +192,25 @@ export namespace AnswerPageStore {
 
   export const onUserNameChange = (userName: string): void => {
     updateAnswerBeingEdited((answerBeingEdited) =>
-      IRecord.setIn(answerBeingEdited, ['user', 'name'], userName)
+      Obj.setIn(answerBeingEdited, ['user', 'name'], userName)
     );
   };
 
   export const onCommentChange = (comment: string): void => {
     updateAnswerBeingEdited((answerBeingEdited) =>
-      IRecord.set(answerBeingEdited, 'comment', comment)
+      Obj.set(answerBeingEdited, 'comment', comment)
     );
   };
 
   export const onWeightChange = (weight: Weight): void => {
     updateAnswerBeingEdited((answerBeingEdited) =>
-      IRecord.set(answerBeingEdited, 'weight', weight)
+      Obj.set(answerBeingEdited, 'weight', weight)
     );
   };
 
   export const toggleRequiredSection = (): void => {
     updateAnswerBeingEdited((answerBeingEdited) =>
-      IRecord.update(answerBeingEdited, 'isRequiredParticipants', (b) => !b)
+      Obj.update(answerBeingEdited, 'isRequiredParticipants', (b) => !b)
     );
   };
 
@@ -237,7 +237,7 @@ export namespace AnswerPageStore {
     setAnswerBeingEditedSectionState('creating');
     // automatically set username with user.displayName
     updateAnswerBeingEdited((prev) =>
-      IRecord.setIn(prev, ['user', 'name'], user?.displayName ?? '')
+      Obj.setIn(prev, ['user', 'name'], user?.displayName ?? '')
     );
   };
 
@@ -256,7 +256,7 @@ export namespace AnswerPageStore {
         await api.answers
           .add(
             eventId,
-            IRecord.set(answerBeingEdited, 'createdAt', IDate.now())
+            Obj.set(answerBeingEdited, 'createdAt', DateUtils.now())
           )
           .then((res) => {
             if (Result.isErr(res)) {
@@ -318,9 +318,9 @@ export namespace AnswerPageStore {
       .add(
         eventId,
         pipe(answerDefaultValue)
-          .chain((a) => IRecord.set(a, 'createdAt', IDate.now()))
+          .chain((a) => Obj.set(a, 'createdAt', DateUtils.now()))
           .chain((a) =>
-            IRecord.set(a, 'user', {
+            Obj.set(a, 'user', {
               id: fireAuthUser.uid,
               name: fireAuthUser.displayName ?? '',
             })
@@ -387,7 +387,7 @@ export namespace AnswerPageStore {
     );
 
     updateAnswerBeingEdited((answerBeingEdited) =>
-      IRecord.set(
+      Obj.set(
         answerBeingEdited,
         'selection',
         nextAnswerSelectionMap
@@ -399,10 +399,10 @@ export namespace AnswerPageStore {
 
   const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
     updateAnswerBeingEdited((ans) =>
-      IRecord.set(
+      Obj.set(
         ans,
         'user',
-        IRecord.update(ans.user, 'id', (uid) =>
+        Obj.update(ans.user, 'id', (uid) =>
           uid === null ? user?.uid ?? null : null
         )
       )

@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { IDate } from '@noshiro/ts-utils';
+import { DateUtils } from '@noshiro/ts-utils';
 import { datetimeSpecificationTypeDef } from '../enum';
 import { answerIconSettingsTypeDef } from './answer-icon-settings';
 import { notificationSettingsTypeDef, userTypeDef, ymdhmTypeDef } from './base';
@@ -24,7 +24,7 @@ export const eventScheduleTypeDef = t.record({
     types: [t.stringLiteral('none'), notificationSettingsTypeDef],
     defaultType: t.stringLiteral('none'),
   }),
-  timezoneOffsetMinutes: t.number(IDate.today().getTimezoneOffset()),
+  timezoneOffsetMinutes: t.number(DateUtils.today().getTimezoneOffset()),
   author: userTypeDef,
   archivedBy: t.array(userTypeDef),
 });

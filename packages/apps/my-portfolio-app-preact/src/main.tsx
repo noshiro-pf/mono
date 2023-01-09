@@ -22,7 +22,7 @@ const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
 };
 
 const tabIndexOnChange = (tabIdx: number): void => {
-  if (IList.indexIsInRange(routeList, tabIdx)) {
+  if (Arr.indexIsInRange(routeList, tabIdx)) {
     const route = routeList[tabIdx];
     if (route !== undefined) {
       push(route);
@@ -48,7 +48,7 @@ export const Main = memoNamed('Main', () => {
   const pathname = usePathname();
 
   const pathNameLast = useMemo(
-    () => IList.last(pathname.split('/').filter((s) => s !== '')) ?? '',
+    () => Arr.last(pathname.split('/').filter((s) => s !== '')) ?? '',
     [pathname]
   );
 

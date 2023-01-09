@@ -1,4 +1,4 @@
-import { IDate, IRecord, isRecord, Num } from '@noshiro/ts-utils';
+import { DateUtils, isRecord, Num, Obj } from '@noshiro/ts-utils';
 import {
   hoursMinutesDefaultValue,
   isHoursEnum,
@@ -29,11 +29,11 @@ export const ymdhmDefaultValue: Ymdhm = {
 
 export const isYmdhm = (a: unknown): a is Ymdhm =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'year', isYearEnum) &&
-  IRecord.hasKeyValue(a, 'month', isMonthEnum) &&
-  IRecord.hasKeyValue(a, 'date', isDateEnum) &&
-  IRecord.hasKeyValue(a, 'hours', isHoursEnum) &&
-  IRecord.hasKeyValue(a, 'minutes', isMinutesEnum);
+  Obj.hasKeyValue(a, 'year', isYearEnum) &&
+  Obj.hasKeyValue(a, 'month', isMonthEnum) &&
+  Obj.hasKeyValue(a, 'date', isDateEnum) &&
+  Obj.hasKeyValue(a, 'hours', isHoursEnum) &&
+  Obj.hasKeyValue(a, 'minutes', isMinutesEnum);
 
 const d = ymdhmDefaultValue;
 
@@ -41,25 +41,31 @@ export const fillYmdhm = (a?: unknown): Ymdhm =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        year: IRecord.hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
-        month: IRecord.hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
-        date: IRecord.hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
-        hours: IRecord.hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
-        minutes: IRecord.hasKeyValue(a, 'minutes', isMinutesEnum)
+        year: Obj.hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
+        month: Obj.hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
+        date: Obj.hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
+        hours: Obj.hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
+        minutes: Obj.hasKeyValue(a, 'minutes', isMinutesEnum)
           ? a.minutes
           : d.minutes,
       };
 
 export const ymdhmFromDate = (date: RawDateType): Ymdhm => ({
-  year: IDate.getLocaleYear(date),
-  month: IDate.getLocaleMonth(date),
-  date: IDate.getLocaleDate(date),
-  hours: IDate.getLocaleHours(date),
-  minutes: IDate.getLocaleMinutes(date),
+  year: DateUtils.getLocaleYear(date),
+  month: DateUtils.getLocaleMonth(date),
+  date: DateUtils.getLocaleDate(date),
+  hours: DateUtils.getLocaleHours(date),
+  minutes: DateUtils.getLocaleMinutes(date),
 });
 
-export const ymdhm2Date = (ymdhm: Ymdhm): IDate =>
-  IDate.create(ymdhm.year, ymdhm.month, ymdhm.date, ymdhm.hours, ymdhm.minutes);
+export const ymdhm2Date = (ymdhm: Ymdhm): DateUtils =>
+  DateUtils.create(
+    ymdhm.year,
+    ymdhm.month,
+    ymdhm.date,
+    ymdhm.hours,
+    ymdhm.minutes
+  );
 
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
   if (a.year !== b.year) return Num.sign(a.year - b.year);

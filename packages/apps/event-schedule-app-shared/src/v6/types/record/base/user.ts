@@ -1,4 +1,4 @@
-import { IRecord, isRecord } from '@noshiro/ts-utils';
+import { isRecord, Obj } from '@noshiro/ts-utils';
 import type { UserId, UserName } from '../../named-primitive-types';
 import { isUserId, isUserName } from '../../named-primitive-types';
 
@@ -14,8 +14,8 @@ export const userDefaultValue: User = {
 
 export const isUser = (a: unknown): a is User =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'id', isUserId) &&
-  IRecord.hasKeyValue(a, 'name', isUserName);
+  Obj.hasKeyValue(a, 'id', isUserId) &&
+  Obj.hasKeyValue(a, 'name', isUserName);
 
 const d = userDefaultValue;
 
@@ -23,6 +23,6 @@ export const fillUser = (a?: unknown): User =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        id: IRecord.hasKeyValue(a, 'id', isUserId) ? a.id : d.id,
-        name: IRecord.hasKeyValue(a, 'name', isUserName) ? a.name : d.name,
+        id: Obj.hasKeyValue(a, 'id', isUserId) ? a.id : d.id,
+        name: Obj.hasKeyValue(a, 'name', isUserName) ? a.name : d.name,
       };

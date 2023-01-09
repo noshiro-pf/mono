@@ -345,7 +345,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 </tbody>
               </table>
               <NoteForPointOfFair>
-                {IList.map(
+                {Arr.map(
                   dc.noteForPointOfFair(eventSchedule.answerIcons.fair.point),
                   (s, i) => (
                     <Description key={i} text={s} />

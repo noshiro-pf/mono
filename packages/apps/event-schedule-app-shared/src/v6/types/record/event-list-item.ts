@@ -1,4 +1,4 @@
-import { IList, IRecord, isRecord, isString } from '@noshiro/ts-utils';
+import { Arr, isRecord, isString, Obj } from '@noshiro/ts-utils';
 import type { Answer } from './answer';
 import { fillAnswer, isAnswer } from './answer';
 import type { EventSchedule } from './event-schedule';
@@ -39,23 +39,23 @@ const isEventScheduleMetadata = (
   a: unknown
 ): a is EventListItem['eventScheduleMetadata'] =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'id', isString) &&
-  IRecord.hasKeyValue(a, 'createdAt', isString) &&
-  IRecord.hasKeyValue(a, 'updatedAt', isString);
+  Obj.hasKeyValue(a, 'id', isString) &&
+  Obj.hasKeyValue(a, 'createdAt', isString) &&
+  Obj.hasKeyValue(a, 'updatedAt', isString);
 
 const isAnswersMetadata = (a: unknown): a is EventListItem['answersMetadata'] =>
-  isRecord(a) && IRecord.hasKeyValue(a, 'lastUpdate', isString);
+  isRecord(a) && Obj.hasKeyValue(a, 'lastUpdate', isString);
 
 export const isEventListItem = (a: unknown): a is EventListItem =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'eventSchedule', isEventSchedule) &&
-  IRecord.hasKeyValue(a, 'eventScheduleMetadata', isEventScheduleMetadata) &&
-  IRecord.hasKeyValue(
+  Obj.hasKeyValue(a, 'eventSchedule', isEventSchedule) &&
+  Obj.hasKeyValue(a, 'eventScheduleMetadata', isEventScheduleMetadata) &&
+  Obj.hasKeyValue(
     a,
     'answers',
-    (e: unknown): e is Answer[] => IList.isArray(e) && e.every(isAnswer)
+    (e: unknown): e is Answer[] => Arr.isArray(e) && e.every(isAnswer)
   ) &&
-  IRecord.hasKeyValue(a, 'answersMetadata', isAnswersMetadata);
+  Obj.hasKeyValue(a, 'answersMetadata', isAnswersMetadata);
 
 const d = eventListItemDefaultValue;
 
@@ -65,15 +65,15 @@ const fillEventScheduleMetadata = (
   !isRecord(a)
     ? d.eventScheduleMetadata
     : {
-        id: IRecord.hasKeyValue(a, 'id', isString)
+        id: Obj.hasKeyValue(a, 'id', isString)
           ? a.id
           : d.eventScheduleMetadata.id,
 
-        createdAt: IRecord.hasKeyValue(a, 'createdAt', isString)
+        createdAt: Obj.hasKeyValue(a, 'createdAt', isString)
           ? a.createdAt
           : d.eventScheduleMetadata.createdAt,
 
-        updatedAt: IRecord.hasKeyValue(a, 'updatedAt', isString)
+        updatedAt: Obj.hasKeyValue(a, 'updatedAt', isString)
           ? a.updatedAt
           : d.eventScheduleMetadata.updatedAt,
       };
@@ -82,7 +82,7 @@ const fillAnswersMetadata = (a: unknown): EventListItem['answersMetadata'] =>
   !isRecord(a)
     ? d.answersMetadata
     : {
-        lastUpdate: IRecord.hasKeyValue(a, 'lastUpdate', isString)
+        lastUpdate: Obj.hasKeyValue(a, 'lastUpdate', isString)
           ? a.lastUpdate
           : d.answersMetadata.lastUpdate,
       };
@@ -91,21 +91,21 @@ export const fillEventListItem = (a?: unknown): EventListItem =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        eventSchedule: IRecord.hasKey(a, 'eventSchedule')
+        eventSchedule: Obj.hasKey(a, 'eventSchedule')
           ? fillEventSchedule(a.eventSchedule)
           : d.eventSchedule,
 
-        eventScheduleMetadata: IRecord.hasKey(a, 'eventScheduleMetadata')
+        eventScheduleMetadata: Obj.hasKey(a, 'eventScheduleMetadata')
           ? fillEventScheduleMetadata(a.eventScheduleMetadata)
           : d.eventScheduleMetadata,
 
-        answers: IRecord.hasKey(a, 'answers')
-          ? IList.isArray(a.answers)
+        answers: Obj.hasKey(a, 'answers')
+          ? Arr.isArray(a.answers)
             ? a.answers.map(fillAnswer)
             : d.answers
           : d.answers,
 
-        answersMetadata: IRecord.hasKey(a, 'answersMetadata')
+        answersMetadata: Obj.hasKey(a, 'answersMetadata')
           ? fillAnswersMetadata(a.answersMetadata)
           : d.answersMetadata,
       };

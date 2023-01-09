@@ -109,7 +109,7 @@ export namespace AnswerTableStore {
 
   const datetimeRangeListReversed$ = eventSchedule$.chain(
     mapI((eventSchedule) =>
-      mapOptional(eventSchedule?.datetimeRangeList, IList.reverse)
+      mapOptional(eventSchedule?.datetimeRangeList, Arr.reverse)
     )
   );
 
@@ -120,17 +120,14 @@ export namespace AnswerTableStore {
     mapI(([eventSchedule, scores]) =>
       eventSchedule === undefined || scores === undefined
         ? undefined
-        : IList.sortBy(
-            eventSchedule.datetimeRangeList,
-            (d) => scores.get(d) ?? 0
-          )
+        : Arr.sortBy(eventSchedule.datetimeRangeList, (d) => scores.get(d) ?? 0)
     )
   );
 
   const datetimeRangeListSortedByScoresReversed$ =
     datetimeRangeListSortedByScores$.chain(
       mapI((datetimeRangeListSortedByScores) =>
-        mapOptional(datetimeRangeListSortedByScores, IList.reverse)
+        mapOptional(datetimeRangeListSortedByScores, Arr.reverse)
       )
     );
 
@@ -204,7 +201,7 @@ export namespace AnswerTableStore {
                 const answerTableRow: readonly AnswerTableCell[] | undefined =
                   pipe(answerTable.get(datetimeRange)).chain((list) =>
                     mapOptional(list, (row) =>
-                      IList.zip(
+                      Arr.zip(
                         row,
                         answers.map((a) => a.weight)
                       ).map(([[iconId, point, comment], weight]) => ({

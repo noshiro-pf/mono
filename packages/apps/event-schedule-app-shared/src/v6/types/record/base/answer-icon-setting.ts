@@ -1,4 +1,4 @@
-import { IRecord, isRecord, isString } from '@noshiro/ts-utils';
+import { isRecord, isString, Obj } from '@noshiro/ts-utils';
 import type { AnswerIconPoint } from '../../enum';
 import { isAnswerIconPoint } from '../../enum';
 
@@ -14,8 +14,8 @@ export const answerIconSettingDefaultValue: AnswerIconSetting = {
 
 export const isAnswerIconSetting = (a: unknown): a is AnswerIconSetting =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'description', isString) &&
-  IRecord.hasKeyValue(a, 'point', isAnswerIconPoint);
+  Obj.hasKeyValue(a, 'description', isString) &&
+  Obj.hasKeyValue(a, 'point', isAnswerIconPoint);
 
 const d = answerIconSettingDefaultValue;
 
@@ -23,10 +23,10 @@ export const fillAnswerIconSetting = (a?: unknown): AnswerIconSetting =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        description: IRecord.hasKeyValue(a, 'description', isString)
+        description: Obj.hasKeyValue(a, 'description', isString)
           ? a.description
           : d.description,
-        point: IRecord.hasKeyValue(a, 'point', isAnswerIconPoint)
+        point: Obj.hasKeyValue(a, 'point', isAnswerIconPoint)
           ? a.point
           : d.point,
       };

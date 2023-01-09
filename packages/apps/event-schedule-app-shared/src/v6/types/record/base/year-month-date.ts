@@ -1,9 +1,9 @@
 import {
-  IDate,
-  IRecord,
+  DateUtils,
   isNumber,
   isRecord,
   Num,
+  Obj,
   pipe,
 } from '@noshiro/ts-utils';
 
@@ -14,9 +14,9 @@ export type YearMonthDate = Readonly<{
 }>;
 
 export const yearMonthDateDefaultValue: YearMonthDate = {
-  year: pipe(IDate.today()).chain(IDate.getLocaleYear).value,
-  month: pipe(IDate.today()).chain(IDate.getLocaleMonth).value,
-  date: pipe(IDate.today()).chain(IDate.getLocaleDate).value,
+  year: pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value,
+  month: pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value,
+  date: pipe(DateUtils.today()).chain(DateUtils.getLocaleDate).value,
 } as const;
 
 export const isYearEnum = (a: unknown): a is YearEnum =>
@@ -30,9 +30,9 @@ export const isDateEnum = (a: unknown): a is DateEnum =>
 
 export const isYearMonthDate = (a: unknown): a is YearMonthDate =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'year', isYearEnum) &&
-  IRecord.hasKeyValue(a, 'month', isMonthEnum) &&
-  IRecord.hasKeyValue(a, 'date', isDateEnum);
+  Obj.hasKeyValue(a, 'year', isYearEnum) &&
+  Obj.hasKeyValue(a, 'month', isMonthEnum) &&
+  Obj.hasKeyValue(a, 'date', isDateEnum);
 
 const d = yearMonthDateDefaultValue;
 
@@ -40,15 +40,15 @@ export const fillYearMonthDate = (a?: unknown): YearMonthDate =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        year: IRecord.hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
-        month: IRecord.hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
-        date: IRecord.hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
+        year: Obj.hasKeyValue(a, 'year', isYearEnum) ? a.year : d.year,
+        month: Obj.hasKeyValue(a, 'month', isMonthEnum) ? a.month : d.month,
+        date: Obj.hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
       };
 
-export const ymdFromDate = (date: IDate): YearMonthDate => ({
-  year: IDate.getLocaleYear(date),
-  month: IDate.getLocaleMonth(date),
-  date: IDate.getLocaleDate(date),
+export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
+  year: DateUtils.getLocaleYear(date),
+  month: DateUtils.getLocaleMonth(date),
+  date: DateUtils.getLocaleDate(date),
 });
 
 export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {

@@ -4,8 +4,8 @@ export const assertIsCredentialError: (
   if (
     !(
       isRecord(e) &&
-      IRecord.hasKeyValue(e, 'code', isString) &&
-      IRecord.hasKeyValue(e, 'message', isString)
+      Obj.hasKeyValue(e, 'code', isString) &&
+      Obj.hasKeyValue(e, 'message', isString)
     )
   ) {
     throw new Error(`object is not credential error type: ${Str.from(e)}`);

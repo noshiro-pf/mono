@@ -4,14 +4,7 @@ import {
   fillEventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import {
-  IRecord,
-  isRecord,
-  isString,
-  Json,
-  Result,
-  Str,
-} from '@noshiro/ts-utils';
+import { isRecord, isString, Json, Obj, Result, Str } from '@noshiro/ts-utils';
 import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {
@@ -50,11 +43,11 @@ const isGmailConfig = (
   };
 }> =>
   isRecord(config) &&
-  IRecord.hasKey(config, 'gmail') &&
+  Obj.hasKey(config, 'gmail') &&
   isRecord(config.gmail) &&
-  IRecord.hasKeyValue(config.gmail, 'email', isString) &&
-  IRecord.hasKeyValue(config.gmail, 'password', isString) &&
-  IRecord.hasKeyValue(config.gmail, 'app-password', isString);
+  Obj.hasKeyValue(config.gmail, 'email', isString) &&
+  Obj.hasKeyValue(config.gmail, 'password', isString) &&
+  Obj.hasKeyValue(config.gmail, 'app-password', isString);
 
 export const fillGmailConfig = (
   config: ReadonlyJSONValue

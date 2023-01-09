@@ -135,8 +135,8 @@ export const useMultipleDatePickerState = (
         ? undefined
         : (action: SelectedDatesReducerAction) => {
             onSelectedDatesChange(
-              IList.sort(
-                IList.from(
+              Arr.sort(
+                Arr.from(
                   selectedDatesReducer(selectedDatesSet, action).values()
                 ),
                 compareYmd

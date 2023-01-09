@@ -5,6 +5,7 @@
 /// <reference path="../../stdlib/dist/lib.esnext.d.ts" />
 /// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />
 
+export * from './array';
 export * from './assert-type';
 export * from './collections';
 export * from './date';
@@ -14,5 +15,6 @@ export * from './iterator';
 export * from './json';
 export * from './num';
 export * from './others';
+export * from './record';
 export * from './str';
 export * from './tiny-observable';

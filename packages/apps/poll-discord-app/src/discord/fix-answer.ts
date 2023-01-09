@@ -102,7 +102,7 @@ export const fixAnswerAndUpdateMessage = async (
       ]
     ]
   */
-  const newPollFilled: Poll = IRecord.update(poll, 'answers', (answers) =>
+  const newPollFilled: Poll = Obj.update(poll, 'answers', (answers) =>
     answers.withMutations(
       reactionsForThisPoll.map(([dateId, reactions]) => ({
         type: 'set',

@@ -1,4 +1,4 @@
-import { IDate } from '@noshiro/ts-utils';
+import { DateUtils } from '@noshiro/ts-utils';
 
 export class Stopwatch {
   #startTime = 0;
@@ -11,7 +11,7 @@ export class Stopwatch {
   }
 
   start(log = false): void {
-    this.#startTime = IDate.now();
+    this.#startTime = DateUtils.now();
     this.#time = 0;
     if (log) {
       console.log(`${this.#name} started.`);
@@ -19,7 +19,7 @@ export class Stopwatch {
   }
 
   stop(log = false): void {
-    this.#endTime = IDate.now();
+    this.#endTime = DateUtils.now();
     this.#time = this.#endTime - this.#startTime;
     if (log) {
       console.log(`${this.#name} stopped.`);

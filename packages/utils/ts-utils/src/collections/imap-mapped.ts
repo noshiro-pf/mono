@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { pipe } from '../functional';
 import { objectIs, tp } from '../others';
-import { IList } from './list';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
@@ -91,7 +90,10 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     fromKey: (k: KM) => K
   ) {
     // eslint-disable-next-line no-restricted-globals
-    this.#map = new Map(IList.fromMapped(iterable, ([k, v]) => [toKey(k), v]));
+    this.#map = new Map(
+      // eslint-disable-next-line no-restricted-globals
+      Array.from(iterable, ([k, v]) => [toKey(k), v])
+    );
     this.#toKey = toKey;
     this.#fromKey = fromKey;
   }
@@ -133,7 +135,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this.#toKey(key);
 
     return IMapMapped.new(
-      IList.from(this.#map)
+      // eslint-disable-next-line no-restricted-globals
+      Array.from(this.#map)
         .filter(([km]) => !objectIs(km, keyMapped))
         .map(([km, v]) => tp(this.#fromKey(km), v)),
       this.#toKey,
@@ -155,7 +158,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       );
     } else {
       return IMapMapped.new(
-        IList.fromMapped(this.#map, ([km, v]) =>
+        // eslint-disable-next-line no-restricted-globals
+        Array.from(this.#map, ([km, v]) =>
           tp(this.#fromKey(km), objectIs(km, keyMapped) ? value : v)
         ),
         this.#toKey,
@@ -171,7 +175,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     const keyMapped = this.#toKey(key);
 
     return IMapMapped.new(
-      IList.fromMapped(
+      // eslint-disable-next-line no-restricted-globals
+      Array.from(
         this.#map.entries(),
         (keyValue) =>
           pipe(keyValue)
@@ -222,7 +227,8 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     }
 
     return IMapMapped.new<K, V, KM>(
-      IList.fromMapped(mut_result, ([k, v]) => [this.#fromKey(k), v]),
+      // eslint-disable-next-line no-restricted-globals
+      Array.from(mut_result, ([k, v]) => [this.#fromKey(k), v]),
       this.#toKey,
       this.#fromKey
     );
@@ -285,19 +291,23 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   toKeysArray(): readonly K[] {
-    return IList.from(this.keys());
+    // eslint-disable-next-line no-restricted-globals
+    return Array.from(this.keys());
   }
 
   toValuesArray(): readonly V[] {
-    return IList.from(this.values());
+    // eslint-disable-next-line no-restricted-globals
+    return Array.from(this.values());
   }
 
   toEntriesArray(): readonly (readonly [K, V])[] {
-    return IList.from(this.entries());
+    // eslint-disable-next-line no-restricted-globals
+    return Array.from(this.entries());
   }
 
   toArray(): readonly (readonly [K, V])[] {
-    return IList.from(this.entries());
+    // eslint-disable-next-line no-restricted-globals
+    return Array.from(this.entries());
   }
 
   toRawMap(): ReadonlyMap<KM, V> {

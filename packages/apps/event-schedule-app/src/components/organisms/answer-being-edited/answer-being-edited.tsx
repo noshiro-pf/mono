@@ -256,7 +256,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
               onWeightChange={AnswerPageStore.onWeightChange}
             />
           </WeightSettingWrapper>
-          {IList.map(dc.weight.description, (d, i) => (
+          {Arr.map(dc.weight.description, (d, i) => (
             <Description key={i} text={d} />
           ))}
         </Paragraph>

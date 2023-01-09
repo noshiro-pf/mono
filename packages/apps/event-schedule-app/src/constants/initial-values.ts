@@ -8,9 +8,9 @@ import { defaultIconPoint } from './default-icon-point';
 import { dict } from './dictionary';
 
 export const yearMonthDateInitialValue: YearMonthDate = {
-  year: IDate.getLocaleYear(IDate.today()),
-  month: IDate.getLocaleMonth(IDate.today()),
-  date: IDate.getLocaleDate(IDate.today()),
+  year: DateUtils.getLocaleYear(DateUtils.today()),
+  month: DateUtils.getLocaleMonth(DateUtils.today()),
+  date: DateUtils.getLocaleDate(DateUtils.today()),
 };
 
 export const datetimeRangeInitialValue: DatetimeRange = {
@@ -37,19 +37,22 @@ export const answerIconsInitialValue: AnswerIconSettings = {
   },
 } as const;
 
-export const answerDeadlineInitialValue: Ymdhm = pipe(IDate.today())
+export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
   .chain(
-    IDate.updateLocaleDate(
+    DateUtils.updateLocaleDate(
       (a) => (a + answerDeadlineRemainingDaysDefaultValue) as DateEnum
     )
   )
-  .chain(IDate.setLocaleHours(23))
-  .chain(IDate.setLocaleMinutes(59))
-  .chain(IDate.toDate)
+  .chain(DateUtils.setLocaleHours(23))
+  .chain(DateUtils.setLocaleMinutes(59))
+  .chain(DateUtils.toDate)
   .chain(ymdhmFromDate).value;
 
-export const notificationSettingsInitialValue: NotificationSettings =
-  IRecord.set(notificationSettingsDefaultValue, 'notifyOnAnswerChange', true);
+export const notificationSettingsInitialValue: NotificationSettings = Obj.set(
+  notificationSettingsDefaultValue,
+  'notifyOnAnswerChange',
+  true
+);
 
 export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =
   'startSpecified';
@@ -62,7 +65,7 @@ export const eventScheduleInitialValue: EventSchedule = {
   answerDeadline: 'none',
   answerIcons: answerIconsInitialValue,
   notificationSettings: 'none',
-  timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
+  timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
   author: {
     id: null,
     name: '',

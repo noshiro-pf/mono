@@ -35,17 +35,17 @@ const randomizePlayerCards = (): DeepReadonly<
 > =>
   pipe(allCards)
     .chain(getShuffled)
-    .chain((cards) => IList.partition(cards, 6))
-    .chain((cards) => IList.map(cards, sortCards))
+    .chain((cards) => Arr.partition(cards, 6))
+    .chain((cards) => Arr.map(cards, sortCards))
     .chain((listOfCards) => {
-      if (!IList.isArrayOfLength4(listOfCards)) {
+      if (!Arr.isArrayOfLength4(listOfCards)) {
         throw new Error('listOfCards should be of length 4');
       }
       return listOfCards;
     }).value;
 
 export const newShuffleDef = (): PermutationString<'0123'> =>
-  pipe(IList.seqUnwrapped(4))
+  pipe(Arr.seqUnwrapped(4))
     .chain(getShuffled)
     .chain((list) => list.join('')).value as PermutationString<'0123'>;
 

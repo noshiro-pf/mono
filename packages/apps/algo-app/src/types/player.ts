@@ -6,6 +6,6 @@ export type Player = Readonly<{
 
 export const isPlayer = (data: unknown): data is Player =>
   isRecord(data) &&
-  // IRecord.hasKeyValue(data, 'id', isString) &&
-  IRecord.hasKeyValue(data, 'name', isString) &&
-  IRecord.hasKeyValue(data, 'online', isBoolean);
+  // Obj.hasKeyValue(data, 'id', isString) &&
+  Obj.hasKeyValue(data, 'name', isString) &&
+  Obj.hasKeyValue(data, 'online', isBoolean);

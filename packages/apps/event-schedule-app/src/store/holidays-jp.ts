@@ -9,8 +9,8 @@ export const holidaysJpDefinition$: InitializedObservable<
   .chain(
     map((record) =>
       IMapMapped.new(
-        IRecord.entries(record).map(([key, value]) => [
-          ymdFromDate(IDate.from(key)),
+        Obj.entries(record).map(([key, value]) => [
+          ymdFromDate(DateUtils.from(key)),
           value,
         ]),
         ymdToKey,

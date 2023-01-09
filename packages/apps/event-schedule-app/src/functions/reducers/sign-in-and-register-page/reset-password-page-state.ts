@@ -41,7 +41,7 @@ export const resetPasswordPageStateReducer: Reducer<
 > = (state, action) => {
   switch (action.type) {
     case 'inputEmail':
-      return IRecord.set(
+      return Obj.set(
         state,
         'email',
         emailInputStateReducer(state.email, {
@@ -80,7 +80,7 @@ export const resetPasswordPageStateReducer: Reducer<
     }
 
     case 'done':
-      return IRecord.set(state, 'isWaitingResponse', false);
+      return Obj.set(state, 'isWaitingResponse', false);
 
     case 'reset':
       return resetPasswordPageInitialState;

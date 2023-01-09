@@ -36,7 +36,7 @@ export const DatePickerDate = memoNamed<Props>(
     holidayJpName,
   }) => {
     const dateString = useMemo<string>(
-      () => IDate.create(ymd.year, ymd.month, ymd.date).toString(),
+      () => DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
       [ymd]
     );
 

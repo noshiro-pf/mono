@@ -73,7 +73,7 @@ export const controlGroupStack = [
 export const controlGroupStackZIndex: ReadonlyRecord<
   typeof controlGroupStack[number],
   number
-> = IRecord.fromEntries(controlGroupStack.map((key, index) => [key, index]));
+> = Obj.fromEntries(controlGroupStack.map((key, index) => [key, index]));
 
 export const inputTransitionShadow = (
   color: string = inputShadowColorFocus,

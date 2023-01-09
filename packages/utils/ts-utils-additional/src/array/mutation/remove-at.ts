@@ -3,10 +3,10 @@
  * @return the deleted element
  */
 
-import { IList } from '@noshiro/ts-utils';
+import { Arr } from '@noshiro/ts-utils';
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const removeAt = <T>(mut_array: T[], index: number): T | undefined =>
-  !IList.indexIsInRange(mut_array, index)
+  !Arr.indexIsInRange(mut_array, index)
     ? undefined
     : mut_array.splice(index, 1)[0];

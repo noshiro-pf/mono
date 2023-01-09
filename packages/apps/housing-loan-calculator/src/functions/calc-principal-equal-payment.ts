@@ -14,7 +14,7 @@ export const calcPrincipalEqualPayment = ({
 }> => {
   const fixedPrincipalYenPerMonth = borrowingTotal / numPayments;
 
-  const borrowingBalanceYen = IList.seqUnwrapped(numPayments + 1).map(
+  const borrowingBalanceYen = Arr.seqUnwrapped(numPayments + 1).map(
     (i) => borrowingTotal - i * fixedPrincipalYenPerMonth
   );
 

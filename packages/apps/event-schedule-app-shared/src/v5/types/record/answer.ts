@@ -1,4 +1,4 @@
-import { assertType, IDate } from '@noshiro/ts-utils';
+import { assertType, DateUtils } from '@noshiro/ts-utils';
 import type { AnswerSelection, PartialAnswerSelection } from '../../../v4';
 import { ANSWER_KEY_CREATED_AT, fillAnswerSelection } from '../../../v4';
 import type { AnswerId, Weight } from '../named-primitive-types';
@@ -34,7 +34,7 @@ export const answerDefaultValue: Answer = {
   user: userDefaultValue,
   comment: '',
   selection: [],
-  [ANSWER_KEY_CREATED_AT]: IDate.now(),
+  [ANSWER_KEY_CREATED_AT]: DateUtils.now(),
   weight: 1,
   isRequiredParticipants: false,
 } as const;

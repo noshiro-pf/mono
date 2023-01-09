@@ -1,10 +1,10 @@
 export const now = (): Ymdhm => {
-  const nowDateObj = IDate.today();
+  const nowDateObj = DateUtils.today();
   return {
-    year: IDate.getLocaleYear(nowDateObj),
-    month: IDate.getLocaleMonth(nowDateObj),
-    date: IDate.getLocaleDate(nowDateObj),
-    hours: IDate.getLocaleHours(nowDateObj),
-    minutes: IDate.getLocaleMinutes(nowDateObj),
+    year: DateUtils.getLocaleYear(nowDateObj),
+    month: DateUtils.getLocaleMonth(nowDateObj),
+    date: DateUtils.getLocaleDate(nowDateObj),
+    hours: DateUtils.getLocaleHours(nowDateObj),
+    minutes: DateUtils.getLocaleMinutes(nowDateObj),
   };
 };

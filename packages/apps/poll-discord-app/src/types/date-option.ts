@@ -8,8 +8,8 @@ export type DateOption = Readonly<{
 
 export const isDateOption = (a: unknown): a is DateOption =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'id', isString) &&
-  IRecord.hasKeyValue(a, 'label', isString);
+  Obj.hasKeyValue(a, 'id', isString) &&
+  Obj.hasKeyValue(a, 'label', isString);
 
 const dateOptionDefaultValue: DateOption = {
   id: createDateOptionId(''),
@@ -22,6 +22,6 @@ export const fillDateOption = (a: unknown): DateOption =>
   !isRecord(a)
     ? d
     : {
-        id: IRecord.hasKeyValue(a, 'id', isString) ? a.id : d.id,
-        label: IRecord.hasKeyValue(a, 'label', isString) ? a.label : d.label,
+        id: Obj.hasKeyValue(a, 'id', isString) ? a.id : d.id,
+        label: Obj.hasKeyValue(a, 'label', isString) ? a.label : d.label,
       };

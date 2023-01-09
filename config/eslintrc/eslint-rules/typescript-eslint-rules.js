@@ -16,8 +16,8 @@ const banTypes = {
     fixWith: 'StrictExclude',
   },
   Date: {
-    message: 'Use `IDate` from @noshiro/ts-utils instead.',
-    fixWith: 'IDate',
+    message: 'Use `DateUtils` from @noshiro/ts-utils instead.',
+    fixWith: 'DateUtils',
   },
   Set: {
     message: 'Use `ISet` or `MutableSet` from @noshiro/ts-utils instead.',

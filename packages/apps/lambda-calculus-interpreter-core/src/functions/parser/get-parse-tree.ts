@@ -20,13 +20,13 @@ export const getParseTree = (
 
   /* (lambda x.e)? */
   if (
-    IList.isArrayOfLength6OrMore(tokens) &&
+    Arr.isArrayOfLength6OrMore(tokens) &&
     tokens[0] === '(' &&
     tokens[1] === 'lambda' &&
     isVariable(tokens[2]) &&
     tokens[3] === '.' &&
     tokensRepresentsLambdaTerm(tokens.slice(4, -1)) &&
-    IList.last(tokens) === ')'
+    Arr.last(tokens) === ')'
   ) {
     const body = getParseTree(tokens.slice(4, -1));
     if (body === undefined) return undefined;
@@ -35,9 +35,9 @@ export const getParseTree = (
 
   /* (e e)? */
   if (
-    IList.isArrayOfLength3OrMore(tokens) &&
+    Arr.isArrayOfLength3OrMore(tokens) &&
     tokens[0] === '(' &&
-    IList.last(tokens) === ')'
+    Arr.last(tokens) === ')'
   ) {
     for (const sep of range(1, tokens.length - 1)) {
       const leftTokens = tokens.slice(1, sep);

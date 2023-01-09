@@ -1,4 +1,4 @@
-import { IList } from '@noshiro/ts-utils';
+import { Arr } from '@noshiro/ts-utils';
 
 type Unwrap<S> = { readonly [P in keyof S]: ArrayElement<S[P]> };
 
@@ -9,11 +9,11 @@ export function zipArrays<
     ...(readonly (readonly unknown[])[])
   ]
 >(...arrays: T): readonly Unwrap<T>[] {
-  const len = IList.min(arrays.map(IList.size));
+  const len = Arr.min(arrays.map(Arr.size));
 
   if (len === undefined) return [];
 
-  return IList.seqUnwrapped(len).map((i) =>
+  return Arr.seqUnwrapped(len).map((i) =>
     arrays.map((a) => a[i])
   ) as readonly Unwrap<T>[];
 }

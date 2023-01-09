@@ -13,7 +13,7 @@ export const createAnswerSelectionMapFromAnswers = (
   AnswerSelectionMapKey
 > =>
   IMapMapped.new(
-    IList.flatMap(answers, ({ id, selection }) =>
+    Arr.flatMap(answers, ({ id, selection }) =>
       selection.map((s) => [
         {
           datetimeRange: s.datetimeRange,

@@ -64,15 +64,15 @@ export const EventListItemComponent = memoNamed<Props>(
 
     const datetimeOptionsSummary = useMemo<string>(
       () =>
-        `${ymd2str(IList.first(eventSchedule.datetimeRangeList).ymd)} ${
+        `${ymd2str(Arr.first(eventSchedule.datetimeRangeList).ymd)} ${
           dict.common.tilde
-        } ${ymd2str(IList.last(eventSchedule.datetimeRangeList).ymd)}`,
+        } ${ymd2str(Arr.last(eventSchedule.datetimeRangeList).ymd)}`,
       [eventSchedule.datetimeRangeList]
     );
 
     const lastUpdateStr = useMemo<string>(() => {
-      const answerLastUpdate = IDate.from(lastUpdate);
-      const eventLastUpdate = IDate.from(updatedAt);
+      const answerLastUpdate = DateUtils.from(lastUpdate);
+      const eventLastUpdate = DateUtils.from(updatedAt);
 
       return lastUpdate === '' ||
         answerLastUpdate.getTime() < eventLastUpdate.getTime()

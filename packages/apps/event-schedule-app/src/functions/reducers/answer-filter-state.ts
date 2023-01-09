@@ -194,21 +194,21 @@ export namespace AnswerFilterState {
           case 'reset':
             return pipe(initialState)
               .chain((draft) =>
-                IRecord.setIn(
+                Obj.setIn(
                   draft,
                   ['dateRange', 'defaultValue'],
                   state.dateRange.defaultValue
                 )
               )
               .chain((draft) =>
-                IRecord.setIn(
+                Obj.setIn(
                   draft,
                   ['dateRange', 'value'],
                   state.dateRange.defaultValue ?? initialState.dateRange.value
                 )
               )
               .chain((draft) =>
-                IRecord.set(
+                Obj.set(
                   draft,
                   'iconState',
                   AnswerIconFilterState.reducer(state.iconState, {
@@ -218,7 +218,7 @@ export namespace AnswerFilterState {
               ).value;
 
           case 'icon':
-            return IRecord.set(
+            return Obj.set(
               state,
               'iconState',
               AnswerIconFilterState.reducer(state.iconState, action.action)
@@ -286,7 +286,7 @@ export namespace AnswerFilterState {
             const currStart = curr.value.start;
             const currEnd = curr.value.end;
 
-            return IRecord.set(
+            return Obj.set(
               state,
               'dateRange',
               // 現在のdateRangeが日程候補の範囲外の値になっていたらリセット
@@ -311,44 +311,44 @@ export namespace AnswerFilterState {
             return state.scoreRange.enabled === action.value
               ? state // check変更無しならそのまま返す
               : !action.value // 無効化されたらリセット
-              ? IRecord.set(state, 'scoreRange', {
+              ? Obj.set(state, 'scoreRange', {
                   enabled: false,
                   value: initialState.scoreRange.value,
                 })
-              : IRecord.setIn(state, ['scoreRange', 'enabled'], true);
+              : Obj.setIn(state, ['scoreRange', 'enabled'], true);
 
           case 'set-enabled-filtering-by-dayOfWeek':
             return state.dayOfWeek.enabled === action.value
               ? state // check変更無しならそのまま返す
               : !action.value // 無効化されたらリセット
-              ? IRecord.set(state, 'dayOfWeek', {
+              ? Obj.set(state, 'dayOfWeek', {
                   enabled: false,
                   value: initialState.dayOfWeek.value,
                 })
-              : IRecord.setIn(state, ['dayOfWeek', 'enabled'], true);
+              : Obj.setIn(state, ['dayOfWeek', 'enabled'], true);
 
           case 'set-enabled-filtering-by-dateRange':
             return state.dateRange.enabled === action.value
               ? state // check変更無しならそのまま返す
               : !action.value // 無効化されたらリセット
-              ? IRecord.set(state, 'dateRange', {
+              ? Obj.set(state, 'dateRange', {
                   enabled: false,
                   defaultValue: state.dateRange.defaultValue,
                   value:
                     state.dateRange.defaultValue ??
                     initialState.dateRange.value,
                 })
-              : IRecord.setIn(state, ['dateRange', 'enabled'], true);
+              : Obj.setIn(state, ['dateRange', 'enabled'], true);
 
           case 'set-enabled-filtering-by-iconOfSpecifiedRespondent':
             return state.iconOfSpecifiedRespondent.enabled === action.value
               ? state // check変更無しならそのまま返す
               : !action.value // 無効化されたらリセット
-              ? IRecord.set(state, 'iconOfSpecifiedRespondent', {
+              ? Obj.set(state, 'iconOfSpecifiedRespondent', {
                   enabled: false,
                   falseKeys: initialState.iconOfSpecifiedRespondent.falseKeys,
                 })
-              : IRecord.setIn(
+              : Obj.setIn(
                   state,
                   ['iconOfSpecifiedRespondent', 'enabled'],
                   true
@@ -359,14 +359,14 @@ export namespace AnswerFilterState {
 
             if (value) {
               // check value is true
-              return IRecord.updateIn(
+              return Obj.updateIn(
                 state,
                 ['iconOfSpecifiedRespondent', 'falseKeys'] as const,
                 (st) => st.delete([username, iconId])
               );
             } else {
               // check value is false
-              return IRecord.updateIn(
+              return Obj.updateIn(
                 state,
                 ['iconOfSpecifiedRespondent', 'falseKeys'] as const,
                 (st) => st.add([username, iconId])
@@ -375,41 +375,35 @@ export namespace AnswerFilterState {
           }
 
           case 'set-filledDateOnly':
-            return IRecord.update(state, 'filledDateOnly', (b) => !b);
+            return Obj.update(state, 'filledDateOnly', (b) => !b);
 
           case 'set-scoreRange':
-            return IRecord.setIn(state, ['scoreRange', 'value'], action.range);
+            return Obj.setIn(state, ['scoreRange', 'value'], action.range);
 
           case 'set-dateRange':
-            return IRecord.setIn(state, ['dateRange', 'value'], action.range);
+            return Obj.setIn(state, ['dateRange', 'value'], action.range);
 
           case 'set-dayOfWeek':
-            return IRecord.updateIn(
+            return Obj.updateIn(
               state,
               ['dayOfWeek', 'value'] as const,
-              (draft) =>
-                IRecord.set(draft, action.value.key, action.value.checked)
+              (draft) => Obj.set(draft, action.value.key, action.value.checked)
             );
         }
       })
       // 不整合な状態になっていたら修正
       .chain((state) =>
-        IRecord.updateIn(
-          state,
-          ['dateRange', 'value'] as const,
-          ({ start, end }) =>
-            isNotUndefined(start) &&
-            isNotUndefined(end) &&
-            compareYmd(start, end) > 0
-              ? { start, end: start }
-              : { start, end }
+        Obj.updateIn(state, ['dateRange', 'value'] as const, ({ start, end }) =>
+          isNotUndefined(start) &&
+          isNotUndefined(end) &&
+          compareYmd(start, end) > 0
+            ? { start, end: start }
+            : { start, end }
         )
       )
       .chain((state) =>
-        IRecord.updateIn(
-          state,
-          ['scoreRange', 'value'] as const,
-          ({ min, max }) => (max < min ? { min, max: min } : { min, max })
+        Obj.updateIn(state, ['scoreRange', 'value'] as const, ({ min, max }) =>
+          max < min ? { min, max: min } : { min, max }
         )
       ).value;
 }

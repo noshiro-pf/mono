@@ -1,6 +1,6 @@
-import { IRecord, tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginSyncflowDef = IRecord.fromEntries(
+export const providePluginSyncflowDef = Obj.fromEntries(
   [
     'auditTime',
     'auditTimeI',

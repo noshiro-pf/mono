@@ -6,7 +6,7 @@ import type { ComponentProps } from 'react';
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 
 const parseDate = (str: string): RawDateType =>
-  pipe(IDate.from(str)).chain(IDate.toDate).value;
+  pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
 type DateRangeInputPropsOriginal = ComponentProps<typeof DateRangeInput2>;
 
@@ -50,7 +50,7 @@ export const BpDateRangeInput = memoNamed<Props>(
         castWritable(
           tp(
             pipe(dateRange.start).chainOptional((d) =>
-              IDate.toDate(
+              DateUtils.toDate(
                 ymdhm2Date({
                   ...d,
                   hours: 0,
@@ -60,7 +60,7 @@ export const BpDateRangeInput = memoNamed<Props>(
             ).value ?? null,
 
             pipe(dateRange.end).chainOptional((d) =>
-              IDate.toDate(
+              DateUtils.toDate(
                 ymdhm2Date({
                   ...d,
                   hours: 0,
@@ -77,7 +77,7 @@ export const BpDateRangeInput = memoNamed<Props>(
       () =>
         castWritable(
           pipe(_minDate).chainOptional((d) =>
-            IDate.toDate(
+            DateUtils.toDate(
               ymdhm2Date({
                 ...d,
                 hours: 0,
@@ -93,7 +93,7 @@ export const BpDateRangeInput = memoNamed<Props>(
       () =>
         castWritable(
           pipe(_maxDate).chainOptional((d) =>
-            IDate.toDate(
+            DateUtils.toDate(
               ymdhm2Date({
                 ...d,
                 hours: 0,

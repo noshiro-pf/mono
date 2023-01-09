@@ -1,4 +1,4 @@
-import { IList, Result } from '@noshiro/ts-utils';
+import { Arr, Result } from '@noshiro/ts-utils';
 import type { Type } from '../type';
 import {
   createAssertFunction,
@@ -20,18 +20,18 @@ export const arrayOfLength = <A, N extends Index1000>(
 
   const {
     typeName,
-    defaultValue = IList.zerosUnwrapped(size as number).map(
+    defaultValue = Arr.zerosUnwrapped(size as number).map(
       () => elementType.defaultValue
     ) as unknown as ArrayOfLength<N, A>,
   } = options ?? {};
 
-  const zs = IList.zerosUnwrapped(size as number);
+  const zs = Arr.zerosUnwrapped(size as number);
 
   const typeNameFilled: string =
     typeName ?? `[${zs.map(() => elementType.typeName).join(', ')}]`;
 
   const validate: Type<T>['validate'] = (a) => {
-    if (!IList.isArray(a)) {
+    if (!Arr.isArray(a)) {
       return Result.err([
         validationErrorMessage(a, 'The value is expected to be an array'),
       ]);
@@ -61,7 +61,7 @@ export const arrayOfLength = <A, N extends Index1000>(
   };
 
   const fill: Type<T>['fill'] = (a) =>
-    IList.isArray(a)
+    Arr.isArray(a)
       ? (zs.map((_, i) => elementType.fill(a[i])) as unknown as T)
       : defaultValue;
 

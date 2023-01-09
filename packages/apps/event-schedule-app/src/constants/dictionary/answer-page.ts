@@ -120,7 +120,7 @@ export const answerPageDictionary = {
         Sat: boolean;
       }>) =>
         pipe(
-          IList.zip(
+          Arr.zip(
             [Sun, Mon, Tue, Wed, Thr, Fri, Sat] as const,
             commonDictionary.date.dayList
           )
@@ -128,7 +128,7 @@ export const answerPageDictionary = {
 
             .map(([_, displayName]) => displayName)
         ).chain((list) =>
-          IList.isEmpty(list) ? '曜日：なし' : `${list.join('・')}のみ`
+          Arr.isEmpty(list) ? '曜日：なし' : `${list.join('・')}のみ`
         ).value,
 
       iconOfSpecifiedRespondent: '回答者の記号で絞り込み（詳細設定）',

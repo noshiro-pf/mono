@@ -54,14 +54,14 @@ export const registerPageStateReducer: Reducer<
 > = (state, action) => {
   switch (action.type) {
     case 'inputUsername':
-      return IRecord.set(state, 'username', {
+      return Obj.set(state, 'username', {
         inputValue: action.payload,
         error: undefined,
       });
 
     case 'setUsernameError':
       return {
-        username: IRecord.set(state.username, 'error', action.payload),
+        username: Obj.set(state.username, 'error', action.payload),
         email: state.email,
         password: state.password,
         otherErrors: state.otherErrors,
@@ -69,7 +69,7 @@ export const registerPageStateReducer: Reducer<
       };
 
     case 'inputEmail':
-      return IRecord.set(
+      return Obj.set(
         state,
         'email',
         emailInputStateReducer(state.email, {
@@ -91,7 +91,7 @@ export const registerPageStateReducer: Reducer<
       };
 
     case 'inputPassword':
-      return IRecord.set(
+      return Obj.set(
         state,
         'password',
         passwordWithConfirmationStateReducer(state.password, {
@@ -113,7 +113,7 @@ export const registerPageStateReducer: Reducer<
       };
 
     case 'inputPasswordConfirmation':
-      return IRecord.set(
+      return Obj.set(
         state,
         'password',
         passwordWithConfirmationStateReducer(state.password, {
@@ -154,7 +154,7 @@ export const registerPageStateReducer: Reducer<
     }
 
     case 'done':
-      return IRecord.set(state, 'isWaitingResponse', false);
+      return Obj.set(state, 'isWaitingResponse', false);
 
     case 'reset':
       return registerPageInitialState;

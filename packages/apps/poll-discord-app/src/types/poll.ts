@@ -35,7 +35,7 @@ assertType<TypeExtends<PollJson, ReadonlyJSONType>>();
 const pollDefaultValue: Poll = {
   id: createPollId(''),
   title: '',
-  updatedAt: createTimestamp(IDate.now()),
+  updatedAt: createTimestamp(DateUtils.now()),
   dateOptions: [],
   answers: IMap.new<DateOptionId, AnswerOfDate>([]),
   titleMessageId: createTitleMessageId(''),
@@ -47,29 +47,29 @@ export const fillPoll = (a?: unknown): Poll =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        id: IRecord.hasKeyValue(a, 'id', isString) ? a.id : d.id,
+        id: Obj.hasKeyValue(a, 'id', isString) ? a.id : d.id,
 
-        title: IRecord.hasKeyValue(a, 'title', isString) ? a.title : d.title,
+        title: Obj.hasKeyValue(a, 'title', isString) ? a.title : d.title,
 
-        updatedAt: IRecord.hasKeyValue(a, 'updatedAt', isTimestamp)
+        updatedAt: Obj.hasKeyValue(a, 'updatedAt', isTimestamp)
           ? a.updatedAt
           : d.updatedAt,
 
         // TODO
-        dateOptions: IRecord.hasKeyValue(a, 'dateOptions', IList.isArray)
+        dateOptions: Obj.hasKeyValue(a, 'dateOptions', Arr.isArray)
           ? a.dateOptions.map(fillDateOption)
           : d.dateOptions,
 
-        answers: IRecord.hasKeyValue(a, 'answers', isRecord)
+        answers: Obj.hasKeyValue(a, 'answers', isRecord)
           ? IMap.new<DateOptionId, AnswerOfDate>(
-              IRecord.entries(a.answers).map(([k, v]) => [
+              Obj.entries(a.answers).map(([k, v]) => [
                 createDateOptionId(k),
                 fillAnswerOfDate(v),
               ])
             )
           : d.answers,
 
-        titleMessageId: IRecord.hasKeyValue(a, 'titleMessageId', isString)
+        titleMessageId: Obj.hasKeyValue(a, 'titleMessageId', isString)
           ? a.titleMessageId
           : d.titleMessageId,
       };
@@ -79,8 +79,6 @@ export const pollToJson = (a: Poll): PollJson => ({
   title: a.title,
   updatedAt: a.updatedAt,
   dateOptions: a.dateOptions,
-  answers: IRecord.fromEntries(
-    a.answers.map(answerOfDateToJson).toEntriesArray()
-  ),
+  answers: Obj.fromEntries(a.answers.map(answerOfDateToJson).toEntriesArray()),
   titleMessageId: a.titleMessageId,
 });

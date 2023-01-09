@@ -78,7 +78,7 @@ const rpSendPollMessageSub = async (
   const summaryMessageEmbed = rpCreateSummaryMessage(
     {
       id: createPollId(''),
-      updatedAt: createTimestamp(IDate.now()),
+      updatedAt: createTimestamp(DateUtils.now()),
       title,
       dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(

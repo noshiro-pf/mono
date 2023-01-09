@@ -20,7 +20,7 @@ export const historyReducer: ReducerType<
       undo: draft.history,
       redo: draft.history,
       'roll-dices': pipe(draft.history)
-        .chain((hist) => IList.take(hist, currIdx + 1))
+        .chain((hist) => Arr.take(hist, currIdx + 1))
         .chain((hist) => [...hist, rollTwoDices()]).value,
     });
   });

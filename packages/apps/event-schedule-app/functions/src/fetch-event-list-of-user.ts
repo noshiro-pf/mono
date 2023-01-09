@@ -5,7 +5,7 @@ import {
   fillAnswer,
   fillEventSchedule,
 } from '@noshiro/event-schedule-app-shared';
-import { IList, IMap, pipe, tp } from '@noshiro/ts-utils';
+import { Arr, IMap, pipe, tp } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
 import type { CallableContext } from 'firebase-functions/v1/https';
@@ -63,7 +63,7 @@ export const fetchEventListOfUserImpl = async (
   }));
 
   const eventListFiltered = pipe(eventList).chain((list) =>
-    IList.filter(list, ({ eventSchedule }) => {
+    Arr.filter(list, ({ eventSchedule }) => {
       const isArchived = eventSchedule.archivedBy.some((u) => u.id === uid);
 
       switch (filterOptionState) {
@@ -101,7 +101,7 @@ export const fetchEventListOfUserImpl = async (
     }
   >[] = await Promise.all(
     pipe(eventListFiltered).chain((list) =>
-      IList.map(list, ({ eventScheduleMetadata: { id: eventId } }) =>
+      Arr.map(list, ({ eventScheduleMetadata: { id: eventId } }) =>
         db
           .collection(
             `${collectionPath.events}/${eventId}/${collectionPath.answers}`
@@ -112,7 +112,7 @@ export const fetchEventListOfUserImpl = async (
             answers: answersSnapshot.docs.map((d) => fillAnswer(d.data())),
             answersMetadata: {
               lastUpdate: pipe(answersSnapshot.docs)
-                .chain((ds) => IList.maxBy(ds, (d) => d.updateTime.toMillis()))
+                .chain((ds) => Arr.maxBy(ds, (d) => d.updateTime.toMillis()))
                 .chain((d) => d?.updateTime.toDate().toISOString() ?? '').value,
             },
           }))

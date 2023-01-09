@@ -1,5 +1,5 @@
 import { useState } from '@noshiro/preact-utils';
-import { IList } from '@noshiro/ts-utils';
+import { Arr } from '@noshiro/ts-utils';
 import type { RefObject } from 'preact';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
@@ -18,7 +18,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
     () =>
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       new CustomResizeObserver((entries) => {
-        if (IList.isNonEmpty(entries)) {
+        if (Arr.isNonEmpty(entries)) {
           setSize(entries[0].contentRect);
         }
       }),

@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { IDate, Num } from '@noshiro/ts-utils';
+import { DateUtils, Num } from '@noshiro/ts-utils';
 import { datesTypeDef, monthsTypeDef, yearsTypeDef } from '../../enum';
 
 export const yearMonthDateTypeDef = t.record({
@@ -16,10 +16,10 @@ export const isYearMonthDate = yearMonthDateTypeDef.is;
 
 export const fillYearMonthDate = yearMonthDateTypeDef.fill;
 
-export const ymdFromDate = (date: IDate): YearMonthDate => ({
-  year: IDate.getLocaleYear(date),
-  month: IDate.getLocaleMonth(date),
-  date: IDate.getLocaleDate(date),
+export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
+  year: DateUtils.getLocaleYear(date),
+  month: DateUtils.getLocaleMonth(date),
+  date: DateUtils.getLocaleDate(date),
 });
 
 export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {

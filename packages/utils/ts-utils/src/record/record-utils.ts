@@ -1,6 +1,4 @@
-import { IList } from './list';
-
-export namespace IRecord {
+export namespace RecordUtils {
   export const get = <R extends ReadonlyRecordBase, K extends keyof R>(
     record: R,
     key: K
@@ -51,7 +49,8 @@ export namespace IRecord {
     index >= keyPath.length
       ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         updater(obj)
-      : IList.isArray(obj)
+      : // eslint-disable-next-line no-restricted-globals
+      Array.isArray(obj)
       ? obj.map((v, i): unknown =>
           i === keyPath[index]
             ? UNSAFE_updateIn_impl(
@@ -193,7 +192,7 @@ export namespace IRecord {
    *
    * @example
    * ```ts
-   * const entries = IRecord.entries({
+   * const entries = RecordUtils.entries({
    *   x: 1,
    *   y: 2,
    *   z: 2,

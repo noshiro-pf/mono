@@ -25,8 +25,8 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   };
 });
 
-const resultsSortedByProbability = pipe(IList.from(results)).chain((list) =>
-  IList.sort(list, (a, b) => -(a.countSum - b.countSum))
+const resultsSortedByProbability = pipe(Arr.from(results)).chain((list) =>
+  Arr.sort(list, (a, b) => -(a.countSum - b.countSum))
 ).value;
 
 export const Main = memoNamed('Main', () => {
@@ -71,7 +71,7 @@ export const Main = memoNamed('Main', () => {
 
   const { state: columnsAlive, updateState: updateDeadColumns } = useState<
     readonly boolean[]
-  >(IList.newArrayThrow(11, true));
+  >(Arr.newArrayUnwrapped(11, true));
 
   const columnsAliveWithHandler = useMemo<
     readonly Readonly<{

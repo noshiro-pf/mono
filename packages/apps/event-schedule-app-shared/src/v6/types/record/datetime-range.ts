@@ -1,4 +1,4 @@
-import { IRecord, isRecord } from '@noshiro/ts-utils';
+import { isRecord, Obj } from '@noshiro/ts-utils';
 import type { YearMonthDate } from './base';
 import {
   compareYmd,
@@ -26,8 +26,8 @@ export const datetimeRangeDefaultValue: DatetimeRange = {
 
 export const isDatetimeRange = (a: unknown): a is DatetimeRange =>
   isRecord(a) &&
-  IRecord.hasKeyValue(a, 'ymd', isYearMonthDate) &&
-  IRecord.hasKeyValue(a, 'timeRange', isTimeRange);
+  Obj.hasKeyValue(a, 'ymd', isYearMonthDate) &&
+  Obj.hasKeyValue(a, 'timeRange', isTimeRange);
 
 const d = datetimeRangeDefaultValue;
 
@@ -35,8 +35,8 @@ export const fillDatetimeRange = (a?: unknown): DatetimeRange =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        ymd: IRecord.hasKey(a, 'ymd') ? fillYearMonthDate(a.ymd) : d.ymd,
-        timeRange: IRecord.hasKey(a, 'timeRange')
+        ymd: Obj.hasKey(a, 'ymd') ? fillYearMonthDate(a.ymd) : d.ymd,
+        timeRange: Obj.hasKey(a, 'timeRange')
           ? fillTimeRange(a.timeRange)
           : d.timeRange,
       };

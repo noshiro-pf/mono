@@ -23,7 +23,7 @@ export const verifyEmail = async (
 
       if (
         isRecord(err) &&
-        IRecord.hasKeyValue(err, 'code', isString) &&
+        Obj.hasKeyValue(err, 'code', isString) &&
         err.code === 'functions/not-found'
       ) {
         return Result.err({

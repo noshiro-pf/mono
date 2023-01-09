@@ -138,7 +138,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             title,
             notes,
             datetimeSpecification,
-            datetimeRangeList: IList.isNonEmpty(datetimeRangeList)
+            datetimeRangeList: Arr.isNonEmpty(datetimeRangeList)
               ? datetimeRangeList
               : datetimeRangeListInitialValue,
             answerDeadline: answerDeadline ?? 'none',
@@ -146,7 +146,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             notificationSettings:
               notificationSettingsWithEmail === undefined
                 ? 'none'
-                : IRecord.removeProperties(notificationSettingsWithEmail, [
+                : Obj.removeProperties(notificationSettingsWithEmail, [
                     'email',
                   ]),
             timezoneOffsetMinutes:

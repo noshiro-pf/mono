@@ -20,7 +20,7 @@ export const calcPrincipalAndInterestEqualPayment = ({
     interestRate,
   });
 
-  const borrowingBalanceYen = IList.seqUnwrapped(numPayments + 1).map((ith) =>
+  const borrowingBalanceYen = Arr.seqUnwrapped(numPayments + 1).map((ith) =>
     ithBorrowingBalanceInPIER({
       total: borrowingTotal,
       numPayments,

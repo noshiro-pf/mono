@@ -1,5 +1,5 @@
 import { assertType } from '../assert-type';
-import { IRecord } from './record';
+import { RecordUtils } from './record-utils';
 
 type R0 = DeepReadonly<{
   x: { a: number; b: number };
@@ -13,10 +13,10 @@ const rcd: R0 = {
   z: [1, 2, 4],
 } as const;
 
-describe('IRecord', () => {
+describe('RecordUtils', () => {
   describe('get', () => {
     {
-      const result = IRecord.get(rcd, 'x');
+      const result = RecordUtils.get(rcd, 'x');
 
       assertType<
         TypeEq<typeof result, DeepReadonly<{ a: number; b: number }>>
@@ -27,7 +27,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.get(rcd, 'y');
+      const result = RecordUtils.get(rcd, 'y');
 
       assertType<
         TypeEq<typeof result, DeepReadonly<{ c: { d: number; 4: number } }>>
@@ -41,7 +41,7 @@ describe('IRecord', () => {
 
   describe('set', () => {
     {
-      const result = IRecord.set(rcd, 'x', { a: 0, b: 0 } as const);
+      const result = RecordUtils.set(rcd, 'x', { a: 0, b: 0 } as const);
 
       assertType<TypeEq<typeof result, R0>>();
 
@@ -54,7 +54,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.set(rcd, 'y', { c: { d: 888, 4: 999 } });
+      const result = RecordUtils.set(rcd, 'y', { c: { d: 888, 4: 999 } });
 
       assertType<TypeEq<typeof result, R0>>();
 
@@ -70,7 +70,7 @@ describe('IRecord', () => {
 
   describe('update', () => {
     {
-      const result = IRecord.update(
+      const result = RecordUtils.update(
         rcd,
         'x',
         (curr) => ({ a: curr.a + 1, b: curr.b + 2 } as const)
@@ -87,7 +87,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.update(rcd, 'y', () => ({
+      const result = RecordUtils.update(rcd, 'y', () => ({
         c: { d: 888, 4: 999 },
       }));
 
@@ -105,7 +105,7 @@ describe('IRecord', () => {
 
   describe('getIn', () => {
     {
-      const result = IRecord.getIn(rcd, [] as const);
+      const result = RecordUtils.getIn(rcd, [] as const);
 
       assertType<TypeEq<typeof result, R0>>();
 
@@ -118,7 +118,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.getIn(rcd, ['y', 'c', 'd'] as const);
+      const result = RecordUtils.getIn(rcd, ['y', 'c', 'd'] as const);
 
       assertType<TypeEq<typeof result, number>>();
 
@@ -130,7 +130,7 @@ describe('IRecord', () => {
 
   describe('setIn', () => {
     {
-      const result = IRecord.setIn(rcd, [], {
+      const result = RecordUtils.setIn(rcd, [], {
         x: { a: 999, b: 999 },
         y: { c: { d: 999, 4: 999 } },
         z: [999, 999, 999],
@@ -147,7 +147,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.setIn(rcd, ['y', 'c', 'd'], 999);
+      const result = RecordUtils.setIn(rcd, ['y', 'c', 'd'], 999);
 
       assertType<TypeEq<typeof result, R0>>();
 
@@ -160,7 +160,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.setIn(rcd, ['y', 'c'], { d: 999, 4: 999 });
+      const result = RecordUtils.setIn(rcd, ['y', 'c'], { d: 999, 4: 999 });
 
       assertType<TypeEq<typeof result, R0>>();
 
@@ -173,7 +173,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.setIn(rcd, ['z', 1], 999);
+      const result = RecordUtils.setIn(rcd, ['z', 1], 999);
 
       assertType<TypeEq<typeof result, R0>>();
 
@@ -189,7 +189,7 @@ describe('IRecord', () => {
 
   describe('updateIn', () => {
     {
-      const result = IRecord.updateIn(rcd, [] as const, (curr) => curr);
+      const result = RecordUtils.updateIn(rcd, [] as const, (curr) => curr);
 
       assertType<TypeEq<typeof result, R0>>();
 
@@ -198,7 +198,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.updateIn(
+      const result = RecordUtils.updateIn(
         rcd,
         ['y', 'c', 'd'] as const,
         (curr) => curr + 1000
@@ -215,7 +215,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.updateIn(rcd, ['y', 'c'] as const, (curr) => ({
+      const result = RecordUtils.updateIn(rcd, ['y', 'c'] as const, (curr) => ({
         d: curr.d + 1000,
         // eslint-disable-next-line unicorn/prefer-at
         '4': curr[4] + 2000,
@@ -235,7 +235,7 @@ describe('IRecord', () => {
 
   describe('removeProperties', () => {
     {
-      const result = IRecord.removeProperties(rcd, ['x'] as const);
+      const result = RecordUtils.removeProperties(rcd, ['x'] as const);
 
       assertType<
         TypeEq<
@@ -255,7 +255,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.removeProperties(rcd, ['y', 'z'] as const);
+      const result = RecordUtils.removeProperties(rcd, ['y', 'z'] as const);
 
       assertType<
         TypeEq<
@@ -276,7 +276,7 @@ describe('IRecord', () => {
 
   describe('merge', () => {
     {
-      const result = IRecord.merge(rcd, { a: 1, b: 2 } as const);
+      const result = RecordUtils.merge(rcd, { a: 1, b: 2 } as const);
 
       assertType<
         TypeEq<
@@ -302,7 +302,7 @@ describe('IRecord', () => {
       });
     }
     {
-      const result = IRecord.merge(rcd, {
+      const result = RecordUtils.merge(rcd, {
         x: 1,
         y: { p: '3', q: '4' },
         a: 1,
@@ -333,7 +333,7 @@ describe('IRecord', () => {
 
   describe('keys', () => {
     test('case 1', () => {
-      const keys = IRecord.keys({ x: 1, y: 2 });
+      const keys = RecordUtils.keys({ x: 1, y: 2 });
 
       assertType<TypeEq<typeof keys, ('x' | 'y')[]>>();
 
@@ -342,7 +342,7 @@ describe('IRecord', () => {
 
     test('case 2', () => {
       const symb = Symbol();
-      const keys = IRecord.keys({ x: 1, y: 2, z: '3', 3: 4, [symb]: 5 });
+      const keys = RecordUtils.keys({ x: 1, y: 2, z: '3', 3: 4, [symb]: 5 });
 
       assertType<TypeEq<typeof keys, ('3' | 'x' | 'y' | 'z')[]>>();
 
@@ -352,7 +352,7 @@ describe('IRecord', () => {
 
   describe('values', () => {
     test('case 1', () => {
-      const values = IRecord.values({ x: 1, y: 2 } as const);
+      const values = RecordUtils.values({ x: 1, y: 2 } as const);
 
       assertType<TypeEq<typeof values, readonly (1 | 2)[]>>();
 
@@ -370,7 +370,7 @@ describe('IRecord', () => {
 
     // eslint-disable-next-line no-restricted-globals
     const obj0 = Object.fromEntries(entries);
-    const obj1 = IRecord.fromEntries(entries);
+    const obj1 = RecordUtils.fromEntries(entries);
 
     assertType<TypeEq<typeof obj0, Record<string, 1 | 2 | 3>>>();
     assertType<TypeEq<typeof obj1, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>>();
@@ -395,7 +395,7 @@ describe('IRecord', () => {
 
     assertType<
       TypeEq<
-        IRecord.Entries<RecordType1>,
+        RecordUtils.Entries<RecordType1>,
         readonly (
           | readonly ['3', 4]
           | readonly ['x', 1]
@@ -421,7 +421,7 @@ describe('IRecord', () => {
 
     assertType<
       TypeEq<
-        IRecord.Entries<RecordType2>,
+        RecordUtils.Entries<RecordType2>,
         | readonly (
             | readonly ['3', 4]
             | readonly ['x', 1]
@@ -437,7 +437,7 @@ describe('IRecord', () => {
 
     assertType<
       TypeEq<
-        IRecord.Entries<Record<string, number>>,
+        RecordUtils.Entries<Record<string, number>>,
         readonly (readonly [string, number])[]
       >
     >();
@@ -454,7 +454,7 @@ describe('IRecord', () => {
 
       // eslint-disable-next-line no-restricted-globals
       const entries0 = Object.entries(obj);
-      const entries1 = IRecord.entries(obj);
+      const entries1 = RecordUtils.entries(obj);
 
       expect(entries1).toStrictEqual([
         ['3', 4],

@@ -1,5 +1,5 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { assertType, IList, tp } from '@noshiro/ts-utils';
+import { Arr, assertType, tp } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { createMailBodyForAnswerDeadline } from './create-mail-body';
@@ -33,7 +33,7 @@ export const notifyAnswerDeadline = async (
     events.map(([eventId]) => getEmail(db, eventId))
   );
 
-  const eventsWithEmail = IList.zip(events, emails);
+  const eventsWithEmail = Arr.zip(events, emails);
 
   await Promise.all(
     eventsWithEmail.flatMap(([[eventId, ev], email]) => {

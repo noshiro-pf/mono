@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-internal-modules
 import { firestorePaths } from '@noshiro/event-schedule-app-shared/cjs/v7';
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { IRecord, Json } from '@noshiro/ts-utils';
+import { Json, Obj } from '@noshiro/ts-utils';
 // eslint-disable-next-line import/no-namespace
 import admin from 'firebase-admin';
 import serviceAccount from './service-account-key.json';
@@ -32,8 +32,8 @@ const printAllEvents = async (): Promise<boolean> => {
   );
 
   const result = {
-    events: IRecord.fromEntries(eventsEntries),
-    answers: IRecord.fromEntries(answersEntries),
+    events: Obj.fromEntries(eventsEntries),
+    answers: Obj.fromEntries(answersEntries),
   };
 
   console.log(Json.stringifySortedKey(result).value);

@@ -54,7 +54,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
 
   const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
     () =>
-      IList.seqUnwrapped(numRows).map((i) => [
+      Arr.seqUnwrapped(numRows).map((i) => [
         i.toString(),
         formatYenValue(borrowingBalanceYen[i] ?? 0),
         formatYenValue(interestYen[i] ?? 0),
@@ -78,9 +78,9 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
         </tr>
       </thead>
       <tbody>
-        {IList.map(tableData, (tableRow, rowIdx) => (
+        {Arr.map(tableData, (tableRow, rowIdx) => (
           <tr key={rowIdx}>
-            {IList.map(tableRow, (cell, colIdx) => (
+            {Arr.map(tableRow, (cell, colIdx) => (
               <td key={colIdx} style={dataCellStyle}>
                 {cell}
               </td>

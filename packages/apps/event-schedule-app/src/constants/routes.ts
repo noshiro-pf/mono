@@ -63,34 +63,34 @@ export namespace Routes {
 
   export const isRoute = {
     createPage: (pathnameTokens: readonly string[]): boolean =>
-      IList.isArrayOfLength1(pathnameTokens) &&
+      Arr.isArrayOfLength1(pathnameTokens) &&
       pathnameTokens[0] === pathToken.createPage,
 
     /**
      * pathnameTokens[1] is `event-id`
      */
     answerPage: (pathnameTokens: readonly string[]): boolean =>
-      IList.isArrayOfLength2(pathnameTokens) &&
+      Arr.isArrayOfLength2(pathnameTokens) &&
       pathnameTokens[0] === pathToken.answerPage,
 
     /**
      * pathnameTokens[1] is `event-id`
      */
     editPage: (pathnameTokens: readonly string[]): boolean =>
-      IList.isArrayOfLength3(pathnameTokens) &&
+      Arr.isArrayOfLength3(pathnameTokens) &&
       pathnameTokens[0] === pathToken.answerPage &&
       pathnameTokens[2] === pathToken.editPageSuffix,
 
     eventListPage: (pathnameTokens: readonly string[]): boolean =>
-      IList.isArrayOfLength1(pathnameTokens) &&
+      Arr.isArrayOfLength1(pathnameTokens) &&
       pathnameTokens[0] === pathToken.eventListPage,
 
     registerPage: (pathnameTokens: readonly string[]): boolean =>
-      IList.isArrayOfLength1(pathnameTokens) &&
+      Arr.isArrayOfLength1(pathnameTokens) &&
       pathnameTokens[0] === pathToken.registerUser,
 
     signInPage: (pathnameTokens: readonly string[]): boolean =>
-      IList.isArrayOfLength1(pathnameTokens) &&
+      Arr.isArrayOfLength1(pathnameTokens) &&
       pathnameTokens[0] === pathToken.signIn,
   } as const;
 

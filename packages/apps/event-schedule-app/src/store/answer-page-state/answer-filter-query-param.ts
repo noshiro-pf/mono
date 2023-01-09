@@ -35,7 +35,7 @@ export namespace AnswerFilterQueryParam {
   const ymdFromStr = (ymdStr: string): YearMonthDate | undefined => {
     const res = ymdStr.split('-');
 
-    if (!IList.isArrayOfLength3(res)) return undefined;
+    if (!Arr.isArrayOfLength3(res)) return undefined;
 
     const ret = {
       year: Str.toNumber(res[0]),
@@ -96,7 +96,7 @@ export namespace AnswerFilterQueryParam {
     rangeStr: string
   ): Readonly<{ a: string; b: string }> | undefined => {
     const res = rangeStr.split(Routes.queryParamValue.rangeDelim);
-    return IList.isArrayOfLength2(res) ? { a: res[0], b: res[1] } : undefined;
+    return Arr.isArrayOfLength2(res) ? { a: res[0], b: res[1] } : undefined;
   };
 
   const filledDateOnlyToStr = (value: boolean): string =>

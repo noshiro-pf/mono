@@ -10,7 +10,7 @@ import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues';
 
-const hueListDefault = IList.seqUnwrapped(360);
+const hueListDefault = Arr.seqUnwrapped(360);
 
 export const calcAll = ({
   saturation,
@@ -44,17 +44,17 @@ export const calcAll = ({
 
   /* 1. 彩度・明度を固定し色相を横軸としたときの相対輝度分布 */
 
-  const maxLuminanceInList = IList.max(luminanceList) ?? 1;
+  const maxLuminanceInList = Arr.max(luminanceList) ?? 1;
   const luminanceListNormalized = luminanceList.map(
     (l) => l / maxLuminanceInList
   );
 
-  const relativeLuminanceDistribution = IList.zip(
+  const relativeLuminanceDistribution = Arr.zip(
     hslList,
     luminanceListNormalized
   );
 
-  const pickedUpHues_equallySpaced = IList.seqUnwrapped(divisionNumber)
+  const pickedUpHues_equallySpaced = Arr.seqUnwrapped(divisionNumber)
     .map((i) => Num.roundToInt((i * 360) / divisionNumber) as Hue)
     .map((h) => ((h - firstHue + 360) % 360) as Hue);
 
@@ -65,7 +65,7 @@ export const calcAll = ({
   );
 
   const result1_equallySpaced: ColorResult = {
-    accumulatedDistribution: IList.zip(
+    accumulatedDistribution: Arr.zip(
       hslList,
       hueListDefault.map((i) => i / 360)
     ),
@@ -91,7 +91,7 @@ export const calcAll = ({
   );
 
   const result2_weighted: ColorResult = {
-    accumulatedDistribution: IList.zip(
+    accumulatedDistribution: Arr.zip(
       hslList,
       normalizeList(getLuminanceListAccumulated(luminanceList, false))
     ),
@@ -118,7 +118,7 @@ export const calcAll = ({
   );
 
   const result3_weighted_log: ColorResult = {
-    accumulatedDistribution: IList.zip(
+    accumulatedDistribution: Arr.zip(
       hslList,
       normalizeList(getLuminanceListAccumulated(luminanceList, true))
     ),

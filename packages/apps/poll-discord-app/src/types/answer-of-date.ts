@@ -28,20 +28,17 @@ export const fillAnswerOfDate = (a?: unknown): AnswerOfDate =>
     ? d
     : {
         good:
-          IRecord.hasKeyValue(a, 'good', IList.isArray) &&
-          a.good.every(isUserId)
+          Obj.hasKeyValue(a, 'good', Arr.isArray) && a.good.every(isUserId)
             ? ISet.new(a.good)
             : d.good,
 
         fair:
-          IRecord.hasKeyValue(a, 'fair', IList.isArray) &&
-          a.fair.every(isUserId)
+          Obj.hasKeyValue(a, 'fair', Arr.isArray) && a.fair.every(isUserId)
             ? ISet.new(a.fair)
             : d.fair,
 
         poor:
-          IRecord.hasKeyValue(a, 'poor', IList.isArray) &&
-          a.poor.every(isUserId)
+          Obj.hasKeyValue(a, 'poor', Arr.isArray) && a.poor.every(isUserId)
             ? ISet.new(a.poor)
             : d.poor,
       };

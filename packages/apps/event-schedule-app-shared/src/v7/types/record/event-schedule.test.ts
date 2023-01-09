@@ -1,4 +1,4 @@
-import { assertType, IDate } from '@noshiro/ts-utils';
+import { assertType, DateUtils } from '@noshiro/ts-utils';
 import type { DatetimeSpecificationEnumType } from '../enum';
 import type { AnswerIconSettings } from './answer-icon-settings';
 import type { NotificationSettings, User, Ymdhm } from './base';
@@ -45,7 +45,7 @@ describe('EventSchedule', () => {
         poor: answerIconSettingTypeDef(0).defaultValue,
       },
       notificationSettings: 'none',
-      timezoneOffsetMinutes: IDate.today().getTimezoneOffset(),
+      timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
       author: userDefaultValue,
       archivedBy: [],
     };

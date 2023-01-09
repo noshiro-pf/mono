@@ -181,12 +181,12 @@ export namespace AnswerIconFilterState {
           }
 
           case 'enableFiltering':
-            return IRecord.update(state, action.iconId, (a) =>
-              IRecord.set(a, 'enabled', true)
+            return Obj.update(state, action.iconId, (a) =>
+              Obj.set(a, 'enabled', true)
             );
 
           case 'disableFiltering':
-            return IRecord.set(state, action.iconId, {
+            return Obj.set(state, action.iconId, {
               enabled: false,
               min: 0,
               max: state.upperLimit,
@@ -195,36 +195,28 @@ export namespace AnswerIconFilterState {
           case 'setMin': {
             const next = Num.clamp(0, state.upperLimit)(action.value);
 
-            return IRecord.update(
+            return Obj.update(
               state,
               action.iconId,
               (a) =>
                 pipe(a)
-                  .chain((v) => IRecord.set(v, 'min', next))
+                  .chain((v) => Obj.set(v, 'min', next))
                   .chain((v) =>
-                    IRecord.set(
-                      v,
-                      'max',
-                      Math.max(next, state[action.iconId].max)
-                    )
+                    Obj.set(v, 'max', Math.max(next, state[action.iconId].max))
                   ).value
             );
           }
 
           case 'setMax': {
             const next = Num.clamp(0, state.upperLimit)(action.value);
-            return IRecord.update(
+            return Obj.update(
               state,
               action.iconId,
               (a) =>
                 pipe(a)
-                  .chain((v) => IRecord.set(v, 'max', next))
+                  .chain((v) => Obj.set(v, 'max', next))
                   .chain((v) =>
-                    IRecord.set(
-                      v,
-                      'min',
-                      Math.min(next, state[action.iconId].min)
-                    )
+                    Obj.set(v, 'min', Math.min(next, state[action.iconId].min))
                   ).value
             );
           }
@@ -239,23 +231,22 @@ export namespace AnswerIconFilterState {
               }>
             > = (st) =>
               !st.enabled
-                ? IRecord.set(st, 'max', upperLimit) // フィルタがoffのときはデフォルト値で更新
+                ? Obj.set(st, 'max', upperLimit) // フィルタがoffのときはデフォルト値で更新
                 : pipe(st)
                     .chain((a) =>
-                      IRecord.update(a, 'min', (m) => Math.min(upperLimit, m))
+                      Obj.update(a, 'min', (m) => Math.min(upperLimit, m))
                     )
                     .chain((a) =>
-                      IRecord.update(a, 'max', (m) => Math.min(upperLimit, m))
+                      Obj.update(a, 'max', (m) => Math.min(upperLimit, m))
                     ).value; // 回答が減ったとき
 
             return pipe(state)
-              .chain((st) => IRecord.set(st, 'upperLimit', upperLimit))
-              .chain((st) => IRecord.update(st, 'good', helperFn))
-              .chain((st) => IRecord.update(st, 'fair', helperFn))
-              .chain((st) => IRecord.update(st, 'poor', helperFn))
-              .chain((st) => IRecord.update(st, 'goodPlusFair', helperFn))
-              .chain((st) => IRecord.update(st, 'fairPlusPoor', helperFn))
-              .value;
+              .chain((st) => Obj.set(st, 'upperLimit', upperLimit))
+              .chain((st) => Obj.update(st, 'good', helperFn))
+              .chain((st) => Obj.update(st, 'fair', helperFn))
+              .chain((st) => Obj.update(st, 'poor', helperFn))
+              .chain((st) => Obj.update(st, 'goodPlusFair', helperFn))
+              .chain((st) => Obj.update(st, 'fairPlusPoor', helperFn)).value;
           }
         }
       })
