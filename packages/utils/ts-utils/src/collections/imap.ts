@@ -1,4 +1,4 @@
-import { MutableMap, objectIs, tp } from '../others';
+import { MutableMap, tp } from '../others';
 import { ISet } from './iset';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -112,7 +112,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   delete(key: K): IMap<K, V> {
     if (!this.has(key)) return this;
 
-    return IMap.new(ArrayFrom(this.#map).filter(([k]) => !objectIs(k, key)));
+    return IMap.new(ArrayFrom(this.#map).filter(([k]) => !Object.is(k, key)));
   }
 
   set(key: K, value: V): IMap<K, V> {
@@ -121,7 +121,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
       return IMap.new([...this.#map, tp(key, value)]);
     } else {
       return IMap.new(
-        ArrayFrom(this.#map, ([k, v]) => tp(k, objectIs(k, key) ? value : v))
+        ArrayFrom(this.#map, ([k, v]) => tp(k, Object.is(k, key) ? value : v))
       );
     }
   }
@@ -133,7 +133,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     return IMap.new(
       ArrayFrom(this.#map, ([k, v]) =>
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        tp(k, objectIs(k, key) ? updater(curr!) : v)
+        tp(k, Object.is(k, key) ? updater(curr!) : v)
       )
     );
   }

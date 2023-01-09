@@ -45,7 +45,6 @@ export const providePluginTsUtilsDef = Obj.fromEntries(
     'noop',
     'Num',
     'Obj',
-    'objectIs',
     'pipe',
     'range',
     'RecordUtils',

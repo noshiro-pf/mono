@@ -29,7 +29,12 @@ const eslintReactRules = {
   'react/boolean-prop-naming': 'error',
   'react/button-has-type': 'error',
   'react/default-props-match-prop-types': 'error',
+
+  /**
+   * props を展開して使うかどうかを統一する。
+   */
   'react/destructuring-assignment': 'error',
+
   'react/display-name': 'error',
   'react/forbid-component-props': ['error', { forbid: ['className'] }], // modified
   'react/forbid-dom-props': 'error',
@@ -49,17 +54,34 @@ const eslintReactRules = {
   'react/jsx-handler-names': 'off', // disabled
   'react/jsx-key': 'error',
   'react/jsx-max-depth': 'off', // disabled
+
+  /**
+   * JSXに直接コールバック関数を書くのを禁止する。
+   * 修正方法： React.useCallback を使うようにする。
+   */
   'react/jsx-no-bind': 'error',
+
   'react/jsx-no-comment-textnodes': 'error',
   'react/jsx-no-constructed-context-values': 'error',
   'react/jsx-no-duplicate-props': 'error',
+
+  /**
+   * JSXに文字列を直接書くのを避け `<div>{"aaa"}</div>` のように書くことを強制する。
+   * 変数に `{}` を付け忘れるミスに気づきやすくなったり syntax highlighting で読みやすくなるなどのメリットがある。
+   */
   'react/jsx-no-literals': 'error',
+
   'react/jsx-no-script-url': 'error',
   'react/jsx-no-target-blank': 'error',
   'react/jsx-no-undef': 'error',
   'react/jsx-no-useless-fragment': 'error',
   'react/jsx-pascal-case': 'error',
+
+  /**
+   * `{...props}` 形式でpropsを渡すと props の過不足のチェックが甘くなるため
+   */
   'react/jsx-props-no-spreading': 'error', // modified
+
   'react/jsx-sort-default-props': 'off', // deprecated
   'react/jsx-sort-props': [
     'error',
@@ -101,7 +123,12 @@ const eslintReactRules = {
   'react/prefer-exact-props': 'error',
   'react/prefer-read-only-props': 'error',
   'react/prefer-stateless-function': 'error',
-  'react/prop-types': 'error',
+
+  /**
+   * TypeScript では不要
+   */
+  'react/prop-types': 'off',
+
   'react/react-in-jsx-scope': 'off', // disabled
   'react/require-default-props': 'error',
   'react/require-optimization': 'error',

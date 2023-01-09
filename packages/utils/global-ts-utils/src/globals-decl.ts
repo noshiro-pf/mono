@@ -44,7 +44,6 @@ import type {
   noop as _noop,
   Num as _Num,
   Obj as _Obj,
-  objectIs as _objectIs,
   Ok as _Ok,
   pipe as _pipe,
   Queue as _Queue,
@@ -120,7 +119,6 @@ declare global {
   const noop: typeof _noop;
   const Num: typeof _Num;
   const Obj: typeof _Obj;
-  const objectIs: typeof _objectIs;
   const pipe: typeof _pipe;
   const range: typeof _range;
   const RecordUtils: typeof _RecordUtils;

@@ -75,7 +75,8 @@ export const useRouterLinkClick = ({
 
         // If the URL hasn't changed, a regular <a> will do a replace instead of
         // a push, so do the same here.
-        const replace = replaceProp === true || createPath(location) === href;
+        const replace =
+          replaceProp === true || createPath(window.location) === href;
 
         if (replace) {
           redirectFn(href);

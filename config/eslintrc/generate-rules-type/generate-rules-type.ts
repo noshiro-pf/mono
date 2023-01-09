@@ -288,7 +288,7 @@ const generateRulesType = async (
             require('eslint/use-at-your-own-risk')?.builtinRules.entries() ?? []
           )
         )
-      : // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-require-imports,import/no-internal-modules,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,unicorn/prefer-module,import/no-dynamic-require,no-restricted-globals
+      : // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, import/no-dynamic-require, security/detect-non-literal-require, @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, unicorn/prefer-module, no-restricted-syntax
         Object.entries(require(pluginName).rules);
 
   const schemaList: DeepReadonly<

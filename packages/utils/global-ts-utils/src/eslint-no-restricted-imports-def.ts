@@ -44,7 +44,6 @@ export const eslintNoRestrictedImportsTsUtilsDef = {
     'noop',
     'Num',
     'Obj',
-    'objectIs',
     'pipe',
     'range',
     'RecordUtils',

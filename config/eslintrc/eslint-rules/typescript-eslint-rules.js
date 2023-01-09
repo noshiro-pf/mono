@@ -218,6 +218,11 @@ const typescriptEslintRules = {
   '@typescript-eslint/prefer-as-const': 'error',
   '@typescript-eslint/prefer-enum-initializers': 'error',
   '@typescript-eslint/prefer-for-of': 'error',
+
+  /**
+   * 関数メンバーをメソッド記法で書くと双変になり安全性が低くなるため
+   * https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-function-parameters-bivariant
+   */
   '@typescript-eslint/prefer-function-type': 'error',
   '@typescript-eslint/prefer-includes': 'error',
   '@typescript-eslint/prefer-literal-enum-member': 'error',
@@ -239,8 +244,22 @@ const typescriptEslintRules = {
   '@typescript-eslint/prefer-string-starts-ends-with': 'error',
   '@typescript-eslint/prefer-ts-expect-error': 'error',
   '@typescript-eslint/promise-function-async': 'off', // disabled
+
+  /**
+   * sortはデフォルトで文字列としての比較を行うため、数値のソートを行おうとしたときに
+   * 比較関数を忘れることを防ぐため使用。
+   */
   '@typescript-eslint/require-array-sort-compare': 'error',
   '@typescript-eslint/require-await': 'error',
+
+  /**
+   * `+` の曖昧性回避のため使用。
+   * restrict-plus-operands で bigint, number, string 同士にしか使用できないように制限し、
+   * prefer-template で文字列の連結に `+` を使うことも禁止する。
+   * 修正方法： template literal を使うか、文字列の配列を `join("")` で結合する。
+   *  - a + b -> `${a}${b}`
+   *  - s_1 + s_2 + ... + s_n -> [s_1, ..., s_n].join("")
+   */
   '@typescript-eslint/restrict-plus-operands': [
     'error',
     { checkCompoundAssignments: true },
@@ -251,11 +270,22 @@ const typescriptEslintRules = {
   ], // modified
   '@typescript-eslint/return-await': 'error',
   '@typescript-eslint/sort-type-union-intersection-members': 'error',
+
+  /**
+   * boolean への暗黙のキャストを回避するために使用。
+   * 数値 `0`, `NaN` や 文字列 `""` が条件部に来たときに false として扱われるのを
+   * 見落とさないようにするため。
+   */
   '@typescript-eslint/strict-boolean-expressions': [
     'error',
     { allowString: false, allowNumber: false, allowNullableObject: false },
   ], // modified
+
+  /**
+   * switch の case 漏れを防ぐ（型情報を使用）
+   */
   '@typescript-eslint/switch-exhaustiveness-check': 'error',
+
   '@typescript-eslint/triple-slash-reference': 'error',
   '@typescript-eslint/typedef': 'error',
   '@typescript-eslint/unbound-method': 'error',

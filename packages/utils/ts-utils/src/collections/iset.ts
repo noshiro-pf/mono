@@ -1,5 +1,5 @@
 import { assertType } from '../assert-type';
-import { MutableSet, objectIs } from '../others';
+import { MutableSet } from '../others';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface ISetInterface<K> {
@@ -126,7 +126,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   delete(key: K): ISet<K> {
     if (!this.has(key)) return this;
 
-    return ISet.new(ArrayFrom(this.#set).filter((k) => !objectIs(k, key)));
+    return ISet.new(ArrayFrom(this.#set).filter((k) => !Object.is(k, key)));
   }
 
   withMutations(
