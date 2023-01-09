@@ -39,6 +39,7 @@ export namespace psql {
 
   export const setJsonData = (
     psqlClient: PsqlClient,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     jsonData: JSONType
   ): Promise<Result<undefined, JSONValue>> => {
     const query = `update ${psqlTableName} SET ${
