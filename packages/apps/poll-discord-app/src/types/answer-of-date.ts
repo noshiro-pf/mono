@@ -13,7 +13,7 @@ export type AnswerOfDateJson = DeepReadonly<{
   poor: string[];
 }>;
 
-assertType<TypeExtends<AnswerOfDateJson, ReadonlyJSONType>>();
+assertType<TypeExtends<AnswerOfDateJson, JSONType>>();
 
 export const answerOfDateDefaultValue: AnswerOfDate = {
   good: ISet.new<UserId>([]),

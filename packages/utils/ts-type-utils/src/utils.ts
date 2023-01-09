@@ -34,29 +34,29 @@ export type Primitive =
 
 /* JSONValue */
 
+export type MutableJSONValue =
+  | MutableJSONValue[]
+  | boolean
+  | number
+  | string
+  | {
+      [K in string]?: MutableJSONValue;
+    }
+  | null;
+
 export type JSONValue =
-  | JSONValue[]
   | boolean
   | number
   | string
+  | readonly JSONValue[]
   | {
-      [K in string]?: JSONValue;
+      readonly [K in string]?: JSONValue;
     }
   | null;
 
-export type ReadonlyJSONValue =
-  | boolean
-  | number
-  | string
-  | readonly ReadonlyJSONValue[]
-  | {
-      readonly [K in string]?: ReadonlyJSONValue;
-    }
-  | null;
+export type JSONType = Record<string, JSONValue>;
 
-export type ReadonlyJSONType = ReadonlyRecord<string, ReadonlyJSONValue>;
-
-export type JSONType = ReadonlyRecord<string, JSONValue>;
+export type MutableJSONType = MutableRecord<string, MutableJSONValue>;
 
 /* Other Utilities */
 
@@ -81,9 +81,11 @@ export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
 export type RecordKeyType = keyof never;
 
-export type ReadonlyRecord<K extends RecordKeyType, V> = Readonly<Record<K, V>>;
+export type MutableRecord<K extends RecordKeyType, V> = {
+  [P in K]: V;
+};
 
-export type ReadonlyRecordBase = ReadonlyRecord<RecordKeyType, unknown>;
+export type RecordBase = Record<RecordKeyType, unknown>;
 
 export type FunctionType<A, B> = (value: A) => B;
 

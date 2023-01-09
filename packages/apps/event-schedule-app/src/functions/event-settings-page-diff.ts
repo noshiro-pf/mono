@@ -165,7 +165,7 @@ const datetimeRange2str = (
 const datetimeRangeListDiff = (
   a: Pick<EventSchedule, 'datetimeRangeList' | 'datetimeSpecification'>,
   b: Pick<EventSchedule, 'datetimeRangeList' | 'datetimeSpecification'>
-): ReadonlyRecord<'added' | 'deleted', readonly string[]> | undefined => {
+): Record<'added' | 'deleted', readonly string[]> | undefined => {
   const setA = ISetMapped.new(
     a.datetimeRangeList,
     datetimeRangeToMapKey,

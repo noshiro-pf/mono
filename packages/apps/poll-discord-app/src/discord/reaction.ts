@@ -48,11 +48,7 @@ const onRefreshClick = async (
   if (result.some(Result.isErr)) {
     return Result.err(
       Result.unwrapThrow(
-        Json.stringify(
-          result.map((a) => a.value) as ReadonlyJSONValue,
-          undefined,
-          2
-        )
+        Json.stringify(result.map((a) => a.value) as JSONValue, undefined, 2)
       )
     );
   }

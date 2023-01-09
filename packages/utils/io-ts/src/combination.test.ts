@@ -35,7 +35,7 @@ describe('nested record', () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const x: ReadonlyRecordBase = {
+      const x: RecordBase = {
         xs: [1, 2, 3],
         rec: {
           a: 1,
@@ -47,14 +47,14 @@ describe('nested record', () => {
       if (nestedRecord.is(x)) {
         assertType<TypeEq<typeof x, NestedRecord>>();
       } else {
-        assertType<TypeEq<typeof x, ReadonlyRecordBase>>();
+        assertType<TypeEq<typeof x, RecordBase>>();
       }
 
       expect(nestedRecord.is(x)).toBe(true);
     });
 
     test('falsy case', () => {
-      const x: ReadonlyRecordBase = {
+      const x: RecordBase = {
         xs: [-1, 2.2, 3.3],
         rec: {
           a: 123,
@@ -66,7 +66,7 @@ describe('nested record', () => {
       if (nestedRecord.is(x)) {
         assertType<TypeEq<typeof x, NestedRecord>>();
       } else {
-        assertType<TypeEq<typeof x, ReadonlyRecordBase>>();
+        assertType<TypeEq<typeof x, RecordBase>>();
       }
 
       expect(nestedRecord.is(x)).toBe(false);
@@ -75,7 +75,7 @@ describe('nested record', () => {
 
   describe('validate', () => {
     test('falsy case', () => {
-      const x: ReadonlyRecordBase = {
+      const x: RecordBase = {
         xs: [-1, 2.2, 3.3],
         rec: {
           a: 123,
@@ -94,7 +94,7 @@ describe('nested record', () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: ReadonlyRecordBase = {};
+      const x: RecordBase = {};
 
       expect(nestedRecord.fill(x)).toStrictEqual({
         xs: [],
@@ -107,7 +107,7 @@ describe('nested record', () => {
     });
 
     test('from a filled record', () => {
-      const x: ReadonlyRecordBase = {
+      const x: RecordBase = {
         xs: [-1, 2.2, 3.3],
         rec: {
           a: 123,
@@ -127,7 +127,7 @@ describe('nested record', () => {
     });
 
     test('from a partial record', () => {
-      const x: ReadonlyRecordBase = {
+      const x: RecordBase = {
         xs: [11, 22],
         rec: {
           a: 3,
@@ -145,7 +145,7 @@ describe('nested record', () => {
     });
 
     test('from a partial record with excess property', () => {
-      const x: ReadonlyRecordBase = {
+      const x: RecordBase = {
         xs: [11, 22],
         rec: {
           a: 3,

@@ -2,7 +2,7 @@ import type { AnswerSymbolId } from '../enum';
 import type { SymbolSetting } from './base';
 import { fillSymbolSetting } from './base';
 
-export type SymbolSettings = ReadonlyRecord<AnswerSymbolId, SymbolSetting>;
+export type SymbolSettings = Record<AnswerSymbolId, SymbolSetting>;
 
 export type PartialSymbolSettings = DeepPartial<SymbolSettings>;
 

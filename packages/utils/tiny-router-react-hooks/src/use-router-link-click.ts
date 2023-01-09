@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 const isModifiedEvent = (
-  ev: ReadonlyRecord<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>
+  ev: Record<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>
 ): boolean => ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey;
 
 type Path = Readonly<{

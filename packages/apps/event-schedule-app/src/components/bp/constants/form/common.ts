@@ -70,7 +70,7 @@ export const controlGroupStack = [
   'select-caret',
 ];
 
-export const controlGroupStackZIndex: ReadonlyRecord<
+export const controlGroupStackZIndex: Record<
   typeof controlGroupStack[number],
   number
 > = Obj.fromEntries(controlGroupStack.map((key, index) => [key, index]));

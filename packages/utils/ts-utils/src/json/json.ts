@@ -13,7 +13,7 @@ export namespace Json {
    */
   export const parse = (
     text: string,
-    reviver?: (this: unknown, key: string, value: ReadonlyJSONValue) => unknown
+    reviver?: (this: unknown, key: string, value: JSONValue) => unknown
   ): Result<JSONValue, string> => {
     try {
       return Result.ok(
@@ -71,7 +71,7 @@ export namespace Json {
   };
 
   export const stringifySortedKey = (
-    value: ReadonlyRecordBase,
+    value: RecordBase,
     space?: number | string
   ): Result<string, string> => {
     const allKeys = pipe(keysDeep(value))
@@ -83,7 +83,7 @@ export namespace Json {
 }
 
 const keysDeepImpl = (
-  obj: ReadonlyRecordBase,
+  obj: RecordBase,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_keys: string[]
 ): void => {
@@ -104,7 +104,7 @@ const keysDeepImpl = (
   }
 };
 
-const keysDeep = (obj: ReadonlyRecordBase): readonly string[] => {
+const keysDeep = (obj: RecordBase): readonly string[] => {
   const mut_keys: string[] = [];
   keysDeepImpl(obj, mut_keys);
   return mut_keys;

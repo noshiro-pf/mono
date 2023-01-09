@@ -27,6 +27,6 @@ export const isDatetimeSpecificationEnumType = datetimeSpecificationTypeDef.is;
 assertType<
   TypeExtends<
     typeof datetimeSpecificationOptions,
-    ReadonlyRecord<DatetimeSpecificationEnumType, DatetimeSpecificationEnumType>
+    Record<DatetimeSpecificationEnumType, DatetimeSpecificationEnumType>
   >
 >();

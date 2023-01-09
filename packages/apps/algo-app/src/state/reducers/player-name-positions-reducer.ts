@@ -10,7 +10,7 @@ const initialState = (): Record<NWES, Rect> => ({
 });
 
 export const playerNamePositionsReducer: ReducerType<
-  ReadonlyRecord<NWES, Rect> | undefined,
+  Record<NWES, Rect> | undefined,
   readonly [NWES, Rect]
 > = (state, [direction, rect]) =>
   produce(state ?? initialState(), (draft) => {

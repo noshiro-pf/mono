@@ -21,7 +21,7 @@ export namespace EventScheduleAppLocalStorage {
     createEventPage: EventSchedule;
   }>;
 
-  type StoreKeys = ReadonlyRecord<keyof Store, string>;
+  type StoreKeys = Record<keyof Store, string>;
 
   const keys: StoreKeys = {
     createEventPage: attachSuffix('createEventPage'),
