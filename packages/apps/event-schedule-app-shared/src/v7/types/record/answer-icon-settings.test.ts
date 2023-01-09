@@ -10,7 +10,10 @@ import type { AnswerIconSetting } from './base';
 
 describe('AnswerIconSettings', () => {
   assertType<
-    TypeEq<AnswerIconSettings, Record<AnswerIconId, AnswerIconSetting>>
+    TypeEq<
+      AnswerIconSettings,
+      Readonly<Record<AnswerIconId, AnswerIconSetting>>
+    >
   >();
 
   test('defaultValue', () => {
