@@ -1,0 +1,10 @@
+{
+  "extends": "../../../config/tsconfig/tsconfig.react.nolib.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "noEmit": true
+  },
+  "include": ["./src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

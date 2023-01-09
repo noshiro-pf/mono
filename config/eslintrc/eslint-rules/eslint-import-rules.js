@@ -26,6 +26,7 @@ const eslintImportsRules = {
         'rxjs/operators',
         'solid-js/web',
         '@testing-library/jest-dom/extend-expect',
+        'react-dom/client',
         'preact/**',
         'immer/**',
         'firebase/*',

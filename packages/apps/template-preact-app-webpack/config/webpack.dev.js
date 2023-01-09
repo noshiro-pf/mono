@@ -26,17 +26,19 @@ const {
 } = require('@noshiro/global-goober/cjs/provide-plugin-def');
 
 const {
-  webpackConfigReactProdMaker,
+  webpackConfigReactDevMaker,
 } = require('../../../../config/webpackconfig/react');
+
 const { dotenvValues } = require('./env');
 const { paths } = require('./paths');
 
-console.log('use bundle analyzer: ', dotenvValues.USE_BUNDLE_ANALYZER);
+require('webpack-dev-server');
 
-const webpackConfigMerged = webpackConfigReactProdMaker(
+const webpackConfigMerged = webpackConfigReactDevMaker(
   paths,
+  dotenvValues.HOST ?? 'localhost',
+  Number(dotenvValues.PORT ?? 8080),
   'bundle.js',
-  dotenvValues.USE_BUNDLE_ANALYZER,
   [
     new ProvidePlugin({
       ...providePluginPreactDef,
