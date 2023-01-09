@@ -70,9 +70,15 @@ const config = {
   },
   ignorePatterns: [
     ...readGitignoreFiles({ cwd: __dirname }),
-    '*.d.ts',
-    '.eslintrc.cjs',
     '*_bs.ts',
+    '*.d.ts',
+
+    // configs
+    '.eslintrc.cjs',
+    'webpack.*.js',
+    'app_directory.js',
+    'env.js',
+    'paths.js',
   ],
 };
 
