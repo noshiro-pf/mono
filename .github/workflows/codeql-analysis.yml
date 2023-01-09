@@ -15,6 +15,7 @@ on:
   push:
     branches-ignore:
       - 'dev'
+      - 'develop'
       - 'archive/**'
     paths-ignore:
       - 'docs/**'
