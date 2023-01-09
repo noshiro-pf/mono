@@ -50,7 +50,8 @@ const isGmailConfig = (
   Obj.hasKeyValue(config.gmail, 'app-password', isString);
 
 export const fillGmailConfig = (
-  config: ReadonlyJSONValue
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  config: JSONValue
 ): DeepReadonly<{
   gmail: {
     email: string;
