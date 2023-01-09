@@ -8,10 +8,9 @@
   "scripts": {
     "build:apps": "node scripts/build-apps.js",
     "build:utils": "node scripts/build-utils.js",
-    "check:all": "run-s ws:build fmt:all ws:lint:fix ws:test type-check:root",
     "check:no-diff": "scripts/git_no_changes.sh",
     "ci:local": "yarn clean && yarn install && yarn ci",
-    "ci": "run-s ws:setup ws:gi ws:build fmt:all ws:lint:fix:fast ws:test:fast type-check:root check:no-diff",
+    "ci": "run-s ws:setup ws:gi ws:type-check ws:build fmt:all ws:lint:fix:fast ws:test:fast type-check:root check:no-diff",
     "clean:all": "git clean -xfd",
     "clean": "run-p clean:node_modules clean:wireit clean:eslintcache",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
