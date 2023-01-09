@@ -35,7 +35,7 @@ interface Array<T> {
     thisArg?: unknown
   ): S | undefined;
   find(
-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
     thisArg?: unknown
   ): T | undefined;
 
@@ -49,7 +49,7 @@ interface Array<T> {
    * predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
     thisArg?: unknown
   ): number;
 
@@ -379,7 +379,7 @@ interface ReadonlyArray<T> {
     thisArg?: unknown
   ): S | undefined;
   find(
-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
     thisArg?: unknown
   ): T | undefined;
 
@@ -393,7 +393,7 @@ interface ReadonlyArray<T> {
    * predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
-    predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+    predicate: (value: T, index: number, obj: readonly T[]) => boolean,
     thisArg?: unknown
   ): number;
 }

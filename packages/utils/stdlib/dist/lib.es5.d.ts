@@ -1351,7 +1351,7 @@ interface ReadonlyArray<T> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: T, index: number, array: readonly T[]) => unknown,
+    predicate: (value: T, index: number, array: readonly T[]) => boolean,
     thisArg?: unknown
   ): boolean;
   /**
@@ -1363,7 +1363,7 @@ interface ReadonlyArray<T> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: T, index: number, array: readonly T[]) => unknown,
+    predicate: (value: T, index: number, array: readonly T[]) => boolean,
     thisArg?: unknown
   ): boolean;
   /**
@@ -1399,7 +1399,7 @@ interface ReadonlyArray<T> {
    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: T, index: number, array: readonly T[]) => unknown,
+    predicate: (value: T, index: number, array: readonly T[]) => boolean,
     thisArg?: unknown
   ): readonly T[];
   /**
@@ -1555,7 +1555,7 @@ interface Array<T> {
    * [11,2,22,1].sort((a, b) => a - b)
    * ```
    */
-  sort(compareFn?: (a: T, b: T) => number): this;
+  sort(compareFn: (a: T, b: T) => number): this;
   /**
    * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
    * @param start The zero-based location in the array from which to start removing elements.
@@ -1613,7 +1613,7 @@ interface Array<T> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: T, index: number, array: readonly T[]) => unknown,
+    predicate: (value: T, index: number, array: readonly T[]) => boolean,
     thisArg?: unknown
   ): boolean;
   /**
@@ -1625,7 +1625,7 @@ interface Array<T> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: T, index: number, array: readonly T[]) => unknown,
+    predicate: (value: T, index: number, array: readonly T[]) => boolean,
     thisArg?: unknown
   ): boolean;
   /**
@@ -1661,7 +1661,7 @@ interface Array<T> {
    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: T, index: number, array: readonly T[]) => unknown,
+    predicate: (value: T, index: number, array: readonly T[]) => boolean,
     thisArg?: unknown
   ): readonly T[];
   /**
@@ -2201,7 +2201,7 @@ interface Int8Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Int8Array) => unknown,
+    predicate: (value: number, index: number, array: Int8Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -2223,7 +2223,7 @@ interface Int8Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Int8Array) => unknown,
+    predicate: (value: number, index: number, array: Int8Array) => boolean,
     thisArg?: unknown
   ): Int8Array;
 
@@ -2432,7 +2432,7 @@ interface Int8Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Int8Array) => unknown,
+    predicate: (value: number, index: number, array: Int8Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -2556,7 +2556,7 @@ interface Uint8Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Uint8Array) => unknown,
+    predicate: (value: number, index: number, array: Uint8Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -2578,7 +2578,7 @@ interface Uint8Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Uint8Array) => unknown,
+    predicate: (value: number, index: number, array: Uint8Array) => boolean,
     thisArg?: unknown
   ): Uint8Array;
 
@@ -2787,7 +2787,7 @@ interface Uint8Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Uint8Array) => unknown,
+    predicate: (value: number, index: number, array: Uint8Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -2916,7 +2916,7 @@ interface Uint8ClampedArray {
       value: number,
       index: number,
       array: Uint8ClampedArray
-    ) => unknown,
+    ) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -2942,7 +2942,7 @@ interface Uint8ClampedArray {
       value: number,
       index: number,
       array: Uint8ClampedArray
-    ) => unknown,
+    ) => boolean,
     thisArg?: unknown
   ): Uint8ClampedArray;
 
@@ -3171,7 +3171,7 @@ interface Uint8ClampedArray {
       value: number,
       index: number,
       array: Uint8ClampedArray
-    ) => unknown,
+    ) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -3296,7 +3296,7 @@ interface Int16Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Int16Array) => unknown,
+    predicate: (value: number, index: number, array: Int16Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -3318,7 +3318,7 @@ interface Int16Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Int16Array) => unknown,
+    predicate: (value: number, index: number, array: Int16Array) => boolean,
     thisArg?: unknown
   ): Int16Array;
 
@@ -3526,7 +3526,7 @@ interface Int16Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Int16Array) => unknown,
+    predicate: (value: number, index: number, array: Int16Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -3651,7 +3651,7 @@ interface Uint16Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Uint16Array) => unknown,
+    predicate: (value: number, index: number, array: Uint16Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -3673,7 +3673,7 @@ interface Uint16Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Uint16Array) => unknown,
+    predicate: (value: number, index: number, array: Uint16Array) => boolean,
     thisArg?: unknown
   ): Uint16Array;
 
@@ -3882,7 +3882,7 @@ interface Uint16Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Uint16Array) => unknown,
+    predicate: (value: number, index: number, array: Uint16Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -4006,7 +4006,7 @@ interface Int32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Int32Array) => unknown,
+    predicate: (value: number, index: number, array: Int32Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -4028,7 +4028,7 @@ interface Int32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Int32Array) => unknown,
+    predicate: (value: number, index: number, array: Int32Array) => boolean,
     thisArg?: unknown
   ): Int32Array;
 
@@ -4237,7 +4237,7 @@ interface Int32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Int32Array) => unknown,
+    predicate: (value: number, index: number, array: Int32Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -4362,7 +4362,7 @@ interface Uint32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Uint32Array) => unknown,
+    predicate: (value: number, index: number, array: Uint32Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -4384,7 +4384,7 @@ interface Uint32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Uint32Array) => unknown,
+    predicate: (value: number, index: number, array: Uint32Array) => boolean,
     thisArg?: unknown
   ): Uint32Array;
 
@@ -4592,7 +4592,7 @@ interface Uint32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Uint32Array) => unknown,
+    predicate: (value: number, index: number, array: Uint32Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -4717,7 +4717,7 @@ interface Float32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Float32Array) => unknown,
+    predicate: (value: number, index: number, array: Float32Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -4739,7 +4739,7 @@ interface Float32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Float32Array) => unknown,
+    predicate: (value: number, index: number, array: Float32Array) => boolean,
     thisArg?: unknown
   ): Float32Array;
 
@@ -4948,7 +4948,7 @@ interface Float32Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Float32Array) => unknown,
+    predicate: (value: number, index: number, array: Float32Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -5073,7 +5073,7 @@ interface Float64Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: Float64Array) => unknown,
+    predicate: (value: number, index: number, array: Float64Array) => boolean,
     thisArg?: unknown
   ): boolean;
 
@@ -5095,7 +5095,7 @@ interface Float64Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: Float64Array) => unknown,
+    predicate: (value: number, index: number, array: Float64Array) => boolean,
     thisArg?: unknown
   ): Float64Array;
 
@@ -5304,7 +5304,7 @@ interface Float64Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: Float64Array) => unknown,
+    predicate: (value: number, index: number, array: Float64Array) => boolean,
     thisArg?: unknown
   ): boolean;
 

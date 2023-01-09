@@ -112,9 +112,7 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/formatToParts).
      */
-    formatToParts(
-      list: Iterable<string>
-    ): readonly {
+    formatToParts(list: Iterable<string>): readonly {
       readonly type: 'element' | 'literal';
       readonly value: string;
     }[];

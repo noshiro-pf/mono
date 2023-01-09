@@ -311,7 +311,7 @@ interface BigInt64Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: bigint, index: number, array: BigInt64Array) => unknown,
+    predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
     thisArg?: unknown
   ): BigInt64Array;
 
@@ -642,7 +642,7 @@ interface BigUint64Array {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: bigint, index: number, array: BigUint64Array) => unknown,
+    predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
     thisArg?: unknown
   ): BigUint64Array;
 
