@@ -22,7 +22,8 @@
     "test": "wireit",
     "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit"
+    "type-check": "wireit",
+    "type-check:watch": "tsc --noEmit --watch"
   },
   "browserslist": {
     "production": [
@@ -37,13 +38,24 @@
     ]
   },
   "dependencies": {
+    "@noshiro/io-ts": "*",
     "@noshiro/react-utils": "*",
+    "@noshiro/syncflow": "*",
+    "@noshiro/syncflow-react-hooks": "*",
+    "@noshiro/tiny-router-observable": "*",
+    "@noshiro/tiny-router-react-hooks": "*",
     "@noshiro/ts-utils": "*",
+    "@noshiro/ts-utils-additional": "*",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
+    "@noshiro/global-react": "*",
+    "@noshiro/global-react-utils": "*",
+    "@noshiro/global-styled-components": "*",
+    "@noshiro/global-syncflow": "*",
+    "@noshiro/global-syncflow-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   },

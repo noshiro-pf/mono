@@ -22,7 +22,8 @@
     "test": "wireit",
     "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit"
+    "type-check": "wireit",
+    "type-check:watch": "tsc --noEmit --watch"
   },
   "browserslist": {
     "production": [
@@ -38,12 +39,25 @@
   },
   "dependencies": {
     "@noshiro/goober": "*",
+    "@noshiro/io-ts": "*",
     "@noshiro/preact-utils": "*",
+    "@noshiro/resize-observer-preact-hooks": "*",
+    "@noshiro/syncflow": "*",
+    "@noshiro/syncflow-preact-hooks": "*",
+    "@noshiro/tiny-router-observable": "*",
+    "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
-    "preact": "^10.4.7",
-    "preact-router": "^3.2.1"
+    "@noshiro/ts-utils-additional": "*",
+    "preact": "^10.4.7"
   },
   "devDependencies": {
+    "@noshiro/global-goober": "*",
+    "@noshiro/global-preact": "*",
+    "@noshiro/global-preact-utils": "*",
+    "@noshiro/global-syncflow": "*",
+    "@noshiro/global-syncflow-preact-hooks": "*",
+    "@noshiro/global-tiny-router-observable": "*",
+    "@noshiro/global-tiny-router-preact-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   },
