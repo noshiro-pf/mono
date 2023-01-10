@@ -1,4 +1,17 @@
 {
   "extends": "../../../config/tsconfig/tsconfig.react.nolib.json",
-  "include": ["./src", "./scripts"]
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "noEmit": true,
+
+    // customize
+    "baseUrl": "./src/",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "types": ["vitest/globals"]
+  },
+  "include": ["./src", "./scripts", "./config"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

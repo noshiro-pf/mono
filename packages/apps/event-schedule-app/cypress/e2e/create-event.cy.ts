@@ -1,8 +1,7 @@
-const e = (selector) => `[data-cy="${selector}"]`;
+const e = (selector: string): string => `[data-cy="${selector}"]`;
 
-const path = (selectorList) => selectorList.map(e).join(' ');
-
-/** @typedef { import("cypress").cy } */
+const path = (selectorList: readonly string[]): string =>
+  selectorList.map(e).join(' ');
 
 describe('create page', () => {
   it('create event', () => {
@@ -21,7 +20,7 @@ describe('create page', () => {
     // create-event-result-dialog
     cy.get(path(['create-event-result-dialog-body'])).should('be.visible');
     cy.get(path(['create-event-result-dialog-body', 'url-wrapper']), {
-      timeout: 20000,
+      timeout: 20_000,
     }).should('be.visible');
     cy.get(path(['create-event-result-dialog-footer', 'back-button'])).should(
       'be.visible'
@@ -86,10 +85,10 @@ describe('create page', () => {
 /**
  * @param {string} username
  */
-const createAnswer = (username) => {
+const createAnswer = (username: string): void => {
   cy.get(e('answer-page')).within(() => {
     // create answer
-    cy.get(e('add-answer-button'), { timeout: 15000 }).click();
+    cy.get(e('add-answer-button'), { timeout: 15_000 }).click();
 
     cy.get(e('answer-being-edited-section')).should('be.visible');
 
@@ -125,3 +124,5 @@ const createAnswer = (username) => {
     });
   });
 };
+
+export {};
