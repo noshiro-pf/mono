@@ -1,27 +1,7 @@
 {
+  "extends": "./tsconfig.type-checking.json",
   // https://www.typescriptlang.org/ja/tsconfig
   "compilerOptions": {
-    // Type Checking
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "exactOptionalPropertyTypes": false, // TODO
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-    // "alwaysStrict": true,                 // enabled by "strict"
-    // "strictBindCallApply": true,          // enabled by "strict"
-    // "strictFunctionTypes": true,          // enabled by "strict"
-    // "strictNullChecks": true,             // enabled by "strict"
-    // "strictPropertyInitialization": true, // enabled by "strict"
-    // "noImplicitAny": true,                // enabled by "strict"
-    // "noImplicitThis": true,               // enabled by "strict"
-    // "useUnknownInCatchVariables": true,   // enabled by "strict"
-
     // Modules
     "module": "esnext",
     "moduleResolution": "node",
