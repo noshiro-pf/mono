@@ -135,7 +135,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
                       onClick={iconHeader.poor.onClick}
                     />
                   </th>
-                  <th />
+                  <th>{dc.table.header.score}</th>
+                  <th>{dc.table.header.comment}</th>
                 </tr>
               )}
             </thead>

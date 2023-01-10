@@ -8,30 +8,33 @@ import {
   RegisterPage,
   SignInPage,
 } from './components';
+import { ErrorBoundary } from './error-handler';
 import { useShowPage } from './store';
 
 export const Main = memoNamed('Main', () => {
   const show = useShowPage();
 
   return (
-    <Root>
-      {show.createPage ? (
-        <CreateEventSchedule />
-      ) : show.editPage ? (
-        <EditEventSchedule />
-      ) : show.answerPage ? (
-        <AnswerPage />
-      ) : show.eventListPage ? (
-        <EventListPage />
-      ) : show.registerPage ? (
-        <RegisterPage />
-      ) : show.signInPage ? (
-        <SignInPage />
-      ) : (
-        <NotFoundPage />
-      )}
-      <Footer />
-    </Root>
+    <ErrorBoundary>
+      <Root>
+        {show.createPage ? (
+          <CreateEventSchedule />
+        ) : show.editPage ? (
+          <EditEventSchedule />
+        ) : show.answerPage ? (
+          <AnswerPage />
+        ) : show.eventListPage ? (
+          <EventListPage />
+        ) : show.registerPage ? (
+          <RegisterPage />
+        ) : show.signInPage ? (
+          <SignInPage />
+        ) : (
+          <NotFoundPage />
+        )}
+        <Footer />
+      </Root>
+    </ErrorBoundary>
   );
 });
 

@@ -1,15 +1,10 @@
 import type { firestore } from 'firebase-admin';
 import { getEmail } from './get-event-item';
+import type { VerifyEmailPayload } from './types';
 
-export const testEmailImpl = async (
+export const verifyEmailImpl = async (
   db: firestore.Firestore,
-  {
-    email,
-    eventId,
-  }: Readonly<{
-    eventId: string;
-    email: string;
-  }>
+  { email, eventId }: VerifyEmailPayload
 ): Promise<'ng' | 'ok'> => {
   const emailExpected = await getEmail(db, eventId);
   return emailExpected === email ? 'ok' : 'ng';

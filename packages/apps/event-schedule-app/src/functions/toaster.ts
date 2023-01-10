@@ -4,18 +4,31 @@ export const createToaster = (): IToaster =>
   Toaster.create({ canEscapeKeyClear: true, position: 'top' });
 
 export const showToast = ({
+  isCloseButtonShown = true,
   toast,
   message,
   intent,
-}: Readonly<{
+  icon,
+}: DeepReadonly<{
+  isCloseButtonShown?: boolean;
   toast: IToaster;
-  message: string;
+  message: ReactNode;
   intent: Intent;
+  icon?: IconName;
 }>): void => {
   toast.show({
-    timeout: 2000,
+    isCloseButtonShown,
+    timeout: intent === 'danger' || intent === 'warning' ? 0 : 2000,
     intent,
     message,
-    icon: intent === 'success' ? 'tick' : undefined,
+    icon:
+      icon ??
+      match<Intent, IconName | undefined>(intent, {
+        danger: 'error',
+        success: 'tick',
+        warning: 'warning-sign',
+        primary: undefined,
+        none: undefined,
+      }),
   });
 };

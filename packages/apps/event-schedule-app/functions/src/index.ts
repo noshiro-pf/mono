@@ -1,15 +1,21 @@
 // initializeApp must be imported as default import.
 // https://github.com/firebase/firebase-admin-node/issues/593
-import { isBoolean, isRecord, isString, Obj } from '@noshiro/ts-utils';
 import admin from 'firebase-admin';
-import { https, region } from 'firebase-functions';
+import { https, logger, region } from 'firebase-functions';
+import { collectionPath } from './constants';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
-import { collectionPath } from './firestore-paths';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
 import { onUserDelete } from './on-user-delete';
-import { testEmailImpl as verifyEmailImpl } from './test-email';
-import { fillAnswerWithCheck, toStringWithCheck } from './type-check';
+import { sendReportImpl } from './send-report-impl';
+import {
+  fillAnswerWithCheck,
+  isFetchEventListOfUserPayload,
+  isSendReportPayload,
+  isVerifyEmailPayload,
+  toStringWithCheck,
+} from './types';
+import { verifyEmailImpl } from './verify-email';
 
 admin.initializeApp();
 
@@ -93,20 +99,7 @@ export const fetchEventListOfUser = regionSelected
     memory: '1GB',
   })
   .https.onCall((payload: unknown, context) => {
-    if (
-      !(
-        isRecord(payload) &&
-        Obj.hasKeyValue(payload, 'filterText', isString) &&
-        Obj.hasKeyValue(
-          payload,
-          'filterOptionState',
-          (v: unknown): v is 'archive' | 'inProgress' =>
-            v === 'archive' || v === 'inProgress'
-        ) &&
-        Obj.hasKeyValue(payload, 'showAllPastDaysEvent', isBoolean) &&
-        Obj.hasKeyValue(payload, 'showOnlyEventSchedulesICreated', isBoolean)
-      )
-    ) {
+    if (!isFetchEventListOfUserPayload(payload)) {
       throw new https.HttpsError(
         'invalid-argument',
         'The payload type is invalid.'
@@ -118,13 +111,7 @@ export const fetchEventListOfUser = regionSelected
 
 export const verifyEmail = regionSelected.https.onCall(
   (payload: unknown, _context) => {
-    if (
-      !(
-        isRecord(payload) &&
-        Obj.hasKeyValue(payload, 'eventId', isString) &&
-        Obj.hasKeyValue(payload, 'email', isString)
-      )
-    ) {
+    if (!isVerifyEmailPayload(payload)) {
       throw new https.HttpsError(
         'invalid-argument',
         'The payload type is invalid.'
@@ -132,5 +119,18 @@ export const verifyEmail = regionSelected.https.onCall(
     }
 
     return verifyEmailImpl(db, payload);
+  }
+);
+
+export const sendReport = regionSelected.https.onCall(
+  (payload: unknown, _context) => {
+    if (!isSendReportPayload(payload)) {
+      throw new https.HttpsError(
+        'invalid-argument',
+        'The payload type is invalid.'
+      );
+    }
+
+    sendReportImpl(payload).catch(logger.error);
   }
 );

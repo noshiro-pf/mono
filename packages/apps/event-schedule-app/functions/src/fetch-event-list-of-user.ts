@@ -9,7 +9,8 @@ import { Arr, IMap, pipe, tp } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
 import type { CallableContext } from 'firebase-functions/v1/https';
-import { collectionPath } from './firestore-paths';
+import { collectionPath } from './constants';
+import type { FetchEventListOfUserPayload } from './types';
 import { today } from './utils';
 
 /**
@@ -24,12 +25,7 @@ export const fetchEventListOfUserImpl = async (
     filterOptionState,
     showAllPastDaysEvent,
     showOnlyEventSchedulesICreated,
-  }: Readonly<{
-    filterText: string;
-    filterOptionState: 'archive' | 'inProgress';
-    showAllPastDaysEvent: boolean;
-    showOnlyEventSchedulesICreated: boolean;
-  }>,
+  }: FetchEventListOfUserPayload,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   context: CallableContext
 ): Promise<readonly EventListItem[]> => {

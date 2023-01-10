@@ -4,7 +4,7 @@ import {
   fillEventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { isRecord, isString, Json, Obj, Result, Str } from '@noshiro/ts-utils';
+import { isString, Str } from '@noshiro/ts-utils';
 import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {
@@ -31,39 +31,4 @@ export const fillEventScheduleWithCheck = (
     logger.error(`There is a difference with the result of fillEventSchedule`);
   }
   return filled;
-};
-
-const isGmailConfig = (
-  config: unknown
-): config is DeepReadonly<{
-  gmail: {
-    email: string;
-    password: string;
-    'app-password': string;
-  };
-}> =>
-  isRecord(config) &&
-  Obj.hasKey(config, 'gmail') &&
-  isRecord(config.gmail) &&
-  Obj.hasKeyValue(config.gmail, 'email', isString) &&
-  Obj.hasKeyValue(config.gmail, 'password', isString) &&
-  Obj.hasKeyValue(config.gmail, 'app-password', isString);
-
-export const fillGmailConfig = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  config: JSONValue
-): DeepReadonly<{
-  gmail: {
-    email: string;
-    password: string;
-    'app-password': string;
-  };
-}> => {
-  if (!isGmailConfig(config)) {
-    logger.error(
-      `${Result.unwrapThrow(Json.stringify(config))} is not GmailConfig`
-    );
-    return { gmail: { email: '', password: '', 'app-password': '' } };
-  }
-  return config;
 };

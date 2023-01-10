@@ -6,7 +6,7 @@ import {
   createMailBodyForAnswerDelete,
   createMailBodyForNewAnswer,
   createMailBodyForUpdatedAnswer,
-} from './create-mail-body';
+} from './functions';
 import { getEmail, getEventItem } from './get-event-item';
 import { createMailOptions, sendEmail } from './setup-mailer';
 import { now } from './utils';

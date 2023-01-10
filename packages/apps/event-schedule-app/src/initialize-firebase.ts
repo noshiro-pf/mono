@@ -11,7 +11,7 @@ import {
 } from 'firebase/firestore';
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import firebaseJson from '../firebase.json';
-import { isDevelopment } from './env';
+import { isDevelopment, useEmulators } from './env';
 import { clog } from './utils';
 
 const fbApp = initializeApp(firebaseConfig);
@@ -31,10 +31,7 @@ const firestore = initializeFirestore(fbApp, {
 //   clog(`using firestore emulator. (${host}:${port})`);
 // }
 
-export const firestoreEvents = collection(
-  firestore,
-  `${firestorePaths.events}${isDevelopment ? '_dev' : ''}`
-);
+export const firestoreEvents = collection(firestore, firestorePaths.events);
 
 export const fbAuth = getAuth();
 
@@ -42,7 +39,7 @@ export const googleAuthProvider = new GoogleAuthProvider();
 
 export const fbFunctions = getFunctions(fbApp, 'asia-northeast2');
 
-if (isDevelopment) {
+if (isDevelopment && useEmulators) {
   connectFirestoreEmulator(
     firestore,
     'localhost',

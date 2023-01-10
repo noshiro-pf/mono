@@ -1,6 +1,6 @@
 import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { DateUtils } from '@noshiro/ts-utils';
-import { today } from './utils';
+import { today } from '../utils';
 
 const ymd2Date = (ymd: YearMonthDate): DateUtils =>
   DateUtils.create(ymd.year, ymd.month, ymd.date);
