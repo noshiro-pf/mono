@@ -1,8 +1,8 @@
 import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
+import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import { Arr, assertType, tp } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
-import { collectionPath } from './constants';
 import {
   createMailBodyForAnswerDeadline,
   todayIsNDaysBeforeDeadline,
@@ -23,7 +23,7 @@ export const notifyAnswerDeadline = async (
   db: firestore.Firestore
 ): Promise<void> => {
   const querySnapshot = await db
-    .collection(collectionPath.events)
+    .collection(firestorePaths.events)
     .where(keys.notificationSettings, '!=', 'none')
     .get();
 
