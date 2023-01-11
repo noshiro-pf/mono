@@ -73,12 +73,13 @@ const config = {
     '*_bs.ts',
     '*.d.ts',
 
-    // configs
+    // configs & scripts
     '.eslintrc.cjs',
     'webpack.*.js',
     'app_directory.js',
     'env.js',
     'paths.js',
+    'cypress.config.js',
   ],
 };
 
