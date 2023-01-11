@@ -1,5 +1,4 @@
 'use strict';
-
 // @ts-check
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */

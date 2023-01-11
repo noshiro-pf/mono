@@ -1,8 +1,8 @@
 'use strict';
-
 // @ts-check
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
+/** @typedef { import("../../../config/eslintrc/eslint-rules/rules-type/typescript-eslint-rules").TypeScriptEslintRules } TypeScriptEslintRules */
 
 const {
   restrictedImportsOption,
