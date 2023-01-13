@@ -4,11 +4,12 @@
   "license": "MIT",
   "author": "noshiro",
   "sideEffects": false,
-  "main": "esm/index.js",
+  "main": "cjs/index.js",
   "module": "esm/index.js",
   "types": "esm/index.d.ts",
   "scripts": {
     "build": "run-p build:**",
+    "build:cjs": "wireit",
     "build:esm": "wireit",
     "clean": "rimraf esm .wireit",
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
@@ -40,6 +41,23 @@
         "../ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "build:cjs": {
+      "command": "tsc --incremental --pretty --project config/tsconfig.cjs.json",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.ts",
+        "tsconfig.json",
+        "../../../config/tsconfig/tsconfig.react.nolib.json",
+        "../ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [
+        "cjs/**",
+        ".tsbuildinfo"
+      ],
       "packageLocks": [
         "yarn.lock"
       ]
