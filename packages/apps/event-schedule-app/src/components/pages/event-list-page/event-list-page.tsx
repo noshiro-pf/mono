@@ -124,7 +124,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
       {eventListWithHandler === undefined ? (
         <Spinner />
       ) : (
-        <Body>
+        <Main>
           <FilterByArea>
             <HTMLSelect
               disabled={formElementsAreDisabled}
@@ -192,13 +192,13 @@ export const EventListPage = memoNamed('EventListPage', () => {
               />
             ))}
           </ListItemsWrapper>
-        </Body>
+        </Main>
       )}
     </div>
   );
 });
 
-const Body = styled.div`
+const Main = styled.div`
   margin: 0 20px;
 `;
 

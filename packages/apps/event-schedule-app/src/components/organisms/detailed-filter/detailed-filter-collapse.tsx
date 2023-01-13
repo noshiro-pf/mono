@@ -33,8 +33,8 @@ export const DetailedFilterCollapse = memoNamed<Props>(
 
     return (
       <Collapse isOpen={isOpen}>
-        <Body>
-          <BodyContent>
+        <Main>
+          <MainContent>
             <DetailedFilterDateRange
               dateRange={dateRange.defaultValue}
               state={dateRange}
@@ -105,8 +105,8 @@ export const DetailedFilterCollapse = memoNamed<Props>(
                 }
               />
             )}
-          </BodyContent>
-        </Body>
+          </MainContent>
+        </Main>
       </Collapse>
     );
   }
@@ -117,12 +117,12 @@ const Title = styled.div`
   margin-bottom: 15px;
 `;
 
-const Body = styled.div`
+const Main = styled.div`
   margin-bottom: 10px;
   overflow-x: auto;
 `;
 
-const BodyContent = styled.div`
+const MainContent = styled.div`
   padding: 10px;
   width: 350px;
   border: solid 1px rgba(16, 22, 26, 0.15);
