@@ -96,11 +96,18 @@ const hasDeletedDatetimeChanges$: InitializedObservable<boolean> = diff$.chain(
 );
 
 const hasNoChanges$: InitializedObservable<boolean> = combineLatestI([
+  emailVerified$,
   eventScheduleFromDatabase$,
   commonState$,
 ]).chain(
-  mapI(([eventScheduleFromDatabase, { eventScheduleNormalized }]) =>
-    deepEqual(eventScheduleFromDatabase, eventScheduleNormalized)
+  mapI(
+    ([
+      emailVerified,
+      eventScheduleFromDatabase,
+      { eventScheduleNormalized, notificationSettingsWithEmail },
+    ]) =>
+      emailVerified === notificationSettingsWithEmail?.email &&
+      deepEqual(eventScheduleFromDatabase, eventScheduleNormalized)
   )
 );
 
