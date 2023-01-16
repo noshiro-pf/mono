@@ -7,12 +7,10 @@ const { state$: fireAuthUser$, setState: setUser } = createState<
   FireAuthUser | undefined
 >(undefined);
 
-export { fireAuthUser$ };
-
-export const useFireAuthUser = (): FireAuthUser | undefined =>
+const useFireAuthUser = (): FireAuthUser | undefined =>
   useObservableValue(fireAuthUser$);
 
-export const passwordProviderIncluded$: InitializedObservable<boolean> =
+const passwordProviderIncluded$: InitializedObservable<boolean> =
   fireAuthUser$.chain(
     mapI(
       (user) =>
@@ -20,10 +18,10 @@ export const passwordProviderIncluded$: InitializedObservable<boolean> =
     )
   );
 
-export const usePasswordProviderIncluded = (): boolean =>
+const usePasswordProviderIncluded = (): boolean =>
   useObservableValue(passwordProviderIncluded$);
 
-export const emitAuthStateChange = (): void => {
+const emitAuthStateChange = (): void => {
   setUser(fbAuth.currentUser ?? undefined);
 };
 
@@ -32,12 +30,22 @@ fbAuth.onAuthStateChanged((user) => {
   setUser(user ?? undefined);
 });
 
-export const signOut = async (): Promise<void> => {
+const signOut = async (): Promise<void> => {
   await fbAuth.signOut();
   router.push(Routes.routes.signInPage);
 };
 
-export const signOutClick = (): void => {
+const signOutClick = (): void => {
   // TODO: use toast
   signOut().catch(console.error);
 };
+
+export const Auth = {
+  fireAuthUser$,
+  passwordProviderIncluded$,
+  useFireAuthUser,
+  usePasswordProviderIncluded,
+  emitAuthStateChange,
+  signOut,
+  signOutClick,
+} as const;

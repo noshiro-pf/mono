@@ -1,38 +1,42 @@
-export namespace UpdateUserInfoDialogStore {
-  const {
-    state$: _openingDialog$,
-    setState: setOpeningDialog,
-    resetState: _closeDialog,
-  } = createState<
-    | 'deleteAccount'
-    | 'deleteAccountCreatedWithGoogle'
-    | 'updateDisplayName'
-    | 'updateEmail'
-    | 'updatePassword'
-    | undefined
-  >(undefined);
+const {
+  state$: openingDialog$,
+  setState: setOpeningDialog,
+  resetState: closeDialog,
+} = createState<
+  | 'deleteAccount'
+  | 'deleteAccountCreatedWithGoogle'
+  | 'updateDisplayName'
+  | 'updateEmail'
+  | 'updatePassword'
+  | undefined
+>(undefined);
 
-  export const openingDialog$ = _openingDialog$;
+const changeUsername = (): void => {
+  setOpeningDialog('updateDisplayName');
+};
 
-  export const changeUsername = (): void => {
-    setOpeningDialog('updateDisplayName');
-  };
+const changeEmail = (): void => {
+  setOpeningDialog('updateEmail');
+};
 
-  export const changeEmail = (): void => {
-    setOpeningDialog('updateEmail');
-  };
+const changePassword = (): void => {
+  setOpeningDialog('updatePassword');
+};
 
-  export const changePassword = (): void => {
-    setOpeningDialog('updatePassword');
-  };
+const deleteAccount = (): void => {
+  setOpeningDialog('deleteAccount');
+};
 
-  export const deleteAccount = (): void => {
-    setOpeningDialog('deleteAccount');
-  };
+const deleteAccountCreatedWithGoogle = (): void => {
+  setOpeningDialog('deleteAccountCreatedWithGoogle');
+};
 
-  export const deleteAccountCreatedWithGoogle = (): void => {
-    setOpeningDialog('deleteAccountCreatedWithGoogle');
-  };
-
-  export const closeDialog = _closeDialog;
-}
+export const UpdateUserInfoDialogStore = {
+  openingDialog$,
+  closeDialog,
+  changeUsername,
+  changeEmail,
+  changePassword,
+  deleteAccount,
+  deleteAccountCreatedWithGoogle,
+} as const;

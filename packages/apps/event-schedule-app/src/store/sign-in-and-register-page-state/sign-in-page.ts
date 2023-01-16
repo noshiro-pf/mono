@@ -14,170 +14,175 @@ const dc = dict.register;
 
 const toast = createToaster();
 
-export namespace SignInPageStore {
-  const [formState$, dispatch] = createReducer(
-    signInPageStateReducer,
-    signInPageInitialState
+const [formState$, dispatch] = createReducer(
+  signInPageStateReducer,
+  signInPageInitialState
+);
+
+const enterButtonDisabled$ = formState$.chain(
+  mapI((state) => state.isWaitingResponse || signInPageHasError(state))
+);
+
+const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+);
+
+const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
+  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
+);
+
+const passwordIsOpenState = createBooleanState(false);
+
+const togglePasswordLock = passwordIsOpenState.toggle;
+
+const { state$: passwordIsOpen$, setFalse: hidePassword } = passwordIsOpenState;
+
+const state$ = combineLatestI([
+  formState$,
+  enterButtonDisabled$,
+  emailFormIntent$,
+  passwordFormIntent$,
+  passwordIsOpen$,
+]).chain(
+  mapI(
+    ([
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    ]) => ({
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    })
+  )
+);
+
+const submit = async (pageToBack: string | undefined): Promise<void> => {
+  const s = dispatch({ type: 'submit' });
+
+  if (signInPageHasError(s)) return;
+
+  const signInResult = await api.auth.signIn(
+    s.email.inputValue,
+    s.password.inputValue
   );
 
-  const enterButtonDisabled$ = formState$.chain(
-    mapI((state) => state.isWaitingResponse || signInPageHasError(state))
-  );
+  if (Result.isErr(signInResult)) {
+    switch (signInResult.value.code) {
+      case 'auth/user-not-found':
+        dispatch({
+          type: 'setEmailError',
+          payload: dict.register.message.error.userNotFound,
+        });
+        break;
 
-  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-    mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
-  );
+      case 'auth/wrong-password':
+        dispatch({
+          type: 'setPasswordError',
+          payload: dict.register.message.error.wrongPassword,
+        });
+        break;
 
-  const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-    mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
-  );
+      default:
+        console.error(signInResult.value);
 
-  const passwordIsOpenState = createBooleanState(false);
+        dispatch({
+          type: 'setOtherError',
+          payload: signInResult.value.message,
+        });
 
-  export const togglePasswordLock = passwordIsOpenState.toggle;
+        showToast({
+          toast,
+          message: dc.message.error.unknownErrorOnSignIn,
+          intent: 'danger',
+        });
+        break;
+    }
+  } else {
+    dispatch({ type: 'done' });
 
-  const { state$: passwordIsOpen$, setFalse: hidePassword } =
-    passwordIsOpenState;
+    showToast({
+      toast,
+      message: dc.message.success.signIn,
+      intent: 'success',
+    });
 
-  export const state$ = combineLatestI([
-    formState$,
-    enterButtonDisabled$,
-    emailFormIntent$,
-    passwordFormIntent$,
-    passwordIsOpen$,
-  ]).chain(
-    mapI(
-      ([
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      })
-    )
-  );
-
-  const submit = async (pageToBack: string | undefined): Promise<void> => {
-    const s = dispatch({ type: 'submit' });
-
-    if (signInPageHasError(s)) return;
-
-    const signInResult = await api.auth.signIn(
-      s.email.inputValue,
-      s.password.inputValue
-    );
-
-    if (Result.isErr(signInResult)) {
-      switch (signInResult.value.code) {
-        case 'auth/user-not-found':
-          dispatch({
-            type: 'setEmailError',
-            payload: dict.register.message.error.userNotFound,
-          });
-          break;
-
-        case 'auth/wrong-password':
-          dispatch({
-            type: 'setPasswordError',
-            payload: dict.register.message.error.wrongPassword,
-          });
-          break;
-
-        default:
-          console.error(signInResult.value);
-
-          dispatch({
-            type: 'setOtherError',
-            payload: signInResult.value.message,
-          });
-
-          showToast({
-            toast,
-            message: dc.message.error.unknownErrorOnSignIn,
-            intent: 'danger',
-          });
-          break;
-      }
+    if (pageToBack !== undefined) {
+      router.redirect(pageToBack);
     } else {
-      dispatch({ type: 'done' });
-
-      showToast({
-        toast,
-        message: dc.message.success.signIn,
-        intent: 'success',
-      });
-
-      if (pageToBack !== undefined) {
-        router.redirect(pageToBack);
-      } else {
-        router.redirect(Routes.routes.createPage);
-      }
+      router.redirect(Routes.routes.createPage);
     }
-  };
+  }
+};
 
-  export const inputEmailHandler = (value: string): void => {
-    dispatch({
-      type: 'inputEmail',
-      payload: value,
-    });
-  };
-
-  export const inputPasswordHandler = (value: string): void => {
-    dispatch({
-      type: 'inputPassword',
-      payload: value,
-    });
-  };
-
-  export const enterClickHandler = (): void => {
-    if (
-      mut_subscribedValues.enterButtonDisabled ||
-      mut_subscribedValues.googleSignInButtonDisabled
-    )
-      return;
-
-    // TODO: use toast
-    submit(mut_subscribedValues.pageToBack).catch(console.error);
-  };
-
-  const resetAllState = (): void => {
-    dispatch({ type: 'reset' });
-    hidePassword();
-  };
-
-  /* subscriptions */
-
-  const mut_subscribedValues: {
-    enterButtonDisabled: boolean;
-    googleSignInButtonDisabled: boolean;
-    pageToBack: string | undefined;
-  } = {
-    enterButtonDisabled: true,
-    googleSignInButtonDisabled: true,
-    pageToBack: undefined,
-  };
-
-  enterButtonDisabled$.subscribe((v) => {
-    mut_subscribedValues.enterButtonDisabled = v;
+const inputEmailHandler = (value: string): void => {
+  dispatch({
+    type: 'inputEmail',
+    payload: value,
   });
+};
 
-  GoogleSignInStore.googleSignInButtonDisabled$.subscribe((v) => {
-    mut_subscribedValues.googleSignInButtonDisabled = v;
+const inputPasswordHandler = (value: string): void => {
+  dispatch({
+    type: 'inputPassword',
+    payload: value,
   });
+};
 
-  router.pageToBack$.subscribe((v) => {
-    mut_subscribedValues.pageToBack = v;
-  });
+const enterClickHandler = (): void => {
+  if (
+    mut_subscribedValues.enterButtonDisabled ||
+    mut_subscribedValues.googleSignInButtonDisabled
+  )
+    return;
 
-  router.isRoute.signInPage$.subscribe((isSignInPage) => {
-    if (!isSignInPage) {
-      resetAllState();
-    }
-  });
-}
+  // TODO: use toast
+  submit(mut_subscribedValues.pageToBack).catch(console.error);
+};
+
+const resetAllState = (): void => {
+  dispatch({ type: 'reset' });
+  hidePassword();
+};
+
+/* subscriptions */
+
+const mut_subscribedValues: {
+  enterButtonDisabled: boolean;
+  googleSignInButtonDisabled: boolean;
+  pageToBack: string | undefined;
+} = {
+  enterButtonDisabled: true,
+  googleSignInButtonDisabled: true,
+  pageToBack: undefined,
+};
+
+enterButtonDisabled$.subscribe((v) => {
+  mut_subscribedValues.enterButtonDisabled = v;
+});
+
+GoogleSignInStore.googleSignInButtonDisabled$.subscribe((v) => {
+  mut_subscribedValues.googleSignInButtonDisabled = v;
+});
+
+router.pageToBack$.subscribe((v) => {
+  mut_subscribedValues.pageToBack = v;
+});
+
+router.isRoute.signInPage$.subscribe((isSignInPage) => {
+  if (!isSignInPage) {
+    resetAllState();
+  }
+});
+
+export const SignInPageStore = {
+  state$,
+  togglePasswordLock,
+  inputEmailHandler,
+  inputPasswordHandler,
+  enterClickHandler,
+} as const;

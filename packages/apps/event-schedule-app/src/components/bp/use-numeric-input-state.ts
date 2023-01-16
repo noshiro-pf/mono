@@ -3,7 +3,7 @@ import {
   numericInputContinuousChangeDelay,
   numericInputContinuousChangeInterval,
 } from './constants';
-import { NumericInputState } from './numeric-input-state';
+import { createNumericInputStateReducer } from './numeric-input-state';
 
 export const useNumericInputState = <NumericValue extends number>({
   valueFromProps,
@@ -29,7 +29,7 @@ export const useNumericInputState = <NumericValue extends number>({
 }> => {
   const { reducer, toValueNormalized } = useMemo(
     () =>
-      NumericInputState.createReducer(normalizeValue, {
+      createNumericInputStateReducer(normalizeValue, {
         defaultValue,
         step,
       }),

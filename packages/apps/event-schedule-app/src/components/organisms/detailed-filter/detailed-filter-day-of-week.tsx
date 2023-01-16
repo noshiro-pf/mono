@@ -12,7 +12,7 @@ import {
 const dc = dict.answerPage.detailedFilter;
 
 type Props = Readonly<{
-  state: AnswerFilterState.State['dayOfWeek'];
+  state: AnswerFilterState['dayOfWeek'];
 }>;
 
 /* 曜日で絞り込み */

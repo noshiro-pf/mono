@@ -6,74 +6,55 @@ import {
   updateDisplayNamePageInitialState,
   updateDisplayNamePageStateReducer,
 } from '../../functions';
-import { emitAuthStateChange, fireAuthUser$ } from '../auth';
+import { Auth } from '../auth';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-export namespace UpdateDisplayNamePageStore {
-  const [formState$, dispatch] = createReducer(
-    updateDisplayNamePageStateReducer,
-    updateDisplayNamePageInitialState
-  );
+const [formState$, dispatch] = createReducer(
+  updateDisplayNamePageStateReducer,
+  updateDisplayNamePageInitialState
+);
 
-  const enterButtonDisabled$ = formState$.chain(
-    mapI(
-      (state) => state.isWaitingResponse || updateDisplayNamePageHasError(state)
-    )
-  );
+const enterButtonDisabled$ = formState$.chain(
+  mapI(
+    (state) => state.isWaitingResponse || updateDisplayNamePageHasError(state)
+  )
+);
 
-  const displayNameFormIntent$: InitializedObservable<Intent> =
-    formState$.chain(
-      mapI((state) =>
-        state.displayName.error === undefined ? 'primary' : 'danger'
-      )
+const displayNameFormIntent$: InitializedObservable<Intent> = formState$.chain(
+  mapI((state) =>
+    state.displayName.error === undefined ? 'primary' : 'danger'
+  )
+);
+
+const state$ = combineLatestI([
+  formState$,
+  enterButtonDisabled$,
+  displayNameFormIntent$,
+]).chain(
+  mapI(([formState, enterButtonDisabled, displayNameFormIntent]) => ({
+    formState,
+    enterButtonDisabled,
+    displayNameFormIntent,
+  }))
+);
+
+const submit = async (user: FireAuthUser): Promise<void> => {
+  const s = dispatch({ type: 'submit' });
+
+  if (updateDisplayNamePageHasError(s)) return;
+
+  const res = await api.auth.update.displayName(user, s.displayName.inputValue);
+
+  if (Result.isErr(res)) {
+    console.error(
+      'error occurred on updateDisplayName:',
+      res.value.code,
+      res.value.message
     );
-
-  export const state$ = combineLatestI([
-    formState$,
-    enterButtonDisabled$,
-    displayNameFormIntent$,
-  ]).chain(
-    mapI(([formState, enterButtonDisabled, displayNameFormIntent]) => ({
-      formState,
-      enterButtonDisabled,
-      displayNameFormIntent,
-    }))
-  );
-
-  const submit = async (user: FireAuthUser): Promise<void> => {
-    const s = dispatch({ type: 'submit' });
-
-    if (updateDisplayNamePageHasError(s)) return;
-
-    const res = await api.auth.update.displayName(
-      user,
-      s.displayName.inputValue
-    );
-
-    if (Result.isErr(res)) {
-      console.error(
-        'error occurred on updateDisplayName:',
-        res.value.code,
-        res.value.message
-      );
-
-      dispatch({ type: 'done' });
-
-      UpdateUserInfoDialogStore.closeDialog();
-
-      showToast({
-        toast,
-        message: dc.updateDisplayName.message.error,
-        intent: 'danger',
-      });
-      return;
-    }
-
-    emitAuthStateChange(); // added because onAuthStateChanged doesn't fire on updateProfile
 
     dispatch({ type: 'done' });
 
@@ -81,60 +62,79 @@ export namespace UpdateDisplayNamePageStore {
 
     showToast({
       toast,
-      message: dc.updateDisplayName.message.success,
-      intent: 'success',
+      message: dc.updateDisplayName.message.error,
+      intent: 'danger',
     });
-  };
+    return;
+  }
 
-  export const enterClickHandler = (): void => {
-    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+  Auth.emitAuthStateChange(); // added because onAuthStateChanged doesn't fire on updateProfile
 
-    if (enterButtonDisabled || fireAuthUser === undefined) return;
+  dispatch({ type: 'done' });
 
-    // TODO: use toast
-    submit(fireAuthUser).catch(console.error);
-  };
+  UpdateUserInfoDialogStore.closeDialog();
 
-  export const inputDisplayNameHandler = (value: string): void => {
-    dispatch({
-      type: 'inputDisplayName',
-      payload: value,
-    });
-  };
+  showToast({
+    toast,
+    message: dc.updateDisplayName.message.success,
+    intent: 'success',
+  });
+};
 
-  const resetAllDialogState = (): void => {
-    dispatch({ type: 'reset' });
-  };
+const enterClickHandler = (): void => {
+  const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
 
-  /* subscriptions */
+  if (enterButtonDisabled || fireAuthUser === undefined) return;
 
-  const mut_subscribedValues: {
-    enterButtonDisabled: boolean;
-    fireAuthUser: FireAuthUser | undefined;
-  } = {
-    enterButtonDisabled: true,
-    fireAuthUser: undefined,
-  };
+  // TODO: use toast
+  submit(fireAuthUser).catch(console.error);
+};
 
-  enterButtonDisabled$.subscribe((v) => {
-    mut_subscribedValues.enterButtonDisabled = v;
+const inputDisplayNameHandler = (value: string): void => {
+  dispatch({
+    type: 'inputDisplayName',
+    payload: value,
+  });
+};
+
+const resetAllDialogState = (): void => {
+  dispatch({ type: 'reset' });
+};
+
+/* subscriptions */
+
+const mut_subscribedValues: {
+  enterButtonDisabled: boolean;
+  fireAuthUser: FireAuthUser | undefined;
+} = {
+  enterButtonDisabled: true,
+  fireAuthUser: undefined,
+};
+
+enterButtonDisabled$.subscribe((v) => {
+  mut_subscribedValues.enterButtonDisabled = v;
+});
+
+Auth.fireAuthUser$.subscribe((v) => {
+  mut_subscribedValues.fireAuthUser = v;
+});
+
+UpdateUserInfoDialogStore.openingDialog$
+  .chain(withLatestFromI(Auth.fireAuthUser$))
+  .subscribe(([openingDialog, fireAuthUser]) => {
+    if (openingDialog === undefined) {
+      resetAllDialogState();
+    }
+    if (openingDialog === 'updateDisplayName') {
+      dispatch({
+        type: 'inputDisplayName',
+        payload: fireAuthUser?.displayName ?? '',
+      });
+    }
   });
 
-  fireAuthUser$.subscribe((v) => {
-    mut_subscribedValues.fireAuthUser = v;
-  });
-
-  UpdateUserInfoDialogStore.openingDialog$
-    .chain(withLatestFromI(fireAuthUser$))
-    .subscribe(([openingDialog, fireAuthUser]) => {
-      if (openingDialog === undefined) {
-        resetAllDialogState();
-      }
-      if (openingDialog === 'updateDisplayName') {
-        dispatch({
-          type: 'inputDisplayName',
-          payload: fireAuthUser?.displayName ?? '',
-        });
-      }
-    });
-}
+export const UpdateDisplayNamePageStore = {
+  state$,
+  enterClickHandler,
+  inputDisplayNameHandler,
+} as const;

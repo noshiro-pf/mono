@@ -15,166 +15,168 @@ const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
 const toast = createToaster();
 
-export namespace ConfirmEmailDialogStore {
-  const [formState$, dispatch] = createReducer(
-    confirmEmailDialogFormStateReducer,
-    confirmEmailDialogFormInitialState
-  );
+const [formState$, dispatch] = createReducer(
+  confirmEmailDialogFormStateReducer,
+  confirmEmailDialogFormInitialState
+);
 
-  const enterButtonDisabled$ = formState$.chain(
-    mapI(
-      (state) => state.isWaitingResponse || confirmEmailDialogHasError(state)
-    )
-  );
+const enterButtonDisabled$ = formState$.chain(
+  mapI((state) => state.isWaitingResponse || confirmEmailDialogHasError(state))
+);
 
-  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-    mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
-  );
+const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+);
 
-  const emailIsVerified = createBooleanState(false);
+const emailIsVerified = createBooleanState(false);
 
-  export const isOpen$ = combineLatestI([
-    emailIsVerified.state$,
-    eventSchedule$,
-  ]).chain(
-    mapI(
-      ([verified, eventSchedule]) =>
-        eventSchedule?.notificationSettings !== 'none' && !verified
-    )
-  );
+const isOpen$ = combineLatestI([emailIsVerified.state$, eventSchedule$]).chain(
+  mapI(
+    ([verified, eventSchedule]) =>
+      eventSchedule?.notificationSettings !== 'none' && !verified
+  )
+);
 
-  export const state$ = combineLatestI([
-    formState$,
-    enterButtonDisabled$,
-    emailFormIntent$,
-  ]).chain(
-    mapI(([formState, enterButtonDisabled, emailFormIntent]) => ({
-      formState,
-      enterButtonDisabled,
-      emailFormIntent,
-    }))
-  );
+const state$ = combineLatestI([
+  formState$,
+  enterButtonDisabled$,
+  emailFormIntent$,
+]).chain(
+  mapI(([formState, enterButtonDisabled, emailFormIntent]) => ({
+    formState,
+    enterButtonDisabled,
+    emailFormIntent,
+  }))
+);
 
-  const submit = async (eventId: string, email: string): Promise<void> => {
-    const s = dispatch({ type: 'submit' });
+const submit = async (eventId: string, email: string): Promise<void> => {
+  const s = dispatch({ type: 'submit' });
 
-    if (confirmEmailDialogHasError(s)) return;
+  if (confirmEmailDialogHasError(s)) return;
 
-    const verifyEmailResult = await api.event.verifyEmail(eventId, email);
+  const verifyEmailResult = await api.event.verifyEmail(eventId, email);
 
-    if (Result.isErr(verifyEmailResult)) {
-      console.error(verifyEmailResult.value);
+  if (Result.isErr(verifyEmailResult)) {
+    console.error(verifyEmailResult.value);
+    dispatch({
+      type: 'setOtherError',
+      payload: verifyEmailResult.value.message,
+    });
+
+    showToast({
+      toast,
+      message: dc.error,
+      intent: 'danger',
+    });
+    return;
+  }
+
+  switch (verifyEmailResult.value) {
+    case 'ng':
       dispatch({
-        type: 'setOtherError',
-        payload: verifyEmailResult.value.message,
+        type: 'setEmailDoesNotMatchError',
       });
+      break;
+
+    case 'ok':
+      dispatch({ type: 'done' });
+
+      EditEventScheduleStore.setEmailVerified(email);
 
       showToast({
         toast,
-        message: dc.error,
-        intent: 'danger',
+        message: dc.success,
+        intent: 'success',
       });
-      return;
-    }
 
-    switch (verifyEmailResult.value) {
-      case 'ng':
-        dispatch({
-          type: 'setEmailDoesNotMatchError',
-        });
-        break;
+      emailIsVerified.setTrue();
+      break;
+  }
+};
 
-      case 'ok':
-        dispatch({ type: 'done' });
+const enterClickHandler = (): void => {
+  const { eventId, enterButtonDisabled, formState } = mut_subscribedValues;
 
-        EditEventScheduleStore.setEmailVerified(email);
+  if (enterButtonDisabled) return;
 
-        showToast({
-          toast,
-          message: dc.success,
-          intent: 'success',
-        });
+  const email = formState?.email.inputValue;
 
-        emailIsVerified.setTrue();
-        break;
-    }
-  };
+  if (
+    eventId === undefined ||
+    eventId === '' ||
+    email === undefined ||
+    email === ''
+  ) {
+    throw new Error('eventId and email input value must be non null string');
+  }
 
-  export const enterClickHandler = (): void => {
-    const { eventId, enterButtonDisabled, formState } = mut_subscribedValues;
+  // TODO: use toast
+  submit(eventId, email).catch(console.error);
+};
 
-    if (enterButtonDisabled) return;
+const cancelClickHandler = (): void => {
+  router.back();
+};
 
-    const email = formState?.email.inputValue;
+const inputEmailHandler = (value: string): void => {
+  dispatch({
+    type: 'inputEmail',
+    payload: value,
+  });
+};
 
-    if (
-      eventId === undefined ||
-      eventId === '' ||
-      email === undefined ||
-      email === ''
-    ) {
-      throw new Error('eventId and email input value must be non null string');
-    }
+const resetInput = (): void => {
+  dispatch({ type: 'reset' });
+};
 
-    // TODO: use toast
-    submit(eventId, email).catch(console.error);
-  };
+const resetAllState = (): void => {
+  resetInput();
+  emailIsVerified.reset();
+};
 
-  export const cancelClickHandler = (): void => {
-    router.back();
-  };
+/* subscriptions */
 
-  export const inputEmailHandler = (value: string): void => {
-    dispatch({
-      type: 'inputEmail',
-      payload: value,
-    });
-  };
+const mut_subscribedValues: {
+  formState: ConfirmEmailDialogFormState | undefined;
+  enterButtonDisabled: boolean;
+  eventId: string | undefined;
+  lastSetEmail: string | undefined;
+} = {
+  formState: undefined,
+  enterButtonDisabled: true,
+  eventId: undefined,
+  lastSetEmail: undefined,
+};
 
-  export const resetInput = (): void => {
-    dispatch({ type: 'reset' });
-  };
+router.eventId$.subscribe((eventId) => {
+  mut_subscribedValues.eventId = eventId;
+});
 
-  const resetAllState = (): void => {
+formState$.subscribe((v) => {
+  mut_subscribedValues.formState = v;
+});
+
+enterButtonDisabled$.subscribe((v) => {
+  mut_subscribedValues.enterButtonDisabled = v;
+});
+
+router.isRoute.editPage$.subscribe((isEditPage) => {
+  if (!isEditPage) {
+    resetAllState();
+  }
+});
+
+isOpen$.subscribe((isOpen) => {
+  if (!isOpen) {
     resetInput();
-    emailIsVerified.reset();
-  };
+  }
+});
 
-  /* subscriptions */
-
-  const mut_subscribedValues: {
-    formState: ConfirmEmailDialogFormState | undefined;
-    enterButtonDisabled: boolean;
-    eventId: string | undefined;
-    lastSetEmail: string | undefined;
-  } = {
-    formState: undefined,
-    enterButtonDisabled: true,
-    eventId: undefined,
-    lastSetEmail: undefined,
-  };
-
-  router.eventId$.subscribe((eventId) => {
-    mut_subscribedValues.eventId = eventId;
-  });
-
-  formState$.subscribe((v) => {
-    mut_subscribedValues.formState = v;
-  });
-
-  enterButtonDisabled$.subscribe((v) => {
-    mut_subscribedValues.enterButtonDisabled = v;
-  });
-
-  router.isRoute.editPage$.subscribe((isEditPage) => {
-    if (!isEditPage) {
-      resetAllState();
-    }
-  });
-
-  isOpen$.subscribe((isOpen) => {
-    if (!isOpen) {
-      resetInput();
-    }
-  });
-}
+export const ConfirmEmailDialogStore = {
+  state$,
+  isOpen$,
+  enterClickHandler,
+  inputEmailHandler,
+  resetInput,
+  cancelClickHandler,
+} as const;

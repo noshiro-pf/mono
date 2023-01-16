@@ -1,4 +1,4 @@
-import { fireAuthUser$ } from './auth';
+import { Auth } from './auth';
 import {
   AnswersStore,
   EventListStore,
@@ -41,7 +41,7 @@ router.eventId$.subscribe(() => {
   AnswersStore.fetchAnswers();
 });
 
-fireAuthUser$
+Auth.fireAuthUser$
   .chain(mapI((u) => mapOptional(u, (a) => a.uid)))
   .chain(distinctUntilChangedI())
   .subscribe(() => {

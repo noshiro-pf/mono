@@ -6,7 +6,7 @@ import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled';
 const dc = dict.answerPage.detailedFilter;
 
 type Props = DeepReadonly<{
-  state: AnswerFilterState.State['dateRange'];
+  state: AnswerFilterState['dateRange'];
   dateRange:
     | {
         start: YearMonthDate;

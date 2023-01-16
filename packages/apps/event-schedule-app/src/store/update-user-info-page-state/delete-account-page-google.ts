@@ -6,174 +6,172 @@ import {
   emailInputStateReducer,
   showToast,
 } from '../../functions';
-import { fireAuthUser$ } from '../auth';
+import { Auth } from '../auth';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-export namespace DeleteAccountCreatedWithGoogleStore {
-  const [formState$, dispatch] = createReducer(
-    emailInputStateReducer,
-    emailInputInitialState
-  );
+const [formState$, dispatch] = createReducer(
+  emailInputStateReducer,
+  emailInputInitialState
+);
 
-  const enterButtonDisabled$ = combineLatestI([
-    formState$,
-    fireAuthUser$,
-  ]).chain(
-    mapI(
-      ([formState, fireAuthUser]) =>
-        formState.inputValue !== fireAuthUser?.email
-    )
-  );
+const enterButtonDisabled$ = combineLatestI([
+  formState$,
+  Auth.fireAuthUser$,
+]).chain(
+  mapI(
+    ([formState, fireAuthUser]) => formState.inputValue !== fireAuthUser?.email
+  )
+);
 
-  const {
-    setFalse: setFalseIsWaitingResponse,
-    setTrue: setTrueIsWaitingResponse,
-    state$: isWaitingResponse$,
-  } = createBooleanState(false);
+const {
+  setFalse: setFalseIsWaitingResponse,
+  setTrue: setTrueIsWaitingResponse,
+  state$: isWaitingResponse$,
+} = createBooleanState(false);
 
-  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-    mapI((state) => (state.error === undefined ? 'primary' : 'danger'))
-  );
+const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
+  mapI((state) => (state.error === undefined ? 'primary' : 'danger'))
+);
 
-  export const state$ = combineLatestI([
-    formState$,
-    enterButtonDisabled$,
-    isWaitingResponse$,
-    emailFormIntent$,
-  ]).chain(
-    mapI(
-      ([
-        formState,
-        enterButtonDisabled,
-        isWaitingResponse,
-        emailFormIntent,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        isWaitingResponse,
-        emailFormIntent,
-      })
-    )
-  );
+const state$ = combineLatestI([
+  formState$,
+  enterButtonDisabled$,
+  isWaitingResponse$,
+  emailFormIntent$,
+]).chain(
+  mapI(
+    ([formState, enterButtonDisabled, isWaitingResponse, emailFormIntent]) => ({
+      formState,
+      enterButtonDisabled,
+      isWaitingResponse,
+      emailFormIntent,
+    })
+  )
+);
 
-  const submit = async (user: FireAuthUser): Promise<void> => {
-    const s = dispatch({ type: 'submit' });
+const submit = async (user: FireAuthUser): Promise<void> => {
+  const s = dispatch({ type: 'submit' });
 
-    if (emailInputHasError(s)) return;
+  if (emailInputHasError(s)) return;
 
-    setTrueIsWaitingResponse();
+  setTrueIsWaitingResponse();
 
-    const signInResult = await api.auth.googleSignInWithPopup();
+  const signInResult = await api.auth.googleSignInWithPopup();
 
-    if (Result.isErr(signInResult)) {
-      // TODO: use toast
-      console.error(
-        'error occurred on googleSignInWithPopup:',
-        signInResult.value
-      );
-      return;
-    }
+  if (Result.isErr(signInResult)) {
+    // TODO: use toast
+    console.error(
+      'error occurred on googleSignInWithPopup:',
+      signInResult.value
+    );
+    return;
+  }
 
-    const credential: AuthCredential | undefined = signInResult.value;
+  const credential: AuthCredential | undefined = signInResult.value;
 
-    if (credential === undefined) return;
+  if (credential === undefined) return;
 
-    const res1 = await api.auth.reauthenticateWithCredential(user, credential);
+  const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 
-    if (Result.isErr(res1)) {
-      console.error(
-        'error occurred on reauthenticateWithCredential:',
-        res1.value.code,
-        res1.value.message
-      );
-
-      setFalseIsWaitingResponse();
-      UpdateUserInfoDialogStore.closeDialog();
-
-      showToast({
-        toast,
-        message: dc.reauthenticate.message.error,
-        intent: 'danger',
-      });
-      return;
-    }
-
-    const res2 = await api.auth.deleteUser(user);
-
-    if (Result.isErr(res2)) {
-      console.error(
-        'error occurred on deleteUser:',
-        res2.value.code,
-        res2.value.message
-      );
-
-      setFalseIsWaitingResponse();
-      UpdateUserInfoDialogStore.closeDialog();
-
-      showToast({
-        toast,
-        message: dc.deleteAccount.message.error,
-        intent: 'danger',
-      });
-      return;
-    }
+  if (Result.isErr(res1)) {
+    console.error(
+      'error occurred on reauthenticateWithCredential:',
+      res1.value.code,
+      res1.value.message
+    );
 
     setFalseIsWaitingResponse();
     UpdateUserInfoDialogStore.closeDialog();
 
     showToast({
       toast,
-      message: dc.deleteAccount.message.success,
-      intent: 'success',
+      message: dc.reauthenticate.message.error,
+      intent: 'danger',
     });
-  };
+    return;
+  }
 
-  export const enterClickHandler = (): void => {
-    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+  const res2 = await api.auth.deleteUser(user);
 
-    if (enterButtonDisabled || fireAuthUser === undefined) return;
+  if (Result.isErr(res2)) {
+    console.error(
+      'error occurred on deleteUser:',
+      res2.value.code,
+      res2.value.message
+    );
 
-    // TODO: use toast
-    submit(fireAuthUser).catch(console.error);
-  };
-
-  export const inputEmailHandler = (value: string): void => {
-    dispatch({
-      type: 'input',
-      payload: value,
-    });
-  };
-
-  const resetAllDialogState = (): void => {
-    dispatch({ type: 'reset' });
     setFalseIsWaitingResponse();
-  };
+    UpdateUserInfoDialogStore.closeDialog();
 
-  /* subscriptions */
+    showToast({
+      toast,
+      message: dc.deleteAccount.message.error,
+      intent: 'danger',
+    });
+    return;
+  }
 
-  const mut_subscribedValues: {
-    enterButtonDisabled: boolean;
-    fireAuthUser: FireAuthUser | undefined;
-  } = {
-    enterButtonDisabled: true,
-    fireAuthUser: undefined,
-  };
+  setFalseIsWaitingResponse();
+  UpdateUserInfoDialogStore.closeDialog();
 
-  enterButtonDisabled$.subscribe((v) => {
-    mut_subscribedValues.enterButtonDisabled = v;
+  showToast({
+    toast,
+    message: dc.deleteAccount.message.success,
+    intent: 'success',
   });
+};
 
-  fireAuthUser$.subscribe((u) => {
-    mut_subscribedValues.fireAuthUser = u;
-  });
+const enterClickHandler = (): void => {
+  const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
 
-  UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
-    if (openingDialog === undefined) {
-      resetAllDialogState();
-    }
+  if (enterButtonDisabled || fireAuthUser === undefined) return;
+
+  // TODO: use toast
+  submit(fireAuthUser).catch(console.error);
+};
+
+const inputEmailHandler = (value: string): void => {
+  dispatch({
+    type: 'input',
+    payload: value,
   });
-}
+};
+
+const resetAllDialogState = (): void => {
+  dispatch({ type: 'reset' });
+  setFalseIsWaitingResponse();
+};
+
+/* subscriptions */
+
+const mut_subscribedValues: {
+  enterButtonDisabled: boolean;
+  fireAuthUser: FireAuthUser | undefined;
+} = {
+  enterButtonDisabled: true,
+  fireAuthUser: undefined,
+};
+
+enterButtonDisabled$.subscribe((v) => {
+  mut_subscribedValues.enterButtonDisabled = v;
+});
+
+Auth.fireAuthUser$.subscribe((u) => {
+  mut_subscribedValues.fireAuthUser = u;
+});
+
+UpdateUserInfoDialogStore.openingDialog$.subscribe((openingDialog) => {
+  if (openingDialog === undefined) {
+    resetAllDialogState();
+  }
+});
+
+export const DeleteAccountCreatedWithGoogleStore = {
+  state$,
+  enterClickHandler,
+  inputEmailHandler,
+} as const;
