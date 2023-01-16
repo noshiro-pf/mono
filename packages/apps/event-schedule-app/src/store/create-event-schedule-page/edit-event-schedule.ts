@@ -135,9 +135,7 @@ const saveToDatabase = async (): Promise<void> => {
   const res = await api.event.update(eventId, eventScheduleNormalized);
 
   const res2 =
-    email === ''
-      ? undefined
-      : await api.event.updateAuthorsEmail(eventId, email);
+    email === '' ? undefined : await api.event.setAuthorsEmail(eventId, email);
 
   setIsLoadingFalse();
 

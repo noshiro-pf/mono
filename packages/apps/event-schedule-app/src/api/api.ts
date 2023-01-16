@@ -22,7 +22,6 @@ import {
   setAuthorsEmail,
   unarchiveEventSchedule,
   updateAnswer,
-  updateAuthorsEmail,
   updateEventSchedule,
   verifyEmail,
 } from './crud';
@@ -49,7 +48,6 @@ export const api = {
     archive: archiveEventSchedule,
     unarchive: unarchiveEventSchedule,
     setAuthorsEmail,
-    updateAuthorsEmail,
     verifyEmail,
   },
   answers: {
