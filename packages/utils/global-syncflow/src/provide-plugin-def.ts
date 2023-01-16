@@ -49,5 +49,5 @@ export const providePluginSyncflowDef = Obj.fromEntries(
     'withLatestFromI',
     'zip',
     'zipI',
-  ].map((key) => tp(key, ['@noshiro/syncflow', key]))
+  ].map((key) => tp(key, tp('@noshiro/syncflow', key)))
 );

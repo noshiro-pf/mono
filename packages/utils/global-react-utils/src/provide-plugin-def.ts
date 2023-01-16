@@ -10,5 +10,5 @@ export const providePluginReactUtilsDef = Obj.fromEntries(
     'useTinyObservable',
     'useTinyObservableEffect',
     'useTinyObservableValue',
-  ].map((key) => tp(key, ['@noshiro/react-utils', key]))
+  ].map((key) => tp(key, tp('@noshiro/react-utils', key)))
 );

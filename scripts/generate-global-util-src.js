@@ -72,7 +72,7 @@ const generateProvidePluginDef = (packageName, importsList, varName) =>
     `export const providePlugin${varName}Def = Obj.fromEntries(`,
     '[',
     ...importsList.map((s) => `'${s}',`),
-    `].map((key) => tp(key, ['${packageName}', key]))`,
+    `].map((key) => tp(key, tp('${packageName}', key)))`,
     ');',
   ].join('\n');
 

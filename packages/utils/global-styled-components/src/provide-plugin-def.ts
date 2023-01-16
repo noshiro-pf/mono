@@ -1,3 +1,5 @@
+import { tp } from '@noshiro/ts-utils';
+
 export const providePluginStyledComponentsDef = {
-  styled: ['styled-components', 'default'],
+  styled: tp('styled-components', 'default'),
 };

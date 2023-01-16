@@ -20,6 +20,7 @@
     "type-check": "wireit"
   },
   "dependencies": {
+    "@noshiro/ts-utils": "*",
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
