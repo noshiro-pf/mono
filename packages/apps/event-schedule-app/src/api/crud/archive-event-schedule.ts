@@ -1,11 +1,11 @@
 import { arrayRemove, arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import { firestoreEvents } from '../../initialize-firebase';
 
-type KeyType = 'archivedBy';
-const key: KeyType = 'archivedBy';
+type KeyT = 'archivedBy';
+const key: KeyT = 'archivedBy';
 
-assertType<TypeExtends<KeyType, keyof EventSchedule>>();
-assertType<TypeEq<User, EventSchedule[KeyType][number]>>();
+assertType<TypeExtends<KeyT, keyof EventSchedule>>();
+assertType<TypeEq<User, EventSchedule[KeyT][number]>>();
 
 export const archiveEventSchedule = (
   eventId: string,

@@ -17,7 +17,7 @@ import type {
   NotificationSettingsWithEmail,
 } from '../../types';
 import { mapNoneToUndefined } from '../../utils';
-import { fireAuthUser$ } from '../auth';
+import { Auth } from '../auth';
 import { createToggleSectionState } from '../utils';
 
 type ReturnValues = Readonly<{
@@ -75,7 +75,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     resetState: resetAnswerIcons,
   } = createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
 
-  const initialNotificationSettingsWithEmailFilled$ = fireAuthUser$.chain(
+  const initialNotificationSettingsWithEmailFilled$ = Auth.fireAuthUser$.chain(
     mapI((user) => ({
       ...notificationSettingsInitialValue,
       email: user?.email ?? '',
@@ -121,7 +121,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       answerDeadline$,
       answerIcons$,
       notificationSettingsWithEmail$,
-      fireAuthUser$,
+      Auth.fireAuthUser$,
     ]).chain(
       mapI(
         ([

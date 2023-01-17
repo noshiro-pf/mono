@@ -3,10 +3,10 @@ import type { ChangeEventHandler } from 'react';
 import { api } from '../../../api';
 import { createToaster, showToast } from '../../../functions';
 import {
+  Auth,
   eventList$,
   EventListPageFilterStore,
   EventListStore,
-  useFireAuthUser,
 } from '../../../store';
 import { BpCheckbox, BpInput } from '../../bp';
 import { Header } from '../../organisms';
@@ -62,7 +62,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
 
   const eventList = useObservableValue(eventList$);
 
-  const fireAuthUser = useFireAuthUser();
+  const fireAuthUser = Auth.useFireAuthUser();
 
   const eventListWithHandler = useMemo(
     () =>
@@ -124,7 +124,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
       {eventListWithHandler === undefined ? (
         <Spinner />
       ) : (
-        <Body>
+        <Main>
           <FilterByArea>
             <HTMLSelect
               disabled={formElementsAreDisabled}
@@ -192,13 +192,13 @@ export const EventListPage = memoNamed('EventListPage', () => {
               />
             ))}
           </ListItemsWrapper>
-        </Body>
+        </Main>
       )}
     </div>
   );
 });
 
-const Body = styled.div`
+const Main = styled.div`
   margin: 0 20px;
 `;
 

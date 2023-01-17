@@ -4,12 +4,12 @@ import {
   eventListItemDefaultValue,
   fillAnswer,
   fillEventSchedule,
+  firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { Arr, IMap, pipe, tp } from '@noshiro/ts-utils';
 import type { firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
 import type { CallableContext } from 'firebase-functions/v1/https';
-import { collectionPath } from './constants';
 import type { FetchEventListOfUserPayload } from './types';
 import { today } from './utils';
 
@@ -40,7 +40,7 @@ export const fetchEventListOfUserImpl = async (
 
   const uid = context.auth.uid;
 
-  const eventsSnapshot = await pipe(db.collection(collectionPath.events))
+  const eventsSnapshot = await pipe(db.collection(firestorePaths.events))
     .chain((ref) =>
       showOnlyEventSchedulesICreated ? ref.where('author.id', '==', uid) : ref
     )
@@ -100,7 +100,7 @@ export const fetchEventListOfUserImpl = async (
       Arr.map(list, ({ eventScheduleMetadata: { id: eventId } }) =>
         db
           .collection(
-            `${collectionPath.events}/${eventId}/${collectionPath.answers}`
+            `${firestorePaths.events}/${eventId}/${firestorePaths.answers}`
           )
           .get()
           .then((answersSnapshot) => ({

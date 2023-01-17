@@ -9,12 +9,12 @@ import {
   answers$,
   AnswersStore,
   AnswerTableStore,
+  Auth,
   errorType$,
   eventSchedule$,
   EventScheduleStore,
   holidaysJpDefinition$,
   router,
-  useFireAuthUser,
 } from '../../../store';
 import { toClassName } from '../../../utils';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
@@ -132,7 +132,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
   const tagProps = useObservableValue(AnswerFilterAndSortStore.tagProps$);
 
-  const fireAuthUser = useFireAuthUser();
+  const fireAuthUser = Auth.useFireAuthUser();
 
   // ログイン済み且つ回答済みの場合のみ非表示、それ以外の場合は表示
   const showAnswerLaterButton = useMemo<boolean>(

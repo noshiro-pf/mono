@@ -1,8 +1,8 @@
 // initializeApp must be imported as default import.
 // https://github.com/firebase/firebase-admin-node/issues/593
+import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import admin from 'firebase-admin';
 import { https, logger, region } from 'firebase-functions';
-import { collectionPath } from './constants';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
 import { notifyAnswerDeadline } from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
@@ -28,7 +28,7 @@ const wildcard = {
   answerId: 'answerId',
 } as const;
 
-const answerDocPath = `${collectionPath.events}/{${wildcard.eventId}}/${collectionPath.answers}/{${wildcard.answerId}}`;
+const answerDocPath = `${firestorePaths.events}/{${wildcard.eventId}}/${firestorePaths.answers}/{${wildcard.answerId}}`;
 
 export const answerCreationListener = regionSelected.firestore
   .document(answerDocPath)

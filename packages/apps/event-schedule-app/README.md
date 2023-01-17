@@ -38,3 +38,23 @@ yarn start:dev-server
 ### service-account-key.json
 
 最初は tsc を通すために空ファイルが自動生成されているので中身を更新する。
+
+### Firestore structure
+
+`[]` は collection
+
+```
+/[events_v7]/
+    |
+    +--(event-id): EventSchedule
+        |
+        +--[answers]/
+        |   |
+        |   +--(answer-id): Answer
+        |
+        +--[internal]/
+            |
+            +--values
+                |
+                +--email: string
+```

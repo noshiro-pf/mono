@@ -1,7 +1,7 @@
 import { Button, FormGroup } from '@blueprintjs/core';
 import { theNameIsAlreadyUsedFn } from '../../../functions';
 import { useFormError } from '../../../hooks';
-import { AnswerPageStore, useFireAuthUser } from '../../../store';
+import { AnswerPageStore, Auth } from '../../../store';
 import { CustomIcon, Description } from '../../atoms';
 import {
   BpInput,
@@ -70,7 +70,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
     );
     const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
 
-    const fireAuthUser = useFireAuthUser();
+    const fireAuthUser = Auth.useFireAuthUser();
 
     const forNonLoggedInUserDialogState = useBoolState(false);
 

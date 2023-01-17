@@ -39,6 +39,7 @@ export type EventSettingsPageDiffResult = DeepReadonly<{
 
 const datetimeSpecificationOptions =
   dict.eventSettingsPage.section2.datetimeSpecificationOptions;
+
 const dc = dict.eventSettingsPage.diff;
 
 const map = (a: string, b: string): string =>
@@ -112,7 +113,7 @@ const notificationSettingsDiff = (
   emailPrev: string | undefined,
   emailCurr: string | undefined
 ): readonly string[] | undefined => {
-  if (deepEqual(a, b)) return undefined;
+  if (deepEqual(a, b) && emailPrev === emailCurr) return undefined;
 
   if (a === 'none' || b === 'none') {
     return [

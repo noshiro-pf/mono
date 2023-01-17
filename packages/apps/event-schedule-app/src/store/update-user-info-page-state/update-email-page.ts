@@ -7,126 +7,112 @@ import {
   updateEmailPageInitialState,
   updateEmailPageStateReducer,
 } from '../../functions';
-import { fireAuthUser$ } from '../auth';
+import { Auth } from '../auth';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
 
 const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-export namespace UpdateEmailPageStore {
-  const [formState$, dispatch] = createReducer(
-    updateEmailPageStateReducer,
-    updateEmailPageInitialState
+const [formState$, dispatch] = createReducer(
+  updateEmailPageStateReducer,
+  updateEmailPageInitialState
+);
+
+const enterButtonDisabled$ = formState$.chain(
+  mapI((state) => state.isWaitingResponse || updateEmailPageHasError(state))
+);
+
+const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+);
+
+const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
+  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
+);
+
+const {
+  state$: passwordIsOpen$,
+  setFalse: hidePassword,
+  toggle: togglePasswordLock,
+} = createBooleanState(false);
+
+const state$ = combineLatestI([
+  formState$,
+  enterButtonDisabled$,
+  emailFormIntent$,
+  passwordFormIntent$,
+  passwordIsOpen$,
+]).chain(
+  mapI(
+    ([
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    ]) => ({
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    })
+  )
+);
+
+const submit = async (user: FireAuthUser): Promise<void> => {
+  const s = dispatch({ type: 'submit' });
+
+  if (updateEmailPageHasError(s)) return;
+
+  const currentEmail = user.email ?? '';
+
+  const credential: AuthCredential = EmailAuthProvider.credential(
+    currentEmail,
+    s.password.inputValue
   );
 
-  const enterButtonDisabled$ = formState$.chain(
-    mapI((state) => state.isWaitingResponse || updateEmailPageHasError(state))
-  );
+  const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 
-  const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-    mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
-  );
+  if (Result.isErr(res1)) {
+    switch (res1.value.code) {
+      case 'auth/wrong-password':
+        dispatch({
+          type: 'setPasswordError',
+          payload: dc.reauthenticate.message.wrongPassword,
+        });
+        break;
 
-  const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-    mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
-  );
+      default:
+        console.error(
+          'error occurred on reauthenticateWithCredential:',
+          res1.value.code,
+          res1.value.message
+        );
 
-  const passwordIsOpenState = createBooleanState(false);
+        dispatch({ type: 'done' });
 
-  export const togglePasswordLock = passwordIsOpenState.toggle;
+        UpdateUserInfoDialogStore.closeDialog();
 
-  const { state$: passwordIsOpen$, setFalse: hidePassword } =
-    passwordIsOpenState;
+        showToast({
+          toast,
+          message: dc.reauthenticate.message.error,
+          intent: 'danger',
+        });
+        break;
+    }
+    return;
+  }
 
-  export const state$ = combineLatestI([
-    formState$,
-    enterButtonDisabled$,
-    emailFormIntent$,
-    passwordFormIntent$,
-    passwordIsOpen$,
-  ]).chain(
-    mapI(
-      ([
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      })
-    )
-  );
+  const res2 = await api.auth.update.email(user, s.email.inputValue);
 
-  const submit = async (user: FireAuthUser): Promise<void> => {
-    const s = dispatch({ type: 'submit' });
-
-    if (updateEmailPageHasError(s)) return;
-
-    const currentEmail = user.email ?? '';
-
-    const credential: AuthCredential = EmailAuthProvider.credential(
-      currentEmail,
-      s.password.inputValue
+  if (Result.isErr(res2)) {
+    console.error(
+      'error occurred on updateEmail:',
+      res2.value.code,
+      res2.value.message
     );
-
-    const res1 = await api.auth.reauthenticateWithCredential(user, credential);
-
-    if (Result.isErr(res1)) {
-      switch (res1.value.code) {
-        case 'auth/wrong-password':
-          dispatch({
-            type: 'setPasswordError',
-            payload: dc.reauthenticate.message.wrongPassword,
-          });
-          break;
-
-        default:
-          console.error(
-            'error occurred on reauthenticateWithCredential:',
-            res1.value.code,
-            res1.value.message
-          );
-
-          dispatch({ type: 'done' });
-
-          UpdateUserInfoDialogStore.closeDialog();
-
-          showToast({
-            toast,
-            message: dc.reauthenticate.message.error,
-            intent: 'danger',
-          });
-          break;
-      }
-      return;
-    }
-
-    const res2 = await api.auth.update.email(user, s.email.inputValue);
-
-    if (Result.isErr(res2)) {
-      console.error(
-        'error occurred on updateEmail:',
-        res2.value.code,
-        res2.value.message
-      );
-
-      dispatch({ type: 'done' });
-
-      UpdateUserInfoDialogStore.closeDialog();
-
-      showToast({
-        toast,
-        message: dc.updateEmail.message.error,
-        intent: 'danger',
-      });
-      return;
-    }
 
     dispatch({ type: 'done' });
 
@@ -134,65 +120,84 @@ export namespace UpdateEmailPageStore {
 
     showToast({
       toast,
-      message: dc.updateEmail.message.success,
-      intent: 'success',
+      message: dc.updateEmail.message.error,
+      intent: 'danger',
     });
-  };
+    return;
+  }
 
-  export const enterClickHandler = (): void => {
-    const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+  dispatch({ type: 'done' });
 
-    if (enterButtonDisabled || fireAuthUser === undefined) return;
+  UpdateUserInfoDialogStore.closeDialog();
 
-    // TODO: use toast
-    submit(fireAuthUser).catch(console.error);
-  };
+  showToast({
+    toast,
+    message: dc.updateEmail.message.success,
+    intent: 'success',
+  });
+};
 
-  export const inputEmailHandler = (value: string): void => {
-    dispatch({
-      type: 'inputEmail',
-      payload: value,
-    });
-  };
+const enterClickHandler = (): void => {
+  const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
 
-  export const inputPasswordHandler = (value: string): void => {
-    dispatch({
-      type: 'inputPassword',
-      payload: value,
-    });
-  };
+  if (enterButtonDisabled || fireAuthUser === undefined) return;
 
-  const resetAllDialogState = (): void => {
-    dispatch({ type: 'reset' });
-    hidePassword();
-  };
+  // TODO: use toast
+  submit(fireAuthUser).catch(console.error);
+};
 
-  /* subscriptions */
+const inputEmailHandler = (value: string): void => {
+  dispatch({
+    type: 'inputEmail',
+    payload: value,
+  });
+};
 
-  const mut_subscribedValues: {
-    enterButtonDisabled: boolean;
-    fireAuthUser: FireAuthUser | undefined;
-  } = {
-    enterButtonDisabled: true,
-    fireAuthUser: undefined,
-  };
+const inputPasswordHandler = (value: string): void => {
+  dispatch({
+    type: 'inputPassword',
+    payload: value,
+  });
+};
 
-  enterButtonDisabled$.subscribe((v) => {
-    mut_subscribedValues.enterButtonDisabled = v;
+const resetAllDialogState = (): void => {
+  dispatch({ type: 'reset' });
+  hidePassword();
+};
+
+/* subscriptions */
+
+const mut_subscribedValues: {
+  enterButtonDisabled: boolean;
+  fireAuthUser: FireAuthUser | undefined;
+} = {
+  enterButtonDisabled: true,
+  fireAuthUser: undefined,
+};
+
+enterButtonDisabled$.subscribe((v) => {
+  mut_subscribedValues.enterButtonDisabled = v;
+});
+
+Auth.fireAuthUser$.subscribe((u) => {
+  mut_subscribedValues.fireAuthUser = u;
+});
+
+UpdateUserInfoDialogStore.openingDialog$
+  .chain(withLatestFromI(Auth.fireAuthUser$))
+  .subscribe(([openingDialog, user]) => {
+    if (openingDialog === undefined) {
+      resetAllDialogState();
+    }
+    if (openingDialog === 'updateEmail') {
+      dispatch({ type: 'inputEmail', payload: user?.email ?? '' });
+    }
   });
 
-  fireAuthUser$.subscribe((u) => {
-    mut_subscribedValues.fireAuthUser = u;
-  });
-
-  UpdateUserInfoDialogStore.openingDialog$
-    .chain(withLatestFromI(fireAuthUser$))
-    .subscribe(([openingDialog, user]) => {
-      if (openingDialog === undefined) {
-        resetAllDialogState();
-      }
-      if (openingDialog === 'updateEmail') {
-        dispatch({ type: 'inputEmail', payload: user?.email ?? '' });
-      }
-    });
-}
+export const UpdateEmailPageStore = {
+  togglePasswordLock,
+  state$,
+  enterClickHandler,
+  inputEmailHandler,
+  inputPasswordHandler,
+} as const;

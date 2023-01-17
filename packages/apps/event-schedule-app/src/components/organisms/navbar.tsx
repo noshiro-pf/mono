@@ -3,13 +3,7 @@ import { Popover2 } from '@blueprintjs/popover2';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { css } from 'styled-components';
 import { aboutThisAppUrl, feedbackUrl, Routes } from '../../constants';
-import {
-  router,
-  signOutClick,
-  UpdateUserInfoDialogStore,
-  useFireAuthUser,
-  usePasswordProviderIncluded,
-} from '../../store';
+import { Auth, router, UpdateUserInfoDialogStore } from '../../store';
 import { NoWrapSpan } from '../atoms';
 import { ForNonLoggedInUserDialog } from './button-with-confirm';
 import {
@@ -27,7 +21,7 @@ const popoverModifiers = {
 } as const;
 
 export const NavBar = memoNamed('NavBar', () => {
-  const fireAuthUser = useFireAuthUser();
+  const fireAuthUser = Auth.useFireAuthUser();
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
@@ -51,7 +45,7 @@ export const NavBar = memoNamed('NavBar', () => {
     UpdateUserInfoDialogStore.openingDialog$
   );
 
-  const passwordProviderIncluded = usePasswordProviderIncluded();
+  const passwordProviderIncluded = Auth.usePasswordProviderIncluded();
 
   const forNonLoggedInUserDialogState = useBoolState(false);
 
@@ -141,7 +135,7 @@ export const NavBar = memoNamed('NavBar', () => {
                       </MenuItem>
                       <MenuItem
                         text={dc.auth.menu.signOut}
-                        onClick={signOutClick}
+                        onClick={Auth.signOutClick}
                       />
                     </Menu>
                   }
