@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.lib.cjs.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  }
+}
