@@ -1,3 +1,5 @@
+import { tp } from '@noshiro/ts-utils';
+
 export const providePluginGooberDef = {
-  styled: ['@noshiro/goober', 'styled'],
+  styled: tp('@noshiro/goober', 'styled'),
 };

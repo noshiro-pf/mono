@@ -22,7 +22,8 @@
     "type-check": "wireit"
   },
   "dependencies": {
-    "@noshiro/goober": "*"
+    "@noshiro/goober": "*",
+    "@noshiro/ts-utils": "*"
   },
   "devDependencies": {
     "@noshiro/ts-type-utils": "*"
