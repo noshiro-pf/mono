@@ -10,5 +10,5 @@ export const providePluginPreactUtilsDef = Obj.fromEntries(
     'useTinyObservable',
     'useTinyObservableEffect',
     'useTinyObservableValue',
-  ].map((key) => tp(key, ['@noshiro/preact-utils', key]))
+  ].map((key) => tp(key, tp('@noshiro/preact-utils', key)))
 );

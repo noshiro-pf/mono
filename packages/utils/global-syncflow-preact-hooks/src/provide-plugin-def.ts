@@ -10,5 +10,5 @@ export const providePluginSyncflowPreactHooksDef = Obj.fromEntries(
     'useObservableValue',
     'useValueAsObservable',
     'useVoidEventObservable',
-  ].map((key) => tp(key, ['@noshiro/syncflow-preact-hooks', key]))
+  ].map((key) => tp(key, tp('@noshiro/syncflow-preact-hooks', key)))
 );

@@ -52,5 +52,5 @@ export const providePluginTsUtilsDef = Obj.fromEntries(
     'Str',
     'toBoolean',
     'tp',
-  ].map((key) => tp(key, ['@noshiro/ts-utils', key]))
+  ].map((key) => tp(key, tp('@noshiro/ts-utils', key)))
 );
