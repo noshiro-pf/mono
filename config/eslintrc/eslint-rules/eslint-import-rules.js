@@ -34,6 +34,7 @@ const eslintImportsRules = {
         '@blueprintjs/*',
         '@material-ui/*',
         'resize-observer/lib/ResizeObserverEntry',
+        'vitest/config',
       ],
     },
   ],
