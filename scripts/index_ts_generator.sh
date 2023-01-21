@@ -100,6 +100,12 @@ for directory in $(find . -mindepth "${min_recursion_depth}" -maxdepth "${max_re
                 sub_directory_basename=$(basename "${sub_directory}")
                 result+="export * from './${sub_directory_basename}';"
             done
+
+        fi
+
+
+        if [ -z "${result}" ]; then
+            result+="export {};"
         fi
 
         echo "${result}" > "${index_ts}"
