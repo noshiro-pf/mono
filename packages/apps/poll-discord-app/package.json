@@ -12,13 +12,14 @@
     "heroku:bash": "heroku run bash --app poll-discord-app",
     "heroku:logs": "heroku logs --tail --app poll-discord-app",
     "lint": "wireit",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "yarn z:lint --fix",
     "setup": "run-p setup:**",
     "setup:dbjson": "echo '{ \"polls\": [] }' > ./db.json",
     "start:dev": "export NODE_ENV='development' && node ./dist/index.js",
     "start:prod": "node ./dist/index.js",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit"
+    "type-check": "wireit",
+    "z:lint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
@@ -76,7 +77,7 @@
       "packageLocks": []
     },
     "lint": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+      "command": "yarn z:lint",
       "files": [
         "src/**/*.ts",
         ".eslintignore",
