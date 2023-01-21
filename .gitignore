@@ -29,6 +29,8 @@ yarn-debug.log*
 yarn-error.log*
 firebase-debug.log*
 firebase-debug.*.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Firebase cache
 .firebase/
@@ -92,3 +94,14 @@ build/Release
 
 # wireit
 **/.wireit
+
+*.local
+
+# Editor directories and files
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

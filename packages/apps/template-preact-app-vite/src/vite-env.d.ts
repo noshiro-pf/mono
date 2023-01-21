@@ -12,5 +12,13 @@
 /// <reference path="../../../utils/global-goober/esm/globals-decl.d.ts" />
 
 /// <reference types="node" />
+/// <reference types="react" />
+/// <reference types="react-dom" />
 
 /// <reference types="vite/client" />
+
+import type { dict as _dict } from './constants/dictionary/dictionary';
+
+declare global {
+  const dict: typeof _dict;
+}

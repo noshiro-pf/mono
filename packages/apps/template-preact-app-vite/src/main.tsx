@@ -9,3 +9,10 @@ const root = document.querySelector('#app');
 if (root !== null) {
   render(<App />, root);
 }
+
+// TODO: uncomment this after updating Preact
+/*
+  "dependencies": {
+    "preact": "^10.11.3"
+
+*/

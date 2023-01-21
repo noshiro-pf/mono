@@ -3,29 +3,50 @@
   "version": "0.0.0",
   "private": false,
   "license": "MIT",
-  "type": "module",
   "scripts": {
     "build": "run-s build:bundle",
     "build:bundle": "wireit",
-    "clean": "rimraf dist .firebase",
+    "build:bundle:no-minify": "yarn z:vite:build --minify false",
+    "clean": "run-p clean:*",
+    "clean:build": "rimraf build",
+    "clean:firebase": "rimraf .firebase",
+    "clean:wireit": "rimraf .wireit",
+    "cy:open": "cypress open",
+    "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
+    "cy:run:chrome": "cypress run --headed --browser chrome",
+    "cy:run:firefox": "cypress run --headed --browser firefox",
     "fb:deploy": "wireit",
+    "fb:deploy:hosting": "wireit",
+    "fb:export": "wireit",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fb:login:ci": "firebase login:ci",
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gi": "wireit",
-    "lint": "wireit",
-    "lint:fix": "yarn lint --fix",
-    "preview": "yarn vite-default preview",
+    "lint": "run-p z:lint:*",
+    "lint:fix": "run-p z:lint:fix:*",
+    "preview": "yarn z:vite:preview",
     "serve": "firebase serve",
-    "start": "run-p start:**",
-    "start:dev-server": "yarn vite-default",
+    "start:dev-server": "yarn z:vite --port 5180",
+    "start:emulators": "yarn z:firebase:emulators:start",
     "test": "wireit",
-    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
-    "tscw": "tsc --noEmit --watch",
+    "testw": "yarn z:vitest watch",
+    "tscw": "yarn type-check:watch",
     "type-check": "wireit",
-    "type-check:watch": "tsc --noEmit --watch",
-    "vite-default": "vite --config config/vite.config.ts"
+    "type-check:watch": "yarn z:type-check --watch",
+    "z:eslint": "eslint --ext .ts,.tsx",
+    "z:eslint:cy": "yarn z:eslint cypress/ --cache --cache-location cypress/.eslintcache",
+    "z:eslint:src": "yarn z:eslint src/ --cache --cache-location .eslintcache",
+    "z:firebase:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
+    "z:lint:cy": "wireit",
+    "z:lint:fix:cy": "yarn z:lint:cy --fix",
+    "z:lint:fix:src": "yarn z:lint:src --fix",
+    "z:lint:src": "wireit",
+    "z:type-check": "tsc --noEmit",
+    "z:vite": "vite --config config/vite.config.ts",
+    "z:vite:build": "yarn type-check && yarn z:vite build",
+    "z:vite:preview": "yarn z:vite preview",
+    "z:vitest": "vitest --config config/vitest.config.ts --passWithNoTests"
   },
   "browserslist": {
     "production": [
@@ -50,7 +71,7 @@
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "preact": "^10.11.3"
+    "preact": "^10.4.7"
   },
   "devDependencies": {
     "@noshiro/global-goober": "*",
@@ -65,7 +86,7 @@
   },
   "wireit": {
     "type-check": {
-      "command": "tsc --noEmit",
+      "command": "yarn z:type-check",
       "files": [
         "src/**/*.{ts,tsx}",
         "tsconfig.json",
@@ -78,7 +99,7 @@
       ]
     },
     "build:bundle": {
-      "command": "tsc && vite build",
+      "command": "yarn z:vite:build",
       "files": [
         "src/**/*",
         "tsconfig.json",
@@ -87,7 +108,7 @@
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [
-        "dist/**"
+        "build/**"
       ],
       "packageLocks": [
         "yarn.lock"
@@ -99,6 +120,16 @@
         "build"
       ]
     },
+    "fb:deploy:hosting": {
+      "command": "firebase deploy --only hosting",
+      "dependencies": [
+        "build"
+      ]
+    },
+    "fb:export": {
+      "command": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --write ./scripts/firestore_backup.json",
+      "dependencies": []
+    },
     "gi": {
       "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
       "clean": false,
@@ -108,8 +139,8 @@
       ],
       "packageLocks": []
     },
-    "lint": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+    "z:lint:src": {
+      "command": "yarn z:eslint:src --color",
       "dependencies": [
         "type-check"
       ],
@@ -129,13 +160,36 @@
         "yarn.lock"
       ]
     },
-    "test": {
-      "command": "jest --config config/jest.config.json --passWithNoTests",
+    "z:lint:cy": {
+      "command": "yarn z:eslint:cy --color",
       "dependencies": [
         "type-check"
       ],
       "files": [
-        "config/jest.config.json",
+        "cypress/**/*.ts",
+        ".eslintignore",
+        "cypress/.eslintrc.cjs",
+        "../../../package.json",
+        "package.json",
+        "cypress/tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "test": {
+      "command": "yarn z:vitest run",
+      "dependencies": [
+        "type-check"
+      ],
+      "files": [
+        "config/global.ts",
+        "config/tsconfig.test.json",
+        "config/vitest.config.ts",
         "src/**"
       ],
       "packageLocks": [

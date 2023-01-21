@@ -6,6 +6,7 @@ SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
 typeNames=(
     "EslintArrayFuncRules"
+    "EslintCypressRules"
     "EslintFunctionalRules"
     "EslintImportsRules"
     "EslintJestRules"
@@ -21,6 +22,7 @@ typeNames=(
 
 pluginNames=(
     "eslint-plugin-array-func"
+    "eslint-plugin-cypress"
     "eslint-plugin-functional"
     "eslint-plugin-import"
     "eslint-plugin-jest"
@@ -36,6 +38,7 @@ pluginNames=(
 
 rulePrefixes=(
     "array-func/"
+    "cypress/"
     "functional/"
     "import/"
     "jest/"
@@ -51,6 +54,7 @@ rulePrefixes=(
 
 outputFiles=(
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-array-func-rules.ts"
+    "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-cypress-rules.ts"
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-functional-rules.ts"
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-import-rules.ts"
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-jest-rules.ts"

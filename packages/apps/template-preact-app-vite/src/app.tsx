@@ -1,12 +1,14 @@
 import './app.css';
 import { preactLogo } from './assets';
 
-export const App = memoNamed('App', () => {
-  const { state: count, updateState: updateCount } = useState(0);
+const { state$: count$, updateState: updateCount } = createState(0);
 
-  const increment = useCallback(() => {
-    updateCount((c) => c + 1);
-  }, [updateCount]);
+const increment = (): void => {
+  updateCount((c) => c + 1);
+};
+
+export const App = memoNamed('App', () => {
+  const count = useObservableValue(count$);
 
   return (
     <>
@@ -20,7 +22,11 @@ export const App = memoNamed('App', () => {
       </div>
       <h1>{'Vite + Preact'}</h1>
       <div className='card'>
-        <button type='button' onClick={increment}>{`count is ${count}`}</button>
+        <button
+          data-cy='increment-button'
+          type='button'
+          onClick={increment}
+        >{`count is ${count}`}</button>
         <p>
           {'Edit '}
           <code>{'src/app.tsx'}</code>

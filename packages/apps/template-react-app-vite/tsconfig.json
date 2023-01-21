@@ -3,8 +3,15 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "noEmit": true
+    "noEmit": true,
+
+    // customize
+    "baseUrl": "./src/",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "types": ["vitest/globals"]
   },
-  "include": ["./src"],
+  "include": ["./src", "./config"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -2,6 +2,7 @@
 
 'use strict';
 
+const { eslintCypressRules } = require('./eslint-cypress-rules');
 const { eslintDeprecationRules } = require('./eslint-deprecation-rules');
 const { eslintImportsRules } = require('./eslint-import-rules');
 const { eslintJestRules } = require('./eslint-jest-rules');
@@ -28,6 +29,7 @@ const {
 } = require('./typescript-eslint-rules');
 
 module.exports = {
+  eslintCypressRules,
   eslintDeprecationRules,
   eslintImportsRules,
   eslintJestRules,

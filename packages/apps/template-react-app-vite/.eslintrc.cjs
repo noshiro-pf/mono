@@ -24,6 +24,9 @@ const {
   eslintNoRestrictedImportsReactDef,
 } = require('@noshiro/global-react/cjs/eslint-no-restricted-imports-def');
 const {
+  eslintNoRestrictedImportsTinyRouterReactHooksDef,
+} = require('@noshiro/global-tiny-router-react-hooks/cjs/eslint-no-restricted-imports-def');
+const {
   eslintNoRestrictedImportsStyledComponentsDef,
 } = require('@noshiro/global-styled-components/cjs/eslint-no-restricted-imports-def');
 
@@ -40,6 +43,7 @@ const noRestrictedImports = [
       eslintNoRestrictedImportsSyncflowDef,
       eslintNoRestrictedImportsSyncflowReactHooksDef,
       eslintNoRestrictedImportsReactDef,
+      eslintNoRestrictedImportsTinyRouterReactHooksDef,
       eslintNoRestrictedImportsStyledComponentsDef,
     ],
   },

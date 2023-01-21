@@ -4,6 +4,7 @@
 
 const plugins = {
   typescriptEslint: '@typescript-eslint',
+  cypress: 'cypress',
   deprecation: 'deprecation',
   import: 'import',
   jest: 'jest',

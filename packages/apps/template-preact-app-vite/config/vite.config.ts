@@ -1,6 +1,4 @@
-import preact from '@preact/preset-vite';
-import inject from '@rollup/plugin-inject';
-import { defineConfig } from 'vite';
+/* eslint-disable import/no-internal-modules */
 
 import { providePluginGooberDef } from '@noshiro/global-goober/cjs/provide-plugin-def';
 import { providePluginPreactUtilsDef } from '@noshiro/global-preact-utils/cjs/provide-plugin-def';
@@ -10,20 +8,40 @@ import { providePluginSyncflowDef } from '@noshiro/global-syncflow/cjs/provide-p
 import { providePluginTinyRouterPreactHooksDef } from '@noshiro/global-tiny-router-preact-hooks/cjs/provide-plugin-def';
 import { providePluginTsUtilsDef } from '@noshiro/global-ts-utils/cjs/provide-plugin-def';
 
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+import { castWritable, tp } from '@noshiro/ts-utils';
+// eslint-disable-next-line import/no-named-as-default
+import preact from '@preact/preset-vite';
+import inject from '@rollup/plugin-inject';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
+
+const thisDir = dirname(fileURLToPath(import.meta.url));
+
 // https://vitejs.dev/config/
 // eslint-disable-next-line import/no-default-export
 export default defineConfig({
   plugins: [
     preact(),
     inject({
-      ...providePluginPreactDef,
-      ...providePluginPreactUtilsDef,
-      ...providePluginSyncflowDef,
-      ...providePluginSyncflowPreactHooksDef,
-      ...providePluginTsUtilsDef,
-      ...providePluginTinyRouterPreactHooksDef,
-      ...providePluginGooberDef,
-      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      modules: castWritable({
+        ...providePluginPreactDef,
+        ...providePluginPreactUtilsDef,
+        ...providePluginSyncflowDef,
+        ...providePluginSyncflowPreactHooksDef,
+        ...providePluginTsUtilsDef,
+        ...providePluginTinyRouterPreactHooksDef,
+        ...providePluginGooberDef,
+        dict: tp('@/constants/dictionary/dictionary', 'dict'),
+      }),
+      include: ['src/**/*.ts', 'src/**/*.tsx'] as const,
     }),
   ],
+  build: {
+    outDir: 'build',
+  },
+  resolve: {
+    alias: [{ find: '@', replacement: resolve(thisDir, '../', 'src') }],
+  },
 });
