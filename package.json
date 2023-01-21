@@ -27,15 +27,13 @@
     "create:slides": "scripts/create_new_slides.sh",
     "create:util": "scripts/create_new_util.sh",
     "fmt:all": "prettier --write . > /dev/null",
-    "pregen-eslint-rules-type": "rimraf config/eslintrc/eslint-rules/types/*",
-    "gen-eslint-rules-type": "config/eslintrc/generate-rules-type/generate-rules-type.sh",
-    "gen-eslint-rules-type:compile": "tsc -p config/eslintrc/generate-rules-type/tsconfig.generate-rules-type.json",
+    "gen-eslint-rules-type": "wireit",
     "lint:apps": "node scripts/lint-apps.js",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "lint:utils": "node scripts/lint-utils.js",
     "pub:all": "scripts/publish.sh",
     "setup:all": "run-s setup:root ws:setup",
-    "setup:root": "run-s gen-eslint-rules-type:compile gen-eslint-rules-type",
+    "setup:root": "run-s z:gen-eslint-rules-type:compile gen-eslint-rules-type",
     "type-check:root": "run-s type-check:root:scripts type-check:root:configs",
     "type-check:root:configs": "tsc --project config/tsconfig.json",
     "type-check:root:scripts": "tsc --project scripts/tsconfig.json",
@@ -50,6 +48,7 @@
     "ws:test": "yarn z:ws-run-serial test",
     "ws:test:fast": "yarn z:ws-run-parallel test",
     "ws:type-check": "yarn z:ws-run-parallel type-check",
+    "z:gen-eslint-rules-type:compile": "wireit",
     "z:ws-run": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
     "z:ws-run-parallel": "yarn z:ws-run --parallel --concurrency 5",
     "z:ws-run-serial": "yarn z:ws-run --serial",
@@ -159,5 +158,42 @@
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
+  },
+  "wireit": {
+    "gen-eslint-rules-type": {
+      "command": "config/eslintrc/generate-rules-type/generate-rules-type.sh",
+      "files": [
+        "config/eslintrc/generate-rules-type/generate-rules-type.sh"
+      ],
+      "dependencies": [
+        "z:gen-eslint-rules-type:compile"
+      ],
+      "output": [
+        "config/eslintrc/eslint-rules/rules-type/**/*.ts"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:gen-eslint-rules-type:compile": {
+      "command": "tsc -p config/eslintrc/generate-rules-type/tsconfig.generate-rules-type.json",
+      "files": [
+        "packages/utils/stdlib/dist/lib.dom.d.ts",
+        "packages/utils/stdlib/dist/lib.esnext.d.ts",
+        "packages/utils/ts-type-utils/ts-type-utils.d.ts",
+        "config/tsconfig/tsconfig.cjs.nolib.json",
+        "config/eslintrc/generate-rules-type/tsconfig.generate-rules-type.json",
+        "config/eslintrc/generate-rules-type/generate-rules-type.ts",
+        "config/eslintrc/generate-rules-type/index.ts",
+        "config/eslintrc/generate-rules-type/.eslintrc.generate-rules-type.js"
+      ],
+      "output": [
+        "config/eslintrc/generate-rules-type/generate-rules-type.js",
+        "config/eslintrc/generate-rules-type/index.js"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    }
   }
 }
