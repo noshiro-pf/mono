@@ -9,14 +9,9 @@ on:
     branches: [main]
     paths:
       - .github/workflows/deploy_portfolio_app.yml
-      - packages/utils/stdlib/**
-      - packages/utils/ts-utils/**
-      - packages/utils/preact-utils/**
-      - packages/utils/syncflow/**
-      - packages/utils/syncflow-preact-hooks/**
-      - packages/utils/tiny-router-observable/**
-      - packages/utils/tiny-router-preact-hooks/**
-      - packages/utils/resize-observer-preact-hooks/**
+      - config/tsconfig/**
+      - yarn.lock
+      - packages/utils/**
       - packages/apps/my-portfolio-app-preact/**
 
   # Allows you to run this workflow manually from the Actions tab
