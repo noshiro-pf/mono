@@ -1,8 +1,7 @@
-export const isUndefined = (a: unknown): a is undefined =>
-  typeof a === 'undefined';
+export const isUndefined = (a: unknown): a is undefined => a === undefined;
 
 export const isNotUndefined = <T>(a: T): a is RelaxedExclude<T, undefined> =>
-  typeof a !== 'undefined';
+  a !== undefined;
 
 export const isBoolean = (a: unknown): a is boolean => typeof a === 'boolean';
 

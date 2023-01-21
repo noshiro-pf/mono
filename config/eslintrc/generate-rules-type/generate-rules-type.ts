@@ -17,7 +17,7 @@ const compilerConfig = {
 
 const toCapitalCase = (str: string): string =>
   str
-    .replace(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
+    .replaceAll(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
     .replace(/^./u, (x) => x[0]?.toUpperCase() ?? str);
 
 const normalizeToSchemaArray = (
