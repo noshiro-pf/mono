@@ -15,6 +15,7 @@
     "clean:all": "git clean -xfd",
     "clean:build": "find . -name 'build' -type d -prune -exec rm -rf '{}' +",
     "clean:build-artifacts": "run-p clean:esm clean:cjs clean:build",
+    "clean:caches": "run-p clean:eslintcache clean:wireit",
     "clean:cjs": "find . -name 'cjs' -type d -prune -exec rm -rf '{}' +",
     "clean:eslintcache": "find . -name '.eslintcache' -type d -prune -exec rm -rf '{}' +",
     "clean:esm": "find . -name 'esm' -type d -prune -exec rm -rf '{}' +",
