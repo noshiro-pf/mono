@@ -58,6 +58,7 @@ const eslintUnicornRules = {
   'unicorn/no-static-only-class': 'error',
   'unicorn/no-thenable': 'error',
   'unicorn/no-this-assignment': 'error',
+  'unicorn/no-unnecessary-await': 'error',
   'unicorn/no-unreadable-array-destructuring': 'error',
   'unicorn/no-unsafe-regex': 'off', // dup of "security/detect-unsafe-regex"
   'unicorn/no-unused-properties': 'error',
@@ -124,6 +125,7 @@ const eslintUnicornRules = {
   // See #1396
   'unicorn/require-post-message-target-origin': 'off',
   'unicorn/string-content': 'error',
+  'unicorn/switch-case-braces': 'off', // TODO: Enable this
   'unicorn/template-indent': 'error',
   'unicorn/text-encoding-identifier-case': 'error',
   'unicorn/throw-new-error': 'error',

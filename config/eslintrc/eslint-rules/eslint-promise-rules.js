@@ -20,6 +20,7 @@ const eslintPromiseRules = {
   'promise/valid-params': 'error',
   'promise/prefer-await-to-then': 'off',
   'promise/prefer-await-to-callbacks': 'off',
+  'promise/no-multiple-resolved': 'error',
 };
 
 module.exports = { eslintPromiseRules };
