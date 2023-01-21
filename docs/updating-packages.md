@@ -15,6 +15,8 @@ $  yarn add --dev -W  \
         eslint-gitignore@latest                  \
         eslint-import-resolver-typescript@latest \
         eslint-plugin-array-func@latest          \
+        eslint-plugin-cypress@latest             \
+        eslint-plugin-deprecation@latest         \
         eslint-plugin-functional@latest          \
         eslint-plugin-import@latest              \
         eslint-plugin-jest@latest                \
@@ -25,6 +27,12 @@ $  yarn add --dev -W  \
         eslint-plugin-total-functions@latest     \
         eslint-plugin-unicorn@latest             \
         eslint@latest
+```
+
+then
+
+```sh
+$  yarn gen-eslint-rules-type
 ```
 
 ## Formatter
