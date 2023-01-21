@@ -6,13 +6,13 @@
 
 /** @type {EslintCypressRules} */
 const eslintCypressRules = {
-  'cypress/no-assigning-return-values': 'warn',
-  'cypress/no-unnecessary-waiting': 'warn',
-  'cypress/no-async-tests': 'warn',
-  'cypress/assertion-before-screenshot': 'warn',
-  'cypress/require-data-selectors': 'warn',
-  'cypress/no-force': 'warn',
-  'cypress/no-pause': 'warn',
+  'cypress/no-assigning-return-values': 'error',
+  'cypress/no-unnecessary-waiting': 'error',
+  'cypress/no-async-tests': 'error',
+  'cypress/assertion-before-screenshot': 'error',
+  'cypress/require-data-selectors': 'off',
+  'cypress/no-force': 'error',
+  'cypress/no-pause': 'error',
 };
 
 module.exports = { eslintCypressRules };

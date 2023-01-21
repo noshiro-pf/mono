@@ -4,10 +4,10 @@ describe('hello', () => {
   it('hello', () => {
     cy.visit('/');
 
-    const incrementButton = cy.get(e('increment-button'));
+    const incrementButtonId = 'increment-button';
 
-    incrementButton.click();
-    incrementButton.should('have.text', 'count is 1');
+    cy.get(e(incrementButtonId)).click();
+    cy.get(e(incrementButtonId)).should('have.text', 'count is 1');
   });
 });
 
