@@ -8,7 +8,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * @description Require that member overloads be consecutive
+ * @description Require that function overload signatures be consecutive
  * @link https://typescript-eslint.io/rules/adjacent-overload-signatures
  *
  *  | key         | value      |
@@ -21,7 +21,7 @@ namespace AdjacentOverloadSignatures {
 }
 
 /**
- * @description Require using either `T[]` or `Array<T>` for arrays
+ * @description Require consistently using either `T[]` or `Array<T>` for arrays
  * @link https://typescript-eslint.io/rules/array-type
  *
  *  | key         | value      |
@@ -96,7 +96,7 @@ namespace AwaitThenable {
 }
 
 /**
- * @description Disallow `@ts-<directive>` comments or require descriptions after directive
+ * @description Disallow `@ts-<directive>` comments or require descriptions after directives
  * @link https://typescript-eslint.io/rules/ban-ts-comment
  *
  *  | key         | value   |
@@ -467,7 +467,7 @@ namespace CommaDangle {
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
- *  | type        | suggestion |
+ *  | type        | layout     |
  *  | fixable     | whitespace |
  *  | recommended | false      |
  */
@@ -2740,8 +2740,8 @@ namespace LinesBetweenClassMembers {
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
+ *  | type        | layout     |
+ *  | fixable     | whitespace |
  *  | recommended | false      |
  */
 namespace MemberDelimiterStyle {
@@ -11058,7 +11058,7 @@ namespace NoExplicitAny {
 }
 
 /**
- * @description Disallow extra non-null assertion
+ * @description Disallow extra non-null assertions
  * @link https://typescript-eslint.io/rules/no-extra-non-null-assertion
  *
  *  | key         | value   |
@@ -11736,7 +11736,7 @@ namespace NoMisusedPromises {
 }
 
 /**
- * @description Disallow custom TypeScript modules and namespaces
+ * @description Disallow TypeScript namespaces
  * @link https://typescript-eslint.io/rules/no-namespace
  *
  *  | key         | value      |
@@ -13817,7 +13817,7 @@ namespace RequireAwait {
 }
 
 /**
- * @description Require both operands of addition to have type `number` or `string`
+ * @description Require both operands of addition to be the same type and be `bigint`, `number`, or `string`
  * @link https://typescript-eslint.io/rules/restrict-plus-operands
  *
  *  | key                  | value   |
