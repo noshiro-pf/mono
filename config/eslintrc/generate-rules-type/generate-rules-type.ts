@@ -139,7 +139,7 @@ const createResult = async (
 ): Promise<string> => {
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
-    '/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */',
+    '/* eslint-disable @typescript-eslint/sort-type-constituents */',
     "import type { Linter } from 'eslint';",
     ...(schemaList.some(({ schema }) => schema.length === 1)
       ? [

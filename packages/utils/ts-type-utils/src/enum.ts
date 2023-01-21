@@ -10,7 +10,7 @@ export type DateEnum = StrictExclude<Index<32>, 0>;
 export type DayOfWeekIndex = Index<7>;
 
 export type DayOfWeekName =
-  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat';
 
 export type HoursEnum = Index<24>;

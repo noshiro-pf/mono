@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
+/* eslint-disable @typescript-eslint/sort-type-constituents */
 // prettier-ignore
 export type Alpha = (
   0   | 0.01 | 0.02 | 0.03 | 0.04 | 0.05 | 0.06 | 0.07 | 0.08 | 0.09 |

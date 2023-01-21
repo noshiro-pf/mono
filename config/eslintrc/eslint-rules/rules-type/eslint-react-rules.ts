@@ -1,6 +1,6 @@
 /* eslint-disable functional/no-mixed-type */
 /* cSpell:disable */
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
+/* eslint-disable @typescript-eslint/sort-type-constituents */
 import type { Linter } from 'eslint';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
