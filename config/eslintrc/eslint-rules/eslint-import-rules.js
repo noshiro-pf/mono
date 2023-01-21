@@ -43,6 +43,7 @@ const eslintImportsRules = {
   'import/no-cycle': 'error',
   'import/no-useless-path-segments': 'error',
   'import/no-relative-parent-imports': 'off',
+  'import/consistent-type-specifier-style': 'off', // dup of @typescript-eslint/consistent-type-imports
   'import/no-relative-packages': 'error',
 
   // helpfulWarnings
@@ -83,7 +84,12 @@ const eslintImportsRules = {
     },
   ],
   'import/order': 'off', // using prettier-plugin-organize-imports
-  'import/newline-after-import': 'error',
+  'import/newline-after-import': [
+    'error',
+    {
+      considerComments: true,
+    },
+  ],
   'import/prefer-default-export': 'off',
   'import/max-dependencies': 'off',
   'import/no-unassigned-import': [
@@ -107,6 +113,7 @@ const eslintImportsRules = {
   'import/no-anonymous-default-export': 'error',
   'import/group-exports': 'off',
   'import/dynamic-import-chunkname': 'error',
+  'import/no-empty-named-blocks': 'error',
 
   // deprecated rules
   'import/imports-first': 'off',

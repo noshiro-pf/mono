@@ -262,7 +262,7 @@ namespace ForbidComponentProps {
    *       "forbid": {
    *         "type": "array",
    *         "items": {
-   *           "oneOf": [
+   *           "anyOf": [
    *             {
    *               "type": "string"
    *             },
@@ -331,7 +331,7 @@ namespace ForbidDomProps {
    *       "forbid": {
    *         "type": "array",
    *         "items": {
-   *           "oneOf": [
+   *           "anyOf": [
    *             {
    *               "type": "string"
    *             },
@@ -549,7 +549,7 @@ namespace FunctionComponentDefinition {
    *     "type": "object",
    *     "properties": {
    *       "namedComponents": {
-   *         "oneOf": [
+   *         "anyOf": [
    *           {
    *             "enum": [
    *               "function-declaration",
@@ -571,7 +571,7 @@ namespace FunctionComponentDefinition {
    *         ]
    *       },
    *       "unnamedComponents": {
-   *         "oneOf": [
+   *         "anyOf": [
    *           {
    *             "enum": [
    *               "arrow-function",
@@ -626,7 +626,31 @@ namespace FunctionComponentDefinition {
  *  | recommended    | false          |
  */
 namespace HookUseState {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowDestructuredState": {
+   *         "default": false,
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowDestructuredState?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -780,7 +804,7 @@ namespace JsxClosingBracketLocation {
    * ```json
    * [
    *   {
-   *     "oneOf": [
+   *     "anyOf": [
    *       {
    *         "enum": [
    *           "after-props",
@@ -918,7 +942,7 @@ namespace JsxCurlySpacing {
    *       }
    *     },
    *     "basicConfigOrBoolean": {
-   *       "oneOf": [
+   *       "anyOf": [
    *         {
    *           "$ref": "#/definitions/basicConfig"
    *         },
@@ -931,7 +955,7 @@ namespace JsxCurlySpacing {
    *   "type": "array",
    *   "items": [
    *     {
-   *       "oneOf": [
+   *       "anyOf": [
    *         {
    *           "allOf": [
    *             {
@@ -1044,7 +1068,7 @@ namespace JsxCurlyNewline {
    * ```json
    * [
    *   {
-   *     "oneOf": [
+   *     "anyOf": [
    *       {
    *         "enum": [
    *           "consistent",
@@ -1352,7 +1376,7 @@ namespace JsxIndent {
    * ```json
    * [
    *   {
-   *     "oneOf": [
+   *     "anyOf": [
    *       {
    *         "enum": [
    *           "tab"
@@ -1408,7 +1432,7 @@ namespace JsxIndentProps {
    * ```json
    * [
    *   {
-   *     "oneOf": [
+   *     "anyOf": [
    *       {
    *         "enum": [
    *           "tab",
@@ -1422,7 +1446,7 @@ namespace JsxIndentProps {
    *         "type": "object",
    *         "properties": {
    *           "indentMode": {
-   *             "oneOf": [
+   *             "anyOf": [
    *               {
    *                 "enum": [
    *                   "tab",
@@ -2120,7 +2144,7 @@ namespace JsxCurlyBracePresence {
    * ```json
    * [
    *   {
-   *     "oneOf": [
+   *     "anyOf": [
    *       {
    *         "type": "object",
    *         "properties": {
@@ -2367,6 +2391,7 @@ namespace JsxPropsNoSpreading {
  *
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | deprecated  | true             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  */
@@ -2388,13 +2413,7 @@ namespace JsxSortDefaultProps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreCase?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 'off';
 }
 
 /**
@@ -2725,10 +2744,11 @@ namespace JsxWrapMultilines {
  * @description Disallow usage of invalid attributes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-invalid-html-attribute.md
  *
- *  | key      | value           |
- *  | :------- | :-------------- |
- *  | fixable  | code            |
- *  | category | Possible Errors |
+ *  | key            | value           |
+ *  | :------------- | :-------------- |
+ *  | type           | suggestion      |
+ *  | hasSuggestions | true            |
+ *  | category       | Possible Errors |
  */
 namespace NoInvalidHtmlAttribute {
   /**
@@ -3155,7 +3175,7 @@ namespace NoUnescapedEntities {
    *       "forbid": {
    *         "type": "array",
    *         "items": {
-   *           "oneOf": [
+   *           "anyOf": [
    *             {
    *               "type": "string"
    *             },
@@ -3393,6 +3413,19 @@ namespace NoUnusedPropTypes {
  *  | recommended | false          |
  */
 namespace NoUnusedState {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * @description Disallow usage of referential-type variables as default param in functional component
+ * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-object-type-as-default-prop.md
+ *
+ *  | key         | value          |
+ *  | :---------- | :------------- |
+ *  | category    | Best Practices |
+ *  | recommended | false          |
+ */
+namespace NoObjectTypeAsDefaultProp {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -3789,11 +3822,48 @@ namespace SortComp {
 }
 
 /**
+ * @description Enforce defaultProps declarations alphabetical sorting
+ * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-default-props.md
+ *
+ *  | key         | value            |
+ *  | :---------- | :--------------- |
+ *  | category    | Stylistic Issues |
+ *  | recommended | false            |
+ */
+namespace SortDefaultProps {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignoreCase": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly ignoreCase?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * @description Enforce propTypes declarations alphabetical sorting
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-prop-types.md
  *
  *  | key         | value            |
  *  | :---------- | :--------------- |
+ *  | fixable     | code             |
  *  | category    | Stylistic Issues |
  *  | recommended | false            |
  */
@@ -4082,7 +4152,6 @@ export type EslintReactRules = {
   readonly 'react/jsx-fragments': JsxFragments.RuleEntry;
   readonly 'react/jsx-props-no-multi-spaces': JsxPropsNoMultiSpaces.RuleEntry;
   readonly 'react/jsx-props-no-spreading': JsxPropsNoSpreading.RuleEntry;
-  readonly 'react/jsx-sort-default-props': JsxSortDefaultProps.RuleEntry;
   readonly 'react/jsx-sort-props': JsxSortProps.RuleEntry;
   readonly 'react/jsx-tag-spacing': JsxTagSpacing.RuleEntry;
   readonly 'react/jsx-uses-react': JsxUsesReact.RuleEntry;
@@ -4117,6 +4186,7 @@ export type EslintReactRules = {
   readonly 'react/no-unused-class-component-methods': NoUnusedClassComponentMethods.RuleEntry;
   readonly 'react/no-unused-prop-types': NoUnusedPropTypes.RuleEntry;
   readonly 'react/no-unused-state': NoUnusedState.RuleEntry;
+  readonly 'react/no-object-type-as-default-prop': NoObjectTypeAsDefaultProp.RuleEntry;
   readonly 'react/no-will-update-set-state': NoWillUpdateSetState.RuleEntry;
   readonly 'react/prefer-es6-class': PreferEs6Class.RuleEntry;
   readonly 'react/prefer-exact-props': PreferExactProps.RuleEntry;
@@ -4129,6 +4199,7 @@ export type EslintReactRules = {
   readonly 'react/require-render-return': RequireRenderReturn.RuleEntry;
   readonly 'react/self-closing-comp': SelfClosingComp.RuleEntry;
   readonly 'react/sort-comp': SortComp.RuleEntry;
+  readonly 'react/sort-default-props': SortDefaultProps.RuleEntry;
   readonly 'react/sort-prop-types': SortPropTypes.RuleEntry;
   readonly 'react/state-in-constructor': StateInConstructor.RuleEntry;
   readonly 'react/static-property-placement': StaticPropertyPlacement.RuleEntry;
@@ -4136,5 +4207,6 @@ export type EslintReactRules = {
   readonly 'react/void-dom-elements-no-children': VoidDomElementsNoChildren.RuleEntry;
 
   // deprecated
+  readonly 'react/jsx-sort-default-props': JsxSortDefaultProps.RuleEntry;
   readonly 'react/jsx-space-before-closing': JsxSpaceBeforeClosing.RuleEntry;
 };

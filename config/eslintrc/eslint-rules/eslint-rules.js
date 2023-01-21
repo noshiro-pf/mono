@@ -163,7 +163,7 @@ const eslintRules = {
   'id-match': 'error',
   'line-comment-position': 'off', // disabled
   'logical-assignment-operators': [
-    'warn',
+    'error',
     'always',
     { enforceForIfStatements: true },
   ],
@@ -200,6 +200,7 @@ const eslintRules = {
   'no-else-return': 'off', // disabled
   'no-empty-character-class': 'error',
   'no-empty-pattern': 'error',
+  'no-empty-static-block': 'error',
   'no-empty': 'error',
   'no-eq-null': 'off', // eqeqeqでnull許容するならoff
   'no-eval': 'error',
@@ -227,6 +228,7 @@ const eslintRules = {
   'no-negated-condition': 'off', // disabled
   'no-nested-ternary': 'off', // unicorn/no-nested-ternary
   'no-new-func': 'error',
+  'no-new-native-nonconstructor': 'error',
   'no-new-object': 'error',
   'no-new-wrappers': 'error',
   'no-new': 'error',

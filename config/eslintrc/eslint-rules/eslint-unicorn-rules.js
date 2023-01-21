@@ -50,6 +50,7 @@ const eslintUnicornRules = {
   'unicorn/no-invalid-remove-event-listener': 'error',
   'unicorn/no-keyword-prefix': 'off', // {"onlyCamelCase": false}
   'unicorn/no-lonely-if': 'error',
+  'unicorn/no-negated-condition': 'off',
   'unicorn/no-new-array': 'error',
   'unicorn/no-new-buffer': 'error',
   'unicorn/no-null': 'off',
@@ -58,6 +59,7 @@ const eslintUnicornRules = {
   'unicorn/no-static-only-class': 'error',
   'unicorn/no-thenable': 'error',
   'unicorn/no-this-assignment': 'error',
+  'unicorn/no-typeof-undefined': 'error',
   'unicorn/no-unnecessary-await': 'error',
   'unicorn/no-unreadable-array-destructuring': 'error',
   'unicorn/no-unsafe-regex': 'off', // dup of "security/detect-unsafe-regex"
@@ -106,6 +108,7 @@ const eslintUnicornRules = {
   'unicorn/prefer-reflect-apply': 'error',
   'unicorn/prefer-regexp-test': 'error',
   'unicorn/prefer-set-has': 'error',
+  'unicorn/prefer-set-size': 'error',
   'unicorn/prefer-spread': 'off', // prefer array-func/prefer-array-from
   // TODO: Enable this by default when targeting Node.js 16.
   'unicorn/prefer-string-replace-all': 'error',

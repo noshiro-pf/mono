@@ -68,7 +68,7 @@ namespace PreferFlatMap {
 }
 
 /**
- * @description Prefer using .flat() over concating to flatten an array.
+ * @description Prefer using .flat() over concatenating to flatten an array.
  *
  *  | key         | value      |
  *  | :---------- | :--------- |

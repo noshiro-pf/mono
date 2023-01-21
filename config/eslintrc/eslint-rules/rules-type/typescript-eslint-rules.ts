@@ -740,6 +740,12 @@ namespace ConsistentTypeImports {
    *       },
    *       "disallowTypeAnnotations": {
    *         "type": "boolean"
+   *       },
+   *       "fixStyle": {
+   *         "enum": [
+   *           "separate-type-imports",
+   *           "inline-type-imports"
+   *         ]
    *       }
    *     },
    *     "additionalProperties": false
@@ -750,6 +756,7 @@ namespace ConsistentTypeImports {
   export type Options = {
     readonly prefer?: 'type-imports' | 'no-type-imports';
     readonly disallowTypeAnnotations?: boolean;
+    readonly fixStyle?: 'separate-type-imports' | 'inline-type-imports';
   };
 
   export type RuleEntry =
@@ -2394,6 +2401,18 @@ namespace KeywordSpacing {
    *               }
    *             },
    *             "additionalProperties": false
+   *           },
+   *           "type": {
+   *             "type": "object",
+   *             "properties": {
+   *               "before": {
+   *                 "type": "boolean"
+   *               },
+   *               "after": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
    *           }
    *         },
    *         "additionalProperties": false
@@ -2677,6 +2696,10 @@ namespace KeywordSpacing {
         readonly after?: boolean;
       };
       readonly yield?: {
+        readonly before?: boolean;
+        readonly after?: boolean;
+      };
+      readonly type?: {
         readonly before?: boolean;
         readonly after?: boolean;
       };
@@ -2967,7 +2990,9 @@ namespace MemberOrdering {
    *                     "private-decorated-field",
    *                     "private-static-field",
    *                     "private-instance-field",
-   *                     "private-abstract-field",
+   *                     "#private-field",
+   *                     "#private-static-field",
+   *                     "#private-instance-field",
    *                     "method",
    *                     "public-method",
    *                     "public-decorated-method",
@@ -2987,23 +3012,10 @@ namespace MemberOrdering {
    *                     "private-decorated-method",
    *                     "private-static-method",
    *                     "private-instance-method",
-   *                     "private-abstract-method",
+   *                     "#private-method",
+   *                     "#private-static-method",
+   *                     "#private-instance-method",
    *                     "call-signature",
-   *                     "public-call-signature",
-   *                     "static-call-signature",
-   *                     "public-static-call-signature",
-   *                     "instance-call-signature",
-   *                     "public-instance-call-signature",
-   *                     "abstract-call-signature",
-   *                     "public-abstract-call-signature",
-   *                     "protected-call-signature",
-   *                     "protected-static-call-signature",
-   *                     "protected-instance-call-signature",
-   *                     "protected-abstract-call-signature",
-   *                     "private-call-signature",
-   *                     "private-static-call-signature",
-   *                     "private-instance-call-signature",
-   *                     "private-abstract-call-signature",
    *                     "constructor",
    *                     "public-constructor",
    *                     "protected-constructor",
@@ -3027,7 +3039,9 @@ namespace MemberOrdering {
    *                     "private-decorated-get",
    *                     "private-static-get",
    *                     "private-instance-get",
-   *                     "private-abstract-get",
+   *                     "#private-get",
+   *                     "#private-static-get",
+   *                     "#private-instance-get",
    *                     "set",
    *                     "public-set",
    *                     "public-decorated-set",
@@ -3047,7 +3061,9 @@ namespace MemberOrdering {
    *                     "private-decorated-set",
    *                     "private-static-set",
    *                     "private-instance-set",
-   *                     "private-abstract-set",
+   *                     "#private-set",
+   *                     "#private-static-set",
+   *                     "#private-instance-set",
    *                     "static-initialization",
    *                     "static-static-initialization",
    *                     "public-static-static-initialization",
@@ -3060,7 +3076,8 @@ namespace MemberOrdering {
    *                     "protected-abstract-static-initialization",
    *                     "private-static-static-initialization",
    *                     "private-instance-static-initialization",
-   *                     "private-abstract-static-initialization"
+   *                     "#private-static-static-initialization",
+   *                     "#private-instance-static-initialization"
    *                   ]
    *                 },
    *                 {
@@ -3087,7 +3104,9 @@ namespace MemberOrdering {
    *                       "private-decorated-field",
    *                       "private-static-field",
    *                       "private-instance-field",
-   *                       "private-abstract-field",
+   *                       "#private-field",
+   *                       "#private-static-field",
+   *                       "#private-instance-field",
    *                       "method",
    *                       "public-method",
    *                       "public-decorated-method",
@@ -3107,23 +3126,10 @@ namespace MemberOrdering {
    *                       "private-decorated-method",
    *                       "private-static-method",
    *                       "private-instance-method",
-   *                       "private-abstract-method",
+   *                       "#private-method",
+   *                       "#private-static-method",
+   *                       "#private-instance-method",
    *                       "call-signature",
-   *                       "public-call-signature",
-   *                       "static-call-signature",
-   *                       "public-static-call-signature",
-   *                       "instance-call-signature",
-   *                       "public-instance-call-signature",
-   *                       "abstract-call-signature",
-   *                       "public-abstract-call-signature",
-   *                       "protected-call-signature",
-   *                       "protected-static-call-signature",
-   *                       "protected-instance-call-signature",
-   *                       "protected-abstract-call-signature",
-   *                       "private-call-signature",
-   *                       "private-static-call-signature",
-   *                       "private-instance-call-signature",
-   *                       "private-abstract-call-signature",
    *                       "constructor",
    *                       "public-constructor",
    *                       "protected-constructor",
@@ -3147,7 +3153,9 @@ namespace MemberOrdering {
    *                       "private-decorated-get",
    *                       "private-static-get",
    *                       "private-instance-get",
-   *                       "private-abstract-get",
+   *                       "#private-get",
+   *                       "#private-static-get",
+   *                       "#private-instance-get",
    *                       "set",
    *                       "public-set",
    *                       "public-decorated-set",
@@ -3167,7 +3175,9 @@ namespace MemberOrdering {
    *                       "private-decorated-set",
    *                       "private-static-set",
    *                       "private-instance-set",
-   *                       "private-abstract-set",
+   *                       "#private-set",
+   *                       "#private-static-set",
+   *                       "#private-instance-set",
    *                       "static-initialization",
    *                       "static-static-initialization",
    *                       "public-static-static-initialization",
@@ -3180,7 +3190,8 @@ namespace MemberOrdering {
    *                       "protected-abstract-static-initialization",
    *                       "private-static-static-initialization",
    *                       "private-instance-static-initialization",
-   *                       "private-abstract-static-initialization"
+   *                       "#private-static-static-initialization",
+   *                       "#private-instance-static-initialization"
    *                     ]
    *                   }
    *                 }
@@ -3218,7 +3229,9 @@ namespace MemberOrdering {
    *                             "private-decorated-field",
    *                             "private-static-field",
    *                             "private-instance-field",
-   *                             "private-abstract-field",
+   *                             "#private-field",
+   *                             "#private-static-field",
+   *                             "#private-instance-field",
    *                             "method",
    *                             "public-method",
    *                             "public-decorated-method",
@@ -3238,23 +3251,10 @@ namespace MemberOrdering {
    *                             "private-decorated-method",
    *                             "private-static-method",
    *                             "private-instance-method",
-   *                             "private-abstract-method",
+   *                             "#private-method",
+   *                             "#private-static-method",
+   *                             "#private-instance-method",
    *                             "call-signature",
-   *                             "public-call-signature",
-   *                             "static-call-signature",
-   *                             "public-static-call-signature",
-   *                             "instance-call-signature",
-   *                             "public-instance-call-signature",
-   *                             "abstract-call-signature",
-   *                             "public-abstract-call-signature",
-   *                             "protected-call-signature",
-   *                             "protected-static-call-signature",
-   *                             "protected-instance-call-signature",
-   *                             "protected-abstract-call-signature",
-   *                             "private-call-signature",
-   *                             "private-static-call-signature",
-   *                             "private-instance-call-signature",
-   *                             "private-abstract-call-signature",
    *                             "constructor",
    *                             "public-constructor",
    *                             "protected-constructor",
@@ -3278,7 +3278,9 @@ namespace MemberOrdering {
    *                             "private-decorated-get",
    *                             "private-static-get",
    *                             "private-instance-get",
-   *                             "private-abstract-get",
+   *                             "#private-get",
+   *                             "#private-static-get",
+   *                             "#private-instance-get",
    *                             "set",
    *                             "public-set",
    *                             "public-decorated-set",
@@ -3298,7 +3300,9 @@ namespace MemberOrdering {
    *                             "private-decorated-set",
    *                             "private-static-set",
    *                             "private-instance-set",
-   *                             "private-abstract-set",
+   *                             "#private-set",
+   *                             "#private-static-set",
+   *                             "#private-instance-set",
    *                             "static-initialization",
    *                             "static-static-initialization",
    *                             "public-static-static-initialization",
@@ -3311,7 +3315,8 @@ namespace MemberOrdering {
    *                             "protected-abstract-static-initialization",
    *                             "private-static-static-initialization",
    *                             "private-instance-static-initialization",
-   *                             "private-abstract-static-initialization"
+   *                             "#private-static-static-initialization",
+   *                             "#private-instance-static-initialization"
    *                           ]
    *                         },
    *                         {
@@ -3338,7 +3343,9 @@ namespace MemberOrdering {
    *                               "private-decorated-field",
    *                               "private-static-field",
    *                               "private-instance-field",
-   *                               "private-abstract-field",
+   *                               "#private-field",
+   *                               "#private-static-field",
+   *                               "#private-instance-field",
    *                               "method",
    *                               "public-method",
    *                               "public-decorated-method",
@@ -3358,23 +3365,10 @@ namespace MemberOrdering {
    *                               "private-decorated-method",
    *                               "private-static-method",
    *                               "private-instance-method",
-   *                               "private-abstract-method",
+   *                               "#private-method",
+   *                               "#private-static-method",
+   *                               "#private-instance-method",
    *                               "call-signature",
-   *                               "public-call-signature",
-   *                               "static-call-signature",
-   *                               "public-static-call-signature",
-   *                               "instance-call-signature",
-   *                               "public-instance-call-signature",
-   *                               "abstract-call-signature",
-   *                               "public-abstract-call-signature",
-   *                               "protected-call-signature",
-   *                               "protected-static-call-signature",
-   *                               "protected-instance-call-signature",
-   *                               "protected-abstract-call-signature",
-   *                               "private-call-signature",
-   *                               "private-static-call-signature",
-   *                               "private-instance-call-signature",
-   *                               "private-abstract-call-signature",
    *                               "constructor",
    *                               "public-constructor",
    *                               "protected-constructor",
@@ -3398,7 +3392,9 @@ namespace MemberOrdering {
    *                               "private-decorated-get",
    *                               "private-static-get",
    *                               "private-instance-get",
-   *                               "private-abstract-get",
+   *                               "#private-get",
+   *                               "#private-static-get",
+   *                               "#private-instance-get",
    *                               "set",
    *                               "public-set",
    *                               "public-decorated-set",
@@ -3418,7 +3414,9 @@ namespace MemberOrdering {
    *                               "private-decorated-set",
    *                               "private-static-set",
    *                               "private-instance-set",
-   *                               "private-abstract-set",
+   *                               "#private-set",
+   *                               "#private-static-set",
+   *                               "#private-instance-set",
    *                               "static-initialization",
    *                               "static-static-initialization",
    *                               "public-static-static-initialization",
@@ -3431,7 +3429,8 @@ namespace MemberOrdering {
    *                               "protected-abstract-static-initialization",
    *                               "private-static-static-initialization",
    *                               "private-instance-static-initialization",
-   *                               "private-abstract-static-initialization"
+   *                               "#private-static-static-initialization",
+   *                               "#private-instance-static-initialization"
    *                             ]
    *                           }
    *                         }
@@ -3451,7 +3450,16 @@ namespace MemberOrdering {
    *                 "enum": [
    *                   "alphabetically",
    *                   "alphabetically-case-insensitive",
-   *                   "as-written"
+   *                   "as-written",
+   *                   "natural",
+   *                   "natural-case-insensitive"
+   *                 ]
+   *               },
+   *               "optionalityOrder": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "optional-first",
+   *                   "required-first"
    *                 ]
    *               }
    *             },
@@ -3493,7 +3501,9 @@ namespace MemberOrdering {
    *                     "private-decorated-field",
    *                     "private-static-field",
    *                     "private-instance-field",
-   *                     "private-abstract-field",
+   *                     "#private-field",
+   *                     "#private-static-field",
+   *                     "#private-instance-field",
    *                     "method",
    *                     "public-method",
    *                     "public-decorated-method",
@@ -3513,23 +3523,10 @@ namespace MemberOrdering {
    *                     "private-decorated-method",
    *                     "private-static-method",
    *                     "private-instance-method",
-   *                     "private-abstract-method",
+   *                     "#private-method",
+   *                     "#private-static-method",
+   *                     "#private-instance-method",
    *                     "call-signature",
-   *                     "public-call-signature",
-   *                     "static-call-signature",
-   *                     "public-static-call-signature",
-   *                     "instance-call-signature",
-   *                     "public-instance-call-signature",
-   *                     "abstract-call-signature",
-   *                     "public-abstract-call-signature",
-   *                     "protected-call-signature",
-   *                     "protected-static-call-signature",
-   *                     "protected-instance-call-signature",
-   *                     "protected-abstract-call-signature",
-   *                     "private-call-signature",
-   *                     "private-static-call-signature",
-   *                     "private-instance-call-signature",
-   *                     "private-abstract-call-signature",
    *                     "constructor",
    *                     "public-constructor",
    *                     "protected-constructor",
@@ -3553,7 +3550,9 @@ namespace MemberOrdering {
    *                     "private-decorated-get",
    *                     "private-static-get",
    *                     "private-instance-get",
-   *                     "private-abstract-get",
+   *                     "#private-get",
+   *                     "#private-static-get",
+   *                     "#private-instance-get",
    *                     "set",
    *                     "public-set",
    *                     "public-decorated-set",
@@ -3573,7 +3572,9 @@ namespace MemberOrdering {
    *                     "private-decorated-set",
    *                     "private-static-set",
    *                     "private-instance-set",
-   *                     "private-abstract-set",
+   *                     "#private-set",
+   *                     "#private-static-set",
+   *                     "#private-instance-set",
    *                     "static-initialization",
    *                     "static-static-initialization",
    *                     "public-static-static-initialization",
@@ -3586,7 +3587,8 @@ namespace MemberOrdering {
    *                     "protected-abstract-static-initialization",
    *                     "private-static-static-initialization",
    *                     "private-instance-static-initialization",
-   *                     "private-abstract-static-initialization"
+   *                     "#private-static-static-initialization",
+   *                     "#private-instance-static-initialization"
    *                   ]
    *                 },
    *                 {
@@ -3613,7 +3615,9 @@ namespace MemberOrdering {
    *                       "private-decorated-field",
    *                       "private-static-field",
    *                       "private-instance-field",
-   *                       "private-abstract-field",
+   *                       "#private-field",
+   *                       "#private-static-field",
+   *                       "#private-instance-field",
    *                       "method",
    *                       "public-method",
    *                       "public-decorated-method",
@@ -3633,23 +3637,10 @@ namespace MemberOrdering {
    *                       "private-decorated-method",
    *                       "private-static-method",
    *                       "private-instance-method",
-   *                       "private-abstract-method",
+   *                       "#private-method",
+   *                       "#private-static-method",
+   *                       "#private-instance-method",
    *                       "call-signature",
-   *                       "public-call-signature",
-   *                       "static-call-signature",
-   *                       "public-static-call-signature",
-   *                       "instance-call-signature",
-   *                       "public-instance-call-signature",
-   *                       "abstract-call-signature",
-   *                       "public-abstract-call-signature",
-   *                       "protected-call-signature",
-   *                       "protected-static-call-signature",
-   *                       "protected-instance-call-signature",
-   *                       "protected-abstract-call-signature",
-   *                       "private-call-signature",
-   *                       "private-static-call-signature",
-   *                       "private-instance-call-signature",
-   *                       "private-abstract-call-signature",
    *                       "constructor",
    *                       "public-constructor",
    *                       "protected-constructor",
@@ -3673,7 +3664,9 @@ namespace MemberOrdering {
    *                       "private-decorated-get",
    *                       "private-static-get",
    *                       "private-instance-get",
-   *                       "private-abstract-get",
+   *                       "#private-get",
+   *                       "#private-static-get",
+   *                       "#private-instance-get",
    *                       "set",
    *                       "public-set",
    *                       "public-decorated-set",
@@ -3693,7 +3686,9 @@ namespace MemberOrdering {
    *                       "private-decorated-set",
    *                       "private-static-set",
    *                       "private-instance-set",
-   *                       "private-abstract-set",
+   *                       "#private-set",
+   *                       "#private-static-set",
+   *                       "#private-instance-set",
    *                       "static-initialization",
    *                       "static-static-initialization",
    *                       "public-static-static-initialization",
@@ -3706,7 +3701,8 @@ namespace MemberOrdering {
    *                       "protected-abstract-static-initialization",
    *                       "private-static-static-initialization",
    *                       "private-instance-static-initialization",
-   *                       "private-abstract-static-initialization"
+   *                       "#private-static-static-initialization",
+   *                       "#private-instance-static-initialization"
    *                     ]
    *                   }
    *                 }
@@ -3744,7 +3740,9 @@ namespace MemberOrdering {
    *                             "private-decorated-field",
    *                             "private-static-field",
    *                             "private-instance-field",
-   *                             "private-abstract-field",
+   *                             "#private-field",
+   *                             "#private-static-field",
+   *                             "#private-instance-field",
    *                             "method",
    *                             "public-method",
    *                             "public-decorated-method",
@@ -3764,23 +3762,10 @@ namespace MemberOrdering {
    *                             "private-decorated-method",
    *                             "private-static-method",
    *                             "private-instance-method",
-   *                             "private-abstract-method",
+   *                             "#private-method",
+   *                             "#private-static-method",
+   *                             "#private-instance-method",
    *                             "call-signature",
-   *                             "public-call-signature",
-   *                             "static-call-signature",
-   *                             "public-static-call-signature",
-   *                             "instance-call-signature",
-   *                             "public-instance-call-signature",
-   *                             "abstract-call-signature",
-   *                             "public-abstract-call-signature",
-   *                             "protected-call-signature",
-   *                             "protected-static-call-signature",
-   *                             "protected-instance-call-signature",
-   *                             "protected-abstract-call-signature",
-   *                             "private-call-signature",
-   *                             "private-static-call-signature",
-   *                             "private-instance-call-signature",
-   *                             "private-abstract-call-signature",
    *                             "constructor",
    *                             "public-constructor",
    *                             "protected-constructor",
@@ -3804,7 +3789,9 @@ namespace MemberOrdering {
    *                             "private-decorated-get",
    *                             "private-static-get",
    *                             "private-instance-get",
-   *                             "private-abstract-get",
+   *                             "#private-get",
+   *                             "#private-static-get",
+   *                             "#private-instance-get",
    *                             "set",
    *                             "public-set",
    *                             "public-decorated-set",
@@ -3824,7 +3811,9 @@ namespace MemberOrdering {
    *                             "private-decorated-set",
    *                             "private-static-set",
    *                             "private-instance-set",
-   *                             "private-abstract-set",
+   *                             "#private-set",
+   *                             "#private-static-set",
+   *                             "#private-instance-set",
    *                             "static-initialization",
    *                             "static-static-initialization",
    *                             "public-static-static-initialization",
@@ -3837,7 +3826,8 @@ namespace MemberOrdering {
    *                             "protected-abstract-static-initialization",
    *                             "private-static-static-initialization",
    *                             "private-instance-static-initialization",
-   *                             "private-abstract-static-initialization"
+   *                             "#private-static-static-initialization",
+   *                             "#private-instance-static-initialization"
    *                           ]
    *                         },
    *                         {
@@ -3864,7 +3854,9 @@ namespace MemberOrdering {
    *                               "private-decorated-field",
    *                               "private-static-field",
    *                               "private-instance-field",
-   *                               "private-abstract-field",
+   *                               "#private-field",
+   *                               "#private-static-field",
+   *                               "#private-instance-field",
    *                               "method",
    *                               "public-method",
    *                               "public-decorated-method",
@@ -3884,23 +3876,10 @@ namespace MemberOrdering {
    *                               "private-decorated-method",
    *                               "private-static-method",
    *                               "private-instance-method",
-   *                               "private-abstract-method",
+   *                               "#private-method",
+   *                               "#private-static-method",
+   *                               "#private-instance-method",
    *                               "call-signature",
-   *                               "public-call-signature",
-   *                               "static-call-signature",
-   *                               "public-static-call-signature",
-   *                               "instance-call-signature",
-   *                               "public-instance-call-signature",
-   *                               "abstract-call-signature",
-   *                               "public-abstract-call-signature",
-   *                               "protected-call-signature",
-   *                               "protected-static-call-signature",
-   *                               "protected-instance-call-signature",
-   *                               "protected-abstract-call-signature",
-   *                               "private-call-signature",
-   *                               "private-static-call-signature",
-   *                               "private-instance-call-signature",
-   *                               "private-abstract-call-signature",
    *                               "constructor",
    *                               "public-constructor",
    *                               "protected-constructor",
@@ -3924,7 +3903,9 @@ namespace MemberOrdering {
    *                               "private-decorated-get",
    *                               "private-static-get",
    *                               "private-instance-get",
-   *                               "private-abstract-get",
+   *                               "#private-get",
+   *                               "#private-static-get",
+   *                               "#private-instance-get",
    *                               "set",
    *                               "public-set",
    *                               "public-decorated-set",
@@ -3944,7 +3925,9 @@ namespace MemberOrdering {
    *                               "private-decorated-set",
    *                               "private-static-set",
    *                               "private-instance-set",
-   *                               "private-abstract-set",
+   *                               "#private-set",
+   *                               "#private-static-set",
+   *                               "#private-instance-set",
    *                               "static-initialization",
    *                               "static-static-initialization",
    *                               "public-static-static-initialization",
@@ -3957,7 +3940,8 @@ namespace MemberOrdering {
    *                               "protected-abstract-static-initialization",
    *                               "private-static-static-initialization",
    *                               "private-instance-static-initialization",
-   *                               "private-abstract-static-initialization"
+   *                               "#private-static-static-initialization",
+   *                               "#private-instance-static-initialization"
    *                             ]
    *                           }
    *                         }
@@ -3977,7 +3961,16 @@ namespace MemberOrdering {
    *                 "enum": [
    *                   "alphabetically",
    *                   "alphabetically-case-insensitive",
-   *                   "as-written"
+   *                   "as-written",
+   *                   "natural",
+   *                   "natural-case-insensitive"
+   *                 ]
+   *               },
+   *               "optionalityOrder": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "optional-first",
+   *                   "required-first"
    *                 ]
    *               }
    *             },
@@ -4019,7 +4012,9 @@ namespace MemberOrdering {
    *                     "private-decorated-field",
    *                     "private-static-field",
    *                     "private-instance-field",
-   *                     "private-abstract-field",
+   *                     "#private-field",
+   *                     "#private-static-field",
+   *                     "#private-instance-field",
    *                     "method",
    *                     "public-method",
    *                     "public-decorated-method",
@@ -4039,23 +4034,10 @@ namespace MemberOrdering {
    *                     "private-decorated-method",
    *                     "private-static-method",
    *                     "private-instance-method",
-   *                     "private-abstract-method",
+   *                     "#private-method",
+   *                     "#private-static-method",
+   *                     "#private-instance-method",
    *                     "call-signature",
-   *                     "public-call-signature",
-   *                     "static-call-signature",
-   *                     "public-static-call-signature",
-   *                     "instance-call-signature",
-   *                     "public-instance-call-signature",
-   *                     "abstract-call-signature",
-   *                     "public-abstract-call-signature",
-   *                     "protected-call-signature",
-   *                     "protected-static-call-signature",
-   *                     "protected-instance-call-signature",
-   *                     "protected-abstract-call-signature",
-   *                     "private-call-signature",
-   *                     "private-static-call-signature",
-   *                     "private-instance-call-signature",
-   *                     "private-abstract-call-signature",
    *                     "constructor",
    *                     "public-constructor",
    *                     "protected-constructor",
@@ -4079,7 +4061,9 @@ namespace MemberOrdering {
    *                     "private-decorated-get",
    *                     "private-static-get",
    *                     "private-instance-get",
-   *                     "private-abstract-get",
+   *                     "#private-get",
+   *                     "#private-static-get",
+   *                     "#private-instance-get",
    *                     "set",
    *                     "public-set",
    *                     "public-decorated-set",
@@ -4099,7 +4083,9 @@ namespace MemberOrdering {
    *                     "private-decorated-set",
    *                     "private-static-set",
    *                     "private-instance-set",
-   *                     "private-abstract-set",
+   *                     "#private-set",
+   *                     "#private-static-set",
+   *                     "#private-instance-set",
    *                     "static-initialization",
    *                     "static-static-initialization",
    *                     "public-static-static-initialization",
@@ -4112,7 +4098,8 @@ namespace MemberOrdering {
    *                     "protected-abstract-static-initialization",
    *                     "private-static-static-initialization",
    *                     "private-instance-static-initialization",
-   *                     "private-abstract-static-initialization"
+   *                     "#private-static-static-initialization",
+   *                     "#private-instance-static-initialization"
    *                   ]
    *                 },
    *                 {
@@ -4139,7 +4126,9 @@ namespace MemberOrdering {
    *                       "private-decorated-field",
    *                       "private-static-field",
    *                       "private-instance-field",
-   *                       "private-abstract-field",
+   *                       "#private-field",
+   *                       "#private-static-field",
+   *                       "#private-instance-field",
    *                       "method",
    *                       "public-method",
    *                       "public-decorated-method",
@@ -4159,23 +4148,10 @@ namespace MemberOrdering {
    *                       "private-decorated-method",
    *                       "private-static-method",
    *                       "private-instance-method",
-   *                       "private-abstract-method",
+   *                       "#private-method",
+   *                       "#private-static-method",
+   *                       "#private-instance-method",
    *                       "call-signature",
-   *                       "public-call-signature",
-   *                       "static-call-signature",
-   *                       "public-static-call-signature",
-   *                       "instance-call-signature",
-   *                       "public-instance-call-signature",
-   *                       "abstract-call-signature",
-   *                       "public-abstract-call-signature",
-   *                       "protected-call-signature",
-   *                       "protected-static-call-signature",
-   *                       "protected-instance-call-signature",
-   *                       "protected-abstract-call-signature",
-   *                       "private-call-signature",
-   *                       "private-static-call-signature",
-   *                       "private-instance-call-signature",
-   *                       "private-abstract-call-signature",
    *                       "constructor",
    *                       "public-constructor",
    *                       "protected-constructor",
@@ -4199,7 +4175,9 @@ namespace MemberOrdering {
    *                       "private-decorated-get",
    *                       "private-static-get",
    *                       "private-instance-get",
-   *                       "private-abstract-get",
+   *                       "#private-get",
+   *                       "#private-static-get",
+   *                       "#private-instance-get",
    *                       "set",
    *                       "public-set",
    *                       "public-decorated-set",
@@ -4219,7 +4197,9 @@ namespace MemberOrdering {
    *                       "private-decorated-set",
    *                       "private-static-set",
    *                       "private-instance-set",
-   *                       "private-abstract-set",
+   *                       "#private-set",
+   *                       "#private-static-set",
+   *                       "#private-instance-set",
    *                       "static-initialization",
    *                       "static-static-initialization",
    *                       "public-static-static-initialization",
@@ -4232,7 +4212,8 @@ namespace MemberOrdering {
    *                       "protected-abstract-static-initialization",
    *                       "private-static-static-initialization",
    *                       "private-instance-static-initialization",
-   *                       "private-abstract-static-initialization"
+   *                       "#private-static-static-initialization",
+   *                       "#private-instance-static-initialization"
    *                     ]
    *                   }
    *                 }
@@ -4270,7 +4251,9 @@ namespace MemberOrdering {
    *                             "private-decorated-field",
    *                             "private-static-field",
    *                             "private-instance-field",
-   *                             "private-abstract-field",
+   *                             "#private-field",
+   *                             "#private-static-field",
+   *                             "#private-instance-field",
    *                             "method",
    *                             "public-method",
    *                             "public-decorated-method",
@@ -4290,23 +4273,10 @@ namespace MemberOrdering {
    *                             "private-decorated-method",
    *                             "private-static-method",
    *                             "private-instance-method",
-   *                             "private-abstract-method",
+   *                             "#private-method",
+   *                             "#private-static-method",
+   *                             "#private-instance-method",
    *                             "call-signature",
-   *                             "public-call-signature",
-   *                             "static-call-signature",
-   *                             "public-static-call-signature",
-   *                             "instance-call-signature",
-   *                             "public-instance-call-signature",
-   *                             "abstract-call-signature",
-   *                             "public-abstract-call-signature",
-   *                             "protected-call-signature",
-   *                             "protected-static-call-signature",
-   *                             "protected-instance-call-signature",
-   *                             "protected-abstract-call-signature",
-   *                             "private-call-signature",
-   *                             "private-static-call-signature",
-   *                             "private-instance-call-signature",
-   *                             "private-abstract-call-signature",
    *                             "constructor",
    *                             "public-constructor",
    *                             "protected-constructor",
@@ -4330,7 +4300,9 @@ namespace MemberOrdering {
    *                             "private-decorated-get",
    *                             "private-static-get",
    *                             "private-instance-get",
-   *                             "private-abstract-get",
+   *                             "#private-get",
+   *                             "#private-static-get",
+   *                             "#private-instance-get",
    *                             "set",
    *                             "public-set",
    *                             "public-decorated-set",
@@ -4350,7 +4322,9 @@ namespace MemberOrdering {
    *                             "private-decorated-set",
    *                             "private-static-set",
    *                             "private-instance-set",
-   *                             "private-abstract-set",
+   *                             "#private-set",
+   *                             "#private-static-set",
+   *                             "#private-instance-set",
    *                             "static-initialization",
    *                             "static-static-initialization",
    *                             "public-static-static-initialization",
@@ -4363,7 +4337,8 @@ namespace MemberOrdering {
    *                             "protected-abstract-static-initialization",
    *                             "private-static-static-initialization",
    *                             "private-instance-static-initialization",
-   *                             "private-abstract-static-initialization"
+   *                             "#private-static-static-initialization",
+   *                             "#private-instance-static-initialization"
    *                           ]
    *                         },
    *                         {
@@ -4390,7 +4365,9 @@ namespace MemberOrdering {
    *                               "private-decorated-field",
    *                               "private-static-field",
    *                               "private-instance-field",
-   *                               "private-abstract-field",
+   *                               "#private-field",
+   *                               "#private-static-field",
+   *                               "#private-instance-field",
    *                               "method",
    *                               "public-method",
    *                               "public-decorated-method",
@@ -4410,23 +4387,10 @@ namespace MemberOrdering {
    *                               "private-decorated-method",
    *                               "private-static-method",
    *                               "private-instance-method",
-   *                               "private-abstract-method",
+   *                               "#private-method",
+   *                               "#private-static-method",
+   *                               "#private-instance-method",
    *                               "call-signature",
-   *                               "public-call-signature",
-   *                               "static-call-signature",
-   *                               "public-static-call-signature",
-   *                               "instance-call-signature",
-   *                               "public-instance-call-signature",
-   *                               "abstract-call-signature",
-   *                               "public-abstract-call-signature",
-   *                               "protected-call-signature",
-   *                               "protected-static-call-signature",
-   *                               "protected-instance-call-signature",
-   *                               "protected-abstract-call-signature",
-   *                               "private-call-signature",
-   *                               "private-static-call-signature",
-   *                               "private-instance-call-signature",
-   *                               "private-abstract-call-signature",
    *                               "constructor",
    *                               "public-constructor",
    *                               "protected-constructor",
@@ -4450,7 +4414,9 @@ namespace MemberOrdering {
    *                               "private-decorated-get",
    *                               "private-static-get",
    *                               "private-instance-get",
-   *                               "private-abstract-get",
+   *                               "#private-get",
+   *                               "#private-static-get",
+   *                               "#private-instance-get",
    *                               "set",
    *                               "public-set",
    *                               "public-decorated-set",
@@ -4470,7 +4436,9 @@ namespace MemberOrdering {
    *                               "private-decorated-set",
    *                               "private-static-set",
    *                               "private-instance-set",
-   *                               "private-abstract-set",
+   *                               "#private-set",
+   *                               "#private-static-set",
+   *                               "#private-instance-set",
    *                               "static-initialization",
    *                               "static-static-initialization",
    *                               "public-static-static-initialization",
@@ -4483,7 +4451,8 @@ namespace MemberOrdering {
    *                               "protected-abstract-static-initialization",
    *                               "private-static-static-initialization",
    *                               "private-instance-static-initialization",
-   *                               "private-abstract-static-initialization"
+   *                               "#private-static-static-initialization",
+   *                               "#private-instance-static-initialization"
    *                             ]
    *                           }
    *                         }
@@ -4503,7 +4472,16 @@ namespace MemberOrdering {
    *                 "enum": [
    *                   "alphabetically",
    *                   "alphabetically-case-insensitive",
-   *                   "as-written"
+   *                   "as-written",
+   *                   "natural",
+   *                   "natural-case-insensitive"
+   *                 ]
+   *               },
+   *               "optionalityOrder": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "optional-first",
+   *                   "required-first"
    *                 ]
    *               }
    *             },
@@ -4589,7 +4567,16 @@ namespace MemberOrdering {
    *                 "enum": [
    *                   "alphabetically",
    *                   "alphabetically-case-insensitive",
-   *                   "as-written"
+   *                   "as-written",
+   *                   "natural",
+   *                   "natural-case-insensitive"
+   *                 ]
+   *               },
+   *               "optionalityOrder": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "optional-first",
+   *                   "required-first"
    *                 ]
    *               }
    *             },
@@ -4675,7 +4662,16 @@ namespace MemberOrdering {
    *                 "enum": [
    *                   "alphabetically",
    *                   "alphabetically-case-insensitive",
-   *                   "as-written"
+   *                   "as-written",
+   *                   "natural",
+   *                   "natural-case-insensitive"
+   *                 ]
+   *               },
+   *               "optionalityOrder": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "optional-first",
+   *                   "required-first"
    *                 ]
    *               }
    *             },
@@ -4714,7 +4710,9 @@ namespace MemberOrdering {
               | 'private-decorated-field'
               | 'private-static-field'
               | 'private-instance-field'
-              | 'private-abstract-field'
+              | '#private-field'
+              | '#private-static-field'
+              | '#private-instance-field'
               | 'method'
               | 'public-method'
               | 'public-decorated-method'
@@ -4734,23 +4732,10 @@ namespace MemberOrdering {
               | 'private-decorated-method'
               | 'private-static-method'
               | 'private-instance-method'
-              | 'private-abstract-method'
+              | '#private-method'
+              | '#private-static-method'
+              | '#private-instance-method'
               | 'call-signature'
-              | 'public-call-signature'
-              | 'static-call-signature'
-              | 'public-static-call-signature'
-              | 'instance-call-signature'
-              | 'public-instance-call-signature'
-              | 'abstract-call-signature'
-              | 'public-abstract-call-signature'
-              | 'protected-call-signature'
-              | 'protected-static-call-signature'
-              | 'protected-instance-call-signature'
-              | 'protected-abstract-call-signature'
-              | 'private-call-signature'
-              | 'private-static-call-signature'
-              | 'private-instance-call-signature'
-              | 'private-abstract-call-signature'
               | 'constructor'
               | 'public-constructor'
               | 'protected-constructor'
@@ -4774,7 +4759,9 @@ namespace MemberOrdering {
               | 'private-decorated-get'
               | 'private-static-get'
               | 'private-instance-get'
-              | 'private-abstract-get'
+              | '#private-get'
+              | '#private-static-get'
+              | '#private-instance-get'
               | 'set'
               | 'public-set'
               | 'public-decorated-set'
@@ -4794,7 +4781,9 @@ namespace MemberOrdering {
               | 'private-decorated-set'
               | 'private-static-set'
               | 'private-instance-set'
-              | 'private-abstract-set'
+              | '#private-set'
+              | '#private-static-set'
+              | '#private-instance-set'
               | 'static-initialization'
               | 'static-static-initialization'
               | 'public-static-static-initialization'
@@ -4807,7 +4796,8 @@ namespace MemberOrdering {
               | 'protected-abstract-static-initialization'
               | 'private-static-static-initialization'
               | 'private-instance-static-initialization'
-              | 'private-abstract-static-initialization'
+              | '#private-static-static-initialization'
+              | '#private-instance-static-initialization'
             )
           | readonly (
               | 'signature'
@@ -4830,7 +4820,9 @@ namespace MemberOrdering {
               | 'private-decorated-field'
               | 'private-static-field'
               | 'private-instance-field'
-              | 'private-abstract-field'
+              | '#private-field'
+              | '#private-static-field'
+              | '#private-instance-field'
               | 'method'
               | 'public-method'
               | 'public-decorated-method'
@@ -4850,23 +4842,10 @@ namespace MemberOrdering {
               | 'private-decorated-method'
               | 'private-static-method'
               | 'private-instance-method'
-              | 'private-abstract-method'
+              | '#private-method'
+              | '#private-static-method'
+              | '#private-instance-method'
               | 'call-signature'
-              | 'public-call-signature'
-              | 'static-call-signature'
-              | 'public-static-call-signature'
-              | 'instance-call-signature'
-              | 'public-instance-call-signature'
-              | 'abstract-call-signature'
-              | 'public-abstract-call-signature'
-              | 'protected-call-signature'
-              | 'protected-static-call-signature'
-              | 'protected-instance-call-signature'
-              | 'protected-abstract-call-signature'
-              | 'private-call-signature'
-              | 'private-static-call-signature'
-              | 'private-instance-call-signature'
-              | 'private-abstract-call-signature'
               | 'constructor'
               | 'public-constructor'
               | 'protected-constructor'
@@ -4890,7 +4869,9 @@ namespace MemberOrdering {
               | 'private-decorated-get'
               | 'private-static-get'
               | 'private-instance-get'
-              | 'private-abstract-get'
+              | '#private-get'
+              | '#private-static-get'
+              | '#private-instance-get'
               | 'set'
               | 'public-set'
               | 'public-decorated-set'
@@ -4910,7 +4891,9 @@ namespace MemberOrdering {
               | 'private-decorated-set'
               | 'private-static-set'
               | 'private-instance-set'
-              | 'private-abstract-set'
+              | '#private-set'
+              | '#private-static-set'
+              | '#private-instance-set'
               | 'static-initialization'
               | 'static-static-initialization'
               | 'public-static-static-initialization'
@@ -4923,7 +4906,8 @@ namespace MemberOrdering {
               | 'protected-abstract-static-initialization'
               | 'private-static-static-initialization'
               | 'private-instance-static-initialization'
-              | 'private-abstract-static-initialization'
+              | '#private-static-static-initialization'
+              | '#private-instance-static-initialization'
             )[]
         )[]
       | {
@@ -4950,7 +4934,9 @@ namespace MemberOrdering {
                     | 'private-decorated-field'
                     | 'private-static-field'
                     | 'private-instance-field'
-                    | 'private-abstract-field'
+                    | '#private-field'
+                    | '#private-static-field'
+                    | '#private-instance-field'
                     | 'method'
                     | 'public-method'
                     | 'public-decorated-method'
@@ -4970,23 +4956,10 @@ namespace MemberOrdering {
                     | 'private-decorated-method'
                     | 'private-static-method'
                     | 'private-instance-method'
-                    | 'private-abstract-method'
+                    | '#private-method'
+                    | '#private-static-method'
+                    | '#private-instance-method'
                     | 'call-signature'
-                    | 'public-call-signature'
-                    | 'static-call-signature'
-                    | 'public-static-call-signature'
-                    | 'instance-call-signature'
-                    | 'public-instance-call-signature'
-                    | 'abstract-call-signature'
-                    | 'public-abstract-call-signature'
-                    | 'protected-call-signature'
-                    | 'protected-static-call-signature'
-                    | 'protected-instance-call-signature'
-                    | 'protected-abstract-call-signature'
-                    | 'private-call-signature'
-                    | 'private-static-call-signature'
-                    | 'private-instance-call-signature'
-                    | 'private-abstract-call-signature'
                     | 'constructor'
                     | 'public-constructor'
                     | 'protected-constructor'
@@ -5010,7 +4983,9 @@ namespace MemberOrdering {
                     | 'private-decorated-get'
                     | 'private-static-get'
                     | 'private-instance-get'
-                    | 'private-abstract-get'
+                    | '#private-get'
+                    | '#private-static-get'
+                    | '#private-instance-get'
                     | 'set'
                     | 'public-set'
                     | 'public-decorated-set'
@@ -5030,7 +5005,9 @@ namespace MemberOrdering {
                     | 'private-decorated-set'
                     | 'private-static-set'
                     | 'private-instance-set'
-                    | 'private-abstract-set'
+                    | '#private-set'
+                    | '#private-static-set'
+                    | '#private-instance-set'
                     | 'static-initialization'
                     | 'static-static-initialization'
                     | 'public-static-static-initialization'
@@ -5043,7 +5020,8 @@ namespace MemberOrdering {
                     | 'protected-abstract-static-initialization'
                     | 'private-static-static-initialization'
                     | 'private-instance-static-initialization'
-                    | 'private-abstract-static-initialization'
+                    | '#private-static-static-initialization'
+                    | '#private-instance-static-initialization'
                   )
                 | readonly (
                     | 'signature'
@@ -5066,7 +5044,9 @@ namespace MemberOrdering {
                     | 'private-decorated-field'
                     | 'private-static-field'
                     | 'private-instance-field'
-                    | 'private-abstract-field'
+                    | '#private-field'
+                    | '#private-static-field'
+                    | '#private-instance-field'
                     | 'method'
                     | 'public-method'
                     | 'public-decorated-method'
@@ -5086,23 +5066,10 @@ namespace MemberOrdering {
                     | 'private-decorated-method'
                     | 'private-static-method'
                     | 'private-instance-method'
-                    | 'private-abstract-method'
+                    | '#private-method'
+                    | '#private-static-method'
+                    | '#private-instance-method'
                     | 'call-signature'
-                    | 'public-call-signature'
-                    | 'static-call-signature'
-                    | 'public-static-call-signature'
-                    | 'instance-call-signature'
-                    | 'public-instance-call-signature'
-                    | 'abstract-call-signature'
-                    | 'public-abstract-call-signature'
-                    | 'protected-call-signature'
-                    | 'protected-static-call-signature'
-                    | 'protected-instance-call-signature'
-                    | 'protected-abstract-call-signature'
-                    | 'private-call-signature'
-                    | 'private-static-call-signature'
-                    | 'private-instance-call-signature'
-                    | 'private-abstract-call-signature'
                     | 'constructor'
                     | 'public-constructor'
                     | 'protected-constructor'
@@ -5126,7 +5093,9 @@ namespace MemberOrdering {
                     | 'private-decorated-get'
                     | 'private-static-get'
                     | 'private-instance-get'
-                    | 'private-abstract-get'
+                    | '#private-get'
+                    | '#private-static-get'
+                    | '#private-instance-get'
                     | 'set'
                     | 'public-set'
                     | 'public-decorated-set'
@@ -5146,7 +5115,9 @@ namespace MemberOrdering {
                     | 'private-decorated-set'
                     | 'private-static-set'
                     | 'private-instance-set'
-                    | 'private-abstract-set'
+                    | '#private-set'
+                    | '#private-static-set'
+                    | '#private-instance-set'
                     | 'static-initialization'
                     | 'static-static-initialization'
                     | 'public-static-static-initialization'
@@ -5159,14 +5130,18 @@ namespace MemberOrdering {
                     | 'protected-abstract-static-initialization'
                     | 'private-static-static-initialization'
                     | 'private-instance-static-initialization'
-                    | 'private-abstract-static-initialization'
+                    | '#private-static-static-initialization'
+                    | '#private-instance-static-initialization'
                   )[]
               )[]
             | 'never';
           readonly order?:
             | 'alphabetically'
             | 'alphabetically-case-insensitive'
-            | 'as-written';
+            | 'as-written'
+            | 'natural'
+            | 'natural-case-insensitive';
+          readonly optionalityOrder?: 'optional-first' | 'required-first';
         };
     readonly classes?:
       | 'never'
@@ -5192,7 +5167,9 @@ namespace MemberOrdering {
               | 'private-decorated-field'
               | 'private-static-field'
               | 'private-instance-field'
-              | 'private-abstract-field'
+              | '#private-field'
+              | '#private-static-field'
+              | '#private-instance-field'
               | 'method'
               | 'public-method'
               | 'public-decorated-method'
@@ -5212,23 +5189,10 @@ namespace MemberOrdering {
               | 'private-decorated-method'
               | 'private-static-method'
               | 'private-instance-method'
-              | 'private-abstract-method'
+              | '#private-method'
+              | '#private-static-method'
+              | '#private-instance-method'
               | 'call-signature'
-              | 'public-call-signature'
-              | 'static-call-signature'
-              | 'public-static-call-signature'
-              | 'instance-call-signature'
-              | 'public-instance-call-signature'
-              | 'abstract-call-signature'
-              | 'public-abstract-call-signature'
-              | 'protected-call-signature'
-              | 'protected-static-call-signature'
-              | 'protected-instance-call-signature'
-              | 'protected-abstract-call-signature'
-              | 'private-call-signature'
-              | 'private-static-call-signature'
-              | 'private-instance-call-signature'
-              | 'private-abstract-call-signature'
               | 'constructor'
               | 'public-constructor'
               | 'protected-constructor'
@@ -5252,7 +5216,9 @@ namespace MemberOrdering {
               | 'private-decorated-get'
               | 'private-static-get'
               | 'private-instance-get'
-              | 'private-abstract-get'
+              | '#private-get'
+              | '#private-static-get'
+              | '#private-instance-get'
               | 'set'
               | 'public-set'
               | 'public-decorated-set'
@@ -5272,7 +5238,9 @@ namespace MemberOrdering {
               | 'private-decorated-set'
               | 'private-static-set'
               | 'private-instance-set'
-              | 'private-abstract-set'
+              | '#private-set'
+              | '#private-static-set'
+              | '#private-instance-set'
               | 'static-initialization'
               | 'static-static-initialization'
               | 'public-static-static-initialization'
@@ -5285,7 +5253,8 @@ namespace MemberOrdering {
               | 'protected-abstract-static-initialization'
               | 'private-static-static-initialization'
               | 'private-instance-static-initialization'
-              | 'private-abstract-static-initialization'
+              | '#private-static-static-initialization'
+              | '#private-instance-static-initialization'
             )
           | readonly (
               | 'signature'
@@ -5308,7 +5277,9 @@ namespace MemberOrdering {
               | 'private-decorated-field'
               | 'private-static-field'
               | 'private-instance-field'
-              | 'private-abstract-field'
+              | '#private-field'
+              | '#private-static-field'
+              | '#private-instance-field'
               | 'method'
               | 'public-method'
               | 'public-decorated-method'
@@ -5328,23 +5299,10 @@ namespace MemberOrdering {
               | 'private-decorated-method'
               | 'private-static-method'
               | 'private-instance-method'
-              | 'private-abstract-method'
+              | '#private-method'
+              | '#private-static-method'
+              | '#private-instance-method'
               | 'call-signature'
-              | 'public-call-signature'
-              | 'static-call-signature'
-              | 'public-static-call-signature'
-              | 'instance-call-signature'
-              | 'public-instance-call-signature'
-              | 'abstract-call-signature'
-              | 'public-abstract-call-signature'
-              | 'protected-call-signature'
-              | 'protected-static-call-signature'
-              | 'protected-instance-call-signature'
-              | 'protected-abstract-call-signature'
-              | 'private-call-signature'
-              | 'private-static-call-signature'
-              | 'private-instance-call-signature'
-              | 'private-abstract-call-signature'
               | 'constructor'
               | 'public-constructor'
               | 'protected-constructor'
@@ -5368,7 +5326,9 @@ namespace MemberOrdering {
               | 'private-decorated-get'
               | 'private-static-get'
               | 'private-instance-get'
-              | 'private-abstract-get'
+              | '#private-get'
+              | '#private-static-get'
+              | '#private-instance-get'
               | 'set'
               | 'public-set'
               | 'public-decorated-set'
@@ -5388,7 +5348,9 @@ namespace MemberOrdering {
               | 'private-decorated-set'
               | 'private-static-set'
               | 'private-instance-set'
-              | 'private-abstract-set'
+              | '#private-set'
+              | '#private-static-set'
+              | '#private-instance-set'
               | 'static-initialization'
               | 'static-static-initialization'
               | 'public-static-static-initialization'
@@ -5401,7 +5363,8 @@ namespace MemberOrdering {
               | 'protected-abstract-static-initialization'
               | 'private-static-static-initialization'
               | 'private-instance-static-initialization'
-              | 'private-abstract-static-initialization'
+              | '#private-static-static-initialization'
+              | '#private-instance-static-initialization'
             )[]
         )[]
       | {
@@ -5428,7 +5391,9 @@ namespace MemberOrdering {
                     | 'private-decorated-field'
                     | 'private-static-field'
                     | 'private-instance-field'
-                    | 'private-abstract-field'
+                    | '#private-field'
+                    | '#private-static-field'
+                    | '#private-instance-field'
                     | 'method'
                     | 'public-method'
                     | 'public-decorated-method'
@@ -5448,23 +5413,10 @@ namespace MemberOrdering {
                     | 'private-decorated-method'
                     | 'private-static-method'
                     | 'private-instance-method'
-                    | 'private-abstract-method'
+                    | '#private-method'
+                    | '#private-static-method'
+                    | '#private-instance-method'
                     | 'call-signature'
-                    | 'public-call-signature'
-                    | 'static-call-signature'
-                    | 'public-static-call-signature'
-                    | 'instance-call-signature'
-                    | 'public-instance-call-signature'
-                    | 'abstract-call-signature'
-                    | 'public-abstract-call-signature'
-                    | 'protected-call-signature'
-                    | 'protected-static-call-signature'
-                    | 'protected-instance-call-signature'
-                    | 'protected-abstract-call-signature'
-                    | 'private-call-signature'
-                    | 'private-static-call-signature'
-                    | 'private-instance-call-signature'
-                    | 'private-abstract-call-signature'
                     | 'constructor'
                     | 'public-constructor'
                     | 'protected-constructor'
@@ -5488,7 +5440,9 @@ namespace MemberOrdering {
                     | 'private-decorated-get'
                     | 'private-static-get'
                     | 'private-instance-get'
-                    | 'private-abstract-get'
+                    | '#private-get'
+                    | '#private-static-get'
+                    | '#private-instance-get'
                     | 'set'
                     | 'public-set'
                     | 'public-decorated-set'
@@ -5508,7 +5462,9 @@ namespace MemberOrdering {
                     | 'private-decorated-set'
                     | 'private-static-set'
                     | 'private-instance-set'
-                    | 'private-abstract-set'
+                    | '#private-set'
+                    | '#private-static-set'
+                    | '#private-instance-set'
                     | 'static-initialization'
                     | 'static-static-initialization'
                     | 'public-static-static-initialization'
@@ -5521,7 +5477,8 @@ namespace MemberOrdering {
                     | 'protected-abstract-static-initialization'
                     | 'private-static-static-initialization'
                     | 'private-instance-static-initialization'
-                    | 'private-abstract-static-initialization'
+                    | '#private-static-static-initialization'
+                    | '#private-instance-static-initialization'
                   )
                 | readonly (
                     | 'signature'
@@ -5544,7 +5501,9 @@ namespace MemberOrdering {
                     | 'private-decorated-field'
                     | 'private-static-field'
                     | 'private-instance-field'
-                    | 'private-abstract-field'
+                    | '#private-field'
+                    | '#private-static-field'
+                    | '#private-instance-field'
                     | 'method'
                     | 'public-method'
                     | 'public-decorated-method'
@@ -5564,23 +5523,10 @@ namespace MemberOrdering {
                     | 'private-decorated-method'
                     | 'private-static-method'
                     | 'private-instance-method'
-                    | 'private-abstract-method'
+                    | '#private-method'
+                    | '#private-static-method'
+                    | '#private-instance-method'
                     | 'call-signature'
-                    | 'public-call-signature'
-                    | 'static-call-signature'
-                    | 'public-static-call-signature'
-                    | 'instance-call-signature'
-                    | 'public-instance-call-signature'
-                    | 'abstract-call-signature'
-                    | 'public-abstract-call-signature'
-                    | 'protected-call-signature'
-                    | 'protected-static-call-signature'
-                    | 'protected-instance-call-signature'
-                    | 'protected-abstract-call-signature'
-                    | 'private-call-signature'
-                    | 'private-static-call-signature'
-                    | 'private-instance-call-signature'
-                    | 'private-abstract-call-signature'
                     | 'constructor'
                     | 'public-constructor'
                     | 'protected-constructor'
@@ -5604,7 +5550,9 @@ namespace MemberOrdering {
                     | 'private-decorated-get'
                     | 'private-static-get'
                     | 'private-instance-get'
-                    | 'private-abstract-get'
+                    | '#private-get'
+                    | '#private-static-get'
+                    | '#private-instance-get'
                     | 'set'
                     | 'public-set'
                     | 'public-decorated-set'
@@ -5624,7 +5572,9 @@ namespace MemberOrdering {
                     | 'private-decorated-set'
                     | 'private-static-set'
                     | 'private-instance-set'
-                    | 'private-abstract-set'
+                    | '#private-set'
+                    | '#private-static-set'
+                    | '#private-instance-set'
                     | 'static-initialization'
                     | 'static-static-initialization'
                     | 'public-static-static-initialization'
@@ -5637,14 +5587,18 @@ namespace MemberOrdering {
                     | 'protected-abstract-static-initialization'
                     | 'private-static-static-initialization'
                     | 'private-instance-static-initialization'
-                    | 'private-abstract-static-initialization'
+                    | '#private-static-static-initialization'
+                    | '#private-instance-static-initialization'
                   )[]
               )[]
             | 'never';
           readonly order?:
             | 'alphabetically'
             | 'alphabetically-case-insensitive'
-            | 'as-written';
+            | 'as-written'
+            | 'natural'
+            | 'natural-case-insensitive';
+          readonly optionalityOrder?: 'optional-first' | 'required-first';
         };
     readonly classExpressions?:
       | 'never'
@@ -5670,7 +5624,9 @@ namespace MemberOrdering {
               | 'private-decorated-field'
               | 'private-static-field'
               | 'private-instance-field'
-              | 'private-abstract-field'
+              | '#private-field'
+              | '#private-static-field'
+              | '#private-instance-field'
               | 'method'
               | 'public-method'
               | 'public-decorated-method'
@@ -5690,23 +5646,10 @@ namespace MemberOrdering {
               | 'private-decorated-method'
               | 'private-static-method'
               | 'private-instance-method'
-              | 'private-abstract-method'
+              | '#private-method'
+              | '#private-static-method'
+              | '#private-instance-method'
               | 'call-signature'
-              | 'public-call-signature'
-              | 'static-call-signature'
-              | 'public-static-call-signature'
-              | 'instance-call-signature'
-              | 'public-instance-call-signature'
-              | 'abstract-call-signature'
-              | 'public-abstract-call-signature'
-              | 'protected-call-signature'
-              | 'protected-static-call-signature'
-              | 'protected-instance-call-signature'
-              | 'protected-abstract-call-signature'
-              | 'private-call-signature'
-              | 'private-static-call-signature'
-              | 'private-instance-call-signature'
-              | 'private-abstract-call-signature'
               | 'constructor'
               | 'public-constructor'
               | 'protected-constructor'
@@ -5730,7 +5673,9 @@ namespace MemberOrdering {
               | 'private-decorated-get'
               | 'private-static-get'
               | 'private-instance-get'
-              | 'private-abstract-get'
+              | '#private-get'
+              | '#private-static-get'
+              | '#private-instance-get'
               | 'set'
               | 'public-set'
               | 'public-decorated-set'
@@ -5750,7 +5695,9 @@ namespace MemberOrdering {
               | 'private-decorated-set'
               | 'private-static-set'
               | 'private-instance-set'
-              | 'private-abstract-set'
+              | '#private-set'
+              | '#private-static-set'
+              | '#private-instance-set'
               | 'static-initialization'
               | 'static-static-initialization'
               | 'public-static-static-initialization'
@@ -5763,7 +5710,8 @@ namespace MemberOrdering {
               | 'protected-abstract-static-initialization'
               | 'private-static-static-initialization'
               | 'private-instance-static-initialization'
-              | 'private-abstract-static-initialization'
+              | '#private-static-static-initialization'
+              | '#private-instance-static-initialization'
             )
           | readonly (
               | 'signature'
@@ -5786,7 +5734,9 @@ namespace MemberOrdering {
               | 'private-decorated-field'
               | 'private-static-field'
               | 'private-instance-field'
-              | 'private-abstract-field'
+              | '#private-field'
+              | '#private-static-field'
+              | '#private-instance-field'
               | 'method'
               | 'public-method'
               | 'public-decorated-method'
@@ -5806,23 +5756,10 @@ namespace MemberOrdering {
               | 'private-decorated-method'
               | 'private-static-method'
               | 'private-instance-method'
-              | 'private-abstract-method'
+              | '#private-method'
+              | '#private-static-method'
+              | '#private-instance-method'
               | 'call-signature'
-              | 'public-call-signature'
-              | 'static-call-signature'
-              | 'public-static-call-signature'
-              | 'instance-call-signature'
-              | 'public-instance-call-signature'
-              | 'abstract-call-signature'
-              | 'public-abstract-call-signature'
-              | 'protected-call-signature'
-              | 'protected-static-call-signature'
-              | 'protected-instance-call-signature'
-              | 'protected-abstract-call-signature'
-              | 'private-call-signature'
-              | 'private-static-call-signature'
-              | 'private-instance-call-signature'
-              | 'private-abstract-call-signature'
               | 'constructor'
               | 'public-constructor'
               | 'protected-constructor'
@@ -5846,7 +5783,9 @@ namespace MemberOrdering {
               | 'private-decorated-get'
               | 'private-static-get'
               | 'private-instance-get'
-              | 'private-abstract-get'
+              | '#private-get'
+              | '#private-static-get'
+              | '#private-instance-get'
               | 'set'
               | 'public-set'
               | 'public-decorated-set'
@@ -5866,7 +5805,9 @@ namespace MemberOrdering {
               | 'private-decorated-set'
               | 'private-static-set'
               | 'private-instance-set'
-              | 'private-abstract-set'
+              | '#private-set'
+              | '#private-static-set'
+              | '#private-instance-set'
               | 'static-initialization'
               | 'static-static-initialization'
               | 'public-static-static-initialization'
@@ -5879,7 +5820,8 @@ namespace MemberOrdering {
               | 'protected-abstract-static-initialization'
               | 'private-static-static-initialization'
               | 'private-instance-static-initialization'
-              | 'private-abstract-static-initialization'
+              | '#private-static-static-initialization'
+              | '#private-instance-static-initialization'
             )[]
         )[]
       | {
@@ -5906,7 +5848,9 @@ namespace MemberOrdering {
                     | 'private-decorated-field'
                     | 'private-static-field'
                     | 'private-instance-field'
-                    | 'private-abstract-field'
+                    | '#private-field'
+                    | '#private-static-field'
+                    | '#private-instance-field'
                     | 'method'
                     | 'public-method'
                     | 'public-decorated-method'
@@ -5926,23 +5870,10 @@ namespace MemberOrdering {
                     | 'private-decorated-method'
                     | 'private-static-method'
                     | 'private-instance-method'
-                    | 'private-abstract-method'
+                    | '#private-method'
+                    | '#private-static-method'
+                    | '#private-instance-method'
                     | 'call-signature'
-                    | 'public-call-signature'
-                    | 'static-call-signature'
-                    | 'public-static-call-signature'
-                    | 'instance-call-signature'
-                    | 'public-instance-call-signature'
-                    | 'abstract-call-signature'
-                    | 'public-abstract-call-signature'
-                    | 'protected-call-signature'
-                    | 'protected-static-call-signature'
-                    | 'protected-instance-call-signature'
-                    | 'protected-abstract-call-signature'
-                    | 'private-call-signature'
-                    | 'private-static-call-signature'
-                    | 'private-instance-call-signature'
-                    | 'private-abstract-call-signature'
                     | 'constructor'
                     | 'public-constructor'
                     | 'protected-constructor'
@@ -5966,7 +5897,9 @@ namespace MemberOrdering {
                     | 'private-decorated-get'
                     | 'private-static-get'
                     | 'private-instance-get'
-                    | 'private-abstract-get'
+                    | '#private-get'
+                    | '#private-static-get'
+                    | '#private-instance-get'
                     | 'set'
                     | 'public-set'
                     | 'public-decorated-set'
@@ -5986,7 +5919,9 @@ namespace MemberOrdering {
                     | 'private-decorated-set'
                     | 'private-static-set'
                     | 'private-instance-set'
-                    | 'private-abstract-set'
+                    | '#private-set'
+                    | '#private-static-set'
+                    | '#private-instance-set'
                     | 'static-initialization'
                     | 'static-static-initialization'
                     | 'public-static-static-initialization'
@@ -5999,7 +5934,8 @@ namespace MemberOrdering {
                     | 'protected-abstract-static-initialization'
                     | 'private-static-static-initialization'
                     | 'private-instance-static-initialization'
-                    | 'private-abstract-static-initialization'
+                    | '#private-static-static-initialization'
+                    | '#private-instance-static-initialization'
                   )
                 | readonly (
                     | 'signature'
@@ -6022,7 +5958,9 @@ namespace MemberOrdering {
                     | 'private-decorated-field'
                     | 'private-static-field'
                     | 'private-instance-field'
-                    | 'private-abstract-field'
+                    | '#private-field'
+                    | '#private-static-field'
+                    | '#private-instance-field'
                     | 'method'
                     | 'public-method'
                     | 'public-decorated-method'
@@ -6042,23 +5980,10 @@ namespace MemberOrdering {
                     | 'private-decorated-method'
                     | 'private-static-method'
                     | 'private-instance-method'
-                    | 'private-abstract-method'
+                    | '#private-method'
+                    | '#private-static-method'
+                    | '#private-instance-method'
                     | 'call-signature'
-                    | 'public-call-signature'
-                    | 'static-call-signature'
-                    | 'public-static-call-signature'
-                    | 'instance-call-signature'
-                    | 'public-instance-call-signature'
-                    | 'abstract-call-signature'
-                    | 'public-abstract-call-signature'
-                    | 'protected-call-signature'
-                    | 'protected-static-call-signature'
-                    | 'protected-instance-call-signature'
-                    | 'protected-abstract-call-signature'
-                    | 'private-call-signature'
-                    | 'private-static-call-signature'
-                    | 'private-instance-call-signature'
-                    | 'private-abstract-call-signature'
                     | 'constructor'
                     | 'public-constructor'
                     | 'protected-constructor'
@@ -6082,7 +6007,9 @@ namespace MemberOrdering {
                     | 'private-decorated-get'
                     | 'private-static-get'
                     | 'private-instance-get'
-                    | 'private-abstract-get'
+                    | '#private-get'
+                    | '#private-static-get'
+                    | '#private-instance-get'
                     | 'set'
                     | 'public-set'
                     | 'public-decorated-set'
@@ -6102,7 +6029,9 @@ namespace MemberOrdering {
                     | 'private-decorated-set'
                     | 'private-static-set'
                     | 'private-instance-set'
-                    | 'private-abstract-set'
+                    | '#private-set'
+                    | '#private-static-set'
+                    | '#private-instance-set'
                     | 'static-initialization'
                     | 'static-static-initialization'
                     | 'public-static-static-initialization'
@@ -6115,14 +6044,18 @@ namespace MemberOrdering {
                     | 'protected-abstract-static-initialization'
                     | 'private-static-static-initialization'
                     | 'private-instance-static-initialization'
-                    | 'private-abstract-static-initialization'
+                    | '#private-static-static-initialization'
+                    | '#private-instance-static-initialization'
                   )[]
               )[]
             | 'never';
           readonly order?:
             | 'alphabetically'
             | 'alphabetically-case-insensitive'
-            | 'as-written';
+            | 'as-written'
+            | 'natural'
+            | 'natural-case-insensitive';
+          readonly optionalityOrder?: 'optional-first' | 'required-first';
         };
     readonly interfaces?:
       | 'never'
@@ -6140,7 +6073,10 @@ namespace MemberOrdering {
           readonly order?:
             | 'alphabetically'
             | 'alphabetically-case-insensitive'
-            | 'as-written';
+            | 'as-written'
+            | 'natural'
+            | 'natural-case-insensitive';
+          readonly optionalityOrder?: 'optional-first' | 'required-first';
         };
     readonly typeLiterals?:
       | 'never'
@@ -6158,7 +6094,10 @@ namespace MemberOrdering {
           readonly order?:
             | 'alphabetically'
             | 'alphabetically-case-insensitive'
-            | 'as-written';
+            | 'as-written'
+            | 'natural'
+            | 'natural-case-insensitive';
+          readonly optionalityOrder?: 'optional-first' | 'required-first';
         };
   };
 
@@ -6370,7 +6309,9 @@ namespace NamingConvention {
    *                 "global",
    *                 "exported",
    *                 "unused",
-   *                 "requiresQuotes"
+   *                 "requiresQuotes",
+   *                 "override",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -6522,7 +6463,9 @@ namespace NamingConvention {
    *                 "global",
    *                 "exported",
    *                 "unused",
-   *                 "requiresQuotes"
+   *                 "requiresQuotes",
+   *                 "override",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -6649,7 +6592,8 @@ namespace NamingConvention {
    *             "items": {
    *               "type": "string",
    *               "enum": [
-   *                 "unused"
+   *                 "unused",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -6780,7 +6724,8 @@ namespace NamingConvention {
    *                 "destructured",
    *                 "exported",
    *                 "global",
-   *                 "unused"
+   *                 "unused",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -6923,7 +6868,8 @@ namespace NamingConvention {
    *               "enum": [
    *                 "exported",
    *                 "global",
-   *                 "unused"
+   *                 "unused",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -7198,7 +7144,9 @@ namespace NamingConvention {
    *                 "public",
    *                 "readonly",
    *                 "requiresQuotes",
-   *                 "static"
+   *                 "static",
+   *                 "override",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -7331,7 +7279,8 @@ namespace NamingConvention {
    *                 "public",
    *                 "readonly",
    *                 "requiresQuotes",
-   *                 "static"
+   *                 "static",
+   *                 "override"
    *               ]
    *             },
    *             "additionalItems": false
@@ -7907,7 +7856,9 @@ namespace NamingConvention {
    *                 "public",
    *                 "readonly",
    *                 "requiresQuotes",
-   *                 "static"
+   *                 "static",
+   *                 "override",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -8053,7 +8004,9 @@ namespace NamingConvention {
    *                 "protected",
    *                 "public",
    *                 "requiresQuotes",
-   *                 "static"
+   *                 "static",
+   *                 "override",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -8181,7 +8134,8 @@ namespace NamingConvention {
    *               "type": "string",
    *               "enum": [
    *                 "public",
-   *                 "requiresQuotes"
+   *                 "requiresQuotes",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -8441,7 +8395,9 @@ namespace NamingConvention {
    *                 "protected",
    *                 "public",
    *                 "requiresQuotes",
-   *                 "static"
+   *                 "static",
+   *                 "override",
+   *                 "async"
    *               ]
    *             },
    *             "additionalItems": false
@@ -8573,7 +8529,8 @@ namespace NamingConvention {
    *                 "protected",
    *                 "public",
    *                 "requiresQuotes",
-   *                 "static"
+   *                 "static",
+   *                 "override"
    *               ]
    *             },
    *             "additionalItems": false
@@ -9580,6 +9537,8 @@ namespace NamingConvention {
           | 'exported'
           | 'unused'
           | 'requiresQuotes'
+          | 'override'
+          | 'async'
         )[];
         readonly types?: readonly (
           | 'boolean'
@@ -9643,6 +9602,8 @@ namespace NamingConvention {
           | 'exported'
           | 'unused'
           | 'requiresQuotes'
+          | 'override'
+          | 'async'
         )[];
       }
     | {
@@ -9686,7 +9647,7 @@ namespace NamingConvention {
               readonly [k: string]: unknown;
             };
         readonly selector: 'variableLike';
-        readonly modifiers?: readonly 'unused'[];
+        readonly modifiers?: readonly ('unused' | 'async')[];
       }
     | {
         readonly format:
@@ -9735,6 +9696,7 @@ namespace NamingConvention {
           | 'exported'
           | 'global'
           | 'unused'
+          | 'async'
         )[];
         readonly types?: readonly (
           | 'boolean'
@@ -9785,7 +9747,12 @@ namespace NamingConvention {
               readonly [k: string]: unknown;
             };
         readonly selector: 'function';
-        readonly modifiers?: readonly ('exported' | 'global' | 'unused')[];
+        readonly modifiers?: readonly (
+          | 'exported'
+          | 'global'
+          | 'unused'
+          | 'async'
+        )[];
       }
     | {
         readonly format:
@@ -9886,6 +9853,8 @@ namespace NamingConvention {
           | 'readonly'
           | 'requiresQuotes'
           | 'static'
+          | 'override'
+          | 'async'
         )[];
       }
     | {
@@ -9937,6 +9906,7 @@ namespace NamingConvention {
           | 'readonly'
           | 'requiresQuotes'
           | 'static'
+          | 'override'
         )[];
         readonly types?: readonly (
           | 'boolean'
@@ -10154,6 +10124,8 @@ namespace NamingConvention {
           | 'readonly'
           | 'requiresQuotes'
           | 'static'
+          | 'override'
+          | 'async'
         )[];
         readonly types?: readonly (
           | 'boolean'
@@ -10211,6 +10183,8 @@ namespace NamingConvention {
           | 'public'
           | 'requiresQuotes'
           | 'static'
+          | 'override'
+          | 'async'
         )[];
       }
     | {
@@ -10254,7 +10228,7 @@ namespace NamingConvention {
               readonly [k: string]: unknown;
             };
         readonly selector: 'objectLiteralMethod';
-        readonly modifiers?: readonly ('public' | 'requiresQuotes')[];
+        readonly modifiers?: readonly ('public' | 'requiresQuotes' | 'async')[];
       }
     | {
         readonly format:
@@ -10347,6 +10321,8 @@ namespace NamingConvention {
           | 'public'
           | 'requiresQuotes'
           | 'static'
+          | 'override'
+          | 'async'
         )[];
       }
     | {
@@ -10397,6 +10373,7 @@ namespace NamingConvention {
           | 'public'
           | 'requiresQuotes'
           | 'static'
+          | 'override'
         )[];
         readonly types?: readonly (
           | 'boolean'
@@ -11139,6 +11116,9 @@ namespace NoExtraParens {
    *             },
    *             "enforceForFunctionPrototypeMethods": {
    *               "type": "boolean"
+   *             },
+   *             "allowParensAfterCommentPattern": {
+   *               "type": "string"
    *             }
    *           },
    *           "additionalProperties": false
@@ -11167,6 +11147,7 @@ namespace NoExtraParens {
           readonly enforceForSequenceExpressions?: boolean;
           readonly enforceForNewInMemberExpressions?: boolean;
           readonly enforceForFunctionPrototypeMethods?: boolean;
+          readonly allowParensAfterCommentPattern?: string;
         }
       ];
 
@@ -11569,6 +11550,10 @@ namespace NoMagicNumbers {
    *         "type": "boolean",
    *         "default": false
    *       },
+   *       "ignoreClassFieldInitialValues": {
+   *         "type": "boolean",
+   *         "default": false
+   *       },
    *       "ignoreNumericLiteralTypes": {
    *         "type": "boolean"
    *       },
@@ -11593,6 +11578,7 @@ namespace NoMagicNumbers {
     readonly ignore?: readonly (number | string)[];
     readonly ignoreArrayIndexes?: boolean;
     readonly ignoreDefaultValues?: boolean;
+    readonly ignoreClassFieldInitialValues?: boolean;
     readonly ignoreNumericLiteralTypes?: boolean;
     readonly ignoreEnums?: boolean;
     readonly ignoreReadonlyClassProperties?: boolean;
@@ -12581,6 +12567,20 @@ namespace NoUnsafeCall {
 }
 
 /**
+ * @description Disallow unsafe declaration merging
+ * @link https://typescript-eslint.io/rules/no-unsafe-declaration-merging
+ *
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | false   |
+ */
+namespace NoUnsafeDeclarationMerging {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * @description Disallow member access on a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-member-access
  *
@@ -13437,7 +13437,7 @@ namespace PreferNullishCoalescing {
    *       "ignoreMixedLogicalExpressions": {
    *         "type": "boolean"
    *       },
-   *       "forceSuggestionFixer": {
+   *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
    *         "type": "boolean"
    *       }
    *     },
@@ -13450,7 +13450,7 @@ namespace PreferNullishCoalescing {
     readonly ignoreConditionalTests?: boolean;
     readonly ignoreTernaryTests?: boolean;
     readonly ignoreMixedLogicalExpressions?: boolean;
-    readonly forceSuggestionFixer?: boolean;
+    readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
   };
 
   export type RuleEntry =
@@ -13459,7 +13459,7 @@ namespace PreferNullishCoalescing {
 }
 
 /**
- * @description Enforce using concise optional chain expressions instead of chained logical ands
+ * @description Enforce using concise optional chain expressions instead of chained logical ands, negated logical ors, or empty objects
  * @link https://typescript-eslint.io/rules/prefer-optional-chain
  *
  *  | key            | value      |
@@ -14067,8 +14067,8 @@ namespace Semi {
 }
 
 /**
- * @description Enforce members of a type union/intersection to be sorted alphabetically
- * @link https://typescript-eslint.io/rules/sort-type-union-intersection-members
+ * @description Enforce constituents of a type union/intersection to be sorted alphabetically
+ * @link https://typescript-eslint.io/rules/sort-type-constituents
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -14077,7 +14077,7 @@ namespace Semi {
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
  */
-namespace SortTypeUnionIntersectionMembers {
+namespace SortTypeConstituents {
   /**
    * ### schema
    *
@@ -14152,6 +14152,64 @@ namespace SortTypeUnionIntersectionMembers {
   export type RuleEntry =
     | Linter.RuleLevel
     | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Enforce members of a type union/intersection to be sorted alphabetically
+ * @link https://typescript-eslint.io/rules/sort-type-union-intersection-members
+ *
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | true       |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ */
+namespace SortTypeUnionIntersectionMembers {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checkIntersections": {
+   *         "description": "Whether to check intersection types.",
+   *         "type": "boolean"
+   *       },
+   *       "checkUnions": {
+   *         "description": "Whether to check union types.",
+   *         "type": "boolean"
+   *       },
+   *       "groupOrder": {
+   *         "description": "Ordering of the groups.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string",
+   *           "enum": [
+   *             "conditional",
+   *             "function",
+   *             "import",
+   *             "intersection",
+   *             "keyword",
+   *             "nullish",
+   *             "literal",
+   *             "named",
+   *             "object",
+   *             "operator",
+   *             "tuple",
+   *             "union"
+   *           ]
+   *         }
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type RuleEntry = 'off';
 }
 
 /**
@@ -14834,6 +14892,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-unsafe-argument': NoUnsafeArgument.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-assignment': NoUnsafeAssignment.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-call': NoUnsafeCall.RuleEntry;
+  readonly '@typescript-eslint/no-unsafe-declaration-merging': NoUnsafeDeclarationMerging.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-return': NoUnsafeReturn.RuleEntry;
   readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.RuleEntry;
@@ -14870,7 +14929,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.RuleEntry;
   readonly '@typescript-eslint/return-await': ReturnAwait.RuleEntry;
   readonly '@typescript-eslint/semi': Semi.RuleEntry;
-  readonly '@typescript-eslint/sort-type-union-intersection-members': SortTypeUnionIntersectionMembers.RuleEntry;
+  readonly '@typescript-eslint/sort-type-constituents': SortTypeConstituents.RuleEntry;
   readonly '@typescript-eslint/space-before-blocks': SpaceBeforeBlocks.RuleEntry;
   readonly '@typescript-eslint/space-before-function-paren': SpaceBeforeFunctionParen.RuleEntry;
   readonly '@typescript-eslint/space-infix-ops': SpaceInfixOps.RuleEntry;
@@ -14886,4 +14945,5 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-duplicate-imports': NoDuplicateImports.RuleEntry;
   readonly '@typescript-eslint/no-implicit-any-catch': NoImplicitAnyCatch.RuleEntry;
   readonly '@typescript-eslint/no-parameter-properties': NoParameterProperties.RuleEntry;
+  readonly '@typescript-eslint/sort-type-union-intersection-members': SortTypeUnionIntersectionMembers.RuleEntry;
 };

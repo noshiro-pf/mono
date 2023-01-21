@@ -19,6 +19,7 @@ const eslintSecurityRules = {
   'security/detect-disable-mustache-escape': 'error',
   'security/detect-object-injection': 'off', // too many false positives
   'security/detect-new-buffer': 'error',
+  'security/detect-bidi-characters': 'error',
 };
 
 module.exports = { eslintSecurityRules };

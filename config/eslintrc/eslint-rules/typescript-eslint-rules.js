@@ -198,6 +198,7 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-unsafe-argument': 'error',
   '@typescript-eslint/no-unsafe-assignment': 'error',
   '@typescript-eslint/no-unsafe-call': 'error',
+  '@typescript-eslint/no-unsafe-declaration-merging': 'error',
   '@typescript-eslint/no-unsafe-member-access': 'error',
   '@typescript-eslint/no-unsafe-return': 'error',
   '@typescript-eslint/no-unused-expressions': 'error',
@@ -269,7 +270,7 @@ const typescriptEslintRules = {
     { allowNumber: true, allowBoolean: true, allowNullable: true },
   ], // modified
   '@typescript-eslint/return-await': 'error',
-  '@typescript-eslint/sort-type-union-intersection-members': 'error',
+  '@typescript-eslint/sort-type-constituents': 'error',
 
   /**
    * boolean への暗黙のキャストを回避するために使用。
@@ -299,6 +300,7 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-duplicate-imports': 'off',
   '@typescript-eslint/no-implicit-any-catch': 'off',
   '@typescript-eslint/no-parameter-properties': 'off',
+  '@typescript-eslint/sort-type-union-intersection-members': 'off',
 };
 
 module.exports = { typescriptEslintRules, banTypes, restrictedImportsOption };

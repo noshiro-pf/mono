@@ -8,11 +8,13 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
   T[1] extends readonly unknown[] ? readonly [Linter.RuleLevel, ...T[1]] : T;
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-unresolved.md
+ * @description Ensure imports point to a file/module that can be resolved.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-unresolved.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | problem         |
+ *  | category | Static analysis |
  */
 namespace NoUnresolved {
   /**
@@ -72,11 +74,13 @@ namespace NoUnresolved {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/named.md
+ * @description Ensure named imports correspond to a named export in the remote file.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/named.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | problem         |
+ *  | category | Static analysis |
  */
 namespace Named {
   /**
@@ -106,22 +110,26 @@ namespace Named {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/default.md
+ * @description Ensure a default export is present, given a default import.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/default.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | problem         |
+ *  | category | Static analysis |
  */
 namespace Default {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/namespace.md
+ * @description Ensure imported namespaces contain dereferenced properties as they are dereferenced.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/namespace.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | problem         |
+ *  | category | Static analysis |
  */
 namespace Namespace {
   /**
@@ -156,12 +164,14 @@ namespace Namespace {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-namespace.md
+ * @description Forbid namespace (a.k.a. "wildcard" `*`) imports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-namespace.md
  *
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | fixable  | code        |
+ *  | category | Style guide |
  */
 namespace NoNamespace {
   /**
@@ -195,33 +205,39 @@ namespace NoNamespace {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/export.md
+ * @description Forbid any invalid exports, i.e. re-export of the same name.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/export.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value            |
+ *  | :------- | :--------------- |
+ *  | type     | problem          |
+ *  | category | Helpful warnings |
  */
 namespace Export {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-mutable-exports.md
+ * @description Forbid the use of mutable exports with `var` or `let`.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-mutable-exports.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value            |
+ *  | :------- | :--------------- |
+ *  | type     | suggestion       |
+ *  | category | Helpful warnings |
  */
 namespace NoMutableExports {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/extensions.md
+ * @description Ensure consistent use of file extension within the import path.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/extensions.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace Extensions {
   /**
@@ -391,11 +407,13 @@ namespace Extensions {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-restricted-paths.md
+ * @description Enforce which files can be imported in a given folder.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-restricted-paths.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | problem         |
+ *  | category | Static analysis |
  */
 namespace NoRestrictedPaths {
   /**
@@ -413,10 +431,34 @@ namespace NoRestrictedPaths {
    *           "type": "object",
    *           "properties": {
    *             "target": {
-   *               "type": "string"
+   *               "anyOf": [
+   *                 {
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string"
+   *                   },
+   *                   "uniqueItems": true,
+   *                   "minLength": 1
+   *                 }
+   *               ]
    *             },
    *             "from": {
-   *               "type": "string"
+   *               "anyOf": [
+   *                 {
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string"
+   *                   },
+   *                   "uniqueItems": true,
+   *                   "minLength": 1
+   *                 }
+   *               ]
    *             },
    *             "except": {
    *               "type": "array",
@@ -447,14 +489,14 @@ namespace NoRestrictedPaths {
      */
     readonly zones?: readonly [
       {
-        readonly target?: string;
-        readonly from?: string;
+        readonly target?: string | readonly string[];
+        readonly from?: string | readonly string[];
         readonly except?: readonly string[];
         readonly message?: string;
       },
       ...(readonly {
-        readonly target?: string;
-        readonly from?: string;
+        readonly target?: string | readonly string[];
+        readonly from?: string | readonly string[];
         readonly except?: readonly string[];
         readonly message?: string;
       }[])
@@ -468,11 +510,13 @@ namespace NoRestrictedPaths {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-internal-modules.md
+ * @description Forbid importing the submodules of other modules.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-internal-modules.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | suggestion      |
+ *  | category | Static analysis |
  */
 namespace NoInternalModules {
   /**
@@ -481,7 +525,7 @@ namespace NoInternalModules {
    * ```json
    * [
    *   {
-   *     "oneOf": [
+   *     "anyOf": [
    *       {
    *         "type": "object",
    *         "properties": {
@@ -525,23 +569,27 @@ namespace NoInternalModules {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/group-exports.md
+ * @description Prefer named exports to be grouped together in a single export declaration
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/group-exports.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace GroupExports {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-relative-packages.md
+ * @description Forbid importing packages through relative paths.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-relative-packages.md
  *
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | suggestion      |
+ *  | fixable  | code            |
+ *  | category | Static analysis |
  */
 namespace NoRelativePackages {
   /**
@@ -591,11 +639,13 @@ namespace NoRelativePackages {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-relative-parent-imports.md
+ * @description Forbid importing modules from parent directories.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-relative-parent-imports.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | suggestion      |
+ *  | category | Static analysis |
  */
 namespace NoRelativeParentImports {
   /**
@@ -645,24 +695,61 @@ namespace NoRelativeParentImports {
 }
 
 /**
- * @description Forbid a module from importing itself
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-self-import.md
+ * @description Enforce or ban the use of inline type-only markers for named imports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/consistent-type-specifier-style.md
  *
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | recommended | true    |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | fixable  | code        |
+ *  | category | Style guide |
+ */
+namespace ConsistentTypeSpecifierStyle {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "string",
+   *     "enum": [
+   *       "prefer-inline",
+   *       "prefer-top-level"
+   *     ],
+   *     "default": "prefer-inline"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = 'prefer-inline' | 'prefer-top-level';
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Forbid a module from importing itself.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-self-import.md
+ *
+ *  | key         | value           |
+ *  | :---------- | :-------------- |
+ *  | type        | problem         |
+ *  | category    | Static analysis |
+ *  | recommended | true            |
  */
 namespace NoSelfImport {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-cycle.md
+ * @description Forbid a module from importing a module with a dependency path back to itself.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-cycle.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | suggestion      |
+ *  | category | Static analysis |
  */
 namespace NoCycle {
   /**
@@ -691,7 +778,7 @@ namespace NoCycle {
    *         "uniqueItems": true
    *       },
    *       "maxDepth": {
-   *         "oneOf": [
+   *         "anyOf": [
    *           {
    *             "description": "maximum dependency depth to traverse",
    *             "type": "integer",
@@ -707,6 +794,11 @@ namespace NoCycle {
    *       },
    *       "ignoreExternal": {
    *         "description": "ignore external modules",
+   *         "type": "boolean",
+   *         "default": false
+   *       },
+   *       "allowUnsafeDynamicCyclicDependency": {
+   *         "description": "Allow cyclic dependency if there is at least one dynamic import in the chain",
    *         "type": "boolean",
    *         "default": false
    *       }
@@ -729,6 +821,10 @@ namespace NoCycle {
      * ignore external modules
      */
     readonly ignoreExternal?: boolean;
+    /**
+     * Allow cyclic dependency if there is at least one dynamic import in the chain
+     */
+    readonly allowUnsafeDynamicCyclicDependency?: boolean;
   };
 
   export type RuleEntry =
@@ -737,44 +833,52 @@ namespace NoCycle {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-default.md
+ * @description Forbid named default exports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-named-default.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace NoNamedDefault {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-as-default.md
+ * @description Forbid use of exported name as identifier of default export.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-named-as-default.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value            |
+ *  | :------- | :--------------- |
+ *  | type     | problem          |
+ *  | category | Helpful warnings |
  */
 namespace NoNamedAsDefault {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-as-default-member.md
+ * @description Forbid use of exported name as property of default export.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-named-as-default-member.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value            |
+ *  | :------- | :--------------- |
+ *  | type     | suggestion       |
+ *  | category | Helpful warnings |
  */
 namespace NoNamedAsDefaultMember {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-anonymous-default-export.md
+ * @description Forbid anonymous values as default exports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-anonymous-default-export.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace NoAnonymousDefaultExport {
   /**
@@ -812,6 +916,10 @@ namespace NoAnonymousDefaultExport {
    *       "allowObject": {
    *         "description": "If `false`, will report default export of an object expression",
    *         "type": "boolean"
+   *       },
+   *       "allowNew": {
+   *         "description": "If `false`, will report default export of a class instantiation",
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -848,6 +956,10 @@ namespace NoAnonymousDefaultExport {
      * If `false`, will report default export of an object expression
      */
     readonly allowObject?: boolean;
+    /**
+     * If `false`, will report default export of a class instantiation
+     */
+    readonly allowNew?: boolean;
   };
 
   export type RuleEntry =
@@ -856,11 +968,13 @@ namespace NoAnonymousDefaultExport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-unused-modules.md
+ * @description Forbid modules without exports, or exports without matching import in another module.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-unused-modules.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value            |
+ *  | :------- | :--------------- |
+ *  | type     | suggestion       |
+ *  | category | Helpful warnings |
  */
 namespace NoUnusedModules {
   /**
@@ -1009,11 +1123,13 @@ namespace NoUnusedModules {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-commonjs.md
+ * @description Forbid CommonJS `require` calls and `module.exports` or `exports.*`.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-commonjs.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value          |
+ *  | :------- | :------------- |
+ *  | type     | suggestion     |
+ *  | category | Module systems |
  */
 namespace NoCommonjs {
   /**
@@ -1076,23 +1192,27 @@ namespace NoCommonjs {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-amd.md
+ * @description Forbid AMD `require` and `define` calls.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-amd.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value          |
+ *  | :------- | :------------- |
+ *  | type     | suggestion     |
+ *  | category | Module systems |
  */
 namespace NoAmd {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-duplicates.md
+ * @description Forbid repeated import of the same module in multiple places.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-duplicates.md
  *
- *  | key     | value   |
- *  | :------ | :------ |
- *  | type    | problem |
- *  | fixable | code    |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | problem     |
+ *  | fixable  | code        |
+ *  | category | Style guide |
  */
 namespace NoDuplicates {
   /**
@@ -1105,6 +1225,9 @@ namespace NoDuplicates {
    *     "properties": {
    *       "considerQueryString": {
    *         "type": "boolean"
+   *       },
+   *       "prefer-inline": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1114,6 +1237,7 @@ namespace NoDuplicates {
    */
   export type Options = {
     readonly considerQueryString?: boolean;
+    readonly 'prefer-inline'?: boolean;
   };
 
   export type RuleEntry =
@@ -1122,12 +1246,14 @@ namespace NoDuplicates {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/first.md
+ * @description Ensure all imports appear before other statements.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/first.md
  *
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | fixable  | code        |
+ *  | category | Style guide |
  */
 namespace First {
   /**
@@ -1153,11 +1279,13 @@ namespace First {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/max-dependencies.md
+ * @description Enforce the maximum number of dependencies a module can have.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/max-dependencies.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace MaxDependencies {
   /**
@@ -1191,11 +1319,13 @@ namespace MaxDependencies {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-extraneous-dependencies.md
+ * @description Forbid the use of extraneous packages.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-extraneous-dependencies.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value            |
+ *  | :------- | :--------------- |
+ *  | type     | problem          |
+ *  | category | Helpful warnings |
  */
 namespace NoExtraneousDependencies {
   /**
@@ -1235,6 +1365,16 @@ namespace NoExtraneousDependencies {
    *           "string",
    *           "array"
    *         ]
+   *       },
+   *       "includeInternal": {
+   *         "type": [
+   *           "boolean"
+   *         ]
+   *       },
+   *       "includeTypes": {
+   *         "type": [
+   *           "boolean"
+   *         ]
    *       }
    *     },
    *     "additionalProperties": false
@@ -1248,6 +1388,8 @@ namespace NoExtraneousDependencies {
     readonly peerDependencies?: boolean | readonly unknown[];
     readonly bundledDependencies?: boolean | readonly unknown[];
     readonly packageDir?: string | readonly unknown[];
+    readonly includeInternal?: boolean;
+    readonly includeTypes?: boolean;
   };
 
   export type RuleEntry =
@@ -1256,11 +1398,14 @@ namespace NoExtraneousDependencies {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-absolute-path.md
+ * @description Forbid import of modules using absolute paths.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-absolute-path.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | suggestion      |
+ *  | fixable  | code            |
+ *  | category | Static analysis |
  */
 namespace NoAbsolutePath {
   /**
@@ -1310,11 +1455,13 @@ namespace NoAbsolutePath {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-nodejs-modules.md
+ * @description Forbid Node.js builtin modules.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-nodejs-modules.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value          |
+ *  | :------- | :------------- |
+ *  | type     | suggestion     |
+ *  | category | Module systems |
  */
 namespace NoNodejsModules {
   /**
@@ -1348,23 +1495,27 @@ namespace NoNodejsModules {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-webpack-loader-syntax.md
+ * @description Forbid webpack loader syntax in imports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-webpack-loader-syntax.md
  *
- *  | key  | value   |
- *  | :--- | :------ |
- *  | type | problem |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | problem         |
+ *  | category | Static analysis |
  */
 namespace NoWebpackLoaderSyntax {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/order.md
+ * @description Enforce a convention in module import order.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/order.md
  *
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | fixable  | code        |
+ *  | category | Style guide |
  */
 namespace Order {
   /**
@@ -1380,6 +1531,10 @@ namespace Order {
    *       },
    *       "pathGroupsExcludedImportTypes": {
    *         "type": "array"
+   *       },
+   *       "distinctGroup": {
+   *         "type": "boolean",
+   *         "default": true
    *       },
    *       "pathGroups": {
    *         "type": "array",
@@ -1414,6 +1569,7 @@ namespace Order {
    *               ]
    *             }
    *           },
+   *           "additionalProperties": false,
    *           "required": [
    *             "pattern",
    *             "group"
@@ -1442,6 +1598,14 @@ namespace Order {
    *               "desc"
    *             ],
    *             "default": "ignore"
+   *           },
+   *           "orderImportKind": {
+   *             "enum": [
+   *               "ignore",
+   *               "asc",
+   *               "desc"
+   *             ],
+   *             "default": "ignore"
    *           }
    *         },
    *         "additionalProperties": false
@@ -1459,6 +1623,7 @@ namespace Order {
   export type Options = {
     readonly groups?: readonly unknown[];
     readonly pathGroupsExcludedImportTypes?: readonly unknown[];
+    readonly distinctGroup?: boolean;
     readonly pathGroups?: readonly {
       readonly pattern: string;
       readonly patternOptions?: Record<string, unknown>;
@@ -1473,7 +1638,6 @@ namespace Order {
         | 'object'
         | 'type';
       readonly position?: 'after' | 'before';
-      readonly [k: string]: unknown;
     }[];
     readonly 'newlines-between'?:
       | 'ignore'
@@ -1483,6 +1647,7 @@ namespace Order {
     readonly alphabetize?: {
       readonly caseInsensitive?: boolean;
       readonly order?: 'ignore' | 'asc' | 'desc';
+      readonly orderImportKind?: 'ignore' | 'asc' | 'desc';
     };
     readonly warnOnUnassignedImports?: boolean;
   };
@@ -1493,12 +1658,14 @@ namespace Order {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/newline-after-import.md
+ * @description Enforce a newline after import statements.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/newline-after-import.md
  *
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | layout     |
- *  | fixable | whitespace |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | layout      |
+ *  | fixable  | whitespace  |
+ *  | category | Style guide |
  */
 namespace NewlineAfterImport {
   /**
@@ -1512,6 +1679,9 @@ namespace NewlineAfterImport {
    *       "count": {
    *         "type": "integer",
    *         "minimum": 1
+   *       },
+   *       "considerComments": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1521,6 +1691,7 @@ namespace NewlineAfterImport {
    */
   export type Options = {
     readonly count?: number;
+    readonly considerComments?: boolean;
   };
 
   export type RuleEntry =
@@ -1529,44 +1700,80 @@ namespace NewlineAfterImport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/prefer-default-export.md
+ * @description Prefer a default export if module exports a single name or multiple names.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/prefer-default-export.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace PreferDefaultExport {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "target": {
+   *         "type": "string",
+   *         "enum": [
+   *           "single",
+   *           "any"
+   *         ],
+   *         "default": "single"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly target?: 'single' | 'any';
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-default-export.md
+ * @description Forbid default exports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-default-export.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace NoDefaultExport {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-named-export.md
+ * @description Forbid named exports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-named-export.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace NoNamedExport {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-dynamic-require.md
+ * @description Forbid `require()` calls with expressions.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-dynamic-require.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | suggestion      |
+ *  | category | Static analysis |
  */
 namespace NoDynamicRequire {
   /**
@@ -1596,22 +1803,26 @@ namespace NoDynamicRequire {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/unambiguous.md
+ * @description Forbid potentially ambiguous parse goal (`script` vs. `module`).
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/unambiguous.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value          |
+ *  | :------- | :------------- |
+ *  | type     | suggestion     |
+ *  | category | Module systems |
  */
 namespace Unambiguous {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-unassigned-import.md
+ * @description Forbid unassigned imports
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-unassigned-import.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace NoUnassignedImport {
   /**
@@ -1665,12 +1876,14 @@ namespace NoUnassignedImport {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-useless-path-segments.md
+ * @description Forbid unnecessary path segments in import and require statements.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-useless-path-segments.md
  *
- *  | key     | value      |
- *  | :------ | :--------- |
- *  | type    | suggestion |
- *  | fixable | code       |
+ *  | key      | value           |
+ *  | :------- | :-------------- |
+ *  | type     | suggestion      |
+ *  | fixable  | code            |
+ *  | category | Static analysis |
  */
 namespace NoUselessPathSegments {
   /**
@@ -1704,11 +1917,13 @@ namespace NoUselessPathSegments {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/dynamic-import-chunkname.md
+ * @description Enforce a leading comment with the webpackChunkName for dynamic imports.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/dynamic-import-chunkname.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace DynamicImportChunkname {
   /**
@@ -1746,13 +1961,13 @@ namespace DynamicImportChunkname {
 }
 
 /**
- * @description Disallow import statements with module.exports
+ * @description Forbid import statements with CommonJS module.exports.
  *
  *  | key         | value          |
  *  | :---------- | :------------- |
  *  | type        | problem        |
  *  | fixable     | code           |
- *  | category    | Best Practices |
+ *  | category    | Module systems |
  *  | recommended | true           |
  */
 namespace NoImportModuleExports {
@@ -1783,35 +1998,56 @@ namespace NoImportModuleExports {
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/exports-last.md
+ * @description Forbid empty named import blocks.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-empty-named-blocks.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key            | value            |
+ *  | :------------- | :--------------- |
+ *  | type           | suggestion       |
+ *  | fixable        | code             |
+ *  | hasSuggestions | true             |
+ *  | category       | Helpful warnings |
+ */
+namespace NoEmptyNamedBlocks {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * @description Ensure all exports appear after other statements.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/exports-last.md
+ *
+ *  | key      | value       |
+ *  | :------- | :---------- |
+ *  | type     | suggestion  |
+ *  | category | Style guide |
  */
 namespace ExportsLast {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.26.0/docs/rules/no-deprecated.md
+ * @description Forbid imported names marked with `@deprecated` documentation tag.
+ * @link https://github.com/import-js/eslint-plugin-import/blob/v2.27.5/docs/rules/no-deprecated.md
  *
- *  | key  | value      |
- *  | :--- | :--------- |
- *  | type | suggestion |
+ *  | key      | value            |
+ *  | :------- | :--------------- |
+ *  | type     | suggestion       |
+ *  | category | Helpful warnings |
  */
 namespace NoDeprecated {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
+ * @description Replaced by `import/first`.
  * @link https://github.com/import-js/eslint-plugin-import/blob/7b25c1cb95ee18acc1531002fd343e1e6031f9ed/docs/rules/imports-first.md
  *
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | true       |
- *  | fixable    | code       |
+ *  | key        | value       |
+ *  | :--------- | :---------- |
+ *  | type       | suggestion  |
+ *  | deprecated | true        |
+ *  | fixable    | code        |
+ *  | category   | Style guide |
  */
 namespace ImportsFirst {
   /**
@@ -1846,6 +2082,7 @@ export type EslintImportsRules = {
   readonly 'import/group-exports': GroupExports.RuleEntry;
   readonly 'import/no-relative-packages': NoRelativePackages.RuleEntry;
   readonly 'import/no-relative-parent-imports': NoRelativeParentImports.RuleEntry;
+  readonly 'import/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.RuleEntry;
   readonly 'import/no-self-import': NoSelfImport.RuleEntry;
   readonly 'import/no-cycle': NoCycle.RuleEntry;
   readonly 'import/no-named-default': NoNamedDefault.RuleEntry;
@@ -1873,6 +2110,7 @@ export type EslintImportsRules = {
   readonly 'import/no-useless-path-segments': NoUselessPathSegments.RuleEntry;
   readonly 'import/dynamic-import-chunkname': DynamicImportChunkname.RuleEntry;
   readonly 'import/no-import-module-exports': NoImportModuleExports.RuleEntry;
+  readonly 'import/no-empty-named-blocks': NoEmptyNamedBlocks.RuleEntry;
   readonly 'import/exports-last': ExportsLast.RuleEntry;
   readonly 'import/no-deprecated': NoDeprecated.RuleEntry;
 
