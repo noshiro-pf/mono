@@ -13,7 +13,7 @@
     "fmt": "prettier --ignore-path ../../../../.prettierignore  --write .",
     "gi": "wireit",
     "lint": "wireit",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "yarn z:lint --fix",
     "logs": "firebase functions:log",
     "preserve": "yarn build",
     "serve": "firebase emulators:start --only functions",
@@ -24,7 +24,8 @@
     "start": "yarn shell",
     "tscw": "tsc --noEmit --watch",
     "type-check": "wireit",
-    "watch": "yarn build watch"
+    "watch": "yarn build watch",
+    "z:lint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache"
   },
   "dependencies": {
     "@noshiro/event-schedule-app-shared": "*",
@@ -85,7 +86,7 @@
       "packageLocks": []
     },
     "lint": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+      "command": "yarn z:lint",
       "dependencies": [
         "type-check"
       ],

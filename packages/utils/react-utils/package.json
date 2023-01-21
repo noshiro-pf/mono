@@ -15,12 +15,13 @@
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gi": "wireit",
     "lint": "wireit",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "yarn z:lint --fix",
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "test": "wireit",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit"
+    "type-check": "wireit",
+    "z:lint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
@@ -88,7 +89,7 @@
       "packageLocks": []
     },
     "lint": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+      "command": "yarn z:lint",
       "dependencies": [
         "type-check"
       ],

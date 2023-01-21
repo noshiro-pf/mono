@@ -24,7 +24,7 @@
     "gi:src": "wireit",
     "gi:test": "wireit",
     "lint": "wireit",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "yarn z:lint --fix",
     "pub": "yarn publish --no-git-tag-version --access=public",
     "setup": "yarn build",
     "start": "node cjs/test/preview-main.js",
@@ -32,7 +32,8 @@
     "test:detectOpenHandles": "yarn test --detectOpenHandles",
     "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit"
+    "type-check": "wireit",
+    "z:lint": "eslint \"./{src,test}/**/*\" --ext .ts,.tsx --color --cache --cache-location .eslintcache"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
@@ -118,7 +119,7 @@
       "packageLocks": []
     },
     "lint": {
-      "command": "eslint \"./{src,test}/**/*\" --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+      "command": "yarn z:lint",
       "dependencies": [
         "type-check"
       ],

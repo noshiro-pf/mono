@@ -15,13 +15,14 @@
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gi": "wireit",
     "lint": "wireit",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "yarn z:lint --fix",
     "serve": "firebase serve",
     "start": "run-p start:**",
     "start:dev-server": "webpack serve --config config/webpack.dev.js",
     "test": "wireit",
     "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit"
+    "type-check": "wireit",
+    "z:lint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache"
   },
   "browserslist": {
     "production": [
@@ -98,7 +99,7 @@
       "packageLocks": []
     },
     "lint": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+      "command": "yarn z:lint",
       "dependencies": [
         "type-check"
       ],
