@@ -56,6 +56,8 @@ declare global {
   type Observable<A> = _Observable<A>;
   type Subscription = _Subscription;
 
+  /* custom types */
+
   const auditTime: typeof _auditTime;
   const auditTimeI: typeof _auditTimeI;
   const combineLatest: typeof _combineLatest;
@@ -103,4 +105,6 @@ declare global {
   const withLatestFromI: typeof _withLatestFromI;
   const zip: typeof _zip;
   const zipI: typeof _zipI;
+
+  /* custom variables */
 }

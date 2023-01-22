@@ -21,8 +21,12 @@ declare global {
   type ChangeEvent<T> = _ChangeEvent<T>;
   type FormEvent<T> = _FormEvent<T>;
 
+  /* custom types */
+
   const useCallback: typeof _useCallback;
   const useEffect: typeof _useEffect;
   const useMemo: typeof _useMemo;
   const useReducer: typeof _useReducer;
+
+  /* custom variables */
 }
