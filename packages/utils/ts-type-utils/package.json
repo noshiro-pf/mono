@@ -6,27 +6,63 @@
   "sideEffects": false,
   "types": "ts-type-utils.d.ts",
   "scripts": {
-    "build": "run-s build:step1 build:step2 build:step3 build:step4 build:step5",
-    "build:step1": "wireit",
-    "build:step2": "sed -i.bak ./types/*.d.ts -e 's/^import.*$//g' -e 's/export //g'",
-    "build:step3": "rimraf ./types/*.bak",
-    "build:step4": "rimraf ./types/index.d.ts",
-    "build:step5": "ls types/*.d.ts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ts-type-utils.d.ts",
-    "clean": "rimraf ./types",
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
-    "pub": "yarn publish --no-git-tag-version --access=public",
+    "build": "yarn z:cmd:build:seq",
+    "clean": "rimraf ./types ./ts-type-utils.d.ts",
+    "fmt": "yarn z:cmd:prettier",
+    "lint": "yarn z:wireit:lint",
+    "lint:fix": "yarn z:wireit:lint:fix",
+    "pub": "yarn z:cmd:publish",
     "setup": "yarn build",
-    "test": "yarn type-check",
-    "type-check": "wireit"
+    "test": "yarn z:wireit:type-check",
+    "tsc": "yarn z:wireit:type-check",
+    "tscw": "yarn z:cmd:type-check --watch",
+    "z:cmd:build:seq": "run-s z:cmd:build:step1 z:cmd:build:step2 z:cmd:build:step3 z:cmd:build:step4 z:cmd:build:step5",
+    "z:cmd:build:step1": "wireit",
+    "z:cmd:build:step2": "sed -i.bak ./types/*.d.ts -e 's/^import.*$//g' -e 's/export //g'",
+    "z:cmd:build:step3": "rimraf ./types/*.bak",
+    "z:cmd:build:step4": "rimraf ./types/index.d.ts",
+    "z:cmd:build:step5": "ls types/*.d.ts | sed -E 's@(^.*$)@/// <reference path=\"./\\1\" />@g' > ts-type-utils.d.ts",
+    "z:cmd:eslint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+    "z:cmd:prettier": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "z:cmd:publish": "yarn publish --no-git-tag-version --access=public",
+    "z:cmd:type-check": "tsc -p tsconfig.type-check.json",
+    "z:no-wireit:lint": "yarn z:cmd:eslint",
+    "z:no-wireit:lint:fix": "yarn z:cmd:eslint --fix",
+    "z:no-wireit:type-check": "yarn z:cmd:type-check",
+    "z:wireit:lint": "wireit",
+    "z:wireit:lint:fix": "wireit",
+    "z:wireit:type-check": "wireit"
   },
   "wireit": {
-    "type-check": {
-      "command": "tsc -p tsconfig.type-check.json",
+    "z:cmd:build:step1": {
+      "command": "tsc --pretty --project tsconfig.build.json",
       "files": [
         "src/**/*.ts",
-        "tests/**/*.ts",
-        "tsconfig.type-check.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "tsconfig.build.json",
+        "../../../config/tsconfig/**"
+      ],
+      "output": [
+        "types/**",
+        ".tsbuildinfo"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:lint": {
+      "command": "yarn z:no-wireit:lint",
+      "dependencies": [
+        "z:wireit:type-check"
+      ],
+      "files": [
+        "src/**/*.ts",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "package.json",
+        "tsconfig.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../config/eslintrc/**",
         "../ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [],
@@ -34,17 +70,40 @@
         "yarn.lock"
       ]
     },
-    "build:step1": {
-      "command": "tsc --pretty --project tsconfig.build.json",
+    "z:wireit:lint:fix": {
+      "command": "yarn z:no-wireit:lint:fix",
+      "dependencies": [
+        "z:wireit:type-check"
+      ],
       "files": [
         "src/**/*.ts",
-        "tsconfig.build.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json"
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "package.json",
+        "tsconfig.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../config/eslintrc/**",
+        "../ts-type-utils/ts-type-utils.d.ts"
       ],
+      "clean": false,
       "output": [
-        "types/**",
-        ".tsbuildinfo"
+        "src/**/*.ts"
       ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:type-check": {
+      "command": "yarn z:no-wireit:type-check",
+      "files": [
+        "src/**/*.ts",
+        "tests/**/*.ts",
+        "tsconfig.type-check.json",
+        "../../../config/tsconfig/**",
+        "../ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
       "packageLocks": [
         "yarn.lock"
       ]
