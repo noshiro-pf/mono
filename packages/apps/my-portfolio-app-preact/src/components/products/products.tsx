@@ -1,4 +1,3 @@
-import { memoNamed } from '@noshiro/preact-utils';
 import { products } from '../../assets';
 import { ProductsElementView } from './products-element-view';
 

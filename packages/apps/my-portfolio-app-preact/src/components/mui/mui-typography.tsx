@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
 import { type ComponentChildren } from 'preact';
 
 type Props = DeepReadonly<{

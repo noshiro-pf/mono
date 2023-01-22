@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-
 export const MuiAppBar = styled('header')`
   /* Mui-paper-root */
   color: rgba(0, 0, 0, 0.87);

@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
 import { MuiCard, MuiCardContent, MuiDivider, MuiTypography } from '../mui';
 
 export const ProductsElementView = memoNamed<

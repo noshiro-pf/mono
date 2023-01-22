@@ -4,5 +4,3 @@
 
 `firebase login:ci` で FIREBASE_TOKEN 生成
 GitHub の Secrets にこれを貼る。
-
-aaa

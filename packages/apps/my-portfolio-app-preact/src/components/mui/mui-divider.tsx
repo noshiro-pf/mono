@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-
 export const MuiDivider = styled('hr')`
   border: none;
   height: 1px;
