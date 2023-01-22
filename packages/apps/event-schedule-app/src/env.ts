@@ -1,5 +1,5 @@
-export const isProduction = process.env.NODE_ENV === 'production';
-export const isDevelopment = process.env.NODE_ENV === 'development';
+export const isProduction = import.meta.env.PROD;
+export const isDevelopment = import.meta.env.DEV;
 
 export const useEmulators: boolean = true as boolean;
 export const experimentalFeature = {} as const;

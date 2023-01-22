@@ -4,11 +4,12 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "build": "run-s build:bundle build:copy-public",
+    "build": "run-s build:bundle",
     "build:bundle": "wireit",
-    "build:copy-public": "wireit",
+    "build:bundle:no-minify": "yarn z:vite:build --minify false",
     "clean": "run-p clean:*",
-    "clean:firebase": "rimraf build .firebase",
+    "clean:build": "rimraf build",
+    "clean:firebase": "rimraf .firebase",
     "clean:wireit": "rimraf .wireit",
     "cy:open": "cypress open",
     "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
@@ -19,7 +20,6 @@
     "fb:deploy:hosting": "wireit",
     "fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\" } }' > functions/.runtimeconfig.json",
     "fb:emulators:gen-runtimeconfig": "firebase functions:config:get > functions/.runtimeconfig.json",
-    "fb:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
     "fb:export": "wireit",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
@@ -27,19 +27,34 @@
     "fb:write": "node ./scripts/write_firestore",
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gi": "wireit",
-    "lint": "wireit",
-    "lint:fix": "yarn lint --fix",
-    "serve": "http-server ./build",
+    "lint": "run-p z:lint:*",
+    "lint:fix": "run-p z:lint:fix:*",
+    "preview": "yarn z:vite:preview",
+    "serve": "firebase serve",
     "setup": "run-p setup:**",
     "setup:scripts": "wireit",
     "setup:service-account-key": "wireit",
     "start:build-functions": "cd functions && yarn watch",
-    "start:dev-server": "webpack serve --config config/webpack.dev.js",
-    "start:emulators": "yarn fb:emulators:start",
+    "start:dev-server": "yarn z:vite --port 5180",
+    "start:emulators": "yarn z:firebase:emulators:start",
     "test": "wireit",
-    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
-    "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit"
+    "testw": "yarn z:vitest watch",
+    "tscw": "yarn type-check:watch",
+    "type-check": "wireit",
+    "type-check:watch": "yarn z:type-check --watch",
+    "z:eslint": "eslint --ext .ts,.tsx",
+    "z:eslint:cy": "yarn z:eslint cypress/ --cache --cache-location cypress/.eslintcache",
+    "z:eslint:src": "yarn z:eslint src/ --cache --cache-location .eslintcache",
+    "z:firebase:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
+    "z:lint:cy": "wireit",
+    "z:lint:fix:cy": "yarn z:lint:cy --fix",
+    "z:lint:fix:src": "yarn z:lint:src --fix",
+    "z:lint:src": "wireit",
+    "z:type-check": "tsc --noEmit",
+    "z:vite": "vite --config config/vite.config.ts",
+    "z:vite:build": "yarn type-check && yarn z:vite build",
+    "z:vite:preview": "yarn z:vite preview",
+    "z:vitest": "vitest --config config/vitest.config.ts --passWithNoTests"
   },
   "browserslist": {
     "production": [
@@ -84,6 +99,8 @@
     "@noshiro/global-styled-components": "*",
     "@noshiro/global-syncflow": "*",
     "@noshiro/global-syncflow-react-hooks": "*",
+    "@noshiro/global-tiny-router-observable": "*",
+    "@noshiro/global-tiny-router-react-hooks": "*",
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   },
@@ -98,7 +115,7 @@
       ]
     },
     "type-check": {
-      "command": "tsc --noEmit",
+      "command": "yarn z:type-check",
       "files": [
         "src/**/*.{ts,tsx}",
         "tsconfig.json",
@@ -111,17 +128,14 @@
       ]
     },
     "build:bundle": {
-      "command": "webpack --config config/webpack.prod.js",
+      "command": "yarn z:vite:build",
       "dependencies": [
         "../event-schedule-app-shared:build"
       ],
       "files": [
         "src/**/*",
         "tsconfig.json",
-        "config/webpack.prod.js",
-        "config/env.js",
-        "config/paths.js",
-        "../../../config/webpackconfig/react",
+        "config/vite.config.ts",
         "../../../config/tsconfig/tsconfig.react.nolib.json",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
@@ -131,9 +145,6 @@
       "packageLocks": [
         "yarn.lock"
       ]
-    },
-    "build:copy-public": {
-      "command": "cpx \"public/**\" build"
     },
     "fb:deploy": {
       "command": "firebase deploy",
@@ -161,7 +172,7 @@
       ]
     },
     "gi": {
-      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1  --ignore \"(assets|global)\"",
+      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
       "clean": false,
       "files": [
         "../../../scripts/index_ts_generator.sh",
@@ -169,8 +180,8 @@
       ],
       "packageLocks": []
     },
-    "lint": {
-      "command": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+    "z:lint:src": {
+      "command": "yarn z:eslint:src --color",
       "dependencies": [
         "type-check"
       ],
@@ -190,13 +201,36 @@
         "yarn.lock"
       ]
     },
-    "test": {
-      "command": "jest --config config/jest.config.json --passWithNoTests",
+    "z:lint:cy": {
+      "command": "yarn z:eslint:cy --color",
       "dependencies": [
         "type-check"
       ],
       "files": [
-        "config/jest.config.json",
+        "cypress/**/*.ts",
+        ".eslintignore",
+        "cypress/.eslintrc.cjs",
+        "../../../package.json",
+        "package.json",
+        "cypress/tsconfig.json",
+        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "test": {
+      "command": "yarn z:vitest run",
+      "dependencies": [
+        "type-check"
+      ],
+      "files": [
+        "config/global.ts",
+        "config/tsconfig.test.json",
+        "config/vitest.config.ts",
         "src/**"
       ],
       "packageLocks": [

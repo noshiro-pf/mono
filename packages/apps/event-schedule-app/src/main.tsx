@@ -1,46 +1,5 @@
-import {
-  AnswerPage,
-  CreateEventSchedule,
-  EditEventSchedule,
-  EventListPage,
-  Footer,
-  NotFoundPage,
-  RegisterPage,
-  SignInPage,
-} from './components';
-import { ErrorBoundary } from './error-handler';
-import { useShowPage } from './store';
+import { render } from 'react-dom';
+import { App } from './app';
+import './index.css';
 
-export const Main = memoNamed('Main', () => {
-  const show = useShowPage();
-
-  return (
-    <ErrorBoundary>
-      <Root>
-        {show.createPage ? (
-          <CreateEventSchedule />
-        ) : show.editPage ? (
-          <EditEventSchedule />
-        ) : show.answerPage ? (
-          <AnswerPage />
-        ) : show.eventListPage ? (
-          <EventListPage />
-        ) : show.registerPage ? (
-          <RegisterPage />
-        ) : show.signInPage ? (
-          <SignInPage />
-        ) : (
-          <NotFoundPage />
-        )}
-        <Footer />
-      </Root>
-    </ErrorBoundary>
-  );
-});
-
-const Root = styled.div`
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
+render(<App />, document.querySelector('#root'));

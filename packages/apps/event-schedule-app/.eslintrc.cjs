@@ -1,5 +1,4 @@
 'use strict';
-
 // @ts-check
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
@@ -138,6 +137,7 @@ const config = {
         extendDefaults: true,
       },
     ],
+    '@typescript-eslint/no-namespace': 'error', // enable in Vite project
   },
 };
 
