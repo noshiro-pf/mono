@@ -5,7 +5,11 @@
   "license": "MIT",
   "scripts": {
     "build": "wireit",
-    "clean": "rimraf build .firebase",
+    "clean": "run-p clean:**",
+    "clean:build": "rimraf build",
+    "clean:eslintcache": "rimraf .eslintcache",
+    "clean:firebase": "rimraf .firebase",
+    "clean:wireit": "rimraf .wireit",
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "lint": "wireit",
     "lint:fix": "yarn z:lint --fix",
