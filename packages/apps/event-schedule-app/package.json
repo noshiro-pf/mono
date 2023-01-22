@@ -4,9 +4,8 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "build": "run-s build:bundle",
-    "build:bundle": "wireit",
-    "build:bundle:no-minify": "yarn z:vite:build --minify false",
+    "build": "yarn z:wireit:bundle",
+    "build:no-minify": "yarn z:wireit:bundle --minify false",
     "clean": "run-p clean:**",
     "clean:build": "rimraf build",
     "clean:eslintcache": "rimraf .eslintcache",
@@ -16,46 +15,68 @@
     "cy:record": "cypress run --record --key ${CYPRESS_RECORD_KEY}",
     "cy:run:chrome": "cypress run --headed --browser chrome",
     "cy:run:firefox": "cypress run --headed --browser firefox",
-    "fb:deploy": "wireit",
-    "fb:deploy:functions": "wireit",
-    "fb:deploy:hosting": "wireit",
-    "fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\" } }' > functions/.runtimeconfig.json",
+    "fb:deploy": "yarn z:wireit:fb:deploy",
+    "fb:deploy:functions": "yarn z:wireit:fb:deploy:functions",
+    "fb:deploy:hosting": "yarn z:wireit:fb:deploy:hosting",
+    "fb:emulators:gen-dummy-runtimeconfig": "yarn z:cmd:fb:emulators:gen-dummy-runtimeconfig",
     "fb:emulators:gen-runtimeconfig": "firebase functions:config:get > functions/.runtimeconfig.json",
-    "fb:export": "wireit",
+    "fb:export": "yarn z:wireit:fb:export",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fb:login:ci": "firebase login:ci",
     "fb:write": "node ./scripts/write_firestore",
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
-    "gi": "wireit",
-    "lint": "run-p z:lint:*",
-    "lint:fix": "run-p z:lint:fix:*",
-    "preview": "yarn z:vite:preview",
+    "fmt": "yarn z:cmd:prettier",
+    "gi": "yarn z:wireit:gi",
+    "lint": "run-p z:wireit:lint:*",
+    "lint:fix": "run-p z:wireit:lint:fix:*",
+    "preview": "yarn z:cmd:vite:preview",
     "serve": "firebase serve",
     "setup": "run-p setup:**",
-    "setup:scripts": "wireit",
-    "setup:service-account-key": "wireit",
+    "setup:scripts": "yarn z:wireit:setup:scripts",
+    "setup:service-account-key": "yarn z:wireit:setup:service-account-key",
     "start:build-functions": "cd functions && yarn watch",
-    "start:dev-server": "yarn z:vite --port 5180",
-    "start:emulators": "yarn z:firebase:emulators:start",
-    "test": "wireit",
-    "testw": "yarn z:vitest watch",
-    "tscw": "yarn type-check:watch",
-    "type-check": "wireit",
-    "type-check:watch": "yarn z:type-check --watch",
-    "z:eslint": "eslint --ext .ts,.tsx",
-    "z:eslint:cy": "yarn z:eslint cypress/ --cache --cache-location cypress/.eslintcache",
-    "z:eslint:src": "yarn z:eslint src/ --cache --cache-location .eslintcache",
-    "z:firebase:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
-    "z:lint:cy": "wireit",
-    "z:lint:fix:cy": "yarn z:lint:cy --fix",
-    "z:lint:fix:src": "yarn z:lint:src --fix",
-    "z:lint:src": "wireit",
-    "z:type-check": "tsc --noEmit",
-    "z:vite": "vite --config config/vite.config.ts",
-    "z:vite:build": "yarn type-check && yarn z:vite build",
-    "z:vite:preview": "yarn z:vite preview",
-    "z:vitest": "vitest --config config/vitest.config.ts --passWithNoTests"
+    "start:dev-server": "yarn z:cmd:vite --port 5180",
+    "start:emulators": "yarn z:cmd:firebase:emulators:start",
+    "test": "yarn z:wireit:test",
+    "testw": "yarn z:cmd:vitest watch",
+    "tsc": "yarn z:wireit:type-check",
+    "tscw": "yarn z:no-wireit:type-check --watch",
+    "z:cmd:eslint": "eslint --ext .ts,.tsx",
+    "z:cmd:eslint:cy": "yarn z:cmd:eslint cypress/ --cache --cache-location cypress/.eslintcache",
+    "z:cmd:eslint:src": "yarn z:cmd:eslint src/ --cache --cache-location ./.eslintcache",
+    "z:cmd:fb:emulators:gen-dummy-runtimeconfig": "echo '{ \"gmail\": { \"email\": \"dummy@gmail.com\", \"password\": \"dummy\" } }' > functions/.runtimeconfig.json",
+    "z:cmd:firebase:emulators:start": "firebase emulators:start --only functions,firestore  --import firebase-emulator-exports --export-on-exit",
+    "z:cmd:prettier": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "z:cmd:vite": "vite --config config/vite.config.ts",
+    "z:cmd:vite:preview": "yarn z:cmd:vite preview",
+    "z:cmd:vitest": "vitest --config config/vitest.config.ts --passWithNoTests",
+    "z:no-wireit:bundle": "yarn z:cmd:vite build",
+    "z:no-wireit:fb:deploy": "firebase deploy",
+    "z:no-wireit:fb:deploy:hosting": "firebase deploy --only hosting",
+    "z:no-wireit:fb:export": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --write ./scripts/firestore_backup.json",
+    "z:no-wireit:gi": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
+    "z:no-wireit:lint:cy": "yarn z:cmd:eslint:cy --color",
+    "z:no-wireit:lint:fix:cy": "yarn z:cmd:eslint:cy --fix --color",
+    "z:no-wireit:lint:fix:src": "yarn z:cmd:eslint:src --fix --color",
+    "z:no-wireit:lint:src": "yarn z:cmd:eslint:src --color",
+    "z:no-wireit:setup:scripts": "tsc --project config/tsconfig.scripts.json",
+    "z:no-wireit:setup:service-account-key": "touch ./scripts/service-account-key.json",
+    "z:no-wireit:test": "yarn z:cmd:vitest run",
+    "z:no-wireit:type-check": "tsc --noEmit",
+    "z:wireit:bundle": "wireit",
+    "z:wireit:fb:deploy": "wireit",
+    "z:wireit:fb:deploy:functions": "wireit",
+    "z:wireit:fb:deploy:hosting": "wireit",
+    "z:wireit:fb:export": "wireit",
+    "z:wireit:gi": "wireit",
+    "z:wireit:lint:cy": "wireit",
+    "z:wireit:lint:fix:cy": "wireit",
+    "z:wireit:lint:fix:src": "wireit",
+    "z:wireit:lint:src": "wireit",
+    "z:wireit:setup:scripts": "wireit",
+    "z:wireit:setup:service-account-key": "wireit",
+    "z:wireit:test": "wireit",
+    "z:wireit:type-check": "wireit"
   },
   "browserslist": {
     "production": [
@@ -106,38 +127,17 @@
     "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
-    "setup:service-account-key": {
-      "command": "touch ./scripts/service-account-key.json"
-    },
-    "setup:scripts": {
-      "command": "tsc --project config/tsconfig.scripts.json",
+    "z:wireit:bundle": {
+      "command": "yarn z:no-wireit:bundle",
       "dependencies": [
-        "setup:service-account-key"
-      ]
-    },
-    "type-check": {
-      "command": "yarn z:type-check",
-      "files": [
-        "src/**/*.{ts,tsx}",
-        "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.react.nolib.json",
-        "../../utils/ts-type-utils/ts-type-utils.d.ts"
-      ],
-      "output": [],
-      "packageLocks": [
-        "yarn.lock"
-      ]
-    },
-    "build:bundle": {
-      "command": "yarn z:vite:build",
-      "dependencies": [
-        "../event-schedule-app-shared:build"
+        "../event-schedule-app-shared:build",
+        "z:no-wireit:type-check"
       ],
       "files": [
         "src/**/*",
         "tsconfig.json",
         "config/vite.config.ts",
-        "../../../config/tsconfig/tsconfig.react.nolib.json",
+        "../../../config/tsconfig/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [
@@ -147,33 +147,33 @@
         "yarn.lock"
       ]
     },
-    "fb:deploy": {
-      "command": "firebase deploy",
+    "z:wireit:fb:deploy": {
+      "command": "yarn z:no-wireit:fb:deploy",
       "dependencies": [
         "build",
         "./functions:build"
       ]
     },
-    "fb:deploy:functions": {
-      "command": "firebase deploy --only functions",
+    "z:wireit:fb:deploy:functions": {
+      "command": "yarn z:no-wireit:fb:deploy:functions",
       "dependencies": [
         "./functions:build"
       ]
     },
-    "fb:deploy:hosting": {
-      "command": "firebase deploy --only hosting",
+    "z:wireit:fb:deploy:hosting": {
+      "command": "yarn z:no-wireit:fb:deploy:hosting",
       "dependencies": [
         "build"
       ]
     },
-    "fb:export": {
-      "command": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --write ./scripts/firestore_backup.json",
+    "z:wireit:fb:export": {
+      "command": "yarn z:no-wireit:fb:export",
       "dependencies": [
-        "setup:scripts"
+        "z:wireit:setup:scripts"
       ]
     },
-    "gi": {
-      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
+    "z:wireit:gi": {
+      "command": "yarn z:no-wireit:gi",
       "clean": false,
       "files": [
         "../../../scripts/index_ts_generator.sh",
@@ -181,19 +181,32 @@
       ],
       "packageLocks": []
     },
-    "z:lint:src": {
-      "command": "yarn z:eslint:src --color",
+    "z:wireit:type-check": {
+      "command": "yarn z:no-wireit:type-check",
+      "files": [
+        "src/**/*.{ts,tsx}",
+        "tsconfig.json",
+        "../../../config/tsconfig/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:lint:src": {
+      "command": "yarn z:no-wireit:lint:src",
       "dependencies": [
-        "type-check"
+        "tsc"
       ],
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
         ".eslintrc.cjs",
-        "../../../package.json",
         "package.json",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.react.nolib.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
         "../../../config/eslintrc/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
@@ -202,19 +215,43 @@
         "yarn.lock"
       ]
     },
-    "z:lint:cy": {
-      "command": "yarn z:eslint:cy --color",
+    "z:wireit:lint:fix:src": {
+      "command": "yarn z:no-wireit:lint:fix:src",
       "dependencies": [
-        "type-check"
+        "tsc"
+      ],
+      "files": [
+        "src/**/*.{ts,tsx}",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "package.json",
+        "tsconfig.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "clean": false,
+      "output": [
+        "src/**/*.{ts,tsx}"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:lint:cy": {
+      "command": "yarn z:no-wireit:lint:cy",
+      "dependencies": [
+        "tsc"
       ],
       "files": [
         "cypress/**/*.ts",
-        ".eslintignore",
         "cypress/.eslintrc.cjs",
-        "../../../package.json",
-        "package.json",
         "cypress/tsconfig.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "package.json",
+        ".eslintignore",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
         "../../../config/eslintrc/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
@@ -223,10 +260,43 @@
         "yarn.lock"
       ]
     },
-    "test": {
-      "command": "yarn z:vitest run",
+    "z:wireit:lint:fix:cy": {
+      "command": "yarn z:no-wireit:lint:fix:cy",
       "dependencies": [
-        "type-check"
+        "tsc"
+      ],
+      "files": [
+        "cypress/**/*.ts",
+        "cypress/.eslintrc.cjs",
+        "cypress/tsconfig.json",
+        "package.json",
+        ".eslintignore",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "clean": false,
+      "output": [
+        "cypress/**/*.ts"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:setup:scripts": {
+      "command": "yarn z:no-wireit:setup:scripts",
+      "dependencies": [
+        "setup:service-account-key"
+      ]
+    },
+    "z:wireit:setup:service-account-key": {
+      "command": "yarn z:no-wireit:setup:service-account-key"
+    },
+    "z:wireit:test": {
+      "command": "yarn z:no-wireit:test",
+      "dependencies": [
+        "tsc"
       ],
       "files": [
         "config/global.ts",
