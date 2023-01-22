@@ -114,8 +114,19 @@ const typescriptEslintRules = {
   '@typescript-eslint/consistent-indexed-object-style': 'error',
   '@typescript-eslint/consistent-type-assertions': 'error',
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'], // modified
-  '@typescript-eslint/consistent-type-imports': 'error',
-  '@typescript-eslint/consistent-type-exports': 'error',
+  '@typescript-eslint/consistent-type-imports': [
+    // relates to import/consistent-type-specifier-style rule
+    'error',
+    {
+      prefer: 'type-imports',
+      fixStyle: 'inline-type-imports',
+      disallowTypeAnnotations: true,
+    },
+  ],
+  '@typescript-eslint/consistent-type-exports': [
+    'error',
+    { fixMixedExportsWithInlineTypeSpecifier: true },
+  ],
   '@typescript-eslint/default-param-last': 'error',
   '@typescript-eslint/dot-notation': [
     'error',

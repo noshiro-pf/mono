@@ -43,7 +43,10 @@ const eslintImportsRules = {
   'import/no-cycle': 'error',
   'import/no-useless-path-segments': 'error',
   'import/no-relative-parent-imports': 'off',
-  'import/consistent-type-specifier-style': 'off', // dup of @typescript-eslint/consistent-type-imports
+
+  // relates to @typescript-eslint/consistent-type-imports rule
+  'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
+
   'import/no-relative-packages': 'error',
 
   // helpfulWarnings
