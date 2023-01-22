@@ -1,4 +1,3 @@
-import { memoNamed } from '@noshiro/preact-utils';
 import { writings } from '../../assets';
 import { WritingsElement } from './writings-element';
 
