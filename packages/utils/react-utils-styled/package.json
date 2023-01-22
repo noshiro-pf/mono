@@ -10,7 +10,10 @@
   "scripts": {
     "build": "run-p build:**",
     "build:esm": "wireit",
-    "clean": "rimraf esm .wireit",
+    "clean": "run-p clean:**",
+    "clean:build": "rimraf esm",
+    "clean:eslintcache": "rimraf .eslintcache",
+    "clean:wireit": "rimraf .wireit",
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "gi": "wireit",
     "lint": "wireit",

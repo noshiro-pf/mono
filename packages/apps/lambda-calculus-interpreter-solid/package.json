@@ -6,7 +6,10 @@
   "scripts": {
     "build:dev": "wireit",
     "clean": "run-p clean:**",
-    "clean:build": "wireit",
+    "clean:build": "rimraf build",
+    "clean:eslintcache": "rimraf .eslintcache",
+    "clean:firebase": "rimraf .firebase",
+    "clean:wireit": "rimraf .wireit",
     "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
     "lint": "wireit",
     "lint:fix": "yarn z:lint --fix",
@@ -65,10 +68,6 @@
       "packageLocks": [
         "yarn.lock"
       ]
-    },
-    "clean:build": {
-      "command": "rimraf build",
-      "packageLocks": []
     },
     "lint": {
       "command": "yarn z:lint",

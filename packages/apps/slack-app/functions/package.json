@@ -6,7 +6,11 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "wireit",
-    "clean": "rimraf dist",
+    "clean": "run-p clean:**",
+    "clean:build": "rimraf dist",
+    "clean:eslintcache": "rimraf .eslintcache",
+    "clean:firebase": "rimraf .firebase",
+    "clean:wireit": "rimraf .wireit",
     "config:get": "firebase functions:config:get",
     "config:set": "firebase functions:config:set",
     "config:setapikey": "firebase functions:config:set slack.apikey=",
