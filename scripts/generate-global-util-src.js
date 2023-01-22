@@ -55,7 +55,12 @@ const generateGlobalsDecl = (packageName, importsList, typeImportsList) =>
       return `type ${s}${paramsDestStr} = _${s}${paramsSrcStr};`;
     }),
     '',
+    '/* custom types */',
+    '',
     ...importsList.map((s) => `const ${s}: typeof _${s};`),
+    '',
+    '/* custom variables */',
+    '',
     '}',
   ].join('\n');
 

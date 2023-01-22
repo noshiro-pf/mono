@@ -10,6 +10,8 @@ import type {
 } from '@noshiro/preact-utils';
 
 declare global {
+  /* custom types */
+
   const memoNamed: typeof _memoNamed;
   const useAlive: typeof _useAlive;
   const useBoolState: typeof _useBoolState;
@@ -18,4 +20,6 @@ declare global {
   const useTinyObservable: typeof _useTinyObservable;
   const useTinyObservableEffect: typeof _useTinyObservableEffect;
   const useTinyObservableValue: typeof _useTinyObservableValue;
+
+  /* custom variables */
 }

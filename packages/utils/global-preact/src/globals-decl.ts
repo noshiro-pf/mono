@@ -11,8 +11,12 @@ declare global {
   type Reducer<S, A> = _Reducer<S, A>;
   type CSSProperties = _CSSProperties;
 
+  /* custom types */
+
   const useCallback: typeof _useCallback;
   const useEffect: typeof _useEffect;
   const useMemo: typeof _useMemo;
   const useReducer: typeof _useReducer;
+
+  /* custom variables */
 }

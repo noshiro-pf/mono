@@ -17,6 +17,8 @@ declare global {
   type QueryParams = _QueryParams;
   type Router = _Router;
 
+  /* custom types */
+
   const back: typeof _back;
   const pathname$: typeof _pathname$;
   const push: typeof _push;
@@ -27,4 +29,6 @@ declare global {
   const useQueryParams: typeof _useQueryParams;
   const useRouterLinkClick: typeof _useRouterLinkClick;
   const withSlash: typeof _withSlash;
+
+  /* custom variables */
 }

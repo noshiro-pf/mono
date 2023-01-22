@@ -10,6 +10,8 @@ import type {
 } from '@noshiro/syncflow-react-hooks';
 
 declare global {
+  /* custom types */
+
   const useEventObservable: typeof _useEventObservable;
   const useObservable: typeof _useObservable;
   const useObservableEffect: typeof _useObservableEffect;
@@ -18,4 +20,6 @@ declare global {
   const useObservableValue: typeof _useObservableValue;
   const useValueAsObservable: typeof _useValueAsObservable;
   const useVoidEventObservable: typeof _useVoidEventObservable;
+
+  /* custom variables */
 }

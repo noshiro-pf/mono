@@ -76,6 +76,8 @@ declare global {
   type TinyObservable<T> = _TinyObservable<T>;
   type TinyObservableSource<T> = _TinyObservableSource<T>;
 
+  /* custom types */
+
   const Arr: typeof _Arr;
   const ArrayUtils: typeof _ArrayUtils;
   const assertNotType: typeof _assertNotType;
@@ -126,4 +128,6 @@ declare global {
   const Str: typeof _Str;
   const toBoolean: typeof _toBoolean;
   const tp: typeof _tp;
+
+  /* custom variables */
 }
