@@ -8,7 +8,7 @@ export type RoomRemote = DeepReadonly<{
   password: string | undefined;
   players: Player[];
   shuffleDef: PermutationString<'0123'>;
-  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   state: 'not-started' | 'playing' | 'finished';
   // firestore が多重配列に対応していないのでオブジェクト化する
   playerCards: {
@@ -24,7 +24,7 @@ export type Room = DeepReadonly<{
   password: string | undefined;
   players: Player[];
   shuffleDef: PermutationString<'0123'>;
-  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   state: 'not-started' | 'playing' | 'finished';
   playerCards: ArrayOfLength<4, ArrayOfLength<6, Card>>;
 }>;

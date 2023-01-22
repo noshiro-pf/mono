@@ -1,6 +1,6 @@
 import * as t from '@noshiro/io-ts';
 
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
+/* eslint-disable @typescript-eslint/sort-type-constituents */
 
 // prettier-ignore
 const answersScoreTypeDef = t.union({

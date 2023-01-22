@@ -27,7 +27,7 @@ interface ISetInterface<K> {
   // Sequence algorithms
   map: <K2>(mapFn: (key: K) => K2) => ISet<K2>;
 
-  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   filter: (<K2 extends K>(predicate: (key: K) => key is K2) => ISet<K2>) &
     ((predicate: (key: K) => boolean) => ISet<K>);
 

@@ -82,7 +82,6 @@ const eslintReactRules = {
    */
   'react/jsx-props-no-spreading': 'error', // modified
 
-  'react/jsx-sort-default-props': 'off', // deprecated
   'react/jsx-sort-props': [
     'error',
     { callbacksLast: true, reservedFirst: true },
@@ -114,6 +113,7 @@ const eslintReactRules = {
   'react/no-unescaped-entities': 'error',
   'react/no-unknown-property': 'error',
   'react/no-unsafe': 'error',
+  'react/no-object-type-as-default-prop': 'error',
   'react/no-unstable-nested-components': 'error',
   'react/no-unused-class-component-methods': 'error',
   'react/no-unused-prop-types': 'error',
@@ -135,6 +135,7 @@ const eslintReactRules = {
   'react/require-render-return': 'error',
   'react/self-closing-comp': 'error',
   'react/sort-comp': 'error',
+  'react/sort-default-props': 'error',
   'react/sort-prop-types': 'error',
   'react/state-in-constructor': 'error',
   'react/static-property-placement': 'error',
@@ -143,6 +144,7 @@ const eslintReactRules = {
   'react/jsx-no-leaked-render': 'error',
 
   // deprecated
+  'react/jsx-sort-default-props': 'off',
   'react/jsx-space-before-closing': 'off',
 };
 

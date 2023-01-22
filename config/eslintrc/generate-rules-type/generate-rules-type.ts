@@ -17,7 +17,7 @@ const compilerConfig = {
 
 const toCapitalCase = (str: string): string =>
   str
-    .replace(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
+    .replaceAll(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
     .replace(/^./u, (x) => x[0]?.toUpperCase() ?? str);
 
 const normalizeToSchemaArray = (
@@ -139,7 +139,7 @@ const createResult = async (
 ): Promise<string> => {
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
-    '/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */',
+    '/* eslint-disable @typescript-eslint/sort-type-constituents */',
     "import type { Linter } from 'eslint';",
     ...(schemaList.some(({ schema }) => schema.length === 1)
       ? [

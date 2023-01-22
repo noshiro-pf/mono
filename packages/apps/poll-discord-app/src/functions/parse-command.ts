@@ -5,7 +5,7 @@ export const rpParseCommand = (command: string): readonly string[] =>
   command
     .split('"')
     .filter((_, i) => i % 2 === 1)
-    .map((s) => s.replace(/\n/gu, ' ').replace(/\t/gu, ' '));
+    .map((s) => s.replaceAll('\n', ' ').replaceAll('\t', ' '));
 
 export const rp3060ParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
@@ -112,7 +112,7 @@ export const gpParseGroupingCommandArgument = (
     commandArguments
       .split('"')
       .filter((_, i) => i % 2 === 1)
-      .map((s) => s.replace(/\n/gu, ' ').replace(/\t/gu, ' ')),
+      .map((s) => s.replaceAll('\n', ' ').replaceAll('\t', ' ')),
   ]);
 };
 

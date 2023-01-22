@@ -1,5 +1,5 @@
 /* cSpell:disable */
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
+/* eslint-disable @typescript-eslint/sort-type-constituents */
 import type { Linter } from 'eslint';
 
 /**
@@ -68,7 +68,7 @@ namespace PreferFlatMap {
 }
 
 /**
- * @description Prefer using .flat() over concating to flatten an array.
+ * @description Prefer using .flat() over concatenating to flatten an array.
  *
  *  | key         | value      |
  *  | :---------- | :--------- |

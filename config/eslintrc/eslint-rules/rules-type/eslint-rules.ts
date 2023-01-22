@@ -1,5 +1,5 @@
 /* cSpell:disable */
-/* eslint-disable @typescript-eslint/sort-type-union-intersection-members */
+/* eslint-disable @typescript-eslint/sort-type-constituents */
 import type { Linter } from 'eslint';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1481,7 +1481,7 @@ namespace Eqeqeq {
 }
 
 /**
- * @description Enforce "for" loop update clause moving the counter in the right direction.
+ * @description Enforce "for" loop update clause moving the counter in the right direction
  * @link https://eslint.org/docs/rules/for-direction
  *
  *  | key         | value   |
@@ -6178,10 +6178,11 @@ namespace NoElseReturn {
  * @description Disallow empty block statements
  * @link https://eslint.org/docs/rules/no-empty
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | true       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
  */
 namespace NoEmpty {
   /**
@@ -6296,6 +6297,19 @@ namespace NoEmptyFunction {
  *  | recommended | true    |
  */
 namespace NoEmptyPattern {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * @description Disallow empty static blocks
+ * @link https://eslint.org/docs/rules/no-empty-static-block
+ *
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | recommended | false      |
+ */
+namespace NoEmptyStaticBlock {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -6536,6 +6550,9 @@ namespace NoExtraParens {
    *             },
    *             "enforceForFunctionPrototypeMethods": {
    *               "type": "boolean"
+   *             },
+   *             "allowParensAfterCommentPattern": {
+   *               "type": "string"
    *             }
    *           },
    *           "additionalProperties": false
@@ -6564,6 +6581,7 @@ namespace NoExtraParens {
           readonly enforceForSequenceExpressions?: boolean;
           readonly enforceForNewInMemberExpressions?: boolean;
           readonly enforceForFunctionPrototypeMethods?: boolean;
+          readonly allowParensAfterCommentPattern?: string;
         }
       ];
 
@@ -7188,6 +7206,10 @@ namespace NoMagicNumbers {
    *       "ignoreDefaultValues": {
    *         "type": "boolean",
    *         "default": false
+   *       },
+   *       "ignoreClassFieldInitialValues": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -7201,6 +7223,7 @@ namespace NoMagicNumbers {
     readonly ignore?: readonly (number | string)[];
     readonly ignoreArrayIndexes?: boolean;
     readonly ignoreDefaultValues?: boolean;
+    readonly ignoreClassFieldInitialValues?: boolean;
   };
 
   export type RuleEntry =
@@ -7708,6 +7731,19 @@ namespace NoNew {
  *  | recommended | false      |
  */
 namespace NoNewFunc {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
+ * @description Disallow `new` operators with global non-constructor functions
+ * @link https://eslint.org/docs/rules/no-new-native-nonconstructor
+ *
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | recommended | false   |
+ */
+namespace NoNewNativeNonconstructor {
   export type RuleEntry = Linter.RuleLevel;
 }
 
@@ -8615,10 +8651,11 @@ namespace NoReturnAssign {
  * @description Disallow unnecessary `return await`
  * @link https://eslint.org/docs/rules/no-return-await
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  */
 namespace NoReturnAwait {
   export type RuleEntry = Linter.RuleLevel;
@@ -9110,6 +9147,14 @@ namespace NoUnderscoreDangle {
    *       "enforceInClassFields": {
    *         "type": "boolean",
    *         "default": false
+   *       },
+   *       "allowInArrayDestructuring": {
+   *         "type": "boolean",
+   *         "default": true
+   *       },
+   *       "allowInObjectDestructuring": {
+   *         "type": "boolean",
+   *         "default": true
    *       }
    *     },
    *     "additionalProperties": false
@@ -9125,6 +9170,8 @@ namespace NoUnderscoreDangle {
     readonly enforceInMethodNames?: boolean;
     readonly allowFunctionParams?: boolean;
     readonly enforceInClassFields?: boolean;
+    readonly allowInArrayDestructuring?: boolean;
+    readonly allowInObjectDestructuring?: boolean;
   };
 
   export type RuleEntry =
@@ -11191,10 +11238,11 @@ namespace PreferExponentiationOperator {
  * @description Enforce using named capture group in regular expression
  * @link https://eslint.org/docs/rules/prefer-named-capture-group
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  */
 namespace PreferNamedCaptureGroup {
   export type RuleEntry = Linter.RuleLevel;
@@ -11229,7 +11277,7 @@ namespace PreferObjectHasOwn {
 }
 
 /**
- * @description Disallow using Object.assign with an object literal as the first argument and prefer the use of object spread instead.
+ * @description Disallow using Object.assign with an object literal as the first argument and prefer the use of object spread instead
  * @link https://eslint.org/docs/rules/prefer-object-spread
  *
  *  | key         | value      |
@@ -13090,6 +13138,7 @@ export type EslintRules = {
   readonly 'no-empty-character-class': NoEmptyCharacterClass.RuleEntry;
   readonly 'no-empty-function': NoEmptyFunction.RuleEntry;
   readonly 'no-empty-pattern': NoEmptyPattern.RuleEntry;
+  readonly 'no-empty-static-block': NoEmptyStaticBlock.RuleEntry;
   readonly 'no-eq-null': NoEqNull.RuleEntry;
   readonly 'no-eval': NoEval.RuleEntry;
   readonly 'no-ex-assign': NoExAssign.RuleEntry;
@@ -13131,6 +13180,7 @@ export type EslintRules = {
   readonly 'no-nested-ternary': NoNestedTernary.RuleEntry;
   readonly 'no-new': NoNew.RuleEntry;
   readonly 'no-new-func': NoNewFunc.RuleEntry;
+  readonly 'no-new-native-nonconstructor': NoNewNativeNonconstructor.RuleEntry;
   readonly 'no-new-object': NoNewObject.RuleEntry;
   readonly 'no-new-symbol': NoNewSymbol.RuleEntry;
   readonly 'no-new-wrappers': NoNewWrappers.RuleEntry;

@@ -3,7 +3,7 @@ import type { Card } from './card-type';
 import { isCard } from './card-type';
 
 export type GameStateAction = Readonly<
-  // eslint-disable-next-line @typescript-eslint/sort-type-union-intersection-members
+  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   | { timestamp: FieldValue; type: 'selectMyCard'; card: Card }
   | { timestamp: FieldValue; type: 'cancelToss' }
   | { timestamp: FieldValue; type: 'submitToss' }
