@@ -15,10 +15,7 @@ const varName = 'Preact';
 
 const importsList = ['useCallback', 'useEffect', 'useMemo', 'useReducer'];
 
-const typeImportsList = [
-  { name: 'Reducer', params: ['S', 'A'] },
-  { name: 'CSSProperties', params: [] },
-];
+const typeImportsList = [{ name: 'Reducer', params: ['S', 'A'] }];
 
 const main = async () => {
   const rootDir = join(__dirname, '../');
@@ -27,10 +24,14 @@ const main = async () => {
     writeFileAsync(
       `${rootDir}/src/globals-decl.ts`,
       [
-        "import type { CSSProperties as _CSSProperties } from 'react';",
+        "import { type JSX } from 'preact';",
         generateGlobalsDecl(packageName, importsList, typeImportsList).replace(
-          'CSSProperties as _CSSProperties,',
-          ''
+          '/* custom types */',
+          [
+            '/* custom types */',
+            'type CSSProperties = JSX.CSSProperties;',
+            'type GenericEventHandler<Target extends EventTarget> = JSX.GenericEventHandler<Target>;',
+          ].join('\n')
         ),
       ].join('\n')
     ),
