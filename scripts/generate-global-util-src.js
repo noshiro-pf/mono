@@ -36,9 +36,9 @@ const generateGlobalsForJest = (packageName, importsList) =>
 const generateGlobalsDecl = (packageName, importsList, typeImportsList) =>
   [
     // imports
-    'import type {',
-    ...typeImportsList.map(({ name: s }) => `${s} as _${s},`),
-    ...importsList.map((s) => `${s} as _${s},`),
+    'import {',
+    ...typeImportsList.map(({ name: s }) => `type ${s} as _${s},`),
+    ...importsList.map((s) => `type ${s} as _${s},`),
     `} from '${packageName}';`,
 
     '',
