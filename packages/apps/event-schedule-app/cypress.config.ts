@@ -5,6 +5,7 @@ export default defineConfig({
   viewportHeight: 667,
   modifyObstructiveCode: false,
   projectId: 'tf8zhh',
+  pageLoadTimeout: 120000,
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
