@@ -1,7 +1,5 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { BpButton, BpInput } from '@noshiro/react-blueprintjs-utils';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { denom, separator } from '../constants';
 import { toPercentString } from '../functions';
 import { type ResultRow } from '../types';

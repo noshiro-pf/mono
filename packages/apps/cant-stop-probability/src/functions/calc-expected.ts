@@ -22,6 +22,6 @@ import { type Count } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const calcExpected = (count: Count): number => {
-  const { noLine, oneLine, twoLine } = count as { [K in keyof Count]: number };
+  const { noLine, oneLine, twoLine } = count;
   return Math.floor((oneLine + 2 * twoLine) / noLine);
 };
