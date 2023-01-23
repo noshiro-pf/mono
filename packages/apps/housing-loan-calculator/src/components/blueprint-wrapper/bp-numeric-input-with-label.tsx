@@ -1,5 +1,4 @@
 import { Label, NumericInput } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 
 type Props = Readonly<{
   label: string;
