@@ -1,11 +1,11 @@
 import { setup } from '@noshiro/goober';
 import { h, render } from 'preact';
-import { Main } from './components';
+import { App } from './components';
 import './index.css';
 
 setup(h);
 
-const root = document.querySelector('#root');
+const root = document.querySelector('#app');
 if (root !== null) {
-  render(<Main />, root);
+  render(<App />, root);
 }

@@ -3,12 +3,6 @@ import {
   parseLambdaTerm,
   termToString,
 } from '@noshiro/lambda-calculus-interpreter-core';
-import { debounceTimeI, mapI } from '@noshiro/syncflow';
-import {
-  useObservable,
-  useObservableState,
-  useObservableValue,
-} from '@noshiro/syncflow-preact-hooks';
 
 export const useLambdaEval = (
   initialInput: string,
