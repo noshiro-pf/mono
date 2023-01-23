@@ -1,9 +1,7 @@
-import { styled } from '@noshiro/goober';
-import { memoNamed } from '@noshiro/preact-utils';
 import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';
 
-export const Main = memoNamed('Main', () => {
+export const App = memoNamed('App', () => {
   const { inputAreaString, outputAreaString, setInputAreaString } =
     useLambdaEval('((+ 2) 3)', 'Parse error.');
 
