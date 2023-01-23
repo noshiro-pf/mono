@@ -1,4 +1,4 @@
-import type { Variable } from '../types';
+import { type Variable } from '../types';
 
 export const isVariable = (term: unknown): term is Variable => {
   /* "x" -> true, ["lambda", "x", "x"] -> false */

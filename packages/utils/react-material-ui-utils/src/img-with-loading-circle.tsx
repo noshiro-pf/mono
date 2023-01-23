@@ -1,7 +1,6 @@
 import { CircularProgress } from '@material-ui/core';
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import type { CSSProperties } from 'react';
-import { useMemo } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`

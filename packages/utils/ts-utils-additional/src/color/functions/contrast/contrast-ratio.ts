@@ -1,4 +1,4 @@
-import type { Hsl, Rgb } from '../../types';
+import { type Hsl, type Rgb } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
 import { relativeLuminance } from './relative-luminance';
 

@@ -1,4 +1,4 @@
-import type { AnswerFilterState } from '../../../functions';
+import { type AnswerFilterState } from '../../../functions';
 import { AnswerFilterAndSortStore } from '../../../store';
 import { BpDateRangeInput, CheckboxView } from '../../bp';
 import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled';

@@ -1,4 +1,4 @@
-import type { LambdaTerm } from '../../types';
+import { type LambdaTerm } from '../../types';
 import { isAlphaEqual } from '../is-alpha-equal';
 import { isNumber, PLUS, SUCC } from '../parser';
 

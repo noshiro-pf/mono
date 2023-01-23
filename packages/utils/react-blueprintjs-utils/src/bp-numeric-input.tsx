@@ -1,8 +1,13 @@
 import { NumericInput } from '@blueprintjs/core';
 import { memoNamed, useState } from '@noshiro/react-utils';
 import { Str } from '@noshiro/ts-utils';
-import type { ComponentProps, CSSProperties, FocusEventHandler } from 'react';
-import { useCallback, useEffect } from 'react';
+import {
+  useCallback,
+  useEffect,
+  type ComponentProps,
+  type CSSProperties,
+  type FocusEventHandler,
+} from 'react';
 
 type NumericInputPropsOriginal = ComponentProps<typeof NumericInput>;
 

@@ -1,6 +1,9 @@
 import { yearMonthDateInitialValue } from '../../constants';
-import type { DatetimeListReducerAction } from '../../functions';
-import { datetimeListReducer, getMostFrequentTimeRange } from '../../functions';
+import {
+  datetimeListReducer,
+  getMostFrequentTimeRange,
+  type DatetimeListReducerAction,
+} from '../../functions';
 
 type SelectDatetimesHooks = DeepReadonly<{
   selectedDates: YearMonthDate[];

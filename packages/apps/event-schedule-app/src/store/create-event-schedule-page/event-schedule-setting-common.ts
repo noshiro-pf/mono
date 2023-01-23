@@ -10,11 +10,11 @@ import {
   validateEventSchedule,
   validateEventScheduleAll,
 } from '../../functions';
-import type {
-  EventScheduleSettingCommonState,
-  EventScheduleSettingCommonStateHandler,
-  EventScheduleValidation,
-  NotificationSettingsWithEmail,
+import {
+  type EventScheduleSettingCommonState,
+  type EventScheduleSettingCommonStateHandler,
+  type EventScheduleValidation,
+  type NotificationSettingsWithEmail,
 } from '../../types';
 import { mapNoneToUndefined } from '../../utils';
 import { Auth } from '../auth';

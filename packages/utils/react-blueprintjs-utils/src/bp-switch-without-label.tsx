@@ -1,6 +1,6 @@
 import { Switch } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { ComponentProps, CSSProperties } from 'react';
+import { type ComponentProps, type CSSProperties } from 'react';
 
 type SwitchPropsOriginal = ComponentProps<typeof Switch>;
 

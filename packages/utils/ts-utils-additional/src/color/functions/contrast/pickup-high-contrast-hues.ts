@@ -1,6 +1,6 @@
 import { Arr, castWritable, Num, pipe } from '@noshiro/ts-utils';
-import type { Percent } from '../../../types';
-import type { Hue } from '../../types';
+import { type Percent } from '../../../types';
+import { type Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc';
 import { relativeLuminance } from './relative-luminance';

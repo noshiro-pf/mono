@@ -1,4 +1,3 @@
-import type { InputState, PasswordWithConfirmationState } from '../input-state';
 import {
   inputHasError,
   inputInitialState,
@@ -6,6 +5,8 @@ import {
   passwordWithConfirmationHasError,
   passwordWithConfirmationInitialState,
   passwordWithConfirmationStateReducer,
+  type InputState,
+  type PasswordWithConfirmationState,
 } from '../input-state';
 
 export type UpdatePasswordPageState = Readonly<{

@@ -1,11 +1,11 @@
 import { assertNotType, assertType, Maybe } from '@noshiro/ts-utils';
-import type {
-  AsyncChildObservable,
-  ChildObservable,
-  Observable,
-  ObservableBase,
-  RootObservable,
-  SyncChildObservable,
+import {
+  type AsyncChildObservable,
+  type ChildObservable,
+  type Observable,
+  type ObservableBase,
+  type RootObservable,
+  type SyncChildObservable,
 } from '../types';
 import {
   AsyncChildObservableClass,

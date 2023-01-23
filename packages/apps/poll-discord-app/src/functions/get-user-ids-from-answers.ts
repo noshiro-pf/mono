@@ -1,4 +1,4 @@
-import type { Poll, UserId } from '../types';
+import { type Poll, type UserId } from '../types';
 
 export const getUserIdsFromAnswers = (answers: Poll['answers']): ISet<UserId> =>
   ISet.new<UserId>([]).withMutations(

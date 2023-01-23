@@ -1,6 +1,6 @@
 import { styled } from '@noshiro/goober';
 import { memoNamed } from '@noshiro/preact-utils';
-import type { ComponentChildren } from 'preact';
+import { type ComponentChildren } from 'preact';
 
 type Props = DeepReadonly<{
   // eslint-disable-next-line @typescript-eslint/sort-type-constituents

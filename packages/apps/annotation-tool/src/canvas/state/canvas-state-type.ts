@@ -1,7 +1,7 @@
-import type { Point, Rect } from '@noshiro/ts-utils-additional';
-import type { Sprite } from 'pixi.js';
-import type { Direction } from '../functions';
-import type { PixiBbox, PixiTempRect } from '../types';
+import { type Point, type Rect } from '@noshiro/ts-utils-additional';
+import { type Sprite } from 'pixi.js';
+import { type Direction } from '../functions';
+import { type PixiBbox, type PixiTempRect } from '../types';
 
 export type CanvasAppState = {
   pointerPos: Writable<Point>;

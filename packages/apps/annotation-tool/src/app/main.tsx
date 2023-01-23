@@ -3,13 +3,22 @@ import {
   useBoolState,
   useStateWithMapFn,
 } from '@noshiro/react-utils';
-import type { Hue, Percent, RectSize } from '@noshiro/ts-utils-additional';
-import { pickupHighContrastHues } from '@noshiro/ts-utils-additional';
+import {
+  pickupHighContrastHues,
+  type Hue,
+  type Percent,
+  type RectSize,
+} from '@noshiro/ts-utils-additional';
 import { useMemo, useReducer } from 'react';
 import styled from 'styled-components';
-import type { AnnotationCanvasStyle, IdType, Label } from '../canvas';
-import { AnnotationCanvas, defaultAnnotationCanvasStyle } from '../canvas';
-import type { AppEventHandler } from './event-handlers';
+import {
+  AnnotationCanvas,
+  defaultAnnotationCanvasStyle,
+  type AnnotationCanvasStyle,
+  type IdType,
+  type Label,
+} from '../canvas';
+import { type AppEventHandler } from './event-handlers';
 import { Sidebar, visibleLabelsReducer } from './sidebar';
 
 const canvasSize: RectSize = {

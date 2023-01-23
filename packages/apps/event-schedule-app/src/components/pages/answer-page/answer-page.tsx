@@ -1,5 +1,10 @@
-import type { TagProps } from '@blueprintjs/core';
-import { Button, Icon, Spinner, TagInput } from '@blueprintjs/core';
+import {
+  Button,
+  Icon,
+  Spinner,
+  TagInput,
+  type TagProps,
+} from '@blueprintjs/core';
 import html2canvas from 'html2canvas';
 import { useRef } from 'react';
 import { eventIsAfterDeadline } from '../../../functions';

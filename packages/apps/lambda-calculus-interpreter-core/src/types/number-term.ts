@@ -1,5 +1,5 @@
-import type { LambdaTerm } from './lambda-term';
-import type { Variable } from './variable';
+import { type LambdaTerm } from './lambda-term';
+import { type Variable } from './variable';
 
 export type NumberTerm<S extends Variable, Z extends Variable> = readonly [
   'lambda',

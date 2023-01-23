@@ -1,6 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import type { AnswerIconPoint } from '../../enum';
-import { answerIconPointTypeDef } from '../../enum';
+import { answerIconPointTypeDef, type AnswerIconPoint } from '../../enum';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const answerIconSettingTypeDef = <D extends AnswerIconPoint>(

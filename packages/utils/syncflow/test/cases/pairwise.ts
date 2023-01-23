@@ -1,7 +1,12 @@
-import type { Observable } from '../../src';
-import { interval, pairwise, take, withInitialValue } from '../../src';
+import {
+  interval,
+  pairwise,
+  take,
+  withInitialValue,
+  type Observable,
+} from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number

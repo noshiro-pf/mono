@@ -1,7 +1,6 @@
 import { useState } from '@noshiro/react-utils';
 import { Arr } from '@noshiro/ts-utils';
-import type { RefObject } from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type RefObject } from 'react';
 import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
 
 type Size = Readonly<{

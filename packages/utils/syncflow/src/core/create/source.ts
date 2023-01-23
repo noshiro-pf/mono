@@ -1,6 +1,6 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import type { SourceObservable } from '../types';
+import { type SourceObservable } from '../types';
 
 export const subject = <A>(): SourceObservable<A> =>
   new SourceObservableClass<A>();

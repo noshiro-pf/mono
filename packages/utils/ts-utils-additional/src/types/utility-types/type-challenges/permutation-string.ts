@@ -1,5 +1,5 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { StringToUnion } from './string-to-union';
+import { type StringToUnion } from './string-to-union';
 
 type PermutationStringImpl<U extends string, V extends U = U> = [U] extends [
   never

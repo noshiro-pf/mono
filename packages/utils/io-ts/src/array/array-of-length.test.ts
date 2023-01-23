@@ -1,6 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
 import { number } from '../primitives';
-import type { TypeOf } from '../type';
+import { type TypeOf } from '../type';
 import { arrayOfLength } from './array-of-length';
 
 describe('arrayOfLength', () => {

@@ -7,11 +7,12 @@ import {
   TableRow,
 } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hue, Percent } from '@noshiro/ts-utils-additional';
 import {
   blackHsl,
   contrastRatioHsl,
   whiteHsl,
+  type Hue,
+  type Percent,
 } from '@noshiro/ts-utils-additional';
 import { Fragment } from 'react';
 import styled from 'styled-components';

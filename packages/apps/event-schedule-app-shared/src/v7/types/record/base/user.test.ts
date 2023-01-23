@@ -1,7 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { UserId, UserName } from '../../named-primitive-types';
-import type { User } from './user';
-import { fillUser, isUser, userDefaultValue } from './user';
+import { type UserId, type UserName } from '../../named-primitive-types';
+import { fillUser, isUser, userDefaultValue, type User } from './user';
 
 describe('User', () => {
   assertType<

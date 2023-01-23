@@ -1,5 +1,5 @@
 import { notificationSettingsDefaultValue } from '@noshiro/event-schedule-app-shared';
-import type { NotificationSettingsWithEmail } from '../types';
+import { type NotificationSettingsWithEmail } from '../types';
 
 export const notificationSettingsWithEmailDefaultValue: NotificationSettingsWithEmail =
   {

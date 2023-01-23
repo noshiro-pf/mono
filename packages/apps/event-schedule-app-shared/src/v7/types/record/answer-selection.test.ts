@@ -1,13 +1,15 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { AnswerIconIdWithNone, AnswerIconPoint } from '../enum';
-import type { AnswerSelection } from './answer-selection';
+import { type AnswerIconIdWithNone, type AnswerIconPoint } from '../enum';
 import {
   answerSelectionDefaultValue,
   fillAnswerSelection,
   isAnswerSelection,
+  type AnswerSelection,
 } from './answer-selection';
-import type { DatetimeRange } from './datetime-range';
-import { datetimeRangeDefaultValue } from './datetime-range';
+import {
+  datetimeRangeDefaultValue,
+  type DatetimeRange,
+} from './datetime-range';
 
 describe('AnswerSelection', () => {
   assertType<

@@ -1,4 +1,7 @@
-import type { AnswerSymbolIconId, AnswerSymbolPointEnumType } from '../../enum';
+import {
+  type AnswerSymbolIconId,
+  type AnswerSymbolPointEnumType,
+} from '../../enum';
 
 export type AnswerSymbol = Readonly<{
   iconId: AnswerSymbolIconId;

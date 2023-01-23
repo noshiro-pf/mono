@@ -1,6 +1,6 @@
-import type { Client as _PsqlClient } from 'pg';
-import type { psqlRowType } from '../constants';
-import type { Database } from './database';
+import { type Client as _PsqlClient } from 'pg';
+import { type psqlRowType } from '../constants';
+import { type Database } from './database';
 
 export type PollId = string;
 export const createPollId = (id: string): PollId => id;

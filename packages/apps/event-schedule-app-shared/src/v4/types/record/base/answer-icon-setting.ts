@@ -1,4 +1,4 @@
-import type { AnswerIconPoint } from '../../enum';
+import { type AnswerIconPoint } from '../../enum';
 
 export type AnswerIconSetting = Readonly<{
   description: string;

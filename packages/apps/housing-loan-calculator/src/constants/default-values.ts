@@ -1,4 +1,4 @@
-import type { RepaymentType } from '../types';
+import { type RepaymentType } from '../types';
 
 export const defaultValues: {
   repaymentType: RepaymentType;

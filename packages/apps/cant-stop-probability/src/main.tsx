@@ -9,8 +9,11 @@ import {
   countSuccess,
   countSuccessForRemains,
 } from './functions';
-import type { ResultRow, TwoDiceSumValue } from './types';
-import { isTwoDiceSumValue } from './types';
+import {
+  isTwoDiceSumValue,
+  type ResultRow,
+  type TwoDiceSumValue,
+} from './types';
 
 const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const count = countSuccess(x, y, z);

@@ -1,16 +1,16 @@
-import type {
-  back as _back,
-  pathname$ as _pathname$,
-  push as _push,
-  QueryParams as _QueryParams,
-  queryParams$ as _queryParams$,
-  redirect as _redirect,
-  removeListener as _removeListener,
-  Router as _Router,
-  usePathname as _usePathname,
-  useQueryParams as _useQueryParams,
-  useRouterLinkClick as _useRouterLinkClick,
-  withSlash as _withSlash,
+import {
+  type back as _back,
+  type pathname$ as _pathname$,
+  type push as _push,
+  type QueryParams as _QueryParams,
+  type queryParams$ as _queryParams$,
+  type redirect as _redirect,
+  type removeListener as _removeListener,
+  type Router as _Router,
+  type usePathname as _usePathname,
+  type useQueryParams as _useQueryParams,
+  type useRouterLinkClick as _useRouterLinkClick,
+  type withSlash as _withSlash,
 } from '@noshiro/tiny-router-react-hooks';
 
 declare global {

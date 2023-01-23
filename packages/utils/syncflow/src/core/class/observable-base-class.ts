@@ -1,15 +1,15 @@
 import { Arr, Maybe, MutableMap, noop } from '@noshiro/ts-utils';
-import type {
-  ChildObservable,
-  InitializedObservable,
-  Observable,
-  ObservableBase,
-  Operator,
-  Subscriber,
-  SubscriberId,
-  Subscription,
-  ToInitializedOperator,
-  UpdaterSymbol,
+import {
+  type ChildObservable,
+  type InitializedObservable,
+  type Observable,
+  type ObservableBase,
+  type Operator,
+  type Subscriber,
+  type SubscriberId,
+  type Subscription,
+  type ToInitializedOperator,
+  type UpdaterSymbol,
 } from '../types';
 import {
   issueObservableId,

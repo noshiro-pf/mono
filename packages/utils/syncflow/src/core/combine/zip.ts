@@ -1,13 +1,13 @@
 import { createQueue, Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  InitializedZipObservable,
-  NonEmptyUnknownList,
-  TupleToQueueTuple,
-  UpdaterSymbol,
-  Wrap,
-  WrapInitialized,
-  ZipObservable,
+import {
+  type InitializedZipObservable,
+  type NonEmptyUnknownList,
+  type TupleToQueueTuple,
+  type UpdaterSymbol,
+  type Wrap,
+  type WrapInitialized,
+  type ZipObservable,
 } from '../types';
 
 export const zip = <A extends NonEmptyUnknownList>(

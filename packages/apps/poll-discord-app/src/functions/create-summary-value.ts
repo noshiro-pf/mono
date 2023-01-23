@@ -1,12 +1,12 @@
-import type { EmbedFieldData } from 'discord.js';
+import { type EmbedFieldData } from 'discord.js';
 import { emojis } from '../constants';
-import type {
-  AnswerOfDate,
-  AnswerType,
-  DateOption,
-  Group,
-  Poll,
-  UserId,
+import {
+  type AnswerOfDate,
+  type AnswerType,
+  type DateOption,
+  type Group,
+  type Poll,
+  type UserId,
 } from '../types';
 import { userIdToMention } from './user-id-to-mention';
 

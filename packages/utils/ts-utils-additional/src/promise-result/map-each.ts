@@ -1,6 +1,6 @@
 import { promiseStatus } from '../types';
 import { error, pending, success } from './gen';
-import type { PromiseState } from './promise-result-type';
+import { type PromiseState } from './promise-result-type';
 
 export const mapEach =
   <P, E, S, PR = P, ER = E, SR = S>(

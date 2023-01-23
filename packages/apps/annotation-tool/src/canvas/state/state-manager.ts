@@ -1,5 +1,7 @@
-import type { CanvasAppState } from './canvas-state-type';
-import { defaultCanvasAppState } from './canvas-state-type';
+import {
+  defaultCanvasAppState,
+  type CanvasAppState,
+} from './canvas-state-type';
 
 export class StateManager {
   readonly #state: CanvasAppState = defaultCanvasAppState;

@@ -1,4 +1,4 @@
-import type { PlayerIndex } from '../types';
+import { type PlayerIndex } from '../types';
 import { db } from './database';
 import { myName$ } from './my-name';
 

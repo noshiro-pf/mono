@@ -1,7 +1,6 @@
-import type { Observable } from '../../src';
-import { fromArray } from '../../src';
+import { fromArray, type Observable } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 const createStream = (): Readonly<{
   startSource: () => void;

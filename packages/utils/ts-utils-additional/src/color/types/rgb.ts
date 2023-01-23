@@ -1,5 +1,5 @@
-import type { Alpha } from './alpha';
-import type { RgbValue as RgbV } from './rgb-value';
+import { type Alpha } from './alpha';
+import { type RgbValue as RgbV } from './rgb-value';
 
 export type Rgb = readonly [RgbV, RgbV, RgbV];
 export const rgb = (r: RgbV, g: RgbV, b: RgbV): Rgb => [r, g, b];

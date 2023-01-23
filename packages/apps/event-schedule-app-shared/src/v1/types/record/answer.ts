@@ -1,11 +1,17 @@
 import { DateUtils } from '@noshiro/ts-utils';
-import type { AnswerId, UserName, Weight } from '../phantom';
-import { createAnswerId, createUserName, createWeight } from '../phantom';
-import type {
-  AnswerSelection,
-  PartialAnswerSelection,
+import {
+  createAnswerId,
+  createUserName,
+  createWeight,
+  type AnswerId,
+  type UserName,
+  type Weight,
+} from '../phantom';
+import {
+  fillAnswerSelection,
+  type AnswerSelection,
+  type PartialAnswerSelection,
 } from './answer-selection';
-import { fillAnswerSelection } from './answer-selection';
 
 export const ANSWER_KEY_CREATED_AT = 'createdAt';
 

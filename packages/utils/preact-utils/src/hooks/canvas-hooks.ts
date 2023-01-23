@@ -1,5 +1,4 @@
-import type { Ref } from 'preact/hooks';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, type Ref } from 'preact/hooks';
 import { useState } from './use-state';
 
 export const useCanvasContext2d = (): [

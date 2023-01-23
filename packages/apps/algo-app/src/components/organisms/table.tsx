@@ -1,6 +1,11 @@
-import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
+import { type Rect, type RectSize } from '@noshiro/ts-utils-additional';
 import { playerNameRectSize } from '../../constants';
-import type { CardColor, CardNumber, DisplayValues, NWES } from '../../types';
+import {
+  type CardColor,
+  type CardNumber,
+  type DisplayValues,
+  type NWES,
+} from '../../types';
 import { PlayerCardsArea } from './player-cards-area';
 import { PlayerName } from './player-name';
 

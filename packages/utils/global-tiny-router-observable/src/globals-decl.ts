@@ -1,8 +1,8 @@
-import type {
-  createRouter as _createRouter,
-  QueryParams as _QueryParams,
-  Router as _Router,
-  withSlash as _withSlash,
+import {
+  type createRouter as _createRouter,
+  type QueryParams as _QueryParams,
+  type Router as _Router,
+  type withSlash as _withSlash,
 } from '@noshiro/tiny-router-observable';
 
 declare global {

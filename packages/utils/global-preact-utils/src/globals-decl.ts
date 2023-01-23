@@ -1,12 +1,12 @@
-import type {
-  memoNamed as _memoNamed,
-  useAlive as _useAlive,
-  useBoolState as _useBoolState,
-  usePromiseValue as _usePromiseValue,
-  useState as _useState,
-  useTinyObservable as _useTinyObservable,
-  useTinyObservableEffect as _useTinyObservableEffect,
-  useTinyObservableValue as _useTinyObservableValue,
+import {
+  type memoNamed as _memoNamed,
+  type useAlive as _useAlive,
+  type useBoolState as _useBoolState,
+  type usePromiseValue as _usePromiseValue,
+  type useState as _useState,
+  type useTinyObservable as _useTinyObservable,
+  type useTinyObservableEffect as _useTinyObservableEffect,
+  type useTinyObservableValue as _useTinyObservableValue,
 } from '@noshiro/preact-utils';
 
 declare global {

@@ -1,11 +1,11 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  DistinctUntilChangedOperatorObservable,
-  InitializedToInitializedOperator,
-  Observable,
-  ToBaseOperator,
-  UpdaterSymbol,
+import {
+  type DistinctUntilChangedOperatorObservable,
+  type InitializedToInitializedOperator,
+  type Observable,
+  type ToBaseOperator,
+  type UpdaterSymbol,
 } from '../types';
 
 export const distinctUntilChanged =

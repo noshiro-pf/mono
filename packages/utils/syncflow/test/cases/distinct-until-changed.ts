@@ -1,13 +1,13 @@
-import type { Observable } from '../../src';
 import {
   distinctUntilChanged,
   interval,
   map,
   take,
   withLatestFrom,
+  type Observable,
 } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 /*
   counter                0   1   2   3   4   5   6

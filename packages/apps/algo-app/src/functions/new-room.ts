@@ -1,6 +1,8 @@
-import type { PermutationString } from '@noshiro/ts-utils-additional';
-import { getShuffled } from '@noshiro/ts-utils-additional';
-import type { Card, Room } from '../types';
+import {
+  getShuffled,
+  type PermutationString,
+} from '@noshiro/ts-utils-additional';
+import { type Card, type Room } from '../types';
 import { sortCards } from './sort-cards';
 
 const allCards: ArrayOfLength<24, Card> = [

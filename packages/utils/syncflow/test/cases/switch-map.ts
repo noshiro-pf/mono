@@ -1,8 +1,7 @@
 import { tp } from '@noshiro/ts-utils';
-import type { Observable } from '../../src';
-import { interval, map, switchMap, take } from '../../src';
+import { interval, map, switchMap, take, type Observable } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 /*
   (tick)          0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9

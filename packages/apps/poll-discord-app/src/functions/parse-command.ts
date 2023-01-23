@@ -1,5 +1,4 @@
-import type { NumGroups } from '../types';
-import { maxNumGroups } from '../types';
+import { maxNumGroups, type NumGroups } from '../types';
 
 export const rpParseCommand = (command: string): readonly string[] =>
   command

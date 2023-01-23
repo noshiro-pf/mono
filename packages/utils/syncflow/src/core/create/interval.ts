@@ -1,6 +1,6 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import type { IntervalObservable } from '../types';
+import { type IntervalObservable } from '../types';
 
 export const interval = (
   milliSeconds: number,

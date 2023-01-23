@@ -5,15 +5,15 @@ import {
   incrementPlayerIndex,
   sortCards,
 } from '../functions';
-import type {
-  Card,
-  CardWithDisplayValue,
-  CardWithVisibility,
-  DisplayValues,
-  GameState,
-  NWES,
-  PlayerIndex,
-  VisibilityFromMe,
+import {
+  type Card,
+  type CardWithDisplayValue,
+  type CardWithVisibility,
+  type DisplayValues,
+  type GameState,
+  type NWES,
+  type PlayerIndex,
+  type VisibilityFromMe,
 } from '../types';
 
 const mapPlayers6CardsToDisplayValue = ({

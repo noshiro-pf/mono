@@ -1,4 +1,4 @@
-import type { MessageReaction, PartialUser, User } from 'discord.js';
+import { type MessageReaction, type PartialUser, type User } from 'discord.js';
 import { emojis } from '../constants';
 import {
   createUserIdToDisplayNameMap,
@@ -6,8 +6,14 @@ import {
   rpCreateSummaryMessage,
 } from '../functions';
 import { updateVote } from '../in-memory-database';
-import type { AnswerType, DatabaseRef, Poll, PsqlClient } from '../types';
-import { createDateOptionId, createUserId } from '../types';
+import {
+  createDateOptionId,
+  createUserId,
+  type AnswerType,
+  type DatabaseRef,
+  type Poll,
+  type PsqlClient,
+} from '../types';
 import { fixAnswerAndUpdateMessage } from './fix-answer';
 
 const onRefreshClick = async (

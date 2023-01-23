@@ -1,6 +1,6 @@
 import { useState } from '@noshiro/preact-utils';
 import { Arr } from '@noshiro/ts-utils';
-import type { RefObject } from 'preact';
+import { type RefObject } from 'preact';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
 

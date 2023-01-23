@@ -1,10 +1,10 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  Observable,
-  RemoveInitializedOperator,
-  TakeOperatorObservable,
-  UpdaterSymbol,
+import {
+  type Observable,
+  type RemoveInitializedOperator,
+  type TakeOperatorObservable,
+  type UpdaterSymbol,
 } from '../types';
 import { isPositiveInteger } from '../utils';
 

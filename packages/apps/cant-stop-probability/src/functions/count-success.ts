@@ -1,5 +1,5 @@
 import { diceValueSet } from '../constants';
-import type { Count, TwoDiceSumValue } from '../types';
+import { type Count, type TwoDiceSumValue } from '../types';
 import { possibleTwoDiceSumPairs } from './possible-two-dice-sum-pair';
 
 export const countSuccess = (

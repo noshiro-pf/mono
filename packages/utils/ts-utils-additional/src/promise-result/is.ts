@@ -1,9 +1,9 @@
 import { promiseStatus } from '../types';
-import type {
-  Pending,
-  PromiseState,
-  SettleError,
-  SettleSuccess,
+import {
+  type Pending,
+  type PromiseState,
+  type SettleError,
+  type SettleSuccess,
 } from './promise-result-type';
 
 export const isUnresolved = <P, E, S>(

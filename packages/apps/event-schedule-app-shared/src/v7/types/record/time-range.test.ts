@@ -1,13 +1,12 @@
-import type { TimeRange } from './time-range';
 import {
   fillTimeRange,
   isTimeRange,
   timeRangeDefaultValue,
+  type TimeRange,
 } from './time-range';
 
 import { assertType } from '@noshiro/ts-utils';
-import type { HoursMinutes } from './base';
-import { hoursMinutesDefaultValue } from './base';
+import { hoursMinutesDefaultValue, type HoursMinutes } from './base';
 
 describe('TimeRange', () => {
   assertType<

@@ -1,12 +1,12 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  InitializedObservable,
-  InitializedToInitializedOperator,
-  Observable,
-  ToBaseOperator,
-  UpdaterSymbol,
-  WithLatestFromOperatorObservable,
+import {
+  type InitializedObservable,
+  type InitializedToInitializedOperator,
+  type Observable,
+  type ToBaseOperator,
+  type UpdaterSymbol,
+  type WithLatestFromOperatorObservable,
 } from '../types';
 import { maxDepth } from '../utils';
 

@@ -1,5 +1,8 @@
-import type { Observable, SourceObservable } from '@noshiro/syncflow';
-import { source } from '@noshiro/syncflow';
+import {
+  source,
+  type Observable,
+  type SourceObservable,
+} from '@noshiro/syncflow';
 import { useCallback, useMemo } from 'react';
 
 export const useVoidEventObservable = (): [Observable<void>, () => void] => {

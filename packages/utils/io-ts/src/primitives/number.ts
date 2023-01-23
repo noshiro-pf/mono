@@ -1,5 +1,5 @@
 import { isNumber } from '@noshiro/ts-utils';
-import type { Type } from '../type';
+import { type Type } from '../type';
 import { createPrimitiveType } from '../utils';
 
 export const number = (defaultValue: number): Type<number> =>

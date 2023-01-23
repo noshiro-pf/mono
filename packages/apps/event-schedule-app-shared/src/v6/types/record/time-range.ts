@@ -1,10 +1,10 @@
 import { isRecord, Obj } from '@noshiro/ts-utils';
-import type { HoursMinutes } from './base';
 import {
   compareHm,
   fillHoursMinutes,
   hoursMinutesDefaultValue,
   isHoursMinutes,
+  type HoursMinutes,
 } from './base';
 
 export type TimeRange = Readonly<{

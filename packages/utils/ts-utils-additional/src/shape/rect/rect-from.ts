@@ -1,5 +1,5 @@
 import { dist } from '../../num';
-import type { Point, Rect } from '../../types';
+import { type Point, type Rect } from '../../types';
 
 export const rectFromXYs = (
   xs: readonly [number, number],

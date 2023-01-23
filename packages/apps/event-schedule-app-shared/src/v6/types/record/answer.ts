@@ -7,12 +7,18 @@ import {
   isString,
   Obj,
 } from '@noshiro/ts-utils';
-import type { AnswerId, Weight } from '../named-primitive-types';
-import { isAnswerId, isWeight } from '../named-primitive-types';
-import type { AnswerSelection } from './answer-selection';
-import { fillAnswerSelection, isAnswerSelection } from './answer-selection';
-import type { User } from './base';
-import { fillUser, isUser, userDefaultValue } from './base';
+import {
+  isAnswerId,
+  isWeight,
+  type AnswerId,
+  type Weight,
+} from '../named-primitive-types';
+import {
+  fillAnswerSelection,
+  isAnswerSelection,
+  type AnswerSelection,
+} from './answer-selection';
+import { fillUser, isUser, userDefaultValue, type User } from './base';
 
 export const ANSWER_KEY_CREATED_AT = 'createdAt';
 

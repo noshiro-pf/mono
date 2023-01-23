@@ -1,4 +1,4 @@
-import type { Rect } from '@noshiro/ts-utils-additional';
+import { type Rect } from '@noshiro/ts-utils-additional';
 import { inTurnColor, playerNameRectPadding, zIndex } from '../../constants';
 
 type Props = Readonly<{

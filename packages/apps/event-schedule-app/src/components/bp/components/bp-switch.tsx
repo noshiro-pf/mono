@@ -1,5 +1,5 @@
 import { Switch } from '@blueprintjs/core';
-import type { ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 type SwitchPropsOriginal = ComponentProps<typeof Switch>;
 

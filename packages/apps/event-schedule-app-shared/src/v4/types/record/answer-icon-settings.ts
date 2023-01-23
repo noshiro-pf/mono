@@ -1,6 +1,5 @@
-import type { AnswerIconId } from '../enum';
-import type { AnswerIconSetting } from './base';
-import { fillAnswerIconSetting } from './base';
+import { type AnswerIconId } from '../enum';
+import { fillAnswerIconSetting, type AnswerIconSetting } from './base';
 
 export type AnswerIconSettings = Record<AnswerIconId, AnswerIconSetting>;
 

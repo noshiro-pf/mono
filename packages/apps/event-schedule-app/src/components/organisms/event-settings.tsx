@@ -1,5 +1,5 @@
 import { notificationSettingsWithEmailDefaultValue } from '../../constants';
-import type { NotificationSettingsWithEmail } from '../../types';
+import { type NotificationSettingsWithEmail } from '../../types';
 import { AnswerDeadlineDatepicker } from './answer-deadline';
 import { AnswerIconSettingsComponent } from './icon-settings';
 import { NotificationSettingsComponent } from './notification-settings';

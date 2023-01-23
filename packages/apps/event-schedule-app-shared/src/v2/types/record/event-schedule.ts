@@ -1,21 +1,23 @@
 import { DateUtils } from '@noshiro/ts-utils';
-import type {
-  AnswerSymbol,
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-  NotificationSettings,
-  PartialAnswerSymbol,
-  PartialDatetimeRange,
-  PartialNotificationSettings,
-} from '../../../v1';
 import {
   defaultNotificationSettings,
   fillAnswerSymbol,
   fillDatetimeRange,
   fillNotificationSettings,
+  type AnswerSymbol,
+  type DatetimeRange,
+  type DatetimeSpecificationEnumType,
+  type NotificationSettings,
+  type PartialAnswerSymbol,
+  type PartialDatetimeRange,
+  type PartialNotificationSettings,
 } from '../../../v1';
-import type { PartialYmdhm, Ymdhm } from './ymdhm';
-import { defaultYmdhm, fillYmdhm } from './ymdhm';
+import {
+  defaultYmdhm,
+  fillYmdhm,
+  type PartialYmdhm,
+  type Ymdhm,
+} from './ymdhm';
 
 export type EventSchedule = Readonly<{
   title: string;

@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import type { HistoryState } from '../type';
+import { type HistoryState } from '../type';
 import { rollTwoDices } from './roll-dice';
 
 export const historyReducer: ReducerType<

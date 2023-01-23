@@ -1,5 +1,5 @@
-import type { StyledVNode } from '@noshiro/goober';
-import type { RectSize } from '@noshiro/ts-utils-additional';
+import { type StyledVNode } from '@noshiro/goober';
+import { type RectSize } from '@noshiro/ts-utils-additional';
 import { balloonColor, zIndex } from '../../constants';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

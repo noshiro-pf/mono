@@ -1,8 +1,11 @@
-import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
+import {
+  firestorePaths,
+  type Answer,
+  type EventSchedule,
+} from '@noshiro/event-schedule-app-shared';
 import { Obj } from '@noshiro/ts-utils';
-import type { firestore } from 'firebase-admin';
-import type { auth } from 'firebase-functions';
+import { type firestore } from 'firebase-admin';
+import { type auth } from 'firebase-functions';
 
 const removeAuthorIdFromEventSchedule = (
   eventSchedule: EventSchedule,

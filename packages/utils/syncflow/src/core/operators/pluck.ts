@@ -1,11 +1,11 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  InitializedToInitializedOperator,
-  Observable,
-  PluckOperatorObservable,
-  ToBaseOperator,
-  UpdaterSymbol,
+import {
+  type InitializedToInitializedOperator,
+  type Observable,
+  type PluckOperatorObservable,
+  type ToBaseOperator,
+  type UpdaterSymbol,
 } from '../types';
 
 export const pluck =

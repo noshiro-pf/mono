@@ -1,6 +1,6 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
-import type { Graphics } from 'pixi.js';
-import type { IdType } from './id-type';
+import { type Rect, type Rgba } from '@noshiro/ts-utils-additional';
+import { type Graphics } from 'pixi.js';
+import { type IdType } from './id-type';
 
 export type PixiBbox = {
   readonly id: IdType;

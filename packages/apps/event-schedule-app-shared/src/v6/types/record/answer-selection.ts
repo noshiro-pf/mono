@@ -1,11 +1,15 @@
 import { isRecord, isString, Obj } from '@noshiro/ts-utils';
-import type { AnswerIconIdWithNone, AnswerIconPoint } from '../enum';
-import { isAnswerIconIdWithNone, isAnswerIconPoint } from '../enum';
-import type { DatetimeRange } from './datetime-range';
+import {
+  isAnswerIconIdWithNone,
+  isAnswerIconPoint,
+  type AnswerIconIdWithNone,
+  type AnswerIconPoint,
+} from '../enum';
 import {
   datetimeRangeDefaultValue,
   fillDatetimeRange,
   isDatetimeRange,
+  type DatetimeRange,
 } from './datetime-range';
 
 export type AnswerSelection = Readonly<{

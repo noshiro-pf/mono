@@ -1,5 +1,5 @@
 import { Num } from '@noshiro/ts-utils';
-import type { Rect, RectSize } from '../../types';
+import { type Rect, type RectSize } from '../../types';
 
 /**
  * @description 縦横比を維持して表示するための位置計算

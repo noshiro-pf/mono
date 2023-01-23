@@ -1,10 +1,4 @@
 import { DateUtils } from '@noshiro/ts-utils';
-import type {
-  HoursMinutes,
-  PartialHoursMinutes,
-  PartialYearMonthDate,
-  YearMonthDate,
-} from './base';
 import {
   compareHm,
   compareYmd,
@@ -14,6 +8,10 @@ import {
   fillYearMonthDate,
   hmFromDate,
   ymdFromDate,
+  type HoursMinutes,
+  type PartialHoursMinutes,
+  type PartialYearMonthDate,
+  type YearMonthDate,
 } from './base';
 
 export type Ymdhm = Readonly<{

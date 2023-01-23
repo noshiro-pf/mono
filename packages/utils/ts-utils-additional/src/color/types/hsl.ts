@@ -1,6 +1,6 @@
-import type { Percent as P } from '../../types';
-import type { Alpha } from './alpha';
-import type { Hue } from './hue';
+import { type Percent as P } from '../../types';
+import { type Alpha } from './alpha';
+import { type Hue } from './hue';
 
 export type Hsl = readonly [Hue, P, P];
 export const hsl = (h: Hue, s: P, l: P): Hsl => [h, s, l];

@@ -1,13 +1,15 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { Answer } from './answer';
-import type { EventListItem } from './event-list-item';
+import { type Answer } from './answer';
 import {
   eventListItemDefaultValue,
   fillEventListItem,
   isEventListItem,
+  type EventListItem,
 } from './event-list-item';
-import type { EventSchedule } from './event-schedule';
-import { eventScheduleDefaultValue } from './event-schedule';
+import {
+  eventScheduleDefaultValue,
+  type EventSchedule,
+} from './event-schedule';
 
 describe('EventListItem', () => {
   assertType<

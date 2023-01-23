@@ -1,6 +1,6 @@
-import type { Rect } from '@noshiro/ts-utils-additional';
+import { type Rect } from '@noshiro/ts-utils-additional';
 import { playerNamePositionsReducer } from '../../state';
-import type { NWES } from '../../types';
+import { type NWES } from '../../types';
 
 const playerNamePositionsAction$ = source<readonly [NWES, Rect]>();
 

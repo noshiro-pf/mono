@@ -1,5 +1,5 @@
-import type { MakeTuple } from './make-tuple';
-import type { ToNumber } from './to-number';
+import { type MakeTuple } from './make-tuple';
+import { type ToNumber } from './to-number';
 
 export type Seq<N extends number> = SeqImpl<N>;
 

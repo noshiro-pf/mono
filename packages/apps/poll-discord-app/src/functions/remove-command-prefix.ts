@@ -1,4 +1,4 @@
-import type { triggerCommand } from '../constants';
+import { type triggerCommand } from '../constants';
 
 export const removeCommandPrefix = (
   message: string,

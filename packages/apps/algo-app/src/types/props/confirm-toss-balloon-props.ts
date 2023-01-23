@@ -1,5 +1,5 @@
-import type { Rect } from '@noshiro/ts-utils-additional';
-import type { Card } from '../card-type';
+import { type Rect } from '@noshiro/ts-utils-additional';
+import { type Card } from '../card-type';
 
 export type ConfirmTossBalloonProps = Readonly<{
   anchorCardRect: Rect;

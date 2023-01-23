@@ -6,14 +6,15 @@ import {
   isString,
   Obj,
 } from '@noshiro/ts-utils';
-import type { DatetimeSpecificationEnumType } from '../enum';
-import { isDatetimeSpecificationEnumType } from '../enum';
-import type { AnswerIconSettings } from './answer-icon-settings';
+import {
+  isDatetimeSpecificationEnumType,
+  type DatetimeSpecificationEnumType,
+} from '../enum';
 import {
   fillAnswerIconSettings,
   isAnswerIconSettings,
+  type AnswerIconSettings,
 } from './answer-icon-settings';
-import type { NotificationSettings, User, Ymdhm } from './base';
 import {
   answerIconSettingDefaultValue,
   fillNotificationSettings,
@@ -23,12 +24,15 @@ import {
   isUser,
   isYmdhm,
   userDefaultValue,
+  type NotificationSettings,
+  type User,
+  type Ymdhm,
 } from './base';
-import type { DatetimeRange } from './datetime-range';
 import {
   datetimeRangeDefaultValue,
   fillDatetimeRange,
   isDatetimeRange,
+  type DatetimeRange,
 } from './datetime-range';
 
 export type EventSchedule = Readonly<{

@@ -1,5 +1,5 @@
 import { isNumber, Num } from '@noshiro/ts-utils';
-import type { Type } from '../type';
+import { type Type } from '../type';
 import { createPrimitiveType } from '../utils';
 
 type PositiveInteger = number;

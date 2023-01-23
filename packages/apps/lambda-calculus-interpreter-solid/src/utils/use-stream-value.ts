@@ -1,5 +1,9 @@
-import type { InitializedObservable, Observable } from '@noshiro/syncflow';
-import { source, withInitialValue } from '@noshiro/syncflow';
+import {
+  source,
+  withInitialValue,
+  type InitializedObservable,
+  type Observable,
+} from '@noshiro/syncflow';
 import { createSignal, onCleanup } from 'solid-js';
 
 export function useObservableValue<A, B = A>(

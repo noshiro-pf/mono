@@ -1,6 +1,6 @@
-import type {
-  Answer,
-  DatetimeSpecificationEnumType,
+import {
+  type Answer,
+  type DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
 import { answerDiffAsString } from './answer-diff';
 

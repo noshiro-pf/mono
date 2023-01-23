@@ -1,8 +1,7 @@
 import { tp } from '@noshiro/ts-utils';
-import type { Observable } from '../../src';
-import { interval, mapWithIndex, take } from '../../src';
+import { interval, mapWithIndex, take, type Observable } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 const createStreams = (
   tick: number

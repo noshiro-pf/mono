@@ -1,4 +1,4 @@
-import type { Card, NWES } from '../types';
+import { type Card, type NWES } from '../types';
 import { cardEq } from './card-eq';
 
 export const getCardDirection = (

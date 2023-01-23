@@ -1,8 +1,14 @@
-import type { RectSize } from '@noshiro/ts-utils-additional';
-import type { CardTextColor, CustomColor } from '../../constants';
-import { darkGray, eyeIconColorDef, lightGray, zIndex } from '../../constants';
+import { type RectSize } from '@noshiro/ts-utils-additional';
+import {
+  darkGray,
+  eyeIconColorDef,
+  lightGray,
+  zIndex,
+  type CardTextColor,
+  type CustomColor,
+} from '../../constants';
 import { fillCardSize, flipColor } from '../../functions';
-import type { CardColor, VisibilityFromMe } from '../../types';
+import { type CardColor, type VisibilityFromMe } from '../../types';
 
 export const useCardAttributes = (
   color: CardColor,

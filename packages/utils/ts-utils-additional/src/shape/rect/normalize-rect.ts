@@ -1,4 +1,4 @@
-import type { Rect } from '../../types';
+import { type Rect } from '../../types';
 
 /**
  * @description width/heightを非負の値になるように正規化を行う．

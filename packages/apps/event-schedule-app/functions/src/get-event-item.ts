@@ -1,7 +1,9 @@
-import type { EventSchedule } from '@noshiro/event-schedule-app-shared';
-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
+import {
+  firestorePaths,
+  type EventSchedule,
+} from '@noshiro/event-schedule-app-shared';
 import { mapOptional } from '@noshiro/ts-utils';
-import type { firestore } from 'firebase-admin';
+import { type firestore } from 'firebase-admin';
 import { fillEventScheduleWithCheck, isEmailData } from './types';
 
 export const getEventItem = async (

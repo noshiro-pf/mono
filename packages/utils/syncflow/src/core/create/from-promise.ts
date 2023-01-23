@@ -1,6 +1,6 @@
 import { Maybe, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import type { FromPromiseObservable } from '../types';
+import { type FromPromiseObservable } from '../types';
 
 export const fromPromise = <A, E = unknown>(
   promise: Readonly<Promise<A>>

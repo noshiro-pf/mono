@@ -1,7 +1,6 @@
-import type { EmbedFieldData } from 'discord.js';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, type EmbedFieldData } from 'discord.js';
 import { embedMessageColor, footerText } from '../constants';
-import type { Group, Poll, UserId } from '../types';
+import { type Group, type Poll, type UserId } from '../types';
 import {
   gpCreateSummaryField,
   rpCreateSummaryField,

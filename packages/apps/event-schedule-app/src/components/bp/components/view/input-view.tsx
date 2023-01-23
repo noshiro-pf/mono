@@ -1,10 +1,10 @@
-import type {
-  ChangeEventHandler,
-  DetailedHTMLProps,
-  FocusEventHandler,
-  InputHTMLAttributes,
+import {
+  useRef,
+  type ChangeEventHandler,
+  type DetailedHTMLProps,
+  type FocusEventHandler,
+  type InputHTMLAttributes,
 } from 'react';
-import { useRef } from 'react';
 import { css } from 'styled-components';
 
 type Props = Partial<

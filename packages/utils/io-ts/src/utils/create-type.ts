@@ -1,4 +1,4 @@
-import type { Type } from '../type';
+import { type Type } from '../type';
 import { createAssertFunction } from './create-assert-function';
 import { createIsFnFromValidateFn } from './create-is-fn-from-validate-fn';
 

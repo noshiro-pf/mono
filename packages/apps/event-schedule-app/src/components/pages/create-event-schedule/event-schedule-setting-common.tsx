@@ -1,6 +1,6 @@
-import type {
-  EventScheduleSettingCommonState,
-  EventScheduleSettingCommonStateHandler,
+import {
+  type EventScheduleSettingCommonState,
+  type EventScheduleSettingCommonStateHandler,
 } from '../../../types';
 import { Section } from '../../molecules';
 import {

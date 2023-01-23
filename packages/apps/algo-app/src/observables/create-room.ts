@@ -1,4 +1,4 @@
-import type { Room } from '../types';
+import { type Room } from '../types';
 import { db } from './database';
 import { setMyName } from './my-name';
 

@@ -1,10 +1,10 @@
 import { type JSX } from 'preact';
-import type {
-  Reducer as _Reducer,
-  useCallback as _useCallback,
-  useEffect as _useEffect,
-  useMemo as _useMemo,
-  useReducer as _useReducer,
+import {
+  type Reducer as _Reducer,
+  type useCallback as _useCallback,
+  type useEffect as _useEffect,
+  type useMemo as _useMemo,
+  type useReducer as _useReducer,
 } from 'preact/hooks';
 
 declare global {

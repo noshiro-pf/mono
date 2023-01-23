@@ -1,5 +1,4 @@
-import type { FC, NamedExoticComponent } from 'react';
-import { memo } from 'react';
+import { memo, type FC, type NamedExoticComponent } from 'react';
 
 export const memoNamed = <Props>(
   displayName: string,

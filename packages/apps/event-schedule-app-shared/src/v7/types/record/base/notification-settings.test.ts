@@ -1,9 +1,9 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { NotificationSettings } from './notification-settings';
 import {
   fillNotificationSettings,
   isNotificationSettings,
   notificationSettingsDefaultValue,
+  type NotificationSettings,
 } from './notification-settings';
 
 describe('NotificationSettings', () => {

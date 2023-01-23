@@ -1,4 +1,4 @@
-import type { DetailedFilterIcon } from '../../../types';
+import { type DetailedFilterIcon } from '../../../types';
 import { CustomIcon } from '../../atoms';
 import { CheckboxView } from '../../bp';
 import { IconCountNumericInput } from '../../molecules';

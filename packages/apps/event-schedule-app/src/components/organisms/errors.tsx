@@ -1,5 +1,5 @@
 import { errorFontColor } from '../../constants';
-import type { EventScheduleValidation } from '../../types';
+import { type EventScheduleValidation } from '../../types';
 import { Description } from '../atoms';
 
 const dc = dict.eventSettingsPage;

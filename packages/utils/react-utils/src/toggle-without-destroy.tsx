@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
 import { memoNamed } from './memo-named';
 
 type Props = DeepReadonly<{

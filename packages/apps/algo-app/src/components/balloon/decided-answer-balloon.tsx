@@ -1,6 +1,6 @@
-import type { RectSize } from '@noshiro/ts-utils-additional';
+import { type RectSize } from '@noshiro/ts-utils-additional';
 import { zIndex } from '../../constants';
-import type { DecidedAnswerBalloonProps } from '../../types';
+import { type DecidedAnswerBalloonProps } from '../../types';
 import { CardComponent } from '../card';
 import {
   createBalloonBody,

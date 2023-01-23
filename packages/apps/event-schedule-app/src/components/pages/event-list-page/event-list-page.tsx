@@ -1,5 +1,5 @@
 import { Button, ControlGroup, HTMLSelect, Spinner } from '@blueprintjs/core';
-import type { ChangeEventHandler } from 'react';
+import { type ChangeEventHandler } from 'react';
 import { api } from '../../../api';
 import { createToaster, showToast } from '../../../functions';
 import {

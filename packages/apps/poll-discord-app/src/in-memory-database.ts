@@ -1,22 +1,20 @@
 import { psqlRowType } from './constants';
 import { psql } from './postgre-sql';
-import type {
-  AnswerOfDate,
-  AnswerType,
-  CommandMessageId,
-  Database,
-  DatabaseMutRef,
-  DatabaseRef,
-  DateOptionId,
-  Poll,
-  PsqlClient,
-  UserId,
-} from './types';
 import {
   createTimestamp,
   databaseDefaultValue,
   databaseToJson,
   fillDatabase,
+  type AnswerOfDate,
+  type AnswerType,
+  type CommandMessageId,
+  type Database,
+  type DatabaseMutRef,
+  type DatabaseRef,
+  type DateOptionId,
+  type Poll,
+  type PsqlClient,
+  type UserId,
 } from './types';
 
 export const addPoll = (

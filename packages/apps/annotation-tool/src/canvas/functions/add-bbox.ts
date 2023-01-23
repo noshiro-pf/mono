@@ -1,7 +1,11 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
-import type { Application } from 'pixi.js';
-import type { CanvasAppState, CanvasAppStateHandler } from '../state';
-import type { AnnotationCanvasStyle, IdType, PixiBbox } from '../types';
+import { type Rect, type Rgba } from '@noshiro/ts-utils-additional';
+import { type Application } from 'pixi.js';
+import { type CanvasAppState, type CanvasAppStateHandler } from '../state';
+import {
+  type AnnotationCanvasStyle,
+  type IdType,
+  type PixiBbox,
+} from '../types';
 import { addBboxEventListener } from './add-bbox-event-listener';
 import { foreachBboxPoints } from './bbox-points';
 import { createBbox } from './create-pixi-bbox';

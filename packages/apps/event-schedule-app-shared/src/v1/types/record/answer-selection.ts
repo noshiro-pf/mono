@@ -1,6 +1,10 @@
-import type { AnswerSymbolIconId } from '../enum';
-import type { DatetimeRange, PartialDatetimeRange } from './datetime-range';
-import { defaultDatetimeRange, fillDatetimeRange } from './datetime-range';
+import { type AnswerSymbolIconId } from '../enum';
+import {
+  defaultDatetimeRange,
+  fillDatetimeRange,
+  type DatetimeRange,
+  type PartialDatetimeRange,
+} from './datetime-range';
 
 export type AnswerSelection = Readonly<{
   datetimeRange: DatetimeRange;

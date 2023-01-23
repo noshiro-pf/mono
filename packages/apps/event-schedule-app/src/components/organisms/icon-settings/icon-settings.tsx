@@ -1,5 +1,7 @@
-import type { IconListReducerAction } from '../../../functions';
-import { iconListReducer } from '../../../functions';
+import {
+  iconListReducer,
+  type IconListReducerAction,
+} from '../../../functions';
 import { Description } from '../../atoms';
 import { AnswerIconRow } from './icon-setting-row';
 

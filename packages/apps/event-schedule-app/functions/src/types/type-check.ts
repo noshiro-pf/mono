@@ -1,7 +1,8 @@
-import type { Answer, EventSchedule } from '@noshiro/event-schedule-app-shared';
 import {
   fillAnswer,
   fillEventSchedule,
+  type Answer,
+  type EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { isString, Str } from '@noshiro/ts-utils';

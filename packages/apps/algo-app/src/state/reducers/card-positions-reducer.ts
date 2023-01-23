@@ -1,6 +1,6 @@
-import type { Rect } from '@noshiro/ts-utils-additional';
+import { type Rect } from '@noshiro/ts-utils-additional';
 import { produce } from 'immer';
-import type { CardColor, CardNumber } from '../../types';
+import { type CardColor, type CardNumber } from '../../types';
 
 const defaultPosition = (): Rect => ({ top: 0, left: 0, width: 0, height: 0 });
 

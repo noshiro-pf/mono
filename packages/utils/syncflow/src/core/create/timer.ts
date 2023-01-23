@@ -1,6 +1,6 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import type { TimerObservable } from '../types';
+import { type TimerObservable } from '../types';
 
 export const timer = (
   milliSeconds: number,

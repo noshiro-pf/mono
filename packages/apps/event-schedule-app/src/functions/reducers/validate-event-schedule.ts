@@ -1,8 +1,8 @@
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { answerIconPointConfig } from '../../constants';
-import type {
-  EventScheduleValidation,
-  NotificationSettingsWithEmail,
+import {
+  type EventScheduleValidation,
+  type NotificationSettingsWithEmail,
 } from '../../types';
 
 export const validateEventSchedule = ({

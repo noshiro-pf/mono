@@ -1,4 +1,4 @@
-import type { RectSize } from '../types';
+import { type RectSize } from '../types';
 
 export const getImageSizeFromImageElement = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

@@ -1,6 +1,6 @@
 import { Button } from '@blueprintjs/core';
-import type { FormEventHandler } from 'react';
-import type { NumIconFilterState } from '../../../../types';
+import { type FormEventHandler } from 'react';
+import { type NumIconFilterState } from '../../../../types';
 import { SwitchWithoutLabelStyled } from '../../../bp';
 import { IconCountNumericInput } from '../../../molecules';
 

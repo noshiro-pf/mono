@@ -1,12 +1,12 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  CombineLatestObservable,
-  InitializedCombineLatestObservable,
-  NonEmptyUnknownList,
-  UpdaterSymbol,
-  Wrap,
-  WrapInitialized,
+import {
+  type CombineLatestObservable,
+  type InitializedCombineLatestObservable,
+  type NonEmptyUnknownList,
+  type UpdaterSymbol,
+  type Wrap,
+  type WrapInitialized,
 } from '../types';
 
 export const combineLatest = <A extends NonEmptyUnknownList>(

@@ -1,10 +1,10 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  FilterOperatorObservable,
-  Observable,
-  RemoveInitializedOperator,
-  UpdaterSymbol,
+import {
+  type FilterOperatorObservable,
+  type Observable,
+  type RemoveInitializedOperator,
+  type UpdaterSymbol,
 } from '../types';
 
 export function filter<A, B extends A>(

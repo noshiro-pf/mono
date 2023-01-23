@@ -3,7 +3,7 @@ import {
   clampAndRoundAnswersScore,
 } from '../../../constants';
 import { AnswerFilterAndSortStore } from '../../../store';
-import type { AnswersScore } from '../../../types';
+import { type AnswersScore } from '../../../types';
 import { BpRangeSlider, CheckboxView } from '../../bp';
 import { ScoreNumericInput } from '../../molecules';
 import {

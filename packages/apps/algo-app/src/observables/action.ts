@@ -2,7 +2,7 @@ import { fromArray, interval, merge, take } from '@noshiro/syncflow';
 import { serverTimestamp } from 'firebase/firestore';
 import { time } from '../constants';
 import { returnFalse } from '../return-boolean';
-import type { Card, GameStateAction, NWES } from '../types';
+import { type Card, type GameStateAction, type NWES } from '../types';
 import { db } from './database';
 
 const autoPlaySpeedRate = 0.5;

@@ -1,6 +1,6 @@
 import { idfn } from '@noshiro/ts-utils';
 import { mapEach } from './map-each';
-import type { PromiseState } from './promise-result-type';
+import { type PromiseState } from './promise-result-type';
 
 export const mapS = <S, SR = S, P = never, E = never>(
   mapFn: (value: S) => SR

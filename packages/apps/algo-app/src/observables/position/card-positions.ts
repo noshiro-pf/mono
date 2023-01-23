@@ -1,6 +1,6 @@
-import type { Rect } from '@noshiro/ts-utils-additional';
+import { type Rect } from '@noshiro/ts-utils-additional';
 import { cardPositionsReducer } from '../../state';
-import type { CardColor, CardNumber } from '../../types';
+import { type CardColor, type CardNumber } from '../../types';
 
 const cardPositionsAction$ = source<readonly [CardColor, CardNumber, Rect]>();
 

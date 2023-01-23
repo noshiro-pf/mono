@@ -1,5 +1,8 @@
-import type { TinyObservable, TinyObservableSource } from '@noshiro/ts-utils';
-import { createTinyObservable } from '@noshiro/ts-utils';
+import {
+  createTinyObservable,
+  type TinyObservable,
+  type TinyObservableSource,
+} from '@noshiro/ts-utils';
 import { useEffect, useRef } from 'react';
 import { useState } from './use-state';
 

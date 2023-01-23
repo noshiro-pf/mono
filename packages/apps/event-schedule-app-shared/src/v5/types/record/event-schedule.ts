@@ -1,15 +1,4 @@
 import { assertType, DateUtils } from '@noshiro/ts-utils';
-import type {
-  AnswerIconSettings,
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-  NotificationSettings,
-  PartialAnswerIconSettings,
-  PartialDatetimeRange,
-  PartialNotificationSettings,
-  PartialYmdhm,
-  Ymdhm,
-} from '../../../v4';
 import {
   defaultAnswerIconSetting,
   defaultNotificationSettings,
@@ -18,9 +7,17 @@ import {
   fillDatetimeRange,
   fillNotificationSettings,
   fillYmdhm,
+  type AnswerIconSettings,
+  type DatetimeRange,
+  type DatetimeSpecificationEnumType,
+  type NotificationSettings,
+  type PartialAnswerIconSettings,
+  type PartialDatetimeRange,
+  type PartialNotificationSettings,
+  type PartialYmdhm,
+  type Ymdhm,
 } from '../../../v4';
-import type { User } from './base';
-import { fillUser, userDefaultValue } from './base';
+import { fillUser, userDefaultValue, type User } from './base';
 
 export type EventSchedule = Readonly<{
   title: string;

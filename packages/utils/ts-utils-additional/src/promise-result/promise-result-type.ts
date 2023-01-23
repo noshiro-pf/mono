@@ -1,4 +1,8 @@
-import type { PromiseError, PromisePending, PromiseSuccess } from '../types';
+import {
+  type PromiseError,
+  type PromisePending,
+  type PromiseSuccess,
+} from '../types';
 
 export type Pending<P> = Readonly<{ status: PromisePending; value: P }>;
 export type SettleError<E> = Readonly<{ status: PromiseError; value: E }>;

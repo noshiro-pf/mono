@@ -1,5 +1,9 @@
-import type { InitializedObservable } from '@noshiro/syncflow';
-import { pluckI, subject, withInitialValue } from '@noshiro/syncflow';
+import {
+  pluckI,
+  subject,
+  withInitialValue,
+  type InitializedObservable,
+} from '@noshiro/syncflow';
 import { Arr, IMap } from '@noshiro/ts-utils';
 
 export type QueryParams = IMap<string, string>;

@@ -1,4 +1,4 @@
-import type { EventListItem } from '@noshiro/event-schedule-app-shared';
+import { type EventListItem } from '@noshiro/event-schedule-app-shared';
 import {
   errorFontColor,
   eventListItemTextColor,

@@ -1,4 +1,4 @@
-import type { Observable } from '../types';
+import { type Observable } from '../types';
 
 export const maxDepth = (parents: readonly Observable<unknown>[]): number => {
   let mut_max = 0;

@@ -1,7 +1,11 @@
-import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
+import { type Rect, type RectSize } from '@noshiro/ts-utils-additional';
 import { zIndex } from '../../constants';
 import { cardToString } from '../../functions';
-import type { CardColor, CardNumber, CardWithDisplayValue } from '../../types';
+import {
+  type CardColor,
+  type CardNumber,
+  type CardWithDisplayValue,
+} from '../../types';
 import { CardComponent } from '../card';
 
 type Props = Readonly<{

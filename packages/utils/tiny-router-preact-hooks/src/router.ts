@@ -1,6 +1,8 @@
 import { useObservableValue } from '@noshiro/syncflow-preact-hooks';
-import type { QueryParams } from '@noshiro/tiny-router-observable';
-import { createRouter } from '@noshiro/tiny-router-observable';
+import {
+  createRouter,
+  type QueryParams,
+} from '@noshiro/tiny-router-observable';
 
 const { pathname$, queryParams$, back, push, redirect, removeListener } =
   createRouter();

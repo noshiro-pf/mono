@@ -1,5 +1,4 @@
-import type { Rect } from '../../types';
-import { bottom, right } from '../../types';
+import { bottom, right, type Rect } from '../../types';
 
 /**
  * @description innerRectがouterRectに含まれているかどうか

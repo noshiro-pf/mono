@@ -1,6 +1,5 @@
-import type { Hue } from '@noshiro/ts-utils-additional';
-import type { IdType } from './id-type';
-import { defaultIdMaker } from './id-type';
+import { type Hue } from '@noshiro/ts-utils-additional';
+import { defaultIdMaker, type IdType } from './id-type';
 
 export type Label = Readonly<{
   id: IdType;

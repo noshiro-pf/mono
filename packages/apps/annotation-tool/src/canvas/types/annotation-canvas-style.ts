@@ -1,7 +1,11 @@
-import type { Percent, Rgba } from '@noshiro/ts-utils-additional';
-import type { BackgroundStyle } from './background-style';
-import type { BboxStyle, BboxStylePartial } from './bbox-style';
-import { defaultBboxStyle, fillBboxStyle } from './bbox-style';
+import { type Percent, type Rgba } from '@noshiro/ts-utils-additional';
+import { type BackgroundStyle } from './background-style';
+import {
+  defaultBboxStyle,
+  fillBboxStyle,
+  type BboxStyle,
+  type BboxStylePartial,
+} from './bbox-style';
 
 export type AnnotationCanvasStyle = Readonly<{
   background: Readonly<{

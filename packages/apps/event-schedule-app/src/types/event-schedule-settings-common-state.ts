@@ -1,5 +1,5 @@
-import type { EventScheduleValidation } from './event-schedule-validation';
-import type { NotificationSettingsWithEmail } from './notification-with-email';
+import { type EventScheduleValidation } from './event-schedule-validation';
+import { type NotificationSettingsWithEmail } from './notification-with-email';
 
 export type EventScheduleSettingCommonState = Readonly<{
   title: string;

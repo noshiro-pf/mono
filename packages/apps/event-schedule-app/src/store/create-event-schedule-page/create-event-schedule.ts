@@ -11,7 +11,7 @@ import {
   EventScheduleAppLocalStorage,
   showToast,
 } from '../../functions';
-import type { EventScheduleSettingCommonState } from '../../types';
+import { type EventScheduleSettingCommonState } from '../../types';
 import { now } from '../../utils';
 import { Auth } from '../auth';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';

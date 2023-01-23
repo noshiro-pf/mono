@@ -1,4 +1,4 @@
-import type { Point } from '../types';
+import { type Point } from '../types';
 
 export const dist = (p: number, q: number): number => Math.abs(p - q);
 

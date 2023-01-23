@@ -1,6 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
 import { number, string } from '../primitives';
-import type { TypeOf } from '../type';
+import { type TypeOf } from '../type';
 import { keyValueRecord } from './key-value-record';
 
 describe('keyValueRecord', () => {

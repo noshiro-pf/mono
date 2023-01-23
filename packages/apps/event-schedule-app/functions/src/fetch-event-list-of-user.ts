@@ -1,16 +1,16 @@
-import type { EventListItem } from '@noshiro/event-schedule-app-shared';
 import {
   compareYmd,
   eventListItemDefaultValue,
   fillAnswer,
   fillEventSchedule,
   firestorePaths,
+  type EventListItem,
 } from '@noshiro/event-schedule-app-shared';
 import { Arr, IMap, pipe, tp } from '@noshiro/ts-utils';
-import type { firestore } from 'firebase-admin';
+import { type firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
-import type { CallableContext } from 'firebase-functions/v1/https';
-import type { FetchEventListOfUserPayload } from './types';
+import { type CallableContext } from 'firebase-functions/v1/https';
+import { type FetchEventListOfUserPayload } from './types';
 import { today } from './utils';
 
 /**

@@ -1,4 +1,4 @@
-import type { Variable } from './variable';
+import { type Variable } from './variable';
 
 // eslint-disable-next-line @typescript-eslint/sort-type-constituents
 export type LambdaTerm = Variable | LambdaApplication | LambdaAbstraction;

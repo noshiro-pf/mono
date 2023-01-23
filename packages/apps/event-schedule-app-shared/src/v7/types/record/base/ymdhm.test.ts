@@ -1,8 +1,7 @@
 import { assertType } from '@noshiro/ts-utils';
 import { hoursMinutesDefaultValue } from './hours-minutes';
 import { yearMonthDateDefaultValue } from './year-month-date';
-import type { Ymdhm } from './ymdhm';
-import { fillYmdhm, isYmdhm, ymdhmDefaultValue } from './ymdhm';
+import { fillYmdhm, isYmdhm, ymdhmDefaultValue, type Ymdhm } from './ymdhm';
 
 describe('Ymdhm', () => {
   assertType<

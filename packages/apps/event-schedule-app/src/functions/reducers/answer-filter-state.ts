@@ -1,7 +1,9 @@
 import { compareYmd } from '@noshiro/event-schedule-app-shared';
-import type { AnswersScore } from '../../types';
-import type { AnswerIconFilterStateAction } from './answer-icon-filter-state';
-import { AnswerIconFilterState } from './answer-icon-filter-state';
+import { type AnswersScore } from '../../types';
+import {
+  AnswerIconFilterState,
+  type AnswerIconFilterStateAction,
+} from './answer-icon-filter-state';
 
 type UserNameAndIconId = readonly [UserName, AnswerIconIdWithNone];
 

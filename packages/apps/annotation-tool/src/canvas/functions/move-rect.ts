@@ -1,4 +1,4 @@
-import type { Point, Rect } from '@noshiro/ts-utils-additional';
+import { type Point, type Rect } from '@noshiro/ts-utils-additional';
 
 export const moveRect = (rectPrevious: Rect, from: Point, to: Point): Rect => ({
   top: rectPrevious.top - from.y + to.y,

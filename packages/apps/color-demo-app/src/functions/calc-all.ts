@@ -1,10 +1,12 @@
-import type { Hsl, Hue, Percent } from '@noshiro/ts-utils-additional';
 import {
   hslToRgb,
   relativeLuminance,
   variance,
+  type Hsl,
+  type Hue,
+  type Percent,
 } from '@noshiro/ts-utils-additional';
-import type { ColorResult } from '../types';
+import { type ColorResult } from '../types';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';

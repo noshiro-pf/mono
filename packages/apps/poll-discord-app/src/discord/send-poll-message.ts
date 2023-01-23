@@ -1,4 +1,4 @@
-import type { Message } from 'discord.js';
+import { type Message } from 'discord.js';
 import { emojis, triggerCommand } from '../constants';
 import {
   convertRp30ArgToRpArgs,
@@ -15,16 +15,6 @@ import {
   rpParseCommand,
 } from '../functions';
 import { addPoll } from '../in-memory-database';
-import type {
-  AnswerOfDate,
-  DatabaseRef,
-  DateOption,
-  DateOptionId,
-  Group,
-  PsqlClient,
-  TitleMessageId,
-  UserId,
-} from '../types';
 import {
   answerOfDateDefaultValue,
   createCommandMessageId,
@@ -32,6 +22,14 @@ import {
   createPollId,
   createTimestamp,
   createTitleMessageId,
+  type AnswerOfDate,
+  type DatabaseRef,
+  type DateOption,
+  type DateOptionId,
+  type Group,
+  type PsqlClient,
+  type TitleMessageId,
+  type UserId,
 } from '../types';
 
 const rpSendPollMessageSub = async (

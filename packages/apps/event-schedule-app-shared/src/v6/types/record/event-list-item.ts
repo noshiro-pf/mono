@@ -1,11 +1,10 @@
 import { Arr, isRecord, isString, Obj } from '@noshiro/ts-utils';
-import type { Answer } from './answer';
-import { fillAnswer, isAnswer } from './answer';
-import type { EventSchedule } from './event-schedule';
+import { fillAnswer, isAnswer, type Answer } from './answer';
 import {
   eventScheduleDefaultValue,
   fillEventSchedule,
   isEventSchedule,
+  type EventSchedule,
 } from './event-schedule';
 
 export type EventListItem = Readonly<{

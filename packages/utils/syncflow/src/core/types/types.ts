@@ -1,4 +1,4 @@
-import type { Queue } from '@noshiro/ts-utils';
+import { type Queue } from '@noshiro/ts-utils';
 
 export type TupleToQueueTuple<T extends readonly unknown[]> = {
   [P in keyof T]: Queue<T[P]>;

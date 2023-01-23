@@ -2,10 +2,6 @@ import { answerDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
 import { datetimeRange2str, Routes } from '../../constants';
-import type {
-  AnswerSelectionReducerAction,
-  CalendarCurrentPageReducerState,
-} from '../../functions';
 import {
   answerSelectionReducer,
   createToaster,
@@ -13,8 +9,10 @@ import {
   datetimeRangeToMapKey,
   showToast,
   theNameIsAlreadyUsedFn,
+  type AnswerSelectionReducerAction,
+  type CalendarCurrentPageReducerState,
 } from '../../functions';
-import type { AnswerSelectionValue } from '../../types';
+import { type AnswerSelectionValue } from '../../types';
 import { Auth } from '../auth';
 import { answers$, AnswersStore, eventSchedule$ } from '../fetching-state';
 import { router } from '../router';

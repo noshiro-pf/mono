@@ -1,4 +1,4 @@
-import type { Hsl } from '../../types';
+import { type Hsl } from '../../types';
 import { rgbToHex } from '../basic-conversion';
 import { hslToRgb } from './hsl-to-rgb';
 

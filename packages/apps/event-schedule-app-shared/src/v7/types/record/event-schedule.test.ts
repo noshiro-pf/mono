@@ -1,16 +1,23 @@
 import { assertType, DateUtils } from '@noshiro/ts-utils';
-import type { DatetimeSpecificationEnumType } from '../enum';
-import type { AnswerIconSettings } from './answer-icon-settings';
-import type { NotificationSettings, User, Ymdhm } from './base';
-import { answerIconSettingTypeDef, userDefaultValue } from './base';
-import type { DatetimeRange } from './datetime-range';
-import { datetimeRangeDefaultValue } from './datetime-range';
+import { type DatetimeSpecificationEnumType } from '../enum';
+import { type AnswerIconSettings } from './answer-icon-settings';
+import {
+  answerIconSettingTypeDef,
+  userDefaultValue,
+  type NotificationSettings,
+  type User,
+  type Ymdhm,
+} from './base';
+import {
+  datetimeRangeDefaultValue,
+  type DatetimeRange,
+} from './datetime-range';
 
-import type { EventSchedule } from './event-schedule';
 import {
   eventScheduleDefaultValue,
   fillEventSchedule,
   isEventSchedule,
+  type EventSchedule,
 } from './event-schedule';
 
 describe('EventSchedule', () => {

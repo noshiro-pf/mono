@@ -1,5 +1,5 @@
-import type { IsFixedLengthList } from './is-fixed-length-list';
-import type { Tuple } from './tuple';
+import { type IsFixedLengthList } from './is-fixed-length-list';
+import { type Tuple } from './tuple';
 
 export namespace ListType {
   export type Head<T extends readonly unknown[], D = never> = Tuple.Head<T, D>;

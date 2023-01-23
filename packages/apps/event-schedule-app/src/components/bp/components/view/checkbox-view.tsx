@@ -1,5 +1,4 @@
-import type { ChangeEventHandler } from 'react';
-import { useRef } from 'react';
+import { useRef, type ChangeEventHandler } from 'react';
 
 type Props = DeepReadonly<{
   state: 'checked' | 'indeterminate' | 'none';
