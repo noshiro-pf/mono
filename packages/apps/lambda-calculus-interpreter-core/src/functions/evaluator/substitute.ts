@@ -1,9 +1,10 @@
+import { Json, Result } from '@noshiro/ts-utils';
 import { type LambdaTerm, type Variable } from '../../types';
 import { getFreeVariables } from '../get-free-variables';
 import { isAbstraction, isApplication } from '../is-lambda-term';
 import { isVariable } from '../is-variable';
 import { pickUpAvailableVariable } from '../pickup-available-variable';
-import { alphaConversion } from './alpha-convertion';
+import { alphaConversion } from './alpha-conversion';
 
 /**
  * @desc substitute term2 for x in formula term1 in capture-avoiding manner.
