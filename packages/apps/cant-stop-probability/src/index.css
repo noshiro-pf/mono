@@ -1,7 +1,7 @@
-@import '~normalize.css';
+@import 'normalize.css';
 
 /* import these first because they're the base layer */
-@import '~@blueprintjs/core/lib/css/blueprint.css';
+@import '@blueprintjs/core/lib/css/blueprint.css';
 
 body {
   margin: 0;
