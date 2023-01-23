@@ -19,7 +19,7 @@
     "lint:fix": "yarn z:lint:fix:src:wireit",
     "pub": "yarn zz:cmd:publish",
     "test": "yarn z:test:wireit",
-    "testw": "yarn zz:cmd:jest --watch",
+    "testw": "yarn zz:cmd:vitest --watch",
     "tsc": "yarn z:type-check:wireit",
     "tscw": "yarn z:type-check:impl --watch",
     "z:build:impl": "run-p zz:cmd:build:**",
@@ -30,7 +30,7 @@
     "z:lint:fix:src:wireit": "wireit",
     "z:lint:src:impl": "yarn zz:cmd:eslint:src",
     "z:lint:src:wireit": "wireit",
-    "z:test:impl": "yarn zz:cmd:jest",
+    "z:test:impl": "yarn zz:cmd:vitest run",
     "z:test:wireit": "wireit",
     "z:type-check:impl": "tsc --noEmit",
     "z:type-check:wireit": "wireit",
@@ -39,10 +39,10 @@
     "zz:cmd:eslint": "eslint --ext .ts,.tsx --color",
     "zz:cmd:eslint:src": "yarn zz:cmd:eslint src/ --cache --cache-location ./.eslintcache",
     "zz:cmd:gi": "bash ../../../scripts/index_ts_generator.sh",
-    "zz:cmd:jest": "jest --config config/jest.config.json --passWithNoTests",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:cmd:publish": "yarn publish --no-git-tag-version --access=public",
-    "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
+    "zz:cmd:tsc-incremental": "tsc --incremental --pretty",
+    "zz:cmd:vitest": "vitest --config config/vitest.config.ts --passWithNoTests"
   },
   "dependencies": {
     "@noshiro/io-ts": "*",
@@ -119,7 +119,8 @@
     "z:test:wireit": {
       "command": "yarn z:test:impl",
       "files": [
-        "config/jest.config.json",
+        "config/vitest.config.json",
+        "config/tsconfig.test.json",
         "src/**"
       ]
     },
