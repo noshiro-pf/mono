@@ -1,4 +1,3 @@
-import { isRecord } from '@noshiro/ts-utils';
 import {
   answerOfDateToJson,
   fillAnswerOfDate,

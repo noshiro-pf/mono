@@ -1,4 +1,3 @@
-import { isRecord } from '@noshiro/ts-utils';
 import { fillPoll, pollToJson, type Poll, type PollJson } from './poll';
 import {
   createCommandMessageId,
