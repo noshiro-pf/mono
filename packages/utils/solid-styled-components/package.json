@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "test:types": "tsc --project tsconfig.test.json",
-    "tsc": "yarn z:no-wireit:type-check",
+    "tsc": "yarn z:wireit:type-check",
     "tscw": "yarn z:cmd:type-check --watch",
     "z:cmd:type-check": "tsc --noEmit",
     "z:no-wireit:type-check": "yarn z:cmd:type-check",
