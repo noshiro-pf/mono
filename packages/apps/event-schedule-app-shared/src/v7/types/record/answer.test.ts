@@ -1,15 +1,14 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { AnswerId, Weight } from '../named-primitive-types';
-import type { Answer } from './answer';
+import { type AnswerId, type Weight } from '../named-primitive-types';
 import {
   answerDefaultValue,
   ANSWER_KEY_CREATED_AT,
   fillAnswer,
   isAnswer,
+  type Answer,
 } from './answer';
-import type { AnswerSelection } from './answer-selection';
-import type { User } from './base';
-import { userDefaultValue } from './base';
+import { type AnswerSelection } from './answer-selection';
+import { userDefaultValue, type User } from './base';
 
 describe('Answer', () => {
   assertType<

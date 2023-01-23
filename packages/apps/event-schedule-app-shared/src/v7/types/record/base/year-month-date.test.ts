@@ -1,9 +1,9 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { YearMonthDate } from './year-month-date';
 import {
   fillYearMonthDate,
   isYearMonthDate,
   yearMonthDateDefaultValue,
+  type YearMonthDate,
 } from './year-month-date';
 
 describe('YearMonthDate', () => {

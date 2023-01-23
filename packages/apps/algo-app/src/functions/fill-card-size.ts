@@ -1,4 +1,4 @@
-import type { RectSize } from '@noshiro/ts-utils-additional';
+import { type RectSize } from '@noshiro/ts-utils-additional';
 import { defaultCardSize } from '../constants';
 
 export const fillCardSize = (size: Partial<RectSize> | undefined): RectSize =>

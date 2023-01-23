@@ -1,4 +1,4 @@
-import type { DetailedFilterIcon, NumIconFilterState } from '../../types';
+import { type DetailedFilterIcon, type NumIconFilterState } from '../../types';
 
 export type AnswerIconFilterState = DeepReadonly<{
   good: NumIconFilterState;

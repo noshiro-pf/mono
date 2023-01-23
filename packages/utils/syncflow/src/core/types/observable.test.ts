@@ -1,7 +1,12 @@
 import { assertNotType, assertType, Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import type { Observable, ObservableValue, Unwrap, Wrap } from './observable';
-import { isRootObservable } from './observable';
+import {
+  isRootObservable,
+  type Observable,
+  type ObservableValue,
+  type Unwrap,
+  type Wrap,
+} from './observable';
 
 assertType<TypeExtends<number, ObservableValue<Observable<number>>>>();
 assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();

@@ -1,9 +1,14 @@
 import { InputGroup } from '@blueprintjs/core';
 import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
-import type { TinyObservable } from '@noshiro/ts-utils';
-import { createTinyObservable } from '@noshiro/ts-utils';
-import type { ChangeEvent, ComponentProps, FormEvent } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { createTinyObservable, type TinyObservable } from '@noshiro/ts-utils';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  type ChangeEvent,
+  type ComponentProps,
+  type FormEvent,
+} from 'react';
 
 type InputGroupPropsOriginal = ComponentProps<typeof InputGroup>;
 

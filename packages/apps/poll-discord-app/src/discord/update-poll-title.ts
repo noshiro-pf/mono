@@ -1,4 +1,4 @@
-import type { Message, PartialMessage } from 'discord.js';
+import { type Message, type PartialMessage } from 'discord.js';
 import { triggerCommand } from '../constants';
 import {
   createTitleString,
@@ -7,8 +7,11 @@ import {
   rpCreateSummaryMessage,
   rpParseCommand,
 } from '../functions';
-import type { DatabaseRef, PsqlClient } from '../types';
-import { createCommandMessageId } from '../types';
+import {
+  createCommandMessageId,
+  type DatabaseRef,
+  type PsqlClient,
+} from '../types';
 import { fixAnswerAndUpdateMessage } from './fix-answer';
 
 export const updatePollTitle = async (

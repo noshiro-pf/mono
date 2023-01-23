@@ -1,5 +1,5 @@
 import { mapOptional, Num } from '@noshiro/ts-utils';
-import type { Rgb, RgbValue } from '../../types';
+import { type Rgb, type RgbValue } from '../../types';
 
 const clamp255 = Num.clamp(0, 255) as (target: number) => RgbValue;
 

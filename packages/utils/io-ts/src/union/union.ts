@@ -1,5 +1,5 @@
 import { Result } from '@noshiro/ts-utils';
-import type { Type, TypeOf } from '../type';
+import { type Type, type TypeOf } from '../type';
 import {
   createAssertFunction,
   createIsFnFromValidateFn,

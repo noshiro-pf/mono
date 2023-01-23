@@ -1,6 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
 import { number } from '../primitives';
-import type { TypeOf } from '../type';
+import { type TypeOf } from '../type';
 import { nonEmptyArray } from './non-empty-array';
 
 describe('nonEmptyArray', () => {

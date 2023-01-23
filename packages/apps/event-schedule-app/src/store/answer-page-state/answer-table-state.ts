@@ -6,7 +6,10 @@ import {
   createAnswerTable,
   createScore,
 } from '../../functions';
-import type { AnswerTableCell, AnswerTableCellPosition } from '../../types';
+import {
+  type AnswerTableCell,
+  type AnswerTableCellPosition,
+} from '../../types';
 import { ymd2day } from '../../utils';
 import { answers$, eventSchedule$ } from '../fetching-state';
 import { AnswerFilterAndSortStore } from './answer-filter-sort-state';

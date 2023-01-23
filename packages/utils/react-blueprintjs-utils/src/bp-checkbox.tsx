@@ -1,7 +1,6 @@
 import { Checkbox } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { ComponentProps, FormEvent } from 'react';
-import { useCallback } from 'react';
+import { useCallback, type ComponentProps, type FormEvent } from 'react';
 
 type CheckboxPropsOriginal = ComponentProps<typeof Checkbox>;
 

@@ -1,4 +1,4 @@
-import type { CalculatedValues, Store } from '../types';
+import { type CalculatedValues, type Store } from '../types';
 import { calcPrincipalAndInterestEqualPayment } from './calc-principal-and-interest-equal-repayment';
 import { calcPrincipalEqualPayment } from './calc-principal-equal-payment';
 

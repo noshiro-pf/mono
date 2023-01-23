@@ -1,7 +1,7 @@
 import { Client as DiscordClient, Intents } from 'discord.js';
 import { triggerCommand } from '../constants';
 import { DISCORD_TOKEN } from '../env';
-import type { DatabaseRef, PsqlClient } from '../types';
+import { type DatabaseRef, type PsqlClient } from '../types';
 import { onMessageReactionAdd, onMessageReactionRemove } from './reaction';
 import { sendMessageMain } from './send-poll-message';
 import { updatePollTitle } from './update-poll-title';

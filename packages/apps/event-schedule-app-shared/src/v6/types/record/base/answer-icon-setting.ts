@@ -1,6 +1,5 @@
 import { isRecord, isString, Obj } from '@noshiro/ts-utils';
-import type { AnswerIconPoint } from '../../enum';
-import { isAnswerIconPoint } from '../../enum';
+import { isAnswerIconPoint, type AnswerIconPoint } from '../../enum';
 
 export type AnswerIconSetting = Readonly<{
   description: string;

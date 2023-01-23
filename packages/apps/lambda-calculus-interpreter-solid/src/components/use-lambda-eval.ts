@@ -1,16 +1,16 @@
-import type { LambdaTerm } from '@noshiro/lambda-calculus-interpreter-core';
 import {
   evalSequence,
   parseLambdaTerm,
   termToString,
+  type LambdaTerm,
 } from '@noshiro/lambda-calculus-interpreter-core';
-import type { InitializedObservable } from '@noshiro/syncflow';
 import {
   debounceTimeI,
   filter,
   map,
   mapI,
   withInitialValue,
+  type InitializedObservable,
 } from '@noshiro/syncflow';
 
 export const useLambdaEval = (

@@ -1,6 +1,6 @@
-import type { RectSize } from '@noshiro/ts-utils-additional';
+import { type RectSize } from '@noshiro/ts-utils-additional';
 import { outlineColorDef, text } from '../../constants';
-import type { SelectAnswerBalloonProps } from '../../types';
+import { type SelectAnswerBalloonProps } from '../../types';
 import { Button } from '../bp';
 import { CardComponent } from '../card';
 import {

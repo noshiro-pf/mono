@@ -3,7 +3,7 @@ import { array } from './array';
 import { int, positiveInteger, uintRange } from './numbers';
 import { number } from './primitives';
 import { record } from './record';
-import type { TypeOf } from './type';
+import { type TypeOf } from './type';
 
 describe('nested record', () => {
   const nestedRecord = record({

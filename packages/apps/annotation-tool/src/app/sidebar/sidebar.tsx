@@ -1,8 +1,8 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { Percent } from '@noshiro/ts-utils-additional';
+import { type Percent } from '@noshiro/ts-utils-additional';
 import styled from 'styled-components';
-import type { Label } from '../../canvas';
-import type { AppEventHandler } from '../event-handlers';
+import { type Label } from '../../canvas';
+import { type AppEventHandler } from '../event-handlers';
 import { LabelButtons } from './label-button';
 
 type Props = Readonly<{

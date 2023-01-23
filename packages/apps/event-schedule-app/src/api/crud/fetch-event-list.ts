@@ -1,5 +1,7 @@
-import type { EventListItem } from '@noshiro/event-schedule-app-shared';
-import { isEventListItem } from '@noshiro/event-schedule-app-shared';
+import {
+  isEventListItem,
+  type EventListItem,
+} from '@noshiro/event-schedule-app-shared';
 import { httpsCallable } from 'firebase/functions';
 import { fbFunctions } from '../../initialize-firebase';
 

@@ -1,5 +1,5 @@
 import { Arr } from '@noshiro/ts-utils';
-import type { Hsl, Hue } from './types';
+import { type Hsl, type Hue } from './types';
 
 export const whiteHsl: Hsl = [0, 0, 100];
 export const blackHsl: Hsl = [0, 0, 0];

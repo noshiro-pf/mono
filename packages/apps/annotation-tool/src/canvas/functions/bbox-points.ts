@@ -1,4 +1,4 @@
-import type { Point, Rect } from '@noshiro/ts-utils-additional';
+import { type Point, type Rect } from '@noshiro/ts-utils-additional';
 
 // eslint-disable-next-line @typescript-eslint/sort-type-constituents
 export type Direction = 'nw' | 'n_' | 'ne' | 'w_' | 'e_' | 'sw' | 's_' | 'se';

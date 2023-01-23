@@ -1,4 +1,4 @@
-import type { Count } from '../types';
+import { type Count } from '../types';
 
 /**
  * （計算式）

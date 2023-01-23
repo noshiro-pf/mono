@@ -1,4 +1,4 @@
-import type { Card } from '../types';
+import { type Card } from '../types';
 
 export const sortCards = <C extends Card>(
   cards: ArrayOfLength<6, C>

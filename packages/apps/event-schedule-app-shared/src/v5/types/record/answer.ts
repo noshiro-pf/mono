@@ -1,9 +1,17 @@
 import { assertType, DateUtils } from '@noshiro/ts-utils';
-import type { AnswerSelection, PartialAnswerSelection } from '../../../v4';
-import { ANSWER_KEY_CREATED_AT, fillAnswerSelection } from '../../../v4';
-import type { AnswerId, Weight } from '../named-primitive-types';
-import type { PartialUser, User } from './base';
-import { fillUser, userDefaultValue } from './base';
+import {
+  ANSWER_KEY_CREATED_AT,
+  fillAnswerSelection,
+  type AnswerSelection,
+  type PartialAnswerSelection,
+} from '../../../v4';
+import { type AnswerId, type Weight } from '../named-primitive-types';
+import {
+  fillUser,
+  userDefaultValue,
+  type PartialUser,
+  type User,
+} from './base';
 
 export type Answer = Readonly<{
   id: AnswerId;

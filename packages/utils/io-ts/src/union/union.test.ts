@@ -1,7 +1,7 @@
 import { assertType } from '@noshiro/ts-utils';
 import { number, numberLiteral, stringLiteral } from '../primitives';
 import { record } from '../record';
-import type { TypeOf } from '../type';
+import { type TypeOf } from '../type';
 import { union } from './union';
 
 describe('union', () => {

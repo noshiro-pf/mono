@@ -1,8 +1,6 @@
-import type { PermutationString } from '@noshiro/ts-utils-additional';
-import type { Card } from './card-type';
-import { isCard } from './card-type';
-import type { Player } from './player';
-import { isPlayer } from './player';
+import { type PermutationString } from '@noshiro/ts-utils-additional';
+import { isCard, type Card } from './card-type';
+import { isPlayer, type Player } from './player';
 
 export type RoomRemote = DeepReadonly<{
   password: string | undefined;

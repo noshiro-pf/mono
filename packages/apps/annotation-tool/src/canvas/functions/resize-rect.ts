@@ -1,6 +1,9 @@
-import type { Point, Rect } from '@noshiro/ts-utils-additional';
-import { normalizeRect } from '@noshiro/ts-utils-additional';
-import type { Direction } from './bbox-points';
+import {
+  normalizeRect,
+  type Point,
+  type Rect,
+} from '@noshiro/ts-utils-additional';
+import { type Direction } from './bbox-points';
 
 const resizeRectSub = (
   rectPrevious: Rect,

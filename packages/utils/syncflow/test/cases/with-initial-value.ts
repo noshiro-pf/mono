@@ -1,13 +1,14 @@
-import type { Observable, TimerObservable } from '../../src';
 import {
   combineLatest,
   interval,
   take,
   timer,
   withInitialValue,
+  type Observable,
+  type TimerObservable,
 } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 /*
                         : 0    1    2    3    4    5    6    7    8    9    10

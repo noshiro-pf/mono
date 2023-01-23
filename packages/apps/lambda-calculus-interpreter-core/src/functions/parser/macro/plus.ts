@@ -1,4 +1,4 @@
-import type { LambdaTerm } from '../../../types';
+import { type LambdaTerm } from '../../../types';
 import { splitToTokens } from '../split-to-tokens';
 
 const plusStr: string =

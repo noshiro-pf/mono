@@ -1,5 +1,9 @@
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hue, Mappable, Percent } from '@noshiro/ts-utils-additional';
+import {
+  type Hue,
+  type Mappable,
+  type Percent,
+} from '@noshiro/ts-utils-additional';
 import styled from 'styled-components';
 import { ColorItem } from '../atoms';
 

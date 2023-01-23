@@ -1,9 +1,9 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { HoursMinutes } from './hours-minutes';
 import {
   fillHoursMinutes,
   hoursMinutesDefaultValue,
   isHoursMinutes,
+  type HoursMinutes,
 } from './hours-minutes';
 
 describe('HoursMinutes', () => {

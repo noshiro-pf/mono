@@ -1,5 +1,8 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
-import { rgbaToHexNumber } from '@noshiro/ts-utils-additional';
+import {
+  rgbaToHexNumber,
+  type Rect,
+  type Rgba,
+} from '@noshiro/ts-utils-additional';
 import { Graphics, Sprite, Texture } from 'pixi.js';
 
 export const createDummySpriteRectangle = (rect: Rect): Sprite => {

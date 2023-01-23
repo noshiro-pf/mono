@@ -33,7 +33,7 @@ import {
   zipTestCases,
 } from './cases';
 import { TICK } from './constants';
-import type { StreamTestCase } from './typedef';
+import { type StreamTestCase } from './typedef';
 
 const exampleList: readonly {
   name: string;

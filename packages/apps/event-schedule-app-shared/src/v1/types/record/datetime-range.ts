@@ -1,10 +1,16 @@
-import type { PartialYearMonthDate, YearMonthDate } from './base';
-import { compareYmd, defaultYearMonthDate, fillYearMonthDate } from './base';
-import type { PartialTimeRange, TimeRange } from './time-range';
+import {
+  compareYmd,
+  defaultYearMonthDate,
+  fillYearMonthDate,
+  type PartialYearMonthDate,
+  type YearMonthDate,
+} from './base';
 import {
   compareTimeRange,
   defaultTimeRange,
   fillTimeRange,
+  type PartialTimeRange,
+  type TimeRange,
 } from './time-range';
 
 export type DatetimeRange = Readonly<{

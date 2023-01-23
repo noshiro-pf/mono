@@ -1,7 +1,6 @@
-import type { DateRange } from '@blueprintjs/datetime2';
-import { DateRangeInput2 } from '@blueprintjs/datetime2';
+import { DateRangeInput2, type DateRange } from '@blueprintjs/datetime2';
 import { ymdFromDate, ymdhm2Date } from '@noshiro/event-schedule-app-shared';
-import type { ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 

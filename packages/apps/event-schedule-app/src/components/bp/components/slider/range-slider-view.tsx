@@ -3,7 +3,7 @@ import { SliderHandle } from './handle';
 import { SliderProgressStyled, SliderTrackStyled } from './progress-styled';
 import { useRangeSliderInlineStyles } from './range-slider-inline-styles-hook';
 import { useRangeSliderLabels } from './range-slider-labels-hook';
-import type { SliderHandleElementAdaptor } from './slider-handle-hook';
+import { type SliderHandleElementAdaptor } from './slider-handle-hook';
 import {
   SliderLabelMaxStyled,
   SliderLabelMinStyled,

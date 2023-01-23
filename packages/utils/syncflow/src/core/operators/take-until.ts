@@ -1,11 +1,11 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  InitializedToInitializedOperator,
-  Observable,
-  TakeUntilOperatorObservable,
-  ToBaseOperator,
-  UpdaterSymbol,
+import {
+  type InitializedToInitializedOperator,
+  type Observable,
+  type TakeUntilOperatorObservable,
+  type ToBaseOperator,
+  type UpdaterSymbol,
 } from '../types';
 
 export const takeUntil =

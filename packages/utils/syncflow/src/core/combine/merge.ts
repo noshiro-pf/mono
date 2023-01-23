@@ -1,10 +1,10 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  MergeObservable,
-  NonEmptyUnknownList,
-  UpdaterSymbol,
-  Wrap,
+import {
+  type MergeObservable,
+  type NonEmptyUnknownList,
+  type UpdaterSymbol,
+  type Wrap,
 } from '../types';
 
 /** @deprecated use `createState` instead */

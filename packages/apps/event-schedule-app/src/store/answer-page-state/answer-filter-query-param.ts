@@ -1,11 +1,10 @@
 import { isYearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { Routes } from '../../constants';
-import type {
-  AnswerFilterState,
-  AnswerFilterStateAction,
+import {
+  type AnswerFilterState,
+  type AnswerFilterStateAction,
 } from '../../functions';
-import type { AnswersScore } from '../../types';
-import { isAnswersScore } from '../../types';
+import { isAnswersScore, type AnswersScore } from '../../types';
 import { router } from '../router';
 
 const keyDef = Routes.queryParamKey.answerTableState;

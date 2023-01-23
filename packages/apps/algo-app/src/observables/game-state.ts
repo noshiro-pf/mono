@@ -1,6 +1,6 @@
 import { returnFalse } from '../return-boolean';
 import { gameStateReducer, initialGameState } from '../state';
-import type { GameState } from '../types';
+import { type GameState } from '../types';
 import { gameStateActionMerged$ } from './action';
 
 export const gameState$: InitializedObservable<GameState> =

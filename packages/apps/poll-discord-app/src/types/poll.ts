@@ -1,15 +1,21 @@
 import { isRecord } from '@noshiro/ts-utils';
-import type { AnswerOfDate, AnswerOfDateJson } from './answer-of-date';
-import { answerOfDateToJson, fillAnswerOfDate } from './answer-of-date';
-import type { DateOption } from './date-option';
-import { fillDateOption } from './date-option';
-import type { DateOptionId, PollId, Timestamp, TitleMessageId } from './types';
+import {
+  answerOfDateToJson,
+  fillAnswerOfDate,
+  type AnswerOfDate,
+  type AnswerOfDateJson,
+} from './answer-of-date';
+import { fillDateOption, type DateOption } from './date-option';
 import {
   createDateOptionId,
   createPollId,
   createTimestamp,
   createTitleMessageId,
   isTimestamp,
+  type DateOptionId,
+  type PollId,
+  type Timestamp,
+  type TitleMessageId,
 } from './types';
 
 export type Poll = DeepReadonly<{

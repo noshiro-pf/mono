@@ -1,5 +1,5 @@
 import { promiseStatus } from '../types';
-import type { PromiseState } from './promise-result-type';
+import { type PromiseState } from './promise-result-type';
 
 export const pending = <P = never, E = never, S = never>(
   p: P

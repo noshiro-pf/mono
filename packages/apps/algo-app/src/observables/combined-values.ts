@@ -1,11 +1,11 @@
 import { getCardDirection } from '../functions';
 import { mapToDisplayValue } from '../state';
-import type {
-  CardNumber,
-  ConfirmTossBalloonProps,
-  DecidedAnswerBalloonProps,
-  DisplayValues,
-  SelectAnswerBalloonProps,
+import {
+  type CardNumber,
+  type ConfirmTossBalloonProps,
+  type DecidedAnswerBalloonProps,
+  type DisplayValues,
+  type SelectAnswerBalloonProps,
 } from '../types';
 import {
   onAnswerCancel,

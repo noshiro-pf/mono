@@ -1,5 +1,7 @@
-import type { DatetimeRange } from '@noshiro/event-schedule-app-shared';
-import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
+import {
+  fillDatetimeRange,
+  type DatetimeRange,
+} from '@noshiro/event-schedule-app-shared';
 import { Json, Result } from '@noshiro/ts-utils';
 
 export const datetimeRangeToMapKey = (datetimeRange: DatetimeRange): string =>

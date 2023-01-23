@@ -1,8 +1,9 @@
-import type {
-  InitializedObservable,
-  SourceObservable,
+import {
+  source,
+  withInitialValue,
+  type InitializedObservable,
+  type SourceObservable,
 } from '@noshiro/syncflow';
-import { source, withInitialValue } from '@noshiro/syncflow';
 import { useCallback, useMemo } from 'preact/hooks';
 import { useObservable } from './use-observable';
 

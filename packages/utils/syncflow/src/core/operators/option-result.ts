@@ -1,16 +1,16 @@
 import { Maybe, Result } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  InitializedToInitializedOperator,
-  MapMaybeOperatorObservable,
-  MapResultErrOperatorObservable,
-  MapResultOkOperatorObservable,
-  Observable,
-  ToBaseOperator,
-  UnwrapMaybeOperatorObservable,
-  UnwrapResultErrOperatorObservable,
-  UnwrapResultOkOperatorObservable,
-  UpdaterSymbol,
+import {
+  type InitializedToInitializedOperator,
+  type MapMaybeOperatorObservable,
+  type MapResultErrOperatorObservable,
+  type MapResultOkOperatorObservable,
+  type Observable,
+  type ToBaseOperator,
+  type UnwrapMaybeOperatorObservable,
+  type UnwrapResultErrOperatorObservable,
+  type UnwrapResultOkOperatorObservable,
+  type UpdaterSymbol,
 } from '../types';
 
 export const unwrapMaybe =

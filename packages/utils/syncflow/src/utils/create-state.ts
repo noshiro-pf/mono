@@ -1,4 +1,4 @@
-import type { InitializedObservable } from '../core';
+import { type InitializedObservable } from '../core';
 import { createReducer } from './create-reducer';
 
 type Action<S> = Readonly<

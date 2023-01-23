@@ -1,5 +1,5 @@
 import { Num } from '@noshiro/ts-utils';
-import type { Hue } from '../../types';
+import { type Hue } from '../../types';
 
 const clamp359 = Num.clamp(0, 359) as (x: number) => Hue;
 

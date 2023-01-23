@@ -1,13 +1,16 @@
-import type { Point, Rgba } from '@noshiro/ts-utils-additional';
-import type { Direction } from '../functions';
-import { turnOffHighlight, turnOnHighlight } from '../functions';
-import type {
-  AnnotationCanvasStyle,
-  IdType,
-  PixiApp,
-  PixiBbox,
+import { type Point, type Rgba } from '@noshiro/ts-utils-additional';
+import {
+  turnOffHighlight,
+  turnOnHighlight,
+  type Direction,
+} from '../functions';
+import {
+  type AnnotationCanvasStyle,
+  type IdType,
+  type PixiApp,
+  type PixiBbox,
 } from '../types';
-import type { CanvasAppState } from './canvas-state-type';
+import { type CanvasAppState } from './canvas-state-type';
 import {
   onPointerDown,
   onPointerDownOnBackground,

@@ -1,4 +1,4 @@
-import type { ReactNodeArray } from 'react';
+import { type ReactNodeArray } from 'react';
 import { memoNamed } from './memo-named';
 
 type Props = Readonly<{

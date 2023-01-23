@@ -1,8 +1,3 @@
-import type {
-  EmailInputState,
-  InputState,
-  PasswordWithConfirmationState,
-} from '../input-state';
 import {
   emailInputHasError,
   emailInputInitialState,
@@ -11,8 +6,11 @@ import {
   passwordWithConfirmationHasError,
   passwordWithConfirmationInitialState,
   passwordWithConfirmationStateReducer,
+  type EmailInputState,
+  type InputState,
+  type PasswordWithConfirmationState,
 } from '../input-state';
-import type { SignInPageStateAction } from './sign-in-page-state';
+import { type SignInPageStateAction } from './sign-in-page-state';
 
 export type RegisterPageState = Readonly<{
   username: InputState;

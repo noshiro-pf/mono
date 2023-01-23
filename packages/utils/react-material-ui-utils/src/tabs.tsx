@@ -1,7 +1,7 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { Num } from '@noshiro/ts-utils';
-import type { Mappable } from '@noshiro/ts-utils-additional';
+import { type Mappable } from '@noshiro/ts-utils-additional';
 import { useCallback } from 'react';
 
 type Props = Readonly<{

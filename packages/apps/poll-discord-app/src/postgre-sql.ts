@@ -1,7 +1,6 @@
 import { Client } from 'pg';
 import { psqlRowId, psqlRowType, psqlTableName } from './constants';
-import type { PsqlClient, PsqlRow } from './types';
-import { databaseDefaultValue } from './types';
+import { databaseDefaultValue, type PsqlClient, type PsqlRow } from './types';
 
 export namespace psql {
   // export const setTlsRejectUnauthorized0 = (): void => {

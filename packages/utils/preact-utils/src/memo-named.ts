@@ -1,4 +1,4 @@
-import type { FunctionComponent } from 'preact';
+import { type FunctionComponent } from 'preact';
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { memo } from 'preact/compat';

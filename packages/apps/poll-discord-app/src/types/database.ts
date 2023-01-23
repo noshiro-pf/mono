@@ -1,11 +1,12 @@
 import { isRecord } from '@noshiro/ts-utils';
-import type { Poll, PollJson } from './poll';
-import { fillPoll, pollToJson } from './poll';
-import type { CommandMessageId, DateOptionId, PollId } from './types';
+import { fillPoll, pollToJson, type Poll, type PollJson } from './poll';
 import {
   createCommandMessageId,
   createDateOptionId,
   createPollId,
+  type CommandMessageId,
+  type DateOptionId,
+  type PollId,
 } from './types';
 
 export type Database = Readonly<{

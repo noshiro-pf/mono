@@ -1,5 +1,5 @@
-import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
-import type { NWES } from '../../types';
+import { type Rect, type RectSize } from '@noshiro/ts-utils-additional';
+import { type NWES } from '../../types';
 
 export const calcBalloonPosition = ({
   anchorCardRect,

@@ -1,5 +1,5 @@
 import { emojis } from '../constants';
-import type { AnswerType } from '../types';
+import { type AnswerType } from '../types';
 
 export const emojiIdFromUnicode = (unicode: string): AnswerType | undefined => {
   switch (unicode) {

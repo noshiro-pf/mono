@@ -1,4 +1,4 @@
-import type { Rect } from '@noshiro/ts-utils-additional';
+import { type Rect } from '@noshiro/ts-utils-additional';
 import { text } from '../constants';
 import {
   cardPositionsDispatcher,
@@ -10,7 +10,7 @@ import {
   selectAnswerBalloonProps$,
   turnPlayerHighlighterPosition$,
 } from '../observables';
-import type { DisplayValues } from '../types';
+import { type DisplayValues } from '../types';
 import {
   ConfirmTossBalloon,
   DecidedAnswerBalloon,

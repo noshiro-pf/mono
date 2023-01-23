@@ -1,17 +1,17 @@
 import { isRecord, Obj } from '@noshiro/ts-utils';
-import type { YearMonthDate } from './base';
 import {
   compareYmd,
   fillYearMonthDate,
   isYearMonthDate,
   yearMonthDateDefaultValue,
+  type YearMonthDate,
 } from './base';
-import type { TimeRange } from './time-range';
 import {
   compareTimeRange,
   fillTimeRange,
   isTimeRange,
   timeRangeDefaultValue,
+  type TimeRange,
 } from './time-range';
 
 export type DatetimeRange = Readonly<{

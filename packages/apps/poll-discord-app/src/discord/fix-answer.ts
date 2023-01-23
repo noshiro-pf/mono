@@ -1,4 +1,4 @@
-import type { Collection, Message } from 'discord.js';
+import { type Collection, type Message } from 'discord.js';
 import { emojis } from '../constants';
 import {
   createUserIdToDisplayNameMap,
@@ -6,12 +6,12 @@ import {
   rpCreateSummaryMessage,
 } from '../functions';
 import { updatePoll } from '../in-memory-database';
-import type {
-  DatabaseRef,
-  DateOptionId,
-  Poll,
-  PsqlClient,
-  UserId,
+import {
+  type DatabaseRef,
+  type DateOptionId,
+  type Poll,
+  type PsqlClient,
+  type UserId,
 } from '../types';
 
 /** @description reactions を取得して poll.answers を修復（データベースが壊れたときの保険）

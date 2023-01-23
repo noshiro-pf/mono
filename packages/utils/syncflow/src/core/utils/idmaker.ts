@@ -1,4 +1,8 @@
-import type { ObservableId, SubscriberId, UpdaterSymbol } from '../types';
+import {
+  type ObservableId,
+  type SubscriberId,
+  type UpdaterSymbol,
+} from '../types';
 
 function* idMaker<T extends symbol>(): Generator<T, T, T> {
   let mut_i = 0;

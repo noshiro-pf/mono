@@ -1,4 +1,4 @@
-import type { Result } from '@noshiro/ts-utils';
+import { type Result } from '@noshiro/ts-utils';
 
 /**
  * @description

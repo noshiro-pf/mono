@@ -1,4 +1,4 @@
-import type { LambdaTerm } from '../../types';
+import { type LambdaTerm } from '../../types';
 import { isVariable } from '../is-variable';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term';
 

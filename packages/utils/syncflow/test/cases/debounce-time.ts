@@ -1,5 +1,4 @@
 import { tp } from '@noshiro/ts-utils';
-import type { Observable } from '../../src';
 import {
   combineLatest,
   debounceTime,
@@ -7,9 +6,10 @@ import {
   interval,
   mapWithIndex,
   take,
+  type Observable,
 } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 /*
   (tick)    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20

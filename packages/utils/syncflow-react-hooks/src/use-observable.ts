@@ -1,5 +1,5 @@
 import { useState } from '@noshiro/react-utils';
-import type { InitializedObservable, Observable } from '@noshiro/syncflow';
+import { type InitializedObservable, type Observable } from '@noshiro/syncflow';
 import { Maybe } from '@noshiro/ts-utils';
 import { useEffect, useMemo } from 'react';
 

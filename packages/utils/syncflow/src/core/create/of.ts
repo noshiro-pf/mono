@@ -1,6 +1,6 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import type { OfObservable } from '../types';
+import { type OfObservable } from '../types';
 
 export const of = <A>(
   value: A,

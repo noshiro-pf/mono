@@ -1,4 +1,4 @@
-import type { Rgb } from '../../types';
+import { type Rgb } from '../../types';
 
 export const rgbToHex = ([r, g, b]: Rgb): string => {
   const r16 = r.toString(16).padStart(2, '0');

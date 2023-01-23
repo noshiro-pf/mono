@@ -1,5 +1,5 @@
 import { Result } from '@noshiro/ts-utils';
-import type { Type } from '../type';
+import { type Type } from '../type';
 
 const validationResultToString = (result: readonly string[]): string =>
   `\n${result.join(',\n')}`;

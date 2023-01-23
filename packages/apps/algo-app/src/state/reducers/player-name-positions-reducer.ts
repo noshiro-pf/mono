@@ -1,6 +1,6 @@
-import type { Rect } from '@noshiro/ts-utils-additional';
+import { type Rect } from '@noshiro/ts-utils-additional';
 import { produce } from 'immer';
-import type { NWES } from '../../types';
+import { type NWES } from '../../types';
 
 const initialState = (): Record<NWES, Rect> => ({
   S: { top: 0, left: 0, width: 0, height: 0 },

@@ -3,8 +3,7 @@ import { initDiscordClient, startDiscordListener } from './discord';
 import { DATABASE_URL, isDev } from './env';
 import { initializeInMemoryDatabase } from './in-memory-database';
 import { psql } from './postgre-sql';
-import type { DatabaseRef } from './types';
-import { databaseDefaultValue } from './types';
+import { databaseDefaultValue, type DatabaseRef } from './types';
 
 export const main = async (): Promise<Result<unknown, unknown>> => {
   // psql.setTlsRejectUnauthorized0();

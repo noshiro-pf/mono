@@ -1,8 +1,7 @@
 import { Result } from '@noshiro/ts-utils';
-import type { Observable } from '../../src';
-import { fromPromise } from '../../src';
+import { fromPromise, type Observable } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
-import type { StreamTestCase } from '../typedef';
+import { type StreamTestCase } from '../typedef';
 
 const valueToEmit = 1;
 

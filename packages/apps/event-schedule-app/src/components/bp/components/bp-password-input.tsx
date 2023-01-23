@@ -1,6 +1,5 @@
 import { Button } from '@blueprintjs/core';
-import type { BpInputProps } from './bp-input';
-import { BpInput } from './bp-input';
+import { BpInput, type BpInputProps } from './bp-input';
 
 export type BpPasswordInputProps = BpInputProps &
   Readonly<{

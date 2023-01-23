@@ -1,12 +1,12 @@
-import type {
-  useEventObservable as _useEventObservable,
-  useObservable as _useObservable,
-  useObservableEffect as _useObservableEffect,
-  useObservableReducer as _useObservableReducer,
-  useObservableState as _useObservableState,
-  useObservableValue as _useObservableValue,
-  useValueAsObservable as _useValueAsObservable,
-  useVoidEventObservable as _useVoidEventObservable,
+import {
+  type useEventObservable as _useEventObservable,
+  type useObservable as _useObservable,
+  type useObservableEffect as _useObservableEffect,
+  type useObservableReducer as _useObservableReducer,
+  type useObservableState as _useObservableState,
+  type useObservableValue as _useObservableValue,
+  type useValueAsObservable as _useValueAsObservable,
+  type useVoidEventObservable as _useVoidEventObservable,
 } from '@noshiro/syncflow-react-hooks';
 
 declare global {

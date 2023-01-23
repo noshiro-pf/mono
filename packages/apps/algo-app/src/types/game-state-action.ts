@@ -1,6 +1,5 @@
 import { FieldValue } from 'firebase/firestore';
-import type { Card } from './card-type';
-import { isCard } from './card-type';
+import { isCard, type Card } from './card-type';
 
 export type GameStateAction = Readonly<
   // eslint-disable-next-line @typescript-eslint/sort-type-constituents

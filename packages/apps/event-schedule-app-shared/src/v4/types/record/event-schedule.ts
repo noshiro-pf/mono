@@ -1,25 +1,23 @@
 import { DateUtils } from '@noshiro/ts-utils';
-import type {
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-  NotificationSettings,
-  PartialDatetimeRange,
-  PartialNotificationSettings,
-  PartialYmdhm,
-  Ymdhm,
-} from '../../../v3';
 import {
   defaultNotificationSettings,
   defaultYmdhm,
   fillDatetimeRange,
   fillNotificationSettings,
   fillYmdhm,
+  type DatetimeRange,
+  type DatetimeSpecificationEnumType,
+  type NotificationSettings,
+  type PartialDatetimeRange,
+  type PartialNotificationSettings,
+  type PartialYmdhm,
+  type Ymdhm,
 } from '../../../v3';
-import type {
-  AnswerIconSettings,
-  PartialAnswerIconSettings,
+import {
+  fillAnswerIconSettings,
+  type AnswerIconSettings,
+  type PartialAnswerIconSettings,
 } from './answer-icon-settings';
-import { fillAnswerIconSettings } from './answer-icon-settings';
 import { defaultAnswerIconSetting } from './base';
 
 export type EventSchedule = Readonly<{

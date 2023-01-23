@@ -1,5 +1,5 @@
 import { Num } from '@noshiro/ts-utils';
-import type { Percent } from '../../../types';
+import { type Percent } from '../../../types';
 
 const clamp100 = Num.clamp(0, 100) as (x: number) => Percent;
 

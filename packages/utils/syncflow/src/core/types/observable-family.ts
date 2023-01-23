@@ -1,11 +1,11 @@
-import type { Maybe, Result } from '@noshiro/ts-utils';
-import type {
-  AsyncChildObservable,
-  InitializedSyncChildObservable,
-  RootObservable,
-  SyncChildObservable,
+import { type Maybe, type Result } from '@noshiro/ts-utils';
+import {
+  type AsyncChildObservable,
+  type InitializedSyncChildObservable,
+  type RootObservable,
+  type SyncChildObservable,
 } from './observable';
-import type { NonEmptyUnknownList } from './types';
+import { type NonEmptyUnknownList } from './types';
 
 // RootObservable
 

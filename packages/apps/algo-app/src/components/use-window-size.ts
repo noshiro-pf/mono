@@ -1,4 +1,4 @@
-import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
+import { type Rect, type RectSize } from '@noshiro/ts-utils-additional';
 
 export const useWindowSize = (
   windowSize: Rect

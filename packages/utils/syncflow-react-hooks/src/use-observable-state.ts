@@ -1,4 +1,4 @@
-import type { InitializedObservable } from '@noshiro/syncflow';
+import { type InitializedObservable } from '@noshiro/syncflow';
 import { useCallback } from 'react';
 import { useObservableReducer } from './use-observable-reducer';
 

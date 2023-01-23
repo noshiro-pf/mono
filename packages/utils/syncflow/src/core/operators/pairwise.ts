@@ -1,10 +1,10 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
-import type {
-  Observable,
-  PairwiseOperatorObservable,
-  RemoveInitializedOperator,
-  UpdaterSymbol,
+import {
+  type Observable,
+  type PairwiseOperatorObservable,
+  type RemoveInitializedOperator,
+  type UpdaterSymbol,
 } from '../types';
 
 export const pairwise =

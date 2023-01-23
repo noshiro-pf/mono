@@ -1,11 +1,9 @@
 import { FormGroup } from '@blueprintjs/core';
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import type { TinyObservable } from '@noshiro/ts-utils';
-import { Arr } from '@noshiro/ts-utils';
+import { Arr, type TinyObservable } from '@noshiro/ts-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { useCallback } from 'react';
-import type { BpInputProps } from './bp-input';
-import { BpInput } from './bp-input';
+import { BpInput, type BpInputProps } from './bp-input';
 
 export type BpEmailInputProps = BpInputProps &
   Readonly<{

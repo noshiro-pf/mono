@@ -1,6 +1,5 @@
-import type { Collection, Guild, GuildMember } from 'discord.js';
-import type { UserId } from '../types';
-import { createUserId } from '../types';
+import { type Collection, type Guild, type GuildMember } from 'discord.js';
+import { createUserId, type UserId } from '../types';
 import { quoteIfSpaceIncluded } from './quote-if-space-included';
 
 export const createUserIdToDisplayNameMap = async (

@@ -1,5 +1,5 @@
 import { DateInput2 } from '@blueprintjs/datetime2';
-import type { ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string =>
   `${DateUtils.toLocaleYMD(date, '-')}  ${DateUtils.toLocaleHM(date, ':')}`;

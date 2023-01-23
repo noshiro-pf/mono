@@ -1,15 +1,13 @@
-import type { DatetimeRange } from './datetime-range';
 import {
   datetimeRangeDefaultValue,
   fillDatetimeRange,
   isDatetimeRange,
+  type DatetimeRange,
 } from './datetime-range';
 
 import { assertType } from '@noshiro/ts-utils';
-import type { YearMonthDate } from './base';
-import { yearMonthDateDefaultValue } from './base';
-import type { TimeRange } from './time-range';
-import { timeRangeDefaultValue } from './time-range';
+import { yearMonthDateDefaultValue, type YearMonthDate } from './base';
+import { timeRangeDefaultValue, type TimeRange } from './time-range';
 
 describe('DatetimeRange', () => {
   assertType<

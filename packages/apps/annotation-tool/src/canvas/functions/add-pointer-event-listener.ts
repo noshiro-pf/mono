@@ -1,5 +1,5 @@
-import type { Application, Sprite } from 'pixi.js';
-import type { CanvasAppState, CanvasAppStateHandler } from '../state';
+import { type Application, type Sprite } from 'pixi.js';
+import { type CanvasAppState, type CanvasAppStateHandler } from '../state';
 
 export const addGlobalPointerEventListener = (
   app: Application,

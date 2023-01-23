@@ -1,5 +1,8 @@
-import type { Hue, Percent } from '@noshiro/ts-utils-additional';
-import { contrastRatioHsl } from '@noshiro/ts-utils-additional';
+import {
+  contrastRatioHsl,
+  type Hue,
+  type Percent,
+} from '@noshiro/ts-utils-additional';
 
 export const hueListToContrastRatioList = (
   hueList: readonly Hue[],

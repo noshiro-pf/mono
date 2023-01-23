@@ -1,4 +1,4 @@
-import type { HistoryState } from '../type';
+import { type HistoryState } from '../type';
 
 export const historyToSumCount = (
   hist: HistoryState

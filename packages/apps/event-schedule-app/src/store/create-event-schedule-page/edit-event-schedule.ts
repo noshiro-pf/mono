@@ -1,13 +1,13 @@
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
 import { eventScheduleInitialValue, Routes } from '../../constants';
-import type { EventSettingsPageDiffResult } from '../../functions';
 import {
   collectEventSettingsPageDiff,
   createToaster,
   showToast,
+  type EventSettingsPageDiffResult,
 } from '../../functions';
-import type { EventScheduleSettingCommonState } from '../../types';
+import { type EventScheduleSettingCommonState } from '../../types';
 import { AnswersStore, EventScheduleStore } from '../fetching-state';
 import { router } from '../router';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';

@@ -1,22 +1,21 @@
-import type { Some } from '@noshiro/ts-utils';
-import { Arr, MutableSet, pipe } from '@noshiro/ts-utils';
-import type {
-  AsyncChildObservable,
-  AsyncChildObservableType,
-  ChildObservable,
-  InitializedObservable,
-  InitializedSyncChildObservable,
-  InitializedToInitializedOperator,
-  NonEmptyUnknownList,
-  Observable,
-  ObservableId,
-  Operator,
-  SyncChildObservable,
-  SyncChildObservableType,
-  ToInitializedOperator,
-  Wrap,
+import { Arr, MutableSet, pipe, type Some } from '@noshiro/ts-utils';
+import {
+  isManagerObservable,
+  type AsyncChildObservable,
+  type AsyncChildObservableType,
+  type ChildObservable,
+  type InitializedObservable,
+  type InitializedSyncChildObservable,
+  type InitializedToInitializedOperator,
+  type NonEmptyUnknownList,
+  type Observable,
+  type ObservableId,
+  type Operator,
+  type SyncChildObservable,
+  type SyncChildObservableType,
+  type ToInitializedOperator,
+  type Wrap,
 } from '../types';
-import { isManagerObservable } from '../types';
 import { binarySearch, issueUpdaterSymbol, maxDepth } from '../utils';
 import { ObservableBaseClass } from './observable-base-class';
 

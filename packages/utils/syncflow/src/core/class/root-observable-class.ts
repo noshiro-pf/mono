@@ -1,9 +1,9 @@
 import { Arr, MutableSet } from '@noshiro/ts-utils';
-import type {
-  ChildObservable,
-  ObservableId,
-  RootObservable,
-  RootObservableType,
+import {
+  type ChildObservable,
+  type ObservableId,
+  type RootObservable,
+  type RootObservableType,
 } from '../types';
 import { binarySearch, issueUpdaterSymbol } from '../utils';
 import { ObservableBaseClass } from './observable-base-class';

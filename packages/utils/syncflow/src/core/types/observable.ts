@@ -1,13 +1,13 @@
-import type { Maybe, Some } from '@noshiro/ts-utils';
-import type { ObservableId, UpdaterSymbol } from './id';
-import type { ObservableKind } from './observable-kind';
-import type {
-  AsyncChildObservableType,
-  ObservableType,
-  RootObservableType,
-  SyncChildObservableType,
+import { type Maybe, type Some } from '@noshiro/ts-utils';
+import { type ObservableId, type UpdaterSymbol } from './id';
+import { type ObservableKind } from './observable-kind';
+import {
+  type AsyncChildObservableType,
+  type ObservableType,
+  type RootObservableType,
+  type SyncChildObservableType,
 } from './observable-type';
-import type { NonEmptyUnknownList, Subscription } from './types';
+import { type NonEmptyUnknownList, type Subscription } from './types';
 
 /**
  * inheritance

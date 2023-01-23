@@ -1,4 +1,4 @@
-import type { Observable } from '@noshiro/syncflow';
+import { type Observable } from '@noshiro/syncflow';
 import { useEffect } from 'react';
 import { useObservableState } from './use-observable-state';
 

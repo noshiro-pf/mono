@@ -1,5 +1,5 @@
 import { dist } from '../../../../num';
-import type { Rgb } from '../../../types';
+import { type Rgb } from '../../../types';
 import { epsilon } from '../color-test-values';
 
 export const testRgbEquality = (

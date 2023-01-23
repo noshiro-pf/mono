@@ -1,6 +1,6 @@
-import type { WritableDraft } from 'immer/dist/internal';
+import { type WritableDraft } from 'immer/dist/internal';
 import { cardEq } from '../../functions';
-import type { Card, GameState } from '../../types';
+import { type Card, type GameState } from '../../types';
 
 export const faceUpCard = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

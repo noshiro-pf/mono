@@ -1,12 +1,16 @@
 import { Icon, IconSize } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import type { Hsl } from '@noshiro/ts-utils-additional';
 import {
   higherContrastTextColorHsl,
   hslToStr,
+  type Hsl,
 } from '@noshiro/ts-utils-additional';
-import type { BaseSyntheticEvent, CSSProperties } from 'react';
-import { useCallback, useMemo } from 'react';
+import {
+  useCallback,
+  useMemo,
+  type BaseSyntheticEvent,
+  type CSSProperties,
+} from 'react';
 import styled from 'styled-components';
 import {
   LabelButtonItemBodyDisabledStyled,

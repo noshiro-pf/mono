@@ -1,6 +1,6 @@
-import type { Card, CardWithVisibility } from './card-type';
-import type { PhaseInTurn } from './phase-in-turn';
-import type { PlayerIndex } from './player-index';
+import { type Card, type CardWithVisibility } from './card-type';
+import { type PhaseInTurn } from './phase-in-turn';
+import { type PlayerIndex } from './player-index';
 
 export type GameState = Readonly<{
   playerCards: ArrayOfLength<4, ArrayOfLength<6, CardWithVisibility>>;

@@ -1,8 +1,11 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
+import { type Rect, type Rgba } from '@noshiro/ts-utils-additional';
 import { Graphics } from 'pixi.js';
 import { zIndex } from '../z-index';
-import type { Direction } from './bbox-points';
-import { bboxPointsFromRect, mapBboxPoints } from './bbox-points';
+import {
+  bboxPointsFromRect,
+  mapBboxPoints,
+  type Direction,
+} from './bbox-points';
 import { updateBboxPoint } from './update-pixi-bbox-point';
 import { updateBboxRect } from './update-pixi-bbox-rect';
 

@@ -1,5 +1,5 @@
 import { Arr, Str } from '@noshiro/ts-utils';
-import type { LowerAlphabet, UpperAlphabet } from '../types';
+import { type LowerAlphabet, type UpperAlphabet } from '../types';
 
 export const getAlphabets = <Case extends 'lower' | 'upper'>(
   charCase: Case

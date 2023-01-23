@@ -1,5 +1,4 @@
-import type { Observable } from '../core';
-import { source } from '../core';
+import { source, type Observable } from '../core';
 
 export const createVoidEventEmitter = (): [Observable<void>, () => void] => {
   const src$ = source<undefined>();

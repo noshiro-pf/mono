@@ -1,8 +1,8 @@
-import type { IndexOfTuple } from './index-of-tuple';
-import type { IsNotFixedLengthList } from './is-fixed-length-list';
-import type { ToNumber } from './to-number';
-import type { Tuple } from './tuple';
-import type { RecordBase } from './utils';
+import { type IndexOfTuple } from './index-of-tuple';
+import { type IsNotFixedLengthList } from './is-fixed-length-list';
+import { type ToNumber } from './to-number';
+import { type Tuple } from './tuple';
+import { type RecordBase } from './utils';
 
 export type PathsWithIndex<R> = Prefixes<LeafPathsWithIndex<R>>;
 export type Paths<R> = Prefixes<LeafPaths<R>>;

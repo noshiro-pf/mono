@@ -1,15 +1,15 @@
-import type {
-  ChangeEvent as _ChangeEvent,
-  CSSProperties as _CSSProperties,
-  FormEvent as _FormEvent,
-  PropsWithChildren as _PropsWithChildren,
-  ReactNode as _ReactNode,
-  Reducer as _Reducer,
-  RefObject as _RefObject,
-  useCallback as _useCallback,
-  useEffect as _useEffect,
-  useMemo as _useMemo,
-  useReducer as _useReducer,
+import {
+  type ChangeEvent as _ChangeEvent,
+  type CSSProperties as _CSSProperties,
+  type FormEvent as _FormEvent,
+  type PropsWithChildren as _PropsWithChildren,
+  type ReactNode as _ReactNode,
+  type Reducer as _Reducer,
+  type RefObject as _RefObject,
+  type useCallback as _useCallback,
+  type useEffect as _useEffect,
+  type useMemo as _useMemo,
+  type useReducer as _useReducer,
 } from 'react';
 
 declare global {

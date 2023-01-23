@@ -1,5 +1,4 @@
-import type { UserId } from './types';
-import { isUserId } from './types';
+import { isUserId, type UserId } from './types';
 
 export type AnswerOfDate = Readonly<{
   good: ISet<UserId>;

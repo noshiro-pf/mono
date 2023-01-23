@@ -1,8 +1,8 @@
-import type { EmailInputState } from './input-state';
 import {
   emailInputHasError,
   emailInputInitialState,
   emailInputStateReducer,
+  type EmailInputState,
 } from './input-state';
 
 export type ConfirmEmailDialogFormState = DeepReadonly<{

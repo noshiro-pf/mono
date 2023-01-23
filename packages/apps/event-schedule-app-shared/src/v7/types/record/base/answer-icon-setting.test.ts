@@ -1,10 +1,10 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { AnswerIconPoint } from '../../enum';
-import type { AnswerIconSetting } from './answer-icon-setting';
+import { type AnswerIconPoint } from '../../enum';
 import {
   answerIconSettingDefaultValue,
   fillAnswerIconSetting,
   isAnswerIconSetting,
+  type AnswerIconSetting,
 } from './answer-icon-setting';
 
 describe('AnswerIconSetting', () => {

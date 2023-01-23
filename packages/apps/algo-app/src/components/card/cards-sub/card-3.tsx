@@ -1,4 +1,4 @@
-import type { CardProps } from './card-props';
+import { type CardProps } from './card-props';
 
 export const Card3 = memoNamed('Card3', ({ color, textColor }: CardProps) => (
   <>

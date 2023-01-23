@@ -1,5 +1,8 @@
 import { Button } from '@blueprintjs/core';
-import type { CalendarCurrentPageReducerState, YmdKey } from '../../functions';
+import {
+  type CalendarCurrentPageReducerState,
+  type YmdKey,
+} from '../../functions';
 import { useMultipleDatePickerState } from '../../hooks';
 import {
   DatePickerBodyStyled,

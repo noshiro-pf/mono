@@ -1,6 +1,6 @@
 import { firebaseConfig } from './env';
 import { createMailOptions, sendEmail } from './setup-mailer';
-import type { SendReportPayload } from './types';
+import { type SendReportPayload } from './types';
 
 export const sendReportImpl = ({ error }: SendReportPayload): Promise<void> =>
   sendEmail(

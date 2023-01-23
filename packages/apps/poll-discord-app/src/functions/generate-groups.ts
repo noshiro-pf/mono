@@ -1,5 +1,5 @@
 import { getAlphabets } from '@noshiro/ts-utils-additional';
-import type { Group, NumGroups } from '../types';
+import { type Group, type NumGroups } from '../types';
 
 export const generateGroups = (
   numGroups: NumGroups,

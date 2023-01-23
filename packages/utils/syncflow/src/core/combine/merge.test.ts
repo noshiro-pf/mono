@@ -1,6 +1,6 @@
 import { assertType } from '@noshiro/ts-utils';
 import { fromArray } from '../create';
-import type { SyncChildObservable } from '../types';
+import { type SyncChildObservable } from '../types';
 import { merge } from './merge';
 
 // type tests

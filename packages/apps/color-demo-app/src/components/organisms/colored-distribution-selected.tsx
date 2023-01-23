@@ -1,7 +1,7 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { hslToStr } from '@noshiro/ts-utils-additional';
 import styled from 'styled-components';
-import type { ColorResult } from '../../types';
+import { type ColorResult } from '../../types';
 
 const Root = styled.div`
   width: 100%;

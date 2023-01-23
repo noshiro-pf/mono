@@ -1,9 +1,12 @@
-import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
+import { type Rect, type RectSize } from '@noshiro/ts-utils-additional';
 import { createElement } from 'preact';
 import { useRef } from 'preact/hooks';
-import type { CustomColor } from '../../constants';
-import { outlineColorDef } from '../../constants';
-import type { CardColor, CardNumber, VisibilityFromMe } from '../../types';
+import { outlineColorDef, type CustomColor } from '../../constants';
+import {
+  type CardColor,
+  type CardNumber,
+  type VisibilityFromMe,
+} from '../../types';
 import {
   Card0,
   Card1,

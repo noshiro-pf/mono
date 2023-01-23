@@ -1,4 +1,4 @@
-import type { Rgb } from '../../types';
+import { type Rgb } from '../../types';
 
 /**
  * link: https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef

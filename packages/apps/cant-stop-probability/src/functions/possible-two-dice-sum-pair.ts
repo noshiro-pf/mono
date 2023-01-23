@@ -1,4 +1,4 @@
-import type { DiceValue, TwoDiceSumValue } from '../types';
+import { type DiceValue, type TwoDiceSumValue } from '../types';
 
 export const possibleTwoDiceSumPairs = (
   a: DiceValue,

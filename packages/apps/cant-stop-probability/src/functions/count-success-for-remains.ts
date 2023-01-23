@@ -1,5 +1,5 @@
 import { diceValueSet } from '../constants';
-import type { TwoDiceSumValue } from '../types';
+import { type TwoDiceSumValue } from '../types';
 import { possibleTwoDiceSums } from './possible-two-dice-sums';
 
 // 踏破されていない列のいずれかが出る場合の数

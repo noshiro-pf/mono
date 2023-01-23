@@ -1,6 +1,5 @@
-import type { Queue } from '@noshiro/ts-utils';
-import { assertNotType, assertType } from '@noshiro/ts-utils';
-import type { Subscriber, TupleToQueueTuple } from './types';
+import { assertNotType, assertType, type Queue } from '@noshiro/ts-utils';
+import { type Subscriber, type TupleToQueueTuple } from './types';
 
 // type tests
 

@@ -1,9 +1,9 @@
 import { assertType } from '@noshiro/ts-utils';
 import { fromArray } from '../create';
 import { withInitialValue } from '../operators';
-import type {
-  InitializedSyncChildObservable,
-  SyncChildObservable,
+import {
+  type InitializedSyncChildObservable,
+  type SyncChildObservable,
 } from '../types';
 import { combineLatest, combineLatestI } from './combine-latest';
 

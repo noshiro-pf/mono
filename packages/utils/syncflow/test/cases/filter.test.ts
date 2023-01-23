@@ -1,6 +1,5 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { Observable } from '../../src';
-import { filter, fromArray } from '../../src';
+import { filter, fromArray, type Observable } from '../../src';
 import { testStream } from '../test-stream';
 import { filterTestCases } from './filter';
 

@@ -1,5 +1,9 @@
-import type { Hue, Percent } from '@noshiro/ts-utils-additional';
-import { hslToRgb, relativeLuminance } from '@noshiro/ts-utils-additional';
+import {
+  hslToRgb,
+  relativeLuminance,
+  type Hue,
+  type Percent,
+} from '@noshiro/ts-utils-additional';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
 const huesDefault = Arr.seqUnwrapped(360);

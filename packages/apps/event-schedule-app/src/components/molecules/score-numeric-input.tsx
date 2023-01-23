@@ -2,7 +2,7 @@ import {
   answersScoreNumericInputConfig,
   clampAndRoundAnswersScore,
 } from '../../constants';
-import type { AnswersScore } from '../../types';
+import { type AnswersScore } from '../../types';
 import { NumericInputView, useNumericInputState } from '../bp';
 
 type Props = Readonly<{

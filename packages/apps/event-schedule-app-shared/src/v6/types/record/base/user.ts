@@ -1,6 +1,10 @@
 import { isRecord, Obj } from '@noshiro/ts-utils';
-import type { UserId, UserName } from '../../named-primitive-types';
-import { isUserId, isUserName } from '../../named-primitive-types';
+import {
+  isUserId,
+  isUserName,
+  type UserId,
+  type UserName,
+} from '../../named-primitive-types';
 
 export type User = Readonly<{
   id: UserId;

@@ -1,10 +1,10 @@
-import type {
-  AnswerIconIdWithNone,
-  AnswerIconPoint,
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
-  HoursMinutes,
-  YearMonthDate,
+import {
+  type AnswerIconIdWithNone,
+  type AnswerIconPoint,
+  type DatetimeRange,
+  type DatetimeSpecificationEnumType,
+  type HoursMinutes,
+  type YearMonthDate,
 } from '@noshiro/event-schedule-app-shared';
 
 export const pad2 = (n: number): string => n.toString().padStart(2, '0');

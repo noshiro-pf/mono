@@ -1,4 +1,4 @@
-import type { YearMonthDate } from '@noshiro/event-schedule-app-shared';
+import { type YearMonthDate } from '@noshiro/event-schedule-app-shared';
 import { DateUtils } from '@noshiro/ts-utils';
 import { today } from '../utils';
 

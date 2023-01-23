@@ -1,5 +1,10 @@
-import type { HoursMinutes, PartialHoursMinutes } from './base';
-import { compareHm, defaultHoursMinutes, fillHoursMinutes } from './base';
+import {
+  compareHm,
+  defaultHoursMinutes,
+  fillHoursMinutes,
+  type HoursMinutes,
+  type PartialHoursMinutes,
+} from './base';
 
 export type TimeRange = Readonly<{
   start: HoursMinutes;

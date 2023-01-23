@@ -1,6 +1,5 @@
-import type { AnswerSymbolId } from '../enum';
-import type { SymbolSetting } from './base';
-import { fillSymbolSetting } from './base';
+import { type AnswerSymbolId } from '../enum';
+import { fillSymbolSetting, type SymbolSetting } from './base';
 
 export type SymbolSettings = Record<AnswerSymbolId, SymbolSetting>;
 

@@ -1,5 +1,5 @@
 import { defaultIconPoint } from '../../constants';
-import type { AnswerSelectionValue } from '../../types';
+import { type AnswerSelectionValue } from '../../types';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {

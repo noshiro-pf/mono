@@ -1,6 +1,6 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
-import type { FromArrayObservable } from '../types';
+import { type FromArrayObservable } from '../types';
 
 export const fromArray = <A>(
   values: readonly A[],

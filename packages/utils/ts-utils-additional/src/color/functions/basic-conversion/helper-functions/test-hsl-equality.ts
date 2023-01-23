@@ -1,5 +1,5 @@
 import { dist } from '../../../../num';
-import type { Hsl } from '../../../types';
+import { type Hsl } from '../../../types';
 import { epsilon } from '../color-test-values';
 
 export const testHslEquality = (

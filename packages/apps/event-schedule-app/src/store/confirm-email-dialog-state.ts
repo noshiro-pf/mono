@@ -1,11 +1,11 @@
 import { api } from '../api';
-import type { ConfirmEmailDialogFormState } from '../functions';
 import {
   confirmEmailDialogFormInitialState,
   confirmEmailDialogFormStateReducer,
   confirmEmailDialogHasError,
   createToaster,
   showToast,
+  type ConfirmEmailDialogFormState,
 } from '../functions';
 import { EditEventScheduleStore } from './create-event-schedule-page';
 import { eventSchedule$ } from './fetching-state';

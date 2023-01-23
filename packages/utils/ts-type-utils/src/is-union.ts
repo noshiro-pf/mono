@@ -1,5 +1,5 @@
-import type { IsNever } from './is-never';
-import type { StrictExclude } from './utils';
+import { type IsNever } from './is-never';
+import { type StrictExclude } from './utils';
 
 /** @internal */
 type _IsUnionImpl<U, K extends U = U> = [U] extends [never]

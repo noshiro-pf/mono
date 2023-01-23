@@ -1,7 +1,7 @@
-import type {
-  LambdaAbstraction,
-  LambdaApplication,
-  LambdaTerm,
+import {
+  type LambdaAbstraction,
+  type LambdaApplication,
+  type LambdaTerm,
 } from '../types';
 import { isVariable } from './is-variable';
 

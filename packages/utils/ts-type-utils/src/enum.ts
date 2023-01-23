@@ -1,5 +1,5 @@
-import type { Index } from './index-type';
-import type { StrictExclude } from './utils';
+import { type Index } from './index-type';
+import { type StrictExclude } from './utils';
 
 export type YearEnum = number;
 

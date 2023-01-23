@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
-import type {
-  AuthCredential as _AuthCredential,
-  OAuthCredential as _OAuthCredential,
-  User as _FireAuthUser,
-  UserCredential as _UserCredential,
+import {
+  type AuthCredential as _AuthCredential,
+  type OAuthCredential as _OAuthCredential,
+  type User as _FireAuthUser,
+  type UserCredential as _UserCredential,
 } from 'firebase/auth';
 
 export type AuthCredential = DeepReadonly<_AuthCredential>;

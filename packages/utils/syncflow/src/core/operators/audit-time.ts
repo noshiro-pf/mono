@@ -1,11 +1,11 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
-import type {
-  AuditTimeOperatorObservable,
-  InitializedToInitializedOperator,
-  Observable,
-  ToBaseOperator,
-  UpdaterSymbol,
+import {
+  type AuditTimeOperatorObservable,
+  type InitializedToInitializedOperator,
+  type Observable,
+  type ToBaseOperator,
+  type UpdaterSymbol,
 } from '../types';
 
 export const auditTime =

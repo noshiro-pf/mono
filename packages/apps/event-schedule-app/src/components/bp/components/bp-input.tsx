@@ -1,6 +1,5 @@
 import { InputGroup } from '@blueprintjs/core';
-import type { ChangeEventHandler, ComponentProps } from 'react';
-import { useRef } from 'react';
+import { useRef, type ChangeEventHandler, type ComponentProps } from 'react';
 
 type InputGroupPropsOriginal = ComponentProps<typeof InputGroup>;
 

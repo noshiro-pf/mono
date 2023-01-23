@@ -1,11 +1,11 @@
-import type {
-  Answer,
-  AnswerIconIdWithNone,
-  AnswerIconPoint,
-  DatetimeRange,
-  DatetimeSpecificationEnumType,
+import {
+  compareDatetimeRange,
+  type Answer,
+  type AnswerIconIdWithNone,
+  type AnswerIconPoint,
+  type DatetimeRange,
+  type DatetimeSpecificationEnumType,
 } from '@noshiro/event-schedule-app-shared';
-import { compareDatetimeRange } from '@noshiro/event-schedule-app-shared';
 import { Arr, IMapMapped, ISetMapped, tp } from '@noshiro/ts-utils';
 import {
   datetimeRange2str,

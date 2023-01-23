@@ -1,11 +1,11 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
-import type {
-  Observable,
-  RemoveInitializedOperator,
-  Subscription,
-  SwitchMapOperatorObservable,
-  UpdaterSymbol,
+import {
+  type Observable,
+  type RemoveInitializedOperator,
+  type Subscription,
+  type SwitchMapOperatorObservable,
+  type UpdaterSymbol,
 } from '../types';
 
 /** @deprecated use `createState` instead */

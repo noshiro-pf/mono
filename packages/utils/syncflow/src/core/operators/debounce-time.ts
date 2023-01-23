@@ -1,11 +1,11 @@
 import { Maybe } from '@noshiro/ts-utils';
 import { AsyncChildObservableClass } from '../class';
-import type {
-  DebounceTimeOperatorObservable,
-  InitializedToInitializedOperator,
-  Observable,
-  ToBaseOperator,
-  UpdaterSymbol,
+import {
+  type DebounceTimeOperatorObservable,
+  type InitializedToInitializedOperator,
+  type Observable,
+  type ToBaseOperator,
+  type UpdaterSymbol,
 } from '../types';
 
 export const debounceTime =

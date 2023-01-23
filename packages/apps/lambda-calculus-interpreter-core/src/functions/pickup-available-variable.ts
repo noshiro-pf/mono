@@ -1,5 +1,5 @@
 import { ALPHABETS } from '../constants';
-import type { Variable } from '../types';
+import { type Variable } from '../types';
 
 export const pickUpAvailableVariable = (
   freeVariables: readonly Variable[]

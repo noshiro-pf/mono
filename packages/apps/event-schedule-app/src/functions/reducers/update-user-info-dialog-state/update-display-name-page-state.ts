@@ -1,8 +1,8 @@
-import type { InputState } from '../input-state';
 import {
   inputHasError,
   inputInitialState,
   inputStateReducer,
+  type InputState,
 } from '../input-state';
 
 export type UpdateDisplayNamePageState = Readonly<{

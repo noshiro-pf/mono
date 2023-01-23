@@ -1,4 +1,4 @@
-import type { AnswersScore } from '../types';
+import { type AnswersScore } from '../types';
 import { defaultIconPoint } from './default-icon-point';
 
 export const answerIconPointConfig = {

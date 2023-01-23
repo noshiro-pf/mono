@@ -1,4 +1,4 @@
-import type { RepaymentType } from './repayment-type';
+import { type RepaymentType } from './repayment-type';
 
 export type Store = DeepReadonly<{
   repaymentType: RepaymentType;

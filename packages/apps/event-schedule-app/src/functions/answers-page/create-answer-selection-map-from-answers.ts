@@ -1,4 +1,4 @@
-import type { AnswerTableCellPosition } from '../../types';
+import { type AnswerTableCellPosition } from '../../types';
 import { answerSelectionFromMapKey, answerSelectionToMapKey } from '../map-key';
 
 export const createAnswerSelectionMapFromAnswers = (

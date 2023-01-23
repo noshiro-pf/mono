@@ -1,8 +1,10 @@
-import type { Rect, Rgba } from '@noshiro/ts-utils-additional';
-import { rgbaToHexNumber } from '@noshiro/ts-utils-additional';
-import type { Graphics } from 'pixi.js';
-import { Rectangle } from 'pixi.js';
-import type { PixiBbox } from '../types';
+import {
+  rgbaToHexNumber,
+  type Rect,
+  type Rgba,
+} from '@noshiro/ts-utils-additional';
+import { Rectangle, type Graphics } from 'pixi.js';
+import { type PixiBbox } from '../types';
 
 export const updateBboxRect = (
   mut_graphics: Graphics,

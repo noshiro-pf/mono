@@ -1,5 +1,5 @@
 import { assertType } from '@noshiro/ts-utils';
-import type { TypeOf } from '../type';
+import { type TypeOf } from '../type';
 import { enumType } from './enum';
 
 describe('enumType', () => {

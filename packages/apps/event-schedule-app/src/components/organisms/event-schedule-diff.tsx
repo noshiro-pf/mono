@@ -1,4 +1,4 @@
-import type { EventSettingsPageDiffResult } from '../../functions';
+import { type EventSettingsPageDiffResult } from '../../functions';
 
 type Props = Readonly<{
   diff: EventSettingsPageDiffResult;

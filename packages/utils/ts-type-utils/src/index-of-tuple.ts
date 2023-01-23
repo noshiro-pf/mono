@@ -1,5 +1,5 @@
-import type { IsFixedLengthList } from './is-fixed-length-list';
-import type { ToNumber } from './to-number';
+import { type IsFixedLengthList } from './is-fixed-length-list';
+import { type ToNumber } from './to-number';
 
 export type IndexOfTuple<
   T extends readonly unknown[],

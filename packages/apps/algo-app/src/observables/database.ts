@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app';
-import type { DocumentReference, Unsubscribe } from 'firebase/firestore';
 import {
   addDoc,
   arrayUnion,
@@ -10,15 +9,19 @@ import {
   orderBy,
   query,
   updateDoc,
+  type DocumentReference,
+  type Unsubscribe,
 } from 'firebase/firestore';
 import { firebaseConfig } from '../constants';
 import { newRoom } from '../functions';
-import type { GameStateAction, Player, Room } from '../types';
 import {
   assertIsGameStateAction,
   assertIsRoomRemote,
   convertRoomRemoteToRoom,
   convertRoomToRoomRemote,
+  type GameStateAction,
+  type Player,
+  type Room,
 } from '../types';
 
 const { state$: _roomId$, setState: _setRoomId } = createState<

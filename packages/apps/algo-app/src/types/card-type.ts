@@ -1,9 +1,7 @@
-import type { CustomColor } from '../constants';
-import type { CardColor } from './card-color';
-import { isCardColor } from './card-color';
-import type { CardNumber } from './card-number';
-import { isCardNumber } from './card-number';
-import type { VisibilityFromMe, VisibleTo } from './visible-to';
+import { type CustomColor } from '../constants';
+import { isCardColor, type CardColor } from './card-color';
+import { isCardNumber, type CardNumber } from './card-number';
+import { type VisibilityFromMe, type VisibleTo } from './visible-to';
 
 export type Card = Readonly<{
   color: CardColor;

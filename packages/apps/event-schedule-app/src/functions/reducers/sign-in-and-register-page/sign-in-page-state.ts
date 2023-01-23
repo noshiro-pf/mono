@@ -1,4 +1,3 @@
-import type { EmailInputState, InputState } from '../input-state';
 import {
   emailInputHasError,
   emailInputInitialState,
@@ -6,6 +5,8 @@ import {
   inputHasError,
   inputInitialState,
   inputStateReducer,
+  type EmailInputState,
+  type InputState,
 } from '../input-state';
 
 export type SignInPageState = Readonly<{

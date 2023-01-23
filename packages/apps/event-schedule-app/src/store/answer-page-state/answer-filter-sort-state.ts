@@ -1,7 +1,7 @@
-import type { TagProps } from '@blueprintjs/core';
+import { type TagProps } from '@blueprintjs/core';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { AnswerFilterState } from '../../functions';
-import type { AnswersScore, DetailedFilterIcon } from '../../types';
+import { type AnswersScore, type DetailedFilterIcon } from '../../types';
 import { answers$, eventSchedule$ } from '../fetching-state';
 import { AnswerFilterQueryParam } from './answer-filter-query-param';
 

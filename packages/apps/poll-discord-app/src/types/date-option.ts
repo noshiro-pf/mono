@@ -1,5 +1,4 @@
-import type { DateOptionId } from './types';
-import { createDateOptionId } from './types';
+import { createDateOptionId, type DateOptionId } from './types';
 
 export type DateOption = Readonly<{
   id: DateOptionId;
