@@ -34,7 +34,7 @@
     "test": "yarn z:wireit:test",
     "test:detectOpenHandles": "yarn z:cmd:jest:detectOpenHandles",
     "testw": "yarn z:cmd:jest --watch",
-    "tsc": "yarn z:no-wireit:type-check",
+    "tsc": "yarn z:wireit:type-check",
     "tscw": "yarn z:cmd:type-check --watch",
     "z:cmd:eslint": "eslint \"./{src,test}/**/*\" --ext .ts,.tsx --color --cache --cache-location .eslintcache",
     "z:cmd:gi": "bash ../../../scripts/index_ts_generator.sh",

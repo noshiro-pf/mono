@@ -23,7 +23,7 @@
     "setup": "yarn build",
     "test": "yarn z:wireit:test",
     "testw": "yarn z:cmd:jest --watch",
-    "tsc": "yarn z:no-wireit:type-check",
+    "tsc": "yarn z:wireit:type-check",
     "tscw": "yarn z:cmd:type-check --watch",
     "z:cmd:eslint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
     "z:cmd:gi": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1",

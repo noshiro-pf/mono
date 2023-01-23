@@ -19,7 +19,7 @@
     "lint": "yarn z:wireit:lint",
     "lint:fix": "yarn z:wireit:lint:fix",
     "setup": "yarn build",
-    "tsc": "yarn z:no-wireit:type-check",
+    "tsc": "yarn z:wireit:type-check",
     "tscw": "yarn z:cmd:type-check --watch",
     "z:cmd:eslint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
     "z:cmd:jest": "jest --config config/jest.config.json --passWithNoTests",

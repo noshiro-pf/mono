@@ -5,21 +5,39 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "wireit",
-    "clean": "rimraf dist",
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
-    "gi": "wireit",
+    "build": "yarn z:wireit:build",
+    "clean": "run-p clean:**",
+    "clean:build": "rimraf dist",
+    "clean:eslintcache": "rimraf .eslintcache",
+    "clean:wireit": "rimraf .wireit",
+    "fmt": "yarn z:cmd:prettier",
+    "gi": "yarn z:wireit:gi",
     "heroku:bash": "heroku run bash --app poll-discord-app",
     "heroku:logs": "heroku logs --tail --app poll-discord-app",
-    "lint": "wireit",
-    "lint:fix": "yarn z:lint --fix",
-    "setup": "run-p setup:**",
-    "setup:dbjson": "echo '{ \"polls\": [] }' > ./db.json",
+    "lint": "yarn z:wireit:lint",
+    "lint:fix": "yarn z:wireit:lint:fix",
+    "setup": "run-p z:cmd:setup:**",
     "start:dev": "export NODE_ENV='development' && node ./dist/index.js",
     "start:prod": "node ./dist/index.js",
-    "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit",
-    "z:lint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache"
+    "tsc": "yarn z:wireit:type-check",
+    "tscw": "yarn z:cmd:type-check --watch",
+    "z:cmd:eslint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+    "z:cmd:gi": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore \"(assets)\"",
+    "z:cmd:prettier": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "z:cmd:publish": "yarn publish --no-git-tag-version --access=public",
+    "z:cmd:setup:dbjson": "echo '{ \"polls\": [] }' > ./db.json",
+    "z:cmd:tsc-incremental": "tsc --incremental --pretty",
+    "z:cmd:type-check": "tsc --noEmit",
+    "z:no-wireit:build": "yarn z:cmd:tsc-incremental --project tsconfig.json",
+    "z:no-wireit:gi": "yarn z:cmd:gi",
+    "z:no-wireit:lint": "yarn z:cmd:eslint",
+    "z:no-wireit:lint:fix": "yarn z:cmd:eslint --fix",
+    "z:no-wireit:type-check": "yarn z:cmd:type-check",
+    "z:wireit:build": "wireit",
+    "z:wireit:gi": "wireit",
+    "z:wireit:lint": "wireit",
+    "z:wireit:lint:fix": "wireit",
+    "z:wireit:type-check": "wireit"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
@@ -39,12 +57,49 @@
     "node": ">=16.6.x"
   },
   "wireit": {
-    "type-check": {
-      "command": "tsc --noEmit",
+    "z:wireit:build": {
+      "command": "yarn z:no-wireit:build",
+      "clean": "if-file-deleted",
       "files": [
         "src/**/*.ts",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../config/tsconfig/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [
+        "dist/**",
+        ".tsbuildinfo"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:gi": {
+      "command": "yarn z:no-wireit:gi",
+      "clean": false,
+      "files": [
+        "../../../scripts/index_ts_generator.sh",
+        "src/**"
+      ],
+      "output": [
+        "src/*/**/index.ts"
+      ],
+      "packageLocks": []
+    },
+    "z:wireit:lint": {
+      "command": "yarn z:no-wireit:lint",
+      "dependencies": [
+        "z:wireit:type-check"
+      ],
+      "files": [
+        "src/**/*.ts",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "package.json",
+        "tsconfig.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../config/eslintrc/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [],
@@ -52,44 +107,42 @@
         "yarn.lock"
       ]
     },
-    "build": {
-      "command": "tsc",
+    "z:wireit:lint:fix": {
+      "command": "yarn z:no-wireit:lint:fix",
+      "dependencies": [
+        "z:wireit:type-check"
+      ],
       "files": [
         "src/**/*.ts",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "package.json",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../config/eslintrc/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
+      "clean": false,
       "output": [
-        "dist/**"
+        "src/**/*.ts"
       ],
       "packageLocks": [
         "yarn.lock"
       ]
     },
-    "gi": {
-      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1  --ignore \"(assets)\"",
-      "clean": false,
-      "files": [
-        "../../../scripts/index_ts_generator.sh",
-        "src/**"
-      ],
-      "packageLocks": []
-    },
-    "lint": {
-      "command": "yarn z:lint",
+    "z:wireit:type-check": {
+      "command": "yarn z:no-wireit:type-check",
       "files": [
         "src/**/*.ts",
-        ".eslintignore",
-        ".eslintrc.cjs",
-        "../../../package.json",
-        "package.json",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json",
-        "../../../config/eslintrc/**",
+        "../../../config/tsconfig/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
-      "output": []
+      "output": [],
+      "packageLocks": [
+        "yarn.lock"
+      ]
     }
   }
 }

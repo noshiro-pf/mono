@@ -10,6 +10,7 @@ import { providePluginTsUtilsDef } from '@noshiro/global-ts-utils/cjs/provide-pl
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { castWritable, tp } from '@noshiro/ts-utils';
+
 // eslint-disable-next-line import/no-named-as-default
 import preact from '@preact/preset-vite';
 import inject from '@rollup/plugin-inject';
