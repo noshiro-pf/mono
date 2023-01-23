@@ -1,5 +1,4 @@
 import type { RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 import { darkGray } from '../../constants';
 import { cardToString } from '../../functions';
 import type { Card } from '../../types';
@@ -13,7 +12,7 @@ type Props = Readonly<{
 const paddingPx = 2;
 
 export const MyCards = memoNamed<Props>('MyCards', ({ cards, height }) => {
-  const wrapperStyle = useMemo<JSXInternal.CSSProperties>(
+  const wrapperStyle = useMemo<CSSProperties>(
     () => ({
       height: `${height}px`,
     }),

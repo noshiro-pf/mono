@@ -1,5 +1,4 @@
 import type { RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 import type { CardTextColor, CustomColor } from '../../constants';
 import { darkGray, eyeIconColorDef, lightGray, zIndex } from '../../constants';
 import { fillCardSize, flipColor } from '../../functions';
@@ -16,10 +15,10 @@ export const useCardAttributes = (
 ): {
   textColor: CardTextColor;
   eyeIconColor: string;
-  wrapperStyle: JSXInternal.CSSProperties;
-  backSideStyle: JSXInternal.CSSProperties;
-  frontSideStyle: JSXInternal.CSSProperties;
-  rectStyle: JSXInternal.CSSProperties;
+  wrapperStyle: CSSProperties;
+  backSideStyle: CSSProperties;
+  frontSideStyle: CSSProperties;
+  rectStyle: CSSProperties;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 } => {
@@ -41,7 +40,7 @@ export const useCardAttributes = (
     setFalse: onMouseLeave,
   } = useBoolState(false);
 
-  const wrapperStyle = useMemo<JSXInternal.CSSProperties>(
+  const wrapperStyle = useMemo<CSSProperties>(
     () => ({
       display: 'block',
       cursor: isClickable ? 'pointer' : 'default',
@@ -55,7 +54,7 @@ export const useCardAttributes = (
     [isClickable, float, isMouseOver, height, width]
   );
 
-  const backSideStyle = useMemo<JSXInternal.CSSProperties>(
+  const backSideStyle = useMemo<CSSProperties>(
     () => ({
       transform:
         visibilityFromMe === 'faceUp' ? 'rotateY(180deg)' : 'rotateY(0)',
@@ -63,7 +62,7 @@ export const useCardAttributes = (
     [visibilityFromMe]
   );
 
-  const frontSideStyle = useMemo<JSXInternal.CSSProperties>(
+  const frontSideStyle = useMemo<CSSProperties>(
     () => ({
       transform:
         visibilityFromMe === 'faceUp' ? 'rotateY(0)' : 'rotateY(180deg)',
@@ -74,7 +73,7 @@ export const useCardAttributes = (
   const _showOutline =
     showOutline === 'always' || (showOutline === 'onHover' && isMouseOver);
 
-  const rectStyle = useMemo<JSXInternal.CSSProperties>(
+  const rectStyle = useMemo<CSSProperties>(
     () => ({
       stroke: _showOutline ? outlineColor : '',
       strokeWidth: _showOutline ? 8 : 0,

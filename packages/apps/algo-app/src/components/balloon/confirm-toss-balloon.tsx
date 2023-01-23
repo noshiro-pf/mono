@@ -1,5 +1,4 @@
 import type { RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 import { outlineColorDef, text } from '../../constants';
 import type { ConfirmTossBalloonProps } from '../../types';
 import { Button } from '../bp';
@@ -23,7 +22,7 @@ const marginBetweenCardAndBalloon = 10;
 export const ConfirmTossBalloon = memoNamed<Props>(
   'ConfirmTossBalloon',
   ({ card, anchorCardRect, submit, cancel }) => {
-    const rootStyle = useMemo<JSXInternal.CSSProperties>(
+    const rootStyle = useMemo<CSSProperties>(
       () =>
         calcBalloonPosition({
           anchorCardRect,

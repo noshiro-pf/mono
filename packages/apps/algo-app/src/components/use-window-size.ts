@@ -1,5 +1,4 @@
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 
 export const useWindowSize = (
   windowSize: Rect
@@ -7,8 +6,8 @@ export const useWindowSize = (
   tableSize: RectSize;
   headerHeight: number;
   footerHeight: number;
-  headerStyle: JSXInternal.CSSProperties;
-  footerStyle: JSXInternal.CSSProperties;
+  headerStyle: CSSProperties;
+  footerStyle: CSSProperties;
 } => {
   const windowMinSideSize = useMemo(
     () => Math.min(windowSize.height, windowSize.width),
@@ -26,11 +25,11 @@ export const useWindowSize = (
   const headerHeight = windowSize.height * 0.05;
   const footerHeight = windowSize.height * 0.1;
 
-  const headerStyle = useMemo<JSXInternal.CSSProperties>(
+  const headerStyle = useMemo<CSSProperties>(
     () => ({ flexBasis: `${headerHeight}px` }),
     [headerHeight]
   );
-  const footerStyle = useMemo<JSXInternal.CSSProperties>(
+  const footerStyle = useMemo<CSSProperties>(
     () => ({ flexBasis: `${footerHeight}px` }),
     [footerHeight]
   );

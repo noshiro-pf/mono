@@ -1,5 +1,4 @@
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 import { playerNameRectSize } from '../../constants';
 import type { CardColor, CardNumber, DisplayValues, NWES } from '../../types';
 import { PlayerCardsArea } from './player-cards-area';
@@ -91,7 +90,7 @@ export const Table = memoNamed(
       };
     }, [tableSize]);
 
-    const tableStyle = useMemo<JSXInternal.CSSProperties>(
+    const tableStyle = useMemo<CSSProperties>(
       () => ({
         width: `${tableSize.width}px`,
         height: `${tableSize.height}px`,

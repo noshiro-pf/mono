@@ -1,5 +1,4 @@
 import type { Rect, RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 import { zIndex } from '../../constants';
 import { cardToString } from '../../functions';
 import type { CardColor, CardNumber, CardWithDisplayValue } from '../../types';
@@ -28,7 +27,7 @@ export const PlayerCardsArea = memoNamed(
     windowSize,
     cardPositionsDispatcher,
   }: Props) => {
-    const rotateStyle = useMemo<JSXInternal.CSSProperties>(() => {
+    const rotateStyle = useMemo<CSSProperties>(() => {
       const common = {
         padding: `${paddingPx}px`,
         transform: `rotate(${rotate}deg)`,

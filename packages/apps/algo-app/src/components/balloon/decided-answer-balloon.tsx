@@ -1,5 +1,4 @@
 import type { RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 import { zIndex } from '../../constants';
 import type { DecidedAnswerBalloonProps } from '../../types';
 import { CardComponent } from '../card';
@@ -29,7 +28,7 @@ const marginBetweenCardAndBalloon = 10;
 export const DecidedAnswerBalloon = memoNamed<Props>(
   'DecidedAnswerBalloon',
   ({ anchorCardRect, arrowDirection, card, showSymbol }) => {
-    const positionStyle = useMemo<JSXInternal.CSSProperties>(
+    const positionStyle = useMemo<CSSProperties>(
       () =>
         calcBalloonPosition({
           anchorCardRect,
