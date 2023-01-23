@@ -1,7 +1,5 @@
 import { MuiSlider } from '@noshiro/react-material-ui-utils';
-import { memoNamed } from '@noshiro/react-utils';
 import { type Hue } from '@noshiro/ts-utils-additional';
-import styled from 'styled-components';
 
 const SliderWrapper = styled.div`
   padding: 10px 0;

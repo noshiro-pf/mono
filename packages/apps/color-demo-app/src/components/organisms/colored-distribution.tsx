@@ -1,10 +1,8 @@
-import { memoNamed } from '@noshiro/react-utils';
 import {
   hslToStr,
   type Hsl,
   type Mappable,
 } from '@noshiro/ts-utils-additional';
-import styled from 'styled-components';
 
 const Root = styled.div`
   width: 100%;

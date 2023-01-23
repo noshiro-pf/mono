@@ -1,12 +1,10 @@
 import { Paper } from '@material-ui/core';
-import { memoNamed } from '@noshiro/react-utils';
 import {
   type Hsl,
   type Hue,
   type Mappable,
   type Percent,
 } from '@noshiro/ts-utils-additional';
-import styled from 'styled-components';
 import { type ColorResult } from '../../../types';
 import { AllSliders, ContrastRatioList } from '../../molecules';
 import {
