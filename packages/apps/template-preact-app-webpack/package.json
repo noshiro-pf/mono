@@ -1,34 +1,55 @@
 {
-  "name": "@noshiro/preact-app-template-webpack",
+  "name": "@noshiro/template-preact-app-webpack",
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
+  "author": "noshiro",
   "scripts": {
-    "build": "run-s build:bundle build:copy-public",
-    "build:bundle": "wireit",
-    "build:copy-public": "wireit",
+    "build": "run-s z:wireit:bundle z:cmd:copy-public",
     "clean": "run-p clean:**",
     "clean:build": "rimraf build",
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:firebase": "rimraf .firebase",
     "clean:wireit": "rimraf .wireit",
-    "fb:deploy": "wireit",
+    "fb:deploy": "yarn z:wireit:fb:deploy",
+    "fb:deploy:hosting": "yarn z:wireit:fb:deploy:hosting",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fb:login:ci": "firebase login:ci",
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
-    "gi": "wireit",
-    "lint": "wireit",
-    "lint:fix": "yarn z:lint --fix",
+    "fmt": "yarn z:cmd:prettier",
+    "gi": "yarn z:wireit:gi",
+    "lint": "run-s z:wireit:lint:*",
+    "lint:fix": "run-p z:wireit:lint:fix:*",
     "serve": "firebase serve",
     "start": "run-p start:**",
-    "start:dev-server": "webpack serve --config config/webpack.dev.js",
-    "test": "wireit",
-    "testw": "jest --config config/jest.config.json --passWithNoTests --watch",
-    "tscw": "tsc --noEmit --watch",
-    "type-check": "wireit",
-    "type-check:watch": "tsc --noEmit --watch",
-    "z:lint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache"
+    "start:dev-server": "yarn z:cmd:webpack-dev-server",
+    "test": "yarn z:wireit:test",
+    "testw": "yarn z:cmd:jest --watch",
+    "tsc": "yarn z:wireit:type-check",
+    "tscw": "yarn z:no-wireit:type-check --watch",
+    "z:cmd:copy-public": "cpx \"public/**\" build",
+    "z:cmd:eslint": "eslint --ext .ts,.tsx",
+    "z:cmd:eslint:src": "yarn z:cmd:eslint src/ --cache --cache-location ./.eslintcache",
+    "z:cmd:jest": "jest --config config/jest.config.json --passWithNoTests",
+    "z:cmd:prettier": "prettier --ignore-path ../../../.prettierignore  --write .",
+    "z:cmd:webpack-dev-server": "webpack serve --config config/webpack.dev.js",
+    "z:cmd:webpack:prd": "webpack --config config/webpack.prod.js",
+    "z:no-wireit:bundle": "yarn z:cmd:webpack:prd",
+    "z:no-wireit:fb:deploy": "firebase deploy",
+    "z:no-wireit:fb:deploy:hosting": "firebase deploy --only hosting",
+    "z:no-wireit:gi": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
+    "z:no-wireit:lint:fix:src": "yarn z:cmd:eslint:src --fix --color",
+    "z:no-wireit:lint:src": "yarn z:cmd:eslint:src --color",
+    "z:no-wireit:test": "yarn z:cmd:jest",
+    "z:no-wireit:type-check": "tsc --noEmit",
+    "z:wireit:bundle": "wireit",
+    "z:wireit:fb:deploy": "wireit",
+    "z:wireit:fb:deploy:hosting": "wireit",
+    "z:wireit:gi": "wireit",
+    "z:wireit:lint:fix:src": "wireit",
+    "z:wireit:lint:src": "wireit",
+    "z:wireit:test": "wireit",
+    "z:wireit:type-check": "wireit"
   },
   "browserslist": {
     "production": [
@@ -67,29 +88,19 @@
     "@noshiro/ts-type-utils": "*"
   },
   "wireit": {
-    "type-check": {
-      "command": "tsc --noEmit",
-      "files": [
-        "src/**/*.{ts,tsx}",
-        "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.preact.nolib.json",
-        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+    "z:wireit:bundle": {
+      "command": "yarn z:no-wireit:bundle",
+      "dependencies": [
+        "z:wireit:type-check"
       ],
-      "output": [],
-      "packageLocks": [
-        "yarn.lock"
-      ]
-    },
-    "build:bundle": {
-      "command": "webpack --config config/webpack.prod.js",
       "files": [
+        "public/**",
         "src/**/*",
         "tsconfig.json",
         "config/webpack.prod.js",
-        "config/env.js",
-        "config/paths.js",
-        "../../../config/webpackconfig/react",
-        "../../../config/tsconfig/tsconfig.preact.nolib.json",
+        "config/*.js",
+        "../../../config/webpackconfig/**",
+        "../../../config/tsconfig/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [
@@ -99,37 +110,43 @@
         "yarn.lock"
       ]
     },
-    "build:copy-public": {
-      "command": "cpx \"public/**\" build"
-    },
-    "fb:deploy": {
-      "command": "firebase deploy",
+    "z:wireit:fb:deploy": {
+      "command": "yarn z:no-wireit:fb:deploy",
       "dependencies": [
         "build"
       ]
     },
-    "gi": {
-      "command": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
+    "z:wireit:fb:deploy:hosting": {
+      "command": "yarn z:no-wireit:fb:deploy:hosting",
+      "dependencies": [
+        "build"
+      ]
+    },
+    "z:wireit:gi": {
+      "command": "yarn z:no-wireit:gi",
       "clean": false,
       "files": [
         "../../../scripts/index_ts_generator.sh",
         "src/**"
       ],
+      "output": [
+        "src/*/**/index.ts"
+      ],
       "packageLocks": []
     },
-    "lint": {
-      "command": "yarn z:lint",
+    "z:wireit:lint:src": {
+      "command": "yarn z:no-wireit:lint:src",
       "dependencies": [
-        "type-check"
+        "z:wireit:type-check"
       ],
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
         ".eslintrc.cjs",
-        "../../../package.json",
         "package.json",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.preact.nolib.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
         "../../../config/eslintrc/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
@@ -138,15 +155,53 @@
         "yarn.lock"
       ]
     },
-    "test": {
-      "command": "jest --config config/jest.config.json --passWithNoTests",
+    "z:wireit:lint:fix:src": {
+      "command": "yarn z:no-wireit:lint:fix:src",
       "dependencies": [
-        "type-check"
+        "z:wireit:type-check"
       ],
       "files": [
+        "src/**/*.{ts,tsx}",
+        ".eslintignore",
+        ".eslintrc.cjs",
+        "package.json",
+        "tsconfig.json",
+        "../../../package.json",
+        "../../../config/tsconfig/**",
+        "../../../config/eslintrc/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "clean": false,
+      "output": [
+        "src/**/*.{ts,tsx}"
+      ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:test": {
+      "command": "yarn z:no-wireit:test",
+      "dependencies": [
+        "z:wireit:type-check"
+      ],
+      "files": [
+        "config/tsconfig.test.json",
         "config/jest.config.json",
         "src/**"
       ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:type-check": {
+      "command": "yarn z:no-wireit:type-check",
+      "files": [
+        "src/**/*.{ts,tsx}",
+        "tsconfig.json",
+        "../../../config/tsconfig/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
       "packageLocks": [
         "yarn.lock"
       ]

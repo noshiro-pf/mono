@@ -1,8 +1,9 @@
 {
-  "name": "@noshiro/react-app-template-vite",
+  "name": "@noshiro/template-react-app-vite",
   "version": "0.0.0",
   "private": false,
   "license": "MIT",
+  "author": "noshiro",
   "scripts": {
     "build": "yarn z:wireit:bundle",
     "build:no-minify": "yarn z:wireit:bundle --minify false",
@@ -17,13 +18,12 @@
     "cy:run:firefox": "cypress run --headed --browser firefox",
     "fb:deploy": "yarn z:wireit:fb:deploy",
     "fb:deploy:hosting": "yarn z:wireit:fb:deploy:hosting",
-    "fb:export": "yarn z:wireit:fb:export",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "fb:login:ci": "firebase login:ci",
     "fmt": "yarn z:cmd:prettier",
     "gi": "yarn z:wireit:gi",
-    "lint": "run-p z:wireit:lint:*",
+    "lint": "run-s z:wireit:lint:*",
     "lint:fix": "run-p z:wireit:lint:fix:*",
     "preview": "yarn z:cmd:vite:preview",
     "serve": "firebase serve",
@@ -43,7 +43,6 @@
     "z:no-wireit:bundle": "yarn z:cmd:vite build",
     "z:no-wireit:fb:deploy": "firebase deploy",
     "z:no-wireit:fb:deploy:hosting": "firebase deploy --only hosting",
-    "z:no-wireit:fb:export": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --write ./scripts/firestore_backup.json",
     "z:no-wireit:gi": "bash ../../../scripts/index_ts_generator.sh ./src --min-depth 1 --ignore assets",
     "z:no-wireit:lint:cy": "yarn z:cmd:eslint:cy --color",
     "z:no-wireit:lint:fix:cy": "yarn z:cmd:eslint:cy --fix --color",
@@ -54,7 +53,6 @@
     "z:wireit:bundle": "wireit",
     "z:wireit:fb:deploy": "wireit",
     "z:wireit:fb:deploy:hosting": "wireit",
-    "z:wireit:fb:export": "wireit",
     "z:wireit:gi": "wireit",
     "z:wireit:lint:cy": "wireit",
     "z:wireit:lint:fix:cy": "wireit",
@@ -104,11 +102,13 @@
     "z:wireit:bundle": {
       "command": "yarn z:no-wireit:bundle",
       "dependencies": [
-        "z:no-wireit:type-check"
+        "z:wireit:type-check"
       ],
       "files": [
+        "public/**",
         "src/**/*",
         "tsconfig.json",
+        "config/globals.ts",
         "config/vite.config.ts",
         "../../../config/tsconfig/**",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
@@ -132,10 +132,6 @@
         "build"
       ]
     },
-    "z:wireit:fb:export": {
-      "command": "yarn z:no-wireit:fb:export",
-      "dependencies": []
-    },
     "z:wireit:gi": {
       "command": "yarn z:no-wireit:gi",
       "clean": false,
@@ -143,25 +139,15 @@
         "../../../scripts/index_ts_generator.sh",
         "src/**"
       ],
-      "packageLocks": []
-    },
-    "z:wireit:type-check": {
-      "command": "yarn z:no-wireit:type-check",
-      "files": [
-        "src/**/*.{ts,tsx}",
-        "tsconfig.json",
-        "../../../config/tsconfig/**",
-        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      "output": [
+        "src/*/**/index.ts"
       ],
-      "output": [],
-      "packageLocks": [
-        "yarn.lock"
-      ]
+      "packageLocks": []
     },
     "z:wireit:lint:src": {
       "command": "yarn z:no-wireit:lint:src",
       "dependencies": [
-        "tsc"
+        "z:wireit:type-check"
       ],
       "files": [
         "src/**/*.{ts,tsx}",
@@ -182,7 +168,7 @@
     "z:wireit:lint:fix:src": {
       "command": "yarn z:no-wireit:lint:fix:src",
       "dependencies": [
-        "tsc"
+        "z:wireit:type-check"
       ],
       "files": [
         "src/**/*.{ts,tsx}",
@@ -206,7 +192,7 @@
     "z:wireit:lint:cy": {
       "command": "yarn z:no-wireit:lint:cy",
       "dependencies": [
-        "tsc"
+        "z:wireit:type-check"
       ],
       "files": [
         "cypress/**/*.ts",
@@ -227,7 +213,7 @@
     "z:wireit:lint:fix:cy": {
       "command": "yarn z:no-wireit:lint:fix:cy",
       "dependencies": [
-        "tsc"
+        "z:wireit:type-check"
       ],
       "files": [
         "cypress/**/*.ts",
@@ -251,7 +237,7 @@
     "z:wireit:test": {
       "command": "yarn z:no-wireit:test",
       "dependencies": [
-        "tsc"
+        "z:wireit:type-check"
       ],
       "files": [
         "config/global.ts",
@@ -259,6 +245,19 @@
         "config/vitest.config.ts",
         "src/**"
       ],
+      "packageLocks": [
+        "yarn.lock"
+      ]
+    },
+    "z:wireit:type-check": {
+      "command": "yarn z:no-wireit:type-check",
+      "files": [
+        "src/**/*.{ts,tsx}",
+        "tsconfig.json",
+        "../../../config/tsconfig/**",
+        "../../utils/ts-type-utils/ts-type-utils.d.ts"
+      ],
+      "output": [],
       "packageLocks": [
         "yarn.lock"
       ]
