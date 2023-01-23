@@ -1,8 +1,8 @@
-@import '~normalize.css';
+@import 'normalize.css';
 
 /* import these first because they're the base layer */
-@import '~@noshiro/blueprint-css/blueprint-min.css';
-@import '~@noshiro/blueprint-css/blueprint-icons.css';
+@import '@noshiro/blueprint-css/blueprint-min.css';
+@import '@noshiro/blueprint-css/blueprint-icons.css';
 
 body {
   margin: 0;

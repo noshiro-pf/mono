@@ -1,6 +1,5 @@
-import { memoNamed } from '@noshiro/react-utils';
 import { type DetailedHTMLProps, type InputHTMLAttributes } from 'react';
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components';
 import { ptInput } from '../style-definitions';
 
 type Props = DetailedHTMLProps<
