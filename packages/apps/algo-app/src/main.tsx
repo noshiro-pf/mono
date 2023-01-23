@@ -5,7 +5,7 @@ import './index.css';
 
 setup(h);
 
-const root = document.querySelector('#root');
+const root = document.querySelector('#app');
 if (root !== null) {
   render(<Root />, root);
 }
