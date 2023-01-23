@@ -1,3 +1,4 @@
+import { Arr, range } from '@noshiro/ts-utils';
 import { isVariable } from '../is-variable';
 
 export const tokensRepresentsLambdaTerm = (

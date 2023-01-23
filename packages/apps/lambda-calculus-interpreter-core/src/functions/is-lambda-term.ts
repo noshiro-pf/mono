@@ -1,3 +1,4 @@
+import { Arr } from '@noshiro/ts-utils';
 import {
   type LambdaAbstraction,
   type LambdaApplication,

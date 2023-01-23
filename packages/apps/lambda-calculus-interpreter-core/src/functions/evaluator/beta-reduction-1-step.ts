@@ -1,3 +1,4 @@
+import { Json, Result } from '@noshiro/ts-utils';
 import { type LambdaTerm } from '../../types';
 import { isAbstraction, isApplication } from '../is-lambda-term';
 import { isVariable } from '../is-variable';

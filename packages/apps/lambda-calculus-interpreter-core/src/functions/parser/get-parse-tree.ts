@@ -1,3 +1,4 @@
+import { Arr, Json, range, Result } from '@noshiro/ts-utils';
 import { type LambdaTerm } from '../../types';
 import { isVariable } from '../is-variable';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term';
