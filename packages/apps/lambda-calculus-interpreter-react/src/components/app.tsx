@@ -1,9 +1,7 @@
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { CodeArea } from './code-area';
 import { useLambdaEval } from './use-lambda-eval';
 
-export const Main = memoNamed('Main', () => {
+export const App = memoNamed('App', () => {
   const { inputAreaString, outputAreaString, setInputAreaString } =
     useLambdaEval('((+ 2) 3)', 'Parse error.');
 
