@@ -1,8 +1,8 @@
 'use strict';
-
 // @ts-check
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
+/** @typedef { import("../../../config/eslintrc/eslint-rules/rules-type/typescript-eslint-rules").TypeScriptEslintRules } TypeScriptEslintRules */
 
 const {
   restrictedImportsOption,
@@ -30,28 +30,41 @@ const {
   eslintNoRestrictedImportsGooberDef,
 } = require('@noshiro/global-goober/cjs/eslint-no-restricted-imports-def');
 
+const { join } = require('path');
+
+/** @type {TypeScriptEslintRules["@typescript-eslint/no-restricted-imports"]} */
+const noRestrictedImports = [
+  'warn',
+  {
+    paths: [
+      ...restrictedImportsOption.paths,
+      eslintNoRestrictedImportsTsUtilsDef,
+      eslintNoRestrictedImportsPreactUtilsDef,
+      eslintNoRestrictedImportsSyncflowDef,
+      eslintNoRestrictedImportsSyncflowPreactHooksDef,
+      eslintNoRestrictedImportsPreactDef,
+      eslintNoRestrictedImportsTinyRouterPreactHooksDef,
+      eslintNoRestrictedImportsGooberDef,
+    ],
+  },
+];
+
 /** @type {LinterConfig} */
 const config = {
   extends: '../../../config/eslintrc/.eslintrc.preact.js',
   parserOptions: {
     project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
   },
   rules: {
-    '@typescript-eslint/no-restricted-imports': [
-      'warn',
+    'import/no-extraneous-dependencies': [
+      'error',
       {
-        paths: [
-          ...restrictedImportsOption.paths,
-          eslintNoRestrictedImportsTsUtilsDef,
-          eslintNoRestrictedImportsPreactUtilsDef,
-          eslintNoRestrictedImportsSyncflowDef,
-          eslintNoRestrictedImportsSyncflowPreactHooksDef,
-          eslintNoRestrictedImportsPreactDef,
-          eslintNoRestrictedImportsTinyRouterPreactHooksDef,
-          eslintNoRestrictedImportsGooberDef,
-        ],
+        packageDir: [join(__dirname, '../../../'), '.'],
       },
     ],
+    '@typescript-eslint/no-restricted-imports': noRestrictedImports,
+    '@typescript-eslint/no-namespace': 'error', // enable in Vite project
   },
 };
 

@@ -2,31 +2,31 @@ import { type Room } from '../types';
 import { db } from './database';
 import { setMyName } from './my-name';
 
-export namespace createRoom {
-  const [_response$, setResponse] = createEventEmitter<Room>();
+const [response$, setResponse] = createEventEmitter<Room>();
 
-  export const response$ = _response$;
+const { state$: isWaitingResponse$, setState: setIsWaitingResponse } =
+  createState<boolean>(false);
 
-  const { state$: _isWaitingResponse$, setState: setIsWaitingResponse } =
-    createState<boolean>(false);
+const dispatch = async (
+  payload: Readonly<{
+    username: string;
+    password: string | undefined;
+  }>
+): Promise<Room> => {
+  setIsWaitingResponse(true);
 
-  export const isWaitingResponse$ = _isWaitingResponse$;
+  const res = await db.createRoom(payload);
 
-  export const dispatch = async (
-    payload: Readonly<{
-      username: string;
-      password: string | undefined;
-    }>
-  ): Promise<Room> => {
-    setIsWaitingResponse(true);
+  setMyName(payload.username);
 
-    const res = await db.createRoom(payload);
+  setIsWaitingResponse(false);
+  setResponse(res);
 
-    setMyName(payload.username);
+  return res;
+};
 
-    setIsWaitingResponse(false);
-    setResponse(res);
-
-    return res;
-  };
-}
+export const createRoom = {
+  response$,
+  isWaitingResponse$,
+  dispatch,
+} as const;

@@ -1,21 +1,19 @@
 import { db } from './database';
 import { setMyName } from './my-name';
 
-export namespace joinRoom {
-  const { state$: _isWaitingResponse$, setState: setIsWaitingResponse } =
-    createState<boolean>(false);
+const { state$: isWaitingResponse$, setState: setIsWaitingResponse } =
+  createState<boolean>(false);
 
-  export const isWaitingResponse$ = _isWaitingResponse$;
+const dispatch = async (roomId: string, username: string): Promise<void> => {
+  setIsWaitingResponse(true);
 
-  export const dispatch = async (
-    roomId: string,
-    username: string
-  ): Promise<void> => {
-    setIsWaitingResponse(true);
+  await db.addPlayer(roomId, username);
+  setMyName(username);
 
-    await db.addPlayer(roomId, username);
-    setMyName(username);
+  setIsWaitingResponse(false);
+};
 
-    setIsWaitingResponse(false);
-  };
-}
+export const joinRoom = {
+  isWaitingResponse$,
+  dispatch,
+} as const;
