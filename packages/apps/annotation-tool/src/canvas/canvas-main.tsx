@@ -1,4 +1,3 @@
-import { memoNamed, useState } from '@noshiro/react-utils';
 import {
   hslaToRgba,
   type Hue,
@@ -10,7 +9,7 @@ import {
   InteractionManager,
   settings as mut_settings,
 } from 'pixi.js';
-import { useEffect, useMemo, useRef, type CSSProperties } from 'react';
+import { useRef } from 'react';
 import {
   addGlobalPointerEventListener,
   createGlobalPixiObjects,
