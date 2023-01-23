@@ -1,17 +1,14 @@
 import { HTMLTable } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import { useMemo, type CSSProperties } from 'react';
 import { viewTexts } from '../../constants';
 import { calculatedValues$, store$ } from '../../observables';
 
 const headerCellStyle: CSSProperties = {
   textAlign: 'center',
-};
+} as const;
 
 const dataCellStyle: CSSProperties = {
   textAlign: 'right',
-};
+} as const;
 
 const formatYenValue = (value: number): string =>
   Intl.NumberFormat('ja-JP', {

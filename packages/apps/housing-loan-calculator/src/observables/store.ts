@@ -1,11 +1,4 @@
-import {
-  combineLatestI,
-  distinctUntilChangedI,
-  mapI,
-  subject,
-  withInitialValue,
-  type InitializedObservable,
-} from '@noshiro/syncflow';
+import { subject } from '@noshiro/syncflow';
 import { defaultValues } from '../constants';
 import { type RepaymentType, type Store } from '../types';
 

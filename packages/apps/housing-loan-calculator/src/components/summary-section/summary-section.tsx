@@ -1,5 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
 import { viewTexts } from '../../constants';
 import { calculatedValues$, store$ } from '../../observables';
 import { DataItem } from './data-item';

@@ -1,11 +1,4 @@
-import {
-  debounceTimeI,
-  mapI,
-  mapTo,
-  merge,
-  withInitialValue,
-  type InitializedObservable,
-} from '@noshiro/syncflow';
+import { merge } from '@noshiro/syncflow';
 import { calcAll } from '../functions';
 import { store$ } from './store';
 
