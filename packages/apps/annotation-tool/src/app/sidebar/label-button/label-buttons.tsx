@@ -1,8 +1,5 @@
 import { Button, Collapse } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
 import { type Percent } from '@noshiro/ts-utils-additional';
-import { useMemo } from 'react';
-import styled from 'styled-components';
 import { type Label } from '../../../canvas';
 import { type AppEventHandler } from '../../event-handlers';
 import { LabelButtonItem } from './label-button-item';

@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 export const LabelButtonText = styled.div`
   flex-grow: 1;
   text-align: center;

@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-
 const Base = styled.button`
   height: 30px;
   width: 100%;

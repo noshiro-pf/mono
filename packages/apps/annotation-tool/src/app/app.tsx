@@ -1,16 +1,10 @@
-import {
-  memoNamed,
-  useBoolState,
-  useStateWithMapFn,
-} from '@noshiro/react-utils';
+import { useStateWithMapFn } from '@noshiro/react-utils';
 import {
   pickupHighContrastHues,
   type Hue,
   type Percent,
   type RectSize,
 } from '@noshiro/ts-utils-additional';
-import { useMemo, useReducer } from 'react';
-import styled from 'styled-components';
 import {
   AnnotationCanvas,
   defaultAnnotationCanvasStyle,
@@ -74,7 +68,7 @@ const labels: NonEmptyArray<Label> = pipe(Arr.zip(hues, labelNames)).chain(
 
 const labelInit: Label = labels[0];
 
-export const Main = memoNamed('Main', () => {
+export const App = memoNamed('App', () => {
   const { state: hidden, setTrue: hide, setFalse: show } = useBoolState(false);
 
   const [visibleLabelIndices, visibleLabelIndicesDispatcher] = useReducer(
