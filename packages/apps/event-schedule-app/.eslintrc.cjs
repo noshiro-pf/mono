@@ -28,6 +28,8 @@ const {
   eslintNoRestrictedImportsStyledComponentsDef,
 } = require('@noshiro/global-styled-components/cjs/eslint-no-restricted-imports-def');
 
+const { join } = require('path');
+
 /** @type {TypeScriptEslintRules["@typescript-eslint/no-restricted-imports"]} */
 const noRestrictedImports = [
   'warn',
@@ -123,6 +125,12 @@ const config = {
     tsconfigRootDir: __dirname,
   },
   rules: {
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        packageDir: [join(__dirname, '../../../'), '.'],
+      },
+    ],
     '@typescript-eslint/no-restricted-imports': noRestrictedImports,
     '@typescript-eslint/ban-types': [
       'error',

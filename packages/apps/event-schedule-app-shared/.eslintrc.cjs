@@ -1,5 +1,7 @@
 'use strict';
 
+const { join } = require('path');
+
 // @ts-check
 
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
@@ -10,6 +12,14 @@ const config = {
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
+  },
+  rules: {
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        packageDir: [join(__dirname, '../../../'), '.'],
+      },
+    ],
   },
 };
 
