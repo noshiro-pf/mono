@@ -7,8 +7,6 @@ import {
   ListItemText,
   Paper,
 } from '@material-ui/core';
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
 import { DiceIcon, SumIcon } from '../assets';
 import { DiceNumber } from './dicer-number';
 import { Histogram } from './histogram';

@@ -1,6 +1,4 @@
-import { memoNamed } from '@noshiro/react-utils';
 import { type Mappable } from '@noshiro/ts-utils-additional';
-import styled from 'styled-components';
 
 type Props = Readonly<{
   xy: Mappable<readonly [number, number]>;

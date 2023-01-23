@@ -1,6 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
-
 type Props = Readonly<{ n: number; opacity: number }>;
 
 export const DiceNumber = memoNamed<Props>('DiceNumber', ({ n, opacity }) => (
