@@ -1,3 +1,11 @@
-import { memoNamed } from '@noshiro/react-utils';
+import { setup } from '@noshiro/goober';
+import { h, render } from 'preact';
+import { App } from './app';
+import './index.css';
 
-export const Main = memoNamed('Main', () => <div />);
+setup(h);
+
+const root = document.querySelector('#app');
+if (root !== null) {
+  render(<App />, root);
+}
