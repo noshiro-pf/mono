@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import { ptInputHeightPx } from '../common';
 import { ptInput, ptInputPlaceholder } from './common';
 
