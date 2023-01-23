@@ -1,5 +1,4 @@
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
-import type { JSXInternal } from 'preact/src/jsx';
 import { getParams, getRoomId, isMainPage, routes, text } from '../constants';
 import { createRoom, db } from '../observables';
 import { Button } from './bp';
@@ -69,7 +68,7 @@ export const Root = memoNamed('Root', () => {
   );
 });
 
-const rootStyle: JSXInternal.CSSProperties = {
+const rootStyle: CSSProperties = {
   width: '100vw',
   height: '100vh',
 } as const;

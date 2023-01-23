@@ -1,4 +1,3 @@
-import type { JSXInternal } from 'preact/src/jsx';
 import { text } from '../constants';
 import { db, joinRoom } from '../observables';
 import { ButtonPrimary, Input, Spinner } from './bp';
@@ -17,21 +16,19 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
   const { state: password, setState: setPassword } = useState<string>('');
   const { state: username, setState: setUsername } = useState<string>('');
 
-  const onPasswordInput: JSXInternal.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setPassword(ev.currentTarget.value);
-      },
-      [setPassword]
-    );
+  const onPasswordInput: GenericEventHandler<HTMLInputElement> = useCallback(
+    (ev) => {
+      setPassword(ev.currentTarget.value);
+    },
+    [setPassword]
+  );
 
-  const onUsernameInput: JSXInternal.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setUsername(ev.currentTarget.value);
-      },
-      [setUsername]
-    );
+  const onUsernameInput: GenericEventHandler<HTMLInputElement> = useCallback(
+    (ev) => {
+      setUsername(ev.currentTarget.value);
+    },
+    [setUsername]
+  );
 
   const disabled: boolean = username === '';
 

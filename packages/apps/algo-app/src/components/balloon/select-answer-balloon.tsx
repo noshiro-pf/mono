@@ -1,5 +1,4 @@
 import type { RectSize } from '@noshiro/ts-utils-additional';
-import type { JSXInternal } from 'preact/src/jsx';
 import { outlineColorDef, text } from '../../constants';
 import type { SelectAnswerBalloonProps } from '../../types';
 import { Button } from '../bp';
@@ -38,7 +37,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
     onCancelClick,
     submitButtonIsDisabled,
   }) => {
-    const rootStyle = useMemo<JSXInternal.CSSProperties>(
+    const rootStyle = useMemo<CSSProperties>(
       () =>
         calcBalloonPosition({
           anchorCardRect,
