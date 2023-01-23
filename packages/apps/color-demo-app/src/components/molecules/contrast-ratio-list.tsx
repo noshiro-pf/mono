@@ -1,6 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-import styled from 'styled-components';
-
 const Root = styled.div`
   padding: 10px;
   display: flex;

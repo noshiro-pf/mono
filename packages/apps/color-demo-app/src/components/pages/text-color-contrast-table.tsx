@@ -6,7 +6,6 @@ import {
   TableHead,
   TableRow,
 } from '@material-ui/core';
-import { memoNamed } from '@noshiro/react-utils';
 import {
   blackHsl,
   contrastRatioHsl,
@@ -15,7 +14,6 @@ import {
   type Percent,
 } from '@noshiro/ts-utils-additional';
 import { Fragment } from 'react';
-import styled from 'styled-components';
 
 const hues: readonly Hue[] = Arr.seqUnwrapped(360);
 

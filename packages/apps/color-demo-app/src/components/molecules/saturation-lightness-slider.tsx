@@ -1,7 +1,5 @@
 import { MuiSlider } from '@noshiro/react-material-ui-utils';
-import { memoNamed } from '@noshiro/react-utils';
 import { type Hue, type Percent } from '@noshiro/ts-utils-additional';
-import styled from 'styled-components';
 import { DivisionNumberSlider } from './division-number-slider';
 import { FirstHueSlider } from './first-hue-slider';
 
