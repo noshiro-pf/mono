@@ -1,4 +1,4 @@
-import type { DeepWritable, TypeEq } from '../src';
+import { type DeepWritable, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<

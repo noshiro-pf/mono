@@ -1,4 +1,4 @@
-import type { MakeTuple, TypeEq } from '../src';
+import { type MakeTuple, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<

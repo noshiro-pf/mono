@@ -1,4 +1,4 @@
-import type { ListType, TypeEq } from '../../src';
+import { type ListType, type TypeEq } from '../../src';
 import { assertType } from '../assert-type';
 
 assertType<TypeEq<ListType.Partition<1, readonly []>, readonly []>>();

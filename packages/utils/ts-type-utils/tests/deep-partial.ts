@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
-import type { DeepPartial, TypeEq } from '../src';
+import { type DeepPartial, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<

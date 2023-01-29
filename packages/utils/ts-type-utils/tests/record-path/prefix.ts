@@ -1,4 +1,4 @@
-import type { Prefixes, TypeEq } from '../../src';
+import { type Prefixes, type TypeEq } from '../../src';
 import { assertType } from '../assert-type';
 
 assertType<

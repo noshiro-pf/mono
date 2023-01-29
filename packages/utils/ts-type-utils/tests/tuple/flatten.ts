@@ -1,4 +1,4 @@
-import type { DeepReadonly, Tuple, TypeEq } from '../../src';
+import { type DeepReadonly, type Tuple, type TypeEq } from '../../src';
 import { assertType } from '../assert-type';
 
 assertType<TypeEq<Tuple.Flatten<DeepReadonly<[]>>, readonly []>>();

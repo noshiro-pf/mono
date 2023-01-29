@@ -1,4 +1,8 @@
-import type { DeepReadonly, RecordValueAtPath, TypeEq } from '../../src';
+import {
+  type DeepReadonly,
+  type RecordValueAtPath,
+  type TypeEq,
+} from '../../src';
 import { assertType } from '../assert-type';
 
 type R0 = DeepReadonly<{

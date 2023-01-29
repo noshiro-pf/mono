@@ -1,4 +1,4 @@
-import type { DeepReadonly, RecordUpdated, TypeEq } from '../../src';
+import { type DeepReadonly, type RecordUpdated, type TypeEq } from '../../src';
 import { assertType } from '../assert-type';
 
 assertType<TypeEq<RecordUpdated<0, readonly [], 'changed'>, 'changed'>>();
