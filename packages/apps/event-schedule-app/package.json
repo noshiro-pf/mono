@@ -92,11 +92,11 @@
     ]
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.1.2",
-    "@blueprintjs/datetime": "^4.3.3",
-    "@blueprintjs/datetime2": "^0.4.1",
-    "@blueprintjs/icons": "^4.2.3",
-    "@blueprintjs/popover2": "^1.4.3",
+    "@blueprintjs/core": "^4.15.0",
+    "@blueprintjs/datetime": "^4.4.13",
+    "@blueprintjs/datetime2": "^0.9.11",
+    "@blueprintjs/icons": "^4.13.0",
+    "@blueprintjs/popover2": "^1.12.0",
     "@noshiro/deep-object-diff": "*",
     "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/fast-deep-equal": "*",
