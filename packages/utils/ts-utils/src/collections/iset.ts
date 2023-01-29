@@ -1,4 +1,3 @@
-import { assertType } from '../assert-type';
 import { MutableSet } from '../others';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -215,11 +214,4 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   toRawSet(): ReadonlySet<K> {
     return this.#set;
   }
-}
-
-{
-  const s = ISet.new([1, 2, 3] as const);
-  const r = s.filter((x): x is 1 => x === 1);
-
-  assertType<TypeEq<typeof r, ISet<1>>>();
 }

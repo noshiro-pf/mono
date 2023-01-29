@@ -1,4 +1,4 @@
-import { assertType } from '../assert-type';
+import { expectType } from '../expect-type';
 import { Num } from '../num';
 import { ISet } from './iset';
 
@@ -136,9 +136,20 @@ describe('ISet.map', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const result = s0.map((x) => (x * 2).toString());
 
-    assertType<TypeEq<typeof result, ISet<string>>>();
+    expectType<typeof result, ISet<string>>('=');
     expect(result).toStrictEqual(ISet.new(['2', '6', '10', '12', '14']));
     expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
+  });
+});
+
+describe('ISet.filter', () => {
+  test('case 1', () => {
+    const s0 = ISet.new([1, 2, 3] as const);
+    const result = s0.filter((x): x is 1 => x === 1);
+
+    expectType<typeof result, ISet<1>>('=');
+
+    expect(result).toStrictEqual(ISet.new([1]));
   });
 });
 

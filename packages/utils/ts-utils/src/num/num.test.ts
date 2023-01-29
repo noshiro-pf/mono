@@ -1,4 +1,4 @@
-import { assertType } from '../assert-type';
+import { expectType } from '../expect-type';
 import { Num } from './num';
 
 const testClamp = (
@@ -38,9 +38,9 @@ describe('Num', () => {
       const f = Num.isUintInRange(0, 3);
       const x: number = 2;
       if (f(x)) {
-        assertType<TypeEq<typeof x, 0 | 1 | 2 | 3>>();
+        expectType<typeof x, 0 | 1 | 2 | 3>('=');
       } else {
-        assertType<TypeEq<typeof x, number>>();
+        expectType<typeof x, number>('=');
       }
       expect(f(x)).toBe(true);
     });
@@ -49,9 +49,9 @@ describe('Num', () => {
       const f = Num.isUintInRange(0, 3);
       const x: number = 100;
       if (f(x)) {
-        assertType<TypeEq<typeof x, 0 | 1 | 2 | 3>>();
+        expectType<typeof x, 0 | 1 | 2 | 3>('=');
       } else {
-        assertType<TypeEq<typeof x, number>>();
+        expectType<typeof x, number>('=');
       }
       expect(f(x)).toBe(false);
     });

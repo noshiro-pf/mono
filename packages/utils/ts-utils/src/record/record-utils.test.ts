@@ -1,4 +1,4 @@
-import { assertType } from '../assert-type';
+import { expectType } from '../expect-type';
 import { RecordUtils } from './record-utils';
 
 type R0 = DeepReadonly<{
@@ -18,9 +18,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.get(rcd, 'x');
 
-      assertType<
-        TypeEq<typeof result, DeepReadonly<{ a: number; b: number }>>
-      >();
+      expectType<typeof result, DeepReadonly<{ a: number; b: number }>>('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({ a: 1, b: 2 });
@@ -29,9 +27,9 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.get(rcd, 'y');
 
-      assertType<
-        TypeEq<typeof result, DeepReadonly<{ c: { d: number; 4: number } }>>
-      >();
+      expectType<typeof result, DeepReadonly<{ c: { d: number; 4: number } }>>(
+        '='
+      );
 
       test('case 2', () => {
         expect(result).toStrictEqual({ c: { d: 3, 4: 5 } });
@@ -43,7 +41,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.set(rcd, 'x', { a: 0, b: 0 } as const);
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({
@@ -56,7 +54,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.set(rcd, 'y', { c: { d: 888, 4: 999 } });
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 2', () => {
         expect(result).toStrictEqual({
@@ -76,7 +74,7 @@ describe('RecordUtils', () => {
         (curr) => ({ a: curr.a + 1, b: curr.b + 2 } as const)
       );
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({
@@ -91,7 +89,7 @@ describe('RecordUtils', () => {
         c: { d: 888, 4: 999 },
       }));
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 2', () => {
         expect(result).toStrictEqual({
@@ -107,7 +105,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.getIn(rcd, [] as const);
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({
@@ -120,7 +118,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.getIn(rcd, ['y', 'c', 'd'] as const);
 
-      assertType<TypeEq<typeof result, number>>();
+      expectType<typeof result, number>('=');
 
       test('case 2', () => {
         expect(result).toBe(3);
@@ -136,7 +134,7 @@ describe('RecordUtils', () => {
         z: [999, 999, 999],
       });
 
-      assertType<TypeEq<typeof result, DeepReadonly<R0>>>();
+      expectType<typeof result, DeepReadonly<R0>>('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({
@@ -149,7 +147,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.setIn(rcd, ['y', 'c', 'd'], 999);
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 2', () => {
         expect(result).toStrictEqual({
@@ -162,7 +160,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.setIn(rcd, ['y', 'c'], { d: 999, 4: 999 });
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 3', () => {
         expect(result).toStrictEqual({
@@ -175,7 +173,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.setIn(rcd, ['z', 1], 999);
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 4', () => {
         expect(result).toStrictEqual({
@@ -191,7 +189,7 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.updateIn(rcd, [] as const, (curr) => curr);
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual(rcd);
@@ -204,7 +202,7 @@ describe('RecordUtils', () => {
         (curr) => curr + 1000
       );
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 2', () => {
         expect(result).toStrictEqual({
@@ -221,7 +219,7 @@ describe('RecordUtils', () => {
         '4': curr[4] + 2000,
       }));
 
-      assertType<TypeEq<typeof result, R0>>();
+      expectType<typeof result, R0>('=');
 
       test('case 3', () => {
         expect(result).toStrictEqual({
@@ -237,15 +235,13 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.removeProperties(rcd, ['x'] as const);
 
-      assertType<
-        TypeEq<
-          typeof result,
-          DeepReadonly<{
-            y: { c: { d: number; 4: number } };
-            z: [number, number, number];
-          }>
-        >
-      >();
+      expectType<
+        typeof result,
+        DeepReadonly<{
+          y: { c: { d: number; 4: number } };
+          z: [number, number, number];
+        }>
+      >('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({
@@ -257,14 +253,12 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.removeProperties(rcd, ['y', 'z'] as const);
 
-      assertType<
-        TypeEq<
-          typeof result,
-          DeepReadonly<{
-            x: { a: number; b: number };
-          }>
-        >
-      >();
+      expectType<
+        typeof result,
+        DeepReadonly<{
+          x: { a: number; b: number };
+        }>
+      >('=');
 
       test('case 2', () => {
         expect(result).toStrictEqual({
@@ -278,18 +272,16 @@ describe('RecordUtils', () => {
     {
       const result = RecordUtils.merge(rcd, { a: 1, b: 2 } as const);
 
-      assertType<
-        TypeEq<
-          typeof result,
-          DeepReadonly<{
-            x: { a: number; b: number };
-            y: { c: { d: number; 4: number } };
-            z: [number, number, number];
-            a: 1;
-            b: 2;
-          }>
-        >
-      >();
+      expectType<
+        typeof result,
+        DeepReadonly<{
+          x: { a: number; b: number };
+          y: { c: { d: number; 4: number } };
+          z: [number, number, number];
+          a: 1;
+          b: 2;
+        }>
+      >('=');
 
       test('case 1', () => {
         expect(result).toStrictEqual({
@@ -308,17 +300,15 @@ describe('RecordUtils', () => {
         a: 1,
       } as const);
 
-      assertType<
-        TypeEq<
-          typeof result,
-          DeepReadonly<{
-            x: 1;
-            y: { p: '3'; q: '4' };
-            z: [number, number, number];
-            a: 1;
-          }>
-        >
-      >();
+      expectType<
+        typeof result,
+        DeepReadonly<{
+          x: 1;
+          y: { p: '3'; q: '4' };
+          z: [number, number, number];
+          a: 1;
+        }>
+      >('=');
 
       test('case 2', () => {
         expect(result).toStrictEqual({
@@ -335,7 +325,7 @@ describe('RecordUtils', () => {
     test('case 1', () => {
       const keys = RecordUtils.keys({ x: 1, y: 2 });
 
-      assertType<TypeEq<typeof keys, ('x' | 'y')[]>>();
+      expectType<typeof keys, ('x' | 'y')[]>('=');
 
       expect(keys).toStrictEqual(['x', 'y']);
     });
@@ -344,7 +334,7 @@ describe('RecordUtils', () => {
       const symb = Symbol();
       const keys = RecordUtils.keys({ x: 1, y: 2, z: '3', 3: 4, [symb]: 5 });
 
-      assertType<TypeEq<typeof keys, ('3' | 'x' | 'y' | 'z')[]>>();
+      expectType<typeof keys, ('3' | 'x' | 'y' | 'z')[]>('=');
 
       expect(keys).toStrictEqual(['3', 'x', 'y', 'z']);
     });
@@ -354,7 +344,7 @@ describe('RecordUtils', () => {
     test('case 1', () => {
       const values = RecordUtils.values({ x: 1, y: 2 } as const);
 
-      assertType<TypeEq<typeof values, readonly (1 | 2)[]>>();
+      expectType<typeof values, readonly (1 | 2)[]>('=');
 
       expect(values).toStrictEqual([1, 2]);
     });
@@ -372,8 +362,8 @@ describe('RecordUtils', () => {
     const obj0 = Object.fromEntries(entries);
     const obj1 = RecordUtils.fromEntries(entries);
 
-    assertType<TypeEq<typeof obj0, Record<string, 1 | 2 | 3>>>();
-    assertType<TypeEq<typeof obj1, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>>();
+    expectType<typeof obj0, Record<string, 1 | 2 | 3>>('=');
+    expectType<typeof obj1, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>('=');
 
     test('case 1', () => {
       expect(obj1).toStrictEqual({
@@ -393,16 +383,14 @@ describe('RecordUtils', () => {
       3: 4;
     }>;
 
-    assertType<
-      TypeEq<
-        RecordUtils.Entries<RecordType1>,
-        readonly (
-          | readonly ['3', 4]
-          | readonly ['x', 1]
-          | readonly ['y' | 'z', 2]
-        )[]
-      >
-    >();
+    expectType<
+      RecordUtils.Entries<RecordType1>,
+      readonly (
+        | readonly ['3', 4]
+        | readonly ['x', 1]
+        | readonly ['y' | 'z', 2]
+      )[]
+    >('=');
 
     type RecordType2 = DeepReadonly<
       | {
@@ -419,28 +407,24 @@ describe('RecordUtils', () => {
         }
     >;
 
-    assertType<
-      TypeEq<
-        RecordUtils.Entries<RecordType2>,
-        | readonly (
-            | readonly ['3', 4]
-            | readonly ['x', 1]
-            | readonly ['y' | 'z', 2]
-          )[]
-        | readonly (
-            | readonly ['9', 40]
-            | readonly ['a', 10]
-            | readonly ['b' | 'c', 20]
-          )[]
-      >
-    >();
+    expectType<
+      RecordUtils.Entries<RecordType2>,
+      | readonly (
+          | readonly ['3', 4]
+          | readonly ['x', 1]
+          | readonly ['y' | 'z', 2]
+        )[]
+      | readonly (
+          | readonly ['9', 40]
+          | readonly ['a', 10]
+          | readonly ['b' | 'c', 20]
+        )[]
+    >('=');
 
-    assertType<
-      TypeEq<
-        RecordUtils.Entries<Record<string, number>>,
-        readonly (readonly [string, number])[]
-      >
-    >();
+    expectType<
+      RecordUtils.Entries<Record<string, number>>,
+      readonly (readonly [string, number])[]
+    >('=');
 
     test('case 1', () => {
       const symb = Symbol();
@@ -463,20 +447,18 @@ describe('RecordUtils', () => {
         ['z', 2],
       ]);
 
-      assertType<
-        TypeEq<typeof entries0, readonly (readonly [string, 1 | 2 | 4])[]>
-      >();
+      expectType<typeof entries0, readonly (readonly [string, 1 | 2 | 4])[]>(
+        '='
+      );
 
-      assertType<
-        TypeEq<
-          typeof entries1,
-          readonly (
-            | readonly ['3', 4]
-            | readonly ['x', 1]
-            | readonly ['y' | 'z', 2]
-          )[]
-        >
-      >();
+      expectType<
+        typeof entries1,
+        readonly (
+          | readonly ['3', 4]
+          | readonly ['x', 1]
+          | readonly ['y' | 'z', 2]
+        )[]
+      >('=');
     });
   });
 });

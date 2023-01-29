@@ -1,4 +1,4 @@
-import { assertNotType, assertType } from '../assert-type';
+import { expectType } from '../expect-type';
 import { isRecord } from './is-record';
 
 describe('isRecord', () => {
@@ -7,11 +7,11 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    assertType<TypeExtends<typeof obj, Record<string, unknown>>>();
-    assertType<TypeEq<typeof res, boolean>>();
+    expectType<typeof obj, Record<string, unknown>>('<=');
+    expectType<typeof res, boolean>('=');
 
     if (res) {
-      assertType<TypeEq<typeof unk, Record<string, unknown>>>();
+      expectType<typeof unk, Record<string, unknown>>('=');
     }
 
     expect(res).toBe(true);
@@ -22,11 +22,11 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    assertType<TypeExtends<typeof obj, Record<string, unknown>>>();
-    assertType<TypeEq<typeof res, boolean>>();
+    expectType<typeof obj, Record<string, unknown>>('<=');
+    expectType<typeof res, boolean>('=');
 
     if (res) {
-      assertType<TypeEq<typeof unk, Record<string, unknown>>>();
+      expectType<typeof unk, Record<string, unknown>>('=');
     }
 
     expect(res).toBe(true);
@@ -37,8 +37,8 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
-    assertType<TypeEq<typeof res, boolean>>();
+    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
   });
@@ -49,8 +49,8 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
-    assertType<TypeEq<typeof res, boolean>>();
+    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
   });
@@ -60,8 +60,8 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
-    assertType<TypeEq<typeof res, boolean>>();
+    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
   });
@@ -71,8 +71,8 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
-    assertType<TypeEq<typeof res, boolean>>();
+    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
   });
@@ -82,8 +82,8 @@ describe('isRecord', () => {
     const unk: unknown = obj;
     const res = isRecord(unk);
 
-    assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
-    assertType<TypeEq<typeof res, boolean>>();
+    expectType<typeof obj, Record<string, unknown>>('!=');
+    expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
   });
@@ -93,8 +93,8 @@ describe('isRecord', () => {
   //   const unk: unknown = obj;
   //   const res = isRecord(unk);
 
-  //   assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
-  //   assertType<TypeEq<typeof res, boolean>>();
+  //   assertNotType<typeof obj, Record<string, unknown>>("<=");
+  //   expectType<typeof res, boolean>("=");
 
   //   expect(res).toBe(false);
   // });
@@ -104,8 +104,8 @@ describe('isRecord', () => {
   //   const unk: unknown = obj;
   //   const res = isRecord(unk);
 
-  //   assertNotType<TypeExtends<typeof obj, Record<string, unknown>>>();
-  //   assertType<TypeEq<typeof res, boolean>>();
+  //   assertNotType<typeof obj, Record<string, unknown>>("<=");
+  //   expectType<typeof res, boolean>("=");
 
   //   expect(res).toBe(false);
   // });
