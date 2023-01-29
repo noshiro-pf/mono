@@ -46,7 +46,7 @@
     "ws:setup": "yarn z:ws-run-stages setup",
     "ws:test": "yarn z:ws-run-serial test",
     "ws:test:fast": "yarn z:ws-run-parallel test",
-    "ws:type-check": "yarn z:ws-run-parallel type-check",
+    "ws:type-check": "yarn z:ws-run-parallel z:wireit:type-check",
     "z:gen-eslint-rules-type:compile": "wireit",
     "z:ws-run": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
     "z:ws-run-parallel": "yarn z:ws-run --parallel --concurrency 5",
