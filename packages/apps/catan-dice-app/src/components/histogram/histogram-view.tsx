@@ -1,7 +1,5 @@
-import { type Mappable } from '@noshiro/ts-utils-additional';
-
 type Props = Readonly<{
-  xy: Mappable<readonly [number, number]>;
+  xy: readonly (readonly [number, number])[];
   max: number;
   numSample: number;
 }>;
