@@ -17,12 +17,10 @@ export const confirmEmailDialogFormInitialState = {
   isWaitingResponse: false,
 } as const;
 
-assertType<
-  TypeExtends<
-    typeof confirmEmailDialogFormInitialState,
-    ConfirmEmailDialogFormState
-  >
->();
+expectType<
+  typeof confirmEmailDialogFormInitialState,
+  ConfirmEmailDialogFormState
+>('<=');
 
 export const confirmEmailDialogHasError = (
   state: ConfirmEmailDialogFormState

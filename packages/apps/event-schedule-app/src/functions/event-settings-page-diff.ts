@@ -49,45 +49,43 @@ type EventSchedulePaths = StrictExclude<Paths<EventSchedule>, readonly []>;
 
 // eslint-disable-next-line no-lone-blocks
 {
-  assertType<
-    TypeEq<
-      Readonly<
-        | ['answerDeadline', 'date']
-        | ['answerDeadline', 'hours']
-        | ['answerDeadline', 'minutes']
-        | ['answerDeadline', 'month']
-        | ['answerDeadline', 'year']
-        | ['answerDeadline']
-        | ['answerIcons', 'fair', 'description']
-        | ['answerIcons', 'fair', 'point']
-        | ['answerIcons', 'fair']
-        | ['answerIcons', 'good', 'description']
-        | ['answerIcons', 'good', 'point']
-        | ['answerIcons', 'good']
-        | ['answerIcons', 'poor', 'description']
-        | ['answerIcons', 'poor', 'point']
-        | ['answerIcons', 'poor']
-        | ['answerIcons']
-        | ['archivedBy']
-        | ['author', 'id']
-        | ['author', 'name']
-        | ['author']
-        | ['datetimeRangeList']
-        | ['datetimeSpecification']
-        | ['notes']
-        | ['notificationSettings', 'notify01daysBeforeAnswerDeadline']
-        | ['notificationSettings', 'notify03daysBeforeAnswerDeadline']
-        | ['notificationSettings', 'notify07daysBeforeAnswerDeadline']
-        | ['notificationSettings', 'notify14daysBeforeAnswerDeadline']
-        | ['notificationSettings', 'notify28daysBeforeAnswerDeadline']
-        | ['notificationSettings', 'notifyOnAnswerChange']
-        | ['notificationSettings']
-        | ['timezoneOffsetMinutes']
-        | ['title']
-      >,
-      EventSchedulePaths
-    >
-  >();
+  expectType<
+    Readonly<
+      | ['answerDeadline', 'date']
+      | ['answerDeadline', 'hours']
+      | ['answerDeadline', 'minutes']
+      | ['answerDeadline', 'month']
+      | ['answerDeadline', 'year']
+      | ['answerDeadline']
+      | ['answerIcons', 'fair', 'description']
+      | ['answerIcons', 'fair', 'point']
+      | ['answerIcons', 'fair']
+      | ['answerIcons', 'good', 'description']
+      | ['answerIcons', 'good', 'point']
+      | ['answerIcons', 'good']
+      | ['answerIcons', 'poor', 'description']
+      | ['answerIcons', 'poor', 'point']
+      | ['answerIcons', 'poor']
+      | ['answerIcons']
+      | ['archivedBy']
+      | ['author', 'id']
+      | ['author', 'name']
+      | ['author']
+      | ['datetimeRangeList']
+      | ['datetimeSpecification']
+      | ['notes']
+      | ['notificationSettings', 'notify01daysBeforeAnswerDeadline']
+      | ['notificationSettings', 'notify03daysBeforeAnswerDeadline']
+      | ['notificationSettings', 'notify07daysBeforeAnswerDeadline']
+      | ['notificationSettings', 'notify14daysBeforeAnswerDeadline']
+      | ['notificationSettings', 'notify28daysBeforeAnswerDeadline']
+      | ['notificationSettings', 'notifyOnAnswerChange']
+      | ['notificationSettings']
+      | ['timezoneOffsetMinutes']
+      | ['title']
+    >,
+    EventSchedulePaths
+  >('=');
 }
 
 const createDiffResult = <P extends EventSchedulePaths, R>(

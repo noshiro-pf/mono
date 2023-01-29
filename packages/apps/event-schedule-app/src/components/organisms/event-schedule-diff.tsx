@@ -8,8 +8,8 @@ const list1 = ['title', 'notes', 'datetimeSpecification'] as const;
 
 const list2 = ['answerDeadline', 'author', 'timezoneOffsetMinutes'] as const;
 
-assertType<TypeExtends<typeof list1, readonly (keyof EventSchedule)[]>>();
-assertType<TypeExtends<typeof list2, readonly (keyof EventSchedule)[]>>();
+expectType<typeof list1, readonly (keyof EventSchedule)[]>('<=');
+expectType<typeof list2, readonly (keyof EventSchedule)[]>('<=');
 
 const dc = dict.eventSettingsPage.diff;
 

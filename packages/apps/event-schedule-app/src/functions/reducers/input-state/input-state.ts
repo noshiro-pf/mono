@@ -8,7 +8,7 @@ export const inputInitialState = {
   error: undefined,
 } as const;
 
-assertType<TypeExtends<typeof inputInitialState, InputState>>();
+expectType<typeof inputInitialState, InputState>('<=');
 
 export const inputHasError = (state: InputState): boolean =>
   state.error !== undefined || state.inputValue === '';

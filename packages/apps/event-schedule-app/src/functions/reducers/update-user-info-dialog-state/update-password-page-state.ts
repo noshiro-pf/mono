@@ -23,9 +23,9 @@ export const updatePasswordPageInitialState = {
   isWaitingResponse: false,
 } as const;
 
-assertType<
-  TypeExtends<typeof updatePasswordPageInitialState, UpdatePasswordPageState>
->();
+expectType<typeof updatePasswordPageInitialState, UpdatePasswordPageState>(
+  '<='
+);
 
 export const updatePasswordPageHasError = (
   state: UpdatePasswordPageState

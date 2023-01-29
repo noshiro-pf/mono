@@ -4,8 +4,8 @@ import { firestoreEvents } from '../../initialize-firebase';
 type KeyT = 'archivedBy';
 const key: KeyT = 'archivedBy';
 
-assertType<TypeExtends<KeyT, keyof EventSchedule>>();
-assertType<TypeEq<User, EventSchedule[KeyT][number]>>();
+expectType<KeyT, keyof EventSchedule>('<=');
+expectType<User, EventSchedule[KeyT][number]>('=');
 
 export const archiveEventSchedule = (
   eventId: string,

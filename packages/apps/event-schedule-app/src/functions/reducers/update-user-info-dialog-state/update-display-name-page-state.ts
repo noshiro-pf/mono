@@ -17,12 +17,10 @@ export const updateDisplayNamePageInitialState = {
   isWaitingResponse: false,
 } as const;
 
-assertType<
-  TypeExtends<
-    typeof updateDisplayNamePageInitialState,
-    UpdateDisplayNamePageState
-  >
->();
+expectType<
+  typeof updateDisplayNamePageInitialState,
+  UpdateDisplayNamePageState
+>('<=');
 
 export const updateDisplayNamePageHasError = (
   state: UpdateDisplayNamePageState

@@ -2,7 +2,7 @@ import {
   firestorePaths,
   type EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
-import { Arr, assertType, tp } from '@noshiro/ts-utils';
+import { Arr, expectType, tp } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import {
@@ -19,7 +19,7 @@ const keys = {
   answerDeadline: 'answerDeadline',
 } as const;
 
-assertType<TypeExtends<ValueOf<typeof keys>, keyof EventSchedule>>();
+expectType<ValueOf<typeof keys>, keyof EventSchedule>('<=');
 
 export const notifyAnswerDeadline = async (
   db: firestore.Firestore

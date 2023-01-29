@@ -20,12 +20,10 @@ export const passwordWithConfirmationInitialState = {
   },
 } as const;
 
-assertType<
-  TypeExtends<
-    typeof passwordWithConfirmationInitialState,
-    PasswordWithConfirmationState
-  >
->();
+expectType<
+  typeof passwordWithConfirmationInitialState,
+  PasswordWithConfirmationState
+>('<=');
 
 export const passwordWithConfirmationHasError = (
   state: PasswordWithConfirmationState
