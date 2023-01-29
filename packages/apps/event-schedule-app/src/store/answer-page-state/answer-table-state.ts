@@ -201,24 +201,22 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
               const score = scores.get(datetimeRange) ?? 0;
 
               const answerTableRow: readonly AnswerTableCell[] | undefined =
-                pipe(answerTable.get(datetimeRange)).chain((list) =>
-                  mapOptional(list, (row) =>
-                    Arr.zip(
-                      row,
-                      answers.map((a) => a.weight)
-                    ).map(([[iconId, point, comment], weight]) => ({
-                      iconId,
-                      point,
-                      showPoint: match(iconId, {
-                        good: point !== eventSchedule.answerIcons.good.point,
-                        fair: point !== eventSchedule.answerIcons.fair.point,
-                        poor: point !== eventSchedule.answerIcons.poor.point,
-                        none: false,
-                      }),
-                      weight,
-                      comment,
-                    }))
-                  )
+                pipe(answerTable.get(datetimeRange)).chainOptional((row) =>
+                  Arr.zip(
+                    row,
+                    answers.map((a) => a.weight)
+                  ).map(([[iconId, point, comment], weight]) => ({
+                    iconId,
+                    point,
+                    showPoint: match(iconId, {
+                      good: point !== eventSchedule.answerIcons.good.point,
+                      fair: point !== eventSchedule.answerIcons.fair.point,
+                      poor: point !== eventSchedule.answerIcons.poor.point,
+                      none: false,
+                    }),
+                    weight,
+                    comment,
+                  }))
                 ).value;
 
               const value: DeepReadonly<{
