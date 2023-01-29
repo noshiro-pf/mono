@@ -1,5 +1,5 @@
-import { Paper } from '@material-ui/core';
-import { MuiTabs } from '@noshiro/react-material-ui-utils';
+import { Paper } from '@mui/material';
+import { MuiTabs } from '@noshiro/react-mui-utils';
 import { ComponentSwitcher } from '@noshiro/react-utils';
 import { LuminanceVisualizer, TextColorContrastTable } from './components';
 

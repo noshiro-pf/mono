@@ -1,8 +1,3 @@
-const Root = styled.div`
-  padding: 10px;
-  display: flex;
-`;
-
 type Props = Readonly<{ contrastRatioList: readonly number[] }>;
 
 export const ContrastRatioList = memoNamed<Props>(
@@ -18,3 +13,8 @@ export const ContrastRatioList = memoNamed<Props>(
     </Root>
   )
 );
+
+const Root = styled.div`
+  padding: 10px;
+  display: flex;
+`;

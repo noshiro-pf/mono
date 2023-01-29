@@ -1,8 +1,4 @@
-import { MuiSlider } from '@noshiro/react-material-ui-utils';
-
-const SliderWrapper = styled.div`
-  padding: 10px 0;
-`;
+import { MuiSlider } from '@noshiro/react-mui-utils';
 
 type Props = Readonly<{
   divisionNumber: number;
@@ -25,3 +21,7 @@ export const DivisionNumberSlider = memoNamed<Props>(
     </SliderWrapper>
   )
 );
+
+const SliderWrapper = styled.div`
+  padding: 10px 0;
+`;

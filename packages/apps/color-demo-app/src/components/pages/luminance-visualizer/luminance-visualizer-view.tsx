@@ -1,10 +1,5 @@
-import { Paper } from '@material-ui/core';
-import {
-  type Hsl,
-  type Hue,
-  type Mappable,
-  type Percent,
-} from '@noshiro/ts-utils-additional';
+import { Paper } from '@mui/material';
+import { type Hsl, type Hue, type Percent } from '@noshiro/ts-utils-additional';
 import { type ColorResult } from '../../../types';
 import { AllSliders, ContrastRatioList } from '../../molecules';
 import {
@@ -22,7 +17,7 @@ type Props = Readonly<{
   divisionNumberOnChange: (v: number) => void;
   firstHue: Hue;
   firstHueOnChange: (v: Hue) => void;
-  relativeLuminanceDistribution: Mappable<readonly [Hsl, number]>;
+  relativeLuminanceDistribution: readonly (readonly [Hsl, number])[];
   result1_equallySpaced: ColorResult;
   result2_weighted: ColorResult;
   result3_weighted_log: ColorResult;
