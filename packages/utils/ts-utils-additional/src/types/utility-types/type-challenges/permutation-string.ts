@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type StringToUnion } from './string-to-union';
 
 type PermutationStringImpl<U extends string, V extends U = U> = [U] extends [
@@ -13,13 +13,11 @@ export type PermutationString<U extends string> = PermutationStringImpl<
   StringToUnion<U>
 >;
 
-assertType<
-  TypeEq<
-    PermutationString<'123'>,
-    '123' | '132' | '213' | '231' | '312' | '321'
-  >
->();
+expectType<
+  PermutationString<'123'>,
+  '123' | '132' | '213' | '231' | '312' | '321'
+>('=');
 
-assertType<TypeEq<PermutationString<'12'>, '12' | '21'>>();
-assertType<TypeEq<PermutationString<'1'>, '1'>>();
-assertType<TypeEq<PermutationString<''>, ''>>();
+expectType<PermutationString<'12'>, '12' | '21'>('=');
+expectType<PermutationString<'1'>, '1'>('=');
+expectType<PermutationString<''>, ''>('=');

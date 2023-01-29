@@ -1,6 +1,6 @@
-import { type IsUnion, type TypeEq } from '../src';
-import { assertType } from './assert-type';
+import { type IsUnion } from '../src';
+import { expectType } from './expect-type';
 
-assertType<TypeEq<IsUnion<string>, false>>();
-assertType<TypeEq<IsUnion<number | string>, true>>();
-assertType<TypeEq<IsUnion<[number | string]>, false>>();
+expectType<IsUnion<string>, false>('=');
+expectType<IsUnion<number | string>, true>('=');
+expectType<IsUnion<[number | string]>, false>('=');

@@ -1,10 +1,10 @@
-import { type Tuple, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type Tuple } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<Tuple.Last<[]>, never>>();
-assertType<TypeEq<Tuple.Last<[1]>, 1>>();
-assertType<TypeEq<Tuple.Last<[1, 2, 3]>, 3>>();
+expectType<Tuple.Last<[]>, never>('=');
+expectType<Tuple.Last<[1]>, 1>('=');
+expectType<Tuple.Last<[1, 2, 3]>, 3>('=');
 
-assertType<TypeEq<Tuple.Last<readonly []>, never>>();
-assertType<TypeEq<Tuple.Last<readonly [1]>, 1>>();
-assertType<TypeEq<Tuple.Last<readonly [1, 2, 3]>, 3>>();
+expectType<Tuple.Last<readonly []>, never>('=');
+expectType<Tuple.Last<readonly [1]>, 1>('=');
+expectType<Tuple.Last<readonly [1, 2, 3]>, 3>('=');

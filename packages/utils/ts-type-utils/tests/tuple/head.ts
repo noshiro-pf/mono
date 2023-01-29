@@ -1,12 +1,12 @@
-import { type Tuple, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type Tuple } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<Tuple.Head<[]>, never>>();
-assertType<TypeEq<Tuple.Head<[1]>, 1>>();
-assertType<TypeEq<Tuple.Head<[1, 2], 0>, 1>>();
-assertType<TypeEq<Tuple.Head<[], 1>, 1>>();
+expectType<Tuple.Head<[]>, never>('=');
+expectType<Tuple.Head<[1]>, 1>('=');
+expectType<Tuple.Head<[1, 2], 0>, 1>('=');
+expectType<Tuple.Head<[], 1>, 1>('=');
 
-assertType<TypeEq<Tuple.Head<readonly []>, never>>();
-assertType<TypeEq<Tuple.Head<readonly [1]>, 1>>();
-assertType<TypeEq<Tuple.Head<readonly [1, 2], 0>, 1>>();
-assertType<TypeEq<Tuple.Head<readonly [], 1>, 1>>();
+expectType<Tuple.Head<readonly []>, never>('=');
+expectType<Tuple.Head<readonly [1]>, 1>('=');
+expectType<Tuple.Head<readonly [1, 2], 0>, 1>('=');
+expectType<Tuple.Head<readonly [], 1>, 1>('=');

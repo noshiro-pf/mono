@@ -1,4 +1,4 @@
-import { assertType, Result } from '@noshiro/ts-utils';
+import { expectType, Result } from '@noshiro/ts-utils';
 import { array } from './array';
 import { int, positiveInteger, uintRange } from './numbers';
 import { number } from './primitives';
@@ -17,21 +17,19 @@ describe('nested record', () => {
 
   type NestedRecord = TypeOf<typeof nestedRecord>;
 
-  assertType<
-    TypeEq<
-      NestedRecord,
-      Readonly<{
-        xs: readonly number[];
-        rec: Readonly<{
-          a: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-          b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-        }>;
-        meta: number;
-      }>
-    >
-  >();
+  expectType<
+    NestedRecord,
+    Readonly<{
+      xs: readonly number[];
+      rec: Readonly<{
+        a: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+        b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+      }>;
+      meta: number;
+    }>
+  >('=');
 
-  assertType<TypeEq<typeof nestedRecord.defaultValue, NestedRecord>>();
+  expectType<typeof nestedRecord.defaultValue, NestedRecord>('=');
 
   describe('is', () => {
     test('truthy case', () => {
@@ -45,9 +43,9 @@ describe('nested record', () => {
       };
 
       if (nestedRecord.is(x)) {
-        assertType<TypeEq<typeof x, NestedRecord>>();
+        expectType<typeof x, NestedRecord>('=');
       } else {
-        assertType<TypeEq<typeof x, RecordBase>>();
+        expectType<typeof x, RecordBase>('=');
       }
 
       expect(nestedRecord.is(x)).toBe(true);
@@ -64,9 +62,9 @@ describe('nested record', () => {
       };
 
       if (nestedRecord.is(x)) {
-        assertType<TypeEq<typeof x, NestedRecord>>();
+        expectType<typeof x, NestedRecord>('=');
       } else {
-        assertType<TypeEq<typeof x, RecordBase>>();
+        expectType<typeof x, RecordBase>('=');
       }
 
       expect(nestedRecord.is(x)).toBe(false);
@@ -210,7 +208,7 @@ describe('ymd', () => {
 
       assertIsYmd(x); // throws an error
 
-      assertType<TypeEq<typeof x.month, number>>(); // no type error
+      expectType<typeof x.month, number>('='); // no type error
     };
 
     expect(f).toThrow('The record is expected to have the key "month".');
@@ -248,9 +246,9 @@ describe('ymd2', () => {
 
   type YMD2 = TypeOf<typeof ymd2>;
 
-  assertType<
-    TypeEq<YMD2['month'], 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
-  >();
+  expectType<YMD2['month'], 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>(
+    '='
+  );
 
   test('is', () => {
     const x = {

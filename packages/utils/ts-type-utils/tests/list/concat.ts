@@ -1,16 +1,10 @@
-import { type ListType, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type ListType } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<ListType.Concat<readonly [], readonly []>, readonly []>>();
-assertType<
-  TypeEq<ListType.Concat<readonly [1, 2], readonly []>, readonly [1, 2]>
->();
-assertType<
-  TypeEq<ListType.Concat<readonly [], readonly [1, 2]>, readonly [1, 2]>
->();
-assertType<
-  TypeEq<
-    ListType.Concat<readonly [1, 2], readonly [3, 4, 5]>,
-    readonly [1, 2, 3, 4, 5]
-  >
->();
+expectType<ListType.Concat<readonly [], readonly []>, readonly []>('=');
+expectType<ListType.Concat<readonly [1, 2], readonly []>, readonly [1, 2]>('=');
+expectType<ListType.Concat<readonly [], readonly [1, 2]>, readonly [1, 2]>('=');
+expectType<
+  ListType.Concat<readonly [1, 2], readonly [3, 4, 5]>,
+  readonly [1, 2, 3, 4, 5]
+>('=');

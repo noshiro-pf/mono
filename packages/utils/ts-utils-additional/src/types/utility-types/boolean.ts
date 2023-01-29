@@ -1,9 +1,9 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 export type BoolNot<A extends boolean> = A extends true ? false : true;
 
-assertType<TypeEq<BoolNot<true>, false>>();
-assertType<TypeEq<BoolNot<false>, true>>();
+expectType<BoolNot<true>, false>('=');
+expectType<BoolNot<false>, true>('=');
 
 export type BoolAnd<A extends boolean, B extends boolean> = A extends true
   ? B extends true
@@ -11,10 +11,10 @@ export type BoolAnd<A extends boolean, B extends boolean> = A extends true
     : false
   : false;
 
-assertType<TypeEq<BoolAnd<true, true>, true>>();
-assertType<TypeEq<BoolAnd<true, false>, false>>();
-assertType<TypeEq<BoolAnd<false, true>, false>>();
-assertType<TypeEq<BoolAnd<false, false>, false>>();
+expectType<BoolAnd<true, true>, true>('=');
+expectType<BoolAnd<true, false>, false>('=');
+expectType<BoolAnd<false, true>, false>('=');
+expectType<BoolAnd<false, false>, false>('=');
 
 export type BoolOr<A extends boolean, B extends boolean> = A extends false
   ? B extends false
@@ -22,44 +22,44 @@ export type BoolOr<A extends boolean, B extends boolean> = A extends false
     : true
   : true;
 
-assertType<TypeEq<BoolOr<true, true>, true>>();
-assertType<TypeEq<BoolOr<true, false>, true>>();
-assertType<TypeEq<BoolOr<false, true>, true>>();
-assertType<TypeEq<BoolOr<false, false>, false>>();
+expectType<BoolOr<true, true>, true>('=');
+expectType<BoolOr<true, false>, true>('=');
+expectType<BoolOr<false, true>, true>('=');
+expectType<BoolOr<false, false>, false>('=');
 
 export type BoolNand<A extends boolean, B extends boolean> = BoolNot<
   BoolAnd<A, B>
 >;
 
-assertType<TypeEq<BoolNand<true, true>, false>>();
-assertType<TypeEq<BoolNand<true, false>, true>>();
-assertType<TypeEq<BoolNand<false, true>, true>>();
-assertType<TypeEq<BoolNand<false, false>, true>>();
+expectType<BoolNand<true, true>, false>('=');
+expectType<BoolNand<true, false>, true>('=');
+expectType<BoolNand<false, true>, true>('=');
+expectType<BoolNand<false, false>, true>('=');
 
 export type BoolNor<A extends boolean, B extends boolean> = BoolNot<
   BoolOr<A, B>
 >;
 
-assertType<TypeEq<BoolNor<true, true>, false>>();
-assertType<TypeEq<BoolNor<true, false>, false>>();
-assertType<TypeEq<BoolNor<false, true>, false>>();
-assertType<TypeEq<BoolNor<false, false>, true>>();
+expectType<BoolNor<true, true>, false>('=');
+expectType<BoolNor<true, false>, false>('=');
+expectType<BoolNor<false, true>, false>('=');
+expectType<BoolNor<false, false>, true>('=');
 
 export type BoolEq<A extends boolean, B extends boolean> = BoolOr<
   BoolAnd<A, B>,
   BoolAnd<BoolNot<A>, BoolNot<B>>
 >;
 
-assertType<TypeEq<BoolEq<true, true>, true>>();
-assertType<TypeEq<BoolEq<true, false>, false>>();
-assertType<TypeEq<BoolEq<false, true>, false>>();
-assertType<TypeEq<BoolEq<false, false>, true>>();
+expectType<BoolEq<true, true>, true>('=');
+expectType<BoolEq<true, false>, false>('=');
+expectType<BoolEq<false, true>, false>('=');
+expectType<BoolEq<false, false>, true>('=');
 
 export type BoolNeq<A extends boolean, B extends boolean> = BoolNot<
   BoolEq<A, B>
 >;
 
-assertType<TypeEq<BoolNeq<true, true>, false>>();
-assertType<TypeEq<BoolNeq<true, false>, true>>();
-assertType<TypeEq<BoolNeq<false, true>, true>>();
-assertType<TypeEq<BoolNeq<false, false>, false>>();
+expectType<BoolNeq<true, true>, false>('=');
+expectType<BoolNeq<true, false>, true>('=');
+expectType<BoolNeq<false, true>, true>('=');
+expectType<BoolNeq<false, false>, false>('=');

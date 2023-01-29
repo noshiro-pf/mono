@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { fromArray } from '../create';
 import { withInitialValue } from '../operators';
 import {
@@ -19,16 +19,14 @@ const zi = zipI([
   r2.chain(withInitialValue('0')),
 ] as const);
 
-assertType<
-  TypeExtends<typeof z, SyncChildObservable<readonly [number, string], 'zip'>>
->();
+expectType<typeof z, SyncChildObservable<readonly [number, string], 'zip'>>(
+  '<='
+);
 
-assertType<
-  TypeExtends<
-    typeof zi,
-    InitializedSyncChildObservable<readonly [number, string], 'zip'>
-  >
->();
+expectType<
+  typeof zi,
+  InitializedSyncChildObservable<readonly [number, string], 'zip'>
+>('<=');
 
 test('dummy', () => {
   expect(1).toBe(1);

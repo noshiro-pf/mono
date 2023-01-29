@@ -1,6 +1,4 @@
-import { type MakeTuple, type TypeEq } from '../src';
-import { assertType } from './assert-type';
+import { type MakeTuple } from '../src';
+import { expectType } from './expect-type';
 
-assertType<
-  TypeEq<MakeTuple<unknown, 3>, readonly [unknown, unknown, unknown]>
->();
+expectType<MakeTuple<unknown, 3>, readonly [unknown, unknown, unknown]>('=');

@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { number, string } from '../primitives';
 import { type TypeOf } from '../type';
 import { keyValueRecord } from './key-value-record';
@@ -8,9 +8,9 @@ describe('keyValueRecord', () => {
 
   type StrNumRecord = TypeOf<typeof strNumRecord>;
 
-  assertType<TypeEq<StrNumRecord, Readonly<Record<string, number>>>>();
+  expectType<StrNumRecord, Readonly<Record<string, number>>>('=');
 
-  assertType<TypeEq<typeof strNumRecord.defaultValue, StrNumRecord>>();
+  expectType<typeof strNumRecord.defaultValue, StrNumRecord>('=');
 
   describe('is', () => {
     test('truthy case', () => {
@@ -21,9 +21,9 @@ describe('keyValueRecord', () => {
       };
 
       if (strNumRecord.is(x)) {
-        assertType<TypeEq<typeof x, StrNumRecord>>();
+        expectType<typeof x, StrNumRecord>('=');
       } else {
-        assertType<TypeEq<typeof x, RecordBase>>();
+        expectType<typeof x, RecordBase>('=');
       }
 
       expect(strNumRecord.is(x)).toBe(true);
@@ -37,9 +37,9 @@ describe('keyValueRecord', () => {
       };
 
       if (strNumRecord.is(x)) {
-        assertType<TypeEq<typeof x, StrNumRecord>>();
+        expectType<typeof x, StrNumRecord>('=');
       } else {
-        assertType<TypeEq<typeof x, RecordBase>>();
+        expectType<typeof x, RecordBase>('=');
       }
 
       expect(strNumRecord.is(x)).toBe(false);

@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 type PermutationImpl<U, V extends U = U> = [U] extends [never]
   ? []
@@ -8,14 +8,12 @@ type PermutationImpl<U, V extends U = U> = [U] extends [never]
 
 export type Permutation<U> = PermutationImpl<U>;
 
-assertType<
-  TypeEq<
-    Permutation<'A' | 'B' | 'C'>,
-    | ['A', 'B', 'C']
-    | ['A', 'C', 'B']
-    | ['B', 'A', 'C']
-    | ['B', 'C', 'A']
-    | ['C', 'A', 'B']
-    | ['C', 'B', 'A']
-  >
->();
+expectType<
+  Permutation<'A' | 'B' | 'C'>,
+  | ['A', 'B', 'C']
+  | ['A', 'C', 'B']
+  | ['B', 'A', 'C']
+  | ['B', 'C', 'A']
+  | ['C', 'A', 'B']
+  | ['C', 'B', 'A']
+>('=');

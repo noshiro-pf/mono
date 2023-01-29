@@ -1,8 +1,8 @@
-import { type Tuple, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type Tuple } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<Tuple.SkipLast<0, readonly []>, readonly []>>();
-assertType<TypeEq<Tuple.SkipLast<1, readonly []>, readonly []>>();
-assertType<TypeEq<Tuple.SkipLast<0, readonly [1, 2, 3]>, readonly [1, 2, 3]>>();
-assertType<TypeEq<Tuple.SkipLast<1, readonly [1, 2, 3]>, readonly [1, 2]>>();
-assertType<TypeEq<Tuple.SkipLast<5, readonly [1, 2, 3]>, readonly []>>();
+expectType<Tuple.SkipLast<0, readonly []>, readonly []>('=');
+expectType<Tuple.SkipLast<1, readonly []>, readonly []>('=');
+expectType<Tuple.SkipLast<0, readonly [1, 2, 3]>, readonly [1, 2, 3]>('=');
+expectType<Tuple.SkipLast<1, readonly [1, 2, 3]>, readonly [1, 2]>('=');
+expectType<Tuple.SkipLast<5, readonly [1, 2, 3]>, readonly []>('=');

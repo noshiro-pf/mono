@@ -1,6 +1,5 @@
-import { type IndexOfTuple, type TypeEq } from '../src';
-import { assertType } from './assert-type';
+import { type IndexOfTuple } from '../src';
+import { expectType } from './expect-type';
 
-// assertType<TypeEq<IndexOfTuple<readonly [1, 2, 3]>, '0' | '1' | '2'>>();
-assertType<TypeEq<IndexOfTuple<readonly [1, 2, 3]>, 0 | 1 | 2>>();
-assertType<TypeEq<IndexOfTuple<readonly unknown[]>, number>>();
+expectType<IndexOfTuple<readonly [1, 2, 3]>, 0 | 1 | 2>('=');
+expectType<IndexOfTuple<readonly unknown[]>, number>('=');

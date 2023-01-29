@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 export type LookUp<
   R extends { kind: string },
@@ -20,10 +20,10 @@ type Dog = {
   color: 'black' | 'brown' | 'white';
 };
 
-assertType<TypeEq<LookUp<Cat | Dog, 'cat' | 'dog'>, Cat | Dog>>();
-assertType<TypeEq<LookUp<Cat | Dog, 'dog'>, Dog>>();
-assertType<TypeEq<LookUp<Cat | Dog, 'cat'>, Cat>>();
+expectType<LookUp<Cat | Dog, 'cat' | 'dog'>, Cat | Dog>('=');
+expectType<LookUp<Cat | Dog, 'dog'>, Dog>('=');
+expectType<LookUp<Cat | Dog, 'cat'>, Cat>('=');
 
-assertType<TypeEq<LookUp2<Cat | Dog, 'cat' | 'dog'>, Cat | Dog>>();
-assertType<TypeEq<LookUp2<Cat | Dog, 'dog'>, Dog>>();
-assertType<TypeEq<LookUp2<Cat | Dog, 'cat'>, Cat>>();
+expectType<LookUp2<Cat | Dog, 'cat' | 'dog'>, Cat | Dog>('=');
+expectType<LookUp2<Cat | Dog, 'dog'>, Dog>('=');
+expectType<LookUp2<Cat | Dog, 'cat'>, Cat>('=');
