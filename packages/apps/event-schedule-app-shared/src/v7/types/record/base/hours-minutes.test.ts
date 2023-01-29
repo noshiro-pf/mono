@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import {
   fillHoursMinutes,
   hoursMinutesDefaultValue,
@@ -7,15 +7,13 @@ import {
 } from './hours-minutes';
 
 describe('HoursMinutes', () => {
-  assertType<
-    TypeEq<
-      HoursMinutes,
-      Readonly<{
-        hours: HoursEnum;
-        minutes: MinutesEnum;
-      }>
-    >
-  >();
+  expectType<
+    HoursMinutes,
+    Readonly<{
+      hours: HoursEnum;
+      minutes: MinutesEnum;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: HoursMinutes = {

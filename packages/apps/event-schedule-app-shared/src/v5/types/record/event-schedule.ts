@@ -1,4 +1,4 @@
-import { assertType, DateUtils } from '@noshiro/ts-utils';
+import { DateUtils, expectType } from '@noshiro/ts-utils';
 import {
   defaultAnswerIconSetting,
   defaultNotificationSettings,
@@ -50,8 +50,8 @@ export type PartialEventSchedule = Partial<
   >
 >;
 
-assertType<TypeEq<keyof EventSchedule, keyof PartialEventSchedule>>();
-assertType<TypeExtends<EventSchedule, PartialEventSchedule>>();
+expectType<keyof EventSchedule, keyof PartialEventSchedule>('=');
+expectType<EventSchedule, PartialEventSchedule>('<=');
 
 export const eventScheduleDefaultValue: EventSchedule = {
   title: '',

@@ -5,19 +5,17 @@ import {
   type TimeRange,
 } from './time-range';
 
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { hoursMinutesDefaultValue, type HoursMinutes } from './base';
 
 describe('TimeRange', () => {
-  assertType<
-    TypeEq<
-      TimeRange,
-      Readonly<{
-        start: HoursMinutes;
-        end: HoursMinutes;
-      }>
-    >
-  >();
+  expectType<
+    TimeRange,
+    Readonly<{
+      start: HoursMinutes;
+      end: HoursMinutes;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: TimeRange = {

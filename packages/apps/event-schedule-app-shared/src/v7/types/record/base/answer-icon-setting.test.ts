@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type AnswerIconPoint } from '../../enum';
 import {
   answerIconSettingDefaultValue,
@@ -8,15 +8,13 @@ import {
 } from './answer-icon-setting';
 
 describe('AnswerIconSetting', () => {
-  assertType<
-    TypeEq<
-      AnswerIconSetting,
-      Readonly<{
-        description: string;
-        point: AnswerIconPoint;
-      }>
-    >
-  >();
+  expectType<
+    AnswerIconSetting,
+    Readonly<{
+      description: string;
+      point: AnswerIconPoint;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: AnswerIconSetting = {

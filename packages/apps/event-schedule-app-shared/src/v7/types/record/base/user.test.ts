@@ -1,17 +1,15 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type UserId, type UserName } from '../../named-primitive-types';
 import { fillUser, isUser, userDefaultValue, type User } from './user';
 
 describe('User', () => {
-  assertType<
-    TypeEq<
-      User,
-      Readonly<{
-        id: UserId;
-        name: UserName;
-      }>
-    >
-  >();
+  expectType<
+    User,
+    Readonly<{
+      id: UserId;
+      name: UserName;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: User = {

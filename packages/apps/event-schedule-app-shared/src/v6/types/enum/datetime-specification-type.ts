@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 export type DatetimeSpecificationEnumType =
@@ -22,30 +22,22 @@ export const isDatetimeSpecificationEnumType = (
   a === 'endSpecified' ||
   a === 'startAndEndSpecified';
 
-assertType<
-  TypeExtends<
-    typeof datetimeSpecificationOptions.noStartEndSpecified,
-    DatetimeSpecificationEnumType
-  >
->();
+expectType<
+  typeof datetimeSpecificationOptions.noStartEndSpecified,
+  DatetimeSpecificationEnumType
+>('<=');
 
-assertType<
-  TypeExtends<
-    typeof datetimeSpecificationOptions.startSpecified,
-    DatetimeSpecificationEnumType
-  >
->();
+expectType<
+  typeof datetimeSpecificationOptions.startSpecified,
+  DatetimeSpecificationEnumType
+>('<=');
 
-assertType<
-  TypeExtends<
-    typeof datetimeSpecificationOptions.endSpecified,
-    DatetimeSpecificationEnumType
-  >
->();
+expectType<
+  typeof datetimeSpecificationOptions.endSpecified,
+  DatetimeSpecificationEnumType
+>('<=');
 
-assertType<
-  TypeExtends<
-    typeof datetimeSpecificationOptions.startAndEndSpecified,
-    DatetimeSpecificationEnumType
-  >
->();
+expectType<
+  typeof datetimeSpecificationOptions.startAndEndSpecified,
+  DatetimeSpecificationEnumType
+>('<=');

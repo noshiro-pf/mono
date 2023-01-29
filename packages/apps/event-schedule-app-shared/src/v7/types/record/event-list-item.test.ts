@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type Answer } from './answer';
 import {
   eventListItemDefaultValue,
@@ -12,24 +12,22 @@ import {
 } from './event-schedule';
 
 describe('EventListItem', () => {
-  assertType<
-    TypeEq<
-      EventListItem,
-      Readonly<{
-        eventSchedule: EventSchedule;
-        eventScheduleMetadata: Readonly<{
-          id: string;
-          createdAt: string;
-          updatedAt: string;
-        }>;
+  expectType<
+    EventListItem,
+    Readonly<{
+      eventSchedule: EventSchedule;
+      eventScheduleMetadata: Readonly<{
+        id: string;
+        createdAt: string;
+        updatedAt: string;
+      }>;
 
-        answers: readonly Answer[];
-        answersMetadata: Readonly<{
-          lastUpdate: string;
-        }>;
-      }>
-    >
-  >();
+      answers: readonly Answer[];
+      answersMetadata: Readonly<{
+        lastUpdate: string;
+      }>;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: EventListItem = {

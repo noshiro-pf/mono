@@ -1,21 +1,19 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { hoursMinutesDefaultValue } from './hours-minutes';
 import { yearMonthDateDefaultValue } from './year-month-date';
 import { fillYmdhm, isYmdhm, ymdhmDefaultValue, type Ymdhm } from './ymdhm';
 
 describe('Ymdhm', () => {
-  assertType<
-    TypeEq<
-      Ymdhm,
-      Readonly<{
-        year: YearEnum;
-        month: MonthEnum;
-        date: DateEnum;
-        hours: HoursEnum;
-        minutes: MinutesEnum;
-      }>
-    >
-  >();
+  expectType<
+    Ymdhm,
+    Readonly<{
+      year: YearEnum;
+      month: MonthEnum;
+      date: DateEnum;
+      hours: HoursEnum;
+      minutes: MinutesEnum;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: Ymdhm = {

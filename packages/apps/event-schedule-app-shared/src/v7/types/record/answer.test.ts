@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type AnswerId, type Weight } from '../named-primitive-types';
 import {
   answerDefaultValue,
@@ -11,20 +11,18 @@ import { type AnswerSelection } from './answer-selection';
 import { userDefaultValue, type User } from './base';
 
 describe('Answer', () => {
-  assertType<
-    TypeEq<
-      Answer,
-      Readonly<{
-        id: AnswerId;
-        user: User;
-        comment: string;
-        selection: readonly AnswerSelection[];
-        [ANSWER_KEY_CREATED_AT]: number;
-        weight: Weight;
-        isRequiredParticipants: boolean;
-      }>
-    >
-  >();
+  expectType<
+    Answer,
+    Readonly<{
+      id: AnswerId;
+      user: User;
+      comment: string;
+      selection: readonly AnswerSelection[];
+      [ANSWER_KEY_CREATED_AT]: number;
+      weight: Weight;
+      isRequiredParticipants: boolean;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: Answer = {
