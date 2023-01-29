@@ -48,9 +48,9 @@
     "z:wireit:type-check": "wireit"
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.1.2",
-    "@blueprintjs/datetime": "^4.3.3",
-    "@blueprintjs/icons": "^4.2.3",
+    "@blueprintjs/core": "^4.15.0",
+    "@blueprintjs/datetime": "^4.4.13",
+    "@blueprintjs/icons": "^4.13.0",
     "@noshiro/react-utils": "*",
     "@noshiro/react-utils-styled": "*",
     "@noshiro/resize-observer-react-hooks": "*",
