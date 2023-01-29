@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
-    "preact": "^10.4.7"
+    "preact": "^10.11.3"
   },
   "devDependencies": {
     "@noshiro/ts-type-utils": "*",
