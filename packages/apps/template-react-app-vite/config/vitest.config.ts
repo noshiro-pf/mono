@@ -10,12 +10,14 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: [
-      '@noshiro/global-ts-utils',
+      '@noshiro/global-react',
       '@noshiro/global-react-utils',
+      '@noshiro/global-styled-components',
       '@noshiro/global-syncflow',
       '@noshiro/global-syncflow-react-hooks',
-      '@noshiro/global-react',
-      '@noshiro/global-styled-components',
+      '@noshiro/global-tiny-router-observable',
+      '@noshiro/global-tiny-router-react-hooks',
+      '@noshiro/global-ts-utils',
       resolve(thisDir, 'globals.ts'),
     ],
     typecheck: {
