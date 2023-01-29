@@ -1,5 +1,5 @@
-import type { TSESLint } from '@typescript-eslint/utils';
-import type { JSONSchema4 } from 'json-schema';
+import { type TSESLint } from '@typescript-eslint/utils';
+import { type JSONSchema4 } from 'json-schema';
 import { compile } from 'json-schema-to-typescript';
 
 type Meta = DeepReadonly<
@@ -20,15 +20,13 @@ const toCapitalCase = (str: string): string =>
     .replaceAll(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
     .replace(/^./u, (x) => x[0]?.toUpperCase() ?? str);
 
+// eslint-disable-next-line no-restricted-globals
+const isArray = (a: unknown): a is readonly unknown[] => Array.isArray(a);
+
 const normalizeToSchemaArray = (
   schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined
 ): DeepReadonly<JSONSchema4[]> =>
-  schema === undefined
-    ? []
-    : // eslint-disable-next-line no-restricted-globals
-    Array.isArray(schema)
-    ? schema
-    : [schema];
+  schema === undefined ? [] : isArray(schema) ? schema : [schema];
 
 const removeMultiLineCommentCharacter = (str: string): string =>
   str.replace('/*', ' ').replace('*/', ' ');
@@ -140,7 +138,7 @@ const createResult = async (
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
     '/* eslint-disable @typescript-eslint/sort-type-constituents */',
-    "import type { Linter } from 'eslint';",
+    "import { type Linter } from 'eslint';",
     ...(schemaList.some(({ schema }) => schema.length === 1)
       ? [
           '',
