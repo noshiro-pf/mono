@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { number, numberLiteral, stringLiteral } from '../primitives';
 import { record } from '../record';
 import { type TypeOf } from '../type';
@@ -13,30 +13,28 @@ describe('tuple', () => {
 
   type TargetType = TypeOf<typeof targetType>;
 
-  assertType<
-    TypeEq<
-      TargetType,
-      readonly [
-        Readonly<{
-          x: number;
-          y: number;
-        }>,
-        3,
-        '2'
-      ]
-    >
-  >();
+  expectType<
+    TargetType,
+    readonly [
+      Readonly<{
+        x: number;
+        y: number;
+      }>,
+      3,
+      '2'
+    ]
+  >('=');
 
-  assertType<TypeEq<typeof targetType.defaultValue, TargetType>>();
+  expectType<typeof targetType.defaultValue, TargetType>('=');
 
   describe('is', () => {
     test('truthy case', () => {
       const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
 
       if (targetType.is(x)) {
-        assertType<TypeEq<typeof x, TargetType>>();
+        expectType<typeof x, TargetType>('=');
       } else {
-        assertType<TypeEq<typeof x, unknown>>();
+        expectType<typeof x, unknown>('=');
       }
 
       expect(targetType.is(x)).toBe(true);
@@ -46,9 +44,9 @@ describe('tuple', () => {
       const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'];
 
       if (targetType.is(x)) {
-        assertType<TypeEq<typeof x, TargetType>>();
+        expectType<typeof x, TargetType>('=');
       } else {
-        assertType<TypeEq<typeof x, unknown>>();
+        expectType<typeof x, unknown>('=');
       }
 
       expect(targetType.is(x)).toBe(false);

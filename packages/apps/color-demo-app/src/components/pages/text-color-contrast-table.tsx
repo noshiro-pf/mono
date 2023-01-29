@@ -24,14 +24,12 @@ const lightnessList = [40, 60, 80] as const;
 const saturationListWithIndex = Arr.zip(saturationList, indices);
 const lightnessListWithIndex = Arr.zip(lightnessList, indices);
 
-assertType<TypeExtends<typeof saturationList, readonly Percent[]>>();
-assertType<TypeExtends<typeof lightnessList, readonly Percent[]>>();
+expectType<typeof saturationList, readonly Percent[]>('<=');
+expectType<typeof lightnessList, readonly Percent[]>('<=');
 
 const SL = Arr.zip(Arr.zip(saturationList, lightnessList), indices);
 
-assertType<
-  TypeExtends<typeof SL, DeepReadonly<[[Percent, Percent], number][]>>
->();
+expectType<typeof SL, DeepReadonly<[[Percent, Percent], number][]>>('<=');
 
 export const TextColorContrastTable = memoNamed(
   'TextColorContrastTable',

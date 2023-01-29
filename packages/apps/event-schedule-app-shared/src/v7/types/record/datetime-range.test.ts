@@ -5,20 +5,18 @@ import {
   type DatetimeRange,
 } from './datetime-range';
 
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { yearMonthDateDefaultValue, type YearMonthDate } from './base';
 import { timeRangeDefaultValue, type TimeRange } from './time-range';
 
 describe('DatetimeRange', () => {
-  assertType<
-    TypeEq<
-      DatetimeRange,
-      Readonly<{
-        ymd: YearMonthDate;
-        timeRange: TimeRange;
-      }>
-    >
-  >();
+  expectType<
+    DatetimeRange,
+    Readonly<{
+      ymd: YearMonthDate;
+      timeRange: TimeRange;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: DatetimeRange = {

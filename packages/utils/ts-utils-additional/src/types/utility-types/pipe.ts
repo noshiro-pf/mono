@@ -1,21 +1,21 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 export type ShiftZip<T extends unknown[]> = ListType.Zip<T, ListType.Tail<T>>;
-assertType<
-  TypeEq<ShiftZip<[1, 2, 3]>, readonly [readonly [1, 2], readonly [2, 3]]>
->();
+expectType<ShiftZip<[1, 2, 3]>, readonly [readonly [1, 2], readonly [2, 3]]>(
+  '='
+);
 
 export type Tuple2Fn<T> = T extends [infer A, infer B] ? (x: A) => B : never;
-assertType<TypeEq<Tuple2Fn<[1, 2]>, (x: 1) => 2>>();
+expectType<Tuple2Fn<[1, 2]>, (x: 1) => 2>('=');
 
 export type _Pipe<T extends unknown[]> = { [P in keyof T]: Tuple2Fn<T[P]> };
-assertType<TypeEq<_Pipe<[[1, 2], [2, 3]]>, [(x: 1) => 2, (x: 2) => 3]>>();
+expectType<_Pipe<[[1, 2], [2, 3]]>, [(x: 1) => 2, (x: 2) => 3]>('=');
 
 export type Cast<T, P> = T extends P ? T : P;
 // export type Pipe<T extends unknown[]> = _Pipe<
 //   ShiftZip<T> extends infer A ? Cast<A, unknown[]> : never
 // >;
-// assertType<TypeEq<Pipe<[1, 2, 3]>, [(x: 1) => 2, (x: 2) => 3]>>();
+// expectType<Pipe<[1, 2, 3]>, [(x: 1) => 2, (x: 2) => 3]>("=");
 
 // export type Cast<T, P> = T extends P ? T : P;
 // export type Pipe<T extends unknown[]> = _Pipe<Cast<ShiftZip<T>, unknown[]>>;

@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type TypeOf } from '../type';
 import { enumType } from './enum';
 
@@ -10,18 +10,18 @@ describe('enumType', () => {
 
   type TargetType = TypeOf<typeof targetType>;
 
-  assertType<TypeEq<TargetType, '2' | 'a' | 3>>();
+  expectType<TargetType, '2' | 'a' | 3>('=');
 
-  assertType<TypeEq<typeof targetType.defaultValue, TargetType>>();
+  expectType<typeof targetType.defaultValue, TargetType>('=');
 
   describe('is', () => {
     test('truthy case', () => {
       const x: number | string = Math.random() >= 0 ? 3 : '0'; // the value is always 1
 
       if (targetType.is(x)) {
-        assertType<TypeEq<typeof x, TargetType>>();
+        expectType<typeof x, TargetType>('=');
       } else {
-        assertType<TypeEq<typeof x, number | string>>();
+        expectType<typeof x, number | string>('=');
       }
 
       expect(targetType.is(x)).toBe(true);
@@ -31,9 +31,9 @@ describe('enumType', () => {
       const x: number | string = Math.random() >= 0 ? 5 : '0'; // the value is always 5
 
       if (targetType.is(x)) {
-        assertType<TypeEq<typeof x, TargetType>>();
+        expectType<typeof x, TargetType>('=');
       } else {
-        assertType<TypeEq<typeof x, number | string>>();
+        expectType<typeof x, number | string>('=');
       }
 
       expect(targetType.is(x)).toBe(false);

@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type AnswerIconIdWithNone, type AnswerIconPoint } from '../enum';
 import {
   answerSelectionDefaultValue,
@@ -12,17 +12,15 @@ import {
 } from './datetime-range';
 
 describe('AnswerSelection', () => {
-  assertType<
-    TypeEq<
-      AnswerSelection,
-      Readonly<{
-        datetimeRange: DatetimeRange;
-        iconId: AnswerIconIdWithNone;
-        point: AnswerIconPoint;
-        comment: string;
-      }>
-    >
-  >();
+  expectType<
+    AnswerSelection,
+    Readonly<{
+      datetimeRange: DatetimeRange;
+      iconId: AnswerIconIdWithNone;
+      point: AnswerIconPoint;
+      comment: string;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: AnswerSelection = {

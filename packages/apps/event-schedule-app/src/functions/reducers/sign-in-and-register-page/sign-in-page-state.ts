@@ -23,7 +23,7 @@ export const signInPageInitialState = {
   isWaitingResponse: false,
 } as const;
 
-assertType<TypeExtends<typeof signInPageInitialState, SignInPageState>>();
+expectType<typeof signInPageInitialState, SignInPageState>('<=');
 
 export const signInPageHasError = (state: SignInPageState): boolean =>
   emailInputHasError(state.email) ||

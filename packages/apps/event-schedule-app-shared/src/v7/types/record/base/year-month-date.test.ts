@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import {
   fillYearMonthDate,
   isYearMonthDate,
@@ -7,16 +7,14 @@ import {
 } from './year-month-date';
 
 describe('YearMonthDate', () => {
-  assertType<
-    TypeEq<
-      YearMonthDate,
-      Readonly<{
-        year: YearEnum;
-        month: MonthEnum;
-        date: DateEnum;
-      }>
-    >
-  >();
+  expectType<
+    YearMonthDate,
+    Readonly<{
+      year: YearEnum;
+      month: MonthEnum;
+      date: DateEnum;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: YearMonthDate = {

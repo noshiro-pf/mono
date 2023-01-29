@@ -1,6 +1,6 @@
-import { type Tuple, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type Tuple } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<Tuple.ButLast<readonly []>, readonly []>>();
-assertType<TypeEq<Tuple.ButLast<readonly [1]>, readonly []>>();
-assertType<TypeEq<Tuple.ButLast<readonly [1, 2, 3]>, readonly [1, 2]>>();
+expectType<Tuple.ButLast<readonly []>, readonly []>('=');
+expectType<Tuple.ButLast<readonly [1]>, readonly []>('=');
+expectType<Tuple.ButLast<readonly [1, 2, 3]>, readonly [1, 2]>('=');

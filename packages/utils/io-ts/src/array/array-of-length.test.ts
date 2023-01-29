@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { number } from '../primitives';
 import { type TypeOf } from '../type';
 import { arrayOfLength } from './array-of-length';
@@ -11,18 +11,18 @@ describe('arrayOfLength', () => {
 
   type Xs = TypeOf<typeof xs>;
 
-  assertType<TypeEq<Xs, ArrayOfLength<4, number>>>();
+  expectType<Xs, ArrayOfLength<4, number>>('=');
 
-  assertType<TypeEq<typeof xs.defaultValue, Xs>>();
+  expectType<typeof xs.defaultValue, Xs>('=');
 
   describe('is', () => {
     test('truthy case', () => {
       const ys: unknown = [5, 6, 7, 8];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, Xs>>();
+        expectType<typeof ys, Xs>('=');
       } else {
-        assertType<TypeEq<typeof ys, unknown>>();
+        expectType<typeof ys, unknown>('=');
       }
 
       expect(xs.is(ys)).toBe(true);
@@ -32,9 +32,9 @@ describe('arrayOfLength', () => {
       const ys: unknown = [];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, Xs>>();
+        expectType<typeof ys, Xs>('=');
       } else {
-        assertType<TypeEq<typeof ys, unknown>>();
+        expectType<typeof ys, unknown>('=');
       }
 
       expect(xs.is(ys)).toBe(false);
@@ -44,9 +44,9 @@ describe('arrayOfLength', () => {
       const ys: unknown = ['1', '', 3];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, Xs>>();
+        expectType<typeof ys, Xs>('=');
       } else {
-        assertType<TypeEq<typeof ys, unknown>>();
+        expectType<typeof ys, unknown>('=');
       }
 
       expect(xs.is(ys)).toBe(false);

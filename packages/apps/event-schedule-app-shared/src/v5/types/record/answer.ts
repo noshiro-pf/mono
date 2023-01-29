@@ -1,4 +1,4 @@
-import { assertType, DateUtils } from '@noshiro/ts-utils';
+import { DateUtils, expectType } from '@noshiro/ts-utils';
 import {
   ANSWER_KEY_CREATED_AT,
   fillAnswerSelection,
@@ -34,8 +34,8 @@ export type PartialAnswer = Partial<
   >
 >;
 
-assertType<TypeEq<keyof Answer, keyof PartialAnswer>>();
-assertType<TypeExtends<Answer, PartialAnswer>>();
+expectType<keyof Answer, keyof PartialAnswer>('=');
+expectType<Answer, PartialAnswer>('<=');
 
 export const answerDefaultValue: Answer = {
   id: '',

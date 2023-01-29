@@ -1,4 +1,4 @@
-import { assertNotType, assertType, Maybe } from '@noshiro/ts-utils';
+import { expectType, Maybe } from '@noshiro/ts-utils';
 import {
   type AsyncChildObservable,
   type ChildObservable,
@@ -28,59 +28,51 @@ import { RootObservableClass } from './root-observable-class';
 
 // type tests
 
-assertType<TypeEq<Observable<number>, Observable<number>>>();
-assertNotType<TypeEq<Observable<string>, Observable<number>>>();
+expectType<Observable<number>, Observable<number>>('=');
+expectType<Observable<string>, Observable<number>>('!<=');
 
 // inheritance
-assertType<TypeExtends<ChildObservable<number>, ObservableBase<number>>>();
-assertType<
-  TypeExtends<SyncChildObservable<number, 'map'>, ChildObservable<number>>
->();
-assertType<
-  TypeExtends<
-    AsyncChildObservable<number, 'debounceTime'>,
-    ChildObservable<number>
-  >
->();
-assertType<
-  TypeExtends<RootObservable<number, 'FromArray'>, ObservableBase<number>>
->();
-assertType<
-  TypeExtends<SyncChildObservable<number, 'map'>, ChildObservable<number>>
->();
-assertType<TypeExtends<Observable<number>, ObservableBase<number>>>();
-assertNotType<TypeExtends<ObservableBase<number>, Observable<number>>>();
-assertType<TypeExtends<ChildObservable<number>, Observable<number>>>();
+expectType<ChildObservable<number>, ObservableBase<number>>('<=');
+expectType<SyncChildObservable<number, 'map'>, ChildObservable<number>>('<=');
+expectType<
+  AsyncChildObservable<number, 'debounceTime'>,
+  ChildObservable<number>
+>('<=');
+expectType<RootObservable<number, 'FromArray'>, ObservableBase<number>>('<=');
+expectType<SyncChildObservable<number, 'map'>, ChildObservable<number>>('<=');
+expectType<Observable<number>, ObservableBase<number>>('<=');
+expectType<ObservableBase<number>, Observable<number>>('!<=');
+expectType<ChildObservable<number>, Observable<number>>('<=');
 
 // ObservableBase is covariant
-assertType<TypeExtends<ObservableBase<1>, ObservableBase<number>>>();
-assertNotType<TypeExtends<ObservableBase<number>, ObservableBase<1>>>();
+expectType<ObservableBase<1>, ObservableBase<number>>('<=');
+expectType<ObservableBase<number>, ObservableBase<1>>('!<=');
 // Observable is covariant
-assertType<TypeExtends<Observable<1>, Observable<number>>>();
-assertNotType<TypeExtends<Observable<number>, Observable<1>>>();
+expectType<Observable<1>, Observable<number>>('<=');
+expectType<Observable<number>, Observable<1>>('!<=');
 
 const root = new RootObservableClass({
   type: 'FromArray',
   currentValueInit: Maybe.some(0),
 });
 
-assertType<TypeExtends<typeof root, RootObservable<number, 'FromArray'>>>();
+expectType<typeof root, RootObservable<number, 'FromArray'>>('<=');
 
 const syncChild = new SyncChildObservableClass({
   parents: [root],
   type: 'map',
   currentValueInit: Maybe.some(0),
 });
-assertType<TypeExtends<typeof syncChild, SyncChildObservable<number, 'map'>>>();
+expectType<typeof syncChild, SyncChildObservable<number, 'map'>>('<=');
 
 const asyncChild = new AsyncChildObservableClass({
   parents: [root],
   type: 'debounceTime',
   currentValueInit: Maybe.some(0),
 });
-assertType<
-  TypeExtends<typeof asyncChild, AsyncChildObservable<number, 'debounceTime'>>
->();
+expectType<typeof asyncChild, AsyncChildObservable<number, 'debounceTime'>>(
+  '<='
+);
 
 test('SyncChildObservableClass', () => {
   expect(syncChild.depth).toBe(1);

@@ -1,12 +1,10 @@
-import { type ListType, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type ListType } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<ListType.Tail<readonly []>, readonly []>>();
-assertType<TypeEq<ListType.Tail<readonly [1]>, readonly []>>();
-assertType<TypeEq<ListType.Tail<readonly [1, 2, 3]>, readonly [2, 3]>>();
-assertType<
-  TypeEq<
-    ListType.Tail<readonly [1, 2, 3, ...(readonly number[])]>,
-    readonly [2, 3, ...(readonly number[])]
-  >
->();
+expectType<ListType.Tail<readonly []>, readonly []>('=');
+expectType<ListType.Tail<readonly [1]>, readonly []>('=');
+expectType<ListType.Tail<readonly [1, 2, 3]>, readonly [2, 3]>('=');
+expectType<
+  ListType.Tail<readonly [1, 2, 3, ...(readonly number[])]>,
+  readonly [2, 3, ...(readonly number[])]
+>('=');

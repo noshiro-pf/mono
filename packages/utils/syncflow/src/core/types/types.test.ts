@@ -1,21 +1,19 @@
-import { assertNotType, assertType, type Queue } from '@noshiro/ts-utils';
+import { expectType, type Queue } from '@noshiro/ts-utils';
 import { type Subscriber, type TupleToQueueTuple } from './types';
 
-// type tests
+test('type test', () => {
+  expect(1).toBe(1); // dummy
 
-assertType<
-  TypeEq<
+  // type tests
+
+  expectType<
     TupleToQueueTuple<readonly [number, string, boolean]>,
     readonly [Queue<number>, Queue<string>, Queue<boolean>]
-  >
->();
+  >('=');
 
-// Subscriber is covariant
-assertType<TypeExtends<Subscriber<number>, Subscriber<1>>>();
-assertNotType<TypeExtends<Subscriber<1>, Subscriber<number>>>();
-assertNotType<TypeExtends<Subscriber<number>, Subscriber<'1'>>>();
-assertNotType<TypeExtends<Subscriber<'1'>, Subscriber<number>>>();
-
-test('dummy', () => {
-  expect(1).toBe(1);
+  // Subscriber is covariant
+  expectType<Subscriber<number>, Subscriber<1>>('<=');
+  expectType<Subscriber<1>, Subscriber<number>>('!<=');
+  expectType<Subscriber<number>, Subscriber<'1'>>('!<=');
+  expectType<Subscriber<'1'>, Subscriber<number>>('!<=');
 });

@@ -1,4 +1,4 @@
-import { assertType, DateUtils } from '@noshiro/ts-utils';
+import { DateUtils, expectType } from '@noshiro/ts-utils';
 import { type DatetimeSpecificationEnumType } from '../enum';
 import { type AnswerIconSettings } from './answer-icon-settings';
 import {
@@ -21,23 +21,21 @@ import {
 } from './event-schedule';
 
 describe('EventSchedule', () => {
-  assertType<
-    TypeEq<
-      EventSchedule,
-      Readonly<{
-        title: string;
-        notes: string;
-        datetimeSpecification: DatetimeSpecificationEnumType;
-        datetimeRangeList: NonEmptyArray<DatetimeRange>;
-        answerDeadline: Ymdhm | 'none';
-        answerIcons: AnswerIconSettings;
-        notificationSettings: NotificationSettings | 'none';
-        timezoneOffsetMinutes: number;
-        author: User;
-        archivedBy: readonly User[];
-      }>
-    >
-  >();
+  expectType<
+    EventSchedule,
+    Readonly<{
+      title: string;
+      notes: string;
+      datetimeSpecification: DatetimeSpecificationEnumType;
+      datetimeRangeList: NonEmptyArray<DatetimeRange>;
+      answerDeadline: Ymdhm | 'none';
+      answerIcons: AnswerIconSettings;
+      notificationSettings: NotificationSettings | 'none';
+      timezoneOffsetMinutes: number;
+      author: User;
+      archivedBy: readonly User[];
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: EventSchedule = {

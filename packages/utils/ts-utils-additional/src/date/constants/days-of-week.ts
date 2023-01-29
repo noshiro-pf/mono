@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 export const daysOfWeek = {
   en: {
@@ -56,8 +56,8 @@ type WeekdaysType = readonly [
   Readonly<{ name: string; abbr: string }>
 ];
 
-assertType<TypeExtends<typeof daysOfWeek.en, MonthsType>>();
-assertType<TypeExtends<typeof daysOfWeek.jp, MonthsType>>();
+expectType<typeof daysOfWeek.en, MonthsType>('<=');
+expectType<typeof daysOfWeek.jp, MonthsType>('<=');
 
-assertType<TypeExtends<typeof daysOfWeekList.en, WeekdaysType>>();
-assertType<TypeExtends<typeof daysOfWeekList.jp, WeekdaysType>>();
+expectType<typeof daysOfWeekList.en, WeekdaysType>('<=');
+expectType<typeof daysOfWeekList.jp, WeekdaysType>('<=');

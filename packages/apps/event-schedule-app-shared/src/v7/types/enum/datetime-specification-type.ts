@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 export const datetimeSpecificationTypeDef = t.enumType({
   values: [
@@ -24,9 +24,7 @@ export const datetimeSpecificationOptions = {
 
 export const isDatetimeSpecificationEnumType = datetimeSpecificationTypeDef.is;
 
-assertType<
-  TypeExtends<
-    typeof datetimeSpecificationOptions,
-    Record<DatetimeSpecificationEnumType, DatetimeSpecificationEnumType>
-  >
->();
+expectType<
+  typeof datetimeSpecificationOptions,
+  Record<DatetimeSpecificationEnumType, DatetimeSpecificationEnumType>
+>('<=');

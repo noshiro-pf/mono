@@ -28,7 +28,7 @@ const actionTypes = [
   'goToNextTurn',
 ] as const;
 
-assertType<TypeEq<typeof actionTypes[number], GameStateAction['type']>>();
+expectType<typeof actionTypes[number], GameStateAction['type']>('=');
 
 const isActionType = (data: unknown): data is GameStateAction['type'] =>
   Arr.includes(actionTypes, data);
@@ -51,12 +51,8 @@ export const assertIsGameStateAction: (
     throw new Error('hasKeyValue failed');
   }
 
-  assertType<
-    TypeExtends<typeof data, Pick<GameStateAction, 'timestamp' | 'type'>>
-  >();
-  assertType<
-    TypeExtends<Pick<GameStateAction, 'timestamp' | 'type'>, typeof data>
-  >();
+  expectType<typeof data, Pick<GameStateAction, 'timestamp' | 'type'>>('<=');
+  expectType<Pick<GameStateAction, 'timestamp' | 'type'>, typeof data>('<=');
 
   switch (data.type) {
     case 'selectMyCard':
@@ -83,4 +79,4 @@ export const assertIsGameStateAction: (
   }
 };
 
-assertType<TypeExtends<GameStateAction, Readonly<{ type: string }>>>();
+expectType<GameStateAction, Readonly<{ type: string }>>('<=');

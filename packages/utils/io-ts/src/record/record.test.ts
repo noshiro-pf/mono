@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { number } from '../primitives';
 import { type TypeOf } from '../type';
 import { record } from './record';
@@ -12,11 +12,9 @@ describe('record', () => {
 
   type Ymd = TypeOf<typeof ymd>;
 
-  assertType<
-    TypeEq<Ymd, Readonly<{ year: number; month: number; date: number }>>
-  >();
+  expectType<Ymd, Readonly<{ year: number; month: number; date: number }>>('=');
 
-  assertType<TypeEq<typeof ymd.defaultValue, Ymd>>();
+  expectType<typeof ymd.defaultValue, Ymd>('=');
 
   describe('is', () => {
     test('truthy case', () => {
@@ -27,9 +25,9 @@ describe('record', () => {
       };
 
       if (ymd.is(x)) {
-        assertType<TypeEq<typeof x, Ymd>>();
+        expectType<typeof x, Ymd>('=');
       } else {
-        assertType<TypeEq<typeof x, RecordBase>>();
+        expectType<typeof x, RecordBase>('=');
       }
 
       expect(ymd.is(x)).toBe(true);
@@ -43,9 +41,9 @@ describe('record', () => {
       };
 
       if (ymd.is(x)) {
-        assertType<TypeEq<typeof x, Ymd>>();
+        expectType<typeof x, Ymd>('=');
       } else {
-        assertType<TypeEq<typeof x, RecordBase>>();
+        expectType<typeof x, RecordBase>('=');
       }
 
       expect(ymd.is(x)).toBe(false);

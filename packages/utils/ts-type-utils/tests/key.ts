@@ -1,9 +1,8 @@
-import { type ExpectTrue, type TypeEq } from '../src';
-import { assertType } from './assert-type';
+import { expectType } from './expect-type';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-assertType<ExpectTrue<TypeEq<keyof never, keyof any>>>();
+expectType<keyof never, keyof any>('=');
 
-assertType<ExpectTrue<TypeEq<never, keyof unknown>>>();
+expectType<never, keyof unknown>('=');
 
-assertType<ExpectTrue<TypeEq<keyof never, PropertyKey>>>();
+expectType<keyof never, PropertyKey>('=');

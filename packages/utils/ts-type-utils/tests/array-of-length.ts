@@ -1,15 +1,11 @@
-import {
-  type ArrayOfLength,
-  type MutableArrayOfLength,
-  type TypeEq,
-} from '../src';
-import { assertType } from './assert-type';
+import { type ArrayOfLength, type MutableArrayOfLength } from '../src';
+import { expectType } from './expect-type';
 
-assertType<TypeEq<[0, 0], MutableArrayOfLength<2, 0>>>();
-assertType<TypeEq<[0, 0, 0], MutableArrayOfLength<3, 0>>>();
-assertType<TypeEq<[0, 0, 0, 0], MutableArrayOfLength<4, 0>>>();
-assertType<TypeEq<[0, 0, 0, 0, 0], MutableArrayOfLength<5, 0>>>();
-assertType<TypeEq<readonly [0, 0], ArrayOfLength<2, 0>>>();
-assertType<TypeEq<readonly [0, 0, 0], ArrayOfLength<3, 0>>>();
-assertType<TypeEq<readonly [0, 0, 0, 0], ArrayOfLength<4, 0>>>();
-assertType<TypeEq<readonly [0, 0, 0, 0, 0], ArrayOfLength<5, 0>>>();
+expectType<[0, 0], MutableArrayOfLength<2, 0>>('=');
+expectType<[0, 0, 0], MutableArrayOfLength<3, 0>>('=');
+expectType<[0, 0, 0, 0], MutableArrayOfLength<4, 0>>('=');
+expectType<[0, 0, 0, 0, 0], MutableArrayOfLength<5, 0>>('=');
+expectType<readonly [0, 0], ArrayOfLength<2, 0>>('=');
+expectType<readonly [0, 0, 0], ArrayOfLength<3, 0>>('=');
+expectType<readonly [0, 0, 0, 0], ArrayOfLength<4, 0>>('=');
+expectType<readonly [0, 0, 0, 0, 0], ArrayOfLength<5, 0>>('=');

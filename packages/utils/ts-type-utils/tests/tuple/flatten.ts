@@ -1,17 +1,15 @@
-import { type DeepReadonly, type Tuple, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type DeepReadonly, type Tuple } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<Tuple.Flatten<DeepReadonly<[]>>, readonly []>>();
-assertType<TypeEq<Tuple.Flatten<DeepReadonly<[[]]>>, readonly []>>();
-assertType<
-  TypeEq<Tuple.Flatten<DeepReadonly<[[1, 2], [], [3]]>>, readonly [1, 2, 3]>
->();
-assertType<
-  TypeEq<Tuple.Flatten<DeepReadonly<[[1, 2], [3]]>>, readonly [1, 2, 3]>
->();
-assertType<
-  TypeEq<Tuple.Flatten<DeepReadonly<[[1, 2], [3], []]>>, readonly [1, 2, 3]>
->();
-assertType<
-  TypeEq<Tuple.Flatten<DeepReadonly<[[], [1, 2], [3]]>>, readonly [1, 2, 3]>
->();
+expectType<Tuple.Flatten<DeepReadonly<[]>>, readonly []>('=');
+expectType<Tuple.Flatten<DeepReadonly<[[]]>>, readonly []>('=');
+expectType<Tuple.Flatten<DeepReadonly<[[1, 2], [], [3]]>>, readonly [1, 2, 3]>(
+  '='
+);
+expectType<Tuple.Flatten<DeepReadonly<[[1, 2], [3]]>>, readonly [1, 2, 3]>('=');
+expectType<Tuple.Flatten<DeepReadonly<[[1, 2], [3], []]>>, readonly [1, 2, 3]>(
+  '='
+);
+expectType<Tuple.Flatten<DeepReadonly<[[], [1, 2], [3]]>>, readonly [1, 2, 3]>(
+  '='
+);

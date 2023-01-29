@@ -10,7 +10,7 @@ export const emailInputInitialState = {
   error: undefined,
 } as const;
 
-assertType<TypeExtends<typeof emailInputInitialState, EmailInputState>>();
+expectType<typeof emailInputInitialState, EmailInputState>('<=');
 
 export const emailInputHasError = (state: EmailInputState): boolean =>
   state.error !== undefined || state.inputValue === '';

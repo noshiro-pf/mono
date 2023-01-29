@@ -23,9 +23,7 @@ export const updateEmailPageInitialState = {
   isWaitingResponse: false,
 } as const;
 
-assertType<
-  TypeExtends<typeof updateEmailPageInitialState, UpdateEmailPageState>
->();
+expectType<typeof updateEmailPageInitialState, UpdateEmailPageState>('<=');
 
 export const updateEmailPageHasError = (state: UpdateEmailPageState): boolean =>
   emailInputHasError(state.email) ||

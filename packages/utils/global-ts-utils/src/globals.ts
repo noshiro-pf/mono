@@ -5,13 +5,12 @@
 import {
   Arr,
   ArrayUtils,
-  assertNotType,
   assertNotUndefined,
-  assertType,
   castWritable,
   createQueue,
   createTinyObservable,
   DateUtils,
+  expectType,
   hasKey,
   hasKeyValue,
   idfn,
@@ -57,13 +56,12 @@ import {
 
 (global as any).Arr = Arr;
 (global as any).ArrayUtils = ArrayUtils;
-(global as any).assertNotType = assertNotType;
 (global as any).assertNotUndefined = assertNotUndefined;
-(global as any).assertType = assertType;
 (global as any).castWritable = castWritable;
 (global as any).createQueue = createQueue;
 (global as any).createTinyObservable = createTinyObservable;
 (global as any).DateUtils = DateUtils;
+(global as any).expectType = expectType;
 (global as any).hasKey = hasKey;
 (global as any).hasKeyValue = hasKeyValue;
 (global as any).idfn = idfn;

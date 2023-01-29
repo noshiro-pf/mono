@@ -1,5 +1,3 @@
-import { assertType } from '../assert-type';
-
 export const pipe = <A>(a: A): Pipe<A> => new PipeClass(a);
 
 type Pipe<A> = Readonly<{
@@ -28,11 +26,3 @@ class PipeClass<A> implements Pipe<A> {
     return this.#a;
   }
 }
-
-const y: number | undefined = (() => 1 as number | undefined)();
-
-const z = pipe(y)
-  .chainOptional((x) => x + 1)
-  .chainOptional((x) => `${x}`).value;
-
-assertType<TypeEq<typeof z, string | undefined>>();

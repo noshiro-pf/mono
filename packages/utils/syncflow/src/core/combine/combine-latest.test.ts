@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { fromArray } from '../create';
 import { withInitialValue } from '../operators';
 import {
@@ -19,22 +19,18 @@ const cmi = combineLatestI([
   r2.chain(withInitialValue(0)),
 ] as const);
 
-assertType<
-  TypeExtends<
-    typeof cm,
-    SyncChildObservable<readonly [number, string], 'combineLatest'>
-  >
->();
+expectType<
+  typeof cm,
+  SyncChildObservable<readonly [number, string], 'combineLatest'>
+>('<=');
 
-assertType<
-  TypeExtends<
-    typeof cmi,
-    InitializedSyncChildObservable<
-      readonly [number, number | string],
-      'combineLatest'
-    >
+expectType<
+  typeof cmi,
+  InitializedSyncChildObservable<
+    readonly [number, number | string],
+    'combineLatest'
   >
->();
+>('<=');
 
 test('dummy', () => {
   expect(1).toBe(1);

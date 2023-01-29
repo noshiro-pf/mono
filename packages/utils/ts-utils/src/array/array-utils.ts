@@ -1,4 +1,3 @@
-import { assertType } from '../assert-type';
 import { IMap } from '../collections';
 import { pipe, Result } from '../functional';
 import { Num } from '../num';
@@ -225,12 +224,6 @@ export namespace ArrayUtils {
 
   export const copy = <T extends readonly unknown[]>(list: T): T =>
     list.slice() as T;
-  {
-    const ar = [1, 2, 3] as const;
-    const ar2 = copy(ar);
-
-    assertType<TypeEq<typeof ar2, readonly [1, 2, 3]>>();
-  }
 
   export const slice = <T>(
     list: readonly T[],
@@ -375,13 +368,6 @@ export namespace ArrayUtils {
     predicate: (value: T, index: number) => boolean
   ): readonly T[] {
     return list.filter(predicate);
-  }
-
-  {
-    const a = [1, 2, 3] as const;
-    const r = filter(a, (x): x is 1 => x === 1);
-
-    assertType<TypeEq<typeof r, readonly 1[]>>();
   }
 
   export const filterNot = <T extends readonly unknown[]>(

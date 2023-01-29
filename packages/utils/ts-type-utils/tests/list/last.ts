@@ -1,10 +1,10 @@
-import { type ListType, type TypeEq } from '../../src';
-import { assertType } from '../assert-type';
+import { type ListType } from '../../src';
+import { expectType } from '../expect-type';
 
-assertType<TypeEq<ListType.Last<[]>, never>>();
-assertType<TypeEq<ListType.Last<[1]>, 1>>();
-assertType<TypeEq<ListType.Last<[1, 2, 3]>, 3>>();
+expectType<ListType.Last<[]>, never>('=');
+expectType<ListType.Last<[1]>, 1>('=');
+expectType<ListType.Last<[1, 2, 3]>, 3>('=');
 
-assertType<TypeEq<ListType.Last<readonly []>, never>>();
-assertType<TypeEq<ListType.Last<readonly [1]>, 1>>();
-assertType<TypeEq<ListType.Last<readonly [1, 2, 3]>, 3>>();
+expectType<ListType.Last<readonly []>, never>('=');
+expectType<ListType.Last<readonly [1]>, 1>('=');
+expectType<ListType.Last<readonly [1, 2, 3]>, 3>('=');

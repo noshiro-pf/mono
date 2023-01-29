@@ -1,4 +1,4 @@
-import { assertNotType, assertType, Maybe } from '@noshiro/ts-utils';
+import { expectType, Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import {
   isRootObservable,
@@ -8,29 +8,23 @@ import {
   type Wrap,
 } from './observable';
 
-assertType<TypeExtends<number, ObservableValue<Observable<number>>>>();
-assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
+expectType<number, ObservableValue<Observable<number>>>('<=');
+expectType<number, ObservableValue<Observable<string>>>('!<=');
 
-assertType<
-  TypeExtends<
-    readonly [number, string],
-    Unwrap<readonly [Observable<number>, Observable<string>]>
-  >
->();
-assertNotType<TypeExtends<number, ObservableValue<Observable<string>>>>();
+expectType<
+  readonly [number, string],
+  Unwrap<readonly [Observable<number>, Observable<string>]>
+>('<=');
+expectType<number, ObservableValue<Observable<string>>>('!<=');
 
-assertType<
-  TypeExtends<
-    readonly [Observable<number>, Observable<number>],
-    Wrap<readonly [number, number]>
-  >
->();
-assertNotType<
-  TypeExtends<
-    readonly [Observable<number>, Observable<string>],
-    Wrap<readonly [number, number]>
-  >
->();
+expectType<
+  readonly [Observable<number>, Observable<number>],
+  Wrap<readonly [number, number]>
+>('<=');
+expectType<
+  readonly [Observable<number>, Observable<string>],
+  Wrap<readonly [number, number]>
+>('!<=');
 
 test('', () => {
   expect(

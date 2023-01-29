@@ -1,7 +1,7 @@
-import { type Seq, type TypeEq } from '../src';
-import { assertType } from './assert-type';
+import { type Seq } from '../src';
+import { expectType } from './expect-type';
 
-assertType<TypeEq<Seq<3>, readonly [0, 1, 2]>>();
-assertType<TypeEq<Seq<0>, readonly []>>();
-assertType<TypeEq<Seq<1.2>, never>>();
-assertType<TypeEq<Seq<5>, readonly [0, 1, 2, 3, 4]>>();
+expectType<Seq<3>, readonly [0, 1, 2]>('=');
+expectType<Seq<0>, readonly []>('=');
+expectType<Seq<1.2>, never>('=');
+expectType<Seq<5>, readonly [0, 1, 2, 3, 4]>('=');

@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { number } from '../primitives';
 import { type TypeOf } from '../type';
 import { nonEmptyArray } from './non-empty-array';
@@ -10,18 +10,18 @@ describe('nonEmptyArray', () => {
 
   type Xs = TypeOf<typeof xs>;
 
-  assertType<TypeEq<Xs, NonEmptyArray<number>>>();
+  expectType<Xs, NonEmptyArray<number>>('=');
 
-  assertType<TypeEq<typeof xs.defaultValue, Xs>>();
+  expectType<typeof xs.defaultValue, Xs>('=');
 
   describe('is', () => {
     test('truthy case', () => {
       const ys: unknown = [1, 2, 3];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, Xs>>();
+        expectType<typeof ys, Xs>('=');
       } else {
-        assertType<TypeEq<typeof ys, unknown>>();
+        expectType<typeof ys, unknown>('=');
       }
 
       expect(xs.is(ys)).toBe(true);
@@ -31,9 +31,9 @@ describe('nonEmptyArray', () => {
       const ys: unknown = [];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, Xs>>();
+        expectType<typeof ys, Xs>('=');
       } else {
-        assertType<TypeEq<typeof ys, unknown>>();
+        expectType<typeof ys, unknown>('=');
       }
 
       expect(xs.is(ys)).toBe(false);
@@ -43,9 +43,9 @@ describe('nonEmptyArray', () => {
       const ys: unknown = ['1', '', 3];
 
       if (xs.is(ys)) {
-        assertType<TypeEq<typeof ys, Xs>>();
+        expectType<typeof ys, Xs>('=');
       } else {
-        assertType<TypeEq<typeof ys, unknown>>();
+        expectType<typeof ys, unknown>('=');
       }
 
       expect(xs.is(ys)).toBe(false);

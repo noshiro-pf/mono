@@ -28,7 +28,7 @@ export const registerPageInitialState = {
   isWaitingResponse: false,
 } as const;
 
-assertType<TypeExtends<typeof registerPageInitialState, RegisterPageState>>();
+expectType<typeof registerPageInitialState, RegisterPageState>('<=');
 
 export const registerPageHasError = (state: RegisterPageState): boolean =>
   state.username.inputValue === '' ||

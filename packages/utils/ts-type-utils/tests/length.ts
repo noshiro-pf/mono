@@ -1,4 +1,4 @@
-import { type Length, type TypeEq } from '../src';
-import { assertType } from './assert-type';
+import { type Length } from '../src';
+import { expectType } from './expect-type';
 
-assertType<TypeEq<Length<readonly [1, 2, 3]>, 3>>();
+expectType<Length<readonly [1, 2, 3]>, 3>('=');

@@ -1,14 +1,13 @@
 import {
   type Arr as _Arr,
   type ArrayUtils as _ArrayUtils,
-  type assertNotType as _assertNotType,
   type assertNotUndefined as _assertNotUndefined,
-  type assertType as _assertType,
   type castWritable as _castWritable,
   type createQueue as _createQueue,
   type createTinyObservable as _createTinyObservable,
   type DateUtils as _DateUtils,
   type Err as _Err,
+  type expectType as _expectType,
   type hasKey as _hasKey,
   type hasKeyValue as _hasKeyValue,
   type idfn as _idfn,
@@ -80,13 +79,12 @@ declare global {
 
   const Arr: typeof _Arr;
   const ArrayUtils: typeof _ArrayUtils;
-  const assertNotType: typeof _assertNotType;
   const assertNotUndefined: typeof _assertNotUndefined;
-  const assertType: typeof _assertType;
   const castWritable: typeof _castWritable;
   const createQueue: typeof _createQueue;
   const createTinyObservable: typeof _createTinyObservable;
   const DateUtils: typeof _DateUtils;
+  const expectType: typeof _expectType;
   const hasKey: typeof _hasKey;
   const hasKeyValue: typeof _hasKeyValue;
   const idfn: typeof _idfn;

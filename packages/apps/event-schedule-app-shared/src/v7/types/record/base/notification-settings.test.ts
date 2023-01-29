@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import {
   fillNotificationSettings,
   isNotificationSettings,
@@ -7,19 +7,17 @@ import {
 } from './notification-settings';
 
 describe('NotificationSettings', () => {
-  assertType<
-    TypeEq<
-      NotificationSettings,
-      Readonly<{
-        notifyOnAnswerChange: boolean;
-        notify01daysBeforeAnswerDeadline: boolean;
-        notify03daysBeforeAnswerDeadline: boolean;
-        notify07daysBeforeAnswerDeadline: boolean;
-        notify14daysBeforeAnswerDeadline: boolean;
-        notify28daysBeforeAnswerDeadline: boolean;
-      }>
-    >
-  >();
+  expectType<
+    NotificationSettings,
+    Readonly<{
+      notifyOnAnswerChange: boolean;
+      notify01daysBeforeAnswerDeadline: boolean;
+      notify03daysBeforeAnswerDeadline: boolean;
+      notify07daysBeforeAnswerDeadline: boolean;
+      notify14daysBeforeAnswerDeadline: boolean;
+      notify28daysBeforeAnswerDeadline: boolean;
+    }>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: NotificationSettings = {

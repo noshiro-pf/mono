@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 
 export const months = {
   en: {
@@ -81,8 +81,8 @@ type MonthsListType = readonly [
   Readonly<{ value: 12; name: string }>
 ];
 
-assertType<TypeExtends<typeof months.jp, MonthsType>>();
-assertType<TypeExtends<typeof months.en, MonthsType>>();
+expectType<typeof months.jp, MonthsType>('<=');
+expectType<typeof months.en, MonthsType>('<=');
 
-assertType<TypeExtends<typeof monthsList.jp, MonthsListType>>();
-assertType<TypeExtends<typeof monthsList.en, MonthsListType>>();
+expectType<typeof monthsList.jp, MonthsListType>('<=');
+expectType<typeof monthsList.en, MonthsListType>('<=');

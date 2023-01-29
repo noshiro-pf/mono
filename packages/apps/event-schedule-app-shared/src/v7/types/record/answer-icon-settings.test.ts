@@ -1,4 +1,4 @@
-import { assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type AnswerIconId } from '../enum';
 import {
   answerIconSettingsDefaultValue,
@@ -9,12 +9,10 @@ import {
 import { type AnswerIconSetting } from './base';
 
 describe('AnswerIconSettings', () => {
-  assertType<
-    TypeEq<
-      AnswerIconSettings,
-      Readonly<Record<AnswerIconId, AnswerIconSetting>>
-    >
-  >();
+  expectType<
+    AnswerIconSettings,
+    Readonly<Record<AnswerIconId, AnswerIconSetting>>
+  >('=');
 
   test('defaultValue', () => {
     const defaultValue: AnswerIconSettings = {

@@ -23,9 +23,7 @@ export const deleteAccountPageInitialState = {
   isWaitingResponse: false,
 } as const;
 
-assertType<
-  TypeExtends<typeof deleteAccountPageInitialState, DeleteAccountPageState>
->();
+expectType<typeof deleteAccountPageInitialState, DeleteAccountPageState>('<=');
 
 export const deleteAccountPageHasError = (
   state: DeleteAccountPageState
