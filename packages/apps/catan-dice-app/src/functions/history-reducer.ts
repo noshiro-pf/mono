@@ -21,6 +21,7 @@ export const historyReducer: ReducerType<
       redo: draft.history,
       'roll-dices': pipe(draft.history)
         .chain((hist) => Arr.take(hist, currIdx + 1))
-        .chain((hist) => [...hist, rollTwoDices()]).value,
+        .chain((hist) => [...hist, rollTwoDices()])
+        .chain(castWritable).value,
     });
   });

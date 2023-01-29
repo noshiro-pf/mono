@@ -1,5 +1,6 @@
 export * from './color';
 export * from './default-card-size';
+export * from './dictionary';
 export * from './directions';
 export * from './firebase';
 export * from './routes';

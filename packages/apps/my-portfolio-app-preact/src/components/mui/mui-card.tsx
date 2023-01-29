@@ -1,5 +1,3 @@
-import { styled } from '@noshiro/goober';
-
 export const MuiCard = styled('div')`
   /* MuiPaper-root */
   color: rgba(0, 0, 0, 0.87);

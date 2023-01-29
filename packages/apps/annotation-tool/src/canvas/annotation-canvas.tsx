@@ -1,7 +1,4 @@
-import { memoNamed } from '@noshiro/react-utils';
 import { type Hue, type RectSize } from '@noshiro/ts-utils-additional';
-import { useMemo, type CSSProperties } from 'react';
-import styled from 'styled-components';
 import { SampleImage } from '../assets';
 import { CanvasMain } from './canvas-main';
 import { bgCheckerboardImg } from './img';

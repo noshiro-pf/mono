@@ -1,11 +1,4 @@
-import { memoNamed } from '@noshiro/react-utils';
-import {
-  useCallback,
-  useMemo,
-  type ChangeEventHandler,
-  type CSSProperties,
-} from 'react';
-import styled from 'styled-components';
+import { type ChangeEventHandler } from 'react';
 
 type Props = DeepReadonly<{
   value: string;

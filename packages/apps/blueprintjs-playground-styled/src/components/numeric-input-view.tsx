@@ -1,5 +1,4 @@
-import { memoNamed } from '@noshiro/react-utils';
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components';
 import {
   ptButton,
   ptButtonBase,

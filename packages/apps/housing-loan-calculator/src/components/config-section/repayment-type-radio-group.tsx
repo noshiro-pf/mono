@@ -1,6 +1,4 @@
 import { Radio, RadioGroup } from '@blueprintjs/core';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, type FormEvent } from 'react';
 import { viewTexts } from '../../constants';
 import { type RepaymentType } from '../../types';
 

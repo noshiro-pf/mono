@@ -1,9 +1,8 @@
-import styled from 'styled-components';
 import {
   ptButtonBase,
   ptButtonHeight,
-} from '../style-definitions/button/common';
-import { ptButtonHeightPx } from '../style-definitions/common';
+  ptButtonHeightPx,
+} from '../style-definitions';
 
 export const Button = styled.button`
   ${ptButtonBase}

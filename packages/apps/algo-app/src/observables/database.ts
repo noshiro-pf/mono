@@ -24,85 +24,91 @@ import {
   type Room,
 } from '../types';
 
-const { state$: _roomId$, setState: _setRoomId } = createState<
+const { state$: roomId$, setState: setRoomId } = createState<
   string | undefined
 >(undefined);
 
-const { state$: _room$, setState: _setRoom } = createState<Room | undefined>(
+const { state$: room$, setState: setRoom } = createState<Room | undefined>(
   undefined
 );
 
-const [_actionsFromDb$, _setActionsFromDb] =
+const [actionsFromDb$, _setActionsFromDb] =
   createEventEmitter<readonly GameStateAction[]>();
 
-export namespace db {
-  export const fbApp = initializeApp(firebaseConfig);
+const fbApp = initializeApp(firebaseConfig);
 
-  export const firestore = getFirestore();
+const firestore = getFirestore();
 
-  export const paths = {
-    rooms: 'rooms',
-    actions: 'actions',
-    players: 'players',
-  } as const;
+const paths = {
+  rooms: 'rooms',
+  actions: 'actions',
+  players: 'players',
+} as const;
 
-  export const setRoomId = _setRoomId;
+const { state$: myName$, setState: setMyName } = createState<
+  string | undefined
+>(undefined);
 
-  export const room$ = _room$;
+const addAction = (
+  roomId: string,
+  localAction: GameStateAction
+): Promise<Result<DocumentReference, unknown>> =>
+  Result.fromPromise(
+    addDoc(
+      collection(firestore, paths.rooms, roomId, paths.actions),
+      localAction
+    )
+  );
 
-  export const { state$: myName$, setState: setMyName } = createState<
-    string | undefined
-  >(undefined);
+const addPlayer = (
+  roomId: string,
+  username: string
+): Promise<Result<void, unknown>> => {
+  const ref: DocumentReference = doc(firestore, paths.rooms, roomId);
 
-  export const actionsFromDb$ = _actionsFromDb$;
-
-  export const addAction = (
-    roomId: string,
-    localAction: GameStateAction
-  ): Promise<Result<DocumentReference, unknown>> =>
-    Result.fromPromise(
-      addDoc(
-        collection(firestore, paths.rooms, roomId, paths.actions),
-        localAction
-      )
-    );
-
-  export const addPlayer = (
-    roomId: string,
-    username: string
-  ): Promise<Result<void, unknown>> => {
-    const ref: DocumentReference = doc(firestore, paths.rooms, roomId);
-
-    const player: Player = {
-      name: username,
-      online: true,
-    };
-
-    return Result.fromPromise(
-      updateDoc(ref, {
-        players: arrayUnion(player),
-      })
-    );
+  const player: Player = {
+    name: username,
+    online: true,
   };
 
-  export const createRoom = async ({
-    username,
-    password,
-  }: Readonly<{
-    username: string;
-    password: string | undefined;
-  }>): Promise<Room> => {
-    const room = newRoom(password, { name: username, online: true });
-    const res = await addDoc(
-      collection(firestore, paths.rooms),
-      convertRoomToRoomRemote(room)
-    );
+  return Result.fromPromise(
+    updateDoc(ref, {
+      players: arrayUnion(player),
+    })
+  );
+};
 
-    const id = res.id;
+const createRoom = async ({
+  username,
+  password,
+}: Readonly<{
+  username: string;
+  password: string | undefined;
+}>): Promise<Room> => {
+  const room = newRoom(password, { name: username, online: true });
+  const res = await addDoc(
+    collection(firestore, paths.rooms),
+    convertRoomToRoomRemote(room)
+  );
 
-    return { ...room, id };
-  };
-}
+  const id = res.id;
+
+  return { ...room, id };
+};
+
+export const db = {
+  setRoomId,
+  room$,
+  actionsFromDb$,
+  fbApp,
+  paths,
+  firestore,
+  myName$,
+  setMyName,
+  addAction,
+  addPlayer,
+  createRoom,
+} as const;
 
 const mut_unsubscribe: {
   room: Unsubscribe | undefined;
@@ -112,7 +118,7 @@ const mut_unsubscribe: {
   actions: undefined,
 };
 
-_roomId$.subscribe((roomId) => {
+roomId$.subscribe((roomId) => {
   if (roomId === undefined) return;
 
   if (mut_unsubscribe.room !== undefined) {
@@ -132,7 +138,7 @@ _roomId$.subscribe((roomId) => {
   mut_unsubscribe.room = onSnapshot(roomDoc, (d) => {
     const data = d.data();
     assertIsRoomRemote(data);
-    _setRoom(convertRoomRemoteToRoom(data, d.id));
+    setRoom(convertRoomRemoteToRoom(data, d.id));
   });
 
   mut_unsubscribe.actions = onSnapshot(actionsColl, (q) => {

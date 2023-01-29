@@ -1,5 +1,3 @@
-import { withSlash } from '@noshiro/tiny-router-react-hooks';
-
 export const uriWithQueryParams = (
   uri: string,
   queryParameters: DeepReadonly<

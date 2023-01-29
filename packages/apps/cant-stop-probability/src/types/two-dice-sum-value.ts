@@ -1,4 +1,11 @@
-export type TwoDiceSumValue = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+import * as t from '@noshiro/io-ts';
 
-export const isTwoDiceSumValue = (value: number): value is TwoDiceSumValue =>
-  Num.isUint32(value) && 2 <= value && value <= 12;
+const twoDiceSumValueType = t.uintRange({
+  defaultValue: 2,
+  min: 2,
+  max: 12,
+});
+
+export type TwoDiceSumValue = t.TypeOf<typeof twoDiceSumValueType>;
+
+export const isTwoDiceSumValue = twoDiceSumValueType.is;

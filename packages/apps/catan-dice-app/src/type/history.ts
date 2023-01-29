@@ -1,6 +1,6 @@
-export type HistoryState = Readonly<{
+export type HistoryState = DeepReadonly<{
   index: number;
-  history: readonly (readonly [number, number])[];
+  history: [number, number][];
 }>;
 
 export const defaultHistoryState: HistoryState = {

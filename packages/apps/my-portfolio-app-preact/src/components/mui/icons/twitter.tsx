@@ -1,4 +1,3 @@
-import { memoNamed } from '@noshiro/preact-utils';
 import { links } from '../../../constants';
 
 export const TwitterIconLink = memoNamed('TwitterIcon', () => (

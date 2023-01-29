@@ -24,7 +24,7 @@ export const writings: readonly WritingsInfo[] = [
     body: 'ReScriptを使ってみた感想をまとめました。',
   },
   {
-    id: 'ts4.1-immutable-setin',
+    id: 'typescript-union-combination-limit-of-25',
     link: 'https://www.kabuku.co.jp/developers/typescript-union-combination-limit-of-25',
     title:
       'Union 型を含むオブジェクト型を代入するときに遭遇しうるTypeScript型チェックの制限について',

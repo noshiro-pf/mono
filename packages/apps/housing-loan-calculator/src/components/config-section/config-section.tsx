@@ -1,6 +1,3 @@
-import { memoNamed } from '@noshiro/react-utils';
-import { useObservableValue } from '@noshiro/syncflow-react-hooks';
-import styled from 'styled-components';
 import { viewTexts } from '../../constants';
 import {
   setBorrowingPeriodYear,
