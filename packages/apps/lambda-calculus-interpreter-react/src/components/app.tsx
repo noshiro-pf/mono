@@ -1,9 +1,13 @@
+import {
+  inputAreaString$,
+  outputAreaString$,
+  setInputAreaString,
+} from '../state';
 import { CodeArea } from './code-area';
-import { useLambdaEval } from './use-lambda-eval';
 
 export const App = memoNamed('App', () => {
-  const { inputAreaString, outputAreaString, setInputAreaString } =
-    useLambdaEval('((+ 2) 3)', 'Parse error.');
+  const inputAreaString = useObservableValue(inputAreaString$);
+  const outputAreaString = useObservableValue(outputAreaString$);
 
   return (
     <Root>
@@ -24,7 +28,7 @@ export const App = memoNamed('App', () => {
         <CodeArea
           maxHeightPx={800}
           minHeightPx={500}
-          value={outputAreaString}
+          value={outputAreaString ?? 'Parse error.'}
         />
       </TextAreaWrapper>
     </Root>
