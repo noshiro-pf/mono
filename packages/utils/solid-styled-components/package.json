@@ -13,12 +13,7 @@
     "dist"
   ],
   "scripts": {
-    "test:types": "tsc --project tsconfig.test.json",
-    "tsc": "yarn z:wireit:type-check",
-    "tscw": "yarn z:cmd:type-check --watch",
-    "z:cmd:type-check": "tsc --noEmit",
-    "z:no-wireit:type-check": "yarn z:cmd:type-check",
-    "z:wireit:type-check": "wireit"
+    "test:types": "tsc --project tsconfig.test.json"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*",
@@ -30,20 +25,5 @@
   },
   "peerDependencies": {
     "solid-js": "^0.23.11"
-  },
-  "wireit": {
-    "z:wireit:type-check": {
-      "command": "yarn z:no-wireit:type-check",
-      "files": [
-        "src/**/*.ts",
-        "tsconfig.json",
-        "../../../config/tsconfig/**",
-        "../ts-type-utils/ts-type-utils.d.ts"
-      ],
-      "output": [],
-      "packageLocks": [
-        "yarn.lock"
-      ]
-    }
   }
 }
