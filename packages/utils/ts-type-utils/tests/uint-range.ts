@@ -1,4 +1,4 @@
-import type { TypeEq, UintRange } from '../src';
+import { type TypeEq, type UintRange } from '../src';
 import { assertType } from './assert-type';
 
 assertType<TypeEq<UintRange<0, 3>, 0 | 1 | 2 | 3>>();

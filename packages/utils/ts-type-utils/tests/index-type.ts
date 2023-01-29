@@ -1,4 +1,4 @@
-import type { Index, TypeEq } from '../src';
+import { type Index, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<TypeEq<Index<3>, 0 | 1 | 2>>();

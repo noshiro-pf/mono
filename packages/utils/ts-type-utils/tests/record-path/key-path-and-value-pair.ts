@@ -1,8 +1,8 @@
-import type {
-  DeepReadonly,
-  KeyPathAndValueTypeAtPathTuple,
-  Paths,
-  TypeEq,
+import {
+  type DeepReadonly,
+  type KeyPathAndValueTypeAtPathTuple,
+  type Paths,
+  type TypeEq,
 } from '../../src';
 import { assertType } from '../assert-type';
 

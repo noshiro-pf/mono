@@ -1,10 +1,10 @@
-import type {
-  DeepReadonly,
-  LeafPaths,
-  LeafPathsWithIndex,
-  Paths,
-  PathsWithIndex,
-  TypeEq,
+import {
+  type DeepReadonly,
+  type LeafPaths,
+  type LeafPathsWithIndex,
+  type Paths,
+  type PathsWithIndex,
+  type TypeEq,
 } from '../../src';
 import { assertType } from '../assert-type';
 

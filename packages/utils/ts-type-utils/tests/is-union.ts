@@ -1,4 +1,4 @@
-import type { IsUnion, TypeEq } from '../src';
+import { type IsUnion, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<TypeEq<IsUnion<string>, false>>();

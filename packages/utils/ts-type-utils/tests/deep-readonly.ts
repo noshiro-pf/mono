@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
-import type { DeepReadonly, TypeEq } from '../src';
+import { type DeepReadonly, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<

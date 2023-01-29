@@ -1,4 +1,4 @@
-import type { ExpectTrue, TypeEq } from '../src';
+import { type ExpectTrue, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,4 +1,4 @@
-import type { Seq, TypeEq } from '../src';
+import { type Seq, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<TypeEq<Seq<3>, readonly [0, 1, 2]>>();

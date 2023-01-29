@@ -1,4 +1,4 @@
-import type { ToNumber, TypeEq } from '../src';
+import { type ToNumber, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<TypeEq<ToNumber<'1000'>, 1000>>();

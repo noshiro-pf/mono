@@ -1,4 +1,4 @@
-import type { Tuple, TypeEq } from '../../src';
+import { type Tuple, type TypeEq } from '../../src';
 import { assertType } from '../assert-type';
 
 assertType<TypeEq<Tuple.Skip<0, readonly []>, readonly []>>();

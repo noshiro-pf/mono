@@ -1,4 +1,4 @@
-import type { IsFixedLengthList, TypeEq } from '../src';
+import { type IsFixedLengthList, type TypeEq } from '../src';
 import { assertType } from './assert-type';
 
 assertType<TypeEq<IsFixedLengthList<[]>, true>>();

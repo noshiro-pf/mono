@@ -1,4 +1,8 @@
-import type { ArrayOfLength, MutableArrayOfLength, TypeEq } from '../src';
+import {
+  type ArrayOfLength,
+  type MutableArrayOfLength,
+  type TypeEq,
+} from '../src';
 import { assertType } from './assert-type';
 
 assertType<TypeEq<[0, 0], MutableArrayOfLength<2, 0>>>();
