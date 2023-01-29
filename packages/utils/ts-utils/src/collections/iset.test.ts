@@ -63,12 +63,12 @@ describe('ISet.some', () => {
   test('case 1', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
 
-    expect(s0).toContain(3);
+    expect(s0.toRawSet()).toContain(3);
   });
   test('case 2', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
 
-    expect(s0).not.toContain(999);
+    expect(s0.toRawSet()).not.toContain(999);
   });
   test('case 3', () => {
     const s0 = ISet.new<number>([]);
