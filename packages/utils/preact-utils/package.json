@@ -50,7 +50,7 @@
   "dependencies": {
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "preact": "^10.4.7"
+    "preact": "^10.11.3"
   },
   "devDependencies": {
     "@noshiro/ts-type-utils": "*"
