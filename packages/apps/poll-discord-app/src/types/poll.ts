@@ -35,7 +35,7 @@ export type PollJson = DeepReadonly<{
   titleMessageId: TitleMessageId;
 }>;
 
-assertType<TypeExtends<PollJson, JSONType>>();
+expectType<PollJson, JSONType>('<=');
 
 const pollDefaultValue: Poll = {
   id: createPollId(''),
