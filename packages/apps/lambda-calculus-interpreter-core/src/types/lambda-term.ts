@@ -1,4 +1,4 @@
-import { assertNotType, assertType } from '@noshiro/ts-utils';
+import { expectType } from '@noshiro/ts-utils';
 import { type Variable } from './variable';
 
 // eslint-disable-next-line @typescript-eslint/sort-type-constituents
@@ -15,27 +15,27 @@ const l4 = [
 ] as const;
 const l5 = ['lambda', 'x', ['x', ['y', 'y']]] as const;
 
-assertType<TypeExtends<typeof l1, LambdaTerm>>();
-assertType<TypeExtends<typeof l1, Variable>>();
-assertNotType<TypeExtends<typeof l1, LambdaApplication>>();
-assertNotType<TypeExtends<typeof l1, LambdaAbstraction>>();
+expectType<typeof l1, LambdaTerm>('<=');
+expectType<typeof l1, Variable>('<=');
+expectType<typeof l1, LambdaApplication>('!<=');
+expectType<typeof l1, LambdaAbstraction>('!<=');
 
-assertType<TypeExtends<typeof l2, LambdaTerm>>();
-assertNotType<TypeExtends<typeof l2, Variable>>();
-assertType<TypeExtends<typeof l2, LambdaApplication>>();
-assertNotType<TypeExtends<typeof l2, LambdaAbstraction>>();
+expectType<typeof l2, LambdaTerm>('<=');
+expectType<typeof l2, Variable>('!<=');
+expectType<typeof l2, LambdaApplication>('<=');
+expectType<typeof l2, LambdaAbstraction>('!<=');
 
-assertType<TypeExtends<typeof l3, LambdaTerm>>();
-assertNotType<TypeExtends<typeof l3, Variable>>();
-assertType<TypeExtends<typeof l3, LambdaApplication>>();
-assertNotType<TypeExtends<typeof l3, LambdaAbstraction>>();
+expectType<typeof l3, LambdaTerm>('<=');
+expectType<typeof l3, Variable>('!<=');
+expectType<typeof l3, LambdaApplication>('<=');
+expectType<typeof l3, LambdaAbstraction>('!<=');
 
-assertType<TypeExtends<typeof l4, LambdaTerm>>();
-assertNotType<TypeExtends<typeof l4, Variable>>();
-assertType<TypeExtends<typeof l4, LambdaApplication>>();
-assertNotType<TypeExtends<typeof l4, LambdaAbstraction>>();
+expectType<typeof l4, LambdaTerm>('<=');
+expectType<typeof l4, Variable>('!<=');
+expectType<typeof l4, LambdaApplication>('<=');
+expectType<typeof l4, LambdaAbstraction>('!<=');
 
-assertType<TypeExtends<typeof l5, LambdaTerm>>();
-assertNotType<TypeExtends<typeof l5, Variable>>();
-assertNotType<TypeExtends<typeof l5, LambdaApplication>>();
-assertType<TypeExtends<typeof l5, LambdaAbstraction>>();
+expectType<typeof l5, LambdaTerm>('<=');
+expectType<typeof l5, Variable>('!<=');
+expectType<typeof l5, LambdaApplication>('!<=');
+expectType<typeof l5, LambdaAbstraction>('<=');
