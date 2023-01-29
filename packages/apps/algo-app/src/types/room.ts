@@ -28,7 +28,7 @@ export type Room = DeepReadonly<{
 }>;
 
 const roomStateList = ['not-started', 'playing', 'finished'] as const;
-assertType<TypeEq<typeof roomStateList[number], Room['state']>>();
+expectType<typeof roomStateList[number], Room['state']>('=');
 
 export const assertIsRoomRemote: (
   data: unknown
@@ -103,8 +103,8 @@ export const assertIsRoomRemote: (
     throw new Error('hasKeyValue failed for playerCards');
   }
 
-  assertType<TypeExtends<typeof data, RoomRemote>>();
-  assertType<TypeExtends<RoomRemote, typeof data>>();
+  expectType<typeof data, RoomRemote>('<=');
+  expectType<RoomRemote, typeof data>('<=');
 };
 
 export const convertRoomRemoteToRoom = (
