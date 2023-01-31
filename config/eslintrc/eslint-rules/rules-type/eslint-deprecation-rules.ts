@@ -1,6 +1,6 @@
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
-import type { Linter } from 'eslint';
+import { type Linter } from 'eslint';
 
 /**
  * @description Do not use deprecated APIs.

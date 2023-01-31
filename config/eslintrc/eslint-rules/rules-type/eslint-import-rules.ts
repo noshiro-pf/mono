@@ -1,7 +1,7 @@
 /* eslint-disable functional/no-mixed-type */
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
-import type { Linter } from 'eslint';
+import { type Linter } from 'eslint';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =

@@ -1,6 +1,6 @@
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
-import type { Linter } from 'eslint';
+import { type Linter } from 'eslint';
 
 /**
  * @description Prefer using the mapFn callback of Array.from over an immediate .map() call.
