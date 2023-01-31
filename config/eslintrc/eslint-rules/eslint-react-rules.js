@@ -111,7 +111,7 @@ const eslintReactRules = {
   'react/no-this-in-sfc': 'error',
   'react/no-typos': 'error',
   'react/no-unescaped-entities': 'error',
-  'react/no-unknown-property': 'error',
+  'react/no-unknown-property': ['error', { ignore: ['css'] }],
   'react/no-unsafe': 'error',
   'react/no-object-type-as-default-prop': 'error',
   'react/no-unstable-nested-components': 'error',
