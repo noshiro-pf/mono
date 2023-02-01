@@ -74,9 +74,12 @@
     ]
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@fontsource/roboto": "^4.5.8",
+    "@mui/material": "^5.11.6",
     "@noshiro/io-ts": "*",
-    "@noshiro/react-material-ui-utils": "*",
+    "@noshiro/react-mui-utils": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/resize-observer-react-hooks": "*",
     "@noshiro/syncflow": "*",

@@ -1,9 +1,5 @@
-import { MuiSlider } from '@noshiro/react-material-ui-utils';
+import { MuiSlider } from '@noshiro/react-mui-utils';
 import { type Hue } from '@noshiro/ts-utils-additional';
-
-const SliderWrapper = styled.div`
-  padding: 10px 0;
-`;
 
 type Props = Readonly<{
   firstHue: Hue;
@@ -23,3 +19,7 @@ export const FirstHueSlider = memoNamed<Props>('FirstHueSlider', (props) => (
     />
   </SliderWrapper>
 ));
+
+const SliderWrapper = styled.div`
+  padding: 10px 0;
+`;

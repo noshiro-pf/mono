@@ -1,26 +1,8 @@
-import {
-  type Hue,
-  type Mappable,
-  type Percent,
-} from '@noshiro/ts-utils-additional';
+import { type Hue, type Percent } from '@noshiro/ts-utils-additional';
 import { ColorItem } from '../atoms';
 
-const ColorsWrapper = styled.div`
-  padding: 10px;
-`;
-
-const Colors = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 10px;
-`;
-
-const ColorItemWrapper = styled.div`
-  padding: 3px;
-`;
-
 type Props = Readonly<{
-  hueList: Mappable<Hue>;
+  hueList: readonly Hue[];
   saturation: Percent;
   lightness: Percent;
 }>;
@@ -37,3 +19,17 @@ export const ColorList = memoNamed<Props>('ColorList', (props) => (
     </Colors>
   </ColorsWrapper>
 ));
+
+const ColorsWrapper = styled.div`
+  padding: 10px;
+`;
+
+const Colors = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+`;
+
+const ColorItemWrapper = styled.div`
+  padding: 3px;
+`;

@@ -6,7 +6,7 @@ import {
   ListItemAvatar,
   ListItemText,
   Paper,
-} from '@material-ui/core';
+} from '@mui/material';
 import { DiceIcon, SumIcon } from '../assets';
 import { DiceNumber } from './dicer-number';
 import { Histogram } from './histogram';
@@ -66,13 +66,13 @@ export const MainView = memoNamed<Props>(
         </List>
         <ButtonsWrapper>
           <ButtonWithMargin>
-            <Button color='primary' variant='contained' onClick={rollDices}>
+            <Button color={'primary'} variant='contained' onClick={rollDices}>
               {'Roll dices!!!'}
             </Button>
           </ButtonWithMargin>
           <ButtonWithMargin>
             <Button
-              color='default'
+              color={'secondary'}
               disabled={!undoable}
               variant='contained'
               onClick={undo}
@@ -82,7 +82,7 @@ export const MainView = memoNamed<Props>(
           </ButtonWithMargin>
           <ButtonWithMargin>
             <Button
-              color='default'
+              color={'secondary'}
               disabled={!redoable}
               variant='contained'
               onClick={redo}

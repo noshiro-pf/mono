@@ -1,11 +1,7 @@
-import { MuiSlider } from '@noshiro/react-material-ui-utils';
+import { MuiSlider } from '@noshiro/react-mui-utils';
 import { type Hue, type Percent } from '@noshiro/ts-utils-additional';
 import { DivisionNumberSlider } from './division-number-slider';
 import { FirstHueSlider } from './first-hue-slider';
-
-const SliderWrapper = styled.div`
-  padding: 10px 0;
-`;
 
 type Props = Readonly<{
   saturation: Percent;
@@ -52,3 +48,7 @@ export const AllSliders = memoNamed<Props>('AllSliders', (props) => (
     />
   </div>
 ));
+
+const SliderWrapper = styled.div`
+  padding: 10px 0;
+`;

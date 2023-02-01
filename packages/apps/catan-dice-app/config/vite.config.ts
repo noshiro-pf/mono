@@ -22,7 +22,9 @@ const thisDir = dirname(fileURLToPath(import.meta.url));
 // eslint-disable-next-line import/no-default-export
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      jsxImportSource: '@emotion/react',
+    }),
     inject({
       modules: castWritable({
         ...providePluginReactDef,

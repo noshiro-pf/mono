@@ -1,8 +1,26 @@
-import {
-  hslToStr,
-  type Hsl,
-  type Mappable,
-} from '@noshiro/ts-utils-additional';
+import { hslToStr, type Hsl } from '@noshiro/ts-utils-additional';
+
+type Props = Readonly<{
+  accumulatedDistribution: readonly (readonly [Hsl, number])[];
+}>;
+
+export const ColoredDistribution = memoNamed<Props>(
+  'ColoredDistribution',
+  (props) => (
+    <Root>
+      {props.accumulatedDistribution.map(([hsl, value]) => (
+        <BarWrapper key={hsl[0]}>
+          <Bar
+            style={{
+              height: `${value * 100}%`,
+              backgroundColor: hslToStr(hsl),
+            }}
+          />
+        </BarWrapper>
+      ))}
+    </Root>
+  )
+);
 
 const Root = styled.div`
   width: 100%;
@@ -23,25 +41,3 @@ const Bar = styled.div`
   width: 100%;
   /* border-color: black; */
 `;
-
-type Props = Readonly<{
-  accumulatedDistribution: Mappable<readonly [Hsl, number]>;
-}>;
-
-export const ColoredDistribution = memoNamed<Props>(
-  'ColoredDistribution',
-  (props) => (
-    <Root>
-      {props.accumulatedDistribution.map(([hsl, value]) => (
-        <BarWrapper key={hsl[0]}>
-          <Bar
-            style={{
-              height: `${value * 100}%`,
-              backgroundColor: hslToStr(hsl),
-            }}
-          />
-        </BarWrapper>
-      ))}
-    </Root>
-  )
-);
