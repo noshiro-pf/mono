@@ -27,6 +27,7 @@ export const App = memoNamed('App', () => {
       <TextAreaWrapper>
         <div>{'Input:'}</div>
         <CodeArea
+          cyId={'input-area'}
           maxHeightPx={500}
           minHeightPx={100}
           value={inputAreaString}
@@ -37,6 +38,7 @@ export const App = memoNamed('App', () => {
       <TextAreaWrapper>
         <div>{'Output:'}</div>
         <CodeArea
+          cyId={'output-area'}
           maxHeightPx={800}
           minHeightPx={500}
           value={outputAreaString ?? 'Parse error.'}

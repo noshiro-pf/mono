@@ -3,11 +3,18 @@ type Props = DeepReadonly<{
   valueChange?: (value: string) => void;
   minHeightPx: number;
   maxHeightPx: number;
+  cyId: string;
 }>;
 
 export const CodeArea = memoNamed<Props>(
   'CodeArea',
-  ({ value, valueChange = () => undefined, minHeightPx, maxHeightPx }) => {
+  ({
+    value,
+    valueChange = () => undefined,
+    minHeightPx,
+    maxHeightPx,
+    cyId,
+  }) => {
     const onChange = useCallback<React.ChangeEventHandler<HTMLTextAreaElement>>(
       (ev) => {
         valueChange(ev.target.value);
@@ -49,6 +56,7 @@ export const CodeArea = memoNamed<Props>(
             color: #ffffff91;
           }
         `}
+        data-cy={cyId}
         style={style}
         value={value}
         onChange={onChange}
