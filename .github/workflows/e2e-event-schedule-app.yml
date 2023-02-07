@@ -56,8 +56,8 @@ jobs:
       - name: build dependencies
         run: yarn zz:cmd:ws-run-stages --recursive -p @noshiro/event-schedule-app -c build
 
-      # - name: ws:build
-      #   run: yarn ws:build
+      - name: build functions
+        run: yarn workspace @noshiro/event-schedule-app-functions build
 
       # - name: create runtimeconfig
       #   run: yarn workspace @noshiro/event-schedule-app z:setup:fb:emulators:gen-dummy-runtimeconfig
