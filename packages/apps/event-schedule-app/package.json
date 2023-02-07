@@ -69,7 +69,7 @@
     "z:setup:service-account-key": "touch ./scripts/service-account-key.json",
     "z:test:impl": "yarn zz:cmd:vitest run",
     "z:test:wireit": "wireit",
-    "z:type-check:impl": "tsc --noEmit",
+    "z:type-check:impl": "tsc --noEmit --project config/tsconfig.src.json",
     "z:type-check:wireit": "wireit",
     "zz:cmd:eslint": "eslint --ext .ts,.tsx --color",
     "zz:cmd:eslint:cy": "yarn zz:cmd:eslint cypress/ --cache --cache-location cypress/.eslintcache",
