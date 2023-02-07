@@ -9,11 +9,14 @@
     "clean:build": "rimraf build",
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:firebase": "rimraf .firebase",
-    "clean:wireit": "rimraf .wireit",
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write .",
-    "lint": "wireit",
-    "lint:fix": "yarn z:lint --fix",
-    "z:lint": "eslint src/ --ext .ts,.tsx --color --cache --cache-location .eslintcache"
+    "clean:wireit": "rimraf .wireit/*/cache",
+    "fmt": "yarn zz:cmd:prettier .",
+    "lint": "yarn z:lint:wireit",
+    "lint:fix": "yarn zz:cmd:lint src/ --fix",
+    "z:lint:impl": "yarn zz:cmd:lint src/",
+    "z:lint:wireit": "wireit",
+    "zz:cmd:lint": "eslint --ext .ts,.tsx --color --cache --cache-location .eslintcache",
+    "zz:cmd:prettier": "prettier --ignore-path ../../../.prettierignore  --write"
   },
   "dependencies": {
     "@noshiro/ts-utils": "*"
@@ -42,8 +45,8 @@
         "yarn.lock"
       ]
     },
-    "lint": {
-      "command": "yarn z:lint",
+    "z:lint:wireit": {
+      "command": "yarn z:lint:impl",
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
