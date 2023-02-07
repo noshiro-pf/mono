@@ -167,16 +167,20 @@ export const NotificationSettingsComponent = memoNamed<Props>(
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
-        <CheckboxesWrapper>
-          <CheckboxWrapper>
+        <div
+          css={css`
+            padding: 5px;
+          `}
+        >
+          <div>
             <BpCheckbox
               checked={notificationSettingsWithEmail.notifyOnAnswerChange}
               disabled={disabled}
               label={dc.notification.notifyOnAnswerChange}
               onCheck={onNotifyOnAnswerChangeCheck}
             />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
+          </div>
+          <div>
             <BpCheckbox
               checked={
                 notificationSettingsWithEmail.notify01daysBeforeAnswerDeadline
@@ -185,8 +189,8 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               label={dc.notification.notify01daysBeforeAnswerDeadline}
               onCheck={onNotify01daysBeforeAnswerDeadlineCheck}
             />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
+          </div>
+          <div>
             <BpCheckbox
               checked={
                 notificationSettingsWithEmail.notify03daysBeforeAnswerDeadline
@@ -195,8 +199,8 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               label={dc.notification.notify03daysBeforeAnswerDeadline}
               onCheck={onNotify03daysBeforeAnswerDeadlineCheck}
             />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
+          </div>
+          <div>
             <BpCheckbox
               checked={
                 notificationSettingsWithEmail.notify07daysBeforeAnswerDeadline
@@ -205,8 +209,8 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               label={dc.notification.notify07daysBeforeAnswerDeadline}
               onCheck={onNotify07daysBeforeAnswerDeadlineCheck}
             />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
+          </div>
+          <div>
             <BpCheckbox
               checked={
                 notificationSettingsWithEmail.notify14daysBeforeAnswerDeadline
@@ -215,8 +219,8 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               label={dc.notification.notify14daysBeforeAnswerDeadline}
               onCheck={onNotify14daysBeforeAnswerDeadlineCheck}
             />
-          </CheckboxWrapper>
-          <CheckboxWrapper>
+          </div>
+          <div>
             <BpCheckbox
               checked={
                 notificationSettingsWithEmail.notify28daysBeforeAnswerDeadline
@@ -225,17 +229,9 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               label={dc.notification.notify28daysBeforeAnswerDeadline}
               onCheck={onNotify28daysBeforeAnswerDeadlineCheck}
             />
-          </CheckboxWrapper>
-        </CheckboxesWrapper>
+          </div>
+        </div>
       </div>
     );
   }
 );
-
-const CheckboxesWrapper = styled.div`
-  padding: 5px;
-`;
-
-const CheckboxWrapper = styled.div`
-  display: flex;
-`;

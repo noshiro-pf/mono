@@ -1,7 +1,7 @@
 import { type Hsl, type Percent } from '@noshiro/ts-utils-additional';
 import { type BaseSyntheticEvent } from 'react';
 import { type Label } from '../../../canvas';
-import { type AppEventHandler } from '../../event-handlers';
+import { type AppEventHandler } from '../../../types';
 import { LabelButtonItemView } from './label-button-item-view';
 
 type Props = Readonly<{

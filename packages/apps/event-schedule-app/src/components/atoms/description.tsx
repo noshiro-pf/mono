@@ -9,7 +9,11 @@ type Props = Readonly<{
 export const Description = memoNamed<Props>(
   'Description',
   ({ text, error = false, color }) => (
-    <Root
+    <div
+      css={css`
+        font-size: smaller;
+        margin-bottom: 5px;
+      `}
       style={{
         color:
           color ??
@@ -17,11 +21,6 @@ export const Description = memoNamed<Props>(
       }}
     >
       {text}
-    </Root>
+    </div>
   )
 );
-
-const Root = styled.div`
-  font-size: smaller;
-  margin-bottom: 5px;
-`;

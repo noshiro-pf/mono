@@ -60,12 +60,15 @@ const HeaderCell = memoNamed<PropsHeaderCell>(
 
     return (
       <DatePickerWeekdayResolved role={'columnheader'} onClick={onClick}>
-        <Abbr title={title}>{abbr}</Abbr>
+        <abbr
+          css={css`
+            text-decoration: none !important;
+          `}
+          title={title}
+        >
+          {abbr}
+        </abbr>
       </DatePickerWeekdayResolved>
     );
   }
 );
-
-const Abbr = styled.abbr`
-  text-decoration: none !important;
-`;

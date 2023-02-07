@@ -36,8 +36,19 @@ export const MainView = memoNamed<Props>(
     undoable,
     redoable,
   }) => (
-    <Root>
-      <PaddedPaper>
+    <div
+      css={css`
+        min-height: 100vh;
+        padding: 20px;
+        user-select: none;
+        -webkit-touch-callout: none;
+      `}
+    >
+      <Paper
+        css={css`
+          padding: 10px;
+        `}
+      >
         <List>
           <ListItem>
             <ListItemAvatar>
@@ -64,13 +75,19 @@ export const MainView = memoNamed<Props>(
             </ListItemText>
           </ListItem>
         </List>
-        <ButtonsWrapper>
-          <ButtonWithMargin>
+        <div
+          css={css`
+            padding: 10px;
+            display: flex;
+            flex-direction: row;
+          `}
+        >
+          <div css={buttonWithMarginStyle}>
             <Button color={'primary'} variant='contained' onClick={rollDices}>
               {'Roll dices!!!'}
             </Button>
-          </ButtonWithMargin>
-          <ButtonWithMargin>
+          </div>
+          <div css={buttonWithMarginStyle}>
             <Button
               color={'secondary'}
               disabled={!undoable}
@@ -79,8 +96,8 @@ export const MainView = memoNamed<Props>(
             >
               {'Undo'}
             </Button>
-          </ButtonWithMargin>
-          <ButtonWithMargin>
+          </div>
+          <div css={buttonWithMarginStyle}>
             <Button
               color={'secondary'}
               disabled={!redoable}
@@ -89,40 +106,23 @@ export const MainView = memoNamed<Props>(
             >
               {'Redo'}
             </Button>
-          </ButtonWithMargin>
-        </ButtonsWrapper>
-        <HistogramWrapper>
+          </div>
+        </div>
+        <div
+          css={css`
+            padding: 20px 10px;
+            height: 350px;
+            width: 350px;
+            max-width: 100%;
+          `}
+        >
           <Histogram sumCount={sumCount} />
-        </HistogramWrapper>
-      </PaddedPaper>
-    </Root>
+        </div>
+      </Paper>
+    </div>
   )
 );
 
-const Root = styled.div`
-  min-height: 100vh;
-  padding: 20px;
-  user-select: none;
-  -webkit-touch-callout: none;
-`;
-
-const PaddedPaper = styled(Paper)`
-  padding: 10px;
-`;
-
-const HistogramWrapper = styled.div`
-  padding: 20px 10px;
-  height: 350px;
-  width: 350px;
-  max-width: 100%;
-`;
-
-const ButtonsWrapper = styled.div`
-  padding: 10px;
-  display: flex;
-  flex-direction: row;
-`;
-
-const ButtonWithMargin = styled.div`
+const buttonWithMarginStyle = css`
   padding: 5px;
 `;

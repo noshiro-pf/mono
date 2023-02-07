@@ -39,7 +39,11 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
     );
 
     return (
-      <Root>
+      <div
+        css={css`
+          padding: 10px;
+        `}
+      >
         <Row>
           <NumericInputWrapper>
             <IconCountNumericInput
@@ -64,27 +68,27 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
         </Row>
 
         <Footer>
-          <SwitchWrapper>
+          <div
+            css={css`
+              margin: 5px 10px;
+            `}
+          >
             <SwitchWithoutLabelStyled
               checked={state.enabled}
               label={dc.enableFilteringSwitchLabel}
               onChange={switchHandler}
             />
-          </SwitchWrapper>
+          </div>
           <Button
             intent={'primary'}
             text={dict.common.buttonText.close}
             onClick={onClose}
           />
         </Footer>
-      </Root>
+      </div>
     );
   }
 );
-
-const Root = styled.div`
-  padding: 10px;
-`;
 
 const numericInputWrapperWidthPx = 120;
 
@@ -102,10 +106,6 @@ const NumericInputWrapper = styled.div`
 const Suffix = styled.div`
   white-space: nowrap;
   margin-left: 5px;
-`;
-
-const SwitchWrapper = styled.div`
-  margin: 5px 10px;
 `;
 
 const Footer = styled.div`

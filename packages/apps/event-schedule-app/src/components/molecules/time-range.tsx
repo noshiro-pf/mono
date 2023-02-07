@@ -15,7 +15,14 @@ export const TimeRangeView = memoNamed<Props>(
     onRangeStartChange,
     timeRange,
   }) => (
-    <TimeRangeWrapper>
+    <div
+      css={css`
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        margin-left: 7px;
+      `}
+    >
       {datetimeSpecification === 'startSpecified' ||
       datetimeSpecification === 'startAndEndSpecified' ? (
         <BpTimePicker
@@ -30,13 +37,6 @@ export const TimeRangeView = memoNamed<Props>(
       datetimeSpecification === 'startAndEndSpecified' ? (
         <BpTimePicker time={timeRange.end} onTimeChange={onRangeEndChange} />
       ) : undefined}
-    </TimeRangeWrapper>
+    </div>
   )
 );
-
-const TimeRangeWrapper = styled.div`
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  margin-left: 7px;
-`;

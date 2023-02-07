@@ -5,7 +5,6 @@ import {
   type FocusEventHandler,
   type InputHTMLAttributes,
 } from 'react';
-import { css } from 'styled-components';
 
 type Props = Partial<
   Readonly<{

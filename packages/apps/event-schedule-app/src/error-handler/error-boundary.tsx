@@ -153,7 +153,11 @@ export class ErrorBoundary extends Component<{}, State> {
     return !hasError ? (
       this.props.children
     ) : (
-      <NonIdealStateRoot>
+      <div
+        css={css`
+          height: 100vh;
+        `}
+      >
         <NonIdealState
           action={
             <Button onClick={this.handleOpenClick}>
@@ -172,12 +176,17 @@ export class ErrorBoundary extends Component<{}, State> {
           <div className={Classes.DIALOG_BODY}>
             <Label>
               {dc.sendReport.log}
-              <PreWithMaxHeight>
+              <Pre
+                css={css`
+                  max-height: 200px;
+                  overflow-y: auto;
+                `}
+              >
                 {Str.from(error)}
                 {isRecord(errorInfo) && hasKey(errorInfo, 'componentStack')
                   ? errorInfo.componentStack
                   : undefined}
-              </PreWithMaxHeight>
+              </Pre>
             </Label>
 
             <FormGroup
@@ -212,19 +221,10 @@ export class ErrorBoundary extends Component<{}, State> {
             </ButtonsWrapperAlignEnd>
           </div>
         </DialogWithMaxWidth>
-      </NonIdealStateRoot>
+      </div>
     );
   }
 }
-
-const NonIdealStateRoot = styled.div`
-  height: 100vh;
-`;
-
-const PreWithMaxHeight = styled(Pre)`
-  max-height: 200px;
-  overflow-y: auto;
-`;
 
 /**
  * @link https://www.asobou.co.jp/blog/web/error-boundary

@@ -82,7 +82,17 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
           </CheckboxWrapper>
         </FilterItem>
         <FilterItemContent>
-          <NumericInputsWrapper>
+          <div
+            css={css`
+              display: flex;
+              margin-right: 40px;
+              margin-bottom: 5px;
+
+              & > * {
+                margin: 3px;
+              }
+            `}
+          >
             <ScoreNumericInput
               disabled={!enabled}
               max={rangeFromProps.max}
@@ -95,7 +105,7 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
               value={rangeFromProps.max}
               onValueChange={onMaxChange}
             />
-          </NumericInputsWrapper>
+          </div>
           <RangeSliderWrapper>
             <BpRangeSlider
               disabled={!enabled}
@@ -112,13 +122,3 @@ export const DetailedFilterScoreRange = memoNamed<Props>(
     );
   }
 );
-
-const NumericInputsWrapper = styled.div`
-  display: flex;
-  margin-right: 40px;
-  margin-bottom: 5px;
-
-  & > * {
-    margin: 3px;
-  }
-`;

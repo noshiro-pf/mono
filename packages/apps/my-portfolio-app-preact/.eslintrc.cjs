@@ -4,48 +4,27 @@
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 /** @typedef { import("../../../config/eslintrc/eslint-rules/rules-type/typescript-eslint-rules").TypeScriptEslintRules } TypeScriptEslintRules */
 
+const { join } = require('node:path');
+
 const {
   restrictedImportsOption,
 } = require('../../../config/eslintrc/eslint-rules');
 
-const {
-  eslintNoRestrictedImportsTsUtilsDef,
-} = require('@noshiro/global-ts-utils/cjs/eslint-no-restricted-imports-def');
-const {
-  eslintNoRestrictedImportsPreactUtilsDef,
-} = require('@noshiro/global-preact-utils/cjs/eslint-no-restricted-imports-def');
-const {
-  eslintNoRestrictedImportsSyncflowDef,
-} = require('@noshiro/global-syncflow/cjs/eslint-no-restricted-imports-def');
-const {
-  eslintNoRestrictedImportsSyncflowPreactHooksDef,
-} = require('@noshiro/global-syncflow-preact-hooks/cjs/eslint-no-restricted-imports-def');
-const {
-  eslintNoRestrictedImportsPreactDef,
-} = require('@noshiro/global-preact/cjs/eslint-no-restricted-imports-def');
-const {
-  eslintNoRestrictedImportsTinyRouterPreactHooksDef,
-} = require('@noshiro/global-tiny-router-preact-hooks/cjs/eslint-no-restricted-imports-def');
-const {
-  eslintNoRestrictedImportsGooberDef,
-} = require('@noshiro/global-goober/cjs/eslint-no-restricted-imports-def');
+const { devDependencies } = require('./package.json');
 
-const { join } = require('path');
+const globalUtils = Object.keys(devDependencies).filter((packageName) =>
+  packageName.startsWith('@noshiro/global-')
+);
+
+const eslintNoRestrictedImportsDefs = globalUtils.map((packageName) =>
+  require(`${packageName}/cjs/eslint-no-restricted-imports-def`)
+);
 
 /** @type {TypeScriptEslintRules["@typescript-eslint/no-restricted-imports"]} */
 const noRestrictedImports = [
   'warn',
   {
-    paths: [
-      ...restrictedImportsOption.paths,
-      eslintNoRestrictedImportsTsUtilsDef,
-      eslintNoRestrictedImportsPreactUtilsDef,
-      eslintNoRestrictedImportsSyncflowDef,
-      eslintNoRestrictedImportsSyncflowPreactHooksDef,
-      eslintNoRestrictedImportsPreactDef,
-      eslintNoRestrictedImportsTinyRouterPreactHooksDef,
-      eslintNoRestrictedImportsGooberDef,
-    ],
+    paths: [...restrictedImportsOption.paths, ...eslintNoRestrictedImportsDefs],
   },
 ];
 

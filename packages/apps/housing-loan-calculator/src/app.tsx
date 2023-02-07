@@ -1,15 +1,27 @@
-// import { uriWithQueryParams } from './utils';
 import { Spinner, SpinnerSize } from '@blueprintjs/core';
-import { useMainHooks } from './app-hooks';
 import { ConfigSection, PaymentTable, SummarySection } from './components';
-import { viewTexts } from './constants';
+import { isCalculating$ } from './store';
 
 export const App = memoNamed('App', () => {
-  const { isCalculating } = useMainHooks();
+  const isCalculating = useObservableValue(isCalculating$);
 
   return (
-    <Root>
-      <Title>{viewTexts.appTitle}</Title>
+    <div
+      css={css`
+        min-height: 100vh;
+        padding: 10px;
+      `}
+    >
+      <div
+        css={css`
+          padding: 10px;
+          font-size: x-large;
+          font-weight: bold;
+          color: white;
+        `}
+      >
+        {dict.appTitle}
+      </div>
       <Section>
         <Paper>
           <ConfigSection />
@@ -37,21 +49,9 @@ export const App = memoNamed('App', () => {
           )}
         </Paper>
       </Section>
-    </Root>
+    </div>
   );
 });
-
-const Root = styled.div`
-  min-height: 100vh;
-  padding: 10px;
-`;
-
-const Title = styled.div`
-  padding: 10px;
-  font-size: x-large;
-  font-weight: bold;
-  color: white;
-`;
 
 const Section = styled.div`
   padding: 5px 0;

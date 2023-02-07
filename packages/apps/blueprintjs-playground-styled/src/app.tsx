@@ -1,8 +1,13 @@
 import { InputGroupView, NumericInputView } from './components';
 
 export const App = memoNamed('App', () => (
-  <Root>
-    <h1>{'Blueprint.js Playground (styled-components)'}</h1>
+  <div
+    css={css`
+      min-height: 100vh;
+      padding: 20px;
+    `}
+  >
+    <h1>{'Blueprint.js Playground (styled in scratch)'}</h1>
 
     <h2>{'NumericInput'}</h2>
     <MarginBox>
@@ -26,13 +31,8 @@ export const App = memoNamed('App', () => (
         onChange={noop}
       />
     </MarginBox>
-  </Root>
+  </div>
 ));
-
-const Root = styled.div`
-  min-height: 100vh;
-  padding: 20px;
-`;
 
 const MarginBox = styled.div`
   margin: 10px;

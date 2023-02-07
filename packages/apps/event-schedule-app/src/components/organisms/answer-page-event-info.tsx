@@ -18,15 +18,57 @@ export const AnswerPageEventInfo = memoNamed<Props>(
     );
 
     return (
-      <Container>
-        <TableLabel1>{dc.eventInfo.eventName}</TableLabel1>
-        <TableValue1>{eventSchedule.title}</TableValue1>
-        <TableLabel2>{dc.eventInfo.notes}</TableLabel2>
-        <TableValue2>
+      <div
+        css={css`
+          display: grid;
+          grid-template-columns: auto 1fr;
+          grid-template-rows: repeat(3, auto);
+          grid-template-areas:
+            'label1 value1'
+            'label2 value2'
+            'label3 value3';
+        `}
+      >
+        <TableLabel
+          css={css`
+            grid-area: label1;
+          `}
+        >
+          {dc.eventInfo.eventName}
+        </TableLabel>
+        <TableValue
+          css={css`
+            grid-area: value1;
+          `}
+        >
+          {eventSchedule.title}
+        </TableValue>
+        <TableLabel
+          css={css`
+            grid-area: label2;
+          `}
+        >
+          {dc.eventInfo.notes}
+        </TableLabel>
+        <TableValue
+          css={css`
+            grid-area: value2;
+          `}
+        >
           <AnswerPageNotes notes={eventSchedule.notes} />
-        </TableValue2>
-        <TableLabel3>{dc.eventInfo.answerDeadline}</TableLabel3>
-        <TableValue3>
+        </TableValue>
+        <TableLabel
+          css={css`
+            grid-area: label3;
+          `}
+        >
+          {dc.eventInfo.answerDeadline}
+        </TableLabel>
+        <TableValue
+          css={css`
+            grid-area: value3;
+          `}
+        >
           {eventSchedule.answerDeadline === 'none' ? (
             <div>{dict.answerPage.eventInfo.noAnswerDeadline}</div>
           ) : (
@@ -42,21 +84,11 @@ export const AnswerPageEventInfo = memoNamed<Props>(
               />
             </>
           )}
-        </TableValue3>
-      </Container>
+        </TableValue>
+      </div>
     );
   }
 );
-
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: repeat(3, auto);
-  grid-template-areas:
-    'label1 value1'
-    'label2 value2'
-    'label3 value3';
-`;
 
 const TableCell = styled.div`
   padding-top: 3px;
@@ -72,30 +104,10 @@ const TableLabel = styled(TableCell)`
   font-weight: bolder;
 `;
 
-const TableLabel1 = styled(TableLabel)`
-  grid-area: label1;
-`;
-const TableLabel2 = styled(TableLabel)`
-  grid-area: label2;
-`;
-const TableLabel3 = styled(TableLabel)`
-  grid-area: label3;
-`;
-
 const TableValue = styled(TableCell)`
   grid-area: value;
   white-space: pre-line;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-const TableValue1 = styled(TableValue)`
-  grid-area: value1;
-`;
-const TableValue2 = styled(TableValue)`
-  grid-area: value2;
-`;
-const TableValue3 = styled(TableValue)`
-  grid-area: value3;
 `;

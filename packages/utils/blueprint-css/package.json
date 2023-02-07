@@ -12,7 +12,8 @@
     "resources/icons/*"
   ],
   "scripts": {
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write ."
+    "fmt": "yarn zz:cmd:prettier .",
+    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../.prettierignore --write"
   },
   "devDependencies": {
     "normalize.css": "^8.0.1"

@@ -1,10 +1,10 @@
 /* eslint-disable import/no-internal-modules */
 
-import type {
-  Answer as AnswerCurr,
-  EventSchedule as EventScheduleCurr,
+import {
+  firestorePaths as firestorePathsCurr,
+  type Answer as AnswerCurr,
+  type EventSchedule as EventScheduleCurr,
 } from '@noshiro/event-schedule-app-shared/cjs/v5';
-import { firestorePaths as firestorePathsCurr } from '@noshiro/event-schedule-app-shared/cjs/v5';
 import {
   fillAnswer,
   fillEventSchedule,

@@ -8,28 +8,29 @@ type Props = Readonly<{
 }>;
 
 export const ColorList = memoNamed<Props>('ColorList', (props) => (
-  <ColorsWrapper>
+  <div
+    css={css`
+      padding: 10px;
+    `}
+  >
     <div>{'色相リスト'}</div>
-    <Colors>
+    <div
+      css={css`
+        display: flex;
+        flex-direction: row;
+        padding: 10px;
+      `}
+    >
       {props.hueList.map((hue) => (
-        <ColorItemWrapper key={hue}>
+        <div
+          key={hue}
+          css={css`
+            padding: 3px;
+          `}
+        >
           <ColorItem hsl={[hue, props.saturation, props.lightness]} />
-        </ColorItemWrapper>
+        </div>
       ))}
-    </Colors>
-  </ColorsWrapper>
+    </div>
+  </div>
 ));
-
-const ColorsWrapper = styled.div`
-  padding: 10px;
-`;
-
-const Colors = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 10px;
-`;
-
-const ColorItemWrapper = styled.div`
-  padding: 3px;
-`;

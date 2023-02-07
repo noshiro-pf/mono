@@ -1,6 +1,6 @@
 import { type Percent } from '@noshiro/ts-utils-additional';
 import { type Label } from '../../canvas';
-import { type AppEventHandler } from '../event-handlers';
+import { type AppEventHandler } from '../../types';
 import { LabelButtons } from './label-button';
 
 type Props = Readonly<{
@@ -14,7 +14,15 @@ type Props = Readonly<{
 }>;
 
 export const Sidebar = memoNamed<Props>('Sidebar', (props) => (
-  <Root>
+  <div
+    css={css`
+      width: 100%;
+      height: 100%;
+      background-color: #5a5a5a;
+      color: white;
+      padding: 10px;
+    `}
+  >
     <LabelButtons
       handlers={props.handlers}
       hidden={props.hidden}
@@ -24,13 +32,5 @@ export const Sidebar = memoNamed<Props>('Sidebar', (props) => (
       selectedLabel={props.selectedLabel}
       visibleLabels={props.visibleLabels}
     />
-  </Root>
+  </div>
 ));
-
-const Root = styled.div`
-  width: 100%;
-  height: 100%;
-  background-color: #5a5a5a;
-  color: white;
-  padding: 10px;
-`;

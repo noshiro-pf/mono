@@ -32,49 +32,51 @@ export const AnnotationCanvas = memoNamed<Props>(
     );
 
     return (
-      <Root style={rootStyle}>
-        <RelativeWrapper>
-          <AbsoluteWrapper>
+      <div
+        css={css`
+          background-image: url(${bgCheckerboardImg});
+        `}
+        style={rootStyle}
+      >
+        <div
+          css={css`
+            position: relative;
+            width: 100%;
+            height: 100%;
+          `}
+        >
+          <div css={absoluteWrapperStyle}>
             <div style={imgWrapperStyle}>
-              <Img src={SampleImage} />
+              <img
+                css={css`
+                  display: block;
+                  width: 100%;
+                  height: 100%;
+                  object-fit: contain;
+                  user-select: none;
+                `}
+                src={SampleImage}
+              />
             </div>
-          </AbsoluteWrapper>
-          <AbsoluteWrapper>
+          </div>
+          <div css={absoluteWrapperStyle}>
             <CanvasMain
               canvasSize={props.canvasSize}
               canvasStyles={props.canvasStyles}
               idMaker={idMaker}
               selectedHue={props.selectedHue}
             />
-          </AbsoluteWrapper>
-        </RelativeWrapper>
-      </Root>
+          </div>
+        </div>
+      </div>
     );
   }
 );
 
-const Root = styled.div`
-  background-image: url(${bgCheckerboardImg});
-`;
-
-const RelativeWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-`;
-
-const AbsoluteWrapper = styled.div`
+const absoluteWrapperStyle = css`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-`;
-
-const Img = styled.img`
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  user-select: none;
 `;

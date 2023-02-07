@@ -53,11 +53,14 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: ws:setup
-        run: yarn ws:setup
+      - name: build dependencies
+        run: yarn zz:cmd:ws-run-stages --recursive -p @noshiro/event-schedule-app -c build
 
-      - name: create runtimeconfig
-        run: yarn workspace @noshiro/event-schedule-app fb:emulators:gen-dummy-runtimeconfig
+      - name: build functions
+        run: yarn workspace @noshiro/event-schedule-app-functions build
+
+      # - name: create runtimeconfig
+      #   run: yarn workspace @noshiro/event-schedule-app z:setup:fb:emulators:gen-dummy-runtimeconfig
 
       # - name: Cypress install
       #   uses: cypress-io/github-action@v2

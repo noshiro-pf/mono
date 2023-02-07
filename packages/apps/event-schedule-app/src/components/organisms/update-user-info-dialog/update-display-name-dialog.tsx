@@ -22,7 +22,12 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
     return (
       <UpdateUserInfoDialogTemplate
         body={
-          <Content>
+          <div
+            css={css`
+              width: 300px;
+              height: 80px;
+            `}
+          >
             <FormGroup
               helperText={formState.displayName.error}
               intent={displayNameFormIntent}
@@ -39,7 +44,7 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
                 }
               />
             </FormGroup>
-          </Content>
+          </div>
         }
         closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
@@ -59,8 +64,3 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
     );
   }
 );
-
-const Content = styled.div`
-  width: 300px;
-  height: 80px;
-`;

@@ -7,16 +7,20 @@ export const DataItem = memoNamed<Props>(
   'DataItem',
   ({ title, description }) => (
     <>
-      <DataTitle>{title}</DataTitle>
-      <DataDescription>{description}</DataDescription>
+      <dt
+        css={css`
+          padding: 5px;
+        `}
+      >
+        {title}
+      </dt>
+      <dd
+        css={css`
+          padding: 5px;
+        `}
+      >
+        {description}
+      </dd>
     </>
   )
 );
-
-const DataTitle = styled.dt`
-  padding: 5px;
-`;
-
-const DataDescription = styled.dd`
-  padding: 5px;
-`;

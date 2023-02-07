@@ -1,14 +1,14 @@
 /* eslint-disable import/no-internal-modules */
-import type {
-  Answer as AnswerV2,
-  EventSchedule as EventScheduleV2,
+import {
+  type Answer as AnswerV2,
+  type EventSchedule as EventScheduleV2,
 } from '@noshiro/event-schedule-app-shared/cjs/v2';
-import type {
-  Answer as AnswerV3,
-  AnswerId,
-  EventSchedule as EventScheduleV3,
-  UserName,
-  Weight,
+import {
+  type Answer as AnswerV3,
+  type AnswerId,
+  type EventSchedule as EventScheduleV3,
+  type UserName,
+  type Weight,
 } from '@noshiro/event-schedule-app-shared/cjs/v3';
 
 const eventScheduleExampleV2: EventScheduleV2 = {
@@ -129,7 +129,7 @@ const eventScheduleExampleV3: EventScheduleV3 = {
 const answersExampleV2: readonly AnswerV2[] = [
   {
     id: 'SLuMolYBthCjcHCnvW24' as AnswerId,
-    createdAt: 1624732632134,
+    createdAt: 1_624_732_632_134,
     userName: 'Carol' as UserName,
     comment: '',
     isRequiredParticipants: false,
@@ -170,7 +170,7 @@ const answersExampleV2: readonly AnswerV2[] = [
   },
   {
     id: 'YWTREKVx4Wf4owicQBoc' as AnswerId,
-    createdAt: 1615363320667,
+    createdAt: 1_615_363_320_667,
     userName: 'Bob' as UserName,
     comment: '',
     isRequiredParticipants: true,
@@ -211,7 +211,7 @@ const answersExampleV2: readonly AnswerV2[] = [
   },
   {
     id: 'brTRiK8cUgFtmGcBJW5q' as AnswerId,
-    createdAt: 1615279702147,
+    createdAt: 1_615_279_702_147,
     userName: 'Alice' as UserName,
     comment: '',
     isRequiredParticipants: false,
@@ -255,7 +255,7 @@ const answersExampleV2: readonly AnswerV2[] = [
 const answersExampleV3: readonly AnswerV3[] = [
   {
     id: 'SLuMolYBthCjcHCnvW24' as AnswerId,
-    createdAt: 1624732632134,
+    createdAt: 1_624_732_632_134,
     userName: 'Carol' as UserName,
     comment: '',
     isRequiredParticipants: false,
@@ -299,7 +299,7 @@ const answersExampleV3: readonly AnswerV3[] = [
   },
   {
     id: 'YWTREKVx4Wf4owicQBoc' as AnswerId,
-    createdAt: 1615363320667,
+    createdAt: 1_615_363_320_667,
     userName: 'Bob' as UserName,
     comment: '',
     isRequiredParticipants: true,
@@ -343,7 +343,7 @@ const answersExampleV3: readonly AnswerV3[] = [
   },
   {
     id: 'brTRiK8cUgFtmGcBJW5q' as AnswerId,
-    createdAt: 1615279702147,
+    createdAt: 1_615_279_702_147,
     userName: 'Alice' as UserName,
     comment: '',
     isRequiredParticipants: false,

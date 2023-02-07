@@ -1,4 +1,3 @@
-import { viewTexts } from '../../constants';
 import {
   setBorrowingPeriodYear,
   setDownPaymentManYen,
@@ -6,7 +5,7 @@ import {
   setPropertyPriceManYen,
   setRepaymentType,
   store$,
-} from '../../observables';
+} from '../../store';
 import { BpNumericInputWithLabel } from '../blueprint-wrapper';
 import { RepaymentTypeRadioGroup } from './repayment-type-radio-group';
 
@@ -21,10 +20,10 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
 
   return (
     <>
-      <SectionTitle>{viewTexts.settings}</SectionTitle>
+      <SectionTitle>{dict.settings}</SectionTitle>
       <ConfigElement>
         <BpNumericInputWithLabel
-          label={viewTexts.downPaymentManYen}
+          label={dict.downPaymentManYen}
           min={0}
           value={downPaymentManYen}
           onValueChange={setDownPaymentManYen}
@@ -32,7 +31,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
-          label={viewTexts.propertyPriceManYen}
+          label={dict.propertyPriceManYen}
           min={0}
           value={propertyPriceManYen}
           onValueChange={setPropertyPriceManYen}
@@ -40,7 +39,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
-          label={viewTexts.borrowingPeriodYear}
+          label={dict.borrowingPeriodYear}
           min={1}
           value={borrowingPeriodYear}
           onValueChange={setBorrowingPeriodYear}
@@ -48,7 +47,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
-          label={viewTexts.interestRatePerYear}
+          label={dict.interestRatePerYear}
           max={100}
           min={0}
           value={interestRatePercentPerYear}

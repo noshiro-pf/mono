@@ -70,36 +70,34 @@ export const LabelButtonItemView = memoNamed<Props>(
       [disabled, props]
     );
 
-    const EyeIconWrapperConditional = useMemo(
-      () => (disabled ? IconWrapper : IconButtonWrapper),
-      [disabled]
-    );
-
     return (
-      <Root>
+      <div
+        css={css`
+          padding-bottom: 5px;
+        `}
+      >
         <LabelButtonItemBodyComponentConditional
           style={buttonBgStyleConditional}
           onClick={onLabelClickConditional}
         >
           <Icon icon={'tick'} style={isSelectedIconStyle} />
           <LabelButtonText>{props.labelText}</LabelButtonText>
-          <EyeIconWrapperConditional onClick={onVisibilityIconClickConditional}>
+          <div
+            css={disabled ? iconWrapperStyle : iconButtonWrapperStyle}
+            onClick={onVisibilityIconClickConditional}
+          >
             <Icon
               icon={props.isVisible ? 'eye-open' : 'eye-off'}
               iconSize={IconSize.LARGE}
             />
-          </EyeIconWrapperConditional>
+          </div>
         </LabelButtonItemBodyComponentConditional>
-      </Root>
+      </div>
     );
   }
 );
 
-const Root = styled.div`
-  padding-bottom: 5px;
-`;
-
-const IconWrapper = styled.div`
+const iconWrapperStyle = css`
   height: 30px;
   width: 40px;
   border-radius: 20px;
@@ -110,7 +108,8 @@ const IconWrapper = styled.div`
   align-items: center;
 `;
 
-const IconButtonWrapper = styled(IconWrapper)`
+const iconButtonWrapperStyle = css`
+  ${iconWrapperStyle}
   &:hover {
     opacity: 0.5;
   }

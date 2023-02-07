@@ -5,7 +5,6 @@ import {
   type FocusEventHandler,
   type InputHTMLAttributes,
 } from 'react';
-import { css } from 'styled-components';
 import {
   ptButton,
   ptButtonBase,

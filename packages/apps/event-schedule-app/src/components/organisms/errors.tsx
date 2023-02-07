@@ -11,7 +11,11 @@ type Props = Readonly<{
 export const EventSchedulePropertiesErrors = memoNamed<Props>(
   'EventSchedulePropertiesErrors',
   ({ eventScheduleValidation }) => (
-    <ErrorMessagesWrapper>
+    <div
+      css={css`
+        margin: 10px;
+      `}
+    >
       {eventScheduleValidation.title ? undefined : (
         <Description
           color={errorFontColor}
@@ -42,10 +46,6 @@ export const EventSchedulePropertiesErrors = memoNamed<Props>(
           text={dc.errorMessages.answerIcons}
         />
       )}
-    </ErrorMessagesWrapper>
+    </div>
   )
 );
-
-const ErrorMessagesWrapper = styled.div`
-  margin: 10px;
-`;

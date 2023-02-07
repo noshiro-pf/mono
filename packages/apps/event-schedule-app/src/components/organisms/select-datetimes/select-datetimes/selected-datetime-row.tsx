@@ -23,52 +23,53 @@ export const SelectedDatetimeRow = memoNamed<Props>(
     onDuplicateClick,
     onDeleteClick,
   }) => (
-    <Root data-cy={'selected-datetime-row'}>
-      <DatetimeWrapper>
-        <YmdWrapper>
+    <div
+      css={css`
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        margin-bottom: 5px;
+        justify-content: space-between;
+      `}
+      data-cy={'selected-datetime-row'}
+    >
+      <div
+        css={css`
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+        `}
+      >
+        <div
+          css={css`
+            margin-top: 3px;
+            margin-bottom: 3px;
+          `}
+        >
           <BpDatePicker
             closeOnSelection={true}
             ymd={datetimeRange.ymd}
             onYmdChange={onYmdChange}
           />
-        </YmdWrapper>
+        </div>
         <TimeRangeView
           datetimeSpecification={datetimeSpecification}
           timeRange={datetimeRange.timeRange}
           onRangeEndChange={onRangeEndChange}
           onRangeStartChange={onRangeStartChange}
         />
-      </DatetimeWrapper>
+      </div>
 
-      <ButtonsWrapper>
+      <div
+        css={css`
+          display: flex;
+          flex-wrap: nowrap;
+          margin-left: 5px;
+        `}
+      >
         <Button icon={'duplicate'} minimal={true} onClick={onDuplicateClick} />
         <Button icon={'trash'} minimal={true} onClick={onDeleteClick} />
-      </ButtonsWrapper>
-    </Root>
+      </div>
+    </div>
   )
 );
-
-const Root = styled.div`
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  margin-bottom: 5px;
-  justify-content: space-between;
-`;
-
-const DatetimeWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const YmdWrapper = styled.div`
-  margin-top: 3px;
-  margin-bottom: 3px;
-`;
-
-const ButtonsWrapper = styled.div`
-  display: flex;
-  flex-wrap: nowrap;
-  margin-left: 5px;
-`;

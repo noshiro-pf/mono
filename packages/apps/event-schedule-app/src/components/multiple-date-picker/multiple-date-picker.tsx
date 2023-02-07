@@ -52,7 +52,14 @@ export const MultipleDatePicker = memoNamed<Props>(
       <div>
         <DatePickerStyled>
           <DayPickerStyled lang='en'>
-            <CenteringWrapper tabIndex={0}>
+            <div
+              css={css`
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+              `}
+              tabIndex={0}
+            >
               <DatepickerNav
                 month={calendarCurrentPage.month}
                 year={calendarCurrentPage.year}
@@ -74,24 +81,18 @@ export const MultipleDatePicker = memoNamed<Props>(
                   ))}
                 </DatePickerBodyStyled>
               </DatePickerMonthStyled>
-            </CenteringWrapper>
+            </div>
           </DayPickerStyled>
         </DatePickerStyled>
-        <TodayWrapper>
+        <div
+          css={css`
+            display: flex;
+            justify-content: center;
+          `}
+        >
           <Button onClick={onTodayClick}>{'Today'}</Button>
-        </TodayWrapper>
+        </div>
       </div>
     );
   }
 );
-
-const CenteringWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const TodayWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;

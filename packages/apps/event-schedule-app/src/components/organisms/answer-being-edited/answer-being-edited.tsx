@@ -86,7 +86,11 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   dc.nameIsRequired
                 )
               ) : (
-                <Spacer />
+                <div
+                  css={css`
+                    height: 1rem;
+                  `}
+                />
               )
             }
             intent={showUserNameError ? 'danger' : 'primary'}
@@ -102,8 +106,20 @@ export const AnswerBeingEdited = memoNamed<Props>(
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
-        <TableWrapper>
-          <Table>
+        <div
+          css={css`
+            overflow-x: auto;
+            margin-bottom: 15px;
+          `}
+        >
+          <HTMLTableBorderedStyled2
+            css={css`
+              th,
+              td {
+                padding: 6px;
+              }
+            `}
+          >
             <thead>
               {iconHeader === undefined ? undefined : (
                 <tr>
@@ -203,7 +219,12 @@ export const AnswerBeingEdited = memoNamed<Props>(
                         onClick={buttons.poor.onClick}
                       />
                     </td>
-                    <TdWithMaxWidth>
+                    <td
+                      css={css`
+                        min-width: 87px;
+                        max-width: 87px;
+                      `}
+                    >
                       {match(iconId, {
                         none: undefined,
                         good: <AnswerIconGoodPoint />,
@@ -216,9 +237,13 @@ export const AnswerBeingEdited = memoNamed<Props>(
                           />
                         ),
                       })}
-                    </TdWithMaxWidth>
+                    </td>
                     <td>
-                      <TextArea
+                      <BpTextArea
+                        css={css`
+                          resize: vertical;
+                          min-height: 38px;
+                        `}
                         rows={1}
                         value={comment}
                         onValueChange={onCellCommentChange}
@@ -228,8 +253,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
                 )
               )}
             </tbody>
-          </Table>
-        </TableWrapper>
+          </HTMLTableBorderedStyled2>
+        </div>
         <WidthRestrictedInputWrapper>
           <FormGroup label={dc.comments}>
             <BpTextArea
@@ -251,12 +276,16 @@ export const AnswerBeingEdited = memoNamed<Props>(
           />
         </Paragraph>
         <Paragraph>
-          <WeightSettingWrapper>
+          <div
+            css={css`
+              margin-bottom: 5px;
+            `}
+          >
             <WeightSetting
               weight={answerBeingEdited.weight}
               onWeightChange={AnswerPageStore.onWeightChange}
             />
-          </WeightSettingWrapper>
+          </div>
           {Arr.map(dc.weight.description, (d, i) => (
             <Description key={i} text={d} />
           ))}
@@ -319,36 +348,6 @@ export const AnswerBeingEdited = memoNamed<Props>(
   }
 );
 
-const TableWrapper = styled.div`
-  overflow-x: auto;
-  margin-bottom: 15px;
-`;
-
-const Table = styled(HTMLTableBorderedStyled2)`
-  th,
-  td {
-    padding: 6px;
-  }
-`;
-
-const TdWithMaxWidth = styled.td`
-  min-width: 87px;
-  max-width: 87px;
-`;
-
-const TextArea = styled(BpTextArea)`
-  resize: vertical;
-  min-height: 38px;
-`;
-
-const Spacer = styled.div`
-  height: 1rem;
-`;
-
 const Paragraph = styled.div`
   margin: 20px 0;
-`;
-
-const WeightSettingWrapper = styled.div`
-  margin-bottom: 5px;
 `;

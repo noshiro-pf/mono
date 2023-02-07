@@ -55,7 +55,14 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
     );
 
     return (
-      <Root data-cy={'icon-settings'}>
+      <div
+        css={css`
+          & > * {
+            margin-bottom: 5px;
+          }
+        `}
+        data-cy={'icon-settings'}
+      >
         <div>{dc.title}</div>
         <Description text={dc.description} />
         <AnswerIconRow
@@ -76,13 +83,7 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
           onDescriptionChange={onNgDescriptionChange}
           onPointChange={noop}
         />
-      </Root>
+      </div>
     );
   }
 );
-
-const Root = styled.div`
-  & > * {
-    margin-bottom: 5px;
-  }
-`;

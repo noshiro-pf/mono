@@ -16,9 +16,26 @@ const dc = dict.eventSettingsPage.diff;
 export const EventScheduleDiff = memoNamed<Props>(
   'EventScheduleDiff',
   ({ diff }) => (
-    <Wrapper>
-      <BorderedWrapper>
-        <Title>{dc.title}</Title>
+    <div
+      css={css`
+        margin: 10px 20px;
+      `}
+    >
+      <div
+        css={css`
+          padding: 15px 20px;
+          border-radius: 5px;
+          border-style: solid;
+          border-color: gray;
+        `}
+      >
+        <div
+          css={css`
+            margin: 5px;
+          `}
+        >
+          {dc.title}
+        </div>
         <ul>
           {list1.map((li) =>
             mapOptional(diff[li], (s) => (
@@ -127,22 +144,7 @@ export const EventScheduleDiff = memoNamed<Props>(
             </li>
           )}
         </ul>
-      </BorderedWrapper>
-    </Wrapper>
+      </div>
+    </div>
   )
 );
-
-const Wrapper = styled.div`
-  margin: 10px 20px;
-`;
-
-const BorderedWrapper = styled.div`
-  padding: 15px 20px;
-  border-radius: 5px;
-  border-style: solid;
-  border-color: gray;
-`;
-
-const Title = styled.div`
-  margin: 5px;
-`;

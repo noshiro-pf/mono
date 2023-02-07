@@ -58,8 +58,25 @@ export const DetailedFilterIconOfSpecifiedRespondent = memoNamed<Props>(
 
       <FilterItemContent>
         {Arr.map(checkState, (respondent, index) => (
-          <Row key={index}>
-            <Username>{respondent.username}</Username>
+          <div
+            key={index}
+            css={css`
+              display: flex;
+              align-items: center;
+            `}
+          >
+            <div
+              css={css`
+                width: 60px;
+                margin-right: 10px;
+                overflow-x: hidden;
+                white-space: nowrap;
+                display: inline-block;
+                text-overflow: ellipsis;
+              `}
+            >
+              {respondent.username}
+            </div>
             <HorizontalCheckboxesWrapper>
               <CheckboxWithRightLabel>
                 <CheckboxView
@@ -121,26 +138,12 @@ export const DetailedFilterIconOfSpecifiedRespondent = memoNamed<Props>(
                 </CheckboxLabel>
               </CheckboxWithRightLabel>
             </HorizontalCheckboxesWrapper>
-          </Row>
+          </div>
         ))}
       </FilterItemContent>
     </>
   )
 );
-
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const Username = styled.div`
-  width: 60px;
-  margin-right: 10px;
-  overflow-x: hidden;
-  white-space: nowrap;
-  display: inline-block;
-  text-overflow: ellipsis;
-`;
 
 const CheckboxLabel = styled.div`
   margin-left: 5px;
