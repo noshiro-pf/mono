@@ -10,7 +10,8 @@
   "types": "goober.d.ts",
   "typings": "./goober.d.ts",
   "scripts": {
-    "fmt": "prettier --ignore-path ../../../.prettierignore  --write ."
+    "fmt": "yarn zz:cmd:prettier .",
+    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../.prettierignore --write"
   },
   "peerDependencies": {
     "csstype": "^2.6.2"

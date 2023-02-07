@@ -1,10 +1,8 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.base.json",
+  "extends": "../../../config/tsconfig/tsconfig.lib.cjs.nolib.json",
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "CommonJS",
-    "declaration": true
+    "lib": ["dom", "dom.iterable", "esnext"]
   },
   "include": ["src/20201016_namespaces"]
 }

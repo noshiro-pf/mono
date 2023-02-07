@@ -21,14 +21,23 @@ export const ParagraphWithSwitch = memoNamed<Props>(
     description,
   }) => (
     <div>
-      <SwitchWrapper>
+      <div
+        css={css`
+          display: flex;
+          align-items: center;
+          margin-bottom: 5px;
+          & > * {
+            margin-right: 5px;
+          }
+        `}
+      >
         <div>{title}</div>
         <SwitchWithoutLabelStyled
           checked={toggleState}
           inline={true}
           onChange={onToggle}
         />
-      </SwitchWrapper>
+      </div>
       {description === undefined
         ? undefined
         : Arr.map(description, (d, i) => <Description key={i} text={d} />)}
@@ -36,12 +45,3 @@ export const ParagraphWithSwitch = memoNamed<Props>(
     </div>
   )
 );
-
-const SwitchWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-  & > * {
-    margin-right: 5px;
-  }
-`;

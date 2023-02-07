@@ -8,11 +8,14 @@
   "scripts": {
     "build:apps": "node scripts/build-apps.js",
     "build:utils": "node scripts/build-utils.js",
-    "check:no-diff": "scripts/git_no_changes.sh",
-    "ci": "run-s ws:setup ws:gi ws:type-check ws:build fmt:all ws:lint:fix:fast ws:test:fast type-check:root check:no-diff",
-    "ci:local": "yarn clean && yarn install && yarn ci",
-    "clean": "run-p clean:node_modules clean:caches clean:build",
+    "ci": "run-s type-check:root ws:build ws:gi zz:cmd:check:no-diff ws:type-check ws:test fmt:all zz:cmd:check:no-diff ws:lint:fix zz:cmd:check:no-diff",
+    "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
+    "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",
+    "ci:clean-install": "run-s clean ci:install ci",
+    "ci:install": "yarn",
+    "clean": "run-s clean:build-and-cache clean:node_modules",
     "clean:build": "run-p ws:clean:build",
+    "clean:build-and-cache": "run-p clean:build clean:caches",
     "clean:caches": "run-p ws:clean:eslintcache ws:clean:wireit",
     "clean:gitignored": "git clean -xfd",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
@@ -20,36 +23,34 @@
     "create:react-app:vite": "scripts/create_new_react_app_vite.sh",
     "create:slides": "scripts/create_new_slides.sh",
     "create:util": "scripts/create_new_util.sh",
-    "fmt:all": "prettier --write . > /dev/null",
+    "fmt:all": "prettier --write --cache --cache-strategy content . > /dev/null",
+    "fmt:all:no-cache": "prettier --write . > /dev/null",
     "gen-eslint-rules-type": "wireit",
     "lint:apps": "node scripts/lint-apps.js",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "lint:utils": "node scripts/lint-utils.js",
     "pub:all": "scripts/publish.sh",
-    "setup:all": "run-s setup:root ws:setup",
-    "setup:root": "run-s z:gen-eslint-rules-type:compile gen-eslint-rules-type",
-    "type-check:root": "run-s type-check:root:scripts type-check:root:configs",
-    "type-check:root:configs": "tsc --project config/tsconfig.json",
-    "type-check:root:scripts": "tsc --project scripts/tsconfig.json",
-    "ws:build": "yarn z:ws-run-stages build",
-    "ws:clean": "yarn z:ws-run-parallel clean",
-    "ws:clean:build": "yarn z:ws-run-parallel clean:build",
-    "ws:clean:eslintcache": "yarn z:ws-run-parallel clean:eslintcache",
-    "ws:clean:wireit": "yarn z:ws-run-parallel clean:wireit",
-    "ws:gi": "yarn z:ws-run-parallel gi",
-    "ws:lint": "yarn z:ws-run-serial lint",
-    "ws:lint:fast": "yarn z:ws-run-parallel lint",
-    "ws:lint:fix": "yarn z:ws-run-serial lint:fix",
-    "ws:lint:fix:fast": "yarn z:ws-run-parallel lint:fix",
-    "ws:setup": "yarn z:ws-run-stages setup",
-    "ws:test": "yarn z:ws-run-serial test",
-    "ws:test:fast": "yarn z:ws-run-parallel test",
-    "ws:type-check": "yarn z:ws-run-parallel z:wireit:type-check",
+    "type-check:root": "run-p z:type-check:root:*:wireit",
+    "ws:build": "yarn zz:cmd:ws-run-stages build",
+    "ws:clean": "yarn zz:cmd:ws-run-parallel clean",
+    "ws:clean:build": "yarn zz:cmd:ws-run-parallel clean:build",
+    "ws:clean:eslintcache": "yarn zz:cmd:ws-run-parallel clean:eslintcache",
+    "ws:clean:wireit": "yarn zz:cmd:ws-run-parallel clean:wireit",
+    "ws:gi": "yarn zz:cmd:ws-run-parallel gi",
+    "ws:lint": "yarn zz:cmd:ws-run-parallel lint",
+    "ws:lint:fix": "yarn zz:cmd:ws-run-parallel lint:fix",
+    "ws:test": "yarn zz:cmd:ws-run-parallel test",
+    "ws:type-check": "yarn zz:cmd:ws-run-parallel z:type-check:wireit",
     "z:gen-eslint-rules-type:compile": "wireit",
-    "z:ws-run": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
-    "z:ws-run-parallel": "yarn z:ws-run --parallel --concurrency 5",
-    "z:ws-run-serial": "yarn z:ws-run --serial",
-    "z:ws-run-stages": "yarn z:ws-run --stages"
+    "z:type-check:root:configs:impl": "tsc --project config/tsconfig.json",
+    "z:type-check:root:configs:wireit": "wireit",
+    "z:type-check:root:scripts:impl": "tsc --project scripts/tsconfig.json",
+    "z:type-check:root:scripts:wireit": "wireit",
+    "zz:cmd:check:no-diff": "scripts/git_no_changes.sh",
+    "zz:cmd:ws-run": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
+    "zz:cmd:ws-run-parallel": "yarn zz:cmd:ws-run --parallel --concurrency 5",
+    "zz:cmd:ws-run-serial": "yarn zz:cmd:ws-run --serial",
+    "zz:cmd:ws-run-stages": "yarn zz:cmd:ws-run --stages"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
@@ -155,7 +156,7 @@
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.8.0",
     "webpack-node-externals": "^3.0.0",
-    "wireit": "0.5.0",
+    "wireit": "^0.9.4",
     "wsrun": "^5.2.4"
   },
   "engines": {
@@ -173,9 +174,6 @@
       ],
       "output": [
         "config/eslintrc/eslint-rules/rules-type/**/*.ts"
-      ],
-      "packageLocks": [
-        "yarn.lock"
       ]
     },
     "z:gen-eslint-rules-type:compile": {
@@ -193,9 +191,18 @@
       "output": [
         "config/eslintrc/generate-rules-type/generate-rules-type.js",
         "config/eslintrc/generate-rules-type/index.js"
-      ],
-      "packageLocks": [
-        "yarn.lock"
+      ]
+    },
+    "z:type-check:root:configs:wireit": {
+      "command": "yarn z:type-check:root:configs:impl",
+      "dependencies": [
+        "./packages/utils/ts-type-utils:build"
+      ]
+    },
+    "z:type-check:root:scripts:wireit": {
+      "command": "yarn z:type-check:root:scripts:impl",
+      "dependencies": [
+        "./packages/utils/ts-type-utils:build"
       ]
     }
   }

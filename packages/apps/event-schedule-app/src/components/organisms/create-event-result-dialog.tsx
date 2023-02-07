@@ -51,18 +51,37 @@ export const CreateEventResultDialog = memoNamed<Props>(
           ) : (
             <>
               <p>{dc.description}</p>
-              <UrlWrapper data-cy={'url-wrapper'}>
+              <div
+                css={css`
+                  display: flex;
+                  align-items: center;
+                  flex-wrap: nowrap;
+                `}
+                data-cy={'url-wrapper'}
+              >
                 <div>{'URL: '}</div>
-                <AnchorWrapper>
-                  <Anchor
+                <div
+                  css={css`
+                    flex-shrink: 1;
+                    min-width: 0;
+                  `}
+                >
+                  <a
+                    css={css`
+                      display: block;
+                      margin: 0 5px;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      white-space: nowrap;
+                    `}
                     href={url}
                     rel={'noopener noreferrer'}
                     target={'_blank'}
                     onClick={onLinkClick}
                   >
                     {url}
-                  </Anchor>
-                </AnchorWrapper>
+                  </a>
+                </div>
                 <div>
                   <Tooltip2 content={dc.clipboardButton}>
                     <Button
@@ -73,7 +92,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
                     />
                   </Tooltip2>
                 </div>
-              </UrlWrapper>
+              </div>
             </>
           )}
         </div>
@@ -112,22 +131,3 @@ export const CreateEventResultDialog = memoNamed<Props>(
     );
   }
 );
-
-const UrlWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-`;
-
-const Anchor = styled.a`
-  display: block;
-  margin: 0 5px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-`;
-
-const AnchorWrapper = styled.div`
-  flex-shrink: 1;
-  min-width: 0;
-`;

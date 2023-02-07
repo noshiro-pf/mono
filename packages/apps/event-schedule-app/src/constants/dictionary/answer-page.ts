@@ -125,7 +125,6 @@ export const answerPageDictionary = {
             commonDictionary.date.dayList
           )
             .filter(([checked, _displayName]) => checked)
-
             .map(([_, displayName]) => displayName)
         ).chain((list) =>
           Arr.isEmpty(list) ? '曜日：なし' : `${list.join('・')}のみ`

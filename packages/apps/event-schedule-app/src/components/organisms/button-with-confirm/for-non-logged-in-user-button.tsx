@@ -33,13 +33,17 @@ export const ForNonLoggedInUserDialog = memoNamed<Props>(
       </Paragraph>
       <Paragraph>
         <Smaller>{dc.link.prefix}</Smaller>
-        <SmallerAnchor
+        <a
+          css={css`
+            font-size: smaller;
+            text-decoration: underline;
+          `}
           href={introductionUrl}
           rel={'noopener noreferrer'}
           target={'_blank'}
         >
           {dc.link.body}
-        </SmallerAnchor>
+        </a>
         <Smaller>{dc.link.suffix}</Smaller>
       </Paragraph>
     </AlertWithMaxWidth>
@@ -52,9 +56,4 @@ const Paragraph = styled.div`
 
 const Smaller = styled.span`
   font-size: smaller;
-`;
-
-const SmallerAnchor = styled.a`
-  font-size: smaller;
-  text-decoration: underline;
 `;

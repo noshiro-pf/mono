@@ -28,7 +28,12 @@ export const DeleteAccountDialog = memoNamed<Props>(
     return (
       <UpdateUserInfoDialogTemplate
         body={
-          <Content>
+          <div
+            css={css`
+              width: 300px;
+              height: 160px;
+            `}
+          >
             <FormGroup
               helperText={formState.email.error}
               intent={emailFormIntent}
@@ -67,7 +72,7 @@ export const DeleteAccountDialog = memoNamed<Props>(
                 onValueChange={DeleteAccountPageStore.inputPasswordHandler}
               />
             </FormGroup>
-          </Content>
+          </div>
         }
         closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
@@ -87,8 +92,3 @@ export const DeleteAccountDialog = memoNamed<Props>(
     );
   }
 );
-
-const Content = styled.div`
-  width: 300px;
-  height: 160px;
-`;

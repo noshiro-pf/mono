@@ -5,11 +5,12 @@ type Props = Readonly<{
 }>;
 
 export const ColorItem = memoNamed<Props>('ColorItem', (props) => (
-  <Box style={{ backgroundColor: hslToStr(props.hsl) }} />
+  <div
+    css={css`
+      width: 30px;
+      height: 30px;
+      border-radius: 25%;
+    `}
+    style={{ backgroundColor: hslToStr(props.hsl) }}
+  />
 ));
-
-const Box = styled.div`
-  width: 30px;
-  height: 30px;
-  border-radius: 25%;
-`;

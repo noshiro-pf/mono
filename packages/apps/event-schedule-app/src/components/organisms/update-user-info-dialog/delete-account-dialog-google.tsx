@@ -26,7 +26,12 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
     return (
       <UpdateUserInfoDialogTemplate
         body={
-          <Content>
+          <div
+            css={css`
+              width: 300px;
+              height: 100px;
+            `}
+          >
             <FormGroup
               helperText={formState.error}
               intent={emailFormIntent}
@@ -45,7 +50,7 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
                 }
               />
             </FormGroup>
-          </Content>
+          </div>
         }
         closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
@@ -65,8 +70,3 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
     );
   }
 );
-
-const Content = styled.div`
-  width: 300px;
-  height: 100px;
-`;

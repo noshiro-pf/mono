@@ -1,3 +1,1 @@
-export const dict = {
-  title: 'title',
-} as const;
+export const dict = {} as const;

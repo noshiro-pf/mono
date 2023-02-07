@@ -15,7 +15,11 @@ type Props = DeepReadonly<{
 export const AnswerPageError = memoNamed<Props>(
   'AnswerPageError',
   ({ errorType }) => (
-    <ErrorMessageWrapper>
+    <div
+      css={css`
+        margin: 20px;
+      `}
+    >
       {errorType.data === 'eventScheduleResult' &&
       errorType.type.type === 'others' ? (
         <Description color={errorFontColor} text={dc.eventScheduleOtherError} />
@@ -23,10 +27,6 @@ export const AnswerPageError = memoNamed<Props>(
       {errorType.data === 'answersResult' ? (
         <Description color={errorFontColor} text={dc.answersResultOtherError} />
       ) : undefined}
-    </ErrorMessageWrapper>
+    </div>
   )
 );
-
-const ErrorMessageWrapper = styled.div`
-  margin: 20px;
-`;

@@ -10,7 +10,7 @@ cp -r unchanged dist
 for file in "./dist"/*; do
     # /// <reference lib="(.+)" />
     # /// <reference path="lib.$1.d.ts" />
-
+    
     sed -i.bak -r 's@/// <reference lib="(.+)" />@/// <reference path="./lib.\1.d.ts" />@g' "${file}"
     sed -i.bak -e 's/declare var /declare const /g' "${file}"
     sed -i.bak -e 's/  var /  const /g' "${file}"
@@ -38,3 +38,4 @@ rm -rf "dist"/*.bak
 
 yarn fmt
 
+node ./scripts/gen-stdlib-dts.js

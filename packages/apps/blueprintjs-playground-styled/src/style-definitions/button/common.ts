@@ -1,4 +1,4 @@
-import { css, type FlattenSimpleInterpolation } from 'styled-components';
+import { type SerializedStyles } from '@emotion/react';
 import {
   black,
   blue1,
@@ -168,9 +168,7 @@ export const ptButtonBase = css`
   vertical-align: middle;
 `;
 
-export const ptButtonHeight = (
-  heightPx: number
-): FlattenSimpleInterpolation => css`
+export const ptButtonHeight = (heightPx: number): SerializedStyles => css`
   min-height: ${heightPx}px;
   min-width: ${heightPx}px;
 `;

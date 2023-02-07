@@ -3,7 +3,7 @@ import { type TwoDiceSumValue } from './two-dice-sum-value';
 
 export type ResultRow = Readonly<{
   id: string;
-  selected: readonly [TwoDiceSumValue, TwoDiceSumValue, TwoDiceSumValue];
+  selected: ArrayOfLength<3, TwoDiceSumValue>;
   count: Count;
   countSum: number;
   probability: number;

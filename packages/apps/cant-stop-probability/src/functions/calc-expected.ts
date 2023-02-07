@@ -16,11 +16,11 @@ import { type Count } from '../types';
  * である必要がある。
  *
  * 条件を満たすNの最大値は
+ *
  * N = floor((P1 + 2 * P2) / P0)
+ *
  * で求められる。
  */
-
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const calcExpected = (count: Count): number => {
   const { noLine, oneLine, twoLine } = count;
   return Math.floor((oneLine + 2 * twoLine) / noLine);

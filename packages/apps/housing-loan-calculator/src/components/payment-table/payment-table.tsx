@@ -1,6 +1,5 @@
 import { HTMLTable } from '@blueprintjs/core';
-import { viewTexts } from '../../constants';
-import { calculatedValues$, store$ } from '../../observables';
+import { calculatedValues$, store$ } from '../../store';
 
 const headerCellStyle: CSSProperties = {
   textAlign: 'center',
@@ -63,13 +62,13 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
     <HTMLTable bordered={true} condensed={true} striped={true}>
       <thead>
         <tr>
-          <th style={headerCellStyle}>{viewTexts.numPayments}</th>
-          <th style={headerCellStyle}>{viewTexts.borrowingBalanceYen}</th>
-          <th style={headerCellStyle}>{viewTexts.interestYen}</th>
+          <th style={headerCellStyle}>{dict.numPayments}</th>
+          <th style={headerCellStyle}>{dict.borrowingBalanceYen}</th>
+          <th style={headerCellStyle}>{dict.interestYen}</th>
           <th style={headerCellStyle}>
             {repaymentType === 'principal-equal-payment'
-              ? viewTexts.monthlyPaymentsYen(true)
-              : viewTexts.monthlyPrincipalPaymentsYen(true)}
+              ? dict.monthlyPaymentsYen(true)
+              : dict.monthlyPrincipalPaymentsYen(true)}
           </th>
         </tr>
       </thead>

@@ -1,5 +1,4 @@
 import { Radio, RadioGroup } from '@blueprintjs/core';
-import { viewTexts } from '../../constants';
 import { type RepaymentType } from '../../types';
 
 type Props = Readonly<{
@@ -20,16 +19,16 @@ export const RepaymentTypeRadioGroup = memoNamed<Props>(
 
     return (
       <RadioGroup
-        label={viewTexts.repaymentType}
+        label={dict.repaymentType}
         selectedValue={repaymentType}
         onChange={onChange}
       >
         <Radio
-          label={viewTexts.principalEqualPayment}
+          label={dict.principalEqualPayment}
           value='principal-equal-payment'
         />
         <Radio
-          label={viewTexts.principalAndInterestEqualRepayment}
+          label={dict.principalAndInterestEqualRepayment}
           value='principal-and-interest-equal-repayment'
         />
       </RadioGroup>

@@ -33,8 +33,20 @@ export const DetailedFilterCollapse = memoNamed<Props>(
 
     return (
       <Collapse isOpen={isOpen}>
-        <Main>
-          <MainContent>
+        <div
+          css={css`
+            margin-bottom: 10px;
+            overflow-x: auto;
+          `}
+        >
+          <div
+            css={css`
+              padding: 10px;
+              width: 350px;
+              border: solid 1px rgba(16, 22, 26, 0.15);
+              border-radius: 10px;
+            `}
+          >
             <DetailedFilterDateRange
               dateRange={dateRange.defaultValue}
               state={dateRange}
@@ -49,9 +61,14 @@ export const DetailedFilterCollapse = memoNamed<Props>(
 
             <hr />
 
-            <Title>
+            <div
+              css={css`
+                margin-top: 20px;
+                margin-bottom: 15px;
+              `}
+            >
               {dict.answerPage.detailedFilter.filterItems.answerIcon}
-            </Title>
+            </div>
 
             <DetailedFilterNumGoodIcon
               enabled={iconState.good.enabled}
@@ -105,26 +122,9 @@ export const DetailedFilterCollapse = memoNamed<Props>(
                 }
               />
             )}
-          </MainContent>
-        </Main>
+          </div>
+        </div>
       </Collapse>
     );
   }
 );
-
-const Title = styled.div`
-  margin-top: 20px;
-  margin-bottom: 15px;
-`;
-
-const Main = styled.div`
-  margin-bottom: 10px;
-  overflow-x: auto;
-`;
-
-const MainContent = styled.div`
-  padding: 10px;
-  width: 350px;
-  border: solid 1px rgba(16, 22, 26, 0.15);
-  border-radius: 10px;
-`;

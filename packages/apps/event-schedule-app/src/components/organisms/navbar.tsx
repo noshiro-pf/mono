@@ -1,7 +1,6 @@
 import { AnchorButton, Icon, Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
-import { css } from 'styled-components';
 import { aboutThisAppUrl, feedbackUrl, Routes } from '../../constants';
 import { Auth, router, UpdateUserInfoDialogStore } from '../../store';
 import { NoWrapSpan } from '../atoms';
@@ -50,7 +49,17 @@ export const NavBar = memoNamed('NavBar', () => {
   const forNonLoggedInUserDialogState = useBoolState(false);
 
   return (
-    <Wrapper>
+    <div
+      css={css`
+        background-color: #333;
+        color: white;
+        font-size: 12px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+      `}
+    >
       <Row>
         <Item>
           <AnchorButton
@@ -65,7 +74,11 @@ export const NavBar = memoNamed('NavBar', () => {
         </Item>
       </Row>
       <Row2>
-        <UserAccount>
+        <div
+          css={css`
+            display: flex;
+          `}
+        >
           {fireAuthUser === undefined ? (
             <>
               <ItemAnchor onClick={forNonLoggedInUserDialogState.setTrue}>
@@ -170,9 +183,13 @@ export const NavBar = memoNamed('NavBar', () => {
               />
             </>
           )}
-        </UserAccount>
+        </div>
 
-        <IconButtons>
+        <div
+          css={css`
+            display: flex;
+          `}
+        >
           <Item>
             <AnchorButton
               href={feedbackUrl}
@@ -194,21 +211,11 @@ export const NavBar = memoNamed('NavBar', () => {
               title={dc.help}
             />
           </Item>
-        </IconButtons>
+        </div>
       </Row2>
-    </Wrapper>
+    </div>
   );
 });
-
-const Wrapper = styled.div`
-  background-color: #333;
-  color: white;
-  font-size: 12px;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-`;
 
 const Row = styled.div`
   display: flex;
@@ -217,10 +224,6 @@ const Row = styled.div`
 const Row2 = styled(Row)`
   flex: 1;
   justify-content: space-between;
-`;
-
-const UserAccount = styled.div`
-  display: flex;
 `;
 
 const itemCss = css`
@@ -252,8 +255,4 @@ const ItemAnchor = styled(Anchor)`
     text-decoration: none;
     background-color: rgba(255, 255, 255, 0.15);
   }
-`;
-
-const IconButtons = styled.div`
-  display: flex;
 `;

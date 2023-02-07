@@ -1,5 +1,4 @@
 import { type DetailedHTMLProps, type InputHTMLAttributes } from 'react';
-import { css } from 'styled-components';
 import { ptInput } from '../style-definitions';
 
 type Props = DetailedHTMLProps<
@@ -10,36 +9,31 @@ type Props = DetailedHTMLProps<
 export const InputGroupView = memoNamed<Props>(
   'InputGroupView',
   ({ value, placeholder, disabled, onChange }) => (
-    <InputGroup disabled={disabled}>
-      <InputView
+    <div
+      css={css`
+        display: block;
+        position: relative;
+
+        ${disabled === true
+          ? css`
+              cursor: not-allowed;
+            `
+          : css``}
+      `}
+    >
+      <input
+        css={css`
+          ${ptInput}
+          /* .bp3-input-group .bp3-input */
+          position: relative;
+          width: 100%;
+        `}
         disabled={disabled}
         placeholder={placeholder}
         type='text'
         value={value}
         onChange={onChange}
       />
-    </InputGroup>
+    </div>
   )
 );
-
-type StyleProps = Readonly<{ disabled?: boolean }>;
-
-const InputGroup = styled.div`
-  display: block;
-  position: relative;
-
-  ${(props: StyleProps) =>
-    props.disabled === true
-      ? css`
-          cursor: not-allowed;
-        `
-      : css``}
-`;
-
-const InputView = styled.input`
-  ${ptInput}
-
-  /* .bp3-input-group .bp3-input */
-  position: relative;
-  width: 100%;
-`;

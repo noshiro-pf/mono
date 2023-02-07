@@ -1,6 +1,6 @@
 import { type RepaymentType } from './repayment-type';
 
-export type Store = DeepReadonly<{
+export type Store = Readonly<{
   repaymentType: RepaymentType;
   /** 頭金（円） */
   downPaymentManYen: number;

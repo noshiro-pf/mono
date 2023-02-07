@@ -7,7 +7,11 @@ type Props = Readonly<{
 }>;
 
 export const FirstHueSlider = memoNamed<Props>('FirstHueSlider', (props) => (
-  <SliderWrapper>
+  <div
+    css={css`
+      padding: 10px 0;
+    `}
+  >
     <div>{'色相0°位置'}</div>
     <MuiSlider
       ariaLabelledby='first-hue'
@@ -17,9 +21,5 @@ export const FirstHueSlider = memoNamed<Props>('FirstHueSlider', (props) => (
       value={props.firstHue}
       onChange={props.firstHueOnChange as (h: number) => void}
     />
-  </SliderWrapper>
+  </div>
 ));
-
-const SliderWrapper = styled.div`
-  padding: 10px 0;
-`;

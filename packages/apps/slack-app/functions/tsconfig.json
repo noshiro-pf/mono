@@ -1,7 +1,6 @@
 {
-  "extends": "../../../../config/tsconfig/tsconfig.base.json",
+  "extends": "../../../../config/tsconfig/tsconfig.cjs.nolib.json",
   "compilerOptions": {
-    "module": "commonjs",
     "target": "es2017",
     "outDir": "dist"
   },

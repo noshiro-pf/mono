@@ -8,22 +8,22 @@ type Props = Readonly<{
 export const Header = memoNamed<Props>('Header', ({ title }) => (
   <div>
     <NavBar />
-    <Wrapper>
+    <div
+      css={css`
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 20px;
+      `}
+    >
       <Title>
         <Icon icon={'timeline-events'} iconSize={28} />
         <div>{title}</div>
       </Title>
-    </Wrapper>
+    </div>
   </div>
 ));
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 20px;
-`;
 
 const Title = styled.span`
   display: flex;

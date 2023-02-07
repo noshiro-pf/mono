@@ -26,23 +26,25 @@ export const DeadColumn = memoNamed<Props>(
             {alive ? (
               <span>{columnId}</span>
             ) : (
-              <LineThrough>{columnId}</LineThrough>
+              <span
+                css={css`
+                  text-decoration: line-through;
+                `}
+              >
+                {columnId}
+              </span>
             )}
           </BpButton>
         ))}
       </ButtonGroup>
-      <ProbabilityText>
+      <div
+        css={css`
+          padding: 10px;
+        `}
+      >
         {'確率： '}
         {hitSomeAliveColumnProbability}
-      </ProbabilityText>
+      </div>
     </div>
   )
 );
-
-const LineThrough = styled.span`
-  text-decoration: line-through;
-`;
-
-const ProbabilityText = styled.div`
-  padding: 10px;
-`;

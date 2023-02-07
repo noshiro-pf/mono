@@ -1,4 +1,4 @@
-export const queryParams = {
+export const queryParamKey = {
   repaymentType: 'repayment-type',
   downPayment: 'down-payment',
   propertyPrice: 'property-price',

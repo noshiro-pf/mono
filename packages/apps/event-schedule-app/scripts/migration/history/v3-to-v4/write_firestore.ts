@@ -1,18 +1,16 @@
 /* eslint-disable import/no-internal-modules */
 
-import type {
-  Answer as AnswerCurr,
-  EventSchedule as EventScheduleCurr,
+import {
+  firestorePaths as firestorePathsCurr,
+  type Answer as AnswerCurr,
+  type EventSchedule as EventScheduleCurr,
 } from '@noshiro/event-schedule-app-shared/cjs/v3';
-import { firestorePaths as firestorePathsCurr } from '@noshiro/event-schedule-app-shared/cjs/v3';
-import type {
-  Answer as AnswerNext,
-  EventSchedule as EventScheduleNext,
-} from '@noshiro/event-schedule-app-shared/cjs/v4';
 import {
   fillAnswer,
   fillEventSchedule,
   firestorePaths as firestorePathsNext,
+  type Answer as AnswerNext,
+  type EventSchedule as EventScheduleNext,
 } from '@noshiro/event-schedule-app-shared/cjs/v4';
 import * as admin from 'firebase-admin';
 import serviceAccount from '../../../service-account-key.json';

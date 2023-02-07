@@ -36,20 +36,20 @@ export const TextColorContrastTable = memoNamed(
   () => componentElement
 );
 
-const Root = styled.div`
-  width: 100%;
-  height: 100%;
-  background-color: #c2c2c2;
-  padding: 10px;
-`;
-
 const PaperCustomized = styled(Paper)`
   margin-top: 10px;
   padding: 10px;
 `;
 
 const componentElement = (
-  <Root>
+  <div
+    css={css`
+      width: 100%;
+      height: 100%;
+      background-color: #c2c2c2;
+      padding: 10px;
+    `}
+  >
     <PaperCustomized variant='outlined'>
       <Table>
         <TableHead>
@@ -128,5 +128,5 @@ const componentElement = (
         </TableBody>
       </Table>
     </PaperCustomized>
-  </Root>
+  </div>
 );

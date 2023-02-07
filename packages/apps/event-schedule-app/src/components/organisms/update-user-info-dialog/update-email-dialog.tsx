@@ -29,7 +29,12 @@ export const UpdateEmailDialog = memoNamed<Props>(
     return (
       <UpdateUserInfoDialogTemplate
         body={
-          <Content>
+          <div
+            css={css`
+              width: 300px;
+              height: 200px;
+            `}
+          >
             <FormGroup
               intent={'none'}
               label={<Label>{dc.updateEmail.currentEmail}</Label>}
@@ -72,7 +77,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
                 onValueChange={UpdateEmailPageStore.inputPasswordHandler}
               />
             </FormGroup>
-          </Content>
+          </div>
         }
         closeDialog={UpdateUserInfoDialogStore.closeDialog}
         dialogIsOpen={dialogIsOpen}
@@ -92,8 +97,3 @@ export const UpdateEmailDialog = memoNamed<Props>(
     );
   }
 );
-
-const Content = styled.div`
-  width: 300px;
-  height: 200px;
-`;

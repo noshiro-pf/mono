@@ -19,7 +19,9 @@ scripts/**/*.js
 **/*.d.ts
 !**/react-app-env.d.ts
 !**/vite-env.d.ts
+!**/globals.d.ts
 *.tsbuildinfo
+!**/gen-global-dts.js
 
 # Logs
 logs

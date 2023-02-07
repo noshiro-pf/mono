@@ -10,14 +10,14 @@ type Props = Readonly<{
 export const FetchEventScheduleError = memoNamed<Props>(
   'AnswerPageError',
   ({ errorType }) => (
-    <ErrorMessageWrapper>
+    <div
+      css={css`
+        margin: 20px;
+      `}
+    >
       {errorType === 'others' ? (
         <Description color={errorFontColor} text={dc.eventScheduleOtherError} />
       ) : undefined}
-    </ErrorMessageWrapper>
+    </div>
   )
 );
-
-const ErrorMessageWrapper = styled.div`
-  margin: 20px;
-`;

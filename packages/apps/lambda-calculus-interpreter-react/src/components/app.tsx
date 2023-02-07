@@ -10,9 +10,20 @@ export const App = memoNamed('App', () => {
   const outputAreaString = useObservableValue(outputAreaString$);
 
   return (
-    <Root>
+    <div
+      css={css`
+        padding: 10px;
+        min-height: 100vh;
+      `}
+    >
       <h2>{'(Untyped) lambda calculus'}</h2>
-      <Description>{'expr ::= x | (lambda x. expr) | (expr expr)'}</Description>
+      <div
+        css={css`
+          padding: 10px;
+        `}
+      >
+        {'expr ::= x | (lambda x. expr) | (expr expr)'}
+      </div>
       <TextAreaWrapper>
         <div>{'Input:'}</div>
         <CodeArea
@@ -31,18 +42,9 @@ export const App = memoNamed('App', () => {
           value={outputAreaString ?? 'Parse error.'}
         />
       </TextAreaWrapper>
-    </Root>
+    </div>
   );
 });
-
-const Root = styled.div`
-  padding: 10px;
-  min-height: 100vh;
-`;
-
-const Description = styled.div`
-  padding: 10px;
-`;
 
 const TextAreaWrapper = styled.div`
   padding: 10px;

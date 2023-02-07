@@ -53,7 +53,14 @@ export const EventSettings = memoNamed<Props>(
     }, [useNotification, focusEmailInput$, clickedMoreThanOnce]);
 
     return (
-      <Root>
+      <div
+        css={css`
+          padding: 10px;
+          & > * {
+            margin-bottom: 15px;
+          }
+        `}
+      >
         <ParagraphWithSwitch
           description={dc.answerDeadline.howAnswerDeadlineIsUsed}
           elementToToggle={
@@ -95,15 +102,7 @@ export const EventSettings = memoNamed<Props>(
           answerIcons={answerIcons}
           onAnswerIconsChange={onAnswerIconsChange}
         />
-      </Root>
+      </div>
     );
   }
 );
-
-const Root = styled.div`
-  padding: 10px;
-
-  & > * {
-    margin-bottom: 15px;
-  }
-`;

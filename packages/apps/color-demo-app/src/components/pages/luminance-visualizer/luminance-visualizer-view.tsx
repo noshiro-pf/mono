@@ -26,7 +26,14 @@ type Props = Readonly<{
 export const LuminanceVisualizerView = memoNamed<Props>(
   'LuminanceVisualizerView',
   (props) => (
-    <Root>
+    <div
+      css={css`
+        width: 100%;
+        height: 100%;
+        background-color: #c2c2c2;
+        padding: 10px;
+      `}
+    >
       <PaperCustomized variant='outlined'>
         <AllSliders
           divisionNumber={props.divisionNumber}
@@ -123,16 +130,9 @@ export const LuminanceVisualizerView = memoNamed<Props>(
           {props.result3_weighted_log.adjacentContrastRatioVariance}
         </Variance>
       </PaperCustomized>
-    </Root>
+    </div>
   )
 );
-
-const Root = styled.div`
-  width: 100%;
-  height: 100%;
-  background-color: #c2c2c2;
-  padding: 10px;
-`;
 
 const PaperCustomized = styled(Paper)`
   margin-top: 10px;

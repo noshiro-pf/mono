@@ -7,35 +7,36 @@ type Props = Readonly<{
 export const ColoredDistribution = memoNamed<Props>(
   'ColoredDistribution',
   (props) => (
-    <Root>
+    <div
+      css={css`
+        width: 100%;
+        height: 300px;
+        display: flex;
+        flex-direction: row;
+      `}
+    >
       {props.accumulatedDistribution.map(([hsl, value]) => (
-        <BarWrapper key={hsl[0]}>
+        <div
+          key={hsl[0]}
+          css={css`
+            width: ${100 / 360}%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+          `}
+        >
           <Bar
             style={{
               height: `${value * 100}%`,
               backgroundColor: hslToStr(hsl),
             }}
           />
-        </BarWrapper>
+        </div>
       ))}
-    </Root>
+    </div>
   )
 );
-
-const Root = styled.div`
-  width: 100%;
-  height: 300px;
-  display: flex;
-  flex-direction: row;
-`;
-
-const BarWrapper = styled.div`
-  width: ${100 / 360}%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-`;
 
 const Bar = styled.div`
   width: 100%;

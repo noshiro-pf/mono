@@ -1,5 +1,5 @@
 {
-  "extends": "../../../config/tsconfig/tsconfig.react.nolib.json",
+  "extends": "../../../config/tsconfig/tsconfig.react-emotion.nolib.json",
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,

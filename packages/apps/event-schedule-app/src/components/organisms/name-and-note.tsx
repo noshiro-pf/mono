@@ -22,7 +22,11 @@ export const NameAndNotes = memoNamed<Props>(
     );
 
     return (
-      <Root>
+      <WidthRestrictedInputWrapper
+        css={css`
+          padding: 10px;
+        `}
+      >
         <FormGroup
           helperText={
             showError
@@ -51,11 +55,7 @@ export const NameAndNotes = memoNamed<Props>(
             onValueChange={onNotesChange}
           />
         </FormGroup>
-      </Root>
+      </WidthRestrictedInputWrapper>
     );
   }
 );
-
-const Root = styled(WidthRestrictedInputWrapper)`
-  padding: 10px;
-`;

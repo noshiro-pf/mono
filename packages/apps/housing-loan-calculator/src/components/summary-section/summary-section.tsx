@@ -1,5 +1,4 @@
-import { viewTexts } from '../../constants';
-import { calculatedValues$, store$ } from '../../observables';
+import { calculatedValues$, store$ } from '../../store';
 import { DataItem } from './data-item';
 
 export const SummarySection = memoNamed('SummarySection', () => {
@@ -16,28 +15,28 @@ export const SummarySection = memoNamed('SummarySection', () => {
     <dl>
       <DataItem
         description={`${propertyPriceManYen - downPaymentManYen}万円`}
-        title={viewTexts.borrowingTotalYen}
+        title={dict.borrowingTotalYen}
       />
       {repaymentType === 'principal-equal-payment' ? (
         <DataItem
           description={`${fixedPrincipalYenPerMonth.toFixed(0)}円`}
-          title={viewTexts.monthlyPrincipalPaymentsYen(false)}
+          title={dict.monthlyPrincipalPaymentsYen(false)}
         />
       ) : (
         <DataItem
           description={`${fixedMonthlyPaymentsYen.toFixed(0)}円`}
-          title={viewTexts.monthlyPaymentsYen(false)}
+          title={dict.monthlyPaymentsYen(false)}
         />
       )}
       <DataItem
         description={`${interestSumManYen.toFixed(2)}万円`}
-        title={viewTexts.interestSum}
+        title={dict.interestSum}
       />
       <DataItem
         description={`${(propertyPriceManYen + interestSumManYen).toFixed(
           2
         )}万円`}
-        title={viewTexts.paymentsSum}
+        title={dict.paymentsSum}
       />
     </dl>
   );

@@ -16,7 +16,14 @@ export const App = memoNamed('App', () => {
 
   return (
     <ErrorBoundary>
-      <Root>
+      <div
+        css={css`
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        `}
+      >
         {show.createPage ? (
           <CreateEventSchedule />
         ) : show.editPage ? (
@@ -33,14 +40,7 @@ export const App = memoNamed('App', () => {
           <NotFoundPage />
         )}
         <Footer />
-      </Root>
+      </div>
     </ErrorBoundary>
   );
 });
-
-const Root = styled.div`
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;

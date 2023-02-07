@@ -124,7 +124,11 @@ export const EventListPage = memoNamed('EventListPage', () => {
       {eventListWithHandler === undefined ? (
         <Spinner />
       ) : (
-        <Main>
+        <div
+          css={css`
+            margin: 0 20px;
+          `}
+        >
           <FilterByArea>
             <HTMLSelect
               disabled={formElementsAreDisabled}
@@ -167,7 +171,11 @@ export const EventListPage = memoNamed('EventListPage', () => {
 
           <hr />
 
-          <ItemCountAndRefresh>
+          <FilterByArea
+            css={css`
+              justify-content: space-between;
+            `}
+          >
             <div>{dc.itemCount(eventListWithHandler.length)}</div>
             <Button
               disabled={refreshButtonIsDisabled}
@@ -178,9 +186,15 @@ export const EventListPage = memoNamed('EventListPage', () => {
             >
               {dc.refresh}
             </Button>
-          </ItemCountAndRefresh>
+          </FilterByArea>
 
-          <ListItemsWrapper>
+          <div
+            css={css`
+              > * {
+                margin: 10px 0;
+              }
+            `}
+          >
             {eventListWithHandler.map(([eventListItem, archive, unarchive]) => (
               <EventListItemComponent
                 key={eventListItem.eventScheduleMetadata.id}
@@ -191,16 +205,12 @@ export const EventListPage = memoNamed('EventListPage', () => {
                 onConfirmUnArchiving={unarchive}
               />
             ))}
-          </ListItemsWrapper>
-        </Main>
+          </div>
+        </div>
       )}
     </div>
   );
 });
-
-const Main = styled.div`
-  margin: 0 20px;
-`;
 
 const FilterByArea = styled.div`
   margin: 10px 0;
@@ -210,15 +220,5 @@ const FilterByArea = styled.div`
 
   > * {
     margin: 3px 10px;
-  }
-`;
-
-const ItemCountAndRefresh = styled(FilterByArea)`
-  justify-content: space-between;
-`;
-
-const ListItemsWrapper = styled.div`
-  > * {
-    margin: 10px 0;
   }
 `;

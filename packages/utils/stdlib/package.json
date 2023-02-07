@@ -6,8 +6,9 @@
   "sideEffects": false,
   "scripts": {
     "autofix": "wireit",
-    "fmt": "prettier --ignore-path ./.prettierignore  --write .",
-    "gen": "./gen.sh"
+    "fmt": "yarn zz:cmd:prettier .",
+    "gen": "./gen.sh",
+    "zz:cmd:prettier": "prettier --cache --ignore-path ./.prettierignore --write"
   },
   "wireit": {
     "autofix": {
@@ -20,10 +21,7 @@
         "../../../config/tsconfig/tsconfig.base.nolib.json",
         "../../../config/eslintrc/**"
       ],
-      "output": [],
-      "packageLocks": [
-        "yarn.lock"
-      ]
+      "output": []
     }
   }
 }

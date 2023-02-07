@@ -8,8 +8,21 @@ const labels = ['luminance', 'text-color'];
 export const App = memoNamed('App', () => {
   const { state: tabIndex, setState: setTabIndex } = useState(0);
   return (
-    <Root>
-      <H1>{'Color demo'}</H1>
+    <div
+      css={css`
+        min-height: 100vh;
+        background-color: hsl(0, 0%, 33%);
+        padding: 10px;
+        overflow: auto;
+      `}
+    >
+      <h1
+        css={css`
+          color: white;
+        `}
+      >
+        {'Color demo'}
+      </h1>
       <Paper>
         <MuiTabs
           labels={labels}
@@ -21,17 +34,6 @@ export const App = memoNamed('App', () => {
           <TextColorContrastTable />
         </ComponentSwitcher>
       </Paper>
-    </Root>
+    </div>
   );
 });
-
-const Root = styled.div`
-  min-height: 100vh;
-  background-color: hsl(0, 0%, 33%);
-  padding: 10px;
-  overflow: auto;
-`;
-
-const H1 = styled.h1`
-  color: white;
-`;

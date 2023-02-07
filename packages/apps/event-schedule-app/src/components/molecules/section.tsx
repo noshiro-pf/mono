@@ -9,7 +9,12 @@ type Props = Readonly<{
 export const Section = memoNamed<PropsWithChildren<Props>>(
   'Section',
   ({ children, sectionTitle, onCloseClick }) => (
-    <Root>
+    <div
+      css={css`
+        margin: 10px;
+        min-width: 300px;
+      `}
+    >
       <Card elevation={1}>
         <Header>
           {sectionTitle === undefined ? undefined : (
@@ -21,14 +26,9 @@ export const Section = memoNamed<PropsWithChildren<Props>>(
         </Header>
         {children}
       </Card>
-    </Root>
+    </div>
   )
 );
-
-const Root = styled.div`
-  margin: 10px;
-  min-width: 300px;
-`;
 
 const Header = styled.div`
   display: flex;

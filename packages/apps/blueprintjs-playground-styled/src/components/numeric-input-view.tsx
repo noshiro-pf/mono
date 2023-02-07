@@ -1,4 +1,3 @@
-import { css } from 'styled-components';
 import {
   ptButton,
   ptButtonBase,
@@ -17,8 +16,50 @@ type Props = Readonly<{
 export const NumericInputView = memoNamed<Props>(
   'NumericInputView',
   ({ value, disabled, fill }) => (
-    <NumericInputControlGroup fillSpace={fill}>
-      <InputGroup disabled={disabled} fillSpace={fill}>
+    <div
+      css={css`
+        transform: translateZ(0);
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        flex-direction: row;
+        -webkit-box-align: stretch;
+        align-items: stretch;
+
+        ${fill === true
+          ? css`
+              width: 100%;
+            `
+          : css``}
+      `}
+    >
+      <div
+        css={css`
+          -webkit-box-flex: 0;
+          flex-grow: 0;
+          flex-shrink: 0;
+
+          display: block;
+          position: relative;
+
+          border-radius: 3px 0 0 3px;
+
+          margin-right: -1px;
+
+          ${disabled === true
+            ? css`
+                cursor: not-allowed;
+              `
+            : css``}
+
+          ${fill === true
+            ? css`
+                -webkit-box-flex: 1;
+                flex: 1 1 auto;
+              `
+            : css``}
+        `}
+      >
         <InputAlignedRight
           autoComplete='off'
           disabled={disabled}
@@ -26,8 +67,8 @@ export const NumericInputView = memoNamed<Props>(
           value={value}
           onChange={noop}
         />
-      </InputGroup>
-      <ButtonGroupVerticalFixed>
+      </div>
+      <div css={buttonGroupVerticalFixedStyle}>
         <ButtonUp aria-label='increment' disabled={disabled} type='button'>
           <IconWrapper aria-hidden='true'>
             <ChevronUpDownIcon
@@ -58,57 +99,10 @@ export const NumericInputView = memoNamed<Props>(
             </ChevronUpDownIcon>
           </IconWrapper>
         </ButtonDown>
-      </ButtonGroupVerticalFixed>
-    </NumericInputControlGroup>
+      </div>
+    </div>
   )
 );
-
-type StyleProps = Readonly<{ disabled?: boolean; fillSpace?: boolean }>;
-
-const NumericInputControlGroup = styled.div`
-  transform: translateZ(0);
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  flex-direction: row;
-  -webkit-box-align: stretch;
-  align-items: stretch;
-
-  ${(props: StyleProps) =>
-    props.fillSpace === true
-      ? css`
-          width: 100%;
-        `
-      : css``}
-`;
-
-const InputGroup = styled.div`
-  -webkit-box-flex: 0;
-  flex-grow: 0;
-  flex-shrink: 0;
-
-  display: block;
-  position: relative;
-
-  border-radius: 3px 0 0 3px;
-
-  margin-right: -1px;
-
-  ${(props: StyleProps) =>
-    props.disabled === true
-      ? css`
-          cursor: not-allowed;
-        `
-      : css``}
-
-  ${(props: StyleProps) =>
-    props.fillSpace === true
-      ? css`
-          -webkit-box-flex: 1;
-          flex: 1 1 auto;
-        `
-      : css``}
-`;
 
 const InputAlignedRight = styled.input`
   ${ptInput}
@@ -139,7 +133,7 @@ const InputAlignedRight = styled.input`
   text-align: right;
 `;
 
-const ButtonGroupVerticalFixed = styled.div`
+const buttonGroupVerticalFixedStyle = css`
   display: inline-flex;
 
   -webkit-box-flex: 0;

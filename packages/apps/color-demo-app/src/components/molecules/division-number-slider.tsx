@@ -8,7 +8,11 @@ type Props = Readonly<{
 export const DivisionNumberSlider = memoNamed<Props>(
   'DivisionNumberSlider',
   (props) => (
-    <SliderWrapper>
+    <div
+      css={css`
+        padding: 10px 0;
+      `}
+    >
       <div>{'分割数'}</div>
       <MuiSlider
         ariaLabelledby='division-number'
@@ -18,10 +22,6 @@ export const DivisionNumberSlider = memoNamed<Props>(
         value={props.divisionNumber}
         onChange={props.divisionNumberOnChange as (value: number) => void}
       />
-    </SliderWrapper>
+    </div>
   )
 );
-
-const SliderWrapper = styled.div`
-  padding: 10px 0;
-`;

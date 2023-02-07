@@ -34,3 +34,10 @@ firestore.rules
 .vscodeignore
 *.svelte
 packages/utils/syncflow/docs/**/*.js
+.wireit
+*.tsbuildinfo
+
+
+# Optional eslint cache
+.eslintcache
+.eslintcache-deps

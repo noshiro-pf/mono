@@ -27,7 +27,11 @@ export const SetTimesPopoverContent = memoNamed<Props>(
     }, [onOkClick, timeRange]);
 
     return (
-      <Root>
+      <div
+        css={css`
+          padding: 10px;
+        `}
+      >
         <TimeRangeView
           datetimeSpecification={datetimeSpecification}
           timeRange={timeRange}
@@ -46,11 +50,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
             onClick={onOkClickHandler}
           />
         </ButtonsWrapperAlignEnd>
-      </Root>
+      </div>
     );
   }
 );
-
-const Root = styled.div`
-  padding: 10px;
-`;

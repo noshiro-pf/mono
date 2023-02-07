@@ -43,17 +43,31 @@ export const SelectDatetimes = memoNamed<Props>(
     const holidaysJpDefinition = useObservableValue(holidaysJpDefinition$);
 
     return (
-      <Root>
+      <div
+        css={css`
+          display: flex;
+          flex-wrap: wrap-reverse;
+        `}
+      >
         <div>
-          <DatetimeSpecificationSelectWrapper>
+          <div
+            css={css`
+              margin-bottom: 10px;
+            `}
+          >
             <div>{dc.datetimeSpecification}</div>
             <BpSelect
               options={selectorOptions}
               value={datetimeSpecification}
               onValueChange={onDatetimeSpecificationChange as CastedHandlerType}
             />
-          </DatetimeSpecificationSelectWrapper>
-          <DatetimeRangeListWrapper data-cy={'datetime-list'}>
+          </div>
+          <div
+            css={css`
+              margin-bottom: 10px;
+            `}
+            data-cy={'datetime-list'}
+          >
             {datetimeListWithHandler.map(
               ({
                 id,
@@ -77,7 +91,7 @@ export const SelectDatetimes = memoNamed<Props>(
               )
             )}
             <AddElementButton onClick={onAddDatetimeClick} />
-          </DatetimeRangeListWrapper>
+          </div>
           <ButtonsWrapper>
             <DeleteAllButton onConfirmDeleteAll={onConfirmDeleteAll} />
             <SetTimesPopover
@@ -99,20 +113,7 @@ export const SelectDatetimes = memoNamed<Props>(
           setYearMonth$={AnswerPageStore.setYearMonth$}
           onSelectedDatesChange={onSelectedDatesChange}
         />
-      </Root>
+      </div>
     );
   }
 );
-
-const Root = styled.div`
-  display: flex;
-  flex-wrap: wrap-reverse;
-`;
-
-const DatetimeSpecificationSelectWrapper = styled.div`
-  margin-bottom: 10px;
-`;
-
-const DatetimeRangeListWrapper = styled.div`
-  margin-bottom: 10px;
-`;

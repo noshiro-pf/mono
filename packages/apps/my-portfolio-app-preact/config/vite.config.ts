@@ -1,15 +1,5 @@
-/* eslint-disable import/no-internal-modules */
-
-import { providePluginGooberDef } from '@noshiro/global-goober/cjs/provide-plugin-def';
-import { providePluginPreactUtilsDef } from '@noshiro/global-preact-utils/cjs/provide-plugin-def';
-import { providePluginPreactDef } from '@noshiro/global-preact/cjs/provide-plugin-def';
-import { providePluginSyncflowPreactHooksDef } from '@noshiro/global-syncflow-preact-hooks/cjs/provide-plugin-def';
-import { providePluginSyncflowDef } from '@noshiro/global-syncflow/cjs/provide-plugin-def';
-import { providePluginTinyRouterPreactHooksDef } from '@noshiro/global-tiny-router-preact-hooks/cjs/provide-plugin-def';
-import { providePluginTsUtilsDef } from '@noshiro/global-ts-utils/cjs/provide-plugin-def';
-
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { castWritable } from '@noshiro/ts-utils';
+import { castWritable, tp } from '@noshiro/ts-utils';
 
 // eslint-disable-next-line import/no-named-as-default
 import preact from '@preact/preset-vite';
@@ -18,8 +8,22 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import mdPlugin, { Mode } from 'vite-plugin-markdown';
+import packageJson from '../package.json';
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const {
+  genGlobalImportDefsFromDevDependencies,
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-internal-modules, unicorn/prefer-module, import/no-unresolved
+} = require('../../../../scripts/get-global-import-def-from-dev-dependencies');
 
 const thisDir = dirname(fileURLToPath(import.meta.url));
+
+const providePluginDefs = (
+  genGlobalImportDefsFromDevDependencies as (
+    pwd: string,
+    devDependencies: Readonly<Record<string, string>>
+  ) => Record<string, readonly [string, string]>
+)(thisDir, packageJson.devDependencies);
 
 // https://vitejs.dev/config/
 // eslint-disable-next-line import/no-default-export
@@ -29,13 +33,8 @@ export default defineConfig({
     mdPlugin({ mode: [Mode.REACT] }),
     inject({
       modules: castWritable({
-        ...providePluginPreactDef,
-        ...providePluginPreactUtilsDef,
-        ...providePluginSyncflowDef,
-        ...providePluginSyncflowPreactHooksDef,
-        ...providePluginTsUtilsDef,
-        ...providePluginTinyRouterPreactHooksDef,
-        ...providePluginGooberDef,
+        ...providePluginDefs,
+        dict: tp('@/constants/dictionary/dictionary', 'dict'),
       }),
       include: ['src/**/*.ts', 'src/**/*.tsx'] as const,
     }),

@@ -1,7 +1,12 @@
 import { InputGroup, NumericInput } from '@blueprintjs/core';
 
 export const App = memoNamed('App', () => (
-  <Root>
+  <div
+    css={css`
+      min-height: 100vh;
+      padding: 20px;
+    `}
+  >
     <h1>{'Blueprint.js Playground'}</h1>
 
     <h2>{'NumericInput'}</h2>
@@ -26,13 +31,8 @@ export const App = memoNamed('App', () => (
         onChange={noop}
       />
     </MarginBox>
-  </Root>
+  </div>
 ));
-
-const Root = styled.div`
-  min-height: 100vh;
-  padding: 20px;
-`;
 
 const MarginBox = styled.div`
   margin: 10px;

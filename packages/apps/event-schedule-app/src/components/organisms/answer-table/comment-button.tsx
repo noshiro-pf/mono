@@ -20,8 +20,21 @@ export const CommentButton = memoNamed<Props>(
       <Popover2
         canEscapeKeyClose={true}
         content={
-          <ContentRoot>
-            <Comments>{comment}</Comments>
+          <div
+            css={css`
+              padding: 10px;
+              max-width: 250px;
+            `}
+          >
+            <div
+              css={css`
+                margin: 10px;
+                overflow-wrap: anywhere;
+                white-space: pre-line;
+              `}
+            >
+              {comment}
+            </div>
             <ButtonsWrapperAlignEnd>
               <Button
                 intent='none'
@@ -29,7 +42,7 @@ export const CommentButton = memoNamed<Props>(
                 onClick={handleClose}
               />
             </ButtonsWrapperAlignEnd>
-          </ContentRoot>
+          </div>
         }
         isOpen={isOpen}
         minimal={true}
@@ -37,7 +50,11 @@ export const CommentButton = memoNamed<Props>(
         onClose={handleClose}
       >
         {useSmallButton ? (
-          <SmallButton
+          <Button
+            css={css`
+              min-height: 16px !important;
+              min-width: 16px !important;
+            `}
             icon={<Icon icon={'comment'} size={12} />}
             minimal={true}
             small={true}
@@ -55,19 +72,3 @@ export const CommentButton = memoNamed<Props>(
     );
   }
 );
-
-const ContentRoot = styled.div`
-  padding: 10px;
-  max-width: 250px;
-`;
-
-const Comments = styled.div`
-  margin: 10px;
-  overflow-wrap: anywhere;
-  white-space: pre-line;
-`;
-
-const SmallButton = styled(Button)`
-  min-height: 16px !important;
-  min-width: 16px !important;
-`;
