@@ -10,7 +10,6 @@ import {
   type usePathname as _usePathname,
   type useQueryParams as _useQueryParams,
   type useRouterLinkClick as _useRouterLinkClick,
-  type withSlash as _withSlash,
 } from '@noshiro/tiny-router-preact-hooks';
 
 declare global {
@@ -28,7 +27,6 @@ declare global {
   const usePathname: typeof _usePathname;
   const useQueryParams: typeof _useQueryParams;
   const useRouterLinkClick: typeof _useRouterLinkClick;
-  const withSlash: typeof _withSlash;
 
   /* custom variables */
 }

@@ -23,7 +23,6 @@ const importsList = [
   'usePathname',
   'useQueryParams',
   'useRouterLinkClick',
-  'withSlash',
 ];
 
 const typeImportsList = [

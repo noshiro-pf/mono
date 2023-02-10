@@ -1,6 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable functional/immutable-data */
+/* eslint-disable
+  @typescript-eslint/no-explicit-any,
+  @typescript-eslint/no-unsafe-member-access,
+  functional/immutable-data
+*/
 
 import {
   back,
@@ -12,7 +14,6 @@ import {
   usePathname,
   useQueryParams,
   useRouterLinkClick,
-  withSlash,
 } from '@noshiro/tiny-router-preact-hooks';
 
 (global as any).back = back;
@@ -24,4 +25,3 @@ import {
 (global as any).usePathname = usePathname;
 (global as any).useQueryParams = useQueryParams;
 (global as any).useRouterLinkClick = useRouterLinkClick;
-(global as any).withSlash = withSlash;

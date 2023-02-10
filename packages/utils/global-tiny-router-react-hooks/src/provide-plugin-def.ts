@@ -11,6 +11,5 @@ export const providePluginTinyRouterReactHooksDef = Obj.fromEntries(
     'usePathname',
     'useQueryParams',
     'useRouterLinkClick',
-    'withSlash',
   ].map((key) => tp(key, tp('@noshiro/tiny-router-react-hooks', key)))
 );

@@ -10,7 +10,6 @@ export const eslintNoRestrictedImportsTinyRouterReactHooksDef = {
     'usePathname',
     'useQueryParams',
     'useRouterLinkClick',
-    'withSlash',
     'QueryParams',
     'Router',
   ],

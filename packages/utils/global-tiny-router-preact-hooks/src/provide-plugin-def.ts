@@ -11,6 +11,5 @@ export const providePluginTinyRouterPreactHooksDef = Obj.fromEntries(
     'usePathname',
     'useQueryParams',
     'useRouterLinkClick',
-    'withSlash',
   ].map((key) => tp(key, tp('@noshiro/tiny-router-preact-hooks', key)))
 );
