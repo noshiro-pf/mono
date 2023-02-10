@@ -2,7 +2,9 @@
 
 /// <reference path="../../stdlib/stdlib.d.ts" />
 
+export * from './aliases';
 export * from './deep';
+export * from './enum';
 export * from './index-of-tuple';
 export * from './index-type';
 export * from './is-fixed-length-list';
