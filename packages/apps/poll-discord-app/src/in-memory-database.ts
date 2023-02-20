@@ -59,7 +59,7 @@ export const updatePoll = (
     Obj.update(ref.db, 'polls', (polls) => polls.set(poll.id, poll))
   );
 
-export const getPollByDateId = (
+const getPollByDateId = (
   ref: DatabaseRef,
   dateOptionId: DateOptionId
 ): Result<Poll, string> => {

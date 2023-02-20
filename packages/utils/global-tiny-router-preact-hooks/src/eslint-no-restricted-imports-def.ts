@@ -10,8 +10,6 @@ export const eslintNoRestrictedImportsTinyRouterPreactHooksDef = {
     'usePathname',
     'useQueryParams',
     'useRouterLinkClick',
-    'QueryParams',
-    'Router',
   ],
   message: 'use global variable instead.',
 };

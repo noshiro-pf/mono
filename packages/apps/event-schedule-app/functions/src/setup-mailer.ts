@@ -2,7 +2,7 @@ import { logger } from 'firebase-functions';
 import { createTransport } from 'nodemailer';
 import { firebaseConfig } from './env';
 
-export const mailTransport = createTransport({
+const mailTransport = createTransport({
   service: 'gmail',
   auth: {
     user: firebaseConfig.gmail.email,
@@ -10,7 +10,7 @@ export const mailTransport = createTransport({
   },
 });
 
-export type MailOptions = Readonly<{
+type MailOptions = Readonly<{
   from: string;
   to: string;
   subject: string;

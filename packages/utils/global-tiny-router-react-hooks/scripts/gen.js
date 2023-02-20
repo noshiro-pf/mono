@@ -25,10 +25,7 @@ const importsList = [
   'useRouterLinkClick',
 ];
 
-const typeImportsList = [
-  { name: 'QueryParams', params: [] },
-  { name: 'Router', params: [] },
-];
+const typeImportsList = [];
 
 const main = async () => {
   const rootDir = join(__dirname, '../');

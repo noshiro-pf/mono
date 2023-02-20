@@ -10,8 +10,6 @@ export const eslintNoRestrictedImportsTinyRouterReactHooksDef = {
     'usePathname',
     'useQueryParams',
     'useRouterLinkClick',
-    'QueryParams',
-    'Router',
   ],
   message: 'use global variable instead.',
 };
