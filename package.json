@@ -23,7 +23,7 @@
     "create:react-app:vite": "scripts/create_new_react_app_vite.sh",
     "create:slides": "scripts/create_new_slides.sh",
     "create:util": "scripts/create_new_util.sh",
-    "fmt:all": "prettier --write --cache --cache-strategy content . > /dev/null",
+    "fmt:all": "prettier --cache --cache-strategy content --write . > /dev/null",
     "fmt:all:no-cache": "prettier --write . > /dev/null",
     "gen-eslint-rules-type": "wireit",
     "lint:apps": "node scripts/lint-apps.js",

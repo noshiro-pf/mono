@@ -121,5 +121,5 @@ echo
 echo "--- prettier ---"
 
 if [ -n "${index_ts_files}" ]; then
-    node "${SCRIPT_DIR}"/../node_modules/.bin/prettier --write ${index_ts_files}
+    node "${SCRIPT_DIR}"/../node_modules/.bin/prettier --cache --cache-strategy content --write ${index_ts_files}
 fi
