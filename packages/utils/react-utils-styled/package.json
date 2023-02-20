@@ -85,9 +85,6 @@
     },
     "z:lint:src:wireit": {
       "command": "yarn z:lint:src:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
@@ -103,9 +100,6 @@
     },
     "z:lint:fix:src:wireit": {
       "command": "yarn z:lint:fix:src:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
@@ -124,9 +118,6 @@
     },
     "z:test:wireit": {
       "command": "yarn z:test:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "config/jest.config.json",
         "src/**"

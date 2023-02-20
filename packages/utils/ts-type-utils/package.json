@@ -50,9 +50,6 @@
     },
     "z:lint:src:wireit": {
       "command": "yarn z:lint:src:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "src/**/*.ts",
         ".eslintignore",
@@ -68,9 +65,6 @@
     },
     "z:lint:fix:src:wireit": {
       "command": "yarn z:lint:fix:src:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "src/**/*.ts",
         ".eslintignore",
