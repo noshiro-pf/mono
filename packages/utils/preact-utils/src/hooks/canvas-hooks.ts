@@ -1,9 +1,9 @@
-import { useEffect, useRef, type Ref } from 'preact/hooks';
+import { useEffect, useRef } from 'preact/hooks';
 import { useState } from './use-state';
 
 export const useCanvasContext2d = (): [
   CanvasRenderingContext2D | undefined,
-  Ref<HTMLCanvasElement | null>
+  preact.Ref<HTMLCanvasElement | null>
 ] => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { state: ctx, setState: setCtx } = useState<

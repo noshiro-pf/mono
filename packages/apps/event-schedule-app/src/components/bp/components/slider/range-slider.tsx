@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useNormalizedRangeSliderProps } from './normalize-range-slider-props-hook';
 import { useOnRangeChangeHandlerHook } from './on-range-change-handler-hook';
 import { RangeSliderView } from './range-slider-view';

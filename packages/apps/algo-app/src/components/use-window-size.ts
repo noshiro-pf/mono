@@ -6,8 +6,8 @@ export const useWindowSize = (
   tableSize: RectSize;
   headerHeight: number;
   footerHeight: number;
-  headerStyle: CSSProperties;
-  footerStyle: CSSProperties;
+  headerStyle: preact.JSX.CSSProperties;
+  footerStyle: preact.JSX.CSSProperties;
 } => {
   const windowMinSideSize = useMemo(
     () => Math.min(windowSize.height, windowSize.width),
@@ -25,11 +25,11 @@ export const useWindowSize = (
   const headerHeight = windowSize.height * 0.05;
   const footerHeight = windowSize.height * 0.1;
 
-  const headerStyle = useMemo<CSSProperties>(
+  const headerStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({ flexBasis: `${headerHeight}px` }),
     [headerHeight]
   );
-  const footerStyle = useMemo<CSSProperties>(
+  const footerStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({ flexBasis: `${footerHeight}px` }),
     [footerHeight]
   );

@@ -16,19 +16,21 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
   const { state: password, setState: setPassword } = useState<string>('');
   const { state: username, setState: setUsername } = useState<string>('');
 
-  const onPasswordInput: GenericEventHandler<HTMLInputElement> = useCallback(
-    (ev) => {
-      setPassword(ev.currentTarget.value);
-    },
-    [setPassword]
-  );
+  const onPasswordInput: preact.JSX.GenericEventHandler<HTMLInputElement> =
+    useCallback(
+      (ev) => {
+        setPassword(ev.currentTarget.value);
+      },
+      [setPassword]
+    );
 
-  const onUsernameInput: GenericEventHandler<HTMLInputElement> = useCallback(
-    (ev) => {
-      setUsername(ev.currentTarget.value);
-    },
-    [setUsername]
-  );
+  const onUsernameInput: preact.JSX.GenericEventHandler<HTMLInputElement> =
+    useCallback(
+      (ev) => {
+        setUsername(ev.currentTarget.value);
+      },
+      [setUsername]
+    );
 
   const disabled: boolean = username === '';
 

@@ -1,8 +1,7 @@
-import { type VNode } from 'preact';
 import { memoNamed } from './memo-named';
 
 type Props = Readonly<{
-  children: readonly VNode[];
+  children: readonly preact.VNode[];
   index: number;
 }>;
 

@@ -1,17 +1,5 @@
 export const eslintNoRestrictedImportsReactDef = {
   name: 'react',
-  importNames: [
-    'useCallback',
-    'useEffect',
-    'useMemo',
-    'useReducer',
-    'Reducer',
-    'CSSProperties',
-    'PropsWithChildren',
-    'ReactNode',
-    'RefObject',
-    'ChangeEvent',
-    'FormEvent',
-  ],
+  importNames: ['useCallback', 'useEffect', 'useMemo', 'useReducer', 'useRef'],
   message: 'use global variable instead.',
 };

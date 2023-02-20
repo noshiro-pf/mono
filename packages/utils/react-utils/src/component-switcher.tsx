@@ -1,8 +1,7 @@
-import { type ReactNodeArray } from 'react';
 import { memoNamed } from './memo-named';
 
 type Props = Readonly<{
-  children: ReactNodeArray;
+  children: React.ReactNodeArray;
   index: number;
 }>;
 

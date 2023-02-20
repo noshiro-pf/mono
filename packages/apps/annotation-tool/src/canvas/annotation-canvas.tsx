@@ -15,7 +15,7 @@ export const AnnotationCanvas = memoNamed<Props>(
   (props: Props) => {
     const idMaker = defaultIdMaker;
 
-    const rootStyle = useMemo<CSSProperties>(
+    const rootStyle = useMemo<React.CSSProperties>(
       () => ({
         width: `${props.canvasSize.width}px`,
         height: `${props.canvasSize.height}px`,
@@ -23,7 +23,7 @@ export const AnnotationCanvas = memoNamed<Props>(
       [props.canvasSize]
     );
 
-    const imgWrapperStyle = useMemo<CSSProperties>(
+    const imgWrapperStyle = useMemo<React.CSSProperties>(
       () => ({
         height: '100%',
         padding: `${props.canvasStyles.background.minPaddingPx}px`,

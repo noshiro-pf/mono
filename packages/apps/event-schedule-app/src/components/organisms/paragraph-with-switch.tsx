@@ -7,7 +7,7 @@ type Props = Readonly<{
   toggleState: boolean;
   onToggle: () => void;
   hideContentIfToggleIsFalse: boolean;
-  elementToToggle: ReactNode;
+  elementToToggle: React.ReactNode;
 }>;
 
 export const ParagraphWithSwitch = memoNamed<Props>(

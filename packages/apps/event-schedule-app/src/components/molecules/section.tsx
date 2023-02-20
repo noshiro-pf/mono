@@ -6,7 +6,7 @@ type Props = Readonly<{
   onCloseClick?: () => void;
 }>;
 
-export const Section = memoNamed<PropsWithChildren<Props>>(
+export const Section = memoNamed<React.PropsWithChildren<Props>>(
   'Section',
   ({ children, sectionTitle, onCloseClick }) => (
     <div

@@ -1,11 +1,4 @@
 import {
-  useRef,
-  type ChangeEventHandler,
-  type DetailedHTMLProps,
-  type FocusEventHandler,
-  type InputHTMLAttributes,
-} from 'react';
-import {
   ptButton,
   ptButtonBase,
   ptButtonHeight,
@@ -17,8 +10,8 @@ import {
 type Props = Partial<
   Readonly<{
     inputProps: StrictOmit<
-      DetailedHTMLProps<
-        InputHTMLAttributes<HTMLInputElement>,
+      React.DetailedHTMLProps<
+        React.InputHTMLAttributes<HTMLInputElement>,
         HTMLInputElement
       >,
       | 'autoComplete'
@@ -33,10 +26,10 @@ type Props = Partial<
     disabled: boolean;
 
     valueAsStr: string;
-    onInputBlur: FocusEventHandler<HTMLInputElement>;
-    onInputFocus: FocusEventHandler<HTMLInputElement>;
+    onInputBlur: React.FocusEventHandler<HTMLInputElement>;
+    onInputFocus: React.FocusEventHandler<HTMLInputElement>;
     onInputStringChange: (value: string) => void;
-    onInputChange: ChangeEventHandler<HTMLInputElement>;
+    onInputChange: React.ChangeEventHandler<HTMLInputElement>;
 
     fillSpace: boolean;
     onIncrementClick: () => void;
@@ -66,7 +59,7 @@ export const NumericInputView = memoNamed<Props>(
     onDecrementMouseDown,
     selectOnFocus,
   }) => {
-    const inputValueChangeHandler: ChangeEventHandler<HTMLInputElement> =
+    const inputValueChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
       useCallback(
         (ev) => {
           onInputStringChange?.(ev.currentTarget.value);
@@ -77,15 +70,16 @@ export const NumericInputView = memoNamed<Props>(
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const inputFocusHandler: FocusEventHandler<HTMLInputElement> = useCallback(
-      (ev) => {
-        onInputFocus?.(ev);
-        if (selectOnFocus === true) {
-          inputRef.current?.select();
-        }
-      },
-      [selectOnFocus, onInputFocus]
-    );
+    const inputFocusHandler: React.FocusEventHandler<HTMLInputElement> =
+      useCallback(
+        (ev) => {
+          onInputFocus?.(ev);
+          if (selectOnFocus === true) {
+            inputRef.current?.select();
+          }
+        },
+        [selectOnFocus, onInputFocus]
+      );
 
     return (
       <NumericInputControlGroup fillSpace={fillSpace}>

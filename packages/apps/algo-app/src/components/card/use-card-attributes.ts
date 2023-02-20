@@ -21,10 +21,10 @@ export const useCardAttributes = (
 ): {
   textColor: CardTextColor;
   eyeIconColor: string;
-  wrapperStyle: CSSProperties;
-  backSideStyle: CSSProperties;
-  frontSideStyle: CSSProperties;
-  rectStyle: CSSProperties;
+  wrapperStyle: preact.JSX.CSSProperties;
+  backSideStyle: preact.JSX.CSSProperties;
+  frontSideStyle: preact.JSX.CSSProperties;
+  rectStyle: preact.JSX.CSSProperties;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 } => {
@@ -46,7 +46,7 @@ export const useCardAttributes = (
     setFalse: onMouseLeave,
   } = useBoolState(false);
 
-  const wrapperStyle = useMemo<CSSProperties>(
+  const wrapperStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({
       display: 'block',
       cursor: isClickable ? 'pointer' : 'default',
@@ -60,7 +60,7 @@ export const useCardAttributes = (
     [isClickable, float, isMouseOver, height, width]
   );
 
-  const backSideStyle = useMemo<CSSProperties>(
+  const backSideStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({
       transform:
         visibilityFromMe === 'faceUp' ? 'rotateY(180deg)' : 'rotateY(0)',
@@ -68,7 +68,7 @@ export const useCardAttributes = (
     [visibilityFromMe]
   );
 
-  const frontSideStyle = useMemo<CSSProperties>(
+  const frontSideStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({
       transform:
         visibilityFromMe === 'faceUp' ? 'rotateY(0)' : 'rotateY(180deg)',
@@ -79,7 +79,7 @@ export const useCardAttributes = (
   const _showOutline =
     showOutline === 'always' || (showOutline === 'onHover' && isMouseOver);
 
-  const rectStyle = useMemo<CSSProperties>(
+  const rectStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({
       stroke: _showOutline ? outlineColor : '',
       strokeWidth: _showOutline ? 8 : 0,

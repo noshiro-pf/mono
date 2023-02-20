@@ -13,17 +13,15 @@ const { writeFileAsync } = require('../../../../scripts/write-file-async');
 const packageName = 'react';
 const varName = 'React';
 
-const importsList = ['useCallback', 'useEffect', 'useMemo', 'useReducer'];
-
-const typeImportsList = [
-  { name: 'Reducer', params: ['S', 'A'] },
-  { name: 'CSSProperties', params: [] },
-  { name: 'PropsWithChildren', params: ['P'] },
-  { name: 'ReactNode', params: [] },
-  { name: 'RefObject', params: ['T'] },
-  { name: 'ChangeEvent', params: ['T'] },
-  { name: 'FormEvent', params: ['T'] },
+const importsList = [
+  'useCallback',
+  'useEffect',
+  'useMemo',
+  'useReducer',
+  'useRef',
 ];
+
+const typeImportsList = [];
 
 const main = async () => {
   const rootDir = join(__dirname, '../');

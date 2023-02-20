@@ -18,7 +18,7 @@ export const CodeArea = memoNamed<Props>(
       [valueChange]
     );
 
-    const style = useMemo<CSSProperties>(
+    const style = useMemo<preact.JSX.CSSProperties>(
       () => ({
         minHeight: `${minHeightPx}px`,
         maxHeight: `${maxHeightPx}px`,

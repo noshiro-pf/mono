@@ -28,7 +28,7 @@ const marginBetweenCardAndBalloon = 10;
 export const DecidedAnswerBalloon = memoNamed<Props>(
   'DecidedAnswerBalloon',
   ({ anchorCardRect, arrowDirection, card, showSymbol }) => {
-    const positionStyle = useMemo<CSSProperties>(
+    const positionStyle = useMemo<preact.JSX.CSSProperties>(
       () =>
         calcBalloonPosition({
           anchorCardRect,

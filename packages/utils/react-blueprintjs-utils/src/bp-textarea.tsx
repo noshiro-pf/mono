@@ -1,8 +1,8 @@
 import { TextArea } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, type ChangeEvent, type ComponentProps } from 'react';
+import { useCallback } from 'react';
 
-type TextAreaPropsOriginal = ComponentProps<typeof TextArea>;
+type TextAreaPropsOriginal = React.ComponentProps<typeof TextArea>;
 
 export type BpTextAreaProps = Readonly<{
   onValueChange: (value: string) => void;
@@ -14,7 +14,7 @@ export const BpTextArea = memoNamed<BpTextAreaProps>(
   ({ value, onValueChange, ...props }) => {
     const onChangeHandler = useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: ChangeEvent<HTMLTextAreaElement>) => {
+      (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
         onValueChange(ev.target.value);
       },
       [onValueChange]

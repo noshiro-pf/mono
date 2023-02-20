@@ -95,7 +95,7 @@ export const Table = memoNamed(
       };
     }, [tableSize]);
 
-    const tableStyle = useMemo<CSSProperties>(
+    const tableStyle = useMemo<preact.JSX.CSSProperties>(
       () => ({
         width: `${tableSize.width}px`,
         height: `${tableSize.height}px`,

@@ -12,7 +12,7 @@ export const showToast = ({
 }: DeepReadonly<{
   isCloseButtonShown?: boolean;
   toast: IToaster;
-  message: ReactNode;
+  message: React.ReactNode;
   intent: Intent;
   icon?: IconName;
 }>): void => {

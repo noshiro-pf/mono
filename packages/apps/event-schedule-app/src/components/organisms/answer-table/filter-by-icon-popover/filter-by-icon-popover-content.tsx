@@ -1,5 +1,4 @@
 import { Button } from '@blueprintjs/core';
-import { type FormEventHandler } from 'react';
 import { type NumIconFilterState } from '../../../../types';
 import { SwitchWithoutLabelStyled } from '../../../bp';
 import { IconCountNumericInput } from '../../../molecules';
@@ -27,7 +26,7 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
     enableFiltering,
     disableFiltering,
   }) => {
-    const switchHandler = useCallback<FormEventHandler<HTMLInputElement>>(
+    const switchHandler = useCallback<React.FormEventHandler<HTMLInputElement>>(
       (ev) => {
         if ((ev.target as HTMLInputElement).checked) {
           enableFiltering();

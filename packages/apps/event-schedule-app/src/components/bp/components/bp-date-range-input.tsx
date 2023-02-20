@@ -1,13 +1,12 @@
 import { DateRangeInput2, type DateRange } from '@blueprintjs/datetime2';
 import { ymdFromDate, ymdhm2Date } from '@noshiro/event-schedule-app-shared';
-import { type ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 
 const parseDate = (str: string): RawDateType =>
   pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
-type DateRangeInputPropsOriginal = ComponentProps<typeof DateRangeInput2>;
+type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput2>;
 
 type Props = DeepReadonly<{
   dateRange: {

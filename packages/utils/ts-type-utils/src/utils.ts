@@ -146,3 +146,5 @@ type MutableArrayAtLeastLenRec<
 export type MergeIntersection<R extends Record<string, unknown>> = {
   [K in keyof R]: R[K];
 };
+
+export type Reducer<S, A> = (state: S, action: A) => S;

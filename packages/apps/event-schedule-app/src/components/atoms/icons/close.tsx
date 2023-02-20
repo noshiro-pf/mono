@@ -1,7 +1,7 @@
 type Props = Readonly<{
   size?: number;
   color?: string;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
 }>;
 
 export const CloseIcon = memoNamed<Props>(

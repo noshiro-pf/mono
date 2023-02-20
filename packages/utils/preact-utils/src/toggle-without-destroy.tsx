@@ -1,11 +1,10 @@
-import { type h, type VNode } from 'preact';
 import { memoNamed } from './memo-named';
 
 type Props = Readonly<{
   condition: boolean;
-  childTrue: VNode;
-  childFalse: VNode;
-  style?: h.JSX.CSSProperties;
+  childTrue: preact.VNode;
+  childFalse: preact.VNode;
+  style?: preact.JSX.CSSProperties;
 }>;
 
 const displayNoneStyle = { display: 'none' };

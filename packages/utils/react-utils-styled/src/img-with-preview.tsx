@@ -1,5 +1,5 @@
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import { useMemo, type CSSProperties } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`
@@ -49,7 +49,7 @@ export const ImgWithPreview = memoNamed<Props>(
       setFalse: onLoadStart,
     } = useBoolState(false);
 
-    const imgStyle = useMemo<CSSProperties>(
+    const imgStyle = useMemo<React.CSSProperties>(
       () => ({ opacity: loaded ? 1 : 0 }),
       [loaded]
     );

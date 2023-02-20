@@ -11,7 +11,7 @@ import {
 } from '../atoms';
 import { BpInput, BpSelect, BpSwitch, BpTimePicker } from '../bp';
 
-const size: CSSProperties = { width: '32px', height: '32px' };
+const size: React.CSSProperties = { width: '32px', height: '32px' };
 
 const options: Readonly<HTMLSelectProps['options']> = [
   { value: '', label: 'select...' },

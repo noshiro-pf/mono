@@ -1,10 +1,8 @@
-import { useRef, type ChangeEventHandler } from 'react';
-
 type Props = DeepReadonly<{
   state: 'checked' | 'indeterminate' | 'none';
   disabled?: boolean;
   onCheck?: (checked: boolean) => void;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }>;
 
 export const CheckboxView = ({
@@ -13,13 +11,14 @@ export const CheckboxView = ({
   onCheck,
   onChange,
 }: Props): JSX.Element => {
-  const onChangeHandler: ChangeEventHandler<HTMLInputElement> = useCallback(
-    (ev) => {
-      onCheck?.(ev.target.checked);
-      onChange?.(ev);
-    },
-    [onCheck, onChange]
-  );
+  const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
+    useCallback(
+      (ev) => {
+        onCheck?.(ev.target.checked);
+        onChange?.(ev);
+      },
+      [onCheck, onChange]
+    );
 
   const inputRef = useRef<Writable<HTMLInputElement>>(null);
 

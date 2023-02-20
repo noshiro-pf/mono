@@ -1,8 +1,8 @@
 import { Switch } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, type ComponentProps } from 'react';
+import { useCallback } from 'react';
 
-type SwitchPropsOriginal = ComponentProps<typeof Switch>;
+type SwitchPropsOriginal = React.ComponentProps<typeof Switch>;
 
 export type BpSwitchProps = Readonly<{ onToggle: () => void }> &
   SwitchPropsOriginal;

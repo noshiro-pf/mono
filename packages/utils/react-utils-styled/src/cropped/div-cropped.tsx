@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { type Rect } from '@noshiro/ts-utils-additional';
-import { useMemo, type ReactNode } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`
@@ -50,7 +50,7 @@ const AbsoluteWrapper = styled.div`
  */
 
 type Props = DeepReadonly<{
-  children: ReactNode;
+  children: React.ReactNode;
   cropRectRelative: Rect;
 }>;
 

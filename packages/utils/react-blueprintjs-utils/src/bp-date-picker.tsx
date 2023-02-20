@@ -2,7 +2,7 @@ import { type HTMLInputProps, type InputGroupProps2 } from '@blueprintjs/core';
 import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { DateUtils, pipe } from '@noshiro/ts-utils';
-import { useCallback, useMemo, type ComponentProps } from 'react';
+import { useCallback, useMemo } from 'react';
 import { type YearMonthDate } from './types';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
@@ -20,7 +20,7 @@ const tenYearsLater = pipe(DateUtils.today())
   .chain(DateUtils.toDate).value;
 
 // eslint-disable-next-line deprecation/deprecation
-type DateInputPropsOriginal = ComponentProps<typeof DateInput>;
+type DateInputPropsOriginal = React.ComponentProps<typeof DateInput>;
 
 export type BpDatePickerProps = Readonly<{
   ymd: YearMonthDate | undefined;

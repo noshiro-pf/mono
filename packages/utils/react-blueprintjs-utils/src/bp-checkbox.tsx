@@ -1,8 +1,8 @@
 import { Checkbox } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, type ComponentProps, type FormEvent } from 'react';
+import { useCallback } from 'react';
 
-type CheckboxPropsOriginal = ComponentProps<typeof Checkbox>;
+type CheckboxPropsOriginal = React.ComponentProps<typeof Checkbox>;
 
 export type BpCheckboxProps = CheckboxPropsOriginal &
   Readonly<{
@@ -15,7 +15,7 @@ export const BpCheckbox = memoNamed<BpCheckboxProps>(
   ({ checked, onCheck, ...props }) => {
     const onChangeHandler = useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: FormEvent<HTMLInputElement>) => {
+      (ev: React.FormEvent<HTMLInputElement>) => {
         onCheck(ev.currentTarget.checked);
       },
       [onCheck]

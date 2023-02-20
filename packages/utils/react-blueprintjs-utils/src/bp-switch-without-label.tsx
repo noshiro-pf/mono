@@ -1,8 +1,7 @@
 import { Switch } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { type ComponentProps, type CSSProperties } from 'react';
 
-type SwitchPropsOriginal = ComponentProps<typeof Switch>;
+type SwitchPropsOriginal = React.ComponentProps<typeof Switch>;
 
 export type BpSwitchWithoutLabelProps = Readonly<{ onToggle: () => void }> &
   StrictOmit<SwitchPropsOriginal, 'label' | 'labelElement'>;
@@ -22,6 +21,6 @@ export const BpSwitchWithoutLabel = memoNamed<BpSwitchWithoutLabelProps>(
   )
 );
 
-const style: CSSProperties = {
+const style: React.CSSProperties = {
   margin: 0,
 };

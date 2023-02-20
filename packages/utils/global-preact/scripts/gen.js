@@ -13,9 +13,15 @@ const { writeFileAsync } = require('../../../../scripts/write-file-async');
 const packageName = 'preact/hooks';
 const varName = 'Preact';
 
-const importsList = ['useCallback', 'useEffect', 'useMemo', 'useReducer'];
+const importsList = [
+  'useCallback',
+  'useEffect',
+  'useMemo',
+  'useReducer',
+  'useRef',
+];
 
-const typeImportsList = [{ name: 'Reducer', params: ['S', 'A'] }];
+const typeImportsList = [];
 
 const main = async () => {
   const rootDir = join(__dirname, '../');
@@ -27,11 +33,7 @@ const main = async () => {
         "import { type JSX } from 'preact';",
         generateGlobalsDecl(packageName, importsList, typeImportsList).replace(
           '/* custom types */',
-          [
-            '/* custom types */',
-            'type CSSProperties = JSX.CSSProperties;',
-            'type GenericEventHandler<Target extends EventTarget> = JSX.GenericEventHandler<Target>;',
-          ].join('\n')
+          ['/* custom types */'].join('\n')
         ),
       ].join('\n')
     ),

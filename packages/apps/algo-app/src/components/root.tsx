@@ -68,7 +68,7 @@ export const Root = memoNamed('Root', () => {
   );
 });
 
-const rootStyle: CSSProperties = {
+const rootStyle: preact.JSX.CSSProperties = {
   width: '100vw',
   height: '100vh',
 } as const;

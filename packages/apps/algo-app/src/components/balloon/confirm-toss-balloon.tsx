@@ -22,7 +22,7 @@ const marginBetweenCardAndBalloon = 10;
 export const ConfirmTossBalloon = memoNamed<Props>(
   'ConfirmTossBalloon',
   ({ card, anchorCardRect, submit, cancel }) => {
-    const rootStyle = useMemo<CSSProperties>(
+    const rootStyle = useMemo<preact.JSX.CSSProperties>(
       () =>
         calcBalloonPosition({
           anchorCardRect,

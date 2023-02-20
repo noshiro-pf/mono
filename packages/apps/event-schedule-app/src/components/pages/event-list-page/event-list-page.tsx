@@ -1,5 +1,4 @@
 import { Button, ControlGroup, HTMLSelect, Spinner } from '@blueprintjs/core';
-import { type ChangeEventHandler } from 'react';
 import { api } from '../../../api';
 import { createToaster, showToast } from '../../../functions';
 import {
@@ -14,9 +13,9 @@ import { EventListItemComponent } from './event-list-item';
 
 const dc = dict.eventListPage;
 
-const filterOptionStateChangeHandler: ChangeEventHandler<HTMLSelectElement> = (
-  ev
-) => {
+const filterOptionStateChangeHandler: React.ChangeEventHandler<
+  HTMLSelectElement
+> = (ev) => {
   const v = ev.target.value;
   if (v === 'archive' || v === 'inProgress') {
     EventListPageFilterStore.setFilterOptionState(v);

@@ -12,7 +12,7 @@ import {
 import { useRangeSliderRatios } from './to-ratio-hook';
 
 type Props = Readonly<{
-  trackElementRef: RefObject<HTMLDivElement>;
+  trackElementRef: React.RefObject<HTMLDivElement>;
   disabled: boolean;
   min: number;
   max: number;

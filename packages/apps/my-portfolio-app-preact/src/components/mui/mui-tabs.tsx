@@ -1,5 +1,4 @@
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
-import { type ComponentChildren } from 'preact';
 import { useMedia } from 'preact-media-hook';
 import { mediaQueries } from '../../constants';
 
@@ -94,7 +93,7 @@ const Root = styled('div')`
 
 const TabsScroller = memoNamed<{
   scrollable: boolean;
-  children: ComponentChildren;
+  children: preact.ComponentChildren;
 }>('TabsWrapper', ({ scrollable, children }) =>
   scrollable ? (
     <TabScrollerStyledScrollable>{children}</TabScrollerStyledScrollable>

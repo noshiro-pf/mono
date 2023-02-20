@@ -1,6 +1,6 @@
-import { useEffect, useRef, type MutableRefObject } from 'react';
+import { useEffect, useRef } from 'react';
 
-export const useValueAsRef = <T>(value: T): MutableRefObject<T> => {
+export const useValueAsRef = <T>(value: T): React.MutableRefObject<T> => {
   const ref = useRef<T>(value);
   useEffect(() => {
     ref.current = value;

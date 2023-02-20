@@ -1,11 +1,11 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { calculatedValues$, store$ } from '../../store';
 
-const headerCellStyle: CSSProperties = {
+const headerCellStyle: React.CSSProperties = {
   textAlign: 'center',
 } as const;
 
-const dataCellStyle: CSSProperties = {
+const dataCellStyle: React.CSSProperties = {
   textAlign: 'right',
 } as const;
 

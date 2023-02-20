@@ -3,6 +3,7 @@
 /// <reference path="./globals.d.ts" />
 
 /// <reference types="node" />
+/// <reference types="preact" />
 
 /// <reference types="vite/client" />
 
