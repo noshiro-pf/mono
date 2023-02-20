@@ -1,8 +1,7 @@
-import { type DetailedHTMLProps, type InputHTMLAttributes } from 'react';
 import { ptInput } from '../style-definitions';
 
-type Props = DetailedHTMLProps<
-  InputHTMLAttributes<HTMLInputElement>,
+type Props = React.DetailedHTMLProps<
+  React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 >;
 

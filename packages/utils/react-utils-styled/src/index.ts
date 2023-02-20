@@ -2,6 +2,7 @@
 
 /// <reference path="../../stdlib/stdlib.d.ts" />
 /// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />
+/// <reference types="react" />
 
 export * from './aspect-ratio-limiter';
 export * from './centering-wrapper';

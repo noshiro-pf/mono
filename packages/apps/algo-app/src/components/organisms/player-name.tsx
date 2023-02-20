@@ -1,6 +1,5 @@
 import { type Rect } from '@noshiro/ts-utils-additional';
 import { createElement, Fragment } from 'preact';
-import { useRef } from 'preact/hooks';
 import {
   inTurnColor,
   playerNameRectPadding,
@@ -25,7 +24,7 @@ export const PlayerName = memoNamed<Props>(
     windowSize,
     onBoundingClientRectChange,
   }) => {
-    const rotateStyle = useMemo<CSSProperties>(
+    const rotateStyle = useMemo<preact.JSX.CSSProperties>(
       () =>
         match(rotate, {
           0: {
@@ -58,7 +57,7 @@ export const PlayerName = memoNamed<Props>(
       [rotate]
     );
 
-    const styleMerged = useMemo<CSSProperties>(
+    const styleMerged = useMemo<preact.JSX.CSSProperties>(
       () => ({
         ...rotateStyle,
         backgroundColor: isInTurn ? inTurnColor : undefined,

@@ -250,7 +250,7 @@ export const AnswerTable = memoNamed<Props>(
 const userNameWrapperWidth = 80;
 const userNameWrapperThinWidth = 45;
 
-const answerCellStyle: CSSProperties = {
+const answerCellStyle: React.CSSProperties = {
   minWidth: `${userNameWrapperWidth}px`,
   maxWidth: `${userNameWrapperWidth}px`,
   overflowX: 'hidden',
@@ -258,7 +258,7 @@ const answerCellStyle: CSSProperties = {
   position: 'relative',
 } as const;
 
-const answerCellThinStyle: CSSProperties = {
+const answerCellThinStyle: React.CSSProperties = {
   minWidth: `${userNameWrapperThinWidth}px`,
   maxWidth: `${userNameWrapperThinWidth}px`,
   overflowX: 'hidden',

@@ -31,7 +31,7 @@ export const PlayerCardsArea = memoNamed(
     windowSize,
     cardPositionsDispatcher,
   }: Props) => {
-    const rotateStyle = useMemo<CSSProperties>(() => {
+    const rotateStyle = useMemo<preact.JSX.CSSProperties>(() => {
       const common = {
         padding: `${paddingPx}px`,
         transform: `rotate(${rotate}deg)`,

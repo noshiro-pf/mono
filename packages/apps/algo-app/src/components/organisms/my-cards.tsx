@@ -12,7 +12,7 @@ type Props = Readonly<{
 const paddingPx = 2;
 
 export const MyCards = memoNamed<Props>('MyCards', ({ cards, height }) => {
-  const wrapperStyle = useMemo<CSSProperties>(
+  const wrapperStyle = useMemo<preact.JSX.CSSProperties>(
     () => ({
       height: `${height}px`,
     }),

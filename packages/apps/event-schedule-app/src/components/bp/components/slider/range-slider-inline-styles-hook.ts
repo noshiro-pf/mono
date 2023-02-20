@@ -6,13 +6,13 @@ export const useRangeSliderInlineStyles = (
   leftRatio: number,
   rightRatio: number
 ): Readonly<{
-  progressStartStyle: CSSProperties;
-  progressMidStyle: CSSProperties;
-  progressEndStyle: CSSProperties;
-  leftHandleStyle: CSSProperties;
-  rightHandleStyle: CSSProperties;
+  progressStartStyle: React.CSSProperties;
+  progressMidStyle: React.CSSProperties;
+  progressEndStyle: React.CSSProperties;
+  leftHandleStyle: React.CSSProperties;
+  rightHandleStyle: React.CSSProperties;
 }> => {
-  const progressStartStyle: CSSProperties = useMemo(
+  const progressStartStyle: React.CSSProperties = useMemo(
     () => ({
       left: formatPercentage(0),
       right: formatPercentage(1 - leftRatio),
@@ -21,7 +21,7 @@ export const useRangeSliderInlineStyles = (
     [leftRatio]
   );
 
-  const progressMidStyle: CSSProperties = useMemo(
+  const progressMidStyle: React.CSSProperties = useMemo(
     () => ({
       left: formatPercentage(leftRatio),
       right: formatPercentage(1 - rightRatio),
@@ -30,7 +30,7 @@ export const useRangeSliderInlineStyles = (
     [leftRatio, rightRatio]
   );
 
-  const progressEndStyle: CSSProperties = useMemo(
+  const progressEndStyle: React.CSSProperties = useMemo(
     () => ({
       left: formatPercentage(rightRatio),
       right: formatPercentage(0),
@@ -39,14 +39,14 @@ export const useRangeSliderInlineStyles = (
     [rightRatio]
   );
 
-  const leftHandleStyle: CSSProperties = useMemo(
+  const leftHandleStyle: React.CSSProperties = useMemo(
     () => ({
       left: `calc(${formatPercentage(leftRatio)} - ${handleSize.width})`,
     }),
     [leftRatio]
   );
 
-  const rightHandleStyle: CSSProperties = useMemo(
+  const rightHandleStyle: React.CSSProperties = useMemo(
     () => ({
       left: `calc(${formatPercentage(rightRatio)} - ${handleSize.width})`,
     }),

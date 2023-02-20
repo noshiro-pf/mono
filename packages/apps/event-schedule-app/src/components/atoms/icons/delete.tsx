@@ -1,6 +1,6 @@
 type Props = Readonly<{
   size?: number;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
   color?: string;
 }>;
 

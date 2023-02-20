@@ -1,7 +1,6 @@
 import { TimePicker } from '@blueprintjs/datetime';
-import { type ComponentProps } from 'react';
 
-type TimePickerPropsOriginal = ComponentProps<typeof TimePicker>;
+type TimePickerPropsOriginal = React.ComponentProps<typeof TimePicker>;
 
 export type BpTimePickerProps = Readonly<{
   time: HoursMinutes;

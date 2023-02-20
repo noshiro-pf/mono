@@ -6,7 +6,7 @@ import {
   type TagProps,
 } from '@blueprintjs/core';
 import html2canvas from 'html2canvas';
-import { useRef } from 'react';
+
 import { eventIsAfterDeadline } from '../../../functions';
 import {
   AnswerFilterAndSortStore,
@@ -251,7 +251,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                       }
                       tagProps={
                         tagProps as (
-                          value: DeepReadonly<ReactNode>,
+                          value: DeepReadonly<React.ReactNode>,
                           index: number
                         ) => TagProps
                       }

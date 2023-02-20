@@ -1,8 +1,8 @@
 import { Button } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useMemo, type ComponentProps, type CSSProperties } from 'react';
+import { useMemo } from 'react';
 
-type ButtonPropsOriginal = ComponentProps<typeof Button>;
+type ButtonPropsOriginal = React.ComponentProps<typeof Button>;
 
 export type BpButtonProps = ButtonPropsOriginal &
   Readonly<{ nowrap?: boolean }>;
@@ -10,7 +10,7 @@ export type BpButtonProps = ButtonPropsOriginal &
 export const BpButton = memoNamed<BpButtonProps>(
   'BpButton',
   ({ nowrap, ...props }) => {
-    const style = useMemo<CSSProperties>(
+    const style = useMemo<React.CSSProperties>(
       () => ({
         ...props.style,
         outline: 'none',

@@ -4,7 +4,6 @@ import {
   hslToStr,
   type Hsl,
 } from '@noshiro/ts-utils-additional';
-import { type BaseSyntheticEvent } from 'react';
 import {
   LabelButtonItemBodyDisabledStyled,
   LabelButtonItemBodyStyled,
@@ -19,7 +18,7 @@ type Props = Readonly<{
   isVisible: boolean;
   disabled?: boolean;
   onLabelClick: () => void;
-  onVisibilityIconClick: (ev: BaseSyntheticEvent) => void;
+  onVisibilityIconClick: (ev: React.BaseSyntheticEvent) => void;
 }>;
 
 export const LabelButtonItemView = memoNamed<Props>(
@@ -27,7 +26,7 @@ export const LabelButtonItemView = memoNamed<Props>(
   (props) => {
     const disabled = props.disabled ?? false;
 
-    const buttonBgStyle = useMemo<CSSProperties>(
+    const buttonBgStyle = useMemo<React.CSSProperties>(
       () => ({
         backgroundColor: hslToStr(props.hsl),
         color: higherContrastTextColorHsl(props.hsl),
@@ -35,12 +34,12 @@ export const LabelButtonItemView = memoNamed<Props>(
       [props.hsl]
     );
 
-    const buttonBgStyleConditional = useMemo<CSSProperties>(
+    const buttonBgStyleConditional = useMemo<React.CSSProperties>(
       () => (disabled ? {} : buttonBgStyle),
       [disabled, buttonBgStyle]
     );
 
-    const isSelectedIconStyle = useMemo<CSSProperties>(
+    const isSelectedIconStyle = useMemo<React.CSSProperties>(
       () => ({
         color: props.isSelected
           ? higherContrastTextColorHsl(props.hsl)
@@ -63,7 +62,7 @@ export const LabelButtonItemView = memoNamed<Props>(
     }, [disabled, props]);
 
     const onVisibilityIconClickConditional = useCallback(
-      (ev: BaseSyntheticEvent) => {
+      (ev: React.BaseSyntheticEvent) => {
         if (disabled) return;
         props.onVisibilityIconClick(ev);
       },

@@ -1,6 +1,5 @@
 import { type Rect, type RectSize } from '@noshiro/ts-utils-additional';
 import { createElement } from 'preact';
-import { useRef } from 'preact/hooks';
 import { outlineColorDef, type CustomColor } from '../../constants';
 import {
   type CardColor,

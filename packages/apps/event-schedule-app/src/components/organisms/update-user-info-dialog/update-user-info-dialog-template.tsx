@@ -3,8 +3,8 @@ import { DialogWithMaxWidth } from '../../bp';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
 type Props = Readonly<{
-  body: ReactNode;
-  submitButton: ReactNode;
+  body: React.ReactNode;
+  submitButton: React.ReactNode;
   dialogIsOpen: boolean;
   closeDialog: () => void;
   title: string;

@@ -1,9 +1,7 @@
-import { type ComponentChildren } from 'preact';
-
 type Props = DeepReadonly<{
   // eslint-disable-next-line @typescript-eslint/sort-type-constituents
   variant: 'title' | 'subtitle1' | 'body1' | 'body2';
-  children: ComponentChildren;
+  children: preact.ComponentChildren;
 }>;
 
 export const MuiTypography = memoNamed<Props>(

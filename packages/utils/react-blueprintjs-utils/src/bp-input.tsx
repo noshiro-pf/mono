@@ -1,16 +1,9 @@
 import { InputGroup } from '@blueprintjs/core';
 import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
 import { createTinyObservable, type TinyObservable } from '@noshiro/ts-utils';
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  type ChangeEvent,
-  type ComponentProps,
-  type FormEvent,
-} from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
-type InputGroupPropsOriginal = ComponentProps<typeof InputGroup>;
+type InputGroupPropsOriginal = React.ComponentProps<typeof InputGroup>;
 
 export type BpInputProps = InputGroupPropsOriginal &
   Readonly<{
@@ -23,8 +16,10 @@ export const BpInput = memoNamed<BpInputProps>(
   'BpInput',
   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
     const onChangeHandler = useCallback(
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: ChangeEvent<HTMLInputElement> & FormEvent<HTMLElement>) => {
+      (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        ev: React.ChangeEvent<HTMLInputElement> & React.FormEvent<HTMLElement>
+      ) => {
         onValueChange(ev.target.value);
       },
       [onValueChange]

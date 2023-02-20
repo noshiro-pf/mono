@@ -1,5 +1,3 @@
-import { type ChangeEventHandler } from 'react';
-
 type Props = DeepReadonly<{
   value: string;
   valueChange?: (value: string) => void;
@@ -10,14 +8,14 @@ type Props = DeepReadonly<{
 export const CodeArea = memoNamed<Props>(
   'CodeArea',
   ({ value, valueChange = () => undefined, minHeightPx, maxHeightPx }) => {
-    const onChange = useCallback<ChangeEventHandler<HTMLTextAreaElement>>(
+    const onChange = useCallback<React.ChangeEventHandler<HTMLTextAreaElement>>(
       (ev) => {
         valueChange(ev.target.value);
       },
       [valueChange]
     );
 
-    const style = useMemo<CSSProperties>(
+    const style = useMemo<React.CSSProperties>(
       () => ({
         minHeight: `${minHeightPx}px`,
         maxHeight: `${maxHeightPx}px`,

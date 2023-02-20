@@ -1,10 +1,10 @@
 import { TimePicker } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
 import { DateUtils, pipe } from '@noshiro/ts-utils';
-import { useCallback, useMemo, type ComponentProps } from 'react';
+import { useCallback, useMemo } from 'react';
 import { type HoursMinutes } from './types';
 
-type TimePickerPropsOriginal = ComponentProps<typeof TimePicker>;
+type TimePickerPropsOriginal = React.ComponentProps<typeof TimePicker>;
 
 export type BpTimePickerProps = Readonly<{
   time: HoursMinutes;

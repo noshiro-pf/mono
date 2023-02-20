@@ -1,6 +1,6 @@
 import { memoNamed } from '@noshiro/react-utils';
 import { useResizeObserver } from '@noshiro/resize-observer-react-hooks';
-import { useMemo, type CSSProperties, type ReactNode } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 const Root = styled.div`
@@ -13,7 +13,7 @@ const Root = styled.div`
 `;
 
 type Props = DeepReadonly<{
-  children: ReactNode;
+  children: React.ReactNode;
   maxWidthPerHeight?: number;
   minWidthPerHeight?: number;
 }>;
@@ -60,7 +60,7 @@ export const AspectRatioLimiter = memoNamed<Props>(
       };
     }, [maxWidthPerHeight, minWidthPerHeight, wrapperSize]);
 
-    const wrapperStyle = useMemo<CSSProperties>(
+    const wrapperStyle = useMemo<React.CSSProperties>(
       () => ({
         paddingTop: `${padding.top}px`,
         paddingLeft: `${padding.left}px`,

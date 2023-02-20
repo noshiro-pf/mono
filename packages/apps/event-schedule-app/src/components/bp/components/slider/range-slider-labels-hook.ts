@@ -17,7 +17,7 @@ export const useRangeSliderLabels = ({
     {
       value: number;
       ratio: number;
-      cssStyle: CSSProperties;
+      cssStyle: React.CSSProperties;
     }[]
   >;
   minLabel: string;

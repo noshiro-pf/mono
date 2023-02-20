@@ -2,6 +2,7 @@
 
 /// <reference path="../../stdlib/stdlib.d.ts" />
 /// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />
+/// <reference types="react" />
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';

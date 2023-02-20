@@ -1,9 +1,7 @@
 import { useValueAsRef } from '@noshiro/react-utils';
-import type React from 'react';
-import { useRef } from 'react';
 
 type Props = Readonly<{
-  trackElementRef: RefObject<HTMLDivElement>;
+  trackElementRef: React.RefObject<HTMLDivElement>;
   disabled: boolean;
   stepSize: number;
   min: number;
@@ -15,7 +13,7 @@ type Props = Readonly<{
 }>;
 
 export type SliderHandleElementAdaptor = Readonly<{
-  handleElementRef: RefObject<HTMLSpanElement>;
+  handleElementRef: React.RefObject<HTMLSpanElement>;
   beginHandleMovement: React.MouseEventHandler<HTMLSpanElement>;
   beginHandleTouchMovement: React.TouchEventHandler<HTMLSpanElement>;
   handleKeyDown: React.KeyboardEventHandler<HTMLSpanElement>;

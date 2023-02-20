@@ -9,7 +9,6 @@ import {
   InteractionManager,
   settings as mut_settings,
 } from 'pixi.js';
-import { useRef } from 'react';
 import {
   addGlobalPointerEventListener,
   createGlobalPixiObjects,
@@ -126,7 +125,7 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   );
 });
 
-const canvasStyle: CSSProperties = {
+const canvasStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
   zIndex: zIndex.canvasRoot,

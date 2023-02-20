@@ -1,5 +1,4 @@
 import { DateInput2 } from '@blueprintjs/datetime2';
-import { type ComponentProps } from 'react';
 
 const formatDate = (date: RawDateType): string =>
   `${DateUtils.toLocaleYMD(date, '-')}  ${DateUtils.toLocaleHM(date, ':')}`;
@@ -12,7 +11,7 @@ const tenYearsLater = pipe(DateUtils.today())
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 
-type DateInputPropsOriginal = ComponentProps<typeof DateInput2>;
+type DateInputPropsOriginal = React.ComponentProps<typeof DateInput2>;
 
 export type BpDatetimePickerProps = Readonly<{
   ymdhm: Ymdhm | undefined;

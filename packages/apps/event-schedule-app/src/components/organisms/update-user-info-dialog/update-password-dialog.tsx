@@ -16,7 +16,7 @@ type Props = Readonly<{
 }>;
 
 // https://yuzu441.hateblo.jp/entry/2020/11/16/190229
-const hideStyle: CSSProperties = { display: 'none' };
+const hideStyle: React.CSSProperties = { display: 'none' };
 
 export const UpdatePasswordDialog = memoNamed<Props>(
   'UpdatePasswordDialog',

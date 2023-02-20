@@ -1,8 +1,8 @@
 import { HTMLSelect, type HTMLSelectProps } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
-import { useCallback, type ChangeEvent, type ComponentProps } from 'react';
+import { useCallback } from 'react';
 
-type HTMLSelectPropsOriginal = ComponentProps<typeof HTMLSelect>;
+type HTMLSelectPropsOriginal = React.ComponentProps<typeof HTMLSelect>;
 
 export type BpSelectProps = Readonly<{
   onValueChange: (value: string) => void;
@@ -15,7 +15,7 @@ export const BpSelect = memoNamed<BpSelectProps>(
   ({ value, onValueChange, options, ...props }) => {
     const onChangeHandler = useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: ChangeEvent<HTMLSelectElement>) => {
+      (ev: React.ChangeEvent<HTMLSelectElement>) => {
         onValueChange(ev.target.value);
       },
       [onValueChange]

@@ -23,7 +23,7 @@ export const DatetimeRangeCell = memoNamed<Props>(
     tableMinimized,
     holidaysJpDefinition,
   }) => {
-    const colored: CSSProperties = useMemo(() => {
+    const colored: React.CSSProperties = useMemo(() => {
       const dayValue = ymd2day(datetimeRange.ymd);
 
       return {

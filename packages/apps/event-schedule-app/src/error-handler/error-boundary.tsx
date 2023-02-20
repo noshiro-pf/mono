@@ -138,7 +138,7 @@ export class ErrorBoundary extends Component<{}, State> {
     });
   };
 
-  override render(): ReactNode {
+  override render(): React.ReactNode {
     const {
       error,
       errorInfo,
@@ -235,7 +235,7 @@ const dc = dict.errorMessages.errorHandler;
 
 const toast = createToaster();
 
-const showErrorToast = (error: DeepReadonly<ReactNode>): void => {
+const showErrorToast = (error: DeepReadonly<React.ReactNode>): void => {
   showToast({
     toast,
     intent: 'danger',

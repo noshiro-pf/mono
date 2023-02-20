@@ -539,11 +539,14 @@ const tagValues$: InitializedObservable<readonly string[]> = tags$.chain(
 );
 
 const tagProps$: InitializedObservable<
-  (value: DeepReadonly<ReactNode>, index: number) => DeepReadonly<TagProps>
+  (
+    value: DeepReadonly<React.ReactNode>,
+    index: number
+  ) => DeepReadonly<TagProps>
 > = tags$.chain(
   mapI(
     (tags) =>
-      (value: DeepReadonly<ReactNode>): DeepReadonly<TagProps> =>
+      (value: DeepReadonly<React.ReactNode>): DeepReadonly<TagProps> =>
         tags.find((t) => t.value === value)?.props ?? {
           intent: 'none' as const,
         }

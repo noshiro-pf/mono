@@ -2,9 +2,9 @@ import { toClassName } from '../../../../utils';
 import { SliderLabelStyled } from './slider-label-styled';
 
 type Props = Readonly<{
-  handleElementRef: RefObject<HTMLSpanElement>;
+  handleElementRef: React.RefObject<HTMLSpanElement>;
   direction: 'left' | 'right';
-  style: CSSProperties;
+  style: React.CSSProperties;
   disabled: boolean;
   tabIndex?: number;
   label: string;

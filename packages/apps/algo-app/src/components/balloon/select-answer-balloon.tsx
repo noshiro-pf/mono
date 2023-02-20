@@ -37,7 +37,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
     onCancelClick,
     submitButtonIsDisabled,
   }) => {
-    const rootStyle = useMemo<CSSProperties>(
+    const rootStyle = useMemo<preact.JSX.CSSProperties>(
       () =>
         calcBalloonPosition({
           anchorCardRect,

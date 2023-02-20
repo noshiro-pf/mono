@@ -1,15 +1,9 @@
 import { NumericInput } from '@blueprintjs/core';
 import { memoNamed, useState } from '@noshiro/react-utils';
 import { Str } from '@noshiro/ts-utils';
-import {
-  useCallback,
-  useEffect,
-  type ComponentProps,
-  type CSSProperties,
-  type FocusEventHandler,
-} from 'react';
+import { useCallback, useEffect } from 'react';
 
-type NumericInputPropsOriginal = ComponentProps<typeof NumericInput>;
+type NumericInputPropsOriginal = React.ComponentProps<typeof NumericInput>;
 
 export type BpNumericInputProps = Readonly<{
   value: number;
@@ -63,7 +57,9 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
       [onValueChange, onValueChangeFiltered, parseNumericString, setState]
     );
 
-    const onBlurInternal = useCallback<FocusEventHandler<HTMLInputElement>>(
+    const onBlurInternal = useCallback<
+      React.FocusEventHandler<HTMLInputElement>
+    >(
       (ev) => {
         if (onBlur !== undefined) {
           onBlur(ev);
@@ -111,6 +107,6 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
   }
 );
 
-const style: CSSProperties = {
+const style: React.CSSProperties = {
   textAlign: 'right',
 };

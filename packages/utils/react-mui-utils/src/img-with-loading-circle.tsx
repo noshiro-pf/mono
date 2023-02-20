@@ -1,6 +1,6 @@
 import { CircularProgress } from '@mui/material';
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import { useMemo, type CSSProperties } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = Readonly<{
@@ -17,13 +17,13 @@ export const ImgWithLoadingCircle = memoNamed<Props>(
       setFalse: onLoadStart,
     } = useBoolState(false);
 
-    const imgStyle = useMemo<CSSProperties>(
+    const imgStyle = useMemo<React.CSSProperties>(
       // dummy comment
       () => ({ opacity: loaded ? 1 : 0 }),
       [loaded]
     );
 
-    const loadingStyle = useMemo<CSSProperties>(
+    const loadingStyle = useMemo<React.CSSProperties>(
       () => ({ opacity: loaded ? 0 : 1 }),
       [loaded]
     );

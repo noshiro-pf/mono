@@ -1,7 +1,6 @@
 import { InputGroup } from '@blueprintjs/core';
-import { useRef, type ChangeEventHandler, type ComponentProps } from 'react';
 
-type InputGroupPropsOriginal = ComponentProps<typeof InputGroup>;
+type InputGroupPropsOriginal = React.ComponentProps<typeof InputGroup>;
 
 export type BpInputProps = InputGroupPropsOriginal &
   Readonly<{
@@ -13,12 +12,13 @@ export type BpInputProps = InputGroupPropsOriginal &
 export const BpInput = memoNamed<BpInputProps>(
   'BpInput',
   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
-    const onChangeHandler: ChangeEventHandler<HTMLInputElement> = useCallback(
-      (ev) => {
-        onValueChange(ev.target.value);
-      },
-      [onValueChange]
-    );
+    const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
+      useCallback(
+        (ev) => {
+          onValueChange(ev.target.value);
+        },
+        [onValueChange]
+      );
 
     const inputRef = useRef<HTMLInputElement | null>(null);
 

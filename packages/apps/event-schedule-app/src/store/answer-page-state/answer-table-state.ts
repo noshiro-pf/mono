@@ -168,7 +168,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
         score: number;
         answerSummaryRow: ArrayOfLength<3, number> | undefined;
         answerTableRow: AnswerTableCell[] | undefined;
-        style: CSSProperties;
+        style: React.CSSProperties;
       }>
     >
   | undefined
@@ -225,7 +225,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
                 score: number;
                 answerSummaryRow: ArrayOfLength<3, number> | undefined;
                 answerTableRow: AnswerTableCell[] | undefined;
-                style: CSSProperties;
+                style: React.CSSProperties;
               }> = {
                 key: datetimeRange2str(datetimeRange),
                 datetimeRange,
@@ -256,7 +256,7 @@ const tableBodyValues$: InitializedObservable<
       score: number;
       answerSummaryRow: ArrayOfLength<3, number> | undefined;
       answerTableRow: AnswerTableCell[] | undefined;
-      style: CSSProperties;
+      style: React.CSSProperties;
     }[]
   >
 > = combineLatestI([

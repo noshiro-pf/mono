@@ -11,7 +11,7 @@ export const RepaymentTypeRadioGroup = memoNamed<Props>(
   ({ repaymentType, onRepaymentTypeChange }) => {
     const onChange = useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      (ev: FormEvent<HTMLInputElement>) => {
+      (ev: React.FormEvent<HTMLInputElement>) => {
         onRepaymentTypeChange(ev.currentTarget.value as RepaymentType);
       },
       [onRepaymentTypeChange]

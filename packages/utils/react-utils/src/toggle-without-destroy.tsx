@@ -1,11 +1,10 @@
-import { type CSSProperties, type ReactNode } from 'react';
 import { memoNamed } from './memo-named';
 
 type Props = DeepReadonly<{
   condition: boolean;
-  childTrue: ReactNode;
-  childFalse: ReactNode;
-  style?: CSSProperties;
+  childTrue: React.ReactNode;
+  childFalse: React.ReactNode;
+  style?: React.CSSProperties;
 }>;
 
 const displayNoneStyle = { display: 'none' };
