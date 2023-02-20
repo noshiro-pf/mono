@@ -139,9 +139,6 @@
     },
     "z:dev-server:wireit": {
       "command": "yarn z:dev-server:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "service": true
     },
     "z:bundle:wireit": {
@@ -208,9 +205,6 @@
     },
     "z:lint:src:wireit": {
       "command": "yarn z:lint:src:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
@@ -226,9 +220,6 @@
     },
     "z:lint:fix:src:wireit": {
       "command": "yarn z:lint:fix:src:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "src/**/*.{ts,tsx}",
         ".eslintignore",
@@ -247,9 +238,6 @@
     },
     "z:lint:cy:wireit": {
       "command": "yarn z:lint:cy:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "cypress/**/*.ts",
         "cypress/.eslintrc.cjs",
@@ -265,9 +253,6 @@
     },
     "z:lint:fix:cy:wireit": {
       "command": "yarn z:lint:fix:cy:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "cypress/**/*.ts",
         "cypress/.eslintrc.cjs",
@@ -303,9 +288,6 @@
     },
     "z:test:wireit": {
       "command": "yarn z:test:impl",
-      "dependencies": [
-        "z:type-check:wireit"
-      ],
       "files": [
         "config/global.ts",
         "config/tsconfig.test.json",
