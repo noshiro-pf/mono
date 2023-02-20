@@ -2,20 +2,15 @@ import {
   type back as _back,
   type pathname$ as _pathname$,
   type push as _push,
-  type QueryParams as _QueryParams,
   type queryParams$ as _queryParams$,
   type redirect as _redirect,
   type removeListener as _removeListener,
-  type Router as _Router,
   type usePathname as _usePathname,
   type useQueryParams as _useQueryParams,
   type useRouterLinkClick as _useRouterLinkClick,
 } from '@noshiro/tiny-router-preact-hooks';
 
 declare global {
-  type QueryParams = _QueryParams;
-  type Router = _Router;
-
   /* custom types */
 
   const back: typeof _back;

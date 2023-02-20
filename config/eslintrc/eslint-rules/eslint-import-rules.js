@@ -67,7 +67,7 @@ const eslintImportsRules = {
     },
   ],
   'import/no-mutable-exports': 'error',
-  'import/no-unused-modules': 'error',
+  'import/no-unused-modules': ['error', { unusedExports: true }],
 
   // moduleSystems
   'import/unambiguous': 'error',

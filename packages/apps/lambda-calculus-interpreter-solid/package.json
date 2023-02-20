@@ -4,6 +4,7 @@
   "private": false,
   "license": "MIT",
   "author": "noshiro",
+  "browser": "src/main.tsx",
   "scripts": {
     "build:dev": "wireit",
     "clean": "run-p clean:**",

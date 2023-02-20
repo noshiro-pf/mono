@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unused-modules */
+
 import { config } from 'dotenv';
 
 config();

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unused-modules
 export const log = (value: JSONValue, prettyPrint: boolean = true): void => {
   console.log(
     Result.unwrapThrow(

@@ -4,6 +4,7 @@
   "private": false,
   "license": "MIT",
   "author": "noshiro",
+  "browser": "src/main.tsx",
   "scripts": {
     "build": "yarn z:bundle:wireit",
     "build:no-minify": "yarn z:bundle:wireit --minify false",

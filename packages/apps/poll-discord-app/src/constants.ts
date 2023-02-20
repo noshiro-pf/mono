@@ -19,8 +19,8 @@ export const emojis = {
 
 export const embedMessageColor = '#3e68b0';
 
-export const thumbnailUrl =
-  'https://github.com/noshiro-pf/poll_discord_app/blob/main/src/assets/calendar_icon.png?raw=true';
+// const thumbnailUrl =
+//   'https://github.com/noshiro-pf/poll_discord_app/blob/main/src/assets/calendar_icon.png?raw=true';
 
 export const footerText = 'Last Update';
 
