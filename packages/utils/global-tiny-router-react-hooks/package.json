@@ -33,7 +33,7 @@
     "zz:cmd:fmt-src": "yarn zz:cmd:prettier ./src",
     "zz:cmd:gen": "node ./scripts/gen.js",
     "zz:cmd:jest": "jest --config config/jest.config.json --passWithNoTests",
-    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../.prettierignore --write",
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:cmd:setup": "run-s zz:cmd:gen zz:cmd:fmt-src",
     "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
   },

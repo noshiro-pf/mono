@@ -42,7 +42,7 @@
     "z:fb:deploy:hosting:wireit": "wireit",
     "z:fb:deploy:impl": "firebase deploy",
     "z:fb:deploy:wireit": "wireit",
-    "z:fb:export:impl": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --write ./scripts/firestore_backup.json",
+    "z:fb:export:impl": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json",
     "z:fb:export:wireit": "wireit",
     "z:gi:impl": "yarn zz:cmd:gi ./src --min-depth 1 --ignore assets",
     "z:gi:wireit": "wireit",
@@ -64,7 +64,7 @@
     "zz:cmd:eslint:cy": "yarn zz:cmd:eslint cypress/ --cache --cache-location cypress/.eslintcache",
     "zz:cmd:eslint:src": "yarn zz:cmd:eslint src/ --cache --cache-location ./.eslintcache",
     "zz:cmd:gi": "bash ../../../scripts/index_ts_generator.sh",
-    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../.prettierignore --write",
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:cmd:vite": "vite --config config/vite.config.ts",
     "zz:cmd:vite:preview": "yarn zz:cmd:vite preview",
     "zz:cmd:vitest": "vitest --config config/vitest.config.ts --passWithNoTests"

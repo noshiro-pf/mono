@@ -85,7 +85,7 @@ function lintFix() {
 
 
 function format() {
-    prettier --write ${outputFiles[@]}
+    prettier --cache --cache-strategy content --write ${outputFiles[@]}
 }
 
 for (( i=0; i < ${#typeNames[*]}; ++i)); do

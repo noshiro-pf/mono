@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "fmt": "yarn zz:cmd:prettier .",
-    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../.prettierignore --write"
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
   },
   "devDependencies": {
     "normalize.css": "^8.0.1"

@@ -52,7 +52,7 @@
     "zz:cmd:gi": "bash ../../../scripts/index_ts_generator.sh",
     "zz:cmd:jest": "jest --config config/jest.config.json --passWithNoTests",
     "zz:cmd:jest:detectOpenHandles": "yarn zz:cmd:jest --detectOpenHandles",
-    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../.prettierignore --write",
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:cmd:publish": "yarn publish --no-git-tag-version --access=public",
     "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
   },

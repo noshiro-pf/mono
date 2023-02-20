@@ -47,7 +47,7 @@
     "zz:cmd:eslint": "eslint --ext .ts,.tsx --color",
     "zz:cmd:eslint:src": "yarn zz:cmd:eslint src/ --cache --cache-location ./.eslintcache",
     "zz:cmd:gi": "bash ../../../../scripts/index_ts_generator.sh",
-    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../../.prettierignore --write"
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../../.prettierignore --write"
   },
   "dependencies": {
     "@noshiro/event-schedule-app-shared": "*",

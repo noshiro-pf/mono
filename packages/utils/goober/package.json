@@ -11,7 +11,7 @@
   "typings": "./goober.d.ts",
   "scripts": {
     "fmt": "yarn zz:cmd:prettier .",
-    "zz:cmd:prettier": "prettier --cache --ignore-path ../../../.prettierignore --write"
+    "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
   },
   "peerDependencies": {
     "csstype": "^2.6.2"
