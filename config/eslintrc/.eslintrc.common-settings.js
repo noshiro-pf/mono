@@ -40,6 +40,7 @@ const config = {
       impliedStrict: true,
       jsx: true,
     },
+    jsxPragma: null, // for @typescript/eslint-parser
     sourceType: 'module',
     project: join(__dirname, '../tsconfig/tsconfig.eslint.json'),
   },
