@@ -1,27 +1,27 @@
 import {
-  type back as _back,
-  type pathname$ as _pathname$,
-  type push as _push,
-  type queryParams$ as _queryParams$,
-  type redirect as _redirect,
-  type removeListener as _removeListener,
-  type usePathname as _usePathname,
-  type useQueryParams as _useQueryParams,
-  type useRouterLinkClick as _useRouterLinkClick,
+  type back as VAR_back,
+  type pathname$ as VAR_pathname$,
+  type push as VAR_push,
+  type queryParams$ as VAR_queryParams$,
+  type redirect as VAR_redirect,
+  type removeListener as VAR_removeListener,
+  type usePathname as VAR_usePathname,
+  type useQueryParams as VAR_useQueryParams,
+  type useRouterLinkClick as VAR_useRouterLinkClick,
 } from '@noshiro/tiny-router-react-hooks';
 
 declare global {
   /* custom types */
 
-  const back: typeof _back;
-  const pathname$: typeof _pathname$;
-  const push: typeof _push;
-  const queryParams$: typeof _queryParams$;
-  const redirect: typeof _redirect;
-  const removeListener: typeof _removeListener;
-  const usePathname: typeof _usePathname;
-  const useQueryParams: typeof _useQueryParams;
-  const useRouterLinkClick: typeof _useRouterLinkClick;
+  const back: typeof VAR_back;
+  const pathname$: typeof VAR_pathname$;
+  const push: typeof VAR_push;
+  const queryParams$: typeof VAR_queryParams$;
+  const redirect: typeof VAR_redirect;
+  const removeListener: typeof VAR_removeListener;
+  const usePathname: typeof VAR_usePathname;
+  const useQueryParams: typeof VAR_useQueryParams;
+  const useRouterLinkClick: typeof VAR_useRouterLinkClick;
 
   /* custom variables */
 }

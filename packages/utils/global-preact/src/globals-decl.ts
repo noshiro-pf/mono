@@ -1,19 +1,19 @@
 import {
-  type useCallback as _useCallback,
-  type useEffect as _useEffect,
-  type useMemo as _useMemo,
-  type useReducer as _useReducer,
-  type useRef as _useRef,
+  type useCallback as VAR_useCallback,
+  type useEffect as VAR_useEffect,
+  type useMemo as VAR_useMemo,
+  type useReducer as VAR_useReducer,
+  type useRef as VAR_useRef,
 } from 'preact/hooks';
 
 declare global {
   /* custom types */
 
-  const useCallback: typeof _useCallback;
-  const useEffect: typeof _useEffect;
-  const useMemo: typeof _useMemo;
-  const useReducer: typeof _useReducer;
-  const useRef: typeof _useRef;
+  const useCallback: typeof VAR_useCallback;
+  const useEffect: typeof VAR_useEffect;
+  const useMemo: typeof VAR_useMemo;
+  const useReducer: typeof VAR_useReducer;
+  const useRef: typeof VAR_useRef;
 
   /* custom variables */
 }

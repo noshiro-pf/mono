@@ -1,25 +1,25 @@
 import {
-  type memoNamed as _memoNamed,
-  type useAlive as _useAlive,
-  type useBoolState as _useBoolState,
-  type usePromiseValue as _usePromiseValue,
-  type useState as _useState,
-  type useTinyObservable as _useTinyObservable,
-  type useTinyObservableEffect as _useTinyObservableEffect,
-  type useTinyObservableValue as _useTinyObservableValue,
+  type memoNamed as VAR_memoNamed,
+  type useAlive as VAR_useAlive,
+  type useBoolState as VAR_useBoolState,
+  type usePromiseValue as VAR_usePromiseValue,
+  type useState as VAR_useState,
+  type useTinyObservable as VAR_useTinyObservable,
+  type useTinyObservableEffect as VAR_useTinyObservableEffect,
+  type useTinyObservableValue as VAR_useTinyObservableValue,
 } from '@noshiro/react-utils';
 
 declare global {
   /* custom types */
 
-  const memoNamed: typeof _memoNamed;
-  const useAlive: typeof _useAlive;
-  const useBoolState: typeof _useBoolState;
-  const usePromiseValue: typeof _usePromiseValue;
-  const useState: typeof _useState;
-  const useTinyObservable: typeof _useTinyObservable;
-  const useTinyObservableEffect: typeof _useTinyObservableEffect;
-  const useTinyObservableValue: typeof _useTinyObservableValue;
+  const memoNamed: typeof VAR_memoNamed;
+  const useAlive: typeof VAR_useAlive;
+  const useBoolState: typeof VAR_useBoolState;
+  const usePromiseValue: typeof VAR_usePromiseValue;
+  const useState: typeof VAR_useState;
+  const useTinyObservable: typeof VAR_useTinyObservable;
+  const useTinyObservableEffect: typeof VAR_useTinyObservableEffect;
+  const useTinyObservableValue: typeof VAR_useTinyObservableValue;
 
   /* custom variables */
 }

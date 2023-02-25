@@ -30,7 +30,6 @@ const main = async () => {
     writeFileAsync(
       `${rootDir}/src/globals-decl.ts`,
       [
-        "import { type JSX } from 'preact';",
         generateGlobalsDecl(packageName, importsList, typeImportsList).replace(
           '/* custom types */',
           ['/* custom types */'].join('\n')
