@@ -16,12 +16,12 @@ export const ControlGroupStyled = styled.div`
   align-items: stretch;
 
   // round the left corners of the left-most element
-  > :first-child {
+  > :first-of-type {
     border-radius: ${ptBorderRadiusPx}px 0 0 ${ptBorderRadiusPx}px;
   }
 
   // round the right corners of the right-most element
-  > :last-child {
+  > :last-of-type {
     border-radius: 0 ${ptBorderRadiusPx}px ${ptBorderRadiusPx}px 0;
     margin-right: 0;
   }

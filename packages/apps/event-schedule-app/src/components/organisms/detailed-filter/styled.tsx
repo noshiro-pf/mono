@@ -2,10 +2,10 @@ import { Icon } from '@blueprintjs/core';
 
 export const FilterItem = styled.div`
   margin: 5px;
-  &:not(:first-child) {
+  &:not(:first-of-type) {
     margin-top: 15px;
   }
-  &:first-child {
+  &:first-of-type {
     margin-top: 0;
   }
   display: flex;
@@ -18,7 +18,7 @@ export const CheckboxWrapper = styled.label`
   align-items: center;
   cursor: pointer;
 
-  > :first-child {
+  > :first-of-type {
     margin-right: 10px;
   }
 `;
@@ -52,7 +52,7 @@ export const CheckboxWithBottomLabel = styled.div`
 export const HorizontalCheckboxesWrapper = styled.div`
   display: flex;
 
-  > :not(:last-child) {
+  > :not(:last-of-type) {
     margin-right: 15px;
   }
 `;
@@ -60,7 +60,7 @@ export const HorizontalCheckboxesWrapper = styled.div`
 export const VerticalCheckboxesWrapper = styled.div`
   display: flex;
 
-  > :not(:last-child) {
+  > :not(:last-of-type) {
     margin-right: 5px;
   }
 `;

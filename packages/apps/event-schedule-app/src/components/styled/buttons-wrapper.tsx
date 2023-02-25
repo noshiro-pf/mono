@@ -10,7 +10,7 @@ export const ButtonsWrapperNowrap = styled.div`
   & > * {
     margin-right: 5px; // margin between this button and the next button
   }
-  &::last-child {
+  &::last-of-type {
     margin-right: 0;
   }
 `;
