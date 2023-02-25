@@ -4,6 +4,7 @@ import { castWritable, tp } from '@noshiro/ts-utils';
 // eslint-disable-next-line import/no-named-as-default
 import preact from '@preact/preset-vite';
 import inject from '@rollup/plugin-inject';
+import legacy from '@vitejs/plugin-legacy';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
@@ -38,6 +39,7 @@ export default defineConfig({
       }),
       include: ['src/**/*.ts', 'src/**/*.tsx'] as const,
     }),
+    legacy(),
   ],
   build: {
     outDir: 'build',

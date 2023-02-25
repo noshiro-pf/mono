@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { castWritable, tp } from '@noshiro/ts-utils';
 import inject from '@rollup/plugin-inject';
+import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react-swc';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,6 +37,7 @@ export default defineConfig({
       }),
       include: ['src/**/*.ts', 'src/**/*.tsx'] as const,
     }),
+    legacy(),
   ],
   build: {
     outDir: 'build',
