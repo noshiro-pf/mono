@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import { useMemo } from 'react';
-import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`
   width: 100%;

@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { memoNamed } from '@noshiro/react-utils';
 import { useResizeObserver } from '@noshiro/resize-observer-react-hooks';
 import { useMemo } from 'react';
-import styled from 'styled-components';
 
 const Root = styled.div`
   width: 100%;

@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { memoNamed } from '@noshiro/react-utils';
 import { useEffect, useRef } from 'react';
-import styled from 'styled-components';
 
 const Root = styled.div`
   width: 100%;

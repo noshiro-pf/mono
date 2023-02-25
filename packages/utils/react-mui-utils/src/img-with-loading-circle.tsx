@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { CircularProgress } from '@mui/material';
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
 import { useMemo } from 'react';
-import styled from 'styled-components';
 
 type Props = Readonly<{
   src: string;
