@@ -55,6 +55,7 @@
         "src/**/*.ts",
         "tsconfig.json",
         "../../../config/tsconfig/**",
+        "../stdlib/stdlib.d.ts",
         "../ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [
@@ -74,6 +75,7 @@
         "../../../package.json",
         "../../../config/tsconfig/**",
         "../../../config/eslintrc/**",
+        "../stdlib/stdlib.d.ts",
         "../ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": []
@@ -89,6 +91,7 @@
         "../../../package.json",
         "../../../config/tsconfig/**",
         "../../../config/eslintrc/**",
+        "../stdlib/stdlib.d.ts",
         "../ts-type-utils/ts-type-utils.d.ts"
       ],
       "clean": false,
@@ -102,6 +105,7 @@
         "src/**/*.ts",
         "tsconfig.json",
         "../../../config/tsconfig/**",
+        "../stdlib/stdlib.d.ts",
         "../ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": []
