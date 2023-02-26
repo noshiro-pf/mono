@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { memoNamed } from '@noshiro/react-utils';
 import { type Rect } from '@noshiro/ts-utils-additional';
 import { useMemo } from 'react';
-import styled from 'styled-components';
 
 const RelativeWrapper = styled.div`
   position: relative;
