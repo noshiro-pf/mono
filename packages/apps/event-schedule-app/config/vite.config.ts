@@ -24,7 +24,7 @@ const providePluginDefs = (
 )(thisDir, packageJson.devDependencies);
 
 // https://vitejs.dev/config/
-// eslint-disable-next-line import/no-default-export
+// eslint-disable-next-line import/no-default-export, import/no-unused-modules
 export default defineConfig({
   plugins: [
     react({
