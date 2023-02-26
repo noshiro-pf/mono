@@ -39,8 +39,8 @@ const generateGlobalsDecl = (packageName, importsList, typeImportsList) =>
   [
     // imports
     'import {',
-    ...typeImportsList.map(({ name: s }) => `type ${s} as _${s},`),
-    ...importsList.map((s) => `type ${s} as _${s},`),
+    ...typeImportsList.map(({ name: s }) => `type ${s} as TYPE_${s},`),
+    ...importsList.map((s) => `type ${s} as VAR_${s},`),
     `} from '${packageName}';`,
 
     '',
@@ -54,12 +54,12 @@ const generateGlobalsDecl = (packageName, importsList, typeImportsList) =>
           ? ''
           : `<${p.map((a) => a.replace(/ extends .*$/gu, '')).join(', ')}>`;
 
-      return `type ${s}${paramsDestStr} = _${s}${paramsSrcStr};`;
+      return `type ${s}${paramsDestStr} = TYPE_${s}${paramsSrcStr};`;
     }),
     '',
     '/* custom types */',
     '',
-    ...importsList.map((s) => `const ${s}: typeof _${s};`),
+    ...importsList.map((s) => `const ${s}: typeof VAR_${s};`),
     '',
     '/* custom variables */',
     '',
