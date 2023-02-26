@@ -6,23 +6,24 @@ type Props = Readonly<{
 }>;
 
 const convertUrlStringToAnchorElement = (
-  str: string
+  str: string,
+  key: React.Key
 ): JSX.IntrinsicElements['a'] | JSX.IntrinsicElements['span'] =>
   urlRegex({ exact: true, strict: false }).test(str) ? (
-    <a href={str} rel={'noopener noreferrer'} target={'_blank'}>
+    <a key={key} href={str} rel={'noopener noreferrer'} target={'_blank'}>
       {str}
     </a>
   ) : (
-    <span>{str}</span>
+    <span key={key}>{str}</span>
   );
 
 export const AnswerPageNotes = memoNamed<Props>(
   'AnswerPageNotes',
   ({ notes }) => (
     <>
-      {Arr.map(splitStringByWhitespace(notes), (str, i) => (
-        <span key={i}>{convertUrlStringToAnchorElement(str)} </span>
-      ))}
+      {Arr.map(splitStringByWhitespace(notes), (str, i) =>
+        convertUrlStringToAnchorElement(str, i)
+      )}
     </>
   )
 );
