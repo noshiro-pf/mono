@@ -14,6 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
+/// <reference path="./utils.d.ts" />
 
 type FlatArray<Arr, Depth extends number> = {
   readonly done: Arr;

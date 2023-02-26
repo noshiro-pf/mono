@@ -14,6 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
+/// <reference path="./utils.d.ts" />
 
 interface Array<T> {
   /**
@@ -21,7 +22,10 @@ interface Array<T> {
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
-  includes(searchElement: T, fromIndex?: number): boolean;
+  includes(
+    searchElement: T | (WidenLiteral<T> & {}),
+    fromIndex?: number
+  ): searchElement is T;
 }
 
 interface ReadonlyArray<T> {
@@ -30,7 +34,10 @@ interface ReadonlyArray<T> {
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
-  includes(searchElement: T, fromIndex?: number): boolean;
+  includes(
+    searchElement: T | (WidenLiteral<T> & {}),
+    fromIndex?: number
+  ): searchElement is T;
 }
 
 interface Int8Array {

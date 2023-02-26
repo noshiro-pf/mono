@@ -14,6 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
+/// <reference path="./utils.d.ts" />
 
 /// <reference path="./lib.es2021.d.ts" />
 /// <reference path="./lib.dom.d.ts" />

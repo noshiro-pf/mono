@@ -14,6 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
+/// <reference path="./utils.d.ts" />
 
 interface Map<K, V> {
   clear(): void;
@@ -36,7 +37,7 @@ interface Map<K, V> {
   /**
    * @returns boolean indicating whether an element with the specified key exists or not.
    */
-  has(key: K): boolean;
+  has(key: K | (WidenLiteral<K> & {})): key is K;
   /**
    * Adds a new element with a specified key and value to the Map. If an element with the same key already exists, the element will be updated.
    */
@@ -60,7 +61,7 @@ interface ReadonlyMap<K, V> {
     thisArg?: unknown
   ): void;
   get(key: K): V | undefined;
-  has(key: K): boolean;
+  has(key: K | (WidenLiteral<K> & {})): key is K;
   readonly size: number;
 }
 
@@ -77,7 +78,7 @@ interface WeakMap<K extends object, V> {
   /**
    * @returns a boolean indicating whether an element with the specified key exists or not.
    */
-  has(key: K): boolean;
+  has(key: K | (WidenLiteral<K> & {})): key is K;
   /**
    * Adds a new element with a specified key and value.
    * @param key Must be an object.
@@ -115,7 +116,7 @@ interface Set<T> {
   /**
    * @returns a boolean indicating whether an element with the specified value exists in the Set or not.
    */
-  has(value: T): boolean;
+  has(value: T | (WidenLiteral<T> & {})): value is T;
   /**
    * @returns the number of (unique) elements in Set.
    */
@@ -133,7 +134,7 @@ interface ReadonlySet<T> {
     callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
     thisArg?: unknown
   ): void;
-  has(value: T): boolean;
+  has(value: T | (WidenLiteral<T> & {})): value is T;
   readonly size: number;
 }
 
@@ -150,7 +151,7 @@ interface WeakSet<T extends object> {
   /**
    * @returns a boolean indicating whether an object exists in the WeakSet or not.
    */
-  has(value: T): boolean;
+  has(value: T | (WidenLiteral<T> & {})): value is T;
 }
 
 interface WeakSetConstructor {
