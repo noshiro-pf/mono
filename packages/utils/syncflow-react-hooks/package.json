@@ -49,6 +49,9 @@
   "devDependencies": {
     "@noshiro/ts-type-utils": "*"
   },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
   "wireit": {
     "z:build:wireit": {
       "command": "yarn z:build:impl",

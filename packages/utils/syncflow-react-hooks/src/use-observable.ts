@@ -1,7 +1,6 @@
-import { useState } from '@noshiro/react-utils';
 import { type InitializedObservable, type Observable } from '@noshiro/syncflow';
 import { Maybe } from '@noshiro/ts-utils';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useSyncExternalStore } from 'react';
 
 export function useObservable<A>(
   createObservable$: () => InitializedObservable<A>
@@ -34,8 +33,6 @@ export const useObservableEffect = <A>(
   }, []);
 };
 
-// Wraps the value with an object to avoid setState's update behavior when T is function type.
-
 export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
   initialValue: B
@@ -48,11 +45,28 @@ export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
   initialValue?: B
 ): A | B | undefined {
-  const { state, setState } = useState<{ value: A | B | undefined }>({
-    value: Maybe.unwrap(observable$.currentValue) ?? initialValue,
-  });
-  useObservableEffect(observable$, (value) => {
-    setState({ value });
-  });
-  return state.value;
+  const value = useSyncExternalStore(
+    (onStoreChange: () => void) => {
+      const { unsubscribe } = observable$.subscribe(onStoreChange);
+      return unsubscribe;
+    },
+    () => observable$.currentValue
+  );
+
+  return Maybe.unwrapOr(value, initialValue);
 }
+
+// export function useObservableValue_<A, B = A>(
+//   observable$: Observable<A>,
+//   initialValue: B
+// ): A | B {
+//   const value = useSyncExternalStore(
+//     (onStoreChange: () => void) => {
+//       const { unsubscribe } = observable$.subscribe(onStoreChange);
+//       return unsubscribe;
+//     },
+//     () => observable$.currentValue
+//   );
+
+//   return Maybe.unwrapOr(value, initialValue);
+// }
