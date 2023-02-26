@@ -106,7 +106,10 @@ export namespace Num {
    * All other strings are considered decimal.
    */
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  export const parseInt = (str: string, radix?: number): number | undefined => {
+  export const parseInt = (
+    str: string,
+    radix?: UintRange<2, 36>
+  ): number | undefined => {
     // eslint-disable-next-line no-restricted-globals
     const result = Number.parseInt(str, radix);
 
@@ -139,7 +142,7 @@ export namespace Num {
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
   export const toExponential =
-    (fractionDigits?: number) =>
+    (fractionDigits?: UintRange<0, 20>) =>
     (n: number): string =>
       n.toExponential(fractionDigits);
 
