@@ -36,7 +36,7 @@ export const Anchor = styled.a`
   > * {
     margin-right: 7px;
   }
-  > &:last-child {
+  > &:last-of-type {
     margin-right: 0;
   }
 `;

@@ -9,16 +9,17 @@ export const ButtonsWrapperNowrap = styled.div`
 
   & > * {
     margin-right: 5px; // margin between this button and the next button
+    margin-bottom: 5px; // margin between this button and the buttons on next line
   }
-  &::last-child {
+  &::last-of-type {
     margin-right: 0;
+    margin-bottom: 0;
   }
 `;
 
 export const ButtonsWrapper = styled(ButtonsWrapperNowrap)`
   flex-wrap: wrap-reverse;
   margin-top: 10px;
-  margin-bottom: 5px; // margin between this button and the buttons on next line
 `;
 
 export const ButtonsWrapperAlignEnd = styled(ButtonsWrapper)`

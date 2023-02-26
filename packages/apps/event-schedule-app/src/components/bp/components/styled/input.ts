@@ -14,11 +14,11 @@ export const InputGroupInputStyled = styled(InputStyled)`
   width: 100%;
 
   // add space if there's something before or after the input
-  &:not(:first-child) {
+  &:not(:first-of-type) {
     padding-left: ${ptInputHeightPx}px;
   }
 
-  &:not(:last-child) {
+  &:not(:last-of-type) {
     padding-right: ${ptInputHeightPx}px;
   }
 `;

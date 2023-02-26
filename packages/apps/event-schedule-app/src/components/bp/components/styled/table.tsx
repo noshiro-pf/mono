@@ -36,8 +36,8 @@ const HTMLTableStyledBase = styled.table`
 `;
 
 export const HTMLTableStyled = styled(HTMLTableStyledBase)`
-  tbody tr:first-child,
-  tfoot tr:first-child {
+  tbody tr:first-of-type,
+  tfoot tr:first-of-type {
     th,
     td {
       box-shadow: inset 0 ${tableBorderWidthPx}px 0 0 ${tableBorderColor};
@@ -47,7 +47,7 @@ export const HTMLTableStyled = styled(HTMLTableStyledBase)`
 
 export const HTMLTableBorderedStyled = styled(HTMLTableStyled)`
   /* bordered */
-  th:not(:first-child) {
+  th:not(:first-of-type) {
     box-shadow: inset ${tableBorderWidthPx}px 0 0 0 ${tableBorderColor};
   }
 
@@ -55,7 +55,7 @@ export const HTMLTableBorderedStyled = styled(HTMLTableStyled)`
   tfoot tr td {
     box-shadow: inset 0 ${tableBorderWidthPx}px 0 0 ${tableBorderColor};
 
-    &:not(:first-child) {
+    &:not(:first-of-type) {
       box-shadow: inset ${tableBorderWidthPx}px ${tableBorderWidthPx}px 0 0
         ${tableBorderColor};
     }
@@ -63,15 +63,15 @@ export const HTMLTableBorderedStyled = styled(HTMLTableStyled)`
 `;
 
 export const HTMLTableBorderedStyled2 = styled(HTMLTableStyledBase)`
-  thead tr:first-child {
+  thead tr:first-of-type {
     th,
     td {
       border-bottom: ${tableBorderWidthPx}px solid ${tableBorderColor};
     }
   }
-  thead tr:not(:last-child),
-  tbody tr:not(:last-child),
-  tfoot tr:not(:last-child) {
+  thead tr:not(:last-of-type),
+  tbody tr:not(:last-of-type),
+  tfoot tr:not(:last-of-type) {
     th,
     td {
       border-bottom: ${tableBorderWidthPx}px solid ${tableBorderColor};
@@ -83,7 +83,7 @@ export const HTMLTableBorderedStyled2 = styled(HTMLTableStyledBase)`
   tfoot tr {
     th,
     td {
-      &:not(:last-child) {
+      &:not(:last-of-type) {
         border-right: ${tableBorderWidthPx}px solid ${tableBorderColor};
       }
     }
