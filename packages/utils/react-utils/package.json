@@ -50,7 +50,9 @@
     "react": "^17.0.2"
   },
   "devDependencies": {
-    "@noshiro/ts-type-utils": "*"
+    "@material-ui/core": "^4.11.0",
+    "@noshiro/ts-type-utils": "*",
+    "styled-components": "^5.3.0"
   },
   "wireit": {
     "z:build:wireit": {
