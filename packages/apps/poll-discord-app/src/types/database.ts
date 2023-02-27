@@ -49,7 +49,7 @@ export const fillDatabase = (o?: unknown): Database =>
               .chainOptional(Obj.entries)
               .chainOptional((entries) =>
                 entries
-                  .filter((entry): entry is [typeof entry[0], string] =>
+                  .filter((entry): entry is [(typeof entry)[0], string] =>
                     isString(entry[1])
                   )
                   .map(([k, v]) => tp(createDateOptionId(k), v))
@@ -68,7 +68,7 @@ export const fillDatabase = (o?: unknown): Database =>
               .chainOptional(Obj.entries)
               .chainOptional((entries) =>
                 entries
-                  .filter((entry): entry is [typeof entry[0], string] =>
+                  .filter((entry): entry is [(typeof entry)[0], string] =>
                     isString(entry[1])
                   )
                   .map(([k, v]) => tp(createCommandMessageId(k), v))

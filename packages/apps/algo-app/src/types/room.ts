@@ -28,7 +28,7 @@ export type Room = DeepReadonly<{
 }>;
 
 const roomStateList = ['not-started', 'playing', 'finished'] as const;
-expectType<typeof roomStateList[number], Room['state']>('=');
+expectType<(typeof roomStateList)[number], Room['state']>('=');
 
 export const assertIsRoomRemote: (
   data: unknown
