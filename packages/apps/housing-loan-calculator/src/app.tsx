@@ -11,6 +11,7 @@ export const App = memoNamed('App', () => {
         min-height: 100vh;
         padding: 10px;
       `}
+      data-cy={'root'}
     >
       <div
         css={css`
@@ -28,26 +29,10 @@ export const App = memoNamed('App', () => {
         </Paper>
       </Section>
       <Section>
-        <Paper>
-          {isCalculating ? (
-            <SpinnerWrapper>
-              <Spinner intent={'primary'} size={SpinnerSize.STANDARD} />
-            </SpinnerWrapper>
-          ) : (
-            <SummarySection />
-          )}
-        </Paper>
+        <Paper>{isCalculating ? spinnerElement : <SummarySection />}</Paper>
       </Section>
       <Section>
-        <Paper>
-          {isCalculating ? (
-            <SpinnerWrapper>
-              <Spinner intent={'primary'} size={SpinnerSize.STANDARD} />
-            </SpinnerWrapper>
-          ) : (
-            <PaymentTable />
-          )}
-        </Paper>
+        <Paper>{isCalculating ? spinnerElement : <PaymentTable />}</Paper>
       </Section>
     </div>
   );
@@ -69,3 +54,9 @@ const SpinnerWrapper = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
+const spinnerElement = (
+  <SpinnerWrapper>
+    <Spinner intent={'primary'} size={SpinnerSize.STANDARD} />
+  </SpinnerWrapper>
+);
