@@ -8,11 +8,12 @@
   "scripts": {
     "build:apps": "node scripts/build-apps.js",
     "build:utils": "node scripts/build-utils.js",
-    "ci": "run-s type-check:root ws:build ws:gi zz:cmd:check:no-diff ws:type-check ws:test fmt:all zz:cmd:check:no-diff ws:lint:fix zz:cmd:check:no-diff",
+    "ci": "run-s type-check:root ws:build ws:gi zz:cmd:check:no-diff ci:lint-and-test zz:cmd:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
     "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",
     "ci:clean-install": "run-s clean ci:install ci",
     "ci:install": "yarn",
+    "ci:lint-and-test": "run-p ws:type-check ws:test fmt:all ws:lint:fix",
     "clean": "run-s clean:build-and-cache clean:node_modules",
     "clean:build": "run-p ws:clean:build",
     "clean:build-and-cache": "run-p clean:build clean:caches",
