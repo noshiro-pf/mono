@@ -13,12 +13,17 @@ name: 'CodeQL'
 
 on:
   push:
-    branches: ['main', archive/**, develop]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: ['main']
-  schedule:
-    - cron: '18 18 * * 6'
+    branches-ignore:
+      - 'develop'
+      - 'archive/**'
+    paths-ignore:
+      - 'docs/**'
+      - 'experimental/**'
+      - '**.md'
+      - '**.txt'
+      - '.gitignore'
+  # schedule:
+  #   - cron: '18 18 * * 6'
 
 jobs:
   analyze:
