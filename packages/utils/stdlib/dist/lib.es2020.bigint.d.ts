@@ -14,6 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
+/// <reference path="./utils.d.ts" />
 
 /// <reference path="./lib.es2020.intl.d.ts" />
 
@@ -213,7 +214,7 @@ interface BigInt {
    * Returns a string representation of an object.
    * @param radix Specifies a radix for converting numeric values to strings.
    */
-  toString(radix?: number): string;
+  toString(radix?: UintRange<2, 36>): string;
 
   /** Returns a string representation appropriate to the host environment's current locale. */
   toLocaleString(

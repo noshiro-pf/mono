@@ -14,6 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
+/// <reference path="./utils.d.ts" />
 
 interface Array<T> {
   /**
@@ -288,7 +289,7 @@ interface NumberConstructor {
    * If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal.
    * All other strings are considered decimal.
    */
-  parseInt(string: string, radix?: number): number;
+  parseInt(string: string, radix?: UintRange<2, 36>): number;
 }
 
 interface ObjectConstructor {
