@@ -64,6 +64,7 @@ export const MuiTabs = memoNamed<Props>(
             {labelsWithHandler.map(({ index, label, onClick, onResize }) => (
               <Tab
                 key={index}
+                cyId={`tab-${index}`}
                 label={label}
                 selected={index === tabIndex}
                 tabWidthPx={tabWidthPx}
@@ -91,10 +92,12 @@ const Root = styled('div')`
   font-size: large;
 `;
 
-const TabsScroller = memoNamed<{
-  scrollable: boolean;
-  children: preact.ComponentChildren;
-}>('TabsWrapper', ({ scrollable, children }) =>
+const TabsScroller = memoNamed<
+  Readonly<{
+    scrollable: boolean;
+    children: preact.ComponentChildren;
+  }>
+>('TabsWrapper', ({ scrollable, children }) =>
   scrollable ? (
     <TabScrollerStyledScrollable>{children}</TabScrollerStyledScrollable>
   ) : (
@@ -124,7 +127,8 @@ const Tab = memoNamed<{
   onClick: () => void;
   tabWidthPx: number;
   onResize: (width: number) => void;
-}>('Tab', ({ label, selected, tabWidthPx, onClick, onResize }) => {
+  cyId?: string;
+}>('Tab', ({ label, selected, tabWidthPx, onClick, onResize, cyId }) => {
   const style = useMemo(
     () => ({
       minWidth: `${tabWidthPx}px`,
@@ -146,6 +150,7 @@ const Tab = memoNamed<{
     <div ref={ref}>
       <TabStyled
         aria-selected={selected}
+        data-cy={cyId}
         role='tab'
         style={style}
         type='button'
@@ -194,12 +199,14 @@ const TabStyled = styled('button')`
   color: rgba(0, 0, 0, 0.54);
 `;
 
-const TabIndicator = memoNamed<{
-  tabIndex: number;
-  tabWidthList: readonly number[];
-  tabWidthAccumulated: readonly number[];
-  tabWidthPx: number;
-}>(
+const TabIndicator = memoNamed<
+  Readonly<{
+    tabIndex: number;
+    tabWidthList: readonly number[];
+    tabWidthAccumulated: readonly number[];
+    tabWidthPx: number;
+  }>
+>(
   'TabIndicator',
   ({ tabWidthAccumulated, tabWidthList, tabIndex, tabWidthPx }) => (
     <TabIndicatorStyled
