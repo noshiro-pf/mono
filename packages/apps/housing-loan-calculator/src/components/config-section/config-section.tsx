@@ -23,6 +23,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       <SectionTitle>{dict.settings}</SectionTitle>
       <ConfigElement>
         <BpNumericInputWithLabel
+          cyId={'numericInput-downPaymentManYen'}
           label={dict.downPaymentManYen}
           min={0}
           value={downPaymentManYen}
@@ -31,6 +32,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
+          cyId={'numericInput-propertyPriceManYen'}
           label={dict.propertyPriceManYen}
           min={0}
           value={propertyPriceManYen}
@@ -39,6 +41,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
+          cyId={'numericInput-borrowingPeriodYear'}
           label={dict.borrowingPeriodYear}
           min={1}
           value={borrowingPeriodYear}
@@ -47,6 +50,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       </ConfigElement>
       <ConfigElement>
         <BpNumericInputWithLabel
+          cyId={'numericInput-interestRatePerYear'}
           label={dict.interestRatePerYear}
           max={100}
           min={0}
@@ -54,7 +58,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           onValueChange={setInterestRatePercentPerYear}
         />
       </ConfigElement>
-      <ConfigElement>
+      <ConfigElement data-cy={'repaymentTypeRadioGroup'}>
         <RepaymentTypeRadioGroup
           repaymentType={repaymentType}
           onRepaymentTypeChange={setRepaymentType}

@@ -1,16 +1,19 @@
-type Props = Readonly<{
+type Props = DeepReadonly<{
   title: string;
   description: string;
+  cyIdForTitle?: string;
+  cyIdForDescription?: string;
 }>;
 
 export const DataItem = memoNamed<Props>(
   'DataItem',
-  ({ title, description }) => (
+  ({ title, description, cyIdForTitle, cyIdForDescription }) => (
     <>
       <dt
         css={css`
           padding: 5px;
         `}
+        data-cy={cyIdForTitle}
       >
         {title}
       </dt>
@@ -18,6 +21,7 @@ export const DataItem = memoNamed<Props>(
         css={css`
           padding: 5px;
         `}
+        data-cy={cyIdForDescription}
       >
         {description}
       </dd>

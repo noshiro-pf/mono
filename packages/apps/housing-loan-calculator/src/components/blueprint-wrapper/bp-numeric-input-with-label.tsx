@@ -7,15 +7,17 @@ type Props = Readonly<{
   onValueChange?: (valueAsNumber: number) => void;
   min?: number;
   max?: number;
+  cyId?: string;
 }>;
 
 export const BpNumericInputWithLabel = memoNamed<Props>(
   'BpNumericInputWithLabel',
-  ({ label, value, disabled, onValueChange, min, max }) => (
+  ({ label, value, disabled, onValueChange, min, max, cyId }) => (
     <Label>
       {label}
       <NumericInput
         allowNumericCharactersOnly={true}
+        data-cy={cyId}
         disabled={disabled}
         max={max}
         min={min}

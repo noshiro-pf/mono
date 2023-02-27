@@ -5,7 +5,7 @@ export type CalculatedValues = DeepReadonly<{
   interestYen: number[];
   /** 月支払い額（円） */
   monthlyPaymentTotalYen: number[];
-  /** 月々の元金支払額（円） */
+  /** 月々の元金支払い額（円） */
   monthlyPrincipalPaymentYen: number[];
   /** 元金の月額（円） */
   fixedPrincipalYenPerMonth: number;
