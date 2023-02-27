@@ -10,6 +10,7 @@ on:
       - 'develop'
       - 'archive/**'
     paths-ignore:
+      - 'config/eslintrc/**'
       - 'docs/**'
       - 'experimental/**'
       - '**.md'
@@ -18,6 +19,7 @@ on:
       - 'packages/slides/**'
       - 'packages/others/**'
       - 'packages/tools/**'
+      - 'packages/apps/!event-schedule-app*/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
