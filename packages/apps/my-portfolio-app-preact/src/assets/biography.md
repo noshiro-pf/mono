@@ -9,7 +9,7 @@
     -   ボードゲーム
         -   好きなゲーム： Dominion、Tzolk'in、Algo など
     -   Splatoon 2
-    -   将棋（将棋ウォーズ二段）
+    -   将棋（将棋ウォーズ二段、最近はほぼ観る将）
     -   麻雀
 -   ピアノ（9 歳から、東京大学ピアノの会 OB）
     -   [過去の演奏動画](https://youtube.com/playlist?list=PLVnVDg2aP1bLuhgftwiN8PQbsZnoymubk)
