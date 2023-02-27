@@ -1,3 +1,7 @@
+import failOnConsoleError from 'cypress-fail-on-console-error';
+
+failOnConsoleError();
+
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
 describe('hello', () => {
@@ -80,5 +84,3 @@ describe('hello', () => {
     cy.get(e('paymentsSumDescription')).should('have.text', '5892.73万円');
   });
 });
-
-export {};

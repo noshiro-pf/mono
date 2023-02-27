@@ -10,6 +10,7 @@ on:
       - 'develop'
       - 'archive/**'
     paths-ignore:
+      - 'config/eslintrc/**'
       - 'docs/**'
       - 'experimental/**'
       - '**.md'
@@ -18,6 +19,7 @@ on:
       - 'packages/slides/**'
       - 'packages/others/**'
       - 'packages/tools/**'
+      - 'packages/apps/!housing-loan-calculator-app/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -34,12 +36,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setting-up JAVA
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '17'
-
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
@@ -53,7 +49,7 @@ jobs:
           install: false
           working-directory: packages/apps/housing-loan-calculator-app
           spec: cypress/e2e/**/*.cy.ts
-          start: yarn start
+          start: yarn start:dev-server
           wait-on: 'http://localhost:5180'
           wait-on-timeout: 120
           headless: true
