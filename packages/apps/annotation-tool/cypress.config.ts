@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
+  projectId: 'mympjv',
   viewportWidth: 375,
   viewportHeight: 667,
   e2e: {
