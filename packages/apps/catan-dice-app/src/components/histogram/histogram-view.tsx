@@ -24,6 +24,7 @@ export const HistogramView = memoNamed<Props>(
           css={css`
             padding: 5px;
           `}
+          data-cy={'roll-count'}
         >
           {'N = '}
           {numSample}
