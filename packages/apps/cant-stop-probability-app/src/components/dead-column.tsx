@@ -2,12 +2,12 @@ import { ButtonGroup } from '@blueprintjs/core';
 import { BpButton } from '@noshiro/react-blueprintjs-utils';
 import { type TwoDiceSumValue } from '../types';
 
-type Props = Readonly<{
-  columnsAliveWithHandler: readonly Readonly<{
+type Props = DeepReadonly<{
+  columnsAliveWithHandler: {
     columnId: TwoDiceSumValue;
     alive: boolean;
     toggle: () => void;
-  }>[];
+  }[];
   hitSomeAliveColumnProbability: number;
 }>;
 

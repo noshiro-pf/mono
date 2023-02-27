@@ -43,15 +43,15 @@ export const ProbabilityTable = memoNamed<Props>(
           <Th colSpan={3}>{'ちょうどその段数進められる組合せ数'}</Th>
           <Th
             title={[
-              'P0 := 〈すべての列が外れてチャラになる確率〉',
+              'P0 := 〈出た目がどの列にもマッチせずこのターン進めた分が帳消しになる確率〉',
               'P1 := 〈出た目でちょうど1列進められる確率〉',
               'P2 := 〈出た目でちょうど2列進められる確率〉',
               'として',
               '-N * P0 + 1 * P1 + 2 * P2 > 0',
-              'を満たす最大の整数N',
+              'を満たす最大の整数Nで計算している。',
             ].join('\n')}
           >
-            {'既に合計N段進んでいるときに'}
+            {'このターンに選んだ3列について、既に合計N段進んでいるときに'}
             <br />
             {'あと1回サイコロを振る期待値がプラスになる最大のN'}
           </Th>
@@ -59,6 +59,7 @@ export const ProbabilityTable = memoNamed<Props>(
         <tr>
           <Th colSpan={3}>
             <BpInput
+              data-cy={'filter-input'}
               leftIcon={'filter-list'}
               placeholder={`"${separator}" 区切りで数字を入力`}
               value={filterByString}
@@ -86,12 +87,12 @@ export const ProbabilityTable = memoNamed<Props>(
           <Th />
         </tr>
       </thead>
-      <tbody>
+      <tbody data-cy={'table-body'}>
         {filtered.map((r) => (
           <tr key={r.id}>
-            <Td>{r.selected[0]} </Td>
-            <Td>{r.selected[1]} </Td>
-            <Td>{r.selected[2]} </Td>
+            <Td>{r.selected[0]}</Td>
+            <Td>{r.selected[1]}</Td>
+            <Td>{r.selected[2]}</Td>
             <Td>
               <b>{toPercentString(r.probability)}</b>
               {`  (${r.countSum}/${denom})`}
