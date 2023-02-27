@@ -30,7 +30,7 @@ const labelNames = [
   'Horse',
 ] as const;
 
-type LabelLen = typeof labelNames['length'];
+type LabelLen = (typeof labelNames)['length'];
 
 const hues = pickupHighContrastHues(
   labelNames.length,

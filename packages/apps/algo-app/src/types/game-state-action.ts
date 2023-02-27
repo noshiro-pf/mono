@@ -28,7 +28,7 @@ const actionTypes = [
   'goToNextTurn',
 ] as const;
 
-expectType<typeof actionTypes[number], GameStateAction['type']>('=');
+expectType<(typeof actionTypes)[number], GameStateAction['type']>('=');
 
 const isActionType = (data: unknown): data is GameStateAction['type'] =>
   Arr.includes(actionTypes, data);

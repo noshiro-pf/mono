@@ -70,7 +70,7 @@ export const controlGroupStack = [
 ];
 
 export const controlGroupStackZIndex: Record<
-  typeof controlGroupStack[number],
+  (typeof controlGroupStack)[number],
   number
 > = Obj.fromEntries(controlGroupStack.map((key, index) => [key, index]));
 
