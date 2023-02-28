@@ -4,6 +4,8 @@ export default defineConfig({
   projectId: 'thyx1q',
   viewportWidth: 375,
   viewportHeight: 667,
+  modifyObstructiveCode: false,
+  pageLoadTimeout: 120000,
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
