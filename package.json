@@ -88,6 +88,7 @@
     "css-loader": "^6.2.0",
     "cypress": "^12.8.1",
     "cypress-fail-on-console-error": "^4.0.2",
+    "cypress-real-events": "^1.7.6",
     "dotenv": "^16.0.3",
     "esbuild": "^0.17.12",
     "eslint": "^8.39.0",
