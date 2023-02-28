@@ -85,6 +85,7 @@ const config = {
     'env.js',
     'paths.js',
     'cypress.config.js',
+    'cypress.config.ts',
     'gen.js',
     'gen-global-dts.js',
   ],
