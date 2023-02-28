@@ -21,7 +21,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  checkAllPackages:
+  setup:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -39,5 +39,48 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: check
-        run: yarn ci
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn ws:build
+      - run: yarn zz:cmd:check:no-diff
+
+  gi:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn ws:gi
+      - run: yarn zz:cmd:check:no-diff
+
+  type-check-root:
+    needs: [setup, build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn type-check:root
+
+  type-check:
+    needs: [setup, build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn ws:type-check
+
+  test:
+    needs: [setup, build, type-check-root, type-check]
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn ws:test
+
+  format:
+    needs: [setup, build, type-check-root, type-check]
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn fmt:all
+      - run: yarn zz:cmd:check:no-diff
+
+  eslint-fix:
+    needs: [setup, build, type-check-root, type-check]
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn ws:lint:fix
+      - run: yarn zz:cmd:check:no-diff
