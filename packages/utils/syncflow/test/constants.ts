@@ -1,4 +1,4 @@
 export const TICK = {
-  test: 50,
+  test: 100,
   preview: 300,
 } as const;
