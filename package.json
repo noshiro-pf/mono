@@ -31,7 +31,7 @@
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "lint:utils": "node scripts/lint-utils.js",
     "pub:all": "scripts/publish.sh",
-    "type-check:root": "run-p z:type-check:root:*:wireit",
+    "type-check:root": "yarn z:type-check:root:wireit",
     "ws:build": "yarn zz:cmd:ws-run-stages build",
     "ws:clean": "yarn zz:cmd:ws-run-parallel clean",
     "ws:clean:build": "yarn zz:cmd:ws-run-parallel clean:build",
@@ -43,10 +43,10 @@
     "ws:test": "yarn zz:cmd:ws-run-parallel test",
     "ws:type-check": "yarn zz:cmd:ws-run-parallel z:type-check:wireit",
     "z:gen-eslint-rules-type:compile": "wireit",
-    "z:type-check:root:configs:impl": "tsc --project config/tsconfig.json",
-    "z:type-check:root:configs:wireit": "wireit",
-    "z:type-check:root:scripts:impl": "tsc --project scripts/tsconfig.json",
-    "z:type-check:root:scripts:wireit": "wireit",
+    "z:type-check:root:impl": "run-p z:type-check:root:impl:*",
+    "z:type-check:root:impl:configs": "tsc --project config/tsconfig.json",
+    "z:type-check:root:impl:scripts": "tsc --project scripts/tsconfig.json",
+    "z:type-check:root:wireit": "wireit",
     "zz:cmd:check:no-diff": "scripts/git_no_changes.sh",
     "zz:cmd:ws-run": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
     "zz:cmd:ws-run-parallel": "yarn zz:cmd:ws-run --parallel --concurrency 5",
@@ -198,14 +198,8 @@
         "config/eslintrc/generate-rules-type/index.js"
       ]
     },
-    "z:type-check:root:configs:wireit": {
-      "command": "yarn z:type-check:root:configs:impl",
-      "dependencies": [
-        "./packages/utils/ts-type-utils:build"
-      ]
-    },
-    "z:type-check:root:scripts:wireit": {
-      "command": "yarn z:type-check:root:scripts:impl",
+    "z:type-check:root:wireit": {
+      "command": "yarn z:type-check:root:impl",
       "dependencies": [
         "./packages/utils/ts-type-utils:build"
       ]
