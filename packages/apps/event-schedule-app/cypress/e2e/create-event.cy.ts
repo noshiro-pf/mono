@@ -8,10 +8,14 @@ const e = (selector: string): string => `[data-cy="${selector}"]`;
 const path = (selectorList: readonly string[]): string =>
   selectorList.map(e).join(' ');
 
-describe('create page', () => {
-  it('create event', () => {
+describe('main', () => {
+  it('visit', () => {
     cy.visit('/');
 
+    cy.get(path(['title'])).should('be.visible');
+  });
+
+  it('create event', () => {
     // create-page
     cy.get(e('create-page')).within(() => {
       cy.get(path(['title'])).type('ボドゲ会');
@@ -50,18 +54,24 @@ describe('create page', () => {
 
       cy.get(e('open-answer-page-button')).click();
     });
+  });
 
+  it('add answers', () => {
     // answer-page
     cy.get(e('answer-page')).should('be.visible');
 
     createAnswer('Alice');
     createAnswer('Bob');
+  });
 
+  it('edit event', () => {
     cy.get(e('answer-page')).within(() => {
       cy.get(e('edit-event-settings')).click();
     });
 
     cy.get(e('edit-event-schedule-page')).within(() => {
+      cy.get(e('diff-ul')).children().should('have.length', 0);
+
       cy.get(e('title')).should('have.value', 'ボドゲ会');
       cy.get(e('note')).should('have.value', 'ノート\n');
 
@@ -127,6 +137,8 @@ const createAnswer = (username: string): void => {
 
       cy.get(path(['buttons', 'submit-answer-button'])).click();
     });
+
+    cy.get(path(['refresh-answers'])).should('be.disabled');
   });
 };
 
