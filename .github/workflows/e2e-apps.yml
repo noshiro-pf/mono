@@ -1,0 +1,119 @@
+# This is a basic workflow to help you get started with Actions
+
+name: run E2E test on apps
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'archive/**'
+    paths-ignore:
+      - 'config/eslintrc/**'
+      - 'docs/**'
+      - 'experimental/**'
+      - '**.md'
+      - '**.txt'
+      - '.gitignore'
+      - 'packages/slides/**'
+      - 'packages/others/**'
+      - 'packages/tools/**'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
+      options: --user 1001
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build dependencies
+        run: yarn ws:build
+
+  cypress-run:
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
+      options: --user 1001
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app_name:
+          - algo-app
+          - annotation-tool
+          - blueprintjs-playground
+          - blueprintjs-playground-styled
+          - cant-stop-probability-app
+          - catan-dice-app
+          - color-demo-app
+          - housing-loan-calculator-app
+          - lambda-calculus-interpreter-preact
+          - lambda-calculus-interpreter-react
+          - mahjong-calculator-app
+          - my-portfolio-app-preact
+          - poll-discord-app
+          - slack-app
+          - template-preact-app-vite
+          - template-react-app-vite
+
+    steps:
+      - name: Cypress run on Chrome
+        uses: cypress-io/github-action@v4
+        with:
+          browser: chrome
+          install: false
+          working-directory: packages/apps/${{ matrix.app_name }}
+          spec: cypress/e2e/**/*.cy.ts
+          start: yarn start:dev-server
+          wait-on: 'http://localhost:5180'
+          wait-on-timeout: 120
+          headless: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cypress-run-event-schedule-app:
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
+      options: --user 1001
+
+    steps:
+      - name: Cypress run on Chrome
+        uses: cypress-io/github-action@v4
+        with:
+          # group: 'UI - Chrome'
+          browser: chrome
+          install: false
+          working-directory: packages/apps/event-schedule-app
+          spec: cypress/e2e/**/*.cy.ts
+          start: |
+            yarn start:emulators
+            yarn start:dev-server
+          # wait-on: 'http://localhost:8080, http://localhost:8081, http://localhost:5001'
+          wait-on: 'http://localhost:5180'
+          wait-on-timeout: 120
+          headless: true
+          record: true
+          parallel: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
