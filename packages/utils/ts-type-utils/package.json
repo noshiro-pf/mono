@@ -16,7 +16,6 @@
     "lint": "yarn z:lint:src:wireit",
     "lint:fix": "yarn z:lint:fix:src:wireit",
     "pub": "yarn zz:cmd:publish",
-    "test": "yarn z:type-check:wireit",
     "tsc": "yarn z:type-check:wireit",
     "tscw": "yarn z:type-check:impl --watch",
     "z:lint:fix:impl": "yarn zz:cmd:eslint --fix",
