@@ -12,5 +12,7 @@
       }
     ]
   },
-  "testMatch": ["<rootDir>/(test|src)/**/*.test.ts"]
+  "testMatch": ["<rootDir>/test/**/*.test.stream.ts"],
+  "testTimeout": 30000,
+  "detectOpenHandles": true
 }
