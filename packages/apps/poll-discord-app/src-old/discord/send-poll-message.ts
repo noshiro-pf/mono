@@ -232,7 +232,12 @@ export const sendMessageMain = async (
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   message: Message
+  // interaction: Interaction<CacheType>
 ): Promise<Result<undefined, unknown>> => {
+  // if (!interaction.isCommand()) return Result.ok(undefined);
+
+  // const { commandName } = interaction;
+
   if (message.author.bot) return Result.ok(undefined);
 
   if (message.content.startsWith(`${triggerCommand.gp} `)) {

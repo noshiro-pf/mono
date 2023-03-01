@@ -1,68 +1,103 @@
-import { psqlRowId } from './constants';
-import { initDiscordClient, startDiscordListener } from './discord';
-import { DATABASE_URL, isDev } from './env';
-import { initializeInMemoryDatabase } from './in-memory-database';
-import { psql } from './postgre-sql';
-import { databaseDefaultValue, type DatabaseRef } from './types';
+// Require the necessary discord.js classes
+import {
+  ActionRowBuilder,
+  Client,
+  GatewayIntentBits,
+  InteractionType,
+  SelectMenuBuilder,
+} from 'discord.js';
+import { deployCommands } from './deploy-commands';
+import { DISCORD_TOKEN } from './env';
 
-export const main = async (): Promise<Result<unknown, unknown>> => {
-  // psql.setTlsRejectUnauthorized0();
+export const main = (): void => {
+  // Create a new client instance
+  const mut_client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-  const mut_databaseRef: DatabaseRef = {
-    db: databaseDefaultValue,
-  };
+  // When the client is ready, run this code (only once)
+  mut_client.once('ready', () => {
+    console.log('Discord Client is Ready!');
+  });
 
-  const [psqlClientResult, discordClientResult] = await Promise.all([
-    psql.initClient(isDev ? undefined : DATABASE_URL),
-    initDiscordClient(),
-  ]);
+  mut_client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isChatInputCommand() && !interaction.isAutocomplete())
+      return;
 
-  if (Result.isErr(psqlClientResult)) {
-    console.error('initPsqlClient failed.', psqlClientResult.value);
-    return psqlClientResult;
-  }
-  if (Result.isErr(discordClientResult)) {
-    console.error('initDiscordClient failed.', discordClientResult.value);
-    return discordClientResult;
-  }
+    switch (interaction.commandName) {
+      case 'ping': {
+        if (!interaction.isChatInputCommand()) return;
+        await interaction.reply('Pong!');
 
-  const psqlClient = psqlClientResult.value;
-  console.log('PostgreSQL client is ready!');
+        break;
+      }
 
-  const discordClient = discordClientResult.value;
-  console.log('Discord client is ready!');
+      case 'server': {
+        if (!interaction.isChatInputCommand()) return;
+        await interaction.reply(
+          `Server name: ${interaction.guild?.name ?? ''}\nTotal members: ${
+            interaction.guild?.memberCount ?? ''
+          }`
+        );
 
-  // initialize psql database
-  const hasRecordOfIdResult = await psql.hasRecordOfId(psqlClient, psqlRowId);
-  if (Result.isErr(hasRecordOfIdResult)) {
-    console.error(
-      'psql.hasRecordOfId check failed.',
-      hasRecordOfIdResult.value
-    );
-    return hasRecordOfIdResult;
-  }
+        break;
+      }
 
-  if (!hasRecordOfIdResult.value) {
-    const res = await psql.createRecord(psqlClient, psqlRowId);
-    if (Result.isErr(res)) {
-      console.error('psql.createRecord failed.', res.value);
-      return res;
+      case 'user': {
+        if (!interaction.isChatInputCommand()) return;
+        await interaction.reply(
+          `Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}`
+        );
+
+        break;
+      }
+
+      case 'select': {
+        if (!interaction.isChatInputCommand()) return;
+
+        const row = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+          new SelectMenuBuilder()
+            .setCustomId('select')
+            .setPlaceholder('Nothing selected')
+            .addOptions(
+              {
+                label: 'Select me',
+                description: 'This is a description',
+                value: 'first_option',
+              },
+              {
+                label: 'You can select me too',
+                description: 'This is also a description',
+                value: 'second_option',
+              }
+            )
+        );
+
+        await interaction.reply({ content: 'Pong!', components: [row] });
+
+        break;
+      }
+
+      case 'tag': {
+        if (interaction.type !== InteractionType.ApplicationCommandAutocomplete)
+          return;
+
+        const focusedValue = interaction.options.getFocused();
+        const choices = ['faq', 'install', 'collection', 'promise', 'debug'];
+        const filtered = choices.filter((choice) =>
+          choice.startsWith(focusedValue)
+        );
+        await interaction.respond(
+          castWritable(
+            filtered.map((choice) => ({ name: choice, value: choice }))
+          )
+        );
+
+        break;
+      }
     }
-    console.log(`created record with id ${psqlRowId}`);
-  }
+  });
 
-  const initDbResult = await initializeInMemoryDatabase(
-    mut_databaseRef,
-    psqlClient
-  );
+  // Login to Discord with your client's token
+  mut_client.login(DISCORD_TOKEN).catch(noop);
 
-  if (Result.isErr(initDbResult)) {
-    console.error('initDbResult failed.', initDbResult.value);
-    return initDbResult;
-  }
-  console.log('In-Memory DB is ready');
-
-  startDiscordListener(discordClient, psqlClient, mut_databaseRef);
-
-  return Result.ok(undefined);
+  deployCommands();
 };

@@ -1,7 +1,7 @@
 import { daysOfWeekList } from '@noshiro/ts-utils-additional';
 import { rp3060dParseCommand, rp3060ParseCommand } from './parse-command';
 
-export const convertRp60ArgToRpArgsShared = (
+const convertRp60ArgToRpArgsShared = (
   title: string,
   arg1AsNumber: number,
   arg2AsNumber: number
