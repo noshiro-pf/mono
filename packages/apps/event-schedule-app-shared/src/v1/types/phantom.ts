@@ -1,5 +1,3 @@
-import { type Phantomic } from '@noshiro/ts-utils-additional';
-
 export type AnswerId = Phantomic<string, 'AnswerId'>;
 export const createAnswerId = (s: string): AnswerId => s as AnswerId;
 
