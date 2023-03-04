@@ -1,5 +1,6 @@
-import { expectType, ISet, mapOptional, pipe } from '@noshiro/ts-utils';
-import { type UserId } from './types';
+import * as t from '@noshiro/io-ts';
+import { expectType, ISet, pipe } from '@noshiro/ts-utils';
+import { userIdType, type UserId } from './types';
 
 export type AnswerOfDate = Readonly<{
   good: ISet<UserId>;
@@ -7,37 +8,28 @@ export type AnswerOfDate = Readonly<{
   poor: ISet<UserId>;
 }>;
 
-export type AnswerOfDateJson = DeepReadonly<{
-  good: string[];
-  fair: string[];
-  poor: string[];
-}>;
-
-expectType<AnswerOfDateJson, JSONType>('<=');
-
-export type PartialAnswerOfDateJson = Partial<
-  DeepReadonly<{
-    good: UserId[];
-    fair: UserId[];
-    poor: UserId[];
-  }>
->;
-
 export const answerOfDateDefaultValue: AnswerOfDate = {
   good: ISet.new<UserId>([]),
   poor: ISet.new<UserId>([]),
   fair: ISet.new<UserId>([]),
 } as const;
 
-const d = answerOfDateDefaultValue;
-
-export const fillAnswerOfDate = (
-  p?: PartialAnswerOfDateJson
-): AnswerOfDate => ({
-  good: pipe(p?.good).chain((v) => mapOptional(v, ISet.new)).value ?? d.good,
-  poor: pipe(p?.poor).chain((v) => mapOptional(v, ISet.new)).value ?? d.poor,
-  fair: pipe(p?.fair).chain((v) => mapOptional(v, ISet.new)).value ?? d.fair,
+export const answerOfDateJsonType = t.record({
+  good: t.array(userIdType),
+  fair: t.array(userIdType),
+  poor: t.array(userIdType),
 });
+
+export type AnswerOfDateJson = t.TypeOf<typeof answerOfDateJsonType>;
+
+expectType<AnswerOfDateJson, JSONType>('<=');
+
+export const answerOfDateFromJson = (p?: unknown): AnswerOfDate =>
+  pipe(answerOfDateJsonType.fill(p)).chain((a) => ({
+    good: ISet.new(a.good),
+    poor: ISet.new(a.poor),
+    fair: ISet.new(a.fair),
+  })).value;
 
 export const answerOfDateToJson = (a: AnswerOfDate): AnswerOfDateJson => ({
   good: a.good.toArray(),

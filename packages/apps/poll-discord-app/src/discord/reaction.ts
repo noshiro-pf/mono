@@ -8,8 +8,8 @@ import {
 } from '../functions';
 import { updateVote } from '../in-memory-database';
 import {
-  createDateOptionId,
-  createUserId,
+  toDateOptionId,
+  toUserId,
   type AnswerType,
   type DatabaseRef,
   type Poll,
@@ -89,10 +89,10 @@ export const onMessageReactCommon = async (
     return Result.ok(undefined);
   }
 
-  const dateOptionId = createDateOptionId(reactionFilled.message.id);
+  const dateOptionId = toDateOptionId(reactionFilled.message.id);
 
   const [resultPollResult, messages] = await Promise.all([
-    updateVote(databaseRef, psqlClient, dateOptionId, createUserId(user.id), {
+    updateVote(databaseRef, psqlClient, dateOptionId, toUserId(user.id), {
       type: action.type,
       value: action.value,
     }),

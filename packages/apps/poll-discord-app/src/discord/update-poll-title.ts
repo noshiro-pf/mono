@@ -9,7 +9,7 @@ import {
   rpParseCommand,
 } from '../functions';
 import {
-  createCommandMessageId,
+  toCommandMessageId,
   type DatabaseRef,
   type PsqlClient,
 } from '../types';
@@ -38,7 +38,7 @@ export const updatePollTitle = async (
   if (title === undefined) return Result.ok(undefined);
 
   const pollId = databaseRef.db.commandMessageIdToPollIdMap.get(
-    createCommandMessageId(messageFilled.id)
+    toCommandMessageId(messageFilled.id)
   );
   if (pollId === undefined) return Result.ok(undefined);
 

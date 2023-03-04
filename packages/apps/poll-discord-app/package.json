@@ -38,6 +38,7 @@
     "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
   },
   "dependencies": {
+    "@noshiro/io-ts": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
     "discord.js": "^12.5.1",

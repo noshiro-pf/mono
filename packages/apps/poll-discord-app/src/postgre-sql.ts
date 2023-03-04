@@ -25,7 +25,6 @@ const initClient = async (
 };
 
 const getJsonData = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   psqlClient: PsqlClient
 ): Promise<Result<PsqlRow, Error>> => {
   const query = `select * from ${psqlTableName};`;
@@ -88,9 +87,7 @@ const createRecord = (
     psqlRowType.updated_at
   }, ${psqlRowType.id} ) values ( '${Result.unwrapThrow(
     Json.stringify({
-      polls: databaseDefaultValue.polls.toEntriesArray() as unknown as Readonly<
-        Record<string, never>
-      >[], // TODO
+      polls: databaseDefaultValue.polls.toEntriesArray(),
       dateToPollIdMap: databaseDefaultValue.dateToPollIdMap.toEntriesArray(),
       commandMessageIdToPollIdMap:
         databaseDefaultValue.commandMessageIdToPollIdMap.toEntriesArray(),
@@ -108,7 +105,6 @@ const createRecord = (
 };
 
 const closeConnection = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   psqlClient: PsqlClient
 ): Promise<Result<void, unknown>> => Result.fromPromise(psqlClient.end());
 

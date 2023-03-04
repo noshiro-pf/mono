@@ -23,11 +23,11 @@ import {
 import { addPoll } from '../in-memory-database';
 import {
   answerOfDateDefaultValue,
-  createCommandMessageId,
-  createDateOptionId,
-  createPollId,
-  createTimestamp,
-  createTitleMessageId,
+  toCommandMessageId,
+  toDateOptionId,
+  toPollId,
+  toTimestamp,
+  toTitleMessageId,
   type AnswerOfDate,
   type DatabaseRef,
   type DateOption,
@@ -55,7 +55,7 @@ const rpSendPollMessageSub = async (
   >
 > => {
   const titleMessage = await messageChannel.send(createTitleString(title));
-  const titleMessageId = createTitleMessageId(titleMessage.id);
+  const titleMessageId = toTitleMessageId(titleMessage.id);
 
   const mut_dateOptionAndMessageListTemp: (readonly [DateOption, Message])[] =
     [];
@@ -68,7 +68,7 @@ const rpSendPollMessageSub = async (
     mut_dateOptionAndMessageListTemp.push([
       {
         label: el,
-        id: createDateOptionId(result.value.id),
+        id: toDateOptionId(result.value.id),
       },
       result.value,
     ]);
@@ -81,8 +81,8 @@ const rpSendPollMessageSub = async (
 
   const summaryMessageEmbed = rpCreateSummaryMessage(
     {
-      id: createPollId(''),
-      updatedAt: createTimestamp(DateUtils.now()),
+      id: toPollId(''),
+      updatedAt: toTimestamp(DateUtils.now()),
       title,
       dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(
@@ -149,8 +149,8 @@ const rpSendPollMessage = async (
     databaseRef,
     psqlClient,
     {
-      id: createPollId(summaryMessage.id),
-      updatedAt: createTimestamp(summaryMessage.createdTimestamp),
+      id: toPollId(summaryMessage.id),
+      updatedAt: toTimestamp(summaryMessage.createdTimestamp),
       title,
       dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(
@@ -158,7 +158,7 @@ const rpSendPollMessage = async (
       ),
       titleMessageId,
     },
-    createCommandMessageId(messageId)
+    toCommandMessageId(messageId)
   );
 
   await Promise.all(

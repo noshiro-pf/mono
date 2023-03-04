@@ -15,7 +15,8 @@ import {
   type UserId,
 } from '../types';
 
-/** @description reactions を取得して poll.answers を修復（データベースが壊れたときの保険）
+/**
+ * @description reactions を取得して poll.answers を修復（データベースが壊れたときの保険）
  */
 export const fixAnswerAndUpdateMessage = async (
   databaseRef: DatabaseRef,

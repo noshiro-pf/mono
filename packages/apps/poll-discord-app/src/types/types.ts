@@ -1,24 +1,32 @@
+import * as t from '@noshiro/io-ts';
+import { DateUtils } from '@noshiro/ts-utils';
 import { type Client as _PsqlClient } from 'pg';
 import { type psqlRowType } from '../constants';
 import { type Database } from './database';
 
-export type PollId = string;
-export const createPollId = (id: string): PollId => id;
+export const pollIdType = t.string('');
+export type PollId = t.TypeOf<typeof pollIdType>;
+export const toPollId = (id: string): PollId => id;
 
-export type DateOptionId = string;
-export const createDateOptionId = (id: string): DateOptionId => id;
+export const dateOptionIdType = t.string('');
+export type DateOptionId = t.TypeOf<typeof dateOptionIdType>;
+export const toDateOptionId = (id: string): DateOptionId => id;
 
-export type CommandMessageId = string;
-export const createCommandMessageId = (id: string): CommandMessageId => id;
+export const commandMessageIdType = t.string('');
+export type CommandMessageId = t.TypeOf<typeof commandMessageIdType>;
+export const toCommandMessageId = (id: string): CommandMessageId => id;
 
-export type TitleMessageId = string;
-export const createTitleMessageId = (id: string): TitleMessageId => id;
+export const titleMessageIdType = t.string('');
+export type TitleMessageId = t.TypeOf<typeof titleMessageIdType>;
+export const toTitleMessageId = (id: string): TitleMessageId => id;
 
-export type UserId = string;
-export const createUserId = (id: string): UserId => id;
+export const userIdType = t.string('');
+export type UserId = t.TypeOf<typeof userIdType>;
+export const toUserId = (id: string): UserId => id;
 
-export type Timestamp = number;
-export const createTimestamp = (id: number): Timestamp => id;
+export const timestampType = t.number(DateUtils.now());
+export type Timestamp = t.TypeOf<typeof timestampType>;
+export const toTimestamp = (id: number): Timestamp => id;
 
 export type AnswerType = 'fair' | 'good' | 'poor';
 

@@ -1,18 +1,10 @@
-import {
-  DateUtils,
-  isNonNullObject,
-  Json,
-  Obj,
-  pipe,
-  Result,
-} from '@noshiro/ts-utils';
+import { DateUtils, Json, Obj, pipe, Result } from '@noshiro/ts-utils';
 import { psqlRowType } from './constants';
 import { psql } from './postgre-sql';
 import {
-  createTimestamp,
-  databaseDefaultValue,
+  databaseFromJson,
   databaseToJson,
-  fillDatabase,
+  toTimestamp,
   type AnswerOfDate,
   type AnswerType,
   type CommandMessageId,
@@ -95,9 +87,7 @@ export const updateVote = async (
   const curr = pollResult.value;
 
   const next = pipe(curr)
-    .chain((poll) =>
-      Obj.set(poll, 'updatedAt', createTimestamp(DateUtils.now()))
-    )
+    .chain((poll) => Obj.set(poll, 'updatedAt', toTimestamp(DateUtils.now())))
     .chain((poll) =>
       Obj.update(poll, 'answers', (answers) =>
         answers.update(dateOptionId, (answerOfDate): AnswerOfDate => {
@@ -131,9 +121,6 @@ export const updateVote = async (
   return Result.ok(next);
 };
 
-const databaseFromJson = (dbJson: unknown): Database =>
-  isNonNullObject(dbJson) ? fillDatabase(dbJson) : databaseDefaultValue;
-
 const setDatabase = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_ref: DatabaseMutRef,
@@ -147,7 +134,6 @@ const setDatabase = (
 export const initializeInMemoryDatabase = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_ref: DatabaseMutRef,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   psqlClient: PsqlClient
 ): Promise<Result<undefined, Error>> => {
   const res = await psql.getJsonData(psqlClient);
