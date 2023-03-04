@@ -162,11 +162,13 @@ const rpSendPollMessage = async (
   );
 
   await Promise.all(
-    dateOptionMessageList.map(async (msg) => {
-      await msg.react(emojis.good.unicode);
-      await msg.react(emojis.fair.unicode);
-      await msg.react(emojis.poor.unicode);
-    })
+    dateOptionMessageList.map((msg) => msg.react(emojis.good.unicode))
+  );
+  await Promise.all(
+    dateOptionMessageList.map((msg) => msg.react(emojis.fair.unicode))
+  );
+  await Promise.all(
+    dateOptionMessageList.map((msg) => msg.react(emojis.poor.unicode))
   );
 
   return addPollResult;
