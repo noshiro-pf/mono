@@ -93,7 +93,10 @@ workflow は .github ディレクトリに定義されている。
 
 `ci:clean-*` コマンドは、package.json 等が正しく依存関係を記述しているかをローカルで確認するために、ビルド済み utils 等のキャッシュを削除して `"ci"` コマンドを実行するために用意している。
 
-TODO
+### branch
 
--   一部の (P)React アプリは Github Actions で e2e テストが実行されるようにしているが、まだ e2e テストのテストケースは不足していたりそもそも走っていない app が多いため、 e2e テストは追加したい。
--   また、 workflow の実行は並列化できていない箇所があり遅い可能性があるのでメンテする。
+-   `main` ： デフォルトブランチ
+-   `develop` ： 開発用のブランチ
+-   `archive/*` ： 作業中のコード置き場
+-   `deploy-rich-poll` ： `packages/app/poll-discord-app` のデプロイトリガーにしているブランチ。
+    -   `main` ブランチへの関係ない変更で Railway への無駄なデプロイが走らないようにするため。
