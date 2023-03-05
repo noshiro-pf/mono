@@ -17,11 +17,12 @@ on:
       - 'develop'
       - 'archive/**'
     paths-ignore:
-      - 'docs/**'
-      - 'experimental/**'
+      - '.gitignore'
+      - '.cspell.json'
       - '**.md'
       - '**.txt'
-      - '.gitignore'
+      - 'docs/**'
+      - 'experimental/**'
   # schedule:
   #   - cron: '18 18 * * 6'
 

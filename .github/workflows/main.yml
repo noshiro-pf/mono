@@ -10,11 +10,12 @@ on:
       - 'develop'
       - 'archive/**'
     paths-ignore:
-      - 'docs/**'
-      - 'experimental/**'
+      - '.gitignore'
+      - '.cspell.json'
       - '**.md'
       - '**.txt'
-      - '.gitignore'
+      - 'docs/**'
+      - 'experimental/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
