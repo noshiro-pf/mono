@@ -1,6 +1,5 @@
 import * as t from '@noshiro/io-ts';
 import { expectType, IMap, Obj, pipe, tp } from '@noshiro/ts-utils';
-import { pollFromJson, pollJsonType, pollToJson, type Poll } from './poll';
 import {
   commandMessageIdType,
   dateOptionIdType,
@@ -8,7 +7,8 @@ import {
   type CommandMessageId,
   type DateOptionId,
   type PollId,
-} from './types';
+} from './branded';
+import { pollFromJson, pollJsonType, pollToJson, type Poll } from './poll';
 
 export type Database = Readonly<{
   polls: IMap<PollId, Poll>;

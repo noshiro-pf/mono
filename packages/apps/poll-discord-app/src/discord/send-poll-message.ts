@@ -29,6 +29,7 @@ import {
   toTimestamp,
   toTitleMessageId,
   type AnswerOfDate,
+  type CommandMessageId,
   type DatabaseRef,
   type DateOption,
   type DateOptionId,
@@ -129,7 +130,7 @@ const rpSendPollMessage = async (
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   discordChannel: Message['channel'],
-  messageId: string,
+  messageId: CommandMessageId,
   title: string | undefined,
   pollOptions: readonly string[]
 ): Promise<Result<undefined, unknown>> => {
@@ -158,7 +159,7 @@ const rpSendPollMessage = async (
       ),
       titleMessageId,
     },
-    toCommandMessageId(messageId)
+    messageId
   );
 
   await Promise.all(
@@ -257,7 +258,7 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
       title,
       args
     );
@@ -274,7 +275,7 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
       res.value.title,
       res.value.args
     );
@@ -291,7 +292,7 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
       res.value.title,
       res.value.args
     );
@@ -308,7 +309,7 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
       res.value.title,
       res.value.args
     );
@@ -325,7 +326,7 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
       res.value.title,
       res.value.args
     );

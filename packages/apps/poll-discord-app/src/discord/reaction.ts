@@ -9,6 +9,7 @@ import {
 import { updateVote } from '../in-memory-database';
 import {
   toDateOptionId,
+  toPollId,
   toUserId,
   type AnswerType,
   type DatabaseRef,
@@ -28,7 +29,7 @@ const onRefreshClick = async (
   });
 
   const poll: Poll | undefined = databaseRef.db.polls.get(
-    reactionFilled.message.id
+    toPollId(reactionFilled.message.id)
   );
 
   if (poll === undefined) return Result.err('poll not found');

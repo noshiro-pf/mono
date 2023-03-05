@@ -8,6 +8,8 @@ import {
 } from '../functions';
 import { updatePoll } from '../in-memory-database';
 import {
+  toDateOptionId,
+  toUserId,
   type DatabaseRef,
   type DateOptionId,
   type Poll,
@@ -25,11 +27,11 @@ export const fixAnswerAndUpdateMessage = async (
   messages: Collection<string, Message>,
   poll: Poll
 ): Promise<Result<undefined, string>> => {
-  const dateOptionMessages: readonly (readonly [string, Message])[] =
+  const dateOptionMessages: readonly (readonly [DateOptionId, Message])[] =
     poll.dateOptions
       .map((dateOption) =>
         tp(
-          dateOption.id,
+          toDateOptionId(dateOption.id),
           messages.find((m) => m.id === dateOption.id)
         )
       )
@@ -57,15 +59,21 @@ export const fixAnswerAndUpdateMessage = async (
         msg.reactions
           .resolve(emojis.good.unicode)
           ?.users.fetch()
-          .then((good) => good.filter((u) => !u.bot).map((u) => u.id)),
+          .then((good) =>
+            good.filter((u) => !u.bot).map((u) => toUserId(u.id))
+          ),
         msg.reactions
           .resolve(emojis.fair.unicode)
           ?.users.fetch()
-          .then((fair) => fair.filter((u) => !u.bot).map((u) => u.id)),
+          .then((fair) =>
+            fair.filter((u) => !u.bot).map((u) => toUserId(u.id))
+          ),
         msg.reactions
           .resolve(emojis.poor.unicode)
           ?.users.fetch()
-          .then((poor) => poor.filter((u) => !u.bot).map((u) => u.id)),
+          .then((poor) =>
+            poor.filter((u) => !u.bot).map((u) => toUserId(u.id))
+          ),
       ]).then(([good, fair, poor]) =>
         tp(dateId, {
           good,

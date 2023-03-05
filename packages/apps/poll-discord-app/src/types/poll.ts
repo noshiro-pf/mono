@@ -6,28 +6,29 @@ import {
   answerOfDateToJson,
   type AnswerOfDate,
 } from './answer-of-date';
-import { dateOptionType, type DateOption } from './date-option';
 import {
   dateOptionIdType,
+  pollIdType,
   timestampType,
   titleMessageIdType,
   type DateOptionId,
   type PollId,
   type Timestamp,
   type TitleMessageId,
-} from './types';
+} from './branded';
+import { dateOptionType, type DateOption } from './date-option';
 
 export type Poll = DeepReadonly<{
   id: PollId;
   title: string;
-  updatedAt: Timestamp; // timestamp
+  updatedAt: Timestamp;
   dateOptions: DateOption[]; // used to find this Poll object from button message that represents date option
   answers: IMap<DateOptionId, AnswerOfDate>;
   titleMessageId: TitleMessageId;
 }>;
 
 export const pollJsonType = t.record({
-  id: t.string(''),
+  id: pollIdType,
   title: t.string(''),
   updatedAt: timestampType,
   dateOptions: t.array(dateOptionType),
