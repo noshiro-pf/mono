@@ -41,7 +41,7 @@
     "@noshiro/io-ts": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "discord.js": "^12.5.1",
+    "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "pg": "^8.9.0"
   },

@@ -1,5 +1,5 @@
 import { Arr, ISet, isNotUndefined, type IMap } from '@noshiro/ts-utils';
-import { type EmbedFieldData } from 'discord.js';
+import type * as Discord from 'discord.js';
 import { emojis } from '../constants';
 import {
   type AnswerOfDate,
@@ -15,10 +15,10 @@ export const rpCreateSummaryField = (
   dateOption: DateOption,
   poll: Poll,
   userIdToDisplayName: IMap<UserId, string>
-): EmbedFieldData => {
+): Discord.EmbedField => {
   const answerOfDate = poll.answers.get(dateOption.id);
   if (answerOfDate === undefined) {
-    return rpFormatEmbedFieldData(
+    return rpFormatEmbedField(
       dateOption.label,
       rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName)
     );
@@ -27,7 +27,7 @@ export const rpCreateSummaryField = (
     answerOfDate.good.size + answerOfDate.fair.size + answerOfDate.poor.size ===
     0
   ) {
-    return rpFormatEmbedFieldData(
+    return rpFormatEmbedField(
       dateOption.label,
       rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName)
     );
@@ -40,10 +40,11 @@ export const rpCreateSummaryField = (
   );
 };
 
-const rpFormatEmbedFieldData = (
+const rpFormatEmbedField = (
   pollName: string,
   value: string
-): EmbedFieldData => ({
+): Discord.EmbedField => ({
+  inline: true, // TODO: test false
   name: `**${pollName}**`,
   value,
 });
@@ -52,8 +53,8 @@ const rpCreateSummaryFieldSub = (
   pollName: string,
   answerOfDate: AnswerOfDate,
   userIdToDisplayName: IMap<UserId, string>
-): EmbedFieldData =>
-  rpFormatEmbedFieldData(
+): Discord.EmbedField =>
+  rpFormatEmbedField(
     pollName,
     rpCreateSummaryValue(answerOfDate, userIdToDisplayName)
   );
@@ -96,13 +97,14 @@ const rpToUserListString = (
     .map((id) => userIdToDisplayName.get(id) ?? userIdToMention(id))
     .join(', ')}`.trimEnd();
 
-export const gpCreateSummaryField = (group: Group): EmbedFieldData =>
+export const gpCreateSummaryField = (group: Group): Discord.EmbedField =>
   gpFormatEmbedFieldData(group.no, group.nameList.join(', '));
 
 const gpFormatEmbedFieldData = (
   groupName: string,
   value: string
-): EmbedFieldData => ({
+): Discord.EmbedField => ({
+  inline: true, // TODO: test false
   name: `**${groupName}**`,
   value,
 });

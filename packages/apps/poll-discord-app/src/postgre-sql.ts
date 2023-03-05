@@ -1,5 +1,5 @@
 import { Json, Result, Str, toBoolean } from '@noshiro/ts-utils';
-import { Client } from 'pg';
+import * as Psql from 'pg';
 import { psqlRowId, psqlRowType, psqlTableName } from './constants';
 import { databaseDefaultValue, type PsqlClient, type PsqlRow } from './types';
 
@@ -12,7 +12,7 @@ const initClient = async (
   connectionString: string | undefined
 ): Promise<Result<PsqlClient, unknown>> => {
   console.log('Initializing PostgreSQL client...');
-  const psqlClient = new Client({
+  const psqlClient = new Psql.Client({
     connectionString,
     ssl: true,
   });
