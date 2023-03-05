@@ -1,4 +1,4 @@
-import { type Client as _PsqlClient } from 'pg';
+import type * as Psql from 'pg';
 import { type psqlRowType } from '../constants';
 import { type Database } from './database';
 
@@ -13,4 +13,4 @@ export type PsqlRow = {
   [psqlRowType.updated_at]: string;
 };
 
-export type PsqlClient = DeepReadonly<_PsqlClient>;
+export type PsqlClient = DeepReadonly<Psql.Client>;

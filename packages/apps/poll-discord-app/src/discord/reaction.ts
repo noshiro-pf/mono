@@ -1,5 +1,6 @@
 import { Json, match, Result } from '@noshiro/ts-utils';
-import { type MessageReaction, type PartialUser, type User } from 'discord.js';
+import type * as Discord from 'discord.js';
+import { ChannelType } from 'discord.js';
 import { emojis } from '../constants';
 import {
   createUserIdToDisplayNameMap,
@@ -22,9 +23,17 @@ const onRefreshClick = async (
   databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  reactionFilled: MessageReaction
+  reactionFilled: Discord.MessageReaction
 ): Promise<Result<undefined, string>> => {
-  const messages = await reactionFilled.message.channel.messages.fetch({
+  const channel = reactionFilled.message.channel;
+
+  if (channel.type !== ChannelType.GuildText) {
+    return Result.err(
+      `This channel type (${channel.type}) is not supported. (GuildText only)`
+    );
+  }
+
+  const messages = await channel.messages.fetch({
     around: reactionFilled.message.id,
   });
 
@@ -64,7 +73,7 @@ const onRefreshClick = async (
   return Result.ok(undefined);
 };
 
-export const onMessageReactCommon = async (
+const onMessageReactCommon = async (
   databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   action: Readonly<{
@@ -72,32 +81,38 @@ export const onMessageReactCommon = async (
     value: AnswerType | 'refresh' | undefined;
   }>,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  reaction: MessageReaction,
+  reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  user: PartialUser | User
+  user: Discord.PartialUser | Discord.User
 ): Promise<Result<undefined, unknown>> => {
-  const reactionFilled: MessageReaction = reaction.partial
-    ? await reaction.fetch()
-    : reaction;
-
   if (user.bot) return Result.ok(undefined);
   if (action.value === undefined) return Result.ok(undefined);
 
   if (action.value === 'refresh') {
     if (action.type === 'add') {
-      return onRefreshClick(databaseRef, psqlClient, reactionFilled);
+      return onRefreshClick(databaseRef, psqlClient, reaction);
     }
     return Result.ok(undefined);
   }
 
-  const dateOptionId = toDateOptionId(reactionFilled.message.id);
+  const dateOptionId = toDateOptionId(reaction.message.id);
 
-  const [resultPollResult, messages] = await Promise.all([
+  const channel = reaction.message.channel;
+  if (channel.type !== ChannelType.GuildText) {
+    return Result.err(
+      `This channel type (${channel.type}) is not supported. (GuildText only)`
+    );
+  }
+
+  const [resultPollResult, messages]: [
+    Result<Poll, string>,
+    Discord.Collection<string, Discord.Message>
+  ] = await Promise.all([
     updateVote(databaseRef, psqlClient, dateOptionId, toUserId(user.id), {
       type: action.type,
       value: action.value,
     }),
-    reactionFilled.message.channel.messages.fetch({
+    channel.messages.fetch({
       after: dateOptionId,
     }),
   ]);
@@ -107,7 +122,7 @@ export const onMessageReactCommon = async (
   if (messages.size === 0) return Result.err('messages not found.');
 
   const userIdToDisplayNameResult = await createUserIdToDisplayNameMap(
-    reactionFilled.message.guild,
+    reaction.message.guild,
     getUserIdsFromAnswers(resultPoll.answers).toArray()
   );
 
@@ -117,7 +132,9 @@ export const onMessageReactCommon = async (
 
   const userIdToDisplayName = userIdToDisplayNameResult.value;
 
-  const message = messages.find((m) => m.id === resultPoll.id);
+  const message: Discord.Message | undefined = messages.find(
+    (m) => m.id === resultPoll.id
+  );
 
   if (message === undefined) {
     return Result.err(`message with id ${resultPoll.id} not found`);
@@ -125,7 +142,9 @@ export const onMessageReactCommon = async (
 
   const result = await Result.fromPromise(
     message
-      .edit(rpCreateSummaryMessage(resultPoll, userIdToDisplayName))
+      .edit({
+        embeds: [rpCreateSummaryMessage(resultPoll, userIdToDisplayName)],
+      })
       .then(() => undefined)
   );
 
@@ -133,22 +152,22 @@ export const onMessageReactCommon = async (
 };
 
 const mapReactionEmojiNameToAnswerType = (
-  reactionEmojiName: string
+  reactionEmojiName: string | null
 ): AnswerType | 'refresh' | undefined =>
-  match(reactionEmojiName, {
+  match(reactionEmojiName ?? '', {
     [emojis.good.unicode]: 'good',
     [emojis.fair.unicode]: 'fair',
     [emojis.poor.unicode]: 'poor',
     [emojis.refresh.unicode]: 'refresh',
   });
 
-export const onMessageReactionAdd = (
+export const onMessageReactionAdd = async (
   databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  reaction: MessageReaction,
+  reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  user: PartialUser | User
+  user: Discord.PartialUser | Discord.User
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
     databaseRef,
@@ -165,9 +184,9 @@ export const onMessageReactionRemove = (
   databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  reaction: MessageReaction,
+  reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  user: PartialUser | User
+  user: Discord.PartialUser | Discord.User
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
     databaseRef,

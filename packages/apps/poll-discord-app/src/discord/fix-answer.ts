@@ -1,5 +1,5 @@
 import { ISet, isNotUndefined, Obj, Result, Str, tp } from '@noshiro/ts-utils';
-import { type Collection, type Message } from 'discord.js';
+import type * as Discord from 'discord.js';
 import { emojis } from '../constants';
 import {
   createUserIdToDisplayNameMap,
@@ -24,20 +24,22 @@ export const fixAnswerAndUpdateMessage = async (
   databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messages: Collection<string, Message>,
+  messages: Discord.Collection<string, Discord.Message>,
   poll: Poll
 ): Promise<Result<undefined, string>> => {
-  const dateOptionMessages: readonly (readonly [DateOptionId, Message])[] =
-    poll.dateOptions
-      .map((dateOption) =>
-        tp(
-          toDateOptionId(dateOption.id),
-          messages.find((m) => m.id === dateOption.id)
-        )
+  const dateOptionMessages: readonly (readonly [
+    DateOptionId,
+    Discord.Message
+  ])[] = poll.dateOptions
+    .map((dateOption) =>
+      tp(
+        toDateOptionId(dateOption.id),
+        messages.find((m) => m.id === dateOption.id)
       )
-      .filter((a): a is readonly [DateOptionId, Message] =>
-        isNotUndefined(a[1])
-      );
+    )
+    .filter((a): a is readonly [DateOptionId, Discord.Message] =>
+      isNotUndefined(a[1])
+    );
 
   const dateOptionMessagesFilled = await Promise.all(
     dateOptionMessages.map(([dateId, msg]) => tp(dateId, msg))
@@ -147,7 +149,9 @@ export const fixAnswerAndUpdateMessage = async (
     updatePoll(databaseRef, psqlClient, newPollFilled),
     Result.fromPromise(
       pollMessage
-        .edit(rpCreateSummaryMessage(newPollFilled, userIdToDisplayName))
+        .edit({
+          embeds: [rpCreateSummaryMessage(newPollFilled, userIdToDisplayName)],
+        })
         .then(() => undefined)
     ),
   ]);

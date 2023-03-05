@@ -1,5 +1,6 @@
-import { Obj, Result } from '@noshiro/ts-utils';
-import { type Message, type PartialMessage } from 'discord.js';
+import { Obj, Result, type IMap } from '@noshiro/ts-utils';
+import type * as Discord from 'discord.js';
+import { ChannelType } from 'discord.js';
 import { triggerCommand } from '../constants';
 import {
   createTitleString,
@@ -12,6 +13,7 @@ import {
   toCommandMessageId,
   type DatabaseRef,
   type PsqlClient,
+  type UserId,
 } from '../types';
 import { fixAnswerAndUpdateMessage } from './fix-answer';
 
@@ -19,39 +21,48 @@ export const updatePollTitle = async (
   databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  message: Message | PartialMessage
+  message: Discord.Message
 ): Promise<Result<undefined, unknown>> => {
-  const messageFilled = message.partial ? await message.fetch() : message;
-
-  if (messageFilled.author.bot) return Result.ok(undefined);
+  if (message.author.bot) return Result.ok(undefined);
 
   if (
-    !messageFilled.content.startsWith(`${triggerCommand.rp} `) &&
-    !messageFilled.content.startsWith(`${triggerCommand.rp30} `) &&
-    !messageFilled.content.startsWith(`${triggerCommand.rp60} `)
+    !message.content.startsWith(`${triggerCommand.rp} `) &&
+    !message.content.startsWith(`${triggerCommand.rp30} `) &&
+    !message.content.startsWith(`${triggerCommand.rp60} `)
   ) {
     return Result.ok(undefined);
   }
 
-  const [title] = rpParseCommand(messageFilled.content);
+  const [title] = rpParseCommand(message.content);
 
   if (title === undefined) return Result.ok(undefined);
 
   const pollId = databaseRef.db.commandMessageIdToPollIdMap.get(
-    toCommandMessageId(messageFilled.id)
+    toCommandMessageId(message.id)
   );
   if (pollId === undefined) return Result.ok(undefined);
 
   const poll = databaseRef.db.polls.get(pollId);
   if (poll === undefined) return Result.ok(undefined);
 
-  const [userIdToDisplayNameResult, messages] = await Promise.all([
+  const channel = message.channel;
+
+  if (channel.type !== ChannelType.GuildText) {
+    return Result.err(
+      `This channel type (${channel.type}) is not supported. (GuildText only)`
+    );
+  }
+
+  const [userIdToDisplayNameResult, messages]: [
+    Result<IMap<UserId, string>, string>,
+    Discord.Collection<string, Discord.Message>
+  ] = await Promise.all([
     createUserIdToDisplayNameMap(
-      messageFilled.guild,
+      message.guild,
       getUserIdsFromAnswers(poll.answers).toArray()
     ),
-    messageFilled.channel.messages.fetch({
-      after: messageFilled.id,
+    channel.messages.fetch({
+      after: message.id,
     }),
   ]);
 
@@ -68,8 +79,9 @@ export const updatePollTitle = async (
       Result.fromPromise(
         messages
           .find((m) => m.id === pollId)
-          ?.edit(rpCreateSummaryMessage(newPoll, userIdToDisplayName)) ??
-          Promise.resolve(undefined)
+          ?.edit({
+            embeds: [rpCreateSummaryMessage(newPoll, userIdToDisplayName)],
+          }) ?? Promise.resolve(undefined)
       ),
       Result.fromPromise(
         messages
