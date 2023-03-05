@@ -220,6 +220,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
             <ButtonsWrapperNowrapPadChanged>
               {afterDeadline ? undefined : (
                 <Button
+                  data-cy={'refresh-answers'}
                   disabled={refreshButtonIsDisabled}
                   icon={'refresh'}
                   intent={'none'}
