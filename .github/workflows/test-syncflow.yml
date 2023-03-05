@@ -10,11 +10,12 @@ on:
       - 'develop'
       - 'archive/**'
     paths-ignore:
-      - 'docs/**'
-      - 'experimental/**'
+      - '.gitignore'
+      - '.cspell.json'
       - '**.md'
       - '**.txt'
-      - '.gitignore'
+      - 'docs/**'
+      - 'experimental/**'
       - 'packages/!utils/**'
 
   # Allows you to run this workflow manually from the Actions tab
@@ -33,6 +34,7 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
+          cache-dependency-path: yarn.lock
 
       # Set up GitHub Actions caching for Wireit.
       - uses: google/wireit@setup-github-actions-caching/v1
