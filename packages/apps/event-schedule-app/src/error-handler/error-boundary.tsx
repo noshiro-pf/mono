@@ -38,8 +38,12 @@ type State = Readonly<{
   openedOnce: boolean;
 }>;
 
+type Props = Readonly<{
+  children?: React.ReactNode;
+}>;
+
 // eslint-disable-next-line react/require-optimization
-export class ErrorBoundary extends Component<{}, State> {
+export class ErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: unknown): State {
     // Update state so the next render will show the fallback UI.
     return {
@@ -53,7 +57,8 @@ export class ErrorBoundary extends Component<{}, State> {
     };
   }
 
-  constructor(props: {}) {
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  constructor(props: Props) {
     super(props);
     this.state = {
       error: undefined,
@@ -183,7 +188,9 @@ export class ErrorBoundary extends Component<{}, State> {
                 `}
               >
                 {Str.from(error)}
-                {isRecord(errorInfo) && hasKey(errorInfo, 'componentStack')
+                {isRecord(errorInfo) &&
+                hasKey(errorInfo, 'componentStack') &&
+                isString(errorInfo.componentStack)
                   ? errorInfo.componentStack
                   : undefined}
               </Pre>
