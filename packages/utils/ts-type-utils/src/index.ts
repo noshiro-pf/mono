@@ -3,6 +3,8 @@
 /// <reference path="../../stdlib/stdlib.d.ts" />
 
 export * from './aliases';
+export * from './bivariant-hack';
+export * from './boolean';
 export * from './deep';
 export * from './enum';
 export * from './index-of-tuple';
@@ -12,6 +14,7 @@ export * from './is-never';
 export * from './is-union';
 export * from './list';
 export * from './make-tuple';
+export * from './phantomic';
 export * from './record-path';
 export * from './seq';
 export * from './to-number';

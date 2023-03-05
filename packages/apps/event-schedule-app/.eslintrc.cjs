@@ -85,11 +85,6 @@ const noRestrictedImports = [
         message: 'use globals instead.',
       },
       {
-        name: '@noshiro/ts-utils-additional',
-        importNames: ['Phantomic'],
-        message: 'use globals instead.',
-      },
-      {
         name: 'src/types/firebase-types-wrapper',
         importNames: [
           'AuthCredential',

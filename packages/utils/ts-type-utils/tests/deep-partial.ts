@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-
 import { type DeepPartial } from '../src';
 import { expectType } from './expect-type';
 
