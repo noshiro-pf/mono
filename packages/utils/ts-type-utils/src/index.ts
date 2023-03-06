@@ -5,6 +5,7 @@
 export * from './aliases';
 export * from './bivariant-hack';
 export * from './boolean';
+export * from './branded-types';
 export * from './deep';
 export * from './enum';
 export * from './index-of-tuple';

@@ -75,7 +75,7 @@ export type UnionToIntersection<T> = (
   T extends unknown ? (arg: T) => void : never
 ) extends (arg: infer F) => void
   ? F
-  : unknown;
+  : never;
 
 export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
