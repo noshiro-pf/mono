@@ -1,3 +1,4 @@
+import { isUndefined, Num, Result } from '@noshiro/ts-utils';
 import { maxNumGroups, type NumGroups } from '../types';
 
 export const rpParseCommand = (command: string): readonly string[] =>
@@ -34,8 +35,8 @@ export const rp3060ParseCommand = (
   const arg2AsNumber = Num.parseInt(end, 10);
   const rangeCheckFn = Num.isInRange(0, 30);
   if (
-    isUndefined(arg1AsNumber) ||
-    isUndefined(arg2AsNumber) ||
+    arg1AsNumber === undefined ||
+    arg2AsNumber === undefined ||
     !Num.isUint32(arg1AsNumber) ||
     !Num.isUint32(arg2AsNumber) ||
     !rangeCheckFn(arg1AsNumber) ||
@@ -80,8 +81,8 @@ export const rp3060dParseCommand = (
   const arg2AsNumber = Num.parseInt(end, 10);
   const rangeCheckFn = Num.isInRange(0, 30);
   if (
-    isUndefined(arg1AsNumber) ||
-    isUndefined(arg2AsNumber) ||
+    arg1AsNumber === undefined ||
+    arg2AsNumber === undefined ||
     !Num.isUint32(arg1AsNumber) ||
     !Num.isUint32(arg2AsNumber) ||
     !rangeCheckFn(arg1AsNumber) ||
@@ -102,8 +103,7 @@ export const gpParseGroupingCommandArgument = (
   commandArguments: string
 ): Result<readonly [NumGroups, readonly string[]], undefined> => {
   const numGroups = Num.parseInt(commandArguments, 10);
-  if (isUndefined(numGroups) || Num.isNaN(numGroups))
-    return Result.err(undefined);
+  if (numGroups === undefined) return Result.err(undefined);
   if (numGroups < 2 || maxNumGroups < numGroups) return Result.err(undefined);
 
   return Result.ok([
@@ -119,7 +119,7 @@ export const gpParseRandCommandArgument = (
   commandArguments: string
 ): Result<number, undefined> => {
   const n = Num.parseInt(commandArguments, 10);
-  if (isUndefined(n) || Num.isNaN(n)) return Result.err(undefined);
+  if (n === undefined) return Result.err(undefined);
   if (n < 2 || !Num.isSafeInt(n)) return Result.err(undefined);
 
   return Result.ok(n);

@@ -1,12 +1,10 @@
-/* eslint-disable import/no-unused-modules */
+/* eslint-disable @typescript-eslint/dot-notation */
+import dotenv from 'dotenv';
 
-import { config } from 'dotenv';
-
-config();
+dotenv.config();
 
 export const DISCORD_TOKEN = process.env['DISCORD_TOKEN'] ?? '';
 
-// eslint-disable-next-line @typescript-eslint/dot-notation
 export const isDev = process.env['NODE_ENV'] === 'development';
 
 export const DATABASE_URL = isDev

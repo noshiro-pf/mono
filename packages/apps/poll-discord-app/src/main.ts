@@ -1,17 +1,20 @@
+import { Result } from '@noshiro/ts-utils';
 import { psqlRowId } from './constants';
 import { initDiscordClient, startDiscordListener } from './discord';
 import { DATABASE_URL, isDev } from './env';
 import { initializeInMemoryDatabase } from './in-memory-database';
 import { psql } from './postgre-sql';
-import { databaseDefaultValue, type DatabaseRef } from './types';
+import { databaseDefaultValue, type DatabaseMutRef } from './types';
 
 export const main = async (): Promise<Result<unknown, unknown>> => {
-  // psql.setTlsRejectUnauthorized0();
+  console.log('Starting...');
+  psql.setTlsRejectUnauthorized0();
 
-  const mut_databaseRef: DatabaseRef = {
+  const mut_databaseRef: DatabaseMutRef = {
     db: databaseDefaultValue,
   };
 
+  console.log('Initializing PostgreSQL client and DiscordClient...');
   const [psqlClientResult, discordClientResult] = await Promise.all([
     psql.initClient(isDev ? undefined : DATABASE_URL),
     initDiscordClient(),

@@ -5,10 +5,7 @@ export type DateOption = Readonly<{
   label: string;
 }>;
 
-export const isDateOption = (a: unknown): a is DateOption =>
-  isRecord(a) &&
-  Obj.hasKeyValue(a, 'id', isString) &&
-  Obj.hasKeyValue(a, 'label', isString);
+export type PartialDateOption = Partial<DateOption>;
 
 const dateOptionDefaultValue: DateOption = {
   id: createDateOptionId(''),
@@ -17,10 +14,7 @@ const dateOptionDefaultValue: DateOption = {
 
 const d = dateOptionDefaultValue;
 
-export const fillDateOption = (a: unknown): DateOption =>
-  !isRecord(a)
-    ? d
-    : {
-        id: Obj.hasKeyValue(a, 'id', isString) ? a.id : d.id,
-        label: Obj.hasKeyValue(a, 'label', isString) ? a.label : d.label,
-      };
+export const fillDateOption = (from: PartialDateOption): DateOption => ({
+  id: from.id ?? d.id,
+  label: from.label ?? d.label,
+});

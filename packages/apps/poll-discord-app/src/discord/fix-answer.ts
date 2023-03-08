@@ -1,3 +1,4 @@
+import { ISet, isNotUndefined, Obj, Result, Str, tp } from '@noshiro/ts-utils';
 import { type Collection, type Message } from 'discord.js';
 import { emojis } from '../constants';
 import {
@@ -109,8 +110,8 @@ export const fixAnswerAndUpdateMessage = async (
         key: dateId,
         value: {
           good: ISet.new(reactions.good ?? []),
-          poor: ISet.new(reactions.poor ?? []),
           fair: ISet.new(reactions.fair ?? []),
+          poor: ISet.new(reactions.poor ?? []),
         },
       }))
     )
@@ -137,9 +138,7 @@ export const fixAnswerAndUpdateMessage = async (
     updatePoll(databaseRef, psqlClient, newPollFilled),
     Result.fromPromise(
       pollMessage
-        .edit({
-          embeds: [rpCreateSummaryMessage(newPollFilled, userIdToDisplayName)],
-        })
+        .edit(rpCreateSummaryMessage(newPollFilled, userIdToDisplayName))
         .then(() => undefined)
     ),
   ]);

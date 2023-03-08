@@ -1,4 +1,10 @@
-import { type Message } from 'discord.js';
+import { DateUtils, IMap, Result, tp } from '@noshiro/ts-utils';
+import {
+  type DMChannel,
+  type Message,
+  type NewsChannel,
+  type TextChannel,
+} from 'discord.js';
 import { emojis, triggerCommand } from '../constants';
 import {
   convertRp30ArgToRpArgs,
@@ -34,7 +40,7 @@ import {
 
 const rpSendPollMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: Message['channel'],
+  messageChannel: DMChannel | NewsChannel | TextChannel,
   title: string,
   args: readonly string[]
 ): Promise<
@@ -88,7 +94,7 @@ const rpSendPollMessageSub = async (
   );
 
   const summaryMessageInitResult = await Result.fromPromise(
-    messageChannel.send({ embeds: [summaryMessageEmbed] })
+    messageChannel.send(summaryMessageEmbed)
   );
 
   if (Result.isErr(summaryMessageInitResult)) return summaryMessageInitResult;
@@ -97,7 +103,7 @@ const rpSendPollMessageSub = async (
   // memo: "（編集済）" という文字列が表示されてずれるのが操作性を若干損ねるので、
   // あえて一度メッセージを送った後再編集している
   const summaryMessageEditResult = await Result.fromPromise(
-    summaryMessageInit.edit({ embeds: [summaryMessageEmbed] })
+    summaryMessageInit.edit(summaryMessageEmbed)
   );
 
   if (Result.isErr(summaryMessageEditResult)) return summaryMessageEditResult;
@@ -168,11 +174,11 @@ const rpSendPollMessage = async (
 
 const gpSendGroupingMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: Message['channel'],
+  messageChannel: DMChannel | NewsChannel | TextChannel,
   groups: readonly Group[]
 ): Promise<Result<undefined, unknown>> => {
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send({ embeds: [gpCreateSummaryMessage(groups)] })
+    messageChannel.send(gpCreateSummaryMessage(groups))
   );
 
   return Result.map(() => undefined)(summaryMessageResult);
@@ -180,11 +186,11 @@ const gpSendGroupingMessageSub = async (
 
 const gpSendRandMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: Message['channel'],
+  messageChannel: DMChannel | NewsChannel | TextChannel,
   n: number
 ): Promise<Result<undefined, unknown>> => {
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send(Math.ceil(Math.random() * n).toString())
+    messageChannel.send(Math.ceil(Math.random() * n))
   );
 
   return Result.map(() => undefined)(summaryMessageResult);
@@ -255,42 +261,8 @@ export const sendMessageMain = async (
     );
   }
 
-  if (message.content.startsWith(`${triggerCommand.rp30t} `)) {
-    const res = convertRp30ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp30t)
-    );
-
-    if (Result.isErr(res)) return res;
-
-    return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
-      message.channel,
-      message.id,
-      res.value.title,
-      res.value.args
-    );
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rp60t} `)) {
-    const res = convertRp60ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp60t)
-    );
-
-    if (Result.isErr(res)) return res;
-
-    return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
-      message.channel,
-      message.id,
-      res.value.title,
-      res.value.args
-    );
-  }
-
   if (message.content.startsWith(`${triggerCommand.rp30} `)) {
-    const res = convertRp30dArgToRpArgs(
+    const res = convertRp30ArgToRpArgs(
       removeCommandPrefix(message.content, triggerCommand.rp30)
     );
 
@@ -307,8 +279,42 @@ export const sendMessageMain = async (
   }
 
   if (message.content.startsWith(`${triggerCommand.rp60} `)) {
-    const res = convertRp60dArgToRpArgs(
+    const res = convertRp60ArgToRpArgs(
       removeCommandPrefix(message.content, triggerCommand.rp60)
+    );
+
+    if (Result.isErr(res)) return res;
+
+    return rpSendPollMessage(
+      databaseRef,
+      psqlClient,
+      message.channel,
+      message.id,
+      res.value.title,
+      res.value.args
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp30d} `)) {
+    const res = convertRp30dArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp30d)
+    );
+
+    if (Result.isErr(res)) return res;
+
+    return rpSendPollMessage(
+      databaseRef,
+      psqlClient,
+      message.channel,
+      message.id,
+      res.value.title,
+      res.value.args
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp60d} `)) {
+    const res = convertRp60dArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp60d)
     );
 
     if (Result.isErr(res)) return res;

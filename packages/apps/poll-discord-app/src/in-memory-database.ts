@@ -1,3 +1,11 @@
+import {
+  DateUtils,
+  isNonNullObject,
+  Json,
+  Obj,
+  pipe,
+  Result,
+} from '@noshiro/ts-utils';
 import { psqlRowType } from './constants';
 import { psql } from './postgre-sql';
 import {
@@ -18,15 +26,15 @@ import {
 } from './types';
 
 export const addPoll = (
-  ref: DatabaseRef,
+  databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   poll: Poll,
   messageId: CommandMessageId
 ): Promise<Result<undefined, JSONValue>> =>
   setDatabase(
-    ref,
+    databaseRef,
     psqlClient,
-    pipe(ref.db)
+    pipe(databaseRef.db)
       .chain((db) =>
         Obj.update(db, 'polls', (polls) => polls.set(poll.id, poll))
       )
@@ -49,25 +57,25 @@ export const addPoll = (
   );
 
 export const updatePoll = (
-  ref: DatabaseRef,
+  databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   poll: Poll
 ): Promise<Result<undefined, JSONValue>> =>
   setDatabase(
-    ref,
+    databaseRef,
     psqlClient,
-    Obj.update(ref.db, 'polls', (polls) => polls.set(poll.id, poll))
+    Obj.update(databaseRef.db, 'polls', (polls) => polls.set(poll.id, poll))
   );
 
 const getPollByDateId = (
-  ref: DatabaseRef,
+  databaseRef: DatabaseRef,
   dateOptionId: DateOptionId
 ): Result<Poll, string> => {
-  const pollId = ref.db.dateToPollIdMap.get(dateOptionId);
+  const pollId = databaseRef.db.dateToPollIdMap.get(dateOptionId);
   if (pollId === undefined) {
     return Result.err(`pollId for "${dateOptionId}" not found.`);
   }
-  const curr = ref.db.polls.get(pollId);
+  const curr = databaseRef.db.polls.get(pollId);
   if (curr === undefined) {
     return Result.err(`poll with id ${pollId} not found.`);
   }
@@ -76,13 +84,13 @@ const getPollByDateId = (
 };
 
 export const updateVote = async (
-  ref: DatabaseRef,
+  databaseRef: DatabaseRef,
   psqlClient: PsqlClient,
   dateOptionId: DateOptionId,
   userId: UserId,
   action: Readonly<{ type: 'add' | 'remove'; value: AnswerType }>
 ): Promise<Result<Poll, string>> => {
-  const pollResult = getPollByDateId(ref, dateOptionId);
+  const pollResult = getPollByDateId(databaseRef, dateOptionId);
   if (Result.isErr(pollResult)) return Result.err('');
   const curr = pollResult.value;
 
@@ -111,9 +119,9 @@ export const updateVote = async (
   const pollId = curr.id;
 
   const res = await setDatabase(
-    ref,
+    databaseRef,
     psqlClient,
-    Obj.update(ref.db, 'polls', (polls) => polls.set(pollId, next))
+    Obj.update(databaseRef.db, 'polls', (polls) => polls.set(pollId, next))
   );
   if (Result.isErr(res)) {
     return Result.err(
@@ -129,7 +137,7 @@ const databaseFromJson = (dbJson: unknown): Database =>
 const setDatabase = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_ref: DatabaseMutRef,
-  psqlClient: DeepReadonly<PsqlClient>,
+  psqlClient: PsqlClient,
   next: Database
 ): Promise<Result<undefined, JSONValue>> => {
   mut_ref.db = next;
@@ -139,7 +147,8 @@ const setDatabase = (
 export const initializeInMemoryDatabase = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_ref: DatabaseMutRef,
-  psqlClient: DeepReadonly<PsqlClient>
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  psqlClient: PsqlClient
 ): Promise<Result<undefined, Error>> => {
   const res = await psql.getJsonData(psqlClient);
   if (Result.isErr(res)) return res;
