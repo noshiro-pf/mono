@@ -1,9 +1,10 @@
 import { expectType, Result } from '@noshiro/ts-utils';
 import { array } from './array';
-import { int, positiveInteger, uintRange } from './numbers';
+import { int, positiveInteger } from './branded';
 import { number } from './primitives';
 import { record } from './record';
 import { type TypeOf } from './type';
+import { uintRange } from './uint-range';
 
 describe('nested record', () => {
   const nestedRecord = record({
@@ -20,7 +21,7 @@ describe('nested record', () => {
   expectType<
     NestedRecord,
     Readonly<{
-      xs: readonly number[];
+      xs: readonly Int[];
       rec: Readonly<{
         a: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
         b: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
@@ -83,9 +84,9 @@ describe('nested record', () => {
       };
 
       expect(nestedRecord.validate(x).value).toStrictEqual([
-        `The value at record key "xs" is expected to be <int[]>, but it is actually '[-1,2.2,3.3]'.`,
-        `The array element is expected to be <int>, but the actual value at index 1 is '2.2'.`,
-        `The value is expected to be <int>, but it is actually '2.2'.`,
+        `The value at record key "xs" is expected to be <Int[]>, but it is actually '[-1,2.2,3.3]'.`,
+        `The array element is expected to be <Int>, but the actual value at index 1 is '2.2'.`,
+        `The value is expected to be <Int>, but it is actually '2.2'.`,
       ]);
     });
   });

@@ -7,7 +7,7 @@ const parseDate = (str: string): RawDateType =>
   pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
 const tenYearsLater = pipe(DateUtils.today())
-  .chain(DateUtils.updateLocaleYear((a) => a + 99))
+  .chain(DateUtils.updateLocaleYear((a) => (a + 99) as YearEnum))
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 

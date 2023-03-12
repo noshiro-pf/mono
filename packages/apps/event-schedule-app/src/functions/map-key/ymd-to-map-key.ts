@@ -8,7 +8,7 @@ export const ymdFromKey = (ymdKey: YmdKey): YearMonthDate => {
     '-'
   ) as MutableArrayOfLength<3, string>;
   return {
-    year: Num.parseInt(yearStr, 10) ?? 1970,
+    year: (Num.parseInt(yearStr, 10) ?? 1970) as YearEnum,
     month: (Num.parseInt(monthStr, 10) ?? 1) as MonthEnum,
     date: (Num.parseInt(dateStr, 10) ?? 1) as DateEnum,
   };

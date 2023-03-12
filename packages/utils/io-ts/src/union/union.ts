@@ -8,16 +8,16 @@ import {
 
 type MapUnion<T extends Type<unknown>> = T extends T ? TypeOf<T> : never;
 
-export const union = <A extends readonly Type<unknown>[]>({
+export const union = <A extends NonEmptyArray<Type<unknown>>>({
   typeName = 'union',
   types,
   defaultType,
 }: Readonly<{
   typeName?: string;
   types: A;
-  defaultType: A[number];
-}>): Type<MapUnion<A[number]>> => {
-  type T = MapUnion<A[number]>;
+  defaultType: ArrayElement<A>;
+}>): Type<MapUnion<ArrayElement<A>>> => {
+  type T = MapUnion<ArrayElement<A>>;
 
   const validate: Type<T>['validate'] = (a) =>
     types.some((t) => t.is(a))

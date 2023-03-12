@@ -44,11 +44,11 @@ const getValueHelper = (
 
 /** Gets the year, using local time. */
 const getLocaleYear = (date: DateUtils): YearEnum =>
-  getValueHelper(date, (d) => d.getFullYear());
+  getValueHelper(date, (d) => d.getFullYear()) as YearEnum;
 
 /** Gets the year using Universal Coordinated Time (UTC). */
 const getUTCYear = (date: DateUtils): YearEnum =>
-  getValueHelper(date, (d) => d.getUTCFullYear());
+  getValueHelper(date, (d) => d.getUTCFullYear()) as YearEnum;
 
 /**
  * @description Gets the month, using local time.

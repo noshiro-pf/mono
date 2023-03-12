@@ -3,7 +3,7 @@ import { type Type } from '../type';
 import { createAssertFunction } from './create-assert-function';
 import { validationErrorMessage } from './validation-error-message';
 
-export const createPrimitiveType = <A>({
+export const createPrimitiveType = <A extends Primitive>({
   typeName,
   defaultValue,
   is,

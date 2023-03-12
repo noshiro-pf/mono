@@ -35,14 +35,18 @@ export const DatepickerNav = memoNamed<Props>(
   }) => {
     const onYearChangeHandler = useCallback(
       (value: string) => {
-        onYearChange(Str.toNumber(value) ?? thisYear);
+        onYearChange(
+          mapOptional(Str.toNumber(value), (a) => a as YearEnum) ?? thisYear
+        );
       },
       [onYearChange]
     );
 
     const onMonthChangeHandler = useCallback(
       (value: string) => {
-        onMonthChange((Str.toNumber(value) ?? thisMonth) as MonthEnum);
+        onMonthChange(
+          mapOptional(Str.toNumber(value), (a) => a as MonthEnum) ?? thisMonth
+        );
       },
       [onMonthChange]
     );

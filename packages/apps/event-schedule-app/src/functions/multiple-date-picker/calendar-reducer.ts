@@ -25,12 +25,12 @@ export const calendarCurrentPageReducer: ReducerType<
   switch (action.type) {
     case 'prev-month':
       return month === 1
-        ? { year: year - 1, month: 12 }
+        ? { year: (year - 1) as YearEnum, month: 12 }
         : { year, month: (month - 1) as MonthEnum };
 
     case 'next-month':
       return month === 12
-        ? { year: year + 1, month: 1 }
+        ? { year: (year + 1) as YearEnum, month: 1 }
         : { year, month: (month + 1) as MonthEnum };
 
     case 'set-month':
