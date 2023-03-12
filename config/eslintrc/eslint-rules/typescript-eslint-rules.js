@@ -102,7 +102,13 @@ const typescriptEslintRules = {
   '@typescript-eslint/type-annotation-spacing': 'off',
 
   '@typescript-eslint/adjacent-overload-signatures': 'error',
-  '@typescript-eslint/array-type': 'error',
+  '@typescript-eslint/array-type': [
+    'error',
+    {
+      default: 'array',
+      readonly: 'array',
+    },
+  ],
   '@typescript-eslint/await-thenable': 'error',
   '@typescript-eslint/ban-ts-comment': 'error',
   '@typescript-eslint/ban-tslint-comment': 'error',
