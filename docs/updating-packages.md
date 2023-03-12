@@ -86,14 +86,12 @@ $  yarn add -W  \
 $  yarn add --dev -W  \
         @types/compression-webpack-plugin@latest  \
         @types/copy-webpack-plugin@latest         \
-        @types/dotenv-webpack@latest              \
         @types/react-hot-loader@latest            \
         @types/terser-webpack-plugin@latest       \
         @types/webpack-dev-server@latest          \
         compression-webpack-plugin@latest         \
         copy-webpack-plugin@latest                \
         css-loader@latest                         \
-        dotenv-webpack@latest                     \
         dotenv@latest                             \
         html-webpack-plugin@latest                \
         raw-loader@latest                         \
