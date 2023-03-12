@@ -10,7 +10,6 @@
 const copyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { HotModuleReplacementPlugin } = require('webpack');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 require('webpack-dev-server');
 
@@ -48,37 +47,28 @@ const rulesMaker = () => [
  * @param {string} templatePath
  * @param {{ from: string; to: string }[]} copyPaths
  * @param {boolean} hot
- * @param {boolean} useBundleAnalyzer
  * @returns {WebpackPluginInstance[]}
  */
-const pluginsMaker = (templatePath, copyPaths, hot, useBundleAnalyzer) =>
+const pluginsMaker = (templatePath, copyPaths, hot) =>
   [
     new copyWebpackPlugin({ patterns: copyPaths }),
     new HtmlWebpackPlugin({ template: templatePath }),
-  ]
-    .concat(hot ? [new HotModuleReplacementPlugin()] : [])
-    .concat(useBundleAnalyzer ? [new BundleAnalyzerPlugin()] : []);
+  ].concat(hot ? [new HotModuleReplacementPlugin()] : []);
 
 /**
  *
  * @param {SlidesPaths} paths
  * @param {{ from: string; to: string }[]} copyPaths
  * @param {boolean} hot
- * @param {boolean} useBundleAnalyzer
  * @returns {Configuration}
  */
-const webpackConfigSlidesCommonMaker = (
-  paths,
-  copyPaths,
-  hot,
-  useBundleAnalyzer
-) => ({
+const webpackConfigSlidesCommonMaker = (paths, copyPaths, hot) => ({
   entry: [paths.appIndexJs],
   resolve: {
     extensions: ['.js', '.ts'],
   },
   module: { rules: rulesMaker() },
-  plugins: pluginsMaker(paths.template, copyPaths, hot, useBundleAnalyzer),
+  plugins: pluginsMaker(paths.template, copyPaths, hot),
 });
 
 module.exports = { webpackConfigSlidesCommonMaker };

@@ -89,7 +89,6 @@ $  yarn add --dev -W  \
         @types/dotenv-webpack@latest              \
         @types/react-hot-loader@latest            \
         @types/terser-webpack-plugin@latest       \
-        @types/webpack-bundle-analyzer@latest     \
         @types/webpack-dev-server@latest          \
         @types/webpack-node-externals@latest      \
         compression-webpack-plugin@latest         \
@@ -103,7 +102,6 @@ $  yarn add --dev -W  \
         source-map-loader@latest                  \
         style-loader@latest                       \
         url-loader@latest                         \
-        webpack-bundle-analyzer@latest            \
         webpack-cli@latest                        \
         webpack-dev-server@latest                 \
         webpack-merge@latest                      \

@@ -19,39 +19,30 @@ require('webpack-dev-server');
  * @param {Paths} paths
  * @param {string} bundleJsName
  * @param {{ from: string; to: string }[]} copyPaths
- * @param {boolean} useBundleAnalyzer
  * @returns {Configuration}
  */
-const webpackConfigSlidesProdMaker = (
-  paths,
-  bundleJsName,
-  copyPaths,
-  useBundleAnalyzer = false
-) =>
-  merge(
-    webpackConfigSlidesCommonMaker(paths, copyPaths, false, useBundleAnalyzer),
-    {
-      mode: 'production',
-      output: {
-        path: paths.appBuild,
-        publicPath: paths.publicUrlOrPath,
-        filename: bundleJsName,
-      },
-      optimization: {
-        minimize: true,
-        minimizer: [
-          new TerserPlugin({
-            extractComments: 'all',
-            terserOptions: {
-              compress: {
-                drop_console: true,
-              },
+const webpackConfigSlidesProdMaker = (paths, bundleJsName, copyPaths) =>
+  merge(webpackConfigSlidesCommonMaker(paths, copyPaths, false), {
+    mode: 'production',
+    output: {
+      path: paths.appBuild,
+      publicPath: paths.publicUrlOrPath,
+      filename: bundleJsName,
+    },
+    optimization: {
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          extractComments: 'all',
+          terserOptions: {
+            compress: {
+              drop_console: true,
             },
-          }),
-        ],
-      },
-      devtool: 'source-map',
-    }
-  );
+          },
+        }),
+      ],
+    },
+    devtool: 'source-map',
+  });
 
 module.exports = { webpackConfigSlidesProdMaker };

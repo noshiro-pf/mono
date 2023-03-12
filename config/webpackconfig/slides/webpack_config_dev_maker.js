@@ -52,7 +52,7 @@ const webpackConfigSlidesDevMaker = (
   bundleJsName,
   copyPaths
 ) =>
-  merge(webpackConfigSlidesCommonMaker(paths, copyPaths, true, false), {
+  merge(webpackConfigSlidesCommonMaker(paths, copyPaths, true), {
     mode: 'development',
     output: {
       publicPath: paths.publicUrlOrPath,
