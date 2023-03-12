@@ -106,7 +106,6 @@ $  yarn add --dev -W  \
         @types/node@latest        \
         argparse@latest  \
         command-line-args@latest  \
-        cpx@latest                \
         cross-env@latest          \
         glob@latest               \
         http-server@latest        \
