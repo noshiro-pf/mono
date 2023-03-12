@@ -85,14 +85,12 @@ $  yarn add -W  \
 ```sh
 $  yarn add --dev -W  \
         @types/copy-webpack-plugin@latest         \
-        @types/react-hot-loader@latest            \
         @types/terser-webpack-plugin@latest       \
         @types/webpack-dev-server@latest          \
         copy-webpack-plugin@latest                \
         css-loader@latest                         \
         dotenv@latest                             \
         html-webpack-plugin@latest                \
-        react-hot-loader@latest                   \
         source-map-loader@latest                  \
         style-loader@latest                       \
         url-loader@latest                         \
