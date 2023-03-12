@@ -92,7 +92,6 @@ $  yarn add --dev -W  \
         dotenv@latest                             \
         html-webpack-plugin@latest                \
         style-loader@latest                       \
-        url-loader@latest                         \
         webpack-cli@latest                        \
         webpack-dev-server@latest                 \
         webpack-merge@latest                      \
