@@ -91,7 +91,6 @@ $  yarn add --dev -W  \
         css-loader@latest                         \
         dotenv@latest                             \
         html-webpack-plugin@latest                \
-        source-map-loader@latest                  \
         style-loader@latest                       \
         url-loader@latest                         \
         webpack-cli@latest                        \
