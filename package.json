@@ -134,7 +134,6 @@
     "terser": "^5.16.5",
     "terser-webpack-plugin": "^5.1.4",
     "ts-jest": "^29.0.1",
-    "ts-loader": "^9.3.1",
     "ts-morph": "^16.0.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0",
