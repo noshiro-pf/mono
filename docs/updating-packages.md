@@ -57,7 +57,6 @@ $  yarn add --dev -W  \
 $  yarn add --dev -W     \
         typescript@latest  \
         ts-morph@latest    \
-        ts-node@latest     \
         tslib@latest
 ```
 
@@ -84,30 +83,17 @@ $  yarn add -W  \
 
 ```sh
 $  yarn add --dev -W  \
-        @types/compression-webpack-plugin@latest  \
         @types/copy-webpack-plugin@latest         \
-        @types/dotenv-webpack@latest              \
-        @types/react-hot-loader@latest            \
         @types/terser-webpack-plugin@latest       \
-        @types/webpack-bundle-analyzer@latest     \
         @types/webpack-dev-server@latest          \
-        @types/webpack-node-externals@latest      \
-        compression-webpack-plugin@latest         \
         copy-webpack-plugin@latest                \
         css-loader@latest                         \
-        dotenv-webpack@latest                     \
         dotenv@latest                             \
         html-webpack-plugin@latest                \
-        raw-loader@latest                         \
-        react-hot-loader@latest                   \
-        source-map-loader@latest                  \
         style-loader@latest                       \
-        url-loader@latest                         \
-        webpack-bundle-analyzer@latest            \
         webpack-cli@latest                        \
         webpack-dev-server@latest                 \
         webpack-merge@latest                      \
-        webpack-node-externals@latest             \
         webpack@latest
 ```
 
@@ -119,7 +105,6 @@ $  yarn add --dev -W  \
         @types/node@latest        \
         argparse@latest  \
         command-line-args@latest  \
-        cpx@latest                \
         cross-env@latest          \
         glob@latest               \
         http-server@latest        \
