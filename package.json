@@ -128,7 +128,6 @@
     "prettier": "^2.8.4",
     "prettier-plugin-organize-imports": "^3.1.1",
     "prettier-plugin-packagejson": "^2.3.0",
-    "raw-loader": "^4.0.2",
     "react-codemod": "^5.4.3",
     "react-hot-loader": "^4.13.0",
     "rimraf": "^4.3.1",
