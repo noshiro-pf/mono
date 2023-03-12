@@ -90,7 +90,6 @@ $  yarn add --dev -W  \
         @types/react-hot-loader@latest            \
         @types/terser-webpack-plugin@latest       \
         @types/webpack-dev-server@latest          \
-        @types/webpack-node-externals@latest      \
         compression-webpack-plugin@latest         \
         copy-webpack-plugin@latest                \
         css-loader@latest                         \
@@ -105,7 +104,6 @@ $  yarn add --dev -W  \
         webpack-cli@latest                        \
         webpack-dev-server@latest                 \
         webpack-merge@latest                      \
-        webpack-node-externals@latest             \
         webpack@latest
 ```
 
