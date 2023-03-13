@@ -1,5 +1,5 @@
 import { dictionary } from '../constants';
-import { createRoom } from '../observables';
+import { createRoom } from '../store';
 import { ButtonPrimary, Input, Spinner } from './bp';
 
 const dc = dictionary.createRoom;

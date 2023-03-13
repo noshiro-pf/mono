@@ -6,7 +6,7 @@ import {
   isMainPage,
   routes,
 } from '../constants';
-import { createRoom, db } from '../observables';
+import { createRoom, db } from '../store';
 import { Button } from './bp';
 import { CreateRoomPage } from './create-room-page';
 import { GameMain } from './game-main';

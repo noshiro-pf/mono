@@ -9,7 +9,7 @@ import {
   playerNamePositionsDispatcher,
   selectAnswerBalloonProps$,
   turnPlayerHighlighterPosition$,
-} from '../observables';
+} from '../store';
 import { type DisplayValues } from '../types';
 import {
   ConfirmTossBalloon,
