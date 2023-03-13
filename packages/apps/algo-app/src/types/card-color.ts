@@ -1,4 +1,11 @@
-export type CardColor = 'black' | 'white';
+import * as t from '@noshiro/io-ts';
 
-export const isCardColor = (data: unknown): data is CardColor =>
-  typeof data === 'string' && (data === 'black' || data === 'white');
+export const cardColorTypeDef = t.enumType({
+  values: ['black', 'white'] as const,
+  defaultValue: 'black',
+  typeName: 'CardColor',
+});
+
+export type CardColor = t.TypeOf<typeof cardColorTypeDef>;
+
+export const isCardColor = cardColorTypeDef.is;

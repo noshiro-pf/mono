@@ -1,9 +1,25 @@
-import { type Card, type CardWithVisibility } from './card-type';
+import * as t from '@noshiro/io-ts';
+import {
+  cardWithVisibilityTypeDef,
+  type Card,
+  type CardWithVisibility,
+} from './card-type';
 import { type PhaseInTurn } from './phase-in-turn';
 import { type PlayerIndex } from './player-index';
 
+export const playerCardsTypeDef = t.arrayOfLength(
+  4,
+  t.arrayOfLength(6, cardWithVisibilityTypeDef)
+);
+
+type PlayerCards = t.TypeOf<typeof playerCardsTypeDef>;
+
+expectType<PlayerCards, ArrayOfLength<4, ArrayOfLength<6, CardWithVisibility>>>(
+  '<='
+);
+
 export type GameState = Readonly<{
-  playerCards: ArrayOfLength<4, ArrayOfLength<6, CardWithVisibility>>;
+  playerCards: PlayerCards;
 
   // attack and answer
   cardChosenToToss: Card | undefined;

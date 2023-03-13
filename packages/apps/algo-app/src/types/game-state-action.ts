@@ -1,82 +1,79 @@
-import { FieldValue } from 'firebase/firestore';
-import { isCard, type Card } from './card-type';
+import * as t from '@noshiro/io-ts';
+import { cardTypeDef } from './card-type';
+import { firestoreTimestampTypeDef } from './firestore-timestamp-type';
 
-export type GameStateAction = Readonly<
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
-  | { timestamp: FieldValue; type: 'selectMyCard'; card: Card }
-  | { timestamp: FieldValue; type: 'cancelToss' }
-  | { timestamp: FieldValue; type: 'submitToss' }
-  | { timestamp: FieldValue; type: 'selectOpponentCard'; card: Card }
-  | { timestamp: FieldValue; type: 'selectAnswer'; answer: Card }
-  | { timestamp: FieldValue; type: 'cancelAnswer' }
-  | { timestamp: FieldValue; type: 'submitAnswer' }
-  | { timestamp: FieldValue; type: 'showJudgeOnDecidedAnswer' }
-  | { timestamp: FieldValue; type: 'hideDecidedAnswerBalloon' }
-  | { timestamp: FieldValue; type: 'goToNextTurn' }
->;
+const gameStateActionTypeDef = t.union({
+  typeName: 'GameStateAction',
+  types: [
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('selectMyCard'),
+      card: cardTypeDef,
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('cancelToss'),
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('submitToss'),
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('selectOpponentCard'),
+      card: cardTypeDef,
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('selectAnswer'),
+      answer: cardTypeDef,
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('cancelAnswer'),
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('submitAnswer'),
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('showJudgeOnDecidedAnswer'),
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('hideDecidedAnswerBalloon'),
+    }),
+    t.record({
+      timestamp: firestoreTimestampTypeDef,
+      type: t.stringLiteral('goToNextTurn'),
+    }),
+  ],
+  defaultType: t.record({
+    timestamp: firestoreTimestampTypeDef,
+    type: t.stringLiteral('selectMyCard'),
+    card: cardTypeDef,
+  }),
+});
 
-const actionTypes = [
-  'selectMyCard',
-  'cancelToss',
-  'submitToss',
-  'selectOpponentCard',
-  'selectAnswer',
-  'cancelAnswer',
-  'submitAnswer',
-  'showJudgeOnDecidedAnswer',
-  'hideDecidedAnswerBalloon',
-  'goToNextTurn',
-] as const;
-
-expectType<(typeof actionTypes)[number], GameStateAction['type']>('=');
-
-const isActionType = (data: unknown): data is GameStateAction['type'] =>
-  Arr.includes(actionTypes, data);
-
-const isFieldValue = (data: unknown): data is FieldValue =>
-  data instanceof FieldValue;
+export type GameStateAction = t.TypeOf<typeof gameStateActionTypeDef>;
 
 export const assertIsGameStateAction: (
-  data: unknown
-) => asserts data is GameStateAction = (data) => {
-  if (!isRecord(data)) {
-    throw new Error('data is not a Record');
-  }
-  if (
-    !(
-      Obj.hasKeyValue(data, 'type', isActionType) &&
-      Obj.hasKeyValue(data, 'timestamp', isFieldValue)
-    )
-  ) {
-    throw new Error('hasKeyValue failed');
-  }
-
-  expectType<typeof data, Pick<GameStateAction, 'timestamp' | 'type'>>('<=');
-  expectType<Pick<GameStateAction, 'timestamp' | 'type'>, typeof data>('<=');
-
-  switch (data.type) {
-    case 'selectMyCard':
-    case 'selectOpponentCard':
-      if (!Obj.hasKeyValue(data, 'card', isCard)) {
-        throw new Error('hasKeyValue failed');
-      }
-      break;
-
-    case 'selectAnswer':
-      if (!Obj.hasKeyValue(data, 'answer', isCard)) {
-        throw new Error('hasKeyValue failed');
-      }
-      break;
-
-    case 'cancelToss':
-    case 'submitToss':
-    case 'cancelAnswer':
-    case 'submitAnswer':
-    case 'showJudgeOnDecidedAnswer':
-    case 'hideDecidedAnswerBalloon':
-    case 'goToNextTurn':
-      break;
-  }
-};
+  a: unknown
+) => asserts a is GameStateAction = gameStateActionTypeDef.assertIs;
 
 expectType<GameStateAction, Readonly<{ type: string }>>('<=');
+
+expectType<
+  GameStateAction['type'],
+  | 'cancelAnswer'
+  | 'cancelToss'
+  | 'goToNextTurn'
+  | 'hideDecidedAnswerBalloon'
+  | 'selectAnswer'
+  | 'selectMyCard'
+  | 'selectOpponentCard'
+  | 'showJudgeOnDecidedAnswer'
+  | 'submitAnswer'
+  | 'submitToss'
+>('=');

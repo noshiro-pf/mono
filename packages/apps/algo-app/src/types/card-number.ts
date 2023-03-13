@@ -1,4 +1,12 @@
-export type CardNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+import * as t from '@noshiro/io-ts';
 
-export const isCardNumber = (data: unknown): data is CardNumber =>
-  typeof data === 'number' && Num.isInt(data) && Num.isInRange(0, 11)(data);
+export const cardNumberTypeDef = t.uintRange({
+  min: 0,
+  max: 11,
+  defaultValue: 0,
+  typeName: 'CardNumber',
+});
+
+export type CardNumber = t.TypeOf<typeof cardNumberTypeDef>;
+
+export const isCardNumber = cardNumberTypeDef.is;
