@@ -31,7 +31,7 @@ describe('DateUtils', () => {
     const date_20191225 = DateUtils.from('2019/12/25');
 
     test('setYear(2019/12/25, 2018)', () => {
-      const result = DateUtils.setLocaleYear(2018)(date_20191225);
+      const result = DateUtils.setLocaleYear(2018 as YearEnum)(date_20191225);
 
       expect(DateUtils.getLocaleYear(result)).toBe(2018);
       expect(DateUtils.getLocaleMonth(result)).toBe(12);
@@ -184,21 +184,21 @@ describe('DateUtils', () => {
 
   describe('getLastDateNumberOfMonth', () => {
     test('case 1', () => {
-      expect(DateUtils.getLastDateNumberOfMonth(2020, 1)).toBe(31);
+      expect(DateUtils.getLastDateNumberOfMonth(2020 as YearEnum, 1)).toBe(31);
     });
 
     test('case 2', () => {
-      expect(DateUtils.getLastDateNumberOfMonth(2020, 2)).toBe(29);
+      expect(DateUtils.getLastDateNumberOfMonth(2020 as YearEnum, 2)).toBe(29);
     });
 
     test('case 3', () => {
-      expect(DateUtils.getLastDateNumberOfMonth(2020, 4)).toBe(30);
+      expect(DateUtils.getLastDateNumberOfMonth(2020 as YearEnum, 4)).toBe(30);
     });
   });
 
   describe('getAllDatesOfMonth', () => {
     test('case 1', () => {
-      expect(DateUtils.getAllDatesOfMonth(2020, 1)).toStrictEqual([
+      expect(DateUtils.getAllDatesOfMonth(2020 as YearEnum, 1)).toStrictEqual([
         DateUtils.from('2020/1/1'),
         DateUtils.from('2020/1/2'),
         DateUtils.from('2020/1/3'),
@@ -236,19 +236,19 @@ describe('DateUtils', () => {
 
   describe('numWeeksOfMonth', () => {
     test('case 1', () => {
-      expect(DateUtils.numWeeksOfMonth(2020, 1)).toBe(5);
+      expect(DateUtils.numWeeksOfMonth(2020 as YearEnum, 1)).toBe(5);
     });
 
     test('case 2', () => {
-      expect(DateUtils.numWeeksOfMonth(2020, 2)).toBe(5);
+      expect(DateUtils.numWeeksOfMonth(2020 as YearEnum, 2)).toBe(5);
     });
 
     test('case 3', () => {
-      expect(DateUtils.numWeeksOfMonth(2015, 2)).toBe(4);
+      expect(DateUtils.numWeeksOfMonth(2015 as YearEnum, 2)).toBe(4);
     });
 
     test('case 4', () => {
-      expect(DateUtils.numWeeksOfMonth(2015, 5)).toBe(6);
+      expect(DateUtils.numWeeksOfMonth(2015 as YearEnum, 5)).toBe(6);
     });
   });
 

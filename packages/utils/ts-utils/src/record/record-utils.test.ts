@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type';
-import { RecordUtils } from './record-utils';
+import { RecordUtils, type RecordUtilsEntries } from './record-utils';
 
 type R0 = DeepReadonly<{
   x: { a: number; b: number };
@@ -384,7 +384,7 @@ describe('RecordUtils', () => {
     }>;
 
     expectType<
-      RecordUtils.Entries<RecordType1>,
+      RecordUtilsEntries<RecordType1>,
       readonly (
         | readonly ['3', 4]
         | readonly ['x', 1]
@@ -408,7 +408,7 @@ describe('RecordUtils', () => {
     >;
 
     expectType<
-      RecordUtils.Entries<RecordType2>,
+      RecordUtilsEntries<RecordType2>,
       | readonly (
           | readonly ['3', 4]
           | readonly ['x', 1]
@@ -422,7 +422,7 @@ describe('RecordUtils', () => {
     >('=');
 
     expectType<
-      RecordUtils.Entries<Record<string, number>>,
+      RecordUtilsEntries<Record<string, number>>,
       readonly (readonly [string, number])[]
     >('=');
 
