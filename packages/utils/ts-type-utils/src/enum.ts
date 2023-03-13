@@ -1,7 +1,8 @@
+import { type PositiveInteger } from './branded-types';
 import { type Index } from './index-type';
 import { type StrictExclude } from './utils';
 
-export type YearEnum = number;
+export type YearEnum = PositiveInteger;
 
 export type MonthEnum = StrictExclude<Index<13>, 0>;
 

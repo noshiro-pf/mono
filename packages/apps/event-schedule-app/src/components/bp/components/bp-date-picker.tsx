@@ -10,7 +10,7 @@ const inputProps: HTMLInputProps & InputGroupProps2 = {
 };
 
 const tenYearsLater = pipe(DateUtils.today())
-  .chain(DateUtils.updateLocaleYear((y) => y + 99))
+  .chain(DateUtils.updateLocaleYear((y) => (y + 99) as YearEnum))
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 

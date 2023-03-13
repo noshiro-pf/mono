@@ -1,4 +1,5 @@
 import { expectType } from '@noshiro/ts-utils';
+import { toYears } from '../../enum';
 import {
   fillYearMonthDate,
   isYearMonthDate,
@@ -18,7 +19,7 @@ describe('YearMonthDate', () => {
 
   test('defaultValue', () => {
     const defaultValue: YearMonthDate = {
-      year: 1900,
+      year: toYears(1900),
       month: 1,
       date: 1,
     };

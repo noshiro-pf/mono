@@ -4,9 +4,10 @@
 /// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />
 
 export * from './array';
-export * from './numbers';
+export * from './branded';
 export * from './primitives';
 export * from './record';
 export * from './type';
+export * from './uint-range';
 export * from './union';
 export * from './utils';

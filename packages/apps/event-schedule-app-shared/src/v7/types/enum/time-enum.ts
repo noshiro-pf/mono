@@ -5,6 +5,8 @@ export const yearsTypeDef = t.positiveInteger(
   // pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value
 );
 
+export const toYears = yearsTypeDef.fill;
+
 export const monthsTypeDef = t.uintRange({ min: 1, max: 12, defaultValue: 1 });
 // pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value
 
