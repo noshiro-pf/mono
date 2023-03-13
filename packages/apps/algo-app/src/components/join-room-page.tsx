@@ -1,8 +1,8 @@
-import { text } from '../constants';
+import { dictionary } from '../constants';
 import { db, joinRoom } from '../observables';
 import { ButtonPrimary, Input, Spinner } from './bp';
 
-const vt = text.joinRoom;
+const dc = dictionary.joinRoom;
 
 type Props = Readonly<{ roomId: string }>;
 
@@ -54,7 +54,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
     <Centering>
       <FormRect>
         <Block>
-          <Label>{vt.gamePassword.label}</Label>
+          <Label>{dc.gamePassword.label}</Label>
           <Input
             disabled={loading}
             type='text'
@@ -62,11 +62,13 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
             onInput={onPasswordInput}
           />
           {showPasswordError ? (
-            <ErrorMessage>{text.joinRoom.gamePassword.notMatch}</ErrorMessage>
+            <ErrorMessage>
+              {dictionary.joinRoom.gamePassword.notMatch}
+            </ErrorMessage>
           ) : undefined}
         </Block>
         <Block>
-          <Label>{vt.username.label}</Label>
+          <Label>{dc.username.label}</Label>
           <Input
             disabled={loading}
             type='text'
@@ -80,7 +82,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
             type='button'
             onClick={onJoinRoomButtonClick}
           >
-            {loading ? <Spinner size={20} /> : <span>{vt.button}</span>}
+            {loading ? <Spinner size={20} /> : <span>{dc.button}</span>}
           </ButtonPrimary>
         </ButtonWrapper>
       </FormRect>

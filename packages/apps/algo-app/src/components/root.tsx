@@ -1,5 +1,11 @@
 import { useResizeObserver } from '@noshiro/resize-observer-preact-hooks';
-import { getParams, getRoomId, isMainPage, routes, text } from '../constants';
+import {
+  dictionary,
+  getParams,
+  getRoomId,
+  isMainPage,
+  routes,
+} from '../constants';
 import { createRoom, db } from '../observables';
 import { Button } from './bp';
 import { CreateRoomPage } from './create-room-page';
@@ -58,9 +64,11 @@ export const Root = memoNamed('Root', () => {
         )
       ) : (
         <NotFoundPage>
-          <h1>{text.notFoundPage.title}</h1>
+          <h1>{dictionary.notFoundPage.title}</h1>
           <div>
-            <Button onClick={goToMain}>{text.notFoundPage.backToMain}</Button>
+            <Button onClick={goToMain}>
+              {dictionary.notFoundPage.backToMain}
+            </Button>
           </div>
         </NotFoundPage>
       )}

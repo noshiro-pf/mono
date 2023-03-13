@@ -1,4 +1,4 @@
-export const text = {
+export const dictionary = {
   submitTossMessage: ['このカードを', 'ペアに見せる'],
   submitToss: '決定',
   submitAnswer: '回答する',
