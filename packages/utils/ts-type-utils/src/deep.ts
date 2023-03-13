@@ -22,9 +22,9 @@ export type DeepWritable<T> = T extends Primitive
   : // eslint-disable-next-line @typescript-eslint/ban-types,no-restricted-globals
   T extends Function
   ? T
-  : T extends MutableMap<infer K, infer V>
+  : T extends ReadonlyMap<infer K, infer V>
   ? MutableMap<DeepWritable<K>, DeepWritable<V>>
-  : T extends MutableSet<infer V>
+  : T extends ReadonlySet<infer V>
   ? MutableSet<DeepWritable<V>>
   : // eslint-disable-next-line @typescript-eslint/ban-types
   T extends object | readonly unknown[]
