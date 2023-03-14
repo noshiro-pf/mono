@@ -12,7 +12,7 @@
 "22:30-23:00"
 ```
 
-(Use `/rpdev` instead of `/rp` in the development environment)
+(Use `/rp-dev` instead of `/rp` in the development environment)
 
 #### Shorthand
 
@@ -26,7 +26,7 @@ or
 /rp60 "title" 21 23
 ```
 
-(Use `/rp30dev` , `/rp60dev` instead of `/rp30` , `/rp60` respectively in the development environment)
+(Use `/rp30-dev`/`/rp60-dev` instead of `/rp30`/`/rp60` respectively in the development environment)
 
 ### Grouping
 
@@ -61,16 +61,48 @@ result
 2
 ```
 
-## start develop environment
+---
+
+## For developers
+
+### Start app locally
 
 -   setup PostgreSQL
 -   `sudo /etc/init.d/postgresql start`
 -   `yarn start:dev`
 
+<!--
 ## setup
 
 ```bash
 $  heroku config:add TZ=Asia/Tokyo --app poll-discord-app
 $  heroku config:add DATABASE_URL=*** --app poll-discord-app
 $  heroku config:add DISCORD_TOKEN=*** --app poll-discord-app
-```
+``` -->
+
+### setup service
+
+1. Open https://railway.app/
+2. Create a Project with name `Rich Poll`
+3. Open dashboard
+
+#### Create a PostgreSQL service
+
+1. Create a table named `main`
+2. Add columns
+
+| name       | type | default value |
+| :--------- | :--- | :------------ |
+| id         | text |               |
+| updated_at | date |               |
+| data       | json | {}            |
+
+#### Create a worker service
+
+1. Connect to this Github repo.
+2. Open Settings tab.
+3. Select `main` branch in "Automatic Deployments".
+4. Type `yarn build` in "Build Command".
+5. Type `yarn start:prod` in "Start Command".
+6. Set environment variable `DISCORD_TOKEN` generated at [Discord Developer Portal](https://discord.com/developers/applications).
+7.

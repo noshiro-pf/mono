@@ -1,10 +1,14 @@
-import { maxNumGroups, type NumGroups } from '../types';
+import * as t from '@noshiro/io-ts';
+import { isUndefined, Num, Result } from '@noshiro/ts-utils';
+import { isNumGroups, type NumGroups } from '../types';
 
 export const rpParseCommand = (command: string): readonly string[] =>
   command
     .split('"')
     .filter((_, i) => i % 2 === 1)
     .map((s) => s.replaceAll('\n', ' ').replaceAll('\t', ' '));
+
+const hoursType = t.uintRange({ min: 0, max: 30, defaultValue: 0 });
 
 export const rp3060ParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
@@ -32,14 +36,11 @@ export const rp3060ParseCommand = (
 
   const arg1AsNumber = Num.parseInt(begin, 10);
   const arg2AsNumber = Num.parseInt(end, 10);
-  const rangeCheckFn = Num.isInRange(0, 30);
   if (
-    isUndefined(arg1AsNumber) ||
-    isUndefined(arg2AsNumber) ||
-    !Num.isUint32(arg1AsNumber) ||
-    !Num.isUint32(arg2AsNumber) ||
-    !rangeCheckFn(arg1AsNumber) ||
-    !rangeCheckFn(arg2AsNumber)
+    arg1AsNumber === undefined ||
+    arg2AsNumber === undefined ||
+    !hoursType.is(arg1AsNumber) ||
+    !hoursType.is(arg2AsNumber)
   ) {
     return Result.err(
       [
@@ -78,14 +79,11 @@ export const rp3060dParseCommand = (
 
   const arg1AsNumber = Num.parseInt(begin, 10);
   const arg2AsNumber = Num.parseInt(end, 10);
-  const rangeCheckFn = Num.isInRange(0, 30);
   if (
-    isUndefined(arg1AsNumber) ||
-    isUndefined(arg2AsNumber) ||
-    !Num.isUint32(arg1AsNumber) ||
-    !Num.isUint32(arg2AsNumber) ||
-    !rangeCheckFn(arg1AsNumber) ||
-    !rangeCheckFn(arg2AsNumber)
+    arg1AsNumber === undefined ||
+    arg2AsNumber === undefined ||
+    !hoursType.is(arg1AsNumber) ||
+    !hoursType.is(arg2AsNumber)
   ) {
     return Result.err(
       [
@@ -102,12 +100,11 @@ export const gpParseGroupingCommandArgument = (
   commandArguments: string
 ): Result<readonly [NumGroups, readonly string[]], undefined> => {
   const numGroups = Num.parseInt(commandArguments, 10);
-  if (isUndefined(numGroups) || Num.isNaN(numGroups))
+  if (numGroups === undefined || !isNumGroups(numGroups))
     return Result.err(undefined);
-  if (numGroups < 2 || maxNumGroups < numGroups) return Result.err(undefined);
 
   return Result.ok([
-    numGroups as NumGroups,
+    numGroups,
     commandArguments
       .split('"')
       .filter((_, i) => i % 2 === 1)
@@ -119,7 +116,7 @@ export const gpParseRandCommandArgument = (
   commandArguments: string
 ): Result<number, undefined> => {
   const n = Num.parseInt(commandArguments, 10);
-  if (isUndefined(n) || Num.isNaN(n)) return Result.err(undefined);
+  if (n === undefined) return Result.err(undefined);
   if (n < 2 || !Num.isSafeInt(n)) return Result.err(undefined);
 
   return Result.ok(n);

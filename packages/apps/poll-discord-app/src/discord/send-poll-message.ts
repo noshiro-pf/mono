@@ -1,4 +1,10 @@
-import { type Message } from 'discord.js';
+import { DateUtils, IMap, Result, tp } from '@noshiro/ts-utils';
+import {
+  type DMChannel,
+  type Message,
+  type NewsChannel,
+  type TextChannel,
+} from 'discord.js';
 import { emojis, triggerCommand } from '../constants';
 import {
   convertRp30ArgToRpArgs,
@@ -17,12 +23,13 @@ import {
 import { addPoll } from '../in-memory-database';
 import {
   answerOfDateDefaultValue,
-  createCommandMessageId,
-  createDateOptionId,
-  createPollId,
-  createTimestamp,
-  createTitleMessageId,
+  toCommandMessageId,
+  toDateOptionId,
+  toPollId,
+  toTimestamp,
+  toTitleMessageId,
   type AnswerOfDate,
+  type CommandMessageId,
   type DatabaseRef,
   type DateOption,
   type DateOptionId,
@@ -34,7 +41,7 @@ import {
 
 const rpSendPollMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: Message['channel'],
+  messageChannel: DMChannel | NewsChannel | TextChannel,
   title: string,
   args: readonly string[]
 ): Promise<
@@ -49,7 +56,7 @@ const rpSendPollMessageSub = async (
   >
 > => {
   const titleMessage = await messageChannel.send(createTitleString(title));
-  const titleMessageId = createTitleMessageId(titleMessage.id);
+  const titleMessageId = toTitleMessageId(titleMessage.id);
 
   const mut_dateOptionAndMessageListTemp: (readonly [DateOption, Message])[] =
     [];
@@ -62,7 +69,7 @@ const rpSendPollMessageSub = async (
     mut_dateOptionAndMessageListTemp.push([
       {
         label: el,
-        id: createDateOptionId(result.value.id),
+        id: toDateOptionId(result.value.id),
       },
       result.value,
     ]);
@@ -75,8 +82,8 @@ const rpSendPollMessageSub = async (
 
   const summaryMessageEmbed = rpCreateSummaryMessage(
     {
-      id: createPollId(''),
-      updatedAt: createTimestamp(DateUtils.now()),
+      id: toPollId(''),
+      updatedAt: toTimestamp(DateUtils.now()),
       title,
       dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(
@@ -88,7 +95,7 @@ const rpSendPollMessageSub = async (
   );
 
   const summaryMessageInitResult = await Result.fromPromise(
-    messageChannel.send({ embeds: [summaryMessageEmbed] })
+    messageChannel.send(summaryMessageEmbed)
   );
 
   if (Result.isErr(summaryMessageInitResult)) return summaryMessageInitResult;
@@ -97,7 +104,7 @@ const rpSendPollMessageSub = async (
   // memo: "（編集済）" という文字列が表示されてずれるのが操作性を若干損ねるので、
   // あえて一度メッセージを送った後再編集している
   const summaryMessageEditResult = await Result.fromPromise(
-    summaryMessageInit.edit({ embeds: [summaryMessageEmbed] })
+    summaryMessageInit.edit(summaryMessageEmbed)
   );
 
   if (Result.isErr(summaryMessageEditResult)) return summaryMessageEditResult;
@@ -123,7 +130,7 @@ const rpSendPollMessage = async (
   psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   discordChannel: Message['channel'],
-  messageId: string,
+  messageId: CommandMessageId,
   title: string | undefined,
   pollOptions: readonly string[]
 ): Promise<Result<undefined, unknown>> => {
@@ -143,8 +150,8 @@ const rpSendPollMessage = async (
     databaseRef,
     psqlClient,
     {
-      id: createPollId(summaryMessage.id),
-      updatedAt: createTimestamp(summaryMessage.createdTimestamp),
+      id: toPollId(summaryMessage.id),
+      updatedAt: toTimestamp(summaryMessage.createdTimestamp),
       title,
       dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(
@@ -152,15 +159,17 @@ const rpSendPollMessage = async (
       ),
       titleMessageId,
     },
-    createCommandMessageId(messageId)
+    messageId
   );
 
   await Promise.all(
-    dateOptionMessageList.map(async (msg) => {
-      await msg.react(emojis.good.unicode);
-      await msg.react(emojis.fair.unicode);
-      await msg.react(emojis.poor.unicode);
-    })
+    dateOptionMessageList.map((msg) => msg.react(emojis.good.unicode))
+  );
+  await Promise.all(
+    dateOptionMessageList.map((msg) => msg.react(emojis.fair.unicode))
+  );
+  await Promise.all(
+    dateOptionMessageList.map((msg) => msg.react(emojis.poor.unicode))
   );
 
   return addPollResult;
@@ -168,11 +177,11 @@ const rpSendPollMessage = async (
 
 const gpSendGroupingMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: Message['channel'],
+  messageChannel: DMChannel | NewsChannel | TextChannel,
   groups: readonly Group[]
 ): Promise<Result<undefined, unknown>> => {
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send({ embeds: [gpCreateSummaryMessage(groups)] })
+    messageChannel.send(gpCreateSummaryMessage(groups))
   );
 
   return Result.map(() => undefined)(summaryMessageResult);
@@ -180,11 +189,11 @@ const gpSendGroupingMessageSub = async (
 
 const gpSendRandMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: Message['channel'],
+  messageChannel: DMChannel | NewsChannel | TextChannel,
   n: number
 ): Promise<Result<undefined, unknown>> => {
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send(Math.ceil(Math.random() * n).toString())
+    messageChannel.send(Math.ceil(Math.random() * n))
   );
 
   return Result.map(() => undefined)(summaryMessageResult);
@@ -249,48 +258,14 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
       title,
       args
     );
   }
 
-  if (message.content.startsWith(`${triggerCommand.rp30t} `)) {
-    const res = convertRp30ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp30t)
-    );
-
-    if (Result.isErr(res)) return res;
-
-    return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
-      message.channel,
-      message.id,
-      res.value.title,
-      res.value.args
-    );
-  }
-
-  if (message.content.startsWith(`${triggerCommand.rp60t} `)) {
-    const res = convertRp60ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp60t)
-    );
-
-    if (Result.isErr(res)) return res;
-
-    return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
-      message.channel,
-      message.id,
-      res.value.title,
-      res.value.args
-    );
-  }
-
   if (message.content.startsWith(`${triggerCommand.rp30} `)) {
-    const res = convertRp30dArgToRpArgs(
+    const res = convertRp30ArgToRpArgs(
       removeCommandPrefix(message.content, triggerCommand.rp30)
     );
 
@@ -300,14 +275,14 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
       res.value.title,
       res.value.args
     );
   }
 
   if (message.content.startsWith(`${triggerCommand.rp60} `)) {
-    const res = convertRp60dArgToRpArgs(
+    const res = convertRp60ArgToRpArgs(
       removeCommandPrefix(message.content, triggerCommand.rp60)
     );
 
@@ -317,7 +292,41 @@ export const sendMessageMain = async (
       databaseRef,
       psqlClient,
       message.channel,
-      message.id,
+      toCommandMessageId(message.id),
+      res.value.title,
+      res.value.args
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp30d} `)) {
+    const res = convertRp30dArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp30d)
+    );
+
+    if (Result.isErr(res)) return res;
+
+    return rpSendPollMessage(
+      databaseRef,
+      psqlClient,
+      message.channel,
+      toCommandMessageId(message.id),
+      res.value.title,
+      res.value.args
+    );
+  }
+
+  if (message.content.startsWith(`${triggerCommand.rp60d} `)) {
+    const res = convertRp60dArgToRpArgs(
+      removeCommandPrefix(message.content, triggerCommand.rp60d)
+    );
+
+    if (Result.isErr(res)) return res;
+
+    return rpSendPollMessage(
+      databaseRef,
+      psqlClient,
+      message.channel,
+      toCommandMessageId(message.id),
       res.value.title,
       res.value.args
     );

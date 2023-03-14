@@ -1,3 +1,4 @@
+import { Json, match, Result } from '@noshiro/ts-utils';
 import { type MessageReaction, type PartialUser, type User } from 'discord.js';
 import { emojis } from '../constants';
 import {
@@ -7,8 +8,9 @@ import {
 } from '../functions';
 import { updateVote } from '../in-memory-database';
 import {
-  createDateOptionId,
-  createUserId,
+  toDateOptionId,
+  toPollId,
+  toUserId,
   type AnswerType,
   type DatabaseRef,
   type Poll,
@@ -27,7 +29,7 @@ const onRefreshClick = async (
   });
 
   const poll: Poll | undefined = databaseRef.db.polls.get(
-    reactionFilled.message.id
+    toPollId(reactionFilled.message.id)
   );
 
   if (poll === undefined) return Result.err('poll not found');
@@ -74,24 +76,28 @@ export const onMessageReactCommon = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   user: PartialUser | User
 ): Promise<Result<undefined, string>> => {
+  const reactionFilled: MessageReaction = reaction.partial
+    ? await reaction.fetch()
+    : reaction;
+
   if (user.bot) return Result.ok(undefined);
   if (action.value === undefined) return Result.ok(undefined);
 
   if (action.value === 'refresh') {
     if (action.type === 'add') {
-      return onRefreshClick(databaseRef, psqlClient, reaction);
+      return onRefreshClick(databaseRef, psqlClient, reactionFilled);
     }
     return Result.ok(undefined);
   }
 
-  const dateOptionId = createDateOptionId(reaction.message.id);
+  const dateOptionId = toDateOptionId(reactionFilled.message.id);
 
   const [resultPollResult, messages] = await Promise.all([
-    updateVote(databaseRef, psqlClient, dateOptionId, createUserId(user.id), {
+    updateVote(databaseRef, psqlClient, dateOptionId, toUserId(user.id), {
       type: action.type,
       value: action.value,
     }),
-    reaction.message.channel.messages.fetch({
+    reactionFilled.message.channel.messages.fetch({
       after: dateOptionId,
     }),
   ]);
@@ -101,7 +107,7 @@ export const onMessageReactCommon = async (
   if (messages.size === 0) return Result.err('messages not found.');
 
   const userIdToDisplayNameResult = await createUserIdToDisplayNameMap(
-    reaction.message.guild,
+    reactionFilled.message.guild,
     getUserIdsFromAnswers(resultPoll.answers).toArray()
   );
 
@@ -119,9 +125,7 @@ export const onMessageReactCommon = async (
 
   const result = await Result.fromPromise<undefined, string>(
     message
-      .edit({
-        embeds: [rpCreateSummaryMessage(resultPoll, userIdToDisplayName)],
-      })
+      .edit(rpCreateSummaryMessage(resultPoll, userIdToDisplayName))
       .then(() => undefined)
   );
 
@@ -151,7 +155,7 @@ export const onMessageReactionAdd = (
     psqlClient,
     {
       type: 'add',
-      value: mapOptional(reaction.emoji.name, mapReactionEmojiNameToAnswerType),
+      value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
     },
     reaction,
     user
@@ -170,7 +174,7 @@ export const onMessageReactionRemove = (
     psqlClient,
     {
       type: 'remove',
-      value: mapOptional(reaction.emoji.name, mapReactionEmojiNameToAnswerType),
+      value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
     },
     reaction,
     user

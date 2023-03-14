@@ -1,3 +1,4 @@
+import { castWritable, type IMap } from '@noshiro/ts-utils';
 import { MessageEmbed, type EmbedFieldData } from 'discord.js';
 import { embedMessageColor, footerText } from '../constants';
 import { type Group, type Poll, type UserId } from '../types';
@@ -14,7 +15,7 @@ export const rpCreateSummaryMessage = (
     .setColor(embedMessageColor)
     .setTitle(`Collected Results for "${poll.title}"`)
     .addFields(castWritable(rpCreateSummaryFields(poll, userIdToDisplayName)))
-    .setFooter({ text: footerText })
+    .setFooter(footerText)
     .setTimestamp();
 
 const rpCreateSummaryFields = (

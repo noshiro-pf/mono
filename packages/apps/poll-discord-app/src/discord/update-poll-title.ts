@@ -1,3 +1,4 @@
+import { Obj, Result } from '@noshiro/ts-utils';
 import { type Message, type PartialMessage } from 'discord.js';
 import { triggerCommand } from '../constants';
 import {
@@ -8,7 +9,7 @@ import {
   rpParseCommand,
 } from '../functions';
 import {
-  createCommandMessageId,
+  toCommandMessageId,
   type DatabaseRef,
   type PsqlClient,
 } from '../types';
@@ -26,8 +27,8 @@ export const updatePollTitle = async (
 
   if (
     !messageFilled.content.startsWith(`${triggerCommand.rp} `) &&
-    !messageFilled.content.startsWith(`${triggerCommand.rp30t} `) &&
-    !messageFilled.content.startsWith(`${triggerCommand.rp60t} `)
+    !messageFilled.content.startsWith(`${triggerCommand.rp30} `) &&
+    !messageFilled.content.startsWith(`${triggerCommand.rp60} `)
   ) {
     return Result.ok(undefined);
   }
@@ -37,7 +38,7 @@ export const updatePollTitle = async (
   if (title === undefined) return Result.ok(undefined);
 
   const pollId = databaseRef.db.commandMessageIdToPollIdMap.get(
-    createCommandMessageId(messageFilled.id)
+    toCommandMessageId(messageFilled.id)
   );
   if (pollId === undefined) return Result.ok(undefined);
 
@@ -67,9 +68,8 @@ export const updatePollTitle = async (
       Result.fromPromise(
         messages
           .find((m) => m.id === pollId)
-          ?.edit({
-            embeds: [rpCreateSummaryMessage(newPoll, userIdToDisplayName)],
-          }) ?? Promise.resolve(undefined)
+          ?.edit(rpCreateSummaryMessage(newPoll, userIdToDisplayName)) ??
+          Promise.resolve(undefined)
       ),
       Result.fromPromise(
         messages

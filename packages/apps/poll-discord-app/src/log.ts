@@ -1,3 +1,5 @@
+import { Json, Result } from '@noshiro/ts-utils';
+
 // eslint-disable-next-line import/no-unused-modules
 export const log = (value: JSONValue, prettyPrint: boolean = true): void => {
   console.log(

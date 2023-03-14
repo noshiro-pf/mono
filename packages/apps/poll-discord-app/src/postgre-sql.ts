@@ -1,21 +1,25 @@
+import { Json, Result, Str, toBoolean } from '@noshiro/ts-utils';
 import { Client } from 'pg';
 import { psqlRowId, psqlRowType, psqlTableName } from './constants';
 import { databaseDefaultValue, type PsqlClient, type PsqlRow } from './types';
 
-//  const setTlsRejectUnauthorized0 = (): void => {
-//   // eslint-disable-next-line @typescript-eslint/dot-notation,functional/immutable-data
-//   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-// };
+const setTlsRejectUnauthorized0 = (): void => {
+  // eslint-disable-next-line @typescript-eslint/dot-notation, functional/immutable-data
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+};
 
 const initClient = async (
   connectionString: string | undefined
 ): Promise<Result<PsqlClient, unknown>> => {
+  console.log('Initializing PostgreSQL client...');
   const psqlClient = new Client({
     connectionString,
     ssl: true,
   });
 
   const res = await Result.fromPromise(psqlClient.connect());
+
+  console.log('PostgreSQL client initialization completed.');
 
   return Result.isOk(res) ? Result.ok(psqlClient) : Result.err(res.value);
 };
@@ -37,7 +41,6 @@ const getJsonData = (
 
 const setJsonData = (
   psqlClient: PsqlClient,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   jsonData: JSONType
 ): Promise<Result<undefined, JSONValue>> => {
   const query = `update ${psqlTableName} SET ${
@@ -84,9 +87,7 @@ const createRecord = (
     psqlRowType.updated_at
   }, ${psqlRowType.id} ) values ( '${Result.unwrapThrow(
     Json.stringify({
-      polls: databaseDefaultValue.polls.toEntriesArray() as unknown as Readonly<
-        Record<string, never>
-      >[], // TODO
+      polls: databaseDefaultValue.polls.toEntriesArray(),
       dateToPollIdMap: databaseDefaultValue.dateToPollIdMap.toEntriesArray(),
       commandMessageIdToPollIdMap:
         databaseDefaultValue.commandMessageIdToPollIdMap.toEntriesArray(),
@@ -108,6 +109,7 @@ const closeConnection = (
 ): Promise<Result<void, unknown>> => Result.fromPromise(psqlClient.end());
 
 export const psql = {
+  setTlsRejectUnauthorized0,
   initClient,
   getJsonData,
   setJsonData,

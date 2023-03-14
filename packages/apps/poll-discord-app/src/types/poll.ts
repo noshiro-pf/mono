@@ -1,89 +1,64 @@
+import * as t from '@noshiro/io-ts';
+import { expectType, IMap, Obj, pipe } from '@noshiro/ts-utils';
 import {
+  answerOfDateFromJson,
+  answerOfDateJsonType,
   answerOfDateToJson,
-  fillAnswerOfDate,
   type AnswerOfDate,
-  type AnswerOfDateJson,
 } from './answer-of-date';
-import { fillDateOption, type DateOption } from './date-option';
 import {
-  createDateOptionId,
-  createPollId,
-  createTimestamp,
-  createTitleMessageId,
-  isTimestamp,
+  dateOptionIdType,
+  pollIdType,
+  timestampType,
+  titleMessageIdType,
   type DateOptionId,
   type PollId,
   type Timestamp,
   type TitleMessageId,
-} from './types';
+} from './branded';
+import { dateOptionType, type DateOption } from './date-option';
 
 export type Poll = DeepReadonly<{
   id: PollId;
   title: string;
-  updatedAt: Timestamp; // timestamp
+  updatedAt: Timestamp;
   dateOptions: DateOption[]; // used to find this Poll object from button message that represents date option
   answers: IMap<DateOptionId, AnswerOfDate>;
   titleMessageId: TitleMessageId;
 }>;
 
-export type PollJson = DeepReadonly<{
-  id: string;
-  title: string;
-  updatedAt: Timestamp;
-  dateOptions: DateOption[];
-  answers: Record<DateOptionId, AnswerOfDateJson>;
-  titleMessageId: TitleMessageId;
-}>;
+export const pollJsonType = t.record({
+  id: pollIdType,
+  title: t.string(''),
+  updatedAt: timestampType,
+  dateOptions: t.array(dateOptionType),
+  answers: t.keyValueRecord(dateOptionIdType, answerOfDateJsonType),
+  titleMessageId: titleMessageIdType,
+});
+
+export type PollJson = t.TypeOf<typeof pollJsonType>;
 
 expectType<PollJson, JSONType>('<=');
 
-const pollDefaultValue: Poll = {
-  id: createPollId(''),
-  title: '',
-  updatedAt: createTimestamp(DateUtils.now()),
-  dateOptions: [],
-  answers: IMap.new<DateOptionId, AnswerOfDate>([]),
-  titleMessageId: createTitleMessageId(''),
-} as const;
+export const pollFromJson = (p?: unknown): Poll =>
+  pipe(p)
+    .chain(pollJsonType.fill)
+    .chain((a) => ({
+      id: a.id,
+      title: a.title,
+      updatedAt: a.updatedAt,
+      dateOptions: a.dateOptions,
+      answers: IMap.new<DateOptionId, AnswerOfDate>(
+        Obj.entries(a.answers).map(([k, v]) => [k, answerOfDateFromJson(v)])
+      ),
+      titleMessageId: a.titleMessageId,
+    })).value;
 
-const d = pollDefaultValue;
-
-export const fillPoll = (a?: unknown): Poll =>
-  a === undefined || !isRecord(a)
-    ? d
-    : {
-        id: Obj.hasKeyValue(a, 'id', isString) ? a.id : d.id,
-
-        title: Obj.hasKeyValue(a, 'title', isString) ? a.title : d.title,
-
-        updatedAt: Obj.hasKeyValue(a, 'updatedAt', isTimestamp)
-          ? a.updatedAt
-          : d.updatedAt,
-
-        // TODO
-        dateOptions: Obj.hasKeyValue(a, 'dateOptions', Arr.isArray)
-          ? a.dateOptions.map(fillDateOption)
-          : d.dateOptions,
-
-        answers: Obj.hasKeyValue(a, 'answers', isRecord)
-          ? IMap.new<DateOptionId, AnswerOfDate>(
-              Obj.entries(a.answers).map(([k, v]) => [
-                createDateOptionId(k),
-                fillAnswerOfDate(v),
-              ])
-            )
-          : d.answers,
-
-        titleMessageId: Obj.hasKeyValue(a, 'titleMessageId', isString)
-          ? a.titleMessageId
-          : d.titleMessageId,
-      };
-
-export const pollToJson = (a: Poll): PollJson => ({
-  id: a.id,
-  title: a.title,
-  updatedAt: a.updatedAt,
-  dateOptions: a.dateOptions,
-  answers: Obj.fromEntries(a.answers.map(answerOfDateToJson).toEntriesArray()),
-  titleMessageId: a.titleMessageId,
+export const pollToJson = (p: Poll): PollJson => ({
+  id: p.id,
+  title: p.title,
+  updatedAt: p.updatedAt,
+  dateOptions: p.dateOptions,
+  answers: Obj.fromEntries(p.answers.map(answerOfDateToJson).toEntriesArray()),
+  titleMessageId: p.titleMessageId,
 });

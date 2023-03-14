@@ -1,4 +1,5 @@
-import { Client as DiscordClient, Intents } from 'discord.js';
+import { Result } from '@noshiro/ts-utils';
+import { Client as DiscordClient } from 'discord.js';
 import { triggerCommand } from '../constants';
 import { DISCORD_TOKEN } from '../env';
 import { type DatabaseRef, type PsqlClient } from '../types';
@@ -9,37 +10,46 @@ import { updatePollTitle } from './update-poll-title';
 export const initDiscordClient = (): Promise<Result<DiscordClient, unknown>> =>
   // eslint-disable-next-line promise/param-names
   new Promise((resolveAll) => {
+    console.log('Initializing DiscordClient...');
+
     const discordClient = new DiscordClient({
       partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-      intents: [Intents.FLAGS.GUILDS],
     });
 
     Promise.all([
       new Promise<Result<undefined, unknown>>((resolve) => {
         discordClient.once('ready', () => {
-          try {
-            discordClient.user?.setActivity({
+          discordClient.user
+            ?.setActivity({
               name: [
-                triggerCommand.rp30t,
-                triggerCommand.rp60t,
                 triggerCommand.rp30,
                 triggerCommand.rp60,
+                triggerCommand.rp30d,
+                triggerCommand.rp60d,
                 triggerCommand.rp,
                 triggerCommand.gp,
                 triggerCommand.rand,
               ].join(','),
               type: 'PLAYING',
+            })
+            .then(() => {
+              resolve(Result.ok(undefined));
+            })
+            .catch((error) => {
+              resolve(Result.err(error));
             });
-
-            resolve(Result.ok(undefined));
-          } catch (error) {
-            resolve(Result.err(error));
-          }
         });
+      }).then((result) => {
+        console.log('DiscordClient initialization: ready.');
+        return result;
       }),
-      Result.fromPromise(discordClient.login(DISCORD_TOKEN)),
+      Result.fromPromise(discordClient.login(DISCORD_TOKEN)).then((result) => {
+        console.log('DiscordClient initialization: logged in successfully.');
+        return result;
+      }),
     ])
       .then(([ready, login]) => {
+        console.log('DiscordClient initialization completed.');
         if (Result.isErr(ready)) {
           resolveAll(Result.err(ready));
         } else {
@@ -61,11 +71,7 @@ export const startDiscordListener = (
   psqlClient: PsqlClient,
   databaseRef: DatabaseRef
 ): void => {
-  discordClient.on('messageReactionAdd', async (mayBePartialReaction, user) => {
-    const reaction = mayBePartialReaction.partial
-      ? await mayBePartialReaction.fetch()
-      : mayBePartialReaction;
-
+  discordClient.on('messageReactionAdd', (reaction, user) => {
     onMessageReactionAdd(databaseRef, psqlClient, reaction, user)
       .then((result) => {
         if (Result.isErr(result)) {
@@ -75,22 +81,15 @@ export const startDiscordListener = (
       .catch(console.error);
   });
 
-  discordClient.on(
-    'messageReactionRemove',
-    async (mayBePartialReaction, user) => {
-      const reaction = mayBePartialReaction.partial
-        ? await mayBePartialReaction.fetch()
-        : mayBePartialReaction;
-
-      onMessageReactionRemove(databaseRef, psqlClient, reaction, user)
-        .then((result) => {
-          if (Result.isErr(result)) {
-            console.error('on messageReactionRemove error:', result);
-          }
-        })
-        .catch(console.error);
-    }
-  );
+  discordClient.on('messageReactionRemove', (reaction, user) => {
+    onMessageReactionRemove(databaseRef, psqlClient, reaction, user)
+      .then((result) => {
+        if (Result.isErr(result)) {
+          console.error('on messageReactionRemove error:', result);
+        }
+      })
+      .catch(console.error);
+  });
 
   discordClient.on('messageUpdate', (_oldMessage, newMessage) => {
     updatePollTitle(databaseRef, psqlClient, newMessage)

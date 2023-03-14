@@ -1,4 +1,6 @@
-import { isUserId, type UserId } from './types';
+import * as t from '@noshiro/io-ts';
+import { expectType, ISet, pipe } from '@noshiro/ts-utils';
+import { userIdType, type UserId } from './branded';
 
 export type AnswerOfDate = Readonly<{
   good: ISet<UserId>;
@@ -6,44 +8,31 @@ export type AnswerOfDate = Readonly<{
   poor: ISet<UserId>;
 }>;
 
-export type AnswerOfDateJson = DeepReadonly<{
-  good: string[];
-  fair: string[];
-  poor: string[];
-}>;
+export const answerOfDateDefaultValue: AnswerOfDate = {
+  good: ISet.new<UserId>([]),
+  poor: ISet.new<UserId>([]),
+  fair: ISet.new<UserId>([]),
+} as const;
+
+export const answerOfDateJsonType = t.record({
+  good: t.array(userIdType),
+  fair: t.array(userIdType),
+  poor: t.array(userIdType),
+});
+
+export type AnswerOfDateJson = t.TypeOf<typeof answerOfDateJsonType>;
 
 expectType<AnswerOfDateJson, JSONType>('<=');
 
-export const answerOfDateDefaultValue: AnswerOfDate = {
-  good: ISet.new<UserId>([]),
-  fair: ISet.new<UserId>([]),
-  poor: ISet.new<UserId>([]),
-} as const;
-
-const d = answerOfDateDefaultValue;
-
-export const fillAnswerOfDate = (a?: unknown): AnswerOfDate =>
-  !isRecord(a)
-    ? d
-    : {
-        good:
-          Obj.hasKeyValue(a, 'good', Arr.isArray) && a.good.every(isUserId)
-            ? ISet.new(a.good)
-            : d.good,
-
-        fair:
-          Obj.hasKeyValue(a, 'fair', Arr.isArray) && a.fair.every(isUserId)
-            ? ISet.new(a.fair)
-            : d.fair,
-
-        poor:
-          Obj.hasKeyValue(a, 'poor', Arr.isArray) && a.poor.every(isUserId)
-            ? ISet.new(a.poor)
-            : d.poor,
-      };
+export const answerOfDateFromJson = (p?: unknown): AnswerOfDate =>
+  pipe(answerOfDateJsonType.fill(p)).chain((a) => ({
+    good: ISet.new(a.good),
+    poor: ISet.new(a.poor),
+    fair: ISet.new(a.fair),
+  })).value;
 
 export const answerOfDateToJson = (a: AnswerOfDate): AnswerOfDateJson => ({
   good: a.good.toArray(),
-  fair: a.fair.toArray(),
   poor: a.poor.toArray(),
+  fair: a.fair.toArray(),
 });
