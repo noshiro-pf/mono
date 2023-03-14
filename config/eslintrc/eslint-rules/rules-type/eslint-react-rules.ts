@@ -1,4 +1,4 @@
-/* eslint-disable functional/no-mixed-type */
+/* eslint-disable functional/no-mixed-types */
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
@@ -1783,7 +1783,18 @@ namespace JsxNoCommentTextnodes {
  *  | recommended | false          |
  */
 namespace JsxNoConstructedContextValues {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * {}
+   * ```
+   */
+  export type Options = Readonly<Record<string, unknown>>;
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**
@@ -2044,7 +2055,30 @@ namespace JsxNoTargetBlank {
  *  | recommended | false           |
  */
 namespace JsxNoUselessFragment {
-  export type RuleEntry = Linter.RuleLevel;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowExpressions": {
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowExpressions?: boolean;
+    readonly [k: string]: unknown;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
 }
 
 /**

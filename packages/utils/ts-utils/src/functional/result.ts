@@ -3,12 +3,14 @@ export namespace Result {
   const ErrTypeSymbol: unique symbol = Symbol('Result.err');
 
   /** @internal */
+  // eslint-disable-next-line functional/readonly-type
   export type _Ok<S> = {
     readonly type: typeof OkTypeSymbol;
     readonly value: S;
   };
 
   /** @internal */
+  // eslint-disable-next-line functional/readonly-type
   export type _Err<E> = {
     readonly type: typeof ErrTypeSymbol;
     readonly value: E;

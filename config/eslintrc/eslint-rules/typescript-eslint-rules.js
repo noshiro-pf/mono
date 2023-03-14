@@ -30,6 +30,7 @@ const banTypes = {
   },
 };
 
+/** @type {RestrictedImportsOption} */
 const restrictedImportsOption = {
   paths: [
     {
@@ -100,6 +101,9 @@ const typescriptEslintRules = {
   '@typescript-eslint/space-before-function-paren': 'off',
   '@typescript-eslint/space-infix-ops': 'off',
   '@typescript-eslint/type-annotation-spacing': 'off',
+  '@typescript-eslint/block-spacing': 'off',
+  '@typescript-eslint/key-spacing': 'off',
+  '@typescript-eslint/lines-around-comment': 'off',
 
   '@typescript-eslint/adjacent-overload-signatures': 'error',
   '@typescript-eslint/array-type': [
@@ -144,6 +148,11 @@ const typescriptEslintRules = {
       allowExpressions: true,
       allowTypedFunctionExpressions: true,
       allowHigherOrderFunctions: true,
+      allowConciseArrowFunctionExpressionsStartingWithVoid: false,
+      allowDirectConstAssertionInArrowFunctions: true,
+      allowedNames: [],
+      allowFunctionsWithoutTypeParameters: false,
+      allowIIFEs: false,
     },
   ], // modified
   '@typescript-eslint/explicit-member-accessibility': [
@@ -312,6 +321,11 @@ const typescriptEslintRules = {
   '@typescript-eslint/consistent-generic-constructors': 'error',
   '@typescript-eslint/no-duplicate-enum-values': 'error',
   '@typescript-eslint/parameter-properties': 'error',
+
+  // This rule must be enabled when the --verbatimModuleSyntax compiler option is enabled
+  '@typescript-eslint/no-import-type-side-effects': 'off',
+
+  '@typescript-eslint/no-mixed-enums': 'error',
 
   // deprecated
   '@typescript-eslint/no-duplicate-imports': 'off',

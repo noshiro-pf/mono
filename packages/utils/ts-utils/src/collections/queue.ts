@@ -7,21 +7,21 @@ export type Queue<T> = Readonly<{
 
 class QueueClass<T> implements Queue<T> {
   readonly #data: T[] = [];
-  #size: number = 0;
+  #mut_size: number = 0;
 
   get isEmpty(): boolean {
     return this.size === 0;
   }
   get size(): number {
-    return this.#size;
+    return this.#mut_size;
   }
   dequeue(): T | undefined {
-    this.#size -= 1;
+    this.#mut_size -= 1;
 
     return this.#data.pop();
   }
   enqueue(value: T): void {
-    this.#size += 1;
+    this.#mut_size += 1;
     this.#data.unshift(value);
   }
 }

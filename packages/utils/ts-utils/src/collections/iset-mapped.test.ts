@@ -1,7 +1,7 @@
 import { ISetMapped } from './iset-mapped';
 
-const toKey = (a: { readonly v: number }): number => a.v;
-const fromKey = (k: number): { readonly v: number } => ({ v: k });
+const toKey = (a: Readonly<{ v: number }>): number => a.v;
+const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
 
 describe('ISetMapped[Symbol.iterator]', () => {
   test('case 1', () => {

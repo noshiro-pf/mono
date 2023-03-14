@@ -1,7 +1,7 @@
 import { IMapMapped } from './imap-mapped';
 
-const toKey = (a: { readonly v: number }): number => a.v;
-const fromKey = (k: number): { readonly v: number } => ({ v: k });
+const toKey = (a: Readonly<{ v: number }>): number => a.v;
+const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
 
 describe('IMapMapped[Symbol.iterator]', () => {
   test('case 1', () => {
@@ -77,7 +77,7 @@ describe('IMapMapped.has', () => {
     expect(s0.has({ v: 4 })).toBe(false);
   });
   test('case 3', () => {
-    const s0 = IMapMapped.new<{ readonly v: number }, string, number>(
+    const s0 = IMapMapped.new<Readonly<{ v: number }>, string, number>(
       [],
       toKey,
       fromKey
@@ -115,7 +115,7 @@ describe('IMapMapped.get', () => {
     expect(s0.get({ v: 4 })).toBeUndefined();
   });
   test('case 3', () => {
-    const s0 = IMapMapped.new<{ readonly v: number }, string, number>(
+    const s0 = IMapMapped.new<Readonly<{ v: number }>, string, number>(
       [],
       toKey,
       fromKey

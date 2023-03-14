@@ -32,9 +32,8 @@ export const AnswerTable = memoNamed<Props>(
       readonly (Pick<
         Answer,
         'comment' | 'id' | 'isRequiredParticipants' | 'user' | 'weight'
-      > & {
-        readonly onClick: () => void;
-      })[]
+      > &
+        Readonly<{ onClick: () => void }>)[]
     >(
       () =>
         answers.map((a) => ({

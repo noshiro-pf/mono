@@ -1,4 +1,4 @@
-/* eslint-disable functional/no-mixed-type */
+/* eslint-disable functional/no-mixed-types */
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
