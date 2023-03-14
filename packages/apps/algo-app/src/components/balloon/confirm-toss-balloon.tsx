@@ -1,5 +1,5 @@
 import { type RectSize } from '@noshiro/ts-utils-additional';
-import { outlineColorDef, text } from '../../constants';
+import { dictionary, outlineColorDef } from '../../constants';
 import { type ConfirmTossBalloonProps } from '../../types';
 import { Button } from '../bp';
 import { CardComponent } from '../card';
@@ -65,16 +65,16 @@ export const ConfirmTossBalloon = memoNamed<Props>(
               />
             </CardWrapper>
             <Message>
-              <div>{text.submitTossMessage[0]}</div>
-              <div>{text.submitTossMessage[1]}</div>
+              <div>{dictionary.submitTossMessage[0]}</div>
+              <div>{dictionary.submitTossMessage[1]}</div>
             </Message>
           </CardAndMessage>
           <Buttons>
             <div>
-              <Button onClick={cancel}>{text.cancel}</Button>
+              <Button onClick={cancel}>{dictionary.cancel}</Button>
             </div>
             <div>
-              <Button onClick={submit}>{text.submitToss}</Button>
+              <Button onClick={submit}>{dictionary.submitToss}</Button>
             </div>
           </Buttons>
         </BalloonContent>

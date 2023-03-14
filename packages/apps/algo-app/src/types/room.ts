@@ -1,111 +1,72 @@
-import { type PermutationString } from '@noshiro/ts-utils-additional';
-import { isCard, type Card } from './card-type';
-import { isPlayer, type Player } from './player';
+import * as t from '@noshiro/io-ts';
+import { cardTypeDef } from './card-type';
+import { permutationType } from './permutation-type';
+import { playerTypeDef } from './player';
 
-export type RoomRemote = DeepReadonly<{
-  password: string | undefined;
-  players: Player[];
-  shuffleDef: PermutationString<'0123'>;
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
-  state: 'not-started' | 'playing' | 'finished';
-  // firestore が多重配列に対応していないのでオブジェクト化する
-  playerCards: {
-    p0: ArrayOfLength<6, Card>;
-    p1: ArrayOfLength<6, Card>;
-    p2: ArrayOfLength<6, Card>;
-    p3: ArrayOfLength<6, Card>;
-  };
-}>;
-
-export type Room = DeepReadonly<{
-  id: string;
-  password: string | undefined;
-  players: Player[];
-  shuffleDef: PermutationString<'0123'>;
-  // eslint-disable-next-line @typescript-eslint/sort-type-constituents
-  state: 'not-started' | 'playing' | 'finished';
-  playerCards: ArrayOfLength<4, ArrayOfLength<6, Card>>;
-}>;
+const playerCardsTypeDef = t.tuple(
+  tp(
+    cardTypeDef,
+    cardTypeDef,
+    cardTypeDef,
+    cardTypeDef,
+    cardTypeDef,
+    cardTypeDef
+  )
+);
 
 const roomStateList = ['not-started', 'playing', 'finished'] as const;
+
+const commonRecordTypeDefs = {
+  password: t.union({
+    types: [t.string(''), t.undefinedType],
+    defaultType: t.undefinedType,
+  }),
+  shuffleDef: permutationType<'0123'>('0123'),
+  players: t.array(playerTypeDef),
+  state: t.enumType({
+    values: roomStateList,
+    defaultValue: 'not-started',
+  }),
+} as const;
+
+const roomRemoteTypeDef = t.record(
+  {
+    ...commonRecordTypeDefs,
+    // firestore が多重配列に対応していないのでオブジェクト化する
+    playerCards: t.record({
+      p0: playerCardsTypeDef,
+      p1: playerCardsTypeDef,
+      p2: playerCardsTypeDef,
+      p3: playerCardsTypeDef,
+    }),
+  },
+  'RoomRemote'
+);
+
+const roomTypeDef = t.record(
+  {
+    ...commonRecordTypeDefs,
+    id: t.string(''),
+    playerCards: t.tuple(
+      tp(
+        playerCardsTypeDef,
+        playerCardsTypeDef,
+        playerCardsTypeDef,
+        playerCardsTypeDef
+      )
+    ),
+  },
+  'Room'
+);
+
+export type RoomRemote = t.TypeOf<typeof roomRemoteTypeDef>;
+
+export type Room = t.TypeOf<typeof roomTypeDef>;
+
 expectType<(typeof roomStateList)[number], Room['state']>('=');
 
-export const assertIsRoomRemote: (
-  data: unknown
-) => asserts data is RoomRemote = (data) => {
-  if (!isRecord(data)) {
-    throw new Error('is not a record');
-  }
-
-  if (
-    !Obj.hasKeyValue(
-      data,
-      'password',
-      (v): v is RoomRemote['password'] => isString(v) || isUndefined(v)
-    )
-  ) {
-    throw new Error('hasKeyValue failed for password');
-  }
-
-  if (
-    !Obj.hasKeyValue(
-      data,
-      'players',
-      (v): v is RoomRemote['players'] => Arr.isArray(v) && v.every(isPlayer)
-    )
-  ) {
-    throw new Error('hasKeyValue failed for players');
-  }
-
-  if (
-    !Obj.hasKeyValue(
-      data,
-      'shuffleDef',
-      (v): v is RoomRemote['shuffleDef'] =>
-        isString(v) && /^[0-3]{4}$/gu.test(v)
-    )
-  ) {
-    throw new Error('hasKeyValue failed for shuffleDef');
-  }
-
-  if (
-    !Obj.hasKeyValue(
-      data,
-      'state',
-      (v): v is RoomRemote['state'] =>
-        isString(v) && Arr.includes(roomStateList, v)
-    )
-  ) {
-    throw new Error('hasKeyValue failed for state');
-  }
-
-  if (
-    !Obj.hasKeyValue(data, 'playerCards', (v): v is RoomRemote['playerCards'] =>
-      // Arr.isArray(v) &&
-      // isArrayOfLength4(v) &&
-      // v.every(
-      //   (a) => Arr.isArray(a) && isArrayOfLength6(a) && a.every(isCard)
-      // )
-      {
-        const checkFn = (a: unknown): a is RoomRemote['playerCards']['p0'] =>
-          Arr.isArray(a) && Arr.isArrayOfLength6(a) && a.every(isCard);
-
-        return (
-          isRecord(v) &&
-          Obj.hasKeyValue(v, 'p0', checkFn) &&
-          Obj.hasKeyValue(v, 'p1', checkFn) &&
-          Obj.hasKeyValue(v, 'p2', checkFn) &&
-          Obj.hasKeyValue(v, 'p3', checkFn)
-        );
-      }
-    )
-  ) {
-    throw new Error('hasKeyValue failed for playerCards');
-  }
-
-  expectType<typeof data, RoomRemote>('<=');
-  expectType<RoomRemote, typeof data>('<=');
-};
+export const assertIsRoomRemote: (a: unknown) => asserts a is RoomRemote =
+  roomRemoteTypeDef.assertIs;
 
 export const convertRoomRemoteToRoom = (
   roomRemote: RoomRemote,

@@ -1,11 +1,15 @@
-export type Player = Readonly<{
-  // id: string;
-  name: string;
-  online: boolean;
-}>;
+import * as t from '@noshiro/io-ts';
 
-export const isPlayer = (data: unknown): data is Player =>
-  isRecord(data) &&
-  // Obj.hasKeyValue(data, 'id', isString) &&
-  Obj.hasKeyValue(data, 'name', isString) &&
-  Obj.hasKeyValue(data, 'online', isBoolean);
+export const playerTypeDef = t.record(
+  {
+    name: t.string(''),
+    online: t.boolean(false),
+  },
+  'Player'
+);
+
+export type Player = t.TypeOf<typeof playerTypeDef>;
+
+export const isPlayer = playerTypeDef.is;
+
+export const fillPlayer = playerTypeDef.fill;

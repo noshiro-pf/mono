@@ -1,4 +1,4 @@
-import { directions, outlineColorDef, text } from '../constants';
+import { dictionary, directions, outlineColorDef } from '../constants';
 import {
   cardEq,
   decrementPlayerIndex,
@@ -154,9 +154,9 @@ export const mapToDisplayValue = ({
   },
 
   gameMessage: match(gameState.phase, {
-    ph010_selectMyCardToToss: text.gameMessage.selectYourCardToToss,
-    ph020_firstAnswer: text.gameMessage.selectYourCardAndAttack,
-    ph030_continuousAnswer: text.gameMessage.selectYourCardToAttack,
+    ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
+    ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
+    ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
   }),
   turnPlayer: match(gameState.currentPlayerIndex, {
     0: directions[decrementPlayerIndex(0, myPlayerIndex)],

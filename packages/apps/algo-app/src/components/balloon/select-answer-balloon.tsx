@@ -1,5 +1,5 @@
 import { type RectSize } from '@noshiro/ts-utils-additional';
-import { outlineColorDef, text } from '../../constants';
+import { dictionary, outlineColorDef } from '../../constants';
 import { type SelectAnswerBalloonProps } from '../../types';
 import { Button } from '../bp';
 import { CardComponent } from '../card';
@@ -110,12 +110,12 @@ export const SelectAnswerBalloon = memoNamed<Props>(
             ))}
           </CardsWrapper>
           <Buttons>
-            <Button onClick={onCancelClick}>{text.cancel}</Button>
+            <Button onClick={onCancelClick}>{dictionary.cancel}</Button>
             <Button
               disabled={submitButtonIsDisabled || selectedNumber === undefined}
               onClick={submitAnswer}
             >
-              {text.submitAnswer}
+              {dictionary.submitAnswer}
             </Button>
           </Buttons>
         </BalloonContent>

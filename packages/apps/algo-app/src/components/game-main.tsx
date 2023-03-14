@@ -1,5 +1,5 @@
 import { type Rect } from '@noshiro/ts-utils-additional';
-import { text } from '../constants';
+import { dictionary } from '../constants';
 import {
   cardPositionsDispatcher,
   confirmTossBalloonProps$,
@@ -9,7 +9,7 @@ import {
   playerNamePositionsDispatcher,
   selectAnswerBalloonProps$,
   turnPlayerHighlighterPosition$,
-} from '../observables';
+} from '../store';
 import { type DisplayValues } from '../types';
 import {
   ConfirmTossBalloon,
@@ -71,7 +71,7 @@ export const GameMain = memoNamed<Props>('GameMain', ({ windowSize }) => {
           type='button'
           onClick={onTurnEndClick}
         >
-          {text.gameMain.endTurnButton}
+          {dictionary.gameMain.endTurnButton}
         </EndTurnButton>
       </EndTurnButtonWrapper>
 

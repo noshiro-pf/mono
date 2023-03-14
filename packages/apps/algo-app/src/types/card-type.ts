@@ -1,21 +1,33 @@
+import * as t from '@noshiro/io-ts';
 import { type CustomColor } from '../constants';
-import { isCardColor, type CardColor } from './card-color';
-import { isCardNumber, type CardNumber } from './card-number';
-import { type VisibilityFromMe, type VisibleTo } from './visible-to';
+import { cardColorTypeDef } from './card-color';
+import { cardNumberTypeDef } from './card-number';
+import { visibleToTypeDef, type VisibilityFromMe } from './visible-to';
 
-export type Card = Readonly<{
-  color: CardColor;
-  number: CardNumber;
-}>;
+const def = {
+  color: cardColorTypeDef,
+  number: cardNumberTypeDef,
+} as const;
 
-export type CardWithVisibility = MergeIntersection<
-  Card & Readonly<{ visibleTo: VisibleTo }>
->;
+export const cardTypeDef = t.record(def, 'Card');
+
+export const cardWithVisibilityTypeDef = t.record(
+  {
+    ...def,
+    visibleTo: visibleToTypeDef,
+  },
+  'Card'
+);
+
+export type Card = t.TypeOf<typeof cardTypeDef>;
+
+export const isCard = cardTypeDef.is;
+
+export type CardWithVisibility = t.TypeOf<typeof cardWithVisibilityTypeDef>;
 
 export type CardWithHandler = MergeIntersection<
   CardWithVisibility & Readonly<{ onClick: () => void }>
 >;
-
 export type CardWithDisplayValue = MergeIntersection<
   CardWithHandler &
     Readonly<{
@@ -26,8 +38,3 @@ export type CardWithDisplayValue = MergeIntersection<
       outlineColor: CustomColor;
     }>
 >;
-
-export const isCard = (data: unknown): data is Card =>
-  isRecord(data) &&
-  Obj.hasKeyValue(data, 'color', isCardColor) &&
-  Obj.hasKeyValue(data, 'number', isCardNumber);

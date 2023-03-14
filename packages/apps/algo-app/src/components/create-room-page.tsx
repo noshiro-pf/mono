@@ -1,8 +1,8 @@
-import { text } from '../constants';
-import { createRoom } from '../observables';
+import { dictionary } from '../constants';
+import { createRoom } from '../store';
 import { ButtonPrimary, Input, Spinner } from './bp';
 
-const vt = text.createRoom;
+const dc = dictionary.createRoom;
 
 export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
   const { state: password, setState: setPassword } = useState<string>('');
@@ -36,20 +36,20 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
     <Centering>
       <FormRect>
         <Block>
-          <Label>{vt.gamePassword.label}</Label>
+          <Label>{dc.gamePassword.label}</Label>
           <Input
             disabled={loading}
-            placeholder={vt.gamePassword.placeholder}
+            placeholder={dc.gamePassword.placeholder}
             type='text'
             value={password}
             onInput={onPasswordInput}
           />
         </Block>
         <Block>
-          <Label>{vt.username.label}</Label>
+          <Label>{dc.username.label}</Label>
           <Input
             disabled={loading}
-            placeholder={vt.username.placeholder}
+            placeholder={dc.username.placeholder}
             type='text'
             value={username}
             onInput={onUsernameInput}
@@ -62,7 +62,7 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
             onClick={onCreateRoomButtonClick}
           >
             <ButtonContent>
-              {loading ? <Spinner size={20} /> : <span>{vt.button}</span>}
+              {loading ? <Spinner size={20} /> : <span>{dc.button}</span>}
             </ButtonContent>
           </ButtonPrimary>
         </ButtonWrapper>
