@@ -3,93 +3,117 @@ export namespace Result {
   const ErrTypeSymbol: unique symbol = Symbol('Result.err');
 
   /** @internal */
-  // eslint-disable-next-line functional/readonly-type
-  export type _Ok<S> = {
-    readonly type: typeof OkTypeSymbol;
-    readonly value: S;
-  };
+  export type _Ok<S> = Readonly<{
+    type: typeof OkTypeSymbol;
+    value: S;
+  }>;
 
   /** @internal */
-  // eslint-disable-next-line functional/readonly-type
-  export type _Err<E> = {
-    readonly type: typeof ErrTypeSymbol;
-    readonly value: E;
-  };
+  export type _Err<E> = Readonly<{
+    type: typeof ErrTypeSymbol;
+    value: E;
+  }>;
 
   /** @internal */
   export type _Result<S, E> = _Err<E> | _Ok<S>;
+
+  export type Base = _Result<unknown, unknown>;
+
+  export type UnwrapOk<R extends Base> = R extends _Ok<infer S> ? S : never;
+
+  export type UnwrapErr<R extends Base> = R extends _Err<infer E> ? E : never;
+
+  export type NarrowToOk<R extends Base> = R extends _Err<unknown> ? never : R;
+
+  export type NarrowToErr<R extends Base> = R extends _Ok<unknown> ? never : R;
 
   export const ok = <S>(value: S): _Ok<S> => ({ type: OkTypeSymbol, value });
 
   export const err = <E>(value: E): _Err<E> => ({ type: ErrTypeSymbol, value });
 
-  export const isOk = <S, E>(
-    result: _Result<S, E> | null | undefined
-  ): result is _Ok<S> => result?.type === OkTypeSymbol;
+  // eslint-disable-next-line no-restricted-globals
+  const _toStr = String;
 
-  export const isErr = <S, E>(
-    result: _Result<S, E> | null | undefined
-  ): result is _Err<E> => result?.type === ErrTypeSymbol;
+  export const isOk = <R extends Base>(result: R): result is NarrowToOk<R> =>
+    result.type === OkTypeSymbol;
 
-  export const map =
-    <S, S2, E>(mapFn: (value: S) => S2) =>
-    (result: _Result<S, E>): _Result<S2, E> =>
-      isErr<S, E>(result) ? result : ok(mapFn(result.value));
+  export const isErr = <R extends Base>(result: R): result is NarrowToErr<R> =>
+    result.type === ErrTypeSymbol;
 
-  export const mapErr =
-    <S, E, E2>(mapFn: (error: E) => E2) =>
-    (result: _Result<S, E>): _Result<S, E2> =>
-      isOk<S, E>(result) ? result : err(mapFn(result.value));
+  export const map = <R extends Base, S2>(
+    result: R,
+    mapFn: (value: UnwrapOk<R>) => S2
+  ): _Result<S2, UnwrapErr<R>> =>
+    isErr(result)
+      ? (result as _Err<UnwrapErr<R>>)
+      : ok(mapFn(result.value as UnwrapOk<R>));
 
-  export const fold =
-    <S, S2, E, E2>(mapFn: (value: S) => S2, mapErrFn: (error: E) => E2) =>
-    (result: _Result<S, E>): _Result<S2, E2> =>
-      isOk<S, E>(result)
-        ? ok(mapFn(result.value))
-        : err(mapErrFn(result.value));
+  export const mapErr = <R extends Base, E2>(
+    result: R,
+    mapFn: (error: UnwrapErr<R>) => E2
+  ): _Result<UnwrapOk<R>, E2> =>
+    isOk(result)
+      ? (result as _Ok<UnwrapOk<R>>)
+      : err(mapFn(result.value as UnwrapErr<R>));
 
-  export const unwrapThrow = <S, E>(
-    result: _Result<S, E>,
-    // eslint-disable-next-line no-restricted-globals
-    toStr: (e: E) => string = String
-  ): S => {
-    if (isErr<S, E>(result)) {
-      throw new Error(toStr(result.value));
+  export const fold = <R extends Base, S2, E2>(
+    result: R,
+    mapFn: (value: UnwrapOk<R>) => S2,
+    mapErrFn: (error: UnwrapErr<R>) => E2
+  ): _Result<S2, E2> =>
+    isOk(result)
+      ? ok(mapFn(result.value as UnwrapOk<R>))
+      : err(mapErrFn(result.value as UnwrapErr<R>));
+
+  export const unwrapThrow = <R extends Base>(
+    result: R,
+    toStr: (e: UnwrapErr<R>) => string = _toStr
+  ): UnwrapOk<R> => {
+    if (isErr(result)) {
+      throw new Error(toStr(result.value as UnwrapErr<R>));
     }
-
-    return result.value;
+    return result.value as UnwrapOk<R>;
   };
 
-  export const unwrapOk = <S, E>(result: _Result<S, E>): S | undefined =>
-    isErr<S, E>(result) ? undefined : result.value;
+  export const unwrapOk = <R extends Base>(
+    result: R
+  ): UnwrapOk<R> | undefined =>
+    isErr(result) ? undefined : (result.value as UnwrapOk<R>);
 
-  export const unwrapOkOr = <S, E, D>(
-    result: _Result<S, E>,
+  export const unwrapOkOr = <R extends Base, D>(
+    result: R,
     defaultValue: D
-  ): D | S => (isErr<S, E>(result) ? defaultValue : result.value);
+  ): D | UnwrapOk<R> =>
+    isErr(result) ? defaultValue : (result.value as UnwrapOk<R>);
 
-  export const unwrapErr = <S, E>(result: _Result<S, E>): E | undefined =>
-    isErr<S, E>(result) ? result.value : undefined;
+  export const unwrapErr = <R extends Base>(
+    result: R
+  ): UnwrapErr<R> | undefined =>
+    isErr(result) ? (result.value as UnwrapErr<R>) : undefined;
 
-  export const unwrapErrOr = <S, E, D>(
-    result: _Result<S, E>,
+  export const unwrapErrOr = <R extends Base, D>(
+    result: R,
     defaultValue: D
-  ): D | E => (isErr<S, E>(result) ? result.value : defaultValue);
+  ): D | UnwrapErr<R> =>
+    isErr(result) ? (result.value as UnwrapErr<R>) : defaultValue;
 
   export const expectToBe =
-    <S, E>(message: string) =>
-    (result: _Result<S, E>): S => {
-      if (isErr<S, E>(result)) {
+    <R extends Base>(message: string) =>
+    (result: R): UnwrapOk<R> => {
+      if (isErr(result)) {
         throw new Error(message);
       }
-
-      return result.value;
+      return result.value as UnwrapOk<R>;
     };
 
-  export const fromPromise = <S, E = unknown>(
-    promise: Readonly<Promise<S>>
-  ): Promise<_Result<S, E>> =>
-    promise.then(ok).catch((error) => err(error as E));
+  type UnwrapPromise<P extends Promise<unknown>> = P extends Promise<infer V>
+    ? V
+    : never;
+
+  export const fromPromise = <P extends Promise<unknown>>(
+    promise: P
+  ): Promise<_Result<UnwrapPromise<P>, unknown>> =>
+    promise.then((v) => ok(v) as _Ok<UnwrapPromise<P>>).catch(err);
 }
 
 export type Result<S, E> = Result._Result<S, E>;

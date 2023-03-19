@@ -32,8 +32,8 @@ class MapWithIndexObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'mapWithIndex',
-      currentValueInit: Maybe.map<A, B>((x) => mapFn(x, -1))(
-        parentObservable.currentValue
+      currentValueInit: Maybe.map(parentObservable.currentValue, (x) =>
+        mapFn(x, -1)
       ),
     });
     this.#index = -1;

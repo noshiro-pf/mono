@@ -15,7 +15,7 @@ export const archiveEventSchedule = (
     updateDoc(doc(firestoreEvents, eventId), {
       [key]: arrayUnion(user),
     })
-  ).then(Result.fold(() => undefined, Str.from));
+  ).then((a) => Result.fold(a, () => undefined, Str.from));
 
 export const unarchiveEventSchedule = (
   eventId: string,
@@ -25,4 +25,4 @@ export const unarchiveEventSchedule = (
     updateDoc(doc(firestoreEvents, eventId), {
       archivedBy: arrayRemove(user),
     })
-  ).then(Result.fold(() => undefined, Str.from));
+  ).then((a) => Result.fold(a, () => undefined, Str.from));

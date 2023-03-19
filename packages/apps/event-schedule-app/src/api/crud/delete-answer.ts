@@ -8,4 +8,4 @@ export const deleteAnswer = (
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     deleteDoc(doc(firestoreEvents, eventId, firestorePaths.answers, answerId))
-  ).then(Result.fold(() => undefined, Str.from));
+  ).then((a) => Result.fold(a, () => undefined, Str.from));

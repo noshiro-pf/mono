@@ -35,9 +35,10 @@ class WithIndexObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'withIndex',
-      currentValueInit: Maybe.map<A, readonly [number, A]>((x) => [-1, x])(
-        parentObservable.currentValue
-      ),
+      currentValueInit: Maybe.map(parentObservable.currentValue, (x) => [
+        -1,
+        x,
+      ]),
     });
     this.#mut_index = -1;
   }

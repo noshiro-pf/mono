@@ -28,9 +28,7 @@ class PluckObservableClass<A, K extends keyof A>
     super({
       parents: [parentObservable],
       type: 'pluck',
-      currentValueInit: Maybe.map<A, A[K]>((x) => x[key])(
-        parentObservable.currentValue
-      ),
+      currentValueInit: Maybe.map(parentObservable.currentValue, (x) => x[key]),
     });
     this.#key = key;
   }

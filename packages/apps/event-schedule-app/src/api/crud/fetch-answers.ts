@@ -18,10 +18,11 @@ export const fetchAnswers = (
         orderBy(ANSWER_KEY_CREATED_AT, 'asc')
       )
     )
-  ).then(
+  ).then((a) =>
     Result.fold(
+      a,
       (querySnapshot) =>
         querySnapshot.docs.map((d) => fillAnswer({ ...d.data(), id: d.id })),
-      (message) => ({ type: 'others', message: Str.from(message) })
+      (message) => ({ type: 'others', message: Str.from(message) } as const)
     )
   );

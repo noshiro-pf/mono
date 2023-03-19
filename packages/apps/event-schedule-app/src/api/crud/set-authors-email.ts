@@ -18,4 +18,4 @@ export const setAuthorsEmail = (
         [firestorePaths.email]: email,
       }
     )
-  ).then(Result.fold(() => undefined, Str.from));
+  ).then((a) => Result.fold(a, () => undefined, Str.from));

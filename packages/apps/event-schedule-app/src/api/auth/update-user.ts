@@ -15,8 +15,8 @@ export const updateDisplayName = (
     updateProfile(castWritable(user), {
       displayName,
     })
-  ).then(
-    Result.mapErr((error) => {
+  ).then((a) =>
+    Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
     })
@@ -26,8 +26,8 @@ export const updateEmail = (
   user: FireAuthUser,
   email: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_updateEmail(castWritable(user), email)).then(
-    Result.mapErr((error) => {
+  Result.fromPromise(_updateEmail(castWritable(user), email)).then((a) =>
+    Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
     })
@@ -37,8 +37,8 @@ export const updatePassword = (
   user: FireAuthUser,
   password: string
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_updatePassword(castWritable(user), password)).then(
-    Result.mapErr((error) => {
+  Result.fromPromise(_updatePassword(castWritable(user), password)).then((a) =>
+    Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
     })
@@ -47,8 +47,8 @@ export const updatePassword = (
 export const deleteUser = (
   user: FireAuthUser
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(_deleteUser(castWritable(user))).then(
-    Result.mapErr((error) => {
+  Result.fromPromise(_deleteUser(castWritable(user))).then((a) =>
+    Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
     })
@@ -65,8 +65,8 @@ export const reauthenticateWithCredential = (
       castWritable(user),
       castWritable(authCredential)
     )
-  ).then(
-    Result.mapErr((error) => {
+  ).then((a) =>
+    Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
     })

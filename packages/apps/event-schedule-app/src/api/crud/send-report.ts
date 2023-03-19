@@ -8,8 +8,9 @@ export const sendReport = ({
 }: Readonly<{
   error: string;
 }>): Promise<Result<undefined, Readonly<{ message: string }>>> =>
-  Result.fromPromise(fbSendReport({ error })).then(
+  Result.fromPromise(fbSendReport({ error })).then((a) =>
     Result.fold(
+      a,
       () => undefined,
       (result) => ({
         message: Str.from(result),

@@ -156,7 +156,7 @@ const saveToDatabase = async (): Promise<void> => {
     return;
   }
 
-  if (Result.isErr(res2)) {
+  if (res2 !== undefined && Result.isErr(res2)) {
     console.error('Error occurred on updating email: ', res2.value);
     showToast({
       toast,

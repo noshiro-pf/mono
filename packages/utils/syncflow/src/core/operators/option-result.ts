@@ -18,37 +18,44 @@ export const unwrapMaybe =
   (parentObservable: Observable<Maybe<A>>) =>
     new UnwrapMaybeObservableClass(parentObservable);
 
-export const unwrapMaybeI = <A>(): InitializedToInitializedOperator<
-  Maybe<A>,
-  A | undefined
-> => unwrapMaybe() as InitializedToInitializedOperator<Maybe<A>, A | undefined>;
+export const unwrapMaybeI = <
+  M extends Maybe.Base
+>(): InitializedToInitializedOperator<M, Maybe.Unwrap<M> | undefined> =>
+  unwrapMaybe() as InitializedToInitializedOperator<
+    M,
+    Maybe.Unwrap<M> | undefined
+  >;
 
 export const unwrapResultOk =
-  <S, E>(): ToBaseOperator<Result<S, E>, S | undefined> =>
-  (parentObservable: Observable<Result<S, E>>) =>
+  <R extends Result.Base>(): ToBaseOperator<
+    R,
+    Result.UnwrapOk<R> | undefined
+  > =>
+  (parentObservable: Observable<R>) =>
     new UnwrapResultOkObservableClass(parentObservable);
 
-export const unwrapResultOkI = <S, E>(): InitializedToInitializedOperator<
-  Result<S, E>,
-  S | undefined
-> =>
+export const unwrapResultOkI = <
+  R extends Result.Base
+>(): InitializedToInitializedOperator<R, Result.UnwrapOk<R> | undefined> =>
   unwrapResultOk() as InitializedToInitializedOperator<
-    Result<S, E>,
-    S | undefined
+    R,
+    Result.UnwrapOk<R> | undefined
   >;
 
 export const unwrapResultErr =
-  <S, E>(): ToBaseOperator<Result<S, E>, E | undefined> =>
-  (parentObservable: Observable<Result<S, E>>) =>
+  <R extends Result.Base>(): ToBaseOperator<
+    R,
+    Result.UnwrapErr<R> | undefined
+  > =>
+  (parentObservable: Observable<R>) =>
     new UnwrapResultErrObservableClass(parentObservable);
 
-export const unwrapResultErrI = <S, E>(): InitializedToInitializedOperator<
-  Result<S, E>,
-  E | undefined
-> =>
+export const unwrapResultErrI = <
+  R extends Result.Base
+>(): InitializedToInitializedOperator<R, Result.UnwrapErr<R> | undefined> =>
   unwrapResultErr() as InitializedToInitializedOperator<
-    Result<S, E>,
-    E | undefined
+    R,
+    Result.UnwrapErr<R> | undefined
   >;
 
 export const mapMaybe =
@@ -56,16 +63,16 @@ export const mapMaybe =
   (parentObservable: Observable<Maybe<A>>) =>
     new MapMaybeObservableClass(parentObservable, mapFn);
 
-export const mapMaybeI = <A, B>(
-  mapFn: (x: A) => B
-): InitializedToInitializedOperator<Maybe<A>, Maybe<B>> =>
-  mapMaybe(mapFn) as InitializedToInitializedOperator<Maybe<A>, Maybe<B>>;
+export const mapMaybeI = <M extends Maybe.Base, B>(
+  mapFn: (x: Maybe.Unwrap<M>) => B
+): InitializedToInitializedOperator<M, Maybe<B>> =>
+  mapMaybe(mapFn) as InitializedToInitializedOperator<M, Maybe<B>>;
 
 export const mapResultOk =
-  <S, S2, E>(
-    mapFn: (x: S) => S2
-  ): ToBaseOperator<Result<S, E>, Result<S2, E>> =>
-  (parentObservable: Observable<Result<S, E>>) =>
+  <R extends Result.Base, S2>(
+    mapFn: (x: Result.UnwrapOk<R>) => S2
+  ): ToBaseOperator<R, Result<S2, Result.UnwrapErr<R>>> =>
+  (parentObservable: Observable<R>) =>
     new MapResultOkObservableClass(parentObservable, mapFn);
 
 export const mapResultOkI = <S, S2, E>(
@@ -91,19 +98,19 @@ export const mapResultErrI = <S, E, E2>(
     Result<S, E2>
   >;
 
-class UnwrapMaybeObservableClass<A>
+class UnwrapMaybeObservableClass<M extends Maybe.Base>
   extends SyncChildObservableClass<
-    A | undefined,
+    Maybe.Unwrap<M> | undefined,
     'unwrapMaybe',
-    readonly [Maybe<A>]
+    readonly [M]
   >
-  implements UnwrapMaybeOperatorObservable<A>
+  implements UnwrapMaybeOperatorObservable<M>
 {
-  constructor(parentObservable: Observable<Maybe<A>>) {
+  constructor(parentObservable: Observable<M>) {
     super({
       parents: [parentObservable],
       type: 'unwrapMaybe',
-      currentValueInit: Maybe.map(Maybe.unwrap)(parentObservable.currentValue),
+      currentValueInit: Maybe.map(parentObservable.currentValue, Maybe.unwrap),
     });
   }
 
@@ -117,20 +124,21 @@ class UnwrapMaybeObservableClass<A>
   }
 }
 
-class UnwrapResultOkObservableClass<S, E>
+class UnwrapResultOkObservableClass<R extends Result.Base>
   extends SyncChildObservableClass<
-    S | undefined,
+    Result.UnwrapOk<R> | undefined,
     'unwrapResultOk',
-    readonly [Result<S, E>]
+    readonly [R]
   >
-  implements UnwrapResultOkOperatorObservable<S, E>
+  implements UnwrapResultOkOperatorObservable<R>
 {
-  constructor(parentObservable: Observable<Result<S, E>>) {
+  constructor(parentObservable: Observable<R>) {
     super({
       parents: [parentObservable],
       type: 'unwrapResultOk',
-      currentValueInit: Maybe.map(Result.unwrapOk)(
-        parentObservable.currentValue
+      currentValueInit: Maybe.map(
+        parentObservable.currentValue,
+        Result.unwrapOk
       ),
     });
   }
@@ -145,20 +153,21 @@ class UnwrapResultOkObservableClass<S, E>
   }
 }
 
-class UnwrapResultErrObservableClass<S, E>
+class UnwrapResultErrObservableClass<R extends Result.Base>
   extends SyncChildObservableClass<
-    E | undefined,
+    Result.UnwrapErr<R> | undefined,
     'unwrapResultErr',
-    readonly [Result<S, E>]
+    readonly [R]
   >
-  implements UnwrapResultErrOperatorObservable<S, E>
+  implements UnwrapResultErrOperatorObservable<R>
 {
-  constructor(parentObservable: Observable<Result<S, E>>) {
+  constructor(parentObservable: Observable<R>) {
     super({
       parents: [parentObservable],
       type: 'unwrapResultErr',
-      currentValueInit: Maybe.map(Result.unwrapErr)(
-        parentObservable.currentValue
+      currentValueInit: Maybe.map(
+        parentObservable.currentValue,
+        Result.unwrapErr
       ),
     });
   }
@@ -173,18 +182,21 @@ class UnwrapResultErrObservableClass<S, E>
   }
 }
 
-class MapMaybeObservableClass<A, B>
-  extends SyncChildObservableClass<Maybe<B>, 'mapMaybe', readonly [Maybe<A>]>
-  implements MapMaybeOperatorObservable<A, B>
+class MapMaybeObservableClass<M extends Maybe.Base, B>
+  extends SyncChildObservableClass<Maybe<B>, 'mapMaybe', readonly [M]>
+  implements MapMaybeOperatorObservable<M, B>
 {
-  readonly #mapFn: (x: A) => B;
+  readonly #mapFn: (x: Maybe.Unwrap<M>) => B;
 
-  constructor(parentObservable: Observable<Maybe<A>>, mapFn: (x: A) => B) {
+  constructor(
+    parentObservable: Observable<M>,
+    mapFn: (x: Maybe.Unwrap<M>) => B
+  ) {
     super({
       parents: [parentObservable],
       type: 'mapMaybe',
-      currentValueInit: Maybe.map(Maybe.map(mapFn))(
-        parentObservable.currentValue
+      currentValueInit: Maybe.map(parentObservable.currentValue, (a) =>
+        Maybe.map(a, mapFn)
       ),
     });
     this.#mapFn = mapFn;
@@ -196,26 +208,29 @@ class MapMaybeObservableClass<A, B>
       return; // skip update
     }
 
-    this.setNext(Maybe.map(this.#mapFn)(par.currentValue.value), updaterSymbol);
+    this.setNext(Maybe.map(par.currentValue.value, this.#mapFn), updaterSymbol);
   }
 }
 
-class MapResultOkObservableClass<S, S2, E>
+class MapResultOkObservableClass<R extends Result.Base, S2>
   extends SyncChildObservableClass<
-    Result<S2, E>,
+    Result<S2, Result.UnwrapErr<R>>,
     'mapResultOk',
-    readonly [Result<S, E>]
+    readonly [R]
   >
-  implements MapResultOkOperatorObservable<S, S2, E>
+  implements MapResultOkOperatorObservable<R, S2>
 {
-  readonly #mapFn: (x: S) => S2;
+  readonly #mapFn: (x: Result.UnwrapOk<R>) => S2;
 
-  constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: S) => S2) {
+  constructor(
+    parentObservable: Observable<R>,
+    mapFn: (x: Result.UnwrapOk<R>) => S2
+  ) {
     super({
       parents: [parentObservable],
       type: 'mapResultOk',
-      currentValueInit: Maybe.map(Result.map<S, S2, E>(mapFn))(
-        parentObservable.currentValue
+      currentValueInit: Maybe.map(parentObservable.currentValue, (a) =>
+        Result.map(a, mapFn)
       ),
     });
     this.#mapFn = mapFn;
@@ -228,28 +243,31 @@ class MapResultOkObservableClass<S, S2, E>
     }
 
     this.setNext(
-      Result.map<S, S2, E>(this.#mapFn)(par.currentValue.value),
+      Result.map(par.currentValue.value, this.#mapFn),
       updaterSymbol
     );
   }
 }
 
-class MapResultErrObservableClass<S, E, E2>
+class MapResultErrObservableClass<R extends Result.Base, E2>
   extends SyncChildObservableClass<
-    Result<S, E2>,
+    Result<Result.UnwrapOk<R>, E2>,
     'mapResultErr',
-    readonly [Result<S, E>]
+    readonly [R]
   >
-  implements MapResultErrOperatorObservable<S, E, E2>
+  implements MapResultErrOperatorObservable<R, E2>
 {
-  readonly #mapFn: (x: E) => E2;
+  readonly #mapFn: (x: Result.UnwrapErr<R>) => E2;
 
-  constructor(parentObservable: Observable<Result<S, E>>, mapFn: (x: E) => E2) {
+  constructor(
+    parentObservable: Observable<R>,
+    mapFn: (x: Result.UnwrapErr<R>) => E2
+  ) {
     super({
       parents: [parentObservable],
       type: 'mapResultErr',
-      currentValueInit: Maybe.map(Result.mapErr<S, E, E2>(mapFn))(
-        parentObservable.currentValue
+      currentValueInit: Maybe.map(parentObservable.currentValue, (a) =>
+        Result.mapErr(a, mapFn)
       ),
     });
     this.#mapFn = mapFn;
@@ -262,7 +280,7 @@ class MapResultErrObservableClass<S, E, E2>
     }
 
     this.setNext(
-      Result.mapErr<S, E, E2>(this.#mapFn)(par.currentValue.value),
+      Result.mapErr(par.currentValue.value, this.#mapFn),
       updaterSymbol
     );
   }

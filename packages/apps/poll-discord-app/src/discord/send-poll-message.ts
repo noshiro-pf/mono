@@ -184,7 +184,7 @@ const gpSendGroupingMessageSub = async (
     messageChannel.send(gpCreateSummaryMessage(groups))
   );
 
-  return Result.map(() => undefined)(summaryMessageResult);
+  return Result.map(summaryMessageResult, () => undefined);
 };
 
 const gpSendRandMessageSub = async (
@@ -196,7 +196,7 @@ const gpSendRandMessageSub = async (
     messageChannel.send(Math.ceil(Math.random() * n))
   );
 
-  return Result.map(() => undefined)(summaryMessageResult);
+  return Result.map(summaryMessageResult, () => undefined);
 };
 
 const gpSendGroupingMessage = async (
