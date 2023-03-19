@@ -12,7 +12,6 @@ const {
   ignorePattern,
   immutableDataOptions,
   noLetOptions,
-  preferReadonlyTypeOptions,
   preferTacitOptions,
 } = require('./eslint-functional-rules');
 const { eslintPromiseRules } = require('./eslint-promise-rules');
@@ -47,7 +46,6 @@ module.exports = {
   ignorePattern,
   immutableDataOptions,
   noLetOptions,
-  preferReadonlyTypeOptions,
   preferTacitOptions,
 
   /* typescript-eslint-rules */

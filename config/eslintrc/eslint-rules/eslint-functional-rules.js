@@ -6,7 +6,6 @@
 
 /** @typedef { import("../../types/types").ImmutableDataOptions } ImmutableDataOptions */
 /** @typedef { import("../../types/types").NoLetOptions } NoLetOptions */
-/** @typedef { import("../../types/types").PreferReadonlyTypeOptions } PreferReadonlyTypeOptions */
 /** @typedef { import("../../types/types").NoExpressionStatementOptions } NoExpressionStatementOptions */
 /** @typedef { import("../../types/types").PreferTacitOptions } PreferTacitOptions */
 
@@ -14,12 +13,13 @@ const ignorePattern = [
   '^draft', // allow immer.js draft object
   '^mut_',
   '^_mut_',
+  '^#mut_',
 ];
 
 /** @type {ImmutableDataOptions} */
 const immutableDataOptions = {
   assumeTypes: true,
-  ignoreClass: true,
+  ignoreClasses: true,
   ignoreImmediateMutation: true,
   ignorePattern,
   ignoreAccessorPattern: [
@@ -30,19 +30,8 @@ const immutableDataOptions = {
 /** @type {NoLetOptions} */
 const noLetOptions = {
   allowInForLoopInit: false,
-  allowLocalMutation: false,
+  allowInFunctions: false,
   ignorePattern: ignorePattern.filter((p) => p !== '^draft'),
-};
-
-/** @type {PreferReadonlyTypeOptions} */
-const preferReadonlyTypeOptions = {
-  allowLocalMutation: true,
-  allowMutableReturnType: true,
-  checkImplicit: false,
-  ignoreClass: true,
-  ignoreInterface: false,
-  ignoreCollections: false,
-  ignorePattern,
 };
 
 // /** @type {NoExpressionStatementOptions} */
@@ -60,9 +49,8 @@ const preferReadonlyTypeOptions = {
 
 /** @type {PreferTacitOptions} */
 const preferTacitOptions = {
-  assumeTypes: {
-    allowFixer: true,
-  },
+  ignorePattern: undefined,
+  assumeTypes: false,
 };
 
 /**
@@ -73,26 +61,33 @@ const eslintFunctionalRules = {
   // No Mutations Rules
   'functional/immutable-data': ['error', immutableDataOptions],
   'functional/no-let': ['error', noLetOptions],
-  'functional/no-method-signature': 'error',
+  'functional/prefer-property-signatures': 'error',
   // 'functional/prefer-readonly-type': ['warn', preferReadonlyTypeOptions],
   'functional/prefer-readonly-type': 'off',
 
   // No Object-Orientation Rules
-  'functional/no-class': 'off',
-  'functional/no-mixed-type': 'error',
-  'functional/no-this-expression': 'off',
+  'functional/no-classes': 'off',
+  'functional/no-mixed-types': 'off',
+  // 'functional/no-mixed-types': [
+  //   'error',
+  //   {
+  //     checkInterfaces: true,
+  //     checkTypeLiterals: true,
+  //   },
+  // ],
+  'functional/no-this-expressions': 'off',
 
   // No Statements Rules
-  'functional/no-conditional-statement': 'off',
+  'functional/no-conditional-statements': 'off',
   // 'functional/no-expression-statement': ['warn', noExpressionStatementOptions],
-  'functional/no-expression-statement': 'off',
-  'functional/no-loop-statement': 'off',
+  'functional/no-expression-statements': 'off',
+  'functional/no-loop-statements': 'off',
   'functional/no-return-void': 'off',
 
   // No Exceptions Rules
   'functional/no-promise-reject': 'off',
-  'functional/no-throw-statement': 'off',
-  'functional/no-try-statement': 'off',
+  'functional/no-throw-statements': 'off',
+  'functional/no-try-statements': 'off',
 
   // Currying Rules
   'functional/functional-parameters': 'off',
@@ -100,6 +95,61 @@ const eslintFunctionalRules = {
   // Stylistic Rules
   // 'functional/prefer-tacit': ['warn', preferTacitOptions],
   'functional/prefer-tacit': 'off', // false positives
+
+  'functional/readonly-type': ['error', 'generic'],
+
+  // TODO
+  'functional/prefer-immutable-types': 'off',
+  // 'functional/prefer-immutable-types': [
+  //   'warn',
+  //   {
+  //     enforcement: 'Immutable',
+  //     ignoreNamePattern: ignorePattern,
+  //     ignoreClasses: false,
+  //     ignoreInferredTypes: false,
+  //     fixer: {
+  //       ReadonlyShallow: [
+  //         {
+  //           pattern:
+  //             '^([_$a-zA-Z\\xA0-\\uFFFF][_$a-zA-Z0-9\\xA0-\\uFFFF]*\\[\\])$',
+  //           replace: 'readonly $1',
+  //         },
+  //         {
+  //           pattern: '^(Array|Map|Set)<(.+)>$',
+  //           replace: 'Readonly$1<$2>',
+  //         },
+  //         {
+  //           pattern: '^(.+)$',
+  //           replace: 'Readonly<$1>',
+  //         },
+  //       ],
+  //       ReadonlyDeep: false,
+  //       Immutable: false,
+  //     },
+  //   },
+  // ],
+  'functional/type-declaration-immutability': 'off',
+  // 'functional/type-declaration-immutability': [
+  //   'error',
+  //   {
+  //     ignorePattern,
+  //     rules: [
+  //       {
+  //         identifiers: '^.+',
+  //         immutability: 'Immutable',
+  //         comparator: 'AtLeast',
+  //         fixer: false,
+  //       },
+  //       {
+  //         identifiers: 'I?Mutable.+',
+  //         immutability: 'Mutable',
+  //         comparator: 'AtLeast',
+  //         fixer: false,
+  //       },
+  //     ],
+  //     ignoreInterfaces: false,
+  //   },
+  // ],
 };
 
 module.exports = {
@@ -107,6 +157,5 @@ module.exports = {
   ignorePattern,
   immutableDataOptions,
   noLetOptions,
-  preferReadonlyTypeOptions,
   preferTacitOptions,
 };

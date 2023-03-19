@@ -252,6 +252,7 @@ namespace ArrayElementNewline {
    *       ]
    *     }
    *   },
+   *   "type": "array",
    *   "items": [
    *     {
    *       "oneOf": [
@@ -4477,6 +4478,10 @@ namespace LinesAroundComment {
    *       },
    *       "applyDefaultIgnorePatterns": {
    *         "type": "boolean"
+   *       },
+   *       "afterHashbangComment": {
+   *         "type": "boolean",
+   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -4499,6 +4504,7 @@ namespace LinesAroundComment {
     readonly allowArrayEnd?: boolean;
     readonly ignorePattern?: string;
     readonly applyDefaultIgnorePatterns?: boolean;
+    readonly afterHashbangComment?: boolean;
   };
 
   export type RuleEntry =
@@ -5313,18 +5319,55 @@ namespace MultilineCommentStyle {
    * ### schema
    *
    * ```json
-   * [
-   *   {
-   *     "enum": [
-   *       "starred-block",
-   *       "separate-lines",
-   *       "bare-block"
-   *     ]
-   *   }
-   * ]
+   * {
+   *   "anyOf": [
+   *     {
+   *       "type": "array",
+   *       "items": [
+   *         {
+   *           "enum": [
+   *             "starred-block",
+   *             "bare-block"
+   *           ]
+   *         }
+   *       ],
+   *       "additionalItems": false
+   *     },
+   *     {
+   *       "type": "array",
+   *       "items": [
+   *         {
+   *           "enum": [
+   *             "separate-lines"
+   *           ]
+   *         },
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "checkJSDoc": {
+   *               "type": "boolean"
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         }
+   *       ],
+   *       "additionalItems": false
+   *     }
+   *   ]
+   * }
    * ```
    */
-  export type Options = 'starred-block' | 'separate-lines' | 'bare-block';
+  export type Options =
+    | readonly []
+    | readonly ['starred-block' | 'bare-block']
+    | readonly []
+    | readonly ['separate-lines']
+    | readonly [
+        'separate-lines',
+        {
+          readonly checkJSDoc?: boolean;
+        }
+      ];
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -8111,24 +8154,74 @@ namespace NoRestrictedExports {
    * ```json
    * [
    *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "restrictedNamedExports": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string"
+   *     "anyOf": [
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "restrictedNamedExports": {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string"
+   *             },
+   *             "uniqueItems": true
+   *           }
    *         },
-   *         "uniqueItems": true
+   *         "additionalProperties": false
+   *       },
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "restrictedNamedExports": {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string",
+   *               "pattern": "^(?!default$)"
+   *             },
+   *             "uniqueItems": true
+   *           },
+   *           "restrictDefaultExports": {
+   *             "type": "object",
+   *             "properties": {
+   *               "direct": {
+   *                 "type": "boolean"
+   *               },
+   *               "named": {
+   *                 "type": "boolean"
+   *               },
+   *               "defaultFrom": {
+   *                 "type": "boolean"
+   *               },
+   *               "namedFrom": {
+   *                 "type": "boolean"
+   *               },
+   *               "namespaceFrom": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         },
+   *         "additionalProperties": false
    *       }
-   *     },
-   *     "additionalProperties": false
+   *     ]
    *   }
    * ]
    * ```
    */
-  export type Options = {
-    readonly restrictedNamedExports?: readonly string[];
-  };
+  export type Options =
+    | {
+        readonly restrictedNamedExports?: readonly string[];
+      }
+    | {
+        readonly restrictedNamedExports?: readonly string[];
+        readonly restrictDefaultExports?: {
+          readonly direct?: boolean;
+          readonly named?: boolean;
+          readonly defaultFrom?: boolean;
+          readonly namedFrom?: boolean;
+          readonly namespaceFrom?: boolean;
+        };
+      };
 
   export type RuleEntry =
     | Linter.RuleLevel
