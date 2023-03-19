@@ -3,12 +3,14 @@ export namespace Maybe {
   const NoneTypeSymbol: unique symbol = Symbol('Maybe.none');
 
   /** @internal */
+  // eslint-disable-next-line functional/readonly-type
   export type _Some<S> = {
     readonly type: typeof SomeTypeSymbol;
     readonly value: S;
   };
 
   /** @internal */
+  // eslint-disable-next-line functional/readonly-type
   export type _None = {
     readonly type: typeof NoneTypeSymbol;
   };

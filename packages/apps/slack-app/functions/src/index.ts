@@ -65,7 +65,7 @@ export const makeUppercase = firestore
             resolve(
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
               r?.members?.find(
-                (a: { readonly name: string }) => a.name === 'noshiro.pf'
+                (a: Readonly<{ name: string }>) => a.name === 'noshiro.pf'
               )?.profile?.display_name_normalized
             );
           });

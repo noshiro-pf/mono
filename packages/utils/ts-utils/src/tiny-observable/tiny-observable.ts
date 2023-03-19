@@ -1,25 +1,25 @@
 import { MutableMap } from '../others';
 
-export type Subscription = {
-  readonly unsubscribe: () => void;
-};
+export type Subscription = Readonly<{
+  unsubscribe: () => void;
+}>;
 
-export type TinyObservable<T> = {
-  readonly subscribe: (fn: (value: T) => void) => Subscription;
-};
+export type TinyObservable<T> = Readonly<{
+  subscribe: (fn: (value: T) => void) => Subscription;
+}>;
 
 export type TinyObservableSource<T> = MergeIntersection<
-  TinyObservable<T> & { readonly next: (value: T) => void }
+  Readonly<{ next: (value: T) => void }> & TinyObservable<T>
 >;
 
 export const createTinyObservable = <T>(): TinyObservableSource<T> =>
   new TinyObservableClass<T>();
 
 class TinyObservableClass<T> implements TinyObservableSource<T> {
-  readonly #subscriptions = new MutableMap<symbol, (value: T) => void>();
+  readonly #mut_subscriptions = new MutableMap<symbol, (value: T) => void>();
 
   next(value: T): void {
-    for (const fn of this.#subscriptions.values()) {
+    for (const fn of this.#mut_subscriptions.values()) {
       fn(value);
     }
   }
@@ -27,11 +27,11 @@ class TinyObservableClass<T> implements TinyObservableSource<T> {
   subscribe(fn: (value: T) => void): Subscription {
     const id = Symbol();
 
-    this.#subscriptions.set(id, fn);
+    this.#mut_subscriptions.set(id, fn);
 
     return {
       unsubscribe: () => {
-        this.#subscriptions.delete(id);
+        this.#mut_subscriptions.delete(id);
       },
     };
   }
