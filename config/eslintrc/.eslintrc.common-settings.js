@@ -80,7 +80,6 @@ const config = {
 
     // configs & scripts
     '.eslintrc.cjs',
-    'webpack.*.js',
     'app_directory.js',
     'env.js',
     'paths.js',

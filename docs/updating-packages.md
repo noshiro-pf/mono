@@ -80,24 +80,6 @@ $  yarn add -W  \
         @testing-library/user-event@latest
 ```
 
-## Bundler
-
-```sh
-$  yarn add --dev -W  \
-        @types/copy-webpack-plugin@latest         \
-        @types/terser-webpack-plugin@latest       \
-        @types/webpack-dev-server@latest          \
-        copy-webpack-plugin@latest                \
-        css-loader@latest                         \
-        dotenv@latest                             \
-        html-webpack-plugin@latest                \
-        style-loader@latest                       \
-        webpack-cli@latest                        \
-        webpack-dev-server@latest                 \
-        webpack-merge@latest                      \
-        webpack@latest
-```
-
 ## Node
 
 ```sh
