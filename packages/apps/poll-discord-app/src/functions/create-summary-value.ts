@@ -44,7 +44,7 @@ const rpFormatEmbedField = (
   pollName: string,
   value: string
 ): Discord.EmbedField => ({
-  inline: true, // TODO: test false
+  inline: false,
   name: `**${pollName}**`,
   value,
 });
@@ -104,7 +104,7 @@ const gpFormatEmbedFieldData = (
   groupName: string,
   value: string
 ): Discord.EmbedField => ({
-  inline: true, // TODO: test false
+  inline: true,
   name: `**${groupName}**`,
   value,
 });

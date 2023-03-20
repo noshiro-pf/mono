@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "yarn z:build:wireit",
+    "buildw": "yarn z:build:impl --watch",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "clean:eslintcache": "rimraf .eslintcache",
@@ -17,8 +18,8 @@
     "gi": "yarn z:gi:wireit",
     "lint": "yarn z:lint:src:wireit",
     "lint:fix": "yarn z:lint:fix:src:wireit",
-    "start:dev": "export NODE_ENV='development' && node ./dist/index.js",
-    "start:prod": "node ./dist/index.js",
+    "start:dev": "export NODE_ENV='development' && node ./dist/src/index.js",
+    "start:prod": "node ./dist/src/index.js",
     "tsc": "yarn z:type-check:wireit",
     "tscw": "yarn z:type-check:impl --watch",
     "z:build:impl": "yarn zz:cmd:tsc-incremental --project tsconfig.json",
@@ -46,11 +47,10 @@
     "@noshiro/ts-utils-additional": "*",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
-    "pg": "^8.9.0"
+    "firebase": "^9.0.2"
   },
   "devDependencies": {
-    "@noshiro/ts-type-utils": "*",
-    "@types/pg": "^8.6.6"
+    "@noshiro/ts-type-utils": "*"
   },
   "engines": {
     "node": ">=16.6.x"

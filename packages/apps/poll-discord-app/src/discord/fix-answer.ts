@@ -1,19 +1,17 @@
 import { ISet, isNotUndefined, Obj, Result, Str, tp } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { emojis } from '../constants';
+import { firestoreApi } from '../firebase';
 import {
   createUserIdToDisplayNameMap,
   getUserIdsFromAnswers,
   rpCreateSummaryMessage,
 } from '../functions';
-import { updatePoll } from '../in-memory-database';
 import {
   toDateOptionId,
   toUserId,
-  type DatabaseRef,
   type DateOptionId,
   type Poll,
-  type PsqlClient,
   type UserId,
 } from '../types';
 
@@ -21,12 +19,19 @@ import {
  * @description reactions を取得して poll.answers を修復（データベースが壊れたときの保険）
  */
 export const fixAnswerAndUpdateMessage = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   messages: Discord.Collection<string, Discord.Message>,
   poll: Poll
 ): Promise<Result<undefined, string>> => {
+  const pollMessage = messages.find((m) => m.id === poll.id);
+
+  if (pollMessage === undefined) {
+    return Result.err(`message with id ${poll.id} not found`);
+  }
+
+  // remove reaction stamp button
+  await pollMessage.reactions.removeAll();
+
   const dateOptionMessages: readonly (readonly [
     DateOptionId,
     Discord.Message
@@ -128,12 +133,6 @@ export const fixAnswerAndUpdateMessage = async (
     )
   );
 
-  const pollMessage = messages.find((m) => m.id === poll.id);
-
-  if (pollMessage === undefined) {
-    return Result.err(`message with id ${poll.id} not found`);
-  }
-
   const userIdToDisplayNameResult = await createUserIdToDisplayNameMap(
     pollMessage.guild,
     getUserIdsFromAnswers(newPollFilled.answers).toArray()
@@ -145,20 +144,18 @@ export const fixAnswerAndUpdateMessage = async (
 
   const userIdToDisplayName = userIdToDisplayNameResult.value;
 
-  const [updatePollResult, editSummaryMessageResult] = await Promise.all([
-    updatePoll(databaseRef, psqlClient, newPollFilled),
-    Result.fromPromise(
-      pollMessage
-        .edit({
-          embeds: [rpCreateSummaryMessage(newPollFilled, userIdToDisplayName)],
-        })
-        .then(() => undefined)
-    ),
-  ]);
-
-  if (Result.isErr(updatePollResult)) {
-    return Result.err('updatePoll in fixAnswerAndUpdateMessage failed');
+  const setPollResult = await firestoreApi.setPoll(newPollFilled);
+  if (Result.isErr(setPollResult)) {
+    return setPollResult;
   }
+
+  const editSummaryMessageResult = await Result.fromPromise(
+    pollMessage
+      .edit({
+        embeds: [rpCreateSummaryMessage(newPollFilled, userIdToDisplayName)],
+      })
+      .then(() => undefined)
+  );
 
   if (Result.isErr(editSummaryMessageResult)) {
     return Result.err(
@@ -168,6 +165,7 @@ export const fixAnswerAndUpdateMessage = async (
     );
   }
 
+  // restore reaction stamp button
   const addEmojiResult = await Result.fromPromise(
     pollMessage.react(emojis.refresh.unicode)
   );

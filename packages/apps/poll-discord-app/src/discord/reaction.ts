@@ -1,27 +1,17 @@
-import { Json, match, Result } from '@noshiro/ts-utils';
+import { match, Result } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
 import { emojis } from '../constants';
+import { firestoreApi } from '../firebase';
 import {
   createUserIdToDisplayNameMap,
   getUserIdsFromAnswers,
   rpCreateSummaryMessage,
 } from '../functions';
-import { updateVote } from '../in-memory-database';
-import {
-  toDateOptionId,
-  toPollId,
-  toUserId,
-  type AnswerType,
-  type DatabaseRef,
-  type Poll,
-  type PsqlClient,
-} from '../types';
+import { toDateOptionId, toPollId, toUserId, type AnswerType } from '../types';
 import { fixAnswerAndUpdateMessage } from './fix-answer';
 
 const onRefreshClick = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reactionFilled: Discord.MessageReaction
 ): Promise<Result<undefined, string>> => {
@@ -37,15 +27,17 @@ const onRefreshClick = async (
     around: reactionFilled.message.id,
   });
 
-  const poll: Poll | undefined = databaseRef.db.polls.get(
+  const pollResult = await firestoreApi.getPollById(
     toPollId(reactionFilled.message.id)
   );
+
+  if (Result.isErr(pollResult)) return pollResult;
+
+  const poll = pollResult.value;
 
   if (poll === undefined) return Result.err('poll not found');
 
   const fixAnswerAndUpdateMessageResult = await fixAnswerAndUpdateMessage(
-    databaseRef,
-    psqlClient,
     messages,
     poll
   );
@@ -54,28 +46,10 @@ const onRefreshClick = async (
     return fixAnswerAndUpdateMessageResult;
   }
 
-  const users = await reactionFilled.users.fetch();
-
-  const result = await Promise.all(
-    users
-      .filter((u) => !u.bot)
-      .map((u) => Result.fromPromise(reactionFilled.users.remove(u.id)))
-  );
-
-  if (result.some(Result.isErr)) {
-    return Result.err(
-      Result.unwrapThrow(
-        Json.stringify(result.map((a) => a.value) as JSONValue, undefined, 2)
-      )
-    );
-  }
-
   return Result.ok(undefined);
 };
 
 const onMessageReactCommon = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   action: Readonly<{
     type: 'add' | 'remove';
     value: AnswerType | 'refresh' | undefined;
@@ -90,7 +64,7 @@ const onMessageReactCommon = async (
 
   if (action.value === 'refresh') {
     if (action.type === 'add') {
-      return onRefreshClick(databaseRef, psqlClient, reaction);
+      return onRefreshClick(reaction);
     }
     return Result.ok(undefined);
   }
@@ -100,26 +74,60 @@ const onMessageReactCommon = async (
   const channel = reaction.message.channel;
   if (channel.type !== ChannelType.GuildText) {
     return Result.err(
-      `This channel type (${channel.type}) is not supported. (GuildText only)`
+      `This channel type "${channel.type}" is not supported. ("GuildText" only)`
     );
   }
 
-  const [resultPollResult, messages]: [
-    Result<Poll, string>,
+  const pollIdResult = await firestoreApi.getPollIdByDateOptionId(dateOptionId);
+
+  if (Result.isErr(pollIdResult)) return pollIdResult;
+
+  const pollId = pollIdResult.value;
+
+  if (pollId === undefined) {
+    return Result.err(
+      `pollId for dateOptionId "${dateOptionId}" doesn't exist in firestore`
+    );
+  }
+
+  const [updateMessageReactionResult, updatePollUpdatedAtResult, messages]: [
+    Result<void, string>,
+    Result<void, string>,
     Discord.Collection<string, Discord.Message>
   ] = await Promise.all([
-    updateVote(databaseRef, psqlClient, dateOptionId, toUserId(user.id), {
-      type: action.type,
-      value: action.value,
-    }),
+    firestoreApi.updateMessageReaction(
+      pollId,
+      dateOptionId,
+      action.value,
+      toUserId(user.id),
+      action.type
+    ),
+    firestoreApi.updatePollUpdatedAt(pollId),
     channel.messages.fetch({
       after: dateOptionId,
     }),
   ]);
 
-  if (Result.isErr(resultPollResult)) return resultPollResult;
-  const resultPoll = resultPollResult.value;
   if (messages.size === 0) return Result.err('messages not found.');
+
+  if (Result.isErr(updateMessageReactionResult)) {
+    return updateMessageReactionResult;
+  }
+
+  if (Result.isErr(updatePollUpdatedAtResult)) {
+    return updatePollUpdatedAtResult;
+  }
+
+  const resultPollResult = await firestoreApi.getPollById(pollId);
+
+  if (Result.isErr(resultPollResult)) {
+    return resultPollResult;
+  }
+  const resultPoll = resultPollResult.value;
+
+  if (resultPoll === undefined) {
+    return Result.err(`poll of id "${pollId}" doesn't exist in firestore`);
+  }
 
   const userIdToDisplayNameResult = await createUserIdToDisplayNameMap(
     reaction.message.guild,
@@ -162,16 +170,12 @@ const mapReactionEmojiNameToAnswerType = (
   });
 
 export const onMessageReactionAdd = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   user: Discord.PartialUser | Discord.User
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
-    databaseRef,
-    psqlClient,
     {
       type: 'add',
       value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),
@@ -181,16 +185,12 @@ export const onMessageReactionAdd = async (
   );
 
 export const onMessageReactionRemove = (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reaction: Discord.MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   user: Discord.PartialUser | Discord.User
 ): Promise<Result<undefined, unknown>> =>
   onMessageReactCommon(
-    databaseRef,
-    psqlClient,
     {
       type: 'remove',
       value: mapReactionEmojiNameToAnswerType(reaction.emoji.name),

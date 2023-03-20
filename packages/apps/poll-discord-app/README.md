@@ -67,18 +67,7 @@ result
 
 ### Start app locally
 
--   setup PostgreSQL
--   `sudo /etc/init.d/postgresql start`
--   `yarn start:dev`
-
-<!--
-## setup
-
-```bash
-$  heroku config:add TZ=Asia/Tokyo --app poll-discord-app
-$  heroku config:add DATABASE_URL=*** --app poll-discord-app
-$  heroku config:add DISCORD_TOKEN=*** --app poll-discord-app
-``` -->
+`yarn start:dev`
 
 ### setup service
 
@@ -106,3 +95,7 @@ $  heroku config:add DISCORD_TOKEN=*** --app poll-discord-app
 5. Type `yarn start:prod` in "Start Command".
 6. Set environment variable `DISCORD_TOKEN` generated at [Discord Developer Portal](https://discord.com/developers/applications).
 7.
+
+## Links
+
+-   https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags

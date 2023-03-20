@@ -2,6 +2,7 @@ import { DateUtils, IMap, Result, tp } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
 import { emojis, triggerCommand } from '../constants';
+import { firestoreApi } from '../firebase';
 import {
   convertRp30ArgToRpArgs,
   convertRp30dArgToRpArgs,
@@ -16,7 +17,6 @@ import {
   rpCreateSummaryMessage,
   rpParseCommand,
 } from '../functions';
-import { addPoll } from '../in-memory-database';
 import {
   answerOfDateDefaultValue,
   toCommandMessageId,
@@ -26,11 +26,10 @@ import {
   toTitleMessageId,
   type AnswerOfDate,
   type CommandMessageId,
-  type DatabaseRef,
   type DateOption,
   type DateOptionId,
   type Group,
-  type PsqlClient,
+  type Poll,
   type TitleMessageId,
   type UserId,
 } from '../types';
@@ -130,8 +129,6 @@ const rpSendPollMessageSub = async (
 };
 
 const rpSendPollMessage = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   discordChannel: Discord.Message['channel'],
   messageId: CommandMessageId,
@@ -150,21 +147,39 @@ const rpSendPollMessage = async (
   const { summaryMessage, dateOptions, dateOptionMessageList, titleMessageId } =
     replySubResult.value;
 
-  const addPollResult = await addPoll(
-    databaseRef,
-    psqlClient,
-    {
-      id: toPollId(summaryMessage.id),
-      updatedAt: toTimestamp(summaryMessage.createdTimestamp),
-      title,
-      dateOptions,
-      answers: IMap.new<DateOptionId, AnswerOfDate>(
-        dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue))
-      ),
-      titleMessageId,
-    },
-    messageId
-  );
+  const poll: Poll = {
+    id: toPollId(summaryMessage.id),
+    updatedAt: toTimestamp(summaryMessage.createdTimestamp),
+    title,
+    dateOptions,
+    answers: IMap.new<DateOptionId, AnswerOfDate>(
+      dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue))
+    ),
+    titleMessageId,
+  };
+
+  const [
+    setPollResult,
+    setPollIdForCommandMessageIdResult,
+    setPollIdForDateOptionIdsResult,
+  ] = await Promise.all([
+    firestoreApi.setPoll(poll),
+    firestoreApi.setPollIdForCommandMessageId(messageId, poll.id),
+    firestoreApi.setPollIdForDateOptionIds(
+      poll.dateOptions.map((p) => p.id),
+      poll.id
+    ),
+  ]);
+
+  if (Result.isErr(setPollResult)) {
+    return setPollResult;
+  }
+  if (Result.isErr(setPollIdForCommandMessageIdResult)) {
+    return setPollIdForCommandMessageIdResult;
+  }
+  if (Result.isErr(setPollIdForDateOptionIdsResult)) {
+    return setPollIdForDateOptionIdsResult;
+  }
 
   await Promise.all(
     dateOptionMessageList.map((msg) => msg.react(emojis.good.unicode))
@@ -176,7 +191,7 @@ const rpSendPollMessage = async (
     dateOptionMessageList.map((msg) => msg.react(emojis.poor.unicode))
   );
 
-  return addPollResult;
+  return Result.ok(undefined);
 };
 
 const gpSendGroupingMessageSub = async (
@@ -253,8 +268,6 @@ const gpSendRandMessage = async (
 };
 
 export const sendMessageMain = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   message: Discord.Message
 ): Promise<Result<undefined, unknown>> => {
@@ -271,8 +284,6 @@ export const sendMessageMain = async (
   if (message.content.startsWith(`${triggerCommand.rp} `)) {
     const [title, ...args] = rpParseCommand(message.content);
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       title,
@@ -288,8 +299,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
@@ -305,8 +314,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
@@ -322,8 +329,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
@@ -339,8 +344,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
