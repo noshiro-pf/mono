@@ -5000,7 +5000,7 @@
   dependencies:
     "@types/node" "*"
 
-"@typescript-eslint/eslint-plugin@^5.54.1", "@typescript-eslint/eslint-plugin@^5.55.0":
+"@typescript-eslint/eslint-plugin@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.55.0.tgz#bc2400c3a23305e8c9a9c04aa40933868aaaeb47"
   integrity sha512-IZGc50rtbjk+xp5YQoJvmMPmJEYoC53SiKPXyqWfv15XoD2Y5Kju6zN0DwlmaGJp1Iw33JsWJcQ7nw0lGCGjVg==
@@ -5023,17 +5023,7 @@
   dependencies:
     "@typescript-eslint/utils" "5.53.0"
 
-"@typescript-eslint/parser@^5.14.0":
-  version "5.53.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.53.0.tgz#a1f2b9ae73b83181098747e96683f1b249ecab52"
-  integrity sha512-MKBw9i0DLYlmdOb3Oq/526+al20AJZpANdT6Ct9ffxcV8nKCHz63t/S0IhlTFNsBIHJv+GY5SFJ0XfqVeydQrQ==
-  dependencies:
-    "@typescript-eslint/scope-manager" "5.53.0"
-    "@typescript-eslint/types" "5.53.0"
-    "@typescript-eslint/typescript-estree" "5.53.0"
-    debug "^4.3.4"
-
-"@typescript-eslint/parser@^5.54.1", "@typescript-eslint/parser@^5.55.0":
+"@typescript-eslint/parser@^5.14.0", "@typescript-eslint/parser@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.55.0.tgz#8c96a0b6529708ace1dcfa60f5e6aec0f5ed2262"
   integrity sha512-ppvmeF7hvdhUUZWSd2EEWfzcFkjJzgNQzVST22nzg958CR+sphy8A6K7LXQZd6V75m1VKjp+J4g/PCEfSCmzhw==
@@ -5059,7 +5049,7 @@
     "@typescript-eslint/types" "5.55.0"
     "@typescript-eslint/visitor-keys" "5.55.0"
 
-"@typescript-eslint/type-utils@5.55.0", "@typescript-eslint/type-utils@^5.50.0", "@typescript-eslint/type-utils@^5.54.1":
+"@typescript-eslint/type-utils@5.55.0", "@typescript-eslint/type-utils@^5.50.0", "@typescript-eslint/type-utils@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/type-utils/-/type-utils-5.55.0.tgz#74bf0233523f874738677bb73cb58094210e01e9"
   integrity sha512-ObqxBgHIXj8rBNm0yh8oORFrICcJuZPZTqtAFh0oZQyr5DnAHZWfyw54RwpEEH+fD8suZaI0YxvWu5tYE/WswA==
@@ -5105,7 +5095,7 @@
     semver "^7.3.7"
     tsutils "^3.21.0"
 
-"@typescript-eslint/utils@5.53.0", "@typescript-eslint/utils@^5.10.0":
+"@typescript-eslint/utils@5.53.0":
   version "5.53.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/utils/-/utils-5.53.0.tgz#e55eaad9d6fffa120575ffaa530c7e802f13bce8"
   integrity sha512-VUOOtPv27UNWLxFwQK/8+7kvxVC+hPHNsJjzlJyotlaHjLSIgOCKj9I0DBUjwOOA64qjBwx5afAPjksqOxMO0g==
@@ -5119,7 +5109,7 @@
     eslint-utils "^3.0.0"
     semver "^7.3.7"
 
-"@typescript-eslint/utils@5.55.0", "@typescript-eslint/utils@^5.50.0", "@typescript-eslint/utils@^5.54.1", "@typescript-eslint/utils@^5.55.0":
+"@typescript-eslint/utils@5.55.0", "@typescript-eslint/utils@^5.10.0", "@typescript-eslint/utils@^5.50.0", "@typescript-eslint/utils@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/utils/-/utils-5.55.0.tgz#34e97322e7ae5b901e7a870aabb01dad90023341"
   integrity sha512-FkW+i2pQKcpDC3AY6DU54yl8Lfl14FVGYDgBTyGKB75cCwV3KpkpTMFi9d9j2WAJ4271LR2HeC5SEWF/CZmmfw==
@@ -8923,15 +8913,15 @@ eslint-plugin-security@^1.7.1:
   dependencies:
     safe-regex "^2.1.1"
 
-eslint-plugin-total-functions@^6.8.1:
-  version "6.8.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-6.8.1.tgz#67e8d451fa1540a394232f3375b60a6bd75db25b"
-  integrity sha512-52XSRCsfxRZmcPhHbKr62LIzAU26Kq10AHcpctdCxSaYkeob1vhm7QeA9wnibHQ+66Fw62gXRxwAcLA4zX58ug==
+eslint-plugin-total-functions@^6.10.7:
+  version "6.10.7"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-6.10.7.tgz#1f34e47d2acbd6870facbefbd95b76def9aa43f5"
+  integrity sha512-rAvpAV/u9SVVJrpM9rJa3VH1dpSqjLYPJi/QcXy6sea40Xo6FHKhMMKGVryvJQrxDgzW/KrzDTX3sihJm31Gog==
   dependencies:
-    "@typescript-eslint/eslint-plugin" "^5.54.1"
-    "@typescript-eslint/parser" "^5.54.1"
-    "@typescript-eslint/type-utils" "^5.54.1"
-    "@typescript-eslint/utils" "^5.54.1"
+    "@typescript-eslint/eslint-plugin" "^5.55.0"
+    "@typescript-eslint/parser" "^5.55.0"
+    "@typescript-eslint/type-utils" "^5.55.0"
+    "@typescript-eslint/utils" "^5.55.0"
     tsutils "^3.21.0"
 
 eslint-plugin-unicorn@^46.0.0:
