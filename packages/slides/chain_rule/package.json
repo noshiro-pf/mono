@@ -3,19 +3,41 @@
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "prebuild": "yarn clean:build",
-    "build": "webpack --config config/webpack.prod.js",
+    "build": "vite build",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
-    "predeploy": "yarn build",
-    "deploy": "firebase deploy",
+    "fb:deploy": "yarn z:fb:deploy:wireit",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
-    "start": "webpack serve --config config/webpack.dev.js",
-    "watch": "webpack --watch"
+    "preview": "vite preview",
+    "start": "vite",
+    "z:build:impl": "vite build",
+    "z:build:wireit": "wireit",
+    "z:fb:deploy:impl": "firebase deploy",
+    "z:fb:deploy:wireit": "wireit"
   },
   "dependencies": {
     "reveal.js": "^4.0.2"
+  },
+  "wireit": {
+    "z:fb:deploy:wireit": {
+      "command": "yarn z:fb:deploy:impl",
+      "dependencies": [
+        "z:build:wireit"
+      ]
+    },
+    "z:build:wireit": {
+      "command": "yarn z:build:impl",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*"
+      ],
+      "output": [
+        "dist/**",
+        ".tsbuildinfo"
+      ]
+    }
   }
 }

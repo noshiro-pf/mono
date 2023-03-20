@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions,import/no-internal-modules,import/no-extraneous-dependencies */
 import Reveal from 'reveal.js';
 import 'reveal.js/dist/reset.css';
 import 'reveal.js/dist/reveal.css';
@@ -5,7 +6,7 @@ import 'reveal.js/dist/theme/serif.css';
 import Highlight from 'reveal.js/plugin/highlight/highlight.esm.js';
 import 'reveal.js/plugin/highlight/monokai.css';
 import Markdown from 'reveal.js/plugin/markdown/markdown.esm.js';
-import Math from 'reveal.js/plugin/math/math.esm.js';
+import RevealMath from 'reveal.js/plugin/math/math.esm.js';
 import Notes from 'reveal.js/plugin/notes/notes.esm.js';
 
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
@@ -35,5 +36,5 @@ new Reveal({
     },
   },
   // Learn about plugins: https://revealjs.com/plugins/
-  plugins: [Markdown, Highlight, Notes, Math],
+  plugins: [Markdown, Highlight, Notes, RevealMath],
 }).initialize();
