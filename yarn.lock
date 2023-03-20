@@ -4503,10 +4503,10 @@
     "@types/estree" "*"
     "@types/json-schema" "*"
 
-"@types/eslint@^8.21.2":
-  version "8.21.2"
-  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.21.2.tgz#2b61b43a8b0e66006856a2a4c8e51f6f773ead27"
-  integrity sha512-EMpxUyystd3uZVByZap1DACsMXvb82ypQnGn89e1Y0a+LYu3JJscUd/gqhRsVFDkaD2MIiWo0MT8EfXr3DGRKw==
+"@types/eslint@^8.21.3":
+  version "8.21.3"
+  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.21.3.tgz#5794b3911f0f19e34e3a272c49cbdf48d6f543f2"
+  integrity sha512-fa7GkppZVEByMWGbTtE5MbmXWJTVbrjjaS8K6uQj+XtuuUv1fsuPAxhygfqLmsb/Ufb3CV8deFCpiMfAgi00Sw==
   dependencies:
     "@types/estree" "*"
     "@types/json-schema" "*"
@@ -5000,7 +5000,7 @@
   dependencies:
     "@types/node" "*"
 
-"@typescript-eslint/eslint-plugin@^5.54.1", "@typescript-eslint/eslint-plugin@^5.55.0":
+"@typescript-eslint/eslint-plugin@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.55.0.tgz#bc2400c3a23305e8c9a9c04aa40933868aaaeb47"
   integrity sha512-IZGc50rtbjk+xp5YQoJvmMPmJEYoC53SiKPXyqWfv15XoD2Y5Kju6zN0DwlmaGJp1Iw33JsWJcQ7nw0lGCGjVg==
@@ -5033,7 +5033,7 @@
     "@typescript-eslint/typescript-estree" "5.53.0"
     debug "^4.3.4"
 
-"@typescript-eslint/parser@^5.54.1", "@typescript-eslint/parser@^5.55.0":
+"@typescript-eslint/parser@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.55.0.tgz#8c96a0b6529708ace1dcfa60f5e6aec0f5ed2262"
   integrity sha512-ppvmeF7hvdhUUZWSd2EEWfzcFkjJzgNQzVST22nzg958CR+sphy8A6K7LXQZd6V75m1VKjp+J4g/PCEfSCmzhw==
@@ -5059,7 +5059,7 @@
     "@typescript-eslint/types" "5.55.0"
     "@typescript-eslint/visitor-keys" "5.55.0"
 
-"@typescript-eslint/type-utils@5.55.0", "@typescript-eslint/type-utils@^5.50.0", "@typescript-eslint/type-utils@^5.54.1":
+"@typescript-eslint/type-utils@5.55.0", "@typescript-eslint/type-utils@^5.50.0", "@typescript-eslint/type-utils@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/type-utils/-/type-utils-5.55.0.tgz#74bf0233523f874738677bb73cb58094210e01e9"
   integrity sha512-ObqxBgHIXj8rBNm0yh8oORFrICcJuZPZTqtAFh0oZQyr5DnAHZWfyw54RwpEEH+fD8suZaI0YxvWu5tYE/WswA==
@@ -5119,7 +5119,7 @@
     eslint-utils "^3.0.0"
     semver "^7.3.7"
 
-"@typescript-eslint/utils@5.55.0", "@typescript-eslint/utils@^5.50.0", "@typescript-eslint/utils@^5.54.1", "@typescript-eslint/utils@^5.55.0":
+"@typescript-eslint/utils@5.55.0", "@typescript-eslint/utils@^5.50.0", "@typescript-eslint/utils@^5.55.0":
   version "5.55.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/utils/-/utils-5.55.0.tgz#34e97322e7ae5b901e7a870aabb01dad90023341"
   integrity sha512-FkW+i2pQKcpDC3AY6DU54yl8Lfl14FVGYDgBTyGKB75cCwV3KpkpTMFi9d9j2WAJ4271LR2HeC5SEWF/CZmmfw==
@@ -8923,15 +8923,16 @@ eslint-plugin-security@^1.7.1:
   dependencies:
     safe-regex "^2.1.1"
 
-eslint-plugin-total-functions@^6.8.1:
-  version "6.8.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-6.8.1.tgz#67e8d451fa1540a394232f3375b60a6bd75db25b"
-  integrity sha512-52XSRCsfxRZmcPhHbKr62LIzAU26Kq10AHcpctdCxSaYkeob1vhm7QeA9wnibHQ+66Fw62gXRxwAcLA4zX58ug==
+eslint-plugin-total-functions@^7.0.6:
+  version "7.0.6"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-7.0.6.tgz#6bbc54b100d6171f13e1ccb16760a271196ddfd1"
+  integrity sha512-egyDBvt8NbQuapLFuko6E2jKAebEjYpfZpBRBP7X7MP8BdPx4cPw3soXZtBMJwW81Sx02tGLMyROwCjJdQ+BiQ==
   dependencies:
-    "@typescript-eslint/eslint-plugin" "^5.54.1"
-    "@typescript-eslint/parser" "^5.54.1"
-    "@typescript-eslint/type-utils" "^5.54.1"
-    "@typescript-eslint/utils" "^5.54.1"
+    "@typescript-eslint/eslint-plugin" "^5.55.0"
+    "@typescript-eslint/parser" "^5.55.0"
+    "@typescript-eslint/type-utils" "^5.55.0"
+    "@typescript-eslint/utils" "^5.55.0"
+    is-immutable-type "^1.2.8"
     tsutils "^3.21.0"
 
 eslint-plugin-unicorn@^46.0.0:
@@ -11610,6 +11611,13 @@ is-immutable-type@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/is-immutable-type/-/is-immutable-type-1.2.5.tgz#2be51a3b7594480953fa7c9e17dcd0f77d484058"
   integrity sha512-g4jIDuO6GniCVCQy+ypA9BD9L7SplQJtGjr4QjF1DfxnMn9S5vBj9xuMjfhBkTCKuctw2ErM/ZRJn+NBRMLQHQ==
+
+is-immutable-type@^1.2.8:
+  version "1.2.9"
+  resolved "https://registry.yarnpkg.com/is-immutable-type/-/is-immutable-type-1.2.9.tgz#80f066f482af26f36a3dc6c18450cda0ba293c05"
+  integrity sha512-DDx04RjLpGNT4vtF49vGW5CECP6lAx8SL2keq99ogIxwLvJPBvgThdhb43ED5uYO4nq0kZ51tMj7VdCCQgdZ5Q==
+  dependencies:
+    "@typescript-eslint/type-utils" "^5.55.0"
 
 is-installed-globally@^0.3.1:
   version "0.3.2"
