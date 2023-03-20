@@ -142,8 +142,11 @@
     -   React 上で WebGL ライブラリ Pixi.js を使ってキャンバス操作を高速化した矩形アノテーションツールを作ったことがあります（VDom に頼らない状態管理を実装したりしました）。 （→ <a href="../products">Products</a> の「アノテーションツール」）
     -   yarn workspaces を使った mono repo の開発環境構築ノウハウがあります。
         -   Node.js 環境・ブラウザ環境両方に対応した TypeScript ライブラリを作り、普段からメンテしています。
-        -   webpack config を TypeScript で書いて運用しています。
-        -   CI: 趣味開発では TypeScript のコードはほぼすべて[mono repo](https://github.com/noshiro-pf/mono)で管理しています。このレポジトリ内では GitHub Actions を用いてすべてのパッケージで build, lint, test を走らせるようにしています。
+            -   フロントエンドのルーター・状態管理ライブラリは自作のものを使っています。
+        -   CI: 趣味開発では TypeScript のコードはほぼすべて[mono repo](https://github.com/noshiro-pf/mono)で管理しています。
+            -   このレポジトリ内のすべてのパッケージで build, type check, lint, test が走るよう GitHub Actions を設定しています。
+            -   mono リポジトリ内のツールの設定・構成については [README.md](https://github.com/noshiro-pf/mono/blob/main/README.md#monorepo-%E6%A7%8B%E6%88%90) に書いています。主に eslint config と TypeScript の標準ライブラリ型を上書きする設定あたりを工夫しています。
+            -
     -   git: 普段から趣味開発でも業務でもコミットを整理して見やすい PR ・ history を作ることを心がけています。
 -   そのほかの言語などの経験
     -   大学時代は C++ をメインで書いていて、可読性を犠牲にしない範囲でメモリ使用効率や定数倍高速化を追求するのが好きでした。
