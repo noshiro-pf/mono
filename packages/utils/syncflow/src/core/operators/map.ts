@@ -28,7 +28,7 @@ class MapObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'map',
-      currentValueInit: Maybe.map(mapFn)(parentObservable.currentValue),
+      currentValueInit: Maybe.map(parentObservable.currentValue, mapFn),
     });
     this.#mapFn = mapFn;
   }

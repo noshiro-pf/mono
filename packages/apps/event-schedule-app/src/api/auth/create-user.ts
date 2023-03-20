@@ -10,8 +10,8 @@ export const createUser = (
 > =>
   Result.fromPromise(
     createUserWithEmailAndPassword(fbAuth, email, password)
-  ).then(
-    Result.mapErr((error) => {
+  ).then((a) =>
+    Result.mapErr(a, (error) => {
       assertIsCredentialError(error);
       return error;
     })

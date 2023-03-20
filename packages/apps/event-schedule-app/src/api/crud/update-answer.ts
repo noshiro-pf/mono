@@ -12,4 +12,4 @@ export const updateAnswer = (
       doc(firestoreEvents, eventId, firestorePaths.answers, answerId),
       answer
     )
-  ).then(Result.fold(() => undefined, Str.from));
+  ).then((a) => Result.fold(a, () => undefined, Str.from));

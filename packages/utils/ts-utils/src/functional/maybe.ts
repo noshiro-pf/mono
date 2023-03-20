@@ -3,20 +3,28 @@ export namespace Maybe {
   const NoneTypeSymbol: unique symbol = Symbol('Maybe.none');
 
   /** @internal */
-  // eslint-disable-next-line functional/readonly-type
-  export type _Some<S> = {
-    readonly type: typeof SomeTypeSymbol;
-    readonly value: S;
-  };
+  export type _Some<S> = Readonly<{
+    type: typeof SomeTypeSymbol;
+    value: S;
+  }>;
 
   /** @internal */
-  // eslint-disable-next-line functional/readonly-type
-  export type _None = {
-    readonly type: typeof NoneTypeSymbol;
-  };
+  export type _None = Readonly<{
+    type: typeof NoneTypeSymbol;
+  }>;
 
   /** @internal */
   export type _Maybe<S> = _None | _Some<S>;
+
+  export type Base = _Maybe<unknown>;
+
+  export type Unwrap<M extends Base> = M extends _Some<infer S> ? S : never;
+
+  export type NarrowToSome<M extends Base> = M extends _None ? never : M;
+
+  export type NarrowToNone<M extends Base> = M extends _Some<unknown>
+    ? never
+    : M;
 
   export const some = <S>(value: S): _Some<S> => ({
     type: SomeTypeSymbol,
@@ -25,41 +33,45 @@ export namespace Maybe {
 
   export const none: _None = { type: NoneTypeSymbol } as const;
 
-  export const isSome = <S>(
-    option: _Maybe<S> | null | undefined
-  ): option is _Some<S> => option?.type === SomeTypeSymbol;
+  export const isSome = <M extends Base>(maybe: M): maybe is NarrowToSome<M> =>
+    maybe.type === SomeTypeSymbol;
 
-  export const isNone = <S>(
-    option: _Maybe<S> | null | undefined
-  ): option is _None => option?.type === NoneTypeSymbol;
+  export const isNone = <M extends Base>(maybe: M): maybe is NarrowToNone<M> =>
+    maybe.type === NoneTypeSymbol;
 
-  export const map =
-    <S, S2>(mapFn: (value: S) => S2) =>
-    (option: _Maybe<S>): _Maybe<S2> =>
-      isNone(option) ? none : some(mapFn(option.value));
+  export const map = <M extends Base, S2>(
+    maybe: M,
+    mapFn: (value: Unwrap<M>) => S2
+  ): _Maybe<S2> =>
+    isNone(maybe)
+      ? none
+      : some(mapFn((maybe as NarrowToSome<M>).value as Unwrap<M>));
 
-  export const unwrapThrow = <S>(option: _Maybe<S>): S => {
-    if (isNone(option)) {
+  export const unwrapThrow = <M extends Base>(maybe: M): Unwrap<M> => {
+    if (isNone(maybe)) {
       throw new Error('`unwrapThrow()` has failed because it is `None`');
     }
-
-    return option.value;
+    return (maybe as NarrowToSome<M>).value as Unwrap<M>;
   };
 
-  export const unwrap = <S>(option: _Maybe<S>): S | undefined =>
-    isNone(option) ? undefined : option.value;
+  export const unwrap = <M extends Base>(maybe: M): Unwrap<M> | undefined =>
+    isNone(maybe) ? undefined : ((maybe as NarrowToSome<M>).value as Unwrap<M>);
 
-  export const unwrapOr = <S, D>(option: _Maybe<S>, defaultValue: D): D | S =>
-    isNone(option) ? defaultValue : option.value;
+  export const unwrapOr = <M extends Base, D>(
+    maybe: M,
+    defaultValue: D
+  ): D | Unwrap<M> =>
+    isNone(maybe)
+      ? defaultValue
+      : ((maybe as NarrowToSome<M>).value as Unwrap<M>);
 
   export const expectToBe =
-    <S>(message: string) =>
-    (option: _Maybe<S>): S => {
-      if (isNone(option)) {
+    <M extends Base>(message: string) =>
+    (maybe: M): Unwrap<M> => {
+      if (isNone(maybe)) {
         throw new Error(message);
       }
-
-      return option.value;
+      return (maybe as NarrowToSome<M>).value as Unwrap<M>;
     };
 }
 

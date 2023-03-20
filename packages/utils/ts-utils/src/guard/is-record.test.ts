@@ -33,7 +33,7 @@ describe('isRecord', () => {
   });
 
   test('[] is not a record', () => {
-    const obj = [] as const;
+    const obj: DeepReadonly<never[]> = [] as const;
     const unk: unknown = obj;
     const res = isRecord(unk);
 

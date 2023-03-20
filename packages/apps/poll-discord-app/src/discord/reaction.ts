@@ -75,7 +75,7 @@ export const onMessageReactCommon = async (
   reaction: MessageReaction,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   user: PartialUser | User
-): Promise<Result<undefined, string>> => {
+): Promise<Result<undefined, unknown>> => {
   const reactionFilled: MessageReaction = reaction.partial
     ? await reaction.fetch()
     : reaction;
@@ -123,7 +123,7 @@ export const onMessageReactCommon = async (
     return Result.err(`message with id ${resultPoll.id} not found`);
   }
 
-  const result = await Result.fromPromise<undefined, string>(
+  const result = await Result.fromPromise(
     message
       .edit(rpCreateSummaryMessage(resultPoll, userIdToDisplayName))
       .then(() => undefined)

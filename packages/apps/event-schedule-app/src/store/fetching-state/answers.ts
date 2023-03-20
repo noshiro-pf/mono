@@ -47,7 +47,7 @@ combineLatest([fetchAnswersThrottled$, router.eventId$] as const).subscribe(
 );
 
 result$.subscribe((e) => {
-  if (Result.isErr(e)) {
+  if (e !== undefined && Result.isErr(e)) {
     // TODO: use toast
     console.error('answersResult', e.value);
   }

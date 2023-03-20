@@ -21,12 +21,12 @@ export const errorType$: InitializedObservable<
 > = combineLatest([EventScheduleStore.result$, AnswersStore.result$] as const)
   .chain(
     map(([esr, ar]) =>
-      Result.isErr(esr)
+      esr !== undefined && Result.isErr(esr)
         ? ({
             data: 'eventScheduleResult' as const,
             type: esr.value,
           } as const)
-        : Result.isErr(ar)
+        : ar !== undefined && Result.isErr(ar)
         ? ({
             data: 'answersResult' as const,
             type: ar.value,

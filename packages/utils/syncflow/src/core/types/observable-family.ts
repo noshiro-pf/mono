@@ -99,35 +99,39 @@ export type PluckOperatorObservable<A, K extends keyof A> = SyncChildObservable<
   'pluck',
   readonly [A]
 >;
-export type UnwrapMaybeOperatorObservable<A> = SyncChildObservable<
-  A | undefined,
-  'unwrapMaybe',
-  readonly [Maybe<A>]
->;
-export type UnwrapResultOkOperatorObservable<S, E> = SyncChildObservable<
-  S | undefined,
-  'unwrapResultOk',
-  readonly [Result<S, E>]
->;
-export type UnwrapResultErrOperatorObservable<S, E> = SyncChildObservable<
-  E | undefined,
-  'unwrapResultErr',
-  readonly [Result<S, E>]
->;
-export type MapMaybeOperatorObservable<A, B> = SyncChildObservable<
-  Maybe<B>,
-  'mapMaybe',
-  readonly [Maybe<A>]
->;
-export type MapResultOkOperatorObservable<S, S2, E> = SyncChildObservable<
-  Result<S2, E>,
+export type UnwrapMaybeOperatorObservable<M extends Maybe.Base> =
+  SyncChildObservable<Maybe.Unwrap<M> | undefined, 'unwrapMaybe', readonly [M]>;
+export type UnwrapResultOkOperatorObservable<R extends Result.Base> =
+  SyncChildObservable<
+    Result.UnwrapOk<R> | undefined,
+    'unwrapResultOk',
+    readonly [R]
+  >;
+export type UnwrapResultErrOperatorObservable<R extends Result.Base> =
+  SyncChildObservable<
+    Result.UnwrapErr<R> | undefined,
+    'unwrapResultErr',
+    readonly [R]
+  >;
+export type MapMaybeOperatorObservable<
+  M extends Maybe.Base,
+  B
+> = SyncChildObservable<Maybe<B>, 'mapMaybe', readonly [M]>;
+export type MapResultOkOperatorObservable<
+  R extends Result.Base,
+  S2
+> = SyncChildObservable<
+  Result<S2, Result.UnwrapErr<R>>,
   'mapResultOk',
-  readonly [Result<S, E>]
+  readonly [R]
 >;
-export type MapResultErrOperatorObservable<S, E, E2> = SyncChildObservable<
-  Result<S, E2>,
+export type MapResultErrOperatorObservable<
+  R extends Result.Base,
+  E2
+> = SyncChildObservable<
+  Result<Result.UnwrapOk<R>, E2>,
   'mapResultErr',
-  readonly [Result<S, E>]
+  readonly [R]
 >;
 export type WithIndexOperatorObservable<A> = SyncChildObservable<
   readonly [number, A],

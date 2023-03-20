@@ -1,5 +1,5 @@
 import { IMap } from '../collections';
-import { pipe, Result } from '../functional';
+import { Result } from '../functional';
 import { Num } from '../num';
 import { MutableMap, MutableSet, tp } from '../others';
 
@@ -170,7 +170,9 @@ function zerosUnwrapped(len: number): readonly 0[] {
 function seq<N extends Index1000>(len: N): Result<Seq<N>, string>;
 function seq(len: number): Result<readonly number[], string>;
 function seq(len: number): Result<readonly number[], string> {
-  return pipe(zeros(len)).chain(Result.map((l) => map(l, (_, i) => i))).value;
+  return !Num.isUint32(len)
+    ? Result.err('len should be uint32')
+    : Result.ok(ArrayFrom({ length: len }, (_, i) => i));
 }
 
 function seqUnwrapped<N extends Index1000>(len: N): Seq<N>;
@@ -185,7 +187,9 @@ function newArray<T, N extends Index1000>(
 ): Result<ArrayOfLength<N, T>, string>;
 function newArray<T>(len: number, init: T): Result<readonly T[], string>;
 function newArray<T>(len: number, init: T): Result<readonly T[], string> {
-  return pipe(zeros(len)).chain(Result.map((l) => l.map(() => init))).value;
+  return !Num.isUint32(len)
+    ? Result.err('len should be uint32')
+    : Result.ok(ArrayFrom({ length: len }, () => init));
 }
 
 function newArrayUnwrapped<T, N extends Index1000>(
@@ -202,9 +206,7 @@ const range = (
   end: number,
   step: number = 1
 ): Result<readonly number[], string> =>
-  pipe(seq(end - start)).chain(
-    Result.map((l) => l.map((n) => n * step + start))
-  ).value;
+  Result.map(seq(end - start), (l) => l.map((n) => n * step + start));
 
 const rangeUnwrapped = (
   start: number,

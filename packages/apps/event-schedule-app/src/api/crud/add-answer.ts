@@ -8,4 +8,4 @@ export const addAnswer = (
 ): Promise<Result<string, string>> =>
   Result.fromPromise(
     addDoc(collection(firestoreEvents, eventId, firestorePaths.answers), answer)
-  ).then(Result.fold((docRef) => docRef.id, Str.from));
+  ).then((a) => Result.fold(a, (docRef) => docRef.id, Str.from));
