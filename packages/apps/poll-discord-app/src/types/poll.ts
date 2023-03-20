@@ -15,7 +15,7 @@ import {
   type PollId,
   type Timestamp,
   type TitleMessageId,
-} from './branded';
+} from './branded-types';
 import { dateOptionType, type DateOption } from './date-option';
 
 export type Poll = DeepReadonly<{
