@@ -2,6 +2,7 @@ import { Obj, Result, type IMap } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
 import { triggerCommand } from '../constants';
+import { firestoreApi } from '../firebase';
 import {
   createTitleString,
   createUserIdToDisplayNameMap,
@@ -9,17 +10,10 @@ import {
   rpCreateSummaryMessage,
   rpParseCommand,
 } from '../functions';
-import {
-  toCommandMessageId,
-  type DatabaseRef,
-  type PsqlClient,
-  type UserId,
-} from '../types';
+import { toCommandMessageId, type UserId } from '../types';
 import { fixAnswerAndUpdateMessage } from './fix-answer';
 
 export const updatePollTitle = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   message: Discord.Message
 ): Promise<Result<undefined, unknown>> => {
@@ -37,12 +31,21 @@ export const updatePollTitle = async (
 
   if (title === undefined) return Result.ok(undefined);
 
-  const pollId = databaseRef.db.commandMessageIdToPollIdMap.get(
+  const pollIdResult = await firestoreApi.getPollIdByCommandMessageId(
     toCommandMessageId(message.id)
   );
+
+  if (Result.isErr(pollIdResult)) return pollIdResult;
+
+  const pollId = pollIdResult.value;
+
   if (pollId === undefined) return Result.ok(undefined);
 
-  const poll = databaseRef.db.polls.get(pollId);
+  const pollResult = await firestoreApi.getPollById(pollId);
+
+  if (Result.isErr(pollResult)) return pollResult;
+
+  const poll = pollResult.value;
   if (poll === undefined) return Result.ok(undefined);
 
   const channel = message.channel;
@@ -97,5 +100,5 @@ export const updatePollTitle = async (
     return updateTitleMessageResult;
   }
 
-  return fixAnswerAndUpdateMessage(databaseRef, psqlClient, messages, newPoll);
+  return fixAnswerAndUpdateMessage(messages, newPoll);
 };

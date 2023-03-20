@@ -45,6 +45,11 @@ const config = {
         packageDir: [join(__dirname, '../../../'), '.'],
       },
     ],
+    'import/no-unused-modules': [
+      'error',
+      { unusedExports: true, ignoreExports: ['src/index.ts'] },
+    ],
+
     '@typescript-eslint/no-restricted-imports': noRestrictedImports,
   },
 };
