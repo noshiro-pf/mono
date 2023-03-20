@@ -11,6 +11,7 @@ const config = {
   rules: {
     'jest/consistent-test-it': 'off',
     'jest/expect-expect': 'off',
+    'jest/valid-describe-callback': 'off',
   },
 };
 

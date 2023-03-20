@@ -4,7 +4,7 @@ failOnConsoleError();
 
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
-describe('main', () => {
+describe('main', { testIsolation: false }, () => {
   const rollButton = e('roll-dice-button');
   const undoButton = e('undo-button');
   const redoButton = e('redo-button');

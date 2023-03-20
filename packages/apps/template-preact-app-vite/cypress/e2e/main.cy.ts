@@ -4,7 +4,7 @@ failOnConsoleError();
 
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
-describe('main', () => {
+describe('main', { testIsolation: false }, () => {
   const incrementButtonId = 'increment-button';
 
   it('visit', () => {
