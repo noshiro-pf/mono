@@ -7,7 +7,7 @@ import {
   type CommandMessageId,
   type DateOptionId,
   type PollId,
-} from './branded';
+} from './branded-types';
 import { pollFromJson, pollJsonType, pollToJson, type Poll } from './poll';
 
 export type Database = Readonly<{

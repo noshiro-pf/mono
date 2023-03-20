@@ -1,6 +1,6 @@
 import * as t from '@noshiro/io-ts';
 import { expectType, ISet, pipe } from '@noshiro/ts-utils';
-import { userIdType, type UserId } from './branded';
+import { userIdType, type UserId } from './branded-types';
 
 export type AnswerOfDate = Readonly<{
   good: ISet<UserId>;

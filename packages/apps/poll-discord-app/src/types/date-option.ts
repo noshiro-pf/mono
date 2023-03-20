@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { dateOptionIdType } from './branded';
+import { dateOptionIdType } from './branded-types';
 
 export const dateOptionType = t.record({
   id: dateOptionIdType,
