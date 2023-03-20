@@ -4,7 +4,7 @@ failOnConsoleError();
 
 const e = (selector: string): string => `[data-cy="${selector}"]`;
 
-describe('add', () => {
+describe('add', { testIsolation: false }, () => {
   it('visit', () => {
     cy.visit('/');
     cy.get(e('input-area')).should('be.visible');

@@ -8,7 +8,7 @@ const e = (selector: string): string => `[data-cy="${selector}"]`;
 const path = (selectorList: readonly string[]): string =>
   selectorList.map(e).join(' ');
 
-describe('main', () => {
+describe('main', { testIsolation: false }, () => {
   it('visit', () => {
     cy.visit('/');
 
