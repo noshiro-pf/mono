@@ -50,15 +50,16 @@ export type ObservableBase<A> = Readonly<{
     (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
 }>;
 
-export type InitializedObservableBase<A> = ObservableBase<A> & {
-  readonly currentValue: Some<A>;
-  readonly chain: (<B>(
-    operator:
-      | InitializedToInitializedOperator<A, B>
-      | ToInitializedOperator<A, B>
-  ) => InitializedObservable<B>) &
-    (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
-};
+export type InitializedObservableBase<A> = ObservableBase<A> &
+  Readonly<{
+    currentValue: Some<A>;
+    chain: (<B>(
+      operator:
+        | InitializedToInitializedOperator<A, B>
+        | ToInitializedOperator<A, B>
+    ) => InitializedObservable<B>) &
+      (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
+  }>;
 
 export type SyncChildObservable<
   A,

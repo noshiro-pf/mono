@@ -9,17 +9,20 @@ import { type NonEmptyUnknownList } from './types';
 
 // RootObservable
 
-export type SourceObservable<A> = RootObservable<A, 'Source'> & {
-  readonly next: (value: A) => void;
-};
+export type SourceObservable<A> = Readonly<{
+  next: (value: A) => void;
+}> &
+  RootObservable<A, 'Source'>;
 
-export type OfObservable<A> = RootObservable<A, 'Of'> & {
-  readonly emit: () => OfObservable<A>;
-};
+export type OfObservable<A> = Readonly<{
+  emit: () => OfObservable<A>;
+}> &
+  RootObservable<A, 'Of'>;
 
-export type FromArrayObservable<A> = RootObservable<A, 'FromArray'> & {
-  readonly emit: () => FromArrayObservable<A>;
-};
+export type FromArrayObservable<A> = Readonly<{
+  emit: () => FromArrayObservable<A>;
+}> &
+  RootObservable<A, 'FromArray'>;
 
 export type FromPromiseObservable<A, E = unknown> = RootObservable<
   Result<A, E>,
@@ -31,13 +34,15 @@ export type FromSubscribableObservable<A, E = unknown> = RootObservable<
   'FromSubscribable'
 >;
 
-export type IntervalObservable = RootObservable<number, 'Interval'> & {
-  readonly start: () => IntervalObservable;
-};
+export type IntervalObservable = Readonly<{
+  start: () => IntervalObservable;
+}> &
+  RootObservable<number, 'Interval'>;
 
-export type TimerObservable = RootObservable<number, 'Timer'> & {
-  readonly start: () => TimerObservable;
-};
+export type TimerObservable = Readonly<{
+  start: () => TimerObservable;
+}> &
+  RootObservable<number, 'Timer'>;
 
 // InitializedSyncChildObservable
 

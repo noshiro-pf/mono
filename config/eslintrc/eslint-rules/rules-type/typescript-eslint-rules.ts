@@ -1,4 +1,4 @@
-/* eslint-disable functional/no-mixed-type */
+/* eslint-disable functional/no-mixed-types */
 /* cSpell:disable */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
@@ -264,6 +264,38 @@ namespace BanTypes {
     >;
     readonly extendDefaults?: boolean;
   };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Disallow or enforce spaces inside of blocks after opening block and before closing block
+ * @link https://typescript-eslint.io/rules/block-spacing
+ *
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | layout     |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
+ */
+namespace BlockSpacing {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "enum": [
+   *       "always",
+   *       "never"
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = 'always' | 'never';
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -874,12 +906,20 @@ namespace ExplicitFunctionReturnType {
    *         "description": "Whether to ignore arrow functions immediately returning a `as const` value.",
    *         "type": "boolean"
    *       },
+   *       "allowFunctionsWithoutTypeParameters": {
+   *         "description": "Whether to ignore functions that don't have generic type parameters.",
+   *         "type": "boolean"
+   *       },
    *       "allowedNames": {
    *         "description": "An array of function/method names that will not have their arguments or return values checked.",
    *         "items": {
    *           "type": "string"
    *         },
    *         "type": "array"
+   *       },
+   *       "allowIIFEs": {
+   *         "description": "Whether to ignore immediately invoked function expressions (IIFEs).",
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -909,9 +949,17 @@ namespace ExplicitFunctionReturnType {
      */
     readonly allowDirectConstAssertionInArrowFunctions?: boolean;
     /**
+     * Whether to ignore functions that don't have generic type parameters.
+     */
+    readonly allowFunctionsWithoutTypeParameters?: boolean;
+    /**
      * An array of function/method names that will not have their arguments or return values checked.
      */
     readonly allowedNames?: readonly string[];
+    /**
+     * Whether to ignore immediately invoked function expressions (IIFEs).
+     */
+    readonly allowIIFEs?: boolean;
   };
 
   export type RuleEntry =
@@ -1550,6 +1598,281 @@ namespace InitDeclarations {
           readonly ignoreForLoopInit?: boolean;
         }
       ];
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Enforce consistent spacing between property names and type annotations in types and interfaces
+ * @link https://typescript-eslint.io/rules/key-spacing
+ *
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | layout     |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
+ */
+namespace KeySpacing {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "align": {
+   *             "anyOf": [
+   *               {
+   *                 "enum": [
+   *                   "colon",
+   *                   "value"
+   *                 ]
+   *               },
+   *               {
+   *                 "type": "object",
+   *                 "properties": {
+   *                   "mode": {
+   *                     "enum": [
+   *                       "strict",
+   *                       "minimum"
+   *                     ]
+   *                   },
+   *                   "on": {
+   *                     "enum": [
+   *                       "colon",
+   *                       "value"
+   *                     ]
+   *                   },
+   *                   "beforeColon": {
+   *                     "type": "boolean"
+   *                   },
+   *                   "afterColon": {
+   *                     "type": "boolean"
+   *                   }
+   *                 },
+   *                 "additionalProperties": false
+   *               }
+   *             ]
+   *           },
+   *           "mode": {
+   *             "enum": [
+   *               "strict",
+   *               "minimum"
+   *             ]
+   *           },
+   *           "beforeColon": {
+   *             "type": "boolean"
+   *           },
+   *           "afterColon": {
+   *             "type": "boolean"
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       },
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "singleLine": {
+   *             "type": "object",
+   *             "properties": {
+   *               "mode": {
+   *                 "enum": [
+   *                   "strict",
+   *                   "minimum"
+   *                 ]
+   *               },
+   *               "beforeColon": {
+   *                 "type": "boolean"
+   *               },
+   *               "afterColon": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           },
+   *           "multiLine": {
+   *             "type": "object",
+   *             "properties": {
+   *               "align": {
+   *                 "anyOf": [
+   *                   {
+   *                     "enum": [
+   *                       "colon",
+   *                       "value"
+   *                     ]
+   *                   },
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "mode": {
+   *                         "enum": [
+   *                           "strict",
+   *                           "minimum"
+   *                         ]
+   *                       },
+   *                       "on": {
+   *                         "enum": [
+   *                           "colon",
+   *                           "value"
+   *                         ]
+   *                       },
+   *                       "beforeColon": {
+   *                         "type": "boolean"
+   *                       },
+   *                       "afterColon": {
+   *                         "type": "boolean"
+   *                       }
+   *                     },
+   *                     "additionalProperties": false
+   *                   }
+   *                 ]
+   *               },
+   *               "mode": {
+   *                 "enum": [
+   *                   "strict",
+   *                   "minimum"
+   *                 ]
+   *               },
+   *               "beforeColon": {
+   *                 "type": "boolean"
+   *               },
+   *               "afterColon": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       },
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "singleLine": {
+   *             "type": "object",
+   *             "properties": {
+   *               "mode": {
+   *                 "enum": [
+   *                   "strict",
+   *                   "minimum"
+   *                 ]
+   *               },
+   *               "beforeColon": {
+   *                 "type": "boolean"
+   *               },
+   *               "afterColon": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           },
+   *           "multiLine": {
+   *             "type": "object",
+   *             "properties": {
+   *               "mode": {
+   *                 "enum": [
+   *                   "strict",
+   *                   "minimum"
+   *                 ]
+   *               },
+   *               "beforeColon": {
+   *                 "type": "boolean"
+   *               },
+   *               "afterColon": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           },
+   *           "align": {
+   *             "type": "object",
+   *             "properties": {
+   *               "mode": {
+   *                 "enum": [
+   *                   "strict",
+   *                   "minimum"
+   *                 ]
+   *               },
+   *               "on": {
+   *                 "enum": [
+   *                   "colon",
+   *                   "value"
+   *                 ]
+   *               },
+   *               "beforeColon": {
+   *                 "type": "boolean"
+   *               },
+   *               "afterColon": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  export type Options =
+    | {
+        readonly align?:
+          | ('colon' | 'value')
+          | {
+              readonly mode?: 'strict' | 'minimum';
+              readonly on?: 'colon' | 'value';
+              readonly beforeColon?: boolean;
+              readonly afterColon?: boolean;
+            };
+        readonly mode?: 'strict' | 'minimum';
+        readonly beforeColon?: boolean;
+        readonly afterColon?: boolean;
+      }
+    | {
+        readonly singleLine?: {
+          readonly mode?: 'strict' | 'minimum';
+          readonly beforeColon?: boolean;
+          readonly afterColon?: boolean;
+        };
+        readonly multiLine?: {
+          readonly align?:
+            | ('colon' | 'value')
+            | {
+                readonly mode?: 'strict' | 'minimum';
+                readonly on?: 'colon' | 'value';
+                readonly beforeColon?: boolean;
+                readonly afterColon?: boolean;
+              };
+          readonly mode?: 'strict' | 'minimum';
+          readonly beforeColon?: boolean;
+          readonly afterColon?: boolean;
+        };
+      }
+    | {
+        readonly singleLine?: {
+          readonly mode?: 'strict' | 'minimum';
+          readonly beforeColon?: boolean;
+          readonly afterColon?: boolean;
+        };
+        readonly multiLine?: {
+          readonly mode?: 'strict' | 'minimum';
+          readonly beforeColon?: boolean;
+          readonly afterColon?: boolean;
+        };
+        readonly align?: {
+          readonly mode?: 'strict' | 'minimum';
+          readonly on?: 'colon' | 'value';
+          readonly beforeColon?: boolean;
+          readonly afterColon?: boolean;
+        };
+      };
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -2712,6 +3035,140 @@ namespace KeywordSpacing {
 }
 
 /**
+ * @description Require empty lines around comments
+ * @link https://typescript-eslint.io/rules/lines-around-comment
+ *
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | layout     |
+ *  | fixable     | whitespace |
+ *  | recommended | false      |
+ */
+namespace LinesAroundComment {
+  /**
+   * ### schema
+   *
+   * ```json
+   * {
+   *   "type": "array",
+   *   "items": [
+   *     {
+   *       "type": "object",
+   *       "properties": {
+   *         "beforeBlockComment": {
+   *           "type": "boolean",
+   *           "default": true
+   *         },
+   *         "afterBlockComment": {
+   *           "type": "boolean",
+   *           "default": false
+   *         },
+   *         "beforeLineComment": {
+   *           "type": "boolean",
+   *           "default": false
+   *         },
+   *         "afterLineComment": {
+   *           "type": "boolean",
+   *           "default": false
+   *         },
+   *         "allowBlockStart": {
+   *           "type": "boolean",
+   *           "default": false
+   *         },
+   *         "allowBlockEnd": {
+   *           "type": "boolean",
+   *           "default": false
+   *         },
+   *         "allowClassStart": {
+   *           "type": "boolean"
+   *         },
+   *         "allowClassEnd": {
+   *           "type": "boolean"
+   *         },
+   *         "allowObjectStart": {
+   *           "type": "boolean"
+   *         },
+   *         "allowObjectEnd": {
+   *           "type": "boolean"
+   *         },
+   *         "allowArrayStart": {
+   *           "type": "boolean"
+   *         },
+   *         "allowArrayEnd": {
+   *           "type": "boolean"
+   *         },
+   *         "allowInterfaceStart": {
+   *           "type": "boolean"
+   *         },
+   *         "allowInterfaceEnd": {
+   *           "type": "boolean"
+   *         },
+   *         "allowTypeStart": {
+   *           "type": "boolean"
+   *         },
+   *         "allowTypeEnd": {
+   *           "type": "boolean"
+   *         },
+   *         "allowEnumStart": {
+   *           "type": "boolean"
+   *         },
+   *         "allowEnumEnd": {
+   *           "type": "boolean"
+   *         },
+   *         "allowModuleStart": {
+   *           "type": "boolean"
+   *         },
+   *         "allowModuleEnd": {
+   *           "type": "boolean"
+   *         },
+   *         "ignorePattern": {
+   *           "type": "string"
+   *         },
+   *         "applyDefaultIgnorePatterns": {
+   *           "type": "boolean"
+   *         }
+   *       },
+   *       "additionalProperties": false
+   *     }
+   *   ]
+   * }
+   * ```
+   */
+  export type Options =
+    | readonly []
+    | readonly [
+        {
+          readonly beforeBlockComment?: boolean;
+          readonly afterBlockComment?: boolean;
+          readonly beforeLineComment?: boolean;
+          readonly afterLineComment?: boolean;
+          readonly allowBlockStart?: boolean;
+          readonly allowBlockEnd?: boolean;
+          readonly allowClassStart?: boolean;
+          readonly allowClassEnd?: boolean;
+          readonly allowObjectStart?: boolean;
+          readonly allowObjectEnd?: boolean;
+          readonly allowArrayStart?: boolean;
+          readonly allowArrayEnd?: boolean;
+          readonly allowInterfaceStart?: boolean;
+          readonly allowInterfaceEnd?: boolean;
+          readonly allowTypeStart?: boolean;
+          readonly allowTypeEnd?: boolean;
+          readonly allowEnumStart?: boolean;
+          readonly allowEnumEnd?: boolean;
+          readonly allowModuleStart?: boolean;
+          readonly allowModuleEnd?: boolean;
+          readonly ignorePattern?: string;
+          readonly applyDefaultIgnorePatterns?: boolean;
+        }
+      ];
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * @description Require or disallow an empty line between class members
  * @link https://typescript-eslint.io/rules/lines-between-class-members
  *
@@ -2970,7 +3427,30 @@ namespace MemberOrdering {
    *               "oneOf": [
    *                 {
    *                   "enum": [
+   *                     "readonly-signature",
    *                     "signature",
+   *                     "readonly-field",
+   *                     "public-readonly-field",
+   *                     "public-decorated-readonly-field",
+   *                     "decorated-readonly-field",
+   *                     "static-readonly-field",
+   *                     "public-static-readonly-field",
+   *                     "instance-readonly-field",
+   *                     "public-instance-readonly-field",
+   *                     "abstract-readonly-field",
+   *                     "public-abstract-readonly-field",
+   *                     "protected-readonly-field",
+   *                     "protected-decorated-readonly-field",
+   *                     "protected-static-readonly-field",
+   *                     "protected-instance-readonly-field",
+   *                     "protected-abstract-readonly-field",
+   *                     "private-readonly-field",
+   *                     "private-decorated-readonly-field",
+   *                     "private-static-readonly-field",
+   *                     "private-instance-readonly-field",
+   *                     "#private-readonly-field",
+   *                     "#private-static-readonly-field",
+   *                     "#private-instance-readonly-field",
    *                     "field",
    *                     "public-field",
    *                     "public-decorated-field",
@@ -3084,7 +3564,30 @@ namespace MemberOrdering {
    *                   "type": "array",
    *                   "items": {
    *                     "enum": [
+   *                       "readonly-signature",
    *                       "signature",
+   *                       "readonly-field",
+   *                       "public-readonly-field",
+   *                       "public-decorated-readonly-field",
+   *                       "decorated-readonly-field",
+   *                       "static-readonly-field",
+   *                       "public-static-readonly-field",
+   *                       "instance-readonly-field",
+   *                       "public-instance-readonly-field",
+   *                       "abstract-readonly-field",
+   *                       "public-abstract-readonly-field",
+   *                       "protected-readonly-field",
+   *                       "protected-decorated-readonly-field",
+   *                       "protected-static-readonly-field",
+   *                       "protected-instance-readonly-field",
+   *                       "protected-abstract-readonly-field",
+   *                       "private-readonly-field",
+   *                       "private-decorated-readonly-field",
+   *                       "private-static-readonly-field",
+   *                       "private-instance-readonly-field",
+   *                       "#private-readonly-field",
+   *                       "#private-static-readonly-field",
+   *                       "#private-instance-readonly-field",
    *                       "field",
    *                       "public-field",
    *                       "public-decorated-field",
@@ -3209,7 +3712,30 @@ namespace MemberOrdering {
    *                       "oneOf": [
    *                         {
    *                           "enum": [
+   *                             "readonly-signature",
    *                             "signature",
+   *                             "readonly-field",
+   *                             "public-readonly-field",
+   *                             "public-decorated-readonly-field",
+   *                             "decorated-readonly-field",
+   *                             "static-readonly-field",
+   *                             "public-static-readonly-field",
+   *                             "instance-readonly-field",
+   *                             "public-instance-readonly-field",
+   *                             "abstract-readonly-field",
+   *                             "public-abstract-readonly-field",
+   *                             "protected-readonly-field",
+   *                             "protected-decorated-readonly-field",
+   *                             "protected-static-readonly-field",
+   *                             "protected-instance-readonly-field",
+   *                             "protected-abstract-readonly-field",
+   *                             "private-readonly-field",
+   *                             "private-decorated-readonly-field",
+   *                             "private-static-readonly-field",
+   *                             "private-instance-readonly-field",
+   *                             "#private-readonly-field",
+   *                             "#private-static-readonly-field",
+   *                             "#private-instance-readonly-field",
    *                             "field",
    *                             "public-field",
    *                             "public-decorated-field",
@@ -3323,7 +3849,30 @@ namespace MemberOrdering {
    *                           "type": "array",
    *                           "items": {
    *                             "enum": [
+   *                               "readonly-signature",
    *                               "signature",
+   *                               "readonly-field",
+   *                               "public-readonly-field",
+   *                               "public-decorated-readonly-field",
+   *                               "decorated-readonly-field",
+   *                               "static-readonly-field",
+   *                               "public-static-readonly-field",
+   *                               "instance-readonly-field",
+   *                               "public-instance-readonly-field",
+   *                               "abstract-readonly-field",
+   *                               "public-abstract-readonly-field",
+   *                               "protected-readonly-field",
+   *                               "protected-decorated-readonly-field",
+   *                               "protected-static-readonly-field",
+   *                               "protected-instance-readonly-field",
+   *                               "protected-abstract-readonly-field",
+   *                               "private-readonly-field",
+   *                               "private-decorated-readonly-field",
+   *                               "private-static-readonly-field",
+   *                               "private-instance-readonly-field",
+   *                               "#private-readonly-field",
+   *                               "#private-static-readonly-field",
+   *                               "#private-instance-readonly-field",
    *                               "field",
    *                               "public-field",
    *                               "public-decorated-field",
@@ -3481,7 +4030,30 @@ namespace MemberOrdering {
    *               "oneOf": [
    *                 {
    *                   "enum": [
+   *                     "readonly-signature",
    *                     "signature",
+   *                     "readonly-field",
+   *                     "public-readonly-field",
+   *                     "public-decorated-readonly-field",
+   *                     "decorated-readonly-field",
+   *                     "static-readonly-field",
+   *                     "public-static-readonly-field",
+   *                     "instance-readonly-field",
+   *                     "public-instance-readonly-field",
+   *                     "abstract-readonly-field",
+   *                     "public-abstract-readonly-field",
+   *                     "protected-readonly-field",
+   *                     "protected-decorated-readonly-field",
+   *                     "protected-static-readonly-field",
+   *                     "protected-instance-readonly-field",
+   *                     "protected-abstract-readonly-field",
+   *                     "private-readonly-field",
+   *                     "private-decorated-readonly-field",
+   *                     "private-static-readonly-field",
+   *                     "private-instance-readonly-field",
+   *                     "#private-readonly-field",
+   *                     "#private-static-readonly-field",
+   *                     "#private-instance-readonly-field",
    *                     "field",
    *                     "public-field",
    *                     "public-decorated-field",
@@ -3595,7 +4167,30 @@ namespace MemberOrdering {
    *                   "type": "array",
    *                   "items": {
    *                     "enum": [
+   *                       "readonly-signature",
    *                       "signature",
+   *                       "readonly-field",
+   *                       "public-readonly-field",
+   *                       "public-decorated-readonly-field",
+   *                       "decorated-readonly-field",
+   *                       "static-readonly-field",
+   *                       "public-static-readonly-field",
+   *                       "instance-readonly-field",
+   *                       "public-instance-readonly-field",
+   *                       "abstract-readonly-field",
+   *                       "public-abstract-readonly-field",
+   *                       "protected-readonly-field",
+   *                       "protected-decorated-readonly-field",
+   *                       "protected-static-readonly-field",
+   *                       "protected-instance-readonly-field",
+   *                       "protected-abstract-readonly-field",
+   *                       "private-readonly-field",
+   *                       "private-decorated-readonly-field",
+   *                       "private-static-readonly-field",
+   *                       "private-instance-readonly-field",
+   *                       "#private-readonly-field",
+   *                       "#private-static-readonly-field",
+   *                       "#private-instance-readonly-field",
    *                       "field",
    *                       "public-field",
    *                       "public-decorated-field",
@@ -3720,7 +4315,30 @@ namespace MemberOrdering {
    *                       "oneOf": [
    *                         {
    *                           "enum": [
+   *                             "readonly-signature",
    *                             "signature",
+   *                             "readonly-field",
+   *                             "public-readonly-field",
+   *                             "public-decorated-readonly-field",
+   *                             "decorated-readonly-field",
+   *                             "static-readonly-field",
+   *                             "public-static-readonly-field",
+   *                             "instance-readonly-field",
+   *                             "public-instance-readonly-field",
+   *                             "abstract-readonly-field",
+   *                             "public-abstract-readonly-field",
+   *                             "protected-readonly-field",
+   *                             "protected-decorated-readonly-field",
+   *                             "protected-static-readonly-field",
+   *                             "protected-instance-readonly-field",
+   *                             "protected-abstract-readonly-field",
+   *                             "private-readonly-field",
+   *                             "private-decorated-readonly-field",
+   *                             "private-static-readonly-field",
+   *                             "private-instance-readonly-field",
+   *                             "#private-readonly-field",
+   *                             "#private-static-readonly-field",
+   *                             "#private-instance-readonly-field",
    *                             "field",
    *                             "public-field",
    *                             "public-decorated-field",
@@ -3834,7 +4452,30 @@ namespace MemberOrdering {
    *                           "type": "array",
    *                           "items": {
    *                             "enum": [
+   *                               "readonly-signature",
    *                               "signature",
+   *                               "readonly-field",
+   *                               "public-readonly-field",
+   *                               "public-decorated-readonly-field",
+   *                               "decorated-readonly-field",
+   *                               "static-readonly-field",
+   *                               "public-static-readonly-field",
+   *                               "instance-readonly-field",
+   *                               "public-instance-readonly-field",
+   *                               "abstract-readonly-field",
+   *                               "public-abstract-readonly-field",
+   *                               "protected-readonly-field",
+   *                               "protected-decorated-readonly-field",
+   *                               "protected-static-readonly-field",
+   *                               "protected-instance-readonly-field",
+   *                               "protected-abstract-readonly-field",
+   *                               "private-readonly-field",
+   *                               "private-decorated-readonly-field",
+   *                               "private-static-readonly-field",
+   *                               "private-instance-readonly-field",
+   *                               "#private-readonly-field",
+   *                               "#private-static-readonly-field",
+   *                               "#private-instance-readonly-field",
    *                               "field",
    *                               "public-field",
    *                               "public-decorated-field",
@@ -3992,7 +4633,30 @@ namespace MemberOrdering {
    *               "oneOf": [
    *                 {
    *                   "enum": [
+   *                     "readonly-signature",
    *                     "signature",
+   *                     "readonly-field",
+   *                     "public-readonly-field",
+   *                     "public-decorated-readonly-field",
+   *                     "decorated-readonly-field",
+   *                     "static-readonly-field",
+   *                     "public-static-readonly-field",
+   *                     "instance-readonly-field",
+   *                     "public-instance-readonly-field",
+   *                     "abstract-readonly-field",
+   *                     "public-abstract-readonly-field",
+   *                     "protected-readonly-field",
+   *                     "protected-decorated-readonly-field",
+   *                     "protected-static-readonly-field",
+   *                     "protected-instance-readonly-field",
+   *                     "protected-abstract-readonly-field",
+   *                     "private-readonly-field",
+   *                     "private-decorated-readonly-field",
+   *                     "private-static-readonly-field",
+   *                     "private-instance-readonly-field",
+   *                     "#private-readonly-field",
+   *                     "#private-static-readonly-field",
+   *                     "#private-instance-readonly-field",
    *                     "field",
    *                     "public-field",
    *                     "public-decorated-field",
@@ -4106,7 +4770,30 @@ namespace MemberOrdering {
    *                   "type": "array",
    *                   "items": {
    *                     "enum": [
+   *                       "readonly-signature",
    *                       "signature",
+   *                       "readonly-field",
+   *                       "public-readonly-field",
+   *                       "public-decorated-readonly-field",
+   *                       "decorated-readonly-field",
+   *                       "static-readonly-field",
+   *                       "public-static-readonly-field",
+   *                       "instance-readonly-field",
+   *                       "public-instance-readonly-field",
+   *                       "abstract-readonly-field",
+   *                       "public-abstract-readonly-field",
+   *                       "protected-readonly-field",
+   *                       "protected-decorated-readonly-field",
+   *                       "protected-static-readonly-field",
+   *                       "protected-instance-readonly-field",
+   *                       "protected-abstract-readonly-field",
+   *                       "private-readonly-field",
+   *                       "private-decorated-readonly-field",
+   *                       "private-static-readonly-field",
+   *                       "private-instance-readonly-field",
+   *                       "#private-readonly-field",
+   *                       "#private-static-readonly-field",
+   *                       "#private-instance-readonly-field",
    *                       "field",
    *                       "public-field",
    *                       "public-decorated-field",
@@ -4231,7 +4918,30 @@ namespace MemberOrdering {
    *                       "oneOf": [
    *                         {
    *                           "enum": [
+   *                             "readonly-signature",
    *                             "signature",
+   *                             "readonly-field",
+   *                             "public-readonly-field",
+   *                             "public-decorated-readonly-field",
+   *                             "decorated-readonly-field",
+   *                             "static-readonly-field",
+   *                             "public-static-readonly-field",
+   *                             "instance-readonly-field",
+   *                             "public-instance-readonly-field",
+   *                             "abstract-readonly-field",
+   *                             "public-abstract-readonly-field",
+   *                             "protected-readonly-field",
+   *                             "protected-decorated-readonly-field",
+   *                             "protected-static-readonly-field",
+   *                             "protected-instance-readonly-field",
+   *                             "protected-abstract-readonly-field",
+   *                             "private-readonly-field",
+   *                             "private-decorated-readonly-field",
+   *                             "private-static-readonly-field",
+   *                             "private-instance-readonly-field",
+   *                             "#private-readonly-field",
+   *                             "#private-static-readonly-field",
+   *                             "#private-instance-readonly-field",
    *                             "field",
    *                             "public-field",
    *                             "public-decorated-field",
@@ -4345,7 +5055,30 @@ namespace MemberOrdering {
    *                           "type": "array",
    *                           "items": {
    *                             "enum": [
+   *                               "readonly-signature",
    *                               "signature",
+   *                               "readonly-field",
+   *                               "public-readonly-field",
+   *                               "public-decorated-readonly-field",
+   *                               "decorated-readonly-field",
+   *                               "static-readonly-field",
+   *                               "public-static-readonly-field",
+   *                               "instance-readonly-field",
+   *                               "public-instance-readonly-field",
+   *                               "abstract-readonly-field",
+   *                               "public-abstract-readonly-field",
+   *                               "protected-readonly-field",
+   *                               "protected-decorated-readonly-field",
+   *                               "protected-static-readonly-field",
+   *                               "protected-instance-readonly-field",
+   *                               "protected-abstract-readonly-field",
+   *                               "private-readonly-field",
+   *                               "private-decorated-readonly-field",
+   *                               "private-static-readonly-field",
+   *                               "private-instance-readonly-field",
+   *                               "#private-readonly-field",
+   *                               "#private-static-readonly-field",
+   *                               "#private-instance-readonly-field",
    *                               "field",
    *                               "public-field",
    *                               "public-decorated-field",
@@ -4503,7 +5236,9 @@ namespace MemberOrdering {
    *               "oneOf": [
    *                 {
    *                   "enum": [
+   *                     "readonly-signature",
    *                     "signature",
+   *                     "readonly-field",
    *                     "field",
    *                     "method",
    *                     "constructor"
@@ -4513,7 +5248,9 @@ namespace MemberOrdering {
    *                   "type": "array",
    *                   "items": {
    *                     "enum": [
+   *                       "readonly-signature",
    *                       "signature",
+   *                       "readonly-field",
    *                       "field",
    *                       "method",
    *                       "constructor"
@@ -4534,7 +5271,9 @@ namespace MemberOrdering {
    *                       "oneOf": [
    *                         {
    *                           "enum": [
+   *                             "readonly-signature",
    *                             "signature",
+   *                             "readonly-field",
    *                             "field",
    *                             "method",
    *                             "constructor"
@@ -4544,7 +5283,9 @@ namespace MemberOrdering {
    *                           "type": "array",
    *                           "items": {
    *                             "enum": [
+   *                               "readonly-signature",
    *                               "signature",
+   *                               "readonly-field",
    *                               "field",
    *                               "method",
    *                               "constructor"
@@ -4598,7 +5339,9 @@ namespace MemberOrdering {
    *               "oneOf": [
    *                 {
    *                   "enum": [
+   *                     "readonly-signature",
    *                     "signature",
+   *                     "readonly-field",
    *                     "field",
    *                     "method",
    *                     "constructor"
@@ -4608,7 +5351,9 @@ namespace MemberOrdering {
    *                   "type": "array",
    *                   "items": {
    *                     "enum": [
+   *                       "readonly-signature",
    *                       "signature",
+   *                       "readonly-field",
    *                       "field",
    *                       "method",
    *                       "constructor"
@@ -4629,7 +5374,9 @@ namespace MemberOrdering {
    *                       "oneOf": [
    *                         {
    *                           "enum": [
+   *                             "readonly-signature",
    *                             "signature",
+   *                             "readonly-field",
    *                             "field",
    *                             "method",
    *                             "constructor"
@@ -4639,7 +5386,9 @@ namespace MemberOrdering {
    *                           "type": "array",
    *                           "items": {
    *                             "enum": [
+   *                               "readonly-signature",
    *                               "signature",
+   *                               "readonly-field",
    *                               "field",
    *                               "method",
    *                               "constructor"
@@ -4690,7 +5439,30 @@ namespace MemberOrdering {
       | 'never'
       | readonly (
           | (
+              | 'readonly-signature'
               | 'signature'
+              | 'readonly-field'
+              | 'public-readonly-field'
+              | 'public-decorated-readonly-field'
+              | 'decorated-readonly-field'
+              | 'static-readonly-field'
+              | 'public-static-readonly-field'
+              | 'instance-readonly-field'
+              | 'public-instance-readonly-field'
+              | 'abstract-readonly-field'
+              | 'public-abstract-readonly-field'
+              | 'protected-readonly-field'
+              | 'protected-decorated-readonly-field'
+              | 'protected-static-readonly-field'
+              | 'protected-instance-readonly-field'
+              | 'protected-abstract-readonly-field'
+              | 'private-readonly-field'
+              | 'private-decorated-readonly-field'
+              | 'private-static-readonly-field'
+              | 'private-instance-readonly-field'
+              | '#private-readonly-field'
+              | '#private-static-readonly-field'
+              | '#private-instance-readonly-field'
               | 'field'
               | 'public-field'
               | 'public-decorated-field'
@@ -4800,7 +5572,30 @@ namespace MemberOrdering {
               | '#private-instance-static-initialization'
             )
           | readonly (
+              | 'readonly-signature'
               | 'signature'
+              | 'readonly-field'
+              | 'public-readonly-field'
+              | 'public-decorated-readonly-field'
+              | 'decorated-readonly-field'
+              | 'static-readonly-field'
+              | 'public-static-readonly-field'
+              | 'instance-readonly-field'
+              | 'public-instance-readonly-field'
+              | 'abstract-readonly-field'
+              | 'public-abstract-readonly-field'
+              | 'protected-readonly-field'
+              | 'protected-decorated-readonly-field'
+              | 'protected-static-readonly-field'
+              | 'protected-instance-readonly-field'
+              | 'protected-abstract-readonly-field'
+              | 'private-readonly-field'
+              | 'private-decorated-readonly-field'
+              | 'private-static-readonly-field'
+              | 'private-instance-readonly-field'
+              | '#private-readonly-field'
+              | '#private-static-readonly-field'
+              | '#private-instance-readonly-field'
               | 'field'
               | 'public-field'
               | 'public-decorated-field'
@@ -4914,7 +5709,30 @@ namespace MemberOrdering {
           readonly memberTypes?:
             | readonly (
                 | (
+                    | 'readonly-signature'
                     | 'signature'
+                    | 'readonly-field'
+                    | 'public-readonly-field'
+                    | 'public-decorated-readonly-field'
+                    | 'decorated-readonly-field'
+                    | 'static-readonly-field'
+                    | 'public-static-readonly-field'
+                    | 'instance-readonly-field'
+                    | 'public-instance-readonly-field'
+                    | 'abstract-readonly-field'
+                    | 'public-abstract-readonly-field'
+                    | 'protected-readonly-field'
+                    | 'protected-decorated-readonly-field'
+                    | 'protected-static-readonly-field'
+                    | 'protected-instance-readonly-field'
+                    | 'protected-abstract-readonly-field'
+                    | 'private-readonly-field'
+                    | 'private-decorated-readonly-field'
+                    | 'private-static-readonly-field'
+                    | 'private-instance-readonly-field'
+                    | '#private-readonly-field'
+                    | '#private-static-readonly-field'
+                    | '#private-instance-readonly-field'
                     | 'field'
                     | 'public-field'
                     | 'public-decorated-field'
@@ -5024,7 +5842,30 @@ namespace MemberOrdering {
                     | '#private-instance-static-initialization'
                   )
                 | readonly (
+                    | 'readonly-signature'
                     | 'signature'
+                    | 'readonly-field'
+                    | 'public-readonly-field'
+                    | 'public-decorated-readonly-field'
+                    | 'decorated-readonly-field'
+                    | 'static-readonly-field'
+                    | 'public-static-readonly-field'
+                    | 'instance-readonly-field'
+                    | 'public-instance-readonly-field'
+                    | 'abstract-readonly-field'
+                    | 'public-abstract-readonly-field'
+                    | 'protected-readonly-field'
+                    | 'protected-decorated-readonly-field'
+                    | 'protected-static-readonly-field'
+                    | 'protected-instance-readonly-field'
+                    | 'protected-abstract-readonly-field'
+                    | 'private-readonly-field'
+                    | 'private-decorated-readonly-field'
+                    | 'private-static-readonly-field'
+                    | 'private-instance-readonly-field'
+                    | '#private-readonly-field'
+                    | '#private-static-readonly-field'
+                    | '#private-instance-readonly-field'
                     | 'field'
                     | 'public-field'
                     | 'public-decorated-field'
@@ -5147,7 +5988,30 @@ namespace MemberOrdering {
       | 'never'
       | readonly (
           | (
+              | 'readonly-signature'
               | 'signature'
+              | 'readonly-field'
+              | 'public-readonly-field'
+              | 'public-decorated-readonly-field'
+              | 'decorated-readonly-field'
+              | 'static-readonly-field'
+              | 'public-static-readonly-field'
+              | 'instance-readonly-field'
+              | 'public-instance-readonly-field'
+              | 'abstract-readonly-field'
+              | 'public-abstract-readonly-field'
+              | 'protected-readonly-field'
+              | 'protected-decorated-readonly-field'
+              | 'protected-static-readonly-field'
+              | 'protected-instance-readonly-field'
+              | 'protected-abstract-readonly-field'
+              | 'private-readonly-field'
+              | 'private-decorated-readonly-field'
+              | 'private-static-readonly-field'
+              | 'private-instance-readonly-field'
+              | '#private-readonly-field'
+              | '#private-static-readonly-field'
+              | '#private-instance-readonly-field'
               | 'field'
               | 'public-field'
               | 'public-decorated-field'
@@ -5257,7 +6121,30 @@ namespace MemberOrdering {
               | '#private-instance-static-initialization'
             )
           | readonly (
+              | 'readonly-signature'
               | 'signature'
+              | 'readonly-field'
+              | 'public-readonly-field'
+              | 'public-decorated-readonly-field'
+              | 'decorated-readonly-field'
+              | 'static-readonly-field'
+              | 'public-static-readonly-field'
+              | 'instance-readonly-field'
+              | 'public-instance-readonly-field'
+              | 'abstract-readonly-field'
+              | 'public-abstract-readonly-field'
+              | 'protected-readonly-field'
+              | 'protected-decorated-readonly-field'
+              | 'protected-static-readonly-field'
+              | 'protected-instance-readonly-field'
+              | 'protected-abstract-readonly-field'
+              | 'private-readonly-field'
+              | 'private-decorated-readonly-field'
+              | 'private-static-readonly-field'
+              | 'private-instance-readonly-field'
+              | '#private-readonly-field'
+              | '#private-static-readonly-field'
+              | '#private-instance-readonly-field'
               | 'field'
               | 'public-field'
               | 'public-decorated-field'
@@ -5371,7 +6258,30 @@ namespace MemberOrdering {
           readonly memberTypes?:
             | readonly (
                 | (
+                    | 'readonly-signature'
                     | 'signature'
+                    | 'readonly-field'
+                    | 'public-readonly-field'
+                    | 'public-decorated-readonly-field'
+                    | 'decorated-readonly-field'
+                    | 'static-readonly-field'
+                    | 'public-static-readonly-field'
+                    | 'instance-readonly-field'
+                    | 'public-instance-readonly-field'
+                    | 'abstract-readonly-field'
+                    | 'public-abstract-readonly-field'
+                    | 'protected-readonly-field'
+                    | 'protected-decorated-readonly-field'
+                    | 'protected-static-readonly-field'
+                    | 'protected-instance-readonly-field'
+                    | 'protected-abstract-readonly-field'
+                    | 'private-readonly-field'
+                    | 'private-decorated-readonly-field'
+                    | 'private-static-readonly-field'
+                    | 'private-instance-readonly-field'
+                    | '#private-readonly-field'
+                    | '#private-static-readonly-field'
+                    | '#private-instance-readonly-field'
                     | 'field'
                     | 'public-field'
                     | 'public-decorated-field'
@@ -5481,7 +6391,30 @@ namespace MemberOrdering {
                     | '#private-instance-static-initialization'
                   )
                 | readonly (
+                    | 'readonly-signature'
                     | 'signature'
+                    | 'readonly-field'
+                    | 'public-readonly-field'
+                    | 'public-decorated-readonly-field'
+                    | 'decorated-readonly-field'
+                    | 'static-readonly-field'
+                    | 'public-static-readonly-field'
+                    | 'instance-readonly-field'
+                    | 'public-instance-readonly-field'
+                    | 'abstract-readonly-field'
+                    | 'public-abstract-readonly-field'
+                    | 'protected-readonly-field'
+                    | 'protected-decorated-readonly-field'
+                    | 'protected-static-readonly-field'
+                    | 'protected-instance-readonly-field'
+                    | 'protected-abstract-readonly-field'
+                    | 'private-readonly-field'
+                    | 'private-decorated-readonly-field'
+                    | 'private-static-readonly-field'
+                    | 'private-instance-readonly-field'
+                    | '#private-readonly-field'
+                    | '#private-static-readonly-field'
+                    | '#private-instance-readonly-field'
                     | 'field'
                     | 'public-field'
                     | 'public-decorated-field'
@@ -5604,7 +6537,30 @@ namespace MemberOrdering {
       | 'never'
       | readonly (
           | (
+              | 'readonly-signature'
               | 'signature'
+              | 'readonly-field'
+              | 'public-readonly-field'
+              | 'public-decorated-readonly-field'
+              | 'decorated-readonly-field'
+              | 'static-readonly-field'
+              | 'public-static-readonly-field'
+              | 'instance-readonly-field'
+              | 'public-instance-readonly-field'
+              | 'abstract-readonly-field'
+              | 'public-abstract-readonly-field'
+              | 'protected-readonly-field'
+              | 'protected-decorated-readonly-field'
+              | 'protected-static-readonly-field'
+              | 'protected-instance-readonly-field'
+              | 'protected-abstract-readonly-field'
+              | 'private-readonly-field'
+              | 'private-decorated-readonly-field'
+              | 'private-static-readonly-field'
+              | 'private-instance-readonly-field'
+              | '#private-readonly-field'
+              | '#private-static-readonly-field'
+              | '#private-instance-readonly-field'
               | 'field'
               | 'public-field'
               | 'public-decorated-field'
@@ -5714,7 +6670,30 @@ namespace MemberOrdering {
               | '#private-instance-static-initialization'
             )
           | readonly (
+              | 'readonly-signature'
               | 'signature'
+              | 'readonly-field'
+              | 'public-readonly-field'
+              | 'public-decorated-readonly-field'
+              | 'decorated-readonly-field'
+              | 'static-readonly-field'
+              | 'public-static-readonly-field'
+              | 'instance-readonly-field'
+              | 'public-instance-readonly-field'
+              | 'abstract-readonly-field'
+              | 'public-abstract-readonly-field'
+              | 'protected-readonly-field'
+              | 'protected-decorated-readonly-field'
+              | 'protected-static-readonly-field'
+              | 'protected-instance-readonly-field'
+              | 'protected-abstract-readonly-field'
+              | 'private-readonly-field'
+              | 'private-decorated-readonly-field'
+              | 'private-static-readonly-field'
+              | 'private-instance-readonly-field'
+              | '#private-readonly-field'
+              | '#private-static-readonly-field'
+              | '#private-instance-readonly-field'
               | 'field'
               | 'public-field'
               | 'public-decorated-field'
@@ -5828,7 +6807,30 @@ namespace MemberOrdering {
           readonly memberTypes?:
             | readonly (
                 | (
+                    | 'readonly-signature'
                     | 'signature'
+                    | 'readonly-field'
+                    | 'public-readonly-field'
+                    | 'public-decorated-readonly-field'
+                    | 'decorated-readonly-field'
+                    | 'static-readonly-field'
+                    | 'public-static-readonly-field'
+                    | 'instance-readonly-field'
+                    | 'public-instance-readonly-field'
+                    | 'abstract-readonly-field'
+                    | 'public-abstract-readonly-field'
+                    | 'protected-readonly-field'
+                    | 'protected-decorated-readonly-field'
+                    | 'protected-static-readonly-field'
+                    | 'protected-instance-readonly-field'
+                    | 'protected-abstract-readonly-field'
+                    | 'private-readonly-field'
+                    | 'private-decorated-readonly-field'
+                    | 'private-static-readonly-field'
+                    | 'private-instance-readonly-field'
+                    | '#private-readonly-field'
+                    | '#private-static-readonly-field'
+                    | '#private-instance-readonly-field'
                     | 'field'
                     | 'public-field'
                     | 'public-decorated-field'
@@ -5938,7 +6940,30 @@ namespace MemberOrdering {
                     | '#private-instance-static-initialization'
                   )
                 | readonly (
+                    | 'readonly-signature'
                     | 'signature'
+                    | 'readonly-field'
+                    | 'public-readonly-field'
+                    | 'public-decorated-readonly-field'
+                    | 'decorated-readonly-field'
+                    | 'static-readonly-field'
+                    | 'public-static-readonly-field'
+                    | 'instance-readonly-field'
+                    | 'public-instance-readonly-field'
+                    | 'abstract-readonly-field'
+                    | 'public-abstract-readonly-field'
+                    | 'protected-readonly-field'
+                    | 'protected-decorated-readonly-field'
+                    | 'protected-static-readonly-field'
+                    | 'protected-instance-readonly-field'
+                    | 'protected-abstract-readonly-field'
+                    | 'private-readonly-field'
+                    | 'private-decorated-readonly-field'
+                    | 'private-static-readonly-field'
+                    | 'private-instance-readonly-field'
+                    | '#private-readonly-field'
+                    | '#private-static-readonly-field'
+                    | '#private-instance-readonly-field'
                     | 'field'
                     | 'public-field'
                     | 'public-decorated-field'
@@ -6060,14 +7085,42 @@ namespace MemberOrdering {
     readonly interfaces?:
       | 'never'
       | readonly (
-          | ('signature' | 'field' | 'method' | 'constructor')
-          | readonly ('signature' | 'field' | 'method' | 'constructor')[]
+          | (
+              | 'readonly-signature'
+              | 'signature'
+              | 'readonly-field'
+              | 'field'
+              | 'method'
+              | 'constructor'
+            )
+          | readonly (
+              | 'readonly-signature'
+              | 'signature'
+              | 'readonly-field'
+              | 'field'
+              | 'method'
+              | 'constructor'
+            )[]
         )[]
       | {
           readonly memberTypes?:
             | readonly (
-                | ('signature' | 'field' | 'method' | 'constructor')
-                | readonly ('signature' | 'field' | 'method' | 'constructor')[]
+                | (
+                    | 'readonly-signature'
+                    | 'signature'
+                    | 'readonly-field'
+                    | 'field'
+                    | 'method'
+                    | 'constructor'
+                  )
+                | readonly (
+                    | 'readonly-signature'
+                    | 'signature'
+                    | 'readonly-field'
+                    | 'field'
+                    | 'method'
+                    | 'constructor'
+                  )[]
               )[]
             | 'never';
           readonly order?:
@@ -6081,14 +7134,42 @@ namespace MemberOrdering {
     readonly typeLiterals?:
       | 'never'
       | readonly (
-          | ('signature' | 'field' | 'method' | 'constructor')
-          | readonly ('signature' | 'field' | 'method' | 'constructor')[]
+          | (
+              | 'readonly-signature'
+              | 'signature'
+              | 'readonly-field'
+              | 'field'
+              | 'method'
+              | 'constructor'
+            )
+          | readonly (
+              | 'readonly-signature'
+              | 'signature'
+              | 'readonly-field'
+              | 'field'
+              | 'method'
+              | 'constructor'
+            )[]
         )[]
       | {
           readonly memberTypes?:
             | readonly (
-                | ('signature' | 'field' | 'method' | 'constructor')
-                | readonly ('signature' | 'field' | 'method' | 'constructor')[]
+                | (
+                    | 'readonly-signature'
+                    | 'signature'
+                    | 'readonly-field'
+                    | 'field'
+                    | 'method'
+                    | 'constructor'
+                  )
+                | readonly (
+                    | 'readonly-signature'
+                    | 'signature'
+                    | 'readonly-field'
+                    | 'field'
+                    | 'method'
+                    | 'constructor'
+                  )[]
               )[]
             | 'never';
           readonly order?:
@@ -6304,6 +7385,7 @@ namespace NamingConvention {
    *                 "public",
    *                 "protected",
    *                 "private",
+   *                 "#private",
    *                 "abstract",
    *                 "destructured",
    *                 "global",
@@ -6458,6 +7540,7 @@ namespace NamingConvention {
    *                 "public",
    *                 "protected",
    *                 "private",
+   *                 "#private",
    *                 "abstract",
    *                 "destructured",
    *                 "global",
@@ -7140,6 +8223,7 @@ namespace NamingConvention {
    *               "enum": [
    *                 "abstract",
    *                 "private",
+   *                 "#private",
    *                 "protected",
    *                 "public",
    *                 "readonly",
@@ -7275,6 +8359,7 @@ namespace NamingConvention {
    *               "enum": [
    *                 "abstract",
    *                 "private",
+   *                 "#private",
    *                 "protected",
    *                 "public",
    *                 "readonly",
@@ -7852,6 +8937,7 @@ namespace NamingConvention {
    *               "enum": [
    *                 "abstract",
    *                 "private",
+   *                 "#private",
    *                 "protected",
    *                 "public",
    *                 "readonly",
@@ -8001,6 +9087,7 @@ namespace NamingConvention {
    *               "enum": [
    *                 "abstract",
    *                 "private",
+   *                 "#private",
    *                 "protected",
    *                 "public",
    *                 "requiresQuotes",
@@ -8392,6 +9479,7 @@ namespace NamingConvention {
    *               "enum": [
    *                 "abstract",
    *                 "private",
+   *                 "#private",
    *                 "protected",
    *                 "public",
    *                 "requiresQuotes",
@@ -9531,6 +10619,7 @@ namespace NamingConvention {
           | 'public'
           | 'protected'
           | 'private'
+          | '#private'
           | 'abstract'
           | 'destructured'
           | 'global'
@@ -9596,6 +10685,7 @@ namespace NamingConvention {
           | 'public'
           | 'protected'
           | 'private'
+          | '#private'
           | 'abstract'
           | 'destructured'
           | 'global'
@@ -9848,6 +10938,7 @@ namespace NamingConvention {
         readonly modifiers?: readonly (
           | 'abstract'
           | 'private'
+          | '#private'
           | 'protected'
           | 'public'
           | 'readonly'
@@ -9901,6 +10992,7 @@ namespace NamingConvention {
         readonly modifiers?: readonly (
           | 'abstract'
           | 'private'
+          | '#private'
           | 'protected'
           | 'public'
           | 'readonly'
@@ -10119,6 +11211,7 @@ namespace NamingConvention {
         readonly modifiers?: readonly (
           | 'abstract'
           | 'private'
+          | '#private'
           | 'protected'
           | 'public'
           | 'readonly'
@@ -10179,6 +11272,7 @@ namespace NamingConvention {
         readonly modifiers?: readonly (
           | 'abstract'
           | 'private'
+          | '#private'
           | 'protected'
           | 'public'
           | 'requiresQuotes'
@@ -10317,6 +11411,7 @@ namespace NamingConvention {
         readonly modifiers?: readonly (
           | 'abstract'
           | 'private'
+          | '#private'
           | 'protected'
           | 'public'
           | 'requiresQuotes'
@@ -11347,6 +12442,20 @@ namespace NoImpliedEval {
 }
 
 /**
+ * @description Enforce the use of top-level import type qualifier when an import only has specifiers with inline type qualifiers
+ * @link https://typescript-eslint.io/rules/no-import-type-side-effects
+ *
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | fixable     | code    |
+ *  | recommended | false   |
+ */
+namespace NoImportTypeSideEffects {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * @description Disallow explicit type declarations for variables or parameters initialized to a number, string, or boolean
  * @link https://typescript-eslint.io/rules/no-inferrable-types
  *
@@ -11719,6 +12828,20 @@ namespace NoMisusedPromises {
   export type RuleEntry =
     | Linter.RuleLevel
     | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Disallow enums from having both number and string members
+ * @link https://typescript-eslint.io/rules/no-mixed-enums
+ *
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ */
+namespace NoMixedEnums {
+  export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
@@ -14427,6 +15550,9 @@ namespace StrictBooleanExpressions {
    *       "allowNullableNumber": {
    *         "type": "boolean"
    *       },
+   *       "allowNullableEnum": {
+   *         "type": "boolean"
+   *       },
    *       "allowAny": {
    *         "type": "boolean"
    *       },
@@ -14446,6 +15572,7 @@ namespace StrictBooleanExpressions {
     readonly allowNullableBoolean?: boolean;
     readonly allowNullableString?: boolean;
     readonly allowNullableNumber?: boolean;
+    readonly allowNullableEnum?: boolean;
     readonly allowAny?: boolean;
     readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
   };
@@ -14821,6 +15948,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/ban-ts-comment': BanTsComment.RuleEntry;
   readonly '@typescript-eslint/ban-tslint-comment': BanTslintComment.RuleEntry;
   readonly '@typescript-eslint/ban-types': BanTypes.RuleEntry;
+  readonly '@typescript-eslint/block-spacing': BlockSpacing.RuleEntry;
   readonly '@typescript-eslint/brace-style': BraceStyle.RuleEntry;
   readonly '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.RuleEntry;
   readonly '@typescript-eslint/comma-dangle': CommaDangle.RuleEntry;
@@ -14839,7 +15967,9 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/func-call-spacing': FuncCallSpacing.RuleEntry;
   readonly '@typescript-eslint/indent': Indent.RuleEntry;
   readonly '@typescript-eslint/init-declarations': InitDeclarations.RuleEntry;
+  readonly '@typescript-eslint/key-spacing': KeySpacing.RuleEntry;
   readonly '@typescript-eslint/keyword-spacing': KeywordSpacing.RuleEntry;
+  readonly '@typescript-eslint/lines-around-comment': LinesAroundComment.RuleEntry;
   readonly '@typescript-eslint/lines-between-class-members': LinesBetweenClassMembers.RuleEntry;
   readonly '@typescript-eslint/member-delimiter-style': MemberDelimiterStyle.RuleEntry;
   readonly '@typescript-eslint/member-ordering': MemberOrdering.RuleEntry;
@@ -14862,6 +15992,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-floating-promises': NoFloatingPromises.RuleEntry;
   readonly '@typescript-eslint/no-for-in-array': NoForInArray.RuleEntry;
   readonly '@typescript-eslint/no-implied-eval': NoImpliedEval.RuleEntry;
+  readonly '@typescript-eslint/no-import-type-side-effects': NoImportTypeSideEffects.RuleEntry;
   readonly '@typescript-eslint/no-inferrable-types': NoInferrableTypes.RuleEntry;
   readonly '@typescript-eslint/no-invalid-this': NoInvalidThis.RuleEntry;
   readonly '@typescript-eslint/no-invalid-void-type': NoInvalidVoidType.RuleEntry;
@@ -14871,6 +16002,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.RuleEntry;
   readonly '@typescript-eslint/no-misused-new': NoMisusedNew.RuleEntry;
   readonly '@typescript-eslint/no-misused-promises': NoMisusedPromises.RuleEntry;
+  readonly '@typescript-eslint/no-mixed-enums': NoMixedEnums.RuleEntry;
   readonly '@typescript-eslint/no-namespace': NoNamespace.RuleEntry;
   readonly '@typescript-eslint/no-non-null-asserted-nullish-coalescing': NoNonNullAssertedNullishCoalescing.RuleEntry;
   readonly '@typescript-eslint/no-non-null-asserted-optional-chain': NoNonNullAssertedOptionalChain.RuleEntry;

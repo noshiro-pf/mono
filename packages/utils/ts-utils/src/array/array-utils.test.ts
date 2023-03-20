@@ -867,7 +867,7 @@ describe('ArrayUtils.sortBy', () => {
       typeof sorted,
       ArrayOfLength<
         3,
-        { readonly v: 1 } | { readonly v: 2 } | { readonly v: 3 }
+        Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>
       >
     >('=');
 
@@ -887,7 +887,7 @@ describe('ArrayUtils.sortBy', () => {
       typeof sorted,
       ArrayOfLength<
         3,
-        { readonly v: 1 } | { readonly v: 2 } | { readonly v: 3 }
+        Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>
       >
     >('=');
 
@@ -927,7 +927,7 @@ describe('ArrayUtils.find', () => {
 
     expectType<
       typeof result,
-      { readonly v: 1 } | { readonly v: 2 } | { readonly v: 3 } | undefined
+      Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }> | undefined
     >('=');
 
     test('case 1', () => {
@@ -935,14 +935,14 @@ describe('ArrayUtils.find', () => {
     });
   }
   {
-    const xs: readonly { readonly v: 1 | 2 | 3 }[] = [
+    const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
       { v: 2 },
       { v: 1 },
       { v: 3 },
     ] as const;
     const result = ArrayUtils.find(xs, (x) => x.v === 1);
 
-    expectType<typeof result, { readonly v: 1 | 2 | 3 } | undefined>('=');
+    expectType<typeof result, Readonly<{ v: 1 | 2 | 3 }> | undefined>('=');
 
     test('case 2', () => {
       expect(result).toStrictEqual({ v: 1 });
@@ -1008,12 +1008,12 @@ describe('ArrayUtils.minBy', () => {
 
   expectType<
     typeof result,
-    | { readonly x: 1; readonly y: 2 }
-    | { readonly x: 2; readonly y: 3 }
-    | { readonly x: 3; readonly y: 2 }
-    | { readonly x: 4; readonly y: 1 }
-    | { readonly x: 5; readonly y: 1 }
-    | { readonly x: 6; readonly y: 1 }
+    | Readonly<{ x: 1; y: 2 }>
+    | Readonly<{ x: 2; y: 3 }>
+    | Readonly<{ x: 3; y: 2 }>
+    | Readonly<{ x: 4; y: 1 }>
+    | Readonly<{ x: 5; y: 1 }>
+    | Readonly<{ x: 6; y: 1 }>
   >('=');
 
   test('case 1', () => {
@@ -1035,12 +1035,12 @@ describe('ArrayUtils.maxBy', () => {
 
   expectType<
     typeof result,
-    | { readonly x: 1; readonly y: 2 }
-    | { readonly x: 2; readonly y: 3 }
-    | { readonly x: 3; readonly y: 2 }
-    | { readonly x: 4; readonly y: 1 }
-    | { readonly x: 5; readonly y: 1 }
-    | { readonly x: 6; readonly y: 1 }
+    | Readonly<{ x: 1; y: 2 }>
+    | Readonly<{ x: 2; y: 3 }>
+    | Readonly<{ x: 3; y: 2 }>
+    | Readonly<{ x: 4; y: 1 }>
+    | Readonly<{ x: 5; y: 1 }>
+    | Readonly<{ x: 6; y: 1 }>
   >('=');
 
   test('case 1', () => {
@@ -1109,12 +1109,12 @@ describe('ArrayUtils.groupBy', () => {
     IMap<
       1 | 2 | 3,
       readonly (
-        | { readonly x: 1; readonly y: 1 }
-        | { readonly x: 1; readonly y: 2 }
-        | { readonly x: 1; readonly y: 3 }
-        | { readonly x: 2; readonly y: 1 }
-        | { readonly x: 2; readonly y: 2 }
-        | { readonly x: 3; readonly y: 1 }
+        | Readonly<{ x: 1; y: 1 }>
+        | Readonly<{ x: 1; y: 2 }>
+        | Readonly<{ x: 1; y: 3 }>
+        | Readonly<{ x: 2; y: 1 }>
+        | Readonly<{ x: 2; y: 2 }>
+        | Readonly<{ x: 3; y: 1 }>
       )[]
     >
   >('=');
@@ -1124,12 +1124,12 @@ describe('ArrayUtils.groupBy', () => {
       IMap.new<
         1 | 2 | 3,
         readonly (
-          | { readonly x: 1; readonly y: 1 }
-          | { readonly x: 1; readonly y: 2 }
-          | { readonly x: 1; readonly y: 3 }
-          | { readonly x: 2; readonly y: 1 }
-          | { readonly x: 2; readonly y: 2 }
-          | { readonly x: 3; readonly y: 1 }
+          | Readonly<{ x: 1; y: 1 }>
+          | Readonly<{ x: 1; y: 2 }>
+          | Readonly<{ x: 1; y: 3 }>
+          | Readonly<{ x: 2; y: 1 }>
+          | Readonly<{ x: 2; y: 2 }>
+          | Readonly<{ x: 3; y: 1 }>
         )[]
       >([
         [

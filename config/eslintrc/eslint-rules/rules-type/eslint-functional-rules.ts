@@ -8,11 +8,12 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
 
 /**
  * @description Enforce functional parameters.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/functional-parameters.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/functional-parameters.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
+ *  | category    | Currying   |
  *  | recommended | error      |
  */
 namespace FunctionalParameters {
@@ -73,6 +74,9 @@ namespace FunctionalParameters {
    *                   "exactlyOne"
    *                 ]
    *               },
+   *               "ignoreLambdaExpression": {
+   *                 "type": "boolean"
+   *               },
    *               "ignoreIIFE": {
    *                 "type": "boolean"
    *               }
@@ -97,6 +101,7 @@ namespace FunctionalParameters {
       | ('atLeastOne' | 'exactlyOne')
       | {
           readonly count?: 'atLeastOne' | 'exactlyOne';
+          readonly ignoreLambdaExpression?: boolean;
           readonly ignoreIIFE?: boolean;
         };
   };
@@ -108,12 +113,13 @@ namespace FunctionalParameters {
 
 /**
  * @description Enforce treating data as immutable.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/immutable-data.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/immutable-data.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value        |
+ *  | :---------- | :----------- |
+ *  | type        | suggestion   |
+ *  | category    | No Mutations |
+ *  | recommended | error        |
  */
 namespace ImmutableData {
   /**
@@ -142,7 +148,7 @@ namespace ImmutableData {
    *           "type": "string"
    *         }
    *       },
-   *       "ignoreClass": {
+   *       "ignoreClasses": {
    *         "oneOf": [
    *           {
    *             "type": "boolean"
@@ -186,7 +192,7 @@ namespace ImmutableData {
   export type Options = {
     readonly ignorePattern?: string | readonly string[];
     readonly ignoreAccessorPattern?: string | readonly string[];
-    readonly ignoreClass?: boolean | 'fieldsOnly';
+    readonly ignoreClasses?: boolean | 'fieldsOnly';
     readonly ignoreImmediateMutation?: boolean;
     readonly assumeTypes?:
       | boolean
@@ -203,27 +209,29 @@ namespace ImmutableData {
 
 /**
  * @description Disallow classes.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-class.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-classes.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value              |
+ *  | :---------- | :----------------- |
+ *  | type        | suggestion         |
+ *  | category    | No Other Paradigms |
+ *  | recommended | error              |
  */
-namespace NoClass {
+namespace NoClasses {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
  * @description Disallow conditional statements.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-conditional-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-conditional-statements.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value         |
+ *  | :---------- | :------------ |
+ *  | type        | suggestion    |
+ *  | category    | No Statements |
+ *  | recommended | error         |
  */
-namespace NoConditionalStatement {
+namespace NoConditionalStatements {
   /**
    * ### schema
    *
@@ -262,14 +270,15 @@ namespace NoConditionalStatement {
 
 /**
  * @description Disallow expression statements.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-expression-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-expression-statements.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value         |
+ *  | :---------- | :------------ |
+ *  | type        | suggestion    |
+ *  | category    | No Statements |
+ *  | recommended | strict        |
  */
-namespace NoExpressionStatement {
+namespace NoExpressionStatements {
   /**
    * ### schema
    *
@@ -308,13 +317,13 @@ namespace NoExpressionStatement {
 
 /**
  * @description Disallow mutable variables.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-let.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-let.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | error      |
+ *  | key         | value        |
+ *  | :---------- | :----------- |
+ *  | type        | suggestion   |
+ *  | category    | No Mutations |
+ *  | recommended | error        |
  */
 namespace NoLet {
   /**
@@ -325,9 +334,6 @@ namespace NoLet {
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "allowLocalMutation": {
-   *         "type": "boolean"
-   *       },
    *       "ignorePattern": {
    *         "type": [
    *           "string",
@@ -339,6 +345,9 @@ namespace NoLet {
    *       },
    *       "allowInForLoopInit": {
    *         "type": "boolean"
+   *       },
+   *       "allowInFunctions": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -347,9 +356,9 @@ namespace NoLet {
    * ```
    */
   export type Options = {
-    readonly allowLocalMutation?: boolean;
     readonly ignorePattern?: string | readonly string[];
     readonly allowInForLoopInit?: boolean;
+    readonly allowInFunctions?: boolean;
   };
 
   export type RuleEntry =
@@ -359,64 +368,29 @@ namespace NoLet {
 
 /**
  * @description Disallow imperative loops.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-loop-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-loop-statements.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value         |
+ *  | :---------- | :------------ |
+ *  | type        | suggestion    |
+ *  | category    | No Statements |
+ *  | recommended | error         |
  */
-namespace NoLoopStatement {
+namespace NoLoopStatements {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
- * @description Prefer property signatures with readonly modifiers over method signatures.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-method-signature.md
+ * @description Restrict types so that only members of the same kind are allowed in them.
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-mixed-types.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | warn       |
+ *  | key         | value              |
+ *  | :---------- | :----------------- |
+ *  | type        | suggestion         |
+ *  | category    | No Other Paradigms |
+ *  | recommended | error              |
  */
-namespace NoMethodSignature {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "ignoreIfReadonly": {
-   *         "type": "boolean",
-   *         "default": true
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type Options = {
-    readonly ignoreIfReadonly?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
-}
-
-/**
- * @description Restrict types so that only members of the same kind of are allowed in them.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-mixed-type.md
- *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
- */
-namespace NoMixedType {
+namespace NoMixedTypes {
   /**
    * ### schema
    *
@@ -449,12 +423,13 @@ namespace NoMixedType {
 
 /**
  * @description Disallow try-catch[-finally] and try-finally patterns.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-promise-reject.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-promise-reject.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key         | value         |
+ *  | :---------- | :------------ |
+ *  | type        | suggestion    |
+ *  | category    | No Exceptions |
+ *  | recommended | false         |
  */
 namespace NoPromiseReject {
   export type RuleEntry = Linter.RuleLevel;
@@ -462,12 +437,13 @@ namespace NoPromiseReject {
 
 /**
  * @description Disallow functions that don't return anything.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-return-void.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-return-void.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value         |
+ *  | :---------- | :------------ |
+ *  | type        | suggestion    |
+ *  | category    | No Statements |
+ *  | recommended | error         |
  */
 namespace NoReturnVoid {
   /**
@@ -484,7 +460,7 @@ namespace NoReturnVoid {
    *       "allowUndefined": {
    *         "type": "boolean"
    *       },
-   *       "ignoreImplicit": {
+   *       "ignoreInferredTypes": {
    *         "type": "boolean"
    *       }
    *     },
@@ -496,7 +472,7 @@ namespace NoReturnVoid {
   export type Options = {
     readonly allowNull?: boolean;
     readonly allowUndefined?: boolean;
-    readonly ignoreImplicit?: boolean;
+    readonly ignoreInferredTypes?: boolean;
   };
 
   export type RuleEntry =
@@ -506,27 +482,29 @@ namespace NoReturnVoid {
 
 /**
  * @description Disallow this access.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-this-expression.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-this-expressions.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value              |
+ *  | :---------- | :----------------- |
+ *  | type        | suggestion         |
+ *  | category    | No Other Paradigms |
+ *  | recommended | strict             |
  */
-namespace NoThisExpression {
+namespace NoThisExpressions {
   export type RuleEntry = Linter.RuleLevel;
 }
 
 /**
  * @description Disallow throwing exceptions.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-throw-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-throw-statements.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value         |
+ *  | :---------- | :------------ |
+ *  | type        | suggestion    |
+ *  | category    | No Exceptions |
+ *  | recommended | error         |
  */
-namespace NoThrowStatement {
+namespace NoThrowStatements {
   /**
    * ### schema
    *
@@ -555,14 +533,15 @@ namespace NoThrowStatement {
 
 /**
  * @description Disallow try-catch[-finally] and try-finally patterns.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/no-try-statement.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/no-try-statements.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | error      |
+ *  | key         | value         |
+ *  | :---------- | :------------ |
+ *  | type        | suggestion    |
+ *  | category    | No Exceptions |
+ *  | recommended | strict        |
  */
-namespace NoTryStatement {
+namespace NoTryStatements {
   /**
    * ### schema
    *
@@ -594,14 +573,643 @@ namespace NoTryStatement {
 }
 
 /**
- * @description Prefer readonly array over mutable arrays.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/prefer-readonly-type.md
+ * @description Require function parameters to be typed as certain immutability
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/prefer-immutable-types.md
+ *
+ *  | key         | value        |
+ *  | :---------- | :----------- |
+ *  | type        | suggestion   |
+ *  | fixable     | code         |
+ *  | category    | No Mutations |
+ *  | recommended | error        |
+ */
+namespace PreferImmutableTypes {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignoreClasses": {
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean"
+   *           },
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "fieldsOnly"
+   *             ]
+   *           }
+   *         ]
+   *       },
+   *       "enforcement": {
+   *         "type": [
+   *           "string",
+   *           "number",
+   *           "boolean"
+   *         ],
+   *         "enum": [
+   *           "ReadonlyShallow",
+   *           "ReadonlyDeep",
+   *           "Immutable",
+   *           null,
+   *           3,
+   *           4,
+   *           5,
+   *           "None",
+   *           false
+   *         ]
+   *       },
+   *       "ignoreInferredTypes": {
+   *         "type": "boolean"
+   *       },
+   *       "ignoreNamePattern": {
+   *         "type": [
+   *           "string",
+   *           "array"
+   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "ignoreTypePattern": {
+   *         "type": [
+   *           "string",
+   *           "array"
+   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "parameters": {
+   *         "oneOf": [
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ignoreClasses": {
+   *                 "oneOf": [
+   *                   {
+   *                     "type": "boolean"
+   *                   },
+   *                   {
+   *                     "type": "string",
+   *                     "enum": [
+   *                       "fieldsOnly"
+   *                     ]
+   *                   }
+   *                 ]
+   *               },
+   *               "enforcement": {
+   *                 "type": [
+   *                   "string",
+   *                   "number",
+   *                   "boolean"
+   *                 ],
+   *                 "enum": [
+   *                   "ReadonlyShallow",
+   *                   "ReadonlyDeep",
+   *                   "Immutable",
+   *                   null,
+   *                   3,
+   *                   4,
+   *                   5,
+   *                   "None",
+   *                   false
+   *                 ]
+   *               },
+   *               "ignoreInferredTypes": {
+   *                 "type": "boolean"
+   *               },
+   *               "ignoreNamePattern": {
+   *                 "type": [
+   *                   "string",
+   *                   "array"
+   *                 ],
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "ignoreTypePattern": {
+   *                 "type": [
+   *                   "string",
+   *                   "array"
+   *                 ],
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           },
+   *           {
+   *             "type": [
+   *               "string",
+   *               "number",
+   *               "boolean"
+   *             ],
+   *             "enum": [
+   *               "ReadonlyShallow",
+   *               "ReadonlyDeep",
+   *               "Immutable",
+   *               null,
+   *               3,
+   *               4,
+   *               5,
+   *               "None",
+   *               false
+   *             ]
+   *           }
+   *         ]
+   *       },
+   *       "returnTypes": {
+   *         "oneOf": [
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ignoreClasses": {
+   *                 "oneOf": [
+   *                   {
+   *                     "type": "boolean"
+   *                   },
+   *                   {
+   *                     "type": "string",
+   *                     "enum": [
+   *                       "fieldsOnly"
+   *                     ]
+   *                   }
+   *                 ]
+   *               },
+   *               "enforcement": {
+   *                 "type": [
+   *                   "string",
+   *                   "number",
+   *                   "boolean"
+   *                 ],
+   *                 "enum": [
+   *                   "ReadonlyShallow",
+   *                   "ReadonlyDeep",
+   *                   "Immutable",
+   *                   null,
+   *                   3,
+   *                   4,
+   *                   5,
+   *                   "None",
+   *                   false
+   *                 ]
+   *               },
+   *               "ignoreInferredTypes": {
+   *                 "type": "boolean"
+   *               },
+   *               "ignoreNamePattern": {
+   *                 "type": [
+   *                   "string",
+   *                   "array"
+   *                 ],
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "ignoreTypePattern": {
+   *                 "type": [
+   *                   "string",
+   *                   "array"
+   *                 ],
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           },
+   *           {
+   *             "type": [
+   *               "string",
+   *               "number",
+   *               "boolean"
+   *             ],
+   *             "enum": [
+   *               "ReadonlyShallow",
+   *               "ReadonlyDeep",
+   *               "Immutable",
+   *               null,
+   *               3,
+   *               4,
+   *               5,
+   *               "None",
+   *               false
+   *             ]
+   *           }
+   *         ]
+   *       },
+   *       "variables": {
+   *         "oneOf": [
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ignoreClasses": {
+   *                 "oneOf": [
+   *                   {
+   *                     "type": "boolean"
+   *                   },
+   *                   {
+   *                     "type": "string",
+   *                     "enum": [
+   *                       "fieldsOnly"
+   *                     ]
+   *                   }
+   *                 ]
+   *               },
+   *               "enforcement": {
+   *                 "type": [
+   *                   "string",
+   *                   "number",
+   *                   "boolean"
+   *                 ],
+   *                 "enum": [
+   *                   "ReadonlyShallow",
+   *                   "ReadonlyDeep",
+   *                   "Immutable",
+   *                   null,
+   *                   3,
+   *                   4,
+   *                   5,
+   *                   "None",
+   *                   false
+   *                 ]
+   *               },
+   *               "ignoreInferredTypes": {
+   *                 "type": "boolean"
+   *               },
+   *               "ignoreNamePattern": {
+   *                 "type": [
+   *                   "string",
+   *                   "array"
+   *                 ],
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "ignoreTypePattern": {
+   *                 "type": [
+   *                   "string",
+   *                   "array"
+   *                 ],
+   *                 "items": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "ignoreInFunctions": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           },
+   *           {
+   *             "type": [
+   *               "string",
+   *               "number",
+   *               "boolean"
+   *             ],
+   *             "enum": [
+   *               "ReadonlyShallow",
+   *               "ReadonlyDeep",
+   *               "Immutable",
+   *               null,
+   *               3,
+   *               4,
+   *               5,
+   *               "None",
+   *               false
+   *             ]
+   *           }
+   *         ]
+   *       },
+   *       "fixer": {
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean",
+   *             "enum": [
+   *               false
+   *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ReadonlyShallow": {
+   *                 "oneOf": [
+   *                   {
+   *                     "type": "boolean",
+   *                     "enum": [
+   *                       false
+   *                     ]
+   *                   },
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "pattern": {
+   *                         "type": "string"
+   *                       },
+   *                       "replace": {
+   *                         "type": "string"
+   *                       }
+   *                     },
+   *                     "additionalProperties": false
+   *                   },
+   *                   {
+   *                     "type": "array",
+   *                     "items": {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "pattern": {
+   *                           "type": "string"
+   *                         },
+   *                         "replace": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   }
+   *                 ]
+   *               },
+   *               "ReadonlyDeep": {
+   *                 "oneOf": [
+   *                   {
+   *                     "type": "boolean",
+   *                     "enum": [
+   *                       false
+   *                     ]
+   *                   },
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "pattern": {
+   *                         "type": "string"
+   *                       },
+   *                       "replace": {
+   *                         "type": "string"
+   *                       }
+   *                     },
+   *                     "additionalProperties": false
+   *                   },
+   *                   {
+   *                     "type": "array",
+   *                     "items": {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "pattern": {
+   *                           "type": "string"
+   *                         },
+   *                         "replace": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   }
+   *                 ]
+   *               },
+   *               "Immutable": {
+   *                 "oneOf": [
+   *                   {
+   *                     "type": "boolean",
+   *                     "enum": [
+   *                       false
+   *                     ]
+   *                   },
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "pattern": {
+   *                         "type": "string"
+   *                       },
+   *                       "replace": {
+   *                         "type": "string"
+   *                       }
+   *                     },
+   *                     "additionalProperties": false
+   *                   },
+   *                   {
+   *                     "type": "array",
+   *                     "items": {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "pattern": {
+   *                           "type": "string"
+   *                         },
+   *                         "replace": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "additionalProperties": false
+   *                     }
+   *                   }
+   *                 ]
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly ignoreClasses?: boolean | 'fieldsOnly';
+    readonly enforcement?:
+      | 'ReadonlyShallow'
+      | 'ReadonlyDeep'
+      | 'Immutable'
+      | null
+      | 3
+      | 4
+      | 5
+      | 'None'
+      | false;
+    readonly ignoreInferredTypes?: boolean;
+    readonly ignoreNamePattern?: string | readonly string[];
+    readonly ignoreTypePattern?: string | readonly string[];
+    readonly parameters?:
+      | {
+          readonly ignoreClasses?: boolean | 'fieldsOnly';
+          readonly enforcement?:
+            | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
+            | 3
+            | 4
+            | 5
+            | 'None'
+            | false;
+          readonly ignoreInferredTypes?: boolean;
+          readonly ignoreNamePattern?: string | readonly string[];
+          readonly ignoreTypePattern?: string | readonly string[];
+        }
+      | (
+          | 'ReadonlyShallow'
+          | 'ReadonlyDeep'
+          | 'Immutable'
+          | null
+          | 3
+          | 4
+          | 5
+          | 'None'
+          | false
+        );
+    readonly returnTypes?:
+      | {
+          readonly ignoreClasses?: boolean | 'fieldsOnly';
+          readonly enforcement?:
+            | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
+            | 3
+            | 4
+            | 5
+            | 'None'
+            | false;
+          readonly ignoreInferredTypes?: boolean;
+          readonly ignoreNamePattern?: string | readonly string[];
+          readonly ignoreTypePattern?: string | readonly string[];
+        }
+      | (
+          | 'ReadonlyShallow'
+          | 'ReadonlyDeep'
+          | 'Immutable'
+          | null
+          | 3
+          | 4
+          | 5
+          | 'None'
+          | false
+        );
+    readonly variables?:
+      | {
+          readonly ignoreClasses?: boolean | 'fieldsOnly';
+          readonly enforcement?:
+            | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
+            | 3
+            | 4
+            | 5
+            | 'None'
+            | false;
+          readonly ignoreInferredTypes?: boolean;
+          readonly ignoreNamePattern?: string | readonly string[];
+          readonly ignoreTypePattern?: string | readonly string[];
+          readonly ignoreInFunctions?: boolean;
+        }
+      | (
+          | 'ReadonlyShallow'
+          | 'ReadonlyDeep'
+          | 'Immutable'
+          | null
+          | 3
+          | 4
+          | 5
+          | 'None'
+          | false
+        );
+    readonly fixer?:
+      | false
+      | {
+          readonly ReadonlyShallow?:
+            | false
+            | {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }
+            | readonly {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }[];
+          readonly ReadonlyDeep?:
+            | false
+            | {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }
+            | readonly {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }[];
+          readonly Immutable?:
+            | false
+            | {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }
+            | readonly {
+                readonly pattern?: string;
+                readonly replace?: string;
+              }[];
+        };
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Prefer property signatures over method signatures.
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/prefer-property-signatures.md
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
  *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | error      |
+ *  | category    | Stylistic  |
+ *  | recommended | false      |
+ */
+namespace PreferPropertySignatures {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignoreIfReadonlyWrapped": {
+   *         "type": "boolean",
+   *         "default": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly ignoreIfReadonlyWrapped?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Prefer readonly types over mutable types.
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/prefer-readonly-type.md
+ *
+ *  | key         | value        |
+ *  | :---------- | :----------- |
+ *  | type        | suggestion   |
+ *  | deprecated  | true         |
+ *  | fixable     | code         |
+ *  | category    | No Mutations |
+ *  | recommended | error        |
  */
 namespace PreferReadonlyType {
   /**
@@ -655,30 +1263,19 @@ namespace PreferReadonlyType {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowLocalMutation?: boolean;
-    readonly ignorePattern?: string | readonly string[];
-    readonly ignoreClass?: boolean | 'fieldsOnly';
-    readonly ignoreInterface?: boolean;
-    readonly allowMutableReturnType?: boolean;
-    readonly checkImplicit?: boolean;
-    readonly ignoreCollections?: boolean;
-  };
-
-  export type RuleEntry =
-    | Linter.RuleLevel
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+  export type RuleEntry = 'off';
 }
 
 /**
  * @description Replaces `x => f(x)` with just `f`.
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v4.4.1/docs/rules/prefer-tacit.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/prefer-tacit.md
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | category       | Stylistic  |
+ *  | recommended    | false      |
  */
 namespace PreferTacit {
   /**
@@ -698,27 +1295,8 @@ namespace PreferTacit {
    *           "type": "string"
    *         }
    *       },
-   *       "ignoreImmediateMutation": {
-   *         "type": "boolean"
-   *       },
    *       "assumeTypes": {
-   *         "oneOf": [
-   *           {
-   *             "type": "boolean",
-   *             "enum": [
-   *               false
-   *             ]
-   *           },
-   *           {
-   *             "type": "object",
-   *             "properties": {
-   *               "allowFixer": {
-   *                 "type": "boolean"
-   *               }
-   *             },
-   *             "additionalProperties": false
-   *           }
-   *         ]
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -728,12 +1306,247 @@ namespace PreferTacit {
    */
   export type Options = {
     readonly ignorePattern?: string | readonly string[];
-    readonly ignoreImmediateMutation?: boolean;
-    readonly assumeTypes?:
-      | false
-      | {
-          readonly allowFixer?: boolean;
-        };
+    readonly assumeTypes?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Require consistently using either `readonly` keywords or `Readonly<T>`
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/readonly-type.md
+ *
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | fixable     | code       |
+ *  | category    | Stylistic  |
+ *  | recommended | error      |
+ */
+namespace ReadonlyType {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "string",
+   *     "enum": [
+   *       "generic",
+   *       "keyword"
+   *     ],
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = 'generic' | 'keyword';
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
+ * @description Enforce the immutability of types based on patterns.
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v5.0.6/docs/rules/type-declaration-immutability.md
+ *
+ *  | key         | value        |
+ *  | :---------- | :----------- |
+ *  | type        | suggestion   |
+ *  | fixable     | code         |
+ *  | category    | No Mutations |
+ *  | recommended | error        |
+ */
+namespace TypeDeclarationImmutability {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignorePattern": {
+   *         "type": [
+   *           "string",
+   *           "array"
+   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "rules": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "object",
+   *           "properties": {
+   *             "identifiers": {
+   *               "type": [
+   *                 "string",
+   *                 "array"
+   *               ],
+   *               "items": {
+   *                 "type": [
+   *                   "string"
+   *                 ]
+   *               }
+   *             },
+   *             "immutability": {
+   *               "type": [
+   *                 "string",
+   *                 "number"
+   *               ],
+   *               "enum": [
+   *                 "Mutable",
+   *                 "ReadonlyShallow",
+   *                 "ReadonlyDeep",
+   *                 "Immutable",
+   *                 null,
+   *                 2,
+   *                 3,
+   *                 4,
+   *                 5
+   *               ]
+   *             },
+   *             "comparator": {
+   *               "type": [
+   *                 "string",
+   *                 "number"
+   *               ],
+   *               "enum": [
+   *                 "Exactly",
+   *                 "AtLeast",
+   *                 "More",
+   *                 -2,
+   *                 "Less",
+   *                 -1,
+   *                 "AtMost",
+   *                 0,
+   *                 1,
+   *                 2
+   *               ]
+   *             },
+   *             "fixer": {
+   *               "oneOf": [
+   *                 {
+   *                   "type": "boolean",
+   *                   "enum": [
+   *                     false
+   *                   ]
+   *                 },
+   *                 {
+   *                   "type": "object",
+   *                   "properties": {
+   *                     "pattern": {
+   *                       "type": "string"
+   *                     },
+   *                     "replace": {
+   *                       "type": "string"
+   *                     }
+   *                   },
+   *                   "additionalProperties": false
+   *                 },
+   *                 {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "pattern": {
+   *                         "type": "string"
+   *                       },
+   *                       "replace": {
+   *                         "type": "string"
+   *                       }
+   *                     },
+   *                     "additionalProperties": false
+   *                   }
+   *                 }
+   *               ]
+   *             }
+   *           },
+   *           "required": [
+   *             "identifiers",
+   *             "immutability"
+   *           ],
+   *           "additionalProperties": false
+   *         }
+   *       },
+   *       "ignoreInterfaces": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly ignorePattern?: string | readonly string[];
+    readonly rules?: readonly {
+      readonly identifiers: string | readonly string[];
+      readonly immutability:
+        | (
+            | 'Mutable'
+            | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
+            | 2
+            | 3
+            | 4
+            | 5
+          )
+        | (
+            | 'Mutable'
+            | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
+            | 2
+            | 3
+            | 4
+            | 5
+          );
+      readonly comparator?:
+        | (
+            | 'Exactly'
+            | 'AtLeast'
+            | 'More'
+            | -2
+            | 'Less'
+            | -1
+            | 'AtMost'
+            | 0
+            | 1
+            | 2
+          )
+        | (
+            | 'Exactly'
+            | 'AtLeast'
+            | 'More'
+            | -2
+            | 'Less'
+            | -1
+            | 'AtMost'
+            | 0
+            | 1
+            | 2
+          );
+      readonly fixer?:
+        | false
+        | {
+            readonly pattern?: string;
+            readonly replace?: string;
+          }
+        | readonly {
+            readonly pattern?: string;
+            readonly replace?: string;
+          }[];
+    }[];
+    readonly ignoreInterfaces?: boolean;
   };
 
   export type RuleEntry =
@@ -744,18 +1557,23 @@ namespace PreferTacit {
 export type EslintFunctionalRules = {
   readonly 'functional/functional-parameters': FunctionalParameters.RuleEntry;
   readonly 'functional/immutable-data': ImmutableData.RuleEntry;
-  readonly 'functional/no-class': NoClass.RuleEntry;
-  readonly 'functional/no-conditional-statement': NoConditionalStatement.RuleEntry;
-  readonly 'functional/no-expression-statement': NoExpressionStatement.RuleEntry;
+  readonly 'functional/no-classes': NoClasses.RuleEntry;
+  readonly 'functional/no-conditional-statements': NoConditionalStatements.RuleEntry;
+  readonly 'functional/no-expression-statements': NoExpressionStatements.RuleEntry;
   readonly 'functional/no-let': NoLet.RuleEntry;
-  readonly 'functional/no-loop-statement': NoLoopStatement.RuleEntry;
-  readonly 'functional/no-method-signature': NoMethodSignature.RuleEntry;
-  readonly 'functional/no-mixed-type': NoMixedType.RuleEntry;
+  readonly 'functional/no-loop-statements': NoLoopStatements.RuleEntry;
+  readonly 'functional/no-mixed-types': NoMixedTypes.RuleEntry;
   readonly 'functional/no-promise-reject': NoPromiseReject.RuleEntry;
   readonly 'functional/no-return-void': NoReturnVoid.RuleEntry;
-  readonly 'functional/no-this-expression': NoThisExpression.RuleEntry;
-  readonly 'functional/no-throw-statement': NoThrowStatement.RuleEntry;
-  readonly 'functional/no-try-statement': NoTryStatement.RuleEntry;
-  readonly 'functional/prefer-readonly-type': PreferReadonlyType.RuleEntry;
+  readonly 'functional/no-this-expressions': NoThisExpressions.RuleEntry;
+  readonly 'functional/no-throw-statements': NoThrowStatements.RuleEntry;
+  readonly 'functional/no-try-statements': NoTryStatements.RuleEntry;
+  readonly 'functional/prefer-immutable-types': PreferImmutableTypes.RuleEntry;
+  readonly 'functional/prefer-property-signatures': PreferPropertySignatures.RuleEntry;
   readonly 'functional/prefer-tacit': PreferTacit.RuleEntry;
+  readonly 'functional/readonly-type': ReadonlyType.RuleEntry;
+  readonly 'functional/type-declaration-immutability': TypeDeclarationImmutability.RuleEntry;
+
+  // deprecated
+  readonly 'functional/prefer-readonly-type': PreferReadonlyType.RuleEntry;
 };

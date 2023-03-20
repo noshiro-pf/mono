@@ -1,6 +1,6 @@
-import type { Linter } from 'eslint';
+import { type Linter } from 'eslint';
 // eslint-disable-next-line import/no-internal-modules
-import type { EslintFunctionalRules } from '../eslintrc/eslint-rules/rules-type/eslint-functional-rules';
+import { type EslintFunctionalRules } from '../eslintrc/eslint-rules/rules-type/eslint-functional-rules';
 
 export type LinterRulesRecord = Readonly<Partial<Linter.RulesRecord>>;
 
@@ -41,13 +41,8 @@ export type NoLetOptions = StrictExclude<
   Linter.RuleLevel
 >[1];
 
-export type PreferReadonlyTypeOptions = StrictExclude<
-  EslintFunctionalRules['functional/prefer-readonly-type'],
-  Linter.RuleLevel
->[1];
-
 export type NoExpressionStatementOptions = StrictExclude<
-  EslintFunctionalRules['functional/no-expression-statement'],
+  EslintFunctionalRules['functional/no-expression-statements'],
   Linter.RuleLevel
 >[1];
 
