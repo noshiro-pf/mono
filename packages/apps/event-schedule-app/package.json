@@ -64,7 +64,7 @@
     "z:lint:src:wireit": "wireit",
     "z:setup": "run-p z:setup:build-deps z:setup:gen-global-dts",
     "z:setup:build-deps": "wireit",
-    "z:setup:gen-global-dts": "node ./scripts/gen-global-dts.js",
+    "z:setup:gen-global-dts": "node ./scripts/gen-global-dts.mjs",
     "z:setup:scripts:impl": "tsc --project config/tsconfig.scripts.json",
     "z:setup:scripts:wireit": "wireit",
     "z:setup:service-account-key": "touch ./scripts/service-account-key.json",
@@ -291,7 +291,7 @@
       "clean": false,
       "output": [
         "scripts/**/*.js",
-        "!scripts/gen-global-dts.js"
+        "!scripts/gen-global-dts.mjs"
       ]
     },
     "z:test:wireit": {

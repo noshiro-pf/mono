@@ -1,6 +1,6 @@
 'use strict';
 
-const { join } = require('path');
+const { join } = require('node:path');
 
 // @ts-check
 
@@ -85,7 +85,7 @@ const eslintImportsRules = {
     'error',
     'never',
     {
-      pattern: { json: 'always' },
+      pattern: { json: 'always', mjs: 'always' },
     },
   ],
   'import/order': 'off', // using prettier-plugin-organize-imports

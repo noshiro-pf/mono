@@ -6,8 +6,6 @@
     "packages/**"
   ],
   "scripts": {
-    "build:apps": "node scripts/build-apps.js",
-    "build:utils": "node scripts/build-utils.js",
     "ci": "run-s type-check:root ws:build ws:gi zz:cmd:check:no-diff ci:lint-and-test zz:cmd:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
     "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",
@@ -27,9 +25,9 @@
     "fmt:all": "prettier --cache --cache-strategy content --write . > /dev/null",
     "fmt:all:no-cache": "prettier --write . > /dev/null",
     "gen-eslint-rules-type": "wireit",
-    "lint:apps": "node scripts/lint-apps.js",
+    "lint:apps": "node scripts/lint-apps.mjs",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "lint:utils": "node scripts/lint-utils.js",
+    "lint:utils": "node scripts/lint-utils.mjs",
     "pub:all": "scripts/publish.sh",
     "type-check:root": "yarn z:type-check:root:wireit",
     "ws:build": "yarn zz:cmd:wsrun-stages build",

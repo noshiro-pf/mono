@@ -6,22 +6,15 @@ import react from '@vitejs/plugin-react-swc';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
-import packageJson from '../package.json';
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const {
-  genGlobalImportDefsFromDevDependencies,
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-internal-modules, unicorn/prefer-module, import/no-unresolved
-} = require('../../../../scripts/get-global-import-def-from-dev-dependencies');
+import { genGlobalImportDefsFromDevDependencies } from '../../../../scripts/get-global-import-def-from-dev-dependencies.mjs';
+import packageJson from '../package.json' assert { type: 'json' };
 
 const thisDir = dirname(fileURLToPath(import.meta.url));
 
-const providePluginDefs = (
-  genGlobalImportDefsFromDevDependencies as (
-    pwd: string,
-    devDependencies: Readonly<Record<string, string>>
-  ) => Record<string, readonly [string, string]>
-)(thisDir, packageJson.devDependencies);
+const providePluginDefs = genGlobalImportDefsFromDevDependencies(
+  thisDir,
+  packageJson.devDependencies
+);
 
 // https://vitejs.dev/config/
 // eslint-disable-next-line import/no-default-export, import/no-unused-modules
