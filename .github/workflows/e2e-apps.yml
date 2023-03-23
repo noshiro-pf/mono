@@ -71,7 +71,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build dependencies
-        run: yarn zz:cmd:ws-run-stages --recursive -p @noshiro/${{ matrix.app_name }} -c build
+        run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/${{ matrix.app_name }} -c build
 
       - name: Cypress run on Chrome
         uses: cypress-io/github-action@v5
@@ -121,7 +121,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build dependencies
-        run: yarn zz:cmd:ws-run-stages --recursive -p @noshiro/event-schedule-app -c build
+        run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/event-schedule-app -c build
 
       - name: build functions
         run: yarn workspace @noshiro/event-schedule-app-functions build
