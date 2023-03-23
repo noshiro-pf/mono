@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { expectType, IMap, Obj, pipe } from '@noshiro/ts-utils';
+
 import {
   answerOfDateFromJson,
   answerOfDateJsonType,

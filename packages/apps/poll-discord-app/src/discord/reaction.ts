@@ -1,4 +1,3 @@
-import { match, Result } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
 import { emojis } from '../constants';

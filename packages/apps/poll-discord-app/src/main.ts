@@ -1,4 +1,3 @@
-import { Result } from '@noshiro/ts-utils';
 import { initDiscordClient, startDiscordListener } from './discord';
 
 export const main = async (): Promise<Result<unknown, unknown>> => {

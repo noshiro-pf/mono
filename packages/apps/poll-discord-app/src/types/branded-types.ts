@@ -1,5 +1,4 @@
 import * as t from '@noshiro/io-ts';
-import { DateUtils } from '@noshiro/ts-utils';
 
 export const [commandMessageIdType, toCommandMessageId] = t.simpleBrandedString(
   'CommandMessageId',

@@ -1,4 +1,3 @@
-import { ISet } from '@noshiro/ts-utils';
 import { type Poll, type UserId } from '../types';
 
 export const getUserIdsFromAnswers = (answers: Poll['answers']): ISet<UserId> =>

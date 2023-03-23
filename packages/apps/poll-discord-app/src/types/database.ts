@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { expectType, IMap, Obj, pipe, tp } from '@noshiro/ts-utils';
+
 import {
   commandMessageIdType,
   dateOptionIdType,

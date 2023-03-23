@@ -1,4 +1,3 @@
-import { Arr, ISet, isNotUndefined, type IMap } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { emojis } from '../constants';
 import {

@@ -52,6 +52,7 @@ const config = {
 
     '@typescript-eslint/no-restricted-imports': noRestrictedImports,
   },
+  ignorePatterns: ['dist/**/*'],
 };
 
 module.exports = config;

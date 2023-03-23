@@ -1,8 +1,9 @@
 {
   "extends": "../../../config/tsconfig/tsconfig.cjs.nolib.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "noEmit": true
   },
-  "include": ["./src"],
+  "include": ["./src", "./scripts"],
   "exclude": ["node_modules", "dist"]
 }

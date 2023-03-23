@@ -1,4 +1,3 @@
-import { castWritable, IMap, Result, Str } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { toUserId, type UserId } from '../types';
 import { quoteIfSpaceIncluded } from './quote-if-space-included';

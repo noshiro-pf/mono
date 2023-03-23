@@ -1,4 +1,3 @@
-import { ISet, isNotUndefined, Obj, Result, Str, tp } from '@noshiro/ts-utils';
 import type * as Discord from 'discord.js';
 import { emojis } from '../constants';
 import { firestoreApi } from '../firebase';

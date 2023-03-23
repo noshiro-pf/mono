@@ -1,4 +1,3 @@
-import { Result } from '@noshiro/ts-utils';
 import {
   ActivityType as DiscordActivityType,
   Client as DiscordClient,

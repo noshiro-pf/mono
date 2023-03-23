@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { isUndefined, Num, Result } from '@noshiro/ts-utils';
+
 import { isNumGroups, type NumGroups } from '../types';
 
 export const rpParseCommand = (command: string): readonly string[] =>

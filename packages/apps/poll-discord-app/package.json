@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "yarn z:build:wireit",
-    "buildw": "yarn z:build:impl --watch",
+    "build": "yarn z:bundle:wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
     "clean:eslintcache": "rimraf .eslintcache",
@@ -18,24 +17,27 @@
     "gi": "yarn z:gi:wireit",
     "lint": "yarn z:lint:src:wireit",
     "lint:fix": "yarn z:lint:fix:src:wireit",
-    "start:dev": "export NODE_ENV='development' && node ./dist/src/index.js",
-    "start:prod": "node ./dist/src/index.js",
+    "scp": "yarn zz:cmd:gcloud:scp:wireit",
+    "start:dev": "node ./dist/bot.dev.cjs",
+    "start:prd": "node ./dist/bot.prd.cjs",
     "tsc": "yarn z:type-check:wireit",
     "tscw": "yarn z:type-check:impl --watch",
-    "z:build:impl": "yarn zz:cmd:tsc-incremental --project tsconfig.json",
-    "z:build:wireit": "wireit",
+    "z:bundle:impl": "run-p zz:cmd:bundle:*:impl",
+    "z:bundle:wireit": "wireit",
     "z:gi:impl": "yarn zz:cmd:gi ./src --min-depth 1 --ignore assets",
     "z:gi:wireit": "wireit",
     "z:lint:fix:src:impl": "yarn zz:cmd:eslint:src --fix",
     "z:lint:fix:src:wireit": "wireit",
     "z:lint:src:impl": "yarn zz:cmd:eslint:src",
     "z:lint:src:wireit": "wireit",
-    "z:setup": "run-p z:setup:dbjson",
-    "z:setup:dbjson": "echo '{ \"polls\": [] }' > ./db.json",
     "z:type-check:impl": "tsc --noEmit",
     "z:type-check:wireit": "wireit",
+    "zz:cmd:bundle:dev:impl": "node ./scripts/bundle.dev.mjs",
+    "zz:cmd:bundle:prd:impl": "node ./scripts/bundle.prd.mjs",
     "zz:cmd:eslint": "eslint --ext .ts,.tsx --color",
     "zz:cmd:eslint:src": "yarn zz:cmd:eslint src/ --cache --cache-location ./.eslintcache",
+    "zz:cmd:gcloud:scp:impl": "gcloud compute scp ./bot.*.cjs ./.env.* e2-micro-1:/home/noshiro --zone=us-central1-a",
+    "zz:cmd:gcloud:scp:wireit": "wireit",
     "zz:cmd:gi": "bash ../../../scripts/index_ts_generator.sh",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write",
     "zz:cmd:publish": "yarn publish --no-git-tag-version --access=public",
@@ -50,28 +52,33 @@
     "firebase": "^9.0.2"
   },
   "devDependencies": {
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*"
   },
   "engines": {
     "node": ">=16.6.x"
   },
   "wireit": {
-    "z:build:wireit": {
-      "command": "yarn z:build:impl",
-      "clean": "if-file-deleted",
+    "zz:cmd:gcloud:scp:wireit": {
+      "command": "yarn zz:cmd:gcloud:scp:impl",
       "dependencies": [
-        "z:setup"
-      ],
+        "z:type-check:wireit",
+        "build"
+      ]
+    },
+    "z:bundle:wireit": {
+      "command": "yarn z:bundle:impl",
+      "clean": true,
       "files": [
         "src/**/*.ts",
         "tsconfig.json",
+        "./scripts/**/*",
         "../../../config/tsconfig/**",
         "../../utils/stdlib/stdlib.d.ts",
         "../../utils/ts-type-utils/ts-type-utils.d.ts"
       ],
       "output": [
-        "dist/**",
-        ".tsbuildinfo"
+        "./dist/**/*"
       ]
     },
     "z:gi:wireit": {
@@ -123,9 +130,6 @@
     },
     "z:type-check:wireit": {
       "command": "yarn z:type-check:impl",
-      "dependencies": [
-        "z:setup"
-      ],
       "files": [
         "src/**/*.ts",
         "tsconfig.json",

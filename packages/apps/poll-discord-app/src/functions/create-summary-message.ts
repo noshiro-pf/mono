@@ -1,4 +1,3 @@
-import { castWritable, type IMap } from '@noshiro/ts-utils';
 import { EmbedBuilder, type EmbedField } from 'discord.js';
 import { embedMessageColor, footerText } from '../constants';
 import { type Group, type Poll, type UserId } from '../types';

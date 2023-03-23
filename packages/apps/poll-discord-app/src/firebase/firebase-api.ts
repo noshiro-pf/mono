@@ -1,13 +1,4 @@
 import * as t from '@noshiro/io-ts';
-import {
-  DateUtils,
-  mapOptional,
-  match,
-  noop,
-  pipe,
-  Result,
-  Str,
-} from '@noshiro/ts-utils';
 import * as firestore from 'firebase/firestore';
 import {
   pollFromJson,
