@@ -1,0 +1,5 @@
+{
+  "extends": "../../../../config/tsconfig/tsconfig.preact.nolib.json",
+  "include": ["../src", "./globals.ts"],
+  "exclude": ["../node_modules", "../build"]
+}

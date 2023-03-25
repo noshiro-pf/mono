@@ -49,6 +49,7 @@ jobs:
           - lambda-calculus-interpreter-preact
           - lambda-calculus-interpreter-react
           - my-portfolio-app-preact
+          - mahjong-calculator-app
           - slack-app
           - template-preact-app-vite
           - template-react-app-vite
