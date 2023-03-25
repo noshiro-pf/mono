@@ -39,7 +39,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: build dependencies
-        run: yarn zz:cmd:ws-run-stages --recursive -p @noshiro/my-portfolio-app-preact -c build
+        run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/my-portfolio-app-preact -c build
 
       - name: lint
         run: yarn workspace @noshiro/my-portfolio-app-preact lint

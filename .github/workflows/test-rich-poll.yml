@@ -40,7 +40,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: build dependencies
-        run: yarn zz:cmd:ws-run-stages --recursive -p @noshiro/poll-discord-app -c build
+        run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/poll-discord-app -c build
 
       - name: lint
         run: yarn workspace @noshiro/poll-discord-app lint
