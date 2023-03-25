@@ -7,7 +7,6 @@ import {
   type createTinyObservable as VAR_createTinyObservable,
   type DateUtils as TYPE_DateUtils,
   type DateUtils as VAR_DateUtils,
-  type Err as TYPE_Err,
   type expectType as VAR_expectType,
   type hasKey as VAR_hasKey,
   type hasKeyValue as VAR_hasKeyValue,
@@ -45,18 +44,15 @@ import {
   type memoizeFunction as VAR_memoizeFunction,
   type MutableMap as VAR_MutableMap,
   type MutableSet as VAR_MutableSet,
-  type None as TYPE_None,
   type noop as VAR_noop,
   type Num as VAR_Num,
   type Obj as VAR_Obj,
-  type Ok as TYPE_Ok,
   type pipe as VAR_pipe,
   type Queue as TYPE_Queue,
   type range as VAR_range,
   type RecordUtils as VAR_RecordUtils,
   type Result as TYPE_Result,
   type Result as VAR_Result,
-  type Some as TYPE_Some,
   type Str as VAR_Str,
   type Subscription as TYPE_Subscription,
   type TinyObservable as TYPE_TinyObservable,
@@ -66,18 +62,14 @@ import {
 } from '@noshiro/ts-utils';
 
 declare global {
-  type Err<E> = TYPE_Err<E>;
   type DateUtils = TYPE_DateUtils;
   type IMap<K, V> = TYPE_IMap<K, V>;
   type IMapMapped<K, V, KM extends RecordKeyType> = TYPE_IMapMapped<K, V, KM>;
   type ISet<S> = TYPE_ISet<S>;
   type ISetMapped<K, KM extends RecordKeyType> = TYPE_ISetMapped<K, KM>;
   type Maybe<S> = TYPE_Maybe<S>;
-  type None = TYPE_None;
-  type Ok<S> = TYPE_Ok<S>;
   type Queue<T> = TYPE_Queue<T>;
   type Result<S, E> = TYPE_Result<S, E>;
-  type Some<S> = TYPE_Some<S>;
   type Subscription = TYPE_Subscription;
   type TinyObservable<T> = TYPE_TinyObservable<T>;
   type TinyObservableSource<T> = TYPE_TinyObservableSource<T>;

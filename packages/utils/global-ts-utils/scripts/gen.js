@@ -66,18 +66,14 @@ const importsList = [
 ];
 
 const typeImportsList = [
-  { name: 'Err', params: ['E'] },
   { name: 'DateUtils', params: [] },
   { name: 'IMap', params: ['K', 'V'] },
   { name: 'IMapMapped', params: ['K', 'V', 'KM extends RecordKeyType'] },
   { name: 'ISet', params: ['S'] },
   { name: 'ISetMapped', params: ['K', 'KM extends RecordKeyType'] },
   { name: 'Maybe', params: ['S'] },
-  { name: 'None', params: [] },
-  { name: 'Ok', params: ['S'] },
   { name: 'Queue', params: ['T'] },
   { name: 'Result', params: ['S', 'E'] },
-  { name: 'Some', params: ['S'] },
   { name: 'Subscription', params: [] },
   { name: 'TinyObservable', params: ['T'] },
   { name: 'TinyObservableSource', params: ['T'] },

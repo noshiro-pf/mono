@@ -1,4 +1,4 @@
-import { type Maybe, type Some } from '@noshiro/ts-utils';
+import { type Maybe } from '@noshiro/ts-utils';
 import { type ObservableId, type UpdaterSymbol } from './id';
 import { type ObservableKind } from './observable-kind';
 import {
@@ -52,7 +52,7 @@ export type ObservableBase<A> = Readonly<{
 
 export type InitializedObservableBase<A> = ObservableBase<A> &
   Readonly<{
-    currentValue: Some<A>;
+    currentValue: Maybe.Some<A>;
     chain: (<B>(
       operator:
         | InitializedToInitializedOperator<A, B>
