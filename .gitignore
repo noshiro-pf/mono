@@ -5,6 +5,7 @@ packages/**/dist
 packages/**/lib
 packages/**/esm
 packages/**/cjs
+packages/**/dts
 packages/**/config/**/*.js
 packages/**/scripts/**/*.js
 experimental/**/build
@@ -12,6 +13,7 @@ experimental/**/dist
 experimental/**/lib
 experimental/**/esm
 experimental/**/cjs
+experimental/**/dts
 experimental/**/config/**/*.js
 experimental/**/scripts/**/*.js
 config/**/*.js
