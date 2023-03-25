@@ -10450,7 +10450,7 @@ glob@^7.0.0, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6, glob@^7.1.7:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^8.0.0, glob@^8.0.1, glob@^8.0.3:
+glob@^8.0.0, glob@^8.0.1:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/glob/-/glob-8.1.0.tgz#d388f656593ef708ee3e34640fdfb99a9fd1c33e"
   integrity sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==
@@ -10465,6 +10465,16 @@ glob@^9.2.0:
   version "9.2.1"
   resolved "https://registry.yarnpkg.com/glob/-/glob-9.2.1.tgz#f47e34e1119e7d4f93a546e75851ba1f1e68de50"
   integrity sha512-Pxxgq3W0HyA3XUvSXcFhRSs+43Jsx0ddxcFrbjxNGkL2Ak5BAUBxLqI5G6ADDeCHLfzzXFhe0b1yYcctGmytMA==
+  dependencies:
+    fs.realpath "^1.0.0"
+    minimatch "^7.4.1"
+    minipass "^4.2.4"
+    path-scurry "^1.6.1"
+
+glob@^9.3.2:
+  version "9.3.2"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-9.3.2.tgz#8528522e003819e63d11c979b30896e0eaf52eda"
+  integrity sha512-BTv/JhKXFEHsErMte/AnfiSv8yYOLLiyH2lTg8vn02O21zWFgHPTfxtgn1QRe7NRgggUhC8hacR2Re94svHqeA==
   dependencies:
     fs.realpath "^1.0.0"
     minimatch "^7.4.1"
@@ -15199,7 +15209,7 @@ preact-media-hook@^1.0.3:
   resolved "https://registry.yarnpkg.com/preact-media-hook/-/preact-media-hook-1.0.3.tgz#1e208a90bfae9a351d97415c58e9b3a8d2bfef7c"
   integrity sha512-Vl32i29Hyb5DGg7atJ/Fp4dXhMrgRG9n3/99tRfxH7Wixapgguil0PGnzgXJMOWisPp/VAx6ShlWhXVaTYMITg==
 
-preact@^10.13.2:
+preact@^10.11.3, preact@^10.13.2:
   version "10.13.2"
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.13.2.tgz#2c40c73d57248b57234c4ae6cd9ab9d8186ebc0a"
   integrity sha512-q44QFLhOhty2Bd0Y46fnYW0gD/cbVM9dUVtNTDKPcdXSMA7jfY+Jpd6rk3GB0lcQss0z5s/6CmVP0Z/hV+g6pw==
