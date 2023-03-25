@@ -1,0 +1,7 @@
+{
+  "extends": "../../../../config/tsconfig/tsconfig.base.nolib.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["./**/*.ts"]
+}
