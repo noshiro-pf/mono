@@ -1,4 +1,3 @@
-import { Maybe } from '@noshiro/ts-utils';
 import { InitializedSyncChildObservableClass } from '../class';
 import {
   type Observable,

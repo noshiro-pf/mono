@@ -8,7 +8,7 @@
   "sideEffects": false,
   "main": "cjs/src/index.js",
   "module": "esm/index.js",
-  "types": "esm/index.d.ts",
+  "types": "dts/index.d.ts",
   "files": [
     "package.json",
     "cjs",
@@ -17,7 +17,7 @@
   "scripts": {
     "build": "yarn z:build:wireit",
     "clean": "run-p clean:**",
-    "clean:build": "rimraf cjs esm",
+    "clean:build": "rimraf cjs esm dts",
     "clean:eslintcache": "rimraf .eslintcache",
     "clean:wireit": "rimraf .wireit/*/cache",
     "fmt": "yarn zz:cmd:prettier .",
@@ -45,8 +45,9 @@
     "z:test:wireit": "wireit",
     "z:type-check:impl": "tsc --noEmit",
     "z:type-check:wireit": "wireit",
-    "zz:cmd:build:cjs": "yarn zz:cmd:tsc-incremental --project config/tsconfig.cjs.json",
-    "zz:cmd:build:esm": "yarn zz:cmd:tsc-incremental --project config/tsconfig.esm.json",
+    "zz:cmd:build:cjs": "node ./scripts/esbuild.cjs.mjs",
+    "zz:cmd:build:dts": "yarn zz:cmd:tsc-incremental --project config/tsconfig.dts.json",
+    "zz:cmd:build:esm": "node ./scripts/esbuild.esm.mjs",
     "zz:cmd:eslint": "eslint --ext .ts,.tsx --color",
     "zz:cmd:eslint:src-and-test": "yarn zz:cmd:eslint \"./{src,test}/**/*\" --cache --cache-location ./.eslintcache",
     "zz:cmd:gi": "bash ../../../scripts/index_ts_generator.sh",
@@ -62,6 +63,7 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^2.0.1",
+    "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@tsconfig/docusaurus": "^1.0.6"
   },
@@ -72,10 +74,11 @@
   "wireit": {
     "z:build:wireit": {
       "command": "yarn z:build:impl",
-      "clean": "if-file-deleted",
+      "clean": true,
       "files": [
         "src/**/*.ts",
         "tsconfig.json",
+        "./scripts/**/*",
         "../../../config/tsconfig/**",
         "../stdlib/stdlib.d.ts",
         "../ts-type-utils/ts-type-utils.d.ts"
@@ -83,7 +86,7 @@
       "output": [
         "cjs/**",
         "esm/**",
-        ".tsbuildinfo"
+        "dts/**"
       ]
     },
     "z:gi:src:wireit": {

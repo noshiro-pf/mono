@@ -1,4 +1,3 @@
-import { ISet } from '@noshiro/ts-utils';
 import {
   filter,
   interval,

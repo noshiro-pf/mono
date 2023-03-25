@@ -1,0 +1,10 @@
+{
+  "extends": "../../../../config/tsconfig/tsconfig.base.nolib.json",
+  "compilerOptions": {
+    "outDir": "../dts",
+    "declaration": true,
+    "emitDeclarationOnly": true
+  },
+  "include": ["../src", "../test"],
+  "exclude": ["../node_modules", "../dts", "../cjs", "../esm"]
+}

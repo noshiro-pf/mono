@@ -1,4 +1,3 @@
-import { expectType } from '@noshiro/ts-utils';
 import { fromArray } from '../create';
 import { withInitialValue } from '../operators';
 import {
