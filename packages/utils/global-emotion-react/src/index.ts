@@ -6,5 +6,6 @@
 // eslint-disable-next-line import/no-unassigned-import
 import './globals';
 
-export { eslintNoRestrictedImportsEmotionReactDef } from './eslint-no-restricted-imports-def';
-export { providePluginEmotionReactDef } from './provide-plugin-def';
+export { autoImportDef } from './auto-import-def';
+export { eslintNoRestrictedImportsDef } from './eslint-no-restricted-imports-def';
+export { providePluginDef } from './provide-plugin-def';

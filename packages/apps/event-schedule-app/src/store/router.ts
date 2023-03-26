@@ -1,4 +1,3 @@
-import { createRouter } from '@noshiro/tiny-router-observable';
 import { Routes } from '../constants';
 
 const _router = createRouter();

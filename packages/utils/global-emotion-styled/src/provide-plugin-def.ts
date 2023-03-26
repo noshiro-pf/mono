@@ -1,5 +1,5 @@
 import { tp } from '@noshiro/ts-utils';
 
-export const providePluginEmotionStyledDef = {
+export const providePluginDef = {
   styled: tp('@emotion/styled', 'default'),
-};
+} as const;

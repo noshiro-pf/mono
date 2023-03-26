@@ -1,6 +1,6 @@
 import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginSyncflowPreactHooksDef = Obj.fromEntries(
+export const providePluginDef = Obj.fromEntries(
   [
     'useEventObservable',
     'useObservable',

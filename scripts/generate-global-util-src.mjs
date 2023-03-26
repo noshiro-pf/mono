@@ -1,5 +1,20 @@
 // @ts-check
 
+/** @type {string} */
+export const generateIndexTs = [
+  '/* eslint-disable @typescript-eslint/triple-slash-reference */',
+  '',
+  '/// <reference path="../../stdlib/stdlib.d.ts" />',
+  '/// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />',
+  '',
+  '// eslint-disable-next-line import/no-unassigned-import',
+  "import './globals';",
+  '',
+  "export { autoImportDef } from './auto-import-def';",
+  "export { eslintNoRestrictedImportsDef } from './eslint-no-restricted-imports-def';",
+  "export { providePluginDef } from './provide-plugin-def';",
+].join('\n');
+
 /**
  * @param {string} packageName
  * @param {readonly string[]} importsList
@@ -72,14 +87,27 @@ export const generateGlobalsDecl = (
 /**
  * @param {string} packageName
  * @param {readonly string[]} importsList
- * @param {string} varName
  * @returns {string}
  */
-export const generateProvidePluginDef = (packageName, importsList, varName) =>
+export const generateAutoImportDef = (packageName, importsList) =>
+  [
+    'export const autoImportDef = {',
+    `"${packageName}": [`,
+    ...importsList.map((s) => `'${s}',`),
+    ']',
+    '} as const;',
+  ].join('\n');
+
+/**
+ * @param {string} packageName
+ * @param {readonly string[]} importsList
+ * @returns {string}
+ */
+export const generateProvidePluginDef = (packageName, importsList) =>
   [
     "import { Obj, tp } from '@noshiro/ts-utils';",
     '',
-    `export const providePlugin${varName}Def = Obj.fromEntries(`,
+    `export const providePluginDef = Obj.fromEntries(`,
     '[',
     ...importsList.map((s) => `'${s}',`),
     `].map((key) => tp(key, tp('${packageName}', key)))`,
@@ -90,14 +118,12 @@ export const generateProvidePluginDef = (packageName, importsList, varName) =>
  * @param {string} packageName
  * @param {readonly string[]} importsList
  * @param {Readonly<{ name: string, params: readonly string[] }>[]} typeImportsList
- * @param {string} varName
  * @returns {string}
  */
 export const generateEslintNoRestrictedImportsDef = (
   packageName,
   importsList,
-  typeImportsList,
-  varName
+  typeImportsList
 ) => {
   /**
    * @type {{
@@ -113,7 +139,7 @@ export const generateEslintNoRestrictedImportsDef = (
   };
 
   return [
-    `export const eslintNoRestrictedImports${varName}Def = {`,
+    `export const eslintNoRestrictedImportsDef = {`,
     `name: '${def.name}',`,
     `importNames: [${def.importNames.map((s) => `'${s}'`).join(', ')}],`,
     `message: '${def.message}'`,

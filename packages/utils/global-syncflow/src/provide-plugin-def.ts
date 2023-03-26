@@ -1,6 +1,6 @@
 import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginSyncflowDef = Obj.fromEntries(
+export const providePluginDef = Obj.fromEntries(
   [
     'auditTime',
     'auditTimeI',

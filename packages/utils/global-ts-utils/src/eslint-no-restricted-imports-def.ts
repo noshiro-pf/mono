@@ -1,4 +1,4 @@
-export const eslintNoRestrictedImportsTsUtilsDef = {
+export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/ts-utils',
   importNames: [
     'Arr',

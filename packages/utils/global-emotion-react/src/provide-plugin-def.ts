@@ -1,5 +1,5 @@
-import { tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginEmotionReactDef = {
-  css: tp('@emotion/react', 'css'),
-};
+export const providePluginDef = Obj.fromEntries(
+  ['css'].map((key) => tp(key, tp('@emotion/react', key)))
+);

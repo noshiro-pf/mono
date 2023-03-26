@@ -1,5 +1,4 @@
 import { Icon, NonIdealState } from '@blueprintjs/core';
-import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { Routes } from '../../constants';
 import { router } from '../../store';
 import { Anchor } from '../bp';

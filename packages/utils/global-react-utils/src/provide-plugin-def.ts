@@ -1,6 +1,6 @@
 import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginReactUtilsDef = Obj.fromEntries(
+export const providePluginDef = Obj.fromEntries(
   [
     'memoNamed',
     'useAlive',

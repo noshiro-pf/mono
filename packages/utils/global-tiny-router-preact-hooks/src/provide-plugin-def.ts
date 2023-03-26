@@ -1,6 +1,6 @@
 import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginTinyRouterPreactHooksDef = Obj.fromEntries(
+export const providePluginDef = Obj.fromEntries(
   [
     'back',
     'pathname$',
