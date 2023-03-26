@@ -1,3 +1,4 @@
+import { expectType, type Queue } from '@noshiro/ts-utils';
 import { type Subscriber, type TupleToQueueTuple } from './types';
 
 test('type test', () => {

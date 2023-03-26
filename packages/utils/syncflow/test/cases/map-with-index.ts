@@ -1,3 +1,4 @@
+import { tp } from '@noshiro/ts-utils';
 import { interval, mapWithIndex, take, type Observable } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import { type StreamTestCase } from '../typedef';

@@ -1,3 +1,4 @@
+import { Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import { type SourceObservable } from '../types';
 

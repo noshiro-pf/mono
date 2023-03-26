@@ -1,3 +1,4 @@
+import { Maybe } from '@noshiro/ts-utils';
 import { source, withInitialValue, type InitializedObservable } from '../core';
 
 export const createReducer = <S, A>(

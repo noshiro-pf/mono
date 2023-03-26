@@ -1,3 +1,4 @@
+import { noop } from '@noshiro/ts-utils';
 import { type Subscriber } from '../types';
 
 export const toSubscriber = <A>(

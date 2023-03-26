@@ -1,3 +1,4 @@
+import { Maybe, Result } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import { type FromSubscribableObservable, type Subscribable } from '../types';
 

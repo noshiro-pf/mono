@@ -1,3 +1,4 @@
+import { expectType } from '@noshiro/ts-utils';
 import {
   interval,
   mapI,

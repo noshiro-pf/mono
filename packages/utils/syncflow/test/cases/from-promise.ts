@@ -1,3 +1,4 @@
+import { Result } from '@noshiro/ts-utils';
 import { fromPromise, type Observable } from '../../src';
 import { getStreamOutputAsPromise } from '../get-stream-output-as-promise';
 import { type StreamTestCase } from '../typedef';

@@ -1,3 +1,4 @@
+import { expectType, Maybe } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import {
   isRootObservable,

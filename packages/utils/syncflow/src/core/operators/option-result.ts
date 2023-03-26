@@ -1,3 +1,4 @@
+import { Maybe, Result } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type InitializedToInitializedOperator,
