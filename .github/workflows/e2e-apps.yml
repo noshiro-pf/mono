@@ -144,10 +144,10 @@ jobs:
           wait-on: 'http://localhost:5180'
           wait-on-timeout: 120
           # headless: true
-          record: true
-          parallel: true
+          # record: true
+          # parallel: true
         env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY_FOR_EVENT_SCHEDULE_APP }}
+          # CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY_FOR_EVENT_SCHEDULE_APP }}
           # Recommended: pass the GitHub token lets this action correctly
           # determine the unique run id necessary to re-run the checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
