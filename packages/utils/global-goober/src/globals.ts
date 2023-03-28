@@ -4,6 +4,6 @@
   functional/immutable-data
 */
 
-import { styled as _styled } from '@noshiro/goober';
+import { styled } from '@noshiro/goober';
 
-(global as any).styled = _styled;
+(global as any).styled = styled;

@@ -1,5 +1,5 @@
-import { tp } from '@noshiro/ts-utils';
+import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginGooberDef = {
-  styled: tp('@noshiro/goober', 'styled'),
-};
+export const providePluginDef = Obj.fromEntries(
+  ['styled'].map((key) => tp(key, tp('@noshiro/goober', key)))
+);

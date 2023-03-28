@@ -1,4 +1,4 @@
-export const eslintNoRestrictedImportsPreactUtilsDef = {
+export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/preact-utils',
   importNames: [
     'memoNamed',

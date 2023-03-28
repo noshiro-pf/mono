@@ -6,6 +6,7 @@
     "packages/**"
   ],
   "scripts": {
+    "build:globals": "yarn zz:cmd:wsrun-stages -p '@noshiro/global-*' -c build",
     "ci": "run-s type-check:root ws:build ws:gi zz:cmd:check:no-diff ci:lint-and-test zz:cmd:check:no-diff",
     "ci:clean-build-and-cache": "run-s clean:build-and-cache ci",
     "ci:clean-gitignored": "run-s clean:gitignored ci:install ci",

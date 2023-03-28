@@ -1,4 +1,4 @@
-export const eslintNoRestrictedImportsSyncflowReactHooksDef = {
+export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/syncflow-react-hooks',
   importNames: [
     'useEventObservable',

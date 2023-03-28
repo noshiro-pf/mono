@@ -1,6 +1,5 @@
 import { AnchorButton, Icon, Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
-import { useRouterLinkClick } from '@noshiro/tiny-router-react-hooks';
 import { aboutThisAppUrl, feedbackUrl, Routes } from '../../constants';
 import { Auth, router, UpdateUserInfoDialogStore } from '../../store';
 import { NoWrapSpan } from '../atoms';

@@ -4,6 +4,6 @@
   functional/immutable-data
 */
 
-import { css as _css } from '@emotion/react';
+import { css } from '@emotion/react';
 
-(global as any).css = _css;
+(global as any).css = css;

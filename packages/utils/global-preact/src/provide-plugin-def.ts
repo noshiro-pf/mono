@@ -1,6 +1,6 @@
 import { Obj, tp } from '@noshiro/ts-utils';
 
-export const providePluginPreactDef = Obj.fromEntries(
+export const providePluginDef = Obj.fromEntries(
   ['useCallback', 'useEffect', 'useMemo', 'useReducer', 'useRef'].map((key) =>
     tp(key, tp('preact/hooks', key))
   )

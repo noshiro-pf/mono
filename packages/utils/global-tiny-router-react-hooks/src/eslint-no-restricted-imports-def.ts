@@ -1,4 +1,4 @@
-export const eslintNoRestrictedImportsTinyRouterReactHooksDef = {
+export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/tiny-router-react-hooks',
   importNames: [
     'back',

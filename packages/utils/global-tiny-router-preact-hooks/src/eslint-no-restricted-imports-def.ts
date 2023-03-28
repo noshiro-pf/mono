@@ -1,4 +1,4 @@
-export const eslintNoRestrictedImportsTinyRouterPreactHooksDef = {
+export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/tiny-router-preact-hooks',
   importNames: [
     'back',

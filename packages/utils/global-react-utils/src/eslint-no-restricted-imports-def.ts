@@ -1,4 +1,4 @@
-export const eslintNoRestrictedImportsReactUtilsDef = {
+export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/react-utils',
   importNames: [
     'memoNamed',

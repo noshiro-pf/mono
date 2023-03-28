@@ -1,5 +1,9 @@
-import { type css as _css } from '@emotion/react';
+import { type css as VAR_css } from '@emotion/react';
 
 declare global {
-  const css: typeof _css;
+  /* custom types */
+
+  const css: typeof VAR_css;
+
+  /* custom variables */
 }
