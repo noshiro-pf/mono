@@ -98,7 +98,7 @@ done
 
 rm -rf "dist"/*.bak
 
-node ./scripts/gen-stdlib-dts.js
+node ./scripts/gen-stdlib-dts.mjs
 
 # ###### prettier ######
 

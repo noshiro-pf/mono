@@ -2,5 +2,4 @@
 !dist/*.d.ts
 !unchanged
 !unchanged/*.d.ts
-!scripts/gen-stdlib-dts.js
 !stdlib.d.ts

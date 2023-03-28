@@ -5,7 +5,7 @@
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 
 const { readGitignoreFiles } = require('eslint-gitignore');
-const { join } = require('path');
+const { join } = require('node:path');
 const { plugins } = require('./eslint-plugins');
 
 /** @type {LinterConfig} */
@@ -46,7 +46,16 @@ const config = {
   },
   settings: {
     'import/parsers': {
-      '@typescript-eslint/parser': ['.test.ts', '.ts', '.tsx'],
+      '@typescript-eslint/parser': [
+        '.test.ts',
+        '.mts',
+        '.cts',
+        '.ts',
+        '.tsx',
+        '.mjs',
+        '.cjs',
+        '.js',
+      ],
     },
     'import/resolver': {
       typescript: {
@@ -77,16 +86,7 @@ const config = {
     ...readGitignoreFiles({ cwd: __dirname }),
     '*_bs.ts',
     '*.d.ts',
-
-    // configs & scripts
     '.eslintrc.cjs',
-    'app_directory.js',
-    'env.js',
-    'paths.js',
-    'cypress.config.js',
-    'cypress.config.ts',
-    'gen.js',
-    'gen-global-dts.js',
   ],
 };
 

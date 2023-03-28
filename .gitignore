@@ -17,11 +17,12 @@ experimental/**/scripts/**/*.js
 config/**/*.js
 scripts/**/*.js
 **/*.d.ts
+**/*.d.mts
+**/*.d.cts
 !**/react-app-env.d.ts
 !**/vite-env.d.ts
 !**/globals.d.ts
 *.tsbuildinfo
-!**/gen-global-dts.js
 
 # Logs
 logs
