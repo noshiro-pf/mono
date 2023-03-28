@@ -20,14 +20,3 @@ export const emojis = {
 export const embedMessageColor = '#3e68b0';
 
 export const footerText = 'Last Update';
-
-// psql
-export const psqlTableName = 'main';
-
-export const psqlRowType = {
-  id: 'id',
-  data: 'data',
-  updated_at: 'updated_at',
-} as const;
-
-export const psqlRowId = '2023-03-05_01:57';

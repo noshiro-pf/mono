@@ -1,12 +1,24 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 import dotenv from 'dotenv';
 
-dotenv.config();
+// eslint-disable-next-line functional/readonly-type, @typescript-eslint/ban-types
+const NODE_ENV: 'development' | 'production' | (string & {}) | undefined =
+  process.env['NODE_ENV'];
+
+console.log(`NODE_ENV = "${NODE_ENV ?? ''}"`);
+
+export const isDev = NODE_ENV === 'development';
+
+dotenv.config({
+  path:
+    mapOptional(NODE_ENV, (n) =>
+      match(n, {
+        development: '.env.dev',
+        production: '.env.prd',
+      })
+    ) ?? '.env',
+});
 
 export const DISCORD_TOKEN = process.env['DISCORD_TOKEN'] ?? '';
 
-export const isDev = process.env['NODE_ENV'] === 'development';
-
-export const DATABASE_URL = isDev
-  ? process.env['LOCAL_DATABASE_URL']
-  : process.env['DATABASE_URL'];
+export const useEmulators: boolean = false as boolean;

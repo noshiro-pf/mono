@@ -1,11 +1,7 @@
-import { DateUtils, IMap, Result, tp } from '@noshiro/ts-utils';
-import {
-  type DMChannel,
-  type Message,
-  type NewsChannel,
-  type TextChannel,
-} from 'discord.js';
+import type * as Discord from 'discord.js';
+import { ChannelType } from 'discord.js';
 import { emojis, triggerCommand } from '../constants';
+import { firestoreApi } from '../firebase';
 import {
   convertRp30ArgToRpArgs,
   convertRp30dArgToRpArgs,
@@ -20,7 +16,6 @@ import {
   rpCreateSummaryMessage,
   rpParseCommand,
 } from '../functions';
-import { addPoll } from '../in-memory-database';
 import {
   answerOfDateDefaultValue,
   toCommandMessageId,
@@ -30,36 +25,43 @@ import {
   toTitleMessageId,
   type AnswerOfDate,
   type CommandMessageId,
-  type DatabaseRef,
   type DateOption,
   type DateOptionId,
   type Group,
-  type PsqlClient,
+  type Poll,
   type TitleMessageId,
   type UserId,
 } from '../types';
 
 const rpSendPollMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: DMChannel | NewsChannel | TextChannel,
+  messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
   title: string,
   args: readonly string[]
 ): Promise<
   Result<
     Readonly<{
       dateOptions: readonly DateOption[];
-      dateOptionMessageList: readonly Message[];
-      summaryMessage: Message;
+      dateOptionMessageList: readonly Discord.Message[];
+      summaryMessage: Discord.Message;
       titleMessageId: TitleMessageId;
     }>,
     unknown
   >
 > => {
+  if (messageChannel.type !== ChannelType.GuildText) {
+    return Result.err(
+      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`
+    );
+  }
+
   const titleMessage = await messageChannel.send(createTitleString(title));
   const titleMessageId = toTitleMessageId(titleMessage.id);
 
-  const mut_dateOptionAndMessageListTemp: (readonly [DateOption, Message])[] =
-    [];
+  const mut_dateOptionAndMessageListTemp: (readonly [
+    DateOption,
+    Discord.Message
+  ])[] = [];
 
   for (const el of args) {
     // eslint-disable-next-line no-await-in-loop
@@ -95,7 +97,7 @@ const rpSendPollMessageSub = async (
   );
 
   const summaryMessageInitResult = await Result.fromPromise(
-    messageChannel.send(summaryMessageEmbed)
+    messageChannel.send({ embeds: [summaryMessageEmbed] })
   );
 
   if (Result.isErr(summaryMessageInitResult)) return summaryMessageInitResult;
@@ -104,7 +106,7 @@ const rpSendPollMessageSub = async (
   // memo: "（編集済）" という文字列が表示されてずれるのが操作性を若干損ねるので、
   // あえて一度メッセージを送った後再編集している
   const summaryMessageEditResult = await Result.fromPromise(
-    summaryMessageInit.edit(summaryMessageEmbed)
+    summaryMessageInit.edit({ embeds: [summaryMessageEmbed] })
   );
 
   if (Result.isErr(summaryMessageEditResult)) return summaryMessageEditResult;
@@ -126,10 +128,8 @@ const rpSendPollMessageSub = async (
 };
 
 const rpSendPollMessage = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  discordChannel: Message['channel'],
+  discordChannel: Discord.Message['channel'],
   messageId: CommandMessageId,
   title: string | undefined,
   pollOptions: readonly string[]
@@ -146,21 +146,39 @@ const rpSendPollMessage = async (
   const { summaryMessage, dateOptions, dateOptionMessageList, titleMessageId } =
     replySubResult.value;
 
-  const addPollResult = await addPoll(
-    databaseRef,
-    psqlClient,
-    {
-      id: toPollId(summaryMessage.id),
-      updatedAt: toTimestamp(summaryMessage.createdTimestamp),
-      title,
-      dateOptions,
-      answers: IMap.new<DateOptionId, AnswerOfDate>(
-        dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue))
-      ),
-      titleMessageId,
-    },
-    messageId
-  );
+  const poll: Poll = {
+    id: toPollId(summaryMessage.id),
+    updatedAt: toTimestamp(summaryMessage.createdTimestamp),
+    title,
+    dateOptions,
+    answers: IMap.new<DateOptionId, AnswerOfDate>(
+      dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue))
+    ),
+    titleMessageId,
+  };
+
+  const [
+    setPollResult,
+    setPollIdForCommandMessageIdResult,
+    setPollIdForDateOptionIdsResult,
+  ] = await Promise.all([
+    firestoreApi.setPoll(poll),
+    firestoreApi.setPollIdForCommandMessageId(messageId, poll.id),
+    firestoreApi.setPollIdForDateOptionIds(
+      poll.dateOptions.map((p) => p.id),
+      poll.id
+    ),
+  ]);
+
+  if (Result.isErr(setPollResult)) {
+    return setPollResult;
+  }
+  if (Result.isErr(setPollIdForCommandMessageIdResult)) {
+    return setPollIdForCommandMessageIdResult;
+  }
+  if (Result.isErr(setPollIdForDateOptionIdsResult)) {
+    return setPollIdForDateOptionIdsResult;
+  }
 
   await Promise.all(
     dateOptionMessageList.map((msg) => msg.react(emojis.good.unicode))
@@ -172,16 +190,22 @@ const rpSendPollMessage = async (
     dateOptionMessageList.map((msg) => msg.react(emojis.poor.unicode))
   );
 
-  return addPollResult;
+  return Result.ok(undefined);
 };
 
 const gpSendGroupingMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: DMChannel | NewsChannel | TextChannel,
+  messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
   groups: readonly Group[]
 ): Promise<Result<undefined, unknown>> => {
+  if (messageChannel.type !== ChannelType.GuildText) {
+    return Result.err(
+      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`
+    );
+  }
+
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send(gpCreateSummaryMessage(groups))
+    messageChannel.send({ embeds: [gpCreateSummaryMessage(groups)] })
   );
 
   return Result.map(summaryMessageResult, () => undefined);
@@ -189,11 +213,17 @@ const gpSendGroupingMessageSub = async (
 
 const gpSendRandMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageChannel: DMChannel | NewsChannel | TextChannel,
+  messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
   n: number
 ): Promise<Result<undefined, unknown>> => {
+  if (messageChannel.type !== ChannelType.GuildText) {
+    return Result.err(
+      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`
+    );
+  }
+
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send(Math.ceil(Math.random() * n))
+    messageChannel.send(Math.ceil(Math.random() * n).toString())
   );
 
   return Result.map(summaryMessageResult, () => undefined);
@@ -201,7 +231,7 @@ const gpSendRandMessageSub = async (
 
 const gpSendGroupingMessage = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageFilled: Message
+  messageFilled: Discord.Message
 ): Promise<Result<undefined, unknown>> => {
   const parseResult = gpParseGroupingCommandArgument(
     removeCommandPrefix(messageFilled.content, triggerCommand.gp)
@@ -222,7 +252,7 @@ const gpSendGroupingMessage = async (
 
 const gpSendRandMessage = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageFilled: Message
+  messageFilled: Discord.Message
 ): Promise<Result<undefined, unknown>> => {
   const parseResult = gpParseRandCommandArgument(
     removeCommandPrefix(messageFilled.content, triggerCommand.rand)
@@ -237,10 +267,8 @@ const gpSendRandMessage = async (
 };
 
 export const sendMessageMain = async (
-  databaseRef: DatabaseRef,
-  psqlClient: PsqlClient,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  message: Message
+  message: Discord.Message
 ): Promise<Result<undefined, unknown>> => {
   if (message.author.bot) return Result.ok(undefined);
 
@@ -255,8 +283,6 @@ export const sendMessageMain = async (
   if (message.content.startsWith(`${triggerCommand.rp} `)) {
     const [title, ...args] = rpParseCommand(message.content);
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       title,
@@ -272,8 +298,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
@@ -289,8 +313,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
@@ -306,8 +328,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
@@ -323,8 +343,6 @@ export const sendMessageMain = async (
     if (Result.isErr(res)) return res;
 
     return rpSendPollMessage(
-      databaseRef,
-      psqlClient,
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,

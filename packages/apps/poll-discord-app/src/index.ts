@@ -4,7 +4,6 @@
 
 /// <reference path="./globals.d.ts" />
 
-import { Result } from '@noshiro/ts-utils';
 import { main } from './main';
 
 main()

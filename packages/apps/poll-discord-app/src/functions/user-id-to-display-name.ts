@@ -1,11 +1,10 @@
-import { castWritable, IMap, Result, Str } from '@noshiro/ts-utils';
-import { type Collection, type Guild, type GuildMember } from 'discord.js';
+import type * as Discord from 'discord.js';
 import { toUserId, type UserId } from '../types';
 import { quoteIfSpaceIncluded } from './quote-if-space-included';
 
 export const createUserIdToDisplayNameMap = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  guild: Guild | null,
+  guild: Discord.Guild | null,
   userIds: readonly UserId[] | undefined
 ): Promise<Result<IMap<UserId, string>, string>> => {
   if (guild === null) {
@@ -13,7 +12,7 @@ export const createUserIdToDisplayNameMap = async (
   }
 
   const guildMembersResult: Result<
-    Collection<string, GuildMember>,
+    Discord.Collection<string, Discord.GuildMember>,
     unknown
   > = await Result.fromPromise(
     userIds === undefined
