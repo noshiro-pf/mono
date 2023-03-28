@@ -1,4 +1,4 @@
-import { Arr, MutableSet, pipe, type Some } from '@noshiro/ts-utils';
+import { Arr, MutableSet, pipe, type Maybe } from '@noshiro/ts-utils';
 import {
   isManagerObservable,
   type AsyncChildObservable,
@@ -225,8 +225,8 @@ export class InitializedSyncChildObservableClass<
     super({ type, parents, depth, currentValueInit });
   }
 
-  override get currentValue(): Some<A> {
-    return super.getCurrentValue() as Some<A>;
+  override get currentValue(): Maybe.Some<A> {
+    return super.getCurrentValue() as Maybe.Some<A>;
   }
 
   override chain<B>(

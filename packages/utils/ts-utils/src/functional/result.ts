@@ -1,35 +1,35 @@
+const OkTypeSymbol: unique symbol = Symbol('Result.ok');
+const ErrTypeSymbol: unique symbol = Symbol('Result.err');
+
+type _Ok<S> = Readonly<{
+  type: typeof OkTypeSymbol;
+  value: S;
+}>;
+
+type _Err<E> = Readonly<{
+  type: typeof ErrTypeSymbol;
+  value: E;
+}>;
+
+export type Result<S, E> = _Err<E> | _Ok<S>;
+
 export namespace Result {
-  const OkTypeSymbol: unique symbol = Symbol('Result.ok');
-  const ErrTypeSymbol: unique symbol = Symbol('Result.err');
+  export type Ok<S> = _Ok<S>;
+  export type Err<E> = _Err<E>;
 
-  /** @internal */
-  export type _Ok<S> = Readonly<{
-    type: typeof OkTypeSymbol;
-    value: S;
-  }>;
+  export type Base = Result<unknown, unknown>;
 
-  /** @internal */
-  export type _Err<E> = Readonly<{
-    type: typeof ErrTypeSymbol;
-    value: E;
-  }>;
+  export type UnwrapOk<R extends Base> = R extends Ok<infer S> ? S : never;
 
-  /** @internal */
-  export type _Result<S, E> = _Err<E> | _Ok<S>;
+  export type UnwrapErr<R extends Base> = R extends Err<infer E> ? E : never;
 
-  export type Base = _Result<unknown, unknown>;
+  export type NarrowToOk<R extends Base> = R extends Err<unknown> ? never : R;
 
-  export type UnwrapOk<R extends Base> = R extends _Ok<infer S> ? S : never;
+  export type NarrowToErr<R extends Base> = R extends Ok<unknown> ? never : R;
 
-  export type UnwrapErr<R extends Base> = R extends _Err<infer E> ? E : never;
+  export const ok = <S>(value: S): Ok<S> => ({ type: OkTypeSymbol, value });
 
-  export type NarrowToOk<R extends Base> = R extends _Err<unknown> ? never : R;
-
-  export type NarrowToErr<R extends Base> = R extends _Ok<unknown> ? never : R;
-
-  export const ok = <S>(value: S): _Ok<S> => ({ type: OkTypeSymbol, value });
-
-  export const err = <E>(value: E): _Err<E> => ({ type: ErrTypeSymbol, value });
+  export const err = <E>(value: E): Err<E> => ({ type: ErrTypeSymbol, value });
 
   // eslint-disable-next-line no-restricted-globals
   const _toStr = String;
@@ -43,24 +43,24 @@ export namespace Result {
   export const map = <R extends Base, S2>(
     result: R,
     mapFn: (value: UnwrapOk<R>) => S2
-  ): _Result<S2, UnwrapErr<R>> =>
+  ): Result<S2, UnwrapErr<R>> =>
     isErr(result)
-      ? (result as _Err<UnwrapErr<R>>)
+      ? (result as Err<UnwrapErr<R>>)
       : ok(mapFn(result.value as UnwrapOk<R>));
 
   export const mapErr = <R extends Base, E2>(
     result: R,
     mapFn: (error: UnwrapErr<R>) => E2
-  ): _Result<UnwrapOk<R>, E2> =>
+  ): Result<UnwrapOk<R>, E2> =>
     isOk(result)
-      ? (result as _Ok<UnwrapOk<R>>)
+      ? (result as Ok<UnwrapOk<R>>)
       : err(mapFn(result.value as UnwrapErr<R>));
 
   export const fold = <R extends Base, S2, E2>(
     result: R,
     mapFn: (value: UnwrapOk<R>) => S2,
     mapErrFn: (error: UnwrapErr<R>) => E2
-  ): _Result<S2, E2> =>
+  ): Result<S2, E2> =>
     isOk(result)
       ? ok(mapFn(result.value as UnwrapOk<R>))
       : err(mapErrFn(result.value as UnwrapErr<R>));
@@ -112,10 +112,6 @@ export namespace Result {
 
   export const fromPromise = <P extends Promise<unknown>>(
     promise: P
-  ): Promise<_Result<UnwrapPromise<P>, unknown>> =>
-    promise.then((v) => ok(v) as _Ok<UnwrapPromise<P>>).catch(err);
+  ): Promise<Result<UnwrapPromise<P>, unknown>> =>
+    promise.then((v) => ok(v) as Ok<UnwrapPromise<P>>).catch(err);
 }
-
-export type Result<S, E> = Result._Result<S, E>;
-export type Ok<S> = Result._Ok<S>;
-export type Err<E> = Result._Err<E>;

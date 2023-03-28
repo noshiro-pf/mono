@@ -1,37 +1,37 @@
+const SomeTypeSymbol: unique symbol = Symbol('Maybe.some');
+const NoneTypeSymbol: unique symbol = Symbol('Maybe.none');
+
+type _Some<S> = Readonly<{
+  type: typeof SomeTypeSymbol;
+  value: S;
+}>;
+
+type _None = Readonly<{
+  type: typeof NoneTypeSymbol;
+}>;
+
+export type Maybe<S> = _None | _Some<S>;
+
 export namespace Maybe {
-  const SomeTypeSymbol: unique symbol = Symbol('Maybe.some');
-  const NoneTypeSymbol: unique symbol = Symbol('Maybe.none');
+  export type Some<S> = _Some<S>;
+  export type None = _None;
 
-  /** @internal */
-  export type _Some<S> = Readonly<{
-    type: typeof SomeTypeSymbol;
-    value: S;
-  }>;
+  export type Base = Maybe<unknown>;
 
-  /** @internal */
-  export type _None = Readonly<{
-    type: typeof NoneTypeSymbol;
-  }>;
+  export type Unwrap<M extends Base> = M extends Some<infer S> ? S : never;
 
-  /** @internal */
-  export type _Maybe<S> = _None | _Some<S>;
+  export type NarrowToSome<M extends Base> = M extends None ? never : M;
 
-  export type Base = _Maybe<unknown>;
-
-  export type Unwrap<M extends Base> = M extends _Some<infer S> ? S : never;
-
-  export type NarrowToSome<M extends Base> = M extends _None ? never : M;
-
-  export type NarrowToNone<M extends Base> = M extends _Some<unknown>
+  export type NarrowToNone<M extends Base> = M extends Some<unknown>
     ? never
     : M;
 
-  export const some = <S>(value: S): _Some<S> => ({
+  export const some = <S>(value: S): Some<S> => ({
     type: SomeTypeSymbol,
     value,
   });
 
-  export const none: _None = { type: NoneTypeSymbol } as const;
+  export const none: None = { type: NoneTypeSymbol } as const;
 
   export const isSome = <M extends Base>(maybe: M): maybe is NarrowToSome<M> =>
     maybe.type === SomeTypeSymbol;
@@ -42,7 +42,7 @@ export namespace Maybe {
   export const map = <M extends Base, S2>(
     maybe: M,
     mapFn: (value: Unwrap<M>) => S2
-  ): _Maybe<S2> =>
+  ): Maybe<S2> =>
     isNone(maybe)
       ? none
       : some(mapFn((maybe as NarrowToSome<M>).value as Unwrap<M>));
@@ -74,7 +74,3 @@ export namespace Maybe {
       return (maybe as NarrowToSome<M>).value as Unwrap<M>;
     };
 }
-
-export type Maybe<S> = Maybe._Maybe<S>;
-export type Some<S> = Maybe._Some<S>;
-export type None = Maybe._None;
