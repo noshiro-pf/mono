@@ -6,13 +6,13 @@ export type TehaiType = 'Chi-toi' | 'Kokushi' | 'normal';
 
 export type MaximizeTarget = 'exp' | 'winProb';
 
-export type Shanten = UintRange<0, 13> | -1;
+export type Shanten = UintRange<0, 14> | -1;
 
-export type Turn = UintRange<1, 17>;
+export type Turn = UintRange<1, 18>;
 
-export type DoraIndicatorPosition = UintRange<0, 4>;
+export type DoraIndicatorPosition = UintRange<0, 5>;
 
-export type NumTiles = UintRange<0, 4>;
+export type NumTiles = UintRange<0, 5>;
 
 export type TileName =
   // eslint-disable-next-line @typescript-eslint/sort-type-constituents

@@ -165,7 +165,9 @@ export const problem2String = (
   return mut_str;
 };
 
-export const aka2Normal = (tile: TileName): TileName => {
+export const aka2Normal = (
+  tile: TileName
+): StrictExclude<TileName, 'AkaManzu5' | 'AkaPinzu5' | 'AkaSozu5'> => {
   switch (tile) {
     case 'AkaManzu5':
       return 'Manzu5';
@@ -178,5 +180,7 @@ export const aka2Normal = (tile: TileName): TileName => {
   }
 };
 
-export const shanten2String = (shanten: Shanten): string =>
+export const shanten2String = (
+  shanten: Shanten
+): '和了' | '聴牌' | `${Shanten}向聴` =>
   shanten === -1 ? '和了' : shanten === 0 ? '聴牌' : `${shanten}向聴`;

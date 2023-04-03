@@ -260,7 +260,7 @@ export const addTile2Hand = (tile: TileName): void => {
 
 // 牌を手牌から削除する。
 export const removeTileFromHand = (tile: TileName): void => {
-  updateHand((hand) => Arr.remove(hand, hand.indexOf(tile)));
+  updateHand((hand) => Arr.remove(hand, Arr.indexOf(hand, tile)));
 };
 
 // 牌を副露ブロックの一覧に追加する。
@@ -270,7 +270,9 @@ export const addRevealedBlock = (block: RevealedBlock): void => {
 
 // 牌を副露ブロックの一覧から削除する。
 export const removeRevealedBlock = (block: RevealedBlock): void => {
-  updateRevealedBlocks((blocks) => Arr.remove(blocks, blocks.indexOf(block)));
+  updateRevealedBlocks((blocks) =>
+    Arr.remove(blocks, Arr.indexOf(blocks, block))
+  );
 };
 
 // 牌をドラ表示牌の一覧に追加する。
@@ -285,43 +287,43 @@ export const removeDora = (index: DoraIndicatorPosition): void => {
 
 // 牌山を作成する。
 const allTiles: readonly TileName[] = [
-  Arr.newArrayUnwrapped(4, 'Manzu1' as const),
-  Arr.newArrayUnwrapped(4, 'Manzu2' as const),
-  Arr.newArrayUnwrapped(4, 'Manzu3' as const),
-  Arr.newArrayUnwrapped(4, 'Manzu4' as const),
-  Arr.newArrayUnwrapped(3, 'Manzu5' as const),
+  Arr.newArray(4, 'Manzu1' as const),
+  Arr.newArray(4, 'Manzu2' as const),
+  Arr.newArray(4, 'Manzu3' as const),
+  Arr.newArray(4, 'Manzu4' as const),
+  Arr.newArray(3, 'Manzu5' as const),
   'AkaManzu5' as const,
-  Arr.newArrayUnwrapped(4, 'Manzu6' as const),
-  Arr.newArrayUnwrapped(4, 'Manzu7' as const),
-  Arr.newArrayUnwrapped(4, 'Manzu8' as const),
-  Arr.newArrayUnwrapped(4, 'Manzu9' as const),
-  Arr.newArrayUnwrapped(4, 'Pinzu1' as const),
-  Arr.newArrayUnwrapped(4, 'Pinzu2' as const),
-  Arr.newArrayUnwrapped(4, 'Pinzu3' as const),
-  Arr.newArrayUnwrapped(4, 'Pinzu4' as const),
-  Arr.newArrayUnwrapped(3, 'Pinzu5' as const),
+  Arr.newArray(4, 'Manzu6' as const),
+  Arr.newArray(4, 'Manzu7' as const),
+  Arr.newArray(4, 'Manzu8' as const),
+  Arr.newArray(4, 'Manzu9' as const),
+  Arr.newArray(4, 'Pinzu1' as const),
+  Arr.newArray(4, 'Pinzu2' as const),
+  Arr.newArray(4, 'Pinzu3' as const),
+  Arr.newArray(4, 'Pinzu4' as const),
+  Arr.newArray(3, 'Pinzu5' as const),
   'AkaPinzu5' as const,
-  Arr.newArrayUnwrapped(4, 'Pinzu6' as const),
-  Arr.newArrayUnwrapped(4, 'Pinzu7' as const),
-  Arr.newArrayUnwrapped(4, 'Pinzu8' as const),
-  Arr.newArrayUnwrapped(4, 'Pinzu9' as const),
-  Arr.newArrayUnwrapped(4, 'Sozu1' as const),
-  Arr.newArrayUnwrapped(4, 'Sozu2' as const),
-  Arr.newArrayUnwrapped(4, 'Sozu3' as const),
-  Arr.newArrayUnwrapped(4, 'Sozu4' as const),
-  Arr.newArrayUnwrapped(3, 'Sozu5' as const),
+  Arr.newArray(4, 'Pinzu6' as const),
+  Arr.newArray(4, 'Pinzu7' as const),
+  Arr.newArray(4, 'Pinzu8' as const),
+  Arr.newArray(4, 'Pinzu9' as const),
+  Arr.newArray(4, 'Sozu1' as const),
+  Arr.newArray(4, 'Sozu2' as const),
+  Arr.newArray(4, 'Sozu3' as const),
+  Arr.newArray(4, 'Sozu4' as const),
+  Arr.newArray(3, 'Sozu5' as const),
   'AkaSozu5' as const,
-  Arr.newArrayUnwrapped(4, 'Sozu6' as const),
-  Arr.newArrayUnwrapped(4, 'Sozu7' as const),
-  Arr.newArrayUnwrapped(4, 'Sozu8' as const),
-  Arr.newArrayUnwrapped(4, 'Sozu9' as const),
-  Arr.newArrayUnwrapped(4, 'Ton' as const),
-  Arr.newArrayUnwrapped(4, 'Nan' as const),
-  Arr.newArrayUnwrapped(4, 'Sha' as const),
-  Arr.newArrayUnwrapped(4, 'Pei' as const),
-  Arr.newArrayUnwrapped(4, 'Haku' as const),
-  Arr.newArrayUnwrapped(4, 'Hatsu' as const),
-  Arr.newArrayUnwrapped(4, 'Chun' as const),
+  Arr.newArray(4, 'Sozu6' as const),
+  Arr.newArray(4, 'Sozu7' as const),
+  Arr.newArray(4, 'Sozu8' as const),
+  Arr.newArray(4, 'Sozu9' as const),
+  Arr.newArray(4, 'Ton' as const),
+  Arr.newArray(4, 'Nan' as const),
+  Arr.newArray(4, 'Sha' as const),
+  Arr.newArray(4, 'Pei' as const),
+  Arr.newArray(4, 'Haku' as const),
+  Arr.newArray(4, 'Hatsu' as const),
+  Arr.newArray(4, 'Chun' as const),
 ].flat();
 
 // ランダムな手牌を設定する。

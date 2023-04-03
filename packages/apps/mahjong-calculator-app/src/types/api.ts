@@ -11,7 +11,7 @@ export type ApiMeldedBlock = Readonly<{
    * | Minkan |   3   |    明槓     |
    * | Kakan  |   4   |    加槓     |
    */
-  type: UintRange<0, 4>;
+  type: UintRange<0, 5>;
 
   tiles: ArrayAtLeastLen<3, Tile['no']>;
 

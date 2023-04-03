@@ -47,7 +47,7 @@ export const toHMRFormatText = ({
     // 4行目: ドラ（※槓ドラ非対応）
     toTiles34([doraHyouji2Dora[firstDraIndicator]]).join(''),
     // 5行目: 捨牌
-    Arr.newArrayUnwrapped(18, -1).join(''),
+    Arr.newArray(18, -1).join(''),
   ].join('\n');
 
   return Result.ok(text);
