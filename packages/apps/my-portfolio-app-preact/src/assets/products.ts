@@ -44,7 +44,7 @@ export const products: DeepReadonly<{
       title: '@noshiro/ts-type-utils',
       subtitle: 'TypeScriptの型ユーティリティ集',
       description:
-        '`type UintRange<1, 5> = 1 | 2 | 3 | 4 | 5` のような型ユーティリティのライブラリ',
+        '`type UintRange<1, 5> = 1 | 2 | 3 | 4` のような型ユーティリティのライブラリ',
       implementation: 'TypeScriptで実装。（最終更新：2022年8月17日）',
       imageUrl: '',
     },

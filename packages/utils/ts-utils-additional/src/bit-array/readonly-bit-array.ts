@@ -1,13 +1,15 @@
-import { Arr, Num, range } from '@noshiro/ts-utils';
+import { Arr, Num, range, toUint32 } from '@noshiro/ts-utils';
+
+type SmallInt = Int9;
 
 export type ReadonlyBitArrayType = Readonly<{
-  size: number;
-  get: (at: number) => 0 | 1 | undefined;
+  size: Uint32;
+  get: (at: Int32 | SmallInt) => 0 | 1 | undefined;
 
   values: () => IterableIterator<0 | 1>;
-  entries: () => IterableIterator<readonly [number, 0 | 1]>;
-  map: (fn: (value: 0 | 1, index: number) => 0 | 1) => ReadonlyBitArrayType;
-  forEach: (fn: (value: 0 | 1, index: number) => void) => void;
+  entries: () => IterableIterator<readonly [Uint32, 0 | 1]>;
+  map: (fn: (value: 0 | 1, index: Uint32) => 0 | 1) => ReadonlyBitArrayType;
+  forEach: (fn: (value: 0 | 1, index: Uint32) => void) => void;
   toString: () => string;
 }>;
 
@@ -20,11 +22,11 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     this.#isInRange = Num.isInRange(0, input.length - 1);
   }
 
-  get size(): number {
-    return this.#data.length;
+  get size(): Uint32 {
+    return toUint32(this.#data.length);
   }
 
-  get(at: number): 0 | 1 | undefined {
+  get(at: Int32 | SmallInt): 0 | 1 | undefined {
     if (!this.#isInRange(at)) {
       return undefined;
     }
@@ -38,19 +40,21 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     }
   }
 
-  *entries(): IterableIterator<readonly [number, 0 | 1]> {
+  *entries(): IterableIterator<readonly [Uint32, 0 | 1]> {
     for (const idx of range(0, this.size)) {
-      yield [idx, this.#data[idx] === 0 ? 0 : 1];
+      yield [toUint32(idx), this.#data[idx] === 0 ? 0 : 1];
     }
   }
 
-  map(fn: (value: 0 | 1, index: number) => 0 | 1): ReadonlyBitArrayType {
-    return ReadonlyBitArray(this.#data.map((v, i) => fn(v === 0 ? 0 : 1, i)));
+  map(fn: (value: 0 | 1, index: Uint32) => 0 | 1): ReadonlyBitArrayType {
+    return ReadonlyBitArray(
+      this.#data.map((v, i) => fn(v === 0 ? 0 : 1, toUint32(i)))
+    );
   }
 
-  forEach(fn: (value: 0 | 1, index: number) => void): void {
+  forEach(fn: (value: 0 | 1, index: Uint32) => void): void {
     for (const [i, v] of this.#data.entries()) {
-      fn(v === 0 ? 0 : 1, i);
+      fn(v === 0 ? 0 : 1, toUint32(i));
     }
   }
 

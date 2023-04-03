@@ -10,7 +10,7 @@ type Props = DeepReadonly<{
   range: { min: number; max: number };
   stepSize: number;
   labelStepSize?: number;
-  labelFractionDigits?: UintRange<0, 20>;
+  labelFractionDigits?: UintRange<0, 21>;
   customLabelValues?: readonly number[];
   onChange?: (value: Readonly<{ min: number; max: number }>) => void;
   onRelease?: (value: Readonly<{ min: number; max: number }>) => void;

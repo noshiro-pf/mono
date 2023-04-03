@@ -1,6 +1,6 @@
 import { fillHoursMinutes } from '@noshiro/event-schedule-app-shared';
 
-export type HoursMinutesMapKey = Phantomic<string, 'HoursMinutesMapKey'>;
+export type HoursMinutesMapKey = Brand<string, 'HoursMinutesMapKey'>;
 
 export const timeRangeToMapKey = (
   timeRange: HoursMinutes

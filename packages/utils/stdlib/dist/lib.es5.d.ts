@@ -36,7 +36,7 @@ declare function eval(x: string): unknown;
  * If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal.
  * All other strings are considered decimal.
  */
-declare function parseInt(string: string, radix?: UintRange<2, 36>): number;
+declare function parseInt(string: string, radix?: UintRange<2, 37>): number;
 
 /**
  * Converts a string to a floating-point number.
@@ -650,25 +650,25 @@ interface Number {
    * Returns a string representation of an object.
    * @param radix Specifies a radix for converting numeric values to strings. This value is only used for numbers.
    */
-  toString(radix?: UintRange<2, 36>): string;
+  toString(radix?: UintRange<2, 37>): string;
 
   /**
    * Returns a string representing a number in fixed-point notation.
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
-  toFixed(fractionDigits?: UintRange<0, 20>): string;
+  toFixed(fractionDigits?: UintRange<0, 21>): string;
 
   /**
    * Returns a string containing a number represented in exponential notation.
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
-  toExponential(fractionDigits?: UintRange<0, 20>): string;
+  toExponential(fractionDigits?: UintRange<0, 21>): string;
 
   /**
    * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.
    * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
    */
-  toPrecision(precision?: UintRange<1, 21>): string;
+  toPrecision(precision?: UintRange<1, 22>): string;
 
   /** Returns the primitive value of the specified object. */
   valueOf(): number;

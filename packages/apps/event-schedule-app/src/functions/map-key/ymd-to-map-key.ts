@@ -1,4 +1,4 @@
-export type YmdKey = Phantomic<string, 'YmdKey'>;
+export type YmdKey = Brand<string, 'YmdKey'>;
 
 export const ymdToKey = ({ year, month, date }: YearMonthDate): YmdKey =>
   `${year}-${month}-${date}` as YmdKey;

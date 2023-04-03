@@ -1,6 +1,6 @@
 import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
 
-export type DatetimeRangeMapKey = Phantomic<string, 'DatetimeRangeMapKey'>;
+export type DatetimeRangeMapKey = Brand<string, 'DatetimeRangeMapKey'>;
 
 export const datetimeRangeToMapKey = (
   datetimeRange: DatetimeRange

@@ -1,6 +1,6 @@
 import { fillDatetimeRange } from '@noshiro/event-schedule-app-shared';
 
-export type AnswerSelectionMapKey = Phantomic<string, 'AnswerSelectionMapKey'>;
+export type AnswerSelectionMapKey = Brand<string, 'AnswerSelectionMapKey'>;
 
 type AnswerSelectionData = Readonly<{
   answerId: AnswerId;

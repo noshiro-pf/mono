@@ -7,7 +7,7 @@ type Props = Readonly<{
   min: number;
   max: number;
   value: number;
-  labelFractionDigits: UintRange<0, 20>;
+  labelFractionDigits: UintRange<0, 21>;
   onChange: (value: number) => void;
   onRelease: (value: number) => void;
 }>;

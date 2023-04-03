@@ -1,5 +1,5 @@
-import { Num } from '@noshiro/ts-utils';
+import { Arr, Uint32 } from '@noshiro/ts-utils';
 
-export const randomArrayElement = <T>(array: readonly T[]): T =>
+export const randomArrayElement = <T>(array: NonEmptyArray<T>): T =>
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  array[Num.randInt(0, array.length - 1)]!;
+  array[Uint32.random(0, Uint32.sub0(Arr.length(array), 1))]!;

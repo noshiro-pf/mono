@@ -3,7 +3,7 @@ export const calcPrincipalEqualPayment = ({
   borrowingTotalYen: borrowingTotal,
   interestRatePerMonth: interestRate,
 }: Readonly<{
-  borrowingPeriodMonth: number;
+  borrowingPeriodMonth: Uint32;
   borrowingTotalYen: number;
   interestRatePerMonth: number;
 }>): Readonly<{
@@ -14,7 +14,7 @@ export const calcPrincipalEqualPayment = ({
 }> => {
   const fixedPrincipalYenPerMonth = borrowingTotal / numPayments;
 
-  const borrowingBalanceYen = Arr.seqUnwrapped(numPayments + 1).map(
+  const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map(
     (i) => borrowingTotal - i * fixedPrincipalYenPerMonth
   );
 

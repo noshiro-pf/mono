@@ -2,7 +2,7 @@
  * @internal
  * union の要素の中に K をキーとして含むものが一つでもあれば false、そうでなければ true を返す。
  */
-export type NoUnionMemberHasKey<O extends object, K> = (
+export type _NoUnionMemberHasKey<O extends object, K> = (
   O extends O ? (K extends keyof O ? 1 : 0) : never
 ) extends 0
   ? true
@@ -15,8 +15,8 @@ export type NoUnionMemberHasKey<O extends object, K> = (
  * union の要素の中に K をキーとして含むものが一つも無ければ、`Record<K, unknown>` を返す。
  * 結果には Readonly を付ける。
  */
-export type AppendKey<O extends object, K extends PropertyKey> = Readonly<
-  NoUnionMemberHasKey<O, K> extends true
+export type _AppendKey<O extends object, K extends PropertyKey> = Readonly<
+  _NoUnionMemberHasKey<O, K> extends true
     ? O & Record<K, unknown>
     : O extends O // union distribution
     ? K extends keyof O
@@ -25,10 +25,13 @@ export type AppendKey<O extends object, K extends PropertyKey> = Readonly<
     : never
 >;
 
+/**
+ * @experimental
+ */
 export const hasKey2 = <K extends PropertyKey, O extends object>(
   // eslint-disable-next-line @typescript-eslint/ban-types
   obj: O,
   key: K
-): obj is AppendKey<O, K> =>
+): obj is _AppendKey<O, K> =>
   // eslint-disable-next-line no-restricted-globals, prefer-object-has-own, no-restricted-syntax
   Object.prototype.hasOwnProperty.call(obj, key);

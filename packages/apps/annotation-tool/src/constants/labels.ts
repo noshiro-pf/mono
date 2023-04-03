@@ -1,8 +1,4 @@
-import {
-  pickupHighContrastHues,
-  type Hue,
-  type Percent,
-} from '@noshiro/ts-utils-additional';
+import { pickupHighContrastHues, type Hue } from '@noshiro/ts-utils-additional';
 import { type Label } from '../canvas';
 
 export const [

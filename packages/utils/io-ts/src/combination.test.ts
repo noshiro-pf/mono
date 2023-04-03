@@ -10,8 +10,8 @@ describe('nested record', () => {
   const nestedRecord = record({
     xs: array(int(2)),
     rec: record({
-      a: uintRange({ min: 0, max: 10, defaultValue: 0 }),
-      b: uintRange({ min: 0, max: 10, defaultValue: 0 }),
+      a: uintRange({ start: 0, end: 11, defaultValue: 0 }),
+      b: uintRange({ start: 0, end: 11, defaultValue: 0 }),
     }),
     meta: number(100),
   });
@@ -84,9 +84,9 @@ describe('nested record', () => {
       };
 
       expect(nestedRecord.validate(x).value).toStrictEqual([
-        `The value at record key "xs" is expected to be <Int[]>, but it is actually '[-1,2.2,3.3]'.`,
-        `The array element is expected to be <Int>, but the actual value at index 1 is '2.2'.`,
-        `The value is expected to be <Int>, but it is actually '2.2'.`,
+        `The value at record key "xs" is expected to be <(Finite & Int)[]>, but it is actually '[-1,2.2,3.3]'.`,
+        `The array element is expected to be <Finite & Int>, but the actual value at index 1 is '2.2'.`,
+        `The value must satisfy the constraint corresponding to the brand keys: <Finite & Int>, but it is actually '2.2'.`,
       ]);
     });
   });
@@ -235,13 +235,13 @@ describe('ymd2', () => {
     year: positiveInteger(1900),
     month: uintRange({
       defaultValue: 1,
-      min: 1,
-      max: 12,
+      start: 1,
+      end: 13,
     }),
     date: uintRange({
       defaultValue: 1,
-      min: 1,
-      max: 31,
+      start: 1,
+      end: 32,
     }),
   });
 

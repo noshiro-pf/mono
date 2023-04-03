@@ -1,6 +1,7 @@
 import { useDebounce } from '@noshiro/react-utils';
-import { type Hue, type Percent } from '@noshiro/ts-utils-additional';
+import { type Hue } from '@noshiro/ts-utils-additional';
 import { calcAll } from '../../../functions';
+import { type DivisionNumber } from '../../../types';
 import { LuminanceVisualizerView } from './luminance-visualizer-view';
 
 const saturationInit = 80;
@@ -20,7 +21,7 @@ export const LuminanceVisualizer = memoNamed('LuminanceVisualizer', () => {
   const { state: firstHue, setState: setFirstHue } = useState<Hue>(hueInit);
 
   const { state: divisionNumber, setState: setDivisionNumber } =
-    useState<number>(divisionNumberInit);
+    useState<DivisionNumber>(divisionNumberInit);
 
   /* values */
   const {

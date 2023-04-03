@@ -10,16 +10,12 @@ type WidenLiteral<T> = T extends string
   ? symbol
   : T;
 
-type UintRange<Min extends number, Max extends number> = Exclude<
-  _UintRangeImpl.SeqPlus1<Max>,
-  _UintRangeImpl.Index<Min>
+type UintRange<Start extends number, End extends number> = Exclude<
+  _UintRangeImpl.Index<End>,
+  _UintRangeImpl.Index<Start>
 >;
 
 namespace _UintRangeImpl {
-  export type SeqPlus1<N extends number> = IndexOfTuple<
-    readonly [...MakeTuple<unknown, N>, unknown]
-  >;
-
   export type Index<N extends number> = IndexOfTuple<MakeTuple<unknown, N>>;
 
   type MakeTuple<T, N extends number> = _MakeTupleInternals.MakeTupleImpl<

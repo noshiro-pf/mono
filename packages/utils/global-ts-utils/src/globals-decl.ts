@@ -8,6 +8,7 @@ import {
   type DateUtils as TYPE_DateUtils,
   type DateUtils as VAR_DateUtils,
   type expectType as VAR_expectType,
+  type FiniteNumber as VAR_FiniteNumber,
   type hasKey as VAR_hasKey,
   type hasKeyValue as VAR_hasKeyValue,
   type idfn as VAR_idfn,
@@ -16,12 +17,17 @@ import {
   type IMap as VAR_IMap,
   type IMapMapped as TYPE_IMapMapped,
   type IMapMapped as VAR_IMapMapped,
+  type Int as VAR_Int,
+  type Int32 as VAR_Int32,
+  type isBigint as VAR_isBigint,
   type isBoolean as VAR_isBoolean,
   type ISet as TYPE_ISet,
   type ISet as VAR_ISet,
   type ISetMapped as TYPE_ISetMapped,
   type ISetMapped as VAR_ISetMapped,
+  type isNonNullish as VAR_isNonNullish,
   type isNonNullObject as VAR_isNonNullObject,
+  type isNotBigint as VAR_isNotBigint,
   type isNotBoolean as VAR_isNotBoolean,
   type isNotNull as VAR_isNotNull,
   type isNotNumber as VAR_isNotNumber,
@@ -29,6 +35,7 @@ import {
   type isNotSymbol as VAR_isNotSymbol,
   type isNotUndefined as VAR_isNotUndefined,
   type isNull as VAR_isNull,
+  type isNullish as VAR_isNullish,
   type isNumber as VAR_isNumber,
   type isPrimitive as VAR_isPrimitive,
   type isRecord as VAR_isRecord,
@@ -44,6 +51,7 @@ import {
   type memoizeFunction as VAR_memoizeFunction,
   type MutableMap as VAR_MutableMap,
   type MutableSet as VAR_MutableSet,
+  type NonNegativeNumber as VAR_NonNegativeNumber,
   type noop as VAR_noop,
   type Num as VAR_Num,
   type Obj as VAR_Obj,
@@ -53,12 +61,24 @@ import {
   type RecordUtils as VAR_RecordUtils,
   type Result as TYPE_Result,
   type Result as VAR_Result,
+  type SafeInt as VAR_SafeInt,
+  type SafeUint as VAR_SafeUint,
   type Str as VAR_Str,
   type Subscription as TYPE_Subscription,
   type TinyObservable as TYPE_TinyObservable,
   type TinyObservableSource as TYPE_TinyObservableSource,
   type toBoolean as VAR_toBoolean,
+  type toFiniteNumber as VAR_toFiniteNumber,
+  type toInt as VAR_toInt,
+  type toInt32 as VAR_toInt32,
+  type toNonNegativeNumber as VAR_toNonNegativeNumber,
+  type toSafeInt as VAR_toSafeInt,
+  type toSafeUint as VAR_toSafeUint,
+  type toUint as VAR_toUint,
+  type toUint32 as VAR_toUint32,
   type tp as VAR_tp,
+  type Uint as VAR_Uint,
+  type Uint32 as VAR_Uint32,
 } from '@noshiro/ts-utils';
 
 declare global {
@@ -84,16 +104,22 @@ declare global {
   const createTinyObservable: typeof VAR_createTinyObservable;
   const DateUtils: typeof VAR_DateUtils;
   const expectType: typeof VAR_expectType;
+  const FiniteNumber: typeof VAR_FiniteNumber;
   const hasKey: typeof VAR_hasKey;
   const hasKeyValue: typeof VAR_hasKeyValue;
   const idfn: typeof VAR_idfn;
   const ifThen: typeof VAR_ifThen;
   const IMap: typeof VAR_IMap;
   const IMapMapped: typeof VAR_IMapMapped;
+  const Int: typeof VAR_Int;
+  const Int32: typeof VAR_Int32;
+  const isBigint: typeof VAR_isBigint;
   const isBoolean: typeof VAR_isBoolean;
   const ISet: typeof VAR_ISet;
   const ISetMapped: typeof VAR_ISetMapped;
+  const isNonNullish: typeof VAR_isNonNullish;
   const isNonNullObject: typeof VAR_isNonNullObject;
+  const isNotBigint: typeof VAR_isNotBigint;
   const isNotBoolean: typeof VAR_isNotBoolean;
   const isNotNull: typeof VAR_isNotNull;
   const isNotNumber: typeof VAR_isNotNumber;
@@ -101,6 +127,7 @@ declare global {
   const isNotSymbol: typeof VAR_isNotSymbol;
   const isNotUndefined: typeof VAR_isNotUndefined;
   const isNull: typeof VAR_isNull;
+  const isNullish: typeof VAR_isNullish;
   const isNumber: typeof VAR_isNumber;
   const isPrimitive: typeof VAR_isPrimitive;
   const isRecord: typeof VAR_isRecord;
@@ -115,6 +142,7 @@ declare global {
   const memoizeFunction: typeof VAR_memoizeFunction;
   const MutableMap: typeof VAR_MutableMap;
   const MutableSet: typeof VAR_MutableSet;
+  const NonNegativeNumber: typeof VAR_NonNegativeNumber;
   const noop: typeof VAR_noop;
   const Num: typeof VAR_Num;
   const Obj: typeof VAR_Obj;
@@ -122,9 +150,21 @@ declare global {
   const range: typeof VAR_range;
   const RecordUtils: typeof VAR_RecordUtils;
   const Result: typeof VAR_Result;
+  const SafeInt: typeof VAR_SafeInt;
+  const SafeUint: typeof VAR_SafeUint;
   const Str: typeof VAR_Str;
   const toBoolean: typeof VAR_toBoolean;
+  const toFiniteNumber: typeof VAR_toFiniteNumber;
+  const toInt: typeof VAR_toInt;
+  const toInt32: typeof VAR_toInt32;
+  const toNonNegativeNumber: typeof VAR_toNonNegativeNumber;
+  const toSafeInt: typeof VAR_toSafeInt;
+  const toSafeUint: typeof VAR_toSafeUint;
+  const toUint: typeof VAR_toUint;
+  const toUint32: typeof VAR_toUint32;
   const tp: typeof VAR_tp;
+  const Uint: typeof VAR_Uint;
+  const Uint32: typeof VAR_Uint32;
 
   /* custom variables */
 }

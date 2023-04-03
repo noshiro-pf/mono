@@ -8,12 +8,14 @@ export const rpParseCommand = (command: string): readonly string[] =>
     .filter((_, i) => i % 2 === 1)
     .map((s) => s.replaceAll('\n', ' ').replaceAll('\t', ' '));
 
-const hoursType = t.uintRange({ min: 0, max: 30, defaultValue: 0 });
+const hoursType = t.uintRange({ start: 0, end: 31, defaultValue: 0 });
+
+export type Hours = t.TypeOf<typeof hoursType>;
 
 export const rp3060ParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
   functionName: 'convertRp30ArgsToRpArgs' | 'convertRp60ArgsToRpArgs'
-): Result<readonly [string, number, number], string> => {
+): Result<readonly [string, Hours, Hours], string> => {
   const regexResult =
     /\s*"(?<title>.*)"\s+"?(?<begin>[0-9]{1,2})"?\s+"?(?<end>[0-9]{1,2})"?/u.exec(
       commandArguments
@@ -56,7 +58,7 @@ export const rp3060ParseCommand = (
 export const rp3060dParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
   functionName: 'convertRp30dArgsToRpArgs' | 'convertRp60dArgsToRpArgs'
-): Result<readonly [number, number], string> => {
+): Result<readonly [Hours, Hours], string> => {
   const regexResult =
     /\s*"?(?<begin>[0-9]{1,2})"?\s+"?(?<end>[0-9]{1,2})"?/u.exec(
       commandArguments

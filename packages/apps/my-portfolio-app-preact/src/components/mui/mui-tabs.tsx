@@ -44,7 +44,7 @@ export const MuiTabs = memoNamed<Props>(
       >
     >(
       () =>
-        labels.map((label, index) => ({
+        Arr.map(labels, (label, index) => ({
           index,
           label,
           onClick: () => {

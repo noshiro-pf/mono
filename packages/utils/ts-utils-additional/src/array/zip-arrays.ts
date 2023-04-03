@@ -13,7 +13,7 @@ export function zipArrays<
 
   if (len === undefined) return [];
 
-  return Arr.seqUnwrapped(len).map((i) =>
+  return Arr.seq(len).map((i) =>
     arrays.map((a) => a[i])
   ) as readonly Unwrap<T>[];
 }

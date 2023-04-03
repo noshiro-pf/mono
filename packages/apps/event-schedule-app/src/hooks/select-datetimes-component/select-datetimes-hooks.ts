@@ -48,35 +48,35 @@ export const useSelectDatetimesHooks = (
   /* handlers */
 
   const onDatetimeRangeYmdChange = useCallback(
-    (index: number, ymd: YearMonthDate) => {
+    (index: Uint32, ymd: YearMonthDate) => {
       dispatch({ type: 'ymd', index, ymd });
     },
     [dispatch]
   );
 
   const onDatetimeRangeStartChange = useCallback(
-    (index: number, hm: HoursMinutes) => {
+    (index: Uint32, hm: HoursMinutes) => {
       dispatch({ type: 'start', index, hm });
     },
     [dispatch]
   );
 
   const onDatetimeRangeEndChange = useCallback(
-    (index: number, hm: HoursMinutes) => {
+    (index: Uint32, hm: HoursMinutes) => {
       dispatch({ type: 'end', index, hm });
     },
     [dispatch]
   );
 
   const onDeleteDatetimeClick = useCallback(
-    (index: number) => {
+    (index: Uint32) => {
       dispatch({ type: 'delete', index });
     },
     [dispatch]
   );
 
   const onDuplicateDatetimeClick = useCallback(
-    (index: number) => {
+    (index: Uint32) => {
       dispatch({ type: 'duplicate', index });
     },
     [dispatch]

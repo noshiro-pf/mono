@@ -1,8 +1,8 @@
 import * as t from '@noshiro/io-ts';
 
 export const cardNumberTypeDef = t.uintRange({
-  min: 0,
-  max: 11,
+  start: 0,
+  end: 12,
   defaultValue: 0,
   typeName: 'CardNumber',
 });

@@ -1,9 +1,9 @@
 import { Num } from '@noshiro/ts-utils';
-import { number } from '../primitives';
-import { type Type } from '../type';
-import { brand } from './brand';
+import { number } from '../../primitives';
+import { type Type } from '../../type';
+import { brand } from '../brand';
 
-const is = (a: number): a is Int => !Num.isNaN(a) && Num.isInt(a);
+const is = Num.isInt;
 
 export const int = (defaultValue: number = 0): Type<Int> => {
   if (!is(defaultValue)) {
@@ -14,6 +14,6 @@ export const int = (defaultValue: number = 0): Type<Int> => {
     codec: number(defaultValue),
     is,
     defaultValue,
-    typeName: 'Int',
-  });
+    brandKeys: ['Finite', 'Int'],
+  } as const);
 };

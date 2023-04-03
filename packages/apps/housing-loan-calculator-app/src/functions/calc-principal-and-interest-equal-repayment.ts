@@ -5,7 +5,7 @@ export const calcPrincipalAndInterestEqualPayment = ({
   borrowingTotalYen: borrowingTotal,
   interestRatePerMonth: interestRate,
 }: Readonly<{
-  borrowingPeriodMonth: number;
+  borrowingPeriodMonth: Uint32;
   borrowingTotalYen: number;
   interestRatePerMonth: number;
 }>): Readonly<{
@@ -20,7 +20,7 @@ export const calcPrincipalAndInterestEqualPayment = ({
     interestRate,
   });
 
-  const borrowingBalanceYen = Arr.seqUnwrapped(numPayments + 1).map((ith) =>
+  const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map((ith) =>
     ithBorrowingBalanceInPIER({
       total: borrowingTotal,
       numPayments,

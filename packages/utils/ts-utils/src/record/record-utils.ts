@@ -195,12 +195,12 @@ const fromEntries = <K extends PropertyKey, V>(
 const entries = <R extends RecordBase>(
   object: R
   // eslint-disable-next-line no-restricted-syntax
-): RecordUtilsEntries<R> => Object.entries(object) as RecordUtilsEntries<R>;
+): _RecordUtilsEntries<R> => Object.entries(object) as _RecordUtilsEntries<R>;
 
 /**
  * @internal
  */
-export type RecordUtilsEntries<R extends RecordBase> = R extends R
+export type _RecordUtilsEntries<R extends RecordBase> = R extends R
   ? readonly {
       readonly [K in keyof R]: readonly [
         ToObjectKeysValue<keyof PickByValue<R, R[K]>>,

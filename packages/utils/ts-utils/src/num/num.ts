@@ -58,14 +58,14 @@ const POSITIVE_INFINITY: number = Number.POSITIVE_INFINITY;
  * @param number A numeric value.
  */
 // eslint-disable-next-line no-restricted-globals
-const isInt = (a: number): boolean => Number.isInteger(a);
+const isInt = (a: number): a is Int => Number.isInteger(a);
 
 /**
  * Returns true if the value passed is a safe integer.
  * @param number A numeric value.
  */
 // eslint-disable-next-line no-restricted-globals
-const isSafeInt = (a: number): boolean => Number.isSafeInteger(a);
+const isSafeInt = (a: number): a is SafeInt => Number.isSafeInteger(a);
 
 /**
  * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a
@@ -83,7 +83,7 @@ const isNaN: (a: number) => boolean = Number.isNaN;
  * @param number A numeric value.
  */
 // eslint-disable-next-line no-restricted-globals, @typescript-eslint/no-shadow
-const isFinite: (a: number) => boolean = Number.isFinite;
+const isFinite = (a: number): a is FiniteNumber => Number.isFinite(a);
 
 /**
  * Converts a string to a floating-point number.
@@ -105,12 +105,9 @@ const parseFloat = (str: string): number | undefined => {
  * All other strings are considered decimal.
  */
 // eslint-disable-next-line @typescript-eslint/no-shadow
-const parseInt = (
-  str: string,
-  radix?: UintRange<2, 36>
-): number | undefined => {
+const parseInt = (str: string, radix?: UintRange<2, 37>): Int | undefined => {
   // eslint-disable-next-line no-restricted-globals
-  const result = Number.parseInt(str, radix);
+  const result = Number.parseInt(str, radix) as Int;
 
   return isNaN(result) ? undefined : result;
 };
@@ -123,36 +120,36 @@ const parseInt = (
  */
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const toString =
-  (radix?: UintRange<2, 36>) =>
-  (n: number): string =>
-    n.toString(radix);
+  (radix?: UintRange<2, 37>) =>
+  (n: number): `${number}` =>
+    n.toString(radix) as `${number}`;
 
 /**
  * Returns a string representing a number in fixed-point notation.
  * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
  */
 const toFixed =
-  (fractionDigits?: UintRange<0, 20>) =>
-  (n: number): string =>
-    n.toFixed(fractionDigits);
+  (fractionDigits?: UintRange<0, 21>) =>
+  (n: number): `${number}` =>
+    n.toFixed(fractionDigits) as `${number}`;
 
 /**
  * Returns a string containing a number represented in exponential notation.
  * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
  */
 const toExponential =
-  (fractionDigits?: UintRange<0, 20>) =>
-  (n: number): string =>
-    n.toExponential(fractionDigits);
+  (fractionDigits?: UintRange<0, 21>) =>
+  (n: number): `${number}` =>
+    n.toExponential(fractionDigits) as `${number}`;
 
 /**
  * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.
  * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
  */
 const toPrecision =
-  (precision?: UintRange<1, 21>) =>
-  (n: number): string =>
-    n.toPrecision(precision);
+  (precision?: UintRange<1, 22>) =>
+  (n: number): `${number}` =>
+    n.toPrecision(precision) as `${number}`;
 
 /**
  * Converts a number to a string by using the current or specified locale.
@@ -162,8 +159,8 @@ const toPrecision =
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const toLocaleString =
   (locales?: string | readonly string[], options?: Intl.NumberFormatOptions) =>
-  (n: number): string =>
-    n.toLocaleString(locales, options);
+  (n: number): `${number}` =>
+    n.toLocaleString(locales, options) as `${number}`;
 
 /* custom functions */
 
@@ -171,16 +168,6 @@ const isInRange =
   (min: number, max: number) =>
   (target: number): boolean =>
     min <= target && target <= max;
-
-const isUintInRange =
-  <Min extends number, Max extends number>(min: Min, max: Max) =>
-  (target: number): target is UintRange<Min, Max> =>
-    min <= target && target <= max;
-
-const isUint32Range = isInRange(0, 2 ** 32 - 1);
-
-/** @description check value with Number.isInteger and check range */
-const isUint32 = (a: number): boolean => isInt(a) && isUint32Range(a);
 
 /**
  * @description 値を与えられた範囲内に収める．targetの値が不正な場合はminを返す．
@@ -194,11 +181,27 @@ const clamp =
   (target: number): number =>
     !isFinite(target) ? min : Math.max(min, Math.min(max, target));
 
-const divInt = (a: number, b: number): number =>
-  Math.floor(Math.floor(a) / Math.floor(b));
+const isNonZero = (a: number): a is NonZeroNumber => a !== 0;
 
-const randInt = (min: number, max: number): number =>
-  min + Math.floor((max - min + 1) * Math.random());
+const isPositive = (a: number): a is PositiveNumber => a > 0;
+
+const isNonNegative = (a: number): a is NonNegativeNumber => a >= 0;
+
+const isUintInRange =
+  <Min extends number, Max extends number>(min: Min, max: Max) =>
+  (target: number): target is UintRange<Min, Max> =>
+    min <= target && target <= max;
+
+const isInt32Range = isInRange(-(2 ** 32), 2 ** 32 - 1);
+
+/** @description check value with Number.isInteger and check range */
+const isInt32 = (a: number): a is Int32 => isInt(a) && isInt32Range(a);
+
+/** @description check value with Number.isInteger and check range */
+const isUint32 = (a: number): a is Uint32 => isInt32(a) && isNonNegative(a);
+
+const clampToInt32 = clamp(-(2 ** 32), 2 ** 32 - 1);
+const clampToUint32 = clamp(0, 2 ** 32 - 1);
 
 const roundAt = (val: number, precision: number): number => {
   const digit = 10 ** precision;
@@ -209,7 +212,7 @@ const roundAt = (val: number, precision: number): number => {
 const roundBy = (digit: number, value: number): number =>
   Math.round(value * 10 ** digit) / 10 ** digit;
 
-const roundToInt = (n: number): number => 0 | (n + 0.5);
+const roundToInt = (n: number): Int => (0 | (n + 0.5)) as Int;
 
 const round = (digit: number): ((x: number) => number) => {
   const powAmount = 10 ** digit;
@@ -245,10 +248,14 @@ export const Num = {
   toLocaleString,
   isInRange,
   isUintInRange,
+  isNonZero,
+  isPositive,
+  isNonNegative,
+  isInt32,
   isUint32,
+  clampToInt32,
+  clampToUint32,
   clamp,
-  divInt,
-  randInt,
   roundAt,
   roundBy,
   roundToInt,

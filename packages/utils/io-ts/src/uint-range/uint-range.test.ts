@@ -4,8 +4,8 @@ import { uintRange } from './uint-range';
 
 describe('uintRange', () => {
   const month = uintRange({
-    min: 1,
-    max: 12,
+    start: 1,
+    end: 13,
     defaultValue: 1,
     typeName: 'month',
   });

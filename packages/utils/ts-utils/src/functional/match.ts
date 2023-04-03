@@ -1,6 +1,9 @@
 import { hasKey } from '../guard';
 
-export type IsLiteralType<T extends RecordKeyType> = string extends T
+/**
+ * @internal
+ */
+export type _IsLiteralType<T extends RecordKeyType> = string extends T
   ? false
   : number extends T
   ? false
@@ -11,7 +14,7 @@ export type IsLiteralType<T extends RecordKeyType> = string extends T
 export function match<Case extends RecordKeyType, V>(
   switchCase: Case,
   cases: Record<Case, V>
-): IsLiteralType<Case> extends true ? V : V | undefined;
+): _IsLiteralType<Case> extends true ? V : V | undefined;
 
 export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
   switchCase: Case,

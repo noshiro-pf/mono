@@ -1,4 +1,4 @@
-export const rollTwoDices = (): readonly [number, number] => [
-  Num.randInt(1, 6),
-  Num.randInt(1, 6),
+export const rollTwoDices = (): readonly [Uint32, Uint32] => [
+  Uint32.random(1, 6),
+  Uint32.random(1, 6),
 ];

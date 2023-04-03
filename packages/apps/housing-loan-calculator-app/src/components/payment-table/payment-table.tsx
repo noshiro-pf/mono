@@ -35,21 +35,17 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
 
   const numRows = useMemo(
     () =>
-      Math.max(
-        borrowingBalanceYen.length,
-        interestYen.length,
-        monthlyPaymentTotalYen.length
+      Uint32.max(
+        Arr.length(borrowingBalanceYen),
+        Arr.length(interestYen),
+        Arr.length(monthlyPaymentTotalYen)
       ),
-    [
-      borrowingBalanceYen.length,
-      interestYen.length,
-      monthlyPaymentTotalYen.length,
-    ]
+    [borrowingBalanceYen, interestYen, monthlyPaymentTotalYen]
   );
 
   const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
     () =>
-      Arr.seqUnwrapped(numRows).map((i) => [
+      Arr.seq(numRows).map((i) => [
         i.toString(),
         formatYenValue(borrowingBalanceYen[i] ?? 0),
         formatYenValue(interestYen[i] ?? 0),

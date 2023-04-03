@@ -5,12 +5,12 @@ import { brand } from './brand';
 export const simpleBrandedNumber = <S extends string>(
   typeName: S,
   defaultValue: number = 0
-): [Type<Phantomic<number, S>>, (a: number) => Phantomic<number, S>] => {
+): [Type<Brand<number, S>>, (a: number) => Brand<number, S>] => {
   const b = brand({
     codec: number(defaultValue),
-    defaultValue: defaultValue as Phantomic<number, S>,
-    is: (_id: number): _id is Phantomic<number, S> => true,
-    typeName,
+    defaultValue: defaultValue as Brand<number, S>,
+    is: (_id: number): _id is Brand<number, S> => true,
+    brandKeys: [typeName],
   });
 
   return [b, b.fill];

@@ -214,7 +214,7 @@ interface BigInt {
    * Returns a string representation of an object.
    * @param radix Specifies a radix for converting numeric values to strings.
    */
-  toString(radix?: UintRange<2, 36>): string;
+  toString(radix?: UintRange<2, 37>): string;
 
   /** Returns a string representation appropriate to the host environment's current locale. */
   toLocaleString(

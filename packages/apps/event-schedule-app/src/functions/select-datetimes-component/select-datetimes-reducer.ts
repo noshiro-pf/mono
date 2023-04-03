@@ -13,12 +13,12 @@ export type DatetimeListReducerAction = Readonly<
       mostFrequentTimeRange: TimeRange;
     }
   | { type: 'addClick'; datetimeRange: DatetimeRange }
-  | { type: 'delete'; index: number }
+  | { type: 'delete'; index: Uint32 }
   | { type: 'deleteAll' | 'sort' }
-  | { type: 'duplicate'; index: number }
-  | { type: 'end' | 'start'; index: number; hm: HoursMinutes }
+  | { type: 'duplicate'; index: Uint32 }
+  | { type: 'end' | 'start'; index: Uint32; hm: HoursMinutes }
   | { type: 'setTimeAtOneTime'; timeRange: TimeRange }
-  | { type: 'ymd'; index: number; ymd: YearMonthDate }
+  | { type: 'ymd'; index: Uint32; ymd: YearMonthDate }
 >;
 
 export type DatetimeListReducerState = readonly DatetimeRange[];

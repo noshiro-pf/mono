@@ -50,7 +50,7 @@ const { state$: selectedTabId$, setState: handleTabChange } = createState<
 
 const { state$: columnsAlive$, updateState: updateDeadColumns } = createState<
   readonly boolean[]
->(Arr.newArrayUnwrapped(11, true));
+>(Arr.newArray(11, true));
 
 export const App = memoNamed('App', () => {
   const sortBy = useObservableValue(sortBy$);

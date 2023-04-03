@@ -11,14 +11,14 @@ export const useNormalizedRangeSliderProps = ({
   range: { min: number; max: number };
   stepSize: number;
   labelStepSize?: number;
-  labelFractionDigits?: UintRange<0, 20>;
+  labelFractionDigits?: UintRange<0, 21>;
 }>): Readonly<{
   max: number;
   min: number;
   range: { min: number; max: number };
   stepSize: number;
   labelStepSize: number;
-  labelFractionDigits: UintRange<0, 20>;
+  labelFractionDigits: UintRange<0, 21>;
 }> => {
   const min = useMemo(() => {
     if (!Num.isFinite(_min)) {
@@ -63,7 +63,7 @@ export const useNormalizedRangeSliderProps = ({
     [_range, clamp]
   );
 
-  const labelFractionDigits: UintRange<0, 20> = useMemo(
+  const labelFractionDigits: UintRange<0, 21> = useMemo(
     () =>
       _labelFractionDigits ??
       pipe(-Math.floor(Math.log10(labelStepSize))).chain((x) =>

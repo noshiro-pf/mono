@@ -49,7 +49,10 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
                     newCommits: [],
                   } // ローカルの方が進んでいるときは無視
                 : {
-                    newCommits: Arr.skip(action.value, commitsPlayed.length),
+                    newCommits: Arr.skip(
+                      action.value,
+                      Arr.length(commitsPlayed)
+                    ),
                     commitsPlayed: action.value,
                   };
           }

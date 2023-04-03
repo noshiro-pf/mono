@@ -35,7 +35,7 @@ describe('Num', () => {
 
   describe('isUintInRange', () => {
     test('truthy case', () => {
-      const f = Num.isUintInRange(0, 3);
+      const f = Num.isUintInRange(0, 4);
       const x: number = 2;
       if (f(x)) {
         expectType<typeof x, 0 | 1 | 2 | 3>('=');
@@ -46,7 +46,7 @@ describe('Num', () => {
     });
 
     test('falsy case', () => {
-      const f = Num.isUintInRange(0, 3);
+      const f = Num.isUintInRange(0, 4);
       const x: number = 100;
       if (f(x)) {
         expectType<typeof x, 0 | 1 | 2 | 3>('=');

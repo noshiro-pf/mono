@@ -1,7 +1,14 @@
 import { IMap } from '../collections';
-import { Result } from '../functional';
-import { Num } from '../num';
+import { Num, toUint32, Uint32 } from '../num';
 import { MutableMap, MutableSet, tp } from '../others';
+
+/**
+ * Uint32 などの branded type にキャストせずに array index として使える数値の型定義。
+ * あまり大きくすると型計算が重くなるので注意。
+ */
+
+type SmallUint = Uint9;
+type SmallInt = Int9;
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
 // type FlatArrayDepth =
@@ -119,8 +126,8 @@ const isArrayOfLength6OrMore = <T>(
 ): array is ArrayAtLeastLen<6, T> => array.length >= 6;
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
-const length = <T extends readonly unknown[]>(list: T): Length<T> & number =>
-  list.length;
+const length = <T extends readonly unknown[]>(list: T): Length<T> & Uint32 =>
+  toUint32(list.length);
 
 const size = length;
 
@@ -143,83 +150,53 @@ const asMut = <T extends readonly unknown[]>(list: T): Writable<T> =>
  */
 const fromMapped: <T, U>(
   iterable: Iterable<T> | Readonly<ArrayLike<T>>,
-  mapfn: (v: T, k: number) => U
+  mapfn: (v: T, k: Uint32) => U
 ) => readonly U[] = ArrayFrom;
 
-type Index1000 = Index<1000>;
-
-function zeros<N extends Index1000>(
-  len: N
-): Result<ArrayOfLength<N, 0>, string>;
-function zeros(len: number): Result<readonly 0[], string>;
-function zeros(len: number): Result<readonly 0[], string> {
-  return !Num.isUint32(len)
-    ? Result.err('len should be uint32')
-    : Result.ok(
-        // eslint-disable-next-line functional/immutable-data
-        ArrayFrom<0>({ length: len }).fill(0)
-      );
+function zeros<N extends SmallUint>(len: N): ArrayOfLength<N, 0>;
+function zeros(len: Uint32): readonly 0[];
+function zeros(len: SmallUint | Uint32): readonly 0[] {
+  // eslint-disable-next-line functional/immutable-data
+  return ArrayFrom<0>({ length: len }).fill(0);
 }
 
-function zerosUnwrapped<N extends Index1000>(len: N): ArrayOfLength<N, 0>;
-function zerosUnwrapped(len: number): readonly 0[];
-function zerosUnwrapped(len: number): readonly 0[] {
-  return Result.unwrapThrow(zeros(len));
+function seq<N extends SmallUint>(len: N): Seq<N>;
+function seq(len: Uint32): readonly Uint32[];
+function seq(len: SmallUint | Uint32): readonly Uint32[] {
+  return ArrayFrom({ length: len }, (_, i) => toUint32(i));
 }
 
-function seq<N extends Index1000>(len: N): Result<Seq<N>, string>;
-function seq(len: number): Result<readonly number[], string>;
-function seq(len: number): Result<readonly number[], string> {
-  return !Num.isUint32(len)
-    ? Result.err('len should be uint32')
-    : Result.ok(ArrayFrom({ length: len }, (_, i) => i));
+function newArray<T, N extends SmallUint>(len: N, init: T): ArrayOfLength<N, T>;
+function newArray<T>(len: Uint32, init: T): readonly T[];
+function newArray<T>(len: SmallUint | Uint32, init: T): readonly T[] {
+  return ArrayFrom({ length: len }, () => init);
 }
 
-function seqUnwrapped<N extends Index1000>(len: N): Seq<N>;
-function seqUnwrapped(len: number): readonly number[];
-function seqUnwrapped(len: number): readonly number[] {
-  return Result.unwrapThrow(seq(len));
+// TODO: improve return type
+function range<S extends SmallUint, E extends SmallUint>(
+  start: S,
+  end: E
+): readonly UintRange<S, E>[];
+function range(
+  start: SmallUint | Uint32,
+  end: SmallUint | Uint32,
+  step?: PositiveInt32 | StrictExclude<SmallUint, 0>
+): readonly Uint32[];
+function range(
+  start: SmallUint | Uint32,
+  end: SmallUint | Uint32,
+  step: PositiveInt32 | StrictExclude<SmallUint, 0> = 1
+): readonly Uint32[] {
+  const sz = Uint32.floor(Uint32.div(Uint32.sub0(end, start), step));
+  return seq(sz).map((n) => toUint32(n * step + start));
 }
-
-function newArray<T, N extends Index1000>(
-  len: N,
-  init: T
-): Result<ArrayOfLength<N, T>, string>;
-function newArray<T>(len: number, init: T): Result<readonly T[], string>;
-function newArray<T>(len: number, init: T): Result<readonly T[], string> {
-  return !Num.isUint32(len)
-    ? Result.err('len should be uint32')
-    : Result.ok(ArrayFrom({ length: len }, () => init));
-}
-
-function newArrayUnwrapped<T, N extends Index1000>(
-  len: N,
-  init: T
-): ArrayOfLength<N, T>;
-function newArrayUnwrapped<T>(len: number, init: T): readonly T[];
-function newArrayUnwrapped<T>(len: number, init: T): readonly T[] {
-  return Result.unwrapThrow(newArray(len, init));
-}
-
-const range = (
-  start: number,
-  end: number,
-  step: number = 1
-): Result<readonly number[], string> =>
-  Result.map(seq(end - start), (l) => l.map((n) => n * step + start));
-
-const rangeUnwrapped = (
-  start: number,
-  end: number,
-  step: number = 1
-): readonly number[] => Result.unwrapThrow(range(start, end, step));
 
 const copy = <T extends readonly unknown[]>(list: T): T => list.slice() as T;
 
 const slice = <T>(
   list: readonly T[],
-  start: number,
-  end: number
+  start: SafeInt | SmallInt,
+  end: SafeInt | SmallInt
 ): readonly T[] => {
   const startClamped = Num.clamp(0, list.length)(start);
   const endClamped = Num.clamp(startClamped, list.length)(end);
@@ -254,27 +231,65 @@ const shift = tail;
 const butLast = <T extends readonly unknown[]>(list: T): ListType.ButLast<T> =>
   (isEmpty(list) ? [] : list.slice(0, -1)) as ListType.ButLast<T>;
 
-const take = <T extends readonly unknown[], N extends number>(
+function take<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
-): ListType.Take<N, T> => slice(list, 0, num) as ListType.Take<N, T>;
+): ListType.Take<N, T>;
+function take<T extends readonly unknown[]>(
+  list: T,
+  num: Uint32
+): readonly T[number][];
+function take<T extends readonly unknown[]>(
+  list: T,
+  num: SmallUint | Uint32
+): readonly T[number][] {
+  return slice(list, 0, num);
+}
 
-const takeLast = <T extends readonly unknown[], N extends number>(
+function takeLast<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
-): ListType.TakeLast<N, T> =>
-  slice(list, size(list) - num, size(list)) as ListType.TakeLast<N, T>;
+): ListType.TakeLast<N, T>;
+function takeLast<T extends readonly unknown[]>(
+  list: T,
+  num: Uint32
+): readonly T[number][];
+function takeLast<T extends readonly unknown[]>(
+  list: T,
+  num: SmallUint | Uint32
+): readonly T[number][] {
+  return slice(list, Uint32.sub(size(list), num), size(list));
+}
 
-const skip = <T extends readonly unknown[], N extends number>(
+function skip<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
-): ListType.Skip<N, T> => slice(list, num, size(list)) as ListType.Skip<N, T>;
+): ListType.Skip<N, T>;
+function skip<T extends readonly unknown[]>(
+  list: T,
+  num: Uint32
+): readonly T[number][];
+function skip<T extends readonly unknown[]>(
+  list: T,
+  num: SmallUint | Uint32
+): readonly T[number][] {
+  return slice(list, num, size(list));
+}
 
-const skipLast = <T extends readonly unknown[], N extends number>(
+function skipLast<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
-): ListType.SkipLast<N, T> =>
-  slice(list, 0, size(list) - num) as ListType.SkipLast<N, T>;
+): ListType.SkipLast<N, T>;
+function skipLast<T extends readonly unknown[]>(
+  list: T,
+  num: Uint32
+): readonly T[number][];
+function skipLast<T extends readonly unknown[]>(
+  list: T,
+  num: SmallUint | Uint32
+): readonly T[number][] {
+  return slice(list, 0, Uint32.sub(size(list), num));
+}
 
 const pop = butLast;
 
@@ -282,42 +297,51 @@ const pop = butLast;
  * Returns the item located at the specified index.
  * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
  */
-const at = <A>(list: readonly A[], index: number): A | undefined =>
+const at = <A>(list: readonly A[], index: SafeInt | SmallInt): A | undefined =>
   list.at(index);
 
 function every<A, B extends A>(
   list: readonly A[],
-  predicate: (value: A, index: number) => value is B
+  predicate: (value: A, index: Uint32) => value is B
 ): list is readonly B[];
 function every<A>(
   list: readonly A[],
-  predicate: (value: A, index: number) => boolean
+  predicate: (value: A, index: Uint32) => boolean
 ): boolean;
 function every<A>(
   list: readonly A[],
-  predicate: (value: A, index: number) => boolean
+  predicate: (value: A, index: Uint32) => boolean
 ): boolean {
-  return list.every(predicate);
+  return list.every(predicate as (value: A, index: number) => boolean);
 }
 
 const some = <A>(
   list: readonly A[],
-  predicate: (value: A, index: number) => boolean
-): boolean => list.some(predicate);
+  predicate: (value: A, index: Uint32) => boolean
+): boolean => list.some(predicate as (value: A, index: number) => boolean);
 
 const map = <T extends readonly unknown[], B>(
   list: T,
-  mapFn: (a: T[number], index: number) => B
+  mapFn: (a: T[number], index: Uint32) => B
 ): { readonly [K in keyof T]: B } =>
   list.map(mapFn as (a: unknown, index: number) => B) as {
     readonly [K in keyof T]: B;
   };
 
 // TODO: support tuple type
-const flat = <T extends readonly unknown[], D extends number = 1>(
+function flat<T extends readonly unknown[]>(
+  list: T
+): readonly FlatArray<T, 1>[];
+function flat<T extends readonly unknown[], D extends number>(
+  list: T,
+  depth: D
+): readonly FlatArray<T, D>[];
+function flat<T extends readonly unknown[], D extends number>(
   list: T,
   depth: D = 1 as D
-): readonly FlatArray<T, D>[] => list.flat(depth);
+): readonly FlatArray<T, D>[] {
+  return list.flat(depth);
+}
 
 const flatMap = <T extends readonly unknown[], M>(
   list: T,
@@ -329,37 +353,40 @@ const flatMap = <T extends readonly unknown[], M>(
 const zip = <T1 extends readonly unknown[], T2 extends readonly unknown[]>(
   list1: T1,
   list2: T2
-): ListType.Zip<T1, T2> => {
-  const len = Math.min(list1.length, list2.length);
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return seqUnwrapped(len).map((i) => tp(list1[i]!, list2[i]!));
-};
+): ListType.Zip<T1, T2> =>
+  seq(Uint32.min(length(list1), length(list2))).map((i) =>
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    tp(list1[i]!, list2[i]!)
+  );
 
 function filter<T, S extends T>(
   list: readonly T[],
-  predicate: (value: T, index: number) => value is S
+  predicate: (value: T, index: Uint32) => value is S
 ): readonly S[];
 function filter<T>(
   list: readonly T[],
-  predicate: (value: T, index: number) => boolean
+  predicate: (value: T, index: Uint32) => boolean
 ): readonly T[];
 function filter<T>(
   list: readonly T[],
-  predicate: (value: T, index: number) => boolean
+  predicate: (value: T, index: Uint32) => boolean
 ): readonly T[] {
-  return list.filter(predicate);
+  return list.filter(predicate as (value: T, index: number) => boolean);
 }
 
 const filterNot = <T extends readonly unknown[]>(
   list: T,
-  predicate: (a: T[number], index: number) => boolean
-): readonly T[number][] => list.filter((a, i) => !predicate(a as T[number], i));
+  predicate: (a: T[number], index: Uint32) => boolean
+): readonly T[number][] =>
+  list.filter(
+    (a, i) => !(predicate as (value: unknown, index: number) => boolean)(a, i)
+  );
 
-// TODO: improve type
+// TODO: improve type (use Index<Length<T>>)
 const set = <T extends readonly unknown[], N>(
   list: T,
-  index: number,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  index: Uint32 | (Index<Length<T>> & SmallUint),
   newValue: N
 ): { readonly [K in keyof T]: N | T[K] } =>
   map(list, (a, i) => (i === index ? newValue : a)) as {
@@ -369,7 +396,8 @@ const set = <T extends readonly unknown[], N>(
 // TODO: improve type
 const update = <T extends readonly unknown[], N>(
   list: T,
-  index: number,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  index: Uint32 | (Index<Length<T>> & SmallUint),
   updater: (prev: T[number]) => N
 ): { readonly [K in keyof T]: N | T[K] } =>
   map(list, (a, i) => (i === index ? updater(a) : a)) as {
@@ -379,7 +407,7 @@ const update = <T extends readonly unknown[], N>(
 // TODO: improve type
 const insert = <A>(
   list: readonly A[],
-  index: number,
+  index: SafeInt | SmallInt,
   newValue: A
 ): readonly A[] => {
   const mut_temp = ArrayFrom(list);
@@ -389,7 +417,10 @@ const insert = <A>(
   return mut_temp;
 };
 
-const remove = <A>(list: readonly A[], index: number): readonly A[] => {
+const remove = <A>(
+  list: readonly A[],
+  index: SafeInt | SmallInt
+): readonly A[] => {
   const mut_temp = ArrayFrom(list);
 
   mut_temp.splice(index, 1);
@@ -412,11 +443,11 @@ const concat = <T1 extends readonly unknown[], T2 extends readonly unknown[]>(
   list2: T2
 ): readonly [...T1, ...T2] => [...list1, ...list2];
 
-const partition = <N extends number, T>(
+const partition = <N extends PositiveInt32 | StrictExclude<SmallUint, 0>, T>(
   list: readonly T[],
   n: N
 ): readonly ArrayOfLength<N, T>[] =>
-  seqUnwrapped(Math.ceil(list.length / n)).map(
+  seq(Uint32.div(length(list), n)).map(
     (i: number) =>
       list.slice(n * i, n * (i + 1)) as unknown as ArrayOfLength<N, T>
   );
@@ -474,14 +505,31 @@ const includes = <A>(list: readonly A[], searchElement: A): boolean =>
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const find = <A>(
   list: readonly A[],
-  predicate: (value: A, index: number) => boolean
+  predicate: (value: A, index: Uint32) => boolean
 ): A | undefined =>
   list.find(predicate as (value: A, index: number) => boolean);
 
-const findIndex = <A>(
-  list: readonly A[],
-  predicate: (value: A, index: number) => boolean
-): number => list.findIndex(predicate as (value: A, index: number) => boolean);
+const findIndex = <A extends readonly unknown[]>(
+  list: A,
+  predicate: (value: A[number], index: Uint32) => boolean
+): IndexOfTuple<A> | -1 =>
+  list.findIndex(
+    predicate as (value: A[number], index: number) => boolean
+  ) as IndexOfTuple<A>;
+
+const indexOf = <A extends readonly unknown[]>(
+  list: A,
+  searchElement: A[number],
+  fromIndex?: IndexOfTuple<A> | undefined
+): IndexOfTuple<A> | -1 =>
+  list.indexOf(searchElement, fromIndex) as IndexOfTuple<A>;
+
+const lastIndexOf = <A extends readonly unknown[]>(
+  list: A,
+  searchElement: A[number],
+  fromIndex?: IndexOfTuple<A> | undefined
+): IndexOfTuple<A> | -1 =>
+  list.lastIndexOf(searchElement, fromIndex) as IndexOfTuple<A>;
 
 function min<T extends readonly [number, ...(readonly number[])]>(
   list: T,
@@ -650,7 +698,7 @@ const scan = <A, B>(
   init: B
 ): NonEmptyArray<B> => {
   const mut_result: B[] = ArrayFrom(
-    newArrayUnwrapped<B>(list.length + 1, init)
+    newArray<B>(toUint32(list.length + 1), init)
   );
 
   let mut_acc = init;
@@ -665,24 +713,27 @@ const scan = <A, B>(
 
 const count = <A>(
   list: readonly A[],
-  predicate: (value: A, index: number) => boolean = () => true
-): number =>
-  list.reduce<number>(
-    (acc, curr, index) => (predicate(curr, index) ? acc + 1 : acc),
-    0
+  predicate: (value: A, index: Uint32) => boolean = () => true
+): Uint32 =>
+  list.reduce<Uint32>(
+    (acc, curr, index) =>
+      (predicate as (value: A, idx: number) => boolean)(curr, index)
+        ? Uint32.add(acc, 1)
+        : acc,
+    toUint32(0)
   );
 
 const countBy = <T extends readonly unknown[], G extends Primitive>(
   list: T,
-  grouper: (value: T[number], index: number) => G
-): IMap<G, number> => {
-  const mut_groups = new MutableMap<G, number>();
+  grouper: (value: T[number], index: Uint32) => G
+): IMap<G, Uint32> => {
+  const mut_groups = new MutableMap<G, Uint32>();
 
   for (const [index, e] of list.entries()) {
-    const key = grouper(e, index);
+    const key = grouper(e, toUint32(index));
     const curr = mut_groups.get(key) ?? 0;
 
-    mut_groups.set(key, curr + 1);
+    mut_groups.set(key, Uint32.add(curr, 1));
   }
 
   return IMap.new(mut_groups);
@@ -690,12 +741,12 @@ const countBy = <T extends readonly unknown[], G extends Primitive>(
 
 const groupBy = <T extends readonly unknown[], G extends Primitive>(
   list: T,
-  grouper: (value: T[number], index: number) => G
+  grouper: (value: T[number], index: Uint32) => G
 ): IMap<G, readonly T[number][]> => {
   const mut_groups = new MutableMap<G, T[number][]>();
 
   for (const [index, e] of list.entries()) {
-    const key = grouper(e, index);
+    const key = grouper(e, toUint32(index));
 
     if (mut_groups.has(key)) {
       const mut_g = mut_groups.get(key);
@@ -745,8 +796,10 @@ function uniqBy<A, B>(
   });
 }
 
-const indexIsInRange = <T>(list: readonly T[], index: number): boolean =>
-  Num.isUint32(index) && 0 <= index && index < list.length;
+const indexIsInRange = <T>(
+  list: readonly T[],
+  index: SmallUint | Uint32
+): boolean => Num.isInRange(0, list.length)(index);
 
 const eq = <T>(list1: readonly T[], list2: readonly T[]): boolean =>
   list1.length === list2.length && list1.every((v, i) => v === list2[i]);
@@ -835,7 +888,6 @@ export const ArrayUtils = {
   asMut,
   fromMapped,
   range,
-  rangeUnwrapped,
   copy,
   slice,
   first,
@@ -867,6 +919,8 @@ export const ArrayUtils = {
   includes,
   find,
   findIndex,
+  indexOf,
+  lastIndexOf,
   sum,
   foldl,
   reduce,
@@ -884,11 +938,8 @@ export const ArrayUtils = {
   setDifference,
   sortedNumSetDifference,
   zeros,
-  zerosUnwrapped,
   seq,
-  seqUnwrapped,
   newArray,
-  newArrayUnwrapped,
   head,
   last,
   every,

@@ -1,5 +1,5 @@
 import { Arr } from '../array';
-import { Num } from '../num';
+import { Num, Uint32 } from '../num';
 
 export type DateUtils = StrictOmit<
   RawDateType,
@@ -423,8 +423,8 @@ const getAllDatesOfMonth = (
   year: YearEnum,
   month: MonthEnum
 ): readonly DateUtils[] =>
-  Arr.rangeUnwrapped(1, getLastDateNumberOfMonth(year, month) + 1).map((date) =>
-    create(year, month, date as DateEnum)
+  Arr.range(1, Uint32.add(getLastDateNumberOfMonth(year, month), 1)).map(
+    (date) => create(year, month, date as DateEnum)
   );
 
 const numWeeksOfMonth = (year: YearEnum, month: MonthEnum): number => {

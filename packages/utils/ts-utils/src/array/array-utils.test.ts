@@ -1,6 +1,6 @@
 import { IMap } from '../collections';
 import { expectType } from '../expect-type';
-import { Result } from '../functional';
+import { toUint32 } from '../num';
 import { ArrayUtils } from './array-utils';
 
 describe('ArrayUtils.isEmpty', () => {
@@ -22,26 +22,26 @@ describe('ArrayUtils.zeros', () => {
   test('fixed length', () => {
     const result = ArrayUtils.zeros(3);
 
-    expectType<typeof result, Result<readonly [0, 0, 0], string>>('=');
+    expectType<typeof result, readonly [0, 0, 0]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 0, 0]));
+    expect(result).toStrictEqual([0, 0, 0]);
   });
 
   test('fixed length (empty)', () => {
     const result = ArrayUtils.zeros(0);
 
-    expectType<typeof result, Result<readonly [], string>>('=');
+    expectType<typeof result, readonly []>('=');
 
-    expect(result).toStrictEqual(Result.ok([]));
+    expect(result).toStrictEqual([]);
   });
 
   test('unknown length', () => {
-    const n: number = (() => 3)();
+    const n: Uint32 = toUint32(3);
     const result = ArrayUtils.zeros(n);
 
-    expectType<typeof result, Result<readonly 0[], string>>('=');
+    expectType<typeof result, readonly 0[]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 0, 0]));
+    expect(result).toStrictEqual([0, 0, 0]);
   });
 });
 
@@ -49,29 +49,26 @@ describe('ArrayUtils.seq', () => {
   test('fixed length', () => {
     const result = ArrayUtils.seq(10);
 
-    expectType<
-      typeof result,
-      Result<readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], string>
-    >('=');
+    expectType<typeof result, readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
+    expect(result).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   test('fixed length (empty)', () => {
     const result = ArrayUtils.seq(0);
 
-    expectType<typeof result, Result<readonly [], string>>('=');
+    expectType<typeof result, readonly []>('=');
 
-    expect(result).toStrictEqual(Result.ok([]));
+    expect(result).toStrictEqual([]);
   });
 
   test('unknown length', () => {
-    const n: number = (() => 3)();
+    const n: Uint32 = toUint32(3);
     const result = ArrayUtils.seq(n);
 
-    expectType<typeof result, Result<readonly number[], string>>('=');
+    expectType<typeof result, readonly Uint32[]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 1, 2]));
+    expect(result).toStrictEqual([0, 1, 2]);
   });
 });
 
@@ -633,7 +630,7 @@ describe('ArrayUtils.insert', () => {
     });
   }
   {
-    const result = ArrayUtils.insert(xs, 999, 5);
+    const result = ArrayUtils.insert(xs, toUint32(999), 5);
 
     expectType<typeof result, readonly (1 | 2 | 3 | 5)[]>('=');
 
@@ -950,6 +947,33 @@ describe('ArrayUtils.find', () => {
   }
 });
 
+describe('ArrayUtils.findIndex', () => {
+  {
+    const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
+    const result = ArrayUtils.findIndex(xs, (x) => x.v === 1);
+
+    expectType<typeof result, -1 | 0 | 1 | 2>('=');
+
+    test('case 1', () => {
+      expect(result).toBe(1);
+    });
+  }
+  {
+    const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
+      { v: 2 },
+      { v: 1 },
+      { v: 3 },
+    ] as const;
+    const result = ArrayUtils.findIndex(xs, (x) => x.v === 1);
+
+    expectType<typeof result, Uint32 | -1>('=');
+
+    test('case 2', () => {
+      expect(result).toBe(1);
+    });
+  }
+});
+
 describe('ArrayUtils.min', () => {
   {
     const xs = [3, 5, 4] as const;
@@ -1060,7 +1084,7 @@ describe('ArrayUtils.count', () => {
 
   const result = ArrayUtils.count(xs, (a) => a.x === 2);
 
-  expectType<typeof result, number>('=');
+  expectType<typeof result, Uint32>('=');
 
   test('case 1', () => {
     expect(result).toBe(2);
@@ -1079,7 +1103,7 @@ describe('ArrayUtils.countBy', () => {
 
   const result = ArrayUtils.countBy(xs, (a) => a.x);
 
-  expectType<typeof result, IMap<1 | 2 | 3, number>>('=');
+  expectType<typeof result, IMap<1 | 2 | 3, Uint32>>('=');
 
   test('case 1', () => {
     expect(result).toStrictEqual(

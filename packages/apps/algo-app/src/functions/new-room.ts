@@ -47,7 +47,7 @@ const randomizePlayerCards = (): DeepReadonly<
     }).value;
 
 export const newShuffleDef = (): PermutationString<'0123'> =>
-  pipe(Arr.seqUnwrapped(4))
+  pipe(Arr.seq(4))
     .chain(getShuffled)
     .chain((list) => list.join('')).value as PermutationString<'0123'>;
 

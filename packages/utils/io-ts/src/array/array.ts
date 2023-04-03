@@ -19,7 +19,7 @@ export const array = <A>(
 
   const { typeName, defaultValue = [] } = options ?? {};
 
-  const typeNameFilled: string = typeName ?? `${elementType.typeName}[]`;
+  const typeNameFilled: string = typeName ?? `(${elementType.typeName})[]`;
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {

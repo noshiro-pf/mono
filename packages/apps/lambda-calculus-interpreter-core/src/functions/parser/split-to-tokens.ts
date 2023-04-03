@@ -1,8 +1,8 @@
-import { range } from '@noshiro/ts-utils';
+import { range, toUint32 } from '@noshiro/ts-utils';
 
 export const splitToTokens = (input: string): readonly string[] => {
   let mut_spaceInserted = '';
-  for (const i of range(0, input.length)) {
+  for (const i of range(0, toUint32(input.length))) {
     const char = input.charAt(i);
     switch (char) {
       case '(':
