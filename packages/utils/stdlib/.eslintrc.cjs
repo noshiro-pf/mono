@@ -9,18 +9,10 @@ const { plugins } = require('../../../config/eslintrc/eslint-plugins');
 /** @type {LinterConfig} */
 const config = {
   root: true,
-  env: {
-    browser: true,
-    node: true,
-    es2022: true,
-  },
   plugins: [
-    plugins.arrayFunc,
+    // plugins.arrayFunc,
     plugins.functional,
-    plugins.import,
-    plugins.jest,
-    plugins.promise,
-    plugins.unicorn,
+    // plugins.unicorn,
     plugins.typescriptEslint,
   ],
   parser: '@typescript-eslint/parser',
