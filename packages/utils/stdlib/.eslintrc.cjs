@@ -33,6 +33,7 @@ const config = {
       'warn',
       {
         fixToUnknown: true,
+        ignoreRestArgs: true,
       },
     ],
 

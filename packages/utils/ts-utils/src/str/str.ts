@@ -41,7 +41,7 @@ const fromCodePoint = (...codePoints: readonly number[]): string =>
  */
 const raw = (
   template: Readonly<{ raw: Readonly<ArrayLike<string>> | readonly string[] }>,
-  ...substitutions: readonly unknown[]
+  ...substitutions: readonly never[]
 ): // eslint-disable-next-line no-restricted-globals
 string => String.raw(template, ...substitutions);
 

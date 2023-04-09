@@ -331,7 +331,7 @@ interface ObjectConstructor {
    * @param target The target object to copy to.
    * @param sources One or more source objects from which to copy properties
    */
-  assign(target: object, ...sources: readonly unknown[]): unknown;
+  assign(target: object, ...sources: readonly never[]): unknown;
 
   /**
    * Returns an array of all symbol properties found directly on object o.
@@ -592,6 +592,6 @@ interface StringConstructor {
    */
   raw(
     template: { readonly raw: readonly string[] | ArrayLike<string> },
-    ...substitutions: readonly unknown[]
+    ...substitutions: readonly never[]
   ): string;
 }
