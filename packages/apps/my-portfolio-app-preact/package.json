@@ -91,7 +91,7 @@
     "@noshiro/tiny-router-observable": "*",
     "@noshiro/tiny-router-preact-hooks": "*",
     "@noshiro/ts-utils": "*",
-    "preact": "^10.11.3",
+    "preact": "^10.13.2",
     "preact-media-hook": "^1.0.3"
   },
   "devDependencies": {
