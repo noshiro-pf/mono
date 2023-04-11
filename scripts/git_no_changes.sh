@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if git status --porcelain | grep .; then
     echo Repo is dirty
     exit 1

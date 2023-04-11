@@ -25,6 +25,7 @@
     "create:util": "scripts/create_new_util.sh",
     "fmt:all": "prettier --cache --cache-strategy content --write . > /dev/null",
     "fmt:all:no-cache": "prettier --write . > /dev/null",
+    "fmt:all:print": "prettier --cache --cache-strategy content --write .",
     "gen-eslint-rules-type": "wireit",
     "lint:apps": "node scripts/lint-apps.mjs",
     "lint:cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
