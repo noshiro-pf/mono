@@ -1,4 +1,4 @@
-import { isRecord, Obj, Result } from '@noshiro/ts-utils';
+import { isRecord, Result } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type';
 import {
   createAssertFunction,
@@ -6,10 +6,10 @@ import {
   validationErrorMessage,
 } from '../utils';
 
-type RecordResultType<
-  K extends Type<string>,
-  V extends Type<unknown>
-> = Readonly<Record<TypeOf<K>, TypeOf<V>>>;
+type RecordResultType<K extends Type<string>, V extends Type<unknown>> = Record<
+  TypeOf<K>,
+  TypeOf<V>
+>;
 
 export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
   keyType: K,
@@ -29,7 +29,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
       ]);
     }
 
-    for (const [k, v] of Obj.entries(a)) {
+    for (const [k, v] of Object.entries(a)) {
       {
         const res = keyType.validate(k);
 
@@ -61,8 +61,8 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? (Obj.fromEntries(
-          Obj.entries(a).filter(([k, v]) => keyType.is(k) && valueType.is(v))
+      ? (Object.fromEntries(
+          Object.entries(a).filter(([k, v]) => keyType.is(k) && valueType.is(v))
         ) as T)
       : defaultValue;
 

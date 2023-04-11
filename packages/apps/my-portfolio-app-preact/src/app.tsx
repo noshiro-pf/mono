@@ -17,7 +17,7 @@ const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
 };
 
 const tabIndexOnChange = (tabIdx: number): void => {
-  if (Arr.indexIsInRange(routeList, tabIdx)) {
+  if (Arr.indexIsInRange(routeList, toUint32(tabIdx))) {
     const route = routeList[tabIdx];
     if (route !== undefined) {
       push(route);

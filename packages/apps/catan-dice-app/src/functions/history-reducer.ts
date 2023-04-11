@@ -1,26 +1,26 @@
-import { type HistoryState } from '../type';
+import { add1, sub1, type HistoryState } from '../type';
 import { rollTwoDices } from './roll-dice';
 
 export const historyReducer: Reducer<
   HistoryState,
   'redo' | 'roll-dices' | 'undo'
 > = (state, action) => {
-  const size = state.history.length;
+  const size = Arr.length(state.history);
   const currIdx = state.index;
 
   return {
     index: match(action, {
-      undo: Math.max(-1, currIdx - 1),
-      redo: Math.min(size - 1, currIdx + 1),
-      'roll-dices': currIdx + 1,
+      undo: sub1(currIdx),
+      redo: SafeUint.min(SafeUint.sub(size, 1), add1(currIdx)),
+      'roll-dices': add1(currIdx),
     }),
 
     history: match(action, {
       undo: state.history,
       redo: state.history,
       'roll-dices': pipe(state.history)
-        .chain((hist) => Arr.take(hist, currIdx + 1))
-        .chain((hist) => [...hist, rollTwoDices()])
+        .chain((hist) => Arr.take(hist, add1(currIdx)))
+        .chain((hist) => Arr.pushed(hist, rollTwoDices()))
         .chain(castWritable).value,
     }),
   };

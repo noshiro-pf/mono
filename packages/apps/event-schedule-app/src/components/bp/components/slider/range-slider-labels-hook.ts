@@ -10,7 +10,7 @@ export const useRangeSliderLabels = ({
   max: number;
   min: number;
   toRatio: (x: number) => number | undefined;
-  labelFractionDigits?: UintRange<0, 20>;
+  labelFractionDigits?: UintRange<0, 21>;
   customLabelValues?: readonly number[];
 }>): Readonly<{
   customLabelValuesWithRatio: DeepReadonly<
@@ -42,7 +42,7 @@ export const useRangeSliderLabels = ({
   }, [customLabelValues, min, max, toRatio]);
 
   const toFixed = useMemo(
-    () => Num.toFixed(labelFractionDigits),
+    () => (n: number) => n.toFixed(labelFractionDigits),
     [labelFractionDigits]
   );
 

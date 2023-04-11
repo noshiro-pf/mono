@@ -63,7 +63,7 @@ export const answerDiffAsString = (
       datetimeRangeFromMapKey
     );
 
-    const allDatetimeRangeSorted = Arr.sort(
+    const allDatetimeRangeSorted = Arr.sorted(
       allDatetimeRangeSet.toArray(),
       compareDatetimeRange
     );

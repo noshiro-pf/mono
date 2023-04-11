@@ -69,7 +69,7 @@ export const PlayerCardsArea = memoNamed(
     >(
       () =>
         pipe(cards).chain((list) =>
-          Arr.map(list, (c: CardWithDisplayValue) => ({
+          Tpl.map(list, (c: CardWithDisplayValue) => ({
             ...c,
             key: cardToString(c),
             onBoundingClientRectChange: (rect: Rect) => {

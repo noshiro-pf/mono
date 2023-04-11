@@ -8,7 +8,7 @@ export const timer = (
 ): TimerObservable => new TimerObservableClass(milliSeconds, startManually);
 
 class TimerObservableClass
-  extends RootObservableClass<number, 'Timer'>
+  extends RootObservableClass<0, 'Timer'>
   implements TimerObservable
 {
   readonly #milliSeconds: number;

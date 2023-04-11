@@ -1,3 +1,5 @@
+import { SafeUint, toSafeUint } from '../num';
+
 const get = <R extends RecordBase, K extends keyof R>(
   record: R,
   key: K
@@ -18,7 +20,7 @@ const update = <R extends RecordBase, K extends keyof R>(
 const UNSAFE_getIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
-  index: number
+  index: SafeUint
 ): unknown =>
   index >= keyPath.length
     ? obj
@@ -26,7 +28,7 @@ const UNSAFE_getIn_impl = (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         obj[keyPath[index]!] as RecordBase,
         keyPath,
-        index + 1
+        SafeUint.add(index, 1)
       );
 
 const getIn = <R extends RecordBase, Path extends Paths<R>>(
@@ -36,27 +38,25 @@ const getIn = <R extends RecordBase, Path extends Paths<R>>(
   UNSAFE_getIn_impl(
     record,
     keyPath as readonly string[],
-    0
+    toSafeUint(0)
   ) as RecordValueAtPath<R, Path>;
 
 const UNSAFE_updateIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
-  index: number,
+  index: SafeUint,
   updater: (prev: unknown) => unknown
 ): unknown =>
   index >= keyPath.length
-    ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      updater(obj)
-    : // eslint-disable-next-line no-restricted-globals
-    Array.isArray(obj)
+    ? updater(obj)
+    : Array.isArray(obj)
     ? obj.map((v, i): unknown =>
         i === keyPath[index]
           ? UNSAFE_updateIn_impl(
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               obj[keyPath[index]!] as RecordBase,
               keyPath,
-              index + 1,
+              SafeUint.add(index, 1),
               updater
             )
           : v
@@ -68,7 +68,7 @@ const UNSAFE_updateIn_impl = (
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           obj[keyPath[index]!] as RecordBase,
           keyPath,
-          index + 1,
+          SafeUint.add(index, 1),
           updater
         ),
       };
@@ -80,7 +80,7 @@ const setIn = <R extends RecordBase>(
   UNSAFE_updateIn_impl(
     record,
     keyPath as readonly string[],
-    0,
+    toSafeUint(0),
     () => newValue
   ) as R;
 
@@ -94,7 +94,7 @@ const updateIn = <R extends RecordBase, Path extends Paths<R>>(
   UNSAFE_updateIn_impl(
     record,
     keyPath as readonly string[],
-    0,
+    toSafeUint(0),
     updater as (prev: unknown) => unknown
   ) as R;
 
@@ -103,12 +103,12 @@ const removeProperties = <R extends RecordBase, K extends keyof R>(
   // eslint-disable-next-line @typescript-eslint/no-shadow
   keys: readonly K[]
 ): Readonly<{
-  [Key in StrictExclude<keyof R, K>]: R[Key];
+  [Key in Exclude<keyof R, K>]: R[Key];
 }> => {
   // eslint-disable-next-line no-restricted-globals
   const keysSet = new Set<keyof R>(keys);
-  return fromEntries(
-    entries(record).filter(([k, _v]) => !keysSet.has(k))
+  return Object.fromEntries(
+    Object.entries(record).filter(([k, _v]) => !keysSet.has(k))
   ) as never;
 };
 
@@ -129,105 +129,6 @@ const merge = <R1 extends RecordBase, R2 extends RecordBase>(
     : never;
 }> => ({ ...record1, ...record2 } as never);
 
-/**
- * `Object.keys` の返り値型を改善したもの。
- * `o: R` であるとして、
- * `Object.keys(o)` は `string[]` を返すが
- * `RecordUtil.keys(o)` は `(keyof typeof o)[]` を返す。
- * ただし、 number が key に含まれる場合は `Object.keys` のランタイム挙動に併せて文字列化する。
- *
- * @example
- * ```ts
- * const keys1 = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // string[]
- * const keys2 = RecordUtil.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z')[]
- * ```
- */
-const keys = <R extends RecordBase>(object: R): ToObjectKeysValue<keyof R>[] =>
-  // eslint-disable-next-line no-restricted-syntax
-  Object.keys(object) as ToObjectKeysValue<keyof R>[];
-
-const values = <K extends PropertyKey, V>(object: Record<K, V>): readonly V[] =>
-  Object.values(object);
-
-/**
- * `Object.fromEntries` の返り値型を改善したもの。
- * `entries: Iterable<readonly [K, V]>` であるとして、
- * `Object.fromEntries(entries)` は `Record<string, V>` を返すが、
- * `RecordUtil.fromEntries(entries)` は `Readonly<Record<K, V>>` を返す。
- *
- * @example
- * ```ts
- * const entries: readonly (readonly ['x' | 'y' | 'z' | 4, 1 | 2 | 3])[] = [
- *   ['x', 1],
- *   ['y', 2],
- *   ['z', 3],
- *   [4, 3],
- * ] as const;
- *
- * const obj1 = Object.fromEntries(entries); // Record<string, 1 | 2 | 3>
- * const obj2 = RecordUtil.fromEntries(entries); // Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>
- * ```
- */
-const fromEntries = <K extends PropertyKey, V>(
-  entries_: Iterable<readonly [K, V]>
-): Record<K, V> =>
-  // eslint-disable-next-line no-restricted-syntax
-  Object.fromEntries(entries_) as Record<K, V>;
-
-/**
- * `Object.entries` の返り値型を改善したもの。
- * `Object.entries(obj)` はキー部を string として返すが、
- * `RecordUtil.entries(obj)` はキーと値のペアを維持して entries を返す。
- *
- * @example
- * ```ts
- * const entries = RecordUtils.entries({
- *   x: 1,
- *   y: 2,
- *   z: 2,
- *   3: 4,
- * } as const);
- *
- * const entries1 = Object.entries(obj); // [string, 1 | 2 | 4]
- * const entries2 = RecordUtil.entries(obj); // (['3', 4] | ['x', 1] | ['y' | 'z', 2])[]
- * ```
- */
-const entries = <R extends RecordBase>(
-  object: R
-  // eslint-disable-next-line no-restricted-syntax
-): RecordUtilsEntries<R> => Object.entries(object) as RecordUtilsEntries<R>;
-
-/**
- * @internal
- */
-export type RecordUtilsEntries<R extends RecordBase> = R extends R
-  ? readonly {
-      readonly [K in keyof R]: readonly [
-        ToObjectKeysValue<keyof PickByValue<R, R[K]>>,
-        R[K]
-      ];
-      // eslint-disable-next-line @typescript-eslint/ban-types
-    }[RelaxedExclude<keyof R, symbol>][]
-  : never;
-
-function hasKey<R extends RecordBase, K extends keyof R>(
-  rec: R,
-  key: K
-): rec is R & Record<K, R[K]>;
-
-function hasKey<R extends RecordBase, K extends PropertyKey>(
-  rec: R,
-  key: K
-): rec is R & Record<K, R[K]>;
-
-function hasKey<R extends RecordBase, K extends PropertyKey>(
-  rec: R,
-  key: K
-): rec is R & Record<K, R[K]> {
-  // eslint-disable-next-line prefer-object-has-own, no-restricted-syntax
-  return Object.prototype.hasOwnProperty.call(rec, key);
-}
-
 function hasKeyValue<R extends RecordBase, K extends keyof R, V extends R[K]>(
   rec: R,
   key: K,
@@ -245,27 +146,8 @@ function hasKeyValue<
   K extends PropertyKey,
   V extends R[K]
 >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V> {
-  return hasKey(rec, key) && valueChecker(rec[key]);
+  return Object.hasOwn(rec, key) && valueChecker(rec[key]);
 }
-
-/**
- * @internal
- */
-type ToObjectKeysValue<A> = A extends string
-  ? A
-  : A extends number
-  ? `${A}`
-  : never;
-
-/**
- * @internal
- */
-type PickByValue<R, V> = Pick<
-  R,
-  {
-    [K in keyof R]: R[K] extends V ? K : never;
-  }[keyof R]
->;
 
 export const RecordUtils = {
   get,
@@ -276,11 +158,6 @@ export const RecordUtils = {
   updateIn,
   removeProperties,
   merge,
-  keys,
-  values,
-  fromEntries,
-  entries,
-  hasKey,
   hasKeyValue,
 } as const;
 

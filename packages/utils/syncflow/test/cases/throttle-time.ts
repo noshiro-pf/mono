@@ -21,7 +21,7 @@ const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   filtered$: Observable<number>;
   throttleTime$: Observable<number>;
   merged$: Observable<number>;

@@ -1,1 +1,1 @@
-export type DiceValue = UintRange<1, 6>;
+export type DiceValue = UintRange<1, 7>;

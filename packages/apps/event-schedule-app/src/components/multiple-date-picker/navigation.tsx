@@ -2,12 +2,12 @@ import { Button } from '@blueprintjs/core';
 import { monthsList } from '@noshiro/ts-utils-additional';
 import { BpSelect } from '../bp';
 
-const thisYear = DateUtils.getLocaleYear(DateUtils.today());
+const thisYear = toUint32(DateUtils.getLocaleYear(DateUtils.today()));
 const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());
 
-const yearOption: readonly number[] = Arr.rangeUnwrapped(
-  thisYear - 100,
-  thisYear + 100
+const yearOption: readonly YearEnum[] = Arr.range(
+  Uint32.sub(thisYear, 100),
+  Uint32.add(thisYear, 100)
 );
 const monthOption: readonly OptionProps[] = monthsList.en.map((e) => ({
   value: e.value,
@@ -36,7 +36,7 @@ export const DatepickerNav = memoNamed<Props>(
     const onYearChangeHandler = useCallback(
       (value: string) => {
         onYearChange(
-          mapOptional(Str.toNumber(value), (a) => a as YearEnum) ?? thisYear
+          mapOptional(Num.from(value), (a) => a as YearEnum) ?? thisYear
         );
       },
       [onYearChange]
@@ -45,7 +45,7 @@ export const DatepickerNav = memoNamed<Props>(
     const onMonthChangeHandler = useCallback(
       (value: string) => {
         onMonthChange(
-          mapOptional(Str.toNumber(value), (a) => a as MonthEnum) ?? thisMonth
+          mapOptional(Num.from(value), (a) => a as MonthEnum) ?? thisMonth
         );
       },
       [onMonthChange]

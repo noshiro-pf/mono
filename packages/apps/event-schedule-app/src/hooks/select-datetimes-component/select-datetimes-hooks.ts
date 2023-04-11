@@ -48,35 +48,35 @@ export const useSelectDatetimesHooks = (
   /* handlers */
 
   const onDatetimeRangeYmdChange = useCallback(
-    (index: number, ymd: YearMonthDate) => {
+    (index: SafeUint, ymd: YearMonthDate) => {
       dispatch({ type: 'ymd', index, ymd });
     },
     [dispatch]
   );
 
   const onDatetimeRangeStartChange = useCallback(
-    (index: number, hm: HoursMinutes) => {
+    (index: SafeUint, hm: HoursMinutes) => {
       dispatch({ type: 'start', index, hm });
     },
     [dispatch]
   );
 
   const onDatetimeRangeEndChange = useCallback(
-    (index: number, hm: HoursMinutes) => {
+    (index: SafeUint, hm: HoursMinutes) => {
       dispatch({ type: 'end', index, hm });
     },
     [dispatch]
   );
 
   const onDeleteDatetimeClick = useCallback(
-    (index: number) => {
+    (index: SafeUint) => {
       dispatch({ type: 'delete', index });
     },
     [dispatch]
   );
 
   const onDuplicateDatetimeClick = useCallback(
-    (index: number) => {
+    (index: SafeUint) => {
       dispatch({ type: 'duplicate', index });
     },
     [dispatch]
@@ -118,7 +118,7 @@ export const useSelectDatetimesHooks = (
 
   const datetimeListWithHandler = useMemo(
     () =>
-      Arr.map(datetimeList, (datetimeRange, index) => ({
+      datetimeList.map((datetimeRange, index) => ({
         id: index,
         datetimeRange,
         onYmdChange: (ymd: YearMonthDate | undefined) => {

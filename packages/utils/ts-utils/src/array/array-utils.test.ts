@@ -1,11 +1,11 @@
 import { IMap } from '../collections';
 import { expectType } from '../expect-type';
-import { Result } from '../functional';
-import { ArrayUtils } from './array-utils';
+import { toSafeUint, toUint32 } from '../num';
+import { Arr } from './array-utils';
 
 describe('ArrayUtils.isEmpty', () => {
   const xs = [1, 2, 3] as const;
-  const result = ArrayUtils.isEmpty(xs);
+  const result = Arr.isEmpty(xs);
 
   expectType<typeof result, boolean>('=');
 
@@ -14,70 +14,67 @@ describe('ArrayUtils.isEmpty', () => {
   });
 
   test('case 2', () => {
-    expect(ArrayUtils.isEmpty([])).toBe(true);
+    expect(Arr.isEmpty([])).toBe(true);
   });
 });
 
 describe('ArrayUtils.zeros', () => {
   test('fixed length', () => {
-    const result = ArrayUtils.zeros(3);
+    const result = Arr.zeros(3);
 
-    expectType<typeof result, Result<readonly [0, 0, 0], string>>('=');
+    expectType<typeof result, readonly [0, 0, 0]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 0, 0]));
+    expect(result).toStrictEqual([0, 0, 0]);
   });
 
   test('fixed length (empty)', () => {
-    const result = ArrayUtils.zeros(0);
+    const result = Arr.zeros(0);
 
-    expectType<typeof result, Result<readonly [], string>>('=');
+    expectType<typeof result, readonly []>('=');
 
-    expect(result).toStrictEqual(Result.ok([]));
+    expect(result).toStrictEqual([]);
   });
 
   test('unknown length', () => {
-    const n: number = (() => 3)();
-    const result = ArrayUtils.zeros(n);
+    const n: Uint32 = toUint32(3);
+    const result = Arr.zeros(n);
 
-    expectType<typeof result, Result<readonly 0[], string>>('=');
+    expectType<typeof result, readonly 0[]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 0, 0]));
+    expect(result).toStrictEqual([0, 0, 0]);
   });
 });
 
 describe('ArrayUtils.seq', () => {
   test('fixed length', () => {
-    const result = ArrayUtils.seq(10);
+    const result = Arr.seq(10);
 
-    expectType<
-      typeof result,
-      Result<readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], string>
-    >('=');
+    expectType<typeof result, readonly [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
+    expect(result).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   test('fixed length (empty)', () => {
-    const result = ArrayUtils.seq(0);
+    const result = Arr.seq(0);
 
-    expectType<typeof result, Result<readonly [], string>>('=');
+    expectType<typeof result, readonly []>('=');
 
-    expect(result).toStrictEqual(Result.ok([]));
+    expect(result).toStrictEqual([]);
   });
 
   test('unknown length', () => {
-    const n: number = (() => 3)();
-    const result = ArrayUtils.seq(n);
+    const n: SafeUint = toSafeUint(3);
+    const result = Arr.seq(n);
 
-    expectType<typeof result, Result<readonly number[], string>>('=');
+    expectType<typeof result, readonly SafeUint[]>('=');
 
-    expect(result).toStrictEqual(Result.ok([0, 1, 2]));
+    expect(result).toStrictEqual([0, 1, 2]);
   });
 });
 
 describe('ArrayUtils.isNonEmpty', () => {
   const xs = [1, 2, 3] as const;
-  const result = ArrayUtils.isNonEmpty(xs);
+  const result = Arr.isNonEmpty(xs);
 
   expectType<typeof result, boolean>('=');
 
@@ -86,7 +83,7 @@ describe('ArrayUtils.isNonEmpty', () => {
   });
 
   test('case 2', () => {
-    expect(ArrayUtils.isNonEmpty([])).toBe(false);
+    expect(Arr.isNonEmpty([])).toBe(false);
   });
 });
 
@@ -96,72 +93,72 @@ describe('ArrayUtils.isNonEmpty', () => {
   describe.each([
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 0, 5),
+      result: Arr.sliceClamped(list, 0, 5),
       toBe: [0, 1, 2, 3, 4],
     }, // 正常
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 0, 6),
+      result: Arr.sliceClamped(list, 0, 6),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, -1, 5),
+      result: Arr.sliceClamped(list, -1, 5),
       toBe: [0, 1, 2, 3, 4],
     }, // 片方オーバー
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, -1, 6),
+      result: Arr.sliceClamped(list, -1, 6),
       toBe: [0, 1, 2, 3, 4],
     }, // 両方オーバー
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 0, 3),
+      result: Arr.sliceClamped(list, 0, 3),
       toBe: [0, 1, 2],
     }, // 正常
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 1, 3),
+      result: Arr.sliceClamped(list, 1, 3),
       toBe: [1, 2],
     }, // 正常
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, -1, 3),
+      result: Arr.sliceClamped(list, -1, 3),
       toBe: [0, 1, 2],
     }, // 片方オーバー
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 3, 5),
+      result: Arr.sliceClamped(list, 3, 5),
       toBe: [3, 4],
     }, // 正常
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 3, 6),
+      result: Arr.sliceClamped(list, 3, 6),
       toBe: [3, 4],
     }, // 片方オーバー
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 4, 3),
+      result: Arr.sliceClamped(list, 4, 3),
       toBe: [],
     }, // start > end
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 0, -1),
+      result: Arr.sliceClamped(list, 0, -1),
       toBe: [],
     }, // start > end
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, -1, -2),
+      result: Arr.sliceClamped(list, -1, -2),
       toBe: [],
     }, // start > end
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 6, 9),
+      result: Arr.sliceClamped(list, 6, 9),
       toBe: [],
     },
     {
       testName: 'ArrayUtils.slice',
-      result: ArrayUtils.slice(list, 6, 3),
+      result: Arr.sliceClamped(list, 6, 3),
       toBe: [],
     },
   ])('ArrayUtils.slice', ({ result, testName, toBe }) => {
@@ -174,7 +171,7 @@ describe('ArrayUtils.isNonEmpty', () => {
 describe('ArrayUtils.head', () => {
   {
     const xs = [1, 2, 3] as const;
-    const head = ArrayUtils.head(xs);
+    const head = Arr.head(xs);
 
     expectType<typeof head, 1>('=');
 
@@ -184,7 +181,7 @@ describe('ArrayUtils.head', () => {
   }
   {
     const xs: MutableNonEmptyArray<number> = [1, 2, 3];
-    const head = ArrayUtils.head(xs);
+    const head = Arr.head(xs);
 
     expectType<typeof head, number>('=');
 
@@ -194,7 +191,7 @@ describe('ArrayUtils.head', () => {
   }
   {
     const mut_xs: number[] = [1, 2, 3];
-    const head = ArrayUtils.head(mut_xs);
+    const head = Arr.head(mut_xs);
 
     expectType<typeof head, number | undefined>('=');
 
@@ -205,7 +202,7 @@ describe('ArrayUtils.head', () => {
   {
     const xs = [] as const;
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    const head = ArrayUtils.head(xs);
+    const head = Arr.head(xs);
 
     expectType<typeof head, undefined>('=');
 
@@ -218,7 +215,7 @@ describe('ArrayUtils.head', () => {
 describe('ArrayUtils.last', () => {
   {
     const xs = [1, 2, 3] as const;
-    const last = ArrayUtils.last(xs);
+    const last = Arr.last(xs);
 
     expectType<typeof last, 3>('=');
 
@@ -228,7 +225,7 @@ describe('ArrayUtils.last', () => {
   }
   {
     const xs: MutableNonEmptyArray<number> = [1, 2, 3];
-    const last = ArrayUtils.last(xs);
+    const last = Arr.last(xs);
 
     expectType<typeof last, number>('=');
 
@@ -238,7 +235,7 @@ describe('ArrayUtils.last', () => {
   }
   {
     const mut_xs: number[] = [1, 2, 3];
-    const last = ArrayUtils.last(mut_xs);
+    const last = Arr.last(mut_xs);
 
     expectType<typeof last, number | undefined>('=');
 
@@ -249,7 +246,7 @@ describe('ArrayUtils.last', () => {
   {
     const xs = [] as const;
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-    const last = ArrayUtils.last(xs);
+    const last = Arr.last(xs);
 
     expectType<typeof last, undefined>('=');
 
@@ -261,7 +258,7 @@ describe('ArrayUtils.last', () => {
 
 describe('ArrayUtils.tail', () => {
   const xs = [1, 2, 3] as const;
-  const tail = ArrayUtils.tail(xs);
+  const tail = Arr.tail(xs);
 
   expectType<typeof tail, readonly [2, 3]>('=');
 
@@ -270,17 +267,17 @@ describe('ArrayUtils.tail', () => {
   });
 
   test('alias 1', () => {
-    expect(ArrayUtils.rest).toStrictEqual(ArrayUtils.tail);
+    expect(Arr.rest).toStrictEqual(Arr.tail);
   });
   test('alias 2', () => {
-    expect(ArrayUtils.shift).toStrictEqual(ArrayUtils.tail);
+    expect(Arr.shift).toStrictEqual(Arr.tail);
   });
 });
 
 describe('ArrayUtils.butLast', () => {
   {
     const xs = [1, 2, 3] as const;
-    const butLast = ArrayUtils.butLast(xs);
+    const butLast = Arr.butLast(xs);
 
     expectType<typeof butLast, readonly [1, 2]>('=');
 
@@ -290,7 +287,7 @@ describe('ArrayUtils.butLast', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const butLast = ArrayUtils.butLast(xs);
+    const butLast = Arr.butLast(xs);
 
     expectType<typeof butLast, readonly number[]>('=');
 
@@ -300,14 +297,14 @@ describe('ArrayUtils.butLast', () => {
   }
 
   test('alias', () => {
-    expect(ArrayUtils.pop).toStrictEqual(ArrayUtils.butLast);
+    expect(Arr.pop).toStrictEqual(Arr.butLast);
   });
 });
 
 describe('ArrayUtils.take', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = ArrayUtils.take(xs, 2);
+    const t = Arr.take(xs, 2);
 
     expectType<typeof t, readonly [1, 2]>('=');
 
@@ -317,7 +314,7 @@ describe('ArrayUtils.take', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = ArrayUtils.take(xs, 2);
+    const t = Arr.take(xs, 2);
 
     expectType<typeof t, readonly number[]>('=');
 
@@ -330,7 +327,7 @@ describe('ArrayUtils.take', () => {
 describe('ArrayUtils.takeLast', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = ArrayUtils.takeLast(xs, 2);
+    const t = Arr.takeLast(xs, 2);
 
     expectType<typeof t, readonly [2, 3]>('=');
 
@@ -340,7 +337,7 @@ describe('ArrayUtils.takeLast', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = ArrayUtils.takeLast(xs, 2);
+    const t = Arr.takeLast(xs, 2);
 
     expectType<typeof t, readonly number[]>('=');
 
@@ -353,7 +350,7 @@ describe('ArrayUtils.takeLast', () => {
 describe('ArrayUtils.skip', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = ArrayUtils.skip(xs, 2);
+    const t = Arr.skip(xs, 2);
 
     expectType<typeof t, readonly [3]>('=');
 
@@ -363,7 +360,7 @@ describe('ArrayUtils.skip', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = ArrayUtils.skip(xs, 2);
+    const t = Arr.skip(xs, 2);
 
     expectType<typeof t, readonly number[]>('=');
 
@@ -376,7 +373,7 @@ describe('ArrayUtils.skip', () => {
 describe('ArrayUtils.skipLast', () => {
   {
     const xs = [1, 2, 3] as const;
-    const t = ArrayUtils.skipLast(xs, 2);
+    const t = Arr.skipLast(xs, 2);
 
     expectType<typeof t, readonly [1]>('=');
 
@@ -386,7 +383,7 @@ describe('ArrayUtils.skipLast', () => {
   }
   {
     const xs: readonly number[] = [1, 2, 3];
-    const t = ArrayUtils.skipLast(xs, 2);
+    const t = Arr.skipLast(xs, 2);
 
     expectType<typeof t, readonly number[]>('=');
 
@@ -396,64 +393,9 @@ describe('ArrayUtils.skipLast', () => {
   }
 });
 
-describe('ArrayUtils.every', () => {
-  const xs = [1, 2, 3] as const;
-
-  if (ArrayUtils.every(xs, (x): x is 1 => x === 1)) {
-    expectType<typeof xs, readonly [1, 2, 3] & readonly 1[]>('=');
-  } else {
-    expectType<typeof xs, readonly [1, 2, 3] & readonly 1[]>('!=');
-  }
-
-  test('case 1', () => {
-    expect(ArrayUtils.every(xs, (x): x is 1 => x === 1)).toBe(false);
-  });
-
-  test('case 2', () => {
-    expect(ArrayUtils.every(xs, (x) => 1 <= x && x <= 3)).toBe(true);
-  });
-});
-
-describe('ArrayUtils.some', () => {
-  const xs = [1, 2, 3] as const;
-
-  test('case 1', () => {
-    expect(ArrayUtils.some(xs, (x): x is 1 => x === 1)).toBe(true);
-  });
-
-  test('case 2', () => {
-    expect(ArrayUtils.some(xs, (x) => x <= 1 && 3 <= x)).toBe(false);
-  });
-});
-
-describe('ArrayUtils.map', () => {
-  const xs = [1, 2, 3] as const;
-  const mapped = ArrayUtils.map(xs, (x, i): number => x * x * i);
-
-  expectType<typeof mapped, ArrayOfLength<3, number>>('=');
-
-  test('case 1', () => {
-    expect(mapped).toStrictEqual([0, 4, 18]);
-  });
-});
-
-describe('ArrayUtils.flat', () => {
-  const xs = [1, 2, [3, 4, [5, 6, [7, 8]]]] as const;
-  const result = ArrayUtils.flat(xs, 1);
-
-  expectType<
-    typeof result,
-    readonly (readonly [5, 6, readonly [7, 8]] | 1 | 2 | 3 | 4)[]
-  >('=');
-
-  test('case 1', () => {
-    expect(result).toStrictEqual([1, 2, 3, 4, [5, 6, [7, 8]]]);
-  });
-});
-
 describe('ArrayUtils.flatMap', () => {
   const xs = [1, 2, 3] as const;
-  const mapped = ArrayUtils.flatMap(xs, (x, i) => [i, x * x]);
+  const mapped = Arr.flatMap(xs, (x, i) => [i, x * x]);
 
   expectType<typeof mapped, readonly number[]>('=');
 
@@ -466,7 +408,7 @@ describe('ArrayUtils.zip', () => {
   {
     const xs = [1, 2, 3] as const;
     const ys = [4, 5, 6] as const;
-    const zipped = ArrayUtils.zip(xs, ys);
+    const zipped = Arr.zip(xs, ys);
 
     expectType<
       typeof zipped,
@@ -484,7 +426,7 @@ describe('ArrayUtils.zip', () => {
   {
     const xs: readonly number[] = [1, 2, 3];
     const ys: readonly number[] = [4];
-    const zipped = ArrayUtils.zip(xs, ys);
+    const zipped = Arr.zip(xs, ys);
 
     expectType<typeof zipped, readonly (readonly [number, number])[]>('=');
 
@@ -495,7 +437,7 @@ describe('ArrayUtils.zip', () => {
   {
     const xs = [1] as const;
     const ys: readonly number[] = [4, 5, 6];
-    const zipped = ArrayUtils.zip(xs, ys);
+    const zipped = Arr.zip(xs, ys);
 
     expectType<typeof zipped, readonly [readonly [1, number | undefined]]>('=');
 
@@ -545,33 +487,9 @@ describe('ArrayUtils.zip', () => {
   // });
 });
 
-describe('ArrayUtils.filter', () => {
-  {
-    const xs = [1, 2, 3] as const;
-    const filtered = ArrayUtils.filter(xs, (x): x is 1 | 3 => x % 2 === 1);
-
-    expectType<typeof filtered, readonly (1 | 3)[]>('=');
-
-    test('case 1', () => {
-      expect(filtered).toStrictEqual([1, 3]);
-    });
-  }
-
-  {
-    const xs = [1, 2, 3] as const;
-    const filtered = ArrayUtils.filter(xs, (x) => x % 2 === 1);
-
-    expectType<typeof filtered, readonly (1 | 2 | 3)[]>('=');
-
-    test('case 2', () => {
-      expect(filtered).toStrictEqual([1, 3]);
-    });
-  }
-});
-
 describe('ArrayUtils.filterNot', () => {
   const xs = [1, 2, 3] as const;
-  const filtered = ArrayUtils.filterNot(xs, (x) => x % 2 === 0);
+  const filtered = Arr.filterNot(xs, (x) => x % 2 === 0);
 
   expectType<typeof filtered, readonly (1 | 2 | 3)[]>('=');
 
@@ -582,9 +500,9 @@ describe('ArrayUtils.filterNot', () => {
 
 describe('ArrayUtils.set', () => {
   const xs = [1, 2, 3] as const;
-  const result = ArrayUtils.set(xs, 1, 4 as const);
+  const result = Arr.set(xs, 1, 4 as const);
 
-  expectType<typeof result, readonly [1 | 4, 2 | 4, 3 | 4]>('=');
+  expectType<typeof result, readonly (1 | 2 | 3 | 4)[]>('=');
 
   test('case 1', () => {
     expect(result).toStrictEqual([1, 4, 3]);
@@ -593,9 +511,9 @@ describe('ArrayUtils.set', () => {
 
 describe('ArrayUtils.update', () => {
   const xs = [1, 2, 3] as const;
-  const result = ArrayUtils.update(xs, 1, (x) => x + 2);
+  const result = Arr.update(xs, 1, (x) => x + 2);
 
-  expectType<typeof result, readonly [number, number, number]>('=');
+  expectType<typeof result, readonly number[]>('=');
 
   test('case 1', () => {
     expect(result).toStrictEqual([1, 4, 3]);
@@ -606,7 +524,7 @@ describe('ArrayUtils.insert', () => {
   const xs = [1, 2, 3] as const;
 
   {
-    const result = ArrayUtils.insert(xs, 1, 5);
+    const result = Arr.inserted(xs, 1, 5);
 
     expectType<typeof result, readonly (1 | 2 | 3 | 5)[]>('=');
 
@@ -615,7 +533,7 @@ describe('ArrayUtils.insert', () => {
     });
   }
   {
-    const result = ArrayUtils.insert(xs, 0, 5);
+    const result = Arr.inserted(xs, 0, 5);
 
     expectType<typeof result, readonly (1 | 2 | 3 | 5)[]>('=');
 
@@ -624,7 +542,7 @@ describe('ArrayUtils.insert', () => {
     });
   }
   {
-    const result = ArrayUtils.insert(xs, 3, 5);
+    const result = Arr.inserted(xs, 3, 5);
 
     expectType<typeof result, readonly (1 | 2 | 3 | 5)[]>('=');
 
@@ -633,7 +551,7 @@ describe('ArrayUtils.insert', () => {
     });
   }
   {
-    const result = ArrayUtils.insert(xs, 999, 5);
+    const result = Arr.inserted(xs, toUint32(999), 5);
 
     expectType<typeof result, readonly (1 | 2 | 3 | 5)[]>('=');
 
@@ -647,7 +565,7 @@ describe('ArrayUtils.remove', () => {
   const xs = [1, 2, 3] as const;
 
   {
-    const result = ArrayUtils.remove(xs, 1);
+    const result = Arr.removed(xs, 1);
 
     expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
@@ -656,7 +574,7 @@ describe('ArrayUtils.remove', () => {
     });
   }
   {
-    const result = ArrayUtils.remove(xs, 0);
+    const result = Arr.removed(xs, 0);
 
     expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
@@ -665,7 +583,7 @@ describe('ArrayUtils.remove', () => {
     });
   }
   {
-    const result = ArrayUtils.remove(xs, 2);
+    const result = Arr.removed(xs, 2);
 
     expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
@@ -674,7 +592,7 @@ describe('ArrayUtils.remove', () => {
     });
   }
   {
-    const result = ArrayUtils.remove(xs, 3);
+    const result = Arr.removed(xs, 3);
 
     expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
@@ -683,7 +601,7 @@ describe('ArrayUtils.remove', () => {
     });
   }
   {
-    const result = ArrayUtils.remove(xs, 5);
+    const result = Arr.removed(xs, 5);
 
     expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
@@ -695,7 +613,7 @@ describe('ArrayUtils.remove', () => {
 
 describe('ArrayUtils.push', () => {
   const xs = [1, 2, 3] as const;
-  const result = ArrayUtils.push(xs, 4 as const);
+  const result = Arr.pushed(xs, 4 as const);
 
   expectType<typeof result, readonly [1, 2, 3, 4]>('=');
 
@@ -706,7 +624,7 @@ describe('ArrayUtils.push', () => {
 
 describe('ArrayUtils.unshift', () => {
   const xs = [1, 2, 3] as const;
-  const result = ArrayUtils.unshift(xs, 4 as const);
+  const result = Arr.unshifted(xs, 4 as const);
 
   expectType<typeof result, readonly [4, 1, 2, 3]>('=');
 
@@ -718,7 +636,7 @@ describe('ArrayUtils.unshift', () => {
 describe('ArrayUtils.concat', () => {
   const xs = [1, 2, 3] as const;
   const ys = [4, 5] as const;
-  const result = ArrayUtils.concat(xs, ys);
+  const result = Arr.concat(xs, ys);
 
   expectType<typeof result, readonly [1, 2, 3, 4, 5]>('=');
 
@@ -761,7 +679,7 @@ describe('ArrayUtils.partition', () => {
   const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
   {
-    const result = ArrayUtils.partition(xs, 4);
+    const result = Arr.partition(xs, 4);
 
     expectType<
       typeof result,
@@ -781,7 +699,7 @@ describe('ArrayUtils.partition', () => {
   }
 
   {
-    const result = ArrayUtils.partition(xs, 3);
+    const result = Arr.partition(xs, 3);
 
     expectType<
       typeof result,
@@ -802,35 +720,25 @@ describe('ArrayUtils.partition', () => {
   }
 });
 
-describe('ArrayUtils.reverse', () => {
+describe('ArrayUtils.reversed', () => {
   {
     const xs = [1, 2, 3] as const;
-    const result = ArrayUtils.reverse(xs);
+    const result = Arr.reversed(xs);
 
-    expectType<typeof result, readonly [3, 2, 1]>('=');
+    expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
     test('case 1', () => {
       expect(result).toStrictEqual([3, 2, 1]);
     });
   }
-  {
-    const xs: readonly number[] = [4, 5, 6];
-    const result = ArrayUtils.reverse(xs);
-
-    expectType<typeof result, readonly number[]>('=');
-
-    test('case 2', () => {
-      expect(result).toStrictEqual([6, 5, 4]);
-    });
-  }
 });
 
-describe('ArrayUtils.sort', () => {
+describe('ArrayUtils.sorted', () => {
   {
     const xs = [2, 1, 3] as const;
-    const result = ArrayUtils.sort(xs);
+    const result = Arr.sorted(xs);
 
-    expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
+    expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
     test('case 1', () => {
       expect(result).toStrictEqual([1, 2, 3]);
@@ -838,9 +746,9 @@ describe('ArrayUtils.sort', () => {
   }
   {
     const xs = [2, 1, 3] as const;
-    const result = ArrayUtils.sort(xs, (a, b) => a - b);
+    const result = Arr.sorted(xs, (a, b) => a - b);
 
-    expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
+    expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
     test('case 2', () => {
       expect(result).toStrictEqual([1, 2, 3]);
@@ -848,9 +756,9 @@ describe('ArrayUtils.sort', () => {
   }
   {
     const xs = [2, 1, 3] as const;
-    const result = ArrayUtils.sort(xs, (a, b) => b - a);
+    const result = Arr.sorted(xs, (a, b) => b - a);
 
-    expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
+    expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
 
     test('case 3', () => {
       expect(result).toStrictEqual([3, 2, 1]);
@@ -858,17 +766,14 @@ describe('ArrayUtils.sort', () => {
   }
 });
 
-describe('ArrayUtils.sortBy', () => {
+describe('ArrayUtils.sortedBy', () => {
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const sorted = ArrayUtils.sortBy(xs, (x) => x.v);
+    const sorted = Arr.sortedBy(xs, (x) => x.v);
 
     expectType<
       typeof sorted,
-      ArrayOfLength<
-        3,
-        Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>
-      >
+      readonly (Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>)[]
     >('=');
 
     test('case 1', () => {
@@ -877,7 +782,7 @@ describe('ArrayUtils.sortBy', () => {
   }
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const sorted = ArrayUtils.sortBy(
+    const sorted = Arr.sortedBy(
       xs,
       (x) => x.v,
       (a, b) => a - b
@@ -885,10 +790,7 @@ describe('ArrayUtils.sortBy', () => {
 
     expectType<
       typeof sorted,
-      ArrayOfLength<
-        3,
-        Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>
-      >
+      readonly (Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }>)[]
     >('=');
 
     test('case 2', () => {
@@ -897,63 +799,10 @@ describe('ArrayUtils.sortBy', () => {
   }
 });
 
-describe('ArrayUtils.includes', () => {
-  {
-    const xs = [2, 1, 3] as const;
-    const result = ArrayUtils.includes(xs, 2);
-
-    expectType<typeof result, boolean>('=');
-
-    test('case 1', () => {
-      expect(result).toBe(true);
-    });
-  }
-  {
-    const xs: readonly number[] = [2, 1, 3];
-    const result = ArrayUtils.includes(xs, 4);
-
-    expectType<typeof result, boolean>('=');
-
-    test('case 2', () => {
-      expect(result).toBe(false);
-    });
-  }
-});
-
-describe('ArrayUtils.find', () => {
-  {
-    const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
-    const result = ArrayUtils.find(xs, (x) => x.v === 1);
-
-    expectType<
-      typeof result,
-      Readonly<{ v: 1 }> | Readonly<{ v: 2 }> | Readonly<{ v: 3 }> | undefined
-    >('=');
-
-    test('case 1', () => {
-      expect(result).toStrictEqual({ v: 1 });
-    });
-  }
-  {
-    const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
-      { v: 2 },
-      { v: 1 },
-      { v: 3 },
-    ] as const;
-    const result = ArrayUtils.find(xs, (x) => x.v === 1);
-
-    expectType<typeof result, Readonly<{ v: 1 | 2 | 3 }> | undefined>('=');
-
-    test('case 2', () => {
-      expect(result).toStrictEqual({ v: 1 });
-    });
-  }
-});
-
 describe('ArrayUtils.min', () => {
   {
     const xs = [3, 5, 4] as const;
-    const result = ArrayUtils.min(xs);
+    const result = Arr.min(xs);
 
     expectType<typeof result, 3 | 4 | 5>('=');
 
@@ -963,7 +812,7 @@ describe('ArrayUtils.min', () => {
   }
   {
     const xs = [3, 5, 4] as const;
-    const result = ArrayUtils.min(xs, (a, b) => a - b);
+    const result = Arr.min(xs, (a, b) => a - b);
 
     expectType<typeof result, 3 | 4 | 5>('=');
 
@@ -973,7 +822,7 @@ describe('ArrayUtils.min', () => {
   }
   {
     const xs: readonly (3 | 4 | 5)[] = [3, 5, 4] as const;
-    const result = ArrayUtils.min(xs, (a, b) => a - b);
+    const result = Arr.min(xs, (a, b) => a - b);
 
     expectType<typeof result, 3 | 4 | 5 | undefined>('=');
 
@@ -985,7 +834,7 @@ describe('ArrayUtils.min', () => {
 
 describe('ArrayUtils.max', () => {
   const xs = [3, 5, 4] as const;
-  const result = ArrayUtils.max(xs, (a, b) => a - b);
+  const result = Arr.max(xs, (a, b) => a - b);
 
   expectType<typeof result, 3 | 4 | 5>('=');
 
@@ -995,7 +844,14 @@ describe('ArrayUtils.max', () => {
 });
 
 describe('ArrayUtils.minBy', () => {
-  const xs = [
+  const xs: NonEmptyArray<
+    | Readonly<{ x: 1; y: 2 }>
+    | Readonly<{ x: 2; y: 3 }>
+    | Readonly<{ x: 3; y: 2 }>
+    | Readonly<{ x: 4; y: 1 }>
+    | Readonly<{ x: 5; y: 1 }>
+    | Readonly<{ x: 6; y: 1 }>
+  > = [
     { x: 5, y: 1 },
     { x: 4, y: 1 },
     { x: 6, y: 1 },
@@ -1004,7 +860,7 @@ describe('ArrayUtils.minBy', () => {
     { x: 2, y: 3 },
   ] as const;
 
-  const result = ArrayUtils.minBy(xs, (a) => a.x);
+  const result = Arr.minBy(xs, (a) => a.x);
 
   expectType<
     typeof result,
@@ -1022,7 +878,14 @@ describe('ArrayUtils.minBy', () => {
 });
 
 describe('ArrayUtils.maxBy', () => {
-  const xs = [
+  const xs: NonEmptyArray<
+    | Readonly<{ x: 1; y: 2 }>
+    | Readonly<{ x: 2; y: 3 }>
+    | Readonly<{ x: 3; y: 2 }>
+    | Readonly<{ x: 4; y: 1 }>
+    | Readonly<{ x: 5; y: 1 }>
+    | Readonly<{ x: 6; y: 1 }>
+  > = [
     { x: 5, y: 1 },
     { x: 4, y: 1 },
     { x: 6, y: 1 },
@@ -1031,7 +894,7 @@ describe('ArrayUtils.maxBy', () => {
     { x: 2, y: 3 },
   ] as const;
 
-  const result = ArrayUtils.maxBy(xs, (a) => a.x);
+  const result = Arr.maxBy(xs, (a) => a.x);
 
   expectType<
     typeof result,
@@ -1058,9 +921,9 @@ describe('ArrayUtils.count', () => {
     { x: 1, y: 3 },
   ] as const;
 
-  const result = ArrayUtils.count(xs, (a) => a.x === 2);
+  const result = Arr.count(xs, (a) => a.x === 2);
 
-  expectType<typeof result, number>('=');
+  expectType<typeof result, SafeUint>('=');
 
   test('case 1', () => {
     expect(result).toBe(2);
@@ -1077,9 +940,9 @@ describe('ArrayUtils.countBy', () => {
     { x: 1, y: 3 },
   ] as const;
 
-  const result = ArrayUtils.countBy(xs, (a) => a.x);
+  const result = Arr.countBy(xs, (a) => a.x);
 
-  expectType<typeof result, IMap<1 | 2 | 3, number>>('=');
+  expectType<typeof result, IMap<1 | 2 | 3, SafeUint>>('=');
 
   test('case 1', () => {
     expect(result).toStrictEqual(
@@ -1102,7 +965,7 @@ describe('ArrayUtils.groupBy', () => {
     { x: 1, y: 3 },
   ] as const;
 
-  const result = ArrayUtils.groupBy(xs, (a) => a.x);
+  const result = Arr.groupBy(xs, (a) => a.x);
 
   expectType<
     typeof result,
@@ -1158,7 +1021,7 @@ describe('ArrayUtils.isSubset', () => {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2] as const;
 
-    const result = ArrayUtils.isSubset(ys, xs);
+    const result = Arr.isSubset(ys, xs);
 
     expectType<typeof result, boolean>('=');
 
@@ -1170,7 +1033,7 @@ describe('ArrayUtils.isSubset', () => {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2, 4] as const;
 
-    const result = ArrayUtils.isSubset(ys, xs);
+    const result = Arr.isSubset(ys, xs);
 
     expectType<typeof result, boolean>('=');
 
@@ -1185,7 +1048,7 @@ describe('ArrayUtils.isSuperset', () => {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2] as const;
 
-    const result = ArrayUtils.isSuperset(ys, xs);
+    const result = Arr.isSuperset(ys, xs);
 
     expectType<typeof result, boolean>('=');
 
@@ -1193,7 +1056,7 @@ describe('ArrayUtils.isSuperset', () => {
       expect(result).toBe(false);
     });
 
-    const result2 = ArrayUtils.isSuperset(xs, ys);
+    const result2 = Arr.isSuperset(xs, ys);
 
     test('case 2', () => {
       expect(result2).toBe(true);
@@ -1203,7 +1066,7 @@ describe('ArrayUtils.isSuperset', () => {
     const xs = [1, 2, 3] as const;
     const ys = [3, 2, 4] as const;
 
-    const result = ArrayUtils.isSuperset(ys, xs);
+    const result = Arr.isSuperset(ys, xs);
 
     expectType<typeof result, boolean>('=');
 
@@ -1215,7 +1078,7 @@ describe('ArrayUtils.isSuperset', () => {
 
 describe('ArrayUtils.copy', () => {
   const xs = [1, 2, 3] as const;
-  const result = ArrayUtils.copy(xs);
+  const result = Arr.copy(xs);
 
   expectType<typeof result, readonly [1, 2, 3]>('=');
 
@@ -1258,23 +1121,55 @@ describe('ArrayUtils.copy', () => {
 //   toBe: [0],
 // });
 
-// testArrayEquality({
-//   testName: 'range(1, 3)',
-//   target: range(1, 3),
-//   toBe: [1, 2],
-// });
+describe('ArrayUtils.range', () => {
+  test('range(1, 3)', () => {
+    const result = Arr.range(1, 3);
 
-// testArrayEquality({
-//   testName: 'range(0, 0)',
-//   target: range(0, 0),
-//   toBe: [],
-// });
+    expectType<typeof result, readonly (1 | 2)[]>('=');
 
-// testArrayEquality({
-//   testName: 'range 3',
-//   target: range(0, 1),
-//   toBe: [0],
-// });
+    expect(result).toStrictEqual([1, 2]);
+  });
+
+  test('range(0, 0)', () => {
+    const result = Arr.range(0, 0);
+
+    expectType<typeof result, readonly never[]>('=');
+
+    expect(result).toStrictEqual([]);
+  });
+
+  test('range(0, 1)', () => {
+    const result = Arr.range(0, 1);
+
+    expectType<typeof result, readonly 0[]>('=');
+
+    expect(result).toStrictEqual([0]);
+  });
+
+  test('range(0, 10, 2)', () => {
+    const result = Arr.range(0, 10, 2);
+
+    expectType<typeof result, readonly SafeInt[]>('=');
+
+    expect(result).toStrictEqual([0, 2, 4, 6, 8]);
+  });
+
+  test('range(0, 11, 2)', () => {
+    const result = Arr.range(0, 11, 2);
+
+    expectType<typeof result, readonly SafeInt[]>('=');
+
+    expect(result).toStrictEqual([0, 2, 4, 6, 8, 10]);
+  });
+
+  test('range(1, 12, 2)', () => {
+    const result = Arr.range(1, 12, 2);
+
+    expectType<typeof result, readonly SafeInt[]>('=');
+
+    expect(result).toStrictEqual([1, 3, 5, 7, 9, 11]);
+  });
+});
 
 // const array1 = newArray(3, 0);
 // expectType<typeof array1, number[]>('=');

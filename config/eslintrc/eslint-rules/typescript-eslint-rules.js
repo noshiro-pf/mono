@@ -7,14 +7,6 @@
 
 /** @type {Record<string, { message?: string; fixWith?: string; }>} */
 const banTypes = {
-  Omit: {
-    message: 'Use `StrictOmit` instead.',
-    fixWith: 'StrictOmit',
-  },
-  Exclude: {
-    message: 'Use `StrictExclude` instead.',
-    fixWith: 'StrictExclude',
-  },
   Date: {
     message: 'Use `DateUtils` from @noshiro/ts-utils instead.',
     fixWith: 'DateUtils',

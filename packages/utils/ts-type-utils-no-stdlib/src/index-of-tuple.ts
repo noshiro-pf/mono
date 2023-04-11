@@ -1,3 +1,4 @@
+import { type Uint32 } from './branded-types';
 import { type IsFixedLengthList } from './is-fixed-length-list';
 import { type ToNumber } from './to-number';
 
@@ -10,4 +11,4 @@ export type IndexOfTuple<
       ? ToNumber<K>
       : never
     : never
-  : number;
+  : Uint32;

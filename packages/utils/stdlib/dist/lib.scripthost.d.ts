@@ -130,7 +130,7 @@ declare const WScript: {
    * Can be accessed only while using CScript.exe.
    */
   readonly StdOut: TextStreamWriter;
-  readonly Arguments: { readonly length: number; Item(n: number): string };
+  readonly Arguments: { readonly length: SafeUint; Item(n: number): string };
 
   /**
    *  The full path of the currently running script.

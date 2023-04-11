@@ -1,6 +1,6 @@
 import { FormGroup } from '@blueprintjs/core';
 import { memoNamed, useBoolState } from '@noshiro/react-utils';
-import { Arr, type TinyObservable } from '@noshiro/ts-utils';
+import { type TinyObservable } from '@noshiro/ts-utils';
 import { isEmailString } from '@noshiro/ts-utils-additional';
 import { useCallback } from 'react';
 import { BpInput, type BpInputProps } from './bp-input';
@@ -69,7 +69,8 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
               {otherErrorMessages === undefined
                 ? undefined
                 : showOtherErrorMessages
-                ? Arr.map(otherErrorMessages, (er, index) => (
+                ? otherErrorMessages.map((er, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
                     <div key={index}>{er}</div>
                   ))
                 : undefined}

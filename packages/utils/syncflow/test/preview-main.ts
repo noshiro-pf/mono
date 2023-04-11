@@ -1,4 +1,4 @@
-import { Arr, Str } from '@noshiro/ts-utils';
+import { Arr, Num, toSafeUint } from '@noshiro/ts-utils';
 import { ArgumentParser } from 'argparse';
 import {
   auditTimeTestCases,
@@ -71,7 +71,7 @@ const exampleList: readonly {
   { name: 'zip', cases: zipTestCases },
 ];
 
-const printExamples = (exampleIdx: number): void => {
+const printExamples = (exampleIdx: SafeUint): void => {
   console.log('examples:');
   for (const [i, example] of exampleList.entries()) {
     const isSelected = exampleIdx === i;
@@ -85,7 +85,7 @@ const printExamples = (exampleIdx: number): void => {
 
 const printExampleCases = (
   exampleCases: readonly StreamTestCase<unknown>[],
-  testCaseIdx: number
+  testCaseIdx: SafeUint
 ): void => {
   console.log('test cases:');
   for (const [i, c] of exampleCases.entries()) {
@@ -106,10 +106,26 @@ const printMode = (isPreviewMode: boolean): void => {
   console.log(`mode: ${isPreviewMode ? 'preview' : 'dump'}`);
 };
 
-const getArgs = (): {
-  exampleIdx: number;
+const convertArgs = (
+  args: DeepReadonly<{
+    example_no: string[];
+    preview: string[] | null;
+    case_no: string[];
+  }>
+): Readonly<{
+  exampleIdx: SafeUint;
   isPreviewMode: boolean;
-  testCaseIdx: number;
+  testCaseIdx: SafeUint;
+}> => ({
+  exampleIdx: toSafeUint(Num.from(args.example_no[0] ?? '0') - 1),
+  isPreviewMode: args.preview != null,
+  testCaseIdx: toSafeUint(Num.from(args.case_no[0] ?? '0') - 1),
+});
+
+const getArgs = (): {
+  exampleIdx: SafeUint;
+  isPreviewMode: boolean;
+  testCaseIdx: SafeUint;
 } => {
   const parser = new ArgumentParser({
     add_help: true,
@@ -135,27 +151,11 @@ const getArgs = (): {
     required: false,
   });
 
-  const convertArgs = (
-    args: Readonly<{
-      example_no: readonly string[];
-      preview: readonly string[] | null;
-      case_no: readonly string[];
-    }>
-  ): {
-    exampleIdx: number;
-    isPreviewMode: boolean;
-    testCaseIdx: number;
-  } => ({
-    exampleIdx: (Str.toNumber(args.example_no[0] ?? '0') ?? 0) - 1,
-    isPreviewMode: args.preview != null,
-    testCaseIdx: (Str.toNumber(args.case_no[0] ?? '0') ?? 0) - 1,
-  });
-
   return convertArgs(
-    parser.parse_args() as Readonly<{
-      example_no: readonly string[];
-      preview: readonly string[] | null;
-      case_no: readonly string[];
+    parser.parse_args() as DeepReadonly<{
+      example_no: string[];
+      preview: string[] | null;
+      case_no: string[];
     }>
   );
 };

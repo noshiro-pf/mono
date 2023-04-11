@@ -10,21 +10,21 @@ export const validateEventSchedule = ({
   datetimeRangeList,
   answerIcons,
   notificationSettingsWithEmail,
-}: Readonly<{
-  datetimeRangeList: readonly DatetimeRange[]; // allow an empty array
-  notificationSettingsWithEmail: NotificationSettingsWithEmail | 'none';
-}> &
-  StrictOmit<
-    EventSchedule,
-    | 'answerDeadline'
-    | 'archivedBy'
-    | 'author'
-    | 'datetimeRangeList'
-    | 'datetimeSpecification'
-    | 'notes'
-    | 'notificationSettings'
-    | 'timezoneOffsetMinutes'
-  >): EventScheduleValidation => ({
+}: Omit<
+  EventSchedule,
+  | 'answerDeadline'
+  | 'archivedBy'
+  | 'author'
+  | 'datetimeRangeList'
+  | 'datetimeSpecification'
+  | 'notes'
+  | 'notificationSettings'
+  | 'timezoneOffsetMinutes'
+> &
+  Readonly<{
+    datetimeRangeList: readonly DatetimeRange[]; // allow an empty array
+    notificationSettingsWithEmail: NotificationSettingsWithEmail | 'none';
+  }>): EventScheduleValidation => ({
   title: title !== '',
   datetimeRangeList: !Arr.isEmpty(datetimeRangeList),
   answerIcons:

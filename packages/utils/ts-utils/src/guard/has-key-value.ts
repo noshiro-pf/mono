@@ -1,10 +1,5 @@
-import { hasKey } from './has-key';
-
 export const hasKeyValue = <K extends PropertyKey, V>(
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  obj: object,
+  obj: RecordBase,
   key: K,
   valueChecker: (v: unknown) => v is V
-): obj is Record<K, V> =>
-  // eslint-disable-next-line no-prototype-builtins
-  hasKey(obj, key) && valueChecker(obj[key]);
+): obj is Record<K, V> => Object.hasOwn(obj, key) && valueChecker(obj[key]);

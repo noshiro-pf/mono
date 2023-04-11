@@ -78,8 +78,8 @@ interface DOMStringList {
 
 interface DOMTokenList {
   [Symbol.iterator](): IterableIterator<string>;
-  entries(): IterableIterator<readonly [number, string]>;
-  keys(): IterableIterator<number>;
+  entries(): IterableIterator<readonly [SafeUint, string]>;
+  keys(): IterableIterator<SafeUint>;
   values(): IterableIterator<string>;
 }
 
@@ -204,9 +204,9 @@ interface Navigator {
 interface NodeList {
   [Symbol.iterator](): IterableIterator<Node>;
   /** Returns an array of key, value pairs for every entry in the list. */
-  entries(): IterableIterator<readonly [number, Node]>;
+  entries(): IterableIterator<readonly [SafeUint, Node]>;
   /** Returns an list of keys in the list. */
-  keys(): IterableIterator<number>;
+  keys(): IterableIterator<SafeUint>;
   /** Returns an list of values in the list. */
   values(): IterableIterator<Node>;
 }
@@ -214,9 +214,9 @@ interface NodeList {
 interface NodeListOf<TNode extends Node> {
   [Symbol.iterator](): IterableIterator<TNode>;
   /** Returns an array of key, value pairs for every entry in the list. */
-  entries(): IterableIterator<readonly [number, TNode]>;
+  entries(): IterableIterator<readonly [SafeUint, TNode]>;
   /** Returns an list of keys in the list. */
-  keys(): IterableIterator<number>;
+  keys(): IterableIterator<SafeUint>;
   /** Returns an list of values in the list. */
   values(): IterableIterator<TNode>;
 }

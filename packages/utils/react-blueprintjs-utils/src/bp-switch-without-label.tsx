@@ -3,8 +3,11 @@ import { memoNamed } from '@noshiro/react-utils';
 
 type SwitchPropsOriginal = React.ComponentProps<typeof Switch>;
 
-export type BpSwitchWithoutLabelProps = Readonly<{ onToggle: () => void }> &
-  StrictOmit<SwitchPropsOriginal, 'label' | 'labelElement'>;
+export type BpSwitchWithoutLabelProps = Omit<
+  SwitchPropsOriginal,
+  'label' | 'labelElement'
+> &
+  Readonly<{ onToggle: () => void }>;
 
 export const BpSwitchWithoutLabel = memoNamed<BpSwitchWithoutLabelProps>(
   'BpSwitchWithoutLabel',

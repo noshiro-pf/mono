@@ -7,7 +7,7 @@ export const myPlayerIndex$: InitializedObservable<PlayerIndex | undefined> =
     mapI(([room, myName]) => {
       if (room === undefined || myName === undefined) return undefined;
 
-      const index = room.players.findIndex((p) => p.name === myName);
+      const index: number = room.players.findIndex((p) => p.name === myName);
       if (index === 0 || index === 1 || index === 2 || index === 3) {
         return index;
       }

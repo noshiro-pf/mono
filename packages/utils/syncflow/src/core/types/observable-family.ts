@@ -37,12 +37,12 @@ export type FromSubscribableObservable<A, E = unknown> = RootObservable<
 export type IntervalObservable = Readonly<{
   start: () => IntervalObservable;
 }> &
-  RootObservable<number, 'Interval'>;
+  RootObservable<SafeUint, 'Interval'>;
 
 export type TimerObservable = Readonly<{
   start: () => TimerObservable;
 }> &
-  RootObservable<number, 'Timer'>;
+  RootObservable<0, 'Timer'>;
 
 // InitializedSyncChildObservable
 
@@ -134,7 +134,7 @@ export type MapResultErrOperatorObservable<
   readonly [R]
 >;
 export type WithIndexOperatorObservable<A> = SyncChildObservable<
-  readonly [number, A],
+  readonly [SafeUint | -1, A],
   'withIndex',
   readonly [A]
 >;

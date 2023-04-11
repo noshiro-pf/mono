@@ -27,5 +27,5 @@ interface Number {
   toLocaleString(
     locales?: Intl.LocalesArgument,
     options?: Intl.NumberFormatOptions
-  ): string;
+  ): `${number}`;
 }

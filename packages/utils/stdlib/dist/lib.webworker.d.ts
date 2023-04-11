@@ -32,11 +32,11 @@ interface AesCbcParams extends Algorithm {
 
 interface AesCtrParams extends Algorithm {
   readonly counter: BufferSource;
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface AesDerivedKeyParams extends Algorithm {
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface AesGcmParams extends Algorithm {
@@ -46,11 +46,11 @@ interface AesGcmParams extends Algorithm {
 }
 
 interface AesKeyAlgorithm extends KeyAlgorithm {
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface AesKeyGenParams extends Algorithm {
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface Algorithm {
@@ -847,7 +847,7 @@ interface AnimationFrameProvider {
 
 /** A file-like object of immutable, raw data. Blobs represent data that isn't necessarily in a JavaScript-native format. The File interface is based on Blob, inheriting blob functionality and expanding it to support files on the user's system. */
 interface Blob {
-  readonly size: number;
+  readonly size: SafeUint;
   readonly type: string;
   arrayBuffer(): Promise<ArrayBuffer>;
   slice(start?: number, end?: number, contentType?: string): Blob;
@@ -1608,7 +1608,7 @@ declare const DOMRectReadOnly: {
 /** A type returned by some APIs which contains a list of DOMString (strings). */
 interface DOMStringList {
   /** Returns the number of strings in strings. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Returns true if strings contains string, and false otherwise. */
   contains(string: string): boolean;
   /** Returns the string with index index from strings. */
@@ -1968,7 +1968,7 @@ declare const File: {
 
 /** An object of this type is returned by the files property of the HTML <input> element; this lets you access the list of files selected with the <input type="file"> element. It's also used for a list of files dropped into web content when using the drag and drop API; see the DataTransfer object for details on this usage. */
 interface FileList {
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): File | null;
   readonly [index: number]: File;
 }
@@ -4055,7 +4055,7 @@ interface SubtleCrypto {
       | HkdfParams
       | Pbkdf2Params,
     baseKey: CryptoKey,
-    length: number
+    length: SafeUint
   ): Promise<ArrayBuffer>;
   deriveKey(
     algorithm:
@@ -7888,7 +7888,7 @@ declare namespace WebAssembly {
   };
 
   interface Table {
-    readonly length: number;
+    readonly length: SafeUint;
     get(index: number): unknown;
     grow(delta: number, value?: unknown): number;
     set(index: number, value?: unknown): void;

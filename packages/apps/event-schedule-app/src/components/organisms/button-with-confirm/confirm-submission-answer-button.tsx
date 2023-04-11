@@ -65,7 +65,7 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
     )
 );
 
-const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
+const SubmitAnswerButton = memoNamed<Omit<Props, 'hasUnanswered'>>(
   'SubmitAnswerButton',
   ({ loading, disabled, mode }) => (
     <ButtonNowrapStyled

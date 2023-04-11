@@ -8,7 +8,7 @@ export const getLuminanceListAccumulated = (
   const luminanceListCorrected: NonEmptyArray<number> = pipe(
     luminanceList
   ).chain((list) =>
-    Arr.map(list, (v: number) => (useLog ? Math.log(v + 0.05) : v + 0.05))
+    Tpl.map(list, (v) => (useLog ? Math.log(v + 0.05) : v + 0.05))
   ).value;
 
   const luminanceDiffAccumulated = pipe(Arr.rest(luminanceListCorrected))
@@ -19,9 +19,7 @@ export const getLuminanceListAccumulated = (
         tp(Arr.first(luminanceListCorrected), 0)
       )
     )
-    .chain((list) =>
-      Arr.map(list, ([_, acc]: readonly [number, number]) => acc)
-    ).value;
+    .chain((list) => list.map(([_, acc]) => acc)).value;
 
   return luminanceDiffAccumulated;
 };

@@ -9,10 +9,7 @@ import {
 import { type AnswerIconSetting } from './base';
 
 describe('AnswerIconSettings', () => {
-  expectType<
-    AnswerIconSettings,
-    Readonly<Record<AnswerIconId, AnswerIconSetting>>
-  >('=');
+  expectType<AnswerIconSettings, Record<AnswerIconId, AnswerIconSetting>>('=');
 
   test('defaultValue', () => {
     const defaultValue: AnswerIconSettings = {

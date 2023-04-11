@@ -1,5 +1,3 @@
-import { Num } from '@noshiro/ts-utils';
-
 // prettier-ignore
 export type AnswerIconPoint = (
     0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9
@@ -16,4 +14,4 @@ export type AnswerIconPoint = (
 );
 
 export const isAnswerIconPoint = (a: unknown): a is AnswerIconPoint =>
-  typeof a === 'number' && 0 <= a && a <= 10 && Num.isSafeInt(a * 10);
+  typeof a === 'number' && 0 <= a && a <= 10 && Number.isSafeInteger(a * 10);

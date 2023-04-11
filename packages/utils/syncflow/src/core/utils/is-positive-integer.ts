@@ -1,3 +1,6 @@
 import { Num } from '@noshiro/ts-utils';
 
-export const isPositiveInteger = (n: number): boolean => n >= 1 && Num.isInt(n);
+export const isPositiveSafeInteger = (
+  n: number
+): n is NonZeroSafeInt & SafeUint =>
+  Number.isSafeInteger(n) && Num.isNonNegative(n) && Num.isNonZero(n);

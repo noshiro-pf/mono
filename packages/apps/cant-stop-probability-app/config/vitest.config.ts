@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { Obj } from '@noshiro/ts-utils';
 
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +8,7 @@ import packageJson from '../package.json' assert { type: 'json' };
 
 const thisDir = dirname(fileURLToPath(import.meta.url));
 
-const globalUtils = Obj.keys(packageJson.devDependencies).filter(
+const globalUtils = Object.keys(packageJson.devDependencies).filter(
   (packageName) => packageName.startsWith('@noshiro/global-')
 );
 

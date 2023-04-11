@@ -49,7 +49,7 @@ export const pollFromJson = (p?: unknown): Poll =>
       updatedAt: a.updatedAt,
       dateOptions: a.dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(
-        Obj.entries(a.answers).map(([k, v]) => [k, answerOfDateFromJson(v)])
+        Object.entries(a.answers).map(([k, v]) => [k, answerOfDateFromJson(v)])
       ),
       titleMessageId: a.titleMessageId,
     })).value;
@@ -59,6 +59,8 @@ export const pollToJson = (p: Poll): PollJson => ({
   title: p.title,
   updatedAt: p.updatedAt,
   dateOptions: p.dateOptions,
-  answers: Obj.fromEntries(p.answers.map(answerOfDateToJson).toEntriesArray()),
+  answers: Object.fromEntries(
+    p.answers.map(answerOfDateToJson).toEntriesArray()
+  ),
   titleMessageId: p.titleMessageId,
 });

@@ -1,21 +1,21 @@
 import { NumericInput } from '@blueprintjs/core';
 import { memoNamed, useState } from '@noshiro/react-utils';
-import { Str } from '@noshiro/ts-utils';
+import { Num } from '@noshiro/ts-utils';
 import { useCallback, useEffect } from 'react';
 
 type NumericInputPropsOriginal = React.ComponentProps<typeof NumericInput>;
 
-export type BpNumericInputProps = Readonly<{
-  value: number;
-  onValueChangeFiltered?: (valueAsNumber: number) => void;
-  parseNumericString?: (value: string) => number | undefined;
-  valueWhenNotParsedAsNumber?: number;
-  convertValueOnBlurAndEmit?: (
-    valueAsNumber: number,
-    valueAsString: string
-  ) => number;
-}> &
-  StrictOmit<NumericInputPropsOriginal, 'value'>;
+export type BpNumericInputProps = Omit<NumericInputPropsOriginal, 'value'> &
+  Readonly<{
+    value: number;
+    onValueChangeFiltered?: (valueAsNumber: number) => void;
+    parseNumericString?: (value: string) => number | undefined;
+    valueWhenNotParsedAsNumber?: number;
+    convertValueOnBlurAndEmit?: (
+      valueAsNumber: number,
+      valueAsString: string
+    ) => number;
+  }>;
 
 export const BpNumericInput = memoNamed<BpNumericInputProps>(
   'BpNumericInput',
@@ -25,7 +25,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
     onValueChangeFiltered,
     selectAllOnFocus = true,
     fill = true,
-    parseNumericString = Str.toNumber,
+    parseNumericString = Num.from,
     valueWhenNotParsedAsNumber = 0,
     onBlur,
     convertValueOnBlurAndEmit,

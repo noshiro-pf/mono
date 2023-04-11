@@ -22,7 +22,7 @@ type Props = DeepReadonly<{
     }>
   ) => void;
 }> &
-  StrictOmit<
+  Omit<
     DateRangeInputPropsOriginal,
     | 'defaultValue'
     | 'formatDate'

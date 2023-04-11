@@ -17,7 +17,6 @@ import { FunctionType } from '../types';
  * @returns {number[]}
  */
 const range = (start, end) =>
-  // eslint-disable-next-line no-restricted-globals
   Array.from({ length: end - start }, (_, i) => start + i);
 
 /**
@@ -76,13 +75,12 @@ const input = () => {
   }
 
   /** @type {number} */
-  // eslint-disable-next-line no-restricted-globals
+  // eslint-disable-next-line deprecation/deprecation
   const len = Number(args[0]);
 
   /** @type {string | undefined} */
   const path = args[1];
 
-  // eslint-disable-next-line no-restricted-globals
   if (Number.isNaN(len)) {
     throw new TypeError('The first argument must be integer.');
   }

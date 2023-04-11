@@ -1,7 +1,6 @@
 import { Arr } from '../array';
 import { pipe, Result } from '../functional';
 import { isRecord } from '../guard';
-import { Obj } from '../record';
 import { Str } from '../str';
 
 /**
@@ -36,7 +35,7 @@ const parse = (
 const stringify = (
   value: unknown,
   replacer?: (this: unknown, key: string, val: unknown) => unknown,
-  space?: number | string
+  space?: UintRange<1, 11> | string
 ): Result<string, string> => {
   try {
     return Result.ok(
@@ -57,7 +56,7 @@ const stringify = (
 const stringifySelected = (
   value: unknown,
   propertiesToBeSelected?: readonly (number | string)[] | null,
-  space?: number | string
+  space?: UintRange<1, 11> | string
 ): Result<string, string> => {
   try {
     return Result.ok(
@@ -71,11 +70,11 @@ const stringifySelected = (
 
 const stringifySortedKey = (
   value: RecordBase,
-  space?: number | string
+  space?: UintRange<1, 11> | string
 ): Result<string, string> => {
   const allKeys = pipe(keysDeep(value))
     .chain((keys) => Arr.uniq(keys))
-    .chain((ks) => Arr.sort(ks, Str.cmp)).value;
+    .chain((ks) => Arr.sorted(ks, Str.cmp)).value;
 
   return stringifySelected(value, allKeys, space);
 };
@@ -85,13 +84,12 @@ const keysDeepImpl = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_keys: string[]
 ): void => {
-  for (const k of Obj.keys(obj)) {
+  for (const k of Object.keys(obj)) {
     mut_keys.push(k);
     const o = obj[k];
     if (isRecord(o)) {
       keysDeepImpl(o, mut_keys);
     }
-    // eslint-disable-next-line no-restricted-globals
     if (Array.isArray(o)) {
       for (const li of o) {
         if (isRecord(li)) {

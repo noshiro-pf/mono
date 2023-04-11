@@ -49,7 +49,10 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
                     newCommits: [],
                   } // ローカルの方が進んでいるときは無視
                 : {
-                    newCommits: Arr.skip(action.value, commitsPlayed.length),
+                    newCommits: Arr.skip(
+                      action.value,
+                      Arr.length(commitsPlayed)
+                    ),
                     commitsPlayed: action.value,
                   };
           }
@@ -298,18 +301,20 @@ const actionsToAutoPlay = [
       timestamp: serverTimestamp(),
     },
   ],
-] as const;
+] as const satisfies NonEmptyArray<NonEmptyArray<GameStateAction>>;
 
-const autoPlayMargin = 1 + (time.showJudge + time.hideJudge) / 1000;
+const autoPlayMargin = toSafeUint(1 + (time.showJudge + time.hideJudge) / 1000);
 
-const actionsToAutoPlayStream = <T>(
-  actions: readonly T[],
-  numSkip: number
-): Observable<T> =>
+const actionsToAutoPlayStream = (
+  actions: NonEmptyArray<GameStateAction>,
+  numSkip: SafeUint | Uint9
+): Observable<GameStateAction> =>
   zip([
-    interval(autoPlaySpeedRate * 1000)
-      .chain(skip(numSkip))
-      .chain(take(actions.length)),
+    Num.isNonZero(numSkip)
+      ? interval(autoPlaySpeedRate * 1000)
+          .chain(skip(numSkip))
+          .chain(take(Arr.length(actions)))
+      : interval(autoPlaySpeedRate * 1000).chain(take(Arr.length(actions))),
     fromArray(actions),
   ] as const).chain(map(([, action]) => action));
 
@@ -318,31 +323,38 @@ const autoPlay = merge([
   actionsToAutoPlayStream(actionsToAutoPlay[0], 0),
   actionsToAutoPlayStream(
     actionsToAutoPlay[1],
-    autoPlayMargin + actionsToAutoPlay[0].length
+    SafeUint.add(autoPlayMargin, Arr.length(actionsToAutoPlay[0]))
   ),
   actionsToAutoPlayStream(
     actionsToAutoPlay[2],
-    autoPlayMargin +
-      actionsToAutoPlay[0].length +
+    toSafeUint(
       autoPlayMargin +
-      actionsToAutoPlay[1].length
+        actionsToAutoPlay[0].length +
+        autoPlayMargin +
+        actionsToAutoPlay[1].length
+    )
   ),
   actionsToAutoPlayStream(
     actionsToAutoPlay[3],
-    autoPlayMargin +
-      actionsToAutoPlay[0].length +
+    toSafeUint(
       autoPlayMargin +
-      actionsToAutoPlay[1].length +
-      autoPlayMargin +
-      actionsToAutoPlay[2].length
+        actionsToAutoPlay[0].length +
+        autoPlayMargin +
+        actionsToAutoPlay[1].length +
+        autoPlayMargin +
+        actionsToAutoPlay[2].length
+    )
   ),
-] as const).chain(take(0));
+] as const);
 
 autoPlay.subscribe((action) => {
-  if (action.type === 'submitAnswer') {
-    onAnswerSubmit();
-  } else {
-    gameStateDispatcher(action);
+  // turn off auto play
+  if (returnFalse()) {
+    if (action.type === 'submitAnswer') {
+      onAnswerSubmit();
+    } else {
+      gameStateDispatcher(action);
+    }
   }
 });
 

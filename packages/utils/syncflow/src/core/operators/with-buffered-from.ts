@@ -54,7 +54,7 @@ class WithBufferedFromObservableClass<A, B>
     });
 
     observable.subscribe((value) => {
-      this.#mut_bufferedValues = Arr.push(this.#mut_bufferedValues, value);
+      this.#mut_bufferedValues = Arr.pushed(this.#mut_bufferedValues, value);
     });
   }
 

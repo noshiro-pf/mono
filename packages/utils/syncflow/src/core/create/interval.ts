@@ -1,4 +1,4 @@
-import { Maybe } from '@noshiro/ts-utils';
+import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import { type IntervalObservable } from '../types';
 
@@ -9,11 +9,11 @@ export const interval = (
   new IntervalObservableClass(milliSeconds, startManually);
 
 class IntervalObservableClass
-  extends RootObservableClass<number, 'Interval'>
+  extends RootObservableClass<SafeUint, 'Interval'>
   implements IntervalObservable
 {
   readonly #milliSeconds: number;
-  #counter: number;
+  #counter: SafeUint;
   #timerId0: TimerId | undefined;
   #timerId: TimerId | undefined;
   #isStarted: boolean;
@@ -21,7 +21,7 @@ class IntervalObservableClass
   constructor(milliSeconds: number, startManually?: boolean) {
     super({ type: 'Interval', currentValueInit: Maybe.none });
     this.#milliSeconds = milliSeconds;
-    this.#counter = 0;
+    this.#counter = toSafeUint(0);
     this.#timerId0 = undefined;
     this.#timerId = undefined;
     this.#isStarted = false;
@@ -47,7 +47,7 @@ class IntervalObservableClass
     }, 0);
 
     this.#timerId = setInterval(() => {
-      this.#counter += 1;
+      this.#counter = SafeUint.add(1, this.#counter);
       this.startUpdate(this.#counter);
     }, this.#milliSeconds);
 

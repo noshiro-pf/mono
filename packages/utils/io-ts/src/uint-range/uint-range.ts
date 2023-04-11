@@ -2,26 +2,33 @@ import { isNumber, Json, Num, Result } from '@noshiro/ts-utils';
 import { type Type } from '../type';
 import { createAssertFunction, createIsFnFromValidateFn } from '../utils';
 
-export const uintRange = <Max extends Index<100>, Min extends Index<Max>>({
+export const uintRange = <
+  Start extends Uint8,
+  End extends Exclude<Uint8, Start>
+>({
   defaultValue,
-  max,
-  min,
+  end,
+  start,
   typeName,
 }: Readonly<{
   typeName?: string;
-  min: Min;
-  max: Max;
-  defaultValue: UintRange<Min, Max>;
-}>): Type<UintRange<Min, Max>> => {
-  type T = UintRange<Min, Max>;
+  start: Start;
+  end: End;
+  defaultValue: UintRange<Start, End>;
+}>): Type<UintRange<Start, End>> => {
+  type T = UintRange<Start, End>;
 
-  const typeNameFilled = typeName ?? `uintRange(${min}, ${max})`;
+  const typeNameFilled = typeName ?? `uintRange(${start}, ${end})`;
 
   const validate: Type<T>['validate'] = (a) => {
-    if (!(isNumber(a) && Num.isInt(a) && Num.isInRange(min, max)(a))) {
+    if (
+      !(isNumber(a) && Number.isInteger(a) && Num.isInRange(start, end - 1)(a))
+    ) {
       const stringifyResult = Json.stringify(a);
 
-      const prefix = `The value is expected to be an integer between ${min} and ${max}`;
+      const prefix = `The value is expected to be an integer between ${start} and ${
+        end - 1
+      }`;
 
       if (Result.isErr(stringifyResult)) {
         return Result.err([

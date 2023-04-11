@@ -6,7 +6,7 @@ const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   double$: Observable<number>;
   quad1$: Observable<number>;
   quad2$: Observable<number>;

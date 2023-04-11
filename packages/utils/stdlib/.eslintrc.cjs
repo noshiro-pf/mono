@@ -23,7 +23,7 @@ const config = {
       impliedStrict: true,
     },
     sourceType: 'module',
-    project: './tsconfig.json',
+    project: './tsconfig.eslint.json',
     tsconfigRootDir: __dirname,
   },
   rules: {

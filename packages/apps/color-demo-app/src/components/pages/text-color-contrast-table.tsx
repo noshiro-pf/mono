@@ -11,11 +11,10 @@ import {
   contrastRatioHsl,
   whiteHsl,
   type Hue,
-  type Percent,
 } from '@noshiro/ts-utils-additional';
 import { Fragment } from 'react';
 
-const hues: readonly Hue[] = Arr.seqUnwrapped(360);
+const hues: readonly Hue[] = Arr.seq(360);
 
 const indices = [0, 1, 2] as const;
 const saturationList = [80, 80, 100] as const;

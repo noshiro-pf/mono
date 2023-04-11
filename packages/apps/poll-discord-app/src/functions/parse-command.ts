@@ -8,12 +8,14 @@ export const rpParseCommand = (command: string): readonly string[] =>
     .filter((_, i) => i % 2 === 1)
     .map((s) => s.replaceAll('\n', ' ').replaceAll('\t', ' '));
 
-const hoursType = t.uintRange({ min: 0, max: 30, defaultValue: 0 });
+const hoursType = t.uintRange({ start: 0, end: 31, defaultValue: 0 });
+
+export type Hours = t.TypeOf<typeof hoursType>;
 
 export const rp3060ParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
   functionName: 'convertRp30ArgsToRpArgs' | 'convertRp60ArgsToRpArgs'
-): Result<readonly [string, number, number], string> => {
+): Result<readonly [string, Hours, Hours], string> => {
   const regexResult =
     /\s*"(?<title>.*)"\s+"?(?<begin>[0-9]{1,2})"?\s+"?(?<end>[0-9]{1,2})"?/u.exec(
       commandArguments
@@ -34,14 +36,9 @@ export const rp3060ParseCommand = (
     return Result.err(parseErrorMessage);
   }
 
-  const arg1AsNumber = Num.parseInt(begin, 10);
-  const arg2AsNumber = Num.parseInt(end, 10);
-  if (
-    arg1AsNumber === undefined ||
-    arg2AsNumber === undefined ||
-    !hoursType.is(arg1AsNumber) ||
-    !hoursType.is(arg2AsNumber)
-  ) {
+  const arg1AsNumber = Number.parseInt(begin, 10);
+  const arg2AsNumber = Number.parseInt(end, 10);
+  if (!hoursType.is(arg1AsNumber) || !hoursType.is(arg2AsNumber)) {
     return Result.err(
       [
         `error has occurred in ${functionName}:`,
@@ -56,7 +53,7 @@ export const rp3060ParseCommand = (
 export const rp3060dParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
   functionName: 'convertRp30dArgsToRpArgs' | 'convertRp60dArgsToRpArgs'
-): Result<readonly [number, number], string> => {
+): Result<readonly [Hours, Hours], string> => {
   const regexResult =
     /\s*"?(?<begin>[0-9]{1,2})"?\s+"?(?<end>[0-9]{1,2})"?/u.exec(
       commandArguments
@@ -77,14 +74,9 @@ export const rp3060dParseCommand = (
     return Result.err(parseErrorMessage);
   }
 
-  const arg1AsNumber = Num.parseInt(begin, 10);
-  const arg2AsNumber = Num.parseInt(end, 10);
-  if (
-    arg1AsNumber === undefined ||
-    arg2AsNumber === undefined ||
-    !hoursType.is(arg1AsNumber) ||
-    !hoursType.is(arg2AsNumber)
-  ) {
+  const arg1AsNumber = Number.parseInt(begin, 10);
+  const arg2AsNumber = Number.parseInt(end, 10);
+  if (!hoursType.is(arg1AsNumber) || !hoursType.is(arg2AsNumber)) {
     return Result.err(
       [
         `error has occurred in ${functionName}:`,
@@ -99,9 +91,8 @@ export const rp3060dParseCommand = (
 export const gpParseGroupingCommandArgument = (
   commandArguments: string
 ): Result<readonly [NumGroups, readonly string[]], undefined> => {
-  const numGroups = Num.parseInt(commandArguments, 10);
-  if (numGroups === undefined || !isNumGroups(numGroups))
-    return Result.err(undefined);
+  const numGroups = Number.parseInt(commandArguments, 10);
+  if (!isNumGroups(numGroups)) return Result.err(undefined);
 
   return Result.ok([
     numGroups,
@@ -115,9 +106,8 @@ export const gpParseGroupingCommandArgument = (
 export const gpParseRandCommandArgument = (
   commandArguments: string
 ): Result<number, undefined> => {
-  const n = Num.parseInt(commandArguments, 10);
-  if (n === undefined) return Result.err(undefined);
-  if (n < 2 || !Num.isSafeInt(n)) return Result.err(undefined);
+  const n = Number.parseInt(commandArguments, 10);
+  if (!Number.isSafeInteger(n) || n < 2) return Result.err(undefined);
 
   return Result.ok(n);
 };

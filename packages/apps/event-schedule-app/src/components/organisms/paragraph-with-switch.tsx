@@ -40,7 +40,8 @@ export const ParagraphWithSwitch = memoNamed<Props>(
       </div>
       {description === undefined
         ? undefined
-        : Arr.map(description, (d, i) => <Description key={i} text={d} />)}
+        : // eslint-disable-next-line react/no-array-index-key
+          description.map((d, i) => <Description key={i} text={d} />)}
       {hideContentIfToggleIsFalse && !toggleState ? undefined : elementToToggle}
     </div>
   )

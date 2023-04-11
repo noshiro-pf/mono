@@ -72,7 +72,7 @@ export const controlGroupStack = [
 export const controlGroupStackZIndex: Record<
   (typeof controlGroupStack)[number],
   number
-> = Obj.fromEntries(controlGroupStack.map((key, index) => [key, index]));
+> = Object.fromEntries(controlGroupStack.map((key, index) => [key, index]));
 
 export const inputTransitionShadow = (
   color: string = inputShadowColorFocus,

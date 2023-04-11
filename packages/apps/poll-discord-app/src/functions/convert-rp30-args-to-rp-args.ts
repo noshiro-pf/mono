@@ -1,18 +1,22 @@
 import { daysOfWeekList } from '@noshiro/ts-utils-additional';
-import { rp3060dParseCommand, rp3060ParseCommand } from './parse-command';
+import {
+  rp3060dParseCommand,
+  rp3060ParseCommand,
+  type Hours,
+} from './parse-command';
 
 export const convertRp60ArgToRpArgsShared = (
   title: string,
-  arg1AsNumber: number,
-  arg2AsNumber: number
+  arg1AsNumber: Hours,
+  arg2AsNumber: Hours
 ): Result<
   Readonly<{ title: string | undefined; args: readonly string[] }>,
   string
 > => {
   const argsConverted: readonly string[] = pipe(
-    Arr.rangeUnwrapped(arg1AsNumber, arg2AsNumber)
+    Arr.range(arg1AsNumber, arg2AsNumber)
   ).chain((list) =>
-    Arr.map(list, (hour: number) => `${hour}:00-${hour + 1}:00`)
+    list.map((hour: number) => `${hour}:00-${hour + 1}:00`)
   ).value;
 
   return Result.ok({ title, args: argsConverted });
@@ -60,14 +64,14 @@ export const convertRp60dArgToRpArgs = (
 
 export const convertRp30ArgToRpArgsShared = (
   title: string,
-  arg1AsNumber: number,
-  arg2AsNumber: number
+  arg1AsNumber: Hours,
+  arg2AsNumber: Hours
 ): Result<
   Readonly<{ title: string | undefined; args: readonly string[] }>,
   string
 > => {
   const argsConverted: readonly string[] = pipe(
-    Arr.rangeUnwrapped(arg1AsNumber, arg2AsNumber)
+    Arr.range(arg1AsNumber, arg2AsNumber)
   ).chain((list) =>
     Arr.flatMap(list, (hour: number) => [
       `${hour}:00-${hour}:30`,

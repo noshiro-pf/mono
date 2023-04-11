@@ -1,4 +1,4 @@
-import { Maybe } from '@noshiro/ts-utils';
+import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type InitializedToInitializedOperator,
@@ -9,27 +9,31 @@ import {
 } from '../types';
 
 export const withIndex =
-  <A>(): ToBaseOperator<A, readonly [number, A]> =>
+  <A>(): ToBaseOperator<A, readonly [SafeUint | -1, A]> =>
   (parentObservable: Observable<A>) =>
     new WithIndexObservableClass(parentObservable);
 
 export const withIndexI = <A>(): InitializedToInitializedOperator<
   A,
-  readonly [number, A]
-> => withIndex() as InitializedToInitializedOperator<A, readonly [number, A]>;
+  readonly [SafeUint | -1, A]
+> =>
+  withIndex() as InitializedToInitializedOperator<
+    A,
+    readonly [SafeUint | -1, A]
+  >;
 
 export const attachIndex = withIndex; // alias
 export const attachIndexI = withIndexI; // alias
 
 class WithIndexObservableClass<A>
   extends SyncChildObservableClass<
-    readonly [number, A],
+    readonly [SafeUint | -1, A],
     'withIndex',
     readonly [A]
   >
   implements WithIndexOperatorObservable<A>
 {
-  #mut_index: number;
+  #mut_index: SafeUint | -1;
 
   constructor(parentObservable: Observable<A>) {
     super({
@@ -49,7 +53,8 @@ class WithIndexObservableClass<A>
       return; // skip update
     }
 
-    this.#mut_index += 1;
+    this.#mut_index =
+      this.#mut_index === -1 ? toSafeUint(0) : SafeUint.add(this.#mut_index, 1);
     this.setNext([this.#mut_index, par.currentValue.value], updaterSymbol);
   }
 }

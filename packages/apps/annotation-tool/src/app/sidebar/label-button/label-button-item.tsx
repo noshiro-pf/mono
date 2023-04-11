@@ -1,4 +1,4 @@
-import { type Hsl, type Percent } from '@noshiro/ts-utils-additional';
+import { type Hsl } from '@noshiro/ts-utils-additional';
 import { type Label } from '../../../canvas';
 import { type AppEventHandler } from '../../../types';
 import { LabelButtonItemView } from './label-button-item-view';

@@ -1,4 +1,3 @@
-import { type Percent } from '@noshiro/ts-utils-additional';
 import { type Label } from '../../canvas';
 import { type AppEventHandler } from '../../types';
 import { LabelButtons } from './label-button';

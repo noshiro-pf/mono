@@ -3,7 +3,7 @@ interface ISetMappedInterface<K, KM extends RecordKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
-  size: number;
+  size: SafeUint;
   isEmpty: boolean;
   has: (key: K) => boolean;
 
@@ -88,7 +88,6 @@ export const ISetMapped = {
   ): ISetMapped<K, KM> => a.union(b),
 };
 
-// eslint-disable-next-line no-restricted-globals
 const ArrayFrom = Array.from;
 
 class ISetMappedClass<K, KM extends RecordKeyType>
@@ -109,7 +108,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
     this.#fromKey = fromKey;
   }
 
-  get size(): number {
+  get size(): SafeUint {
     return this.#set.size;
   }
 

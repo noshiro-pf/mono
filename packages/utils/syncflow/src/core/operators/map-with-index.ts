@@ -1,4 +1,4 @@
-import { Maybe } from '@noshiro/ts-utils';
+import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type InitializedToInitializedOperator,
@@ -9,12 +9,12 @@ import {
 } from '../types';
 
 export const mapWithIndex =
-  <A, B>(mapFn: (x: A, index: number) => B): ToBaseOperator<A, B> =>
+  <A, B>(mapFn: (x: A, index: SafeUint | -1) => B): ToBaseOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new MapWithIndexObservableClass(parentObservable, mapFn);
 
 export const mapWithIndexI = <A, B>(
-  mapFn: (x: A, index: number) => B
+  mapFn: (x: A, index: SafeUint | -1) => B
 ): InitializedToInitializedOperator<A, B> =>
   mapWithIndex(mapFn) as InitializedToInitializedOperator<A, B>;
 
@@ -22,12 +22,12 @@ class MapWithIndexObservableClass<A, B>
   extends SyncChildObservableClass<B, 'mapWithIndex', readonly [A]>
   implements MapWithIndexOperatorObservable<A, B>
 {
-  readonly #mapFn: (x: A, index: number) => B;
-  #index: number;
+  readonly #mapFn: (x: A, index: SafeUint | -1) => B;
+  #index: SafeUint | -1;
 
   constructor(
     parentObservable: Observable<A>,
-    mapFn: (x: A, index: number) => B
+    mapFn: (x: A, index: SafeUint | -1) => B
   ) {
     super({
       parents: [parentObservable],
@@ -46,7 +46,8 @@ class MapWithIndexObservableClass<A, B>
       return; // skip update
     }
 
-    this.#index += 1;
+    this.#index =
+      this.#index === -1 ? toSafeUint(0) : SafeUint.add(1, this.#index);
     this.setNext(
       this.#mapFn(par.currentValue.value, this.#index),
       updaterSymbol

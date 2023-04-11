@@ -22,7 +22,7 @@ const createStreams = (
   startSource: () => void;
   timer1$: Observable<number>;
   timer2$: Observable<number>;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   combined$: Observable<readonly [number, number, number]>;
 }> => {
   const timer1$ = timer(tick * 3, true);

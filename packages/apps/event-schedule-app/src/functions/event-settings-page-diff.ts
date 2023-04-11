@@ -45,7 +45,7 @@ const dc = dict.eventSettingsPage.diff;
 const map = (a: string, b: string): string =>
   `"${a}" ${dict.common.mapTo} "${b}"`;
 
-type EventSchedulePaths = StrictExclude<Paths<EventSchedule>, readonly []>;
+type EventSchedulePaths = Exclude<Paths<EventSchedule>, readonly []>;
 
 // eslint-disable-next-line no-lone-blocks
 {
@@ -121,11 +121,11 @@ const notificationSettingsDiff = (
 
   const collectedDiff = Arr.concat(
     emailPrev === emailCurr ? [] : [map(emailPrev ?? '', emailCurr ?? '')],
-    Obj.keys(a).reduce<readonly string[]>(
+    Object.keys(a).reduce<readonly string[]>(
       (acc, key) =>
         a[key] === b[key]
           ? acc
-          : Arr.push(
+          : Arr.pushed(
               acc,
               `${notificationSettings[key]}${dict.common.colon} ${map(
                 a[key] ? ndc.on : ndc.off,

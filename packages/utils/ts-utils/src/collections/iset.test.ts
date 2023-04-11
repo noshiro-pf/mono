@@ -1,5 +1,4 @@
 import { expectType } from '../expect-type';
-import { Num } from '../num';
 import { ISet } from './iset';
 
 describe('ISet[Symbol.iterator]', () => {
@@ -35,9 +34,9 @@ describe('ISet.has', () => {
     expect(s0.has(0)).toBe(false);
   });
   test('case 4', () => {
-    const s0 = ISet.new([1, 3, 5, 6, 7, Num.NaN]);
+    const s0 = ISet.new([1, 3, 5, 6, 7, Number.NaN]);
 
-    expect(s0.has(Num.NaN)).toBe(true);
+    expect(s0.has(Number.NaN)).toBe(true);
   });
 });
 
@@ -97,10 +96,10 @@ describe('ISet.add', () => {
     expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
-    const s0 = ISet.new([1, 2, 3, Num.NaN]);
+    const s0 = ISet.new([1, 2, 3, Number.NaN]);
 
-    expect(s0.add(Num.NaN)).toStrictEqual(ISet.new([1, 2, 3, Num.NaN]));
-    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Num.NaN]));
+    expect(s0.add(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
+    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
   });
 });
 
@@ -124,10 +123,10 @@ describe('ISet.delete', () => {
     expect(s0).toStrictEqual(ISet.new<number>([]));
   });
   test('case 4', () => {
-    const s0 = ISet.new([1, 2, 3, Num.NaN]);
+    const s0 = ISet.new([1, 2, 3, Number.NaN]);
 
-    expect(s0.delete(Num.NaN)).toStrictEqual(ISet.new([1, 2, 3]));
-    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Num.NaN]));
+    expect(s0.delete(Number.NaN)).toStrictEqual(ISet.new([1, 2, 3]));
+    expect(s0).toStrictEqual(ISet.new([1, 2, 3, Number.NaN]));
   });
 });
 
@@ -136,7 +135,7 @@ describe('ISet.map', () => {
     const s0 = ISet.new([1, 3, 5, 6, 7]);
     const result = s0.map((x) => (x * 2).toString());
 
-    expectType<typeof result, ISet<string>>('=');
+    expectType<typeof result, ISet<`${number}`>>('=');
     expect(result).toStrictEqual(ISet.new(['2', '6', '10', '12', '14']));
     expect(s0).toStrictEqual(ISet.new([1, 3, 5, 6, 7]));
   });
@@ -209,7 +208,6 @@ describe('ISet.union', () => {
   });
   test('case 2', () => {
     expect(
-      // eslint-disable-next-line no-restricted-globals
       Array.from(
         ISet.union(ISet.new([1, 3, 5, 6, 7]), ISet.new([2, 4, 8])).toArray()
       ).sort((a, b) => a - b)

@@ -25,8 +25,8 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   };
 });
 
-const resultsSortedByProbability = pipe(Arr.from(results)).chain((list) =>
-  Arr.sort(list, (a, b) => -(a.countSum - b.countSum))
+const resultsSortedByProbability = pipe(Array.from(results)).chain((list) =>
+  Arr.sorted(list, (a, b) => -(a.countSum - b.countSum))
 ).value;
 
 const { state$: sortBy$, setState: setSortBy } = createState<'dice' | 'prob'>(
@@ -50,7 +50,7 @@ const { state$: selectedTabId$, setState: handleTabChange } = createState<
 
 const { state$: columnsAlive$, updateState: updateDeadColumns } = createState<
   readonly boolean[]
->(Arr.newArrayUnwrapped(11, true));
+>(Arr.newArray(11, true));
 
 export const App = memoNamed('App', () => {
   const sortBy = useObservableValue(sortBy$);
@@ -62,7 +62,7 @@ export const App = memoNamed('App', () => {
     () =>
       filterByString
         .split(separator)
-        .map(Str.toNumber)
+        .map(Num.from)
         .filter(isNotUndefined)
         .filter(isTwoDiceSumValue),
     [filterByString]

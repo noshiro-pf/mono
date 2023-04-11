@@ -15,6 +15,7 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
+/// <reference path="./lib.es5.d.ts" />
 
 interface ObjectConstructor {
   /**
@@ -22,5 +23,11 @@ interface ObjectConstructor {
    * @param o An object.
    * @param v A property name.
    */
-  hasOwn(o: object, v: PropertyKey): boolean;
+  hasOwn<
+    R extends RecordBase,
+    K extends (keyof R | (string & {})) | Exclude<PropertyKey, string>
+  >(
+    obj: R,
+    key: K
+  ): obj is R & Record<K, R[K]>;
 }

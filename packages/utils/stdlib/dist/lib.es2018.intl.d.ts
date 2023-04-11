@@ -24,22 +24,22 @@ declare namespace Intl {
   interface PluralRulesOptions {
     readonly localeMatcher?: 'lookup' | 'best fit' | undefined;
     readonly type?: PluralRuleType | undefined;
-    readonly minimumIntegerDigits?: number | undefined;
-    readonly minimumFractionDigits?: number | undefined;
-    readonly maximumFractionDigits?: number | undefined;
-    readonly minimumSignificantDigits?: number | undefined;
-    readonly maximumSignificantDigits?: number | undefined;
+    readonly minimumIntegerDigits?: UintRange<1, 22> | undefined;
+    readonly minimumFractionDigits?: UintRange<0, 21> | undefined;
+    readonly maximumFractionDigits?: UintRange<0, 21> | undefined;
+    readonly minimumSignificantDigits?: UintRange<1, 22> | undefined;
+    readonly maximumSignificantDigits?: UintRange<1, 22> | undefined;
   }
 
   interface ResolvedPluralRulesOptions {
     readonly locale: string;
     readonly pluralCategories: readonly LDMLPluralRule[];
     readonly type: PluralRuleType;
-    readonly minimumIntegerDigits: number;
-    readonly minimumFractionDigits: number;
-    readonly maximumFractionDigits: number;
-    readonly minimumSignificantDigits?: number;
-    readonly maximumSignificantDigits?: number;
+    readonly minimumIntegerDigits: UintRange<1, 22>;
+    readonly minimumFractionDigits: UintRange<0, 21>;
+    readonly maximumFractionDigits: UintRange<0, 21>;
+    readonly minimumSignificantDigits?: UintRange<1, 22>;
+    readonly maximumSignificantDigits?: UintRange<1, 22>;
   }
 
   interface PluralRules {

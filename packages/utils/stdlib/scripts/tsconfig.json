@@ -9,6 +9,6 @@
     "target": "ESNext",
     "noEmit": true
   },
-  "include": ["./*.mjs"],
+  "include": ["./**/*.mjs"],
   "exclude": ["node_modules"]
 }

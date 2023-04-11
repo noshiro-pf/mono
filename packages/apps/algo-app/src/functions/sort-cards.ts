@@ -4,7 +4,7 @@ export const sortCards = <C extends Card>(
   cards: ArrayOfLength<6, C>
 ): ArrayOfLength<6, C> =>
   pipe(cards).chain((list) =>
-    Arr.sort(list, (a, b) =>
+    Tpl.sorted(list, (a, b) =>
       a.number === b.number
         ? a.color === 'black'
           ? -1

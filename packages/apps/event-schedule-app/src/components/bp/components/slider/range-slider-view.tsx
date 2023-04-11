@@ -17,7 +17,7 @@ type Props = Readonly<{
   min: number;
   max: number;
   range: Readonly<{ min: number; max: number }>;
-  labelFractionDigits: UintRange<0, 20>;
+  labelFractionDigits: UintRange<0, 21>;
   customLabelValues?: readonly number[];
   leftHandle: SliderHandleElementAdaptor;
   rightHandle: SliderHandleElementAdaptor;

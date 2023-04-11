@@ -286,7 +286,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
               onWeightChange={AnswerPageStore.onWeightChange}
             />
           </div>
-          {Arr.map(dc.weight.description, (d, i) => (
+          {dc.weight.description.map((d, i) => (
+            // eslint-disable-next-line react/no-array-index-key
             <Description key={i} text={d} />
           ))}
         </Paragraph>

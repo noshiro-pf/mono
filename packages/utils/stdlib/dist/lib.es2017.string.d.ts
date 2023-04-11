@@ -28,7 +28,7 @@ interface String {
    *        If this string is too long, it will be truncated and the left-most part will be applied.
    *        The default value for this parameter is " " (U+0020).
    */
-  padStart(maxLength: number, fillString?: string): string;
+  padStart(maxLength: SafeUint | Uint9, fillString?: string): string;
 
   /**
    * Pads the current string with a given string (possibly repeated) so that the resulting string reaches a given length.
@@ -41,5 +41,5 @@ interface String {
    *        If this string is too long, it will be truncated and the left-most part will be applied.
    *        The default value for this parameter is " " (U+0020).
    */
-  padEnd(maxLength: number, fillString?: string): string;
+  padEnd(maxLength: SafeUint | Uint9, fillString?: string): string;
 }

@@ -1,4 +1,4 @@
-import { Arr, MutableSet, pipe, type Maybe } from '@noshiro/ts-utils';
+import { Arr, MutableSet, type Maybe } from '@noshiro/ts-utils';
 import {
   isManagerObservable,
   type AsyncChildObservable,
@@ -27,7 +27,7 @@ const registerChild = <A>(
     p.addChild(child);
   }
   // register child to all reachable ManagerObservables
-  const mut_rest = pipe(parents).chain(Arr.from).chain(Arr.asMut).value;
+  const mut_rest = Array.from(parents);
 
   while (mut_rest.length >= 1) {
     const p = mut_rest.pop();
@@ -116,7 +116,7 @@ export class AsyncChildObservableClass<
       this.#procedure.map((a) => a.depth),
       child.depth
     );
-    this.#procedure = Arr.insert(this.#procedure, insertPos, child);
+    this.#procedure = Arr.inserted(this.#procedure, insertPos, child);
   }
 
   startUpdate(nextValue: A): void {

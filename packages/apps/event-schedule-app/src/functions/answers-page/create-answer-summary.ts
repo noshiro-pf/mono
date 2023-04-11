@@ -12,7 +12,7 @@ export const createAnswerSummary = (
   >
 ): IMapMapped<DatetimeRange, ArrayOfLength<3, number>, DatetimeRangeMapKey> =>
   IMapMapped.new(
-    Arr.map(datetimeRangeList, (datetimeRange) => {
+    datetimeRangeList.map((datetimeRange) => {
       const answersForThisDatetimeRange:
         | DeepReadonly<
             [
@@ -59,7 +59,7 @@ const calcScoreSum = (
   return someRequiredParticipantsScoreIs0
     ? 0
     : pipe(Arr.zip(answerPointList, answerWeightList))
-        .chain((list) => Arr.map(list, ([score, weight]) => score * weight))
+        .chain((list) => list.map(([score, weight]) => score * weight))
         .chain(Arr.sum).value;
 };
 

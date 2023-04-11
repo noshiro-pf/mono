@@ -1,25 +1,24 @@
-import { Arr, castWritable, Num, pipe } from '@noshiro/ts-utils';
-import { type Percent } from '../../../types';
+import { Arr, pipe, Tpl } from '@noshiro/ts-utils';
 import { type Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc';
 import { relativeLuminance } from './relative-luminance';
 
 // constants
-const hues = Arr.seqUnwrapped(360);
+const hues = Arr.seq(360);
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す
  */
 export const pickupHighContrastHues = (
-  n: number,
+  n: SafeUint,
   saturation: Percent,
   lightness: Percent
 ): NonEmptyArray<Hue> | undefined => {
-  if (!Num.isUint32(n) || n < 1) return undefined;
+  if (n < 1) return undefined;
 
   const luminanceList = pipe(hues).chain((list) =>
-    Arr.map(list, (hue: Hue) =>
+    Tpl.map(list, (hue: Hue) =>
       relativeLuminance(hslToRgb([hue, saturation, lightness]))
     )
   ).value;
@@ -27,7 +26,7 @@ export const pickupHighContrastHues = (
   const luminanceDiffAccumulated = getLuminanceListAccumulated(luminanceList);
 
   /* pickup n hues */
-  const mut_result: Hue[] = castWritable(Arr.zerosUnwrapped(n));
+  const mut_result: Hue[] = Arr.asMut(Arr.zeros(n));
 
   let mut_i = 0;
   let mut_y = 0;

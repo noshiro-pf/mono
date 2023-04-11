@@ -15,6 +15,7 @@ and limitations under the License.
 
 /// <reference no-default-lib="true"/>
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
+/// <reference path="./lib.es5.d.ts" />
 
 /// <reference path="./lib.es2015.iterable.d.ts" />
 
@@ -22,10 +23,22 @@ interface ObjectConstructor {
   /**
    * Returns an object created by key-value entries for properties and methods
    * @param entries An iterable object that contains key-value entries for properties and methods.
+   *
+   * @example
+   * ```ts
+   * const entries: readonly (readonly ['x' | 'y' | 'z' | 4, 1 | 2 | 3])[] = [
+   *   ['x', 1],
+   *   ['y', 2],
+   *   ['z', 3],
+   *   [4, 3],
+   * ] as const;
+   *
+   * const obj = Object.fromEntries(entries); // Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>
+   * ```
    */
-  fromEntries<T = unknown>(
-    entries: Iterable<readonly [PropertyKey, T]>
-  ): { readonly [k: string]: T };
+  fromEntries<K extends PropertyKey, V>(
+    entries: Iterable<readonly [K, V]>
+  ): Record<K, V>;
 
   /**
    * Returns an object created by key-value entries for properties and methods

@@ -28,8 +28,8 @@ export const fillTimeRange = (a?: unknown): TimeRange =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        start: Obj.hasKey(a, 'start') ? fillHoursMinutes(a.start) : d.start,
-        end: Obj.hasKey(a, 'end') ? fillHoursMinutes(a.end) : d.end,
+        start: Object.hasOwn(a, 'start') ? fillHoursMinutes(a.start) : d.start,
+        end: Object.hasOwn(a, 'end') ? fillHoursMinutes(a.end) : d.end,
       };
 
 export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {

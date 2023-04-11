@@ -11,17 +11,17 @@ export const useNormalizedRangeSliderProps = ({
   range: { min: number; max: number };
   stepSize: number;
   labelStepSize?: number;
-  labelFractionDigits?: UintRange<0, 20>;
+  labelFractionDigits?: UintRange<0, 21>;
 }>): Readonly<{
   max: number;
   min: number;
   range: { min: number; max: number };
   stepSize: number;
   labelStepSize: number;
-  labelFractionDigits: UintRange<0, 20>;
+  labelFractionDigits: UintRange<0, 21>;
 }> => {
   const min = useMemo(() => {
-    if (!Num.isFinite(_min)) {
+    if (!Number.isFinite(_min)) {
       console.error('`min` should be finite.');
       return defaultValues.min;
     }
@@ -29,7 +29,7 @@ export const useNormalizedRangeSliderProps = ({
   }, [_min]);
 
   const max = useMemo(() => {
-    if (!Num.isFinite(_max)) {
+    if (!Number.isFinite(_max)) {
       console.error('`max` should be finite.');
       return defaultValues.max;
     }
@@ -39,7 +39,7 @@ export const useNormalizedRangeSliderProps = ({
   const clamp = useMemo(() => Num.clamp(min, max), [min, max]);
 
   const stepSize = useMemo(() => {
-    if (!Num.isFinite(_stepSize)) {
+    if (!Number.isFinite(_stepSize)) {
       console.error('`stepSize` should be finite.');
       return defaultValues.stepSize;
     }
@@ -48,7 +48,7 @@ export const useNormalizedRangeSliderProps = ({
 
   const labelStepSize = useMemo(() => {
     if (_labelStepSize === undefined) return stepSize;
-    if (!Num.isFinite(_labelStepSize)) {
+    if (!Number.isFinite(_labelStepSize)) {
       console.error('`labelStepSize` should be finite.');
       return defaultValues.labelStepSize;
     }
@@ -63,7 +63,7 @@ export const useNormalizedRangeSliderProps = ({
     [_range, clamp]
   );
 
-  const labelFractionDigits: UintRange<0, 20> = useMemo(
+  const labelFractionDigits: UintRange<0, 21> = useMemo(
     () =>
       _labelFractionDigits ??
       pipe(-Math.floor(Math.log10(labelStepSize))).chain((x) =>

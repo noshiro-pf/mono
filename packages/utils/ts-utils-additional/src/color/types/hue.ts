@@ -40,4 +40,5 @@ export type Hue = (
  350 | 351 | 352 | 353 | 354 | 355 | 356 | 357 | 358 | 359
 );
 
-export const hue = (h: number): Hue => Math.round(Num.clamp(0, 359)(h)) as Hue;
+export const hue = (h: number): Hue =>
+  Math.round(Num.clamp<number>(0, 359)(h)) as Hue;

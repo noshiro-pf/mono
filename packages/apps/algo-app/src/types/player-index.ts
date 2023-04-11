@@ -1,8 +1,8 @@
 import * as t from '@noshiro/io-ts';
 
 export const playerIndexTypeDef = t.uintRange({
-  min: 0,
-  max: 3,
+  start: 0,
+  end: 4,
   defaultValue: 0,
   typeName: 'PlayerIndex',
 });

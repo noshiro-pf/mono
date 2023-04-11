@@ -26,7 +26,8 @@ export const ScoreNumericInput = memoNamed<Props>(
     onValueChange,
   }) => {
     const normalizeValue = useCallback(
-      (value: number) => clampAndRoundAnswersScore(Num.clamp(min, max)(value)),
+      (value: number) =>
+        clampAndRoundAnswersScore(Num.clamp<number>(min, max)(value)),
       [min, max]
     );
 

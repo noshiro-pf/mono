@@ -16,15 +16,23 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 
+type MapToTypedArray<T> = T extends BigInt64
+  ? BigInt64Array
+  : T extends Int32
+  ? Int32Array
+  : never;
+
+type TypedArrayElementTypes = BigInt64 | Int32;
+
 interface Atomics {
   /**
    * A non-blocking, asynchronous version of wait which is usable on the main thread.
    * Waits asynchronously on a shared memory location and returns a Promise
    */
-  waitAsync(
-    typedArray: BigInt64Array | Int32Array,
-    index: number,
-    value: bigint,
+  waitAsync<T extends TypedArrayElementTypes>(
+    typedArray: MapToTypedArray<T>,
+    index: SafeUint,
+    value: T,
     timeout?: number
   ):
     | {

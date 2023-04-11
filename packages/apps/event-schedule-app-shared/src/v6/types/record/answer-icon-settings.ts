@@ -26,7 +26,7 @@ export const fillAnswerIconSettings = (a?: unknown): AnswerIconSettings =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        good: Obj.hasKey(a, 'good') ? fillAnswerIconSetting(a.good) : d.good,
-        fair: Obj.hasKey(a, 'fair') ? fillAnswerIconSetting(a.fair) : d.fair,
-        poor: Obj.hasKey(a, 'poor') ? fillAnswerIconSetting(a.poor) : d.poor,
+        good: Object.hasOwn(a, 'good') ? fillAnswerIconSetting(a.good) : d.good,
+        fair: Object.hasOwn(a, 'fair') ? fillAnswerIconSetting(a.fair) : d.fair,
+        poor: Object.hasOwn(a, 'poor') ? fillAnswerIconSetting(a.poor) : d.poor,
       };

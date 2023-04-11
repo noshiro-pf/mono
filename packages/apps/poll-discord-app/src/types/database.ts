@@ -40,20 +40,22 @@ export const databaseFromJson = (o?: unknown): Database =>
     .chain(databaseJsonType.fill)
     .chain((p) => ({
       polls: IMap.new<PollId, Poll>(
-        Obj.entries(p.polls).map(([k, v]) => tp(k, pollFromJson(v)))
+        Object.entries(p.polls).map(([k, v]) => tp(k, pollFromJson(v)))
       ),
       dateToPollIdMap: IMap.new<DateOptionId, PollId>(
-        Obj.entries(p.dateToPollIdMap)
+        Object.entries(p.dateToPollIdMap)
       ),
       commandMessageIdToPollIdMap: IMap.new<CommandMessageId, PollId>(
-        Obj.entries(p.commandMessageIdToPollIdMap)
+        Object.entries(p.commandMessageIdToPollIdMap)
       ),
     })).value;
 
 export const databaseToJson = (database: Database): DatabaseJson => ({
-  polls: Obj.fromEntries(database.polls.map(pollToJson).toEntriesArray()),
-  dateToPollIdMap: Obj.fromEntries(database.dateToPollIdMap.toEntriesArray()),
-  commandMessageIdToPollIdMap: Obj.fromEntries(
+  polls: Object.fromEntries(database.polls.map(pollToJson).toEntriesArray()),
+  dateToPollIdMap: Object.fromEntries(
+    database.dateToPollIdMap.toEntriesArray()
+  ),
+  commandMessageIdToPollIdMap: Object.fromEntries(
     database.commandMessageIdToPollIdMap.toEntriesArray()
   ),
 });

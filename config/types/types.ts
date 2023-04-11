@@ -31,22 +31,22 @@ export type RestrictedImportsOption = DeepReadonly<
   | { paths: string[] }
 >;
 
-export type ImmutableDataOptions = StrictExclude<
+export type ImmutableDataOptions = Exclude<
   EslintFunctionalRules['functional/immutable-data'],
   Linter.RuleLevel
 >[1];
 
-export type NoLetOptions = StrictExclude<
+export type NoLetOptions = Exclude<
   EslintFunctionalRules['functional/no-let'],
   Linter.RuleLevel
 >[1];
 
-export type NoExpressionStatementOptions = StrictExclude<
+export type NoExpressionStatementOptions = Exclude<
   EslintFunctionalRules['functional/no-expression-statements'],
   Linter.RuleLevel
 >[1];
 
-export type PreferTacitOptions = StrictExclude<
+export type PreferTacitOptions = Exclude<
   EslintFunctionalRules['functional/prefer-tacit'],
   Linter.RuleLevel
 >[1];

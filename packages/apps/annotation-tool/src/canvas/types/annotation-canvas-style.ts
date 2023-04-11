@@ -1,4 +1,4 @@
-import { type Percent, type Rgba } from '@noshiro/ts-utils-additional';
+import { type Rgba } from '@noshiro/ts-utils-additional';
 import { type BackgroundStyle } from './background-style';
 import {
   defaultBboxStyle,

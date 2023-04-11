@@ -24,7 +24,9 @@ export const hmFromDate = (date: DateUtils): HoursMinutes => ({
 });
 
 export const compareHm = (a: HoursMinutes, b: HoursMinutes): -1 | 0 | 1 => {
-  if (a.hours !== b.hours) return Num.sign(a.hours - b.hours);
-  if (a.minutes !== b.minutes) return Num.sign(a.minutes - b.minutes);
+  if (a.hours !== b.hours)
+    return Num.mapNaN2Undefined(Math.sign(a.hours - b.hours)) ?? 0;
+  if (a.minutes !== b.minutes)
+    return Num.mapNaN2Undefined(Math.sign(a.minutes - b.minutes)) ?? 0;
   return 0;
 };

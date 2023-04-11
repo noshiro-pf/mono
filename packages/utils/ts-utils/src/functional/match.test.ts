@@ -1,11 +1,11 @@
 import { expectType } from '../expect-type';
-import { match, type IsLiteralType } from './match';
+import { match, type _IsLiteralType } from './match';
 
 describe('match', () => {
-  expectType<IsLiteralType<'aaa'>, true>('=');
-  expectType<IsLiteralType<33>, true>('=');
-  expectType<IsLiteralType<number | 'aa'>, false>('=');
-  expectType<IsLiteralType<'aa' | 32>, true>('=');
+  expectType<_IsLiteralType<'aaa'>, true>('=');
+  expectType<_IsLiteralType<33>, true>('=');
+  expectType<_IsLiteralType<number | 'aa'>, false>('=');
+  expectType<_IsLiteralType<'aa' | 32>, true>('=');
 
   type Direction = 'E' | 'N' | 'S' | 'W';
   const direction: Direction = 'N';

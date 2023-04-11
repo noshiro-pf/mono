@@ -49,12 +49,12 @@ class MergeMapObservableClass<A, B>
     }
 
     const observable = this.#mapToObservable(par.currentValue.value);
-    this.#observables = Arr.push(this.#observables, observable);
+    this.#observables = Arr.pushed(this.#observables, observable);
 
     const subscription = observable.subscribe((curr) => {
       this.startUpdate(curr);
     });
-    this.#subscriptions = Arr.push(this.#subscriptions, subscription);
+    this.#subscriptions = Arr.pushed(this.#subscriptions, subscription);
   }
 
   override complete(): void {

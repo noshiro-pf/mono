@@ -21,4 +21,4 @@ export const [
   purpleHue,
   magentaHue, // fuchsia
   roseHue,
-]: readonly Hue[] = Arr.seqUnwrapped(12).map((i) => (i * 30) as Hue);
+]: readonly Hue[] = Arr.seq(12).map((i) => (i * 30) as Hue);

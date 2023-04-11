@@ -2,17 +2,16 @@ import {
   hslToRgb,
   relativeLuminance,
   type Hue,
-  type Percent,
 } from '@noshiro/ts-utils-additional';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 
-const huesDefault = Arr.seqUnwrapped(360);
+const huesDefault = Arr.seq(360);
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（＝hue）を返す
  */
 export const pickupHighContrastHues = (
-  n: number,
+  n: Uint8,
   saturation: Percent,
   lightness: Percent,
   firstHue: Hue,
@@ -29,7 +28,7 @@ export const pickupHighContrastHues = (
 
   /* pickup n hues */
 
-  const mut_result: Hue[] = Arr.asMut(Arr.zerosUnwrapped(n));
+  const mut_result: Hue[] = Arr.asMut(Arr.zeros(n));
 
   let mut_i = 0;
   let mut_y = 0;

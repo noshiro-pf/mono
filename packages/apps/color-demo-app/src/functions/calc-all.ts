@@ -4,15 +4,14 @@ import {
   variance,
   type Hsl,
   type Hue,
-  type Percent,
 } from '@noshiro/ts-utils-additional';
-import { type ColorResult } from '../types';
+import { type ColorResult, type DivisionNumber } from '../types';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues';
 
-const hueListDefault = Arr.seqUnwrapped(360);
+const hueListDefault = Arr.seq(360);
 
 export const calcAll = ({
   saturation,
@@ -23,7 +22,7 @@ export const calcAll = ({
   saturation: Percent;
   lightness: Percent;
   firstHue: Hue;
-  divisionNumber: number;
+  divisionNumber: DivisionNumber;
 }>): DeepReadonly<{
   relativeLuminanceDistribution: [Hsl, number][];
   result1_equallySpaced: ColorResult;
@@ -56,7 +55,7 @@ export const calcAll = ({
     luminanceListNormalized
   );
 
-  const pickedUpHues_equallySpaced = Arr.seqUnwrapped(divisionNumber)
+  const pickedUpHues_equallySpaced = Arr.seq(divisionNumber)
     .map((i) => Num.roundToInt((i * 360) / divisionNumber) as Hue)
     .map((h) => ((h - firstHue + 360) % 360) as Hue);
 
