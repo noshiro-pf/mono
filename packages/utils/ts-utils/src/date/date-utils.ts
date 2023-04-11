@@ -138,15 +138,15 @@ const getUTCSeconds = (date: DateUtils): SecondsEnum =>
  * @description Gets the milliseconds of a Date, using local time.
  * @returns a number from 0 to 999
  */
-const getLocaleMilliseconds = (date: DateUtils): SecondsEnum =>
-  getValueHelper(date, (d) => d.getMilliseconds()) as SecondsEnum;
+const getLocaleMilliseconds = (date: DateUtils): MillisecondsEnum =>
+  getValueHelper(date, (d) => d.getMilliseconds()) as MillisecondsEnum;
 
 /**
  * @description Gets the milliseconds of a Date object using Universal Coordinated Time (UTC).
  * @returns a number from 0 to 999
  */
-const getUTCMilliseconds = (date: DateUtils): SecondsEnum =>
-  getValueHelper(date, (d) => d.getUTCMilliseconds()) as SecondsEnum;
+const getUTCMilliseconds = (date: DateUtils): MillisecondsEnum =>
+  getValueHelper(date, (d) => d.getUTCMilliseconds()) as MillisecondsEnum;
 
 /* set */
 
