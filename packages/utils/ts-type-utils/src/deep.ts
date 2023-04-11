@@ -1,5 +1,4 @@
 import { type MutableMap, type MutableSet } from './aliases';
-import { type Primitive } from './utils';
 
 export type DeepReadonly<T> = T extends Primitive
   ? T

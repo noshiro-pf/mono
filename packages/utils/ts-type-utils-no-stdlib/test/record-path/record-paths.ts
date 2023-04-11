@@ -1,11 +1,11 @@
 import {
-  type DeepReadonly,
   type LeafPaths,
   type LeafPathsWithIndex,
   type Paths,
   type PathsWithIndex,
 } from '../../src';
 import { expectType } from '../expect-type';
+import { type _DeepReadonly as DeepReadonly } from '../utils-for-test';
 
 type R0 = DeepReadonly<{
   x: {

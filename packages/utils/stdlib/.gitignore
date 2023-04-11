@@ -1,5 +1,5 @@
 !dist
-!dist/*.d.ts
+!dist/**/*.d.ts
 !unchanged
 !unchanged/*.d.ts
 !stdlib.d.ts
