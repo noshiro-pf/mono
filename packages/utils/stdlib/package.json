@@ -5,20 +5,25 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
-    "autofix": "wireit",
+    "autofix": "yarn z:autofix:wireit",
     "fmt": "yarn zz:cmd:prettier .",
-    "gen": "./gen.sh",
+    "gen": "run-s gen:temp gen:dist",
+    "gen:dist": "./scripts/gen-dist.sh",
+    "gen:temp": "./scripts/gen-temp.sh",
+    "z:autofix:impl": "yarn zz:cmd:eslint temp/ --ext .d.ts",
+    "z:autofix:wireit": "wireit",
+    "zz:cmd:eslint": "eslint --fix --color --cache --cache-location .eslintcache",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ./.prettierignore --write"
   },
   "wireit": {
-    "autofix": {
-      "command": "eslint dist/ --ext .d.ts --fix --color --cache --cache-location .eslintcache",
+    "z:autofix:wireit": {
+      "command": "yarn z:autofix:impl",
       "files": [
-        "dist/**/*.d.ts",
+        "temp/**/*.d.ts",
         ".eslintignore",
         ".eslintrc.cjs",
         "tsconfig.json",
-        "../../../config/tsconfig/tsconfig.base.nolib.json",
+        "../../../config/tsconfig/**",
         "../../../config/eslintrc/**"
       ],
       "output": []

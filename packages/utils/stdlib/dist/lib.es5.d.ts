@@ -305,7 +305,7 @@ interface Function {
   call(
     this: Function,
     thisArg: unknown,
-    ...argArray: readonly unknown[]
+    ...argArray: readonly never[]
   ): unknown;
 
   /**
@@ -317,7 +317,7 @@ interface Function {
   bind(
     this: Function,
     thisArg: unknown,
-    ...argArray: readonly unknown[]
+    ...argArray: readonly never[]
   ): unknown;
 
   /** Returns a string representation of a function. */

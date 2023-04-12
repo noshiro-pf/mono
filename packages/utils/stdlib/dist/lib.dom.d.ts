@@ -23151,12 +23151,12 @@ interface WindowOrWorkerGlobalScope {
   setInterval(
     handler: TimerHandler,
     timeout?: number,
-    ...arguments: readonly unknown[]
+    ...arguments: readonly never[]
   ): number;
   setTimeout(
     handler: TimerHandler,
     timeout?: number,
-    ...arguments: readonly unknown[]
+    ...arguments: readonly never[]
   ): number;
   structuredClone(
     value: unknown,
@@ -23636,26 +23636,26 @@ declare const XSLTProcessor: {
 };
 
 interface Console {
-  assert(condition?: boolean, ...data: readonly unknown[]): void;
+  assert(condition?: boolean, ...data: readonly never[]): void;
   clear(): void;
   count(label?: string): void;
   countReset(label?: string): void;
-  debug(...data: readonly unknown[]): void;
+  debug(...data: readonly never[]): void;
   dir(item?: unknown, options?: unknown): void;
-  dirxml(...data: readonly unknown[]): void;
-  error(...data: readonly unknown[]): void;
-  group(...data: readonly unknown[]): void;
-  groupCollapsed(...data: readonly unknown[]): void;
+  dirxml(...data: readonly never[]): void;
+  error(...data: readonly never[]): void;
+  group(...data: readonly never[]): void;
+  groupCollapsed(...data: readonly never[]): void;
   groupEnd(): void;
-  info(...data: readonly unknown[]): void;
-  log(...data: readonly unknown[]): void;
+  info(...data: readonly never[]): void;
+  log(...data: readonly never[]): void;
   table(tabularData?: unknown, properties?: readonly string[]): void;
   time(label?: string): void;
   timeEnd(label?: string): void;
-  timeLog(label?: string, ...data: readonly unknown[]): void;
+  timeLog(label?: string, ...data: readonly never[]): void;
   timeStamp(label?: string): void;
-  trace(...data: readonly unknown[]): void;
-  warn(...data: readonly unknown[]): void;
+  trace(...data: readonly never[]): void;
+  warn(...data: readonly never[]): void;
 }
 
 declare const console: Console;
@@ -23818,7 +23818,7 @@ interface BlobCallback {
 }
 
 interface CustomElementConstructor {
-  new (...params: readonly unknown[]): HTMLElement;
+  new (...params: readonly never[]): HTMLElement;
 }
 
 interface DecodeErrorCallback {
@@ -24756,12 +24756,12 @@ declare function reportError(e: unknown): void;
 declare function setInterval(
   handler: TimerHandler,
   timeout?: number,
-  ...arguments: readonly unknown[]
+  ...arguments: readonly never[]
 ): number;
 declare function setTimeout(
   handler: TimerHandler,
   timeout?: number,
-  ...arguments: readonly unknown[]
+  ...arguments: readonly never[]
 ): number;
 declare function structuredClone(
   value: unknown,
