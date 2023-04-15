@@ -10,7 +10,7 @@ export type SelectedDatesReducerState = ISetMapped<YearMonthDate, YmdKey>;
 export const selectedDatesReducerInitialState: SelectedDatesReducerState =
   ISetMapped.new([], ymdToKey, ymdFromKey);
 
-export const selectedDatesReducer: ReducerType<
+export const selectedDatesReducer: Reducer<
   SelectedDatesReducerState,
   SelectedDatesReducerAction
 > = (state, action) => {

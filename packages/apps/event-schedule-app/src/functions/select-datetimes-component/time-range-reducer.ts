@@ -7,7 +7,7 @@ export type TimeRangeReducerAction = Readonly<{
 
 export type TimeRangeReducerState = TimeRange;
 
-export const timeRangeReducer: ReducerType<
+export const timeRangeReducer: Reducer<
   TimeRangeReducerState,
   TimeRangeReducerAction
 > = (state, action) => {

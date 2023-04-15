@@ -13,7 +13,7 @@ export type IconListReducerAction = Readonly<
 
 export type IconListReducerState = AnswerIconSettings;
 
-export const iconListReducer: ReducerType<
+export const iconListReducer: Reducer<
   IconListReducerState,
   IconListReducerAction
 > = (state, action) => {

@@ -9,7 +9,7 @@ const initialState = (): Record<NWES, Rect> => ({
   E: { top: 0, left: 0, width: 0, height: 0 },
 });
 
-export const playerNamePositionsReducer: ReducerType<
+export const playerNamePositionsReducer: Reducer<
   Record<NWES, Rect> | undefined,
   readonly [NWES, Rect]
 > = (state, [direction, rect]) =>

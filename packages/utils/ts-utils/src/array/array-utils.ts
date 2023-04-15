@@ -646,7 +646,7 @@ const reduceRight = foldr;
 
 const scan = <A, B>(
   list: NonEmptyArray<A> | readonly A[],
-  reducer: ReducerType<B, A>,
+  reducer: Reducer<B, A>,
   init: B
 ): NonEmptyArray<B> => {
   const mut_result: B[] = ArrayFrom(

@@ -1,4 +1,4 @@
-export const visibleLabelsReducer: ReducerType<
+export const visibleLabelsReducer: Reducer<
   readonly boolean[],
   | { type: 'flip'; index: number }
   | { type: 'hide-all' }

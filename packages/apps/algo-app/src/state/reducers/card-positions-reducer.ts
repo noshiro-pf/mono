@@ -35,7 +35,7 @@ const initialState = (): Record<CardColor, ArrayOfLength<12, Rect>> => ({
   ],
 });
 
-export const cardPositionsReducer: ReducerType<
+export const cardPositionsReducer: Reducer<
   Record<CardColor, ArrayOfLength<12, Rect>> | undefined,
   readonly [CardColor, CardNumber, Rect]
 > = (state, [color, number, rect]) =>

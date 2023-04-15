@@ -1,6 +1,6 @@
 import { type GameState, type GameStateAction } from '../../types';
 
-export const confirmTossBalloonIsOpenReducer: ReducerType<
+export const confirmTossBalloonIsOpenReducer: Reducer<
   GameState['confirmTossBalloonIsOpen'],
   GameStateAction
 > = (curr, action) => {
