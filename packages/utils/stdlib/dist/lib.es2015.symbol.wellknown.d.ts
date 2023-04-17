@@ -74,7 +74,7 @@ interface SymbolConstructor {
   readonly toStringTag: unique symbol;
 
   /**
-   * An Object whose own property names are property names that are excluded from the 'with'
+   * An Object whose truthy properties are properties that are excluded from the 'with'
    * environment bindings of the associated objects.
    */
   readonly unscopables: unique symbol;
@@ -91,17 +91,21 @@ interface Symbol {
 
 interface Array<T> {
   /**
-   * Returns an object whose properties have the value 'true'
+   * Is an object whose properties have the value 'true'
    * when they will be absent when used in a 'with' statement.
    */
-  [Symbol.unscopables](): {
-    readonly copyWithin: boolean;
-    readonly entries: boolean;
-    readonly fill: boolean;
-    readonly find: boolean;
-    readonly findIndex: boolean;
-    readonly keys: boolean;
-    readonly values: boolean;
+  readonly [Symbol.unscopables]: {
+    readonly [K in keyof any[]]?: boolean;
+  };
+}
+
+interface ReadonlyArray<T> {
+  /**
+   * Is an object whose properties have the value 'true'
+   * when they will be absent when used in a 'with' statement.
+   */
+  readonly [Symbol.unscopables]: {
+    readonly [K in keyof (readonly any[])]?: boolean;
   };
 }
 

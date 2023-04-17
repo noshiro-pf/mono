@@ -16,6 +16,9 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 
+/// <reference path="./lib.decorators.d.ts" />
+/// <reference path="./lib.decorators.legacy.d.ts" />
+
 /////////////////////////////
 /// ECMAScript APIs
 /////////////////////////////
@@ -886,7 +889,7 @@ interface Date {
   toLocaleTimeString(): string;
   /** Returns the stored time value in milliseconds since midnight, January 1, 1970 UTC. */
   valueOf(): SafeUint;
-  /** Gets the time value in milliseconds. */
+  /** Returns the stored time value in milliseconds since midnight, January 1, 1970 UTC. */
   getTime(): SafeUint;
   /** Gets the year, using local time. */
   getFullYear(): YearEnum;
@@ -1817,24 +1820,6 @@ interface TypedPropertyDescriptor<T> {
   readonly get?: () => T;
   readonly set?: (value: T) => void;
 }
-
-declare type ClassDecorator = <TFunction extends Function>(
-  target: TFunction
-) => TFunction | void;
-declare type PropertyDecorator = (
-  target: Object,
-  propertyKey: string | symbol
-) => void;
-declare type MethodDecorator = <T>(
-  target: Object,
-  propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>
-) => TypedPropertyDescriptor<T> | void;
-declare type ParameterDecorator = (
-  target: Object,
-  propertyKey: string | symbol,
-  parameterIndex: number
-) => void;
 
 declare type PromiseConstructorLike = new <T>(
   executor: (

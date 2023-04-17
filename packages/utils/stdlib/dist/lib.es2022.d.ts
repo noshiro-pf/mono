@@ -23,3 +23,4 @@ and limitations under the License.
 /// <reference path="./lib.es2022.object.d.ts" />
 /// <reference path="./lib.es2022.sharedmemory.d.ts" />
 /// <reference path="./lib.es2022.string.d.ts" />
+/// <reference path="./lib.es2022.regexp.d.ts" />

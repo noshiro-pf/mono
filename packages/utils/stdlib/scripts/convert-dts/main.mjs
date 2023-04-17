@@ -6,6 +6,7 @@ import { convertLibDom } from './lib.dom.mjs';
 import { convertLibEs2015Collection } from './lib.es2015.collection.mjs';
 import { convertLibEs2015Core } from './lib.es2015.core.mjs';
 import { convertLibEs2015Iterable } from './lib.es2015.iterable.mjs';
+import { convertEs2015SymbolWellknown } from './lib.es2015.symbol.wellknown.mjs';
 import { convertLibEs2016ArrayInclude } from './lib.es2016.array.include.mjs';
 import { convertLibEs2017Object } from './lib.es2017.object.mjs';
 import { convertLibEs2017Sharedmemory } from './lib.es2017.sharedmemory.mjs';
@@ -18,6 +19,7 @@ import { convertLibEs2020Sharedmemory } from './lib.es2020.sharedmemory.mjs';
 import { convertLibEs2022Array } from './lib.es2022.array.mjs';
 import { convertLibEs2022Object } from './lib.es2022.object.mjs';
 import { convertLibEs2022Sharedmemory } from './lib.es2022.sharedmemory.mjs';
+import { convertLibEs2023Array } from './lib.es2023.array.mjs';
 import { convertLibEs5 } from './lib.es5.mjs';
 
 const srcDir = './temp';
@@ -132,6 +134,10 @@ const convert = (content, filename) => {
       ret = convertLibEs2015Collection(ret);
       break;
 
+    case 'lib.es2015.symbol.wellknown.d.ts':
+      ret = convertEs2015SymbolWellknown(ret);
+      break;
+
     case 'lib.es2015.core.d.ts':
       ret = convertLibEs2015Core(ret, commentOutDeprecated);
       break;
@@ -190,6 +196,14 @@ const convert = (content, filename) => {
 
     case 'lib.es2022.sharedmemory.d.ts':
       ret = convertLibEs2022Sharedmemory(ret);
+      break;
+
+    case 'lib.es2022.regexp.d.ts':
+      ret = ret.replaceAll('number', indexType.ret);
+      break;
+
+    case 'lib.es2023.array.d.ts':
+      ret = convertLibEs2023Array(ret);
       break;
   }
 
