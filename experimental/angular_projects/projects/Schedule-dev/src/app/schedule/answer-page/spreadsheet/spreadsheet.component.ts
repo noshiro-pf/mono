@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog, Sort } from '@angular/material';
-import { manual, RN } from 'rnjs';
+import { RN, manual } from 'rnjs';
 import { AlertDialogComponent } from '../../../mylib/alert-dialog.component';
 import { utils } from '../../../mylib/utilities';
 import { Answer, Schedule, ScheduleSymbol } from '../../schedule-event';

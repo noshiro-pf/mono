@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
 import {
   type AuthCredential as _AuthCredential,
-  type OAuthCredential as _OAuthCredential,
   type User as _FireAuthUser,
+  type OAuthCredential as _OAuthCredential,
   type UserCredential as _UserCredential,
 } from 'firebase/auth';
 

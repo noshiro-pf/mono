@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { combine, manual, RN } from 'rnjs';
+import { RN, combine, manual } from 'rnjs';
 import { TableSettings } from '../../mylib/data-table/types/table-settings';
 import { utils } from '../../mylib/utilities';
 import { GameResult } from '../types/game-result';

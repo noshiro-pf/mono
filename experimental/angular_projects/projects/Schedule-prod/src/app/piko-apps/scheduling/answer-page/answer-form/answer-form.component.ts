@@ -9,9 +9,9 @@ import {
 import { MatDialog } from '@angular/material';
 import {
   BehaviorSubject,
-  combineLatest,
   Observable,
   ReplaySubject,
+  combineLatest,
 } from 'rxjs';
 import { map, takeWhile } from 'rxjs/operators';
 import { DatabaseService } from '../../../../database/database.service';

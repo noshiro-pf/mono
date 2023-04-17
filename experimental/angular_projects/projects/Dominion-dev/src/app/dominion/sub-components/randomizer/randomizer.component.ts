@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { combine, manual, merge, of, RN } from 'rnjs';
+import { RN, combine, manual, merge, of } from 'rnjs';
 import { AlertDialogComponent } from '../../../mylib/alert-dialog.component';
 import { utils } from '../../../mylib/utilities';
 import { BlackMarketPileCard } from '../../types/black-market-pile-card';

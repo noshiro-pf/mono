@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { combineLatest, Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { first, switchMap } from 'rxjs/operators';
 import { DatabaseService } from '../../../database/database.service';
 import { ConfirmDialogComponent } from '../../../mylib/confirm-dialog.component';

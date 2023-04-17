@@ -52,10 +52,10 @@ import {
 import { OrderedMap } from './OrderedMap';
 import { OrderedSet } from './OrderedSet';
 import { isAssociative } from './predicates/isAssociative';
-import { isCollection, IS_COLLECTION_SYMBOL } from './predicates/isCollection';
-import { isIndexed, IS_INDEXED_SYMBOL } from './predicates/isIndexed';
-import { isKeyed, IS_KEYED_SYMBOL } from './predicates/isKeyed';
-import { isOrdered, IS_ORDERED_SYMBOL } from './predicates/isOrdered';
+import { IS_COLLECTION_SYMBOL, isCollection } from './predicates/isCollection';
+import { IS_INDEXED_SYMBOL, isIndexed } from './predicates/isIndexed';
+import { IS_KEYED_SYMBOL, isKeyed } from './predicates/isKeyed';
+import { IS_ORDERED_SYMBOL, isOrdered } from './predicates/isOrdered';
 import { Range } from './Range';
 import { ArraySeq, IndexedSeq, KeyedSeq, SetSeq } from './Seq';
 import { Set } from './Set';

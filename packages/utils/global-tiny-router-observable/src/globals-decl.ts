@@ -1,7 +1,7 @@
 import {
-  type createRouter as VAR_createRouter,
   type QueryParams as TYPE_QueryParams,
   type Router as TYPE_Router,
+  type createRouter as VAR_createRouter,
   type withSlash as VAR_withSlash,
 } from '@noshiro/tiny-router-observable';
 

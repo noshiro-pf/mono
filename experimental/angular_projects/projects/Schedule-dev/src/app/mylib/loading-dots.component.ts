@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { interval, RN } from 'rnjs';
+import { RN, interval } from 'rnjs';
 import { utils } from './utilities';
 
 const dotsLength = 5;

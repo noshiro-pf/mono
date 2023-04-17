@@ -20,7 +20,7 @@ import { isImmutable } from './predicates/isImmutable';
 import { isKeyed } from './predicates/isKeyed';
 import { IS_ORDERED_SYMBOL } from './predicates/isOrdered';
 import { isRecord } from './predicates/isRecord';
-import { isSeq, IS_SEQ_SYMBOL } from './predicates/isSeq';
+import { IS_SEQ_SYMBOL, isSeq } from './predicates/isSeq';
 import { wrapIndex } from './TrieUtils';
 import hasOwnProperty from './utils/hasOwnProperty';
 import isArrayLike from './utils/isArrayLike';

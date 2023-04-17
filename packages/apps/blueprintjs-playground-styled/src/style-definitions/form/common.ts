@@ -141,9 +141,9 @@ export const ptInput = css`
 
 export { darkButtonColorDisabled as darkInputColorDisabled } from '../button';
 export {
-  ptDarkTextColor as darkInputColor,
-  ptDarkTextColorDisabled as darkInputPlaceholderColor,
   ptIconSizeLargePx as controlIndicatorSizeLargePx,
   ptIconSizeStandardPx as controlIndicatorSizePx,
+  ptDarkTextColor as darkInputColor,
+  ptDarkTextColorDisabled as darkInputPlaceholderColor,
   ptIntentPrimary as darkInputShadowColorFocus,
 } from '../common';

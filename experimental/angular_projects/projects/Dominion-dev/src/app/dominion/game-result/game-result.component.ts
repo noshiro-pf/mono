@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { combine, manual, merge, RN } from 'rnjs';
+import { RN, combine, manual, merge } from 'rnjs';
 import { FireDatabaseService } from '../../database/database.service';
 import { utils } from '../../mylib/utilities';
 import { GameResult } from '../types/game-result';

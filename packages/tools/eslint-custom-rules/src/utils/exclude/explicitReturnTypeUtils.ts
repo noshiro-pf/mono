@@ -3,7 +3,7 @@ import {
   TSESLint,
   TSESTree,
 } from '@typescript-eslint/experimental-utils';
-import { nullThrows, NullThrowsReasons } from '../nullThrows';
+import { NullThrowsReasons, nullThrows } from '../nullThrows';
 import { isConstructor, isSetter, isTypeAssertion } from './astUtils';
 import { getFunctionHeadLoc } from './getFunctionHeadLoc';
 

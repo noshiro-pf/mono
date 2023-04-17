@@ -6,7 +6,7 @@ import {
   InputLabel,
 } from '@material-ui/core'
 import ClearIcon from '@material-ui/icons/Clear'
-import React, { ChangeEvent, CSSProperties, memo, useCallback } from 'react'
+import React, { CSSProperties, ChangeEvent, memo, useCallback } from 'react'
 
 const inputStyle: CSSProperties = {
   minWidth: '120px',

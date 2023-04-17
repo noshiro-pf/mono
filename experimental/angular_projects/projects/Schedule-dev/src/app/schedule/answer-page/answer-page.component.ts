@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { combine, fromObservable, manual, RN } from 'rnjs';
+import { RN, combine, fromObservable, manual } from 'rnjs';
 import { DatabaseService } from '../../database/database.service';
 import { utils } from '../../mylib/utilities';
 import { Schedule } from '../schedule-event';

@@ -4,8 +4,8 @@ import {
   type EventSchedule as EventScheduleV2,
 } from '@noshiro/event-schedule-app-shared/cjs/v2';
 import {
-  type Answer as AnswerV3,
   type AnswerId,
+  type Answer as AnswerV3,
   type EventSchedule as EventScheduleV3,
   type UserName,
   type Weight,

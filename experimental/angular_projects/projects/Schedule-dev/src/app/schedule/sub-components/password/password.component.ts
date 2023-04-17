@@ -6,7 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { manual, merge, RN } from 'rnjs';
+import { RN, manual, merge } from 'rnjs';
 
 @Component({
   selector: 'app-password',

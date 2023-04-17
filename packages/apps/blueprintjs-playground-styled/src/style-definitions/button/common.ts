@@ -561,8 +561,8 @@ export const ptButton = css`
 // }
 
 export {
+  darkGray5 as darkButtonBackgroundColor,
   darkGray2 as darkButtonBackgroundColorActive,
   darkGray4 as darkButtonBackgroundColorHover,
-  darkGray5 as darkButtonBackgroundColor,
   ptDarkTextColorDisabled as darkButtonColorDisabled,
 } from '../common';

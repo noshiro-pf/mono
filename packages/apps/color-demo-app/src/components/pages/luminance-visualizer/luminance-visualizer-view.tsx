@@ -3,9 +3,9 @@ import { type Hsl, type Hue } from '@noshiro/ts-utils-additional';
 import { type ColorResult, type DivisionNumber } from '../../../types';
 import { AllSliders, ContrastRatioList } from '../../molecules';
 import {
+  ColorList,
   ColoredDistribution,
   ColoredDistributionSelected,
-  ColorList,
 } from '../../organisms';
 
 type Props = Readonly<{

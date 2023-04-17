@@ -9,7 +9,7 @@ import {
   unionTypeParts,
 } from 'tsutils';
 import ts from 'typescript';
-import { nullThrows, NullThrowsReasons } from './nullThrows';
+import { NullThrowsReasons, nullThrows } from './nullThrows';
 import { getTypeOfPropertyOfType } from './propertyTypes';
 
 const enum Readonlyness {

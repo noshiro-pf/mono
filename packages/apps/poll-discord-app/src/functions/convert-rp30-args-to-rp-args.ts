@@ -1,7 +1,7 @@
 import { daysOfWeekList } from '@noshiro/ts-utils-additional';
 import {
-  rp3060dParseCommand,
   rp3060ParseCommand,
+  rp3060dParseCommand,
   type Hours,
 } from './parse-command';
 

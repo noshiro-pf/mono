@@ -7,7 +7,7 @@ import {
   Output,
 } from '@angular/core';
 import { Sort, SortDirection } from '@angular/material';
-import { combine, manual, merge, RN } from '../rn/RN';
+import { RN, combine, manual, merge } from '../rn/RN';
 import { filterFn } from './functions/filter-function';
 import { getSorted } from './functions/get-sorted';
 import { isValidSetting_withTable } from './functions/is-valid-setting';

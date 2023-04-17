@@ -13,9 +13,9 @@ import styled from 'styled-components'
 import { dcardCostToStr } from '~/types/card-cost'
 import { DCardProperty, TDCardProperty } from '~/types/dcard-property'
 import {
-  isEmpty,
   TSelectedCards,
   TSelectedCardsKeys,
+  isEmpty,
 } from '~/types/selected-cards'
 import { TSelectedCardsCheckbox } from '~/types/selected-cards-checkbox-values'
 

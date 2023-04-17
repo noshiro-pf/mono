@@ -1,7 +1,7 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
-import { combine, fromObservable, RN } from 'rnjs';
+import { RN, combine, fromObservable } from 'rnjs';
 import { ChatMessage } from '../dominion/online-game/types/chat-message';
 import { GameRoom } from '../dominion/online-game/types/game-room';
 import { GameCommunication } from '../dominion/online-game/types/game-room-communication';

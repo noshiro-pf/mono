@@ -13,7 +13,7 @@ import { withMutations } from './methods/withMutations';
 import { sortFactory } from './Operations';
 import { OrderedSet } from './OrderedSet';
 import { isOrdered } from './predicates/isOrdered';
-import { isSet, IS_SET_SYMBOL } from './predicates/isSet';
+import { IS_SET_SYMBOL, isSet } from './predicates/isSet';
 import { DELETE } from './TrieUtils';
 import assertNotInfinite from './utils/assertNotInfinite';
 

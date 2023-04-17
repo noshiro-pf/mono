@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { combineLatest, Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { filter, startWith, withLatestFrom } from 'rxjs/operators';
 import { GameConfigDialogComponent } from '../../dialogs/game-config-dialog/game-config-dialog.component';
 import { HelpDialogComponent } from '../../dialogs/help-dialog/help-dialog.component';

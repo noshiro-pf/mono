@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from 'react'
-import { isWideCard, TDCardProperty } from '~/types/dcard-property'
+import { TDCardProperty, isWideCard } from '~/types/dcard-property'
 import { DCardImageView } from './dcard-image-view'
 
 export const DCardImage = memo(

@@ -1,7 +1,7 @@
 import { IMap } from '../collections';
 import { range as rangeIterator } from '../iterator';
 import { Num, SafeUint, toSafeUint } from '../num';
-import { idfn, MutableMap, MutableSet, tp } from '../others';
+import { MutableMap, MutableSet, idfn, tp } from '../others';
 
 // SafeUint などの branded type にキャストせずに引数として渡せる数値型の定義。
 // あまり大きな union を用いると型計算が重くなるので注意。

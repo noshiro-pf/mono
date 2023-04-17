@@ -23,7 +23,7 @@ import { wasAltered } from './methods/wasAltered';
 import { withMutations } from './methods/withMutations';
 import { sortFactory } from './Operations';
 import { OrderedMap } from './OrderedMap';
-import { isMap, IS_MAP_SYMBOL } from './predicates/isMap';
+import { IS_MAP_SYMBOL, isMap } from './predicates/isMap';
 import { isOrdered } from './predicates/isOrdered';
 import {
   DELETE,

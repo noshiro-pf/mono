@@ -5,10 +5,10 @@ import {
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
 import { api } from '../../api';
-import { eventScheduleInitialValue, Routes } from '../../constants';
+import { Routes, eventScheduleInitialValue } from '../../constants';
 import {
-  createToaster,
   EventScheduleAppLocalStorage,
+  createToaster,
   showToast,
 } from '../../functions';
 import { type EventScheduleSettingCommonState } from '../../types';

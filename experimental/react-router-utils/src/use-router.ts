@@ -1,7 +1,7 @@
 import type { History as HistoryType, Location as LocationType } from 'history';
 import type { Context } from 'react';
 import { useCallback, useContext, useMemo } from 'react';
-import type { match, RouteComponentProps, StaticContext } from 'react-router';
+import type { RouteComponentProps, StaticContext, match } from 'react-router';
 import { __RouterContext } from 'react-router';
 import { pathnameToPathList } from './pathname-to-pathlist';
 

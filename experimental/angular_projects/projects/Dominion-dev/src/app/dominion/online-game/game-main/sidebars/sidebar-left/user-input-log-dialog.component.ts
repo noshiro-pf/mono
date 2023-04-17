@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest, Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { GameState } from '../../../types/game-state';
 import { UserInput } from '../../../types/user-input';
 
