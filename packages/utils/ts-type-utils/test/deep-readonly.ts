@@ -1,3 +1,4 @@
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
 import { type DeepReadonly } from '../src';

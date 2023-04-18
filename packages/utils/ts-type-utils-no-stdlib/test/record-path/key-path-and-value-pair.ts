@@ -1,9 +1,6 @@
-import {
-  type DeepReadonly,
-  type KeyPathAndValueTypeAtPathTuple,
-  type Paths,
-} from '../../src';
+import { type KeyPathAndValueTypeAtPathTuple, type Paths } from '../../src';
 import { expectType } from '../expect-type';
+import { type _DeepReadonly as DeepReadonly } from '../utils-for-test';
 
 type R0 = DeepReadonly<{
   x: {

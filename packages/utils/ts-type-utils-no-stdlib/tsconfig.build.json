@@ -1,0 +1,14 @@
+{
+  "extends": "../../../config/tsconfig/tsconfig.base.nolib.json",
+  "include": ["./src"],
+  "compilerOptions": {
+    "declarationDir": "types",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "isolatedModules": false,
+    "module": "ESNext",
+    "importsNotUsedAsValues": "remove",
+    "typeRoots": [],
+    "types": []
+  }
+}

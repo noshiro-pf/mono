@@ -1,3 +1,4 @@
+/* eslint-disable functional/readonly-type */
 import { type DeepWritable } from '../src';
 import { expectType } from './expect-type';
 

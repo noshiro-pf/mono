@@ -1,7 +1,7 @@
 import { cardEq } from '../../functions';
 import { type GameState, type GameStateAction } from '../../types';
 
-export const cardChosenToBeAttackedReducer: ReducerType<
+export const cardChosenToBeAttackedReducer: Reducer<
   GameState['cardChosenToBeAttacked'],
   GameStateAction
 > = (curr, action) => {

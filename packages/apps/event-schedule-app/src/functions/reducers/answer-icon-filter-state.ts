@@ -104,10 +104,10 @@ const normalizeState = ({
   };
 };
 
-const reducer: ReducerType<
-  AnswerIconFilterState,
-  AnswerIconFilterStateAction
-> = (currentState, action) =>
+const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
+  currentState,
+  action
+) =>
   pipe(currentState)
     .chain((state) => {
       switch (action.type) {

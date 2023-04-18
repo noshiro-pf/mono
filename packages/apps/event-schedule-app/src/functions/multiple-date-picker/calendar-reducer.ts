@@ -18,7 +18,7 @@ export const calendarCurrentPageInitialState =
     month: DateUtils.getLocaleMonth(DateUtils.today()),
   });
 
-export const calendarCurrentPageReducer: ReducerType<
+export const calendarCurrentPageReducer: Reducer<
   CalendarCurrentPageReducerState,
   CalendarCurrentPageReducerAction
 > = ({ year, month }, action) => {

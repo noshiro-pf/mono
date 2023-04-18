@@ -6,7 +6,7 @@ type UpdateStateFn<S> = (updateFn: (prevState: S) => S) => void;
 
 export const useAsyncDispatchFunction = <S, A>(
   state: S,
-  reducer: ReducerType<S, A>,
+  reducer: Reducer<S, A>,
   updateState: UpdateStateFn<S>
 ): AsyncDispatch<S, A> => {
   // hold resolution function for all setState calls still unresolved
@@ -48,7 +48,7 @@ export const useAsyncDispatchFunction = <S, A>(
 };
 
 export const useAsyncReducer = <S, A>(
-  reducer: ReducerType<S, A>,
+  reducer: Reducer<S, A>,
   init: S
 ): [S, AsyncDispatch<S, A>] => {
   const { state, updateState } = useState(init);

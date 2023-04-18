@@ -21,14 +21,14 @@ export const createNumericInputStateReducer = <
     defaultValue: NumericValue;
   }>
 ): Readonly<{
-  reducer: ReducerType<string, Action>;
+  reducer: Reducer<string, Action>;
   toValueNormalized: (valueStr: string) => NumericValue;
 }> => {
   const toValueNormalized = (valueStr: string): NumericValue =>
     pipe(valueStr).chain(parseValue).chainOptional(normalizeValue).value ??
     config.defaultValue;
 
-  const reducer: ReducerType<string, Action> = (state, action) => {
+  const reducer: Reducer<string, Action> = (state, action) => {
     switch (action.type) {
       case 'set-string':
         return action.value;

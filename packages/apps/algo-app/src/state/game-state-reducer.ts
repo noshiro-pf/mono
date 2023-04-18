@@ -13,12 +13,12 @@ import {
   selectAnswerBalloonIsOpenReducer,
 } from './reducers';
 
-export const gameStateReducer: ReducerType<
+export const gameStateReducer: Reducer<
   GameState,
   readonly GameStateAction[]
 > = (state, actions) => actions.reduce(gameStateReducer1Step, state);
 
-const gameStateReducer1Step: ReducerType<GameState, GameStateAction> = (
+const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
   state,
   action
 ) =>

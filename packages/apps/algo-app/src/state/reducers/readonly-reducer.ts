@@ -1,6 +1,6 @@
 import { type GameState, type GameStateAction } from '../../types';
 
-export const readonlyReducer: ReducerType<
+export const readonlyReducer: Reducer<
   GameState['readonly'],
   GameStateAction
 > = (curr, action) => {

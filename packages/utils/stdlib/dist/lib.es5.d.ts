@@ -14,7 +14,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
-/// <reference path="./utils.d.ts" />
+/// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 
 /////////////////////////////
 /// ECMAScript APIs
@@ -1895,7 +1895,7 @@ type Record<K extends keyof never, T> = {
 /**
  * Exclude from T those types that are assignable to U
  */
-type Exclude<T, U> = T extends U ? never : T;
+type Exclude<T, U extends T> = T extends U ? never : T;
 
 /**
  * Extract from T those types that are assignable to U

@@ -23,7 +23,7 @@ export type DatetimeListReducerAction = Readonly<
 
 export type DatetimeListReducerState = readonly DatetimeRange[];
 
-export const datetimeListReducer: ReducerType<
+export const datetimeListReducer: Reducer<
   DatetimeListReducerState,
   DatetimeListReducerAction
 > = (state, action) => {

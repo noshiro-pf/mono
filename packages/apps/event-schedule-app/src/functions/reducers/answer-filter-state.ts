@@ -189,7 +189,7 @@ export type AnswerFilterStateAction = DeepReadonly<
   | { type: 'reset' }
 >;
 
-const reducer: ReducerType<AnswerFilterState, AnswerFilterStateAction> = (
+const reducer: Reducer<AnswerFilterState, AnswerFilterStateAction> = (
   currentState,
   action
 ) =>

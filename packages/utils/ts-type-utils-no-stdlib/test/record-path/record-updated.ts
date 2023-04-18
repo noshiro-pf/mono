@@ -1,5 +1,6 @@
-import { type DeepReadonly, type RecordUpdated } from '../../src';
+import { type RecordUpdated } from '../../src';
 import { expectType } from '../expect-type';
+import { type _DeepReadonly as DeepReadonly } from '../utils-for-test';
 
 expectType<RecordUpdated<0, readonly [], 'changed'>, 'changed'>('=');
 

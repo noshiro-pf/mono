@@ -30,7 +30,7 @@ export type AnswerSelectionReducerState = IMapMapped<
   DatetimeRangeMapKey
 >;
 
-export const answerSelectionReducer: ReducerType<
+export const answerSelectionReducer: Reducer<
   AnswerSelectionReducerState,
   AnswerSelectionReducerAction
 > = (state, action) => {

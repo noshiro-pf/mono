@@ -1,5 +1,6 @@
-import { type DeepReadonly, type RecordValueAtPath } from '../../src';
+import { type RecordValueAtPath } from '../../src';
 import { expectType } from '../expect-type';
+import { type _DeepReadonly as DeepReadonly } from '../utils-for-test';
 
 type R0 = DeepReadonly<{
   x: {

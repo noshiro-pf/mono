@@ -15,6 +15,9 @@
     "zz:cmd:eslint": "eslint --fix --color --cache --cache-location .eslintcache",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ./.prettierignore --write"
   },
+  "devDependencies": {
+    "@noshiro/ts-type-utils-no-stdlib": "*"
+  },
   "wireit": {
     "z:autofix:wireit": {
       "command": "yarn z:autofix:impl",

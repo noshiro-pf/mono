@@ -1,7 +1,7 @@
 import { type HistoryState } from '../type';
 import { rollTwoDices } from './roll-dice';
 
-export const historyReducer: ReducerType<
+export const historyReducer: Reducer<
   HistoryState,
   'redo' | 'roll-dices' | 'undo'
 > = (state, action) => {
