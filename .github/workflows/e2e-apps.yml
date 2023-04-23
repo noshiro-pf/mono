@@ -10,7 +10,7 @@ on:
       - 'develop'
       - 'develop*'
       - 'archive/**'
-      - 'deploy-rich-poll'
+      - 'deploy/**'
     paths-ignore:
       - '.gitignore'
       - '.cspell.json'
