@@ -134,7 +134,8 @@
     "vite-plugin-markdown": "^2.1.0",
     "vitest": "^0.31.0",
     "wireit": "^0.9.4",
-    "wsrun": "^5.2.4"
+    "wsrun": "^5.2.4",
+    "zenn-cli": "^0.1.142"
   },
   "engines": {
     "node": ">=16.0.0",
