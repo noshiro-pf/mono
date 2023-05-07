@@ -2,48 +2,49 @@ import { Routes } from '../constants';
 
 const _router = createRouter();
 
-const toPathnameTokens = (pathname: string): readonly string[] =>
+const toPathSegments = (pathname: string): readonly string[] =>
   pathname.split('/').filter((s) => s !== '');
 
-const pathnameTokens$: InitializedObservable<readonly string[]> =
-  _router.pathname$.chain(mapI(toPathnameTokens));
+const pathSegments$: InitializedObservable<readonly string[]> =
+  _router.pathname$.chain(mapI(toPathSegments));
 
 const pageToBack$ = _router.pathname$.chain(
   filter((pathname) => {
-    const tokens = toPathnameTokens(pathname);
+    const pathSegments = toPathSegments(pathname);
     // ログインページ・新規登録ページは除外
     return (
-      !Routes.isRoute.registerPage(tokens) && !Routes.isRoute.signInPage(tokens)
+      !Routes.isRoute.registerPage(pathSegments) &&
+      !Routes.isRoute.signInPage(pathSegments)
     );
   })
 );
 
 export const router = {
   ..._router,
-  pathnameTokens$,
+  pathSegments$,
   pageToBack$,
 
   isRoute: {
-    createPage$: pathnameTokens$
+    createPage$: pathSegments$
       .chain(mapI(Routes.isRoute.createPage))
       .chain(distinctUntilChangedI()),
-    answerPage$: pathnameTokens$
+    answerPage$: pathSegments$
       .chain(mapI(Routes.isRoute.answerPage))
       .chain(distinctUntilChangedI()),
-    editPage$: pathnameTokens$
+    editPage$: pathSegments$
       .chain(mapI(Routes.isRoute.editPage))
       .chain(distinctUntilChangedI()),
-    eventListPage$: pathnameTokens$
+    eventListPage$: pathSegments$
       .chain(mapI(Routes.isRoute.eventListPage))
       .chain(distinctUntilChangedI()),
-    registerPage$: pathnameTokens$
+    registerPage$: pathSegments$
       .chain(mapI(Routes.isRoute.registerPage))
       .chain(distinctUntilChangedI()),
-    signInPage$: pathnameTokens$
+    signInPage$: pathSegments$
       .chain(mapI(Routes.isRoute.signInPage))
       .chain(distinctUntilChangedI()),
   },
-  eventId$: pathnameTokens$
+  eventId$: pathSegments$
     .chain(mapI(Routes.getEventIdFromPathname))
     .chain(distinctUntilChangedI()),
 } as const;

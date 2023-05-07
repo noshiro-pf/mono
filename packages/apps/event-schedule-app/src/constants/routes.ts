@@ -1,4 +1,4 @@
-const pathToken = {
+const pathSegment = {
   createPage: 'create',
   answerPage: 'event',
   editPageSuffix: 'edit',
@@ -47,57 +47,57 @@ const queryParamValue = {
 } as const;
 
 const routes = {
-  createPage: `/${pathToken.createPage}/`,
+  createPage: `/${pathSegment.createPage}/`,
 
-  answerPage: (eventId: string) => `/${pathToken.answerPage}/${eventId}/`,
+  answerPage: (eventId: string) => `/${pathSegment.answerPage}/${eventId}/`,
 
   editPage: (eventId: string) =>
-    `/${pathToken.answerPage}/${eventId}/${pathToken.editPageSuffix}/`,
+    `/${pathSegment.answerPage}/${eventId}/${pathSegment.editPageSuffix}/`,
 
-  eventListPage: `/${pathToken.eventListPage}/`,
+  eventListPage: `/${pathSegment.eventListPage}/`,
 
-  registerPage: `/${pathToken.registerUser}/`,
-  signInPage: `/${pathToken.signIn}/`,
+  registerPage: `/${pathSegment.registerUser}/`,
+  signInPage: `/${pathSegment.signIn}/`,
 } as const;
 
 const isRoute = {
-  createPage: (pathnameTokens: readonly string[]): boolean =>
-    Arr.isArrayOfLength1(pathnameTokens) &&
-    pathnameTokens[0] === pathToken.createPage,
+  createPage: (pathSegments: readonly string[]): boolean =>
+    Arr.isArrayOfLength1(pathSegments) &&
+    pathSegments[0] === pathSegment.createPage,
 
   /**
-   * pathnameTokens[1] is `event-id`
+   * pathSegments[1] is `event-id`
    */
-  answerPage: (pathnameTokens: readonly string[]): boolean =>
-    Arr.isArrayOfLength2(pathnameTokens) &&
-    pathnameTokens[0] === pathToken.answerPage,
+  answerPage: (pathSegments: readonly string[]): boolean =>
+    Arr.isArrayOfLength2(pathSegments) &&
+    pathSegments[0] === pathSegment.answerPage,
 
   /**
-   * pathnameTokens[1] is `event-id`
+   * pathSegments[1] is `event-id`
    */
-  editPage: (pathnameTokens: readonly string[]): boolean =>
-    Arr.isArrayOfLength3(pathnameTokens) &&
-    pathnameTokens[0] === pathToken.answerPage &&
-    pathnameTokens[2] === pathToken.editPageSuffix,
+  editPage: (pathSegments: readonly string[]): boolean =>
+    Arr.isArrayOfLength3(pathSegments) &&
+    pathSegments[0] === pathSegment.answerPage &&
+    pathSegments[2] === pathSegment.editPageSuffix,
 
-  eventListPage: (pathnameTokens: readonly string[]): boolean =>
-    Arr.isArrayOfLength1(pathnameTokens) &&
-    pathnameTokens[0] === pathToken.eventListPage,
+  eventListPage: (pathSegments: readonly string[]): boolean =>
+    Arr.isArrayOfLength1(pathSegments) &&
+    pathSegments[0] === pathSegment.eventListPage,
 
-  registerPage: (pathnameTokens: readonly string[]): boolean =>
-    Arr.isArrayOfLength1(pathnameTokens) &&
-    pathnameTokens[0] === pathToken.registerUser,
+  registerPage: (pathSegments: readonly string[]): boolean =>
+    Arr.isArrayOfLength1(pathSegments) &&
+    pathSegments[0] === pathSegment.registerUser,
 
-  signInPage: (pathnameTokens: readonly string[]): boolean =>
-    Arr.isArrayOfLength1(pathnameTokens) &&
-    pathnameTokens[0] === pathToken.signIn,
+  signInPage: (pathSegments: readonly string[]): boolean =>
+    Arr.isArrayOfLength1(pathSegments) &&
+    pathSegments[0] === pathSegment.signIn,
 } as const;
 
 const redirectRules = IMap.new<string, string>([['/', routes.createPage]]);
 
 const getEventIdFromPathname = (
-  pathnameTokens: readonly string[]
-): string | undefined => pathnameTokens[1];
+  pathSegments: readonly string[]
+): string | undefined => pathSegments[1];
 
 export const Routes = {
   queryParamKey,
