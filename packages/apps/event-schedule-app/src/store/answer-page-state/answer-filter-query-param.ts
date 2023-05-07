@@ -13,18 +13,22 @@ const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
   'date' | 'score',
   'asc' | 'desc'
 ]): void => {
-  router.updateQueryParams((urlSearchParams) => {
-    if (sortKey === 'date') {
-      urlSearchParams.delete(keyDef.sortBy);
-    } else {
-      urlSearchParams.set(keyDef.sortBy, sortKey);
-    }
-    if (sortOrder === 'asc') {
-      urlSearchParams.delete(keyDef.sortOrder);
-    } else {
-      urlSearchParams.set(keyDef.sortOrder, sortOrder);
-    }
-  }, false);
+  router.updateQueryParams(
+    (urlSearchParams) => {
+      if (sortKey === 'date') {
+        urlSearchParams.delete(keyDef.sortBy);
+      } else {
+        urlSearchParams.set(keyDef.sortBy, sortKey);
+      }
+      if (sortOrder === 'asc') {
+        urlSearchParams.delete(keyDef.sortOrder);
+      } else {
+        urlSearchParams.set(keyDef.sortOrder, sortOrder);
+      }
+      return urlSearchParams;
+    },
+    { method: 'replaceState' }
+  );
 };
 
 const num2str = (n: number): string => Num.roundAt(n, 2).toString(10);
@@ -111,95 +115,106 @@ const saveFilterStateToQueryParams = ({
   filledDateOnly,
   dayOfWeek,
 }: AnswerFilterState): void => {
-  router.updateQueryParams((urlSearchParams) => {
-    if (
-      dateRange.enabled &&
-      isNotUndefined(dateRange.value.start) &&
-      isNotUndefined(dateRange.value.end)
-    ) {
-      urlSearchParams.set(
-        keyDef.date,
-        range2str(ymd2str(dateRange.value.start), ymd2str(dateRange.value.end))
-      );
-    } else {
-      urlSearchParams.delete(keyDef.date);
-    }
+  router.updateQueryParams(
+    (urlSearchParams) => {
+      if (
+        dateRange.enabled &&
+        isNotUndefined(dateRange.value.start) &&
+        isNotUndefined(dateRange.value.end)
+      ) {
+        urlSearchParams.set(
+          keyDef.date,
+          range2str(
+            ymd2str(dateRange.value.start),
+            ymd2str(dateRange.value.end)
+          )
+        );
+      } else {
+        urlSearchParams.delete(keyDef.date);
+      }
 
-    if (dayOfWeek.enabled) {
-      urlSearchParams.set(keyDef.dayOfWeek, dayOfWeekToStr(dayOfWeek.value));
-    } else {
-      urlSearchParams.delete(keyDef.dayOfWeek);
-    }
+      if (dayOfWeek.enabled) {
+        urlSearchParams.set(keyDef.dayOfWeek, dayOfWeekToStr(dayOfWeek.value));
+      } else {
+        urlSearchParams.delete(keyDef.dayOfWeek);
+      }
 
-    if (filledDateOnly) {
-      urlSearchParams.set(
-        keyDef.filledDateOnly,
-        filledDateOnlyToStr(filledDateOnly)
-      );
-    } else {
-      urlSearchParams.delete(keyDef.filledDateOnly);
-    }
+      if (filledDateOnly) {
+        urlSearchParams.set(
+          keyDef.filledDateOnly,
+          filledDateOnlyToStr(filledDateOnly)
+        );
+      } else {
+        urlSearchParams.delete(keyDef.filledDateOnly);
+      }
 
-    if (scoreRange.enabled) {
-      urlSearchParams.set(
-        keyDef.score,
-        range2str(num2str(scoreRange.value.min), num2str(scoreRange.value.max))
-      );
-    } else {
-      urlSearchParams.delete(keyDef.score);
-    }
+      if (scoreRange.enabled) {
+        urlSearchParams.set(
+          keyDef.score,
+          range2str(
+            num2str(scoreRange.value.min),
+            num2str(scoreRange.value.max)
+          )
+        );
+      } else {
+        urlSearchParams.delete(keyDef.score);
+      }
 
-    if (iconState.good.enabled) {
-      urlSearchParams.set(
-        keyDef.good,
-        range2str(num2str(iconState.good.min), num2str(iconState.good.max))
-      );
-    } else {
-      urlSearchParams.delete(keyDef.good);
-    }
+      if (iconState.good.enabled) {
+        urlSearchParams.set(
+          keyDef.good,
+          range2str(num2str(iconState.good.min), num2str(iconState.good.max))
+        );
+      } else {
+        urlSearchParams.delete(keyDef.good);
+      }
 
-    if (iconState.fair.enabled) {
-      urlSearchParams.set(
-        keyDef.fair,
-        range2str(num2str(iconState.fair.min), num2str(iconState.fair.max))
-      );
-    } else {
-      urlSearchParams.delete(keyDef.fair);
-    }
+      if (iconState.fair.enabled) {
+        urlSearchParams.set(
+          keyDef.fair,
+          range2str(num2str(iconState.fair.min), num2str(iconState.fair.max))
+        );
+      } else {
+        urlSearchParams.delete(keyDef.fair);
+      }
 
-    if (iconState.poor.enabled) {
-      urlSearchParams.set(
-        keyDef.poor,
-        range2str(num2str(iconState.poor.min), num2str(iconState.poor.max))
-      );
-    } else {
-      urlSearchParams.delete(keyDef.poor);
-    }
+      if (iconState.poor.enabled) {
+        urlSearchParams.set(
+          keyDef.poor,
+          range2str(num2str(iconState.poor.min), num2str(iconState.poor.max))
+        );
+      } else {
+        urlSearchParams.delete(keyDef.poor);
+      }
 
-    if (iconState.goodPlusFair.enabled) {
-      urlSearchParams.set(
-        keyDef.goodPlusFair,
-        range2str(
-          num2str(iconState.goodPlusFair.min),
-          num2str(iconState.goodPlusFair.max)
-        )
-      );
-    } else {
-      urlSearchParams.delete(keyDef.goodPlusFair);
-    }
+      if (iconState.goodPlusFair.enabled) {
+        urlSearchParams.set(
+          keyDef.goodPlusFair,
+          range2str(
+            num2str(iconState.goodPlusFair.min),
+            num2str(iconState.goodPlusFair.max)
+          )
+        );
+      } else {
+        urlSearchParams.delete(keyDef.goodPlusFair);
+      }
 
-    if (iconState.fairPlusPoor.enabled) {
-      urlSearchParams.set(
-        keyDef.fairPlusPoor,
-        range2str(
-          num2str(iconState.fairPlusPoor.min),
-          num2str(iconState.fairPlusPoor.max)
-        )
-      );
-    } else {
-      urlSearchParams.delete(keyDef.fairPlusPoor);
-    }
-  }, false);
+      if (iconState.fairPlusPoor.enabled) {
+        urlSearchParams.set(
+          keyDef.fairPlusPoor,
+          range2str(
+            num2str(iconState.fairPlusPoor.min),
+            num2str(iconState.fairPlusPoor.max)
+          )
+        );
+      } else {
+        urlSearchParams.delete(keyDef.fairPlusPoor);
+      }
+
+      return urlSearchParams;
+    },
+    { method: 'replaceState' }
+  );
 };
 
 const restoreFromQueryParams = (
@@ -310,7 +325,7 @@ const restoreFromQueryParams = (
 };
 
 const mut_subscribedValues: {
-  queryParams: IMap<string, string> | undefined;
+  queryParams: URLSearchParams | undefined;
 } = {
   queryParams: undefined,
 };

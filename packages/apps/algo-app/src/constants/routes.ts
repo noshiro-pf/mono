@@ -23,13 +23,13 @@ export const isMainPage = (path: string): boolean =>
   path === routes.main || path === withSlash(routes.createRoom);
 
 export const getParams = (
-  queryParams: QueryParams
+  queryParams: DeepReadonly<URLSearchParams>
 ): DeepReadonly<{
   playerId: string | undefined;
   replay: boolean;
   observe: boolean;
 }> => ({
-  playerId: queryParams.get(params.playerId),
+  playerId: queryParams.get(params.playerId) ?? undefined,
   replay: queryParams.get(params.replay) === 'true',
   observe: queryParams.get(params.observe) === 'true',
 });

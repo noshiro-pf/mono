@@ -55,18 +55,3 @@ export function useObservableValue<A, B = A>(
 
   return Maybe.unwrapOr(value, initialValue);
 }
-
-// export function useObservableValue_<A, B = A>(
-//   observable$: Observable<A>,
-//   initialValue: B
-// ): A | B {
-//   const value = useSyncExternalStore(
-//     (onStoreChange: () => void) => {
-//       const { unsubscribe } = observable$.subscribe(onStoreChange);
-//       return unsubscribe;
-//     },
-//     () => observable$.currentValue
-//   );
-
-//   return Maybe.unwrapOr(value, initialValue);
-// }
