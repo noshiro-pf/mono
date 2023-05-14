@@ -1,6 +1,8 @@
 import {
   compareYmd,
   fillNotificationSettings,
+  toUserId,
+  toUserName,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { toAbsolutePath } from '@noshiro/ts-utils-additional';
@@ -122,8 +124,8 @@ const createEvent = async (): Promise<Result<undefined, string>> => {
 
   const res = await api.event.add(
     Obj.set(eventScheduleNormalized, 'author', {
-      id: fireAuthUser?.uid ?? null,
-      name: fireAuthUser?.displayName ?? '',
+      id: mapOptional(fireAuthUser?.uid, toUserId) ?? null,
+      name: toUserName(fireAuthUser?.displayName ?? ''),
     })
   );
 

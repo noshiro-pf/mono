@@ -1,26 +1,39 @@
+import { toWeight } from '@noshiro/event-schedule-app-shared';
 import { type AnswersScore } from '../types';
 import { defaultIconPoint } from './default-icon-point';
 
+type NumericInputConfigBase = Readonly<{
+  step: number;
+  majorStep?: number;
+  min: number;
+  max: number;
+  digit: SafeUint;
+  defaultValue: number;
+}>;
+
 export const answerIconPointConfig = {
-  step: 1,
-  min: 0,
-  max: 10,
+  step: 1 satisfies AnswerIconPoint,
+  min: 0 satisfies AnswerIconPoint,
+  max: 10 satisfies AnswerIconPoint,
   fair: {
-    min: 0.1,
-    max: 9.9,
-    defaultValue: defaultIconPoint.fair,
+    min: 0.1 satisfies AnswerIconPoint,
+    max: 9.9 satisfies AnswerIconPoint,
+    defaultValue: defaultIconPoint.fair satisfies AnswerIconPoint,
   },
   digit: 1,
-  defaultValue: 0,
-} as const;
+  defaultValue: 0 satisfies AnswerIconPoint,
+} as const satisfies NumericInputConfigBase &
+  Readonly<{
+    fair: Pick<NumericInputConfigBase, 'defaultValue' | 'max' | 'min'>;
+  }>;
 
 export const weightNumericInputConfig = {
-  step: 1,
-  min: 0.1,
-  max: 10,
+  step: toWeight(1),
+  min: toWeight(0.1),
+  max: toWeight(10),
   digit: 1,
-  defaultValue: 1,
-} as const;
+  defaultValue: toWeight(1),
+} as const satisfies NumericInputConfigBase;
 
 export const iconFilterNumericInputConfig = {
   step: 1,
@@ -28,16 +41,16 @@ export const iconFilterNumericInputConfig = {
   max: Number.POSITIVE_INFINITY,
   digit: 0,
   defaultValue: 0,
-} as const;
+} as const satisfies NumericInputConfigBase;
 
 export const answersScoreNumericInputConfig = {
-  step: 0.01,
-  majorStep: 0.1,
-  min: 0,
-  max: 1,
+  step: 0.01 satisfies AnswersScore,
+  majorStep: 0.1 satisfies AnswersScore,
+  min: 0 satisfies AnswersScore,
+  max: 1 satisfies AnswersScore,
   digit: 2,
-  defaultValue: 0,
-} as const;
+  defaultValue: 0 satisfies AnswersScore,
+} as const satisfies NumericInputConfigBase;
 
 const clampAndRoundFn =
   <T extends number>(

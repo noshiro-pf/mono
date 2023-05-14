@@ -1,4 +1,8 @@
-import { eventScheduleDefaultValue } from '@noshiro/event-schedule-app-shared';
+import {
+  eventScheduleDefaultValue,
+  toUserId,
+  toUserName,
+} from '@noshiro/event-schedule-app-shared';
 import {
   answerDeadlineInitialValue,
   datetimeRangeListInitialValue,
@@ -152,8 +156,8 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             timezoneOffsetMinutes:
               eventScheduleDefaultValue.timezoneOffsetMinutes,
             author: {
-              id: fireAuthUser?.uid ?? null,
-              name: fireAuthUser?.displayName ?? '',
+              id: mapOptional(fireAuthUser?.uid, toUserId) ?? null,
+              name: toUserName(fireAuthUser?.displayName ?? ''),
             },
             archivedBy: [],
           })

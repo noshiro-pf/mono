@@ -2,6 +2,7 @@ import {
   answerDeadlineRemainingDaysDefaultValue,
   notificationSettingsDefaultValue,
   timeRangeDefaultValue,
+  toUserName,
   ymdhmFromDate,
 } from '@noshiro/event-schedule-app-shared';
 import { defaultIconPoint } from './default-icon-point';
@@ -68,7 +69,7 @@ export const eventScheduleInitialValue: EventSchedule = {
   timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
   author: {
     id: null,
-    name: '',
+    name: toUserName(''),
   },
   archivedBy: [],
 };

@@ -1,7 +1,11 @@
-import { answerDefaultValue } from '@noshiro/event-schedule-app-shared';
+import {
+  answerDefaultValue,
+  toUserId,
+  toUserName,
+} from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
 import { api } from '../../api';
-import { datetimeRange2str, Routes } from '../../constants';
+import { Routes, datetimeRange2str } from '../../constants';
 import {
   answerSelectionReducer,
   createToaster,
@@ -14,7 +18,7 @@ import {
 } from '../../functions';
 import { type AnswerSelectionValue } from '../../types';
 import { Auth } from '../auth';
-import { answers$, AnswersStore, eventSchedule$ } from '../fetching-state';
+import { AnswersStore, answers$, eventSchedule$ } from '../fetching-state';
 import { router } from '../router';
 
 const toast = createToaster();
@@ -54,7 +58,11 @@ const setAnswerBeingEditedSectionState = (
     const user = Auth.fireAuthUser$.snapshot.value;
 
     updateAnswerBeingEdited((ans) =>
-      Obj.set(ans, 'user', Obj.set(ans.user, 'id', user?.uid ?? null))
+      Obj.set(
+        ans,
+        'user',
+        Obj.set(ans.user, 'id', mapOptional(user?.uid, toUserId) ?? null)
+      )
     );
   }
 };
@@ -178,7 +186,7 @@ const onCancelEditingAnswer = (): void => {
   setAnswerBeingEditedSectionState('hidden');
 };
 
-const onUserNameChange = (userName: string): void => {
+const onUserNameChange = (userName: UserName): void => {
   updateAnswerBeingEdited((answerBeingEdited) =>
     Obj.setIn(answerBeingEdited, ['user', 'name'], userName)
   );
@@ -225,7 +233,7 @@ const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
   setAnswerBeingEditedSectionState('creating');
   // automatically set username with user.displayName
   updateAnswerBeingEdited((prev) =>
-    Obj.setIn(prev, ['user', 'name'], user?.displayName ?? '')
+    Obj.setIn(prev, ['user', 'name'], toUserName(user?.displayName ?? ''))
   );
 };
 
@@ -306,8 +314,8 @@ const onSubmitEmptyAnswerImpl = async (
         .chain((a) => Obj.set(a, 'createdAt', DateUtils.now()))
         .chain((a) =>
           Obj.set(a, 'user', {
-            id: fireAuthUser.uid,
-            name: fireAuthUser.displayName ?? '',
+            id: toUserId(fireAuthUser.uid),
+            name: toUserName(fireAuthUser.displayName ?? ''),
           })
         ).value
     )
@@ -389,7 +397,7 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
       ans,
       'user',
       Obj.update(ans.user, 'id', (uid) =>
-        uid === null ? user?.uid ?? null : null
+        uid === null ? mapOptional(user?.uid, toUserId) ?? null : null
       )
     )
   );
