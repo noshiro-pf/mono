@@ -1,4 +1,5 @@
 import { Button, ControlGroup, HTMLSelect, Spinner } from '@blueprintjs/core';
+import { toUserId, toUserName } from '@noshiro/event-schedule-app-shared';
 import { api } from '../../../api';
 import { createToaster, showToast } from '../../../functions';
 import {
@@ -71,15 +72,15 @@ export const EventListPage = memoNamed('EventListPage', () => {
           () => {
             if (fireAuthUser === undefined) return;
             archiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-              id: fireAuthUser.uid,
-              name: fireAuthUser.displayName ?? '',
+              id: toUserId(fireAuthUser.uid),
+              name: toUserName(fireAuthUser.displayName ?? ''),
             }).catch(noop);
           },
           () => {
             if (fireAuthUser === undefined) return;
             unarchiveEventScheduleHandler(e.eventScheduleMetadata.id, {
-              id: fireAuthUser.uid,
-              name: fireAuthUser.displayName ?? '',
+              id: toUserId(fireAuthUser.uid),
+              name: toUserName(fireAuthUser.displayName ?? ''),
             }).catch(noop);
           }
         )
