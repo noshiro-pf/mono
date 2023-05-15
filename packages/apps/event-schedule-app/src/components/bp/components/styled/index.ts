@@ -2,6 +2,7 @@ export * from './anchor-button';
 export * from './button-group';
 export * from './button-nowrap';
 export * from './control-group';
+export * from './custom-icon-button';
 export * from './date-picker-day';
 export * from './dialog-with-max-width';
 export * from './input';

@@ -1,7 +1,6 @@
-import { Button } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 import { AnswerFilterAndSortStore } from '../../../../store';
-import { CustomIcon } from '../../../atoms';
+import { CustomIconButton } from '../../../bp';
 import { FilterByIconPopoverContent } from './filter-by-icon-popover-content';
 
 const dc = dict.answerPage.answers;
@@ -68,10 +67,9 @@ export const FilterByIconPopover = memoNamed<Props>(
         placement={'bottom'}
         onClose={handleClose}
       >
-        <Button
+        <CustomIconButton
           active={state.enabled}
-          icon={<CustomIcon iconName={answerIconId} />}
-          minimal={true}
+          iconName={answerIconId}
           outlined={true}
           title={dc.iconHeaderFilter[answerIconId].title}
           onClick={handleOpen}

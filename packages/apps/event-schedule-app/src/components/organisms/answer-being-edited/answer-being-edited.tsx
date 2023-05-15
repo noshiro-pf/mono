@@ -1,12 +1,13 @@
-import { Button, FormGroup } from '@blueprintjs/core';
+import { FormGroup } from '@blueprintjs/core';
 import { theNameIsAlreadyUsedFn } from '../../../functions';
 import { useFormError } from '../../../hooks';
 import { AnswerPageStore, Auth } from '../../../store';
-import { CustomIcon, Description } from '../../atoms';
+import { Description } from '../../atoms';
 import {
   BpInput,
   BpTextArea,
   ButtonNowrapStyled,
+  CustomIconButton,
   HTMLTableBorderedStyled2,
 } from '../../bp';
 import {
@@ -125,28 +126,25 @@ export const AnswerBeingEdited = memoNamed<Props>(
                 <tr>
                   <th />
                   <th>
-                    <Button
+                    <CustomIconButton
                       data-cy={'col-good-button'}
-                      icon={<CustomIcon iconName={'good'} />}
-                      minimal={true}
+                      iconName={'good'}
                       title={iconHeader.good.iconDescription}
                       onClick={iconHeader.good.onClick}
                     />
                   </th>
                   <th>
-                    <Button
+                    <CustomIconButton
                       data-cy={'col-fair-button'}
-                      icon={<CustomIcon iconName={'fair'} />}
-                      minimal={true}
+                      iconName={'fair'}
                       title={iconHeader.fair.iconDescription}
                       onClick={iconHeader.fair.onClick}
                     />
                   </th>
                   <th>
-                    <Button
+                    <CustomIconButton
                       data-cy={'col-poor-button'}
-                      icon={<CustomIcon iconName={'poor'} />}
-                      minimal={true}
+                      iconName={'poor'}
                       title={iconHeader.poor.iconDescription}
                       onClick={iconHeader.poor.onClick}
                     />
@@ -178,43 +176,28 @@ export const AnswerBeingEdited = memoNamed<Props>(
                       />
                     </td>
                     <td>
-                      <Button
+                      <CustomIconButton
                         active={iconId === 'good'}
-                        icon={
-                          <CustomIcon
-                            color={iconId === 'good' ? 'blue' : 'gray'}
-                            iconName={'good'}
-                          />
-                        }
-                        minimal={true}
+                        iconColor={iconId === 'good' ? 'blue' : 'gray'}
+                        iconName={'good'}
                         title={buttons.good.description}
                         onClick={buttons.good.onClick}
                       />
                     </td>
                     <td>
-                      <Button
+                      <CustomIconButton
                         active={iconId === 'fair'}
-                        icon={
-                          <CustomIcon
-                            color={iconId === 'fair' ? 'blue' : 'gray'}
-                            iconName={'fair'}
-                          />
-                        }
-                        minimal={true}
+                        iconColor={iconId === 'fair' ? 'blue' : 'gray'}
+                        iconName={'fair'}
                         title={buttons.fair.description}
                         onClick={buttons.fair.onClick}
                       />
                     </td>
                     <td>
-                      <Button
+                      <CustomIconButton
                         active={iconId === 'poor'}
-                        icon={
-                          <CustomIcon
-                            color={iconId === 'poor' ? 'blue' : 'gray'}
-                            iconName={'poor'}
-                          />
-                        }
-                        minimal={true}
+                        iconColor={iconId === 'poor' ? 'blue' : 'gray'}
+                        iconName={'poor'}
                         title={buttons.poor.description}
                         onClick={buttons.poor.onClick}
                       />
