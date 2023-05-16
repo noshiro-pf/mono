@@ -81,7 +81,7 @@
     "@vitejs/plugin-legacy": "^4.0.2",
     "@vitejs/plugin-react-swc": "^3.3.0",
     "argparse": "^2.0.1",
-    "babel-loader": "^8.2.2",
+    "babel-loader": "^9.1.2",
     "command-line-args": "^5.2.1",
     "cross-env": "^7.0.3",
     "cspell": "^6.12.0",
