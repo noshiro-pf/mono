@@ -117,9 +117,9 @@ const importsList = [
 const typeImportsList = [
   { name: 'DateUtils', params: [] },
   { name: 'IMap', params: ['K', 'V'] },
-  { name: 'IMapMapped', params: ['K', 'V', 'KM extends RecordKeyType'] },
+  { name: 'IMapMapped', params: ['K', 'V', 'KM extends number | string'] },
   { name: 'ISet', params: ['S'] },
-  { name: 'ISetMapped', params: ['K', 'KM extends RecordKeyType'] },
+  { name: 'ISetMapped', params: ['K', 'KM extends number | string'] },
   { name: 'Maybe', params: ['S'] },
   { name: 'Queue', params: ['T'] },
   { name: 'Result', params: ['S', 'E'] },

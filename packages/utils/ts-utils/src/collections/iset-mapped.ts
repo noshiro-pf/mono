@@ -1,5 +1,7 @@
+type KeyType = number | string;
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-interface ISetMappedInterface<K, KM extends RecordKeyType> {
+interface ISetMappedInterface<K, KM extends KeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
@@ -50,17 +52,17 @@ interface ISetMappedInterface<K, KM extends RecordKeyType> {
   toRawSet: () => ReadonlySet<KM>;
 }
 
-export type ISetMapped<K, KM extends RecordKeyType> = Iterable<K> &
+export type ISetMapped<K, KM extends KeyType> = Iterable<K> &
   Readonly<ISetMappedInterface<K, KM>>;
 
 export const ISetMapped = {
-  new: <K, KM extends RecordKeyType>(
+  new: <K, KM extends KeyType>(
     iterable: Iterable<K>,
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ): ISetMapped<K, KM> => new ISetMappedClass<K, KM>(iterable, toKey, fromKey),
 
-  equal: <K, KM extends RecordKeyType>(
+  equal: <K, KM extends KeyType>(
     a: ISetMapped<K, KM>,
     b: ISetMapped<K, KM>
   ): boolean => {
@@ -69,7 +71,7 @@ export const ISetMapped = {
     return a.every((e) => b.has(e));
   },
 
-  diff: <K, KM extends RecordKeyType>(
+  diff: <K, KM extends KeyType>(
     oldSet: ISetMapped<K, KM>,
     newSet: ISetMapped<K, KM>
   ): Record<'added' | 'deleted', ISetMapped<K, KM>> => ({
@@ -77,12 +79,12 @@ export const ISetMapped = {
     added: newSet.subtract(oldSet),
   }),
 
-  intersection: <K, KM extends RecordKeyType>(
+  intersection: <K, KM extends KeyType>(
     a: ISetMapped<K, KM>,
     b: ISetMapped<K, KM>
   ): ISetMapped<K, KM> => a.intersect(b),
 
-  union: <K, KM extends RecordKeyType>(
+  union: <K, KM extends KeyType>(
     a: ISetMapped<K, KM>,
     b: ISetMapped<K, KM>
   ): ISetMapped<K, KM> => a.union(b),
@@ -90,7 +92,7 @@ export const ISetMapped = {
 
 const ArrayFrom = Array.from;
 
-class ISetMappedClass<K, KM extends RecordKeyType>
+class ISetMappedClass<K, KM extends KeyType>
   implements ISetMapped<K, KM>, Iterable<K>
 {
   readonly #set: ReadonlySet<KM>;
@@ -151,7 +153,10 @@ class ISetMappedClass<K, KM extends RecordKeyType>
   }
 
   delete(key: K): ISetMapped<K, KM> {
-    if (!this.has(key)) return this;
+    if (!this.has(key)) {
+      console.warn(`ISetMapped.delete: key not found: ${this.#toKey(key)}`);
+      return this;
+    }
     const keyMapped = this.#toKey(key);
 
     return ISetMapped.new(
@@ -178,6 +183,7 @@ class ISetMappedClass<K, KM extends RecordKeyType>
         case 'delete':
           mut_result.delete(key);
           break;
+
         case 'add':
           mut_result.add(key);
           break;

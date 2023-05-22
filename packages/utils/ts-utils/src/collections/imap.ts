@@ -1,4 +1,5 @@
 import { MutableMap, tp } from '../others';
+import { Str } from '../str';
 import { ISet } from './iset';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -109,7 +110,10 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   delete(key: K): IMap<K, V> {
-    if (!this.has(key)) return this;
+    if (!this.has(key)) {
+      console.warn(`IMap.delete: key not found: ${Str.from(key)}`);
+      return this;
+    }
 
     return IMap.new(ArrayFrom(this.#map).filter(([k]) => !Object.is(k, key)));
   }
@@ -126,7 +130,11 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
   }
 
   update(key: K, updater: (value: V) => V): IMap<K, V> {
-    if (!this.has(key)) return this;
+    if (!this.has(key)) {
+      console.error(`IMap.update: key not found: ${Str.from(key)}`);
+      return this;
+    }
+
     const curr = this.get(key);
 
     return IMap.new(
@@ -151,15 +159,21 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
         case 'delete':
           mut_result.delete(action.key);
           break;
+
         case 'set':
           mut_result.set(action.key, action.value);
           break;
+
         case 'update': {
           if (mut_result.has(action.key)) {
             mut_result.set(
               action.key,
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               action.updater(mut_result.get(action.key)!)
+            );
+          } else {
+            console.error(
+              `IMap.withMutations: key not found: ${Str.from(action.key)}`
             );
           }
           break;
