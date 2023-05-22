@@ -10,7 +10,7 @@ type Props = Readonly<{
 export const CustomIcon = memoNamed<Props>(
   'MyIcon',
   ({ iconName, color, size }) => {
-    const icon = useMemo<JSX.Element>(() => {
+    const icon = useMemo<React.JSX.Element>(() => {
       switch (iconName) {
         case 'good':
           return <CircleIcon color={color} size={size} />;

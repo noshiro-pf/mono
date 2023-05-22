@@ -10,7 +10,7 @@ export const CheckboxView = ({
   disabled = false,
   onCheck,
   onChange,
-}: Props): JSX.Element => {
+}: Props): React.JSX.Element => {
   const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
     useCallback(
       (ev) => {
