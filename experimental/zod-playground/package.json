@@ -1,0 +1,16 @@
+{
+  "name": "zod-playground",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "start": "yarn build && node src/index.js"
+  },
+  "dependencies": {
+    "fp-ts": "^2.15.0",
+    "io-ts": "^2.2.20",
+    "typescript": "^5.0.4",
+    "zod": "^3.21.4"
+  }
+}
