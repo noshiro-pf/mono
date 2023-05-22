@@ -57,8 +57,9 @@ export const DetailedFilterIconOfSpecifiedRespondent = memoNamed<Props>(
       </FilterItem>
 
       <FilterItemContent>
-        {Arr.map(checkState, (respondent, index) => (
+        {checkState.map((respondent, index) => (
           <div
+            // eslint-disable-next-line react/no-array-index-key
             key={index}
             css={css`
               display: flex;

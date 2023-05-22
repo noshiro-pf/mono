@@ -1,24 +1,17 @@
+import { toSafeInt } from '@noshiro/ts-utils';
 import { binarySearch, halfInt } from './utils';
 
 describe('halfInt', () => {
   test('case: even number', () => {
-    expect(halfInt(2)).toBe(1);
+    expect(halfInt(toSafeInt(2))).toBe(1);
   });
 
   test('case: odd positive number', () => {
-    expect(halfInt(3)).toBe(1);
+    expect(halfInt(toSafeInt(3))).toBe(1);
   });
 
   test('case: odd negative number', () => {
-    expect(halfInt(-3)).toBe(-1);
-  });
-
-  test('case: float positive number', () => {
-    expect(halfInt(3.3)).toBe(1);
-  });
-
-  test('case: float negative number', () => {
-    expect(halfInt(-3.3)).toBe(-1);
+    expect(halfInt(toSafeInt(-3))).toBe(-1);
   });
 });
 

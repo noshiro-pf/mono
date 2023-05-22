@@ -68,10 +68,15 @@ export const ymdhm2Date = (ymdhm: Ymdhm): DateUtils =>
   );
 
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
-  if (a.year !== b.year) return Num.sign(a.year - b.year);
-  if (a.month !== b.month) return Num.sign(a.month - b.month);
-  if (a.date !== b.date) return Num.sign(a.date - b.date);
-  if (a.hours !== b.hours) return Num.sign(a.hours - b.hours);
-  if (a.minutes !== b.minutes) return Num.sign(a.minutes - b.minutes);
+  if (a.year !== b.year)
+    return Num.mapNaN2Undefined(Math.sign(a.year - b.year)) ?? 0;
+  if (a.month !== b.month)
+    return Num.mapNaN2Undefined(Math.sign(a.month - b.month)) ?? 0;
+  if (a.date !== b.date)
+    return Num.mapNaN2Undefined(Math.sign(a.date - b.date)) ?? 0;
+  if (a.hours !== b.hours)
+    return Num.mapNaN2Undefined(Math.sign(a.hours - b.hours)) ?? 0;
+  if (a.minutes !== b.minutes)
+    return Num.mapNaN2Undefined(Math.sign(a.minutes - b.minutes)) ?? 0;
   return 0;
 };

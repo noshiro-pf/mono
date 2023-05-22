@@ -3,7 +3,7 @@ import { expectType } from '@noshiro/ts-utils';
 type PermutationImpl<U, V extends U = U> = [U] extends [never]
   ? []
   : V extends V
-  ? [V, ...PermutationImpl<StrictExclude<U, V>>]
+  ? [V, ...PermutationImpl<Exclude<U, V>>]
   : never;
 
 export type Permutation<U> = PermutationImpl<U>;

@@ -24,7 +24,7 @@ const createStreams1 = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   even$: Observable<number>;
   filtered$: Observable<number>;
   debounced$: Observable<number>;
@@ -56,7 +56,7 @@ const createStreams2 = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   even$: Observable<number>;
   filtered$: Observable<number>;
   debounced$: Observable<number>;

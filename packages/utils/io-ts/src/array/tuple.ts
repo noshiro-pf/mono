@@ -20,7 +20,7 @@ export const tuple = <A extends readonly Type<unknown>[]>(
   const defaultValue = types.map((t) => t.defaultValue) as MapTuple<A>;
 
   const validate: Type<T>['validate'] = (a) => {
-    if (!Arr.isArray(a)) {
+    if (!Array.isArray(a)) {
       return Result.err([
         validationErrorMessage(a, 'The value is expected to be an array'),
       ]);
@@ -49,7 +49,7 @@ export const tuple = <A extends readonly Type<unknown>[]>(
   };
 
   const fill: Type<T>['fill'] = (a) =>
-    !Arr.isArray(a)
+    !Array.isArray(a)
       ? defaultValue
       : (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 

@@ -45,7 +45,7 @@ interface Map<K, V> {
   /**
    * @returns the number of elements in the Map.
    */
-  readonly size: number;
+  readonly size: SafeUint;
 }
 
 interface MapConstructor {
@@ -62,7 +62,7 @@ interface ReadonlyMap<K, V> {
   ): void;
   get(key: K): V | undefined;
   has(key: K | (WidenLiteral<K> & {})): key is K;
-  readonly size: number;
+  readonly size: SafeUint;
 }
 
 interface WeakMap<K extends object, V> {
@@ -120,7 +120,7 @@ interface Set<T> {
   /**
    * @returns the number of (unique) elements in Set.
    */
-  readonly size: number;
+  readonly size: SafeUint;
 }
 
 interface SetConstructor {
@@ -135,7 +135,7 @@ interface ReadonlySet<T> {
     thisArg?: unknown
   ): void;
   has(value: T | (WidenLiteral<T> & {})): value is T;
-  readonly size: number;
+  readonly size: SafeUint;
 }
 
 interface WeakSet<T extends object> {

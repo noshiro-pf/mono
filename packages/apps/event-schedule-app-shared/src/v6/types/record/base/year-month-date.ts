@@ -20,13 +20,13 @@ export const yearMonthDateDefaultValue: YearMonthDate = {
 } as const;
 
 export const isYearEnum = (a: unknown): a is YearEnum =>
-  isNumber(a) && Num.isInt(a) && a > 0;
+  isNumber(a) && Number.isInteger(a) && a > 0;
 
 export const isMonthEnum = (a: unknown): a is MonthEnum =>
-  isNumber(a) && Num.isInt(a) && Num.isInRange(1, 12)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRange(1, 12)(a);
 
 export const isDateEnum = (a: unknown): a is DateEnum =>
-  isNumber(a) && Num.isInt(a) && Num.isInRange(1, 31)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRange(1, 31)(a);
 
 export const isYearMonthDate = (a: unknown): a is YearMonthDate =>
   isRecord(a) &&
@@ -52,8 +52,11 @@ export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
 });
 
 export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {
-  if (a.year !== b.year) return Num.sign(a.year - b.year);
-  if (a.month !== b.month) return Num.sign(a.month - b.month);
-  if (a.date !== b.date) return Num.sign(a.date - b.date);
+  if (a.year !== b.year)
+    return Num.mapNaN2Undefined(Math.sign(a.year - b.year)) ?? 0;
+  if (a.month !== b.month)
+    return Num.mapNaN2Undefined(Math.sign(a.month - b.month)) ?? 0;
+  if (a.date !== b.date)
+    return Num.mapNaN2Undefined(Math.sign(a.date - b.date)) ?? 0;
   return 0;
 };

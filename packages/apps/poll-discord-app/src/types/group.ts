@@ -7,8 +7,8 @@ export type Group = DeepReadonly<{
 }>;
 
 const numGroupType = t.uintRange({
-  min: 2,
-  max: 26,
+  start: 2,
+  end: 27,
   defaultValue: 2,
 });
 

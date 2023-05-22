@@ -42,7 +42,8 @@ export const Spinner = memoNamed<Props>('Spinner', ({ size: _size, value }) => {
   );
 
   const strokeOffset =
-    PATH_LENGTH - PATH_LENGTH * (value == null ? 0.25 : Num.clamp(0, 1)(value));
+    PATH_LENGTH -
+    PATH_LENGTH * (mapOptional(value, Num.clamp<number>(0, 1)) ?? 0.25);
 
   const viewBox = useMemo(() => getViewBox(strokeWidth), [strokeWidth]);
 

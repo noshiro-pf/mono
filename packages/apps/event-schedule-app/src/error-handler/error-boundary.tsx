@@ -189,7 +189,7 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 {Str.from(error)}
                 {isRecord(errorInfo) &&
-                hasKey(errorInfo, 'componentStack') &&
+                Object.hasOwn(errorInfo, 'componentStack') &&
                 isString(errorInfo.componentStack)
                   ? errorInfo.componentStack
                   : undefined}

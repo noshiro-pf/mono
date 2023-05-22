@@ -1,5 +1,5 @@
-import { Obj, tp } from '@noshiro/ts-utils';
+import { tp } from '@noshiro/ts-utils';
 
-export const providePluginDef = Obj.fromEntries(
+export const providePluginDef = Object.fromEntries(
   ['styled'].map((key) => tp(key, tp('@noshiro/goober', key)))
 );

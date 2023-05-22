@@ -12,25 +12,10 @@ export type ExpectTrue<T extends true> = T;
 
 export type TypeExtends<A, B> = A extends B ? true : false;
 
-/* improved standard type utilities */
-
-/**
- * Exclude from T those types that are assignable to U
- */
-export type StrictExclude<T, U extends T> = T extends U ? never : T;
-
 /**
  * Exclude from T those types that are assignable to U
  */
 export type RelaxedExclude<T, U> = T extends U ? never : T;
-
-/**
- * Construct a type with the properties of T except for those in type K.
- */
-export type StrictOmit<T, K extends keyof T> = Pick<
-  T,
-  StrictExclude<keyof T, K>
->;
 
 /**
  * Construct a type with the properties of T except for those in type K.

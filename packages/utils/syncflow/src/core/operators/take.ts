@@ -1,4 +1,4 @@
-import { Maybe } from '@noshiro/ts-utils';
+import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type Observable,
@@ -6,10 +6,12 @@ import {
   type TakeOperatorObservable,
   type UpdaterSymbol,
 } from '../types';
-import { isPositiveInteger } from '../utils';
+import { isPositiveSafeInteger } from '../utils';
 
 export const take =
-  <A>(n: number): RemoveInitializedOperator<A, A> =>
+  <A>(
+    n: Exclude<Uint9, 0> | (NonZeroSafeInt & SafeUint)
+  ): RemoveInitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new TakeObservableClass(parentObservable, n);
 
@@ -17,22 +19,25 @@ class TakeObservableClass<A>
   extends SyncChildObservableClass<A, 'take', readonly [A]>
   implements TakeOperatorObservable<A>
 {
-  readonly #n: number;
-  #mut_counter: number;
+  readonly #n: NonZeroSafeInt & SafeUint;
+  #mut_counter: SafeUint;
 
-  constructor(parentObservable: Observable<A>, n: number) {
+  constructor(
+    parentObservable: Observable<A>,
+    n: Exclude<Uint9, 0> | (NonZeroSafeInt & SafeUint)
+  ) {
     super({
       parents: [parentObservable],
       type: 'take',
-      currentValueInit: !isPositiveInteger(n)
+      currentValueInit: !isPositiveSafeInteger(n)
         ? Maybe.none
         : parentObservable.currentValue,
     });
-    this.#mut_counter = 0;
-    this.#n = n;
+    this.#mut_counter = toSafeUint(0);
+    this.#n = n as NonZeroSafeInt & SafeUint;
 
     // complete immediately if n is not positive integer
-    if (!isPositiveInteger(n)) {
+    if (!isPositiveSafeInteger(n)) {
       this.complete();
     }
   }
@@ -43,7 +48,7 @@ class TakeObservableClass<A>
       return; // skip update
     }
 
-    this.#mut_counter += 1;
+    this.#mut_counter = SafeUint.add(1, this.#mut_counter);
     if (this.#mut_counter > this.#n) {
       this.complete();
     } else {

@@ -5,6 +5,7 @@ import {
   isRecord,
   isString,
   Obj,
+  Tpl,
 } from '@noshiro/ts-utils';
 import {
   isDatetimeSpecificationEnumType,
@@ -74,10 +75,10 @@ const isNotificationSettingsWithNone = (
   e === 'none' || isNotificationSettings(e);
 
 const isDatetimeRangeList = (e: unknown): e is DatetimeRange[] =>
-  Arr.isArray(e) && Arr.isArrayOfLength1OrMore(e) && e.every(isDatetimeRange);
+  Array.isArray(e) && Arr.isArrayOfLength1OrMore(e) && e.every(isDatetimeRange);
 
 const isUserList = (e: unknown): e is User[] =>
-  Arr.isArray(e) && e.every(isUser);
+  Array.isArray(e) && e.every(isUser);
 
 export const isEventSchedule = (a: unknown): a is EventSchedule =>
   isRecord(a) &&
@@ -113,24 +114,24 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
           ? a.datetimeSpecification
           : d.datetimeSpecification,
 
-        datetimeRangeList: Obj.hasKey(a, 'datetimeRangeList')
-          ? Arr.isArray(a.datetimeRangeList) &&
+        datetimeRangeList: Object.hasOwn(a, 'datetimeRangeList')
+          ? Array.isArray(a.datetimeRangeList) &&
             Arr.isArrayOfLength1OrMore(a.datetimeRangeList)
-            ? Arr.map(a.datetimeRangeList, fillDatetimeRange)
+            ? Tpl.map(a.datetimeRangeList, fillDatetimeRange)
             : d.datetimeRangeList
           : d.datetimeRangeList,
 
-        answerDeadline: Obj.hasKey(a, 'answerDeadline')
+        answerDeadline: Object.hasOwn(a, 'answerDeadline')
           ? a.answerDeadline === 'none'
             ? 'none'
             : fillYmdhm(a.answerDeadline)
           : d.answerDeadline,
 
-        answerIcons: Obj.hasKey(a, 'answerIcons')
+        answerIcons: Object.hasOwn(a, 'answerIcons')
           ? fillAnswerIconSettings(a.answerIcons)
           : d.answerIcons,
 
-        notificationSettings: Obj.hasKey(a, 'notificationSettings')
+        notificationSettings: Object.hasOwn(a, 'notificationSettings')
           ? a.notificationSettings === 'none'
             ? 'none'
             : fillNotificationSettings(a.notificationSettings)
@@ -144,11 +145,11 @@ export const fillEventSchedule = (a?: unknown): EventSchedule =>
           ? a.timezoneOffsetMinutes
           : d.timezoneOffsetMinutes,
 
-        author: Obj.hasKey(a, 'author') ? fillUser(a.author) : d.author,
+        author: Object.hasOwn(a, 'author') ? fillUser(a.author) : d.author,
 
-        archivedBy: Obj.hasKey(a, 'archivedBy')
-          ? Arr.isArray(a.archivedBy)
-            ? Arr.map(a.archivedBy, fillUser)
+        archivedBy: Object.hasOwn(a, 'archivedBy')
+          ? Array.isArray(a.archivedBy)
+            ? a.archivedBy.map(fillUser)
             : d.archivedBy
           : d.archivedBy,
       };

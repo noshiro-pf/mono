@@ -20,7 +20,6 @@ const toCapitalCase = (str: string): string =>
     .replaceAll(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
     .replace(/^./u, (x) => x[0]?.toUpperCase() ?? str);
 
-// eslint-disable-next-line no-restricted-globals
 const isArray = (a: unknown): a is readonly unknown[] => Array.isArray(a);
 
 const normalizeToSchemaArray = (
@@ -280,7 +279,6 @@ const generateRulesType = async (
   > =
     pluginName === 'eslint'
       ? deepCopy(
-          // eslint-disable-next-line no-restricted-globals
           Array.from(
             // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-require-imports,import/no-internal-modules,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,unicorn/prefer-module
             require('eslint/use-at-your-own-risk')?.builtinRules.entries() ?? []

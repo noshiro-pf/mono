@@ -5,11 +5,10 @@ export type NumericInputStateBaseAction = DeepReadonly<
   | { type: 'set-string'; value: string }
 >;
 
-const parseValue = (valueStr: string): number | undefined => {
-  const res = Num.parseFloat(valueStr);
-  if (res === undefined || Num.isNaN(res)) return undefined;
-  return res;
-};
+const parseValue = (valueStr: string): number | undefined =>
+  pipe(Number.parseFloat(valueStr)).chain((a) =>
+    Number.isNaN(a) ? undefined : a
+  ).value;
 
 export const createNumericInputStateReducer = <
   NumericValue extends number,

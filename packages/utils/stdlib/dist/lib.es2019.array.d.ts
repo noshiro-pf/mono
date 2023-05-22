@@ -64,7 +64,7 @@ interface ReadonlyArray<T> {
     callback: (
       this: This,
       value: T,
-      index: number,
+      index: SafeUint,
       array: readonly T[]
     ) => U | ReadonlyArray<U>,
     thisArg?: This
@@ -76,7 +76,10 @@ interface ReadonlyArray<T> {
    *
    * @param depth The maximum recursion depth
    */
-  flat<A, D extends number = 1>(this: A, depth?: D): readonly FlatArray<A, D>[];
+  flat<A, D extends SafeUint | Uint9 = 1>(
+    this: A,
+    depth?: D
+  ): readonly FlatArray<A, D>[];
 }
 
 interface Array<T> {
@@ -94,7 +97,7 @@ interface Array<T> {
     callback: (
       this: This,
       value: T,
-      index: number,
+      index: SafeUint,
       array: readonly T[]
     ) => U | ReadonlyArray<U>,
     thisArg?: This
@@ -106,5 +109,8 @@ interface Array<T> {
    *
    * @param depth The maximum recursion depth
    */
-  flat<A, D extends number = 1>(this: A, depth?: D): readonly FlatArray<A, D>[];
+  flat<A, D extends SafeUint | Uint9 = 1>(
+    this: A,
+    depth?: D
+  ): readonly FlatArray<A, D>[];
 }

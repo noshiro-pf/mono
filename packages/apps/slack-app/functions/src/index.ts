@@ -8,6 +8,8 @@ import {
 } from 'firebase-functions';
 import { get } from 'https';
 
+/// <reference path="./globals.d.ts" />
+
 // The Firebase Admin SDK to access Cloud Firestore.
 initializeApp();
 

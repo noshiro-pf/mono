@@ -1,4 +1,4 @@
-import { Arr, isRecord, isString, Obj } from '@noshiro/ts-utils';
+import { isRecord, isString, Obj } from '@noshiro/ts-utils';
 import { fillAnswer, isAnswer, type Answer } from './answer';
 import {
   eventScheduleDefaultValue,
@@ -52,7 +52,7 @@ export const isEventListItem = (a: unknown): a is EventListItem =>
   Obj.hasKeyValue(
     a,
     'answers',
-    (e: unknown): e is Answer[] => Arr.isArray(e) && e.every(isAnswer)
+    (e: unknown): e is Answer[] => Array.isArray(e) && e.every(isAnswer)
   ) &&
   Obj.hasKeyValue(a, 'answersMetadata', isAnswersMetadata);
 
@@ -90,21 +90,21 @@ export const fillEventListItem = (a?: unknown): EventListItem =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        eventSchedule: Obj.hasKey(a, 'eventSchedule')
+        eventSchedule: Object.hasOwn(a, 'eventSchedule')
           ? fillEventSchedule(a.eventSchedule)
           : d.eventSchedule,
 
-        eventScheduleMetadata: Obj.hasKey(a, 'eventScheduleMetadata')
+        eventScheduleMetadata: Object.hasOwn(a, 'eventScheduleMetadata')
           ? fillEventScheduleMetadata(a.eventScheduleMetadata)
           : d.eventScheduleMetadata,
 
-        answers: Obj.hasKey(a, 'answers')
-          ? Arr.isArray(a.answers)
+        answers: Object.hasOwn(a, 'answers')
+          ? Array.isArray(a.answers)
             ? a.answers.map(fillAnswer)
             : d.answers
           : d.answers,
 
-        answersMetadata: Obj.hasKey(a, 'answersMetadata')
+        answersMetadata: Object.hasOwn(a, 'answersMetadata')
           ? fillAnswersMetadata(a.answersMetadata)
           : d.answersMetadata,
       };

@@ -2,7 +2,7 @@
 import { firestorePaths } from '@noshiro/event-schedule-app-shared/cjs/v7';
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { Json, Obj } from '@noshiro/ts-utils';
+import { Json } from '@noshiro/ts-utils';
 
 // eslint-disable-next-line import/no-namespace
 import admin from 'firebase-admin';
@@ -34,8 +34,8 @@ const printAllEvents = async (): Promise<boolean> => {
   );
 
   const result = {
-    events: Obj.fromEntries(eventsEntries),
-    answers: Obj.fromEntries(answersEntries),
+    events: Object.fromEntries(eventsEntries),
+    answers: Object.fromEntries(answersEntries),
   };
 
   console.log(Json.stringifySortedKey(result).value);

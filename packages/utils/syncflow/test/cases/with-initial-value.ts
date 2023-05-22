@@ -23,7 +23,7 @@ const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   timer$: TimerObservable;
   combineLatest1$: Observable<readonly [number, number]>;
   combineLatest2$: Observable<readonly [number, number]>;

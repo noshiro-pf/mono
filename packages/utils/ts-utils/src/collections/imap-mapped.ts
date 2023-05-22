@@ -7,7 +7,7 @@ interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
-  size: number;
+  size: SafeUint;
   has: (key: K) => boolean;
   get: (key: K) => V | undefined;
 
@@ -77,7 +77,6 @@ export const IMapMapped = {
   },
 };
 
-// eslint-disable-next-line no-restricted-globals
 const ArrayFrom = Array.from;
 
 class IMapMappedClass<K, V, KM extends RecordKeyType>
@@ -98,7 +97,7 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
     this.#fromKey = fromKey;
   }
 
-  get size(): number {
+  get size(): SafeUint {
     return this.#map.size;
   }
 

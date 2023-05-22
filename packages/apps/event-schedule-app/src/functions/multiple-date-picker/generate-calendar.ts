@@ -26,7 +26,10 @@ export const generateCalendar = (
       getFirstDateOfMonth(year, (month + 1) as MonthEnum)
     );
 
-  const lastDateNumberOfPrevMonth = getLastDateNumberOfMonth(year, month - 1);
+  const lastDateNumberOfPrevMonth = getLastDateNumberOfMonth(
+    year,
+    (month - 1) as MonthIndexEnum
+  );
   const lastDateNumberOfThisMonth = getLastDateNumberOfMonth(year, month);
 
   const cells1d: readonly YearMonthDate[] = Arr.concat(
@@ -49,8 +52,8 @@ export const generateCalendar = (
 
   const rowSize = numWeeks(year, month);
 
-  return Arr.rangeUnwrapped(0, rowSize).map((i: number) =>
-    cells1d.slice(7 * i, 7 * (i + 1))
+  return Arr.range(0, rowSize).map((i) =>
+    cells1d.slice(Uint8.mul(7, i), Uint8.mul(7, Uint8.add(i, 1)))
   );
 };
 
@@ -60,22 +63,24 @@ const genYmdRangeList = (
   from: DateEnum,
   to: DateEnum
 ): readonly YearMonthDate[] =>
-  Arr.rangeUnwrapped(from, to + 1).map((n) => ({
+  Arr.range(from, Uint32.add(to, 1)).map((n) => ({
     year,
     month,
     date: n as DateEnum,
   }));
 
 const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): DateUtils =>
-  // eslint-disable-next-line no-restricted-globals
-  new Date(year, month - 1, 1);
+  new Date(year, (month - 1) as MonthIndexEnum, 1);
 
 const getLastDateNumberOfMonth = (
   year: YearEnum,
-  month: number // 0 - 13
+  month: UintRange<0, 14> // 0 - 13
 ): 28 | 29 | 30 | 31 =>
-  // eslint-disable-next-line no-restricted-globals
-  new Date(year, month, 0).getDate() as Extract<DateEnum, 28 | 29 | 30 | 31>;
+  // 翌月の0日目を取得することで、前月の最終日を取得できる
+  new Date(year, month as MonthIndexEnum, 0 as DateEnum).getDate() as Extract<
+    DateEnum,
+    28 | 29 | 30 | 31
+  >;
 
 const numWeeks = (year: YearEnum, month: MonthEnum): 4 | 5 | 6 => {
   const firstDate = getFirstDateOfMonth(year, month);

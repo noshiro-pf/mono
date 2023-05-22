@@ -2,11 +2,11 @@ import { Checkbox } from '@blueprintjs/core';
 
 type CheckboxPropsOriginal = React.ComponentProps<typeof Checkbox>;
 
-export type BpCheckboxProps = Readonly<{
-  checked: boolean;
-  onCheck: (checked: boolean) => void;
-}> &
-  StrictOmit<CheckboxPropsOriginal, 'checked'>;
+export type BpCheckboxProps = Omit<CheckboxPropsOriginal, 'checked'> &
+  Readonly<{
+    checked: boolean;
+    onCheck: (checked: boolean) => void;
+  }>;
 
 export const BpCheckbox = memoNamed<BpCheckboxProps>(
   'BpCheckbox',

@@ -16,15 +16,15 @@ const tenYearsLater = pipe(DateUtils.today())
 
 type DateInputPropsOriginal = React.ComponentProps<typeof DateInput2>;
 
-export type BpDatePickerProps = Readonly<{
-  ymd: YearMonthDate | undefined;
-  onYmdChange: (ymd: YearMonthDate | undefined) => void;
-  shortcuts?: boolean | readonly DatePickerShortcut[];
-}> &
-  StrictOmit<
-    DateInputPropsOriginal,
-    'formatDate' | 'parseDate' | 'shortcuts' | 'timePrecision'
-  >;
+export type BpDatePickerProps = Omit<
+  DateInputPropsOriginal,
+  'formatDate' | 'parseDate' | 'shortcuts' | 'timePrecision'
+> &
+  Readonly<{
+    ymd: YearMonthDate | undefined;
+    onYmdChange: (ymd: YearMonthDate | undefined) => void;
+    shortcuts?: boolean | readonly DatePickerShortcut[];
+  }>;
 
 export const BpDatePicker = memoNamed<BpDatePickerProps>(
   'BpDatePicker',

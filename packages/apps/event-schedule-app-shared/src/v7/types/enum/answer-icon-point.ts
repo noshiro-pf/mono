@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { isNumber, Num } from '@noshiro/ts-utils';
+import { isNumber } from '@noshiro/ts-utils';
 
 export const answerIconPointTypeDef = (
   defaultValue: AnswerIconPoint
@@ -7,7 +7,7 @@ export const answerIconPointTypeDef = (
   t.createPrimitiveType({
     defaultValue,
     is: (a: unknown): a is AnswerIconPoint =>
-      isNumber(a) && 0 <= a && a <= 10 && Num.isSafeInt(a * 10),
+      isNumber(a) && 0 <= a && a <= 10 && Number.isSafeInteger(a * 10),
     typeName: 'AnswerIconPoint',
   });
 

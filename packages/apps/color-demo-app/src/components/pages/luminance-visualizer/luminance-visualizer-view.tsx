@@ -1,6 +1,6 @@
 import { Paper } from '@mui/material';
-import { type Hsl, type Hue, type Percent } from '@noshiro/ts-utils-additional';
-import { type ColorResult } from '../../../types';
+import { type Hsl, type Hue } from '@noshiro/ts-utils-additional';
+import { type ColorResult, type DivisionNumber } from '../../../types';
 import { AllSliders, ContrastRatioList } from '../../molecules';
 import {
   ColoredDistribution,
@@ -13,8 +13,8 @@ type Props = Readonly<{
   saturationOnChange: (v: Percent) => void;
   lightness: Percent;
   lightnessOnChange: (v: Percent) => void;
-  divisionNumber: number;
-  divisionNumberOnChange: (v: number) => void;
+  divisionNumber: DivisionNumber;
+  divisionNumberOnChange: (v: DivisionNumber) => void;
   firstHue: Hue;
   firstHueOnChange: (v: Hue) => void;
   relativeLuminanceDistribution: readonly (readonly [Hsl, number])[];

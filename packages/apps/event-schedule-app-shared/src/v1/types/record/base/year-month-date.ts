@@ -28,8 +28,11 @@ export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
 });
 
 export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {
-  if (a.year !== b.year) return Num.sign(a.year - b.year);
-  if (a.month !== b.month) return Num.sign(a.month - b.month);
-  if (a.date !== b.date) return Num.sign(a.date - b.date);
+  if (a.year !== b.year)
+    return Num.mapNaN2Undefined(Math.sign(a.year - b.year)) ?? 0;
+  if (a.month !== b.month)
+    return Num.mapNaN2Undefined(Math.sign(a.month - b.month)) ?? 0;
+  if (a.date !== b.date)
+    return Num.mapNaN2Undefined(Math.sign(a.date - b.date)) ?? 0;
   return 0;
 };

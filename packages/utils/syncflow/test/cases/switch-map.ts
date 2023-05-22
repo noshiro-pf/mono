@@ -18,7 +18,7 @@ const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   switchMap$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick * 7, true);

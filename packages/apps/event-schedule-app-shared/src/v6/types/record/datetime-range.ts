@@ -35,8 +35,8 @@ export const fillDatetimeRange = (a?: unknown): DatetimeRange =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        ymd: Obj.hasKey(a, 'ymd') ? fillYearMonthDate(a.ymd) : d.ymd,
-        timeRange: Obj.hasKey(a, 'timeRange')
+        ymd: Object.hasOwn(a, 'ymd') ? fillYearMonthDate(a.ymd) : d.ymd,
+        timeRange: Object.hasOwn(a, 'timeRange')
           ? fillTimeRange(a.timeRange)
           : d.timeRange,
       };

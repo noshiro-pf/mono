@@ -13,29 +13,29 @@ const initialState: AnswerIconFilterState = {
   good: {
     enabled: false,
     min: 0,
-    max: Num.POSITIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
   },
   fair: {
     enabled: false,
     min: 0,
-    max: Num.POSITIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
   },
   poor: {
     enabled: false,
     min: 0,
-    max: Num.POSITIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
   },
   goodPlusFair: {
     enabled: false,
     min: 0,
-    max: Num.POSITIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
   },
   fairPlusPoor: {
     enabled: false,
     min: 0,
-    max: Num.POSITIVE_INFINITY,
+    max: Number.POSITIVE_INFINITY,
   },
-  upperLimit: Num.POSITIVE_INFINITY,
+  upperLimit: Number.POSITIVE_INFINITY,
 };
 
 export type AnswerIconFilterStateAction = DeepReadonly<

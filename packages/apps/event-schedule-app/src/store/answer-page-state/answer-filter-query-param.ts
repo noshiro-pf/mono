@@ -27,7 +27,7 @@ const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
   }, false);
 };
 
-const num2str = (n: number): string => Num.toString(10)(Num.roundAt(n, 2));
+const num2str = (n: number): string => Num.roundAt(n, 2).toString(10);
 
 // for query params
 const ymd2str = ({ year, month, date }: YearMonthDate): string =>
@@ -39,9 +39,9 @@ const ymdFromStr = (ymdStr: string): YearMonthDate | undefined => {
   if (!Arr.isArrayOfLength3(res)) return undefined;
 
   const ret = {
-    year: Str.toNumber(res[0]),
-    month: Str.toNumber(res[1]),
-    date: Str.toNumber(res[2]),
+    year: Num.from(res[0]),
+    month: Num.from(res[1]),
+    date: Num.from(res[2]),
   };
 
   return isYearMonthDate(ret) ? ret : undefined;
@@ -75,7 +75,7 @@ const dayOfWeekFromStr = (
   Fri: boolean;
   Sat: boolean;
 }> => {
-  const set = ISet.new(Str.split(Routes.queryParamValue.dayElementDelim)(str));
+  const set = ISet.new(str.split(Routes.queryParamValue.dayElementDelim));
 
   return {
     Sun: set.has(Routes.queryParamValue.dayAbbrDef.Sun),
@@ -224,7 +224,7 @@ const restoreFromQueryParams = (
 
   const parseScore = (s: string): AnswersScore | undefined =>
     pipe(s)
-      .chain(Str.toNumber)
+      .chain(Num.from)
       .chain((a) => (isAnswersScore(a) ? a : undefined)).value;
 
   filterStateDispatch({
@@ -262,8 +262,8 @@ const restoreFromQueryParams = (
         good: pipe(queryParams.get(keyDef.good))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.parseInt(range.a),
-            max: Num.parseInt(range.b),
+            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
+            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -271,8 +271,8 @@ const restoreFromQueryParams = (
         fair: pipe(queryParams.get(keyDef.fair))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.parseInt(range.a),
-            max: Num.parseInt(range.b),
+            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
+            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -280,8 +280,8 @@ const restoreFromQueryParams = (
         poor: pipe(queryParams.get(keyDef.poor))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.parseInt(range.a),
-            max: Num.parseInt(range.b),
+            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
+            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -289,8 +289,8 @@ const restoreFromQueryParams = (
         goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.parseInt(range.a),
-            max: Num.parseInt(range.b),
+            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
+            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
           })).value ?? {
           min: undefined,
           max: undefined,
@@ -298,8 +298,8 @@ const restoreFromQueryParams = (
         fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
           .chainOptional(rangeFromStr)
           .chainOptional((range) => ({
-            min: Num.parseInt(range.a),
-            max: Num.parseInt(range.b),
+            min: Num.mapNaN2Undefined(Number.parseInt(range.a, 10)),
+            max: Num.mapNaN2Undefined(Number.parseInt(range.b, 10)),
           })).value ?? {
           min: undefined,
           max: undefined,

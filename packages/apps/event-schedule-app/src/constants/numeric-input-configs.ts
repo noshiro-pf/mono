@@ -25,7 +25,7 @@ export const weightNumericInputConfig = {
 export const iconFilterNumericInputConfig = {
   step: 1,
   min: 0,
-  max: Num.POSITIVE_INFINITY,
+  max: Number.POSITIVE_INFINITY,
   digit: 0,
   defaultValue: 0,
 } as const;
@@ -49,7 +49,7 @@ const clampAndRoundFn =
     }>
   ) =>
   (x: number): T =>
-    !Num.isFinite(x)
+    !Number.isFinite(x)
       ? cfg.defaultValue
       : x < cfg.min
       ? cfg.min

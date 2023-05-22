@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type';
-import { RecordUtils, type RecordUtilsEntries } from './record-utils';
+import { RecordUtils } from './record-utils';
 
 type R0 = DeepReadonly<{
   x: { a: number; b: number };
@@ -323,18 +323,18 @@ describe('RecordUtils', () => {
 
   describe('keys', () => {
     test('case 1', () => {
-      const keys = RecordUtils.keys({ x: 1, y: 2 });
+      const keys = Object.keys({ x: 1, y: 2 });
 
-      expectType<typeof keys, ('x' | 'y')[]>('=');
+      expectType<typeof keys, readonly ('x' | 'y')[]>('=');
 
       expect(keys).toStrictEqual(['x', 'y']);
     });
 
     test('case 2', () => {
       const symb = Symbol();
-      const keys = RecordUtils.keys({ x: 1, y: 2, z: '3', 3: 4, [symb]: 5 });
+      const keys = Object.keys({ x: 1, y: 2, z: '3', 3: 4, [symb]: 5 });
 
-      expectType<typeof keys, ('3' | 'x' | 'y' | 'z')[]>('=');
+      expectType<typeof keys, readonly ('3' | 'x' | 'y' | 'z')[]>('=');
 
       expect(keys).toStrictEqual(['3', 'x', 'y', 'z']);
     });
@@ -342,7 +342,7 @@ describe('RecordUtils', () => {
 
   describe('values', () => {
     test('case 1', () => {
-      const values = RecordUtils.values({ x: 1, y: 2 } as const);
+      const values = Object.values({ x: 1, y: 2 } as const);
 
       expectType<typeof values, readonly (1 | 2)[]>('=');
 
@@ -360,13 +360,11 @@ describe('RecordUtils', () => {
 
     // eslint-disable-next-line no-restricted-syntax
     const obj0 = Object.fromEntries(entries);
-    const obj1 = RecordUtils.fromEntries(entries);
 
-    expectType<typeof obj0, Record<string, 1 | 2 | 3>>('=');
-    expectType<typeof obj1, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>('=');
+    expectType<typeof obj0, Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>('=');
 
     test('case 1', () => {
-      expect(obj1).toStrictEqual({
+      expect(obj0).toStrictEqual({
         x: 1,
         y: 2,
         z: 3,
@@ -384,7 +382,7 @@ describe('RecordUtils', () => {
     }>;
 
     expectType<
-      RecordUtilsEntries<RecordType1>,
+      _RecordUtilsEntries<RecordType1>,
       readonly (
         | readonly ['3', 4]
         | readonly ['x', 1]
@@ -408,7 +406,7 @@ describe('RecordUtils', () => {
     >;
 
     expectType<
-      RecordUtilsEntries<RecordType2>,
+      _RecordUtilsEntries<RecordType2>,
       | readonly (
           | readonly ['3', 4]
           | readonly ['x', 1]
@@ -422,7 +420,7 @@ describe('RecordUtils', () => {
     >('=');
 
     expectType<
-      RecordUtilsEntries<Record<string, number>>,
+      _RecordUtilsEntries<Record<string, number>>,
       readonly (readonly [string, number])[]
     >('=');
 
@@ -438,21 +436,16 @@ describe('RecordUtils', () => {
 
       // eslint-disable-next-line no-restricted-syntax
       const entries0 = Object.entries(obj);
-      const entries1 = RecordUtils.entries(obj);
 
-      expect(entries1).toStrictEqual([
+      expect(entries0).toStrictEqual([
         ['3', 4],
         ['x', 1],
         ['y', 2],
         ['z', 2],
       ]);
 
-      expectType<typeof entries0, readonly (readonly [string, 1 | 2 | 4])[]>(
-        '='
-      );
-
       expectType<
-        typeof entries1,
+        typeof entries0,
         readonly (
           | readonly ['3', 4]
           | readonly ['x', 1]

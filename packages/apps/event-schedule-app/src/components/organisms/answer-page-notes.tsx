@@ -20,10 +20,6 @@ const convertUrlStringToAnchorElement = (
 export const AnswerPageNotes = memoNamed<Props>(
   'AnswerPageNotes',
   ({ notes }) => (
-    <>
-      {Arr.map(splitStringByWhitespace(notes), (str, i) =>
-        convertUrlStringToAnchorElement(str, i)
-      )}
-    </>
+    <>{splitStringByWhitespace(notes).map(convertUrlStringToAnchorElement)}</>
   )
 );

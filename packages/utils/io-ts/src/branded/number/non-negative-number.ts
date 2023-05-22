@@ -1,9 +1,9 @@
 import { Num } from '@noshiro/ts-utils';
-import { number } from '../primitives';
-import { type Type } from '../type';
-import { brand } from './brand';
+import { number } from '../../primitives';
+import { type Type } from '../../type';
+import { brand } from '../brand';
 
-const is = (a: number): a is NonNegativeNumber => !Num.isNaN(a) && a >= 0;
+const is = Num.isNonNegative;
 
 export const nonNegativeNumber = (
   defaultValue: number = 0
@@ -16,6 +16,7 @@ export const nonNegativeNumber = (
     codec: number(defaultValue),
     is,
     defaultValue,
-    typeName: 'NonNegativeNumber',
-  });
+    brandKeys: ['NonNegative'],
+    brandFalseKeys: ['NaN'],
+  } as const);
 };

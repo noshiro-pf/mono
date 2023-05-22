@@ -6,7 +6,7 @@ interface IMapInterface<K, V> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: number;
+  size: SafeUint;
   has: (key: K) => boolean;
   get: (key: K) => V | undefined;
 
@@ -56,7 +56,6 @@ interface IMapInterface<K, V> {
 export type IMap<K, V> = Iterable<readonly [K, V]> &
   Readonly<IMapInterface<K, V>>;
 
-// eslint-disable-next-line no-restricted-globals
 const ArrayFrom = Array.from;
 
 export const IMap = {
@@ -77,7 +76,7 @@ class IMapClass<K, V> implements IMap<K, V>, Iterable<readonly [K, V]> {
     this.#map = new MutableMap(iterable);
   }
 
-  get size(): number {
+  get size(): SafeUint {
     return this.#map.size;
   }
 

@@ -27,3 +27,31 @@ export const getDistFileList = async (srcDir) => {
 
   return distFileList;
 };
+
+/** @typedef {import("./type").Pipe} Pipe */
+
+/**
+ * @param {string} a
+ * @returns {Pipe}
+ */
+export const pipe = (a) => ({
+  value: a,
+  chain: (fn) => pipe(fn(a)),
+});
+
+/**
+ * https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/length
+ * https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/length
+ *
+ * - max array length : 2^32 - 1
+ * - max string length : 2^53 - 1
+ */
+export const indexType = {
+  argNonNegative: 'SafeUint | Uint9',
+  arg: 'SafeInt | Int10',
+  ret: 'SafeUint',
+  size: 'SafeUint',
+  searchResult: 'SafeUint | -1',
+  callbackArg: 'SafeUint',
+  newArrayMaxSize: 'Uint32',
+};

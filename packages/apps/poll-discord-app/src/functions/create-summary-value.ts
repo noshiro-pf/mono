@@ -90,7 +90,7 @@ const rpToUserListString = (
   reactions: ISet<UserId>,
   userIdToDisplayName: IMap<UserId, string>
 ): string =>
-  `\t(${reactions.size})\t${Arr.sort(reactions.toArray(), (a, b) =>
+  `\t(${reactions.size})\t${Arr.sorted(reactions.toArray(), (a, b) =>
     a.localeCompare(b)
   )
     .map((id) => userIdToDisplayName.get(id) ?? userIdToMention(id))

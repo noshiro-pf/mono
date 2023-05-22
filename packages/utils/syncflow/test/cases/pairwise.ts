@@ -12,7 +12,7 @@ const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   pairwise$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick, true);
@@ -33,11 +33,13 @@ const createStreams2 = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint | -1>;
   pairwise$: Observable<readonly [number, number]>;
 }> => {
   const interval$ = interval(tick, true);
-  const counter$ = interval$.chain(take(6)).chain(withInitialValue(-1));
+  const counter$ = interval$
+    .chain(take(6))
+    .chain(withInitialValue(-1 as const));
 
   const pairwise$ = counter$.chain(pairwise());
 

@@ -1,4 +1,4 @@
-import { Arr, Str } from '@noshiro/ts-utils';
+import { Arr, Uint32 } from '@noshiro/ts-utils';
 import { type LowerAlphabet, type UpperAlphabet } from '../types';
 
 export const getAlphabets = <Case extends 'lower' | 'upper'>(
@@ -7,8 +7,7 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const code = charCase === 'lower' ? 'a'.codePointAt(0)! : 'A'.codePointAt(0)!;
 
-  return Arr.seqUnwrapped(26).map((i) =>
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    Str.fromCodePoint(code + i)
+  return Arr.seq(26).map((i) =>
+    String.fromCodePoint(Uint32.add(code, i))
   ) as Case extends 'lower' ? LowerAlphabet[] : UpperAlphabet[];
 };

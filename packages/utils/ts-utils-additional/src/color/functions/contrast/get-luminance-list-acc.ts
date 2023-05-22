@@ -1,11 +1,11 @@
-import { Arr, pipe, tp } from '@noshiro/ts-utils';
+import { Arr, pipe, tp, Tpl } from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (
   luminanceList: NonEmptyArray<number>
 ): NonEmptyArray<number> => {
   /* +0.05はコントラスト比計算時に足される補正項  */
   const luminanceListCorrected = pipe(luminanceList).chain((list) =>
-    Arr.map(list, (v: number) => Math.log(v + 0.05))
+    Tpl.map(list, (v: number) => Math.log(v + 0.05))
   ).value;
 
   const luminanceDiffAccumulated = pipe(luminanceListCorrected)
@@ -18,7 +18,7 @@ export const getLuminanceListAccumulated = (
       )
     )
     .chain((list) =>
-      Arr.map(list, ([_, acc]: readonly [number, number]) => acc)
+      Tpl.map(list, ([_, acc]: readonly [number, number]) => acc)
     ).value;
 
   return luminanceDiffAccumulated;

@@ -1,8 +1,9 @@
 import { MuiSlider } from '@noshiro/react-mui-utils';
+import { type DivisionNumber } from '../../types';
 
 type Props = Readonly<{
-  divisionNumber: number;
-  divisionNumberOnChange: (value: number) => void;
+  divisionNumber: DivisionNumber;
+  divisionNumberOnChange: (value: DivisionNumber) => void;
 }>;
 
 export const DivisionNumberSlider = memoNamed<Props>(

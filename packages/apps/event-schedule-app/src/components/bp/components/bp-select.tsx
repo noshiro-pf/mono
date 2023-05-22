@@ -2,11 +2,11 @@ import { HTMLSelect } from '@blueprintjs/core';
 
 type HTMLSelectPropsOriginal = React.ComponentProps<typeof HTMLSelect>;
 
-export type BpSelectProps = Readonly<{
-  onValueChange: (value: string) => void;
-  options: Readonly<HTMLSelectPropsOriginal['options']>;
-}> &
-  StrictOmit<HTMLSelectPropsOriginal, 'options'>;
+export type BpSelectProps = Omit<HTMLSelectPropsOriginal, 'options'> &
+  Readonly<{
+    onValueChange: (value: string) => void;
+    options: Readonly<HTMLSelectPropsOriginal['options']>;
+  }>;
 
 export const BpSelect = memoNamed<BpSelectProps>(
   'BpSelect',

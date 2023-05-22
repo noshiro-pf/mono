@@ -1,8 +1,4 @@
-import {
-  pickupHighContrastHues,
-  type Hue,
-  type Percent,
-} from '@noshiro/ts-utils-additional';
+import { pickupHighContrastHues, type Hue } from '@noshiro/ts-utils-additional';
 import { type Label } from '../canvas';
 
 export const [
@@ -33,7 +29,7 @@ const labelNames = [
 type LabelLen = (typeof labelNames)['length'];
 
 const hues = pickupHighContrastHues(
-  labelNames.length,
+  Arr.length(labelNames),
   saturationDarker,
   lightnessDarker
 ) as ArrayOfLength<LabelLen, Hue>;
@@ -41,7 +37,7 @@ const hues = pickupHighContrastHues(
 export const labels: NonEmptyArray<Label> = pipe(
   Arr.zip(hues, labelNames)
 ).chain((list) =>
-  Arr.map(
+  Tpl.map(
     list,
     ([hue, labelName], index): Label => ({
       id: index.toString(),

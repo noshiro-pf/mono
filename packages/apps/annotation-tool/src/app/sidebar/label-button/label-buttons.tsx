@@ -1,5 +1,4 @@
 import { Button, Collapse } from '@blueprintjs/core';
-import { type Percent } from '@noshiro/ts-utils-additional';
 import { type Label } from '../../../canvas';
 import { type AppEventHandler } from '../../../types';
 import { LabelButtonItem } from './label-button-item';

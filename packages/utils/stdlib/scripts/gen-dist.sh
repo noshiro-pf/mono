@@ -5,7 +5,7 @@
 
 mkdir -p ./dist
 rm -f ./dist/lib.*
-node ./scripts/convert-dts.mjs
+node ./scripts/convert-dts/main.mjs
 
 
 ###### last step ######

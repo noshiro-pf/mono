@@ -9,7 +9,7 @@ import {
 
 type Props = Partial<
   Readonly<{
-    inputProps: StrictOmit<
+    inputProps: Omit<
       React.DetailedHTMLProps<
         React.InputHTMLAttributes<HTMLInputElement>,
         HTMLInputElement

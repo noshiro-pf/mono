@@ -1,4 +1,4 @@
-import { hasKey, isRecord, Obj, Result, tp } from '@noshiro/ts-utils';
+import { isRecord, Result, tp } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type';
 import {
   createAssertFunction,
@@ -18,12 +18,14 @@ export const record = <A extends Record<string, Type<unknown>>>(
 
   const typeNameFilled: string =
     typeName ??
-    `{ ${Obj.entries(recordType)
+    `{ ${Object.entries(recordType)
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
 
-  const defaultValue = Obj.fromEntries(
-    Obj.entries(recordType).map(([key, value]) => tp(key, value.defaultValue))
+  const defaultValue = Object.fromEntries(
+    Object.entries(recordType).map(([key, value]) =>
+      tp(key, value.defaultValue)
+    )
   ) as T;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -33,8 +35,8 @@ export const record = <A extends Record<string, Type<unknown>>>(
       ]);
     }
 
-    for (const [k, valueType] of Obj.entries(recordType)) {
-      if (!hasKey(a, k)) {
+    for (const [k, valueType] of Object.entries(recordType)) {
+      if (!Object.hasOwn(a, k)) {
         return Result.err([`The record is expected to have the key "${k}".`]);
       }
 
@@ -56,9 +58,9 @@ export const record = <A extends Record<string, Type<unknown>>>(
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? (Obj.fromEntries(
-          Obj.entries(recordType).map(([k, v]) =>
-            tp(k, hasKey(a, k) ? v.fill(a[k]) : v.defaultValue)
+      ? (Object.fromEntries(
+          Object.entries(recordType).map(([k, v]) =>
+            tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue)
           )
         ) as T)
       : defaultValue;

@@ -1,4 +1,4 @@
-import { type Hue, type Percent } from '@noshiro/ts-utils-additional';
+import { type Hue } from '@noshiro/ts-utils-additional';
 import { ColorItem } from '../atoms';
 
 type Props = Readonly<{

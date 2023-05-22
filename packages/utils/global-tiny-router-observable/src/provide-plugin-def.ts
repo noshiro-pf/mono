@@ -1,6 +1,6 @@
-import { Obj, tp } from '@noshiro/ts-utils';
+import { tp } from '@noshiro/ts-utils';
 
-export const providePluginDef = Obj.fromEntries(
+export const providePluginDef = Object.fromEntries(
   ['createRouter', 'withSlash'].map((key) =>
     tp(key, tp('@noshiro/tiny-router-observable', key))
   )

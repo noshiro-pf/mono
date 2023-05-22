@@ -86,7 +86,7 @@ export const convertRoomRemoteToRoom = (
 });
 
 export const convertRoomToRoomRemote = (
-  room: StrictOmit<Room, 'id'>
+  room: Omit<Room, 'id'>
 ): RoomRemote => ({
   password: room.password,
   players: room.players,

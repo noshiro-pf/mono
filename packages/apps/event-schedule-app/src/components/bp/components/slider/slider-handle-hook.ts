@@ -7,7 +7,7 @@ type Props = Readonly<{
   min: number;
   max: number;
   value: number;
-  labelFractionDigits: UintRange<0, 20>;
+  labelFractionDigits: UintRange<0, 21>;
   onChange: (value: number) => void;
   onRelease: (value: number) => void;
 }>;
@@ -67,7 +67,7 @@ export const useSliderHandleStateManager = ({
   const changeValue = useCallback(
     (newValue: number, callback: (v: number) => void = onChangeRef.current) => {
       const _newValue = clampRef.current(newValue);
-      if (!Num.isNaN(_newValue) && valueRef.current !== _newValue) {
+      if (!Number.isNaN(_newValue) && valueRef.current !== _newValue) {
         callback(_newValue);
       }
       return _newValue;
@@ -89,7 +89,7 @@ export const useSliderHandleStateManager = ({
     );
     const pixelDelta = clientPixel - handleCenterPixel;
 
-    if (Num.isNaN(pixelDelta)) {
+    if (Number.isNaN(pixelDelta)) {
       return valueRef.current;
     }
     // convert pixels to range value in increments of `stepSize`
@@ -225,7 +225,7 @@ export const useSliderHandleStateManager = ({
   );
 
   const tooltipValue = useMemo(
-    () => Num.toFixed(labelFractionDigits)(value),
+    () => value.toFixed(labelFractionDigits),
     [value, labelFractionDigits]
   );
 

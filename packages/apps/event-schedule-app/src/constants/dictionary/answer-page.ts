@@ -11,10 +11,10 @@ const genTagName = (
     min === max
       ? `${commonText} = ${min}`
       : min === 0
-      ? max === Num.POSITIVE_INFINITY
+      ? max === Number.POSITIVE_INFINITY
         ? `${commonText} ≦ ∞` // dummy
         : `${commonText} ≦ ${max}`
-      : max === Num.POSITIVE_INFINITY
+      : max === Number.POSITIVE_INFINITY
       ? `${min} ≦ ${commonText}`
       : `${min} ≦ ${commonText} ≦ ${max}`;
 };
@@ -28,10 +28,10 @@ const genTagNameAdded = (
     min === max
       ? `${commonText} = ${min}`
       : min === 0
-      ? max === Num.POSITIVE_INFINITY
+      ? max === Number.POSITIVE_INFINITY
         ? `${commonText} ≦ ∞` // dummy
         : `${commonText} ≦ ${max}`
-      : max === Num.POSITIVE_INFINITY
+      : max === Number.POSITIVE_INFINITY
       ? `${min} ≦ ${commonText}`
       : `${min} ≦ ${commonText} ≦ ${max}`;
 };

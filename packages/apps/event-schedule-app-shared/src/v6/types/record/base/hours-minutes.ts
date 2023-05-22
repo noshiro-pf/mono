@@ -11,10 +11,10 @@ export const hoursMinutesDefaultValue: HoursMinutes = {
 } as const;
 
 export const isHoursEnum = (a: unknown): a is HoursEnum =>
-  isNumber(a) && Num.isInt(a) && Num.isInRange(0, 23)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRange(0, 23)(a);
 
 export const isMinutesEnum = (a: unknown): a is MinutesEnum =>
-  isNumber(a) && Num.isInt(a) && Num.isInRange(0, 59)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRange(0, 59)(a);
 
 export const isHoursMinutes = (a: unknown): a is HoursMinutes =>
   isRecord(a) &&
@@ -39,7 +39,9 @@ export const hmFromDate = (date: DateUtils): HoursMinutes => ({
 });
 
 export const compareHm = (a: HoursMinutes, b: HoursMinutes): -1 | 0 | 1 => {
-  if (a.hours !== b.hours) return Num.sign(a.hours - b.hours);
-  if (a.minutes !== b.minutes) return Num.sign(a.minutes - b.minutes);
+  if (a.hours !== b.hours)
+    return Num.mapNaN2Undefined(Math.sign(a.hours - b.hours)) ?? 0;
+  if (a.minutes !== b.minutes)
+    return Num.mapNaN2Undefined(Math.sign(a.minutes - b.minutes)) ?? 0;
   return 0;
 };

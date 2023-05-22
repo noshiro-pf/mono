@@ -111,7 +111,7 @@ const datetimeRangeList$ = eventSchedule$.chain(
 
 const datetimeRangeListReversed$ = eventSchedule$.chain(
   mapI((eventSchedule) =>
-    mapOptional(eventSchedule?.datetimeRangeList, Arr.reverse)
+    mapOptional(eventSchedule?.datetimeRangeList, Arr.reversed)
   )
 );
 
@@ -122,14 +122,14 @@ const datetimeRangeListSortedByScores$ = combineLatestI([
   mapI(([eventSchedule, scores]) =>
     eventSchedule === undefined || scores === undefined
       ? undefined
-      : Arr.sortBy(eventSchedule.datetimeRangeList, (d) => scores.get(d) ?? 0)
+      : Arr.sortedBy(eventSchedule.datetimeRangeList, (d) => scores.get(d) ?? 0)
   )
 );
 
 const datetimeRangeListSortedByScoresReversed$ =
   datetimeRangeListSortedByScores$.chain(
     mapI((datetimeRangeListSortedByScores) =>
-      mapOptional(datetimeRangeListSortedByScores, Arr.reverse)
+      mapOptional(datetimeRangeListSortedByScores, Arr.reversed)
     )
   );
 
@@ -329,6 +329,7 @@ const tableBodyValuesFiltered$ = combineLatestI([
         // 指定した回答者の記号で絞り込み
         answerTableRow.every(
           (cell, index) =>
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             !falseKeys.has([answers?.[index]?.user.name ?? '', cell.iconId])
         ) &&
         // スコアで絞り込み

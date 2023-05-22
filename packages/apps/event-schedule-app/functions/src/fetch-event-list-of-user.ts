@@ -6,7 +6,7 @@ import {
   firestorePaths,
   type EventListItem,
 } from '@noshiro/event-schedule-app-shared';
-import { Arr, IMap, pipe, tp } from '@noshiro/ts-utils';
+import { Arr, IMap, pipe, tp, Tpl } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
 import { type CallableContext } from 'firebase-functions/v1/https';
@@ -59,7 +59,7 @@ export const fetchEventListOfUserImpl = async (
   }));
 
   const eventListFiltered = pipe(eventList).chain((list) =>
-    Arr.filter(list, ({ eventSchedule }) => {
+    list.filter(({ eventSchedule }) => {
       const isArchived = eventSchedule.archivedBy.some((u) => u.id === uid);
 
       switch (filterOptionState) {
@@ -97,7 +97,7 @@ export const fetchEventListOfUserImpl = async (
     }
   >[] = await Promise.all(
     pipe(eventListFiltered).chain((list) =>
-      Arr.map(list, ({ eventScheduleMetadata: { id: eventId } }) =>
+      Tpl.map(list, ({ eventScheduleMetadata: { id: eventId } }) =>
         db
           .collection(
             `${firestorePaths.events}/${eventId}/${firestorePaths.answers}`

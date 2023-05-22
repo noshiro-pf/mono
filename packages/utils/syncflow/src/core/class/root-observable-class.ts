@@ -43,7 +43,7 @@ export class RootObservableClass<A, Type extends RootObservableType>
       child.depth
     );
 
-    this.#procedure = Arr.insert(this.#procedure, insertPos, child);
+    this.#procedure = Arr.inserted(this.#procedure, insertPos, child);
   }
 
   startUpdate(nextValue: A): void {

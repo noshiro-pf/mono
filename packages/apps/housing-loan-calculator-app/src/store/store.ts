@@ -32,9 +32,9 @@ const setPropertyPriceManYen = (value: number): void => {
 
 // 借入期間（月）
 const { state$: borrowingPeriodYear$, setState: _setBorrowingPeriodYear } =
-  createState<number>(defaultValues.borrowingPeriodYear);
+  createState<Uint32>(defaultValues.borrowingPeriodYear);
 
-const setBorrowingPeriodYear = (value: number): void => {
+const setBorrowingPeriodYear = (value: Uint32): void => {
   _setBorrowingPeriodYear(value);
   nextUserInput();
 };
@@ -84,15 +84,15 @@ queryParams$.subscribe((query) => {
   } as const;
 
   const paramsAsNumber = {
-    downPayment: mapOptional(paramsAsStr.downPayment, Str.toNumber),
-    propertyPrice: mapOptional(paramsAsStr.propertyPrice, Str.toNumber),
+    downPayment: mapOptional(paramsAsStr.downPayment, Num.from),
+    propertyPrice: mapOptional(paramsAsStr.propertyPrice, Num.from),
     borrowingPeriodMonth: mapOptional(
       paramsAsStr.borrowingPeriodMonth,
-      Str.toNumber
+      Num.from
     ),
     interestRatePerMonth: mapOptional(
       paramsAsStr.interestRatePerMonth,
-      Str.toNumber
+      Num.from
     ),
   } as const;
 
@@ -109,7 +109,7 @@ queryParams$.subscribe((query) => {
     _setPropertyPriceManYen(paramsAsNumber.propertyPrice);
   }
   if (paramsAsNumber.borrowingPeriodMonth !== undefined) {
-    _setBorrowingPeriodYear(paramsAsNumber.borrowingPeriodMonth);
+    _setBorrowingPeriodYear(toUint32(paramsAsNumber.borrowingPeriodMonth));
   }
   if (paramsAsNumber.interestRatePerMonth !== undefined) {
     _setInterestRatePercentPerYear(paramsAsNumber.interestRatePerMonth);

@@ -2,23 +2,46 @@ import { pipe, Result } from '@noshiro/ts-utils';
 import { type Type } from '../type';
 import { createType, validationErrorMessage } from '../utils';
 
-export const brand = <A extends Primitive, S extends string>({
+type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
+  ? never
+  : A[number];
+
+export const brand = <
+  A extends Primitive,
+  BrandTrueKeys extends readonly string[],
+  BrandFalseKeys extends readonly string[] = []
+>({
   codec,
   is,
-  typeName,
+  brandKeys,
+  brandFalseKeys,
   defaultValue,
 }: Readonly<{
   codec: Type<A>;
-  is: (a: A) => a is Phantomic<A, S>;
-  typeName: S;
-  defaultValue: Phantomic<A, S>;
-}>): Type<Phantomic<A, S>> => {
-  type T = Phantomic<A, S>;
+  is: (
+    a: A
+  ) => a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
+  brandKeys: BrandTrueKeys;
+  brandFalseKeys?: BrandFalseKeys;
+  defaultValue: Brand<
+    A,
+    ArrayToUnion<BrandTrueKeys>,
+    ArrayToUnion<BrandFalseKeys>
+  >;
+}>): Type<
+  Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>
+> => {
+  type T = Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
+
+  const brandKeysStr = [
+    ...brandKeys,
+    ...(brandFalseKeys?.map((s) => `not(${s})`) ?? []),
+  ].join(' & ');
 
   const validate: Type<T>['validate'] = (a) =>
     pipe(a)
       .chain(codec.validate)
-      .chain((v): Result<Phantomic<A, S>, readonly string[]> => {
+      .chain((v): Result<T, readonly string[]> => {
         if (Result.isErr(v)) return v;
 
         if (is(v.value)) {
@@ -27,7 +50,7 @@ export const brand = <A extends Primitive, S extends string>({
           return Result.err([
             validationErrorMessage(
               v.value,
-              `The value is expected to be <${typeName}>`
+              `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`
             ),
           ]);
         }
@@ -39,7 +62,7 @@ export const brand = <A extends Primitive, S extends string>({
       .chain((result) => Result.unwrapOkOr(result, defaultValue)).value;
 
   return createType({
-    typeName,
+    typeName: brandKeysStr,
     defaultValue,
     validate,
     fill,

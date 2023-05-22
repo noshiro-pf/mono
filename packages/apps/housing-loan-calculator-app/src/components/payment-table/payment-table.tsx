@@ -35,21 +35,17 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
 
   const numRows = useMemo(
     () =>
-      Math.max(
-        borrowingBalanceYen.length,
-        interestYen.length,
-        monthlyPaymentTotalYen.length
+      SafeUint.max(
+        Arr.length(borrowingBalanceYen),
+        Arr.length(interestYen),
+        Arr.length(monthlyPaymentTotalYen)
       ),
-    [
-      borrowingBalanceYen.length,
-      interestYen.length,
-      monthlyPaymentTotalYen.length,
-    ]
+    [borrowingBalanceYen, interestYen, monthlyPaymentTotalYen]
   );
 
   const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
     () =>
-      Arr.seqUnwrapped(numRows).map((i) => [
+      Arr.seq(numRows).map((i) => [
         i.toString(),
         formatYenValue(borrowingBalanceYen[i] ?? 0),
         formatYenValue(interestYen[i] ?? 0),
@@ -73,9 +69,11 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
         </tr>
       </thead>
       <tbody>
-        {Arr.map(tableData, (tableRow, rowIdx) => (
+        {tableData.map((tableRow, rowIdx) => (
+          // eslint-disable-next-line react/no-array-index-key
           <tr key={rowIdx}>
-            {Arr.map(tableRow, (cell, colIdx) => (
+            {tableRow.map((cell, colIdx) => (
+              // eslint-disable-next-line react/no-array-index-key
               <td key={colIdx} style={dataCellStyle}>
                 {cell}
               </td>

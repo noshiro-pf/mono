@@ -1,7 +1,7 @@
 import { Arr } from '../array';
-import { Num } from '../num';
+import { Uint32 } from '../num';
 
-export type DateUtils = StrictOmit<
+export type DateUtils = Omit<
   RawDateType,
   | 'getDate'
   | 'getDay'
@@ -153,7 +153,6 @@ const getUTCMilliseconds = (date: DateUtils): MillisecondsEnum =>
 const setValueHelper =
   (setFn: (date: RawDateType) => void) =>
   (curr: DateUtils): DateUtils => {
-    // eslint-disable-next-line no-restricted-globals
     const copy = new Date(curr as RawDateType);
     setFn(copy);
     return copy;
@@ -174,13 +173,13 @@ const setUTCYear = (year: YearEnum): ((curr: DateUtils) => DateUtils) =>
 /** Sets the month value in the Date object using local time. */
 const setLocaleMonth = (month: MonthEnum): ((curr: DateUtils) => DateUtils) =>
   setValueHelper((mut_copy) => {
-    mut_copy.setMonth(month - 1);
+    mut_copy.setMonth((month - 1) as MonthIndexEnum);
   });
 
 /** Sets the month value in the Date object using Universal Coordinated Time (UTC). */
 const setUTCMonth = (month: MonthEnum): ((curr: DateUtils) => DateUtils) =>
   setValueHelper((mut_copy) => {
-    mut_copy.setUTCMonth(month - 1);
+    mut_copy.setUTCMonth((month - 1) as MonthIndexEnum);
   });
 
 /** Sets the numeric day-of-the-month value of the Date object using local time. */
@@ -329,11 +328,9 @@ const updateUTCMilliseconds =
 
 /* create  */
 
-// eslint-disable-next-line no-restricted-globals
 const today = (): DateUtils => new Date();
 
-// eslint-disable-next-line no-restricted-globals
-const now = (): number => Date.now();
+const now = (): SafeUint => Date.now();
 
 const create = (
   year: YearEnum,
@@ -342,25 +339,31 @@ const create = (
   hours: HoursEnum = 0,
   minutes: MinutesEnum = 0,
   seconds: SecondsEnum = 0,
-  ms: number = 0
-  // eslint-disable-next-line no-restricted-globals
-): DateUtils => new Date(year, month - 1, date, hours, minutes, seconds, ms);
+  ms: MillisecondsEnum = 0
+): DateUtils =>
+  new Date(
+    year,
+    (month - 1) as MonthIndexEnum,
+    date,
+    hours,
+    minutes,
+    seconds,
+    ms
+  );
 
 const from = (value: RawDateType | number | string): DateUtils =>
-  // eslint-disable-next-line no-restricted-globals
   new Date(value);
 
 /* timestamp */
 
 /** Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970. */
-const parse = (str: string): number | undefined => {
-  // eslint-disable-next-line no-restricted-globals
+const parse = (str: string): SafeUint | undefined => {
   const res = Date.parse(str);
-  return Num.isNaN(res) ? undefined : res;
+  return Number.isNaN(res) ? undefined : res;
 };
 
 /** Gets the time value in milliseconds. */
-const toTimestamp = (d: DateUtils): number => d.getTime();
+const toTimestamp = (d: DateUtils): SafeUint => d.getTime();
 
 /* yesterday & tomorrow */
 
@@ -371,7 +374,6 @@ const getLocaleTomorrow = updateLocaleDate((d) => (d + 1) as DateEnum);
 /* convert */
 
 const toMidnight = (date: DateUtils): DateUtils => {
-  // eslint-disable-next-line no-restricted-globals
   const mut_midnight = new Date(date as RawDateType);
   mut_midnight.setHours(0, 0, 0, 0);
   return mut_midnight;
@@ -423,15 +425,18 @@ const getAllDatesOfMonth = (
   year: YearEnum,
   month: MonthEnum
 ): readonly DateUtils[] =>
-  Arr.rangeUnwrapped(1, getLastDateNumberOfMonth(year, month) + 1).map((date) =>
-    create(year, month, date as DateEnum)
+  Arr.range(1, Uint32.add(getLastDateNumberOfMonth(year, month), 1)).map(
+    (date) => create(year, month, date as DateEnum)
   );
 
-const numWeeksOfMonth = (year: YearEnum, month: MonthEnum): number => {
+const numWeeksOfMonth = (
+  year: YearEnum,
+  month: MonthEnum
+): 1 | 2 | 3 | 4 | 5 | 6 => {
   const lastDateNumber = getLastDateNumberOfMonth(year, month);
   const lastDate = setLocaleDate(lastDateNumber)(create(year, month));
 
-  return weekNumberLocale(lastDate) + 1;
+  return (weekNumberLocale(lastDate) + 1) as 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 /* format */

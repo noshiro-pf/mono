@@ -18,15 +18,15 @@ const tenYearsLater = pipe(DateUtils.today())
 // eslint-disable-next-line deprecation/deprecation
 type DateInputPropsOriginal = React.ComponentProps<typeof DateInput>;
 
-export type BpDatetimePickerProps = Readonly<{
-  ymdhm: Ymdhm | undefined;
-  onYmdhmChange: (ymdhm: Ymdhm | undefined) => void;
-  shortcuts?: boolean | readonly DatePickerShortcut[];
-}> &
-  StrictOmit<
-    DateInputPropsOriginal,
-    'formatDate' | 'parseDate' | 'shortcuts' | 'timePrecision'
-  >;
+export type BpDatetimePickerProps = Omit<
+  DateInputPropsOriginal,
+  'formatDate' | 'parseDate' | 'shortcuts' | 'timePrecision'
+> &
+  Readonly<{
+    ymdhm: Ymdhm | undefined;
+    onYmdhmChange: (ymdhm: Ymdhm | undefined) => void;
+    shortcuts?: boolean | readonly DatePickerShortcut[];
+  }>;
 
 export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
   'BpDatetimePicker',

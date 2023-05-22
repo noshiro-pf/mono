@@ -13,12 +13,12 @@ export type DatetimeListReducerAction = Readonly<
       mostFrequentTimeRange: TimeRange;
     }
   | { type: 'addClick'; datetimeRange: DatetimeRange }
-  | { type: 'delete'; index: number }
+  | { type: 'delete'; index: SafeUint }
   | { type: 'deleteAll' | 'sort' }
-  | { type: 'duplicate'; index: number }
-  | { type: 'end' | 'start'; index: number; hm: HoursMinutes }
+  | { type: 'duplicate'; index: SafeUint }
+  | { type: 'end' | 'start'; index: SafeUint; hm: HoursMinutes }
   | { type: 'setTimeAtOneTime'; timeRange: TimeRange }
-  | { type: 'ymd'; index: number; ymd: YearMonthDate }
+  | { type: 'ymd'; index: SafeUint; ymd: YearMonthDate }
 >;
 
 export type DatetimeListReducerState = readonly DatetimeRange[];
@@ -51,7 +51,7 @@ export const datetimeListReducer: Reducer<
               .map((ymd) => ({ ymd, timeRange: timeRangeDefaultValue }))
           )
         )
-        .chain((list) => Arr.sort(list, compareDatetimeRange)).value;
+        .chain((list) => Arr.sorted(list, compareDatetimeRange)).value;
     }
 
     case 'ymd':
@@ -66,17 +66,17 @@ export const datetimeListReducer: Reducer<
       );
 
     case 'duplicate':
-      return Arr.insert(
+      return Arr.inserted(
         state,
         action.index,
         state[action.index] ?? datetimeRangeInitialValue
       );
 
     case 'delete':
-      return Arr.remove(state, action.index);
+      return Arr.removed(state, action.index);
 
     case 'addClick':
-      return Arr.push(state, action.datetimeRange);
+      return Arr.pushed(state, action.datetimeRange);
 
     case 'deleteAll':
       return [];
@@ -85,6 +85,6 @@ export const datetimeListReducer: Reducer<
       return state.map((el) => Obj.set(el, 'timeRange', action.timeRange));
 
     case 'sort':
-      return Arr.sort(state, compareDatetimeRange);
+      return Arr.sorted(state, compareDatetimeRange);
   }
 };

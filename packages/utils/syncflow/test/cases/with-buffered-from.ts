@@ -20,7 +20,7 @@ const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   filtered$: Observable<number>;
   sampleCounter$: Observable<number>;
   withBufferedFrom$: Observable<DeepReadonly<[number, number[]]>>;

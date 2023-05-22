@@ -12,7 +12,7 @@ const createStreams = (
   tick: number
 ): Readonly<{
   startSource: () => void;
-  counter$: Observable<number>;
+  counter$: Observable<SafeUint>;
   even$: Observable<number>;
   multiplesOf3$: Observable<number>;
   zipped$: Observable<readonly [number, number]>;

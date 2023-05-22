@@ -5,7 +5,7 @@ interface ISetInterface<K> {
   new (iterable: Iterable<K>): void;
 
   // Getting information
-  size: number;
+  size: SafeUint;
   isEmpty: boolean;
   has: (key: K) => boolean;
 
@@ -54,7 +54,6 @@ interface ISetInterface<K> {
 
 export type ISet<K> = Iterable<K> & Readonly<ISetInterface<K>>;
 
-// eslint-disable-next-line no-restricted-globals
 const ArrayFrom = Array.from;
 
 export const ISet = {
@@ -86,7 +85,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
     this.#set = new MutableSet(iterable);
   }
 
-  get size(): number {
+  get size(): SafeUint {
     return this.#set.size;
   }
 

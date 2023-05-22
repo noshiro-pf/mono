@@ -41,7 +41,7 @@ interface GeneratorFunction {
   /**
    * The length of the arguments.
    */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Returns the name of the function.
    */
@@ -66,7 +66,7 @@ interface GeneratorFunctionConstructor {
   /**
    * The length of the arguments.
    */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Returns the name of the function.
    */

@@ -45,7 +45,6 @@ import type {
   YearMonthDate as _YearMonthDate,
   Ymdhm as _Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import type { Phantomic as _Phantomic } from '@noshiro/ts-utils-additional';
 import type { dict as _dict } from './constants/dictionary/dictionary';
 import type {
   AnswerSelectionMapKey as _AnswerSelectionMapKey,
@@ -74,7 +73,7 @@ declare global {
   /* @blueprintjs/datetime */
   type DatePickerShortcut = Readonly<
     ArrayElement<
-      StrictExclude<DateInput2Props['shortcuts'], boolean | undefined>
+      Exclude<DateInput2Props['shortcuts'], boolean | undefined>
     >
   >;
 
@@ -107,7 +106,6 @@ declare global {
   type AuthCredential = _AuthCredential;
   type OAuthCredential = _OAuthCredential;
   type UserCredential = _UserCredential;
-  type Phantomic<T, U extends string> = _Phantomic<T, U>;
   type YmdKey = _YmdKey;
   type DatetimeRangeMapKey = _DatetimeRangeMapKey;
   type AnswerSelectionMapKey = _AnswerSelectionMapKey;

@@ -21,7 +21,10 @@ clog('firebase.initializeApp done.');
 const firestore = initializeFirestore(fbApp, {
   ignoreUndefinedProperties: true,
   // https://zenn.dev/cauchye/articles/20210816_yutaro-elk
-  experimentalForceLongPolling: hasKey(window, 'Cypress'),
+  experimentalForceLongPolling: Object.hasOwn(
+    window as unknown as RecordBase,
+    'Cypress'
+  ),
 });
 // if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
 //   const host = 'localhost';

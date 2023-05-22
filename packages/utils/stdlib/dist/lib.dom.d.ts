@@ -32,11 +32,11 @@ interface AesCbcParams extends Algorithm {
 
 interface AesCtrParams extends Algorithm {
   readonly counter: BufferSource;
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface AesDerivedKeyParams extends Algorithm {
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface AesGcmParams extends Algorithm {
@@ -46,11 +46,11 @@ interface AesGcmParams extends Algorithm {
 }
 
 interface AesKeyAlgorithm extends KeyAlgorithm {
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface AesKeyGenParams extends Algorithm {
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface Algorithm {
@@ -80,7 +80,7 @@ interface AssignedNodesOptions {
 }
 
 interface AudioBufferOptions {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfChannels?: number;
   readonly sampleRate: number;
 }
@@ -564,7 +564,7 @@ interface HmacImportParams extends Algorithm {
 
 interface HmacKeyAlgorithm extends KeyAlgorithm {
   readonly hash: KeyAlgorithm;
-  readonly length: number;
+  readonly length: SafeUint;
 }
 
 interface HmacKeyGenParams extends Algorithm {
@@ -981,7 +981,7 @@ interface OfflineAudioCompletionEventInit extends EventInit {
 }
 
 interface OfflineAudioContextOptions {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfChannels?: number;
   readonly sampleRate: number;
 }
@@ -2318,7 +2318,7 @@ declare const Attr: {
 /** A short audio asset residing in memory, created from an audio file using the AudioContext.decodeAudioData() method, or from raw data using AudioContext.createBuffer(). Once put into an AudioBuffer, the audio can then be played by being passed into an AudioBufferSourceNode. */
 interface AudioBuffer {
   readonly duration: number;
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfChannels: number;
   readonly sampleRate: number;
   copyFromChannel(
@@ -2717,7 +2717,7 @@ interface BaseAudioContext extends EventTarget {
   createBiquadFilter(): BiquadFilterNode;
   createBuffer(
     numberOfChannels: number,
-    length: number,
+    length: SafeUint,
     sampleRate: number
   ): AudioBuffer;
   createBufferSource(): AudioBufferSourceNode;
@@ -2819,7 +2819,7 @@ declare const BiquadFilterNode: {
 
 /** A file-like object of immutable, raw data. Blobs represent data that isn't necessarily in a JavaScript-native format. The File interface is based on Blob, inheriting blob functionality and expanding it to support files on the user's system. */
 interface Blob {
-  readonly size: number;
+  readonly size: SafeUint;
   readonly type: string;
   arrayBuffer(): Promise<ArrayBuffer>;
   slice(start?: number, end?: number, contentType?: string): Blob;
@@ -3143,7 +3143,7 @@ declare const CSSRule: {
 
 /** A CSSRuleList is an (indirect-modify only) array-like object containing an ordered collection of CSSRule objects. */
 interface CSSRuleList {
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): CSSRule | null;
   readonly [index: number]: CSSRule;
 }
@@ -3366,7 +3366,7 @@ interface CSSStyleDeclaration {
   readonly justifyItems: string;
   readonly justifySelf: string;
   readonly left: string;
-  readonly length: number;
+  readonly length: SafeUint;
   readonly letterSpacing: string;
   readonly lightingColor: string;
   readonly lineBreak: string;
@@ -4156,7 +4156,7 @@ declare const ChannelSplitterNode: {
 /** The CharacterData abstract interface represents a Node object that contains characters. This is an abstract interface, meaning there aren't any object of type CharacterData: it is implemented by other interfaces, like Text, Comment, or ProcessingInstruction which aren't abstract. */
 interface CharacterData extends Node, ChildNode, NonDocumentTypeChildNode {
   readonly data: string;
-  readonly length: number;
+  readonly length: SafeUint;
   readonly ownerDocument: Document;
   appendData(data: string): void;
   deleteData(offset: number, count: number): void;
@@ -4734,7 +4734,7 @@ type SVGRect = DOMRect;
 declare const SVGRect: typeof DOMRect;
 
 interface DOMRectList {
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): DOMRect | null;
   readonly [index: number]: DOMRect;
 }
@@ -4770,7 +4770,7 @@ declare const DOMRectReadOnly: {
 /** A type returned by some APIs which contains a list of DOMString (strings). */
 interface DOMStringList {
   /** Returns the number of strings in strings. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Returns true if strings contains string, and false otherwise. */
   contains(string: string): boolean;
   /** Returns the string with index index from strings. */
@@ -4796,7 +4796,7 @@ declare const DOMStringMap: {
 /** A set of space-separated tokens. Such a set is returned by Element.classList, HTMLLinkElement.relList, HTMLAnchorElement.relList, HTMLAreaElement.relList, HTMLIframeElement.sandbox, or HTMLOutputElement.htmlFor. It is indexed beginning with 0 as with JavaScript Array objects. DOMTokenList is always case-sensitive. */
 interface DOMTokenList {
   /** Returns the number of tokens. */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Returns the associated set as string.
    *
@@ -4931,7 +4931,7 @@ declare const DataTransferItem: {
 /** A list of DataTransferItem objects representing items being dragged. During a drag operation, each DragEvent has a dataTransfer property and that property is a DataTransferItemList. */
 interface DataTransferItemList {
   /** Returns the number of items in the drag data store. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Adds a new entry for the given data to the drag data store. If the data is plain text then a type string has to be provided also. */
   add(data: string, type: string): DataTransferItem | null;
   add(data: File): DataTransferItem | null;
@@ -6127,7 +6127,7 @@ declare const File: {
 
 /** An object of this type is returned by the files property of the HTML <input> element; this lets you access the list of files selected with the <input type="file"> element. It's also used for a list of files dropped into web content when using the drag and drop API; see the DataTransfer object for details on this usage. */
 interface FileList {
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): File | null;
   readonly [index: number]: File;
 }
@@ -7152,7 +7152,7 @@ interface GlobalEventHandlers {
 
 interface HTMLAllCollection {
   /** Returns the number of elements in the collection. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Returns the item with index index from the collection (determined by tree order). */
   item(nameOrIndex?: string): HTMLCollection | Element | null;
   /**
@@ -7566,7 +7566,7 @@ declare const HTMLCanvasElement: {
 /** A generic collection (array-like object similar to arguments) of elements (in document order) and offers methods and properties for selecting from the list. */
 interface HTMLCollectionBase {
   /** Sets or retrieves the number of objects in a collection. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Retrieves an object from various collections. */
   item(index: number): Element | null;
   readonly [index: number]: Element;
@@ -8089,7 +8089,7 @@ interface HTMLFormElement extends HTMLElement {
   /** Sets or retrieves the encoding type for the form. */
   readonly enctype: string;
   /** Sets or retrieves the number of objects in a collection. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Sets or retrieves how to send the form data to the server. */
   readonly method: string;
   /** Sets or retrieves the name of the object. */
@@ -8713,7 +8713,7 @@ interface HTMLInputElement extends HTMLElement {
   readonly selectionEnd: number | null;
   /** Gets or sets the starting position or offset of a text selection. */
   readonly selectionStart: number | null;
-  readonly size: number;
+  readonly size: SafeUint;
   /** The address or URL of the a media resource that is to be considered. */
   readonly src: string;
   /** Defines an increment or jump between values that you want to allow the user to enter. When used with the max and min attributes, lets you control the range and increment (for example, allow only even numbers) that the user can enter into an input field. */
@@ -9555,7 +9555,7 @@ interface HTMLOptionsCollection extends HTMLCollectionOf<HTMLOptionElement> {
    *
    * When set to a greater number, adds new blank option elements to that container.
    */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Returns the index of the first selected item, if any, or −1 if there is no selected item.
    *
@@ -9936,7 +9936,7 @@ interface HTMLSelectElement extends HTMLElement {
   readonly form: HTMLFormElement | null;
   readonly labels: NodeListOf<HTMLLabelElement>;
   /** Sets or retrieves the number of objects in a collection. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Sets or retrieves the Boolean value indicating whether multiple items can be selected from a list. */
   readonly multiple: boolean;
   /** Sets or retrieves the name of the object. */
@@ -9949,7 +9949,7 @@ interface HTMLSelectElement extends HTMLElement {
   readonly selectedIndex: number;
   readonly selectedOptions: HTMLCollectionOf<HTMLOptionElement>;
   /** Sets or retrieves the number of rows in the list box. */
-  readonly size: number;
+  readonly size: SafeUint;
   /** Retrieves the type of select control based on the value of the MULTIPLE attribute. */
   readonly type: string;
   /** Returns the error message that would be displayed if the user submits the form, or an empty string if no error message. It also triggers the standard error message, such as "this is a required field". The result is that the user sees validation messages without actually submitting. */
@@ -11025,7 +11025,7 @@ declare const Headers: {
 
 /** Allows manipulation of the browser session history, that is the pages visited in the tab or frame that the current page is loaded in. */
 interface History {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly scrollRestoration: ScrollRestoration;
   readonly state: unknown;
   back(): void;
@@ -12098,7 +12098,7 @@ declare const MediaKeySession: {
  * Available only in secure contexts.
  */
 interface MediaKeyStatusMap {
-  readonly size: number;
+  readonly size: SafeUint;
   get(keyId: BufferSource): MediaKeyStatus | undefined;
   has(keyId: BufferSource): boolean;
   forEach(
@@ -12146,7 +12146,7 @@ declare const MediaKeys: {
 };
 
 interface MediaList {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly mediaText: string;
   toString(): string;
   appendMedium(medium: string): void;
@@ -12631,7 +12631,7 @@ declare const MimeType: {
  */
 interface MimeTypeArray {
   /** @deprecated */
-  readonly length: number;
+  readonly length: SafeUint;
   /** @deprecated */
   item(index: number): MimeType | null;
   /** @deprecated */
@@ -12780,7 +12780,7 @@ declare const MutationRecord: {
 
 /** A collection of Attr objects. Objects inside a NamedNodeMap are not in any particular order, unlike NodeList, although they may be accessed by an index as in an array. */
 interface NamedNodeMap {
-  readonly length: number;
+  readonly length: SafeUint;
   getNamedItem(qualifiedName: string): Attr | null;
   getNamedItemNS(namespace: string | null, localName: string): Attr | null;
   item(index: number): Attr | null;
@@ -13060,7 +13060,7 @@ declare const NodeIterator: {
 /** NodeList objects are collections of nodes, usually returned by properties such as Node.childNodes and methods such as document.querySelectorAll(). */
 interface NodeList {
   /** Returns the number of nodes in the collection. */
-  readonly length: number;
+  readonly length: SafeUint;
   /** Returns the node with index index from the collection. The nodes are sorted in tree order. */
   item(index: number): Node | null;
   /**
@@ -13250,7 +13250,7 @@ interface OfflineAudioContextEventMap extends BaseAudioContextEventMap {
 
 /** An AudioContext interface representing an audio-processing graph built from linked together AudioNodes. In contrast with a standard AudioContext, an OfflineAudioContext doesn't render the audio to the device hardware; instead, it generates it, as fast as it can, and outputs the result to an AudioBuffer. */
 interface OfflineAudioContext extends BaseAudioContext {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly oncomplete:
     | ((this: OfflineAudioContext, ev: OfflineAudioCompletionEvent) => unknown)
     | null;
@@ -13290,7 +13290,7 @@ declare const OfflineAudioContext: {
   new (contextOptions: OfflineAudioContextOptions): OfflineAudioContext;
   new (
     numberOfChannels: number,
-    length: number,
+    length: SafeUint,
     sampleRate: number
   ): OfflineAudioContext;
 };
@@ -14055,7 +14055,7 @@ interface Plugin {
    * Returns the number of MIME types, represented by MimeType objects, supported by the plugin.
    * @deprecated
    */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Returns the plugin's name.
    * @deprecated
@@ -14083,7 +14083,7 @@ declare const Plugin: {
  */
 interface PluginArray {
   /** @deprecated */
-  readonly length: number;
+  readonly length: SafeUint;
   /** @deprecated */
   item(index: number): Plugin | null;
   /** @deprecated */
@@ -17015,7 +17015,7 @@ declare const SVGLength: {
 
 /** The SVGLengthList defines a list of SVGLength objects. */
 interface SVGLengthList {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfItems: number;
   appendItem(newItem: SVGLength): SVGLength;
   clear(): void;
@@ -17257,7 +17257,7 @@ declare const SVGNumber: {
 
 /** The SVGNumberList defines a list of SVGNumber objects. */
 interface SVGNumberList {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfItems: number;
   appendItem(newItem: SVGNumber): SVGNumber;
   clear(): void;
@@ -17343,7 +17343,7 @@ declare const SVGPatternElement: {
 };
 
 interface SVGPointList {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfItems: number;
   appendItem(newItem: DOMPoint): DOMPoint;
   clear(): void;
@@ -17720,7 +17720,7 @@ declare const SVGStopElement: {
 
 /** The SVGStringList defines a list of DOMString objects. */
 interface SVGStringList {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfItems: number;
   appendItem(newItem: string): string;
   clear(): void;
@@ -18092,7 +18092,7 @@ declare const SVGTransform: {
 
 /** The SVGTransformList defines a list of SVGTransform objects. */
 interface SVGTransformList {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly numberOfItems: number;
   appendItem(newItem: SVGTransform): SVGTransform;
   clear(): void;
@@ -18656,7 +18656,7 @@ interface SourceBufferListEventMap {
 
 /** A simple container list for multiple SourceBuffer objects. */
 interface SourceBufferList extends EventTarget {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly onaddsourcebuffer:
     | ((this: SourceBufferList, ev: Event) => unknown)
     | null;
@@ -18709,7 +18709,7 @@ declare const SpeechRecognitionAlternative: {
 
 interface SpeechRecognitionResult {
   readonly isFinal: boolean;
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): SpeechRecognitionAlternative;
   readonly [index: number]: SpeechRecognitionAlternative;
 }
@@ -18720,7 +18720,7 @@ declare const SpeechRecognitionResult: {
 };
 
 interface SpeechRecognitionResultList {
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): SpeechRecognitionResult;
   readonly [index: number]: SpeechRecognitionResult;
 }
@@ -18921,7 +18921,7 @@ declare const StereoPannerNode: {
 /** This Web Storage API interface provides access to a particular domain's session or local storage. It allows, for example, the addition, modification, or deletion of stored data items. */
 interface Storage {
   /** Returns the number of key/value pairs. */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Removes all key/value pairs, if there are any.
    *
@@ -19021,7 +19021,7 @@ declare const StyleSheet: {
 
 /** A list of StyleSheet. */
 interface StyleSheetList {
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): CSSStyleSheet | null;
   readonly [index: number]: CSSStyleSheet;
 }
@@ -19063,7 +19063,7 @@ interface SubtleCrypto {
       | HkdfParams
       | Pbkdf2Params,
     baseKey: CryptoKey,
-    length: number
+    length: SafeUint
   ): Promise<ArrayBuffer>;
   deriveKey(
     algorithm:
@@ -19424,7 +19424,7 @@ declare const TextTrackCue: {
 
 interface TextTrackCueList {
   /** Returns the number of cues in the list. */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Returns the first text track cue (in text track cue order) with text track cue identifier id.
    *
@@ -19446,7 +19446,7 @@ interface TextTrackListEventMap {
 }
 
 interface TextTrackList extends EventTarget {
-  readonly length: number;
+  readonly length: SafeUint;
   readonly onaddtrack:
     | ((this: TextTrackList, ev: TrackEvent) => unknown)
     | null;
@@ -19486,7 +19486,7 @@ declare const TextTrackList: {
 /** Used to represent a set of time ranges, primarily for the purpose of tracking which portions of media have been buffered when loading it for use by the <audio> and <video> elements. */
 interface TimeRanges {
   /** Returns the number of ranges in the object. */
-  readonly length: number;
+  readonly length: SafeUint;
   /**
    * Returns the time for the end of the range with the given index.
    *
@@ -19545,7 +19545,7 @@ declare const TouchEvent: {
 
 /** A list of contact points on a touch surface. For example, if the user has three fingers on the touch surface (such as a screen or trackpad), the corresponding TouchList object would have one Touch object for each finger, for a total of three entries. */
 interface TouchList {
-  readonly length: number;
+  readonly length: SafeUint;
   item(index: number): Touch | null;
   readonly [index: number]: Touch;
 }
@@ -19717,7 +19717,7 @@ interface VTTCue extends TextTrackCue {
   readonly position: LineAndPositionSetting;
   readonly positionAlign: PositionAlignSetting;
   readonly region: VTTRegion | null;
-  readonly size: number;
+  readonly size: SafeUint;
   readonly snapToLines: boolean;
   readonly text: string;
   readonly vertical: DirectionSetting;
@@ -22874,7 +22874,7 @@ interface Window
   readonly history: History;
   readonly innerHeight: number;
   readonly innerWidth: number;
-  readonly length: number;
+  readonly length: SafeUint;
   get location(): Location;
   set location(href: string | Location);
   /** Returns true if the location bar is visible; otherwise, returns false. */
@@ -23735,7 +23735,7 @@ declare namespace WebAssembly {
   };
 
   interface Table {
-    readonly length: number;
+    readonly length: SafeUint;
     get(index: number): unknown;
     grow(delta: number, value?: unknown): number;
     set(index: number, value?: unknown): void;
@@ -24230,7 +24230,7 @@ declare const frames: WindowProxy;
 declare const history: History;
 declare const innerHeight: number;
 declare const innerWidth: number;
-declare const length: number;
+declare const length: SafeUint;
 declare const location: Location;
 /** Returns true if the location bar is visible; otherwise, returns false. */
 declare const locationbar: BarProp;

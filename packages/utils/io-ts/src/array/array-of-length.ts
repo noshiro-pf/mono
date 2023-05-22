@@ -1,4 +1,4 @@
-import { Arr, Result } from '@noshiro/ts-utils';
+import { Arr, Result, toUint32 } from '@noshiro/ts-utils';
 import { type Type } from '../type';
 import {
   createAssertFunction,
@@ -6,9 +6,9 @@ import {
   validationErrorMessage,
 } from '../utils';
 
-type Index1000 = Index<1000>;
+type SmallUint = Uint9;
 
-export const arrayOfLength = <A, N extends Index1000>(
+export const arrayOfLength = <A, N extends SmallUint>(
   size: N,
   elementType: Type<A>,
   options?: Readonly<{
@@ -20,18 +20,15 @@ export const arrayOfLength = <A, N extends Index1000>(
 
   const {
     typeName,
-    defaultValue = Arr.zerosUnwrapped(size as number).map(
-      () => elementType.defaultValue
-    ) as unknown as ArrayOfLength<N, A>,
+    defaultValue = Arr.newArray(size, elementType.defaultValue),
   } = options ?? {};
 
-  const zs = Arr.zerosUnwrapped(size as number);
-
   const typeNameFilled: string =
-    typeName ?? `[${zs.map(() => elementType.typeName).join(', ')}]`;
+    typeName ??
+    `[${Arr.newArray(toUint32(size), elementType.typeName).join(', ')}]`;
 
   const validate: Type<T>['validate'] = (a) => {
-    if (!Arr.isArray(a)) {
+    if (!Array.isArray(a)) {
       return Result.err([
         validationErrorMessage(a, 'The value is expected to be an array'),
       ]);
@@ -61,8 +58,10 @@ export const arrayOfLength = <A, N extends Index1000>(
   };
 
   const fill: Type<T>['fill'] = (a) =>
-    Arr.isArray(a)
-      ? (zs.map((_, i) => elementType.fill(a[i])) as unknown as T)
+    Array.isArray(a)
+      ? (Arr.seq(toUint32(size)).map((i) =>
+          elementType.fill(a[i])
+        ) as unknown as T)
       : defaultValue;
 
   return {

@@ -1,4 +1,6 @@
-import { Num } from '../num';
+import { SafeInt, toSafeInt } from '../num';
+
+type SmallInt = Int10;
 
 /**
  * @throws Will throw an error if the argument is not safe integer.
@@ -6,22 +8,16 @@ import { Num } from '../num';
  * @param end
  * @param step default value is 1
  */
-export function* range(
-  start: number,
-  end: number,
-  step: number = 1
-): Generator<number, void, unknown> {
-  if (!Num.isSafeInt(start)) {
-    throw new Error('start must be a safe integer.');
-  }
-  if (!Num.isSafeInt(end)) {
-    throw new Error('end must be a safe integer.');
-  }
-  if (!Num.isSafeInt(step)) {
-    throw new Error('step must be a safe integer.');
-  }
-  // eslint-disable-next-line functional/no-let
-  for (let i = start; i !== end; i += step) {
-    yield i;
+export function* range<I extends SafeInt>(
+  start: I | SmallInt,
+  end: I | SmallInt,
+  step: Exclude<SmallInt, 0> | IntersectBrand<I, NonZeroNumber> = 1
+): Generator<I, void, unknown> {
+  for (
+    let mut_i = toSafeInt(start);
+    step > 0 ? mut_i < end : mut_i > end;
+    mut_i = SafeInt.add(mut_i, step as I)
+  ) {
+    yield mut_i as I;
   }
 }

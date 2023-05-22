@@ -39,7 +39,7 @@ export const fillAnswerSelection = (a?: unknown): AnswerSelection =>
   a === undefined || !isRecord(a)
     ? d
     : {
-        datetimeRange: Obj.hasKey(a, 'datetimeRange')
+        datetimeRange: Object.hasOwn(a, 'datetimeRange')
           ? fillDatetimeRange(a.datetimeRange)
           : d.datetimeRange,
 

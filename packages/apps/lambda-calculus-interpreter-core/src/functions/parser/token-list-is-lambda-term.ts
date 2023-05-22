@@ -1,4 +1,4 @@
-import { Arr, range } from '@noshiro/ts-utils';
+import { Arr, range, SafeInt } from '@noshiro/ts-utils';
 import { isVariable } from '../is-variable';
 
 export const tokensRepresentsLambdaTerm = (
@@ -23,7 +23,7 @@ export const tokensRepresentsLambdaTerm = (
 
   /* (e e)? */
   if (tokens[0] === '(' && Arr.last(tokens) === ')') {
-    for (const sep of range(1, tokens.length - 1)) {
+    for (const sep of range(1, SafeInt.sub(Arr.length(tokens), 1))) {
       if (
         tokensRepresentsLambdaTerm(tokens.slice(1, sep)) &&
         tokensRepresentsLambdaTerm(tokens.slice(sep, -1))

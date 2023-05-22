@@ -1,5 +1,4 @@
 import {
-  Arr,
   DateUtils,
   isBoolean,
   isNumber,
@@ -51,7 +50,7 @@ export const isAnswer = (a: unknown): a is Answer =>
     a,
     'selection',
     (e: unknown): e is AnswerSelection[] =>
-      Arr.isArray(e) && e.every(isAnswerSelection)
+      Array.isArray(e) && e.every(isAnswerSelection)
   ) &&
   Obj.hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber) &&
   Obj.hasKeyValue(a, 'weight', isWeight) &&
@@ -65,14 +64,14 @@ export const fillAnswer = (a?: unknown): Answer =>
     : {
         id: Obj.hasKeyValue(a, 'id', isAnswerId) ? a.id : d.id,
 
-        user: Obj.hasKey(a, 'user') ? fillUser(a.user) : d.user,
+        user: Object.hasOwn(a, 'user') ? fillUser(a.user) : d.user,
 
         comment: Obj.hasKeyValue(a, 'comment', isString)
           ? a.comment
           : d.comment,
 
-        selection: Obj.hasKey(a, 'selection')
-          ? Arr.isArray(a.selection)
+        selection: Object.hasOwn(a, 'selection')
+          ? Array.isArray(a.selection)
             ? a.selection.map(fillAnswerSelection)
             : d.selection
           : d.selection,

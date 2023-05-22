@@ -6,7 +6,7 @@ type PermutationStringImpl<U extends string, V extends U = U> = [U] extends [
 ]
   ? ''
   : V extends V
-  ? `${V}${PermutationStringImpl<StrictExclude<U, V>>}`
+  ? `${V}${PermutationStringImpl<Exclude<U, V>>}`
   : never;
 
 export type PermutationString<U extends string> = PermutationStringImpl<

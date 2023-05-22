@@ -351,12 +351,12 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
                 </tbody>
               </table>
               <NoteForPointOfFair>
-                {Arr.map(
-                  dc.noteForPointOfFair(eventSchedule.answerIcons.fair.point),
-                  (s, i) => (
+                {dc
+                  .noteForPointOfFair(eventSchedule.answerIcons.fair.point)
+                  .map((s, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
                     <Description key={i} text={s} />
-                  )
-                )}
+                  ))}
               </NoteForPointOfFair>
             </IconDescriptionWrapper>
             {answerBeingEditedSectionState === 'hidden' && !afterDeadline ? (

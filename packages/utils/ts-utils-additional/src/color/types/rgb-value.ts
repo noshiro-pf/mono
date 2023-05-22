@@ -31,4 +31,4 @@ export type RgbValue = (
 );
 
 export const rgbValue = (v: number): RgbValue =>
-  Math.round(Num.clamp(0, 255)(v)) as RgbValue;
+  Math.round(Num.clamp<number>(0, 255)(v)) as RgbValue;

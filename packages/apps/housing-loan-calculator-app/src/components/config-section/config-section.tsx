@@ -45,7 +45,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           label={dict.borrowingPeriodYear}
           min={1}
           value={borrowingPeriodYear}
-          onValueChange={setBorrowingPeriodYear}
+          onValueChange={setBorrowingPeriodYear as (a: number) => void}
         />
       </ConfigElement>
       <ConfigElement>

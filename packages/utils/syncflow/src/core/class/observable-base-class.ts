@@ -57,7 +57,7 @@ export class ObservableBaseClass<
   }
 
   addChild<B>(child: ChildObservable<B>): void {
-    this.#children = Arr.push(
+    this.#children = Arr.pushed(
       this.#children,
       child as ChildObservable<unknown>
     );

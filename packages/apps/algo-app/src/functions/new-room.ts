@@ -38,7 +38,7 @@ const randomizePlayerCards = (): DeepReadonly<
   pipe(allCards)
     .chain(getShuffled)
     .chain((cards) => Arr.partition(cards, 6))
-    .chain((cards) => Arr.map(cards, sortCards))
+    .chain((cards) => Tpl.map(cards, sortCards))
     .chain((listOfCards) => {
       if (!Arr.isArrayOfLength4(listOfCards)) {
         throw new Error('listOfCards should be of length 4');
@@ -47,14 +47,14 @@ const randomizePlayerCards = (): DeepReadonly<
     }).value;
 
 export const newShuffleDef = (): PermutationString<'0123'> =>
-  pipe(Arr.seqUnwrapped(4))
+  pipe(Arr.seq(4))
     .chain(getShuffled)
     .chain((list) => list.join('')).value as PermutationString<'0123'>;
 
 export const newRoom = (
   password: Room['password'],
   player: Room['players'][0]
-): StrictOmit<Room, 'id'> => ({
+): Omit<Room, 'id'> => ({
   state: 'not-started',
   password,
   players: [player],

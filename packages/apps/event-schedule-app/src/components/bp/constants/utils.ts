@@ -7,7 +7,7 @@ export const hexToRgba = (
   `rgba(${hexToRgb(hex).join(', ')}, ${alpha})`;
 
 /**
- * @description join lines with `.join(', \n').concat(';')`
+ * @description join lines with `${lines.join(', \n')};`
  */
 export const joinCssStr = (...lines: readonly string[]): string =>
-  lines.join(', \n').concat(';');
+  `${lines.join(', \n')};`;

@@ -40,7 +40,7 @@ const mapPlayers6CardsToDisplayValue = ({
   pipe(player6Cards)
     .chain(sortCards)
     .chain((list) =>
-      Arr.map(list, (c) => {
+      Tpl.map(list, (c) => {
         const isAns = cardEq(gameState.cardChosenToBeAttacked, c);
         const isAtk = cardEq(gameState.cardChosenToAttack, c);
         const isToss = cardEq(gameState.cardChosenToToss, c);
