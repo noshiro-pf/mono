@@ -28,10 +28,7 @@ const packageName = packageJson.name.replace(
 
 const importsList = ['createRouter', 'withSlash'];
 
-const typeImportsList = [
-  { name: 'QueryParams', params: [] },
-  { name: 'Router', params: [] },
-];
+const typeImportsList = [{ name: 'Router', params: [] }];
 
 const main = async () => {
   const rootDir = join(thisDir, '../');
