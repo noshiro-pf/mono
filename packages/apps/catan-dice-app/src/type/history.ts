@@ -3,10 +3,10 @@ export type HistoryState = DeepReadonly<{
   history: [SafeUint, SafeUint][];
 }>;
 
-export const defaultHistoryState: HistoryState = {
+export const defaultHistoryState = {
   index: -1,
   history: [],
-} as const;
+} as const satisfies HistoryState;
 
 type Idx = HistoryState['index'];
 

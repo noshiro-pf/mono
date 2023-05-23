@@ -18,11 +18,11 @@ export type YearMonthDate = Readonly<{
     date: DateEnum;
 }>;
 
-export const yearMonthDateDefaultValue: YearMonthDate = {
+export const yearMonthDateDefaultValue = {
     year: pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value,
     month: pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value,
     date: pipe(DateUtils.today()).chain(DateUtils.getLocaleDate).value,
-} as const;
+} as const satisfies YearMonthDate;
 
 export const isYearEnum = (a: unknown): a is YearEnum =>
     isNumber(a) && Number.isInteger(a) && a > 0;

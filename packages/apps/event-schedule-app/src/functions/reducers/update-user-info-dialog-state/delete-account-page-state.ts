@@ -21,9 +21,7 @@ export const deleteAccountPageInitialState = {
   password: inputInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<typeof deleteAccountPageInitialState, DeleteAccountPageState>('<=');
+} as const satisfies DeleteAccountPageState;
 
 export const deleteAccountPageHasError = (
   state: DeleteAccountPageState

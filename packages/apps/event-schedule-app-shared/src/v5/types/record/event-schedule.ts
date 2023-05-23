@@ -53,7 +53,7 @@ export type PartialEventSchedule = Partial<
 expectType<keyof EventSchedule, keyof PartialEventSchedule>('=');
 expectType<EventSchedule, PartialEventSchedule>('<=');
 
-export const eventScheduleDefaultValue: EventSchedule = {
+export const eventScheduleDefaultValue = {
   title: '',
   notes: '',
   datetimeSpecification: 'noStartEndSpecified',
@@ -67,7 +67,7 @@ export const eventScheduleDefaultValue: EventSchedule = {
   notificationSettings: 'none',
   timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
   author: userDefaultValue,
-} as const;
+} as const satisfies EventSchedule;
 
 const d = eventScheduleDefaultValue;
 export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule => ({

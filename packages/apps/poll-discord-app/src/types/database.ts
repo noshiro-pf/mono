@@ -29,11 +29,11 @@ export type DatabaseJson = t.TypeOf<typeof databaseJsonType>;
 
 expectType<DatabaseJson, JSONType>('<=');
 
-export const databaseDefaultValue: Database = {
+export const databaseDefaultValue = {
   polls: IMap.new<PollId, Poll>([]),
   dateToPollIdMap: IMap.new<DateOptionId, PollId>([]),
   commandMessageIdToPollIdMap: IMap.new<CommandMessageId, PollId>([]),
-} as const;
+} as const satisfies Database;
 
 export const databaseFromJson = (o?: unknown): Database =>
   pipe(o)

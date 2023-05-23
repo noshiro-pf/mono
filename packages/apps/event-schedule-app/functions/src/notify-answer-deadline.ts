@@ -2,7 +2,7 @@ import {
   firestorePaths,
   type EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
-import { Arr, expectType, tp } from '@noshiro/ts-utils';
+import { Arr, tp } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import {
@@ -17,9 +17,7 @@ import { pad2 } from './utils';
 const keys = {
   notificationSettings: 'notificationSettings',
   answerDeadline: 'answerDeadline',
-} as const;
-
-expectType<ValueOf<typeof keys>, keyof EventSchedule>('<=');
+} as const satisfies Record<string, keyof EventSchedule>;
 
 export const notifyAnswerDeadline = async (
   db: firestore.Firestore

@@ -4,12 +4,17 @@ type Props = Readonly<{
   diff: EventSettingsPageDiffResult;
 }>;
 
-const list1 = ['title', 'notes', 'datetimeSpecification'] as const;
+const list1 = [
+  'title',
+  'notes',
+  'datetimeSpecification',
+] as const satisfies readonly (keyof EventSchedule)[];
 
-const list2 = ['answerDeadline', 'author', 'timezoneOffsetMinutes'] as const;
-
-expectType<typeof list1, readonly (keyof EventSchedule)[]>('<=');
-expectType<typeof list2, readonly (keyof EventSchedule)[]>('<=');
+const list2 = [
+  'answerDeadline',
+  'author',
+  'timezoneOffsetMinutes',
+] as const satisfies readonly (keyof EventSchedule)[];
 
 const dc = dict.eventSettingsPage.diff;
 

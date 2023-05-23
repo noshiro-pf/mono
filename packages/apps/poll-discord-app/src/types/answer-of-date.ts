@@ -8,11 +8,11 @@ export type AnswerOfDate = Readonly<{
   poor: ISet<UserId>;
 }>;
 
-export const answerOfDateDefaultValue: AnswerOfDate = {
+export const answerOfDateDefaultValue = {
   good: ISet.new<UserId>([]),
   fair: ISet.new<UserId>([]),
   poor: ISet.new<UserId>([]),
-} as const;
+} as const satisfies AnswerOfDate;
 
 export const answerOfDateJsonType = t.record({
   good: t.array(userIdType),

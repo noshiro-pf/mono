@@ -1,6 +1,6 @@
 import { type RectSize } from '@noshiro/ts-utils-additional';
 
-export const defaultCardSize: RectSize = {
+export const defaultCardSize = {
   width: 145,
   height: 225,
-} as const;
+} as const satisfies RectSize;

@@ -37,7 +37,7 @@ export type AnnotationCanvasStylePartial = Readonly<{
   labelLightness?: Percent;
 }>;
 
-export const defaultAnnotationCanvasStyle: AnnotationCanvasStyle = {
+export const defaultAnnotationCanvasStyle = {
   background: {
     style: 'checkerboard',
     minPaddingPx: 10,
@@ -50,7 +50,7 @@ export const defaultAnnotationCanvasStyle: AnnotationCanvasStyle = {
   temporaryRectFaceColor: [130, 125, 175, 0.5],
   labelSaturation: 80,
   labelLightness: 50,
-} as const;
+} as const satisfies AnnotationCanvasStyle;
 
 const dfl = defaultAnnotationCanvasStyle;
 

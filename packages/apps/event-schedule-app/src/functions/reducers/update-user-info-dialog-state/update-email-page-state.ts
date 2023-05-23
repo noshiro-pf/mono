@@ -21,9 +21,7 @@ export const updateEmailPageInitialState = {
   password: inputInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<typeof updateEmailPageInitialState, UpdateEmailPageState>('<=');
+} as const satisfies UpdateEmailPageState;
 
 export const updateEmailPageHasError = (state: UpdateEmailPageState): boolean =>
   emailInputHasError(state.email) ||

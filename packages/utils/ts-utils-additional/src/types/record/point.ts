@@ -3,4 +3,4 @@ export type Point = Readonly<{
   y: number;
 }>;
 
-export const defaultPoint: Point = { x: 0, y: 0 } as const;
+export const defaultPoint = { x: 0, y: 0 } as const satisfies Point;

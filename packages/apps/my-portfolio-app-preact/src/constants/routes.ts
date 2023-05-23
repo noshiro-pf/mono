@@ -22,13 +22,13 @@ export const labels = {
   writings: '執筆物',
 } as const;
 
-export const tabKeys: readonly (keyof Routes)[] = [
+export const tabKeys = [
   'career',
   'biography',
   'skills',
   'products',
   'writings',
-] as const;
+] as const satisfies readonly (keyof Routes)[];
 
 export const routeList = tabKeys.map((k) => routes[k]);
 export const labelList = tabKeys.map((k) => labels[k]);

@@ -37,7 +37,7 @@ export type PartialAnswer = Partial<
 expectType<keyof Answer, keyof PartialAnswer>('=');
 expectType<Answer, PartialAnswer>('<=');
 
-export const answerDefaultValue: Answer = {
+export const answerDefaultValue = {
   id: '',
   user: userDefaultValue,
   comment: '',
@@ -45,7 +45,7 @@ export const answerDefaultValue: Answer = {
   [ANSWER_KEY_CREATED_AT]: DateUtils.now(),
   weight: 1,
   isRequiredParticipants: false,
-} as const;
+} as const satisfies Answer;
 
 const d = answerDefaultValue;
 export const fillAnswer = (p?: PartialAnswer): Answer => ({

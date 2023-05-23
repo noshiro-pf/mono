@@ -19,12 +19,12 @@ export type AnswerSelection = Readonly<{
   comment: string;
 }>;
 
-export const answerSelectionDefaultValue: AnswerSelection = {
+export const answerSelectionDefaultValue = {
   datetimeRange: datetimeRangeDefaultValue,
   iconId: 'none',
   point: 0,
   comment: '',
-} as const;
+} as const satisfies AnswerSelection;
 
 export const isAnswerSelection = (a: unknown): a is AnswerSelection =>
   isRecord(a) &&

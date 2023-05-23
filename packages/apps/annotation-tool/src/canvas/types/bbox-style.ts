@@ -20,7 +20,7 @@ export type BboxStyle = Readonly<{
 
 export type BboxStylePartial = Partial<BboxStyle>;
 
-export const defaultBboxStyle: BboxStyle = {
+export const defaultBboxStyle = {
   pointWidthPx: 8,
   borderWidthPx: {
     notSelected: 2,
@@ -32,7 +32,7 @@ export const defaultBboxStyle: BboxStyle = {
   },
   highlightedFaceColorSLA: [80, 50, 0.4],
   borderDashLengthPx: 5,
-} as const;
+} as const satisfies BboxStyle;
 
 const dfl = defaultBboxStyle;
 

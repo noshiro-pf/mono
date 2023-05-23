@@ -12,10 +12,10 @@ export type TimeRange = Readonly<{
   end: HoursMinutes;
 }>;
 
-export const timeRangeDefaultValue: TimeRange = {
+export const timeRangeDefaultValue = {
   start: hoursMinutesDefaultValue,
   end: hoursMinutesDefaultValue,
-} as const;
+} as const satisfies TimeRange;
 
 export const isTimeRange = (a: unknown): a is TimeRange =>
   isRecord(a) &&

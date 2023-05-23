@@ -25,10 +25,10 @@ export type PartialDatetimeRange = Partial<
   }>
 >;
 
-export const defaultDatetimeRange: DatetimeRange = {
+export const defaultDatetimeRange = {
   ymd: defaultYearMonthDate,
   timeRange: defaultTimeRange,
-} as const;
+} as const satisfies DatetimeRange;
 
 const d = defaultDatetimeRange;
 export const fillDatetimeRange = (p?: PartialDatetimeRange): DatetimeRange => ({

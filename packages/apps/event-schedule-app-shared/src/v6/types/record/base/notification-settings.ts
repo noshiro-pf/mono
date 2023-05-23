@@ -10,7 +10,7 @@ export type NotificationSettings = Readonly<{
   notify28daysBeforeAnswerDeadline: boolean;
 }>;
 
-export const notificationSettingsDefaultValue: NotificationSettings = {
+export const notificationSettingsDefaultValue = {
   email: '',
   notifyOnAnswerChange: false,
   notify01daysBeforeAnswerDeadline: false,
@@ -18,7 +18,7 @@ export const notificationSettingsDefaultValue: NotificationSettings = {
   notify07daysBeforeAnswerDeadline: false,
   notify14daysBeforeAnswerDeadline: false,
   notify28daysBeforeAnswerDeadline: false,
-} as const;
+} as const satisfies NotificationSettings;
 
 export const isNotificationSettings = (a: unknown): a is NotificationSettings =>
   isRecord(a) &&

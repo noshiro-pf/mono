@@ -6,10 +6,10 @@ export type AnswerIconSetting = Readonly<{
   point: AnswerIconPoint;
 }>;
 
-export const answerIconSettingDefaultValue: AnswerIconSetting = {
+export const answerIconSettingDefaultValue = {
   description: '',
   point: 0,
-} as const;
+} as const satisfies AnswerIconSetting;
 
 export const isAnswerIconSetting = (a: unknown): a is AnswerIconSetting =>
   isRecord(a) &&

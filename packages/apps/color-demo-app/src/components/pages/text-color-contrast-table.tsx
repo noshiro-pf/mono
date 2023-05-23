@@ -17,18 +17,16 @@ import { Fragment } from 'react';
 const hues: readonly Hue[] = Arr.seq(360);
 
 const indices = [0, 1, 2] as const;
-const saturationList = [80, 80, 100] as const;
-const lightnessList = [40, 60, 80] as const;
+const saturationList = [80, 80, 100] as const satisfies readonly Percent[];
+const lightnessList = [40, 60, 80] as const satisfies readonly Percent[];
 
 const saturationListWithIndex = Arr.zip(saturationList, indices);
 const lightnessListWithIndex = Arr.zip(lightnessList, indices);
 
-expectType<typeof saturationList, readonly Percent[]>('<=');
-expectType<typeof lightnessList, readonly Percent[]>('<=');
-
-const SL = Arr.zip(Arr.zip(saturationList, lightnessList), indices);
-
-expectType<typeof SL, DeepReadonly<[[Percent, Percent], number][]>>('<=');
+const SL = Arr.zip(
+  Arr.zip(saturationList, lightnessList),
+  indices
+) satisfies DeepReadonly<[[Percent, Percent], number][]>;
 
 export const TextColorContrastTable = memoNamed(
   'TextColorContrastTable',

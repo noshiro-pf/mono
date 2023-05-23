@@ -49,7 +49,7 @@ export type PartialEventSchedule = Partial<
   }>
 >;
 
-export const defaultEventSchedule: EventSchedule = {
+export const defaultEventSchedule = {
   title: '',
   notes: '',
   datetimeSpecification: 'noStartEndSpecified',
@@ -61,7 +61,7 @@ export const defaultEventSchedule: EventSchedule = {
   useNotification: false,
   notificationSettings: defaultNotificationSettings,
   timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
-} as const;
+} as const satisfies EventSchedule;
 
 const d = defaultEventSchedule;
 export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule => ({

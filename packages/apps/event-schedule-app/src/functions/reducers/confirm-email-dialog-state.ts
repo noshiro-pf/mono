@@ -15,12 +15,7 @@ export const confirmEmailDialogFormInitialState = {
   email: emailInputInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<
-  typeof confirmEmailDialogFormInitialState,
-  ConfirmEmailDialogFormState
->('<=');
+} as const satisfies ConfirmEmailDialogFormState;
 
 export const confirmEmailDialogHasError = (
   state: ConfirmEmailDialogFormState

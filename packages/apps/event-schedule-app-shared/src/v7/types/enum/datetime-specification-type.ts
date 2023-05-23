@@ -1,5 +1,4 @@
 import * as t from '@noshiro/io-ts';
-import { expectType } from '@noshiro/ts-utils';
 
 export const datetimeSpecificationTypeDef = t.enumType({
   values: [
@@ -20,11 +19,9 @@ export const datetimeSpecificationOptions = {
   startSpecified: 'startSpecified',
   endSpecified: 'endSpecified',
   startAndEndSpecified: 'startAndEndSpecified',
-} as const;
+} as const satisfies Record<
+  DatetimeSpecificationEnumType,
+  DatetimeSpecificationEnumType
+>;
 
 export const isDatetimeSpecificationEnumType = datetimeSpecificationTypeDef.is;
-
-expectType<
-  typeof datetimeSpecificationOptions,
-  Record<DatetimeSpecificationEnumType, DatetimeSpecificationEnumType>
->('<=');

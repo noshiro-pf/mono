@@ -5,10 +5,10 @@ export type HoursMinutes = Readonly<{
   minutes: MinutesEnum;
 }>;
 
-export const hoursMinutesDefaultValue: HoursMinutes = {
+export const hoursMinutesDefaultValue = {
   hours: 0,
   minutes: 0,
-} as const;
+} as const satisfies HoursMinutes;
 
 export const isHoursEnum = (a: unknown): a is HoursEnum =>
   isNumber(a) && Number.isInteger(a) && Num.isInRange(0, 23)(a);

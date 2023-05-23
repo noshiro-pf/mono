@@ -12,7 +12,7 @@ export type PartialNotificationSettings = Partial<
   Readonly<NotificationSettings>
 >;
 
-export const defaultNotificationSettings: NotificationSettings = {
+export const defaultNotificationSettings = {
   email: '',
   notifyOnAnswerChange: false,
   notify01daysBeforeAnswerDeadline: false,
@@ -20,7 +20,7 @@ export const defaultNotificationSettings: NotificationSettings = {
   notify07daysBeforeAnswerDeadline: false,
   notify14daysBeforeAnswerDeadline: false,
   notify28daysBeforeAnswerDeadline: false,
-} as const;
+} as const satisfies NotificationSettings;
 
 const d = defaultNotificationSettings;
 export const fillNotificationSettings = (

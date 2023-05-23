@@ -6,9 +6,7 @@ export type InputState = Readonly<{
 export const inputInitialState = {
   inputValue: '',
   error: undefined,
-} as const;
-
-expectType<typeof inputInitialState, InputState>('<=');
+} as const satisfies InputState;
 
 export const inputHasError = (state: InputState): boolean =>
   state.error !== undefined || state.inputValue === '';

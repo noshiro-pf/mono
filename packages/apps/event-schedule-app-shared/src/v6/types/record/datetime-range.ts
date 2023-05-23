@@ -19,10 +19,10 @@ export type DatetimeRange = Readonly<{
   timeRange: TimeRange;
 }>;
 
-export const datetimeRangeDefaultValue: DatetimeRange = {
+export const datetimeRangeDefaultValue = {
   ymd: yearMonthDateDefaultValue,
   timeRange: timeRangeDefaultValue,
-} as const;
+} as const satisfies DatetimeRange;
 
 export const isDatetimeRange = (a: unknown): a is DatetimeRange =>
   isRecord(a) &&

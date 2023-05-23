@@ -249,21 +249,21 @@ export const AnswerTable = memoNamed<Props>(
 const userNameWrapperWidth = 80;
 const userNameWrapperThinWidth = 45;
 
-const answerCellStyle: React.CSSProperties = {
+const answerCellStyle = {
   minWidth: `${userNameWrapperWidth}px`,
   maxWidth: `${userNameWrapperWidth}px`,
   overflowX: 'hidden',
   padding: '5px',
   position: 'relative',
-} as const;
+} as const satisfies React.CSSProperties;
 
-const answerCellThinStyle: React.CSSProperties = {
+const answerCellThinStyle = {
   minWidth: `${userNameWrapperThinWidth}px`,
   maxWidth: `${userNameWrapperThinWidth}px`,
   overflowX: 'hidden',
   padding: '3px',
   position: 'relative',
-} as const;
+} as const satisfies React.CSSProperties;
 
 const RequiredParticipantIconStyled = styled.div`
   position: absolute;

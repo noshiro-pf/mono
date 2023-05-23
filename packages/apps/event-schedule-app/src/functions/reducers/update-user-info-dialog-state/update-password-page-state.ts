@@ -21,11 +21,7 @@ export const updatePasswordPageInitialState = {
   newPassword: passwordWithConfirmationInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<typeof updatePasswordPageInitialState, UpdatePasswordPageState>(
-  '<='
-);
+} as const satisfies UpdatePasswordPageState;
 
 export const updatePasswordPageHasError = (
   state: UpdatePasswordPageState

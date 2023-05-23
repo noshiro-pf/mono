@@ -1,5 +1,3 @@
-import { expectType } from '@noshiro/ts-utils';
-
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 export type DatetimeSpecificationEnumType =
   | 'noStartEndSpecified'
@@ -12,24 +10,7 @@ export const datetimeSpecificationOptions = {
   startSpecified: 'startSpecified',
   endSpecified: 'endSpecified',
   startAndEndSpecified: 'startAndEndSpecified',
-} as const;
-
-expectType<
-  typeof datetimeSpecificationOptions.noStartEndSpecified,
+} as const satisfies Record<
+  DatetimeSpecificationEnumType,
   DatetimeSpecificationEnumType
->('<=');
-
-expectType<
-  typeof datetimeSpecificationOptions.startSpecified,
-  DatetimeSpecificationEnumType
->('<=');
-
-expectType<
-  typeof datetimeSpecificationOptions.endSpecified,
-  DatetimeSpecificationEnumType
->('<=');
-
-expectType<
-  typeof datetimeSpecificationOptions.startAndEndSpecified,
-  DatetimeSpecificationEnumType
->('<=');
+>;

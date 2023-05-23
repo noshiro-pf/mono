@@ -11,11 +11,11 @@ export type AnswerSymbol = Readonly<{
 
 export type PartialAnswerSymbol = Partial<AnswerSymbol>;
 
-const defaultAnswerSymbol: AnswerSymbol = {
+const defaultAnswerSymbol = {
   iconId: 'handmade-cross',
   description: '',
   point: 0,
-} as const;
+} as const satisfies AnswerSymbol;
 
 const d = defaultAnswerSymbol;
 export const fillAnswerSymbol = (a: PartialAnswerSymbol): AnswerSymbol => ({

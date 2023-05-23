@@ -8,11 +8,11 @@ export type YearMonthDate = Readonly<{
 
 export type PartialYearMonthDate = Partial<YearMonthDate>;
 
-export const defaultYearMonthDate: YearMonthDate = {
+export const defaultYearMonthDate = {
   year: pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value,
   month: pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value,
   date: pipe(DateUtils.today()).chain(DateUtils.getLocaleDate).value,
-} as const;
+} as const satisfies YearMonthDate;
 
 const d = defaultYearMonthDate;
 export const fillYearMonthDate = (a?: PartialYearMonthDate): YearMonthDate => ({
