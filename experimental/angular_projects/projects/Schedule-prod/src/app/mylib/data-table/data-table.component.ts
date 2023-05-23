@@ -8,9 +8,9 @@ import {
 } from '@angular/core';
 import {
   BehaviorSubject,
-  combineLatest,
   Observable,
   ReplaySubject,
+  combineLatest,
 } from 'rxjs';
 import { debounceTime, map, takeWhile, withLatestFrom } from 'rxjs/operators';
 import { utils } from '../utilities';

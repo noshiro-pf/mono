@@ -11,7 +11,7 @@ import { asImmutable } from './methods/asImmutable';
 import { asMutable } from './methods/asMutable';
 import { wasAltered } from './methods/wasAltered';
 import { withMutations } from './methods/withMutations';
-import { isStack, IS_STACK_SYMBOL } from './predicates/isStack';
+import { IS_STACK_SYMBOL, isStack } from './predicates/isStack';
 import { ArraySeq } from './Seq';
 import { resolveBegin, resolveEnd, wholeSlice, wrapIndex } from './TrieUtils';
 import assertNotInfinite from './utils/assertNotInfinite';

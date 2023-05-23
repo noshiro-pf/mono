@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { MatSidenav } from '@angular/material/sidenav';
-import { combine, RN } from 'rnjs';
+import { RN, combine } from 'rnjs';
 import { FireDatabaseService } from '../../../database/database.service';
 import { UserService } from '../../../database/user.service';
 import { utils } from '../../../mylib/utilities';

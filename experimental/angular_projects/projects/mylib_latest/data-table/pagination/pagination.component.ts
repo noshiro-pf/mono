@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { combine, manual, RN } from '../../rn/RN';
+import { RN, combine, manual } from '../../rn/RN';
 import { utils } from '../../utilities';
 
 @Component({

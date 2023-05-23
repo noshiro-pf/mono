@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { useCallback, useState as _useState } from 'react';
+import { useState as _useState, useCallback } from 'react';
 
 export const useState = <T>(
   initialState: T

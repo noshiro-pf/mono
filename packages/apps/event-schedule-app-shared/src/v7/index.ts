@@ -1,19 +1,19 @@
 export { answerDeadlineRemainingDaysDefaultValue, firebaseConfig } from '../v6';
 export { firestorePaths } from './constants';
 export {
+  ANSWER_KEY_CREATED_AT,
   answerDefaultValue,
   answerIconIdTypeDef,
   answerIconIdWithNoneTypeDef,
   answerIconPointTypeDef,
   answerIconSettingDefaultValue,
+  answerIconSettingTypeDef,
   answerIconSettingsDefaultValue,
   answerIconSettingsTypeDef,
-  answerIconSettingTypeDef,
   answerIdTypeDef,
   answerSelectionDefaultValue,
   answerSelectionTypeDef,
   answerTypeDef,
-  ANSWER_KEY_CREATED_AT,
   compareDatetimeRange,
   compareHm,
   compareTimeRange,

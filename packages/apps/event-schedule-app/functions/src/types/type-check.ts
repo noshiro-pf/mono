@@ -5,7 +5,7 @@ import {
   type EventSchedule,
 } from '@noshiro/event-schedule-app-shared';
 import { deepEqual } from '@noshiro/fast-deep-equal';
-import { isString, Str } from '@noshiro/ts-utils';
+import { Str, isString } from '@noshiro/ts-utils';
 import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {

@@ -6,7 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { combine, manual, RN } from 'rnjs';
+import { RN, combine, manual } from 'rnjs';
 import { FireDatabaseService } from '../../../database/database.service';
 import { utils } from '../../../mylib/utilities';
 import { toListIndex } from '../../functions/to-list-index';

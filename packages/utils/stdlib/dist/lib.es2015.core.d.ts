@@ -27,12 +27,7 @@ interface Array<T> {
    * predicate. If it is not provided, undefined is used instead.
    */
   find<S extends T>(
-    predicate: (
-      this: void,
-      value: T,
-      index: SafeUint,
-      obj: readonly T[]
-    ) => value is S,
+    predicate: (value: T, index: SafeUint, obj: readonly T[]) => value is S,
     thisArg?: unknown
   ): S | undefined;
   find(
@@ -387,12 +382,7 @@ interface ReadonlyArray<T> {
    * predicate. If it is not provided, undefined is used instead.
    */
   find<S extends T>(
-    predicate: (
-      this: void,
-      value: T,
-      index: SafeUint,
-      obj: readonly T[]
-    ) => value is S,
+    predicate: (value: T, index: SafeUint, obj: readonly T[]) => value is S,
     thisArg?: unknown
   ): S | undefined;
   find(

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
-import { combine, RN } from 'rnjs';
+import { RN, combine } from 'rnjs';
 import { FireDatabaseService } from '../../../database/database.service';
 import { utils } from '../../../mylib/utilities';
 import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.component';

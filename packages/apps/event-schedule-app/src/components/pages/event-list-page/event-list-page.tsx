@@ -3,9 +3,9 @@ import { api } from '../../../api';
 import { createToaster, showToast } from '../../../functions';
 import {
   Auth,
-  eventList$,
   EventListPageFilterStore,
   EventListStore,
+  eventList$,
 } from '../../../store';
 import { BpCheckbox, BpInput } from '../../bp';
 import { Header } from '../../organisms';

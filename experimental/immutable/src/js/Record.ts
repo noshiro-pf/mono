@@ -21,7 +21,7 @@ import { setIn } from './methods/setIn';
 import { update } from './methods/update';
 import { updateIn } from './methods/updateIn';
 import { withMutations } from './methods/withMutations';
-import { isRecord, IS_RECORD_SYMBOL } from './predicates/isRecord';
+import { IS_RECORD_SYMBOL, isRecord } from './predicates/isRecord';
 import { keyedSeqFromValue } from './Seq';
 import { toJS } from './toJS';
 import { DELETE } from './TrieUtils';

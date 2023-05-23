@@ -17,7 +17,7 @@ import { update } from './methods/update';
 import { updateIn } from './methods/updateIn';
 import { wasAltered } from './methods/wasAltered';
 import { withMutations } from './methods/withMutations';
-import { isList, IS_LIST_SYMBOL } from './predicates/isList';
+import { IS_LIST_SYMBOL, isList } from './predicates/isList';
 import {
   DELETE,
   MakeRef,

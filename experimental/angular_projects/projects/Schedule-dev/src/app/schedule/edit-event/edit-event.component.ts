@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { combine, fromObservable, manual, merge, RN } from 'rnjs';
+import { RN, combine, fromObservable, manual, merge } from 'rnjs';
 import { DatabaseService } from '../../database/database.service';
 import { ConfirmDialogComponent } from '../../mylib/confirm-dialog.component';
 import { Answer, Schedule, ScheduleSymbol } from '../schedule-event';

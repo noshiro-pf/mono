@@ -1,7 +1,7 @@
 import { AnchorButton, Icon, Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
-import { aboutThisAppUrl, feedbackUrl, Routes } from '../../constants';
-import { Auth, router, UpdateUserInfoDialogStore } from '../../store';
+import { Routes, aboutThisAppUrl, feedbackUrl } from '../../constants';
+import { Auth, UpdateUserInfoDialogStore, router } from '../../store';
 import { NoWrapSpan } from '../atoms';
 import { ForNonLoggedInUserDialog } from './button-with-confirm';
 import {

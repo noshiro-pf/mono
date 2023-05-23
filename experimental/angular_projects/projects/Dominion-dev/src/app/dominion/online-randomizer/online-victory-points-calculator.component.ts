@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { combine, RN } from 'rnjs';
+import { RN, combine } from 'rnjs';
 import { UserService } from '../../database/user.service';
 import { NumberOfVictoryCards } from '../types/number-of-victory-cards';
 import { MyRandomizerGroupService } from './my-randomizer-group.service';

@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { combineLatest, from, merge, Observable, ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject, combineLatest, from, merge } from 'rxjs';
 import { filter, map, startWith, switchMap, takeWhile } from 'rxjs/operators';
 import { MessageDialogComponent } from '../mylib/message-dialog.component';
 import { shareWithCache } from '../mylib/my-rxjs-operators/share-with-cache';

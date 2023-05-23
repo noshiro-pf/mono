@@ -6,19 +6,33 @@
 export const convertLibEs2022Sharedmemory = (from) => {
   let ret = from;
 
-  ret = ret.replaceAll('index: number', 'index: SafeUint');
   ret = ret.replaceAll(
-    '(\n    typedArray:',
-    '<T extends TypedArrayElementTypes>(\n    typedArray:'
+    [
+      '  waitAsync(',
+      '    typedArray: Int32Array,',
+      '    index: number,',
+      '    value: number,',
+    ].join('\n'),
+    [
+      '  waitAsync(',
+      '    typedArray: Int32Array,',
+      '    index: SafeUint,',
+      '    value: Int32,',
+    ].join('\n')
   );
-  ret = ret.replaceAll(`value: bigint`, `value: T`);
   ret = ret.replaceAll(
-    'typedArray: BigInt64Array | Int32Array,',
-    'typedArray: MapToTypedArray<T>,'
-  );
-  ret = ret.replaceAll(
-    'interface Atomics {',
-    'type MapToTypedArray<T> = T extends BigInt64\n  ? BigInt64Array\n  : T extends Int32\n  ? Int32Array\n  : never;\n\ntype TypedArrayElementTypes = BigInt64 | Int32;\n\ninterface Atomics {'
+    [
+      '  waitAsync(',
+      '    typedArray: BigInt64Array,',
+      '    index: number,',
+      '    value: bigint,',
+    ].join('\n'),
+    [
+      '  waitAsync(',
+      '    typedArray: BigInt64Array,',
+      '    index: SafeUint,',
+      '    value: BigInt64,',
+    ].join('\n')
   );
 
   return ret;

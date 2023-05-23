@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { manual, RN } from 'rnjs';
+import { RN, manual } from 'rnjs';
 import { FireDatabaseService } from '../../database/database.service';
 import { CellPosition } from '../../mylib/data-table/types/cell-position';
 import { TableSettings } from '../../mylib/data-table/types/table-settings';

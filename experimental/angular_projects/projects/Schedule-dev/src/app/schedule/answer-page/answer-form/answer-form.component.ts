@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { combine, manual, merge, RN } from 'rnjs';
+import { RN, combine, manual, merge } from 'rnjs';
 import { DatabaseService } from '../../../database/database.service';
 import { ConfirmDialogComponent } from '../../../mylib/confirm-dialog.component';
 import { utils } from '../../../mylib/utilities';

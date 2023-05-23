@@ -13,23 +13,27 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-
-
 /// <reference no-default-lib="true"/>
+/// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 
+interface RegExpMatchArray {
+  readonly indices?: RegExpIndicesArray;
+}
 
-interface String {
-    /**
-     * Replace all instances of a substring in a string, using a regular expression or search string.
-     * @param searchValue A string to search for.
-     * @param replaceValue A string containing the text to replace for every successful match of searchValue in this string.
-     */
-    replaceAll(searchValue: string | RegExp, replaceValue: string): string;
+interface RegExpExecArray {
+  readonly indices?: RegExpIndicesArray;
+}
 
-    /**
-     * Replace all instances of a substring in a string, using a regular expression or search string.
-     * @param searchValue A string to search for.
-     * @param replacer A function that returns the replacement text.
-     */
-    replaceAll(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string;
+interface RegExpIndicesArray extends Array<readonly [SafeUint, SafeUint]> {
+  readonly groups?: {
+    readonly [key: string]: readonly [SafeUint, SafeUint];
+  };
+}
+
+interface RegExp {
+  /**
+   * Returns a Boolean value indicating the state of the hasIndices flag (d) used with with a regular expression.
+   * Default is false. Read-only.
+   */
+  readonly hasIndices: boolean;
 }

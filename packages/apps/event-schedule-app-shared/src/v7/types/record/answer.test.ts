@@ -1,8 +1,8 @@
 import { expectType } from '@noshiro/ts-utils';
 import { type AnswerId, type Weight } from '../named-primitive-types';
 import {
-  answerDefaultValue,
   ANSWER_KEY_CREATED_AT,
+  answerDefaultValue,
   fillAnswer,
   isAnswer,
   type Answer,

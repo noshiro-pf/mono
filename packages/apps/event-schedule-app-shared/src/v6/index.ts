@@ -2,11 +2,11 @@
 export { answerDeadlineRemainingDaysDefaultValue, firebaseConfig } from '../v5';
 export { firestorePaths } from './constants';
 export {
+  ANSWER_KEY_CREATED_AT,
   answerDefaultValue,
   answerIconSettingDefaultValue,
   answerIconSettingsDefaultValue,
   answerSelectionDefaultValue,
-  ANSWER_KEY_CREATED_AT,
   compareDatetimeRange,
   compareHm,
   compareTimeRange,

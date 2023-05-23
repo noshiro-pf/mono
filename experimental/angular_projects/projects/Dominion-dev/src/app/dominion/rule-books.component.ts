@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireStorage } from 'angularfire2/storage';
-import { fromObservable, RN } from 'rnjs';
+import { RN, fromObservable } from 'rnjs';
 
 @Component({
   selector: 'app-rule-books',

@@ -11,6 +11,6 @@ export const InputGroup = styled.div`
 
 export {
   ptButtonHeightPx as inputButtonHeightLargePx,
-  ptButtonHeightSmallerPx as inputButtonHeightSmallPx,
   ptButtonHeightSmallPx as inputButtonHeightPx,
+  ptButtonHeightSmallerPx as inputButtonHeightSmallPx,
 } from '../common';

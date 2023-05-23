@@ -1,5 +1,6 @@
 // This file is created to avoid circular reference between RN and operators.
 
+export * from './RN';
 export * from './operators/debounce';
 export * from './operators/filter';
 export * from './operators/flatMap';
@@ -12,4 +13,3 @@ export * from './operators/skipUnchanged';
 export * from './operators/switchMap';
 export * from './operators/take';
 export * from './operators/withLatest';
-export * from './RN';

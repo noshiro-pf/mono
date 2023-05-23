@@ -1,6 +1,6 @@
 import * as I from 'immutable'
 import { memo, useCallback, useMemo, useState } from 'react'
-import { combine, merge, RN } from 'rnjs'
+import { RN, combine, merge } from 'rnjs'
 import {
   useEffectFromProps,
   useRN,
@@ -10,7 +10,7 @@ import {
 import { placeListFromGameResults$ } from '~/firebase/firebase-combined-values'
 import * as fb from '~/firebase/firebase-worker'
 import { TDCardProperty } from '~/types/dcard-property'
-import { GameResult, getScored, TGameResult } from '~/types/game-result'
+import { GameResult, TGameResult, getScored } from '~/types/game-result'
 import {
   PlayerResultChange,
   TPlayerResultChange,

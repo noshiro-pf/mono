@@ -1,6 +1,6 @@
 import * as I from 'immutable'
 import { memo, useCallback, useState } from 'react'
-import { combine, merge, RN } from 'rnjs'
+import { RN, combine, merge } from 'rnjs'
 import {
   useEventAsStream,
   useRN,

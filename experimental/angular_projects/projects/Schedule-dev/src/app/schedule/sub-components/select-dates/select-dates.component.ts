@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { manual, merge, RN } from 'rnjs';
+import { RN, manual, merge } from 'rnjs';
 import { utils } from '../../../mylib/utilities';
 import { getAddedDates, getRemovedDates, to0000 } from './functions';
 import { SetTimeDialogComponent } from './set-time-dialog.component';

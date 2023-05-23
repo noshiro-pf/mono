@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import {
+  MAT_DATE_LOCALE,
   MatAutocompleteModule,
   MatButtonModule,
   MatButtonToggleModule,
@@ -20,15 +21,14 @@ import {
   MatRadioModule,
   MatSelectModule,
   MatSidenavModule,
-  MatSliderModule,
   MatSlideToggleModule,
+  MatSliderModule,
   MatSnackBarModule,
   MatSortModule,
   MatStepperModule,
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
-  MAT_DATE_LOCALE,
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 

@@ -3,7 +3,7 @@ import {
   firestorePaths,
 } from '@noshiro/event-schedule-app-shared';
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { GoogleAuthProvider, getAuth } from 'firebase/auth';
 import {
   collection,
   connectFirestoreEmulator,

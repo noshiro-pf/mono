@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AngularFireStorage } from 'angularfire2/storage';
-import { combine, fromObservable, manual, merge, RN } from 'rnjs';
+import { RN, combine, fromObservable, manual, merge } from 'rnjs';
 import { fbPaths } from '../../../database/paths';
 import { isWideCard } from '../../functions/is-wide-card';
 import { CardProperty } from '../../types/card-property';

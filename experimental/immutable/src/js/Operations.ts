@@ -25,7 +25,7 @@ import { OrderedMap } from './OrderedMap';
 import { isCollection } from './predicates/isCollection';
 import { isIndexed } from './predicates/isIndexed';
 import { isKeyed } from './predicates/isKeyed';
-import { isOrdered, IS_ORDERED_SYMBOL } from './predicates/isOrdered';
+import { IS_ORDERED_SYMBOL, isOrdered } from './predicates/isOrdered';
 import { isSeq } from './predicates/isSeq';
 import {
   ArraySeq,

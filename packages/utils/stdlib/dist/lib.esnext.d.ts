@@ -16,5 +16,5 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 
-/// <reference path="./lib.es2022.d.ts" />
+/// <reference path="./lib.es2023.d.ts" />
 /// <reference path="./lib.esnext.intl.d.ts" />

@@ -14,11 +14,21 @@ export const convertLibEs5_TypedArray = (from) => {
   let ret = from;
 
   /** @param {ElemType} elemType */
-  const marker = (elemType) => ({
-    Array: `interface ${elemType}Array {`,
-    ArrayConstructor: `interface ${elemType}ArrayConstructor {`,
-    declareConstArray: `declare const ${elemType}Array: ${elemType}ArrayConstructor`,
-  });
+  const marker = (elemType) => {
+    const Array = `interface ${elemType}Array {`;
+    const ArrayConstructor = `interface ${elemType}ArrayConstructor {`;
+    const declareConstArray = `declare const ${elemType}Array: ${elemType}ArrayConstructor`;
+    return {
+      Array: {
+        start: Array,
+        end: ArrayConstructor,
+      },
+      ArrayConstructor: {
+        start: ArrayConstructor,
+        end: declareConstArray,
+      },
+    };
+  };
 
   /** @type {ElemType[]} */
   const elemTypes = [
@@ -36,15 +46,15 @@ export const convertLibEs5_TypedArray = (from) => {
   for (const elemType of elemTypes) {
     {
       const slice = ret.slice(
-        ret.indexOf(marker(elemType).Array),
-        ret.indexOf(marker(elemType).ArrayConstructor)
+        ret.indexOf(marker(elemType).Array.start),
+        ret.indexOf(marker(elemType).Array.end)
       );
       ret = ret.replaceAll(slice, convertInterfaceTypedArray(slice, elemType));
     }
     {
       const slice = ret.slice(
-        ret.indexOf(marker(elemType).ArrayConstructor),
-        ret.indexOf(marker(elemType).declareConstArray)
+        ret.indexOf(marker(elemType).ArrayConstructor.start),
+        ret.indexOf(marker(elemType).ArrayConstructor.end)
       );
       ret = ret.replaceAll(
         slice,

@@ -16,31 +16,38 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 
-type MapToTypedArray<T> = T extends BigInt64
-  ? BigInt64Array
-  : T extends Int32
-  ? Int32Array
-  : never;
-
-type TypedArrayElementTypes = BigInt64 | Int32;
-
 interface Atomics {
   /**
    * A non-blocking, asynchronous version of wait which is usable on the main thread.
    * Waits asynchronously on a shared memory location and returns a Promise
+   * @param typedArray A shared Int32Array or BigInt64Array.
+   * @param index The position in the typedArray to wait on.
+   * @param value The expected value to test.
+   * @param [timeout] The expected value to test.
    */
-  waitAsync<T extends TypedArrayElementTypes>(
-    typedArray: MapToTypedArray<T>,
+  waitAsync(
+    typedArray: Int32Array,
     index: SafeUint,
-    value: T,
+    value: Int32,
     timeout?: number
   ):
-    | {
-        readonly async: false;
-        readonly value: 'ok' | 'not-equal' | 'timed-out';
-      }
-    | {
-        readonly async: true;
-        readonly value: Promise<'ok' | 'not-equal' | 'timed-out'>;
-      };
+    | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }
+    | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
+
+  /**
+   * A non-blocking, asynchronous version of wait which is usable on the main thread.
+   * Waits asynchronously on a shared memory location and returns a Promise
+   * @param typedArray A shared Int32Array or BigInt64Array.
+   * @param index The position in the typedArray to wait on.
+   * @param value The expected value to test.
+   * @param [timeout] The expected value to test.
+   */
+  waitAsync(
+    typedArray: BigInt64Array,
+    index: SafeUint,
+    value: BigInt64,
+    timeout?: number
+  ):
+    | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }
+    | { readonly async: true; readonly value: Promise<'ok' | 'timed-out'> };
 }

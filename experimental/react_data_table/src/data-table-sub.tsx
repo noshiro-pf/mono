@@ -16,7 +16,7 @@ import { ICellPosition, ICellPositionInPage } from './types/cell-position'
 import { TDataTableState } from './types/data-table-state'
 import { HeaderValueType } from './types/header-value-type'
 import { SortState, TSortState } from './types/sort-state'
-import { TableSettings, TTableSettings } from './types/table-settings'
+import { TTableSettings, TableSettings } from './types/table-settings'
 
 export const DataTableSub = memo(
   ({

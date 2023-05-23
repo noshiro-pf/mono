@@ -1,8 +1,8 @@
 import {
   ActivityType as DiscordActivityType,
   Client as DiscordClient,
-  GatewayIntentBits,
   Partials as DiscordPartials,
+  GatewayIntentBits,
   type Message as DiscordMessage,
   type MessageReaction as DiscordMessageReaction,
 } from 'discord.js';

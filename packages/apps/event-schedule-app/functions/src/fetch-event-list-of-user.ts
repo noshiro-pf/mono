@@ -6,7 +6,7 @@ import {
   firestorePaths,
   type EventListItem,
 } from '@noshiro/event-schedule-app-shared';
-import { Arr, IMap, pipe, tp, Tpl } from '@noshiro/ts-utils';
+import { Arr, IMap, Tpl, pipe, tp } from '@noshiro/ts-utils';
 import { type firestore } from 'firebase-admin';
 import { https } from 'firebase-functions';
 import { type CallableContext } from 'firebase-functions/v1/https';
