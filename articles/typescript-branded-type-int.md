@@ -1,5 +1,5 @@
 ---
-title: "TypeScript の Branded Type をより便利に活用する方法のまとめ"
+title: "TypeScript の Type Branding をより便利に活用する方法のまとめ"
 emoji: "🐈"
 type: "tech"
 topics: ["typescript", "brand"]
@@ -8,8 +8,8 @@ published: true
 
 ## 概要
 
-TypeScript で用いられることのある Type branding というハックと既存のいくつかのライブラリでのその実装例を説明し、次に、より安全かつ便利に Type branding を活用するためのユーティリティの実装や ESLint 設定も紹介します。
-最後に Branded Type の活用例として、数値型を `number` より細かく使い分けられるように Branded Type を定義する実装例を載せています。 Branded Type のよくある実装に、筆者が最近思いついたちょっとした工夫を入れることで数値型の Branded Type を上手く実装できたので紹介してみました。
+TypeScript で用いられることのある Type branding というハックと既存のいくつかのライブラリでのその実装例を説明し、次に、より安全かつ便利に Type branding を使うためのユーティリティの実装や ESLint 設定も紹介します。
+最後に Type branding の活用例として、数値型を `number` より細かく使い分けられるように Branded Type を定義する実装例を載せています。 Branded Type のよくある実装に、筆者が最近思いついたちょっとした工夫を入れることで数値型の Branded Type を上手く実装できたので紹介してみました。
 
 ## Type branding とは
 
@@ -434,7 +434,7 @@ number & {
 
 という型になってしまいます。
 
-`Brand` 型の定義を工夫することで解決できれば理想的なのですが、元々 `number` 型を「割る」ときにプロパティを新たに「足す」ということをしているので union を取ったときに対消滅させるような仕組みにすることは簡単ではなさそうだと思い、 union 型から `boolean` になってしまったキーを取り除くユーティリティだけ用意してみることにしました。
+`Brand` 型の定義を工夫することで解決できれば理想的なのですが、元々 `number` 型を「割る」ときにプロパティを新たに「足す」ということをしているので union を取ったときに対消滅させるような仕組みにするのは単純な方法では上手くいかず、他に良い方法が思い付かなかったので、 union 型から `boolean` になってしまったキーを取り除くユーティリティだけ用意してみることにしました。
 
 ```ts
 NormalizeBrandUnion<NegativeNumber | PositiveNumber>;
