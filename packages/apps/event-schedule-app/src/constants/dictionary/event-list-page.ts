@@ -14,7 +14,7 @@ export const eventListPageDictionary = {
   },
   refresh: '更新',
   search: '検索',
-  itemCount: (n: number) => `${n}件`,
+  itemCount: (n: SafeUint) => `${n}件`,
   archive: 'アーカイブする',
   unarchive: 'アーカイブ解除する',
   confirmationMessage: {

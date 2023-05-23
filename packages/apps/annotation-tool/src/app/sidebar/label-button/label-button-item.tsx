@@ -4,7 +4,7 @@ import { type AppEventHandler } from '../../../types';
 import { LabelButtonItemView } from './label-button-item-view';
 
 type Props = Readonly<{
-  index: number;
+  index: SafeUint;
   label: Label;
   labelsSaturation: Percent;
   labelsLightness: Percent;

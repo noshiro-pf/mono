@@ -176,7 +176,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
               justify-content: space-between;
             `}
           >
-            <div>{dc.itemCount(eventListWithHandler.length)}</div>
+            <div>{dc.itemCount(Arr.length(eventListWithHandler))}</div>
             <Button
               disabled={refreshButtonIsDisabled}
               icon={'refresh'}

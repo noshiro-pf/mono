@@ -11,7 +11,7 @@ import {
 import { LabelButtonText } from './label-button-item-text-styled';
 
 type Props = Readonly<{
-  index: number;
+  index: SafeUint;
   hsl: Hsl;
   isSelected: boolean;
   labelText: string;

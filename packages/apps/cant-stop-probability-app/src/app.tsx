@@ -14,7 +14,7 @@ import {
 
 const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   const count = countSuccess(x, y, z);
-  const countSum = denom - count.noLine;
+  const countSum = SafeUint.sub(denom, count.noLine);
   return {
     id: `${x}-${y}-${z}`,
     selected: tp(x, y, z),

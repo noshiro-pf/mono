@@ -20,7 +20,7 @@ type MultipleDatePickerState = DeepReadonly<{
   onYearChange: (year: YearEnum) => void;
   onMonthChange: (month: MonthEnum) => void;
   calendarCells: {
-    index: number;
+    index: SafeUint;
     week: {
       ymd: YearMonthDate;
       selected: boolean;
@@ -77,7 +77,7 @@ export const useMultipleDatePickerState = (
           dayType: DayType;
           holidayJpName: string | undefined;
         }[];
-        index: number;
+        index: SafeUint;
       }[]
     >
   >(

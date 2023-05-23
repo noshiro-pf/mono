@@ -14,7 +14,7 @@ import { Histogram } from './histogram';
 type Props = Readonly<{
   diceValue1: number;
   diceValue2: number;
-  sumCount: ArrayOfLength<11, number>;
+  sumCount: ArrayOfLength<11, SafeUint>;
   opacity: number;
   rollDices: () => void;
   undo: () => void;
