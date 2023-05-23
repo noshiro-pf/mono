@@ -7,10 +7,10 @@ export type AnswerIconSetting = Readonly<{
 
 export type PartialAnswerIconSetting = Partial<AnswerIconSetting>;
 
-export const defaultAnswerIconSetting: AnswerIconSetting = {
+export const defaultAnswerIconSetting = {
   description: '',
   point: 0,
-} as const;
+} as const satisfies AnswerIconSetting;
 
 const d = defaultAnswerIconSetting;
 export const fillAnswerIconSetting = (

@@ -5,6 +5,7 @@ export const isDevelopment = import.meta.env.DEV;
 
 export const useEmulators: boolean = true as boolean;
 
-export const experimentalFeature = {} as const;
-
-expectType<typeof experimentalFeature, Record<never, 'hidden' | 'shown'>>('<=');
+export const experimentalFeature = {} as const satisfies Record<
+  never,
+  'hidden' | 'shown'
+>;

@@ -22,7 +22,7 @@ export const datetimeRangeListInitialValue: NonEmptyArray<DatetimeRange> = [
   datetimeRangeInitialValue,
 ];
 
-export const answerIconsInitialValue: AnswerIconSettings = {
+export const answerIconsInitialValue = {
   good: {
     description: dict.iconDescriptionDefault.circle,
     point: defaultIconPoint.good,
@@ -35,7 +35,7 @@ export const answerIconsInitialValue: AnswerIconSettings = {
     description: dict.iconDescriptionDefault.cross,
     point: defaultIconPoint.poor,
   },
-} as const;
+} as const satisfies AnswerIconSettings;
 
 export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
   .chain(

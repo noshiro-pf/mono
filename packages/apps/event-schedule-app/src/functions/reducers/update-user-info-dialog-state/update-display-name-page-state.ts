@@ -15,12 +15,7 @@ export const updateDisplayNamePageInitialState = {
   displayName: inputInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<
-  typeof updateDisplayNamePageInitialState,
-  UpdateDisplayNamePageState
->('<=');
+} as const satisfies UpdateDisplayNamePageState;
 
 export const updateDisplayNamePageHasError = (
   state: UpdateDisplayNamePageState

@@ -31,7 +31,7 @@ export type Answer = Readonly<{
   isRequiredParticipants: boolean;
 }>;
 
-export const answerDefaultValue: Answer = {
+export const answerDefaultValue = {
   id: '',
   user: userDefaultValue,
   comment: '',
@@ -39,7 +39,7 @@ export const answerDefaultValue: Answer = {
   [ANSWER_KEY_CREATED_AT]: DateUtils.now(),
   weight: 1,
   isRequiredParticipants: false,
-} as const;
+} as const satisfies Answer;
 
 export const isAnswer = (a: unknown): a is Answer =>
   isRecord(a) &&

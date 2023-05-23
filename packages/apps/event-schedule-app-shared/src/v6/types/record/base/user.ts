@@ -11,10 +11,10 @@ export type User = Readonly<{
   name: UserName;
 }>;
 
-export const userDefaultValue: User = {
+export const userDefaultValue = {
   id: null,
   name: '',
-} as const;
+} as const satisfies User;
 
 export const isUser = (a: unknown): a is User =>
   isRecord(a) &&

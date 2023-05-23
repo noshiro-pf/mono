@@ -15,9 +15,7 @@ export const resetPasswordPageInitialState = {
   email: emailInputInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<typeof resetPasswordPageInitialState, ResetPasswordPageState>('<=');
+} as const satisfies ResetPasswordPageState;
 
 export const resetPasswordPageHasError = (
   state: ResetPasswordPageState

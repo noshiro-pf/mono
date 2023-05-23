@@ -3,7 +3,7 @@ export type RectSize = Readonly<{
   width: number;
 }>;
 
-export const defaultRectSize: RectSize = {
+export const defaultRectSize = {
   height: 0,
   width: 0,
-} as const;
+} as const satisfies RectSize;

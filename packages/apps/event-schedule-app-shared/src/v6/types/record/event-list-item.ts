@@ -21,7 +21,7 @@ export type EventListItem = Readonly<{
   }>;
 }>;
 
-export const eventListItemDefaultValue: EventListItem = {
+export const eventListItemDefaultValue = {
   eventSchedule: eventScheduleDefaultValue,
   eventScheduleMetadata: {
     id: '',
@@ -32,7 +32,7 @@ export const eventListItemDefaultValue: EventListItem = {
   answersMetadata: {
     lastUpdate: '',
   },
-} as const;
+} as const satisfies EventListItem;
 
 const isEventScheduleMetadata = (
   a: unknown

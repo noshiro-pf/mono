@@ -2,7 +2,7 @@ import { datetimeSpecificationOptions } from '@noshiro/event-schedule-app-shared
 
 const dc = dict.eventSettingsPage.section2;
 
-export const selectorOptions: readonly OptionProps[] = [
+export const selectorOptions = [
   {
     label: dc.datetimeSpecificationOptions.noStartEndSpecified,
     value: datetimeSpecificationOptions.noStartEndSpecified,
@@ -19,4 +19,4 @@ export const selectorOptions: readonly OptionProps[] = [
     label: dc.datetimeSpecificationOptions.startAndEndSpecified,
     value: datetimeSpecificationOptions.startAndEndSpecified,
   },
-] as const;
+] as const satisfies readonly OptionProps[];

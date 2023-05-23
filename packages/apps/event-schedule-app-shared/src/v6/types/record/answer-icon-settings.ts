@@ -8,11 +8,11 @@ import {
 
 export type AnswerIconSettings = Record<AnswerIconId, AnswerIconSetting>;
 
-export const answerIconSettingsDefaultValue: AnswerIconSettings = {
+export const answerIconSettingsDefaultValue = {
   good: { description: '', point: 10 },
   fair: { description: '', point: 6 },
   poor: { description: '', point: 0 },
-} as const;
+} as const satisfies AnswerIconSettings;
 
 export const isAnswerIconSettings = (a: unknown): a is AnswerIconSettings =>
   isRecord(a) &&

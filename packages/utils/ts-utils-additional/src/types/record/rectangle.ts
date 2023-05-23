@@ -6,12 +6,12 @@ export type Rect = Readonly<{
 }> &
   RectSize;
 
-export const defaultRect: Rect = {
+export const defaultRect = {
   top: 0,
   left: 0,
   width: defaultRectSize.width,
   height: defaultRectSize.height,
-} as const;
+} as const satisfies Rect;
 
 export const rectSizeToRect = (rectSize: RectSize): Rect => ({
   width: rectSize.width,

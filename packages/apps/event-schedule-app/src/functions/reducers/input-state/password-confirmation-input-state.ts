@@ -18,12 +18,7 @@ export const passwordWithConfirmationInitialState = {
     inputValue: '',
     error: undefined,
   },
-} as const;
-
-expectType<
-  typeof passwordWithConfirmationInitialState,
-  PasswordWithConfirmationState
->('<=');
+} as const satisfies PasswordWithConfirmationState;
 
 export const passwordWithConfirmationHasError = (
   state: PasswordWithConfirmationState

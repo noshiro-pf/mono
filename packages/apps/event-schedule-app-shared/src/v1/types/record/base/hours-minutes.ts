@@ -7,10 +7,10 @@ export type HoursMinutes = Readonly<{
 
 export type PartialHoursMinutes = Partial<HoursMinutes>;
 
-export const defaultHoursMinutes: HoursMinutes = {
+export const defaultHoursMinutes = {
   hours: 0,
   minutes: 0,
-} as const;
+} as const satisfies HoursMinutes;
 
 const d = defaultHoursMinutes;
 export const fillHoursMinutes = (a?: PartialHoursMinutes): HoursMinutes => ({

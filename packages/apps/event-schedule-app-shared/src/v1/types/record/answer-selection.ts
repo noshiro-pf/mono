@@ -18,10 +18,10 @@ export type PartialAnswerSelection = Partial<
   }>
 >;
 
-const defaultAnswerSelection: AnswerSelection = {
+const defaultAnswerSelection = {
   datetimeRange: defaultDatetimeRange,
   iconId: undefined,
-} as const;
+} as const satisfies AnswerSelection;
 
 const d = defaultAnswerSelection;
 export const fillAnswerSelection = (

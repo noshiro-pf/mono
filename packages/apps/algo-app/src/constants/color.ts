@@ -3,9 +3,7 @@ export type CustomColor = '#383838' | 'red' | 'rgb(48, 255, 135)';
 export const outlineColorDef = {
   green: 'rgb(48, 255, 135)',
   red: 'red',
-} as const;
-
-expectType<typeof outlineColorDef, Record<string, CustomColor>>('<=');
+} as const satisfies Record<string, CustomColor>;
 
 export type CardTextColor = DarkGray | LightGray | 'black' | 'white';
 type DarkGray = 'rgb(60, 60, 60)';

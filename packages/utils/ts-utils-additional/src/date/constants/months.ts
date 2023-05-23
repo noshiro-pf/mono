@@ -1,5 +1,3 @@
-import { expectType } from '@noshiro/ts-utils';
-
 export const months = {
   en: {
     1: 'January',
@@ -14,7 +12,7 @@ export const months = {
     10: 'October',
     11: 'November',
     12: 'December',
-  },
+  } satisfies MonthsType,
   jp: {
     1: '一月',
     2: '二月',
@@ -28,7 +26,7 @@ export const months = {
     10: '十月',
     11: '十一月',
     12: '十二月',
-  },
+  } satisfies MonthsType,
 } as const;
 
 export const monthsList = {
@@ -45,7 +43,7 @@ export const monthsList = {
     { value: 10, name: months.en[10] },
     { value: 11, name: months.en[11] },
     { value: 12, name: months.en[12] },
-  ],
+  ] satisfies MonthsListType,
   jp: [
     { value: 1, name: months.jp[1] },
     { value: 2, name: months.jp[2] },
@@ -59,7 +57,7 @@ export const monthsList = {
     { value: 10, name: months.jp[10] },
     { value: 11, name: months.jp[11] },
     { value: 12, name: months.jp[12] },
-  ],
+  ] satisfies MonthsListType,
 } as const;
 
 type MonthsType = Readonly<
@@ -80,9 +78,3 @@ type MonthsListType = readonly [
   Readonly<{ value: 11; name: string }>,
   Readonly<{ value: 12; name: string }>
 ];
-
-expectType<typeof months.jp, MonthsType>('<=');
-expectType<typeof months.en, MonthsType>('<=');
-
-expectType<typeof monthsList.jp, MonthsListType>('<=');
-expectType<typeof monthsList.en, MonthsListType>('<=');

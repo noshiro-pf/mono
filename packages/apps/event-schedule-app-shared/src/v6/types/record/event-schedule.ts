@@ -49,7 +49,7 @@ export type EventSchedule = Readonly<{
   archivedBy: readonly User[];
 }>;
 
-export const eventScheduleDefaultValue: EventSchedule = {
+export const eventScheduleDefaultValue = {
   title: '',
   notes: '',
   datetimeSpecification: 'noStartEndSpecified',
@@ -64,7 +64,7 @@ export const eventScheduleDefaultValue: EventSchedule = {
   timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
   author: userDefaultValue,
   archivedBy: [],
-} as const;
+} as const satisfies EventSchedule;
 
 const isAnswerDeadline = (e: unknown): e is Ymdhm | 'none' =>
   e === 'none' || isYmdhm(e);

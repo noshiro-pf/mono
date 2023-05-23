@@ -1,13 +1,13 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { calculatedValues$, store$ } from '../../store';
 
-const headerCellStyle: React.CSSProperties = {
+const headerCellStyle = {
   textAlign: 'center',
-} as const;
+} as const satisfies React.CSSProperties;
 
-const dataCellStyle: React.CSSProperties = {
+const dataCellStyle = {
   textAlign: 'right',
-} as const;
+} as const satisfies React.CSSProperties;
 
 const formatYenValue = (value: number): string =>
   Intl.NumberFormat('ja-JP', {

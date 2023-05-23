@@ -7,10 +7,10 @@ export type User = Readonly<{
 
 export type PartialUser = Partial<User>;
 
-export const userDefaultValue: User = {
+export const userDefaultValue = {
   id: null,
   name: '',
-} as const;
+} as const satisfies User;
 
 const d = userDefaultValue;
 export const fillUser = (a: PartialUser): User => ({

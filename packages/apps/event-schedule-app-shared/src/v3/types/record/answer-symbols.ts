@@ -5,11 +5,11 @@ export type SymbolSettings = Record<AnswerSymbolId, SymbolSetting>;
 
 export type PartialSymbolSettings = DeepPartial<SymbolSettings>;
 
-const defaultSymbolSettings: SymbolSettings = {
+const defaultSymbolSettings = {
   good: { description: '', point: 10 },
   fair: { description: '', point: 6 },
   poor: { description: '', point: 0 },
-} as const;
+} as const satisfies SymbolSettings;
 
 const d = defaultSymbolSettings;
 export const fillSymbolSettings = (

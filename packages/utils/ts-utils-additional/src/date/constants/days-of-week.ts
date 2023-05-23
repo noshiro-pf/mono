@@ -1,5 +1,3 @@
-import { expectType } from '@noshiro/ts-utils';
-
 export const daysOfWeek = {
   en: {
     Sun: { name: 'Sunday', abbr: 'Su' },
@@ -9,7 +7,7 @@ export const daysOfWeek = {
     Thr: { name: 'Thursday', abbr: 'Th' },
     Fri: { name: 'Friday', abbr: 'Fr' },
     Sat: { name: 'Saturday', abbr: 'Sa' },
-  },
+  } satisfies MonthsType,
   jp: {
     Sun: { name: '日曜日', abbr: '日' },
     Mon: { name: '月曜日', abbr: '月' },
@@ -18,7 +16,7 @@ export const daysOfWeek = {
     Thr: { name: '木曜日', abbr: '木' },
     Fri: { name: '金曜日', abbr: '金' },
     Sat: { name: '土曜日', abbr: '土' },
-  },
+  } satisfies MonthsType,
 } as const;
 
 export const daysOfWeekList = {
@@ -30,7 +28,7 @@ export const daysOfWeekList = {
     { name: 'Thursday', abbr: 'Th' },
     { name: 'Friday', abbr: 'Fr' },
     { name: 'Saturday', abbr: 'Sa' },
-  ],
+  ] satisfies WeekdaysType,
   jp: [
     { name: '日曜日', abbr: '日' },
     { name: '月曜日', abbr: '月' },
@@ -39,7 +37,7 @@ export const daysOfWeekList = {
     { name: '木曜日', abbr: '木' },
     { name: '金曜日', abbr: '金' },
     { name: '土曜日', abbr: '土' },
-  ],
+  ] satisfies WeekdaysType,
 } as const;
 
 type MonthsType = Readonly<
@@ -55,9 +53,3 @@ type WeekdaysType = readonly [
   Readonly<{ name: string; abbr: string }>,
   Readonly<{ name: string; abbr: string }>
 ];
-
-expectType<typeof daysOfWeek.en, MonthsType>('<=');
-expectType<typeof daysOfWeek.jp, MonthsType>('<=');
-
-expectType<typeof daysOfWeekList.en, WeekdaysType>('<=');
-expectType<typeof daysOfWeekList.jp, WeekdaysType>('<=');

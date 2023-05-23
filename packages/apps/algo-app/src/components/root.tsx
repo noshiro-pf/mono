@@ -76,10 +76,10 @@ export const Root = memoNamed('Root', () => {
   );
 });
 
-const rootStyle: preact.JSX.CSSProperties = {
+const rootStyle = {
   width: '100vw',
   height: '100vh',
-} as const;
+} as const satisfies preact.JSX.CSSProperties;
 
 const NotFoundPage = styled('div')`
   padding: 20px;

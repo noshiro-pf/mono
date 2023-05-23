@@ -21,9 +21,7 @@ export const signInPageInitialState = {
   password: inputInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<typeof signInPageInitialState, SignInPageState>('<=');
+} as const satisfies SignInPageState;
 
 export const signInPageHasError = (state: SignInPageState): boolean =>
   emailInputHasError(state.email) ||

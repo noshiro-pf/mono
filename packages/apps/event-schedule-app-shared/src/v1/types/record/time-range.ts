@@ -18,10 +18,10 @@ export type PartialTimeRange = Partial<
   }>
 >;
 
-export const defaultTimeRange: TimeRange = {
+export const defaultTimeRange = {
   start: defaultHoursMinutes,
   end: defaultHoursMinutes,
-} as const;
+} as const satisfies TimeRange;
 
 const d = defaultTimeRange;
 export const fillTimeRange = (p?: PartialTimeRange): TimeRange => ({

@@ -26,9 +26,7 @@ export const registerPageInitialState = {
   password: passwordWithConfirmationInitialState,
   otherErrors: undefined,
   isWaitingResponse: false,
-} as const;
-
-expectType<typeof registerPageInitialState, RegisterPageState>('<=');
+} as const satisfies RegisterPageState;
 
 export const registerPageHasError = (state: RegisterPageState): boolean =>
   state.username.inputValue === '' ||

@@ -44,7 +44,7 @@ export type PartialAnswer = Partial<
   >
 >;
 
-export const defaultAnswer: Answer = {
+export const defaultAnswer = {
   id: createAnswerId(''),
   userName: createUserName(''),
   comment: '',
@@ -53,7 +53,7 @@ export const defaultAnswer: Answer = {
   useWeight: false,
   weight: createWeight(1),
   isRequiredParticipants: false,
-} as const;
+} as const satisfies Answer;
 
 const d = defaultAnswer;
 export const fillAnswer = (p?: PartialAnswer): Answer => ({
