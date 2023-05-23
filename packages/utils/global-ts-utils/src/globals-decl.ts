@@ -100,9 +100,9 @@ import {
 declare global {
   type DateUtils = TYPE_DateUtils;
   type IMap<K, V> = TYPE_IMap<K, V>;
-  type IMapMapped<K, V, KM extends RecordKeyType> = TYPE_IMapMapped<K, V, KM>;
+  type IMapMapped<K, V, KM extends number | string> = TYPE_IMapMapped<K, V, KM>;
   type ISet<S> = TYPE_ISet<S>;
-  type ISetMapped<K, KM extends RecordKeyType> = TYPE_ISetMapped<K, KM>;
+  type ISetMapped<K, KM extends number | string> = TYPE_ISetMapped<K, KM>;
   type Maybe<S> = TYPE_Maybe<S>;
   type Queue<T> = TYPE_Queue<T>;
   type Result<S, E> = TYPE_Result<S, E>;

@@ -2,8 +2,10 @@
 import { pipe } from '../functional';
 import { tp } from '../others';
 
+type KeyType = number | string;
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
+interface IMapMappedInterface<K, V, KM extends KeyType> {
   new (iterable: Iterable<K>, toKey: (a: K) => KM, fromKey: (k: KM) => K): void;
 
   // Getting information
@@ -54,20 +56,18 @@ interface IMapMappedInterface<K, V, KM extends RecordKeyType> {
   toRawMap: () => ReadonlyMap<KM, V>;
 }
 
-export type IMapMapped<K, V, KM extends RecordKeyType> = Iterable<
-  readonly [K, V]
-> &
+export type IMapMapped<K, V, KM extends KeyType> = Iterable<readonly [K, V]> &
   Readonly<IMapMappedInterface<K, V, KM>>;
 
 export const IMapMapped = {
-  new: <K, V, KM extends RecordKeyType>(
+  new: <K, V, KM extends KeyType>(
     iterable: Iterable<readonly [K, V]>,
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K
   ): IMapMapped<K, V, KM> =>
     new IMapMappedClass<K, V, KM>(iterable, toKey, fromKey),
 
-  equal: <K, V, KM extends RecordKeyType>(
+  equal: <K, V, KM extends KeyType>(
     a: IMapMapped<K, V, KM>,
     b: IMapMapped<K, V, KM>
   ): boolean => {
@@ -79,7 +79,7 @@ export const IMapMapped = {
 
 const ArrayFrom = Array.from;
 
-class IMapMappedClass<K, V, KM extends RecordKeyType>
+class IMapMappedClass<K, V, KM extends KeyType>
   implements IMapMapped<K, V, KM>, Iterable<readonly [K, V]>
 {
   readonly #map: ReadonlyMap<KM, V>;
@@ -130,7 +130,10 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   delete(key: K): IMapMapped<K, V, KM> {
-    if (!this.has(key)) return this;
+    if (!this.has(key)) {
+      console.warn(`IMapMapped.delete: key not found: ${this.#toKey(key)}`);
+      return this;
+    }
     const keyMapped = this.#toKey(key);
 
     return IMapMapped.new(
@@ -166,7 +169,10 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
   }
 
   update(key: K, updater: (value: V) => V): IMapMapped<K, V, KM> {
-    if (!this.has(key)) return this;
+    if (!this.has(key)) {
+      console.error(`IMapMapped.update: key not found: ${this.#toKey(key)}`);
+      return this;
+    }
 
     const curr = this.get(key)!;
     const keyMapped = this.#toKey(key);
@@ -184,13 +190,6 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
       this.#toKey,
       this.#fromKey
     );
-    // return IMapMapped.new(
-    //   ArrayFrom(this._map.entries(), ([km, v]) => tp(this._fromKey(km), v))(
-    //     ([km, v]) => tp(km, Object.is(km, keyMapped) ? updater(curr) : v)
-    //   ),
-    //   this._toKey,
-    //   this._fromKey
-    // );
   }
 
   withMutations(
@@ -210,12 +209,20 @@ class IMapMappedClass<K, V, KM extends RecordKeyType>
         case 'delete':
           mut_result.delete(key);
           break;
+
         case 'set':
           mut_result.set(key, action.value);
           break;
+
         case 'update': {
           if (mut_result.has(key)) {
             mut_result.set(key, action.updater(mut_result.get(key)!));
+          } else {
+            console.warn(
+              `IMapMapped.withMutations::update: key not found: ${this.#toKey(
+                key
+              )}`
+            );
           }
           break;
         }

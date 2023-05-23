@@ -1,4 +1,5 @@
 import { MutableSet } from '../others';
+import { Str } from '../str';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface ISetInterface<K> {
@@ -122,7 +123,10 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
   }
 
   delete(key: K): ISet<K> {
-    if (!this.has(key)) return this;
+    if (!this.has(key)) {
+      console.warn(`ISet.delete: key not found: ${Str.from(key)}`);
+      return this;
+    }
 
     return ISet.new(ArrayFrom(this.#set).filter((k) => !Object.is(k, key)));
   }
@@ -139,6 +143,7 @@ class ISetClass<K> implements ISet<K>, Iterable<K> {
         case 'delete':
           mut_result.delete(action.key);
           break;
+
         case 'add':
           mut_result.add(action.key);
           break;
