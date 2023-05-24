@@ -23,8 +23,9 @@ const isNonZero = <N extends number>(
   a: N
 ): a is NonZeroNumber & RelaxedExclude<N, 0> => a !== 0;
 
-const isNonNegative = <N extends number>(a: N): a is N & NonNegativeNumber =>
-  a >= 0;
+const isNonNegative = <N extends number>(
+  a: N
+): a is NonNegativeNumber & RelaxedExclude<N, NegativeIndex<1024>> => a >= 0;
 
 const isUintInRange =
   <Min extends number, Max extends number>(min: Min, max: Max) =>

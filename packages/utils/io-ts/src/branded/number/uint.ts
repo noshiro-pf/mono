@@ -3,7 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = (a: number): a is Uint =>
+const is = (a: number): a is UintBrand =>
   !Number.isNaN(a) && Number.isInteger(a) && Num.isNonNegative(a);
 
 export const uint = (defaultValue: number = 0): Type<Uint> => {

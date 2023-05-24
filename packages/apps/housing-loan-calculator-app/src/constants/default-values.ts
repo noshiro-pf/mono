@@ -4,7 +4,7 @@ export const defaultValues = {
   repaymentType: 'principal-equal-payment',
   downPaymentManYen: 200,
   propertyPriceManYen: 2780,
-  borrowingPeriodYear: toUint32(35),
+  borrowingPeriodYear: 35,
   interestRatePercentPerYear: 0.5,
 } as const satisfies Readonly<{
   repaymentType: RepaymentType;

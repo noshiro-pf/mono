@@ -1,4 +1,4 @@
-import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
+import { Maybe, SafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type Observable,
@@ -10,7 +10,9 @@ import { isPositiveSafeInteger } from '../utils';
 
 export const take =
   <A>(
-    n: Exclude<Uint9, 0> | (NonZeroSafeInt & SafeUint)
+    n:
+      | Exclude<SmallUint, 0>
+      | IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>
   ): RemoveInitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     new TakeObservableClass(parentObservable, n);
@@ -19,12 +21,14 @@ class TakeObservableClass<A>
   extends SyncChildObservableClass<A, 'take', readonly [A]>
   implements TakeOperatorObservable<A>
 {
-  readonly #n: NonZeroSafeInt & SafeUint;
+  readonly #n: IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>;
   #mut_counter: SafeUint;
 
   constructor(
     parentObservable: Observable<A>,
-    n: Exclude<Uint9, 0> | (NonZeroSafeInt & SafeUint)
+    n:
+      | Exclude<SmallUint, 0>
+      | IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>
   ) {
     super({
       parents: [parentObservable],
@@ -33,8 +37,8 @@ class TakeObservableClass<A>
         ? Maybe.none
         : parentObservable.currentValue,
     });
-    this.#mut_counter = toSafeUint(0);
-    this.#n = n as NonZeroSafeInt & SafeUint;
+    this.#mut_counter = 0;
+    this.#n = n as IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>;
 
     // complete immediately if n is not positive integer
     if (!isPositiveSafeInteger(n)) {

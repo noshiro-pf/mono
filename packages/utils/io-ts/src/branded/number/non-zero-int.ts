@@ -3,7 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = (a: number): a is NonZeroInt =>
+const is = (a: number): a is NonZeroIntBrand =>
   Number.isInteger(a) && Num.isNonZero(a);
 
 export const nonZeroInt = (defaultValue: number = 0): Type<NonZeroInt> => {

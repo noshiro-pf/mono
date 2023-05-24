@@ -1,4 +1,4 @@
-import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
+import { Maybe, SafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type InitializedToInitializedOperator,
@@ -46,8 +46,7 @@ class MapWithIndexObservableClass<A, B>
       return; // skip update
     }
 
-    this.#index =
-      this.#index === -1 ? toSafeUint(0) : SafeUint.add(1, this.#index);
+    this.#index = this.#index === -1 ? 0 : SafeUint.add(1, this.#index);
     this.setNext(
       this.#mapFn(par.currentValue.value, this.#index),
       updaterSymbol

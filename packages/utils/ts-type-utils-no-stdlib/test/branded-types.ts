@@ -7,7 +7,10 @@ import {
   type InfiniteNumber,
   type Int,
   type Int16,
+  type Int16Brand,
   type Int32,
+  type Int32Brand,
+  type IntBrand,
   type NEGATIVE_INFINITY,
   type NaNType,
   type NegativeNumber,
@@ -15,32 +18,39 @@ import {
   type NegativeUint32,
   type NonNegativeNumber,
   type NonZeroInt,
+  type NonZeroIntBrand,
   type NonZeroNumber,
   type NonZeroSafeInt,
+  type NonZeroSafeIntBrand,
   type NormalizeBrandUnion,
   type POSITIVE_INFINITY,
   type PositiveNumber,
   type SafeInt,
+  type SafeIntBrand,
   type SafeUint,
+  type SafeUintBrand,
   type Uint,
   type Uint16,
+  type Uint16Brand,
   type Uint32,
+  type Uint32Brand,
+  type UintBrand,
 } from '../src';
 import { expectType } from './expect-type';
 
 {
   // types that extend FiniteNumber
   expectType<FiniteNumber, FiniteNumber>('<=');
-  expectType<Int, FiniteNumber>('<=');
-  expectType<Uint, FiniteNumber>('<=');
-  expectType<NonZeroInt, FiniteNumber>('<=');
-  expectType<SafeInt, FiniteNumber>('<=');
-  expectType<SafeUint, FiniteNumber>('<=');
-  expectType<NonZeroSafeInt, FiniteNumber>('<=');
-  expectType<Uint32, FiniteNumber>('<=');
-  expectType<Int32, FiniteNumber>('<=');
-  expectType<Uint16, FiniteNumber>('<=');
-  expectType<Int16, FiniteNumber>('<=');
+  expectType<IntBrand, FiniteNumber>('<=');
+  expectType<UintBrand, FiniteNumber>('<=');
+  expectType<NonZeroIntBrand, FiniteNumber>('<=');
+  expectType<SafeIntBrand, FiniteNumber>('<=');
+  expectType<SafeUintBrand, FiniteNumber>('<=');
+  expectType<NonZeroSafeIntBrand, FiniteNumber>('<=');
+  expectType<Uint32Brand, FiniteNumber>('<=');
+  expectType<Int32Brand, FiniteNumber>('<=');
+  expectType<Uint16Brand, FiniteNumber>('<=');
+  expectType<Int16Brand, FiniteNumber>('<=');
 
   // types that don't extend FiniteNumber
   expectType<NaNType, FiniteNumber>('!<=');
@@ -107,10 +117,10 @@ import { expectType } from './expect-type';
 {
   // types that extend NonNegativeNumber
   expectType<POSITIVE_INFINITY, NonNegativeNumber>('<=');
-  expectType<Uint, NonNegativeNumber>('<=');
-  expectType<SafeUint, NonNegativeNumber>('<=');
-  expectType<Uint32, NonNegativeNumber>('<=');
-  expectType<Uint16, NonNegativeNumber>('<=');
+  expectType<UintBrand, NonNegativeNumber>('<=');
+  expectType<SafeUintBrand, NonNegativeNumber>('<=');
+  expectType<Uint32Brand, NonNegativeNumber>('<=');
+  expectType<Uint16Brand, NonNegativeNumber>('<=');
 
   // types that don't extend NonNegativeNumber
   expectType<NEGATIVE_INFINITY, NonNegativeNumber>('!<=');
@@ -155,8 +165,8 @@ import { expectType } from './expect-type';
   expectType<InfiniteNumber, NonZeroNumber>('<=');
   expectType<POSITIVE_INFINITY, NonZeroNumber>('<=');
   expectType<NEGATIVE_INFINITY, NonZeroNumber>('<=');
-  expectType<NonZeroInt, NonZeroNumber>('<=');
-  expectType<NonZeroSafeInt, NonZeroNumber>('<=');
+  expectType<NonZeroIntBrand, NonZeroNumber>('<=');
+  expectType<NonZeroSafeIntBrand, NonZeroNumber>('<=');
 
   // types that don't extend NonZeroNumber
   expectType<FiniteNumber, NonZeroNumber>('!<=');
@@ -194,7 +204,7 @@ expectType<Int16, SafeInt>('<=');
 expectType<Uint32, SafeUint>('<=');
 expectType<Uint16, SafeUint>('<=');
 
-expectType<NormalizeBrandUnion<Uint16 | Uint32>, Uint32>('=');
+expectType<NormalizeBrandUnion<Uint16Brand | Uint32Brand>, Uint32Brand>('=');
 expectType<
   NormalizeBrandUnion<NEGATIVE_INFINITY | POSITIVE_INFINITY>,
   InfiniteNumber

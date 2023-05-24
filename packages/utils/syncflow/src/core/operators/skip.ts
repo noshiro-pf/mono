@@ -1,4 +1,4 @@
-import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
+import { Maybe, SafeUint } from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type Observable,
@@ -10,7 +10,9 @@ import { isPositiveSafeInteger } from '../utils';
 
 export const skip =
   <A>(
-    n: Exclude<Uint9, 0> | (NonZeroSafeInt & SafeUint)
+    n:
+      | Exclude<SmallUint, 0>
+      | IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>
   ): RemoveInitializedOperator<A, A> =>
   (parentObservable: Observable<A>) =>
     !isPositiveSafeInteger(n)
@@ -21,12 +23,14 @@ class SkipObservableClass<A>
   extends SyncChildObservableClass<A, 'skip', readonly [A]>
   implements SkipOperatorObservable<A>
 {
-  readonly #n: NonZeroSafeInt & SafeUint;
+  readonly #n: IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>;
   #counter: SafeUint;
 
   constructor(
     parentObservable: Observable<A>,
-    n: Exclude<Uint9, 0> | (NonZeroSafeInt & SafeUint)
+    n:
+      | Exclude<SmallUint, 0>
+      | IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>
   ) {
     super({
       parents: [parentObservable],
@@ -35,8 +39,8 @@ class SkipObservableClass<A>
         ? parentObservable.currentValue
         : Maybe.none,
     });
-    this.#counter = toSafeUint(0);
-    this.#n = n as NonZeroSafeInt & SafeUint;
+    this.#counter = 0;
+    this.#n = n as IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {

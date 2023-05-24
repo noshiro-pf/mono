@@ -1,4 +1,15 @@
 import { type Brand } from './brand';
+import { type Index, type NegativeIndex } from './index-type';
+
+/** @internal */
+type SmallIntPositiveIndexMax = 512;
+/** @internal */
+type SmallIntNegativeIndexMax = 513;
+
+export type SmallUint = Index<SmallIntPositiveIndexMax>;
+export type SmallNegativeInt = NegativeIndex<SmallIntNegativeIndexMax>;
+export type SmallInt = SmallNegativeInt | SmallUint;
+export type NonZeroSmallInt = Exclude<SmallInt, 0>;
 
 // number type classes
 
@@ -87,56 +98,100 @@ export type NegativeNumber = Brand<
 >;
 
 /** Numeric brand type after checking with `Number.isInteger(x)` */
-export type Int = Brand<number, _FiniteKey | _IntKey, _NaNKey>;
+export type IntBrand = Brand<number, _FiniteKey | _IntKey, _NaNKey>;
+
+/** Numeric brand type after checking with `Number.isInteger(x)` */
+export type Int = IntBrand | SmallInt;
 
 /** Numeric brand type after checking with `Number.isInteger(x)` and `x >= 0` */
-export type Uint = Brand<
+export type UintBrand = Brand<
   number,
   _FiniteKey | _IntKey | _NonNegativeKey,
   _NaNKey
 >;
 
+/** Numeric brand type after checking with `Number.isInteger(x)` and `x >= 0` */
+export type Uint = SmallUint | UintBrand;
+
 /** Numeric brand type after checking with `Number.isInteger(x)` and `x != 0` */
-export type NonZeroInt = Brand<
+export type NonZeroIntBrand = Brand<
   number,
   _FiniteKey | _IntKey,
   _NaNKey | _ZeroKey
 >;
 
+/** Numeric brand type after checking with `Number.isInteger(x)` and `x != 0` */
+export type NonZeroInt = NonZeroIntBrand | NonZeroSmallInt;
+
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` */
-export type SafeInt = Brand<number, _FiniteKey | _SafeIntKey, _NaNKey>;
+export type SafeIntBrand = Brand<number, _FiniteKey | _SafeIntKey, _NaNKey>;
+
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` */
+export type SafeInt = SafeIntBrand | SmallInt;
 
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x >= 0` */
-export type SafeUint = Brand<number, _NonNegativeKey | _SafeIntKey, _NaNKey>;
+export type SafeUintBrand = Brand<
+  number,
+  _NonNegativeKey | _SafeIntKey,
+  _NaNKey
+>;
+
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x >= 0` */
+export type SafeUint = SafeUintBrand | SmallUint;
 
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x != 0` */
-export type NonZeroSafeInt = Brand<number, _SafeIntKey, _NaNKey | _ZeroKey>;
+export type NonZeroSafeIntBrand = Brand<
+  number,
+  _SafeIntKey,
+  _NaNKey | _ZeroKey
+>;
+
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x != 0` */
+export type NonZeroSafeInt = NonZeroSafeIntBrand | NonZeroSmallInt;
 
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^32 - 1` */
-export type Uint32 = Brand<number, _Uint32Key, _NaNKey>;
+export type Uint32Brand = Brand<number, _Uint32Key, _NaNKey>;
+
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^32 - 1` */
+export type Uint32 = SmallUint | Uint32Brand;
 
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^16 - 1` */
-export type Uint16 = Brand<number, _Uint16Key, _NaNKey>;
+export type Uint16Brand = Brand<number, _Uint16Key, _NaNKey>;
+
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^16 - 1` */
+export type Uint16 = SmallUint | Uint16Brand;
 
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^32 - 1 <= x < 0` */
-export type NegativeUint32 = Brand<
+export type NegativeUint32Brand = Brand<
   number,
   _NegativeUint32Key,
   _NaNKey | _ZeroKey
 >;
 
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^32 - 1 <= x < 0` */
+export type NegativeUint32 = NegativeUint32Brand | SmallNegativeInt;
+
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^16 - 1 <= x < 0` */
-export type NegativeUint16 = Brand<
+export type NegativeUint16Brand = Brand<
   number,
   _NegativeUint16Key,
   _NaNKey | _ZeroKey
 >;
 
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^16 - 1 <= x < 0` */
+export type NegativeUint16 = NegativeUint16Brand | SmallNegativeInt;
+
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^31 <= x <= 2^31 - 1` */
-export type Int32 = Brand<number, _Int32Key, _NaNKey>;
+export type Int32Brand = Brand<number, _Int32Key, _NaNKey>;
+
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^31 <= x <= 2^31 - 1` */
+export type Int32 = Int32Brand | SmallInt;
 
 /** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^15 <= x <= 2^15 - 1` */
-export type Int16 = Brand<number, _Int16Key, _NaNKey>;
+export type Int16Brand = Brand<number, _Int16Key, _NaNKey>;
+
+/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^15 <= x <= 2^15 - 1` */
+export type Int16 = Int16Brand | SmallInt;
 
 /** Numeric brand type of element value of `Float32Array` */
 export type Float32 = Brand<number, _Float32Key>;

@@ -1,4 +1,4 @@
-import { SafeUint, toSafeUint } from '../num';
+import { SafeUint } from '../num';
 
 const get = <R extends RecordBase, K extends keyof R>(
   record: R,
@@ -38,7 +38,7 @@ const getIn = <R extends RecordBase, Path extends Paths<R>>(
   UNSAFE_getIn_impl(
     record,
     keyPath as readonly string[],
-    toSafeUint(0)
+    0
   ) as RecordValueAtPath<R, Path>;
 
 const UNSAFE_updateIn_impl = (
@@ -80,7 +80,7 @@ const setIn = <R extends RecordBase>(
   UNSAFE_updateIn_impl(
     record,
     keyPath as readonly string[],
-    toSafeUint(0),
+    0,
     () => newValue
   ) as R;
 
@@ -94,7 +94,7 @@ const updateIn = <R extends RecordBase, Path extends Paths<R>>(
   UNSAFE_updateIn_impl(
     record,
     keyPath as readonly string[],
-    toSafeUint(0),
+    0,
     updater as (prev: unknown) => unknown
   ) as R;
 

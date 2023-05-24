@@ -1,4 +1,4 @@
-import { Arr, SafeInt, toSafeInt } from '@noshiro/ts-utils';
+import { Arr, SafeInt } from '@noshiro/ts-utils';
 
 export const halfInt = (x: SafeInt): SafeInt =>
   x % 2 === 0
@@ -14,12 +14,12 @@ export const binarySearch = <N extends number>(
   sortedArray: readonly N[],
   x: N
 ): SafeInt => {
-  if (sortedArray.length === 0) return toSafeInt(0);
-  let mut_left: SafeInt = toSafeInt(0);
+  if (sortedArray.length === 0) return 0;
+  let mut_left: SafeInt = 0;
   let mut_right: SafeInt = SafeInt.sub(Arr.length(sortedArray), 1);
   let mut_mid: SafeInt = SafeInt.add(
     mut_left,
-    toSafeInt(halfInt(SafeInt.sub(mut_right, mut_left)))
+    halfInt(SafeInt.sub(mut_right, mut_left))
   );
 
   // loop while x is in the range of [left, right)
@@ -32,10 +32,7 @@ export const binarySearch = <N extends number>(
     } else {
       mut_left = SafeInt.add(mut_mid, 1);
     }
-    mut_mid = SafeInt.add(
-      mut_left,
-      toSafeInt(halfInt(SafeInt.sub(mut_right, mut_left)))
-    );
+    mut_mid = SafeInt.add(mut_left, halfInt(SafeInt.sub(mut_right, mut_left)));
   }
   return mut_mid;
 };

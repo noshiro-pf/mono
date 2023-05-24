@@ -3,7 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = isInt32;
+const is = isInt32 as (u: number) => u is Int32Brand;
 
 export const int32 = (defaultValue: number = 0): Type<Int32> => {
   if (!is(defaultValue)) {
