@@ -142,13 +142,13 @@ const submitButtonIsDisabled$: InitializedObservable<boolean> = combineLatestI([
 const answerSelectionMap$: InitializedObservable<
   IMapMapped<DatetimeRange, AnswerSelectionValue, DatetimeRangeMapKey>
 > = combineLatestI([
-  answerBeingEdited$.chain(pluckI('selection')),
+  answerBeingEdited$,
   eventSchedule$
     .chain(filter(isNotUndefined))
     .chain(pluck('datetimeRangeList'))
     .chain(withInitialValue<readonly DatetimeRange[]>([])),
 ]).chain(
-  mapI(([selection, datetimeRangeList]) => {
+  mapI(([{ selection }, datetimeRangeList]) => {
     const entries: DeepReadonly<[DatetimeRange, AnswerSelectionValue][]> =
       Arr.concat(
         datetimeRangeList.map((d) => [
@@ -358,24 +358,25 @@ const onEditButtonClickImpl = (eventId: string | undefined): void => {
 };
 
 /* @internal */
-const answerBeingEditedDispatchImpl = (
-  action: AnswerSelectionReducerAction,
-  answerSelectionMap: IMapMapped<
-    DatetimeRange,
-    AnswerSelectionValue,
-    DatetimeRangeMapKey
-  >
+const answerBeingEditedDispatch = (
+  action: AnswerSelectionReducerAction
 ): void => {
-  const nextAnswerSelectionMap = answerSelectionReducer(
-    answerSelectionMap,
-    action
-  );
-
   updateAnswerBeingEdited((answerBeingEdited) =>
     Obj.set(
       answerBeingEdited,
       'selection',
-      nextAnswerSelectionMap
+      answerSelectionReducer(
+        IMapMapped.new<
+          DatetimeRange,
+          AnswerSelectionValue,
+          DatetimeRangeMapKey
+        >(
+          answerBeingEdited.selection.map((s) => [s.datetimeRange, s]),
+          datetimeRangeToMapKey,
+          datetimeRangeFromMapKey
+        ),
+        action
+      )
         .map((s, d) => ({ datetimeRange: d, ...s }))
         .toValuesArray()
     )
@@ -402,28 +403,16 @@ combineLatest([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
 
 /* subscribe values */
 
-const answerSelectionMapDefaultValue = IMapMapped.new<
-  DatetimeRange,
-  AnswerSelectionValue,
-  DatetimeRangeMapKey
->([], datetimeRangeToMapKey, datetimeRangeFromMapKey);
-
 const mut_subscribedValues: {
   eventId: string | undefined;
   answerBeingEdited: Answer;
   answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden';
   fireAuthUser: FireAuthUser | undefined;
-  answerSelectionMap: IMapMapped<
-    DatetimeRange,
-    AnswerSelectionValue,
-    DatetimeRangeMapKey
-  >;
 } = {
   eventId: undefined,
   answerBeingEdited: answerDefaultValue,
   answerBeingEditedSectionState: 'hidden',
   fireAuthUser: undefined,
-  answerSelectionMap: answerSelectionMapDefaultValue,
 };
 
 router.eventId$.subscribe((id) => {
@@ -440,10 +429,6 @@ answerBeingEditedSectionState$.subscribe((v) => {
 
 Auth.fireAuthUser$.subscribe((u) => {
   mut_subscribedValues.fireAuthUser = u;
-});
-
-answerSelectionMap$.subscribe((u) => {
-  mut_subscribedValues.answerSelectionMap = u;
 });
 
 /* callbacks using subscribed values */
@@ -486,15 +471,6 @@ const onDeleteAnswerClick = (): Promise<void> =>
     mut_subscribedValues.eventId,
     mut_subscribedValues.answerBeingEdited
   );
-
-const answerBeingEditedDispatch = (
-  action: AnswerSelectionReducerAction
-): void => {
-  answerBeingEditedDispatchImpl(
-    action,
-    mut_subscribedValues.answerSelectionMap
-  );
-};
 
 const toggleProtectedSection = (): void => {
   toggleProtectedSectionImpl(mut_subscribedValues.fireAuthUser);
