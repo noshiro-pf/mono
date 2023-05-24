@@ -3,7 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = (a: number): a is SafeUint =>
+const is = (a: number): a is SafeUintBrand =>
   Number.isSafeInteger(a) && Num.isNonNegative(a);
 
 export const safeUint = (defaultValue: number = 0): Type<SafeUint> => {

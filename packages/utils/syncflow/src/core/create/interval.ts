@@ -1,4 +1,4 @@
-import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
+import { Maybe, SafeUint } from '@noshiro/ts-utils';
 import { RootObservableClass } from '../class';
 import { type IntervalObservable } from '../types';
 
@@ -21,7 +21,7 @@ class IntervalObservableClass
   constructor(milliSeconds: number, startManually?: boolean) {
     super({ type: 'Interval', currentValueInit: Maybe.none });
     this.#milliSeconds = milliSeconds;
-    this.#counter = toSafeUint(0);
+    this.#counter = 0;
     this.#timerId0 = undefined;
     this.#timerId = undefined;
     this.#isStarted = false;

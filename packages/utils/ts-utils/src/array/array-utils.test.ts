@@ -1149,7 +1149,7 @@ describe('ArrayUtils.range', () => {
   test('range(0, 10, 2)', () => {
     const result = Arr.range(0, 10, 2);
 
-    expectType<typeof result, readonly SafeInt[]>('=');
+    expectType<typeof result, readonly SafeUint[]>('=');
 
     expect(result).toStrictEqual([0, 2, 4, 6, 8]);
   });
@@ -1157,7 +1157,7 @@ describe('ArrayUtils.range', () => {
   test('range(0, 11, 2)', () => {
     const result = Arr.range(0, 11, 2);
 
-    expectType<typeof result, readonly SafeInt[]>('=');
+    expectType<typeof result, readonly SafeUint[]>('=');
 
     expect(result).toStrictEqual([0, 2, 4, 6, 8, 10]);
   });
@@ -1165,7 +1165,7 @@ describe('ArrayUtils.range', () => {
   test('range(1, 12, 2)', () => {
     const result = Arr.range(1, 12, 2);
 
-    expectType<typeof result, readonly SafeInt[]>('=');
+    expectType<typeof result, readonly SafeUint[]>('=');
 
     expect(result).toStrictEqual([1, 3, 5, 7, 9, 11]);
   });

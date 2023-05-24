@@ -1,14 +1,17 @@
+import { expectType } from '../../expect-type';
 import { Num } from '../num';
-import { type _SmallUint } from './small-index';
 
 /** return type */
 type T = SafeUint;
 
-/** arg type */
-type A = _SmallUint | T;
-
 /** denominator type */
-type D = Exclude<_SmallUint, 0> | IntersectBrand<T, NonZeroNumber>;
+type D = Exclude<SmallUint, 0> | IntersectBrand<SafeUintBrand, NonZeroNumber>;
+
+expectType<
+  D,
+  | Brand<number, 'Finite' | 'Int' | 'NonNegative' | 'SafeInt', 'NaN' | 'Zero'>
+  | Exclude<SmallUint, 0>
+>('=');
 
 const MIN_VALUE = 0;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
@@ -25,29 +28,29 @@ export const toSafeUint = (a: number): T => {
 
 const to = toSafeUint;
 
-const _c = Num.clamp<number>(toSafeUint(MIN_VALUE), MAX_VALUE);
+const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
 const clamp = (a: number): T => to(Math.round(_c(a)));
 
-const max = (...values: readonly A[]): T => to(Math.max(...values));
-const min = (...values: readonly A[]): T => to(Math.min(...values));
+const max = (...values: readonly T[]): T => to(Math.max(...values));
+const min = (...values: readonly T[]): T => to(Math.min(...values));
 
 /** @returns a ** b, but clamped to [0, MAX_SAFE_INTEGER] */
-const pow = (x: A, y: A): T => clamp(x ** y);
+const pow = (x: T, y: T): T => clamp(x ** y);
 
 /** @returns a + b, but clamped to [0, MAX_SAFE_INTEGER] */
-const add = (x: A, y: A): T => clamp(x + y);
+const add = (x: T, y: T): T => clamp(x + y);
 
 /** @returns a - b, but clamped to [0, MAX_SAFE_INTEGER] */
-const sub = (x: A, y: A): T => clamp(x - y);
+const sub = (x: T, y: T): T => clamp(x - y);
 
 /** @returns a * b, but clamped to [0, MAX_SAFE_INTEGER] */
-const mul = (x: A, y: A): T => clamp(x * y);
+const mul = (x: T, y: T): T => clamp(x * y);
 
 /** @returns a / b, but clamped to [0, MAX_SAFE_INTEGER] */
-const div = (x: A, y: D): T => clamp(Math.floor(x / y));
+const div = (x: T, y: D): T => clamp(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: A, max: A): T =>
+const random = (min: T, max: T): T =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const SafeUint = {

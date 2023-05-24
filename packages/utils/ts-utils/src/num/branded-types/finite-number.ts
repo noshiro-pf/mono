@@ -1,9 +1,6 @@
 /** return type */
 type T = FiniteNumber;
 
-/** arg type */
-type A = T;
-
 /** non-negative type */
 type Abs = NonNegativeNumber;
 
@@ -19,28 +16,28 @@ export const toFiniteNumber = (a: number): T => {
 
 const to = toFiniteNumber;
 
-const abs = (x: A): Abs => Math.abs(x);
+const abs = (x: T): Abs => Math.abs(x);
 
-const max = (...values: readonly A[]): T => to(Math.max(...values));
-const min = (...values: readonly A[]): T => to(Math.min(...values));
+const max = (...values: readonly T[]): T => to(Math.max(...values));
+const min = (...values: readonly T[]): T => to(Math.min(...values));
 
-const pow = (x: A, y: A): T => to(x ** y);
+const pow = (x: T, y: T): T => to(x ** y);
 
-const add = (x: A, y: A): T => to(x + y);
+const add = (x: T, y: T): T => to(x + y);
 
-const sub = (x: A, y: A): T => to(x - y);
+const sub = (x: T, y: T): T => to(x - y);
 
-const mul = (x: A, y: A): T => to(x * y);
+const mul = (x: T, y: T): T => to(x * y);
 
-const div = (x: A, y: D): T => to(Math.floor(x / y));
+const div = (x: T, y: D): T => to(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: A, max: A): T =>
+const random = (min: T, max: T): T =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
-const floor = (x: A): T => to(Math.floor(x));
-const ceil = (x: A): T => to(Math.ceil(x));
-const round = (x: A): T => to(Math.round(x));
+const floor = (x: T): T => to(Math.floor(x));
+const ceil = (x: T): T => to(Math.ceil(x));
+const round = (x: T): T => to(Math.round(x));
 
 export const FiniteNumber = {
   abs,

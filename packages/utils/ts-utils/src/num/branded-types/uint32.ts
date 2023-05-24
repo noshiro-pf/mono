@@ -1,14 +1,21 @@
+import { expectType } from '../../expect-type';
 import { Num } from '../num';
-import { type _SmallUint } from './small-index';
 
 /** return type */
 type T = Uint32;
 
-/** arg type */
-type A = _SmallUint | T;
-
 /** denominator type */
-type D = Exclude<_SmallUint, 0> | IntersectBrand<T, NonZeroNumber>;
+type D = Exclude<SmallUint, 0> | IntersectBrand<Uint32Brand, NonZeroNumber>;
+
+expectType<
+  D,
+  | Brand<
+      number,
+      'Finite' | 'Int' | 'NonNegative' | 'SafeInt' | 'Uint32',
+      'NaN' | 'Zero'
+    >
+  | Exclude<SmallUint, 0>
+>('=');
 
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 32 - 1;
@@ -32,26 +39,26 @@ const to = toUint32;
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
 const clamp = (a: number): T => to(Math.round(_c(a)));
 
-const max = (...values: readonly A[]): T => to(Math.max(...values));
-const min = (...values: readonly A[]): T => to(Math.min(...values));
+const max = (...values: readonly T[]): T => to(Math.max(...values));
+const min = (...values: readonly T[]): T => to(Math.min(...values));
 
 /** @returns a ** b, but clamped to [0, 2^32) */
-const pow = (x: A, y: A): T => clamp(x ** y);
+const pow = (x: T, y: T): T => clamp(x ** y);
 
 /** @returns a + b, but clamped to [0, 2^32) */
-const add = (x: A, y: A): T => clamp(x + y);
+const add = (x: T, y: T): T => clamp(x + y);
 
 /** @returns a - b, but clamped to [0, 2^32) */
-const sub = (x: A, y: A): T => clamp(x - y);
+const sub = (x: T, y: T): T => clamp(x - y);
 
 /** @returns a * b, but clamped to [0, 2^32) */
-const mul = (x: A, y: A): T => clamp(x * y);
+const mul = (x: T, y: T): T => clamp(x * y);
 
 /** @returns a / b, but clamped to [0, 2^32) */
-const div = (x: A, y: D): T => clamp(Math.floor(x / y));
+const div = (x: T, y: D): T => clamp(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: A, max: A): T =>
+const random = (min: T, max: T): T =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const Uint32 = {

@@ -1,12 +1,10 @@
-import { Arr, Result, toUint32 } from '@noshiro/ts-utils';
+import { Arr, Result, toSafeUint, toUint32 } from '@noshiro/ts-utils';
 import { type Type } from '../type';
 import {
   createAssertFunction,
   createIsFnFromValidateFn,
   validationErrorMessage,
 } from '../utils';
-
-type SmallUint = Uint9;
 
 export const arrayOfLength = <A, N extends SmallUint>(
   size: N,
@@ -25,7 +23,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
 
   const typeNameFilled: string =
     typeName ??
-    `[${Arr.newArray(toUint32(size), elementType.typeName).join(', ')}]`;
+    `[${Arr.newArray(toSafeUint(size), elementType.typeName).join(', ')}]`;
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Array.isArray(a)) {

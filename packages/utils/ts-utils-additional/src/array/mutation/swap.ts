@@ -1,12 +1,10 @@
 import { Arr } from '@noshiro/ts-utils';
 
-type SmallUint = Uint9;
-
 export const swap = <T>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_array: T[],
-  index1: SmallUint | Uint32,
-  index2: SmallUint | Uint32
+  index1: Uint32,
+  index2: Uint32
 ): void => {
   if (
     Arr.indexIsInRange(mut_array, index1) &&

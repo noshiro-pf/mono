@@ -1,15 +1,13 @@
-import { Num, range, toUint32 } from '@noshiro/ts-utils';
-
-type SmallInt = Int10;
+import { Num, range } from '@noshiro/ts-utils';
 
 export type ReadonlyBitArrayType = Readonly<{
-  size: Uint32;
-  get: (at: Int32 | SmallInt) => 0 | 1 | undefined;
+  size: SafeUint;
+  get: (at: SafeInt) => 0 | 1 | undefined;
 
   values: () => IterableIterator<0 | 1>;
-  entries: () => IterableIterator<readonly [Uint32, 0 | 1]>;
-  map: (fn: (value: 0 | 1, index: Uint32) => 0 | 1) => ReadonlyBitArrayType;
-  forEach: (fn: (value: 0 | 1, index: Uint32) => void) => void;
+  entries: () => IterableIterator<readonly [SafeUint, 0 | 1]>;
+  map: (fn: (value: 0 | 1, index: SafeUint) => 0 | 1) => ReadonlyBitArrayType;
+  forEach: (fn: (value: 0 | 1, index: SafeUint) => void) => void;
   toString: () => string;
 }>;
 
@@ -22,11 +20,11 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     this.#isInRange = Num.isInRange(0, input.length - 1);
   }
 
-  get size(): Uint32 {
-    return toUint32(this.#data.length);
+  get size(): SafeUint {
+    return this.#data.length;
   }
 
-  get(at: Int32 | SmallInt): 0 | 1 | undefined {
+  get(at: SafeInt): 0 | 1 | undefined {
     if (!this.#isInRange(at)) {
       return undefined;
     }
@@ -40,21 +38,19 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     }
   }
 
-  *entries(): IterableIterator<readonly [Uint32, 0 | 1]> {
+  *entries(): IterableIterator<readonly [SafeUint, 0 | 1]> {
     for (const idx of range(0, this.size)) {
-      yield [toUint32(idx), this.#data[idx] === 0 ? 0 : 1];
+      yield [idx, this.#data[idx] === 0 ? 0 : 1];
     }
   }
 
-  map(fn: (value: 0 | 1, index: Uint32) => 0 | 1): ReadonlyBitArrayType {
-    return ReadonlyBitArray(
-      this.#data.map((v, i) => fn(v === 0 ? 0 : 1, toUint32(i)))
-    );
+  map(fn: (value: 0 | 1, index: SafeUint) => 0 | 1): ReadonlyBitArrayType {
+    return ReadonlyBitArray(this.#data.map((v, i) => fn(v === 0 ? 0 : 1, i)));
   }
 
-  forEach(fn: (value: 0 | 1, index: Uint32) => void): void {
+  forEach(fn: (value: 0 | 1, index: SafeUint) => void): void {
     for (const [i, v] of this.#data.entries()) {
-      fn(v === 0 ? 0 : 1, toUint32(i));
+      fn(v === 0 ? 0 : 1, i);
     }
   }
 

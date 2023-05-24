@@ -1,6 +1,9 @@
 import { Num } from '../num';
 
-type SmallUint = Uint9;
+// eslint-disable-next-line @typescript-eslint/no-shadow
+function length<T extends readonly unknown[]>(list: T): Length<T> {
+  return list.length;
+}
 
 const reversed = <T extends readonly unknown[]>(tpl: T): Tuple.Reverse<T> =>
   // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-return
@@ -98,6 +101,7 @@ function sortedBy<T extends readonly unknown[], B>(
 }
 
 export const TupleUtils = {
+  length,
   reversed,
   findIndex,
   indexOf,

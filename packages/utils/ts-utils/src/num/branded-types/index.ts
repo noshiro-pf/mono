@@ -5,7 +5,6 @@ export * from './int32';
 export * from './non-negative-number';
 export * from './safe-int';
 export * from './safe-uint';
-export * from './small-index';
 export * from './uint';
 export * from './uint16';
 export * from './uint32';

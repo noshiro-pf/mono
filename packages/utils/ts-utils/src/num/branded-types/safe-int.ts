@@ -1,17 +1,13 @@
 import { Num } from '../num';
-import { type _SmallInt } from './small-index';
 
 /** return type */
 type T = SafeInt;
-
-/** arg type */
-type A = _SmallInt | T;
 
 /** non-negative type */
 type Abs = SafeUint;
 
 /** denominator type */
-type D = Exclude<_SmallInt, 0> | NonZeroSafeInt;
+type D = NonZeroSafeInt;
 
 const MIN_VALUE = Number.MIN_SAFE_INTEGER;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
@@ -28,28 +24,28 @@ const to = toSafeInt;
 const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
 const clamp = (a: number): T => to(Math.round(_c(a)));
 
-const abs = (x: A): Abs => to(Math.abs(x)) as Abs;
+const abs = (x: T): Abs => to(Math.abs(x)) as Abs;
 
-const max = (...values: readonly A[]): T => to(Math.max(...values));
-const min = (...values: readonly A[]): T => to(Math.min(...values));
+const max = (...values: readonly T[]): T => to(Math.max(...values));
+const min = (...values: readonly T[]): T => to(Math.min(...values));
 
 /** @returns a ** b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
-const pow = (x: A, y: A): T => clamp(x ** y);
+const pow = (x: T, y: T): T => clamp(x ** y);
 
 /** @returns a + b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
-const add = (x: A, y: A): T => clamp(x + y);
+const add = (x: T, y: T): T => clamp(x + y);
 
 /** @returns a - b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
-const sub = (x: A, y: A): T => clamp(x - y);
+const sub = (x: T, y: T): T => clamp(x - y);
 
 /** @returns a * b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
-const mul = (x: A, y: A): T => clamp(x * y);
+const mul = (x: T, y: T): T => clamp(x * y);
 
 /** @returns a / b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
-const div = (x: A, y: D): T => clamp(Math.floor(x / y));
+const div = (x: T, y: D): T => clamp(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: A, max: A): T =>
+const random = (min: T, max: T): T =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const SafeInt = {

@@ -1,17 +1,8 @@
 import { IMap } from '../collections';
+import { expectType } from '../expect-type';
 import { range as rangeIterator } from '../iterator';
 import { Num, SafeUint, toSafeUint } from '../num';
 import { MutableMap, MutableSet, idfn, tp } from '../others';
-
-// SafeUint などの branded type にキャストせずに引数として渡せる数値型の定義。
-// あまり大きな union を用いると型計算が重くなるので注意。
-
-type SmallUint = Uint9;
-type SmallInt = Int10;
-
-type NonNegativeIndexType = SafeUint;
-type IndexType = SafeInt;
-type SizeType = SafeUint;
 
 // copied from node_modules/typescript/lib/lib.es2019.array.d.ts and modified
 // type FlatArrayDepth =
@@ -124,33 +115,40 @@ const isArrayOfLength6OrMore = <A>(
 // eslint-disable-next-line @typescript-eslint/no-shadow
 function length<T extends NonEmptyArray<unknown>>(
   list: T
-): Length<T> & NonZeroSafeInt & SizeType;
-function length<T extends readonly unknown[]>(list: T): Length<T> & SizeType;
-function length<T extends readonly unknown[]>(list: T): Length<T> & SizeType {
+): Exclude<SmallUint, 0> | IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>;
+function length<T extends readonly unknown[]>(list: T): SafeUint;
+function length<T extends readonly unknown[]>(
+  list: T
+): IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand> | SafeUint {
   return toSafeUint(list.length);
 }
+
+expectType<
+  IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>,
+  Brand<number, 'Finite' | 'Int' | 'NonNegative' | 'SafeInt', 'NaN' | 'Zero'>
+>('=');
 
 const size = length;
 
 const asMut: <T extends readonly unknown[]>(list: T) => Writable<T> = idfn;
 
 function zeros<N extends SmallUint>(len: N): ArrayOfLength<N, 0>;
-function zeros(len: SizeType): readonly 0[];
-function zeros(len: SizeType | SmallUint): readonly 0[] {
+function zeros(len: SafeUint): readonly 0[];
+function zeros(len: SafeUint): readonly 0[] {
   // eslint-disable-next-line functional/immutable-data
-  return Array.from<0>({ length: toSafeUint(len) }).fill(0);
+  return Array.from<0>({ length: len }).fill(0);
 }
 
 function seq<N extends SmallUint>(len: N): Seq<N>;
-function seq(len: SizeType): readonly SizeType[];
-function seq(len: SizeType | SmallUint): readonly SizeType[] {
-  return Array.from({ length: toSafeUint(len) }, (_, i) => toSafeUint(i));
+function seq(len: SafeUint): readonly SafeUint[];
+function seq(len: SafeUint): readonly SafeUint[] {
+  return Array.from({ length: len }, (_, i) => i);
 }
 
 function newArray<V, N extends SmallUint>(len: N, init: V): ArrayOfLength<N, V>;
-function newArray<V>(len: SizeType, init: V): readonly V[];
-function newArray<V>(len: SizeType | SmallUint, init: V): readonly V[] {
-  return Array.from({ length: toSafeUint(len) }, () => init);
+function newArray<V>(len: SafeUint, init: V): readonly V[];
+function newArray<V>(len: SafeUint, init: V): readonly V[] {
+  return Array.from({ length: len }, () => init);
 }
 
 // TODO: improve return type
@@ -158,30 +156,38 @@ function range<S extends SmallInt, E extends SmallInt>(
   start: S,
   end: E
 ): readonly UintRange<S, E>[];
-function range<I extends IndexType>(
-  start: I | SmallInt,
-  end: I | SmallInt,
-  step?: Exclude<SmallInt, 0> | IntersectBrand<I, NonZeroNumber>
-): readonly I[];
-function range<I extends IndexType>(
-  start: I | SmallInt,
-  end: I | SmallInt,
-  step: Exclude<SmallInt, 0> | IntersectBrand<I, NonZeroNumber> = 1
-): readonly I[] {
-  return Array.from(rangeIterator<I>(start, end, step));
+
+function range(
+  start: SafeUint,
+  end: SafeUint,
+  step?: Exclude<SmallInt, 0> | IntersectBrand<SafeUintBrand, NonZeroNumber>
+): readonly SafeUint[];
+
+function range(
+  start: SafeInt,
+  end: SafeInt,
+  step?: Exclude<SmallInt, 0> | IntersectBrand<SafeIntBrand, NonZeroNumber>
+): readonly SafeInt[];
+
+function range(
+  start: SafeInt,
+  end: SafeInt,
+  step: Exclude<SmallInt, 0> | IntersectBrand<SafeIntBrand, NonZeroNumber> = 1
+): readonly SafeInt[] {
+  return Array.from(rangeIterator(start, end, step));
 }
 
 const copy = <T extends readonly unknown[]>(list: T): T => list.slice() as T;
 
 const sliceClamped = <T>(
   list: readonly T[],
-  start: IndexType | SmallInt,
-  end: IndexType | SmallInt
+  start: SafeInt,
+  end: SafeInt
 ): readonly T[] => {
-  const startClamped = Num.clamp(0, list.length)(start);
-  const endClamped = Num.clamp(startClamped, list.length)(end);
+  const startClamped = Num.clamp<SafeInt>(0, length(list))(start);
+  const endClamped = Num.clamp<SafeInt>(startClamped, length(list))(end);
 
-  return list.slice(toSafeUint(startClamped), toSafeUint(endClamped));
+  return list.slice(startClamped, endClamped);
 };
 
 function head(list: readonly []): undefined;
@@ -215,11 +221,8 @@ function take<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
 ): ListType.Take<N, T>;
-function take<A>(list: readonly A[], num: NonNegativeIndexType): readonly A[];
-function take<A>(
-  list: readonly A[],
-  num: NonNegativeIndexType | SmallUint
-): readonly A[] {
+function take<A>(list: readonly A[], num: SafeUint): readonly A[];
+function take<A>(list: readonly A[], num: SafeUint | SmallUint): readonly A[] {
   return sliceClamped(list, 0, num);
 }
 
@@ -227,13 +230,10 @@ function takeLast<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
 ): ListType.TakeLast<N, T>;
+function takeLast<A>(list: readonly A[], num: SafeUint): readonly A[];
 function takeLast<A>(
   list: readonly A[],
-  num: NonNegativeIndexType
-): readonly A[];
-function takeLast<A>(
-  list: readonly A[],
-  num: NonNegativeIndexType | SmallUint
+  num: SafeUint | SmallUint
 ): readonly A[] {
   return sliceClamped(list, SafeUint.sub(size(list), num), size(list));
 }
@@ -242,11 +242,8 @@ function skip<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
 ): ListType.Skip<N, T>;
-function skip<A>(list: readonly A[], num: NonNegativeIndexType): readonly A[];
-function skip<A>(
-  list: readonly A[],
-  num: NonNegativeIndexType | SmallUint
-): readonly A[] {
+function skip<A>(list: readonly A[], num: SafeUint): readonly A[];
+function skip<A>(list: readonly A[], num: SafeUint | SmallUint): readonly A[] {
   return sliceClamped(list, num, size(list));
 }
 
@@ -254,13 +251,10 @@ function skipLast<T extends readonly unknown[], N extends SmallUint>(
   list: T,
   num: N
 ): ListType.SkipLast<N, T>;
+function skipLast<A>(list: readonly A[], num: SafeUint): readonly A[];
 function skipLast<A>(
   list: readonly A[],
-  num: NonNegativeIndexType
-): readonly A[];
-function skipLast<A>(
-  list: readonly A[],
-  num: NonNegativeIndexType | SmallUint
+  num: SafeUint | SmallUint
 ): readonly A[] {
   return sliceClamped(list, 0, SafeUint.sub(size(list), num));
 }
@@ -269,7 +263,7 @@ const pop = butLast;
 
 const flatMap = <A, M>(
   list: readonly A[],
-  mapper: (value: A, key: NonNegativeIndexType) => readonly M[]
+  mapper: (value: A, key: SafeUint) => readonly M[]
 ): readonly M[] => list.flatMap(mapper);
 
 // TODO: add an overload of NonEmpty case
@@ -284,25 +278,25 @@ const zip = <T1 extends readonly unknown[], T2 extends readonly unknown[]>(
 
 const filterNot = <A>(
   list: readonly A[],
-  predicate: (a: A, index: NonNegativeIndexType) => boolean
+  predicate: (a: A, index: SafeUint) => boolean
 ): readonly A[] => list.filter((a, i) => !predicate(a, i));
 
 const set = <A, U>(
   list: readonly A[],
-  index: NonNegativeIndexType | SmallUint,
+  index: SafeUint,
   newValue: U
 ): readonly (A | U)[] => list.map((a, i) => (i === index ? newValue : a));
 
 const update = <A, U>(
   list: readonly A[],
-  index: NonNegativeIndexType | SmallUint,
+  index: SafeUint,
   updater: (prev: A) => U
 ): readonly (A | U)[] => list.map((a, i) => (i === index ? updater(a) : a));
 
 // TODO: improve type
 const inserted = <A>(
   list: readonly A[],
-  index: IndexType | SmallInt,
+  index: SafeInt,
   newValue: A
 ): readonly A[] => {
   const mut_temp = Array.from(list);
@@ -314,7 +308,7 @@ const inserted = <A>(
 
 const removed = <A>(
   list: readonly A[],
-  index: IndexType | SmallInt
+  index: SafeInt | SmallInt
 ): readonly A[] => {
   const mut_temp = Array.from(list);
 
@@ -341,7 +335,7 @@ const concat = <T1 extends readonly unknown[], T2 extends readonly unknown[]>(
 const partition = <
   N extends
     | Exclude<SmallUint, 0>
-    | IntersectBrand<NonNegativeIndexType, NonZeroNumber>,
+    | IntersectBrand<SafeUintBrand, NonZeroNumber>,
   A
 >(
   list: readonly A[],
@@ -511,11 +505,7 @@ const sum = (list: readonly number[]): number =>
 
 const foldl = <A, S>(
   list: readonly A[],
-  callbackfn: (
-    previousValue: S,
-    currentValue: A,
-    currentIndex: NonNegativeIndexType
-  ) => S,
+  callbackfn: (previousValue: S, currentValue: A, currentIndex: SafeUint) => S,
   initialValue: S
 ): S => list.reduce(callbackfn, initialValue);
 
@@ -523,11 +513,7 @@ const reduce = foldl;
 
 const foldr = <A, S>(
   list: readonly A[],
-  callbackfn: (
-    previousValue: S,
-    currentValue: A,
-    currentIndex: NonNegativeIndexType
-  ) => S,
+  callbackfn: (previousValue: S, currentValue: A, currentIndex: SafeUint) => S,
   initialValue: S
 ): S => list.reduceRight(callbackfn, initialValue);
 
@@ -538,10 +524,7 @@ const scan = <A, B>(
   reducer: Reducer<B, A>,
   init: B
 ): NonEmptyArray<B> => {
-  const mut_result: B[] = Array.from(
-    { length: toSafeUint(list.length + 1) },
-    () => init
-  );
+  const mut_result: B[] = Array.from({ length: list.length + 1 }, () => init);
 
   let mut_acc = init;
 
@@ -555,24 +538,24 @@ const scan = <A, B>(
 
 const count = <A>(
   list: readonly A[],
-  predicate: (value: A, index: NonNegativeIndexType) => boolean = () => true
-): NonNegativeIndexType =>
-  list.reduce<NonNegativeIndexType>(
+  predicate: (value: A, index: SafeUint) => boolean = () => true
+): SafeUint =>
+  list.reduce<SafeUint>(
     (acc, curr, index) =>
       (predicate as (value: A, idx: number) => boolean)(curr, index)
         ? SafeUint.add(acc, 1)
         : acc,
-    toSafeUint(0)
+    0
   );
 
 const countBy = <A, G extends Primitive>(
   list: readonly A[],
-  grouper: (value: A, index: NonNegativeIndexType) => G
-): IMap<G, NonNegativeIndexType> => {
-  const mut_groups = new MutableMap<G, NonNegativeIndexType>();
+  grouper: (value: A, index: SafeUint) => G
+): IMap<G, SafeUint> => {
+  const mut_groups = new MutableMap<G, SafeUint>();
 
   for (const [index, e] of list.entries()) {
-    const key = grouper(e, toSafeUint(index));
+    const key = grouper(e, index);
     const curr = mut_groups.get(key) ?? 0;
 
     mut_groups.set(key, SafeUint.add(curr, 1));
@@ -583,12 +566,12 @@ const countBy = <A, G extends Primitive>(
 
 const groupBy = <A, G extends Primitive>(
   list: readonly A[],
-  grouper: (value: A, index: NonNegativeIndexType) => G
+  grouper: (value: A, index: SafeUint) => G
 ): IMap<G, readonly A[]> => {
   const mut_groups = new MutableMap<G, A[]>();
 
   for (const [index, e] of list.entries()) {
-    const key = grouper(e, toSafeUint(index));
+    const key = grouper(e, index);
 
     if (mut_groups.has(key)) {
       const mut_g = mut_groups.get(key);
@@ -638,10 +621,8 @@ function uniqBy<A, B>(
   });
 }
 
-const indexIsInRange = <T>(
-  list: readonly T[],
-  index: NonNegativeIndexType | SmallUint
-): boolean => Num.isInRange(0, list.length)(index);
+const indexIsInRange = <T>(list: readonly T[], index: SafeUint): boolean =>
+  Num.isInRange(0, list.length)(index);
 
 const eq = <T>(list1: readonly T[], list2: readonly T[]): boolean =>
   list1.length === list2.length && list1.every((v, i) => v === list2[i]);
