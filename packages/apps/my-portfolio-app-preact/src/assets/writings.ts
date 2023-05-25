@@ -2,9 +2,24 @@ import { type WritingsInfo } from '../types';
 
 export const writings: readonly WritingsInfo[] = [
   {
+    id: 'typescript-type-branding',
+    link: 'https://zenn.dev/noshiro_piko/articles/typescript-branded-type-int',
+    title: 'TypeScript の Type Branding をより便利に活用する方法のまとめ',
+    subtitle: '',
+    body: 'TypeScript で用いられることのある Type Branding というハックをより便利に活用する方法をまとめました。',
+  },
+  {
+    id: 'tatekae',
+    link: 'https://docs.google.com/presentation/d/1YlzL2HnN73eB13s8t0EMAoqbLMCMb3Zrb6QJ_vTUCSk/edit#slide=id.p',
+    title: '最短手数の立替精算方法を計算するアルゴリズム',
+    subtitle:
+      '旅先で立て替えた支払いの最適な精算方法を計算する効率の良いアルゴリズムについて',
+    body: '',
+  },
+  {
     id: 'io-ts',
     link: 'https://docs.google.com/presentation/d/19YwEkeNl8x3IWglTv8YjcOZPyMVympXn0qyDLf2mXUI/edit#slide=id.p',
-    title: 'io-ts のようなライブラリを 自作した',
+    title: 'io-ts のようなライブラリを自作した',
     subtitle: '自作ライブラリ "@noshiro/io-ts" の紹介スライド',
     body: '',
   },

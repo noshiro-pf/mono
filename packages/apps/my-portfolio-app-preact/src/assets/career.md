@@ -1,6 +1,8 @@
 # Links
 
 -   [Github](https://github.com/noshiro-pf)
+-   [Zenn](https://zenn.dev/noshiro_piko)
+-   [Qiita](https://qiita.com/pikohideaki)
 -   [Forkwell Jobs](https://portfolio.forkwell.com/@Hideaki_Noshiro)
 -   [Wantedly](https://www.wantedly.com/id/hideaki_noshiro)
 -   [Twitter](https://twitter.com/noshiro_piko)
