@@ -15,9 +15,7 @@ export const convertRp60ArgToRpArgsShared = (
 > => {
   const argsConverted: readonly string[] = pipe(
     Arr.range(arg1AsNumber, arg2AsNumber)
-  ).chain((list) =>
-    list.map((hour: number) => `${hour}:00-${hour + 1}:00`)
-  ).value;
+  ).chain((list) => list.map((hour) => `${hour}:00-${hour + 1}:00`)).value;
 
   return Result.ok({ title, args: argsConverted });
 };
@@ -73,7 +71,7 @@ export const convertRp30ArgToRpArgsShared = (
   const argsConverted: readonly string[] = pipe(
     Arr.range(arg1AsNumber, arg2AsNumber)
   ).chain((list) =>
-    Arr.flatMap(list, (hour: number) => [
+    Arr.flatMap(list, (hour) => [
       `${hour}:00-${hour}:30`,
       `${hour}:30-${hour + 1}:00`,
     ])

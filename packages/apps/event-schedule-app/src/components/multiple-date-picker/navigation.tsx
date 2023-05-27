@@ -2,12 +2,12 @@ import { Button } from '@blueprintjs/core';
 import { monthsList } from '@noshiro/ts-utils-additional';
 import { BpSelect } from '../bp';
 
-const thisYear = toUint32(DateUtils.getLocaleYear(DateUtils.today()));
+const thisYear = toSafeUint(DateUtils.getLocaleYear(DateUtils.today()));
 const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());
 
 const yearOption: readonly YearEnum[] = Arr.range(
-  Uint32.sub(thisYear, 100),
-  Uint32.add(thisYear, 100)
+  SafeUint.sub(thisYear, 100),
+  SafeUint.add(thisYear, 100)
 );
 const monthOption: readonly OptionProps[] = monthsList.en.map((e) => ({
   value: e.value,

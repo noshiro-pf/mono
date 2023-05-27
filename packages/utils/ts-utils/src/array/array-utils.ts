@@ -151,11 +151,22 @@ function newArray<V>(len: SafeUint, init: V): readonly V[] {
   return Array.from({ length: len }, () => init);
 }
 
-// TODO: improve return type
-function range<S extends SmallInt, E extends SmallInt>(
+type LEQ = {
+  readonly [N in Index<512>]: Index<N>;
+};
+
+type RangeList<S extends SmallUint, E extends SmallUint> = BoolOr<
+  IsUnion<S>,
+  IsUnion<E>
+> extends true
+  ? readonly RelaxedExclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくないので、その回避のため
+  : ListType.Skip<S, Seq<E>>;
+
+function range<S extends SmallUint, E extends SmallUint>(
   start: S,
-  end: E
-): readonly UintRange<S, E>[];
+  end: E,
+  step?: 1
+): RangeList<S, E>;
 
 function range(
   start: SafeUint,
