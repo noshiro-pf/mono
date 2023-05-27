@@ -1,5 +1,13 @@
 type PropertyKey = string | number | symbol;
 
+
+/**
+ * Make all properties in T optional
+ */
+type Partial<T> = {
+  [P in keyof T]?: T[P];
+};
+
 /**
  * Make all properties in T readonly
  */
@@ -26,6 +34,11 @@ type Omit<T, K extends keyof T> = Pick<
   T,
   Exclude<keyof T, K>
 >;
+
+/**
+ * Extract from T those types that are assignable to U
+ */
+type Extract<T, U> = T extends U ? T : never;
 
 /**
  * Construct a type with a set of properties K of type T
