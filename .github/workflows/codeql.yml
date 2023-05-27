@@ -22,7 +22,11 @@ on:
       - '.gitignore'
       - '.cspell.json'
       - '**.md'
+      - '**.png'
+      - '**.jpg'
       - '**.txt'
+      - 'articles/**'
+      - 'books/**'
       - 'docs/**'
       - 'experimental/**'
   # schedule:
