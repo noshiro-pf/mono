@@ -1,6 +1,6 @@
 import { IMap } from '../collections';
 import { expectType } from '../expect-type';
-import { toSafeUint, toUint32 } from '../num';
+import { toSafeUint } from '../num';
 import { Arr } from './array-utils';
 
 describe('ArrayUtils.isEmpty', () => {
@@ -36,7 +36,7 @@ describe('ArrayUtils.zeros', () => {
   });
 
   test('unknown length', () => {
-    const n: Uint32 = toUint32(3);
+    const n: SafeUint = toSafeUint(3);
     const result = Arr.zeros(n);
 
     expectType<typeof result, readonly 0[]>('=');
@@ -551,7 +551,7 @@ describe('ArrayUtils.insert', () => {
     });
   }
   {
-    const result = Arr.inserted(xs, toUint32(999), 5);
+    const result = Arr.inserted(xs, toSafeUint(999), 5);
 
     expectType<typeof result, readonly (1 | 2 | 3 | 5)[]>('=');
 
@@ -1125,7 +1125,15 @@ describe('ArrayUtils.range', () => {
   test('range(1, 3)', () => {
     const result = Arr.range(1, 3);
 
-    expectType<typeof result, readonly (1 | 2)[]>('=');
+    expectType<typeof result, readonly [1, 2]>('=');
+
+    expect(result).toStrictEqual([1, 2]);
+  });
+
+  test('range(1, 3, 1)', () => {
+    const result = Arr.range(1, 3, 1);
+
+    expectType<typeof result, readonly [1, 2]>('=');
 
     expect(result).toStrictEqual([1, 2]);
   });
@@ -1133,7 +1141,7 @@ describe('ArrayUtils.range', () => {
   test('range(0, 0)', () => {
     const result = Arr.range(0, 0);
 
-    expectType<typeof result, readonly never[]>('=');
+    expectType<typeof result, readonly []>('=');
 
     expect(result).toStrictEqual([]);
   });
@@ -1141,9 +1149,47 @@ describe('ArrayUtils.range', () => {
   test('range(0, 1)', () => {
     const result = Arr.range(0, 1);
 
-    expectType<typeof result, readonly 0[]>('=');
+    expectType<typeof result, readonly [0]>('=');
 
     expect(result).toStrictEqual([0]);
+  });
+
+  test('range(0, -1)', () => {
+    const result = Arr.range(0, -1);
+
+    expectType<typeof result, readonly SafeInt[]>('=');
+
+    expect(result).toStrictEqual([]);
+  });
+
+  test('range(SmallUint, SmallUint)', () => {
+    const s = 0 as SmallUint;
+    const e = 1 as SmallUint;
+    const result = Arr.range(s, e);
+
+    expectType<typeof result, readonly Exclude<SmallUint, 511>[]>('=');
+
+    expect(result).toStrictEqual([0]);
+  });
+
+  test('range(0 | 1 | 2, 1 | 2 | 3)', () => {
+    const s = 0 as 0 | 1 | 2;
+    const e = 1 as 1 | 2 | 3;
+    const result = Arr.range(s, e);
+
+    expectType<typeof result, readonly (0 | 1 | 2)[]>('=');
+
+    expect(result).toStrictEqual([0]);
+  });
+
+  test('range(2|3, 5|6|7)', () => {
+    const s = 2 as 2 | 3;
+    const e = 5 as 5 | 6 | 7;
+    const result = Arr.range(s, e);
+
+    expectType<typeof result, readonly (2 | 3 | 4 | 5 | 6)[]>('=');
+
+    expect(result).toStrictEqual([2, 3, 4]);
   });
 
   test('range(0, 10, 2)', () => {

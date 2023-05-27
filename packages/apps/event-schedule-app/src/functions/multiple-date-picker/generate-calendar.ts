@@ -63,10 +63,10 @@ const genYmdRangeList = (
   from: DateEnum,
   to: DateEnum
 ): readonly YearMonthDate[] =>
-  Arr.range(from, Uint32.add(to, 1)).map((n) => ({
+  Arr.range(from, Uint8.add(to, 1) as DateEnum | 32).map((n) => ({
     year,
     month,
-    date: n as DateEnum,
+    date: n,
   }));
 
 const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): DateUtils =>
