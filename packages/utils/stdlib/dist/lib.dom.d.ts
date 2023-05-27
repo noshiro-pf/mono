@@ -2869,7 +2869,7 @@ interface Body {
   arrayBuffer(): Promise<ArrayBuffer>;
   blob(): Promise<Blob>;
   formData(): Promise<FormData>;
-  json(): Promise<unknown>;
+  json(): Promise<JSONType>;
   text(): Promise<string>;
 }
 
