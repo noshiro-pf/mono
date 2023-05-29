@@ -1,9 +1,10 @@
 import { type MakeTuple } from './make-tuple';
 import { type ToNumber } from './to-number';
 
-export type Seq<N extends number> = SeqImpl<N>;
+export type Seq<N extends number> = _SeqImpl<N>;
 
-type SeqImpl<
+/** @internal */
+type _SeqImpl<
   N extends number,
   T extends readonly unknown[] = MakeTuple<unknown, N>
 > = {

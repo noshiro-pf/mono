@@ -1,5 +1,7 @@
 import { type IsNever } from './is-never';
 
+export type IsUnion<U> = _IsUnionImpl<U>;
+
 /** @internal */
 type _IsUnionImpl<U, K extends U = U> = [U] extends [never]
   ? false
@@ -8,5 +10,3 @@ type _IsUnionImpl<U, K extends U = U> = [U] extends [never]
     ? false
     : true
   : never;
-
-export type IsUnion<U> = _IsUnionImpl<U>;
