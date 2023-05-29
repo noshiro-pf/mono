@@ -15,6 +15,7 @@ experimental/**/cjs
 experimental/**/config/**/*.js
 experimental/**/scripts/**/*.js
 config/**/*.js
+!config/eslintrc/**/*.js
 scripts/**/*.js
 **/*.d.ts
 **/*.d.mts

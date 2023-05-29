@@ -619,6 +619,8 @@ namespace PreferImmutableTypes {
    *           3,
    *           4,
    *           5,
+   *           null,
+   *           "Calculating",
    *           "None",
    *           false
    *         ]
@@ -676,6 +678,8 @@ namespace PreferImmutableTypes {
    *                   3,
    *                   4,
    *                   5,
+   *                   null,
+   *                   "Calculating",
    *                   "None",
    *                   false
    *                 ]
@@ -718,6 +722,8 @@ namespace PreferImmutableTypes {
    *               3,
    *               4,
    *               5,
+   *               null,
+   *               "Calculating",
    *               "None",
    *               false
    *             ]
@@ -756,6 +762,8 @@ namespace PreferImmutableTypes {
    *                   3,
    *                   4,
    *                   5,
+   *                   null,
+   *                   "Calculating",
    *                   "None",
    *                   false
    *                 ]
@@ -798,6 +806,8 @@ namespace PreferImmutableTypes {
    *               3,
    *               4,
    *               5,
+   *               null,
+   *               "Calculating",
    *               "None",
    *               false
    *             ]
@@ -836,6 +846,8 @@ namespace PreferImmutableTypes {
    *                   3,
    *                   4,
    *                   5,
+   *                   null,
+   *                   "Calculating",
    *                   "None",
    *                   false
    *                 ]
@@ -881,6 +893,8 @@ namespace PreferImmutableTypes {
    *               3,
    *               4,
    *               5,
+   *               null,
+   *               "Calculating",
    *               "None",
    *               false
    *             ]
@@ -1030,6 +1044,7 @@ namespace PreferImmutableTypes {
       | 3
       | 4
       | 5
+      | 'Calculating'
       | 'None'
       | false;
     readonly ignoreInferredTypes?: boolean;
@@ -1046,6 +1061,7 @@ namespace PreferImmutableTypes {
             | 3
             | 4
             | 5
+            | 'Calculating'
             | 'None'
             | false;
           readonly ignoreInferredTypes?: boolean;
@@ -1060,6 +1076,7 @@ namespace PreferImmutableTypes {
           | 3
           | 4
           | 5
+          | 'Calculating'
           | 'None'
           | false
         );
@@ -1074,6 +1091,7 @@ namespace PreferImmutableTypes {
             | 3
             | 4
             | 5
+            | 'Calculating'
             | 'None'
             | false;
           readonly ignoreInferredTypes?: boolean;
@@ -1088,6 +1106,7 @@ namespace PreferImmutableTypes {
           | 3
           | 4
           | 5
+          | 'Calculating'
           | 'None'
           | false
         );
@@ -1102,6 +1121,7 @@ namespace PreferImmutableTypes {
             | 3
             | 4
             | 5
+            | 'Calculating'
             | 'None'
             | false;
           readonly ignoreInferredTypes?: boolean;
@@ -1117,6 +1137,7 @@ namespace PreferImmutableTypes {
           | 3
           | 4
           | 5
+          | 'Calculating'
           | 'None'
           | false
         );
@@ -1408,7 +1429,9 @@ namespace TypeDeclarationImmutability {
    *                 2,
    *                 3,
    *                 4,
-   *                 5
+   *                 5,
+   *                 null,
+   *                 "Calculating"
    *               ]
    *             },
    *             "comparator": {
@@ -1498,6 +1521,8 @@ namespace TypeDeclarationImmutability {
             | 3
             | 4
             | 5
+            | null
+            | 'Calculating'
           )
         | (
             | 'Mutable'
@@ -1509,6 +1534,8 @@ namespace TypeDeclarationImmutability {
             | 3
             | 4
             | 5
+            | null
+            | 'Calculating'
           );
       readonly comparator?:
         | (

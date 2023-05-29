@@ -66,13 +66,13 @@ const metaToString = (meta: Meta): string => {
 
   const tableHeader = ['key', 'value'] as const;
   const [longestKeyLength, longestValueLength] = keyValuesStr.reduce<
-    readonly [number, number]
+    readonly [SafeUint, SafeUint]
   >(
     ([keyMax, valueMax], [key, value]) => [
-      Math.max(keyMax, key.length),
-      Math.max(valueMax, value.length),
+      Math.max(keyMax, key.length) as SafeUint,
+      Math.max(valueMax, value.length) as SafeUint,
     ],
-    [tableHeader[0].length, tableHeader[1].length]
+    [tableHeader[0].length as SafeUint, tableHeader[1].length as SafeUint]
   );
 
   const result = [
@@ -215,7 +215,7 @@ const createResult = async (
               (_, i) =>
                 `   | readonly [Linter.RuleLevel, ${OptionsStrs.slice(
                   0,
-                  i + 1
+                  (i + 1) as SafeUint
                 ).join(', ')}]`
             )
           );

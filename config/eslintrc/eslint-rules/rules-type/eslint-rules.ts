@@ -8,7 +8,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleLevel, unknown]> =
 
 /**
  * @description Enforce getter and setter pairs in objects and classes
- * @link https://eslint.org/docs/rules/accessor-pairs
+ * @link https://eslint.org/docs/latest/rules/accessor-pairs
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -55,7 +55,7 @@ namespace AccessorPairs {
 
 /**
  * @description Enforce linebreaks after opening and before closing array brackets
- * @link https://eslint.org/docs/rules/array-bracket-newline
+ * @link https://eslint.org/docs/latest/rules/array-bracket-newline
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -113,7 +113,7 @@ namespace ArrayBracketNewline {
 
 /**
  * @description Enforce consistent spacing inside array brackets
- * @link https://eslint.org/docs/rules/array-bracket-spacing
+ * @link https://eslint.org/docs/latest/rules/array-bracket-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -167,7 +167,7 @@ namespace ArrayBracketSpacing {
 
 /**
  * @description Enforce `return` statements in callbacks of array methods
- * @link https://eslint.org/docs/rules/array-callback-return
+ * @link https://eslint.org/docs/latest/rules/array-callback-return
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -209,7 +209,7 @@ namespace ArrayCallbackReturn {
 
 /**
  * @description Enforce line breaks after each array element
- * @link https://eslint.org/docs/rules/array-element-newline
+ * @link https://eslint.org/docs/latest/rules/array-element-newline
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -301,7 +301,7 @@ namespace ArrayElementNewline {
 
 /**
  * @description Require braces around arrow function bodies
- * @link https://eslint.org/docs/rules/arrow-body-style
+ * @link https://eslint.org/docs/latest/rules/arrow-body-style
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -373,7 +373,7 @@ namespace ArrowBodyStyle {
 
 /**
  * @description Require parentheses around arrow function arguments
- * @link https://eslint.org/docs/rules/arrow-parens
+ * @link https://eslint.org/docs/latest/rules/arrow-parens
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -420,7 +420,7 @@ namespace ArrowParens {
 
 /**
  * @description Enforce consistent spacing before and after the arrow in arrow functions
- * @link https://eslint.org/docs/rules/arrow-spacing
+ * @link https://eslint.org/docs/latest/rules/arrow-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -463,7 +463,7 @@ namespace ArrowSpacing {
 
 /**
  * @description Enforce the use of variables within the scope they are defined
- * @link https://eslint.org/docs/rules/block-scoped-var
+ * @link https://eslint.org/docs/latest/rules/block-scoped-var
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -476,7 +476,7 @@ namespace BlockScopedVar {
 
 /**
  * @description Disallow or enforce spaces inside of blocks after opening block and before closing block
- * @link https://eslint.org/docs/rules/block-spacing
+ * @link https://eslint.org/docs/latest/rules/block-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -508,7 +508,7 @@ namespace BlockSpacing {
 
 /**
  * @description Enforce consistent brace style for blocks
- * @link https://eslint.org/docs/rules/brace-style
+ * @link https://eslint.org/docs/latest/rules/brace-style
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -556,7 +556,7 @@ namespace BraceStyle {
 
 /**
  * @description Require `return` statements after callbacks
- * @link https://eslint.org/docs/rules/callback-return
+ * @link https://eslint.org/docs/latest/rules/callback-return
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -584,7 +584,7 @@ namespace CallbackReturn {
 
 /**
  * @description Enforce camelcase naming convention
- * @link https://eslint.org/docs/rules/camelcase
+ * @link https://eslint.org/docs/latest/rules/camelcase
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -652,7 +652,7 @@ namespace Camelcase {
 
 /**
  * @description Enforce or disallow capitalization of the first letter of a comment
- * @link https://eslint.org/docs/rules/capitalized-comments
+ * @link https://eslint.org/docs/latest/rules/capitalized-comments
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -759,7 +759,7 @@ namespace CapitalizedComments {
 
 /**
  * @description Enforce that class methods utilize `this`
- * @link https://eslint.org/docs/rules/class-methods-use-this
+ * @link https://eslint.org/docs/latest/rules/class-methods-use-this
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -803,7 +803,7 @@ namespace ClassMethodsUseThis {
 
 /**
  * @description Require or disallow trailing commas
- * @link https://eslint.org/docs/rules/comma-dangle
+ * @link https://eslint.org/docs/latest/rules/comma-dangle
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -902,7 +902,7 @@ namespace CommaDangle {
 
 /**
  * @description Enforce consistent spacing before and after commas
- * @link https://eslint.org/docs/rules/comma-spacing
+ * @link https://eslint.org/docs/latest/rules/comma-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -945,7 +945,7 @@ namespace CommaSpacing {
 
 /**
  * @description Enforce consistent comma style
- * @link https://eslint.org/docs/rules/comma-style
+ * @link https://eslint.org/docs/latest/rules/comma-style
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -994,7 +994,7 @@ namespace CommaStyle {
 
 /**
  * @description Enforce a maximum cyclomatic complexity allowed in a program
- * @link https://eslint.org/docs/rules/complexity
+ * @link https://eslint.org/docs/latest/rules/complexity
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1046,7 +1046,7 @@ namespace Complexity {
 
 /**
  * @description Enforce consistent spacing inside computed property brackets
- * @link https://eslint.org/docs/rules/computed-property-spacing
+ * @link https://eslint.org/docs/latest/rules/computed-property-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1093,7 +1093,7 @@ namespace ComputedPropertySpacing {
 
 /**
  * @description Require `return` statements to either always or never specify values
- * @link https://eslint.org/docs/rules/consistent-return
+ * @link https://eslint.org/docs/latest/rules/consistent-return
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1130,7 +1130,7 @@ namespace ConsistentReturn {
 
 /**
  * @description Enforce consistent naming when capturing the current execution context
- * @link https://eslint.org/docs/rules/consistent-this
+ * @link https://eslint.org/docs/latest/rules/consistent-this
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1161,7 +1161,7 @@ namespace ConsistentThis {
 
 /**
  * @description Require `super()` calls in constructors
- * @link https://eslint.org/docs/rules/constructor-super
+ * @link https://eslint.org/docs/latest/rules/constructor-super
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -1174,7 +1174,7 @@ namespace ConstructorSuper {
 
 /**
  * @description Enforce consistent brace style for all control statements
- * @link https://eslint.org/docs/rules/curly
+ * @link https://eslint.org/docs/latest/rules/curly
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1238,7 +1238,7 @@ namespace Curly {
 
 /**
  * @description Require `default` cases in `switch` statements
- * @link https://eslint.org/docs/rules/default-case
+ * @link https://eslint.org/docs/latest/rules/default-case
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1274,7 +1274,7 @@ namespace DefaultCase {
 
 /**
  * @description Enforce default clauses in switch statements to be last
- * @link https://eslint.org/docs/rules/default-case-last
+ * @link https://eslint.org/docs/latest/rules/default-case-last
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1287,7 +1287,7 @@ namespace DefaultCaseLast {
 
 /**
  * @description Enforce default parameters to be last
- * @link https://eslint.org/docs/rules/default-param-last
+ * @link https://eslint.org/docs/latest/rules/default-param-last
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1300,7 +1300,7 @@ namespace DefaultParamLast {
 
 /**
  * @description Enforce consistent newlines before and after dots
- * @link https://eslint.org/docs/rules/dot-location
+ * @link https://eslint.org/docs/latest/rules/dot-location
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -1332,7 +1332,7 @@ namespace DotLocation {
 
 /**
  * @description Enforce dot notation whenever possible
- * @link https://eslint.org/docs/rules/dot-notation
+ * @link https://eslint.org/docs/latest/rules/dot-notation
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1375,7 +1375,7 @@ namespace DotNotation {
 
 /**
  * @description Require or disallow newline at the end of files
- * @link https://eslint.org/docs/rules/eol-last
+ * @link https://eslint.org/docs/latest/rules/eol-last
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1409,7 +1409,7 @@ namespace EolLast {
 
 /**
  * @description Require the use of `===` and `!==`
- * @link https://eslint.org/docs/rules/eqeqeq
+ * @link https://eslint.org/docs/latest/rules/eqeqeq
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1483,7 +1483,7 @@ namespace Eqeqeq {
 
 /**
  * @description Enforce "for" loop update clause moving the counter in the right direction
- * @link https://eslint.org/docs/rules/for-direction
+ * @link https://eslint.org/docs/latest/rules/for-direction
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -1496,7 +1496,7 @@ namespace ForDirection {
 
 /**
  * @description Require or disallow spacing between function identifiers and their invocations
- * @link https://eslint.org/docs/rules/func-call-spacing
+ * @link https://eslint.org/docs/latest/rules/func-call-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1567,7 +1567,7 @@ namespace FuncCallSpacing {
 
 /**
  * @description Require function names to match the name of the variable or property to which they are assigned
- * @link https://eslint.org/docs/rules/func-name-matching
+ * @link https://eslint.org/docs/latest/rules/func-name-matching
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1652,7 +1652,7 @@ namespace FuncNameMatching {
 
 /**
  * @description Require or disallow named `function` expressions
- * @link https://eslint.org/docs/rules/func-names
+ * @link https://eslint.org/docs/latest/rules/func-names
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1709,7 +1709,7 @@ namespace FuncNames {
 
 /**
  * @description Enforce the consistent use of either `function` declarations or expressions
- * @link https://eslint.org/docs/rules/func-style
+ * @link https://eslint.org/docs/latest/rules/func-style
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1755,7 +1755,7 @@ namespace FuncStyle {
 
 /**
  * @description Enforce line breaks between arguments of a function call
- * @link https://eslint.org/docs/rules/function-call-argument-newline
+ * @link https://eslint.org/docs/latest/rules/function-call-argument-newline
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1788,7 +1788,7 @@ namespace FunctionCallArgumentNewline {
 
 /**
  * @description Enforce consistent line breaks inside function parentheses
- * @link https://eslint.org/docs/rules/function-paren-newline
+ * @link https://eslint.org/docs/latest/rules/function-paren-newline
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1841,7 +1841,7 @@ namespace FunctionParenNewline {
 
 /**
  * @description Enforce consistent spacing around `*` operators in generator functions
- * @link https://eslint.org/docs/rules/generator-star-spacing
+ * @link https://eslint.org/docs/latest/rules/generator-star-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -1986,7 +1986,7 @@ namespace GeneratorStarSpacing {
 
 /**
  * @description Enforce `return` statements in getters
- * @link https://eslint.org/docs/rules/getter-return
+ * @link https://eslint.org/docs/latest/rules/getter-return
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -2023,7 +2023,7 @@ namespace GetterReturn {
 
 /**
  * @description Require `require()` calls to be placed at top-level module scope
- * @link https://eslint.org/docs/rules/global-require
+ * @link https://eslint.org/docs/latest/rules/global-require
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2037,7 +2037,7 @@ namespace GlobalRequire {
 
 /**
  * @description Require grouped accessor pairs in object literals and classes
- * @link https://eslint.org/docs/rules/grouped-accessor-pairs
+ * @link https://eslint.org/docs/latest/rules/grouped-accessor-pairs
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2069,7 +2069,7 @@ namespace GroupedAccessorPairs {
 
 /**
  * @description Require `for-in` loops to include an `if` statement
- * @link https://eslint.org/docs/rules/guard-for-in
+ * @link https://eslint.org/docs/latest/rules/guard-for-in
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2082,7 +2082,7 @@ namespace GuardForIn {
 
 /**
  * @description Require error handling in callbacks
- * @link https://eslint.org/docs/rules/handle-callback-err
+ * @link https://eslint.org/docs/latest/rules/handle-callback-err
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2107,7 +2107,7 @@ namespace HandleCallbackErr {
 
 /**
  * @description Disallow specified identifiers
- * @link https://eslint.org/docs/rules/id-blacklist
+ * @link https://eslint.org/docs/latest/rules/id-blacklist
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2134,7 +2134,7 @@ namespace IdBlacklist {
 
 /**
  * @description Disallow specified identifiers
- * @link https://eslint.org/docs/rules/id-denylist
+ * @link https://eslint.org/docs/latest/rules/id-denylist
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2164,7 +2164,7 @@ namespace IdDenylist {
 
 /**
  * @description Enforce minimum and maximum identifier lengths
- * @link https://eslint.org/docs/rules/id-length
+ * @link https://eslint.org/docs/latest/rules/id-length
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2228,7 +2228,7 @@ namespace IdLength {
 
 /**
  * @description Require identifiers to match a specified regular expression
- * @link https://eslint.org/docs/rules/id-match
+ * @link https://eslint.org/docs/latest/rules/id-match
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2286,7 +2286,7 @@ namespace IdMatch {
 
 /**
  * @description Enforce the location of arrow function bodies
- * @link https://eslint.org/docs/rules/implicit-arrow-linebreak
+ * @link https://eslint.org/docs/latest/rules/implicit-arrow-linebreak
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2318,7 +2318,7 @@ namespace ImplicitArrowLinebreak {
 
 /**
  * @description Enforce consistent indentation
- * @link https://eslint.org/docs/rules/indent
+ * @link https://eslint.org/docs/latest/rules/indent
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2636,7 +2636,7 @@ namespace Indent {
 
 /**
  * @description Enforce consistent indentation
- * @link https://eslint.org/docs/rules/indent-legacy
+ * @link https://eslint.org/docs/latest/rules/indent-legacy
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2803,7 +2803,7 @@ namespace IndentLegacy {
 
 /**
  * @description Require or disallow initialization in variable declarations
- * @link https://eslint.org/docs/rules/init-declarations
+ * @link https://eslint.org/docs/latest/rules/init-declarations
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2873,7 +2873,7 @@ namespace InitDeclarations {
 
 /**
  * @description Enforce the consistent use of either double or single quotes in JSX attributes
- * @link https://eslint.org/docs/rules/jsx-quotes
+ * @link https://eslint.org/docs/latest/rules/jsx-quotes
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -2905,7 +2905,7 @@ namespace JsxQuotes {
 
 /**
  * @description Enforce consistent spacing between keys and values in object literal properties
- * @link https://eslint.org/docs/rules/key-spacing
+ * @link https://eslint.org/docs/latest/rules/key-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -3180,7 +3180,7 @@ namespace KeySpacing {
 
 /**
  * @description Enforce consistent spacing before and after keywords
- * @link https://eslint.org/docs/rules/keyword-spacing
+ * @link https://eslint.org/docs/latest/rules/keyword-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -4319,7 +4319,7 @@ namespace KeywordSpacing {
 
 /**
  * @description Enforce position of line comments
- * @link https://eslint.org/docs/rules/line-comment-position
+ * @link https://eslint.org/docs/latest/rules/line-comment-position
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -4382,7 +4382,7 @@ namespace LineCommentPosition {
 
 /**
  * @description Enforce consistent linebreak style
- * @link https://eslint.org/docs/rules/linebreak-style
+ * @link https://eslint.org/docs/latest/rules/linebreak-style
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -4414,7 +4414,7 @@ namespace LinebreakStyle {
 
 /**
  * @description Require empty lines around comments
- * @link https://eslint.org/docs/rules/lines-around-comment
+ * @link https://eslint.org/docs/latest/rules/lines-around-comment
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -4514,7 +4514,7 @@ namespace LinesAroundComment {
 
 /**
  * @description Require or disallow newlines around directives
- * @link https://eslint.org/docs/rules/lines-around-directive
+ * @link https://eslint.org/docs/latest/rules/lines-around-directive
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -4566,7 +4566,7 @@ namespace LinesAroundDirective {
 
 /**
  * @description Require or disallow an empty line between class members
- * @link https://eslint.org/docs/rules/lines-between-class-members
+ * @link https://eslint.org/docs/latest/rules/lines-between-class-members
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -4612,8 +4612,8 @@ namespace LinesBetweenClassMembers {
 }
 
 /**
- * @description Require or disallow logical assignment logical operator shorthand
- * @link https://eslint.org/docs/rules/logical-assignment-operators
+ * @description Require or disallow logical assignment operator shorthand
+ * @link https://eslint.org/docs/latest/rules/logical-assignment-operators
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -4680,7 +4680,7 @@ namespace LogicalAssignmentOperators {
 
 /**
  * @description Enforce a maximum number of classes per file
- * @link https://eslint.org/docs/rules/max-classes-per-file
+ * @link https://eslint.org/docs/latest/rules/max-classes-per-file
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -4731,7 +4731,7 @@ namespace MaxClassesPerFile {
 
 /**
  * @description Enforce a maximum depth that blocks can be nested
- * @link https://eslint.org/docs/rules/max-depth
+ * @link https://eslint.org/docs/latest/rules/max-depth
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -4783,7 +4783,7 @@ namespace MaxDepth {
 
 /**
  * @description Enforce a maximum line length
- * @link https://eslint.org/docs/rules/max-len
+ * @link https://eslint.org/docs/latest/rules/max-len
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -4984,7 +4984,7 @@ namespace MaxLen {
 
 /**
  * @description Enforce a maximum number of lines per file
- * @link https://eslint.org/docs/rules/max-lines
+ * @link https://eslint.org/docs/latest/rules/max-lines
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5039,7 +5039,7 @@ namespace MaxLines {
 
 /**
  * @description Enforce a maximum number of lines of code in a function
- * @link https://eslint.org/docs/rules/max-lines-per-function
+ * @link https://eslint.org/docs/latest/rules/max-lines-per-function
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5098,7 +5098,7 @@ namespace MaxLinesPerFunction {
 
 /**
  * @description Enforce a maximum depth that callbacks can be nested
- * @link https://eslint.org/docs/rules/max-nested-callbacks
+ * @link https://eslint.org/docs/latest/rules/max-nested-callbacks
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5150,7 +5150,7 @@ namespace MaxNestedCallbacks {
 
 /**
  * @description Enforce a maximum number of parameters in function definitions
- * @link https://eslint.org/docs/rules/max-params
+ * @link https://eslint.org/docs/latest/rules/max-params
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5202,7 +5202,7 @@ namespace MaxParams {
 
 /**
  * @description Enforce a maximum number of statements allowed in function blocks
- * @link https://eslint.org/docs/rules/max-statements
+ * @link https://eslint.org/docs/latest/rules/max-statements
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5268,7 +5268,7 @@ namespace MaxStatements {
 
 /**
  * @description Enforce a maximum number of statements allowed per line
- * @link https://eslint.org/docs/rules/max-statements-per-line
+ * @link https://eslint.org/docs/latest/rules/max-statements-per-line
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -5306,7 +5306,7 @@ namespace MaxStatementsPerLine {
 
 /**
  * @description Enforce a particular style for multiline comments
- * @link https://eslint.org/docs/rules/multiline-comment-style
+ * @link https://eslint.org/docs/latest/rules/multiline-comment-style
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5376,7 +5376,7 @@ namespace MultilineCommentStyle {
 
 /**
  * @description Enforce newlines between operands of ternary expressions
- * @link https://eslint.org/docs/rules/multiline-ternary
+ * @link https://eslint.org/docs/latest/rules/multiline-ternary
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5409,7 +5409,7 @@ namespace MultilineTernary {
 
 /**
  * @description Require constructor names to begin with a capital letter
- * @link https://eslint.org/docs/rules/new-cap
+ * @link https://eslint.org/docs/latest/rules/new-cap
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5478,7 +5478,7 @@ namespace NewCap {
 
 /**
  * @description Enforce or disallow parentheses when invoking a constructor with no arguments
- * @link https://eslint.org/docs/rules/new-parens
+ * @link https://eslint.org/docs/latest/rules/new-parens
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -5491,26 +5491,17 @@ namespace NewParens {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": [
-   *             "always",
-   *             "never"
-   *           ]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     }
-   *   ]
-   * }
+   * [
+   *   {
+   *     "enum": [
+   *       "always",
+   *       "never"
+   *     ]
+   *   }
+   * ]
    * ```
    */
-  export type Options = readonly [] | readonly ['always' | 'never'];
+  export type Options = 'always' | 'never';
 
   export type RuleEntry =
     | Linter.RuleLevel
@@ -5519,7 +5510,7 @@ namespace NewParens {
 
 /**
  * @description Require or disallow an empty line after variable declarations
- * @link https://eslint.org/docs/rules/newline-after-var
+ * @link https://eslint.org/docs/latest/rules/newline-after-var
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5548,7 +5539,7 @@ namespace NewlineAfterVar {
 
 /**
  * @description Require an empty line before `return` statements
- * @link https://eslint.org/docs/rules/newline-before-return
+ * @link https://eslint.org/docs/latest/rules/newline-before-return
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5563,7 +5554,7 @@ namespace NewlineBeforeReturn {
 
 /**
  * @description Require a newline after each call in a method chain
- * @link https://eslint.org/docs/rules/newline-per-chained-call
+ * @link https://eslint.org/docs/latest/rules/newline-per-chained-call
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5603,7 +5594,7 @@ namespace NewlinePerChainedCall {
 
 /**
  * @description Disallow the use of `alert`, `confirm`, and `prompt`
- * @link https://eslint.org/docs/rules/no-alert
+ * @link https://eslint.org/docs/latest/rules/no-alert
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5616,7 +5607,7 @@ namespace NoAlert {
 
 /**
  * @description Disallow `Array` constructors
- * @link https://eslint.org/docs/rules/no-array-constructor
+ * @link https://eslint.org/docs/latest/rules/no-array-constructor
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5629,7 +5620,7 @@ namespace NoArrayConstructor {
 
 /**
  * @description Disallow using an async function as a Promise executor
- * @link https://eslint.org/docs/rules/no-async-promise-executor
+ * @link https://eslint.org/docs/latest/rules/no-async-promise-executor
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5642,7 +5633,7 @@ namespace NoAsyncPromiseExecutor {
 
 /**
  * @description Disallow `await` inside of loops
- * @link https://eslint.org/docs/rules/no-await-in-loop
+ * @link https://eslint.org/docs/latest/rules/no-await-in-loop
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5655,7 +5646,7 @@ namespace NoAwaitInLoop {
 
 /**
  * @description Disallow bitwise operators
- * @link https://eslint.org/docs/rules/no-bitwise
+ * @link https://eslint.org/docs/latest/rules/no-bitwise
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5728,7 +5719,7 @@ namespace NoBitwise {
 
 /**
  * @description Disallow use of the `Buffer()` constructor
- * @link https://eslint.org/docs/rules/no-buffer-constructor
+ * @link https://eslint.org/docs/latest/rules/no-buffer-constructor
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5742,7 +5733,7 @@ namespace NoBufferConstructor {
 
 /**
  * @description Disallow the use of `arguments.caller` or `arguments.callee`
- * @link https://eslint.org/docs/rules/no-caller
+ * @link https://eslint.org/docs/latest/rules/no-caller
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5755,7 +5746,7 @@ namespace NoCaller {
 
 /**
  * @description Disallow lexical declarations in case clauses
- * @link https://eslint.org/docs/rules/no-case-declarations
+ * @link https://eslint.org/docs/latest/rules/no-case-declarations
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5768,7 +5759,7 @@ namespace NoCaseDeclarations {
 
 /**
  * @description Disallow `catch` clause parameters from shadowing variables in the outer scope
- * @link https://eslint.org/docs/rules/no-catch-shadow
+ * @link https://eslint.org/docs/latest/rules/no-catch-shadow
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5782,7 +5773,7 @@ namespace NoCatchShadow {
 
 /**
  * @description Disallow reassigning class members
- * @link https://eslint.org/docs/rules/no-class-assign
+ * @link https://eslint.org/docs/latest/rules/no-class-assign
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5795,7 +5786,7 @@ namespace NoClassAssign {
 
 /**
  * @description Disallow comparing against -0
- * @link https://eslint.org/docs/rules/no-compare-neg-zero
+ * @link https://eslint.org/docs/latest/rules/no-compare-neg-zero
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5808,7 +5799,7 @@ namespace NoCompareNegZero {
 
 /**
  * @description Disallow assignment operators in conditional expressions
- * @link https://eslint.org/docs/rules/no-cond-assign
+ * @link https://eslint.org/docs/latest/rules/no-cond-assign
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5839,7 +5830,7 @@ namespace NoCondAssign {
 
 /**
  * @description Disallow arrow functions where they could be confused with comparisons
- * @link https://eslint.org/docs/rules/no-confusing-arrow
+ * @link https://eslint.org/docs/latest/rules/no-confusing-arrow
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5882,7 +5873,7 @@ namespace NoConfusingArrow {
 
 /**
  * @description Disallow the use of `console`
- * @link https://eslint.org/docs/rules/no-console
+ * @link https://eslint.org/docs/latest/rules/no-console
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -5926,7 +5917,7 @@ namespace NoConsole {
 
 /**
  * @description Disallow reassigning `const` variables
- * @link https://eslint.org/docs/rules/no-const-assign
+ * @link https://eslint.org/docs/latest/rules/no-const-assign
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5939,7 +5930,7 @@ namespace NoConstAssign {
 
 /**
  * @description Disallow expressions where the operation doesn't affect the value
- * @link https://eslint.org/docs/rules/no-constant-binary-expression
+ * @link https://eslint.org/docs/latest/rules/no-constant-binary-expression
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5952,7 +5943,7 @@ namespace NoConstantBinaryExpression {
 
 /**
  * @description Disallow constant expressions in conditions
- * @link https://eslint.org/docs/rules/no-constant-condition
+ * @link https://eslint.org/docs/latest/rules/no-constant-condition
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -5989,7 +5980,7 @@ namespace NoConstantCondition {
 
 /**
  * @description Disallow returning value from constructor
- * @link https://eslint.org/docs/rules/no-constructor-return
+ * @link https://eslint.org/docs/latest/rules/no-constructor-return
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6013,7 +6004,7 @@ namespace NoConstructorReturn {
 
 /**
  * @description Disallow `continue` statements
- * @link https://eslint.org/docs/rules/no-continue
+ * @link https://eslint.org/docs/latest/rules/no-continue
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6026,7 +6017,7 @@ namespace NoContinue {
 
 /**
  * @description Disallow control characters in regular expressions
- * @link https://eslint.org/docs/rules/no-control-regex
+ * @link https://eslint.org/docs/latest/rules/no-control-regex
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6039,7 +6030,7 @@ namespace NoControlRegex {
 
 /**
  * @description Disallow the use of `debugger`
- * @link https://eslint.org/docs/rules/no-debugger
+ * @link https://eslint.org/docs/latest/rules/no-debugger
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6052,7 +6043,7 @@ namespace NoDebugger {
 
 /**
  * @description Disallow deleting variables
- * @link https://eslint.org/docs/rules/no-delete-var
+ * @link https://eslint.org/docs/latest/rules/no-delete-var
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6064,8 +6055,8 @@ namespace NoDeleteVar {
 }
 
 /**
- * @description Disallow division operators explicitly at the beginning of regular expressions
- * @link https://eslint.org/docs/rules/no-div-regex
+ * @description Disallow equal signs explicitly at the beginning of regular expressions
+ * @link https://eslint.org/docs/latest/rules/no-div-regex
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6079,7 +6070,7 @@ namespace NoDivRegex {
 
 /**
  * @description Disallow duplicate arguments in `function` definitions
- * @link https://eslint.org/docs/rules/no-dupe-args
+ * @link https://eslint.org/docs/latest/rules/no-dupe-args
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6092,7 +6083,7 @@ namespace NoDupeArgs {
 
 /**
  * @description Disallow duplicate class members
- * @link https://eslint.org/docs/rules/no-dupe-class-members
+ * @link https://eslint.org/docs/latest/rules/no-dupe-class-members
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6105,7 +6096,7 @@ namespace NoDupeClassMembers {
 
 /**
  * @description Disallow duplicate conditions in if-else-if chains
- * @link https://eslint.org/docs/rules/no-dupe-else-if
+ * @link https://eslint.org/docs/latest/rules/no-dupe-else-if
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6118,7 +6109,7 @@ namespace NoDupeElseIf {
 
 /**
  * @description Disallow duplicate keys in object literals
- * @link https://eslint.org/docs/rules/no-dupe-keys
+ * @link https://eslint.org/docs/latest/rules/no-dupe-keys
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6131,7 +6122,7 @@ namespace NoDupeKeys {
 
 /**
  * @description Disallow duplicate case labels
- * @link https://eslint.org/docs/rules/no-duplicate-case
+ * @link https://eslint.org/docs/latest/rules/no-duplicate-case
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6144,7 +6135,7 @@ namespace NoDuplicateCase {
 
 /**
  * @description Disallow duplicate module imports
- * @link https://eslint.org/docs/rules/no-duplicate-imports
+ * @link https://eslint.org/docs/latest/rules/no-duplicate-imports
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6181,7 +6172,7 @@ namespace NoDuplicateImports {
 
 /**
  * @description Disallow `else` blocks after `return` statements in `if` statements
- * @link https://eslint.org/docs/rules/no-else-return
+ * @link https://eslint.org/docs/latest/rules/no-else-return
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6219,7 +6210,7 @@ namespace NoElseReturn {
 
 /**
  * @description Disallow empty block statements
- * @link https://eslint.org/docs/rules/no-empty
+ * @link https://eslint.org/docs/latest/rules/no-empty
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -6257,7 +6248,7 @@ namespace NoEmpty {
 
 /**
  * @description Disallow empty character classes in regular expressions
- * @link https://eslint.org/docs/rules/no-empty-character-class
+ * @link https://eslint.org/docs/latest/rules/no-empty-character-class
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6270,7 +6261,7 @@ namespace NoEmptyCharacterClass {
 
 /**
  * @description Disallow empty functions
- * @link https://eslint.org/docs/rules/no-empty-function
+ * @link https://eslint.org/docs/latest/rules/no-empty-function
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6332,7 +6323,7 @@ namespace NoEmptyFunction {
 
 /**
  * @description Disallow empty destructuring patterns
- * @link https://eslint.org/docs/rules/no-empty-pattern
+ * @link https://eslint.org/docs/latest/rules/no-empty-pattern
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6345,7 +6336,7 @@ namespace NoEmptyPattern {
 
 /**
  * @description Disallow empty static blocks
- * @link https://eslint.org/docs/rules/no-empty-static-block
+ * @link https://eslint.org/docs/latest/rules/no-empty-static-block
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6358,7 +6349,7 @@ namespace NoEmptyStaticBlock {
 
 /**
  * @description Disallow `null` comparisons without type-checking operators
- * @link https://eslint.org/docs/rules/no-eq-null
+ * @link https://eslint.org/docs/latest/rules/no-eq-null
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6371,7 +6362,7 @@ namespace NoEqNull {
 
 /**
  * @description Disallow the use of `eval()`
- * @link https://eslint.org/docs/rules/no-eval
+ * @link https://eslint.org/docs/latest/rules/no-eval
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6408,7 +6399,7 @@ namespace NoEval {
 
 /**
  * @description Disallow reassigning exceptions in `catch` clauses
- * @link https://eslint.org/docs/rules/no-ex-assign
+ * @link https://eslint.org/docs/latest/rules/no-ex-assign
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6421,7 +6412,7 @@ namespace NoExAssign {
 
 /**
  * @description Disallow extending native types
- * @link https://eslint.org/docs/rules/no-extend-native
+ * @link https://eslint.org/docs/latest/rules/no-extend-native
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6461,7 +6452,7 @@ namespace NoExtendNative {
 
 /**
  * @description Disallow unnecessary calls to `.bind()`
- * @link https://eslint.org/docs/rules/no-extra-bind
+ * @link https://eslint.org/docs/latest/rules/no-extra-bind
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6475,7 +6466,7 @@ namespace NoExtraBind {
 
 /**
  * @description Disallow unnecessary boolean casts
- * @link https://eslint.org/docs/rules/no-extra-boolean-cast
+ * @link https://eslint.org/docs/latest/rules/no-extra-boolean-cast
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6513,7 +6504,7 @@ namespace NoExtraBooleanCast {
 
 /**
  * @description Disallow unnecessary labels
- * @link https://eslint.org/docs/rules/no-extra-label
+ * @link https://eslint.org/docs/latest/rules/no-extra-label
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6527,7 +6518,7 @@ namespace NoExtraLabel {
 
 /**
  * @description Disallow unnecessary parentheses
- * @link https://eslint.org/docs/rules/no-extra-parens
+ * @link https://eslint.org/docs/latest/rules/no-extra-parens
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -6635,7 +6626,7 @@ namespace NoExtraParens {
 
 /**
  * @description Disallow unnecessary semicolons
- * @link https://eslint.org/docs/rules/no-extra-semi
+ * @link https://eslint.org/docs/latest/rules/no-extra-semi
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6649,7 +6640,7 @@ namespace NoExtraSemi {
 
 /**
  * @description Disallow fallthrough of `case` statements
- * @link https://eslint.org/docs/rules/no-fallthrough
+ * @link https://eslint.org/docs/latest/rules/no-fallthrough
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6691,7 +6682,7 @@ namespace NoFallthrough {
 
 /**
  * @description Disallow leading or trailing decimal points in numeric literals
- * @link https://eslint.org/docs/rules/no-floating-decimal
+ * @link https://eslint.org/docs/latest/rules/no-floating-decimal
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6705,7 +6696,7 @@ namespace NoFloatingDecimal {
 
 /**
  * @description Disallow reassigning `function` declarations
- * @link https://eslint.org/docs/rules/no-func-assign
+ * @link https://eslint.org/docs/latest/rules/no-func-assign
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6718,7 +6709,7 @@ namespace NoFuncAssign {
 
 /**
  * @description Disallow assignments to native objects or read-only global variables
- * @link https://eslint.org/docs/rules/no-global-assign
+ * @link https://eslint.org/docs/latest/rules/no-global-assign
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6758,7 +6749,7 @@ namespace NoGlobalAssign {
 
 /**
  * @description Disallow shorthand type conversions
- * @link https://eslint.org/docs/rules/no-implicit-coercion
+ * @link https://eslint.org/docs/latest/rules/no-implicit-coercion
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6824,7 +6815,7 @@ namespace NoImplicitCoercion {
 
 /**
  * @description Disallow declarations in the global scope
- * @link https://eslint.org/docs/rules/no-implicit-globals
+ * @link https://eslint.org/docs/latest/rules/no-implicit-globals
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6861,7 +6852,7 @@ namespace NoImplicitGlobals {
 
 /**
  * @description Disallow the use of `eval()`-like methods
- * @link https://eslint.org/docs/rules/no-implied-eval
+ * @link https://eslint.org/docs/latest/rules/no-implied-eval
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6874,7 +6865,7 @@ namespace NoImpliedEval {
 
 /**
  * @description Disallow assigning to imported bindings
- * @link https://eslint.org/docs/rules/no-import-assign
+ * @link https://eslint.org/docs/latest/rules/no-import-assign
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6887,7 +6878,7 @@ namespace NoImportAssign {
 
 /**
  * @description Disallow inline comments after code
- * @link https://eslint.org/docs/rules/no-inline-comments
+ * @link https://eslint.org/docs/latest/rules/no-inline-comments
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -6923,7 +6914,7 @@ namespace NoInlineComments {
 
 /**
  * @description Disallow variable or `function` declarations in nested blocks
- * @link https://eslint.org/docs/rules/no-inner-declarations
+ * @link https://eslint.org/docs/latest/rules/no-inner-declarations
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6954,7 +6945,7 @@ namespace NoInnerDeclarations {
 
 /**
  * @description Disallow invalid regular expression strings in `RegExp` constructors
- * @link https://eslint.org/docs/rules/no-invalid-regexp
+ * @link https://eslint.org/docs/latest/rules/no-invalid-regexp
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -6993,7 +6984,7 @@ namespace NoInvalidRegexp {
 
 /**
  * @description Disallow use of `this` in contexts where the value of `this` is `undefined`
- * @link https://eslint.org/docs/rules/no-invalid-this
+ * @link https://eslint.org/docs/latest/rules/no-invalid-this
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7030,7 +7021,7 @@ namespace NoInvalidThis {
 
 /**
  * @description Disallow irregular whitespace
- * @link https://eslint.org/docs/rules/no-irregular-whitespace
+ * @link https://eslint.org/docs/latest/rules/no-irregular-whitespace
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -7082,7 +7073,7 @@ namespace NoIrregularWhitespace {
 
 /**
  * @description Disallow the use of the `__iterator__` property
- * @link https://eslint.org/docs/rules/no-iterator
+ * @link https://eslint.org/docs/latest/rules/no-iterator
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7095,7 +7086,7 @@ namespace NoIterator {
 
 /**
  * @description Disallow labels that share a name with a variable
- * @link https://eslint.org/docs/rules/no-label-var
+ * @link https://eslint.org/docs/latest/rules/no-label-var
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7108,7 +7099,7 @@ namespace NoLabelVar {
 
 /**
  * @description Disallow labeled statements
- * @link https://eslint.org/docs/rules/no-labels
+ * @link https://eslint.org/docs/latest/rules/no-labels
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7150,7 +7141,7 @@ namespace NoLabels {
 
 /**
  * @description Disallow unnecessary nested blocks
- * @link https://eslint.org/docs/rules/no-lone-blocks
+ * @link https://eslint.org/docs/latest/rules/no-lone-blocks
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7163,7 +7154,7 @@ namespace NoLoneBlocks {
 
 /**
  * @description Disallow `if` statements as the only statement in `else` blocks
- * @link https://eslint.org/docs/rules/no-lonely-if
+ * @link https://eslint.org/docs/latest/rules/no-lonely-if
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7177,7 +7168,7 @@ namespace NoLonelyIf {
 
 /**
  * @description Disallow function declarations that contain unsafe references inside loop statements
- * @link https://eslint.org/docs/rules/no-loop-func
+ * @link https://eslint.org/docs/latest/rules/no-loop-func
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7190,7 +7181,7 @@ namespace NoLoopFunc {
 
 /**
  * @description Disallow literal numbers that lose precision
- * @link https://eslint.org/docs/rules/no-loss-of-precision
+ * @link https://eslint.org/docs/latest/rules/no-loss-of-precision
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -7203,7 +7194,7 @@ namespace NoLossOfPrecision {
 
 /**
  * @description Disallow magic numbers
- * @link https://eslint.org/docs/rules/no-magic-numbers
+ * @link https://eslint.org/docs/latest/rules/no-magic-numbers
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7276,7 +7267,7 @@ namespace NoMagicNumbers {
 
 /**
  * @description Disallow characters which are made with multiple code points in character class syntax
- * @link https://eslint.org/docs/rules/no-misleading-character-class
+ * @link https://eslint.org/docs/latest/rules/no-misleading-character-class
  *
  *  | key            | value   |
  *  | :------------- | :------ |
@@ -7290,7 +7281,7 @@ namespace NoMisleadingCharacterClass {
 
 /**
  * @description Disallow mixed binary operators
- * @link https://eslint.org/docs/rules/no-mixed-operators
+ * @link https://eslint.org/docs/latest/rules/no-mixed-operators
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7456,7 +7447,7 @@ namespace NoMixedOperators {
 
 /**
  * @description Disallow `require` calls to be mixed with regular variable declarations
- * @link https://eslint.org/docs/rules/no-mixed-requires
+ * @link https://eslint.org/docs/latest/rules/no-mixed-requires
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7497,7 +7488,7 @@ namespace NoMixedRequires {
 
 /**
  * @description Disallow mixed spaces and tabs for indentation
- * @link https://eslint.org/docs/rules/no-mixed-spaces-and-tabs
+ * @link https://eslint.org/docs/latest/rules/no-mixed-spaces-and-tabs
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -7529,7 +7520,7 @@ namespace NoMixedSpacesAndTabs {
 
 /**
  * @description Disallow use of chained assignment expressions
- * @link https://eslint.org/docs/rules/no-multi-assign
+ * @link https://eslint.org/docs/latest/rules/no-multi-assign
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7566,7 +7557,7 @@ namespace NoMultiAssign {
 
 /**
  * @description Disallow multiple spaces
- * @link https://eslint.org/docs/rules/no-multi-spaces
+ * @link https://eslint.org/docs/latest/rules/no-multi-spaces
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7614,7 +7605,7 @@ namespace NoMultiSpaces {
 
 /**
  * @description Disallow multiline strings
- * @link https://eslint.org/docs/rules/no-multi-str
+ * @link https://eslint.org/docs/latest/rules/no-multi-str
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7627,7 +7618,7 @@ namespace NoMultiStr {
 
 /**
  * @description Disallow multiple empty lines
- * @link https://eslint.org/docs/rules/no-multiple-empty-lines
+ * @link https://eslint.org/docs/latest/rules/no-multiple-empty-lines
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7678,7 +7669,7 @@ namespace NoMultipleEmptyLines {
 
 /**
  * @description Disallow assignments to native objects or read-only global variables
- * @link https://eslint.org/docs/rules/no-native-reassign
+ * @link https://eslint.org/docs/latest/rules/no-native-reassign
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7713,7 +7704,7 @@ namespace NoNativeReassign {
 
 /**
  * @description Disallow negated conditions
- * @link https://eslint.org/docs/rules/no-negated-condition
+ * @link https://eslint.org/docs/latest/rules/no-negated-condition
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7726,7 +7717,7 @@ namespace NoNegatedCondition {
 
 /**
  * @description Disallow negating the left operand in `in` expressions
- * @link https://eslint.org/docs/rules/no-negated-in-lhs
+ * @link https://eslint.org/docs/latest/rules/no-negated-in-lhs
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -7740,7 +7731,7 @@ namespace NoNegatedInLhs {
 
 /**
  * @description Disallow nested ternary expressions
- * @link https://eslint.org/docs/rules/no-nested-ternary
+ * @link https://eslint.org/docs/latest/rules/no-nested-ternary
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7753,7 +7744,7 @@ namespace NoNestedTernary {
 
 /**
  * @description Disallow `new` operators outside of assignments or comparisons
- * @link https://eslint.org/docs/rules/no-new
+ * @link https://eslint.org/docs/latest/rules/no-new
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7766,7 +7757,7 @@ namespace NoNew {
 
 /**
  * @description Disallow `new` operators with the `Function` object
- * @link https://eslint.org/docs/rules/no-new-func
+ * @link https://eslint.org/docs/latest/rules/no-new-func
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7779,7 +7770,7 @@ namespace NoNewFunc {
 
 /**
  * @description Disallow `new` operators with global non-constructor functions
- * @link https://eslint.org/docs/rules/no-new-native-nonconstructor
+ * @link https://eslint.org/docs/latest/rules/no-new-native-nonconstructor
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -7792,7 +7783,7 @@ namespace NoNewNativeNonconstructor {
 
 /**
  * @description Disallow `Object` constructors
- * @link https://eslint.org/docs/rules/no-new-object
+ * @link https://eslint.org/docs/latest/rules/no-new-object
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7805,7 +7796,7 @@ namespace NoNewObject {
 
 /**
  * @description Disallow `new` operators with calls to `require`
- * @link https://eslint.org/docs/rules/no-new-require
+ * @link https://eslint.org/docs/latest/rules/no-new-require
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7819,7 +7810,7 @@ namespace NoNewRequire {
 
 /**
  * @description Disallow `new` operators with the `Symbol` object
- * @link https://eslint.org/docs/rules/no-new-symbol
+ * @link https://eslint.org/docs/latest/rules/no-new-symbol
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -7832,7 +7823,7 @@ namespace NoNewSymbol {
 
 /**
  * @description Disallow `new` operators with the `String`, `Number`, and `Boolean` objects
- * @link https://eslint.org/docs/rules/no-new-wrappers
+ * @link https://eslint.org/docs/latest/rules/no-new-wrappers
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7845,7 +7836,7 @@ namespace NoNewWrappers {
 
 /**
  * @description Disallow `\8` and `\9` escape sequences in string literals
- * @link https://eslint.org/docs/rules/no-nonoctal-decimal-escape
+ * @link https://eslint.org/docs/latest/rules/no-nonoctal-decimal-escape
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -7859,7 +7850,7 @@ namespace NoNonoctalDecimalEscape {
 
 /**
  * @description Disallow calling global object properties as functions
- * @link https://eslint.org/docs/rules/no-obj-calls
+ * @link https://eslint.org/docs/latest/rules/no-obj-calls
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -7872,7 +7863,7 @@ namespace NoObjCalls {
 
 /**
  * @description Disallow octal literals
- * @link https://eslint.org/docs/rules/no-octal
+ * @link https://eslint.org/docs/latest/rules/no-octal
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7885,7 +7876,7 @@ namespace NoOctal {
 
 /**
  * @description Disallow octal escape sequences in string literals
- * @link https://eslint.org/docs/rules/no-octal-escape
+ * @link https://eslint.org/docs/latest/rules/no-octal-escape
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7898,7 +7889,7 @@ namespace NoOctalEscape {
 
 /**
  * @description Disallow reassigning `function` parameters
- * @link https://eslint.org/docs/rules/no-param-reassign
+ * @link https://eslint.org/docs/latest/rules/no-param-reassign
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7971,7 +7962,7 @@ namespace NoParamReassign {
 
 /**
  * @description Disallow string concatenation with `__dirname` and `__filename`
- * @link https://eslint.org/docs/rules/no-path-concat
+ * @link https://eslint.org/docs/latest/rules/no-path-concat
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -7985,7 +7976,7 @@ namespace NoPathConcat {
 
 /**
  * @description Disallow the unary operators `++` and `--`
- * @link https://eslint.org/docs/rules/no-plusplus
+ * @link https://eslint.org/docs/latest/rules/no-plusplus
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8022,7 +8013,7 @@ namespace NoPlusplus {
 
 /**
  * @description Disallow the use of `process.env`
- * @link https://eslint.org/docs/rules/no-process-env
+ * @link https://eslint.org/docs/latest/rules/no-process-env
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8036,7 +8027,7 @@ namespace NoProcessEnv {
 
 /**
  * @description Disallow the use of `process.exit()`
- * @link https://eslint.org/docs/rules/no-process-exit
+ * @link https://eslint.org/docs/latest/rules/no-process-exit
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8050,7 +8041,7 @@ namespace NoProcessExit {
 
 /**
  * @description Disallow returning values from Promise executor functions
- * @link https://eslint.org/docs/rules/no-promise-executor-return
+ * @link https://eslint.org/docs/latest/rules/no-promise-executor-return
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -8063,7 +8054,7 @@ namespace NoPromiseExecutorReturn {
 
 /**
  * @description Disallow the use of the `__proto__` property
- * @link https://eslint.org/docs/rules/no-proto
+ * @link https://eslint.org/docs/latest/rules/no-proto
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8076,7 +8067,7 @@ namespace NoProto {
 
 /**
  * @description Disallow calling some `Object.prototype` methods directly on objects
- * @link https://eslint.org/docs/rules/no-prototype-builtins
+ * @link https://eslint.org/docs/latest/rules/no-prototype-builtins
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -8089,7 +8080,7 @@ namespace NoPrototypeBuiltins {
 
 /**
  * @description Disallow variable redeclaration
- * @link https://eslint.org/docs/rules/no-redeclare
+ * @link https://eslint.org/docs/latest/rules/no-redeclare
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8126,7 +8117,7 @@ namespace NoRedeclare {
 
 /**
  * @description Disallow multiple spaces in regular expressions
- * @link https://eslint.org/docs/rules/no-regex-spaces
+ * @link https://eslint.org/docs/latest/rules/no-regex-spaces
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8140,7 +8131,7 @@ namespace NoRegexSpaces {
 
 /**
  * @description Disallow specified names in exports
- * @link https://eslint.org/docs/rules/no-restricted-exports
+ * @link https://eslint.org/docs/latest/rules/no-restricted-exports
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8230,7 +8221,7 @@ namespace NoRestrictedExports {
 
 /**
  * @description Disallow specified global variables
- * @link https://eslint.org/docs/rules/no-restricted-globals
+ * @link https://eslint.org/docs/latest/rules/no-restricted-globals
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8289,7 +8280,7 @@ namespace NoRestrictedGlobals {
 
 /**
  * @description Disallow specified modules when loaded by `import`
- * @link https://eslint.org/docs/rules/no-restricted-imports
+ * @link https://eslint.org/docs/latest/rules/no-restricted-imports
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8479,7 +8470,7 @@ namespace NoRestrictedImports {
 
 /**
  * @description Disallow specified modules when loaded by `require`
- * @link https://eslint.org/docs/rules/no-restricted-modules
+ * @link https://eslint.org/docs/latest/rules/no-restricted-modules
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8574,7 +8565,7 @@ namespace NoRestrictedModules {
 
 /**
  * @description Disallow certain properties on certain objects
- * @link https://eslint.org/docs/rules/no-restricted-properties
+ * @link https://eslint.org/docs/latest/rules/no-restricted-properties
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8652,7 +8643,7 @@ namespace NoRestrictedProperties {
 
 /**
  * @description Disallow specified syntax
- * @link https://eslint.org/docs/rules/no-restricted-syntax
+ * @link https://eslint.org/docs/latest/rules/no-restricted-syntax
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8711,7 +8702,7 @@ namespace NoRestrictedSyntax {
 
 /**
  * @description Disallow assignment operators in `return` statements
- * @link https://eslint.org/docs/rules/no-return-assign
+ * @link https://eslint.org/docs/latest/rules/no-return-assign
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8742,7 +8733,7 @@ namespace NoReturnAssign {
 
 /**
  * @description Disallow unnecessary `return await`
- * @link https://eslint.org/docs/rules/no-return-await
+ * @link https://eslint.org/docs/latest/rules/no-return-await
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -8756,7 +8747,7 @@ namespace NoReturnAwait {
 
 /**
  * @description Disallow `javascript:` urls
- * @link https://eslint.org/docs/rules/no-script-url
+ * @link https://eslint.org/docs/latest/rules/no-script-url
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8769,7 +8760,7 @@ namespace NoScriptUrl {
 
 /**
  * @description Disallow assignments where both sides are exactly the same
- * @link https://eslint.org/docs/rules/no-self-assign
+ * @link https://eslint.org/docs/latest/rules/no-self-assign
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -8806,7 +8797,7 @@ namespace NoSelfAssign {
 
 /**
  * @description Disallow comparisons where both sides are exactly the same
- * @link https://eslint.org/docs/rules/no-self-compare
+ * @link https://eslint.org/docs/latest/rules/no-self-compare
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -8819,7 +8810,7 @@ namespace NoSelfCompare {
 
 /**
  * @description Disallow comma operators
- * @link https://eslint.org/docs/rules/no-sequences
+ * @link https://eslint.org/docs/latest/rules/no-sequences
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8855,7 +8846,7 @@ namespace NoSequences {
 
 /**
  * @description Disallow returning values from setters
- * @link https://eslint.org/docs/rules/no-setter-return
+ * @link https://eslint.org/docs/latest/rules/no-setter-return
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -8868,7 +8859,7 @@ namespace NoSetterReturn {
 
 /**
  * @description Disallow variable declarations from shadowing variables declared in the outer scope
- * @link https://eslint.org/docs/rules/no-shadow
+ * @link https://eslint.org/docs/latest/rules/no-shadow
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8926,7 +8917,7 @@ namespace NoShadow {
 
 /**
  * @description Disallow identifiers from shadowing restricted names
- * @link https://eslint.org/docs/rules/no-shadow-restricted-names
+ * @link https://eslint.org/docs/latest/rules/no-shadow-restricted-names
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8939,7 +8930,7 @@ namespace NoShadowRestrictedNames {
 
 /**
  * @description Disallow spacing between function identifiers and their applications (deprecated)
- * @link https://eslint.org/docs/rules/no-spaced-func
+ * @link https://eslint.org/docs/latest/rules/no-spaced-func
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8954,7 +8945,7 @@ namespace NoSpacedFunc {
 
 /**
  * @description Disallow sparse arrays
- * @link https://eslint.org/docs/rules/no-sparse-arrays
+ * @link https://eslint.org/docs/latest/rules/no-sparse-arrays
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -8967,7 +8958,7 @@ namespace NoSparseArrays {
 
 /**
  * @description Disallow synchronous methods
- * @link https://eslint.org/docs/rules/no-sync
+ * @link https://eslint.org/docs/latest/rules/no-sync
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -8999,7 +8990,7 @@ namespace NoSync {
 
 /**
  * @description Disallow all tabs
- * @link https://eslint.org/docs/rules/no-tabs
+ * @link https://eslint.org/docs/latest/rules/no-tabs
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -9036,7 +9027,7 @@ namespace NoTabs {
 
 /**
  * @description Disallow template literal placeholder syntax in regular strings
- * @link https://eslint.org/docs/rules/no-template-curly-in-string
+ * @link https://eslint.org/docs/latest/rules/no-template-curly-in-string
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9049,7 +9040,7 @@ namespace NoTemplateCurlyInString {
 
 /**
  * @description Disallow ternary operators
- * @link https://eslint.org/docs/rules/no-ternary
+ * @link https://eslint.org/docs/latest/rules/no-ternary
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9062,7 +9053,7 @@ namespace NoTernary {
 
 /**
  * @description Disallow `this`/`super` before calling `super()` in constructors
- * @link https://eslint.org/docs/rules/no-this-before-super
+ * @link https://eslint.org/docs/latest/rules/no-this-before-super
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9075,7 +9066,7 @@ namespace NoThisBeforeSuper {
 
 /**
  * @description Disallow throwing literals as exceptions
- * @link https://eslint.org/docs/rules/no-throw-literal
+ * @link https://eslint.org/docs/latest/rules/no-throw-literal
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9088,7 +9079,7 @@ namespace NoThrowLiteral {
 
 /**
  * @description Disallow trailing whitespace at the end of lines
- * @link https://eslint.org/docs/rules/no-trailing-spaces
+ * @link https://eslint.org/docs/latest/rules/no-trailing-spaces
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9131,7 +9122,7 @@ namespace NoTrailingSpaces {
 
 /**
  * @description Disallow the use of undeclared variables unless mentioned in ` global  ` comments
- * @link https://eslint.org/docs/rules/no-undef
+ * @link https://eslint.org/docs/latest/rules/no-undef
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9168,7 +9159,7 @@ namespace NoUndef {
 
 /**
  * @description Disallow initializing variables to `undefined`
- * @link https://eslint.org/docs/rules/no-undef-init
+ * @link https://eslint.org/docs/latest/rules/no-undef-init
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9182,7 +9173,7 @@ namespace NoUndefInit {
 
 /**
  * @description Disallow the use of `undefined` as an identifier
- * @link https://eslint.org/docs/rules/no-undefined
+ * @link https://eslint.org/docs/latest/rules/no-undefined
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9195,7 +9186,7 @@ namespace NoUndefined {
 
 /**
  * @description Disallow dangling underscores in identifiers
- * @link https://eslint.org/docs/rules/no-underscore-dangle
+ * @link https://eslint.org/docs/latest/rules/no-underscore-dangle
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9274,7 +9265,7 @@ namespace NoUnderscoreDangle {
 
 /**
  * @description Disallow confusing multiline expressions
- * @link https://eslint.org/docs/rules/no-unexpected-multiline
+ * @link https://eslint.org/docs/latest/rules/no-unexpected-multiline
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9287,7 +9278,7 @@ namespace NoUnexpectedMultiline {
 
 /**
  * @description Disallow unmodified loop conditions
- * @link https://eslint.org/docs/rules/no-unmodified-loop-condition
+ * @link https://eslint.org/docs/latest/rules/no-unmodified-loop-condition
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9300,7 +9291,7 @@ namespace NoUnmodifiedLoopCondition {
 
 /**
  * @description Disallow ternary operators when simpler alternatives exist
- * @link https://eslint.org/docs/rules/no-unneeded-ternary
+ * @link https://eslint.org/docs/latest/rules/no-unneeded-ternary
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9338,7 +9329,7 @@ namespace NoUnneededTernary {
 
 /**
  * @description Disallow unreachable code after `return`, `throw`, `continue`, and `break` statements
- * @link https://eslint.org/docs/rules/no-unreachable
+ * @link https://eslint.org/docs/latest/rules/no-unreachable
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9351,7 +9342,7 @@ namespace NoUnreachable {
 
 /**
  * @description Disallow loops with a body that allows only one iteration
- * @link https://eslint.org/docs/rules/no-unreachable-loop
+ * @link https://eslint.org/docs/latest/rules/no-unreachable-loop
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9403,7 +9394,7 @@ namespace NoUnreachableLoop {
 
 /**
  * @description Disallow control flow statements in `finally` blocks
- * @link https://eslint.org/docs/rules/no-unsafe-finally
+ * @link https://eslint.org/docs/latest/rules/no-unsafe-finally
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9416,7 +9407,7 @@ namespace NoUnsafeFinally {
 
 /**
  * @description Disallow negating the left operand of relational operators
- * @link https://eslint.org/docs/rules/no-unsafe-negation
+ * @link https://eslint.org/docs/latest/rules/no-unsafe-negation
  *
  *  | key            | value   |
  *  | :------------- | :------ |
@@ -9454,7 +9445,7 @@ namespace NoUnsafeNegation {
 
 /**
  * @description Disallow use of optional chaining in contexts where the `undefined` value is not allowed
- * @link https://eslint.org/docs/rules/no-unsafe-optional-chaining
+ * @link https://eslint.org/docs/latest/rules/no-unsafe-optional-chaining
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9491,7 +9482,7 @@ namespace NoUnsafeOptionalChaining {
 
 /**
  * @description Disallow unused expressions
- * @link https://eslint.org/docs/rules/no-unused-expressions
+ * @link https://eslint.org/docs/latest/rules/no-unused-expressions
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9543,7 +9534,7 @@ namespace NoUnusedExpressions {
 
 /**
  * @description Disallow unused labels
- * @link https://eslint.org/docs/rules/no-unused-labels
+ * @link https://eslint.org/docs/latest/rules/no-unused-labels
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9557,7 +9548,7 @@ namespace NoUnusedLabels {
 
 /**
  * @description Disallow unused private class members
- * @link https://eslint.org/docs/rules/no-unused-private-class-members
+ * @link https://eslint.org/docs/latest/rules/no-unused-private-class-members
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9570,7 +9561,7 @@ namespace NoUnusedPrivateClassMembers {
 
 /**
  * @description Disallow unused variables
- * @link https://eslint.org/docs/rules/no-unused-vars
+ * @link https://eslint.org/docs/latest/rules/no-unused-vars
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9656,7 +9647,7 @@ namespace NoUnusedVars {
 
 /**
  * @description Disallow the use of variables before they are defined
- * @link https://eslint.org/docs/rules/no-use-before-define
+ * @link https://eslint.org/docs/latest/rules/no-use-before-define
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9715,7 +9706,7 @@ namespace NoUseBeforeDefine {
 
 /**
  * @description Disallow useless backreferences in regular expressions
- * @link https://eslint.org/docs/rules/no-useless-backreference
+ * @link https://eslint.org/docs/latest/rules/no-useless-backreference
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -9728,7 +9719,7 @@ namespace NoUselessBackreference {
 
 /**
  * @description Disallow unnecessary calls to `.call()` and `.apply()`
- * @link https://eslint.org/docs/rules/no-useless-call
+ * @link https://eslint.org/docs/latest/rules/no-useless-call
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9741,7 +9732,7 @@ namespace NoUselessCall {
 
 /**
  * @description Disallow unnecessary `catch` clauses
- * @link https://eslint.org/docs/rules/no-useless-catch
+ * @link https://eslint.org/docs/latest/rules/no-useless-catch
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9754,7 +9745,7 @@ namespace NoUselessCatch {
 
 /**
  * @description Disallow unnecessary computed property keys in objects and classes
- * @link https://eslint.org/docs/rules/no-useless-computed-key
+ * @link https://eslint.org/docs/latest/rules/no-useless-computed-key
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9792,7 +9783,7 @@ namespace NoUselessComputedKey {
 
 /**
  * @description Disallow unnecessary concatenation of literals or template literals
- * @link https://eslint.org/docs/rules/no-useless-concat
+ * @link https://eslint.org/docs/latest/rules/no-useless-concat
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9805,7 +9796,7 @@ namespace NoUselessConcat {
 
 /**
  * @description Disallow unnecessary constructors
- * @link https://eslint.org/docs/rules/no-useless-constructor
+ * @link https://eslint.org/docs/latest/rules/no-useless-constructor
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9818,7 +9809,7 @@ namespace NoUselessConstructor {
 
 /**
  * @description Disallow unnecessary escape characters
- * @link https://eslint.org/docs/rules/no-useless-escape
+ * @link https://eslint.org/docs/latest/rules/no-useless-escape
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -9832,7 +9823,7 @@ namespace NoUselessEscape {
 
 /**
  * @description Disallow renaming import, export, and destructured assignments to the same name
- * @link https://eslint.org/docs/rules/no-useless-rename
+ * @link https://eslint.org/docs/latest/rules/no-useless-rename
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9880,7 +9871,7 @@ namespace NoUselessRename {
 
 /**
  * @description Disallow redundant return statements
- * @link https://eslint.org/docs/rules/no-useless-return
+ * @link https://eslint.org/docs/latest/rules/no-useless-return
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9894,7 +9885,7 @@ namespace NoUselessReturn {
 
 /**
  * @description Require `let` or `const` instead of `var`
- * @link https://eslint.org/docs/rules/no-var
+ * @link https://eslint.org/docs/latest/rules/no-var
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9908,7 +9899,7 @@ namespace NoVar {
 
 /**
  * @description Disallow `void` operators
- * @link https://eslint.org/docs/rules/no-void
+ * @link https://eslint.org/docs/latest/rules/no-void
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -9945,7 +9936,7 @@ namespace NoVoid {
 
 /**
  * @description Disallow specified warning terms in comments
- * @link https://eslint.org/docs/rules/no-warning-comments
+ * @link https://eslint.org/docs/latest/rules/no-warning-comments
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10004,7 +9995,7 @@ namespace NoWarningComments {
 
 /**
  * @description Disallow whitespace before properties
- * @link https://eslint.org/docs/rules/no-whitespace-before-property
+ * @link https://eslint.org/docs/latest/rules/no-whitespace-before-property
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10018,7 +10009,7 @@ namespace NoWhitespaceBeforeProperty {
 
 /**
  * @description Disallow `with` statements
- * @link https://eslint.org/docs/rules/no-with
+ * @link https://eslint.org/docs/latest/rules/no-with
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10031,7 +10022,7 @@ namespace NoWith {
 
 /**
  * @description Enforce the location of single-line statements
- * @link https://eslint.org/docs/rules/nonblock-statement-body-position
+ * @link https://eslint.org/docs/latest/rules/nonblock-statement-body-position
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10120,7 +10111,7 @@ namespace NonblockStatementBodyPosition {
 
 /**
  * @description Enforce consistent line breaks after opening and before closing braces
- * @link https://eslint.org/docs/rules/object-curly-newline
+ * @link https://eslint.org/docs/latest/rules/object-curly-newline
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10330,7 +10321,7 @@ namespace ObjectCurlyNewline {
 
 /**
  * @description Enforce consistent spacing inside braces
- * @link https://eslint.org/docs/rules/object-curly-spacing
+ * @link https://eslint.org/docs/latest/rules/object-curly-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10380,7 +10371,7 @@ namespace ObjectCurlySpacing {
 
 /**
  * @description Enforce placing object properties on separate lines
- * @link https://eslint.org/docs/rules/object-property-newline
+ * @link https://eslint.org/docs/latest/rules/object-property-newline
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10423,7 +10414,7 @@ namespace ObjectPropertyNewline {
 
 /**
  * @description Require or disallow method and property shorthand syntax for object literals
- * @link https://eslint.org/docs/rules/object-shorthand
+ * @link https://eslint.org/docs/latest/rules/object-shorthand
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10550,7 +10541,7 @@ namespace ObjectShorthand {
 
 /**
  * @description Enforce variables to be declared either together or separately in functions
- * @link https://eslint.org/docs/rules/one-var
+ * @link https://eslint.org/docs/latest/rules/one-var
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10648,7 +10639,7 @@ namespace OneVar {
 
 /**
  * @description Require or disallow newlines around variable declarations
- * @link https://eslint.org/docs/rules/one-var-declaration-per-line
+ * @link https://eslint.org/docs/latest/rules/one-var-declaration-per-line
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10680,7 +10671,7 @@ namespace OneVarDeclarationPerLine {
 
 /**
  * @description Require or disallow assignment operator shorthand where possible
- * @link https://eslint.org/docs/rules/operator-assignment
+ * @link https://eslint.org/docs/latest/rules/operator-assignment
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10712,7 +10703,7 @@ namespace OperatorAssignment {
 
 /**
  * @description Enforce consistent linebreak style for operators
- * @link https://eslint.org/docs/rules/operator-linebreak
+ * @link https://eslint.org/docs/latest/rules/operator-linebreak
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -10768,7 +10759,7 @@ namespace OperatorLinebreak {
 
 /**
  * @description Require or disallow padding within blocks
- * @link https://eslint.org/docs/rules/padded-blocks
+ * @link https://eslint.org/docs/latest/rules/padded-blocks
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -10849,7 +10840,7 @@ namespace PaddedBlocks {
 
 /**
  * @description Require or disallow padding lines between statements
- * @link https://eslint.org/docs/rules/padding-line-between-statements
+ * @link https://eslint.org/docs/latest/rules/padding-line-between-statements
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11126,7 +11117,7 @@ namespace PaddingLineBetweenStatements {
 
 /**
  * @description Require using arrow functions for callbacks
- * @link https://eslint.org/docs/rules/prefer-arrow-callback
+ * @link https://eslint.org/docs/latest/rules/prefer-arrow-callback
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11169,7 +11160,7 @@ namespace PreferArrowCallback {
 
 /**
  * @description Require `const` declarations for variables that are never reassigned after declared
- * @link https://eslint.org/docs/rules/prefer-const
+ * @link https://eslint.org/docs/latest/rules/prefer-const
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11215,7 +11206,7 @@ namespace PreferConst {
 
 /**
  * @description Require destructuring from arrays and/or objects
- * @link https://eslint.org/docs/rules/prefer-destructuring
+ * @link https://eslint.org/docs/latest/rules/prefer-destructuring
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11315,7 +11306,7 @@ namespace PreferDestructuring {
 
 /**
  * @description Disallow the use of `Math.pow` in favor of the `**` operator
- * @link https://eslint.org/docs/rules/prefer-exponentiation-operator
+ * @link https://eslint.org/docs/latest/rules/prefer-exponentiation-operator
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11329,7 +11320,7 @@ namespace PreferExponentiationOperator {
 
 /**
  * @description Enforce using named capture group in regular expression
- * @link https://eslint.org/docs/rules/prefer-named-capture-group
+ * @link https://eslint.org/docs/latest/rules/prefer-named-capture-group
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -11343,7 +11334,7 @@ namespace PreferNamedCaptureGroup {
 
 /**
  * @description Disallow `parseInt()` and `Number.parseInt()` in favor of binary, octal, and hexadecimal literals
- * @link https://eslint.org/docs/rules/prefer-numeric-literals
+ * @link https://eslint.org/docs/latest/rules/prefer-numeric-literals
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11357,7 +11348,7 @@ namespace PreferNumericLiterals {
 
 /**
  * @description Disallow use of `Object.prototype.hasOwnProperty.call()` and prefer use of `Object.hasOwn()`
- * @link https://eslint.org/docs/rules/prefer-object-has-own
+ * @link https://eslint.org/docs/latest/rules/prefer-object-has-own
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11371,7 +11362,7 @@ namespace PreferObjectHasOwn {
 
 /**
  * @description Disallow using Object.assign with an object literal as the first argument and prefer the use of object spread instead
- * @link https://eslint.org/docs/rules/prefer-object-spread
+ * @link https://eslint.org/docs/latest/rules/prefer-object-spread
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11385,7 +11376,7 @@ namespace PreferObjectSpread {
 
 /**
  * @description Require using Error objects as Promise rejection reasons
- * @link https://eslint.org/docs/rules/prefer-promise-reject-errors
+ * @link https://eslint.org/docs/latest/rules/prefer-promise-reject-errors
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11422,7 +11413,7 @@ namespace PreferPromiseRejectErrors {
 
 /**
  * @description Require `Reflect` methods where applicable
- * @link https://eslint.org/docs/rules/prefer-reflect
+ * @link https://eslint.org/docs/latest/rules/prefer-reflect
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11468,7 +11459,7 @@ namespace PreferReflect {
 
 /**
  * @description Disallow use of the `RegExp` constructor in favor of regular expression literals
- * @link https://eslint.org/docs/rules/prefer-regex-literals
+ * @link https://eslint.org/docs/latest/rules/prefer-regex-literals
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -11506,7 +11497,7 @@ namespace PreferRegexLiterals {
 
 /**
  * @description Require rest parameters instead of `arguments`
- * @link https://eslint.org/docs/rules/prefer-rest-params
+ * @link https://eslint.org/docs/latest/rules/prefer-rest-params
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11519,7 +11510,7 @@ namespace PreferRestParams {
 
 /**
  * @description Require spread operators instead of `.apply()`
- * @link https://eslint.org/docs/rules/prefer-spread
+ * @link https://eslint.org/docs/latest/rules/prefer-spread
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11532,7 +11523,7 @@ namespace PreferSpread {
 
 /**
  * @description Require template literals instead of string concatenation
- * @link https://eslint.org/docs/rules/prefer-template
+ * @link https://eslint.org/docs/latest/rules/prefer-template
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11546,7 +11537,7 @@ namespace PreferTemplate {
 
 /**
  * @description Require quotes around object literal property names
- * @link https://eslint.org/docs/rules/quote-props
+ * @link https://eslint.org/docs/latest/rules/quote-props
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11631,7 +11622,7 @@ namespace QuoteProps {
 
 /**
  * @description Enforce the consistent use of either backticks, double, or single quotes
- * @link https://eslint.org/docs/rules/quotes
+ * @link https://eslint.org/docs/latest/rules/quotes
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -11693,7 +11684,7 @@ namespace Quotes {
 
 /**
  * @description Enforce the consistent use of the radix argument when using `parseInt()`
- * @link https://eslint.org/docs/rules/radix
+ * @link https://eslint.org/docs/latest/rules/radix
  *
  *  | key            | value      |
  *  | :------------- | :--------- |
@@ -11725,7 +11716,7 @@ namespace Radix {
 
 /**
  * @description Disallow assignments that can lead to race conditions due to usage of `await` or `yield`
- * @link https://eslint.org/docs/rules/require-atomic-updates
+ * @link https://eslint.org/docs/latest/rules/require-atomic-updates
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -11762,7 +11753,7 @@ namespace RequireAtomicUpdates {
 
 /**
  * @description Disallow async functions which have no `await` expression
- * @link https://eslint.org/docs/rules/require-await
+ * @link https://eslint.org/docs/latest/rules/require-await
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11775,7 +11766,7 @@ namespace RequireAwait {
 
 /**
  * @description Require JSDoc comments
- * @link https://eslint.org/docs/rules/require-jsdoc
+ * @link https://eslint.org/docs/latest/rules/require-jsdoc
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11830,12 +11821,13 @@ namespace RequireJsdoc {
 
 /**
  * @description Enforce the use of `u` flag on RegExp
- * @link https://eslint.org/docs/rules/require-unicode-regexp
+ * @link https://eslint.org/docs/latest/rules/require-unicode-regexp
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
  */
 namespace RequireUnicodeRegexp {
   export type RuleEntry = Linter.RuleLevel;
@@ -11843,7 +11835,7 @@ namespace RequireUnicodeRegexp {
 
 /**
  * @description Require generator functions to contain `yield`
- * @link https://eslint.org/docs/rules/require-yield
+ * @link https://eslint.org/docs/latest/rules/require-yield
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11856,7 +11848,7 @@ namespace RequireYield {
 
 /**
  * @description Enforce spacing between rest and spread operators and their expressions
- * @link https://eslint.org/docs/rules/rest-spread-spacing
+ * @link https://eslint.org/docs/latest/rules/rest-spread-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -11888,7 +11880,7 @@ namespace RestSpreadSpacing {
 
 /**
  * @description Require or disallow semicolons instead of ASI
- * @link https://eslint.org/docs/rules/semi
+ * @link https://eslint.org/docs/latest/rules/semi
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -11941,6 +11933,9 @@ namespace Semi {
    *           "properties": {
    *             "omitLastInOneLineBlock": {
    *               "type": "boolean"
+   *             },
+   *             "omitLastInOneLineClassBody": {
+   *               "type": "boolean"
    *             }
    *           },
    *           "additionalProperties": false
@@ -11971,6 +11966,7 @@ namespace Semi {
         'always',
         {
           readonly omitLastInOneLineBlock?: boolean;
+          readonly omitLastInOneLineClassBody?: boolean;
         }
       ];
 
@@ -11981,7 +11977,7 @@ namespace Semi {
 
 /**
  * @description Enforce consistent spacing before and after semicolons
- * @link https://eslint.org/docs/rules/semi-spacing
+ * @link https://eslint.org/docs/latest/rules/semi-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12024,7 +12020,7 @@ namespace SemiSpacing {
 
 /**
  * @description Enforce location of semicolons
- * @link https://eslint.org/docs/rules/semi-style
+ * @link https://eslint.org/docs/latest/rules/semi-style
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12056,7 +12052,7 @@ namespace SemiStyle {
 
 /**
  * @description Enforce sorted import declarations within modules
- * @link https://eslint.org/docs/rules/sort-imports
+ * @link https://eslint.org/docs/latest/rules/sort-imports
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12133,7 +12129,7 @@ namespace SortImports {
 
 /**
  * @description Require object keys to be sorted
- * @link https://eslint.org/docs/rules/sort-keys
+ * @link https://eslint.org/docs/latest/rules/sort-keys
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12195,7 +12191,7 @@ namespace SortKeys {
 
 /**
  * @description Require variables within the same declaration block to be sorted
- * @link https://eslint.org/docs/rules/sort-vars
+ * @link https://eslint.org/docs/latest/rules/sort-vars
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12233,7 +12229,7 @@ namespace SortVars {
 
 /**
  * @description Enforce consistent spacing before blocks
- * @link https://eslint.org/docs/rules/space-before-blocks
+ * @link https://eslint.org/docs/latest/rules/space-before-blocks
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12302,7 +12298,7 @@ namespace SpaceBeforeBlocks {
 
 /**
  * @description Enforce consistent spacing before `function` definition opening parenthesis
- * @link https://eslint.org/docs/rules/space-before-function-paren
+ * @link https://eslint.org/docs/latest/rules/space-before-function-paren
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12371,7 +12367,7 @@ namespace SpaceBeforeFunctionParen {
 
 /**
  * @description Enforce consistent spacing inside parentheses
- * @link https://eslint.org/docs/rules/space-in-parens
+ * @link https://eslint.org/docs/latest/rules/space-in-parens
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12426,7 +12422,7 @@ namespace SpaceInParens {
 
 /**
  * @description Require spacing around infix operators
- * @link https://eslint.org/docs/rules/space-infix-ops
+ * @link https://eslint.org/docs/latest/rules/space-infix-ops
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12464,7 +12460,7 @@ namespace SpaceInfixOps {
 
 /**
  * @description Enforce consistent spacing before or after unary operators
- * @link https://eslint.org/docs/rules/space-unary-ops
+ * @link https://eslint.org/docs/latest/rules/space-unary-ops
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12514,7 +12510,7 @@ namespace SpaceUnaryOps {
 
 /**
  * @description Enforce consistent spacing after the `//` or ` ` in a comment
- * @link https://eslint.org/docs/rules/spaced-comment
+ * @link https://eslint.org/docs/latest/rules/spaced-comment
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12619,7 +12615,7 @@ namespace SpacedComment {
 
 /**
  * @description Require or disallow strict mode directives
- * @link https://eslint.org/docs/rules/strict
+ * @link https://eslint.org/docs/latest/rules/strict
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12653,7 +12649,7 @@ namespace Strict {
 
 /**
  * @description Enforce spacing around colons of switch statements
- * @link https://eslint.org/docs/rules/switch-colon-spacing
+ * @link https://eslint.org/docs/latest/rules/switch-colon-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12696,7 +12692,7 @@ namespace SwitchColonSpacing {
 
 /**
  * @description Require symbol descriptions
- * @link https://eslint.org/docs/rules/symbol-description
+ * @link https://eslint.org/docs/latest/rules/symbol-description
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12709,7 +12705,7 @@ namespace SymbolDescription {
 
 /**
  * @description Require or disallow spacing around embedded expressions of template strings
- * @link https://eslint.org/docs/rules/template-curly-spacing
+ * @link https://eslint.org/docs/latest/rules/template-curly-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12741,7 +12737,7 @@ namespace TemplateCurlySpacing {
 
 /**
  * @description Require or disallow spacing between template tags and their literals
- * @link https://eslint.org/docs/rules/template-tag-spacing
+ * @link https://eslint.org/docs/latest/rules/template-tag-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12773,7 +12769,7 @@ namespace TemplateTagSpacing {
 
 /**
  * @description Require or disallow Unicode byte order mark (BOM)
- * @link https://eslint.org/docs/rules/unicode-bom
+ * @link https://eslint.org/docs/latest/rules/unicode-bom
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12805,7 +12801,7 @@ namespace UnicodeBom {
 
 /**
  * @description Require calls to `isNaN()` when checking for `NaN`
- * @link https://eslint.org/docs/rules/use-isnan
+ * @link https://eslint.org/docs/latest/rules/use-isnan
  *
  *  | key         | value   |
  *  | :---------- | :------ |
@@ -12847,7 +12843,7 @@ namespace UseIsnan {
 
 /**
  * @description Enforce valid JSDoc comments
- * @link https://eslint.org/docs/rules/valid-jsdoc
+ * @link https://eslint.org/docs/latest/rules/valid-jsdoc
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12911,7 +12907,7 @@ namespace ValidJsdoc {
 
 /**
  * @description Enforce comparing `typeof` expressions against valid strings
- * @link https://eslint.org/docs/rules/valid-typeof
+ * @link https://eslint.org/docs/latest/rules/valid-typeof
  *
  *  | key            | value   |
  *  | :------------- | :------ |
@@ -12949,7 +12945,7 @@ namespace ValidTypeof {
 
 /**
  * @description Require `var` declarations be placed at the top of their containing scope
- * @link https://eslint.org/docs/rules/vars-on-top
+ * @link https://eslint.org/docs/latest/rules/vars-on-top
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -12962,7 +12958,7 @@ namespace VarsOnTop {
 
 /**
  * @description Require parentheses around immediate `function` invocations
- * @link https://eslint.org/docs/rules/wrap-iife
+ * @link https://eslint.org/docs/latest/rules/wrap-iife
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -13010,7 +13006,7 @@ namespace WrapIife {
 
 /**
  * @description Require parenthesis around regex literals
- * @link https://eslint.org/docs/rules/wrap-regex
+ * @link https://eslint.org/docs/latest/rules/wrap-regex
  *
  *  | key         | value  |
  *  | :---------- | :----- |
@@ -13024,7 +13020,7 @@ namespace WrapRegex {
 
 /**
  * @description Require or disallow spacing around the `*` in `yield*` expressions
- * @link https://eslint.org/docs/rules/yield-star-spacing
+ * @link https://eslint.org/docs/latest/rules/yield-star-spacing
  *
  *  | key         | value      |
  *  | :---------- | :--------- |
@@ -13079,7 +13075,7 @@ namespace YieldStarSpacing {
 
 /**
  * @description Require or disallow "Yoda" conditions
- * @link https://eslint.org/docs/rules/yoda
+ * @link https://eslint.org/docs/latest/rules/yoda
  *
  *  | key         | value      |
  *  | :---------- | :--------- |

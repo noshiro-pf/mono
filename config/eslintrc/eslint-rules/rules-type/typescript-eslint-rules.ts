@@ -199,11 +199,12 @@ namespace BanTslintComment {
  * @description Disallow certain types
  * @link https://typescript-eslint.io/rules/ban-types
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | fixable     | code       |
- *  | recommended | error      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | error      |
  */
 namespace BanTypes {
   /**
@@ -235,6 +236,12 @@ namespace BanTypes {
    *                 },
    *                 "fixWith": {
    *                   "type": "string"
+   *                 },
+   *                 "suggest": {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
    *                 }
    *               },
    *               "additionalProperties": false
@@ -260,6 +267,7 @@ namespace BanTypes {
       | {
           readonly message?: string;
           readonly fixWith?: string;
+          readonly suggest?: readonly string[];
         }
     >;
     readonly extendDefaults?: boolean;
@@ -604,10 +612,12 @@ namespace ConsistentIndexedObjectStyle {
  * @description Enforce consistent usage of type assertions
  * @link https://typescript-eslint.io/rules/consistent-type-assertions
  *
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | recommended | strict     |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | strict     |
  */
 namespace ConsistentTypeAssertions {
   /**
@@ -11958,6 +11968,48 @@ namespace NoDuplicateImports {
 }
 
 /**
+ * @description Disallow duplicate constituents of union or intersection types
+ * @link https://typescript-eslint.io/rules/no-duplicate-type-constituents
+ *
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | fixable              | code       |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | true       |
+ */
+namespace NoDuplicateTypeConstituents {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "type": "object",
+   *     "properties": {
+   *       "ignoreIntersections": {
+   *         "type": "boolean"
+   *       },
+   *       "ignoreUnions": {
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly ignoreIntersections?: boolean;
+    readonly ignoreUnions?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.RuleLevel
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;
+}
+
+/**
  * @description Disallow using the `delete` operator on computed key expressions
  * @link https://typescript-eslint.io/rules/no-dynamic-delete
  *
@@ -13704,6 +13756,20 @@ namespace NoUnsafeDeclarationMerging {
 }
 
 /**
+ * @description Disallow comparing an enum value with a non-enum value
+ * @link https://typescript-eslint.io/rules/no-unsafe-enum-comparison
+ *
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | recommended          | strict     |
+ *  | requiresTypeChecking | true       |
+ */
+namespace NoUnsafeEnumComparison {
+  export type RuleEntry = Linter.RuleLevel;
+}
+
+/**
  * @description Disallow member access on a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-member-access
  *
@@ -15026,6 +15092,10 @@ namespace RestrictTemplateExpressions {
    *       "allowRegExp": {
    *         "description": "Whether to allow `regexp` typed values in template expressions.",
    *         "type": "boolean"
+   *       },
+   *       "allowNever": {
+   *         "description": "Whether to allow `never` typed values in template expressions.",
+   *         "type": "boolean"
    *       }
    *     }
    *   }
@@ -15053,6 +15123,10 @@ namespace RestrictTemplateExpressions {
      * Whether to allow `regexp` typed values in template expressions.
      */
     readonly allowRegExp?: boolean;
+    /**
+     * Whether to allow `never` typed values in template expressions.
+     */
+    readonly allowNever?: boolean;
     readonly [k: string]: unknown;
   };
 
@@ -15151,6 +15225,9 @@ namespace Semi {
    *           "properties": {
    *             "omitLastInOneLineBlock": {
    *               "type": "boolean"
+   *             },
+   *             "omitLastInOneLineClassBody": {
+   *               "type": "boolean"
    *             }
    *           },
    *           "additionalProperties": false
@@ -15181,6 +15258,7 @@ namespace Semi {
         'always',
         {
           readonly omitLastInOneLineBlock?: boolean;
+          readonly omitLastInOneLineClassBody?: boolean;
         }
       ];
 
@@ -15981,6 +16059,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.RuleEntry;
   readonly '@typescript-eslint/no-dupe-class-members': NoDupeClassMembers.RuleEntry;
   readonly '@typescript-eslint/no-duplicate-enum-values': NoDuplicateEnumValues.RuleEntry;
+  readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.RuleEntry;
   readonly '@typescript-eslint/no-dynamic-delete': NoDynamicDelete.RuleEntry;
   readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.RuleEntry;
   readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
@@ -16025,6 +16104,7 @@ export type TypeScriptEslintRules = {
   readonly '@typescript-eslint/no-unsafe-assignment': NoUnsafeAssignment.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-call': NoUnsafeCall.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-declaration-merging': NoUnsafeDeclarationMerging.RuleEntry;
+  readonly '@typescript-eslint/no-unsafe-enum-comparison': NoUnsafeEnumComparison.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.RuleEntry;
   readonly '@typescript-eslint/no-unsafe-return': NoUnsafeReturn.RuleEntry;
   readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.RuleEntry;

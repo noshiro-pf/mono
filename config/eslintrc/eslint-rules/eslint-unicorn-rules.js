@@ -138,6 +138,7 @@ const eslintUnicornRules = {
   'unicorn/prefer-native-coercion-functions': 'error',
   'unicorn/prefer-event-target': 'error',
   'unicorn/prefer-logical-operator-over-ternary': 'error',
+  'unicorn/prefer-blob-reading-methods': 'error',
 
   // deprecated rules
   'unicorn/import-index': 'off',

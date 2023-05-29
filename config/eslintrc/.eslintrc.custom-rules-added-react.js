@@ -5,13 +5,21 @@
 /** @typedef { import("eslint").Linter.Config } LinterConfig */
 
 const { plugins } = require('./eslint-plugins');
-const { eslintReactRules, eslintReactHooksRules } = require('./eslint-rules');
+const {
+  eslintReactRules,
+  eslintReactHooksRules,
+  eslintReactRefresh,
+} = require('./eslint-rules');
 
 /** @type {LinterConfig} */
 const config = {
   extends: ['./.eslintrc.custom-rules-added.js'],
-  plugins: [plugins.react, plugins.reactHooks],
-  rules: { ...eslintReactRules, ...eslintReactHooksRules },
+  plugins: [plugins.react, plugins.reactHooks, plugins.reactRefresh],
+  rules: {
+    ...eslintReactRules,
+    ...eslintReactHooksRules,
+    ...eslintReactRefresh,
+  },
 };
 
 module.exports = config;
