@@ -52,6 +52,11 @@ jobs:
           yarn ws:gi
           yarn zz:cmd:check:no-diff
 
+      - name: fmt:all
+        run: |
+          yarn fmt:all
+          yarn zz:cmd:check:no-diff
+
       - name: build
         run: |
           yarn ws:build
@@ -65,11 +70,6 @@ jobs:
 
       - name: ws:test
         run: yarn ws:test
-
-      - name: fmt:all
-        run: |
-          yarn fmt:all
-          yarn zz:cmd:check:no-diff
 
       - name: ws:lint:fix
         run: |
