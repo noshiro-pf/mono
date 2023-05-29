@@ -8,10 +8,20 @@
 const config = {
   extends: ['../.eslintrc.common-settings.js'],
   rules: {
-    // TODO
-    // 'functional/prefer-readonly-type': ['warn', preferReadonlyTypeOptions],
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'], // modified
     '@typescript-eslint/consistent-indexed-object-style': 'error',
+
+    // TODO
+    // https://github.com/jonaskello/eslint-plugin-functional/blob/master/docs/rules/prefer-readonly-type.md
+    'functional/prefer-readonly-type': [
+      'warn',
+      {
+        ignoreCollections: false,
+        ignoreClass: 'fieldsOnly',
+        // allowMutableReturnType: true,
+        // ignorePattern: [],
+      },
+    ],
   },
 };
 

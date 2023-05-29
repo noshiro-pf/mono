@@ -21,6 +21,7 @@ const { eslintReactHooksRules } = require('./eslint-react-hooks-rules');
 const { eslintArrayFuncRules } = require('./eslint-array-func-rules');
 const { eslintRules } = require('./eslint-rules');
 const { eslintSecurityRules } = require('./eslint-security-rules');
+const { eslintReactRefresh } = require('./eslint-react-refresh-rules');
 const {
   typescriptEslintRules,
   banTypes,
@@ -37,6 +38,7 @@ module.exports = {
   eslintUnicornRules,
   eslintReactRules,
   eslintReactHooksRules,
+  eslintReactRefresh,
   eslintArrayFuncRules,
   eslintRules,
   eslintSecurityRules,

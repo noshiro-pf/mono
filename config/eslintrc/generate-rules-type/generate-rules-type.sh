@@ -16,6 +16,7 @@ typeNames=(
     "EslintUnicornRules"
     "EslintReactRules"
     "EslintReactHooksRules"
+    "EslintReactRefresh"
     "EslintRules"
     "TypeScriptEslintRules"
 )
@@ -32,6 +33,7 @@ pluginNames=(
     "eslint-plugin-unicorn"
     "eslint-plugin-react"
     "eslint-plugin-react-hooks"
+    "eslint-plugin-react-refresh"
     "eslint"
     "@typescript-eslint/eslint-plugin"
 )
@@ -48,6 +50,7 @@ rulePrefixes=(
     "unicorn/"
     "react/"
     "react-hooks/"
+    "react-refresh/"
     "xxx"
     "@typescript-eslint/"
 )
@@ -64,6 +67,7 @@ outputFiles=(
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-unicorn-rules.ts"
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-react-rules.ts"
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-react-hooks-rules.ts"
+    "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-react-refresh-rules.ts"
     "${SCRIPT_DIR}/../eslint-rules/rules-type/eslint-rules.ts"
     "${SCRIPT_DIR}/../eslint-rules/rules-type/typescript-eslint-rules.ts"
 )
@@ -74,7 +78,7 @@ function generate () {
     pluginName=$2
     rulePrefix=$3
     outputFileName=$4
-
+    
     node ${SCRIPT_DIR}/index.js ${typeName} ${pluginName} ${rulePrefix} > ${outputFileName}
 }
 

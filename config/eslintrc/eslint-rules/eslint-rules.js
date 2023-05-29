@@ -53,7 +53,7 @@ const eslintRules = {
   'linebreak-style': 'off',
   'multiline-ternary': 'off',
   'newline-per-chained-call': 'off',
-  'new-parens': 'off',
+  // 'new-parens': 'off',
   'no-extra-parens': 'off',
   'no-extra-semi': 'off',
   'no-floating-decimal': 'off',
@@ -86,6 +86,8 @@ const eslintRules = {
   'wrap-iife': 'off',
   'wrap-regex': 'off',
   'yield-star-spacing': 'off',
+
+  'new-parens': ['error', 'always'],
 
   /**
    * disable in favor of @typescript-eslint

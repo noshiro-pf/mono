@@ -285,7 +285,15 @@ const typescriptEslintRules = {
   ], // modified
   '@typescript-eslint/restrict-template-expressions': [
     'error',
-    { allowNumber: true, allowBoolean: true, allowNullable: true },
+    {
+      allowNumber: true,
+      allowBoolean: true,
+      allowNullable: true,
+      allowAny: false,
+      allowNever: false,
+      allowNullish: false,
+      allowRegExp: false,
+    },
   ], // modified
   '@typescript-eslint/return-await': 'error',
   '@typescript-eslint/sort-type-constituents': 'error',
@@ -318,6 +326,9 @@ const typescriptEslintRules = {
   '@typescript-eslint/no-import-type-side-effects': 'off',
 
   '@typescript-eslint/no-mixed-enums': 'error',
+
+  '@typescript-eslint/no-duplicate-type-constituents': 'error',
+  '@typescript-eslint/no-unsafe-enum-comparison': 'error',
 
   // deprecated
   '@typescript-eslint/no-duplicate-imports': 'off',

@@ -16,6 +16,7 @@ const plugins = {
   totalFunctions: 'total-functions',
   react: 'react',
   reactHooks: 'react-hooks',
+  reactRefresh: 'react-refresh',
 };
 
 module.exports = { plugins };
