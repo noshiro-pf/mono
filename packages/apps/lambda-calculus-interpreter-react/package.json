@@ -81,7 +81,7 @@
     ]
   },
   "dependencies": {
-    "@emotion/react": "^11.10.5",
+    "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.10.5",
     "@noshiro/lambda-calculus-interpreter-core": "*",
     "@noshiro/react-utils": "*",
