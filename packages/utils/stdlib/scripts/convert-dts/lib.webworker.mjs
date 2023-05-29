@@ -3,7 +3,7 @@
  * @param {string} from
  * @returns {string}
  */
-export const convertLibDom = (from) => {
+export const convertLibWebWorker = (from) => {
   let ret = from;
 
   ret = ret.replaceAll(

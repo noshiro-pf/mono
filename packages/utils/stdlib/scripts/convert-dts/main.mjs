@@ -21,6 +21,7 @@ import { convertLibEs2022Object } from './lib.es2022.object.mjs';
 import { convertLibEs2022Sharedmemory } from './lib.es2022.sharedmemory.mjs';
 import { convertLibEs2023Array } from './lib.es2023.array.mjs';
 import { convertLibEs5 } from './lib.es5.mjs';
+import { convertLibWebWorker } from './lib.webworker.mjs';
 
 const srcDir = './temp';
 const distDir = './dist';
@@ -120,6 +121,10 @@ const convert = (content, filename) => {
   switch (filename) {
     case 'lib.dom.d.ts':
       ret = convertLibDom(ret);
+      break;
+
+    case 'lib.webworker.d':
+      ret = convertLibWebWorker(ret);
       break;
 
     case 'lib.dom.iterable.d.ts':
