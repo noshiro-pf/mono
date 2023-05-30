@@ -64,7 +64,8 @@
         "tsconfig.json",
         "../../../config/tsconfig/**",
         "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts"
+        "../ts-type-utils/ts-type-utils.d.ts",
+        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
       ],
       "output": [
         "cjs/**",
@@ -96,7 +97,8 @@
         "../../../config/tsconfig/**",
         "../../../config/eslintrc/**",
         "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts"
+        "../ts-type-utils/ts-type-utils.d.ts",
+        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
       ],
       "output": []
     },
@@ -112,7 +114,8 @@
         "../../../config/tsconfig/**",
         "../../../config/eslintrc/**",
         "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts"
+        "../ts-type-utils/ts-type-utils.d.ts",
+        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
       ],
       "clean": false,
       "output": [
@@ -133,7 +136,8 @@
         "tsconfig.json",
         "../../../config/tsconfig/**",
         "../stdlib/stdlib.d.ts",
-        "../ts-type-utils/ts-type-utils.d.ts"
+        "../ts-type-utils/ts-type-utils.d.ts",
+        "../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts"
       ],
       "output": []
     }
