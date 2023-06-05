@@ -78,7 +78,7 @@ result
 1. (local) Set environment variable `DISCORD_TOKEN` generated at [Discord Developer Portal](https://discord.com/developers/applications).
 1. (local) `yarn build:prd`
 1. (local) `yarn scp`
-1. (in VM) `node ./bot.prd.cjs`
+1. (in VM) `nohup node ./bot.prd.cjs &`
 
 ## Links
 
