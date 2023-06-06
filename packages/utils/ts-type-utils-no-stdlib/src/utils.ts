@@ -1,5 +1,7 @@
 /* Type Test Utilities */
 
+import { type MakeTuple } from './make-tuple';
+
 // https://github.com/microsoft/TypeScript/issues/27024
 // prettier-ignore
 export type TypeEq<A, B> =
@@ -87,8 +89,9 @@ export type MutableRecord<K extends RecordKeyType, V> = {
 export type RecordBase = Record<RecordKeyType, unknown>;
 
 export type FunctionType<A, B> = (value: A) => B;
+export type Fn<A, B> = (value: A) => B;
 
-export type MonoTypeFunction<X> = (value: X) => X;
+export type MonoTypeFunction<X> = Fn<X, X>;
 
 /* Array utilities */
 
@@ -102,21 +105,11 @@ export type ArrayElement<S> = S extends readonly (infer T)[] ? T : never;
 
 /* ArrayOfLength */
 
-export type ArrayOfLength<N extends number, T> = _ArrayOfLengthRec<
-  N,
-  T,
-  readonly []
->;
+export type ArrayOfLength<N extends number, Elm> = MakeTuple<Elm, N>;
 
-export type MutableArrayOfLength<N extends number, T> = Writable<
-  ArrayOfLength<N, T>
+export type MutableArrayOfLength<N extends number, Elm> = Writable<
+  ArrayOfLength<N, Elm>
 >;
-
-/** @internal */
-type _ArrayOfLengthRec<Num, Elm, T extends readonly unknown[]> = {
-  0: T;
-  1: _ArrayOfLengthRec<Num, Elm, readonly [Elm, ...T]>;
-}[T extends { length: Num } ? 0 : 1];
 
 /* ArrayAtLeastLen */
 
@@ -124,11 +117,11 @@ type _ArrayOfLengthRec<Num, Elm, T extends readonly unknown[]> = {
 
 export type MutableArrayAtLeastLen<
   N extends number,
-  T
-> = MutableArrayAtLeastLenRec<N, T, T[], []>;
+  Elm
+> = MutableArrayAtLeastLenRec<N, Elm, Elm[], []>;
 
-export type ArrayAtLeastLen<N extends number, T> = Readonly<
-  MutableArrayAtLeastLen<N, T>
+export type ArrayAtLeastLen<N extends number, Elm> = Readonly<
+  MutableArrayAtLeastLen<N, Elm>
 >;
 
 /** @internal */

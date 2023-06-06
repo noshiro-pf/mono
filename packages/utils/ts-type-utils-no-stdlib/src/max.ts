@@ -1,16 +1,16 @@
+import { type Uint10 } from './enum';
 import { type IsNever } from './is-never';
 
+export type Max<N extends Uint10> = _MaxImpl<N, []>;
+
 type _MaxImpl<
-  N extends number,
+  N extends Uint10,
   T extends readonly unknown[]
 > = IsNever<N> extends true
   ? never
   : [N] extends [Partial<T>['length']]
   ? T['length']
   : _MaxImpl<N, [0, ...T]>;
-
-// export type Max<N extends Index<512>> = _MaxImpl<N, []>;
-export type Max<N extends number> = _MaxImpl<N, []>;
 
 // /** @internal */
 // namespace _MaxImpl {
@@ -61,14 +61,14 @@ export type Max<N extends number> = _MaxImpl<N, []>;
 //   }[keyof LEQ];
 // }
 
-// export type Max<N extends Index<512>> = _MaxImpl.Main<N>;
+// export type Max<N extends Uint10> = _MaxImpl.Main<N>;
 
 // /** @internal */
-// type _MaxImpl<N extends Index<64>, T extends readonly unknown[] = []> = {
+// type _MaxImpl<N extends Index<64>, T extends readonly unknown[]> = {
 //   b: T['length'];
 //   r: _MaxImpl<N, [0, ...T]>;
 // }[[N] extends [Partial<T>['length']] ? 'b' : 'r'];
 
-// export type Max<N extends Index<64>> = _MaxImpl<N>;
+// export type Max<N extends Index<64>> = _MaxImpl<N, []>;
 
 // https://stackoverflow.com/questions/62968955/how-to-implement-a-type-level-max-function-over-a-union-of-literals-in-typescri

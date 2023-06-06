@@ -1,6 +1,6 @@
 import { MutableMap } from './aliases';
 
-export const memoizeFunction = <A extends unknown[], R, K>(
+export const memoizeFunction = <A extends readonly unknown[], R, K>(
   fn: (...args: A) => R,
   argsToCacheKey: (...args: A) => K
 ): ((...args: A) => R) => {

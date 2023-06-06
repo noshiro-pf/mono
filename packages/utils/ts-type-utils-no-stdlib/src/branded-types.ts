@@ -2,12 +2,10 @@ import { type Brand } from './brand';
 import { type Index, type NegativeIndex } from './index-type';
 
 /** @internal */
-type SmallIntPositiveIndexMax = 512;
-/** @internal */
-type SmallIntNegativeIndexMax = 513;
+type SmallIntIndexMax = 512;
 
-export type SmallUint = Index<SmallIntPositiveIndexMax>;
-export type SmallNegativeInt = NegativeIndex<SmallIntNegativeIndexMax>;
+export type SmallUint = Index<SmallIntIndexMax>;
+export type SmallNegativeInt = NegativeIndex<SmallIntIndexMax>;
 export type SmallInt = SmallNegativeInt | SmallUint;
 export type NonZeroSmallInt = Exclude<SmallInt, 0>;
 
