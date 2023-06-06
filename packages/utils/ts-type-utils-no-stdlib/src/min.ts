@@ -1,16 +1,16 @@
-import { type Index } from './index-type';
+import { type Uint10 } from './enum';
 import { type IsNever } from './is-never';
 
+export type Min<N extends Uint10> = _MinImpl<N, []>;
+
 type _MinImpl<
-  N extends number,
+  N extends Uint10,
   T extends readonly unknown[]
 > = IsNever<N> extends true
   ? never
   : T['length'] extends N
   ? T['length']
   : _MinImpl<N, [0, ...T]>;
-
-export type Min<N extends Index<512>> = _MinImpl<N, []>;
 
 // /** @internal */
 // type _MinImpl<

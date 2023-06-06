@@ -7,7 +7,7 @@ type T = Int8;
 type A = T;
 
 /** non-negative type */
-type Abs = Exclude<Int8, NegativeIndex<129>>;
+type Abs = Exclude<Int8, NegativeIndex<128>>;
 
 /** denominator type */
 type D = Exclude<Int8, 0>;

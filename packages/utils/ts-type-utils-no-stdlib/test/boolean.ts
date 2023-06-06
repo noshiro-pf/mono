@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   type BoolAnd,
   type BoolEq,
@@ -15,6 +16,9 @@ import { expectType } from './expect-type';
 
   expectType<BoolNot<never>, never>('=');
   expectType<BoolNot<boolean>, never>('=');
+
+  // @ts-expect-error
+  expectType<BoolNot<'true'>, never>('=');
 }
 {
   expectType<BoolAnd<true, true>, true>('=');
@@ -34,6 +38,13 @@ import { expectType } from './expect-type';
   expectType<BoolAnd<boolean, true>, never>('=');
   expectType<BoolAnd<boolean, false>, never>('=');
   expectType<BoolAnd<boolean, boolean>, never>('=');
+
+  // @ts-expect-error
+  expectType<BoolAnd<'true', true>, never>('=');
+  // @ts-expect-error
+  expectType<BoolAnd<true, 'true'>, never>('=');
+  // @ts-expect-error
+  expectType<BoolAnd<'true', 'true'>, never>('=');
 }
 {
   expectType<BoolOr<true, true>, true>('=');
@@ -53,6 +64,13 @@ import { expectType } from './expect-type';
   expectType<BoolOr<boolean, true>, never>('=');
   expectType<BoolOr<boolean, false>, never>('=');
   expectType<BoolOr<boolean, boolean>, never>('=');
+
+  // @ts-expect-error
+  expectType<BoolOr<'true', true>, never>('=');
+  // @ts-expect-error
+  expectType<BoolOr<true, 'true'>, never>('=');
+  // @ts-expect-error
+  expectType<BoolOr<'true', 'true'>, never>('=');
 }
 {
   expectType<BoolNand<true, true>, false>('=');
@@ -72,6 +90,13 @@ import { expectType } from './expect-type';
   expectType<BoolNand<boolean, true>, never>('=');
   expectType<BoolNand<boolean, false>, never>('=');
   expectType<BoolNand<boolean, boolean>, never>('=');
+
+  // @ts-expect-error
+  expectType<BoolNand<'true', true>, never>('=');
+  // @ts-expect-error
+  expectType<BoolNand<true, 'true'>, never>('=');
+  // @ts-expect-error
+  expectType<BoolNand<'true', 'true'>, never>('=');
 }
 {
   expectType<BoolNor<true, true>, false>('=');
@@ -91,6 +116,13 @@ import { expectType } from './expect-type';
   expectType<BoolNor<boolean, true>, never>('=');
   expectType<BoolNor<boolean, false>, never>('=');
   expectType<BoolNor<boolean, boolean>, never>('=');
+
+  // @ts-expect-error
+  expectType<BoolNor<'true', true>, never>('=');
+  // @ts-expect-error
+  expectType<BoolNor<true, 'true'>, never>('=');
+  // @ts-expect-error
+  expectType<BoolNor<'true', 'true'>, never>('=');
 }
 {
   expectType<BoolEq<true, true>, true>('=');
@@ -110,6 +142,13 @@ import { expectType } from './expect-type';
   expectType<BoolEq<boolean, true>, never>('=');
   expectType<BoolEq<boolean, false>, never>('=');
   expectType<BoolEq<boolean, boolean>, never>('=');
+
+  // @ts-expect-error
+  expectType<BoolEq<'true', true>, never>('=');
+  // @ts-expect-error
+  expectType<BoolEq<true, 'true'>, never>('=');
+  // @ts-expect-error
+  expectType<BoolEq<'true', 'true'>, never>('=');
 }
 {
   expectType<BoolNeq<true, true>, false>('=');
@@ -129,4 +168,11 @@ import { expectType } from './expect-type';
   expectType<BoolNeq<boolean, true>, never>('=');
   expectType<BoolNeq<boolean, false>, never>('=');
   expectType<BoolNeq<boolean, boolean>, never>('=');
+
+  // @ts-expect-error
+  expectType<BoolNeq<'true', true>, never>('=');
+  // @ts-expect-error
+  expectType<BoolNeq<true, 'true'>, never>('=');
+  // @ts-expect-error
+  expectType<BoolNeq<'true', 'true'>, never>('=');
 }

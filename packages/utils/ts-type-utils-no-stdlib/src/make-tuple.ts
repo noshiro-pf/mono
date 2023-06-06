@@ -1,9 +1,12 @@
-export type MakeTuple<T, N extends number> = _MakeTupleInternals.MakeTupleImpl<
-  T,
-  `${N}`
->;
+export type MakeTuple<
+  Elm,
+  N extends number
+> = _MakeTupleInternals.MakeTupleImpl<Elm, `${N}`, []>;
 
-/** @internal */
+/**
+ * @link https://techracho.bpsinc.jp/yoshi/2020_09_04/97108
+ * @internal
+ */
 export namespace _MakeTupleInternals {
   /** @internal */
   type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -37,16 +40,29 @@ export namespace _MakeTupleInternals {
 
   /** @internal */
   export type MakeTupleImpl<
-    T,
+    Elm,
     N extends string,
-    X extends readonly unknown[] = []
+    X extends readonly unknown[]
   > = string extends N
     ? never
     : N extends ''
     ? X
     : First<N> extends infer U
     ? U extends DigitStr
-      ? MakeTupleImpl<T, Tail<N>, readonly [...Tile<[T], U>, ...Tile<X, 10>]>
+      ? MakeTupleImpl<
+          Elm,
+          Tail<N>,
+          readonly [...Tile<[Elm], U>, ...Tile<X, 10>]
+        >
       : never
     : never;
 }
+
+// type MakeTuple<Elm, N extends number> = _MakeTupleImpl<N, Elm, readonly []>;
+
+// /** @internal */
+// type _MakeTupleImpl<Num, Elm, T extends readonly unknown[]> =
+//   //
+//   T extends { length: Num }
+//     ? T
+//     : _MakeTupleImpl<Num, Elm, readonly [Elm, ...T]>;

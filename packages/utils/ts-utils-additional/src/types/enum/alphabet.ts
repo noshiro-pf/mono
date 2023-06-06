@@ -6,12 +6,6 @@ export type LowerAlphabet = (
   | 'v' | 'w' | 'x' | 'y' | 'z'
 );
 
-// prettier-ignore
-export type UpperAlphabet = (
-  | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G'
-  | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N'
-  | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U'
-  | 'V' | 'W' | 'X' | 'Y' | 'Z'
-);
+export type UpperAlphabet = Uppercase<LowerAlphabet>;
 
 export type Alphabet = LowerAlphabet | UpperAlphabet;
