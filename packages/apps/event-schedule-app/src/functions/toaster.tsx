@@ -1,6 +1,6 @@
 import {
-  Toaster,
-  type IToasterProps,
+  OverlayToaster,
+  type OverlayToasterProps,
   type ToastProps,
 } from '@blueprintjs/core';
 import { createRoot } from 'react-dom/client';
@@ -12,12 +12,12 @@ const callback =
   (
     resolve: (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      value: PromiseLike<Toaster> | Toaster
+      value: OverlayToaster | PromiseLike<OverlayToaster>
     ) => void,
     reject: (reason?: unknown) => void
   ) =>
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  (instance: Toaster | null) => {
+  (instance: OverlayToaster | null) => {
     if (instance === null) {
       reject(new Error('[Blueprint] Unable to create toaster.'));
     } else {
@@ -26,18 +26,18 @@ const callback =
   };
 
 export const createToaster = (
-  props?: DeepReadonly<IToasterProps>,
+  props?: DeepReadonly<OverlayToasterProps>,
   container = document.body
-): Promise<Toaster> => {
+): Promise<OverlayToaster> => {
   const containerElement = document.createElement('div');
 
   container.append(containerElement);
 
   const root = createRoot(containerElement);
 
-  return new Promise<Toaster>((resolve, reject) => {
+  return new Promise<OverlayToaster>((resolve, reject) => {
     root.render(
-      <Toaster
+      <OverlayToaster
         canEscapeKeyClear={true}
         position={'top'}
         usePortal={false}
