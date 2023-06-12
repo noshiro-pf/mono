@@ -45,7 +45,7 @@
     "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.0",
+    "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.10.5",
     "@fontsource/roboto": "^4.5.8",
     "@mui/material": "^5.11.6",
