@@ -2,9 +2,23 @@ import { type WritingsInfo } from '../types';
 
 export const writings: readonly WritingsInfo[] = [
   {
+    id: 'typescript-type-utilities-min-max',
+    link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-utilities',
+    title: 'TypeScript 型ユーティリティ集',
+    subtitle: '',
+    body: '私が自作してライブラリやアプリの開発などにも使っている TypeScript の型ユーティリティをまとめました。',
+  },
+  {
+    id: 'typescript-type-utilities',
+    link: 'https://zenn.dev/noshiro_piko/articles/typescript-type-level-min',
+    title: 'TypeScript の型ユーティリティ Min, Max の実装',
+    subtitle: 'TypeScript の型ユーティリティ Min, Max の実装と解説',
+    body: '',
+  },
+  {
     id: 'typescript-type-branding',
     link: 'https://zenn.dev/noshiro_piko/articles/typescript-branded-type-int',
-    title: 'TypeScript の Type Branding をより便利に活用する方法のまとめ',
+    title: '★ TypeScript の Type Branding をより便利に活用する方法のまとめ',
     subtitle: '',
     body: 'TypeScript で用いられることのある Type Branding というハックをより便利に活用する方法をまとめました。',
   },
@@ -97,10 +111,9 @@ export const writings: readonly WritingsInfo[] = [
   {
     id: 'reactive-programming-introduction-with-rxjs',
     link: 'https://qiita.com/pikohideaki/items/292ab134397f4959e66b',
-    title: '★ RxJSによるリアクティブプログラミング入門',
-    subtitle:
-      'RxJSを用いたリアクティブプログラミングについての入門者向け解説記事',
-    body: 'リアクティブプログラミングとは何なのか・どうやって使うのか・使うと何が嬉しいのかをなるべく予備知識なく分かるように解説してみたもの。',
+    title: '★ リアクティブプログラミングはどう有用なのか',
+    subtitle: 'リアクティブプログラミングについての入門者向け解説記事',
+    body: 'リアクティブプログラミングとは何なのか・どうやって使うのか・使うと何が嬉しいのかを RxJS を題材になるべく予備知識なく分かるように解説してみたもの。',
   },
   {
     id: 'dezero-slides',
