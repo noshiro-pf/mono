@@ -12,7 +12,7 @@ class FromSubscribableObservableClass<A, E = unknown>
   implements FromSubscribableObservable<A, E>
 {
   constructor(subscribable: Subscribable<A>) {
-    super({ type: 'FromSubscribable', currentValueInit: Maybe.none });
+    super({ type: 'FromSubscribable', initialValue: Maybe.none });
 
     subscribable.subscribe(
       (nextValue) => {

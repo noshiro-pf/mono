@@ -32,26 +32,26 @@ class DistinctUntilChangedObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'distinctUntilChanged',
-      currentValueInit: parentObservable.currentValue,
+      initialValue: parentObservable.snapshot,
     });
-    // parentObservable.currentValue has value
+    // parentObservable.snapshot has value
     // if parentObservable is InitializedObservable
-    this.#previousValue = parentObservable.currentValue;
+    this.#previousValue = parentObservable.snapshot;
     this.#eq = eq;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
 
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
     const prev = this.#previousValue;
 
-    if (Maybe.isNone(prev) || !this.#eq(prev.value, par.currentValue.value)) {
-      this.setNext(par.currentValue.value, updaterSymbol);
+    if (Maybe.isNone(prev) || !this.#eq(prev.value, par.snapshot.value)) {
+      this.setNext(par.snapshot.value, updaterSymbol);
     }
-    this.#previousValue = par.currentValue;
+    this.#previousValue = par.snapshot;
   }
 }

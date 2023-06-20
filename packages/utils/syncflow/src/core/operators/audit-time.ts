@@ -30,7 +30,7 @@ class AuditTimeObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'auditTime',
-      currentValueInit: parentObservable.currentValue,
+      initialValue: parentObservable.snapshot,
     });
     this.#isSkipping = false;
     this.#timerId = undefined;
@@ -41,7 +41,7 @@ class AuditTimeObservableClass<A>
     const par = this.parents[0];
     if (
       par.updaterSymbol !== updaterSymbol ||
-      Maybe.isNone(par.currentValue) ||
+      Maybe.isNone(par.snapshot) ||
       this.#isSkipping
     ) {
       return; // skip update
@@ -50,8 +50,8 @@ class AuditTimeObservableClass<A>
     // set timer
     this.#isSkipping = true;
     this.#timerId = setTimeout(() => {
-      if (Maybe.isNone(par.currentValue)) return;
-      this.startUpdate(par.currentValue.value);
+      if (Maybe.isNone(par.snapshot)) return;
+      this.startUpdate(par.snapshot.value);
       this.#isSkipping = false;
     }, this.#milliSeconds);
   }

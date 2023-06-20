@@ -22,26 +22,26 @@ class PairwiseObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'pairwise',
-      currentValueInit: Maybe.none,
+      initialValue: Maybe.none,
     });
-    // parentObservable.currentValue has value
+    // parentObservable.snapshot has value
     // if parentObservable is InitializedObservable
-    this.#previousValue = parentObservable.currentValue;
+    this.#previousValue = parentObservable.snapshot;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
 
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
     const prev = this.#previousValue;
 
     if (!Maybe.isNone(prev)) {
-      this.setNext([prev.value, par.currentValue.value], updaterSymbol);
+      this.setNext([prev.value, par.snapshot.value], updaterSymbol);
     }
 
-    this.#previousValue = par.currentValue;
+    this.#previousValue = par.snapshot;
   }
 }

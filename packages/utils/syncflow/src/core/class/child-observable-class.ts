@@ -87,18 +87,18 @@ export class AsyncChildObservableClass<
     type,
     parents,
     depth = 1 + maxDepth(parents),
-    currentValueInit,
+    initialValue,
   }: Readonly<{
     type: Type;
     parents: Wrap<P>;
     depth?: number;
-    currentValueInit: AsyncChildObservable<A, Type>['currentValue'];
+    initialValue: AsyncChildObservable<A, Type>['snapshot'];
   }>) {
     super({
       kind: 'async child',
       type,
       depth,
-      currentValueInit,
+      initialValue,
     });
     this.type = type;
     this.parents = parents;
@@ -165,18 +165,18 @@ export class SyncChildObservableClass<
     type,
     parents,
     depth = 1 + maxDepth(parents),
-    currentValueInit,
+    initialValue,
   }: Readonly<{
     type: Type;
     parents: Wrap<P>;
     depth?: number;
-    currentValueInit: SyncChildObservable<A, Type>['currentValue'];
+    initialValue: SyncChildObservable<A, Type>['snapshot'];
   }>) {
     super({
       kind: 'sync child',
       type,
       depth,
-      currentValueInit,
+      initialValue,
     });
     this.type = type;
     this.parents = parents;
@@ -215,17 +215,17 @@ export class InitializedSyncChildObservableClass<
     type,
     parents,
     depth = 1 + maxDepth(parents),
-    currentValueInit,
+    initialValue,
   }: Readonly<{
     type: Type;
     parents: Wrap<P>;
     depth?: number;
-    currentValueInit: InitializedSyncChildObservable<A, Type>['currentValue'];
+    initialValue: InitializedSyncChildObservable<A, Type>['snapshot'];
   }>) {
-    super({ type, parents, depth, currentValueInit });
+    super({ type, parents, depth, initialValue });
   }
 
-  override get currentValue(): Maybe.Some<A> {
+  override get snapshot(): Maybe.Some<A> {
     return super.getCurrentValue() as Maybe.Some<A>;
   }
 

@@ -43,13 +43,13 @@ class WithBufferedFromObservableClass<A, B>
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       type: 'withBufferedFrom',
-      currentValueInit: Maybe.isNone(parentObservable.currentValue)
+      initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
         : Maybe.some([
-            parentObservable.currentValue.value,
-            Maybe.isNone(observable.currentValue)
+            parentObservable.snapshot.value,
+            Maybe.isNone(observable.snapshot)
               ? []
-              : [observable.currentValue.value],
+              : [observable.snapshot.value],
           ]),
     });
 
@@ -60,14 +60,11 @@ class WithBufferedFromObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(
-      [par.currentValue.value, this.#mut_bufferedValues],
-      updaterSymbol
-    );
+    this.setNext([par.snapshot.value, this.#mut_bufferedValues], updaterSymbol);
     this.#clearBuffer();
   }
 

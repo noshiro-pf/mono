@@ -25,10 +25,10 @@ class TakeWhileObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'takeWhile',
-      currentValueInit: Maybe.isNone(parentObservable.currentValue)
+      initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
-        : predicate(parentObservable.currentValue.value)
-        ? parentObservable.currentValue
+        : predicate(parentObservable.snapshot.value)
+        ? parentObservable.snapshot
         : Maybe.none,
     });
     this.#predicate = predicate;
@@ -36,12 +36,12 @@ class TakeWhileObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    if (this.#predicate(par.currentValue.value)) {
-      this.setNext(par.currentValue.value, updaterSymbol);
+    if (this.#predicate(par.snapshot.value)) {
+      this.setNext(par.snapshot.value, updaterSymbol);
     } else {
       this.complete();
     }

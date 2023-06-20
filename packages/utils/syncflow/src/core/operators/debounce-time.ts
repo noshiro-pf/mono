@@ -29,7 +29,7 @@ class DebounceTimeObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'debounceTime',
-      currentValueInit: parentObservable.currentValue,
+      initialValue: parentObservable.snapshot,
     });
     this.#timerId = undefined;
     this.#milliSeconds = milliSeconds;
@@ -37,15 +37,15 @@ class DebounceTimeObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
     this.#resetTimer();
     // set timer
     this.#timerId = setTimeout(() => {
-      if (Maybe.isNone(par.currentValue)) return;
-      this.startUpdate(par.currentValue.value);
+      if (Maybe.isNone(par.snapshot)) return;
+      this.startUpdate(par.snapshot.value);
     }, this.#milliSeconds);
   }
 

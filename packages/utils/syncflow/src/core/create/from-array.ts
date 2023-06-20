@@ -15,7 +15,7 @@ class FromArrayObservableClass<A>
   readonly #values: readonly A[];
 
   constructor(values: readonly A[], startManually: boolean = false) {
-    super({ type: 'FromArray', currentValueInit: Maybe.none });
+    super({ type: 'FromArray', initialValue: Maybe.none });
     this.#values = values;
     if (!startManually) {
       setTimeout(() => {

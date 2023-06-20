@@ -16,7 +16,7 @@ class TimerObservableClass
   #isStarted: boolean;
 
   constructor(milliSeconds: number, startManually: boolean) {
-    super({ type: 'Timer', currentValueInit: Maybe.none });
+    super({ type: 'Timer', initialValue: Maybe.none });
     this.#milliSeconds = milliSeconds;
     this.#timerId = undefined;
     this.#isStarted = false;

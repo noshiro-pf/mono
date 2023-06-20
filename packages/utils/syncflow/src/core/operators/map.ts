@@ -28,17 +28,17 @@ class MapObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'map',
-      currentValueInit: Maybe.map(parentObservable.currentValue, mapFn),
+      initialValue: Maybe.map(parentObservable.snapshot, mapFn),
     });
     this.#mapFn = mapFn;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(this.#mapFn(par.currentValue.value), updaterSymbol);
+    this.setNext(this.#mapFn(par.snapshot.value), updaterSymbol);
   }
 }

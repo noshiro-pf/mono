@@ -25,23 +25,23 @@ class SkipWhileObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'skipWhile',
-      currentValueInit: Maybe.isNone(parentObservable.currentValue)
+      initialValue: Maybe.isNone(parentObservable.snapshot)
         ? Maybe.none
-        : predicate(parentObservable.currentValue.value)
+        : predicate(parentObservable.snapshot.value)
         ? Maybe.none
-        : parentObservable.currentValue,
+        : parentObservable.snapshot,
     });
     this.#predicate = predicate;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    if (!this.#predicate(par.currentValue.value)) {
-      this.setNext(par.currentValue.value, updaterSymbol);
+    if (!this.#predicate(par.snapshot.value)) {
+      this.setNext(par.snapshot.value, updaterSymbol);
     }
   }
 }

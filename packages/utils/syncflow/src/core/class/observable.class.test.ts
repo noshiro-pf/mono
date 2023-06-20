@@ -53,7 +53,7 @@ expectType<Observable<number>, Observable<1>>('!<=');
 
 const root = new RootObservableClass({
   type: 'FromArray',
-  currentValueInit: Maybe.some(0),
+  initialValue: Maybe.some(0),
 });
 
 expectType<typeof root, RootObservable<number, 'FromArray'>>('<=');
@@ -61,14 +61,14 @@ expectType<typeof root, RootObservable<number, 'FromArray'>>('<=');
 const syncChild = new SyncChildObservableClass({
   parents: [root],
   type: 'map',
-  currentValueInit: Maybe.some(0),
+  initialValue: Maybe.some(0),
 });
 expectType<typeof syncChild, SyncChildObservable<number, 'map'>>('<=');
 
 const asyncChild = new AsyncChildObservableClass({
   parents: [root],
   type: 'debounceTime',
-  currentValueInit: Maybe.some(0),
+  initialValue: Maybe.some(0),
 });
 expectType<typeof asyncChild, AsyncChildObservable<number, 'debounceTime'>>(
   '<='

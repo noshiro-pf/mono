@@ -30,7 +30,7 @@ class ThrottleTimeObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'throttleTime',
-      currentValueInit: parentObservable.currentValue,
+      initialValue: parentObservable.snapshot,
     });
     this.#mut_timerId = undefined;
     this.#mut_isSkipping = false;
@@ -41,13 +41,13 @@ class ThrottleTimeObservableClass<A>
     const par = this.parents[0];
     if (
       par.updaterSymbol !== updaterSymbol ||
-      Maybe.isNone(par.currentValue) ||
+      Maybe.isNone(par.snapshot) ||
       this.#mut_isSkipping
     ) {
       return; // skip update
     }
 
-    this.setNext(par.currentValue.value, updaterSymbol);
+    this.setNext(par.snapshot.value, updaterSymbol);
 
     this.#mut_isSkipping = true;
     // set timer

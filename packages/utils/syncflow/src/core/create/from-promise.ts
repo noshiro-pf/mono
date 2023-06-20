@@ -11,7 +11,7 @@ class FromPromiseObservableClass<A, E = unknown>
   implements FromPromiseObservable<A, E>
 {
   constructor(promise: Readonly<Promise<A>>) {
-    super({ type: 'FromPromise', currentValueInit: Maybe.none });
+    super({ type: 'FromPromise', initialValue: Maybe.none });
 
     promise
       .then((value) => {

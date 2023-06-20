@@ -32,7 +32,7 @@ export type ObservableBase<A> = Readonly<{
   addChild: <B>(child: ChildObservable<B>) => void;
 
   // state
-  currentValue: Maybe<A>;
+  snapshot: Maybe<A>;
   isCompleted: boolean;
   updaterSymbol: UpdaterSymbol;
   hasSubscriber: boolean;
@@ -52,7 +52,7 @@ export type ObservableBase<A> = Readonly<{
 
 export type InitializedObservableBase<A> = ObservableBase<A> &
   Readonly<{
-    currentValue: Maybe.Some<A>;
+    snapshot: Maybe.Some<A>;
     chain: (<B>(
       operator:
         | InitializedToInitializedOperator<A, B>

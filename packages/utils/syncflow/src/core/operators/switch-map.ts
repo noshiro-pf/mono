@@ -31,7 +31,7 @@ class SwitchMapObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'switchMap',
-      currentValueInit: Maybe.none,
+      initialValue: Maybe.none,
     });
     this.#mapToObservable = mapToObservable;
     this.#observable = undefined;
@@ -40,14 +40,14 @@ class SwitchMapObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
     this.#observable?.complete();
     this.#subscription?.unsubscribe();
 
-    const observable = this.#mapToObservable(par.currentValue.value);
+    const observable = this.#mapToObservable(par.snapshot.value);
     this.#observable = observable;
 
     const subscription = observable.subscribe((curr) => {

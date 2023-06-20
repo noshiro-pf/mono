@@ -39,22 +39,19 @@ class WithIndexObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'withIndex',
-      currentValueInit: Maybe.map(parentObservable.currentValue, (x) => [
-        -1,
-        x,
-      ]),
+      initialValue: Maybe.map(parentObservable.snapshot, (x) => [-1, x]),
     });
     this.#mut_index = -1;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
     this.#mut_index =
       this.#mut_index === -1 ? 0 : SafeUint.add(this.#mut_index, 1);
-    this.setNext([this.#mut_index, par.currentValue.value], updaterSymbol);
+    this.setNext([this.#mut_index, par.snapshot.value], updaterSymbol);
   }
 }

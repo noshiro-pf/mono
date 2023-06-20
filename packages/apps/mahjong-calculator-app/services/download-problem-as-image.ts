@@ -16,8 +16,8 @@ export const downloadProblemAsImage = async (): Promise<void> => {
     .toDataURL('image/png')
     .replace('image/png', 'image/octet-stream');
 
-  const handSorted = handSorted$.currentValue;
-  const revealedBlocks = revealedBlocks$.currentValue;
+  const handSorted = handSorted$.snapshot;
+  const revealedBlocks = revealedBlocks$.snapshot;
 
   if (Maybe.isNone(handSorted) || Maybe.isNone(revealedBlocks)) return;
 

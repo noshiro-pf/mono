@@ -14,7 +14,7 @@ class OfObservableClass<A>
   readonly #value: A;
 
   constructor(value: A, startManually: boolean = false) {
-    super({ type: 'Of', currentValueInit: Maybe.none });
+    super({ type: 'Of', initialValue: Maybe.none });
     this.#value = value;
     if (!startManually) {
       setTimeout(() => {

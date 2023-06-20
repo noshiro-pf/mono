@@ -28,14 +28,14 @@ class MapToObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'mapTo',
-      currentValueInit: Maybe.map(parentObservable.currentValue, () => value),
+      initialValue: Maybe.map(parentObservable.snapshot, () => value),
     });
     this.#value = value;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 

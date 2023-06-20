@@ -33,9 +33,9 @@ class TakeObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'take',
-      currentValueInit: !isPositiveSafeInteger(n)
+      initialValue: !isPositiveSafeInteger(n)
         ? Maybe.none
-        : parentObservable.currentValue,
+        : parentObservable.snapshot,
     });
     this.#mut_counter = 0;
     this.#n = n as IntersectBrand<NonZeroSafeIntBrand, SafeUintBrand>;
@@ -48,7 +48,7 @@ class TakeObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
@@ -56,7 +56,7 @@ class TakeObservableClass<A>
     if (this.#mut_counter > this.#n) {
       this.complete();
     } else {
-      this.setNext(par.currentValue.value, updaterSymbol);
+      this.setNext(par.snapshot.value, updaterSymbol);
     }
   }
 }
