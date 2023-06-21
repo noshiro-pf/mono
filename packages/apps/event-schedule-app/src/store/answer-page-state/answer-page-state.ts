@@ -51,7 +51,7 @@ const setAnswerBeingEditedSectionState = (
 
   // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
   if (nextState === 'creating') {
-    const user = mut_subscribedValues.fireAuthUser;
+    const user = Auth.fireAuthUser$.snapshot.value;
 
     updateAnswerBeingEdited((ans) =>
       Obj.set(ans, 'user', Obj.set(ans.user, 'id', user?.uid ?? null))
@@ -401,79 +401,49 @@ combineLatest([emptyAnswerSelection$, resetAnswerBeingEditedAction$] as const)
   .chain(map(([x, _]) => x))
   .subscribe(setAnswerBeingEdited);
 
-/* subscribe values */
-
-const mut_subscribedValues: {
-  eventId: string | undefined;
-  answerBeingEdited: Answer;
-  answerBeingEditedSectionState: 'creating' | 'editing' | 'hidden';
-  fireAuthUser: FireAuthUser | undefined;
-} = {
-  eventId: undefined,
-  answerBeingEdited: answerDefaultValue,
-  answerBeingEditedSectionState: 'hidden',
-  fireAuthUser: undefined,
-};
-
-router.eventId$.subscribe((id) => {
-  mut_subscribedValues.eventId = id;
-});
-
-answerBeingEdited$.subscribe((v) => {
-  mut_subscribedValues.answerBeingEdited = v;
-});
-
-answerBeingEditedSectionState$.subscribe((v) => {
-  mut_subscribedValues.answerBeingEditedSectionState = v;
-});
-
-Auth.fireAuthUser$.subscribe((u) => {
-  mut_subscribedValues.fireAuthUser = u;
-});
-
 /* callbacks using subscribed values */
 
 const onAnswerClick = (answer: Answer): void => {
-  onAnswerClickImpl(answer, mut_subscribedValues.fireAuthUser);
+  onAnswerClickImpl(answer, Auth.fireAuthUser$.snapshot.value);
 };
 
 const onAddAnswerButtonClick = (): void => {
-  onAddAnswerButtonClickImpl(mut_subscribedValues.fireAuthUser);
+  onAddAnswerButtonClickImpl(Auth.fireAuthUser$.snapshot.value);
 };
 
 const onEditButtonClick = (): void => {
-  onEditButtonClickImpl(mut_subscribedValues.eventId);
+  onEditButtonClickImpl(router.eventId$.snapshot.value);
 };
 
 const onSubmitAnswerClickPromise = (): Promise<void> =>
   onSubmitAnswerImpl(
-    mut_subscribedValues.eventId,
-    mut_subscribedValues.answerBeingEdited,
-    mut_subscribedValues.answerBeingEditedSectionState
+    router.eventId$.snapshot.value,
+    answerBeingEdited$.snapshot.value,
+    answerBeingEditedSectionState$.snapshot.value
   );
 
 const onSubmitAnswerClick = (): void => {
   onSubmitAnswerImpl(
-    mut_subscribedValues.eventId,
-    mut_subscribedValues.answerBeingEdited,
-    mut_subscribedValues.answerBeingEditedSectionState
+    router.eventId$.snapshot.value,
+    answerBeingEdited$.snapshot.value,
+    answerBeingEditedSectionState$.snapshot.value
   ).catch(noop);
 };
 
 const onSubmitEmptyAnswerClick = (): Promise<void> =>
   onSubmitEmptyAnswerImpl(
-    mut_subscribedValues.eventId,
-    mut_subscribedValues.fireAuthUser
+    router.eventId$.snapshot.value,
+    Auth.fireAuthUser$.snapshot.value
   );
 
 const onDeleteAnswerClick = (): Promise<void> =>
   onDeleteAnswerImpl(
-    mut_subscribedValues.eventId,
-    mut_subscribedValues.answerBeingEdited
+    router.eventId$.snapshot.value,
+    answerBeingEdited$.snapshot.value
   );
 
 const toggleProtectedSection = (): void => {
-  toggleProtectedSectionImpl(mut_subscribedValues.fireAuthUser);
+  toggleProtectedSectionImpl(Auth.fireAuthUser$.snapshot.value);
 };
 
 /* combined values */

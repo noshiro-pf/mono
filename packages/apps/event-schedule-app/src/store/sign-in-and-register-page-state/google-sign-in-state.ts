@@ -43,27 +43,13 @@ const googleSignInSubmit = async (
   }
 };
 
-const mut_subscribedValues: {
-  googleSignInButtonDisabled: boolean;
-  pageToBack: string | undefined;
-} = {
-  googleSignInButtonDisabled: true,
-  pageToBack: undefined,
-};
-
-googleSignInButtonDisabled$.subscribe((v) => {
-  mut_subscribedValues.googleSignInButtonDisabled = v;
-});
-
-router.pageToBack$.subscribe((v) => {
-  mut_subscribedValues.pageToBack = v;
-});
-
 const googleSignInClickHandler = (): void => {
-  if (mut_subscribedValues.googleSignInButtonDisabled) return;
+  if (googleSignInButtonDisabled$.snapshot.value) return;
 
   // TODO: use toast
-  googleSignInSubmit(mut_subscribedValues.pageToBack).catch(console.error);
+  googleSignInSubmit(Maybe.unwrap(router.pageToBack$.snapshot)).catch(
+    console.error
+  );
 };
 
 export const GoogleSignInStore = {

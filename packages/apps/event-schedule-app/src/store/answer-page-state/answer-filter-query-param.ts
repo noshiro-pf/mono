@@ -221,7 +221,7 @@ const restoreFromQueryParams = (
   setSortOrderAndKey: (v: readonly ['date' | 'score', 'asc' | 'desc']) => void,
   filterStateDispatch: (action: AnswerFilterStateAction) => void
 ): void => {
-  const queryParams = mut_subscribedValues.queryParams;
+  const queryParams = router.queryParams$.snapshot.value;
 
   if (queryParams === undefined) return;
 
@@ -323,16 +323,6 @@ const restoreFromQueryParams = (
     },
   });
 };
-
-const mut_subscribedValues: {
-  queryParams: URLSearchParams | undefined;
-} = {
-  queryParams: undefined,
-};
-
-router.queryParams$.subscribe((v) => {
-  mut_subscribedValues.queryParams = v;
-});
 
 export const AnswerFilterQueryParam = {
   saveSortStateToQueryParams,
