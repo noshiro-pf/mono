@@ -11,10 +11,10 @@ export const hoursMinutesDefaultValue = {
 } as const satisfies HoursMinutes;
 
 export const isHoursEnum = (a: unknown): a is HoursEnum =>
-  isNumber(a) && Number.isInteger(a) && Num.isInRange(0, 23)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRangeInclusive(0, 23)(a);
 
 export const isMinutesEnum = (a: unknown): a is MinutesEnum =>
-  isNumber(a) && Number.isInteger(a) && Num.isInRange(0, 59)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRangeInclusive(0, 59)(a);
 
 export const isHoursMinutes = (a: unknown): a is HoursMinutes =>
   isRecord(a) &&

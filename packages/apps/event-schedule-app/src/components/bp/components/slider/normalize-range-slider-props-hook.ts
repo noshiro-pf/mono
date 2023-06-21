@@ -67,7 +67,7 @@ export const useNormalizedRangeSliderProps = ({
     () =>
       _labelFractionDigits ??
       pipe(-Math.floor(Math.log10(labelStepSize))).chain((x) =>
-        Num.isUintInRange(0, 20)(x) ? x : 0
+        Num.isUintInRangeInclusive(0, 20)(x) ? x : 0
       ).value,
     [_labelFractionDigits, labelStepSize]
   );

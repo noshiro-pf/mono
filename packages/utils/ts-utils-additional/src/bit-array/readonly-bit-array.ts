@@ -17,7 +17,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
 
   constructor(input: Readonly<Uint8Array> | readonly (0 | 1)[]) {
     this.#data = new Uint8Array(input);
-    this.#isInRange = Num.isInRange(0, input.length - 1);
+    this.#isInRange = Num.isInRange(0, input.length);
   }
 
   get size(): SafeUint {

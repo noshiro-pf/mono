@@ -12,7 +12,7 @@ type D = Exclude<Uint8, 0>;
 const MIN_VALUE = 0;
 const MAX_VALUE = 255;
 
-const isInUint8Range = Num.isInRange(MIN_VALUE, MAX_VALUE);
+const isInUint8Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
 export const toUint8 = (a: number): Uint8 => {
   if (!Number.isInteger(a) || !isInUint8Range(a)) {

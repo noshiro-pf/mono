@@ -15,7 +15,7 @@ type D = Exclude<Int8, 0>;
 const MIN_VALUE = -128;
 const MAX_VALUE = 127;
 
-const isInInt8Range = Num.isInRange(MIN_VALUE, MAX_VALUE);
+const isInInt8Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
 export const toInt8 = (a: number): Int8 => {
   if (!Number.isInteger(a) || !isInInt8Range(a)) {

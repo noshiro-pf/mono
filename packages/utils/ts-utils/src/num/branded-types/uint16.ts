@@ -20,7 +20,7 @@ expectType<
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 16 - 1;
 
-const isUint16Range = Num.isInRange(MIN_VALUE, MAX_VALUE);
+const isUint16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
 export const isUint16 = (a: number): a is T =>
   Number.isInteger(a) && isUint16Range(a);

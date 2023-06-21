@@ -25,8 +25,8 @@ export const useRangeSliderLabels = ({
 }> => {
   const customLabelValuesWithRatio = useMemo(() => {
     if (customLabelValues === undefined) return [];
-    const isInRange = Num.isInRange(min, max);
-    if (!customLabelValues.every(isInRange)) {
+    const isInRangeInclusive = Num.isInRangeInclusive(min, max);
+    if (!customLabelValues.every(isInRangeInclusive)) {
       console.error('all values should be in [min, max].');
       return [];
     }

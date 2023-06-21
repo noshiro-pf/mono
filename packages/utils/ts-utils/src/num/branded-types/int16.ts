@@ -33,7 +33,7 @@ expectType<
 const MIN_VALUE = -(2 ** 15);
 const MAX_VALUE = 2 ** 15 - 1;
 
-const isInt16Range = Num.isInRange(MIN_VALUE, MAX_VALUE);
+const isInt16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
 export const isInt16 = (a: number): a is T =>
   Number.isInteger(a) && isInt16Range(a);

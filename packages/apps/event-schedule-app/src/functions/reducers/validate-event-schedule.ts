@@ -31,7 +31,7 @@ export const validateEventSchedule = ({
     answerIcons.good.description === '' ||
     answerIcons.fair.description === '' ||
     answerIcons.poor.description === '' ||
-    Num.isInRange(
+    Num.isInRangeInclusive(
       answerIconPointConfig.fair.min,
       answerIconPointConfig.fair.max
     )(answerIcons.fair.point),
