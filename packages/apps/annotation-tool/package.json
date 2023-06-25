@@ -81,7 +81,7 @@
     "@blueprintjs/core": "^4.20.1",
     "@blueprintjs/icons": "^4.13.0",
     "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.10.5",
+    "@emotion/styled": "^11.11.0",
     "@noshiro/io-ts": "*",
     "@noshiro/react-utils": "*",
     "@noshiro/syncflow": "*",
