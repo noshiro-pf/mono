@@ -45,7 +45,7 @@
     "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
   },
   "dependencies": {
-    "@emotion/styled": "^11.10.5",
+    "@emotion/styled": "^11.11.0",
     "@noshiro/react-utils": "*",
     "@noshiro/resize-observer-react-hooks": "*",
     "@noshiro/ts-utils": "*",

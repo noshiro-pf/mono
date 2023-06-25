@@ -100,7 +100,7 @@
     "@blueprintjs/icons": "^4.13.0",
     "@blueprintjs/popover2": "^1.12.0",
     "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.10.5",
+    "@emotion/styled": "^11.11.0",
     "@noshiro/deep-object-diff": "*",
     "@noshiro/event-schedule-app-shared": "*",
     "@noshiro/fast-deep-equal": "*",
