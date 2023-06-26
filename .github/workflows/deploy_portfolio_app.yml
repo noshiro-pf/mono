@@ -6,7 +6,7 @@ name: Deploy my-portfolio-app-preact
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [main]
+    branches: [develop]
     paths:
       - .github/workflows/deploy_portfolio_app.yml
       - config/tsconfig/**
