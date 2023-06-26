@@ -9,9 +9,9 @@
 -   ゲーム
     -   ボードゲーム
         -   好きなゲーム： Dominion、Tzolk'in、Algo など
-    -   Splatoon 2, 3
+    -   Splatoon 2, 3（最高 XP 約 2300）
     -   将棋（将棋ウォーズ二段、最近はほぼ観る将）
-    -   麻雀
+    -   麻雀（[雀魂 雀聖 1](https://amae-koromo.sapk.ch/player/68823014/12/)）
 -   ピアノ（9 歳～、東京大学ピアノの会 OB）
     -   [過去の演奏動画](https://youtube.com/playlist?list=PLVnVDg2aP1bLuhgftwiN8PQbsZnoymubk)
 
