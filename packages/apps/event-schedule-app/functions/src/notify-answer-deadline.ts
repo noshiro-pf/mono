@@ -48,6 +48,7 @@ export const notifyAnswerDeadline = async (
 
       return (
         [
+          [ns.notify00daysBeforeAnswerDeadline, 0],
           [ns.notify01daysBeforeAnswerDeadline, 1],
           [ns.notify03daysBeforeAnswerDeadline, 3],
           [ns.notify07daysBeforeAnswerDeadline, 7],

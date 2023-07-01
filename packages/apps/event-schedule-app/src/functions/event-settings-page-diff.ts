@@ -74,6 +74,7 @@ type EventSchedulePaths = Exclude<Paths<EventSchedule>, readonly []>;
       | ['datetimeRangeList']
       | ['datetimeSpecification']
       | ['notes']
+      | ['notificationSettings', 'notify00daysBeforeAnswerDeadline']
       | ['notificationSettings', 'notify01daysBeforeAnswerDeadline']
       | ['notificationSettings', 'notify03daysBeforeAnswerDeadline']
       | ['notificationSettings', 'notify07daysBeforeAnswerDeadline']
