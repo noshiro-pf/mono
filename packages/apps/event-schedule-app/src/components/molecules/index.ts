@@ -1,5 +1,6 @@
 export * from './add-element-button';
 export * from './answer-icon-point-input';
+export * from './custom-scrollbar-wrapper';
 export * from './icon-count-numeric-input';
 export * from './lock-button';
 export * from './score-numeric-input';
