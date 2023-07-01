@@ -1,5 +1,6 @@
 import { FormGroup } from '@blueprintjs/core';
 import { answerDeadlineShortcuts } from '../../constants';
+import { useIsMobile } from '../../store';
 import { BpDatetimePicker } from '../bp';
 
 type Props = Readonly<{
@@ -14,6 +15,8 @@ export const AnswerDeadlineDatepicker = memoNamed<Props>(
     const showError: boolean =
       useAnswerDeadline && answerDeadline === undefined;
 
+    const isMobile = useIsMobile();
+
     return (
       <FormGroup
         helperText={
@@ -26,7 +29,7 @@ export const AnswerDeadlineDatepicker = memoNamed<Props>(
       >
         <BpDatetimePicker
           disabled={!useAnswerDeadline}
-          shortcuts={answerDeadlineShortcuts}
+          shortcuts={isMobile ? false : answerDeadlineShortcuts}
           showActionsBar={false}
           ymdhm={answerDeadline}
           onYmdhmChange={onAnswerDeadlineChange}
