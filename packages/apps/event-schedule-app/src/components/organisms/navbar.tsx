@@ -1,5 +1,4 @@
-import { AnchorButton, Icon, Menu, MenuItem } from '@blueprintjs/core';
-import { Popover2 } from '@blueprintjs/popover2';
+import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { Routes, aboutThisAppUrl, feedbackUrl } from '../../constants';
 import { Auth, UpdateUserInfoDialogStore, router } from '../../store';
 import { NoWrapSpan } from '../atoms';
@@ -111,7 +110,7 @@ export const NavBar = memoNamed('NavBar', () => {
               </ItemAnchor>
               <Item>
                 <span>{dc.auth.userName.prefix}</span>
-                <Popover2
+                <Popover
                   content={
                     <Menu>
                       <MenuItem text={dc.auth.menu.accountSettings}>
@@ -157,7 +156,7 @@ export const NavBar = memoNamed('NavBar', () => {
                   transitionDuration={50}
                 >
                   <Anchor>{fireAuthUser.displayName}</Anchor>
-                </Popover2>
+                </Popover>
                 <span>{dc.auth.userName.suffix}</span>
               </Item>
 

@@ -1,4 +1,4 @@
-import { Popover2 } from '@blueprintjs/popover2';
+import { Popover } from '@blueprintjs/core';
 import { AnswerFilterAndSortStore } from '../../../../store';
 import { CustomIconButton } from '../../../bp';
 import { FilterByIconPopoverContent } from './filter-by-icon-popover-content';
@@ -49,7 +49,7 @@ export const FilterByIconPopover = memoNamed<Props>(
     );
 
     return (
-      <Popover2
+      <Popover
         canEscapeKeyClose={true}
         content={
           <FilterByIconPopoverContent
@@ -74,7 +74,7 @@ export const FilterByIconPopover = memoNamed<Props>(
           title={dc.iconHeaderFilter[answerIconId].title}
           onClick={handleOpen}
         />
-      </Popover2>
+      </Popover>
     );
   }
 );

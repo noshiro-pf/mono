@@ -1,5 +1,4 @@
-import { Button, ButtonGroup } from '@blueprintjs/core';
-import { Popover2 } from '@blueprintjs/popover2';
+import { Button, ButtonGroup, Popover } from '@blueprintjs/core';
 
 type Props = Readonly<{
   onSortChange: (state: 'asc' | 'desc') => void;
@@ -23,7 +22,7 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
   }, [onSortChange, handleClose]);
 
   return (
-    <Popover2
+    <Popover
       canEscapeKeyClose={true}
       content={
         <ButtonGroup vertical={true}>
@@ -46,6 +45,6 @@ export const SortButton = memoNamed<Props>('SortButton', ({ onSortChange }) => {
         small={true}
         onClick={handleOpen}
       />
-    </Popover2>
+    </Popover>
   );
 });
