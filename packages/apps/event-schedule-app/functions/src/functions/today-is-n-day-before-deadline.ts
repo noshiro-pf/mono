@@ -1,18 +1,21 @@
-import { type YearMonthDate } from '@noshiro/event-schedule-app-shared';
+import {
+  type YearMonthDate,
+  type Ymdhm,
+} from '@noshiro/event-schedule-app-shared';
 import { DateUtils } from '@noshiro/ts-utils';
 import { today } from '../utils';
 
-const ymd2Date = (ymd: YearMonthDate): DateUtils =>
+const ymd2DateObject = (ymd: YearMonthDate): DateUtils =>
   DateUtils.create(ymd.year, ymd.month, ymd.date);
 
 const millisecOfADay: number = 24 * 3600 * 1000;
 
 export const todayIsNDaysBeforeDeadline = (
-  n: number,
-  answerDeadlineYmd: YearMonthDate
+  n: 0 | 1 | 3 | 7 | 14 | 28,
+  answerDeadlineYmdhm: Ymdhm
 ): boolean => {
-  const answerDeadlineDate = ymd2Date(answerDeadlineYmd);
-  const todayDate = ymd2Date(today());
+  const answerDeadlineDate = ymd2DateObject(answerDeadlineYmdhm);
+  const todayDate = ymd2DateObject(today());
   const daysDiff: number =
     (answerDeadlineDate.getTime() - todayDate.getTime()) / millisecOfADay;
   return daysDiff === n;

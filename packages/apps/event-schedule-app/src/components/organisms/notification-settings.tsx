@@ -50,6 +50,19 @@ export const NotificationSettingsComponent = memoNamed<Props>(
       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
     );
 
+    const onNotifyAfterAnswerDeadlineCheck = useCallback(
+      (checked: boolean) => {
+        onNotificationSettingsWithEmailChange(
+          Obj.set(
+            notificationSettingsWithEmail,
+            'notifyAfterAnswerDeadline',
+            checked
+          )
+        );
+      },
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+    );
+
     const onNotify00daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
         onNotificationSettingsWithEmailChange(
@@ -126,6 +139,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
 
     const disabledDetail = useMemo(
       () => ({
+        notifyAfterAnswerDeadline:
+          disabled ||
+          !useAnswerDeadline ||
+          answerDeadline === undefined ||
+          ymdhmDateDiff(answerDeadline, now()) <= -1,
         notify00daysBefore:
           disabled ||
           !useAnswerDeadline ||
@@ -196,6 +214,14 @@ export const NotificationSettingsComponent = memoNamed<Props>(
               disabled={disabled}
               label={dc.notification.notifyOnAnswerChange}
               onCheck={onNotifyOnAnswerChangeCheck}
+            />
+          </CheckboxWrapper>
+          <CheckboxWrapper>
+            <BpCheckbox
+              checked={notificationSettingsWithEmail.notifyAfterAnswerDeadline}
+              disabled={disabledDetail.notifyAfterAnswerDeadline}
+              label={dc.notification.notifyAfterAnswerDeadline}
+              onCheck={onNotifyAfterAnswerDeadlineCheck}
             />
           </CheckboxWrapper>
           <CheckboxWrapper>

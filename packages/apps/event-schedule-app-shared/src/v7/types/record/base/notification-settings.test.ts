@@ -11,6 +11,7 @@ describe('NotificationSettings', () => {
     NotificationSettings,
     Readonly<{
       notifyOnAnswerChange: boolean;
+      notifyAfterAnswerDeadline: boolean;
       notify00daysBeforeAnswerDeadline: boolean;
       notify01daysBeforeAnswerDeadline: boolean;
       notify03daysBeforeAnswerDeadline: boolean;
@@ -23,6 +24,7 @@ describe('NotificationSettings', () => {
   test('defaultValue', () => {
     const defaultValue: NotificationSettings = {
       notifyOnAnswerChange: false,
+      notifyAfterAnswerDeadline: false,
       notify00daysBeforeAnswerDeadline: false,
       notify01daysBeforeAnswerDeadline: false,
       notify03daysBeforeAnswerDeadline: false,

@@ -78,3 +78,11 @@ export const createMailBodyForAnswerDeadline = ({
     '回答ページを確認：',
     `${urlPrefix}/${eventId}`,
   ].join('\n');
+
+export const createMailBodyForAnswerResult = (eventId: string): string =>
+  [
+    '回答を締め切りました。結果を確認しましょう。',
+    '',
+    '回答ページを確認：',
+    `${urlPrefix}/${eventId}`,
+  ].join('\n');

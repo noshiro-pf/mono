@@ -80,6 +80,7 @@ type EventSchedulePaths = Exclude<Paths<EventSchedule>, readonly []>;
       | ['notificationSettings', 'notify07daysBeforeAnswerDeadline']
       | ['notificationSettings', 'notify14daysBeforeAnswerDeadline']
       | ['notificationSettings', 'notify28daysBeforeAnswerDeadline']
+      | ['notificationSettings', 'notifyAfterAnswerDeadline']
       | ['notificationSettings', 'notifyOnAnswerChange']
       | ['notificationSettings']
       | ['timezoneOffsetMinutes']
