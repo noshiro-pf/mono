@@ -50,9 +50,7 @@ export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
 
 export const notificationSettingsInitialValue: NotificationSettings = pipe(
   notificationSettingsDefaultValue
-)
-  .chain((o) => Obj.set(o, 'notifyOnAnswerChange', true))
-  .chain((o) => Obj.set(o, 'notify00daysBeforeAnswerDeadline', true)).value;
+).chain((o) => Obj.set(o, 'notifyOnAnswerChange', true)).value;
 
 export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =
   'startSpecified';

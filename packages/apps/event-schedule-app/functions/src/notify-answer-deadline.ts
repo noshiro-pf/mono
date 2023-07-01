@@ -7,6 +7,8 @@ import { type firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import {
   createMailBodyForAnswerDeadline,
+  createMailBodyForAnswerResult,
+  deadlinePassed,
   todayIsNDaysBeforeDeadline,
 } from './functions';
 import { getEmail } from './get-event-item';
@@ -58,9 +60,7 @@ export const notifyAnswerDeadline = async (
       )
         .filter(
           ([flag, diff]) =>
-            flag &&
-            todayIsNDaysBeforeDeadline(diff, answerDeadline) &&
-            email !== ''
+            flag && todayIsNDaysBeforeDeadline(diff, answerDeadline)
         )
         .map(([_, diff]) => {
           logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
@@ -72,6 +72,51 @@ export const notifyAnswerDeadline = async (
             })
           );
         });
+    })
+  );
+};
+
+export const notifyAfterAnswerDeadline = async (
+  db: firestore.Firestore,
+  minutes: MinutesEnum
+): Promise<void> => {
+  const querySnapshot = await db
+    .collection(firestorePaths.events)
+    .where(keys.notificationSettings, '!=', 'none')
+    .get();
+
+  const events = querySnapshot.docs
+    .map((doc) => tp(doc.id, fillEventScheduleWithCheck(doc.data())))
+    .filter(([_id, ev]) => ev.answerDeadline !== 'none');
+
+  const emails = await Promise.all(
+    events.map(([eventId]) => getEmail(db, eventId))
+  );
+
+  const eventsWithEmail = Arr.zip(events, emails);
+
+  await Promise.all(
+    eventsWithEmail.map(([[eventId, ev], email]) => {
+      const ns = ev.notificationSettings;
+      const answerDeadline = ev.answerDeadline;
+
+      if (
+        answerDeadline !== 'none' &&
+        ns !== 'none' &&
+        email !== '' &&
+        ns.notifyAfterAnswerDeadline &&
+        deadlinePassed(answerDeadline, minutes)
+      ) {
+        return sendEmail(
+          createMailOptions({
+            to: email,
+            subject: `イベント「${ev.title}」の回答を締め切りました。`,
+            text: createMailBodyForAnswerResult(eventId),
+          })
+        );
+      }
+
+      return Promise.resolve();
     })
   );
 };
