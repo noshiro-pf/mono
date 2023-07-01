@@ -42,6 +42,7 @@ export const eventSettingsPageDictionary = {
       useNotification: '幹事用通知設定',
       emailAddress: '通知先メールアドレス',
       notifyOnAnswerChange: '回答に更新があったときにメール通知',
+      notify00daysBeforeAnswerDeadline: '回答締め切り当日にメール通知',
       notify01daysBeforeAnswerDeadline: '回答締め切り1日前にメール通知',
       notify03daysBeforeAnswerDeadline: '回答締め切り3日前にメール通知',
       notify07daysBeforeAnswerDeadline: '回答締め切り7日前にメール通知',

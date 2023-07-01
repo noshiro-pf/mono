@@ -65,10 +65,15 @@ export const createMailBodyForAnswerDeadline = ({
   diff,
 }: Readonly<{
   eventId: string;
-  diff: 1 | 3 | 7 | 14 | 28;
+  diff: 0 | 1 | 3 | 7 | 14 | 28;
 }>): string =>
   [
-    `回答期限${diff}日前になりました。未回答の人がいたらリマインドを送りましょう。`,
+    [
+      diff === 0
+        ? `回答期限当日になりました。`
+        : `回答期限${diff}日前になりました。`,
+      '未回答の人がいたらリマインドを送りましょう。',
+    ].join(''),
     '',
     '回答ページを確認：',
     `${urlPrefix}/${eventId}`,
