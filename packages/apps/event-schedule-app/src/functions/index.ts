@@ -10,4 +10,5 @@ export * from './reducers';
 export * from './select-datetimes-component';
 export * from './the-name-is-already-used';
 export * from './toaster';
+export * from './ymd-to-day-in-week';
 export * from './ymdhm-date-diff';

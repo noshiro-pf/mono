@@ -1,3 +1,4 @@
+import { daysOfWeek } from '@noshiro/ts-utils-additional';
 import { defaultIconPoint } from '../default-icon-point';
 
 export const eventSettingsPageDictionary = {
@@ -25,6 +26,12 @@ export const eventSettingsPageDictionary = {
       '日程を全削除しますか？（この操作は取り消すことができません）',
     removeAllResultMessage: '削除しました。',
     setTimesAtOneTime: '時刻一括変更',
+    setTimesAtOneTimeForDay: {
+      title: '以下の曜日に適用',
+      items: daysOfWeek.jp,
+      checkAll: '全選択',
+      flipAll: '反転',
+    },
     sortDatetimes: '日時を昇順に並べ替える',
   },
   section3: {

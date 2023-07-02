@@ -20,7 +20,12 @@ type SelectDatetimesHooks = DeepReadonly<{
   onAddDatetimeClick: () => void;
   onConfirmDeleteAll: () => void;
   setTimesPopoverInitialValue: TimeRange;
-  onSetTimesPopoverSubmit: (timeRange: TimeRange) => void;
+  onSetTimesPopoverSubmit: (
+    state: Readonly<{
+      timeRange: TimeRange;
+      checkboxState: Record<DayOfWeekName, boolean>;
+    }>
+  ) => void;
   onSortClick: () => void;
 }>;
 
@@ -97,8 +102,14 @@ export const useSelectDatetimesHooks = (
   }, [dispatch]);
 
   const onSetTimesAtOneTimeClick = useCallback(
-    (timeRange: TimeRange) => {
-      dispatch({ type: 'setTimeAtOneTime', timeRange });
+    ({
+      checkboxState,
+      timeRange,
+    }: Readonly<{
+      timeRange: TimeRange;
+      checkboxState: Record<DayOfWeekName, boolean>;
+    }>) => {
+      dispatch({ type: 'setTimeAtOneTime', checkboxState, timeRange });
     },
     [dispatch]
   );

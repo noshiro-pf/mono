@@ -20,7 +20,6 @@ export const TimeRangeView = memoNamed<Props>(
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
-        margin-left: 7px;
       `}
     >
       {datetimeSpecification === 'startSpecified' ||
