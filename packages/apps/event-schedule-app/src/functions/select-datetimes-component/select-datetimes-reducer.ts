@@ -4,6 +4,7 @@ import {
 } from '@noshiro/event-schedule-app-shared';
 import { datetimeRangeInitialValue } from '../../constants';
 import { ymdFromKey, ymdToKey } from '../map-key';
+import { ymdToDayInWeek } from '../ymd-to-day-in-week';
 import { timeRangeReducer } from './time-range-reducer';
 
 export type DatetimeListReducerAction = Readonly<
@@ -12,12 +13,16 @@ export type DatetimeListReducerAction = Readonly<
       list: readonly YearMonthDate[];
       mostFrequentTimeRange: TimeRange;
     }
+  | {
+      type: 'setTimeAtOneTime';
+      timeRange: TimeRange;
+      checkboxState: Record<DayOfWeekName, boolean>;
+    }
   | { type: 'addClick'; datetimeRange: DatetimeRange }
   | { type: 'delete'; index: SafeUint }
   | { type: 'deleteAll' | 'sort' }
   | { type: 'duplicate'; index: SafeUint }
   | { type: 'end' | 'start'; index: SafeUint; hm: HoursMinutes }
-  | { type: 'setTimeAtOneTime'; timeRange: TimeRange }
   | { type: 'ymd'; index: SafeUint; ymd: YearMonthDate }
 >;
 
@@ -82,7 +87,11 @@ export const datetimeListReducer: Reducer<
       return [];
 
     case 'setTimeAtOneTime':
-      return state.map((el) => Obj.set(el, 'timeRange', action.timeRange));
+      return state.map((el) =>
+        action.checkboxState[ymdToDayInWeek(el.ymd)]
+          ? Obj.set(el, 'timeRange', action.timeRange)
+          : el
+      );
 
     case 'sort':
       return Arr.sorted(state, compareDatetimeRange);
