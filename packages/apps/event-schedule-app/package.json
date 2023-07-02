@@ -7,6 +7,7 @@
   "browser": "src/main.tsx",
   "scripts": {
     "build": "yarn z:bundle:wireit",
+    "build:functions": "yarn workspace @noshiro/event-schedule-app-functions build",
     "build:no-minify": "yarn z:bundle:wireit --minify false",
     "clean": "run-p clean:**",
     "clean:build": "rimraf build",
@@ -43,12 +44,13 @@
     "z:bundle:wireit": "wireit",
     "z:dev-server:impl": "yarn zz:cmd:vite --port 5180",
     "z:dev-server:wireit": "wireit",
+    "z:fb:deploy:functions:impl": "firebase deploy --only functions",
     "z:fb:deploy:functions:wireit": "wireit",
     "z:fb:deploy:hosting:impl": "firebase deploy --only hosting",
     "z:fb:deploy:hosting:wireit": "wireit",
     "z:fb:deploy:impl": "firebase deploy",
     "z:fb:deploy:wireit": "wireit",
-    "z:fb:emulators:start:impl": "firebase emulators:start --only functions,firestore --import firebase-emulator-exports --export-on-exit",
+    "z:fb:emulators:start:impl": "firebase emulators:start --only functions,firestore,pubsub --import firebase-emulator-exports --export-on-exit",
     "z:fb:emulators:start:wireit": "wireit",
     "z:fb:export:impl": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json",
     "z:fb:export:wireit": "wireit",
@@ -110,7 +112,6 @@
     "@noshiro/tiny-router-react-hooks": "*",
     "@noshiro/ts-utils": "*",
     "@noshiro/ts-utils-additional": "*",
-    "date-fns": "^2.30.0",
     "firebase": "^9.22.1",
     "html2canvas": "^1.4.1",
     "react": "^18.2.0",
@@ -189,6 +190,7 @@
     "z:fb:emulators:start:wireit": {
       "command": "yarn z:fb:emulators:start:impl",
       "dependencies": [
+        "./functions:build",
         "./functions:z:setup"
       ],
       "service": true
