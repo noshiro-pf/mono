@@ -1,4 +1,5 @@
 import { Button } from '@blueprintjs/core';
+import { timeRangeDefaultValue } from '@noshiro/event-schedule-app-shared';
 import { timeRangeReducer } from '../../../../functions';
 import { TimeRangeView } from '../../../molecules';
 import { ButtonsWrapperAlignEnd } from '../../../styled';
@@ -13,14 +14,11 @@ type Props = Readonly<{
 export const SetTimesPopoverContent = memoNamed<Props>(
   'SetTimesPopoverContent',
   ({ initialValue, datetimeSpecification, onCancelClick, onOkClick }) => {
-    const [timeRange, dispatch] = useReducer(timeRangeReducer, initialValue);
+    useEffect(() => {
+      dispatch({ type: 'init', timeRange: initialValue });
+    }, [initialValue]);
 
-    const onRangeStartChange = useCallback((hm: HoursMinutes) => {
-      dispatch({ type: 'start', hm });
-    }, []);
-    const onRangeEndChange = useCallback((hm: HoursMinutes) => {
-      dispatch({ type: 'end', hm });
-    }, []);
+    const timeRange = useObservableValue(timeRange$);
 
     const onOkClickHandler = useCallback(() => {
       onOkClick(timeRange);
@@ -54,3 +52,16 @@ export const SetTimesPopoverContent = memoNamed<Props>(
     );
   }
 );
+
+const [timeRange$, dispatch] = createReducer(
+  timeRangeReducer,
+  timeRangeDefaultValue
+);
+
+const onRangeStartChange = (hm: HoursMinutes): void => {
+  dispatch({ type: 'start', hm });
+};
+
+const onRangeEndChange = (hm: HoursMinutes): void => {
+  dispatch({ type: 'end', hm });
+};

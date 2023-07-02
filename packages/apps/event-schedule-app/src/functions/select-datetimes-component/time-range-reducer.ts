@@ -1,17 +1,25 @@
 import { compareHm } from '@noshiro/event-schedule-app-shared';
 
-export type TimeRangeReducerAction = Readonly<{
-  type: 'end' | 'start';
-  hm: HoursMinutes;
-}>;
+type TimeRangeReducerAction =
+  | Readonly<{
+      type: 'end' | 'start';
+      hm: HoursMinutes;
+    }>
+  | Readonly<{
+      type: 'init';
+      timeRange: TimeRange;
+    }>;
 
-export type TimeRangeReducerState = TimeRange;
+type TimeRangeReducerState = TimeRange;
 
 export const timeRangeReducer: Reducer<
   TimeRangeReducerState,
   TimeRangeReducerAction
 > = (state, action) => {
   switch (action.type) {
+    case 'init':
+      return action.timeRange;
+
     case 'start': {
       const newStart = action.hm;
       return pipe(state)
