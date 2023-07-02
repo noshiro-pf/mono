@@ -36,19 +36,14 @@ const abs = (x: A): Abs => to(Math.abs(x)) as Abs;
 const max = (...values: readonly A[]): T => to(Math.max(...values));
 const min = (...values: readonly A[]): T => to(Math.min(...values));
 
-/** @returns a ** b, but clamped to [-128, 127] */
 const pow = (x: A, y: A): T => clamp(x ** y);
 
-/** @returns a + b, but clamped to [-128, 127] */
 const add = (x: A, y: A): T => clamp(x + y);
 
-/** @returns a - b, but clamped to [-128, 127] */
 const sub = (x: A, y: A): T => clamp(x - y);
 
-/** @returns a * b, but clamped to [-128, 127] */
 const mul = (x: A, y: A): T => clamp(x * y);
 
-/** @returns a / b, but clamped to [-128, 127] */
 const div = (x: A, y: D): T => clamp(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -61,11 +56,21 @@ export const Int8 = {
   max,
   min,
   abs,
-  pow,
-  add,
-  sub,
-  mul,
-  div,
   random,
   clamp,
+
+  /** @returns a ** b, but clamped to [-128, 127] */
+  pow,
+
+  /** @returns a + b, but clamped to [-128, 127] */
+  add,
+
+  /** @returns a - b, but clamped to [-128, 127] */
+  sub,
+
+  /** @returns a * b, but clamped to [-128, 127] */
+  mul,
+
+  /** @returns ⌊a / b⌋, but clamped to [-128, 127] */
+  div,
 } as const;

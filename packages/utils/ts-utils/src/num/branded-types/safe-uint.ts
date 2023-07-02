@@ -34,19 +34,14 @@ const clamp = (a: number): T => to(Math.round(_c(a)));
 const max = (...values: readonly T[]): T => to(Math.max(...values));
 const min = (...values: readonly T[]): T => to(Math.min(...values));
 
-/** @returns a ** b, but clamped to [0, MAX_SAFE_INTEGER] */
 const pow = (x: T, y: T): T => clamp(x ** y);
 
-/** @returns a + b, but clamped to [0, MAX_SAFE_INTEGER] */
 const add = (x: T, y: T): T => clamp(x + y);
 
-/** @returns a - b, but clamped to [0, MAX_SAFE_INTEGER] */
 const sub = (x: T, y: T): T => clamp(x - y);
 
-/** @returns a * b, but clamped to [0, MAX_SAFE_INTEGER] */
 const mul = (x: T, y: T): T => clamp(x * y);
 
-/** @returns a / b, but clamped to [0, MAX_SAFE_INTEGER] */
 const div = (x: T, y: D): T => clamp(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -58,11 +53,21 @@ export const SafeUint = {
   MAX_VALUE,
   max,
   min,
-  pow,
-  add,
-  sub,
-  mul,
-  div,
-  random,
   clamp,
+  random,
+
+  /** @returns a ** b, but clamped to [0, MAX_SAFE_INTEGER] */
+  pow,
+
+  /** @returns a + b, but clamped to [0, MAX_SAFE_INTEGER] */
+  add,
+
+  /** @returns a - b, but clamped to [0, MAX_SAFE_INTEGER] */
+  sub,
+
+  /** @returns a * b, but clamped to [0, MAX_SAFE_INTEGER] */
+  mul,
+
+  /** @returns ⌊a / b⌋, but clamped to [0, MAX_SAFE_INTEGER] */
+  div,
 } as const;

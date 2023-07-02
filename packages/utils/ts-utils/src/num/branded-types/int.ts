@@ -39,10 +39,20 @@ export const Int = {
   abs,
   max,
   min,
-  pow,
-  add,
-  sub,
-  mul,
-  div,
   random,
+
+  /** @returns a ** b */
+  pow,
+
+  /** @returns a + b */
+  add,
+
+  /** @returns a - b */
+  sub,
+
+  /** @returns a * b */
+  mul,
+
+  /** @returns ⌊a / b⌋ */
+  div,
 } as const;

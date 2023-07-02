@@ -26,7 +26,6 @@ const pow = (x: T, y: T): T => to(x ** y);
 
 const add = (x: T, y: T): T => to(x + y);
 
-/** @returns a - b, but never less than 0 */
 const sub = (x: T, y: T): T => to(Math.max(0, x - y));
 
 const mul = (x: T, y: T): T => to(x * y);
@@ -44,13 +43,23 @@ const round = (x: T): T => to(Math.round(x));
 export const NonNegativeNumber = {
   max,
   min,
-  pow,
-  add,
-  sub,
-  mul,
-  div,
-  random,
   floor,
   ceil,
   round,
+  random,
+
+  /** @returns a ** b, but never less than 0 */
+  pow,
+
+  /** @returns a + b, but never less than 0 */
+  add,
+
+  /** @returns a - b, but never less than 0 */
+  sub,
+
+  /** @returns a * b, but never less than 0 */
+  mul,
+
+  /** @returns ⌊a / b⌋, but never less than 0 */
+  div,
 } as const;

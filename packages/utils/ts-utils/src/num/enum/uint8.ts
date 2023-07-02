@@ -31,19 +31,14 @@ const clamp = (a: number): T => to(Math.round(_c(a)));
 const max = (...values: readonly A[]): T => to(Math.max(...values));
 const min = (...values: readonly A[]): T => to(Math.min(...values));
 
-/** @returns a ** b, but clamped to [0, 255] */
 const pow = (x: A, y: A): T => clamp(x ** y);
 
-/** @returns a + b, but clamped to [0, 255] */
 const add = (x: A, y: A): T => clamp(x + y);
 
-/** @returns a - b, but clamped to [0, 255] */
 const sub = (x: A, y: A): T => clamp(x - y);
 
-/** @returns a * b, but clamped to [0, 255] */
 const mul = (x: A, y: A): T => clamp(x * y);
 
-/** @returns a / b, but clamped to [0, 255] */
 const div = (x: A, y: D): T => clamp(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -55,11 +50,21 @@ export const Uint8 = {
   MAX_VALUE,
   max,
   min,
-  pow,
-  add,
-  sub,
-  mul,
-  div,
-  random,
   clamp,
+  random,
+
+  /** @returns a ** b, but clamped to [0, 255] */
+  pow,
+
+  /** @returns a + b, but clamped to [0, 255] */
+  add,
+
+  /** @returns a - b, but clamped to [0, 255] */
+  sub,
+
+  /** @returns a * b, but clamped to [0, 255] */
+  mul,
+
+  /** @returns ⌊a / b⌋, but clamped to [0, 255] */
+  div,
 } as const;
