@@ -52,12 +52,18 @@ export const SelectedDatetimeRow = memoNamed<Props>(
             onYmdChange={onYmdChange}
           />
         </div>
-        <TimeRangeView
-          datetimeSpecification={datetimeSpecification}
-          timeRange={datetimeRange.timeRange}
-          onRangeEndChange={onRangeEndChange}
-          onRangeStartChange={onRangeStartChange}
-        />
+        <div
+          css={css`
+            margin-left: 7px;
+          `}
+        >
+          <TimeRangeView
+            datetimeSpecification={datetimeSpecification}
+            timeRange={datetimeRange.timeRange}
+            onRangeEndChange={onRangeEndChange}
+            onRangeStartChange={onRangeStartChange}
+          />
+        </div>
       </div>
 
       <div

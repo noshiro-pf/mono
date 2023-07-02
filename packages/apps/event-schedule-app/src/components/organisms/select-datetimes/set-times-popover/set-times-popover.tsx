@@ -6,7 +6,12 @@ const dc = dict.eventSettingsPage.section2;
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;
   initialValue: TimeRange;
-  onSetTimesSubmit: (range: TimeRange) => void;
+  onSetTimesSubmit: (
+    state: Readonly<{
+      timeRange: TimeRange;
+      checkboxState: Record<DayOfWeekName, boolean>;
+    }>
+  ) => void;
 }>;
 
 export const SetTimesPopover = memoNamed<Props>(
@@ -19,8 +24,13 @@ export const SetTimesPopover = memoNamed<Props>(
     } = useBoolState(false);
 
     const onOkClick = useCallback(
-      (range: TimeRange) => {
-        onSetTimesSubmit(range);
+      (
+        state: Readonly<{
+          timeRange: TimeRange;
+          checkboxState: Record<DayOfWeekName, boolean>;
+        }>
+      ) => {
+        onSetTimesSubmit(state);
         handleClose();
       },
       [onSetTimesSubmit, handleClose]
