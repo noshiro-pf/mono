@@ -62,6 +62,27 @@ const setAnswerBeingEditedSectionState = (
 const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
   createVoidEventEmitter();
 
+const {
+  state$: checkboxesState$,
+  setState: setCheckboxesState,
+  updateState: updateCheckboxesState,
+  resetState: resetCheckboxesState,
+} = createState(
+  ISetMapped.new<DatetimeRange, DatetimeRangeMapKey>(
+    [],
+    datetimeRangeToMapKey,
+    datetimeRangeFromMapKey
+  )
+);
+
+const { state$: batchInputFieldIsOpen$, toggle: _toggleBatchInputField } =
+  createBooleanState(false);
+
+const toggleBatchInputField = (): void => {
+  _toggleBatchInputField();
+  resetCheckboxesState();
+};
+
 /* mapped values */
 
 const selectedAnswerUserName$ = selectedAnswerSaved$.chain(
@@ -446,6 +467,24 @@ const toggleProtectedSection = (): void => {
   toggleProtectedSectionImpl(Auth.fireAuthUser$.snapshot.value);
 };
 
+const applyBatchInput = ({
+  comment,
+  selectedIconId,
+  point,
+}: Readonly<{
+  comment: string;
+  selectedIconId: AnswerIconIdWithNone;
+  point: AnswerIconPoint;
+}>): void => {
+  answerBeingEditedDispatch({
+    type: 'batch-input',
+    comment,
+    selectedIconId,
+    point,
+    checkboxState: checkboxesState$.snapshot.value,
+  });
+};
+
 /* combined values */
 
 const iconHeader$: InitializedObservable<
@@ -511,6 +550,7 @@ const answerBeingEditedList$: InitializedObservable<
       >;
       onPointChange: (point: AnswerIconPoint) => void;
       onCommentChange: (comment: string) => void;
+      onCheck: (checked: boolean) => void;
     }[]
   >
 > = combineLatestI([eventSchedule$, answerSelectionMap$]).chain(
@@ -573,11 +613,32 @@ const answerBeingEditedList$: InitializedObservable<
                   comment,
                 });
               },
+              onCheck: (checked: boolean) => {
+                updateCheckboxesState((set) =>
+                  checked ? set.add(d) : set.delete(d)
+                );
+              },
             } as const)
         )
       ) ?? []
   )
 );
+
+const onCheckAll = (checked: boolean): void => {
+  const dates = eventSchedule$.snapshot.value?.datetimeRangeList ?? [];
+
+  if (checked) {
+    setCheckboxesState(
+      ISetMapped.new<DatetimeRange, DatetimeRangeMapKey>(
+        dates,
+        datetimeRangeToMapKey,
+        datetimeRangeFromMapKey
+      )
+    );
+  } else {
+    resetCheckboxesState();
+  }
+};
 
 const hasUnanswered$: InitializedObservable<boolean> =
   answerBeingEditedList$.chain(
@@ -602,6 +663,8 @@ export const AnswerPageStore = {
   submitButtonIsDisabled$,
   submitButtonIsLoading$,
   theNameIsAlreadyUsed$,
+  checkboxesState$,
+  batchInputFieldIsOpen$,
   closeAlertOnAnswerClick,
   onAddAnswerButtonClick,
   onAnswerClick,
@@ -616,4 +679,7 @@ export const AnswerPageStore = {
   onWeightChange,
   toggleProtectedSection,
   toggleRequiredSection,
+  applyBatchInput,
+  toggleBatchInputField,
+  onCheckAll,
 } as const;

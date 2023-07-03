@@ -7,6 +7,7 @@ import {
   BpInput,
   BpTextArea,
   ButtonNowrapStyled,
+  CheckboxView,
   CustomIconButton,
   HTMLTableBorderedStyled2,
 } from '../../bp';
@@ -21,6 +22,7 @@ import {
   WidthRestrictedInputWrapper,
 } from '../../styled';
 import { DatetimeRangeCell } from '../answer-table';
+import { BatchInputAnswerForm } from '../batch-input-field';
 import {
   DeleteAnswerButton,
   ForNonLoggedInUserDialog,
@@ -66,15 +68,26 @@ export const AnswerBeingEdited = memoNamed<Props>(
     const theNameIsAlreadyUsed = useObservableValue(
       AnswerPageStore.theNameIsAlreadyUsed$
     );
+
     const iconHeader = useObservableValue(AnswerPageStore.iconHeader$);
+
     const answerBeingEditedList = useObservableValue(
       AnswerPageStore.answerBeingEditedList$
     );
+
     const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
 
     const fireAuthUser = Auth.useFireAuthUser();
 
     const forNonLoggedInUserDialogState = useBoolState(false);
+
+    const batchInputFieldIsOpen = useObservableValue(
+      AnswerPageStore.batchInputFieldIsOpen$
+    );
+
+    const checkboxesState = useObservableValue(
+      AnswerPageStore.checkboxesState$
+    );
 
     return (
       <>
@@ -120,6 +133,20 @@ export const AnswerBeingEdited = memoNamed<Props>(
             <thead>
               {iconHeader === undefined ? undefined : (
                 <tr>
+                  {batchInputFieldIsOpen ? (
+                    <th>
+                      <CheckboxView
+                        state={
+                          checkboxesState.size === answerBeingEditedList.length
+                            ? 'checked'
+                            : checkboxesState.size === 0
+                            ? 'none'
+                            : 'indeterminate'
+                        }
+                        onCheck={AnswerPageStore.onCheckAll}
+                      />
+                    </th>
+                  ) : undefined}
                   <th />
                   <th>
                     <CustomIconButton
@@ -159,8 +186,21 @@ export const AnswerBeingEdited = memoNamed<Props>(
                   buttons,
                   onPointChange,
                   onCommentChange: onCellCommentChange,
+                  onCheck,
                 }) => (
                   <tr key={key}>
+                    {batchInputFieldIsOpen ? (
+                      <td>
+                        <CheckboxView
+                          state={
+                            checkboxesState.has(datetimeRange)
+                              ? 'checked'
+                              : 'none'
+                          }
+                          onCheck={onCheck}
+                        />
+                      </td>
+                    ) : undefined}
                     <td>
                       <DatetimeRangeCell
                         datetimeRange={datetimeRange}
@@ -233,6 +273,12 @@ export const AnswerBeingEdited = memoNamed<Props>(
               )}
             </tbody>
           </HTMLTableBorderedStyled2>
+          <BatchInputAnswerForm
+            answerIcons={eventSchedule.answerIcons}
+            applyBatchInput={AnswerPageStore.applyBatchInput}
+            isOpen={batchInputFieldIsOpen}
+            toggleOpen={AnswerPageStore.toggleBatchInputField}
+          />
         </TableWrapper>
         <WidthRestrictedInputWrapper>
           <FormGroup label={dc.comments}>
