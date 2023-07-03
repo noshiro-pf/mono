@@ -3,6 +3,7 @@ export * from './answer-deadline';
 export * from './answer-page-event-info';
 export * from './answer-page-notes';
 export * from './answer-table';
+export * from './batch-input-field';
 export * from './button-with-confirm';
 export * from './confirm-email-dialog';
 export * from './create-event-result-dialog';

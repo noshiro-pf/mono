@@ -3,6 +3,13 @@ import { type AnswerSelectionValue } from '../../types';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {
+      type: 'batch-input';
+      comment: string;
+      selectedIconId: AnswerIconIdWithNone;
+      point: AnswerIconPoint;
+      checkboxState: ISetMapped<DatetimeRange, DatetimeRangeMapKey>;
+    }
+  | {
       type: 'cell-comment';
       datetimeRange: DatetimeRange;
       comment: string;
@@ -100,6 +107,25 @@ export const answerSelectionReducer: Reducer<
                 point: match(action.icon, defaultIconPoint),
                 comment: state.get(d)?.comment ?? '',
               },
+        }))
+      );
+    }
+
+    case 'batch-input': {
+      return state.withMutations(
+        action.checkboxState.toArray().map((d) => ({
+          type: 'set' as const,
+          key: d,
+          value: {
+            iconId: action.selectedIconId,
+            point: match(action.selectedIconId, {
+              good: defaultIconPoint.good,
+              fair: action.point,
+              poor: defaultIconPoint.poor,
+              none: defaultIconPoint.none,
+            }),
+            comment: action.comment,
+          },
         }))
       );
     }
