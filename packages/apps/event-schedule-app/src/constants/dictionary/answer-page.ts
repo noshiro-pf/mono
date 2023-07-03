@@ -185,6 +185,11 @@ export const answerPageDictionary = {
       },
     },
     yourName: 'あなたの名前：',
+    batchInput: {
+      openButton: '一括入力',
+      closeButton: '一括入力を終了する',
+      apply: '適用',
+    },
     comments: 'コメント（任意）：',
     nameIsRequired: '名前は必須項目です',
     theNameIsAlreadyUsed: 'その名前は既に使われています。',
