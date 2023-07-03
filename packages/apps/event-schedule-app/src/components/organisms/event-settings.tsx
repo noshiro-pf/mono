@@ -77,6 +77,7 @@ export const EventSettings = memoNamed<Props>(
         />
         <hr />
         <ParagraphWithSwitch
+          description={dc.notification.description}
           elementToToggle={
             <NotificationSettingsComponent
               answerDeadline={answerDeadline}

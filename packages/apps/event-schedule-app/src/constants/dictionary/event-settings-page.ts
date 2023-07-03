@@ -39,23 +39,25 @@ export const eventSettingsPageDictionary = {
     answerDeadline: {
       title: '回答期限',
       howAnswerDeadlineIsUsed: [
-        '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
+        '回答期限を設定して、幹事用の通知設定',
+        '回答期限を過ぎると、回答を追加・編集できないようになります。',
       ],
     },
-    howAnswerDeadlineIsUsed: [
-      '設定した場合、回答期限以降に回答を追加・編集できなくなります。',
-    ],
     notification: {
+      description: [
+        '回答が追加されたときや、回答期限が近づいたときなどにメールで通知するよう設定することができます。',
+        '回答期限に関する通知設定を有効にするには、一つ前のセクションで回答期限を設定する必要があります。',
+      ],
       useNotification: '幹事用通知設定',
       emailAddress: '通知先メールアドレス',
       notifyOnAnswerChange: '回答に更新があったときにメール通知',
-      notifyAfterAnswerDeadline: '回答締切後にメール通知',
-      notify00daysBeforeAnswerDeadline: '回答締め切り当日にメール通知',
-      notify01daysBeforeAnswerDeadline: '回答締め切り1日前にメール通知',
-      notify03daysBeforeAnswerDeadline: '回答締め切り3日前にメール通知',
-      notify07daysBeforeAnswerDeadline: '回答締め切り7日前にメール通知',
-      notify14daysBeforeAnswerDeadline: '回答締め切り14日前にメール通知',
-      notify28daysBeforeAnswerDeadline: '回答締め切り28日前にメール通知',
+      notifyAfterAnswerDeadline: '回答期限を過ぎたらメール通知',
+      notify00daysBeforeAnswerDeadline: '回答期限当日にメール通知',
+      notify01daysBeforeAnswerDeadline: '回答期限1日前にメール通知',
+      notify03daysBeforeAnswerDeadline: '回答期限3日前にメール通知',
+      notify07daysBeforeAnswerDeadline: '回答期限7日前にメール通知',
+      notify14daysBeforeAnswerDeadline: '回答期限14日前にメール通知',
+      notify28daysBeforeAnswerDeadline: '回答期限28日前にメール通知',
     },
     iconSettings: {
       title: '回答に使う記号の設定',
