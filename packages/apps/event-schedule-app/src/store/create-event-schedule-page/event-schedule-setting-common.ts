@@ -56,11 +56,11 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
 
   const {
     toggleState$: useAnswerDeadline$,
-    toggle: toggleAnswerDeadlineSection,
+    toggle: _toggleAnswerDeadlineSection,
     value$: answerDeadline$,
     setValue: setAnswerDeadline,
     resetState: resetAnswerDeadlineSection,
-    turnOff: turnOffAnswerDeadlineSection,
+    turnOff: _turnOffAnswerDeadlineSection,
     turnOn: turnOnAnswerDeadlineSection,
   } = createToggleSectionState<Ymdhm | undefined>({
     initialToggleState: eventScheduleInitialValue.answerDeadline !== 'none',
@@ -75,10 +75,15 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     resetState: resetAnswerIcons,
   } = createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
 
-  const initialNotificationSettingsWithEmailFilled$ = Auth.fireAuthUser$.chain(
-    mapI((user) => ({
+  const initialNotificationSettingsWithEmailFilled$ = combineLatestI([
+    Auth.fireAuthUser$,
+    answerDeadline$,
+  ]).chain(
+    mapI(([user, answerDeadline]) => ({
       ...notificationSettingsInitialValue,
       email: user?.email ?? '',
+      notifyAfterAnswerDeadline: answerDeadline !== undefined,
+      notify00daysBeforeAnswerDeadline: answerDeadline !== undefined,
     }))
   );
 
@@ -104,6 +109,48 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     valueToBeSetWhenTurnedOn: () =>
       initialNotificationSettingsWithEmailFilled$.snapshot.value,
   });
+
+  // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
+  const toggleAnswerDeadlineSection = (): void => {
+    _toggleAnswerDeadlineSection();
+    if (!useAnswerDeadline$.snapshot.value) {
+      updateNotificationSettingsWithEmail((prev) =>
+        prev === undefined
+          ? prev
+          : {
+              email: prev.email,
+              notifyOnAnswerChange: prev.notifyOnAnswerChange,
+              notifyAfterAnswerDeadline: false,
+              notify00daysBeforeAnswerDeadline: false,
+              notify01daysBeforeAnswerDeadline: false,
+              notify03daysBeforeAnswerDeadline: false,
+              notify07daysBeforeAnswerDeadline: false,
+              notify14daysBeforeAnswerDeadline: false,
+              notify28daysBeforeAnswerDeadline: false,
+            }
+      );
+    }
+  };
+
+  // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
+  const turnOffAnswerDeadlineSection = (): void => {
+    _turnOffAnswerDeadlineSection();
+    updateNotificationSettingsWithEmail((prev) =>
+      prev === undefined
+        ? prev
+        : {
+            email: prev.email,
+            notifyOnAnswerChange: prev.notifyOnAnswerChange,
+            notifyAfterAnswerDeadline: false,
+            notify00daysBeforeAnswerDeadline: false,
+            notify01daysBeforeAnswerDeadline: false,
+            notify03daysBeforeAnswerDeadline: false,
+            notify07daysBeforeAnswerDeadline: false,
+            notify14daysBeforeAnswerDeadline: false,
+            notify28daysBeforeAnswerDeadline: false,
+          }
+    );
+  };
 
   const setNotificationSettings = (a: NotificationSettings): void => {
     updateNotificationSettingsWithEmail((b) => ({
