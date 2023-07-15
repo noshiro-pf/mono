@@ -98,7 +98,7 @@
     "@blueprintjs/datetime": "^4.4.13",
     "@blueprintjs/datetime2": "^1.0.0",
     "@blueprintjs/icons": "^4.13.0",
-    "@blueprintjs/popover2": "^1.12.0",
+    "@blueprintjs/popover2": "^2.0.3",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@noshiro/deep-object-diff": "*",
