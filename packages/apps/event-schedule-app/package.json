@@ -131,7 +131,7 @@
     "@noshiro/global-ts-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.4"
+    "@types/react-dom": "^18.2.7"
   },
   "wireit": {
     "z:setup:build-deps": {
