@@ -8281,10 +8281,10 @@ deep-object-diff@^1.1.7:
   resolved "https://registry.yarnpkg.com/deep-object-diff/-/deep-object-diff-1.1.9.tgz#6df7ef035ad6a0caa44479c536ed7b02570f4595"
   integrity sha512-Rn+RuwkmkDwCi2/oXOFS9Gsr5lJZu/yTGpK7wAaAIE75CC+LCGEZHpY6VQJa/RoJcrmaA/docWJZvYohlNkWPA==
 
-deepmerge-ts@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/deepmerge-ts/-/deepmerge-ts-4.3.0.tgz#432aff3cd09f947e36cdb3772a43960bf45327fe"
-  integrity sha512-if3ZYdkD2dClhnXR5reKtG98cwyaRT1NeugQoAPTTfsOpV9kqyeiBF9Qa5RHjemb3KzD5ulqygv6ED3t5j9eJw==
+deepmerge-ts@^5.0.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/deepmerge-ts/-/deepmerge-ts-5.1.0.tgz#c55206cc4c7be2ded89b9c816cf3608884525d7a"
+  integrity sha512-eS8dRJOckyo9maw9Tu5O5RUi/4inFLrnoLkBe3cPfDMx3WZioXtmOew4TXQaxq7Rhl4xjDtR7c6x8nNTxOvbFw==
 
 deepmerge@^4.2.2:
   version "4.3.0"
@@ -9084,14 +9084,14 @@ eslint-plugin-deprecation@^1.4.1:
     tslib "^2.3.1"
     tsutils "^3.21.0"
 
-eslint-plugin-functional@^5.0.6:
-  version "5.0.6"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-5.0.6.tgz#52e81c72eb6fde147cef3d66fc21568d3fda01e8"
-  integrity sha512-7/NzMapT2BwveBgSmxL9v14bRm00ZCZsOiAb6VtFNomVWFhxkmYLg3zsH5H+TA9Zm5COsgePUe1c5ABsuW8Akw==
+eslint-plugin-functional@^5.0.8:
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-5.0.8.tgz#3b49718b2a717f196a3d077f970b6b698ccbe925"
+  integrity sha512-rXC5THzqqSXUrbTBG+dLLYn10Af0C9Df+N4TT3onPrOz+kgInshLJdRAvEcV+8HHNsZyDrNLcgWh5jzVaAnleQ==
   dependencies:
     "@typescript-eslint/type-utils" "^5.50.0"
     "@typescript-eslint/utils" "^5.50.0"
-    deepmerge-ts "^4.3.0"
+    deepmerge-ts "^5.0.0"
     escape-string-regexp "^4.0.0"
     is-immutable-type "^1.2.5"
     semver "^7.3.8"
