@@ -45,7 +45,7 @@
     "zz:cmd:tsc-incremental": "tsc --incremental --pretty"
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.20.1",
+    "@blueprintjs/core": "^5.1.5",
     "@blueprintjs/datetime": "^4.4.13",
     "@blueprintjs/icons": "^4.13.0",
     "@emotion/styled": "^11.11.0",

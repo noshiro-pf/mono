@@ -80,7 +80,7 @@
     ]
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.20.1",
+    "@blueprintjs/core": "^5.1.5",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@noshiro/io-ts": "*",

@@ -94,7 +94,7 @@
     ]
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.20.1",
+    "@blueprintjs/core": "^5.1.5",
     "@blueprintjs/datetime": "^4.4.13",
     "@blueprintjs/datetime2": "^1.0.0",
     "@blueprintjs/icons": "^4.13.0",
