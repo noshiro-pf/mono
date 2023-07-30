@@ -138,7 +138,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
 
   const fireAuthUser = Auth.useFireAuthUser();
 
-  // ログイン済み且つ回答済みの場合のみ非表示、それ以外の場合は表示
+  // 「後で回答」ボタンを表示するかどうか。
+  // ログイン済み & 回答済みの場合のみ非表示、それ以外の場合は表示。
   const showAnswerLaterButton = useMemo<boolean>(
     () =>
       !(
