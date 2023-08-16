@@ -1,5 +1,4 @@
 import * as t from '@noshiro/io-ts';
-
 import { userIdType, type UserId } from './branded-types';
 
 export type AnswerOfDate = Readonly<{
