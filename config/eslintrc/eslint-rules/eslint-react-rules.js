@@ -141,7 +141,12 @@ const eslintReactRules = {
   'react/static-property-placement': 'error',
   'react/style-prop-object': 'error',
   'react/void-dom-elements-no-children': 'error',
-  'react/jsx-no-leaked-render': 'error',
+  'react/jsx-no-leaked-render': [
+    'error',
+    {
+      validStrategies: ['ternary'],
+    },
+  ],
 
   // deprecated
   'react/jsx-sort-default-props': 'off',
