@@ -1,4 +1,4 @@
-import { type TSESLint } from '@typescript-eslint/utils';
+import { type TSESLint } from '@typescript-eslint/utils/dist';
 import { type JSONSchema4 } from 'json-schema';
 import { compile } from 'json-schema-to-typescript';
 
@@ -36,14 +36,8 @@ const deepCopy = <T>(obj: T): T => JSON.parse(JSON.stringify(obj)) as T;
 const metaToString = (meta: Meta): string => {
   const { deprecated, docs, fixable, hasSuggestions, type } = meta;
   if (docs === undefined) return '';
-  const {
-    description,
-    recommended,
-    category,
-    requiresTypeChecking,
-    suggestion,
-    url,
-  } = docs;
+  const { description, recommended, category, requiresTypeChecking, url } =
+    docs;
 
   const keyValue: DeepReadonly<[string, boolean | string | undefined][]> = [
     ['type', type],
@@ -53,7 +47,6 @@ const metaToString = (meta: Meta): string => {
     ['category', category],
     ['recommended', recommended],
     ['requiresTypeChecking', requiresTypeChecking],
-    ['suggestion', suggestion],
   ];
 
   const keyValuesStr: DeepReadonly<[string, string][]> = keyValue
