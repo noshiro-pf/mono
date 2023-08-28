@@ -362,11 +362,11 @@ namespace BraceStyle {
  * @description Enforce that literals on classes are exposed in a consistent style
  * @link https://typescript-eslint.io/rules/class-literal-property-style
  *
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | fixable     | code    |
- *  | recommended | strict  |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | hasSuggestions | true    |
+ *  | recommended    | strict  |
  */
 namespace ClassLiteralPropertyStyle {
   /**
@@ -14617,16 +14617,33 @@ namespace PreferNullishCoalescing {
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "ignoreConditionalTests": {
+   *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
    *         "type": "boolean"
    *       },
-   *       "ignoreTernaryTests": {
+   *       "ignoreConditionalTests": {
    *         "type": "boolean"
    *       },
    *       "ignoreMixedLogicalExpressions": {
    *         "type": "boolean"
    *       },
-   *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
+   *       "ignorePrimitives": {
+   *         "type": "object",
+   *         "properties": {
+   *           "bigint": {
+   *             "type": "boolean"
+   *           },
+   *           "boolean": {
+   *             "type": "boolean"
+   *           },
+   *           "number": {
+   *             "type": "boolean"
+   *           },
+   *           "string": {
+   *             "type": "boolean"
+   *           }
+   *         }
+   *       },
+   *       "ignoreTernaryTests": {
    *         "type": "boolean"
    *       }
    *     },
@@ -14636,10 +14653,17 @@ namespace PreferNullishCoalescing {
    * ```
    */
   export type Options = {
-    readonly ignoreConditionalTests?: boolean;
-    readonly ignoreTernaryTests?: boolean;
-    readonly ignoreMixedLogicalExpressions?: boolean;
     readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+    readonly ignoreConditionalTests?: boolean;
+    readonly ignoreMixedLogicalExpressions?: boolean;
+    readonly ignorePrimitives?: {
+      readonly bigint?: boolean;
+      readonly boolean?: boolean;
+      readonly number?: boolean;
+      readonly string?: boolean;
+      readonly [k: string]: unknown;
+    };
+    readonly ignoreTernaryTests?: boolean;
   };
 
   export type RuleEntry =
@@ -15025,12 +15049,28 @@ namespace RestrictPlusOperands {
    *     "type": "object",
    *     "additionalProperties": false,
    *     "properties": {
-   *       "checkCompoundAssignments": {
-   *         "description": "Whether to check compound assignments such as `+=`.",
-   *         "type": "boolean"
-   *       },
    *       "allowAny": {
    *         "description": "Whether to allow `any` typed values.",
+   *         "type": "boolean"
+   *       },
+   *       "allowBoolean": {
+   *         "description": "Whether to allow `boolean` typed values.",
+   *         "type": "boolean"
+   *       },
+   *       "allowNullish": {
+   *         "description": "Whether to allow potentially `null` or `undefined` typed values.",
+   *         "type": "boolean"
+   *       },
+   *       "allowNumberAndString": {
+   *         "description": "Whether to allow `bigint`/`number` typed values and `string` typed values to be added together.",
+   *         "type": "boolean"
+   *       },
+   *       "allowRegExp": {
+   *         "description": "Whether to allow `regexp` typed values.",
+   *         "type": "boolean"
+   *       },
+   *       "checkCompoundAssignments": {
+   *         "description": "Whether to check compound assignments such as `+=`.",
    *         "type": "boolean"
    *       }
    *     }
@@ -15040,13 +15080,29 @@ namespace RestrictPlusOperands {
    */
   export type Options = {
     /**
-     * Whether to check compound assignments such as `+=`.
-     */
-    readonly checkCompoundAssignments?: boolean;
-    /**
      * Whether to allow `any` typed values.
      */
     readonly allowAny?: boolean;
+    /**
+     * Whether to allow `boolean` typed values.
+     */
+    readonly allowBoolean?: boolean;
+    /**
+     * Whether to allow potentially `null` or `undefined` typed values.
+     */
+    readonly allowNullish?: boolean;
+    /**
+     * Whether to allow `bigint`/`number` typed values and `string` typed values to be added together.
+     */
+    readonly allowNumberAndString?: boolean;
+    /**
+     * Whether to allow `regexp` typed values.
+     */
+    readonly allowRegExp?: boolean;
+    /**
+     * Whether to check compound assignments such as `+=`.
+     */
+    readonly checkCompoundAssignments?: boolean;
   };
 
   export type RuleEntry =
@@ -15073,20 +15129,20 @@ namespace RestrictTemplateExpressions {
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "allowNumber": {
-   *         "description": "Whether to allow `number` typed values in template expressions.",
+   *       "allowAny": {
+   *         "description": "Whether to allow `any` typed values in template expressions.",
    *         "type": "boolean"
    *       },
    *       "allowBoolean": {
    *         "description": "Whether to allow `boolean` typed values in template expressions.",
    *         "type": "boolean"
    *       },
-   *       "allowAny": {
-   *         "description": "Whether to allow `any` typed values in template expressions.",
-   *         "type": "boolean"
-   *       },
    *       "allowNullish": {
    *         "description": "Whether to allow `nullish` typed values in template expressions.",
+   *         "type": "boolean"
+   *       },
+   *       "allowNumber": {
+   *         "description": "Whether to allow `number` typed values in template expressions.",
    *         "type": "boolean"
    *       },
    *       "allowRegExp": {
@@ -15104,21 +15160,21 @@ namespace RestrictTemplateExpressions {
    */
   export type Options = {
     /**
-     * Whether to allow `number` typed values in template expressions.
+     * Whether to allow `any` typed values in template expressions.
      */
-    readonly allowNumber?: boolean;
+    readonly allowAny?: boolean;
     /**
      * Whether to allow `boolean` typed values in template expressions.
      */
     readonly allowBoolean?: boolean;
     /**
-     * Whether to allow `any` typed values in template expressions.
-     */
-    readonly allowAny?: boolean;
-    /**
      * Whether to allow `nullish` typed values in template expressions.
      */
     readonly allowNullish?: boolean;
+    /**
+     * Whether to allow `number` typed values in template expressions.
+     */
+    readonly allowNumber?: boolean;
     /**
      * Whether to allow `regexp` typed values in template expressions.
      */
