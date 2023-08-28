@@ -18,10 +18,10 @@ const ignorePattern = [
 
 /** @type {ImmutableDataOptions} */
 const immutableDataOptions = {
-  assumeTypes: true,
   ignoreClasses: true,
   ignoreImmediateMutation: true,
-  ignorePattern,
+  ignoreIdentifierPattern: ignorePattern,
+  ignoreNonConstDeclarations: false,
   ignoreAccessorPattern: [
     '**.current.**', // allow React Ref object
   ],
@@ -31,7 +31,7 @@ const immutableDataOptions = {
 const noLetOptions = {
   allowInForLoopInit: false,
   allowInFunctions: false,
-  ignorePattern: ignorePattern.filter((p) => p !== '^draft'),
+  ignoreIdentifierPattern: ignorePattern.filter((p) => p !== '^draft'),
 };
 
 // /** @type {NoExpressionStatementOptions} */
@@ -46,12 +46,6 @@ const noLetOptions = {
 //     ...ignorePattern,
 //   ],
 // };
-
-/** @type {PreferTacitOptions} */
-const preferTacitOptions = {
-  ignorePattern: undefined,
-  assumeTypes: false,
-};
 
 /**
  * @type {EslintFunctionalRules}
@@ -93,7 +87,6 @@ const eslintFunctionalRules = {
   'functional/functional-parameters': 'off',
 
   // Stylistic Rules
-  // 'functional/prefer-tacit': ['warn', preferTacitOptions],
   'functional/prefer-tacit': 'off', // false positives
 
   'functional/readonly-type': ['error', 'generic'],
@@ -157,5 +150,4 @@ module.exports = {
   ignorePattern,
   immutableDataOptions,
   noLetOptions,
-  preferTacitOptions,
 };

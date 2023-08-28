@@ -246,7 +246,21 @@ const typescriptEslintRules = {
   '@typescript-eslint/prefer-includes': 'error',
   '@typescript-eslint/prefer-literal-enum-member': 'error',
   '@typescript-eslint/prefer-namespace-keyword': 'error',
-  '@typescript-eslint/prefer-nullish-coalescing': 'error',
+  '@typescript-eslint/prefer-nullish-coalescing': [
+    'error',
+    {
+      allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false,
+      ignoreConditionalTests: false,
+      ignoreTernaryTests: false,
+      ignoreMixedLogicalExpressions: false,
+      ignorePrimitives: {
+        bigint: false,
+        boolean: false,
+        number: false,
+        string: false,
+      },
+    },
+  ],
   '@typescript-eslint/prefer-optional-chain': 'error',
   '@typescript-eslint/prefer-readonly': 'error',
   '@typescript-eslint/prefer-readonly-parameter-types': [
@@ -281,7 +295,14 @@ const typescriptEslintRules = {
    */
   '@typescript-eslint/restrict-plus-operands': [
     'error',
-    { checkCompoundAssignments: true },
+    {
+      checkCompoundAssignments: true,
+      allowBoolean: false,
+      allowNullish: false,
+      allowNumberAndString: false,
+      allowRegExp: false,
+      allowAny: false,
+    },
   ], // modified
   '@typescript-eslint/restrict-template-expressions': [
     'error',
