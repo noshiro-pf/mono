@@ -180,7 +180,7 @@ export const toInt = (a: number): Int => {
       "error",
       {
         "selector": "TSAsExpression[typeAnnotation.typeName.name='Int']",
-        "message": "use createInt or isInt instead"
+        "message": "use toInt or isInt instead"
       }
     ]
   }
