@@ -109,7 +109,7 @@
     "file-loader": "^6.2.0",
     "firebase-admin": "^11.9.0",
     "firebase-functions-test": "^3.1.0",
-    "firebase-tools": "^11.27.0",
+    "firebase-tools": "^12.5.2",
     "glob": "^10.2.6",
     "happy-dom": "^9.19.2",
     "http-server": "^14.1.1",
