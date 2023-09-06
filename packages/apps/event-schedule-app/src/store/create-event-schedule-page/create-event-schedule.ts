@@ -106,8 +106,6 @@ const createEvent = async (): Promise<Result<undefined, string>> => {
   const commonState = commonState$.snapshot.value;
   const fireAuthUser = Auth.fireAuthUser$.snapshot.value;
 
-  if (commonState === undefined) return Result.ok(undefined);
-
   const {
     eventScheduleNormalized,
     eventScheduleValidationOk,

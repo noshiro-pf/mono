@@ -100,14 +100,9 @@ const enterClickHandler = (): void => {
 
   if (enterButtonDisabled) return;
 
-  const email = formState?.email.inputValue;
+  const email = formState.email.inputValue;
 
-  if (
-    eventId === undefined ||
-    eventId === '' ||
-    email === undefined ||
-    email === ''
-  ) {
+  if (eventId === undefined || eventId === '' || email === '') {
     throw new Error('eventId and email input value must be non null string');
   }
 

@@ -116,16 +116,12 @@ const answerPagePath$ = router.eventId$.chain(
 
 const onBackToAnswerPage = (): void => {
   const answerPagePath = answerPagePath$.snapshot.value;
-  if (answerPagePath !== undefined) {
-    router.push(answerPagePath);
-  }
+  router.push(answerPagePath);
 };
 
 const saveToDatabase = async (): Promise<void> => {
   const commonState = commonState$.snapshot.value;
   const eventId = router.eventId$.snapshot.value;
-
-  if (commonState === undefined) return;
 
   const {
     eventScheduleNormalized,

@@ -223,8 +223,6 @@ const restoreFromQueryParams = (
 ): void => {
   const queryParams = router.queryParams$.snapshot.value;
 
-  if (queryParams === undefined) return;
-
   const sortKey =
     queryParams.get(keyDef.sortBy) === Routes.queryParamValue.sortBy.score
       ? 'score'
