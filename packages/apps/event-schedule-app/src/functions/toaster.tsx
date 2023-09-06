@@ -57,7 +57,7 @@ export const showToast = ({
   icon,
 }: DeepReadonly<{
   isCloseButtonShown?: boolean;
-  toast: Promise<IToaster>;
+  toast: Promise<Toaster>;
   message: React.ReactNode;
   intent: Intent;
   icon?: IconName;

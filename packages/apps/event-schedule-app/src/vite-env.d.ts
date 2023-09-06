@@ -17,7 +17,7 @@ import type {
   IconName as _IconName,
   InputGroupProps as _InputGroupProps,
   Intent as _Intent,
-  IToaster as _IToaster,
+  Toaster as _Toaster,
   OptionProps as _OptionProps,
   PopperModifiers as _PopperModifiers,
 } from '@blueprintjs/core';
@@ -66,7 +66,7 @@ declare global {
   type InputGroupProps = _InputGroupProps;
   type Intent = _Intent;
   // eslint-disable-next-line deprecation/deprecation
-  type IToaster = _IToaster;
+  type Toaster = _Toaster;
   type OptionProps = _OptionProps;
   type PopperModifiers = _PopperModifiers;
 
