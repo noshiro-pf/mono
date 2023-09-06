@@ -13,6 +13,9 @@ type EventSchedulePicked = Pick<
     datetimeRangeList: readonly DatetimeRange[];
   }>;
 
+/**
+ * localStorage のキー重複回避のために suffix を付けている
+ */
 const attachSuffix = (key: string): string =>
   `${key}--event-schedule-app--2dc690b2-4b9b-49c3-921b-8c2a9451e415`;
 
