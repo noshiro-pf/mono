@@ -180,7 +180,7 @@ export const toInt = (a: number): Int => {
       "error",
       {
         "selector": "TSAsExpression[typeAnnotation.typeName.name='Int']",
-        "message": "use createInt or isInt instead"
+        "message": "use toInt or isInt instead"
       }
     ]
   }
@@ -192,7 +192,7 @@ export const toInt = (a: number): Int => {
 本節では Branded Type の活用例として数値型を `number` より細かく使い分けられるように数値型 の Branded Type を作る方法を紹介します。
 
 TypeScript でコードを書くときに使える数値型はほとんどの場合 `number` ただ一つです。元が JavaScript という動的型付言語であることを思うとそんなものかもしれませんが、例えば C++ には `int`, `double`, `size_t`, `uint32_t`（≧C++11） など数値型がいくつもあります。
-TypeScript には `bigint` 型も存在しますが、 `number` を置き換えるようには設計されていません。例えば、 TypeScript の標準ライブラリは配列の index に用いることはできないよう定義されています（少し試してみると `[1,2,3][0n]` というコードは少なくとも最新の V8 エンジンでは正常に実行できるようでしたが、このあたりの仕様については今回本題ではないため割愛します）。
+TypeScript には `bigint` 型も存在しますが、 `number` を置き換えるようには設計されていません。例えば、 TypeScript の標準ライブラリは配列の index に用いることはできないよう定義されています（少し試してみると `[1,2,3][0n]` というコードは少なくとも最新の V8 エンジンでは正常に実行できるようでしたが、このあたりの仕様については今回本題ではないため詳しく調べられておらず、本記事では割愛します）。
 
 ```ts
 // lib.es5.d.ts （標準ライブラリの型定義）
@@ -218,12 +218,12 @@ interface Array<T> {
 }
 ```
 
-こういった事情もあり、整数を使う箇所でもほぼ浮動小数点数 `number` を（諦めて）使っていることがほとんどです。
-また、整数しか入力として想定していないような関数を定義するときも仮引数に `number` 型を使わざるを得ない以上、 `Number.isInteger` などでチェックするバリデーションコードを関数の初めに書くべきではあるのですが、いちいちバリデーションを書くのは手間ですし、どうせすべての箇所で厳密にやるのが現実的にほぼ無理ということで、特に重要な場合以外は省いてしまうことも多いと思っています。
-そもそも、型を信じることでそういったバリデーションコードをいちいち書く手間を省けるのが JavaScript と比較したときの TypeScript のメリットでもあるはずなので、数値型の制約も型でなるべく解決したいと思うのがやはり自然に思えます。
-（整数など）特定の条件を満たす数値だけ受け取りたい関数では、それを**型で明示してある方が、関数にバリデーションコードを書く手間とランタイムチェックコストを省ける上に関数のインターフェースも分かりやすくなる**メリットがありそうです。
+こういった事情もあり、整数を使うべき箇所でもほぼ浮動小数点数 `number` を（諦めて）使っていることがほとんどです。
+また、整数しか入力として想定していないような関数を定義するときも仮引数に `number` 型を使わざるを得ない以上、ちゃんとやるなら `Number.isInteger` などでチェックするバリデーションコードを関数の初めに書くべきではあるのですが、いちいちバリデーションを書くのは手間ですし、どうせすべての箇所で厳密にやるのが現実的にほぼ無理ということで、特に重要な場合以外は省いてしまうことも多そうです。
+そもそも、型を信じることで（TypeScript の型による保証は絶対ではないので、信じられるように注意してコードを書くことで）そういったバリデーションコードをすべての関数に都度書く手間とランタイムコストを省けるのが JavaScript と比較したときの TypeScript のメリットでもあるはずなので、数値型の制約も型でなるべく保証できている状態が自然に思えます。
+特定の条件を満たす数値型（整数など）だけを受け取る関数では、それを**型で明示してある方が、関数にバリデーションコードを書く手間とランタイムチェックコストを省ける上に関数のインターフェースも分かりやすくなる**メリットがありそうです。
 
-そこで今回は `Number` のメソッドに対応する Branded number type を用意することを考えたいと思います。
+そこで、今回は組み込みの `Number` オブジェクトに生えている各種バリデーション関数に対応する Branded number type を実装することにします。
 
 - `NaN` （`Number.isNaN` で絞った結果に対応）
 - `InfiniteNumber`
@@ -238,7 +238,7 @@ interface Array<T> {
     - `Uint`（`Int` かつ非負）
     - `SafeUint`（`SafeInt` かつ非負）
 
-これらに単にそれぞれ名前を付けて Branded Type にするという愚直な方法はもちろんありますが、例えば `NegativeNumber & PositiveNumber` は意味的には空集合なので `never` になってほしいという要請を満たす工夫をしたいと考えました。
+これらに単にそれぞれ名前を付けて前節までの方法で Branded Type にするという愚直な方法はもちろんありますが、例えば `NegativeNumber & PositiveNumber` は意味的には空集合なので `never` になってほしいという要請を満たす工夫をしたいと考えました。
 
 ```ts
 type PositiveNumber = number & { Positive: never };
@@ -446,7 +446,7 @@ number & {
 */
 ```
 
-TypeScript 型パズルテクニックが少し必要なので説明を省きますが（[TypeScript の型初級](https://qiita.com/uhyo/items/da21e2b3c10c8a03952f#conditional-type%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bunion-distribution) などの記事が参考になりそうです）、以下の実装で所望の `NormalizeBrandUnion` を得ることができます。
+TypeScript の型レベルプログラミングテクニックが少し必要で本記事では説明を省きますが（[TypeScript の型初級](https://qiita.com/uhyo/items/da21e2b3c10c8a03952f#conditional-type%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bunion-distribution) などの記事が参考になりそうです）、以下の実装で所望の `NormalizeBrandUnion` を得ることができます。
 
 ```ts
 type TypeEq<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
