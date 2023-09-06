@@ -41,13 +41,13 @@ class WithLatestFromObservableClass<A, B>
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       type: 'withLatestFrom',
-      currentValueInit:
-        Maybe.isNone(parentObservable.currentValue) ||
-        Maybe.isNone(observable.currentValue)
+      initialValue:
+        Maybe.isNone(parentObservable.snapshot) ||
+        Maybe.isNone(observable.snapshot)
           ? Maybe.none
           : Maybe.some([
-              parentObservable.currentValue.value,
-              observable.currentValue.value,
+              parentObservable.snapshot.value,
+              observable.snapshot.value,
             ]),
     });
 
@@ -56,13 +56,13 @@ class WithLatestFromObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    const curr = this.#observable.currentValue;
+    const curr = this.#observable.snapshot;
     if (Maybe.isNone(curr)) return; // skip update
 
-    this.setNext([par.currentValue.value, curr.value], updaterSymbol);
+    this.setNext([par.snapshot.value, curr.value], updaterSymbol);
   }
 }

@@ -28,17 +28,17 @@ class PluckObservableClass<A, K extends keyof A>
     super({
       parents: [parentObservable],
       type: 'pluck',
-      currentValueInit: Maybe.map(parentObservable.currentValue, (x) => x[key]),
+      initialValue: Maybe.map(parentObservable.snapshot, (x) => x[key]),
     });
     this.#key = key;
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(par.currentValue.value[this.#key], updaterSymbol);
+    this.setNext(par.snapshot.value[this.#key], updaterSymbol);
   }
 }

@@ -35,8 +35,8 @@ class SkipObservableClass<A>
     super({
       parents: [parentObservable],
       type: 'skip',
-      currentValueInit: !isPositiveSafeInteger(n)
-        ? parentObservable.currentValue
+      initialValue: !isPositiveSafeInteger(n)
+        ? parentObservable.snapshot
         : Maybe.none,
     });
     this.#counter = 0;
@@ -45,13 +45,13 @@ class SkipObservableClass<A>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
     this.#counter = SafeUint.add(1, this.#counter);
     if (this.#counter > this.#n) {
-      this.setNext(par.currentValue.value, updaterSymbol);
+      this.setNext(par.snapshot.value, updaterSymbol);
     }
   }
 }

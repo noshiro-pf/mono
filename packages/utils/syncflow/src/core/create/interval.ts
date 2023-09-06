@@ -19,7 +19,7 @@ class IntervalObservableClass
   #isStarted: boolean;
 
   constructor(milliSeconds: number, startManually?: boolean) {
-    super({ type: 'Interval', currentValueInit: Maybe.none });
+    super({ type: 'Interval', initialValue: Maybe.none });
     this.#milliSeconds = milliSeconds;
     this.#counter = 0;
     this.#timerId0 = undefined;

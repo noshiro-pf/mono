@@ -102,7 +102,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     })).value,
     valueToBeSetWhenTurnedOff: () => undefined,
     valueToBeSetWhenTurnedOn: () =>
-      initialNotificationSettingsWithEmailFilled$.currentValue.value,
+      initialNotificationSettingsWithEmailFilled$.snapshot.value,
   });
 
   const setNotificationSettings = (a: NotificationSettings): void => {

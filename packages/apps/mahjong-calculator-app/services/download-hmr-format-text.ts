@@ -76,10 +76,10 @@ export const downloadHMRFormatText = (): Result<
     | { type: 'turn-is-undefined' }
   >
 > => {
-  const maybeHand = handSorted$.currentValue;
-  const maybeTurn = turn$.currentValue;
-  const maybeDoraIndicators = doraIndicators$.currentValue;
-  const maybeNumRemainingTiles = numRemainingTiles$.currentValue;
+  const maybeHand = handSorted$.snapshot;
+  const maybeTurn = turn$.snapshot;
+  const maybeDoraIndicators = doraIndicators$.snapshot;
+  const maybeNumRemainingTiles = numRemainingTiles$.snapshot;
 
   if (Maybe.isNone(maybeHand)) {
     return Result.err({ type: 'hand-is-undefined' });

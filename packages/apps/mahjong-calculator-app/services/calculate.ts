@@ -27,16 +27,16 @@ export const calculate = (): void => {
   setIsCalculating(true);
   resetResult();
 
-  const maybeHand = handSorted$.currentValue;
-  const maybeRevealedBlocks = revealedBlocks$.currentValue;
-  const maybeTurn = turn$.currentValue;
-  const maybeBakaze = bakaze$.currentValue;
-  const maybeJikaze = jikaze$.currentValue;
-  const maybeTehaiType = tehaiType$.currentValue;
-  const maybeDoraIndicators = doraIndicators$.currentValue;
-  const maybeNumRemainingTiles = numRemainingTiles$.currentValue;
-  const maybeFlagOptions = flagOptions$.currentValue;
-  const maybeMaximizeTarget = maximizeTarget$.currentValue;
+  const maybeHand = handSorted$.snapshot;
+  const maybeRevealedBlocks = revealedBlocks$.snapshot;
+  const maybeTurn = turn$.snapshot;
+  const maybeBakaze = bakaze$.snapshot;
+  const maybeJikaze = jikaze$.snapshot;
+  const maybeTehaiType = tehaiType$.snapshot;
+  const maybeDoraIndicators = doraIndicators$.snapshot;
+  const maybeNumRemainingTiles = numRemainingTiles$.snapshot;
+  const maybeFlagOptions = flagOptions$.snapshot;
+  const maybeMaximizeTarget = maximizeTarget$.snapshot;
 
   if (Maybe.isNone(maybeHand)) {
     setResult(Result.err({ type: 'hand-is-undefined', message: '' } as const));

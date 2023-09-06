@@ -9,7 +9,7 @@ export const createReducer = <S, A>(
 
   const dispatch = (action: A): S => {
     const nextState = reducer(
-      Maybe.unwrapOr(state$.currentValue, initialState),
+      Maybe.unwrapOr(state$.snapshot, initialState),
       action
     );
     state$.next(nextState);

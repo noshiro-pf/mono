@@ -29,7 +29,7 @@ class ScanObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'scan',
-      currentValueInit: Maybe.some(initialValue),
+      initialValue: Maybe.some(initialValue),
     });
     this.#reducer = reducer;
   }
@@ -38,14 +38,14 @@ class ScanObservableClass<A, B>
     const par = this.parents[0];
     if (
       par.updaterSymbol !== updaterSymbol ||
-      Maybe.isNone(par.currentValue) ||
-      Maybe.isNone(this.currentValue)
+      Maybe.isNone(par.snapshot) ||
+      Maybe.isNone(this.snapshot)
     ) {
       return; // skip update
     }
 
     this.setNext(
-      this.#reducer(this.currentValue.value, par.currentValue.value),
+      this.#reducer(this.snapshot.value, par.snapshot.value),
       updaterSymbol
     );
   }

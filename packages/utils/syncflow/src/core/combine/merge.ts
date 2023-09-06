@@ -22,16 +22,16 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
     super({
       parents,
       type: 'merge',
-      currentValueInit: Maybe.none,
+      initialValue: Maybe.none,
     });
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const parentToUse = this.parents.find(
-      (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.currentValue)
+      (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.snapshot)
     );
     if (parentToUse === undefined) return;
-    const nextValue = Maybe.unwrap(parentToUse.currentValue) as ArrayElement<P>;
+    const nextValue = Maybe.unwrap(parentToUse.snapshot) as ArrayElement<P>;
     this.setNext(nextValue, updaterSymbol);
   }
 }

@@ -30,7 +30,7 @@ test('', () => {
   expect(
     isRootObservable(
       new RootObservableClass({
-        currentValueInit: Maybe.some(0),
+        initialValue: Maybe.some(0),
         type: 'Of',
       })
     )

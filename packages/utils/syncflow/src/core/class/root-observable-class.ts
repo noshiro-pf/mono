@@ -18,16 +18,16 @@ export class RootObservableClass<A, Type extends RootObservableType>
 
   constructor({
     type,
-    currentValueInit,
+    initialValue,
   }: Readonly<{
     type: Type;
-    currentValueInit: RootObservable<A, Type>['currentValue'];
+    initialValue: RootObservable<A, Type>['snapshot'];
   }>) {
     super({
       kind: 'root',
       type,
       depth: 0,
-      currentValueInit,
+      initialValue,
     });
     this.type = type;
     this.#procedure = [];

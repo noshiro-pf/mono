@@ -12,7 +12,7 @@ class SourceObservableClass<A>
   implements SourceObservable<A>
 {
   constructor() {
-    super({ type: 'Source', currentValueInit: Maybe.none });
+    super({ type: 'Source', initialValue: Maybe.none });
   }
 
   next(nextValue: A): void {

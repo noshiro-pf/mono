@@ -110,17 +110,17 @@ class UnwrapMaybeObservableClass<M extends Maybe.Base>
     super({
       parents: [parentObservable],
       type: 'unwrapMaybe',
-      currentValueInit: Maybe.map(parentObservable.currentValue, Maybe.unwrap),
+      initialValue: Maybe.map(parentObservable.snapshot, Maybe.unwrap),
     });
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(Maybe.unwrap(par.currentValue.value), updaterSymbol);
+    this.setNext(Maybe.unwrap(par.snapshot.value), updaterSymbol);
   }
 }
 
@@ -136,20 +136,17 @@ class UnwrapResultOkObservableClass<R extends Result.Base>
     super({
       parents: [parentObservable],
       type: 'unwrapResultOk',
-      currentValueInit: Maybe.map(
-        parentObservable.currentValue,
-        Result.unwrapOk
-      ),
+      initialValue: Maybe.map(parentObservable.snapshot, Result.unwrapOk),
     });
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(Result.unwrapOk(par.currentValue.value), updaterSymbol);
+    this.setNext(Result.unwrapOk(par.snapshot.value), updaterSymbol);
   }
 }
 
@@ -165,20 +162,17 @@ class UnwrapResultErrObservableClass<R extends Result.Base>
     super({
       parents: [parentObservable],
       type: 'unwrapResultErr',
-      currentValueInit: Maybe.map(
-        parentObservable.currentValue,
-        Result.unwrapErr
-      ),
+      initialValue: Maybe.map(parentObservable.snapshot, Result.unwrapErr),
     });
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(Result.unwrapErr(par.currentValue.value), updaterSymbol);
+    this.setNext(Result.unwrapErr(par.snapshot.value), updaterSymbol);
   }
 }
 
@@ -195,7 +189,7 @@ class MapMaybeObservableClass<M extends Maybe.Base, B>
     super({
       parents: [parentObservable],
       type: 'mapMaybe',
-      currentValueInit: Maybe.map(parentObservable.currentValue, (a) =>
+      initialValue: Maybe.map(parentObservable.snapshot, (a) =>
         Maybe.map(a, mapFn)
       ),
     });
@@ -204,11 +198,11 @@ class MapMaybeObservableClass<M extends Maybe.Base, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(Maybe.map(par.currentValue.value, this.#mapFn), updaterSymbol);
+    this.setNext(Maybe.map(par.snapshot.value, this.#mapFn), updaterSymbol);
   }
 }
 
@@ -229,7 +223,7 @@ class MapResultOkObservableClass<R extends Result.Base, S2>
     super({
       parents: [parentObservable],
       type: 'mapResultOk',
-      currentValueInit: Maybe.map(parentObservable.currentValue, (a) =>
+      initialValue: Maybe.map(parentObservable.snapshot, (a) =>
         Result.map(a, mapFn)
       ),
     });
@@ -238,14 +232,11 @@ class MapResultOkObservableClass<R extends Result.Base, S2>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(
-      Result.map(par.currentValue.value, this.#mapFn),
-      updaterSymbol
-    );
+    this.setNext(Result.map(par.snapshot.value, this.#mapFn), updaterSymbol);
   }
 }
 
@@ -266,7 +257,7 @@ class MapResultErrObservableClass<R extends Result.Base, E2>
     super({
       parents: [parentObservable],
       type: 'mapResultErr',
-      currentValueInit: Maybe.map(parentObservable.currentValue, (a) =>
+      initialValue: Maybe.map(parentObservable.snapshot, (a) =>
         Result.mapErr(a, mapFn)
       ),
     });
@@ -275,13 +266,10 @@ class MapResultErrObservableClass<R extends Result.Base, E2>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
-    this.setNext(
-      Result.mapErr(par.currentValue.value, this.#mapFn),
-      updaterSymbol
-    );
+    this.setNext(Result.mapErr(par.snapshot.value, this.#mapFn), updaterSymbol);
   }
 }

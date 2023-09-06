@@ -32,9 +32,7 @@ class MapWithIndexObservableClass<A, B>
     super({
       parents: [parentObservable],
       type: 'mapWithIndex',
-      currentValueInit: Maybe.map(parentObservable.currentValue, (x) =>
-        mapFn(x, -1)
-      ),
+      initialValue: Maybe.map(parentObservable.snapshot, (x) => mapFn(x, -1)),
     });
     this.#index = -1;
     this.#mapFn = mapFn;
@@ -42,14 +40,11 @@ class MapWithIndexObservableClass<A, B>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const par = this.parents[0];
-    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.currentValue)) {
+    if (par.updaterSymbol !== updaterSymbol || Maybe.isNone(par.snapshot)) {
       return; // skip update
     }
 
     this.#index = this.#index === -1 ? 0 : SafeUint.add(1, this.#index);
-    this.setNext(
-      this.#mapFn(par.currentValue.value, this.#index),
-      updaterSymbol
-    );
+    this.setNext(this.#mapFn(par.snapshot.value, this.#index), updaterSymbol);
   }
 }

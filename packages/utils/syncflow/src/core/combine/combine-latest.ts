@@ -30,11 +30,11 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
 {
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.currentValue);
+    const parentsValues = parents.map((p) => p.snapshot);
     super({
       parents,
       type: 'combineLatest',
-      currentValueInit: parentsValues.every(Maybe.isSome)
+      initialValue: parentsValues.every(Maybe.isSome)
         ? Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
         : Maybe.none,
     });
@@ -43,7 +43,7 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     if (this.parents.every((o) => o.updaterSymbol !== updaterSymbol)) return; // all parents are skipped
 
-    const parentValues = this.parents.map((a) => a.currentValue);
+    const parentValues = this.parents.map((a) => a.snapshot);
     if (parentValues.every(Maybe.isSome)) {
       const nextValue = parentValues.map((a) => a.value) as unknown as A;
       this.setNext(nextValue, updaterSymbol);

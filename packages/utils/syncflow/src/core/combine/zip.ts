@@ -29,11 +29,11 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
 
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.currentValue);
+    const parentsValues = parents.map((p) => p.snapshot);
     super({
       parents,
       type: 'zip',
-      currentValueInit: parentsValues.every(Maybe.isSome)
+      initialValue: parentsValues.every(Maybe.isSome)
         ? Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
         : Maybe.none,
     });
@@ -44,11 +44,8 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const queues = this.#queues;
     for (const [index, par] of this.parents.entries()) {
-      if (
-        par.updaterSymbol === updaterSymbol &&
-        Maybe.isSome(par.currentValue)
-      ) {
-        queues[index]?.enqueue(par.currentValue.value);
+      if (par.updaterSymbol === updaterSymbol && Maybe.isSome(par.snapshot)) {
+        queues[index]?.enqueue(par.snapshot.value);
       }
     }
 

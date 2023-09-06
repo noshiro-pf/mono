@@ -49,7 +49,7 @@ export function useObservableValue<A, B = A>(
   initialValue?: B
 ): A | B | undefined {
   const { state, setState } = useState<{ value: A | B | undefined }>({
-    value: Maybe.unwrap(observable$.currentValue) ?? initialValue,
+    value: Maybe.unwrap(observable$.snapshot) ?? initialValue,
   });
   useObservableEffect(observable$, (value) => {
     setState({ value });
