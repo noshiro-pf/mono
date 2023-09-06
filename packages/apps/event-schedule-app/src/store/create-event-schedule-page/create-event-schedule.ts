@@ -48,9 +48,9 @@ const restoreFromLocalStorage = (): void => {
     commonStateHandlers.setTitle(ev.title);
     commonStateHandlers.setNotes(ev.notes);
     commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
-    // 過去日は復元しない
+    // 過去日（今日含む）は復元しない
     commonStateHandlers.setDatetimeRangeList(
-      ev.datetimeRangeList.filter((d) => compareYmd(d.ymd, now()) >= 0)
+      ev.datetimeRangeList.filter((d) => compareYmd(d.ymd, now()) > 0)
     );
     commonStateHandlers.setAnswerIcons(ev.answerIcons);
 
