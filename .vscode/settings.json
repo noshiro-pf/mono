@@ -3,6 +3,5 @@
     {
       "mode": "auto"
     }
-  ],
-  "prettier.prettierPath": "./node_modules/prettier"
+  ]
 }
