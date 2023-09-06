@@ -65,7 +65,10 @@ const restoreFromLocalStorage = (): void => {
       commonStateHandlers.turnOffNotificationSection();
     } else {
       commonStateHandlers.turnOnNotificationSection();
-      commonStateHandlers.setNotificationSettings(ev.notificationSettings);
+      commonStateHandlers.setNotificationSettingsWithEmail({
+        ...ev.notificationSettings,
+        email: Auth.fireAuthUser$.snapshot.value?.email ?? '',
+      });
     }
   }
 };
