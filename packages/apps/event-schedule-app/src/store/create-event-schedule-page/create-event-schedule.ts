@@ -103,9 +103,8 @@ const {
 const { state$: url$, setState: setUrl } = createState<string>('');
 
 const createEvent = async (): Promise<Result<undefined, string>> => {
-  const { commonState, fireAuthUser } = mut_subscribedValues;
-
-  if (commonState === undefined) return Result.ok(undefined);
+  const commonState = commonState$.snapshot.value;
+  const fireAuthUser = Auth.fireAuthUser$.snapshot.value;
 
   const {
     eventScheduleNormalized,
@@ -174,7 +173,7 @@ const onCreateEventClick = (): void => {
 };
 
 const onClipboardButtonClick = (): void => {
-  const url = mut_subscribedValues.url;
+  const url = url$.snapshot.value;
 
   // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
   if (
@@ -189,33 +188,11 @@ const onClipboardButtonClick = (): void => {
 
 /* subscriptions */
 
-const mut_subscribedValues: {
-  commonState: EventScheduleSettingCommonState | undefined;
-  fireAuthUser: FireAuthUser | undefined;
-  url: string | undefined;
-} = {
-  commonState: undefined,
-  fireAuthUser: undefined,
-  url: undefined,
-};
-
-commonState$.subscribe((commonState) => {
-  mut_subscribedValues.commonState = commonState;
-});
-
 commonState$
   .chain(debounceTime(500))
   .chain(skip(1))
   .chain(filter(isNotUndefined))
   .subscribe(saveToLocalStorage);
-
-Auth.fireAuthUser$.subscribe((user) => {
-  mut_subscribedValues.fireAuthUser = user;
-});
-
-url$.subscribe((url) => {
-  mut_subscribedValues.url = url;
-});
 
 export const CreateEventScheduleStore = {
   closeCreateResultDialog,

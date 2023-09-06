@@ -7,7 +7,6 @@ import {
   showToast,
   type EventSettingsPageDiffResult,
 } from '../../functions';
-import { type EventScheduleSettingCommonState } from '../../types';
 import { AnswersStore, EventScheduleStore } from '../fetching-state';
 import { router } from '../router';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';
@@ -116,16 +115,13 @@ const answerPagePath$ = router.eventId$.chain(
 );
 
 const onBackToAnswerPage = (): void => {
-  const { answerPagePath } = mut_subscribedValues;
-  if (answerPagePath !== undefined) {
-    router.push(answerPagePath);
-  }
+  const answerPagePath = answerPagePath$.snapshot.value;
+  router.push(answerPagePath);
 };
 
 const saveToDatabase = async (): Promise<void> => {
-  const { commonState, eventId } = mut_subscribedValues;
-
-  if (commonState === undefined) return;
+  const commonState = commonState$.snapshot.value;
+  const eventId = router.eventId$.snapshot.value;
 
   const {
     eventScheduleNormalized,
@@ -186,38 +182,6 @@ const {
   setTrue: setIsLoadingTrue,
   setFalse: setIsLoadingFalse,
 } = createBooleanState(false);
-
-/* subscriptions */
-
-const mut_subscribedValues: {
-  commonState: EventScheduleSettingCommonState | undefined;
-  answerPagePath: string | undefined;
-  url: string | undefined;
-  eventId: string | undefined;
-  emailVerified: string | undefined;
-} = {
-  commonState: undefined,
-  answerPagePath: undefined,
-  url: undefined,
-  eventId: undefined,
-  emailVerified: undefined,
-};
-
-commonState$.subscribe((commonState) => {
-  mut_subscribedValues.commonState = commonState;
-});
-
-answerPagePath$.subscribe((user) => {
-  mut_subscribedValues.answerPagePath = user;
-});
-
-router.eventId$.subscribe((user) => {
-  mut_subscribedValues.eventId = user;
-});
-
-emailVerified$.subscribe((v) => {
-  mut_subscribedValues.emailVerified = v;
-});
 
 export const EditEventScheduleStore = {
   commonState$,

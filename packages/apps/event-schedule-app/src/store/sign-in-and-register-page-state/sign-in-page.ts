@@ -135,13 +135,13 @@ const inputPasswordHandler = (value: string): void => {
 
 const enterClickHandler = (): void => {
   if (
-    mut_subscribedValues.enterButtonDisabled ||
-    mut_subscribedValues.googleSignInButtonDisabled
+    enterButtonDisabled$.snapshot.value ||
+    GoogleSignInStore.googleSignInButtonDisabled$.snapshot.value
   )
     return;
 
   // TODO: use toast
-  submit(mut_subscribedValues.pageToBack).catch(console.error);
+  submit(Maybe.unwrap(router.pageToBack$.snapshot)).catch(console.error);
 };
 
 const resetAllState = (): void => {
@@ -150,28 +150,6 @@ const resetAllState = (): void => {
 };
 
 /* subscriptions */
-
-const mut_subscribedValues: {
-  enterButtonDisabled: boolean;
-  googleSignInButtonDisabled: boolean;
-  pageToBack: string | undefined;
-} = {
-  enterButtonDisabled: true,
-  googleSignInButtonDisabled: true,
-  pageToBack: undefined,
-};
-
-enterButtonDisabled$.subscribe((v) => {
-  mut_subscribedValues.enterButtonDisabled = v;
-});
-
-GoogleSignInStore.googleSignInButtonDisabled$.subscribe((v) => {
-  mut_subscribedValues.googleSignInButtonDisabled = v;
-});
-
-router.pageToBack$.subscribe((v) => {
-  mut_subscribedValues.pageToBack = v;
-});
 
 router.isRoute.signInPage$.subscribe((isSignInPage) => {
   if (!isSignInPage) {

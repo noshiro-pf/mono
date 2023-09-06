@@ -5,7 +5,6 @@ import {
   confirmEmailDialogHasError,
   createToaster,
   showToast,
-  type ConfirmEmailDialogFormState,
 } from '../functions';
 import { EditEventScheduleStore } from './create-event-schedule-page';
 import { eventSchedule$ } from './fetching-state';
@@ -95,18 +94,15 @@ const submit = async (eventId: string, email: string): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  const { eventId, enterButtonDisabled, formState } = mut_subscribedValues;
+  const eventId = router.eventId$.snapshot.value;
+  const formState = formState$.snapshot.value;
+  const enterButtonDisabled = enterButtonDisabled$.snapshot.value;
 
   if (enterButtonDisabled) return;
 
-  const email = formState?.email.inputValue;
+  const email = formState.email.inputValue;
 
-  if (
-    eventId === undefined ||
-    eventId === '' ||
-    email === undefined ||
-    email === ''
-  ) {
+  if (eventId === undefined || eventId === '' || email === '') {
     throw new Error('eventId and email input value must be non null string');
   }
 
@@ -135,30 +131,6 @@ const resetAllState = (): void => {
 };
 
 /* subscriptions */
-
-const mut_subscribedValues: {
-  formState: ConfirmEmailDialogFormState | undefined;
-  enterButtonDisabled: boolean;
-  eventId: string | undefined;
-  lastSetEmail: string | undefined;
-} = {
-  formState: undefined,
-  enterButtonDisabled: true,
-  eventId: undefined,
-  lastSetEmail: undefined,
-};
-
-router.eventId$.subscribe((eventId) => {
-  mut_subscribedValues.eventId = eventId;
-});
-
-formState$.subscribe((v) => {
-  mut_subscribedValues.formState = v;
-});
-
-enterButtonDisabled$.subscribe((v) => {
-  mut_subscribedValues.enterButtonDisabled = v;
-});
 
 router.isRoute.editPage$.subscribe((isEditPage) => {
   if (!isEditPage) {

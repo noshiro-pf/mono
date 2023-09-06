@@ -82,7 +82,8 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  const { enterButtonDisabled, fireAuthUser } = mut_subscribedValues;
+  const enterButtonDisabled = enterButtonDisabled$.snapshot.value;
+  const fireAuthUser = Auth.fireAuthUser$.snapshot.value;
 
   if (enterButtonDisabled || fireAuthUser === undefined) return;
 
@@ -102,22 +103,6 @@ const resetAllDialogState = (): void => {
 };
 
 /* subscriptions */
-
-const mut_subscribedValues: {
-  enterButtonDisabled: boolean;
-  fireAuthUser: FireAuthUser | undefined;
-} = {
-  enterButtonDisabled: true,
-  fireAuthUser: undefined,
-};
-
-enterButtonDisabled$.subscribe((v) => {
-  mut_subscribedValues.enterButtonDisabled = v;
-});
-
-Auth.fireAuthUser$.subscribe((v) => {
-  mut_subscribedValues.fireAuthUser = v;
-});
 
 UpdateUserInfoDialogStore.openingDialog$
   .chain(withLatestFromI(Auth.fireAuthUser$))
