@@ -47,19 +47,14 @@ const abs = (x: T): Abs => to(Math.abs(x)) as Abs;
 const max = (...values: readonly T[]): T => to(Math.max(...values));
 const min = (...values: readonly T[]): T => to(Math.min(...values));
 
-/** @returns a ** b, but clamped to [-2^31, 2^31) */
 const pow = (x: T, y: T): T => clamp(x ** y);
 
-/** @returns a + b, but clamped to [-2^31, 2^31) */
 const add = (x: T, y: T): T => clamp(x + y);
 
-/** @returns a - b, but clamped to [-2^31, 2^31) */
 const sub = (x: T, y: T): T => clamp(x - y);
 
-/** @returns a * b, but clamped to [-2^31, 2^31) */
 const mul = (x: T, y: T): T => clamp(x * y);
 
-/** @returns a / b, but clamped to [-2^31, 2^31) */
 const div = (x: T, y: D): T => clamp(Math.floor(x / y));
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -72,11 +67,21 @@ export const Int32 = {
   abs,
   max,
   min,
-  pow,
-  add,
-  sub,
-  mul,
-  div,
-  random,
   clamp,
+  random,
+
+  /** @returns a ** b, but clamped to [-2^31, 2^31) */
+  pow,
+
+  /** @returns a + b, but clamped to [-2^31, 2^31) */
+  add,
+
+  /** @returns a - b, but clamped to [-2^31, 2^31) */
+  sub,
+
+  /** @returns a * b, but clamped to [-2^31, 2^31) */
+  mul,
+
+  /** @returns ⌊a / b⌋, but clamped to [-2^31, 2^31) */
+  div,
 } as const;
