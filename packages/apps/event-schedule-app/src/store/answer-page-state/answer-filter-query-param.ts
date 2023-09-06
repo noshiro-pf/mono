@@ -5,7 +5,7 @@ import {
   type AnswerFilterStateAction,
 } from '../../functions';
 import { isAnswersScore, type AnswersScore } from '../../types';
-import { router } from '../router';
+import { Router } from '../router';
 
 const keyDef = Routes.queryParamKey.answerTableState;
 
@@ -13,7 +13,7 @@ const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
   'date' | 'score',
   'asc' | 'desc'
 ]): void => {
-  router.updateQueryParams(
+  Router.updateQueryParams(
     (urlSearchParams) => {
       if (sortKey === 'date') {
         urlSearchParams.delete(keyDef.sortBy);
@@ -115,7 +115,7 @@ const saveFilterStateToQueryParams = ({
   filledDateOnly,
   dayOfWeek,
 }: AnswerFilterState): void => {
-  router.updateQueryParams(
+  Router.updateQueryParams(
     (urlSearchParams) => {
       if (
         dateRange.enabled &&
@@ -221,7 +221,7 @@ const restoreFromQueryParams = (
   setSortOrderAndKey: (v: readonly ['date' | 'score', 'asc' | 'desc']) => void,
   filterStateDispatch: (action: AnswerFilterStateAction) => void
 ): void => {
-  const queryParams = router.state$.snapshot.value.searchParams;
+  const queryParams = Router.state$.snapshot.value.searchParams;
 
   const sortKey =
     queryParams.get(keyDef.sortBy) === Routes.queryParamValue.sortBy.score

@@ -7,7 +7,7 @@ import {
   signInPageInitialState,
   signInPageStateReducer,
 } from '../../functions';
-import { router } from '../router';
+import { Router } from '../router';
 import { GoogleSignInStore } from './google-sign-in-state';
 
 const dc = dict.register;
@@ -112,9 +112,9 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
     });
 
     if (pageToBack !== undefined) {
-      router.redirect(pageToBack);
+      Router.redirect(pageToBack);
     } else {
-      router.redirect(Routes.routes.createPage);
+      Router.redirect(Routes.routes.createPage);
     }
   }
 };
@@ -141,7 +141,7 @@ const enterClickHandler = (): void => {
     return;
 
   // TODO: use toast
-  submit(Maybe.unwrap(router.pageToBack$.snapshot)).catch(console.error);
+  submit(Maybe.unwrap(Router.pageToBack$.snapshot)).catch(console.error);
 };
 
 const resetAllState = (): void => {
@@ -151,7 +151,7 @@ const resetAllState = (): void => {
 
 /* subscriptions */
 
-router.isRoute.signInPage$.subscribe((isSignInPage) => {
+Router.isRoute.signInPage$.subscribe((isSignInPage) => {
   if (!isSignInPage) {
     resetAllState();
   }

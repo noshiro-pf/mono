@@ -1,5 +1,5 @@
 import { Spinner } from '@blueprintjs/core';
-import { EventScheduleStore, router } from '../../../store';
+import { EventScheduleStore, Router } from '../../../store';
 import { Header } from '../../organisms';
 import { NotFoundPage } from '../not-found-page';
 import { EditEventScheduleOk } from './edit-event-schedule-ok';
@@ -8,7 +8,7 @@ import { FetchEventScheduleError } from './error';
 const dc = dict.eventSettingsPage;
 
 export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
-  const eventId = useObservableValue(router.eventId$);
+  const eventId = useObservableValue(Router.eventId$);
   const eventScheduleResult = useObservableValue(EventScheduleStore.result$);
 
   return eventScheduleResult !== undefined &&

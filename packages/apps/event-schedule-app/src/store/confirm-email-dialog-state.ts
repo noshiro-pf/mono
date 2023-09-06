@@ -8,7 +8,7 @@ import {
 } from '../functions';
 import { EditEventScheduleStore } from './create-event-schedule-page';
 import { eventSchedule$ } from './fetching-state';
-import { router } from './router';
+import { Router } from './router';
 
 const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
@@ -94,7 +94,7 @@ const submit = async (eventId: string, email: string): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  const eventId = router.eventId$.snapshot.value;
+  const eventId = Router.eventId$.snapshot.value;
   const formState = formState$.snapshot.value;
   const enterButtonDisabled = enterButtonDisabled$.snapshot.value;
 
@@ -111,7 +111,7 @@ const enterClickHandler = (): void => {
 };
 
 const cancelClickHandler = (): void => {
-  router.back();
+  Router.back();
 };
 
 const inputEmailHandler = (value: string): void => {
@@ -132,7 +132,7 @@ const resetAllState = (): void => {
 
 /* subscriptions */
 
-router.isRoute.editPage$.subscribe((isEditPage) => {
+Router.isRoute.editPage$.subscribe((isEditPage) => {
   if (!isEditPage) {
     resetAllState();
   }
