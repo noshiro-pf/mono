@@ -9,10 +9,10 @@ import {
   SignInPage,
 } from './components';
 import { ErrorBoundary } from './error-handler';
-import { useShowPage } from './store';
+import { Router } from './store';
 
 export const App = memoNamed('App', () => {
-  const show = useShowPage();
+  const show = Router.useShowPage();
 
   return (
     <ErrorBoundary>
