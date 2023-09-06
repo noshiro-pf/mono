@@ -1,3 +1,5 @@
+import { Router } from '../router';
+
 export const uriWithQueryParams = (
   uri: string,
   queryParameters: DeepReadonly<
@@ -8,7 +10,7 @@ export const uriWithQueryParams = (
     ([_, value]) => value !== undefined
   );
 
-  const normalizedUri = withSlash(uri);
+  const normalizedUri = Router.utils.withSlash(uri);
 
   if (nonNullQueryParameters.length === 0) {
     return normalizedUri;

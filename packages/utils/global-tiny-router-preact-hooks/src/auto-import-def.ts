@@ -1,13 +1,3 @@
 export const autoImportDef = {
-  '@noshiro/tiny-router-preact-hooks': [
-    'back',
-    'pathname$',
-    'push',
-    'queryParams$',
-    'redirect',
-    'removeListener',
-    'usePathname',
-    'useQueryParams',
-    'useRouterLinkClick',
-  ],
+  '@noshiro/tiny-router-preact-hooks': ['useRouterLinkClick'],
 } as const;

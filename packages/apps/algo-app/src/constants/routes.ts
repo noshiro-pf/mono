@@ -1,3 +1,5 @@
+import { Router } from '../router';
+
 export const routes = {
   main: '/',
   createRoom: '/create',
@@ -20,10 +22,10 @@ export const getRoomId = (path: string): string | undefined =>
   getRoomIdRegexp.exec(path)?.groups?.['roomId'];
 
 export const isMainPage = (path: string): boolean =>
-  path === routes.main || path === withSlash(routes.createRoom);
+  path === routes.main || path === Router.utils.withSlash(routes.createRoom);
 
 export const getParams = (
-  queryParams: DeepReadonly<URLSearchParams>
+  queryParams: ReadonlyURLSearchParams
 ): DeepReadonly<{
   playerId: string | undefined;
   replay: boolean;

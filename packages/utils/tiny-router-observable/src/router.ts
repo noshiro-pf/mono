@@ -1,7 +1,6 @@
 import {
   createState,
   mapI,
-  pluckI,
   type InitializedObservable,
 } from '@noshiro/syncflow';
 import { castWritable, pipe } from '@noshiro/ts-utils';
@@ -17,20 +16,34 @@ export type UpdateQueryParamsOptions = Partial<
   }>
 >;
 
-export type Router = Readonly<{
-  pathname$: InitializedObservable<string>;
+export type ReadonlyURLSearchParams = DeepReadonly<
+  Omit<URLSearchParams, 'append' | 'delete' | 'set' | 'sort'>
+>;
 
-  pathSegments$: InitializedObservable<readonly string[]>;
-  queryParams$: InitializedObservable<DeepReadonly<URLSearchParams>>;
+export type RouterState = Readonly<{
+  /**
+   * @description `(new URL(window.location.href)).searchParams`
+   */
+  pathname: string;
+
+  /**
+   * @description `splitToPathSegments(pathname)`
+   */
+  pathSegments: readonly string[];
+
+  /**
+   * @description Query parameters created from `(new URL(window.location.href)).searchParams`.
+   * Mutation methods (`append`, `delete`, `set`, `sort` of `URLSearchParams`) are omitted .
+   */
+  searchParams: ReadonlyURLSearchParams;
+}>;
+
+export type Router = Readonly<{
+  state$: InitializedObservable<RouterState>;
 
   push: (nextUrl: string) => void;
 
-  updateQueryParams: (
-    recipe: (
-      urlSearchParams: DeepReadonly<URLSearchParams>
-    ) => DeepReadonly<URLSearchParams>,
-    options?: UpdateQueryParamsOptions
-  ) => void;
+  redirect: (nextUrl: string) => void;
 
   go: (delta?: number | undefined) => void;
 
@@ -38,9 +51,17 @@ export type Router = Readonly<{
 
   back: () => void;
 
-  redirect: (nextUrl: string) => void;
+  updateQueryParams: (
+    recipe: (draft: URLSearchParams) => URLSearchParams,
+    options?: UpdateQueryParamsOptions
+  ) => void;
 
   removeListener: () => void;
+
+  utils: {
+    splitToPathSegments: (pathname: string) => readonly string[];
+    withSlash: (path: string) => string;
+  };
 }>;
 
 /**
@@ -48,37 +69,31 @@ export type Router = Readonly<{
  * and starts listening URL changes.
  */
 export const createRouter = (): Router => {
-  const { state$: url$, setState: setUrl } = createState<URL>(
-    new URL(window.location.href)
-  );
+  const getCurrentUrl = (): URL => new URL(window.location.href);
 
-  const pathname$: InitializedObservable<string> = url$.chain(
-    pluckI('pathname')
-  );
+  const { state$: url$, setState: setUrl } = createState<URL>(getCurrentUrl());
 
-  const queryParams$: InitializedObservable<URLSearchParams> = url$.chain(
-    pluckI('searchParams')
+  const state$ = url$.chain(
+    mapI((a) => ({
+      pathname: a.pathname,
+      searchParams: a.searchParams,
+      pathSegments: splitToPathSegments(a.pathname),
+    }))
   );
 
   const updateState = (): void => {
-    setUrl(new URL(window.location.href));
-  };
-
-  const push = (nextPath: string): void => {
-    const p = withSlash(nextPath);
-    window.history.pushState({}, '', p);
-    updateState();
+    setUrl(getCurrentUrl());
   };
 
   const updateQueryParams = (
-    recipe: (
-      urlSearchParams: DeepReadonly<URLSearchParams>
-    ) => DeepReadonly<URLSearchParams>,
+    recipe: (draft: URLSearchParams) => URLSearchParams,
     options?: UpdateQueryParamsOptions
   ): void => {
-    const mut_url = castWritable(new URL(window.location.href));
+    const mut_url = castWritable(getCurrentUrl());
 
     const { sortParams = true, method = 'pushState' } = options ?? {};
+
+    const prev = mut_url.searchParams.toString();
 
     const nextSearchParams = pipe(mut_url.searchParams)
       .chain(recipe)
@@ -92,18 +107,36 @@ export const createRouter = (): Router => {
       )
       .chain((a) => a.toString()).value;
 
-    if (nextSearchParams === mut_url.searchParams.toString()) return;
+    if (nextSearchParams === prev) return;
 
     mut_url.search = nextSearchParams;
 
     switch (method) {
       case 'pushState':
-        window.history.pushState({}, '', mut_url.toString());
+        push(mut_url.toString());
         break;
+
       case 'replaceState':
-        window.history.replaceState({}, '', mut_url.toString());
+        redirect(mut_url.toString());
         break;
     }
+  };
+
+  const push = (nextUrl: string, appendSlash: boolean = true): void => {
+    window.history.pushState(
+      {},
+      '',
+      appendSlash ? withSlash(nextUrl) : nextUrl
+    );
+    updateState();
+  };
+
+  const redirect = (nextUrl: string, appendSlash: boolean = true): void => {
+    window.history.replaceState(
+      {},
+      '',
+      appendSlash ? withSlash(nextUrl) : nextUrl
+    );
     updateState();
   };
 
@@ -122,36 +155,25 @@ export const createRouter = (): Router => {
     updateState();
   };
 
-  const redirect = (nextUrl: string): void => {
-    const p = withSlash(nextUrl);
-    window.history.replaceState({}, '', p);
-    updateState();
-  };
-
+  // initialize
   window.addEventListener('popstate', updateState);
 
-  const pathSegments$: InitializedObservable<readonly string[]> =
-    pathname$.chain(
-      mapI((pathname) => pathname.split('/').filter((s) => s !== ''))
-    );
-
   return {
+    state$,
     push,
-    updateQueryParams,
+    redirect,
     go,
     forward,
     back,
-    redirect,
-    pathname$,
-    queryParams$,
-    pathSegments$,
+    updateQueryParams,
     removeListener: () => {
       window.removeEventListener('popstate', updateState);
     },
+    utils: { splitToPathSegments, withSlash },
   };
 };
 
-export const withSlash = (path: string): string =>
+const withSlash = (path: string): string =>
   path.endsWith('/')
     ? path
     : path.includes('/?')
@@ -159,3 +181,6 @@ export const withSlash = (path: string): string =>
     : path.includes('?')
     ? path.split('?').join('/?')
     : `${path}/`;
+
+const splitToPathSegments = (pathname: string): readonly string[] =>
+  pathname.split('/').filter((s) => s !== '');

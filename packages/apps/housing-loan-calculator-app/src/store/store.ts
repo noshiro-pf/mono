@@ -1,4 +1,5 @@
 import { defaultValues, queryParamKey } from '../constants';
+import { Router } from '../router';
 import { type RepaymentType, type Store } from '../types';
 import { uriWithQueryParams } from '../utils';
 
@@ -74,7 +75,7 @@ const store$: InitializedObservable<Store> = combineLatestI([
   )
 );
 
-queryParams$.subscribe((query) => {
+Router.state$.subscribe(({ searchParams: query }) => {
   const paramsAsStr = {
     repaymentType: query.get(queryParamKey.repaymentType),
     downPayment: query.get(queryParamKey.downPayment),
@@ -117,7 +118,7 @@ queryParams$.subscribe((query) => {
 });
 
 userInput$.chain(withLatestFrom(store$)).subscribe(([_, store]) => {
-  push(
+  Router.push(
     uriWithQueryParams('/', [
       [queryParamKey.repaymentType, store.repaymentType],
       [queryParamKey.downPayment, store.downPaymentManYen],

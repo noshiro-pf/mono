@@ -2,17 +2,15 @@ import { Routes } from '../constants';
 
 const _router = createRouter();
 
-const toPathSegments = (pathname: string): readonly string[] =>
-  pathname.split('/').filter((s) => s !== '');
-
 const pathSegments$: InitializedObservable<readonly string[]> =
-  _router.pathname$.chain(mapI(toPathSegments));
+  _router.state$.chain(mapI((state) => state.pathSegments));
 
-const pageToBack$ = _router.pathname$.chain(
+const pageToBack$ = _router.state$.chain(pluckI('pathname')).chain(
   filter((pathname) => {
-    const pathSegments = toPathSegments(pathname);
-    // ログインページ・新規登録ページは除外
+    const pathSegments = _router.utils.splitToPathSegments(pathname);
+
     return (
+      // ログインページ・新規登録ページは除外
       !Routes.isRoute.registerPage(pathSegments) &&
       !Routes.isRoute.signInPage(pathSegments)
     );
@@ -74,7 +72,7 @@ export const useShowPage = (): Readonly<{
   };
 };
 
-router.pathname$.subscribe((pathname) => {
+router.state$.subscribe(({ pathname }) => {
   const to = Routes.redirectRules.get(pathname);
   if (to !== undefined) {
     router.redirect(to);

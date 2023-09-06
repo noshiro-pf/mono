@@ -1,3 +1,3 @@
 export const autoImportDef = {
-  '@noshiro/tiny-router-observable': ['createRouter', 'withSlash'],
+  '@noshiro/tiny-router-observable': ['createRouter'],
 } as const;

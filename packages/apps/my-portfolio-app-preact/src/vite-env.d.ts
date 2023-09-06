@@ -13,7 +13,7 @@ declare module '*.md' {
   const attributes: Record<string, unknown>;
 
   import React from 'react'
-  const ReactComponent: React.VFC;
+  const ReactComponent: React.FC;
 
   export { attributes, ReactComponent };
 }
