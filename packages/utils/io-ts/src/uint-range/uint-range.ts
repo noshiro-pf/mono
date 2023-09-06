@@ -21,9 +21,7 @@ export const uintRange = <
   const typeNameFilled = typeName ?? `uintRange(${start}, ${end})`;
 
   const validate: Type<T>['validate'] = (a) => {
-    if (
-      !(isNumber(a) && Number.isInteger(a) && Num.isInRange(start, end - 1)(a))
-    ) {
+    if (!(isNumber(a) && Number.isInteger(a) && Num.isInRange(start, end)(a))) {
       const stringifyResult = Json.stringify(a);
 
       const prefix = `The value is expected to be an integer between ${start} and ${

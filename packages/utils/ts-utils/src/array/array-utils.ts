@@ -152,7 +152,7 @@ function newArray<V>(len: SafeUint, init: V): readonly V[] {
 }
 
 type LEQ = {
-  readonly [N in Index<512>]: Index<N>;
+  readonly [N in SmallUint]: Index<N>;
 };
 
 type RangeList<S extends SmallUint, E extends SmallUint> = BoolOr<

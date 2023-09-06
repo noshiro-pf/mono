@@ -1,9 +1,36 @@
 const from: (n: unknown) => number = Number;
 
+/** `lowerBound <= x < upperBound` */
 const isInRange =
-  (min: number, max: number) =>
-  (target: number): boolean =>
-    min <= target && target <= max;
+  (lowerBound: number, upperBound: number) =>
+  (x: number): boolean =>
+    lowerBound <= x && x < upperBound;
+
+/** `lowerBound <= x <= upperBound` */
+const isInRangeInclusive =
+  (lowerBound: number, upperBound: number) =>
+  (x: number): boolean =>
+    lowerBound <= x && x <= upperBound;
+
+type LEQ = {
+  readonly [N in SmallUint]: Index<N>;
+};
+
+type LEQC = {
+  readonly [N in SmallUint]: Index<N> | N;
+};
+
+/** `lowerBound <= x < upperBound` */
+const isUintInRange =
+  <L extends SmallUint, U extends SmallUint>(lowerBound: L, upperBound: U) =>
+  (x: number): x is RelaxedExclude<LEQ[U], LEQ[Min<L>]> =>
+    Number.isSafeInteger(x) && lowerBound <= x && x < upperBound;
+
+/** `lowerBound <= x <= upperBound` */
+const isUintInRangeInclusive =
+  <L extends SmallUint, U extends SmallUint>(lowerBound: L, upperBound: U) =>
+  (x: number): x is RelaxedExclude<LEQC[U], LEQ[Min<L>]> =>
+    Number.isSafeInteger(x) && lowerBound <= x && x <= upperBound;
 
 /**
  * @description 値を与えられた範囲内に収める．targetの値が不正な場合はminを返す．
@@ -13,11 +40,11 @@ const isInRange =
  *  clamp(0, 2)(1.5) // 1.5
  */
 const clamp =
-  <N extends number>(min: N, max: N) =>
+  <N extends number>(lowerBound: N, upperBound: N) =>
   (target: N): N =>
     !Number.isFinite(target)
-      ? min
-      : (Math.max(min, Math.min(max, target)) as N);
+      ? lowerBound
+      : (Math.max(lowerBound, Math.min(upperBound, target)) as N);
 
 const isNonZero = <N extends number>(
   a: N
@@ -26,11 +53,6 @@ const isNonZero = <N extends number>(
 const isNonNegative = <N extends number>(
   a: N
 ): a is NonNegativeNumber & RelaxedExclude<N, NegativeIndex<1024>> => a >= 0;
-
-const isUintInRange =
-  <Min extends number, Max extends number>(min: Min, max: Max) =>
-  (target: number): target is UintRange<Min, Max> =>
-    min <= target && target <= max;
 
 const roundAt = (val: number, precision: number): number => {
   const digit = 10 ** precision;
@@ -58,7 +80,9 @@ export const Num = {
   from,
   toString,
   isInRange,
+  isInRangeInclusive,
   isUintInRange,
+  isUintInRangeInclusive,
   isNonZero,
   isNonNegative,
   clamp,

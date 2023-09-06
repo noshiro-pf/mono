@@ -19,12 +19,12 @@ describe('Num', () => {
     testClamp([0, 2], Number.NaN, 0);
   });
 
-  describe('isUintInRange', () => {
+  describe('isUintInRangeInclusive', () => {
     test('truthy case', () => {
-      const f = Num.isUintInRange(0, 4);
+      const f = Num.isUintInRangeInclusive(0, 4);
       const x: number = 2;
       if (f(x)) {
-        expectType<typeof x, 0 | 1 | 2 | 3>('=');
+        expectType<typeof x, 0 | 1 | 2 | 3 | 4>('=');
       } else {
         expectType<typeof x, number>('=');
       }
@@ -32,10 +32,10 @@ describe('Num', () => {
     });
 
     test('falsy case', () => {
-      const f = Num.isUintInRange(0, 4);
+      const f = Num.isUintInRangeInclusive(0, 4);
       const x: number = 100;
       if (f(x)) {
-        expectType<typeof x, 0 | 1 | 2 | 3>('=');
+        expectType<typeof x, 0 | 1 | 2 | 3 | 4>('=');
       } else {
         expectType<typeof x, number>('=');
       }

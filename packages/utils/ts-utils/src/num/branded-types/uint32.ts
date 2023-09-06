@@ -20,7 +20,7 @@ expectType<
 const MIN_VALUE = 0;
 const MAX_VALUE = 2 ** 32 - 1;
 
-const isUint32Range = Num.isInRange(MIN_VALUE, MAX_VALUE);
+const isUint32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
 export const isUint32 = (a: number): a is T =>
   Number.isInteger(a) && isUint32Range(a);

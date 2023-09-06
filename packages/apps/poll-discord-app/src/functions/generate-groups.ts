@@ -22,7 +22,7 @@ export const generateGroups = (
           list.filter((_, i) =>
             Num.isInRange(
               Math.floor(nameList.length * (idx / numGroups)),
-              Math.floor(nameList.length * ((idx + 1) / numGroups)) - 1
+              Math.floor(nameList.length * ((idx + 1) / numGroups))
             )(i)
           )
         )

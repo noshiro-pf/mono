@@ -313,14 +313,14 @@ const tableBodyValuesFiltered$ = combineLatestI([
 
       return (
         // 記号個数で絞り込み
-        Num.isInRange(goodBounds.min, goodBounds.max)(good) &&
-        Num.isInRange(fairBounds.min, fairBounds.max)(fair) &&
-        Num.isInRange(poorBounds.min, poorBounds.max)(poor) &&
-        Num.isInRange(
+        Num.isInRangeInclusive(goodBounds.min, goodBounds.max)(good) &&
+        Num.isInRangeInclusive(fairBounds.min, fairBounds.max)(fair) &&
+        Num.isInRangeInclusive(poorBounds.min, poorBounds.max)(poor) &&
+        Num.isInRangeInclusive(
           goodPlusFairBounds.min,
           goodPlusFairBounds.max
         )(good + fair) &&
-        Num.isInRange(
+        Num.isInRangeInclusive(
           fairPlusPoorBounds.min,
           fairPlusPoorBounds.max
         )(fair + poor) &&
@@ -333,7 +333,10 @@ const tableBodyValuesFiltered$ = combineLatestI([
             !falseKeys.has([answers?.[index]?.user.name ?? '', cell.iconId])
         ) &&
         // スコアで絞り込み
-        Num.isInRange(scoreRange.value.min, scoreRange.value.max)(score) &&
+        Num.isInRangeInclusive(
+          scoreRange.value.min,
+          scoreRange.value.max
+        )(score) &&
         // 曜日で絞り込み
         match(day, {
           0: Sun,

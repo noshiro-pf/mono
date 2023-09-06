@@ -23,10 +23,10 @@ export const isYearEnum = (a: unknown): a is YearEnum =>
   isNumber(a) && Number.isInteger(a) && a > 0;
 
 export const isMonthEnum = (a: unknown): a is MonthEnum =>
-  isNumber(a) && Number.isInteger(a) && Num.isInRange(1, 12)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRangeInclusive(1, 12)(a);
 
 export const isDateEnum = (a: unknown): a is DateEnum =>
-  isNumber(a) && Number.isInteger(a) && Num.isInRange(1, 31)(a);
+  isNumber(a) && Number.isInteger(a) && Num.isInRangeInclusive(1, 31)(a);
 
 export const isYearMonthDate = (a: unknown): a is YearMonthDate =>
   isRecord(a) &&
