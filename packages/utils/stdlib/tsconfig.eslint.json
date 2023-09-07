@@ -6,6 +6,7 @@
   "include": [
     "./dist",
     "./temp",
+    "./test",
     "./unchanged",
     "./scripts",
     "./stdlib.d.ts",

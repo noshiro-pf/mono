@@ -1,3 +1,5 @@
+import { keyIsIn } from '../guard';
+
 /**
  * @internal
  */
@@ -25,5 +27,5 @@ export function match<Case extends RecordKeyType, V, CaseSub extends Case>(
   cases: Record<CaseSub, V>,
   defaultCase?: V
 ): V | undefined {
-  return Object.hasOwn(cases, switchCase) ? cases[switchCase] : defaultCase;
+  return keyIsIn(switchCase, cases) ? cases[switchCase] : defaultCase;
 }

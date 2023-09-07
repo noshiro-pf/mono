@@ -3,6 +3,12 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["./dist", "./scripts", "./stdlib.d.ts", "./.eslintrc.cjs"],
+  "include": [
+    "./dist",
+    "./scripts",
+    "./stdlib.d.ts",
+    "./.eslintrc.cjs",
+    "./test"
+  ],
   "exclude": ["node_modules"]
 }

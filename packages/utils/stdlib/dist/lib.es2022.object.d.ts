@@ -17,17 +17,36 @@ and limitations under the License.
 /// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />
 /// <reference path="./lib.es5.d.ts" />
 
+/**
+ * @internal
+ * O が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、
+ * union 型を K をキーとして含むもののみに絞った型を返す。
+ * union の要素の中に K をキーとして含むものが一つも無ければ、`Record<K, unknown>` を返す。
+ * 結果には Readonly を付ける。
+ */
+type _HasOwnReturnType<
+  R extends RecordBase,
+  K extends PropertyKey
+> = R extends R // union distribution
+  ? K extends keyof R
+    ? string extends keyof R
+      ? Record<K, R[keyof R]> & R
+      : number extends keyof R
+      ? Record<K, R[keyof R]> & R
+      : symbol extends keyof R
+      ? Record<K, R[keyof R]> & R
+      : R
+    : never // omit union member that does not have key K
+  : never; // dummy case for union distribution
+
 interface ObjectConstructor {
   /**
    * Determines whether an object has a property with the specified name.
-   * @param o An object.
-   * @param v A property name.
+   * @param obj An object.
+   * @param key A property name.
    */
-  hasOwn<
-    R extends RecordBase,
-    K extends (keyof R | (string & {})) | Exclude<PropertyKey, string>
-  >(
+  hasOwn<R extends RecordBase, K extends PropertyKey>(
     obj: R,
     key: K
-  ): obj is R & Record<K, R[K]>;
+  ): obj is _HasOwnReturnType<R, K>;
 }
