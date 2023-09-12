@@ -6,6 +6,7 @@ import {
   isMainPage,
   routes,
 } from '../constants';
+import { Router } from '../router';
 import { createRoom, db } from '../store';
 import { Button } from './bp';
 import { CreateRoomPage } from './create-room-page';
@@ -13,7 +14,7 @@ import { GameMain } from './game-main';
 import { JoinRoomPage } from './join-room-page';
 
 const goToMain = (): void => {
-  push(routes.main);
+  Router.push(routes.main);
 };
 
 export const Root = memoNamed('Root', () => {
@@ -24,8 +25,9 @@ export const Root = memoNamed('Root', () => {
     left: 0,
   });
 
-  const pathname = usePathname();
-  const queryParams = useQueryParams();
+  const { pathname, searchParams: queryParams } = useObservableValue(
+    Router.state$
+  );
 
   const showMain = useMemo(() => isMainPage(pathname), [pathname]);
 
@@ -43,7 +45,7 @@ export const Root = memoNamed('Root', () => {
   }, [roomId]);
 
   useObservableEffect(createRoom.response$, (res) => {
-    push(`${routes.rooms}/${res.id}`);
+    Router.push(`${routes.rooms}/${res.id}`);
   });
 
   return (

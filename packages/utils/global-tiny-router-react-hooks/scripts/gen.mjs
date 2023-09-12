@@ -26,17 +26,7 @@ const packageName = packageJson.name.replace(
   '@noshiro/'
 );
 
-const importsList = [
-  'back',
-  'pathname$',
-  'push',
-  'queryParams$',
-  'redirect',
-  'removeListener',
-  'usePathname',
-  'useQueryParams',
-  'useRouterLinkClick',
-];
+const importsList = ['useRouterLinkClick'];
 
 /**
  * @type {Readonly<{ name: string; params: readonly string[]; }>[]}

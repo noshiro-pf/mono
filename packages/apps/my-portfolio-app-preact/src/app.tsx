@@ -9,6 +9,7 @@ import {
   Writings,
 } from './components';
 import { labelList, links, routeList, routes } from './constants';
+import { Router } from './router';
 
 const pathNameLastToIndex = (pathNameLast: string): number | undefined => {
   // eslint-disable-next-line unicorn/prefer-array-index-of
@@ -20,7 +21,7 @@ const tabIndexOnChange = (tabIdx: number): void => {
   if (Arr.indexIsInRange(routeList, toSafeUint(tabIdx))) {
     const route = routeList[tabIdx];
     if (route !== undefined) {
-      push(route);
+      Router.push(route);
     }
   }
 };
@@ -48,7 +49,7 @@ const pages = {
 };
 
 export const App = memoNamed('App', () => {
-  const pathname = usePathname();
+  const { pathname } = useObservableValue(Router.state$);
 
   const pathNameLast = useMemo(
     () => Arr.last(pathname.split('/').filter((s) => s !== '')) ?? '',
@@ -64,7 +65,7 @@ export const App = memoNamed('App', () => {
 
   useEffect(() => {
     if (tabIndex === undefined) {
-      redirect(routes.career);
+      Router.redirect(routes.career);
     }
   }, [pathname, tabIndex]);
 

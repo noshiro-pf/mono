@@ -3,5 +3,4 @@
 /// <reference path="../../stdlib/stdlib.d.ts" />
 /// <reference path="../../ts-type-utils/ts-type-utils.d.ts" />
 
-export * from './router';
 export * from './use-router-link-click';

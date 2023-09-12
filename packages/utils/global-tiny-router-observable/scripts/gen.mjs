@@ -26,9 +26,14 @@ const packageName = packageJson.name.replace(
   '@noshiro/'
 );
 
-const importsList = ['createRouter', 'withSlash'];
+const importsList = ['createRouter'];
 
-const typeImportsList = [{ name: 'Router', params: [] }];
+const typeImportsList = [
+  { name: 'Router', params: [] },
+  { name: 'ReadonlyURLSearchParams', params: [] },
+  { name: 'RouterState', params: [] },
+  { name: 'UpdateQueryParamsOptions', params: [] },
+];
 
 const main = async () => {
   const rootDir = join(thisDir, '../');

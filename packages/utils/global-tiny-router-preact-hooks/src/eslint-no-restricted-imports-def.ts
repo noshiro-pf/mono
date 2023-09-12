@@ -1,15 +1,5 @@
 export const eslintNoRestrictedImportsDef = {
   name: '@noshiro/tiny-router-preact-hooks',
-  importNames: [
-    'back',
-    'pathname$',
-    'push',
-    'queryParams$',
-    'redirect',
-    'removeListener',
-    'usePathname',
-    'useQueryParams',
-    'useRouterLinkClick',
-  ],
+  importNames: ['useRouterLinkClick'],
   message: 'use global variable instead.',
 };
