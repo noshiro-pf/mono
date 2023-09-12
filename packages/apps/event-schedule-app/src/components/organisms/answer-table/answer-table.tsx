@@ -274,6 +274,11 @@ const RequiredParticipantIconStyled = styled.div`
 const BpButtonOverflowHidden = styled(Button)`
   max-width: 100%;
   overflow-x: hidden;
+
+  & > span {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 const SummaryCellStyle = styled.div`
