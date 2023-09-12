@@ -68,10 +68,13 @@ export const AnswerBeingEdited = memoNamed<Props>(
     const theNameIsAlreadyUsed = useObservableValue(
       AnswerPageStore.theNameIsAlreadyUsed$
     );
+
     const iconHeader = useObservableValue(AnswerPageStore.iconHeader$);
+
     const answerBeingEditedList = useObservableValue(
       AnswerPageStore.answerBeingEditedList$
     );
+
     const hasUnanswered = useObservableValue(AnswerPageStore.hasUnanswered$);
 
     const fireAuthUser = Auth.useFireAuthUser();
@@ -130,7 +133,20 @@ export const AnswerBeingEdited = memoNamed<Props>(
             <thead>
               {iconHeader === undefined ? undefined : (
                 <tr>
-                  {batchInputFieldIsOpen ? <th /> : undefined}
+                  {batchInputFieldIsOpen ? (
+                    <th>
+                      <CheckboxView
+                        state={
+                          checkboxesState.size === answerBeingEditedList.length
+                            ? 'checked'
+                            : checkboxesState.size === 0
+                            ? 'none'
+                            : 'indeterminate'
+                        }
+                        onCheck={AnswerPageStore.onCheckAll}
+                      />
+                    </th>
+                  ) : undefined}
                   <th />
                   <th>
                     <CustomIconButton

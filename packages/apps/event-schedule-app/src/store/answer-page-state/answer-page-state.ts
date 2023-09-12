@@ -72,6 +72,7 @@ const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
 
 const {
   state$: checkboxesState$,
+  setState: setCheckboxesState,
   updateState: updateCheckboxesState,
   resetState: resetCheckboxesState,
 } = createState(
@@ -631,6 +632,22 @@ const answerBeingEditedList$: InitializedObservable<
   )
 );
 
+const onCheckAll = (checked: boolean): void => {
+  const dates = eventSchedule$.snapshot.value?.datetimeRangeList ?? [];
+
+  if (checked) {
+    setCheckboxesState(
+      ISetMapped.new<DatetimeRange, DatetimeRangeMapKey>(
+        dates,
+        datetimeRangeToMapKey,
+        datetimeRangeFromMapKey
+      )
+    );
+  } else {
+    resetCheckboxesState();
+  }
+};
+
 const hasUnanswered$: InitializedObservable<boolean> =
   answerBeingEditedList$.chain(
     mapI((answerBeingEditedList) =>
@@ -672,4 +689,5 @@ export const AnswerPageStore = {
   toggleRequiredSection,
   applyBatchInput,
   toggleBatchInputField,
+  onCheckAll,
 } as const;
