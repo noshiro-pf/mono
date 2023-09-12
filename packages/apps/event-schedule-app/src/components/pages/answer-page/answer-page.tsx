@@ -6,18 +6,17 @@ import {
   type TagProps,
 } from '@blueprintjs/core';
 import html2canvas from 'html2canvas';
-
 import { eventIsAfterDeadline } from '../../../functions';
 import {
   AnswerFilterAndSortStore,
   AnswerPageStore,
-  answers$,
-  AnswersStore,
   AnswerTableStore,
+  AnswersStore,
   Auth,
+  EventScheduleStore,
+  answers$,
   errorType$,
   eventSchedule$,
-  EventScheduleStore,
   holidaysJpDefinition$,
   router,
 } from '../../../store';

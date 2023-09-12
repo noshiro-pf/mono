@@ -12,7 +12,6 @@ import {
   datetimeRangeDefaultValue,
   type DatetimeRange,
 } from './datetime-range';
-
 import {
   eventScheduleDefaultValue,
   fillEventSchedule,

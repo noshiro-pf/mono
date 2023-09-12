@@ -1,12 +1,11 @@
+import { expectType } from '@noshiro/ts-utils';
+import { yearMonthDateDefaultValue, type YearMonthDate } from './base';
 import {
   datetimeRangeDefaultValue,
   fillDatetimeRange,
   isDatetimeRange,
   type DatetimeRange,
 } from './datetime-range';
-
-import { expectType } from '@noshiro/ts-utils';
-import { yearMonthDateDefaultValue, type YearMonthDate } from './base';
 import { timeRangeDefaultValue, type TimeRange } from './time-range';
 
 describe('DatetimeRange', () => {

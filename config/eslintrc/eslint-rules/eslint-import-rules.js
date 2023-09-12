@@ -77,7 +77,7 @@ const eslintImportsRules = {
   'import/no-import-module-exports': 'off',
 
   // styleGuide
-  'import/first': 'error',
+  'import/first': ['error', 'absolute-first'],
   'import/exports-last': 'off',
   'import/no-duplicates': 'error',
   'import/no-namespace': 'off',
@@ -88,7 +88,13 @@ const eslintImportsRules = {
       pattern: { json: 'always', mjs: 'always' },
     },
   ],
-  'import/order': 'off', // using prettier-plugin-organize-imports
+  'import/order': [
+    'error',
+    {
+      groups: [], // using prettier-plugin-organize-imports
+      'newlines-between': 'never',
+    },
+  ],
   'import/newline-after-import': [
     'error',
     {

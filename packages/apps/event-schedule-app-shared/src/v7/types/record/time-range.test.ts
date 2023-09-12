@@ -1,12 +1,11 @@
+import { expectType } from '@noshiro/ts-utils';
+import { hoursMinutesDefaultValue, type HoursMinutes } from './base';
 import {
   fillTimeRange,
   isTimeRange,
   timeRangeDefaultValue,
   type TimeRange,
 } from './time-range';
-
-import { expectType } from '@noshiro/ts-utils';
-import { hoursMinutesDefaultValue, type HoursMinutes } from './base';
 
 describe('TimeRange', () => {
   expectType<

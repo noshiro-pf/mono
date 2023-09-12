@@ -1,5 +1,4 @@
 import * as t from '@noshiro/io-ts';
-
 import {
   commandMessageIdType,
   dateOptionIdType,
