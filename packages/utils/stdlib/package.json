@@ -10,8 +10,12 @@
     "gen": "run-s gen:temp gen:dist",
     "gen:dist": "./scripts/gen-dist.sh",
     "gen:temp": "./scripts/gen-temp.sh",
+    "tsc": "yarn z:type-check:wireit",
+    "tscw": "yarn z:type-check:impl --watch",
     "z:autofix:impl": "yarn zz:cmd:eslint temp/ --ext .d.ts",
     "z:autofix:wireit": "wireit",
+    "z:type-check:impl": "tsc -p tsconfig.type-check.json",
+    "z:type-check:wireit": "wireit",
     "zz:cmd:eslint": "eslint --fix --color --cache --cache-location .eslintcache",
     "zz:cmd:prettier": "prettier --cache --cache-strategy content --ignore-path ./.prettierignore --write"
   },
@@ -28,6 +32,15 @@
         "tsconfig.json",
         "../../../config/tsconfig/**",
         "../../../config/eslintrc/**"
+      ],
+      "output": []
+    },
+    "z:type-check:wireit": {
+      "command": "yarn z:type-check:impl",
+      "files": [
+        "test/**/*.ts",
+        "tsconfig.type-check.json",
+        "../../../config/tsconfig/**"
       ],
       "output": []
     }
