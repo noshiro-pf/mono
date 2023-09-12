@@ -53,6 +53,7 @@ export const AnswerPageEventInfo = memoNamed<Props>(
         <TableValue
           css={css`
             grid-area: value2;
+            white-space: pre-wrap;
           `}
         >
           <AnswerPageNotes notes={eventSchedule.notes} />
