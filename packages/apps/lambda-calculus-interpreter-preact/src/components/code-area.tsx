@@ -1,14 +1,6 @@
 import { type ChangeEventHandler } from 'react';
 
-type Props = DeepReadonly<{
-  value: string;
-  valueChange?: (value: string) => void;
-  minHeightPx: number;
-  maxHeightPx: number;
-  cyId: string;
-}>;
-
-export const CodeArea = memoNamed<Props>(
+export const CodeArea = memoNamed(
   'CodeArea',
   ({
     value,
@@ -16,7 +8,13 @@ export const CodeArea = memoNamed<Props>(
     minHeightPx,
     maxHeightPx,
     cyId,
-  }) => {
+  }: Readonly<{
+    value: string;
+    valueChange?: (a: string) => void;
+    minHeightPx: number;
+    maxHeightPx: number;
+    cyId: string;
+  }>) => {
     const onChange = useCallback<ChangeEventHandler<HTMLTextAreaElement>>(
       (ev) => {
         valueChange(ev.target.value);
@@ -33,12 +31,17 @@ export const CodeArea = memoNamed<Props>(
     );
 
     return (
-      <Styled data-cy={cyId} style={style} value={value} onChange={onChange} />
+      <TextArea
+        data-cy={cyId}
+        style={style}
+        value={value}
+        onChange={onChange}
+      />
     );
   }
 );
 
-const Styled = styled('textarea')`
+const TextArea = styled('textarea')`
   /* size */
   overflow: hidden;
   max-width: 100%;
