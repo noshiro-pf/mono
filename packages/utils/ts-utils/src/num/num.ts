@@ -76,6 +76,15 @@ const mapNaN2Undefined = <N extends number>(
 ): RelaxedExclude<N, NaNType> | undefined =>
   Number.isNaN(value) ? undefined : (value as RelaxedExclude<N, NaNType>);
 
+const increment = <N extends SmallUint>(n: N): Increment<N> =>
+  // eslint-disable-next-line no-restricted-syntax
+  (n + 1) as Increment<N>;
+
+type PositiveSmallInt = SmallInt<'>0'>;
+const decrement = <N extends PositiveSmallInt>(n: N): Decrement<N> =>
+  // eslint-disable-next-line no-restricted-syntax
+  (n - 1) as Decrement<N>;
+
 export const Num = {
   from,
   toString,
@@ -91,4 +100,6 @@ export const Num = {
   roundToInt,
   round,
   mapNaN2Undefined,
+  increment,
+  decrement,
 } as const;
