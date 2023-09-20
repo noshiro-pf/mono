@@ -1,6 +1,6 @@
 import { isNumber, Json, Num, Result } from '@noshiro/ts-utils';
 import { type Type } from '../type';
-import { createAssertFunction, createIsFnFromValidateFn } from '../utils';
+import { createAssertFn, createCastFn, createIsFn } from '../utils';
 
 export const uintRange = <
   Start extends Uint8,
@@ -42,7 +42,7 @@ export const uintRange = <
     return Result.ok(a as T);
   };
 
-  const is = createIsFnFromValidateFn<T>(validate);
+  const is = createIsFn<T>(validate);
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultValue);
 
@@ -52,6 +52,7 @@ export const uintRange = <
     fill,
     validate,
     is,
-    assertIs: createAssertFunction(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
   };
 };

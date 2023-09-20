@@ -1,8 +1,9 @@
 import { isRecord, Result } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type';
 import {
-  createAssertFunction,
-  createIsFnFromValidateFn,
+  createAssertFn,
+  createCastFn,
+  createIsFn,
   validationErrorMessage,
 } from '../utils';
 
@@ -71,7 +72,8 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
     defaultValue,
     fill,
     validate,
-    is: createIsFnFromValidateFn(validate),
-    assertIs: createAssertFunction(validate),
+    is: createIsFn(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
   };
 };
