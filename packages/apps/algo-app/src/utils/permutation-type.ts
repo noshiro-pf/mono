@@ -1,6 +1,7 @@
 import {
-  createAssertFunction,
-  createIsFnFromValidateFn,
+  createAssertFn,
+  createCastFn,
+  createIsFn,
   validationErrorMessage,
   type Type,
 } from '@noshiro/io-ts';
@@ -50,7 +51,7 @@ export const permutationType = <
     return Result.ok(a as P);
   };
 
-  const is = createIsFnFromValidateFn<P>(validate);
+  const is = createIsFn<P>(validate);
 
   const fill: Type<P>['fill'] = (a) => (is(a) ? a : defaultValue);
 
@@ -60,6 +61,7 @@ export const permutationType = <
     fill,
     validate,
     is,
-    assertIs: createAssertFunction(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
   };
 };

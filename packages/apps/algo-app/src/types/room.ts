@@ -1,7 +1,7 @@
 import * as t from '@noshiro/io-ts';
 import { cardTypeDef } from './card-type';
-import { permutationType } from './permutation-type';
 import { playerTypeDef } from './player';
+import { shuffleDefType } from './shuffle-def';
 
 const playerCardsTypeDef = t.tuple(
   tp(
@@ -21,7 +21,7 @@ const commonRecordTypeDefs = {
     types: [t.string(''), t.undefinedType],
     defaultType: t.undefinedType,
   }),
-  shuffleDef: permutationType<'0123'>('0123'),
+  shuffleDef: shuffleDefType,
   players: t.array(playerTypeDef),
   state: t.enumType({
     values: roomStateList,
