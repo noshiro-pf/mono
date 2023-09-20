@@ -1,26 +1,29 @@
+import { toYen, type PercentFloat, type Yen } from '../types';
+
 export const calcPrincipalEqualPayment = ({
   borrowingPeriodMonth: numPayments,
-  borrowingTotalYen: borrowingTotal,
+  borrowingTotalYen,
   interestRatePerMonth: interestRate,
 }: Readonly<{
-  borrowingPeriodMonth: Uint32;
-  borrowingTotalYen: number;
-  interestRatePerMonth: number;
+  borrowingPeriodMonth: SafeUint;
+  borrowingTotalYen: Yen;
+  interestRatePerMonth: PercentFloat;
 }>): Readonly<{
-  fixedPrincipalYenPerMonth: number;
-  borrowingBalanceYen: readonly number[];
-  interestYen: readonly number[];
-  monthlyPaymentTotalYen: readonly number[];
+  fixedPrincipalYenPerMonth: Yen;
+  borrowingBalanceYen: readonly Yen[];
+  interestYen: readonly Yen[];
+  monthlyPaymentTotalYen: readonly Yen[];
 }> => {
-  const fixedPrincipalYenPerMonth = borrowingTotal / numPayments;
+  const fixedPrincipalYenPerMonth = toYen(borrowingTotalYen / numPayments);
 
-  const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map(
-    (i) => borrowingTotal - i * fixedPrincipalYenPerMonth
+  const borrowingBalanceYen = Arr.seq(SafeUint.add(numPayments, 1)).map((i) =>
+    toYen(borrowingTotalYen - i * fixedPrincipalYenPerMonth)
   );
 
-  const interestYen = borrowingBalanceYen.map((b) => interestRate * b);
-  const monthlyPaymentTotalYen = interestYen.map(
-    (v) => v + fixedPrincipalYenPerMonth
+  const interestYen = borrowingBalanceYen.map((b) => toYen(interestRate * b));
+
+  const monthlyPaymentTotalYen = interestYen.map((v) =>
+    toYen(v + fixedPrincipalYenPerMonth)
   );
 
   return {

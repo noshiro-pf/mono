@@ -1,6 +1,13 @@
 import { defaultValues, queryParamKey } from '../constants';
 import { Router } from '../router';
-import { type RepaymentType, type Store } from '../types';
+import {
+  toPercentFloat,
+  toYen,
+  type PercentFloat,
+  type RepaymentType,
+  type Store,
+  type Yen,
+} from '../types';
 import { uriWithQueryParams } from '../utils';
 
 const [userInput$, nextUserInput] = createVoidEventEmitter();
@@ -15,38 +22,38 @@ const setRepaymentType = (value: RepaymentType): void => {
 
 // 頭金（円）
 const { state$: downPaymentManYen$, setState: _setDownPaymentManYen } =
-  createState<number>(defaultValues.downPaymentManYen);
+  createState<Yen>(defaultValues.downPaymentManYen);
 
-const setDownPaymentManYen = (value: number): void => {
+const setDownPaymentManYen = (value: Yen): void => {
   _setDownPaymentManYen(value);
   nextUserInput();
 };
 
 // 物件の金額（円）
 const { state$: propertyPriceManYen$, setState: _setPropertyPriceManYen } =
-  createState<number>(defaultValues.propertyPriceManYen);
+  createState<Yen>(defaultValues.propertyPriceManYen);
 
-const setPropertyPriceManYen = (value: number): void => {
+const setPropertyPriceManYen = (value: Yen): void => {
   _setPropertyPriceManYen(value);
   nextUserInput();
 };
 
-// 借入期間（月）
+// 借入期間（年）
 const { state$: borrowingPeriodYear$, setState: _setBorrowingPeriodYear } =
-  createState<Uint32>(defaultValues.borrowingPeriodYear);
+  createState<YearEnum>(defaultValues.borrowingPeriodYear);
 
-const setBorrowingPeriodYear = (value: Uint32): void => {
+const setBorrowingPeriodYear = (value: YearEnum): void => {
   _setBorrowingPeriodYear(value);
   nextUserInput();
 };
 
-// 月当たりの金利
+// 年当たりの金利
 const {
   state$: interestRatePercentPerYear$,
   setState: _setInterestRatePercentPerYear,
-} = createState<number>(defaultValues.interestRatePercentPerYear);
+} = createState<PercentFloat>(defaultValues.interestRatePercentPerYear);
 
-const setInterestRatePercentPerYear = (value: number): void => {
+const setInterestRatePercentPerYear = (value: PercentFloat): void => {
   _setInterestRatePercentPerYear(value);
   nextUserInput();
 };
@@ -104,16 +111,18 @@ Router.state$.subscribe(({ searchParams: query }) => {
     _setRepaymentType(paramsAsStr.repaymentType);
   }
   if (paramsAsNumber.downPayment !== undefined) {
-    _setDownPaymentManYen(paramsAsNumber.downPayment);
+    _setDownPaymentManYen(toYen(paramsAsNumber.downPayment));
   }
   if (paramsAsNumber.propertyPrice !== undefined) {
-    _setPropertyPriceManYen(paramsAsNumber.propertyPrice);
+    _setPropertyPriceManYen(toYen(paramsAsNumber.propertyPrice));
   }
   if (paramsAsNumber.borrowingPeriodMonth !== undefined) {
-    _setBorrowingPeriodYear(toUint32(paramsAsNumber.borrowingPeriodMonth));
+    _setBorrowingPeriodYear(toSafeUint(paramsAsNumber.borrowingPeriodMonth));
   }
   if (paramsAsNumber.interestRatePerMonth !== undefined) {
-    _setInterestRatePercentPerYear(paramsAsNumber.interestRatePerMonth);
+    _setInterestRatePercentPerYear(
+      toPercentFloat(paramsAsNumber.interestRatePerMonth)
+    );
   }
 });
 

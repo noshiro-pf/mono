@@ -27,7 +27,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           label={dict.downPaymentManYen}
           min={0}
           value={downPaymentManYen}
-          onValueChange={setDownPaymentManYen}
+          onValueChange={setDownPaymentManYen as (a: number) => void}
         />
       </ConfigElement>
       <ConfigElement>
@@ -36,7 +36,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           label={dict.propertyPriceManYen}
           min={0}
           value={propertyPriceManYen}
-          onValueChange={setPropertyPriceManYen}
+          onValueChange={setPropertyPriceManYen as (a: number) => void}
         />
       </ConfigElement>
       <ConfigElement>
@@ -55,7 +55,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           max={100}
           min={0}
           value={interestRatePercentPerYear}
-          onValueChange={setInterestRatePercentPerYear}
+          onValueChange={setInterestRatePercentPerYear as (a: number) => void}
         />
       </ConfigElement>
       <ConfigElement data-cy={'repaymentTypeRadioGroup'}>

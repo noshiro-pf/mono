@@ -1,38 +1,43 @@
+import { toYen, type PercentFloat, type Yen } from '../types';
 import { ithBorrowingBalanceInPIER, monthlyPaymentsInPIER } from './financial';
 
 export const calcPrincipalAndInterestEqualPayment = ({
   borrowingPeriodMonth: numPayments,
-  borrowingTotalYen: borrowingTotal,
+  borrowingTotalYen,
   interestRatePerMonth: interestRate,
 }: Readonly<{
-  borrowingPeriodMonth: Uint32;
-  borrowingTotalYen: number;
-  interestRatePerMonth: number;
+  borrowingPeriodMonth: SafeUint;
+  borrowingTotalYen: Yen;
+  interestRatePerMonth: PercentFloat;
 }>): Readonly<{
-  borrowingBalanceYen: readonly number[];
-  interestYen: readonly number[];
-  monthlyPrincipalPaymentYen: readonly number[];
-  fixedMonthlyPaymentsYen: number;
+  borrowingBalanceYen: readonly Yen[];
+  interestYen: readonly Yen[];
+  monthlyPrincipalPaymentYen: readonly Yen[];
+  fixedMonthlyPaymentsYen: Yen;
 }> => {
-  const fixedMonthlyPaymentsYen = monthlyPaymentsInPIER({
-    total: borrowingTotal,
-    numPayments,
-    interestRate,
-  });
-
-  const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map((ith) =>
-    ithBorrowingBalanceInPIER({
-      total: borrowingTotal,
+  const fixedMonthlyPaymentsYen = toYen(
+    monthlyPaymentsInPIER({
+      total: borrowingTotalYen,
       numPayments,
       interestRate,
-      ith,
     })
   );
 
-  const interestYen = borrowingBalanceYen.map((b) => interestRate * b);
+  const borrowingBalanceYen = Arr.seq(SafeUint.add(numPayments, 1)).map((ith) =>
+    toYen(
+      ithBorrowingBalanceInPIER({
+        total: borrowingTotalYen,
+        numPayments,
+        interestRate,
+        ith,
+      })
+    )
+  );
 
-  const monthlyPrincipalPaymentYen = interestYen.map(
-    (v) => fixedMonthlyPaymentsYen - v
+  const interestYen = borrowingBalanceYen.map((b) => toYen(interestRate * b));
+
+  const monthlyPrincipalPaymentYen = interestYen.map((v) =>
+    toYen(fixedMonthlyPaymentsYen - v)
   );
 
   return {

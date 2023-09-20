@@ -1,15 +1,21 @@
-import { type RepaymentType } from '../types';
+import {
+  toPercentFloat,
+  toYen,
+  type PercentFloat,
+  type RepaymentType,
+  type Yen,
+} from '../types';
 
 export const defaultValues = {
   repaymentType: 'principal-equal-payment',
-  downPaymentManYen: 200,
-  propertyPriceManYen: 2780,
+  downPaymentManYen: toYen(200),
+  propertyPriceManYen: toYen(2780),
   borrowingPeriodYear: 35,
-  interestRatePercentPerYear: 0.5,
+  interestRatePercentPerYear: toPercentFloat(0.5),
 } as const satisfies Readonly<{
   repaymentType: RepaymentType;
-  downPaymentManYen: number;
-  propertyPriceManYen: number;
-  borrowingPeriodYear: Uint32;
-  interestRatePercentPerYear: number;
+  downPaymentManYen: Yen;
+  propertyPriceManYen: Yen;
+  borrowingPeriodYear: SafeUint;
+  interestRatePercentPerYear: PercentFloat;
 }>;
