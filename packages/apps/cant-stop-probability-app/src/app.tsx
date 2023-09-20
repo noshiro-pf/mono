@@ -8,6 +8,7 @@ import {
 } from './functions';
 import {
   isTwoDiceSumValue,
+  toTwoDiceSumValue,
   type ResultRow,
   type TwoDiceSumValue,
 } from './types';
@@ -44,9 +45,17 @@ const sortByProbability = (): void => {
 const { state$: filterByString$, setState: setFilterByString } =
   createState<string>('');
 
-const { state$: selectedTabId$, setState: handleTabChange } = createState<
+const { state$: selectedTabId$, setState: setSelectedTabId } = createState<
   'deadColumnUI' | 'table'
 >('table');
+
+const handleTabChange = (a: string): void => {
+  if (a === 'deadColumnUI' || a === 'table') {
+    setSelectedTabId(a);
+  } else {
+    console.warn(`invalid tab id "${a}"`);
+  }
+};
 
 const { state$: columnsAlive$, updateState: updateDeadColumns } = createState<
   readonly boolean[]
@@ -88,7 +97,7 @@ export const App = memoNamed('App', () => {
   >(
     () =>
       columnsAlive.map((alive, index) => ({
-        columnId: (index + 2) as TwoDiceSumValue,
+        columnId: toTwoDiceSumValue(index + 2),
         alive,
         toggle: () => {
           updateDeadColumns((prev) =>
@@ -114,10 +123,7 @@ export const App = memoNamed('App', () => {
     <Root>
       <Navbar>
         <Navbar.Group>
-          <Tabs
-            selectedTabId={selectedTabId}
-            onChange={handleTabChange as (value: string) => void}
-          >
+          <Tabs selectedTabId={selectedTabId} onChange={handleTabChange}>
             <Tab id='table' title='確率表' />
             <Tab id='deadColumnUI' title='残存列確率' />
           </Tabs>
