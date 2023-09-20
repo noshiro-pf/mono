@@ -1,7 +1,7 @@
 /* eslint-disable import/no-internal-modules */
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { castWritable, tp } from '@noshiro/ts-utils';
+import { castDeepWritable, tp } from '@noshiro/ts-utils';
 
 // eslint-disable-next-line import/no-named-as-default
 import preact from '@preact/preset-vite';
@@ -26,7 +26,7 @@ export default defineConfig({
   plugins: [
     preact(),
     inject({
-      modules: castWritable({
+      modules: castDeepWritable({
         ...providePluginDefs,
         dict: tp('@/constants/dictionary/dictionary', 'dict'),
       }),
