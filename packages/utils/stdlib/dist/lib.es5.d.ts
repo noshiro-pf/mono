@@ -783,7 +783,8 @@ interface Math {
    * For example, the absolute value of -5 is the same as the absolute value of 5.
    * @param x A numeric expression for which the absolute value is needed.
    */
-  abs(x: FiniteNumber): NonNegativeNumber;
+  abs<N extends SmallInt>(x: N): AbsoluteValue<N>;
+  abs<N extends FiniteNumber>(x: N): IntersectBrand<N, NonNegativeNumber>;
   abs(x: number): NonNegativeNumber | NaNType;
   /**
    * Returns the arc cosine (or inverse cosine) of a number.
@@ -810,6 +811,7 @@ interface Math {
    * Returns the smallest integer greater than or equal to its numeric argument.
    * @param x A numeric expression.
    */
+  ceil<N extends FiniteNumber>(x: N): IntersectBrand<N, Int>;
   ceil(x: number): Int | InfiniteNumber | NaNType;
   /**
    * Returns the cosine of a number.
@@ -825,6 +827,7 @@ interface Math {
    * Returns the greatest integer less than or equal to its numeric argument.
    * @param x A numeric expression.
    */
+  floor<N extends FiniteNumber>(x: N): IntersectBrand<N, Int>;
   floor(x: number): Int | InfiniteNumber | NaNType;
   /**
    * Returns the natural logarithm (base e) of a number.
@@ -853,6 +856,7 @@ interface Math {
    * Returns a supplied numeric expression rounded to the nearest integer.
    * @param x The value to be rounded to the nearest integer.
    */
+  round<N extends FiniteNumber>(x: N): IntersectBrand<N, Int>;
   round(x: number): Int | InfiniteNumber | NaNType;
   /**
    * Returns the sine of a number.
