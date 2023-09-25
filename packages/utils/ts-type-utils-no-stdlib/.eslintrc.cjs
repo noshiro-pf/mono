@@ -13,10 +13,6 @@ const config = {
   },
   rules: {
     '@typescript-eslint/no-shadow': 'off',
-    'import/no-unused-modules': [
-      'error',
-      { unusedExports: true, ignoreExports: ['src/index.ts'] },
-    ],
   },
 };
 
