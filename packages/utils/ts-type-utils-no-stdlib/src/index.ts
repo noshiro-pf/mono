@@ -1,3 +1,4 @@
+export * from './abs';
 export * from './bivariant-hack';
 export * from './boolean';
 export * from './brand';
