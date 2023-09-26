@@ -7,7 +7,6 @@ import { numberToRgbValue } from './from-number';
  * link: https://www.w3.org/TR/css-color-3/#hsl-color
  * @deprecated
  */
-// eslint-disable-next-line import/no-unused-modules
 export const hslToRgb = ([h, s, l]: Hsl): Rgb => {
   const normH = h / 360;
   const normS = s / 100;
@@ -42,7 +41,6 @@ const hue2rgb = (m1: number, m2: number, normH: number): number => {
 /**
  * @deprecated
  */
-// eslint-disable-next-line import/no-unused-modules
 export const hslaToRgba = ([h, s, l, a]: Hsla): Rgba => {
   // eslint-disable-next-line deprecation/deprecation
   const [r, g, b] = hslToRgb([h, s, l]);

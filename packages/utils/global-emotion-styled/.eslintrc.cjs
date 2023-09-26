@@ -10,12 +10,6 @@ const config = {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
-  rules: {
-    'import/no-unused-modules': [
-      'error',
-      { unusedExports: true, ignoreExports: ['src/index.ts'] },
-    ],
-  },
 };
 
 module.exports = config;
