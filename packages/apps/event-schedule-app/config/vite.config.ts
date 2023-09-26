@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { castWritable, tp } from '@noshiro/ts-utils';
+import { castDeepWritable, tp } from '@noshiro/ts-utils';
 import inject from '@rollup/plugin-inject';
 import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react-swc';
@@ -24,7 +24,7 @@ export default defineConfig({
       jsxImportSource: '@emotion/react',
     }),
     inject({
-      modules: castWritable({
+      modules: castDeepWritable({
         ...providePluginDefs,
         dict: tp('@/constants/dictionary/dictionary', 'dict'),
       }),
