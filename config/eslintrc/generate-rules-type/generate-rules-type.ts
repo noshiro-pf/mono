@@ -1,4 +1,4 @@
-import { type TSESLint } from '@typescript-eslint/utils/dist';
+import type { TSESLint } from '@typescript-eslint/experimental-utils';
 import { type JSONSchema4 } from 'json-schema';
 import { compile } from 'json-schema-to-typescript';
 
