@@ -1,4 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+/* eslint-disable @typescript-eslint/no-restricted-imports */
+/* eslint-disable import/no-default-export */
+/* eslint-disable import/no-internal-modules */
+/* eslint-disable import/no-named-as-default */
+
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
@@ -10,7 +14,6 @@ const globalUtils = Object.keys(packageJson.devDependencies).filter(
   (packageName) => packageName.startsWith('@noshiro/global-')
 );
 
-// eslint-disable-next-line import/no-default-export, import/no-unused-modules
 export default defineConfig({
   test: {
     globals: true,

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-restricted-imports */
+/* eslint-disable import/no-default-export */
 /* eslint-disable import/no-internal-modules */
+/* eslint-disable import/no-named-as-default */
 
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { castDeepWritable, tp } from '@noshiro/ts-utils';
 import inject from '@rollup/plugin-inject';
 import legacy from '@vitejs/plugin-legacy';
@@ -19,7 +21,6 @@ const providePluginDefs = genGlobalImportDefsFromDevDependencies(
 );
 
 // https://vitejs.dev/config/
-// eslint-disable-next-line import/no-default-export, import/no-unused-modules
 export default defineConfig({
   plugins: [
     react({
