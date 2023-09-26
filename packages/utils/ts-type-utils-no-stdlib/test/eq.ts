@@ -1,8 +1,6 @@
-/* eslint-disable
-  @typescript-eslint/ban-ts-comment,
-  @typescript-eslint/no-explicit-any,
-  @typescript-eslint/no-duplicate-type-constituents
-*/
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-duplicate-type-constituents */
 
 import { expectType } from './expect-type';
 
