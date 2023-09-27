@@ -39,7 +39,8 @@ export const convertLibEs5_Math = (from) => {
         'abs(x: number): number;',
 
         [
-          'abs(x: FiniteNumber): NonNegativeNumber;',
+          'abs<N extends SmallInt>(x: N): AbsoluteValue<N>;',
+          'abs<N extends FiniteNumber>(x: N): IntersectBrand<N, NonNegativeNumber>;',
           'abs(x: number): NonNegativeNumber | NaNType;',
         ].join('\n')
       );
@@ -63,7 +64,10 @@ export const convertLibEs5_Math = (from) => {
       for (const fn of ['ceil', 'floor', 'round']) {
         str = str.replaceAll(
           `${fn}(x: number): number;`,
-          `${fn}(x: number): Int | InfiniteNumber | NaNType;`
+          [
+            `${fn}<N extends FiniteNumber>(x: N): IntersectBrand<N, Int>;`,
+            `${fn}(x: number): Int | InfiniteNumber | NaNType;`,
+          ].join('\n')
         );
       }
       return str;
