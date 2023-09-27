@@ -1,9 +1,8 @@
-/* eslint-disable
-  @typescript-eslint/no-explicit-any,
-  @typescript-eslint/no-unsafe-member-access,
-  functional/immutable-data,
-  import/no-internal-modules,
-*/
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable functional/immutable-data */
+/* eslint-disable import/no-internal-modules */
+/* eslint-disable no-restricted-syntax */
 
 import { dict } from '../src/constants/dictionary';
 
