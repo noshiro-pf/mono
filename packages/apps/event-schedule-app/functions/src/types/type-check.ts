@@ -10,7 +10,7 @@ import { logger } from 'firebase-functions';
 
 export const toStringWithCheck = (value: unknown): string => {
   if (isString(value)) return value;
-  logger.error(`typeof value should be string but was ${typeof value}`);
+  logger.warn(`typeof value should be string but was ${typeof value}`);
   return Str.from(value);
 };
 
@@ -19,7 +19,7 @@ export const fillAnswerWithCheck = (
 ): Answer => {
   const filled = fillAnswer(value);
   if (!deepEqual(filled, value)) {
-    logger.error(`There is a difference with the result of fillAnswer`);
+    logger.warn(`There is a difference with the result of fillAnswer`);
   }
   return filled;
 };
@@ -29,7 +29,7 @@ export const fillEventScheduleWithCheck = (
 ): EventSchedule => {
   const filled = fillEventSchedule(value);
   if (!deepEqual(filled, value)) {
-    logger.error(`There is a difference with the result of fillEventSchedule`);
+    logger.warn(`There is a difference with the result of fillEventSchedule`);
   }
   return filled;
 };

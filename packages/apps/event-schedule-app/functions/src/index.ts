@@ -4,7 +4,10 @@ import { firestorePaths } from '@noshiro/event-schedule-app-shared';
 import admin from 'firebase-admin';
 import { https, logger, region } from 'firebase-functions';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user';
-import { notifyAnswerDeadline } from './notify-answer-deadline';
+import {
+  notifyAfterAnswerDeadline,
+  notifyAnswerDeadline,
+} from './notify-answer-deadline';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change';
 import { onUserDelete } from './on-user-delete';
 import { sendReportImpl } from './send-report-impl';
@@ -67,6 +70,13 @@ export const notifyAnswerDeadlineEveryday = regionSelected.pubsub
   .schedule('00 12 * * *')
   .timeZone('Asia/Tokyo')
   .onRun(() => notifyAnswerDeadline(db));
+
+const minutes: MinutesEnum = 10;
+
+export const notifyAfterAnswerDeadlineEveryMinutes = regionSelected.pubsub
+  .schedule(`*/${minutes} * * * *`)
+  .timeZone('Asia/Tokyo')
+  .onRun(() => notifyAfterAnswerDeadline(db, minutes));
 
 // export const answerPagePreRender = functions
 //   .region('asia-northeast2')

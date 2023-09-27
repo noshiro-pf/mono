@@ -41,6 +41,8 @@ export const validateEventSchedule = ({
   notificationItems:
     notificationSettingsWithEmail === 'none' ||
     notificationSettingsWithEmail.notifyOnAnswerChange ||
+    notificationSettingsWithEmail.notifyAfterAnswerDeadline ||
+    notificationSettingsWithEmail.notify00daysBeforeAnswerDeadline ||
     notificationSettingsWithEmail.notify01daysBeforeAnswerDeadline ||
     notificationSettingsWithEmail.notify03daysBeforeAnswerDeadline ||
     notificationSettingsWithEmail.notify07daysBeforeAnswerDeadline ||
