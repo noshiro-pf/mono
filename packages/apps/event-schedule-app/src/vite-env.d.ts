@@ -15,13 +15,13 @@ import type {
   HTMLInputProps as _HTMLInputProps,
   HTMLSelectProps as _HTMLSelectProps,
   IconName as _IconName,
-  InputGroupProps2 as _InputGroupProps2,
+  InputGroupProps as _InputGroupProps,
   Intent as _Intent,
-  IToaster as _IToaster,
+  Toaster as _Toaster,
   OptionProps as _OptionProps,
   PopperModifiers as _PopperModifiers,
 } from '@blueprintjs/core';
-import type { DateInput2Props } from '@blueprintjs/datetime2';
+import type { DateInputProps } from '@blueprintjs/datetime';
 import type {
   Answer as _Answer,
   AnswerIconId as _AnswerIconId,
@@ -63,17 +63,17 @@ declare global {
   type HTMLInputProps = _HTMLInputProps;
   type HTMLSelectProps = _HTMLSelectProps;
   type IconName = _IconName;
-  type InputGroupProps2 = _InputGroupProps2;
+  type InputGroupProps = _InputGroupProps;
   type Intent = _Intent;
   // eslint-disable-next-line deprecation/deprecation
-  type IToaster = _IToaster;
+  type Toaster = _Toaster;
   type OptionProps = _OptionProps;
   type PopperModifiers = _PopperModifiers;
 
   /* @blueprintjs/datetime */
   type DatePickerShortcut = Readonly<
     ArrayElement<
-      Exclude<DateInput2Props['shortcuts'], boolean | undefined>
+      Exclude<DateInputProps['shortcuts'], boolean | undefined>
     >
   >;
 

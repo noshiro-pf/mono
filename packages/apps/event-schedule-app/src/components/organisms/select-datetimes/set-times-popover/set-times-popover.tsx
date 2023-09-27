@@ -1,5 +1,4 @@
-import { Button } from '@blueprintjs/core';
-import { Popover2 } from '@blueprintjs/popover2';
+import { Button, Popover } from '@blueprintjs/core';
 import { SetTimesPopoverContent } from './set-times-popover-content';
 
 const dc = dict.eventSettingsPage.section2;
@@ -28,7 +27,7 @@ export const SetTimesPopover = memoNamed<Props>(
     );
 
     return (
-      <Popover2
+      <Popover
         canEscapeKeyClose={true}
         content={
           <SetTimesPopoverContent
@@ -46,7 +45,7 @@ export const SetTimesPopover = memoNamed<Props>(
           text={dc.setTimesAtOneTime}
           onClick={handleOpen}
         />
-      </Popover2>
+      </Popover>
     );
   }
 );

@@ -1,11 +1,11 @@
-import { DateInput2 } from '@blueprintjs/datetime2';
+import { DateInput } from '@blueprintjs/datetime';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 
 const parseDate = (str: string): RawDateType =>
   pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
-const inputProps: HTMLInputProps & InputGroupProps2 = {
+const inputProps: HTMLInputProps & InputGroupProps = {
   style: { width: '90px' },
 };
 
@@ -14,7 +14,7 @@ const tenYearsLater = pipe(DateUtils.today())
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 
-type DateInputPropsOriginal = React.ComponentProps<typeof DateInput2>;
+type DateInputPropsOriginal = React.ComponentProps<typeof DateInput>;
 
 export type BpDatePickerProps = Omit<
   DateInputPropsOriginal,
@@ -67,7 +67,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
     );
 
     return (
-      <DateInput2
+      <DateInput
         canClearSelection={canClearSelection}
         formatDate={formatDate}
         inputProps={inputProps}

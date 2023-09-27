@@ -1,5 +1,4 @@
-import { Button, Icon } from '@blueprintjs/core';
-import { Popover2 } from '@blueprintjs/popover2';
+import { Button, Icon, Popover } from '@blueprintjs/core';
 import { ButtonsWrapperAlignEnd } from '../../styled';
 
 type Props = Readonly<{
@@ -17,7 +16,7 @@ export const CommentButton = memoNamed<Props>(
     } = useBoolState(false);
 
     return (
-      <Popover2
+      <Popover
         canEscapeKeyClose={true}
         content={
           <div
@@ -68,7 +67,7 @@ export const CommentButton = memoNamed<Props>(
             onClick={handleOpen}
           />
         )}
-      </Popover2>
+      </Popover>
     );
   }
 );

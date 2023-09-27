@@ -1,4 +1,4 @@
-import { DateInput2 } from '@blueprintjs/datetime2';
+import { DateInput } from '@blueprintjs/datetime';
 
 const formatDate = (date: RawDateType): string =>
   `${DateUtils.toLocaleYMD(date, '-')}  ${DateUtils.toLocaleHM(date, ':')}`;
@@ -11,11 +11,18 @@ const tenYearsLater = pipe(DateUtils.today())
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 
-type DateInputPropsOriginal = React.ComponentProps<typeof DateInput2>;
+type DateInputPropsOriginal = React.ComponentProps<typeof DateInput>;
 
 export type BpDatetimePickerProps = Omit<
   DateInputPropsOriginal,
-  'formatDate' | 'parseDate' | 'shortcuts' | 'timePrecision'
+  | 'className'
+  | 'defaultValue'
+  | 'formatDate'
+  | 'onChange'
+  | 'parseDate'
+  | 'shortcuts'
+  | 'timePrecision'
+  | 'value'
 > &
   Readonly<{
     ymdhm: Ymdhm | undefined;
@@ -66,7 +73,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     );
 
     return (
-      <DateInput2
+      <DateInput
         canClearSelection={canClearSelection}
         formatDate={formatDate}
         maxDate={maxDate}
@@ -75,6 +82,12 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
         shortcuts={shortcuts as Writable<typeof shortcuts>}
         showActionsBar={showActionsBar}
+        /**
+         * FIXME: Blueprintjs v5 から showTimezoneSelect = true としていると
+         * 以下のエラーが発生するようになったため一旦非表示にしている。
+         * "Internal React error: Expected static flag was missing."
+         */
+        showTimezoneSelect={false}
         timePrecision={'minute'}
         value={date}
         onChange={onChangeHandler}

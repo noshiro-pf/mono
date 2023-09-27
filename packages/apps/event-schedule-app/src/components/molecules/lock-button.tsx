@@ -1,5 +1,4 @@
-import { Button } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
+import { Button, Tooltip } from '@blueprintjs/core';
 
 export const LockButton = memoNamed<
   Readonly<{
@@ -8,7 +7,7 @@ export const LockButton = memoNamed<
     onLockClick: () => void;
   }>
 >('LockButton', ({ passwordIsOpen, disabled, onLockClick }) => (
-  <Tooltip2
+  <Tooltip
     content={`${passwordIsOpen ? 'Hide' : 'Show'} Password`}
     disabled={disabled}
   >
@@ -19,5 +18,5 @@ export const LockButton = memoNamed<
       minimal={true}
       onClick={onLockClick}
     />
-  </Tooltip2>
+  </Tooltip>
 ));

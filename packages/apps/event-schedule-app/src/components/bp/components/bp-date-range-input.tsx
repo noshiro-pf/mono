@@ -1,4 +1,4 @@
-import { DateRangeInput2, type DateRange } from '@blueprintjs/datetime2';
+import { DateRangeInput, type DateRange } from '@blueprintjs/datetime';
 import { ymdFromDate, ymdhm2Date } from '@noshiro/event-schedule-app-shared';
 
 const formatDate = (date: RawDateType): string => date.toLocaleDateString();
@@ -6,7 +6,7 @@ const formatDate = (date: RawDateType): string => date.toLocaleDateString();
 const parseDate = (str: string): RawDateType =>
   pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
-type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput2>;
+type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput>;
 
 type Props = DeepReadonly<{
   dateRange: {
@@ -114,7 +114,7 @@ export const BpDateRangeInput = memoNamed<Props>(
     );
 
     return (
-      <DateRangeInput2
+      <DateRangeInput
         disabled={disabled}
         formatDate={formatDate}
         maxDate={maxDate}
