@@ -6,6 +6,7 @@ export * from './event-list-page-state';
 export * from './fetched-values-state';
 export * from './fetching-state';
 export * from './holidays-jp';
+export * from './media';
 export * from './router';
 export * from './sign-in-and-register-page-state';
 export * from './update-user-info-page-state';

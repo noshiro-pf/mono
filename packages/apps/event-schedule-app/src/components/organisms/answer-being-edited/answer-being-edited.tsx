@@ -14,6 +14,7 @@ import {
   AnswerIconFairPointInput,
   AnswerIconGoodPoint,
   AnswerIconPoorPoint,
+  CustomScrollbarWrapper,
 } from '../../molecules';
 import {
   ButtonsWrapperAlignEnd,
@@ -107,12 +108,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             />
           </FormGroup>
         </WidthRestrictedInputWrapper>
-        <div
-          css={css`
-            overflow-x: auto;
-            margin-bottom: 15px;
-          `}
-        >
+        <TableWrapper>
           <HTMLTableBorderedStyled2
             css={css`
               th,
@@ -237,7 +233,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
               )}
             </tbody>
           </HTMLTableBorderedStyled2>
-        </div>
+        </TableWrapper>
         <WidthRestrictedInputWrapper>
           <FormGroup label={dc.comments}>
             <BpTextArea
@@ -334,4 +330,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
 
 const Paragraph = styled.div`
   margin: 20px 0;
+`;
+
+const TableWrapper = styled(CustomScrollbarWrapper)`
+  margin-bottom: 15px;
 `;
