@@ -326,6 +326,17 @@ const eslintRules = {
         "MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']",
       message: 'use "Object.hasOwn" instead.',
     },
+    {
+      // ban "new Array" expression
+      selector: "NewExpression[callee.name='Array']",
+      message: "use Array.from or 'Arr.zeros' from @utils/Array instead.",
+    },
+    {
+      // ban "React.useImperativeHandle"
+      selector:
+        "MemberExpression[object.name='React'][property.name='useImperativeHandle']",
+      message: 'pass Observable via props instead.',
+    },
   ],
   'no-return-assign': 'error',
   'no-script-url': 'error',
