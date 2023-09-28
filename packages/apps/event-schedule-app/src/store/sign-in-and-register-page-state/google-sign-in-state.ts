@@ -1,7 +1,7 @@
 import { api } from '../../api';
 import { Routes } from '../../constants';
 import { createToaster, showToast } from '../../functions';
-import { router } from '../router';
+import { Router } from '../router';
 
 const dc = dict.register;
 
@@ -36,9 +36,9 @@ const googleSignInSubmit = async (
     });
 
     if (pageToBack !== undefined) {
-      router.redirect(pageToBack);
+      Router.redirect(pageToBack);
     } else {
-      router.redirect(Routes.routes.createPage);
+      Router.redirect(Routes.routes.createPage);
     }
   }
 };
@@ -47,7 +47,7 @@ const googleSignInClickHandler = (): void => {
   if (googleSignInButtonDisabled$.snapshot.value) return;
 
   // TODO: use toast
-  googleSignInSubmit(Maybe.unwrap(router.pageToBack$.snapshot)).catch(
+  googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.snapshot)).catch(
     console.error
   );
 };

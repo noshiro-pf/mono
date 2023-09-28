@@ -17,7 +17,7 @@ const pageToBack$ = _router.state$.chain(pluckI('pathname')).chain(
   })
 );
 
-export const router = {
+export const Router = {
   ..._router,
   pathSegments$,
   pageToBack$,
@@ -55,12 +55,12 @@ export const useShowPage = (): Readonly<{
   registerPage: boolean;
   signInPage: boolean;
 }> => {
-  const createPage = useObservableValue(router.isRoute.createPage$);
-  const answerPage = useObservableValue(router.isRoute.answerPage$);
-  const editPage = useObservableValue(router.isRoute.editPage$);
-  const eventListPage = useObservableValue(router.isRoute.eventListPage$);
-  const registerPage = useObservableValue(router.isRoute.registerPage$);
-  const signInPage = useObservableValue(router.isRoute.signInPage$);
+  const createPage = useObservableValue(Router.isRoute.createPage$);
+  const answerPage = useObservableValue(Router.isRoute.answerPage$);
+  const editPage = useObservableValue(Router.isRoute.editPage$);
+  const eventListPage = useObservableValue(Router.isRoute.eventListPage$);
+  const registerPage = useObservableValue(Router.isRoute.registerPage$);
+  const signInPage = useObservableValue(Router.isRoute.signInPage$);
 
   return {
     createPage,
@@ -72,9 +72,9 @@ export const useShowPage = (): Readonly<{
   };
 };
 
-router.state$.subscribe(({ pathname }) => {
+Router.state$.subscribe(({ pathname }) => {
   const to = Routes.redirectRules.get(pathname);
   if (to !== undefined) {
-    router.redirect(to);
+    Router.redirect(to);
   }
 });
