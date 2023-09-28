@@ -7,7 +7,9 @@ const parseDate = (str: string): RawDateType =>
   pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
 
 const tenYearsLater = pipe(DateUtils.today())
-  .chain(DateUtils.updateLocaleYear((a) => (a + 99) as YearEnum))
+  .chain(
+    DateUtils.updateLocaleYear((a) => toSafeUint(a + 99) satisfies YearEnum)
+  )
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 
@@ -80,7 +82,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         parseDate={parseDate}
         placeholder={placeholder}
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
-        shortcuts={shortcuts as Writable<typeof shortcuts>}
+        shortcuts={castWritable(shortcuts)}
         showActionsBar={showActionsBar}
         /**
          * FIXME: Blueprintjs v5 から showTimezoneSelect = true としていると

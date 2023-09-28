@@ -19,6 +19,7 @@ class FromSubscribableObservableClass<A, E = unknown>
         this.startUpdate(Result.ok(nextValue));
       },
       (error?: unknown) => {
+        // eslint-disable-next-line no-restricted-syntax
         this.startUpdate(Result.err(error as E));
       },
       () => {

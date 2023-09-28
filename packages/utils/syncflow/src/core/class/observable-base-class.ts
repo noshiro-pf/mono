@@ -59,6 +59,7 @@ export class ObservableBaseClass<
   addChild<B>(child: ChildObservable<B>): void {
     this.#children = Arr.pushed(
       this.#children,
+      // eslint-disable-next-line no-restricted-syntax
       child as ChildObservable<unknown>
     );
   }
@@ -134,6 +135,7 @@ export class ObservableBaseClass<
   chain<B>(operator: ToInitializedOperator<A, B>): InitializedObservable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B>;
   chain<B>(operator: Operator<A, B>): Observable<B> {
+    // eslint-disable-next-line no-restricted-syntax
     return operator(this as unknown as InitializedObservable<A>);
   }
 

@@ -22,6 +22,7 @@ const firestore = initializeFirestore(fbApp, {
   ignoreUndefinedProperties: true,
   // https://zenn.dev/cauchye/articles/20210816_yutaro-elk
   experimentalForceLongPolling: Object.hasOwn(
+    // eslint-disable-next-line no-restricted-syntax
     window as unknown as RecordBase,
     'Cypress'
   ),

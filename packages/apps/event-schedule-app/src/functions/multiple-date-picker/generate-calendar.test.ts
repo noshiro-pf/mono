@@ -10,7 +10,7 @@ test('generate-calendar', () => {
    * |19|20|21|22|23|24|25|   |
    * |26|27|28|29|30|31| 1| --+
    */
-  const year = 2020 as YearEnum;
+  const year: YearEnum = toSafeUint(2020);
   const month = 7;
   expect(generateCalendar(year, month)).toStrictEqual([
     [

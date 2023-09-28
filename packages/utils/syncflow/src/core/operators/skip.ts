@@ -1,4 +1,9 @@
-import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
+import {
+  Maybe,
+  SafeUint,
+  castRemoveSmallInt,
+  toSafeUint,
+} from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type Observable,
@@ -31,7 +36,7 @@ class SkipObservableClass<A>
         : Maybe.none,
     });
     this.#counter = toSafeUint(0);
-    this.#n = n as PositiveSafeInt;
+    this.#n = castRemoveSmallInt(n);
   }
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {

@@ -25,13 +25,13 @@ export const calendarCurrentPageReducer: Reducer<
   switch (action.type) {
     case 'prev-month':
       return month === 1
-        ? { year: (year - 1) as YearEnum, month: 12 }
-        : { year, month: (month - 1) as MonthEnum };
+        ? { year: toSafeUint(year - 1) satisfies YearEnum, month: 12 }
+        : { year, month: Num.decrement(month) satisfies MonthEnum };
 
     case 'next-month':
       return month === 12
-        ? { year: (year + 1) as YearEnum, month: 1 }
-        : { year, month: (month + 1) as MonthEnum };
+        ? { year: toSafeUint(year + 1) satisfies YearEnum, month: 1 }
+        : { year, month: Num.increment(month) satisfies MonthEnum };
 
     case 'set-month':
       return { year, month: action.month };

@@ -16,6 +16,7 @@ export const map =
 export const mapI = <A, B>(
   mapFn: (x: A) => B
 ): InitializedToInitializedOperator<A, B> =>
+  // eslint-disable-next-line no-restricted-syntax
   map(mapFn) as InitializedToInitializedOperator<A, B>;
 
 class MapObservableClass<A, B>

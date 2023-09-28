@@ -1,7 +1,7 @@
 import { type HTMLInputProps, type InputGroupProps2 } from '@blueprintjs/core';
 import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
 import { memoNamed } from '@noshiro/react-utils';
-import { DateUtils, pipe } from '@noshiro/ts-utils';
+import { DateUtils, castWritable, pipe, toSafeUint } from '@noshiro/ts-utils';
 import { useCallback, useMemo } from 'react';
 import { type YearMonthDate } from './types';
 
@@ -15,7 +15,9 @@ const inputProps: HTMLInputProps & InputGroupProps2 = {
 };
 
 const tenYearsLater = pipe(DateUtils.today())
-  .chain(DateUtils.updateLocaleYear((a) => (a + 99) as YearEnum))
+  .chain(
+    DateUtils.updateLocaleYear((a) => toSafeUint(a + 99) satisfies YearEnum)
+  )
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 
@@ -81,7 +83,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         parseDate={parseDate}
         placeholder={placeholder}
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
-        shortcuts={shortcuts as Writable<typeof shortcuts>}
+        shortcuts={castWritable(shortcuts)}
         showActionsBar={showActionsBar}
         timePrecision={undefined}
         value={dateObj}

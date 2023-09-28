@@ -15,9 +15,10 @@ const parse = (
 ): Result<JSONValue, string> => {
   try {
     return Result.ok(
-      // eslint-disable-next-line no-restricted-globals
+      // eslint-disable-next-line no-restricted-globals, no-restricted-syntax
       JSON.parse(
         text,
+        // eslint-disable-next-line no-restricted-syntax
         reviver as (this: unknown, key: string, value: unknown) => unknown
       ) as JSONValue
     );

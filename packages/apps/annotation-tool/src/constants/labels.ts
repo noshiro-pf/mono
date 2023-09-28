@@ -28,6 +28,7 @@ const labelNames = [
 
 type LabelLen = (typeof labelNames)['length'];
 
+// eslint-disable-next-line no-restricted-syntax
 const hues = pickupHighContrastHues(
   labelNames.length,
   saturationDarker,

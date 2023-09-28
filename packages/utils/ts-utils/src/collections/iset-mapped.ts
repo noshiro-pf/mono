@@ -232,7 +232,7 @@ class ISetMappedClass<K, KM extends KeyType>
   }
 
   isSupersetOf(set: ISetMapped<K, KM>): boolean {
-    return set.every((k) => (this as ISetMapped<K, KM>).has(k));
+    return set.every((k) => this.has(k));
   }
 
   subtract(set: ISetMapped<K, KM>): ISetMapped<K, KM> {

@@ -21,6 +21,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
 
   const { typeName = 'key-value-record' } = options ?? {};
 
+  // eslint-disable-next-line no-restricted-syntax
   const defaultValue = {} as T;
 
   const validate: Type<T>['validate'] = (a) => {
@@ -57,12 +58,14 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
       }
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? (Object.fromEntries(
+      ? // eslint-disable-next-line no-restricted-syntax
+        (Object.fromEntries(
           Object.entries(a).filter(([k, v]) => keyType.is(k) && valueType.is(v))
         ) as T)
       : defaultValue;

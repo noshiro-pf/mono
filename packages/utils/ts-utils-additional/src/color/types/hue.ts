@@ -1,4 +1,5 @@
 import { Num } from '@noshiro/ts-utils';
+import { toHue } from '../to-hue';
 
 // prettier-ignore
 export type Hue = (
@@ -41,4 +42,4 @@ export type Hue = (
 );
 
 export const hue = (h: number): Hue =>
-  Math.round(Num.clamp<number>(0, 359)(h)) as Hue;
+  toHue(Math.round(Num.clamp<number>(0, 359)(h)));

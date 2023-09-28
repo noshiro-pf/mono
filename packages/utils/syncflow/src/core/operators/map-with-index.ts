@@ -16,6 +16,7 @@ export const mapWithIndex =
 export const mapWithIndexI = <A, B>(
   mapFn: (x: A, index: SafeUint | -1) => B
 ): InitializedToInitializedOperator<A, B> =>
+  // eslint-disable-next-line no-restricted-syntax
   mapWithIndex(mapFn) as InitializedToInitializedOperator<A, B>;
 
 class MapWithIndexObservableClass<A, B>

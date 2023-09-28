@@ -1,6 +1,7 @@
 /* eslint-disable
   @typescript-eslint/no-explicit-any,
   @typescript-eslint/no-unsafe-member-access,
+  no-restricted-syntax,
   functional/immutable-data
 */
 

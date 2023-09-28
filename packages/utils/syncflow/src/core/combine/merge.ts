@@ -31,6 +31,7 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
       (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.snapshot)
     );
     if (parentToUse === undefined) return;
+    // eslint-disable-next-line no-restricted-syntax
     const nextValue = Maybe.unwrap(parentToUse.snapshot) as ArrayElement<P>;
     this.setNext(nextValue, updaterSymbol);
   }

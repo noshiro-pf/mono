@@ -16,6 +16,7 @@ export const debounceTime =
 export const debounceTimeI = <A>(
   milliSeconds: number
 ): InitializedToInitializedOperator<A, A> =>
+  // eslint-disable-next-line no-restricted-syntax
   debounceTime(milliSeconds) as InitializedToInitializedOperator<A, A>;
 
 class DebounceTimeObservableClass<A>

@@ -337,6 +337,11 @@ const eslintRules = {
         "MemberExpression[object.name='React'][property.name='useImperativeHandle']",
       message: 'pass Observable via props instead.',
     },
+    {
+      // ban "as"
+      selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
+      message: "Don't use `as`.",
+    },
   ],
   'no-return-assign': 'error',
   'no-script-url': 'error',

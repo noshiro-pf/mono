@@ -4,6 +4,7 @@ import {
   type Hue,
 } from '@noshiro/ts-utils-additional';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
+import { toHue } from './to-hue';
 
 const huesDefault = Arr.seq(360);
 
@@ -17,9 +18,9 @@ export const pickupHighContrastHues = (
   firstHue: Hue,
   useLog: boolean
 ): readonly Hue[] => {
-  const hues = huesDefault.map((h) => ((h - firstHue + 360) % 360) as Hue);
+  const hues = Tpl.map(huesDefault, (h) => toHue((h - firstHue + 360) % 360));
 
-  const luminanceList: readonly number[] = hues.map((hue) =>
+  const luminanceList: ArrayOfLength<360, number> = Tpl.map(hues, (hue) =>
     relativeLuminance(hslToRgb([hue, saturation, lightness]))
   );
 
@@ -37,7 +38,7 @@ export const pickupHighContrastHues = (
   if (maxValue === undefined) return [];
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
     if (value > mut_y) {
-      mut_result[mut_i] = x as Hue;
+      mut_result[mut_i] = toHue(x);
       [mut_i, mut_y] = [mut_i + 1, (maxValue * (mut_i + 1)) / n];
     }
   }

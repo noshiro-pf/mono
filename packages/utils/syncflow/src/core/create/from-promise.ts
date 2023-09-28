@@ -20,6 +20,7 @@ class FromPromiseObservableClass<A, E = unknown>
       })
       .catch((error: unknown) => {
         if (this.isCompleted) return;
+        // eslint-disable-next-line no-restricted-syntax
         this.startUpdate(Result.err(error as E));
       })
       .finally(() => {

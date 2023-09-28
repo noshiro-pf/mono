@@ -3,6 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
+// eslint-disable-next-line no-restricted-syntax
 const is = isUint32 as (u: number) => u is Uint32;
 
 export const uint32 = (defaultValue: number = 0): Type<Uint32> => {
