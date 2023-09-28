@@ -1,25 +1,33 @@
 export const getLuminanceListAccumulated = (
-  luminanceList: readonly number[],
+  luminanceList: NonEmptyArray<NonNegativeFiniteNumber>,
   useLog: boolean
-): readonly number[] => {
-  if (!Arr.isNonEmpty(luminanceList)) return [];
-
+): NonEmptyArray<NonNegativeFiniteNumber> => {
   /* +0.05はコントラスト比計算時に足される補正項  */
-  const luminanceListCorrected: NonEmptyArray<number> = pipe(
+  const luminanceListCorrected: NonEmptyArray<FiniteNumber> = pipe(
     luminanceList
   ).chain((list) =>
-    Tpl.map(list, (v) => (useLog ? Math.log(v + 0.05) : v + 0.05))
+    Tpl.map(list, (v) => toFiniteNumber(useLog ? Math.log(v + 0.05) : v + 0.05))
   ).value;
 
-  const luminanceDiffAccumulated = pipe(Arr.rest(luminanceListCorrected))
+  const luminanceDiffAccumulated: NonEmptyArray<NonNegativeFiniteNumber> = pipe(
+    luminanceListCorrected
+  )
+    .chain(Arr.rest)
     .chain((list) =>
       Arr.scan(
         list,
-        ([prev, acc], curr) => tp(curr, acc + Math.abs(curr - prev)),
-        tp(Arr.first(luminanceListCorrected), 0)
+        ([prev, acc], curr) =>
+          tp(
+            curr,
+            NonNegativeFiniteNumber.add(
+              acc,
+              FiniteNumber.abs(FiniteNumber.sub(curr, prev))
+            )
+          ),
+        tp(Arr.first(luminanceListCorrected), toNonNegativeFiniteNumber(0))
       )
     )
-    .chain((list) => list.map(([_, acc]) => acc)).value;
+    .chain((list) => Tpl.map(list, ([_, acc]) => acc)).value;
 
   return luminanceDiffAccumulated;
 };

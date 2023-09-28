@@ -25,107 +25,135 @@ export const calcAll = ({
   firstHue: Hue;
   divisionNumber: DivisionNumber;
 }>): DeepReadonly<{
-  relativeLuminanceDistribution: [Hsl, number][];
+  relativeLuminanceDistribution: [Hsl, NonNegativeFiniteNumber][];
   result1_equallySpaced: ColorResult;
   result2_weighted: ColorResult;
   result3_weighted_log: ColorResult;
 }> => {
   /* values */
 
-  const hueList = hueListDefault.map((h) => toHue((h - firstHue + 360) % 360));
+  const hueList: ArrayOfLength<360, Hue> = Tpl.map(hueListDefault, (h) =>
+    toHue((h - firstHue + 360) % 360)
+  );
 
-  const hslList: readonly Hsl[] = hueList.map((hue) => [
-    hue,
-    saturation,
-    lightness,
-  ]);
+  const hslList: ArrayOfLength<360, Hsl> = Tpl.map(hueList, (hue) =>
+    tp(hue, saturation, lightness)
+  );
 
-  const luminanceList = hslList.map(hslToRgb).map(relativeLuminance);
+  const luminanceList: ArrayOfLength<360, NonNegativeFiniteNumber> = pipe(
+    hslList
+  )
+    .chain((a) => Tpl.map(a, hslToRgb))
+    .chain((a) => Tpl.map(a, relativeLuminance)).value;
 
   /* 1. 彩度・明度を固定し色相を横軸としたときの相対輝度分布 */
 
-  const maxLuminanceInList = Arr.max(luminanceList) ?? 1;
-  const luminanceListNormalized = luminanceList.map(
-    (l) => l / maxLuminanceInList
-  );
+  const maxLuminanceInList = Arr.max(luminanceList);
+  const luminanceListNormalized: ArrayOfLength<360, NonNegativeFiniteNumber> =
+    Tpl.map(luminanceList, (l) =>
+      Num.isNonZero(maxLuminanceInList)
+        ? NonNegativeFiniteNumber.div(l, maxLuminanceInList)
+        : toNonNegativeFiniteNumber(0)
+    );
 
-  const relativeLuminanceDistribution = Arr.zip(
-    hslList,
-    luminanceListNormalized
-  );
+  // Type annotations are added to avoid
+  // "Type instantiation is excessively deep and possibly infinite." error
+  const relativeLuminanceDistribution = Arr.zip<
+    NonEmptyArray<Hsl>,
+    NonEmptyArray<NonNegativeFiniteNumber>
+  >(hslList, luminanceListNormalized);
 
-  const pickedUpHues_equallySpaced = Arr.seq(divisionNumber)
-    .map((i) => toHue(Num.roundToInt((i * 360) / divisionNumber)))
-    .map((h) => toHue((h - firstHue + 360) % 360));
+  const pickedUpHues_equallySpaced = pipe(Arr.seq(divisionNumber))
+    .chain((list) =>
+      Tpl.map(list, (i) => Num.roundToInt((i * 360) / divisionNumber))
+    )
+    .chain((list) =>
+      Tpl.map(list, (h) => toHue((h - firstHue + 360) % 360))
+    ).value;
 
-  const adjacentContrastRatioList_equallySpaced = hueListToContrastRatioList(
-    pickedUpHues_equallySpaced,
-    saturation,
-    lightness
-  );
+  const adjacentContrastRatioList_equallySpaced: NonEmptyArray<PositiveFiniteNumber> =
+    hueListToContrastRatioList(
+      pickedUpHues_equallySpaced,
+      saturation,
+      lightness
+    );
 
   const result1_equallySpaced: ColorResult = {
-    accumulatedDistribution: Arr.zip(
+    accumulatedDistribution: Arr.zip<
+      NonEmptyArray<Hsl>,
+      NonEmptyArray<NonNegativeFiniteNumber>
+    >(
       hslList,
-      hueListDefault.map((i) => i / 360)
+      Tpl.map(hueListDefault, (i) =>
+        NonNegativeFiniteNumber.div(
+          toNonNegativeFiniteNumber(i),
+          toPositiveSafeInt(360)
+        )
+      )
     ),
     pickedUpHues: pickedUpHues_equallySpaced,
     adjacentContrastRatioList: adjacentContrastRatioList_equallySpaced,
-    adjacentContrastRatioVariance:
-      variance(adjacentContrastRatioList_equallySpaced) ?? 0,
+    adjacentContrastRatioVariance: variance(
+      adjacentContrastRatioList_equallySpaced
+    ),
   };
 
   /* 相対輝度の変化量の絶対値の累積分布 */
-  const pickedUpHues_weighted = pickupHighContrastHues(
-    divisionNumber,
-    saturation,
-    lightness,
-    firstHue,
-    false
-  ).map((h) => toHue((h - firstHue + 360) % 360));
+  const pickedUpHues_weighted: ArrayOfLength<DivisionNumber, Hue> = pipe(
+    pickupHighContrastHues(
+      divisionNumber,
+      saturation,
+      lightness,
+      firstHue,
+      false
+    )
+  ).chain((t) => Tpl.map(t, (h) => toHue((h - firstHue + 360) % 360))).value;
 
-  const adjacentContrastRatioList_weighted = hueListToContrastRatioList(
-    pickedUpHues_weighted,
-    saturation,
-    lightness
-  );
+  const adjacentContrastRatioList_weighted: NonEmptyArray<PositiveFiniteNumber> =
+    hueListToContrastRatioList(pickedUpHues_weighted, saturation, lightness);
 
   const result2_weighted: ColorResult = {
-    accumulatedDistribution: Arr.zip(
+    accumulatedDistribution: Arr.zip<
+      NonEmptyArray<Hsl>,
+      NonEmptyArray<NonNegativeFiniteNumber>
+    >(
       hslList,
       normalizeList(getLuminanceListAccumulated(luminanceList, false))
     ),
     pickedUpHues: pickedUpHues_weighted,
     adjacentContrastRatioList: adjacentContrastRatioList_weighted,
-    adjacentContrastRatioVariance:
-      variance(adjacentContrastRatioList_weighted) ?? 0,
+    adjacentContrastRatioVariance: variance(adjacentContrastRatioList_weighted),
   };
 
   /* 相対輝度の変化量の絶対値のlogの累積分布 */
 
-  const pickedUpHues_weighted_log = pickupHighContrastHues(
-    divisionNumber,
-    saturation,
-    lightness,
-    firstHue,
-    true
-  ).map((h) => toHue((h - firstHue + 360) % 360));
+  const pickedUpHues_weighted_log: ArrayOfLength<DivisionNumber, Hue> = pipe(
+    pickupHighContrastHues(
+      divisionNumber,
+      saturation,
+      lightness,
+      firstHue,
+      true
+    )
+  ).chain((t) => Tpl.map(t, (h) => toHue((h - firstHue + 360) % 360))).value;
 
-  const adjacentContrastRatioList_weighted_log = hueListToContrastRatioList(
-    pickedUpHues_weighted_log,
-    saturation,
-    lightness
-  );
+  const adjacentContrastRatioList_weighted_log: NonEmptyArray<PositiveFiniteNumber> =
+    hueListToContrastRatioList(
+      pickedUpHues_weighted_log,
+      saturation,
+      lightness
+    );
 
   const result3_weighted_log: ColorResult = {
-    accumulatedDistribution: Arr.zip(
-      hslList,
-      normalizeList(getLuminanceListAccumulated(luminanceList, true))
-    ),
+    accumulatedDistribution: Arr.zip<
+      NonEmptyArray<Hsl>,
+      NonEmptyArray<NonNegativeFiniteNumber>
+    >(hslList, normalizeList(getLuminanceListAccumulated(luminanceList, true))),
     pickedUpHues: pickedUpHues_weighted_log,
     adjacentContrastRatioList: adjacentContrastRatioList_weighted_log,
-    adjacentContrastRatioVariance:
-      variance(adjacentContrastRatioList_weighted_log) ?? 0,
+    adjacentContrastRatioVariance: variance(
+      adjacentContrastRatioList_weighted_log
+    ),
   };
 
   return {

@@ -21,9 +21,9 @@ export const ColorList = memoNamed<Props>('ColorList', (props) => (
         padding: 10px;
       `}
     >
-      {props.hueList.map((hue) => (
+      {Tpl.map(props.hueList, (hue, index) => (
         <div
-          key={hue}
+          key={index}
           css={css`
             padding: 3px;
           `}

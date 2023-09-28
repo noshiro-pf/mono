@@ -26,7 +26,7 @@ const lightnessListWithIndex = Arr.zip(lightnessList, indices);
 const SL = Arr.zip(
   Arr.zip(saturationList, lightnessList),
   indices
-) satisfies DeepReadonly<[[Percent, Percent], number][]>;
+) satisfies DeepReadonly<[[Percent, Percent], Uint8][]>;
 
 export const TextColorContrastTable = memoNamed(
   'TextColorContrastTable',

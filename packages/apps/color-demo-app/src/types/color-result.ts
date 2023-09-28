@@ -1,8 +1,8 @@
 import { type Hsl, type Hue } from '@noshiro/ts-utils-additional';
 
 export type ColorResult = DeepReadonly<{
-  accumulatedDistribution: [Hsl, number][];
+  accumulatedDistribution: [Hsl, NonNegativeFiniteNumber][];
   pickedUpHues: Hue[];
-  adjacentContrastRatioList: number[];
-  adjacentContrastRatioVariance: number;
+  adjacentContrastRatioList: PositiveFiniteNumber[];
+  adjacentContrastRatioVariance: NonNegativeFiniteNumber;
 }>;
