@@ -7,135 +7,650 @@ import {
   type InfiniteNumber,
   type Int,
   type Int16,
-  type Int16Brand,
   type Int32,
-  type Int32Brand,
-  type IntBrand,
   type NEGATIVE_INFINITY,
   type NaNType,
+  type NegativeInt,
+  type NegativeInt16,
+  type NegativeInt32,
   type NegativeNumber,
-  type NegativeUint16,
-  type NegativeUint32,
+  type NegativeSafeInt,
   type NonNegativeNumber,
   type NonZeroInt,
-  type NonZeroIntBrand,
   type NonZeroNumber,
   type NonZeroSafeInt,
-  type NonZeroSafeIntBrand,
   type NormalizeBrandUnion,
   type POSITIVE_INFINITY,
+  type PositiveInt,
   type PositiveNumber,
+  type PositiveSafeInt,
   type SafeInt,
-  type SafeIntBrand,
   type SafeUint,
-  type SafeUintBrand,
+  type SmallInt,
   type Uint,
   type Uint16,
-  type Uint16Brand,
   type Uint32,
-  type Uint32Brand,
-  type UintBrand,
+  type ValidNumber,
+  type WithSmallInt,
 } from '../src';
 import { expectType } from './expect-type';
 
 {
-  // types that extend FiniteNumber
-  expectType<FiniteNumber, FiniteNumber>('<=');
-  expectType<IntBrand, FiniteNumber>('<=');
-  expectType<UintBrand, FiniteNumber>('<=');
-  expectType<NonZeroIntBrand, FiniteNumber>('<=');
-  expectType<SafeIntBrand, FiniteNumber>('<=');
-  expectType<SafeUintBrand, FiniteNumber>('<=');
-  expectType<NonZeroSafeIntBrand, FiniteNumber>('<=');
-  expectType<Uint32Brand, FiniteNumber>('<=');
-  expectType<Int32Brand, FiniteNumber>('<=');
-  expectType<Uint16Brand, FiniteNumber>('<=');
-  expectType<Int16Brand, FiniteNumber>('<=');
+  expectType<
+    NaNType,
+    Readonly<{
+      NaN: true;
+      Finite: false;
+      Int: false;
+      SafeInt: false;
+      '!=0': true;
+      '< 2^15': false;
+      '< 2^16': false;
+      '< 2^31': false;
+      '< 2^32': false;
+      '> -2^16': false;
+      '> -2^32': false;
+      '>= -2^15': false;
+      '>= -2^31': false;
+      '>=0': false;
+    }> &
+      number
+  >('=');
 
-  // types that don't extend FiniteNumber
-  expectType<NaNType, FiniteNumber>('!<=');
-  expectType<InfiniteNumber, FiniteNumber>('!<=');
-  expectType<POSITIVE_INFINITY, FiniteNumber>('!<=');
-  expectType<NEGATIVE_INFINITY, FiniteNumber>('!<=');
-  expectType<NonZeroNumber, FiniteNumber>('!<=');
-  expectType<NonNegativeNumber, FiniteNumber>('!<=');
-  expectType<Float32, FiniteNumber>('!<=');
-  expectType<Float64, FiniteNumber>('!<=');
-  expectType<BigInt64, FiniteNumber>('!<=');
-  expectType<BigUint64, FiniteNumber>('!<=');
+  expectType<
+    InfiniteNumber,
+    Readonly<{
+      NaN: false;
+      Finite: false;
+      '!=0': true;
+      Int: false;
+      SafeInt: false;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    POSITIVE_INFINITY,
+    Readonly<{
+      NaN: false;
+      Finite: false;
+      '!=0': true;
+      Int: false;
+      SafeInt: false;
+      '>=0': true;
+      '>= -2^15': true;
+      '> -2^16': true;
+      '>= -2^31': true;
+      '> -2^32': true;
+      '< 2^15': false;
+      '< 2^16': false;
+      '< 2^31': false;
+      '< 2^32': false;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NEGATIVE_INFINITY,
+    Readonly<{
+      NaN: false;
+      Finite: false;
+      '!=0': true;
+      Int: false;
+      SafeInt: false;
+      '>=0': false;
+      '>= -2^15': false;
+      '> -2^16': false;
+      '>= -2^31': false;
+      '> -2^32': false;
+      '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+    }> &
+      number
+  >('=');
+
+  expectType<POSITIVE_INFINITY, PositiveNumber>('<=');
+  expectType<NEGATIVE_INFINITY, NegativeNumber>('<=');
+
+  expectType<
+    NonZeroNumber,
+    Readonly<{
+      NaN: false;
+      '!=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NonNegativeNumber,
+    Readonly<{
+      NaN: false;
+      '>=0': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    PositiveNumber,
+    Readonly<{
+      NaN: false;
+      '!=0': true;
+      // '< 2^15': true;
+      // '< 2^16': true;
+      // '< 2^31': true;
+      // '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<PositiveNumber, NonNegativeNumber>('<=');
+  expectType<NegativeNumber & PositiveNumber, never>('=');
+
+  expectType<
+    NegativeNumber,
+    Readonly<{
+      NaN: false;
+      '!=0': true;
+      '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      // '> -2^16': true;
+      // '> -2^32': true;
+      // '>= -2^15': true;
+      // '>= -2^31': true;
+      '>=0': false;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    FiniteNumber,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+    }> &
+      number
+  >('=');
+
+  // integer types
+
+  expectType<
+    Int,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    Uint,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      // '!=0': true;
+      // '< 2^15': true;
+      // '< 2^16': true;
+      // '< 2^31': true;
+      // '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    PositiveInt,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      '!=0': true;
+      // '< 2^15': true;
+      // '< 2^16': true;
+      // '< 2^31': true;
+      // '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NegativeInt,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      '!=0': true;
+      '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      // '> -2^16': true;
+      // '> -2^32': true;
+      // '>= -2^15': true;
+      // '>= -2^31': true;
+      '>=0': false;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NonZeroInt,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      '!=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    SafeInt,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    SafeUint,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      // '!=0': true;
+      // '< 2^15': true;
+      // '< 2^16': true;
+      // '< 2^31': true;
+      // '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    PositiveSafeInt,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      '!=0': true;
+      // '< 2^15': true;
+      // '< 2^16': true;
+      // '< 2^31': true;
+      // '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NegativeSafeInt,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      '!=0': true;
+      SafeInt: true;
+      '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      // '> -2^16': true;
+      // '> -2^32': true;
+      // '>= -2^15': true;
+      // '>= -2^31': true;
+      '>=0': false;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NonZeroSafeInt,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      '!=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    Int32,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      // '!=0': true;
+      // '< 2^15': true;
+      // '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      // '> -2^16': true;
+      '> -2^32': true;
+      // '>= -2^15': true;
+      '>= -2^31': true;
+      // '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    Int16,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      // '!=0': true;
+      '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      // '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    Uint32,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      // '!=0': true;
+      // '< 2^15': true;
+      // '< 2^16': true;
+      // '< 2^31': true;
+      '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    Uint16,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      // '!=0': true;
+      // '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NegativeInt32,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      '!=0': true;
+      '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      // '> -2^16': true;
+      '> -2^32': true;
+      // '>= -2^15': true;
+      // '>= -2^31': true;
+      '>=0': false;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    NegativeInt16,
+    Readonly<{
+      NaN: false;
+      Finite: true;
+      Int: true;
+      SafeInt: true;
+      '!=0': true;
+      '< 2^15': true;
+      '< 2^16': true;
+      '< 2^31': true;
+      '< 2^32': true;
+      '> -2^16': true;
+      '> -2^32': true;
+      // '>= -2^15': true;
+      '>= -2^31': true;
+      '>=0': false;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    Float32,
+    Readonly<{
+      Float32: true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    Float64,
+    Readonly<{
+      Float64: true;
+    }> &
+      number
+  >('=');
+
+  expectType<
+    BigInt64,
+    Readonly<{
+      Finite: true;
+      Int: true;
+      NaN: false;
+      BigInt64: true;
+    }> &
+      bigint
+  >('=');
+
+  expectType<
+    BigUint64,
+    Readonly<{
+      Finite: true;
+      Int: true;
+      NaN: false;
+      BigUint64: true;
+    }> &
+      bigint
+  >('=');
 }
 
 {
-  // types that extend FiniteNumber
-  expectType<NaNType, NaNType>('<=');
-
-  // types that don't extend NaN
-  expectType<FiniteNumber, NaNType>('!<=');
-  expectType<NonZeroNumber, NaNType>('!<=');
-  expectType<NonNegativeNumber, NaNType>('!<=');
-  expectType<InfiniteNumber, NaNType>('!<=');
-  expectType<POSITIVE_INFINITY, NaNType>('!<=');
-  expectType<NEGATIVE_INFINITY, NaNType>('!<=');
-  expectType<Int, NaNType>('!<=');
-  expectType<Uint, NaNType>('!<=');
-  expectType<NonZeroInt, NaNType>('!<=');
-  expectType<SafeInt, NaNType>('!<=');
-  expectType<SafeUint, NaNType>('!<=');
-  expectType<NonZeroSafeInt, NaNType>('!<=');
-  expectType<Uint32, NaNType>('!<=');
-  expectType<Int32, NaNType>('!<=');
-  expectType<Uint16, NaNType>('!<=');
-  expectType<Int16, NaNType>('!<=');
-  expectType<Float32, NaNType>('!<=');
-  expectType<Float64, NaNType>('!<=');
-  expectType<BigInt64, NaNType>('!<=');
-  expectType<BigUint64, NaNType>('!<=');
+  const op = '!<=';
+  expectType<InfiniteNumber, NaNType>(op);
+  expectType<POSITIVE_INFINITY, NaNType>(op);
+  expectType<NEGATIVE_INFINITY, NaNType>(op);
+  expectType<NonZeroNumber, NaNType>(op);
+  expectType<NonNegativeNumber, NaNType>(op);
+  expectType<PositiveNumber, NaNType>(op);
+  expectType<NegativeNumber, NaNType>(op);
+  expectType<FiniteNumber, NaNType>(op);
+  expectType<Int, NaNType>(op);
+  expectType<Uint, NaNType>(op);
+  expectType<NonZeroInt, NaNType>(op);
+  expectType<SafeInt, NaNType>(op);
+  expectType<SafeUint, NaNType>(op);
+  expectType<NonZeroSafeInt, NaNType>(op);
+  expectType<Int32, NaNType>(op);
+  expectType<Int16, NaNType>(op);
+  expectType<Uint32, NaNType>(op);
+  expectType<Uint16, NaNType>(op);
+  expectType<NegativeInt32, NaNType>(op);
+  expectType<NegativeInt16, NaNType>(op);
+  expectType<Float32, NaNType>(op);
+  expectType<Float64, NaNType>(op);
+  expectType<BigInt64, NaNType>(op);
+  expectType<BigUint64, NaNType>(op);
 }
 
 {
-  // types that extend Int
-  expectType<Uint, Int>('<=');
-  expectType<NonZeroInt, Int>('<=');
-  expectType<SafeInt, Int>('<=');
-  expectType<SafeUint, Int>('<=');
-  expectType<NonZeroSafeInt, Int>('<=');
-  expectType<Uint32, Int>('<=');
-  expectType<Int32, Int>('<=');
-  expectType<Uint16, Int>('<=');
-  expectType<Int16, Int>('<=');
+  {
+    // types that extend FiniteNumber
+    const op = '<=';
 
-  // types that don't extend Int
-  expectType<FiniteNumber, Int>('!<=');
-  expectType<NonZeroNumber, Int>('!<=');
-  expectType<NonNegativeNumber, Int>('!<=');
-  expectType<Float32, Int>('!<=');
-  expectType<Float64, Int>('!<=');
-  expectType<BigInt64, Int>('!<=');
-  expectType<BigUint64, Int>('!<=');
+    expectType<Int, FiniteNumber>(op);
+    expectType<Uint, FiniteNumber>(op);
+    expectType<NonZeroInt, FiniteNumber>(op);
+    expectType<SafeInt, FiniteNumber>(op);
+    expectType<SafeUint, FiniteNumber>(op);
+    expectType<NonZeroSafeInt, FiniteNumber>(op);
+    expectType<Int32, FiniteNumber>(op);
+    expectType<Int16, FiniteNumber>(op);
+    expectType<Uint32, FiniteNumber>(op);
+    expectType<Uint16, FiniteNumber>(op);
+    expectType<NegativeInt32, FiniteNumber>(op);
+    expectType<NegativeInt16, FiniteNumber>(op);
+  }
+  {
+    // types that don't extend FiniteNumber
+    const op = '!<=';
+
+    expectType<NaNType, FiniteNumber>(op);
+    expectType<InfiniteNumber, FiniteNumber>(op);
+    expectType<POSITIVE_INFINITY, FiniteNumber>(op);
+    expectType<NEGATIVE_INFINITY, FiniteNumber>(op);
+    expectType<NonZeroNumber, FiniteNumber>(op);
+    expectType<NonNegativeNumber, FiniteNumber>(op);
+    expectType<PositiveNumber, FiniteNumber>(op);
+    expectType<NegativeNumber, FiniteNumber>(op);
+    expectType<Float32, FiniteNumber>(op);
+    expectType<Float64, FiniteNumber>(op);
+    expectType<BigInt64, FiniteNumber>(op);
+    expectType<BigUint64, FiniteNumber>(op);
+  }
 }
 
 {
-  // types that extend NonNegativeNumber
-  expectType<POSITIVE_INFINITY, NonNegativeNumber>('<=');
-  expectType<UintBrand, NonNegativeNumber>('<=');
-  expectType<SafeUintBrand, NonNegativeNumber>('<=');
-  expectType<Uint32Brand, NonNegativeNumber>('<=');
-  expectType<Uint16Brand, NonNegativeNumber>('<=');
+  {
+    // types that extend Int
+    const op = '<=';
+    expectType<Int, Int>(op);
+    expectType<Uint, Int>(op);
+    expectType<NonZeroInt, Int>(op);
+    expectType<SafeInt, Int>(op);
+    expectType<SafeUint, Int>(op);
+    expectType<NonZeroSafeInt, Int>(op);
+    expectType<Int32, Int>(op);
+    expectType<Int16, Int>(op);
+    expectType<Uint32, Int>(op);
+    expectType<Uint16, Int>(op);
+    expectType<NegativeInt32, Int>(op);
+    expectType<NegativeInt16, Int>(op);
+  }
+  {
+    // types that don't extend Int
+    const op = '!<=';
+    expectType<InfiniteNumber, Int>(op);
+    expectType<POSITIVE_INFINITY, Int>(op);
+    expectType<NEGATIVE_INFINITY, Int>(op);
+    expectType<NonZeroNumber, Int>(op);
+    expectType<NonNegativeNumber, Int>(op);
+    expectType<PositiveNumber, Int>(op);
+    expectType<NegativeNumber, Int>(op);
+    expectType<FiniteNumber, Int>(op);
+    expectType<Float32, Int>(op);
+    expectType<Float64, Int>(op);
+    expectType<BigInt64, Int>(op);
+    expectType<BigUint64, Int>(op);
+  }
+}
 
-  // types that don't extend NonNegativeNumber
-  expectType<NEGATIVE_INFINITY, NonNegativeNumber>('!<=');
-  expectType<FiniteNumber, NonNegativeNumber>('!<=');
-  expectType<NonZeroNumber, NonNegativeNumber>('!<=');
-  expectType<Int, NonNegativeNumber>('!<=');
-  expectType<NonZeroInt, NonNegativeNumber>('!<=');
-  expectType<SafeInt, NonNegativeNumber>('!<=');
-  expectType<NonZeroSafeInt, NonNegativeNumber>('!<=');
-  expectType<Int32, NonNegativeNumber>('!<=');
-  expectType<Int16, NonNegativeNumber>('!<=');
-  expectType<Float32, NonNegativeNumber>('!<=');
-  expectType<Float64, NonNegativeNumber>('!<=');
-  expectType<BigInt64, NonNegativeNumber>('!<=');
-  expectType<BigUint64, NonNegativeNumber>('!<=');
+{
+  {
+    // types that extend Int
+    const op = '<=';
+    expectType<Uint, NonNegativeNumber>(op);
+    expectType<SafeUint, NonNegativeNumber>(op);
+    expectType<Uint32, NonNegativeNumber>(op);
+    expectType<Uint16, NonNegativeNumber>(op);
+    expectType<POSITIVE_INFINITY, NonNegativeNumber>(op);
+    expectType<NonNegativeNumber, NonNegativeNumber>(op);
+    expectType<PositiveNumber, NonNegativeNumber>(op);
+  }
+  {
+    // types that don't extend Int
+    const op = '!<=';
+    expectType<InfiniteNumber, NonNegativeNumber>(op);
+    expectType<NEGATIVE_INFINITY, NonNegativeNumber>(op);
+    expectType<NonZeroNumber, NonNegativeNumber>(op);
+    expectType<NegativeNumber, NonNegativeNumber>(op);
+    expectType<FiniteNumber, NonNegativeNumber>(op);
+    expectType<Int, NonNegativeNumber>(op);
+    expectType<NonZeroInt, NonNegativeNumber>(op);
+    expectType<SafeInt, NonNegativeNumber>(op);
+    expectType<NonZeroSafeInt, NonNegativeNumber>(op);
+    expectType<Int32, NonNegativeNumber>(op);
+    expectType<Int16, NonNegativeNumber>(op);
+    expectType<NegativeInt32, NonNegativeNumber>(op);
+    expectType<NegativeInt16, NonNegativeNumber>(op);
+    expectType<Float32, NonNegativeNumber>(op);
+    expectType<Float64, NonNegativeNumber>(op);
+    expectType<BigInt64, NonNegativeNumber>(op);
+    expectType<BigUint64, NonNegativeNumber>(op);
+  }
 }
 
 {
@@ -165,8 +680,8 @@ import { expectType } from './expect-type';
   expectType<InfiniteNumber, NonZeroNumber>('<=');
   expectType<POSITIVE_INFINITY, NonZeroNumber>('<=');
   expectType<NEGATIVE_INFINITY, NonZeroNumber>('<=');
-  expectType<NonZeroIntBrand, NonZeroNumber>('<=');
-  expectType<NonZeroSafeIntBrand, NonZeroNumber>('<=');
+  expectType<NonZeroInt, NonZeroNumber>('<=');
+  expectType<NonZeroSafeInt, NonZeroNumber>('<=');
 
   // types that don't extend NonZeroNumber
   expectType<FiniteNumber, NonZeroNumber>('!<=');
@@ -185,30 +700,124 @@ import { expectType } from './expect-type';
   expectType<BigUint64, NonZeroNumber>('!<=');
 }
 
-// integer type relations
-expectType<NonZeroSafeInt, NonZeroInt>('<=');
-expectType<SafeUint, SafeInt>('<=');
-expectType<NonZeroSafeInt, SafeInt>('<=');
-expectType<Uint32, Uint>('<=');
+{
+  // other subset relationships
+  expectType<POSITIVE_INFINITY, PositiveNumber>('<=');
+  expectType<NEGATIVE_INFINITY, NegativeNumber>('<=');
 
-expectType<Uint16, Uint32>('<=');
-expectType<Int16, Int32>('<=');
+  expectType<NonZeroSafeInt, NonZeroInt>('<=');
+  expectType<SafeUint, SafeInt>('<=');
+  expectType<NonZeroSafeInt, SafeInt>('<=');
+  expectType<Uint32, Uint>('<=');
 
-expectType<Uint32, SafeInt>('<=');
-expectType<Uint16, SafeInt>('<=');
-expectType<NegativeUint32, SafeInt>('<=');
-expectType<NegativeUint16, SafeInt>('<=');
-expectType<Int32, SafeInt>('<=');
-expectType<Int16, SafeInt>('<=');
+  expectType<Uint16, Uint32>('<=');
+  expectType<Int16, Int32>('<=');
 
-expectType<Uint32, SafeUint>('<=');
-expectType<Uint16, SafeUint>('<=');
+  expectType<Uint32, SafeInt>('<=');
+  expectType<Uint16, SafeInt>('<=');
+  expectType<NegativeInt32, SafeInt>('<=');
+  expectType<NegativeInt16, SafeInt>('<=');
+  expectType<Int32, SafeInt>('<=');
+  expectType<Int16, SafeInt>('<=');
 
-expectType<NormalizeBrandUnion<Uint16Brand | Uint32Brand>, Uint32Brand>('=');
-expectType<
-  NormalizeBrandUnion<NEGATIVE_INFINITY | POSITIVE_INFINITY>,
-  InfiniteNumber
->('=');
-expectType<NormalizeBrandUnion<NegativeNumber | PositiveNumber>, NonZeroNumber>(
-  '='
-);
+  expectType<Uint32, SafeUint>('<=');
+  expectType<Uint16, SafeUint>('<=');
+}
+
+{
+  // Cases that result in an empty set
+
+  expectType<NaNType & ValidNumber, never>('=');
+  expectType<NegativeNumber & NonNegativeNumber, never>('=');
+  expectType<NegativeNumber & PositiveNumber, never>('=');
+  expectType<NegativeInt & PositiveInt, never>('=');
+  expectType<NegativeSafeInt & PositiveSafeInt, never>('=');
+  expectType<NEGATIVE_INFINITY & POSITIVE_INFINITY, never>('=');
+  expectType<FiniteNumber & InfiniteNumber, never>('=');
+}
+
+{
+  // NormalizeBrandUnion
+
+  expectType<NormalizeBrandUnion<Uint16 | Uint32>, Uint32>('=');
+  expectType<
+    NormalizeBrandUnion<NEGATIVE_INFINITY | POSITIVE_INFINITY>,
+    InfiniteNumber
+  >('=');
+  expectType<
+    NormalizeBrandUnion<NegativeNumber | PositiveNumber>,
+    NonZeroNumber
+  >('=');
+  expectType<
+    NormalizeBrandUnion<NegativeNumber | NonNegativeNumber>,
+    ValidNumber
+  >('=');
+}
+
+{
+  expectType<SmallInt<'', 4>, -1 | -2 | -3 | -4 | 0 | 1 | 2 | 3>('=');
+  expectType<SmallInt<'<0', 4>, -1 | -2 | -3 | -4>('=');
+  expectType<SmallInt<'<=0', 4>, -1 | -2 | -3 | -4 | 0>('=');
+  expectType<SmallInt<'>=0', 4>, 0 | 1 | 2 | 3>('=');
+  expectType<SmallInt<'>0', 4>, 1 | 2 | 3>('=');
+}
+
+{
+  // SmallInt with default value
+
+  expectType<0, SmallInt<''>>('<=');
+  expectType<0, SmallInt<'<0'>>('!<=');
+  expectType<0, SmallInt<'<=0'>>('<=');
+  expectType<0, SmallInt<'>=0'>>('<=');
+  expectType<0, SmallInt<'>0'>>('!<=');
+
+  expectType<-1, SmallInt<''>>('<=');
+  expectType<-1, SmallInt<'<0'>>('<=');
+  expectType<-1, SmallInt<'<=0'>>('<=');
+  expectType<-1, SmallInt<'>=0'>>('!<=');
+  expectType<-1, SmallInt<'>0'>>('!<=');
+
+  expectType<511, SmallInt<''>>('<=');
+  expectType<511, SmallInt<'<0'>>('!<=');
+  expectType<511, SmallInt<'<=0'>>('!<=');
+  expectType<511, SmallInt<'>=0'>>('<=');
+  expectType<511, SmallInt<'>0'>>('<=');
+
+  expectType<512, SmallInt<''>>('!<=');
+  expectType<512, SmallInt<'<0'>>('!<=');
+  expectType<512, SmallInt<'<=0'>>('!<=');
+  expectType<512, SmallInt<'>=0'>>('!<=');
+  expectType<512, SmallInt<'>0'>>('!<=');
+
+  expectType<-512, SmallInt<''>>('<=');
+  expectType<-512, SmallInt<'<0'>>('<=');
+  expectType<-512, SmallInt<'<=0'>>('<=');
+  expectType<-512, SmallInt<'>=0'>>('!<=');
+  expectType<-512, SmallInt<'>0'>>('!<=');
+
+  expectType<-513, SmallInt<''>>('!<=');
+  expectType<-513, SmallInt<'<0'>>('!<=');
+  expectType<-513, SmallInt<'<=0'>>('!<=');
+  expectType<-513, SmallInt<'>=0'>>('!<=');
+  expectType<-513, SmallInt<'>0'>>('!<=');
+}
+
+{
+  expectType<WithSmallInt<Int>, Int | SmallInt>('=');
+  expectType<WithSmallInt<SafeInt>, SafeInt | SmallInt>('=');
+  expectType<WithSmallInt<Int32>, Int32 | SmallInt>('=');
+  expectType<WithSmallInt<Int16>, Int16 | SmallInt>('=');
+
+  expectType<WithSmallInt<NonZeroInt>, NonZeroInt | SmallInt<'!=0'>>('=');
+  expectType<WithSmallInt<NonZeroSafeInt>, NonZeroSafeInt | SmallInt<'!=0'>>(
+    '='
+  );
+
+  expectType<WithSmallInt<Uint>, SmallInt<'>=0'> | Uint>('=');
+  expectType<WithSmallInt<SafeUint>, SafeUint | SmallInt<'>=0'>>('=');
+  expectType<WithSmallInt<Uint32>, SmallInt<'>=0'> | Uint32>('=');
+  expectType<WithSmallInt<Uint16>, SmallInt<'>=0'> | Uint16>('=');
+
+  expectType<WithSmallInt<NegativeInt32>, NegativeInt32 | SmallInt<'<0'>>('=');
+  expectType<WithSmallInt<NegativeInt16>, NegativeInt16 | SmallInt<'<0'>>('=');
+}

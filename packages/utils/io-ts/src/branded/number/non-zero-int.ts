@@ -3,7 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = (a: number): a is NonZeroIntBrand =>
+const is = (a: number): a is NonZeroInt =>
   Number.isInteger(a) && Num.isNonZero(a);
 
 export const nonZeroInt = (defaultValue: number = 0): Type<NonZeroInt> => {
@@ -15,7 +15,7 @@ export const nonZeroInt = (defaultValue: number = 0): Type<NonZeroInt> => {
     codec: number(defaultValue),
     is,
     defaultValue,
-    brandKeys: ['Finite', 'Int'],
-    brandFalseKeys: ['NaN', 'Zero'],
+    brandKeys: ['Finite', 'Int', '!=0'],
+    brandFalseKeys: ['NaN'],
   } as const);
 };

@@ -20,7 +20,7 @@ export const answerIconPointConfig = {
     max: 9.9 satisfies AnswerIconPoint,
     defaultValue: defaultIconPoint.fair satisfies AnswerIconPoint,
   },
-  digit: 1,
+  digit: toSafeUint(1),
   defaultValue: 0 satisfies AnswerIconPoint,
 } as const satisfies NumericInputConfigBase &
   Readonly<{
@@ -31,7 +31,7 @@ export const weightNumericInputConfig = {
   step: toWeight(1),
   min: toWeight(0.1),
   max: toWeight(10),
-  digit: 1,
+  digit: toSafeUint(1),
   defaultValue: toWeight(1),
 } as const satisfies NumericInputConfigBase;
 
@@ -39,7 +39,7 @@ export const iconFilterNumericInputConfig = {
   step: 1,
   min: 0,
   max: Number.POSITIVE_INFINITY,
-  digit: 0,
+  digit: toSafeUint(0),
   defaultValue: 0,
 } as const satisfies NumericInputConfigBase;
 
@@ -48,7 +48,7 @@ export const answersScoreNumericInputConfig = {
   majorStep: 0.1 satisfies AnswersScore,
   min: 0 satisfies AnswersScore,
   max: 1 satisfies AnswersScore,
-  digit: 2,
+  digit: toSafeUint(2),
   defaultValue: 0 satisfies AnswersScore,
 } as const satisfies NumericInputConfigBase;
 

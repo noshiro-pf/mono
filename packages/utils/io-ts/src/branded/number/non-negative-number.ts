@@ -16,7 +16,7 @@ export const nonNegativeNumber = (
     codec: number(defaultValue),
     is,
     defaultValue,
-    brandKeys: ['NonNegative'],
+    brandKeys: ['>=0', '> -2^16', '> -2^32', '>= -2^15', '>= -2^31'],
     brandFalseKeys: ['NaN'],
   } as const);
 };

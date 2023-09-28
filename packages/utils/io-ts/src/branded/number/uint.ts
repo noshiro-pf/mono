@@ -3,7 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = (a: number): a is UintBrand =>
+const is = (a: number): a is Uint =>
   !Number.isNaN(a) && Number.isInteger(a) && Num.isNonNegative(a);
 
 export const uint = (defaultValue: number = 0): Type<Uint> => {
@@ -15,7 +15,15 @@ export const uint = (defaultValue: number = 0): Type<Uint> => {
     codec: number(defaultValue),
     is,
     defaultValue,
-    brandKeys: ['Finite', 'NonNegative', 'Int'],
+    brandKeys: [
+      'Finite',
+      'Int',
+      '> -2^32',
+      '>= -2^31',
+      '> -2^16',
+      '>= -2^15',
+      '>=0',
+    ],
     brandFalseKeys: ['NaN'],
   } as const);
 };

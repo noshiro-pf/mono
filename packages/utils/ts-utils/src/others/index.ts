@@ -1,5 +1,6 @@
 export * from './aliases';
 export * from './cast-readonly';
+export * from './cast-remove-small-int';
 export * from './cast-writable';
 export * from './id-fn';
 export * from './if-then';

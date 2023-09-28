@@ -1,44 +1,14 @@
-import { expectType } from '../../expect-type';
 import { Num } from '../num';
-
-/** return type */
-type T = Int16;
-
-/** non-negative type */
-type Abs = IntersectBrand<Int16Brand, NonNegativeNumber> | SmallUint;
-
-/** denominator type */
-type D = Exclude<SmallInt, 0> | IntersectBrand<Int16Brand, NonZeroNumber>;
-
-expectType<
-  Abs,
-  | Brand<
-      number,
-      'Finite' | 'Int' | 'Int16' | 'Int32' | 'NonNegative' | 'SafeInt',
-      'NaN'
-    >
-  | SmallUint
->('=');
-
-expectType<
-  D,
-  | Brand<
-      number,
-      'Finite' | 'Int' | 'Int16' | 'Int32' | 'SafeInt',
-      'NaN' | 'Zero'
-    >
-  | Exclude<SmallInt, 0>
->('=');
 
 const MIN_VALUE = -(2 ** 15);
 const MAX_VALUE = 2 ** 15 - 1;
 
 const isInt16Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
-export const isInt16 = (a: number): a is T =>
+export const isInt16 = (a: number): a is Int16 =>
   Number.isInteger(a) && isInt16Range(a);
 
-export const toInt16 = (a: number): T => {
+export const toInt16 = (a: number): Int16 => {
   if (!isInt16(a)) {
     throw new TypeError(`Expected integer in [-2^15, 2^15), got: ${a}`);
   }
@@ -48,48 +18,57 @@ export const toInt16 = (a: number): T => {
 const to = toInt16;
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): T => to(Math.round(_c(a)));
+const clamp = (a: number): Int16 => to(Math.round(_c(a)));
 
-const abs = (x: T): Abs => to(Math.abs(x)) as Abs;
+const abs = (x: Int16WithSmallInt): IntersectBrand<Int16, NonNegativeNumber> =>
+  Math.abs(to(x));
 
-const max = (...values: readonly T[]): T => to(Math.max(...values));
-const min = (...values: readonly T[]): T => to(Math.min(...values));
+const _min = (...values: readonly Int16WithSmallInt[]): Int16 =>
+  to(Math.min(...values));
 
-const pow = (x: T, y: T): T => clamp(x ** y);
+const _max = (...values: readonly Int16WithSmallInt[]): Int16 =>
+  to(Math.max(...values));
 
-const add = (x: T, y: T): T => clamp(x + y);
+const pow = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 =>
+  clamp(x ** y);
 
-const sub = (x: T, y: T): T => clamp(x - y);
+const add = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x + y);
 
-const mul = (x: T, y: T): T => clamp(x * y);
+const sub = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x - y);
 
-const div = (x: T, y: D): T => clamp(Math.floor(x / y));
+const mul = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x * y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: T, max: T): T =>
+const div = (
+  x: Int16WithSmallInt,
+  y: WithSmallInt<IntersectBrand<Int16, NonZeroNumber>>
+): Int16 => clamp(Math.floor(x / y));
+
+const random = (min: Int16WithSmallInt, max: Int16WithSmallInt): Int16 =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const Int16 = {
   MIN_VALUE,
   MAX_VALUE,
   abs,
-  max,
-  min,
+
+  min: _min,
+  max: _max,
   clamp,
+
   random,
 
-  /** @returns a ** b, but clamped to [-2^15, 2^15) */
+  /** @returns `a ** b`, but clamped to `[-2^15, 2^15)` */
   pow,
 
-  /** @returns a + b, but clamped to [-2^15, 2^15) */
+  /** @returns `a + b`, but clamped to `[-2^15, 2^15)` */
   add,
 
-  /** @returns a - b, but clamped to [-2^15, 2^15) */
+  /** @returns `a - b`, but clamped to `[-2^15, 2^15)` */
   sub,
 
-  /** @returns a * b, but clamped to [-2^15, 2^15) */
+  /** @returns `a * b`, but clamped to `[-2^15, 2^15)` */
   mul,
 
-  /** @returns ⌊a / b⌋, but clamped to [-2^15, 2^15) */
+  /** @returns `⌊a / b⌋`, but clamped to `[-2^15, 2^15)` */
   div,
 } as const;

@@ -1,4 +1,4 @@
-import { SafeUint } from '../num';
+import { SafeUint, toSafeUint } from '../num';
 
 export type Queue<T> = Readonly<{
   isEmpty: boolean;
@@ -9,7 +9,7 @@ export type Queue<T> = Readonly<{
 
 class QueueClass<T> implements Queue<T> {
   readonly #data: T[] = [];
-  #mut_size: SafeUint = 0;
+  #mut_size: SafeUint = toSafeUint(0);
 
   get isEmpty(): boolean {
     return this.size === 0;

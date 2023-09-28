@@ -11,11 +11,12 @@ export type NegativeIndex<N extends number> = _NegativeIndexImpl.MapIdx<
 /** @internal */
 namespace _NegativeIndexImpl {
   /** @internal */
-  type ToNumberFromNegative<S extends `-${number}`> =
-    S extends `${infer N extends number}` ? N : never;
+  type ToNumber<S extends `-${number}`> = S extends `${infer N extends number}`
+    ? N
+    : never;
 
   /** @internal */
   export type MapIdx<I extends number> = I extends I
-    ? ToNumberFromNegative<`-${I}`>
+    ? ToNumber<`-${I}`>
     : never;
 }

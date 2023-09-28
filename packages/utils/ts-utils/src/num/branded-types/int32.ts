@@ -1,36 +1,14 @@
-import { expectType } from '../../expect-type';
 import { Num } from '../num';
-
-/** return type */
-type T = Int32;
-
-/** non-negative type */
-type Abs = IntersectBrand<Int32Brand, NonNegativeNumber> | SmallUint;
-
-/** denominator type */
-type D = Exclude<SmallInt, 0> | IntersectBrand<Int32Brand, NonZeroNumber>;
-
-expectType<
-  Abs,
-  | Brand<number, 'Finite' | 'Int' | 'Int32' | 'NonNegative' | 'SafeInt', 'NaN'>
-  | SmallUint
->('=');
-
-expectType<
-  D,
-  | Brand<number, 'Finite' | 'Int' | 'Int32' | 'SafeInt', 'NaN' | 'Zero'>
-  | Exclude<SmallInt, 0>
->('=');
 
 const MIN_VALUE = -(2 ** 31);
 const MAX_VALUE = 2 ** 31 - 1;
 
 const isInt32Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
 
-export const isInt32 = (a: number): a is T =>
+export const isInt32 = (a: number): a is Int32 =>
   Number.isInteger(a) && isInt32Range(a);
 
-export const toInt32 = (a: number): T => {
+export const toInt32 = (a: number): Int32 => {
   if (!isInt32(a)) {
     throw new TypeError(`Expected integer in [-2^31, 2^31), got: ${a}`);
   }
@@ -40,48 +18,57 @@ export const toInt32 = (a: number): T => {
 const to = toInt32;
 
 const _c = Num.clamp(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): T => to(Math.round(_c(a)));
+const clamp = (a: number): Int32 => to(Math.round(_c(a)));
 
-const abs = (x: T): Abs => to(Math.abs(x)) as Abs;
+const abs = (x: Int32WithSmallInt): IntersectBrand<Int32, NonNegativeNumber> =>
+  Math.abs(to(x));
 
-const max = (...values: readonly T[]): T => to(Math.max(...values));
-const min = (...values: readonly T[]): T => to(Math.min(...values));
+const _min = (...values: readonly Int32WithSmallInt[]): Int32 =>
+  to(Math.min(...values));
 
-const pow = (x: T, y: T): T => clamp(x ** y);
+const _max = (...values: readonly Int32WithSmallInt[]): Int32 =>
+  to(Math.max(...values));
 
-const add = (x: T, y: T): T => clamp(x + y);
+const pow = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 =>
+  clamp(x ** y);
 
-const sub = (x: T, y: T): T => clamp(x - y);
+const add = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x + y);
 
-const mul = (x: T, y: T): T => clamp(x * y);
+const sub = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x - y);
 
-const div = (x: T, y: D): T => clamp(Math.floor(x / y));
+const mul = (x: Int32WithSmallInt, y: Int32WithSmallInt): Int32 => clamp(x * y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: T, max: T): T =>
+const div = (
+  x: Int32WithSmallInt,
+  y: WithSmallInt<IntersectBrand<Int32, NonZeroNumber>>
+): Int32 => clamp(Math.floor(x / y));
+
+const random = (min: Int32WithSmallInt, max: Int32WithSmallInt): Int32 =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const Int32 = {
   MIN_VALUE,
   MAX_VALUE,
   abs,
-  max,
-  min,
+
+  min: _min,
+  max: _max,
   clamp,
+
   random,
 
-  /** @returns a ** b, but clamped to [-2^31, 2^31) */
+  /** @returns `a ** b`, but clamped to `[-2^31, 2^31)` */
   pow,
 
-  /** @returns a + b, but clamped to [-2^31, 2^31) */
+  /** @returns `a + b`, but clamped to `[-2^31, 2^31)` */
   add,
 
-  /** @returns a - b, but clamped to [-2^31, 2^31) */
+  /** @returns `a - b`, but clamped to `[-2^31, 2^31)` */
   sub,
 
-  /** @returns a * b, but clamped to [-2^31, 2^31) */
+  /** @returns `a * b`, but clamped to `[-2^31, 2^31)` */
   mul,
 
-  /** @returns ⌊a / b⌋, but clamped to [-2^31, 2^31) */
+  /** @returns `⌊a / b⌋`, but clamped to `[-2^31, 2^31)` */
   div,
 } as const;

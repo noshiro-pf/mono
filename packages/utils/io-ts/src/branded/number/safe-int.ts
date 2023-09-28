@@ -2,7 +2,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = Number.isSafeInteger as (u: number) => u is SafeIntBrand;
+const is = Number.isSafeInteger;
 
 export const safeInt = (defaultValue: number = 0): Type<SafeInt> => {
   if (!is(defaultValue)) {

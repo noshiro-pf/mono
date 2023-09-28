@@ -1,13 +1,4 @@
-/** return type */
-type T = FiniteNumber;
-
-/** non-negative type */
-type Abs = NonNegativeNumber;
-
-/** denominator type */
-type D = NonZeroNumber;
-
-export const toFiniteNumber = (a: number): T => {
+export const toFiniteNumber = (a: number): FiniteNumber => {
   if (!Number.isFinite(a)) {
     throw new TypeError(`Expected finite number, got: ${a}`);
   }
@@ -16,40 +7,58 @@ export const toFiniteNumber = (a: number): T => {
 
 const to = toFiniteNumber;
 
-const abs = (x: T): Abs => Math.abs(x);
+const abs = (x: FiniteNumber): NonNegativeFiniteNumber => Math.abs(x);
 
-const max = (...values: readonly T[]): T => to(Math.max(...values));
-const min = (...values: readonly T[]): T => to(Math.min(...values));
+const _min = (...values: readonly FiniteNumber[]): FiniteNumber =>
+  to(Math.min(...values));
 
-const pow = (x: T, y: T): T => to(x ** y);
+const _max = (...values: readonly FiniteNumber[]): FiniteNumber =>
+  to(Math.max(...values));
 
-const add = (x: T, y: T): T => to(x + y);
+const pow = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x ** y);
 
-const sub = (x: T, y: T): T => to(x - y);
+const add = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x + y);
 
-const mul = (x: T, y: T): T => to(x * y);
+const sub = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x - y);
 
-const div = (x: T, y: D): T => to(Math.floor(x / y));
+const mul = (x: FiniteNumber, y: FiniteNumber): FiniteNumber => to(x * y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: T, max: T): T =>
-  add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
+const div = (x: FiniteNumber, y: NonZeroFiniteNumber): FiniteNumber =>
+  Math.floor(toFiniteNumber(x / y));
 
-const floor = (x: T): T => to(Math.floor(x));
-const ceil = (x: T): T => to(Math.ceil(x));
-const round = (x: T): T => to(Math.round(x));
+const random = (min: FiniteNumber, max: FiniteNumber): FiniteNumber =>
+  add(
+    min,
+    Math.floor(toFiniteNumber((Math.max(max, min) - min + 1) * Math.random()))
+  );
+
+const floor = (x: FiniteNumber): Int => Math.floor(x);
+const ceil = (x: FiniteNumber): Int => Math.ceil(x);
+const round = (x: FiniteNumber): Int => Math.round(x);
 
 export const FiniteNumber = {
   abs,
-  max,
-  min,
-  pow,
-  add,
-  sub,
-  mul,
-  div,
-  random,
+
+  min: _min,
+  max: _max,
+
   floor,
   ceil,
   round,
+  random,
+
+  /** @returns `a ** b` */
+  pow,
+
+  /** @returns `a + b` */
+  add,
+
+  /** @returns `a - b` */
+  sub,
+
+  /** @returns `a * b` */
+  mul,
+
+  /** @returns `a / b` */
+  div,
 } as const;

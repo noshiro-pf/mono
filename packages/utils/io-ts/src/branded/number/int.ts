@@ -2,7 +2,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = Number.isInteger as (u: number) => u is IntBrand;
+const is = Number.isInteger;
 
 export const int = (defaultValue: number = 0): Type<Int> => {
   if (!is(defaultValue)) {

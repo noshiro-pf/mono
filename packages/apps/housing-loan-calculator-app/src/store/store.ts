@@ -40,7 +40,7 @@ const setPropertyPriceManYen = (value: Yen): void => {
 
 // 借入期間（年）
 const { state$: borrowingPeriodYear$, setState: _setBorrowingPeriodYear } =
-  createState<YearEnum>(defaultValues.borrowingPeriodYear);
+  createState<YearEnum>(toSafeUint(defaultValues.borrowingPeriodYear));
 
 const setBorrowingPeriodYear = (value: YearEnum): void => {
   _setBorrowingPeriodYear(value);
