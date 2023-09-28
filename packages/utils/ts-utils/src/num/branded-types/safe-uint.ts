@@ -1,27 +1,14 @@
-import { expectType } from '../../expect-type';
 import { Num } from '../num';
-
-/** return type */
-type T = SafeUint;
-
-/** denominator type */
-type D = Exclude<SmallUint, 0> | IntersectBrand<SafeUintBrand, NonZeroNumber>;
-
-expectType<
-  D,
-  | Brand<number, 'Finite' | 'Int' | 'NonNegative' | 'SafeInt', 'NaN' | 'Zero'>
-  | Exclude<SmallUint, 0>
->('=');
 
 const MIN_VALUE = 0;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
-export const isSafeUint = (a: number): a is T =>
+export const isSafeUint = (a: number): a is SafeUint =>
   Number.isSafeInteger(a) && Num.isNonNegative(a);
 
-export const toSafeUint = (a: number): T => {
+export const toSafeUint = (a: number): SafeUint => {
   if (!isSafeUint(a)) {
-    throw new TypeError(`Expected safe non-negative integer, got: ${a}`);
+    throw new TypeError(`Expected non-negative safe integer, got: ${a}`);
   }
   return a;
 };
@@ -29,45 +16,59 @@ export const toSafeUint = (a: number): T => {
 const to = toSafeUint;
 
 const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): T => to(Math.round(_c(a)));
+const clamp = (a: number): SafeUint => to(Math.round(_c(a)));
 
-const max = (...values: readonly T[]): T => to(Math.max(...values));
-const min = (...values: readonly T[]): T => to(Math.min(...values));
+const _min = (...values: readonly SafeUintWithSmallInt[]): SafeUint =>
+  to(Math.min(...values));
 
-const pow = (x: T, y: T): T => clamp(x ** y);
+const _max = (...values: readonly SafeUintWithSmallInt[]): SafeUint =>
+  to(Math.max(...values));
 
-const add = (x: T, y: T): T => clamp(x + y);
+const pow = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
+  clamp(x ** y);
 
-const sub = (x: T, y: T): T => clamp(x - y);
+const add = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
+  clamp(x + y);
 
-const mul = (x: T, y: T): T => clamp(x * y);
+const sub = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
+  clamp(x - y);
 
-const div = (x: T, y: D): T => clamp(Math.floor(x / y));
+const mul = (x: SafeUintWithSmallInt, y: SafeUintWithSmallInt): SafeUint =>
+  clamp(x * y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: T, max: T): T =>
+const div = (
+  x: SafeUintWithSmallInt,
+  y: PositiveSafeIntWithSmallInt
+): SafeUint => clamp(Math.floor(x / y));
+
+const random = (
+  min: SafeUintWithSmallInt,
+  max: SafeUintWithSmallInt
+): SafeUint =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const SafeUint = {
   MIN_VALUE,
   MAX_VALUE,
-  max,
-  min,
+
+  min: _min,
+  max: _max,
   clamp,
+
   random,
 
-  /** @returns a ** b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a ** b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
   pow,
 
-  /** @returns a + b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a + b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
   add,
 
-  /** @returns a - b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a - b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
   sub,
 
-  /** @returns a * b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a * b`, but clamped to `[0, MAX_SAFE_INTEGER]` */
   mul,
 
-  /** @returns ⌊a / b⌋, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `⌊a / b⌋`, but clamped to `[0, MAX_SAFE_INTEGER]` */
   div,
 } as const;

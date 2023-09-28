@@ -29,7 +29,7 @@ const labelNames = [
 type LabelLen = (typeof labelNames)['length'];
 
 const hues = pickupHighContrastHues(
-  Arr.length(labelNames),
+  labelNames.length,
   saturationDarker,
   lightnessDarker
 ) as ArrayOfLength<LabelLen, Hue>;

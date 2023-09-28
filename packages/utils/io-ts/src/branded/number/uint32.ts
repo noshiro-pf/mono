@@ -3,7 +3,7 @@ import { number } from '../../primitives';
 import { type Type } from '../../type';
 import { brand } from '../brand';
 
-const is = isUint32 as (u: number) => u is Uint32Brand;
+const is = isUint32 as (u: number) => u is Uint32;
 
 export const uint32 = (defaultValue: number = 0): Type<Uint32> => {
   if (!is(defaultValue)) {
@@ -16,7 +16,17 @@ export const uint32 = (defaultValue: number = 0): Type<Uint32> => {
     codec: number(defaultValue),
     is,
     defaultValue,
-    brandKeys: ['Finite', 'Int', 'NonNegative', 'SafeInt', 'Uint32'],
+    brandKeys: [
+      'Finite',
+      'Int',
+      'SafeInt',
+      '> -2^16',
+      '> -2^32',
+      '>= -2^15',
+      '>= -2^31',
+      '>=0',
+      '< 2^32',
+    ],
     brandFalseKeys: ['NaN'],
   } as const);
 };

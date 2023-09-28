@@ -1,63 +1,56 @@
 import { Num } from '../num';
 
-/** return type */
-type T = Int8;
-
-/** arg type */
-type A = T;
-
-/** non-negative type */
-type Abs = Exclude<Int8, NegativeIndex<128>>;
-
-/** denominator type */
-type D = Exclude<Int8, 0>;
-
 const MIN_VALUE = -128;
 const MAX_VALUE = 127;
 
-const isInInt8Range = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
+const _r = Num.isInRangeInclusive(MIN_VALUE, MAX_VALUE);
+const isInInt8Range = (a: number): a is Int8 => Number.isInteger(a) && _r(a);
 
 export const toInt8 = (a: number): Int8 => {
-  if (!Number.isInteger(a) || !isInInt8Range(a)) {
+  if (!isInInt8Range(a)) {
     throw new TypeError(
       `Expected integer in [${MIN_VALUE}, ${MAX_VALUE}], got: ${a}`
     );
   }
-  return a as Int8;
+  return a;
 };
 
 const to = toInt8;
 
 const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): T => to(Math.round(_c(a)));
+const clamp = (a: number): Int8 => to(Math.round(_c(a)));
 
-const abs = (x: A): Abs => to(Math.abs(x)) as Abs;
+type Abs = Index<129>;
 
-const max = (...values: readonly A[]): T => to(Math.max(...values));
-const min = (...values: readonly A[]): T => to(Math.min(...values));
+const abs = (x: Int8): Abs => Math.abs(x);
 
-const pow = (x: A, y: A): T => clamp(x ** y);
+const _min = (...values: readonly Int8[]): Int8 => to(Math.min(...values));
 
-const add = (x: A, y: A): T => clamp(x + y);
+const _max = (...values: readonly Int8[]): Int8 => to(Math.max(...values));
 
-const sub = (x: A, y: A): T => clamp(x - y);
+const pow = (x: Int8, y: Int8): Int8 => clamp(x ** y);
 
-const mul = (x: A, y: A): T => clamp(x * y);
+const add = (x: Int8, y: Int8): Int8 => clamp(x + y);
 
-const div = (x: A, y: D): T => clamp(Math.floor(x / y));
+const sub = (x: Int8, y: Int8): Int8 => clamp(x - y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: A, max: A): T =>
+const mul = (x: Int8, y: Int8): Int8 => clamp(x * y);
+
+const div = (x: Int8, y: Exclude<Int8, 0>): Int8 => clamp(Math.floor(x / y));
+
+const random = (min: Int8, max: Int8): Int8 =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const Int8 = {
   MIN_VALUE,
   MAX_VALUE,
-  max,
-  min,
+
+  min: _min,
+  max: _max,
+  clamp,
+
   abs,
   random,
-  clamp,
 
   /** @returns a ** b, but clamped to [-128, 127] */
   pow,

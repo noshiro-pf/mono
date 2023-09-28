@@ -1,18 +1,10 @@
 import { Num } from '../num';
-
-/** return type */
-type T = SafeInt;
-
-/** non-negative type */
-type Abs = SafeUint;
-
-/** denominator type */
-type D = NonZeroSafeInt;
+import { toFiniteNumber } from './finite-number';
 
 const MIN_VALUE = Number.MIN_SAFE_INTEGER;
 const MAX_VALUE = Number.MAX_SAFE_INTEGER;
 
-export const toSafeInt = (a: number): T => {
+export const toSafeInt = (a: number): SafeInt => {
   if (!Number.isSafeInteger(a)) {
     throw new TypeError(`Expected safe integer, got: ${a}`);
   }
@@ -22,48 +14,57 @@ export const toSafeInt = (a: number): T => {
 const to = toSafeInt;
 
 const _c = Num.clamp<number>(MIN_VALUE, MAX_VALUE);
-const clamp = (a: number): T => to(Math.round(_c(a)));
+const clamp = (a: number): SafeInt => to(Math.round(_c(a)));
 
-const abs = (x: T): Abs => to(Math.abs(x)) as Abs;
+const abs = (x: SafeIntWithSmallInt): SafeUint => Math.abs(to(x));
 
-const max = (...values: readonly T[]): T => to(Math.max(...values));
-const min = (...values: readonly T[]): T => to(Math.min(...values));
+const _min = (...values: readonly SafeIntWithSmallInt[]): SafeInt =>
+  to(Math.min(...values));
 
-const pow = (x: T, y: T): T => clamp(x ** y);
+const _max = (...values: readonly SafeIntWithSmallInt[]): SafeInt =>
+  to(Math.max(...values));
 
-const add = (x: T, y: T): T => clamp(x + y);
+const pow = (x: SafeIntWithSmallInt, y: SafeIntWithSmallInt): SafeInt =>
+  clamp(x ** y);
 
-const sub = (x: T, y: T): T => clamp(x - y);
+const add = (x: SafeIntWithSmallInt, y: SafeIntWithSmallInt): SafeInt =>
+  clamp(x + y);
 
-const mul = (x: T, y: T): T => clamp(x * y);
+const sub = (x: SafeIntWithSmallInt, y: SafeIntWithSmallInt): SafeInt =>
+  clamp(x - y);
 
-const div = (x: T, y: D): T => clamp(Math.floor(x / y));
+const mul = (x: SafeIntWithSmallInt, y: SafeIntWithSmallInt): SafeInt =>
+  clamp(x * y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: T, max: T): T =>
+const div = (x: SafeIntWithSmallInt, y: NonZeroSafeIntWithSmallInt): SafeInt =>
+  clamp(Math.floor(toFiniteNumber(x / y)));
+
+const random = (min: SafeIntWithSmallInt, max: SafeIntWithSmallInt): SafeInt =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const SafeInt = {
   MIN_VALUE,
   MAX_VALUE,
   abs,
-  max,
-  min,
+
+  min: _min,
+  max: _max,
   clamp,
+
   random,
 
-  /** @returns a ** b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
+  /** @returns `a ** b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   pow,
 
-  /** @returns a + b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
+  /** @returns `a + b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   add,
 
-  /** @returns a - b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
+  /** @returns `a - b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   sub,
 
-  /** @returns a * b, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
+  /** @returns `a * b`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   mul,
 
-  /** @returns ⌊a / b⌋, but clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] */
+  /** @returns `⌊a / b⌋`, but clamped to `[MIN_SAFE_INTEGER, MAX_SAFE_INTEGER]` */
   div,
 } as const;

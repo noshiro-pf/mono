@@ -16,7 +16,7 @@ export const nonZeroNumber = (
     codec: number(defaultValue),
     is,
     defaultValue,
-    brandKeys: [],
-    brandFalseKeys: ['NaN', 'Zero'],
+    brandKeys: ['!=0'],
+    brandFalseKeys: ['NaN'],
   } as const);
 };

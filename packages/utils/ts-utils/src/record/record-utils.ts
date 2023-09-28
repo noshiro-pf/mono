@@ -20,7 +20,7 @@ const update = <R extends RecordBase, K extends keyof R>(
 const UNSAFE_getIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
-  index: SafeUint
+  index: SafeUintWithSmallInt
 ): unknown =>
   index >= keyPath.length
     ? obj
@@ -44,7 +44,7 @@ const getIn = <R extends RecordBase, Path extends Paths<R>>(
 const UNSAFE_updateIn_impl = (
   obj: RecordBase,
   keyPath: readonly (number | string)[],
-  index: SafeUint,
+  index: SafeUintWithSmallInt,
   updater: (prev: unknown) => unknown
 ): unknown =>
   index >= keyPath.length

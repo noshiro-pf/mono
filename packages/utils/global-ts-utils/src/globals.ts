@@ -7,52 +7,35 @@
 import {
   Arr,
   ArrayUtils,
-  DateUtils,
-  FiniteNumber,
-  IMap,
-  IMapMapped,
-  ISet,
-  ISetMapped,
-  Int,
-  Int16,
-  Int32,
-  Int8,
-  Json,
-  Maybe,
-  MutableMap,
-  MutableSet,
-  NonNegativeNumber,
-  Num,
-  Obj,
-  RecordUtils,
-  Result,
-  SafeInt,
-  SafeUint,
-  Str,
-  Tpl,
-  TupleUtils,
-  Uint,
-  Uint16,
-  Uint32,
-  Uint8,
   assertNotUndefined,
   castDeepReadonly,
   castDeepWritable,
   castReadonly,
+  castRemoveSmallInt,
   castWritable,
   createQueue,
   createTinyObservable,
+  DateUtils,
   expectType,
+  FiniteNumber,
   hasKeyValue,
   idfn,
   ifThen,
+  IMap,
+  IMapMapped,
+  Int,
+  Int16,
+  Int32,
+  Int8,
   isBigint,
   isBoolean,
+  ISet,
+  ISetMapped,
   isInt16,
   isInt32,
-  isNonNegative,
-  isNonNullObject,
+  isNonNegativeFiniteNumber,
   isNonNullish,
+  isNonNullObject,
   isNotBigint,
   isNotBoolean,
   isNotNull,
@@ -63,6 +46,9 @@ import {
   isNull,
   isNullish,
   isNumber,
+  isPositiveFiniteNumber,
+  isPositiveInt,
+  isPositiveSafeInt,
   isPrimitive,
   isRecord,
   isSafeUint,
@@ -72,20 +58,39 @@ import {
   isUint16,
   isUint32,
   isUndefined,
+  Json,
+  keyIsIn,
   mapOptional,
   mapOptionalC,
   match,
+  Maybe,
   memoizeFunction,
+  MutableMap,
+  MutableSet,
+  NonNegativeNumber,
   noop,
+  Num,
+  Obj,
   pipe,
+  PositiveInt,
+  PositiveNumber,
+  PositiveSafeInt,
   range,
+  RecordUtils,
+  Result,
+  SafeInt,
+  SafeUint,
+  Str,
   toBoolean,
   toFiniteNumber,
   toInt,
   toInt16,
   toInt32,
   toInt8,
-  toNonNegativeNumber,
+  toNonNegativeFiniteNumber,
+  toPositiveFiniteNumber,
+  toPositiveInt,
+  toPositiveSafeInt,
   toSafeInt,
   toSafeUint,
   toUint,
@@ -93,15 +98,22 @@ import {
   toUint32,
   toUint8,
   tp,
+  Tpl,
+  TupleUtils,
+  Uint,
+  Uint16,
+  Uint32,
+  Uint8,
 } from '@noshiro/ts-utils';
 
 (global as any).Arr = Arr;
 (global as any).ArrayUtils = ArrayUtils;
 (global as any).assertNotUndefined = assertNotUndefined;
-(global as any).castWritable = castWritable;
+(global as any).castDeepReadonly = castDeepReadonly;
 (global as any).castDeepWritable = castDeepWritable;
 (global as any).castReadonly = castReadonly;
-(global as any).castDeepReadonly = castDeepReadonly;
+(global as any).castRemoveSmallInt = castRemoveSmallInt;
+(global as any).castWritable = castWritable;
 (global as any).createQueue = createQueue;
 (global as any).createTinyObservable = createTinyObservable;
 (global as any).DateUtils = DateUtils;
@@ -122,7 +134,7 @@ import {
 (global as any).ISetMapped = ISetMapped;
 (global as any).isInt16 = isInt16;
 (global as any).isInt32 = isInt32;
-(global as any).isNonNegative = isNonNegative;
+(global as any).isNonNegativeFiniteNumber = isNonNegativeFiniteNumber;
 (global as any).isNonNullish = isNonNullish;
 (global as any).isNonNullObject = isNonNullObject;
 (global as any).isNotBigint = isNotBigint;
@@ -135,6 +147,9 @@ import {
 (global as any).isNull = isNull;
 (global as any).isNullish = isNullish;
 (global as any).isNumber = isNumber;
+(global as any).isPositiveFiniteNumber = isPositiveFiniteNumber;
+(global as any).isPositiveInt = isPositiveInt;
+(global as any).isPositiveSafeInt = isPositiveSafeInt;
 (global as any).isPrimitive = isPrimitive;
 (global as any).isRecord = isRecord;
 (global as any).isSafeUint = isSafeUint;
@@ -145,6 +160,7 @@ import {
 (global as any).isUint32 = isUint32;
 (global as any).isUndefined = isUndefined;
 (global as any).Json = Json;
+(global as any).keyIsIn = keyIsIn;
 (global as any).mapOptional = mapOptional;
 (global as any).mapOptionalC = mapOptionalC;
 (global as any).match = match;
@@ -157,6 +173,9 @@ import {
 (global as any).Num = Num;
 (global as any).Obj = Obj;
 (global as any).pipe = pipe;
+(global as any).PositiveInt = PositiveInt;
+(global as any).PositiveNumber = PositiveNumber;
+(global as any).PositiveSafeInt = PositiveSafeInt;
 (global as any).range = range;
 (global as any).RecordUtils = RecordUtils;
 (global as any).Result = Result;
@@ -169,7 +188,10 @@ import {
 (global as any).toInt16 = toInt16;
 (global as any).toInt32 = toInt32;
 (global as any).toInt8 = toInt8;
-(global as any).toNonNegativeNumber = toNonNegativeNumber;
+(global as any).toNonNegativeFiniteNumber = toNonNegativeFiniteNumber;
+(global as any).toPositiveFiniteNumber = toPositiveFiniteNumber;
+(global as any).toPositiveInt = toPositiveInt;
+(global as any).toPositiveSafeInt = toPositiveSafeInt;
 (global as any).toSafeInt = toSafeInt;
 (global as any).toSafeUint = toSafeUint;
 (global as any).toUint = toUint;

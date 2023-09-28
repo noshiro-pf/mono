@@ -1,204 +1,303 @@
-import { type Brand } from './brand';
+import {
+  type Brand,
+  type ChangeBaseBrand,
+  type ExtendBrand,
+  type GetBrandValuePart,
+  type IntersectBrand,
+  type UnwrapBrandFalseKeys,
+  type UnwrapBrandTrueKeys,
+} from './brand';
 import { type Index, type NegativeIndex } from './index-type';
+import { type RelaxedExclude, type TypeEq } from './utils';
 
 /** @internal */
-type SmallIntIndexMax = 512;
-
-export type SmallUint = Index<SmallIntIndexMax>;
-export type SmallNegativeInt = NegativeIndex<SmallIntIndexMax>;
-export type SmallInt = SmallNegativeInt | SmallUint;
-export type NonZeroSmallInt = Exclude<SmallInt, 0>;
-
-// number type classes
-
-/** @internal */
-type _NaNKey = 'NaN';
-/** @internal */
-type _FiniteKey = 'Finite';
-/** @internal */
-type _ZeroKey = 'Zero';
-/** @internal */
-type _NonNegativeKey = 'NonNegative';
-
-// integer type classes
+type _IntRangeKeys =
+  | '< 2^15'
+  | '< 2^16'
+  | '< 2^31'
+  | '< 2^32'
+  | '> -2^16'
+  | '> -2^32'
+  | '>= -2^15'
+  | '>= -2^31'
+  | '>=0';
 
 /** @internal */
-type _IntKey = _FiniteKey | 'Int';
-/** @internal */
-type _SafeIntKey = _IntKey | 'SafeInt';
-/** @internal */
-type _Int32Key = _SafeIntKey | 'Int32';
-/** @internal */
-type _Int16Key = _Int32Key | 'Int16';
-/** @internal */
-type _Uint32Key = _NonNegativeKey | _SafeIntKey | 'Uint32';
-/** @internal */
-type _Uint16Key = _Uint32Key | 'Uint16';
-/** @internal */
-type _NegativeUint32Key = _SafeIntKey | 'NegativeUint32';
-/** @internal */
-type _NegativeUint16Key = _NegativeUint32Key | 'NegativeUint16';
+type _Keys =
+  | _IntRangeKeys
+  | '!=0'
+  | 'Finite'
+  | 'Float32'
+  | 'Float64'
+  | 'Int'
+  | 'NaN'
+  | 'SafeInt';
 
 /** @internal */
-type _Float32Key = 'Float32';
-/** @internal */
-type _Float64Key = 'Float64';
-/** @internal */
-type _BigInt64Key = 'BigInt64';
-/** @internal */
-type _BigUint64Key = 'BigUint64';
+type _BrandedNumberBaseType = Brand<number, never, never>;
 
-/** Numeric brand type for `NaN` */
-export type NaNType = Brand<
-  number,
-  _NaNKey,
-  _FiniteKey | _NonNegativeKey | _ZeroKey
+/** @internal */
+type _ExtendNumberBrand<
+  B extends _BrandedNumberBaseType,
+  T extends RelaxedExclude<_Keys, UnwrapBrandTrueKeys<B>>,
+  F extends RelaxedExclude<_Keys, T | UnwrapBrandFalseKeys<B>> = never
+> = Brand<
+  GetBrandValuePart<B>,
+  T | (UnwrapBrandTrueKeys<B> & string),
+  F | (UnwrapBrandFalseKeys<B> & string)
 >;
 
-/** Numeric brand type after checking with `Number.isFinite(x)` */
-export type FiniteNumber = Brand<number, _FiniteKey, _NaNKey>;
+/** Numeric brand type for `NaN` */
+export type NaNType = _ExtendNumberBrand<
+  _BrandedNumberBaseType,
+  '!=0' | 'NaN',
+  _IntRangeKeys | '>=0' | 'Finite' | 'Int' | 'SafeInt'
+>;
+
+/** Numeric brand type for numbers except `NaN` */
+export type ValidNumber = _ExtendNumberBrand<
+  _BrandedNumberBaseType,
+  never,
+  'NaN'
+>;
+
+/** Numeric brand type for value after checking with `Number.isFinite(x)` */
+export type FiniteNumber = _ExtendNumberBrand<ValidNumber, 'Finite'>;
 
 /** Numeric brand type for `Infinity` */
-export type InfiniteNumber = Brand<
-  number,
-  never,
-  _FiniteKey | _NaNKey | _ZeroKey
+export type InfiniteNumber = _ExtendNumberBrand<
+  ValidNumber,
+  '!=0',
+  'Finite' | 'Int' | 'SafeInt'
+>;
+
+/** Numeric brand type for value after checking with `x != 0` */
+export type NonZeroNumber = _ExtendNumberBrand<ValidNumber, '!=0'>;
+
+/** Numeric brand type for value after checking with `x >= 0` */
+export type NonNegativeNumber = _ExtendNumberBrand<
+  ValidNumber,
+  '> -2^16' | '> -2^32' | '>= -2^15' | '>= -2^31' | '>=0'
+>;
+
+/** Numeric brand type for value after checking with `x > 0` */
+export type PositiveNumber = IntersectBrand<NonZeroNumber, NonNegativeNumber>;
+
+/** Numeric brand type for value after checking with `x < 0` */
+export type NegativeNumber = _ExtendNumberBrand<
+  NonZeroNumber,
+  '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32',
+  '>=0'
 >;
 
 /** Numeric brand type for `Number.POSITIVE_INFINITY` */
-export type POSITIVE_INFINITY = Brand<
-  number,
-  _NonNegativeKey,
-  _FiniteKey | _NaNKey | _ZeroKey
+export type POSITIVE_INFINITY = _ExtendNumberBrand<
+  IntersectBrand<InfiniteNumber, PositiveNumber>,
+  never,
+  '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32'
 >;
 
 /** Numeric brand type for `Number.NEGATIVE_INFINITY` */
-export type NEGATIVE_INFINITY = Brand<
-  number,
+export type NEGATIVE_INFINITY = _ExtendNumberBrand<
+  IntersectBrand<InfiniteNumber, NegativeNumber>,
   never,
-  _FiniteKey | _NaNKey | _NonNegativeKey | _ZeroKey
+  '> -2^16' | '> -2^32' | '>= -2^15' | '>= -2^31'
 >;
 
-/** Numeric brand type after checking with `x != 0` */
-export type NonZeroNumber = Brand<number, never, _NaNKey | _ZeroKey>;
+/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x != 0` */
+export type NonZeroFiniteNumber = IntersectBrand<NonZeroNumber, FiniteNumber>;
 
-/** Numeric brand type after checking with `x >= 0` */
-export type NonNegativeNumber = Brand<number, _NonNegativeKey, _NaNKey>;
-
-/** Numeric brand type after checking with `x > 0` */
-export type PositiveNumber = Brand<number, _NonNegativeKey, _NaNKey | _ZeroKey>;
-
-/** Numeric brand type after checking with `x < 0` */
-export type NegativeNumber = Brand<
-  number,
-  never,
-  _NaNKey | _NonNegativeKey | _ZeroKey
+/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x >= 0` */
+export type NonNegativeFiniteNumber = IntersectBrand<
+  NonNegativeNumber,
+  FiniteNumber
 >;
 
-/** Numeric brand type after checking with `Number.isInteger(x)` */
-export type IntBrand = Brand<number, _FiniteKey | _IntKey, _NaNKey>;
+/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x > 0` */
+export type PositiveFiniteNumber = IntersectBrand<PositiveNumber, FiniteNumber>;
 
-/** Numeric brand type after checking with `Number.isInteger(x)` */
-export type Int = IntBrand | SmallInt;
+/** Numeric brand type for value after checking with `Number.isFinite(x)` and `x < 0` */
+export type NegativeFiniteNumber = IntersectBrand<NegativeNumber, FiniteNumber>;
 
-/** Numeric brand type after checking with `Number.isInteger(x)` and `x >= 0` */
-export type UintBrand = Brand<
-  number,
-  _FiniteKey | _IntKey | _NonNegativeKey,
-  _NaNKey
+// integer types
+
+/** Numeric brand type for value after checking with `Number.isInteger(x)` */
+export type Int = _ExtendNumberBrand<FiniteNumber, 'Int'>;
+
+/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x >= 0` */
+export type Uint = IntersectBrand<Int, NonNegativeNumber>;
+
+/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x > 0` */
+export type PositiveInt = IntersectBrand<Int, PositiveNumber>;
+
+/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x < 0` */
+export type NegativeInt = IntersectBrand<Int, NegativeNumber>;
+
+/** Numeric brand type for value after checking with `Number.isInteger(x)` and `x != 0` */
+export type NonZeroInt = IntersectBrand<Int, NonZeroNumber>;
+
+/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` */
+export type SafeInt = _ExtendNumberBrand<Int, 'SafeInt'>;
+
+/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x >= 0` */
+export type SafeUint = IntersectBrand<SafeInt, NonNegativeNumber>;
+
+/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x > 0` */
+export type PositiveSafeInt = IntersectBrand<SafeInt, PositiveNumber>;
+
+/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x < 0` */
+export type NegativeSafeInt = IntersectBrand<SafeInt, NegativeNumber>;
+
+/** Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `x != 0` */
+export type NonZeroSafeInt = IntersectBrand<SafeInt, NonZeroNumber>;
+
+/**
+ * `[-2^31, 2^31 - 1]`
+ *
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^31 <= x <= 2^31 - 1` */
+export type Int32 = _ExtendNumberBrand<
+  SafeInt,
+  '< 2^31' | '< 2^32' | '> -2^32' | '>= -2^31'
 >;
 
-/** Numeric brand type after checking with `Number.isInteger(x)` and `x >= 0` */
-export type Uint = SmallUint | UintBrand;
-
-/** Numeric brand type after checking with `Number.isInteger(x)` and `x != 0` */
-export type NonZeroIntBrand = Brand<
-  number,
-  _FiniteKey | _IntKey,
-  _NaNKey | _ZeroKey
+/**
+ * `[-2^15, 2^15 - 1]`
+ *
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^15 <= x <= 2^15 - 1` */
+export type Int16 = _ExtendNumberBrand<
+  Int32,
+  '< 2^15' | '< 2^16' | '> -2^16' | '>= -2^15'
 >;
 
-/** Numeric brand type after checking with `Number.isInteger(x)` and `x != 0` */
-export type NonZeroInt = NonZeroIntBrand | NonZeroSmallInt;
+/**
+ * `[0, 2^32 - 1]`
+ *
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^32 - 1` */
+export type Uint32 = _ExtendNumberBrand<SafeUint, '< 2^32'>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` */
-export type SafeIntBrand = Brand<number, _FiniteKey | _SafeIntKey, _NaNKey>;
+/**
+ * `[0, 2^16 - 1]`
+ *
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^16 - 1` */
+export type Uint16 = _ExtendNumberBrand<Uint32, '< 2^16' | '< 2^31'>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` */
-export type SafeInt = SafeIntBrand | SmallInt;
-
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x >= 0` */
-export type SafeUintBrand = Brand<
-  number,
-  _NonNegativeKey | _SafeIntKey,
-  _NaNKey
+/**
+ * `[2^32 + 1, -1]`
+ *
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^32 < x < 0` */
+export type NegativeInt32 = _ExtendNumberBrand<
+  IntersectBrand<SafeInt, NegativeNumber>,
+  '> -2^32'
 >;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x >= 0` */
-export type SafeUint = SafeUintBrand | SmallUint;
-
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x != 0` */
-export type NonZeroSafeIntBrand = Brand<
-  number,
-  _SafeIntKey,
-  _NaNKey | _ZeroKey
+/**
+ * `[2^16 + 1, -1]`
+ *
+ * Numeric brand type for value after checking with `Number.isSafeInteger(x)` and `-2^16 < x < 0` */
+export type NegativeInt16 = _ExtendNumberBrand<
+  NegativeInt32,
+  '> -2^16' | '>= -2^31'
 >;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `x != 0` */
-export type NonZeroSafeInt = NonZeroSafeIntBrand | NonZeroSmallInt;
+/** Numeric brand type for `Float32Array` element */
+export type Float32 = _ExtendNumberBrand<_BrandedNumberBaseType, 'Float32'>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^32 - 1` */
-export type Uint32Brand = Brand<number, _Uint32Key, _NaNKey>;
+/** Numeric brand type for `Float64Array` element */
+export type Float64 = _ExtendNumberBrand<_BrandedNumberBaseType, 'Float64'>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^32 - 1` */
-export type Uint32 = SmallUint | Uint32Brand;
+/** Numeric brand type for `BigInt64Array` element */
+export type BigInt64 = ExtendBrand<ChangeBaseBrand<Int, bigint>, 'BigInt64'>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^16 - 1` */
-export type Uint16Brand = Brand<number, _Uint16Key, _NaNKey>;
+/** Numeric brand type for `BigUint64Array` element */
+export type BigUint64 = ExtendBrand<ChangeBaseBrand<Int, bigint>, 'BigUint64'>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `0 <= x <= 2^16 - 1` */
-export type Uint16 = SmallUint | Uint16Brand;
+/** @internal */
+type _SmallIntIndexMax = 512;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^32 - 1 <= x < 0` */
-export type NegativeUint32Brand = Brand<
-  number,
-  _NegativeUint32Key,
-  _NaNKey | _ZeroKey
+/**
+ * @internal
+ * integers in `[1, MaxIndex - 1]` */
+type _SmallPositiveInt<MaxIndex extends number> = RelaxedExclude<
+  Index<MaxIndex>,
+  0
 >;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^32 - 1 <= x < 0` */
-export type NegativeUint32 = NegativeUint32Brand | SmallNegativeInt;
+/**
+ * @internal
+ * integers in `[-MaxIndex, -1]` */
+type _SmallNegativeInt<MaxIndex extends number> = NegativeIndex<MaxIndex>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^16 - 1 <= x < 0` */
-export type NegativeUint16Brand = Brand<
-  number,
-  _NegativeUint16Key,
-  _NaNKey | _ZeroKey
->;
+/**
+ * small integers union
+ *
+ * - `''`    : integers in `[-MaxIndex, MaxIndex - 1]`
+ * - `'!=0'` : integers in `[-MaxIndex, MaxIndex - 1] \ { 0 }`
+ * - `'<0'`  : integers in `[-MaxIndex, -1]`
+ * - `'<=0'` : integers in `[-MaxIndex, 0]`
+ * - `'>0'`  : integers in `[1, MaxIndex - 1]`
+ * - `'>=0'` : integers in `[0, MaxIndex - 1]`
+ *
+ * @default MaxIndex = 512
+ */
+export type SmallInt<
+  T extends '!=0' | '' | '<=0' | '<0' | '>=0' | '>0' = '',
+  MaxIndex extends number = _SmallIntIndexMax
+> = TypeEq<T, '<=0'> extends true
+  ? _SmallNegativeInt<MaxIndex> | 0
+  : TypeEq<T, '<0'> extends true
+  ? _SmallNegativeInt<MaxIndex>
+  : TypeEq<T, '>=0'> extends true
+  ? _SmallPositiveInt<MaxIndex> | 0
+  : TypeEq<T, '>0'> extends true
+  ? _SmallPositiveInt<MaxIndex>
+  : TypeEq<T, '!=0'> extends true
+  ? _SmallNegativeInt<MaxIndex> | _SmallPositiveInt<MaxIndex>
+  : TypeEq<T, ''> extends true
+  ? _SmallNegativeInt<MaxIndex> | _SmallPositiveInt<MaxIndex> | 0
+  : never;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^16 - 1 <= x < 0` */
-export type NegativeUint16 = NegativeUint16Brand | SmallNegativeInt;
+export type SmallUint = SmallInt<'>=0'>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^31 <= x <= 2^31 - 1` */
-export type Int32Brand = Brand<number, _Int32Key, _NaNKey>;
+/**
+ * append optimal small integers union to number type
+ *
+ * - `SmallInt`         : integers in `[-512, 511]`
+ * - `SmallUint`        : integers in `[0, 511]`
+ * - `SmallPositiveInt` : integers in `[1, 511]`
+ * - `NonZeroSmallInt`  : integers in `[-512, 511] \ { 0 }`
+ * - `SmallNegativeInt` : integers in `[-512, -1]`
+ */
+export type WithSmallInt<
+  N extends Int,
+  MaxIndex extends number = _SmallIntIndexMax
+> =
+  | Exclude<
+      SmallInt<'', MaxIndex>,
+      | (N extends NegativeNumber ? SmallInt<'>=0', MaxIndex> : never)
+      | (N extends NonNegativeNumber ? SmallInt<'<0', MaxIndex> : never)
+      | (N extends NonZeroInt ? 0 : never)
+    >
+  | N;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^31 <= x <= 2^31 - 1` */
-export type Int32 = Int32Brand | SmallInt;
+export type IntWithSmallInt = WithSmallInt<Int>;
+export type SafeIntWithSmallInt = WithSmallInt<SafeInt>;
+export type UintWithSmallInt = WithSmallInt<Uint>;
+export type SafeUintWithSmallInt = WithSmallInt<SafeUint>;
+export type PositiveIntWithSmallInt = WithSmallInt<PositiveInt>;
+export type PositiveSafeIntWithSmallInt = WithSmallInt<PositiveSafeInt>;
+export type NegativeIntWithSmallInt = WithSmallInt<NegativeInt>;
+export type NegativeSafeIntWithSmallInt = WithSmallInt<NegativeSafeInt>;
+export type NonZeroIntWithSmallInt = WithSmallInt<NonZeroInt>;
+export type NonZeroSafeIntWithSmallInt = WithSmallInt<NonZeroSafeInt>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^15 <= x <= 2^15 - 1` */
-export type Int16Brand = Brand<number, _Int16Key, _NaNKey>;
+export type Int32WithSmallInt = WithSmallInt<Int32>;
+export type Int16WithSmallInt = WithSmallInt<Int16>;
+export type Uint32WithSmallInt = WithSmallInt<Uint32>;
+export type Uint16WithSmallInt = WithSmallInt<Uint16>;
+export type NegativeInt32WithSmallInt = WithSmallInt<NegativeInt32>;
+export type NegativeInt16WithSmallInt = WithSmallInt<NegativeInt16>;
 
-/** Numeric brand type after checking with `Number.isSafeInteger(x)` and `-2^15 <= x <= 2^15 - 1` */
-export type Int16 = Int16Brand | SmallInt;
-
-/** Numeric brand type of element value of `Float32Array` */
-export type Float32 = Brand<number, _Float32Key>;
-
-/** Numeric brand type of element value of `Float64Array` */
-export type Float64 = Brand<number, _Float64Key>;
-
-/** Numeric brand type of element value of `BigInt64Array` */
-export type BigInt64 = Brand<bigint, _BigInt64Key, _NaNKey>;
-
-/** Numeric brand type of element value of `BigUint64Array` */
-export type BigUint64 = Brand<bigint, _BigUint64Key, _NaNKey>;
+export type RemoveSmallInt<
+  N extends IntWithSmallInt,
+  MaxIndex extends number = _SmallIntIndexMax
+> = RelaxedExclude<N, SmallInt<'', MaxIndex>>;

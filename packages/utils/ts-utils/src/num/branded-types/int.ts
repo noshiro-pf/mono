@@ -1,13 +1,6 @@
-/** return type */
-type T = Int;
+import { toFiniteNumber } from './finite-number';
 
-/** non-negative type */
-type Abs = Uint;
-
-/** denominator type */
-type D = NonZeroInt;
-
-export const toInt = (a: number): T => {
+export const toInt = (a: number): Int => {
   if (!Number.isInteger(a)) {
     throw new TypeError(`Expected integer, got: ${a}`);
   }
@@ -16,43 +9,48 @@ export const toInt = (a: number): T => {
 
 const to = toInt;
 
-const abs = (x: T): Abs => to(Math.abs(x)) as Abs;
+const abs = (x: IntWithSmallInt): Uint => Math.abs(toInt(x));
 
-const max = (...values: readonly T[]): T => to(Math.max(...values));
-const min = (...values: readonly T[]): T => to(Math.min(...values));
+const _min = (...values: readonly IntWithSmallInt[]): Int =>
+  to(Math.min(...values));
 
-const pow = (x: T, y: T): T => to(x ** y);
+const _max = (...values: readonly IntWithSmallInt[]): Int =>
+  to(Math.max(...values));
 
-const add = (x: T, y: T): T => to(x + y);
+const pow = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x ** y);
 
-const sub = (x: T, y: T): T => to(x - y);
+const add = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x + y);
 
-const mul = (x: T, y: T): T => to(x * y);
+const sub = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x - y);
 
-const div = (x: T, y: D): T => to(Math.floor(x / y));
+const mul = (x: IntWithSmallInt, y: IntWithSmallInt): Int => to(x * y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: T, max: T): T =>
+const div = (x: IntWithSmallInt, y: NonZeroIntWithSmallInt): Int =>
+  Math.floor(toFiniteNumber(x / y));
+
+const random = (min: IntWithSmallInt, max: IntWithSmallInt): Int =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const Int = {
   abs,
-  max,
-  min,
+
+  min: _min,
+  max: _max,
+
   random,
 
-  /** @returns a ** b */
+  /** @returns `a ** b` */
   pow,
 
-  /** @returns a + b */
+  /** @returns `a + b` */
   add,
 
-  /** @returns a - b */
+  /** @returns `a - b` */
   sub,
 
-  /** @returns a * b */
+  /** @returns `a * b` */
   mul,
 
-  /** @returns ⌊a / b⌋ */
+  /** @returns `⌊a / b⌋` */
   div,
 } as const;

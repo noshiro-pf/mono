@@ -307,7 +307,7 @@ const autoPlayMargin = toSafeUint(1 + (time.showJudge + time.hideJudge) / 1000);
 
 const actionsToAutoPlayStream = (
   actions: NonEmptyArray<GameStateAction>,
-  numSkip: SafeUint
+  numSkip: SafeUintWithSmallInt
 ): Observable<GameStateAction> =>
   zip([
     Num.isNonZero(numSkip)

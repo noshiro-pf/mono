@@ -2,7 +2,7 @@ import { Num, range } from '@noshiro/ts-utils';
 
 export type ReadonlyBitArrayType = Readonly<{
   size: SafeUint;
-  get: (at: SafeInt) => 0 | 1 | undefined;
+  get: (at: SafeIntWithSmallInt) => 0 | 1 | undefined;
 
   values: () => IterableIterator<0 | 1>;
   entries: () => IterableIterator<readonly [SafeUint, 0 | 1]>;
@@ -24,7 +24,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
     return this.#data.length;
   }
 
-  get(at: SafeInt): 0 | 1 | undefined {
+  get(at: SafeIntWithSmallInt): 0 | 1 | undefined {
     if (!this.#isInRange(at)) {
       return undefined;
     }

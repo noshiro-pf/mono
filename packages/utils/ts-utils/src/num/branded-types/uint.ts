@@ -1,22 +1,11 @@
-import { expectType } from '../../expect-type';
 import { Num } from '../num';
 
-/** return type */
-type T = Uint;
+const MIN_VALUE = 0;
 
-/** denominator type */
-type D = Exclude<SmallUint, 0> | IntersectBrand<UintBrand, NonZeroNumber>;
-
-expectType<
-  D,
-  | Brand<number, 'Finite' | 'Int' | 'NonNegative', 'NaN' | 'Zero'>
-  | Exclude<SmallUint, 0>
->('=');
-
-export const isUint = (a: number): a is T =>
+export const isUint = (a: number): a is Uint =>
   Number.isInteger(a) && Num.isNonNegative(a);
 
-export const toUint = (a: number): T => {
+export const toUint = (a: number): Uint => {
   if (!isUint(a)) {
     throw new TypeError(`Expected non-negative integer, got: ${a}`);
   }
@@ -25,40 +14,49 @@ export const toUint = (a: number): T => {
 
 const to = toUint;
 
-const max = (...values: readonly T[]): T => to(Math.max(...values));
-const min = (...values: readonly T[]): T => to(Math.min(...values));
+const clamp = (a: number): Uint => to(Math.round(Math.max(MIN_VALUE, a)));
 
-const pow = (x: T, y: T): T => to(x ** y);
+const _min = (...values: readonly UintWithSmallInt[]): Uint =>
+  to(Math.min(...values));
 
-const add = (x: T, y: T): T => to(x + y);
+const _max = (...values: readonly UintWithSmallInt[]): Uint =>
+  to(Math.max(...values));
 
-const sub = (x: T, y: T): T => to(Math.max(0, x - y));
+const pow = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x ** y);
 
-const mul = (x: T, y: T): T => to(x * y);
+const add = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x + y);
 
-const div = (x: T, y: D): T => to(Math.floor(x / y));
+const sub = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x - y);
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const random = (min: T, max: T): T =>
+const mul = (x: UintWithSmallInt, y: UintWithSmallInt): Uint => clamp(x * y);
+
+const div = (x: UintWithSmallInt, y: PositiveIntWithSmallInt): Uint =>
+  clamp(Math.floor(x / y));
+
+const random = (min: UintWithSmallInt, max: UintWithSmallInt): Uint =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 
 export const Uint = {
-  max,
-  min,
+  MIN_VALUE,
+
+  min: _min,
+  max: _max,
+  clamp,
+
   random,
 
-  /** @returns a ** b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a ** b`, but never less than 0 */
   pow,
 
-  /** @returns a + b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a + b`, but never less than 0 */
   add,
 
-  /** @returns a - b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a - b`, but never less than 0 */
   sub,
 
-  /** @returns a * b, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `a * b`, but never less than 0 */
   mul,
 
-  /** @returns ⌊a / b⌋, but clamped to [0, MAX_SAFE_INTEGER] */
+  /** @returns `⌊a / b⌋`, but never less than 0 */
   div,
 } as const;
