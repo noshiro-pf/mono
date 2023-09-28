@@ -144,7 +144,7 @@ jobs:
           working-directory: packages/apps/event-schedule-app
           spec: cypress/e2e/**/*.cy.ts
           start: |
-            yarn start:emulators
+            yarn z:fb:emulators:start:e2e
             yarn start:dev-server
           # wait-on: 'http://localhost:8080, http://localhost:8081, http://localhost:5001'
           wait-on: 'http://localhost:5180'

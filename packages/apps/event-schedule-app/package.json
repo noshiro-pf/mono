@@ -50,6 +50,7 @@
     "z:fb:deploy:hosting:wireit": "wireit",
     "z:fb:deploy:impl": "firebase deploy",
     "z:fb:deploy:wireit": "wireit",
+    "z:fb:emulators:start:e2e": "firebase emulators:start --only functions,firestore --import firebase-emulator-exports --export-on-exit",
     "z:fb:emulators:start:impl": "firebase emulators:start --only functions,firestore,pubsub --import firebase-emulator-exports --export-on-exit",
     "z:fb:emulators:start:wireit": "wireit",
     "z:fb:export:impl": "node ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json",
