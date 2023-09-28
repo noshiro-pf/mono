@@ -44,7 +44,8 @@ const clamp =
   (target: N): N =>
     !Number.isFinite(target)
       ? lowerBound
-      : (Math.max(lowerBound, Math.min(upperBound, target)) as N);
+      : // eslint-disable-next-line no-restricted-syntax
+        (Math.max(lowerBound, Math.min(upperBound, target)) as N);
 
 const isNonZero = <N extends number>(
   a: N
@@ -63,6 +64,7 @@ const roundAt = (val: number, precision: number): number => {
 const roundBy = (digit: number, value: number): number =>
   Math.round(value * 10 ** digit) / 10 ** digit;
 
+// eslint-disable-next-line no-restricted-syntax
 const roundToInt = (n: number): Int => (0 | (n + 0.5)) as Int;
 
 const round = (digit: number): ((x: number) => number) => {
@@ -74,6 +76,7 @@ const round = (digit: number): ((x: number) => number) => {
 const mapNaN2Undefined = <N extends number>(
   value: N
 ): RelaxedExclude<N, NaNType> | undefined =>
+  // eslint-disable-next-line no-restricted-syntax
   Number.isNaN(value) ? undefined : (value as RelaxedExclude<N, NaNType>);
 
 const increment = <N extends SmallUint>(n: N): Increment<N> =>

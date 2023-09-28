@@ -1,4 +1,4 @@
-import { Num } from '@noshiro/ts-utils';
+import { Uint8 } from '@noshiro/ts-utils';
 
 // prettier-ignore
 export type RgbValue = (
@@ -30,5 +30,4 @@ export type RgbValue = (
  250 | 251 | 252 | 253 | 254 | 255
 );
 
-export const rgbValue = (v: number): RgbValue =>
-  Math.round(Num.clamp<number>(0, 255)(v)) as RgbValue;
+export const rgbValue = (v: number): RgbValue => Uint8.clamp(v);

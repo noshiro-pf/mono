@@ -184,6 +184,7 @@ function range(
   return Array.from(rangeIterator(start, end, step));
 }
 
+// eslint-disable-next-line no-restricted-syntax
 const copy = <T extends readonly unknown[]>(list: T): T => list.slice() as T;
 
 const sliceClamped = <T>(
@@ -219,12 +220,14 @@ function last<A>(list: readonly A[]): A | undefined {
 }
 
 const tail = <T extends readonly unknown[]>(list: T): ListType.Tail<T> =>
+  // eslint-disable-next-line no-restricted-syntax
   list.slice(1) as ListType.Tail<T>;
 
 const rest = tail;
 const shift = tail;
 
 const butLast = <T extends readonly unknown[]>(list: T): ListType.ButLast<T> =>
+  // eslint-disable-next-line no-restricted-syntax
   (isEmpty(list) ? [] : list.slice(0, -1)) as ListType.ButLast<T>;
 
 function take<T extends readonly unknown[], N extends SmallUint>(
@@ -370,6 +373,7 @@ const partition = <N extends PositiveSafeIntWithSmallInt, A>(
 ): readonly ArrayOfLength<N, A>[] =>
   seq(SafeUint.div(length(list), n)).map(
     (i) =>
+      // eslint-disable-next-line no-restricted-syntax
       list.slice(
         SafeUint.mul(n, i),
         SafeUint.mul(n, SafeUint.add(i, 1))
@@ -389,6 +393,7 @@ function sorted<A>(
   list: readonly A[],
   comparator?: (x: A, y: A) => number
 ): readonly A[] {
+  // eslint-disable-next-line no-restricted-syntax
   const cmp = comparator ?? ((x, y) => (x as number) - (y as number));
 
   return Array.from(list).sort(cmp);
@@ -411,8 +416,10 @@ function sortedBy<A, B>(
 ): readonly A[] {
   return sorted(list, (x, y) =>
     comparator === undefined
-      ? (comparatorValueMapper(x) as unknown as number) -
-        (comparatorValueMapper(y) as unknown as number)
+      ? // eslint-disable-next-line no-restricted-syntax
+        (comparatorValueMapper(x) as number) -
+        // eslint-disable-next-line no-restricted-syntax
+        (comparatorValueMapper(y) as number)
       : comparator(comparatorValueMapper(x), comparatorValueMapper(y))
   );
 }
@@ -560,6 +567,7 @@ const scan = <A, B>(
     mut_result[index + 1] = mut_acc;
   }
 
+  // eslint-disable-next-line no-restricted-syntax
   return mut_result as readonly B[] as NonEmptyArray<B>;
 };
 
@@ -657,6 +665,7 @@ const eq = <T>(list1: readonly T[], list2: readonly T[]): boolean =>
 const isSubset = <A extends Primitive, B extends Primitive = A>(
   list1: readonly A[],
   list2: readonly B[]
+  // eslint-disable-next-line no-restricted-syntax
 ): boolean => list1.every((a) => list2.includes(a as A & B));
 
 /** @returns list1 ⊃ list2 */
@@ -669,6 +678,7 @@ const setIntersection = <A extends Primitive, B extends Primitive = A>(
   list1: readonly A[],
   list2: readonly B[]
 ): readonly (A & B)[] =>
+  // eslint-disable-next-line no-restricted-syntax
   list1.filter((e) => list2.includes(e as A & B)) as readonly (A & B)[];
 
 const setDifference = <A extends Primitive>(

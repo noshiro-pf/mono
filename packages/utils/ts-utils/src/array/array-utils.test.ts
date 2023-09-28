@@ -1163,9 +1163,7 @@ describe('ArrayUtils.range', () => {
   });
 
   test('range(SmallUint, SmallUint)', () => {
-    const s = 0 as SmallUint;
-    const e = 1 as SmallUint;
-    const result = Arr.range(s, e);
+    const result = Arr.range<SmallUint, SmallUint>(0, 1);
 
     expectType<typeof result, readonly Exclude<SmallUint, 511>[]>('=');
 
@@ -1173,9 +1171,7 @@ describe('ArrayUtils.range', () => {
   });
 
   test('range(0 | 1 | 2, 1 | 2 | 3)', () => {
-    const s = 0 as 0 | 1 | 2;
-    const e = 1 as 1 | 2 | 3;
-    const result = Arr.range(s, e);
+    const result = Arr.range<0 | 1 | 2, 1 | 2 | 3>(0, 1);
 
     expectType<typeof result, readonly (0 | 1 | 2)[]>('=');
 
@@ -1183,9 +1179,7 @@ describe('ArrayUtils.range', () => {
   });
 
   test('range(2|3, 5|6|7)', () => {
-    const s = 2 as 2 | 3;
-    const e = 5 as 5 | 6 | 7;
-    const result = Arr.range(s, e);
+    const result = Arr.range<2 | 3, 5 | 6 | 7>(2, 5);
 
     expectType<typeof result, readonly (2 | 3 | 4 | 5 | 6)[]>('=');
 

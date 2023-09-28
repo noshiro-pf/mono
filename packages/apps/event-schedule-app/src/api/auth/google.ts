@@ -14,6 +14,7 @@ export const googleSignInWithPopup = (): Promise<
         undefined,
       (error) =>
         // The AuthCredential type that was used.
+        // eslint-disable-next-line no-restricted-syntax
         GoogleAuthProvider.credentialFromError(error as FirebaseError) ??
         undefined
     )

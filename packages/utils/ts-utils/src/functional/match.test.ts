@@ -10,6 +10,7 @@ describe('match', () => {
   type Direction = 'E' | 'N' | 'S' | 'W';
   const direction: Direction = 'N';
 
+  // eslint-disable-next-line no-restricted-syntax
   const res = match(direction as Direction, {
     E: 2,
     N: 3,
@@ -17,6 +18,7 @@ describe('match', () => {
     W: 5,
   });
 
+  // eslint-disable-next-line no-restricted-syntax
   const res2 = match('N' as string, {
     E: 2,
     N: 3,
@@ -25,6 +27,7 @@ describe('match', () => {
   });
 
   const res3 = match(
+    // eslint-disable-next-line no-restricted-syntax
     'N' as string,
     {
       E: 2,

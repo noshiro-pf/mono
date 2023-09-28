@@ -34,7 +34,7 @@ export const permutationType = <
   const valueSet = ISet.new(permutationStringImpl(defaultValue));
 
   const validate: Type<P>['validate'] = (a) => {
-    if (!(valueSet as ISet<unknown>).has(a)) {
+    if (typeof a !== 'string' || !valueSet.has(a)) {
       const valuesStr = valueSet
         .toArray()
         .map((s) => `'${s}'`)
@@ -48,6 +48,7 @@ export const permutationType = <
       ]);
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     return Result.ok(a as P);
   };
 

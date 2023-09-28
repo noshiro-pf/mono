@@ -1,10 +1,8 @@
-import { mapOptional, Num } from '@noshiro/ts-utils';
+import { mapOptional, Num, Uint8 } from '@noshiro/ts-utils';
 import { type Rgb, type RgbValue } from '../../types';
 
-const clamp255 = Num.clamp(0, 255) as (target: number) => RgbValue;
-
 const parseAsHexAndClamp = (hexStr: string): RgbValue | undefined =>
-  mapOptional(Num.mapNaN2Undefined(Number.parseInt(hexStr, 16)), clamp255);
+  mapOptional(Num.mapNaN2Undefined(Number.parseInt(hexStr, 16)), Uint8.clamp);
 
 export const hexToRgb = (hex: string): Rgb => {
   if (!/^#[0-9a-fA-F]{6}$/u.test(hex)) return [0, 0, 0];

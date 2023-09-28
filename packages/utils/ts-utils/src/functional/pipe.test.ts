@@ -19,7 +19,8 @@ describe('pipe', () => {
   });
 
   test('case 3', () => {
-    const y: number | undefined = (() => 1 as number | undefined)();
+    // eslint-disable-next-line no-restricted-syntax
+    const y = 1 as number | undefined;
 
     const z = pipe(y)
       .chainOptional((x) => x + 1)

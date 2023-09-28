@@ -10,6 +10,7 @@ import { hueListToContrastRatioList } from './get-contrast-ratio-list';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated';
 import { normalizeList } from './normalize-list';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues';
+import { toHue } from './to-hue';
 
 const hueListDefault = Arr.seq(360);
 
@@ -31,9 +32,7 @@ export const calcAll = ({
 }> => {
   /* values */
 
-  const hueList = hueListDefault.map(
-    (h) => ((h - firstHue + 360) % 360) as Hue
-  );
+  const hueList = hueListDefault.map((h) => toHue((h - firstHue + 360) % 360));
 
   const hslList: readonly Hsl[] = hueList.map((hue) => [
     hue,
@@ -56,8 +55,8 @@ export const calcAll = ({
   );
 
   const pickedUpHues_equallySpaced = Arr.seq(divisionNumber)
-    .map((i) => Num.roundToInt((i * 360) / divisionNumber) as Hue)
-    .map((h) => ((h - firstHue + 360) % 360) as Hue);
+    .map((i) => toHue(Num.roundToInt((i * 360) / divisionNumber)))
+    .map((h) => toHue((h - firstHue + 360) % 360));
 
   const adjacentContrastRatioList_equallySpaced = hueListToContrastRatioList(
     pickedUpHues_equallySpaced,
@@ -83,7 +82,7 @@ export const calcAll = ({
     lightness,
     firstHue,
     false
-  ).map((h) => ((h - firstHue + 360) % 360) as Hue);
+  ).map((h) => toHue((h - firstHue + 360) % 360));
 
   const adjacentContrastRatioList_weighted = hueListToContrastRatioList(
     pickedUpHues_weighted,
@@ -110,7 +109,7 @@ export const calcAll = ({
     lightness,
     firstHue,
     true
-  ).map((h) => ((h - firstHue + 360) % 360) as Hue);
+  ).map((h) => toHue((h - firstHue + 360) % 360));
 
   const adjacentContrastRatioList_weighted_log = hueListToContrastRatioList(
     pickedUpHues_weighted_log,

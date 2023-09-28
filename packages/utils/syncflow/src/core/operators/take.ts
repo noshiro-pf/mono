@@ -1,4 +1,9 @@
-import { Maybe, SafeUint, toSafeUint } from '@noshiro/ts-utils';
+import {
+  Maybe,
+  SafeUint,
+  castRemoveSmallInt,
+  toSafeUint,
+} from '@noshiro/ts-utils';
 import { SyncChildObservableClass } from '../class';
 import {
   type Observable,
@@ -29,7 +34,7 @@ class TakeObservableClass<A>
         : parentObservable.snapshot,
     });
     this.#mut_counter = toSafeUint(0);
-    this.#n = n as PositiveSafeInt;
+    this.#n = castRemoveSmallInt(n);
 
     // complete immediately if n is not positive integer
     if (!isPositiveSafeInteger(n)) {

@@ -1,4 +1,4 @@
-import { Arr, Result } from '@noshiro/ts-utils';
+import { Arr, Result, TupleUtils } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type';
 import {
   createAssertFn,
@@ -18,7 +18,10 @@ export const tuple = <A extends readonly Type<unknown>[]>(
   type T = MapTuple<A>;
 
   const { typeName = 'tuple' } = options ?? {};
-  const defaultValue = types.map((t) => t.defaultValue) as MapTuple<A>;
+  const defaultValue = TupleUtils.map(
+    types,
+    (t) => t.defaultValue
+  ) satisfies MapTuple<A>;
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Array.isArray(a)) {
@@ -46,13 +49,15 @@ export const tuple = <A extends readonly Type<unknown>[]>(
       }
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     !Array.isArray(a)
       ? defaultValue
-      : (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
+      : // eslint-disable-next-line no-restricted-syntax
+        (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 
   return {
     typeName,

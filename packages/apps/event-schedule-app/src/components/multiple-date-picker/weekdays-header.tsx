@@ -21,6 +21,7 @@ export const WeekdaysHeader = memoNamed<Props>(
             onClick === undefined
               ? undefined
               : () => {
+                  // eslint-disable-next-line no-restricted-syntax
                   onClick(idx as DayOfWeekIndex);
                 },
         })),

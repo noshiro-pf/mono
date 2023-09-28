@@ -1,4 +1,5 @@
 import { Arr } from '@noshiro/ts-utils';
+import { toHue } from './to-hue';
 import { type Hsl, type Hue } from './types';
 
 export const whiteHsl: Hsl = [0, 0, 100];
@@ -21,4 +22,4 @@ export const [
   purpleHue,
   magentaHue, // fuchsia
   roseHue,
-]: readonly Hue[] = Arr.seq(12).map((i) => (i * 30) as Hue);
+]: readonly Hue[] = Arr.seq(12).map((i) => toHue(i * 30));

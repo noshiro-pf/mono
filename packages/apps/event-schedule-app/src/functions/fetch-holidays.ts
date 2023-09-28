@@ -1,5 +1,6 @@
 export const fetchHolidaysJson = (): Promise<Record<string, string>> =>
   fetch('https://holidays-jp.github.io/api/v1/date.json').then(
+    // eslint-disable-next-line no-restricted-syntax
     (res) => res.json() as Promise<Record<string, string>>
   );
 

@@ -5,6 +5,7 @@ export type HoursMinutesMapKey = Brand<string, 'HoursMinutesMapKey'>;
 export const timeRangeToMapKey = (
   timeRange: HoursMinutes
 ): HoursMinutesMapKey =>
+  // eslint-disable-next-line no-restricted-syntax
   Result.unwrapThrow(Json.stringify(timeRange)) as HoursMinutesMapKey;
 
 export const timeRangeFromMapKey = (key: HoursMinutesMapKey): HoursMinutes =>

@@ -18,7 +18,9 @@ export const combineLatestI = <A extends NonEmptyUnknownList>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   parents: WrapInitialized<A>
 ): InitializedCombineLatestObservable<A> =>
+  // eslint-disable-next-line no-restricted-syntax
   new CombineLatestObservableClass(
+    // eslint-disable-next-line no-restricted-syntax
     parents as Wrap<A>
   ) as InitializedCombineLatestObservable<A>;
 
@@ -35,7 +37,8 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
       parents,
       type: 'combineLatest',
       initialValue: parentsValues.every(Maybe.isSome)
-        ? Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
+        ? // eslint-disable-next-line no-restricted-syntax
+          Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
         : Maybe.none,
     });
   }
@@ -45,6 +48,7 @@ class CombineLatestObservableClass<A extends NonEmptyUnknownList>
 
     const parentValues = this.parents.map((a) => a.snapshot);
     if (parentValues.every(Maybe.isSome)) {
+      // eslint-disable-next-line no-restricted-syntax
       const nextValue = parentValues.map((a) => a.value) as unknown as A;
       this.setNext(nextValue, updaterSymbol);
     }

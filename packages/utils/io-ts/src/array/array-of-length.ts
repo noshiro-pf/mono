@@ -1,4 +1,4 @@
-import { Arr, Result, toSafeUint, toUint32 } from '@noshiro/ts-utils';
+import { Arr, Result, Tpl, toSafeUint } from '@noshiro/ts-utils';
 import { type Type } from '../type';
 import {
   createAssertFn,
@@ -53,14 +53,15 @@ export const arrayOfLength = <A, N extends SmallUint>(
       }
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     return Result.ok(a as unknown as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     Array.isArray(a)
-      ? (Arr.seq(toUint32(size)).map((i) =>
-          elementType.fill(a[i])
-        ) as unknown as T)
+      ? // TODO: remove as
+        // eslint-disable-next-line no-restricted-syntax
+        (Tpl.map(Arr.seq(size), (i) => elementType.fill(a[i]) satisfies A) as T)
       : defaultValue;
 
   return {

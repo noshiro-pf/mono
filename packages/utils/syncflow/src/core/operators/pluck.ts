@@ -16,6 +16,7 @@ export const pluck =
 export const pluckI = <A, K extends keyof A>(
   key: K
 ): InitializedToInitializedOperator<A, A[K]> =>
+  // eslint-disable-next-line no-restricted-syntax
   pluck(key) as InitializedToInitializedOperator<A, A[K]>;
 
 class PluckObservableClass<A, K extends keyof A>
