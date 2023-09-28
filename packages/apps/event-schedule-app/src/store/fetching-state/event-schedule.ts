@@ -1,6 +1,6 @@
 import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
-import { router } from '../router';
+import { Router } from '../router';
 
 const [fetchEventSchedule$, _fetchEventSchedule] = createVoidEventEmitter();
 
@@ -23,7 +23,7 @@ const result$ = eventScheduleResult$;
 
 combineLatest([
   fetchEventScheduleThrottled$,
-  router.eventId$,
+  Router.eventId$,
 ] as const).subscribe(([_, eventId]) => {
   if (eventId === undefined) return;
 

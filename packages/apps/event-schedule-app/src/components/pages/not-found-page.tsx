@@ -1,13 +1,13 @@
 import { Icon, NonIdealState } from '@blueprintjs/core';
 import { Routes } from '../../constants';
-import { router } from '../../store';
+import { Router } from '../../store';
 import { Anchor } from '../bp';
 
 export const NotFoundPage = memoNamed('NotFoundPage', () => {
   const onClick = useRouterLinkClick({
     replace: false,
-    pushFn: router.push,
-    redirectFn: router.redirect,
+    pushFn: Router.push,
+    redirectFn: Router.redirect,
   });
 
   return (

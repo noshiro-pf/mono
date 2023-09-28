@@ -14,11 +14,11 @@ import {
   AnswersStore,
   Auth,
   EventScheduleStore,
+  Router,
   answers$,
   errorType$,
   eventSchedule$,
   holidaysJpDefinition$,
-  router,
 } from '../../../store';
 import { toClassName } from '../../../utils';
 import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
@@ -77,7 +77,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
   );
   const answers = useObservableValue(answers$);
   const errorType = useObservableValue(errorType$);
-  const eventId = useObservableValue(router.eventId$);
+  const eventId = useObservableValue(Router.eventId$);
   const eventSchedule = useObservableValue(eventSchedule$);
   const refreshButtonIsDisabled = useObservableValue(
     AnswersStore.refreshButtonIsDisabled$

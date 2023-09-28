@@ -1,6 +1,6 @@
 import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
 import { Routes, aboutThisAppUrl, feedbackUrl } from '../../constants';
-import { Auth, UpdateUserInfoDialogStore, router } from '../../store';
+import { Auth, Router, UpdateUserInfoDialogStore } from '../../store';
 import { NoWrapSpan } from '../atoms';
 import { ForNonLoggedInUserDialog } from './button-with-confirm';
 import {
@@ -22,20 +22,20 @@ export const NavBar = memoNamed('NavBar', () => {
 
   const handleSignInClick = useRouterLinkClick({
     replace: false,
-    pushFn: router.push,
-    redirectFn: router.redirect,
+    pushFn: Router.push,
+    redirectFn: Router.redirect,
   });
 
   const handleRegisterClick = useRouterLinkClick({
     replace: false,
-    pushFn: router.push,
-    redirectFn: router.redirect,
+    pushFn: Router.push,
+    redirectFn: Router.redirect,
   });
 
   const handleEventListButtonClick = useRouterLinkClick({
     replace: false,
-    pushFn: router.push,
-    redirectFn: router.redirect,
+    pushFn: Router.push,
+    redirectFn: Router.redirect,
   });
 
   const openingDialog = useObservableValue(

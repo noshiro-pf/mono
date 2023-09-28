@@ -15,7 +15,7 @@ import {
 import { type AnswerSelectionValue } from '../../types';
 import { Auth } from '../auth';
 import { answers$, AnswersStore, eventSchedule$ } from '../fetching-state';
-import { router } from '../router';
+import { Router } from '../router';
 
 const toast = createToaster();
 
@@ -374,7 +374,7 @@ const onDeleteAnswerImpl = async (
 /* @internal */
 const onEditButtonClickImpl = (eventId: string | undefined): void => {
   if (eventId !== undefined) {
-    router.push(Routes.routes.editPage(eventId));
+    Router.push(Routes.routes.editPage(eventId));
   }
 };
 
@@ -433,19 +433,19 @@ const onAddAnswerButtonClick = (): void => {
 };
 
 const onEditButtonClick = (): void => {
-  onEditButtonClickImpl(router.eventId$.snapshot.value);
+  onEditButtonClickImpl(Router.eventId$.snapshot.value);
 };
 
 const onSubmitAnswerClickPromise = (): Promise<void> =>
   onSubmitAnswerImpl(
-    router.eventId$.snapshot.value,
+    Router.eventId$.snapshot.value,
     answerBeingEdited$.snapshot.value,
     answerBeingEditedSectionState$.snapshot.value
   );
 
 const onSubmitAnswerClick = (): void => {
   onSubmitAnswerImpl(
-    router.eventId$.snapshot.value,
+    Router.eventId$.snapshot.value,
     answerBeingEdited$.snapshot.value,
     answerBeingEditedSectionState$.snapshot.value
   ).catch(noop);
@@ -453,13 +453,13 @@ const onSubmitAnswerClick = (): void => {
 
 const onSubmitEmptyAnswerClick = (): Promise<void> =>
   onSubmitEmptyAnswerImpl(
-    router.eventId$.snapshot.value,
+    Router.eventId$.snapshot.value,
     Auth.fireAuthUser$.snapshot.value
   );
 
 const onDeleteAnswerClick = (): Promise<void> =>
   onDeleteAnswerImpl(
-    router.eventId$.snapshot.value,
+    Router.eventId$.snapshot.value,
     answerBeingEdited$.snapshot.value
   );
 

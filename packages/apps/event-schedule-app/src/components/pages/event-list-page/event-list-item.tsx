@@ -7,7 +7,7 @@ import {
   ymdhm2strWithDay,
 } from '../../../constants';
 import { eventIsAfterDeadline } from '../../../functions';
-import { router } from '../../../store';
+import { Router } from '../../../store';
 import { SectionTitle } from '../../atoms';
 import { ArchiveEventButton } from '../../organisms';
 
@@ -36,7 +36,7 @@ export const EventListItemComponent = memoNamed<Props>(
     onConfirmUnArchiving,
   }) => {
     const onLinkClick = useCallback(() => {
-      router.push(Routes.routes.answerPage(eventId));
+      Router.push(Routes.routes.answerPage(eventId));
     }, [eventId]);
 
     const hasUnanswered = useMemo<boolean>(

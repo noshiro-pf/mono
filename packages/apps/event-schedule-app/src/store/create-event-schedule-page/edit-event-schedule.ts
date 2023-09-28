@@ -8,7 +8,7 @@ import {
   type EventSettingsPageDiffResult,
 } from '../../functions';
 import { AnswersStore, EventScheduleStore } from '../fetching-state';
-import { router } from '../router';
+import { Router } from '../router';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common';
 
 const toast = createToaster();
@@ -110,18 +110,18 @@ const hasNoChanges$: InitializedObservable<boolean> = combineLatestI([
   )
 );
 
-const answerPagePath$ = router.eventId$.chain(
+const answerPagePath$ = Router.eventId$.chain(
   mapI((eventId) => Routes.routes.answerPage(eventId ?? ''))
 );
 
 const onBackToAnswerPage = (): void => {
   const answerPagePath = answerPagePath$.snapshot.value;
-  router.push(answerPagePath);
+  Router.push(answerPagePath);
 };
 
 const saveToDatabase = async (): Promise<void> => {
   const commonState = commonState$.snapshot.value;
-  const eventId = router.eventId$.snapshot.value;
+  const eventId = Router.eventId$.snapshot.value;
 
   const {
     eventScheduleNormalized,

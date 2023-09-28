@@ -1,6 +1,6 @@
 import { api } from '../../api';
 import { fetchThrottleTime } from '../../constants';
-import { router } from '../router';
+import { Router } from '../router';
 
 const [fetchAnswers$, fetchAnswers] = createVoidEventEmitter();
 
@@ -30,7 +30,7 @@ const refreshAnswers = (): void => {
 
 /* subscriptions */
 
-combineLatest([fetchAnswersThrottled$, router.eventId$] as const).subscribe(
+combineLatest([fetchAnswersThrottled$, Router.eventId$] as const).subscribe(
   ([_, eventId]) => {
     if (eventId === undefined) return;
 

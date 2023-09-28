@@ -1,7 +1,7 @@
 import { Routes } from '../constants';
 import { fbAuth } from '../initialize-firebase';
 import { clog } from '../utils';
-import { router } from './router';
+import { Router } from './router';
 
 const { state$: fireAuthUser$, setState: setUser } = createState<
   FireAuthUser | undefined
@@ -32,7 +32,7 @@ fbAuth.onAuthStateChanged((user) => {
 
 const signOut = async (): Promise<void> => {
   await fbAuth.signOut();
-  router.push(Routes.routes.signInPage);
+  Router.push(Routes.routes.signInPage);
 };
 
 const signOutClick = (): void => {

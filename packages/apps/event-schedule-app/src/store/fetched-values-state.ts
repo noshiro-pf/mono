@@ -4,7 +4,7 @@ import {
   EventListStore,
   EventScheduleStore,
 } from './fetching-state';
-import { router } from './router';
+import { Router } from './router';
 
 export const errorType$: InitializedObservable<
   DeepReadonly<
@@ -36,7 +36,7 @@ export const errorType$: InitializedObservable<
   )
   .chain(withInitialValue(undefined));
 
-router.eventId$.subscribe(() => {
+Router.eventId$.subscribe(() => {
   EventScheduleStore.fetchEventSchedule();
   AnswersStore.fetchAnswers();
 });
