@@ -59,7 +59,7 @@ jobs:
           - template-react-app-vite
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v3
         id: setup_node_id
@@ -80,7 +80,7 @@ jobs:
         run: yarn zz:cmd:wsrun-stages --recursive -p @noshiro/${{ matrix.app_name }} -c build
 
       - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           browser: chrome
           install: false
@@ -103,7 +103,7 @@ jobs:
       options: --user 1001
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setting-up JAVA
         uses: actions/setup-java@v3
@@ -136,7 +136,7 @@ jobs:
       #   run: yarn workspace @noshiro/event-schedule-app z:setup:fb:emulators:gen-dummy-runtimeconfig
 
       - name: Cypress run on Chrome
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           # group: 'UI - Chrome'
           browser: chrome
