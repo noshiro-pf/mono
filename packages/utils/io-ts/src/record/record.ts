@@ -23,6 +23,7 @@ export const record = <A extends Record<string, Type<unknown>>>(
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
 
+  // eslint-disable-next-line no-restricted-syntax
   const defaultValue = Object.fromEntries(
     Object.entries(recordType).map(([key, value]) =>
       tp(key, value.defaultValue)
@@ -54,12 +55,14 @@ export const record = <A extends Record<string, Type<unknown>>>(
       }
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     return Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? (Object.fromEntries(
+      ? // eslint-disable-next-line no-restricted-syntax
+        (Object.fromEntries(
           Object.entries(recordType).map(([k, v]) =>
             tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue)
           )

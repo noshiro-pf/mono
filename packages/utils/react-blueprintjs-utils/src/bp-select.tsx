@@ -1,4 +1,4 @@
-import { HTMLSelect, type HTMLSelectProps } from '@blueprintjs/core';
+import { HTMLSelect } from '@blueprintjs/core';
 import { memoNamed } from '@noshiro/react-utils';
 import { useCallback } from 'react';
 
@@ -23,7 +23,7 @@ export const BpSelect = memoNamed<BpSelectProps>(
 
     return (
       <HTMLSelect
-        options={options as HTMLSelectProps['options']}
+        options={options}
         value={value}
         onChange={onChangeHandler}
         // eslint-disable-next-line react/jsx-props-no-spreading

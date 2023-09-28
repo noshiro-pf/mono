@@ -61,7 +61,7 @@ class CReadonlyBitArray implements ReadonlyBitArrayType {
 
 export const ReadonlyBitArray = (
   input: Readonly<Uint8Array> | readonly (0 | 1)[]
-): ReadonlyBitArrayType => new CReadonlyBitArray(input) as ReadonlyBitArrayType;
+): ReadonlyBitArrayType => new CReadonlyBitArray(input);
 
 export const ReadonlyBitArrayFromStr = (bitStr: string): ReadonlyBitArrayType =>
   ReadonlyBitArray(Array.from(bitStr, (c) => (c === '0' ? 0 : 1)));

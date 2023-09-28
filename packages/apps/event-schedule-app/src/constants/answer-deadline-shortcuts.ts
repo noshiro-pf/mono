@@ -12,21 +12,25 @@ export const answerDeadlineShortcuts: readonly DatePickerShortcut[] = [
     includeTime: true,
   },
   {
+    // eslint-disable-next-line no-restricted-syntax
     date: createDate(DateUtils.updateLocaleDate((v) => (v + 1) as DateEnum)),
     label: 'Tomorrow',
     includeTime: true,
   },
   {
+    // eslint-disable-next-line no-restricted-syntax
     date: createDate(DateUtils.updateLocaleDate((v) => (v + 7) as DateEnum)),
     label: '1 week later',
     includeTime: true,
   },
   {
+    // eslint-disable-next-line no-restricted-syntax
     date: createDate(DateUtils.updateLocaleDate((v) => (v + 14) as DateEnum)),
     label: '2 week later',
     includeTime: true,
   },
   {
+    // eslint-disable-next-line no-restricted-syntax
     date: createDate(DateUtils.updateLocaleMonth((v) => (v + 1) as MonthEnum)),
     label: '1 month later',
     includeTime: true,

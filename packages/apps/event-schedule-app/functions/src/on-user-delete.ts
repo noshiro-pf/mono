@@ -1,4 +1,6 @@
 import {
+  fillAnswer,
+  fillEventSchedule,
   firestorePaths,
   type Answer,
   type EventSchedule,
@@ -40,7 +42,7 @@ export const onUserDelete = async (
     writeBatch.set(
       documentRef,
       removeAuthorIdFromEventSchedule(
-        doc.data() as EventSchedule,
+        fillEventSchedule(doc.data()),
         userIdToBeRemoved
       )
     );
@@ -57,7 +59,7 @@ export const onUserDelete = async (
 
       writeBatch.set(
         documentRefForAnswers,
-        removeUserIdFromAnswer(ans.data() as Answer, userIdToBeRemoved)
+        removeUserIdFromAnswer(fillAnswer(ans.data()), userIdToBeRemoved)
       );
     }
   }

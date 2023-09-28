@@ -21,4 +21,4 @@ dotenv.config({
 
 export const DISCORD_TOKEN = process.env['DISCORD_TOKEN'] ?? '';
 
-export const useEmulators: boolean = false as boolean;
+export const useEmulators: boolean = false;

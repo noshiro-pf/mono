@@ -27,6 +27,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           label={dict.downPaymentManYen}
           min={0}
           value={downPaymentManYen}
+          // eslint-disable-next-line no-restricted-syntax
           onValueChange={setDownPaymentManYen as (a: number) => void}
         />
       </ConfigElement>
@@ -36,6 +37,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           label={dict.propertyPriceManYen}
           min={0}
           value={propertyPriceManYen}
+          // eslint-disable-next-line no-restricted-syntax
           onValueChange={setPropertyPriceManYen as (a: number) => void}
         />
       </ConfigElement>
@@ -45,6 +47,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           label={dict.borrowingPeriodYear}
           min={1}
           value={borrowingPeriodYear}
+          // eslint-disable-next-line no-restricted-syntax
           onValueChange={setBorrowingPeriodYear as (a: number) => void}
         />
       </ConfigElement>
@@ -55,6 +58,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
           max={100}
           min={0}
           value={interestRatePercentPerYear}
+          // eslint-disable-next-line no-restricted-syntax
           onValueChange={setInterestRatePercentPerYear as (a: number) => void}
         />
       </ConfigElement>

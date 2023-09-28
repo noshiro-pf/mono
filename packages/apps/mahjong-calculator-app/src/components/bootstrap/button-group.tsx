@@ -14,6 +14,7 @@ type Props = PropsTyped<string>;
 export const ButtonGroupTyped = <T,>(
   props: PropsTyped<T>
 ): preact.VNode<PropsTyped<T>> | null =>
+  // eslint-disable-next-line no-restricted-syntax
   createElement(ButtonGroup, props as unknown as Props);
 
 export const ButtonGroup = memoNamed<Props>(

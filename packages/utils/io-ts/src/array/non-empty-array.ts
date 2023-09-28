@@ -48,6 +48,7 @@ export const nonEmptyArray = <A>(
       }
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     return Result.ok(a as T);
   };
 

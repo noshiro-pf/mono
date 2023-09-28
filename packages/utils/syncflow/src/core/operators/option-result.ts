@@ -21,6 +21,7 @@ export const unwrapMaybe =
 export const unwrapMaybeI = <
   M extends Maybe.Base
 >(): InitializedToInitializedOperator<M, Maybe.Unwrap<M> | undefined> =>
+  // eslint-disable-next-line no-restricted-syntax
   unwrapMaybe() as InitializedToInitializedOperator<
     M,
     Maybe.Unwrap<M> | undefined
@@ -37,6 +38,7 @@ export const unwrapResultOk =
 export const unwrapResultOkI = <
   R extends Result.Base
 >(): InitializedToInitializedOperator<R, Result.UnwrapOk<R> | undefined> =>
+  // eslint-disable-next-line no-restricted-syntax
   unwrapResultOk() as InitializedToInitializedOperator<
     R,
     Result.UnwrapOk<R> | undefined
@@ -53,6 +55,7 @@ export const unwrapResultErr =
 export const unwrapResultErrI = <
   R extends Result.Base
 >(): InitializedToInitializedOperator<R, Result.UnwrapErr<R> | undefined> =>
+  // eslint-disable-next-line no-restricted-syntax
   unwrapResultErr() as InitializedToInitializedOperator<
     R,
     Result.UnwrapErr<R> | undefined
@@ -66,6 +69,7 @@ export const mapMaybe =
 export const mapMaybeI = <M extends Maybe.Base, B>(
   mapFn: (x: Maybe.Unwrap<M>) => B
 ): InitializedToInitializedOperator<M, Maybe<B>> =>
+  // eslint-disable-next-line no-restricted-syntax
   mapMaybe(mapFn) as InitializedToInitializedOperator<M, Maybe<B>>;
 
 export const mapResultOk =
@@ -78,6 +82,7 @@ export const mapResultOk =
 export const mapResultOkI = <S, S2, E>(
   mapFn: (x: S) => S2
 ): InitializedToInitializedOperator<Result<S, E>, Result<S2, E>> =>
+  // eslint-disable-next-line no-restricted-syntax
   mapResultOk(mapFn) as InitializedToInitializedOperator<
     Result<S, E>,
     Result<S2, E>
@@ -93,6 +98,7 @@ export const mapResultErr =
 export const mapResultErrI = <S, E, E2>(
   mapFn: (x: E) => E2
 ): InitializedToInitializedOperator<Result<S, E>, Result<S, E2>> =>
+  // eslint-disable-next-line no-restricted-syntax
   mapResultErr(mapFn) as InitializedToInitializedOperator<
     Result<S, E>,
     Result<S, E2>

@@ -18,11 +18,12 @@ export const enumType = <Values extends readonly Primitive[]>({
 }>): Type<ArrayElement<Values>> => {
   type T = ArrayElement<Values>;
 
-  const valueSet = ISet.new(values) as ISet<unknown>;
+  const valueSet = ISet.new<unknown>(values);
 
   const validate: Type<T>['validate'] = (a) =>
     valueSet.has(a)
-      ? Result.ok(a as T)
+      ? // eslint-disable-next-line no-restricted-syntax
+        Result.ok(a as T)
       : Result.err([
           validationErrorMessage(
             a,

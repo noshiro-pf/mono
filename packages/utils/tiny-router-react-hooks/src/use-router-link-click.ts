@@ -62,7 +62,14 @@ export const useRouterLinkClick = ({
 }>): React.MouseEventHandler<HTMLElement> =>
   useCallback(
     (ev) => {
-      const el = ev.target as HTMLAnchorElement;
+      const el = ev.target;
+      if (!(el instanceof HTMLAnchorElement)) {
+        console.warn(
+          'useRouterLinkClick should be used for HTMLAnchorElement.'
+        );
+        return;
+      }
+
       const href = el.href;
 
       if (

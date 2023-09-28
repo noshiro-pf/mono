@@ -1,8 +1,4 @@
-import {
-  OverlayToaster,
-  type OverlayToasterProps,
-  type ToastProps,
-} from '@blueprintjs/core';
+import { OverlayToaster, type OverlayToasterProps } from '@blueprintjs/core';
 import { createRoot } from 'react-dom/client';
 
 // export const createToaster = (): IToaster =>
@@ -63,23 +59,22 @@ export const showToast = ({
   icon?: IconName;
 }>): void => {
   toast
-    .then(
-      (t) =>
-        t.show({
-          isCloseButtonShown,
-          timeout: intent === 'danger' || intent === 'warning' ? 0 : 2000,
-          intent,
-          message,
-          icon:
-            icon ??
-            match<Intent, IconName | undefined>(intent, {
-              danger: 'error',
-              success: 'tick',
-              warning: 'warning-sign',
-              primary: undefined,
-              none: undefined,
-            }),
-        } as unknown as ToastProps) // FIXME: Blueprint types are wrong
+    .then((t) =>
+      t.show({
+        isCloseButtonShown,
+        timeout: intent === 'danger' || intent === 'warning' ? 0 : 2000,
+        intent,
+        message,
+        icon:
+          icon ??
+          match<Intent, IconName | undefined>(intent, {
+            danger: 'error',
+            success: 'tick',
+            warning: 'warning-sign',
+            primary: undefined,
+            none: undefined,
+          }),
+      })
     )
     .catch(console.error);
 };

@@ -1,4 +1,5 @@
 import { Arr, pipe, Tpl } from '@noshiro/ts-utils';
+import { toHue } from '../../to-hue';
 import { type Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc';
@@ -35,10 +36,11 @@ export const pickupHighContrastHues = (
 
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
     if (value > mut_y) {
-      mut_result[mut_i] = x as Hue;
+      mut_result[mut_i] = toHue(x);
       [mut_i, mut_y] = [mut_i + 1, (maxValue * (mut_i + 1)) / n];
     }
   }
 
+  // eslint-disable-next-line no-restricted-syntax
   return mut_result as MutableNonEmptyArray<Hue>; // n >= 1 なので
 };

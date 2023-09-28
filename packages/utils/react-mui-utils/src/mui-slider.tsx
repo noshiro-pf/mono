@@ -16,7 +16,13 @@ export const MuiSlider = memoNamed<Props>(
   ({ value, onChange, ariaLabelledby, step, min, max }) => {
     const sliderOnChange = useCallback(
       (_: unknown, _value: number | readonly number[]) => {
-        onChange(_value as number);
+        if (typeof _value === 'number') {
+          onChange(_value);
+        } else {
+          console.warn(
+            'MuiSlider.sliderOnChange: typeof value should be "number"'
+          );
+        }
       },
       [onChange]
     );

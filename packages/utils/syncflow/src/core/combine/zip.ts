@@ -19,6 +19,7 @@ export const zipI = <A extends NonEmptyUnknownList>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   parents: WrapInitialized<A>
 ): InitializedZipObservable<A> =>
+  // eslint-disable-next-line no-restricted-syntax
   new ZipObservableClass(parents as Wrap<A>) as InitializedZipObservable<A>;
 
 class ZipObservableClass<A extends NonEmptyUnknownList>
@@ -34,10 +35,12 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
       parents,
       type: 'zip',
       initialValue: parentsValues.every(Maybe.isSome)
-        ? Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
+        ? // eslint-disable-next-line no-restricted-syntax
+          Maybe.some(parentsValues.map((c) => c.value) as unknown as A)
         : Maybe.none,
     });
 
+    // eslint-disable-next-line no-restricted-syntax
     this.#queues = parents.map(createQueue) as unknown as TupleToQueueTuple<A>;
   }
 
@@ -50,6 +53,7 @@ class ZipObservableClass<A extends NonEmptyUnknownList>
     }
 
     if (queues.every((list) => !list.isEmpty)) {
+      // eslint-disable-next-line no-restricted-syntax
       const nextValue = queues.map((q) => q.dequeue()) as unknown as A;
       this.setNext(nextValue, updaterSymbol);
     }

@@ -22,7 +22,8 @@ export const union = <A extends NonEmptyArray<Type<unknown>>>({
 
   const validate: Type<T>['validate'] = (a) =>
     types.some((t) => t.is(a))
-      ? Result.ok(a as T)
+      ? // eslint-disable-next-line no-restricted-syntax
+        Result.ok(a as T)
       : Result.err([
           validationErrorMessage(
             a,
@@ -34,10 +35,12 @@ export const union = <A extends NonEmptyArray<Type<unknown>>>({
 
   const is = createIsFn<T>(validate);
 
+  // eslint-disable-next-line no-restricted-syntax
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : (defaultType.fill(a) as T));
 
   return {
     typeName,
+    // eslint-disable-next-line no-restricted-syntax
     defaultValue: defaultType.defaultValue as T,
     fill,
     validate,

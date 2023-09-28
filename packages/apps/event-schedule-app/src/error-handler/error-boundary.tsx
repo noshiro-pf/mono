@@ -20,7 +20,7 @@ import {
 } from '../components';
 import { createToaster, showToast } from '../functions';
 
-// eslint-disable-next-line functional/immutable-data, unicorn/prefer-add-event-listener
+// eslint-disable-next-line functional/immutable-data, unicorn/prefer-add-event-listener, no-restricted-syntax
 (window.onerror as Writable<typeof window.onerror>) = (e: unknown) => {
   const errorString = Result.unwrapThrow(Json.stringify(e));
   console.error(errorString);

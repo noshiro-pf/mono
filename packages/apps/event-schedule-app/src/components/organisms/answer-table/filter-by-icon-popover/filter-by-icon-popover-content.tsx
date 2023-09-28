@@ -28,7 +28,8 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
   }) => {
     const switchHandler = useCallback<React.FormEventHandler<HTMLInputElement>>(
       (ev) => {
-        if ((ev.target as HTMLInputElement).checked) {
+        if (!(ev.target instanceof HTMLInputElement)) return;
+        if (ev.target.checked) {
           enableFiltering();
         } else {
           disableFiltering();

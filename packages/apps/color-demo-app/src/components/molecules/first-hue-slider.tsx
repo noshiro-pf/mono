@@ -19,6 +19,7 @@ export const FirstHueSlider = memoNamed<Props>('FirstHueSlider', (props) => (
       min={0}
       step={1}
       value={props.firstHue}
+      // eslint-disable-next-line no-restricted-syntax
       onChange={props.firstHueOnChange as (h: number) => void}
     />
   </div>

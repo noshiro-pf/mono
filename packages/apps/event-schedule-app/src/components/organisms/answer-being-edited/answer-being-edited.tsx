@@ -117,6 +117,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
               intent={showUserNameError ? 'danger' : 'primary'}
               value={answerBeingEdited.user.name}
               onBlur={onUserNameBlur}
+              // eslint-disable-next-line no-restricted-syntax
               onValueChange={onUserNameChangeLocal as (v: string) => void}
             />
           </FormGroup>

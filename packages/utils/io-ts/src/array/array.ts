@@ -43,6 +43,7 @@ export const array = <A>(
       }
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     return Result.ok(a as T);
   };
 

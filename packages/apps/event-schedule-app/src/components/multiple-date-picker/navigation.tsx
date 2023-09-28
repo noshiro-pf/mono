@@ -36,7 +36,10 @@ export const DatepickerNav = memoNamed<Props>(
     const onYearChangeHandler = useCallback(
       (value: string) => {
         onYearChange(
-          mapOptional(Num.from(value), (a) => a as YearEnum) ?? thisYear
+          mapOptional(
+            Num.from(value),
+            (a) => toSafeUint(a) satisfies YearEnum
+          ) ?? thisYear
         );
       },
       [onYearChange]
@@ -45,6 +48,7 @@ export const DatepickerNav = memoNamed<Props>(
     const onMonthChangeHandler = useCallback(
       (value: string) => {
         onMonthChange(
+          // eslint-disable-next-line no-restricted-syntax
           mapOptional(Num.from(value), (a) => a as MonthEnum) ?? thisMonth
         );
       },

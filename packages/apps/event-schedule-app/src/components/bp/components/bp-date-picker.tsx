@@ -10,7 +10,9 @@ const inputProps: HTMLInputProps & InputGroupProps = {
 };
 
 const tenYearsLater = pipe(DateUtils.today())
-  .chain(DateUtils.updateLocaleYear((y) => (y + 99) as YearEnum))
+  .chain(
+    DateUtils.updateLocaleYear((y) => toSafeUint(y + 99) satisfies YearEnum)
+  )
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
 
@@ -75,7 +77,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
         parseDate={parseDate}
         placeholder={placeholder}
         reverseMonthAndYearMenus={reverseMonthAndYearMenus}
-        shortcuts={shortcuts as Writable<typeof shortcuts>}
+        shortcuts={castWritable(shortcuts)}
         showActionsBar={showActionsBar}
         timePrecision={undefined}
         value={date}

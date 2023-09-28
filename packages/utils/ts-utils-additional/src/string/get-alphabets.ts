@@ -11,6 +11,7 @@ export const getAlphabets = <Case extends 'lower' | 'upper'>(
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const code = charCase === 'lower' ? 'a'.codePointAt(0)! : 'A'.codePointAt(0)!;
 
+  // eslint-disable-next-line no-restricted-syntax
   return Arr.seq(26).map((i) => String.fromCodePoint(Uint32.add(code, i))) as [
     Case
   ] extends ['lower']
