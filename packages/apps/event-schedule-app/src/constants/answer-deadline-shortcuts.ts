@@ -1,4 +1,4 @@
-const createDate = (modifier: (d: DateUtils) => DateUtils): RawDateType =>
+const createDate = (modifier: (d: DateType) => DateType): RawDateType =>
   pipe(DateUtils.today())
     .chain(modifier)
     .chain(DateUtils.setLocaleHours(23))

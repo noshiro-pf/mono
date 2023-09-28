@@ -1,10 +1,11 @@
 import {
   DateUtils,
-  isNumber,
-  isRecord,
   Num,
   Obj,
+  isNumber,
+  isRecord,
   pipe,
+  type DateType,
 } from '@noshiro/ts-utils';
 
 export type YearMonthDate = Readonly<{
@@ -45,7 +46,7 @@ export const fillYearMonthDate = (a?: unknown): YearMonthDate =>
         date: Obj.hasKeyValue(a, 'date', isDateEnum) ? a.date : d.date,
       };
 
-export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
+export const ymdFromDate = (date: DateType): YearMonthDate => ({
   year: DateUtils.getLocaleYear(date),
   month: DateUtils.getLocaleMonth(date),
   date: DateUtils.getLocaleDate(date),

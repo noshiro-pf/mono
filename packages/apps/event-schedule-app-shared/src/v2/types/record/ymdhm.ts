@@ -1,4 +1,4 @@
-import { DateUtils, Num } from '@noshiro/ts-utils';
+import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
 import { defaultHoursMinutes, defaultYearMonthDate } from '../../../v1';
 
 export type Ymdhm = Readonly<{
@@ -36,7 +36,7 @@ export const ymdhmFromDate = (date: RawDateType): Ymdhm => ({
   minutes: DateUtils.getLocaleMinutes(date),
 });
 
-export const ymdhm2Date = (ymdhm: Ymdhm): DateUtils =>
+export const ymdhm2Date = (ymdhm: Ymdhm): DateType =>
   DateUtils.create(
     ymdhm.year,
     ymdhm.month,

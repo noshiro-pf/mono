@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { DateUtils, Num } from '@noshiro/ts-utils';
+import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
 import { hoursTypeDef, minutesTypeDef } from '../../enum';
 
 export const hoursMinutesTypeDef = t.record({
@@ -15,7 +15,7 @@ export const isHoursMinutes = hoursMinutesTypeDef.is;
 
 export const fillHoursMinutes = hoursMinutesTypeDef.fill;
 
-export const hmFromDate = (date: DateUtils): HoursMinutes => ({
+export const hmFromDate = (date: DateType): HoursMinutes => ({
   hours: DateUtils.getLocaleHours(date),
   minutes: DateUtils.getLocaleMinutes(date),
 });
