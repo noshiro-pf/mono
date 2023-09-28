@@ -282,10 +282,10 @@ const zip = <T1 extends readonly unknown[], T2 extends readonly unknown[]>(
   list1: T1,
   list2: T2
 ): ListType.Zip<T1, T2> =>
+  // eslint-disable-next-line no-restricted-syntax
   seq(SafeUint.min(length(list1), length(list2))).map((i) =>
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    tp(list1[i]!, list2[i]!)
-  );
+    tp(list1[i], list2[i])
+  ) as ListType.Zip<T1, T2>;
 
 const filterNot = <A>(
   list: readonly A[],

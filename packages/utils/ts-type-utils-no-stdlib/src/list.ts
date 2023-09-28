@@ -1,5 +1,6 @@
 import { type IsFixedLengthList } from './is-fixed-length-list';
 import { type Tuple } from './tuple';
+import { type NonEmptyArray } from './utils';
 
 export namespace ListType {
   export type Head<T extends readonly unknown[], D = never> = Tuple.Head<T, D>;
@@ -61,29 +62,23 @@ export namespace ListType {
   export type Zip<
     A extends readonly unknown[],
     B extends readonly unknown[]
-  > = {
-    0: readonly [];
-    1: readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>];
-    2: readonly [
-      readonly [Head<A>, B[number] | undefined],
-      ...Zip<Tail<A>, Tail<B>>
-    ];
-    3: readonly [
-      readonly [A[number] | undefined, Head<B>],
-      ...Zip<Tail<A>, Tail<B>>
-    ];
-    4: readonly (readonly [A[number], B[number]])[];
-  }[A extends readonly []
-    ? 0
+  > = A extends readonly []
+    ? readonly []
     : B extends readonly []
-    ? 0
-    : A extends readonly [unknown, ...(readonly unknown[])]
-    ? B extends readonly [unknown, ...(readonly unknown[])]
-      ? 1 // both A and B has at least 1 element
-      : 2 // A has at least 1 element but B doesn't
-    : B extends readonly [unknown, ...(readonly unknown[])]
-    ? 3 // B has at least 1 element but A doesn't
-    : 4];
+    ? readonly []
+    : A extends NonEmptyArray<unknown>
+    ? B extends NonEmptyArray<unknown>
+      ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
+      : readonly [
+          readonly [Head<A>, B[number] | undefined],
+          ...Zip<Tail<A>, Tail<B>>
+        ] // A has at least 1 element but B doesn't
+    : B extends NonEmptyArray<unknown>
+    ? readonly [
+        readonly [A[number] | undefined, Head<B>],
+        ...Zip<Tail<A>, Tail<B>>
+      ] // B has at least 1 element but A doesn't
+    : readonly (readonly [A[number], B[number]])[];
 
   export type Partition<
     N extends number,

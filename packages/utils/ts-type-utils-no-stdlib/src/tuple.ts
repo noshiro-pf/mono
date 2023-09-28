@@ -1,3 +1,5 @@
+import { type NonEmptyArray } from './utils';
+
 export namespace Tuple {
   export type Head<
     T extends readonly unknown[],
@@ -63,10 +65,11 @@ export namespace Tuple {
     N extends number,
     T extends readonly unknown[],
     R extends readonly unknown[]
-  > = {
-    0: T;
-    1: _SkipImpl<N, Tail<T>, readonly [Head<T>, ...R]>;
-  }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
+  > = T extends readonly []
+    ? T
+    : R['length'] extends N
+    ? T
+    : _SkipImpl<N, Tail<T>, readonly [Head<T>, ...R]>;
 
   export type Skip<N extends number, T extends readonly unknown[]> = _SkipImpl<
     N,
@@ -79,10 +82,11 @@ export namespace Tuple {
     N extends number,
     T extends readonly unknown[],
     R extends readonly unknown[]
-  > = {
-    0: R;
-    1: _TakeLastImpl<N, ButLast<T>, readonly [Last<T>, ...R]>;
-  }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
+  > = T extends readonly []
+    ? R
+    : R['length'] extends N
+    ? R
+    : _TakeLastImpl<N, ButLast<T>, readonly [Last<T>, ...R]>;
 
   export type TakeLast<
     N extends number,
@@ -94,10 +98,11 @@ export namespace Tuple {
     N extends number,
     T extends readonly unknown[],
     R extends readonly unknown[]
-  > = {
-    0: T;
-    1: _SkipLastImpl<N, ButLast<T>, readonly [Last<T>, ...R]>;
-  }[T extends readonly [] ? 0 : R['length'] extends N ? 0 : 1];
+  > = T extends readonly []
+    ? T
+    : R['length'] extends N
+    ? T
+    : _SkipLastImpl<N, ButLast<T>, readonly [Last<T>, ...R]>;
 
   export type SkipLast<
     N extends number,
@@ -131,17 +136,13 @@ export namespace Tuple {
     T extends readonly (readonly unknown[])[],
     R1 extends readonly unknown[],
     R2 extends readonly unknown[]
-  > = {
-    0: Reverse<R2>;
-    1: _FlattenImpl<Tail<T>, Head<T, []>, R2>;
-    2: _FlattenImpl<T, Tail<R1>, readonly [Head<R1>, ...R2]>;
-  }[T extends readonly []
+  > = T extends readonly []
     ? R1 extends readonly []
-      ? 0
-      : 2
+      ? Reverse<R2>
+      : _FlattenImpl<T, Tail<R1>, readonly [Head<R1>, ...R2]>
     : R1 extends readonly []
-    ? 1
-    : 2];
+    ? _FlattenImpl<Tail<T>, Head<T, []>, R2>
+    : _FlattenImpl<T, Tail<R1>, readonly [Head<R1>, ...R2]>;
 
   export type Flatten<T extends readonly (readonly unknown[])[]> = _FlattenImpl<
     T,
@@ -154,11 +155,11 @@ export namespace Tuple {
     A extends readonly unknown[],
     B extends readonly unknown[],
     R extends readonly unknown[]
-  > = {
-    0: Reverse<R>;
-    1: _ConcatImpl<Tail<A>, B, readonly [Head<A>, ...R]>;
-    2: _ConcatImpl<A, Tail<B>, readonly [Head<B>, ...R]>;
-  }[A extends readonly [] ? (B extends readonly [] ? 0 : 2) : 1];
+  > = A extends readonly []
+    ? B extends readonly []
+      ? Reverse<R>
+      : _ConcatImpl<A, Tail<B>, readonly [Head<B>, ...R]>
+    : _ConcatImpl<Tail<A>, B, readonly [Head<A>, ...R]>;
 
   export type Concat<
     A extends readonly unknown[],
@@ -168,10 +169,11 @@ export namespace Tuple {
   export type Zip<
     A extends readonly unknown[],
     B extends readonly unknown[]
-  > = {
-    0: readonly [];
-    1: readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>];
-  }[A extends readonly [] ? 0 : B extends readonly [] ? 0 : 1];
+  > = A extends NonEmptyArray<unknown>
+    ? B extends NonEmptyArray<unknown>
+      ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
+      : readonly []
+    : readonly [];
 
   /** @internal */
   type _PartitionImpl<
@@ -179,17 +181,13 @@ export namespace Tuple {
     T extends readonly unknown[],
     R1 extends readonly unknown[],
     R2 extends readonly unknown[]
-  > = {
-    0: Reverse<R2>;
-    1: _PartitionImpl<N, T, readonly [], readonly [Reverse<R1>, ...R2]>;
-    2: _PartitionImpl<N, Tail<T>, readonly [Head<T>, ...R1], R2>;
-  }[T extends readonly []
+  > = T extends readonly []
     ? R1 extends readonly []
-      ? 0
-      : 1
+      ? Reverse<R2>
+      : _PartitionImpl<N, T, readonly [], readonly [Reverse<R1>, ...R2]>
     : R1['length'] extends N
-    ? 1
-    : 2];
+    ? _PartitionImpl<N, T, readonly [], readonly [Reverse<R1>, ...R2]>
+    : _PartitionImpl<N, Tail<T>, readonly [Head<T>, ...R1], R2>;
 
   export type Partition<
     N extends number,
