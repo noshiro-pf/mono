@@ -1,9 +1,19 @@
-import { type ListType } from '../../src';
+import { type ArrayOfLength, type ListType } from '../../src';
 import { expectType } from '../expect-type';
 
 expectType<ListType.Zip<readonly [], readonly []>, readonly []>('=');
 expectType<ListType.Zip<readonly [1], readonly []>, readonly []>('=');
 expectType<ListType.Zip<readonly [], readonly [1]>, readonly []>('=');
+
+// <= かつ >= だが "=" だとエラーになってしまう
+expectType<
+  ListType.Zip<ArrayOfLength<32, 1>, ArrayOfLength<32, 2>>,
+  ArrayOfLength<32, readonly [1, 2]>
+>('<=');
+expectType<
+  ArrayOfLength<32, readonly [1, 2]>,
+  ListType.Zip<ArrayOfLength<32, 1>, ArrayOfLength<32, 2>>
+>('<=');
 
 expectType<
   ListType.Zip<readonly [1, 2, 3], readonly [4, 5]>,
