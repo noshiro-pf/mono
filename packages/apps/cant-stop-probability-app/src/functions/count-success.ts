@@ -1,4 +1,4 @@
-import { diceValueSet } from '../constants';
+import { diceValueList } from '../constants';
 import { type Count, type TwoDiceSumValue } from '../types';
 import { possibleTwoDiceSumPairs } from './possible-two-dice-sum-pair';
 
@@ -13,10 +13,10 @@ export const countSuccess = (
     noLine: 0,
   };
 
-  for (const a of diceValueSet) {
-    for (const b of diceValueSet) {
-      for (const c of diceValueSet) {
-        for (const d of diceValueSet) {
+  for (const a of diceValueList) {
+    for (const b of diceValueList) {
+      for (const c of diceValueList) {
+        for (const d of diceValueList) {
           const [pair1, pair2, pair3] = possibleTwoDiceSumPairs(a, b, c, d);
           // どれか1列を2段進められる組み合わせ
           if (
@@ -66,5 +66,9 @@ export const countSuccess = (
     }
   }
 
-  return mut_count as Count;
+  return {
+    noLine: toSafeUint(mut_count.noLine),
+    oneLine: toSafeUint(mut_count.oneLine),
+    twoLine: toSafeUint(mut_count.twoLine),
+  };
 };

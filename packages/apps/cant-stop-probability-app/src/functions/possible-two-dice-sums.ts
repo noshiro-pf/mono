@@ -1,4 +1,4 @@
-import { type DiceValue, type TwoDiceSumValue } from '../types';
+import { addDiceValues, type DiceValue, type TwoDiceSumValue } from '../types';
 
 export const possibleTwoDiceSums = (
   a: DiceValue,
@@ -6,4 +6,11 @@ export const possibleTwoDiceSums = (
   c: DiceValue,
   d: DiceValue
 ): ISet<TwoDiceSumValue> =>
-  ISet.new([a + b, a + c, a + d, b + c, b + d, c + d] as TwoDiceSumValue[]);
+  ISet.new([
+    addDiceValues(a, b),
+    addDiceValues(a, c),
+    addDiceValues(a, d),
+    addDiceValues(b, c),
+    addDiceValues(b, d),
+    addDiceValues(c, d),
+  ]);

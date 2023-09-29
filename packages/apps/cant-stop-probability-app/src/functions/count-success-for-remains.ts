@@ -1,4 +1,4 @@
-import { diceValueSet } from '../constants';
+import { diceValueList } from '../constants';
 import { type TwoDiceSumValue } from '../types';
 import { possibleTwoDiceSums } from './possible-two-dice-sums';
 
@@ -8,10 +8,10 @@ export const countSuccessForRemains = (
 ): SafeUint => {
   let mut_count = 0;
 
-  for (const a of diceValueSet) {
-    for (const b of diceValueSet) {
-      for (const c of diceValueSet) {
-        for (const d of diceValueSet) {
+  for (const a of diceValueList) {
+    for (const b of diceValueList) {
+      for (const c of diceValueList) {
+        for (const d of diceValueList) {
           if (
             ISet.intersection(columnsAlive, possibleTwoDiceSums(a, b, c, d))
               .size > 0
