@@ -1,8 +1,9 @@
 import { Arr, Result, Tpl } from '@noshiro/ts-utils';
 import { type Type } from '../type';
 import {
-  createAssertFunction,
-  createIsFnFromValidateFn,
+  createAssertFn,
+  createCastFn,
+  createIsFn,
   validationErrorMessage,
 } from '../utils';
 
@@ -60,7 +61,8 @@ export const nonEmptyArray = <A>(
     defaultValue,
     fill,
     validate,
-    is: createIsFnFromValidateFn(validate),
-    assertIs: createAssertFunction(validate),
+    is: createIsFn(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
   };
 };

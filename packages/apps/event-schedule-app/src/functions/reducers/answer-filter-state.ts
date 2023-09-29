@@ -1,4 +1,4 @@
-import { compareYmd } from '@noshiro/event-schedule-app-shared';
+import { compareYmd, toUserName } from '@noshiro/event-schedule-app-shared';
 import { type AnswersScore } from '../../types';
 import {
   AnswerIconFilterState,
@@ -85,7 +85,7 @@ const initialState: AnswerFilterState = {
       [],
       ([username, iconId]: UserNameAndIconId) => `${username}--${iconId}`,
       (key) => [
-        key.slice(0, -6),
+        toUserName(key.slice(0, -6)),
         key.endsWith(`--good`)
           ? 'good'
           : key.endsWith(`--fair`)

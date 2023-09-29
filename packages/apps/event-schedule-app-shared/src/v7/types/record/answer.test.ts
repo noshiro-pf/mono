@@ -1,5 +1,10 @@
 import { expectType } from '@noshiro/ts-utils';
-import { type AnswerId, type Weight } from '../named-primitive-types';
+import {
+  toAnswerId,
+  toWeight,
+  type AnswerId,
+  type Weight,
+} from '../named-primitive-types';
 import {
   ANSWER_KEY_CREATED_AT,
   answerDefaultValue,
@@ -26,12 +31,12 @@ describe('Answer', () => {
 
   test('defaultValue', () => {
     const defaultValue: Answer = {
-      id: '',
+      id: toAnswerId(''),
       user: userDefaultValue,
       comment: '',
       selection: [],
       [ANSWER_KEY_CREATED_AT]: 0,
-      weight: 1,
+      weight: toWeight(1),
       isRequiredParticipants: false,
     };
     expect(answerDefaultValue).toStrictEqual(defaultValue);

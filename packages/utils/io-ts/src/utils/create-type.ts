@@ -1,6 +1,7 @@
 import { type Type } from '../type';
-import { createAssertFunction } from './create-assert-function';
-import { createIsFnFromValidateFn } from './create-is-fn-from-validate-fn';
+import { createAssertFn } from './create-assert-fn';
+import { createCastFn } from './create-cast-fn';
+import { createIsFn } from './create-is-fn';
 
 export const createType = <A>({
   typeName,
@@ -13,14 +14,15 @@ export const createType = <A>({
   validate: Type<A>['validate'];
   fill?: Type<A>['fill'];
 }>): Type<A> => {
-  const is = createIsFnFromValidateFn<A>(validate);
+  const is = createIsFn<A>(validate);
 
   return {
     typeName,
     defaultValue,
     validate,
     is,
-    assertIs: createAssertFunction(validate),
+    assertIs: createAssertFn(validate),
     fill: fill ?? ((a) => (is(a) ? a : defaultValue)),
+    cast: createCastFn(validate),
   };
 };

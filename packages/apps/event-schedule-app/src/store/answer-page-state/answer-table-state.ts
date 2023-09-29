@@ -1,4 +1,4 @@
-import { compareYmd } from '@noshiro/event-schedule-app-shared';
+import { compareYmd, toUserName } from '@noshiro/event-schedule-app-shared';
 import { answerTableColor, datetimeRange2str } from '../../constants';
 import {
   createAnswerSelectionMapFromAnswers,
@@ -328,9 +328,11 @@ const tableBodyValuesFiltered$ = combineLatestI([
         ifThen(filledDateOnly, good + fair + poor === numAnswers) &&
         // 指定した回答者の記号で絞り込み
         answerTableRow.every(
-          (cell, index) =>
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            !falseKeys.has([answers?.[index]?.user.name ?? '', cell.iconId])
+          (cell, index: number) =>
+            !falseKeys.has([
+              answers?.[index]?.user.name ?? toUserName(''),
+              cell.iconId,
+            ])
         ) &&
         // スコアで絞り込み
         Num.isInRangeInclusive(

@@ -9,4 +9,6 @@ export const playerIndexTypeDef = t.uintRange({
 
 export type PlayerIndex = t.TypeOf<typeof playerIndexTypeDef>;
 
+export const toPlayerIndex = playerIndexTypeDef.cast;
+
 export const fillPlayerIndex = playerIndexTypeDef.fill;

@@ -1,8 +1,9 @@
 import { Result } from '@noshiro/ts-utils';
 import { type Type, type TypeOf } from '../type';
 import {
-  createAssertFunction,
-  createIsFnFromValidateFn,
+  createAssertFn,
+  createCastFn,
+  createIsFn,
   validationErrorMessage,
 } from '../utils';
 
@@ -31,7 +32,7 @@ export const union = <A extends NonEmptyArray<Type<unknown>>>({
           ),
         ]);
 
-  const is = createIsFnFromValidateFn<T>(validate);
+  const is = createIsFn<T>(validate);
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : (defaultType.fill(a) as T));
 
@@ -41,6 +42,7 @@ export const union = <A extends NonEmptyArray<Type<unknown>>>({
     fill,
     validate,
     is,
-    assertIs: createAssertFunction(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
   };
 };

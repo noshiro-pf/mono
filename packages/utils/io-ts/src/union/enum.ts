@@ -1,8 +1,9 @@
 import { ISet, Result } from '@noshiro/ts-utils';
 import { type Type } from '../type';
 import {
-  createAssertFunction,
-  createIsFnFromValidateFn,
+  createAssertFn,
+  createCastFn,
+  createIsFn,
   validationErrorMessage,
 } from '../utils';
 
@@ -31,7 +32,7 @@ export const enumType = <Values extends readonly Primitive[]>({
           ),
         ]);
 
-  const is = createIsFnFromValidateFn<T>(validate);
+  const is = createIsFn<T>(validate);
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultValue);
 
@@ -41,6 +42,7 @@ export const enumType = <Values extends readonly Primitive[]>({
     fill,
     validate,
     is,
-    assertIs: createAssertFunction(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
   };
 };

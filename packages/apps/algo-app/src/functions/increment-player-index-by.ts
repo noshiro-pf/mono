@@ -1,11 +1,11 @@
-import { type PlayerIndex } from '../types';
+import { toPlayerIndex, type PlayerIndex } from '../types';
 
 export const incrementPlayerIndex = (
   index: PlayerIndex,
   by: 0 | 1 | 2 | 3
-): PlayerIndex => ((index + by) % 4) as PlayerIndex;
+): PlayerIndex => toPlayerIndex((index + by) % 4);
 
 export const decrementPlayerIndex = (
   index: PlayerIndex,
   by: 0 | 1 | 2 | 3
-): PlayerIndex => ((4 + index - by) % 4) as PlayerIndex;
+): PlayerIndex => toPlayerIndex((4 + index - by) % 4);

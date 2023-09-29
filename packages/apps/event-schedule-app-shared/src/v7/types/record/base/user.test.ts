@@ -1,5 +1,9 @@
 import { expectType } from '@noshiro/ts-utils';
-import { type UserId, type UserName } from '../../named-primitive-types';
+import {
+  toUserName,
+  type UserId,
+  type UserName,
+} from '../../named-primitive-types';
 import { fillUser, isUser, userDefaultValue, type User } from './user';
 
 describe('User', () => {
@@ -14,7 +18,7 @@ describe('User', () => {
   test('defaultValue', () => {
     const defaultValue: User = {
       id: null,
-      name: '',
+      name: toUserName(''),
     };
     expect(userDefaultValue).toStrictEqual(defaultValue);
   });

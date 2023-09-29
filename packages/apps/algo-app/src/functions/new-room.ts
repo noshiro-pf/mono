@@ -1,8 +1,5 @@
-import {
-  getShuffled,
-  type PermutationString,
-} from '@noshiro/ts-utils-additional';
-import { type Card, type Room } from '../types';
+import { getShuffled } from '@noshiro/ts-utils-additional';
+import { toShuffleDef, type Card, type Room, type ShuffleDef } from '../types';
 import { sortCards } from './sort-cards';
 
 const allCards: ArrayOfLength<24, Card> = [
@@ -46,10 +43,11 @@ const randomizePlayerCards = (): DeepReadonly<
       return listOfCards;
     }).value;
 
-export const newShuffleDef = (): PermutationString<'0123'> =>
+export const newShuffleDef = (): ShuffleDef =>
   pipe(Arr.seq(4))
     .chain(getShuffled)
-    .chain((list) => list.join('')).value as PermutationString<'0123'>;
+    .chain((list) => list.join(''))
+    .chain(toShuffleDef).value;
 
 export const newRoom = (
   password: Room['password'],

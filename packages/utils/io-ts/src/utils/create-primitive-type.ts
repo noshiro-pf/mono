@@ -1,6 +1,7 @@
 import { Result } from '@noshiro/ts-utils';
 import { type Type } from '../type';
-import { createAssertFunction } from './create-assert-function';
+import { createAssertFn } from './create-assert-fn';
+import { createCastFn } from './create-cast-fn';
 import { validationErrorMessage } from './validation-error-message';
 
 export const createPrimitiveType = <A extends Primitive>({
@@ -28,6 +29,7 @@ export const createPrimitiveType = <A extends Primitive>({
     is,
     fill: (a) => (is(a) ? a : defaultValue),
     validate,
-    assertIs: createAssertFunction(validate),
+    assertIs: createAssertFn(validate),
+    cast: createCastFn(validate),
   };
 };
