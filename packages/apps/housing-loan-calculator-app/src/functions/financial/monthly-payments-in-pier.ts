@@ -1,3 +1,5 @@
+import { type PercentFloat } from '../../types';
+
 /**
  * @description
  * 元利均等返済における月々の支払い額を求める計算式．
@@ -9,6 +11,6 @@ export const monthlyPaymentsInPIER = ({
   interestRate: r,
 }: Readonly<{
   total: number;
-  numPayments: number;
-  interestRate: number;
+  numPayments: SafeUint;
+  interestRate: PercentFloat;
 }>): number => total * r * (1 + 1 / ((1 + r) ** n - 1));

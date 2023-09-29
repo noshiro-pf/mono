@@ -1,1 +1,1 @@
-export const denom = 6 ** 4;
+export const denom = SafeUint.pow(6, 4);

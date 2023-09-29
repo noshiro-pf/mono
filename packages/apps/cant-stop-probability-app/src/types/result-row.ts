@@ -5,7 +5,7 @@ export type ResultRow = Readonly<{
   id: string;
   selected: ArrayOfLength<3, TwoDiceSumValue>;
   count: Count;
-  countSum: number;
+  countSum: SafeUint;
   probability: number;
   expected: number;
 }>;

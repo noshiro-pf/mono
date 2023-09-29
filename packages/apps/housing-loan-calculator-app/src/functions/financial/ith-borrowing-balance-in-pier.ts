@@ -1,3 +1,5 @@
+import { type PercentFloat } from '../../types';
+
 /**
  * @description
  * 元利均等返済におけるi回支払い後の残高
@@ -10,9 +12,9 @@ export const ithBorrowingBalanceInPIER = ({
   ith: i,
 }: Readonly<{
   total: number;
-  numPayments: number;
-  interestRate: number;
-  ith: number;
+  numPayments: SafeUint;
+  interestRate: PercentFloat;
+  ith: SafeUint;
 }>): number => {
   const q = 1 + r;
   return total * ((1 - q ** (i - n)) / (1 - q ** -n));

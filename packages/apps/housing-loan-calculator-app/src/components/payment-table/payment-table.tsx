@@ -1,5 +1,6 @@
 import { HTMLTable } from '@blueprintjs/core';
 import { calculatedValues$, store$ } from '../../store';
+import { toYen, type Yen } from '../../types';
 
 const headerCellStyle = {
   textAlign: 'center',
@@ -9,7 +10,7 @@ const dataCellStyle = {
   textAlign: 'right',
 } as const satisfies React.CSSProperties;
 
-const formatYenValue = (value: number): string =>
+const formatYenValue = (value: Yen): string =>
   Intl.NumberFormat('ja-JP', {
     style: 'currency',
     currency: 'JPY',
@@ -25,7 +26,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
     monthlyPrincipalPaymentYen,
   } = useObservableValue(calculatedValues$);
 
-  const monthlyPayment = useMemo<readonly number[]>(
+  const monthlyPayment = useMemo<readonly Yen[]>(
     () =>
       repaymentType === 'principal-equal-payment'
         ? monthlyPaymentTotalYen
@@ -47,9 +48,9 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
     () =>
       Arr.seq(numRows).map((i) => [
         i.toString(),
-        formatYenValue(borrowingBalanceYen[i] ?? 0),
-        formatYenValue(interestYen[i] ?? 0),
-        formatYenValue(monthlyPayment[i] ?? 0),
+        formatYenValue(borrowingBalanceYen[i] ?? toYen(0)),
+        formatYenValue(interestYen[i] ?? toYen(0)),
+        formatYenValue(monthlyPayment[i] ?? toYen(0)),
       ]),
     [numRows, borrowingBalanceYen, interestYen, monthlyPayment]
   );

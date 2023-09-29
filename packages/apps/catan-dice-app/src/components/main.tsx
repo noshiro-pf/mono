@@ -3,7 +3,10 @@ import { historyReducer, historyToSumCount } from '../functions';
 import { defaultHistoryState } from '../type';
 import { MainView } from './main-view';
 
-const sumCountInitial = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as const;
+const sumCountInitial = Tpl.map(
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as const,
+  toSafeUint
+);
 
 const [rollDices$, rollDices] = createVoidEventEmitter();
 const [undo$, undo] = createVoidEventEmitter();
@@ -31,7 +34,7 @@ const diceValues$: InitializedObservable<readonly [number, number]> = history$
   )
   .chain(withInitialValue([0, 0] as const));
 
-const sumCount$: InitializedObservable<ArrayOfLength<11, number>> = history$
+const sumCount$: InitializedObservable<ArrayOfLength<11, SafeUint>> = history$
   .chain(map(historyToSumCount))
   .chain(withInitialValue(sumCountInitial));
 

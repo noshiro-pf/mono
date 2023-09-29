@@ -1,16 +1,18 @@
+import { type Yen } from './yen';
+
 export type CalculatedValues = DeepReadonly<{
   /** 借入残高（円） */
-  borrowingBalanceYen: number[];
+  borrowingBalanceYen: Yen[];
   /** 利息（円） */
-  interestYen: number[];
+  interestYen: Yen[];
   /** 月支払い額（円） */
-  monthlyPaymentTotalYen: number[];
+  monthlyPaymentTotalYen: Yen[];
   /** 月々の元金支払い額（円） */
-  monthlyPrincipalPaymentYen: number[];
+  monthlyPrincipalPaymentYen: Yen[];
   /** 元金の月額（円） */
-  fixedPrincipalYenPerMonth: number;
+  fixedPrincipalYenPerMonth: Yen;
   /** 月額 */
-  fixedMonthlyPaymentsYen: number;
+  fixedMonthlyPaymentsYen: Yen;
   /** 利息合計額 */
-  interestSumManYen: number;
+  interestSumManYen: Yen;
 }>;
