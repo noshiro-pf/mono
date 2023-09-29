@@ -2,10 +2,10 @@ import {
   type YearMonthDate,
   type Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import { DateUtils } from '@noshiro/ts-utils';
+import { DateUtils, type DateType } from '@noshiro/ts-utils';
 import { today } from '../utils';
 
-const ymd2DateObject = (ymd: YearMonthDate): DateUtils =>
+const ymd2DateObject = (ymd: YearMonthDate): DateType =>
   DateUtils.create(ymd.year, ymd.month, ymd.date);
 
 const millisecOfADay: number = 24 * 3600 * 1000;

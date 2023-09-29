@@ -1,4 +1,11 @@
-import { DateUtils, isNumber, isRecord, Num, Obj } from '@noshiro/ts-utils';
+import {
+  DateUtils,
+  Num,
+  Obj,
+  isNumber,
+  isRecord,
+  type DateType,
+} from '@noshiro/ts-utils';
 
 export type HoursMinutes = Readonly<{
   hours: HoursEnum;
@@ -33,7 +40,7 @@ export const fillHoursMinutes = (a?: unknown): HoursMinutes =>
           : d.minutes,
       };
 
-export const hmFromDate = (date: DateUtils): HoursMinutes => ({
+export const hmFromDate = (date: DateType): HoursMinutes => ({
   hours: DateUtils.getLocaleHours(date),
   minutes: DateUtils.getLocaleMinutes(date),
 });

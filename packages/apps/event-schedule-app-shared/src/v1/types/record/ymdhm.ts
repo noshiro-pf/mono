@@ -1,4 +1,4 @@
-import { DateUtils } from '@noshiro/ts-utils';
+import { DateUtils, type DateType } from '@noshiro/ts-utils';
 import {
   compareHm,
   compareYmd,
@@ -37,12 +37,12 @@ export const fillYmdhm = (p?: PartialYmdhm): Ymdhm => ({
   hm: fillHoursMinutes(p?.hm ?? d.hm),
 });
 
-export const ymdhmFromDate = (date: DateUtils): Ymdhm => ({
+export const ymdhmFromDate = (date: DateType): Ymdhm => ({
   ymd: ymdFromDate(date),
   hm: hmFromDate(date),
 });
 
-export const ymdhm2Date = (ymdhm: Ymdhm): DateUtils =>
+export const ymdhm2Date = (ymdhm: Ymdhm): DateType =>
   DateUtils.create(
     ymdhm.ymd.year,
     ymdhm.ymd.month,

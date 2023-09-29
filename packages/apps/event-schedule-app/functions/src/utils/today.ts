@@ -2,9 +2,9 @@ import {
   type YearMonthDate,
   type Ymdhm,
 } from '@noshiro/event-schedule-app-shared';
-import { DateUtils, pipe } from '@noshiro/ts-utils';
+import { DateUtils, pipe, type DateType } from '@noshiro/ts-utils';
 
-const todayDate = (): DateUtils => {
+const todayDate = (): DateType => {
   const japanLocaleString = DateUtils.today().toLocaleString('ja-JP', {
     timeZone: 'Asia/Tokyo',
   });

@@ -1,4 +1,10 @@
-import { DateUtils, isRecord, Num, Obj } from '@noshiro/ts-utils';
+import {
+  DateUtils,
+  Num,
+  Obj,
+  isRecord,
+  type DateType,
+} from '@noshiro/ts-utils';
 import {
   hoursMinutesDefaultValue,
   isHoursEnum,
@@ -58,7 +64,7 @@ export const ymdhmFromDate = (date: RawDateType): Ymdhm => ({
   minutes: DateUtils.getLocaleMinutes(date),
 });
 
-export const ymdhm2Date = (ymdhm: Ymdhm): DateUtils =>
+export const ymdhm2Date = (ymdhm: Ymdhm): DateType =>
   DateUtils.create(
     ymdhm.year,
     ymdhm.month,
