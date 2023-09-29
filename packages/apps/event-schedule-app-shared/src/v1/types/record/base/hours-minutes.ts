@@ -1,4 +1,4 @@
-import { DateUtils, Num } from '@noshiro/ts-utils';
+import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
 
 export type HoursMinutes = Readonly<{
   hours: HoursEnum;
@@ -18,7 +18,7 @@ export const fillHoursMinutes = (a?: PartialHoursMinutes): HoursMinutes => ({
   minutes: a?.minutes ?? d.minutes,
 });
 
-export const hmFromDate = (date: DateUtils): HoursMinutes => ({
+export const hmFromDate = (date: DateType): HoursMinutes => ({
   hours: DateUtils.getLocaleHours(date),
   minutes: DateUtils.getLocaleMinutes(date),
 });

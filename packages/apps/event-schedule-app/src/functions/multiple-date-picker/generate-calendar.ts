@@ -69,7 +69,7 @@ const genYmdRangeList = (
     date: n,
   }));
 
-const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): DateUtils =>
+const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): DateType =>
   new Date(year, (month - 1) as MonthIndexEnum, 1);
 
 const getLastDateNumberOfMonth = (

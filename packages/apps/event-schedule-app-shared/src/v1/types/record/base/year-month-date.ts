@@ -1,4 +1,4 @@
-import { DateUtils, Num, pipe } from '@noshiro/ts-utils';
+import { DateUtils, Num, pipe, type DateType } from '@noshiro/ts-utils';
 
 export type YearMonthDate = Readonly<{
   year: YearEnum;
@@ -21,7 +21,7 @@ export const fillYearMonthDate = (a?: PartialYearMonthDate): YearMonthDate => ({
   date: a?.date ?? d.date,
 });
 
-export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
+export const ymdFromDate = (date: DateType): YearMonthDate => ({
   year: DateUtils.getLocaleYear(date),
   month: DateUtils.getLocaleMonth(date),
   date: DateUtils.getLocaleDate(date),
