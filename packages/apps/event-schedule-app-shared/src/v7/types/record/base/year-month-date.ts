@@ -1,5 +1,5 @@
 import * as t from '@noshiro/io-ts';
-import { DateUtils, Num } from '@noshiro/ts-utils';
+import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
 import { datesTypeDef, monthsTypeDef, yearsTypeDef } from '../../enum';
 
 export const yearMonthDateTypeDef = t.record({
@@ -16,7 +16,7 @@ export const isYearMonthDate = yearMonthDateTypeDef.is;
 
 export const fillYearMonthDate = yearMonthDateTypeDef.fill;
 
-export const ymdFromDate = (date: DateUtils): YearMonthDate => ({
+export const ymdFromDate = (date: DateType): YearMonthDate => ({
   year: DateUtils.getLocaleYear(date),
   month: DateUtils.getLocaleMonth(date),
   date: DateUtils.getLocaleDate(date),

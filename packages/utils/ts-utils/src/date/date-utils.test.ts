@@ -1,5 +1,3 @@
-import { DateUtils } from './date-utils';
-
 describe('DateUtils', () => {
   describe('getDay', () => {
     test('getDay(2019/12/25)', () => {

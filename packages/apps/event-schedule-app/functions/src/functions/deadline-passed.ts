@@ -1,8 +1,8 @@
 import { type Ymdhm } from '@noshiro/event-schedule-app-shared';
-import { DateUtils, SafeInt } from '@noshiro/ts-utils';
+import { DateUtils, SafeInt, type DateType } from '@noshiro/ts-utils';
 import { now } from '../utils';
 
-const ymdhm2DateObject = (ymdhm: Ymdhm): DateUtils =>
+const ymdhm2DateObject = (ymdhm: Ymdhm): DateType =>
   DateUtils.create(
     ymdhm.year,
     ymdhm.month,
