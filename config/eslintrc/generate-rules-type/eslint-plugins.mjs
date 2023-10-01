@@ -1,0 +1,86 @@
+export const eslintPlugins = {
+  EslintRules: {
+    typeName: 'EslintRules',
+    pluginName: 'eslint',
+    rulePrefix: 'xxx',
+    outputFileName: 'eslint-rules.ts',
+  },
+  EslintArrayFuncRules: {
+    typeName: 'EslintArrayFuncRules',
+    pluginName: 'eslint-plugin-array-func',
+    rulePrefix: 'array-func/',
+    outputFileName: 'eslint-array-func-rules.ts',
+  },
+  EslintCypressRules: {
+    typeName: 'EslintCypressRules',
+    pluginName: 'eslint-plugin-cypress',
+    rulePrefix: 'cypress/',
+    outputFileName: 'eslint-cypress-rules.ts',
+  },
+  EslintFunctionalRules: {
+    typeName: 'EslintFunctionalRules',
+    pluginName: 'eslint-plugin-functional',
+    rulePrefix: 'functional/',
+    outputFileName: 'eslint-functional-rules.ts',
+  },
+  EslintImportsRules: {
+    typeName: 'EslintImportsRules',
+    pluginName: 'eslint-plugin-import',
+    rulePrefix: 'import/',
+    outputFileName: 'eslint-import-rules.ts',
+  },
+  EslintJestRules: {
+    typeName: 'EslintJestRules',
+    pluginName: 'eslint-plugin-jest',
+    rulePrefix: 'jest/',
+    outputFileName: 'eslint-jest-rules.ts',
+  },
+  EslintPromiseRules: {
+    typeName: 'EslintPromiseRules',
+    pluginName: 'eslint-plugin-promise',
+    rulePrefix: 'promise/',
+    outputFileName: 'eslint-promise-rules.ts',
+  },
+  EslintSecurityRules: {
+    typeName: 'EslintSecurityRules',
+    pluginName: 'eslint-plugin-security',
+    rulePrefix: 'security/',
+    outputFileName: 'eslint-security-rules.ts',
+  },
+  EslintDeprecationRules: {
+    typeName: 'EslintDeprecationRules',
+    pluginName: 'eslint-plugin-deprecation',
+    rulePrefix: 'deprecation/',
+    outputFileName: 'eslint-deprecation-rules.ts',
+  },
+  EslintUnicornRules: {
+    typeName: 'EslintUnicornRules',
+    pluginName: 'eslint-plugin-unicorn',
+    rulePrefix: 'unicorn/',
+    outputFileName: 'eslint-unicorn-rules.ts',
+  },
+  EslintReactRules: {
+    typeName: 'EslintReactRules',
+    pluginName: 'eslint-plugin-react',
+    rulePrefix: 'react/',
+    outputFileName: 'eslint-react-rules.ts',
+  },
+  EslintReactHooksRules: {
+    typeName: 'EslintReactHooksRules',
+    pluginName: 'eslint-plugin-react-hooks',
+    rulePrefix: 'react-hooks/',
+    outputFileName: 'eslint-react-hooks-rules.ts',
+  },
+  EslintReactRefresh: {
+    typeName: 'EslintReactRefresh',
+    pluginName: 'eslint-plugin-react-refresh',
+    rulePrefix: 'react-refresh/',
+    outputFileName: 'eslint-react-refresh-rules.ts',
+  },
+  TypeScriptEslintRules: {
+    typeName: 'TypeScriptEslintRules',
+    pluginName: '@typescript-eslint/eslint-plugin',
+    rulePrefix: '@typescript-eslint/',
+    outputFileName: 'typescript-eslint-rules.ts',
+  },
+};

@@ -3,5 +3,5 @@
   "compilerOptions": {
     "module": "commonjs"
   },
-  "include": ["./generate-rules-type.ts", "./index.ts"]
+  "include": ["./generate-rules-type.ts"]
 }

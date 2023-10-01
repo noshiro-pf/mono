@@ -1,4 +1,6 @@
 /* cSpell:disable */
+/* eslint-disable functional/no-mixed-types */
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
 
@@ -9,7 +11,6 @@ import { type Linter } from 'eslint';
  *  | key                  | value   |
  *  | :------------------- | :------ |
  *  | type                 | problem |
- *  | recommended          | warn    |
  *  | requiresTypeChecking | true    |
  */
 namespace Deprecation {

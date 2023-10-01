@@ -1,5 +1,6 @@
-/* eslint-disable functional/no-mixed-types */
 /* cSpell:disable */
+/* eslint-disable functional/no-mixed-types */
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
 
@@ -752,7 +753,6 @@ namespace JsxBooleanValue {
   export type Options =
     | readonly []
     | readonly ['always' | 'never']
-    | readonly []
     | readonly ['always']
     | readonly [
         'always',
@@ -760,7 +760,6 @@ namespace JsxBooleanValue {
           readonly never?: readonly string[];
         }
       ]
-    | readonly []
     | readonly ['never']
     | readonly [
         'never',

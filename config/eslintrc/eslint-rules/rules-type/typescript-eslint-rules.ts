@@ -1,5 +1,6 @@
-/* eslint-disable functional/no-mixed-types */
 /* cSpell:disable */
+/* eslint-disable functional/no-mixed-types */
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
 
@@ -64,7 +65,7 @@ namespace ArrayType {
    * }
    * ```
    */
-  // modified
+  /* modified */
   export type Options = {
     /**
      * The array type expected for mutable cases...
@@ -160,7 +161,7 @@ namespace BanTsComment {
    * }
    * ```
    */
-  // modified
+  /* modified */
   export type Options = Readonly<{
     'ts-expect-error'?: DirectiveConfigSchema;
     'ts-ignore'?: DirectiveConfigSchema;
@@ -1054,7 +1055,7 @@ namespace ExplicitMemberAccessibility {
    * }
    * ```
    */
-  // modified
+  /* modified */
   export type Options = Readonly<{
     accessibility?: AccessibilityLevel;
     overrides?: Readonly<{
@@ -1212,7 +1213,6 @@ namespace FuncCallSpacing {
   export type Options =
     | readonly []
     | readonly ['never']
-    | readonly []
     | readonly ['always']
     | readonly [
         'always',
@@ -1600,7 +1600,6 @@ namespace InitDeclarations {
   export type Options =
     | readonly []
     | readonly ['always']
-    | readonly []
     | readonly ['never']
     | readonly [
         'never',
@@ -12281,7 +12280,6 @@ namespace NoExtraParens {
   export type Options =
     | readonly []
     | readonly ['functions']
-    | readonly []
     | readonly ['all']
     | readonly [
         'all',
@@ -13167,7 +13165,7 @@ namespace NoRestrictedImports {
    * }
    * ```
    */
-  // modified
+  /* modified */
   export type Options =
     | {
         readonly paths: readonly {
@@ -15308,7 +15306,6 @@ namespace Semi {
             | 'never';
         }
       ]
-    | readonly []
     | readonly ['always']
     | readonly [
         'always',

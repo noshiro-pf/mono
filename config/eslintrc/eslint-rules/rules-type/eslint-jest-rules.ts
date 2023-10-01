@@ -1,4 +1,6 @@
 /* cSpell:disable */
+/* eslint-disable functional/no-mixed-types */
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
 
@@ -1280,7 +1282,7 @@ namespace ValidTitle {
    * ]
    * ```
    */
-  // modified
+  /* modified */
   export type Options = {
     readonly ignoreTypeOfDescribeName?: boolean;
     readonly disallowedWords?: readonly string[];

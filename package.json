@@ -144,9 +144,12 @@
   },
   "wireit": {
     "gen-eslint-rules-type": {
-      "command": "config/eslintrc/generate-rules-type/generate-rules-type.sh",
+      "command": "node ./config/eslintrc/generate-rules-type/main.mjs",
       "files": [
-        "config/eslintrc/generate-rules-type/generate-rules-type.sh"
+        "config/eslintrc/generate-rules-type/.eslintrc.generate-rules-type.js",
+        "config/eslintrc/generate-rules-type/generate-rules-type.js",
+        "config/eslintrc/generate-rules-type/replace.mjs",
+        "config/eslintrc/generate-rules-type/main.mjs"
       ],
       "dependencies": [
         "z:gen-eslint-rules-type:compile"
@@ -168,8 +171,7 @@
         "config/eslintrc/generate-rules-type/.eslintrc.generate-rules-type.js"
       ],
       "output": [
-        "config/eslintrc/generate-rules-type/generate-rules-type.js",
-        "config/eslintrc/generate-rules-type/index.js"
+        "config/eslintrc/generate-rules-type/generate-rules-type.js"
       ]
     },
     "z:type-check:root:wireit": {
