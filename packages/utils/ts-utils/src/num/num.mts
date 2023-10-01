@@ -18,6 +18,7 @@ type LEQ = {
   readonly [N in SmallUint]: Index<N>;
 };
 
+/* cspell:disable-next-line */
 type LEQC = {
   readonly [N in SmallUint]: Index<N> | N;
 };
@@ -31,6 +32,7 @@ const isUintInRange =
 /** `lowerBound <= x <= upperBound` */
 const isUintInRangeInclusive =
   <L extends SmallUint, U extends SmallUint>(lowerBound: L, upperBound: U) =>
+  /* cspell:disable-next-line */
   (x: number): x is RelaxedExclude<LEQC[U], LEQ[Min<L>]> =>
     Number.isSafeInteger(x) && lowerBound <= x && x <= upperBound;
 
@@ -68,6 +70,35 @@ const isNonNegative = <N extends number>(
 const isPositive = <N extends number>(
   a: N,
 ): a is PositiveNumber & RelaxedExclude<N, NegativeIndex<1024> | 0> => a > 0;
+
+const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number => a / b;
+
+// ValidNumber
+// FiniteNumber
+// NonZeroNumber
+// NonNegativeNumber
+// PositiveNumber
+// NegativeNumber
+// NonZeroFiniteNumber
+// NonNegativeFiniteNumber
+// PositiveFiniteNumber
+// NegativeFiniteNumber
+// Int
+// Uint
+// PositiveInt
+// NegativeInt
+// NonZeroInt
+// SafeInt
+// SafeUint
+// PositiveSafeInt
+// NegativeSafeInt
+// NonZeroSafeInt
+// Int32
+// Int16
+// Uint32
+// Uint16
+// NegativeInt32
+// NegativeInt16
 
 const roundAt = (val: number, precision: number): number => {
   const digit = 10 ** precision;
@@ -111,6 +142,7 @@ export const Num = {
   isNonZero,
   isNonNegative,
   isPositive,
+  div,
   clamp,
   roundAt,
   roundBy,
