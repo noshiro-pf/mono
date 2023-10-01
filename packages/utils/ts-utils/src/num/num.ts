@@ -55,6 +55,10 @@ const isNonNegative = <N extends number>(
   a: N
 ): a is NonNegativeNumber & RelaxedExclude<N, NegativeIndex<1024>> => a >= 0;
 
+const isPositive = <N extends number>(
+  a: N
+): a is PositiveNumber & RelaxedExclude<N, NegativeIndex<1024> | 0> => a > 0;
+
 const roundAt = (val: number, precision: number): number => {
   const digit = 10 ** precision;
 
@@ -97,6 +101,7 @@ export const Num = {
   isUintInRangeInclusive,
   isNonZero,
   isNonNegative,
+  isPositive,
   clamp,
   roundAt,
   roundBy,
