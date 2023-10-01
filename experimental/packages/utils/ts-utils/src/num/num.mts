@@ -75,6 +75,21 @@ const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number =>
   // eslint-disable-next-line total-functions/no-partial-division
   a / b;
 
+// TODO: generate code
+function add(
+  a: PositiveFiniteNumber,
+  b: NonNegativeFiniteNumber,
+): PositiveFiniteNumber;
+function add(
+  a: NonNegativeFiniteNumber,
+  b: PositiveFiniteNumber,
+): PositiveFiniteNumber;
+function add(a: FiniteNumber, b: FiniteNumber): FiniteNumber;
+function add(a: FiniteNumber, b: FiniteNumber): FiniteNumber {
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return (a + b) as FiniteNumber;
+}
+
 // ValidNumber
 // FiniteNumber
 // NonZeroNumber
@@ -152,6 +167,7 @@ export const Num = {
   isNonNegative,
   isPositive,
   div,
+  add,
   clamp,
   roundAt,
   roundBy,
