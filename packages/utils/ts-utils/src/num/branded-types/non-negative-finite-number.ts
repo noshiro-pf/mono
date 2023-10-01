@@ -61,7 +61,7 @@ const floor = (x: NonNegativeFiniteNumber): Uint => Math.floor(x);
 const ceil = (x: NonNegativeFiniteNumber): Uint => Math.ceil(x);
 const round = (x: NonNegativeFiniteNumber): Uint => Math.round(x);
 
-export const NonNegativeNumber = {
+export const NonNegativeFiniteNumber = {
   min: _min,
   max: _max,
 
