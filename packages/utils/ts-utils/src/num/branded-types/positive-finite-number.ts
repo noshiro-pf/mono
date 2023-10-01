@@ -57,7 +57,7 @@ const floor = (x: PositiveFiniteNumber): Uint => Math.floor(x);
 const ceil = (x: PositiveFiniteNumber): PositiveInt => Math.ceil(x);
 const round = (x: PositiveFiniteNumber): Uint => Math.round(x);
 
-export const PositiveNumber = {
+export const PositiveFiniteNumber = {
   min: _min,
   max: _max,
 
