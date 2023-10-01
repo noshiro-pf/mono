@@ -259,6 +259,24 @@ export const replaceRulesType = (content, typeName) => {
       );
       break;
     }
+
+    case eslintPlugins.PreferArrowFunctionRules.typeName: {
+      const slice = mut_ret.slice(
+        mut_ret.indexOf('namespace PreferArrowFunctions {'),
+        mut_ret.indexOf('export type PreferArrowFunctionRules = {')
+      );
+      mut_ret = mut_ret.replaceAll(
+        slice,
+        slice.replaceAll(
+          'readonly returnStyle?: string;',
+          [
+            '/* modified */',
+            "readonly returnStyle?: 'explicit' | 'implicit' | 'unchanged';",
+          ].join('\n')
+        )
+      );
+      break;
+    }
   }
 
   return mut_ret;
