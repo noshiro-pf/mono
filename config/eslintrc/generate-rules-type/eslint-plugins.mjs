@@ -11,6 +11,12 @@ export const eslintPlugins = {
     rulePrefix: 'array-func/',
     outputFileName: 'eslint-array-func-rules.ts',
   },
+  PreferArrowFunctionRules: {
+    typeName: 'PreferArrowFunctionRules',
+    pluginName: 'eslint-plugin-prefer-arrow-functions',
+    rulePrefix: 'prefer-arrow-functions/',
+    outputFileName: 'eslint-prefer-arrow-functions-rules.ts',
+  },
   EslintCypressRules: {
     typeName: 'EslintCypressRules',
     pluginName: 'eslint-plugin-cypress',
