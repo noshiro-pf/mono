@@ -143,7 +143,7 @@ const eslintRules = {
   // customized
   'accessor-pairs': 'error',
   'array-callback-return': 'error',
-  'arrow-body-style': 'error',
+  'arrow-body-style': ['error', 'as-needed'],
   'block-scoped-var': 'error',
   camelcase: 'off', // disabled
   'capitalized-comments': 'off', // disabled
@@ -157,7 +157,7 @@ const eslintRules = {
   'for-direction': 'error',
   'func-name-matching': 'error',
   'func-names': 'error',
-  'func-style': 'off', // on にしてもよいかも
+  'func-style': 'off', // 関数オーバーロードで偽陽性が出る
   'grouped-accessor-pairs': 'error',
   'guard-for-in': 'error',
   'id-denylist': 'error',

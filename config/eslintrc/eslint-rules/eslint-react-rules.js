@@ -47,7 +47,7 @@ const eslintReactRules = {
   ], // modified
   'react/hook-use-state': 'off', // disabled
   'react/iframe-missing-sandbox': 'error',
-  'react/jsx-boolean-value': 'off', // disabled
+  'react/jsx-boolean-value': ['error', 'always'], // disabled
   'react/jsx-curly-brace-presence': 'off', // disabled
   'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }], // modified
   'react/jsx-fragments': 'error',
