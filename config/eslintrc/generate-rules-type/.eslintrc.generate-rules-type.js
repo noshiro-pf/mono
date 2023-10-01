@@ -10,6 +10,7 @@ const config = {
   rules: {
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'], // modified
     '@typescript-eslint/consistent-indexed-object-style': 'error',
+    '@typescript-eslint/no-duplicate-type-constituents': 'error',
 
     // TODO
     // https://github.com/jonaskello/eslint-plugin-functional/blob/master/docs/rules/prefer-readonly-type.md

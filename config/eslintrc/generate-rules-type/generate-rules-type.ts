@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+
+/// <reference path="../../../packages/utils/stdlib/stdlib.d.ts" />
+/// <reference path="../../../packages/utils/ts-type-utils/ts-type-utils.d.ts" />
+
 import type { TSESLint } from '@typescript-eslint/experimental-utils';
 import { type JSONSchema4 } from 'json-schema';
 import { compile } from 'json-schema-to-typescript';
@@ -129,6 +134,8 @@ const createResult = async (
 ): Promise<string> => {
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
+    '/* eslint-disable functional/no-mixed-types */',
+    '/* eslint-disable functional/readonly-type */',
     '/* eslint-disable @typescript-eslint/sort-type-constituents */',
     "import { type Linter } from 'eslint';",
     ...(schemaList.some(({ schema }) => schema.length === 1)
@@ -262,7 +269,7 @@ const createRulePrefix = (
     ? rulePrefixOrNull
     : `${pluginName.replace(/^eslint-plugin-/u, '')}/`;
 
-const generateRulesType = async (
+export const generateRulesType = (
   typeName: string,
   pluginName: string,
   rulePrefixOrNull: string | undefined
@@ -305,27 +312,29 @@ const generateRulesType = async (
   );
 };
 
-export const main = async (): Promise<void> => {
-  if (process.argv.length < 5) {
-    throw new Error('wrong number of arguments.');
-  }
-  const typeName = process.argv[2];
-  const pluginName = process.argv[3];
-  const rulePrefixOrNull = process.argv[4];
+// export const main = async (): Promise<void> => {
+//   if (process.argv.length < 5) {
+//     throw new Error('wrong number of arguments.');
+//   }
+//   const typeName = process.argv[2];
+//   const pluginName = process.argv[3];
+//   const rulePrefixOrNull = process.argv[4];
 
-  if (
-    typeof typeName !== 'string' ||
-    typeof pluginName !== 'string' ||
-    typeof rulePrefixOrNull !== 'string'
-  ) {
-    throw new TypeError('each type of arguments should be string');
-  }
+//   if (
+//     typeof typeName !== 'string' ||
+//     typeof pluginName !== 'string' ||
+//     typeof rulePrefixOrNull !== 'string'
+//   ) {
+//     throw new TypeError('each type of arguments should be string');
+//   }
 
-  const result = await generateRulesType(
-    typeName,
-    pluginName,
-    rulePrefixOrNull
-  );
+//   const result = await generateRulesType(
+//     typeName,
+//     pluginName,
+//     rulePrefixOrNull
+//   );
 
-  console.log(result);
-};
+//   console.log(result);
+// };
+
+// main().catch(console.error);

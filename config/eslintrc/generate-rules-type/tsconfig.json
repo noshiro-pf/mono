@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig/tsconfig.base.nolib.json",
+  "compilerOptions": {
+    "noLib": false,
+    "lib": ["ESNext"],
+    "allowJs": true,
+    "checkJs": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "noEmit": true
+  },
+  "include": ["./**/*.mjs"],
+  "exclude": ["node_modules"]
+}

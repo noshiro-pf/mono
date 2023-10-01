@@ -1,5 +1,6 @@
-/* eslint-disable functional/no-mixed-types */
 /* cSpell:disable */
+/* eslint-disable functional/no-mixed-types */
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
 
@@ -368,8 +369,6 @@ namespace Extensions {
   export type Options =
     | readonly []
     | readonly ['always' | 'ignorePackages' | 'never']
-    | readonly []
-    | readonly ['always' | 'ignorePackages' | 'never']
     | readonly [
         'always' | 'ignorePackages' | 'never',
         {
@@ -381,7 +380,6 @@ namespace Extensions {
           readonly [k: string]: unknown;
         }
       ]
-    | readonly []
     | readonly [
         {
           readonly pattern?: Record<
@@ -392,10 +390,7 @@ namespace Extensions {
           readonly [k: string]: unknown;
         }
       ]
-    | readonly []
     | readonly [Record<string, 'always' | 'ignorePackages' | 'never'>]
-    | readonly []
-    | readonly ['always' | 'ignorePackages' | 'never']
     | readonly [
         'always' | 'ignorePackages' | 'never',
         Record<string, 'always' | 'ignorePackages' | 'never'>
@@ -1134,7 +1129,6 @@ namespace NoCommonjs {
   export type Options =
     | readonly []
     | readonly ['allow-primitive-modules']
-    | readonly []
     | readonly [
         {
           readonly allowPrimitiveModules?: boolean;

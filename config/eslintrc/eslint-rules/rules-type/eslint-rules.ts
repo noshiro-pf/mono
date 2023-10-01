@@ -1,4 +1,6 @@
 /* cSpell:disable */
+/* eslint-disable functional/no-mixed-types */
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
 
@@ -357,7 +359,6 @@ namespace ArrowBodyStyle {
   export type Options =
     | readonly []
     | readonly ['always' | 'never']
-    | readonly []
     | readonly ['as-needed']
     | readonly [
         'as-needed',
@@ -1227,7 +1228,6 @@ namespace Curly {
   export type Options =
     | readonly []
     | readonly ['all']
-    | readonly []
     | readonly ['multi' | 'multi-line' | 'multi-or-nest']
     | readonly ['multi' | 'multi-line' | 'multi-or-nest', 'consistent'];
 
@@ -1473,7 +1473,6 @@ namespace Eqeqeq {
           readonly null?: 'always' | 'never' | 'ignore';
         }
       ]
-    | readonly []
     | readonly ['smart' | 'allow-null'];
 
   export type RuleEntry =
@@ -1551,7 +1550,6 @@ namespace FuncCallSpacing {
   export type Options =
     | readonly []
     | readonly ['never']
-    | readonly []
     | readonly ['always']
     | readonly [
         'always',
@@ -1637,7 +1635,6 @@ namespace FuncNameMatching {
           readonly includeCommonJSModuleExports?: boolean;
         }
       ]
-    | readonly []
     | readonly [
         {
           readonly considerPropertyDescriptor?: boolean;
@@ -2857,7 +2854,6 @@ namespace InitDeclarations {
   export type Options =
     | readonly []
     | readonly ['always']
-    | readonly []
     | readonly ['never']
     | readonly [
         'never',
@@ -5360,7 +5356,6 @@ namespace MultilineCommentStyle {
   export type Options =
     | readonly []
     | readonly ['starred-block' | 'bare-block']
-    | readonly []
     | readonly ['separate-lines']
     | readonly [
         'separate-lines',
@@ -6602,7 +6597,6 @@ namespace NoExtraParens {
   export type Options =
     | readonly []
     | readonly ['functions']
-    | readonly []
     | readonly ['all']
     | readonly [
         'all',
@@ -10514,7 +10508,6 @@ namespace ObjectShorthand {
         | 'consistent'
         | 'consistent-as-needed'
       ]
-    | readonly []
     | readonly ['always' | 'methods' | 'properties']
     | readonly [
         'always' | 'methods' | 'properties',
@@ -10522,7 +10515,6 @@ namespace ObjectShorthand {
           readonly avoidQuotes?: boolean;
         }
       ]
-    | readonly []
     | readonly ['always' | 'methods']
     | readonly [
         'always' | 'methods',
@@ -11604,8 +11596,6 @@ namespace QuoteProps {
   export type Options =
     | readonly []
     | readonly ['always' | 'as-needed' | 'consistent' | 'consistent-as-needed']
-    | readonly []
-    | readonly ['always' | 'as-needed' | 'consistent' | 'consistent-as-needed']
     | readonly [
         'always' | 'as-needed' | 'consistent' | 'consistent-as-needed',
         {
@@ -11960,7 +11950,6 @@ namespace Semi {
             | 'never';
         }
       ]
-    | readonly []
     | readonly ['always']
     | readonly [
         'always',

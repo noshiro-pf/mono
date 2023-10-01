@@ -1,4 +1,6 @@
 /* cSpell:disable */
+/* eslint-disable functional/no-mixed-types */
+/* eslint-disable functional/readonly-type */
 /* eslint-disable @typescript-eslint/sort-type-constituents */
 import { type Linter } from 'eslint';
 
@@ -1487,57 +1489,27 @@ namespace TypeDeclarationImmutability {
     readonly rules?: readonly {
       readonly identifiers: string | readonly string[];
       readonly immutability:
-        | (
-            | 'Mutable'
-            | 'ReadonlyShallow'
-            | 'ReadonlyDeep'
-            | 'Immutable'
-            | null
-            | 2
-            | 3
-            | 4
-            | 5
-            | null
-            | 'Calculating'
-          )
-        | (
-            | 'Mutable'
-            | 'ReadonlyShallow'
-            | 'ReadonlyDeep'
-            | 'Immutable'
-            | null
-            | 2
-            | 3
-            | 4
-            | 5
-            | null
-            | 'Calculating'
-          );
+        | 'Mutable'
+        | 'ReadonlyShallow'
+        | 'ReadonlyDeep'
+        | 'Immutable'
+        | null
+        | 2
+        | 3
+        | 4
+        | 5
+        | 'Calculating';
       readonly comparator?:
-        | (
-            | 'Exactly'
-            | 'AtLeast'
-            | 'More'
-            | -2
-            | 'Less'
-            | -1
-            | 'AtMost'
-            | 0
-            | 1
-            | 2
-          )
-        | (
-            | 'Exactly'
-            | 'AtLeast'
-            | 'More'
-            | -2
-            | 'Less'
-            | -1
-            | 'AtMost'
-            | 0
-            | 1
-            | 2
-          );
+        | 'Exactly'
+        | 'AtLeast'
+        | 'More'
+        | -2
+        | 'Less'
+        | -1
+        | 'AtMost'
+        | 0
+        | 1
+        | 2;
       readonly fixer?:
         | false
         | {
