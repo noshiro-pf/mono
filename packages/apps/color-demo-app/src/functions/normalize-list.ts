@@ -1,5 +1,9 @@
-export const normalizeList = (list: readonly number[]): readonly number[] => {
+export const normalizeList = (
+  list: NonEmptyArray<NonNegativeFiniteNumber>
+): NonEmptyArray<NonNegativeFiniteNumber> => {
   const maxValueInList = Arr.max(list);
-  if (maxValueInList === undefined || maxValueInList === 0) return list;
-  return list.map((l) => l / maxValueInList);
+  if (Num.isNonZero(maxValueInList)) {
+    return Tpl.map(list, (l) => NonNegativeFiniteNumber.div(l, maxValueInList));
+  }
+  return list;
 };

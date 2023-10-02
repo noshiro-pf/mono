@@ -1,7 +1,7 @@
 import { hslToStr, type Hsl } from '@noshiro/ts-utils-additional';
 
 type Props = Readonly<{
-  accumulatedDistribution: readonly (readonly [Hsl, number])[];
+  accumulatedDistribution: readonly (readonly [Hsl, NonNegativeFiniteNumber])[];
 }>;
 
 export const ColoredDistribution = memoNamed<Props>(

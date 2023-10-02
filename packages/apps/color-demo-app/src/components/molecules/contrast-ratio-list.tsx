@@ -1,4 +1,4 @@
-type Props = Readonly<{ contrastRatioList: readonly number[] }>;
+type Props = Readonly<{ contrastRatioList: readonly PositiveFiniteNumber[] }>;
 
 export const ContrastRatioList = memoNamed<Props>(
   'ContrastRatioList',

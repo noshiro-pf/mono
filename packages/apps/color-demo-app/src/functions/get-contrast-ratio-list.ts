@@ -1,11 +1,11 @@
 import { contrastRatioHsl, type Hue } from '@noshiro/ts-utils-additional';
 
 export const hueListToContrastRatioList = (
-  hueList: readonly Hue[],
+  hueList: NonEmptyArray<Hue>,
   saturation: Percent,
   lightness: Percent
-): readonly number[] =>
-  hueList.map((h, idx) =>
+): NonEmptyArray<PositiveFiniteNumber> =>
+  Tpl.map(hueList, (h, idx) =>
     contrastRatioHsl(
       [h, saturation, lightness],
       [hueList[(idx + 1) % hueList.length] ?? 0, saturation, lightness]

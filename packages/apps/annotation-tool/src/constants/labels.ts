@@ -28,12 +28,11 @@ const labelNames = [
 
 type LabelLen = (typeof labelNames)['length'];
 
-// eslint-disable-next-line no-restricted-syntax
-const hues = pickupHighContrastHues(
+const hues: ArrayOfLength<LabelLen, Hue> = pickupHighContrastHues(
   labelNames.length,
   saturationDarker,
   lightnessDarker
-) as ArrayOfLength<LabelLen, Hue>;
+);
 
 export const labels: NonEmptyArray<Label> = pipe(
   Arr.zip(hues, labelNames)

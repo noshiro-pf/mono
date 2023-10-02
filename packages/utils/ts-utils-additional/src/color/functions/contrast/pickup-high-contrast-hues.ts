@@ -1,33 +1,43 @@
-import { Arr, pipe, Tpl } from '@noshiro/ts-utils';
+import { Arr, Num, Tpl } from '@noshiro/ts-utils';
 import { toHue } from '../../to-hue';
 import { type Hue } from '../../types';
 import { hslToRgb } from '../rgb-hsl-conversion';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc';
 import { relativeLuminance } from './relative-luminance';
 
-// constants
 const hues = Arr.seq(360) satisfies Seq<360>;
 
 /**
  * relativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す
  */
-export const pickupHighContrastHues = (
+export function pickupHighContrastHues<N extends SmallUint>(
+  n: N,
+  saturation: Percent,
+  lightness: Percent
+): ArrayOfLength<N, Hue>;
+export function pickupHighContrastHues(
+  n: PositiveSafeIntWithSmallInt,
+  saturation: Percent,
+  lightness: Percent
+): NonEmptyArray<Hue>;
+export function pickupHighContrastHues(
   n: SafeUintWithSmallInt,
   saturation: Percent,
   lightness: Percent
-): NonEmptyArray<Hue> | undefined => {
-  if (n < 1) return undefined;
+): NonEmptyArray<Hue> | undefined {
+  if (!Num.isPositive(n)) return undefined;
 
-  const luminanceList = pipe(hues).chain((list) =>
-    Tpl.map(list, (hue: Hue) =>
-      relativeLuminance(hslToRgb([hue, saturation, lightness]))
-    )
-  ).value;
+  const luminanceList: ArrayOfLength<360, NonNegativeFiniteNumber> = Tpl.map(
+    hues,
+    (hue) => relativeLuminance(hslToRgb([hue, saturation, lightness]))
+  );
 
-  const luminanceDiffAccumulated = getLuminanceListAccumulated(luminanceList);
+  const luminanceDiffAccumulated: NonEmptyArray<FiniteNumber> =
+    getLuminanceListAccumulated(luminanceList);
 
   /* pickup n hues */
-  const mut_result: Hue[] = Arr.asMut(Arr.zeros(n));
+
+  const mut_result: MutableNonEmptyArray<Hue> = Arr.asMut(Arr.zeros(n));
 
   let mut_i = 0;
   let mut_y = 0;
@@ -41,6 +51,5 @@ export const pickupHighContrastHues = (
     }
   }
 
-  // eslint-disable-next-line no-restricted-syntax
-  return mut_result as MutableNonEmptyArray<Hue>; // n >= 1 なので
-};
+  return mut_result;
+}
