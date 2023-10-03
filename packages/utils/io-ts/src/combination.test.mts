@@ -1,4 +1,4 @@
-import { expectType, Result } from '@noshiro/ts-utils';
+import { expectType, Result, toInt } from '@noshiro/ts-utils';
 import { array } from './array/index.mjs';
 import { int } from './branded/index.mjs';
 import { number } from './primitives/index.mjs';
@@ -8,7 +8,7 @@ import { uintRange } from './uint-range/index.mjs';
 
 describe('nested record', () => {
   const nestedRecord = record({
-    xs: array(int(2)),
+    xs: array(int(toInt(2))),
     rec: record({
       a: uintRange({ start: 0, end: 11, defaultValue: 0 }),
       b: uintRange({ start: 0, end: 11, defaultValue: 0 }),
@@ -232,7 +232,7 @@ describe('ymd', () => {
 
 describe('ymd2', () => {
   const ymd2 = record({
-    year: int(1900),
+    year: int(toInt(1900)),
     month: uintRange({
       defaultValue: 1,
       start: 1,

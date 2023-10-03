@@ -1,20 +1,12 @@
-import { isUint32 } from '@noshiro/ts-utils';
+import { isUint32, toUint32 } from '@noshiro/ts-utils';
 import { number } from '../../primitives/index.mjs';
 import { type Type } from '../../type.mjs';
 import { brand } from '../brand.mjs';
 
-const is = isUint32 as (u: number) => u is Uint32;
-
-export const uint32 = (defaultValue: number = 0): Type<Uint32> => {
-  if (!is(defaultValue)) {
-    throw new Error(
-      'defaultValue must be a non-negative integer in the range of 32-bit unsigned',
-    );
-  }
-
-  return brand({
+export const uint32 = (defaultValue: Uint32 = toUint32(0)): Type<Uint32> =>
+  brand({
     codec: number(defaultValue),
-    is,
+    is: isUint32,
     defaultValue,
     brandKeys: [
       'Finite',
@@ -29,4 +21,3 @@ export const uint32 = (defaultValue: number = 0): Type<Uint32> => {
     ],
     brandFalseKeys: ['NaNValue'],
   } as const);
-};

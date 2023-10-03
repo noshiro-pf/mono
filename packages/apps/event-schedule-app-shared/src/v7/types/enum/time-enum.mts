@@ -1,7 +1,8 @@
 import * as t from '@noshiro/io-ts';
+import { toSafeUint } from '@noshiro/ts-utils';
 
 export const yearsTypeDef = t.safeUint(
-  1900,
+  toSafeUint(1900),
   // pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value
 );
 
