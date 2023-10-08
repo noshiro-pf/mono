@@ -49,7 +49,7 @@
     "@noshiro/ts-utils-additional": "*",
     "discord.js": "^14.12.1",
     "dotenv": "^16.0.3",
-    "firebase": "^9.22.1"
+    "firebase": "^10.4.0"
   },
   "devDependencies": {
     "@noshiro/global-ts-utils": "*",
