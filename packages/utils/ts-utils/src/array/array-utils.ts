@@ -206,7 +206,7 @@ function head<H, L extends readonly unknown[]>(list: readonly [H, ...L]): H;
 function head<A>(list: NonEmptyArray<A>): A;
 function head<A>(list: readonly A[]): A | undefined;
 function head<A>(list: readonly A[]): A | undefined {
-  return isEmpty(list) ? undefined : list[0];
+  return list.at(0);
 }
 
 const first = head;

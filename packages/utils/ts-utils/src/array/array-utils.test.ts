@@ -18,6 +18,21 @@ describe('ArrayUtils.isEmpty', () => {
   });
 });
 
+describe('ArrayUtils.isNonEmpty', () => {
+  const xs = [1, 2, 3] as const;
+  const result = Arr.isNonEmpty(xs);
+
+  expectType<typeof result, boolean>('=');
+
+  test('case 1', () => {
+    expect(result).toBe(true);
+  });
+
+  test('case 2', () => {
+    expect(Arr.isNonEmpty([])).toBe(false);
+  });
+});
+
 describe('ArrayUtils.zeros', () => {
   test('fixed length', () => {
     const result = Arr.zeros(3);
@@ -69,21 +84,6 @@ describe('ArrayUtils.seq', () => {
     expectType<typeof result, readonly SafeUint[]>('=');
 
     expect(result).toStrictEqual([0, 1, 2]);
-  });
-});
-
-describe('ArrayUtils.isNonEmpty', () => {
-  const xs = [1, 2, 3] as const;
-  const result = Arr.isNonEmpty(xs);
-
-  expectType<typeof result, boolean>('=');
-
-  test('case 1', () => {
-    expect(result).toBe(true);
-  });
-
-  test('case 2', () => {
-    expect(Arr.isNonEmpty([])).toBe(false);
   });
 });
 
