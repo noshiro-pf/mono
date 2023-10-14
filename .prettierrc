@@ -2,5 +2,6 @@
   "semi": true,
   "endOfLine": "lf",
   "singleQuote": true,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "trailingComma": "es5"
 }
