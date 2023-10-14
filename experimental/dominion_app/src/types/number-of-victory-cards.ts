@@ -96,19 +96,19 @@ const NumVictoryCardsRecordFactory = I.Record<INumVictoryCards>(
   keys.reduce((acc, key) => {
     acc[key] = 0
     return acc
-  }, {} as INumVictoryCards)
+  }, {} as INumVictoryCards),
 )
 
 export const NumVictoryCards = (
-  nvc?: Partial<INumVictoryCards>
+  nvc?: Partial<INumVictoryCards>,
 ): TNumVictoryCards => NumVictoryCardsRecordFactory(nvc)
 
 export const NumVictoryCardsFromJS = (
-  nvc?: Partial<INumVictoryCardsJS>
+  nvc?: Partial<INumVictoryCardsJS>,
 ): TNumVictoryCards => NumVictoryCards(nvc)
 
 export const NumVictoryCardsToJS = (
-  nvc: INumVictoryCards
+  nvc: INumVictoryCards,
 ): INumVictoryCardsJS =>
   keys.reduce((acc: INumVictoryCardsJS, key: string) => {
     acc[key] = nvc[key]
@@ -157,12 +157,12 @@ export const VPtotal = (nvc: INumVictoryCards): number =>
 
 export const VPofCard = (
   nvc: INumVictoryCards,
-  name: keyof INumVictoryCards
+  name: keyof INumVictoryCards,
 ): number => nvc[name] * VPperCard(nvc, name)
 
 export const VPperCard = (
   nvc: INumVictoryCards,
-  name: keyof INumVictoryCards
+  name: keyof INumVictoryCards,
 ): number => {
   switch (name) {
     case 'VPtoken':
@@ -259,7 +259,7 @@ export const VPperCard = (
 
 export const toStr = (
   nvc: INumVictoryCards,
-  dcardlist: I.List<TDCardProperty>
+  dcardlist: I.List<TDCardProperty>,
 ): string => {
   const result: string[] = []
 

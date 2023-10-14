@@ -131,7 +131,10 @@ export class AnswerFormComponent implements OnInit {
   readonly getDayStringEng = utils.date.getDayStringEng;
   readonly toHM = utils.date.toHM;
 
-  constructor(private dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    private dialog: MatDialog,
+    private database: DatabaseService
+  ) {}
 
   ngOnInit() {}
 

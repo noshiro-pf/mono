@@ -39,7 +39,7 @@ export const MyTableBody = memo(
         </TableRow>
       ))}
     </TableBody>
-  )
+  ),
 )
 
 MyTableBody.displayName = 'MyTableBody'

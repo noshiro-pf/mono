@@ -28,7 +28,7 @@ export const HeaderCellSelect = memo(
         reset={reset}
       />
     )
-  }
+  },
 )
 
 HeaderCellSelect.displayName = 'HeaderCellSelect'

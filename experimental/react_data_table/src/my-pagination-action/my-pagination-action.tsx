@@ -17,28 +17,28 @@ export const MyPaginationActions = memo(
       (event: any) => {
         onChangePage(event, 0)
       },
-      [onChangePage]
+      [onChangePage],
     )
 
     const handleBackButtonClick = useCallback(
       (event: any) => {
         onChangePage(event, page - 1)
       },
-      [page, onChangePage]
+      [page, onChangePage],
     )
 
     const handleNextButtonClick = useCallback(
       (event: any) => {
         onChangePage(event, page + 1)
       },
-      [page, onChangePage]
+      [page, onChangePage],
     )
 
     const handleLastPageButtonClick = useCallback(
       (event: any) => {
         onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1))
       },
-      [count, rowsPerPage, onChangePage]
+      [count, rowsPerPage, onChangePage],
     )
 
     return (
@@ -52,7 +52,7 @@ export const MyPaginationActions = memo(
         handleLastPageButtonClick={handleLastPageButtonClick}
       />
     )
-  }
+  },
 )
 
 MyPaginationActions.displayName = 'MyPaginationActions'

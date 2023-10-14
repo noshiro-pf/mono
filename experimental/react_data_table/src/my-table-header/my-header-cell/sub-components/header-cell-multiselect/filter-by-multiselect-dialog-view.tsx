@@ -92,7 +92,7 @@ export const FilterByMultiselectDialogView = memo(
         </DialogActions>
       </Dialog>
     )
-  }
+  },
 )
 
 FilterByMultiselectDialogView.displayName = 'FilterByMultiselectDialogView'

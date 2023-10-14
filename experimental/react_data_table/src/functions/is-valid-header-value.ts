@@ -5,7 +5,7 @@ import { TTableSettings } from '../types/table-settings'
 
 export const isValidHeaderValues = (
   settings: TTableSettings,
-  headerValuesAll: I.List<HeaderValueType>
+  headerValuesAll: I.List<HeaderValueType>,
 ) => {
   if (settings.columnSettings.size !== headerValuesAll.size) {
     console.error('mismatch in length of headerValues and settings')
@@ -18,7 +18,7 @@ export const isValidHeaderValues = (
     const filterType = colSetting.filterType
     if (!isValidHeaderValue(headerValue, filterType)) {
       console.error(
-        `headerValue and filterType does not match. ${i}-th headerValue is "${headerValue}"(${typeof headerValue}) and filterType is "${filterType}".`
+        `headerValue and filterType does not match. ${i}-th headerValue is "${headerValue}"(${typeof headerValue}) and filterType is "${filterType}".`,
       )
       return false
     }
@@ -29,7 +29,7 @@ export const isValidHeaderValues = (
 
 const isValidHeaderValue = (
   headerValue: HeaderValueType,
-  filterType: FilterType
+  filterType: FilterType,
 ): boolean => {
   if (filterType === 'none') return true
   switch (typeof headerValue) {

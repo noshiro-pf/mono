@@ -23,7 +23,7 @@ export const MyHeaderCell = memo(
     headerValue: HeaderValueType
     cellSortStateChange: (
       columnId: number | 'NoColumn',
-      state: CellSortStateType
+      state: CellSortStateType,
     ) => void
     headerValueChange: (v: {
       columnIndex: number
@@ -34,7 +34,7 @@ export const MyHeaderCell = memo(
       (value: string = '') => {
         headerValueChange({ columnIndex: columnId as number, value })
       },
-      [columnId, headerValueChange]
+      [columnId, headerValueChange],
     )
 
     const selectedIndexChange = useCallback(
@@ -44,7 +44,7 @@ export const MyHeaderCell = memo(
           value: selectedIndex,
         })
       },
-      [columnId, headerValueChange]
+      [columnId, headerValueChange],
     )
 
     const selectedIndiceChange = useCallback(
@@ -54,7 +54,7 @@ export const MyHeaderCell = memo(
           value: selectedIndice,
         })
       },
-      [columnId, headerValueChange]
+      [columnId, headerValueChange],
     )
 
     const sortClick = useCallback(() => {
@@ -88,7 +88,7 @@ export const MyHeaderCell = memo(
         sortClick={sortClick}
       />
     )
-  }
+  },
 )
 
 MyHeaderCell.displayName = 'MyHeaderCell'

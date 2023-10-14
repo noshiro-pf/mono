@@ -40,7 +40,7 @@ type _BrandedNumberBaseType = Brand<number, never, never>;
 type _ExtendNumberBrand<
   B extends _BrandedNumberBaseType,
   T extends RelaxedExclude<_Keys, UnwrapBrandTrueKeys<B>>,
-  F extends RelaxedExclude<_Keys, T | UnwrapBrandFalseKeys<B>> = never
+  F extends RelaxedExclude<_Keys, T | UnwrapBrandFalseKeys<B>> = never,
 > = Brand<
   GetBrandValuePart<B>,
   T | (UnwrapBrandTrueKeys<B> & string),
@@ -241,7 +241,7 @@ type _SmallNegativeInt<MaxIndex extends number> = NegativeIndex<MaxIndex>;
  */
 export type SmallInt<
   T extends '!=0' | '' | '<=0' | '<0' | '>=0' | '>0' = '',
-  MaxIndex extends number = _SmallIntIndexMax
+  MaxIndex extends number = _SmallIntIndexMax,
 > = TypeEq<T, '<=0'> extends true
   ? _SmallNegativeInt<MaxIndex> | 0
   : TypeEq<T, '<0'> extends true
@@ -269,7 +269,7 @@ export type SmallUint = SmallInt<'>=0'>;
  */
 export type WithSmallInt<
   N extends Int,
-  MaxIndex extends number = _SmallIntIndexMax
+  MaxIndex extends number = _SmallIntIndexMax,
 > =
   | Exclude<
       SmallInt<'', MaxIndex>,
@@ -299,5 +299,5 @@ export type NegativeInt16WithSmallInt = WithSmallInt<NegativeInt16>;
 
 export type RemoveSmallInt<
   N extends IntWithSmallInt,
-  MaxIndex extends number = _SmallIntIndexMax
+  MaxIndex extends number = _SmallIntIndexMax,
 > = RelaxedExclude<N, SmallInt<'', MaxIndex>>;

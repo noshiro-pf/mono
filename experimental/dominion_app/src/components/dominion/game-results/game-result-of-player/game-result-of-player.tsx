@@ -47,19 +47,19 @@ export const GameResultOfPlayer = memo(
           ColumnSetting({
             sort: 'number-reverse',
             label: `${i}位回数`,
-          })
-        )
+          }),
+        ),
       ),
     })
 
     const table = allPlayerGameResults(gameResultsFiltered).map((obj) =>
       I.List([obj.name, obj.scoreAverage, obj.scoreSum, obj.count]).concat(
-        numRankOption.map((i) => obj.numEachRank.get(i))
-      )
+        numRankOption.map((i) => obj.numEachRank.get(i)),
+      ),
     )
 
     return <DataTable table={table} settings={settings} />
-  }
+  },
 )
 
 GameResultOfPlayer.displayName = 'GameResultOfPlayer'

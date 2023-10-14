@@ -46,7 +46,7 @@ const createStreams = (
 
 export const timerTestCases: readonly [
   StreamTestCase<number>,
-  StreamTestCase<[number, number, number]>
+  StreamTestCase<[number, number, number]>,
 ] = [
   {
     name: 'timer case 1',

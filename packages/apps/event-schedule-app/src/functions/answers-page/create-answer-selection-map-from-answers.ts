@@ -8,7 +8,7 @@ export const createAnswerSelectionMapFromAnswers = (
   readonly [
     iconId: AnswerIconIdWithNone,
     point: AnswerIconPoint,
-    comment: string
+    comment: string,
   ],
   AnswerSelectionMapKey
 > =>

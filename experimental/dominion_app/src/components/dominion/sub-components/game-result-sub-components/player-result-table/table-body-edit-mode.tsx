@@ -43,10 +43,10 @@ export const PlayerResultTableBodyEditMode = memo(
               playerIndex,
               key,
               value: key === 'VP' ? parseInt(value, 10) : value.toString(),
-            })
+            }),
           )
         },
-      [playerResultChange]
+      [playerResultChange],
     )
 
     const turnOrderOnClick = useCallback(
@@ -56,15 +56,15 @@ export const PlayerResultTableBodyEditMode = memo(
             playerIndex,
             key: 'turnOrder',
             value,
-          })
+          }),
         )
       },
-      [playerResultChange]
+      [playerResultChange],
     )
 
     const lastPlayerTurnOnChange = useCallback(
       (name: string) => () => lastTurnPlayerChange(name),
-      [lastTurnPlayerChange]
+      [lastTurnPlayerChange],
     )
 
     return (
@@ -121,7 +121,7 @@ export const PlayerResultTableBodyEditMode = memo(
         ))}
       </TableBody>
     )
-  }
+  },
 )
 
 PlayerResultTableBodyEditMode.displayName = 'PlayerResultTableBodyEditMode'

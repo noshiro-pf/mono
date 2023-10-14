@@ -21,7 +21,7 @@ import {
 export class ObservableBaseClass<
   A,
   Kind extends ObservableBase<A>['kind'],
-  Depth extends ObservableBase<A>['depth']
+  Depth extends ObservableBase<A>['depth'],
 > implements ObservableBase<A>
 {
   readonly id;

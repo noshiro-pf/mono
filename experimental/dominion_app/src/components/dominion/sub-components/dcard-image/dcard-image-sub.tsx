@@ -44,7 +44,7 @@ export const DCardImageSub = memo(
         </div>
       )}
     </div>
-  )
+  ),
 )
 
 DCardImageSub.displayName = 'DCardImageSub'

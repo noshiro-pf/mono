@@ -18,7 +18,7 @@ export const createAnswerSummary = (
             [
               iconId: AnswerIconIdWithNone,
               point: AnswerIconPoint,
-              comment: string
+              comment: string,
             ][]
           >
         | undefined = answerTable.get(datetimeRange);

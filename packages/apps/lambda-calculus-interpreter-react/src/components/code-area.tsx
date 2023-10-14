@@ -48,7 +48,9 @@ const TextArea = styled.textarea`
 
   /* border */
   border-radius: 8px;
-  box-shadow: inset 0 0 1px 2px #3c3d39, 0 0 15px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 0 1px 2px #3c3d39,
+    0 0 15px rgba(0, 0, 0, 0.5);
   border: 1px solid #0b0c0a;
 
   /* color */

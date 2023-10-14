@@ -37,7 +37,7 @@ export const SelectMyName = memo(() => {
   const [nameAfter$, setNameAfter] = useStateAsStream('')
 
   const tabIndex$: RN<number> = useRN(
-    merge(tabIndexChange$, addNameClick$.mapTo(0)).skipUnchanged()
+    merge(tabIndexChange$, addNameClick$.mapTo(0)).skipUnchanged(),
   )
 
   /* streams */
@@ -53,11 +53,11 @@ export const SelectMyName = memo(() => {
         }
         return I.List(names).sort()
       })
-      .skipUnchanged()
+      .skipUnchanged(),
   )
 
   const newName$: RN<string> = useRN(
-    merge(newNameChange$, addNameClick$.mapTo('')).skipUnchanged()
+    merge(newNameChange$, addNameClick$.mapTo('')).skipUnchanged(),
   )
 
   const selectedName$: RN<string> = useRN(
@@ -65,22 +65,22 @@ export const SelectMyName = memo(() => {
       ls.myName$,
       selectedNameChange$,
       addNameClick$.withLatest(newName$).map(([_, n]) => n),
-      deleteCurrentNameClick$.mapTo('')
-    ).skipUnchanged()
+      deleteCurrentNameClick$.mapTo(''),
+    ).skipUnchanged(),
   )
 
   // select from database tab
   const selectedNameIsInGameResults$: RN<boolean> = useRN(
     combine(fbc.nameListFromGameResults$, selectedName$)
       .map(([list, n]) => list.includes(n))
-      .skipUnchanged()
+      .skipUnchanged(),
   )
 
   // add new name tab
   const newNameIsAlreadyUsed$: RN<boolean> = useRN(
     combine(nameList$, newName$)
       .map(([list, name]) => list.includes(name))
-      .skipUnchanged()
+      .skipUnchanged(),
   )
 
   // rename dialog
@@ -88,9 +88,9 @@ export const SelectMyName = memo(() => {
     combine(nameList$, selectedName$, nameAfter$)
       .map(
         ([l, before, after]) =>
-          after !== '' && before !== after && !l.includes(after)
+          after !== '' && before !== after && !l.includes(after),
       )
-      .withInitialValue(false)
+      .withInitialValue(false),
   )
 
   const renameDialogErrorMessage$: RN<string> = useRN(
@@ -101,8 +101,8 @@ export const SelectMyName = memo(() => {
           return 'その名前は既に使われています。'
         }
         return ''
-      }
-    )
+      },
+    ),
   )
 
   /* extract values */
@@ -132,7 +132,7 @@ export const SelectMyName = memo(() => {
     (v) => {
       fb.addUser(User({ name: v })).catch(console.log)
     },
-    false
+    false,
   )
 
   useRNEffect(
@@ -143,7 +143,7 @@ export const SelectMyName = memo(() => {
     (v) => {
       fb.deleteUserByName(v).catch(console.log)
     },
-    false
+    false,
   )
 
   /* onchanges */

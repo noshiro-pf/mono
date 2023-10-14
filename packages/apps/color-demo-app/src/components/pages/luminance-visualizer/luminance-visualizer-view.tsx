@@ -19,7 +19,7 @@ type Props = Readonly<{
   firstHueOnChange: (v: Hue) => void;
   relativeLuminanceDistribution: readonly (readonly [
     Hsl,
-    NonNegativeFiniteNumber
+    NonNegativeFiniteNumber,
   ])[];
   result1_equallySpaced: ColorResult;
   result2_weighted: ColorResult;

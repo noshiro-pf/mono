@@ -41,11 +41,11 @@ const SelectedCardsIdRecordFactory = I.Record<ISelectedCardsId>({
 })
 
 export const SelectedCardsId = (
-  sc?: Partial<ISelectedCardsId>
+  sc?: Partial<ISelectedCardsId>,
 ): TSelectedCardsId => SelectedCardsIdRecordFactory(sc)
 
 export const SelectedCardsIdFromJS = (
-  sc?: Partial<ISelectedCardsIdJS>
+  sc?: Partial<ISelectedCardsIdJS>,
 ): TSelectedCardsId => {
   if (sc === undefined) return SelectedCardsId()
   const wd = withDefaultMix(sc, SelectedCardsId())
@@ -63,7 +63,7 @@ export const SelectedCardsIdFromJS = (
 }
 
 export const SelectedCardsIdToJS: (
-  scid: TSelectedCardsId
+  scid: TSelectedCardsId,
 ) => ISelectedCardsIdJS = (scid) => ({
   Prosperity: scid.Prosperity,
   DarkAges: scid.DarkAges,

@@ -17,10 +17,10 @@ export const gameStateActionMerged$: Observable<readonly GameStateAction[]> =
   // eslint-disable-next-line deprecation/deprecation
   merge([
     localGameStateActionSource$.chain(
-      map((a) => ({ type: 'local', value: a } as const))
+      map((a) => ({ type: 'local', value: a }) as const)
     ),
     db.actionsFromDb$.chain(
-      map((a) => ({ type: 'remote', value: a } as const))
+      map((a) => ({ type: 'remote', value: a }) as const)
     ),
   ] as const)
     .chain(
@@ -163,12 +163,15 @@ export const onAnswerSubmit = (): void => {
     });
   }, autoPlaySpeedRate * time.showJudge);
 
-  setTimeout(() => {
-    gameStateDispatcher({
-      type: 'hideDecidedAnswerBalloon',
-      timestamp: serverTimestamp(),
-    });
-  }, autoPlaySpeedRate * (time.showJudge + time.hideJudge));
+  setTimeout(
+    () => {
+      gameStateDispatcher({
+        type: 'hideDecidedAnswerBalloon',
+        timestamp: serverTimestamp(),
+      });
+    },
+    autoPlaySpeedRate * (time.showJudge + time.hideJudge)
+  );
 };
 
 export const onTurnEndClick = (): void => {

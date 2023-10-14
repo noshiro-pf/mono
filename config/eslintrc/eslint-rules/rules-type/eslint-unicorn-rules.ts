@@ -451,7 +451,7 @@ namespace ImportStyle {
           readonly checkRequire?: boolean;
           readonly extendDefaultStyles?: boolean;
           readonly styles?: ModuleStyles;
-        }
+        },
       ];
   export type Styles = false | BooleanObject;
 
@@ -2238,7 +2238,7 @@ namespace PreventAbbreviations {
           readonly extendDefaultAllowList?: boolean;
           readonly allowList?: BooleanObject;
           readonly ignore?: readonly unknown[];
-        }
+        },
       ];
   export type Replacements = false | BooleanObject;
 

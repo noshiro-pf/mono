@@ -58,7 +58,7 @@ export const SelectedCardsList = memo(
         setDialogIsOpen(true)
         setSelectedCardIndex(cardIndex)
       },
-      [setDialogIsOpen, setSelectedCardIndex]
+      [setDialogIsOpen, setSelectedCardIndex],
     )
 
     return (
@@ -79,7 +79,7 @@ export const SelectedCardsList = memo(
         />
       </>
     )
-  }
+  },
 )
 
 SelectedCardsList.displayName = 'SelectedCardsList'

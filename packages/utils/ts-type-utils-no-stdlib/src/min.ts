@@ -5,7 +5,7 @@ export type Min<N extends Uint10> = _MinImpl<N, []>;
 
 type _MinImpl<
   N extends Uint10,
-  T extends readonly unknown[]
+  T extends readonly unknown[],
 > = IsNever<N> extends true
   ? never
   : T['length'] extends N

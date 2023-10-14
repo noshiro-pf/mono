@@ -36,7 +36,7 @@ export const CardListView = memo(
           />
         )}
     </Root>
-  )
+  ),
 )
 
 CardListView.displayName = 'CardListView'

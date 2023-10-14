@@ -86,7 +86,10 @@ export class GameResultListComponent implements OnInit {
 
   table$!: RN<any[][]>;
 
-  constructor(public dialog: MatDialog, private database: FireDatabaseService) {
+  constructor(
+    public dialog: MatDialog,
+    private database: FireDatabaseService
+  ) {
     this.table$ = this.GRlistFiltered$.map((GRlist) =>
       GRlist.map((gr) => [
         gr.date,

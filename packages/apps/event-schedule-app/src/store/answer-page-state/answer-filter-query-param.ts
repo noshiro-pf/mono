@@ -11,7 +11,7 @@ const keyDef = Routes.queryParamKey.answerTableState;
 
 const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
   'date' | 'score',
-  'asc' | 'desc'
+  'asc' | 'desc',
 ]): void => {
   Router.updateQueryParams(
     (urlSearchParams) => {

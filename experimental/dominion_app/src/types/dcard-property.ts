@@ -113,7 +113,7 @@ export const DCardProperty = (dcp?: Partial<IDCardProperty>): TDCardProperty =>
   DCardPropertyRecordFactory(dcp)
 
 export const DCardPropertyFromJS = (
-  dcp?: Partial<IDCardPropertyJS>
+  dcp?: Partial<IDCardPropertyJS>,
 ): TDCardProperty => {
   if (dcp === undefined) return DCardProperty()
   const dfl = DCardProperty()
@@ -205,7 +205,7 @@ export const isBasicTreasure = (dcp: TDCardProperty): boolean =>
   dcp.cardId === 'Pouch'
 
 export const DCardPropertytoStr = (
-  dcp: TDCardProperty
+  dcp: TDCardProperty,
 ): I.Map<string, string> =>
   I.Map({
     index: dcp.index.toString(),

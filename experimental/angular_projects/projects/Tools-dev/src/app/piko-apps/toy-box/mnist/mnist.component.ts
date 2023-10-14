@@ -42,7 +42,10 @@ export class MnistComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private dialogRef!: any;
 
-  constructor(private model: ModelService, public dialog: MatDialog) {}
+  constructor(
+    private model: ModelService,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     const imageData$: Observable<np.TNdNum> = this.predictionClick$.pipe(

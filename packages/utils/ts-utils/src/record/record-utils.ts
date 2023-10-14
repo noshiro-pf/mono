@@ -136,7 +136,7 @@ const merge = <R1 extends RecordBase, R2 extends RecordBase>(
     ? R1[Key]
     : never;
   // eslint-disable-next-line no-restricted-syntax
-}> => ({ ...record1, ...record2 } as never);
+}> => ({ ...record1, ...record2 }) as never;
 
 function hasKeyValue<R extends RecordBase, K extends keyof R, V extends R[K]>(
   rec: R,
@@ -147,13 +147,13 @@ function hasKeyValue<R extends RecordBase, K extends keyof R, V extends R[K]>(
 function hasKeyValue<
   R extends RecordBase,
   K extends PropertyKey,
-  V extends R[K]
+  V extends R[K],
 >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V>;
 
 function hasKeyValue<
   R extends RecordBase,
   K extends PropertyKey,
-  V extends R[K]
+  V extends R[K],
 >(rec: R, key: K, valueChecker: (v: R[K]) => v is V): rec is R & Record<K, V> {
   return Object.hasOwn(rec, key) && valueChecker(rec[key]);
 }

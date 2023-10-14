@@ -18,7 +18,7 @@ export const Randomizer = memo(() => {
       fbc.currentRandomizerGroup$
         .map((g) => g !== undefined)
         .mapTo<boolean>(true), // TODO
-    []
+    [],
   )
 
   const BlackMarketIsUsed$: RN<boolean> = useMemo(
@@ -29,9 +29,9 @@ export const Randomizer = memo(() => {
           !group.selectedCardsHistory.isEmpty() &&
           !group.selectedCardsHistory
             .get(group.selectedIndexInHistory, SelectedCards())
-            .BlackMarketPile.isEmpty()
+            .BlackMarketPile.isEmpty(),
       ),
-    []
+    [],
   )
 
   /* extract values */

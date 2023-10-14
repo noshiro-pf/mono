@@ -34,15 +34,15 @@ const keyGen = () => Math.random().toString()
 export const scoreTable$: RN<I.List<I.List<number>>> = fromObservable(
   [],
   list(database.ref(paths.database.data.scoreTable)).pipe(
-    map((changes) => changes.map((c) => c.snapshot.val()))
-  )
+    map((changes) => changes.map((c) => c.snapshot.val())),
+  ),
 ).map((s) => I.List(s.map((e) => I.List(e))))
 
 export const expansions$: RN<I.List<string>> = fromObservable(
   [],
   list(database.ref(paths.database.data.expansions)).pipe(
-    map((changes) => changes.map((c) => c.snapshot.val()))
-  )
+    map((changes) => changes.map((c) => c.snapshot.val())),
+  ),
 ).map((s) => I.List(s))
 
 // dcardlist
@@ -52,16 +52,16 @@ export const dcardlist$: RN<I.List<TDCardProperty>> = fromObservable(
   list(database.ref(paths.database.data.dcardlist)).pipe(
     map((changes) =>
       changes.map((c) =>
-        DCardPropertyFromJS({ key: c.snapshot.key, ...c.snapshot.val() })
-      )
-    )
-  )
+        DCardPropertyFromJS({ key: c.snapshot.key, ...c.snapshot.val() }),
+      ),
+    ),
+  ),
 ).map((dcardlist) => I.List(dcardlist))
 
 export const setDcardImgUrl = (
   key: string,
   frontOrBack: 'front' | 'back',
-  imgUrl: string
+  imgUrl: string,
 ): Promise<any> => {
   if (!key) return Promise.resolve()
   return database
@@ -74,8 +74,8 @@ export const setDcardImgUrl = (
 export const users$: RN<I.List<TUser>> = fromObservable(
   [],
   list(database.ref(paths.database.users)).pipe(
-    map((changes) => changes.map((c) => UserFromJS(c.snapshot.val())))
-  )
+    map((changes) => changes.map((c) => UserFromJS(c.snapshot.val()))),
+  ),
 ).map((users) => I.List(users))
 
 export const setUser = (key: string, user: TUser): Promise<any> => {
@@ -111,14 +111,14 @@ export const gameResults$: RN<I.List<TGameResult>> = combine(
   fromObservable(
     [],
     list(database.ref(paths.database.gameResults)).pipe(
-      map((changes) => changes.map((c) => GameResultFromJS(c.snapshot.val())))
-    )
+      map((changes) => changes.map((c) => GameResultFromJS(c.snapshot.val()))),
+    ),
   ),
-  scoreTable$
+  scoreTable$,
 ).map(([gameResults, scoreTable]) =>
   I.List(gameResults).map((gr) =>
-    gr.set('players', getScored(scoreTable, gr.players, gr.lastTurnPlayer))
-  )
+    gr.set('players', getScored(scoreTable, gr.players, gr.lastTurnPlayer)),
+  ),
 )
 
 export const setGameResult = (key: string, gr: TGameResult): Promise<any> => {
@@ -136,7 +136,7 @@ export const addGameResult = (gr: TGameResult): Promise<any> => {
 
 export const renameGameResult = (
   nameBefore: string,
-  nameAfter: string
+  nameAfter: string,
 ): Promise<any> => {
   const updates: { [key: string]: any } = {}
   gameResults$.value.forEach((gr) => {
@@ -159,7 +159,7 @@ export const randomizerGroups$: RN<I.List<TRandomizerGroup>> = fromObservable(
   [],
   list(database.ref(paths.database.randomizerGroups)).pipe(
     map((changes) =>
-      changes.map((c) => RandomizerGroupFromJS(c.snapshot.val()))
-    )
-  )
+      changes.map((c) => RandomizerGroupFromJS(c.snapshot.val())),
+    ),
+  ),
 ).map((randomizerGroups) => I.List(randomizerGroups))

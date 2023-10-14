@@ -53,7 +53,7 @@ export const positionAll = (position: string, value: string) =>
     position,
     right: value,
     top: value,
-  } as const);
+  }) as const;
 
 export const baseTypography = [
   `font-size: ${ptFontSizePx}px;`,

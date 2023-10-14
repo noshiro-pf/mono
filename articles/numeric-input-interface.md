@@ -28,7 +28,7 @@ numeric input の設計を考える上で、まず React の controlled componen
       (ev: React.ChangeEvent<HTMLInputElement>) => {
         setStr(ev.target.value);
       },
-      []
+      [],
     );
 
     return (
@@ -193,7 +193,7 @@ const FullyControlledNumericInput = (props: Props) => {
       const value = ev.target.value;
       onChange(value);
     },
-    []
+    [],
   );
 
   return <input type="number" value={value} onChange={handleChange} />;
@@ -206,7 +206,7 @@ const App = () => {
     (ev: React.ChangeEvent<HTMLInputElement>) => {
       setNumStr(ev.target.value);
     },
-    []
+    [],
   );
 
   // フォーム状態 `numStr` を使用する箇所で parse 処理が都度必要になる
@@ -359,7 +359,7 @@ type Props = Readonly<{
       (ev: React.ChangeEvent<HTMLInputElement>) => {
         onChange(ev.target.value);
       },
-      [onChange]
+      [onChange],
     );
 
     return (

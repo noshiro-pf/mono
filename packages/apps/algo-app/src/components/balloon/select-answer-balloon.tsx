@@ -85,7 +85,7 @@ export const SelectAnswerBalloon = memoNamed<Props>(
               onClick: () => {
                 onSelectedNumberChange(n);
               },
-            } as const)
+            }) as const
         ),
       [cardColor, onSelectedNumberChange, selectedNumber]
     );

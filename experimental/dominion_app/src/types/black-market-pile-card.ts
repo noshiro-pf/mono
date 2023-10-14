@@ -11,7 +11,7 @@ export type TBlackMarketPileCard = I.Record<IBlackMarketPileCard> &
   Readonly<IBlackMarketPileCard>
 
 export const BlackMarketPileCard = (
-  bm?: Partial<IBlackMarketPileCard>
+  bm?: Partial<IBlackMarketPileCard>,
 ): TBlackMarketPileCard =>
   I.Record<IBlackMarketPileCard>({
     cardIndex: 0,
@@ -19,11 +19,11 @@ export const BlackMarketPileCard = (
   })(bm)
 
 export const BlackMarketPileCardFromJS = (
-  bm?: Partial<IBlackMarketPileCardJS>
+  bm?: Partial<IBlackMarketPileCardJS>,
 ): TBlackMarketPileCard => BlackMarketPileCard(bm)
 
 export const BlackMarketPileCardToJS = (
-  bm: TBlackMarketPileCard
+  bm: TBlackMarketPileCard,
 ): IBlackMarketPileCardJS => ({
   cardIndex: bm.cardIndex,
   faceUp: bm.faceUp,

@@ -49,7 +49,7 @@ const createStreams = (
 
 export const auditTimeTestCases: readonly [
   StreamTestCase<number>,
-  StreamTestCase<number>
+  StreamTestCase<number>,
 ] = [
   {
     name: 'auditTime case 1',

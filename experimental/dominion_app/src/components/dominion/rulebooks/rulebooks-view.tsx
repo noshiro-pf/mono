@@ -57,7 +57,7 @@ export const RulebooksView = memo(
           ))}
       </div>
     </div>
-  )
+  ),
 )
 
 RulebooksView.displayName = 'RulebooksView'

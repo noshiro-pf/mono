@@ -48,7 +48,7 @@ export const createState = <T>(
   { value: T },
   (next: T) => void,
   (fn: (value: T) => T) => void,
-  CallbackFunction[]
+  CallbackFunction[],
 ] => {
   const stateRef = {
     value: init,

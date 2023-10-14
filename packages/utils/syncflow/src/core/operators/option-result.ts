@@ -19,7 +19,7 @@ export const unwrapMaybe =
     new UnwrapMaybeObservableClass(parentObservable);
 
 export const unwrapMaybeI = <
-  M extends Maybe.Base
+  M extends Maybe.Base,
 >(): InitializedToInitializedOperator<M, Maybe.Unwrap<M> | undefined> =>
   // eslint-disable-next-line no-restricted-syntax
   unwrapMaybe() as InitializedToInitializedOperator<
@@ -36,7 +36,7 @@ export const unwrapResultOk =
     new UnwrapResultOkObservableClass(parentObservable);
 
 export const unwrapResultOkI = <
-  R extends Result.Base
+  R extends Result.Base,
 >(): InitializedToInitializedOperator<R, Result.UnwrapOk<R> | undefined> =>
   // eslint-disable-next-line no-restricted-syntax
   unwrapResultOk() as InitializedToInitializedOperator<
@@ -53,7 +53,7 @@ export const unwrapResultErr =
     new UnwrapResultErrObservableClass(parentObservable);
 
 export const unwrapResultErrI = <
-  R extends Result.Base
+  R extends Result.Base,
 >(): InitializedToInitializedOperator<R, Result.UnwrapErr<R> | undefined> =>
   // eslint-disable-next-line no-restricted-syntax
   unwrapResultErr() as InitializedToInitializedOperator<

@@ -25,7 +25,7 @@ const createStreams = (
 };
 
 export const mapWithIndexTestCases: readonly [
-  StreamTestCase<[number, number]>
+  StreamTestCase<[number, number]>,
 ] = [
   {
     name: 'mapWithIndex case 1',

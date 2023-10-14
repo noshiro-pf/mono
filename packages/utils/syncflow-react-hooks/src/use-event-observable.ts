@@ -17,7 +17,7 @@ export const useVoidEventObservable = (): [Observable<void>, () => void] => {
 
 export const useEventObservable = <A>(): [
   Observable<A>,
-  (value: A) => void
+  (value: A) => void,
 ] => {
   const src$ = useMemo<SourceObservable<A>>(source, []);
 

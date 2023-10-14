@@ -52,13 +52,13 @@ export const GameResultList = memo(
         toYMDslashed(gr.date),
         gr.place,
         gr.players.map((p) => `${p.rank}. ${p.name}(${p.VP})`).join('，'),
-      ])
+      ]),
     )
 
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false)
 
     const [selectedGameResult, setSelectedGameResult] = useState<TGameResult>(
-      GameResult()
+      GameResult(),
     )
 
     const closeDialog = useCallback(() => {
@@ -68,11 +68,11 @@ export const GameResultList = memo(
     const cellClick = useCallback(
       (pos: ICellPosition) => {
         setSelectedGameResult(
-          gameResultsFiltered.get(pos.rowIndex, GameResult())
+          gameResultsFiltered.get(pos.rowIndex, GameResult()),
         )
         setDialogIsOpen(true)
       },
-      [gameResultsFiltered, setDialogIsOpen, setSelectedGameResult]
+      [gameResultsFiltered, setDialogIsOpen, setSelectedGameResult],
     )
 
     const expansions = useRNValue(fb.expansions$)
@@ -90,7 +90,7 @@ export const GameResultList = memo(
         />
       </>
     )
-  }
+  },
 )
 
 GameResultList.displayName = 'GameResultList'

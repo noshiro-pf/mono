@@ -62,7 +62,7 @@ export const RenameDialog = memo(
         </>
       )}
     </Dialog>
-  )
+  ),
 )
 
 RenameDialog.displayName = 'RenameDialog'

@@ -57,7 +57,10 @@ export class AnswerFormComponent implements OnInit, OnDestroy {
   getDayStringEng = utils.date.getDayStringEng;
   toHM = utils.date.toHM;
 
-  constructor(private dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    private dialog: MatDialog,
+    private database: DatabaseService
+  ) {}
 
   ngOnInit() {
     this.allDatesSelected$ = this.dateToSymbolId$.pipe(

@@ -71,7 +71,7 @@ describe('RecordUtils', () => {
       const result = RecordUtils.update(
         rcd,
         'x',
-        (curr) => ({ a: curr.a + 1, b: curr.b + 2 } as const)
+        (curr) => ({ a: curr.a + 1, b: curr.b + 2 }) as const
       );
 
       expectType<typeof result, R0>('=');

@@ -22,7 +22,7 @@ export const ExpansionsToggleListView = memo(
       (name: string) => (_: any, checked: boolean) => {
         checkOnChangeInput({ name, checked })
       },
-      [checkOnChangeInput]
+      [checkOnChangeInput],
     )
 
     const selectionState: 'all' | 'partial' | 'none' = (() => {
@@ -77,7 +77,7 @@ export const ExpansionsToggleListView = memo(
         </div>
       </>
     )
-  }
+  },
 )
 
 ExpansionsToggleListView.displayName = 'ExpansionsToggleListView'

@@ -73,7 +73,7 @@ export const HeaderCellView = memo(
         )}
       </TableCellContent>
     </TableCell>
-  )
+  ),
 )
 
 HeaderCellView.displayName = 'HeaderCellView'

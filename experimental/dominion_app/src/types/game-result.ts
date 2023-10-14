@@ -84,7 +84,7 @@ export const GameResultToJS = (gr: TGameResult): IGameResultJS => ({
 const isHigher = (
   playerA: TPlayerResultRanked,
   playerB: TPlayerResultRanked,
-  lastTurnOrder: number
+  lastTurnOrder: number,
 ): boolean => {
   if (playerA.VP > playerB.VP) return true
   if (playerA.VP < playerB.VP) return false
@@ -98,7 +98,7 @@ const isHigher = (
 
 const getRanked = (
   lastTurnPlayer: string,
-  players: I.List<TPlayerResultRanked>
+  players: I.List<TPlayerResultRanked>,
 ): I.List<TPlayerResultRanked> => {
   const rankTemp: number[] = players.map(() => 1).toArray()
 
@@ -123,7 +123,7 @@ const getRanked = (
       rank: rankTemp[i],
       score: p.score,
       turnOrder: p.turnOrder,
-    })
+    }),
   )
   // .map((p, i) => [i, p] as [number, TPlayerResultRanked])
   // .sort((a, b) => a.rank - b.rank);
@@ -142,7 +142,7 @@ const getRanked = (
  */
 const averagedScore = (
   scoreList: I.List<number>, // ex.) I.List([-1, 6, 3, 1, 0, -1, -1])
-  rankList: I.List<number> // ex.) I.List([1, 2, 2, 4])
+  rankList: I.List<number>, // ex.) I.List([1, 2, 2, 4])
 ): I.List<number> => {
   const scoreListTemp = scoreList.toArray() // [-1, 6, 3, 1, 0, -1, -1]
   const rankListTemp = rankList.sort().push(10000).toArray() // 番兵付きrankList [1, 2, 2, 4, 10000]
@@ -170,12 +170,12 @@ const averagedScore = (
 export const getScored = (
   scoreTable: I.List<I.List<number>>,
   players: I.List<TPlayerResultRanked>,
-  lastTurnPlayer: string
+  lastTurnPlayer: string,
 ): I.List<TPlayerResultRanked> => {
   const playersRanked = getRanked(lastTurnPlayer, players)
   const scoreList = averagedScore(
     scoreTable.get(players.size, I.List([0, 0, 0, 0, 0, 0, 0])),
-    playersRanked.map((e) => e.rank)
+    playersRanked.map((e) => e.rank),
   )
 
   return playersRanked.map((e) => e.set('score', scoreList.get(e.rank, 0)))
@@ -185,72 +185,72 @@ export const getScored = (
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 2, 3, 4])).equals(
-    I.List([-1, 6, 3, 1, 0, -1, -1])
-  )
+    I.List([-1, 6, 3, 1, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 1, 3, 4])).equals(
-    I.List([-1, 4.5, 3, 1, 0, -1, -1])
-  )
+    I.List([-1, 4.5, 3, 1, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 2, 2, 4])).equals(
-    I.List([-1, 6, 2, 1, 0, -1, -1])
-  )
+    I.List([-1, 6, 2, 1, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 2, 3, 3])).equals(
-    I.List([-1, 6, 3, 0.5, 0, -1, -1])
-  )
+    I.List([-1, 6, 3, 0.5, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 1, 3, 3])).equals(
-    I.List([-1, 4.5, 3, 0.5, 0, -1, -1])
-  )
+    I.List([-1, 4.5, 3, 0.5, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 1, 1, 4])).equals(
-    I.List([-1, 3.333, 3, 1, 0, -1, -1])
-  )
+    I.List([-1, 3.333, 3, 1, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 2, 2, 2])).equals(
-    I.List([-1, 6, 1.333, 1, 0, -1, -1])
-  )
+    I.List([-1, 6, 1.333, 1, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 6, 3, 1, 0, -1, -1]), I.List([1, 1, 1, 1])).equals(
-    I.List([-1, 2.5, 3, 1, 0, -1, -1])
-  )
+    I.List([-1, 2.5, 3, 1, 0, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 5, 2.5, 0, -1, -1, -1]), I.List([1, 2, 3])).equals(
-    I.List([-1, 5, 2.5, 0, -1, -1, -1])
-  )
+    I.List([-1, 5, 2.5, 0, -1, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 5, 2.5, 0, -1, -1, -1]), I.List([1, 1, 3])).equals(
-    I.List([-1, 3.75, 2.5, 0, -1, -1, -1])
-  )
+    I.List([-1, 3.75, 2.5, 0, -1, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 5, 2.5, 0, -1, -1, -1]), I.List([1, 2, 2])).equals(
-    I.List([-1, 5, 1.25, 0, -1, -1, -1])
-  )
+    I.List([-1, 5, 1.25, 0, -1, -1, -1]),
+  ),
 )
 
 console.assert(
   averagedScore(I.List([-1, 5, 2.5, 0, -1, -1, -1]), I.List([1, 1, 1])).equals(
-    I.List([-1, 2.5, 2.5, 0, -1, -1, -1])
-  )
+    I.List([-1, 2.5, 2.5, 0, -1, -1, -1]),
+  ),
 )

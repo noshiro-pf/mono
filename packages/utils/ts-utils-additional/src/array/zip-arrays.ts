@@ -6,8 +6,8 @@ export function zipArrays<
   T extends readonly [
     readonly unknown[],
     readonly unknown[],
-    ...(readonly (readonly unknown[])[])
-  ]
+    ...(readonly (readonly unknown[])[]),
+  ],
 >(...arrays: T): readonly Unwrap<T>[] {
   const len = Arr.min(arrays.map(Arr.size));
 

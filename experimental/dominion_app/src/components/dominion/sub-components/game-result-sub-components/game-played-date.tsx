@@ -16,7 +16,7 @@ export const GamePlayedDate = memo(
   }>) => {
     const dateValue = useMemo(
       () => `${dateUtils.toYMD(date, '-')}T${dateUtils.toHM(date)}`,
-      [date]
+      [date],
     )
 
     return (
@@ -30,7 +30,7 @@ export const GamePlayedDate = memo(
         />
       </div>
     )
-  }
+  },
 )
 
 GamePlayedDate.displayName = 'GamePlayedDate'

@@ -88,7 +88,7 @@ const createStreams2 = (
 
 export const combineLatestTestCases: readonly [
   StreamTestCase<[number, number, number, number, number]>,
-  StreamTestCase<number>
+  StreamTestCase<number>,
 ] = [
   {
     name: 'combineLatest case 1',

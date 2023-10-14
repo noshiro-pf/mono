@@ -93,11 +93,11 @@ const RandomizerGroupRecordFactory = I.Record<IRandomizerGroup>({
 })
 
 export const RandomizerGroup = (
-  rmg?: Partial<IRandomizerGroup>
+  rmg?: Partial<IRandomizerGroup>,
 ): TRandomizerGroup => RandomizerGroupRecordFactory(rmg)
 
 export const RandomizerGroupFromJS = (
-  rmg?: Partial<IRandomizerGroupJS>
+  rmg?: Partial<IRandomizerGroupJS>,
 ): TRandomizerGroup => {
   const dfl = RandomizerGroup()
   if (rmg === undefined) return dfl
@@ -112,7 +112,7 @@ export const RandomizerGroupFromJS = (
     selectedExpansions: I.List(wd('selectedExpansions')),
     selectedCardsCheckbox: SelectedCardsCheckbox(wd('selectedCardsCheckbox')),
     BlackMarketPileShuffled: I.List(wd('BlackMarketPileShuffled')).map(
-      BlackMarketPileCard
+      BlackMarketPileCard,
     ),
     BlackMarketPhase: wd('BlackMarketPhase'),
     selectedCardsHistory: I.List(wd('selectedCardsHistory'))
@@ -133,7 +133,7 @@ export const RandomizerGroupFromJS = (
 }
 
 export const RandomizerGroupToJS = (
-  rmg: TRandomizerGroup
+  rmg: TRandomizerGroup,
 ): IRandomizerGroupJS => ({
   key: rmg.key,
   createdDate: rmg.createdDate,

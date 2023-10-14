@@ -6,7 +6,7 @@ import { __RouterContext } from 'react-router';
 import { pathnameToPathList } from './pathname-to-pathlist';
 
 const useRouter = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): RouteComponentProps<RouteParam, StaticContext, unknown> =>
   useContext<RouteComponentProps<RouteParam, StaticContext, unknown>>(
     __RouterContext as unknown as Context<
@@ -15,21 +15,21 @@ const useRouter = <
   );
 
 const useHistory = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): HistoryType<unknown> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.history, [router.history]);
 };
 
 const useLocation = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): LocationType<unknown> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.location, [router.location]);
 };
 
 export const useQuery = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): URLSearchParams => {
   const loc = useLocation<RouteParam>();
   const params = useMemo(() => new URLSearchParams(loc.search), [loc.search]);
@@ -37,21 +37,21 @@ export const useQuery = <
 };
 
 export const useMatch = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): match<RouteParam> => {
   const router = useRouter<RouteParam>();
   return useMemo(() => router.match, [router.match]);
 };
 
 const usePathName = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): string => {
   const loc = useLocation<RouteParam>();
   return useMemo(() => loc.pathname, [loc.pathname]);
 };
 
 export const usePathNameList = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): readonly string[] => {
   const pathname = usePathName<RouteParam>();
   return useMemo(() => pathnameToPathList(pathname), [pathname]);
@@ -62,7 +62,7 @@ export const usePathNameList = <
  * "Hash history cannot PUSH the same path; a new entry will not be added to the history stack"
  */
 export const useNavigator = <
-  RouteParam extends { [K in keyof RouteParam]?: string | undefined }
+  RouteParam extends { [K in keyof RouteParam]?: string | undefined },
 >(): ((pathname: string) => void) => {
   const hist = useHistory<RouteParam>();
   const nav = useCallback(

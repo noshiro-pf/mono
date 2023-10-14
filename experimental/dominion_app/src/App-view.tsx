@@ -60,7 +60,7 @@ export const AppView = memo(
         </div>
       </BrowserRouter>
     </MuiThemeProvider>
-  )
+  ),
 )
 
 AppView.displayName = 'AppView'

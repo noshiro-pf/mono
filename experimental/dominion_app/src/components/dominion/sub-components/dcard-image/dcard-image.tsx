@@ -44,14 +44,14 @@ export const DCardImage = memo(
             ? [230, 150]
             : [widthInput * (23 / 15), widthInput]
           : [heightInput, heightInput * (15 / 23)],
-      [isWide, heightInput, widthInput]
+      [isWide, heightInput, widthInput],
     )
 
     const description = descriptionInput || ''
 
     const borderWidth = useMemo(
       () => (18 / 250) * Math.min(width, height),
-      [width, height]
+      [width, height],
     )
 
     const imgUrl = faceUp ? dcard.imgUrl.front : dcard.imgUrl.back
@@ -74,7 +74,7 @@ export const DCardImage = memo(
         onClick={onClick}
       />
     )
-  }
+  },
 )
 
 DCardImage.displayName = 'DCardImage'

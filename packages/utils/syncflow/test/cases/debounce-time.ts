@@ -84,7 +84,7 @@ const createStreams2 = (
 
 export const debounceTimeTestCases: readonly [
   StreamTestCase<[number, number]>,
-  StreamTestCase<[number, number]>
+  StreamTestCase<[number, number]>,
 ] = [
   {
     name: 'debounceTime case 1',

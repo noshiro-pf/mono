@@ -12,7 +12,7 @@ const parseValue = (valueStr: string): number | undefined =>
 
 export const createNumericInputStateReducer = <
   NumericValue extends number,
-  Action extends NumericInputStateBaseAction = NumericInputStateBaseAction
+  Action extends NumericInputStateBaseAction = NumericInputStateBaseAction,
 >(
   normalizeValue: (value: number) => NumericValue,
   config: Readonly<{

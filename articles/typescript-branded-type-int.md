@@ -129,7 +129,7 @@ export const Int = z
   .number()
   .refine(
     (a) => Number.isInteger(a),
-    (a) => ({ message: `a non-integer number "${a}" was passed to "Int"` })
+    (a) => ({ message: `a non-integer number "${a}" was passed to "Int"` }),
   )
   .brand("Int");
 
@@ -151,7 +151,7 @@ type IntBrand = { readonly Int: unique symbol };
 export const Int = t.brand(
   t.number,
   (a): a is t.Branded<number, IntBrand> => Number.isInteger(a),
-  "Int"
+  "Int",
 );
 
 export type Int = t.TypeOf<typeof Int>;
@@ -284,7 +284,7 @@ type NegativeNumber = number & {
 export type Brand<
   T,
   TrueKeys extends string,
-  FalseKeys extends string = never
+  FalseKeys extends string = never,
 > = T & {
   readonly [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
 };

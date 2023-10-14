@@ -57,7 +57,7 @@ export const updatePollTitle = async (
 
   const [userIdToDisplayNameResult, messages]: [
     Result<IMap<UserId, string>, string>,
-    Discord.Collection<string, Discord.Message>
+    Discord.Collection<string, Discord.Message>,
   ] = await Promise.all([
     createUserIdToDisplayNameMap(
       message.guild,

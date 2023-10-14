@@ -26,25 +26,25 @@ export const DataTableDataFlow = (
   pageNumberSource$: RN<number>,
   headerValueSource$: RN<IHeaderValueChange>,
   sortStateSource$: RN<TSortState>,
-  resetAllClick$: RN<void>
+  resetAllClick$: RN<void>,
 ): RN<TDataTableState> => {
   const _fromPropsValid$ = fromProps$.filter(
     [I.List(), TableSettings()],
-    ([table, settings]) => isValidInput(settings, table)
+    ([table, settings]) => isValidInput(settings, table),
   )
 
   const table$ = _fromPropsValid$.map(([table, _]) => table)
   const settings$ = _fromPropsValid$.map(([_, settings]) => settings)
 
   const tableTransformed$ = _fromPropsValid$.map(([table, settings]) =>
-    transformTable(table, settings)
+    transformTable(table, settings),
   )
 
   const selectorOptionsAllValueOnly$: RN<I.List<I.List<any>>> = combine(
     table$,
-    settings$
+    settings$,
   ).map(([table, settings]) =>
-    makeAllSelectOptions(table, settings.columnSettings)
+    makeAllSelectOptions(table, settings.columnSettings),
   )
 
   // RNs
@@ -56,7 +56,7 @@ export const DataTableDataFlow = (
 
   const initialHeaderValues$: RN<I.List<HeaderValueType>> = combine(
     settings$,
-    selectorOptionsAllValueOnly$
+    selectorOptionsAllValueOnly$,
   ).map(([settings, options]) => getInitialHeaderValues(settings, options))
 
   const headerValuesAll$: RN<I.List<HeaderValueType>> =
@@ -66,13 +66,13 @@ export const DataTableDataFlow = (
           initialHeaderValues,
           (
             acc: I.List<HeaderValueType>,
-            curr: 'resetAll' | IHeaderValueChange
+            curr: 'resetAll' | IHeaderValueChange,
           ) =>
             curr === 'resetAll'
               ? initialHeaderValues
-              : acc.set(curr.columnIndex, curr.value)
+              : acc.set(curr.columnIndex, curr.value),
         )
-        .skipUnchanged(I.is)
+        .skipUnchanged(I.is),
     )
 
   const headerValuesAllBuffered$ = settings$
@@ -85,7 +85,7 @@ export const DataTableDataFlow = (
     .switchMap((sortInit) =>
       merge(sortStateChange$, resetAllClick$.mapTo(sortInit))
         .withInitialValue(sortInit)
-        .skipUnchanged(obj.shallowEq)
+        .skipUnchanged(obj.shallowEq),
     )
 
   const sortStateBuffered$ = settings$
@@ -103,7 +103,7 @@ export const DataTableDataFlow = (
     headerValuesAllBuffered$,
     table$,
     settings$,
-    selectorOptionsAllValueOnly$
+    selectorOptionsAllValueOnly$,
   )
     .map(([headerValuesAll, table, settings, selectorOptionsAllValueOnly]) =>
       getFilteredIndice(
@@ -111,8 +111,8 @@ export const DataTableDataFlow = (
         settings,
         selectorOptionsAllValueOnly,
         headerValuesAll,
-        filterCache
-      )
+        filterCache,
+      ),
     )
     .skipUnchanged()
 
@@ -122,14 +122,14 @@ export const DataTableDataFlow = (
     filteredIndice$,
     table$,
     settings$,
-    selectorOptionsAllValueOnly$
+    selectorOptionsAllValueOnly$,
   ).map(([filteredIndice, table, settings, selectorOptionsAllValueOnly]) =>
     makeAllSelectOptionsWithViewValue(
       table,
       filteredIndice,
       selectorOptionsAllValueOnly,
-      settings.columnSettings
-    )
+      settings.columnSettings,
+    ),
   )
 
   const filteredLength$: RN<number> = filteredIndice$
@@ -141,7 +141,7 @@ export const DataTableDataFlow = (
     .switchMap((itemsPerPageInit) =>
       merge(itemsPerPageChange$, resetAllClick$.mapTo(itemsPerPageInit))
         .withInitialValue(itemsPerPageInit)
-        .skipUnchanged()
+        .skipUnchanged(),
     )
 
   const itemsPerPageBuffered$ = settings$
@@ -156,7 +156,7 @@ export const DataTableDataFlow = (
   const pageNumber$: RN<number> = merge(
     pageNumberChange$,
     pageLength$.mapTo(1),
-    resetAllClick$.mapTo(1)
+    resetAllClick$.mapTo(1),
   ).skipUnchanged()
 
   const pageNumberBuffered$ = settings$
@@ -168,33 +168,33 @@ export const DataTableDataFlow = (
     filteredIndice$,
     sortStateBuffered$,
     table$,
-    settings$
+    settings$,
   ).map(([filteredIndice, sortState, table, settings]) =>
-    getSortedIndice(table, filteredIndice, sortState, settings)
+    getSortedIndice(table, filteredIndice, sortState, settings),
   )
 
   const slicedIndice$: RN<I.List<number>> = combine(
     itemsPerPageBuffered$,
     pageNumberBuffered$,
     sortedIndice$,
-    settings$.pluck('usepagination').skipUnchanged()
+    settings$.pluck('usepagination').skipUnchanged(),
   ).map(([itemsPerPage, pageNumber, sortedIndice, usepagination]) =>
     usepagination
       ? getSlicedIndice(sortedIndice, itemsPerPage, pageNumber)
-      : sortedIndice
+      : sortedIndice,
   )
 
   const tableTransformedSliced$: RN<I.List<[number, I.List<string>]>> = combine(
     tableTransformed$,
-    slicedIndice$
+    slicedIndice$,
   ).map(([tableTransformed, slicedIndice]) =>
     slicedIndice.map(
       (i) =>
         [i, tableTransformed.get(i, I.List<string>())] as [
           number,
-          I.List<string>
-        ]
-    )
+          I.List<string>,
+        ],
+    ),
   )
 
   return combine(
@@ -206,7 +206,7 @@ export const DataTableDataFlow = (
     filteredIndice$,
     sortedIndice$,
     slicedIndice$,
-    tableTransformedSliced$
+    tableTransformedSliced$,
   ).map(
     ([
       sortState,
@@ -229,6 +229,6 @@ export const DataTableDataFlow = (
         sortedIndice,
         slicedIndice,
         tableTransformedSliced,
-      })
+      }),
   )
 }

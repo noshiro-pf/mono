@@ -23,6 +23,6 @@ export const fetchAnswers = (
       a,
       (querySnapshot) =>
         querySnapshot.docs.map((d) => fillAnswer({ ...d.data(), id: d.id })),
-      (message) => ({ type: 'others', message: Str.from(message) } as const)
+      (message) => ({ type: 'others', message: Str.from(message) }) as const
     )
   );

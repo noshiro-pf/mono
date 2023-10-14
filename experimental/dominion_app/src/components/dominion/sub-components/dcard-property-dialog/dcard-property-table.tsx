@@ -42,7 +42,7 @@ export const DCardPropertyDialogTable = memo(
         </TableBody>
       </Table>
     </Paper>
-  )
+  ),
 )
 
 DCardPropertyDialogTable.displayName = 'DCardPropertyDialogTable'

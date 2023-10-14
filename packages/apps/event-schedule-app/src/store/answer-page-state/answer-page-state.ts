@@ -133,7 +133,7 @@ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
               iconId: 'none',
               point: 0,
               comment: '',
-            } as const)
+            }) as const
         )
       )
     )
@@ -626,7 +626,7 @@ const answerBeingEditedList$: InitializedObservable<
                   checked ? set.add(d) : set.delete(d)
                 );
               },
-            } as const)
+            }) as const
         )
       ) ?? []
   )

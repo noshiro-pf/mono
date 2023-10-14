@@ -6,7 +6,7 @@ export type BrandBase = Brand<unknown, never, never>;
 export type Brand<
   T,
   TrueKeys extends string,
-  FalseKeys extends string = never
+  FalseKeys extends string = never,
 > = T & {
   readonly [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
 };
@@ -62,7 +62,7 @@ export type GetBrandValuePart<B extends BrandBase> = B extends Brand<
 export type ExtendBrand<
   B extends BrandBase,
   T extends string,
-  F extends string = never
+  F extends string = never,
 > = IsNever<F & T> extends true // T and F shouldn't have intersection
   ? Brand<
       GetBrandValuePart<B>,

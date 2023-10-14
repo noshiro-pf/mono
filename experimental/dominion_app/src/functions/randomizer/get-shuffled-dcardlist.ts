@@ -3,7 +3,7 @@ import { TDCardProperty } from '~/types/dcard-property'
 
 export const getDcardsInSelectedExpansionsWithIndex = (
   dcardlist: I.List<TDCardProperty>,
-  selectedExpansions: I.List<string>
+  selectedExpansions: I.List<string>,
 ): I.List<{ index: number; dcardprop: TDCardProperty }> => {
   const selectedExpansionsSet = selectedExpansions.toSet()
 
@@ -12,6 +12,6 @@ export const getDcardsInSelectedExpansionsWithIndex = (
     .filter((v) => v.dcardprop.randomizerCandidate)
     .filter(
       (v) =>
-        !selectedExpansionsSet.intersect(v.dcardprop.expansionName).isEmpty()
+        !selectedExpansionsSet.intersect(v.dcardprop.expansionName).isEmpty(),
     )
 }

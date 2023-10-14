@@ -80,7 +80,7 @@ export const RandomizerSelectCardsView = memo(
         </Paper>
       )}
     </Root>
-  )
+  ),
 )
 
 RandomizerSelectCardsView.displayName = 'RandomizerSelectCardsView'

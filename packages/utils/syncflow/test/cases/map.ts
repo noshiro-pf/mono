@@ -32,7 +32,7 @@ const createStreams = (
 export const mapTestCases: readonly [
   StreamTestCase<number>,
   StreamTestCase<number>,
-  StreamTestCase<number>
+  StreamTestCase<number>,
 ] = [
   {
     name: 'map case 1',

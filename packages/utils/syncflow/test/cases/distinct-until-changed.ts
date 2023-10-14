@@ -43,7 +43,7 @@ const createStreams = (
 };
 
 export const distinctUntilChangedTestCases: readonly [
-  StreamTestCase<[number, number]>
+  StreamTestCase<[number, number]>,
 ] = [
   {
     name: 'distinctUntilChanged case 1',

@@ -20,7 +20,7 @@ const answerSelectionMap$: InitializedObservable<
       readonly [
         iconId: AnswerIconIdWithNone,
         point: AnswerIconPoint,
-        comment: string
+        comment: string,
       ],
       AnswerSelectionMapKey
     >
@@ -38,7 +38,7 @@ const answerSelectionMapFn$ = answerSelectionMap$.chain(
       ): readonly [
         iconId: AnswerIconIdWithNone,
         point: AnswerIconPoint,
-        comment: string
+        comment: string,
       ] =>
         answerSelectionMap?.get({ datetimeRange, answerId }) ??
         tp('none', 0, '')
@@ -52,7 +52,7 @@ const answerTable$: InitializedObservable<
         [
           iconId: AnswerIconIdWithNone,
           point: AnswerIconPoint,
-          comment: string
+          comment: string,
         ][]
       >,
       DatetimeRangeMapKey

@@ -4,8 +4,8 @@ import { TSelectedCards, getAllCards } from '~/types/selected-cards'
 
 export const usePotion = (
   selectedCards: TSelectedCards,
-  dcardlist: I.List<TDCardProperty>
+  dcardlist: I.List<TDCardProperty>,
 ) =>
   getAllCards(selectedCards).some(
-    (i) => dcardlist.get(i, DCardProperty()).effects.cost.potion > 0
+    (i) => dcardlist.get(i, DCardProperty()).effects.cost.potion > 0,
   )

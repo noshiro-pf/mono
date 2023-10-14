@@ -35,11 +35,11 @@ const SelectedCardsCheckboxRecordFactory = I.Record<ISelectedCardsCheckbox>({
 })
 
 export const SelectedCardsCheckbox = (
-  scchk?: Partial<TSelectedCardsCheckbox>
+  scchk?: Partial<TSelectedCardsCheckbox>,
 ): TSelectedCardsCheckbox => SelectedCardsCheckboxRecordFactory(scchk)
 
 export const SelectedCardsCheckboxFromJS = (
-  scchk?: Partial<ISelectedCardsCheckboxJS>
+  scchk?: Partial<ISelectedCardsCheckboxJS>,
 ): TSelectedCardsCheckbox => {
   if (scchk === undefined) return SelectedCardsCheckbox()
   const wd = withDefaultMix(scchk, SelectedCardsCheckbox())
@@ -55,7 +55,7 @@ export const SelectedCardsCheckboxFromJS = (
 }
 
 export const SelectedCardsCheckboxToJS = (
-  scchk: TSelectedCardsCheckbox
+  scchk: TSelectedCardsCheckbox,
 ): ISelectedCardsCheckboxJS => ({
   KingdomCards10: scchk.KingdomCards10.toArray(),
   BaneCard: scchk.BaneCard.toArray(),

@@ -18,7 +18,7 @@ export const MyTabs = memo(
       (_event: any, value: string) => {
         tabIndexChange(parseInt(value, 10))
       },
-      [tabIndexChange]
+      [tabIndexChange],
     )
 
     const scrollable = useValueWithDefault(scrollableInput, false)
@@ -37,7 +37,7 @@ export const MyTabs = memo(
         ))}
       </Tabs>
     )
-  }
+  },
 )
 
 MyTabs.displayName = 'MyTabs'

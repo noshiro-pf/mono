@@ -156,10 +156,13 @@ const ListItem = styled.div`
   padding: 18px;
 
   /* .bp4-elevation-1 */
-  box-shadow: 0 0 0 1px rgb(17 20 24 / 10%), 0 0 0 rgb(17 20 24 / 0%),
+  box-shadow:
+    0 0 0 1px rgb(17 20 24 / 10%),
+    0 0 0 rgb(17 20 24 / 0%),
     0 1px 1px rgb(17 20 24 / 20%);
 
-  transition: transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
+  transition:
+    transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-transform 200ms cubic-bezier(0.4, 1, 0.75, 0.9),
     -webkit-box-shadow 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
@@ -170,7 +173,9 @@ const ListItem = styled.div`
     text-decoration: none;
     color: unset;
 
-    box-shadow: 0 0 0 1px rgb(17 20 24 / 10%), 0 2px 4px rgb(17 20 24 / 20%),
+    box-shadow:
+      0 0 0 1px rgb(17 20 24 / 10%),
+      0 2px 4px rgb(17 20 24 / 20%),
       0 8px 24px rgb(17 20 24 / 20%);
     cursor: pointer;
   }

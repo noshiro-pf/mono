@@ -16,7 +16,7 @@ export const MyTableCellButton = memo(
     <Button variant='outlined' style={buttonStyle} onClick={onClick} fullWidth>
       {value}
     </Button>
-  )
+  ),
 )
 
 MyTableCellButton.displayName = 'MyTableCellButton'

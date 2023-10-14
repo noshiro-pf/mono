@@ -288,7 +288,7 @@ export function setIn<R extends ReadonlyRecordBase>(
 
 ```ts
 export type TypeEq<X, Y> = (<T>() => T extends X ? 1 : 2) extends <
-    T
+    T,
 >() => T extends Y ? 1 : 2
     ? true
     : false;
@@ -500,7 +500,7 @@ readonly ['x', ...LeafPaths<R['x']>]
 ```ts
 type LeafPathsImplListCase<
     T extends readonly unknown[],
-    PathHead extends keyof T = keyof T
+    PathHead extends keyof T = keyof T,
 > = T extends readonly []
     ? readonly []
     : IsInfiniteList<T> extends true
@@ -558,7 +558,7 @@ export type IsInfiniteList<T extends readonly unknown[]> =
 ```ts
 type Prefixes<T extends readonly unknown[]> = T extends readonly [
     infer Head,
-    ...infer Rest
+    ...infer Rest,
 ]
     ? readonly [] | readonly [Head, ...Prefixes<Rest>]
     : readonly [];
@@ -632,7 +632,7 @@ type Paths<R> = Prefixes<LeafPaths<R>>;
 ```ts
 type RecordValueAtPath<R, Path extends Paths<R>> = Path extends readonly [
     infer Head,
-    ...infer Rest
+    ...infer Rest,
 ]
     ? Head extends keyof R
         ? Rest extends Paths<R[Head]>
@@ -694,7 +694,7 @@ assertType<
                   {
                       d: { x: number }[];
                       4: 5;
-                  }
+                  },
               ]
             | [
                   ['y'],
@@ -706,7 +706,7 @@ assertType<
                       g: [{ x: number }, ...{ y: string[] }[]];
                       h: (a: number) => string;
                       i: (a: string) => string;
-                  }
+                  },
               ]
             | [['x', 'a'], 1]
             | [['x', 'b'], { x: [number, ...string[]] }[]]

@@ -13,7 +13,7 @@ describe('pipe', () => {
   test('case 2', () => {
     expect(
       pipe({ x: 2, y: 3 } as const)
-        .chain((p) => ({ x: p.x, y: p.y * 4 } as const))
+        .chain((p) => ({ x: p.x, y: p.y * 4 }) as const)
         .chain((p) => ({ x: p.x * 5, y: p.y })).value
     ).toStrictEqual({ x: 10, y: 12 });
   });

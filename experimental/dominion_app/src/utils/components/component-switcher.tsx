@@ -18,10 +18,10 @@ export const ComponentSwitcher = memo(
           <div key={i} style={{ display: 'none' }}>
             {c}
           </div>
-        )
+        ),
       )}
     </>
-  )
+  ),
 )
 
 ComponentSwitcher.displayName = 'ComponentSwitcher'

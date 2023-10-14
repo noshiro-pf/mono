@@ -9,7 +9,7 @@ type Options = readonly [
     checkParameterProperties?: boolean;
     ignoreInferredTypes?: boolean;
     allow?: readonly __String[];
-  }>
+  }>,
 ];
 
 type MessageIds = 'shouldBeReadonly';

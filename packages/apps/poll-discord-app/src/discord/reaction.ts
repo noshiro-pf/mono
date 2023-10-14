@@ -92,7 +92,7 @@ const onMessageReactCommon = async (
   const [updateMessageReactionResult, updatePollUpdatedAtResult, messages]: [
     Result<void, string>,
     Result<void, string>,
-    Discord.Collection<string, Discord.Message>
+    Discord.Collection<string, Discord.Message>,
   ] = await Promise.all([
     firestoreApi.updateMessageReaction(
       pollId,

@@ -758,14 +758,14 @@ namespace JsxBooleanValue {
         'always',
         {
           readonly never?: readonly string[];
-        }
+        },
       ]
     | readonly ['never']
     | readonly [
         'never',
         {
           readonly always?: readonly string[];
-        }
+        },
       ];
 
   export type RuleEntry =
@@ -1013,7 +1013,7 @@ namespace JsxCurlySpacing {
             readonly children?: BasicConfigOrBoolean;
             readonly [k: string]: unknown;
           })
-        | ('always' | 'never')
+        | ('always' | 'never'),
       ]
     | readonly [
         (
@@ -1030,7 +1030,7 @@ namespace JsxCurlySpacing {
             readonly objectLiterals?: 'always' | 'never';
             readonly [k: string]: unknown;
           };
-        }
+        },
       ];
   export type BasicConfigOrBoolean = BasicConfig | boolean;
 

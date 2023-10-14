@@ -34,7 +34,7 @@ export const DCardImageList = memo(
         ))}
       </DCardList>
     </>
-  )
+  ),
 )
 
 DCardImageList.displayName = 'DCardImageList'

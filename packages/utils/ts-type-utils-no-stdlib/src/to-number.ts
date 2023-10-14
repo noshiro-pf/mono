@@ -1,5 +1,7 @@
-export type ToNumber<S extends `${number}`> =
-  S extends `${infer N extends number}` ? N : never;
+export type ToNumber<S extends `${number}`> = S extends `${infer N extends
+  number}`
+  ? N
+  : never;
 
 // export type ToNumber<S extends `${number}`> =
 //   _ToNumberInternals._IsSmallNumber<S> extends true

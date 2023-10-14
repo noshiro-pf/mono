@@ -9,7 +9,7 @@ type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
 export const brand = <
   A extends Primitive,
   BrandTrueKeys extends readonly string[],
-  BrandFalseKeys extends readonly string[] = []
+  BrandFalseKeys extends readonly string[] = [],
 >({
   codec,
   is,

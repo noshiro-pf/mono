@@ -31,5 +31,5 @@ const DataTableStateRecordFactory = I.Record<IDataTableState>({
 })
 
 export const DataTableState = (
-  dt?: Partial<IDataTableState>
+  dt?: Partial<IDataTableState>,
 ): TDataTableState => DataTableStateRecordFactory(dt)

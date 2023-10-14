@@ -17,7 +17,10 @@ export class FeedbackComponent implements OnInit {
 
   readonly feedbacks$: RN<Feedback[]> = this.database.feedbacks$;
 
-  constructor(private dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    private dialog: MatDialog,
+    private database: DatabaseService
+  ) {}
 
   ngOnInit() {}
 

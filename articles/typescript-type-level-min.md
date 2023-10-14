@@ -26,7 +26,7 @@ type R2 = Min<1 | 2 | 3>; // 1
 ```ts
 type _MinImpl<
   N extends number,
-  T extends readonly unknown[]
+  T extends readonly unknown[],
 > = T["length"] extends N ? T["length"] : _MinImpl<N, [0, ...T]>;
 
 export type Min<N extends number> = _MinImpl<N, []>;

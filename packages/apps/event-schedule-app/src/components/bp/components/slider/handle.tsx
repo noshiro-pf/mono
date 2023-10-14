@@ -65,20 +65,24 @@ const SliderHandleStyled = styled.span`
   background-color: #f6f7f9;
   color: #1c2127;
   border-radius: 2px;
-  box-shadow: 0 0 0 1px rgba(17, 20, 24, 0.5), 0 1px 1px rgba(17, 20, 24, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(17, 20, 24, 0.5),
+    0 1px 1px rgba(17, 20, 24, 0.5);
   cursor: pointer;
 
   &:hover {
     background-clip: padding-box;
     background-color: #edeff2;
-    box-shadow: inset 0 0 0 1px rgba(17, 20, 24, 0.2),
+    box-shadow:
+      inset 0 0 0 1px rgba(17, 20, 24, 0.2),
       0 1px 2px rgba(17, 20, 24, 0.2);
   }
 
   &:active,
   &.active {
     background-color: #dce0e5;
-    box-shadow: inset 0 0 0 1px rgba(17, 20, 24, 0.2),
+    box-shadow:
+      inset 0 0 0 1px rgba(17, 20, 24, 0.2),
       0 1px 2px rgba(17, 20, 24, 0.2);
   }
 
@@ -109,7 +113,9 @@ const SliderHandleStyled = styled.span`
   &:hover {
     background-clip: padding-box;
     background-color: #edeff2;
-    box-shadow: 0 0 0 1px rgba(17, 20, 24, 0.5), 0 1px 2px rgba(17, 20, 24, 0.6);
+    box-shadow:
+      0 0 0 1px rgba(17, 20, 24, 0.5),
+      0 1px 2px rgba(17, 20, 24, 0.6);
     cursor: grab;
     z-index: 2;
   }
@@ -117,8 +123,10 @@ const SliderHandleStyled = styled.span`
   &:active,
   &.active {
     background-color: #dce0e5;
-    box-shadow: inset 0 1px 1px rgba(17, 20, 24, 0.1),
-      0 0 0 1px rgba(17, 20, 24, 0.5), 0 1px 2px rgba(17, 20, 24, 0.2);
+    box-shadow:
+      inset 0 1px 1px rgba(17, 20, 24, 0.1),
+      0 0 0 1px rgba(17, 20, 24, 0.5),
+      0 1px 2px rgba(17, 20, 24, 0.2);
     cursor: grabbing;
   }
 
@@ -148,7 +156,9 @@ const SliderHandleStyled = styled.span`
 const SliderHandleLabelStyled = styled(SliderLabelStyled)`
   background: #404854;
   border-radius: 2px;
-  box-shadow: 0 0 0 1px rgba(17, 20, 24, 0.1), 0 2px 4px rgba(17, 20, 24, 0.2),
+  box-shadow:
+    0 0 0 1px rgba(17, 20, 24, 0.1),
+    0 2px 4px rgba(17, 20, 24, 0.2),
     0 8px 24px rgba(17, 20, 24, 0.2);
   color: #f6f7f9;
   margin-left: 8px;

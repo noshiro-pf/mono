@@ -5,7 +5,7 @@ export const pileSize = (
   cardPropertyList: I.List<TDCardProperty>,
   cardIndex: number,
   numPlayer: number,
-  DarkAges: boolean
+  DarkAges: boolean,
 ): number => {
   switch (cardPropertyList.get(cardIndex, DCardProperty()).cardId) {
     case 'Copper':

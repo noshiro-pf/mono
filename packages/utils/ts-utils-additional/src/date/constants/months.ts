@@ -76,5 +76,5 @@ type MonthsListType = readonly [
   Readonly<{ value: 9; name: string }>,
   Readonly<{ value: 10; name: string }>,
   Readonly<{ value: 11; name: string }>,
-  Readonly<{ value: 12; name: string }>
+  Readonly<{ value: 12; name: string }>,
 ];

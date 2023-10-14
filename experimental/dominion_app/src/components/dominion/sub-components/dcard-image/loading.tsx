@@ -16,7 +16,7 @@ export const Loading = memo(
     >
       <CircularProgress />
     </div>
-  )
+  ),
 )
 
 Loading.displayName = 'Loading'

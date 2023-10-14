@@ -35,7 +35,7 @@ const expectType = <A, B>(
     ? "<=" | "="
     : TypeExtends<A, B> extends true
     ? "!=" | "<="
-    : "!<=" | "!="
+    : "!<=" | "!=",
 ): void => undefined;
 ```
 
@@ -247,7 +247,7 @@ type IndexOfTuple<T extends readonly unknown[]> = _IndexOfTupleImpl<T, keyof T>;
 
 type _IndexOfTupleImpl<
   T extends readonly unknown[],
-  K
+  K,
 > = IsFixedLengthList<T> extends true
   ? K extends keyof T
     ? K extends `${number}`
@@ -296,7 +296,7 @@ namespace _MakeTupleInternals {
 
   type Tile<
     T extends readonly unknown[],
-    N extends Digit | DigitStr | "10" | 10
+    N extends Digit | DigitStr | "10" | 10,
   > = [
     readonly [],
     readonly [...T],
@@ -308,13 +308,13 @@ namespace _MakeTupleInternals {
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T],
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
     readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
-    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T]
+    readonly [...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T, ...T],
   ][N];
 
   export type MakeTupleImpl<
     T,
     N extends string,
-    X extends readonly unknown[]
+    X extends readonly unknown[],
   > = string extends N
     ? never
     : N extends ""

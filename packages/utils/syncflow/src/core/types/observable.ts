@@ -64,7 +64,7 @@ export type InitializedObservableBase<A> = ObservableBase<A> &
 export type SyncChildObservable<
   A,
   Type extends SyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = ObservableBase<A> &
   Readonly<{
     kind: 'sync child';
@@ -75,13 +75,13 @@ export type SyncChildObservable<
 export type InitializedSyncChildObservable<
   A,
   Type extends SyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = InitializedObservableBase<A> & SyncChildObservable<A, Type, P>;
 
 export type AsyncChildObservable<
   A,
   Type extends AsyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = ObservableBase<A> &
   Readonly<{
     kind: 'async child';
@@ -93,19 +93,19 @@ export type AsyncChildObservable<
 export type InitializedAsyncChildObservable<
   A,
   Type extends AsyncChildObservableType,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = AsyncChildObservable<A, Type, P> & InitializedObservableBase<A>;
 
 export type ChildObservable<
   A,
-  P extends NonEmptyUnknownList = NonEmptyUnknownList
+  P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > =
   | AsyncChildObservable<A, AsyncChildObservableType, P>
   | SyncChildObservable<A, SyncChildObservableType, P>;
 
 export type RootObservable<
   A,
-  Type extends RootObservableType
+  Type extends RootObservableType,
 > = ObservableBase<A> &
   Readonly<{
     kind: 'root';
@@ -116,7 +116,7 @@ export type RootObservable<
 
 export type InitializedRootObservable<
   A,
-  Type extends RootObservableType
+  Type extends RootObservableType,
 > = InitializedObservableBase<A> & RootObservable<A, Type>;
 
 export type Observable<A> =

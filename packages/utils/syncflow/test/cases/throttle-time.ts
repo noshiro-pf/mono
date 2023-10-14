@@ -49,7 +49,7 @@ const createStreams = (
 
 export const throttleTimeTestCases: readonly [
   StreamTestCase<number>,
-  StreamTestCase<number>
+  StreamTestCase<number>,
 ] = [
   {
     name: 'throttleTime case 1',

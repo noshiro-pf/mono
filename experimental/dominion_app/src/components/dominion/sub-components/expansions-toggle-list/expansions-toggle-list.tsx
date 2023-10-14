@@ -34,7 +34,7 @@ export const ExpansionsToggleList = memo(
     /* from props */
 
     const [expansions$, setExpansions] = useStateAsStream<I.List<string>>(
-      I.List()
+      I.List(),
     )
     useEffectFromProps(expansions, setExpansions)
 
@@ -55,7 +55,7 @@ export const ExpansionsToggleList = memo(
         selectAllClick$.withLatest(expansions$).map(([_, expansions]) => ({
           id: 'selectAll' as 'selectAll',
           value: expansions,
-        }))
+        })),
       )
         .scan(
           I.Set<string>(),
@@ -65,7 +65,7 @@ export const ExpansionsToggleList = memo(
               | { id: 'input'; value: I.List<string> }
               | { id: 'change'; value: { name: string; checked: boolean } }
               | { id: 'selectAll'; value: I.List<string> }
-              | { id: 'deselectAll' }
+              | { id: 'deselectAll' },
           ) => {
             switch (curr.id) {
               case 'deselectAll':
@@ -83,23 +83,23 @@ export const ExpansionsToggleList = memo(
               default:
                 return acc
             }
-          }
+          },
         )
-        .skipUnchanged(I.is)
+        .skipUnchanged(I.is),
     )
 
     const expansionsWithCheck$: RN<I.List<[string, boolean]>> = useRN(
       combine(expansions$, expansionsChecked$).map(
         ([expansions, expansionsChecked]) =>
-          expansions.map((e) => [e, expansionsChecked.has(e)])
-      )
+          expansions.map((e) => [e, expansionsChecked.has(e)]),
+      ),
     )
 
     /* side effects */
 
     useRNEffect(
       expansionsChecked$.map((s) => s.toList()),
-      expansionscheckedOnChange
+      expansionscheckedOnChange,
     )
 
     /* extract values */
@@ -114,7 +114,7 @@ export const ExpansionsToggleList = memo(
         deselectAllClick={deselectAllClick}
       />
     )
-  }
+  },
 )
 
 ExpansionsToggleList.displayName = 'ExpansionsToggleList'

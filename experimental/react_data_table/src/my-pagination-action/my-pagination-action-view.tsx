@@ -58,7 +58,7 @@ export const MyPaginationActionsView = memo(
         <LastPageIcon />
       </IconButton>
     </Root>
-  )
+  ),
 )
 
 MyPaginationActionsView.displayName = 'MyPaginationActionsView'

@@ -19,7 +19,7 @@ export const PlayerResultTableBodyNormal = memo(
         p.score,
         p.turnOrder,
         p.name === lastTurnPlayer ? 'o' : '',
-      ])
+      ]),
     )
 
     return (
@@ -35,7 +35,7 @@ export const PlayerResultTableBodyNormal = memo(
         ))}
       </TableBody>
     )
-  }
+  },
 )
 
 PlayerResultTableBodyNormal.displayName = 'PlayerResultTableBodyNormal'

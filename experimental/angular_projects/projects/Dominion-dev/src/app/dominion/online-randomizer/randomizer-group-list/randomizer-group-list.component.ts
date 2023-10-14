@@ -99,9 +99,8 @@ export class RandomizerGroupListComponent implements OnInit {
       resetVPCalculator: 0,
     });
 
-    const ref = await this.database.randomizerGroup.addGroup(
-      newRandomizerGroup
-    );
+    const ref =
+      await this.database.randomizerGroup.addGroup(newRandomizerGroup);
     const groupId = ref.key;
     await this.user.setRandomizerGroupId(groupId);
     await this.myRandomizerGroup.addMember(groupId, uid, myName, myNameYomi);

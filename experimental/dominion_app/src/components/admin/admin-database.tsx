@@ -21,7 +21,7 @@ export const AdminDatabase = memo(() => {
       string,
       string,
       string,
-      string
+      string,
     ] = await Promise.all([
       fb.storage
         .ref(`${fbPaths.storage.dcardImages}/${BoonBackImgName}`)
@@ -43,19 +43,19 @@ export const AdminDatabase = memo(() => {
           .ref(
             `${fbPaths.storage.dcardImages}/${dcard.nameEng.replace(
               / /g,
-              '_'
-            )}.jpg`
+              '_',
+            )}.jpg`,
           )
-          .getDownloadURL()
-      )
+          .getDownloadURL(),
+      ),
     )
 
     await Promise.all(
       dcardlist
         .map((dcard, i) =>
-          fb.setDcardImgUrl(dcard.key, 'front', frontImageUrls[i])
+          fb.setDcardImgUrl(dcard.key, 'front', frontImageUrls[i]),
         )
-        .toArray()
+        .toArray(),
     )
 
     await Promise.all(
@@ -69,7 +69,7 @@ export const AdminDatabase = memo(() => {
           })()
           return fb.setDcardImgUrl(dcard.key, 'back', backImageUrl)
         })
-        .toArray()
+        .toArray(),
     )
 
     setInProcess(false)

@@ -26,7 +26,7 @@ export const HeaderCellInputView = memo(
   }>) => {
     const onInput = useCallback(
       (ev: ChangeEvent<HTMLInputElement>) => valueChange(ev.target.value || ''),
-      [valueChange]
+      [valueChange],
     )
 
     return (
@@ -50,7 +50,7 @@ export const HeaderCellInputView = memo(
         />
       </FormControl>
     )
-  }
+  },
 )
 
 HeaderCellInputView.displayName = 'HeaderCellInputView'

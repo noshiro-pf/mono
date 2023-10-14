@@ -44,7 +44,7 @@ export const ConfirmTossBalloon = memoNamed<Props>(
           float: 'never',
           showOutline: 'never',
           outlineColor: outlineColorDef.green,
-        } as const),
+        }) as const,
       [card]
     );
 

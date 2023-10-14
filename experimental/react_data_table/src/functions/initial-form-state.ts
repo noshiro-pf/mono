@@ -6,7 +6,7 @@ import { TTableSettings } from '../types/table-settings'
 
 export const initialHeaderValues = (
   settings: TTableSettings,
-  selectorOptionsAll: I.List<I.List<ISelectorOptionWithViewValue>>
+  selectorOptionsAll: I.List<I.List<ISelectorOptionWithViewValue>>,
 ): I.List<HeaderValueType> =>
   I.List(
     settings.columnSettings.map((setting, colIdx) => {
@@ -23,12 +23,12 @@ export const initialHeaderValues = (
         default:
           return ''
       }
-    })
+    }),
   )
 
 export const initialFormState = (
   settings: TTableSettings,
-  selectorOptionsAll: I.List<I.List<ISelectorOptionWithViewValue>>
+  selectorOptionsAll: I.List<I.List<ISelectorOptionWithViewValue>>,
 ): {
   headerValues: I.List<HeaderValueType>
   sortState: TSortState

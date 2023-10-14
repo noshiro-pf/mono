@@ -60,7 +60,7 @@ const rpSendPollMessageSub = async (
 
   const mut_dateOptionAndMessageListTemp: (readonly [
     DateOption,
-    Discord.Message
+    Discord.Message,
   ])[] = [];
 
   for (const el of args) {

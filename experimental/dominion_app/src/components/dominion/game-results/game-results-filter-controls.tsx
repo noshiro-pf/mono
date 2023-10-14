@@ -27,21 +27,21 @@ export const GameResultFilterControls = memo(
 
     const _dateBeginChange = useCallback(
       (v: string) => dateBeginChange(new Date(v).getTime()),
-      [dateBeginChange]
+      [dateBeginChange],
     )
 
     const dateEndStr = useMemo(() => date.toYMD(dateEnd, '-'), [dateEnd])
 
     const _dateEndChange = useCallback(
       (v: string) => dateEndChange(new Date(v).getTime()),
-      [dateEndChange]
+      [dateEndChange],
     )
 
     const onCheck = useCallback(
       (i: number, checked: boolean) => {
         numPlayerCheck({ numPlayers: i, checked: checked })
       },
-      [numPlayerCheck]
+      [numPlayerCheck],
     )
 
     return (
@@ -56,7 +56,7 @@ export const GameResultFilterControls = memo(
         onCheck={onCheck}
       />
     )
-  }
+  },
 )
 
 GameResultFilterControls.displayName = 'GameResultFilterControls'

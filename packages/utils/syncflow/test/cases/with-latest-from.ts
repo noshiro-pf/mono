@@ -31,7 +31,7 @@ const createStreams = (
 };
 
 export const withLatestFromTestCases: readonly [
-  StreamTestCase<[number, number]>
+  StreamTestCase<[number, number]>,
 ] = [
   {
     name: 'withLatestFrom case 1',

@@ -5,7 +5,7 @@ export type Max<N extends Uint10> = _MaxImpl<N, []>;
 
 type _MaxImpl<
   N extends Uint10,
-  T extends readonly unknown[]
+  T extends readonly unknown[],
 > = IsNever<N> extends true
   ? never
   : [N] extends [Partial<T>['length']]

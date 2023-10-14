@@ -55,7 +55,7 @@ export const SelectedCards = (sc?: Partial<ISelectedCards>): TSelectedCards =>
   SelectedCardsRecordFactory(sc)
 
 export const SelectedCardsFromJS = (
-  sc?: Partial<ISelectedCardsJS>
+  sc?: Partial<ISelectedCardsJS>,
 ): TSelectedCards => {
   if (sc === undefined) return SelectedCards()
   const wd = withDefaultMix(sc, SelectedCards())
@@ -96,7 +96,7 @@ export const getAllCards = (sc: ISelectedCards): I.List<number> =>
     sc.LandmarkCards,
     sc.ProjectCards,
     sc.Obelisk,
-    sc.BlackMarketPile
+    sc.BlackMarketPile,
   )
 
 export const isEmpty = (sc: ISelectedCards): boolean =>

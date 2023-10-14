@@ -7,7 +7,7 @@ export const createAnswerTable = (
   ) => readonly [
     iconId: AnswerIconIdWithNone,
     point: AnswerIconPoint,
-    comment: string
+    comment: string,
   ],
   datetimeRangeList: readonly DatetimeRange[],
   answers: readonly Answer[]

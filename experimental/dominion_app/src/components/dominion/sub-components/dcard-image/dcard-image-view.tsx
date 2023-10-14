@@ -41,7 +41,7 @@ export const DCardImageView = memo(
         isButton={isButton}
         onClick={isButton ? onClick : noop}
       />
-    )
+    ),
 )
 
 DCardImageView.displayName = 'DCardImageView'

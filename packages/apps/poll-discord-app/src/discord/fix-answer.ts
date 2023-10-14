@@ -33,7 +33,7 @@ export const fixAnswerAndUpdateMessage = async (
 
   const dateOptionMessages: readonly (readonly [
     DateOptionId,
-    Discord.Message
+    Discord.Message,
   ])[] = poll.dateOptions
     .map((dateOption) =>
       tp(
@@ -57,7 +57,7 @@ export const fixAnswerAndUpdateMessage = async (
         good: UserId[] | undefined;
         fair: UserId[] | undefined;
         poor: UserId[] | undefined;
-      }
+      },
     ][]
   > = await Promise.all(
     dateOptionMessagesFilled.map(([dateId, msg]) =>

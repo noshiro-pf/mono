@@ -110,7 +110,10 @@ export class ScheduleComponent implements OnInit {
     )
     .withInitialValue(false);
 
-  constructor(public dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    public dialog: MatDialog,
+    private database: DatabaseService
+  ) {}
 
   ngOnInit() {}
 

@@ -71,7 +71,7 @@ export const GameResultFilterControlsView = memo(
       (i: number) => (_ev: any, checked: boolean) => {
         onCheckInput(i, checked)
       },
-      [onCheckInput]
+      [onCheckInput],
     )
 
     return (
@@ -127,7 +127,7 @@ export const GameResultFilterControlsView = memo(
         </CheckboxesWrapper>
       </Root>
     )
-  }
+  },
 )
 
 GameResultFilterControlsView.displayName = 'GameResultFilterControlsView'

@@ -36,7 +36,7 @@ console.log(result); // [1, 2, 3, 4]
 function rangeArray(
   start: number,
   end: number,
-  step: number = 1
+  step: number = 1,
 ): readonly number[] {
   return Array.from(range(start, end, step)); // [...range(start, end, step)] でも ok
 }
@@ -44,7 +44,7 @@ function rangeArray(
 function* range(
   start: number,
   end: number,
-  step: number = 1
+  step: number = 1,
 ): Generator<number, void, unknown> {
   for (let i: number = start; step > 0 ? i < end : i > end; i += step) {
     yield i;
@@ -110,18 +110,18 @@ type DateEnum = Exclude<Index<32>, 0>;
 
 const getLastDateNumberOfMonth = (
   year: number,
-  month: MonthEnum
+  month: MonthEnum,
 ): 28 | 29 | 30 | 31 => new Date(year, month, 0).getDate() as 28 | 29 | 30 | 31;
 
 const getAllDatesOfMonth = (
   year: number,
-  month: MonthEnum
+  month: MonthEnum,
 ): readonly DateEnum[] =>
   rangeArray(
     1,
-    (getLastDateNumberOfMonth(year, month) + 1) as 29 | 30 | 31 | 32
+    (getLastDateNumberOfMonth(year, month) + 1) as 29 | 30 | 31 | 32,
   ).map(
-    (date: DateEnum) => new Date(year, month - 1, date).getDate() as DateEnum
+    (date: DateEnum) => new Date(year, month - 1, date).getDate() as DateEnum,
   );
 
 console.log(getAllDatesOfMonth(2024, 2));

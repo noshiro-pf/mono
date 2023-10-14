@@ -74,7 +74,10 @@ export class SchedulingComponent implements OnInit {
   eventPageUrlPrefix = '';
   eventPageId = '';
 
-  constructor(public dialog: MatDialog, private database: DatabaseService) {}
+  constructor(
+    public dialog: MatDialog,
+    private database: DatabaseService
+  ) {}
 
   ngOnInit() {
     this.eventPageUrlPrefix = window.location.href + '/answer/';

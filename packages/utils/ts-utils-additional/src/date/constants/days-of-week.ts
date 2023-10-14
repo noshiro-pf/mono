@@ -51,5 +51,5 @@ type WeekdaysType = readonly [
   Readonly<{ name: string; abbr: string }>,
   Readonly<{ name: string; abbr: string }>,
   Readonly<{ name: string; abbr: string }>,
-  Readonly<{ name: string; abbr: string }>
+  Readonly<{ name: string; abbr: string }>,
 ];

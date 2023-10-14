@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 export const useTimerRef = (): readonly [
   React.MutableRefObject<number | undefined>,
-  () => void
+  () => void,
 ] => {
   const timerRef = useRef<number | undefined>(undefined);
 

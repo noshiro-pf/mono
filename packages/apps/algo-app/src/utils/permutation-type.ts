@@ -26,7 +26,7 @@ const permutationStringImpl = (s: string): readonly string[] => {
 
 export const permutationType = <
   A extends string,
-  P extends PermutationString<A> = PermutationString<A>
+  P extends PermutationString<A> = PermutationString<A>,
 >(
   defaultValue: P,
   typeName?: string

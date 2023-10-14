@@ -47,7 +47,7 @@ const createStreams = (
 };
 
 export const withBufferedFromTestCases: readonly [
-  StreamTestCase<[number, number[]]>
+  StreamTestCase<[number, number[]]>,
 ] = [
   {
     name: 'withBufferedFrom case 1',
