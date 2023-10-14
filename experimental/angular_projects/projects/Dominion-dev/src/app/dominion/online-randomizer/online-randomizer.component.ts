@@ -17,7 +17,7 @@ export class OnlineRandomizerComponent implements OnInit {
 
   constructor(
     private user: UserService,
-    private myRandomizerGroup: MyRandomizerGroupService
+    private myRandomizerGroup: MyRandomizerGroupService,
   ) {
     // TODO: RxJS -> RN
     // this.signedIn$ = this.user.signedIn$;

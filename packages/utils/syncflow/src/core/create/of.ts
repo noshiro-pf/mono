@@ -4,7 +4,7 @@ import { type OfObservable } from '../types';
 
 export const of = <A>(
   value: A,
-  startManually: boolean = false
+  startManually: boolean = false,
 ): OfObservable<A> => new OfObservableClass<A>(value, startManually);
 
 class OfObservableClass<A>

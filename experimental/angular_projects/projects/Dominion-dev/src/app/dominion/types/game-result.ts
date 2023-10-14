@@ -20,7 +20,7 @@ export class GameResult {
       selectedExpansionNameList: string[];
       selectedCardsId: SelectedCardsId;
       lastTurnPlayerName: string;
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 
@@ -28,7 +28,7 @@ export class GameResult {
     this.date = initObj.timeStamp || Date.now();
     this.place = initObj.place || '';
     this.players = (initObj.players || []).map(
-      (e) => new PlayerResultRanked(e)
+      (e) => new PlayerResultRanked(e),
     );
     this.memo = initObj.memo || '';
     this.selectedExpansionNameList = initObj.selectedExpansionNameList || [];
@@ -42,13 +42,13 @@ export class GameResult {
     this.players.forEach((e) => (e.rank = 1)); // initialize ranks
 
     const lastTurnPlayer = this.players.find(
-      (e) => e.name === this.lastTurnPlayerName
+      (e) => e.name === this.lastTurnPlayerName,
     );
     const lastTurnOrder = lastTurnPlayer ? lastTurnPlayer.turnOrder : -1;
 
     const isHigher = (
       playerA: PlayerResultRanked,
-      playerB: PlayerResultRanked
+      playerB: PlayerResultRanked,
     ) => {
       if (playerA.VP > playerB.VP) return true;
       if (playerA.VP < playerB.VP) return false;

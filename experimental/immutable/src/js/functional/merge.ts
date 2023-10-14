@@ -34,7 +34,7 @@ export function mergeDeepWithSources(collection, sources, merger) {
 export function mergeWithSources(collection, sources, merger) {
   if (!isDataStructure(collection)) {
     throw new TypeError(
-      'Cannot merge into non-data-structure value: ' + collection
+      'Cannot merge into non-data-structure value: ' + collection,
     );
   }
   if (isImmutable(collection)) {

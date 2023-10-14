@@ -45,7 +45,7 @@ export class ScoringTableComponent implements OnInit {
             e.score[4] < 0 ? '' : e.score[4].toString(),
             e.score[5] < 0 ? '' : e.score[5].toString(),
             e.score[6] < 0 ? '' : e.score[6].toString(),
-          ])
+          ]),
     );
   }
 

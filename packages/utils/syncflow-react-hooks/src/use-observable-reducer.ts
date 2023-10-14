@@ -9,12 +9,12 @@ import { useObservable } from './use-observable';
 
 export const useObservableReducer = <S, A>(
   reducer: (state: S, action: A) => S,
-  initialState: S
+  initialState: S,
 ): [InitializedObservable<S>, (action: A) => S] => {
   const source$ = useMemo<SourceObservable<S>>(source, []);
 
   const state$ = useObservable(() =>
-    source$.chain(withInitialValue(initialState))
+    source$.chain(withInitialValue(initialState)),
   );
 
   const dispatch = useCallback((action: A): S => {

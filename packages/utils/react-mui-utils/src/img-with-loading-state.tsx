@@ -19,5 +19,5 @@ export const ImgWithLoadingState = memoNamed<Props>(
         fullImgSrc={fullImgSrc}
         previewImgSrc={previewImgSrc}
       />
-    )
+    ),
 );

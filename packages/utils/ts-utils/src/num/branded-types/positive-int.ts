@@ -25,32 +25,32 @@ const _max = (...values: readonly PositiveIntWithSmallInt[]): PositiveInt =>
 
 const pow = (
   x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt
+  y: PositiveIntWithSmallInt,
 ): PositiveInt => clamp(x ** y);
 
 const add = (
   x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt
+  y: PositiveIntWithSmallInt,
 ): PositiveInt => clamp(x + y);
 
 const sub = (
   x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt
+  y: PositiveIntWithSmallInt,
 ): PositiveInt => clamp(x - y);
 
 const mul = (
   x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt
+  y: PositiveIntWithSmallInt,
 ): PositiveInt => clamp(x * y);
 
 const div = (
   x: PositiveIntWithSmallInt,
-  y: PositiveIntWithSmallInt
+  y: PositiveIntWithSmallInt,
 ): PositiveInt => clamp(Math.floor(x / y));
 
 const random = (
   min: PositiveIntWithSmallInt,
-  max: PositiveIntWithSmallInt
+  max: PositiveIntWithSmallInt,
 ): PositiveInt =>
   add(min, to(Math.floor((Math.max(max, min) - min + 1) * Math.random())));
 

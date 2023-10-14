@@ -47,7 +47,7 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
         }
         showErrorsIfExists();
       },
-      [onBlur, showErrorsIfExists]
+      [onBlur, showErrorsIfExists],
     );
 
     const valueChangeHandler = useCallback(
@@ -55,7 +55,7 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
         onValueChange(str);
         hideErrors();
       },
-      [onValueChange, hideErrors]
+      [onValueChange, hideErrors],
     );
 
     return (
@@ -94,5 +94,5 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
         />
       </FormGroup>
     );
-  }
+  },
 );

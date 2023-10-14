@@ -8,7 +8,7 @@ export const convertLibDom = (from) => {
 
   ret = ret.replaceAll(
     'json(): Promise<unknown>;',
-    'json(): Promise<JSONType>;'
+    'json(): Promise<JSONType>;',
   );
 
   return ret;

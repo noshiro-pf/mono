@@ -8,13 +8,13 @@ import {
 } from '@noshiro/ts-utils';
 
 export const getLuminanceListAccumulated = (
-  luminanceList: NonEmptyArray<NonNegativeFiniteNumber>
+  luminanceList: NonEmptyArray<NonNegativeFiniteNumber>,
 ): NonEmptyArray<FiniteNumber> => {
   /* +0.05はコントラスト比計算時に足される補正項  */
   const luminanceListCorrected: NonEmptyArray<FiniteNumber> = pipe(
-    luminanceList
+    luminanceList,
   ).chain((list) =>
-    Tpl.map(list, (v) => toFiniteNumber(Math.log(v + 0.05)))
+    Tpl.map(list, (v) => toFiniteNumber(Math.log(v + 0.05))),
   ).value;
 
   const luminanceDiffAccumulated = pipe(luminanceListCorrected)
@@ -27,11 +27,11 @@ export const getLuminanceListAccumulated = (
             curr,
             FiniteNumber.add(
               acc,
-              FiniteNumber.abs(FiniteNumber.sub(curr, prev))
-            )
+              FiniteNumber.abs(FiniteNumber.sub(curr, prev)),
+            ),
           ),
-        tp(Arr.first(luminanceListCorrected), toFiniteNumber(0))
-      )
+        tp(Arr.first(luminanceListCorrected), toFiniteNumber(0)),
+      ),
     )
     .chain((list) => Tpl.map(list, ([_, acc]) => acc)).value;
 

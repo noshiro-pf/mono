@@ -17,7 +17,7 @@ type Props = Readonly<{
     state: Readonly<{
       timeRange: TimeRange;
       checkboxState: Record<DayOfWeekName, boolean>;
-    }>
+    }>,
   ) => void;
 }>;
 
@@ -173,12 +173,12 @@ export const SetTimesPopoverContent = memoNamed<Props>(
         </ButtonsWrapperAlignEnd>
       </div>
     );
-  }
+  },
 );
 
 const [timeRange$, dispatch] = createReducer(
   timeRangeReducer,
-  timeRangeDefaultValue
+  timeRangeDefaultValue,
 );
 
 const onRangeStartChange = (hm: HoursMinutes): void => {
@@ -231,7 +231,7 @@ const [checkboxState$, checkboxStateDispatch] = createReducer(
     Thr: true,
     Fri: true,
     Sat: true,
-  }
+  },
 );
 
 const setSundayCheck = (checked: boolean): void => {

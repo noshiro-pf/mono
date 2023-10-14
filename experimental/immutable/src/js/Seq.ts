@@ -305,7 +305,7 @@ export function keyedSeqFromValue(value) {
   }
   throw new TypeError(
     'Expected Array or collection object of [k, v] entries, or keyed object: ' +
-      value
+      value,
   );
 }
 
@@ -315,7 +315,7 @@ export function indexedSeqFromValue(value) {
     return seq;
   }
   throw new TypeError(
-    'Expected Array or collection object of values: ' + value
+    'Expected Array or collection object of values: ' + value,
   );
 }
 
@@ -328,7 +328,7 @@ function seqFromValue(value) {
     return new ObjectSeq(value);
   }
   throw new TypeError(
-    'Expected Array or collection object of values, or keyed object: ' + value
+    'Expected Array or collection object of values, or keyed object: ' + value,
   );
 }
 

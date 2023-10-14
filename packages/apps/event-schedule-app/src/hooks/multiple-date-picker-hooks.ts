@@ -38,13 +38,13 @@ export const useMultipleDatePickerState = (
   selectedDates: readonly YearMonthDate[],
   onSelectedDatesChange?: (value: readonly YearMonthDate[]) => void,
   setYearMonth$?: Observable<CalendarCurrentPageReducerState>,
-  holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>
+  holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>,
 ): MultipleDatePickerState => {
   /* states */
 
   const [calendarCurrentPage, calendarCurrentPageDispatch] = useReducer(
     calendarCurrentPageReducer,
-    calendarCurrentPageInitialState()
+    calendarCurrentPageInitialState(),
   );
 
   useObservableEffect(setYearMonth$ ?? fromArray([]), ({ year, month }) => {
@@ -59,12 +59,12 @@ export const useMultipleDatePickerState = (
 
   const selectedDatesSet = useMemo<ISetMapped<YearMonthDate, YmdKey>>(
     () => ISetMapped.new(selectedDates, ymdToKey, ymdFromKey),
-    [selectedDates]
+    [selectedDates],
   );
 
   const dates = useMemo<DeepReadonly<YearMonthDate[][]>>(
     () => generateCalendar(calendarCurrentPage.year, calendarCurrentPage.month),
-    [calendarCurrentPage]
+    [calendarCurrentPage],
   );
 
   const calendarCells = useMemo<
@@ -102,7 +102,7 @@ export const useMultipleDatePickerState = (
           };
         }),
       })),
-    [dates, selectedDatesSet, calendarCurrentPage, holidaysJpDefinition]
+    [dates, selectedDatesSet, calendarCurrentPage, holidaysJpDefinition],
   );
 
   /* handlers */
@@ -135,13 +135,13 @@ export const useMultipleDatePickerState = (
             onSelectedDatesChange(
               Arr.sorted(
                 Array.from(
-                  selectedDatesReducer(selectedDatesSet, action).values()
+                  selectedDatesReducer(selectedDatesSet, action).values(),
                 ),
-                compareYmd
-              )
+                compareYmd,
+              ),
             );
           },
-    [selectedDatesSet, onSelectedDatesChange]
+    [selectedDatesSet, onSelectedDatesChange],
   );
 
   const onDateClick = useMemo(
@@ -151,7 +151,7 @@ export const useMultipleDatePickerState = (
         : (ymd: YearMonthDate) => {
             selectedDatesDispatch({ type: 'flip', dateToFlip: ymd });
           },
-    [selectedDatesDispatch]
+    [selectedDatesDispatch],
   );
 
   const onWeekdaysHeaderCellClick = useMemo(
@@ -166,7 +166,7 @@ export const useMultipleDatePickerState = (
                 .filter((d) => d.month === calendarCurrentPage.month),
             });
           },
-    [selectedDatesDispatch, dates, calendarCurrentPage.month]
+    [selectedDatesDispatch, dates, calendarCurrentPage.month],
   );
 
   return {

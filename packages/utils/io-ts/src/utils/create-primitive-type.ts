@@ -19,7 +19,7 @@ export const createPrimitiveType = <A extends Primitive>({
       : Result.err([
           validationErrorMessage(
             a,
-            `The value is expected to be <${typeName}>`
+            `The value is expected to be <${typeName}>`,
           ),
         ]);
 

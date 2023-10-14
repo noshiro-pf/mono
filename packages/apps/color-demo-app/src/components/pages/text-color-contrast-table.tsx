@@ -25,12 +25,12 @@ const lightnessListWithIndex = Arr.zip(lightnessList, indices);
 
 const SL = Arr.zip(
   Arr.zip(saturationList, lightnessList),
-  indices
+  indices,
 ) satisfies DeepReadonly<[[Percent, Percent], Uint8][]>;
 
 export const TextColorContrastTable = memoNamed(
   'TextColorContrastTable',
-  () => componentElement
+  () => componentElement,
 );
 
 const PaperCustomized = styled(Paper)`
@@ -84,7 +84,7 @@ const componentElement = (
                 ]);
                 const contrastBlack = contrastRatioHsl(
                   [hue, saturation, lightness],
-                  blackHsl
+                  blackHsl,
                 );
 
                 const hslStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;

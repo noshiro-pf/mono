@@ -16,8 +16,8 @@ const outputAreaString$: InitializedObservable<string | undefined> =
           .chainOptional(evalSequence)
           .chainOptional((seq) => seq.map(termToString))
           .chainOptional((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
-          .value
-    )
+          .value,
+    ),
   );
 
 export { inputAreaString$, setInputAreaString, outputAreaString$ };

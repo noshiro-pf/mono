@@ -28,7 +28,7 @@ export const DetailedFilterCollapse = memoNamed<Props>(
     } = useObservableValue(AnswerFilterAndSortStore.filterState$);
 
     const iconOfSpecifiedRespondentCheckState = useObservableValue(
-      AnswerFilterAndSortStore.iconOfSpecifiedRespondentCheckState$
+      AnswerFilterAndSortStore.iconOfSpecifiedRespondentCheckState$,
     );
 
     return (
@@ -126,5 +126,5 @@ export const DetailedFilterCollapse = memoNamed<Props>(
         </div>
       </Collapse>
     );
-  }
+  },
 );

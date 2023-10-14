@@ -17,13 +17,13 @@ export const calcPrincipalEqualPayment = ({
   const fixedPrincipalYenPerMonth = toYen(borrowingTotalYen / numPayments);
 
   const borrowingBalanceYen = Arr.seq(SafeUint.add(numPayments, 1)).map((i) =>
-    toYen(borrowingTotalYen - i * fixedPrincipalYenPerMonth)
+    toYen(borrowingTotalYen - i * fixedPrincipalYenPerMonth),
   );
 
   const interestYen = borrowingBalanceYen.map((b) => toYen(interestRate * b));
 
   const monthlyPaymentTotalYen = interestYen.map((v) =>
-    toYen(v + fixedPrincipalYenPerMonth)
+    toYen(v + fixedPrincipalYenPerMonth),
   );
 
   return {

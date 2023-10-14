@@ -30,7 +30,7 @@ export class PlayerCards {
 
   sortByCardType(dcards: DCard[]): DCard[] {
     let sorted = dcards.sort(
-      (a, b) => a.cardProperty.indexInList - b.cardProperty.indexInList
+      (a, b) => a.cardProperty.indexInList - b.cardProperty.indexInList,
     );
     let Actions, Treasures, Victories;
     const f = (type: CardType) => (d: DCard) =>

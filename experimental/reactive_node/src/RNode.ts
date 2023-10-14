@@ -29,7 +29,7 @@ export class RNode<T> {
       this.parents,
       this.syncChildren,
       this.asyncChildren,
-      this.subscribers
+      this.subscribers,
     );
   }
 

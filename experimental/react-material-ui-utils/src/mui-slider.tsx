@@ -16,7 +16,7 @@ export const MuiSlider = memoNamed<
     (_: unknown, _value: number | readonly number[]) => {
       onChange(_value as number);
     },
-    [onChange]
+    [onChange],
   );
 
   return (

@@ -16,7 +16,7 @@ export class MultipleDatePickerComponent implements OnInit {
 
   @Input() set initialDateList(value: number[]) {
     const initialDateValuesUniq = utils.array.uniq(
-      value.map((e) => utils.date.toMidnightTimestamp(e))
+      value.map((e) => utils.date.toMidnightTimestamp(e)),
     );
     this.selectedDateValues$.emit(initialDateValuesUniq);
   }
@@ -33,7 +33,7 @@ export class MultipleDatePickerComponent implements OnInit {
     this.weeks$ = combine(
       this.currentYear$,
       this.currentMonth$,
-      this.selectedDateValues$
+      this.selectedDateValues$,
     ).map(([year, month, selectedDates]) => {
       const weeks: { date: Date; selected: boolean }[][] = [];
       utils.date.getAllDatesIn(year, month).forEach((date: Date) => {
@@ -118,11 +118,11 @@ export class MultipleDatePickerComponent implements OnInit {
       .filter((date: Date) => date.getDay() === dayIndex)
       .filter(this.filterFn);
     const datesInColumnAllSelected = datesOfDayColumn.every((e) =>
-      current.includes(e.getTime())
+      current.includes(e.getTime()),
     );
 
     datesOfDayColumn.forEach((date) =>
-      utils.array.remove(current, date.getTime())
+      utils.array.remove(current, date.getTime()),
     );
     if (!datesInColumnAllSelected) {
       datesOfDayColumn.forEach((date) => current.push(date.getTime()));

@@ -9,7 +9,7 @@ test('isApplication 2', () => {
     isApplication([
       ['x', ['y', 'y']],
       ['x', ['y', 'y']],
-    ])
+    ]),
   ).toBe(true);
 });
 

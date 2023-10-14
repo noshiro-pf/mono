@@ -5,7 +5,7 @@ const testUri = (
   queryParameters: DeepReadonly<
     [string, boolean | number | string | undefined][]
   >,
-  expectedUri: string
+  expectedUri: string,
 ): void => {
   test('equality', () => {
     expect(uriWithQueryParams(targetUri, queryParameters)).toBe(expectedUri);
@@ -22,7 +22,7 @@ testUri(
     ['num', 11],
     ['bool', true],
   ],
-  'http://localhost/?str=string&num=11&bool=true'
+  'http://localhost/?str=string&num=11&bool=true',
 );
 
 // test number and boolean (with slash)
@@ -33,7 +33,7 @@ testUri(
     ['num', 11],
     ['bool', true],
   ],
-  'http://localhost/?str=string&num=11&bool=true'
+  'http://localhost/?str=string&num=11&bool=true',
 );
 
 testUri('http://localhost/', [], 'http://localhost/');

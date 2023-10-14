@@ -7,7 +7,7 @@ type StyledDiv = StyledVNode<Pick<any, number | string | symbol>>;
 
 export const createBalloonBody = (
   //
-  balloonSize: RectSize
+  balloonSize: RectSize,
 ): StyledDiv => styled('div')`
   position: absolute;
   width: ${balloonSize.width}px;
@@ -19,7 +19,7 @@ export const createBalloonBody = (
 `;
 
 export const createBalloonWithDownArrow = (
-  BalloonBody: StyledDiv
+  BalloonBody: StyledDiv,
 ): StyledDiv => styled(BalloonBody)`
   &:before {
     position: absolute;
@@ -34,7 +34,7 @@ export const createBalloonWithDownArrow = (
 `;
 
 export const createBalloonWithUpArrow = (
-  BalloonBody: StyledDiv
+  BalloonBody: StyledDiv,
 ): StyledDiv => styled(BalloonBody)`
   &:before {
     position: absolute;
@@ -49,7 +49,7 @@ export const createBalloonWithUpArrow = (
 `;
 
 export const createBalloonWithLeftArrow = (
-  BalloonBody: StyledDiv
+  BalloonBody: StyledDiv,
 ): StyledDiv => styled(BalloonBody)`
   &:before {
     position: absolute;
@@ -64,7 +64,7 @@ export const createBalloonWithLeftArrow = (
 `;
 
 export const createBalloonWithRightArrow = (
-  BalloonBody: StyledDiv
+  BalloonBody: StyledDiv,
 ): StyledDiv => styled(BalloonBody)`
   &:before {
     position: absolute;

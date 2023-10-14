@@ -3,7 +3,7 @@ import React, { ReactNode, useState } from 'react';
 function component<P, M>(
   model: (props: P) => M,
   postprocess: (model: M) => void,
-  view: (model: M) => ReactNode
+  view: (model: M) => ReactNode,
 ) {}
 
 interface Props {
@@ -26,5 +26,5 @@ export const App = component(
         {'-1'}
       </button>
     </div>
-  )
+  ),
 );

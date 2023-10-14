@@ -30,7 +30,7 @@ export class GameRoomCommunicationService {
     private afdb: AngularFireDatabase,
     private user: UserService,
     private database: FireDatabaseService,
-    private myGameRoomService: MyGameRoomService
+    private myGameRoomService: MyGameRoomService,
   ) {
     // const gameRoomCommunication$
     //   = combineLatest(
@@ -108,7 +108,7 @@ export class GameRoomCommunicationService {
     });
     await this.database.onlineGameCommunication.sendMessage(
       communicationId,
-      msg
+      msg,
     );
   }
 
@@ -116,7 +116,7 @@ export class GameRoomCommunicationService {
     userInputCommand: UserInputCommand,
     playerId: number,
     autoSort: boolean,
-    clickedCardId?: number
+    clickedCardId?: number,
   ) {
     const communicationId = await this.communicationId$.toPromise();
     const userInput = new UserInput(
@@ -129,18 +129,18 @@ export class GameRoomCommunicationService {
           shuffleBy: utils.number.random.permutation(this.nofAllDCards),
         },
       },
-      undefined
+      undefined,
     );
     await this.database.onlineGameCommunication.sendUserInput(
       communicationId,
-      userInput
+      userInput,
     );
   }
 
   async removeAllUserInput() {
     const communicationId = await this.communicationId$.toPromise();
     await this.database.onlineGameCommunication.removeAllUserInput(
-      communicationId
+      communicationId,
     );
   }
 
@@ -149,7 +149,7 @@ export class GameRoomCommunicationService {
     await this.database.onlineGameCommunication.setThinkingState(
       communicationId,
       playerId,
-      state
+      state,
     );
   }
 
@@ -158,7 +158,7 @@ export class GameRoomCommunicationService {
     await this.database.onlineGameCommunication.setPresenceState(
       communicationId,
       playerId,
-      state
+      state,
     );
   }
 
@@ -166,7 +166,7 @@ export class GameRoomCommunicationService {
     const communicationId = await this.communicationId$.toPromise();
     await this.database.onlineGameCommunication.setTerminatedState(
       communicationId,
-      state
+      state,
     );
   }
 
@@ -174,7 +174,7 @@ export class GameRoomCommunicationService {
     const communicationId = await this.communicationId$.toPromise();
     await this.database.onlineGameCommunication.setResultSubmittedState(
       communicationId,
-      state
+      state,
     );
   }
 }

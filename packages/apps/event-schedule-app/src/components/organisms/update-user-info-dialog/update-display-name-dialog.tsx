@@ -62,5 +62,5 @@ export const UpdateDisplayNameDialog = memoNamed<Props>(
         title={dc.updateDisplayName.title}
       />
     );
-  }
+  },
 );

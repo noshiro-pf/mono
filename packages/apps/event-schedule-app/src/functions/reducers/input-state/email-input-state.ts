@@ -40,7 +40,7 @@ export const emailInputStateReducer: Reducer<
         'error',
         !isEmailString(state.inputValue)
           ? dict.common.error.invalidEmail
-          : undefined
+          : undefined,
       );
 
     case 'reset':

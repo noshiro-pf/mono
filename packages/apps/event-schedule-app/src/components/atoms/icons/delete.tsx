@@ -32,5 +32,5 @@ export const DeleteIcon = memoNamed<Props>(
         fill={color}
       />
     </svg>
-  )
+  ),
 );

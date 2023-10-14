@@ -42,12 +42,12 @@ const convert = (content, filename) => {
 
   ret = ret.replaceAll(
     '/// <reference no-default-lib="true"/>',
-    '/// <reference no-default-lib="true"/>\n/// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />'
+    '/// <reference no-default-lib="true"/>\n/// <reference path="../../ts-type-utils-no-stdlib/ts-type-utils-no-stdlib.d.ts" />',
   );
 
   ret = ret.replaceAll(
     /\/\/\/ <reference lib="(.+)" \/>/gu,
-    '/// <reference path="./lib.$1.d.ts" />'
+    '/// <reference path="./lib.$1.d.ts" />',
   );
 
   ret = ret.replaceAll('declare var ', 'declare const ');
@@ -57,43 +57,43 @@ const convert = (content, filename) => {
   ret = ret.replaceAll('radix?: number', 'radix?: UintRange<2, 37>');
   ret = ret.replaceAll(
     'minimumIntegerDigits?: number | undefined',
-    'minimumIntegerDigits?: UintRange<1, 22> | undefined'
+    'minimumIntegerDigits?: UintRange<1, 22> | undefined',
   );
   ret = ret.replaceAll(
     'minimumSignificantDigits?: number | undefined',
-    'minimumSignificantDigits?: UintRange<1, 22> | undefined'
+    'minimumSignificantDigits?: UintRange<1, 22> | undefined',
   );
   ret = ret.replaceAll(
     'maximumSignificantDigits?: number | undefined',
-    'maximumSignificantDigits?: UintRange<1, 22> | undefined'
+    'maximumSignificantDigits?: UintRange<1, 22> | undefined',
   );
   ret = ret.replaceAll(
     'minimumFractionDigits?: number | undefined',
-    'minimumFractionDigits?: UintRange<0, 21> | undefined'
+    'minimumFractionDigits?: UintRange<0, 21> | undefined',
   );
   ret = ret.replaceAll(
     'maximumFractionDigits?: number | undefined',
-    'maximumFractionDigits?: UintRange<0, 21> | undefined'
+    'maximumFractionDigits?: UintRange<0, 21> | undefined',
   );
   ret = ret.replaceAll(
     'minimumIntegerDigits: number;',
-    'minimumIntegerDigits: UintRange<1, 22>;'
+    'minimumIntegerDigits: UintRange<1, 22>;',
   );
   ret = ret.replaceAll(
     'minimumSignificantDigits?: number;',
-    'minimumSignificantDigits?: UintRange<1, 22>;'
+    'minimumSignificantDigits?: UintRange<1, 22>;',
   );
   ret = ret.replaceAll(
     'maximumSignificantDigits?: number;',
-    'maximumSignificantDigits?: UintRange<1, 22>;'
+    'maximumSignificantDigits?: UintRange<1, 22>;',
   );
   ret = ret.replaceAll(
     'minimumFractionDigits: number;',
-    'minimumFractionDigits: UintRange<0, 21>;'
+    'minimumFractionDigits: UintRange<0, 21>;',
   );
   ret = ret.replaceAll(
     'maximumFractionDigits: number;',
-    'maximumFractionDigits: UintRange<0, 21>;'
+    'maximumFractionDigits: UintRange<0, 21>;',
   );
 
   ret = ret.replaceAll('length: number', `length: ${indexType.size}`);
@@ -106,13 +106,13 @@ const convert = (content, filename) => {
 
   ret = ret.replaceAll(
     /\.\.\.([_\$a-zA-Z\\xA0-\\uFFFF][_\$a-zA-Z0-9\\xA0-\\uFFFF]*): readonly any\[\]/gu,
-    '...$1: readonly never[]'
+    '...$1: readonly never[]',
   );
   ret = ret.replaceAll('...args: unknown', '...args: readonly never[]');
   ret = ret.replaceAll('...args: unknown[]', '...args: readonly never[]');
   ret = ret.replaceAll(
     '...args: readonly unknown[]',
-    '...args: readonly never[]'
+    '...args: readonly never[]',
   );
 
   ret = ret.replaceAll('keyof unknown', 'keyof never');
@@ -217,6 +217,6 @@ const convert = (content, filename) => {
 
 await Promise.all(
   distFileList.map(({ content, filename }) =>
-    writeFileAsync(`${distDir}/${filename}`, convert(content, filename))
-  )
+    writeFileAsync(`${distDir}/${filename}`, convert(content, filename)),
+  ),
 );

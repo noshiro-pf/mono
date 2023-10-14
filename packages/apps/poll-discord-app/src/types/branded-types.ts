@@ -2,7 +2,7 @@ import * as t from '@noshiro/io-ts';
 
 export const commandMessageIdType = t.simpleBrandedString(
   'CommandMessageId',
-  ''
+  '',
 );
 
 export const toCommandMessageId = commandMessageIdType.cast;
@@ -23,7 +23,7 @@ export type PollId = t.TypeOf<typeof pollIdType>;
 
 export const timestampType = t.simpleBrandedNumber(
   'Timestamp',
-  DateUtils.now()
+  DateUtils.now(),
 );
 
 export const toTimestamp = timestampType.cast;

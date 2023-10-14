@@ -8,7 +8,7 @@ export class User {
     initObj?: {
       name: string;
       nameYomi: string;
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 

@@ -29,7 +29,7 @@ export const permutationType = <
   P extends PermutationString<A> = PermutationString<A>,
 >(
   defaultValue: P,
-  typeName?: string
+  typeName?: string,
 ): Type<P> => {
   const valueSet = ISet.new(permutationStringImpl(defaultValue));
 
@@ -43,7 +43,7 @@ export const permutationType = <
       return Result.err([
         validationErrorMessage(
           a,
-          `The value is expected to be one of the elements contained in { ${valuesStr} }`
+          `The value is expected to be one of the elements contained in { ${valuesStr} }`,
         ),
       ]);
     }

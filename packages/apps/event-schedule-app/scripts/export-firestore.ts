@@ -20,17 +20,17 @@ const subCollectionName = firestorePaths.answers;
 const printAllEvents = async (): Promise<boolean> => {
   const eventsSnapshot = await db.collection(collectionName).get();
   const eventsEntries = eventsSnapshot.docs.map(
-    (d) => [d.id, d.data()] as const
+    (d) => [d.id, d.data()] as const,
   );
 
   const answersDocs = await Promise.all(
     eventsSnapshot.docs.map((d) =>
-      db.collection(`${collectionName}/${d.id}/${subCollectionName}`).get()
-    )
+      db.collection(`${collectionName}/${d.id}/${subCollectionName}`).get(),
+    ),
   );
 
   const answersEntries = eventsSnapshot.docs.map(
-    (d, i) => [d.id, answersDocs[i]?.docs.map((a) => a.data())] as const
+    (d, i) => [d.id, answersDocs[i]?.docs.map((a) => a.data())] as const,
   );
 
   const result = {

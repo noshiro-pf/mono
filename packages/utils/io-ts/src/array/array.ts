@@ -14,7 +14,7 @@ export const array = <A>(
       typeName: string;
       defaultValue: readonly A[];
     }>
-  >
+  >,
 ): Type<readonly A[]> => {
   type T = readonly A[];
 
@@ -36,7 +36,7 @@ export const array = <A>(
         const message = validationErrorMessage(
           el,
           `The array element is expected to be <${elementType.typeName}>`,
-          (str) => `but the actual value at index ${index} is '${str}'`
+          (str) => `but the actual value at index ${index} is '${str}'`,
         );
 
         return Result.err([message, ...res.value]);

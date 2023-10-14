@@ -101,7 +101,7 @@ export const NumericInputView = memoNamed<Props>(
         </ButtonDown>
       </div>
     </div>
-  )
+  ),
 );
 
 const InputAlignedRight = styled.input`

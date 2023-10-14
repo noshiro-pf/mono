@@ -20,11 +20,11 @@ export const iconListReducer: Reducer<
   switch (action.type) {
     case 'update-description':
       return Obj.update(state, action.iconId, (s) =>
-        Obj.set(s, 'description', action.description)
+        Obj.set(s, 'description', action.description),
       );
     case 'update-point':
       return Obj.update(state, action.iconId, (s) =>
-        Obj.set(s, 'point', action.point)
+        Obj.set(s, 'point', action.point),
       );
   }
 };

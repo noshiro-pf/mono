@@ -68,5 +68,5 @@ export const DeleteAccountCreatedWithGoogleDialog = memoNamed<Props>(
         title={dc.deleteAccount.title}
       />
     );
-  }
+  },
 );

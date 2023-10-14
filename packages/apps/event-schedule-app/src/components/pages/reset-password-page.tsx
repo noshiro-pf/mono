@@ -68,7 +68,7 @@ export const ResetPasswordPage = memoNamed<Props>(
         </SignInStyled.FormRect>
       </FormRectWrapper>
     );
-  }
+  },
 );
 
 const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`

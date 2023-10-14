@@ -20,7 +20,7 @@ export const calcPrincipalAndInterestEqualPayment = ({
       total: borrowingTotalYen,
       numPayments,
       interestRate,
-    })
+    }),
   );
 
   const borrowingBalanceYen = Arr.seq(SafeUint.add(numPayments, 1)).map((ith) =>
@@ -30,14 +30,14 @@ export const calcPrincipalAndInterestEqualPayment = ({
         numPayments,
         interestRate,
         ith,
-      })
-    )
+      }),
+    ),
   );
 
   const interestYen = borrowingBalanceYen.map((b) => toYen(interestRate * b));
 
   const monthlyPrincipalPaymentYen = interestYen.map((v) =>
-    toYen(fixedMonthlyPaymentsYen - v)
+    toYen(fixedMonthlyPaymentsYen - v),
   );
 
   return {

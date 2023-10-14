@@ -15,7 +15,7 @@ type Props = Readonly<{
   windowSize: Rect;
   playerNamePositionsDispatcher: (action: readonly [NWES, Rect]) => void;
   cardPositionsDispatcher: (
-    action: readonly [CardColor, CardNumber, Rect]
+    action: readonly [CardColor, CardNumber, Rect],
   ) => void;
 }>;
 
@@ -103,7 +103,7 @@ export const Table = memoNamed(
         gridTemplateColumns: `${sidesWidth}px ${areaSize.height}px auto ${areaSize.height}px ${sidesWidth}px`,
         padding: `${containerPaddingPx}px`,
       }),
-      [tableSize, areaSize]
+      [tableSize, areaSize],
     );
 
     const onBoundingClientRectChange = useMemo(
@@ -114,9 +114,9 @@ export const Table = memoNamed(
             (rect: Readonly<DOMRect>) => {
               playerNamePositionsDispatcher([d, rect]);
             },
-          ])
+          ]),
         ),
-      [playerNamePositionsDispatcher]
+      [playerNamePositionsDispatcher],
     );
 
     return (
@@ -203,7 +203,7 @@ export const Table = memoNamed(
         </PlayerNameAreaE>
       </Container>
     );
-  }
+  },
 );
 
 const Container = styled('div')`

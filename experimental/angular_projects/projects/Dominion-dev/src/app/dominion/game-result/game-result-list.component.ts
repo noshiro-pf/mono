@@ -88,7 +88,7 @@ export class GameResultListComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private database: FireDatabaseService
+    private database: FireDatabaseService,
   ) {
     this.table$ = this.GRlistFiltered$.map((GRlist) =>
       GRlist.map((gr) => [
@@ -97,7 +97,7 @@ export class GameResultListComponent implements OnInit {
         gr.players.map((grpl) => [grpl.rank, grpl.name, grpl.VP, grpl.score]),
         'memo',
         'Detail',
-      ])
+      ]),
     );
   }
 

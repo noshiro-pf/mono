@@ -25,7 +25,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('h1').textContent).toContain(
-      'Welcome to RN-Graph-dev!'
+      'Welcome to RN-Graph-dev!',
     );
   });
 });

@@ -48,29 +48,29 @@ const main = async () => {
       [
         generateGlobalsDecl(packageName, importsList, typeImportsList).replace(
           '/* custom types */',
-          ['/* custom types */'].join('\n')
+          ['/* custom types */'].join('\n'),
         ),
-      ].join('\n')
+      ].join('\n'),
     ),
     writeFileAsync(
       `${rootDir}/src/globals.ts`,
-      generateGlobalsForJest(packageName, importsList)
+      generateGlobalsForJest(packageName, importsList),
     ),
     writeFileAsync(
       `${rootDir}/src/provide-plugin-def.ts`,
-      generateProvidePluginDef(packageName, importsList)
+      generateProvidePluginDef(packageName, importsList),
     ),
     writeFileAsync(
       `${rootDir}/src/auto-import-def.ts`,
-      generateAutoImportDef(packageName, importsList)
+      generateAutoImportDef(packageName, importsList),
     ),
     writeFileAsync(
       `${rootDir}/src/eslint-no-restricted-imports-def.ts`,
       generateEslintNoRestrictedImportsDef(
         packageName,
         importsList,
-        typeImportsList
-      )
+        typeImportsList,
+      ),
     ),
   ]);
 };

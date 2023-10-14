@@ -3,14 +3,14 @@ import { type Group, type NumGroups } from '../types';
 
 export const generateGroups = (
   numGroups: NumGroups,
-  nameList: readonly string[]
+  nameList: readonly string[],
 ): readonly Group[] => {
   const nameListWithRand: DeepReadonly<[string, number, number][]> = pipe(
-    nameList
+    nameList,
   )
     .chain((list) => Tpl.map(list, (n, i) => tp(n, i, Math.random())))
     .chain((list) =>
-      Arr.sorted(list, ([_n1, _i1, r1], [_n2, _i2, r2]) => r1 - r2)
+      Arr.sorted(list, ([_n1, _i1, r1], [_n2, _i2, r2]) => r1 - r2),
     ).value;
 
   return getAlphabets('upper')
@@ -22,9 +22,9 @@ export const generateGroups = (
           list.filter((_, i) =>
             Num.isInRange(
               Math.floor(nameList.length * (idx / numGroups)),
-              Math.floor(nameList.length * ((idx + 1) / numGroups))
-            )(i)
-          )
+              Math.floor(nameList.length * ((idx + 1) / numGroups)),
+            )(i),
+          ),
         )
         .chain((list) => Arr.sortedBy(list, ([_, i]) => i))
         .chain((list) => Tpl.map(list, ([n]) => n)).value,

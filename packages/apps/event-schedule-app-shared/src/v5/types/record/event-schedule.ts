@@ -75,7 +75,7 @@ export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule => ({
   notes: p?.notes ?? d.notes,
   datetimeSpecification: p?.datetimeSpecification ?? d.datetimeSpecification,
   datetimeRangeList: (p?.datetimeRangeList ?? d.datetimeRangeList).map(
-    fillDatetimeRange
+    fillDatetimeRange,
   ),
   answerDeadline:
     p?.answerDeadline === 'none'
@@ -86,7 +86,7 @@ export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule => ({
     p?.notificationSettings === 'none'
       ? 'none'
       : fillNotificationSettings(
-          p?.notificationSettings ?? defaultNotificationSettings
+          p?.notificationSettings ?? defaultNotificationSettings,
         ),
   timezoneOffsetMinutes: p?.timezoneOffsetMinutes ?? d.timezoneOffsetMinutes,
   author: fillUser(p?.author ?? userDefaultValue),

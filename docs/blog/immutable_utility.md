@@ -742,7 +742,7 @@ const UNSAFE_setIn_impl = (
     record: ReadonlyRecordBase,
     keyPath: readonly (number | string)[],
     index: number,
-    newValue: unknown
+    newValue: unknown,
 ): unknown =>
     index >= keyPath.length
         ? newValue
@@ -754,9 +754,9 @@ const UNSAFE_setIn_impl = (
                         record[keyPath[index]!] as ReadonlyRecordBase,
                         keyPath,
                         index + 1,
-                        newValue
+                        newValue,
                     )
-                  : v
+                  : v,
           )
         : {
               ...record,
@@ -766,7 +766,7 @@ const UNSAFE_setIn_impl = (
                   record[keyPath[index]!] as ReadonlyRecordBase,
                   keyPath,
                   index + 1,
-                  newValue
+                  newValue,
               ),
           };
 

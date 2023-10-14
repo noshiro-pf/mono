@@ -66,7 +66,7 @@ export const cardCostToStr = (cost: CardCost): string => {
 };
 
 export const cardPropertyToStr = (
-  cp: CardProperty
+  cp: CardProperty,
 ): { [key: string]: string } => ({
   indexInList: cp.indexInList.toString(),
   cardId: cp.cardId,

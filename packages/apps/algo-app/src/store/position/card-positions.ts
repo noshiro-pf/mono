@@ -5,7 +5,7 @@ import { type CardColor, type CardNumber } from '../../types';
 const cardPositionsAction$ = source<readonly [CardColor, CardNumber, Rect]>();
 
 export const cardPositionsDispatcher = (
-  action: readonly [CardColor, CardNumber, Rect]
+  action: readonly [CardColor, CardNumber, Rect],
 ): void => {
   cardPositionsAction$.next(action);
 };

@@ -5,7 +5,7 @@ import { epsilon } from '../color-test-values';
 export const testRgbEquality = (
   testname: string,
   rgb1: Rgb,
-  rgb2: Rgb
+  rgb2: Rgb,
 ): void => {
   test(testname, () => {
     const [r1, g1, b1] = rgb1;

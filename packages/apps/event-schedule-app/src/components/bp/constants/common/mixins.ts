@@ -95,7 +95,7 @@ export const focusOutline = (offsetPx: number = 2): string =>
 export const borderShadow = (
   alpha: number,
   colorHex: string = black,
-  sizePx = 1
+  sizePx = 1,
 ): string => `0 0 0 ${sizePx}px ${hexToRgba(colorHex, alpha)}`;
 
 // returns the padding necessary to center text in a container of the given height.
@@ -103,7 +103,7 @@ export const borderShadow = (
 
 export const centeredTextPaddingPx = (
   height: number,
-  lineHeight: number = Math.floor(ptFontSizePx * ptLineHeightPx)
+  lineHeight: number = Math.floor(ptFontSizePx * ptLineHeightPx),
 ): number => Math.floor((height - lineHeight) / 2);
 
 // Isolates z-indices

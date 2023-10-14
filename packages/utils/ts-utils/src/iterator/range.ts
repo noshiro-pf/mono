@@ -9,17 +9,17 @@ import { SafeInt, toSafeInt } from '../num';
 export function range(
   start: SafeUintWithSmallInt,
   end: SafeUintWithSmallInt,
-  step?: PositiveSafeIntWithSmallInt
+  step?: PositiveSafeIntWithSmallInt,
 ): Generator<SafeUint, void, unknown>;
 export function range(
   start: SafeIntWithSmallInt,
   end: SafeIntWithSmallInt,
-  step?: NonZeroSafeIntWithSmallInt
+  step?: NonZeroSafeIntWithSmallInt,
 ): Generator<SafeInt, void, unknown>;
 export function* range(
   start: SafeIntWithSmallInt,
   end: SafeIntWithSmallInt,
-  step: NonZeroSafeIntWithSmallInt = 1
+  step: NonZeroSafeIntWithSmallInt = 1,
 ): Generator<SafeInt, void, unknown> {
   for (
     let mut_i: SafeInt = toSafeInt(start);

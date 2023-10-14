@@ -91,7 +91,7 @@ export const HistogramView = memoNamed<Props>(
         ))}
       </div>
     </div>
-  )
+  ),
 );
 
 const textHeightPx = 30;

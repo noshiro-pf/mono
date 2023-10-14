@@ -41,5 +41,5 @@ export const UpdateUserInfoDialogTemplate = memoNamed<Props>(
         </ButtonsWrapperAlignEnd>
       </div>
     </DialogWithMaxWidth>
-  )
+  ),
 );

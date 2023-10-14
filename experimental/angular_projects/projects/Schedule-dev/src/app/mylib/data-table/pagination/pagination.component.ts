@@ -33,24 +33,24 @@ export class PaginationComponent implements OnInit {
 
   readonly pageLength$: RN<number> = combine(
     this.rowSize$,
-    this.itemsPerPage$
+    this.itemsPerPage$,
   ).map(([rowSize, itemsPerPage]) => Math.ceil(rowSize / itemsPerPage));
 
   readonly rangeStart$: RN<number> = combine(
     this.itemsPerPage$,
-    this.pageNumber$
+    this.pageNumber$,
   ).map(([itemsPerPage, pageNumber]) => itemsPerPage * (pageNumber - 1) + 1);
 
   readonly rangeEnd$: RN<number> = combine(
     this.itemsPerPage$,
     this.pageNumber$,
-    this.rowSize$
+    this.rowSize$,
   ).map(([itemsPerPage, pageNumber, rowSize]) =>
-    Math.min(rowSize, itemsPerPage * pageNumber)
+    Math.min(rowSize, itemsPerPage * pageNumber),
   );
 
   readonly pageIndice$: RN<number[]> = this.pageLength$.map((len) =>
-    utils.number.numSeq(1, len)
+    utils.number.numSeq(1, len),
   );
 
   constructor() {}

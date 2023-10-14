@@ -134,7 +134,7 @@ export const LuminanceVisualizerView = memoNamed<Props>(
         </Variance>
       </PaperCustomized>
     </div>
-  )
+  ),
 );
 
 const PaperCustomized = styled(Paper)`

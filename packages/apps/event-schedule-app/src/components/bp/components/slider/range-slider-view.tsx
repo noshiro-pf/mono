@@ -111,7 +111,7 @@ export const RangeSliderView = memoNamed<Props>(
         />
       </Root>
     );
-  }
+  },
 );
 
 /**

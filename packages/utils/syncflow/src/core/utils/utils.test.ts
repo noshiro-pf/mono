@@ -70,7 +70,7 @@ describe('binarySearch', () => {
 
   test('complicated example 5', () => {
     expect([0, 1, 2, 3]).toContain(
-      binarySearch([1, 1, 1, 3, 4, 4, 6, 7, 8], 1)
+      binarySearch([1, 1, 1, 3, 4, 4, 6, 7, 8], 1),
     );
   });
 

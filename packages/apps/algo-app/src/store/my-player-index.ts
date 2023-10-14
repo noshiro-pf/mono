@@ -13,9 +13,9 @@ export const myPlayerIndex$: InitializedObservable<PlayerIndex | undefined> =
       }
 
       console.warn(
-        `myName should be one of { 0, 1, 2, 3 }. result is "${index}". `
+        `myName should be one of { 0, 1, 2, 3 }. result is "${index}". `,
       );
 
       return undefined;
-    })
+    }),
   );

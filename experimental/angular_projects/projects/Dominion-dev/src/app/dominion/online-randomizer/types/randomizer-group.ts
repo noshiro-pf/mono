@@ -56,7 +56,7 @@ export class RandomizerGroup {
 
       newGameResultDialogOpened: boolean;
       resetVPCalculator: number;
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 
@@ -67,7 +67,7 @@ export class RandomizerGroup {
 
     this.isSelectedExpansions = initObj.isSelectedExpansions || [];
     this.selectedCardsCheckbox = new SelectedCardsCheckbox(
-      initObj.selectedCardsCheckbox
+      initObj.selectedCardsCheckbox,
     );
     this.BlackMarketPileShuffled = initObj.BlackMarketPileShuffled || [];
     this.BlackMarketPhase = initObj.BlackMarketPhase || BlackMarketPhase.init;

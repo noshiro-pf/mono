@@ -1,7 +1,7 @@
 import { Arr, pipe, tp, Tpl } from '@noshiro/ts-utils';
 
 export const getShuffled = <T extends readonly unknown[]>(
-  arr: T
+  arr: T,
 ): Readonly<{ [K in keyof T]: T[number] }> =>
   // eslint-disable-next-line no-restricted-syntax
   pipe(Array.from(arr, (e) => tp(e, Math.random())))

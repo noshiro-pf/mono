@@ -29,7 +29,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private database: FireDatabaseService,
-    private user: UserService
+    private user: UserService,
   ) {}
 
   ngOnInit() {
@@ -53,7 +53,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
 
     this.allPlayersAreReady$ = this.playersNameList$.pipe(
       map((e) => e.length >= this.newRoom.numberOfPlayers),
-      startWith(false)
+      startWith(false),
     );
 
     // this.selectedExpansionNameList$
@@ -71,7 +71,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
       .pipe(
         filter((e) => e === true),
         takeWhile(() => this.alive),
-        delay(1000)
+        delay(1000),
       )
       .subscribe(() => {
         this.router.navigate(['/online-game-main']);

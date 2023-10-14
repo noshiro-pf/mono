@@ -76,7 +76,7 @@ export class SchedulingComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private database: DatabaseService
+    private database: DatabaseService,
   ) {}
 
   ngOnInit() {

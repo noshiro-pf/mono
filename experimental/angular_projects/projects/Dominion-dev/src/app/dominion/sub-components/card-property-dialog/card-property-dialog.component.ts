@@ -60,7 +60,7 @@ export class CardPropertyDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<CardPropertyDialogComponent>,
-    private database: FireDatabaseService
+    private database: FireDatabaseService,
   ) {}
 
   ngOnInit() {
@@ -82,25 +82,25 @@ export class CardPropertyDialogComponent implements OnInit {
             default:
               throw new Error('value must be "increment" or "decrement"');
           }
-        }
+        },
       ),
-      this.showingIndexInput$.mapTo(0)
+      this.showingIndexInput$.mapTo(0),
     );
 
     this.showingIndex$ = combine(
       this.showingIndexInput$,
-      showingIndexIncrAcc$
+      showingIndexIncrAcc$,
     ).map(([input, acc]) => input + acc);
 
     this.card$ = combine(
       this.showingIndex$,
       this.indiceInCardList$,
-      this.cardPropertyList$
+      this.cardPropertyList$,
     ).map(([showingIndex, indiceInCardList, cardPropertyList]) =>
       indiceInCardList.length === 0 ||
       !utils.array.isInArrayRange(showingIndex, indiceInCardList)
         ? new CardProperty()
-        : cardPropertyList[indiceInCardList[showingIndex]]
+        : cardPropertyList[indiceInCardList[showingIndex]],
     );
 
     this.cardForView$ = this.card$.map(cardPropertyToStr);

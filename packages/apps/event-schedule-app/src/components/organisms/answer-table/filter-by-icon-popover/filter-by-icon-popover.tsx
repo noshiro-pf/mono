@@ -28,7 +28,7 @@ export const FilterByIconPopover = memoNamed<Props>(
     }, [answerIconId]);
 
     const filterState = useObservableValue(
-      AnswerFilterAndSortStore.filterState$
+      AnswerFilterAndSortStore.filterState$,
     );
 
     const state = filterState.iconState[answerIconId];
@@ -38,14 +38,14 @@ export const FilterByIconPopover = memoNamed<Props>(
       (value: number) => {
         AnswerFilterAndSortStore.setMinCountOfIcon(answerIconId, value);
       },
-      [answerIconId]
+      [answerIconId],
     );
 
     const onMaxChange = useCallback(
       (value: number) => {
         AnswerFilterAndSortStore.setMaxCountOfIcon(answerIconId, value);
       },
-      [answerIconId]
+      [answerIconId],
     );
 
     return (
@@ -76,5 +76,5 @@ export const FilterByIconPopover = memoNamed<Props>(
         />
       </Popover>
     );
-  }
+  },
 );

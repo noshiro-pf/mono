@@ -16,7 +16,7 @@ export const TurnPlayerHighlighter = memoNamed<Props>(
         height: `${position.height + 2 * playerNameRectPadding}px`,
       }}
     />
-  )
+  ),
 );
 
 const Rectangle = styled('div')`

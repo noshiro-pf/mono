@@ -53,7 +53,7 @@ export const answerSelectionReducer: Reducer<
                 point: match(nextIcon, defaultIconPoint),
                 comment,
               };
-            }
+            },
           )
         : state.set(action.datetimeRange, {
             iconId: action.icon,
@@ -64,7 +64,7 @@ export const answerSelectionReducer: Reducer<
     case 'cell-point':
       return state.has(action.datetimeRange)
         ? state.update(action.datetimeRange, (prev) =>
-            Obj.set(prev, 'point', action.point)
+            Obj.set(prev, 'point', action.point),
           )
         : state.set(action.datetimeRange, {
             point: action.point,
@@ -80,7 +80,7 @@ export const answerSelectionReducer: Reducer<
     case 'cell-comment':
       return state.has(action.datetimeRange)
         ? state.update(action.datetimeRange, (prev) =>
-            Obj.set(prev, 'comment', action.comment)
+            Obj.set(prev, 'comment', action.comment),
           )
         : state.set(action.datetimeRange, {
             point: 0,
@@ -90,7 +90,7 @@ export const answerSelectionReducer: Reducer<
 
     case 'header': {
       const allSelected = action.datetimeRangeList.every(
-        (d) => state.get(d)?.iconId === action.icon
+        (d) => state.get(d)?.iconId === action.icon,
       );
       return state.withMutations(
         action.datetimeRangeList.map((d) => ({
@@ -107,7 +107,7 @@ export const answerSelectionReducer: Reducer<
                 point: match(action.icon, defaultIconPoint),
                 comment: state.get(d)?.comment ?? '',
               },
-        }))
+        })),
       );
     }
 
@@ -126,7 +126,7 @@ export const answerSelectionReducer: Reducer<
             }),
             comment: action.comment,
           },
-        }))
+        })),
       );
     }
   }

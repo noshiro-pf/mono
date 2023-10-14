@@ -34,5 +34,5 @@ export const DeleteAllButton = memoNamed<Props>(
       toastConfig={toastConfig}
       onConfirmClick={onConfirmDeleteAll}
     />
-  )
+  ),
 );

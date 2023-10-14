@@ -9,7 +9,7 @@ export const updateBboxPoint = (
   x: number,
   y: number,
   pointWidthPxHalf: number,
-  color: Rgba
+  color: Rgba,
 ): void => {
   const rect: Rect = {
     left: x - pointWidthPxHalf,
@@ -24,20 +24,20 @@ export const updateBboxPoint = (
     rect.left,
     rect.top,
     rect.width,
-    rect.height
+    rect.height,
   );
 };
 
 export const updatePointOfBbox = (
   pixiBbox: PixiBbox,
   direction: Direction,
-  pointAfter: Point
+  pointAfter: Point,
 ): void => {
   updateBboxPoint(
     pixiBbox.pixi.points[direction],
     pointAfter.x,
     pointAfter.y,
     pixiBbox.style.pointWidthPxHalf,
-    pixiBbox.style.borderColor
+    pixiBbox.style.borderColor,
   );
 };

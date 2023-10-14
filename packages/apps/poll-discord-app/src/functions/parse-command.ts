@@ -13,11 +13,11 @@ export type Hours = t.TypeOf<typeof hoursType>;
 
 export const rp3060ParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
-  functionName: 'convertRp30ArgsToRpArgs' | 'convertRp60ArgsToRpArgs'
+  functionName: 'convertRp30ArgsToRpArgs' | 'convertRp60ArgsToRpArgs',
 ): Result<readonly [string, Hours, Hours], string> => {
   const regexResult =
     /\s*"(?<title>.*)"\s+"?(?<begin>[0-9]{1,2})"?\s+"?(?<end>[0-9]{1,2})"?/u.exec(
-      commandArguments
+      commandArguments,
     )?.groups;
 
   const parseErrorMessage = [
@@ -42,7 +42,7 @@ export const rp3060ParseCommand = (
       [
         `error has occurred in ${functionName}:`,
         'each argument should be an integer in the range 0 <= x <= 30.',
-      ].join('')
+      ].join(''),
     );
   }
 
@@ -51,11 +51,11 @@ export const rp3060ParseCommand = (
 
 export const rp3060dParseCommand = (
   commandArguments: string, // "9月4日 (土)" 15  25
-  functionName: 'convertRp30dArgsToRpArgs' | 'convertRp60dArgsToRpArgs'
+  functionName: 'convertRp30dArgsToRpArgs' | 'convertRp60dArgsToRpArgs',
 ): Result<readonly [Hours, Hours], string> => {
   const regexResult =
     /\s*"?(?<begin>[0-9]{1,2})"?\s+"?(?<end>[0-9]{1,2})"?/u.exec(
-      commandArguments
+      commandArguments,
     )?.groups;
 
   const parseErrorMessage = [
@@ -80,7 +80,7 @@ export const rp3060dParseCommand = (
       [
         `error has occurred in ${functionName}:`,
         'each argument should be an integer in the range 0 <= x <= 30.',
-      ].join('')
+      ].join(''),
     );
   }
 
@@ -88,7 +88,7 @@ export const rp3060dParseCommand = (
 };
 
 export const gpParseGroupingCommandArgument = (
-  commandArguments: string
+  commandArguments: string,
 ): Result<readonly [NumGroups, readonly string[]], undefined> => {
   const numGroups = Number.parseInt(commandArguments, 10);
   if (!isNumGroups(numGroups)) return Result.err(undefined);
@@ -103,7 +103,7 @@ export const gpParseGroupingCommandArgument = (
 };
 
 export const gpParseRandCommandArgument = (
-  commandArguments: string
+  commandArguments: string,
 ): Result<number, undefined> => {
   const n = Number.parseInt(commandArguments, 10);
   if (!Number.isSafeInteger(n) || n < 2) return Result.err(undefined);

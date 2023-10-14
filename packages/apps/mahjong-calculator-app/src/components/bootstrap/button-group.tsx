@@ -12,7 +12,7 @@ type PropsTyped<T> = DeepReadonly<{
 type Props = PropsTyped<string>;
 
 export const ButtonGroupTyped = <T,>(
-  props: PropsTyped<T>
+  props: PropsTyped<T>,
 ): preact.VNode<PropsTyped<T>> | null =>
   // eslint-disable-next-line no-restricted-syntax
   createElement(ButtonGroup, props as unknown as Props);
@@ -27,9 +27,9 @@ export const ButtonGroup = memoNamed<Props>(
             onClick: () => {
               onClick(btn.id);
             },
-          })
+          }),
         ),
-      [buttons, onClick]
+      [buttons, onClick],
     );
 
     return (
@@ -45,7 +45,7 @@ export const ButtonGroup = memoNamed<Props>(
         ))}
       </Root>
     );
-  }
+  },
 );
 
 const Root = styled('div')`

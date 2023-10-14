@@ -18,11 +18,11 @@ export const BpInput = memoNamed<BpInputProps>(
     const onChangeHandler = useCallback(
       (
         // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-        ev: React.ChangeEvent<HTMLInputElement> & React.FormEvent<HTMLElement>
+        ev: React.ChangeEvent<HTMLInputElement> & React.FormEvent<HTMLElement>,
       ) => {
         onValueChange(ev.target.value);
       },
-      [onValueChange]
+      [onValueChange],
     );
 
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -38,7 +38,7 @@ export const BpInput = memoNamed<BpInputProps>(
 
     useTinyObservableEffect(
       focus$ ?? createTinyObservable<undefined>(),
-      onFocus
+      onFocus,
     );
 
     return (
@@ -50,5 +50,5 @@ export const BpInput = memoNamed<BpInputProps>(
         {...props}
       />
     );
-  }
+  },
 );

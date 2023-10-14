@@ -19,6 +19,6 @@ export const JikazeButtonGroup = memoNamed<Props>(
   (props) =>
     createElement(
       ButtonGroupTyped<Jikaze>,
-      Obj.merge(props, { buttons: jikazeButtons })
-    )
+      Obj.merge(props, { buttons: jikazeButtons }),
+    ),
 );

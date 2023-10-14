@@ -26,7 +26,7 @@ export class GameRoomListComponent implements OnInit {
     public snackBar: MatSnackBar,
     public dialog: MatDialog,
     private database: FireDatabaseService,
-    private user: UserService
+    private user: UserService,
   ) {}
 
   ngOnInit() {}

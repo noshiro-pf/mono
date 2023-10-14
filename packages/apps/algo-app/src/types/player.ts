@@ -5,7 +5,7 @@ export const playerTypeDef = t.record(
     name: t.string(''),
     online: t.boolean(false),
   },
-  'Player'
+  'Player',
 );
 
 export type Player = t.TypeOf<typeof playerTypeDef>;

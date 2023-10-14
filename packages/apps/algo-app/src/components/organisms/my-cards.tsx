@@ -16,14 +16,14 @@ export const MyCards = memoNamed<Props>('MyCards', ({ cards, height }) => {
     () => ({
       height: `${height}px`,
     }),
-    [height]
+    [height],
   );
 
   const cardHeight = useMemo<number>(() => height - 4 * paddingPx, [height]);
 
   const cardSize = useMemo<RectSize>(
     () => ({ width: (2 / 3) * cardHeight, height: cardHeight }),
-    [cardHeight]
+    [cardHeight],
   );
 
   return (

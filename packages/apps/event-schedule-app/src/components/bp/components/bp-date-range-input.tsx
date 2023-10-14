@@ -19,7 +19,7 @@ type Props = DeepReadonly<{
     dateRange: Readonly<{
       start: YearMonthDate | undefined;
       end: YearMonthDate | undefined;
-    }>
+    }>,
   ) => void;
 }> &
   Omit<
@@ -53,8 +53,8 @@ export const BpDateRangeInput = memoNamed<Props>(
                   ...d,
                   hours: 0,
                   minutes: 0,
-                })
-              )
+                }),
+              ),
             ).value ?? null,
 
             pipe(dateRange.end).chainOptional((d) =>
@@ -63,12 +63,12 @@ export const BpDateRangeInput = memoNamed<Props>(
                   ...d,
                   hours: 0,
                   minutes: 0,
-                })
-              )
-            ).value ?? null
-          )
+                }),
+              ),
+            ).value ?? null,
+          ),
         ),
-      [dateRange]
+      [dateRange],
     );
 
     const minDate: RawDateMutType | undefined = useMemo(
@@ -80,11 +80,11 @@ export const BpDateRangeInput = memoNamed<Props>(
                 ...d,
                 hours: 0,
                 minutes: 0,
-              })
-            )
-          ).value
+              }),
+            ),
+          ).value,
         ),
-      [_minDate]
+      [_minDate],
     );
 
     const maxDate: RawDateMutType | undefined = useMemo(
@@ -96,11 +96,11 @@ export const BpDateRangeInput = memoNamed<Props>(
                 ...d,
                 hours: 0,
                 minutes: 0,
-              })
-            )
-          ).value
+              }),
+            ),
+          ).value,
         ),
-      [_maxDate]
+      [_maxDate],
     );
 
     const onChange = useCallback(
@@ -110,7 +110,7 @@ export const BpDateRangeInput = memoNamed<Props>(
           end: pipe(end).chainOptional(ymdFromDate).value ?? undefined,
         });
       },
-      [onDateRangeChange]
+      [onDateRangeChange],
     );
 
     return (
@@ -126,5 +126,5 @@ export const BpDateRangeInput = memoNamed<Props>(
         {...props}
       />
     );
-  }
+  },
 );

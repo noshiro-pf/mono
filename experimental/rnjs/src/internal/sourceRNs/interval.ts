@@ -3,7 +3,7 @@ import { RN } from '../RN';
 export const interval = (
   milliSec: number,
   startImmediately: boolean = false,
-  name: string = ''
+  name: string = '',
 ): IntervalRN => new IntervalRN(milliSec, startImmediately, name);
 
 class IntervalRN extends RN<number> {
@@ -15,7 +15,7 @@ class IntervalRN extends RN<number> {
   constructor(
     milliSec: number,
     startImmediately: boolean = false,
-    name: string = ''
+    name: string = '',
   ) {
     super(0, [], name);
     this.milliSec = milliSec;

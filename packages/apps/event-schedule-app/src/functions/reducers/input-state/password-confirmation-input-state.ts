@@ -21,7 +21,7 @@ export const passwordWithConfirmationInitialState = {
 } as const satisfies PasswordWithConfirmationState;
 
 export const passwordWithConfirmationHasError = (
-  state: PasswordWithConfirmationState
+  state: PasswordWithConfirmationState,
 ): boolean =>
   state.password.inputValue === '' ||
   state.passwordConfirmation.inputValue === '' ||
@@ -57,12 +57,12 @@ export const passwordWithConfirmationStateReducer: Reducer<
                 passwordInputValue.length + 1 &&
               state.password.inputValue.slice(0, -1) === passwordInputValue
               ? ''
-              : passwordInputValue
-          )
+              : passwordInputValue,
+          ),
         )
         .chain((draft) => Obj.setIn(draft, ['password', 'error'], undefined))
         .chain((draft) =>
-          Obj.setIn(draft, ['passwordConfirmation', 'error'], undefined)
+          Obj.setIn(draft, ['passwordConfirmation', 'error'], undefined),
         ).value;
     }
 
@@ -81,12 +81,12 @@ export const passwordWithConfirmationStateReducer: Reducer<
                 passwordInputValue.length + 1 &&
               state.password.inputValue.slice(0, -1) === passwordInputValue
               ? ''
-              : passwordInputValue
-          )
+              : passwordInputValue,
+          ),
         )
         .chain((draft) => Obj.setIn(draft, ['password', 'error'], undefined))
         .chain((draft) =>
-          Obj.setIn(draft, ['passwordConfirmation', 'error'], undefined)
+          Obj.setIn(draft, ['passwordConfirmation', 'error'], undefined),
         ).value;
     }
 
@@ -97,7 +97,7 @@ export const passwordWithConfirmationStateReducer: Reducer<
       return Obj.setIn(
         state,
         ['passwordConfirmation', 'error'],
-        action.payload
+        action.payload,
       );
 
     case 'submit':
@@ -106,7 +106,7 @@ export const passwordWithConfirmationStateReducer: Reducer<
         ['passwordConfirmation', 'error'],
         state.password.inputValue !== state.passwordConfirmation.inputValue
           ? dict.common.error.passwordNotMatch
-          : undefined
+          : undefined,
       );
 
     case 'reset':

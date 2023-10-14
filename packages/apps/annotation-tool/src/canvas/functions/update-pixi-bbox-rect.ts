@@ -11,7 +11,7 @@ export const updateBboxRect = (
   rect: Rect,
   borderWidthPx: number,
   borderColor: Rgba,
-  faceColor: Rgba | undefined
+  faceColor: Rgba | undefined,
 ): void => {
   mut_graphics.clear();
 
@@ -36,7 +36,7 @@ export const turnOnHighlight = (pixiBbox: PixiBbox): void => {
     pixiBbox.rect,
     pixiBbox.style.borderWidthPx,
     pixiBbox.style.borderColor,
-    pixiBbox.style.faceHighlightColor
+    pixiBbox.style.faceHighlightColor,
   );
 };
 
@@ -46,7 +46,7 @@ export const turnOffHighlight = (pixiBbox: PixiBbox): void => {
     pixiBbox.rect,
     pixiBbox.style.borderWidthPx,
     pixiBbox.style.borderColor,
-    undefined
+    undefined,
   );
 };
 
@@ -56,6 +56,6 @@ export const updateRectOfBbox = (pixiBbox: PixiBbox, rectAfter: Rect): void => {
     rectAfter,
     pixiBbox.style.borderWidthPx,
     pixiBbox.style.borderColor,
-    pixiBbox.style.faceHighlightColor
+    pixiBbox.style.faceHighlightColor,
   );
 };

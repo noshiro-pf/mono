@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import { useState } from './use-state';
 
 export const usePromiseValue = <T>(
-  promise: Readonly<Promise<T>>
+  promise: Readonly<Promise<T>>,
 ): PromiseState<undefined, unknown, T> => {
   const promiseMemoized = useRef(promise);
 

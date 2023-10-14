@@ -15,22 +15,22 @@
 
 export const generateCalendar = (
   year: YearEnum,
-  month: MonthEnum
+  month: MonthEnum,
 ): readonly (readonly YearMonthDate[])[] => {
   const numPrevMonthDates = DateUtils.getLocaleDayOfWeek(
-    getFirstDateOfMonth(year, month)
+    getFirstDateOfMonth(year, month),
   );
   const numNextMonthDates =
     7 -
     DateUtils.getLocaleDayOfWeek(
       // eslint-disable-next-line no-restricted-syntax
-      getFirstDateOfMonth(year, (month + 1) as MonthEnum)
+      getFirstDateOfMonth(year, (month + 1) as MonthEnum),
     );
 
   const lastDateNumberOfPrevMonth = getLastDateNumberOfMonth(
     year,
     // eslint-disable-next-line no-restricted-syntax
-    (month - 1) as MonthIndexEnum
+    (month - 1) as MonthIndexEnum,
   );
   const lastDateNumberOfThisMonth = getLastDateNumberOfMonth(year, month);
 
@@ -41,7 +41,7 @@ export const generateCalendar = (
       (month - 1) as MonthEnum,
       // eslint-disable-next-line no-restricted-syntax
       (lastDateNumberOfPrevMonth - numPrevMonthDates + 1) as DateEnum,
-      lastDateNumberOfPrevMonth
+      lastDateNumberOfPrevMonth,
     ),
     Arr.concat(
       genYmdRangeList(year, month, 1, lastDateNumberOfThisMonth),
@@ -51,15 +51,15 @@ export const generateCalendar = (
         (month + 1) as MonthEnum,
         1,
         // eslint-disable-next-line no-restricted-syntax
-        numNextMonthDates as DateEnum
-      )
-    )
+        numNextMonthDates as DateEnum,
+      ),
+    ),
   );
 
   const rowSize = numWeeks(year, month);
 
   return Arr.range(0, rowSize).map((i) =>
-    cells1d.slice(Uint8.mul(7, i), Uint8.mul(7, Uint8.add(i, 1)))
+    cells1d.slice(Uint8.mul(7, i), Uint8.mul(7, Uint8.add(i, 1))),
   );
 };
 
@@ -67,7 +67,7 @@ const genYmdRangeList = (
   year: YearEnum,
   month: MonthEnum,
   from: DateEnum,
-  to: DateEnum
+  to: DateEnum,
 ): readonly YearMonthDate[] =>
   // eslint-disable-next-line no-restricted-syntax
   Arr.range(from, Uint8.add(to, 1) as DateEnum | 32).map((n) => ({
@@ -82,7 +82,7 @@ const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): DateType =>
 
 const getLastDateNumberOfMonth = (
   year: YearEnum,
-  month: UintRange<0, 14> // 0 - 13
+  month: UintRange<0, 14>, // 0 - 13
 ): 28 | 29 | 30 | 31 =>
   // 翌月の0日目を取得することで、前月の最終日を取得できる
   // eslint-disable-next-line no-restricted-syntax
@@ -96,6 +96,6 @@ const numWeeks = (year: YearEnum, month: MonthEnum): 4 | 5 | 6 => {
   const lastDateNumber = getLastDateNumberOfMonth(year, month);
   // eslint-disable-next-line no-restricted-syntax
   return Math.ceil(
-    (DateUtils.getLocaleDayOfWeek(firstDate) + lastDateNumber) / 7
+    (DateUtils.getLocaleDayOfWeek(firstDate) + lastDateNumber) / 7,
   ) as 4 | 5 | 6;
 };

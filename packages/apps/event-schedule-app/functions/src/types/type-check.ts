@@ -15,7 +15,7 @@ export const toStringWithCheck = (value: unknown): string => {
 };
 
 export const fillAnswerWithCheck = (
-  value: DeepReadonly<FirebaseFirestore.DocumentData>
+  value: DeepReadonly<FirebaseFirestore.DocumentData>,
 ): Answer => {
   const filled = fillAnswer(value);
   if (!deepEqual(filled, value)) {
@@ -25,7 +25,7 @@ export const fillAnswerWithCheck = (
 };
 
 export const fillEventScheduleWithCheck = (
-  value: DeepReadonly<FirebaseFirestore.DocumentData>
+  value: DeepReadonly<FirebaseFirestore.DocumentData>,
 ): EventSchedule => {
   const filled = fillEventSchedule(value);
   if (!deepEqual(filled, value)) {

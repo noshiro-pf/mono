@@ -4,7 +4,7 @@ export const useKeyEventListener = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   onKeyDown: (ev: KeyboardEvent) => void,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  onKeyUp: (ev: KeyboardEvent) => void
+  onKeyUp: (ev: KeyboardEvent) => void,
 ): void => {
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown);

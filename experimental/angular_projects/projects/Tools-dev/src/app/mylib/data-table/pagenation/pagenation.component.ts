@@ -41,17 +41,17 @@ export class PagenationComponent implements OnInit {
     this.pageLength$ = combineLatest(
       this.itemsPerPage$,
       this.dataSize$,
-      (itemsPerPage, dataSize) => Math.ceil(dataSize / itemsPerPage)
+      (itemsPerPage, dataSize) => Math.ceil(dataSize / itemsPerPage),
     );
 
     this.pageIndice$ = this.pageLength$.pipe(
-      map((len) => utils.number.seq0(len))
+      map((len) => utils.number.seq0(len)),
     );
 
     this.rangeStart$ = combineLatest(
       this.itemsPerPage$,
       this.selectedPageIndex$,
-      (itemsPerPage, selectedPageIndex) => itemsPerPage * selectedPageIndex + 1
+      (itemsPerPage, selectedPageIndex) => itemsPerPage * selectedPageIndex + 1,
     );
 
     this.rangeEnd$ = combineLatest(
@@ -59,7 +59,7 @@ export class PagenationComponent implements OnInit {
       this.selectedPageIndex$,
       this.dataSize$,
       (itemsPerPage, idx, dataSize) =>
-        Math.min(dataSize, itemsPerPage * (idx + 1))
+        Math.min(dataSize, itemsPerPage * (idx + 1)),
     );
   }
 
@@ -71,10 +71,10 @@ export class PagenationComponent implements OnInit {
 export function getDataAtPage<T>(
   data: Array<T>,
   itemsPerPage: number,
-  selectedPageIndex: number
+  selectedPageIndex: number,
 ): Array<T> {
   return data.slice(
     itemsPerPage * selectedPageIndex,
-    itemsPerPage * (selectedPageIndex + 1)
+    itemsPerPage * (selectedPageIndex + 1),
   );
 }

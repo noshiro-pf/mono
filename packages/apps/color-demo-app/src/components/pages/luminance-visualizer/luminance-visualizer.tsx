@@ -32,7 +32,7 @@ export const LuminanceVisualizer = memoNamed('LuminanceVisualizer', () => {
   } = useDebounce(
     () => calcAll({ saturation, lightness, firstHue, divisionNumber }),
     [saturation, lightness, firstHue, divisionNumber],
-    200
+    200,
   );
 
   return (

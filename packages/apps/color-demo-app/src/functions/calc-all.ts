@@ -33,15 +33,15 @@ export const calcAll = ({
   /* values */
 
   const hueList: ArrayOfLength<360, Hue> = Tpl.map(hueListDefault, (h) =>
-    toHue((h - firstHue + 360) % 360)
+    toHue((h - firstHue + 360) % 360),
   );
 
   const hslList: ArrayOfLength<360, Hsl> = Tpl.map(hueList, (hue) =>
-    tp(hue, saturation, lightness)
+    tp(hue, saturation, lightness),
   );
 
   const luminanceList: ArrayOfLength<360, NonNegativeFiniteNumber> = pipe(
-    hslList
+    hslList,
   )
     .chain((a) => Tpl.map(a, hslToRgb))
     .chain((a) => Tpl.map(a, relativeLuminance)).value;
@@ -53,7 +53,7 @@ export const calcAll = ({
     Tpl.map(luminanceList, (l) =>
       Num.isNonZero(maxLuminanceInList)
         ? NonNegativeFiniteNumber.div(l, maxLuminanceInList)
-        : toNonNegativeFiniteNumber(0)
+        : toNonNegativeFiniteNumber(0),
     );
 
   // Type annotations are added to avoid
@@ -65,17 +65,17 @@ export const calcAll = ({
 
   const pickedUpHues_equallySpaced = pipe(Arr.seq(divisionNumber))
     .chain((list) =>
-      Tpl.map(list, (i) => Num.roundToInt((i * 360) / divisionNumber))
+      Tpl.map(list, (i) => Num.roundToInt((i * 360) / divisionNumber)),
     )
     .chain((list) =>
-      Tpl.map(list, (h) => toHue((h - firstHue + 360) % 360))
+      Tpl.map(list, (h) => toHue((h - firstHue + 360) % 360)),
     ).value;
 
   const adjacentContrastRatioList_equallySpaced: NonEmptyArray<PositiveFiniteNumber> =
     hueListToContrastRatioList(
       pickedUpHues_equallySpaced,
       saturation,
-      lightness
+      lightness,
     );
 
   const result1_equallySpaced: ColorResult = {
@@ -87,14 +87,14 @@ export const calcAll = ({
       Tpl.map(hueListDefault, (i) =>
         NonNegativeFiniteNumber.div(
           toNonNegativeFiniteNumber(i),
-          toPositiveSafeInt(360)
-        )
-      )
+          toPositiveSafeInt(360),
+        ),
+      ),
     ),
     pickedUpHues: pickedUpHues_equallySpaced,
     adjacentContrastRatioList: adjacentContrastRatioList_equallySpaced,
     adjacentContrastRatioVariance: variance(
-      adjacentContrastRatioList_equallySpaced
+      adjacentContrastRatioList_equallySpaced,
     ),
   };
 
@@ -105,8 +105,8 @@ export const calcAll = ({
       saturation,
       lightness,
       firstHue,
-      false
-    )
+      false,
+    ),
   ).chain((t) => Tpl.map(t, (h) => toHue((h - firstHue + 360) % 360))).value;
 
   const adjacentContrastRatioList_weighted: NonEmptyArray<PositiveFiniteNumber> =
@@ -118,7 +118,7 @@ export const calcAll = ({
       NonEmptyArray<NonNegativeFiniteNumber>
     >(
       hslList,
-      normalizeList(getLuminanceListAccumulated(luminanceList, false))
+      normalizeList(getLuminanceListAccumulated(luminanceList, false)),
     ),
     pickedUpHues: pickedUpHues_weighted,
     adjacentContrastRatioList: adjacentContrastRatioList_weighted,
@@ -133,15 +133,15 @@ export const calcAll = ({
       saturation,
       lightness,
       firstHue,
-      true
-    )
+      true,
+    ),
   ).chain((t) => Tpl.map(t, (h) => toHue((h - firstHue + 360) % 360))).value;
 
   const adjacentContrastRatioList_weighted_log: NonEmptyArray<PositiveFiniteNumber> =
     hueListToContrastRatioList(
       pickedUpHues_weighted_log,
       saturation,
-      lightness
+      lightness,
     );
 
   const result3_weighted_log: ColorResult = {
@@ -152,7 +152,7 @@ export const calcAll = ({
     pickedUpHues: pickedUpHues_weighted_log,
     adjacentContrastRatioList: adjacentContrastRatioList_weighted_log,
     adjacentContrastRatioVariance: variance(
-      adjacentContrastRatioList_weighted_log
+      adjacentContrastRatioList_weighted_log,
     ),
   };
 

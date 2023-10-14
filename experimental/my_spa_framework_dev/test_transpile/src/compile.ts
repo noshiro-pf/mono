@@ -11,18 +11,20 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
   allDiagnostics.forEach((diagnostic) => {
     if (diagnostic.file) {
       let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
-        diagnostic.start!
+        diagnostic.start!,
       );
       let message = ts.flattenDiagnosticMessageText(
         diagnostic.messageText,
-        '\n'
+        '\n',
       );
       console.log(
-        `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`
+        `${diagnostic.file.fileName} (${line + 1},${
+          character + 1
+        }): ${message}`,
       );
     } else {
       console.log(
-        ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
+        ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
       );
     }
   });

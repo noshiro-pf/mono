@@ -26,7 +26,7 @@ export const Root = memoNamed('Root', () => {
   });
 
   const { pathname, searchParams: queryParams } = useObservableValue(
-    Router.state$
+    Router.state$,
   );
 
   const showMain = useMemo(() => isMainPage(pathname), [pathname]);
@@ -35,7 +35,7 @@ export const Root = memoNamed('Root', () => {
 
   const { playerId, replay, observe } = useMemo(
     () => getParams(queryParams),
-    [queryParams]
+    [queryParams],
   );
 
   useEffect(() => {

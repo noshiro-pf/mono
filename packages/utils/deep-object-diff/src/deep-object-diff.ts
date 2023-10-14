@@ -9,6 +9,6 @@ type DetailedDiffResult<T> = Readonly<{
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const deepObjectDiff = <T extends object>(
   a: T,
-  b: T
+  b: T,
   // eslint-disable-next-line no-restricted-syntax
 ): DetailedDiffResult<T> => detailedDiff(a, b) as DetailedDiffResult<T>;

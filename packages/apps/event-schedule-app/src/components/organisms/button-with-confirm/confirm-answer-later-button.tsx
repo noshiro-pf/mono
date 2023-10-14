@@ -55,5 +55,5 @@ export const AnswerLaterButtonWithConfirmation = memoNamed<Props>(
         <ForNonLoggedInUserDialog cancel={closeDialog} isOpen={isOpen} />
       </>
     );
-  }
+  },
 );

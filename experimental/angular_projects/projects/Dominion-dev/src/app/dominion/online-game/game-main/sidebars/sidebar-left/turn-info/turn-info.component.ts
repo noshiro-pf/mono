@@ -44,11 +44,11 @@ export class TurnInfoComponent implements OnInit {
         default:
           throw new Error(`unknown phase name '${phase}'`);
       }
-    })
+    }),
   );
 
   potionRepeater$ = this.potion$.pipe(
-    map((potion) => Array.from(new Array(potion)))
+    map((potion) => Array.from(new Array(potion))),
   );
 
   constructor(private gameStateService: GameStateService) {}

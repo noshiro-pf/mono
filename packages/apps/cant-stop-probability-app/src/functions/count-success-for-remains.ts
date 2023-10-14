@@ -4,7 +4,7 @@ import { possibleTwoDiceSums } from './possible-two-dice-sums';
 
 // 踏破されていない列のいずれかが出る場合の数
 export const countSuccessForRemains = (
-  columnsAlive: ISet<TwoDiceSumValue>
+  columnsAlive: ISet<TwoDiceSumValue>,
 ): SafeUint => {
   let mut_count = 0;
 

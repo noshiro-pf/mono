@@ -68,7 +68,7 @@ describe('permutationType', () => {
       type TargetType = t.TypeOf<typeof targetType>;
 
       expectType<TargetType, '012' | '021' | '102' | '120' | '201' | '210'>(
-        '='
+        '=',
       );
 
       expectType<typeof targetType.defaultValue, TargetType>('=');

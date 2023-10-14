@@ -48,7 +48,7 @@ export class UserInputLogDialogComponent implements OnInit {
           clickedCardId: userInput.data.clickedCardId,
           clickedCardName: gameState.getDCard(userInput.data.clickedCardId)
             .cardProperty.nameJp,
-        }))
+        })),
     );
   }
 }

@@ -60,7 +60,7 @@ export class ObservableBaseClass<
     this.#children = Arr.pushed(
       this.#children,
       // eslint-disable-next-line no-restricted-syntax
-      child as ChildObservable<unknown>
+      child as ChildObservable<unknown>,
     );
   }
 
@@ -154,7 +154,7 @@ export class ObservableBaseClass<
     }
 
     const id: SubscriberId = this.#addSubscriber(
-      toSubscriber(onNext, onComplete)
+      toSubscriber(onNext, onComplete),
     );
     return {
       unsubscribe: () => {

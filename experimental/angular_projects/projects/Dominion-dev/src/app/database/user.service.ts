@@ -33,26 +33,26 @@ export class UserService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private database: FireDatabaseService
+    private database: FireDatabaseService,
   ) {
     this.signedIn$ = fromObservable<fbUser>(
       {} as fbUser,
-      this.afAuth.authState
+      this.afAuth.authState,
     ).map((user) => !!user);
 
     this.uid$ = fromObservable<fbUser>({} as fbUser, this.afAuth.authState).map(
-      (user) => (user || { uid: '' }).uid || ''
+      (user) => (user || { uid: '' }).uid || '',
     );
 
     this.myDisplayName$ = fromObservable<fbUser>(
       {} as fbUser,
-      this.afAuth.authState
+      this.afAuth.authState,
     ).map((user) => (user || { displayName: '' }).displayName || '');
 
     this.user$ = combine(this.uid$, this.database.users$).map(([uid, users]) =>
       !uid || users.length === 0
         ? new User()
-        : users.find((e) => e.databaseKey === uid) || new User()
+        : users.find((e) => e.databaseKey === uid) || new User(),
     );
 
     this.name$ = this.user$.pluck('name').skipUnchanged();
@@ -66,9 +66,9 @@ export class UserService {
     this.onlineGame = {
       isSelectedExpansions$: combine(
         this.database.expansionNameList$.map((list) => list.map((_) => false)),
-        onlineGame$.pluck('isSelectedExpansions').skipUnchanged()
+        onlineGame$.pluck('isSelectedExpansions').skipUnchanged(),
       ).map(([initArray, isSelectedExpansions]) =>
-        initArray.map((_, i) => !!isSelectedExpansions[i])
+        initArray.map((_, i) => !!isSelectedExpansions[i]),
       ),
 
       numberOfPlayers$: onlineGame$.pluck('numberOfPlayers').skipUnchanged(),
@@ -94,7 +94,7 @@ export class UserService {
     };
 
     this.signedInToRandomizerGroup$ = this.randomizerGroupId$.map(
-      (groupId) => !!groupId
+      (groupId) => !!groupId,
     );
 
     this.uid$.subscribe((val) => (this.uid = val));
@@ -115,7 +115,7 @@ export class UserService {
     return this.database.user.set.onlineGame.isSelectedExpansions(
       this.uid,
       index,
-      value
+      value,
     );
   }
 
@@ -142,7 +142,7 @@ export class UserService {
     if (!this.uid) return Promise.resolve();
     return this.database.user.set.onlineGame.cardSizeAutoChange(
       this.uid,
-      value
+      value,
     );
   }
   setOnlineGameCardSizeRatio(value: number) {

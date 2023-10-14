@@ -11,7 +11,7 @@ const useRouter = <
   useContext<RouteComponentProps<RouteParam, StaticContext, unknown>>(
     __RouterContext as unknown as Context<
       RouteComponentProps<RouteParam, StaticContext, unknown>
-    >
+    >,
   );
 
 const useHistory = <
@@ -71,7 +71,7 @@ export const useNavigator = <
         hist.push(pathname);
       }
     },
-    [hist]
+    [hist],
   );
   return nav;
 };

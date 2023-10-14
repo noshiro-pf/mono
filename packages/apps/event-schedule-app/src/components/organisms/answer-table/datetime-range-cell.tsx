@@ -40,7 +40,7 @@ export const DatetimeRangeCell = memoNamed<Props>(
             Sunday: calendarDateColor.sunday,
             Saturday: calendarDateColor.saturday,
             normal: calendarDateColor.normal,
-          }
+          },
         ),
       };
     }, [holidaysJpDefinition, datetimeRange.ymd]);
@@ -87,5 +87,5 @@ export const DatetimeRangeCell = memoNamed<Props>(
         ),
       })
     );
-  }
+  },
 );

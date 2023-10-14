@@ -20,7 +20,7 @@ import {
 export const fixAnswerAndUpdateMessage = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   messages: Discord.Collection<string, Discord.Message>,
-  poll: Poll
+  poll: Poll,
 ): Promise<Result<undefined, string>> => {
   const pollMessage = messages.find((m) => m.id === poll.id);
 
@@ -38,15 +38,15 @@ export const fixAnswerAndUpdateMessage = async (
     .map((dateOption) =>
       tp(
         toDateOptionId(dateOption.id),
-        messages.find((m) => m.id === dateOption.id)
-      )
+        messages.find((m) => m.id === dateOption.id),
+      ),
     )
     .filter((a): a is readonly [DateOptionId, Discord.Message] =>
-      isNotUndefined(a[1])
+      isNotUndefined(a[1]),
     );
 
   const dateOptionMessagesFilled = await Promise.all(
-    dateOptionMessages.map(([dateId, msg]) => tp(dateId, msg))
+    dateOptionMessages.map(([dateId, msg]) => tp(dateId, msg)),
   );
 
   // TODO: flatMapにする
@@ -66,28 +66,28 @@ export const fixAnswerAndUpdateMessage = async (
           .resolve(emojis.good.unicode)
           ?.users.fetch()
           .then((good) =>
-            good.filter((u) => !u.bot).map((u) => toUserId(u.id))
+            good.filter((u) => !u.bot).map((u) => toUserId(u.id)),
           ),
         msg.reactions
           .resolve(emojis.fair.unicode)
           ?.users.fetch()
           .then((fair) =>
-            fair.filter((u) => !u.bot).map((u) => toUserId(u.id))
+            fair.filter((u) => !u.bot).map((u) => toUserId(u.id)),
           ),
         msg.reactions
           .resolve(emojis.poor.unicode)
           ?.users.fetch()
           .then((poor) =>
-            poor.filter((u) => !u.bot).map((u) => toUserId(u.id))
+            poor.filter((u) => !u.bot).map((u) => toUserId(u.id)),
           ),
       ]).then(([good, fair, poor]) =>
         tp(dateId, {
           good,
           fair,
           poor,
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 
   /*
@@ -128,13 +128,13 @@ export const fixAnswerAndUpdateMessage = async (
           fair: ISet.new(reactions.fair ?? []),
           poor: ISet.new(reactions.poor ?? []),
         },
-      }))
-    )
+      })),
+    ),
   );
 
   const userIdToDisplayNameResult = await createUserIdToDisplayNameMap(
     pollMessage.guild,
-    getUserIdsFromAnswers(newPollFilled.answers).toArray()
+    getUserIdsFromAnswers(newPollFilled.answers).toArray(),
   );
 
   if (Result.isErr(userIdToDisplayNameResult)) {
@@ -153,27 +153,27 @@ export const fixAnswerAndUpdateMessage = async (
       .edit({
         embeds: [rpCreateSummaryMessage(newPollFilled, userIdToDisplayName)],
       })
-      .then(() => undefined)
+      .then(() => undefined),
   );
 
   if (Result.isErr(editSummaryMessageResult)) {
     return Result.err(
       `editSummaryMessage in fixAnswerAndUpdateMessage failed: ${Str.from(
-        editSummaryMessageResult.value
-      )}`
+        editSummaryMessageResult.value,
+      )}`,
     );
   }
 
   // restore reaction stamp button
   const addEmojiResult = await Result.fromPromise(
-    pollMessage.react(emojis.refresh.unicode)
+    pollMessage.react(emojis.refresh.unicode),
   );
 
   if (Result.isErr(addEmojiResult)) {
     return Result.err(
       `addEmoji in fixAnswerAndUpdateMessage failed: ${Str.from(
-        addEmojiResult.value
-      )}`
+        addEmojiResult.value,
+      )}`,
     );
   }
 

@@ -8,9 +8,9 @@ export const scan =
       state: Readonly<U>,
       srcValue: T,
       srcIndex?: number,
-      index?: number
+      index?: number,
     ) => U,
-    name: string = ''
+    name: string = '',
   ): Operator<T, U> =>
   (src: RN<T>) =>
     new ScanRN<T, U>(src, initialValue, fn, name);
@@ -21,7 +21,7 @@ class ScanRN<T, U> extends RN<U> {
     state: Readonly<U>,
     srcValue: T,
     srcIndex?: number,
-    index?: number
+    index?: number,
   ) => U;
 
   constructor(
@@ -31,9 +31,9 @@ class ScanRN<T, U> extends RN<U> {
       state: Readonly<U>,
       srcValue: T,
       srcIndex?: number,
-      index?: number
+      index?: number,
     ) => U,
-    name: string
+    name: string,
   ) {
     super(initialValue, [src], name);
     this.scanState = initialValue;
@@ -47,7 +47,7 @@ class ScanRN<T, U> extends RN<U> {
       this.scanState,
       src.value,
       src.index,
-      this.index + 1
+      this.index + 1,
     );
     this.fireWith(this.scanState);
   }

@@ -4,7 +4,7 @@ import { Subscribable } from '../types/Subscribable';
 export const fromObservable = <T>(
   initialValue: T,
   obs: Subscribable<T>,
-  name: string = ''
+  name: string = '',
 ): FromObservableRN<T> => new FromObservableRN<T>(initialValue, obs, name);
 
 class FromObservableRN<T> extends RN<T> {
@@ -26,7 +26,7 @@ class FromObservableRN<T> extends RN<T> {
       },
       () => {
         this.terminate();
-      }
+      },
     );
   }
 }

@@ -16,7 +16,7 @@ type MessageIds = 'shouldBeReadonly';
 
 const createRule = ESLintUtils.RuleCreator(
   () =>
-    `https://github.com/typescript-eslint/typescript-eslint/blob/v4.24.0/packages/eslint-plugin/docs/rules/prefer-readonly-parameter-types.md`
+    `https://github.com/typescript-eslint/typescript-eslint/blob/v4.24.0/packages/eslint-plugin/docs/rules/prefer-readonly-parameter-types.md`,
 );
 
 export const preferReadonlyParameterTypesRuleName =
@@ -93,7 +93,7 @@ export const preferReadonlyParameterTypesRule = createRule<Options, MessageIds>(
             | TSESTree.TSDeclareFunction
             | TSESTree.TSEmptyBodyFunctionExpression
             | TSESTree.TSFunctionType
-            | TSESTree.TSMethodSignature
+            | TSESTree.TSMethodSignature,
         ): void {
           for (const param of node.params) {
             if (
@@ -146,7 +146,7 @@ export const preferReadonlyParameterTypesRule = createRule<Options, MessageIds>(
         },
       };
     },
-  }
+  },
 );
 
 export default preferReadonlyParameterTypesRule;

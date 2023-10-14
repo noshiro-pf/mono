@@ -10,11 +10,11 @@ export const convertLibDomIterable = (from) => {
 
   ret = ret.replaceAll(
     'entries(): IterableIterator<readonly [number,',
-    `entries(): IterableIterator<readonly [${indexType.ret},`
+    `entries(): IterableIterator<readonly [${indexType.ret},`,
   );
   ret = ret.replaceAll(
     'keys(): IterableIterator<number>;',
-    `keys(): IterableIterator<${indexType.ret}>;`
+    `keys(): IterableIterator<${indexType.ret}>;`,
   );
 
   return ret;

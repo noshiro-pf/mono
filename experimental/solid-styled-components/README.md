@@ -42,7 +42,7 @@ import { styled } from 'solid-styled-components';
 const Btn = styled('button')(
     (props) => `
   border-radius: ${props.size}px;
-`
+`,
 );
 
 <Btn size={20} />;
@@ -160,7 +160,7 @@ render(
             <SomeText>some text</SomeText>
         </ThemeProvider>
     ),
-    document.getElementById('app')
+    document.getElementById('app'),
 );
 ```
 

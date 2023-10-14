@@ -83,7 +83,7 @@ export const unbuttonize = (dcards: DCard[], playerId?: number) => {
 
 export const buttonizeForTurnPlayer = (
   dcards: DCard[],
-  gameState: GameState
+  gameState: GameState,
 ) => {
   const pid = gameState.turnPlayerIndex();
   dcards.forEach((d) => (d.isButton[pid] = true));
@@ -92,7 +92,7 @@ export const buttonizeForTurnPlayer = (
 export const buttonizeIf = (
   dcards: DCard[],
   playerId: number,
-  classifier: (c: DCard) => boolean
+  classifier: (c: DCard) => boolean,
 ) => {
   dcards
     .filter((c) => classifier(c))
@@ -106,12 +106,12 @@ export const buttonizeSupplyIf = (
   gameState: GameState,
   playerId: number,
   condition: (Dcard: DCard) => boolean,
-  gainCardStateSetter: (state: boolean) => void
+  gainCardStateSetter: (state: boolean) => void,
 ) => {
   const topCards = ([] as DCard[])
     .concat(
       utils.object.map(gameState.DCards.BasicCards, (e) => e[0]),
-      gameState.DCards.KingdomCards.map((pile) => pile[0])
+      gameState.DCards.KingdomCards.map((pile) => pile[0]),
     )
     .filter((c) => c !== undefined);
   buttonizeIf(topCards, playerId, condition);
@@ -120,7 +120,7 @@ export const buttonizeSupplyIf = (
 
 export const resetDCardsAttributes = (
   gameState: GameState,
-  gainCardStateSetter: (state: boolean) => void
+  gainCardStateSetter: (state: boolean) => void,
 ) => {
   gainCardStateSetter(false);
 
@@ -134,7 +134,7 @@ export const resetDCardsAttributes = (
     .concat(
       gameState.DCards.BasicCards.getDCards(),
       gameState.DCards.KingdomCards.getDCards(),
-      gameState.DCards.trashPile
+      gameState.DCards.trashPile,
     )
     .forEach((c) => {
       c.faceUp.forEach((_, i, ar) => (ar[i] = true));
@@ -142,7 +142,7 @@ export const resetDCardsAttributes = (
   // 山札は裏に
   gameState.DCards.allPlayersCards.forEach((playerCards) => {
     playerCards.Deck.forEach((c) =>
-      c.faceUp.forEach((_, i, ar) => (ar[i] = false))
+      c.faceUp.forEach((_, i, ar) => (ar[i] = false)),
     );
   });
   // 場・捨て山は表に
@@ -154,7 +154,7 @@ export const resetDCardsAttributes = (
   // 手札は自分にのみ表に
   gameState.DCards.allPlayersCards.forEach((playerCards, id) => {
     playerCards.HandCards.forEach((c) =>
-      c.faceUp.forEach((_, i, ar) => (ar[i] = i === id))
+      c.faceUp.forEach((_, i, ar) => (ar[i] = i === id)),
     );
   });
 };
@@ -168,10 +168,10 @@ export const draw1Card = async (playerId: number, data: DataForCardEffect) => {
   data.gameStateSetter(data.gameState);
   if (playerCards.Deck.length < 1) {
     const shuffleBy_adjusted = data.shuffleBy.filter(
-      (e) => e < playerCards.DiscardPile.length
+      (e) => e < playerCards.DiscardPile.length,
     );
     playerCards.Deck = playerCards.DiscardPile.map(
-      (_, i) => playerCards.DiscardPile[shuffleBy_adjusted[i]]
+      (_, i) => playerCards.DiscardPile[shuffleBy_adjusted[i]],
     );
     playerCards.DiscardPile = [];
     faceDown(playerCards.Deck);
@@ -188,12 +188,12 @@ export const drawCards = async (
   n: number,
   playerId: number,
   data: DataForCardEffect,
-  showMessage: boolean
+  showMessage: boolean,
 ) => {
   if (n <= 0) return;
   if (showMessage) {
     data.messager(
-      `${data.playersNameList[playerId]}が${n}枚カードを引きました。`
+      `${data.playersNameList[playerId]}が${n}枚カードを引きました。`,
     );
   }
   for (let i = 0; i < n; ++i) {
@@ -208,11 +208,11 @@ export const playCard = (
   dcard: DCard,
   playerId: number,
   data: DataForCardEffect,
-  showMessage: boolean
+  showMessage: boolean,
 ) => {
   if (showMessage) {
     data.messager(
-      `${data.playersNameList[playerId]}が${dcard.cardProperty.nameJp}をプレイしました。`
+      `${data.playersNameList[playerId]}が${dcard.cardProperty.nameJp}をプレイしました。`,
     );
   }
   data.gameState.removeDCards([dcard.id]);
@@ -227,11 +227,11 @@ export const gainCard = (
   dcard: DCard,
   playerId: number,
   data: DataForCardEffect,
-  showMessage: boolean
+  showMessage: boolean,
 ) => {
   if (showMessage) {
     data.messager(
-      `${data.playersNameList[playerId]}が${dcard.cardProperty.nameJp}を獲得しました。`
+      `${data.playersNameList[playerId]}が${dcard.cardProperty.nameJp}を獲得しました。`,
     );
   }
   data.gameState.removeDCards([dcard.id]);
@@ -244,11 +244,11 @@ export const buyCard = (
   dcard: DCard,
   playerId: number,
   data: DataForCardEffect,
-  showMessage: boolean
+  showMessage: boolean,
 ) => {
   if (showMessage) {
     data.messager(
-      `${data.playersNameList[playerId]}が${dcard.cardProperty.nameJp}を購入しました。`
+      `${data.playersNameList[playerId]}が${dcard.cardProperty.nameJp}を購入しました。`,
     );
   }
   data.gameState.turnInfo.buy -= 1;
@@ -261,11 +261,11 @@ export const discard = (
   dcards: DCard[],
   playerId: number,
   data: DataForCardEffect,
-  showMessage: boolean
+  showMessage: boolean,
 ) => {
   if (showMessage) {
     data.messager(
-      `${data.playersNameList[playerId]}が${dcards.length}枚捨て札にしました。`
+      `${data.playersNameList[playerId]}が${dcards.length}枚捨て札にしました。`,
     );
   }
   data.gameState.removeDCards(dcards.map((c) => c.id));
@@ -282,7 +282,7 @@ export const cleanUp = async (playerId: number, data: DataForCardEffect) => {
     ([] as DCard[]).concat(playerCards.HandCards, playerCards.PlayArea),
     playerId,
     data,
-    false
+    false,
   );
   // 手札に5枚カードを引く
   await drawCards(5, playerId, data, false);

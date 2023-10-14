@@ -13,7 +13,7 @@ import { relativeLuminance } from './relative-luminance';
  */
 export const contrastRatioRgb = (
   rgb1: Rgb,
-  rgb2: Rgb
+  rgb2: Rgb,
 ): PositiveFiniteNumber => {
   const a = relativeLuminance(rgb1);
   const b = relativeLuminance(rgb2);
@@ -22,7 +22,7 @@ export const contrastRatioRgb = (
 
   return PositiveFiniteNumber.div(
     toPositiveFiniteNumber(relativeLuminanceLighter + 0.05),
-    toPositiveFiniteNumber(relativeLuminanceDarker + 0.05)
+    toPositiveFiniteNumber(relativeLuminanceDarker + 0.05),
   );
 };
 

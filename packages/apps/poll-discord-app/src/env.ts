@@ -15,7 +15,7 @@ dotenv.config({
       match(n, {
         development: '.env.dev',
         production: '.env.prd',
-      })
+      }),
     ) ?? '.env',
 });
 

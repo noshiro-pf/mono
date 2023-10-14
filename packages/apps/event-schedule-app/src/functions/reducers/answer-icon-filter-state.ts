@@ -87,7 +87,7 @@ const normalizeState = ({
   const clamp = Num.clamp(0, upperLimit);
 
   const helperFn = (
-    s: AnswerIconFilterState['good']
+    s: AnswerIconFilterState['good'],
   ): AnswerIconFilterState['good'] => ({
     enabled: s.enabled,
     min: clamp(s.min),
@@ -106,7 +106,7 @@ const normalizeState = ({
 
 const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
   currentState,
-  action
+  action,
 ) =>
   pipe(currentState)
     .chain((state) => {
@@ -186,7 +186,7 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
 
         case 'enableFiltering':
           return Obj.update(state, action.iconId, (a) =>
-            Obj.set(a, 'enabled', true)
+            Obj.set(a, 'enabled', true),
           );
 
         case 'disableFiltering':
@@ -206,8 +206,8 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
               pipe(a)
                 .chain((v) => Obj.set(v, 'min', next))
                 .chain((v) =>
-                  Obj.set(v, 'max', Math.max(next, state[action.iconId].max))
-                ).value
+                  Obj.set(v, 'max', Math.max(next, state[action.iconId].max)),
+                ).value,
           );
         }
 
@@ -220,8 +220,8 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
               pipe(a)
                 .chain((v) => Obj.set(v, 'max', next))
                 .chain((v) =>
-                  Obj.set(v, 'min', Math.min(next, state[action.iconId].min))
-                ).value
+                  Obj.set(v, 'min', Math.min(next, state[action.iconId].min)),
+                ).value,
           );
         }
 
@@ -238,10 +238,10 @@ const reducer: Reducer<AnswerIconFilterState, AnswerIconFilterStateAction> = (
               ? Obj.set(st, 'max', upperLimit) // フィルタがoffのときはデフォルト値で更新
               : pipe(st)
                   .chain((a) =>
-                    Obj.update(a, 'min', (m) => Math.min(upperLimit, m))
+                    Obj.update(a, 'min', (m) => Math.min(upperLimit, m)),
                   )
                   .chain((a) =>
-                    Obj.update(a, 'max', (m) => Math.min(upperLimit, m))
+                    Obj.update(a, 'max', (m) => Math.min(upperLimit, m)),
                   ).value; // 回答が減ったとき
 
           return pipe(state)

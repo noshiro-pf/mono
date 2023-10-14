@@ -14,7 +14,7 @@ export class Feedback {
       timeStamp: number;
       closed: boolean;
       category: 'bugReport' | 'suggestion' | '';
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 

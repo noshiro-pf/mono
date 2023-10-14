@@ -12,7 +12,7 @@ export const convertLibEs2016ArrayInclude = (from) => {
 
   ret = ret.replaceAll(
     'includes(searchElement: T, fromIndex?: number): boolean;',
-    'includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchElement is T;'
+    'includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchElement is T;',
   );
 
   for (const [typeName, returnTypeAfter] of [
@@ -28,7 +28,7 @@ export const convertLibEs2016ArrayInclude = (from) => {
   ]) {
     ret = ret.replaceAll(
       `interface ${typeName} {\n  /**\n   * Determines whether an array includes a certain element, returning true or false as appropriate.\n   * @param searchElement The element to search for.\n   * @param fromIndex The position in this array at which to begin searching for searchElement.\n   */\n  includes(searchElement: number, fromIndex?: number): boolean;\n}`,
-      `interface ${typeName} {\n  /**\n   * Determines whether an array includes a certain element, returning true or false as appropriate.\n   * @param searchElement The element to search for.\n   * @param fromIndex The position in this array at which to begin searching for searchElement.\n   */\n  includes(searchElement: ${returnTypeAfter}, fromIndex?: number): boolean;\n}`
+      `interface ${typeName} {\n  /**\n   * Determines whether an array includes a certain element, returning true or false as appropriate.\n   * @param searchElement The element to search for.\n   * @param fromIndex The position in this array at which to begin searching for searchElement.\n   */\n  includes(searchElement: ${returnTypeAfter}, fromIndex?: number): boolean;\n}`,
     );
   }
 

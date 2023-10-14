@@ -4,7 +4,7 @@ import { type IntervalObservable } from '../types';
 
 export const interval = (
   milliSeconds: number,
-  startManually?: boolean
+  startManually?: boolean,
 ): IntervalObservable =>
   new IntervalObservableClass(milliSeconds, startManually);
 

@@ -45,7 +45,7 @@ export const utils = {
     submatch: (
       target: string,
       key: string,
-      ignoreCase: boolean = false
+      ignoreCase: boolean = false,
     ): boolean =>
       ignoreCase
         ? utils.string.submatch(target.toUpperCase(), key.toUpperCase())
@@ -140,7 +140,7 @@ export const utils = {
         .map((e) => [e, mapFn(e)])
         .filter(
           (val, index, array) =>
-            array.map((a) => a[1]).indexOf(val[1]) === index
+            array.map((a) => a[1]).indexOf(val[1]) === index,
         )
         .map((a) => a[0]),
 
@@ -191,7 +191,7 @@ export const utils = {
 
       for (let i = 0; i < arr.length; i += QUANTUM) {
         const submin = Math.min(
-          ...arr.slice(i, Math.min(i + QUANTUM, arr.length))
+          ...arr.slice(i, Math.min(i + QUANTUM, arr.length)),
         );
         min = Math.min(submin, min);
       }
@@ -204,7 +204,7 @@ export const utils = {
 
       for (let i = 0; i < arr.length; i += QUANTUM) {
         const submax = Math.max(
-          ...arr.slice(i, Math.max(i + QUANTUM, arr.length))
+          ...arr.slice(i, Math.max(i + QUANTUM, arr.length)),
         );
         max = Math.max(submax, max);
       }
@@ -229,7 +229,7 @@ export const utils = {
     numberSequence: (
       start: number,
       length: number,
-      step: number = 1
+      step: number = 1,
     ): number[] =>
       Array.from(new Array(length)).map((_, i) => i * step + start),
 

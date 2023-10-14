@@ -2,7 +2,7 @@ import { DCard } from '../online-game/types/dcard';
 
 export const getDCardsByIdArray = (
   idArray: number[] | void,
-  dcards: DCard[]
+  dcards: DCard[],
 ): DCard[] => {
   // cardIdArrayの順番で取得
   if (!idArray) return dcards;

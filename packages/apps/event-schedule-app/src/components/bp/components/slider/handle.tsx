@@ -53,7 +53,7 @@ export const SliderHandle = memoNamed<Props>(
         {label}
       </SliderHandleLabelStyled>
     </SliderHandleStyled>
-  )
+  ),
 );
 
 const SliderHandleStyled = styled.span`

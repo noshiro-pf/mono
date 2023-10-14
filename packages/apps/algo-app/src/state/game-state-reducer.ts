@@ -20,7 +20,7 @@ export const gameStateReducer: Reducer<
 
 const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
   state,
-  action
+  action,
 ) =>
   produce(state, (draft) => {
     draft.answerSelected = answerSelectedReducer(state.answerSelected, action);
@@ -29,7 +29,7 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
       case 'ph010_selectMyCardToToss':
         draft.cardChosenToToss = cardChosenToTossReducer(
           state.cardChosenToToss,
-          action
+          action,
         );
         break;
 
@@ -37,29 +37,29 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
       case 'ph030_continuousAnswer':
         draft.cardChosenToAttack = cardChosenToAttackReducer(
           state.cardChosenToAttack,
-          action
+          action,
         );
         break;
     }
 
     draft.cardChosenToBeAttacked = cardChosenToBeAttackedReducer(
       state.cardChosenToBeAttacked,
-      action
+      action,
     );
 
     draft.confirmTossBalloonIsOpen = confirmTossBalloonIsOpenReducer(
       state.confirmTossBalloonIsOpen,
-      action
+      action,
     );
 
     draft.selectAnswerBalloonIsOpen = selectAnswerBalloonIsOpenReducer(
       state.selectAnswerBalloonIsOpen,
-      action
+      action,
     );
 
     draft.decidedAnswerBalloonIsOpen = decidedAnswerBalloonIsOpenReducer(
       state.decidedAnswerBalloonIsOpen,
-      action
+      action,
     );
 
     draft.readonly = readonlyReducer(draft.readonly, action);
@@ -75,7 +75,7 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
       case 'submitToss':
         if (state.cardChosenToToss === undefined) {
           console.warn(
-            'gameState.cardChosenToToss should not be undefined here.'
+            'gameState.cardChosenToToss should not be undefined here.',
           );
           return;
         }
@@ -90,20 +90,20 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
       case 'showJudgeOnDecidedAnswer':
         if (draft.answerSelected === undefined) {
           console.warn(
-            'gameState.answerSelected should not be undefined here.'
+            'gameState.answerSelected should not be undefined here.',
           );
           return;
         }
         if (draft.cardChosenToBeAttacked === undefined) {
           console.warn(
-            'gameState.cardChosenToBeAttacked should not be undefined here.'
+            'gameState.cardChosenToBeAttacked should not be undefined here.',
           );
           return;
         }
 
         draft.judgeResult = cardEq(
           draft.answerSelected,
-          draft.cardChosenToBeAttacked
+          draft.cardChosenToBeAttacked,
         )
           ? 'o'
           : 'x';

@@ -18,7 +18,7 @@ test('includes', () => {
 test('Symbol.iterator', () => {
   testDeepEqual(
     [2, 4, 6, 8],
-    [...tuple(1, 2, 3, 4, 5, 6, 7, 8, 9).filter((x) => x % 2 === 0)]
+    [...tuple(1, 2, 3, 4, 5, 6, 7, 8, 9).filter((x) => x % 2 === 0)],
   );
 
   const [a, b, c, ...rest] = tuple(1, 2, 3, 4, 5);
@@ -77,7 +77,7 @@ describe('Array methods', () => {
   test('concat', () => {
     testStrictEqual(
       tuple(1, 2, 3).concat(4, tuple(5, 6), 7),
-      tuple(1, 2, 3, 4, 5, 6, 7)
+      tuple(1, 2, 3, 4, 5, 6, 7),
     );
   });
 
@@ -113,52 +113,52 @@ describe('Array methods', () => {
   test('filter', () => {
     testStrictEqual(
       tuple(1, 2, 3, 4, 5, 6, 7, 8, 9).filter((x) => x % 2),
-      tuple(1, 3, 5, 7, 9)
+      tuple(1, 3, 5, 7, 9),
     );
   });
 
   test('map', () => {
     testStrictEqual(
       tuple(1, 2, 3, 4).map((x) => x + 1),
-      tuple(2, 3, 4, 5)
+      tuple(2, 3, 4, 5),
     );
   });
 
   test('every', () => {
     testStrictEqual(
       tuple(2, 4, 6, 8).every((x) => x % 2 === 0),
-      true
+      true,
     );
     testStrictEqual(
       tuple(2, 4, 6, 7).every((x) => x % 2 === 0),
-      false
+      false,
     );
   });
 
   test('some', () => {
     testStrictEqual(
       tuple(1, 2, 3, 4).some((x) => x === 3),
-      true
+      true,
     );
     testStrictEqual(
       tuple(1, 2, 3, 4).some((x) => x > 5),
-      false
+      false,
     );
   });
 
   test('reduce', () => {
     testStrictEqual(
       tuple(1, 2, 3, 4, 5).reduce((x, sum) => x + sum, 0),
-      15
+      15,
     );
   });
 
   test('reduceRight', () => {
     testStrictEqual(
       [tuple(0, 1), tuple(2, 3), tuple(4, 5)].reduceRight((previous, current) =>
-        previous.concat(current)
+        previous.concat(current),
       ),
-      tuple(4, 5, 2, 3, 0, 1)
+      tuple(4, 5, 2, 3, 0, 1),
     );
   });
 
@@ -177,7 +177,7 @@ describe('Array methods', () => {
   test('sort', () => {
     testStrictEqual(
       tuple(4, 2, 7, 6, 9, 3, 1, 0, 3, 2, 7).sort(),
-      tuple(0, 1, 2, 2, 3, 3, 4, 6, 7, 7, 9)
+      tuple(0, 1, 2, 2, 3, 3, 4, 6, 7, 7, 9),
     );
   });
 
@@ -188,7 +188,7 @@ describe('Array methods', () => {
           return key.length === obj[key];
         });
       }),
-      { baz: 3 }
+      { baz: 3 },
     );
   });
 
@@ -199,7 +199,7 @@ describe('Array methods', () => {
           return key.length === obj[key];
         });
       }),
-      2
+      2,
     );
   });
 });

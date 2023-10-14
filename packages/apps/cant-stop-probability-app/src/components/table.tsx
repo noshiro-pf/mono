@@ -105,7 +105,7 @@ export const ProbabilityTable = memoNamed<Props>(
         ))}
       </tbody>
     </HTMLTable>
-  )
+  ),
 );
 
 const Th = styled.th`

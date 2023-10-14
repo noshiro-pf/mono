@@ -14,7 +14,7 @@ export const mapWithIndex =
     new MapWithIndexObservableClass(parentObservable, mapFn);
 
 export const mapWithIndexI = <A, B>(
-  mapFn: (x: A, index: SafeUint | -1) => B
+  mapFn: (x: A, index: SafeUint | -1) => B,
 ): InitializedToInitializedOperator<A, B> =>
   // eslint-disable-next-line no-restricted-syntax
   mapWithIndex(mapFn) as InitializedToInitializedOperator<A, B>;
@@ -28,7 +28,7 @@ class MapWithIndexObservableClass<A, B>
 
   constructor(
     parentObservable: Observable<A>,
-    mapFn: (x: A, index: SafeUint | -1) => B
+    mapFn: (x: A, index: SafeUint | -1) => B,
   ) {
     super({
       parents: [parentObservable],

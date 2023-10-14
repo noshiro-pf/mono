@@ -70,11 +70,11 @@ const updateStore = async (): Promise<boolean> => {
     const eventScheduleCurr = doc.data() as EventScheduleCurr;
     writeBatch.set(
       documentRef,
-      fillEventSchedule(convertEventSchedule(eventScheduleCurr))
+      fillEventSchedule(convertEventSchedule(eventScheduleCurr)),
     );
 
     const emailRef = db.doc(
-      `${path.eventsNext}/${id}/${path.internal}/${path.values}`
+      `${path.eventsNext}/${id}/${path.internal}/${path.values}`,
     );
     if (eventScheduleCurr.notificationSettings !== 'none') {
       writeBatch.set(emailRef, {
@@ -84,11 +84,11 @@ const updateStore = async (): Promise<boolean> => {
 
     for (const ans of answersSnapshotCurr.docs) {
       const documentRefForAnswers = db.doc(
-        `${path.eventsNext}/${id}/${path.answers}/${ans.id}`
+        `${path.eventsNext}/${id}/${path.answers}/${ans.id}`,
       );
       writeBatch.set(
         documentRefForAnswers,
-        fillAnswer(ans.data() as AnswerCurr)
+        fillAnswer(ans.data() as AnswerCurr),
       );
     }
   }

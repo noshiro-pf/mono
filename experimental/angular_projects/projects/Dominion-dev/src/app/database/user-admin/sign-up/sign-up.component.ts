@@ -27,7 +27,7 @@ export class SignUpComponent implements OnInit {
     public snackBar: MatSnackBar,
     public afAuth: AngularFireAuth,
     private location: Location,
-    private database: FireDatabaseService
+    private database: FireDatabaseService,
   ) {}
 
   ngOnInit() {}
@@ -77,7 +77,7 @@ export class SignUpComponent implements OnInit {
               messageSec: 1,
               autoSort: true,
             },
-          })
+          }),
         );
 
         this.location.back();

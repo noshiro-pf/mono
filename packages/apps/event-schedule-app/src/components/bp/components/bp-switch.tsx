@@ -14,5 +14,5 @@ export const BpSwitch = memoNamed<BpSwitchProps>(
 
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <Switch checked={checked} onChange={onChangeHandler} {...props} />;
-  }
+  },
 );

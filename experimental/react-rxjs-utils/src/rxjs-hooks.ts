@@ -4,7 +4,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { distinctUntilChanged, shareReplay, startWith } from 'rxjs/operators';
 
 export function useStream<A>(
-  createStream$: () => Observable<A>
+  createStream$: () => Observable<A>,
 ): Observable<A> {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const s = useMemo(() => createStream$().pipe(shareReplay(1)), []);
@@ -13,18 +13,18 @@ export function useStream<A>(
 
 export const useDataStream = <A>(
   initialValue: A,
-  createStream$: () => Observable<A>
+  createStream$: () => Observable<A>,
 ): Observable<A> =>
   useStream<A>(() =>
     createStream$().pipe(
       startWith(initialValue),
-      distinctUntilChanged<A>(Object.is)
-    )
+      distinctUntilChanged<A>(Object.is),
+    ),
   );
 
 export const useStreamEffect = <T>(
   stream$: Observable<T>,
-  subscriptionFn: (v: T) => void
+  subscriptionFn: (v: T) => void,
 ): void => {
   useEffect(() => {
     const s = stream$.subscribe(subscriptionFn);
@@ -40,7 +40,7 @@ export function useStreamValue<T>(stream$: Observable<T>, initialValue: T): T;
 export function useStreamValue<T>(stream$: Observable<T>): T | undefined;
 export function useStreamValue<T>(
   stream$: Observable<T>,
-  initialValue?: T
+  initialValue?: T,
 ): T | undefined {
   const [state, setState] = useState<{ value: T | undefined }>({
     value: initialValue,
@@ -76,7 +76,7 @@ export const useEventAsStream = <T>(): [Observable<T>, (value: T) => void] => {
 };
 
 export const useStateAsStream = <T>(
-  initialValue: T
+  initialValue: T,
 ): [Observable<T>, (v: T) => void] => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const src$ = useMemo(() => new BehaviorSubject<T>(initialValue), []);
@@ -93,7 +93,7 @@ export const useStateAsStream = <T>(
 
 export const useChangeValueEffect = <T>(
   input: T,
-  callback: (v: T) => void
+  callback: (v: T) => void,
 ): void => {
   useEffect(() => {
     callback(input);

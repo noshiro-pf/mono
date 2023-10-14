@@ -4,7 +4,7 @@ export const swap = <T>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_array: T[],
   index1: Uint32WithSmallInt,
-  index2: Uint32WithSmallInt
+  index2: Uint32WithSmallInt,
 ): void => {
   if (
     Arr.indexIsInRange(mut_array, index1) &&

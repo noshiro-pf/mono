@@ -23,7 +23,7 @@ export const selectedDatesReducer: Reducer<
     case 'fill-column':
       return Arr.isSubset(
         action.dates.map(ymdToKey),
-        state.toArray().map(ymdToKey)
+        state.toArray().map(ymdToKey),
       )
         ? state.subtract(ISetMapped.new(action.dates, ymdToKey, ymdFromKey))
         : state.union(ISetMapped.new(action.dates, ymdToKey, ymdFromKey));

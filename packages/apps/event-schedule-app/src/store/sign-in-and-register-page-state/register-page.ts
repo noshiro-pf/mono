@@ -16,19 +16,19 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   registerPageStateReducer,
-  registerPageInitialState
+  registerPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || registerPageHasError(state))
+  mapI((state) => state.isWaitingResponse || registerPageHasError(state)),
 );
 
 const usernameFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.username.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.username.error === undefined ? 'primary' : 'danger')),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
@@ -36,8 +36,8 @@ const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
     state.password.password.error === undefined &&
     state.password.passwordConfirmation.error === undefined
       ? 'primary'
-      : 'danger'
-  )
+      : 'danger',
+  ),
 );
 
 const passwordIsOpenState = createBooleanState(false);
@@ -69,8 +69,8 @@ const state$ = combineLatestI([
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-    })
-  )
+    }),
+  ),
 );
 
 const submit = async (pageToBack: string | undefined): Promise<void> => {
@@ -80,7 +80,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
 
   const createUserResult = await api.auth.createUser(
     s.email.inputValue,
-    s.password.password.inputValue
+    s.password.password.inputValue,
   );
 
   if (Result.isErr(createUserResult)) {

@@ -43,7 +43,7 @@ export class RandomizerSelectCardsComponent implements OnInit {
   }) {
     await this.myRandomizerGroup.setIsSelectedExpansions(
       value.index,
-      value.checked
+      value.checked,
     );
   }
 
@@ -74,7 +74,7 @@ export class RandomizerSelectCardsComponent implements OnInit {
     await this.myRandomizerGroup.setSelectedCardsCheckbox(
       value.category,
       value.index,
-      value.checked
+      value.checked,
     );
   }
 

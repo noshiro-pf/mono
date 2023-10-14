@@ -21,7 +21,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
       (ev) => {
         setPassword(ev.currentTarget.value);
       },
-      [setPassword]
+      [setPassword],
     );
 
   const onUsernameInput: preact.JSX.GenericEventHandler<HTMLInputElement> =
@@ -29,7 +29,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
       (ev) => {
         setUsername(ev.currentTarget.value);
       },
-      [setUsername]
+      [setUsername],
     );
 
   const disabled: boolean = username === '';

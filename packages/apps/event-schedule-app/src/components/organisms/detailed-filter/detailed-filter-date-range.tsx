@@ -45,7 +45,7 @@ export const DetailedFilterDateRange = memoNamed<Props>(
         />
       </FilterItemContent>
     </>
-  )
+  ),
 );
 
 const dateRangeInputStyle = { style: { width: '100px' } };

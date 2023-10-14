@@ -18,7 +18,7 @@ const thisDir = dirname(fileURLToPath(import.meta.url));
 
 const providePluginDefs = genGlobalImportDefsFromDevDependencies(
   thisDir,
-  packageJson.devDependencies
+  packageJson.devDependencies,
 );
 
 // https://vitejs.dev/config/

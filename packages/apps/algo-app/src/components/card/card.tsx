@@ -87,7 +87,7 @@ export const CardComponent = memoNamed<Props>(
       isClickable,
       float,
       showOutline,
-      outlineColor
+      outlineColor,
     );
 
     const ref = useRef<HTMLDivElement>(null);
@@ -175,7 +175,7 @@ export const CardComponent = memoNamed<Props>(
         </Wrapper>
       </div>
     );
-  }
+  },
 );
 
 const Wrapper = styled('div')`

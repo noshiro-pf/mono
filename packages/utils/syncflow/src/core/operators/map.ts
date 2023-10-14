@@ -14,7 +14,7 @@ export const map =
     new MapObservableClass(parentObservable, mapFn);
 
 export const mapI = <A, B>(
-  mapFn: (x: A) => B
+  mapFn: (x: A) => B,
 ): InitializedToInitializedOperator<A, B> =>
   // eslint-disable-next-line no-restricted-syntax
   map(mapFn) as InitializedToInitializedOperator<A, B>;

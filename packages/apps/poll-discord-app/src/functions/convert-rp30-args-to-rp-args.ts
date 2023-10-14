@@ -8,13 +8,13 @@ import {
 export const convertRp60ArgToRpArgsShared = (
   title: string,
   arg1AsNumber: Hours,
-  arg2AsNumber: Hours
+  arg2AsNumber: Hours,
 ): Result<
   Readonly<{ title: string | undefined; args: readonly string[] }>,
   string
 > => {
   const argsConverted: readonly string[] = pipe(
-    Arr.range(arg1AsNumber, arg2AsNumber)
+    Arr.range(arg1AsNumber, arg2AsNumber),
   ).chain((list) => list.map((hour) => `${hour}:00-${hour + 1}:00`)).value;
 
   return Result.ok({ title, args: argsConverted });
@@ -22,7 +22,7 @@ export const convertRp60ArgToRpArgsShared = (
 
 /** @description ショートカットコマンド `/rp60` の引数を /rp コマンドの引数に変換する */
 export const convertRp60ArgToRpArgs = (
-  commandArguments: string
+  commandArguments: string,
 ): Result<
   DeepReadonly<{
     title: string | undefined;
@@ -41,7 +41,7 @@ export const convertRp60ArgToRpArgs = (
 
 /** @description ショートカットコマンド `/rp30d` の引数を /rp コマンドの引数に変換する */
 export const convertRp60dArgToRpArgs = (
-  commandArguments: string
+  commandArguments: string,
 ): Result<
   Readonly<{ title: string | undefined; args: readonly string[] }>,
   string
@@ -54,7 +54,7 @@ export const convertRp60dArgToRpArgs = (
 
   const td = DateUtils.today();
   const title = `${DateUtils.getLocaleMonth(td)}/${DateUtils.getLocaleDate(
-    td
+    td,
   )}（${daysOfWeekList.jp[DateUtils.getLocaleDayOfWeek(td)].abbr}）`;
 
   return convertRp60ArgToRpArgsShared(title, arg1AsNumber, arg2AsNumber);
@@ -63,18 +63,18 @@ export const convertRp60dArgToRpArgs = (
 export const convertRp30ArgToRpArgsShared = (
   title: string,
   arg1AsNumber: Hours,
-  arg2AsNumber: Hours
+  arg2AsNumber: Hours,
 ): Result<
   Readonly<{ title: string | undefined; args: readonly string[] }>,
   string
 > => {
   const argsConverted: readonly string[] = pipe(
-    Arr.range(arg1AsNumber, arg2AsNumber)
+    Arr.range(arg1AsNumber, arg2AsNumber),
   ).chain((list) =>
     Arr.flatMap(list, (hour) => [
       `${hour}:00-${hour}:30`,
       `${hour}:30-${hour + 1}:00`,
-    ])
+    ]),
   ).value;
 
   return Result.ok({ title, args: argsConverted });
@@ -82,7 +82,7 @@ export const convertRp30ArgToRpArgsShared = (
 
 /** @description ショートカットコマンド `/rp30` の引数を /rp コマンドの引数に変換する */
 export const convertRp30ArgToRpArgs = (
-  commandArguments: string
+  commandArguments: string,
 ): Result<
   Readonly<{ title: string | undefined; args: readonly string[] }>,
   string
@@ -98,7 +98,7 @@ export const convertRp30ArgToRpArgs = (
 
 /** @description ショートカットコマンド `/rp30d` の引数を /rp コマンドの引数に変換する */
 export const convertRp30dArgToRpArgs = (
-  commandArguments: string
+  commandArguments: string,
 ): Result<
   Readonly<{ title: string | undefined; args: readonly string[] }>,
   string
@@ -111,7 +111,7 @@ export const convertRp30dArgToRpArgs = (
 
   const td = DateUtils.today();
   const title = `${DateUtils.getLocaleMonth(td)}/${DateUtils.getLocaleDate(
-    td
+    td,
   )}（${daysOfWeekList.jp[DateUtils.getLocaleDayOfWeek(td)].abbr}）`;
 
   return convertRp30ArgToRpArgsShared(title, arg1AsNumber, arg2AsNumber);

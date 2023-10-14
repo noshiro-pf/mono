@@ -5,7 +5,7 @@ import { SelectorOption } from '../types/selector-option';
 export const makeSelectOptions = (
   table: any[][],
   tableFiltered: any[][],
-  headerSettings: IHeaderSettingFilled[]
+  headerSettings: IHeaderSettingFilled[],
 ): SelectorOption[][] => {
   const selectorOptions: SelectorOption[][] = headerSettings.map(() => []); // initialize
 

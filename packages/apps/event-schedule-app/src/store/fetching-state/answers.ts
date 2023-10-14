@@ -5,7 +5,7 @@ import { Router } from '../router';
 const [fetchAnswers$, fetchAnswers] = createVoidEventEmitter();
 
 const fetchAnswersThrottled$ = fetchAnswers$.chain(
-  throttleTime(fetchThrottleTime)
+  throttleTime(fetchThrottleTime),
 );
 
 const { state$: answersResult$, setState: setAnswersResult } = createState<
@@ -43,7 +43,7 @@ combineLatest([fetchAnswersThrottled$, Router.eventId$] as const).subscribe(
         setRefreshButtonIsLoading(false);
       })
       .catch(noop);
-  }
+  },
 );
 
 result$.subscribe((e) => {

@@ -15,7 +15,7 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   emailInputStateReducer,
-  emailInputInitialState
+  emailInputInitialState,
 );
 
 const enterButtonDisabled$ = combineLatestI([
@@ -23,8 +23,8 @@ const enterButtonDisabled$ = combineLatestI([
   Auth.fireAuthUser$,
 ]).chain(
   mapI(
-    ([formState, fireAuthUser]) => formState.inputValue !== fireAuthUser?.email
-  )
+    ([formState, fireAuthUser]) => formState.inputValue !== fireAuthUser?.email,
+  ),
 );
 
 const {
@@ -34,7 +34,7 @@ const {
 } = createBooleanState(false);
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.error === undefined ? 'primary' : 'danger')),
 );
 
 const state$ = combineLatestI([
@@ -49,8 +49,8 @@ const state$ = combineLatestI([
       enterButtonDisabled,
       isWaitingResponse,
       emailFormIntent,
-    })
-  )
+    }),
+  ),
 );
 
 const submit = async (user: FireAuthUser): Promise<void> => {
@@ -66,7 +66,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
     // TODO: use toast
     console.error(
       'error occurred on googleSignInWithPopup:',
-      signInResult.value
+      signInResult.value,
     );
     return;
   }
@@ -81,7 +81,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
     console.error(
       'error occurred on reauthenticateWithCredential:',
       res1.value.code,
-      res1.value.message
+      res1.value.message,
     );
 
     setFalseIsWaitingResponse();
@@ -101,7 +101,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
     console.error(
       'error occurred on deleteUser:',
       res2.value.code,
-      res2.value.message
+      res2.value.message,
     );
 
     setFalseIsWaitingResponse();

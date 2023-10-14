@@ -43,7 +43,7 @@ export type DateType = Omit<
 
 const getValueHelper = <N extends number>(
   date: DateType,
-  getFn: (d: RawDateType) => N
+  getFn: (d: RawDateType) => N,
   // eslint-disable-next-line no-restricted-syntax
 ): N => getFn(date as RawDateType);
 
@@ -68,7 +68,7 @@ const getLocaleMonth = (date: DateType): MonthEnum =>
  */
 const getUTCMonth = (date: DateType): MonthEnum =>
   getValueHelper(date, (d) =>
-    Num.increment(d.getUTCMonth())
+    Num.increment(d.getUTCMonth()),
   ) satisfies MonthEnum;
 
 /**
@@ -215,7 +215,7 @@ const setUTCHours = (hours: HoursEnum): ((curr: DateType) => DateType) =>
 
 /** Sets the minutes value in the Date object using local time. */
 const setLocaleMinutes = (
-  minutes: MinutesEnum
+  minutes: MinutesEnum,
 ): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setMinutes(minutes);
@@ -229,7 +229,7 @@ const setUTCMinutes = (minutes: MinutesEnum): ((curr: DateType) => DateType) =>
 
 /** Sets the seconds value in the Date object using local time. */
 const setLocaleSeconds = (
-  seconds: SecondsEnum
+  seconds: SecondsEnum,
 ): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setSeconds(seconds);
@@ -243,7 +243,7 @@ const setUTCSeconds = (seconds: SecondsEnum): ((curr: DateType) => DateType) =>
 
 /** Sets the milliseconds value in the Date object using local time. */
 const setLocaleMilliseconds = (
-  milliseconds: MillisecondsEnum
+  milliseconds: MillisecondsEnum,
 ): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setMilliseconds(milliseconds);
@@ -251,7 +251,7 @@ const setLocaleMilliseconds = (
 
 /** Sets the milliseconds value in the Date object using Universal Coordinated Time (UTC). */
 const setUTCMilliseconds = (
-  milliseconds: MillisecondsEnum
+  milliseconds: MillisecondsEnum,
 ): ((curr: DateType) => DateType) =>
   setValueHelper((mut_copy) => {
     mut_copy.setUTCMilliseconds(milliseconds);
@@ -342,7 +342,7 @@ const create = (
   hours: HoursEnum = 0,
   minutes: MinutesEnum = 0,
   seconds: SecondsEnum = 0,
-  ms: MillisecondsEnum = 0
+  ms: MillisecondsEnum = 0,
 ): DateType =>
   new Date(
     year,
@@ -351,7 +351,7 @@ const create = (
     hours,
     minutes,
     seconds,
-    ms
+    ms,
   );
 
 const from = (value: RawDateType | number | string): DateType =>
@@ -433,15 +433,15 @@ const getLastDateNumberOfMonth = (year: YearEnum, month: MonthEnum): DateEnum =>
 
 const getAllDatesOfMonth = (
   year: YearEnum,
-  month: MonthEnum
+  month: MonthEnum,
 ): readonly DateType[] =>
   Arr.range(1, Num.increment(getLastDateNumberOfMonth(year, month))).map(
-    (date) => create(year, month, date)
+    (date) => create(year, month, date),
   );
 
 const numWeeksOfMonth = (
   year: YearEnum,
-  month: MonthEnum
+  month: MonthEnum,
 ): 1 | 2 | 3 | 4 | 5 | 6 => {
   const lastDateNumber = getLastDateNumberOfMonth(year, month);
   const lastDate = setLocaleDate(lastDateNumber)(create(year, month));
@@ -473,10 +473,10 @@ const toLocaleHMS = (date: DateType, delimiter: string = ':'): string =>
 const toLocaleYMDHMS = (
   date: DateType,
   delimiterForYMD: string = '/',
-  delimiterForHMS: string = ':'
+  delimiterForHMS: string = ':',
 ): string =>
   [toLocaleYMD(date, delimiterForYMD), toLocaleHMS(date, delimiterForHMS)].join(
-    ' '
+    ' ',
   );
 
 export const DateUtils = {

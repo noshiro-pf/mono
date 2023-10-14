@@ -57,10 +57,10 @@ expectType<
   DeepReadonly<[{ x: number }, ...{ y: string[] }[]]>
 >('=');
 expectType<RecordValueAtPath<R0, readonly ['y', 'h']>, (a: number) => string>(
-  '='
+  '=',
 );
 expectType<RecordValueAtPath<R0, readonly ['y', 'i']>, (a: string) => number>(
-  '='
+  '=',
 );
 expectType<
   RecordValueAtPath<R0, readonly ['z']>,

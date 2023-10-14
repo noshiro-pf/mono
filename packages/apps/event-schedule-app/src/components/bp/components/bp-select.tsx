@@ -16,7 +16,7 @@ export const BpSelect = memoNamed<BpSelectProps>(
       (ev: React.ChangeEvent<HTMLSelectElement>) => {
         onValueChange(ev.target.value);
       },
-      [onValueChange]
+      [onValueChange],
     );
 
     return (
@@ -28,5 +28,5 @@ export const BpSelect = memoNamed<BpSelectProps>(
         {...props}
       />
     );
-  }
+  },
 );

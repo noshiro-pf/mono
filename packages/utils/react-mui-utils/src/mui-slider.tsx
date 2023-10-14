@@ -20,11 +20,11 @@ export const MuiSlider = memoNamed<Props>(
           onChange(_value);
         } else {
           console.warn(
-            'MuiSlider.sliderOnChange: typeof value should be "number"'
+            'MuiSlider.sliderOnChange: typeof value should be "number"',
           );
         }
       },
-      [onChange]
+      [onChange],
     );
 
     return (
@@ -39,5 +39,5 @@ export const MuiSlider = memoNamed<Props>(
         onChange={sliderOnChange}
       />
     );
-  }
+  },
 );

@@ -7,14 +7,14 @@ import { DataForCardEffect } from './data-for-card-effect';
 export const Council_Room = async (
   thisDcard: DCard,
   playerId: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   data.messager('他のプレイヤーはカードを1枚引きます。');
   await cs.forAllOtherPlayers(
     true,
     playerId,
     (d: DataForCardEffect, pid: number) => drawCards(1, pid, data, true),
-    data
+    data,
   );
 
   cs.goToDeterminatePhase(data);
@@ -28,9 +28,9 @@ export const Throne_Room = async (
   getCardEffect: (
     dcard: DCard,
     pid: number,
-    data: DataForCardEffect
+    data: DataForCardEffect,
   ) => Promise<void>,
-  selectedActionCard: DCard
+  selectedActionCard: DCard,
 ) => {
   const cardEffectPhase = data.gameState.turnInfo.action; // todo
   switch (cardEffectPhase) {

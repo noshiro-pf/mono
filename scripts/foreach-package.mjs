@@ -17,7 +17,7 @@ export const forEachPackages = async ({ prefixes, command, wsrunOptions }) => {
   const packageNameList = prefixes.flatMap((prefix) =>
     workspaces
       .filter((ws) => ws.location.startsWith(prefix))
-      .map((ws) => ws.name)
+      .map((ws) => ws.name),
   );
 
   /** @type {string} */

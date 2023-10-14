@@ -134,5 +134,5 @@ export const CreateEventResultDialog = memoNamed<Props>(
         </div>
       </DialogWithMaxWidth>
     );
-  }
+  },
 );

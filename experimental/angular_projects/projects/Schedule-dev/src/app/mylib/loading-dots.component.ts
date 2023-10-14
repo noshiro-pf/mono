@@ -12,7 +12,7 @@ const timeInterval = 400;
 })
 export class LoadingDotsComponent implements OnInit {
   readonly dots$: RN<string> = interval(timeInterval, true).map((i) =>
-    utils.array.new((i % dotsLength) + 1, '.').join('')
+    utils.array.new((i % dotsLength) + 1, '.').join(''),
   );
 
   constructor() {}

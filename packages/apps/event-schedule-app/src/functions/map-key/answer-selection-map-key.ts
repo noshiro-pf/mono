@@ -8,13 +8,13 @@ type AnswerSelectionData = Readonly<{
 }>;
 
 export const answerSelectionToMapKey = (
-  answerSelection: AnswerSelectionData
+  answerSelection: AnswerSelectionData,
 ): AnswerSelectionMapKey =>
   // eslint-disable-next-line no-restricted-syntax
   Result.unwrapThrow(Json.stringify(answerSelection)) as AnswerSelectionMapKey;
 
 export const answerSelectionFromMapKey = (
-  key: AnswerSelectionMapKey
+  key: AnswerSelectionMapKey,
 ): AnswerSelectionData => {
   // eslint-disable-next-line no-restricted-syntax
   const parsed = Result.unwrapThrow(Json.parse(key)) as {

@@ -21,7 +21,7 @@ type Props = DeepReadonly<{
       comment: string;
       selectedIconId: AnswerIconIdWithNone;
       point: AnswerIconPoint;
-    }>
+    }>,
   ) => void;
 }>;
 
@@ -150,7 +150,7 @@ export const BatchInputAnswerForm = memoNamed<Props>(
         ) : undefined}
       </div>
     );
-  }
+  },
 );
 
 const dc = dict.answerPage.answerBeingEdited;

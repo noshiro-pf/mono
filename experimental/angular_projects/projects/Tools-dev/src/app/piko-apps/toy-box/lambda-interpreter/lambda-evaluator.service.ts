@@ -170,7 +170,7 @@ export class LambdaEvaluatorService {
 
   pickUpAvailableVariable(freeVariables: Variable[]): Variable {
     const availableVariables = this.ALPHABETS.filter(
-      (e) => !freeVariables.includes(e)
+      (e) => !freeVariables.includes(e),
     );
     if (availableVariables.length < 1) console.error('alphabets exhausted');
     return availableVariables[0]; // pick up one available

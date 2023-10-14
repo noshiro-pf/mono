@@ -41,7 +41,7 @@ export class HomeComponent implements OnInit {
           title: 'Tools Collection',
           subtitle: 'ツール集',
         },
-      ])
+      ]),
     );
   }
 

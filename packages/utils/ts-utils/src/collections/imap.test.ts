@@ -7,7 +7,7 @@ describe('IMap[Symbol.iterator]', () => {
         [1, 10],
         [2, 20],
         [3, 30],
-      ] as const)
+      ] as const),
     );
 
     expect(m0).toStrictEqual(
@@ -15,7 +15,7 @@ describe('IMap[Symbol.iterator]', () => {
         [1, 10],
         [2, 20],
         [3, 30],
-      ] as const)
+      ] as const),
     );
   });
 });
@@ -134,7 +134,7 @@ describe('IMap.set', () => {
         [6, 60],
         [7, 70],
         [9, 90],
-      ])
+      ]),
     );
     expect(m0).toStrictEqual(
       IMap.new([
@@ -143,7 +143,7 @@ describe('IMap.set', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
   });
   test('case 2', () => {
@@ -162,7 +162,7 @@ describe('IMap.set', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
     expect(m0).toStrictEqual(
       IMap.new([
@@ -171,7 +171,7 @@ describe('IMap.set', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
   });
   test('case 3', () => {
@@ -199,7 +199,7 @@ describe('IMap.update', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
     expect(m0).toStrictEqual(
       IMap.new([
@@ -208,7 +208,7 @@ describe('IMap.update', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
   });
   test('case 2', () => {
@@ -227,7 +227,7 @@ describe('IMap.update', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
     expect(m0).toStrictEqual(
       IMap.new([
@@ -236,7 +236,7 @@ describe('IMap.update', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
   });
   test('case 3', () => {
@@ -264,7 +264,7 @@ describe('IMap.delete', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
     expect(m0).toStrictEqual(
       IMap.new([
@@ -273,7 +273,7 @@ describe('IMap.delete', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
   });
   test('case 2', () => {
@@ -291,7 +291,7 @@ describe('IMap.delete', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
     expect(m0).toStrictEqual(
       IMap.new([
@@ -300,7 +300,7 @@ describe('IMap.delete', () => {
         [5, 50],
         [6, 60],
         [7, 70],
-      ])
+      ]),
     );
   });
   test('case 3', () => {

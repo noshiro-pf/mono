@@ -36,5 +36,5 @@ export const DeleteAnswerButton = memoNamed<Props>(
       toastConfig={toastConfig}
       onConfirmClick={onConfirmDeleteAnswer}
     />
-  )
+  ),
 );

@@ -18,7 +18,7 @@ export class MessageForMeAreaComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.gameMessageList_default1Line$ = this.gameMessageList$.pipe(
       startWith([]),
-      map((list) => (list.length > 0 ? list : ['']))
+      map((list) => (list.length > 0 ? list : [''])),
     );
   }
 

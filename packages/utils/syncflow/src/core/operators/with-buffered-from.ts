@@ -12,13 +12,13 @@ import { maxDepth } from '../utils';
 
 export const withBufferedFrom =
   <A, B>(
-    observable: Observable<B>
+    observable: Observable<B>,
   ): ToBaseOperator<A, readonly [A, readonly B[]]> =>
   (parentObservable: Observable<A>) =>
     new WithBufferedFromObservableClass(parentObservable, observable);
 
 export const withBufferedFromI = <A, B>(
-  observable: InitializedObservable<B>
+  observable: InitializedObservable<B>,
 ): InitializedToInitializedOperator<A, readonly [A, readonly B[]]> =>
   // eslint-disable-next-line no-restricted-syntax
   withBuffered(observable) as InitializedToInitializedOperator<

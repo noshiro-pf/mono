@@ -32,7 +32,7 @@ class SkipUntilObservableClass<A>
       },
       () => {
         this.#isSkipping = false;
-      }
+      },
     );
   }
 

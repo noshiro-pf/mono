@@ -11,7 +11,7 @@ const {
 
 const [visibleLabelIndices$, visibleLabelIndicesDispatcher] = createReducer(
   visibleLabelsReducer,
-  labels.map(() => true)
+  labels.map(() => true),
 );
 
 const { state$: selectedLabel$, setState: setSelectedLabel } =
@@ -39,8 +39,8 @@ const handlers: AppEventHandler = {
 
 const visibleLabels$ = visibleLabelIndices$.chain(
   mapI((visibleLabelIndices) =>
-    labels.filter((_, i) => visibleLabelIndices[i] === true)
-  )
+    labels.filter((_, i) => visibleLabelIndices[i] === true),
+  ),
 );
 
 export {

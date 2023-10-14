@@ -18,7 +18,7 @@ import { type StreamTestCase } from '../typedef';
   auditTime               3           4                       10          13          18          20
 */
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;

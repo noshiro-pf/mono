@@ -7,7 +7,7 @@ const Int = z
   .number()
   .refine(
     (a) => Number.isInteger(a),
-    (a) => ({ message: `Invalid value "${a}" supplied to Int` })
+    (a) => ({ message: `Invalid value "${a}" supplied to Int` }),
   )
   .brand('Int');
 const isInt = (a) => Int.safeParse(a).success;

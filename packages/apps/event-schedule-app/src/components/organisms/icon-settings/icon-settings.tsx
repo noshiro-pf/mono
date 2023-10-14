@@ -19,14 +19,14 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
       (action: IconListReducerAction) => {
         onAnswerIconsChange(iconListReducer(answerIcons, action));
       },
-      [answerIcons, onAnswerIconsChange]
+      [answerIcons, onAnswerIconsChange],
     );
 
     const onOkDescriptionChange = useCallback(
       (description: string) => {
         dispatch({ type: 'update-description', iconId: 'good', description });
       },
-      [dispatch]
+      [dispatch],
     );
 
     const onNeitherDescriptionChange = useCallback(
@@ -37,21 +37,21 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
           description,
         });
       },
-      [dispatch]
+      [dispatch],
     );
 
     const onNeitherPointChange = useCallback(
       (point: AnswerIconPoint) => {
         dispatch({ type: 'update-point', iconId: 'fair', point });
       },
-      [dispatch]
+      [dispatch],
     );
 
     const onNgDescriptionChange = useCallback(
       (description: string) => {
         dispatch({ type: 'update-description', iconId: 'poor', description });
       },
-      [dispatch]
+      [dispatch],
     );
 
     return (
@@ -85,5 +85,5 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
         />
       </div>
     );
-  }
+  },
 );

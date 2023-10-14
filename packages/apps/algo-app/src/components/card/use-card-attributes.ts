@@ -17,7 +17,7 @@ export const useCardAttributes = (
   isClickable: boolean,
   float: 'always' | 'never' | 'onHover',
   showOutline: 'always' | 'never' | 'onHover',
-  outlineColor: CustomColor
+  outlineColor: CustomColor,
 ): {
   textColor: CardTextColor;
   eyeIconColor: string;
@@ -57,7 +57,7 @@ export const useCardAttributes = (
       width: `${width}px`,
       zIndex: zIndex.cards,
     }),
-    [isClickable, float, isMouseOver, height, width]
+    [isClickable, float, isMouseOver, height, width],
   );
 
   const backSideStyle = useMemo<preact.JSX.CSSProperties>(
@@ -65,7 +65,7 @@ export const useCardAttributes = (
       transform:
         visibilityFromMe === 'faceUp' ? 'rotateY(180deg)' : 'rotateY(0)',
     }),
-    [visibilityFromMe]
+    [visibilityFromMe],
   );
 
   const frontSideStyle = useMemo<preact.JSX.CSSProperties>(
@@ -73,7 +73,7 @@ export const useCardAttributes = (
       transform:
         visibilityFromMe === 'faceUp' ? 'rotateY(0)' : 'rotateY(180deg)',
     }),
-    [visibilityFromMe]
+    [visibilityFromMe],
   );
 
   const _showOutline =
@@ -85,7 +85,7 @@ export const useCardAttributes = (
       strokeWidth: _showOutline ? 8 : 0,
       fill: color,
     }),
-    [_showOutline, color, outlineColor]
+    [_showOutline, color, outlineColor],
   );
 
   return {

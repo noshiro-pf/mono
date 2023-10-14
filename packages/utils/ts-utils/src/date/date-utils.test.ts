@@ -21,25 +21,25 @@ describe('DateUtils', () => {
   describe('getDay', () => {
     test('getDay(2019/12/25)', () => {
       expect(DateUtils.getLocaleDayOfWeek(DateUtils.from('2019/12/22'))).toBe(
-        0
+        0,
       );
       expect(DateUtils.getLocaleDayOfWeek(DateUtils.from('2019/12/23'))).toBe(
-        1
+        1,
       );
       expect(DateUtils.getLocaleDayOfWeek(DateUtils.from('2019/12/24'))).toBe(
-        2
+        2,
       );
       expect(DateUtils.getLocaleDayOfWeek(DateUtils.from('2019/12/25'))).toBe(
-        3
+        3,
       );
       expect(DateUtils.getLocaleDayOfWeek(DateUtils.from('2019/12/26'))).toBe(
-        4
+        4,
       );
       expect(DateUtils.getLocaleDayOfWeek(DateUtils.from('2019/12/27'))).toBe(
-        5
+        5,
       );
       expect(DateUtils.getLocaleDayOfWeek(DateUtils.from('2019/12/28'))).toBe(
-        6
+        6,
       );
     });
   });
@@ -49,7 +49,7 @@ describe('DateUtils', () => {
 
     test('setYear(2019/12/25, 2018)', () => {
       const result = DateUtils.setLocaleYear(
-        toSafeUint(2018) satisfies YearEnum
+        toSafeUint(2018) satisfies YearEnum,
       )(date_20191225);
 
       expect(DateUtils.getLocaleYear(result)).toBe(2018);
@@ -121,13 +121,13 @@ describe('DateUtils', () => {
   describe('getLocaleYesterday', () => {
     test('case 1', () => {
       expect(
-        DateUtils.getLocaleYesterday(DateUtils.from('2020/01/02'))
+        DateUtils.getLocaleYesterday(DateUtils.from('2020/01/02')),
       ).toStrictEqual(DateUtils.from('2020/01/01'));
     });
 
     test('case 2', () => {
       expect(
-        DateUtils.getLocaleYesterday(DateUtils.from('2021/01/01'))
+        DateUtils.getLocaleYesterday(DateUtils.from('2021/01/01')),
       ).toStrictEqual(DateUtils.from('2020/12/31'));
     });
   });
@@ -135,13 +135,13 @@ describe('DateUtils', () => {
   describe('getLocaleTomorrow', () => {
     test('case 1', () => {
       expect(
-        DateUtils.getLocaleTomorrow(DateUtils.from('2020/01/01'))
+        DateUtils.getLocaleTomorrow(DateUtils.from('2020/01/01')),
       ).toStrictEqual(DateUtils.from('2020/01/02'));
     });
 
     test('case 2', () => {
       expect(
-        DateUtils.getLocaleTomorrow(DateUtils.from('2020/12/31'))
+        DateUtils.getLocaleTomorrow(DateUtils.from('2020/12/31')),
       ).toStrictEqual(DateUtils.from('2021/01/01'));
     });
   });
@@ -149,7 +149,7 @@ describe('DateUtils', () => {
   describe('toMidnight', () => {
     test('case 1', () => {
       expect(
-        DateUtils.toMidnight(DateUtils.from('2020/1/1 12:34:56'))
+        DateUtils.toMidnight(DateUtils.from('2020/1/1 12:34:56')),
       ).toStrictEqual(DateUtils.from('2020/1/1 00:00:00'));
     });
   });
@@ -157,19 +157,19 @@ describe('DateUtils', () => {
   describe('cmp', () => {
     test('case 1', () => {
       expect(
-        DateUtils.cmp(DateUtils.from('2020/1/1'), DateUtils.from('2020/1/2'))
+        DateUtils.cmp(DateUtils.from('2020/1/1'), DateUtils.from('2020/1/2')),
       ).toBe(-1);
     });
 
     test('case 2', () => {
       expect(
-        DateUtils.cmp(DateUtils.from('2020/1/1'), DateUtils.from('2020/1/1'))
+        DateUtils.cmp(DateUtils.from('2020/1/1'), DateUtils.from('2020/1/1')),
       ).toBe(0);
     });
 
     test('case 3', () => {
       expect(
-        DateUtils.cmp(DateUtils.from('2020/1/2'), DateUtils.from('2020/1/1'))
+        DateUtils.cmp(DateUtils.from('2020/1/2'), DateUtils.from('2020/1/1')),
       ).toBe(1);
     });
 
@@ -177,8 +177,8 @@ describe('DateUtils', () => {
       expect(
         DateUtils.cmp(
           DateUtils.from('2020/1/1 00:00:00'),
-          DateUtils.from('2020/1/1 00:00:01')
-        )
+          DateUtils.from('2020/1/1 00:00:01'),
+        ),
       ).toBe(-1);
     });
   });
@@ -206,8 +206,8 @@ describe('DateUtils', () => {
       expect(
         DateUtils.getLastDateNumberOfMonth(
           toSafeUint(2020) satisfies YearEnum,
-          1
-        )
+          1,
+        ),
       ).toBe(31);
     });
 
@@ -215,8 +215,8 @@ describe('DateUtils', () => {
       expect(
         DateUtils.getLastDateNumberOfMonth(
           toSafeUint(2020) satisfies YearEnum,
-          2
-        )
+          2,
+        ),
       ).toBe(29);
     });
 
@@ -224,8 +224,8 @@ describe('DateUtils', () => {
       expect(
         DateUtils.getLastDateNumberOfMonth(
           toSafeUint(2020) satisfies YearEnum,
-          4
-        )
+          4,
+        ),
       ).toBe(30);
     });
   });
@@ -233,7 +233,7 @@ describe('DateUtils', () => {
   describe('getAllDatesOfMonth', () => {
     test('case 1', () => {
       expect(
-        DateUtils.getAllDatesOfMonth(toSafeUint(2020) satisfies YearEnum, 1)
+        DateUtils.getAllDatesOfMonth(toSafeUint(2020) satisfies YearEnum, 1),
       ).toStrictEqual([
         DateUtils.from('2020/1/1'),
         DateUtils.from('2020/1/2'),
@@ -273,25 +273,25 @@ describe('DateUtils', () => {
   describe('numWeeksOfMonth', () => {
     test('case 1', () => {
       expect(
-        DateUtils.numWeeksOfMonth(toSafeUint(2020) satisfies YearEnum, 1)
+        DateUtils.numWeeksOfMonth(toSafeUint(2020) satisfies YearEnum, 1),
       ).toBe(5);
     });
 
     test('case 2', () => {
       expect(
-        DateUtils.numWeeksOfMonth(toSafeUint(2020) satisfies YearEnum, 2)
+        DateUtils.numWeeksOfMonth(toSafeUint(2020) satisfies YearEnum, 2),
       ).toBe(5);
     });
 
     test('case 3', () => {
       expect(
-        DateUtils.numWeeksOfMonth(toSafeUint(2015) satisfies YearEnum, 2)
+        DateUtils.numWeeksOfMonth(toSafeUint(2015) satisfies YearEnum, 2),
       ).toBe(4);
     });
 
     test('case 4', () => {
       expect(
-        DateUtils.numWeeksOfMonth(toSafeUint(2015) satisfies YearEnum, 5)
+        DateUtils.numWeeksOfMonth(toSafeUint(2015) satisfies YearEnum, 5),
       ).toBe(6);
     });
   });
@@ -299,13 +299,13 @@ describe('DateUtils', () => {
   describe('toLocaleYMD', () => {
     test('case 1', () => {
       expect(DateUtils.toLocaleYMD(DateUtils.from('2020/1/1'), '/')).toBe(
-        '2020/01/01'
+        '2020/01/01',
       );
     });
 
     test('case 2', () => {
       expect(DateUtils.toLocaleYMD(DateUtils.from('2020/1/1'), '-')).toBe(
-        '2020-01-01'
+        '2020-01-01',
       );
     });
   });
@@ -313,13 +313,13 @@ describe('DateUtils', () => {
   describe('toLocaleHM', () => {
     test('case 1', () => {
       expect(
-        DateUtils.toLocaleHM(DateUtils.from('2020/1/1 12:34:56'), ':')
+        DateUtils.toLocaleHM(DateUtils.from('2020/1/1 12:34:56'), ':'),
       ).toBe('12:34');
     });
 
     test('case 2', () => {
       expect(
-        DateUtils.toLocaleHM(DateUtils.from('2020/1/1 12:34:56'), '.')
+        DateUtils.toLocaleHM(DateUtils.from('2020/1/1 12:34:56'), '.'),
       ).toBe('12.34');
     });
   });
@@ -327,13 +327,13 @@ describe('DateUtils', () => {
   describe('toLocaleHMS', () => {
     test('case 1', () => {
       expect(
-        DateUtils.toLocaleHMS(DateUtils.from('2020/1/1 12:34:56'), ':')
+        DateUtils.toLocaleHMS(DateUtils.from('2020/1/1 12:34:56'), ':'),
       ).toBe('12:34:56');
     });
 
     test('case 2', () => {
       expect(
-        DateUtils.toLocaleHMS(DateUtils.from('2020/1/1 12:34:56'), '.')
+        DateUtils.toLocaleHMS(DateUtils.from('2020/1/1 12:34:56'), '.'),
       ).toBe('12.34.56');
     });
   });
@@ -341,13 +341,13 @@ describe('DateUtils', () => {
   describe('toLocaleYMDHMS', () => {
     test('case 1', () => {
       expect(
-        DateUtils.toLocaleYMDHMS(DateUtils.from('2020/1/1 12:34:56'), '/', ':')
+        DateUtils.toLocaleYMDHMS(DateUtils.from('2020/1/1 12:34:56'), '/', ':'),
       ).toBe('2020/01/01 12:34:56');
     });
 
     test('case 2', () => {
       expect(
-        DateUtils.toLocaleYMDHMS(DateUtils.from('2020/1/1 12:34:56'), '@', '*')
+        DateUtils.toLocaleYMDHMS(DateUtils.from('2020/1/1 12:34:56'), '@', '*'),
       ).toBe('2020@01@01 12*34*56');
     });
   });

@@ -21,5 +21,5 @@ export const DetailedFilterNumGoodPlusFairIcon = memoNamed<Props>(
       onMaxChange={AnswerFilterAndSortStore.setGoodPlusFairMax}
       onMinChange={AnswerFilterAndSortStore.setGoodPlusFairMin}
     />
-  )
+  ),
 );

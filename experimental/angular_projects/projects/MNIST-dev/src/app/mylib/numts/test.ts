@@ -262,7 +262,7 @@ import * as np from './num';
     [
       [4, 2],
       [0, 1],
-    ]
+    ],
   ) as number[][];
   if (a[0][0] !== 4) throw new Error('dot (matrix/matrix)');
   if (a[0][1] !== 4) throw new Error('dot (matrix/matrix)');
@@ -280,7 +280,7 @@ import * as np from './num';
     [
       [1, 2],
       [3, 4],
-    ]
+    ],
   ) as number[];
   if (b[0] !== 14) throw new Error('dot (vector/matrix)');
   if (b[1] !== 20) throw new Error('dot (vector/matrix)');
@@ -296,7 +296,7 @@ import * as np from './num';
       [2, 4],
       [1, 3],
     ],
-    [3, 2]
+    [3, 2],
   ) as number[];
   if (c[0] !== 14) throw new Error('dot (matrix/vector)');
   if (c[1] !== 9) throw new Error('dot (matrix/vector)');

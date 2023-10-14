@@ -13,7 +13,7 @@ export const mapToSKeyWithCtrl =
     Readonly<KeyboardEvent>
   > =>
   (
-    keyEvent$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>
+    keyEvent$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>,
   ): Observable<Readonly<KeyboardEvent>> =>
     keyEvent$.pipe(
       filterTargetAlphabetKeyEvent('s'),
@@ -22,5 +22,5 @@ export const mapToSKeyWithCtrl =
       map((ev) => {
         ev.preventDefault();
         return ev;
-      })
+      }),
     );

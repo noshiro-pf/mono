@@ -16,5 +16,5 @@ export const ToggleWithoutDestroy = memoNamed<Props>(
       <div style={condition ? style : displayNoneStyle}>{childTrue}</div>
       <div style={condition ? displayNoneStyle : style}>{childFalse}</div>
     </>
-  )
+  ),
 );

@@ -104,7 +104,7 @@ export class ErrorBoundary extends Component<Props, State> {
             error: Str.from(this.state.error),
             errorInfo: this.state.errorInfo,
             description: this.state.description,
-          })
+          }),
         ),
       })
       .then((res) => {

@@ -47,18 +47,18 @@ export const convertLibEs5_TypedArray = (from) => {
     {
       const slice = ret.slice(
         ret.indexOf(marker(elemType).Array.start),
-        ret.indexOf(marker(elemType).Array.end)
+        ret.indexOf(marker(elemType).Array.end),
       );
       ret = ret.replaceAll(slice, convertInterfaceTypedArray(slice, elemType));
     }
     {
       const slice = ret.slice(
         ret.indexOf(marker(elemType).ArrayConstructor.start),
-        ret.indexOf(marker(elemType).ArrayConstructor.end)
+        ret.indexOf(marker(elemType).ArrayConstructor.end),
       );
       ret = ret.replaceAll(
         slice,
-        convertInterfaceTypedArrayConstructor(slice, elemType)
+        convertInterfaceTypedArrayConstructor(slice, elemType),
       );
     }
   }
@@ -82,21 +82,21 @@ export const convertLibEs5_TypedArray = (from) => {
   {
     const slice = ret.slice(
       ret.indexOf(markers.ArrayBuffer.start),
-      ret.indexOf(markers.ArrayBuffer.end)
+      ret.indexOf(markers.ArrayBuffer.end),
     );
 
     ret = ret.replaceAll(
       slice,
       slice.replaceAll(
         `slice(begin: number, end?: number)`,
-        `slice(begin: ${indexType.arg}, end?: ${indexType.arg})`
-      )
+        `slice(begin: ${indexType.arg}, end?: ${indexType.arg})`,
+      ),
     );
   }
   {
     const slice = ret.slice(
       ret.indexOf(markers.ArrayBufferView.start),
-      ret.indexOf(markers.ArrayBufferView.end)
+      ret.indexOf(markers.ArrayBufferView.end),
     );
 
     ret = ret.replaceAll(slice, convertArrayBufferView(slice));
@@ -105,7 +105,7 @@ export const convertLibEs5_TypedArray = (from) => {
   {
     const slice = ret.slice(
       ret.indexOf(markers.DataView.start),
-      ret.indexOf(markers.DataView.end)
+      ret.indexOf(markers.DataView.end),
     );
 
     ret = ret.replaceAll(slice, convertDataView(slice));
@@ -129,47 +129,47 @@ const convertInterfaceTypedArray = (from, elementType) => {
 
   ret = ret.replaceAll(
     `readonly BYTES_PER_ELEMENT: number;`,
-    `readonly BYTES_PER_ELEMENT: ${BYTES_PER_ELEMENT(elementType)};`
+    `readonly BYTES_PER_ELEMENT: ${BYTES_PER_ELEMENT(elementType)};`,
   );
   ret = ret.replaceAll(
     `readonly [index: number]: number;`,
-    `readonly [index: number]: ${elementType};`
+    `readonly [index: number]: ${elementType};`,
   );
   ret = ret.replaceAll(`index: number,`, `index: ${indexType.callbackArg},`);
   ret = ret.replaceAll(
     `predicate: (value: number, index: number, array: ${arrayType}) => unknown`,
-    `predicate: (value: ${elementType}, index: ${indexType.callbackArg}, array: ${arrayType}) => boolean`
+    `predicate: (value: ${elementType}, index: ${indexType.callbackArg}, array: ${arrayType}) => boolean`,
   );
   ret = ret.replaceAll(
     `fill(value: number, start?: number, end?: number)`,
-    `fill(value: ${elementType}, start?: ${indexType.arg}, end?: ${indexType.arg})`
+    `fill(value: ${elementType}, start?: ${indexType.arg}, end?: ${indexType.arg})`,
   );
   ret = ret.replaceAll(
     `unknown,\n    thisArg?: unknown\n  ): boolean`,
-    `boolean,\n    thisArg?: unknown\n  ): boolean`
+    `boolean,\n    thisArg?: unknown\n  ): boolean`,
   );
   ret = ret.replaceAll(
     `) => unknown,\n    thisArg?: unknown\n  ): ${arrayType};`,
-    `) => boolean,\n    thisArg?: unknown\n  ): ${arrayType};`
+    `) => boolean,\n    thisArg?: unknown\n  ): ${arrayType};`,
   );
   ret = ret.replaceAll(
     `searchElement: number`,
-    `searchElement: ${elementType}`
+    `searchElement: ${elementType}`,
   );
   ret = ret.replaceAll(
     `fromIndex?: ${indexType.arg}): number;`,
-    `fromIndex?: ${indexType.arg}): ${indexType.searchResult};`
+    `fromIndex?: ${indexType.arg}): ${indexType.searchResult};`,
   );
 
   ret = ret.replaceAll(
     `findIndex(\n    predicate: (value: number, index: ${indexType.callbackArg}, obj: ${arrayType}) => boolean,\n    thisArg?: unknown\n  ): number;`,
-    `findIndex(\n    predicate: (value: number, index: ${indexType.callbackArg}, obj: ${arrayType}) => boolean,\n    thisArg?: unknown\n  ): ${indexType.searchResult};`
+    `findIndex(\n    predicate: (value: number, index: ${indexType.callbackArg}, obj: ${arrayType}) => boolean,\n    thisArg?: unknown\n  ): ${indexType.searchResult};`,
   );
 
   // Uint8ClampedArray
   ret = ret.replaceAll(
     `findIndex(\n    predicate: (\n      value: number,\n      index: ${indexType.callbackArg},\n      obj: Uint8ClampedArray\n    ) => boolean,\n    thisArg?: unknown\n  ): number;`,
-    `findIndex(\n    predicate: (\n      value: number,\n      index: ${indexType.callbackArg},\n      obj: Uint8ClampedArray\n    ) => boolean,\n    thisArg?: unknown\n  ): ${indexType.searchResult};`
+    `findIndex(\n    predicate: (\n      value: number,\n      index: ${indexType.callbackArg},\n      obj: Uint8ClampedArray\n    ) => boolean,\n    thisArg?: unknown\n  ): ${indexType.searchResult};`,
   );
 
   // convert rest
@@ -178,12 +178,12 @@ const convertInterfaceTypedArray = (from, elementType) => {
   // revert
   ret = ret.replaceAll(
     `(a: ${elementType}, b: ${elementType}) => ${elementType}`,
-    `(a: ${elementType}, b: ${elementType}) => number`
+    `(a: ${elementType}, b: ${elementType}) => number`,
   );
   ret = ret.replaceAll(`[index: ${elementType}]`, `[index: number]`);
   ret = ret.replaceAll(
     `Converts a ${elementType} to a string`,
-    `Converts a number to a string`
+    `Converts a number to a string`,
   );
 
   return ret;
@@ -201,16 +201,16 @@ const convertInterfaceTypedArrayConstructor = (from, elementType) => {
 
   ret = ret.replaceAll(
     `readonly BYTES_PER_ELEMENT: number;`,
-    `readonly BYTES_PER_ELEMENT: ${BYTES_PER_ELEMENT(elementType)};`
+    `readonly BYTES_PER_ELEMENT: ${BYTES_PER_ELEMENT(elementType)};`,
   );
   ret = ret.replaceAll(
     `new (array: ArrayLike<number>`,
-    `new (array: ArrayLike<${elementType}>`
+    `new (array: ArrayLike<${elementType}>`,
   );
   ret = ret.replaceAll(`length?: number`, `length?: ${indexType.size}`);
   ret = ret.replaceAll(
     `mapfn: (v: T, k: number) => number,`,
-    `mapfn: (v: T, k: ${indexType.callbackArg}) => ${elementType},`
+    `mapfn: (v: T, k: ${indexType.callbackArg}) => ${elementType},`,
   );
   ret = ret.replaceAll(`number`, elementType);
 
@@ -251,7 +251,7 @@ const convertArrayBufferView = (from) => {
 
   ret.replaceAll(
     'slice(begin: number, end?: number): ArrayBuffer;',
-    `slice(begin: ${indexType.arg}, end?: ${indexType.arg}): ArrayBuffer;`
+    `slice(begin: ${indexType.arg}, end?: ${indexType.arg}): ArrayBuffer;`,
   );
 
   for (const [fn, valueType] of [
@@ -260,7 +260,7 @@ const convertArrayBufferView = (from) => {
   ]) {
     ret = ret.replaceAll(
       `${fn}(byteOffset: SafeUint): number;`,
-      `${fn}(byteOffset: SafeUint): ${valueType};`
+      `${fn}(byteOffset: SafeUint): ${valueType};`,
     );
   }
 
@@ -280,7 +280,7 @@ const convertDataView = (from) => {
   ]) {
     ret = ret.replaceAll(
       `${fn}(byteOffset: SafeUint): number;`,
-      `${fn}(byteOffset: SafeUint): ${valueType};`
+      `${fn}(byteOffset: SafeUint): ${valueType};`,
     );
   }
 
@@ -294,7 +294,7 @@ const convertDataView = (from) => {
   ]) {
     ret = ret.replaceAll(
       `${fn}(byteOffset: SafeUint, littleEndian?: boolean): number;`,
-      `${fn}(byteOffset: SafeUint, littleEndian?: boolean): ${valueType};`
+      `${fn}(byteOffset: SafeUint, littleEndian?: boolean): ${valueType};`,
     );
   }
 
@@ -304,7 +304,7 @@ const convertDataView = (from) => {
   ]) {
     ret = ret.replaceAll(
       `${fn}(byteOffset: SafeUint, value: number): void;`,
-      `${fn}(byteOffset: SafeUint, value: ${valueType}): void;`
+      `${fn}(byteOffset: SafeUint, value: ${valueType}): void;`,
     );
   }
 
@@ -318,7 +318,7 @@ const convertDataView = (from) => {
   ]) {
     ret = ret.replaceAll(
       `${fn}(byteOffset: SafeUint, value: number, littleEndian?: boolean): void;`,
-      `${fn}(byteOffset: SafeUint, value: ${valueType}, littleEndian?: boolean): void;`
+      `${fn}(byteOffset: SafeUint, value: ${valueType}, littleEndian?: boolean): void;`,
     );
   }
 

@@ -26,7 +26,7 @@ const answerSelectionMap$: InitializedObservable<
     >
   | undefined
 > = answers$.chain(
-  mapI((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers))
+  mapI((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers)),
 );
 
 const answerSelectionMapFn$ = answerSelectionMap$.chain(
@@ -34,15 +34,15 @@ const answerSelectionMapFn$ = answerSelectionMap$.chain(
     (answerSelectionMap) =>
       (
         datetimeRange: DatetimeRange,
-        answerId: AnswerId
+        answerId: AnswerId,
       ): readonly [
         iconId: AnswerIconIdWithNone,
         point: AnswerIconPoint,
         comment: string,
       ] =>
         answerSelectionMap?.get({ datetimeRange, answerId }) ??
-        tp('none', 0, '')
-  )
+        tp('none', 0, ''),
+  ),
 );
 
 const answerTable$: InitializedObservable<
@@ -65,9 +65,9 @@ const answerTable$: InitializedObservable<
       : createAnswerTable(
           answerSelectionMapFn,
           eventSchedule.datetimeRangeList,
-          answers
-        )
-  )
+          answers,
+        ),
+  ),
 );
 
 // sum of (good, fair, poor)
@@ -78,8 +78,8 @@ const answerSummary$: InitializedObservable<
   mapI(([eventSchedule, answerTable]) =>
     eventSchedule === undefined || answerTable === undefined
       ? undefined
-      : createAnswerSummary(eventSchedule.datetimeRangeList, answerTable)
-  )
+      : createAnswerSummary(eventSchedule.datetimeRangeList, answerTable),
+  ),
 );
 
 const scores$: InitializedObservable<
@@ -100,19 +100,19 @@ const scores$: InitializedObservable<
           eventSchedule.datetimeRangeList,
           answerSummary,
           answerTable,
-          answers
-        )
-  )
+          answers,
+        ),
+  ),
 );
 
 const datetimeRangeList$ = eventSchedule$.chain(
-  mapI((eventSchedule) => eventSchedule?.datetimeRangeList)
+  mapI((eventSchedule) => eventSchedule?.datetimeRangeList),
 );
 
 const datetimeRangeListReversed$ = eventSchedule$.chain(
   mapI((eventSchedule) =>
-    mapOptional(eventSchedule?.datetimeRangeList, Arr.reversed)
-  )
+    mapOptional(eventSchedule?.datetimeRangeList, Arr.reversed),
+  ),
 );
 
 const datetimeRangeListSortedByScores$ = combineLatestI([
@@ -122,15 +122,18 @@ const datetimeRangeListSortedByScores$ = combineLatestI([
   mapI(([eventSchedule, scores]) =>
     eventSchedule === undefined || scores === undefined
       ? undefined
-      : Arr.sortedBy(eventSchedule.datetimeRangeList, (d) => scores.get(d) ?? 0)
-  )
+      : Arr.sortedBy(
+          eventSchedule.datetimeRangeList,
+          (d) => scores.get(d) ?? 0,
+        ),
+  ),
 );
 
 const datetimeRangeListSortedByScoresReversed$ =
   datetimeRangeListSortedByScores$.chain(
     mapI((datetimeRangeListSortedByScores) =>
-      mapOptional(datetimeRangeListSortedByScores, Arr.reversed)
-    )
+      mapOptional(datetimeRangeListSortedByScores, Arr.reversed),
+    ),
   );
 
 const datetimeRangeListReordered$ = combineLatestI([
@@ -155,8 +158,8 @@ const datetimeRangeListReordered$ = combineLatestI([
           : datetimeRangeListReversed
         : sortOrder === 'asc'
         ? datetimeRangeListSortedByScores
-        : datetimeRangeListSortedByScoresReversed
-  )
+        : datetimeRangeListSortedByScoresReversed,
+  ),
 );
 
 const datetimeRangeToTableRowValuesMap$: InitializedObservable<
@@ -204,7 +207,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
                 pipe(answerTable.get(datetimeRange)).chainOptional((row) =>
                   Arr.zip(
                     row,
-                    answers.map((a) => a.weight)
+                    answers.map((a) => a.weight),
                   ).map(([[iconId, point, comment], weight]) => ({
                     iconId,
                     point,
@@ -216,7 +219,7 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
                     }),
                     weight,
                     comment,
-                  }))
+                  })),
                 ).value;
 
               const value: DeepReadonly<{
@@ -243,9 +246,9 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
               } as const;
 
               return tp(datetimeRange, value);
-            })
-          )
-  )
+            }),
+          ),
+  ),
 );
 
 const tableBodyValues$: InitializedObservable<
@@ -270,9 +273,9 @@ const tableBodyValues$: InitializedObservable<
       : datetimeRangeListReordered.map(
           (datetimeRange) =>
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            datetimeRangeToTableRowValuesMap.get(datetimeRange)!
-        )
-  )
+            datetimeRangeToTableRowValuesMap.get(datetimeRange)!,
+        ),
+  ),
 );
 
 const tableBodyValuesFiltered$ = combineLatestI([
@@ -318,11 +321,11 @@ const tableBodyValuesFiltered$ = combineLatestI([
         Num.isInRangeInclusive(poorBounds.min, poorBounds.max)(poor) &&
         Num.isInRangeInclusive(
           goodPlusFairBounds.min,
-          goodPlusFairBounds.max
+          goodPlusFairBounds.max,
         )(good + fair) &&
         Num.isInRangeInclusive(
           fairPlusPoorBounds.min,
-          fairPlusPoorBounds.max
+          fairPlusPoorBounds.max,
         )(fair + poor) &&
         // 全員回答済みの候補日のみ表示
         ifThen(filledDateOnly, good + fair + poor === numAnswers) &&
@@ -332,12 +335,12 @@ const tableBodyValuesFiltered$ = combineLatestI([
             !falseKeys.has([
               answers?.[index]?.user.name ?? toUserName(''),
               cell.iconId,
-            ])
+            ]),
         ) &&
         // スコアで絞り込み
         Num.isInRangeInclusive(
           scoreRange.value.min,
-          scoreRange.value.max
+          scoreRange.value.max,
         )(score) &&
         // 曜日で絞り込み
         match(day, {
@@ -354,8 +357,8 @@ const tableBodyValuesFiltered$ = combineLatestI([
           compareYmd(dateStart, datetimeRange.ymd) <= 0) &&
         (dateEnd === undefined || compareYmd(datetimeRange.ymd, dateEnd) <= 0)
       );
-    })
-  )
+    }),
+  ),
 );
 
 const {

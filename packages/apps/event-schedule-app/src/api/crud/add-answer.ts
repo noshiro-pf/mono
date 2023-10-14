@@ -4,8 +4,11 @@ import { firestoreEvents } from '../../initialize-firebase';
 
 export const addAnswer = (
   eventId: string,
-  answer: Answer
+  answer: Answer,
 ): Promise<Result<string, string>> =>
   Result.fromPromise(
-    addDoc(collection(firestoreEvents, eventId, firestorePaths.answers), answer)
+    addDoc(
+      collection(firestoreEvents, eventId, firestorePaths.answers),
+      answer,
+    ),
   ).then((a) => Result.fold(a, (docRef) => docRef.id, Str.from));

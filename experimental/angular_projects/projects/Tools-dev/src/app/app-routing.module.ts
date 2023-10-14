@@ -40,7 +40,7 @@ import { ToyBoxComponent } from './piko-apps/toy-box/toy-box.component';
         },
         { component: NotFoundPageComponent, path: '**' },
       ],
-      { useHash: true }
+      { useHash: true },
     ),
   ],
   exports: [RouterModule],

@@ -50,7 +50,7 @@ export const isAnswer = (a: unknown): a is Answer =>
     a,
     'selection',
     (e: unknown): e is AnswerSelection[] =>
-      Array.isArray(e) && e.every(isAnswerSelection)
+      Array.isArray(e) && e.every(isAnswerSelection),
   ) &&
   Obj.hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber) &&
   Obj.hasKeyValue(a, 'weight', isWeight) &&
@@ -79,7 +79,7 @@ export const fillAnswer = (a?: unknown): Answer =>
         [ANSWER_KEY_CREATED_AT]: Obj.hasKeyValue(
           a,
           ANSWER_KEY_CREATED_AT,
-          isNumber
+          isNumber,
         )
           ? a[ANSWER_KEY_CREATED_AT]
           : d[ANSWER_KEY_CREATED_AT],
@@ -89,7 +89,7 @@ export const fillAnswer = (a?: unknown): Answer =>
         isRequiredParticipants: Obj.hasKeyValue(
           a,
           'isRequiredParticipants',
-          isBoolean
+          isBoolean,
         )
           ? a.isRequiredParticipants
           : d.isRequiredParticipants,

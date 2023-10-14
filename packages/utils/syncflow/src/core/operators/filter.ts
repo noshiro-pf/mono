@@ -8,13 +8,13 @@ import {
 } from '../types';
 
 export function filter<A, B extends A>(
-  predicate: (value: A) => value is B
+  predicate: (value: A) => value is B,
 ): RemoveInitializedOperator<A, B>;
 export function filter<A>(
-  predicate: (value: A) => boolean
+  predicate: (value: A) => boolean,
 ): RemoveInitializedOperator<A, A>;
 export function filter<A>(
-  predicate: (value: A) => boolean
+  predicate: (value: A) => boolean,
 ): RemoveInitializedOperator<A, A> {
   return (parentObservable: Observable<A>) =>
     new FilterObservableClass(parentObservable, predicate);

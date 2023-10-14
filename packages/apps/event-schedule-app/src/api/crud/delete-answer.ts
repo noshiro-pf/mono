@@ -4,8 +4,8 @@ import { firestoreEvents } from '../../initialize-firebase';
 
 export const deleteAnswer = (
   eventId: string,
-  answerId: Answer['id']
+  answerId: Answer['id'],
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
-    deleteDoc(doc(firestoreEvents, eventId, firestorePaths.answers, answerId))
+    deleteDoc(doc(firestoreEvents, eventId, firestorePaths.answers, answerId)),
   ).then((a) => Result.fold(a, () => undefined, Str.from));

@@ -19,7 +19,7 @@ export const brand = <
 }: Readonly<{
   codec: Type<A>;
   is: (
-    a: A
+    a: A,
   ) => a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
   brandKeys: BrandTrueKeys;
   brandFalseKeys?: BrandFalseKeys;
@@ -50,7 +50,7 @@ export const brand = <
           return Result.err([
             validationErrorMessage(
               v.value,
-              `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`
+              `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`,
             ),
           ]);
         }

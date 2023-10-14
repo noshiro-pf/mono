@@ -12,12 +12,12 @@ import {
 
 export const zip = <A extends NonEmptyUnknownList>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  parents: Wrap<A>
+  parents: Wrap<A>,
 ): ZipObservable<A> => new ZipObservableClass(parents);
 
 export const zipI = <A extends NonEmptyUnknownList>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  parents: WrapInitialized<A>
+  parents: WrapInitialized<A>,
 ): InitializedZipObservable<A> =>
   // eslint-disable-next-line no-restricted-syntax
   new ZipObservableClass(parents as Wrap<A>) as InitializedZipObservable<A>;

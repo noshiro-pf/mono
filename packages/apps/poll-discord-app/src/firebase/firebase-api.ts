@@ -18,12 +18,12 @@ const pollsCollection = firestore.collection(firestoreApp, 'polls');
 
 const dateToPollIdMapCollection = firestore.collection(
   firestoreApp,
-  'dateOptionIdToPollIdMap'
+  'dateOptionIdToPollIdMap',
 );
 
 const commandMessageIdToPollIdMapCollection = firestore.collection(
   firestoreApp,
-  'commandMessageIdToPollIdMap'
+  'commandMessageIdToPollIdMap',
 );
 
 const valueType = t.record({
@@ -34,14 +34,14 @@ const valueType = t.record({
 });
 
 const getPollIdByCommandMessageId = (
-  commandMessageId: CommandMessageId
+  commandMessageId: CommandMessageId,
 ): Promise<Result<PollId | undefined, string>> =>
   Result.fromPromise(
     firestore
       .getDoc(
-        firestore.doc(commandMessageIdToPollIdMapCollection, commandMessageId)
+        firestore.doc(commandMessageIdToPollIdMapCollection, commandMessageId),
       )
-      .then((d) => d.data())
+      .then((d) => d.data()),
   ).then((result) =>
     Result.fold(
       result,
@@ -50,30 +50,30 @@ const getPollIdByCommandMessageId = (
           .chain(valueType.fill)
           .chain((o) => o.value)
           .chainOptional(toPollId).value,
-      Str.from
-    )
+      Str.from,
+    ),
   );
 
 const setPollIdForCommandMessageId = (
   commandMessageId: CommandMessageId,
-  pollId: PollId
+  pollId: PollId,
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     firestore.setDoc(
       firestore.doc(commandMessageIdToPollIdMapCollection, commandMessageId),
       {
         value: pollId,
-      }
-    )
+      },
+    ),
   ).then((result) => Result.fold(result, noop, Str.from));
 
 const getPollIdByDateOptionId = (
-  dateOptionId: DateOptionId
+  dateOptionId: DateOptionId,
 ): Promise<Result<PollId | undefined, string>> =>
   Result.fromPromise(
     firestore
       .getDoc(firestore.doc(dateToPollIdMapCollection, dateOptionId))
-      .then((d) => d.data())
+      .then((d) => d.data()),
   ).then((result) =>
     Result.fold(
       result,
@@ -82,13 +82,13 @@ const getPollIdByDateOptionId = (
           .chain(valueType.fill)
           .chain((o) => o.value)
           .chainOptional(toPollId).value,
-      Str.from
-    )
+      Str.from,
+    ),
   );
 
 const setPollIdForDateOptionIds = async (
   dateOptionIds: readonly DateOptionId[],
-  pollId: PollId
+  pollId: PollId,
 ): Promise<Result<void, string>> => {
   try {
     const batch = firestore.writeBatch(firestoreApp);
@@ -109,33 +109,33 @@ const setPollIdForDateOptionIds = async (
 
 const setPoll = (poll: Poll): Promise<Result<void, string>> =>
   Result.fromPromise(
-    firestore.setDoc(firestore.doc(pollsCollection, poll.id), pollToJson(poll))
+    firestore.setDoc(firestore.doc(pollsCollection, poll.id), pollToJson(poll)),
   ).then((result) => Result.fold(result, noop, Str.from));
 
 const getPollById = (
-  pollId: PollId
+  pollId: PollId,
 ): Promise<Result<Poll | undefined, string>> =>
   Result.fromPromise(
     firestore
       .getDoc(firestore.doc(pollsCollection, pollId))
-      .then((d) => d.data())
+      .then((d) => d.data()),
   ).then((result) =>
-    Result.fold(result, (d) => mapOptional(d, pollFromJson), Str.from)
+    Result.fold(result, (d) => mapOptional(d, pollFromJson), Str.from),
   );
 
 const updatePollTitle = (
   pollId: PollId,
-  title: Poll['title']
+  title: Poll['title'],
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
-    firestore.updateDoc(firestore.doc(pollsCollection, pollId), { title })
+    firestore.updateDoc(firestore.doc(pollsCollection, pollId), { title }),
   ).then((a) => Result.fold(a, noop, Str.from));
 
 const updatePollUpdatedAt = (pollId: PollId): Promise<Result<void, string>> =>
   Result.fromPromise(
     firestore.updateDoc(firestore.doc(pollsCollection, pollId), {
       updatedAt: toTimestamp(DateUtils.now()),
-    })
+    }),
   ).then((a) => Result.fold(a, noop, Str.from));
 
 const updateMessageReaction = (
@@ -143,7 +143,7 @@ const updateMessageReaction = (
   dateOptionId: DateOptionId,
   answerType: AnswerType,
   userId: UserId,
-  actionType: 'add' | 'remove'
+  actionType: 'add' | 'remove',
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     firestore.updateDoc(firestore.doc(pollsCollection, pollId), {
@@ -151,7 +151,7 @@ const updateMessageReaction = (
         add: firestore.arrayUnion(userId),
         remove: firestore.arrayRemove(userId),
       }),
-    })
+    }),
   ).then((a) => Result.fold(a, noop, Str.from));
 
 export const firestoreApi = {

@@ -57,6 +57,6 @@ export class MyGameRoomService {
 
   constructor(
     private database: FireDatabaseService,
-    private user: UserService
+    private user: UserService,
   ) {}
 }

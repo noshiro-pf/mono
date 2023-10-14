@@ -21,5 +21,5 @@ export const PrivateRoute = memoNamed<Props>(
       case true:
         return <Route component={component} exact={exact} path={path} />;
     }
-  }
+  },
 );

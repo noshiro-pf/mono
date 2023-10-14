@@ -38,7 +38,7 @@ export const fillDatetimeRange = (p?: PartialDatetimeRange): DatetimeRange => ({
 
 export const compareDatetimeRange = (
   a: DatetimeRange,
-  b: DatetimeRange
+  b: DatetimeRange,
 ): number => {
   const compareYmdResult = compareYmd(a.ymd, b.ymd);
   if (compareYmdResult !== 0) return compareYmdResult;

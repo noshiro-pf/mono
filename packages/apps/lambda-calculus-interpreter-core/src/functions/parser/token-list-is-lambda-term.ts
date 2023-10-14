@@ -2,7 +2,7 @@ import { Arr, range, SafeInt } from '@noshiro/ts-utils';
 import { isVariable } from '../is-variable';
 
 export const tokensRepresentsLambdaTerm = (
-  tokens: readonly string[]
+  tokens: readonly string[],
 ): boolean => {
   /* e ::= x | (lambda x.e) | (e e) */
   if (tokens.length < 1) return false;

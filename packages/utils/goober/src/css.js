@@ -18,13 +18,13 @@ function css(val) {
         : // Regular arrays
           _val.reduce(
             (o, i) => (i ? Object.assign(o, i.call ? i(ctx.p) : i) : o),
-            {}
+            {},
           )
       : _val,
     getSheet(ctx.target),
     ctx.g,
     ctx.o,
-    ctx.k
+    ctx.k,
   );
 }
 

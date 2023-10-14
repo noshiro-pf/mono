@@ -41,7 +41,7 @@ export type EventScheduleSettingCommonStateHandler = Readonly<{
   toggleNotificationSection: () => void;
   setNotificationSettings: (value: NotificationSettings) => void;
   setNotificationSettingsWithEmail: (
-    value: NotificationSettingsWithEmail
+    value: NotificationSettingsWithEmail,
   ) => void;
   resetNotificationSettingsSection: () => void;
   turnOffNotificationSection: () => void;

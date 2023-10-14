@@ -18,7 +18,7 @@ export const convertLibEs2022Sharedmemory = (from) => {
       '    typedArray: Int32Array,',
       '    index: SafeUint,',
       '    value: Int32,',
-    ].join('\n')
+    ].join('\n'),
   );
   ret = ret.replaceAll(
     [
@@ -32,7 +32,7 @@ export const convertLibEs2022Sharedmemory = (from) => {
       '    typedArray: BigInt64Array,',
       '    index: SafeUint,',
       '    value: BigInt64,',
-    ].join('\n')
+    ].join('\n'),
   );
 
   return ret;

@@ -3,5 +3,5 @@
  */
 export const keyIsIn = <K extends PropertyKey, R extends RecordBase>(
   key: K,
-  obj: R
+  obj: R,
 ): key is K & keyof typeof obj => Object.hasOwn(obj, key);

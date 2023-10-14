@@ -16,7 +16,7 @@ export const cardWithVisibilityTypeDef = t.record(
     ...def,
     visibleTo: visibleToTypeDef,
   },
-  'Card'
+  'Card',
 );
 
 export type Card = t.TypeOf<typeof cardTypeDef>;

@@ -8,7 +8,7 @@ const parseDate = (str: string): RawDateType =>
 
 const tenYearsLater = pipe(DateUtils.today())
   .chain(
-    DateUtils.updateLocaleYear((a) => toSafeUint(a + 99) satisfies YearEnum)
+    DateUtils.updateLocaleYear((a) => toSafeUint(a + 99) satisfies YearEnum),
   )
   .chain(DateUtils.setLocaleMonth(12))
   .chain(DateUtils.toDate).value;
@@ -61,7 +61,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
           minutes: DateUtils.getLocaleMinutes(dt),
         });
       },
-      [onYmdhmChange]
+      [onYmdhmChange],
     );
 
     const date = useMemo<string | undefined>(
@@ -69,9 +69,9 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         ymdhm === undefined
           ? undefined
           : DateUtils.from(
-              `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`
+              `${ymdhm.year}/${ymdhm.month}/${ymdhm.date} ${ymdhm.hours}:${ymdhm.minutes}:00`,
             ).toLocaleString(),
-      [ymdhm]
+      [ymdhm],
     );
 
     return (
@@ -97,5 +97,5 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
         {...props}
       />
     );
-  }
+  },
 );

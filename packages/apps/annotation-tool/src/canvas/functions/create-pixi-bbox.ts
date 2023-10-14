@@ -14,7 +14,7 @@ const createBboxPoint = (
   pointWidthPxHalf: number,
   x: number,
   y: number,
-  color: Rgba
+  color: Rgba,
 ): Graphics => {
   const mut_point = new Graphics();
 
@@ -46,18 +46,18 @@ const createBboxPoint = (
 const createBboxPoints = (
   rect: Rect,
   pointWidthPx: number,
-  color: Rgba
+  color: Rgba,
 ): { [key in Direction]: Graphics } => {
   const pointWidthPxHalf = Num.roundToInt(pointWidthPx / 2);
   return mapBboxPoints(bboxPointsFromRect(rect), (direction, p) =>
-    createBboxPoint(direction, pointWidthPxHalf, p.x, p.y, color)
+    createBboxPoint(direction, pointWidthPxHalf, p.x, p.y, color),
   );
 };
 
 export const createBboxRect = (
   rect: Rect,
   borderWidthPx: number,
-  borderColor: Rgba
+  borderColor: Rgba,
 ): Graphics => {
   const mut_gr = new Graphics();
   updateBboxRect(mut_gr, rect, borderWidthPx, borderColor, undefined);
@@ -71,7 +71,7 @@ export const createBbox = (
   rect: Rect,
   borderWidthPx: number,
   pointWidthPx: number,
-  borderColor: Rgba
+  borderColor: Rgba,
 ): [Graphics, { [key in Direction]: Graphics }] => [
   createBboxRect(rect, borderWidthPx, borderColor),
   createBboxPoints(rect, pointWidthPx, borderColor),

@@ -15,8 +15,8 @@ export const getDistFileList = async (srcDir) => {
 
   const distFileContentList = await Promise.all(
     distFileNameList.map((filename) =>
-      readFileAsync(`${srcDir}/${filename}`, 'utf8')
-    )
+      readFileAsync(`${srcDir}/${filename}`, 'utf8'),
+    ),
   );
 
   /** @type {{ filename: string, content: string }[]} */

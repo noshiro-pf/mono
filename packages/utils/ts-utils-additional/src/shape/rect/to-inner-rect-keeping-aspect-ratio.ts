@@ -22,7 +22,7 @@ import { type Rect, type RectSize } from '../../types';
 
 export const toInnerRectSizeKeepingAspectRatio = (
   outerRectSize: RectSize,
-  aspectRatio: number
+  aspectRatio: number,
 ): RectSize => {
   if (aspectRatio <= 0 || !Number.isFinite(aspectRatio)) {
     return outerRectSize;
@@ -52,7 +52,7 @@ export const toInnerRectSizeKeepingAspectRatio = (
 
 export const toInnerRectKeepingAspectRatio = (
   outerRect: Rect,
-  aspectRatio: number
+  aspectRatio: number,
 ): Rect => {
   const {
     height: outerH,
@@ -63,7 +63,7 @@ export const toInnerRectKeepingAspectRatio = (
 
   const { height: innerH, width: innerW } = toInnerRectSizeKeepingAspectRatio(
     { width: outerW, height: outerH },
-    aspectRatio
+    aspectRatio,
   );
 
   return {

@@ -7,7 +7,7 @@ import { Arr } from '@noshiro/ts-utils';
 export const removeAt = <T>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_array: T[],
-  index: Uint32WithSmallInt
+  index: Uint32WithSmallInt,
 ): T | undefined =>
   !Arr.indexIsInRange(mut_array, index)
     ? undefined

@@ -1,6 +1,6 @@
 function objectForEachKey<T extends Record<string, unknown>>(
   obj: T,
-  callback: (key: keyof T) => void
+  callback: (key: keyof T) => void,
 ): void {
   const keys = Object.keys(obj);
   for (const key of keys) {
@@ -10,7 +10,7 @@ function objectForEachKey<T extends Record<string, unknown>>(
 
 function objectMapKey<T extends Record<string, unknown>, TReturn>(
   obj: T,
-  callback: (key: keyof T) => TReturn
+  callback: (key: keyof T) => TReturn,
 ): TReturn[] {
   const values: TReturn[] = [];
   objectForEachKey(obj, (key) => {
@@ -22,7 +22,7 @@ function objectMapKey<T extends Record<string, unknown>, TReturn>(
 function objectReduceKey<T extends Record<string, unknown>, TAccumulator>(
   obj: T,
   callback: (acc: TAccumulator, key: keyof T) => TAccumulator,
-  initial: TAccumulator
+  initial: TAccumulator,
 ): TAccumulator {
   let accumulator = initial;
   objectForEachKey(obj, (key) => {

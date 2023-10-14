@@ -9,7 +9,7 @@ export const skip =
 export const skipWhile =
   <T>(
     initialValue: T,
-    predicate: (value: T, index: number) => boolean
+    predicate: (value: T, index: number) => boolean,
   ): Operator<T, T> =>
   (src: RN<T>) =>
     new SkipWhileRN<T>(src, initialValue, predicate);
@@ -20,7 +20,7 @@ class SkipWhileRN<T> extends RN<T> {
   constructor(
     src: RN<T>,
     initialValue: T,
-    predicate: (value: T, index: number) => boolean
+    predicate: (value: T, index: number) => boolean,
   ) {
     super(initialValue, [src]);
     this.predicate = predicate;

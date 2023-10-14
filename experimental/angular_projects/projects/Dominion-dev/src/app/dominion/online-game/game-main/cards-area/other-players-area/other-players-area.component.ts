@@ -39,7 +39,7 @@ export class OtherPlayerAreaComponent implements OnInit {
 
   constructor(
     private myGameRoomService: MyGameRoomService,
-    private communication: GameRoomCommunicationService
+    private communication: GameRoomCommunicationService,
   ) {}
 
   ngOnInit() {}

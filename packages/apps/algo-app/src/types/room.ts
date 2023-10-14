@@ -10,8 +10,8 @@ const playerCardsTypeDef = t.tuple(
     cardTypeDef,
     cardTypeDef,
     cardTypeDef,
-    cardTypeDef
-  )
+    cardTypeDef,
+  ),
 );
 
 const roomStateList = ['not-started', 'playing', 'finished'] as const;
@@ -40,7 +40,7 @@ const roomRemoteTypeDef = t.record(
       p3: playerCardsTypeDef,
     }),
   },
-  'RoomRemote'
+  'RoomRemote',
 );
 
 const roomTypeDef = t.record(
@@ -52,11 +52,11 @@ const roomTypeDef = t.record(
         playerCardsTypeDef,
         playerCardsTypeDef,
         playerCardsTypeDef,
-        playerCardsTypeDef
-      )
+        playerCardsTypeDef,
+      ),
     ),
   },
-  'Room'
+  'Room',
 );
 
 export type RoomRemote = t.TypeOf<typeof roomRemoteTypeDef>;
@@ -70,7 +70,7 @@ export const assertIsRoomRemote: (a: unknown) => asserts a is RoomRemote =
 
 export const convertRoomRemoteToRoom = (
   roomRemote: RoomRemote,
-  id: string
+  id: string,
 ): Room => ({
   id,
   password: roomRemote.password,
@@ -86,7 +86,7 @@ export const convertRoomRemoteToRoom = (
 });
 
 export const convertRoomToRoomRemote = (
-  room: Omit<Room, 'id'>
+  room: Omit<Room, 'id'>,
 ): RoomRemote => ({
   password: room.password,
   players: room.players,

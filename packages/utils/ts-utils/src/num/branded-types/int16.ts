@@ -40,7 +40,7 @@ const mul = (x: Int16WithSmallInt, y: Int16WithSmallInt): Int16 => clamp(x * y);
 
 const div = (
   x: Int16WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Int16, NonZeroNumber>>
+  y: WithSmallInt<IntersectBrand<Int16, NonZeroNumber>>,
 ): Int16 => clamp(Math.floor(x / y));
 
 const random = (min: Int16WithSmallInt, max: Int16WithSmallInt): Int16 =>

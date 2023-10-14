@@ -27,7 +27,7 @@ const log = debug('typescript-eslint:eslint-plugin:utils:types');
  */
 export function isTypeArrayTypeOrUnionOfArrayTypes(
   type: ts.Type,
-  checker: ts.TypeChecker
+  checker: ts.TypeChecker,
 ): boolean {
   for (const t of unionTypeParts(type)) {
     if (!checker.isArrayType(t)) {
@@ -46,7 +46,7 @@ export function isTypeArrayTypeOrUnionOfArrayTypes(
 export function containsAllTypesByName(
   type: ts.Type,
   allowAny: boolean,
-  allowedNames: Set<string>
+  allowedNames: Set<string>,
 ): boolean {
   if (isTypeFlagSet(type, ts.TypeFlags.Any | ts.TypeFlags.Unknown)) {
     return !allowAny;
@@ -63,7 +63,7 @@ export function containsAllTypesByName(
 
   if (isUnionOrIntersectionType(type)) {
     return type.types.every((t) =>
-      containsAllTypesByName(t, allowAny, allowedNames)
+      containsAllTypesByName(t, allowAny, allowedNames),
     );
   }
 
@@ -82,7 +82,7 @@ export function containsAllTypesByName(
  */
 export function getTypeName(
   typeChecker: ts.TypeChecker,
-  type: ts.Type
+  type: ts.Type,
 ): string {
   // It handles `string` and string literal types as string.
   if ((type.flags & ts.TypeFlags.StringLike) !== 0) {
@@ -105,7 +105,7 @@ export function getTypeName(
     ) {
       return getTypeName(
         typeChecker,
-        typeChecker.getTypeFromTypeNode(typeParamDecl.constraint)
+        typeChecker.getTypeFromTypeNode(typeParamDecl.constraint),
       );
     }
   }
@@ -142,7 +142,7 @@ export function getTypeName(
  */
 export function getConstrainedTypeAtLocation(
   checker: ts.TypeChecker,
-  node: ts.Node
+  node: ts.Node,
 ): ts.Type {
   const nodeType = checker.getTypeAtLocation(node);
   const constrained = checker.getBaseConstraintOfType(nodeType);
@@ -159,7 +159,7 @@ export function isNullableType(
   {
     isReceiver = false,
     allowUndefined = true,
-  }: { isReceiver?: boolean; allowUndefined?: boolean } = {}
+  }: { isReceiver?: boolean; allowUndefined?: boolean } = {},
 ): boolean {
   const flags = getTypeFlags(type);
 
@@ -179,7 +179,7 @@ export function isNullableType(
  */
 export function getDeclaration(
   checker: ts.TypeChecker,
-  node: ts.Expression
+  node: ts.Expression,
 ): ts.Declaration | null {
   const symbol = checker.getSymbolAtLocation(node);
   if (!symbol) {
@@ -207,7 +207,7 @@ export function getTypeFlags(type: ts.Type): ts.TypeFlags {
 export function isTypeFlagSet(
   type: ts.Type,
   flagsToCheck: ts.TypeFlags,
-  isReceiver?: boolean
+  isReceiver?: boolean,
 ): boolean {
   const flags = getTypeFlags(type);
 
@@ -223,7 +223,7 @@ export function isTypeFlagSet(
  */
 export function typeIsOrHasBaseType(
   type: ts.Type,
-  parentType: ts.Type
+  parentType: ts.Type,
 ): boolean {
   const parentSymbol = parentType.getSymbol();
   if (!type.getSymbol() || !parentSymbol) {
@@ -259,7 +259,7 @@ export function getSourceFileOfNode(node: ts.Node): ts.SourceFile {
 
 export function getTokenAtPosition(
   sourceFile: ts.SourceFile,
-  position: number
+  position: number,
 ): ts.Node {
   const queue: ts.Node[] = [sourceFile];
   let current: ts.Node;
@@ -324,7 +324,7 @@ export function getEqualsKind(operator: string): EqualsKind | undefined {
 
 export function getTypeArguments(
   type: ts.TypeReference,
-  checker: ts.TypeChecker
+  checker: ts.TypeChecker,
 ): readonly ts.Type[] {
   // getTypeArguments was only added in TS3.7
   if (checker.getTypeArguments) {
@@ -359,13 +359,13 @@ export function isTypeAnyType(type: ts.Type): boolean {
  */
 export function isTypeAnyArrayType(
   type: ts.Type,
-  checker: ts.TypeChecker
+  checker: ts.TypeChecker,
 ): boolean {
   return (
     checker.isArrayType(type) &&
     isTypeAnyType(
       // getTypeArguments was only added in TS3.7
-      getTypeArguments(type, checker)[0]
+      getTypeArguments(type, checker)[0],
     )
   );
 }
@@ -375,13 +375,13 @@ export function isTypeAnyArrayType(
  */
 export function isTypeUnknownArrayType(
   type: ts.Type,
-  checker: ts.TypeChecker
+  checker: ts.TypeChecker,
 ): boolean {
   return (
     checker.isArrayType(type) &&
     isTypeUnknownType(
       // getTypeArguments was only added in TS3.7
-      getTypeArguments(type, checker)[0]
+      getTypeArguments(type, checker)[0],
     )
   );
 }
@@ -397,7 +397,7 @@ export const enum AnyType {
  */
 export function isAnyOrAnyArrayTypeDiscriminated(
   node: ts.Node,
-  checker: ts.TypeChecker
+  checker: ts.TypeChecker,
 ): AnyType {
   const type = checker.getTypeAtLocation(node);
   if (isTypeAnyType(type)) {
@@ -423,7 +423,7 @@ export function isUnsafeAssignment(
   type: ts.Type,
   receiver: ts.Type,
   checker: ts.TypeChecker,
-  senderNode: TSESTree.Node | null
+  senderNode: TSESTree.Node | null,
 ): false | { sender: ts.Type; receiver: ts.Type } {
   if (isTypeAnyType(type)) {
     // Allow assignment of any ==> unknown.
@@ -495,7 +495,7 @@ export function isUnsafeAssignment(
  */
 export function getContextualType(
   checker: ts.TypeChecker,
-  node: ts.Expression
+  node: ts.Expression,
 ): ts.Type | undefined {
   const parent = node.parent;
   if (!parent) {
@@ -526,7 +526,7 @@ export function getContextualType(
     return checker.getTypeAtLocation(parent.left);
   } else if (
     ![ts.SyntaxKind.TemplateSpan, ts.SyntaxKind.JsxExpression].includes(
-      parent.kind
+      parent.kind,
     )
   ) {
     // parent is not something we know we can get the contextual type of

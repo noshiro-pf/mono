@@ -4,7 +4,7 @@ import { type TimerObservable } from '../types';
 
 export const timer = (
   milliSeconds: number,
-  startManually: boolean = false
+  startManually: boolean = false,
 ): TimerObservable => new TimerObservableClass(milliSeconds, startManually);
 
 class TimerObservableClass

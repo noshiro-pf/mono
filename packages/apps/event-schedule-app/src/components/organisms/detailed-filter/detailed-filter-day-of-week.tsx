@@ -91,5 +91,5 @@ export const DetailedFilterDayOfWeek = memoNamed<Props>(
         </VerticalCheckboxesWrapper>
       </FilterItemContent>
     </>
-  )
+  ),
 );

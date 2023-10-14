@@ -48,7 +48,7 @@ export const InputView = memoNamed<Props>(
           onInputStringChange?.(ev.currentTarget.value);
           onInputChange?.(ev);
         },
-        [onInputStringChange, onInputChange]
+        [onInputStringChange, onInputChange],
       );
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +61,7 @@ export const InputView = memoNamed<Props>(
             inputRef.current?.select();
           }
         },
-        [selectOnFocus, onInputFocus]
+        [selectOnFocus, onInputFocus],
       );
 
     return (
@@ -82,7 +82,7 @@ export const InputView = memoNamed<Props>(
         </InputGroup>
       </InputControlGroup>
     );
-  }
+  },
 );
 
 const defaultFocusStyle = css`

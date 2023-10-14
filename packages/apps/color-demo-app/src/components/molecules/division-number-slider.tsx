@@ -25,5 +25,5 @@ export const DivisionNumberSlider = memoNamed<Props>(
         onChange={props.divisionNumberOnChange as (value: number) => void}
       />
     </div>
-  )
+  ),
 );

@@ -1,7 +1,7 @@
 import * as t from '@noshiro/io-ts';
 
 export const yearsTypeDef = t.safeUint(
-  1900
+  1900,
   // pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value
 );
 

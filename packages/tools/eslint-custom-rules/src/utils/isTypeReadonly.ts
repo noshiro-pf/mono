@@ -24,7 +24,7 @@ const enum Readonlyness {
 const checkTypeArguments = (
   checker: ts.TypeChecker,
   seenTypes: Set<ts.Type>,
-  typeReference: ts.TypeReference
+  typeReference: ts.TypeReference,
 ): Readonlyness => {
   const typeArguments = checker.getTypeArguments(typeReference);
   // this shouldn't happen in reality as:
@@ -41,7 +41,7 @@ const checkTypeArguments = (
       .some(
         (typeArg) =>
           isTypeReadonlyRecurser(checker, typeArg, seenTypes) ===
-          Readonlyness.Mutable
+          Readonlyness.Mutable,
       )
   ) {
     return Readonlyness.Mutable;
@@ -52,12 +52,12 @@ const checkTypeArguments = (
 const isTypeReadonlyArrayOrTuple = (
   checker: ts.TypeChecker,
   type: ts.Type,
-  seenTypes: Set<ts.Type>
+  seenTypes: Set<ts.Type>,
 ): Readonlyness => {
   if (checker.isArrayType(type)) {
     const symbol = nullThrows(
       type.getSymbol(),
-      NullThrowsReasons.MissingToken('symbol', 'array type')
+      NullThrowsReasons.MissingToken('symbol', 'array type'),
     );
     const escapedName = symbol.getEscapedName();
     if (escapedName === 'Array') {
@@ -81,7 +81,7 @@ const isTypeReadonlyArrayOrTuple = (
 const isTypeReadonlyObject = (
   checker: ts.TypeChecker,
   type: ts.Type,
-  seenTypes: Set<ts.Type>
+  seenTypes: Set<ts.Type>,
 ): Readonlyness => {
   const checkIndexSignature = (kind: ts.IndexKind): Readonlyness => {
     const indexInfo = checker.getIndexInfoOfType(type, kind);
@@ -113,7 +113,7 @@ const isTypeReadonlyObject = (
       const propertyType = getTypeOfPropertyOfType(checker, type, property);
       if (propertyType === undefined) {
         console.error(
-          `Expected to find a property "${property.name}" for the type.`
+          `Expected to find a property "${property.name}" for the type.`,
         );
         continue;
       }
@@ -148,7 +148,7 @@ const isTypeReadonlyObject = (
 const isTypeReadonlyRecurser = (
   checker: ts.TypeChecker,
   type: ts.Type,
-  seenTypes: Set<ts.Type>
+  seenTypes: Set<ts.Type>,
 ): Readonlyness.Immutable | Readonlyness.Mutable => {
   if (type === undefined || type === null) {
     throw new Error("type shouldn't be nullable");
@@ -208,7 +208,7 @@ const isTypeReadonlyRecurser = (
       const isTypeArgumentsReadonly = checkTypeArguments(
         checker,
         seenTypes,
-        type
+        type,
       );
       if (isTypeArgumentsReadonly !== Readonlyness.UnknownType) {
         return isTypeArgumentsReadonly;
@@ -236,6 +236,6 @@ const isTypeReadonlyRecurser = (
  */
 export const isTypeReadonly = (
   checker: ts.TypeChecker,
-  type: ts.Type
+  type: ts.Type,
 ): boolean =>
   isTypeReadonlyRecurser(checker, type, new Set()) === Readonlyness.Immutable;

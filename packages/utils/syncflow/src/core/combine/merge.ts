@@ -10,7 +10,7 @@ import {
 /** @deprecated use `createState` instead */
 export const merge = <P extends NonEmptyUnknownList>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  parents: Wrap<P>
+  parents: Wrap<P>,
 ): MergeObservable<P> => new MergeObservableClass(parents);
 
 class MergeObservableClass<P extends NonEmptyUnknownList>
@@ -28,7 +28,7 @@ class MergeObservableClass<P extends NonEmptyUnknownList>
 
   override tryUpdate(updaterSymbol: UpdaterSymbol): void {
     const parentToUse = this.parents.find(
-      (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.snapshot)
+      (o) => o.updaterSymbol === updaterSymbol && Maybe.isSome(o.snapshot),
     );
     if (parentToUse === undefined) return;
     // eslint-disable-next-line no-restricted-syntax

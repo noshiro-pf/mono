@@ -22,7 +22,7 @@ for (const s of strings) {
         validators[_name]?.isAcceptable(s) ?? false
           ? 'matches'
           : 'does not match'
-      } ${_name}`
+      } ${_name}`,
     );
   }
 }

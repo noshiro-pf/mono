@@ -3,14 +3,14 @@ import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
 export const createAnswerTable = (
   answerSelectionMapFn: (
     datetimeRange: DatetimeRange,
-    answerId: AnswerId
+    answerId: AnswerId,
   ) => readonly [
     iconId: AnswerIconIdWithNone,
     point: AnswerIconPoint,
     comment: string,
   ],
   datetimeRangeList: readonly DatetimeRange[],
-  answers: readonly Answer[]
+  answers: readonly Answer[],
 ): IMapMapped<
   DatetimeRange,
   DeepReadonly<
@@ -22,9 +22,9 @@ export const createAnswerTable = (
     datetimeRangeList.map((datetimeRange) =>
       tp(
         datetimeRange,
-        answers.map((answer) => answerSelectionMapFn(datetimeRange, answer.id))
-      )
+        answers.map((answer) => answerSelectionMapFn(datetimeRange, answer.id)),
+      ),
     ),
     datetimeRangeToMapKey,
-    datetimeRangeFromMapKey
+    datetimeRangeFromMapKey,
   );

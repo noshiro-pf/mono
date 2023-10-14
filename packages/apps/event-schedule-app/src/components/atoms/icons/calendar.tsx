@@ -58,5 +58,5 @@ export const CalendarIcon = memoNamed<Props>(
         />
       </g>
     </svg>
-  )
+  ),
 );

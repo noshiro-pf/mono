@@ -45,7 +45,7 @@ export type ObservableBase<A> = Readonly<{
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
 
   chain: (<B>(
-    operator: ToInitializedOperator<A, B>
+    operator: ToInitializedOperator<A, B>,
   ) => InitializedObservable<B>) &
     (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
 }>;
@@ -56,7 +56,7 @@ export type InitializedObservableBase<A> = ObservableBase<A> &
     chain: (<B>(
       operator:
         | InitializedToInitializedOperator<A, B>
-        | ToInitializedOperator<A, B>
+        | ToInitializedOperator<A, B>,
     ) => InitializedObservable<B>) &
       (<B>(operator: ToBaseOperator<A, B>) => Observable<B>);
   }>;
@@ -134,15 +134,15 @@ export type ManagerObservable<A> =
   | RootObservable<A, RootObservableType>;
 
 export type InitializedToInitializedOperator<A, B> = (
-  src: InitializedObservable<A>
+  src: InitializedObservable<A>,
 ) => InitializedObservable<B>;
 
 export type ToInitializedOperator<A, B> = (
-  src: InitializedObservable<A> | Observable<A>
+  src: InitializedObservable<A> | Observable<A>,
 ) => InitializedObservable<B>;
 
 export type RemoveInitializedOperator<A, B> = (
-  src: InitializedObservable<A> | Observable<A>
+  src: InitializedObservable<A> | Observable<A>,
 ) => Observable<B>;
 export type ToBaseOperator<A, B> = RemoveInitializedOperator<A, B>; // alias
 
@@ -155,15 +155,15 @@ export type Operator<A, B> =
   | ToInitializedOperator<A, B>;
 
 export const isManagerObservable = <A>(
-  obs: Observable<A>
+  obs: Observable<A>,
 ): obs is ManagerObservable<A> => obs.kind !== 'sync child';
 
 export const isRootObservable = <A>(
-  obs: Observable<A>
+  obs: Observable<A>,
 ): obs is RootObservable<A, RootObservableType> => obs.kind === 'root';
 
 export const isChildObservable = <A>(
-  obs: Observable<A>
+  obs: Observable<A>,
 ): obs is ChildObservable<A> =>
   obs.kind === 'sync child' || obs.kind === 'async child';
 

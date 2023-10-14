@@ -46,12 +46,12 @@ export const EventListItemComponent = memoNamed<Props>(
           : answers
               .find(({ user }) => user.id === fireAuthUser.uid)
               ?.selection.some((a) => a.iconId === 'none') ?? false,
-      [answers, fireAuthUser]
+      [answers, fireAuthUser],
     );
 
     const afterDeadline = useMemo(
       () => eventIsAfterDeadline(eventSchedule),
-      [eventSchedule]
+      [eventSchedule],
     );
 
     const authorName = useMemo<string>(
@@ -59,7 +59,7 @@ export const EventListItemComponent = memoNamed<Props>(
         eventSchedule.author.name === ''
           ? dc.listItem.anonymous
           : eventSchedule.author.name,
-      [eventSchedule.author.name]
+      [eventSchedule.author.name],
     );
 
     const datetimeOptionsSummary = useMemo<string>(
@@ -67,7 +67,7 @@ export const EventListItemComponent = memoNamed<Props>(
         `${ymd2str(Arr.first(eventSchedule.datetimeRangeList).ymd)} ${
           dict.common.tilde
         } ${ymd2str(Arr.last(eventSchedule.datetimeRangeList).ymd)}`,
-      [eventSchedule.datetimeRangeList]
+      [eventSchedule.datetimeRangeList],
     );
 
     const lastUpdateStr = useMemo<string>(() => {
@@ -86,7 +86,7 @@ export const EventListItemComponent = memoNamed<Props>(
           archive: onConfirmArchiving,
           unarchive: onConfirmUnArchiving,
         }),
-      [archiveOrUnArchive, onConfirmArchiving, onConfirmUnArchiving]
+      [archiveOrUnArchive, onConfirmArchiving, onConfirmUnArchiving],
     );
 
     return (
@@ -141,7 +141,7 @@ export const EventListItemComponent = memoNamed<Props>(
         </TableContainer>
       </ListItem>
     );
-  }
+  },
 );
 
 const ListItem = styled.div`

@@ -10,7 +10,7 @@ const dc = dict.eventSettingsPage.section3;
 type Props = Readonly<{
   notificationSettingsWithEmail: NotificationSettingsWithEmail;
   onNotificationSettingsWithEmailChange: (
-    value: NotificationSettingsWithEmail
+    value: NotificationSettingsWithEmail,
   ) => void;
   disabled: boolean;
   useAnswerDeadline: boolean;
@@ -31,10 +31,10 @@ export const NotificationSettingsComponent = memoNamed<Props>(
     const onEmailChange = useCallback(
       (email: string) => {
         onNotificationSettingsWithEmailChange(
-          Obj.set(notificationSettingsWithEmail, 'email', email)
+          Obj.set(notificationSettingsWithEmail, 'email', email),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
 
     const onNotifyOnAnswerChangeCheck = useCallback(
@@ -43,11 +43,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notifyOnAnswerChange',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
 
     const onNotifyAfterAnswerDeadlineCheck = useCallback(
@@ -56,11 +56,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notifyAfterAnswerDeadline',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
 
     const onNotify00daysBeforeAnswerDeadlineCheck = useCallback(
@@ -69,11 +69,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notify00daysBeforeAnswerDeadline',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
 
     const onNotify01daysBeforeAnswerDeadlineCheck = useCallback(
@@ -82,11 +82,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notify01daysBeforeAnswerDeadline',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
     const onNotify03daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
@@ -94,11 +94,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notify03daysBeforeAnswerDeadline',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
     const onNotify07daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
@@ -106,11 +106,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notify07daysBeforeAnswerDeadline',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
     const onNotify14daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
@@ -118,11 +118,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notify14daysBeforeAnswerDeadline',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
     const onNotify28daysBeforeAnswerDeadlineCheck = useCallback(
       (checked: boolean) => {
@@ -130,11 +130,11 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           Obj.set(
             notificationSettingsWithEmail,
             'notify28daysBeforeAnswerDeadline',
-            checked
-          )
+            checked,
+          ),
         );
       },
-      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange]
+      [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
     );
 
     const disabledDetail = useMemo(
@@ -175,7 +175,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
           answerDeadline === undefined ||
           ymdhmDateDiff(answerDeadline, now()) <= 28,
       }),
-      [answerDeadline, disabled, useAnswerDeadline]
+      [answerDeadline, disabled, useAnswerDeadline],
     );
 
     const invalidEmail =
@@ -287,7 +287,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const CheckboxWrapper = styled.div`

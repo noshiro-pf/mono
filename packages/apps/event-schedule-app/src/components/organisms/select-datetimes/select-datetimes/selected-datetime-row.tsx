@@ -77,5 +77,5 @@ export const SelectedDatetimeRow = memoNamed<Props>(
         <Button icon={'trash'} minimal={true} onClick={onDeleteClick} />
       </div>
     </div>
-  )
+  ),
 );

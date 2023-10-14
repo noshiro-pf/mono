@@ -1,5 +1,5 @@
 export const assertIsCredentialError: (
-  e: unknown
+  e: unknown,
 ) => asserts e is { code: string; message: string } = (e) => {
   if (
     !(

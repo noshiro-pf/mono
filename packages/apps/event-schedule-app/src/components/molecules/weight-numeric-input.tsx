@@ -36,7 +36,7 @@ export const WeightNumericInput = memoNamed<Props>(
 
     const inputProps = useMemo(
       () => ({ min, max, step, onKeyDown }),
-      [onKeyDown]
+      [onKeyDown],
     );
 
     return (
@@ -52,5 +52,5 @@ export const WeightNumericInput = memoNamed<Props>(
         onInputStringChange={setValueStr}
       />
     );
-  }
+  },
 );

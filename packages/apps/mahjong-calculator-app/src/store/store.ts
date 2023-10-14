@@ -135,7 +135,7 @@ export const numHandTiles$ = combineLatestI([
   handSorted$,
   revealedBlocks$,
 ]).chain(
-  mapI(([hand, revealedBlocks]) => hand.length + revealedBlocks.length * 3)
+  mapI(([hand, revealedBlocks]) => hand.length + revealedBlocks.length * 3),
 );
 
 // ドラの枚数
@@ -204,17 +204,17 @@ export const numRemainingTiles$: InitializedObservable<
     }
 
     return mut_counts;
-  })
+  }),
 );
 
 // 「天鳳 / 牌理」の URL
 export const tenhoURL$ = handSorted$.chain(
-  mapI((hand) => `https://tenhou.net/2/?q=${hand2TenhoString(hand)}`)
+  mapI((hand) => `https://tenhou.net/2/?q=${hand2TenhoString(hand)}`),
 );
 
 // 「ツモアガリ確率計算機」用の文字列
 export const tsumoProbStr$ = handSorted$.chain(
-  mapI((hand) => hand.map((x) => tileDef[x].TsumoProbString).join(','))
+  mapI((hand) => hand.map((x) => tileDef[x].TsumoProbString).join(',')),
 );
 
 export const problemAsText$ = combineLatestI([
@@ -226,8 +226,8 @@ export const problemAsText$ = combineLatestI([
   revealedBlocks$,
 ]).chain(
   mapI(([bakaze, jikaze, turn, doraIndicators, hand, revealedBlocks]) =>
-    problem2String(bakaze, jikaze, turn, doraIndicators, hand, revealedBlocks)
-  )
+    problem2String(bakaze, jikaze, turn, doraIndicators, hand, revealedBlocks),
+  ),
 );
 
 /* handlers */

@@ -14,7 +14,7 @@ import { fixAnswerAndUpdateMessage } from './fix-answer';
 
 export const updatePollTitle = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  message: Discord.Message
+  message: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   if (message.author.bot) return Result.ok(undefined);
 
@@ -31,7 +31,7 @@ export const updatePollTitle = async (
   if (title === undefined) return Result.ok(undefined);
 
   const pollIdResult = await firestoreApi.getPollIdByCommandMessageId(
-    toCommandMessageId(message.id)
+    toCommandMessageId(message.id),
   );
 
   if (Result.isErr(pollIdResult)) return pollIdResult;
@@ -51,7 +51,7 @@ export const updatePollTitle = async (
 
   if (channel.type !== ChannelType.GuildText) {
     return Result.err(
-      `This channel type (${channel.type}) is not supported. (GuildText only)`
+      `This channel type (${channel.type}) is not supported. (GuildText only)`,
     );
   }
 
@@ -61,7 +61,7 @@ export const updatePollTitle = async (
   ] = await Promise.all([
     createUserIdToDisplayNameMap(
       message.guild,
-      getUserIdsFromAnswers(poll.answers).toArray()
+      getUserIdsFromAnswers(poll.answers).toArray(),
     ),
     channel.messages.fetch({
       after: message.id,
@@ -83,12 +83,12 @@ export const updatePollTitle = async (
           .find((m) => m.id === pollId)
           ?.edit({
             embeds: [rpCreateSummaryMessage(newPoll, userIdToDisplayName)],
-          }) ?? Promise.resolve(undefined)
+          }) ?? Promise.resolve(undefined),
       ),
       Result.fromPromise(
         messages
           .find((m) => m.id === poll.titleMessageId)
-          ?.edit(createTitleString(title)) ?? Promise.resolve(undefined)
+          ?.edit(createTitleString(title)) ?? Promise.resolve(undefined),
       ),
     ]);
 

@@ -24,5 +24,5 @@ export const CustomIcon = memoNamed<Props>(
     }, [iconName, color, size]);
 
     return <Icon color={color} icon={icon} iconSize={size} />;
-  }
+  },
 );

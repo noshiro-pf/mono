@@ -15,7 +15,7 @@ export const params = {
 // eslint-disable-next-line security/detect-non-literal-regexp
 const getRoomIdRegexp = new RegExp(
   `^${routes.rooms}/(?<roomId>[^/]+)/.*$`,
-  'u'
+  'u',
 );
 
 export const getRoomId = (path: string): string | undefined =>
@@ -25,7 +25,7 @@ export const isMainPage = (path: string): boolean =>
   path === routes.main || path === Router.utils.withSlash(routes.createRoom);
 
 export const getParams = (
-  queryParams: ReadonlyURLSearchParams
+  queryParams: ReadonlyURLSearchParams,
 ): DeepReadonly<{
   playerId: string | undefined;
   replay: boolean;

@@ -5,7 +5,7 @@ import { type NWES } from '../../types';
 const playerNamePositionsAction$ = source<readonly [NWES, Rect]>();
 
 export const playerNamePositionsDispatcher = (
-  action: readonly [NWES, Rect]
+  action: readonly [NWES, Rect],
 ): void => {
   playerNamePositionsAction$.next(action);
 };
@@ -13,5 +13,5 @@ export const playerNamePositionsDispatcher = (
 export const playerNamePositions$: InitializedObservable<
   Record<NWES, Rect> | undefined
 > = playerNamePositionsAction$.chain(
-  scan(playerNamePositionsReducer, undefined)
+  scan(playerNamePositionsReducer, undefined),
 );

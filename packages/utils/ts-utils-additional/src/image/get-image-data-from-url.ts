@@ -1,5 +1,5 @@
 export const getImageElementFromUrl = (
-  url: string
+  url: string,
 ): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const mut_img: Writable<HTMLImageElement> = new Image();

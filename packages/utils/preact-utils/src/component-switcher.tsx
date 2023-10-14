@@ -22,9 +22,9 @@ export const ComponentSwitcher = memoNamed<Props>(
             <div key={i} style={displayNoneStyle}>
               {c}
             </div>
-          )
+          ),
         )
       }
     </>
-  )
+  ),
 );

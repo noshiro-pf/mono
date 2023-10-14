@@ -67,7 +67,7 @@ export const AspectRatioLimiter = memoNamed<Props>(
         paddingRight: `${padding.right}px`,
         paddingBottom: `${padding.bottom}px`,
       }),
-      [padding]
+      [padding],
     );
 
     return (
@@ -75,5 +75,5 @@ export const AspectRatioLimiter = memoNamed<Props>(
         {children}
       </Root>
     );
-  }
+  },
 );

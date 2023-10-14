@@ -41,7 +41,7 @@ export const answerCreationListener = regionSelected.firestore
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
       answerItemBefore: undefined,
       answerItemAfter: fillAnswerWithCheck(snapshot.data()),
-    })
+    }),
   );
 
 export const answerDeletionListener = regionSelected.firestore
@@ -52,7 +52,7 @@ export const answerDeletionListener = regionSelected.firestore
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
       answerItemBefore: fillAnswerWithCheck(snapshot.data()),
       answerItemAfter: undefined,
-    })
+    }),
   );
 
 export const answerUpdateListener = regionSelected.firestore
@@ -63,7 +63,7 @@ export const answerUpdateListener = regionSelected.firestore
       eventId: toStringWithCheck(context.params[wildcard.eventId]),
       answerItemBefore: fillAnswerWithCheck(change.before.data()),
       answerItemAfter: fillAnswerWithCheck(change.after.data()),
-    })
+    }),
   );
 
 export const notifyAnswerDeadlineEveryday = regionSelected.pubsub
@@ -112,7 +112,7 @@ export const fetchEventListOfUser = regionSelected
     if (!isFetchEventListOfUserPayload(payload)) {
       throw new https.HttpsError(
         'invalid-argument',
-        'The payload type is invalid.'
+        'The payload type is invalid.',
       );
     }
 
@@ -124,12 +124,12 @@ export const verifyEmail = regionSelected.https.onCall(
     if (!isVerifyEmailPayload(payload)) {
       throw new https.HttpsError(
         'invalid-argument',
-        'The payload type is invalid.'
+        'The payload type is invalid.',
       );
     }
 
     return verifyEmailImpl(db, payload);
-  }
+  },
 );
 
 export const sendReport = regionSelected.https.onCall(
@@ -137,10 +137,10 @@ export const sendReport = regionSelected.https.onCall(
     if (!isSendReportPayload(payload)) {
       throw new https.HttpsError(
         'invalid-argument',
-        'The payload type is invalid.'
+        'The payload type is invalid.',
       );
     }
 
     sendReportImpl(payload).catch(logger.error);
-  }
+  },
 );

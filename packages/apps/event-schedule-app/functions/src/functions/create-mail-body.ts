@@ -56,7 +56,7 @@ export const createMailBodyForUpdatedAnswer = ({
     ...answerDiffAsString(
       answerItemBefore,
       answerItemAfter,
-      datetimeSpecification
+      datetimeSpecification,
     ),
   ].join('\n');
 

@@ -19,7 +19,7 @@ const main = async () => {
     const result = await generateRulesType(
       plugin.typeName,
       plugin.pluginName,
-      plugin.rulePrefix
+      plugin.rulePrefix,
     );
 
     const targetFilePath = `${thisDir}/../eslint-rules/rules-type/${plugin.outputFileName}`;
@@ -30,13 +30,13 @@ const main = async () => {
   console.log('running `lint --fix` ... (adding "readonly")');
 
   await execAsync(
-    `eslint --fix --no-eslintrc --config ${thisDir}/.eslintrc.generate-rules-type.js ${rulesTypeDir} --ext .ts`
+    `eslint --fix --no-eslintrc --config ${thisDir}/.eslintrc.generate-rules-type.js ${rulesTypeDir} --ext .ts`,
   );
 
   console.log('formatting code ...');
 
   await execAsync(
-    `prettier --cache --cache-strategy content --write ${rulesTypeDir}`
+    `prettier --cache --cache-strategy content --write ${rulesTypeDir}`,
   );
 
   for (const plugin of Object.values(eslintPlugins)) {
@@ -54,7 +54,7 @@ const main = async () => {
   console.log('formatting code ...');
 
   await execAsync(
-    `prettier --cache --cache-strategy content --write ${rulesTypeDir}`
+    `prettier --cache --cache-strategy content --write ${rulesTypeDir}`,
   );
 };
 

@@ -45,11 +45,11 @@ function extract(file: string, identifiers: string[]): void {
   if (!foundNodes.length) {
     console.log(
       `Could not find any of ${identifiers.join(
-        ', '
+        ', ',
       )} in ${file}, found: ${unfoundNodes
         .filter((f) => f[0])
         .map((f) => f[0])
-        .join(', ')}.`
+        .join(', ')}.`,
     );
     process.exitCode = 1;
   } else {
@@ -57,7 +57,7 @@ function extract(file: string, identifiers: string[]): void {
       const [name, node] = f;
       console.log('### ' + name + '\n');
       console.log(
-        printer.printNode(ts.EmitHint.Unspecified, node, sourceFile)
+        printer.printNode(ts.EmitHint.Unspecified, node, sourceFile),
       ) + '\n';
     });
   }

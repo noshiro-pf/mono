@@ -2,7 +2,7 @@
 import { useState as _useState, useCallback } from 'preact/hooks';
 
 export const useState = <T>(
-  initialState: T
+  initialState: T,
 ): Readonly<{
   state: T;
   setState: (next: T) => void;
@@ -19,7 +19,7 @@ export const useState = <T>(
     (updateFn: (v: T) => T) => {
       setState(updateFn);
     },
-    [setState]
+    [setState],
   );
 
   return { state, setState, updateState, resetState };

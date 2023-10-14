@@ -8,7 +8,7 @@ import { EventListPageFilterStore } from '../event-list-page-state';
 const [fetchEventList$, fetchEventList] = createVoidEventEmitter();
 
 const fetchEventListThrottled$ = fetchEventList$.chain(
-  throttleTime(fetchThrottleTime)
+  throttleTime(fetchThrottleTime),
 );
 
 const { state$: eventListResult$, setState: setEventListResult } = createState<
@@ -47,8 +47,8 @@ combineLatest(
       .chain(mapI(([_, filterText]) => filterText)),
     EventListPageFilterStore.filterOptionState$,
     EventListPageFilterStore.showAllPastDaysEvent$,
-    EventListPageFilterStore.showOnlyEventSchedulesICreated$
-  )
+    EventListPageFilterStore.showOnlyEventSchedulesICreated$,
+  ),
 ).subscribe(
   ([
     _,
@@ -77,7 +77,7 @@ combineLatest(
         setRefreshButtonIsLoading(false);
       })
       .catch(noop);
-  }
+  },
 );
 
 result$.subscribe((e) => {

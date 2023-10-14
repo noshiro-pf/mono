@@ -65,7 +65,7 @@ export const NumericInputView = memoNamed<Props>(
           onInputStringChange?.(ev.currentTarget.value);
           onInputChange?.(ev);
         },
-        [onInputStringChange, onInputChange]
+        [onInputStringChange, onInputChange],
       );
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -78,7 +78,7 @@ export const NumericInputView = memoNamed<Props>(
             inputRef.current?.select();
           }
         },
-        [selectOnFocus, onInputFocus]
+        [selectOnFocus, onInputFocus],
       );
 
     return (
@@ -141,7 +141,7 @@ export const NumericInputView = memoNamed<Props>(
         </ButtonGroupVerticalFixed>
       </NumericInputControlGroup>
     );
-  }
+  },
 );
 
 type StyleProps = Readonly<{ disabled?: boolean; fillSpace?: boolean }>;

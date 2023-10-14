@@ -81,7 +81,7 @@ function App() {
       __props_transactions,
       _el_10,
       'onClick',
-      handleDecrement
+      handleDecrement,
     );
   };
 
@@ -105,7 +105,7 @@ function App() {
       ],
     ],
     false,
-    __props_transactions
+    __props_transactions,
   );
   return {
     element: _el_,

@@ -42,7 +42,7 @@ export class TableSettings implements ITableSettingsFilled {
       this.sortInit = { active: NoColumn, direction: '' };
     } else {
       this.headerSettings = initializer.headerSettings.map(
-        (e) => new HeaderSetting(e)
+        (e) => new HeaderSetting(e),
       );
       this.displayNo = !!initializer.displayNo;
       this.usepagination = !!initializer.usepagination;

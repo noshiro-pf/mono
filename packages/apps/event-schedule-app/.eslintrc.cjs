@@ -14,14 +14,14 @@ const {
 const { devDependencies } = require('./package.json');
 
 const globalUtils = Object.keys(devDependencies).filter((packageName) =>
-  packageName.startsWith('@noshiro/global-')
+  packageName.startsWith('@noshiro/global-'),
 );
 
 const eslintNoRestrictedImportsDefs = globalUtils.map(
   (packageName) =>
     require(`${packageName}/cjs/eslint-no-restricted-imports-def`)[
       'eslintNoRestrictedImportsDef'
-    ]
+    ],
 );
 
 /** @type {TypeScriptEslintRules["@typescript-eslint/no-restricted-imports"]} */

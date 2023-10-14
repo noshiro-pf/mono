@@ -18,7 +18,7 @@ export const confirmEmailDialogFormInitialState = {
 } as const satisfies ConfirmEmailDialogFormState;
 
 export const confirmEmailDialogHasError = (
-  state: ConfirmEmailDialogFormState
+  state: ConfirmEmailDialogFormState,
 ): boolean =>
   emailInputHasError(state.email) || state.otherErrors !== undefined;
 
@@ -43,7 +43,7 @@ export const confirmEmailDialogFormStateReducer: Reducer<
         emailInputStateReducer(state.email, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setEmailDoesNotMatchError':
@@ -55,8 +55,8 @@ export const confirmEmailDialogFormStateReducer: Reducer<
               payload:
                 dict.answerPage.eventInfo.verifyEmailDialog
                   .editButtonConfirmDialogValidationFailedMessage,
-            })
-          )
+            }),
+          ),
         )
         .chain((draft) => Obj.set(draft, 'isWaitingResponse', false)).value;
 
@@ -77,8 +77,8 @@ export const confirmEmailDialogFormStateReducer: Reducer<
           Obj.set(
             draft,
             'isWaitingResponse',
-            !emailInputHasError(emailNextState)
-          )
+            !emailInputHasError(emailNextState),
+          ),
         ).value;
     }
 

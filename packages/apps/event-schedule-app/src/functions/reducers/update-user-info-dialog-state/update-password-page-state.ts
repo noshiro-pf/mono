@@ -24,7 +24,7 @@ export const updatePasswordPageInitialState = {
 } as const satisfies UpdatePasswordPageState;
 
 export const updatePasswordPageHasError = (
-  state: UpdatePasswordPageState
+  state: UpdatePasswordPageState,
 ): boolean =>
   inputHasError(state.oldPassword) ||
   passwordWithConfirmationHasError(state.newPassword) ||
@@ -55,7 +55,7 @@ export const updatePasswordPageStateReducer: Reducer<
         inputStateReducer(state.oldPassword, {
           type: 'input',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'inputNewPassword':
@@ -65,7 +65,7 @@ export const updatePasswordPageStateReducer: Reducer<
         passwordWithConfirmationStateReducer(state.newPassword, {
           type: 'inputPassword',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'inputNewPasswordConfirmation':
@@ -75,7 +75,7 @@ export const updatePasswordPageStateReducer: Reducer<
         passwordWithConfirmationStateReducer(state.newPassword, {
           type: 'inputPasswordConfirmation',
           payload: action.payload,
-        })
+        }),
       );
 
     case 'setOldPasswordError':
@@ -124,7 +124,7 @@ export const updatePasswordPageStateReducer: Reducer<
         state.newPassword,
         {
           type: 'submit',
-        }
+        },
       );
 
       return {

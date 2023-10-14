@@ -13,13 +13,13 @@ import { userIdToMention } from './user-id-to-mention';
 export const rpCreateSummaryField = (
   dateOption: DateOption,
   poll: Poll,
-  userIdToDisplayName: IMap<UserId, string>
+  userIdToDisplayName: IMap<UserId, string>,
 ): Discord.EmbedField => {
   const answerOfDate = poll.answers.get(dateOption.id);
   if (answerOfDate === undefined) {
     return rpFormatEmbedField(
       dateOption.label,
-      rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName)
+      rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName),
     );
   }
   if (
@@ -28,20 +28,20 @@ export const rpCreateSummaryField = (
   ) {
     return rpFormatEmbedField(
       dateOption.label,
-      rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName)
+      rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName),
     );
   }
 
   return rpCreateSummaryFieldSub(
     dateOption.label,
     answerOfDate,
-    userIdToDisplayName
+    userIdToDisplayName,
   );
 };
 
 const rpFormatEmbedField = (
   pollName: string,
-  value: string
+  value: string,
 ): Discord.EmbedField => ({
   inline: false,
   name: `**${pollName}**`,
@@ -51,16 +51,16 @@ const rpFormatEmbedField = (
 const rpCreateSummaryFieldSub = (
   pollName: string,
   answerOfDate: AnswerOfDate,
-  userIdToDisplayName: IMap<UserId, string>
+  userIdToDisplayName: IMap<UserId, string>,
 ): Discord.EmbedField =>
   rpFormatEmbedField(
     pollName,
-    rpCreateSummaryValue(answerOfDate, userIdToDisplayName)
+    rpCreateSummaryValue(answerOfDate, userIdToDisplayName),
   );
 
 export const rpCreateSummaryValue = (
   value: AnswerOfDate,
-  userIdToDisplayName: IMap<UserId, string>
+  userIdToDisplayName: IMap<UserId, string>,
 ): string =>
   [
     value.good.size === 0
@@ -79,19 +79,19 @@ export const rpCreateSummaryValue = (
 export const rpCreateSummaryValueElement = (
   reactions: ISet<UserId>,
   answerType: AnswerType,
-  userIdToDisplayName: IMap<UserId, string>
+  userIdToDisplayName: IMap<UserId, string>,
 ): string =>
   `${emojis[answerType].name} :${rpToUserListString(
     reactions,
-    userIdToDisplayName
+    userIdToDisplayName,
   )}`;
 
 const rpToUserListString = (
   reactions: ISet<UserId>,
-  userIdToDisplayName: IMap<UserId, string>
+  userIdToDisplayName: IMap<UserId, string>,
 ): string =>
   `\t(${reactions.size})\t${Arr.sorted(reactions.toArray(), (a, b) =>
-    a.localeCompare(b)
+    a.localeCompare(b),
   )
     .map((id) => userIdToDisplayName.get(id) ?? userIdToMention(id))
     .join(', ')}`.trimEnd();
@@ -101,7 +101,7 @@ export const gpCreateSummaryField = (group: Group): Discord.EmbedField =>
 
 const gpFormatEmbedFieldData = (
   groupName: string,
-  value: string
+  value: string,
 ): Discord.EmbedField => ({
   inline: true,
   name: `**${groupName}**`,

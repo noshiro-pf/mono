@@ -32,7 +32,7 @@ export const App = () => {
 ```tsx
 function component<P, M>(
     model: (props: P) => M,
-    view: (model: M) => JSX.Element
+    view: (model: M) => JSX.Element,
 ) {}
 interface Props {
     prefix: string;
@@ -58,7 +58,7 @@ export const App = component(
                 {'-1'}
             </button>
         </div>
-    )
+    ),
 );
 ```
 
@@ -84,7 +84,7 @@ export const App = component(
                 {'-1'}
             </button>
         </div>
-    )
+    ),
 );
 ```
 

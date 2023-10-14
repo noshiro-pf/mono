@@ -3,7 +3,7 @@ import { answerIconPointTypeDef, type AnswerIconPoint } from '../../enum';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const answerIconSettingTypeDef = <D extends AnswerIconPoint>(
-  defaultValue: D
+  defaultValue: D,
 ) =>
   t.record({
     description: t.string(''),

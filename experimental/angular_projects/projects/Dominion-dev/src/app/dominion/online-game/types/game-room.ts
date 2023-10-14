@@ -35,7 +35,7 @@ export class GameRoom {
       timeStamp: number;
       selectedCards: any;
       initialState: GameState;
-    }
+    },
   ) {
     this.databaseKey = databaseKey || '';
 
@@ -55,7 +55,7 @@ export class GameRoom {
 
   playersNameShuffled() {
     return this.playersNameList.map(
-      (_, i) => this.playersNameList[this.playerShuffler[i]]
+      (_, i) => this.playersNameList[this.playerShuffler[i]],
     );
   }
 
@@ -80,13 +80,13 @@ export class GameRoom {
 
     const addMultipleCards = (
       placePath: (string | number)[],
-      cardListIndex: number
+      cardListIndex: number,
     ) => {
       const N = pileSize(
         cardList,
         cardListIndex,
         this.numberOfPlayers,
-        this.selectedCards.DarkAges
+        this.selectedCards.DarkAges,
       );
       for (let i = 0; i < N; ++i) {
         addCard(cardListIndex, placePath);

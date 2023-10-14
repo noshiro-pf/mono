@@ -35,7 +35,7 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
           disableFiltering();
         }
       },
-      [enableFiltering, disableFiltering]
+      [enableFiltering, disableFiltering],
     );
 
     return (
@@ -87,7 +87,7 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
         </Footer>
       </div>
     );
-  }
+  },
 );
 
 const numericInputWrapperWidthPx = 120;

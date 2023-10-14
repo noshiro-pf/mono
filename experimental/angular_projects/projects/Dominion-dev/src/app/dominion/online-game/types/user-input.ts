@@ -26,7 +26,7 @@ export class UserInput {
         shuffleBy: number[];
       };
     },
-    index?: number
+    index?: number,
   ) {
     this.command = initObj.command || '';
     this.data = {

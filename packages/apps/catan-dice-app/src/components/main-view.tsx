@@ -127,7 +127,7 @@ export const MainView = memoNamed<Props>(
         </div>
       </Paper>
     </div>
-  )
+  ),
 );
 
 const buttonWithMarginStyle = css`

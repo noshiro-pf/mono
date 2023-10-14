@@ -4,27 +4,27 @@ import { Maybe } from '@noshiro/ts-utils';
 import { useEffect, useMemo } from 'preact/hooks';
 
 export function useObservable<A>(
-  createObservable$: () => InitializedObservable<A>
+  createObservable$: () => InitializedObservable<A>,
 ): InitializedObservable<A>;
 export function useObservable<A>(
-  createObservable$: () => Observable<A>
+  createObservable$: () => Observable<A>,
 ): Observable<A>;
 export function useObservable<A>(
-  createObservable$: () => Observable<A>
+  createObservable$: () => Observable<A>,
 ): Observable<A> {
   const s = useMemo(createObservable$, []);
   useEffect(
     () => () => {
       s.complete();
     },
-    []
+    [],
   );
   return s;
 }
 
 export const useObservableEffect = <A>(
   observable$: Observable<A>,
-  subscriptionFn: (v: A) => void
+  subscriptionFn: (v: A) => void,
 ): void => {
   useEffect(() => {
     const s = observable$.subscribe(subscriptionFn);
@@ -38,15 +38,15 @@ export const useObservableEffect = <A>(
 
 export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
-  initialValue: B
+  initialValue: B,
 ): A | B;
 export function useObservableValue<A>(observable$: InitializedObservable<A>): A;
 export function useObservableValue<A>(
-  observable$: Observable<A>
+  observable$: Observable<A>,
 ): A | undefined;
 export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
-  initialValue?: B
+  initialValue?: B,
 ): A | B | undefined {
   const { state, setState } = useState<{ value: A | B | undefined }>({
     value: Maybe.unwrap(observable$.snapshot) ?? initialValue,

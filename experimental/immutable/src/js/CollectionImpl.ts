@@ -249,7 +249,7 @@ mixin(Collection, {
       initialReduction,
       context,
       arguments.length < 2,
-      false
+      false,
     );
   },
 
@@ -260,7 +260,7 @@ mixin(Collection, {
       initialReduction,
       context,
       arguments.length < 2,
-      true
+      true,
     );
   },
 
@@ -296,7 +296,7 @@ mixin(Collection, {
 
   count(predicate, context) {
     return ensureSize(
-      predicate ? this.toSeq().filter(predicate, context) : this
+      predicate ? this.toSeq().filter(predicate, context) : this,
     );
   },
 
@@ -422,7 +422,7 @@ mixin(Collection, {
   min(comparator) {
     return maxFactory(
       this,
-      comparator ? neg(comparator) : defaultNegComparator
+      comparator ? neg(comparator) : defaultNegComparator,
     );
   },
 
@@ -430,7 +430,7 @@ mixin(Collection, {
     return maxFactory(
       this,
       comparator ? neg(comparator) : defaultNegComparator,
-      mapper
+      mapper,
     );
   },
 
@@ -519,7 +519,7 @@ mixin(KeyedCollection, {
       this,
       this.toSeq()
         .map((v, k) => mapper.call(context, [k, v], iterations++, this))
-        .fromEntrySeq()
+        .fromEntrySeq(),
     );
   },
 
@@ -529,7 +529,7 @@ mixin(KeyedCollection, {
       this.toSeq()
         .flip()
         .map((k, v) => mapper.call(context, k, v, this))
-        .flip()
+        .flip(),
     );
   },
 });
@@ -592,7 +592,7 @@ mixin(IndexedCollection, {
       this,
       numArgs === 1
         ? spliced
-        : spliced.concat(arrCopy(arguments, 2), this.slice(index + removeNum))
+        : spliced.concat(arrCopy(arguments, 2), this.slice(index + removeNum)),
     );
   },
 
@@ -769,7 +769,7 @@ function hashCollection(collection) {
         }
       : (v) => {
           h = (h + hash(v)) | 0;
-        }
+        },
   );
   return murmurHashOfSize(size, h);
 }

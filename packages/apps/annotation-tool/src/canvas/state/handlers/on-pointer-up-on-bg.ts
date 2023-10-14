@@ -14,7 +14,7 @@ export const onPointerUpOnBackground = (
   newBboxColor: Readonly<{ border: Rgba; face: Rgba }>,
   canvasStyles: AnnotationCanvasStyle,
   mut_pixiApp: PixiApp,
-  stateHandler: CanvasAppStateHandler
+  stateHandler: CanvasAppStateHandler,
 ): void => {
   if (mut_state.grabbingObject.type === 'background') {
     addBboxToCanvas(
@@ -24,7 +24,7 @@ export const onPointerUpOnBackground = (
       newBboxColor,
       canvasStyles,
       mut_pixiApp.app,
-      stateHandler
+      stateHandler,
     );
   }
   mut_state.grabbingObject = { type: undefined };

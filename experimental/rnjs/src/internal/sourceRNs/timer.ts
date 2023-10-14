@@ -3,7 +3,7 @@ import { RN } from '../RN';
 export const timer = (
   milliSec: number,
   startImmediately: boolean = false,
-  name: string = ''
+  name: string = '',
 ): TimerRN => new TimerRN(milliSec, startImmediately, name);
 
 class TimerRN extends RN<number> {
@@ -14,7 +14,7 @@ class TimerRN extends RN<number> {
   constructor(
     milliSec: number,
     startImmediately: boolean = false,
-    name: string = ''
+    name: string = '',
   ) {
     super(0, [], name);
     this.milliSec = milliSec;

@@ -7,7 +7,7 @@ export const moveBbox = (
   pixiBbox: PixiBbox,
   rectPrevious: Rect,
   from: Point,
-  to: Point
+  to: Point,
 ): void => {
   updatePixiBbox(pixiBbox, moveRect(rectPrevious, from, to));
 };

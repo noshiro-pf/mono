@@ -6,7 +6,7 @@ export const mapEach =
   <P, E, S, PR = P, ER = E, SR = S>(
     mapP: (value: P) => PR,
     mapE: (value: E) => ER,
-    mapS: (value: S) => SR
+    mapS: (value: S) => SR,
   ) =>
   (target: PromiseState<P, E, S>): PromiseState<PR, ER, SR> => {
     switch (target.status) {

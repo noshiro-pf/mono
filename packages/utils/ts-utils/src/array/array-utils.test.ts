@@ -785,7 +785,7 @@ describe('ArrayUtils.sortedBy', () => {
     const sorted = Arr.sortedBy(
       xs,
       (x) => x.v,
-      (a, b) => a - b
+      (a, b) => a - b,
     );
 
     expectType<
@@ -950,7 +950,7 @@ describe('ArrayUtils.countBy', () => {
         [1, 3],
         [2, 2],
         [3, 1],
-      ])
+      ]),
     );
   });
 });
@@ -1011,7 +1011,7 @@ describe('ArrayUtils.groupBy', () => {
           ],
         ],
         [3, [{ x: 3, y: 1 }]],
-      ])
+      ]),
     );
   });
 });

@@ -10,7 +10,7 @@ import { type CanvasAppState } from '../canvas-state-type';
 export const onPointerMove = (
   mut_state: CanvasAppState,
   pointerPos: Point,
-  pixiApp: PixiApp
+  pixiApp: PixiApp,
 ): void => {
   mut_state.pointerPos = pointerPos;
   pixiApp.verticalLine.position.set(pointerPos.x, 0);
@@ -27,7 +27,7 @@ export const onPointerMove = (
         rectFrom2Points(mut_state.dragStartPoint, mut_state.dragEndPoint),
         pixiApp.temporaryRect.style.faceColor,
         pixiApp.temporaryRect.style.borderWidthPx,
-        pixiApp.temporaryRect.style.borderColor
+        pixiApp.temporaryRect.style.borderColor,
       );
       break;
     case 'bbox-face':
@@ -35,7 +35,7 @@ export const onPointerMove = (
         mut_state.grabbingObject.pixiBbox,
         mut_state.grabbingObject.rectPrevious,
         mut_state.dragStartPoint,
-        mut_state.dragEndPoint
+        mut_state.dragEndPoint,
       );
       break;
     case 'bbox-point':
@@ -44,7 +44,7 @@ export const onPointerMove = (
         mut_state.grabbingObject.rectPrevious,
         mut_state.grabbingObject.direction,
         mut_state.dragStartPoint,
-        mut_state.dragEndPoint
+        mut_state.dragEndPoint,
       );
       break;
     default:

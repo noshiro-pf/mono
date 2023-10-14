@@ -28,7 +28,7 @@ const toCapitalCase = (str: string): string =>
 const isArray = (a: unknown): a is readonly unknown[] => Array.isArray(a);
 
 const normalizeToSchemaArray = (
-  schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined
+  schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined,
 ): DeepReadonly<JSONSchema4[]> =>
   schema === undefined ? [] : isArray(schema) ? schema : [schema];
 
@@ -70,7 +70,7 @@ const metaToString = (meta: Meta): string => {
       Math.max(keyMax, key.length) as SafeUint,
       Math.max(valueMax, value.length) as SafeUint,
     ],
-    [tableHeader[0].length as SafeUint, tableHeader[1].length as SafeUint]
+    [tableHeader[0].length as SafeUint, tableHeader[1].length as SafeUint],
   );
 
   const result = [
@@ -82,18 +82,18 @@ const metaToString = (meta: Meta): string => {
     ' *',
     ` *  | ${tableHeader[0].padEnd(
       longestKeyLength,
-      ' '
+      ' ',
     )} | ${tableHeader[1].padEnd(longestValueLength, ' ')} |`,
     ` *  | ${':'.padEnd(longestKeyLength, '-')} | ${':'.padEnd(
       longestValueLength,
-      '-'
+      '-',
     )} |`,
     ...keyValuesStr.map(
       ([key, value]) =>
         ` *  | ${key.padEnd(longestKeyLength, ' ')} | ${value.padEnd(
           longestValueLength,
-          ' '
-        )} |`
+          ' ',
+        )} |`,
     ),
     ' */',
   ];
@@ -101,7 +101,7 @@ const metaToString = (meta: Meta): string => {
 };
 
 const rawSchemaToString = (
-  rawSchema: DeepReadonly<JSONSchema4 | JSONSchema4[] | undefined>
+  rawSchema: DeepReadonly<JSONSchema4 | JSONSchema4[] | undefined>,
 ): string[] =>
   rawSchema === undefined
     ? []
@@ -130,7 +130,7 @@ const createResult = async (
     }[]
   >,
   typeName: string,
-  ruleNamePrefix: string
+  ruleNamePrefix: string,
 ): Promise<string> => {
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
@@ -175,7 +175,7 @@ const createResult = async (
           const optionsType = await compile(
             sc as JSONSchema4,
             'Options',
-            compilerConfig
+            compilerConfig,
           ).catch((error) => {
             // eslint-disable-next-line no-restricted-globals
             throw new Error(String(error));
@@ -185,7 +185,7 @@ const createResult = async (
             optionsType,
             '',
             '  export type RuleEntry = Linter.RuleLevel',
-            '   | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;'
+            '   | SpreadOptionsIfIsArray<readonly [Linter.RuleLevel, Options]>;',
           );
           break;
         }
@@ -196,8 +196,8 @@ const createResult = async (
           // eslint-disable-next-line no-await-in-loop
           const optionsTypeList: readonly string[] = await Promise.all(
             schema.map((s, index) =>
-              compile(s as JSONSchema4, `Options${index}`, compilerConfig)
-            )
+              compile(s as JSONSchema4, `Options${index}`, compilerConfig),
+            ),
           ).catch((error) => {
             // eslint-disable-next-line no-restricted-globals
             throw new Error(String(error));
@@ -215,9 +215,9 @@ const createResult = async (
               (_, i) =>
                 `   | readonly [Linter.RuleLevel, ${OptionsStrs.slice(
                   0,
-                  (i + 1) as SafeUint
-                ).join(', ')}]`
-            )
+                  (i + 1) as SafeUint,
+                ).join(', ')}]`,
+            ),
           );
           break;
         }
@@ -236,8 +236,8 @@ const createResult = async (
       .map(
         ({ ruleName }) =>
           `'${ruleNamePrefix}${ruleName}': ${toCapitalCase(
-            ruleName
-          )}.RuleEntry;`
+            ruleName,
+          )}.RuleEntry;`,
       ),
 
     ...(deprecatedSchemaList.length === 0
@@ -248,12 +248,12 @@ const createResult = async (
           ...deprecatedSchemaList.map(
             ({ ruleName }) =>
               `'${ruleNamePrefix}${ruleName}': ${toCapitalCase(
-                ruleName
-              )}.RuleEntry;`
+                ruleName,
+              )}.RuleEntry;`,
           ),
         ]),
 
-    '}'
+    '}',
   );
 
   return mut_resultToWrite.join('\n');
@@ -261,7 +261,7 @@ const createResult = async (
 
 const createRulePrefix = (
   rulePrefixOrNull: string | undefined,
-  pluginName: string
+  pluginName: string,
 ): string =>
   pluginName === 'eslint'
     ? ''
@@ -272,7 +272,7 @@ const createRulePrefix = (
 export const generateRulesType = (
   typeName: string,
   pluginName: string,
-  rulePrefixOrNull: string | undefined
+  rulePrefixOrNull: string | undefined,
 ): Promise<string> => {
   const rules: DeepReadonly<
     [string, TSESLint.RuleModule<string, unknown[]>][]
@@ -281,8 +281,9 @@ export const generateRulesType = (
       ? deepCopy(
           Array.from(
             // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-require-imports,import/no-internal-modules,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,unicorn/prefer-module
-            require('eslint/use-at-your-own-risk')?.builtinRules.entries() ?? []
-          )
+            require('eslint/use-at-your-own-risk')?.builtinRules.entries() ??
+              [],
+          ),
         )
       : // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, import/no-dynamic-require, security/detect-non-literal-require, @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, unicorn/prefer-module, no-restricted-syntax
         Object.entries(require(pluginName).rules);
@@ -298,7 +299,9 @@ export const generateRulesType = (
   > = rules.map(([ruleName, value]) => ({
     ruleName,
     schema: normalizeToSchemaArray(
-      value.meta.schema as DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined
+      value.meta.schema as
+        | DeepReadonly<JSONSchema4 | JSONSchema4[]>
+        | undefined,
     ),
     deprecated: value.meta.deprecated ?? false,
     rawSchema: value.meta.schema,
@@ -308,7 +311,7 @@ export const generateRulesType = (
   return createResult(
     schemaList,
     typeName,
-    createRulePrefix(rulePrefixOrNull, pluginName)
+    createRulePrefix(rulePrefixOrNull, pluginName),
   );
 };
 

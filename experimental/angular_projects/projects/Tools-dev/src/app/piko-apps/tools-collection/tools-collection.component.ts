@@ -40,7 +40,7 @@ export class ToolsCollectionComponent implements OnInit {
           title: 'JSON pretty print',
           subtitle: 'テキスト変換（JSON整形）',
         },
-      ])
+      ]),
     );
   }
 

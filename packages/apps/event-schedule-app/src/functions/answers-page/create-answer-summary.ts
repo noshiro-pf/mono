@@ -9,7 +9,7 @@ export const createAnswerSummary = (
       [iconId: AnswerIconIdWithNone, point: AnswerIconPoint, comment: string][]
     >,
     DatetimeRangeMapKey
-  >
+  >,
 ): IMapMapped<DatetimeRange, ArrayOfLength<3, number>, DatetimeRangeMapKey> =>
   IMapMapped.new(
     datetimeRangeList.map((datetimeRange) => {
@@ -28,7 +28,7 @@ export const createAnswerSummary = (
       }
 
       const answerGroups: IMap<AnswerIconIdWithNone, number> = pipe(
-        answersForThisDatetimeRange.map(([iconId, _point]) => iconId)
+        answersForThisDatetimeRange.map(([iconId, _point]) => iconId),
       )
         .chain((list) => Arr.groupBy(list, (x) => x))
         .chain((groups) => groups.map((v) => v.length)).value;
@@ -36,24 +36,24 @@ export const createAnswerSummary = (
       const counts = tp(
         answerGroups.get('good') ?? 0,
         answerGroups.get('fair') ?? 0,
-        answerGroups.get('poor') ?? 0
+        answerGroups.get('poor') ?? 0,
       );
 
       return tp(datetimeRange, counts);
     }),
     datetimeRangeToMapKey,
-    datetimeRangeFromMapKey
+    datetimeRangeFromMapKey,
   );
 
 const calcScoreSum = (
   answerPointList: readonly AnswerIconPoint[],
   answerWeightList: readonly Weight[],
-  isRequiredParticipantsList: readonly boolean[]
+  isRequiredParticipantsList: readonly boolean[],
 ): number => {
   const someRequiredParticipantsScoreIs0: boolean = pipe(
-    Arr.zip(isRequiredParticipantsList, answerPointList)
+    Arr.zip(isRequiredParticipantsList, answerPointList),
   ).chain((list) =>
-    list.some(([required, score]) => required && score === 0)
+    list.some(([required, score]) => required && score === 0),
   ).value;
 
   return someRequiredParticipantsScoreIs0
@@ -80,7 +80,7 @@ export const createScore = (
     >,
     DatetimeRangeMapKey
   >,
-  answers: readonly Answer[]
+  answers: readonly Answer[],
 ): IMapMapped<DatetimeRange, number, DatetimeRangeMapKey> =>
   IMapMapped.new(
     datetimeRangeList.map((datetimeRange) => {
@@ -100,18 +100,18 @@ export const createScore = (
 
       const weightList = answers.map((a) => a.weight);
       const isRequiredParticipantsList = answers.map(
-        (a) => a.isRequiredParticipants
+        (a) => a.isRequiredParticipants,
       );
 
       const scoreSum: number = calcScoreSum(
         answerPointList,
         weightList,
-        isRequiredParticipantsList
+        isRequiredParticipantsList,
       );
       const scoreMax: number = calcScoreSumMax(weightList);
 
       return [datetimeRange, answers.length === 0 ? 0 : scoreSum / scoreMax];
     }),
     datetimeRangeToMapKey,
-    datetimeRangeFromMapKey
+    datetimeRangeFromMapKey,
   );

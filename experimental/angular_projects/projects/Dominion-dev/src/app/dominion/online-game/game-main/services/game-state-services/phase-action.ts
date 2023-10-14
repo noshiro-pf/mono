@@ -9,7 +9,7 @@ import {
 
 export const phaseAction = async (
   data: DataForCardEffect,
-  gainCardStateSetter: (state: boolean) => void
+  gainCardStateSetter: (state: boolean) => void,
 ) => {
   const shuffleBy = data.shuffleBy;
 
@@ -41,7 +41,7 @@ export const phaseAction = async (
 
       case 'Action': {
         const actionCards = turnPlayerCards.HandCards.filter((c) =>
-          c.cardProperty.cardTypes.includes('Action')
+          c.cardProperty.cardTypes.includes('Action'),
         );
         if (turnInfo.action <= 0 || actionCards.length <= 0) {
           // 法貨を実装したらここの条件を変える必要あり
@@ -54,7 +54,7 @@ export const phaseAction = async (
 
       case 'BuyPlay': {
         const treasureCards = turnPlayerCards.HandCards.filter((c) =>
-          c.cardProperty.cardTypes.includes('Treasure')
+          c.cardProperty.cardTypes.includes('Treasure'),
         );
 
         if (treasureCards.length + turnPlayerData.vcoin <= 0) {
@@ -70,7 +70,7 @@ export const phaseAction = async (
             (c: DCard) =>
               c.cardProperty.cost.coin <= turnInfo.coin &&
               c.cardProperty.cost.potion <= turnInfo.potion,
-            (_) => gainCardStateSetter(true)
+            (_) => gainCardStateSetter(true),
           );
         }
         break;
@@ -86,7 +86,7 @@ export const phaseAction = async (
             (c: DCard) =>
               c.cardProperty.cost.coin <= turnInfo.coin &&
               c.cardProperty.cost.potion <= turnInfo.potion,
-            (_) => gainCardStateSetter(true)
+            (_) => gainCardStateSetter(true),
           );
         }
         break;

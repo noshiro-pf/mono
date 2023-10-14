@@ -8,9 +8,9 @@ const callback =
   (
     resolve: (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      value: OverlayToaster | PromiseLike<OverlayToaster>
+      value: OverlayToaster | PromiseLike<OverlayToaster>,
     ) => void,
-    reject: (reason?: unknown) => void
+    reject: (reason?: unknown) => void,
   ) =>
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   (instance: OverlayToaster | null) => {
@@ -23,7 +23,7 @@ const callback =
 
 export const createToaster = (
   props?: DeepReadonly<OverlayToasterProps>,
-  container = document.body
+  container = document.body,
 ): Promise<OverlayToaster> => {
   const containerElement = document.createElement('div');
 
@@ -40,7 +40,7 @@ export const createToaster = (
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
         ref={callback(resolve, reject)}
-      />
+      />,
     );
   });
 };
@@ -74,7 +74,7 @@ export const showToast = ({
             primary: undefined,
             none: undefined,
           }),
-      })
+      }),
     )
     .catch(console.error);
 };

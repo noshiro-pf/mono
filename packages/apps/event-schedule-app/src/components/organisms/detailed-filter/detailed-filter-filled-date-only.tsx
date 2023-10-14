@@ -21,5 +21,5 @@ export const DetailedFilterFilledDateOnly = memoNamed<Props>(
         <span>{dc.filterItems.filledDateOnly}</span>
       </CheckboxWrapper>
     </FilterItem>
-  )
+  ),
 );

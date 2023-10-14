@@ -4,7 +4,7 @@ import { type FromArrayObservable } from '../types';
 
 export const fromArray = <A>(
   values: readonly A[],
-  startManually: boolean = false
+  startManually: boolean = false,
 ): FromArrayObservable<A> =>
   new FromArrayObservableClass<A>(values, startManually);
 

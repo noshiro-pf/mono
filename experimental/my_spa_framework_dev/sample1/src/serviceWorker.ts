@@ -16,7 +16,7 @@ const isLocalhost = Boolean(
     // [::1] is the IPv6 localhost address.
     window.location.hostname === '[::1]' ||
     // 127.0.0.1/8 is considered localhost for IPv4.
-    localhostRegex.test(window.location.hostname)
+    localhostRegex.test(window.location.hostname),
 );
 
 type Config = {
@@ -29,7 +29,7 @@ export function register(config?: Config): void {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(
       (process as { env: Record<string, string> }).env.PUBLIC_URL as string,
-      window.location.href
+      window.location.href,
     );
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
@@ -54,7 +54,7 @@ export function register(config?: Config): void {
           .then(() => {
             console.log(
               'This web app is being served cache-first by a service ' +
-                'worker. To learn more, visit https://bit.ly/CRA-PWA'
+                'worker. To learn more, visit https://bit.ly/CRA-PWA',
             );
           })
           .catch(console.error);
@@ -77,7 +77,7 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
 
   console.log(
     'ServiceWorker registration successful with scope: ',
-    registration.scope
+    registration.scope,
   );
 
   registration.onupdatefound = () => {
@@ -93,7 +93,7 @@ async function registerValidSW(swUrl: string, config?: Config): Promise<void> {
           // content until all client tabs are closed.
           console.log(
             'New content is available and will be used when all ' +
-              'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
+              'tabs for this page are closed. See https://bit.ly/CRA-PWA.',
           );
 
           // Execute callback
@@ -131,7 +131,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
           .then((registration) =>
             registration.unregister().then(() => {
               window.location.reload();
-            })
+            }),
           )
           .catch(console.error);
       } else {
@@ -141,7 +141,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config): void {
     })
     .catch(() => {
       console.log(
-        'No internet connection found. App is running in offline mode.'
+        'No internet connection found. App is running in offline mode.',
       );
     });
 }

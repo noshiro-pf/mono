@@ -32,5 +32,5 @@ import { interval } from './interval';
 
 combineLatest(
   interval(1000).filter((x) => x % 2 === 0),
-  interval(1000).filter((x) => x % 2 === 1)
+  interval(1000).filter((x) => x % 2 === 1),
 ).subscribe(console.log);

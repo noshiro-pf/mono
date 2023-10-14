@@ -7,7 +7,7 @@ const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());
 
 const yearOption: readonly YearEnum[] = Arr.range(
   SafeUint.sub(thisYear, 100),
-  SafeUint.add(thisYear, 100)
+  SafeUint.add(thisYear, 100),
 );
 const monthOption: readonly OptionProps[] = monthsList.en.map((e) => ({
   value: e.value,
@@ -38,21 +38,21 @@ export const DatepickerNav = memoNamed<Props>(
         onYearChange(
           mapOptional(
             Num.from(value),
-            (a) => toSafeUint(a) satisfies YearEnum
-          ) ?? thisYear
+            (a) => toSafeUint(a) satisfies YearEnum,
+          ) ?? thisYear,
         );
       },
-      [onYearChange]
+      [onYearChange],
     );
 
     const onMonthChangeHandler = useCallback(
       (value: string) => {
         onMonthChange(
           // eslint-disable-next-line no-restricted-syntax
-          mapOptional(Num.from(value), (a) => a as MonthEnum) ?? thisMonth
+          mapOptional(Num.from(value), (a) => a as MonthEnum) ?? thisMonth,
         );
       },
-      [onMonthChange]
+      [onMonthChange],
     );
 
     return (
@@ -87,5 +87,5 @@ export const DatepickerNav = memoNamed<Props>(
         />
       </div>
     );
-  }
+  },
 );

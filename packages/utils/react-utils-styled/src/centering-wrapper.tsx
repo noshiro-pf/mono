@@ -15,5 +15,5 @@ type Props = Readonly<{
 
 export const CenteringWrapper = memoNamed<Props>(
   'CenteringWrapper',
-  (props) => <CenteringWrapperDiv style={{ flexDirection: props.direction }} />
+  (props) => <CenteringWrapperDiv style={{ flexDirection: props.direction }} />,
 );

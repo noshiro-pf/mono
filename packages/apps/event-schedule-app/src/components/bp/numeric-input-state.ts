@@ -7,7 +7,7 @@ export type NumericInputStateBaseAction = DeepReadonly<
 
 const parseValue = (valueStr: string): number | undefined =>
   pipe(Number.parseFloat(valueStr)).chain((a) =>
-    Number.isNaN(a) ? undefined : a
+    Number.isNaN(a) ? undefined : a,
   ).value;
 
 export const createNumericInputStateReducer = <
@@ -18,7 +18,7 @@ export const createNumericInputStateReducer = <
   config: Readonly<{
     step: number;
     defaultValue: NumericValue;
-  }>
+  }>,
 ): Readonly<{
   reducer: Reducer<string, Action>;
   toValueNormalized: (valueStr: string) => NumericValue;
@@ -44,7 +44,7 @@ export const createNumericInputStateReducer = <
               match(action.type, {
                 decrement: v - config.step,
                 increment: v + config.step,
-              })
+              }),
             )
             .chainOptional(normalizeValue).value ?? config.defaultValue;
 

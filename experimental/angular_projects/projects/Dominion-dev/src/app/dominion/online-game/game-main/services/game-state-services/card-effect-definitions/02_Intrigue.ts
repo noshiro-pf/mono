@@ -7,13 +7,13 @@ import { DataForCardEffect } from './data-for-card-effect';
 export const Shanty_Town = async (
   thisDcard: DCard,
   pid: number,
-  data: DataForCardEffect
+  data: DataForCardEffect,
 ) => {
   await cs.revealHandCards(pid, 2, data);
 
   if (
     !data.gameState.DCards.allPlayersCards[pid].HandCards.some((e) =>
-      e.cardProperty.cardTypes.includes('Action')
+      e.cardProperty.cardTypes.includes('Action'),
     )
   ) {
     data.messager('手札にアクションカードが無いのでカードを2枚引きます。');

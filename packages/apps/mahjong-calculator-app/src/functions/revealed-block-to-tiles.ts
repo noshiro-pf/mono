@@ -1,7 +1,7 @@
 import { type RevealedBlock, type TileName } from '../types';
 
 export const revealedBlockToTiles = (
-  revealedBlock: RevealedBlock
+  revealedBlock: RevealedBlock,
 ): ArrayOfLength<3, TileName> | ArrayOfLength<4, TileName> =>
   match(revealedBlock, {
     // Ankantsu

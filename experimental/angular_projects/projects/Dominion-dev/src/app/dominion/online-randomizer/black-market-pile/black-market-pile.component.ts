@@ -41,7 +41,7 @@ export class BlackMarketPileComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private database: FireDatabaseService,
-    private myRandomizerGroup: MyRandomizerGroupService
+    private myRandomizerGroup: MyRandomizerGroupService,
   ) {}
 
   ngOnInit() {}
@@ -62,7 +62,7 @@ export class BlackMarketPileComponent implements OnInit {
         break;
       default:
         console.error(
-          `'promiseResolver' does not have operation '${operation}'.`
+          `'promiseResolver' does not have operation '${operation}'.`,
         );
         break;
     }
@@ -70,7 +70,7 @@ export class BlackMarketPileComponent implements OnInit {
 
   async revealTop3Cards(
     cardPropertyList: CardProperty[],
-    BlackMarketPileShuffled: BlackMarketPileCard[]
+    BlackMarketPileShuffled: BlackMarketPileCard[],
   ) {
     {
       // 上から3枚をめくる
@@ -84,7 +84,7 @@ export class BlackMarketPileComponent implements OnInit {
 
       while (true) {
         const clickedElementValue = await new Promise<number>(
-          (resolve) => ((this.promiseResolver as any)['buy'] = resolve)
+          (resolve) => ((this.promiseResolver as any)['buy'] = resolve),
         );
 
         if (clickedElementValue === -1) break; // don't buy
@@ -111,13 +111,13 @@ export class BlackMarketPileComponent implements OnInit {
 
       while (true) {
         const clickedElementValue = await new Promise<number>(
-          (resolve) => (this.promiseResolver['putOnTheBottom'] = resolve)
+          (resolve) => (this.promiseResolver['putOnTheBottom'] = resolve),
         );
         if (clickedElementValue === -1) break;
 
         const selectedElement = utils.array.removeAt(
           BlackMarketPileShuffled,
-          clickedElementValue
+          clickedElementValue,
         );
         if (!!selectedElement) BlackMarketPileShuffled.push(selectedElement);
         this.myRandomizerGroup.setBMPileShuffled(BlackMarketPileShuffled);

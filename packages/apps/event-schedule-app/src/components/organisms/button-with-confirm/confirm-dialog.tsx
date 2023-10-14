@@ -45,5 +45,5 @@ export const ConfirmDialog = memoNamed<Props>(
         <Description text={description} />
       )}
     </AlertWithMaxWidth>
-  )
+  ),
 );

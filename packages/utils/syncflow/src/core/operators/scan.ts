@@ -10,7 +10,7 @@ import {
 export const scan =
   <A, B>(
     reducer: (acc: B, curr: A) => B,
-    initialValue: B
+    initialValue: B,
   ): ToInitializedOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new ScanObservableClass(parentObservable, reducer, initialValue);
@@ -24,7 +24,7 @@ class ScanObservableClass<A, B>
   constructor(
     parentObservable: Observable<A>,
     reducer: (acc: B, curr: A) => B,
-    initialValue: B
+    initialValue: B,
   ) {
     super({
       parents: [parentObservable],
@@ -46,7 +46,7 @@ class ScanObservableClass<A, B>
 
     this.setNext(
       this.#reducer(this.snapshot.value, par.snapshot.value),
-      updaterSymbol
+      updaterSymbol,
     );
   }
 }

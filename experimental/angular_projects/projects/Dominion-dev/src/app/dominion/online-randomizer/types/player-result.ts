@@ -18,7 +18,7 @@ export class PlayerResult {
       VP: number;
       turnOrder: number;
       numberOfVictoryCards: NumberOfVictoryCards;
-    }
+    },
   ) {
     this.uid = uid || '';
     if (!initObj) return;
@@ -28,7 +28,7 @@ export class PlayerResult {
     this.VP = initObj.VP || 0;
     this.turnOrder = initObj.turnOrder || 0;
     this.numberOfVictoryCards = new NumberOfVictoryCards(
-      initObj.numberOfVictoryCards
+      initObj.numberOfVictoryCards,
     );
   }
 }

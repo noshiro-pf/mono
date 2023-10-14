@@ -19,7 +19,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
       () =>
         pipe(state.formState.email.error).chainOptional((s) => <div>{s}</div>)
           .value,
-      [state.formState.email.error]
+      [state.formState.email.error],
     );
 
     const onKeyDown = useCallback(
@@ -29,7 +29,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
           ConfirmEmailDialogStore.enterClickHandler();
         }
       },
-      []
+      [],
     );
 
     useKeyEventListener(onKeyDown, noop);
@@ -102,7 +102,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
         </div>
       </DialogWithMaxWidth>
     );
-  }
+  },
 );
 
 const InputWrapperWithMinHeight = styled('div')`

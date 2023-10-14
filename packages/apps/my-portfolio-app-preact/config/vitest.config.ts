@@ -8,7 +8,7 @@ import packageJson from '../package.json' assert { type: 'json' };
 const thisDir = dirname(fileURLToPath(import.meta.url));
 
 const globalUtils = Object.keys(packageJson.devDependencies).filter(
-  (packageName) => packageName.startsWith('@noshiro/global-')
+  (packageName) => packageName.startsWith('@noshiro/global-'),
 );
 
 export default defineConfig({

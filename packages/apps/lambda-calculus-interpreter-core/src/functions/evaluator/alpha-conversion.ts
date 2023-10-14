@@ -15,11 +15,11 @@ import { isVariable } from '../is-variable';
 export function alphaConversion(to: Variable, term: Variable): Variable;
 export function alphaConversion(
   to: Variable,
-  term: LambdaApplication
+  term: LambdaApplication,
 ): LambdaApplication;
 export function alphaConversion(
   to: Variable,
-  term: LambdaAbstraction
+  term: LambdaAbstraction,
 ): LambdaAbstraction;
 export function alphaConversion(to: Variable, term: LambdaTerm): LambdaTerm {
   if (!isAbstraction(term)) return term;

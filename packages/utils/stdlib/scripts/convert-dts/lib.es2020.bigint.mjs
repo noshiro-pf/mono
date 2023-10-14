@@ -19,21 +19,21 @@ export const convertLibEs2020Bigint = (from) => {
 
   ret = ret.replaceAll(
     'predicate: (value: bigint, index: number, array: BigInt64Array) => unknown',
-    'predicate: (value: bigint, index: number, array: BigInt64Array) => boolean'
+    'predicate: (value: bigint, index: number, array: BigInt64Array) => boolean',
   );
   ret = ret.replaceAll(
     'predicate: (value: bigint, index: number, array: BigUint64Array) => unknown',
-    'predicate: (value: bigint, index: number, array: BigUint64Array) => boolean'
+    'predicate: (value: bigint, index: number, array: BigUint64Array) => boolean',
   );
 
   // BigInt
   ret = ret.replaceAll(
     'asIntN(bits: number, int: bigint): bigint;',
-    'asIntN(bits: UintRange<0, 65>, int: bigint): bigint;'
+    'asIntN(bits: UintRange<0, 65>, int: bigint): bigint;',
   );
   ret = ret.replaceAll(
     'asUintN(bits: number, int: bigint): bigint;',
-    'asUintN(bits: UintRange<0, 65>, int: bigint): bigint;'
+    'asUintN(bits: UintRange<0, 65>, int: bigint): bigint;',
   );
 
   // BigInt64Array / BigUint64Array
@@ -42,39 +42,39 @@ export const convertLibEs2020Bigint = (from) => {
 
   ret = ret.replaceAll(
     'keys(): IterableIterator<number>;',
-    `keys(): IterableIterator<${indexType.ret}>;`
+    `keys(): IterableIterator<${indexType.ret}>;`,
   );
   ret = ret.replaceAll(
     'readonly length: number;',
-    `readonly length: ${indexType.size};`
+    `readonly length: ${indexType.size};`,
   );
   ret = ret.replaceAll(
     'fill(value: bigint, start?: number, end?: number): this;',
-    `fill(value: bigint, start?: ${indexType.arg}, end?: ${indexType.arg}): this;`
+    `fill(value: bigint, start?: ${indexType.arg}, end?: ${indexType.arg}): this;`,
   );
 
   ret = ret.replaceAll('length?: number', `length?: ${indexType.size}`);
   ret = ret.replaceAll(
     'readonly BYTES_PER_ELEMENT: number;',
-    'readonly BYTES_PER_ELEMENT: 8;'
+    'readonly BYTES_PER_ELEMENT: 8;',
   );
 
   // DataView
   ret = ret.replaceAll(
     'getBigInt64(byteOffset: number, littleEndian?: boolean): bigint;',
-    'getBigInt64(byteOffset: SafeUint, littleEndian?: boolean): BigInt64;'
+    'getBigInt64(byteOffset: SafeUint, littleEndian?: boolean): BigInt64;',
   );
   ret = ret.replaceAll(
     'getBigUint64(byteOffset: number, littleEndian?: boolean): bigint;',
-    'getBigUint64(byteOffset: SafeUint, littleEndian?: boolean): BigUint64;'
+    'getBigUint64(byteOffset: SafeUint, littleEndian?: boolean): BigUint64;',
   );
   ret = ret.replaceAll(
     'setBigInt64(byteOffset: number, value: bigint, littleEndian?: boolean): void;',
-    'setBigInt64(byteOffset: SafeUint, value: BigInt64, littleEndian?: boolean): void;'
+    'setBigInt64(byteOffset: SafeUint, value: BigInt64, littleEndian?: boolean): void;',
   );
   ret = ret.replaceAll(
     'setBigUint64(byteOffset: number, value: bigint, littleEndian?: boolean): void;',
-    'setBigUint64(byteOffset: SafeUint, value: BigUint64, littleEndian?: boolean): void;'
+    'setBigUint64(byteOffset: SafeUint, value: BigUint64, littleEndian?: boolean): void;',
   );
 
   /** @param {ElemType} elemType */
@@ -96,18 +96,18 @@ export const convertLibEs2020Bigint = (from) => {
     {
       const slice = ret.slice(
         ret.indexOf(marker(elemType).Array.start),
-        ret.indexOf(marker(elemType).Array.end)
+        ret.indexOf(marker(elemType).Array.end),
       );
       ret = ret.replaceAll(slice, convertInterfaceTypedArray(slice, elemType));
     }
     {
       const slice = ret.slice(
         ret.indexOf(marker(elemType).ArrayConstructor.start),
-        ret.indexOf(marker(elemType).ArrayConstructor.end)
+        ret.indexOf(marker(elemType).ArrayConstructor.end),
       );
       ret = ret.replaceAll(
         slice,
-        convertInterfaceTypedArrayConstructor(slice, elemType)
+        convertInterfaceTypedArrayConstructor(slice, elemType),
       );
     }
   }
@@ -127,7 +127,7 @@ const convertInterfaceTypedArray = (from, elementType) => {
   ret = ret.replaceAll(`index: number`, `index: ${indexType.callbackArg}`);
   ret = ret.replaceAll(
     `[number, ${elementType}]`,
-    `[${indexType.ret}, ${elementType}]`
+    `[${indexType.ret}, ${elementType}]`,
   );
   ret = ret.replaceAll(`number | ${elementType}`, `number | bigint`);
 

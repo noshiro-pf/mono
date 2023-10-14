@@ -29,7 +29,7 @@ export class MyAreaComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private gameRoomCommunication: GameRoomCommunicationService
+    private gameRoomCommunication: GameRoomCommunicationService,
   ) {}
 
   ngOnInit() {}
@@ -61,7 +61,7 @@ export class MyAreaComponent implements OnInit {
       this.gameRoomCommunication.sendUserInput(
         'clicked goToNextPhase',
         myIndex,
-        autoSort
+        autoSort,
       );
     }
   }
@@ -74,7 +74,7 @@ export class MyAreaComponent implements OnInit {
       this.gameRoomCommunication.sendUserInput(
         'clicked finishMyTurn',
         myIndex,
-        autoSort
+        autoSort,
       );
     }
   }
@@ -83,7 +83,7 @@ export class MyAreaComponent implements OnInit {
     this.gameRoomCommunication.sendUserInput(
       'clicked sortHandcards',
       myIndex,
-      false
+      false,
     );
   }
 
@@ -91,7 +91,7 @@ export class MyAreaComponent implements OnInit {
     this.gameRoomCommunication.sendUserInput(
       'play all treasures',
       myIndex,
-      autoSort
+      autoSort,
     );
   }
 }

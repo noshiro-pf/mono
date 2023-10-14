@@ -13,23 +13,23 @@ const hues = Arr.seq(360) satisfies Seq<360>;
 export function pickupHighContrastHues<N extends SmallUint>(
   n: N,
   saturation: Percent,
-  lightness: Percent
+  lightness: Percent,
 ): ArrayOfLength<N, Hue>;
 export function pickupHighContrastHues(
   n: PositiveSafeIntWithSmallInt,
   saturation: Percent,
-  lightness: Percent
+  lightness: Percent,
 ): NonEmptyArray<Hue>;
 export function pickupHighContrastHues(
   n: SafeUintWithSmallInt,
   saturation: Percent,
-  lightness: Percent
+  lightness: Percent,
 ): NonEmptyArray<Hue> | undefined {
   if (!Num.isPositive(n)) return undefined;
 
   const luminanceList: ArrayOfLength<360, NonNegativeFiniteNumber> = Tpl.map(
     hues,
-    (hue) => relativeLuminance(hslToRgb([hue, saturation, lightness]))
+    (hue) => relativeLuminance(hslToRgb([hue, saturation, lightness])),
   );
 
   const luminanceDiffAccumulated: NonEmptyArray<FiniteNumber> =

@@ -25,8 +25,8 @@ const isMyTurn$: InitializedObservable<boolean> = combineLatestI([
 ] as const).chain(
   mapI(
     ([gameState, myPlayerIndex]) =>
-      gameState.currentPlayerIndex === myPlayerIndex
-  )
+      gameState.currentPlayerIndex === myPlayerIndex,
+  ),
 );
 
 export const displayValues$: InitializedObservable<DisplayValues> =
@@ -36,8 +36,8 @@ export const displayValues$: InitializedObservable<DisplayValues> =
         gameState,
         myPlayerIndex: myPlayerIndex ?? 0,
         onCardClick,
-      })
-    )
+      }),
+    ),
   );
 
 export const turnPlayerHighlighterPosition$ = combineLatestI([
@@ -47,8 +47,8 @@ export const turnPlayerHighlighterPosition$ = combineLatestI([
   mapI(([playerNamePositions, displayValues]) =>
     playerNamePositions === undefined
       ? undefined
-      : playerNamePositions[displayValues.turnPlayer]
-  )
+      : playerNamePositions[displayValues.turnPlayer],
+  ),
 );
 
 export const confirmTossBalloonProps$: InitializedObservable<
@@ -71,7 +71,7 @@ export const confirmTossBalloonProps$: InitializedObservable<
         onTossSubmit();
       },
     };
-  })
+  }),
 );
 
 export const selectAnswerBalloonProps$: InitializedObservable<
@@ -105,7 +105,7 @@ export const selectAnswerBalloonProps$: InitializedObservable<
         gameState.cardChosenToAttack === undefined ||
         gameState.cardChosenToBeAttacked === undefined,
     };
-  })
+  }),
 );
 
 export const decidedAnswerBalloonProps$: InitializedObservable<
@@ -125,5 +125,5 @@ export const decidedAnswerBalloonProps$: InitializedObservable<
       card: gameState.answerSelected,
       showSymbol: gameState.judgeResult,
     };
-  })
+  }),
 );

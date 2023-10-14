@@ -42,7 +42,7 @@ export const darkInputBackgroundColorDisabled = hexToRgba(darkGray5, 0.5);
 // second box-shadow of pt-input-box-shadow
 export const inputBoxShadowFocus = `inset 0 1px 1px ${hexToRgba(
   black,
-  ptDropShadowOpacity
+  ptDropShadowOpacity,
 )}` as const;
 
 // for best visual results, button group and control group elements should be
@@ -76,7 +76,7 @@ export const controlGroupStackZIndex: Record<
 
 export const inputTransitionShadow = (
   color: string = inputShadowColorFocus,
-  focused: boolean = false
+  focused: boolean = false,
 ): string =>
   focused
     ? [borderShadow(1, color, 1), borderShadow(0.3, color, 3)].join(', ')

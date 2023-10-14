@@ -13,7 +13,7 @@ const marker = {
 export const convertLibEs5_Math = (from) => {
   const slice = from.slice(
     from.indexOf(marker.start),
-    from.indexOf(marker.end)
+    from.indexOf(marker.end),
   );
 
   return from.replaceAll(
@@ -31,7 +31,7 @@ export const convertLibEs5_Math = (from) => {
       ]) {
         str = str.replaceAll(
           `readonly ${a}: number;`,
-          `readonly ${a}: PositiveNumber;`
+          `readonly ${a}: PositiveNumber;`,
         );
       }
 
@@ -42,23 +42,23 @@ export const convertLibEs5_Math = (from) => {
           'abs<N extends SmallInt>(x: N): AbsoluteValue<N>;',
           'abs<N extends FiniteNumber>(x: N): IntersectBrand<N, NonNegativeNumber>;',
           'abs(x: number): NonNegativeNumber | NaNType;',
-        ].join('\n')
+        ].join('\n'),
       );
       str = str.replaceAll(
         `acos(x: number): number;`,
-        `acos(x: number): NonNegativeNumber | NaNType;`
+        `acos(x: number): NonNegativeNumber | NaNType;`,
       );
 
       // The return type is  NonNegativeNumber instead of PositiveNumber
       // because Math.exp(Number.NEGATIVE_INFINITY) == 0
       str = str.replaceAll(
         `exp(x: number): number;`,
-        `exp(x: number): NonNegativeNumber | NaNType;`
+        `exp(x: number): NonNegativeNumber | NaNType;`,
       );
 
       str = str.replaceAll(
         `sqrt(x: number): number;`,
-        `sqrt(x: number): NonNegativeNumber | NaNType;`
+        `sqrt(x: number): NonNegativeNumber | NaNType;`,
       );
 
       for (const fn of ['ceil', 'floor', 'round']) {
@@ -67,10 +67,10 @@ export const convertLibEs5_Math = (from) => {
           [
             `${fn}<N extends FiniteNumber>(x: N): IntersectBrand<N, Int>;`,
             `${fn}(x: number): Int | InfiniteNumber | NaNType;`,
-          ].join('\n')
+          ].join('\n'),
         );
       }
       return str;
-    }).value
+    }).value,
   );
 };

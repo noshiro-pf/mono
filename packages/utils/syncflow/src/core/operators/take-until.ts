@@ -14,7 +14,7 @@ export const takeUntil =
     new TakeUntilObservableClass(parentObservable, notifier);
 
 export const takeUntilI = <A>(
-  notifier: Observable<unknown>
+  notifier: Observable<unknown>,
 ): InitializedToInitializedOperator<A, A> =>
   // eslint-disable-next-line no-restricted-syntax
   takeUntil(notifier) as InitializedToInitializedOperator<A, A>;
@@ -36,7 +36,7 @@ class TakeUntilObservableClass<A>
       },
       () => {
         this.complete();
-      }
+      },
     );
   }
 

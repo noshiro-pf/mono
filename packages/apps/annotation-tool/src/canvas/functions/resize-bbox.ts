@@ -9,10 +9,10 @@ export const resizeBbox = (
   rectPrevious: Rect,
   pointDirectionToPinch: Direction,
   from: Point,
-  to: Point
+  to: Point,
 ): void => {
   updatePixiBbox(
     pixiBbox,
-    resizeRect(rectPrevious, pointDirectionToPinch, from, to)
+    resizeRect(rectPrevious, pointDirectionToPinch, from, to),
   );
 };

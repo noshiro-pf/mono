@@ -21,7 +21,7 @@ import { ObservableBaseClass } from './observable-base-class';
 
 const registerChild = <A>(
   child: ChildObservable<A>,
-  parents: ChildObservable<A>['parents']
+  parents: ChildObservable<A>['parents'],
 ): void => {
   for (const p of parents) {
     p.addChild(child);
@@ -114,7 +114,7 @@ export class AsyncChildObservableClass<
 
     const insertPos = binarySearch(
       this.#procedure.map((a) => a.depth),
-      child.depth
+      child.depth,
     );
     this.#procedure = Arr.inserted(this.#procedure, insertPos, child);
   }
@@ -233,7 +233,7 @@ export class InitializedSyncChildObservableClass<
   override chain<B>(
     operator:
       | InitializedToInitializedOperator<A, B>
-      | ToInitializedOperator<A, B>
+      | ToInitializedOperator<A, B>,
   ): InitializedObservable<B>;
 
   override chain<B>(operator: Operator<A, B>): Observable<B>;

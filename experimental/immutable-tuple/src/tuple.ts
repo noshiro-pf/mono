@@ -58,7 +58,7 @@ forEachArrayMethod((name, desc, mustConvertThisToArray) => {
     desc.value = function (...args) {
       const result = method.apply(
         mustConvertThisToArray ? toArray(this) : this,
-        args
+        args,
       );
       // Of course, `tuple.prototype.slice` should return a `tuple` object,
       // not a new `Array`.
@@ -78,7 +78,7 @@ tuple.prototype.concat = function (...args) {
   return tuple(
     ...concat.apply(
       toArray(this),
-      args.map((item) => (isTuple(item) ? toArray(item) : item))
-    )
+      args.map((item) => (isTuple(item) ? toArray(item) : item)),
+    ),
   );
 };

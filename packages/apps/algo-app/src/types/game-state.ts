@@ -9,13 +9,13 @@ import { type PlayerIndex } from './player-index';
 
 export const playerCardsTypeDef = t.arrayOfLength(
   4,
-  t.arrayOfLength(6, cardWithVisibilityTypeDef)
+  t.arrayOfLength(6, cardWithVisibilityTypeDef),
 );
 
 type PlayerCards = t.TypeOf<typeof playerCardsTypeDef>;
 
 expectType<PlayerCards, ArrayOfLength<4, ArrayOfLength<6, CardWithVisibility>>>(
-  '<='
+  '<=',
 );
 
 export type GameState = Readonly<{

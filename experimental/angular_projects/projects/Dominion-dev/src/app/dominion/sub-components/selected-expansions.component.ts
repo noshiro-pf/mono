@@ -25,12 +25,12 @@ export class SelectedExpansionsComponent implements OnInit {
 
   expansions$: RN<{ name: string; selected: boolean }[]> = combine(
     this.database.expansionNameList$,
-    this.selectedExpansionNameList$
+    this.selectedExpansionNameList$,
   ).map(([nameList, selectedNameList]) =>
     nameList.map((name) => ({
       name: name,
       selected: selectedNameList.includes(name),
-    }))
+    })),
   );
 
   constructor(private database: FireDatabaseService) {}

@@ -31,7 +31,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
       repaymentType === 'principal-equal-payment'
         ? monthlyPaymentTotalYen
         : monthlyPrincipalPaymentYen,
-    [repaymentType, monthlyPaymentTotalYen, monthlyPrincipalPaymentYen]
+    [repaymentType, monthlyPaymentTotalYen, monthlyPrincipalPaymentYen],
   );
 
   const numRows = useMemo(
@@ -39,9 +39,9 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
       SafeUint.max(
         Arr.length(borrowingBalanceYen),
         Arr.length(interestYen),
-        Arr.length(monthlyPaymentTotalYen)
+        Arr.length(monthlyPaymentTotalYen),
       ),
-    [borrowingBalanceYen, interestYen, monthlyPaymentTotalYen]
+    [borrowingBalanceYen, interestYen, monthlyPaymentTotalYen],
   );
 
   const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
@@ -52,7 +52,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
         formatYenValue(interestYen[i] ?? toYen(0)),
         formatYenValue(monthlyPayment[i] ?? toYen(0)),
       ]),
-    [numRows, borrowingBalanceYen, interestYen, monthlyPayment]
+    [numRows, borrowingBalanceYen, interestYen, monthlyPayment],
   );
 
   return (

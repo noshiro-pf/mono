@@ -9,7 +9,7 @@ const is = isUint32 as (u: number) => u is Uint32;
 export const uint32 = (defaultValue: number = 0): Type<Uint32> => {
   if (!is(defaultValue)) {
     throw new Error(
-      'defaultValue must be a non-negative integer in the range of 32-bit unsigned'
+      'defaultValue must be a non-negative integer in the range of 32-bit unsigned',
     );
   }
 

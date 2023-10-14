@@ -28,5 +28,5 @@ export const AnswerPageError = memoNamed<Props>(
         <Description color={errorFontColor} text={dc.answersResultOtherError} />
       ) : undefined}
     </div>
-  )
+  ),
 );

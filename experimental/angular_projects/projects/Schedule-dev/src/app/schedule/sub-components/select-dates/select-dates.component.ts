@@ -38,7 +38,7 @@ export class SelectDatesComponent implements OnInit {
    **/
   selectedDatetimes$: RN<number[]> = merge(
     this.selectedDatetimesSource$.map((e) => ({ value: e, id: 'input' })),
-    this.updateDatesSource$.map((e) => ({ value: e, id: 'update' }))
+    this.updateDatesSource$.map((e) => ({ value: e, id: 'update' })),
   ).scan([] as number[], (state, curr) => {
     const initializer = curr.value as number[];
     const remove_add = curr.value as { remove: number[]; add: number[] };
@@ -66,7 +66,7 @@ export class SelectDatesComponent implements OnInit {
 
   constructor(public dialog: MatDialog) {
     this.selectedDatetimes$.listen(false, (v) =>
-      this.selectedDatetimesChange.emit(v)
+      this.selectedDatetimesChange.emit(v),
     );
   }
 
@@ -85,7 +85,7 @@ export class SelectDatesComponent implements OnInit {
     const removedDates = getRemovedDates(datetimesOld, datetimesNew);
     const addedDates = getAddedDates(datetimesOld, datetimesNew);
     const removedDatetimes = datetimesOld.filter((e) =>
-      removedDates.includes(to0000(e))
+      removedDates.includes(to0000(e)),
     );
     const addedDatetimes = addedDates.map((d) => this.toDefaultTime(d));
 

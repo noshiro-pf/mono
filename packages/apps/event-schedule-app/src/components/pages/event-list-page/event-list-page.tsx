@@ -82,27 +82,27 @@ export const EventListPage = memoNamed('EventListPage', () => {
               id: toUserId(fireAuthUser.uid),
               name: toUserName(fireAuthUser.displayName ?? ''),
             }).catch(noop);
-          }
-        )
+          },
+        ),
       ),
 
-    [eventList, fireAuthUser]
+    [eventList, fireAuthUser],
   );
 
   const refreshButtonIsDisabled = useObservableValue(
-    EventListStore.refreshButtonIsDisabled$
+    EventListStore.refreshButtonIsDisabled$,
   );
   const refreshButtonIsLoading = useObservableValue(
-    EventListStore.refreshButtonIsLoading$
+    EventListStore.refreshButtonIsLoading$,
   );
   const filterOptionState = useObservableValue(
-    EventListPageFilterStore.filterOptionState$
+    EventListPageFilterStore.filterOptionState$,
   );
   const showOnlyEventSchedulesICreated = useObservableValue(
-    EventListPageFilterStore.showOnlyEventSchedulesICreated$
+    EventListPageFilterStore.showOnlyEventSchedulesICreated$,
   );
   const showAllPastDaysEvent = useObservableValue(
-    EventListPageFilterStore.showAllPastDaysEvent$
+    EventListPageFilterStore.showAllPastDaysEvent$,
   );
   const filterText = useObservableValue(EventListPageFilterStore.filterText$);
 
@@ -115,7 +115,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
         archive: 'unarchive',
         inProgress: 'archive',
       } as const),
-    [filterOptionState]
+    [filterOptionState],
   );
 
   return (

@@ -22,7 +22,7 @@ import { type StreamTestCase } from '../typedef';
  */
 
 const createStreams = (
-  tick: number
+  tick: number,
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
@@ -61,7 +61,7 @@ const createStreams = (
 };
 
 const createStreams2 = (
-  tick: number
+  tick: number,
 ): {
   startSource: () => void;
   counter$: Observable<SafeUint>;
@@ -73,7 +73,7 @@ const createStreams2 = (
 
   const multiplied$ = counter$.chain(map((x) => 1000 * x));
   const sum$ = combineLatest([counter$, multiplied$] as const).chain(
-    map(([a, b]) => a + b)
+    map(([a, b]) => a + b),
   );
 
   return {
@@ -105,7 +105,7 @@ export const combineLatestTestCases: readonly [
       [9, 18, 36, 81, 64],
     ],
     run: (
-      tick: number
+      tick: number,
     ): Promise<DeepReadonly<[number, number, number, number, number][]>> => {
       const { startSource, combined$ } = createStreams(tick);
       return getStreamOutputAsPromise(combined$, startSource);

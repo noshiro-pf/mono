@@ -5,7 +5,7 @@ import { Subscription } from '../types/Subscription';
 export const switchMap =
   <T, U>(
     fn: (srcValue: T, srcIndex: number, index: number) => RN<U>,
-    name: string = ''
+    name: string = '',
   ): Operator<T, U> =>
   (src: RN<T>) =>
     new SwitchMapRN<T, U>(src, fn, name);
@@ -18,7 +18,7 @@ class SwitchMapRN<T, U> extends RN<U> {
   constructor(
     src: RN<T>,
     fn: (srcValue: T, srcIndex: number, index: number) => RN<U>,
-    name: string
+    name: string,
   ) {
     super(fn(src.value, src.index, -1).value, [src], name);
     this.latestRN = fn(src.value, src.index, -1);

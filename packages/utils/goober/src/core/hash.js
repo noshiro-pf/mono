@@ -52,7 +52,7 @@ export let hash = (compiled, sheet, global, append, keyframes) => {
     cache[className] = parse(
       // For keyframes
       keyframes ? { ['@keyframes ' + className]: ast } : ast,
-      global ? '' : '.' + className
+      global ? '' : '.' + className,
     );
   }
 

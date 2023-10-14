@@ -1,11 +1,11 @@
 const MIN_VALUE = 0;
 
 export const isNonNegativeFiniteNumber = (
-  a: number
+  a: number,
 ): a is NonNegativeFiniteNumber => Number.isFinite(a) && a >= 0;
 
 export const toNonNegativeFiniteNumber = (
-  a: number
+  a: number,
 ): NonNegativeFiniteNumber => {
   if (!isNonNegativeFiniteNumber(a)) {
     throw new TypeError(`Expected non-negative finite number, got: ${a}`);
@@ -28,32 +28,32 @@ const _max = (
 
 const pow = (
   x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber
+  y: NonNegativeFiniteNumber,
 ): NonNegativeFiniteNumber => clamp(x ** y);
 
 const add = (
   x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber
+  y: NonNegativeFiniteNumber,
 ): NonNegativeFiniteNumber => clamp(x + y);
 
 const sub = (
   x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber
+  y: NonNegativeFiniteNumber,
 ): NonNegativeFiniteNumber => clamp(x - y);
 
 const mul = (
   x: NonNegativeFiniteNumber,
-  y: NonNegativeFiniteNumber
+  y: NonNegativeFiniteNumber,
 ): NonNegativeFiniteNumber => clamp(x * y);
 
 const div = (
   x: NonNegativeFiniteNumber,
-  y: PositiveFiniteNumber
+  y: PositiveFiniteNumber,
 ): NonNegativeFiniteNumber => clamp(x / y);
 
 const random = (
   min: NonNegativeFiniteNumber,
-  max: NonNegativeFiniteNumber
+  max: NonNegativeFiniteNumber,
 ): NonNegativeFiniteNumber =>
   add(min, to((Math.max(max, min) - min + 1) * Math.random()));
 

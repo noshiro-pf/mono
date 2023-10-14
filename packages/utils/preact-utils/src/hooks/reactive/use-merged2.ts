@@ -4,7 +4,7 @@ import { useState } from '../use-state';
 export function useMerged2<T1, T2>(
   init: T1 | T2,
   value1: T1,
-  value2: T2
+  value2: T2,
 ): T1 | T2 {
   const { state: merged, setState: set } = useState<T1 | T2>(init);
   useEffect(() => {

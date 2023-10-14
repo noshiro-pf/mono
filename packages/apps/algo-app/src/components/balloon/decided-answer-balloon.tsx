@@ -36,7 +36,7 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
           balloonSize,
           marginBetweenCardAndBalloon,
         }),
-      [anchorCardRect, arrowDirection]
+      [anchorCardRect, arrowDirection],
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -53,17 +53,17 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           W: BalloonWithLeftArrow,
         }),
-      [arrowDirection]
+      [arrowDirection],
     );
 
     const oStyle = useMemo(
       () => ({ opacity: showSymbol === 'o' ? 1 : 0 }),
-      [showSymbol]
+      [showSymbol],
     );
 
     const xStyle = useMemo(
       () => ({ opacity: showSymbol === 'x' ? 1 : 0 }),
-      [showSymbol]
+      [showSymbol],
     );
 
     return (
@@ -119,7 +119,7 @@ export const DecidedAnswerBalloon = memoNamed<Props>(
         </SymbolSvg>
       </Wrapper>
     );
-  }
+  },
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call

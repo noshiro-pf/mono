@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useState } from './use-state';
 
 export const useBoolState = (
-  initialState: boolean
+  initialState: boolean,
 ): Readonly<{
   state: boolean;
   setTrue: () => void;

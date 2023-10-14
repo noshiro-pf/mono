@@ -16,19 +16,19 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   signInPageStateReducer,
-  signInPageInitialState
+  signInPageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
-  mapI((state) => state.isWaitingResponse || signInPageHasError(state))
+  mapI((state) => state.isWaitingResponse || signInPageHasError(state)),
 );
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.email.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
-  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger'))
+  mapI((state) => (state.password.error === undefined ? 'primary' : 'danger')),
 );
 
 const passwordIsOpenState = createBooleanState(false);
@@ -57,8 +57,8 @@ const state$ = combineLatestI([
       emailFormIntent,
       passwordFormIntent,
       passwordIsOpen,
-    })
-  )
+    }),
+  ),
 );
 
 const submit = async (pageToBack: string | undefined): Promise<void> => {
@@ -68,7 +68,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
 
   const signInResult = await api.auth.signIn(
     s.email.inputValue,
-    s.password.inputValue
+    s.password.inputValue,
   );
 
   if (Result.isErr(signInResult)) {

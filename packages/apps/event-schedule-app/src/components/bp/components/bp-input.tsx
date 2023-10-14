@@ -17,7 +17,7 @@ export const BpInput = memoNamed<BpInputProps>(
         (ev) => {
           onValueChange(ev.target.value);
         },
-        [onValueChange]
+        [onValueChange],
       );
 
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -34,7 +34,7 @@ export const BpInput = memoNamed<BpInputProps>(
 
     useTinyObservableEffect(
       focus$ ?? createTinyObservable<undefined>(),
-      focusInput
+      focusInput,
     );
 
     return (
@@ -46,5 +46,5 @@ export const BpInput = memoNamed<BpInputProps>(
         {...props}
       />
     );
-  }
+  },
 );

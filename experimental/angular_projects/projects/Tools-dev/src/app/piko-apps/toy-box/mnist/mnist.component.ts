@@ -44,51 +44,51 @@ export class MnistComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private model: ModelService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {}
 
   ngOnInit() {
     const imageData$: Observable<np.TNdNum> = this.predictionClick$.pipe(
       map(() => this.getImageTable()),
-      shareWithCache()
+      shareWithCache(),
     );
 
     const latestScores$ = combineLatest(
       imageData$,
       this.model.predict$,
-      (imageData, predict) => this.getAccuracyScores(imageData, predict)
+      (imageData, predict) => this.getAccuracyScores(imageData, predict),
     ).pipe(
       switchMap((promise) => from(promise)),
-      shareWithCache()
+      shareWithCache(),
     );
 
     this.modelIsReady$ = this.model.predict$.pipe(
       map((_) => true),
       startWith(false),
-      shareWithCache()
+      shareWithCache(),
     );
 
     this.calculating$ = merge(
       this.predictionClick$.pipe(map((_) => true)),
-      latestScores$.pipe(map((_) => false))
+      latestScores$.pipe(map((_) => false)),
     ).pipe(startWith(false), shareWithCache());
 
     this.accuracyScores$ = merge(
       this.resetClick$.pipe(map((_) => np.newArray(10, undefined))),
-      latestScores$
+      latestScores$,
     ).pipe(startWith(np.newArray(10, undefined)), shareWithCache());
 
     this.maxAccuracyIndex$ = merge(
       this.modelIsReady$.pipe(
         filter((e) => e === false),
-        map((_) => undefined)
+        map((_) => undefined),
       ),
       this.accuracyScores$.pipe(
         map((scores) => {
           if (scores.includes(undefined)) return undefined;
           return scores.indexOf(Math.max.apply(null, scores));
-        })
-      )
+        }),
+      ),
     ).pipe(startWith(undefined), shareWithCache());
 
     this.resetClick$.pipe(takeWhile(() => this.alive)).subscribe(() => {
@@ -96,7 +96,7 @@ export class MnistComponent implements OnInit, AfterViewInit, OnDestroy {
         0,
         0,
         this.context.canvas.clientWidth,
-        this.context.canvas.clientHeight
+        this.context.canvas.clientHeight,
       );
     });
 
@@ -108,7 +108,7 @@ export class MnistComponent implements OnInit, AfterViewInit, OnDestroy {
     this.modelIsReady$
       .pipe(
         filter((e) => e === true),
-        takeWhile(() => this.alive)
+        takeWhile(() => this.alive),
       )
       .subscribe(() => {
         this.closeLoadingModal();
@@ -153,7 +153,7 @@ export class MnistComponent implements OnInit, AfterViewInit, OnDestroy {
     };
     this.startPoint(
       t.pageX - this.$canvasOffset.left,
-      t.pageY - this.$canvasOffset.top
+      t.pageY - this.$canvasOffset.top,
     );
   }
   onMouseDown(event: any) {
@@ -165,7 +165,7 @@ export class MnistComponent implements OnInit, AfterViewInit, OnDestroy {
     const t = event.changedTouches[0];
     this.movePoint(
       t.pageX - this.$canvasOffset.left,
-      t.pageY - this.$canvasOffset.top
+      t.pageY - this.$canvasOffset.top,
     );
   }
   onMouseMove(event: any) {
@@ -243,7 +243,7 @@ export class MnistComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getAccuracyScores = (
     imageData: np.TNdNum,
-    predict: (input: np.TNdNum) => Promise<number[]>
+    predict: (input: np.TNdNum) => Promise<number[]>,
   ): Promise<number[]> => {
     return predict([[imageData]]);
   };

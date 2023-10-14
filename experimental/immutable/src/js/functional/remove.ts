@@ -13,13 +13,13 @@ import shallowCopy from '../utils/shallowCopy';
 export function remove(collection, key) {
   if (!isDataStructure(collection)) {
     throw new TypeError(
-      'Cannot update non-data-structure value: ' + collection
+      'Cannot update non-data-structure value: ' + collection,
     );
   }
   if (isImmutable(collection)) {
     if (!collection.remove) {
       throw new TypeError(
-        'Cannot update immutable value without .remove() method: ' + collection
+        'Cannot update immutable value without .remove() method: ' + collection,
       );
     }
     return collection.remove(key);

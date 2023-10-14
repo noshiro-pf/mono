@@ -16,10 +16,10 @@ export const BpCheckbox = memoNamed<BpCheckboxProps>(
       (ev: React.FormEvent<HTMLInputElement>) => {
         onCheck(ev.currentTarget.checked);
       },
-      [onCheck]
+      [onCheck],
     );
 
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <Checkbox checked={checked} onChange={onChangeHandler} {...props} />;
-  }
+  },
 );

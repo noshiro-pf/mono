@@ -31,8 +31,8 @@ export const errorType$: InitializedObservable<
             data: 'answersResult' as const,
             type: ar.value,
           } as const)
-        : undefined
-    )
+        : undefined,
+    ),
   )
   .chain(withInitialValue(undefined));
 

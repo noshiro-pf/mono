@@ -39,11 +39,11 @@ export class CardsAreaComponent implements OnInit {
       this.DCardArrayForView$ = this.DCardArray$;
       this.showArraySize = false;
       this.boxMinWidth$ = this.cardWidth$.pipe(
-        map((width) => (width + this.padding) * this.defaultArrayLength)
+        map((width) => (width + this.padding) * this.defaultArrayLength),
       );
     } else {
       this.DCardArrayForView$ = this.DCardArray$.pipe(
-        map((ar) => ar.slice(0, 1))
+        map((ar) => ar.slice(0, 1)),
       );
       this.boxMinWidth$ = this.cardWidth$;
     }

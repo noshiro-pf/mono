@@ -6,7 +6,7 @@ import { updateRectOfBbox } from './update-pixi-bbox-rect';
 
 export const updatePixiBbox = (
   mut_pixiBbox: PixiBbox,
-  rectAfter: Rect
+  rectAfter: Rect,
 ): void => {
   mut_pixiBbox.rect = rectAfter;
   updateRectOfBbox(mut_pixiBbox, rectAfter);

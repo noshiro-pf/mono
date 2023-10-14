@@ -51,8 +51,8 @@ const main = async () => {
       generateEslintNoRestrictedImportsDef(
         packageName,
         importsList,
-        typeImportsList
-      )
+        typeImportsList,
+      ),
     ),
   ]);
 };

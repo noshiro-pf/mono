@@ -50,7 +50,7 @@ export class SharedAreaComponent implements OnInit {
   constructor(
     private gameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
-    private config: GameConfigService
+    private config: GameConfigService,
   ) {}
 
   ngOnInit() {}

@@ -11,7 +11,7 @@ import {
 /** @deprecated use `createState` instead */
 export const mergeMap =
   <A, B>(
-    mapToObservable: (curr: A) => Observable<B>
+    mapToObservable: (curr: A) => Observable<B>,
   ): RemoveInitializedOperator<A, B> =>
   (parentObservable: Observable<A>) =>
     new MergeMapObservableClass(parentObservable, mapToObservable);
@@ -30,7 +30,7 @@ class MergeMapObservableClass<A, B>
 
   constructor(
     parentObservable: Observable<A>,
-    mapToObservable: (curr: A) => Observable<B>
+    mapToObservable: (curr: A) => Observable<B>,
   ) {
     super({
       parents: [parentObservable],

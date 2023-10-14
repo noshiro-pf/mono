@@ -13,7 +13,7 @@ const marker = {
 export const convertLibEs5_Date = (from) => {
   const slice = from.slice(
     from.indexOf(marker.start),
-    from.indexOf(marker.end)
+    from.indexOf(marker.end),
   );
 
   return from.replaceAll(
@@ -42,70 +42,70 @@ export const convertLibEs5_Date = (from) => {
       ]) {
         str = str.replaceAll(
           `${dateGetMethod}(): number;`,
-          `${dateGetMethod}(): ${type};`
+          `${dateGetMethod}(): ${type};`,
         );
       }
       str = str.replaceAll(
         'setTime(time: number): number;',
-        'setTime(time: SafeUint): SafeUint;'
+        'setTime(time: SafeUint): SafeUint;',
       );
       for (const a of ['setMilliseconds', 'setUTCMilliseconds']) {
         str = str.replaceAll(
           `${a}(ms: number): number;`,
-          `${a}(ms: MillisecondsEnum): SafeUint;`
+          `${a}(ms: MillisecondsEnum): SafeUint;`,
         );
       }
       for (const a of ['setSeconds', 'setUTCSeconds']) {
         str = str.replaceAll(
           `${a}(sec: number, ms?: number): number;`,
-          `${a}(sec: SecondsEnum, ms?: MillisecondsEnum): SafeUint;`
+          `${a}(sec: SecondsEnum, ms?: MillisecondsEnum): SafeUint;`,
         );
       }
       for (const a of ['setMinutes', 'setUTCMinutes']) {
         str = str.replaceAll(
           `${a}(min: number, sec?: number, ms?: number): number;`,
-          `${a}(min: MinutesEnum, sec?: SecondsEnum, ms?: MillisecondsEnum): SafeUint;`
+          `${a}(min: MinutesEnum, sec?: SecondsEnum, ms?: MillisecondsEnum): SafeUint;`,
         );
       }
       for (const a of ['setHours', 'setUTCHours']) {
         str = str.replaceAll(
           `${a}(hours: number, min?: number, sec?: number, ms?: number): number;`,
-          `${a}(hours: HoursEnum, min?: MinutesEnum, sec?: SecondsEnum, ms?: MillisecondsEnum): SafeUint;`
+          `${a}(hours: HoursEnum, min?: MinutesEnum, sec?: SecondsEnum, ms?: MillisecondsEnum): SafeUint;`,
         );
       }
       for (const a of ['setDate', 'setUTCDate']) {
         str = str.replaceAll(
           `${a}(date: number): number;`,
-          `${a}(date: DateEnum): SafeUint;`
+          `${a}(date: DateEnum): SafeUint;`,
         );
       }
       for (const a of ['setMonth', 'setUTCMonth']) {
         str = str.replaceAll(
           `${a}(month: number, date?: number): number;`,
-          `${a}(month: MonthIndexEnum, date?: DateEnum): SafeUint;`
+          `${a}(month: MonthIndexEnum, date?: DateEnum): SafeUint;`,
         );
       }
       for (const a of ['setFullYear', 'setUTCFullYear']) {
         str = str.replaceAll(
           `${a}(year: number, month?: number, date?: number): number;`,
-          `${a}(year: YearEnum, month?: MonthIndexEnum, date?: DateEnum): SafeUint;`
+          `${a}(year: YearEnum, month?: MonthIndexEnum, date?: DateEnum): SafeUint;`,
         );
       }
       str = str.replaceAll(
         'new (\n    year: number,\n    monthIndex: number,\n    date?: number,\n    hours?: number,\n    minutes?: number,\n    seconds?: number,\n    ms?: number\n  ): Date;',
-        'new (\n    year: YearEnum,\n    monthIndex: MonthIndexEnum,\n    date?: DateEnum,\n    hours?: HoursEnum,\n    minutes?: MinutesEnum,\n    seconds?: SecondsEnum,\n    ms?: MillisecondsEnum\n  ): Date;'
+        'new (\n    year: YearEnum,\n    monthIndex: MonthIndexEnum,\n    date?: DateEnum,\n    hours?: HoursEnum,\n    minutes?: MinutesEnum,\n    seconds?: SecondsEnum,\n    ms?: MillisecondsEnum\n  ): Date;',
       );
       str = str.replaceAll(
         'UTC(\n    year: number,\n    monthIndex: number,\n    date?: number,\n    hours?: number,\n    minutes?: number,\n    seconds?: number,\n    ms?: number\n  ): number;',
-        'UTC(\n    year: YearEnum,\n    monthIndex: MonthIndexEnum,\n    date?: DateEnum,\n    hours?: HoursEnum,\n    minutes?: MinutesEnum,\n    seconds?: SecondsEnum,\n    ms?: MillisecondsEnum\n  ): SafeUint;'
+        'UTC(\n    year: YearEnum,\n    monthIndex: MonthIndexEnum,\n    date?: DateEnum,\n    hours?: HoursEnum,\n    minutes?: MinutesEnum,\n    seconds?: SecondsEnum,\n    ms?: MillisecondsEnum\n  ): SafeUint;',
       );
       str = str.replaceAll(
         'parse(s: string): number;',
-        'parse(s: string): SafeUint;'
+        'parse(s: string): SafeUint;',
       );
       str = str.replaceAll('now(): number;', 'now(): SafeUint;');
 
       return str;
-    }).value
+    }).value,
   );
 };

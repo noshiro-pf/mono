@@ -14,7 +14,7 @@ export class Pooling implements Layer {
     pool_h: number,
     pool_w: number,
     stride: number = 1,
-    padding: number = 0
+    padding: number = 0,
   ) {
     this.pool_h = pool_h;
     this.pool_w = pool_w;
@@ -33,7 +33,7 @@ export class Pooling implements Layer {
       this.pool_h,
       this.pool_w,
       this.stride,
-      this.padding
+      this.padding,
     );
 
     col = np.reshape(col, [-1, this.pool_h * this.pool_w]) as number[][];

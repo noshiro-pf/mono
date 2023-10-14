@@ -280,7 +280,7 @@ class BitmapIndexedNode {
           shift + SHIFT,
           keyHash,
           key,
-          notSetValue
+          notSetValue,
         );
   }
 
@@ -308,7 +308,7 @@ class BitmapIndexedNode {
       key,
       value,
       didChangeSize,
-      didAlter
+      didAlter,
     );
 
     if (newNode === node) {
@@ -389,7 +389,7 @@ class HashArrayMapNode {
       key,
       value,
       didChangeSize,
-      didAlter
+      didAlter,
     );
     if (newNode === node) {
       return this;
@@ -585,7 +585,7 @@ class MapIterator extends Iterator {
         if (index <= maxIndex) {
           return mapIteratorValue(
             type,
-            node.entries[this._reverse ? maxIndex - index : index]
+            node.entries[this._reverse ? maxIndex - index : index],
           );
         }
       } else {
@@ -654,7 +654,7 @@ function updateMap(map, k, v) {
       k,
       v,
       didChangeSize,
-      didAlter
+      didAlter,
     );
     if (!didAlter.value) {
       return map;
@@ -679,7 +679,7 @@ function updateNode(
   key,
   value,
   didChangeSize,
-  didAlter
+  didAlter,
 ) {
   if (!node) {
     if (value === NOT_SET) {
@@ -696,7 +696,7 @@ function updateNode(
     key,
     value,
     didChangeSize,
-    didAlter
+    didAlter,
   );
 }
 

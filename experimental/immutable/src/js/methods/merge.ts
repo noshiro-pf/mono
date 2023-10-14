@@ -42,7 +42,7 @@ function mergeIntoKeyedWith(collection, collections, merger) {
     const mergeIntoCollection = merger
       ? (value, key) => {
           update(collection, key, NOT_SET, (oldVal) =>
-            oldVal === NOT_SET ? value : merger(oldVal, value, key)
+            oldVal === NOT_SET ? value : merger(oldVal, value, key),
           );
         }
       : (value, key) => {

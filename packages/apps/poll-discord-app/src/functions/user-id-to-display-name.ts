@@ -5,7 +5,7 @@ import { quoteIfSpaceIncluded } from './quote-if-space-included';
 export const createUserIdToDisplayNameMap = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   guild: Discord.Guild | null,
-  userIds: readonly UserId[] | undefined
+  userIds: readonly UserId[] | undefined,
 ): Promise<Result<IMap<UserId, string>, string>> => {
   if (guild === null) {
     return Result.err('guild is undefined');
@@ -17,7 +17,7 @@ export const createUserIdToDisplayNameMap = async (
   > = await Result.fromPromise(
     userIds === undefined
       ? guild.members.fetch()
-      : guild.members.fetch({ user: castWritable(userIds) })
+      : guild.members.fetch({ user: castWritable(userIds) }),
   );
 
   if (Result.isErr(guildMembersResult)) {
@@ -38,7 +38,7 @@ export const createUserIdToDisplayNameMap = async (
 
   return Result.ok(
     IMap.new<UserId, string>(
-      displayNameList.map(({ userId, displayName }) => [userId, displayName])
-    )
+      displayNameList.map(({ userId, displayName }) => [userId, displayName]),
+    ),
   );
 };

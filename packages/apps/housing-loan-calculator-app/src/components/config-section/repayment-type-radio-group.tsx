@@ -15,7 +15,7 @@ export const RepaymentTypeRadioGroup = memoNamed<Props>(
         // eslint-disable-next-line no-restricted-syntax
         onRepaymentTypeChange(ev.currentTarget.value as RepaymentType);
       },
-      [onRepaymentTypeChange]
+      [onRepaymentTypeChange],
     );
 
     return (
@@ -36,5 +36,5 @@ export const RepaymentTypeRadioGroup = memoNamed<Props>(
         />
       </RadioGroup>
     );
-  }
+  },
 );

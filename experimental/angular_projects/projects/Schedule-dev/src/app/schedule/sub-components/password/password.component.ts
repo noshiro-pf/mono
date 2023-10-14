@@ -30,12 +30,12 @@ export class PasswordComponent implements OnInit, OnDestroy {
     this.enabledFromUI$
       .debounce(100)
       .filter(true, (e) => e === false)
-      .mapTo('')
+      .mapTo(''),
   );
 
   readonly enabled$: RN<boolean> = merge(
     this.passwordFromInput$.map((v) => v !== ''),
-    this.enabledFromUI$.debounce(100)
+    this.enabledFromUI$.debounce(100),
   );
 
   @Output() passwordChange = new EventEmitter<string>();

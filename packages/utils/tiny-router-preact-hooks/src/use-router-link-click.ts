@@ -1,7 +1,7 @@
 import { useCallback } from 'preact/hooks';
 
 const isModifiedEvent = (
-  ev: Record<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>
+  ev: Record<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,
 ): boolean => ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey;
 
 type Path = Readonly<{
@@ -66,7 +66,7 @@ export const useRouterLinkClick = ({
       const el = ev.target;
       if (!(el instanceof HTMLAnchorElement)) {
         console.warn(
-          'useRouterLinkClick should be used for HTMLAnchorElement.'
+          'useRouterLinkClick should be used for HTMLAnchorElement.',
         );
         return;
       }
@@ -93,5 +93,5 @@ export const useRouterLinkClick = ({
         }
       }
     },
-    [replaceProp, pushFn, redirectFn]
+    [replaceProp, pushFn, redirectFn],
   );

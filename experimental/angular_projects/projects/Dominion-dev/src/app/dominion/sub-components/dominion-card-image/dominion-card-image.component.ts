@@ -71,27 +71,27 @@ export class DominionCardImageComponent implements OnInit {
 
   constructor(private storage: AngularFireStorage) {
     const isWideCard$: RN<boolean> = this.card$.map((e) =>
-      isWideCard(e.cardTypes)
+      isWideCard(e.cardTypes),
     );
 
     this.width$ = merge(
       // widthから計算
       this.widthInput$,
       combine(isWideCard$, this.heightInput$).map(([wide, heightInput]) =>
-        Math.floor(heightInput * (!wide ? 15 / 23 : 23 / 15))
-      )
+        Math.floor(heightInput * (!wide ? 15 / 23 : 23 / 15)),
+      ),
     ).skipUnchanged();
 
     this.height$ = merge(
       // widthから計算
       this.heightInput$,
       combine(isWideCard$, this.widthInput$).map(([wide, widthInput]) =>
-        Math.floor(widthInput * (wide ? 15 / 23 : 23 / 15))
-      )
+        Math.floor(widthInput * (wide ? 15 / 23 : 23 / 15)),
+      ),
     ).skipUnchanged();
 
     this.borderWidth$ = combine(this.widthInput$, this.height$).map(
-      ([width, height]) => (18 / 250) * Math.floor(Math.min(width, height))
+      ([width, height]) => (18 / 250) * Math.floor(Math.min(width, height)),
     );
 
     this.borderRadius$ = this.borderWidth$;
@@ -112,8 +112,8 @@ export class DominionCardImageComponent implements OnInit {
       .switchMap((pathSuffix: string) =>
         fromObservable(
           '',
-          this.storage.ref(`${CARD_IMAGE_DIR}/${pathSuffix}`).getDownloadURL()
-        )
+          this.storage.ref(`${CARD_IMAGE_DIR}/${pathSuffix}`).getDownloadURL(),
+        ),
       );
   }
 

@@ -36,13 +36,13 @@ export const App = () => {
   const [numRef, , updateNum, onNumChangeFns] = createState(2);
 
   const [suffixRef, updateSuffix, onSuffixChangeFns] = createReactiveValue(() =>
-    new Array(numRef.value).fill('!').join('')
+    new Array(numRef.value).fill('!').join(''),
   );
   onNumChangeFns.push(updateSuffix);
   updateSuffix(); // initialize
 
   const [msgRef, updateMsg, onMsgChangeFns] = createReactiveValue(
-    () => `world${suffixRef.value}`
+    () => `world${suffixRef.value}`,
   );
   onMsgChangeFns.push(() => updateText_$t1(msgRef.value));
   onSuffixChangeFns.push(updateMsg);

@@ -51,7 +51,7 @@ export const ImgWithPreview = memoNamed<Props>(
 
     const imgStyle = useMemo<React.CSSProperties>(
       () => ({ opacity: loaded ? 1 : 0 }),
-      [loaded]
+      [loaded],
     );
 
     return (
@@ -74,5 +74,5 @@ export const ImgWithPreview = memoNamed<Props>(
         </AbsoluteWrapper>
       </RelativeWrapper>
     );
-  }
+  },
 );

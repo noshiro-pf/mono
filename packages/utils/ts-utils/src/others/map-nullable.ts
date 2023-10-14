@@ -1,6 +1,6 @@
 export const mapOptional = <A, B>(
   value: A | null | undefined,
-  fn: (v: A) => B
+  fn: (v: A) => B,
 ): B | undefined => (value == null ? undefined : fn(value));
 
 export const mapOptionalC =

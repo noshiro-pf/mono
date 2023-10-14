@@ -13,7 +13,7 @@ const defaultAnswerIconSettings = {
 
 const d = defaultAnswerIconSettings;
 export const fillAnswerIconSettings = (
-  p?: PartialAnswerIconSettings
+  p?: PartialAnswerIconSettings,
 ): AnswerIconSettings => ({
   good: fillAnswerIconSetting(p?.good ?? d.good),
   fair: fillAnswerIconSetting(p?.fair ?? d.fair),

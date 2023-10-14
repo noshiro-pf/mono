@@ -21,24 +21,24 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
   ({ eventScheduleFromDb, emailVerified }) => {
     const commonState = useObservableValue(EditEventScheduleStore.commonState$);
     const hasNoChanges = useObservableValue(
-      EditEventScheduleStore.hasNoChanges$
+      EditEventScheduleStore.hasNoChanges$,
     );
 
     useEffect(() => {
       EditEventScheduleStore.setEventSchedule(
         eventScheduleFromDb,
-        emailVerified
+        emailVerified,
       );
     }, [eventScheduleFromDb, emailVerified]);
 
     const editButtonIsLoading = useObservableValue(
-      EditEventScheduleStore.isLoading$
+      EditEventScheduleStore.isLoading$,
     );
 
     const diff = useObservableValue(EditEventScheduleStore.diff$);
 
     const hasDeletedDatetimeChanges = useObservableValue(
-      EditEventScheduleStore.hasDeletedDatetimeChanges$
+      EditEventScheduleStore.hasDeletedDatetimeChanges$,
     );
 
     const { eventScheduleValidationOk } = commonState;
@@ -46,7 +46,7 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
     const resetState = useCallback(() => {
       EditEventScheduleStore.setEventSchedule(
         eventScheduleFromDb,
-        emailVerified
+        emailVerified,
       );
     }, [eventScheduleFromDb, emailVerified]);
 
@@ -84,7 +84,7 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
         <EventScheduleDiff diff={diff} />
       </>
     );
-  }
+  },
 );
 
 const SubTitle = styled('div')`

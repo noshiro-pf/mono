@@ -37,7 +37,7 @@ export const DatePickerDate = memoNamed<Props>(
   }) => {
     const dateString = useMemo<string>(
       () => DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
-      [ymd]
+      [ymd],
     );
 
     const DatePickerDayResolved = useMemo(() => {
@@ -90,5 +90,5 @@ export const DatePickerDate = memoNamed<Props>(
         <DatePickerDayWrapperStyled>{ymd.date}</DatePickerDayWrapperStyled>
       </DatePickerDayResolved>
     );
-  }
+  },
 );

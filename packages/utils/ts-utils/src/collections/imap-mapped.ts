@@ -16,7 +16,7 @@ interface IMapMappedInterface<K, V, KM extends KeyType> {
   // Reducing a value
   every: ((predicate: (value: V, key: K) => boolean) => boolean) &
     (<W extends V>(
-      predicate: (value: V, key: K) => value is W
+      predicate: (value: V, key: K) => value is W,
     ) => this is IMapMapped<K, W, KM>);
   some: (predicate: (value: V, key: K) => boolean) => boolean;
 
@@ -29,7 +29,7 @@ interface IMapMappedInterface<K, V, KM extends KeyType> {
       | { type: 'delete'; key: K }
       | { type: 'set'; key: K; value: V }
       | { type: 'update'; key: K; updater: (value: V) => V }
-    >[]
+    >[],
   ) => IMapMapped<K, V, KM>;
 
   // Sequence algorithms
@@ -37,7 +37,7 @@ interface IMapMappedInterface<K, V, KM extends KeyType> {
   // toKey と fromKey が使えなくなるので key の型は変更できない。
   mapKeys: (mapFn: (key: K) => K) => IMapMapped<K, V, KM>;
   mapEntries: <V2>(
-    mapFn: (entry: readonly [K, V]) => readonly [K, V2]
+    mapFn: (entry: readonly [K, V]) => readonly [K, V2],
   ) => IMapMapped<K, V2, KM>;
 
   // Side effects
@@ -63,13 +63,13 @@ export const IMapMapped = {
   new: <K, V, KM extends KeyType>(
     iterable: Iterable<readonly [K, V]>,
     toKey: (a: K) => KM,
-    fromKey: (k: KM) => K
+    fromKey: (k: KM) => K,
   ): IMapMapped<K, V, KM> =>
     new IMapMappedClass<K, V, KM>(iterable, toKey, fromKey),
 
   equal: <K, V, KM extends KeyType>(
     a: IMapMapped<K, V, KM>,
-    b: IMapMapped<K, V, KM>
+    b: IMapMapped<K, V, KM>,
   ): boolean => {
     if (a.size !== b.size) return false;
 
@@ -89,7 +89,7 @@ class IMapMappedClass<K, V, KM extends KeyType>
   constructor(
     iterable: Iterable<readonly [K, V]>,
     toKey: (a: K) => KM,
-    fromKey: (k: KM) => K
+    fromKey: (k: KM) => K,
   ) {
     // eslint-disable-next-line no-restricted-globals
     this.#map = new Map(ArrayFrom(iterable, ([k, v]) => [toKey(k), v]));
@@ -110,7 +110,7 @@ class IMapMappedClass<K, V, KM extends KeyType>
   }
 
   every<W extends V>(
-    predicate: (value: V, key: K) => value is W
+    predicate: (value: V, key: K) => value is W,
   ): this is IMapMapped<K, W, KM>;
   every(predicate: (value: V, key: K) => boolean): boolean;
   every(predicate: (value: V, key: K) => boolean): boolean {
@@ -141,7 +141,7 @@ class IMapMappedClass<K, V, KM extends KeyType>
         .filter(([km]) => !Object.is(km, keyMapped))
         .map(([km, v]) => tp(this.#fromKey(km), v)),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -152,18 +152,18 @@ class IMapMappedClass<K, V, KM extends KeyType>
     if (!this.has(key)) {
       return IMapMapped.new(
         [...this.#map, tp(keyMapped, value)].map(([km, v]) =>
-          tp(this.#fromKey(km), v)
+          tp(this.#fromKey(km), v),
         ),
         this.#toKey,
-        this.#fromKey
+        this.#fromKey,
       );
     } else {
       return IMapMapped.new(
         ArrayFrom(this.#map, ([km, v]) =>
-          tp(this.#fromKey(km), Object.is(km, keyMapped) ? value : v)
+          tp(this.#fromKey(km), Object.is(km, keyMapped) ? value : v),
         ),
         this.#toKey,
-        this.#fromKey
+        this.#fromKey,
       );
     }
   }
@@ -183,12 +183,12 @@ class IMapMappedClass<K, V, KM extends KeyType>
         (keyValue) =>
           pipe(keyValue)
             .chain(([km, v]) =>
-              tp(km, Object.is(km, keyMapped) ? updater(curr) : v)
+              tp(km, Object.is(km, keyMapped) ? updater(curr) : v),
             )
-            .chain(([km, v]) => tp(this.#fromKey(km), v)).value
+            .chain(([km, v]) => tp(this.#fromKey(km), v)).value,
       ),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -197,7 +197,7 @@ class IMapMappedClass<K, V, KM extends KeyType>
       | { type: 'delete'; key: K }
       | { type: 'set'; key: K; value: V }
       | { type: 'update'; key: K; updater: (value: V) => V }
-    >[]
+    >[],
   ): IMapMapped<K, V, KM> {
     // eslint-disable-next-line no-restricted-globals
     const mut_result = new Map<KM, V>(this.#map);
@@ -220,8 +220,8 @@ class IMapMappedClass<K, V, KM extends KeyType>
           } else {
             console.warn(
               `IMapMapped.withMutations::update: key not found: ${this.#toKey(
-                key
-              )}`
+                key,
+              )}`,
             );
           }
           break;
@@ -232,7 +232,7 @@ class IMapMappedClass<K, V, KM extends KeyType>
     return IMapMapped.new<K, V, KM>(
       ArrayFrom(mut_result, ([k, v]) => [this.#fromKey(k), v]),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -240,7 +240,7 @@ class IMapMappedClass<K, V, KM extends KeyType>
     return IMapMapped.new(
       this.toArray().map(([k, v]) => tp(k, mapFn(v, k))),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
@@ -248,17 +248,17 @@ class IMapMappedClass<K, V, KM extends KeyType>
     return IMapMapped.new(
       this.toArray().map(([k, v]) => tp(mapFn(k), v)),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 
   mapEntries<V2>(
-    mapFn: (entry: readonly [K, V]) => readonly [K, V2]
+    mapFn: (entry: readonly [K, V]) => readonly [K, V2],
   ): IMapMapped<K, V2, KM> {
     return IMapMapped.new(
       this.toArray().map(mapFn),
       this.#toKey,
-      this.#fromKey
+      this.#fromKey,
     );
   }
 

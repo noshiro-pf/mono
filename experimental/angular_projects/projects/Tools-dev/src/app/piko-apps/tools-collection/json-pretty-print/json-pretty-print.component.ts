@@ -21,11 +21,11 @@ export class JsonPrettyPrintComponent implements OnInit {
       } catch (e) {
         return;
       }
-    })
+    }),
   );
 
   output$: Observable<string> = combineLatest(this.obj$, this.spacer$).pipe(
-    map((val) => this.convert(val[0], val[1]))
+    map((val) => this.convert(val[0], val[1])),
   );
 
   constructor() {}

@@ -3,7 +3,7 @@ import { type ApiMeldedBlock, type RevealedBlock } from '../types';
 import { revealedBlockToTiles } from './revealed-block-to-tiles';
 
 export const revealedBlockToApiPayload = (
-  revealedBlock: RevealedBlock
+  revealedBlock: RevealedBlock,
 ): ApiMeldedBlock =>
   pipe(revealedBlock)
     .chain((a) => {
@@ -158,7 +158,7 @@ export const revealedBlockToApiPayload = (
     .chain((id) => {
       const tilesNo = Tpl.map(
         revealedBlockToTiles(revealedBlock),
-        (t) => tileDef[t].no
+        (t) => tileDef[t].no,
       );
 
       return {

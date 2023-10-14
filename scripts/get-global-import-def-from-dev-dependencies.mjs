@@ -9,11 +9,11 @@ import { join } from 'node:path';
  */
 export const genGlobalImportDefsFromDevDependencies = (
   thisDir,
-  devDependencies
+  devDependencies,
 ) => {
   // eslint-disable-next-line no-restricted-syntax
   const globalUtils = Object.keys(devDependencies).filter((packageName) =>
-    packageName.startsWith('@noshiro/global-')
+    packageName.startsWith('@noshiro/global-'),
   );
 
   const importPaths = globalUtils.map((packageName) =>
@@ -21,15 +21,15 @@ export const genGlobalImportDefsFromDevDependencies = (
       thisDir,
       `../../../utils/${packageName.replace(
         '@noshiro/',
-        ''
-      )}/cjs/provide-plugin-def.js`
-    )
+        '',
+      )}/cjs/provide-plugin-def.js`,
+    ),
   );
 
   /** @type {Record<string, Record<string, readonly [string, string]>>[]} */
   const providePluginDefPackages = importPaths.map(
     // eslint-disable-next-line import/no-dynamic-require, security/detect-non-literal-require, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, unicorn/prefer-module
-    (importPath) => require(importPath)
+    (importPath) => require(importPath),
   );
 
   /** @type {Record<string, readonly [string, string]>} */
@@ -38,7 +38,7 @@ export const genGlobalImportDefsFromDevDependencies = (
   /** @type {Record<string, readonly [string, string]>} */
   const providePluginDefs = providePluginDefPackages.reduce(
     (acc, curr) => ({ ...acc, ...Object.values(curr)[0] }),
-    init
+    init,
   );
 
   return providePluginDefs;

@@ -11,7 +11,7 @@ const dispatch = async (
   payload: Readonly<{
     username: string;
     password: string | undefined;
-  }>
+  }>,
 ): Promise<Room> => {
   setIsWaitingResponse(true);
 

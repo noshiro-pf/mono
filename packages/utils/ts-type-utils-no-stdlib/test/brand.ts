@@ -51,9 +51,9 @@ import { expectType } from './expect-type';
   expectType<UnwrapBrandBooleanKeys<AB>, 'B'>('=');
 
   expectType<GetBrandKeysPart<AB>, Readonly<{ B: boolean; T: true; F: false }>>(
-    '='
+    '=',
   );
   expectType<NormalizeBrandUnion<AB>, Readonly<{ T: true; F: false }> & number>(
-    '='
+    '=',
   );
 }

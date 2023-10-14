@@ -17,7 +17,7 @@ export class RandomizerCardImageComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private database: FireDatabaseService,
-    private myRandomizerGroup: MyRandomizerGroupService
+    private myRandomizerGroup: MyRandomizerGroupService,
   ) {}
 
   ngOnInit() {}

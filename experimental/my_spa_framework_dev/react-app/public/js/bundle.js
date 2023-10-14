@@ -31,7 +31,7 @@
             o,
             function (t) {
               return e[t];
-            }.bind(null, o)
+            }.bind(null, o),
           );
       return r;
     }),

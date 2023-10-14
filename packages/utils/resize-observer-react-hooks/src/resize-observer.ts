@@ -11,7 +11,7 @@ type Size = Readonly<{
 }>;
 
 export const useResizeObserverRef = <E extends Element = Element>(
-  setSize: (v: Size) => void
+  setSize: (v: Size) => void,
 ): React.RefObject<E> => {
   const rootResizeObserver = useMemo(
     () =>
@@ -21,7 +21,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
           setSize(entries[0].contentRect);
         }
       }),
-    [setSize]
+    [setSize],
   );
 
   const targetElRef = useRef<E>(null);
@@ -43,10 +43,10 @@ export const useResizeObserverRef = <E extends Element = Element>(
 };
 
 export const useResizeObserver = <E extends Element = Element>(
-  defaultSize?: Size
+  defaultSize?: Size,
 ): [Size, React.RefObject<E>] => {
   const { state: size, setState: setSize } = useState<Size>(
-    defaultSize ?? { width: 0, height: 0, left: 0, top: 0 }
+    defaultSize ?? { width: 0, height: 0, left: 0, top: 0 },
   );
 
   const targetElRef = useResizeObserverRef<E>(setSize);

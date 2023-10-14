@@ -1,7 +1,7 @@
 export const theNameIsAlreadyUsedFn = (
   userName: UserName,
   answers: readonly Answer[],
-  nameToOmit: UserName | undefined
+  nameToOmit: UserName | undefined,
 ): boolean =>
   userName === nameToOmit
     ? false

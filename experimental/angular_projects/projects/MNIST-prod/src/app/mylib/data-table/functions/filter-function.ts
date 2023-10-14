@@ -4,7 +4,7 @@ import { IHeaderSettingFilled } from '../types/header-setting';
 export const filterFn = (
   tableLine: any[],
   headerSettings: IHeaderSettingFilled[],
-  headerValuesAll: (any | undefined)[]
+  headerValuesAll: (any | undefined)[],
 ): boolean => {
   for (let colIndex = 0; colIndex < headerSettings.length; ++colIndex) {
     const headerValue = headerValuesAll[colIndex];

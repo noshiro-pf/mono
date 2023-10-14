@@ -5,7 +5,7 @@ export const addGlobalPointerEventListener = (
   app: Application,
   mut_background: Sprite,
   state: CanvasAppState,
-  stateHandler: CanvasAppStateHandler
+  stateHandler: CanvasAppStateHandler,
 ): (() => void) => {
   const pointerdownCallback = (): void => {
     stateHandler(state, { type: 'backgroundPointerDown' });

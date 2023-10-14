@@ -25,5 +25,5 @@ export const BpNumericInputWithLabel = memoNamed<Props>(
         onValueChange={onValueChange}
       />
     </Label>
-  )
+  ),
 );

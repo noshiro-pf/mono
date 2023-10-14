@@ -11,7 +11,7 @@ export const isUint16 = (a: number): a is Uint16 =>
 export const toUint16 = (a: number): Uint16 => {
   if (!isUint16(a)) {
     throw new TypeError(
-      `Expected non-negative integer less than 2^16, got: ${a}`
+      `Expected non-negative integer less than 2^16, got: ${a}`,
     );
   }
   return a;
@@ -42,7 +42,7 @@ const mul = (x: Uint32WithSmallInt, y: Uint32WithSmallInt): Uint16 =>
 
 const div = (
   x: Uint32WithSmallInt,
-  y: WithSmallInt<IntersectBrand<Uint16, NonZeroNumber>>
+  y: WithSmallInt<IntersectBrand<Uint16, NonZeroNumber>>,
 ): Uint16 => clamp(Math.floor(x / y));
 
 const random = (min: Uint32WithSmallInt, max: Uint32WithSmallInt): Uint16 =>

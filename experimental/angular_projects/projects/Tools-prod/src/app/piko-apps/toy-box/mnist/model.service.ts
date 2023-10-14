@@ -34,7 +34,7 @@ export class ModelService {
       },
       100,
       10,
-      0.01
+      0.01,
     );
 
     this.predict$ = params$.pipe(
@@ -50,7 +50,7 @@ export class ModelService {
           }, 300);
           return p;
         };
-      })
+      }),
     );
   }
 }

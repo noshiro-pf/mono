@@ -31,5 +31,5 @@ export const WeightSetting = memoNamed<WeightSettingProps>(
         {dc.weight.suffix}
       </div>
     </div>
-  )
+  ),
 );

@@ -38,7 +38,7 @@ const resetAllState = (): void => {
 
 const setEventSchedule = (
   ev: EventSchedule,
-  emailVerified: string | undefined
+  emailVerified: string | undefined,
 ): void => {
   setEventScheduleFromDatabase(ev);
 
@@ -60,7 +60,7 @@ const setEventSchedule = (
   } else {
     commonStateHandlers.turnOnNotificationSection();
     commonStateHandlers.setNotificationSettingsWithEmail(
-      Obj.merge(ev.notificationSettings, { email: emailVerified ?? '' })
+      Obj.merge(ev.notificationSettings, { email: emailVerified ?? '' }),
     );
   }
 };
@@ -81,17 +81,17 @@ const diff$: InitializedObservable<EventSettingsPageDiffResult> =
           eventScheduleFromDatabase ?? eventScheduleInitialValue,
           eventScheduleNormalized,
           emailVerified,
-          notificationSettingsWithEmail?.email
-        )
-    )
+          notificationSettingsWithEmail?.email,
+        ),
+    ),
   );
 
 const hasDeletedDatetimeChanges$: InitializedObservable<boolean> = diff$.chain(
   mapI(
     (diff) =>
       diff.datetimeRangeList?.deleted !== undefined &&
-      Arr.isNonEmpty(diff.datetimeRangeList.deleted)
-  )
+      Arr.isNonEmpty(diff.datetimeRangeList.deleted),
+  ),
 );
 
 const hasNoChanges$: InitializedObservable<boolean> = combineLatestI([
@@ -106,12 +106,12 @@ const hasNoChanges$: InitializedObservable<boolean> = combineLatestI([
       { eventScheduleNormalized, notificationSettingsWithEmail },
     ]) =>
       emailVerified === notificationSettingsWithEmail?.email &&
-      deepEqual(eventScheduleFromDatabase, eventScheduleNormalized)
-  )
+      deepEqual(eventScheduleFromDatabase, eventScheduleNormalized),
+  ),
 );
 
 const answerPagePath$ = Router.eventId$.chain(
-  mapI((eventId) => Routes.routes.answerPage(eventId ?? ''))
+  mapI((eventId) => Routes.routes.answerPage(eventId ?? '')),
 );
 
 const onBackToAnswerPage = (): void => {

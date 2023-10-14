@@ -40,7 +40,7 @@ export const arange = seq;
 
 export const createNdArray = (
   shape: number[],
-  initialValue: number = 0
+  initialValue: number = 0,
 ): TNdNum => {
   if (!shape || shape.length < 1) return initialValue;
   const array1 = newArray(shape[0], 0);
@@ -133,7 +133,7 @@ export const map = (x: TNdNum, f: (e: number) => number): TNdNum =>
 const updateValue_s = (
   d: number,
   x: TNdNum,
-  f: (e: number) => number
+  f: (e: number) => number,
 ): void => {
   if (typeof x === 'number') return;
   if (d === 1) {
@@ -168,7 +168,7 @@ const reshape_s = (
   begin: number,
   end: number,
   shape: number[],
-  shapeIdx: number
+  shapeIdx: number,
 ): TNdNum => {
   if (shapeIdx > shape.length - 1) {
     throw new Error('shapeIdx should be in shape index range');
@@ -185,8 +185,8 @@ const reshape_s = (
         begin + chunkSize * i,
         begin + chunkSize * (i + 1),
         shape,
-        shapeIdx + 1
-      )
+        shapeIdx + 1,
+      ),
     );
   }
 };
@@ -216,7 +216,7 @@ const slice_s = (
     begin?: number;
     end?: number;
     stride?: number;
-  }[]
+  }[],
 ): TNdNum => {
   if (typeof x === 'number') return x;
   if (d !== range.length) {
@@ -247,7 +247,7 @@ export const slice = (
     begin?: number;
     end?: number;
     stride?: number;
-  }[]
+  }[],
 ): TNdNum => {
   return slice_s(dim(x), x, range);
 };
@@ -257,7 +257,7 @@ const transpose_s = (
   d: number,
   to: TNdNum,
   tr: number[],
-  pos: number[]
+  pos: number[],
 ): void => {
   if (typeof from === 'number') return;
   if (d === 1) {
@@ -266,7 +266,7 @@ const transpose_s = (
       set(
         to,
         tr.map((j) => pos2[j]),
-        e
+        e,
       );
     });
   } else {
@@ -402,13 +402,13 @@ export const dot = (x: TNdNum, y: TNdNum): TNdNum => {
     // matrix/vector
     return matrixProduct(
       x as number[][],
-      (y as number[]).map((e) => [e])
+      (y as number[]).map((e) => [e]),
     ).map((e) => e[0]);
   } else if (dim_x === 1 && dim_y === 1 && shape_x0 === shape_y0) {
     // vector/vector
     return matrixProduct(
       [x as number[]],
-      (y as number[]).map((e) => [e])
+      (y as number[]).map((e) => [e]),
     )[0][0];
   } else {
     throw new Error('cannot compute the matrix product of given arrays');

@@ -17,29 +17,29 @@ const hm2str = (hm: HoursMinutes): string =>
 
 export const datetimeRange2str = (
   datetimeRange: DatetimeRange,
-  datetimeSpecification: DatetimeSpecificationEnumType
+  datetimeSpecification: DatetimeSpecificationEnumType,
 ): string => {
   switch (datetimeSpecification) {
     case 'noStartEndSpecified':
       return ymd2str(datetimeRange.ymd);
     case 'startSpecified':
       return `${ymd2str(datetimeRange.ymd)} ${hm2str(
-        datetimeRange.timeRange.start
+        datetimeRange.timeRange.start,
       )}~`;
     case 'endSpecified':
       return `${ymd2str(datetimeRange.ymd)} ~${hm2str(
-        datetimeRange.timeRange.end
+        datetimeRange.timeRange.end,
       )}`;
     case 'startAndEndSpecified':
       return `${ymd2str(datetimeRange.ymd)} ${hm2str(
-        datetimeRange.timeRange.start
+        datetimeRange.timeRange.start,
       )}~${hm2str(datetimeRange.timeRange.end)}`;
   }
 };
 
 export const iconId2str = (
   iconId: AnswerIconIdWithNone,
-  point: AnswerIconPoint
+  point: AnswerIconPoint,
 ): string => {
   switch (iconId) {
     case 'none':

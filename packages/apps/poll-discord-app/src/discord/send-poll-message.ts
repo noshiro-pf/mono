@@ -37,7 +37,7 @@ const rpSendPollMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
   title: string,
-  args: readonly string[]
+  args: readonly string[],
 ): Promise<
   Result<
     Readonly<{
@@ -51,7 +51,7 @@ const rpSendPollMessageSub = async (
 > => {
   if (messageChannel.type !== ChannelType.GuildText) {
     return Result.err(
-      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`
+      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`,
     );
   }
 
@@ -78,7 +78,7 @@ const rpSendPollMessageSub = async (
   }
 
   const dateOptionMessageList = mut_dateOptionAndMessageListTemp.map(
-    ([, a]) => a
+    ([, a]) => a,
   );
   const dateOptions = mut_dateOptionAndMessageListTemp.map(([a]) => a);
 
@@ -89,15 +89,15 @@ const rpSendPollMessageSub = async (
       title,
       dateOptions,
       answers: IMap.new<DateOptionId, AnswerOfDate>(
-        dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue))
+        dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue)),
       ),
       titleMessageId,
     },
-    IMap.new<UserId, string>([])
+    IMap.new<UserId, string>([]),
   );
 
   const summaryMessageInitResult = await Result.fromPromise(
-    messageChannel.send({ embeds: [summaryMessageEmbed] })
+    messageChannel.send({ embeds: [summaryMessageEmbed] }),
   );
 
   if (Result.isErr(summaryMessageInitResult)) return summaryMessageInitResult;
@@ -106,7 +106,7 @@ const rpSendPollMessageSub = async (
   // memo: "（編集済）" という文字列が表示されてずれるのが操作性を若干損ねるので、
   // あえて一度メッセージを送った後再編集している
   const summaryMessageEditResult = await Result.fromPromise(
-    summaryMessageInit.edit({ embeds: [summaryMessageEmbed] })
+    summaryMessageInit.edit({ embeds: [summaryMessageEmbed] }),
   );
 
   if (Result.isErr(summaryMessageEditResult)) return summaryMessageEditResult;
@@ -114,7 +114,7 @@ const rpSendPollMessageSub = async (
   const summaryMessage = summaryMessageEditResult.value;
 
   const summaryMessageReactResult = await Result.fromPromise(
-    summaryMessage.react(emojis.refresh.unicode)
+    summaryMessage.react(emojis.refresh.unicode),
   );
 
   if (Result.isErr(summaryMessageReactResult)) return summaryMessageReactResult;
@@ -132,7 +132,7 @@ const rpSendPollMessage = async (
   discordChannel: Discord.Message['channel'],
   messageId: CommandMessageId,
   title: string | undefined,
-  pollOptions: readonly string[]
+  pollOptions: readonly string[],
 ): Promise<Result<undefined, unknown>> => {
   if (title === undefined) return Result.ok(undefined);
   if (pollOptions.length === 0) return Result.ok(undefined);
@@ -140,7 +140,7 @@ const rpSendPollMessage = async (
   const replySubResult = await rpSendPollMessageSub(
     discordChannel,
     title,
-    pollOptions
+    pollOptions,
   );
   if (Result.isErr(replySubResult)) return replySubResult;
   const { summaryMessage, dateOptions, dateOptionMessageList, titleMessageId } =
@@ -152,7 +152,7 @@ const rpSendPollMessage = async (
     title,
     dateOptions,
     answers: IMap.new<DateOptionId, AnswerOfDate>(
-      dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue))
+      dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue)),
     ),
     titleMessageId,
   };
@@ -166,7 +166,7 @@ const rpSendPollMessage = async (
     firestoreApi.setPollIdForCommandMessageId(messageId, poll.id),
     firestoreApi.setPollIdForDateOptionIds(
       poll.dateOptions.map((p) => p.id),
-      poll.id
+      poll.id,
     ),
   ]);
 
@@ -181,13 +181,13 @@ const rpSendPollMessage = async (
   }
 
   await Promise.all(
-    dateOptionMessageList.map((msg) => msg.react(emojis.good.unicode))
+    dateOptionMessageList.map((msg) => msg.react(emojis.good.unicode)),
   );
   await Promise.all(
-    dateOptionMessageList.map((msg) => msg.react(emojis.fair.unicode))
+    dateOptionMessageList.map((msg) => msg.react(emojis.fair.unicode)),
   );
   await Promise.all(
-    dateOptionMessageList.map((msg) => msg.react(emojis.poor.unicode))
+    dateOptionMessageList.map((msg) => msg.react(emojis.poor.unicode)),
   );
 
   return Result.ok(undefined);
@@ -196,16 +196,16 @@ const rpSendPollMessage = async (
 const gpSendGroupingMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
-  groups: readonly Group[]
+  groups: readonly Group[],
 ): Promise<Result<undefined, unknown>> => {
   if (messageChannel.type !== ChannelType.GuildText) {
     return Result.err(
-      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`
+      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`,
     );
   }
 
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send({ embeds: [gpCreateSummaryMessage(groups)] })
+    messageChannel.send({ embeds: [gpCreateSummaryMessage(groups)] }),
   );
 
   return Result.map(summaryMessageResult, () => undefined);
@@ -214,16 +214,16 @@ const gpSendGroupingMessageSub = async (
 const gpSendRandMessageSub = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
-  n: number
+  n: number,
 ): Promise<Result<undefined, unknown>> => {
   if (messageChannel.type !== ChannelType.GuildText) {
     return Result.err(
-      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`
+      `This channel type (${messageChannel.type}) is not supported. (GuildText only)`,
     );
   }
 
   const summaryMessageResult = await Result.fromPromise(
-    messageChannel.send(Math.ceil(Math.random() * n).toString())
+    messageChannel.send(Math.ceil(Math.random() * n).toString()),
   );
 
   return Result.map(summaryMessageResult, () => undefined);
@@ -231,10 +231,10 @@ const gpSendRandMessageSub = async (
 
 const gpSendGroupingMessage = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageFilled: Discord.Message
+  messageFilled: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   const parseResult = gpParseGroupingCommandArgument(
-    removeCommandPrefix(messageFilled.content, triggerCommand.gp)
+    removeCommandPrefix(messageFilled.content, triggerCommand.gp),
   );
   if (Result.isErr(parseResult)) return Result.ok(undefined);
   const [numGroups, nameList] = parseResult.value;
@@ -244,7 +244,7 @@ const gpSendGroupingMessage = async (
 
   const replySubResult = await gpSendGroupingMessageSub(
     messageFilled.channel,
-    generateGroups(numGroups, nameList)
+    generateGroups(numGroups, nameList),
   );
 
   return replySubResult;
@@ -252,10 +252,10 @@ const gpSendGroupingMessage = async (
 
 const gpSendRandMessage = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  messageFilled: Discord.Message
+  messageFilled: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   const parseResult = gpParseRandCommandArgument(
-    removeCommandPrefix(messageFilled.content, triggerCommand.rand)
+    removeCommandPrefix(messageFilled.content, triggerCommand.rand),
   );
 
   if (Result.isErr(parseResult)) return Result.ok(undefined);
@@ -268,7 +268,7 @@ const gpSendRandMessage = async (
 
 export const sendMessageMain = async (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  message: Discord.Message
+  message: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
   if (message.author.bot) return Result.ok(undefined);
 
@@ -286,13 +286,13 @@ export const sendMessageMain = async (
       message.channel,
       toCommandMessageId(message.id),
       title,
-      args
+      args,
     );
   }
 
   if (message.content.startsWith(`${triggerCommand.rp30} `)) {
     const res = convertRp30ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp30)
+      removeCommandPrefix(message.content, triggerCommand.rp30),
     );
 
     if (Result.isErr(res)) return res;
@@ -301,13 +301,13 @@ export const sendMessageMain = async (
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
-      res.value.args
+      res.value.args,
     );
   }
 
   if (message.content.startsWith(`${triggerCommand.rp60} `)) {
     const res = convertRp60ArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp60)
+      removeCommandPrefix(message.content, triggerCommand.rp60),
     );
 
     if (Result.isErr(res)) return res;
@@ -316,13 +316,13 @@ export const sendMessageMain = async (
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
-      res.value.args
+      res.value.args,
     );
   }
 
   if (message.content.startsWith(`${triggerCommand.rp30d} `)) {
     const res = convertRp30dArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp30d)
+      removeCommandPrefix(message.content, triggerCommand.rp30d),
     );
 
     if (Result.isErr(res)) return res;
@@ -331,13 +331,13 @@ export const sendMessageMain = async (
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
-      res.value.args
+      res.value.args,
     );
   }
 
   if (message.content.startsWith(`${triggerCommand.rp60d} `)) {
     const res = convertRp60dArgToRpArgs(
-      removeCommandPrefix(message.content, triggerCommand.rp60d)
+      removeCommandPrefix(message.content, triggerCommand.rp60d),
     );
 
     if (Result.isErr(res)) return res;
@@ -346,7 +346,7 @@ export const sendMessageMain = async (
       message.channel,
       toCommandMessageId(message.id),
       res.value.title,
-      res.value.args
+      res.value.args,
     );
   }
 

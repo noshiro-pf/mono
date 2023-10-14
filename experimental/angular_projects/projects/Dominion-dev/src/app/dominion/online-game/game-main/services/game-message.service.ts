@@ -12,8 +12,8 @@ export class GameMessageService {
     scan(
       (acc: string[], val: string, idx: number) =>
         ([] as string[]).concat(acc, [`${idx + 1}. ${val}`]),
-      []
-    )
+      [],
+    ),
   );
 
   gameMessageIndex$ = this.gameMessage$.pipe(map((value, index) => index));
@@ -23,7 +23,7 @@ export class GameMessageService {
     this.gameMessageList$,
     this.gameMessageIndexDelayed$,
     this.gameMessageIndex$,
-    (list, begin, end) => list.slice(begin + 1, end + 1)
+    (list, begin, end) => list.slice(begin + 1, end + 1),
   );
 
   constructor(private user: UserService) {}

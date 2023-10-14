@@ -19,7 +19,7 @@ export const CodeArea = memoNamed(
       (ev) => {
         valueChange(ev.target.value);
       },
-      [valueChange]
+      [valueChange],
     );
 
     const style = useMemo<preact.JSX.CSSProperties>(
@@ -27,7 +27,7 @@ export const CodeArea = memoNamed(
         minHeight: `${minHeightPx}px`,
         maxHeight: `${maxHeightPx}px`,
       }),
-      [minHeightPx, maxHeightPx]
+      [minHeightPx, maxHeightPx],
     );
 
     return (
@@ -38,7 +38,7 @@ export const CodeArea = memoNamed(
         onChange={onChange}
       />
     );
-  }
+  },
 );
 
 const TextArea = styled('textarea')`

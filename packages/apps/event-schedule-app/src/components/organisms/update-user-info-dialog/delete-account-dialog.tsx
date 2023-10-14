@@ -90,5 +90,5 @@ export const DeleteAccountDialog = memoNamed<Props>(
         title={dc.deleteAccount.title}
       />
     );
-  }
+  },
 );

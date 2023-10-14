@@ -15,19 +15,19 @@ const toast = createToaster();
 
 const [formState$, dispatch] = createReducer(
   updateDisplayNamePageStateReducer,
-  updateDisplayNamePageInitialState
+  updateDisplayNamePageInitialState,
 );
 
 const enterButtonDisabled$ = formState$.chain(
   mapI(
-    (state) => state.isWaitingResponse || updateDisplayNamePageHasError(state)
-  )
+    (state) => state.isWaitingResponse || updateDisplayNamePageHasError(state),
+  ),
 );
 
 const displayNameFormIntent$: InitializedObservable<Intent> = formState$.chain(
   mapI((state) =>
-    state.displayName.error === undefined ? 'primary' : 'danger'
-  )
+    state.displayName.error === undefined ? 'primary' : 'danger',
+  ),
 );
 
 const state$ = combineLatestI([
@@ -39,7 +39,7 @@ const state$ = combineLatestI([
     formState,
     enterButtonDisabled,
     displayNameFormIntent,
-  }))
+  })),
 );
 
 const submit = async (user: FireAuthUser): Promise<void> => {
@@ -53,7 +53,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
     console.error(
       'error occurred on updateDisplayName:',
       res.value.code,
-      res.value.message
+      res.value.message,
     );
 
     dispatch({ type: 'done' });

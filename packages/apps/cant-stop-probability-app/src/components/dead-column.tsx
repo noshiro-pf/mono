@@ -46,5 +46,5 @@ export const DeadColumn = memoNamed<Props>(
         {hitSomeAliveColumnProbability}
       </div>
     </div>
-  )
+  ),
 );

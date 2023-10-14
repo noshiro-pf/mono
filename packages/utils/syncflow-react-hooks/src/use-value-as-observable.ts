@@ -4,7 +4,7 @@ import { useObservableState } from './use-observable-state';
 
 export const useChangeValueEffect = <A>(
   input: A,
-  callback: (v: A) => void
+  callback: (v: A) => void,
 ): void => {
   useEffect(() => {
     callback(input);

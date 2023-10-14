@@ -16,8 +16,8 @@ export const relativeLuminance = ([r, g, b]: Rgb): NonNegativeFiniteNumber =>
     NN.mul(toP(0.2126), f(NN.div(toNN(r), toP(255)))),
     NN.add(
       NN.mul(toP(0.7152), f(NN.div(toNN(g), toP(255)))),
-      NN.mul(toP(0.0722), f(NN.div(toNN(b), toP(255))))
-    )
+      NN.mul(toP(0.0722), f(NN.div(toNN(b), toP(255)))),
+    ),
   );
 
 const f = (v: NonNegativeFiniteNumber): NonNegativeFiniteNumber =>

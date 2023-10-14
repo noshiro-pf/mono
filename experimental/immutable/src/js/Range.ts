@@ -83,7 +83,7 @@ export class Range extends IndexedSeq {
     return new Range(
       this.get(begin, this._end),
       this.get(end, this._end),
-      this._step
+      this._step,
     );
   }
 

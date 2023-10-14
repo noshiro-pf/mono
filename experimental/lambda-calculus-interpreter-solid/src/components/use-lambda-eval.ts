@@ -14,7 +14,7 @@ import {
 } from '@noshiro/syncflow';
 
 export const useLambdaEval = (
-  input$: InitializedObservable<string>
+  input$: InitializedObservable<string>,
 ): InitializedObservable<string> => {
   const inputBuffered$ = input$.chain(debounceTimeI(200 /* ms */));
 
@@ -30,7 +30,7 @@ export const useLambdaEval = (
     evalSequence$.chain(mapI((seq) => seq.map(termToString)));
 
   const output$: InitializedObservable<string> = evalSeqToStr$.chain(
-    mapI((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
+    mapI((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n')),
   );
 
   return output$;

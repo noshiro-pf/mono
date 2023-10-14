@@ -27,15 +27,15 @@ export class MyCardAreaComponent implements OnInit {
   isMyTurn$ = this.gameStateService.isMyTurn$;
   VPtoken$ = this.gameStateService.myData$.pipe(
     map((e) => e.VPtoken),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   vcoin$ = this.gameStateService.myData$.pipe(
     map((e) => e.vcoin),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
   debt$ = this.gameStateService.myData$.pipe(
     map((e) => e.debt),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
 
   private myCards$: Observable<PlayerCards> = this.gameStateService.myCards$;
@@ -47,14 +47,14 @@ export class MyCardAreaComponent implements OnInit {
     Open$: this.myCards$.pipe(map((e) => e.Open)),
     PlayArea$: this.myCards$.pipe(map((e) => e.PlayArea)),
     DiscardPileReveresed$: this.myCards$.pipe(
-      map((e) => utils.array.getReversed(e.DiscardPile))
+      map((e) => utils.array.getReversed(e.DiscardPile)),
     ),
   };
 
   constructor(
     private gameStateService: GameStateService,
     private gameRoomService: MyGameRoomService,
-    private config: GameConfigService
+    private config: GameConfigService,
   ) {}
 
   ngOnInit() {}

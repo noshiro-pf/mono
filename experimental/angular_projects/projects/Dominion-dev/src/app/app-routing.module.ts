@@ -32,7 +32,7 @@ import { NotFoundPageComponent } from './not-found-page.component';
         { component: DataTableDemoComponent, path: 'data-table-demo' },
         { component: NotFoundPageComponent, path: '**' },
       ],
-      { useHash: true }
+      { useHash: true },
     ),
   ],
   exports: [RouterModule],

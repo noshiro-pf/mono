@@ -30,5 +30,5 @@ export const BpPasswordInput = memoNamed<BpPasswordInputProps>(
         onValueChange={props.onPasswordChange}
       />
     );
-  }
+  },
 );

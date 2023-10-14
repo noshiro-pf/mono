@@ -18,7 +18,7 @@ export const NameAndNotes = memoNamed<Props>(
     const [showError, onTitleChangeLocal, onBlur] = useFormError(
       title,
       (v) => v === '',
-      onTitleChange
+      onTitleChange,
     );
 
     return (
@@ -57,5 +57,5 @@ export const NameAndNotes = memoNamed<Props>(
         </FormGroup>
       </WidthRestrictedInputWrapper>
     );
-  }
+  },
 );

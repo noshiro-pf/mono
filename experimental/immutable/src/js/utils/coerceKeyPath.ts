@@ -16,6 +16,6 @@ export default function coerceKeyPath(keyPath: unknown) {
     return keyPath.toArray();
   }
   throw new TypeError(
-    `Invalid keyPath: expected Ordered Collection or Array: ${keyPath}`
+    `Invalid keyPath: expected Ordered Collection or Array: ${keyPath}`,
   );
 }

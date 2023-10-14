@@ -71,7 +71,7 @@ const asyncChild = new AsyncChildObservableClass({
   initialValue: Maybe.some(0),
 });
 expectType<typeof asyncChild, AsyncChildObservable<number, 'debounceTime'>>(
-  '<='
+  '<=',
 );
 
 test('SyncChildObservableClass', () => {

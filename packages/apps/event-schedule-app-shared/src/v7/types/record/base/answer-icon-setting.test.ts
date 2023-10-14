@@ -30,7 +30,7 @@ describe('AnswerIconSetting', () => {
         isAnswerIconSetting({
           description: '',
           point: 0,
-        })
+        }),
       ).toBe(true);
     });
   });
@@ -38,7 +38,7 @@ describe('AnswerIconSetting', () => {
   describe('fillAnswerIconSetting', () => {
     test('defaultValue should be true', () => {
       expect(fillAnswerIconSetting({})).toStrictEqual(
-        answerIconSettingDefaultValue
+        answerIconSettingDefaultValue,
       );
     });
   });

@@ -8,5 +8,5 @@ export const sendReportImpl = ({ error }: SendReportPayload): Promise<void> =>
       to: firebaseConfig.gmail['email-address-for-error-log'],
       subject: `エラー報告がありました。`,
       text: error.split('\\n').join('\n'),
-    })
+    }),
   );

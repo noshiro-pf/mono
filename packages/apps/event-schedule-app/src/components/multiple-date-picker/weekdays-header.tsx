@@ -25,7 +25,7 @@ export const WeekdaysHeader = memoNamed<Props>(
                   onClick(idx as DayOfWeekIndex);
                 },
         })),
-      [onClick]
+      [onClick],
     );
 
     return (
@@ -42,7 +42,7 @@ export const WeekdaysHeader = memoNamed<Props>(
         </DatePickerWeekdaysRowStyled>
       </DatePickerWeekdaysStyled>
     );
-  }
+  },
 );
 
 type PropsHeaderCell = Readonly<{
@@ -71,5 +71,5 @@ const HeaderCell = memoNamed<PropsHeaderCell>(
         </abbr>
       </DatePickerWeekdayResolved>
     );
-  }
+  },
 );

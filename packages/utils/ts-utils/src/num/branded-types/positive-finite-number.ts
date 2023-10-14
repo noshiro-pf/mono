@@ -24,32 +24,32 @@ const _max = (
 
 const pow = (
   x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber
+  y: PositiveFiniteNumber,
 ): PositiveFiniteNumber => clamp(x ** y);
 
 const add = (
   x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber
+  y: PositiveFiniteNumber,
 ): PositiveFiniteNumber => clamp(x + y);
 
 const sub = (
   x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber
+  y: PositiveFiniteNumber,
 ): PositiveFiniteNumber => clamp(x - y);
 
 const mul = (
   x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber
+  y: PositiveFiniteNumber,
 ): PositiveFiniteNumber => clamp(x * y);
 
 const div = (
   x: PositiveFiniteNumber,
-  y: PositiveFiniteNumber
+  y: PositiveFiniteNumber,
 ): PositiveFiniteNumber => clamp(x / y);
 
 const random = (
   min: PositiveFiniteNumber,
-  max: PositiveFiniteNumber
+  max: PositiveFiniteNumber,
 ): PositiveFiniteNumber =>
   add(min, to((Math.max(max, min) - min + 1) * Math.random()));
 

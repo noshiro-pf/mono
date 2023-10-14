@@ -16,7 +16,7 @@ export function fromJS(value, converter) {
     value,
     '',
     converter && converter.length > 2 ? [] : undefined,
-    { '': value }
+    { '': value },
   );
 }
 
@@ -36,9 +36,9 @@ function fromJSWith(stack, converter, value, key, keyPath, parentValue) {
       parentValue,
       key,
       toSeq(value).map((v, k) =>
-        fromJSWith(stack, converter, v, k, keyPath, value)
+        fromJSWith(stack, converter, v, k, keyPath, value),
       ),
-      keyPath && keyPath.slice()
+      keyPath && keyPath.slice(),
     );
     stack.pop();
     keyPath && keyPath.pop();

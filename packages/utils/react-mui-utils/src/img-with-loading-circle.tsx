@@ -20,12 +20,12 @@ export const ImgWithLoadingCircle = memoNamed<Props>(
     const imgStyle = useMemo<React.CSSProperties>(
       // dummy comment
       () => ({ opacity: loaded ? 1 : 0 }),
-      [loaded]
+      [loaded],
     );
 
     const loadingStyle = useMemo<React.CSSProperties>(
       () => ({ opacity: loaded ? 0 : 1 }),
-      [loaded]
+      [loaded],
     );
 
     return (
@@ -48,7 +48,7 @@ export const ImgWithLoadingCircle = memoNamed<Props>(
         </AbsoluteWrapper>
       </RelativeWrapper>
     );
-  }
+  },
 );
 
 const RelativeWrapper = styled.div`

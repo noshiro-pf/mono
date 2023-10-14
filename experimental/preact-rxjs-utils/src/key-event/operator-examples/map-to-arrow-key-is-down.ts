@@ -10,10 +10,10 @@ export const mapToArrowKey =
     ArrowKey
   > =>
   (
-    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>
+    keyEvents$: Observable<readonly ['down' | 'up', Readonly<KeyboardEvent>]>,
   ): Observable<ArrowKey> =>
     keyEvents$.pipe(
       filterKeyInList(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']),
       filter(([du]) => du === 'down'),
-      mapToKey()
+      mapToKey(),
     );

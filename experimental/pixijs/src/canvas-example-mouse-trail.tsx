@@ -102,7 +102,7 @@ function getTangent(k: number, factor: number, array: number[]): number {
 function cubicInterpolation(
   array: number[],
   t: number,
-  tangentFactor?: number
+  tangentFactor?: number,
 ): number {
   if (tangentFactor == null) tangentFactor = 1;
 

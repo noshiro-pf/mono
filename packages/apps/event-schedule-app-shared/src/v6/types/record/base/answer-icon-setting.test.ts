@@ -13,7 +13,7 @@ describe('isAnswerIconSetting', () => {
 describe('fillAnswerIconSetting', () => {
   test('defaultValue should be true', () => {
     expect(fillAnswerIconSetting({})).toStrictEqual(
-      answerIconSettingDefaultValue
+      answerIconSettingDefaultValue,
     );
   });
 });

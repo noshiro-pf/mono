@@ -35,7 +35,7 @@ export const ColoredDistribution = memoNamed<Props>(
         </div>
       ))}
     </div>
-  )
+  ),
 );
 
 const Bar = styled.div`

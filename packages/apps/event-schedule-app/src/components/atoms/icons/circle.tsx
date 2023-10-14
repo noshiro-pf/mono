@@ -20,5 +20,5 @@ export const CircleIcon = memoNamed<Props>(
         fill={color}
       />
     </svg>
-  )
+  ),
 );

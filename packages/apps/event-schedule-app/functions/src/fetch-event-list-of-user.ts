@@ -27,14 +27,14 @@ export const fetchEventListOfUserImpl = async (
     showOnlyEventSchedulesICreated,
   }: FetchEventListOfUserPayload,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  context: CallableContext
+  context: CallableContext,
 ): Promise<readonly EventListItem[]> => {
   // Checking that the user is authenticated.
   if (context.auth === undefined) {
     // Throwing an HttpsError so that the client gets the error details.
     throw new https.HttpsError(
       'failed-precondition',
-      'The function must be called while authenticated.'
+      'The function must be called while authenticated.',
     );
   }
 
@@ -42,7 +42,7 @@ export const fetchEventListOfUserImpl = async (
 
   const eventsSnapshot = await pipe(db.collection(firestorePaths.events))
     .chain((ref) =>
-      showOnlyEventSchedulesICreated ? ref.where('author.id', '==', uid) : ref
+      showOnlyEventSchedulesICreated ? ref.where('author.id', '==', uid) : ref,
     )
     .value.get();
 
@@ -80,7 +80,7 @@ export const fetchEventListOfUserImpl = async (
         const t = today();
         if (
           !eventSchedule.datetimeRangeList.some(
-            (datetimeRange) => compareYmd(datetimeRange.ymd, t) >= 0
+            (datetimeRange) => compareYmd(datetimeRange.ymd, t) >= 0,
           )
         ) {
           return false;
@@ -88,7 +88,7 @@ export const fetchEventListOfUserImpl = async (
       }
 
       return true;
-    })
+    }),
   ).value;
 
   const answersOfEvents: readonly Readonly<
@@ -100,7 +100,7 @@ export const fetchEventListOfUserImpl = async (
       Tpl.map(list, ({ eventScheduleMetadata: { id: eventId } }) =>
         db
           .collection(
-            `${firestorePaths.events}/${eventId}/${firestorePaths.answers}`
+            `${firestorePaths.events}/${eventId}/${firestorePaths.answers}`,
           )
           .get()
           .then((answersSnapshot) => ({
@@ -111,9 +111,9 @@ export const fetchEventListOfUserImpl = async (
                 .chain((ds) => Arr.maxBy(ds, (d) => d.updateTime.toMillis()))
                 .chain((d) => d?.updateTime.toDate().toISOString() ?? '').value,
             },
-          }))
-      )
-    ).value
+          })),
+      ),
+    ).value,
   );
 
   const answersOfEventMap = IMap.new<
@@ -121,8 +121,8 @@ export const fetchEventListOfUserImpl = async (
     Pick<EventListItem, 'answers' | 'answersMetadata'>
   >(
     answersOfEvents.map(({ answers, answersMetadata, eventId }) =>
-      tp(eventId, { answers, answersMetadata })
-    )
+      tp(eventId, { answers, answersMetadata }),
+    ),
   );
 
   const eventListItems: readonly EventListItem[] = eventListFiltered
@@ -145,6 +145,6 @@ export const fetchEventListOfUserImpl = async (
   return eventListItems.filter(
     ({ eventSchedule, answers }) =>
       eventSchedule.author.id === uid ||
-      answers.some(({ user }) => user.id === uid)
+      answers.some(({ user }) => user.id === uid),
   );
 };

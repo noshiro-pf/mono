@@ -28,7 +28,7 @@ describe('RecordUtils', () => {
       const result = RecordUtils.get(rcd, 'y');
 
       expectType<typeof result, DeepReadonly<{ c: { d: number; 4: number } }>>(
-        '='
+        '=',
       );
 
       test('case 2', () => {
@@ -71,7 +71,7 @@ describe('RecordUtils', () => {
       const result = RecordUtils.update(
         rcd,
         'x',
-        (curr) => ({ a: curr.a + 1, b: curr.b + 2 }) as const
+        (curr) => ({ a: curr.a + 1, b: curr.b + 2 }) as const,
       );
 
       expectType<typeof result, R0>('=');
@@ -199,7 +199,7 @@ describe('RecordUtils', () => {
       const result = RecordUtils.updateIn(
         rcd,
         ['y', 'c', 'd'] as const,
-        (curr) => curr + 1000
+        (curr) => curr + 1000,
       );
 
       expectType<typeof result, R0>('=');

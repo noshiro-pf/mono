@@ -7,7 +7,7 @@ import { isAbstraction, isApplication } from '../../is-lambda-term';
 import { isVariable } from '../../is-variable';
 
 export const isNumber = (
-  term: LambdaTerm
+  term: LambdaTerm,
 ): term is NumberTerm<Variable, Variable> => {
   // 2 = ['lambda', 's', ['lambda', 'z', ['s', ['s', 'z'] ] ] ]
   if (!isAbstraction(term)) return false;

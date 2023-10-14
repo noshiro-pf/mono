@@ -62,7 +62,7 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
       />
     ) : (
       <SubmitAnswerButton disabled={disabled} loading={loading} mode={mode} />
-    )
+    ),
 );
 
 const SubmitAnswerButton = memoNamed<Omit<Props, 'hasUnanswered'>>(
@@ -80,5 +80,5 @@ const SubmitAnswerButton = memoNamed<Omit<Props, 'hasUnanswered'>>(
       })}
       onClick={AnswerPageStore.onSubmitAnswerClick}
     />
-  )
+  ),
 );
