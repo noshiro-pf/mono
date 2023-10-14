@@ -5,10 +5,10 @@
 ```ts
 import {
     DateUtils,
+    Num,
     RecordUtils,
     isNumber,
     isRecord,
-    Num,
     pipe,
 } from '@noshiro/ts-utils';
 

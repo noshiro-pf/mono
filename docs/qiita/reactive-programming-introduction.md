@@ -353,8 +353,7 @@ npm install rxjs
 (2) 使用するソースコードでインポート（ES6 モジュールが使える場合）
 
 ```ts
-import { of } from 'rxjs';
-import { map } from 'rxjs/operators';
+
 ```
 
 あるいは以下のようにしてもよいです。
