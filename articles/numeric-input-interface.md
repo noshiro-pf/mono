@@ -1,8 +1,8 @@
 ---
-title: "numeric input の React コンポーネントのインターフェース考察"
-emoji: "🐈"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["typescript", "react", "frontend"]
+title: 'numeric input の React コンポーネントのインターフェース考察'
+emoji: '🐈'
+type: 'tech' # tech: 技術記事 / idea: アイデア
+topics: ['typescript', 'react', 'frontend']
 published: true
 ---
 
@@ -17,10 +17,10 @@ numeric input の設計を考える上で、まず React の controlled componen
 - controlled component（制御されたコンポーネント） ... form の状態を JavaScript の状態と同期させ管理する方法
 
   ```tsx
-  import * as React from "react";
+  import * as React from 'react';
 
   const InputControlled = () => {
-    const [str, setStr] = React.useState("");
+    const [str, setStr] = React.useState('');
 
     console.log({ str });
 
@@ -33,8 +33,8 @@ numeric input の設計を考える上で、まず React の controlled componen
 
     return (
       <div>
-        <div>{"controlled input"}</div>
-        <input type="text" value={str} onChange={onChange} />
+        <div>{'controlled input'}</div>
+        <input type='text' value={str} onChange={onChange} />
       </div>
     );
   };
@@ -43,7 +43,7 @@ numeric input の設計を考える上で、まず React の controlled componen
 - uncontrolled component（非制御コンポーネント） ... form の状態を DOM 自身が扱う
 
   ```tsx
-  import * as React from "react";
+  import * as React from 'react';
 
   const InputUnControlled = () => {
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -55,12 +55,12 @@ numeric input の設計を考える上で、まず React の controlled componen
     return (
       <div>
         <div>
-          <div>{"uncontrolled input"}</div>
-          <input type="text" ref={inputRef} defaultValue={""} />
+          <div>{'uncontrolled input'}</div>
+          <input type='text' ref={inputRef} defaultValue={''} />
         </div>
         <div>
-          <button type={"submit"} onClick={submit}>
-            {"Submit"}
+          <button type={'submit'} onClick={submit}>
+            {'Submit'}
           </button>
         </div>
       </div>
@@ -196,11 +196,11 @@ const FullyControlledNumericInput = (props: Props) => {
     [],
   );
 
-  return <input type="number" value={value} onChange={handleChange} />;
+  return <input type='number' value={value} onChange={handleChange} />;
 };
 
 const App = () => {
-  const [numStr, setNumStr] = React.useState("0");
+  const [numStr, setNumStr] = React.useState('0');
 
   const onChange = React.useCallback(
     (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,11 +220,11 @@ const App = () => {
 
   return (
     <div>
-      <div>{"controlled numeric input"}</div>
-      <input type="number" value={numStr} onChange={onChange} />
+      <div>{'controlled numeric input'}</div>
+      <input type='number' value={numStr} onChange={onChange} />
       <FullyControlledNumericInput value={numStr} onChange={onChange} />
-      <div>{"n + 1"}</div>
-      {num === undefined ? <div>{"error"}</div> : <div>{num + 1}</div>}
+      <div>{'n + 1'}</div>
+      {num === undefined ? <div>{'error'}</div> : <div>{num + 1}</div>}
     </div>
   );
 };
@@ -281,9 +281,9 @@ type Props = Readonly<{
 - App.tsx
 
   ```tsx
-  import { useState } from "react";
-  import { ScoreType } from "./score";
-  import { ScoreNumericInput } from "./score-input";
+  import { useState } from 'react';
+  import { ScoreType } from './score';
+  import { ScoreNumericInput } from './score-input';
 
   export const App = () => {
     const [score, onScoreChange] = useState<ScoreType>(0);
@@ -299,9 +299,9 @@ type Props = Readonly<{
 - score-input.tsx
 
   ```tsx
-  import { useNumericInputState } from "./numeric-input-state";
-  import { NumericInputView } from "./numeric-input-view";
-  import { ScoreType } from "./score";
+  import { useNumericInputState } from './numeric-input-state';
+  import { NumericInputView } from './numeric-input-view';
+  import { ScoreType } from './score';
 
   type Props = Readonly<{
     score: ScoreType;
@@ -340,7 +340,7 @@ type Props = Readonly<{
 - numeric-input-view.tsx
 
   ```tsx
-  import { useCallback } from "react";
+  import { useCallback } from 'react';
 
   type Props = Readonly<{
     value: string;
@@ -368,7 +368,7 @@ type Props = Readonly<{
         max={max}
         min={min}
         step={step}
-        type="number"
+        type='number'
         value={value}
         onBlur={onBlur}
         onChange={handleChange}
@@ -382,7 +382,7 @@ type Props = Readonly<{
   ```ts
   /* eslint-disable @typescript-eslint/no-namespace */
 
-  import { clampAndRound } from "./numeric-type-utils";
+  import { clampAndRound } from './numeric-type-utils';
 
   export type ScoreType =
     | 0
@@ -422,7 +422,7 @@ type Props = Readonly<{
 - numeric-input-state.ts
 
   ```ts
-  import { useCallback, useEffect, useState } from "react";
+  import { useCallback, useEffect, useState } from 'react';
 
   export const useNumericInputState = <T extends number>({
     decode,

@@ -1,8 +1,8 @@
 ---
-title: "TypeScript の Type Branding をより便利に活用する方法のまとめ"
-emoji: "🐈"
-type: "tech"
-topics: ["typescript", "brand"]
+title: 'TypeScript の Type Branding をより便利に活用する方法のまとめ'
+emoji: '🐈'
+type: 'tech'
+topics: ['typescript', 'brand']
 published: true
 ---
 
@@ -22,7 +22,7 @@ type Project = { id: ProjectId; name: string };
 
 declare function findProject(id: ProjectId): Promise<Project>;
 
-const userId: UserId = "user-1";
+const userId: UserId = 'user-1';
 
 // userId を使って findProject を呼んでいるがエラーにならない
 findProject(userId);
@@ -39,7 +39,7 @@ type Project = { id: ProjectId; name: string };
 
 declare function findProject(id: ProjectId): Promise<Project>;
 
-const userId: UserId = "user-1" as UserId;
+const userId: UserId = 'user-1' as UserId;
 
 // Argument of type 'UserId' is not assignable to parameter of type 'ProjectId'.
 findProject(userId);
@@ -62,7 +62,7 @@ type Int = number & { readonly Int: unique symbol };
 [ts-brand](https://github.com/kourge/ts-brand)
 
 ```ts
-type Int = number & { __type__: "Int" } & { __witness__: number };
+type Int = number & { __type__: 'Int' } & { __witness__: number };
 ```
 
 どちらの方法も型を区別するという要件は満たせますが、 tag object の key 部に型 ID を置く前者のやり方の方が、以下のように `&` で意味のある交差型を作ることができる点で便利そうです（後者の方法では `never` に潰れてしまいます）。
@@ -123,7 +123,7 @@ numberToString(12345, r);
 [zod](https://github.com/colinhacks/zod#brand) の使用例：
 
 ```ts
-import * as z from "zod";
+import * as z from 'zod';
 
 export const Int = z
   .number()
@@ -131,7 +131,7 @@ export const Int = z
     (a) => Number.isInteger(a),
     (a) => ({ message: `a non-integer number "${a}" was passed to "Int"` }),
   )
-  .brand("Int");
+  .brand('Int');
 
 export type Int = z.infer<typeof Int>;
 
@@ -143,15 +143,15 @@ export const toInt = (a: number): Int => Int.parse(a);
 [io-ts](https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements) の使用例：
 
 ```ts
-import * as E from "fp-ts/Either";
-import * as t from "io-ts";
+import * as E from 'fp-ts/Either';
+import * as t from 'io-ts';
 
 type IntBrand = { readonly Int: unique symbol };
 
 export const Int = t.brand(
   t.number,
   (a): a is t.Branded<number, IntBrand> => Number.isInteger(a),
-  "Int",
+  'Int',
 );
 
 export type Int = t.TypeOf<typeof Int>;
@@ -293,69 +293,69 @@ export type Brand<
 これを使うと以下のように書き直すことができます。
 
 ```ts
-type PositiveNumber = Brand<number, "NonNegative", "NaN" | "Zero">;
-type NegativeNumber = Brand<number, never, "NonNegative" | "NaN" | "Zero">;
+type PositiveNumber = Brand<number, 'NonNegative', 'NaN' | 'Zero'>;
+type NegativeNumber = Brand<number, never, 'NonNegative' | 'NaN' | 'Zero'>;
 ```
 
 第 3 引数のデフォルト値を `never` にしているので、冒頭の例のような `false` な key を使う必要の無い普通のケースは 2 引数で書けるようにもしています。
 
 ```ts
-type ProjectId = Brand<string, "ProjectId">; // string & { readonly ProjectId: true };
+type ProjectId = Brand<string, 'ProjectId'>; // string & { readonly ProjectId: true };
 ```
 
 これを使うと数値型を以下のように実装できます。
 
 ```ts
-import { type Brand } from "./brand";
+import { type Brand } from './brand';
 
-export type NaNType = Brand<number, "NaN", "Finite" | "NonNegative" | "Zero">;
+export type NaNType = Brand<number, 'NaN', 'Finite' | 'NonNegative' | 'Zero'>;
 
-export type FiniteNumber = Brand<number, "Finite", "NaN">;
+export type FiniteNumber = Brand<number, 'Finite', 'NaN'>;
 
-export type InfiniteNumber = Brand<number, never, "Finite" | "NaN" | "Zero">;
+export type InfiniteNumber = Brand<number, never, 'Finite' | 'NaN' | 'Zero'>;
 
 export type POSITIVE_INFINITY = Brand<
   number,
-  "NonNegative",
-  "Finite" | "NaN" | "Zero"
+  'NonNegative',
+  'Finite' | 'NaN' | 'Zero'
 >;
 
 export type NEGATIVE_INFINITY = Brand<
   number,
   never,
-  "Finite" | "NaN" | "NonNegative" | "Zero"
+  'Finite' | 'NaN' | 'NonNegative' | 'Zero'
 >;
 
-export type NonZeroNumber = Brand<number, never, "NaN" | "Zero">;
+export type NonZeroNumber = Brand<number, never, 'NaN' | 'Zero'>;
 
-export type NonNegativeNumber = Brand<number, "NonNegative", "NaN">;
+export type NonNegativeNumber = Brand<number, 'NonNegative', 'NaN'>;
 
-export type PositiveNumber = Brand<number, "NonNegative", "NaN" | "Zero">;
+export type PositiveNumber = Brand<number, 'NonNegative', 'NaN' | 'Zero'>;
 
 export type NegativeNumber = Brand<
   number,
   never,
-  "NaN" | "NonNegative" | "Zero"
+  'NaN' | 'NonNegative' | 'Zero'
 >;
 
-export type Int = Brand<number, "Finite" | "Int", "NaN">;
+export type Int = Brand<number, 'Finite' | 'Int', 'NaN'>;
 
-export type Uint = Brand<number, "Finite" | "Int" | "NonNegative", "NaN">;
+export type Uint = Brand<number, 'Finite' | 'Int' | 'NonNegative', 'NaN'>;
 
-export type NonZeroInt = Brand<number, "Finite" | "Int", "NaN" | "Zero">;
+export type NonZeroInt = Brand<number, 'Finite' | 'Int', 'NaN' | 'Zero'>;
 
-export type SafeInt = Brand<number, "Finite" | "Int" | "SafeInt", "NaN">;
+export type SafeInt = Brand<number, 'Finite' | 'Int' | 'SafeInt', 'NaN'>;
 
 export type SafeUint = Brand<
   number,
-  "NonNegative" | "Finite" | "Int" | "SafeInt",
-  "NaN"
+  'NonNegative' | 'Finite' | 'Int' | 'SafeInt',
+  'NaN'
 >;
 
 export type NonZeroSafeInt = Brand<
   number,
-  "Finite" | "Int" | "SafeInt",
-  "NaN" | "Zero"
+  'Finite' | 'Int' | 'SafeInt',
+  'NaN' | 'Zero'
 >;
 ```
 

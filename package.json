@@ -48,7 +48,7 @@
     "z:type-check:root:impl:scripts": "tsc --project scripts/tsconfig.json",
     "z:type-check:root:wireit": "wireit",
     "zz:cmd:check:no-diff": "scripts/git_no_changes.sh",
-    "zz:cmd:prettier": "prettier --config ./.prettierrc --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "zz:cmd:prettier": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write",
     "zz:cmd:prettier:cache": "yarn zz:cmd:prettier --cache --cache-strategy content",
     "zz:cmd:wsrun": "wsrun --exclude-missing --fast-exit --prefix --ifDependency",
     "zz:cmd:wsrun-parallel": "yarn zz:cmd:wsrun --parallel --concurrency 5",

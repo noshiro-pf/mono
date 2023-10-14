@@ -1,8 +1,8 @@
 ---
-title: "TypeScript で連番の配列に詳しい型を付ける"
-emoji: "🐈"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["typescript"]
+title: 'TypeScript で連番の配列に詳しい型を付ける'
+emoji: '🐈'
+type: 'tech' # tech: 技術記事 / idea: アイデア
+topics: ['typescript']
 published: false
 ---
 

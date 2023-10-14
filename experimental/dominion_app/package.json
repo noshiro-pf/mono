@@ -26,13 +26,6 @@
       "last 1 safari version"
     ]
   },
-  "prettier": {
-    "endOfLine": "lf",
-    "jsxSingleQuote": true,
-    "semi": false,
-    "singleQuote": true,
-    "useTabs": false
-  },
   "eslintConfig": {
     "extends": "react-app"
   },

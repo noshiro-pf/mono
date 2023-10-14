@@ -3,8 +3,9 @@
     "prettier-plugin-organize-imports",
     "prettier-plugin-packagejson"
   ],
-  "semi": true,
+  "semi": false,
   "endOfLine": "lf",
   "singleQuote": true,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "useTabs": false
 }
