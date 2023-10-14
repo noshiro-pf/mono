@@ -4503,10 +4503,10 @@
     p-map "^4.0.0"
     webpack-sources "^3.2.2"
 
-"@solid/eslint-config-base@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@solid/eslint-config-base/-/eslint-config-base-0.1.8.tgz#5fa2ff9299a7c7a4a6263f9d1125f87f04c25db3"
-  integrity sha512-aBKq05RTVxhBSlcUzg9xX/TebbQkgp4Jly6QaRAFxHgYoeaVUxcHmOZ5k7GGKqTLCoYfOIfI8JLtITG/5hM6Bw==
+"@solid/eslint-config-base@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@solid/eslint-config-base/-/eslint-config-base-0.6.0.tgz#44ab259721f09d11c3e34480064c7922b31afa63"
+  integrity sha512-9bRRTP7tlJI5wjeFFxiT79RRnJ1ploXfHmzzvHK4uk1c0+dkW+gUA1OC9TYtsLQhRDcpzoLUW1gXPgRBHl7WpQ==
 
 "@svgr/babel-plugin-add-jsx-attribute@^6.5.1":
   version "6.5.1"
